@@ -49,30 +49,45 @@ export function useClientStyleRegistry() {
   return { cache, flush };
 }
 
+import { ApolloClient, NormalizedCacheObject } from '@apollo/client';
+
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { cache } = useClientStyleRegistry();
   const [initialized, setInitialized] = useState(false);
   const [authenticated, setAuthenticated] = useState(false);
-  const [client, setClient] = useState<any>(null);
+  const [client, setClient] = useState<ApolloClient<NormalizedCacheObject> | null>(null);
 
+  // Verwenden Sie useEffect, um Keycloak nur auf dem Client zu initialisieren
   useEffect(() => {
+    // Erstelle eine Fallback-Client-Instanz für SSR
+    const defaultClient = createApolloClient();
+    setClient(defaultClient);
+
     const initAuth = async () => {
+      // Vermeidet Hydration-Probleme, indem Authentifizierung nur clientseitig ausgeführt wird
+      if (typeof window === 'undefined') {
+        setInitialized(true);
+        return;
+      }
+
       try {
+        // Keycloak nur auf dem Client initialisieren
         const authenticated = await initKeycloak();
         setAuthenticated(authenticated);
 
-        // Apollo-Client mit Token initialisieren
-        if (keycloak?.token) {
+        // Apollo-Client mit Token initialisieren, wenn keycloak und token vorhanden sind
+        if (keycloak && keycloak.token) {
           const apolloClient = createApolloClient(keycloak.token);
           setClient(apolloClient);
 
           // Token-Refresh-Handler
-          keycloak.onTokenExpired = () => {
-            keycloak
-              .updateToken(30)
+          // Wir verwenden eine lokale Variable für keycloak, um TypeScript-Fehler zu vermeiden
+          const kc = keycloak;
+          kc.onTokenExpired = () => {
+            kc.updateToken(30)
               .then(refreshed => {
-                if (refreshed && keycloak.token) {
-                  const newToken = keycloak.token;
+                if (refreshed && kc.token) {
+                  const newToken = kc.token;
                   const refreshedClient = createApolloClient(newToken);
                   setClient(refreshedClient);
                 }
@@ -81,16 +96,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 console.error('Failed to refresh token');
               });
           };
-        } else {
-          // Fallback für Client ohne Auth-Token
-          const apolloClient = createApolloClient();
-          setClient(apolloClient);
         }
       } catch (error) {
         console.error('Keycloak init error:', error);
-        // Fallback für Client bei Auth-Fehler
-        const apolloClient = createApolloClient();
-        setClient(apolloClient);
       } finally {
         setInitialized(true);
       }
@@ -101,7 +109,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   // Render-Funktion
   const renderContent = () => {
-    if (!initialized) {
+    // Zeige Spinner nur, wenn wir auf dem Client sind und noch initialisieren
+    if (typeof window !== 'undefined' && !initialized) {
       return (
         <Box
           sx={{
@@ -117,13 +126,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       );
     }
 
-    if (!client) {
-      return null;
-    }
+    // Stelle sicher, dass wir immer einen Apollo-Client verwenden, auch wenn Authentifizierung fehlschlägt
+    const apolloClient = client || createApolloClient();
 
     return (
       <AuthContext.Provider value={{ keycloak, initialized, authenticated }}>
-        <ApolloProvider client={client}>
+        <ApolloProvider client={apolloClient}>
           <RootLayout>{children}</RootLayout>
         </ApolloProvider>
       </AuthContext.Provider>

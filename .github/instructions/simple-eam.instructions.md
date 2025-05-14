@@ -30,6 +30,12 @@ Alle Komponenten werden in separaten Docker-Containern bereitgestellt.
 - **Excalidraw**: Für visuelle Diagramme und Zeichnungen
 - **Tanstack Table**: Für fortschrittliche Tabellenfunktionen ([Migrationsleitfaden](https://tanstack.com/table/latest/docs/guide/migrating))
 - **Tanstack Form**: Für einfache und leistungsstarke Formularerstellung
+  - **Philosophie**: Vollständige Typ-Inferenz ohne explizite Generics, kontrollierte Eingabefelder
+  - **Flexible Validierung**: Unterstützt synchrone und asynchrone Validierung mit anpassbaren Zeitpunkten (onChange, onBlur, onSubmit)
+  - **Framework-agnostisch**: Unterstützt React, Vue, Angular, Solid, Svelte und Lit
+  - **Render Props API**: Verwendet Render Props für maximale Flexibilität und Typ-Sicherheit
+  - **Reaktive Datenbindung**: Automatische Aktualisierung des Formularzustands
+  - **Integrierbar**: Einfach in eigene Komponentensysteme integrierbar
 - **Internationalisierungs-Bibliothek**: next-intl für mehrsprachigen Support
 - **Excel-Bibliothek**: SheetJS (xlsx) für Import und Export von Excel-Dateien
 
@@ -143,34 +149,3 @@ simple-eam/
   - Weitere Typen in `/components/<feature>/types.ts` definieren
   - Hilfsfunktionen in `/components/<feature>/utils.ts` auslagern
   - Filter-Logik in Custom Hooks (`use<Feature>Filter.ts`) auslagern
-
-## Weiterführende Anweisungen
-
-Für detaillierte Anweisungen und Dokumentation zu bestimmten Komponenten sind folgende Dateien verfügbar:
-
-1. **Produktanforderungen**: `docs/product_requirements.md`
-2. **Server-Komponente Dokumentation**: `server/README.md`
-3. **Client-Anwendung Dokumentation**: `client/README.md`
-4. **Datenbank-Dokumentation**: `db/README.md`
-
-### Wie man Links zu weiteren Dokumenten hinzufügt:
-
-1. Erstellen Sie die Dokumentationsdateien in den entsprechenden Verzeichnissen
-2. Verwenden Sie relative Markdown-Links wie folgt:
-   ```markdown
-   [Linktext](../../pfad/zur/datei.md)
-   ```
-3. Für detailliertere Anweisungen können Sie auch tiefergehende Strukturen erstellen:
-   ```
-   docs/
-    ├── product_requirements.md
-    ├── server/
-    │   ├── setup.md
-    │   └── api.md
-    ├── client/
-    │   ├── components.md
-    │   └── pages.md
-    └── database/
-        ├── schema.md
-        └── sample_data.md
-   ```

@@ -88,6 +88,7 @@ services:
       - --import-realm
     volumes:
       - ./auth/src:/opt/keycloak/data/import
+      - ./auth/themes:/opt/keycloak/themes
     depends_on:
       - keycloak-db
     networks:

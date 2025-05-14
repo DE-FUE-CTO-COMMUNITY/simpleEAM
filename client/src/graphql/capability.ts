@@ -58,7 +58,7 @@ export const GET_CAPABILITY = gql`
 `;
 
 export const CREATE_CAPABILITY = gql`
-  mutation CreateCapability($input: BusinessCapabilityCreateInput!) {
+  mutation CreateCapability($input: [BusinessCapabilityCreateInput!]!) {
     createBusinessCapabilities(input: $input) {
       businessCapabilities {
         id

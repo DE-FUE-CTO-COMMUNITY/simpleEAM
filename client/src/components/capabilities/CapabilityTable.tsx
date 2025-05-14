@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Box, Tooltip, IconButton, CircularProgress, Button, useTheme, Chip } from '@mui/material';
 import {
   Edit as EditIcon,
@@ -10,7 +10,8 @@ import {
 } from '@mui/icons-material';
 import { Capability } from './types';
 import { formatDate, getLevelLabel } from './utils';
-import { CapabilityStatus } from '../../gql/generated';
+import { BusinessCapability, CapabilityStatus } from '../../gql/generated';
+import CapabilityForm, { CapabilityFormValues } from './CapabilityForm';
 import {
   createColumnHelper,
   flexRender,
@@ -24,6 +25,7 @@ import {
 import { isArchitect } from '@/lib/auth';
 
 interface CapabilityTableProps {
+  id?: string;
   capabilities: Capability[];
   loading: boolean;
   globalFilter: string;
@@ -31,9 +33,13 @@ interface CapabilityTableProps {
   onSortingChange: (sorting: SortingState) => void;
   onRowClick: (id: string) => void;
   onEditClick: (id: string) => void;
+  onCreateCapability?: (data: CapabilityFormValues) => Promise<void>;
+  onUpdateCapability?: (id: string, data: CapabilityFormValues) => Promise<void>;
+  availableTags?: string[];
 }
 
 const CapabilityTable: React.FC<CapabilityTableProps> = ({
+  id: _id, // Markiere als unbenutzt
   capabilities,
   loading,
   globalFilter,
@@ -41,9 +47,67 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
   onSortingChange,
   onRowClick,
   onEditClick,
+  onCreateCapability,
+  onUpdateCapability,
+  availableTags = [],
 }) => {
+  // State für das Formular-Dialog
+  const [formMode, setFormMode] = useState<'create' | 'edit' | 'view'>('view');
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [selectedCapability, setSelectedCapability] = useState<BusinessCapability | null>(null);
+  const [formLoading, setFormLoading] = useState(false);
   const theme = useTheme();
   const columnHelper = createColumnHelper<Capability>();
+
+  // Handler für Formular-Operationen
+  // Handler für das Öffnen des Formulars zur Detailansicht
+  const handleViewCapabilityClick = (id: string) => {
+    const capability = capabilities.find(cap => cap.id === id);
+    if (capability) {
+      setSelectedCapability(capability as unknown as BusinessCapability);
+      setFormMode('view');
+      setIsFormOpen(true);
+    } else {
+      onRowClick(id);
+    }
+  };
+
+  // Handler für das Öffnen des Formulars zum Bearbeiten
+  const handleEditCapabilityClick = (id: string) => {
+    const capability = capabilities.find(cap => cap.id === id);
+    if (capability) {
+      setSelectedCapability(capability as unknown as BusinessCapability);
+      setFormMode('edit');
+      setIsFormOpen(true);
+    } else {
+      onEditClick(id);
+    }
+  };
+
+  // Handler für das Erstellen einer neuen Capability (nicht mehr verwendet)
+  // Diese Funktion wird jetzt über die Hauptseite (page.tsx) gesteuert
+
+  // Handler für das Schließen des Formulars
+  const handleFormClose = () => {
+    setIsFormOpen(false);
+  };
+
+  // Handler für das Speichern des Formulars
+  const handleFormSubmit = async (data: CapabilityFormValues) => {
+    setFormLoading(true);
+    try {
+      if (formMode === 'create' && onCreateCapability) {
+        await onCreateCapability(data);
+      } else if (formMode === 'edit' && onUpdateCapability && selectedCapability) {
+        await onUpdateCapability(selectedCapability.id, data);
+      }
+      setIsFormOpen(false);
+    } catch (error) {
+      console.error('Fehler beim Speichern der Capability:', error);
+    } finally {
+      setFormLoading(false);
+    }
+  };
 
   const columns = [
     columnHelper.accessor('name', {
@@ -121,9 +185,10 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
 
         return (
           <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+            {' '}
             <Tooltip title="Details anzeigen">
               <IconButton
-                onClick={() => onRowClick(capability.id)}
+                onClick={() => handleViewCapabilityClick(capability.id)}
                 color="primary"
                 size="small"
                 sx={{ mx: 0.5 }}
@@ -136,7 +201,7 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
                 <IconButton
                   onClick={e => {
                     e.stopPropagation();
-                    onEditClick(capability.id);
+                    handleEditCapabilityClick(capability.id);
                   }}
                   color="secondary"
                   size="small"
@@ -182,6 +247,21 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
 
   return (
     <>
+      {/* Versteckter Button zum Öffnen des Erstellungsformulars */}
+      {isArchitect() && onCreateCapability && (
+        <Button
+          id="create-capability-button"
+          style={{ display: 'none' }}
+          onClick={() => {
+            setSelectedCapability(null);
+            setFormMode('create');
+            setIsFormOpen(true);
+          }}
+        >
+          Neu erstellen
+        </Button>
+      )}
+
       <Box sx={{ overflow: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
@@ -414,6 +494,18 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
           </Button>
         </Box>
       </Box>
+
+      {/* Capability-Formular Dialog */}
+      <CapabilityForm
+        capability={selectedCapability}
+        availableCapabilities={capabilities as unknown as BusinessCapability[]}
+        availableTags={availableTags}
+        isOpen={isFormOpen}
+        onClose={handleFormClose}
+        onSubmit={handleFormSubmit}
+        mode={formMode}
+        loading={formLoading}
+      />
     </>
   );
 };

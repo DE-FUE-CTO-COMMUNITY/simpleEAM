@@ -4,11 +4,12 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, Typography, Button, Card, Paper } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
-import { useQuery } from '@apollo/client';
+import { useQuery, useMutation } from '@apollo/client';
 import { useSnackbar } from 'notistack';
 import { useAuth, login, isArchitect } from '@/lib/auth';
-import { GET_CAPABILITIES } from '@/graphql/capability';
-import { CapabilityStatus } from '@/gql/generated';
+import { GET_CAPABILITIES, CREATE_CAPABILITY, UPDATE_CAPABILITY } from '@/graphql/capability';
+import { CapabilityStatus, BusinessCapability } from '@/gql/generated';
+import CapabilityForm, { CapabilityFormValues } from '@/components/capabilities/CapabilityForm';
 
 // Importiere die ausgelagerten Komponenten
 import CapabilityTable from '@/components/capabilities/CapabilityTable';
@@ -41,6 +42,9 @@ const CapabilitiesPage = () => {
   const [availableStatuses, setAvailableStatuses] = useState<CapabilityStatus[]>([]);
   const [availableTags, setAvailableTags] = useState<string[]>([]);
 
+  // State für das neue Capability-Formular
+  const [showNewCapabilityForm, setShowNewCapabilityForm] = useState(false);
+
   // Weiterleitung zum Login, falls nicht authentifiziert
   useEffect(() => {
     if (authenticated === false) {
@@ -49,7 +53,7 @@ const CapabilitiesPage = () => {
   }, [authenticated]);
 
   // Business Capabilities laden
-  const { loading, error, data } = useQuery(GET_CAPABILITIES, {
+  const { loading, error, data, refetch } = useQuery(GET_CAPABILITIES, {
     skip: !authenticated,
     fetchPolicy: 'cache-and-network',
   });
@@ -92,9 +96,79 @@ const CapabilitiesPage = () => {
   // Filter auf Capabilities anwenden
   const filteredData = useCapabilityFilter({ capabilities, filterState });
 
+  // Mutation zum Erstellen einer neuen Capability
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [createCapability, { loading: isCreating }] = useMutation(CREATE_CAPABILITY, {
+    onCompleted: () => {
+      enqueueSnackbar('Business Capability erfolgreich erstellt', { variant: 'success' });
+      refetch();
+    },
+    onError: error => {
+      enqueueSnackbar(`Fehler beim Erstellen der Business Capability: ${error.message}`, {
+        variant: 'error',
+      });
+    },
+  });
+
+  // Mutation zum Aktualisieren einer bestehenden Capability
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [updateCapability, { loading: isUpdating }] = useMutation(UPDATE_CAPABILITY, {
+    onCompleted: () => {
+      enqueueSnackbar('Business Capability erfolgreich aktualisiert', { variant: 'success' });
+      refetch();
+    },
+    onError: error => {
+      enqueueSnackbar(`Fehler beim Aktualisieren der Business Capability: ${error.message}`, {
+        variant: 'error',
+      });
+    },
+  });
+
+  // Handler für das Erstellen einer neuen Business Capability
+  const handleCreateCapabilitySubmit = async (data: CapabilityFormValues) => {
+    const { parentId: parent, ...capabilityData } = data;
+    const input = {
+      ...capabilityData,
+      ...(parent
+        ? {
+            children: [
+              {
+                connect: { where: { node: { id: parent } } },
+              },
+            ],
+          }
+        : {}),
+    };
+
+    await createCapability({
+      variables: { input: [input] },
+    });
+
+    // Formular nach dem Erstellen schließen
+    setShowNewCapabilityForm(false);
+  };
+
+  // Handler für das Aktualisieren einer bestehenden Business Capability
+  const handleUpdateCapabilitySubmit = async (id: string, data: CapabilityFormValues) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { parentId, ...capabilityData } = data;
+    // Hier könnten wir auch die Parent-Child-Beziehung mit dem 'parentId'-Wert aktualisieren,
+    // was komplex sein kann, da wir die aktuelle Beziehung prüfen müssten.
+    // Für diese Implementierung beschränken wir uns auf die direkten Capability-Daten.
+    const input = {
+      ...capabilityData,
+    };
+
+    await updateCapability({
+      variables: { id, input },
+    });
+  };
+
   // Neue Business Capability erstellen
   const handleCreateCapability = () => {
-    router.push('/capabilities/create');
+    // Hier fügen wir direkt die Logik für das Erstellen einer neuen Capability ein,
+    // anstatt einen versteckten Button zu verwenden
+    setShowNewCapabilityForm(true);
   };
 
   // Business Capability Details anzeigen
@@ -155,6 +229,7 @@ const CapabilitiesPage = () => {
 
         <Paper sx={{ overflow: 'hidden' }}>
           <CapabilityTable
+            id="capability-table"
             capabilities={filteredData}
             loading={loading}
             globalFilter={globalFilter}
@@ -162,6 +237,9 @@ const CapabilitiesPage = () => {
             onSortingChange={setSorting}
             onRowClick={handleViewCapability}
             onEditClick={handleEditCapability}
+            onCreateCapability={handleCreateCapabilitySubmit}
+            onUpdateCapability={handleUpdateCapabilitySubmit}
+            availableTags={availableTags}
           />
         </Paper>
       </Card>
@@ -178,6 +256,18 @@ const CapabilitiesPage = () => {
             setActiveFiltersCount(count);
             setFilterOpen(false);
           }}
+        />
+      )}
+
+      {/* Formular für neue Capability */}
+      {showNewCapabilityForm && (
+        <CapabilityForm
+          isOpen={showNewCapabilityForm}
+          onClose={() => setShowNewCapabilityForm(false)}
+          onSubmit={handleCreateCapabilitySubmit}
+          mode="create"
+          availableCapabilities={capabilities as unknown as BusinessCapability[]}
+          availableTags={availableTags}
         />
       )}
     </Box>
