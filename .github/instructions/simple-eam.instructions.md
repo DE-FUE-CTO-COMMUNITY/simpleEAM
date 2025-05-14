@@ -1,3 +1,7 @@
+---
+applyTo: '**'
+---
+
 # Simple-EAM (Enterprise Architecture Management)
 
 ## Projektübersicht
@@ -21,10 +25,10 @@ Alle Komponenten werden in separaten Docker-Containern bereitgestellt.
 
 ### Frontend
 
-- **Next.js 15**: React-Framework für serverseitiges Rendering und optimierte Client-Anwendungen
-- **Material UI 7**: UI-Komponentenbibliothek für ein konsistentes und ansprechendes Design
+- **Next.js 15**: React-Framework für serverseitiges Rendering und optimierte Client-Anwendungen ([Dokumentation](https://nextjs.org/docs/app/guides/upgrading/version-15))
+- **Material UI 7**: UI-Komponentenbibliothek für ein konsistentes und ansprechendes Design ([Integration mit Next.js](https://mui.com/material-ui/integrations/nextjs/))
 - **Excalidraw**: Für visuelle Diagramme und Zeichnungen
-- **Tanstack Table**: Für fortschrittliche Tabellenfunktionen
+- **Tanstack Table**: Für fortschrittliche Tabellenfunktionen ([Migrationsleitfaden](https://tanstack.com/table/latest/docs/guide/migrating))
 - **Tanstack Form**: Für einfache und leistungsstarke Formularerstellung
 - **Internationalisierungs-Bibliothek**: next-intl für mehrsprachigen Support
 - **Excel-Bibliothek**: SheetJS (xlsx) für Import und Export von Excel-Dateien
@@ -51,6 +55,8 @@ Alle Komponenten werden in separaten Docker-Containern bereitgestellt.
 
 ### Next.js 15
 
+> [Offizielle Dokumentation: Upgrading auf Next.js 15](https://nextjs.org/docs/app/guides/upgrading/version-15)
+
 - App Router für Routing und Layout-Verwaltung verwenden
 - Server Components wo immer möglich einsetzen
 - Optimale Image-Optimierung mit next/image
@@ -60,12 +66,48 @@ Alle Komponenten werden in separaten Docker-Containern bereitgestellt.
 
 ### Material UI 7
 
+> [Offizielle Dokumentation: Material UI mit Next.js](https://mui.com/material-ui/integrations/nextjs/)
+
 - Theme-Provider für konsistentes Styling verwenden
 - System-API für responsives Design nutzen
 - Custom Theme-Erweiterungen für Projektspezifische Design-Tokens
 - Stack und Grid für Layout-Aufbau bevorzugen
 - React Server Components Patterns für MUI-Komponenten anwenden
 - Barrierefreiheit nach WCAG-Standards gewährleisten
+
+#### Integration mit Next.js 15
+
+Bei der Integration von Material UI 7 mit Next.js 15 sind folgende Punkte zu beachten:
+
+1. **Server Components Support**: Material UI 7 unterstützt React Server Components. Nutzen Sie die entsprechenden Imports:
+
+   ```tsx
+   // Server Component
+   import { Button } from '@mui/material/server';
+
+   // Client Component
+   ('use client');
+   import { Button } from '@mui/material';
+   ```
+
+2. **Styling Setup**: Für die korrekte Styling-Hydration mit Next.js 15:
+
+   ```tsx
+   // app/layout.tsx
+   import { ThemeRegistry } from '@/theme/ThemeRegistry';
+
+   export default function RootLayout({ children }) {
+     return (
+       <html lang="de">
+         <body>
+           <ThemeRegistry>{children}</ThemeRegistry>
+         </body>
+       </html>
+     );
+   }
+   ```
+
+3. **CSS Injection Order**: Die korrekte CSS-Injektionsreihenfolge sicherstellen, um Styling-Konflikte zu vermeiden
 
 ### Paketmanager
 
@@ -95,3 +137,40 @@ simple-eam/
 - Feature-basierte Organisation innerhalb der Komponentenverzeichnisse
 - Tests parallel zur Implementierung in **tests**-Ordnern
 - Konsistente Namenskonventionen: camelCase für Variablen und Funktionen, PascalCase für Komponenten und Klassen
+- Bevorzugt generierte GraphQL-Typen aus `src/gql/generated.ts` verwenden, anstatt eigene Typen zu definieren
+- `page.tsx`-Dateien möglichst klein halten und Logik in Komponenten auslagern (wie bei der Capability-Seite implementiert)
+  - UI-Komponenten in `/components/<feature>/` auslagern
+  - Typen in `/components/<feature>/types.ts` definieren
+  - Hilfsfunktionen in `/components/<feature>/utils.ts` auslagern
+  - Filter-Logik in Custom Hooks (`use<Feature>Filter.ts`) auslagern
+
+## Weiterführende Anweisungen
+
+Für detaillierte Anweisungen und Dokumentation zu bestimmten Komponenten sind folgende Dateien verfügbar:
+
+1. **Produktanforderungen**: `docs/product_requirements.md`
+2. **Server-Komponente Dokumentation**: `server/README.md`
+3. **Client-Anwendung Dokumentation**: `client/README.md`
+4. **Datenbank-Dokumentation**: `db/README.md`
+
+### Wie man Links zu weiteren Dokumenten hinzufügt:
+
+1. Erstellen Sie die Dokumentationsdateien in den entsprechenden Verzeichnissen
+2. Verwenden Sie relative Markdown-Links wie folgt:
+   ```markdown
+   [Linktext](../../pfad/zur/datei.md)
+   ```
+3. Für detailliertere Anweisungen können Sie auch tiefergehende Strukturen erstellen:
+   ```
+   docs/
+    ├── product_requirements.md
+    ├── server/
+    │   ├── setup.md
+    │   └── api.md
+    ├── client/
+    │   ├── components.md
+    │   └── pages.md
+    └── database/
+        ├── schema.md
+        └── sample_data.md
+   ```

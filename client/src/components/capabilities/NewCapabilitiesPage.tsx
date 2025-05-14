@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Box, Typography, Button, Card, Paper } from '@mui/material';
+import { Box, Typography, Button, Card, Paper, useTheme } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
 import { useQuery } from '@apollo/client';
 import { useSnackbar } from 'notistack';
@@ -19,6 +19,7 @@ import { Capability, FilterState } from '@/components/capabilities/types';
 const CapabilitiesPage = () => {
   const { authenticated } = useAuth();
   const router = useRouter();
+  const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
   const [globalFilter, setGlobalFilter] = useState<string>('');
   const [sorting, setSorting] = useState([{ id: 'name', desc: false }]);
