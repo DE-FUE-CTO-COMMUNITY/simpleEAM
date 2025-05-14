@@ -1,36 +1,85 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Simple-EAM: Enterprise Architecture Management
 
-## Getting Started
+Ein skalierbares Enterprise Architecture Management System, das aus mehreren Docker-Containern besteht und moderne Webtechnologien nutzt.
 
-First, run the development server:
+## Projektübersicht
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+Dieses Mono-Repository enthält alle Komponenten des Simple-EAM Systems:
+
+- **Neo4j-Datenbank**: Graphdatenbank für die Speicherung des Enterprise Architecture Models
+- **GraphQL-Server**: API-Schicht für effiziente Datenkommunikation
+- **Keycloak**: Identitäts- und Zugriffsverwaltung
+- **Next.js-Frontend**: Moderne, responsive Benutzeroberfläche
+
+## Projektstruktur
+
+```
+simple-eam/
+├── auth/                   # Keycloak-Konfiguration
+│   └── src/                # Keycloak-Anpassungen
+├── client/                 # Next.js-Frontend
+│   └── src/
+│       ├── app/            # Next.js App Router
+│       └── components/     # React-Komponenten
+├── db/                     # Neo4j-Datenbank
+│   └── src/                # Datenbankskripte, Seed-Dateien
+├── server/                 # GraphQL-Server
+│   └── src/                # Server-Quellcode
+└── docker-compose.yml      # Docker-Konfiguration für alle Services
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Technologie-Stack
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+- **Frontend**: Next.js 15, Material UI 7, Excalidraw, TanStack Table/Form, Internationalisierung
+- **Backend**: GraphQL, Neo4j, Keycloak
+- **Infrastruktur**: Docker, Docker Compose
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Erste Schritte
 
-## Learn More
+### Voraussetzungen
 
-To learn more about Next.js, take a look at the following resources:
+- Docker und Docker Compose installiert
+- Node.js (empfohlene Version: 20.x oder höher)
+- Git
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Installation
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Repository klonen:
+   ```bash
+   git clone https://your-repository-url/simple-eam.git
+   cd simple-eam
+   ```
 
-## Deploy on Vercel
+2. System starten:
+   ```bash
+   docker-compose up -d
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+3. Auf die verschiedenen Komponenten zugreifen:
+   - Frontend: http://localhost:3000
+   - GraphQL-Server: http://localhost:4000/graphql
+   - Neo4j-Browser: http://localhost:7474
+   - Keycloak-Admin: http://localhost:8080
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Entwicklung
+
+Jede Komponente kann unabhängig entwickelt werden:
+
+- **Client**: Im `client`-Verzeichnis arbeiten
+- **Server**: Im `server`-Verzeichnis arbeiten
+- **Datenbank**: Skripte im `db/src`-Verzeichnis pflegen
+- **Auth**: Keycloak-Konfigurationen im `auth/src`-Verzeichnis anpassen
+
+## Branching-Strategie
+
+Wir empfehlen die folgende Branching-Strategie für dieses Mono-Repository:
+
+- `main` - Produktionscode
+- `develop` - Entwicklungszweig
+- `feature/*` - Neue Features
+- `bugfix/*` - Fehlerbehebungen
+- `release/*` - Release-Kandidaten
+
+## Lizenz
+
+[MIT Lizenz](LICENSE)

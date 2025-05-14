@@ -1,21 +1,39 @@
 {
   "name": "simple-eam",
-  "version": "0.1.0",
+  "version": "1.0.0",
+  "description": "Enterprise Architecture Management System mit Neo4j, GraphQL, Keycloak und Next.js",
   "private": true,
+  "workspaces": [
+    "client",
+    "server"
+  ],
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "start": "docker-compose up -d",
+    "stop": "docker-compose down",
+    "dev": "docker-compose up",
+    "client": "cd client && npm run dev",
+    "server": "cd server && npm run dev",
+    "build:all": "npm run build:client && npm run build:server",
+    "build:client": "cd client && npm run build",
+    "build:server": "cd server && npm run build",
+    "lint": "npm run lint:client && npm run lint:server",
+    "lint:client": "cd client && npm run lint",
+    "lint:server": "cd server && npm run lint",
+    "test": "npm run test:client && npm run test:server",
+    "test:client": "cd client && npm run test",
+    "test:server": "cd server && npm run test"
   },
-  "dependencies": {
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "next": "15.3.2"
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.x",
+    "npm": ">=10.x"
   },
   "devDependencies": {
-    "eslint": "^9",
-    "eslint-config-next": "15.3.2",
-    "@eslint/eslintrc": "^3"
+    "@typescript-eslint/eslint-plugin": "^6.19.0",
+    "@typescript-eslint/parser": "^6.19.0",
+    "eslint": "^8.56.0",
+    "prettier": "^3.1.1",
+    "typescript": "^5.3.3"
   }
 }

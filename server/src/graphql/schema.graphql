@@ -1,0 +1,123 @@
+"""
+Business Capability - repräsentiert eine Geschäftsfähigkeit im Enterprise Architecture Management
+"""
+type BusinessCapability @node {
+  id: ID! @id
+  name: String!
+  description: String
+  owner: String
+  maturityLevel: Int
+  status: CapabilityStatus!
+  businessValue: Int
+  tags: [String!]
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime @timestamp(operations: [UPDATE])
+  children: [BusinessCapability!]! @relationship(type: "HAS_PARENT", direction: IN)
+  supportedByApplications: [Application!]! @relationship(type: "SUPPORTS", direction: IN)
+  relatedDataObjects: [DataObject!]! @relationship(type: "RELATED_TO", direction: OUT)
+}
+
+"""
+Application - repräsentiert eine Business-Applikation im Enterprise Architecture Management
+"""
+type Application @node {
+  id: ID! @id
+  name: String!
+  description: String
+  owner: String
+  status: ApplicationStatus!
+  criticality: CriticalityLevel!
+  technologyStack: [String!]
+  version: String
+  hostingEnvironment: String
+  vendor: String
+  costs: Float
+  introductionDate: Date
+  endOfLifeDate: Date
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime @timestamp(operations: [UPDATE])
+  supportsCapabilities: [BusinessCapability!]! @relationship(type: "SUPPORTS", direction: OUT)
+  usesDataObjects: [DataObject!]! @relationship(type: "USES", direction: OUT)
+  interfacesToApplications: [ApplicationInterface!]!
+    @relationship(type: "HAS_INTERFACE", direction: OUT)
+}
+
+"""
+ApplicationInterface - repräsentiert eine Schnittstelle zwischen Applikationen
+"""
+type ApplicationInterface @node {
+  id: ID! @id
+  name: String!
+  description: String
+  interfaceType: InterfaceType!
+  dataObjects: [DataObject!]! @relationship(type: "TRANSFERS", direction: OUT)
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime @timestamp(operations: [UPDATE])
+}
+
+"""
+DataObject - repräsentiert ein Business-Datenobjekt im Enterprise Architecture Management
+"""
+type DataObject @node {
+  id: ID! @id
+  name: String!
+  description: String
+  owner: String
+  classification: DataClassification!
+  source: String
+  format: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime @timestamp(operations: [UPDATE])
+  usedByApplications: [Application!]! @relationship(type: "USES", direction: IN)
+  relatedToCapabilities: [BusinessCapability!]! @relationship(type: "RELATED_TO", direction: IN)
+  transferredInInterfaces: [ApplicationInterface!]! @relationship(type: "TRANSFERS", direction: IN)
+}
+
+"""
+Mögliche Status-Werte für eine Business Capability
+"""
+enum CapabilityStatus {
+  ACTIVE
+  PLANNED
+  RETIRED
+}
+
+"""
+Mögliche Status-Werte für eine Applikation
+"""
+enum ApplicationStatus {
+  ACTIVE
+  IN_DEVELOPMENT
+  RETIRED
+}
+
+"""
+Kritikalitätsstufen für Applikationen
+"""
+enum CriticalityLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+"""
+Datenklassifikation für Business-Datenobjekte
+"""
+enum DataClassification {
+  PUBLIC
+  INTERNAL
+  CONFIDENTIAL
+  STRICTLY_CONFIDENTIAL
+}
+
+"""
+Schnittstellentypen für Applikationsschnittstellen
+"""
+enum InterfaceType {
+  API
+  FILE
+  DATABASE
+  MESSAGE_QUEUE
+  OTHER
+}
