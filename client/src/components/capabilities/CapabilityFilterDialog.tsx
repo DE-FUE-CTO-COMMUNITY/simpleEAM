@@ -22,6 +22,7 @@ import {
 import { ClearAll as ClearAllIcon } from '@mui/icons-material';
 import { FilterProps } from './types';
 import { getLevelLabel, countActiveFilters } from './utils';
+import { CapabilityStatus } from '../../gql/generated';
 
 const CapabilityFilterDialog: React.FC<FilterProps> = ({
   filterState,
@@ -67,8 +68,14 @@ const CapabilityFilterDialog: React.FC<FilterProps> = ({
               value={statusFilter}
               onChange={e => {
                 const value = e.target.value;
+                // Stellen Sie sicher, dass die Werte als CapabilityStatus-Enum behandelt werden
+                const statusValues =
+                  typeof value === 'string'
+                    ? (value.split(',') as CapabilityStatus[])
+                    : (value as CapabilityStatus[]);
+
                 onFilterChange({
-                  statusFilter: typeof value === 'string' ? value.split(',') : value,
+                  statusFilter: statusValues,
                 });
               }}
               input={<OutlinedInput label="Status" />}

@@ -13,7 +13,11 @@ export const formatDate = (dateString: string): string => {
 };
 
 // Liefert den Label für den Reifegrad
-export const getLevelLabel = (level: number): string => {
+export const getLevelLabel = (level: number | null | undefined): string => {
+  if (level === null || level === undefined) {
+    return 'Nicht definiert';
+  }
+
   switch (level) {
     case 0:
       return 'Niedrig';

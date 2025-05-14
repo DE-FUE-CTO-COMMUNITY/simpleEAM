@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import { Capability, FilterState } from './types';
+import { CapabilityStatus } from '../../gql/generated';
 
 interface UseCapabilityFilterProps {
   capabilities: Capability[];
@@ -23,23 +24,26 @@ export const useCapabilityFilter = ({ capabilities, filterState }: UseCapability
   const filteredData = useMemo(() => {
     return capabilities.filter((capability: Capability) => {
       // Status Filter
-      if (statusFilter.length > 0 && !statusFilter.includes(capability.status)) {
+      if (
+        statusFilter.length > 0 &&
+        !statusFilter.includes(capability.status as CapabilityStatus)
+      ) {
         return false;
       }
 
       // Reifegrad Filter
       if (
         maturityLevelFilter.length > 0 &&
+        capability.maturityLevel !== null &&
+        capability.maturityLevel !== undefined &&
         !maturityLevelFilter.includes(capability.maturityLevel)
       ) {
         return false;
       }
 
       // Geschäftswert Range Filter
-      if (
-        capability.businessValue < businessValueRange[0] ||
-        capability.businessValue > businessValueRange[1]
-      ) {
+      const businessValue = capability.businessValue ?? 0;
+      if (businessValue < businessValueRange[0] || businessValue > businessValueRange[1]) {
         return false;
       }
 

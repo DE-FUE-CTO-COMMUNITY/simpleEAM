@@ -10,6 +10,7 @@ import {
 } from '@mui/icons-material';
 import { Capability } from './types';
 import { formatDate, getLevelLabel } from './utils';
+import { CapabilityStatus } from '../../gql/generated';
 import {
   createColumnHelper,
   flexRender,
@@ -74,7 +75,10 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
     }),
     columnHelper.accessor('status', {
       header: 'Status',
-      cell: info => info.getValue(),
+      cell: info => {
+        const status = info.getValue() as CapabilityStatus;
+        return status;
+      },
     }),
     columnHelper.accessor('businessValue', {
       header: 'Geschäftswert',

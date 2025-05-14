@@ -1,19 +1,23 @@
-export interface Capability {
-  id: string;
-  name: string;
-  description: string;
-  maturityLevel: number;
-  status: string;
-  businessValue: number;
-  owner?: string;
-  tags?: string[];
-  createdAt: string;
-  updatedAt?: string;
-  children?: { id: string; name: string }[];
-}
+import { BusinessCapability, CapabilityStatus } from '../../gql/generated';
+
+// Nutze den generierten Typ als Basis und passe ihn für unsere Komponenten an
+export type Capability = Pick<
+  BusinessCapability,
+  | 'id'
+  | 'name'
+  | 'description'
+  | 'maturityLevel'
+  | 'status'
+  | 'businessValue'
+  | 'owner'
+  | 'tags'
+  | 'createdAt'
+  | 'updatedAt'
+  | 'children'
+>;
 
 export interface FilterState {
-  statusFilter: string[];
+  statusFilter: CapabilityStatus[];
   maturityLevelFilter: number[];
   businessValueRange: [number, number];
   tagsFilter: string[];
@@ -24,7 +28,7 @@ export interface FilterState {
 
 export interface FilterProps {
   filterState: FilterState;
-  availableStatuses: string[];
+  availableStatuses: CapabilityStatus[];
   availableTags: string[];
   onFilterChange: (newFilter: Partial<FilterState>) => void;
   onResetFilter: () => void;

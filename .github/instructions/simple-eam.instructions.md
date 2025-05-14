@@ -140,7 +140,7 @@ simple-eam/
 - Bevorzugt generierte GraphQL-Typen aus `src/gql/generated.ts` verwenden, anstatt eigene Typen zu definieren
 - `page.tsx`-Dateien möglichst klein halten und Logik in Komponenten auslagern (wie bei der Capability-Seite implementiert)
   - UI-Komponenten in `/components/<feature>/` auslagern
-  - Typen in `/components/<feature>/types.ts` definieren
+  - Weitere Typen in `/components/<feature>/types.ts` definieren
   - Hilfsfunktionen in `/components/<feature>/utils.ts` auslagern
   - Filter-Logik in Custom Hooks (`use<Feature>Filter.ts`) auslagern
 
