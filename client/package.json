@@ -3,12 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "preinstall": "node -e \"if(process.env.npm_execpath && process.env.npm_execpath.indexOf('yarn') === -1) throw new Error('⚠️ Bitte verwenden Sie yarn für dieses Projekt!')\"",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "codegen": "graphql-codegen --config codegen.ts"
   },
+  "packageManager": "yarn@4.9.1",
   "dependencies": {
     "@apollo/client": "^3.8.0",
     "@emotion/cache": "^11.14.0",

@@ -20,6 +20,18 @@ coverage/
 .nyc_output/
 .pnpm-store/
 
+# Sperren von package-lock.json (Wir verwenden yarn)
+package-lock.json
+
+# Yarn Berry
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+.pnp.*
+
 # Next.js
 client/.next/
 client/out/

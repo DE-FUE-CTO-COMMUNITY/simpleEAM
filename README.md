@@ -45,17 +45,25 @@ simple-eam/
 ### Installation
 
 1. Repository klonen:
+
    ```bash
    git clone https://your-repository-url/simple-eam.git
    cd simple-eam
    ```
 
-2. System starten:
+2. Abhängigkeiten installieren:
+
+   ```bash
+   yarn
+   ```
+
+3. System starten:
+
    ```bash
    docker-compose up -d
    ```
 
-3. Auf die verschiedenen Komponenten zugreifen:
+4. Auf die verschiedenen Komponenten zugreifen:
    - Frontend: http://localhost:3000
    - GraphQL-Server: http://localhost:4000/graphql
    - Neo4j-Browser: http://localhost:7474
@@ -69,6 +77,8 @@ Jede Komponente kann unabhängig entwickelt werden:
 - **Server**: Im `server`-Verzeichnis arbeiten
 - **Datenbank**: Skripte im `db/src`-Verzeichnis pflegen
 - **Auth**: Keycloak-Konfigurationen im `auth/src`-Verzeichnis anpassen
+
+**Wichtig:** In diesem Projekt verwenden wir **yarn** als Paketmanager. Bitte verwenden Sie keine npm-Befehle. Weitere Details finden Sie in der [YARN.md](./YARN.md) Dokumentation.
 
 ## Branching-Strategie
 

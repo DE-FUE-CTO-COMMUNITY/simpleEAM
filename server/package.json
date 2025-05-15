@@ -4,12 +4,14 @@
   "description": "Simple EAM GraphQL-Server mit Neo4j-Datenbank",
   "main": "dist/index.js",
   "scripts": {
+    "preinstall": "node -e \"if(process.env.npm_execpath && process.env.npm_execpath.indexOf('yarn') === -1) throw new Error('⚠️ Bitte verwenden Sie yarn für dieses Projekt!')\"",
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "init-db": "ts-node src/db/init-db.ts",
     "test": "jest"
   },
+  "packageManager": "yarn@4.9.1",
   "dependencies": {
     "@neo4j/graphql": "^7.1.1",
     "apollo-server-core": "^3.12.1",

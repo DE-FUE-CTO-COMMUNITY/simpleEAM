@@ -11,16 +11,29 @@ import { SnackbarProvider } from 'notistack';
 import { AuthContext, initKeycloak, keycloak } from '@/lib/auth';
 import { createApolloClient } from '@/lib/apollo-client';
 import theme from '@/theme/theme';
-import { CircularProgress, Box } from '@mui/material';
+import { CircularProgress } from '@mui/material';
 import RootLayout from '@/components/layout/RootLayout';
 
 // Emotion Cache für Server-Side Rendering
 export function useClientStyleRegistry() {
   const [{ cache, flush }] = useState(() => {
-    const cache = createCache({ key: 'css', prepend: true });
+    const cache = createCache({
+      key: 'mui',
+      prepend: true,
+      // Konfiguration für stabile Klassennamen zwischen Server und Client
+      stylisPlugins: [],
+      // Vermeidet Optimierungen, die zu unterschiedlichen Klassennamen führen könnten
+      speedy: false,
+    });
     return {
       cache,
-      flush: () => cache.sheet.tags.forEach(tag => tag.parentNode?.removeChild(tag)),
+      flush: () => {
+        // Sicherstellen, dass alle Tags entfernt werden
+        if (typeof window !== 'undefined') {
+          cache.sheet.tags.forEach(tag => tag.parentNode?.removeChild(tag));
+        }
+        cache.sheet.flush();
+      },
     };
   });
 
@@ -40,7 +53,7 @@ export function useClientStyleRegistry() {
     return (
       <style
         key="emotion-styles"
-        data-emotion={`css ${Array.from(names).join(' ')}`}
+        data-emotion={`mui ${Array.from(names).join(' ')}`}
         dangerouslySetInnerHTML={{ __html: styles.join('') }}
       />
     );
@@ -53,23 +66,30 @@ import { ApolloClient, NormalizedCacheObject } from '@apollo/client';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { cache } = useClientStyleRegistry();
+  // Um Hydration-Fehler zu vermeiden, initialisieren wir mit false
   const [initialized, setInitialized] = useState(false);
   const [authenticated, setAuthenticated] = useState(false);
   const [client, setClient] = useState<ApolloClient<NormalizedCacheObject> | null>(null);
+  // Verzögertes Mounting für clientseitige Initialisierung
+  const [mounted, setMounted] = useState(false);
 
   // Verwenden Sie useEffect, um Keycloak nur auf dem Client zu initialisieren
+  // Trennung von Mounting- und Auth-Logik für bessere Kontrolle
   useEffect(() => {
+    // Markieren als gemounted für clientseitigen Hydration-Fix
+    setMounted(true);
+  }, []);
+
+  // Separate useEffect für die Authentifizierung
+  useEffect(() => {
+    // Initialisierung nur durchführen, wenn wir auf dem Client sind
+    if (!mounted) return;
+
     // Erstelle eine Fallback-Client-Instanz für SSR
     const defaultClient = createApolloClient();
     setClient(defaultClient);
 
     const initAuth = async () => {
-      // Vermeidet Hydration-Probleme, indem Authentifizierung nur clientseitig ausgeführt wird
-      if (typeof window === 'undefined') {
-        setInitialized(true);
-        return;
-      }
-
       try {
         // Keycloak nur auf dem Client initialisieren
         const authenticated = await initKeycloak();
@@ -81,7 +101,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           setClient(apolloClient);
 
           // Token-Refresh-Handler
-          // Wir verwenden eine lokale Variable für keycloak, um TypeScript-Fehler zu vermeiden
           const kc = keycloak;
           kc.onTokenExpired = () => {
             kc.updateToken(30)
@@ -100,41 +119,56 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       } catch (error) {
         console.error('Keycloak init error:', error);
       } finally {
-        setInitialized(true);
+        // Verzögertes Setzen des initialisierten Status um Flash of Loading zu vermeiden
+        setTimeout(() => {
+          setInitialized(true);
+        }, 300);
       }
     };
 
     initAuth();
-  }, []);
+  }, [mounted]);
 
-  // Render-Funktion
+  // Render-Funktion mit verzögertem Mounting, um Hydration-Fehler zu vermeiden
   const renderContent = () => {
-    // Zeige Spinner nur, wenn wir auf dem Client sind und noch initialisieren
-    if (typeof window !== 'undefined' && !initialized) {
-      return (
-        <Box
-          sx={{
-            display: 'flex',
+    const apolloClient = client || createApolloClient();
+
+    // Identische DOM-Struktur für Server und Client, ohne dynamische Klassennamen
+    return (
+      <>
+        {/* Loading-Zustand: immer rendern, aber nur client-seitig anzeigen */}
+        <div
+          style={{
+            display: mounted && !initialized ? 'flex' : 'none',
             justifyContent: 'center',
             alignItems: 'center',
             height: '100vh',
             width: '100vw',
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            zIndex: 9999,
+            background: 'white',
           }}
         >
-          <CircularProgress />
-        </Box>
-      );
-    }
+          {mounted && <CircularProgress size={40} />}
+        </div>
 
-    // Stelle sicher, dass wir immer einen Apollo-Client verwenden, auch wenn Authentifizierung fehlschlägt
-    const apolloClient = client || createApolloClient();
-
-    return (
-      <AuthContext.Provider value={{ keycloak, initialized, authenticated }}>
-        <ApolloProvider client={apolloClient}>
-          <RootLayout>{children}</RootLayout>
-        </ApolloProvider>
-      </AuthContext.Provider>
+        {/* Haupt-Content: immer rendern, aber als Style kontrollieren */}
+        <div
+          style={{
+            display: mounted && initialized ? 'block' : 'none',
+            width: '100%',
+            height: '100%',
+          }}
+        >
+          <AuthContext.Provider value={{ keycloak, initialized, authenticated }}>
+            <ApolloProvider client={apolloClient}>
+              <RootLayout>{children}</RootLayout>
+            </ApolloProvider>
+          </AuthContext.Provider>
+        </div>
+      </>
     );
   };
 
@@ -142,10 +176,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <html lang="de">
       <head>
         <meta name="viewport" content="initial-scale=1, width=device-width" />
+        {/* Wichtig für Emotion und MUI Hydration */}
+        <meta name="emotion-insertion-point" content="" />
         <title>Simple EAM</title>
       </head>
       <body>
         <CacheProvider value={cache}>
+          {/* Gleiche DOM-Struktur sowohl auf Server als auch auf Client */}
           <ThemeProvider theme={theme}>
             <CssBaseline />
             <SnackbarProvider

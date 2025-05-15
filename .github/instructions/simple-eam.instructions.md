@@ -98,7 +98,7 @@ Alle Komponenten werden in separaten Docker-Containern bereitgestellt.
 
   ```bash
   npm uninstall react-table @types/react-table
-  npm install @tanstack/react-table
+  yarn install @tanstack/react-table
   ```
 
   Die Typen sind jetzt im Basispaket enthalten; `@types/react-table` kann entfernt werden.
@@ -315,10 +315,10 @@ const table = useReactTable({
 
    ```bash
    # Mit der Codemod (empfohlen):
-   npx @next/codemod@canary upgrade latest
+   yarn dlx @next/codemod@canary upgrade latest
 
    # Oder manuell:
-   npm i next@latest react@latest react-dom@latest eslint-config-next@latest
+   yarn add next@latest react@latest react-dom@latest eslint-config-next@latest
    ```
 
 2. **React 19 Kompatibilität**:
@@ -393,12 +393,12 @@ Die Migration von Material UI v6 auf v7 bringt folgende wichtige Änderungen:
 
    - Der veraltete `Grid` wurde zu `GridLegacy` umbenannt
    - `Grid2` ersetzt nun den `Grid`-Namespace
-   - Codemod verfügbar: `npx @mui/codemod v7.0.0/grid-props <path>`
+   - Codemod verfügbar: `yarn dlx @mui/codemod v7.0.0/grid-props <path>`
 
 4. **InputLabel size-Prop standardisiert**:
 
    - `'normal'` wurde durch `'medium'` ersetzt
-   - Codemod verfügbar: `npx @mui/codemod v7.0.0/input-label-size-normal-medium <path>`
+   - Codemod verfügbar: `yarn dlx @mui/codemod v7.0.0/input-label-size-normal-medium <path>`
 
 5. **Theme-Verhalten bei CSS-Variablen**:
 
@@ -442,7 +442,7 @@ Bei der Integration von Material UI 7 mit Next.js 15 sind folgende Punkte zu bea
 1. **Installation der Dependencies**:
 
    ```bash
-   npm install @mui/material-nextjs @emotion/cache
+   yarn install @mui/material-nextjs @emotion/cache
    ```
 
 2. **App Router Konfiguration**:
@@ -561,6 +561,141 @@ Hydration-Fehler treten auf, wenn die serverseitig gerenderte HTML-Struktur nich
    - React Dev Tools verwenden, um DOM-Unterschiede zu identifizieren
    - `suppressHydrationWarning` nur für Debugging verwenden, nicht als dauerhafte Lösung
    - Bei Authentifizierungskomponenten besonders auf verzögerte Initialisierung achten
+
+#### Spezifische Lösungen für häufige Hydration-Fehler
+
+1. **CircularProgress vs. AppBar Hydration-Fehler**:
+
+   Dieser Fehler entsteht häufig, wenn Ladekomponenten in Server-Komponenten falsch initialisiert werden:
+
+   ```tsx
+   // Problematischer Code - kann zu unterschiedlichem DOM auf Client und Server führen
+   <div className={dynamicStyles}>{loading ? <CircularProgress /> : <AppBar />}</div>;
+
+   // Lösung: Sicherstellen, dass beide Komponenten als Client-Komponenten markiert sind
+   ('use client');
+
+   // Und dynamische Stiländerungen vermeiden, die zu unterschiedlichen Klassen führen können
+   <div className={staticClassName}>{loading ? <CircularProgress size={40} /> : <AppBar />}</div>;
+   ```
+
+2. **Lösung für Layout-Komponenten**:
+
+   Bei Hydration-Fehlern in Layout-Komponenten:
+
+   ```tsx
+   // app/layout.tsx
+   'use client';
+
+   import { useState, useEffect } from 'react';
+   import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
+   import { ThemeProvider } from '@mui/material/styles';
+   import CssBaseline from '@mui/material/CssBaseline';
+   import theme from '../theme';
+
+   export default function RootLayout({ children }) {
+     // Verzögerte Rendering-Strategie
+     const [mounted, setMounted] = useState(false);
+
+     useEffect(() => {
+       setMounted(true);
+     }, []);
+
+     // Einfaches Skeleton für den ersten Render
+     if (!mounted) {
+       return (
+         <html lang="de">
+           <body>
+             <div
+               style={{
+                 display: 'flex',
+                 justifyContent: 'center',
+                 alignItems: 'center',
+                 height: '100vh',
+               }}
+             >
+               Laden...
+             </div>
+           </body>
+         </html>
+       );
+     }
+
+     return (
+       <html lang="de">
+         <head>
+           <meta name="emotion-insertion-point" content="" />
+         </head>
+         <body>
+           <AppRouterCacheProvider options={{ key: 'mui' }}>
+             <ThemeProvider theme={theme}>
+               <CssBaseline />
+               {children}
+             </ThemeProvider>
+           </AppRouterCacheProvider>
+         </body>
+       </html>
+     );
+   }
+   ```
+
+3. **Eindeutige CSS-Klassen sicherstellen**:
+
+   Hydration-Fehler mit CSS-Klassen (wie im Beispiel `css-xrtj5z` vs. `css-ogmp5q`):
+
+   ```tsx
+   // Problem: Dynamische Berechnung von Styles während des Renderns
+   <Box sx={{
+     display: "flex",
+     ...dynamicallyGeneratedStyles, // Diese können auf Client und Server unterschiedlich sein
+   }}>
+
+   // Lösung: Definieren Sie Styles außerhalb der Render-Funktion oder verwenden Sie statische Styles
+   const boxStyles = { display: "flex", alignItems: "center" }; // Statisch definierte Styles
+
+   // Im Render:
+   <Box sx={boxStyles}>
+   ```
+
+4. **Verwendung der `useServerInsertedHTML`-Hook**:
+
+   ```tsx
+   // In einem Custom Provider zur Verbesserung des Server-Side Styles
+   'use client';
+
+   import { useServerInsertedHTML } from 'next/navigation';
+
+   export function StyleRegistry({ children }) {
+     // Diese Funktion wird aufgerufen, bevor Inhalte auf dem Server gerendert werden
+     useServerInsertedHTML(() => {
+       // Fügen Sie hier kritische CSS-Styles ein, die vor dem Hydration-Schritt benötigt werden
+       return (
+         <>
+           <style id="mui-ssr-styles">{/* Kritische Styles */}</style>
+         </>
+       );
+     });
+
+     return children;
+   }
+   ```
+
+5. **Spezielle Next.js 15 Technik für schwer zu findende Hydration-Fehler**:
+
+   ```tsx
+   // In next.config.js
+   module.exports = {
+     // Diese Option hilft bei der Identifizierung von Hydration-Problemen
+     reactStrictMode: true,
+
+     // Experimentelle Feature für Debugging von Hydration
+     experimental: {
+       // Verbessert Fehlermeldungen bei Server/Client-Unterschieden
+       optimizeFonts: false,
+       strictFontDetect: true,
+     },
+   };
+   ```
 
 ### Paketmanager
 
