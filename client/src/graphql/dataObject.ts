@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+import { gql } from '@apollo/client'
 
 export const GET_DATA_OBJECTS_COUNT = gql`
   query GetDataObjectsCount {
@@ -10,7 +10,7 @@ export const GET_DATA_OBJECTS_COUNT = gql`
       }
     }
   }
-`;
+`
 
 export const GET_DATA_OBJECTS = gql`
   query GetDataObjects {
@@ -26,7 +26,7 @@ export const GET_DATA_OBJECTS = gql`
       updatedAt
     }
   }
-`;
+`
 
 export const GET_DATA_OBJECT = gql`
   query GetDataObject($id: ID!) {
@@ -50,4 +50,4 @@ export const GET_DATA_OBJECT = gql`
       }
     }
   }
-`;
+`

@@ -9,13 +9,13 @@ convert_npm_to_yarn() {
   cp "$input_file" "$output_file"
   
   # Ersetze npm-Befehle durch yarn-Befehle (Yarn Berry Syntax)
-  sed -i 's/npm install/yarn install/g' "$output_file"
-  sed -i 's/npm i/yarn add/g' "$output_file"
-  sed -i 's/npm ci/yarn install --immutable/g' "$output_file"
-  sed -i 's/npm run/yarn/g' "$output_file"
-  sed -i 's/npm update/yarn up/g' "$output_file"
-  sed -i 's/npm outdated/yarn outdated/g' "$output_file"
-  sed -i 's/npx /yarn dlx /g' "$output_file"
+  sed -i 's/yarn install/yarn install/g' "$output_file"
+  sed -i 's/yarn add/yarn add/g' "$output_file"
+  sed -i 's/yarn install --immutable/yarn install --immutable/g' "$output_file"
+  sed -i 's/yarn/yarn/g' "$output_file"
+  sed -i 's/yarn up/yarn up/g' "$output_file"
+  sed -i 's/yarn outdated/yarn outdated/g' "$output_file"
+  sed -i 's/yarn dlx /yarn dlx /g' "$output_file"
   
   # Vergleiche Dateien
   if diff -q "$input_file" "$output_file" > /dev/null; then

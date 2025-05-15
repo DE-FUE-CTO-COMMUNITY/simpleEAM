@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 import {
   AppBar,
   Box,
@@ -19,7 +19,7 @@ import {
   MenuItem,
   Tooltip,
   styled,
-} from '@mui/material';
+} from '@mui/material'
 import {
   Menu as MenuIcon,
   ChevronLeft as ChevronLeftIcon,
@@ -30,14 +30,14 @@ import {
   Person as PersonIcon,
   Logout as LogoutIcon,
   Settings as SettingsIcon,
-} from '@mui/icons-material';
-import Link from 'next/link';
-import { useRouter, usePathname } from 'next/navigation';
-import AtosLogo from '../common/AtosLogo';
-import { useAuth, logout, isAdmin } from '@/lib/auth';
+} from '@mui/icons-material'
+import Link from 'next/link'
+import { useRouter, usePathname } from 'next/navigation'
+import AtosLogo from '../common/AtosLogo'
+import { useAuth, logout, isAdmin } from '@/lib/auth'
 
 // Konstanten und Styles
-const drawerWidth = 240;
+const drawerWidth = 240
 
 // Styled-Komponenten für das Layout
 const openedMixin = theme => ({
@@ -47,7 +47,7 @@ const openedMixin = theme => ({
     duration: theme.transitions.duration.enteringScreen,
   }),
   overflowX: 'hidden',
-});
+})
 
 const closedMixin = theme => ({
   transition: theme.transitions.create('width', {
@@ -56,7 +56,7 @@ const closedMixin = theme => ({
   }),
   overflowX: 'hidden',
   width: `calc(${theme.spacing(7)} + 1px)`,
-});
+})
 
 const Drawer = styled(MuiDrawer, { shouldForwardProp: prop => prop !== 'open' })(
   ({ theme, open }) => ({
@@ -73,7 +73,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: prop => prop !== 'open' })
       '& .MuiDrawer-paper': closedMixin(theme),
     }),
   })
-);
+)
 
 const Main = styled('main', { shouldForwardProp: prop => prop !== 'open' })(({ theme, open }) => ({
   flexGrow: 1,
@@ -83,50 +83,50 @@ const Main = styled('main', { shouldForwardProp: prop => prop !== 'open' })(({ t
     duration: theme.transitions.duration.leavingScreen,
   }),
   marginLeft: 0,
-}));
+}))
 
 interface RootLayoutProps {
-  children: React.ReactNode;
+  children: React.ReactNode
 }
 
 const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
-  const theme = useTheme();
-  const router = useRouter();
-  const pathname = usePathname();
-  const { keycloak, authenticated } = useAuth();
-  const [open, setOpen] = useState(true);
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const theme = useTheme()
+  const router = useRouter()
+  const pathname = usePathname()
+  const { keycloak, authenticated } = useAuth()
+  const [open, setOpen] = useState(true)
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
   const handleDrawerToggle = () => {
-    setOpen(!open);
-  };
+    setOpen(!open)
+  }
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
+    setAnchorEl(event.currentTarget)
+  }
 
   const handleProfileMenuClose = () => {
-    setAnchorEl(null);
-  };
+    setAnchorEl(null)
+  }
 
   const handleLogout = () => {
-    handleProfileMenuClose();
-    logout();
-  };
+    handleProfileMenuClose()
+    logout()
+  }
 
-  const userName = (authenticated && keycloak?.tokenParsed?.preferred_username) || 'Benutzer';
-  const userInitial = userName.charAt(0).toUpperCase();
+  const userName = (authenticated && keycloak?.tokenParsed?.preferred_username) || 'Benutzer'
+  const userInitial = userName.charAt(0).toUpperCase()
 
   const menuItems = [
     { text: 'Dashboard', icon: <DashboardIcon />, href: '/' },
     { text: 'Business Capabilities', icon: <BusinessIcon />, href: '/capabilities' },
     { text: 'Applikationen', icon: <AppsIcon />, href: '/applications' },
     { text: 'Datenobjekte', icon: <DataObjectIcon />, href: '/dataobjects' },
-  ];
+  ]
 
   const isActive = (href: string) => {
-    return pathname === href || (href !== '/' && pathname?.startsWith(href));
-  };
+    return pathname === href || (href !== '/' && pathname?.startsWith(href))
+  }
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
@@ -279,7 +279,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
         {children}
       </Main>
     </Box>
-  );
-};
+  )
+}
 
-export default RootLayout;
+export default RootLayout

@@ -1,10 +1,10 @@
-'use client';
+'use client'
 
-import React, { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useMutation } from '@apollo/client';
-import { useSnackbar } from 'notistack';
-import { useForm } from '@tanstack/react-form';
+import React, { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { useMutation } from '@apollo/client'
+import { useSnackbar } from 'notistack'
+import { useForm } from '@tanstack/react-form'
 import {
   Box,
   Typography,
@@ -21,14 +21,14 @@ import {
   Divider,
   Paper,
   useTheme,
-} from '@mui/material';
-import { z } from 'zod';
-import { useQuery } from '@apollo/client';
-import { ArrowBack as ArrowBackIcon, Save as SaveIcon } from '@mui/icons-material';
-import { useAuth, login, isArchitect } from '@/lib/auth';
-import RootLayout from '@/components/layout/RootLayout';
-import { CREATE_CAPABILITY } from '@/graphql/capability';
-import { GET_CAPABILITIES } from '@/graphql/capability';
+} from '@mui/material'
+import { z } from 'zod'
+import { useQuery } from '@apollo/client'
+import { ArrowBack as ArrowBackIcon, Save as SaveIcon } from '@mui/icons-material'
+import { useAuth, login, isArchitect } from '@/lib/auth'
+import RootLayout from '@/components/layout/RootLayout'
+import { CREATE_CAPABILITY } from '@/graphql/capability'
+import { GET_CAPABILITIES } from '@/graphql/capability'
 
 // Schema für die Formularvalidierung
 const capabilitySchema = z.object({
@@ -46,47 +46,47 @@ const capabilitySchema = z.object({
     .min(0, 'Level muss 0 oder höher sein')
     .max(3, 'Level darf maximal 3 sein'),
   parentCapabilityId: z.string().optional(),
-});
+})
 
 // TypeScript Typen basierend auf dem Schema
-type CapabilityFormValues = z.infer<typeof capabilitySchema>;
+type CapabilityFormValues = z.infer<typeof capabilitySchema>
 
 const CreateCapabilityPage = () => {
-  const { authenticated } = useAuth();
-  const router = useRouter();
-  const theme = useTheme();
-  const { enqueueSnackbar } = useSnackbar();
+  const { authenticated } = useAuth()
+  const router = useRouter()
+  const theme = useTheme()
+  const { enqueueSnackbar } = useSnackbar()
 
   // Weiterleitung zum Login, falls nicht authentifiziert
   useEffect(() => {
     if (authenticated === false) {
-      login();
+      login()
     } else if (authenticated && !isArchitect()) {
       enqueueSnackbar('Sie haben keine Berechtigung, Business Capabilities zu erstellen', {
         variant: 'error',
-      });
-      router.push('/capabilities');
+      })
+      router.push('/capabilities')
     }
-  }, [authenticated, router, enqueueSnackbar]);
+  }, [authenticated, router, enqueueSnackbar])
 
   // Bestehende Capabilities für Dropdown-Auswahl laden
   const { data: capabilitiesData, loading: capabilitiesLoading } = useQuery(GET_CAPABILITIES, {
     skip: !authenticated,
     fetchPolicy: 'cache-and-network',
-  });
+  })
 
   // Mutation zum Erstellen einer neuen Capability
   const [createCapability, { loading: submitting }] = useMutation(CREATE_CAPABILITY, {
     onCompleted: () => {
-      enqueueSnackbar('Business Capability erfolgreich erstellt', { variant: 'success' });
-      router.push('/capabilities');
+      enqueueSnackbar('Business Capability erfolgreich erstellt', { variant: 'success' })
+      router.push('/capabilities')
     },
     onError: error => {
       enqueueSnackbar(`Fehler beim Erstellen der Business Capability: ${error.message}`, {
         variant: 'error',
-      });
+      })
     },
-  });
+  })
 
   // TanStack Form konfigurieren
   const form = useForm({
@@ -99,71 +99,71 @@ const CreateCapabilityPage = () => {
     // Eigene Implementierung eines Validators mit Zod
     validator: ({ value }) => {
       try {
-        capabilitySchema.parse(value);
-        return { valid: true };
+        capabilitySchema.parse(value)
+        return { valid: true }
       } catch (error) {
         if (error instanceof z.ZodError) {
           // Fehler nach Feld gruppieren
-          const fieldErrors: Record<string, string[]> = {};
+          const fieldErrors: Record<string, string[]> = {}
           error.errors.forEach(err => {
-            const field = err.path[0] as string;
+            const field = err.path[0] as string
             if (!fieldErrors[field]) {
-              fieldErrors[field] = [];
+              fieldErrors[field] = []
             }
-            fieldErrors[field].push(err.message);
-          });
-          return { valid: false, errors: fieldErrors };
+            fieldErrors[field].push(err.message)
+          })
+          return { valid: false, errors: fieldErrors }
         }
-        return { valid: false };
+        return { valid: false }
       }
     },
     onSubmit: async ({ value }) => {
       if (!authenticated || !isArchitect()) {
-        return;
+        return
       }
 
       const input = {
         ...value,
         parentCapabilityId: value.parentCapabilityId || null,
-      };
+      }
 
       await createCapability({
         variables: { input },
-      });
+      })
     },
-  });
+  })
 
   // Zurück zur Übersicht
   const handleCancel = () => {
-    router.push('/capabilities');
-  };
+    router.push('/capabilities')
+  }
 
   // Level-Label für die Anzeige
   const getLevelLabel = (level: number) => {
     switch (level) {
       case 0:
-        return 'Enterprise';
+        return 'Enterprise'
       case 1:
-        return 'Geschäftsbereich';
+        return 'Geschäftsbereich'
       case 2:
-        return 'Geschäftsfunktion';
+        return 'Geschäftsfunktion'
       case 3:
-        return 'Geschäftsprozess';
+        return 'Geschäftsprozess'
       default:
-        return `Level ${level}`;
+        return `Level ${level}`
     }
-  };
+  }
 
   // Filtert Capabilities basierend auf dem ausgewählten Level
   const getAvailableParentCapabilities = (selectedLevel: number) => {
     if (!capabilitiesData?.capabilities || selectedLevel === 0) {
-      return [];
+      return []
     }
 
     return capabilitiesData.capabilities.filter(
       (capability: any) => capability.level < selectedLevel
-    );
-  };
+    )
+  }
 
   return (
     <RootLayout>
@@ -185,9 +185,9 @@ const CreateCapabilityPage = () => {
         <Paper sx={{ p: 3, mb: 4 }}>
           <form
             onSubmit={e => {
-              e.preventDefault();
-              e.stopPropagation();
-              form.handleSubmit();
+              e.preventDefault()
+              e.stopPropagation()
+              form.handleSubmit()
             }}
           >
             <Grid container spacing={3}>
@@ -267,9 +267,9 @@ const CreateCapabilityPage = () => {
                 <form.Field
                   name="parentCapabilityId"
                   render={({ state, handleBlur, handleChange }) => {
-                    const level = form.getFieldValue('level');
-                    const availableParents = getAvailableParentCapabilities(level);
-                    const isDisabled = level === 0 || availableParents.length === 0;
+                    const level = form.getFieldValue('level')
+                    const availableParents = getAvailableParentCapabilities(level)
+                    const isDisabled = level === 0 || availableParents.length === 0
 
                     return (
                       <FormControl fullWidth error={!!state.meta.errors.length}>
@@ -303,7 +303,7 @@ const CreateCapabilityPage = () => {
                           <FormHelperText>{state.meta.errors.join(', ')}</FormHelperText>
                         )}
                       </FormControl>
-                    );
+                    )
                   }}
                 />
               </Grid>
@@ -379,7 +379,7 @@ const CreateCapabilityPage = () => {
         />
       </Box>
     </RootLayout>
-  );
-};
+  )
+}
 
-export default CreateCapabilityPage;
+export default CreateCapabilityPage

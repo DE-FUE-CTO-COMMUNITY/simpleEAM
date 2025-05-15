@@ -1,32 +1,32 @@
-'use client';
+'use client'
 
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Box, Typography, Button, Card, Paper } from '@mui/material';
-import { Add as AddIcon } from '@mui/icons-material';
-import { useQuery, useMutation } from '@apollo/client';
-import { useSnackbar } from 'notistack';
-import { useAuth, login, isArchitect } from '@/lib/auth';
-import { GET_CAPABILITIES, CREATE_CAPABILITY, UPDATE_CAPABILITY } from '@/graphql/capability';
-import { CapabilityStatus, BusinessCapability } from '@/gql/generated';
-import CapabilityForm, { CapabilityFormValues } from '@/components/capabilities/CapabilityForm';
+import React, { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { Box, Typography, Button, Card, Paper } from '@mui/material'
+import { Add as AddIcon } from '@mui/icons-material'
+import { useQuery, useMutation } from '@apollo/client'
+import { useSnackbar } from 'notistack'
+import { useAuth, login, isArchitect } from '@/lib/auth'
+import { GET_CAPABILITIES, CREATE_CAPABILITY, UPDATE_CAPABILITY } from '@/graphql/capability'
+import { CapabilityStatus, BusinessCapability } from '@/gql/generated'
+import CapabilityForm, { CapabilityFormValues } from '@/components/capabilities/CapabilityForm'
 
 // Importiere die ausgelagerten Komponenten
-import CapabilityTable from '@/components/capabilities/CapabilityTable';
-import CapabilityToolbar from '@/components/capabilities/CapabilityToolbar';
-import CapabilityFilterDialog from '@/components/capabilities/CapabilityFilterDialog';
-import { useCapabilityFilter } from '@/components/capabilities/useCapabilityFilter';
-import { Capability, FilterState } from '@/components/capabilities/types';
+import CapabilityTable from '@/components/capabilities/CapabilityTable'
+import CapabilityToolbar from '@/components/capabilities/CapabilityToolbar'
+import CapabilityFilterDialog from '@/components/capabilities/CapabilityFilterDialog'
+import { useCapabilityFilter } from '@/components/capabilities/useCapabilityFilter'
+import { Capability, FilterState } from '@/components/capabilities/types'
 
 const CapabilitiesPage = () => {
-  const { authenticated } = useAuth();
-  const router = useRouter();
-  const { enqueueSnackbar } = useSnackbar();
-  const [globalFilter, setGlobalFilter] = useState<string>('');
-  const [sorting, setSorting] = useState([{ id: 'name', desc: false }]);
+  const { authenticated } = useAuth()
+  const router = useRouter()
+  const { enqueueSnackbar } = useSnackbar()
+  const [globalFilter, setGlobalFilter] = useState<string>('')
+  const [sorting, setSorting] = useState([{ id: 'name', desc: false }])
 
   // Filter-Zustand
-  const [filterOpen, setFilterOpen] = useState(false);
+  const [filterOpen, setFilterOpen] = useState(false)
   const [filterState, setFilterState] = useState<FilterState>({
     statusFilter: [] as CapabilityStatus[],
     maturityLevelFilter: [],
@@ -35,98 +35,98 @@ const CapabilitiesPage = () => {
     descriptionFilter: '',
     ownerFilter: '',
     updatedDateRange: ['', ''],
-  });
-  const [activeFiltersCount, setActiveFiltersCount] = useState<number>(0);
+  })
+  const [activeFiltersCount, setActiveFiltersCount] = useState<number>(0)
 
   // Liste der verfügbaren Status und Tags aus den Daten extrahieren
-  const [availableStatuses, setAvailableStatuses] = useState<CapabilityStatus[]>([]);
-  const [availableTags, setAvailableTags] = useState<string[]>([]);
+  const [availableStatuses, setAvailableStatuses] = useState<CapabilityStatus[]>([])
+  const [availableTags, setAvailableTags] = useState<string[]>([])
 
   // State für das neue Capability-Formular
-  const [showNewCapabilityForm, setShowNewCapabilityForm] = useState(false);
+  const [showNewCapabilityForm, setShowNewCapabilityForm] = useState(false)
 
   // Weiterleitung zum Login, falls nicht authentifiziert
   useEffect(() => {
     if (authenticated === false) {
-      login();
+      login()
     }
-  }, [authenticated]);
+  }, [authenticated])
 
   // Business Capabilities laden
   const { loading, error, data, refetch } = useQuery(GET_CAPABILITIES, {
     skip: !authenticated,
     fetchPolicy: 'cache-and-network',
-  });
+  })
 
   // Verfügbare Status und Tags aus den geladenen Daten extrahieren
   useEffect(() => {
     if (data?.businessCapabilities?.length) {
-      const capabilities = data.businessCapabilities as Capability[];
+      const capabilities = data.businessCapabilities as Capability[]
 
       // Alle Status extrahieren und Duplikate entfernen
       const allStatuses: CapabilityStatus[] = capabilities
         .map((cap: Capability) => cap.status)
-        .filter(Boolean) as CapabilityStatus[];
+        .filter(Boolean) as CapabilityStatus[]
 
-      const uniqueStatuses = Array.from(new Set(allStatuses)).sort();
-      setAvailableStatuses(uniqueStatuses);
+      const uniqueStatuses = Array.from(new Set(allStatuses)).sort()
+      setAvailableStatuses(uniqueStatuses)
 
       // Alle Tags sammeln und Duplikate entfernen
-      const allTags: string[] = [];
+      const allTags: string[] = []
       capabilities.forEach((cap: Capability) => {
         if (cap.tags && Array.isArray(cap.tags)) {
-          allTags.push(...cap.tags);
+          allTags.push(...cap.tags)
         }
-      });
+      })
 
-      const uniqueTags = Array.from(new Set(allTags)).sort();
-      setAvailableTags(uniqueTags);
+      const uniqueTags = Array.from(new Set(allTags)).sort()
+      setAvailableTags(uniqueTags)
     }
-  }, [data]);
+  }, [data])
 
   // Fehlerbehandlung
   useEffect(() => {
     if (error) {
-      enqueueSnackbar('Fehler beim Laden der Business Capabilities', { variant: 'error' });
+      enqueueSnackbar('Fehler beim Laden der Business Capabilities', { variant: 'error' })
     }
-  }, [error, enqueueSnackbar]);
+  }, [error, enqueueSnackbar])
 
-  const capabilities = data?.businessCapabilities || [];
+  const capabilities = data?.businessCapabilities || []
 
   // Filter auf Capabilities anwenden
-  const filteredData = useCapabilityFilter({ capabilities, filterState });
+  const filteredData = useCapabilityFilter({ capabilities, filterState })
 
   // Mutation zum Erstellen einer neuen Capability
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [createCapability, { loading: isCreating }] = useMutation(CREATE_CAPABILITY, {
     onCompleted: () => {
-      enqueueSnackbar('Business Capability erfolgreich erstellt', { variant: 'success' });
-      refetch();
+      enqueueSnackbar('Business Capability erfolgreich erstellt', { variant: 'success' })
+      refetch()
     },
     onError: error => {
       enqueueSnackbar(`Fehler beim Erstellen der Business Capability: ${error.message}`, {
         variant: 'error',
-      });
+      })
     },
-  });
+  })
 
   // Mutation zum Aktualisieren einer bestehenden Capability
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [updateCapability, { loading: isUpdating }] = useMutation(UPDATE_CAPABILITY, {
     onCompleted: () => {
-      enqueueSnackbar('Business Capability erfolgreich aktualisiert', { variant: 'success' });
-      refetch();
+      enqueueSnackbar('Business Capability erfolgreich aktualisiert', { variant: 'success' })
+      refetch()
     },
     onError: error => {
       enqueueSnackbar(`Fehler beim Aktualisieren der Business Capability: ${error.message}`, {
         variant: 'error',
-      });
+      })
     },
-  });
+  })
 
   // Handler für das Erstellen einer neuen Business Capability
   const handleCreateCapabilitySubmit = async (data: CapabilityFormValues) => {
-    const { parentId: parent, ...capabilityData } = data;
+    const { parentId: parent, ...capabilityData } = data
     const input = {
       ...capabilityData,
       ...(parent
@@ -138,53 +138,53 @@ const CapabilitiesPage = () => {
             ],
           }
         : {}),
-    };
+    }
 
     await createCapability({
       variables: { input: [input] },
-    });
+    })
 
     // Formular nach dem Erstellen schließen
-    setShowNewCapabilityForm(false);
-  };
+    setShowNewCapabilityForm(false)
+  }
 
   // Handler für das Aktualisieren einer bestehenden Business Capability
   const handleUpdateCapabilitySubmit = async (id: string, data: CapabilityFormValues) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { parentId, ...capabilityData } = data;
+    const { parentId, ...capabilityData } = data
     // Hier könnten wir auch die Parent-Child-Beziehung mit dem 'parentId'-Wert aktualisieren,
     // was komplex sein kann, da wir die aktuelle Beziehung prüfen müssten.
     // Für diese Implementierung beschränken wir uns auf die direkten Capability-Daten.
     const input = {
       ...capabilityData,
-    };
+    }
 
     await updateCapability({
       variables: { id, input },
-    });
-  };
+    })
+  }
 
   // Neue Business Capability erstellen
   const handleCreateCapability = () => {
     // Hier fügen wir direkt die Logik für das Erstellen einer neuen Capability ein,
     // anstatt einen versteckten Button zu verwenden
-    setShowNewCapabilityForm(true);
-  };
+    setShowNewCapabilityForm(true)
+  }
 
   // Business Capability Details anzeigen
   const handleViewCapability = (id: string) => {
-    router.push(`/capabilities/${id}`);
-  };
+    router.push(`/capabilities/${id}`)
+  }
 
   // Business Capability bearbeiten
   const handleEditCapability = (id: string) => {
-    router.push(`/capabilities/edit/${id}`);
-  };
+    router.push(`/capabilities/edit/${id}`)
+  }
 
   // Filter-Handler
   const handleFilterChange = (newFilterValues: Partial<FilterState>) => {
-    setFilterState(prev => ({ ...prev, ...newFilterValues }));
-  };
+    setFilterState(prev => ({ ...prev, ...newFilterValues }))
+  }
 
   // Filter zurücksetzen
   const handleResetFilter = () => {
@@ -196,9 +196,9 @@ const CapabilitiesPage = () => {
       descriptionFilter: '',
       ownerFilter: '',
       updatedDateRange: ['', ''],
-    });
-    setActiveFiltersCount(0);
-  };
+    })
+    setActiveFiltersCount(0)
+  }
 
   return (
     <Box sx={{ py: 2, px: 1 }}>
@@ -253,8 +253,8 @@ const CapabilitiesPage = () => {
           onResetFilter={handleResetFilter}
           onClose={() => setFilterOpen(false)}
           onApply={count => {
-            setActiveFiltersCount(count);
-            setFilterOpen(false);
+            setActiveFiltersCount(count)
+            setFilterOpen(false)
           }}
         />
       )}
@@ -271,7 +271,7 @@ const CapabilitiesPage = () => {
         />
       )}
     </Box>
-  );
-};
+  )
+}
 
-export default CapabilitiesPage;
+export default CapabilitiesPage

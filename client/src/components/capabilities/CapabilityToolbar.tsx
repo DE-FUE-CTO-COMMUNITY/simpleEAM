@@ -1,19 +1,19 @@
-'use client';
+'use client'
 
-import React from 'react';
-import { Box, TextField, InputAdornment, IconButton, Tooltip, Badge } from '@mui/material';
+import React from 'react'
+import { Box, TextField, InputAdornment, IconButton, Tooltip, Badge } from '@mui/material'
 import {
   Search as SearchIcon,
   FilterList as FilterIcon,
   ClearAll as ClearAllIcon,
-} from '@mui/icons-material';
+} from '@mui/icons-material'
 
 interface CapabilityToolbarProps {
-  globalFilter: string;
-  onGlobalFilterChange: (value: string) => void;
-  activeFiltersCount: number;
-  onFilterClick: () => void;
-  onResetFilters: () => void;
+  globalFilter: string
+  onGlobalFilterChange: (value: string) => void
+  activeFiltersCount: number
+  onFilterClick: () => void
+  onResetFilters: () => void
 }
 
 const CapabilityToolbar: React.FC<CapabilityToolbarProps> = ({
@@ -64,7 +64,7 @@ const CapabilityToolbar: React.FC<CapabilityToolbarProps> = ({
         )}
       </Box>
     </Box>
-  );
-};
+  )
+}
 
-export default CapabilityToolbar;
+export default CapabilityToolbar

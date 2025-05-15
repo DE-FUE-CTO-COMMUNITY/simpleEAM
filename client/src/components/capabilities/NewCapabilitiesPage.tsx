@@ -1,31 +1,31 @@
-'use client';
+'use client'
 
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Box, Typography, Button, Card, Paper, useTheme } from '@mui/material';
-import { Add as AddIcon } from '@mui/icons-material';
-import { useQuery } from '@apollo/client';
-import { useSnackbar } from 'notistack';
-import { useAuth, login, isArchitect } from '@/lib/auth';
-import { GET_CAPABILITIES } from '@/graphql/capability';
+import React, { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { Box, Typography, Button, Card, Paper, useTheme } from '@mui/material'
+import { Add as AddIcon } from '@mui/icons-material'
+import { useQuery } from '@apollo/client'
+import { useSnackbar } from 'notistack'
+import { useAuth, login, isArchitect } from '@/lib/auth'
+import { GET_CAPABILITIES } from '@/graphql/capability'
 
 // Importiere die ausgelagerten Komponenten
-import CapabilityTable from '@/components/capabilities/CapabilityTable';
-import CapabilityToolbar from '@/components/capabilities/CapabilityToolbar';
-import CapabilityFilterDialog from '@/components/capabilities/CapabilityFilterDialog';
-import { useCapabilityFilter } from '@/components/capabilities/useCapabilityFilter';
-import { Capability, FilterState } from '@/components/capabilities/types';
+import CapabilityTable from '@/components/capabilities/CapabilityTable'
+import CapabilityToolbar from '@/components/capabilities/CapabilityToolbar'
+import CapabilityFilterDialog from '@/components/capabilities/CapabilityFilterDialog'
+import { useCapabilityFilter } from '@/components/capabilities/useCapabilityFilter'
+import { Capability, FilterState } from '@/components/capabilities/types'
 
 const CapabilitiesPage = () => {
-  const { authenticated } = useAuth();
-  const router = useRouter();
-  const theme = useTheme();
-  const { enqueueSnackbar } = useSnackbar();
-  const [globalFilter, setGlobalFilter] = useState<string>('');
-  const [sorting, setSorting] = useState([{ id: 'name', desc: false }]);
+  const { authenticated } = useAuth()
+  const router = useRouter()
+  const theme = useTheme()
+  const { enqueueSnackbar } = useSnackbar()
+  const [globalFilter, setGlobalFilter] = useState<string>('')
+  const [sorting, setSorting] = useState([{ id: 'name', desc: false }])
 
   // Filter-Zustand
-  const [filterOpen, setFilterOpen] = useState(false);
+  const [filterOpen, setFilterOpen] = useState(false)
   const [filterState, setFilterState] = useState<FilterState>({
     statusFilter: [],
     maturityLevelFilter: [],
@@ -34,83 +34,83 @@ const CapabilitiesPage = () => {
     descriptionFilter: '',
     ownerFilter: '',
     updatedDateRange: ['', ''],
-  });
-  const [activeFiltersCount, setActiveFiltersCount] = useState<number>(0);
+  })
+  const [activeFiltersCount, setActiveFiltersCount] = useState<number>(0)
 
   // Liste der verfügbaren Status und Tags aus den Daten extrahieren
-  const [availableStatuses, setAvailableStatuses] = useState<string[]>([]);
-  const [availableTags, setAvailableTags] = useState<string[]>([]);
+  const [availableStatuses, setAvailableStatuses] = useState<string[]>([])
+  const [availableTags, setAvailableTags] = useState<string[]>([])
 
   // Weiterleitung zum Login, falls nicht authentifiziert
   useEffect(() => {
     if (authenticated === false) {
-      login();
+      login()
     }
-  }, [authenticated]);
+  }, [authenticated])
 
   // Business Capabilities laden
   const { loading, error, data } = useQuery(GET_CAPABILITIES, {
     skip: !authenticated,
     fetchPolicy: 'cache-and-network',
-  });
+  })
 
   // Verfügbare Status und Tags aus den geladenen Daten extrahieren
   useEffect(() => {
     if (data?.businessCapabilities?.length) {
-      const capabilities = data.businessCapabilities as Capability[];
+      const capabilities = data.businessCapabilities as Capability[]
 
       // Alle Status extrahieren und Duplikate entfernen
       const allStatuses: string[] = capabilities
         .map((cap: Capability) => cap.status)
-        .filter(Boolean);
+        .filter(Boolean)
 
-      const uniqueStatuses = Array.from(new Set(allStatuses)).sort();
-      setAvailableStatuses(uniqueStatuses);
+      const uniqueStatuses = Array.from(new Set(allStatuses)).sort()
+      setAvailableStatuses(uniqueStatuses)
 
       // Alle Tags sammeln und Duplikate entfernen
-      const allTags: string[] = [];
+      const allTags: string[] = []
       capabilities.forEach((cap: Capability) => {
         if (cap.tags && Array.isArray(cap.tags)) {
-          allTags.push(...cap.tags);
+          allTags.push(...cap.tags)
         }
-      });
+      })
 
-      const uniqueTags = Array.from(new Set(allTags)).sort();
-      setAvailableTags(uniqueTags);
+      const uniqueTags = Array.from(new Set(allTags)).sort()
+      setAvailableTags(uniqueTags)
     }
-  }, [data]);
+  }, [data])
 
   // Fehlerbehandlung
   useEffect(() => {
     if (error) {
-      enqueueSnackbar('Fehler beim Laden der Business Capabilities', { variant: 'error' });
+      enqueueSnackbar('Fehler beim Laden der Business Capabilities', { variant: 'error' })
     }
-  }, [error, enqueueSnackbar]);
+  }, [error, enqueueSnackbar])
 
-  const capabilities = data?.businessCapabilities || [];
+  const capabilities = data?.businessCapabilities || []
 
   // Filter auf Capabilities anwenden
-  const filteredData = useCapabilityFilter({ capabilities, filterState });
+  const filteredData = useCapabilityFilter({ capabilities, filterState })
 
   // Neue Business Capability erstellen
   const handleCreateCapability = () => {
-    router.push('/capabilities/create');
-  };
+    router.push('/capabilities/create')
+  }
 
   // Business Capability Details anzeigen
   const handleViewCapability = (id: string) => {
-    router.push(`/capabilities/${id}`);
-  };
+    router.push(`/capabilities/${id}`)
+  }
 
   // Business Capability bearbeiten
   const handleEditCapability = (id: string) => {
-    router.push(`/capabilities/edit/${id}`);
-  };
+    router.push(`/capabilities/edit/${id}`)
+  }
 
   // Filter-Handler
   const handleFilterChange = (newFilterValues: Partial<FilterState>) => {
-    setFilterState(prev => ({ ...prev, ...newFilterValues }));
-  };
+    setFilterState(prev => ({ ...prev, ...newFilterValues }))
+  }
 
   // Filter zurücksetzen
   const handleResetFilter = () => {
@@ -122,9 +122,9 @@ const CapabilitiesPage = () => {
       descriptionFilter: '',
       ownerFilter: '',
       updatedDateRange: ['', ''],
-    });
-    setActiveFiltersCount(0);
-  };
+    })
+    setActiveFiltersCount(0)
+  }
 
   return (
     <Box sx={{ py: 2, px: 1 }}>
@@ -175,13 +175,13 @@ const CapabilitiesPage = () => {
           onResetFilter={handleResetFilter}
           onClose={() => setFilterOpen(false)}
           onApply={count => {
-            setActiveFiltersCount(count);
-            setFilterOpen(false);
+            setActiveFiltersCount(count)
+            setFilterOpen(false)
           }}
         />
       )}
     </Box>
-  );
-};
+  )
+}
 
-export default CapabilitiesPage;
+export default CapabilitiesPage

@@ -1,15 +1,15 @@
-import { createTheme, ThemeOptions } from '@mui/material/styles';
+import { createTheme, ThemeOptions } from '@mui/material/styles'
 
 // Farbpalette für das Atos Corporate Design
 declare module '@mui/material/styles' {
   interface PaletteColor {
-    lighter?: string;
-    darker?: string;
+    lighter?: string
+    darker?: string
   }
 
   interface SimplePaletteColorOptions {
-    lighter?: string;
-    darker?: string;
+    lighter?: string
+    darker?: string
   }
 }
 
@@ -187,8 +187,8 @@ export const themeOptions: ThemeOptions = {
       },
     },
   },
-};
+}
 
-const theme = createTheme(themeOptions);
+const theme = createTheme(themeOptions)
 
-export default theme;
+export default theme

@@ -1,17 +1,17 @@
-'use client';
+'use client'
 
-import React, { useState } from 'react';
-import { Box, Tooltip, IconButton, CircularProgress, Button, useTheme, Chip } from '@mui/material';
+import React, { useState } from 'react'
+import { Box, Tooltip, IconButton, CircularProgress, Button, useTheme, Chip } from '@mui/material'
 import {
   Edit as EditIcon,
   Visibility as VisibilityIcon,
   KeyboardArrowDown as SortDownIcon,
   KeyboardArrowUp as SortUpIcon,
-} from '@mui/icons-material';
-import { Capability } from './types';
-import { formatDate, getLevelLabel } from './utils';
-import { BusinessCapability, CapabilityStatus } from '../../gql/generated';
-import CapabilityForm, { CapabilityFormValues } from './CapabilityForm';
+} from '@mui/icons-material'
+import { Capability } from './types'
+import { formatDate, getLevelLabel } from './utils'
+import { BusinessCapability, CapabilityStatus } from '../../gql/generated'
+import CapabilityForm, { CapabilityFormValues } from './CapabilityForm'
 import {
   createColumnHelper,
   flexRender,
@@ -21,21 +21,21 @@ import {
   getFilteredRowModel,
   getPaginationRowModel,
   SortingState,
-} from '@tanstack/react-table';
-import { isArchitect } from '@/lib/auth';
+} from '@tanstack/react-table'
+import { isArchitect } from '@/lib/auth'
 
 interface CapabilityTableProps {
-  id?: string;
-  capabilities: Capability[];
-  loading: boolean;
-  globalFilter: string;
-  sorting: SortingState;
-  onSortingChange: (sorting: SortingState) => void;
-  onRowClick: (id: string) => void;
-  onEditClick: (id: string) => void;
-  onCreateCapability?: (data: CapabilityFormValues) => Promise<void>;
-  onUpdateCapability?: (id: string, data: CapabilityFormValues) => Promise<void>;
-  availableTags?: string[];
+  id?: string
+  capabilities: Capability[]
+  loading: boolean
+  globalFilter: string
+  sorting: SortingState
+  onSortingChange: (sorting: SortingState) => void
+  onRowClick: (id: string) => void
+  onEditClick: (id: string) => void
+  onCreateCapability?: (data: CapabilityFormValues) => Promise<void>
+  onUpdateCapability?: (id: string, data: CapabilityFormValues) => Promise<void>
+  availableTags?: string[]
 }
 
 const CapabilityTable: React.FC<CapabilityTableProps> = ({
@@ -52,62 +52,62 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
   availableTags = [],
 }) => {
   // State für das Formular-Dialog
-  const [formMode, setFormMode] = useState<'create' | 'edit' | 'view'>('view');
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [selectedCapability, setSelectedCapability] = useState<BusinessCapability | null>(null);
-  const [formLoading, setFormLoading] = useState(false);
-  const theme = useTheme();
-  const columnHelper = createColumnHelper<Capability>();
+  const [formMode, setFormMode] = useState<'create' | 'edit' | 'view'>('view')
+  const [isFormOpen, setIsFormOpen] = useState(false)
+  const [selectedCapability, setSelectedCapability] = useState<BusinessCapability | null>(null)
+  const [formLoading, setFormLoading] = useState(false)
+  const theme = useTheme()
+  const columnHelper = createColumnHelper<Capability>()
 
   // Handler für Formular-Operationen
   // Handler für das Öffnen des Formulars zur Detailansicht
   const handleViewCapabilityClick = (id: string) => {
-    const capability = capabilities.find(cap => cap.id === id);
+    const capability = capabilities.find(cap => cap.id === id)
     if (capability) {
-      setSelectedCapability(capability as unknown as BusinessCapability);
-      setFormMode('view');
-      setIsFormOpen(true);
+      setSelectedCapability(capability as unknown as BusinessCapability)
+      setFormMode('view')
+      setIsFormOpen(true)
     } else {
-      onRowClick(id);
+      onRowClick(id)
     }
-  };
+  }
 
   // Handler für das Öffnen des Formulars zum Bearbeiten
   const handleEditCapabilityClick = (id: string) => {
-    const capability = capabilities.find(cap => cap.id === id);
+    const capability = capabilities.find(cap => cap.id === id)
     if (capability) {
-      setSelectedCapability(capability as unknown as BusinessCapability);
-      setFormMode('edit');
-      setIsFormOpen(true);
+      setSelectedCapability(capability as unknown as BusinessCapability)
+      setFormMode('edit')
+      setIsFormOpen(true)
     } else {
-      onEditClick(id);
+      onEditClick(id)
     }
-  };
+  }
 
   // Handler für das Erstellen einer neuen Capability (nicht mehr verwendet)
   // Diese Funktion wird jetzt über die Hauptseite (page.tsx) gesteuert
 
   // Handler für das Schließen des Formulars
   const handleFormClose = () => {
-    setIsFormOpen(false);
-  };
+    setIsFormOpen(false)
+  }
 
   // Handler für das Speichern des Formulars
   const handleFormSubmit = async (data: CapabilityFormValues) => {
-    setFormLoading(true);
+    setFormLoading(true)
     try {
       if (formMode === 'create' && onCreateCapability) {
-        await onCreateCapability(data);
+        await onCreateCapability(data)
       } else if (formMode === 'edit' && onUpdateCapability && selectedCapability) {
-        await onUpdateCapability(selectedCapability.id, data);
+        await onUpdateCapability(selectedCapability.id, data)
       }
-      setIsFormOpen(false);
+      setIsFormOpen(false)
     } catch (error) {
-      console.error('Fehler beim Speichern der Capability:', error);
+      console.error('Fehler beim Speichern der Capability:', error)
     } finally {
-      setFormLoading(false);
+      setFormLoading(false)
     }
-  };
+  }
 
   const columns = [
     columnHelper.accessor('name', {
@@ -117,14 +117,14 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
     columnHelper.accessor('description', {
       header: 'Beschreibung',
       cell: info => {
-        const value = info.getValue();
-        return value && value.length > 50 ? `${value.substring(0, 50)}...` : value || '-';
+        const value = info.getValue()
+        return value && value.length > 50 ? `${value.substring(0, 50)}...` : value || '-'
       },
     }),
     columnHelper.accessor('maturityLevel', {
       header: 'Reifegrad',
       cell: info => {
-        const level = info.getValue();
+        const level = info.getValue()
         return (
           <Chip
             label={getLevelLabel(level)}
@@ -134,14 +134,14 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
               color: theme.palette.primary.dark,
             }}
           />
-        );
+        )
       },
     }),
     columnHelper.accessor('status', {
       header: 'Status',
       cell: info => {
-        const status = info.getValue() as CapabilityStatus;
-        return status;
+        const status = info.getValue() as CapabilityStatus
+        return status
       },
     }),
     columnHelper.accessor('businessValue', {
@@ -155,15 +155,15 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
     columnHelper.accessor('tags', {
       header: 'Tags',
       cell: info => {
-        const tags = info.getValue();
-        return tags ? tags.join(', ') : '-';
+        const tags = info.getValue()
+        return tags ? tags.join(', ') : '-'
       },
     }),
     columnHelper.accessor('children', {
       header: 'Untergeordnete Capabilities',
       cell: info => {
-        const children = info.getValue();
-        return children ? children.map(child => child.name).join(', ') : '-';
+        const children = info.getValue()
+        return children ? children.map(child => child.name).join(', ') : '-'
       },
     }),
     columnHelper.accessor('createdAt', {
@@ -173,15 +173,15 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
     columnHelper.accessor('updatedAt', {
       header: 'Aktualisiert am',
       cell: info => {
-        const value = info.getValue();
-        return value ? formatDate(value) : '-';
+        const value = info.getValue()
+        return value ? formatDate(value) : '-'
       },
     }),
     columnHelper.display({
       id: 'actions',
       header: 'Aktionen',
       cell: info => {
-        const capability = info.row.original;
+        const capability = info.row.original
 
         return (
           <Box sx={{ display: 'flex', justifyContent: 'center' }}>
@@ -200,8 +200,8 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
               <Tooltip title="Bearbeiten">
                 <IconButton
                   onClick={e => {
-                    e.stopPropagation();
-                    handleEditCapabilityClick(capability.id);
+                    e.stopPropagation()
+                    handleEditCapabilityClick(capability.id)
                   }}
                   color="secondary"
                   size="small"
@@ -212,10 +212,10 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
               </Tooltip>
             )}
           </Box>
-        );
+        )
       },
     }),
-  ];
+  ]
 
   // TanStack Table konfigurieren
   const table = useReactTable({
@@ -235,14 +235,14 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
         pageSize: 10,
       },
     },
-  });
+  })
 
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', p: 4 }}>
         <CircularProgress />
       </Box>
-    );
+    )
   }
 
   return (
@@ -253,9 +253,9 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
           id="create-capability-button"
           style={{ display: 'none' }}
           onClick={() => {
-            setSelectedCapability(null);
-            setFormMode('create');
-            setIsFormOpen(true);
+            setSelectedCapability(null)
+            setFormMode('create')
+            setIsFormOpen(true)
           }}
         >
           Neu erstellen
@@ -333,11 +333,11 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
                     backgroundColor: 'transparent',
                   }}
                   onMouseOver={e => {
-                    (e.currentTarget as HTMLElement).style.backgroundColor =
-                      theme.palette.action.hover;
+                    ;(e.currentTarget as HTMLElement).style.backgroundColor =
+                      theme.palette.action.hover
                   }}
                   onMouseOut={e => {
-                    (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
+                    ;(e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'
                   }}
                 >
                   {row.getVisibleCells().map(cell => (
@@ -381,7 +381,7 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
           <select
             value={table.getState().pagination.pageSize}
             onChange={e => {
-              table.setPageSize(Number(e.target.value));
+              table.setPageSize(Number(e.target.value))
             }}
             style={{
               padding: '4px 8px',
@@ -408,65 +408,65 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             {Array.from({ length: table.getPageCount() > 7 ? 7 : table.getPageCount() }, (_, i) => {
               // Zeige maximal 7 Seitenzahlen an
-              let pageIndex;
-              const currentPage = table.getState().pagination.pageIndex;
-              const totalPages = table.getPageCount();
+              let pageIndex
+              const currentPage = table.getState().pagination.pageIndex
+              const totalPages = table.getPageCount()
 
               if (totalPages <= 7) {
                 // Wenn weniger als 7 Seiten, zeige alle an
-                pageIndex = i;
+                pageIndex = i
               } else if (currentPage < 3) {
                 // Wenn aktuelle Seite weniger als 3 ist
                 if (i < 5) {
-                  pageIndex = i;
+                  pageIndex = i
                 } else if (i === 5) {
                   return (
                     <Box key="ellipsis-end" sx={{ mx: 1 }}>
                       ...
                     </Box>
-                  );
+                  )
                 } else {
-                  pageIndex = totalPages - 1;
+                  pageIndex = totalPages - 1
                 }
               } else if (currentPage > totalPages - 4) {
                 // Wenn aktuelle Seite nahe am Ende ist
                 if (i === 0) {
-                  pageIndex = 0;
+                  pageIndex = 0
                 } else if (i === 1) {
                   return (
                     <Box key="ellipsis-start" sx={{ mx: 1 }}>
                       ...
                     </Box>
-                  );
+                  )
                 } else {
-                  pageIndex = totalPages - 7 + i;
+                  pageIndex = totalPages - 7 + i
                 }
               } else {
                 // Wenn aktuelle Seite in der Mitte ist
                 if (i === 0) {
-                  pageIndex = 0;
+                  pageIndex = 0
                 } else if (i === 1) {
                   return (
                     <Box key="ellipsis-start" sx={{ mx: 1 }}>
                       ...
                     </Box>
-                  );
+                  )
                 } else if (i === 6) {
                   return (
                     <Box key="ellipsis-end" sx={{ mx: 1 }}>
                       ...
                     </Box>
-                  );
+                  )
                 } else if (i === 5) {
-                  pageIndex = totalPages - 1;
+                  pageIndex = totalPages - 1
                 } else {
-                  pageIndex = currentPage + (i - 3);
+                  pageIndex = currentPage + (i - 3)
                 }
               }
 
               // Prüfen und anpassen bei ungültigen pageIndex-Werten
-              if (pageIndex < 0) pageIndex = 0;
-              if (pageIndex >= totalPages) pageIndex = totalPages - 1;
+              if (pageIndex < 0) pageIndex = 0
+              if (pageIndex >= totalPages) pageIndex = totalPages - 1
 
               return (
                 <Button
@@ -481,7 +481,7 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
                 >
                   {pageIndex + 1}
                 </Button>
-              );
+              )
             })}
           </Box>
           <Button
@@ -507,7 +507,7 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
         loading={formLoading}
       />
     </>
-  );
-};
+  )
+}
 
-export default CapabilityTable;
+export default CapabilityTable

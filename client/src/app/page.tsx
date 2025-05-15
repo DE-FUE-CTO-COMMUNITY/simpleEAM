@@ -1,7 +1,7 @@
-'use client';
+'use client'
 
-import React, { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import {
   Box,
   Typography,
@@ -11,15 +11,15 @@ import {
   CardHeader,
   Divider,
   useTheme,
-} from '@mui/material';
+} from '@mui/material'
 import {
   Business as BusinessIcon,
   Apps as AppsIcon,
   DataObject as DataObjectIcon,
   Construction as ConstructionIcon,
-} from '@mui/icons-material';
-import { useQuery } from '@apollo/client';
-import { useSnackbar } from 'notistack';
+} from '@mui/icons-material'
+import { useQuery } from '@apollo/client'
+import { useSnackbar } from 'notistack'
 import {
   BarChart,
   Bar,
@@ -29,97 +29,97 @@ import {
   Tooltip as RechartsTooltip,
   ResponsiveContainer,
   Cell,
-} from 'recharts';
-import { useAuth, login } from '@/lib/auth';
-import { GET_CAPABILITIES_COUNT } from '@/graphql/capability';
-import { GET_APPLICATIONS_COUNT } from '@/graphql/application';
-import { GET_DATA_OBJECTS_COUNT } from '@/graphql/dataObject';
+} from 'recharts'
+import { useAuth, login } from '@/lib/auth'
+import { GET_CAPABILITIES_COUNT } from '@/graphql/capability'
+import { GET_APPLICATIONS_COUNT } from '@/graphql/application'
+import { GET_DATA_OBJECTS_COUNT } from '@/graphql/dataObject'
 
 const Dashboard = () => {
-  const { authenticated } = useAuth();
-  const router = useRouter();
-  const theme = useTheme();
-  const { enqueueSnackbar } = useSnackbar();
+  const { authenticated } = useAuth()
+  const router = useRouter()
+  const theme = useTheme()
+  const { enqueueSnackbar } = useSnackbar()
 
   // Weiterleitung zum Login, falls nicht authentifiziert
   useEffect(() => {
     if (authenticated === false) {
-      login();
+      login()
     }
-  }, [authenticated]);
+  }, [authenticated])
 
   // Daten für Dashboard laden
   const {
     data: capabilitiesData,
     loading: capabilitiesLoading,
     error: capabilitiesError,
-  } = useQuery(GET_CAPABILITIES_COUNT, { skip: !authenticated });
+  } = useQuery(GET_CAPABILITIES_COUNT, { skip: !authenticated })
 
   const {
     data: applicationsData,
     loading: applicationsLoading,
     error: applicationsError,
-  } = useQuery(GET_APPLICATIONS_COUNT, { skip: !authenticated });
+  } = useQuery(GET_APPLICATIONS_COUNT, { skip: !authenticated })
 
   const {
     data: dataObjectsData,
     loading: dataObjectsLoading,
     error: dataObjectsError,
-  } = useQuery(GET_DATA_OBJECTS_COUNT, { skip: !authenticated });
+  } = useQuery(GET_DATA_OBJECTS_COUNT, { skip: !authenticated })
 
   // Fehlerbehandlung
   useEffect(() => {
     if (capabilitiesError) {
-      enqueueSnackbar('Fehler beim Laden der Business Capabilities', { variant: 'error' });
-      console.error('Capabilities error:', capabilitiesError);
+      enqueueSnackbar('Fehler beim Laden der Business Capabilities', { variant: 'error' })
+      console.error('Capabilities error:', capabilitiesError)
     }
     if (applicationsError) {
-      enqueueSnackbar('Fehler beim Laden der Anwendungen', { variant: 'error' });
-      console.error('Applications error:', applicationsError);
+      enqueueSnackbar('Fehler beim Laden der Anwendungen', { variant: 'error' })
+      console.error('Applications error:', applicationsError)
     }
     if (dataObjectsError) {
-      enqueueSnackbar('Fehler beim Laden der Datenobjekte', { variant: 'error' });
-      console.error('DataObjects error:', dataObjectsError);
+      enqueueSnackbar('Fehler beim Laden der Datenobjekte', { variant: 'error' })
+      console.error('DataObjects error:', dataObjectsError)
     }
-  }, [capabilitiesError, applicationsError, dataObjectsError, enqueueSnackbar]);
+  }, [capabilitiesError, applicationsError, dataObjectsError, enqueueSnackbar])
 
   // Anzahl der Elemente - angepasst für die neue Datenstruktur
   const capabilitiesCount =
-    capabilitiesData?.businessCapabilitiesConnection?.aggregate?.count?.nodes || 0;
-  const applicationsCount = applicationsData?.applicationsConnection?.aggregate?.count?.nodes || 0;
-  const dataObjectsCount = dataObjectsData?.dataObjectsConnection?.aggregate?.count?.nodes || 0;
-  const totalCount = capabilitiesCount + applicationsCount + dataObjectsCount;
+    capabilitiesData?.businessCapabilitiesConnection?.aggregate?.count?.nodes || 0
+  const applicationsCount = applicationsData?.applicationsConnection?.aggregate?.count?.nodes || 0
+  const dataObjectsCount = dataObjectsData?.dataObjectsConnection?.aggregate?.count?.nodes || 0
+  const totalCount = capabilitiesCount + applicationsCount + dataObjectsCount
 
   // Daten für das Balkendiagramm
   const chartData = [
     { name: 'Business Capabilities', count: capabilitiesCount },
     { name: 'Anwendungen', count: applicationsCount },
     { name: 'Datenobjekte', count: dataObjectsCount },
-  ];
+  ]
 
-  const isLoading = capabilitiesLoading || applicationsLoading || dataObjectsLoading;
+  const isLoading = capabilitiesLoading || applicationsLoading || dataObjectsLoading
 
   const getCardIcon = (type: string) => {
     switch (type) {
       case 'capability':
-        return <BusinessIcon sx={{ fontSize: 48, color: theme.palette.primary.main }} />;
+        return <BusinessIcon sx={{ fontSize: 48, color: theme.palette.primary.main }} />
       case 'application':
-        return <AppsIcon sx={{ fontSize: 48, color: theme.palette.secondary.main }} />;
+        return <AppsIcon sx={{ fontSize: 48, color: theme.palette.secondary.main }} />
       case 'dataObject':
-        return <DataObjectIcon sx={{ fontSize: 48, color: theme.palette.info.main }} />;
+        return <DataObjectIcon sx={{ fontSize: 48, color: theme.palette.info.main }} />
       default:
-        return <ConstructionIcon sx={{ fontSize: 48, color: theme.palette.grey[500] }} />;
+        return <ConstructionIcon sx={{ fontSize: 48, color: theme.palette.grey[500] }} />
     }
-  };
+  }
 
   const getChartColor = (index: number) => {
     const colors = [
       theme.palette.primary.main,
       theme.palette.secondary.main,
       theme.palette.info.main,
-    ];
-    return colors[index % colors.length];
-  };
+    ]
+    return colors[index % colors.length]
+  }
 
   return (
     <Box sx={{ py: 2, px: 1 }}>
@@ -227,7 +227,7 @@ const Dashboard = () => {
         </CardContent>
       </Card>
     </Box>
-  );
-};
+  )
+}
 
-export default Dashboard;
+export default Dashboard

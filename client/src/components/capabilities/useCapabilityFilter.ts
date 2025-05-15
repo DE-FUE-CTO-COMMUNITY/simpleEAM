@@ -1,12 +1,12 @@
-'use client';
+'use client'
 
-import { useMemo } from 'react';
-import { Capability, FilterState } from './types';
-import { CapabilityStatus } from '../../gql/generated';
+import { useMemo } from 'react'
+import { Capability, FilterState } from './types'
+import { CapabilityStatus } from '../../gql/generated'
 
 interface UseCapabilityFilterProps {
-  capabilities: Capability[];
-  filterState: FilterState;
+  capabilities: Capability[]
+  filterState: FilterState
 }
 
 export const useCapabilityFilter = ({ capabilities, filterState }: UseCapabilityFilterProps) => {
@@ -18,7 +18,7 @@ export const useCapabilityFilter = ({ capabilities, filterState }: UseCapability
     descriptionFilter,
     ownerFilter,
     updatedDateRange,
-  } = filterState;
+  } = filterState
 
   // Filterfunktion für erweiterte Filter
   const filteredData = useMemo(() => {
@@ -28,7 +28,7 @@ export const useCapabilityFilter = ({ capabilities, filterState }: UseCapability
         statusFilter.length > 0 &&
         !statusFilter.includes(capability.status as CapabilityStatus)
       ) {
-        return false;
+        return false
       }
 
       // Reifegrad Filter
@@ -38,13 +38,13 @@ export const useCapabilityFilter = ({ capabilities, filterState }: UseCapability
         capability.maturityLevel !== undefined &&
         !maturityLevelFilter.includes(capability.maturityLevel)
       ) {
-        return false;
+        return false
       }
 
       // Geschäftswert Range Filter
-      const businessValue = capability.businessValue ?? 0;
+      const businessValue = capability.businessValue ?? 0
       if (businessValue < businessValueRange[0] || businessValue > businessValueRange[1]) {
-        return false;
+        return false
       }
 
       // Tags Filter
@@ -52,7 +52,7 @@ export const useCapabilityFilter = ({ capabilities, filterState }: UseCapability
         tagsFilter.length > 0 &&
         (!capability.tags || !capability.tags.some(tag => tagsFilter.includes(tag)))
       ) {
-        return false;
+        return false
       }
 
       // Beschreibungs-Filter
@@ -61,7 +61,7 @@ export const useCapabilityFilter = ({ capabilities, filterState }: UseCapability
         (!capability.description ||
           !capability.description.toLowerCase().includes(descriptionFilter.toLowerCase()))
       ) {
-        return false;
+        return false
       }
 
       // Verantwortlicher-Filter
@@ -69,37 +69,37 @@ export const useCapabilityFilter = ({ capabilities, filterState }: UseCapability
         ownerFilter &&
         (!capability.owner || !capability.owner.toLowerCase().includes(ownerFilter.toLowerCase()))
       ) {
-        return false;
+        return false
       }
 
       // Aktualisierungsdatum-Filter
       if (updatedDateRange[0] || updatedDateRange[1]) {
-        const startDate = updatedDateRange[0] ? new Date(updatedDateRange[0]) : null;
-        const endDate = updatedDateRange[1] ? new Date(updatedDateRange[1]) : null;
+        const startDate = updatedDateRange[0] ? new Date(updatedDateRange[0]) : null
+        const endDate = updatedDateRange[1] ? new Date(updatedDateRange[1]) : null
 
         if (!capability.updatedAt) {
-          return false;
+          return false
         }
 
-        const updatedDate = new Date(capability.updatedAt);
+        const updatedDate = new Date(capability.updatedAt)
 
         if (startDate && updatedDate < startDate) {
-          return false;
+          return false
         }
 
         if (endDate) {
           // Setze das Ende des Tages für einen inklusiven Vergleich
-          const endOfDay = new Date(endDate);
-          endOfDay.setHours(23, 59, 59, 999);
+          const endOfDay = new Date(endDate)
+          endOfDay.setHours(23, 59, 59, 999)
 
           if (updatedDate > endOfDay) {
-            return false;
+            return false
           }
         }
       }
 
-      return true;
-    });
+      return true
+    })
   }, [
     capabilities,
     statusFilter,
@@ -109,7 +109,7 @@ export const useCapabilityFilter = ({ capabilities, filterState }: UseCapability
     descriptionFilter,
     ownerFilter,
     updatedDateRange,
-  ]);
+  ])
 
-  return filteredData;
-};
+  return filteredData
+}

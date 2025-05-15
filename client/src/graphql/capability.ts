@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+import { gql } from '@apollo/client'
 
 export const GET_CAPABILITIES_COUNT = gql`
   query GetBusinessCapabilitiesCount {
@@ -10,7 +10,7 @@ export const GET_CAPABILITIES_COUNT = gql`
       }
     }
   }
-`;
+`
 
 export const GET_CAPABILITIES = gql`
   query GetCapabilities {
@@ -31,7 +31,7 @@ export const GET_CAPABILITIES = gql`
       }
     }
   }
-`;
+`
 
 export const GET_CAPABILITY = gql`
   query GetCapability($id: ID!) {
@@ -55,7 +55,7 @@ export const GET_CAPABILITY = gql`
       }
     }
   }
-`;
+`
 
 export const CREATE_CAPABILITY = gql`
   mutation CreateCapability($input: [BusinessCapabilityCreateInput!]!) {
@@ -71,7 +71,7 @@ export const CREATE_CAPABILITY = gql`
       }
     }
   }
-`;
+`
 
 export const UPDATE_CAPABILITY = gql`
   mutation UpdateCapability($id: ID!, $input: BusinessCapabilityUpdateInput!) {
@@ -87,7 +87,7 @@ export const UPDATE_CAPABILITY = gql`
       }
     }
   }
-`;
+`
 
 export const DELETE_CAPABILITY = gql`
   mutation DeleteCapability($id: ID!) {
@@ -95,4 +95,4 @@ export const DELETE_CAPABILITY = gql`
       nodesDeleted
     }
   }
-`;
+`

@@ -1,18 +1,18 @@
-'use client';
+'use client'
 
-import React, { useState, useEffect } from 'react';
-import { CacheProvider } from '@emotion/react';
-import { ThemeProvider } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
-import { useServerInsertedHTML } from 'next/navigation';
-import createCache from '@emotion/cache';
-import { ApolloProvider } from '@apollo/client';
-import { SnackbarProvider } from 'notistack';
-import { AuthContext, initKeycloak, keycloak } from '@/lib/auth';
-import { createApolloClient } from '@/lib/apollo-client';
-import theme from '@/theme/theme';
-import { CircularProgress } from '@mui/material';
-import RootLayout from '@/components/layout/RootLayout';
+import React, { useState, useEffect } from 'react'
+import { CacheProvider } from '@emotion/react'
+import { ThemeProvider } from '@mui/material/styles'
+import CssBaseline from '@mui/material/CssBaseline'
+import { useServerInsertedHTML } from 'next/navigation'
+import createCache from '@emotion/cache'
+import { ApolloProvider } from '@apollo/client'
+import { SnackbarProvider } from 'notistack'
+import { AuthContext, initKeycloak, keycloak } from '@/lib/auth'
+import { createApolloClient } from '@/lib/apollo-client'
+import theme from '@/theme/theme'
+import { CircularProgress } from '@mui/material'
+import RootLayout from '@/components/layout/RootLayout'
 
 // Emotion Cache für Server-Side Rendering
 export function useClientStyleRegistry() {
@@ -24,31 +24,31 @@ export function useClientStyleRegistry() {
       stylisPlugins: [],
       // Vermeidet Optimierungen, die zu unterschiedlichen Klassennamen führen könnten
       speedy: false,
-    });
+    })
     return {
       cache,
       flush: () => {
         // Sicherstellen, dass alle Tags entfernt werden
         if (typeof window !== 'undefined') {
-          cache.sheet.tags.forEach(tag => tag.parentNode?.removeChild(tag));
+          cache.sheet.tags.forEach(tag => tag.parentNode?.removeChild(tag))
         }
-        cache.sheet.flush();
+        cache.sheet.flush()
       },
-    };
-  });
+    }
+  })
 
   useServerInsertedHTML(() => {
-    const names = new Set();
+    const names = new Set()
     const styles = Array.from(cache.sheet.tags)
       .map(tag => {
-        const key = tag.getAttribute('data-emotion')?.split(' ')[1] ?? '';
-        if (names.has(key)) return null;
-        names.add(key);
-        return tag.innerHTML;
+        const key = tag.getAttribute('data-emotion')?.split(' ')[1] ?? ''
+        if (names.has(key)) return null
+        names.add(key)
+        return tag.innerHTML
       })
-      .filter(Boolean);
+      .filter(Boolean)
 
-    if (styles.length === 0) return null;
+    if (styles.length === 0) return null
 
     return (
       <style
@@ -56,82 +56,82 @@ export function useClientStyleRegistry() {
         data-emotion={`mui ${Array.from(names).join(' ')}`}
         dangerouslySetInnerHTML={{ __html: styles.join('') }}
       />
-    );
-  });
+    )
+  })
 
-  return { cache, flush };
+  return { cache, flush }
 }
 
-import { ApolloClient, NormalizedCacheObject } from '@apollo/client';
+import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const { cache } = useClientStyleRegistry();
+  const { cache } = useClientStyleRegistry()
   // Um Hydration-Fehler zu vermeiden, initialisieren wir mit false
-  const [initialized, setInitialized] = useState(false);
-  const [authenticated, setAuthenticated] = useState(false);
-  const [client, setClient] = useState<ApolloClient<NormalizedCacheObject> | null>(null);
+  const [initialized, setInitialized] = useState(false)
+  const [authenticated, setAuthenticated] = useState(false)
+  const [client, setClient] = useState<ApolloClient<NormalizedCacheObject> | null>(null)
   // Verzögertes Mounting für clientseitige Initialisierung
-  const [mounted, setMounted] = useState(false);
+  const [mounted, setMounted] = useState(false)
 
   // Verwenden Sie useEffect, um Keycloak nur auf dem Client zu initialisieren
   // Trennung von Mounting- und Auth-Logik für bessere Kontrolle
   useEffect(() => {
     // Markieren als gemounted für clientseitigen Hydration-Fix
-    setMounted(true);
-  }, []);
+    setMounted(true)
+  }, [])
 
   // Separate useEffect für die Authentifizierung
   useEffect(() => {
     // Initialisierung nur durchführen, wenn wir auf dem Client sind
-    if (!mounted) return;
+    if (!mounted) return
 
     // Erstelle eine Fallback-Client-Instanz für SSR
-    const defaultClient = createApolloClient();
-    setClient(defaultClient);
+    const defaultClient = createApolloClient()
+    setClient(defaultClient)
 
     const initAuth = async () => {
       try {
         // Keycloak nur auf dem Client initialisieren
-        const authenticated = await initKeycloak();
-        setAuthenticated(authenticated);
+        const authenticated = await initKeycloak()
+        setAuthenticated(authenticated)
 
         // Apollo-Client mit Token initialisieren, wenn keycloak und token vorhanden sind
         if (keycloak && keycloak.token) {
-          const apolloClient = createApolloClient(keycloak.token);
-          setClient(apolloClient);
+          const apolloClient = createApolloClient(keycloak.token)
+          setClient(apolloClient)
 
           // Token-Refresh-Handler
-          const kc = keycloak;
+          const kc = keycloak
           kc.onTokenExpired = () => {
             kc.updateToken(30)
               .then(refreshed => {
                 if (refreshed && kc.token) {
-                  const newToken = kc.token;
-                  const refreshedClient = createApolloClient(newToken);
-                  setClient(refreshedClient);
+                  const newToken = kc.token
+                  const refreshedClient = createApolloClient(newToken)
+                  setClient(refreshedClient)
                 }
               })
               .catch(() => {
-                console.error('Failed to refresh token');
-              });
-          };
+                console.error('Failed to refresh token')
+              })
+          }
         }
       } catch (error) {
-        console.error('Keycloak init error:', error);
+        console.error('Keycloak init error:', error)
       } finally {
         // Verzögertes Setzen des initialisierten Status um Flash of Loading zu vermeiden
         setTimeout(() => {
-          setInitialized(true);
-        }, 300);
+          setInitialized(true)
+        }, 300)
       }
-    };
+    }
 
-    initAuth();
-  }, [mounted]);
+    initAuth()
+  }, [mounted])
 
   // Render-Funktion mit verzögertem Mounting, um Hydration-Fehler zu vermeiden
   const renderContent = () => {
-    const apolloClient = client || createApolloClient();
+    const apolloClient = client || createApolloClient()
 
     // Identische DOM-Struktur für Server und Client, ohne dynamische Klassennamen
     return (
@@ -169,8 +169,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </AuthContext.Provider>
         </div>
       </>
-    );
-  };
+    )
+  }
 
   return (
     <html lang="de">
@@ -198,5 +198,5 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </CacheProvider>
       </body>
     </html>
-  );
+  )
 }

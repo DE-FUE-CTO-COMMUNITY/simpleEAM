@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+import { gql } from '@apollo/client'
 
 export const GET_APPLICATIONS_COUNT = gql`
   query GetApplicationsCount {
@@ -10,7 +10,7 @@ export const GET_APPLICATIONS_COUNT = gql`
       }
     }
   }
-`;
+`
 
 export const GET_APPLICATIONS = gql`
   query GetApplications {
@@ -27,7 +27,7 @@ export const GET_APPLICATIONS = gql`
       technologyStack
     }
   }
-`;
+`
 
 export const GET_APPLICATION = gql`
   query GetApplication($id: ID!) {
@@ -55,4 +55,4 @@ export const GET_APPLICATION = gql`
       }
     }
   }
-`;
+`

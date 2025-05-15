@@ -29,9 +29,9 @@ npm() {
   esac
 }
 
-# Alias für npx zu yarn dlx erstellen
+# Alias für yarn dlx zu yarn dlx erstellen
 npx() {
-  echo "🔄 Umleitung: npx $@ → yarn dlx $@"
+  echo "🔄 Umleitung: yarn dlx $@ → yarn dlx $@"
   yarn dlx "$@"
 }
 

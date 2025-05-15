@@ -1,6 +1,6 @@
-'use client';
+'use client'
 
-import React from 'react';
+import React from 'react'
 import {
   Typography,
   Box,
@@ -18,11 +18,11 @@ import {
   OutlinedInput,
   Slider,
   TextField,
-} from '@mui/material';
-import { ClearAll as ClearAllIcon } from '@mui/icons-material';
-import { FilterProps } from './types';
-import { getLevelLabel, countActiveFilters } from './utils';
-import { CapabilityStatus } from '../../gql/generated';
+} from '@mui/material'
+import { ClearAll as ClearAllIcon } from '@mui/icons-material'
+import { FilterProps } from './types'
+import { getLevelLabel, countActiveFilters } from './utils'
+import { CapabilityStatus } from '../../gql/generated'
 
 const CapabilityFilterDialog: React.FC<FilterProps> = ({
   filterState,
@@ -41,18 +41,18 @@ const CapabilityFilterDialog: React.FC<FilterProps> = ({
     descriptionFilter,
     ownerFilter,
     updatedDateRange,
-  } = filterState;
+  } = filterState
 
   const handleFilterReset = () => {
-    onResetFilter();
-    onClose();
-  };
+    onResetFilter()
+    onClose()
+  }
 
   const handleApply = () => {
-    const activeCount = countActiveFilters(filterState);
-    onApply(activeCount);
-    onClose();
-  };
+    const activeCount = countActiveFilters(filterState)
+    onApply(activeCount)
+    onClose()
+  }
 
   return (
     <Dialog open={true} onClose={onClose} maxWidth="sm" fullWidth>
@@ -67,16 +67,16 @@ const CapabilityFilterDialog: React.FC<FilterProps> = ({
               multiple
               value={statusFilter}
               onChange={e => {
-                const value = e.target.value;
+                const value = e.target.value
                 // Stellen Sie sicher, dass die Werte als CapabilityStatus-Enum behandelt werden
                 const statusValues =
                   typeof value === 'string'
                     ? (value.split(',') as CapabilityStatus[])
-                    : (value as CapabilityStatus[]);
+                    : (value as CapabilityStatus[])
 
                 onFilterChange({
                   statusFilter: statusValues,
-                });
+                })
               }}
               input={<OutlinedInput label="Status" />}
               renderValue={selected => selected.join(', ')}
@@ -98,11 +98,11 @@ const CapabilityFilterDialog: React.FC<FilterProps> = ({
               multiple
               value={maturityLevelFilter}
               onChange={e => {
-                const value = e.target.value;
+                const value = e.target.value
                 onFilterChange({
                   maturityLevelFilter:
                     typeof value === 'string' ? value.split(',').map(Number) : value,
-                });
+                })
               }}
               input={<OutlinedInput label="Reifegrad" />}
               renderValue={selected => selected.map(level => getLevelLabel(level)).join(', ')}
@@ -143,10 +143,10 @@ const CapabilityFilterDialog: React.FC<FilterProps> = ({
               multiple
               value={tagsFilter}
               onChange={e => {
-                const value = e.target.value;
+                const value = e.target.value
                 onFilterChange({
                   tagsFilter: typeof value === 'string' ? value.split(',') : value,
-                });
+                })
               }}
               input={<OutlinedInput label="Tags" />}
               renderValue={selected => selected.join(', ')}
@@ -223,7 +223,7 @@ const CapabilityFilterDialog: React.FC<FilterProps> = ({
         </Button>
       </DialogActions>
     </Dialog>
-  );
-};
+  )
+}
 
-export default CapabilityFilterDialog;
+export default CapabilityFilterDialog

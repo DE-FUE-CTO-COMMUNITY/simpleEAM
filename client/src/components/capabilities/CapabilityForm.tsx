@@ -1,8 +1,8 @@
-'use client';
+'use client'
 
-import React, { useEffect } from 'react';
-import { useForm } from '@tanstack/react-form';
-import { z } from 'zod';
+import React, { useEffect } from 'react'
+import { useForm } from '@tanstack/react-form'
+import { z } from 'zod'
 // Die formatErrorMessage-Funktion wurde entfernt, da sie nicht verwendet wird.
 import {
   Box,
@@ -21,10 +21,10 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-} from '@mui/material';
-import { Grid } from '@mui/material';
-import { Save as SaveIcon, Cancel as CancelIcon, Edit as EditIcon } from '@mui/icons-material';
-import { BusinessCapability, CapabilityStatus } from '../../gql/generated';
+} from '@mui/material'
+import { Grid } from '@mui/material'
+import { Save as SaveIcon, Cancel as CancelIcon, Edit as EditIcon } from '@mui/icons-material'
+import { BusinessCapability, CapabilityStatus } from '../../gql/generated'
 
 // Schema für die Formularvalidierung
 export const capabilitySchema = z.object({
@@ -50,53 +50,53 @@ export const capabilitySchema = z.object({
   owner: z.string().optional(),
   tags: z.array(z.string()).optional(),
   parentId: z.string().optional(),
-});
+})
 
 // TypeScript Typen basierend auf dem Schema
-export type CapabilityFormValues = z.infer<typeof capabilitySchema>;
+export type CapabilityFormValues = z.infer<typeof capabilitySchema>
 
 export interface CapabilityFormProps {
-  capability?: BusinessCapability | null;
-  availableCapabilities?: BusinessCapability[];
-  availableTags?: string[];
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmit: (data: CapabilityFormValues) => Promise<void>;
-  mode: 'create' | 'edit' | 'view';
-  loading?: boolean;
+  capability?: BusinessCapability | null
+  availableCapabilities?: BusinessCapability[]
+  availableTags?: string[]
+  isOpen: boolean
+  onClose: () => void
+  onSubmit: (data: CapabilityFormValues) => Promise<void>
+  mode: 'create' | 'edit' | 'view'
+  loading?: boolean
 }
 
 const getLevelLabel = (level: number | null | undefined): string => {
   if (level === null || level === undefined) {
-    return 'Nicht definiert';
+    return 'Nicht definiert'
   }
 
   switch (level) {
     case 0:
-      return 'Niedrig';
+      return 'Niedrig'
     case 1:
-      return 'Mittel';
+      return 'Mittel'
     case 2:
-      return 'Hoch';
+      return 'Hoch'
     case 3:
-      return 'Sehr Hoch';
+      return 'Sehr Hoch'
     default:
-      return `Level ${level}`;
+      return `Level ${level}`
   }
-};
+}
 
 const getStatusLabel = (status: CapabilityStatus): string => {
   switch (status) {
     case CapabilityStatus.ACTIVE:
-      return 'Aktiv';
+      return 'Aktiv'
     case CapabilityStatus.PLANNED:
-      return 'Geplant';
+      return 'Geplant'
     case CapabilityStatus.RETIRED:
-      return 'Zurückgezogen';
+      return 'Zurückgezogen'
     default:
-      return status;
+      return status
   }
-};
+}
 
 const CapabilityForm: React.FC<CapabilityFormProps> = ({
   capability,
@@ -108,9 +108,9 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
   mode,
   loading = false,
 }) => {
-  const isViewMode = mode === 'view';
-  const isEditMode = mode === 'edit';
-  const isCreateMode = mode === 'create';
+  const isViewMode = mode === 'view'
+  const isEditMode = mode === 'edit'
+  const isCreateMode = mode === 'create'
 
   // Formulardaten initialisieren
   // Formulardaten initialisieren
@@ -123,37 +123,37 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
     owner: capability?.owner ?? '',
     tags: capability?.tags ?? [],
     parentId: capability?.children?.[0]?.id ?? '',
-  };
+  }
 
   // TanStack Form konfigurieren
   const form = useForm({
     defaultValues,
     onSubmit: async ({ value }) => {
-      await onSubmit(value);
+      await onSubmit(value)
     },
-  });
+  })
 
   // Dialog-Titel basierend auf dem Modus
   const getDialogTitle = () => {
-    if (isCreateMode) return 'Neue Business Capability erstellen';
-    if (isEditMode) return 'Business Capability bearbeiten';
-    return 'Business Capability Details';
-  };
+    if (isCreateMode) return 'Neue Business Capability erstellen'
+    if (isEditMode) return 'Business Capability bearbeiten'
+    return 'Business Capability Details'
+  }
 
   // Zurücksetzen des Formulars bei Schließen des Dialogs und Aktualisieren bei neuem Capability
   // Extrahiere stabile Werte aus capability, um die Abhängigkeiten zu stabilisieren
-  const capabilityName = capability?.name;
-  const capabilityDescription = capability?.description;
-  const capabilityMaturityLevel = capability?.maturityLevel;
-  const capabilityBusinessValue = capability?.businessValue;
-  const capabilityStatus = capability?.status;
-  const capabilityOwner = capability?.owner;
-  const capabilityTags = capability?.tags;
-  const capabilityParentId = capability?.children?.[0]?.id;
+  const capabilityName = capability?.name
+  const capabilityDescription = capability?.description
+  const capabilityMaturityLevel = capability?.maturityLevel
+  const capabilityBusinessValue = capability?.businessValue
+  const capabilityStatus = capability?.status
+  const capabilityOwner = capability?.owner
+  const capabilityTags = capability?.tags
+  const capabilityParentId = capability?.children?.[0]?.id
 
   useEffect(() => {
     if (!isOpen) {
-      form.reset();
+      form.reset()
     } else if (capability) {
       // Aktualisiere das Formular bei Änderungen am Capability-Objekt
       form.reset({
@@ -165,7 +165,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
         owner: capabilityOwner ?? '',
         tags: capabilityTags ?? [],
         parentId: capabilityParentId ?? '',
-      });
+      })
     }
   }, [
     isOpen,
@@ -179,16 +179,16 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
     capabilityOwner,
     capabilityTags,
     capabilityParentId,
-  ]);
+  ])
 
   return (
     <Dialog open={isOpen} onClose={isViewMode ? onClose : undefined} fullWidth maxWidth="md">
       <DialogTitle>{getDialogTitle()}</DialogTitle>
       <form
         onSubmit={e => {
-          e.preventDefault();
-          e.stopPropagation();
-          void form.handleSubmit();
+          e.preventDefault()
+          e.stopPropagation()
+          void form.handleSubmit()
         }}
       >
         <DialogContent>
@@ -237,7 +237,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
                     <TextField
                       value={field.state.value}
                       onChange={e => {
-                        field.handleChange(e.target.value as CapabilityStatus);
+                        field.handleChange(e.target.value as CapabilityStatus)
                       }}
                       onBlur={field.handleBlur}
                       disabled={isViewMode || loading}
@@ -463,11 +463,11 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
                         freeSolo
                         value={field.state.value || []}
                         onChange={(_, newValue) => {
-                          field.handleChange(newValue as string[]);
+                          field.handleChange(newValue as string[])
                         }}
                         renderTags={(value, getTagProps) =>
                           value.map((option, index) => {
-                            const tagProps = getTagProps({ index });
+                            const tagProps = getTagProps({ index })
                             // Key wird nicht in props weitergegeben, sondern als separates Prop
                             return (
                               <Chip
@@ -479,7 +479,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
                                 tabIndex={tagProps.tabIndex}
                                 className={tagProps.className}
                               />
-                            );
+                            )
                           })
                         }
                         renderInput={params => (
@@ -540,7 +540,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
               variant="contained"
               color="primary"
               onClick={() => {
-                onClose();
+                onClose()
                 // Hier könnten wir zum Edit-Modus wechseln
               }}
               startIcon={<EditIcon />}
@@ -551,7 +551,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
         </DialogActions>
       </form>
     </Dialog>
-  );
-};
+  )
+}
 
-export default CapabilityForm;
+export default CapabilityForm

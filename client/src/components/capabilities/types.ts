@@ -1,4 +1,4 @@
-import { BusinessCapability, CapabilityStatus } from '../../gql/generated';
+import { BusinessCapability, CapabilityStatus } from '../../gql/generated'
 
 // Nutze den generierten Typ als Basis und passe ihn für unsere Komponenten an
 export type Capability = Pick<
@@ -14,24 +14,24 @@ export type Capability = Pick<
   | 'createdAt'
   | 'updatedAt'
   | 'children'
->;
+>
 
 export interface FilterState {
-  statusFilter: CapabilityStatus[];
-  maturityLevelFilter: number[];
-  businessValueRange: [number, number];
-  tagsFilter: string[];
-  descriptionFilter: string;
-  ownerFilter: string;
-  updatedDateRange: [string, string];
+  statusFilter: CapabilityStatus[]
+  maturityLevelFilter: number[]
+  businessValueRange: [number, number]
+  tagsFilter: string[]
+  descriptionFilter: string
+  ownerFilter: string
+  updatedDateRange: [string, string]
 }
 
 export interface FilterProps {
-  filterState: FilterState;
-  availableStatuses: CapabilityStatus[];
-  availableTags: string[];
-  onFilterChange: (newFilter: Partial<FilterState>) => void;
-  onResetFilter: () => void;
-  onClose: () => void;
-  onApply: (activeCount: number) => void;
+  filterState: FilterState
+  availableStatuses: CapabilityStatus[]
+  availableTags: string[]
+  onFilterChange: (newFilter: Partial<FilterState>) => void
+  onResetFilter: () => void
+  onClose: () => void
+  onApply: (activeCount: number) => void
 }
