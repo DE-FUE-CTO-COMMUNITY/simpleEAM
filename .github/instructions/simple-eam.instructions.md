@@ -110,8 +110,8 @@ Alle Komponenten werden in separaten Docker-Containern bereitgestellt.
 
 ```tsx
 // Vor der Migration (V7)
-import { useTable, usePagination, useSortBy } from 'react-table';
-const tableInstance = useTable({ columns, data }, useSortBy, usePagination);
+import { useTable, usePagination, useSortBy } from 'react-table'
+const tableInstance = useTable({ columns, data }, useSortBy, usePagination)
 
 // Nach der Migration (V8)
 import {
@@ -119,14 +119,14 @@ import {
   getCoreRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-} from '@tanstack/react-table';
+} from '@tanstack/react-table'
 const tableInstance = useReactTable({
   columns,
   data,
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
   getSortedRowModel: getSortedRowModel(),
-});
+})
 ```
 
 #### Spalten-Definition
@@ -141,8 +141,8 @@ const tableInstance = useReactTable({
 - **TypeScript-Integration mit `columnHelper`**:
 
   ```tsx
-  import { createColumnHelper } from '@tanstack/react-table';
-  const columnHelper = createColumnHelper<YourDataType>();
+  import { createColumnHelper } from '@tanstack/react-table'
+  const columnHelper = createColumnHelper<YourDataType>()
 
   const columns = [
     columnHelper.accessor('firstName', {
@@ -156,7 +156,7 @@ const tableInstance = useReactTable({
       accessorKey: 'email',
       header: 'E-Mail',
     },
-  ];
+  ]
   ```
 
 #### Rendering und Markup-Änderungen
@@ -188,7 +188,7 @@ const tableInstance = useReactTable({
 
 ```tsx
 // Kontrollierter Sorting-State
-const [sorting, setSorting] = React.useState<SortingState>([]);
+const [sorting, setSorting] = React.useState<SortingState>([])
 
 const table = useReactTable({
   columns,
@@ -198,7 +198,7 @@ const table = useReactTable({
   },
   onSortingChange: setSorting,
   // Rest der Konfiguration...
-});
+})
 ```
 
 #### Feature-Übergreifende Änderungen
@@ -230,26 +230,26 @@ const table = useReactTable({
 
   ```tsx
   interface User {
-    firstName: string;
-    lastName: string;
-    age: number;
+    firstName: string
+    lastName: string
+    age: number
   }
 
-  const defaultUser: User = { firstName: '', lastName: '', age: 0 };
+  const defaultUser: User = { firstName: '', lastName: '', age: 0 }
 
   // Wiederverwendbare Form-Konfiguration
   const formOpts = formOptions({
     defaultValues: defaultUser,
-  });
+  })
 
   // Form Instance erstellen
   const form = useForm({
     ...formOpts,
     onSubmit: async ({ value }) => {
       // Formular verarbeiten
-      await saveUser(value);
+      await saveUser(value)
     },
-  });
+  })
   ```
 
 - **Field Management**:
@@ -266,13 +266,13 @@ const table = useReactTable({
   - Asynchrone Validierungen für Server-Checks wie Eindeutigkeit von Benutzernames
 
   ```tsx
-  import { z } from 'zod';
+  import { z } from 'zod'
 
   const userSchema = z.object({
     firstName: z.string().min(2, 'Name zu kurz'),
     lastName: z.string().min(2, 'Nachname zu kurz'),
     age: z.number().min(18, 'Mindestens 18 Jahre alt'),
-  });
+  })
 
   // Schema-Validierung auf Form-Ebene
   const form = useForm({
@@ -283,7 +283,7 @@ const table = useReactTable({
     onSubmit: async ({ value }) => {
       // Formular verarbeiten
     },
-  });
+  })
   ```
 
 - **Optimierung und Reaktivität**:
@@ -294,10 +294,10 @@ const table = useReactTable({
 
   ```tsx
   // Richtig - feingranulares Update nur bei Änderung des firstNames
-  const firstName = useStore(form.store, state => state.values.firstName);
+  const firstName = useStore(form.store, state => state.values.firstName)
 
   // Falsch - führt zu Re-Render bei jeder State-Änderung
-  const store = useStore(form.store);
+  const store = useStore(form.store)
   ```
 
 - **Formular-Reset**:
@@ -383,9 +383,9 @@ Die Migration von Material UI v6 auf v7 bringt folgende wichtige Änderungen:
    - Deep Imports mit mehr als einer Ebene funktionieren nicht mehr:
      ```tsx
      // Alt
-     import createTheme from '@mui/material/styles/createTheme';
+     import createTheme from '@mui/material/styles/createTheme'
      // Neu
-     import { createTheme } from '@mui/material/styles';
+     import { createTheme } from '@mui/material/styles'
      ```
    - Modern Bundles wurden entfernt; Aliase für diese müssen entfernt werden
 
@@ -394,6 +394,52 @@ Die Migration von Material UI v6 auf v7 bringt folgende wichtige Änderungen:
    - Der veraltete `Grid` wurde zu `GridLegacy` umbenannt
    - `Grid2` ersetzt nun den `Grid`-Namespace
    - Codemod verfügbar: `yarn dlx @mui/codemod v7.0.0/grid-props <path>`
+
+   **Upgrade zu Grid v2:**
+
+   Die Migration zu Grid v2 bietet folgende Verbesserungen:
+
+   - Verwendet CSS-Variablen, entfernt CSS-Spezifität von Klassenselektoren
+   - Alle Grids werden als Items betrachtet, ohne dass der `item`-Prop angegeben werden muss
+   - Bietet Offset-Funktionalität für flexiblere Positionierung
+   - Verschachtelte Grids haben keine Tiefenbeschränkung mehr
+   - Verwendet keine negativen Margins, vermeidet dadurch Überlauf-Probleme
+
+   **So führen Sie das Upgrade durch:**
+
+   1. Import aktualisieren:
+
+      ```tsx
+      // Der Legacy-Grid-Komponente heißt jetzt GridLegacy
+      -import Grid from '@mui/material/GridLegacy';
+
+      // Die aktualisierte Grid-Komponente heißt Grid
+      +import Grid from '@mui/material/Grid';
+      ```
+
+   2. Legacy-Props entfernen:
+      ```tsx
+      -<Grid item zeroMinWidth>
+      +<Grid>
+      ```
+   3. Size-Props aktualisieren:
+
+      ```tsx
+      // Ab Material UI v6 wurden diese Props in 'size' umbenannt
+      <Grid
+      -  xs={12}
+      -  sm={6}
+      +  size={{ xs: 12, sm: 6 }}
+      >
+
+      // Bei gleichem Wert für alle Breakpoints:
+      -<Grid xs={6}>
+      +<Grid size={6}>
+
+      // Der Wert 'true' wurde zu "grow" umbenannt:
+      -<Grid xs>
+      +<Grid size="grow">
+      ```
 
 4. **InputLabel size-Prop standardisiert**:
 
@@ -445,13 +491,41 @@ Bei der Integration von Material UI 7 mit Next.js 15 sind folgende Punkte zu bea
    yarn install @mui/material-nextjs @emotion/cache
    ```
 
-2. **App Router Konfiguration**:
+2. **Häufige Grid-bezogene Probleme nach Update auf Grid v2:**
+
+   - **Spaltenrichtung**: Weder in GridLegacy noch in Grid v2 wird `direction="column"` oder `direction="column-reverse"` unterstützt. Für vertikale Layouts sollten die [Alternative Ansätze in der Dokumentation](https://mui.com/material-ui/react-grid/#column-direction) verwendet werden.
+   - **Container-Breite**: Die aktualisierte Grid-Komponente wächst standardmäßig nicht auf die volle Breite des Containers:
+
+     ```tsx
+     -<GridLegacy container>
+     +<Grid container sx={{ width: '100%' }}>
+
+     // Alternativ, wenn der übergeordnete Container ein Flex-Container ist:
+     -<GridLegacy container>
+     +<Grid container sx={{ flexGrow: 1 }}>
+     ```
+
+   - **Codemod für umhüllte Grid-Komponenten**: Der bereitgestellte Codemod deckt keine Grid-Komponenten ab, die in anderen Komponenten eingewickelt oder gestylt sind:
+
+     ```tsx
+     // Der Codemod wird StyledGrid nicht abdecken
+     const StyledGrid = styled(Grid)({
+       // Styles
+     })
+
+     // Der Codemod wird WrappedGrid nicht abdecken
+     const WrappedGrid = props => <Grid {...props} />
+     ```
+
+     Diese Komponenten müssen manuell aktualisiert werden.
+
+3. **App Router Konfiguration**:
 
    ```tsx
    // app/layout.tsx
-   import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
-   import { ThemeProvider } from '@mui/material/styles';
-   import theme from '../theme';
+   import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter'
+   import { ThemeProvider } from '@mui/material/styles'
+   import theme from '../theme'
 
    export default function RootLayout({ children }) {
      return (
@@ -462,37 +536,37 @@ Bei der Integration von Material UI 7 mit Next.js 15 sind folgende Punkte zu bea
            </AppRouterCacheProvider>
          </body>
        </html>
-     );
+     )
    }
    ```
 
-3. **Server Components Support**: Material UI 7 unterstützt React Server Components:
+4. **Server Components Support**: Material UI 7 unterstützt React Server Components:
 
    ```tsx
    // Server Component
-   import { Button } from '@mui/material/server';
+   import { Button } from '@mui/material/server'
 
    // Client Component
-   ('use client');
-   import { Button } from '@mui/material';
+   ;('use client')
+   import { Button } from '@mui/material'
    ```
 
-4. **Vermeidung von Hydration-Fehlern**:
+5. **Vermeidung von Hydration-Fehlern**:
 
    - Bei clientseitigen Komponenten verwenden Sie `'use client';` Direktive
    - Sorgen Sie für eine konsistente DOM-Struktur beim serverseitigen und clientseitigen Rendering
    - Verwenden Sie `AppRouterCacheProvider` für korrekte CSS-Handhabung
    - Bei bedingtem Rendering CSS-Properties wie `visibility` oder `display` nutzen, anstatt Komponenten zu entfernen
 
-5. **Custom Emotion Cache** (optional):
+6. **Custom Emotion Cache** (optional):
 
    ```tsx
    <AppRouterCacheProvider options={{ key: 'mui' }}>{children}</AppRouterCacheProvider>
    ```
 
-6. **CSS Injection Order**: Die korrekte CSS-Injektionsreihenfolge wird durch `AppRouterCacheProvider` sichergestellt, um Styling-Konflikte zu vermeiden
+7. **CSS Injection Order**: Die korrekte CSS-Injektionsreihenfolge wird durch `AppRouterCacheProvider` sichergestellt, um Styling-Konflikte zu vermeiden
 
-7. **Bei Verwendung anderer Styling-Lösungen** (z.B. Tailwind CSS):
+8. **Bei Verwendung anderer Styling-Lösungen** (z.B. Tailwind CSS):
 
    ```tsx
    <AppRouterCacheProvider options={{ enableCssLayer: true }}>{children}</AppRouterCacheProvider>
@@ -522,13 +596,13 @@ Hydration-Fehler treten auf, wenn die serverseitig gerenderte HTML-Struktur nich
 2. **Client-Side Initialisierung**: Verwenden Sie `useState` und `useEffect` für clientseitige Initialisierung:
 
    ```tsx
-   'use client';
+   'use client'
 
-   const [isClient, setIsClient] = useState(false);
+   const [isClient, setIsClient] = useState(false)
 
    useEffect(() => {
-     setIsClient(true);
-   }, []);
+     setIsClient(true)
+   }, [])
 
    // Rest des Komponenten-Codes...
    ```
@@ -541,13 +615,13 @@ Hydration-Fehler treten auf, wenn die serverseitig gerenderte HTML-Struktur nich
      return createCache({
        key: 'mui',
        prepend: true, // Style-Tags am Anfang des <head> einfügen
-     });
-   };
+     })
+   }
 
    // Ordnungsgemäße Verwendung von AppRouterCacheProvider
-   <AppRouterCacheProvider options={{ key: 'mui', prepend: true }}>
+   ;<AppRouterCacheProvider options={{ key: 'mui', prepend: true }}>
      {children}
-   </AppRouterCacheProvider>;
+   </AppRouterCacheProvider>
    ```
 
 4. **Meta-Tag für Insertion Point**: Fügen Sie einen Meta-Tag für den Emotion-Insertion-Point hinzu:
@@ -570,13 +644,13 @@ Hydration-Fehler treten auf, wenn die serverseitig gerenderte HTML-Struktur nich
 
    ```tsx
    // Problematischer Code - kann zu unterschiedlichem DOM auf Client und Server führen
-   <div className={dynamicStyles}>{loading ? <CircularProgress /> : <AppBar />}</div>;
+   ;<div className={dynamicStyles}>{loading ? <CircularProgress /> : <AppBar />}</div>
 
    // Lösung: Sicherstellen, dass beide Komponenten als Client-Komponenten markiert sind
-   ('use client');
+   ;('use client')
 
    // Und dynamische Stiländerungen vermeiden, die zu unterschiedlichen Klassen führen können
-   <div className={staticClassName}>{loading ? <CircularProgress size={40} /> : <AppBar />}</div>;
+   ;<div className={staticClassName}>{loading ? <CircularProgress size={40} /> : <AppBar />}</div>
    ```
 
 2. **Lösung für Layout-Komponenten**:
@@ -585,21 +659,21 @@ Hydration-Fehler treten auf, wenn die serverseitig gerenderte HTML-Struktur nich
 
    ```tsx
    // app/layout.tsx
-   'use client';
+   'use client'
 
-   import { useState, useEffect } from 'react';
-   import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
-   import { ThemeProvider } from '@mui/material/styles';
-   import CssBaseline from '@mui/material/CssBaseline';
-   import theme from '../theme';
+   import { useState, useEffect } from 'react'
+   import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter'
+   import { ThemeProvider } from '@mui/material/styles'
+   import CssBaseline from '@mui/material/CssBaseline'
+   import theme from '../theme'
 
    export default function RootLayout({ children }) {
      // Verzögerte Rendering-Strategie
-     const [mounted, setMounted] = useState(false);
+     const [mounted, setMounted] = useState(false)
 
      useEffect(() => {
-       setMounted(true);
-     }, []);
+       setMounted(true)
+     }, [])
 
      // Einfaches Skeleton für den ersten Render
      if (!mounted) {
@@ -618,7 +692,7 @@ Hydration-Fehler treten auf, wenn die serverseitig gerenderte HTML-Struktur nich
              </div>
            </body>
          </html>
-       );
+       )
      }
 
      return (
@@ -635,7 +709,7 @@ Hydration-Fehler treten auf, wenn die serverseitig gerenderte HTML-Struktur nich
            </AppRouterCacheProvider>
          </body>
        </html>
-     );
+     )
    }
    ```
 
@@ -661,9 +735,9 @@ Hydration-Fehler treten auf, wenn die serverseitig gerenderte HTML-Struktur nich
 
    ```tsx
    // In einem Custom Provider zur Verbesserung des Server-Side Styles
-   'use client';
+   'use client'
 
-   import { useServerInsertedHTML } from 'next/navigation';
+   import { useServerInsertedHTML } from 'next/navigation'
 
    export function StyleRegistry({ children }) {
      // Diese Funktion wird aufgerufen, bevor Inhalte auf dem Server gerendert werden
@@ -673,10 +747,10 @@ Hydration-Fehler treten auf, wenn die serverseitig gerenderte HTML-Struktur nich
          <>
            <style id="mui-ssr-styles">{/* Kritische Styles */}</style>
          </>
-       );
-     });
+       )
+     })
 
-     return children;
+     return children
    }
    ```
 
@@ -694,7 +768,7 @@ Hydration-Fehler treten auf, wenn die serverseitig gerenderte HTML-Struktur nich
        optimizeFonts: false,
        strictFontDetect: true,
      },
-   };
+   }
    ```
 
 ### Paketmanager
