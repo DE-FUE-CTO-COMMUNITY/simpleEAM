@@ -216,7 +216,7 @@ const CapabilitiesPage = () => {
         disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
       }
     }
-    
+
     // Aktualisierung der übergeordneten Capability, wenn eine ausgewählt wurde
     if (parentId) {
       // Wir setzen die parents-Beziehung

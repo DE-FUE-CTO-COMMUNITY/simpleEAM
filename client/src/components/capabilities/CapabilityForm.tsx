@@ -4,7 +4,38 @@ import React, { useEffect } from 'react'
 import { useForm } from '@tanstack/react-form'
 import { z } from 'zod'
 import { useQuery } from '@apollo/client'
-// Die formatErrorMessage-Funktion wurde entfernt, da sie nicht verwendet wird.
+
+// Hilfsfunktion zur korrekten Formatierung von Fehlermeldungen
+const formatValidationError = (error: unknown): string => {
+  if (!error) return ''
+  if (Array.isArray(error)) return error.join(', ')
+  if (typeof error === 'object' && error !== null) {
+    // Rekursiv verschachtelte Objekte durchlaufen
+    const messages: string[] = []
+    const processObject = (obj: Record<string, unknown>) => {
+      Object.values(obj).forEach(value => {
+        if (typeof value === 'string') {
+          messages.push(value)
+        } else if (Array.isArray(value)) {
+          value.forEach(item => {
+            if (typeof item === 'string') {
+              messages.push(item)
+            } else if (typeof item === 'object' && item !== null) {
+              processObject(item as Record<string, unknown>)
+            }
+          })
+        } else if (typeof value === 'object' && value !== null) {
+          processObject(value as Record<string, unknown>)
+        }
+      })
+    }
+
+    processObject(error as Record<string, unknown>)
+    return messages.join(', ')
+  }
+  return String(error)
+}
+
 import {
   Box,
   Button,
@@ -165,6 +196,11 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
     onSubmit: async ({ value }) => {
       await onSubmit(value)
     },
+    validators: {
+      // Formularvalidierung mit Zod Schema
+      onChange: capabilitySchema,
+      onSubmit: capabilitySchema,
+    },
   })
 
   // Zurücksetzen des Formulars bei Schließen des Dialogs und Aktualisieren bei neuem Capability
@@ -245,9 +281,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
                     />
                     <FormHelperText>
                       {field.state.meta.isTouched && field.state.meta.errors
-                        ? Array.isArray(field.state.meta.errors)
-                          ? field.state.meta.errors.join(', ')
-                          : String(field.state.meta.errors)
+                        ? formatValidationError(field.state.meta.errors)
                         : ''}
                     </FormHelperText>
                   </FormControl>
@@ -286,9 +320,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
                     </TextField>
                     <FormHelperText>
                       {field.state.meta.isTouched && field.state.meta.errors
-                        ? Array.isArray(field.state.meta.errors)
-                          ? field.state.meta.errors.join(', ')
-                          : String(field.state.meta.errors)
+                        ? formatValidationError(field.state.meta.errors)
                         : ''}
                     </FormHelperText>
                   </FormControl>
@@ -320,9 +352,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
                     />
                     <FormHelperText>
                       {field.state.meta.isTouched && field.state.meta.errors
-                        ? Array.isArray(field.state.meta.errors)
-                          ? field.state.meta.errors.join(', ')
-                          : String(field.state.meta.errors)
+                        ? formatValidationError(field.state.meta.errors)
                         : ''}
                     </FormHelperText>
                   </FormControl>
@@ -358,10 +388,13 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
                       ))}
                     </TextField>
                     <FormHelperText>
-                      {field.state.meta.isTouched && field.state.meta.errors
+                      {field.state.meta.isTouched && !field.state.meta.isValid
                         ? Array.isArray(field.state.meta.errors)
                           ? field.state.meta.errors.join(', ')
-                          : String(field.state.meta.errors)
+                          : typeof field.state.meta.errors === 'object' &&
+                              field.state.meta.errors !== null
+                            ? Object.values(field.state.meta.errors).join(', ')
+                            : String(field.state.meta.errors)
                         : ''}
                     </FormHelperText>
                   </FormControl>
@@ -393,9 +426,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
                     />
                     <FormHelperText>
                       {field.state.meta.isTouched && field.state.meta.errors
-                        ? Array.isArray(field.state.meta.errors)
-                          ? field.state.meta.errors.join(', ')
-                          : String(field.state.meta.errors)
+                        ? formatValidationError(field.state.meta.errors)
                         : ''}
                     </FormHelperText>
                   </FormControl>
@@ -441,9 +472,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
                     </TextField>
                     <FormHelperText>
                       {field.state.meta.isTouched && field.state.meta.errors
-                        ? Array.isArray(field.state.meta.errors)
-                          ? field.state.meta.errors.join(', ')
-                          : String(field.state.meta.errors)
+                        ? formatValidationError(field.state.meta.errors)
                         : ''}
                     </FormHelperText>
                   </FormControl>
@@ -483,9 +512,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
                     </TextField>
                     <FormHelperText>
                       {field.state.meta.isTouched && field.state.meta.errors
-                        ? Array.isArray(field.state.meta.errors)
-                          ? field.state.meta.errors.join(', ')
-                          : String(field.state.meta.errors)
+                        ? formatValidationError(field.state.meta.errors)
                         : ''}
                     </FormHelperText>
                   </FormControl>
@@ -555,9 +582,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
                     )}
                     <FormHelperText>
                       {field.state.meta.isTouched && field.state.meta.errors
-                        ? Array.isArray(field.state.meta.errors)
-                          ? field.state.meta.errors.join(', ')
-                          : String(field.state.meta.errors)
+                        ? formatValidationError(field.state.meta.errors)
                         : ''}
                     </FormHelperText>
                   </FormControl>
@@ -603,7 +628,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
                 type="submit"
                 variant="contained"
                 color="primary"
-                disabled={!form.state.isValid || loading}
+                disabled={loading}
                 startIcon={loading ? <CircularProgress size={20} /> : <SaveIcon />}
               >
                 {isCreateMode ? 'Erstellen' : 'Speichern'}
