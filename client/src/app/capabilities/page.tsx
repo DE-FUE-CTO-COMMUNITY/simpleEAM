@@ -144,7 +144,7 @@ const CapabilitiesPage = () => {
 
   // Handler für das Erstellen einer neuen Business Capability
   const handleCreateCapabilitySubmit = async (data: CapabilityFormValues) => {
-    const { parentId: parent, ...capabilityData } = data
+    const { parentId: parent, ownerId, ...capabilityData } = data
     // Bei CREATE wird kein spezielles Mutation-Objekt benötigt, da direkte Werte erlaubt sind
     const input = {
       name: capabilityData.name,
@@ -152,11 +152,20 @@ const CapabilitiesPage = () => {
       maturityLevel: capabilityData.maturityLevel,
       businessValue: capabilityData.businessValue,
       status: capabilityData.status,
-      owner: capabilityData.owner,
       tags: capabilityData.tags,
+      // Wenn ein Besitzer ausgewählt wurde, verwenden wir die neue owners-Struktur
+      ...(ownerId
+        ? {
+            owners: [
+              {
+                connect: { where: { node: { id: ownerId } } },
+              },
+            ],
+          }
+        : {}),
       ...(parent
         ? {
-            children: [
+            parents: [
               {
                 connect: { where: { node: { id: parent } } },
               },
@@ -176,18 +185,26 @@ const CapabilitiesPage = () => {
   // Handler für das Aktualisieren einer bestehenden Business Capability
   const handleUpdateCapabilitySubmit = async (id: string, data: CapabilityFormValues) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { parentId, ...capabilityData } = data
-    // Hier könnten wir auch die Parent-Child-Beziehung mit dem 'parentId'-Wert aktualisieren,
-    // was komplex sein kann, da wir die aktuelle Beziehung prüfen müssten.
-    // Für diese Implementierung beschränken wir uns auf die direkten Capability-Daten.
-    const input = {
+    const { parentId, ownerId, ...capabilityData } = data
+
+    // Basis-Input-Daten vorbereiten
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const input: Record<string, any> = {
       name: { set: capabilityData.name },
       description: { set: capabilityData.description },
       maturityLevel: { set: capabilityData.maturityLevel },
       businessValue: { set: capabilityData.businessValue },
       status: { set: capabilityData.status },
-      owner: { set: capabilityData.owner },
       tags: { set: capabilityData.tags },
+    }
+
+    // Aktualisierung der Owner-Beziehung, wenn ein Besitzer ausgewählt wurde
+    if (ownerId) {
+      // Wir setzen die owners-Beziehung
+      input.owners = {
+        disconnectAll: true, // Lösche alle bestehenden Beziehungen
+        connect: { where: { node: { id: ownerId } } }, // Verbinde mit dem neuen Besitzer
+      }
     }
 
     await updateCapability({

@@ -9,7 +9,7 @@ export type Capability = Pick<
   | 'maturityLevel'
   | 'status'
   | 'businessValue'
-  | 'owner'
+  | 'owners'
   | 'tags'
   | 'createdAt'
   | 'updatedAt'

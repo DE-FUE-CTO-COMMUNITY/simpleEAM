@@ -20,7 +20,11 @@ export const GET_APPLICATIONS = gql`
       description
       status
       criticality
-      owner
+      owners {
+        id
+        firstName
+        lastName
+      }
       version
       createdAt
       updatedAt
@@ -37,7 +41,11 @@ export const GET_APPLICATION = gql`
       description
       status
       criticality
-      owner
+      owners {
+        id
+        firstName
+        lastName
+      }
       version
       hostingEnvironment
       vendor

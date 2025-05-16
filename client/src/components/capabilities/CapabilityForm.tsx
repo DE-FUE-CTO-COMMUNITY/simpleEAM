@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react'
 import { useForm } from '@tanstack/react-form'
 import { z } from 'zod'
+import { useQuery } from '@apollo/client'
 // Die formatErrorMessage-Funktion wurde entfernt, da sie nicht verwendet wird.
 import {
   Box,
@@ -23,6 +24,31 @@ import {
   DialogTitle,
   DialogContentText,
 } from '@mui/material'
+import { GET_PERSONS } from '@/graphql/person'
+
+// Komponente zur Anzeige der Personenliste
+const PersonSelection = () => {
+  const { data, loading, error } = useQuery(GET_PERSONS)
+
+  if (loading)
+    return (
+      <MenuItem value="">
+        <CircularProgress size={20} /> Lade Personen...
+      </MenuItem>
+    )
+  if (error) return <MenuItem value="">Fehler beim Laden der Personen</MenuItem>
+
+  return (
+    <>
+      <MenuItem value="">Kein Verantwortlicher</MenuItem>
+      {data?.people?.map((person: { id: string; firstName: string; lastName: string }) => (
+        <MenuItem key={person.id} value={person.id}>
+          {`${person.firstName} ${person.lastName}`}
+        </MenuItem>
+      ))}
+    </>
+  )
+}
 import { Grid } from '@mui/material'
 import {
   Save as SaveIcon,
@@ -54,7 +80,7 @@ export const capabilitySchema = z.object({
     .min(0, 'Geschäftswert muss 0 oder höher sein')
     .max(10, 'Geschäftswert darf maximal 10 sein'),
   status: z.nativeEnum(CapabilityStatus),
-  owner: z.string().optional(),
+  ownerId: z.string().optional(),
   tags: z.array(z.string()).optional(),
   parentId: z.string().optional(),
 })
@@ -133,7 +159,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
     maturityLevel: capability?.maturityLevel ?? 0,
     businessValue: capability?.businessValue ?? 0,
     status: capability?.status ?? CapabilityStatus.ACTIVE,
-    owner: capability?.owner ?? '',
+    ownerId: capability?.owners?.[0]?.id ?? '',
     tags: capability?.tags ?? [],
     parentId: capability?.children?.[0]?.id ?? '',
   }
@@ -169,7 +195,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
   const capabilityMaturityLevel = capability?.maturityLevel
   const capabilityBusinessValue = capability?.businessValue
   const capabilityStatus = capability?.status
-  const capabilityOwner = capability?.owner
+  const capabilityOwnerId = capability?.owners?.[0]?.id
   const capabilityTags = capability?.tags
   const capabilityParentId = capability?.children?.[0]?.id
 
@@ -184,7 +210,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
         maturityLevel: capabilityMaturityLevel ?? 0,
         businessValue: capabilityBusinessValue ?? 0,
         status: capabilityStatus ?? CapabilityStatus.ACTIVE,
-        owner: capabilityOwner ?? '',
+        ownerId: capabilityOwnerId ?? '',
         tags: capabilityTags ?? [],
         parentId: capabilityParentId ?? '',
       })
@@ -198,7 +224,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
     capabilityMaturityLevel,
     capabilityBusinessValue,
     capabilityStatus,
-    capabilityOwner,
+    capabilityOwnerId,
     capabilityTags,
     capabilityParentId,
   ])
@@ -403,9 +429,9 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
             {/* Verantwortlicher */}
             <Grid size={{ xs: 12, md: 6 }}>
               <form.Field
-                name="owner"
+                name="ownerId"
                 validators={{
-                  onChange: capabilitySchema.shape.owner,
+                  onChange: capabilitySchema.shape.ownerId,
                 }}
               >
                 {field => (
@@ -420,7 +446,10 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
                       onBlur={field.handleBlur}
                       disabled={isViewMode || loading}
                       error={field.state.meta.isTouched && !field.state.meta.isValid}
-                    />
+                      select
+                    >
+                      <PersonSelection />
+                    </TextField>
                     <FormHelperText>
                       {field.state.meta.isTouched && field.state.meta.errors
                         ? Array.isArray(field.state.meta.errors)

@@ -55,6 +55,12 @@ async function initDatabase(reset: boolean = false) {
       FOR (i:ApplicationInterface) REQUIRE i.id IS UNIQUE
     `)
 
+    // Constraints für Personen
+    await session.run(`
+      CREATE CONSTRAINT person_id_unique IF NOT EXISTS
+      FOR (p:Person) REQUIRE p.id IS UNIQUE
+    `)
+
     // Indizes für die Suche
     await session.run(`
       CREATE INDEX business_capability_name_index IF NOT EXISTS
@@ -103,7 +109,6 @@ async function createSampleData(session: any) {
         id: "bc-001",
         name: "Kundenbeziehung",
         description: "Management der Kundenbeziehungen",
-        owner: "Vertriebsleitung",
         maturityLevel: 4,
         status: "ACTIVE",
         businessValue: 9,
@@ -118,7 +123,6 @@ async function createSampleData(session: any) {
         id: "bc-002",
         name: "Produktentwicklung",
         description: "Entwicklung neuer Produkte und Services",
-        owner: "Produktmanagement",
         maturityLevel: 3,
         status: "ACTIVE",
         businessValue: 8,
@@ -133,7 +137,6 @@ async function createSampleData(session: any) {
         id: "bc-003",
         name: "Marketing",
         description: "Vermarktung von Produkten und Dienstleistungen",
-        owner: "Marketingleitung",
         maturityLevel: 3,
         status: "ACTIVE",
         businessValue: 7,
@@ -148,7 +151,6 @@ async function createSampleData(session: any) {
         id: "bc-004",
         name: "Kundensupport",
         description: "Unterstützung von Kunden bei Problemen",
-        owner: "Support Manager",
         maturityLevel: 4,
         status: "ACTIVE",
         businessValue: 8,
@@ -163,7 +165,6 @@ async function createSampleData(session: any) {
         id: "bc-005",
         name: "Vertrieb",
         description: "Vertrieb von Produkten und Dienstleistungen",
-        owner: "Vertriebsleitung",
         maturityLevel: 5,
         status: "ACTIVE",
         businessValue: 10,
@@ -190,7 +191,6 @@ async function createSampleData(session: any) {
         id: "app-001",
         name: "CRM-System",
         description: "Customer Relationship Management System",
-        owner: "IT-Abteilung",
         status: "ACTIVE",
         criticality: "HIGH",
         technologyStack: ["Java", "Spring", "Oracle"],
@@ -209,7 +209,6 @@ async function createSampleData(session: any) {
         id: "app-002",
         name: "Marketing-Automatisierung",
         description: "System zur Automatisierung von Marketing-Kampagnen",
-        owner: "Marketing",
         status: "ACTIVE",
         criticality: "MEDIUM",
         technologyStack: ["Python", "Django", "PostgreSQL"],
@@ -228,7 +227,6 @@ async function createSampleData(session: any) {
         id: "app-003",
         name: "Produkt-Datenbank",
         description: "Zentrale Datenbank für alle Produktinformationen",
-        owner: "Produktmanagement",
         status: "ACTIVE",
         criticality: "CRITICAL",
         technologyStack: ["MS SQL Server", ".NET"],
@@ -247,7 +245,6 @@ async function createSampleData(session: any) {
         id: "app-004",
         name: "Ticket-System",
         description: "Helpdesk und Ticket-Management",
-        owner: "IT-Support",
         status: "ACTIVE",
         criticality: "HIGH",
         technologyStack: ["PHP", "Laravel", "MySQL"],
@@ -267,7 +264,6 @@ async function createSampleData(session: any) {
         id: "do-001",
         name: "Kundendaten",
         description: "Zentrale Kundeninformationen",
-        owner: "Datenschutzbeauftragter",
         classification: "CONFIDENTIAL",
         source: "CRM-System",
         format: "SQL-Datenbank",
@@ -281,7 +277,6 @@ async function createSampleData(session: any) {
         id: "do-002",
         name: "Produktkatalog",
         description: "Vollständiger Katalog aller Produkte",
-        owner: "Produktmanagement",
         classification: "INTERNAL",
         source: "Produkt-Datenbank",
         format: "SQL-Datenbank",
@@ -295,7 +290,6 @@ async function createSampleData(session: any) {
         id: "do-003",
         name: "Marketing-Kampagnen",
         description: "Daten zu Marketing-Kampagnen",
-        owner: "Marketing",
         classification: "INTERNAL",
         source: "Marketing-Automatisierung",
         format: "JSON",
@@ -309,10 +303,94 @@ async function createSampleData(session: any) {
         id: "do-004",
         name: "Support-Tickets",
         description: "Kundenanfragen und Problemberichte",
-        owner: "Support",
         classification: "CONFIDENTIAL",
         source: "Ticket-System",
         format: "SQL-Datenbank",
+        createdAt: datetime(),
+        updatedAt: datetime()
+      })
+    `)
+
+    // Personen erstellen
+    await session.run(`
+      CREATE (p1:Person {
+        id: "person-001",
+        firstName: "Thomas",
+        lastName: "Müller",
+        email: "thomas.mueller@example.com",
+        department: "IT",
+        role: "CIO",
+        phone: "+49 123 45678",
+        createdAt: datetime(),
+        updatedAt: datetime()
+      })
+    `)
+
+    await session.run(`
+      CREATE (p2:Person {
+        id: "person-002",
+        firstName: "Sabine",
+        lastName: "Weber",
+        email: "sabine.weber@example.com",
+        department: "IT",
+        role: "Enterprise Architect",
+        phone: "+49 123 45679",
+        createdAt: datetime(),
+        updatedAt: datetime()
+      })
+    `)
+
+    await session.run(`
+      CREATE (p3:Person {
+        id: "person-003",
+        firstName: "Michael",
+        lastName: "Schmidt",
+        email: "michael.schmidt@example.com",
+        department: "Finanzen",
+        role: "CFO",
+        phone: "+49 123 45680",
+        createdAt: datetime(),
+        updatedAt: datetime()
+      })
+    `)
+
+    await session.run(`
+      CREATE (p4:Person {
+        id: "person-004",
+        firstName: "Julia",
+        lastName: "Becker",
+        email: "julia.becker@example.com",
+        department: "Marketing",
+        role: "CMO",
+        phone: "+49 123 45681",
+        createdAt: datetime(),
+        updatedAt: datetime()
+      })
+    `)
+
+    await session.run(`
+      CREATE (p5:Person {
+        id: "person-005",
+        firstName: "Andreas",
+        lastName: "Fischer",
+        email: "andreas.fischer@example.com",
+        department: "Vertrieb",
+        role: "Vertriebsleiter",
+        phone: "+49 123 45682",
+        createdAt: datetime(),
+        updatedAt: datetime()
+      })
+    `)
+
+    await session.run(`
+      CREATE (p6:Person {
+        id: "person-006",
+        firstName: "Lisa",
+        lastName: "Hoffmann",
+        email: "lisa.hoffmann@example.com",
+        department: "Produktion",
+        role: "Produktionsleiter",
+        phone: "+49 123 45683",
         createdAt: datetime(),
         updatedAt: datetime()
       })
@@ -440,6 +518,74 @@ async function createSampleData(session: any) {
     await session.run(`
       MATCH (i2:ApplicationInterface {id: "int-002"}), (d2:DataObject {id: "do-002"})
       CREATE (i2)-[:TRANSFERS]->(d2)
+    `)
+
+    // Beziehungen zwischen Personen und Business Capabilities
+    await session.run(`
+      MATCH (p1:Person {id: "person-001"}), (c1:BusinessCapability {id: "bc-001"})
+      CREATE (c1)-[:OWNED_BY]->(p1)
+    `)
+
+    await session.run(`
+      MATCH (p2:Person {id: "person-002"}), (c2:BusinessCapability {id: "bc-002"})
+      CREATE (c2)-[:OWNED_BY]->(p2)
+    `)
+
+    await session.run(`
+      MATCH (p3:Person {id: "person-003"}), (c3:BusinessCapability {id: "bc-003"})
+      CREATE (c3)-[:OWNED_BY]->(p3)
+    `)
+
+    await session.run(`
+      MATCH (p4:Person {id: "person-004"}), (c4:BusinessCapability {id: "bc-004"})
+      CREATE (c4)-[:OWNED_BY]->(p4)
+    `)
+
+    await session.run(`
+      MATCH (p5:Person {id: "person-005"}), (c5:BusinessCapability {id: "bc-005"})
+      CREATE (c5)-[:OWNED_BY]->(p5)
+    `)
+
+    // Beziehungen zwischen Personen und Applications
+    await session.run(`
+      MATCH (p1:Person {id: "person-001"}), (a1:Application {id: "app-001"})
+      CREATE (a1)-[:OWNED_BY]->(p1)
+    `)
+
+    await session.run(`
+      MATCH (p2:Person {id: "person-002"}), (a2:Application {id: "app-002"})
+      CREATE (a2)-[:OWNED_BY]->(p2)
+    `)
+
+    await session.run(`
+      MATCH (p3:Person {id: "person-003"}), (a3:Application {id: "app-003"})
+      CREATE (a3)-[:OWNED_BY]->(p3)
+    `)
+
+    await session.run(`
+      MATCH (p4:Person {id: "person-004"}), (a4:Application {id: "app-004"})
+      CREATE (a4)-[:OWNED_BY]->(p4)
+    `)
+
+    // Beziehungen zwischen Personen und DataObjects
+    await session.run(`
+      MATCH (p5:Person {id: "person-005"}), (d1:DataObject {id: "do-001"})
+      CREATE (d1)-[:OWNED_BY]->(p5)
+    `)
+
+    await session.run(`
+      MATCH (p6:Person {id: "person-006"}), (d2:DataObject {id: "do-002"})
+      CREATE (d2)-[:OWNED_BY]->(p6)
+    `)
+
+    await session.run(`
+      MATCH (p1:Person {id: "person-001"}), (d3:DataObject {id: "do-003"})
+      CREATE (d3)-[:OWNED_BY]->(p1)
+    `)
+
+    await session.run(`
+      MATCH (p2:Person {id: "person-002"}), (d4:DataObject {id: "do-004"})
+      CREATE (d4)-[:OWNED_BY]->(p2)
     `)
 
     console.log('Testdaten erfolgreich erstellt.')

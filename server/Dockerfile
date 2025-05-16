@@ -2,23 +2,27 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Kopiere package.json für die Installation der Abhängigkeiten
-COPY package.json ./
+# Aktiviere Corepack für Yarn Berry
+RUN corepack enable
+RUN corepack prepare yarn@4.9.1 --activate
 
-# Installiere Abhängigkeiten
-RUN yarn install
-
-# Globale Installation von ts-node-dev und typescript
-RUN yarn global add ts-node-dev typescript
-
-# Stelle sicher, dass die yarn global binaries im PATH sind
-ENV PATH /usr/local/share/.config/yarn/global/node_modules/.bin:$PATH
-
-# Kopiere den Quellcode
+# Kopiere das gesamte Projekt (für ein isoliertes Paketmanagement)
 COPY . .
+
+# Installiere die notwendigen Tools direkt
+RUN npm install -g ts-node-dev typescript
+
+# Installiere Abhängigkeiten im Workspace-Modus
+RUN yarn install
 
 # Stelle den Port bereit
 EXPOSE 4000
+
+# Wechsle zum node-Benutzer für mehr Sicherheit
+USER node
+
+# Wechsle in das Server-Verzeichnis
+WORKDIR /app/server
 
 # Starte den Server im Entwicklungsmodus
 CMD ["yarn", "dev"]

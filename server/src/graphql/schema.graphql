@@ -5,16 +5,35 @@ type BusinessCapability @node {
   id: ID! @id
   name: String!
   description: String
-  owner: String
   maturityLevel: Int
   status: CapabilityStatus!
   businessValue: Int
   tags: [String!]
   createdAt: DateTime! @timestamp(operations: [CREATE])
   updatedAt: DateTime @timestamp(operations: [UPDATE])
+  owners: [Person!]! @relationship(type: "OWNED_BY", direction: OUT)
+  parents: [BusinessCapability!]! @relationship(type: "HAS_PARENT", direction: OUT)
   children: [BusinessCapability!]! @relationship(type: "HAS_PARENT", direction: IN)
   supportedByApplications: [Application!]! @relationship(type: "SUPPORTS", direction: IN)
   relatedDataObjects: [DataObject!]! @relationship(type: "RELATED_TO", direction: OUT)
+}
+
+"""
+Person - repräsentiert eine Person im Unternehmen
+"""
+type Person @node {
+  id: ID! @id
+  firstName: String!
+  lastName: String!
+  email: String
+  department: String
+  role: String
+  phone: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime @timestamp(operations: [UPDATE])
+  ownedCapabilities: [BusinessCapability!]! @relationship(type: "OWNED_BY", direction: IN)
+  ownedApplications: [Application!]! @relationship(type: "OWNED_BY", direction: IN)
+  ownedDataObjects: [DataObject!]! @relationship(type: "OWNED_BY", direction: IN)
 }
 
 """
@@ -24,7 +43,6 @@ type Application @node {
   id: ID! @id
   name: String!
   description: String
-  owner: String
   status: ApplicationStatus!
   criticality: CriticalityLevel!
   technologyStack: [String!]
@@ -36,6 +54,7 @@ type Application @node {
   endOfLifeDate: Date
   createdAt: DateTime! @timestamp(operations: [CREATE])
   updatedAt: DateTime @timestamp(operations: [UPDATE])
+  owners: [Person!]! @relationship(type: "OWNED_BY", direction: OUT)
   supportsCapabilities: [BusinessCapability!]! @relationship(type: "SUPPORTS", direction: OUT)
   usesDataObjects: [DataObject!]! @relationship(type: "USES", direction: OUT)
   interfacesToApplications: [ApplicationInterface!]!
@@ -62,12 +81,12 @@ type DataObject @node {
   id: ID! @id
   name: String!
   description: String
-  owner: String
   classification: DataClassification!
   source: String
   format: String
   createdAt: DateTime! @timestamp(operations: [CREATE])
   updatedAt: DateTime @timestamp(operations: [UPDATE])
+  owners: [Person!]! @relationship(type: "OWNED_BY", direction: OUT)
   usedByApplications: [Application!]! @relationship(type: "USES", direction: IN)
   relatedToCapabilities: [BusinessCapability!]! @relationship(type: "RELATED_TO", direction: IN)
   transferredInInterfaces: [ApplicationInterface!]! @relationship(type: "TRANSFERS", direction: IN)

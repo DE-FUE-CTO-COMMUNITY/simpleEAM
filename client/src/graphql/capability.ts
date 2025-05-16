@@ -21,7 +21,11 @@ export const GET_CAPABILITIES = gql`
       maturityLevel
       status
       businessValue
-      owner
+      owners {
+        id
+        firstName
+        lastName
+      }
       tags
       createdAt
       updatedAt
@@ -42,6 +46,11 @@ export const GET_CAPABILITY = gql`
       maturityLevel
       status
       businessValue
+      owners {
+        id
+        firstName
+        lastName
+      }
       tags
       createdAt
       updatedAt

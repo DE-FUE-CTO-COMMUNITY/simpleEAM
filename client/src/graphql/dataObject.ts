@@ -18,7 +18,11 @@ export const GET_DATA_OBJECTS = gql`
       id
       name
       description
-      owner
+      owners {
+        id
+        firstName
+        lastName
+      }
       classification
       source
       format
@@ -34,7 +38,11 @@ export const GET_DATA_OBJECT = gql`
       id
       name
       description
-      owner
+      owners {
+        id
+        firstName
+        lastName
+      }
       classification
       source
       format

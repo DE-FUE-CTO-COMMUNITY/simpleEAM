@@ -67,7 +67,10 @@ export const useCapabilityFilter = ({ capabilities, filterState }: UseCapability
       // Verantwortlicher-Filter
       if (
         ownerFilter &&
-        (!capability.owner || !capability.owner.toLowerCase().includes(ownerFilter.toLowerCase()))
+        (!capability.owners ||
+          !capability.owners.some(owner =>
+            `${owner.firstName} ${owner.lastName}`.toLowerCase().includes(ownerFilter.toLowerCase())
+          ))
       ) {
         return false
       }
