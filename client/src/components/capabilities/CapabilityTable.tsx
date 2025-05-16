@@ -35,6 +35,7 @@ interface CapabilityTableProps {
   onEditClick: (id: string) => void
   onCreateCapability?: (data: CapabilityFormValues) => Promise<void>
   onUpdateCapability?: (id: string, data: CapabilityFormValues) => Promise<void>
+  onDeleteCapability?: (id: string) => Promise<void>
   availableTags?: string[]
 }
 
@@ -49,6 +50,7 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
   onEditClick,
   onCreateCapability,
   onUpdateCapability,
+  onDeleteCapability,
   availableTags = [],
 }) => {
   // State für das Formular-Dialog
@@ -503,6 +505,17 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
         isOpen={isFormOpen}
         onClose={handleFormClose}
         onSubmit={handleFormSubmit}
+        onDelete={
+          onDeleteCapability && selectedCapability
+            ? id => {
+                setFormLoading(true)
+                return onDeleteCapability(id).finally(() => {
+                  setFormLoading(false)
+                  setIsFormOpen(false)
+                })
+              }
+            : undefined
+        }
         mode={formMode}
         loading={formLoading}
         onEditMode={() => setFormMode('edit')}

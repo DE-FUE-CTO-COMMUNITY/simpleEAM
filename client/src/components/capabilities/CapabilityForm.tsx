@@ -21,10 +21,17 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  DialogContentText,
 } from '@mui/material'
 import { Grid } from '@mui/material'
-import { Save as SaveIcon, Cancel as CancelIcon, Edit as EditIcon } from '@mui/icons-material'
+import {
+  Save as SaveIcon,
+  Cancel as CancelIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+} from '@mui/icons-material'
 import { BusinessCapability, CapabilityStatus } from '../../gql/generated'
+import { isArchitect } from '@/lib/auth'
 
 // Schema für die Formularvalidierung
 export const capabilitySchema = z.object({
@@ -62,6 +69,7 @@ export interface CapabilityFormProps {
   isOpen: boolean
   onClose: () => void
   onSubmit: (data: CapabilityFormValues) => Promise<void>
+  onDelete?: (id: string) => Promise<void>
   mode: 'create' | 'edit' | 'view'
   loading?: boolean
   onEditMode?: () => void
@@ -106,6 +114,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
   isOpen,
   onClose,
   onSubmit,
+  onDelete,
   mode,
   loading = false,
   onEditMode,
@@ -114,7 +123,9 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
   const isEditMode = mode === 'edit'
   const isCreateMode = mode === 'create'
 
-  // Formulardaten initialisieren
+  // State für den Bestätigungsdialog beim Löschen
+  const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false)
+
   // Formulardaten initialisieren
   const defaultValues: CapabilityFormValues = {
     name: capability?.name ?? '',
@@ -127,6 +138,22 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
     parentId: capability?.children?.[0]?.id ?? '',
   }
 
+  // Dialog-Titel basierend auf dem Modus
+  const getDialogTitle = () => {
+    if (isCreateMode) return 'Neue Business Capability erstellen'
+    if (isEditMode) return 'Business Capability bearbeiten'
+    return 'Business Capability Details'
+  }
+
+  // Handle-Funktion für das Löschen einer Capability
+  const handleDelete = async () => {
+    if (capability?.id && onDelete) {
+      await onDelete(capability.id)
+      setShowDeleteConfirm(false)
+      onClose()
+    }
+  }
+
   // TanStack Form konfigurieren
   const form = useForm({
     defaultValues,
@@ -134,13 +161,6 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
       await onSubmit(value)
     },
   })
-
-  // Dialog-Titel basierend auf dem Modus
-  const getDialogTitle = () => {
-    if (isCreateMode) return 'Neue Business Capability erstellen'
-    if (isEditMode) return 'Business Capability bearbeiten'
-    return 'Business Capability Details'
-  }
 
   // Zurücksetzen des Formulars bei Schließen des Dialogs und Aktualisieren bei neuem Capability
   // Extrahiere stabile Werte aus capability, um die Abhängigkeiten zu stabilisieren
@@ -546,39 +566,73 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
           </Grid>
         </DialogContent>
 
-        <DialogActions>
-          <Button onClick={onClose} startIcon={<CancelIcon />}>
-            {isViewMode ? 'Schließen' : 'Abbrechen'}
-          </Button>
-          {!isViewMode && (
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              disabled={!form.state.isValid || loading}
-              startIcon={loading ? <CircularProgress size={20} /> : <SaveIcon />}
-            >
-              {isCreateMode ? 'Erstellen' : 'Speichern'}
+        <DialogActions sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          <div>
+            {!isViewMode && capability && onDelete && isArchitect() && (
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={() => setShowDeleteConfirm(true)}
+                startIcon={<DeleteIcon />}
+              >
+                Löschen
+              </Button>
+            )}
+          </div>
+          <div>
+            <Button onClick={onClose} startIcon={<CancelIcon />}>
+              {isViewMode ? 'Schließen' : 'Abbrechen'}
             </Button>
-          )}
-          {isViewMode && capability && (
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => {
-                if (onEditMode) {
-                  onEditMode()
-                } else {
-                  onClose()
-                }
-              }}
-              startIcon={<EditIcon />}
-            >
-              Bearbeiten
-            </Button>
-          )}
+            {!isViewMode && (
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                disabled={!form.state.isValid || loading}
+                startIcon={loading ? <CircularProgress size={20} /> : <SaveIcon />}
+              >
+                {isCreateMode ? 'Erstellen' : 'Speichern'}
+              </Button>
+            )}
+            {isViewMode && capability && (
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => {
+                  if (onEditMode) {
+                    onEditMode()
+                  } else {
+                    onClose()
+                  }
+                }}
+                startIcon={<EditIcon />}
+              >
+                Bearbeiten
+              </Button>
+            )}
+          </div>
         </DialogActions>
       </form>
+      <Dialog open={showDeleteConfirm} onClose={() => setShowDeleteConfirm(false)}>
+        <DialogTitle>Business Capability löschen</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Möchten Sie die Business Capability wirklich löschen? Diese Aktion kann nicht rückgängig
+            gemacht werden.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowDeleteConfirm(false)}>Abbrechen</Button>
+          <Button
+            onClick={handleDelete}
+            color="secondary"
+            variant="contained"
+            startIcon={<DeleteIcon />}
+          >
+            Löschen
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Dialog>
   )
 }

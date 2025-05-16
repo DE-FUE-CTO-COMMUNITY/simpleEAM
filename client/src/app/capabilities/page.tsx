@@ -7,7 +7,12 @@ import { Add as AddIcon } from '@mui/icons-material'
 import { useQuery, useMutation } from '@apollo/client'
 import { useSnackbar } from 'notistack'
 import { useAuth, login, isArchitect } from '@/lib/auth'
-import { GET_CAPABILITIES, CREATE_CAPABILITY, UPDATE_CAPABILITY } from '@/graphql/capability'
+import {
+  GET_CAPABILITIES,
+  CREATE_CAPABILITY,
+  UPDATE_CAPABILITY,
+  DELETE_CAPABILITY,
+} from '@/graphql/capability'
 import { CapabilityStatus, BusinessCapability } from '@/gql/generated'
 import CapabilityForm, { CapabilityFormValues } from '@/components/capabilities/CapabilityForm'
 
@@ -124,6 +129,19 @@ const CapabilitiesPage = () => {
     },
   })
 
+  // Mutation zum Löschen einer Capability
+  const [deleteCapability, { loading: isDeleting }] = useMutation(DELETE_CAPABILITY, {
+    onCompleted: () => {
+      enqueueSnackbar('Business Capability erfolgreich gelöscht', { variant: 'success' })
+      refetch()
+    },
+    onError: error => {
+      enqueueSnackbar(`Fehler beim Löschen der Business Capability: ${error.message}`, {
+        variant: 'error',
+      })
+    },
+  })
+
   // Handler für das Erstellen einer neuen Business Capability
   const handleCreateCapabilitySubmit = async (data: CapabilityFormValues) => {
     const { parentId: parent, ...capabilityData } = data
@@ -182,6 +200,15 @@ const CapabilitiesPage = () => {
     // Hier fügen wir direkt die Logik für das Erstellen einer neuen Capability ein,
     // anstatt einen versteckten Button zu verwenden
     setShowNewCapabilityForm(true)
+  }
+
+  // Business Capability löschen
+  const handleDeleteCapability = async (id: string) => {
+    await deleteCapability({
+      variables: { id },
+    })
+    // Formular nach dem Löschen schließen
+    // Automatisches Schließen erfolgt durch die CapabilityForm selbst
   }
 
   // Business Capability Details anzeigen
@@ -252,6 +279,7 @@ const CapabilitiesPage = () => {
             onEditClick={handleEditCapability}
             onCreateCapability={handleCreateCapabilitySubmit}
             onUpdateCapability={handleUpdateCapabilitySubmit}
+            onDeleteCapability={handleDeleteCapability}
             availableTags={availableTags}
           />
         </Paper>
