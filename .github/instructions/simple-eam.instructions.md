@@ -286,6 +286,131 @@ const table = useReactTable({
   })
   ```
 
+  #### Erweiterte Validierungskonzepte
+
+  - **Validierungszeitpunkte**:
+
+    - Volle Kontrolle über wann Validierung ausgeführt wird: `onChange`, `onBlur`, `onSubmit`
+    - Verschiedene Validierungen für unterschiedliche Ereignisse
+
+    ```tsx
+    <form.Field
+      name="age"
+      validators={{
+        onChange: ({ value }) => (value < 13 ? 'Muss mindestens 13 sein' : undefined),
+        onBlur: ({ value }) => (value < 0 ? 'Ungültiger Wert' : undefined),
+      }}
+    >
+      {field => (
+        <>
+          <input
+            value={field.state.value}
+            onChange={e => field.handleChange(e.target.valueAsNumber)}
+            onBlur={field.handleBlur}
+          />
+          {/* Fehler anzeigen */}
+          {!field.state.meta.isValid && <em role="alert">{field.state.meta.errors.join(', ')}</em>}
+        </>
+      )}
+    </form.Field>
+    ```
+
+  - **Fehleranzeige**:
+
+    - Zugriff auf Fehler als Array: `field.state.meta.errors`
+    - Zugriff auf Fehler nach Validierungstyp: `field.state.meta.errorMap['onChange']`
+    - Typsichere Fehlerbehandlung durch Inferenz der Fehlertypen
+
+  - **Formular- vs. Feldvalidierung**:
+
+    - Validierung kann auf Formularebene oder pro Feld definiert werden
+    - Formularvalidierung kann Feldfehlermeldungen setzen:
+
+    ```tsx
+    const form = useForm({
+      defaultValues: { age: 0, email: '' },
+      validators: {
+        onSubmitAsync: async ({ value }) => {
+          // Serverseitige Validierung
+          const hasErrors = await verifyDataOnServer(value)
+          if (hasErrors) {
+            return {
+              form: 'Ungültige Daten', // Optionale Formularfehlermeldung
+              fields: {
+                age: 'Muss mindestens 13 sein',
+                email: 'E-Mail-Adresse existiert bereits',
+              },
+            }
+          }
+          return null
+        },
+      },
+    })
+    ```
+
+  - **Asynchrone Validierung**:
+
+    - Unterstützung für asynchrone Validierungen mit Endungen wie `onChangeAsync`
+    - Kombinierbar mit synchronen Validierungen (ausführbar in Reihenfolge)
+    - Integriertes Debouncing:
+
+    ```tsx
+    <form.Field
+      name="username"
+      asyncDebounceMs={500} // Globales Debouncing
+      validators={{
+        onChangeAsyncDebounceMs: 1000, // Spezifisches Debouncing
+        onChangeAsync: async ({ value }) => {
+          // Überprüfung, ob Benutzername bereits existiert
+          const exists = await checkUsernameExists(value)
+          return exists ? 'Benutzername bereits vergeben' : undefined
+        },
+      }}
+    />
+    ```
+
+  - **Schema-basierte Validierung**:
+
+    - Unterstützung für Libraries nach [Standard Schema](https://github.com/standard-schema/standard-schema):
+    - Zod, Valibot, ArkType, Effect/Schema
+    - Kann mit benutzerdefinierten Funktionen kombiniert werden:
+
+    ```tsx
+    <form.Field
+      name="email"
+      validators={{
+        onChange: z.string().email('Gültige E-Mail-Adresse eingeben'),
+        onChangeAsync: async ({ value, fieldApi }) => {
+          // Schema-Validierung mit anschließender Logik
+          const errors = fieldApi.parseValueWithSchema(
+            z.string().email('Gültige E-Mail-Adresse eingeben')
+          )
+          if (errors) return errors
+
+          // Zusätzliche asynchrone Validierung
+          const isUnique = await checkEmailUnique(value)
+          return isUnique ? undefined : 'E-Mail wird bereits verwendet'
+        },
+      }}
+    />
+    ```
+
+  - **Formularübermittlung blockieren**:
+
+    - Formular-State enthält `canSubmit`-Flag, das `false` ist, wenn Felder ungültig sind
+    - Submit-Button kann automatisch deaktiviert werden:
+
+    ```tsx
+    <form.Subscribe
+      selector={state => [state.canSubmit, state.isSubmitting]}
+      children={([canSubmit, isSubmitting]) => (
+        <button type="submit" aria-disabled={!canSubmit}>
+          {isSubmitting ? 'Wird übermittelt...' : 'Absenden'}
+        </button>
+      )}
+    />
+    ```
+
 - **Optimierung und Reaktivität**:
 
   - Fein abgestimmte Komponenten-Updates mit `useStore` und selektiven Selektoren
@@ -301,9 +426,213 @@ const table = useReactTable({
   ```
 
 - **Formular-Reset**:
+
   - Verwenden von Button vom Typ "button" statt "reset" bei der Arbeit mit Tanstack Form
   - Native Form-Reset verhindern mit `event.preventDefault()` wenn nötig
   - Listener einsetzen für komplexe Reset-Logik mit Abhängigkeiten
+
+- **Integration mit UI-Bibliotheken**:
+
+  - Tanstack Form ist eine headless Bibliothek und lässt sich mit verschiedenen UI-Frameworks kombinieren
+  - Besonders gut geeignet für Material UI, aber auch mit anderen Bibliotheken wie Mantine nutzbar
+
+  ```tsx
+  // Beispiel mit Material UI
+  import { TextField, Checkbox } from '@mui/material'
+  import { useForm } from '@tanstack/react-form'
+
+  export default function Form() {
+    const form = useForm({
+      defaultValues: {
+        firstName: '',
+        lastName: '',
+        isChecked: false,
+      },
+      onSubmit: async ({ value }) => {
+        console.log(value)
+      },
+    })
+
+    return (
+      <form
+        onSubmit={e => {
+          e.preventDefault()
+          form.handleSubmit()
+        }}
+      >
+        <form.Field
+          name="lastName"
+          children={({ state, handleChange, handleBlur }) => (
+            <TextField
+              label="Nachname"
+              variant="filled"
+              defaultValue={state.value}
+              onChange={e => handleChange(e.target.value)}
+              onBlur={handleBlur}
+              placeholder="Nachname eingeben"
+              error={!state.meta.isValid}
+              helperText={state.meta.errors.join(', ')}
+            />
+          )}
+        />
+
+        <form.Field
+          name="isChecked"
+          children={({ state, handleChange, handleBlur }) => (
+            <Checkbox
+              onChange={e => handleChange(e.target.checked)}
+              onBlur={handleBlur}
+              checked={state.value}
+            />
+          )}
+        />
+
+        <button type="submit">Absenden</button>
+      </form>
+    )
+  }
+  ```
+
+  - **Best Practices für UI-Integration**:
+    - Verwenden von Render Props für optimale Typunterstützung und Kontrolle
+    - Selektive Destrukturierung der benötigten Properties (state, handleChange, handleBlur)
+    - Fehlerstatusweitergabe an UI-Komponenten (z.B. `error={!state.meta.isValid}`)
+    - Fehlermeldungen an UI-Komponenten weitergeben (z.B. `helperText={state.meta.errors.join(', ')}`)
+    - Ereignishandler richtig transformieren (z.B. für Checkboxen: `(e) => handleChange(e.target.checked)`)
+    - Konsistente Validierungsrückmeldung über alle Formularkomponenten hinweg
+
+- **Integration mit Next.js App Router und Server Components**:
+
+  - Für die Integration mit Next.js App Router sind spezielle Import-Pfade und Konfigurationen erforderlich
+  - Nutzung von React Server Actions für serverseitige Validierung und Formularverarbeitung
+
+  ```tsx
+  // 1. Formulardefinition erstellen (shared-code.ts)
+  // Beachte den speziellen Import-Pfad für Server Components
+  import { formOptions } from '@tanstack/react-form/nextjs'
+
+  export const formOpts = formOptions({
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      age: 0,
+    },
+  })
+  ```
+
+  ```tsx
+  // 2. Server Action für Formularverarbeitung (action.ts)
+  'use server'
+
+  import { ServerValidateError, createServerValidate } from '@tanstack/react-form/nextjs'
+  import { formOpts } from './shared-code'
+
+  // Server-Validierung mit Typen aus formOpts
+  const serverValidate = createServerValidate({
+    ...formOpts,
+    onServerValidate: ({ value }) => {
+      // Serverseite Validierungslogik
+      if (value.age < 12) {
+        return 'Server-Validierung: Mindestalter ist 12 Jahre'
+      }
+    },
+  })
+
+  export default async function formAction(prev: unknown, formData: FormData) {
+    try {
+      const validatedData = await serverValidate(formData)
+
+      // Hier können die Daten in der Datenbank gespeichert werden
+      console.log('Validierte Daten:', validatedData)
+
+      // Erfolgreiche Verarbeitung ohne Rückgabe von Fehlern
+      return { success: true }
+    } catch (e) {
+      if (e instanceof ServerValidateError) {
+        // Fehler an Client zurückgeben
+        return e.formState
+      }
+
+      throw e
+    }
+  }
+  ```
+
+  ```tsx
+  // 3. Client-Komponente für das Formular (ClientFormComponent.tsx)
+  'use client'
+
+  import { useActionState } from 'react'
+  import { initialFormState } from '@tanstack/react-form/nextjs'
+  // Beachte: Standard-Import für Client-Komponenten
+  import { mergeForm, useForm, useStore, useTransform } from '@tanstack/react-form'
+  import formAction from './action'
+  import { formOpts } from './shared-code'
+
+  export function ClientForm() {
+    // useActionState für React Server Actions
+    const [state, action] = useActionState(formAction, initialFormState)
+
+    const form = useForm({
+      ...formOpts,
+      // Zusammenführen der Client- und Server-Status
+      transform: useTransform(baseForm => mergeForm(baseForm, state!), [state]),
+    })
+
+    // Zugriff auf Formularfehler
+    const formErrors = useStore(form.store, formState => formState.errors)
+
+    return (
+      <form action={action as never} onSubmit={() => form.handleSubmit()}>
+        {/* Formularfehler anzeigen */}
+        {formErrors.map(error => (
+          <p key={error as string}>{error}</p>
+        ))}
+
+        {/* Formularfeld mit Client- und Server-Validierung */}
+        <form.Field
+          name="age"
+          validators={{
+            onChange: ({ value }) =>
+              value < 8 ? 'Client-Validierung: Mindestalter ist 8 Jahre' : undefined,
+          }}
+        >
+          {field => (
+            <div>
+              <input
+                name="age"
+                type="number"
+                value={field.state.value}
+                onChange={e => field.handleChange(e.target.valueAsNumber)}
+              />
+              {field.state.meta.errors.map(error => (
+                <p key={error as string}>{error}</p>
+              ))}
+            </div>
+          )}
+        </form.Field>
+
+        {/* Submit-Button mit Statusanzeige */}
+        <form.Subscribe selector={formState => [formState.canSubmit, formState.isSubmitting]}>
+          {([canSubmit, isSubmitting]) => (
+            <button type="submit" disabled={!canSubmit}>
+              {isSubmitting ? 'Wird übermittelt...' : 'Absenden'}
+            </button>
+          )}
+        </form.Subscribe>
+      </form>
+    )
+  }
+  ```
+
+  - **Wichtige Hinweise für SSR mit Next.js**:
+
+    - Unterschiedliche Import-Pfade beachten: `@tanstack/react-form/nextjs` für Server-Code
+    - Formularoptionen sollten in einer gemeinsam genutzten Datei definiert werden
+    - Server Actions müssen mit `'use server'` markiert sein
+    - Verwendung von `useActionState` zusammen mit `mergeForm` und `useTransform`
+    - Fehlerbehandlung über `ServerValidateError` Klasse
+    - Formulare müssen als Client-Komponenten markiert sein (`'use client'`)
 
 ### Next.js 15
 
