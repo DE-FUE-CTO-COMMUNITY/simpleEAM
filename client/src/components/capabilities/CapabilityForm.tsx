@@ -25,30 +25,6 @@ import {
   DialogContentText,
 } from '@mui/material'
 import { GET_PERSONS } from '@/graphql/person'
-
-// Komponente zur Anzeige der Personenliste
-const PersonSelection = () => {
-  const { data, loading, error } = useQuery(GET_PERSONS)
-
-  if (loading)
-    return (
-      <MenuItem value="">
-        <CircularProgress size={20} /> Lade Personen...
-      </MenuItem>
-    )
-  if (error) return <MenuItem value="">Fehler beim Laden der Personen</MenuItem>
-
-  return (
-    <>
-      <MenuItem value="">Kein Verantwortlicher</MenuItem>
-      {data?.people?.map((person: { id: string; firstName: string; lastName: string }) => (
-        <MenuItem key={person.id} value={person.id}>
-          {`${person.firstName} ${person.lastName}`}
-        </MenuItem>
-      ))}
-    </>
-  )
-}
 import { Grid } from '@mui/material'
 import {
   Save as SaveIcon,
@@ -149,6 +125,9 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
   const isEditMode = mode === 'edit'
   const isCreateMode = mode === 'create'
 
+  // Personen laden - jetzt sicher an der Wurzel der Komponente
+  const { data: personData, loading: personLoading } = useQuery(GET_PERSONS)
+
   // State für den Bestätigungsdialog beim Löschen
   const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false)
 
@@ -159,9 +138,9 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
     maturityLevel: capability?.maturityLevel ?? 0,
     businessValue: capability?.businessValue ?? 0,
     status: capability?.status ?? CapabilityStatus.ACTIVE,
-    ownerId: capability?.owners?.[0]?.id ?? '',
+    ownerId: capability?.owners && capability.owners.length > 0 ? capability.owners[0]?.id : '',
     tags: capability?.tags ?? [],
-    parentId: capability?.children?.[0]?.id ?? '',
+    parentId: capability?.parents && capability.parents.length > 0 ? capability.parents[0]?.id : '',
   }
 
   // Dialog-Titel basierend auf dem Modus
@@ -195,9 +174,11 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
   const capabilityMaturityLevel = capability?.maturityLevel
   const capabilityBusinessValue = capability?.businessValue
   const capabilityStatus = capability?.status
-  const capabilityOwnerId = capability?.owners?.[0]?.id
+  const capabilityOwnerId =
+    capability?.owners && capability.owners.length > 0 ? capability.owners[0]?.id : undefined
   const capabilityTags = capability?.tags
-  const capabilityParentId = capability?.children?.[0]?.id
+  const capabilityParentId =
+    capability?.parents && capability.parents.length > 0 ? capability.parents[0]?.id : undefined
 
   useEffect(() => {
     if (!isOpen) {
@@ -273,7 +254,6 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
                 )}
               </form.Field>
             </Grid>
-
             {/* Status */}
             <Grid size={{ xs: 12, md: 6 }}>
               <form.Field
@@ -315,7 +295,6 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
                 )}
               </form.Field>
             </Grid>
-
             {/* Beschreibung */}
             <Grid size={{ xs: 12 }}>
               <form.Field
@@ -350,7 +329,6 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
                 )}
               </form.Field>
             </Grid>
-
             {/* Reifegrad */}
             <Grid size={{ xs: 12, md: 6 }}>
               <form.Field
@@ -390,7 +368,6 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
                 )}
               </form.Field>
             </Grid>
-
             {/* Geschäftswert */}
             <Grid size={{ xs: 12, md: 6 }}>
               <form.Field
@@ -424,8 +401,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
                   </FormControl>
                 )}
               </form.Field>
-            </Grid>
-
+            </Grid>{' '}
             {/* Verantwortlicher */}
             <Grid size={{ xs: 12, md: 6 }}>
               <form.Field
@@ -448,7 +424,20 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
                       error={field.state.meta.isTouched && !field.state.meta.isValid}
                       select
                     >
-                      <PersonSelection />
+                      <MenuItem value="">Kein Verantwortlicher</MenuItem>
+                      {personLoading ? (
+                        <MenuItem value="">
+                          <CircularProgress size={20} /> Lade Personen...
+                        </MenuItem>
+                      ) : personData?.people ? (
+                        personData.people.map(
+                          (person: { id: string; firstName: string; lastName: string }) => (
+                            <MenuItem key={person.id} value={person.id}>
+                              {`${person.firstName} ${person.lastName}`}
+                            </MenuItem>
+                          )
+                        )
+                      ) : null}
                     </TextField>
                     <FormHelperText>
                       {field.state.meta.isTouched && field.state.meta.errors
@@ -461,7 +450,6 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
                 )}
               </form.Field>
             </Grid>
-
             {/* Übergeordnete Capability */}
             <Grid size={{ xs: 12, md: 6 }}>
               <form.Field
@@ -504,7 +492,6 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
                 )}
               </form.Field>
             </Grid>
-
             {/* Tags */}
             <Grid size={{ xs: 12 }}>
               <form.Field
@@ -577,7 +564,6 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
                 )}
               </form.Field>
             </Grid>
-
             {/* Metadaten anzeigen im View-Modus */}
             {isViewMode && capability && (
               <Grid size={{ xs: 12 }}>

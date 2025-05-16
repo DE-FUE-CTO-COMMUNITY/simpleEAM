@@ -150,9 +150,13 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
       header: 'Geschäftswert',
       cell: info => info.getValue(),
     }),
-    columnHelper.accessor('owner', {
+    columnHelper.accessor('owners', {
       header: 'Verantwortlicher',
-      cell: info => info.getValue() || '-',
+      cell: info => {
+        const owners = info.getValue()
+        // Nur den ersten Owner anzeigen, falls vorhanden
+        return owners && owners.length > 0 ? `${owners[0].firstName} ${owners[0].lastName}` : '-'
+      },
     }),
     columnHelper.accessor('tags', {
       header: 'Tags',

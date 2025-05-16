@@ -33,6 +33,10 @@ export const GET_CAPABILITIES = gql`
         id
         name
       }
+      parents {
+        id
+        name
+      }
     }
   }
 `
@@ -55,6 +59,10 @@ export const GET_CAPABILITY = gql`
       createdAt
       updatedAt
       children {
+        id
+        name
+      }
+      parents {
         id
         name
       }

@@ -153,23 +153,19 @@ const CapabilitiesPage = () => {
       businessValue: capabilityData.businessValue,
       status: capabilityData.status,
       tags: capabilityData.tags,
-      // Wenn ein Besitzer ausgewählt wurde, verwenden wir die neue owners-Struktur
+      // Wenn ein Besitzer ausgewählt wurde, verwenden wir die neue owners-Struktur (nur ein Owner)
       ...(ownerId
         ? {
-            owners: [
-              {
-                connect: { where: { node: { id: ownerId } } },
-              },
-            ],
+            owners: {
+              connect: [{ where: { node: { id: { eq: ownerId } } } }],
+            },
           }
         : {}),
       ...(parent
         ? {
-            parents: [
-              {
-                connect: { where: { node: { id: parent } } },
-              },
-            ],
+            parents: {
+              connect: [{ where: { node: { id: { eq: parent } } } }],
+            },
           }
         : {}),
     }
@@ -200,10 +196,46 @@ const CapabilitiesPage = () => {
 
     // Aktualisierung der Owner-Beziehung, wenn ein Besitzer ausgewählt wurde
     if (ownerId) {
-      // Wir setzen die owners-Beziehung
+      // Wir setzen die owners-Beziehung (nur einen Owner, auch wenn das Datenmodell mehrere unterstützt)
+      // Gemäß den generierten GraphQL-Typen benötigen wir die richtige Struktur ohne disconnectAll
       input.owners = {
-        disconnectAll: true, // Lösche alle bestehenden Beziehungen
-        connect: { where: { node: { id: ownerId } } }, // Verbinde mit dem neuen Besitzer
+        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+        connect: [
+          {
+            where: {
+              node: {
+                id: { eq: ownerId }, // ID muss als IdScalarFilters-Objekt übergeben werden
+              },
+            },
+          },
+        ], // Verbinde mit dem neuen Besitzer
+      }
+    } else {
+      // Wenn kein Besitzer ausgewählt wurde, entfernen wir alle Besitzer
+      input.owners = {
+        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+      }
+    }
+    
+    // Aktualisierung der übergeordneten Capability, wenn eine ausgewählt wurde
+    if (parentId) {
+      // Wir setzen die parents-Beziehung
+      input.parents = {
+        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+        connect: [
+          {
+            where: {
+              node: {
+                id: { eq: parentId }, // ID muss als IdScalarFilters-Objekt übergeben werden
+              },
+            },
+          },
+        ], // Verbinde mit der neuen übergeordneten Capability
+      }
+    } else {
+      // Wenn keine übergeordnete Capability ausgewählt wurde, entfernen wir alle Verbindungen
+      input.parents = {
+        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
       }
     }
 
