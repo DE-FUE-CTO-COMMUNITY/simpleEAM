@@ -127,8 +127,15 @@ const CapabilitiesPage = () => {
   // Handler für das Erstellen einer neuen Business Capability
   const handleCreateCapabilitySubmit = async (data: CapabilityFormValues) => {
     const { parentId: parent, ...capabilityData } = data
+    // Bei CREATE wird kein spezielles Mutation-Objekt benötigt, da direkte Werte erlaubt sind
     const input = {
-      ...capabilityData,
+      name: capabilityData.name,
+      description: capabilityData.description,
+      maturityLevel: capabilityData.maturityLevel,
+      businessValue: capabilityData.businessValue,
+      status: capabilityData.status,
+      owner: capabilityData.owner,
+      tags: capabilityData.tags,
       ...(parent
         ? {
             children: [
@@ -156,7 +163,13 @@ const CapabilitiesPage = () => {
     // was komplex sein kann, da wir die aktuelle Beziehung prüfen müssten.
     // Für diese Implementierung beschränken wir uns auf die direkten Capability-Daten.
     const input = {
-      ...capabilityData,
+      name: { set: capabilityData.name },
+      description: { set: capabilityData.description },
+      maturityLevel: { set: capabilityData.maturityLevel },
+      businessValue: { set: capabilityData.businessValue },
+      status: { set: capabilityData.status },
+      owner: { set: capabilityData.owner },
+      tags: { set: capabilityData.tags },
     }
 
     await updateCapability({

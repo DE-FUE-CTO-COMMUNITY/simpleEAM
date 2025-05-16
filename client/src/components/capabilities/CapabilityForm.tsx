@@ -64,6 +64,7 @@ export interface CapabilityFormProps {
   onSubmit: (data: CapabilityFormValues) => Promise<void>
   mode: 'create' | 'edit' | 'view'
   loading?: boolean
+  onEditMode?: () => void
 }
 
 const getLevelLabel = (level: number | null | undefined): string => {
@@ -107,6 +108,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
   onSubmit,
   mode,
   loading = false,
+  onEditMode,
 }) => {
   const isViewMode = mode === 'view'
   const isEditMode = mode === 'edit'
@@ -202,17 +204,20 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
                 }}
               >
                 {field => (
-                  <FormControl fullWidth error={!!field.state.meta.errors}>
+                  <FormControl
+                    fullWidth
+                    error={field.state.meta.isTouched && !field.state.meta.isValid}
+                  >
                     <FormLabel>Name *</FormLabel>
                     <TextField
                       value={field.state.value}
                       onChange={e => field.handleChange(e.target.value)}
                       onBlur={field.handleBlur}
                       disabled={isViewMode || loading}
-                      error={!!field.state.meta.errors}
+                      error={field.state.meta.isTouched && !field.state.meta.isValid}
                     />
                     <FormHelperText>
-                      {field.state.meta.errors
+                      {field.state.meta.isTouched && field.state.meta.errors
                         ? Array.isArray(field.state.meta.errors)
                           ? field.state.meta.errors.join(', ')
                           : String(field.state.meta.errors)
@@ -232,7 +237,10 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
                 }}
               >
                 {field => (
-                  <FormControl fullWidth error={!!field.state.meta.errors}>
+                  <FormControl
+                    fullWidth
+                    error={field.state.meta.isTouched && !field.state.meta.isValid}
+                  >
                     <FormLabel>Status *</FormLabel>
                     <TextField
                       value={field.state.value}
@@ -242,7 +250,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
                       onBlur={field.handleBlur}
                       disabled={isViewMode || loading}
                       select
-                      error={!!field.state.meta.errors}
+                      error={field.state.meta.isTouched && !field.state.meta.isValid}
                     >
                       {Object.values(CapabilityStatus).map(status => (
                         <MenuItem key={status} value={status}>
@@ -251,7 +259,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
                       ))}
                     </TextField>
                     <FormHelperText>
-                      {field.state.meta.errors
+                      {field.state.meta.isTouched && field.state.meta.errors
                         ? Array.isArray(field.state.meta.errors)
                           ? field.state.meta.errors.join(', ')
                           : String(field.state.meta.errors)
@@ -271,7 +279,10 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
                 }}
               >
                 {field => (
-                  <FormControl fullWidth error={!!field.state.meta.errors}>
+                  <FormControl
+                    fullWidth
+                    error={field.state.meta.isTouched && !field.state.meta.isValid}
+                  >
                     <FormLabel>Beschreibung *</FormLabel>
                     <TextField
                       value={field.state.value}
@@ -280,10 +291,10 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
                       disabled={isViewMode || loading}
                       multiline
                       rows={4}
-                      error={!!field.state.meta.errors}
+                      error={field.state.meta.isTouched && !field.state.meta.isValid}
                     />
                     <FormHelperText>
-                      {field.state.meta.errors
+                      {field.state.meta.isTouched && field.state.meta.errors
                         ? Array.isArray(field.state.meta.errors)
                           ? field.state.meta.errors.join(', ')
                           : String(field.state.meta.errors)
@@ -303,7 +314,10 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
                 }}
               >
                 {field => (
-                  <FormControl fullWidth error={!!field.state.meta.errors}>
+                  <FormControl
+                    fullWidth
+                    error={field.state.meta.isTouched && !field.state.meta.isValid}
+                  >
                     <FormLabel>Reifegrad *</FormLabel>
                     <TextField
                       value={field.state.value}
@@ -311,7 +325,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
                       onBlur={field.handleBlur}
                       disabled={isViewMode || loading}
                       select
-                      error={!!field.state.meta.errors}
+                      error={field.state.meta.isTouched && !field.state.meta.isValid}
                     >
                       {[0, 1, 2, 3].map(level => (
                         <MenuItem key={level} value={level}>
@@ -320,7 +334,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
                       ))}
                     </TextField>
                     <FormHelperText>
-                      {field.state.meta.errors
+                      {field.state.meta.isTouched && field.state.meta.errors
                         ? Array.isArray(field.state.meta.errors)
                           ? field.state.meta.errors.join(', ')
                           : String(field.state.meta.errors)
@@ -340,7 +354,10 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
                 }}
               >
                 {field => (
-                  <FormControl fullWidth error={!!field.state.meta.errors}>
+                  <FormControl
+                    fullWidth
+                    error={field.state.meta.isTouched && !field.state.meta.isValid}
+                  >
                     <FormLabel>Geschäftswert *</FormLabel>
                     <TextField
                       value={field.state.value}
@@ -348,11 +365,11 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
                       onBlur={field.handleBlur}
                       disabled={isViewMode || loading}
                       inputProps={{ min: 0, max: 10 }}
-                      error={!!field.state.meta.errors}
+                      error={field.state.meta.isTouched && !field.state.meta.isValid}
                       type="number"
                     />
                     <FormHelperText>
-                      {field.state.meta.errors
+                      {field.state.meta.isTouched && field.state.meta.errors
                         ? Array.isArray(field.state.meta.errors)
                           ? field.state.meta.errors.join(', ')
                           : String(field.state.meta.errors)
@@ -372,17 +389,20 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
                 }}
               >
                 {field => (
-                  <FormControl fullWidth error={!!field.state.meta.errors}>
+                  <FormControl
+                    fullWidth
+                    error={field.state.meta.isTouched && !field.state.meta.isValid}
+                  >
                     <FormLabel>Verantwortlicher</FormLabel>
                     <TextField
                       value={field.state.value}
                       onChange={e => field.handleChange(e.target.value)}
                       onBlur={field.handleBlur}
                       disabled={isViewMode || loading}
-                      error={!!field.state.meta.errors}
+                      error={field.state.meta.isTouched && !field.state.meta.isValid}
                     />
                     <FormHelperText>
-                      {field.state.meta.errors
+                      {field.state.meta.isTouched && field.state.meta.errors
                         ? Array.isArray(field.state.meta.errors)
                           ? field.state.meta.errors.join(', ')
                           : String(field.state.meta.errors)
@@ -402,7 +422,10 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
                 }}
               >
                 {field => (
-                  <FormControl fullWidth error={!!field.state.meta.errors}>
+                  <FormControl
+                    fullWidth
+                    error={field.state.meta.isTouched && !field.state.meta.isValid}
+                  >
                     <FormLabel>Übergeordnete Capability</FormLabel>
                     <TextField
                       value={field.state.value}
@@ -410,7 +433,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
                       onBlur={field.handleBlur}
                       disabled={isViewMode || loading}
                       select
-                      error={!!field.state.meta.errors}
+                      error={field.state.meta.isTouched && !field.state.meta.isValid}
                     >
                       <MenuItem value="">Keine übergeordnete Capability</MenuItem>
                       {availableCapabilities
@@ -422,7 +445,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
                         ))}
                     </TextField>
                     <FormHelperText>
-                      {field.state.meta.errors
+                      {field.state.meta.isTouched && field.state.meta.errors
                         ? Array.isArray(field.state.meta.errors)
                           ? field.state.meta.errors.join(', ')
                           : String(field.state.meta.errors)
@@ -442,7 +465,10 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
                 }}
               >
                 {field => (
-                  <FormControl fullWidth error={!!field.state.meta.errors}>
+                  <FormControl
+                    fullWidth
+                    error={field.state.meta.isTouched && !field.state.meta.isValid}
+                  >
                     <FormLabel>Tags</FormLabel>
                     {isViewMode ? (
                       <Box sx={{ mt: 1 }}>
@@ -485,14 +511,14 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
                         renderInput={params => (
                           <TextField
                             {...params}
-                            error={!!field.state.meta.errors}
+                            error={field.state.meta.isTouched && !field.state.meta.isValid}
                             disabled={loading}
                           />
                         )}
                       />
                     )}
                     <FormHelperText>
-                      {field.state.meta.errors
+                      {field.state.meta.isTouched && field.state.meta.errors
                         ? Array.isArray(field.state.meta.errors)
                           ? field.state.meta.errors.join(', ')
                           : String(field.state.meta.errors)
@@ -540,8 +566,11 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
               variant="contained"
               color="primary"
               onClick={() => {
-                onClose()
-                // Hier könnten wir zum Edit-Modus wechseln
+                if (onEditMode) {
+                  onEditMode()
+                } else {
+                  onClose()
+                }
               }}
               startIcon={<EditIcon />}
             >

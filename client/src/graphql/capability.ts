@@ -35,7 +35,7 @@ export const GET_CAPABILITIES = gql`
 
 export const GET_CAPABILITY = gql`
   query GetCapability($id: ID!) {
-    businessCapability(id: $id) {
+    businessCapability(where: { id: $id }) {
       id
       name
       description
@@ -75,7 +75,7 @@ export const CREATE_CAPABILITY = gql`
 
 export const UPDATE_CAPABILITY = gql`
   mutation UpdateCapability($id: ID!, $input: BusinessCapabilityUpdateInput!) {
-    updateBusinessCapabilities(where: { id: $id }, update: $input) {
+    updateBusinessCapabilities(where: { id: { eq: $id } }, update: $input) {
       businessCapabilities {
         id
         name
@@ -91,7 +91,7 @@ export const UPDATE_CAPABILITY = gql`
 
 export const DELETE_CAPABILITY = gql`
   mutation DeleteCapability($id: ID!) {
-    deleteBusinessCapabilities(where: { id: $id }) {
+    deleteBusinessCapabilities(where: { id: { eq: $id } }) {
       nodesDeleted
     }
   }

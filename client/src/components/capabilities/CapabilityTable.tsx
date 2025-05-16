@@ -505,6 +505,7 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
         onSubmit={handleFormSubmit}
         mode={formMode}
         loading={formLoading}
+        onEditMode={() => setFormMode('edit')}
       />
     </>
   )
