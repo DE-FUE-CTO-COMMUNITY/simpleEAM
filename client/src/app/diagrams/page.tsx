@@ -4,7 +4,7 @@ import React from 'react'
 import { Box } from '@mui/material'
 import DiagramEditor from '@/components/diagrams/DiagramEditor'
 
-const DiagramEditorPage = () => {
+const DiagramEditorPage: React.FC = () => {
   return (
     <Box
       sx={{
