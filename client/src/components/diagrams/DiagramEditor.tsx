@@ -5,12 +5,12 @@ import { Box, Typography } from '@mui/material'
 import dynamic from 'next/dynamic'
 
 // Dynamischer Import von Excalidraw, um Server-Side-Rendering zu vermeiden
-// Genau wie in der Dokumentation empfohlen: https://docs.excalidraw.com/docs/@excalidraw/excalidraw/integration
+// Gemäß der offiziellen Dokumentation: https://docs.excalidraw.com/docs/@excalidraw/excalidraw/integration
 const ExcalidrawComponent = dynamic(
   async () => {
+    // Wichtig: Zuerst das CSS importieren, dann die Komponente
+    await import('@excalidraw/excalidraw/index.css')
     const { Excalidraw } = await import('@excalidraw/excalidraw')
-    // CSS-Import funktioniert in diesem Setup möglicherweise nicht direkt
-    // und kann bei Bedarf in der globalen CSS oder an anderer Stelle eingefügt werden
     return Excalidraw
   },
   {
