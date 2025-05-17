@@ -60,6 +60,8 @@ import {
 import Grid from '@mui/material/Grid'
 import { GET_PERSONS } from '@/graphql/person'
 import { GET_CAPABILITIES } from '@/graphql/capability'
+import { GET_DATA_OBJECTS } from '@/graphql/dataObject'
+import { GET_APPLICATION_INTERFACES } from '@/graphql/applicationInterface'
 import {
   Save as SaveIcon,
   Cancel as CancelIcon,
@@ -67,7 +69,7 @@ import {
   Delete as DeleteIcon,
 } from '@mui/icons-material'
 import { Application, ApplicationStatus, CriticalityLevel } from '../../gql/generated'
-import { Person, BusinessCapability } from '../../gql/generated'
+import { Person, BusinessCapability, DataObject, ApplicationInterface } from '../../gql/generated'
 import { isArchitect } from '@/lib/auth'
 
 // Schema für die Formularvalidierung
@@ -103,6 +105,8 @@ export const applicationSchema = z.object({
   endOfLifeDate: z.date().optional().nullable(),
   ownerId: z.string().optional(),
   supportsCapabilityIds: z.array(z.string()).optional(),
+  usesDataObjectIds: z.array(z.string()).optional(),
+  interfacesToApplicationIds: z.array(z.string()).optional(),
 })
 
 // TypeScript Typen basierend auf dem Schema
@@ -204,6 +208,14 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
   const { data: capabilitiesData, loading: capabilitiesLoading } = useQuery(GET_CAPABILITIES)
   const capabilities = capabilitiesData?.businessCapabilities || []
 
+  // GraphQL-Abfrage für DataObjects (für DataObject-Auswahl)
+  const { data: dataObjectsData, loading: dataObjectsLoading } = useQuery(GET_DATA_OBJECTS)
+  const dataObjects = dataObjectsData?.dataObjects || []
+
+  // GraphQL-Abfrage für ApplicationInterfaces (für Interface-Auswahl)
+  const { data: interfacesData, loading: interfacesLoading } = useQuery(GET_APPLICATION_INTERFACES)
+  const applicationInterfaces = interfacesData?.applicationInterfaces || []
+
   // Zustand für Delete-Dialog
   const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false)
 
@@ -224,6 +236,14 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     supportsCapabilityIds:
       application?.supportsCapabilities && application.supportsCapabilities.length > 0
         ? application.supportsCapabilities.map(cap => cap.id)
+        : [],
+    usesDataObjectIds:
+      application?.usesDataObjects && application.usesDataObjects.length > 0
+        ? application.usesDataObjects.map(obj => obj.id)
+        : [],
+    interfacesToApplicationIds:
+      application?.interfacesToApplications && application.interfacesToApplications.length > 0
+        ? application.interfacesToApplications.map(intf => intf.id)
         : [],
   }
 
@@ -287,6 +307,14 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
         supportsCapabilityIds:
           application.supportsCapabilities && application.supportsCapabilities.length > 0
             ? application.supportsCapabilities.map(cap => cap.id)
+            : [],
+        usesDataObjectIds:
+          application.usesDataObjects && application.usesDataObjects.length > 0
+            ? application.usesDataObjects.map(obj => obj.id)
+            : [],
+        interfacesToApplicationIds:
+          application.interfacesToApplications && application.interfacesToApplications.length > 0
+            ? application.interfacesToApplications.map(intf => intf.id)
             : [],
       })
     }
@@ -799,6 +827,126 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
                             field.handleChange(newValue.map(item => item.id))
                           }}
                           disabled={isViewMode || loading || capabilitiesLoading}
+                          renderTags={(value, getTagProps) =>
+                            value.map((option, index) => (
+                              <Chip
+                                variant="outlined"
+                                label={option.name}
+                                {...getTagProps({ index })}
+                                disabled={isViewMode || loading}
+                              />
+                            ))
+                          }
+                          renderInput={params => (
+                            <TextField
+                              {...params}
+                              error={field.state.meta.isTouched && !field.state.meta.isValid}
+                            />
+                          )}
+                          isOptionEqualToValue={(option, value) => option.id === value.id}
+                        />
+                        <FormHelperText>
+                          {field.state.meta.isTouched && field.state.meta.errors
+                            ? formatValidationError(field.state.meta.errors)
+                            : ''}
+                        </FormHelperText>
+                      </FormControl>
+                    )}
+                  </form.Field>
+                </Grid>
+
+                <Grid size={12}>
+                  <form.Field
+                    name="usesDataObjectIds"
+                    validators={{
+                      onChange: applicationSchema.shape.usesDataObjectIds,
+                    }}
+                  >
+                    {field => (
+                      <FormControl
+                        fullWidth
+                        error={field.state.meta.isTouched && !field.state.meta.isValid}
+                      >
+                        <FormLabel>Verwendete Datenobjekte</FormLabel>
+                        <Autocomplete
+                          multiple
+                          options={dataObjects || []}
+                          getOptionLabel={option =>
+                            typeof option === 'string'
+                              ? option
+                              : option.name || 'Unbenanntes Datenobjekt'
+                          }
+                          value={
+                            field.state.value
+                              ? dataObjects.filter((obj: DataObject) =>
+                                  field.state.value?.includes(obj.id)
+                                )
+                              : []
+                          }
+                          onChange={(_, newValue) => {
+                            field.handleChange(newValue.map(item => item.id))
+                          }}
+                          disabled={isViewMode || loading || dataObjectsLoading}
+                          renderTags={(value, getTagProps) =>
+                            value.map((option, index) => (
+                              <Chip
+                                variant="outlined"
+                                label={option.name}
+                                {...getTagProps({ index })}
+                                disabled={isViewMode || loading}
+                              />
+                            ))
+                          }
+                          renderInput={params => (
+                            <TextField
+                              {...params}
+                              error={field.state.meta.isTouched && !field.state.meta.isValid}
+                            />
+                          )}
+                          isOptionEqualToValue={(option, value) => option.id === value.id}
+                        />
+                        <FormHelperText>
+                          {field.state.meta.isTouched && field.state.meta.errors
+                            ? formatValidationError(field.state.meta.errors)
+                            : ''}
+                        </FormHelperText>
+                      </FormControl>
+                    )}
+                  </form.Field>
+                </Grid>
+
+                <Grid size={12}>
+                  <form.Field
+                    name="interfacesToApplicationIds"
+                    validators={{
+                      onChange: applicationSchema.shape.interfacesToApplicationIds,
+                    }}
+                  >
+                    {field => (
+                      <FormControl
+                        fullWidth
+                        error={field.state.meta.isTouched && !field.state.meta.isValid}
+                      >
+                        <FormLabel>Anwendungsschnittstellen</FormLabel>
+                        <Autocomplete
+                          multiple
+                          options={applicationInterfaces || []}
+                          getOptionLabel={option =>
+                            typeof option === 'string'
+                              ? option
+                              : option.name || 'Unbenannte Schnittstelle'
+                          }
+                          value={
+                            field.state.value
+                              ? applicationInterfaces.filter((intf: ApplicationInterface) =>
+                                  field.state.value?.includes(intf.id)
+                                )
+                              : []
+                          }
+                          onChange={(_, newValue) => {
+                            field.handleChange(newValue.map(item => item.id))
+                          }}
+                          disabled={isViewMode || loading || interfacesLoading}
                           renderTags={(value, getTagProps) =>
                             value.map((option, index) => (
                               <Chip

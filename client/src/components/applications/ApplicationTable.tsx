@@ -66,7 +66,14 @@ const ApplicationTable: React.FC<ApplicationTableProps> = ({
   const handleViewApplicationClick = (id: string) => {
     const application = applications.find(app => app.id === id)
     if (application) {
-      setSelectedApplication(application as unknown as Application)
+      // Stelle sicher, dass alle erforderlichen Eigenschaften vorhanden sind
+      const completeApplication = {
+        ...application,
+        usesDataObjects: application.usesDataObjects || [],
+        interfacesToApplications: application.interfacesToApplications || [],
+      } as unknown as Application
+
+      setSelectedApplication(completeApplication)
       setFormMode('view')
       setIsFormOpen(true)
     } else {
@@ -79,7 +86,14 @@ const ApplicationTable: React.FC<ApplicationTableProps> = ({
   const handleEditApplicationClick = (id: string) => {
     const application = applications.find(app => app.id === id)
     if (application) {
-      setSelectedApplication(application as unknown as Application)
+      // Stelle sicher, dass alle erforderlichen Eigenschaften vorhanden sind
+      const completeApplication = {
+        ...application,
+        usesDataObjects: application.usesDataObjects || [],
+        interfacesToApplications: application.interfacesToApplications || [],
+      } as unknown as Application
+
+      setSelectedApplication(completeApplication)
       setFormMode('edit')
       setIsFormOpen(true)
     } else {
@@ -162,6 +176,7 @@ const ApplicationTable: React.FC<ApplicationTableProps> = ({
         header: 'Aktionen',
         cell: info => (
           <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+            {' '}
             <Tooltip title="Details anzeigen">
               <IconButton
                 size="small"

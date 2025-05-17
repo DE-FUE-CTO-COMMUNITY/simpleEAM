@@ -163,7 +163,13 @@ const ApplicationsPage = () => {
 
   // Handler für das Erstellen einer neuen Applikation
   const handleCreateApplicationSubmit = async (data: ApplicationFormValues) => {
-    const { ownerId, supportsCapabilityIds, ...applicationData } = data
+    const {
+      ownerId,
+      supportsCapabilityIds,
+      usesDataObjectIds,
+      interfacesToApplicationIds,
+      ...applicationData
+    } = data
     // Bei CREATE wird kein spezielles Mutation-Objekt benötigt, da direkte Werte erlaubt sind
     const input = {
       name: applicationData.name,
@@ -195,6 +201,26 @@ const ApplicationsPage = () => {
             },
           }
         : {}),
+      // Wenn Datenobjekte ausgewählt wurden, verbinden wir sie mit der Applikation
+      ...(usesDataObjectIds && usesDataObjectIds.length > 0
+        ? {
+            usesDataObjects: {
+              connect: usesDataObjectIds.map(id => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }
+        : {}),
+      // Wenn Schnittstellen ausgewählt wurden, verbinden wir sie mit der Applikation
+      ...(interfacesToApplicationIds && interfacesToApplicationIds.length > 0
+        ? {
+            interfacesToApplications: {
+              connect: interfacesToApplicationIds.map(id => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }
+        : {}),
     }
 
     await createApplication({
@@ -208,7 +234,13 @@ const ApplicationsPage = () => {
   // Handler für das Aktualisieren einer bestehenden Applikation
   const handleUpdateApplicationSubmit = async (id: string, data: ApplicationFormValues) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { ownerId, supportsCapabilityIds, ...applicationData } = data
+    const {
+      ownerId,
+      supportsCapabilityIds,
+      usesDataObjectIds,
+      interfacesToApplicationIds,
+      ...applicationData
+    } = data
 
     // Basis-Input-Daten vorbereiten
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -264,6 +296,46 @@ const ApplicationsPage = () => {
     } else {
       // Wenn keine Capabilities ausgewählt wurden, entfernen wir alle Verbindungen
       input.supportsCapabilities = {
+        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+      }
+    }
+
+    // Aktualisierung der DataObject-Beziehungen
+    if (usesDataObjectIds && usesDataObjectIds.length > 0) {
+      // Wir setzen die usesDataObjects-Beziehung
+      input.usesDataObjects = {
+        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+        connect: usesDataObjectIds.map(doId => ({
+          where: {
+            node: {
+              id: { eq: doId }, // ID muss als IdScalarFilters-Objekt übergeben werden
+            },
+          },
+        })), // Verbinde mit den neuen DataObjects
+      }
+    } else {
+      // Wenn keine DataObjects ausgewählt wurden, entfernen wir alle Verbindungen
+      input.usesDataObjects = {
+        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+      }
+    }
+
+    // Aktualisierung der ApplicationInterface-Beziehungen
+    if (interfacesToApplicationIds && interfacesToApplicationIds.length > 0) {
+      // Wir setzen die interfacesToApplications-Beziehung
+      input.interfacesToApplications = {
+        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+        connect: interfacesToApplicationIds.map(intfId => ({
+          where: {
+            node: {
+              id: { eq: intfId }, // ID muss als IdScalarFilters-Objekt übergeben werden
+            },
+          },
+        })), // Verbinde mit den neuen Interfaces
+      }
+    } else {
+      // Wenn keine Interfaces ausgewählt wurden, entfernen wir alle Verbindungen
+      input.interfacesToApplications = {
         disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
       }
     }
@@ -390,6 +462,30 @@ const ApplicationsPage = () => {
           mode="create"
           availableApplications={applications as unknown as Application[]}
           availableTechStack={availableTechStack}
+          application={
+            {
+              id: '',
+              name: '',
+              description: '',
+              status: ApplicationStatus.ACTIVE,
+              criticality: CriticalityLevel.MEDIUM,
+              costs: null,
+              vendor: '',
+              version: '',
+              hostingEnvironment: '',
+              technologyStack: [],
+              introductionDate: null,
+              endOfLifeDate: null,
+              owners: [],
+              createdAt: new Date().toISOString(),
+              updatedAt: null,
+              supportsCapabilities: [],
+              usesDataObjects: [],
+              interfacesToApplications: [],
+              partOfArchitectures: [],
+              __typename: 'Application',
+            } as unknown as Application
+          }
         />
       )}
     </Box>

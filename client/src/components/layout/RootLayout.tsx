@@ -33,6 +33,7 @@ import {
   Settings as SettingsIcon,
   Architecture as ArchitectureIcon,
   AccountTree as DiagramIcon,
+  Api as ApiIcon,
 } from '@mui/icons-material'
 import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
@@ -130,6 +131,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
     { text: 'Architekturen', icon: <ArchitectureIcon />, href: '/architectures' },
     { text: 'Business Capabilities', icon: <BusinessIcon />, href: '/capabilities' },
     { text: 'Applikationen', icon: <AppsIcon />, href: '/applications' },
+    { text: 'Schnittstellen', icon: <ApiIcon />, href: '/interfaces' },
     { text: 'Datenobjekte', icon: <DataObjectIcon />, href: '/dataobjects' },
     { text: 'Personen', icon: <PersonIcon />, href: '/persons' },
   ]
