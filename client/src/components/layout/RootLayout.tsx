@@ -32,8 +32,8 @@ import {
   Logout as LogoutIcon,
   Settings as SettingsIcon,
   Architecture as ArchitectureIcon,
+  AccountTree as DiagramIcon,
 } from '@mui/icons-material'
-import AccountTreeIcon from '@mui/icons-material/AccountTree'
 import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
 import AtosLogo from '../common/AtosLogo'
@@ -126,7 +126,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
 
   const menuItems = [
     { text: 'Dashboard', icon: <DashboardIcon />, href: '/' },
-    { text: 'Diagram-Editor', icon: <AccountTreeIcon />, href: '/diagrams' },
+    { text: 'Diagram-Editor', icon: <DiagramIcon />, href: '/diagrams' },
     { text: 'Architekturen', icon: <ArchitectureIcon />, href: '/architectures' },
     { text: 'Business Capabilities', icon: <BusinessIcon />, href: '/capabilities' },
     { text: 'Applikationen', icon: <AppsIcon />, href: '/applications' },
