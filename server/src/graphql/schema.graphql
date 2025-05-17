@@ -16,6 +16,7 @@ type BusinessCapability @node {
   children: [BusinessCapability!]! @relationship(type: "HAS_PARENT", direction: IN)
   supportedByApplications: [Application!]! @relationship(type: "SUPPORTS", direction: IN)
   relatedDataObjects: [DataObject!]! @relationship(type: "RELATED_TO", direction: OUT)
+  partOfArchitectures: [Architecture!]! @relationship(type: "CONTAINS", direction: IN)
 }
 
 """
@@ -34,6 +35,8 @@ type Person @node {
   ownedCapabilities: [BusinessCapability!]! @relationship(type: "OWNED_BY", direction: IN)
   ownedApplications: [Application!]! @relationship(type: "OWNED_BY", direction: IN)
   ownedDataObjects: [DataObject!]! @relationship(type: "OWNED_BY", direction: IN)
+  ownedArchitectures: [Architecture!]! @relationship(type: "OWNED_BY", direction: IN)
+  ownedDiagrams: [Diagram!]! @relationship(type: "CREATED_BY", direction: IN)
 }
 
 """
@@ -59,6 +62,7 @@ type Application @node {
   usesDataObjects: [DataObject!]! @relationship(type: "USES", direction: OUT)
   interfacesToApplications: [ApplicationInterface!]!
     @relationship(type: "HAS_INTERFACE", direction: OUT)
+  partOfArchitectures: [Architecture!]! @relationship(type: "CONTAINS", direction: IN)
 }
 
 """
@@ -90,6 +94,7 @@ type DataObject @node {
   usedByApplications: [Application!]! @relationship(type: "USES", direction: IN)
   relatedToCapabilities: [BusinessCapability!]! @relationship(type: "RELATED_TO", direction: IN)
   transferredInInterfaces: [ApplicationInterface!]! @relationship(type: "TRANSFERS", direction: IN)
+  partOfArchitectures: [Architecture!]! @relationship(type: "CONTAINS", direction: IN)
 }
 
 """
@@ -139,4 +144,63 @@ enum InterfaceType {
   DATABASE
   MESSAGE_QUEUE
   OTHER
+}
+
+"""
+Architecture - repräsentiert eine Architektur im Enterprise Architecture Management
+"""
+type Architecture @node {
+  id: ID! @id
+  name: String!
+  description: String
+  timestamp: DateTime!
+  domain: ArchitectureDomain!
+  type: ArchitectureType!
+  tags: [String!]
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime @timestamp(operations: [UPDATE])
+  owners: [Person!]! @relationship(type: "OWNED_BY", direction: OUT)
+  containsCapabilities: [BusinessCapability!]! @relationship(type: "CONTAINS", direction: OUT)
+  containsApplications: [Application!]! @relationship(type: "CONTAINS", direction: OUT)
+  containsDataObjects: [DataObject!]! @relationship(type: "CONTAINS", direction: OUT)
+  parentArchitecture: [Architecture!]! @relationship(type: "PART_OF", direction: OUT)
+  childArchitectures: [Architecture!]! @relationship(type: "PART_OF", direction: IN)
+  diagrams: [Diagram!]! @relationship(type: "BELONGS_TO", direction: IN)
+}
+
+"""
+Diagram - repräsentiert ein Excalidraw-Diagramm
+"""
+type Diagram @node {
+  id: ID! @id
+  title: String!
+  description: String
+  diagramJson: String! # Enthält den JSON-String des Excalidraw-Diagramms
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime @timestamp(operations: [UPDATE])
+  architecture: [Architecture!]! @relationship(type: "BELONGS_TO", direction: OUT)
+  creator: [Person!]! @relationship(type: "CREATED_BY", direction: OUT)
+}
+
+"""
+Architektur-Domänen
+"""
+enum ArchitectureDomain {
+  BUSINESS
+  DATA
+  APPLICATION
+  TECHNOLOGY
+  SECURITY
+  INTEGRATION
+  ENTERPRISE
+}
+
+"""
+Architektur-Typen
+"""
+enum ArchitectureType {
+  CURRENT_STATE
+  FUTURE_STATE
+  TRANSITION
+  CONCEPTUAL
 }
