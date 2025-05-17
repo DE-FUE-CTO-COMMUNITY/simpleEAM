@@ -431,6 +431,52 @@ const table = useReactTable({
   - Native Form-Reset verhindern mit `event.preventDefault()` wenn nötig
   - Listener einsetzen für komplexe Reset-Logik mit Abhängigkeiten
 
+- **Formular-Dialog Interaktion**:
+
+  - **Klare Verantwortlichkeiten definieren**:
+    - Die Tabellen-Komponente sollte primär für Zustandsverwaltung des Dialogs verantwortlich sein (geöffnet/geschlossen)
+    - Die Formular-Komponente sollte nur für Datenvalidierung und -übermittlung verantwortlich sein
+  - **Zustandskoordination**:
+    - Nach erfolgreicher Formularübermittlung explizit den Dialog schließen:
+      ```tsx
+      onSubmit: async ({ value }) => {
+        try {
+          await submitData(value)
+          onClose() // Dialog schließen nach erfolgreicher Übermittlung
+        } catch (error) {
+          console.error('Fehler bei der Übermittlung:', error)
+        }
+      }
+      ```
+    - Formularübermittlung nur im bearbeitbaren Modus auslösen:
+      ```tsx
+      <form
+        onSubmit={e => {
+          e.preventDefault()
+          e.stopPropagation()
+          if (!isViewMode) {
+            void form.handleSubmit()
+          }
+        }}
+      >
+      ```
+  - **Dialog-Steuerung**:
+    - Dialog nur im View-Modus automatisch schließbar machen:
+      ```tsx
+      <Dialog open={isOpen} onClose={isViewMode ? onClose : undefined}>
+      ```
+    - Bei Aktionen wie Löschen immer explizit den Dialog schließen:
+      ```tsx
+      const handleDelete = async () => {
+        try {
+          await deleteData(id)
+        } finally {
+          setShowConfirm(false)
+          onClose() // Dialog immer schließen
+        }
+      }
+      ```
+
 - **Integration mit UI-Bibliotheken**:
 
   - Tanstack Form ist eine headless Bibliothek und lässt sich mit verschiedenen UI-Frameworks kombinieren
