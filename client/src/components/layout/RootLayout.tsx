@@ -19,6 +19,7 @@ import {
   MenuItem,
   Tooltip,
   styled,
+  Theme,
 } from '@mui/material'
 import {
   Menu as MenuIcon,
@@ -32,6 +33,7 @@ import {
   Settings as SettingsIcon,
   Architecture as ArchitectureIcon,
 } from '@mui/icons-material'
+import AccountTreeIcon from '@mui/icons-material/AccountTree'
 import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
 import AtosLogo from '../common/AtosLogo'
@@ -41,7 +43,7 @@ import { useAuth, logout, isAdmin } from '@/lib/auth'
 const drawerWidth = 240
 
 // Styled-Komponenten für das Layout
-const openedMixin = theme => ({
+const openedMixin = (theme: Theme) => ({
   width: drawerWidth,
   transition: theme.transitions.create('width', {
     easing: theme.transitions.easing.sharp,
@@ -50,7 +52,7 @@ const openedMixin = theme => ({
   overflowX: 'hidden',
 })
 
-const closedMixin = theme => ({
+const closedMixin = (theme: Theme) => ({
   transition: theme.transitions.create('width', {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
@@ -59,24 +61,28 @@ const closedMixin = theme => ({
   width: `calc(${theme.spacing(7)} + 1px)`,
 })
 
-const Drawer = styled(MuiDrawer, { shouldForwardProp: prop => prop !== 'open' })(
-  ({ theme, open }) => ({
-    width: drawerWidth,
-    flexShrink: 0,
-    whiteSpace: 'nowrap',
-    boxSizing: 'border-box',
-    ...(open && {
-      ...openedMixin(theme),
-      '& .MuiDrawer-paper': openedMixin(theme),
-    }),
-    ...(!open && {
-      ...closedMixin(theme),
-      '& .MuiDrawer-paper': closedMixin(theme),
-    }),
-  })
-)
+interface DrawerProps {
+  open?: boolean
+}
 
-const Main = styled('main', { shouldForwardProp: prop => prop !== 'open' })(({ theme, open }) => ({
+const Drawer = styled(MuiDrawer, {
+  shouldForwardProp: prop => prop !== 'open',
+})<DrawerProps>(({ theme, open }) => ({
+  width: drawerWidth,
+  flexShrink: 0,
+  whiteSpace: 'nowrap',
+  boxSizing: 'border-box',
+  ...(open && {
+    ...openedMixin(theme),
+    '& .MuiDrawer-paper': openedMixin(theme),
+  }),
+  ...(!open && {
+    ...closedMixin(theme),
+    '& .MuiDrawer-paper': closedMixin(theme),
+  }),
+}))
+
+const Main = styled('main')(({ theme }) => ({
   flexGrow: 1,
   padding: 0,
   transition: theme.transitions.create('margin', {
@@ -120,6 +126,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
 
   const menuItems = [
     { text: 'Dashboard', icon: <DashboardIcon />, href: '/' },
+    { text: 'Diagram-Editor', icon: <AccountTreeIcon />, href: '/diagrams' },
     { text: 'Architekturen', icon: <ArchitectureIcon />, href: '/architectures' },
     { text: 'Business Capabilities', icon: <BusinessIcon />, href: '/capabilities' },
     { text: 'Applikationen', icon: <AppsIcon />, href: '/applications' },
@@ -277,7 +284,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
         </List>
       </Drawer>
 
-      <Main open={open}>
+      <Main>
         <Toolbar /> {/* Spacer für die AppBar */}
         {children}
       </Main>
