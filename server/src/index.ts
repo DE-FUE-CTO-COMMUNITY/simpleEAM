@@ -8,7 +8,7 @@ import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core'
 import http from 'http'
 
 // Eigene Module importieren
-import { neo4jDriver, testConnection, closeDriver } from './db/neo4j-client'
+import { testConnection, closeDriver } from './db/neo4j-client'
 import { neoSchema } from './graphql/schema'
 import { createContext } from './auth/auth'
 
@@ -34,7 +34,8 @@ async function startServer() {
 
   // Middleware konfigurieren
   app.use(cors())
-  app.use(compression())
+  // TypeScript-Fehler umgehen durch explizite Typzuweisung
+  app.use(compression() as express.RequestHandler)
   app.use(
     helmet({ contentSecurityPolicy: process.env.NODE_ENV === 'production' ? undefined : false })
   )
