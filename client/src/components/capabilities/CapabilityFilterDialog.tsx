@@ -18,11 +18,14 @@ import {
   OutlinedInput,
   Slider,
   TextField,
+  CircularProgress,
 } from '@mui/material'
 import { ClearAll as ClearAllIcon } from '@mui/icons-material'
+import { useQuery } from '@apollo/client'
+import { GET_PERSONS } from '@/graphql/person'
 import { FilterProps } from './types'
 import { getLevelLabel, countActiveFilters } from './utils'
-import { CapabilityStatus } from '../../gql/generated'
+import { CapabilityStatus, Person } from '../../gql/generated'
 
 const CapabilityFilterDialog: React.FC<FilterProps> = ({
   filterState,
@@ -42,6 +45,10 @@ const CapabilityFilterDialog: React.FC<FilterProps> = ({
     ownerFilter,
     updatedDateRange,
   } = filterState
+
+  // Personen aus der GraphQL-API laden
+  const { data: personsData, loading: personsLoading } = useQuery(GET_PERSONS)
+  const persons = personsData?.people || []
 
   const handleFilterReset = () => {
     onResetFilter()
@@ -170,13 +177,26 @@ const CapabilityFilterDialog: React.FC<FilterProps> = ({
           />
 
           {/* Verantwortlicher Filter */}
-          <TextField
-            label="Verantwortlicher"
-            fullWidth
-            value={ownerFilter}
-            onChange={e => onFilterChange({ ownerFilter: e.target.value })}
-            placeholder="Name des Verantwortlichen..."
-          />
+          <FormControl fullWidth>
+            <InputLabel id="owner-filter-label">Verantwortlicher</InputLabel>
+            <Select
+              labelId="owner-filter-label"
+              value={ownerFilter}
+              onChange={e => onFilterChange({ ownerFilter: e.target.value })}
+              input={<OutlinedInput label="Verantwortlicher" />}
+              disabled={personsLoading}
+              startAdornment={personsLoading ? <CircularProgress size={20} sx={{ mr: 1 }} /> : null}
+            >
+              <MenuItem value="">
+                <em>Nicht ausgewählt</em>
+              </MenuItem>
+              {persons.map((person: Person) => (
+                <MenuItem key={person.id} value={person.id}>
+                  {`${person.firstName} ${person.lastName}`}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
 
           {/* Aktualisierungsdatum Filter */}
           <Box>
@@ -214,13 +234,23 @@ const CapabilityFilterDialog: React.FC<FilterProps> = ({
           </Box>
         </Box>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={handleFilterReset} startIcon={<ClearAllIcon />}>
+      <DialogActions sx={{ justifyContent: 'space-between', px: 3, py: 2 }}>
+        <Button
+          startIcon={<ClearAllIcon />}
+          onClick={handleFilterReset}
+          color="secondary"
+          variant="outlined"
+        >
           Filter zurücksetzen
         </Button>
-        <Button onClick={handleApply} variant="contained">
-          Anwenden
-        </Button>
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <Button onClick={onClose} color="inherit">
+            Abbrechen
+          </Button>
+          <Button onClick={handleApply} color="primary" variant="contained">
+            Anwenden
+          </Button>
+        </Box>
       </DialogActions>
     </Dialog>
   )

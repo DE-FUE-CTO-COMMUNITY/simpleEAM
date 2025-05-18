@@ -47,7 +47,7 @@ const CapabilityToolbar: React.FC<CapabilityToolbarProps> = ({
             color={activeFiltersCount > 0 ? 'primary' : 'default'}
           >
             {activeFiltersCount > 0 ? (
-              <Badge badgeContent={activeFiltersCount} color="error">
+              <Badge badgeContent={activeFiltersCount} color="primary">
                 <FilterIcon />
               </Badge>
             ) : (

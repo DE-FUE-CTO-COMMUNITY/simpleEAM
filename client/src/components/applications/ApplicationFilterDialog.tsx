@@ -18,11 +18,14 @@ import {
   OutlinedInput,
   Slider,
   TextField,
+  CircularProgress,
 } from '@mui/material'
 import { ClearAll as ClearAllIcon } from '@mui/icons-material'
+import { useQuery } from '@apollo/client'
+import { GET_PERSONS } from '@/graphql/person'
 import { FilterProps } from './types'
 import { getCriticalityLabel, countActiveFilters } from './utils'
-import { ApplicationStatus, CriticalityLevel } from '../../gql/generated'
+import { ApplicationStatus, CriticalityLevel, Person } from '../../gql/generated'
 
 const ApplicationFilterDialog: React.FC<FilterProps> = ({
   filterState,
@@ -45,6 +48,10 @@ const ApplicationFilterDialog: React.FC<FilterProps> = ({
     updatedDateRange,
     vendorFilter,
   } = filterState
+
+  // Personen aus der GraphQL-API laden
+  const { data: personsData, loading: personsLoading } = useQuery(GET_PERSONS)
+  const persons = personsData?.people || []
 
   const handleFilterReset = () => {
     onResetFilter()
@@ -230,18 +237,31 @@ const ApplicationFilterDialog: React.FC<FilterProps> = ({
           />
 
           {/* Verantwortlicher-Filter */}
-          <TextField
-            fullWidth
-            label="Verantwortlicher"
-            value={ownerFilter}
-            onChange={e => {
-              onFilterChange({
-                ownerFilter: e.target.value,
-              })
-            }}
-            margin="normal"
-            helperText="Vorname oder Nachname eingeben"
-          />
+          <FormControl fullWidth>
+            <InputLabel id="owner-filter-label">Verantwortlicher</InputLabel>
+            {/* Person-Auswahl statt Textfeld */}
+            <Select
+              labelId="owner-filter-label"
+              value={ownerFilter}
+              onChange={e => {
+                onFilterChange({
+                  ownerFilter: e.target.value,
+                })
+              }}
+              input={<OutlinedInput label="Verantwortlicher" />}
+              disabled={personsLoading}
+              startAdornment={personsLoading ? <CircularProgress size={20} sx={{ mr: 1 }} /> : null}
+            >
+              <MenuItem value="">
+                <em>Nicht ausgewählt</em>
+              </MenuItem>
+              {persons.map((person: Person) => (
+                <MenuItem key={person.id} value={person.id}>
+                  {`${person.firstName} ${person.lastName}`}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
 
           {/* Aktualisiert-Filter */}
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>

@@ -4,7 +4,6 @@ import React from 'react'
 import {
   Toolbar,
   TextField,
-  Button,
   Box,
   Badge,
   InputAdornment,
@@ -13,8 +12,9 @@ import {
 } from '@mui/material'
 import {
   Search as SearchIcon,
-  FilterList as FilterListIcon,
+  FilterList as FilterIcon,
   Clear as ClearIcon,
+  ClearAll as ClearAllIcon,
 } from '@mui/icons-material'
 
 interface ApplicationToolbarProps {
@@ -64,33 +64,28 @@ const ApplicationToolbar: React.FC<ApplicationToolbarProps> = ({
       />
 
       <Box sx={{ display: 'flex', gap: 1 }}>
-        {activeFiltersCount > 0 && (
-          <Button
-            size="small"
-            color="inherit"
-            onClick={onResetFilters}
-            sx={{ textTransform: 'none' }}
-          >
-            Alle Filter zurücksetzen
-          </Button>
-        )}
-
-        <Tooltip title="Filter anzeigen">
-          <Button
-            variant="outlined"
-            color="primary"
-            size="small"
-            startIcon={
-              <Badge badgeContent={activeFiltersCount} color="primary">
-                <FilterListIcon />
-              </Badge>
-            }
+        <Tooltip title={activeFiltersCount > 0 ? 'Filter bearbeiten' : 'Weitere Filter'}>
+          <IconButton
             onClick={onFilterClick}
-            sx={{ textTransform: 'none' }}
+            color={activeFiltersCount > 0 ? 'primary' : 'default'}
           >
-            Filter
-          </Button>
+            {activeFiltersCount > 0 ? (
+              <Badge badgeContent={activeFiltersCount} color="primary">
+                <FilterIcon />
+              </Badge>
+            ) : (
+              <FilterIcon />
+            )}
+          </IconButton>
         </Tooltip>
+        
+        {activeFiltersCount > 0 && (
+          <Tooltip title="Filter zurücksetzen">
+            <IconButton onClick={onResetFilters}>
+              <ClearAllIcon />
+            </IconButton>
+          </Tooltip>
+        )}
       </Box>
     </Toolbar>
   )

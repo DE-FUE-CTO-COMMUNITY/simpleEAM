@@ -68,9 +68,7 @@ export const useCapabilityFilter = ({ capabilities, filterState }: UseCapability
       if (
         ownerFilter &&
         (!capability.owners ||
-          !capability.owners.some(owner =>
-            `${owner.firstName} ${owner.lastName}`.toLowerCase().includes(ownerFilter.toLowerCase())
-          ))
+          !capability.owners.some(owner => owner.id === ownerFilter))
       ) {
         return false
       }

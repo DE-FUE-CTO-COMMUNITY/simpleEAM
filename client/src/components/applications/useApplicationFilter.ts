@@ -69,10 +69,7 @@ export const useApplicationFilter = ({ applications, filterState }: UseApplicati
       // Verantwortlicher-Filter
       if (
         ownerFilter &&
-        (!application.owners ||
-          !application.owners.some(owner =>
-            `${owner.firstName} ${owner.lastName}`.toLowerCase().includes(ownerFilter.toLowerCase())
-          ))
+        (!application.owners || !application.owners.some(owner => owner.id === ownerFilter))
       ) {
         return false
       }
