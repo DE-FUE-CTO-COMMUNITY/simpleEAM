@@ -1,15 +1,7 @@
 'use client'
 
 import React from 'react'
-import {
-  Toolbar,
-  TextField,
-  Box,
-  Badge,
-  InputAdornment,
-  IconButton,
-  Tooltip,
-} from '@mui/material'
+import { Toolbar, TextField, Box, Badge, InputAdornment, IconButton, Tooltip } from '@mui/material'
 import {
   Search as SearchIcon,
   FilterList as FilterIcon,
@@ -78,7 +70,7 @@ const ApplicationToolbar: React.FC<ApplicationToolbarProps> = ({
             )}
           </IconButton>
         </Tooltip>
-        
+
         {activeFiltersCount > 0 && (
           <Tooltip title="Filter zurücksetzen">
             <IconButton onClick={onResetFilters}>

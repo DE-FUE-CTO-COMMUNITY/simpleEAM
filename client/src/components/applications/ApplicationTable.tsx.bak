@@ -10,7 +10,7 @@ import {
 } from '@mui/icons-material'
 import { ApplicationType } from './types'
 import { formatDate, getCriticalityLabel, formatCosts } from './utils'
-import { Application, CriticalityLevel } from '../../gql/generated'
+import { Application, ApplicationStatus, CriticalityLevel } from '../../gql/generated'
 import ApplicationForm, { ApplicationFormValues } from './ApplicationForm'
 import {
   createColumnHelper,
@@ -63,81 +63,70 @@ const ApplicationTable: React.FC<ApplicationTableProps> = ({
 
   // Handler für Formular-Operationen
   // Handler für das Öffnen des Formulars zur Detailansicht
-  const handleViewApplicationClick = useCallback(
-    (id: string) => {
-      const application = applications.find(app => app.id === id)
-      if (application) {
-        // Stelle sicher, dass alle erforderlichen Eigenschaften vorhanden sind
-        const completeApplication = {
-          ...application,
-          usesDataObjects: application.usesDataObjects || [],
-          interfacesToApplications: application.interfacesToApplications || [],
-        } as unknown as Application
+  const handleViewApplicationClick = useCallback((id: string) => {
+    const application = applications.find(app => app.id === id)
+    if (application) {
+      // Stelle sicher, dass alle erforderlichen Eigenschaften vorhanden sind
+      const completeApplication = {
+        ...application,
+        usesDataObjects: application.usesDataObjects || [],
+        interfacesToApplications: application.interfacesToApplications || [],
+      } as unknown as Application
 
-        setSelectedApplication(completeApplication)
-        setFormMode('view')
-        setIsFormOpen(true)
-      } else {
-        console.warn('Application not found for viewing, falling back to onRowClick:', id)
-        onRowClick(id)
-      }
-    },
-    [applications, onRowClick]
-  )
+      setSelectedApplication(completeApplication)
+      setFormMode('view')
+      setIsFormOpen(true)
+    } else {
+      console.warn('Application not found for viewing, falling back to onRowClick:', id)
+      onRowClick(id)
+    }
+  }, [applications, onRowClick])
 
   // Handler für das Öffnen des Formulars zum Bearbeiten
-  const handleEditApplicationClick = useCallback(
-    (id: string) => {
-      const application = applications.find(app => app.id === id)
-      if (application) {
-        // Stelle sicher, dass alle erforderlichen Eigenschaften vorhanden sind
-        const completeApplication = {
-          ...application,
-          usesDataObjects: application.usesDataObjects || [],
-          interfacesToApplications: application.interfacesToApplications || [],
-        } as unknown as Application
+  const handleEditApplicationClick = useCallback((id: string) => {
+    const application = applications.find(app => app.id === id)
+    if (application) {
+      // Stelle sicher, dass alle erforderlichen Eigenschaften vorhanden sind
+      const completeApplication = {
+        ...application,
+        usesDataObjects: application.usesDataObjects || [],
+        interfacesToApplications: application.interfacesToApplications || [],
+      } as unknown as Application
 
-        setSelectedApplication(completeApplication)
-        setFormMode('edit')
-        setIsFormOpen(true)
-      } else {
-        console.warn('Application not found for editing, falling back to onEditClick:', id)
-        onEditClick(id)
-      }
-    },
-    [applications, onEditClick]
-  )
+      setSelectedApplication(completeApplication)
+      setFormMode('edit')
+      setIsFormOpen(true)
+    } else {
+      console.warn('Application not found for editing, falling back to onEditClick:', id)
+      onEditClick(id)
+    }
+  }, [applications, onEditClick])
+  }
 
   // Handler für das Schließen des Formulars
-  const handleFormClose = useCallback(() => {
+  const handleFormClose = () => {
     setIsFormOpen(false)
-  }, [])
+  }
 
   // Handler für das Speichern des Formulars
-  const handleFormSubmit = useCallback(
-    async (data: ApplicationFormValues) => {
-      setFormLoading(true)
-      try {
-        if (formMode === 'create' && onCreateApplication) {
-          await onCreateApplication(data)
-        } else if (formMode === 'edit' && selectedApplication && onUpdateApplication) {
-          await onUpdateApplication(selectedApplication.id, data)
-        }
-        setIsFormOpen(false)
-      } catch (error) {
-        console.error(
-          `Error ${formMode === 'create' ? 'creating' : 'updating'} application:`,
-          error
-        )
-      } finally {
-        setFormLoading(false)
+  const handleFormSubmit = async (data: ApplicationFormValues) => {
+    setFormLoading(true)
+    try {
+      if (formMode === 'create' && onCreateApplication) {
+        await onCreateApplication(data)
+      } else if (formMode === 'edit' && selectedApplication && onUpdateApplication) {
+        await onUpdateApplication(selectedApplication.id, data)
       }
-    },
-    [formMode, onCreateApplication, onUpdateApplication, selectedApplication]
-  )
+      setIsFormOpen(false)
+    } catch (error) {
+      console.error(`Error ${formMode === 'create' ? 'creating' : 'updating'} application:`, error)
+    } finally {
+      setFormLoading(false)
+    }
+  }
 
   // Spalten-Definition mit columnHelper
-  const columns = useMemo(
+  const columns = React.useMemo(
     () => [
       columnHelper.accessor('name', {
         header: 'Name',
@@ -176,11 +165,6 @@ const ApplicationTable: React.FC<ApplicationTableProps> = ({
       columnHelper.accessor('costs', {
         header: 'Kosten',
         cell: info => formatCosts(info.getValue()),
-        footer: info => info.column.id,
-      }),
-      columnHelper.accessor('createdAt', {
-        header: 'Erstellt',
-        cell: info => formatDate(info.getValue()),
         footer: info => info.column.id,
       }),
       columnHelper.accessor('updatedAt', {
@@ -229,7 +213,7 @@ const ApplicationTable: React.FC<ApplicationTableProps> = ({
         footer: info => info.column.id,
       }),
     ],
-    [handleViewApplicationClick, handleEditApplicationClick]
+    []
   )
 
   // TanStack Table initialisieren
@@ -240,8 +224,7 @@ const ApplicationTable: React.FC<ApplicationTableProps> = ({
       sorting,
       globalFilter,
     },
-    onSortingChange: updater =>
-      onSortingChange(typeof updater === 'function' ? updater(sorting) : updater),
+    onSortingChange: onSortingChange,
     onGlobalFilterChange: () => {}, // Wird über den Parent gesteuert
     globalFilterFn: 'includesString',
     getCoreRowModel: getCoreRowModel(),

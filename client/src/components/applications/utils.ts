@@ -7,7 +7,12 @@ import { CriticalityLevel } from '../../gql/generated'
 // Formatiert das Datum für die Anzeige
 export const formatDate = (dateString: string): string => {
   try {
-    return format(new Date(dateString), 'dd.MM.yyyy HH:mm')
+    // Standarddatum (1.1.1970) prüfen, das als leerer Wert gilt
+    const date = new Date(dateString)
+    if (date.getFullYear() === 1970 && date.getMonth() === 0 && date.getDate() === 1) {
+      return '-'
+    }
+    return format(date, 'dd.MM.yyyy HH:mm')
   } catch (e) {
     return 'Unbekannt'
   }
@@ -20,13 +25,13 @@ export const getCriticalityLabel = (level: CriticalityLevel | null | undefined):
   }
 
   switch (level) {
-    case CriticalityLevel.Low:
+    case CriticalityLevel.LOW:
       return 'Niedrig'
-    case CriticalityLevel.Medium:
+    case CriticalityLevel.MEDIUM:
       return 'Mittel'
-    case CriticalityLevel.High:
+    case CriticalityLevel.HIGH:
       return 'Hoch'
-    case CriticalityLevel.Critical:
+    case CriticalityLevel.CRITICAL:
       return 'Kritisch'
     default:
       return `${level}`
