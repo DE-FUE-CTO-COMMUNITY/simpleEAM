@@ -14,6 +14,9 @@ import theme from '@/theme/theme'
 import { CircularProgress } from '@mui/material'
 import RootLayout from '@/components/layout/RootLayout'
 
+// Import der globalen Styles
+import '@/styles/global.css'
+
 // Emotion Cache für Server-Side Rendering
 export function useClientStyleRegistry() {
   const [{ cache, flush }] = useState(() => {

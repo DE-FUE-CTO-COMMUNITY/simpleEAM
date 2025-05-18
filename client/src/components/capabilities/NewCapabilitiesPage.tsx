@@ -2,12 +2,13 @@
 
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Box, Typography, Button, Card, Paper, useTheme } from '@mui/material'
+import { Box, Typography, Button, Card, Paper } from '@mui/material'
 import { Add as AddIcon } from '@mui/icons-material'
 import { useQuery } from '@apollo/client'
 import { useSnackbar } from 'notistack'
 import { useAuth, login, isArchitect } from '@/lib/auth'
 import { GET_CAPABILITIES } from '@/graphql/capability'
+import { CapabilityStatus } from '@/gql/generated'
 
 // Importiere die ausgelagerten Komponenten
 import CapabilityTable from '@/components/capabilities/CapabilityTable'
@@ -19,7 +20,6 @@ import { Capability, FilterState } from '@/components/capabilities/types'
 const CapabilitiesPage = () => {
   const { authenticated } = useAuth()
   const router = useRouter()
-  const theme = useTheme()
   const { enqueueSnackbar } = useSnackbar()
   const [globalFilter, setGlobalFilter] = useState<string>('')
   const [sorting, setSorting] = useState([{ id: 'name', desc: false }])
@@ -38,7 +38,7 @@ const CapabilitiesPage = () => {
   const [activeFiltersCount, setActiveFiltersCount] = useState<number>(0)
 
   // Liste der verfügbaren Status und Tags aus den Daten extrahieren
-  const [availableStatuses, setAvailableStatuses] = useState<string[]>([])
+  const [availableStatuses, setAvailableStatuses] = useState<CapabilityStatus[]>([])
   const [availableTags, setAvailableTags] = useState<string[]>([])
 
   // Weiterleitung zum Login, falls nicht authentifiziert
@@ -60,11 +60,11 @@ const CapabilitiesPage = () => {
       const capabilities = data.businessCapabilities as Capability[]
 
       // Alle Status extrahieren und Duplikate entfernen
-      const allStatuses: string[] = capabilities
+      const allStatuses = capabilities
         .map((cap: Capability) => cap.status)
-        .filter(Boolean)
+        .filter(Boolean) as CapabilityStatus[]
 
-      const uniqueStatuses = Array.from(new Set(allStatuses)).sort()
+      const uniqueStatuses = Array.from(new Set(allStatuses)).sort() as CapabilityStatus[]
       setAvailableStatuses(uniqueStatuses)
 
       // Alle Tags sammeln und Duplikate entfernen

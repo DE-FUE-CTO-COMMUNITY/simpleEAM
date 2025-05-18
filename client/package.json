@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "typecheck": "tsc --noEmit",
     "codegen": "graphql-codegen --config codegen.ts"
   },
   "packageManager": "yarn@4.9.1",

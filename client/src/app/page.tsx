@@ -128,7 +128,7 @@ const Dashboard = () => {
       </Typography>
 
       <Grid container spacing={3} sx={{ mb: 6 }}>
-        <Grid item xs={12} sm={6} md={4}>
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <Card>
             <CardContent
               sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
@@ -144,7 +144,7 @@ const Dashboard = () => {
           </Card>
         </Grid>
 
-        <Grid item xs={12} sm={6} md={4}>
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <Card>
             <CardContent
               sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
@@ -160,7 +160,7 @@ const Dashboard = () => {
           </Card>
         </Grid>
 
-        <Grid item xs={12} sm={6} md={4}>
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <Card>
             <CardContent
               sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}

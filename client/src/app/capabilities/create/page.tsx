@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { useMutation } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import { useSnackbar } from 'notistack'
 import { useForm } from '@tanstack/react-form'
 import {
@@ -11,7 +11,6 @@ import {
   Button,
   Card,
   CardContent,
-  Grid,
   MenuItem,
   TextField,
   FormControl,
@@ -22,13 +21,12 @@ import {
   Paper,
   useTheme,
 } from '@mui/material'
+import Grid from '@mui/material/Grid'
 import { z } from 'zod'
-import { useQuery } from '@apollo/client'
 import { ArrowBack as ArrowBackIcon, Save as SaveIcon } from '@mui/icons-material'
 import { useAuth, login, isArchitect } from '@/lib/auth'
 import RootLayout from '@/components/layout/RootLayout'
-import { CREATE_CAPABILITY } from '@/graphql/capability'
-import { GET_CAPABILITIES } from '@/graphql/capability'
+import { CREATE_CAPABILITY, GET_CAPABILITIES } from '@/graphql/capability'
 
 // Schema für die Formularvalidierung
 const capabilitySchema = z.object({
@@ -48,8 +46,20 @@ const capabilitySchema = z.object({
   parentCapabilityId: z.string().optional(),
 })
 
-// TypeScript Typen basierend auf dem Schema
-type CapabilityFormValues = z.infer<typeof capabilitySchema>
+// Definiere den Typ für die Business Capability aus dem GraphQL Schema
+interface BusinessCapability {
+  id: string
+  name: string
+  description: string
+  level: number
+  maturityLevel?: string
+  status?: string
+  businessValue?: number
+  createdAt?: string
+  updatedAt?: string
+  children?: { id: string; name: string }[]
+  parents?: { id: string; name: string }[]
+}
 
 const CreateCapabilityPage = () => {
   const { authenticated } = useAuth()
@@ -97,25 +107,27 @@ const CreateCapabilityPage = () => {
       parentCapabilityId: '',
     },
     // Eigene Implementierung eines Validators mit Zod
-    validator: ({ value }) => {
-      try {
-        capabilitySchema.parse(value)
-        return { valid: true }
-      } catch (error) {
-        if (error instanceof z.ZodError) {
-          // Fehler nach Feld gruppieren
-          const fieldErrors: Record<string, string[]> = {}
-          error.errors.forEach(err => {
-            const field = err.path[0] as string
-            if (!fieldErrors[field]) {
-              fieldErrors[field] = []
-            }
-            fieldErrors[field].push(err.message)
-          })
-          return { valid: false, errors: fieldErrors }
+    validators: {
+      onSubmit: ({ value }) => {
+        try {
+          capabilitySchema.parse(value)
+          return { valid: true }
+        } catch (error) {
+          if (error instanceof z.ZodError) {
+            // Fehler nach Feld gruppieren
+            const fieldErrors: Record<string, string[]> = {}
+            error.errors.forEach(err => {
+              const field = err.path[0] as string
+              if (!fieldErrors[field]) {
+                fieldErrors[field] = []
+              }
+              fieldErrors[field].push(err.message)
+            })
+            return { valid: false, errors: fieldErrors }
+          }
+          return { valid: false }
         }
-        return { valid: false }
-      }
+      },
     },
     onSubmit: async ({ value }) => {
       if (!authenticated || !isArchitect()) {
@@ -161,7 +173,7 @@ const CreateCapabilityPage = () => {
     }
 
     return capabilitiesData.capabilities.filter(
-      (capability: any) => capability.level < selectedLevel
+      (capability: BusinessCapability) => capability.level < selectedLevel
     )
   }
 
@@ -191,7 +203,7 @@ const CreateCapabilityPage = () => {
             }}
           >
             <Grid container spacing={3}>
-              <Grid item xs={12}>
+              <Grid size={12}>
                 <Typography variant="h6" gutterBottom>
                   Allgemeine Informationen
                 </Typography>
@@ -199,10 +211,10 @@ const CreateCapabilityPage = () => {
               </Grid>
 
               {/* Name */}
-              <Grid item xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <form.Field
                   name="name"
-                  render={({ state, handleBlur, handleChange }) => (
+                  children={({ state, handleBlur, handleChange }) => (
                     <FormControl fullWidth error={!!state.meta.errors.length}>
                       <FormLabel htmlFor="name" required>
                         Name
@@ -228,10 +240,10 @@ const CreateCapabilityPage = () => {
               </Grid>
 
               {/* Level */}
-              <Grid item xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <form.Field
                   name="level"
-                  render={({ state, handleBlur, handleChange }) => (
+                  children={({ state, handleBlur, handleChange }) => (
                     <FormControl fullWidth error={!!state.meta.errors.length}>
                       <FormLabel htmlFor="level" required>
                         Level
@@ -263,10 +275,10 @@ const CreateCapabilityPage = () => {
               </Grid>
 
               {/* Übergeordnete Capability */}
-              <Grid item xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <form.Field
                   name="parentCapabilityId"
-                  render={({ state, handleBlur, handleChange }) => {
+                  children={({ state, handleBlur, handleChange }) => {
                     const level = form.getFieldValue('level')
                     const availableParents = getAvailableParentCapabilities(level)
                     const isDisabled = level === 0 || availableParents.length === 0
@@ -293,7 +305,7 @@ const CreateCapabilityPage = () => {
                           <MenuItem value="">
                             <em>Keine</em>
                           </MenuItem>
-                          {availableParents.map((cap: any) => (
+                          {availableParents.map((cap: BusinessCapability) => (
                             <MenuItem key={cap.id} value={cap.id}>
                               {cap.name} (Level {cap.level})
                             </MenuItem>
@@ -309,10 +321,10 @@ const CreateCapabilityPage = () => {
               </Grid>
 
               {/* Beschreibung */}
-              <Grid item xs={12}>
+              <Grid size={12}>
                 <form.Field
                   name="description"
-                  render={({ state, handleBlur, handleChange }) => (
+                  children={({ state, handleBlur, handleChange }) => (
                     <FormControl fullWidth error={!!state.meta.errors.length}>
                       <FormLabel htmlFor="description" required>
                         Beschreibung
@@ -339,7 +351,7 @@ const CreateCapabilityPage = () => {
                 />
               </Grid>
 
-              <Grid item xs={12}>
+              <Grid size={12}>
                 <Divider sx={{ my: 1 }} />
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
                   <Button variant="outlined" color="inherit" onClick={handleCancel}>
@@ -365,7 +377,7 @@ const CreateCapabilityPage = () => {
         <form.Subscribe
           selector={state => [state.canSubmit, state.isSubmitting, state.errors]}
           children={([canSubmit, isSubmitting, errors]) => (
-            <Card sx={{ mb: 4, backgroundColor: theme.palette.background.neutral }}>
+            <Card sx={{ mb: 4, backgroundColor: theme.palette.grey[100] }}>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
                   Form Status:
