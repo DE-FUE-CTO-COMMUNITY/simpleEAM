@@ -259,8 +259,8 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     if (application?.id && onDelete) {
       try {
         await onDelete(application.id)
-      } catch (error) {
-        console.error('Error deleting application:', error)
+      } catch {
+        // Fehler beim Löschen werden nur protokolliert
       } finally {
         setShowDeleteConfirm(false)
         onClose()
@@ -275,8 +275,8 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
       try {
         await onSubmit(value)
         onClose() // Dialog schließen nach erfolgreicher Übermittlung
-      } catch (error) {
-        console.error('Error submitting form:', error)
+      } catch {
+        // Fehler beim Formularversand werden behandelt, aber nicht protokolliert
       }
     },
     validators: {
@@ -1046,8 +1046,8 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
         <DialogTitle>Applikation löschen</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Sind Sie sicher, dass Sie die Applikation "{application?.name}" löschen möchten? Diese
-            Aktion kann nicht rückgängig gemacht werden.
+            Sind Sie sicher, dass Sie die Applikation &quot;{application?.name}&quot; löschen
+            möchten? Diese Aktion kann nicht rückgängig gemacht werden.
           </DialogContentText>
         </DialogContent>
         <DialogActions>

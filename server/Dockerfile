@@ -28,6 +28,10 @@ RUN sed -i 's/"skipLibCheck": true/"skipLibCheck": true, "noEmitOnError": false/
 # Build ausführen mit --force, um trotz Fehlern zu kompilieren
 RUN yarn tsc || echo "TypeScript-Warnungen ignoriert"
 
+# GraphQL-Schema-Datei in das Ausgabeverzeichnis kopieren
+RUN mkdir -p /app/server/dist/graphql && \
+    cp /app/server/src/graphql/schema.graphql /app/server/dist/graphql/
+
 # Stelle den Port bereit
 EXPOSE 4000
 

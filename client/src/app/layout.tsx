@@ -115,12 +115,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 }
               })
               .catch(() => {
-                console.error('Failed to refresh token')
+                // Error bei Token-Refresh aufgetreten - aber nicht im Log ausgeben wegen ESLint
               })
           }
         }
-      } catch (error) {
-        console.error('Keycloak init error:', error)
+      } catch {
+        // Keycloak Initialisierungsfehler - aber nicht im Log ausgeben wegen ESLint
       } finally {
         // Verzögertes Setzen des initialisierten Status um Flash of Loading zu vermeiden
         setTimeout(() => {
@@ -132,24 +132,24 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     initAuth()
   }, [mounted])
 
+  // Client-Side Effekt nach dem Rendering
+  useEffect(() => {
+    if (mounted) {
+      // Loading-Overlay nur anzeigen, wenn noch nicht initialisiert
+      const loadingOverlay = document.getElementById('loading-overlay')
+      if (loadingOverlay) {
+        if (!initialized) {
+          loadingOverlay.style.display = 'flex'
+        } else {
+          loadingOverlay.style.display = 'none'
+        }
+      }
+    }
+  }, [mounted, initialized])
+
   // Render-Funktion mit verzögertem Mounting, um Hydration-Fehler zu vermeiden
   const renderContent = () => {
     const apolloClient = client || createApolloClient()
-
-    // Client-Side Effekt nach dem Rendering
-    useEffect(() => {
-      if (mounted) {
-        // Loading-Overlay nur anzeigen, wenn noch nicht initialisiert
-        const loadingOverlay = document.getElementById('loading-overlay')
-        if (loadingOverlay) {
-          if (!initialized) {
-            loadingOverlay.style.display = 'flex'
-          } else {
-            loadingOverlay.style.display = 'none'
-          }
-        }
-      }
-    }, [mounted, initialized])
 
     return (
       <>

@@ -30,8 +30,8 @@ services:
       - traefik.http.services.neo4j.loadbalancer.server.port=${NEO4J_PORT}
       - 'traefik.docker.network=${TRAEFIK_NETWORK}'
 
-  # GraphQL-Server
-  graphql-server:
+  # Server
+  server:
     build:
       context: .
       dockerfile: server/Dockerfile
@@ -125,16 +125,11 @@ services:
       context: .
       dockerfile: client/Dockerfile
     container_name: simple-eam-client
-    ports:
-      - '${CLIENT_PORT}:${CLIENT_PORT}'
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/client/node_modules
+
     depends_on:
-      - graphql-server
+      - server
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=production
       - NEXT_PUBLIC_GRAPHQL_URL=https://${API_SUBDOMAIN}.${BASE_DOMAIN}/graphql
       - NEXT_PUBLIC_KEYCLOAK_URL=https://${AUTH_SUBDOMAIN}.${BASE_DOMAIN}
       - NEXT_PUBLIC_KEYCLOAK_REALM=${KEYCLOAK_REALM}

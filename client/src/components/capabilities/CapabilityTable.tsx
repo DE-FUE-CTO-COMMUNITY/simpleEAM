@@ -339,11 +339,12 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
                     backgroundColor: 'transparent',
                   }}
                   onMouseOver={e => {
-                    ;(e.currentTarget as HTMLElement).style.backgroundColor =
-                      theme.palette.action.hover
+                    const el = e.currentTarget as HTMLElement
+                    el.style.backgroundColor = theme.palette.action.hover
                   }}
                   onMouseOut={e => {
-                    ;(e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'
+                    const el = e.currentTarget as HTMLElement
+                    el.style.backgroundColor = 'transparent'
                   }}
                 >
                   {row.getVisibleCells().map(cell => (

@@ -149,7 +149,7 @@ const ApplicationsPage = () => {
   })
 
   // Mutation zum Löschen einer Applikation
-  const [deleteApplication, { loading: isDeleting }] = useMutation(DELETE_APPLICATION, {
+  const [deleteApplication] = useMutation(DELETE_APPLICATION, {
     onCompleted: () => {
       enqueueSnackbar('Applikation erfolgreich gelöscht', { variant: 'success' })
       refetch()

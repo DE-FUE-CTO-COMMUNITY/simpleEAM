@@ -241,9 +241,8 @@ const CreateCapabilityPage = () => {
 
               {/* Level */}
               <Grid size={{ xs: 12, md: 6 }}>
-                <form.Field
-                  name="level"
-                  children={({ state, handleBlur, handleChange }) => (
+                <form.Field name="level">
+                  {({ state, handleBlur, handleChange }) => (
                     <FormControl fullWidth error={!!state.meta.errors.length}>
                       <FormLabel htmlFor="level" required>
                         Level
@@ -271,14 +270,13 @@ const CreateCapabilityPage = () => {
                       )}
                     </FormControl>
                   )}
-                />
+                </form.Field>
               </Grid>
 
               {/* Übergeordnete Capability */}
               <Grid size={{ xs: 12, md: 6 }}>
-                <form.Field
-                  name="parentCapabilityId"
-                  children={({ state, handleBlur, handleChange }) => {
+                <form.Field name="parentCapabilityId">
+                  {({ state, handleBlur, handleChange }) => {
                     const level = form.getFieldValue('level')
                     const availableParents = getAvailableParentCapabilities(level)
                     const isDisabled = level === 0 || availableParents.length === 0
@@ -317,14 +315,13 @@ const CreateCapabilityPage = () => {
                       </FormControl>
                     )
                   }}
-                />
+                </form.Field>
               </Grid>
 
               {/* Beschreibung */}
               <Grid size={12}>
-                <form.Field
-                  name="description"
-                  children={({ state, handleBlur, handleChange }) => (
+                <form.Field name="description">
+                  {({ state, handleBlur, handleChange }) => (
                     <FormControl fullWidth error={!!state.meta.errors.length}>
                       <FormLabel htmlFor="description" required>
                         Beschreibung
@@ -348,7 +345,7 @@ const CreateCapabilityPage = () => {
                       )}
                     </FormControl>
                   )}
-                />
+                </form.Field>
               </Grid>
 
               <Grid size={12}>
@@ -374,9 +371,8 @@ const CreateCapabilityPage = () => {
           </form>
         </Paper>
 
-        <form.Subscribe
-          selector={state => [state.canSubmit, state.isSubmitting, state.errors]}
-          children={([canSubmit, isSubmitting, errors]) => (
+        <form.Subscribe selector={state => [state.canSubmit, state.isSubmitting, state.errors]}>
+          {([canSubmit, isSubmitting, errors]) => (
             <Card sx={{ mb: 4, backgroundColor: theme.palette.grey[100] }}>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
@@ -388,7 +384,7 @@ const CreateCapabilityPage = () => {
               </CardContent>
             </Card>
           )}
-        />
+        </form.Subscribe>
       </Box>
     </RootLayout>
   )
