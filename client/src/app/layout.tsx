@@ -136,13 +136,27 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const renderContent = () => {
     const apolloClient = client || createApolloClient()
 
-    // Identische DOM-Struktur für Server und Client, ohne dynamische Klassennamen
+    // Client-Side Effekt nach dem Rendering
+    useEffect(() => {
+      if (mounted) {
+        // Loading-Overlay nur anzeigen, wenn noch nicht initialisiert
+        const loadingOverlay = document.getElementById('loading-overlay')
+        if (loadingOverlay) {
+          if (!initialized) {
+            loadingOverlay.style.display = 'flex'
+          } else {
+            loadingOverlay.style.display = 'none'
+          }
+        }
+      }
+    }, [mounted, initialized])
+
     return (
       <>
-        {/* Loading-Zustand: immer rendern, aber nur client-seitig anzeigen */}
+        {/* Loading-Zustand: Konsistente Struktur für Server und Client */}
         <div
           style={{
-            display: mounted && !initialized ? 'flex' : 'none',
+            display: 'none', // Initial IMMER verstecken für SSR, wird nur client-seitig aktualisiert
             justifyContent: 'center',
             alignItems: 'center',
             height: '100vh',
@@ -153,17 +167,18 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             zIndex: 9999,
             background: 'white',
           }}
+          id="loading-overlay"
         >
-          {mounted && <CircularProgress size={40} />}
+          <CircularProgress size={40} />
         </div>
 
-        {/* Haupt-Content: immer rendern, aber als Style kontrollieren */}
+        {/* Haupt-Content: Immer konsistente Struktur */}
         <div
           style={{
-            display: mounted && initialized ? 'block' : 'none',
             width: '100%',
             height: '100%',
           }}
+          id="main-content"
         >
           <AuthContext.Provider value={{ keycloak, initialized, authenticated }}>
             <ApolloProvider client={apolloClient}>

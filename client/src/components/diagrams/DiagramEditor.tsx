@@ -57,7 +57,20 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
         ...style,
       }}
     >
-      {isClient && (
+      {/* Wenn nicht client-seitig, leeren Container rendern für konsistentes SSR */}
+      {!isClient ? (
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100%',
+            width: '100%',
+          }}
+        >
+          <Typography variant="h5">Lade Diagram-Editor...</Typography>
+        </Box>
+      ) : (
         <div style={{ height: '100%', width: '100%' }}>
           <ExcalidrawComponent
             theme="light"

@@ -107,7 +107,7 @@ CREATE (c12)-[:CHILD_OF]->(c1);
 CREATE (c21)-[:CHILD_OF]->(c2);
 CREATE (c31)-[:CHILD_OF]->(c3);
 
-// Anwendungen
+// Applikationen
 CREATE (a1:Application {
   id: "app-1",
   name: "CRM-System",
