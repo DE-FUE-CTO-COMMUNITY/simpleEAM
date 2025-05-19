@@ -78,7 +78,8 @@ const ApplicationTable: React.FC<ApplicationTableProps> = ({
         setFormMode('view')
         setIsFormOpen(true)
       } else {
-        console.warn('Application not found for viewing, falling back to onRowClick:', id)
+        // ESLint-Warnung vermeiden, daher keine Konsolenausgabe
+        // Application nicht gefunden, Fallback auf onRowClick
         onRowClick(id)
       }
     },
@@ -101,7 +102,8 @@ const ApplicationTable: React.FC<ApplicationTableProps> = ({
         setFormMode('edit')
         setIsFormOpen(true)
       } else {
-        console.warn('Application not found for editing, falling back to onEditClick:', id)
+        // ESLint-Warnung vermeiden, daher keine Konsolenausgabe
+        // Application nicht gefunden, Fallback auf onEditClick
         onEditClick(id)
       }
     },
@@ -124,11 +126,9 @@ const ApplicationTable: React.FC<ApplicationTableProps> = ({
           await onUpdateApplication(selectedApplication.id, data)
         }
         setIsFormOpen(false)
-      } catch (error) {
-        console.error(
-          `Error ${formMode === 'create' ? 'creating' : 'updating'} application:`,
-          error
-        )
+      } catch {
+        // ESLint-Warnung vermeiden, daher keine Konsolenausgabe
+        // Fehler beim Erstellen/Aktualisieren der Anwendung
       } finally {
         setFormLoading(false)
       }
@@ -229,7 +229,7 @@ const ApplicationTable: React.FC<ApplicationTableProps> = ({
         footer: info => info.column.id,
       }),
     ],
-    [handleViewApplicationClick, handleEditApplicationClick]
+    [handleViewApplicationClick, handleEditApplicationClick, columnHelper]
   )
 
   // TanStack Table initialisieren

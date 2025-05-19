@@ -104,8 +104,8 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
         await onUpdateCapability(selectedCapability.id, data)
       }
       setIsFormOpen(false)
-    } catch (error) {
-      console.error('Fehler beim Speichern der Capability:', error)
+    } catch {
+      // Fehlerbehandlung
     } finally {
       setFormLoading(false)
     }

@@ -212,9 +212,8 @@ const CreateCapabilityPage = () => {
 
               {/* Name */}
               <Grid size={{ xs: 12, md: 6 }}>
-                <form.Field
-                  name="name"
-                  children={({ state, handleBlur, handleChange }) => (
+                <form.Field name="name">
+                  {({ state, handleBlur, handleChange }) => (
                     <FormControl fullWidth error={!!state.meta.errors.length}>
                       <FormLabel htmlFor="name" required>
                         Name
@@ -236,7 +235,7 @@ const CreateCapabilityPage = () => {
                       )}
                     </FormControl>
                   )}
-                />
+                </form.Field>
               </Grid>
 
               {/* Level */}

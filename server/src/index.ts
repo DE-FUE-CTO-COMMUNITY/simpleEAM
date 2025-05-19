@@ -35,7 +35,7 @@ async function startServer() {
   // Middleware konfigurieren
   app.use(cors())
   // TypeScript-Fehler umgehen durch explizite Typzuweisung
-  app.use(compression() as express.RequestHandler)
+  app.use(compression())
   app.use(
     helmet({ contentSecurityPolicy: process.env.NODE_ENV === 'production' ? undefined : false })
   )

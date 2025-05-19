@@ -130,7 +130,7 @@ const CapabilitiesPage = () => {
   })
 
   // Mutation zum Löschen einer Capability
-  const [deleteCapability, { loading: isDeleting }] = useMutation(DELETE_CAPABILITY, {
+  const [deleteCapability] = useMutation(DELETE_CAPABILITY, {
     onCompleted: () => {
       enqueueSnackbar('Business Capability erfolgreich gelöscht', { variant: 'success' })
       refetch()

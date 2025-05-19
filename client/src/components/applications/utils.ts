@@ -13,7 +13,7 @@ export const formatDate = (dateString: string): string => {
       return '-'
     }
     return format(date, 'dd.MM.yyyy HH:mm')
-  } catch (e) {
+  } catch {
     return 'Unbekannt'
   }
 }

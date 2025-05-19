@@ -554,19 +554,19 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
                         onChange={(_, newValue) => {
                           field.handleChange(newValue as string[])
                         }}
-                        renderTags={(value, getTagProps) =>
+                        renderValue={(value, getItemProps) =>
                           value.map((option, index) => {
-                            const tagProps = getTagProps({ index })
-                            // Key wird nicht in props weitergegeben, sondern als separates Prop
+                            const itemProps = getItemProps({ index })
                             return (
                               <Chip
-                                key={tagProps.key}
+                                variant="outlined"
+                                key={itemProps.key}
                                 label={option}
-                                disabled={loading}
-                                onDelete={tagProps.onDelete}
-                                data-tag-index={tagProps['data-tag-index']}
-                                tabIndex={tagProps.tabIndex}
-                                className={tagProps.className}
+                                disabled={isViewMode || loading}
+                                onDelete={itemProps.onDelete}
+                                data-tag-index={itemProps['data-item-index']}
+                                tabIndex={itemProps.tabIndex}
+                                className={itemProps.className}
                               />
                             )
                           })

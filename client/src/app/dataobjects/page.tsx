@@ -1,13 +1,11 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import React, { useEffect } from 'react'
 import { Box, Typography, Card, Paper } from '@mui/material'
 import { useAuth, login } from '@/lib/auth'
 
 const DataObjectsPage = () => {
   const { authenticated } = useAuth()
-  const router = useRouter()
 
   // Weiterleitung zum Login, falls nicht authentifiziert
   useEffect(() => {

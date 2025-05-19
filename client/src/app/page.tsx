@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import {
   Box,
   Typography,
@@ -45,7 +44,6 @@ import { GET_PERSONS_COUNT } from '@/graphql/person'
 
 const Dashboard = () => {
   const { authenticated } = useAuth()
-  const router = useRouter()
   const theme = useTheme()
   const { enqueueSnackbar } = useSnackbar()
 
@@ -103,31 +101,24 @@ const Dashboard = () => {
   useEffect(() => {
     if (capabilitiesError) {
       enqueueSnackbar('Fehler beim Laden der Business Capabilities', { variant: 'error' })
-      console.error('Capabilities error:', capabilitiesError)
     }
     if (applicationsError) {
       enqueueSnackbar('Fehler beim Laden der Applikationen', { variant: 'error' })
-      console.error('Applications error:', applicationsError)
     }
     if (dataObjectsError) {
       enqueueSnackbar('Fehler beim Laden der Datenobjekte', { variant: 'error' })
-      console.error('DataObjects error:', dataObjectsError)
     }
     if (architecturesError) {
       enqueueSnackbar('Fehler beim Laden der Architekturen', { variant: 'error' })
-      console.error('Architectures error:', architecturesError)
     }
     if (diagramsError) {
       enqueueSnackbar('Fehler beim Laden der Diagramme', { variant: 'error' })
-      console.error('Diagrams error:', diagramsError)
     }
     if (interfacesError) {
       enqueueSnackbar('Fehler beim Laden der Schnittstellen', { variant: 'error' })
-      console.error('Interfaces error:', interfacesError)
     }
     if (personsError) {
       enqueueSnackbar('Fehler beim Laden der Personen', { variant: 'error' })
-      console.error('Persons error:', personsError)
     }
   }, [
     capabilitiesError,

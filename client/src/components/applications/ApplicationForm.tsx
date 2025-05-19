@@ -677,15 +677,22 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
                           onChange={(_, newValue) => field.handleChange(newValue)}
                           disabled={isViewMode || loading}
                           freeSolo
-                          renderTags={(value, getTagProps) =>
-                            value.map((option, index) => (
-                              <Chip
-                                variant="outlined"
-                                label={option}
-                                {...getTagProps({ index })}
-                                disabled={isViewMode || loading}
-                              />
-                            ))
+                          renderValue={(value, getItemProps) =>
+                            value.map((option, index) => {
+                              const itemProps = getItemProps({ index })
+                              return (
+                                <Chip
+                                  variant="outlined"
+                                  key={itemProps.key}
+                                  label={option}
+                                  disabled={isViewMode || loading}
+                                  onDelete={itemProps.onDelete}
+                                  data-tag-index={itemProps['data-item-index']}
+                                  tabIndex={itemProps.tabIndex}
+                                  className={itemProps.className}
+                                />
+                              )
+                            })
                           }
                           renderInput={params => (
                             <TextField
@@ -827,15 +834,22 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
                             field.handleChange(newValue.map(item => item.id))
                           }}
                           disabled={isViewMode || loading || capabilitiesLoading}
-                          renderTags={(value, getTagProps) =>
-                            value.map((option, index) => (
-                              <Chip
-                                variant="outlined"
-                                label={option.name}
-                                {...getTagProps({ index })}
-                                disabled={isViewMode || loading}
-                              />
-                            ))
+                          renderValue={(value, getItemProps) =>
+                            value.map((option, index) => {
+                              const itemProps = getItemProps({ index })
+                              return (
+                                <Chip
+                                  variant="outlined"
+                                  key={itemProps.key}
+                                  label={option}
+                                  disabled={isViewMode || loading}
+                                  onDelete={itemProps.onDelete}
+                                  data-tag-index={itemProps['data-item-index']}
+                                  tabIndex={itemProps.tabIndex}
+                                  className={itemProps.className}
+                                />
+                              )
+                            })
                           }
                           renderInput={params => (
                             <TextField
@@ -887,15 +901,22 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
                             field.handleChange(newValue.map(item => item.id))
                           }}
                           disabled={isViewMode || loading || dataObjectsLoading}
-                          renderTags={(value, getTagProps) =>
-                            value.map((option, index) => (
-                              <Chip
-                                variant="outlined"
-                                label={option.name}
-                                {...getTagProps({ index })}
-                                disabled={isViewMode || loading}
-                              />
-                            ))
+                          renderValue={(value, getItemProps) =>
+                            value.map((option, index) => {
+                              const itemProps = getItemProps({ index })
+                              return (
+                                <Chip
+                                  variant="outlined"
+                                  key={itemProps.key}
+                                  label={option}
+                                  disabled={isViewMode || loading}
+                                  onDelete={itemProps.onDelete}
+                                  data-tag-index={itemProps['data-item-index']}
+                                  tabIndex={itemProps.tabIndex}
+                                  className={itemProps.className}
+                                />
+                              )
+                            })
                           }
                           renderInput={params => (
                             <TextField
@@ -947,15 +968,22 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
                             field.handleChange(newValue.map(item => item.id))
                           }}
                           disabled={isViewMode || loading || interfacesLoading}
-                          renderTags={(value, getTagProps) =>
-                            value.map((option, index) => (
-                              <Chip
-                                variant="outlined"
-                                label={option.name}
-                                {...getTagProps({ index })}
-                                disabled={isViewMode || loading}
-                              />
-                            ))
+                          renderValue={(value, getItemProps) =>
+                            value.map((option, index) => {
+                              const itemProps = getItemProps({ index })
+                              return (
+                                <Chip
+                                  variant="outlined"
+                                  key={itemProps.key}
+                                  label={option}
+                                  disabled={isViewMode || loading}
+                                  onDelete={itemProps.onDelete}
+                                  data-tag-index={itemProps['data-item-index']}
+                                  tabIndex={itemProps.tabIndex}
+                                  className={itemProps.className}
+                                />
+                              )
+                            })
                           }
                           renderInput={params => (
                             <TextField

@@ -7,7 +7,7 @@ import { FilterState } from './types'
 export const formatDate = (dateString: string): string => {
   try {
     return format(new Date(dateString), 'dd.MM.yyyy HH:mm')
-  } catch (e) {
+  } catch {
     return 'Unbekannt'
   }
 }
