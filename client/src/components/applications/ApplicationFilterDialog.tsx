@@ -1,33 +1,12 @@
 'use client'
 
 import React from 'react'
-import {
-  Typography,
-  Box,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Checkbox,
-  ListItemText,
-  OutlinedInput,
-  Slider,
-  TextField,
-  CircularProgress,
-} from '@mui/material'
-import { ClearAll as ClearAllIcon } from '@mui/icons-material'
-import { useQuery } from '@apollo/client'
-import { GET_PERSONS } from '@/graphql/person'
+import GenericFilterDialog, { FilterField } from '../common/GenericFilterDialog'
 import { FilterProps } from './types'
 import { getCriticalityLabel, countActiveFilters } from './utils'
-import { ApplicationStatus, CriticalityLevel, Person } from '../../gql/generated'
+import { ApplicationStatus, CriticalityLevel } from '../../gql/generated'
 
-const ApplicationFilterDialog: React.FC<FilterProps> = ({
+const ApplicationFilterDialogWithGeneric: React.FC<FilterProps> = ({
   filterState,
   availableStatuses,
   availableCriticalities,
@@ -38,288 +17,95 @@ const ApplicationFilterDialog: React.FC<FilterProps> = ({
   onClose,
   onApply,
 }) => {
-  const {
-    statusFilter,
-    criticalityFilter,
-    costRangeFilter,
-    technologyStackFilter,
-    descriptionFilter,
-    ownerFilter,
-    updatedDateRange,
-    vendorFilter,
-  } = filterState
-
-  // Personen aus der GraphQL-API laden
-  const { data: personsData, loading: personsLoading } = useQuery(GET_PERSONS)
-  const persons = personsData?.people || []
-
-  const handleFilterReset = () => {
-    onResetFilter()
-    onClose()
-  }
-
-  const handleApply = () => {
-    const activeCount = countActiveFilters(filterState)
-    onApply(activeCount)
-    onClose()
-  }
+  // Konfiguration der Filterfelder
+  const filterFields: FilterField[] = [
+    // Status Filter
+    {
+      id: 'statusFilter',
+      label: 'Status',
+      type: 'multiSelect',
+      options: availableStatuses.map(status => ({
+        value: status,
+        label: status,
+      })),
+    },
+    // Kritikalitäts-Filter
+    {
+      id: 'criticalityFilter',
+      label: 'Kritikalität',
+      type: 'multiSelect',
+      options: availableCriticalities.map(criticality => ({
+        value: criticality,
+        label: getCriticalityLabel(criticality),
+      })),
+      valueFormatter: value => getCriticalityLabel(value as CriticalityLevel),
+    },
+    // Kosten Range Filter
+    {
+      id: 'costRangeFilter',
+      label: 'Kosten Range',
+      type: 'slider',
+      min: 0,
+      max: 1000000,
+      step: 10000,
+      valueFormatter: value => `${value.toLocaleString('de-DE')} €`,
+    },
+    // Technology Stack Filter
+    {
+      id: 'technologyStackFilter',
+      label: 'Technology Stack',
+      type: 'multiSelect',
+      options: availableTechStack.map(tech => ({
+        value: tech,
+        label: tech,
+      })),
+    },
+    // Vendor Filter
+    {
+      id: 'vendorFilter',
+      label: 'Anbieter',
+      type: 'select',
+      options: availableVendors.map(vendor => ({
+        value: vendor,
+        label: vendor,
+      })),
+    },
+    // Beschreibungs-Filter
+    {
+      id: 'descriptionFilter',
+      label: 'Beschreibung enthält',
+      type: 'text',
+      placeholder: 'Geben Sie einen Text ein...',
+    },
+    // Verantwortlicher-Filter
+    {
+      id: 'ownerFilter',
+      label: 'Verantwortlicher',
+      type: 'personSelect',
+      emptyLabel: 'Alle Verantwortlichen',
+    },
+    // Aktualisiert-Filter
+    {
+      id: 'updatedDateRange',
+      label: 'Aktualisiert (Datum)',
+      type: 'dateRange',
+      fromLabel: 'Von',
+      toLabel: 'Bis',
+    },
+  ]
 
   return (
-    <Dialog open={true} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Filter für Applikationen</DialogTitle>
-      <DialogContent dividers>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {/* Status Filter */}
-          <FormControl fullWidth>
-            <InputLabel id="status-filter-label">Status</InputLabel>
-            <Select
-              labelId="status-filter-label"
-              multiple
-              value={statusFilter}
-              onChange={e => {
-                const value = e.target.value
-                // Stellen Sie sicher, dass die Werte als ApplicationStatus-Enum behandelt werden
-                const statusValues =
-                  typeof value === 'string'
-                    ? (value.split(',') as ApplicationStatus[])
-                    : (value as ApplicationStatus[])
-
-                onFilterChange({
-                  statusFilter: statusValues,
-                })
-              }}
-              input={<OutlinedInput label="Status" />}
-              renderValue={selected => selected.join(', ')}
-            >
-              {availableStatuses.map(status => (
-                <MenuItem key={status} value={status}>
-                  <Checkbox checked={statusFilter.indexOf(status) > -1} />
-                  <ListItemText primary={status} />
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          {/* Kritikalitäts-Filter */}
-          <FormControl fullWidth>
-            <InputLabel id="criticality-filter-label">Kritikalität</InputLabel>
-            <Select
-              labelId="criticality-filter-label"
-              multiple
-              value={criticalityFilter}
-              onChange={e => {
-                const value = e.target.value
-                // Stellen Sie sicher, dass die Werte als CriticalityLevel-Enum behandelt werden
-                const criticalityValues =
-                  typeof value === 'string'
-                    ? (value.split(',') as CriticalityLevel[])
-                    : (value as CriticalityLevel[])
-
-                onFilterChange({
-                  criticalityFilter: criticalityValues,
-                })
-              }}
-              input={<OutlinedInput label="Kritikalität" />}
-              renderValue={selected =>
-                selected.map(level => getCriticalityLabel(level as CriticalityLevel)).join(', ')
-              }
-            >
-              {availableCriticalities.map(criticality => (
-                <MenuItem key={criticality} value={criticality}>
-                  <Checkbox checked={criticalityFilter.indexOf(criticality) > -1} />
-                  <ListItemText primary={getCriticalityLabel(criticality)} />
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          {/* Kosten Range Filter */}
-          <Box sx={{ mt: 3 }}>
-            <Typography variant="subtitle1" gutterBottom>
-              Kosten Range
-            </Typography>
-            <Slider
-              value={costRangeFilter}
-              onChange={(_, newValue) => {
-                onFilterChange({
-                  costRangeFilter: newValue as [number, number],
-                })
-              }}
-              valueLabelDisplay="auto"
-              min={0}
-              max={1000000}
-              step={10000}
-              valueLabelFormat={value => `${value.toLocaleString('de-DE')} €`}
-            />
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-              <Typography variant="body2">
-                {costRangeFilter[0].toLocaleString('de-DE')} €
-              </Typography>
-              <Typography variant="body2">
-                {costRangeFilter[1].toLocaleString('de-DE')} €
-              </Typography>
-            </Box>
-          </Box>
-
-          {/* Technology Stack Filter */}
-          <FormControl fullWidth>
-            <InputLabel id="tech-stack-filter-label">Technology Stack</InputLabel>
-            <Select
-              labelId="tech-stack-filter-label"
-              multiple
-              value={technologyStackFilter}
-              onChange={e => {
-                const value = e.target.value
-                // Wandeln Sie in String-Array um
-                const techStackValues =
-                  typeof value === 'string' ? value.split(',') : (value as string[])
-
-                onFilterChange({
-                  technologyStackFilter: techStackValues,
-                })
-              }}
-              input={<OutlinedInput label="Technology Stack" />}
-              renderValue={selected => selected.join(', ')}
-            >
-              {availableTechStack.map(tech => (
-                <MenuItem key={tech} value={tech}>
-                  <Checkbox checked={technologyStackFilter.indexOf(tech) > -1} />
-                  <ListItemText primary={tech} />
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          {/* Vendor Filter */}
-          <FormControl fullWidth>
-            <InputLabel id="vendor-filter-label">Anbieter</InputLabel>
-            <Select
-              labelId="vendor-filter-label"
-              multiple
-              value={vendorFilter ? [vendorFilter] : []}
-              onChange={e => {
-                const value = e.target.value
-                // Wir implementieren hier Single-Select
-                const vendorValue =
-                  Array.isArray(value) && value.length > 0
-                    ? value[value.length - 1]
-                    : typeof value === 'string'
-                      ? value
-                      : ''
-
-                onFilterChange({
-                  vendorFilter: vendorValue,
-                })
-              }}
-              input={<OutlinedInput label="Anbieter" />}
-              renderValue={selected => selected.join(', ')}
-            >
-              {availableVendors.map(vendor => (
-                <MenuItem key={vendor} value={vendor}>
-                  <Checkbox checked={vendorFilter === vendor} />
-                  <ListItemText primary={vendor} />
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          {/* Beschreibungs-Filter */}
-          <TextField
-            fullWidth
-            label="Beschreibung enthält"
-            value={descriptionFilter}
-            onChange={e => {
-              onFilterChange({
-                descriptionFilter: e.target.value,
-              })
-            }}
-            margin="normal"
-          />
-
-          {/* Verantwortlicher-Filter */}
-          <FormControl fullWidth>
-            <InputLabel id="owner-filter-label">Verantwortlicher</InputLabel>
-            {/* Person-Auswahl statt Textfeld */}
-            <Select
-              labelId="owner-filter-label"
-              value={ownerFilter}
-              onChange={e => {
-                onFilterChange({
-                  ownerFilter: e.target.value,
-                })
-              }}
-              input={<OutlinedInput label="Verantwortlicher" />}
-              disabled={personsLoading}
-              startAdornment={personsLoading ? <CircularProgress size={20} sx={{ mr: 1 }} /> : null}
-            >
-              <MenuItem value="">
-                <em>Nicht ausgewählt</em>
-              </MenuItem>
-              {persons.map((person: Person) => (
-                <MenuItem key={person.id} value={person.id}>
-                  {`${person.firstName} ${person.lastName}`}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          {/* Aktualisiert-Filter */}
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-            <Typography variant="subtitle1">Aktualisiert (Datum)</Typography>
-            <Box sx={{ display: 'flex', gap: 2 }}>
-              <TextField
-                fullWidth
-                label="Von"
-                type="date"
-                value={updatedDateRange[0]}
-                onChange={e => {
-                  onFilterChange({
-                    updatedDateRange: [e.target.value, updatedDateRange[1]],
-                  })
-                }}
-                InputLabelProps={{
-                  shrink: true,
-                }}
-              />
-              <TextField
-                fullWidth
-                label="Bis"
-                type="date"
-                value={updatedDateRange[1]}
-                onChange={e => {
-                  onFilterChange({
-                    updatedDateRange: [updatedDateRange[0], e.target.value],
-                  })
-                }}
-                InputLabelProps={{
-                  shrink: true,
-                }}
-              />
-            </Box>
-          </Box>
-        </Box>
-      </DialogContent>
-
-      <DialogActions sx={{ justifyContent: 'space-between', px: 3, py: 2 }}>
-        <Button
-          startIcon={<ClearAllIcon />}
-          onClick={handleFilterReset}
-          color="secondary"
-          variant="outlined"
-        >
-          Filter zurücksetzen
-        </Button>
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <Button onClick={onClose} color="inherit">
-            Abbrechen
-          </Button>
-          <Button onClick={handleApply} color="primary" variant="contained">
-            Anwenden
-          </Button>
-        </Box>
-      </DialogActions>
-    </Dialog>
+    <GenericFilterDialog
+      title="Filter für Applikationen"
+      filterState={filterState}
+      filterFields={filterFields}
+      onFilterChange={onFilterChange}
+      onResetFilter={onResetFilter}
+      onClose={onClose}
+      onApply={onApply}
+      countActiveFilters={countActiveFilters}
+    />
   )
 }
 
-export default ApplicationFilterDialog
+export default ApplicationFilterDialogWithGeneric
