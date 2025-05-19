@@ -43,16 +43,17 @@ import { GET_APPLICATION_INTERFACES_COUNT } from '@/graphql/applicationInterface
 import { GET_PERSONS_COUNT } from '@/graphql/person'
 
 const Dashboard = () => {
-  const { authenticated } = useAuth()
+  const { authenticated, initialized } = useAuth()
   const theme = useTheme()
   const { enqueueSnackbar } = useSnackbar()
 
   // Weiterleitung zum Login, falls nicht authentifiziert
   useEffect(() => {
-    if (authenticated === false) {
+    // Nur ausführen, wenn Keycloak fertig initialisiert ist
+    if (initialized && authenticated === false) {
       login()
     }
-  }, [authenticated])
+  }, [authenticated, initialized])
 
   // Daten für Dashboard laden
   const {
@@ -143,24 +144,14 @@ const Dashboard = () => {
     interfacesData?.applicationInterfacesConnection?.aggregate?.count?.nodes || 0
   const personsCount = personsData?.peopleConnection?.aggregate?.count?.nodes || 0
 
-  const totalCount =
-    capabilitiesCount +
-    applicationsCount +
-    dataObjectsCount +
-    architecturesCount +
-    diagramsCount +
-    interfacesCount +
-    personsCount
+  const totalCount = capabilitiesCount + applicationsCount + dataObjectsCount + interfacesCount
 
-  // Daten für das Balkendiagramm
+  // Daten für das Balkendiagramm - nur Architekturelemente
   const chartData = [
     { name: 'Business Capabilities', count: capabilitiesCount },
     { name: 'Applikationen', count: applicationsCount },
     { name: 'Datenobjekte', count: dataObjectsCount },
-    { name: 'Architekturen', count: architecturesCount },
-    { name: 'Diagramme', count: diagramsCount },
     { name: 'Schnittstellen', count: interfacesCount },
-    { name: 'Personen', count: personsCount },
   ]
 
   const isLoading =
@@ -193,17 +184,19 @@ const Dashboard = () => {
     }
   }
 
-  const getChartColor = (index: number) => {
-    const colors = [
-      theme.palette.primary.main,
-      theme.palette.secondary.main,
-      theme.palette.info.main,
-      theme.palette.success.main,
-      theme.palette.warning.main,
-      theme.palette.error.main,
-      theme.palette.grey[800],
-    ]
-    return colors[index % colors.length]
+  const getChartColor = (name: string) => {
+    switch (name) {
+      case 'Business Capabilities':
+        return theme.palette.primary.main
+      case 'Applikationen':
+        return theme.palette.secondary.main
+      case 'Datenobjekte':
+        return theme.palette.info.main
+      case 'Schnittstellen':
+        return theme.palette.error.main
+      default:
+        return theme.palette.grey[500]
+    }
   }
 
   return (
@@ -212,6 +205,7 @@ const Dashboard = () => {
         Dashboard
       </Typography>{' '}
       <Grid container spacing={3} sx={{ mb: 6 }}>
+        {/* Architekturelemente */}
         <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3, xl: 2 }}>
           <Card>
             <CardContent
@@ -267,6 +261,23 @@ const Dashboard = () => {
             >
               <Box>
                 <Typography variant="subtitle2" color="text.secondary">
+                  Schnittstellen
+                </Typography>
+                <Typography variant="h4">{isLoading ? '...' : interfacesCount}</Typography>
+              </Box>
+              {getCardIcon('interface')}
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Nicht-Architekturelemente */}
+        <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3, xl: 2 }}>
+          <Card>
+            <CardContent
+              sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+            >
+              <Box>
+                <Typography variant="subtitle2" color="text.secondary">
                   Architekturen
                 </Typography>
                 <Typography variant="h4">{isLoading ? '...' : architecturesCount}</Typography>
@@ -299,22 +310,6 @@ const Dashboard = () => {
             >
               <Box>
                 <Typography variant="subtitle2" color="text.secondary">
-                  Schnittstellen
-                </Typography>
-                <Typography variant="h4">{isLoading ? '...' : interfacesCount}</Typography>
-              </Box>
-              {getCardIcon('interface')}
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3, xl: 2 }}>
-          <Card>
-            <CardContent
-              sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
-            >
-              <Box>
-                <Typography variant="subtitle2" color="text.secondary">
                   Personen
                 </Typography>
                 <Typography variant="h4">{isLoading ? '...' : personsCount}</Typography>
@@ -325,7 +320,7 @@ const Dashboard = () => {
         </Grid>
       </Grid>
       <Card sx={{ mb: 4 }}>
-        <CardHeader title="Übersicht der Architekturelemente" />
+        <CardHeader title="Verteilung der Architekturelemente" />
         <Divider />
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
@@ -345,8 +340,8 @@ const Dashboard = () => {
               <YAxis />
               <RechartsTooltip />
               <Bar dataKey="count" name="Anzahl" radius={[4, 4, 0, 0]}>
-                {chartData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={getChartColor(index)} />
+                {chartData.map(entry => (
+                  <Cell key={`cell-${entry.name}`} fill={getChartColor(entry.name)} />
                 ))}
               </Bar>
             </BarChart>
@@ -362,7 +357,10 @@ const Dashboard = () => {
             vollständige IT-Landschaft.
           </Typography>
           <Typography variant="body1" paragraph>
-            Gesamt wurden <strong>{totalCount}</strong> Architekturelemente erfasst.
+            Es wurden insgesamt <strong>{totalCount}</strong> Architekturelemente (Business
+            Capabilities, Applikationen, Schnittstellen und Datenobjekte) erfasst. Darüber hinaus
+            gibt es {architecturesCount} Architekturen,
+            {diagramsCount} Diagramme und {personsCount} Personen.
           </Typography>
           <Box sx={{ mt: 2 }}>
             <Typography variant="body2" sx={{ fontStyle: 'italic' }}>

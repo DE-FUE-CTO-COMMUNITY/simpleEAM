@@ -34,11 +34,17 @@ interface RootLayoutProps {
 
 const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
   const pathname = usePathname()
-  const { keycloak, authenticated } = useAuth()
+  const { keycloak, authenticated, initialized } = useAuth()
   const [open, setOpen] = useState(true)
 
   const handleDrawerToggle = () => {
     setOpen(!open)
+  }
+
+  // Wenn Keycloak initialisiert ist, aber der Benutzer nicht authentifiziert ist,
+  // wird eine leere Seite angezeigt, um Flash of Content zu vermeiden
+  if (initialized && !authenticated) {
+    return <Box sx={{ display: 'flex', minHeight: '100vh' }} />
   }
 
   const userName = (authenticated && keycloak?.tokenParsed?.preferred_username) || 'Benutzer'
@@ -49,8 +55,8 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
     { text: 'Architekturen', icon: <ArchitectureIcon />, href: '/architectures' },
     { text: 'Business Capabilities', icon: <BusinessIcon />, href: '/capabilities' },
     { text: 'Applikationen', icon: <AppsIcon />, href: '/applications' },
-    { text: 'Schnittstellen', icon: <ApiIcon />, href: '/interfaces' },
     { text: 'Datenobjekte', icon: <DataObjectIcon />, href: '/dataobjects' },
+    { text: 'Schnittstellen', icon: <ApiIcon />, href: '/interfaces' },
     { text: 'Personen', icon: <PersonIcon />, href: '/persons' },
   ]
 
