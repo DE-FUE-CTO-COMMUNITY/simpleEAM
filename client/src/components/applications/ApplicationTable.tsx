@@ -87,13 +87,21 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
     [columnHelper]
   )
 
-  // Mapping von ApplicationType zu Application für das Formular
-  const mapToFormValues = (app: ApplicationType): Application => {
+  // Mapping von ApplicationType zu den erwarteten FormValues für das Formular
+  const mapToFormValues = (app: ApplicationType) => {
     return {
-      ...app,
-      usesDataObjects: app.usesDataObjects || [],
-      interfacesToApplications: app.interfacesToApplications || [],
-    } as unknown as Application
+      name: app.name,
+      description: app.description ?? '',
+      status: app.status,
+      criticality: app.criticality,
+      version: app.version ?? '',
+      ownerId: app.owners && app.owners.length > 0 ? app.owners[0].id : '',
+      vendor: app.vendor ?? '',
+      costs: app.costs ?? 0,
+      techStack: app.technologyStack ?? [],
+      usesDataObjectIds: app.usesDataObjects?.map(obj => obj.id) ?? [],
+      interfacesToApplicationIds: app.interfacesToApplications?.map(a => a.id) ?? [],
+    }
   }
 
   return (

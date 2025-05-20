@@ -4,7 +4,7 @@ import React from 'react'
 import GenericFilterDialog, { FilterField } from '../common/GenericFilterDialog'
 import { FilterProps } from './types'
 import { getCriticalityLabel, countActiveFilters } from './utils'
-import { ApplicationStatus, CriticalityLevel } from '../../gql/generated'
+import { CriticalityLevel } from '../../gql/generated'
 
 const ApplicationFilterDialogWithGeneric: React.FC<FilterProps> = ({
   filterState,
@@ -103,7 +103,7 @@ const ApplicationFilterDialogWithGeneric: React.FC<FilterProps> = ({
       onResetFilter={onResetFilter}
       onClose={onClose}
       onApply={onApply}
-      countActiveFilters={countActiveFilters}
+      countActiveFilters={fs => countActiveFilters(fs as any)}
     />
   )
 }

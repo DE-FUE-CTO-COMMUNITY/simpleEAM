@@ -9,6 +9,7 @@ interface DataObjectToolbarProps {
   activeFiltersCount: number
   onFilterClick: () => void
   onResetFilters: () => void
+  onCreateClick?: () => void
 }
 
 /**

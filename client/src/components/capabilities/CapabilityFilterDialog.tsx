@@ -33,7 +33,7 @@ const CapabilityFilterDialogWithGeneric: React.FC<FilterProps> = ({
       label: 'Reifegrad',
       type: 'multiSelect',
       options: [0, 1, 2, 3].map(level => ({
-        value: level,
+        value: level.toString(),
         label: getLevelLabel(level),
       })),
       valueFormatter: value => getLevelLabel(Number(value)),
@@ -94,7 +94,7 @@ const CapabilityFilterDialogWithGeneric: React.FC<FilterProps> = ({
       onResetFilter={onResetFilter}
       onClose={onClose}
       onApply={onApply}
-      countActiveFilters={countActiveFilters}
+      countActiveFilters={fs => countActiveFilters(fs as any)}
     />
   )
 }
