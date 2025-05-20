@@ -2,6 +2,8 @@
 
 Ein skalierbares Enterprise Architecture Management System, das aus mehreren Docker-Containern besteht und moderne Webtechnologien nutzt.
 
+> **Hinweis für GitHub Copilot**: In diesem Projekt wird ausschließlich Yarn als Paketmanager verwendet. Bei allen Installationsbefehlen bitte immer Yarn-Syntax verwenden, nicht npm.
+
 ## Projektübersicht
 
 Dieses Mono-Repository enthält alle Komponenten des Simple-EAM Systems:
@@ -33,6 +35,10 @@ simple-eam/
 - **Frontend**: Next.js 15, Material UI 7, Excalidraw, TanStack Table/Form, Internationalisierung
 - **Backend**: GraphQL, Neo4j, Keycloak
 - **Infrastruktur**: Docker, Docker Compose
+
+> **Wichtig für Material UI 7**: Wir verwenden die neue Grid v2 API, die sich deutlich von der Legacy Grid-Komponente unterscheidet. Bitte verwenden Sie `size` statt `xs/sm/md`, `<Grid container sx={{ width: '100%' }}>` für Container, und Stack für vertikale Layouts. Siehe [Beispielkomponente](./client/src/components/common/GridV2Example.tsx) und [Dokumentation](https://mui.com/material-ui/migration/upgrade-to-grid-v2/).
+
+> **Wichtig für Tanstack Table**: Wir verwenden Tanstack Table V8, das sich deutlich von React Table v7 unterscheidet. Bitte verwenden Sie `useReactTable` statt `useTable`, `flexRender` für Zellen-Rendering, und explizites State-Management. Siehe [Beispielkomponente](./client/src/components/common/TanstackTableExample.tsx) und [Dokumentation](https://tanstack.com/table/latest/docs/guide/migrating).
 
 ## Erste Schritte
 

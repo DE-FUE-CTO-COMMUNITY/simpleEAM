@@ -1,0 +1,19 @@
+# Verhindert, dass GitHub Copilot veraltete Tanstack Table / React Table-Implementierungen vorschlägt
+
+# Stattdessen empfiehlt es, die Implementierung in TanstackTableExample.tsx anzusehen
+
+# Alte React Table v7 Imports
+
+import { useTable } from 'react-table'
+import { usePagination } from 'react-table'
+import { useSortBy } from 'react-table'
+
+# Alte Syntax für Tabellen
+
+<th {...header.getHeaderProps()}>
+header.render('Header')
+cell.render('Cell')
+
+# Diese Datei dient dazu, GitHub Copilot zu helfen,
+
+# alte Muster zu erkennen und nicht zu empfehlen

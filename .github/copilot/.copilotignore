@@ -1,0 +1,13 @@
+# Verhindert, dass GitHub Copilot veraltete Material UI Grid-Implementierungen vorschlägt
+# Stattdessen empfiehlt es, die Implementierung in GridV2Example.tsx anzusehen
+
+# Alte Grid-Implementierungen in Legacy-Projekten
+**/GridLegacy.tsx
+**/GridLegacy.jsx
+
+# Alte Implementierungen mit xs/sm/md Props
+# Diese müssen manuell ausgeschlossen werden, da Copilot diese Muster nicht lernen soll
+# Beispiel: <Grid xs={12} sm={6}>...</Grid>
+
+# Dies ist eine Heuristik, die GitHub Copilot helfen soll,
+# die korrekten Patterns für Material UI v7 Grid v2 zu verstehen
