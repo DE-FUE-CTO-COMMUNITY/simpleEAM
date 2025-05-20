@@ -1,22 +1,7 @@
 'use client'
 
 import React from 'react'
-import {
-  Box,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Checkbox,
-  ListItemText,
-  OutlinedInput,
-} from '@mui/material'
-import { ClearAll as ClearAllIcon } from '@mui/icons-material'
+import GenericFilterDialog, { FilterField, GenericFilterState } from '../common/GenericFilterDialog'
 import { DataClassification } from '../../gql/generated'
 import { getClassificationLabel } from './utils'
 
@@ -48,104 +33,65 @@ const DataObjectFilterDialog: React.FC<DataObjectFilterDialogProps> = ({
   onResetFilters,
   filterOptions,
 }) => {
-  // Handler für die Änderung der Klassifikationsfilter
-  const handleClassificationChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    const value = event.target.value as DataClassification[]
-    onFiltersChange({ ...filters, classifications: value })
+  // Zähle die aktiven Filter
+  const countActiveFilters = (fs: GenericFilterState) => {
+    return (fs.classifications?.length || 0) + (fs.formats?.length || 0) + (fs.sources?.length || 0)
   }
 
-  // Handler für die Änderung der Format-Filter
-  const handleFormatChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    const value = event.target.value as string[]
-    onFiltersChange({ ...filters, formats: value })
+  // Definiere Filterfelder für den generischen Dialog
+  const filterFields: FilterField[] = [
+    // Klassifikationsfilter
+    {
+      id: 'classifications',
+      label: 'Klassifikation',
+      type: 'multiSelect',
+      options: Object.values(DataClassification).map(classification => ({
+        value: classification,
+        label: getClassificationLabel(classification),
+      })),
+      valueFormatter: value => getClassificationLabel(value as DataClassification),
+    },
+    // Formatfilter
+    {
+      id: 'formats',
+      label: 'Format',
+      type: 'multiSelect',
+      options: filterOptions.availableFormats.map(format => ({
+        value: format,
+        label: format,
+      })),
+    },
+    // Quellenfilter
+    {
+      id: 'sources',
+      label: 'Quelle',
+      type: 'multiSelect',
+      options: filterOptions.availableSources.map(source => ({
+        value: source,
+        label: source,
+      })),
+    },
+  ]
+
+  // Handler für Änderungen der Filter
+  const handleFilterChange = (partialState: Partial<GenericFilterState>) => {
+    onFiltersChange({ ...filters, ...partialState })
   }
 
-  // Handler für die Änderung der Quellen-Filter
-  const handleSourceChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    const value = event.target.value as string[]
-    onFiltersChange({ ...filters, sources: value })
-  }
+  // Wenn der Dialog nicht offen ist, nichts rendern
+  if (!open) return null
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Filter für Datenobjekte</DialogTitle>
-      <DialogContent dividers>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
-          {/* Klassifikation Filter */}
-          <FormControl fullWidth>
-            <InputLabel id="classification-filter-label">Klassifikation</InputLabel>
-            <Select
-              labelId="classification-filter-label"
-              id="classification-filter"
-              multiple
-              value={filters.classifications}
-              onChange={handleClassificationChange as any}
-              input={<OutlinedInput label="Klassifikation" />}
-              renderValue={(selected: DataClassification[]) =>
-                selected.map(c => getClassificationLabel(c)).join(', ')
-              }
-            >
-              {Object.values(DataClassification).map(classification => (
-                <MenuItem key={classification} value={classification}>
-                  <Checkbox checked={filters.classifications.includes(classification)} />
-                  <ListItemText primary={getClassificationLabel(classification)} />
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          {/* Format Filter */}
-          <FormControl fullWidth>
-            <InputLabel id="format-filter-label">Format</InputLabel>
-            <Select
-              labelId="format-filter-label"
-              id="format-filter"
-              multiple
-              value={filters.formats}
-              onChange={handleFormatChange as any}
-              input={<OutlinedInput label="Format" />}
-              renderValue={(selected: string[]) => selected.join(', ')}
-            >
-              {filterOptions.availableFormats.map(format => (
-                <MenuItem key={format} value={format}>
-                  <Checkbox checked={filters.formats.includes(format)} />
-                  <ListItemText primary={format} />
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          {/* Quelle Filter */}
-          <FormControl fullWidth>
-            <InputLabel id="source-filter-label">Quelle</InputLabel>
-            <Select
-              labelId="source-filter-label"
-              id="source-filter"
-              multiple
-              value={filters.sources}
-              onChange={handleSourceChange as any}
-              input={<OutlinedInput label="Quelle" />}
-              renderValue={(selected: string[]) => selected.join(', ')}
-            >
-              {filterOptions.availableSources.map(source => (
-                <MenuItem key={source} value={source}>
-                  <Checkbox checked={filters.sources.includes(source)} />
-                  <ListItemText primary={source} />
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Box>
-      </DialogContent>
-      <DialogActions>
-        <Button startIcon={<ClearAllIcon />} onClick={onResetFilters} color="secondary">
-          Filter zurücksetzen
-        </Button>
-        <Button onClick={onClose} color="primary">
-          Anwenden
-        </Button>
-      </DialogActions>
-    </Dialog>
+    <GenericFilterDialog
+      title="Filter für Datenobjekte"
+      filterState={filters}
+      filterFields={filterFields}
+      onFilterChange={handleFilterChange}
+      onResetFilter={onResetFilters}
+      onClose={onClose}
+      onApply={() => onClose()}
+      countActiveFilters={countActiveFilters}
+    />
   )
 }
 
