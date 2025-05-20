@@ -3,9 +3,9 @@
 import React, { useMemo } from 'react'
 import { Chip, useTheme } from '@mui/material'
 import { GenericTable } from '../common/GenericTable'
-import { DataObject, DataObjectFormValues } from './types'
+import DataObjectForm, { DataObjectFormValues } from './DataObjectForm'
 import { formatDate, getClassificationLabel } from './utils'
-import { DataClassification } from '../../gql/generated'
+import { DataClassification, DataObject } from '../../gql/generated'
 import { createColumnHelper } from '@tanstack/react-table'
 import { SortingState } from '@tanstack/react-table'
 
@@ -128,8 +128,21 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
         },
       }),
     ],
-    [theme, columnHelper]
+    [theme, columnHelper, getClassificationChip]
   )
+
+  // Mapping-Funktion für die Umwandlung von DataObject zu DataObjectFormValues
+  const mapDataObjectToFormValues = (dataObject: DataObject): DataObjectFormValues => {
+    return {
+      name: dataObject.name,
+      description: dataObject.description || undefined,
+      classification: dataObject.classification,
+      format: dataObject.format || undefined,
+      source: dataObject.source || undefined,
+      ownerId:
+        dataObject.owners && dataObject.owners.length > 0 ? dataObject.owners[0].id : undefined,
+    }
+  }
 
   return (
     <GenericTable
@@ -147,7 +160,9 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
       emptyMessage="Keine Datenobjekte gefunden."
       createButtonLabel="Neues Datenobjekt erstellen"
       entityName="Datenobjekt"
+      FormComponent={DataObjectForm}
       getIdFromData={(item: DataObject) => item.id}
+      mapDataToFormValues={mapDataObjectToFormValues}
     />
   )
 }

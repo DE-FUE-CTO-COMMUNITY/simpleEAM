@@ -513,8 +513,8 @@ export function GenericTable<T extends { id: string }, F>({
         <FormComponent
           application={selectedItem} // Für ApplicationForm
           capability={selectedItem} // Für CapabilityForm
+          dataObject={selectedItem} // Für DataObjectForm
           data={selectedItem} // Fallback für generische Forms
-          // Die konvertierten Daten, falls eine Mapping-Funktion definiert ist
           {...(mapDataToFormValues && selectedItem ? mapDataToFormValues(selectedItem) : {})}
           mode={formMode}
           isOpen={isFormOpen}

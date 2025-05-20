@@ -1,16 +1,19 @@
 'use client'
 
 import React from 'react'
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Box } from '@mui/material'
-import { DataObject, DataObjectFormValues } from './types'
+import { Dialog } from '@mui/material'
+import { DataObject } from '../../gql/generated'
+import DataObjectForm, { DataObjectFormValues } from './DataObjectForm'
 
 interface DataObjectDialogProps {
   dataObject?: DataObject | null
   isOpen: boolean
   onClose: () => void
   onSubmit: (data: DataObjectFormValues) => Promise<void>
+  onDelete?: (id: string) => Promise<void>
   isLoading?: boolean
   mode: 'create' | 'edit' | 'view'
+  onEditMode?: () => void
 }
 
 /**
@@ -21,40 +24,23 @@ const DataObjectDialog: React.FC<DataObjectDialogProps> = ({
   isOpen,
   onClose,
   onSubmit,
+  onDelete,
   isLoading = false,
   mode,
+  onEditMode,
 }) => {
-  // Dialog-Titel basierend auf dem Modus
-  const getDialogTitle = () => {
-    if (mode === 'create') return 'Neues Datenobjekt erstellen'
-    if (mode === 'edit') return 'Datenobjekt bearbeiten'
-    return 'Datenobjekt Details'
-  }
-
   return (
     <Dialog open={isOpen} onClose={onClose} fullWidth maxWidth="md">
-      <DialogTitle>{getDialogTitle()}</DialogTitle>
-      <DialogContent>
-        <Box sx={{ pt: 1 }}>The DataObject Form will be implemented later</Box>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} color="inherit">
-          {mode === 'view' ? 'Schließen' : 'Abbrechen'}
-        </Button>
-        {mode !== 'view' && (
-          <Button
-            onClick={() => {
-              // Dummy-Implementation, da das Formular nicht wirklich funktioniert
-              onClose()
-            }}
-            color="primary"
-            variant="contained"
-            disabled={isLoading}
-          >
-            {isLoading ? 'Wird gespeichert...' : 'Speichern'}
-          </Button>
-        )}
-      </DialogActions>
+      <DataObjectForm
+        dataObject={dataObject}
+        isOpen={isOpen}
+        onClose={onClose}
+        onSubmit={onSubmit}
+        onDelete={onDelete}
+        mode={mode}
+        loading={isLoading}
+        onEditMode={onEditMode}
+      />
     </Dialog>
   )
 }

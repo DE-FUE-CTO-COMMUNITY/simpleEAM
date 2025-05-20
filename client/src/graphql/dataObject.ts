@@ -61,75 +61,53 @@ export const GET_DATA_OBJECT = gql`
 `
 
 export const CREATE_DATA_OBJECT = gql`
-  mutation CreateDataObject(
-    $name: String!
-    $description: String
-    $classification: DataClassification!
-    $format: String
-    $source: String
-    $ownerId: ID
-  ) {
-    createDataObject(
-      data: {
-        name: $name
-        description: $description
-        classification: $classification
-        format: $format
-        source: $source
-        ownerId: $ownerId
-      }
-    ) {
-      id
-      name
-      description
-      owners {
+  mutation CreateDataObject($input: [DataObjectCreateInput!]!) {
+    createDataObjects(input: $input) {
+      dataObjects {
         id
-        firstName
-        lastName
+        name
+        description
+        owners {
+          id
+          firstName
+          lastName
+        }
+        classification
+        source
+        format
+        createdAt
+        updatedAt
       }
-      classification
-      source
-      format
-      createdAt
-      updatedAt
     }
   }
 `
 
 export const UPDATE_DATA_OBJECT = gql`
-  mutation UpdateDataObject(
-    $id: ID!
-    $name: String!
-    $description: String
-    $classification: DataClassification!
-    $format: String
-    $source: String
-    $ownerId: ID
-  ) {
-    updateDataObject(
-      id: $id
-      data: {
-        name: $name
-        description: $description
-        classification: $classification
-        format: $format
-        source: $source
-        ownerId: $ownerId
-      }
-    ) {
-      id
-      name
-      description
-      owners {
+  mutation UpdateDataObject($id: ID!, $input: DataObjectUpdateInput!) {
+    updateDataObjects(where: { id: { eq: $id } }, update: $input) {
+      dataObjects {
         id
-        firstName
-        lastName
+        name
+        description
+        owners {
+          id
+          firstName
+          lastName
+        }
+        classification
+        source
+        format
+        createdAt
+        updatedAt
       }
-      classification
-      source
-      format
-      createdAt
-      updatedAt
+    }
+  }
+`
+
+export const DELETE_DATA_OBJECT = gql`
+  mutation DeleteDataObject($id: ID!) {
+    deleteDataObjects(where: { id: { eq: $id } }) {
+      nodesDeleted
     }
   }
 `
