@@ -330,6 +330,7 @@ const CapabilitiesPage = () => {
             onUpdateCapability={handleUpdateCapabilitySubmit}
             onDeleteCapability={handleDeleteCapability}
             availableTags={availableTags}
+            availableCapabilities={capabilities as unknown as BusinessCapability[]}
           />
         </Paper>
       </Card>

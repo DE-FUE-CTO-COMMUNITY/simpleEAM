@@ -1,75 +1,23 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { useForm } from '@tanstack/react-form'
 import { z } from 'zod'
 import { useQuery } from '@apollo/client'
-
-// Hilfsfunktion zur Formatierung von Fehlermeldungen
-const formatValidationError = (error: unknown): string => {
-  if (!error) return ''
-  if (Array.isArray(error)) return error.join(', ')
-  if (typeof error === 'object' && error !== null) {
-    // Rekursiv verschachtelte Objekte durchlaufen
-    const messages: string[] = []
-    const processObject = (obj: Record<string, unknown>) => {
-      Object.values(obj).forEach(value => {
-        if (typeof value === 'string') {
-          messages.push(value)
-        } else if (Array.isArray(value)) {
-          value.forEach(item => {
-            if (typeof item === 'string') {
-              messages.push(item)
-            } else if (typeof item === 'object' && item !== null) {
-              processObject(item as Record<string, unknown>)
-            }
-          })
-        } else if (typeof value === 'object' && value !== null) {
-          processObject(value as Record<string, unknown>)
-        }
-      })
-    }
-
-    processObject(error as Record<string, unknown>)
-    return messages.join(', ')
-  }
-  return String(error)
-}
-
 import {
-  Box,
-  Button,
-  CircularProgress,
-  Divider,
-  FormControl,
-  FormHelperText,
-  FormLabel,
-  MenuItem,
-  TextField,
-  Typography,
-  Autocomplete,
-  Chip,
-  Dialog,
-  Tabs,
-  Tab,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  DialogContentText,
-} from '@mui/material'
-import Grid from '@mui/material/Grid'
+  Application,
+  ApplicationStatus,
+  CriticalityLevel,
+  Person,
+  BusinessCapability,
+  DataObject,
+  ApplicationInterface,
+} from '../../gql/generated'
 import { GET_PERSONS } from '@/graphql/person'
 import { GET_CAPABILITIES } from '@/graphql/capability'
 import { GET_DATA_OBJECTS } from '@/graphql/dataObject'
 import { GET_APPLICATION_INTERFACES } from '@/graphql/applicationInterface'
-import {
-  Save as SaveIcon,
-  Cancel as CancelIcon,
-  Edit as EditIcon,
-  Delete as DeleteIcon,
-} from '@mui/icons-material'
-import { Application, ApplicationStatus, CriticalityLevel } from '../../gql/generated'
-import { Person, BusinessCapability, DataObject, ApplicationInterface } from '../../gql/generated'
+import GenericForm, { FieldConfig, TabConfig } from '../common/GenericForm'
 import { isArchitect } from '@/lib/auth'
 
 // Schema für die Formularvalidierung
@@ -125,38 +73,6 @@ export interface ApplicationFormProps {
   onEditMode?: () => void
 }
 
-// Interface für Tab-Panel
-interface TabPanelProps {
-  children?: React.ReactNode
-  index: number
-  value: number
-}
-
-// TabPanel-Komponente
-function TabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`application-tabpanel-${index}`}
-      aria-labelledby={`application-tab-${index}`}
-      {...other}
-    >
-      {value === index && <Box sx={{ pt: 3 }}>{children}</Box>}
-    </div>
-  )
-}
-
-// a11y-Hilfsfunktion für Tabs
-function a11yProps(index: number) {
-  return {
-    id: `application-tab-${index}`,
-    'aria-controls': `application-tabpanel-${index}`,
-  }
-}
-
 const getCriticalityLabel = (criticality: CriticalityLevel): string => {
   switch (criticality) {
     case CriticalityLevel.LOW:
@@ -196,904 +112,326 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
   loading = false,
   onEditMode,
 }) => {
-  const isViewMode = mode === 'view'
-  const isEditMode = mode === 'edit'
-  const isCreateMode = mode === 'create'
-
-  // GraphQL-Abfrage für Personen (für Owner-Auswahl)
+  // Daten laden
   const { data: personsData, loading: personsLoading } = useQuery(GET_PERSONS)
-  const persons = personsData?.people || []
-
-  // GraphQL-Abfrage für Capabilities (für Capability-Auswahl)
   const { data: capabilitiesData, loading: capabilitiesLoading } = useQuery(GET_CAPABILITIES)
-  const capabilities = capabilitiesData?.businessCapabilities || []
-
-  // GraphQL-Abfrage für DataObjects (für DataObject-Auswahl)
   const { data: dataObjectsData, loading: dataObjectsLoading } = useQuery(GET_DATA_OBJECTS)
-  const dataObjects = dataObjectsData?.dataObjects || []
-
-  // GraphQL-Abfrage für ApplicationInterfaces (für Interface-Auswahl)
   const { data: interfacesData, loading: interfacesLoading } = useQuery(GET_APPLICATION_INTERFACES)
-  const applicationInterfaces = interfacesData?.applicationInterfaces || []
 
-  // Zustand für Delete-Dialog
-  const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false)
-
-  // Default-Werte für das Formular
+  // Standardwerte für das Formular
   const defaultValues: ApplicationFormValues = {
     name: application?.name ?? '',
     description: application?.description ?? '',
     status: application?.status ?? ApplicationStatus.ACTIVE,
     criticality: application?.criticality ?? CriticalityLevel.MEDIUM,
     costs: application?.costs ?? null,
-    vendor: application?.vendor ?? '',
-    version: application?.version ?? '',
-    hostingEnvironment: application?.hostingEnvironment ?? '',
+    vendor: application?.vendor ?? null,
+    version: application?.version ?? null,
+    hostingEnvironment: application?.hostingEnvironment ?? null,
     technologyStack: application?.technologyStack ?? [],
     introductionDate: application?.introductionDate ? new Date(application.introductionDate) : null,
     endOfLifeDate: application?.endOfLifeDate ? new Date(application.endOfLifeDate) : null,
-    ownerId: application?.owners && application.owners.length > 0 ? application.owners[0].id : '',
-    supportsCapabilityIds:
-      application?.supportsCapabilities && application.supportsCapabilities.length > 0
-        ? application.supportsCapabilities.map(cap => cap.id)
-        : [],
-    usesDataObjectIds:
-      application?.usesDataObjects && application.usesDataObjects.length > 0
-        ? application.usesDataObjects.map(obj => obj.id)
-        : [],
-    interfacesToApplicationIds:
-      application?.interfacesToApplications && application.interfacesToApplications.length > 0
-        ? application.interfacesToApplications.map(intf => intf.id)
-        : [],
-  }
-
-  // Titel für den Dialog basierend auf dem Modus
-  const getDialogTitle = () => {
-    if (isCreateMode) return 'Neue Applikation erstellen'
-    if (isEditMode) return 'Applikation bearbeiten'
-    return 'Applikation Details'
-  }
-
-  // Handler für das Löschen
-  const handleDelete = async () => {
-    if (application?.id && onDelete) {
-      try {
-        await onDelete(application.id)
-      } catch {
-        // Fehler beim Löschen werden nur protokolliert
-      } finally {
-        setShowDeleteConfirm(false)
-        onClose()
-      }
-    }
+    ownerId:
+      application?.owners && application.owners.length > 0 ? application.owners[0].id : undefined,
+    supportsCapabilityIds: application?.supportsCapabilities?.map(cap => cap.id) ?? [],
+    usesDataObjectIds: application?.usesDataObjects?.map(obj => obj.id) ?? [],
+    interfacesToApplicationIds: application?.interfacesToApplications?.map(iface => iface.id) ?? [],
   }
 
   // TanStack Form konfigurieren
   const form = useForm({
     defaultValues,
     onSubmit: async ({ value }) => {
-      try {
-        await onSubmit(value)
-        onClose() // Dialog schließen nach erfolgreicher Übermittlung
-      } catch {
-        // Fehler beim Formularversand werden behandelt, aber nicht protokolliert
-      }
+      await onSubmit(value)
     },
     validators: {
-      // Formularvalidierung mit Zod Schema
       onChange: applicationSchema,
+      onSubmit: applicationSchema,
     },
   })
 
-  // Wenn die Anwendungsdaten aktualisiert werden, aktualisiere auch die Formular-Werte
+  // Formular aktualisieren, wenn sich die Daten ändern
   useEffect(() => {
-    if (application) {
+    if (isOpen && application) {
       form.reset({
-        name: application.name,
-        description: application.description || '',
-        status: application.status,
-        criticality: application.criticality,
-        costs: application.costs || null,
-        vendor: application.vendor || '',
-        version: application.version || '',
-        hostingEnvironment: application.hostingEnvironment || '',
-        technologyStack: application.technologyStack || [],
+        name: application.name ?? '',
+        description: application.description ?? '',
+        status: application.status ?? ApplicationStatus.ACTIVE,
+        criticality: application.criticality ?? CriticalityLevel.MEDIUM,
+        costs: application.costs ?? null,
+        vendor: application.vendor ?? null,
+        version: application.version ?? null,
+        hostingEnvironment: application.hostingEnvironment ?? null,
+        technologyStack: application.technologyStack ?? [],
         introductionDate: application.introductionDate
           ? new Date(application.introductionDate)
           : null,
         endOfLifeDate: application.endOfLifeDate ? new Date(application.endOfLifeDate) : null,
         ownerId:
-          application.owners && application.owners.length > 0 ? application.owners[0].id : '',
-        supportsCapabilityIds:
-          application.supportsCapabilities && application.supportsCapabilities.length > 0
-            ? application.supportsCapabilities.map(cap => cap.id)
-            : [],
-        usesDataObjectIds:
-          application.usesDataObjects && application.usesDataObjects.length > 0
-            ? application.usesDataObjects.map(obj => obj.id)
-            : [],
+          application.owners && application.owners.length > 0
+            ? application.owners[0].id
+            : undefined,
+        supportsCapabilityIds: application.supportsCapabilities?.map(cap => cap.id) ?? [],
+        usesDataObjectIds: application.usesDataObjects?.map(obj => obj.id) ?? [],
         interfacesToApplicationIds:
-          application.interfacesToApplications && application.interfacesToApplications.length > 0
-            ? application.interfacesToApplications.map(intf => intf.id)
-            : [],
+          application.interfacesToApplications?.map(iface => iface.id) ?? [],
       })
+    } else if (!isOpen) {
+      form.reset()
     }
-  }, [application, form])
+  }, [form, application, isOpen])
 
-  // State für aktiven Tab
-  const [activeTab, setActiveTab] = useState(0)
+  // Tabs für das Formular definieren
+  const tabs: TabConfig[] = [
+    { id: 'general', label: 'Allgemein' },
+    { id: 'technical', label: 'Technisch' },
+    { id: 'lifecycle', label: 'Lebenszyklus' },
+    { id: 'relationships', label: 'Beziehungen' },
+  ]
 
-  // Handler für Tab-Wechsel
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    setActiveTab(newValue)
-  }
+  // Felder für das Formular definieren
+  const fields: FieldConfig[] = [
+    // Allgemeine Informationen (Tab: general)
+    {
+      name: 'name',
+      label: 'Name',
+      type: 'text',
+      required: true,
+      tabId: 'general',
+      validators: applicationSchema.shape.name,
+      size: { xs: 12, md: 6 },
+    },
+    {
+      name: 'description',
+      label: 'Beschreibung',
+      type: 'textarea',
+      required: true,
+      tabId: 'general',
+      validators: applicationSchema.shape.description,
+      rows: 4,
+      size: 12,
+    },
+    {
+      name: 'status',
+      label: 'Status',
+      type: 'select',
+      required: true,
+      tabId: 'general',
+      validators: applicationSchema.shape.status,
+      options: Object.values(ApplicationStatus).map(status => ({
+        value: status,
+        label: getStatusLabel(status),
+      })),
+      size: { xs: 12, md: 6 },
+    },
+    {
+      name: 'criticality',
+      label: 'Kritikalität',
+      type: 'select',
+      required: true,
+      tabId: 'general',
+      validators: applicationSchema.shape.criticality,
+      options: Object.values(CriticalityLevel).map(level => ({
+        value: level,
+        label: getCriticalityLabel(level),
+      })),
+      size: { xs: 12, md: 6 },
+    },
+    {
+      name: 'costs',
+      label: 'Kosten',
+      type: 'number',
+      tabId: 'general',
+      validators: applicationSchema.shape.costs,
+      size: { xs: 12, md: 6 },
+    },
+    {
+      name: 'ownerId',
+      label: 'Verantwortlicher',
+      type: 'select',
+      tabId: 'general',
+      options: [
+        { value: '', label: 'Keine' },
+        ...(personsData?.people || []).map((person: Person) => ({
+          value: person.id,
+          label: `${person.firstName} ${person.lastName}`,
+        })),
+      ],
+      loadingOptions: personsLoading,
+      size: { xs: 12, md: 6 },
+    },
+
+    // Technische Informationen (Tab: technical)
+    {
+      name: 'vendor',
+      label: 'Anbieter',
+      type: 'text',
+      tabId: 'technical',
+      validators: applicationSchema.shape.vendor,
+      size: { xs: 12, md: 6 },
+    },
+    {
+      name: 'version',
+      label: 'Version',
+      type: 'text',
+      tabId: 'technical',
+      validators: applicationSchema.shape.version,
+      size: { xs: 12, md: 6 },
+    },
+    {
+      name: 'hostingEnvironment',
+      label: 'Hosting-Umgebung',
+      type: 'text',
+      tabId: 'technical',
+      validators: applicationSchema.shape.hostingEnvironment,
+      size: { xs: 12, md: 6 },
+    },
+    {
+      name: 'technologyStack',
+      label: 'Technologie-Stack',
+      type: 'tags',
+      tabId: 'technical',
+      options: availableTechStack.map(tech => ({ value: tech, label: tech })),
+      size: { xs: 12 },
+    },
+
+    // Lebenszyklus (Tab: lifecycle)
+    {
+      name: 'introductionDate',
+      label: 'Einführungsdatum',
+      type: 'date',
+      tabId: 'lifecycle',
+      size: { xs: 12, md: 6 },
+    },
+    {
+      name: 'endOfLifeDate',
+      label: 'End-of-Life Datum',
+      type: 'date',
+      tabId: 'lifecycle',
+      size: { xs: 12, md: 6 },
+    },
+
+    // Beziehungen (Tab: relationships)
+    {
+      name: 'supportsCapabilityIds',
+      label: 'Unterstützte Capabilities',
+      type: 'autocomplete',
+      tabId: 'relationships',
+      multiple: true,
+      options: (capabilitiesData?.businessCapabilities || []).map((cap: BusinessCapability) => ({
+        value: cap.id,
+        label: cap.name,
+      })),
+      loadingOptions: capabilitiesLoading,
+      size: 12,
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          // Direkte ID - suche passende Option
+          const matchingCap = capabilitiesData?.businessCapabilities?.find(
+            (cap: BusinessCapability) => cap.id === option
+          )
+          return matchingCap?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
+    },
+    {
+      name: 'usesDataObjectIds',
+      label: 'Verwendete Datenobjekte',
+      type: 'autocomplete',
+      tabId: 'relationships',
+      multiple: true,
+      options: (dataObjectsData?.dataObjects || []).map((obj: DataObject) => ({
+        value: obj.id,
+        label: obj.name,
+      })),
+      loadingOptions: dataObjectsLoading,
+      size: 12,
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          // Direkte ID - suche passende Option
+          const matchingObj = dataObjectsData?.dataObjects?.find(
+            (obj: DataObject) => obj.id === option
+          )
+          return matchingObj?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
+    },
+    {
+      name: 'interfacesToApplicationIds',
+      label: 'Schnittstellen',
+      type: 'autocomplete',
+      tabId: 'relationships',
+      multiple: true,
+      options: (interfacesData?.applicationInterfaces || []).map((iface: ApplicationInterface) => ({
+        value: iface.id,
+        label: iface.name,
+      })),
+      loadingOptions: interfacesLoading,
+      size: 12,
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          // Direkte ID - suche passende Option
+          const matchingIface = interfacesData?.applicationInterfaces?.find(
+            (iface: ApplicationInterface) => iface.id === option
+          )
+          return matchingIface?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
+    },
+  ]
 
   return (
-    <>
-      <Dialog open={isOpen} onClose={isViewMode ? onClose : undefined} maxWidth="md" fullWidth>
-        <DialogTitle>{getDialogTitle()}</DialogTitle>
-        <form
-          onSubmit={e => {
-            e.preventDefault()
-            e.stopPropagation()
-            if (!isViewMode) {
-              void form.handleSubmit()
+    <GenericForm
+      title={
+        mode === 'create'
+          ? 'Neue Anwendung erstellen'
+          : mode === 'edit'
+            ? 'Anwendung bearbeiten'
+            : 'Anwendungsdetails'
+      }
+      isOpen={isOpen}
+      onClose={onClose}
+      onSubmit={onSubmit}
+      isLoading={loading}
+      mode={mode}
+      fields={fields}
+      tabs={tabs}
+      form={form}
+      enableDelete={mode === 'edit' && !!application && isArchitect()}
+      onDelete={application?.id ? () => onDelete?.(application.id) : undefined}
+      onEditMode={onEditMode}
+      entityId={application?.id}
+      entityName="Anwendung"
+      metadata={
+        application
+          ? {
+              createdAt: application.createdAt,
+              updatedAt: application.updatedAt,
             }
-          }}
-        >
-          <DialogContent>
-            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-              <Tabs
-                value={activeTab}
-                onChange={handleTabChange}
-                aria-label="Applikation Formulartabs"
-                variant="scrollable"
-                scrollButtons="auto"
-              >
-                <Tab label="Allgemeine Informationen" {...a11yProps(0)} />
-                <Tab label="Technische Details" {...a11yProps(1)} />
-                <Tab label="Zeitliche Informationen" {...a11yProps(2)} />
-                <Tab label="Beziehungen" {...a11yProps(3)} />
-              </Tabs>
-            </Box>
-
-            {/* Tab 1: Allgemeine Informationen */}
-            <TabPanel value={activeTab} index={0}>
-              <Grid container spacing={2}>
-                <Grid size={{ xs: 12, md: 6 }}>
-                  <form.Field
-                    name="name"
-                    validators={{
-                      onChange: applicationSchema.shape.name,
-                    }}
-                  >
-                    {field => (
-                      <FormControl
-                        fullWidth
-                        error={field.state.meta.isTouched && !field.state.meta.isValid}
-                      >
-                        <FormLabel>Name *</FormLabel>
-                        <TextField
-                          value={field.state.value}
-                          onChange={e => field.handleChange(e.target.value)}
-                          onBlur={field.handleBlur}
-                          disabled={isViewMode || loading}
-                          error={field.state.meta.isTouched && !field.state.meta.isValid}
-                        />
-                        <FormHelperText>
-                          {field.state.meta.isTouched && field.state.meta.errors
-                            ? formatValidationError(field.state.meta.errors)
-                            : ''}
-                        </FormHelperText>
-                      </FormControl>
-                    )}
-                  </form.Field>
-                </Grid>
-                <Grid size={{ xs: 12, md: 6 }}>
-                  <form.Field
-                    name="status"
-                    validators={{
-                      onChange: applicationSchema.shape.status,
-                    }}
-                  >
-                    {field => (
-                      <FormControl
-                        fullWidth
-                        error={field.state.meta.isTouched && !field.state.meta.isValid}
-                      >
-                        <FormLabel>Status *</FormLabel>
-                        <TextField
-                          value={field.state.value}
-                          onChange={e => field.handleChange(e.target.value as ApplicationStatus)}
-                          onBlur={field.handleBlur}
-                          disabled={isViewMode || loading}
-                          select
-                          error={field.state.meta.isTouched && !field.state.meta.isValid}
-                        >
-                          {Object.values(ApplicationStatus).map(status => (
-                            <MenuItem key={status} value={status}>
-                              {getStatusLabel(status)}
-                            </MenuItem>
-                          ))}
-                        </TextField>
-                        <FormHelperText>
-                          {field.state.meta.isTouched && field.state.meta.errors
-                            ? formatValidationError(field.state.meta.errors)
-                            : ''}
-                        </FormHelperText>
-                      </FormControl>
-                    )}
-                  </form.Field>
-                </Grid>
-                <Grid size={12}>
-                  <form.Field
-                    name="description"
-                    validators={{
-                      onChange: applicationSchema.shape.description,
-                    }}
-                  >
-                    {field => (
-                      <FormControl
-                        fullWidth
-                        error={field.state.meta.isTouched && !field.state.meta.isValid}
-                      >
-                        <FormLabel>Beschreibung *</FormLabel>
-                        <TextField
-                          value={field.state.value}
-                          onChange={e => field.handleChange(e.target.value)}
-                          onBlur={field.handleBlur}
-                          disabled={isViewMode || loading}
-                          multiline
-                          rows={4}
-                          error={field.state.meta.isTouched && !field.state.meta.isValid}
-                        />
-                        <FormHelperText>
-                          {field.state.meta.isTouched && field.state.meta.errors
-                            ? formatValidationError(field.state.meta.errors)
-                            : ''}
-                        </FormHelperText>
-                      </FormControl>
-                    )}
-                  </form.Field>
-                </Grid>
-                <Grid size={{ xs: 12, md: 6 }}>
-                  <form.Field
-                    name="criticality"
-                    validators={{
-                      onChange: applicationSchema.shape.criticality,
-                    }}
-                  >
-                    {field => (
-                      <FormControl
-                        fullWidth
-                        error={field.state.meta.isTouched && !field.state.meta.isValid}
-                      >
-                        <FormLabel>Kritikalität *</FormLabel>
-                        <TextField
-                          value={field.state.value}
-                          onChange={e => field.handleChange(e.target.value as CriticalityLevel)}
-                          onBlur={field.handleBlur}
-                          disabled={isViewMode || loading}
-                          select
-                          error={field.state.meta.isTouched && !field.state.meta.isValid}
-                        >
-                          {Object.values(CriticalityLevel).map(level => (
-                            <MenuItem key={level} value={level}>
-                              {getCriticalityLabel(level)}
-                            </MenuItem>
-                          ))}
-                        </TextField>
-                        <FormHelperText>
-                          {field.state.meta.isTouched && field.state.meta.errors
-                            ? formatValidationError(field.state.meta.errors)
-                            : ''}
-                        </FormHelperText>
-                      </FormControl>
-                    )}
-                  </form.Field>
-                </Grid>
-                <Grid size={{ xs: 12, md: 6 }}>
-                  <form.Field
-                    name="costs"
-                    validators={{
-                      onChange: applicationSchema.shape.costs,
-                    }}
-                  >
-                    {field => (
-                      <FormControl
-                        fullWidth
-                        error={field.state.meta.isTouched && !field.state.meta.isValid}
-                      >
-                        <FormLabel>Kosten</FormLabel>
-                        <TextField
-                          type="number"
-                          value={field.state.value === null ? '' : field.state.value}
-                          onChange={e => {
-                            const value = e.target.value === '' ? null : Number(e.target.value)
-                            field.handleChange(value)
-                          }}
-                          onBlur={field.handleBlur}
-                          disabled={isViewMode || loading}
-                          error={field.state.meta.isTouched && !field.state.meta.isValid}
-                        />
-                        <FormHelperText>
-                          {field.state.meta.isTouched && field.state.meta.errors
-                            ? formatValidationError(field.state.meta.errors)
-                            : ''}
-                        </FormHelperText>
-                      </FormControl>
-                    )}
-                  </form.Field>
-                </Grid>
-                <Grid size={{ xs: 12, md: 6 }}>
-                  <form.Field
-                    name="ownerId"
-                    validators={{
-                      onChange: applicationSchema.shape.ownerId,
-                    }}
-                  >
-                    {field => (
-                      <FormControl
-                        fullWidth
-                        error={field.state.meta.isTouched && !field.state.meta.isValid}
-                      >
-                        <FormLabel>Verantwortlicher</FormLabel>
-                        <TextField
-                          value={field.state.value || ''}
-                          onChange={e => field.handleChange(e.target.value)}
-                          onBlur={field.handleBlur}
-                          disabled={isViewMode || loading || personsLoading}
-                          select
-                          error={field.state.meta.isTouched && !field.state.meta.isValid}
-                        >
-                          <MenuItem value="">
-                            <em>Keiner</em>
-                          </MenuItem>
-                          {persons.map((person: Person) => (
-                            <MenuItem key={person.id} value={person.id}>
-                              {person.firstName} {person.lastName}
-                            </MenuItem>
-                          ))}
-                        </TextField>
-                        <FormHelperText>
-                          {field.state.meta.isTouched && field.state.meta.errors
-                            ? formatValidationError(field.state.meta.errors)
-                            : ''}
-                        </FormHelperText>
-                      </FormControl>
-                    )}
-                  </form.Field>
-                </Grid>
-              </Grid>
-            </TabPanel>
-
-            {/* Tab 2: Technische Details */}
-            <TabPanel value={activeTab} index={1}>
-              <Grid container spacing={2}>
-                <Grid size={{ xs: 12, md: 6 }}>
-                  <form.Field
-                    name="vendor"
-                    validators={{
-                      onChange: applicationSchema.shape.vendor,
-                    }}
-                  >
-                    {field => (
-                      <FormControl
-                        fullWidth
-                        error={field.state.meta.isTouched && !field.state.meta.isValid}
-                      >
-                        <FormLabel>Hersteller</FormLabel>
-                        <TextField
-                          value={field.state.value === null ? '' : field.state.value}
-                          onChange={e => field.handleChange(e.target.value || null)}
-                          onBlur={field.handleBlur}
-                          disabled={isViewMode || loading}
-                          error={field.state.meta.isTouched && !field.state.meta.isValid}
-                        />
-                        <FormHelperText>
-                          {field.state.meta.isTouched && field.state.meta.errors
-                            ? formatValidationError(field.state.meta.errors)
-                            : ''}
-                        </FormHelperText>
-                      </FormControl>
-                    )}
-                  </form.Field>
-                </Grid>
-                <Grid size={{ xs: 12, md: 6 }}>
-                  <form.Field
-                    name="version"
-                    validators={{
-                      onChange: applicationSchema.shape.version,
-                    }}
-                  >
-                    {field => (
-                      <FormControl
-                        fullWidth
-                        error={field.state.meta.isTouched && !field.state.meta.isValid}
-                      >
-                        <FormLabel>Version</FormLabel>
-                        <TextField
-                          value={field.state.value === null ? '' : field.state.value}
-                          onChange={e => field.handleChange(e.target.value || null)}
-                          onBlur={field.handleBlur}
-                          disabled={isViewMode || loading}
-                          error={field.state.meta.isTouched && !field.state.meta.isValid}
-                        />
-                        <FormHelperText>
-                          {field.state.meta.isTouched && field.state.meta.errors
-                            ? formatValidationError(field.state.meta.errors)
-                            : ''}
-                        </FormHelperText>
-                      </FormControl>
-                    )}
-                  </form.Field>
-                </Grid>
-                <Grid size={12}>
-                  <form.Field
-                    name="hostingEnvironment"
-                    validators={{
-                      onChange: applicationSchema.shape.hostingEnvironment,
-                    }}
-                  >
-                    {field => (
-                      <FormControl
-                        fullWidth
-                        error={field.state.meta.isTouched && !field.state.meta.isValid}
-                      >
-                        <FormLabel>Hosting-Umgebung</FormLabel>
-                        <TextField
-                          value={field.state.value === null ? '' : field.state.value}
-                          onChange={e => field.handleChange(e.target.value || null)}
-                          onBlur={field.handleBlur}
-                          disabled={isViewMode || loading}
-                          error={field.state.meta.isTouched && !field.state.meta.isValid}
-                        />
-                        <FormHelperText>
-                          {field.state.meta.isTouched && field.state.meta.errors
-                            ? formatValidationError(field.state.meta.errors)
-                            : ''}
-                        </FormHelperText>
-                      </FormControl>
-                    )}
-                  </form.Field>
-                </Grid>
-                <Grid size={12}>
-                  <form.Field
-                    name="technologyStack"
-                    validators={{
-                      onChange: applicationSchema.shape.technologyStack,
-                    }}
-                  >
-                    {field => (
-                      <FormControl
-                        fullWidth
-                        error={field.state.meta.isTouched && !field.state.meta.isValid}
-                      >
-                        <FormLabel>Technologie-Stack</FormLabel>
-                        <Autocomplete
-                          multiple
-                          options={availableTechStack}
-                          value={field.state.value || []}
-                          onChange={(_, newValue) => field.handleChange(newValue)}
-                          disabled={isViewMode || loading}
-                          freeSolo
-                          renderValue={(value, getItemProps) =>
-                            value.map((option, index) => {
-                              const itemProps = getItemProps({ index })
-                              return (
-                                <Chip
-                                  variant="outlined"
-                                  key={itemProps.key}
-                                  label={option}
-                                  disabled={isViewMode || loading}
-                                  onDelete={itemProps.onDelete}
-                                  data-tag-index={itemProps['data-item-index']}
-                                  tabIndex={itemProps.tabIndex}
-                                  className={itemProps.className}
-                                />
-                              )
-                            })
-                          }
-                          renderInput={params => (
-                            <TextField
-                              {...params}
-                              error={field.state.meta.isTouched && !field.state.meta.isValid}
-                            />
-                          )}
-                        />
-                        <FormHelperText>
-                          {field.state.meta.isTouched && field.state.meta.errors
-                            ? formatValidationError(field.state.meta.errors)
-                            : ''}
-                        </FormHelperText>
-                      </FormControl>
-                    )}
-                  </form.Field>
-                </Grid>
-              </Grid>
-            </TabPanel>
-
-            {/* Tab 3: Zeitliche Informationen */}
-            <TabPanel value={activeTab} index={2}>
-              <Grid container spacing={2}>
-                <Grid size={{ xs: 12, md: 6 }}>
-                  <form.Field
-                    name="introductionDate"
-                    validators={{
-                      onChange: applicationSchema.shape.introductionDate,
-                    }}
-                  >
-                    {field => (
-                      <FormControl
-                        fullWidth
-                        error={field.state.meta.isTouched && !field.state.meta.isValid}
-                      >
-                        <FormLabel>Einführungsdatum</FormLabel>
-                        <TextField
-                          type="date"
-                          value={
-                            field.state.value
-                              ? new Date(field.state.value).toISOString().split('T')[0]
-                              : ''
-                          }
-                          onChange={e => {
-                            const date = e.target.value ? new Date(e.target.value) : null
-                            field.handleChange(date)
-                          }}
-                          onBlur={field.handleBlur}
-                          disabled={isViewMode || loading}
-                          error={field.state.meta.isTouched && !field.state.meta.isValid}
-                          InputLabelProps={{
-                            shrink: true,
-                          }}
-                        />
-                        <FormHelperText>
-                          {field.state.meta.isTouched && field.state.meta.errors
-                            ? formatValidationError(field.state.meta.errors)
-                            : ''}
-                        </FormHelperText>
-                      </FormControl>
-                    )}
-                  </form.Field>
-                </Grid>
-                <Grid size={{ xs: 12, md: 6 }}>
-                  <form.Field
-                    name="endOfLifeDate"
-                    validators={{
-                      onChange: applicationSchema.shape.endOfLifeDate,
-                    }}
-                  >
-                    {field => (
-                      <FormControl
-                        fullWidth
-                        error={field.state.meta.isTouched && !field.state.meta.isValid}
-                      >
-                        <FormLabel>End-of-Life-Datum</FormLabel>
-                        <TextField
-                          type="date"
-                          value={
-                            field.state.value
-                              ? new Date(field.state.value).toISOString().split('T')[0]
-                              : ''
-                          }
-                          onChange={e => {
-                            const date = e.target.value ? new Date(e.target.value) : null
-                            field.handleChange(date)
-                          }}
-                          onBlur={field.handleBlur}
-                          disabled={isViewMode || loading}
-                          error={field.state.meta.isTouched && !field.state.meta.isValid}
-                          InputLabelProps={{
-                            shrink: true,
-                          }}
-                        />
-                        <FormHelperText>
-                          {field.state.meta.isTouched && field.state.meta.errors
-                            ? formatValidationError(field.state.meta.errors)
-                            : ''}
-                        </FormHelperText>
-                      </FormControl>
-                    )}
-                  </form.Field>
-                </Grid>
-              </Grid>
-            </TabPanel>
-
-            {/* Tab 4: Beziehungen */}
-            <TabPanel value={activeTab} index={3}>
-              <Grid container spacing={2}>
-                <Grid size={12}>
-                  <form.Field
-                    name="supportsCapabilityIds"
-                    validators={{
-                      onChange: applicationSchema.shape.supportsCapabilityIds,
-                    }}
-                  >
-                    {field => (
-                      <FormControl
-                        fullWidth
-                        error={field.state.meta.isTouched && !field.state.meta.isValid}
-                      >
-                        <FormLabel>Unterstützte Business Capabilities</FormLabel>
-                        <Autocomplete
-                          multiple
-                          options={capabilities || []}
-                          getOptionLabel={option =>
-                            typeof option === 'string'
-                              ? option
-                              : option.name || 'Unbenannte Capability'
-                          }
-                          value={
-                            field.state.value
-                              ? capabilities.filter((cap: BusinessCapability) =>
-                                  field.state.value?.includes(cap.id)
-                                )
-                              : []
-                          }
-                          onChange={(_, newValue) => {
-                            field.handleChange(newValue.map(item => item.id))
-                          }}
-                          disabled={isViewMode || loading || capabilitiesLoading}
-                          renderValue={(value, getItemProps) =>
-                            value.map((option, index) => {
-                              const itemProps = getItemProps({ index })
-                              return (
-                                <Chip
-                                  variant="outlined"
-                                  key={itemProps.key}
-                                  label={option}
-                                  disabled={isViewMode || loading}
-                                  onDelete={itemProps.onDelete}
-                                  data-tag-index={itemProps['data-item-index']}
-                                  tabIndex={itemProps.tabIndex}
-                                  className={itemProps.className}
-                                />
-                              )
-                            })
-                          }
-                          renderInput={params => (
-                            <TextField
-                              {...params}
-                              error={field.state.meta.isTouched && !field.state.meta.isValid}
-                            />
-                          )}
-                          isOptionEqualToValue={(option, value) => option.id === value.id}
-                        />
-                        <FormHelperText>
-                          {field.state.meta.isTouched && field.state.meta.errors
-                            ? formatValidationError(field.state.meta.errors)
-                            : ''}
-                        </FormHelperText>
-                      </FormControl>
-                    )}
-                  </form.Field>
-                </Grid>
-
-                <Grid size={12}>
-                  <form.Field
-                    name="usesDataObjectIds"
-                    validators={{
-                      onChange: applicationSchema.shape.usesDataObjectIds,
-                    }}
-                  >
-                    {field => (
-                      <FormControl
-                        fullWidth
-                        error={field.state.meta.isTouched && !field.state.meta.isValid}
-                      >
-                        <FormLabel>Verwendete Datenobjekte</FormLabel>
-                        <Autocomplete
-                          multiple
-                          options={dataObjects || []}
-                          getOptionLabel={option =>
-                            typeof option === 'string'
-                              ? option
-                              : option.name || 'Unbenanntes Datenobjekt'
-                          }
-                          value={
-                            field.state.value
-                              ? dataObjects.filter((obj: DataObject) =>
-                                  field.state.value?.includes(obj.id)
-                                )
-                              : []
-                          }
-                          onChange={(_, newValue) => {
-                            field.handleChange(newValue.map(item => item.id))
-                          }}
-                          disabled={isViewMode || loading || dataObjectsLoading}
-                          renderValue={(value, getItemProps) =>
-                            value.map((option, index) => {
-                              const itemProps = getItemProps({ index })
-                              return (
-                                <Chip
-                                  variant="outlined"
-                                  key={itemProps.key}
-                                  label={option}
-                                  disabled={isViewMode || loading}
-                                  onDelete={itemProps.onDelete}
-                                  data-tag-index={itemProps['data-item-index']}
-                                  tabIndex={itemProps.tabIndex}
-                                  className={itemProps.className}
-                                />
-                              )
-                            })
-                          }
-                          renderInput={params => (
-                            <TextField
-                              {...params}
-                              error={field.state.meta.isTouched && !field.state.meta.isValid}
-                            />
-                          )}
-                          isOptionEqualToValue={(option, value) => option.id === value.id}
-                        />
-                        <FormHelperText>
-                          {field.state.meta.isTouched && field.state.meta.errors
-                            ? formatValidationError(field.state.meta.errors)
-                            : ''}
-                        </FormHelperText>
-                      </FormControl>
-                    )}
-                  </form.Field>
-                </Grid>
-
-                <Grid size={12}>
-                  <form.Field
-                    name="interfacesToApplicationIds"
-                    validators={{
-                      onChange: applicationSchema.shape.interfacesToApplicationIds,
-                    }}
-                  >
-                    {field => (
-                      <FormControl
-                        fullWidth
-                        error={field.state.meta.isTouched && !field.state.meta.isValid}
-                      >
-                        <FormLabel>Anwendungsschnittstellen</FormLabel>
-                        <Autocomplete
-                          multiple
-                          options={applicationInterfaces || []}
-                          getOptionLabel={option =>
-                            typeof option === 'string'
-                              ? option
-                              : option.name || 'Unbenannte Schnittstelle'
-                          }
-                          value={
-                            field.state.value
-                              ? applicationInterfaces.filter((intf: ApplicationInterface) =>
-                                  field.state.value?.includes(intf.id)
-                                )
-                              : []
-                          }
-                          onChange={(_, newValue) => {
-                            field.handleChange(newValue.map(item => item.id))
-                          }}
-                          disabled={isViewMode || loading || interfacesLoading}
-                          renderValue={(value, getItemProps) =>
-                            value.map((option, index) => {
-                              const itemProps = getItemProps({ index })
-                              return (
-                                <Chip
-                                  variant="outlined"
-                                  key={itemProps.key}
-                                  label={option}
-                                  disabled={isViewMode || loading}
-                                  onDelete={itemProps.onDelete}
-                                  data-tag-index={itemProps['data-item-index']}
-                                  tabIndex={itemProps.tabIndex}
-                                  className={itemProps.className}
-                                />
-                              )
-                            })
-                          }
-                          renderInput={params => (
-                            <TextField
-                              {...params}
-                              error={field.state.meta.isTouched && !field.state.meta.isValid}
-                            />
-                          )}
-                          isOptionEqualToValue={(option, value) => option.id === value.id}
-                        />
-                        <FormHelperText>
-                          {field.state.meta.isTouched && field.state.meta.errors
-                            ? formatValidationError(field.state.meta.errors)
-                            : ''}
-                        </FormHelperText>
-                      </FormControl>
-                    )}
-                  </form.Field>
-                </Grid>
-              </Grid>
-            </TabPanel>
-
-            {/* Zeige Erstellungs- und Aktualisierungsdaten im View-Modus an */}
-            {isViewMode && application && (
-              <Grid size={{ xs: 12 }}>
-                <Divider sx={{ my: 2 }} />
-                <Typography variant="subtitle2" gutterBottom>
-                  Erstellt am: {new Date(application.createdAt).toLocaleString()}
-                </Typography>
-                {application.updatedAt && (
-                  <Typography variant="subtitle2">
-                    Aktualisiert am: {new Date(application.updatedAt).toLocaleString()}
-                  </Typography>
-                )}
-              </Grid>
-            )}
-          </DialogContent>
-          <DialogActions sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <div>
-              {isEditMode && onDelete && isArchitect() && (
-                <Button
-                  onClick={() => setShowDeleteConfirm(true)}
-                  startIcon={<DeleteIcon />}
-                  variant="contained"
-                  color="secondary"
-                >
-                  Löschen
-                </Button>
-              )}
-            </div>
-            <div>
-              <Button onClick={onClose} startIcon={<CancelIcon />}>
-                {isViewMode ? 'Schließen' : 'Abbrechen'}
-              </Button>
-              {!isViewMode && (
-                <Button
-                  type="submit"
-                  startIcon={loading ? <CircularProgress size={20} /> : <SaveIcon />}
-                  variant="contained"
-                  color="primary"
-                  disabled={loading}
-                >
-                  {isCreateMode ? 'Erstellen' : 'Speichern'}
-                </Button>
-              )}
-              {isViewMode && application && (
-                <Button
-                  onClick={() => {
-                    if (onEditMode) {
-                      onEditMode()
-                    } else {
-                      onClose()
-                    }
-                  }}
-                  startIcon={<EditIcon />}
-                  variant="contained"
-                  color="primary"
-                >
-                  Bearbeiten
-                </Button>
-              )}
-            </div>
-          </DialogActions>
-        </form>
-      </Dialog>
-
-      {/* Bestätigungsdialog für das Löschen */}
-      <Dialog open={showDeleteConfirm} onClose={() => setShowDeleteConfirm(false)}>
-        <DialogTitle>Applikation löschen</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Sind Sie sicher, dass Sie die Applikation &quot;{application?.name}&quot; löschen
-            möchten? Diese Aktion kann nicht rückgängig gemacht werden.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setShowDeleteConfirm(false)} variant="outlined">
-            Abbrechen
-          </Button>
-          <Button
-            onClick={handleDelete}
-            variant="contained"
-            color="error"
-            startIcon={loading ? <CircularProgress size={20} /> : <DeleteIcon />}
-            disabled={loading}
-          >
-            Löschen
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </>
+          : undefined
+      }
+    />
   )
 }
 

@@ -5,7 +5,7 @@ import { Chip, useTheme } from '@mui/material'
 import { GenericTable } from '../common/GenericTable'
 import { Capability } from './types'
 import { formatDate, getLevelLabel } from './utils'
-import { CapabilityStatus } from '../../gql/generated'
+import { CapabilityStatus, BusinessCapability } from '../../gql/generated'
 import CapabilityForm, { CapabilityFormValues } from './CapabilityForm'
 import { createColumnHelper } from '@tanstack/react-table'
 import { SortingState } from '@tanstack/react-table'
@@ -23,6 +23,7 @@ interface CapabilityTableProps {
   onUpdateCapability?: (id: string, data: CapabilityFormValues) => Promise<void>
   onDeleteCapability?: (id: string) => Promise<void>
   availableTags?: string[]
+  availableCapabilities?: BusinessCapability[]
 }
 
 const CapabilityTable: React.FC<CapabilityTableProps> = ({
@@ -37,6 +38,7 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
   onUpdateCapability,
   onDeleteCapability,
   availableTags = [],
+  availableCapabilities = [],
 }) => {
   const theme = useTheme()
   const columnHelper = createColumnHelper<Capability>()
@@ -118,6 +120,20 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
     [theme.palette.primary.lighter, theme.palette.primary.dark, columnHelper]
   )
 
+  // Mapping von Capability zu den erwarteten FormValues für das Formular
+  const mapToFormValues = (capability: Capability): CapabilityFormValues => {
+    return {
+      name: capability.name ?? '',
+      description: capability.description ?? '',
+      maturityLevel: capability.maturityLevel ?? 0,
+      businessValue: capability.businessValue ?? 0,
+      status: capability.status ?? CapabilityStatus.ACTIVE,
+      ownerId: capability.owners && capability.owners.length > 0 ? capability.owners[0].id : '',
+      tags: capability.tags ?? [],
+      parentId: capability.parents && capability.parents.length > 0 ? capability.parents[0].id : '',
+    }
+  }
+
   return (
     <GenericTable
       data={capabilities}
@@ -136,8 +152,10 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
       entityName="Capability"
       FormComponent={CapabilityForm}
       getIdFromData={(item: Capability) => item.id}
+      mapDataToFormValues={mapToFormValues}
       additionalProps={{
         availableTags,
+        availableCapabilities,
       }}
     />
   )

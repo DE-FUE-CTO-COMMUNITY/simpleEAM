@@ -12,6 +12,9 @@ import { AuthContext, initKeycloak, keycloak } from '@/lib/auth'
 import { createApolloClient } from '@/lib/apollo-client'
 import theme from '@/theme/theme'
 import { CircularProgress } from '@mui/material'
+import { LocalizationProvider } from '@mui/x-date-pickers'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import { de } from 'date-fns/locale'
 import RootLayout from '@/components/layout/RootLayout'
 
 // Import der globalen Styles
@@ -203,15 +206,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           {/* Gleiche DOM-Struktur sowohl auf Server als auch auf Client */}
           <ThemeProvider theme={theme}>
             <CssBaseline />
-            <SnackbarProvider
-              maxSnack={3}
-              anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-            >
-              {renderContent()}
-            </SnackbarProvider>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <SnackbarProvider
+                maxSnack={3}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+              >
+                {renderContent()}
+              </SnackbarProvider>
+            </LocalizationProvider>
           </ThemeProvider>
         </CacheProvider>
       </body>

@@ -71,6 +71,30 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
           return owners && owners.length > 0 ? `${owners[0].firstName} ${owners[0].lastName}` : '-'
         },
       }),
+      columnHelper.accessor('supportsCapabilities', {
+        header: 'Capabilities',
+        cell: info => {
+          const caps = info.getValue()
+          return caps && caps.length > 0
+            ? caps
+                .slice(0, 3)
+                .map(cap => cap.name)
+                .join(', ') + (caps.length > 3 ? '...' : '')
+            : '-'
+        },
+      }),
+      columnHelper.accessor('usesDataObjects', {
+        header: 'Datenobjekte',
+        cell: info => {
+          const objs = info.getValue()
+          return objs && objs.length > 0
+            ? objs
+                .slice(0, 2)
+                .map(obj => obj.name)
+                .join(', ') + (objs.length > 2 ? '...' : '')
+            : '-'
+        },
+      }),
       columnHelper.accessor('costs', {
         header: 'Kosten',
         cell: info => formatCosts(info.getValue()),
@@ -95,12 +119,13 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
       status: app.status,
       criticality: app.criticality,
       version: app.version ?? '',
-      ownerId: app.owners && app.owners.length > 0 ? app.owners[0].id : '',
+      ownerId: app.owners && app.owners.length > 0 ? app.owners[0].id : undefined,
       vendor: app.vendor ?? '',
       costs: app.costs ?? 0,
-      techStack: app.technologyStack ?? [],
+      technologyStack: app.technologyStack ?? [],
       usesDataObjectIds: app.usesDataObjects?.map(obj => obj.id) ?? [],
       interfacesToApplicationIds: app.interfacesToApplications?.map(a => a.id) ?? [],
+      supportsCapabilityIds: app.supportsCapabilities?.map(cap => cap.id) ?? [],
     }
   }
 

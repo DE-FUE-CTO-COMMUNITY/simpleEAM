@@ -12,10 +12,10 @@
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "javascript.updateImportsOnFileMove.enabled": "always",
   "typescript.updateImportsOnFileMove.enabled": "always",
-  "eslint.workingDirectories": [
-    "./client",
-    "./server"
-  ],
+  "material-ui-snippets.documentation": {
+    "autocomplete": ".github/copilot/AUTOCOMPLETE_GUIDELINES.md"
+  },
+  "eslint.workingDirectories": ["./client", "./server"],
   "files.associations": {
     "*.graphql": "graphql",
     "*.cypher": "cypher"
