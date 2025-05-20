@@ -14,11 +14,15 @@ import theme from '@/theme/theme'
 import { CircularProgress } from '@mui/material'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import { de } from 'date-fns/locale'
 import RootLayout from '@/components/layout/RootLayout'
+import dayjs from 'dayjs'
+import 'dayjs/locale/de'
 
 // Import der globalen Styles
 import '@/styles/global.css'
+
+// Dayjs Lokalisierung
+dayjs.locale('de')
 
 // Emotion Cache für Server-Side Rendering
 export function useClientStyleRegistry() {
@@ -206,7 +210,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           {/* Gleiche DOM-Struktur sowohl auf Server als auch auf Client */}
           <ThemeProvider theme={theme}>
             <CssBaseline />
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="de">
               <SnackbarProvider
                 maxSnack={3}
                 anchorOrigin={{

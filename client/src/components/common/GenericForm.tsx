@@ -392,8 +392,9 @@ const GenericForm: React.FC<GenericFormProps> = ({
                     <DatePicker
                       value={formField.state.value ? dayjs(formField.state.value) : null}
                       onChange={newValue => {
-                        // Hier verarbeiten wir das neue Datum und stellen sicher, dass es in ein konsistentes Format gebracht wird
-                        formField.handleChange(newValue ? newValue.toISOString() : null)
+                        // Statt den ISO-String zu verwenden, erstellen wir ein Date-Objekt
+                        // Das passt besser zum Zod-Schema, das z.date() erwartet
+                        formField.handleChange(newValue ? newValue.toDate() : null)
                       }}
                       disabled={disabled}
                       slotProps={{
@@ -407,8 +408,11 @@ const GenericForm: React.FC<GenericFormProps> = ({
                           InputProps: { readOnly: !!field.readOnly },
                           required: !!field.required,
                         },
+                        field: {
+                          clearable: true,
+                        },
                       }}
-                      format="dd.MM.yyyy"
+                      format="DD.MM.YYYY"
                     />
                   )}
 
@@ -417,8 +421,9 @@ const GenericForm: React.FC<GenericFormProps> = ({
                       label={field.label}
                       value={formField.state.value ? dayjs(formField.state.value) : null}
                       onChange={newValue => {
-                        // Hier verarbeiten wir das neue Datum und stellen sicher, dass es in ein konsistentes Format gebracht wird
-                        formField.handleChange(newValue ? newValue : null)
+                        // Statt das Dayjs-Objekt direkt zu verwenden, erstellen wir ein Date-Objekt
+                        // Das passt besser zum Zod-Schema, das z.date() erwartet
+                        formField.handleChange(newValue ? newValue.toDate() : null)
                       }}
                       disabled={disabled}
                       slotProps={{
@@ -432,8 +437,11 @@ const GenericForm: React.FC<GenericFormProps> = ({
                           InputProps: { readOnly: !!field.readOnly },
                           required: !!field.required,
                         },
+                        field: {
+                          clearable: true,
+                        },
                       }}
-                      format="dd.MM.yyyy HH:mm"
+                      format="DD.MM.YYYY HH:mm"
                     />
                   )}
 
