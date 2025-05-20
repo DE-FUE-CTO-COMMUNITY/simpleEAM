@@ -45,3 +45,37 @@ export const GET_APPLICATION_INTERFACE = gql`
     }
   }
 `
+
+export const CREATE_APPLICATION_INTERFACE = gql`
+  mutation CreateApplicationInterface($input: [ApplicationInterfaceCreateInput!]!) {
+    createApplicationInterfaces(input: $input) {
+      applicationInterfaces {
+        id
+        name
+        description
+        interfaceType
+      }
+    }
+  }
+`
+
+export const UPDATE_APPLICATION_INTERFACE = gql`
+  mutation UpdateApplicationInterface($id: ID!, $input: ApplicationInterfaceUpdateInput!) {
+    updateApplicationInterfaces(where: { id: $id }, update: $input) {
+      applicationInterfaces {
+        id
+        name
+        description
+        interfaceType
+      }
+    }
+  }
+`
+
+export const DELETE_APPLICATION_INTERFACE = gql`
+  mutation DeleteApplicationInterface($id: ID!) {
+    deleteApplicationInterfaces(where: { id: $id }) {
+      nodesDeleted
+    }
+  }
+`

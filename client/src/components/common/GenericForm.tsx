@@ -599,6 +599,7 @@ const GenericForm: React.FC<GenericFormProps> = ({
             e.preventDefault()
             e.stopPropagation()
             if (!isViewMode) {
+              // Die Formularübermittlung erfolgt über form.handleSubmit()
               void form.handleSubmit()
             }
           }}
