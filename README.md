@@ -40,6 +40,8 @@ simple-eam/
 
 > **Wichtig für Tanstack Table**: Wir verwenden Tanstack Table V8, das sich deutlich von React Table v7 unterscheidet. Bitte verwenden Sie `useReactTable` statt `useTable`, `flexRender` für Zellen-Rendering, und explizites State-Management. Siehe [Beispielkomponente](./client/src/components/common/TanstackTableExample.tsx) und [Dokumentation](https://tanstack.com/table/latest/docs/guide/migrating).
 
+> **Wichtig für TanStack Form**: Wir verwenden TanStack Form für alle Formulare. Bitte verwenden Sie strikte Typisierung, Schema-Validierung mit Zod, `useForm` für die Form-Instanz, Render-Props Pattern für Felder und optimierte Reaktivität mit `useStore`. Siehe unsere [Formular-Richtlinien](./.github/copilot/TANSTACK_FORM_GUIDELINES.md) und [Dokumentation](https://tanstack.com/form/latest/docs/framework/react/guides/basic-concepts).
+
 ## Erste Schritte
 
 ### Voraussetzungen
