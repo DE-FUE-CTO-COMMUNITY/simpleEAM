@@ -128,10 +128,20 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
 
   // Mapping von ApplicationInterface zu den erwarteten FormValues für das Formular
   const mapToFormValues = (iface: ApplicationInterfaceData): ApplicationInterfaceFormValues => {
+    // Sicherstellen, dass iface nicht null oder undefined ist
+    if (!iface) {
+      return {
+        name: '',
+        description: '',
+        interfaceType: InterfaceType.API,
+        dataObjectIds: [],
+      }
+    }
+
     return {
       name: iface.name ?? '',
       description: iface.description ?? '',
-      interfaceType: iface.interfaceType,
+      interfaceType: iface.interfaceType ?? InterfaceType.API,
       dataObjectIds: iface.dataObjects?.map(obj => obj.id) ?? [],
     }
   }

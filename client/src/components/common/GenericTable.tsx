@@ -81,12 +81,22 @@ export function GenericTable<T extends { id: string }, F>({
   // Handler für das Öffnen des Formulars zur Detailansicht
   const handleViewItemClick = useCallback(
     (id: string) => {
+      console.log('GenericTable - handleViewItemClick mit ID:', id)
+
+      if (!id) {
+        console.error('GenericTable - Keine gültige ID für die Ansicht erhalten')
+        return
+      }
+
       const item = data.find(i => getIdFromData(i) === id)
+
       if (item) {
+        console.log('GenericTable - Item in Tabellendaten gefunden:', item)
         setSelectedItem(item)
         setFormMode('view')
         setIsFormOpen(true)
       } else {
+        console.log('GenericTable - Item nicht in lokalen Daten gefunden, onRowClick aufrufen')
         onRowClick(id)
       }
     },
@@ -346,7 +356,18 @@ export function GenericTable<T extends { id: string }, F>({
                     backgroundColor: theme.palette.action.hover,
                   },
                 }}
-                onClick={() => handleViewItemClick(getIdFromData(row.original))}
+                onClick={() => {
+                  const id = getIdFromData(row.original)
+                  console.log('GenericTable - Zeile geklickt, ID:', id, 'Datensatz:', row.original)
+                  if (id) {
+                    handleViewItemClick(id)
+                  } else {
+                    console.error(
+                      'GenericTable - Fehler: Zeile geklickt, aber keine gültige ID gefunden in:',
+                      row.original
+                    )
+                  }
+                }}
               >
                 {row.getVisibleCells().map(cell => (
                   <Box
@@ -514,6 +535,7 @@ export function GenericTable<T extends { id: string }, F>({
           application={selectedItem} // Für ApplicationForm
           capability={selectedItem} // Für CapabilityForm
           dataObject={selectedItem} // Für DataObjectForm
+          applicationInterface={selectedItem} // Für ApplicationInterfaceForm - Wichtig für die Fehlerbehebung!
           data={selectedItem} // Fallback für generische Forms
           {...(mapDataToFormValues && selectedItem ? mapDataToFormValues(selectedItem) : {})}
           mode={formMode}

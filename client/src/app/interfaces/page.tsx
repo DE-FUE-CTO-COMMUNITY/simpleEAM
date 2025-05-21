@@ -115,17 +115,19 @@ const InterfacesPage = () => {
         variables: {
           id: editingInterface.id,
           input: {
-            name: values.name,
-            description: values.description,
-            interfaceType: values.interfaceType,
-            dataObjects: {
-              disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
-              connect: values.dataObjectIds?.map(id => ({
-                where: {
-                  node: { id: { eq: id } },
-                },
-              })),
-            },
+            name: { set: values.name },
+            description: { set: values.description },
+            interfaceType: { set: values.interfaceType },
+            dataObjects: values.dataObjectIds?.length
+              ? {
+                  disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
+                  connect: values.dataObjectIds.map(id => ({
+                    where: {
+                      node: { id: { eq: id } },
+                    },
+                  })),
+                }
+              : undefined,
           },
         },
       })

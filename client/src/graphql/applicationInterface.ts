@@ -54,6 +54,12 @@ export const CREATE_APPLICATION_INTERFACE = gql`
         name
         description
         interfaceType
+        dataObjects {
+          id
+          name
+        }
+        createdAt
+        updatedAt
       }
     }
   }
@@ -61,12 +67,18 @@ export const CREATE_APPLICATION_INTERFACE = gql`
 
 export const UPDATE_APPLICATION_INTERFACE = gql`
   mutation UpdateApplicationInterface($id: ID!, $input: ApplicationInterfaceUpdateInput!) {
-    updateApplicationInterfaces(where: { id: $id }, update: $input) {
+    updateApplicationInterfaces(where: { id: { eq: $id } }, update: $input) {
       applicationInterfaces {
         id
         name
         description
         interfaceType
+        dataObjects {
+          id
+          name
+        }
+        createdAt
+        updatedAt
       }
     }
   }
@@ -74,7 +86,7 @@ export const UPDATE_APPLICATION_INTERFACE = gql`
 
 export const DELETE_APPLICATION_INTERFACE = gql`
   mutation DeleteApplicationInterface($id: ID!) {
-    deleteApplicationInterfaces(where: { id: $id }) {
+    deleteApplicationInterfaces(where: { id: { eq: $id } }) {
       nodesDeleted
     }
   }
