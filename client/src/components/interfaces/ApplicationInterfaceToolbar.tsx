@@ -19,7 +19,9 @@ const ApplicationInterfaceToolbar: React.FC<ApplicationInterfaceToolbarProps> = 
     <GenericToolbar
       {...props}
       searchPlaceholder="Schnittstellen durchsuchen..."
-      showClearSearchButton={true}
+      filterTooltip="Schnittstellenfilter hinzufügen"
+      editFilterTooltip="Schnittstellenfilter bearbeiten"
+      resetFilterTooltip="Schnittstellenfilter zurücksetzen"
     />
   )
 }

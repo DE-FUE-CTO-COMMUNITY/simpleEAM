@@ -3,34 +3,30 @@
 import React, { useEffect } from 'react'
 import { useForm } from '@tanstack/react-form'
 import { z } from 'zod'
-import { useQuery } from '@apollo/client'
-import { ApplicationInterface, InterfaceType, DataObject } from '../../gql/generated'
-import { GET_DATA_OBJECTS } from '@/graphql/dataObject'
+import { ApplicationInterface, InterfaceType } from '../../gql/generated'
 import GenericForm, { FieldConfig } from '../common/GenericForm'
-import { getInterfaceTypeLabel } from '../../types/applicationInterface'
 import { isArchitect } from '@/lib/auth'
+import { DataObject } from '@/gql/generated'
 
 // Schema für die Formularvalidierung
 export const applicationInterfaceSchema = z.object({
   name: z
     .string()
-    .min(3, 'Der Name muss mindestens 3 Zeichen lang sein')
+    .min(2, 'Der Name muss mindestens 2 Zeichen lang sein')
     .max(100, 'Der Name darf maximal 100 Zeichen lang sein'),
-  description: z
-    .string()
-    .min(10, 'Die Beschreibung muss mindestens 10 Zeichen lang sein')
-    .max(1000, 'Die Beschreibung darf maximal 1000 Zeichen lang sein')
-    .optional()
-    .nullable(),
-  interfaceType: z.nativeEnum(InterfaceType),
-  dataObjectIds: z.array(z.string()).optional(),
+  description: z.string().nullable().optional(),
+  interfaceType: z.nativeEnum(InterfaceType, {
+    errorMap: () => ({ message: 'Bitte wählen Sie einen Schnittstellentyp' }),
+  }),
+  dataObjects: z.array(z.string()).optional(),
 })
 
-// TypeScript-Typ basierend auf dem Schema
+// TypeScript Typen basierend auf dem Schema
 export type ApplicationInterfaceFormValues = z.infer<typeof applicationInterfaceSchema>
 
 export interface ApplicationInterfaceFormProps {
   applicationInterface?: ApplicationInterface | null
+  dataObjects?: DataObject[]
   isOpen: boolean
   onClose: () => void
   onSubmit: (data: ApplicationInterfaceFormValues) => Promise<void>
@@ -42,6 +38,7 @@ export interface ApplicationInterfaceFormProps {
 
 const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
   applicationInterface,
+  dataObjects = [],
   isOpen,
   onClose,
   onSubmit,
@@ -50,24 +47,16 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
   loading = false,
   onEditMode,
 }) => {
-  // Sicherheitsmaßnahme: Stelle sicher, dass wir immer ein gültiges Objekt haben
-  const ensuredAppInterface = React.useMemo(() => {
-    if (!applicationInterface && (mode === 'view' || mode === 'edit')) {
-      return null
-    }
-    return applicationInterface
-  }, [applicationInterface, mode])
-
-  // Datenobjekte laden
-  const { data: dataObjectsData, loading: dataObjectsLoading } = useQuery(GET_DATA_OBJECTS)
-
   // Formulardaten initialisieren - leere Standardwerte für neues Formular
-  const defaultValues: ApplicationInterfaceFormValues = {
-    name: '',
-    description: '',
-    interfaceType: InterfaceType.API,
-    dataObjectIds: [],
-  }
+  const defaultValues = React.useMemo<ApplicationInterfaceFormValues>(
+    () => ({
+      name: '',
+      description: null,
+      interfaceType: InterfaceType.API,
+      dataObjects: [],
+    }),
+    []
+  )
 
   // TanStack Form konfigurieren
   const form = useForm({
@@ -78,7 +67,21 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
         name: value.name,
         description: value.description,
         interfaceType: value.interfaceType,
-        dataObjectIds: value.dataObjectIds || [],
+        // Sicherstellen, dass dataObjects korrekt formatiert sind (String-Array von IDs)
+        dataObjects: Array.isArray(value.dataObjects)
+          ? value.dataObjects.map((obj: any) => {
+              // Wenn obj ein Objekt mit value-Eigenschaft ist (aus Autocomplete)
+              if (obj && typeof obj === 'object' && 'value' in obj) {
+                return obj.value
+              }
+              // Wenn obj bereits ein String ist (ID)
+              if (typeof obj === 'string') {
+                return obj
+              }
+              // Fallback
+              return obj
+            })
+          : [],
       }
 
       await onSubmit(formattedValues)
@@ -111,33 +114,33 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       applicationInterface.id
     ) {
       // Im edit/view Mode mit Werten aus applicationInterface initialisieren
+      // Für Autocomplete müssen wir die dataObjects als String-IDs übergeben
+      const dataObjectIds = applicationInterface.dataObjects?.map(obj => obj.id) || []
+
       const formValues = {
         name: applicationInterface.name ?? '',
-        description: applicationInterface.description ?? '',
-        interfaceType: applicationInterface.interfaceType ?? InterfaceType.API,
-        dataObjectIds: applicationInterface.dataObjects?.map(obj => obj.id) ?? [],
+        description: applicationInterface.description ?? null,
+        interfaceType: applicationInterface.interfaceType,
+        dataObjects: dataObjectIds,
       }
 
-      // Formular mit den Werten aus dem vorhandenen Interface zurücksetzen
+      // Formular mit den Werten aus der vorhandenen Schnittstelle zurücksetzen
       form.reset(formValues)
       hasHandledForm = true
     }
 
     // Final Fallback - nur ausführen, wenn keine der vorherigen Bedingungen zutraf
     if (!hasHandledForm) {
-      if (mode === 'view' || mode === 'edit') {
-        // Bei Fehlern im View/Edit-Modus Dialog schließen, da keine sinnvolle Darstellung möglich ist
-        if (onClose) {
-          form.reset(defaultValues) // Formular trotzdem mit Standardwerten zurücksetzen
-          setTimeout(onClose, 100)
-          return
-        }
-      }
-
-      // Fallback für alle anderen Fälle
+      // Immer mit Standardwerten zurücksetzen, aber Dialog nicht automatisch schließen
       form.reset(defaultValues)
+
+      // Log für Debugging-Zwecke
+      console.log('ApplicationInterfaceForm: Formular mit Standardwerten zurückgesetzt', {
+        mode,
+        applicationInterface,
+      })
     }
-  }, [form, applicationInterface, isOpen, defaultValues, mode, onClose])
+  }, [form, applicationInterface, isOpen, defaultValues, mode])
 
   // Feldkonfiguration für das generische Formular
   const fields: FieldConfig[] = [
@@ -147,15 +150,16 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       type: 'text',
       required: true,
       validators: applicationInterfaceSchema.shape.name,
-      size: { xs: 12, md: 6 },
+      size: { xs: 12 },
     },
     {
       name: 'description',
       label: 'Beschreibung',
-      type: 'textarea',
+      type: 'text',
+      multiline: true,
+      rows: 3,
       validators: applicationInterfaceSchema.shape.description,
-      rows: 4,
-      size: 12,
+      size: { xs: 12 },
     },
     {
       name: 'interfaceType',
@@ -163,59 +167,44 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       type: 'select',
       required: true,
       validators: applicationInterfaceSchema.shape.interfaceType,
+      size: { xs: 12, md: 6 },
       options: Object.values(InterfaceType).map(type => ({
         value: type,
-        label: getInterfaceTypeLabel(type),
+        label:
+          type === InterfaceType.API
+            ? 'API'
+            : type === InterfaceType.DATABASE
+              ? 'Datenbank'
+              : type === InterfaceType.FILE
+                ? 'Datei'
+                : type === InterfaceType.MESSAGE_QUEUE
+                  ? 'Nachrichtenwarteschlange'
+                  : 'Sonstige',
       })),
-      size: { xs: 12, md: 6 },
     },
     {
-      name: 'dataObjectIds',
+      name: 'dataObjects',
       label: 'Datenobjekte',
       type: 'autocomplete',
-      multiple: true,
-      options: (dataObjectsData?.dataObjects || []).map((obj: DataObject) => ({
+      size: { xs: 12 },
+      options: dataObjects.map(obj => ({
         value: obj.id,
         label: obj.name,
       })),
-      loadingOptions: dataObjectsLoading,
-      size: 12,
+      multiple: true,
       getOptionLabel: (option: any) => {
-        // Wenn die Option ein String ist (ID), suchen wir nach dem passenden Objekt
         if (typeof option === 'string') {
-          const matchingObj = dataObjectsData?.dataObjects?.find(
-            (obj: DataObject) => obj.id === option
-          )
-          // Wenn wir das Objekt gefunden haben, den Namen zurückgeben
+          // Direkte ID - suche passende Option
+          const matchingObj = dataObjects.find(obj => obj.id === option)
           return matchingObj?.name || option
         }
-        // Bei einem Objekt entweder das Label oder leeren String zurückgeben
         return option?.label || ''
       },
       isOptionEqualToValue: (option: any, value: any) => {
-        // Verbesserte Logik für den Vergleich von Optionen
-        // Falls value ein String ist (eine ID), mit option.value vergleichen
         if (typeof value === 'string') {
           return option.value === value
         }
-
-        // Falls option und value beide definiert sind
-        if (option && value) {
-          // Direkter Vergleich
-          if (option === value) return true
-
-          // Vergleich der value-Eigenschaft
-          if ('value' in option && 'value' in value) {
-            return option.value === value.value
-          }
-
-          // Falls option ein Objekt mit value-Eigenschaft ist und value ein primitiver Wert
-          if ('value' in option) {
-            return option.value === value
-          }
-        }
-
-        return false
+        return option.value === value?.value || option.value === value
       },
     },
   ]
@@ -231,7 +220,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       }
       isOpen={isOpen}
       onClose={onClose}
-      onSubmit={form.handleSubmit}
+      onSubmit={onSubmit}
       isLoading={loading}
       mode={mode}
       fields={fields}

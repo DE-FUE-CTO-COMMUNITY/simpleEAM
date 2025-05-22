@@ -1,20 +1,19 @@
 'use client'
 
 import React, { useMemo } from 'react'
-import { Chip, useTheme } from '@mui/material'
 import { GenericTable } from '../common/GenericTable'
-import { ApplicationInterfaceData } from '../../types/applicationInterface'
-import { formatDate, getInterfaceTypeLabel } from '../../types/applicationInterface'
-import { InterfaceType } from '../../gql/generated'
-import ApplicationInterfaceForm, {
-  ApplicationInterfaceFormValues,
-} from './ApplicationInterfaceForm'
+import { ApplicationInterface } from './types'
+import { ApplicationInterfaceFormValues } from './ApplicationInterfaceForm'
+import ApplicationInterfaceForm from './ApplicationInterfaceForm'
 import { createColumnHelper } from '@tanstack/react-table'
 import { SortingState } from '@tanstack/react-table'
+import { Chip } from '@mui/material'
+import { getInterfaceTypeLabel, formatDate } from './utils'
+import { DataObject } from '@/gql/generated'
 
 interface ApplicationInterfaceTableProps {
   id?: string
-  applicationInterfaces: ApplicationInterfaceData[]
+  applicationInterfaces: ApplicationInterface[]
   loading: boolean
   globalFilter: string
   sorting: SortingState
@@ -24,6 +23,7 @@ interface ApplicationInterfaceTableProps {
   onCreateApplicationInterface?: (data: ApplicationInterfaceFormValues) => Promise<void>
   onUpdateApplicationInterface?: (id: string, data: ApplicationInterfaceFormValues) => Promise<void>
   onDeleteApplicationInterface?: (id: string) => Promise<void>
+  dataObjects?: DataObject[]
 }
 
 const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
@@ -37,54 +37,11 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
   onCreateApplicationInterface,
   onUpdateApplicationInterface,
   onDeleteApplicationInterface,
+  dataObjects = [],
 }) => {
-  const theme = useTheme()
-  const columnHelper = createColumnHelper<ApplicationInterfaceData>()
+  const columnHelper = createColumnHelper<ApplicationInterface>()
 
-  // Hilfsfunktion für die Anzeige des Schnittstellentyps mit farblichem Chip
-  const getInterfaceTypeChip = (type: InterfaceType) => {
-    let color
-    let backgroundColor
-
-    switch (type) {
-      case InterfaceType.API:
-        color = theme.palette.info.dark
-        backgroundColor = theme.palette.info.lighter
-        break
-      case InterfaceType.FILE:
-        color = theme.palette.secondary.dark
-        backgroundColor = theme.palette.secondary.lighter
-        break
-      case InterfaceType.DATABASE:
-        color = theme.palette.error.dark
-        backgroundColor = theme.palette.error.lighter
-        break
-      case InterfaceType.MESSAGE_QUEUE:
-        color = theme.palette.primary.dark
-        backgroundColor = theme.palette.primary.lighter
-        break
-      case InterfaceType.OTHER:
-        color = theme.palette.warning.dark
-        backgroundColor = theme.palette.warning.lighter
-        break
-      default:
-        color = theme.palette.grey[700]
-        backgroundColor = theme.palette.grey[200]
-    }
-
-    return (
-      <Chip
-        label={getInterfaceTypeLabel(type)}
-        size="small"
-        sx={{
-          backgroundColor,
-          color,
-        }}
-      />
-    )
-  }
-
-  // Spalten-Definition für die ApplicationInterface-Tabelle
+  // Spalten-Definition für die Schnittstellen-Tabelle
   const columns = useMemo(
     () => [
       columnHelper.accessor('name', {
@@ -93,56 +50,55 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
       }),
       columnHelper.accessor('description', {
         header: 'Beschreibung',
-        cell: info => {
-          const value = info.getValue()
-          return value && value.length > 50 ? `${value.substring(0, 50)}...` : value || '-'
-        },
+        cell: info => info.getValue() || '-',
       }),
       columnHelper.accessor('interfaceType', {
-        header: 'Typ',
-        cell: info => getInterfaceTypeChip(info.getValue()),
+        header: 'Schnittstellentyp',
+        cell: info => {
+          const type = info.getValue()
+          return (
+            <Chip
+              label={getInterfaceTypeLabel(type)}
+              color={type === 'API' ? 'primary' : 'default'}
+              size="small"
+              variant="outlined"
+            />
+          )
+        },
       }),
       columnHelper.accessor('dataObjects', {
         header: 'Datenobjekte',
         cell: info => {
-          const objs = info.getValue()
-          return objs && objs.length > 0
-            ? objs
-                .slice(0, 2)
-                .map(obj => obj.name)
-                .join(', ') + (objs.length > 2 ? '...' : '')
+          const dataObjects = info.getValue()
+          return dataObjects && dataObjects.length > 0
+            ? dataObjects.map(obj => obj.name).join(', ')
             : '-'
         },
       }),
       columnHelper.accessor('createdAt', {
-        header: 'Erstellt',
+        header: 'Erstellt am',
         cell: info => formatDate(info.getValue()),
       }),
       columnHelper.accessor('updatedAt', {
-        header: 'Aktualisiert',
+        header: 'Aktualisiert am',
         cell: info => formatDate(info.getValue()),
       }),
     ],
-    [columnHelper, getInterfaceTypeChip]
+    [columnHelper]
   )
 
   // Mapping von ApplicationInterface zu den erwarteten FormValues für das Formular
-  const mapToFormValues = (iface: ApplicationInterfaceData): ApplicationInterfaceFormValues => {
-    // Sicherstellen, dass iface nicht null oder undefined ist
-    if (!iface) {
-      return {
-        name: '',
-        description: '',
-        interfaceType: InterfaceType.API,
-        dataObjectIds: [],
-      }
-    }
+  const mapToFormValues = (
+    applicationInterface: ApplicationInterface
+  ): ApplicationInterfaceFormValues => {
+    // Für autocomplete-Felder müssen wir sicherstellen, dass die IDs als reine Strings übergeben werden
+    const dataObjectIds = applicationInterface.dataObjects?.map(obj => obj.id) ?? []
 
     return {
-      name: iface.name ?? '',
-      description: iface.description ?? '',
-      interfaceType: iface.interfaceType ?? InterfaceType.API,
-      dataObjectIds: iface.dataObjects?.map(obj => obj.id) ?? [],
+      name: applicationInterface.name ?? '',
+      description: applicationInterface.description ?? null,
+      interfaceType: applicationInterface.interfaceType,
+      dataObjects: dataObjectIds,
     }
   }
 
@@ -163,8 +119,11 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
       createButtonLabel="Neue Schnittstelle erstellen"
       entityName="Schnittstelle"
       FormComponent={ApplicationInterfaceForm}
-      getIdFromData={(item: ApplicationInterfaceData) => item.id}
+      getIdFromData={(item: ApplicationInterface) => item.id}
       mapDataToFormValues={mapToFormValues}
+      additionalProps={{
+        dataObjects,
+      }}
     />
   )
 }

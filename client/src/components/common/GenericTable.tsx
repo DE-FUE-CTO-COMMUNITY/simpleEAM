@@ -130,12 +130,16 @@ export function GenericTable<T extends { id: string }, F>({
       try {
         if (formMode === 'create' && onCreate) {
           await onCreate(formData)
+          // Nur schließen wenn erfolgreich
+          setIsFormOpen(false)
         } else if (formMode === 'edit' && selectedItem && onUpdate) {
           await onUpdate(getIdFromData(selectedItem), formData)
+          // Nur schließen wenn erfolgreich
+          setIsFormOpen(false)
         }
-        setIsFormOpen(false)
       } catch (error) {
         console.error('Fehler beim Speichern:', error)
+        // Dialog nicht schließen bei Fehler
       } finally {
         setFormLoading(false)
       }
@@ -241,7 +245,7 @@ export function GenericTable<T extends { id: string }, F>({
     )
   }
 
-  // Keine Daten vorhanden
+  // Keine Daten vorhanden und Button zum Erstellen eines neuen Eintrags
   if (data.length === 0) {
     return (
       <Box sx={{ textAlign: 'center', py: 5 }}>
@@ -267,21 +271,6 @@ export function GenericTable<T extends { id: string }, F>({
 
   return (
     <>
-      {/* Versteckter Button zum Öffnen des Erstellungsformulars */}
-      {isArchitect() && onCreate && (
-        <Button
-          id={`create-${entityName.toLowerCase()}-button`}
-          style={{ display: 'none' }}
-          onClick={() => {
-            setSelectedItem(null)
-            setFormMode('create')
-            setIsFormOpen(true)
-          }}
-        >
-          {createButtonLabel}
-        </Button>
-      )}
-
       <Box sx={{ overflow: 'auto' }}>
         <Box
           component="table"

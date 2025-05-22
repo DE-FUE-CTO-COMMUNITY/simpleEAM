@@ -172,28 +172,7 @@ relations: relationIds?.length
 
 Bei der Verwendung von GitHub Copilot für die Implementierung des GenericTable/GenericForm-Patterns können folgende Anweisungen helfen:
 
-```
-Implementiere die <Entity>-Komponenten nach dem Pattern der PERSON-Komponenten (NICHT der Capability-Komponenten).
-Verwende die gleiche Struktur mit GenericTable, GenericForm, GenericToolbar und GenericFilterDialog.
-
-Erstelle für die <Entity>-Implementierung folgende Dateien und halte dich strikt an dieses Pattern:
-1. <Entity>Table.tsx - basierend auf GenericTable
-2. <Entity>Form.tsx - basierend auf GenericForm
-3. <Entity>Toolbar.tsx - basierend auf GenericToolbar
-4. <Entity>FilterDialog.tsx - basierend auf GenericFilterDialog
-5. use<Entity>Filter.tsx - für die Filterlogik
-6. page.tsx - Als Container, der alles zusammenfügt
-
-Wichtige Punkte beim Implementieren:
-1. In der Page-Komponente müssen handleView<Entity> und handleEdit<Entity> leere Funktionen sein und DÜRFEN KEINEN router.push verwenden
-2. GenericTable übernimmt selbst das Öffnen der Dialoge mit dem entsprechenden selectedItem
-
-Beim Implementieren der GraphQL-Mutations:
-1. CREATE_<ENTITY> muss den Array-Input verwenden: input: [{ fields... }]
-2. UPDATE_<ENTITY> muss für jedes Feld { set: values.fieldName } verwenden
-3. Bei Relationsfeldern: erst disconnect [{ where: {} }], dann connect mit map über IDs
-4. Beim Verwenden der GenericTable KEIN additionalProps mit entity: null setzen, da dies selectedItem überschreibt
-```
+````
 
 ## 10. Unterschiede zwischen Dialog-basiertem Ansatz und Routing-Ansatz
 
@@ -220,7 +199,7 @@ const handleEditEntity = (id: string) => {
   // Absichtlich leer - GenericTable übernimmt das Öffnen des Dialogs
   console.log('Edit entity requested:', id)
 }
-```
+````
 
 ### 11.2 Falsche Implementierung (Routing-basiert)
 
@@ -266,47 +245,3 @@ return (
   />
 )
 ```
-
-## 12. Anleitung zur Korrektur der Capability-Implementierung
-
-Die aktuelle Capability-Implementierung enthält einen Fehler, der korrigiert werden sollte, um dem korrekten GenericTable/GenericForm-Pattern zu entsprechen. Hier sind die notwendigen Änderungen:
-
-### 12.1 Korrektur der `handleViewCapability` und `handleEditCapability` Funktionen
-
-Statt:
-
-```tsx
-// FALSCH - verwendet Router
-const handleViewCapability = (id: string) => {
-  router.push(`/capabilities/${id}`)
-}
-
-const handleEditCapability = (id: string) => {
-  router.push(`/capabilities/edit/${id}`)
-}
-```
-
-Sollte es heißen:
-
-```tsx
-// RICHTIG - lässt die GenericTable die Dialog-Funktionalität übernehmen
-const handleViewCapability = (id: string) => {
-  // Absichtlich leer - GenericTable übernimmt das Öffnen des Dialogs
-  console.log('View capability requested:', id)
-}
-
-const handleEditCapability = (id: string) => {
-  // Absichtlich leer - GenericTable übernimmt das Öffnen des Dialogs
-  console.log('Edit capability requested:', id)
-}
-```
-
-### 12.2 Weitere potenzielle Korrekturen in der Capability-Implementierung
-
-1. Überprüfen, dass keine automatische Dialog-Schließung in der Form-Komponente implementiert ist, wenn die Capability null ist
-2. Sicherstellen, dass defaultValues mit useMemo gewrappt sind
-3. Sicherstellen, dass bei der Table-Implementierung keine additionalProps die selectedItem-Prop überschreiben
-
----
-
-Diese Checkliste hilft dabei, eine konsistente Implementierung des GenericTable/GenericForm-Patterns in der gesamten Anwendung sicherzustellen und vermeidet Probleme, die bei abweichenden Implementierungen auftreten können.

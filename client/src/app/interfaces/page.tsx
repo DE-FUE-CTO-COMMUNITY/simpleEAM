@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Box, Typography, Button, Card, CircularProgress } from '@mui/material'
+import { Box, Typography, Button, Card, Paper } from '@mui/material'
 import { Add as AddIcon } from '@mui/icons-material'
 import { useQuery, useMutation } from '@apollo/client'
 import { useSnackbar } from 'notistack'
@@ -12,18 +12,20 @@ import {
   UPDATE_APPLICATION_INTERFACE,
   DELETE_APPLICATION_INTERFACE,
 } from '@/graphql/applicationInterface'
-import { ApplicationInterface } from '@/gql/generated'
-
-// Importiere die Komponenten
-import ApplicationInterfaceTable from '@/components/interfaces/ApplicationInterfaceTable'
-import ApplicationInterfaceToolbar from '@/components/interfaces/ApplicationInterfaceToolbar'
-import ApplicationInterfaceFilterDialog from '@/components/interfaces/ApplicationInterfaceFilterDialog'
+import { GET_DATA_OBJECTS } from '@/graphql/dataObject'
 import ApplicationInterfaceForm, {
   ApplicationInterfaceFormValues,
 } from '@/components/interfaces/ApplicationInterfaceForm'
-import { useApplicationInterfaceFilter } from '@/components/interfaces/useApplicationInterfaceFilter'
 
-const InterfacesPage = () => {
+// Importiere die ausgelagerten Komponenten
+import ApplicationInterfaceTable from '@/components/interfaces/ApplicationInterfaceTable'
+import ApplicationInterfaceToolbar from '@/components/interfaces/ApplicationInterfaceToolbar'
+import ApplicationInterfaceFilterDialog from '@/components/interfaces/ApplicationInterfaceFilterDialog'
+import { useApplicationInterfaceFilter } from '@/components/interfaces/useApplicationInterfaceFilter'
+import { ApplicationInterface, FilterState } from '@/components/interfaces/types'
+import { DataObject } from '@/gql/generated'
+
+function ApplicationInterfacesPage() {
   const { authenticated } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
   const [globalFilter, setGlobalFilter] = useState<string>('')
@@ -31,12 +33,15 @@ const InterfacesPage = () => {
 
   // Filter-Zustand
   const [filterOpen, setFilterOpen] = useState(false)
+  const [filterState, setFilterState] = useState<FilterState>({
+    interfaceTypeFilter: [],
+    searchFilter: '',
+    updatedDateRange: ['', ''],
+  })
   const [activeFiltersCount, setActiveFiltersCount] = useState<number>(0)
 
-  // State für das neue Interface-Formular
-  const [showNewInterfaceForm, setShowNewInterfaceForm] = useState(false)
-  const [editingInterface, setEditingInterface] = useState<ApplicationInterface | null>(null)
-  const [viewingInterface, setViewingInterface] = useState<ApplicationInterface | null>(null)
+  // State für das neue Formular
+  const [showNewApplicationInterfaceForm, setShowNewApplicationInterfaceForm] = useState(false)
 
   // Weiterleitung zum Login, falls nicht authentifiziert
   useEffect(() => {
@@ -51,6 +56,14 @@ const InterfacesPage = () => {
     fetchPolicy: 'cache-and-network',
   })
 
+  // Datenobjekte laden für Formular-Auswahlmöglichkeiten
+  const { data: dataObjectsData } = useQuery(GET_DATA_OBJECTS, {
+    skip: !authenticated,
+    fetchPolicy: 'cache-and-network',
+  })
+
+  const dataObjects = dataObjectsData?.dataObjects || []
+
   // Fehlerbehandlung
   useEffect(() => {
     if (error) {
@@ -58,121 +71,146 @@ const InterfacesPage = () => {
     }
   }, [error, enqueueSnackbar])
 
-  const interfaces = data?.applicationInterfaces || []
+  const applicationInterfaces = data?.applicationInterfaces || []
 
   // Filter auf Schnittstellen anwenden
-  const {
-    filterState,
-    setFilterState,
-    filteredInterfaces,
-    resetFilters,
-    availableInterfaceTypes,
-    availableDataObjects,
-  } = useApplicationInterfaceFilter({ interfaces })
+  const { filteredApplicationInterfaces: filteredData, availableInterfaceTypes } =
+    useApplicationInterfaceFilter({
+      applicationInterfaces,
+    })
 
-  // Mutations
-  const [createApplicationInterface] = useMutation(CREATE_APPLICATION_INTERFACE)
-  const [updateApplicationInterface] = useMutation(UPDATE_APPLICATION_INTERFACE)
-  const [deleteApplicationInterface] = useMutation(DELETE_APPLICATION_INTERFACE)
+  // Mutation zum Erstellen einer neuen Schnittstelle
+  const [createApplicationInterface, { loading: isCreating }] = useMutation(
+    CREATE_APPLICATION_INTERFACE,
+    {
+      onCompleted: () => {
+        enqueueSnackbar('Schnittstelle erfolgreich erstellt', { variant: 'success' })
+        refetch()
+      },
+      onError: error => {
+        enqueueSnackbar(`Fehler beim Erstellen der Schnittstelle: ${error.message}`, {
+          variant: 'error',
+        })
+      },
+    }
+  )
+
+  // Mutation zum Aktualisieren einer bestehenden Schnittstelle
+  const [updateApplicationInterface] = useMutation(UPDATE_APPLICATION_INTERFACE, {
+    onCompleted: () => {
+      enqueueSnackbar('Schnittstelle erfolgreich aktualisiert', { variant: 'success' })
+      refetch()
+    },
+    onError: error => {
+      enqueueSnackbar(`Fehler beim Aktualisieren der Schnittstelle: ${error.message}`, {
+        variant: 'error',
+      })
+    },
+  })
+
+  // Mutation zum Löschen einer Schnittstelle
+  const [deleteApplicationInterface] = useMutation(DELETE_APPLICATION_INTERFACE, {
+    onCompleted: () => {
+      enqueueSnackbar('Schnittstelle erfolgreich gelöscht', { variant: 'success' })
+      refetch()
+    },
+    onError: error => {
+      enqueueSnackbar(`Fehler beim Löschen der Schnittstelle: ${error.message}`, {
+        variant: 'error',
+      })
+    },
+  })
 
   // Handler für das Erstellen einer neuen Schnittstelle
-  const handleCreateInterface = async (values: ApplicationInterfaceFormValues) => {
-    try {
-      await createApplicationInterface({
-        variables: {
-          input: [
-            {
-              name: values.name,
-              description: values.description,
-              interfaceType: values.interfaceType,
-              dataObjects: values.dataObjectIds?.length
-                ? {
-                    connect: values.dataObjectIds.map(id => ({
-                      where: {
-                        node: { id: { eq: id } },
-                      },
-                    })),
-                  }
-                : undefined,
-            },
-          ],
-        },
-      })
-      enqueueSnackbar('Schnittstelle erfolgreich erstellt', { variant: 'success' })
-      setShowNewInterfaceForm(false)
-      await refetch()
-    } catch {
-      enqueueSnackbar('Fehler beim Erstellen der Schnittstelle', { variant: 'error' })
+  const handleCreateApplicationInterfaceSubmit = async (data: ApplicationInterfaceFormValues) => {
+    const input = {
+      name: data.name,
+      description: data.description,
+      interfaceType: data.interfaceType,
+      dataObjects: data.dataObjects?.length
+        ? {
+            connect: data.dataObjects.map(id => ({
+              where: {
+                node: { id: { eq: id } },
+              },
+            })),
+          }
+        : undefined,
     }
+
+    await createApplicationInterface({
+      variables: { input: [input] },
+    })
+
+    // Formular nach dem Erstellen schließen
+    setShowNewApplicationInterfaceForm(false)
   }
 
-  // Handler für das Aktualisieren einer Schnittstelle
-  const handleUpdateInterface = async (values: ApplicationInterfaceFormValues) => {
-    if (!editingInterface?.id) return
-
-    try {
-      await updateApplicationInterface({
-        variables: {
-          id: editingInterface.id,
-          input: {
-            name: { set: values.name },
-            description: { set: values.description },
-            interfaceType: { set: values.interfaceType },
-            dataObjects: values.dataObjectIds?.length
-              ? {
-                  disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
-                  connect: values.dataObjectIds.map(id => ({
-                    where: {
-                      node: { id: { eq: id } },
-                    },
-                  })),
-                }
-              : undefined,
-          },
-        },
-      })
-      enqueueSnackbar('Schnittstelle erfolgreich aktualisiert', { variant: 'success' })
-      setEditingInterface(null)
-      await refetch()
-    } catch {
-      enqueueSnackbar('Fehler beim Aktualisieren der Schnittstelle', { variant: 'error' })
+  // Handler für das Aktualisieren einer bestehenden Schnittstelle
+  const handleUpdateApplicationInterfaceSubmit = async (
+    id: string,
+    data: ApplicationInterfaceFormValues
+  ) => {
+    // Basis-Input-Daten vorbereiten
+    const input = {
+      name: { set: data.name },
+      description: { set: data.description },
+      interfaceType: { set: data.interfaceType },
+      dataObjects: data.dataObjects?.length
+        ? {
+            disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
+            connect: data.dataObjects.map(id => ({
+              where: {
+                node: { id: { eq: id } },
+              },
+            })),
+          }
+        : undefined,
     }
+
+    await updateApplicationInterface({
+      variables: { id, input },
+    })
   }
 
-  // Handler für das Löschen einer Schnittstelle
-  const handleDeleteInterface = async (id: string) => {
-    if (!window.confirm('Möchten Sie diese Schnittstelle wirklich löschen?')) return
-
-    try {
-      await deleteApplicationInterface({
-        variables: { id },
-      })
-      enqueueSnackbar('Schnittstelle erfolgreich gelöscht', { variant: 'success' })
-      await refetch()
-    } catch {
-      enqueueSnackbar('Fehler beim Löschen der Schnittstelle', { variant: 'error' })
-    }
+  // Neue Schnittstelle erstellen
+  const handleCreateApplicationInterface = () => {
+    setShowNewApplicationInterfaceForm(true)
   }
 
-  // Handler für das Öffnen des Edit-Formulars
-  const handleEditInterface = (iface: ApplicationInterface) => {
-    setEditingInterface(iface)
+  // Schnittstelle löschen
+  const handleDeleteApplicationInterface = async (id: string) => {
+    await deleteApplicationInterface({
+      variables: { id },
+    })
+    // Automatisches Schließen erfolgt durch die Form selbst
   }
 
-  // Handler für das Öffnen der Detailansicht
-  const handleViewInterface = (id: string) => {
-    const iface = interfaces.find((i: ApplicationInterface) => i.id === id)
-    if (iface) {
-      setViewingInterface(iface)
-    }
+  // Schnittstelle Details anzeigen - Dialog innerhalb der GenericTable nutzen
+  const handleViewApplicationInterface = (id: string) => {
+    // Nichts tun, da die GenericTable-Komponente die Detail-Anzeige übernimmt
+    console.log(`Schnittstelle anzeigen mit ID: ${id}`)
   }
 
-  // Handler für Wechsel von View zu Edit
-  const handleSwitchToEdit = () => {
-    if (viewingInterface) {
-      setEditingInterface(viewingInterface)
-      setViewingInterface(null)
-    }
+  // Schnittstelle bearbeiten - Dialog innerhalb der GenericTable nutzen
+  const handleEditApplicationInterface = (id: string) => {
+    // Nichts tun, da die GenericTable-Komponente die Bearbeitung übernimmt
+    console.log(`Schnittstelle bearbeiten mit ID: ${id}`)
+  }
+
+  // Filter-Handler
+  const handleFilterChange = (newFilterValues: Partial<FilterState>) => {
+    setFilterState(prev => ({ ...prev, ...newFilterValues }))
+  }
+
+  // Filter zurücksetzen
+  const handleResetFilter = () => {
+    setFilterState({
+      interfaceTypeFilter: [],
+      searchFilter: '',
+      updatedDateRange: ['', ''],
+    })
+    setActiveFiltersCount(0)
   }
 
   return (
@@ -186,30 +224,46 @@ const InterfacesPage = () => {
             variant="contained"
             color="primary"
             startIcon={<AddIcon />}
-            onClick={() => setShowNewInterfaceForm(true)}
+            onClick={handleCreateApplicationInterface}
           >
-            Neue Schnittstelle
+            Neu erstellen
           </Button>
         )}
       </Box>
 
-      {/* Toolbar für Suche und Filter */}
-      <ApplicationInterfaceToolbar
-        globalFilter={globalFilter}
-        onGlobalFilterChange={setGlobalFilter}
-        activeFiltersCount={activeFiltersCount}
-        onFilterClick={() => setFilterOpen(true)}
-        onResetFilters={resetFilters}
-      />
+      <Card sx={{ mb: 3 }}>
+        <ApplicationInterfaceToolbar
+          globalFilter={globalFilter}
+          onGlobalFilterChange={setGlobalFilter}
+          activeFiltersCount={activeFiltersCount}
+          onFilterClick={() => setFilterOpen(true)}
+          onResetFilters={handleResetFilter}
+        />
 
-      {/* Filter-Dialog */}
+        <Paper sx={{ overflow: 'hidden' }}>
+          <ApplicationInterfaceTable
+            id="application-interface-table"
+            applicationInterfaces={filteredData}
+            loading={loading}
+            globalFilter={globalFilter}
+            sorting={sorting}
+            onSortingChange={setSorting}
+            onRowClick={handleViewApplicationInterface}
+            onEditClick={handleEditApplicationInterface}
+            onCreateApplicationInterface={handleCreateApplicationInterfaceSubmit}
+            onUpdateApplicationInterface={handleUpdateApplicationInterfaceSubmit}
+            onDeleteApplicationInterface={handleDeleteApplicationInterface}
+            dataObjects={dataObjects as DataObject[]}
+          />
+        </Paper>
+      </Card>
+
       {filterOpen && (
         <ApplicationInterfaceFilterDialog
           filterState={filterState}
           availableInterfaceTypes={availableInterfaceTypes}
-          availableDataObjects={availableDataObjects}
-          onFilterChange={newFilter => setFilterState(prev => ({ ...prev, ...newFilter }))}
-          onResetFilter={resetFilters}
+          onFilterChange={handleFilterChange}
+          onResetFilter={handleResetFilter}
           onClose={() => setFilterOpen(false)}
           onApply={count => {
             setActiveFiltersCount(count)
@@ -218,71 +272,19 @@ const InterfacesPage = () => {
         />
       )}
 
-      {/* Loading-Indikator */}
-      {loading && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
-          <CircularProgress />
-        </Box>
-      )}
-
-      {/* Tabelle mit Schnittstellen */}
-      {!loading && filteredInterfaces.length === 0 ? (
-        <Card sx={{ mb: 3, p: 4, textAlign: 'center' }}>
-          <Typography variant="h6">Keine Schnittstellen gefunden</Typography>
-          <Typography variant="body1" sx={{ mt: 2 }}>
-            Es wurden keine Schnittstellen gefunden, die den Filterkriterien entsprechen.
-          </Typography>
-        </Card>
-      ) : (
-        <ApplicationInterfaceTable
-          applicationInterfaces={filteredInterfaces}
-          loading={loading}
-          globalFilter={globalFilter}
-          sorting={sorting}
-          onSortingChange={setSorting}
-          onRowClick={handleViewInterface}
-          onEditClick={id => {
-            const iface = interfaces.find((i: ApplicationInterface) => i.id === id)
-            if (iface) handleEditInterface(iface)
-          }}
-          onDeleteApplicationInterface={handleDeleteInterface}
-        />
-      )}
-
-      {/* Formular zum Erstellen einer neuen Schnittstelle */}
-      {showNewInterfaceForm && (
+      {/* Formular für neue Schnittstelle */}
+      {showNewApplicationInterfaceForm && (
         <ApplicationInterfaceForm
-          onClose={() => setShowNewInterfaceForm(false)}
-          onSubmit={handleCreateInterface}
-          isOpen={showNewInterfaceForm}
+          isOpen={showNewApplicationInterfaceForm}
+          onClose={() => setShowNewApplicationInterfaceForm(false)}
+          onSubmit={handleCreateApplicationInterfaceSubmit}
           mode="create"
-        />
-      )}
-
-      {/* Formular zum Bearbeiten einer Schnittstelle */}
-      {editingInterface && (
-        <ApplicationInterfaceForm
-          onClose={() => setEditingInterface(null)}
-          onSubmit={handleUpdateInterface}
-          isOpen={Boolean(editingInterface)}
-          mode="edit"
-          applicationInterface={editingInterface}
-        />
-      )}
-
-      {/* Formular zum Anzeigen einer Schnittstelle */}
-      {viewingInterface && (
-        <ApplicationInterfaceForm
-          onClose={() => setViewingInterface(null)}
-          onSubmit={handleUpdateInterface} // Wird im View-Modus nicht verwendet
-          isOpen={Boolean(viewingInterface)}
-          mode="view"
-          applicationInterface={viewingInterface}
-          onEditMode={handleSwitchToEdit}
+          loading={isCreating}
+          dataObjects={dataObjects as DataObject[]}
         />
       )}
     </Box>
   )
 }
 
-export default InterfacesPage
+export default ApplicationInterfacesPage

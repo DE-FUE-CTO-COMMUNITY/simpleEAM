@@ -2,37 +2,14 @@
 
 import React from 'react'
 import GenericFilterDialog, { FilterField } from '../common/GenericFilterDialog'
-import { getInterfaceTypeLabel } from '../../types/applicationInterface'
+import { FilterProps } from './types'
+import { countActiveFilters } from './utils'
+import { getInterfaceTypeLabel } from './utils'
 import { InterfaceType } from '../../gql/generated'
-import { ApplicationInterfaceFilterState } from './useApplicationInterfaceFilter'
-
-interface FilterProps {
-  filterState: ApplicationInterfaceFilterState
-  availableInterfaceTypes: InterfaceType[]
-  availableDataObjects: { id: string; name: string }[]
-  onFilterChange: (newFilter: Partial<ApplicationInterfaceFilterState>) => void
-  onResetFilter: () => void
-  onClose: () => void
-  onApply: (activeCount: number) => void
-}
-
-/**
- * Zählt die Anzahl der aktiven Filter
- */
-export const countActiveFilters = (filterState: ApplicationInterfaceFilterState): number => {
-  let count = 0
-
-  if (filterState.interfaceTypeFilter?.length) count++
-  if (filterState.dataObjectFilter?.length) count++
-  if (filterState.updatedDateRange?.from || filterState.updatedDateRange?.to) count++
-
-  return count
-}
 
 const ApplicationInterfaceFilterDialog: React.FC<FilterProps> = ({
   filterState,
   availableInterfaceTypes,
-  availableDataObjects,
   onFilterChange,
   onResetFilter,
   onClose,
@@ -40,7 +17,7 @@ const ApplicationInterfaceFilterDialog: React.FC<FilterProps> = ({
 }) => {
   // Konfiguration der Filterfelder
   const filterFields: FilterField[] = [
-    // Schnittstellentyp Filter
+    // Schnittstellentyp-Filter
     {
       id: 'interfaceTypeFilter',
       label: 'Schnittstellentyp',
@@ -49,22 +26,18 @@ const ApplicationInterfaceFilterDialog: React.FC<FilterProps> = ({
         value: type,
         label: getInterfaceTypeLabel(type),
       })),
-      valueFormatter: value => getInterfaceTypeLabel(value as InterfaceType),
     },
-    // Datenobjekte Filter
+    // Suchtext Filter
     {
-      id: 'dataObjectFilter',
-      label: 'Datenobjekte',
-      type: 'multiSelect',
-      options: availableDataObjects.map(obj => ({
-        value: obj.id,
-        label: obj.name,
-      })),
+      id: 'searchFilter',
+      label: 'Suche',
+      type: 'text',
+      placeholder: 'Geben Sie einen Suchtext ein...',
     },
-    // Aktualisiert-Filter
+    // Aktualisierungsdatum Filter
     {
       id: 'updatedDateRange',
-      label: 'Aktualisiert (Datum)',
+      label: 'Aktualisiert im Zeitraum',
       type: 'dateRange',
       fromLabel: 'Von',
       toLabel: 'Bis',
@@ -80,7 +53,7 @@ const ApplicationInterfaceFilterDialog: React.FC<FilterProps> = ({
       onResetFilter={onResetFilter}
       onClose={onClose}
       onApply={onApply}
-      countActiveFilters={fs => countActiveFilters(fs as any)}
+      countActiveFilters={countActiveFilters}
     />
   )
 }
