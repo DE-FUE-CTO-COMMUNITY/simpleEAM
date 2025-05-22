@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import { Box, Typography, Button, Card, Paper } from '@mui/material'
 import { Add as AddIcon } from '@mui/icons-material'
 import { useQuery, useMutation } from '@apollo/client'
@@ -25,7 +24,6 @@ import { Capability, FilterState } from '@/components/capabilities/types'
 
 const CapabilitiesPage = () => {
   const { authenticated } = useAuth()
-  const router = useRouter()
   const { enqueueSnackbar } = useSnackbar()
   const [globalFilter, setGlobalFilter] = useState<string>('')
   const [sorting, setSorting] = useState([{ id: 'name', desc: false }])
@@ -260,14 +258,16 @@ const CapabilitiesPage = () => {
     // Automatisches Schließen erfolgt durch die CapabilityForm selbst
   }
 
-  // Business Capability Details anzeigen
+  // Business Capability Details anzeigen - Dialog innerhalb der GenericTable nutzen
   const handleViewCapability = (id: string) => {
-    router.push(`/capabilities/${id}`)
+    // Nichts tun, da die GenericTable-Komponente die Detail-Anzeige übernimmt
+    console.log(`Capability anzeigen mit ID: ${id}`)
   }
 
-  // Business Capability bearbeiten
+  // Business Capability bearbeiten - Dialog innerhalb der GenericTable nutzen
   const handleEditCapability = (id: string) => {
-    router.push(`/capabilities/edit/${id}`)
+    // Nichts tun, da die GenericTable-Komponente die Bearbeitung übernimmt
+    console.log(`Capability bearbeiten mit ID: ${id}`)
   }
 
   // Filter-Handler

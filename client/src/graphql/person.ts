@@ -21,6 +21,91 @@ export const GET_PERSONS = gql`
       email
       department
       role
+      phone
+      createdAt
+      updatedAt
+      ownedCapabilities {
+        id
+        name
+      }
+      ownedApplications {
+        id
+        name
+      }
+      ownedDataObjects {
+        id
+        name
+      }
+    }
+  }
+`
+
+export const GET_PERSON = gql`
+  query GetPerson($id: ID!) {
+    person(where: { id: $id }) {
+      id
+      firstName
+      lastName
+      email
+      department
+      role
+      phone
+      createdAt
+      updatedAt
+      ownedCapabilities {
+        id
+        name
+      }
+      ownedApplications {
+        id
+        name
+      }
+      ownedDataObjects {
+        id
+        name
+      }
+    }
+  }
+`
+
+export const CREATE_PERSON = gql`
+  mutation CreatePerson($input: [PersonCreateInput!]!) {
+    createPeople(input: $input) {
+      people {
+        id
+        firstName
+        lastName
+        email
+        department
+        role
+        phone
+        createdAt
+      }
+    }
+  }
+`
+
+export const UPDATE_PERSON = gql`
+  mutation UpdatePerson($id: ID!, $input: PersonUpdateInput!) {
+    updatePeople(where: { id: { eq: $id } }, update: $input) {
+      people {
+        id
+        firstName
+        lastName
+        email
+        department
+        role
+        phone
+        updatedAt
+      }
+    }
+  }
+`
+
+export const DELETE_PERSON = gql`
+  mutation DeletePerson($id: ID!) {
+    deletePeople(where: { id: { eq: $id } }) {
+      nodesDeleted
     }
   }
 `

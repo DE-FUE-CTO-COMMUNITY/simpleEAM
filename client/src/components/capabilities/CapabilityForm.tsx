@@ -98,17 +98,20 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
   // Personen laden
   const { data: personData, loading: personLoading } = useQuery(GET_PERSONS)
 
-  // Formulardaten initialisieren
-  const defaultValues: CapabilityFormValues = {
-    name: capability?.name ?? '',
-    description: capability?.description ?? '',
-    maturityLevel: capability?.maturityLevel ?? 0,
-    businessValue: capability?.businessValue ?? 0,
-    status: capability?.status ?? CapabilityStatus.ACTIVE,
-    ownerId: capability?.owners && capability.owners.length > 0 ? capability.owners[0]?.id : '',
-    tags: capability?.tags ?? [],
-    parentId: capability?.parents && capability.parents.length > 0 ? capability.parents[0]?.id : '',
-  }
+  // Formulardaten mit useMemo initialisieren, um unnötige Re-Renders zu vermeiden
+  const defaultValues = React.useMemo<CapabilityFormValues>(
+    () => ({
+      name: '',
+      description: '',
+      maturityLevel: 0,
+      businessValue: 0,
+      status: CapabilityStatus.ACTIVE,
+      ownerId: '',
+      tags: [],
+      parentId: '',
+    }),
+    []
+  )
 
   // TanStack Form konfigurieren
   const form = useForm({

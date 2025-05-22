@@ -535,7 +535,8 @@ export function GenericTable<T extends { id: string }, F>({
           application={selectedItem} // Für ApplicationForm
           capability={selectedItem} // Für CapabilityForm
           dataObject={selectedItem} // Für DataObjectForm
-          applicationInterface={selectedItem} // Für ApplicationInterfaceForm - Wichtig für die Fehlerbehebung!
+          applicationInterface={selectedItem} // Für ApplicationInterfaceForm
+          person={selectedItem} // Für PersonForm - hinzugefügt
           data={selectedItem} // Fallback für generische Forms
           {...(mapDataToFormValues && selectedItem ? mapDataToFormValues(selectedItem) : {})}
           mode={formMode}
