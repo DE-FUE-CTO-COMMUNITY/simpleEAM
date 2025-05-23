@@ -127,18 +127,7 @@ const ArchitecturesPage = () => {
     onCompleted: data => {
       // Überprüfe das Ergebnis der Mutation
       if (data?.updateArchitectures?.architectures?.length > 0) {
-        const updatedArch = data.updateArchitectures.architectures[0]
-
-        // Prüfen, ob Owner korrekt gesetzt wurde
-        const ownerInfo =
-          updatedArch.owners?.length > 0
-            ? `${updatedArch.owners[0].firstName} ${updatedArch.owners[0].lastName}`
-            : 'Kein Verantwortlicher'
-
-        enqueueSnackbar(
-          `Architektur erfolgreich aktualisiert: ${updatedArch.name} (${ownerInfo})`,
-          { variant: 'success' }
-        )
+        enqueueSnackbar('Architektur erfolgreich aktualisiert', { variant: 'success' })
       } else {
         enqueueSnackbar(
           'Architektur wurde aktualisiert, aber die Daten wurden nicht zurückgegeben',
@@ -409,13 +398,9 @@ const ArchitecturesPage = () => {
       }
     }
 
-    try {
-      await updateArchitecture({
-        variables: { id, input },
-      })
-    } catch (error: any) {
-      throw error
-    }
+    await updateArchitecture({
+      variables: { id, input },
+    })
   }
 
   // Neue Architektur erstellen
@@ -431,15 +416,13 @@ const ArchitecturesPage = () => {
   }
 
   // Architektur Details anzeigen - leere Implementierung für GenericTable-Dialog
-  const handleViewArchitecture = (id: string) => {
+  const handleViewArchitecture = (_id: string) => {
     // Absichtlich leer - GenericTable übernimmt das Öffnen des Dialogs
-    console.log('View architecture requested:', id)
   }
 
   // Architektur bearbeiten - leere Implementierung für GenericTable-Dialog
-  const handleEditArchitecture = (id: string) => {
+  const handleEditArchitecture = (_id: string) => {
     // Absichtlich leer - GenericTable übernimmt das Öffnen des Dialogs
-    console.log('Edit architecture requested:', id)
   }
 
   // Filter-Handler
