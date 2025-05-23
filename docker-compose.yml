@@ -80,7 +80,7 @@ services:
       - KC_DB_URL=jdbc:postgresql://keycloak-db:5432/${KC_DB_NAME}
       - KC_DB_USERNAME=${KC_DB_USER}
       - KC_DB_PASSWORD=${KC_DB_PASSWORD}
-      - KC_HOSTNAME=${AUTH_SUBDOMAIN}.${BASE_DOMAIN}
+      - KC_HOSTNAME_URL=https://${AUTH_SUBDOMAIN}.${BASE_DOMAIN}/
       - KC_HOSTNAME_STRICT=false
       - KC_HOSTNAME_STRICT_HTTPS=false
       - KC_PROXY=edge
@@ -111,7 +111,7 @@ services:
     image: postgres:15
     container_name: simple-eam-keycloak-db
     volumes:
-      - keycloak-data:/var/lib/postgresql/data
+      - ./auth/data:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=${KC_DB_NAME}
       - POSTGRES_USER=${KC_DB_USER}
@@ -152,6 +152,3 @@ networks:
     driver: bridge
   traefik:
     external: true
-
-volumes:
-  keycloak-data:
