@@ -245,30 +245,6 @@ export function GenericTable<T extends { id: string }, F>({
     )
   }
 
-  // Keine Daten vorhanden und Button zum Erstellen eines neuen Eintrags
-  if (data.length === 0) {
-    return (
-      <Box sx={{ textAlign: 'center', py: 5 }}>
-        {emptyMessage}
-        {isArchitect() && onCreate && (
-          <Box mt={2}>
-            <Button
-              variant="outlined"
-              color="primary"
-              onClick={() => {
-                setSelectedItem(null)
-                setFormMode('create')
-                setIsFormOpen(true)
-              }}
-            >
-              {createButtonLabel}
-            </Button>
-          </Box>
-        )}
-      </Box>
-    )
-  }
-
   return (
     <>
       <Box sx={{ overflow: 'auto' }}>
@@ -525,7 +501,8 @@ export function GenericTable<T extends { id: string }, F>({
           capability={selectedItem} // Für CapabilityForm
           dataObject={selectedItem} // Für DataObjectForm
           applicationInterface={selectedItem} // Für ApplicationInterfaceForm
-          person={selectedItem} // Für PersonForm - hinzugefügt
+          architecture={selectedItem} // Für ArchitectureForm - hinzugefügt
+          person={selectedItem} // Für PersonForm
           data={selectedItem} // Fallback für generische Forms
           {...(mapDataToFormValues && selectedItem ? mapDataToFormValues(selectedItem) : {})}
           mode={formMode}

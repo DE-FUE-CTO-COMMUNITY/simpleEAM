@@ -13,9 +13,7 @@ import {
   DELETE_ARCHITECTURE,
 } from '@/graphql/architecture'
 import { ArchitectureDomain, ArchitectureType as ArchitectureEnumType } from '@/gql/generated'
-import ArchitectureForm, {
-  ArchitectureFormValues,
-} from '@/components/architectures/ArchitectureForm'
+import ArchitectureForm, { ArchitectureFormValues } from '@/components/architectures/ArchitectureForm'
 
 // Importiere die ausgelagerten Komponenten
 import ArchitectureTable from '@/components/architectures/ArchitectureTable'
@@ -124,31 +122,8 @@ const ArchitecturesPage = () => {
 
   // Mutation zum Aktualisieren einer bestehenden Architektur
   const [updateArchitecture] = useMutation(UPDATE_ARCHITECTURE, {
-    onCompleted: data => {
-      // Überprüfe das Ergebnis der Mutation
-      if (data?.updateArchitectures?.architectures?.length > 0) {
-        const updatedArch = data.updateArchitectures.architectures[0]
-
-        // Prüfen, ob Owner korrekt gesetzt wurde
-        const ownerInfo =
-          updatedArch.owners?.length > 0
-            ? `${updatedArch.owners[0].firstName} ${updatedArch.owners[0].lastName}`
-            : 'Kein Verantwortlicher'
-
-        enqueueSnackbar(
-          `Architektur erfolgreich aktualisiert: ${updatedArch.name} (${ownerInfo})`,
-          { variant: 'success' }
-        )
-      } else {
-        enqueueSnackbar(
-          'Architektur wurde aktualisiert, aber die Daten wurden nicht zurückgegeben',
-          {
-            variant: 'warning',
-          }
-        )
-      }
-
-      // Wir laden explizit neu, um die Änderungen zu sehen
+    onCompleted: () => {
+      enqueueSnackbar('Architektur erfolgreich aktualisiert', { variant: 'success' })
       refetch()
     },
     onError: error => {
@@ -156,9 +131,6 @@ const ArchitecturesPage = () => {
         variant: 'error',
       })
     },
-    // Vollständige Aktualisierung der Apollo-Cache nach Mutation
-    refetchQueries: [{ query: GET_ARCHITECTURES }],
-    awaitRefetchQueries: true,
   })
 
   // Mutation zum Löschen einer Architektur
@@ -193,7 +165,6 @@ const ArchitecturesPage = () => {
       domain: architectureData.domain,
       type: architectureData.type,
       tags: architectureData.tags,
-      timestamp: architectureData.timestamp.toISOString(), // Verwende das vom Benutzer ausgewählte Gültigkeitsdatum
       // Wenn ein Besitzer ausgewählt wurde, verwenden wir die owners-Struktur
       ...(ownerId
         ? {
@@ -272,29 +243,13 @@ const ArchitecturesPage = () => {
       ...architectureData
     } = data
 
-    // Sicherstellen, dass ein gültiges Datum verwendet wird
-    let timestamp: Date
-
-    if (architectureData.timestamp instanceof Date) {
-      timestamp = architectureData.timestamp
-    } else if (typeof architectureData.timestamp === 'string') {
-      try {
-        timestamp = new Date(architectureData.timestamp)
-      } catch {
-        timestamp = new Date()
-      }
-    } else {
-      timestamp = new Date()
-    }
-
     // Basis-Input-Daten vorbereiten
     const input: Record<string, any> = {
       name: { set: architectureData.name },
       description: { set: architectureData.description },
       domain: { set: architectureData.domain },
       type: { set: architectureData.type },
-      tags: { set: Array.isArray(architectureData.tags) ? architectureData.tags : [] },
-      timestamp: { set: timestamp.toISOString() }, // Verwende das vom Benutzer ausgewählte Datum
+      tags: { set: architectureData.tags },
     }
 
     // Aktualisierung der Owner-Beziehung, wenn ein Besitzer ausgewählt wurde
@@ -310,112 +265,118 @@ const ArchitecturesPage = () => {
               },
             },
           },
-        ],
+        ], // Verbinde mit dem neuen Besitzer
       }
     } else {
       // Wenn kein Besitzer ausgewählt wurde, entfernen wir alle Besitzer
       input.owners = {
-        disconnect: [{ where: {} }],
+        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
       }
     }
 
     // Aktualisierung der Application-Beziehungen
     if (containsApplicationIds && containsApplicationIds.length > 0) {
+      // Wir setzen die containsApplications-Beziehung
       input.containsApplications = {
-        disconnect: [{ where: {} }],
+        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
         connect: containsApplicationIds.map(appId => ({
           where: {
             node: {
               id: { eq: appId },
             },
           },
-        })),
+        })), // Verbinde mit den neuen Applikationen
       }
     } else {
+      // Wenn keine Applikationen ausgewählt wurden, entfernen wir alle Verbindungen
       input.containsApplications = {
-        disconnect: [{ where: {} }],
+        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
       }
     }
 
     // Aktualisierung der Capability-Beziehungen
     if (containsCapabilityIds && containsCapabilityIds.length > 0) {
+      // Wir setzen die containsCapabilities-Beziehung
       input.containsCapabilities = {
-        disconnect: [{ where: {} }],
+        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
         connect: containsCapabilityIds.map(capId => ({
           where: {
             node: {
               id: { eq: capId },
             },
           },
-        })),
+        })), // Verbinde mit den neuen Capabilities
       }
     } else {
+      // Wenn keine Capabilities ausgewählt wurden, entfernen wir alle Verbindungen
       input.containsCapabilities = {
-        disconnect: [{ where: {} }],
+        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
       }
     }
 
     // Aktualisierung der DataObject-Beziehungen
     if (containsDataObjectIds && containsDataObjectIds.length > 0) {
+      // Wir setzen die containsDataObjects-Beziehung
       input.containsDataObjects = {
-        disconnect: [{ where: {} }],
+        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
         connect: containsDataObjectIds.map(doId => ({
           where: {
             node: {
               id: { eq: doId },
             },
           },
-        })),
+        })), // Verbinde mit den neuen DataObjects
       }
     } else {
+      // Wenn keine DataObjects ausgewählt wurden, entfernen wir alle Verbindungen
       input.containsDataObjects = {
-        disconnect: [{ where: {} }],
+        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
       }
     }
 
     // Aktualisierung der Diagram-Beziehungen
     if (diagramIds && diagramIds.length > 0) {
+      // Wir setzen die diagrams-Beziehung
       input.diagrams = {
-        disconnect: [{ where: {} }],
+        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
         connect: diagramIds.map(diagId => ({
           where: {
             node: {
               id: { eq: diagId },
             },
           },
-        })),
+        })), // Verbinde mit den neuen Diagrammen
       }
     } else {
+      // Wenn keine Diagramme ausgewählt wurden, entfernen wir alle Verbindungen
       input.diagrams = {
-        disconnect: [{ where: {} }],
+        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
       }
     }
 
     // Aktualisierung der ParentArchitecture-Beziehung
     if (parentArchitectureId) {
+      // Wir setzen die parentArchitecture-Beziehung
       input.parentArchitecture = {
-        disconnect: [{ where: {} }],
+        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
         connect: {
           where: {
             node: {
               id: { eq: parentArchitectureId },
             },
           },
-        },
+        }, // Verbinde mit der neuen Elternarchitektur
       }
     } else {
+      // Wenn keine Elternarchitektur ausgewählt wurde, entfernen wir alle Verbindungen
       input.parentArchitecture = {
-        disconnect: [{ where: {} }],
+        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
       }
     }
 
-    try {
-      await updateArchitecture({
-        variables: { id, input },
-      })
-    } catch (error: any) {
-      throw error
-    }
+    await updateArchitecture({
+      variables: { id, input },
+    })
   }
 
   // Neue Architektur erstellen
@@ -518,7 +479,6 @@ const ArchitecturesPage = () => {
           onFilterClick={() => setIsFilterDialogOpen(true)}
           onAddClick={handleCreateArchitecture}
           activeFiltersCount={activeFiltersCount}
-          onResetFilters={handleResetFilter}
         />
 
         {/* Tabelle der Architekturen */}

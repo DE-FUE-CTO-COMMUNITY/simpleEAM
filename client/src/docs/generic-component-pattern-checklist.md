@@ -245,3 +245,28 @@ return (
   />
 )
 ```
+
+## 12. Prinzip der Nicht-Modifikation generischer Komponenten
+
+- [ ] **GRUNDLEGENDE REGEL:** Generische Komponenten (GenericTable, GenericForm, GenericToolbar, GenericFilterDialog) dürfen NIEMALS modifiziert werden
+- [ ] Bei neuen Anforderungen für eine entity-spezifische Komponente:
+  - [ ] Vorhandene Schnittstellen der generischen Komponenten nutzen
+  - [ ] Die generischen Props und Funktionen wie vorgesehen verwenden
+  - [ ] Bei Bedarf die entity-spezifischen Komponenten anpassen, NICHT die generischen Komponenten
+  - [ ] Wenn erforderlich, gemeinsame neue Funktionalität mit dem Team besprechen, bevor generische Komponenten geändert werden
+
+### 12.1 Korrekte Vorgehensweise bei neuen Anforderungen
+
+1. **Analyse:** Prüfen, ob die Anforderung mit bestehenden Props und Funktionen der generischen Komponente erfüllt werden kann
+2. **Anpassung:** Die entity-spezifische Komponente anpassen, um mit den generischen Schnittstellen zu arbeiten
+3. **Erweiterung:** Das bestehende Pattern erweitern, ohne die generische Basiskomponente zu verändern
+4. **Konsultation:** Bei echtem Bedarf nach neuer generischer Funktionalität das Entwicklungsteam konsultieren
+
+### 12.2 Warum dieser Grundsatz wichtig ist
+
+- Modifikationen an generischen Komponenten können unbeabsichtigte Auswirkungen auf alle davon abgeleiteten Komponenten haben
+- Die Konsistenz des Gesamtsystems wird durch Einhaltung dieses Grundsatzes gewährleistet
+- Die Wartbarkeit bleibt erhalten, da generische Komponenten zuverlässige, stabile Schnittstellen bieten
+- Neue Entwickler können sich auf die bestehenden Muster verlassen
+
+> **WICHTIGER HINWEIS:** Wenn du glaubst, dass eine Änderung an einer generischen Komponente notwendig ist, halte zunächst Rücksprache mit dem Team. In fast allen Fällen lässt sich die Anforderung durch eine Anpassung der entity-spezifischen Komponente lösen, ohne die generischen Basiskomponenten zu verändern.

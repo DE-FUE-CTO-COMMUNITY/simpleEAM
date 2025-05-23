@@ -16,9 +16,9 @@ export const GET_DIAGRAMS = gql`
   query GetDiagrams {
     diagrams {
       id
-      name
+      title
       description
-      content
+      diagramJson
       createdAt
       updatedAt
     }
