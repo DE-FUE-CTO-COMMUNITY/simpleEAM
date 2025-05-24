@@ -2,9 +2,6 @@
 
 import React from 'react'
 import GenericToolbar from '../common/GenericToolbar'
-import { isArchitect } from '@/lib/auth'
-import { Button, Tooltip } from '@mui/material'
-import { Add as AddIcon } from '@mui/icons-material'
 
 interface ArchitectureToolbarProps {
   globalFilter: string
@@ -24,27 +21,8 @@ const ArchitectureToolbar: React.FC<ArchitectureToolbarProps> = ({
   activeFiltersCount,
   onFilterClick,
   onResetFilters,
-  onAddClick,
+  onAddClick: _onAddClick,
 }) => {
-  const renderExtraActions = () => {
-    if (isArchitect() && onAddClick) {
-      return (
-        <Tooltip title="Neue Architektur erstellen">
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={onAddClick}
-            startIcon={<AddIcon />}
-            sx={{ ml: 1 }}
-          >
-            Neu
-          </Button>
-        </Tooltip>
-      )
-    }
-    return null
-  }
-
   return (
     <GenericToolbar
       globalFilter={globalFilter}
@@ -56,7 +34,6 @@ const ArchitectureToolbar: React.FC<ArchitectureToolbarProps> = ({
       filterTooltip="Architekturfilter hinzufügen"
       editFilterTooltip="Architekturfilter bearbeiten"
       resetFilterTooltip="Architekturfilter zurücksetzen"
-      extraActions={renderExtraActions()}
     />
   )
 }

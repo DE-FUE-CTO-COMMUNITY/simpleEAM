@@ -79,7 +79,7 @@ const ArchitectureFilterDialog: React.FC<FilterProps> = ({
       title="Filter für Architekturen"
       filterState={filterState}
       filterFields={filterFields}
-      countActiveFilters={countActiveFilters}
+      countActiveFilters={countActiveFilters as (filterState: any) => number}
       onFilterChange={onFilterChange}
       onResetFilter={onResetFilter}
       onClose={onClose}

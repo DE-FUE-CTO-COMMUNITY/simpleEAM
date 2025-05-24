@@ -3,7 +3,7 @@
 import {
   Architecture as GeneratedArchitecture,
   ArchitectureDomain,
-  ArchitectureType,
+  ArchitectureType as GeneratedArchitectureType,
 } from '../../gql/generated'
 
 // Nutze den generierten Typ als Basis und passe ihn für unsere Komponenten an
@@ -29,7 +29,7 @@ export type ArchitectureType = Pick<
 
 export interface FilterState {
   domainFilter: ArchitectureDomain[]
-  typeFilter: ArchitectureType[]
+  typeFilter: GeneratedArchitectureType[]
   tagsFilter: string[]
   descriptionFilter: string
   ownerFilter: string
@@ -39,7 +39,7 @@ export interface FilterState {
 export interface FilterProps {
   filterState: FilterState
   availableDomains: ArchitectureDomain[]
-  availableTypes: ArchitectureType[]
+  availableTypes: GeneratedArchitectureType[]
   availableTags: string[]
   onFilterChange: (newFilter: Partial<FilterState>) => void
   onResetFilter: () => void

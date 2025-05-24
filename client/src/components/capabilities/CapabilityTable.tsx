@@ -130,7 +130,7 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
       status: capability.status ?? CapabilityStatus.ACTIVE,
       ownerId: capability.owners && capability.owners.length > 0 ? capability.owners[0].id : '',
       tags: capability.tags ?? [],
-      parentId: capability.parents && capability.parents.length > 0 ? capability.parents[0].id : '',
+      parentId: '',
     }
   }
 
