@@ -77,9 +77,12 @@ const PersonForm: React.FC<PersonFormProps> = ({
       await onSubmit(formattedValues)
     },
     validators: {
-      // Formularvalidierung mit Zod Schema
+      // Validierung bei allen Ereignissen durchführen
       onChange: personSchema,
-      onSubmit: personSchema,
+      onBlur: personSchema, // Validieren beim Verlassen eines Feldes
+      onSubmit: personSchema, // Validieren beim Absenden
+      // Initiale Validierung beim Laden des Formulars
+      onMount: personSchema,
     },
   })
 

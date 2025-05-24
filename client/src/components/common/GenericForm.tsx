@@ -230,6 +230,16 @@ const GenericForm: React.FC<GenericFormProps> = ({
   const isEditMode = mode === 'edit'
   const isCreateMode = mode === 'create'
 
+  // Bei offenem Dialog alle Felder manuell validieren
+  React.useEffect(() => {
+    if (isOpen && !isViewMode) {
+      // Wir warten einen Moment, bis das Formular vollständig initialisiert ist
+      setTimeout(() => {
+        form.validate()
+      }, 100)
+    }
+  }, [form, isOpen, isViewMode])
+
   // Handler für Tab-Wechsel
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue)
@@ -328,7 +338,8 @@ const GenericForm: React.FC<GenericFormProps> = ({
               }
 
               const disabled = isViewMode || isLoading || !!field.disabled
-              const isError = formField.state.meta.isTouched && !formField.state.meta.isValid
+              // Ein Feld hat einen Fehler, wenn es nicht gültig ist (unabhängig vom Touch-Status)
+              const isError = !formField.state.meta.isValid
 
               return (
                 <FormControl fullWidth={field.fullWidth !== false} error={isError} sx={{ mb: 2 }}>
@@ -682,7 +693,10 @@ const GenericForm: React.FC<GenericFormProps> = ({
                   variant="contained"
                   color="primary"
                   startIcon={isLoading ? undefined : <SaveIcon />}
-                  disabled={isLoading || (disableSubmitOnErrors && !form.state.canSubmit)}
+                  disabled={
+                    isLoading ||
+                    (disableSubmitOnErrors && (!form.state.canSubmit || !form.state.isValid))
+                  }
                 >
                   {isLoading ? (
                     <>

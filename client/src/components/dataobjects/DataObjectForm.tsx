@@ -91,9 +91,12 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
       await onSubmit(value)
     },
     validators: {
-      // Formularvalidierung mit Zod Schema
+      // Validierung bei allen Ereignissen durchführen
       onChange: dataObjectSchema,
-      onSubmit: dataObjectSchema,
+      onBlur: dataObjectSchema, // Validieren beim Verlassen eines Feldes
+      onSubmit: dataObjectSchema, // Validieren beim Absenden
+      // Initiale Validierung beim Laden des Formulars
+      onMount: dataObjectSchema,
     },
   })
 

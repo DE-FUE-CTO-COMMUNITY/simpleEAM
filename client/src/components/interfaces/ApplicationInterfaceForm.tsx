@@ -87,9 +87,12 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       await onSubmit(formattedValues)
     },
     validators: {
-      // Formularvalidierung mit Zod Schema
+      // Validierung bei allen Ereignissen durchführen
       onChange: applicationInterfaceSchema,
-      onSubmit: applicationInterfaceSchema,
+      onBlur: applicationInterfaceSchema, // Validieren beim Verlassen eines Feldes
+      onSubmit: applicationInterfaceSchema, // Validieren beim Absenden
+      // Initiale Validierung beim Laden des Formulars
+      onMount: applicationInterfaceSchema,
     },
   })
 
