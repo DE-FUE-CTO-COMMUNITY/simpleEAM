@@ -81,8 +81,6 @@ export function GenericTable<T extends { id: string }, F>({
   // Handler für das Öffnen des Formulars zur Detailansicht
   const handleViewItemClick = useCallback(
     (id: string) => {
-      console.log('GenericTable - handleViewItemClick mit ID:', id)
-
       if (!id) {
         console.error('GenericTable - Keine gültige ID für die Ansicht erhalten')
         return
@@ -91,12 +89,10 @@ export function GenericTable<T extends { id: string }, F>({
       const item = data.find(i => getIdFromData(i) === id)
 
       if (item) {
-        console.log('GenericTable - Item in Tabellendaten gefunden:', item)
         setSelectedItem(item)
         setFormMode('view')
         setIsFormOpen(true)
       } else {
-        console.log('GenericTable - Item nicht in lokalen Daten gefunden, onRowClick aufrufen')
         onRowClick(id)
       }
     },
@@ -323,7 +319,6 @@ export function GenericTable<T extends { id: string }, F>({
                 }}
                 onClick={() => {
                   const id = getIdFromData(row.original)
-                  console.log('GenericTable - Zeile geklickt, ID:', id, 'Datensatz:', row.original)
                   if (id) {
                     handleViewItemClick(id)
                   } else {

@@ -119,9 +119,6 @@ const PersonForm: React.FC<PersonFormProps> = ({
     if (!hasHandledForm) {
       // Immer mit Standardwerten zurücksetzen, aber Dialog nicht automatisch schließen
       form.reset(defaultValues)
-
-      // Log für Debugging-Zwecke
-      console.log('PersonForm: Formular mit Standardwerten zurückgesetzt', { mode, person })
     }
   }, [form, person, isOpen, defaultValues, mode, onClose])
 

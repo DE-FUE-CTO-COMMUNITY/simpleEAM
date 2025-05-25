@@ -261,13 +261,11 @@ const CapabilitiesPage = () => {
   // Business Capability Details anzeigen - Dialog innerhalb der GenericTable nutzen
   const handleViewCapability = (id: string) => {
     // Nichts tun, da die GenericTable-Komponente die Detail-Anzeige übernimmt
-    console.log(`Capability anzeigen mit ID: ${id}`)
   }
 
   // Business Capability bearbeiten - Dialog innerhalb der GenericTable nutzen
   const handleEditCapability = (id: string) => {
     // Nichts tun, da die GenericTable-Komponente die Bearbeitung übernimmt
-    console.log(`Capability bearbeiten mit ID: ${id}`)
   }
 
   // Filter-Handler

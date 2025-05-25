@@ -189,13 +189,11 @@ function ApplicationInterfacesPage() {
   // Schnittstelle Details anzeigen - Dialog innerhalb der GenericTable nutzen
   const handleViewApplicationInterface = (id: string) => {
     // Nichts tun, da die GenericTable-Komponente die Detail-Anzeige übernimmt
-    console.log(`Schnittstelle anzeigen mit ID: ${id}`)
   }
 
   // Schnittstelle bearbeiten - Dialog innerhalb der GenericTable nutzen
   const handleEditApplicationInterface = (id: string) => {
     // Nichts tun, da die GenericTable-Komponente die Bearbeitung übernimmt
-    console.log(`Schnittstelle bearbeiten mit ID: ${id}`)
   }
 
   // Filter-Handler

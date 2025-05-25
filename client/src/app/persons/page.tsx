@@ -178,13 +178,11 @@ function PersonsPage() {
   // Person Details anzeigen - Dialog innerhalb der GenericTable nutzen
   const handleViewPerson = (id: string) => {
     // Nichts tun, da die GenericTable-Komponente die Detail-Anzeige übernimmt
-    console.log(`Person anzeigen mit ID: ${id}`)
   }
 
   // Person bearbeiten - Dialog innerhalb der GenericTable nutzen
   const handleEditPerson = (id: string) => {
     // Nichts tun, da die GenericTable-Komponente die Bearbeitung übernimmt
-    console.log(`Person bearbeiten mit ID: ${id}`)
   }
 
   // Filter-Handler
