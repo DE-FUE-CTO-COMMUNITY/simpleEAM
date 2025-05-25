@@ -1148,7 +1148,29 @@ Hydration-Fehler treten auf, wenn die serverseitig gerenderte HTML-Struktur nich
 
 ### Paketmanager
 
-- als Paketmanager yarn verwenden
+⚠️ **WICHTIG: NPM IST STRIKT VERBOTEN!** ⚠️
+
+- **AUSSCHLIESSLICH yarn verwenden** - npm ist in diesem Projekt nicht erlaubt
+- Yarn Berry (v4+) ist konfiguriert und muss verwendet werden
+- Alle Skripte und Befehle verwenden yarn, niemals npm
+
+**Verbotene Befehle:**
+
+```bash
+npm install    # ❌ NIEMALS verwenden
+npm run        # ❌ NIEMALS verwenden
+npm build      # ❌ NIEMALS verwenden
+```
+
+**Korrekte Befehle:**
+
+```bash
+yarn install   # ✅ Verwenden
+yarn run       # ✅ Verwenden
+yarn build     # ✅ Verwenden
+```
+
+Das Projekt ist so konfiguriert, dass npm-Aufrufe technisch blockiert werden.
 
 ## Projektstruktur
 

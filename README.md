@@ -2,6 +2,21 @@
 
 Ein skalierbares Enterprise Architecture Management System, das aus mehreren Docker-Containern besteht und moderne Webtechnologien nutzt.
 
+## ⚠️ WICHTIGER HINWEIS: PAKETMANAGER
+
+**🚫 NPM IST STRIKT VERBOTEN IN DIESEM PROJEKT! 🚫**
+
+Dieses Projekt verwendet **ausschließlich yarn** als Paketmanager:
+
+- ✅ `yarn install` - KORREKT
+- ✅ `yarn add package` - KORREKT
+- ✅ `yarn run script` - KORREKT
+- ❌ `npm install` - VERBOTEN
+- ❌ `npm run` - VERBOTEN
+- ❌ `npm add` - VERBOTEN
+
+Das Projekt ist technisch so konfiguriert, dass npm-Aufrufe blockiert werden.
+
 > **Hinweis für GitHub Copilot**: In diesem Projekt wird ausschließlich Yarn als Paketmanager verwendet. Bei allen Installationsbefehlen bitte immer Yarn-Syntax verwenden, nicht npm.
 
 ## Projektübersicht
