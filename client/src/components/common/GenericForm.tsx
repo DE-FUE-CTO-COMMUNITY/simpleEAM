@@ -232,16 +232,24 @@ const GenericForm: React.FC<GenericFormProps> = ({
     [form, isViewMode]
   )
 
-  // Bei offenem Dialog wird keine manuelle initiale Validierung mehr durchgeführt
-  // TanStack Form wird bei jeder Wertänderung automatisch validieren
-  // Gemäß der TanStack Form-Dokumentation: https://tanstack.com/form/latest/docs/framework/react/guides/validation
+  // Initiale Validierung für Create-Modus
+  // Im Create-Modus sollen ungültige Felder sofort als ungültig angezeigt werden
   React.useEffect(() => {
-    if (isOpen && form && !isViewMode) {
-      // Es ist keine manuelle Validierung erforderlich, da TanStack Form
-      // automatisch die Validierung beim ersten Rendern und bei Wertänderungen durchführt
-      // Die Validierung wird durch die Validator-Konfiguration in der Form-Instanz gesteuert
+    if (isOpen && form && isCreateMode) {
+      // Im Create-Modus führen wir eine initiale Validierung durch
+      // Wir verwenden einen kleinen Timeout, um sicherzustellen, dass die Form vollständig initialisiert ist
+      const timer = setTimeout(() => {
+        try {
+          // Validiere alle Felder mit dem 'change' Event-Typ
+          form.validateAllFields('change')
+        } catch (error) {
+          console.warn('Initiale Validierung fehlgeschlagen:', error)
+        }
+      }, 100)
+
+      return () => clearTimeout(timer)
     }
-  }, [form, isOpen, isViewMode])
+  }, [form, isOpen, isCreateMode])
 
   // Handler für Tab-Wechsel
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
@@ -340,15 +348,29 @@ const GenericForm: React.FC<GenericFormProps> = ({
 
             const disabled = isViewMode || isLoading || !!field.disabled
 
-            // Gemäß TanStack Form Dokumentation:
-            // TanStack Form Best Practice: Verwende isValid für einfache Fehleranzeige
-            // Dies verhindert doppelte Validierungen und entspricht der offiziellen Dokumentation
-            const shouldShowError = !formField.state.meta.isValid
+            // Erweiterte Validierungslogik für bessere UX im Create-Modus
+            // Im Create-Modus zeigen wir Validierungsfehler für ungültige Felder sofort an,
+            // auch wenn sie noch nicht berührt wurden. Im Edit-Modus verwenden wir das Standard-Verhalten.
+            const shouldShowError = isCreateMode
+              ? !formField.state.meta.isValid
+              : !formField.state.meta.isValid &&
+                (formField.state.meta.isTouched || formField.state.meta.isDirty)
+
+            // Im Create-Modus forcieren wir die Anzeige von Validierungsfehlern für Pflichtfelder
+            // die noch keinen Wert haben, unabhängig vom Touch-Status
+            const forceShowErrorInCreateMode =
+              isCreateMode &&
+              field.required &&
+              (formField.state.value === '' ||
+                formField.state.value === null ||
+                formField.state.value === undefined)
+
+            const finalShouldShowError = shouldShowError || forceShowErrorInCreateMode
 
             // Helper text logic: Korrekte Error-Behandlung für TanStack Form
             // TanStack Form errors können Objekte sein, daher müssen wir sie korrekt extrahieren
             const getHelperText = () => {
-              if (shouldShowError && formField.state.meta.errors.length > 0) {
+              if (finalShouldShowError && formField.state.meta.errors.length > 0) {
                 // Fehler korrekt als Strings extrahieren
                 return formField.state.meta.errors
                   .map((error: any) => {
@@ -364,6 +386,12 @@ const GenericForm: React.FC<GenericFormProps> = ({
                   })
                   .join(', ')
               }
+
+              // Im Create-Modus zeigen wir für Pflichtfelder ohne Wert eine Standardmeldung
+              if (forceShowErrorInCreateMode) {
+                return `${field.label} ist ein Pflichtfeld`
+              }
+
               return field.helperText || ''
             }
 
@@ -394,7 +422,7 @@ const GenericForm: React.FC<GenericFormProps> = ({
                     disabled={disabled}
                     multiline
                     rows={field.rows || 4}
-                    error={shouldShowError}
+                    error={finalShouldShowError}
                     placeholder={field.placeholder}
                     fullWidth={field.fullWidth !== false}
                     InputProps={{ readOnly: !!field.readOnly }}
@@ -410,7 +438,7 @@ const GenericForm: React.FC<GenericFormProps> = ({
                     onBlur={formField.handleBlur}
                     disabled={disabled}
                     select
-                    error={shouldShowError}
+                    error={finalShouldShowError}
                     fullWidth={field.fullWidth !== false}
                     InputProps={{ readOnly: !!field.readOnly }}
                     helperText={getHelperText()}
@@ -434,7 +462,7 @@ const GenericForm: React.FC<GenericFormProps> = ({
                     }}
                     onBlur={formField.handleBlur}
                     disabled={disabled}
-                    error={shouldShowError}
+                    error={finalShouldShowError}
                     placeholder={field.placeholder}
                     fullWidth={field.fullWidth !== false}
                     InputProps={{ readOnly: !!field.readOnly }}
@@ -453,7 +481,7 @@ const GenericForm: React.FC<GenericFormProps> = ({
                     slotProps={{
                       textField: {
                         fullWidth: field.fullWidth !== false,
-                        error: shouldShowError,
+                        error: finalShouldShowError,
                         helperText: getHelperText(),
                         onBlur: formField.handleBlur,
                         InputProps: { readOnly: !!field.readOnly },
@@ -477,7 +505,7 @@ const GenericForm: React.FC<GenericFormProps> = ({
                     slotProps={{
                       textField: {
                         fullWidth: field.fullWidth !== false,
-                        error: shouldShowError,
+                        error: finalShouldShowError,
                         helperText: getHelperText(),
                         onBlur: formField.handleBlur,
                         InputProps: { readOnly: !!field.readOnly },
@@ -575,7 +603,7 @@ const GenericForm: React.FC<GenericFormProps> = ({
                       <TextField
                         {...params}
                         label={field.label + (field.required ? ' *' : '')}
-                        error={shouldShowError}
+                        error={finalShouldShowError}
                         placeholder={field.placeholder}
                         fullWidth={field.fullWidth !== false}
                         InputProps={{
@@ -619,7 +647,7 @@ const GenericForm: React.FC<GenericFormProps> = ({
                       <TextField
                         {...params}
                         label={field.label + (field.required ? ' *' : '')}
-                        error={shouldShowError}
+                        error={finalShouldShowError}
                         placeholder={field.placeholder}
                         InputProps={{
                           ...params.InputProps,
@@ -639,7 +667,7 @@ const GenericForm: React.FC<GenericFormProps> = ({
                     onChange={e => formField.handleChange(e.target.value)}
                     onBlur={formField.handleBlur}
                     disabled={disabled}
-                    error={shouldShowError}
+                    error={finalShouldShowError}
                     placeholder={field.placeholder}
                     fullWidth={field.fullWidth !== false}
                     multiline={field.multiline}
