@@ -77,12 +77,10 @@ const PersonForm: React.FC<PersonFormProps> = ({
       await onSubmit(formattedValues)
     },
     validators: {
-      // Validierung bei allen Ereignissen durchführen
+      // Primäre Validierung bei Änderungen
       onChange: personSchema,
-      onBlur: personSchema, // Validieren beim Verlassen eines Feldes
-      onSubmit: personSchema, // Validieren beim Absenden
-      // Initiale Validierung beim Laden des Formulars
-      onMount: personSchema,
+      // Validierung beim Absenden
+      onSubmit: personSchema,
     },
   })
 

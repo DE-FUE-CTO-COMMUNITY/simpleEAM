@@ -120,12 +120,10 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
       await onSubmit(value)
     },
     validators: {
-      // Validierung bei allen Ereignissen durchführen
+      // Primäre Validierung bei Änderungen
       onChange: capabilitySchema,
-      onBlur: capabilitySchema, // Validieren beim Verlassen eines Feldes
-      onSubmit: capabilitySchema, // Validieren beim Absenden
-      // Initiale Validierung beim Laden des Formulars
-      onMount: capabilitySchema,
+      // Validierung beim Absenden
+      onSubmit: capabilitySchema,
     },
   })
 

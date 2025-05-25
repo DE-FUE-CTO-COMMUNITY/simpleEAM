@@ -145,12 +145,10 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
       await onSubmit(value)
     },
     validators: {
-      // Validierung bei allen Ereignissen durchführen
+      // Primäre Validierung bei Änderungen
       onChange: applicationSchema,
-      onBlur: applicationSchema, // Validieren beim Verlassen eines Feldes
-      onSubmit: applicationSchema, // Validieren beim Absenden
-      // Initiale Validierung beim Laden des Formulars
-      onMount: applicationSchema,
+      // Validierung beim Absenden
+      onSubmit: applicationSchema,
     },
   })
 

@@ -91,12 +91,10 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
       await onSubmit(value)
     },
     validators: {
-      // Validierung bei allen Ereignissen durchführen
+      // Primäre Validierung bei Änderungen
       onChange: dataObjectSchema,
-      onBlur: dataObjectSchema, // Validieren beim Verlassen eines Feldes
-      onSubmit: dataObjectSchema, // Validieren beim Absenden
-      // Initiale Validierung beim Laden des Formulars
-      onMount: dataObjectSchema,
+      // Validierung beim Absenden
+      onSubmit: dataObjectSchema,
     },
   })
 

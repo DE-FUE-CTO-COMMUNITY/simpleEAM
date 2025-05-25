@@ -594,7 +594,7 @@ const GenericForm: React.FC<GenericFormProps> = ({
                           ...params.InputProps,
                           readOnly: !!field.readOnly,
                         }}
-                        onBlur={() => formField.handleBlur()}
+                        onBlur={formField.handleBlur}
                         helperText={getHelperText()}
                       />
                     )}

@@ -148,7 +148,7 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
     },
     // Benutzerdefinierte Validierungsfunktionen für TanStack Form
     validators: {
-      // Validierungsfunktion für alle Ereignisse (onChange, onBlur, onMount, onSubmit)
+      // Primäre Validierungsfunktion für Änderungen
       onChange: formState => {
         try {
           // formState enthält die Werte im value-Property
@@ -178,66 +178,7 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
           return { error: 'Validierungsfehler' }
         }
       },
-      // Beim Verlassen des Feldes
-      onBlur: formState => {
-        try {
-          // formState enthält die Werte im value-Property
-          const values = formState.value
-
-          if (!values) {
-            return undefined
-          }
-
-          // Daten aus dem Formular mit Standardwerten anreichern
-          const validationData = {
-            ...values,
-            name: values.name || '',
-            description: values.description || '',
-            domain: values.domain || ArchitectureDomain.ENTERPRISE,
-            type: values.type || ArchitectureType.CURRENT_STATE,
-            timestamp: values.timestamp instanceof Date ? values.timestamp : new Date(),
-          }
-
-          // Schema-Validierung durchführen
-          architectureSchema.parse(validationData)
-          return undefined // Kein Fehler
-        } catch (e) {
-          if (e instanceof z.ZodError) {
-            return e.format()
-          }
-          return { error: 'Validierungsfehler' }
-        }
-      },
-      // Initiale Validierung beim Laden des Formulars
-      onMount: formState => {
-        try {
-          // formState enthält die Werte im value-Property
-          const values = formState.value
-
-          if (!values) {
-            return undefined
-          }
-
-          // Daten aus dem Formular mit Standardwerten anreichern
-          const validationData = {
-            ...values,
-            name: values.name || '',
-            description: values.description || '',
-            domain: values.domain || ArchitectureDomain.ENTERPRISE,
-            type: values.type || ArchitectureType.CURRENT_STATE,
-            timestamp: values.timestamp instanceof Date ? values.timestamp : new Date(),
-          }
-
-          // Schema-Validierung durchführen
-          architectureSchema.parse(validationData)
-          return undefined // Kein Fehler
-        } catch (e) {
-          if (e instanceof z.ZodError) {
-            return e.format()
-          }
-          return { error: 'Validierungsfehler' }
-        }
-      },
+      // Finale Validierung beim Absenden
       onSubmit: formState => {
         try {
           // formState enthält die Werte im value-Property
