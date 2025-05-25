@@ -162,43 +162,6 @@ function TabPanel(props: TabPanelProps) {
 }
 
 /**
- * Hilfsfunktion zur Formatierung von Validierungsfehlern gemäß TanStack Form Dokumentation
- */
-function formatValidationError(errors: unknown): string {
-  if (!errors) return ''
-
-  // TanStack Form errors sind immer Arrays von Strings oder anderen Fehlern
-  if (Array.isArray(errors)) {
-    return errors
-      .filter(error => error != null) // Filter out null/undefined
-      .map(error => {
-        if (typeof error === 'string') return error
-        if (typeof error === 'object' && error !== null) {
-          // Handle nested objects with message property
-          if ('message' in error && typeof error.message === 'string') {
-            return error.message
-          }
-          // For complex error objects, try to stringify meaningfully
-          return JSON.stringify(error)
-        }
-        return String(error)
-      })
-      .join(', ')
-  }
-
-  // Single error value
-  if (typeof errors === 'string') return errors
-  if (typeof errors === 'object' && errors !== null) {
-    if ('message' in errors && typeof errors.message === 'string') {
-      return errors.message
-    }
-    return JSON.stringify(errors)
-  }
-
-  return String(errors)
-}
-
-/**
  * Generische Formular-Komponente, die Tabs und Felder dynamisch rendert
  */
 const GenericForm: React.FC<GenericFormProps> = ({
@@ -237,19 +200,48 @@ const GenericForm: React.FC<GenericFormProps> = ({
   const isEditMode = mode === 'edit'
   const isCreateMode = mode === 'create'
 
-  // Bei offenem Dialog initiale Validierung durchführen
-  React.useEffect(() => {
-    if (isOpen && !isViewMode && form) {
-      // Gemäß TanStack Form Dokumentation:
-      // Initiale Validierung aller Felder beim Öffnen
-      const timer = setTimeout(() => {
-        // Trigger validation for all form fields to ensure proper initial state
-        form.validate('change')
-      }, 100)
+  // Memoized handlers für bessere Performance
+  const handleFormSubmit = React.useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault()
+      e.stopPropagation()
+      if (!isViewMode) {
+        // Die Formularübermittlung erfolgt über form.handleSubmit()
+        // Das ist bereits in der Form-Instanz konfiguriert
+        form.handleSubmit()
+      }
+    },
+    [form, isViewMode]
+  )
 
-      return () => clearTimeout(timer)
+  const handleSubmitClick = React.useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault()
+      // Trigger form submission with validation
+      form.handleSubmit()
+    },
+    [form]
+  )
+
+  // Bei offenem Dialog initiale Validierung nur durchführen wenn nötig
+  React.useEffect(() => {
+    if (isOpen && form && !isViewMode) {
+      // Gemäß TanStack Form Dokumentation:
+      // Initiale Validierung nur im Edit-Modus oder wenn bereits Daten vorhanden sind
+      const hasInitialValues = Object.keys(form.state.values || {}).some(
+        key => form.state.values[key] != null && form.state.values[key] !== ''
+      )
+
+      if (isEditMode || hasInitialValues) {
+        const timer = setTimeout(() => {
+          // Trigger validation for all form fields to ensure proper initial state
+          form.validate('change')
+        }, 100) // Leicht erhöhte Verzögerung für bessere UX
+
+        return () => clearTimeout(timer)
+      }
     }
-  }, [form, isOpen, isViewMode])
+  }, [form, isOpen, isViewMode, isEditMode]) // Verbesserte Dependencies
 
   // Handler für Tab-Wechsel
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
@@ -349,39 +341,56 @@ const GenericForm: React.FC<GenericFormProps> = ({
             const disabled = isViewMode || isLoading || !!field.disabled
 
             // Gemäß TanStack Form Dokumentation:
-            // Zeige Fehler wenn das Feld invalid ist UND (berührt wurde ODER form submitted wurde)
-            const shouldShowError =
-              formField.state.meta.errors.length > 0 &&
-              (formField.state.meta.isTouched ||
-                formField.state.meta.isDirty ||
-                form.state.isSubmitted)
+            // TanStack Form Best Practice: Verwende isValid für einfache Fehleranzeige
+            // Dies verhindert doppelte Validierungen und entspricht der offiziellen Dokumentation
+            const shouldShowError = !formField.state.meta.isValid
 
-            // Helper text logic: Zeige nur Validierungsfehler oder standard helperText
+            // Helper text logic: Korrekte Error-Behandlung für TanStack Form
+            // TanStack Form errors können Objekte sein, daher müssen wir sie korrekt extrahieren
             const getHelperText = () => {
-              if (shouldShowError) {
-                return formatValidationError(formField.state.meta.errors)
+              if (shouldShowError && formField.state.meta.errors.length > 0) {
+                // Fehler korrekt als Strings extrahieren
+                return formField.state.meta.errors
+                  .map((error: any) => {
+                    // Wenn der Fehler ein String ist, verwende ihn direkt
+                    if (typeof error === 'string') {
+                      return error
+                    }
+                    // Wenn der Fehler ein Objekt ist, versuche message oder toString()
+                    if (error && typeof error === 'object') {
+                      return error.message || error.toString() || 'Validierungsfehler'
+                    }
+                    return 'Validierungsfehler'
+                  })
+                  .join(', ')
               }
               return field.helperText || ''
             }
 
             return (
               <Box sx={{ mb: 2 }}>
-                <FormLabel sx={{ mb: 1, display: 'block' }}>
-                  {field.label}
-                  {field.required ? ' *' : ''}
-                </FormLabel>
+                {/* FormLabel nur für Felder anzeigen, die kein eigenes Label haben */}
+                {![
+                  'date',
+                  'datetime',
+                  'text',
+                  'textarea',
+                  'select',
+                  'number',
+                  'autocomplete',
+                ].includes(field.type) && (
+                  <FormLabel sx={{ mb: 1, display: 'block' }}>
+                    {field.label}
+                    {field.required ? ' *' : ''}
+                  </FormLabel>
+                )}
 
                 {field.type === 'textarea' && (
                   <TextField
+                    label={field.label + (field.required ? ' *' : '')}
                     value={formField.state.value === null ? '' : formField.state.value}
                     onChange={e => formField.handleChange(e.target.value)}
-                    onBlur={() => {
-                      formField.handleBlur()
-                      // Trigger validation on blur for better UX
-                      if (!formField.state.meta.isTouched) {
-                        formField.validate('change')
-                      }
-                    }}
+                    onBlur={formField.handleBlur}
                     disabled={disabled}
                     multiline
                     rows={field.rows || 4}
@@ -395,15 +404,10 @@ const GenericForm: React.FC<GenericFormProps> = ({
 
                 {field.type === 'select' && (
                   <TextField
+                    label={field.label + (field.required ? ' *' : '')}
                     value={formField.state.value === null ? '' : formField.state.value}
                     onChange={e => formField.handleChange(e.target.value)}
-                    onBlur={() => {
-                      formField.handleBlur()
-                      // Trigger validation on blur for better UX
-                      if (!formField.state.meta.isTouched) {
-                        formField.validate('change')
-                      }
-                    }}
+                    onBlur={formField.handleBlur}
                     disabled={disabled}
                     select
                     error={shouldShowError}
@@ -421,19 +425,14 @@ const GenericForm: React.FC<GenericFormProps> = ({
 
                 {field.type === 'number' && (
                   <TextField
+                    label={field.label + (field.required ? ' *' : '')}
                     type="number"
                     value={formField.state.value === null ? '' : formField.state.value}
                     onChange={e => {
                       const value = e.target.value === '' ? null : Number(e.target.value)
                       formField.handleChange(value)
                     }}
-                    onBlur={() => {
-                      formField.handleBlur()
-                      // Trigger validation on blur for better UX
-                      if (!formField.state.meta.isTouched) {
-                        formField.validate('change')
-                      }
-                    }}
+                    onBlur={formField.handleBlur}
                     disabled={disabled}
                     error={shouldShowError}
                     placeholder={field.placeholder}
@@ -445,6 +444,7 @@ const GenericForm: React.FC<GenericFormProps> = ({
 
                 {field.type === 'date' && (
                   <DatePicker
+                    label={field.label + (field.required ? ' *' : '')}
                     value={formField.state.value ? dayjs(formField.state.value) : null}
                     onChange={newValue => {
                       formField.handleChange(newValue ? newValue.toDate() : null)
@@ -455,15 +455,8 @@ const GenericForm: React.FC<GenericFormProps> = ({
                         fullWidth: field.fullWidth !== false,
                         error: shouldShowError,
                         helperText: getHelperText(),
-                        onBlur: () => {
-                          formField.handleBlur()
-                          // Trigger validation on blur for better UX
-                          if (!formField.state.meta.isTouched) {
-                            formField.validate('change')
-                          }
-                        },
+                        onBlur: formField.handleBlur,
                         InputProps: { readOnly: !!field.readOnly },
-                        required: !!field.required,
                       },
                       field: {
                         clearable: true,
@@ -475,7 +468,7 @@ const GenericForm: React.FC<GenericFormProps> = ({
 
                 {field.type === 'datetime' && (
                   <DateTimePicker
-                    label={field.label}
+                    label={field.label + (field.required ? ' *' : '')}
                     value={formField.state.value ? dayjs(formField.state.value) : null}
                     onChange={newValue => {
                       formField.handleChange(newValue ? newValue.toDate() : null)
@@ -486,15 +479,8 @@ const GenericForm: React.FC<GenericFormProps> = ({
                         fullWidth: field.fullWidth !== false,
                         error: shouldShowError,
                         helperText: getHelperText(),
-                        onBlur: () => {
-                          formField.handleBlur()
-                          // Trigger validation on blur for better UX
-                          if (!formField.state.meta.isTouched) {
-                            formField.validate('change')
-                          }
-                        },
+                        onBlur: formField.handleBlur,
                         InputProps: { readOnly: !!field.readOnly },
-                        required: !!field.required,
                       },
                       field: {
                         clearable: true,
@@ -601,13 +587,14 @@ const GenericForm: React.FC<GenericFormProps> = ({
                     renderInput={params => (
                       <TextField
                         {...params}
+                        label={field.label + (field.required ? ' *' : '')}
                         error={shouldShowError}
                         placeholder={field.placeholder}
                         InputProps={{
                           ...params.InputProps,
                           readOnly: !!field.readOnly,
                         }}
-                        onBlur={formField.handleBlur}
+                        onBlur={() => formField.handleBlur()}
                         helperText={getHelperText()}
                       />
                     )}
@@ -616,15 +603,10 @@ const GenericForm: React.FC<GenericFormProps> = ({
 
                 {field.type === 'text' && (
                   <TextField
+                    label={field.label + (field.required ? ' *' : '')}
                     value={formField.state.value === null ? '' : formField.state.value}
                     onChange={e => formField.handleChange(e.target.value)}
-                    onBlur={() => {
-                      formField.handleBlur()
-                      // Trigger validation on blur for better UX
-                      if (!formField.state.meta.isTouched) {
-                        formField.validate('change')
-                      }
-                    }}
+                    onBlur={formField.handleBlur}
                     disabled={disabled}
                     error={shouldShowError}
                     placeholder={field.placeholder}
@@ -653,17 +635,7 @@ const GenericForm: React.FC<GenericFormProps> = ({
         sx={sx}
       >
         <DialogTitle>{getDialogTitle()}</DialogTitle>
-        <form
-          onSubmit={e => {
-            e.preventDefault()
-            e.stopPropagation()
-            if (!isViewMode) {
-              // Die Formularübermittlung erfolgt über form.handleSubmit()
-              // Das ist bereits in der Form-Instanz konfiguriert
-              form.handleSubmit()
-            }
-          }}
-        >
+        <form onSubmit={handleFormSubmit}>
           <DialogContent>
             {tabs && tabs.length > 0 ? (
               <>
@@ -743,11 +715,7 @@ const GenericForm: React.FC<GenericFormProps> = ({
                   color="primary"
                   startIcon={isLoading || isSubmitting ? undefined : <SaveIcon />}
                   disabled={isLoading || isSubmitting || (disableSubmitOnErrors && !canSubmit)}
-                  onClick={e => {
-                    e.preventDefault()
-                    // Trigger form submission with validation
-                    form.handleSubmit()
-                  }}
+                  onClick={handleSubmitClick}
                 >
                   {isLoading || isSubmitting ? (
                     <>
