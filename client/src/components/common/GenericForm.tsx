@@ -14,7 +14,6 @@ import {
   Typography,
   FormControl,
   FormLabel,
-  FormHelperText,
   TextField,
   MenuItem,
   CircularProgress,
@@ -31,6 +30,7 @@ import {
 } from '@mui/icons-material'
 import type { SxProps, Theme } from '@mui/material'
 import type { FormApi } from '@tanstack/react-form'
+import { Field } from '@tanstack/react-form'
 import { DatePicker, DateTimePicker } from '@mui/x-date-pickers'
 import dayjs from 'dayjs'
 import { isArchitect } from '@/lib/auth'
@@ -165,34 +165,54 @@ function TabPanel(props: TabPanelProps) {
 /**
  * Hilfsfunktion zur Formatierung von Validierungsfehlern
  */
-function formatValidationError(error: unknown): string {
-  if (!error) return ''
-  if (Array.isArray(error)) return error.join(', ')
-  if (typeof error === 'object' && error !== null) {
-    // Rekursiv verschachtelte Objekte durchlaufen
-    const messages: string[] = []
-    const processObject = (obj: Record<string, unknown>) => {
-      Object.values(obj).forEach(value => {
-        if (typeof value === 'string') {
-          messages.push(value)
-        } else if (Array.isArray(value)) {
-          value.forEach(item => {
-            if (typeof item === 'string') {
-              messages.push(item)
-            } else if (typeof item === 'object' && item !== null) {
-              processObject(item as Record<string, unknown>)
-            }
-          })
-        } else if (typeof value === 'object' && value !== null) {
-          processObject(value as Record<string, unknown>)
+function formatValidationError(errors: unknown): string {
+  if (!errors) return ''
+  if (Array.isArray(errors)) {
+    return errors
+      .map(error => {
+        if (typeof error === 'string') return error
+        if (typeof error === 'object' && error !== null) {
+          // Handle nested objects
+          if ('message' in error && typeof error.message === 'string') {
+            return error.message
+          }
+          return JSON.stringify(error)
         }
+        return String(error)
       })
+      .join(', ')
+  }
+  if (typeof errors === 'string') return errors
+  if (typeof errors === 'object' && errors !== null) {
+    if ('message' in errors && typeof errors.message === 'string') {
+      return errors.message
+    }
+    // Handle ValidationError objects
+    const errorObj = errors as Record<string, unknown>
+    const messages: string[] = []
+
+    // Extract error messages from common error object structures
+    if (errorObj.errors && Array.isArray(errorObj.errors)) {
+      return formatValidationError(errorObj.errors)
     }
 
-    processObject(error as Record<string, unknown>)
-    return messages.join(', ')
+    // Try to extract string values from the object
+    Object.values(errorObj).forEach(value => {
+      if (typeof value === 'string') {
+        messages.push(value)
+      } else if (Array.isArray(value)) {
+        messages.push(formatValidationError(value))
+      }
+    })
+
+    if (messages.length > 0) {
+      return messages.join(', ')
+    }
+
+    // Fallback to stringify if no meaningful strings found
+    return JSON.stringify(errors)
   }
-  return String(error)
+  return String(errors)
 }
 
 /**
@@ -230,13 +250,11 @@ const GenericForm: React.FC<GenericFormProps> = ({
   const isEditMode = mode === 'edit'
   const isCreateMode = mode === 'create'
 
-  // Bei offenem Dialog alle Felder manuell validieren
+  // Bei offenem Dialog initiale Validierung durchführen
   React.useEffect(() => {
-    if (isOpen && !isViewMode) {
-      // Wir warten einen Moment, bis das Formular vollständig initialisiert ist
-      setTimeout(() => {
-        form.validate()
-      }, 100)
+    if (isOpen && !isViewMode && form) {
+      // Initial validation wird automatisch durch TanStack Form gehandhabt
+      // wenn onMount-Validatoren definiert sind
     }
   }, [form, isOpen, isViewMode])
 
@@ -328,269 +346,292 @@ const GenericForm: React.FC<GenericFormProps> = ({
 
     return (
       <Grid key={field.name} {...sizeProps}>
-        {/* @ts-expect-error - TanStack Form-API-Typen sind nicht vollständig */}
-        {form.Field && (
-          <form.Field name={field.name} validators={field.validators}>
-            {(formField: any) => {
-              // Für benutzerdefinierte Rendering-Funktion
-              if (field.customRender) {
-                return field.customRender(formField, isViewMode || isLoading || !!field.disabled)
-              }
+        <Field form={form} name={field.name} validators={field.validators}>
+          {(formField: any) => {
+            // Für benutzerdefinierte Rendering-Funktion
+            if (field.customRender) {
+              return field.customRender(formField, isViewMode || isLoading || !!field.disabled)
+            }
 
-              const disabled = isViewMode || isLoading || !!field.disabled
-              // Ein Feld hat einen Fehler, wenn es nicht gültig ist (unabhängig vom Touch-Status)
-              const isError = !formField.state.meta.isValid
+            const disabled = isViewMode || isLoading || !!field.disabled
+            // Ein Feld hat einen Fehler wenn es Validierungsfehler hat
+            // und entweder berührt wurde oder submitted wurde
+            const hasErrors = formField.state.meta.errors && formField.state.meta.errors.length > 0
+            const shouldShowErrors =
+              hasErrors && (formField.state.meta.isTouched || form.state.isSubmitted)
+            const isError = shouldShowErrors
 
-              return (
-                <FormControl fullWidth={field.fullWidth !== false} error={isError} sx={{ mb: 2 }}>
-                  <FormLabel>
-                    {field.label}
-                    {field.required ? ' *' : ''}
-                  </FormLabel>
+            return (
+              <FormControl fullWidth={field.fullWidth !== false} error={isError} sx={{ mb: 2 }}>
+                <FormLabel>
+                  {field.label}
+                  {field.required ? ' *' : ''}
+                </FormLabel>
 
-                  {field.type === 'textarea' && (
-                    <TextField
-                      value={formField.state.value === null ? '' : formField.state.value}
-                      onChange={e => formField.handleChange(e.target.value)}
-                      onBlur={formField.handleBlur}
-                      disabled={disabled}
-                      multiline
-                      rows={field.rows || 4}
-                      error={isError}
-                      placeholder={field.placeholder}
-                      fullWidth={field.fullWidth !== false}
-                      InputProps={{ readOnly: !!field.readOnly }}
-                    />
-                  )}
+                {field.type === 'textarea' && (
+                  <TextField
+                    value={formField.state.value === null ? '' : formField.state.value}
+                    onChange={e => formField.handleChange(e.target.value)}
+                    onBlur={formField.handleBlur}
+                    disabled={disabled}
+                    multiline
+                    rows={field.rows || 4}
+                    error={isError}
+                    placeholder={field.placeholder}
+                    fullWidth={field.fullWidth !== false}
+                    InputProps={{ readOnly: !!field.readOnly }}
+                    helperText={
+                      isError
+                        ? formatValidationError(formField.state.meta.errors)
+                        : field.helperText
+                    }
+                  />
+                )}
 
-                  {field.type === 'select' && (
-                    <TextField
-                      value={formField.state.value === null ? '' : formField.state.value}
-                      onChange={e => formField.handleChange(e.target.value)}
-                      onBlur={formField.handleBlur}
-                      disabled={disabled}
-                      select
-                      error={isError}
-                      fullWidth={field.fullWidth !== false}
-                      InputProps={{ readOnly: !!field.readOnly }}
-                    >
-                      {field.options?.map(option => (
-                        <MenuItem key={String(option.value)} value={option.value as any}>
-                          {option.label}
-                        </MenuItem>
-                      ))}
-                    </TextField>
-                  )}
+                {field.type === 'select' && (
+                  <TextField
+                    value={formField.state.value === null ? '' : formField.state.value}
+                    onChange={e => formField.handleChange(e.target.value)}
+                    onBlur={formField.handleBlur}
+                    disabled={disabled}
+                    select
+                    error={isError}
+                    fullWidth={field.fullWidth !== false}
+                    InputProps={{ readOnly: !!field.readOnly }}
+                    helperText={
+                      isError
+                        ? formatValidationError(formField.state.meta.errors)
+                        : field.helperText
+                    }
+                  >
+                    {field.options?.map(option => (
+                      <MenuItem key={String(option.value)} value={option.value as any}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                )}
 
-                  {field.type === 'number' && (
-                    <TextField
-                      type="number"
-                      value={formField.state.value === null ? '' : formField.state.value}
-                      onChange={e => {
-                        const value = e.target.value === '' ? null : Number(e.target.value)
-                        formField.handleChange(value)
-                      }}
-                      onBlur={formField.handleBlur}
-                      disabled={disabled}
-                      error={isError}
-                      placeholder={field.placeholder}
-                      fullWidth={field.fullWidth !== false}
-                      InputProps={{ readOnly: !!field.readOnly }}
-                    />
-                  )}
+                {field.type === 'number' && (
+                  <TextField
+                    type="number"
+                    value={formField.state.value === null ? '' : formField.state.value}
+                    onChange={e => {
+                      const value = e.target.value === '' ? null : Number(e.target.value)
+                      formField.handleChange(value)
+                    }}
+                    onBlur={formField.handleBlur}
+                    disabled={disabled}
+                    error={isError}
+                    placeholder={field.placeholder}
+                    fullWidth={field.fullWidth !== false}
+                    InputProps={{ readOnly: !!field.readOnly }}
+                    helperText={
+                      isError
+                        ? formatValidationError(formField.state.meta.errors)
+                        : field.helperText
+                    }
+                  />
+                )}
 
-                  {field.type === 'date' && (
-                    <DatePicker
-                      value={formField.state.value ? dayjs(formField.state.value) : null}
-                      onChange={newValue => {
-                        // Statt den ISO-String zu verwenden, erstellen wir ein Date-Objekt
-                        // Das passt besser zum Zod-Schema, das z.date() erwartet
-                        formField.handleChange(newValue ? newValue.toDate() : null)
-                      }}
-                      disabled={disabled}
-                      slotProps={{
-                        textField: {
-                          fullWidth: field.fullWidth !== false,
-                          error: isError,
-                          helperText: isError
-                            ? formField.state.meta.errors.join(', ')
-                            : field.helperText,
-                          onBlur: formField.handleBlur,
-                          InputProps: { readOnly: !!field.readOnly },
-                          required: !!field.required,
-                        },
-                        field: {
-                          clearable: true,
-                        },
-                      }}
-                      format="DD.MM.YYYY"
-                    />
-                  )}
+                {field.type === 'date' && (
+                  <DatePicker
+                    value={formField.state.value ? dayjs(formField.state.value) : null}
+                    onChange={newValue => {
+                      // Statt den ISO-String zu verwenden, erstellen wir ein Date-Objekt
+                      // Das passt besser zum Zod-Schema, das z.date() erwartet
+                      formField.handleChange(newValue ? newValue.toDate() : null)
+                    }}
+                    disabled={disabled}
+                    slotProps={{
+                      textField: {
+                        fullWidth: field.fullWidth !== false,
+                        error: isError,
+                        helperText: isError
+                          ? formatValidationError(formField.state.meta.errors)
+                          : field.helperText,
+                        onBlur: formField.handleBlur,
+                        InputProps: { readOnly: !!field.readOnly },
+                        required: !!field.required,
+                      },
+                      field: {
+                        clearable: true,
+                      },
+                    }}
+                    format="DD.MM.YYYY"
+                  />
+                )}
 
-                  {field.type === 'datetime' && (
-                    <DateTimePicker
-                      label={field.label}
-                      value={formField.state.value ? dayjs(formField.state.value) : null}
-                      onChange={newValue => {
-                        // Statt das Dayjs-Objekt direkt zu verwenden, erstellen wir ein Date-Objekt
-                        // Das passt besser zum Zod-Schema, das z.date() erwartet
-                        formField.handleChange(newValue ? newValue.toDate() : null)
-                      }}
-                      disabled={disabled}
-                      slotProps={{
-                        textField: {
-                          fullWidth: field.fullWidth !== false,
-                          error: isError,
-                          helperText: isError
-                            ? formField.state.meta.errors.join(', ')
-                            : field.helperText,
-                          onBlur: formField.handleBlur,
-                          InputProps: { readOnly: !!field.readOnly },
-                          required: !!field.required,
-                        },
-                        field: {
-                          clearable: true,
-                        },
-                      }}
-                      format="DD.MM.YYYY HH:mm"
-                    />
-                  )}
+                {field.type === 'datetime' && (
+                  <DateTimePicker
+                    label={field.label}
+                    value={formField.state.value ? dayjs(formField.state.value) : null}
+                    onChange={newValue => {
+                      // Statt das Dayjs-Objekt direkt zu verwenden, erstellen wir ein Date-Objekt
+                      // Das passt besser zum Zod-Schema, das z.date() erwartet
+                      formField.handleChange(newValue ? newValue.toDate() : null)
+                    }}
+                    disabled={disabled}
+                    slotProps={{
+                      textField: {
+                        fullWidth: field.fullWidth !== false,
+                        error: isError,
+                        helperText: isError
+                          ? formatValidationError(formField.state.meta.errors)
+                          : field.helperText,
+                        onBlur: formField.handleBlur,
+                        InputProps: { readOnly: !!field.readOnly },
+                        required: !!field.required,
+                      },
+                      field: {
+                        clearable: true,
+                      },
+                    }}
+                    format="DD.MM.YYYY HH:mm"
+                  />
+                )}
 
-                  {field.type === 'autocomplete' && (
-                    <Autocomplete
-                      options={field.options || []}
-                      value={formField.state.value}
-                      onChange={(_, newValue) => formField.handleChange(newValue)}
-                      disabled={disabled}
-                      multiple={field.multiple}
-                      freeSolo={field.freeSolo}
-                      getOptionLabel={
-                        field.getOptionLabel ||
-                        (option => (typeof option === 'string' ? option : option?.label || ''))
-                      }
-                      isOptionEqualToValue={
-                        field.isOptionEqualToValue ||
-                        ((option, value) => {
-                          // Standard-Implementierung für Objektvergleich
-                          if (option === value) return true
-                          if (!option || !value) return false
+                {field.type === 'autocomplete' && (
+                  <Autocomplete
+                    options={field.options || []}
+                    value={formField.state.value}
+                    onChange={(_, newValue) => formField.handleChange(newValue)}
+                    disabled={disabled}
+                    multiple={field.multiple}
+                    freeSolo={field.freeSolo}
+                    getOptionLabel={
+                      field.getOptionLabel ||
+                      (option => (typeof option === 'string' ? option : option?.label || ''))
+                    }
+                    isOptionEqualToValue={
+                      field.isOptionEqualToValue ||
+                      ((option, value) => {
+                        // Standard-Implementierung für Objektvergleich
+                        if (option === value) return true
+                        if (!option || !value) return false
 
-                          // Prüfe, ob es sich um Objekte handelt
-                          const isOptionObject = typeof option === 'object' && option !== null
-                          const isValueObject = typeof value === 'object' && value !== null
+                        // Prüfe, ob es sich um Objekte handelt
+                        const isOptionObject = typeof option === 'object' && option !== null
+                        const isValueObject = typeof value === 'object' && value !== null
 
-                          // Wenn beides Objekte sind
-                          if (isOptionObject && isValueObject) {
-                            // Wenn Objekte IDs haben, vergleiche nach ID
-                            if ('id' in option && 'id' in value) {
-                              return option.id === value.id
-                            }
-
-                            // Vergleich nach value (für SelectOption-Objekte)
-                            if ('value' in option && 'value' in value) {
-                              return option.value === value.value
-                            }
+                        // Wenn beides Objekte sind
+                        if (isOptionObject && isValueObject) {
+                          // Wenn Objekte IDs haben, vergleiche nach ID
+                          if ('id' in option && 'id' in value) {
+                            return option.id === value.id
                           }
 
-                          // Wenn option ein Objekt ist und value ein primitiver Wert
-                          if (isOptionObject && 'value' in option) {
-                            return option.value === value
+                          // Vergleich nach value (für SelectOption-Objekte)
+                          if ('value' in option && 'value' in value) {
+                            return option.value === value.value
                           }
+                        }
 
-                          // Wenn value ein Objekt ist und option ein primitiver Wert
-                          if (isValueObject && 'value' in value) {
-                            return option === value.value
-                          }
+                        // Wenn option ein Objekt ist und value ein primitiver Wert
+                        if (isOptionObject && 'value' in option) {
+                          return option.value === value
+                        }
 
-                          return false
-                        })
-                      }
-                      loading={field.loadingOptions}
-                      loadingText={field.loadingText || 'Wird geladen...'}
-                      renderOption={field.renderOption}
-                      renderInput={params => (
-                        <TextField
-                          {...params}
-                          error={isError}
-                          placeholder={field.placeholder}
-                          InputProps={{
-                            ...params.InputProps,
-                            readOnly: !!field.readOnly,
-                          }}
-                          onBlur={formField.handleBlur}
-                        />
-                      )}
-                    />
-                  )}
+                        // Wenn value ein Objekt ist und option ein primitiver Wert
+                        if (isValueObject && 'value' in value) {
+                          return option === value.value
+                        }
 
-                  {field.type === 'tags' && (
-                    <Autocomplete
-                      multiple
-                      freeSolo
-                      options={field.options?.map(o => o.label) || []}
-                      value={formField.state.value || []}
-                      onChange={(_, newValue) => formField.handleChange(newValue)}
-                      disabled={disabled}
-                      isOptionEqualToValue={(option, value) => option === value}
-                      renderValue={(value, getItemProps) =>
-                        value.map((option, index) => {
-                          const itemProps = getItemProps({ index })
-                          return (
-                            <Chip
-                              variant="outlined"
-                              key={itemProps.key}
-                              label={option}
-                              disabled={isViewMode || isLoading}
-                              onDelete={itemProps.onDelete}
-                              data-tag-index={itemProps['data-item-index']}
-                              tabIndex={itemProps.tabIndex}
-                              className={itemProps.className}
-                            />
-                          )
-                        })
-                      }
-                      renderInput={params => (
-                        <TextField
-                          {...params}
-                          error={isError}
-                          placeholder={field.placeholder}
-                          InputProps={{
-                            ...params.InputProps,
-                            readOnly: !!field.readOnly,
-                          }}
-                          onBlur={formField.handleBlur}
-                        />
-                      )}
-                    />
-                  )}
+                        return false
+                      })
+                    }
+                    loading={field.loadingOptions}
+                    loadingText={field.loadingText || 'Wird geladen...'}
+                    renderOption={field.renderOption}
+                    renderInput={params => (
+                      <TextField
+                        {...params}
+                        error={isError}
+                        placeholder={field.placeholder}
+                        InputProps={{
+                          ...params.InputProps,
+                          readOnly: !!field.readOnly,
+                        }}
+                        onBlur={formField.handleBlur}
+                        helperText={
+                          isError
+                            ? formatValidationError(formField.state.meta.errors)
+                            : field.helperText
+                        }
+                      />
+                    )}
+                  />
+                )}
 
-                  {field.type === 'text' && (
-                    <TextField
-                      value={formField.state.value === null ? '' : formField.state.value}
-                      onChange={e => formField.handleChange(e.target.value)}
-                      onBlur={formField.handleBlur}
-                      disabled={disabled}
-                      error={isError}
-                      placeholder={field.placeholder}
-                      fullWidth={field.fullWidth !== false}
-                      multiline={field.multiline}
-                      rows={field.rows}
-                      InputProps={{ readOnly: !!field.readOnly }}
-                    />
-                  )}
+                {field.type === 'tags' && (
+                  <Autocomplete
+                    multiple
+                    freeSolo
+                    options={field.options?.map(o => o.label) || []}
+                    value={formField.state.value || []}
+                    onChange={(_, newValue) => formField.handleChange(newValue)}
+                    disabled={disabled}
+                    isOptionEqualToValue={(option, value) => option === value}
+                    renderValue={(value, getItemProps) =>
+                      value.map((option, index) => {
+                        const itemProps = getItemProps({ index })
+                        return (
+                          <Chip
+                            variant="outlined"
+                            key={itemProps.key}
+                            label={option}
+                            disabled={isViewMode || isLoading}
+                            onDelete={itemProps.onDelete}
+                            data-tag-index={itemProps['data-item-index']}
+                            tabIndex={itemProps.tabIndex}
+                            className={itemProps.className}
+                          />
+                        )
+                      })
+                    }
+                    renderInput={params => (
+                      <TextField
+                        {...params}
+                        error={isError}
+                        placeholder={field.placeholder}
+                        InputProps={{
+                          ...params.InputProps,
+                          readOnly: !!field.readOnly,
+                        }}
+                        onBlur={formField.handleBlur}
+                        helperText={
+                          isError
+                            ? formatValidationError(formField.state.meta.errors)
+                            : field.helperText
+                        }
+                      />
+                    )}
+                  />
+                )}
 
-                  <FormHelperText>
-                    {isError
-                      ? formatValidationError(formField.state.meta.errors)
-                      : field.helperText || ''}
-                  </FormHelperText>
-                </FormControl>
-              )
-            }}
-          </form.Field>
-        )}
-        {/* Fallback, wenn form.Field nicht vorhanden ist */}
-        {!form.Field && <Typography color="error">Form field rendering error</Typography>}
+                {field.type === 'text' && (
+                  <TextField
+                    value={formField.state.value === null ? '' : formField.state.value}
+                    onChange={e => formField.handleChange(e.target.value)}
+                    onBlur={formField.handleBlur}
+                    disabled={disabled}
+                    error={isError}
+                    placeholder={field.placeholder}
+                    fullWidth={field.fullWidth !== false}
+                    multiline={field.multiline}
+                    rows={field.rows}
+                    InputProps={{ readOnly: !!field.readOnly }}
+                    helperText={
+                      isError
+                        ? formatValidationError(formField.state.meta.errors)
+                        : field.helperText
+                    }
+                  />
+                )}
+              </FormControl>
+            )
+          }}
+        </Field>
       </Grid>
     )
   }
@@ -611,7 +652,8 @@ const GenericForm: React.FC<GenericFormProps> = ({
             e.stopPropagation()
             if (!isViewMode) {
               // Die Formularübermittlung erfolgt über form.handleSubmit()
-              void form.handleSubmit()
+              // Das ist bereits in der Form-Instanz konfiguriert
+              form.handleSubmit()
             }
           }}
         >
@@ -692,13 +734,14 @@ const GenericForm: React.FC<GenericFormProps> = ({
                   type="submit"
                   variant="contained"
                   color="primary"
-                  startIcon={isLoading ? undefined : <SaveIcon />}
+                  startIcon={isLoading || form.state.isSubmitting ? undefined : <SaveIcon />}
                   disabled={
                     isLoading ||
-                    (disableSubmitOnErrors && (!form.state.canSubmit || !form.state.isValid))
+                    form.state.isSubmitting ||
+                    (disableSubmitOnErrors && !form.state.canSubmit)
                   }
                 >
-                  {isLoading ? (
+                  {isLoading || form.state.isSubmitting ? (
                     <>
                       <CircularProgress size={20} sx={{ mr: 1 }} />
                       Wird gespeichert...
