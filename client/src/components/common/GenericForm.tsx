@@ -117,7 +117,7 @@ export interface GenericFormProps {
   onDelete?: (id?: string) => Promise<void> | void
   deleteButtonText?: string
   deleteConfirmationText?: string
-  disableSubmitOnErrors?: boolean
+  _disableSubmitOnErrors?: boolean // Nicht mehr verwendet - behalten für abwärtskompatibilität
   sx?: SxProps<Theme>
   form: FormApi<any, any, any, any, any, any, any, any, any, any>
   onEditMode?: () => void
@@ -181,7 +181,7 @@ const GenericForm: React.FC<GenericFormProps> = ({
   onDelete,
   deleteButtonText = 'Löschen',
   deleteConfirmationText = 'Sind Sie sicher, dass Sie diesen Eintrag löschen möchten?',
-  disableSubmitOnErrors = true,
+  _disableSubmitOnErrors = true, // Nicht mehr verwendet - behalten für abwärtskompatibilität
   sx,
   form,
   onEditMode,
@@ -193,8 +193,11 @@ const GenericForm: React.FC<GenericFormProps> = ({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
   // Reactive form state tracking using useStore für bessere Performance
-  const canSubmit = useStore(form.store, state => state.canSubmit)
-  const isSubmitting = useStore(form.store, state => state.isSubmitting)
+  const formState = useStore(form.store, state => ({
+    isSubmitting: state.isSubmitting,
+    // Wir verwenden die manuelle Validierung statt canSubmit, da canSubmit bei Autocomplete-Feldern problematisch ist
+  }))
+  const { isSubmitting } = formState
 
   const isViewMode = mode === 'view'
   const isEditMode = mode === 'edit'
@@ -207,41 +210,38 @@ const GenericForm: React.FC<GenericFormProps> = ({
       e.stopPropagation()
       if (!isViewMode) {
         // Die Formularübermittlung erfolgt über form.handleSubmit()
-        // Das ist bereits in der Form-Instanz konfiguriert
+        // TanStack Form validiert automatisch vor der Übermittlung
+        // und führt dann onSubmit aus, wenn die Validierung erfolgreich ist
         form.handleSubmit()
       }
     },
     [form, isViewMode]
   )
 
+  // Konsistente Implementierung mit handleFormSubmit
+  // Beide Handler verwenden denselben Ansatz
   const handleSubmitClick = React.useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault()
-      // Trigger form submission with validation
-      form.handleSubmit()
+
+      if (!isViewMode) {
+        // TanStack Form kümmert sich um Validierung und Fehlerbehandlung
+        form.handleSubmit()
+      }
     },
-    [form]
+    [form, isViewMode]
   )
 
-  // Bei offenem Dialog initiale Validierung nur durchführen wenn nötig
+  // Bei offenem Dialog wird keine manuelle initiale Validierung mehr durchgeführt
+  // TanStack Form wird bei jeder Wertänderung automatisch validieren
+  // Gemäß der TanStack Form-Dokumentation: https://tanstack.com/form/latest/docs/framework/react/guides/validation
   React.useEffect(() => {
     if (isOpen && form && !isViewMode) {
-      // Gemäß TanStack Form Dokumentation:
-      // Initiale Validierung nur im Edit-Modus oder wenn bereits Daten vorhanden sind
-      const hasInitialValues = Object.keys(form.state.values || {}).some(
-        key => form.state.values[key] != null && form.state.values[key] !== ''
-      )
-
-      if (isEditMode || hasInitialValues) {
-        const timer = setTimeout(() => {
-          // Trigger validation for all form fields to ensure proper initial state
-          form.validate('change')
-        }, 100) // Leicht erhöhte Verzögerung für bessere UX
-
-        return () => clearTimeout(timer)
-      }
+      // Es ist keine manuelle Validierung erforderlich, da TanStack Form
+      // automatisch die Validierung beim ersten Rendern und bei Wertänderungen durchführt
+      // Die Validierung wird durch die Validator-Konfiguration in der Form-Instanz gesteuert
     }
-  }, [form, isOpen, isViewMode, isEditMode]) // Verbesserte Dependencies
+  }, [form, isOpen, isViewMode])
 
   // Handler für Tab-Wechsel
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
@@ -497,6 +497,10 @@ const GenericForm: React.FC<GenericFormProps> = ({
                     onChange={(_, newValue) => {
                       // Stelle sicher, dass null-Werte korrekt behandelt werden
                       formField.handleChange(newValue)
+
+                      // Gemäß der TanStack Form-Dokumentation wird die Validierung automatisch
+                      // nach dem handleChange ausgeführt. Eine explizite Validierung ist nicht notwendig.
+                      // https://tanstack.com/form/latest/docs/framework/react/guides/validation
                     }}
                     disabled={disabled}
                     multiple={field.multiple}
@@ -725,7 +729,7 @@ const GenericForm: React.FC<GenericFormProps> = ({
                   variant="contained"
                   color="primary"
                   startIcon={isLoading || isSubmitting ? undefined : <SaveIcon />}
-                  disabled={isLoading || isSubmitting || (disableSubmitOnErrors && !canSubmit)}
+                  disabled={isLoading || isSubmitting}
                   onClick={handleSubmitClick}
                 >
                   {isLoading || isSubmitting ? (
