@@ -203,16 +203,41 @@ const GenericForm: React.FC<GenericFormProps> = ({
   const isEditMode = mode === 'edit'
   const isCreateMode = mode === 'create'
 
+  // Debug logging for form state changes
+  React.useEffect(() => {
+    console.log('🔍 [DEBUG] GenericForm rendered/updated', {
+      isOpen,
+      mode,
+      entityName,
+      formState: {
+        canSubmit: form?.state.canSubmit,
+        isValid: form?.state.isValid,
+        isTouched: form?.state.isTouched,
+        isSubmitting: form?.state.isSubmitting,
+        values: form?.state.values,
+      },
+      fieldsCount: fields.length,
+    })
+  })
+
   // Memoized handlers für bessere Performance
   const handleFormSubmit = React.useCallback(
     (e: React.FormEvent) => {
+      console.log('🚀 [DEBUG] handleFormSubmit called', {
+        isViewMode,
+        formState: form?.state,
+        event: e.type,
+      })
       e.preventDefault()
       e.stopPropagation()
       if (!isViewMode) {
+        console.log('📤 [DEBUG] Calling form.handleSubmit() from handleFormSubmit')
         // Die Formularübermittlung erfolgt über form.handleSubmit()
         // TanStack Form validiert automatisch vor der Übermittlung
         // und führt dann onSubmit aus, wenn die Validierung erfolgreich ist
         form.handleSubmit()
+      } else {
+        console.log('⚠️ [DEBUG] Submit prevented - view mode active')
       }
     },
     [form, isViewMode]
@@ -222,11 +247,47 @@ const GenericForm: React.FC<GenericFormProps> = ({
   // Beide Handler verwenden denselben Ansatz
   const handleSubmitClick = React.useCallback(
     (e: React.MouseEvent) => {
+      console.log('🔴 [DEBUG] handleSubmitClick called', {
+        isViewMode,
+        buttonType: (e.currentTarget as HTMLButtonElement).type,
+        formState: form?.state,
+        formValues: form?.state.values,
+        formCanSubmit: form?.state.canSubmit,
+        formIsValid: form?.state.isValid,
+        formIsTouched: form?.state.isTouched,
+        formErrors: form?.state.errors,
+        formErrorMap: form?.state.errorMap,
+      })
       e.preventDefault()
 
       if (!isViewMode) {
+        console.log('📤 [DEBUG] Calling form.handleSubmit() from handleSubmitClick')
+        console.log('🔍 [DEBUG] Detailed form state before handleSubmit:', {
+          canSubmit: form?.state.canSubmit,
+          isValid: form?.state.isValid,
+          isTouched: form?.state.isTouched,
+          isSubmitting: form?.state.isSubmitting,
+          errors: form?.state.errors,
+          errorMap: form?.state.errorMap,
+          fieldMeta: Object.keys(form?.state.values || {}).reduce(
+            (acc, key) => {
+              const fieldMeta = form?.getFieldMeta(key)
+              acc[key] = {
+                isValid: fieldMeta?.isValid,
+                isTouched: fieldMeta?.isTouched,
+                errors: fieldMeta?.errors,
+              }
+              return acc
+            },
+            {} as Record<string, any>
+          ),
+        })
+
         // TanStack Form kümmert sich um Validierung und Fehlerbehandlung
-        form.handleSubmit()
+        const result = form.handleSubmit()
+        console.log('📋 [DEBUG] handleSubmit result:', result)
+      } else {
+        console.log('⚠️ [DEBUG] Submit prevented - view mode active')
       }
     },
     [form, isViewMode]
@@ -495,12 +556,28 @@ const GenericForm: React.FC<GenericFormProps> = ({
                     options={field.options || []}
                     value={formField.state.value}
                     onChange={(_, newValue) => {
-                      // Stelle sicher, dass null-Werte korrekt behandelt werden
-                      formField.handleChange(newValue)
+                      // Extrahiere IDs/Werte aus Objekten bei Multiple-Auswahl
+                      let processedValue = newValue
 
-                      // Gemäß der TanStack Form-Dokumentation wird die Validierung automatisch
-                      // nach dem handleChange ausgeführt. Eine explizite Validierung ist nicht notwendig.
-                      // https://tanstack.com/form/latest/docs/framework/react/guides/validation
+                      if (field.multiple && Array.isArray(newValue)) {
+                        // Bei Multiple-Auswahl: Extrahiere value-Property aus Objekten
+                        processedValue = newValue.map(item => {
+                          if (typeof item === 'object' && item !== null && 'value' in item) {
+                            return item.value
+                          }
+                          return item
+                        })
+                      } else if (
+                        !field.multiple &&
+                        newValue !== null &&
+                        typeof newValue === 'object' &&
+                        'value' in newValue
+                      ) {
+                        // Bei Single-Auswahl: Extrahiere value-Property wenn es ein Objekt ist
+                        processedValue = newValue.value
+                      }
+
+                      formField.handleChange(processedValue)
                     }}
                     disabled={disabled}
                     multiple={field.multiple}

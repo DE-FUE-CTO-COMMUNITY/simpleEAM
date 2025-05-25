@@ -62,29 +62,47 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
   const form = useForm({
     defaultValues,
     onSubmit: async ({ value }) => {
-      // Formatierung der Daten vor dem Absenden
-      const formattedValues: ApplicationInterfaceFormValues = {
-        name: value.name,
-        description: value.description,
-        interfaceType: value.interfaceType,
-        // Sicherstellen, dass dataObjects korrekt formatiert sind (String-Array von IDs)
-        dataObjects: Array.isArray(value.dataObjects)
-          ? value.dataObjects.map((obj: any) => {
-              // Wenn obj ein Objekt mit value-Eigenschaft ist (aus Autocomplete)
-              if (obj && typeof obj === 'object' && 'value' in obj) {
-                return obj.value
-              }
-              // Wenn obj bereits ein String ist (ID)
-              if (typeof obj === 'string') {
-                return obj
-              }
-              // Fallback
-              return obj
-            })
-          : [],
-      }
+      console.log('🎯 [DEBUG] ApplicationInterface onSubmit called', {
+        value,
+        mode,
+        originalApplicationInterface: applicationInterface,
+      })
 
-      await onSubmit(formattedValues)
+      try {
+        // Formatierung der Daten vor dem Absenden
+        const formattedValues: ApplicationInterfaceFormValues = {
+          name: value.name,
+          description: value.description,
+          interfaceType: value.interfaceType,
+          // Sicherstellen, dass dataObjects korrekt formatiert sind (String-Array von IDs)
+          dataObjects: Array.isArray(value.dataObjects)
+            ? value.dataObjects.map((obj: any) => {
+                // Wenn obj ein Objekt mit value-Eigenschaft ist (aus Autocomplete)
+                if (obj && typeof obj === 'object' && 'value' in obj) {
+                  return obj.value
+                }
+                // Wenn obj bereits ein String ist (ID)
+                if (typeof obj === 'string') {
+                  return obj
+                }
+                // Fallback
+                return obj
+              })
+            : [],
+        }
+
+        console.log('💾 [DEBUG] ApplicationInterface formatted values', {
+          original: value,
+          formatted: formattedValues,
+        })
+
+        console.log('🚀 [DEBUG] Calling parent onSubmit function...')
+        await onSubmit(formattedValues)
+        console.log('✅ [DEBUG] Parent onSubmit completed successfully')
+      } catch (error) {
+        console.error('❌ [DEBUG] Error in ApplicationInterface onSubmit:', error)
+        throw error
+      }
     },
     validators: {
       // Primäre Validierung bei Änderungen
@@ -96,17 +114,26 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
 
   // Formular aktualisieren, wenn sich die Daten ändern
   useEffect(() => {
+    console.log('🔄 [DEBUG] ApplicationInterface useEffect triggered', {
+      isOpen,
+      mode,
+      applicationInterface: applicationInterface?.id,
+      hasDataObjects: !!applicationInterface?.dataObjects,
+    })
+
     // Nicht-reaktives Flag für unerwartete Zustandsbehandlung
     let hasHandledForm = false
 
     if (!isOpen) {
       // Dialog geschlossen - Formular zurücksetzen
+      console.log('❌ [DEBUG] Dialog closed, resetting form')
       form.reset()
       return
     }
 
     if (mode === 'create') {
       // Im CREATE-Modus mit leeren Standardwerten initialisieren
+      console.log('➕ [DEBUG] CREATE mode - resetting with default values', defaultValues)
       form.reset(defaultValues)
       hasHandledForm = true
     } else if (
@@ -124,6 +151,12 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
         interfaceType: applicationInterface.interfaceType,
         dataObjects: dataObjectIds,
       }
+
+      console.log('✏️ [DEBUG] EDIT/VIEW mode - resetting with interface values', {
+        formValues,
+        originalDataObjects: applicationInterface.dataObjects,
+        dataObjectIds,
+      })
 
       // Formular mit den Werten aus der vorhandenen Schnittstelle zurücksetzen
       form.reset(formValues)
