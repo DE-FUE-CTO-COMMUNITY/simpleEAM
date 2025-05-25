@@ -1,0 +1,251 @@
+'use client'
+
+import React, { useState, useMemo } from 'react'
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  Typography,
+  Box,
+  TextField,
+  InputAdornment,
+  Chip,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  CircularProgress,
+} from '@mui/material'
+import { Search, Architecture, Person, CalendarToday } from '@mui/icons-material'
+import { useQuery } from '@apollo/client'
+import { GET_DIAGRAMS } from '@/graphql/diagram'
+import { DIAGRAM_TYPES } from './SaveDiagramDialog'
+
+export interface OpenDiagramDialogProps {
+  open: boolean
+  onClose: () => void
+  onOpen: (diagram: any) => void
+}
+
+const OpenDiagramDialog: React.FC<OpenDiagramDialogProps> = ({ open, onClose, onOpen }) => {
+  const [searchTerm, setSearchTerm] = useState('')
+  const [selectedType, setSelectedType] = useState('')
+  const [selectedArchitecture, setSelectedArchitecture] = useState('')
+
+  const { data, loading, error } = useQuery(GET_DIAGRAMS, {
+    skip: !open,
+  })
+
+  const diagrams = useMemo(() => data?.diagrams || [], [data?.diagrams])
+
+  // Filtern der Diagramme basierend auf Suchkriterien
+  const filteredDiagrams = diagrams.filter((diagram: any) => {
+    const matchesSearch =
+      !searchTerm ||
+      diagram.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (diagram.description && diagram.description.toLowerCase().includes(searchTerm.toLowerCase()))
+
+    const matchesType = !selectedType || diagram.diagramType === selectedType
+
+    const matchesArchitecture =
+      !selectedArchitecture ||
+      (diagram.architecture &&
+        diagram.architecture.some((arch: any) => arch.id === selectedArchitecture))
+
+    return matchesSearch && matchesType && matchesArchitecture
+  })
+
+  // Eindeutige Architektur-Optionen für Filter extrahieren
+  const architectureOptions = React.useMemo(() => {
+    const architectures = new Map()
+    diagrams.forEach((diagram: any) => {
+      if (diagram.architecture) {
+        diagram.architecture.forEach((arch: any) => {
+          architectures.set(arch.id, arch)
+        })
+      }
+    })
+    return Array.from(architectures.values())
+  }, [diagrams])
+
+  const handleOpenDiagram = (diagram: any) => {
+    onOpen(diagram)
+    onClose()
+  }
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('de-DE', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+  }
+
+  const getDiagramTypeLabel = (type: string) => {
+    const diagramType = DIAGRAM_TYPES.find(t => t.value === type)
+    return diagramType?.label || type
+  }
+
+  return (
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+      <DialogTitle>Diagramm öffnen</DialogTitle>
+      <DialogContent>
+        <Box sx={{ mb: 3, display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {/* Suchfeld */}
+          <TextField
+            placeholder="Nach Titel oder Beschreibung suchen..."
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            fullWidth
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Search />
+                </InputAdornment>
+              ),
+            }}
+          />
+
+          {/* Filter */}
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <FormControl sx={{ minWidth: 200 }}>
+              <InputLabel>Diagrammtyp</InputLabel>
+              <Select
+                value={selectedType}
+                label="Diagrammtyp"
+                onChange={e => setSelectedType(e.target.value)}
+              >
+                <MenuItem value="">Alle Typen</MenuItem>
+                {DIAGRAM_TYPES.map(type => (
+                  <MenuItem key={type.value} value={type.value}>
+                    {type.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+            <FormControl sx={{ minWidth: 200 }}>
+              <InputLabel>Architektur</InputLabel>
+              <Select
+                value={selectedArchitecture}
+                label="Architektur"
+                onChange={e => setSelectedArchitecture(e.target.value)}
+              >
+                <MenuItem value="">Alle Architekturen</MenuItem>
+                {architectureOptions.map((arch: any) => (
+                  <MenuItem key={arch.id} value={arch.id}>
+                    {arch.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
+        </Box>
+
+        {/* Diagrammliste */}
+        {loading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+            <CircularProgress />
+          </Box>
+        ) : error ? (
+          <Typography color="error" align="center" sx={{ py: 4 }}>
+            Fehler beim Laden der Diagramme: {error.message}
+          </Typography>
+        ) : filteredDiagrams.length === 0 ? (
+          <Typography color="text.secondary" align="center" sx={{ py: 4 }}>
+            {diagrams.length === 0
+              ? 'Keine Diagramme vorhanden'
+              : 'Keine Diagramme entsprechen den Filterkriterien'}
+          </Typography>
+        ) : (
+          <List sx={{ maxHeight: 400, overflow: 'auto' }}>
+            {filteredDiagrams.map((diagram: any) => (
+              <ListItem key={diagram.id} disablePadding>
+                <ListItemButton
+                  onClick={() => handleOpenDiagram(diagram)}
+                  sx={{
+                    border: 1,
+                    borderColor: 'divider',
+                    borderRadius: 1,
+                    mb: 1,
+                    '&:hover': {
+                      borderColor: 'primary.main',
+                    },
+                  }}
+                >
+                  <ListItemText
+                    primary={
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                        <Typography variant="subtitle1" component="span">
+                          {diagram.title}
+                        </Typography>
+                        {diagram.diagramType && (
+                          <Chip
+                            label={getDiagramTypeLabel(diagram.diagramType)}
+                            size="small"
+                            variant="outlined"
+                          />
+                        )}
+                      </Box>
+                    }
+                    secondary={
+                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                        {diagram.description && (
+                          <Typography variant="body2" color="text.secondary">
+                            {diagram.description}
+                          </Typography>
+                        )}
+
+                        <Box
+                          sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}
+                        >
+                          {diagram.creator && diagram.creator.length > 0 && (
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                              <Person fontSize="small" color="action" />
+                              <Typography variant="caption">
+                                {diagram.creator[0].firstName} {diagram.creator[0].lastName}
+                              </Typography>
+                            </Box>
+                          )}
+
+                          {diagram.architecture && diagram.architecture.length > 0 && (
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                              <Architecture fontSize="small" color="action" />
+                              <Typography variant="caption">
+                                {diagram.architecture.map((arch: any) => arch.name).join(', ')}
+                              </Typography>
+                            </Box>
+                          )}
+
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            <CalendarToday fontSize="small" color="action" />
+                            <Typography variant="caption">
+                              {formatDate(diagram.updatedAt || diagram.createdAt)}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </Box>
+                    }
+                  />
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+        )}
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>Abbrechen</Button>
+      </DialogActions>
+    </Dialog>
+  )
+}
+
+export default OpenDiagramDialog
