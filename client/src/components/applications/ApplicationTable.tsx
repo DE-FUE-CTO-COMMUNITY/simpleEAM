@@ -1,11 +1,11 @@
 'use client'
 
 import React, { useMemo } from 'react'
-import { Chip, useTheme } from '@mui/material'
+import { Chip } from '@mui/material'
 import { GenericTable } from '../common/GenericTable'
 import { ApplicationType } from './types'
 import { formatDate, getCriticalityLabel, formatCosts } from './utils'
-import { Application, CriticalityLevel } from '../../gql/generated'
+import { CriticalityLevel } from '../../gql/generated'
 import ApplicationForm, { ApplicationFormValues } from './ApplicationForm'
 import { createColumnHelper } from '@tanstack/react-table'
 import { SortingState } from '@tanstack/react-table'
@@ -17,8 +17,6 @@ interface ApplicationTableProps {
   globalFilter: string
   sorting: SortingState
   onSortingChange: (sorting: SortingState) => void
-  onRowClick: (id: string) => void
-  onEditClick: (id: string) => void
   onCreateApplication?: (data: ApplicationFormValues) => Promise<void>
   onUpdateApplication?: (id: string, data: ApplicationFormValues) => Promise<void>
   onDeleteApplication?: (id: string) => Promise<void>
@@ -31,14 +29,11 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
   globalFilter,
   sorting,
   onSortingChange,
-  onRowClick,
-  onEditClick,
   onCreateApplication,
   onUpdateApplication,
   onDeleteApplication,
   availableTechStack = [],
 }) => {
-  const theme = useTheme()
   const columnHelper = createColumnHelper<ApplicationType>()
 
   // Spalten-Definition für die Application-Tabelle
@@ -130,14 +125,12 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
   }
 
   return (
-    <GenericTable
+    <GenericTable<ApplicationType, ApplicationFormValues>
       data={applications}
       loading={loading}
       globalFilter={globalFilter}
       sorting={sorting}
       onSortingChange={onSortingChange}
-      onRowClick={onRowClick}
-      onEditClick={onEditClick}
       columns={columns}
       onCreate={onCreateApplication}
       onUpdate={onUpdateApplication}

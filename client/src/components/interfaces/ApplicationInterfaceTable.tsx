@@ -18,8 +18,6 @@ interface ApplicationInterfaceTableProps {
   globalFilter: string
   sorting: SortingState
   onSortingChange: (sorting: SortingState) => void
-  onRowClick: (id: string) => void
-  onEditClick: (id: string) => void
   onCreateApplicationInterface?: (data: ApplicationInterfaceFormValues) => Promise<void>
   onUpdateApplicationInterface?: (id: string, data: ApplicationInterfaceFormValues) => Promise<void>
   onDeleteApplicationInterface?: (id: string) => Promise<void>
@@ -32,8 +30,6 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
   globalFilter,
   sorting,
   onSortingChange,
-  onRowClick,
-  onEditClick,
   onCreateApplicationInterface,
   onUpdateApplicationInterface,
   onDeleteApplicationInterface,
@@ -103,14 +99,12 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
   }
 
   return (
-    <GenericTable
+    <GenericTable<ApplicationInterface, ApplicationInterfaceFormValues>
       data={applicationInterfaces}
       loading={loading}
       globalFilter={globalFilter}
       sorting={sorting}
       onSortingChange={onSortingChange}
-      onRowClick={onRowClick}
-      onEditClick={onEditClick}
       columns={columns}
       onCreate={onCreateApplicationInterface}
       onUpdate={onUpdateApplicationInterface}

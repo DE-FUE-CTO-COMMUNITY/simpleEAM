@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useState, useCallback, useMemo, ReactNode } from 'react'
-import { Box, Tooltip, IconButton, CircularProgress, Button, useTheme, Chip } from '@mui/material'
+import React, { useState, useCallback, useMemo } from 'react'
+import { Box, Tooltip, IconButton, CircularProgress, Button, useTheme } from '@mui/material'
 import {
   Edit as EditIcon,
   Visibility as VisibilityIcon,
@@ -9,7 +9,6 @@ import {
   KeyboardArrowUp as SortUpIcon,
 } from '@mui/icons-material'
 import {
-  createColumnHelper,
   flexRender,
   useReactTable,
   getCoreRowModel,
@@ -33,8 +32,6 @@ export interface GenericTableProps<T, F> {
   globalFilter: string
   sorting: SortingState
   onSortingChange: (sorting: SortingState) => void
-  onRowClick: (id: string) => void
-  onEditClick: (id: string) => void
   columns: ColumnDef<T, any>[] // Spalten-Definition
   onCreate?: (data: F) => Promise<void>
   onUpdate?: (id: string, data: F) => Promise<void>
@@ -57,15 +54,13 @@ export function GenericTable<T extends { id: string }, F>({
   globalFilter,
   sorting,
   onSortingChange,
-  onRowClick,
-  onEditClick,
   columns,
   onCreate,
   onUpdate,
   onDelete,
-  emptyMessage = 'Keine Daten gefunden.',
-  createButtonLabel = 'Neu erstellen',
-  entityName = 'Element',
+  emptyMessage: _emptyMessage = 'Keine Daten gefunden.',
+  createButtonLabel: _createButtonLabel = 'Neu erstellen',
+  entityName: _entityName = 'Element',
   FormComponent,
   getIdFromData = (item: T) => item.id,
   mapDataToFormValues,
@@ -93,10 +88,10 @@ export function GenericTable<T extends { id: string }, F>({
         setFormMode('view')
         setIsFormOpen(true)
       } else {
-        onRowClick(id)
+        console.error('GenericTable - Item mit ID nicht gefunden:', id)
       }
     },
-    [data, onRowClick, getIdFromData]
+    [data, getIdFromData]
   )
 
   // Handler für das Öffnen des Formulars zum Bearbeiten
@@ -108,10 +103,10 @@ export function GenericTable<T extends { id: string }, F>({
         setFormMode('edit')
         setIsFormOpen(true)
       } else {
-        onEditClick(id)
+        console.error('GenericTable - Item mit ID nicht gefunden:', id)
       }
     },
-    [data, onEditClick, getIdFromData]
+    [data, getIdFromData]
   )
 
   // Handler für das Schließen des Formulars

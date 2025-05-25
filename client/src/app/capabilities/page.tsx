@@ -258,16 +258,6 @@ const CapabilitiesPage = () => {
     // Automatisches Schließen erfolgt durch die CapabilityForm selbst
   }
 
-  // Business Capability Details anzeigen - Dialog innerhalb der GenericTable nutzen
-  const handleViewCapability = (id: string) => {
-    // Nichts tun, da die GenericTable-Komponente die Detail-Anzeige übernimmt
-  }
-
-  // Business Capability bearbeiten - Dialog innerhalb der GenericTable nutzen
-  const handleEditCapability = (id: string) => {
-    // Nichts tun, da die GenericTable-Komponente die Bearbeitung übernimmt
-  }
-
   // Filter-Handler
   const handleFilterChange = (newFilterValues: Partial<FilterState>) => {
     setFilterState(prev => ({ ...prev, ...newFilterValues }))
@@ -322,8 +312,6 @@ const CapabilitiesPage = () => {
             globalFilter={globalFilter}
             sorting={sorting}
             onSortingChange={setSorting}
-            onRowClick={handleViewCapability}
-            onEditClick={handleEditCapability}
             onCreateCapability={handleCreateCapabilitySubmit}
             onUpdateCapability={handleUpdateCapabilitySubmit}
             onDeleteCapability={handleDeleteCapability}

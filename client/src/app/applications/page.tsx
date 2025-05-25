@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import { Box, Typography, Button, Card, Paper } from '@mui/material'
 import { Add as AddIcon } from '@mui/icons-material'
 import { useQuery, useMutation } from '@apollo/client'
@@ -25,7 +24,6 @@ import { ApplicationType, FilterState } from '@/components/applications/types'
 
 const ApplicationsPage = () => {
   const { authenticated } = useAuth()
-  const router = useRouter()
   const { enqueueSnackbar } = useSnackbar()
   const [globalFilter, setGlobalFilter] = useState<string>('')
   const [sorting, setSorting] = useState([{ id: 'name', desc: false }])
@@ -361,16 +359,6 @@ const ApplicationsPage = () => {
     // Automatisches Schließen erfolgt durch die ApplicationForm selbst
   }
 
-  // Applikation Details anzeigen
-  const handleViewApplication = (id: string) => {
-    router.push(`/applications/${id}`)
-  }
-
-  // Applikation bearbeiten
-  const handleEditApplication = (id: string) => {
-    router.push(`/applications/edit/${id}`)
-  }
-
   // Filter-Handler
   const handleFilterChange = (newFilterValues: Partial<FilterState>) => {
     setFilterState(prev => ({ ...prev, ...newFilterValues }))
@@ -426,8 +414,6 @@ const ApplicationsPage = () => {
             globalFilter={globalFilter}
             sorting={sorting}
             onSortingChange={setSorting}
-            onRowClick={handleViewApplication}
-            onEditClick={handleEditApplication}
             onCreateApplication={handleCreateApplicationSubmit}
             onUpdateApplication={handleUpdateApplicationSubmit}
             onDeleteApplication={handleDeleteApplication}

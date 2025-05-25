@@ -4,7 +4,7 @@ import React, { useMemo } from 'react'
 import { Chip, useTheme } from '@mui/material'
 import { GenericTable } from '../common/GenericTable'
 import DataObjectForm, { DataObjectFormValues } from './DataObjectForm'
-import { formatDate, getClassificationLabel } from './utils'
+import { formatDate } from './utils'
 import { DataClassification, DataObject } from '../../gql/generated'
 import { createColumnHelper } from '@tanstack/react-table'
 import { SortingState } from '@tanstack/react-table'
@@ -16,8 +16,6 @@ interface DataObjectTableProps {
   globalFilter: string
   sorting: SortingState
   onSortingChange: (sorting: SortingState) => void
-  onRowClick: (id: string) => void
-  onEditClick: (id: string) => void
   onCreateDataObject?: (data: DataObjectFormValues) => Promise<void>
   onUpdateDataObject?: (id: string, data: DataObjectFormValues) => Promise<void>
   onDeleteDataObject?: (id: string) => Promise<void>
@@ -29,8 +27,6 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
   globalFilter,
   sorting,
   onSortingChange,
-  onRowClick,
-  onEditClick,
   onCreateDataObject,
   onUpdateDataObject,
   onDeleteDataObject,
@@ -128,7 +124,7 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
         },
       }),
     ],
-    [theme, columnHelper, getClassificationChip]
+    [columnHelper, getClassificationChip]
   )
 
   // Mapping-Funktion für die Umwandlung von DataObject zu DataObjectFormValues
@@ -145,14 +141,12 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
   }
 
   return (
-    <GenericTable
+    <GenericTable<DataObject, DataObjectFormValues>
       data={dataObjects}
       loading={loading}
       globalFilter={globalFilter}
       sorting={sorting}
       onSortingChange={onSortingChange}
-      onRowClick={onRowClick}
-      onEditClick={onEditClick}
       columns={columns}
       onCreate={onCreateDataObject}
       onUpdate={onUpdateDataObject}

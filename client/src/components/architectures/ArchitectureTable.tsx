@@ -20,8 +20,6 @@ interface ArchitectureTableProps {
   globalFilter: string
   sorting: SortingState
   onSortingChange: (sorting: SortingState) => void
-  onRowClick: (id: string) => void
-  onEditClick: (id: string) => void
   onCreateArchitecture?: (data: ArchitectureFormValues) => Promise<void>
   onUpdateArchitecture?: (id: string, data: ArchitectureFormValues) => Promise<void>
   onDeleteArchitecture?: (id: string) => Promise<void>
@@ -34,8 +32,6 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
   globalFilter,
   sorting,
   onSortingChange,
-  onRowClick,
-  onEditClick,
   onCreateArchitecture,
   onUpdateArchitecture,
   onDeleteArchitecture,
@@ -145,14 +141,12 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
   }
 
   return (
-    <GenericTable
+    <GenericTable<ArchitectureType, ArchitectureFormValues>
       data={architectures}
       loading={loading}
       globalFilter={globalFilter}
       sorting={sorting}
       onSortingChange={onSortingChange}
-      onRowClick={onRowClick}
-      onEditClick={onEditClick}
       columns={columns}
       onCreate={onCreateArchitecture}
       onUpdate={onUpdateArchitecture}

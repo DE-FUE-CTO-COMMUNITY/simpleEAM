@@ -1,5 +1,3 @@
-'use client'
-
 import React, { useMemo } from 'react'
 import { GenericTable } from '../common/GenericTable'
 import { Person } from './types'
@@ -25,21 +23,17 @@ interface PersonTableProps {
   globalFilter: string
   sorting: SortingState
   onSortingChange: (sorting: SortingState) => void
-  onRowClick: (id: string) => void
-  onEditClick: (id: string) => void
   onCreatePerson?: (data: PersonFormValues) => Promise<void>
   onUpdatePerson?: (id: string, data: PersonFormValues) => Promise<void>
   onDeletePerson?: (id: string) => Promise<void>
 }
 
-const PersonTable: React.FC<PersonTableProps> = ({
+const PersonTableWithGenericTable: React.FC<PersonTableProps> = ({
   persons,
   loading,
   globalFilter,
   sorting,
   onSortingChange,
-  onRowClick,
-  onEditClick,
   onCreatePerson,
   onUpdatePerson,
   onDeletePerson,
@@ -116,14 +110,12 @@ const PersonTable: React.FC<PersonTableProps> = ({
   }
 
   return (
-    <GenericTable
+    <GenericTable<Person, PersonFormValues>
       data={persons}
       loading={loading}
       globalFilter={globalFilter}
       sorting={sorting}
       onSortingChange={onSortingChange}
-      onRowClick={onRowClick}
-      onEditClick={onEditClick}
       columns={columns}
       onCreate={onCreatePerson}
       onUpdate={onUpdatePerson}
@@ -138,4 +130,4 @@ const PersonTable: React.FC<PersonTableProps> = ({
   )
 }
 
-export default PersonTable
+export default PersonTableWithGenericTable

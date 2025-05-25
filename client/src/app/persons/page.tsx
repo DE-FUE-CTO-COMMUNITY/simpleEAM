@@ -175,16 +175,6 @@ function PersonsPage() {
     // Automatisches Schließen erfolgt durch die PersonForm selbst
   }
 
-  // Person Details anzeigen - Dialog innerhalb der GenericTable nutzen
-  const handleViewPerson = (id: string) => {
-    // Nichts tun, da die GenericTable-Komponente die Detail-Anzeige übernimmt
-  }
-
-  // Person bearbeiten - Dialog innerhalb der GenericTable nutzen
-  const handleEditPerson = (id: string) => {
-    // Nichts tun, da die GenericTable-Komponente die Bearbeitung übernimmt
-  }
-
   // Filter-Handler
   const handleFilterChange = (newFilterValues: Partial<FilterState>) => {
     setFilterState(prev => ({ ...prev, ...newFilterValues }))
@@ -236,8 +226,6 @@ function PersonsPage() {
             globalFilter={globalFilter}
             sorting={sorting}
             onSortingChange={setSorting}
-            onRowClick={handleViewPerson}
-            onEditClick={handleEditPerson}
             onCreatePerson={handleCreatePersonSubmit}
             onUpdatePerson={handleUpdatePersonSubmit}
             onDeletePerson={handleDeletePerson}

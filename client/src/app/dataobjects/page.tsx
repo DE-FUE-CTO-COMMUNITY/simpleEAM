@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
-import { useRouter } from 'next/navigation'
 import { Box, Typography, Card, Button, Paper } from '@mui/material'
 import { Add as AddIcon } from '@mui/icons-material'
 import { useAuth, login, isArchitect } from '@/lib/auth'
@@ -23,7 +22,6 @@ import { DataObjectFilterState } from '@/components/dataobjects/DataObjectFilter
 
 const DataObjectsPage = () => {
   const { authenticated } = useAuth()
-  const router = useRouter()
   const { enqueueSnackbar } = useSnackbar()
   const [globalFilter, setGlobalFilter] = useState('')
   const [sorting, setSorting] = useState<SortingState>([])
@@ -178,22 +176,6 @@ const DataObjectsPage = () => {
     setShowNewDataObjectForm(true)
   }, [])
 
-  // Handler für das Öffnen der Detailansicht eines Datenobjekts
-  const handleViewDataObject = useCallback(
-    (id: string) => {
-      router.push(`/dataobjects/${id}`)
-    },
-    [router]
-  )
-
-  // Handler für das Öffnen der Form zum Bearbeiten eines Datenobjekts
-  const handleEditDataObject = useCallback(
-    (id: string) => {
-      router.push(`/dataobjects/edit/${id}`)
-    },
-    [router]
-  )
-
   // Handler für das Erstellen eines neuen Datenobjekts
   const handleCreateDataObjectSubmit = async (data: DataObjectFormValues) => {
     try {
@@ -298,8 +280,6 @@ const DataObjectsPage = () => {
             globalFilter={globalFilter}
             sorting={sorting}
             onSortingChange={setSorting}
-            onRowClick={handleViewDataObject}
-            onEditClick={handleEditDataObject}
             onCreateDataObject={handleCreateDataObjectSubmit}
             onUpdateDataObject={handleUpdateDataObjectSubmit}
             onDeleteDataObject={handleDeleteDataObject}

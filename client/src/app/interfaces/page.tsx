@@ -22,7 +22,7 @@ import ApplicationInterfaceTable from '@/components/interfaces/ApplicationInterf
 import ApplicationInterfaceToolbar from '@/components/interfaces/ApplicationInterfaceToolbar'
 import ApplicationInterfaceFilterDialog from '@/components/interfaces/ApplicationInterfaceFilterDialog'
 import { useApplicationInterfaceFilter } from '@/components/interfaces/useApplicationInterfaceFilter'
-import { ApplicationInterface, FilterState } from '@/components/interfaces/types'
+import { FilterState } from '@/components/interfaces/types'
 import { DataObject } from '@/gql/generated'
 
 function ApplicationInterfacesPage() {
@@ -186,16 +186,6 @@ function ApplicationInterfacesPage() {
     // Automatisches Schließen erfolgt durch die Form selbst
   }
 
-  // Schnittstelle Details anzeigen - Dialog innerhalb der GenericTable nutzen
-  const handleViewApplicationInterface = (id: string) => {
-    // Nichts tun, da die GenericTable-Komponente die Detail-Anzeige übernimmt
-  }
-
-  // Schnittstelle bearbeiten - Dialog innerhalb der GenericTable nutzen
-  const handleEditApplicationInterface = (id: string) => {
-    // Nichts tun, da die GenericTable-Komponente die Bearbeitung übernimmt
-  }
-
   // Filter-Handler
   const handleFilterChange = (newFilterValues: Partial<FilterState>) => {
     setFilterState(prev => ({ ...prev, ...newFilterValues }))
@@ -246,8 +236,6 @@ function ApplicationInterfacesPage() {
             globalFilter={globalFilter}
             sorting={sorting}
             onSortingChange={setSorting}
-            onRowClick={handleViewApplicationInterface}
-            onEditClick={handleEditApplicationInterface}
             onCreateApplicationInterface={handleCreateApplicationInterfaceSubmit}
             onUpdateApplicationInterface={handleUpdateApplicationInterfaceSubmit}
             onDeleteApplicationInterface={handleDeleteApplicationInterface}

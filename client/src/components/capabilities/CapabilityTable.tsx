@@ -17,8 +17,6 @@ interface CapabilityTableProps {
   globalFilter: string
   sorting: SortingState
   onSortingChange: (sorting: SortingState) => void
-  onRowClick: (id: string) => void
-  onEditClick: (id: string) => void
   onCreateCapability?: (data: CapabilityFormValues) => Promise<void>
   onUpdateCapability?: (id: string, data: CapabilityFormValues) => Promise<void>
   onDeleteCapability?: (id: string) => Promise<void>
@@ -32,8 +30,6 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
   globalFilter,
   sorting,
   onSortingChange,
-  onRowClick,
-  onEditClick,
   onCreateCapability,
   onUpdateCapability,
   onDeleteCapability,
@@ -135,14 +131,12 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
   }
 
   return (
-    <GenericTable
+    <GenericTable<Capability, CapabilityFormValues>
       data={capabilities}
       loading={loading}
       globalFilter={globalFilter}
       sorting={sorting}
       onSortingChange={onSortingChange}
-      onRowClick={onRowClick}
-      onEditClick={onEditClick}
       columns={columns}
       onCreate={onCreateCapability}
       onUpdate={onUpdateCapability}

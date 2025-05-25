@@ -415,16 +415,6 @@ const ArchitecturesPage = () => {
     })
   }
 
-  // Architektur Details anzeigen - leere Implementierung für GenericTable-Dialog
-  const handleViewArchitecture = (_id: string) => {
-    // Absichtlich leer - GenericTable übernimmt das Öffnen des Dialogs
-  }
-
-  // Architektur bearbeiten - leere Implementierung für GenericTable-Dialog
-  const handleEditArchitecture = (_id: string) => {
-    // Absichtlich leer - GenericTable übernimmt das Öffnen des Dialogs
-  }
-
   // Filter-Handler
   const handleFilterChange = (newFilterValues: Partial<FilterState>) => {
     setFilterState(prev => ({ ...prev, ...newFilterValues }))
@@ -511,8 +501,6 @@ const ArchitecturesPage = () => {
           globalFilter={globalFilter}
           sorting={sorting}
           onSortingChange={setSorting}
-          onRowClick={handleViewArchitecture}
-          onEditClick={handleEditArchitecture}
           onCreateArchitecture={handleCreateArchitectureSubmit}
           onUpdateArchitecture={handleUpdateArchitectureSubmit}
           onDeleteArchitecture={handleDeleteArchitecture}
