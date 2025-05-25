@@ -494,7 +494,10 @@ const GenericForm: React.FC<GenericFormProps> = ({
                   <Autocomplete
                     options={field.options || []}
                     value={formField.state.value}
-                    onChange={(_, newValue) => formField.handleChange(newValue)}
+                    onChange={(_, newValue) => {
+                      // Stelle sicher, dass null-Werte korrekt behandelt werden
+                      formField.handleChange(newValue)
+                    }}
                     disabled={disabled}
                     multiple={field.multiple}
                     freeSolo={field.freeSolo}
@@ -505,34 +508,40 @@ const GenericForm: React.FC<GenericFormProps> = ({
                     isOptionEqualToValue={
                       field.isOptionEqualToValue ||
                       ((option, value) => {
-                        // Standard-Implementierung für Objektvergleich
+                        // Vereinfachte und robustere Implementierung
                         if (option === value) return true
                         if (!option || !value) return false
 
-                        // Prüfe, ob es sich um Objekte handelt
-                        const isOptionObject = typeof option === 'object' && option !== null
-                        const isValueObject = typeof value === 'object' && value !== null
-
-                        // Wenn beides Objekte sind
-                        if (isOptionObject && isValueObject) {
-                          // Wenn Objekte IDs haben, vergleiche nach ID
-                          if ('id' in option && 'id' in value) {
-                            return option.id === value.id
-                          }
-
-                          // Vergleich nach value (für SelectOption-Objekte)
-                          if ('value' in option && 'value' in value) {
-                            return option.value === value.value
-                          }
+                        // Für String-Vergleiche
+                        if (typeof option === 'string' && typeof value === 'string') {
+                          return option === value
                         }
 
-                        // Wenn option ein Objekt ist und value ein primitiver Wert
-                        if (isOptionObject && 'value' in option) {
+                        // Für Objekte mit value-Property (SelectOption)
+                        if (
+                          typeof option === 'object' &&
+                          typeof value === 'object' &&
+                          'value' in option &&
+                          'value' in value
+                        ) {
+                          return option.value === value.value
+                        }
+
+                        // Für Option-Objekt und String-Value
+                        if (
+                          typeof option === 'object' &&
+                          'value' in option &&
+                          typeof value === 'string'
+                        ) {
                           return option.value === value
                         }
 
-                        // Wenn value ein Objekt ist und option ein primitiver Wert
-                        if (isValueObject && 'value' in value) {
+                        // Für String-Option und Value-Objekt
+                        if (
+                          typeof option === 'string' &&
+                          typeof value === 'object' &&
+                          'value' in value
+                        ) {
                           return option === value.value
                         }
 
@@ -545,8 +554,10 @@ const GenericForm: React.FC<GenericFormProps> = ({
                     renderInput={params => (
                       <TextField
                         {...params}
+                        label={field.label + (field.required ? ' *' : '')}
                         error={shouldShowError}
                         placeholder={field.placeholder}
+                        fullWidth={field.fullWidth !== false}
                         InputProps={{
                           ...params.InputProps,
                           readOnly: !!field.readOnly,

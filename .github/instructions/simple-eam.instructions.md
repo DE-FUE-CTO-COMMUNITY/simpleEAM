@@ -288,10 +288,34 @@ const table = useReactTable({
 
   #### Erweiterte Validierungskonzepte
 
-  - **Validierungszeitpunkte**:
+  - **Validierungszeitpunkte (WICHTIG - Anti-Pattern vermeiden)**:
 
-    - Volle Kontrolle über wann Validierung ausgeführt wird: `onChange`, `onBlur`, `onSubmit`
-    - Verschiedene Validierungen für unterschiedliche Ereignisse
+    ⚠️ **NICHT alle Events mit derselben Validierung ausstatten**:
+
+    ```tsx
+    // ❌ FALSCH - führt zu doppelter Validierung und Performance-Problemen
+    validators: {
+      onChange: schema,
+      onBlur: schema,    // ❌ Doppelte Validierung
+      onMount: schema,   // ❌ Unnötige initiale Validierung
+      onSubmit: schema,
+    }
+    ```
+
+    ✅ **RICHTIG - Optimierte Validierungsstrategie**:
+
+    ```tsx
+    // ✅ Empfohlene Konfiguration
+    validators: {
+      onChange: schema,  // Primäre Validierung bei Eingabe
+      onSubmit: schema,  // Finale Validierung beim Absenden
+      // onBlur: nur bei spezifischen Anforderungen (externe API-Checks)
+      // onMount: nur bei vorausgefüllten Formularen
+    }
+    ```
+
+  - **Volle Kontrolle über wann Validierung ausgeführt wird**: `onChange`, `onBlur`, `onSubmit`
+  - **Verschiedene Validierungen für unterschiedliche Ereignisse** (nur bei Bedarf):
 
     ```tsx
     <form.Field
@@ -540,6 +564,17 @@ const table = useReactTable({
   ```
 
   - **Best Practices für UI-Integration**:
+
+    ⚠️ **WICHTIG - onBlur Handler korrekt verwenden**:
+
+    ```tsx
+    // ❌ FALSCH - Arrow Function um handleBlur
+    onBlur={() => handleBlur()}
+
+    // ✅ RICHTIG - Direkte Referenz
+    onBlur={handleBlur}
+    ```
+
     - Verwenden von Render Props für optimale Typunterstützung und Kontrolle
     - Selektive Destrukturierung der benötigten Properties (state, handleChange, handleBlur)
     - Fehlerstatusweitergabe an UI-Komponenten (z.B. `error={!state.meta.isValid}`)
