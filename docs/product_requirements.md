@@ -282,7 +282,24 @@ Simple-EAM besteht aus mehreren Komponenten, die als Docker-Container bereitgest
 - Konfigurierbare Layout-Algorithmen
 - Anpassung und Speicherung der generierten Diagramme
 
-#### FR-DE-04: Diagramm-Export
+#### FR-DE-04: Datenbank-integrierte ArchiMate-Bibliothek
+
+**Beschreibung:** Das System muss eine erweiterte ArchiMate-Bibliothek bereitstellen, die existierende Architektur-Elemente aus der Datenbank anzeigt und das Drag-and-Drop dieser Elemente in Diagramme ermöglicht.  
+**Priorität:** Hoch  
+**Akzeptanzkriterien:**
+
+- Anzeige existierender Architektur-Elemente aus der Datenbank in der Excalidraw-Bibliothek
+- Dropdown-Filter für Architektur-Element-Typen (Business Capability, Application, Data Object, Interface)
+- Visuelle Darstellung der Datenbank-Elemente im Stil der entsprechenden ArchiMate-Symbole
+- Verwendung der ArchiMate-Farbpalette aus der bestehenden archimate-symbols.excalidrawlib
+- Drag-and-Drop-Funktionalität zum Hinzufügen von Datenbank-Elementen zu Diagrammen
+- Erhaltung der Datenbank-ID beim Ziehen von Elementen ins Diagramm (z.B. in customData-Feld)
+- Real-time Synchronisation zwischen Datenbank-Änderungen und Bibliothek-Anzeige
+- Suchfunktion für Architektur-Elemente in der Bibliothek
+- Hierarchische Darstellung von Business Capabilities (Parent-Child-Beziehungen)
+- Tooltip-Anzeige mit Element-Metadaten (Name, Beschreibung, Status, etc.)
+
+#### FR-DE-05: Diagramm-Export
 
 **Beschreibung:** Das System muss den Export von Diagrammen in verschiedene Formate unterstützen.  
 **Priorität:** Niedrig  

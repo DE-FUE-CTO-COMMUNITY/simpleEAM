@@ -161,21 +161,6 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     })
   }, [])
 
-  const getCurrentDiagramData = () => {
-    if (!excalidrawAPI) return '{}'
-
-    const elements = excalidrawAPI.getSceneElements()
-    const appState = excalidrawAPI.getAppState()
-
-    return JSON.stringify({
-      elements,
-      appState: {
-        viewBackgroundColor: appState.viewBackgroundColor,
-        currentItemFontFamily: appState.currentItemFontFamily,
-      },
-    })
-  }
-
   // UI Optionen für Excalidraw - Vollständige Anpassung des Menüs
   const uiOptions = {
     canvasActions: {
@@ -234,8 +219,8 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
         open={saveDialogOpen}
         onClose={() => setSaveDialogOpen(false)}
         onSave={handleSaveDiagram}
-        diagramData={getCurrentDiagramData()}
-        existingDiagram={currentDiagram}
+        excalidrawAPI={excalidrawAPI}
+        currentDiagram={currentDiagram}
       />
 
       {/* Open Dialog */}
