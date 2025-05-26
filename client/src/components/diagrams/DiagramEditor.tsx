@@ -154,9 +154,10 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
 
   const handleLibraryUpdate = useCallback((library: any) => {
     console.log('Integrierte Bibliothek geladen:', library)
+    const itemCount = Array.isArray(library) ? library.length : library.libraryItems?.length || 0
     setNotification({
       open: true,
-      message: 'Architektur-Bibliothek erfolgreich geladen!',
+      message: `Architektur-Bibliothek erfolgreich geladen! (${itemCount} Elemente)`,
       severity: 'success',
     })
   }, [])
