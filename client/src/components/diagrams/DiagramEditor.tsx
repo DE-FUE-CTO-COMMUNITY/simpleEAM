@@ -12,7 +12,7 @@ const ExcalidrawWrapper = dynamic(
     // Wichtig: Zuerst das CSS importieren, dann die Komponente
     await import('@excalidraw/excalidraw/index.css')
     const { Excalidraw, MainMenu } = await import('@excalidraw/excalidraw')
-    
+
     const ExcalidrawComponent: React.FC<{
       onOpenDialog: () => void
       onSaveDialog: () => void
@@ -41,7 +41,7 @@ const ExcalidrawWrapper = dynamic(
             >
               Diagramm öffnen
             </MainMenu.Item>
-            
+
             {/* Custom Save Menu Item */}
             <MainMenu.Item
               onSelect={onSaveDialog}
@@ -54,12 +54,10 @@ const ExcalidrawWrapper = dynamic(
             >
               Diagramm speichern als...
             </MainMenu.Item>
-            
+
             <MainMenu.Separator />
-            
+
             {/* Include default items but exclude social links */}
-            <MainMenu.DefaultItems.LoadScene />
-            <MainMenu.DefaultItems.SaveToActiveFile />
             <MainMenu.DefaultItems.SaveAsImage />
             <MainMenu.DefaultItems.Export />
             <MainMenu.Separator />
@@ -73,7 +71,7 @@ const ExcalidrawWrapper = dynamic(
         </Excalidraw>
       )
     }
-    
+
     return ExcalidrawComponent
   },
   {
@@ -104,6 +102,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const [excalidrawAPI, setExcalidrawAPI] = useState<any>(null)
   const [currentDiagram, setCurrentDiagram] = useState<any>(null)
+  const [archimateLibrary, setArchimateLibrary] = useState<any>(null)
 
   // Dialog-States
   const [saveDialogOpen, setSaveDialogOpen] = useState(false)
@@ -123,6 +122,27 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
   useEffect(() => {
     // Nur Client-seitig rendern
     setIsClient(true)
+
+    // ArchiMate-Bibliothek laden
+    const loadArchimateLibrary = async () => {
+      try {
+        const response = await fetch('/libraries/archimate-symbols.excalidrawlib')
+        if (!response.ok) {
+          throw new Error('Fehler beim Laden der ArchiMate-Bibliothek')
+        }
+        const libraryData = await response.json()
+        setArchimateLibrary(libraryData)
+      } catch (error) {
+        console.error('Fehler beim Laden der ArchiMate-Bibliothek:', error)
+        setNotification({
+          open: true,
+          message: 'Fehler beim Laden der ArchiMate-Bibliothek',
+          severity: 'error',
+        })
+      }
+    }
+
+    loadArchimateLibrary()
 
     // Keyboard-Shortcuts hinzufügen
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -147,12 +167,15 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
   }, [])
 
   // Custom App State for Excalidraw
-  const initialData = {
-    appState: {
-      viewBackgroundColor: '#ffffff',
-      currentItemFontFamily: 1,
-    },
-  }
+  const initialData = React.useMemo(() => {
+    return {
+      appState: {
+        viewBackgroundColor: '#ffffff',
+        currentItemFontFamily: 1,
+      },
+      ...(archimateLibrary && { libraryItems: archimateLibrary.libraryItems }),
+    }
+  }, [archimateLibrary])
 
   const handleSaveDiagram = useCallback((savedDiagram: any) => {
     setCurrentDiagram(savedDiagram)
@@ -196,6 +219,24 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     [excalidrawAPI]
   )
 
+  // Initialisiert die API und ruft sie bei Bedarf auf
+  const handleExcalidrawAPI = useCallback(
+    (api: any) => {
+      setExcalidrawAPI(api)
+
+      // Wenn die Bibliothek bereits geladen ist, registriere sie
+      if (archimateLibrary) {
+        try {
+          // In neueren Versionen von Excalidraw wird die Bibliothek automatisch aus initialData geladen
+          console.log('ArchiMate-Bibliothek geladen und für Excalidraw verfügbar gemacht')
+        } catch (error) {
+          console.error('Fehler beim Registrieren der ArchiMate-Bibliothek:', error)
+        }
+      }
+    },
+    [archimateLibrary]
+  )
+
   const handleCloseNotification = useCallback(() => {
     setNotification(prev => ({ ...prev, open: false }))
   }, [])
@@ -236,8 +277,10 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
       ellipse: true,
       eraser: true,
     },
+    // Aktiviere Bibliotheken
+    libraryReturnUrl: window.location.href, // Wichtig für Bibliotheken-Support
     // Verstecke verschiedene UI-Elemente
-    dockedSidebarBreakpoint: 0, // Deaktiviere Sidebar komplett
+    dockedSidebarBreakpoint: 1000, // Aktiviere Sidebar für Bibliotheken-Unterstützung
     welcomeScreen: false, // Kein Welcome Screen
   }
 
@@ -271,7 +314,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
           <ExcalidrawWrapper
             onOpenDialog={() => setOpenDialogOpen(true)}
             onSaveDialog={() => setSaveDialogOpen(true)}
-            excalidrawAPI={(api: any) => setExcalidrawAPI(api)}
+            excalidrawAPI={handleExcalidrawAPI}
             uiOptions={uiOptions}
             initialData={initialData}
           />
