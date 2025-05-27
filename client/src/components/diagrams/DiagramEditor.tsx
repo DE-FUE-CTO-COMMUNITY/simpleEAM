@@ -11,8 +11,9 @@ import IntegratedLibrary from './IntegratedLibrary'
 const ExcalidrawWrapper = dynamic(
   async () => {
     // Wichtig: Zuerst das CSS importieren, dann die Komponente
-    await import('@excalidraw/excalidraw/index.css')
-    const { Excalidraw, MainMenu } = await import('@excalidraw/excalidraw')
+    await import('@simple-eam/excalidraw/index.css')
+    const ExcalidrawModule = await import('@simple-eam/excalidraw')
+    const { Excalidraw, MainMenu } = ExcalidrawModule.default || ExcalidrawModule
 
     const ExcalidrawComponent: React.FC<{
       onOpenDialog: () => void
