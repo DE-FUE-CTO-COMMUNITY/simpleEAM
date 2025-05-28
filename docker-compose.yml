@@ -78,13 +78,12 @@ services:
       - KC_DB_URL=jdbc:postgresql://keycloak-db:5432/${KC_DB_NAME}
       - KC_DB_USERNAME=${KC_DB_USER}
       - KC_DB_PASSWORD=${KC_DB_PASSWORD}
-      - KC_HOSTNAME_URL=https://${AUTH_SUBDOMAIN}.${BASE_DOMAIN}/
       - KC_HOSTNAME_STRICT=false
-      - KC_HOSTNAME_STRICT_HTTPS=false
+      - KC_HTTP_ENABLED=true
       - KC_PROXY=edge
       - KC_HEALTH_ENABLED=true
     command:
-      - start-dev
+      - start
       - --import-realm
     volumes:
       - ./auth/src:/opt/keycloak/data/import
