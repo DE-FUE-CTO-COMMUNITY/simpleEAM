@@ -23,6 +23,11 @@ Dockerfile
 .dockerignore
 docker-compose.yml
 
+# Ignoriere Datenbank- und Authentifizierungs-Daten
+auth/data
+db/data
+db/logs
+
 # Ignoriere temporäre Dateien
 npm-debug.log*
 yarn-debug.log*
