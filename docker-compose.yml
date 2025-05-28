@@ -95,12 +95,12 @@ services:
       - ${TRAEFIK_NETWORK}
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.keycloak.rule=Host(`${AUTH_SUBDOMAIN}.${BASE_DOMAIN}`)'
-      - 'traefik.http.routers.keycloak.entrypoints=websecure'
-      - 'traefik.http.routers.keycloak.tls=true'
-      - 'traefik.http.routers.keycloak.tls.certresolver=${TRAEFIK_CERTRESOLVER}'
-      - traefik.http.routers.keycloak.tls.domains[0].main=${AUTH_SUBDOMAIN}.${BASE_DOMAIN}
-      - 'traefik.http.services.keycloak.loadbalancer.server.port=${KEYCLOAK_INTERNAL_PORT}'
+      - 'traefik.http.routers.keycloak-eam.rule=Host(`${AUTH_SUBDOMAIN}.${BASE_DOMAIN}`)'
+      - 'traefik.http.routers.keycloak-eam.entrypoints=websecure'
+      - 'traefik.http.routers.keycloak-eam.tls=true'
+      - 'traefik.http.routers.keycloak-eam.tls.certresolver=${TRAEFIK_CERTRESOLVER}'
+      - 'traefik.http.routers.keycloak-eam.tls.domains[0].main=${AUTH_SUBDOMAIN}.${BASE_DOMAIN}'
+      - 'traefik.http.services.keycloak-eam.loadbalancer.server.port=${KEYCLOAK_INTERNAL_PORT}'
       - 'traefik.docker.network=${TRAEFIK_NETWORK}'
 
   # Keycloak-Datenbank
