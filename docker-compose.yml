@@ -71,8 +71,6 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:23.0
     container_name: simple-eam-keycloak
-    ports:
-      - '${KEYCLOAK_EXTERNAL_PORT}:${KEYCLOAK_INTERNAL_PORT}'
     environment:
       - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN}
       - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}

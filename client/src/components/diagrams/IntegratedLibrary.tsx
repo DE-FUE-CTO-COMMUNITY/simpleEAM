@@ -316,10 +316,10 @@ function createLibraryItemFromDatabaseElement(dbElement: any, elementType: strin
     name: libraryItem.name,
     status: libraryItem.status,
     elementCount: elements.length,
-    groupedElements: elements.filter(e => e.groupIds && e.groupIds.length > 0).length,
+    groupedElements: elements.filter((e: any) => e.groupIds && e.groupIds.length > 0).length,
     textElements: elements
-      .filter(e => e.type === 'text')
-      .map(e => ({
+      .filter((e: any) => e.type === 'text')
+      .map((e: any) => ({
         text: e.text,
         rawText: e.rawText,
         originalText: e.originalText,
