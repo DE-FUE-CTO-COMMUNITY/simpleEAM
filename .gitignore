@@ -64,7 +64,6 @@ dist/
 build/
 out/
 .build/
-lib/
 lib-cov/
 
 # Keycloak
