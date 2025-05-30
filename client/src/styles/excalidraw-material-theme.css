@@ -1,0 +1,135 @@
+/**
+ * Excalidraw Material UI Theme Integration
+ * 
+ * This file customizes Excalidraw's CSS variables to align with the Material UI theme colors.
+ * Following the Excalidraw customization documentation pattern:
+ * https://docs.excalidraw.com/docs/@excalidraw/excalidraw/customizing-styles
+ */
+
+/* Light Theme - Material UI Integration */
+.excalidraw {
+  /* Primary Colors - Atos Blue (#0066CC) */
+  --color-primary: #0066CC;
+  --color-primary-darker: #004C99;
+  --color-primary-darkest: #003366;
+  --color-primary-light: #E6F0FF;
+  --color-primary-light-darker: #B3D4FF;
+  --color-primary-hover: #004C99;
+
+  /* Secondary Colors - Atos Light Blue (#00AEEF) */
+  --color-selection: #00AEEF;
+  
+  /* Surface Colors aligned with Material UI */
+  --color-surface-high: #F5F7FA;
+  --color-surface-mid: #F5F7FA;
+  
+  /* Background aligned with Material UI */
+  --default-bg-color: #FFFFFF;
+  --island-bg-color: #FFFFFF;
+  --popup-bg-color: #FFFFFF;
+  --input-bg-color: #FFFFFF;
+  
+  /* Text Colors aligned with Material UI */
+  --color-on-surface: rgba(0, 0, 0, 0.87);
+  --popup-text-color: rgba(0, 0, 0, 0.87);
+  --text-primary-color: rgba(0, 0, 0, 0.87);
+  
+  /* Focus and highlight colors using Material UI primary */
+  --focus-highlight-color: #E6F0FF;
+  --select-highlight-color: #4D94E0;
+  
+  /* Link color using Material UI primary */
+  --link-color: #0066CC;
+  
+  /* Button states aligned with Material UI */
+  --button-hover-bg: #F5F7FA;
+  --button-active-bg: #E6F0FF;
+  --button-active-border: #0066CC;
+  
+  /* Success colors aligned with Material UI */
+  --color-success: #E8F5E8;
+  --color-success-darker: #C8E6C9;
+  --color-success-darkest: #A5D6A7;
+  --color-success-text: #2E7D32;
+  --color-success-contrast: #4CAF50;
+  --color-success-contrast-hover: #66BB6A;
+  --color-success-contrast-active: #81C784;
+  
+  /* Warning colors aligned with Material UI */
+  --color-warning: #FFF3E0;
+  --color-warning-dark: #FFB74D;
+  --color-warning-darker: #FF9800;
+  --color-warning-darkest: #ED6C02;
+  --color-text-warning: rgba(0, 0, 0, 0.87);
+  
+  /* Error/Danger colors aligned with Material UI */
+  --color-danger: #FFEBEE;
+  --color-danger-dark: #EF5350;
+  --color-danger-darker: #F44336;
+  --color-danger-darkest: #D32F2F;
+  --color-danger-text: rgba(0, 0, 0, 0.87);
+  --color-danger-background: #FFEBEE;
+  --color-danger-icon-background: #FFCDD2;
+  --color-danger-color: #C62828;
+  --color-danger-icon-color: #C62828;
+  
+  /* Info colors aligned with Material UI */
+  --color-info: #E1F5FE;
+  --color-info-darker: #4FC3F7;
+  --color-info-darkest: #0288D1;
+  
+  /* Logo colors using Material UI primary */
+  --color-logo-icon: #0066CC;
+  --color-logo-text: #003366;
+  
+  /* Promo color using Material UI primary */
+  --color-promo: #0066CC;
+}
+
+/* Dark Theme - Material UI Integration */
+.excalidraw.theme--dark {
+  /* Primary Colors - Lighter variants for dark theme */
+  --color-primary: #4D94E0;
+  --color-primary-darker: #66A3E6;
+  --color-primary-darkest: #80B3EC;
+  --color-primary-light: #1A365D;
+  --color-primary-light-darker: #0F2A44;
+  --color-primary-hover: #66A3E6;
+
+  /* Secondary Colors - Lighter variant for dark theme */
+  --color-selection: #4DC8F4;
+  
+  /* Dark theme background colors */
+  --default-bg-color: #121212;
+  --island-bg-color: #1E1E1E;
+  --popup-bg-color: #1E1E1E;
+  --input-bg-color: #2D2D2D;
+  
+  /* Dark theme surface colors */
+  --color-surface-high: #2D2D2D;
+  --color-surface-mid: #242424;
+  
+  /* Dark theme text colors */
+  --color-on-surface: rgba(255, 255, 255, 0.87);
+  --popup-text-color: rgba(255, 255, 255, 0.87);
+  --text-primary-color: rgba(255, 255, 255, 0.87);
+  
+  /* Dark theme focus and highlight colors */
+  --focus-highlight-color: #1A365D;
+  --select-highlight-color: #4D94E0;
+  
+  /* Dark theme link color */
+  --link-color: #4D94E0;
+  
+  /* Dark theme button states */
+  --button-hover-bg: #2D2D2D;
+  --button-active-bg: #1A365D;
+  --button-active-border: #4D94E0;
+  
+  /* Dark theme logo colors */
+  --color-logo-icon: #4D94E0;
+  --color-logo-text: #80B3EC;
+  
+  /* Dark theme promo color */
+  --color-promo: #4D94E0;
+}

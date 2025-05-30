@@ -14,6 +14,8 @@ const ExcalidrawWrapper = dynamic(
   async () => {
     // Wichtig: Zuerst das CSS importieren, dann die Komponente
     await import('@excalidraw/excalidraw/index.css')
+    // Import Material UI theme customizations for Excalidraw
+    await import('@/styles/excalidraw-material-theme.css')
     const { Excalidraw, MainMenu } = await import('@excalidraw/excalidraw')
 
     const ExcalidrawComponent: React.FC<{
