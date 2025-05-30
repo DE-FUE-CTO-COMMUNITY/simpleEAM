@@ -18,6 +18,7 @@ export const GET_DIAGRAMS = gql`
       id
       title
       description
+      diagramType
       diagramJson
       createdAt
       updatedAt
@@ -42,6 +43,7 @@ export const GET_DIAGRAM = gql`
       id
       title
       description
+      diagramType
       diagramJson
       createdAt
       updatedAt
@@ -67,6 +69,7 @@ export const CREATE_DIAGRAM = gql`
         id
         title
         description
+        diagramType
         diagramJson
         createdAt
         creator {
@@ -90,6 +93,7 @@ export const UPDATE_DIAGRAM = gql`
         id
         title
         description
+        diagramType
         diagramJson
         updatedAt
         creator {

@@ -32,10 +32,30 @@ export const DIAGRAM_TYPES: DiagramType[] = [
     label: 'Architekturdiagramm',
     description: 'Technische oder fachliche Architektur',
   },
+  {
+    value: 'APPLICATION_LANDSCAPE',
+    label: 'Anwendungslandschaft',
+    description: 'Übersicht über alle Anwendungen und deren Beziehungen',
+  },
   { value: 'CAPABILITY_MAP', label: 'Capability Map', description: 'Fähigkeitslandkarte' },
   { value: 'DATA_FLOW', label: 'Datenflussdiagramm', description: 'Darstellung von Datenströmen' },
   { value: 'PROCESS', label: 'Prozessdiagramm', description: 'Geschäftsprozesse und Workflows' },
   { value: 'NETWORK', label: 'Netzwerkdiagramm', description: 'IT-Infrastruktur und Netzwerke' },
+  {
+    value: 'INTEGRATION_ARCHITECTURE',
+    label: 'Integrationsarchitektur',
+    description: 'Systemintegration und Schnittstellen',
+  },
+  {
+    value: 'SECURITY_ARCHITECTURE',
+    label: 'Sicherheitsarchitektur',
+    description: 'Sicherheitskonzepte und -maßnahmen',
+  },
+  {
+    value: 'CONCEPTUAL',
+    label: 'Konzeptdiagramm',
+    description: 'Konzeptuelle Darstellung und Ideen',
+  },
   { value: 'OTHER', label: 'Sonstige', description: 'Andere Diagrammtypen' },
 ]
 
@@ -49,8 +69,21 @@ export interface SaveDiagramDialogProps {
     title: string
     description?: string
     diagramType?: string
-    architectureId?: string
+    architecture?:
+      | {
+          id: string
+          name: string
+          type: string
+          domain: string
+        }[]
+      | {
+          id: string
+          name: string
+          type: string
+          domain: string
+        }
   }
+  forceSaveAs?: boolean // Wenn true, wird immer ein neues Diagramm erstellt (für "Speichern unter")
 }
 
 const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
@@ -59,21 +92,100 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
   onSave,
   diagramData,
   existingDiagram,
+  forceSaveAs = false,
 }) => {
   const { user } = useAuth()
-  const [title, setTitle] = useState(existingDiagram?.title || '')
-  const [description, setDescription] = useState(existingDiagram?.description || '')
-  const [diagramType, setDiagramType] = useState(existingDiagram?.diagramType || 'ARCHITECTURE')
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
+  const [diagramType, setDiagramType] = useState('ARCHITECTURE')
   const [selectedArchitecture, setSelectedArchitecture] = useState<any>(null)
   const [saving, setSaving] = useState(false)
+  const [titleError, setTitleError] = useState(false)
+  const [architectureError, setArchitectureError] = useState(false)
 
   const { data: architecturesData } = useQuery(GET_ARCHITECTURES_FOR_DIAGRAM)
 
   const [createDiagram] = useMutation(CREATE_DIAGRAM)
   const [updateDiagram] = useMutation(UPDATE_DIAGRAM)
 
+  // Update form fields when dialog opens
+  React.useEffect(() => {
+    if (open) {
+      if (existingDiagram) {
+        // Bei "Speichern unter" fügen wir " - Kopie" zum Titel hinzu
+        const titleValue = forceSaveAs
+          ? `${existingDiagram.title} - Kopie`
+          : existingDiagram.title || ''
+        setTitle(titleValue)
+        setDescription(existingDiagram.description || '')
+        setDiagramType(existingDiagram.diagramType || 'ARCHITECTURE')
+
+        // Setze die bestehende Architektur wenn vorhanden
+        if (existingDiagram.architecture) {
+          // Die Architektur kommt als Array, wir nehmen das erste Element
+          const architectureValue = Array.isArray(existingDiagram.architecture)
+            ? existingDiagram.architecture[0]
+            : existingDiagram.architecture
+          setSelectedArchitecture(architectureValue)
+          setArchitectureError(false) // Architektur ist vorhanden, kein Fehler
+        } else {
+          setSelectedArchitecture(null)
+          setArchitectureError(true) // Keine Architektur, Fehler anzeigen
+        }
+
+        // Für existierende Diagramme: keine Titel-Fehler beim Laden
+        setTitleError(false)
+      } else {
+        // Reset form for new diagrams
+        setTitle('')
+        setDescription('')
+        setDiagramType('ARCHITECTURE')
+        setSelectedArchitecture(null)
+
+        // Für neue Diagramme: Validierungsfehler sofort anzeigen
+        setTitleError(true) // Titel ist leer, also Fehler anzeigen
+        setArchitectureError(true) // Architektur ist nicht gewählt, also Fehler anzeigen
+      }
+    }
+  }, [open, existingDiagram, forceSaveAs])
+
+  // Zusätzliche Validierung für Architektur wenn architecturesData geladen wird
+  React.useEffect(() => {
+    if (
+      existingDiagram?.architecture &&
+      architecturesData?.architectures &&
+      open &&
+      !selectedArchitecture
+    ) {
+      // Extrahiere die Architektur-ID (Array oder Objekt)
+      const architectureFromDiagram = Array.isArray(existingDiagram.architecture)
+        ? existingDiagram.architecture[0]
+        : existingDiagram.architecture
+
+      if (architectureFromDiagram?.id) {
+        // Finde die Architektur in den geladenen Daten
+        const foundArch = architecturesData.architectures.find(
+          (a: any) => a.id === architectureFromDiagram.id
+        )
+
+        // Setze die gefundene Architektur nur wenn noch keine gesetzt ist
+        if (foundArch) {
+          setSelectedArchitecture(foundArch)
+          setArchitectureError(false)
+        }
+      }
+    }
+  }, [architecturesData, open, existingDiagram?.architecture, selectedArchitecture])
+
   const handleSave = async () => {
-    if (!title.trim()) {
+    // Validierung
+    const isTitleValid = title.trim().length > 0
+    const isArchitectureValid = selectedArchitecture !== null
+
+    setTitleError(!isTitleValid)
+    setArchitectureError(!isArchitectureValid)
+
+    if (!isTitleValid || !isArchitectureValid) {
       return
     }
 
@@ -83,17 +195,16 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
         title: title.trim(),
         description: description.trim() || undefined,
         diagramJson: diagramData,
-        ...(selectedArchitecture && {
-          architecture: {
-            connect: [
-              {
-                where: {
-                  node: { id: { eq: selectedArchitecture.id } },
-                },
+        diagramType: diagramType, // Hinzufügen des diagramType-Felds
+        architecture: {
+          connect: [
+            {
+              where: {
+                node: { id: { eq: selectedArchitecture.id } },
               },
-            ],
-          },
-        }),
+            },
+          ],
+        },
         ...(user && {
           creator: {
             connect: [
@@ -108,24 +219,23 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
       }
 
       let result
-      if (existingDiagram?.id) {
+      if (existingDiagram?.id && !forceSaveAs) {
         // Update bestehende Diagramm
         const updateInput = {
           title: { set: title.trim() },
           description: { set: description.trim() || undefined },
           diagramJson: { set: diagramData },
-          ...(selectedArchitecture && {
-            architecture: {
-              disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
-              connect: [
-                {
-                  where: {
-                    node: { id: { eq: selectedArchitecture.id } },
-                  },
+          diagramType: { set: diagramType }, // Hinzufügen des diagramType-Felds für Updates
+          architecture: {
+            disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
+            connect: [
+              {
+                where: {
+                  node: { id: { eq: selectedArchitecture.id } },
                 },
-              ],
-            },
-          }),
+              },
+            ],
+          },
         }
 
         result = await updateDiagram({
@@ -137,7 +247,7 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
 
         onSave(result.data.updateDiagrams.diagrams[0])
       } else {
-        // Neue Diagramm erstellen
+        // Neue Diagramm erstellen (auch bei forceSaveAs)
         result = await createDiagram({
           variables: {
             input: [input],
@@ -157,29 +267,42 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
 
   const selectedDiagramType = DIAGRAM_TYPES.find(type => type.value === diagramType)
 
-  React.useEffect(() => {
-    if (existingDiagram?.architectureId && architecturesData?.architectures) {
-      const arch = architecturesData.architectures.find(
-        (a: any) => a.id === existingDiagram.architectureId
-      )
-      if (arch) {
-        setSelectedArchitecture(arch)
-      }
-    }
-  }, [existingDiagram?.architectureId, architecturesData])
+  // Handler für Titel-Änderungen mit Validierung
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newTitle = e.target.value
+    setTitle(newTitle)
+    // Sofortige Validierung
+    setTitleError(newTitle.trim().length === 0)
+  }
+
+  // Handler für Architektur-Änderungen mit Validierung
+  const handleArchitectureChange = (_: any, newValue: any) => {
+    setSelectedArchitecture(newValue)
+    // Sofortige Validierung
+    setArchitectureError(newValue === null)
+  }
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>{existingDiagram ? 'Diagramm aktualisieren' : 'Diagramm speichern'}</DialogTitle>
+      <DialogTitle>
+        {forceSaveAs
+          ? 'Diagramm speichern unter...'
+          : existingDiagram
+            ? 'Diagramm aktualisieren'
+            : 'Diagramm speichern'}
+      </DialogTitle>
       <DialogContent>
         <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 3 }}>
           <TextField
             label="Titel"
             value={title}
-            onChange={e => setTitle(e.target.value)}
+            onChange={handleTitleChange}
             fullWidth
             required
-            helperText="Eindeutiger Name für das Diagramm"
+            error={titleError}
+            helperText={
+              titleError ? 'Titel ist ein Pflichtfeld' : 'Eindeutiger Name für das Diagramm'
+            }
           />
 
           <TextField
@@ -215,8 +338,15 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
           <Autocomplete
             options={architecturesData?.architectures || []}
             value={selectedArchitecture}
-            onChange={(_, newValue) => setSelectedArchitecture(newValue)}
-            getOptionLabel={option => `${option.name} (${option.type})`}
+            onChange={handleArchitectureChange}
+            getOptionLabel={option => {
+              if (!option || !option.name || !option.type) return ''
+              return `${option.name} (${option.type})`
+            }}
+            isOptionEqualToValue={(option, value) => {
+              if (!option || !value) return false
+              return option.id === value.id
+            }}
             renderOption={(props, option) => (
               <Box component="li" {...props}>
                 <Box>
@@ -231,7 +361,13 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
               <TextField
                 {...params}
                 label="Zugehörige Architektur"
-                helperText="Optional: Ordnet das Diagramm einer bestimmten Architektur zu"
+                required
+                error={architectureError}
+                helperText={
+                  architectureError
+                    ? 'Architektur ist ein Pflichtfeld'
+                    : 'Pflichtfeld: Ordnet das Diagramm einer bestimmten Architektur zu'
+                }
               />
             )}
             fullWidth
@@ -242,8 +378,18 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
         <Button onClick={onClose} disabled={saving}>
           Abbrechen
         </Button>
-        <Button onClick={handleSave} variant="contained" disabled={!title.trim() || saving}>
-          {saving ? 'Speichere...' : existingDiagram ? 'Aktualisieren' : 'Speichern'}
+        <Button
+          onClick={handleSave}
+          variant="contained"
+          disabled={!title.trim() || !selectedArchitecture || saving}
+        >
+          {saving
+            ? 'Speichere...'
+            : forceSaveAs
+              ? 'Als Kopie speichern'
+              : existingDiagram
+                ? 'Aktualisieren'
+                : 'Speichern'}
         </Button>
       </DialogActions>
     </Dialog>

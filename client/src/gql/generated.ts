@@ -4468,6 +4468,7 @@ export type Diagram = {
   creatorConnection: DiagramCreatorConnection;
   description?: Maybe<Scalars['String']['output']>;
   diagramJson: Scalars['String']['output'];
+  diagramType?: Maybe<DiagramType>;
   id: Scalars['ID']['output'];
   title: Scalars['String']['output'];
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
@@ -4660,6 +4661,7 @@ export type DiagramCreateInput = {
   creator?: InputMaybe<DiagramCreatorFieldInput>;
   description?: InputMaybe<Scalars['String']['input']>;
   diagramJson: Scalars['String']['input'];
+  diagramType?: InputMaybe<DiagramType>;
   title: Scalars['String']['input'];
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
 };
@@ -4824,9 +4826,35 @@ export type DiagramSort = {
   createdAt?: InputMaybe<SortDirection>;
   description?: InputMaybe<SortDirection>;
   diagramJson?: InputMaybe<SortDirection>;
+  diagramType?: InputMaybe<SortDirection>;
   id?: InputMaybe<SortDirection>;
   title?: InputMaybe<SortDirection>;
   updatedAt?: InputMaybe<SortDirection>;
+};
+
+/** Diagramm-Typen für Excalidraw-Diagramme */
+export enum DiagramType {
+  APPLICATION_LANDSCAPE = 'APPLICATION_LANDSCAPE',
+  ARCHITECTURE = 'ARCHITECTURE',
+  CAPABILITY_MAP = 'CAPABILITY_MAP',
+  CONCEPTUAL = 'CONCEPTUAL',
+  DATA_FLOW = 'DATA_FLOW',
+  INTEGRATION_ARCHITECTURE = 'INTEGRATION_ARCHITECTURE',
+  NETWORK = 'NETWORK',
+  OTHER = 'OTHER',
+  PROCESS = 'PROCESS',
+  SECURITY_ARCHITECTURE = 'SECURITY_ARCHITECTURE'
+}
+
+/** DiagramType filters */
+export type DiagramTypeEnumScalarFilters = {
+  eq?: InputMaybe<DiagramType>;
+  in?: InputMaybe<Array<DiagramType>>;
+};
+
+/** DiagramType mutations */
+export type DiagramTypeEnumScalarMutations = {
+  set?: InputMaybe<DiagramType>;
 };
 
 export type DiagramUpdateInput = {
@@ -4835,6 +4863,7 @@ export type DiagramUpdateInput = {
   creator?: InputMaybe<Array<DiagramCreatorUpdateFieldInput>>;
   description?: InputMaybe<StringScalarMutations>;
   diagramJson?: InputMaybe<StringScalarMutations>;
+  diagramType?: InputMaybe<DiagramTypeEnumScalarMutations>;
   title?: InputMaybe<StringScalarMutations>;
 };
 
@@ -4849,6 +4878,7 @@ export type DiagramWhere = {
   creatorConnection?: InputMaybe<DiagramCreatorConnectionFilters>;
   description?: InputMaybe<StringScalarFilters>;
   diagramJson?: InputMaybe<StringScalarFilters>;
+  diagramType?: InputMaybe<DiagramTypeEnumScalarFilters>;
   id?: InputMaybe<IdScalarFilters>;
   title?: InputMaybe<StringScalarFilters>;
   updatedAt?: InputMaybe<DateTimeScalarFilters>;

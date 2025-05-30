@@ -42,7 +42,9 @@ const OpenDiagramDialog: React.FC<OpenDiagramDialogProps> = ({ open, onClose, on
     skip: !open,
   })
 
-  const diagrams = useMemo(() => data?.diagrams || [], [data?.diagrams])
+  const diagrams = useMemo(() => {
+    return data?.diagrams || []
+  }, [data?.diagrams])
 
   // Filtern der Diagramme basierend auf Suchkriterien
   const filteredDiagrams = diagrams.filter((diagram: any) => {
@@ -51,6 +53,7 @@ const OpenDiagramDialog: React.FC<OpenDiagramDialogProps> = ({ open, onClose, on
       diagram.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (diagram.description && diagram.description.toLowerCase().includes(searchTerm.toLowerCase()))
 
+    // Typ-Filter mit korrektem diagramType Feld
     const matchesType = !selectedType || diagram.diagramType === selectedType
 
     const matchesArchitecture =
