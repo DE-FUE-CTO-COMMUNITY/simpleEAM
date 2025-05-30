@@ -2,7 +2,6 @@ import express from 'express'
 import { ApolloServer } from 'apollo-server-express'
 import cors from 'cors'
 import helmet from 'helmet'
-import compression from 'compression'
 import dotenv from 'dotenv'
 import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core'
 import http from 'http'
@@ -10,7 +9,6 @@ import http from 'http'
 // Eigene Module importieren
 import { testConnection, closeDriver } from './db/neo4j-client'
 import { neoSchema } from './graphql/schema'
-import { createContext } from './auth/auth'
 
 // Umgebungsvariablen laden
 dotenv.config()
@@ -34,8 +32,6 @@ async function startServer() {
 
   // Middleware konfigurieren
   app.use(cors())
-  // TypeScript-Fehler umgehen durch explizite Typzuweisung
-  app.use(compression())
   app.use(
     helmet({ contentSecurityPolicy: process.env.NODE_ENV === 'production' ? undefined : false })
   )
@@ -47,7 +43,9 @@ async function startServer() {
   // Apollo-Server initialisieren
   const server = new ApolloServer({
     schema,
-    context: createContext,
+    context: ({ req }) => ({
+      token: req.headers.authorization, // Token direkt aus Authorization Header an Neo4j GraphQL Library weitergeben
+    }),
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
     introspection: true, // Für Entwicklung aktivieren
   })

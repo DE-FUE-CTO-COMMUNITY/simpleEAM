@@ -1,7 +1,25 @@
 """
+JWT-Typ für die Authentifizierung mit Keycloak
+"""
+type JWT @jwt {
+  sub: String!
+  preferred_username: String
+  email: String
+  roles: [String!]! @jwtClaim(path: "realm_access.roles")
+}
+
+extend schema @authentication
+
+"""
 Business Capability - repräsentiert eine Geschäftsfähigkeit im Enterprise Architecture Management
 """
-type BusinessCapability @node {
+type BusinessCapability
+  @node
+  @authorization(
+    validate: [
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "architect" } } } }
+    ]
+  ) {
   id: ID! @id
   name: String!
   description: String
@@ -22,7 +40,13 @@ type BusinessCapability @node {
 """
 Person - repräsentiert eine Person im Unternehmen
 """
-type Person @node {
+type Person
+  @node
+  @authorization(
+    validate: [
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "architect" } } } }
+    ]
+  ) {
   id: ID! @id
   firstName: String!
   lastName: String!
@@ -42,7 +66,13 @@ type Person @node {
 """
 Application - repräsentiert eine Business-Applikation im Enterprise Architecture Management
 """
-type Application @node {
+type Application
+  @node
+  @authorization(
+    validate: [
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "architect" } } } }
+    ]
+  ) {
   id: ID! @id
   name: String!
   description: String
@@ -68,7 +98,13 @@ type Application @node {
 """
 ApplicationInterface - repräsentiert eine Schnittstelle zwischen Applikationen
 """
-type ApplicationInterface @node {
+type ApplicationInterface
+  @node
+  @authorization(
+    validate: [
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "architect" } } } }
+    ]
+  ) {
   id: ID! @id
   name: String!
   description: String
@@ -81,7 +117,13 @@ type ApplicationInterface @node {
 """
 DataObject - repräsentiert ein Business-Datenobjekt im Enterprise Architecture Management
 """
-type DataObject @node {
+type DataObject
+  @node
+  @authorization(
+    validate: [
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "architect" } } } }
+    ]
+  ) {
   id: ID! @id
   name: String!
   description: String
@@ -149,7 +191,13 @@ enum InterfaceType {
 """
 Architecture - repräsentiert eine Architektur im Enterprise Architecture Management
 """
-type Architecture @node {
+type Architecture
+  @node
+  @authorization(
+    validate: [
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "architect" } } } }
+    ]
+  ) {
   id: ID! @id
   name: String!
   description: String
@@ -171,7 +219,13 @@ type Architecture @node {
 """
 Diagram - repräsentiert ein Excalidraw-Diagramm
 """
-type Diagram @node {
+type Diagram
+  @node
+  @authorization(
+    validate: [
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "architect" } } } }
+    ]
+  ) {
   id: ID! @id
   title: String!
   description: String

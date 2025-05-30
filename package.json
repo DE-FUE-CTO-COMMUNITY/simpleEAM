@@ -41,6 +41,8 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "compression": "^1.8.0"
+    "axios": "^1.9.0",
+    "compression": "^1.8.0",
+    "dotenv": "^16.5.0"
   }
 }

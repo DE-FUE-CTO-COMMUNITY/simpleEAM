@@ -25,6 +25,7 @@
     "graphql-tools": "^9.0.18",
     "helmet": "^7.0.0",
     "jsonwebtoken": "^9.0.2",
+    "jwks-client": "^2.0.5",
     "neo4j-driver": "^5.13.0",
     "uuid": "^9.0.1"
   },
