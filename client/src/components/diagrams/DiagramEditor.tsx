@@ -152,6 +152,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const [excalidrawAPI, setExcalidrawAPI] = useState<any>(null)
   const [currentDiagram, setCurrentDiagram] = useState<any>(null)
+  const [currentScene, setCurrentScene] = useState<any>(null)
 
   // Dialog-States
   const [saveDialogOpen, setSaveDialogOpen] = useState(false)
@@ -173,6 +174,17 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
   useEffect(() => {
     // Nur Client-seitig rendern
     setIsClient(true)
+
+    // Load persisted scene from localStorage
+    const persistedScene = localStorage.getItem('excalidraw-scene')
+    if (persistedScene) {
+      try {
+        const sceneData = JSON.parse(persistedScene)
+        setCurrentScene(sceneData)
+      } catch (error) {
+        console.error('Fehler beim Laden der gespeicherten Szene:', error)
+      }
+    }
   }, [])
 
   const handleSaveDiagram = useCallback((savedDiagram: any) => {
@@ -190,14 +202,18 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
       if (excalidrawAPI && diagram.diagramJson) {
         try {
           const diagramData = JSON.parse(diagram.diagramJson)
-          excalidrawAPI.updateScene({
+          const sceneData = {
             elements: diagramData.elements || [],
             appState: {
               ...diagramData.appState,
               viewBackgroundColor: '#ffffff',
             },
-          })
+          }
+          excalidrawAPI.updateScene(sceneData)
           setCurrentDiagram(diagram)
+          setCurrentScene(sceneData)
+          // Persist to localStorage
+          localStorage.setItem('excalidraw-scene', JSON.stringify(sceneData))
           setNotification({
             open: true,
             message: `Diagramm "${diagram.title}" erfolgreich geladen!`,
@@ -220,13 +236,17 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
   const handleNewDiagram = useCallback(() => {
     if (excalidrawAPI) {
       // Canvas leeren
-      excalidrawAPI.updateScene({
+      const emptyScene = {
         elements: [],
         appState: {
           viewBackgroundColor: '#ffffff',
         },
-      })
+      }
+      excalidrawAPI.updateScene(emptyScene)
       setCurrentDiagram(null)
+      setCurrentScene(emptyScene)
+      // Clear localStorage
+      localStorage.removeItem('excalidraw-scene')
       setNotification({
         open: true,
         message: 'Neues Diagramm erstellt',
@@ -238,14 +258,18 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
   const handleDeleteDiagram = useCallback(() => {
     // Reset the current diagram and clear canvas
     setCurrentDiagram(null)
-    if (excalidrawAPI) {
-      excalidrawAPI.updateScene({
-        elements: [],
-        appState: {
-          viewBackgroundColor: '#ffffff',
-        },
-      })
+    const emptyScene = {
+      elements: [],
+      appState: {
+        viewBackgroundColor: '#ffffff',
+      },
     }
+    if (excalidrawAPI) {
+      excalidrawAPI.updateScene(emptyScene)
+    }
+    setCurrentScene(emptyScene)
+    // Clear localStorage
+    localStorage.removeItem('excalidraw-scene')
     setNotification({
       open: true,
       message: 'Diagramm erfolgreich gelöscht',
@@ -266,7 +290,47 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
   // Initialisiert die API und ruft sie bei Bedarf auf
   const handleExcalidrawAPI = useCallback((api: any) => {
     setExcalidrawAPI(api)
+
+    // Set up auto-save to localStorage
+    let saveTimeout: NodeJS.Timeout
+    const autoSaveScene = () => {
+      if (api) {
+        const scene = api.getSceneElements()
+        const appState = api.getAppState()
+        const sceneData = {
+          elements: scene,
+          appState: {
+            viewBackgroundColor: appState.viewBackgroundColor,
+            currentItemFontFamily: appState.currentItemFontFamily,
+            // Only save essential app state properties
+          },
+        }
+        localStorage.setItem('excalidraw-scene', JSON.stringify(sceneData))
+        setCurrentScene(sceneData)
+      }
+    }
+
+    // Set up onChange listener for auto-save
+    const onChangeHandler = () => {
+      clearTimeout(saveTimeout)
+      saveTimeout = setTimeout(autoSaveScene, 1000) // Save after 1 second of no changes
+    }
+
+    // Store the change handler reference for cleanup
+    if (api && api.onChange) {
+      api.onChange(onChangeHandler)
+    }
   }, [])
+
+  // Load persisted scene when API becomes available
+  useEffect(() => {
+    if (excalidrawAPI && currentScene && currentScene.elements) {
+      // Only load if there are actually elements to load
+      if (currentScene.elements.length > 0) {
+        excalidrawAPI.updateScene(currentScene)
+      }
+    }
+  }, [excalidrawAPI, currentScene])
 
   // Keyboard shortcuts handling
   useEffect(() => {
@@ -348,7 +412,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     },
   }
 
-  const initialData = {
+  const initialData = currentScene || {
     appState: { viewBackgroundColor: '#ffffff' },
     scrollToContent: true,
   }
