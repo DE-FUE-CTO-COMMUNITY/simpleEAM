@@ -29,6 +29,7 @@ import {
 } from '@mui/icons-material'
 import type { SxProps, Theme } from '@mui/material'
 import type { FormApi } from '@tanstack/react-form'
+import { isViewer } from '@/lib/auth'
 import { Field, useStore } from '@tanstack/react-form'
 import { DatePicker, DateTimePicker } from '@mui/x-date-pickers'
 import dayjs from 'dayjs'
@@ -786,7 +787,7 @@ const GenericForm: React.FC<GenericFormProps> = ({
                   )}
                 </Button>
               )}
-              {isViewMode && onEditMode && (
+              {isViewMode && onEditMode && !isViewer() && (
                 <Button
                   variant="contained"
                   color="primary"

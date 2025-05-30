@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic'
 import SaveDiagramDialog from './SaveDiagramDialog'
 import OpenDiagramDialog from './OpenDiagramDialog'
 import IntegratedLibrary from './IntegratedLibrary'
+import { isViewer } from '@/lib/auth'
 
 // Dynamischer Import von Excalidraw, um Server-Side-Rendering zu vermeiden
 const ExcalidrawWrapper = dynamic(
@@ -20,7 +21,15 @@ const ExcalidrawWrapper = dynamic(
       excalidrawAPI: (api: any) => void
       uiOptions: any
       initialData: any
-    }> = ({ onOpenDialog, onSaveDialog, excalidrawAPI, uiOptions, initialData }) => {
+      viewModeEnabled?: boolean
+    }> = ({
+      onOpenDialog,
+      onSaveDialog,
+      excalidrawAPI,
+      uiOptions,
+      initialData,
+      viewModeEnabled,
+    }) => {
       return (
         <div style={{ height: '100%', width: '100%' }}>
           <Excalidraw
@@ -29,9 +38,9 @@ const ExcalidrawWrapper = dynamic(
             UIOptions={uiOptions}
             initialData={initialData}
             excalidrawAPI={excalidrawAPI}
-          >
-            <MainMenu>
-              {/* Custom Open Menu Item */}
+            viewModeEnabled={viewModeEnabled}
+          >            <MainMenu>
+              {/* Custom Open Menu Item - available for all users */}
               <MainMenu.Item
                 onSelect={onOpenDialog}
                 icon={
@@ -44,18 +53,20 @@ const ExcalidrawWrapper = dynamic(
                 Öffnen
               </MainMenu.Item>
 
-              {/* Custom Save Menu Item */}
-              <MainMenu.Item
-                onSelect={onSaveDialog}
-                icon={
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M15,9H5V5H15M12,19A3,3 0 0,1 9,16A3,3 0 0,1 12,13A3,3 0 0,1 15,16A3,3 0 0,1 12,19M17,3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V7L17,3Z" />
-                  </svg>
-                }
-                shortcut="Ctrl+S"
-              >
-                Speichern
-              </MainMenu.Item>
+              {/* Custom Save Menu Item - only for non-viewer users */}
+              {!viewModeEnabled && (
+                <MainMenu.Item
+                  onSelect={onSaveDialog}
+                  icon={
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M15,9H5V5H15M12,19A3,3 0 0,1 9,16A3,3 0 0,1 12,13A3,3 0 0,1 15,16A3,3 0 0,1 12,19M17,3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V7L17,3Z" />
+                    </svg>
+                  }
+                  shortcut="Ctrl+S"
+                >
+                  Speichern
+                </MainMenu.Item>
+              )}
             </MainMenu>
           </Excalidraw>
         </div>
@@ -222,24 +233,27 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
           excalidrawAPI={handleExcalidrawAPI}
           uiOptions={uiOptions}
           initialData={initialData}
+          viewModeEnabled={isViewer()}
         />
 
-        {/* Integrated Library Component */}
-        {excalidrawAPI && (
+        {/* Integrated Library Component - only for non-viewer users */}
+        {excalidrawAPI && !isViewer() && (
           <IntegratedLibrary excalidrawAPI={excalidrawAPI} onLibraryUpdate={handleLibraryUpdate} />
         )}
       </Box>
 
-      {/* Save Dialog */}
-      <SaveDiagramDialog
-        open={saveDialogOpen}
-        onClose={() => setSaveDialogOpen(false)}
-        onSave={handleSaveDiagram}
-        diagramData={getCurrentDiagramData()}
-        existingDiagram={currentDiagram}
-      />
+      {/* Save Dialog - only for non-viewer users */}
+      {!isViewer() && (
+        <SaveDiagramDialog
+          open={saveDialogOpen}
+          onClose={() => setSaveDialogOpen(false)}
+          onSave={handleSaveDiagram}
+          diagramData={getCurrentDiagramData()}
+          existingDiagram={currentDiagram}
+        />
+      )}
 
-      {/* Open Dialog */}
+      {/* Open Dialog - available for all users */}
       <OpenDiagramDialog
         open={openDialogOpen}
         onClose={() => setOpenDialogOpen(false)}

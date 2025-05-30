@@ -14,6 +14,7 @@ import {
   updateExcalidrawElementFromLibraryItem,
 } from './excalidrawLibraryUtils'
 import { ElementType, LibraryElement } from '@/graphql/library'
+import { isViewer } from '@/lib/auth'
 
 // Dynamischer Import von Excalidraw, um Server-Side-Rendering zu vermeiden
 const ExcalidrawWrapper = dynamic(
@@ -29,7 +30,16 @@ const ExcalidrawWrapper = dynamic(
       uiOptions: any
       initialData: any
       onDrop: (event: React.DragEvent) => void
-    }> = ({ onOpenDialog, onSaveDialog, excalidrawAPI, uiOptions, initialData, onDrop }) => {
+      viewModeEnabled?: boolean
+    }> = ({
+      onOpenDialog,
+      onSaveDialog,
+      excalidrawAPI,
+      uiOptions,
+      initialData,
+      onDrop,
+      viewModeEnabled,
+    }) => {
       return (
         <div
           style={{ height: '100%', width: '100%' }}
@@ -42,42 +52,48 @@ const ExcalidrawWrapper = dynamic(
             UIOptions={uiOptions}
             initialData={initialData}
             excalidrawAPI={excalidrawAPI}
+            viewModeEnabled={viewModeEnabled}
           >
             <MainMenu>
-              {/* Custom Open Menu Item */}
-              <MainMenu.Item
-                onSelect={onOpenDialog}
-                icon={
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
-                  </svg>
-                }
-                shortcut="Ctrl+O"
-              >
-                Diagramm öffnen
-              </MainMenu.Item>
+              {/* Only show menu items for non-viewer users */}
+              {!viewModeEnabled && (
+                <>
+                  {/* Custom Open Menu Item */}
+                  <MainMenu.Item
+                    onSelect={onOpenDialog}
+                    icon={
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
+                      </svg>
+                    }
+                    shortcut="Ctrl+O"
+                  >
+                    Diagramm öffnen
+                  </MainMenu.Item>
 
-              {/* Custom Save Menu Item */}
-              <MainMenu.Item
-                onSelect={onSaveDialog}
-                icon={
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M15,9H5V5H15M12,19A3,3 0 0,1 9,16A3,3 0 0,1 12,13A3,3 0 0,1 15,16A3,3 0 0,1 12,19M17,3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V7L17,3Z" />
-                  </svg>
-                }
-                shortcut="Ctrl+S"
-              >
-                Diagramm speichern als...
-              </MainMenu.Item>
+                  {/* Custom Save Menu Item */}
+                  <MainMenu.Item
+                    onSelect={onSaveDialog}
+                    icon={
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M15,9H5V5H15M12,19A3,3 0 0,1 9,16A3,3 0 0,1 12,13A3,3 0 0,1 15,16A3,3 0 0,1 12,19M17,3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V7L17,3Z" />
+                      </svg>
+                    }
+                    shortcut="Ctrl+S"
+                  >
+                    Diagramm speichern als...
+                  </MainMenu.Item>
 
-              <MainMenu.Separator />
+                  <MainMenu.Separator />
 
-              {/* Include default items but exclude social links */}
-              <MainMenu.DefaultItems.SaveAsImage />
-              <MainMenu.DefaultItems.Export />
-              <MainMenu.Separator />
-              <MainMenu.DefaultItems.ClearCanvas />
-              <MainMenu.DefaultItems.ChangeCanvasBackground />
+                  {/* Include default items but exclude social links */}
+                  <MainMenu.DefaultItems.SaveAsImage />
+                  <MainMenu.DefaultItems.Export />
+                  <MainMenu.Separator />
+                  <MainMenu.DefaultItems.ClearCanvas />
+                  <MainMenu.DefaultItems.ChangeCanvasBackground />
+                </>
+              )}
               <MainMenu.DefaultItems.ToggleTheme />
               <MainMenu.Separator />
               <MainMenu.DefaultItems.Help />
@@ -409,23 +425,26 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
               uiOptions={uiOptions}
               initialData={initialData}
               onDrop={handleDrop}
+              viewModeEnabled={isViewer()}
             />
 
-            {/* Floating Library Toggle Button */}
-            <Fab
-              color="primary"
-              aria-label="Bibliothek öffnen"
-              sx={{
-                position: 'absolute',
-                top: 16,
-                right: 16,
-                zIndex: 1000,
-              }}
-              onClick={() => setLibraryPanelOpen(true)}
-              title="Architektur-Bibliothek (Strg+L)"
-            >
-              <LibraryBooks />
-            </Fab>
+            {/* Floating Library Toggle Button - only for non-viewer users */}
+            {!isViewer() && (
+              <Fab
+                color="primary"
+                aria-label="Bibliothek öffnen"
+                sx={{
+                  position: 'absolute',
+                  top: 16,
+                  right: 16,
+                  zIndex: 1000,
+                }}
+                onClick={() => setLibraryPanelOpen(true)}
+                title="Architektur-Bibliothek (Strg+L)"
+              >
+                <LibraryBooks />
+              </Fab>
+            )}
           </Box>
 
           {/* Database Library Panel */}

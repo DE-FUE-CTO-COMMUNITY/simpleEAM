@@ -114,3 +114,10 @@ export const isAdmin = (): boolean => {
 export const isArchitect = (): boolean => {
   return hasRole('architect') || isAdmin()
 }
+
+/**
+ * Prüft, ob der Benutzer nur Viewer-Rechte hat
+ */
+export const isViewer = (): boolean => {
+  return hasRole('viewer') && !isArchitect() && !isAdmin()
+}
