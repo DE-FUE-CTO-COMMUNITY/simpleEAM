@@ -127,7 +127,7 @@ Simple-EAM besteht aus mehreren Komponenten, die als Docker-Container bereitgest
   - Beschreibung
   - Eigentümer/Verantwortlicher
   - Datenklassifikation (öffentlich, intern, vertraulich, streng vertraulich)
-  - Datenquelle
+  - Datenquellen (Applikationen)
   - Format
   - Lebenszyklusinformationen
 - Datenobjekte können bearbeitet, gelöscht oder archiviert werden
@@ -149,7 +149,52 @@ Simple-EAM besteht aus mehreren Komponenten, die als Docker-Container bereitgest
 
 - Datenobjekte können mit Business Capabilities verknüpft werden
 - Datenobjekte können mit Applikationen verknüpft werden
+- Datenobjekte können mit anderen Datenobjekten verknüpft werden (z.B. Referenzen)
+- Datenobjekte können mit Schnittstellen verknüpft werden
 - Beziehungen können mit Attributen wie "erstellt", "liest", "aktualisiert", "löscht" klassifiziert werden
+
+### 2.4 Schnittstellen-Management
+
+#### FR-IF-01: Erfassung von Schnittstellen
+
+**Beschreibung:** Das System muss die Erstellung und Verwaltung von Schnittstellen zwischen EAM-Elementen ermöglichen.
+**Priorität:** Hoch
+**Akzeptanzkriterien:**
+
+- Benutzer können neue Schnittstellen anlegen mit folgenden Attributen:
+  - Name
+  - Beschreibung
+  - Typ (API, Datenbank, Datei, etc.)
+  - Quelle ( Applikation, )
+  - Ziele (Applikationen )
+  - Datenobjekte (Datenobjekte)
+  - Protokoll (REST, SOAP, GraphQL, etc.)
+  - Version
+  - Status (aktiv, in Entwicklung, außer Betrieb)
+  - Verantwortlicher
+  - Einführungsdatum
+  - End-of-Life-Datum
+- Schnittstellen können bearbeitet, gelöscht oder archiviert werden
+
+#### FR-IF-02: Schnittstellen-Dokumentation
+
+**Beschreibung:** Das System muss die Dokumentation von Schnittstellen unterstützen.
+**Priorität:** Mittel
+**Akzeptanzkriterien:**
+
+- Benutzer können technische Details zu Schnittstellen dokumentieren (z.B. Endpunkte, Authentifizierung, Datenformate)
+- Unterstützung für OpenAPI/Swagger-Dokumentation
+- Möglichkeit, Schnittstellendokumentation zu exportieren
+
+#### FR-IF-03: Schnittstellen-Zuordnung
+
+**Beschreibung:** Das System muss die Zuordnung von Schnittstellen zu anderen EAM-Elementen unterstützen.
+**Priorität:** Hoch
+**Akzeptanzkriterien:**
+
+- Schnittstellen können mit Applikationen verknüpft werden
+- Schnittstellen können mit Datenobjekten verknüpft werden
+- Schnittstellen können mit anderen Schnittstellen verknüpft werden (z.B. für API-Ketten)
 
 ### 2.4 Datenbank-Integration
 
