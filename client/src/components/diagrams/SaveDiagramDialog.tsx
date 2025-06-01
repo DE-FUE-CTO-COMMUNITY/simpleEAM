@@ -258,8 +258,8 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
       }
 
       onClose()
-    } catch (error) {
-      console.error('Fehler beim Speichern des Diagramms:', error)
+    } catch {
+      // Fehler beim Speichern des Diagramms
     } finally {
       setSaving(false)
     }

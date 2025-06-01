@@ -46,8 +46,8 @@ const DeleteDiagramDialog: React.FC<DeleteDiagramDialogProps> = ({
       })
       onDelete()
       onClose()
-    } catch (error) {
-      console.error('Fehler beim Löschen des Diagramms:', error)
+    } catch {
+      // Fehler beim Löschen des Diagramms
     } finally {
       setDeleting(false)
     }

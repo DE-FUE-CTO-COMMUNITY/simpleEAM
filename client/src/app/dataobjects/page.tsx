@@ -244,23 +244,10 @@ const DataObjectsPage = () => {
       const currentDataSourceIds = currentDataObject.dataSources?.map(app => app.id).sort() || []
       const newDataSourceIds = data.dataSources?.sort() || []
 
-      // Debug-Ausgabe für DataSources-Vergleich
-      console.log('DataSources comparison:', {
-        current: currentDataSourceIds,
-        new: newDataSourceIds,
-        currentString: JSON.stringify(currentDataSourceIds),
-        newString: JSON.stringify(newDataSourceIds),
-      })
-
       const dataSourcesChanged =
         JSON.stringify(currentDataSourceIds) !== JSON.stringify(newDataSourceIds)
 
       if (dataSourcesChanged) {
-        console.log('DataSources changed - updating:', {
-          current: currentDataSourceIds,
-          new: newDataSourceIds,
-        })
-
         if (newDataSourceIds.length > 0) {
           input.dataSources = [
             {
@@ -286,24 +273,9 @@ const DataObjectsPage = () => {
       const currentOwnerId = currentDataObject.owners?.[0]?.id || ''
       const newOwnerId = data.ownerId || ''
 
-      // Debug-Ausgabe für Owner-Vergleich
-      console.log('Owner comparison:', {
-        current: currentOwnerId,
-        new: newOwnerId,
-        currentType: typeof currentOwnerId,
-        newType: typeof newOwnerId,
-        currentOwnerObject: currentDataObject.owners?.[0],
-        formOwnerId: data.ownerId,
-      })
-
       const ownerChanged = currentOwnerId !== newOwnerId
 
       if (ownerChanged) {
-        console.log('Owner changed - updating:', {
-          current: currentOwnerId,
-          new: newOwnerId,
-        })
-
         if (newOwnerId) {
           input.owners = [
             {
@@ -320,29 +292,12 @@ const DataObjectsPage = () => {
         }
       }
 
-      // Debug-Ausgabe vor Update
-      console.log('Current DataObject:', {
-        id: currentDataObject.id,
-        name: currentDataObject.name,
-        classification: currentDataObject.classification,
-        dataSources: currentDataObject.dataSources,
-        owners: currentDataObject.owners,
-      })
-      console.log('Form Data:', data)
-
-      // Debug-Ausgabe
-      console.log('DataObject Update Input:', JSON.stringify(input, null, 2))
-      console.log('DataSources changed:', dataSourcesChanged)
-      console.log('Owner changed:', ownerChanged)
-
       await updateDataObject({
         variables: {
           id,
           input,
         },
       })
-
-      console.log('DataObject update completed successfully')
     } catch (error) {
       console.error('Fehler beim Aktualisieren des Datenobjekts:', error)
     }

@@ -30,8 +30,8 @@ const IntegratedLibrary: React.FC<IntegratedLibraryProps> = ({
         }
         const library = await response.json()
         setArchimateLibrary(library)
-      } catch (error) {
-        console.error('Fehler beim Laden der ArchiMate-Bibliothek:', error)
+      } catch {
+        // Fehler beim Laden der ArchiMate-Bibliothek
       }
     }
 
@@ -101,25 +101,12 @@ const IntegratedLibrary: React.FC<IntegratedLibraryProps> = ({
     // For Excalidraw 0.18, we need to pass just the libraryItems array
     const combinedLibraryItems = [...archimateLibrary.libraryItems, ...newLibraryItems]
 
-    console.log('🔄 Integrierte Library erstellt:', {
-      archimateItems: archimateLibrary.libraryItems.length,
-      databaseItems: newLibraryItems.length,
-      totalItems: combinedLibraryItems.length,
-    })
-
     return combinedLibraryItems
   }, [archimateLibrary, data])
 
   // Update library when ready
   useEffect(() => {
     if (integratedLibrary && excalidrawAPI) {
-      console.log('🔧 Aktualisiere Excalidraw Library mit', integratedLibrary.length, 'Elementen')
-      console.log('📚 Original ArchiMate Items:', archimateLibrary?.libraryItems?.length || 0)
-      console.log(
-        '🗄️ Neue Datenbank Items:',
-        integratedLibrary.length - (archimateLibrary?.libraryItems?.length || 0)
-      )
-
       // Use the correct Excalidraw 0.18 API
       excalidrawAPI
         .updateLibrary({
@@ -130,8 +117,7 @@ const IntegratedLibrary: React.FC<IntegratedLibraryProps> = ({
           defaultStatus: 'published', // Set default status to published
         })
         .then(() => {
-          console.log('✅ Library erfolgreich aktualisiert')
-
+          // Library erfolgreich aktualisiert
           // Also open the library sidebar to show the updated items
           excalidrawAPI.updateScene({
             appState: { openSidebar: 'library' },
@@ -139,41 +125,11 @@ const IntegratedLibrary: React.FC<IntegratedLibraryProps> = ({
 
           onLibraryUpdate({ libraryItems: integratedLibrary })
         })
-        .catch((error: any) => {
-          console.error('❌ Fehler beim Aktualisieren der Library:', error)
+        .catch(() => {
+          // Fehler beim Aktualisieren der Library
         })
     }
   }, [integratedLibrary, excalidrawAPI, onLibraryUpdate, archimateLibrary])
-
-  // Debug data loading
-  useEffect(() => {
-    if (data) {
-      console.log('📊 GraphQL Daten geladen:', {
-        businessCapabilities: data.businessCapabilities?.length || 0,
-        applications: data.applications?.length || 0,
-        dataObjects: data.dataObjects?.length || 0,
-        applicationInterfaces: data.applicationInterfaces?.length || 0,
-      })
-
-      // Debug first few items
-      if (data.businessCapabilities?.length > 0) {
-        console.log('📋 Erste Business Capability:', data.businessCapabilities[0])
-      }
-      if (data.applications?.length > 0) {
-        console.log('📋 Erste Application:', data.applications[0])
-      }
-    }
-  }, [data])
-
-  // Debug ArchiMate library loading
-  useEffect(() => {
-    if (archimateLibrary) {
-      console.log('📚 ArchiMate Library geladen:', {
-        totalItems: archimateLibrary.libraryItems?.length || 0,
-        itemNames: archimateLibrary.libraryItems?.map((item: any) => item.name || 'UNNAMED'),
-      })
-    }
-  }, [archimateLibrary])
 
   return null // This component doesn't render anything
 }
@@ -225,8 +181,6 @@ function findArchimateTemplate(library: any, templateName: string) {
     )
   }
 
-  console.log(`🔍 Template für "${templateName}" gefunden:`, item ? 'Ja' : 'Nein')
-
   return item || null
 }
 
@@ -236,9 +190,6 @@ function createLibraryItemFromDatabaseElement(dbElement: any, elementType: strin
     console.warn(`⚠️ Kein Template gefunden für Element-Typ: ${elementType}`)
     return null
   }
-
-  console.log(`🔨 Erstelle Library Item für "${dbElement.name}" (Typ: ${elementType})`)
-  console.log(`📋 Template hat ${template.elements?.length || 0} Elemente`)
 
   // Generate unique IDs for the elements
   const generateId = () => Math.random().toString(36).substr(2, 9)
@@ -273,7 +224,6 @@ function createLibraryItemFromDatabaseElement(dbElement: any, elementType: strin
       newElement.text = dbElement.name
       newElement.originalText = dbElement.name
       newElement.rawText = dbElement.name
-      console.log(`📝 Text Element aktualisiert: "${element.text}" → "${dbElement.name}"`)
     }
 
     // Store database metadata in customData
@@ -310,22 +260,6 @@ function createLibraryItemFromDatabaseElement(dbElement: any, elementType: strin
     created: Date.now(),
     name: dbElement.name, // This should show in the library
   }
-
-  console.log(`✅ Library Item erstellt für "${dbElement.name}":`, {
-    id: libraryItem.id,
-    name: libraryItem.name,
-    status: libraryItem.status,
-    elementCount: elements.length,
-    groupedElements: elements.filter((e: any) => e.groupIds && e.groupIds.length > 0).length,
-    textElements: elements
-      .filter((e: any) => e.type === 'text')
-      .map((e: any) => ({
-        text: e.text,
-        rawText: e.rawText,
-        originalText: e.originalText,
-        groupIds: e.groupIds,
-      })),
-  })
 
   return libraryItem
 }

@@ -181,8 +181,8 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
       try {
         const sceneData = JSON.parse(persistedScene)
         setCurrentScene(sceneData)
-      } catch (error) {
-        console.error('Fehler beim Laden der gespeicherten Szene:', error)
+      } catch {
+        // Fehler beim Laden der gespeicherten Szene
       }
     }
   }, [])
@@ -194,7 +194,6 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
       message: `Diagramm "${savedDiagram.title}" erfolgreich gespeichert!`,
       severity: 'success',
     })
-    console.log('Diagramm gespeichert:', savedDiagram)
   }, [])
 
   const handleOpenDiagram = useCallback(
@@ -219,9 +218,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
             message: `Diagramm "${diagram.title}" erfolgreich geladen!`,
             severity: 'success',
           })
-          console.log('Diagramm geladen:', diagram)
-        } catch (error) {
-          console.error('Fehler beim Laden des Diagramms:', error)
+        } catch {
           setNotification({
             open: true,
             message: 'Fehler beim Laden des Diagramms',
@@ -284,7 +281,6 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
       message: `Diagramm "${savedDiagram.title}" erfolgreich als Kopie gespeichert!`,
       severity: 'success',
     })
-    console.log('Diagramm als Kopie gespeichert:', savedDiagram)
   }, [])
 
   // Initialisiert die API und ruft sie bei Bedarf auf
@@ -372,7 +368,6 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
   }, [handleNewDiagram, currentDiagram])
 
   const handleLibraryUpdate = useCallback((library: any) => {
-    console.log('Integrierte Bibliothek geladen:', library)
     const itemCount = Array.isArray(library) ? library.length : library.libraryItems?.length || 0
     setNotification({
       open: true,
