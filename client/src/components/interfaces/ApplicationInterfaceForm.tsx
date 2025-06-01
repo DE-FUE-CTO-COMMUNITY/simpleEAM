@@ -37,7 +37,7 @@ export const applicationInterfaceSchema = z.object({
   status: z.nativeEnum(InterfaceStatus),
   introductionDate: z.string().optional().nullable(),
   endOfLifeDate: z.string().optional().nullable(),
-  responsiblePerson: z.array(z.string()).optional(),
+  responsiblePerson: z.string().optional().nullable(),
   sourceApplications: z.array(z.string()).optional(),
   targetApplications: z.array(z.string()).optional(),
   dataObjects: z.array(z.string()).optional(),
@@ -63,8 +63,8 @@ export interface ApplicationInterfaceFormProps {
 const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
   applicationInterface,
   dataObjects = [],
-  applications = [],
-  persons = [],
+  applications: _applications = [],
+  persons: _persons = [],
   isOpen,
   onClose,
   onSubmit,
@@ -88,7 +88,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       status: InterfaceStatus.PLANNED,
       introductionDate: null,
       endOfLifeDate: null,
-      responsiblePerson: [],
+      responsiblePerson: null,
       sourceApplications: [],
       targetApplications: [],
       dataObjects: [],
@@ -111,7 +111,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
         status: value.status,
         introductionDate: value.introductionDate,
         endOfLifeDate: value.endOfLifeDate,
-        responsiblePerson: value.responsiblePerson || [],
+        responsiblePerson: value.responsiblePerson || null,
         sourceApplications: value.sourceApplications || [],
         targetApplications: value.targetApplications || [],
         dataObjects: value.dataObjects || [],
@@ -157,7 +157,11 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
         status: applicationInterface.status,
         introductionDate: applicationInterface.introductionDate ?? null,
         endOfLifeDate: applicationInterface.endOfLifeDate ?? null,
-        responsiblePerson: applicationInterface.responsiblePerson?.map(person => person.id) || [],
+        responsiblePerson:
+          applicationInterface.responsiblePerson &&
+          applicationInterface.responsiblePerson.length > 0
+            ? applicationInterface.responsiblePerson[0].id
+            : null,
         sourceApplications: applicationInterface.sourceApplications?.map(app => app.id) || [],
         targetApplications: applicationInterface.targetApplications?.map(app => app.id) || [],
         dataObjects: applicationInterface.dataObjects?.map(obj => obj.id) || [],
@@ -273,7 +277,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
     },
     {
       name: 'responsiblePerson',
-      label: 'Verantwortliche Personen',
+      label: 'Verantwortliche Person',
       type: 'autocomplete',
       size: { xs: 12 },
       options:
@@ -281,7 +285,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
           value: person.id,
           label: `${person.firstName} ${person.lastName}`,
         })) || [],
-      multiple: true,
+      multiple: false,
       loadingOptions: personLoading,
       getOptionLabel: (option: any) => {
         if (typeof option === 'string') {

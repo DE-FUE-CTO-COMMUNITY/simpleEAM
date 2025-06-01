@@ -148,13 +148,13 @@ function ApplicationInterfacesPage() {
       status: data.status,
       introductionDate: data.introductionDate,
       endOfLifeDate: data.endOfLifeDate,
-      responsiblePerson: data.responsiblePerson?.length
+      responsiblePerson: data.responsiblePerson
         ? {
-            connect: data.responsiblePerson.map(id => ({
+            connect: {
               where: {
-                node: { id: { eq: id } },
+                node: { id: { eq: data.responsiblePerson } },
               },
-            })),
+            },
           }
         : undefined,
       sourceApplications: data.sourceApplications?.length
@@ -209,14 +209,14 @@ function ApplicationInterfacesPage() {
       status: { set: data.status },
       introductionDate: { set: data.introductionDate },
       endOfLifeDate: { set: data.endOfLifeDate },
-      responsiblePerson: data.responsiblePerson?.length
+      responsiblePerson: data.responsiblePerson
         ? {
             disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
-            connect: data.responsiblePerson.map(id => ({
+            connect: {
               where: {
-                node: { id: { eq: id } },
+                node: { id: { eq: data.responsiblePerson } },
               },
-            })),
+            },
           }
         : { disconnect: [{ where: {} }] },
       sourceApplications: data.sourceApplications?.length

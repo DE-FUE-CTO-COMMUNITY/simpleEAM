@@ -1095,9 +1095,9 @@ async function createSampleData(session: Session) {
         (a5)-[:USES]->(d8),
         (a6)-[:USES]->(d4),
         (a11)-[:USES]->(d9),
-        (a12)-[:DATA_SOURCE]->(d1),
-        (a12)-[:DATA_SOURCE]->(d2),
-        (a12)-[:DATA_SOURCE]->(d5)
+        (d1)-[:DATA_SOURCE]->(a12),
+        (d2)-[:DATA_SOURCE]->(a12),
+        (d5)-[:DATA_SOURCE]->(a12)
     `)
 
     // Fehlende Datenquellen für alle DataObjects ergänzen
@@ -1111,13 +1111,13 @@ async function createSampleData(session: Session) {
         (a10:Application {id: "app-010"}), (d9:DataObject {id: "do-009"}),
         (a11:Application {id: "app-011"}), (d10:DataObject {id: "do-010"})
       CREATE 
-        (a3)-[:DATA_SOURCE]->(d3),
-        (a4)-[:DATA_SOURCE]->(d4),
-        (a7)-[:DATA_SOURCE]->(d6),
-        (a8)-[:DATA_SOURCE]->(d7),
-        (a9)-[:DATA_SOURCE]->(d8),
-        (a10)-[:DATA_SOURCE]->(d9),
-        (a11)-[:DATA_SOURCE]->(d10)
+        (d3)-[:DATA_SOURCE]->(a3),
+        (d4)-[:DATA_SOURCE]->(a4),
+        (d6)-[:DATA_SOURCE]->(a7),
+        (d7)-[:DATA_SOURCE]->(a8),
+        (d8)-[:DATA_SOURCE]->(a9),
+        (d9)-[:DATA_SOURCE]->(a10),
+        (d10)-[:DATA_SOURCE]->(a11)
     `)
 
     // Interface Source/Target Beziehungen
@@ -1180,7 +1180,7 @@ async function createSampleData(session: Session) {
         (a12)-[:INTERFACE_TARGET]->(i12)
     `)
 
-    // Interface-DataObject Transferbeziehungen
+    // Interface-DataObject Transferbeziehungen (alle Interfaces)
     await session.run(`
       MATCH 
         (i1:ApplicationInterface {id: "int-001"}), (d1:DataObject {id: "do-001"}),
@@ -1198,6 +1198,30 @@ async function createSampleData(session: Session) {
         (i4)-[:TRANSFERS]->(d9),
         (i5)-[:TRANSFERS]->(d1),
         (i6)-[:TRANSFERS]->(d7)
+    `)
+
+    // Fehlende Interface-DataObject Transferbeziehungen für int-007 bis int-012
+    await session.run(`
+      MATCH 
+        (i7:ApplicationInterface {id: "int-007"}), (d10:DataObject {id: "do-010"}),
+        (i8:ApplicationInterface {id: "int-008"}), (d8:DataObject {id: "do-008"}),
+        (i8), (d5:DataObject {id: "do-005"}),
+        (i9:ApplicationInterface {id: "int-009"}), (d7:DataObject {id: "do-007"}),
+        (i9), (d6:DataObject {id: "do-006"}),
+        (i10:ApplicationInterface {id: "int-010"}), (d9:DataObject {id: "do-009"}),
+        (i11:ApplicationInterface {id: "int-011"}), (d2:DataObject {id: "do-002"}),
+        (i11), (d5),
+        (i12:ApplicationInterface {id: "int-012"}), (d6:DataObject {id: "do-006"})
+      CREATE 
+        (i7)-[:TRANSFERS]->(d10),
+        (i8)-[:TRANSFERS]->(d8),
+        (i8)-[:TRANSFERS]->(d5),
+        (i9)-[:TRANSFERS]->(d7),
+        (i9)-[:TRANSFERS]->(d6),
+        (i10)-[:TRANSFERS]->(d9),
+        (i11)-[:TRANSFERS]->(d2),
+        (i11)-[:TRANSFERS]->(d5),
+        (i12)-[:TRANSFERS]->(d6)
     `)
 
     // Fehlende Application-Verantwortlichkeiten ergänzen

@@ -66,6 +66,35 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
           )
         },
       }),
+      columnHelper.accessor('responsiblePerson', {
+        header: 'Verantwortlicher',
+        cell: info => {
+          const responsiblePersons = info.getValue()
+          return responsiblePersons && responsiblePersons.length > 0
+            ? responsiblePersons
+                .map((person: any) => `${person.firstName} ${person.lastName}`)
+                .join(', ')
+            : '-'
+        },
+      }),
+      columnHelper.accessor('sourceApplications', {
+        header: 'Quellanwendungen',
+        cell: info => {
+          const sourceApps = info.getValue()
+          return sourceApps && sourceApps.length > 0
+            ? sourceApps.map((app: any) => app.name).join(', ')
+            : '-'
+        },
+      }),
+      columnHelper.accessor('targetApplications', {
+        header: 'Zielanwendungen',
+        cell: info => {
+          const targetApps = info.getValue()
+          return targetApps && targetApps.length > 0
+            ? targetApps.map((app: any) => app.name).join(', ')
+            : '-'
+        },
+      }),
       columnHelper.accessor('dataObjects', {
         header: 'Datenobjekte',
         cell: info => {
@@ -101,7 +130,9 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
       introductionDate: applicationInterface.introductionDate ?? null,
       endOfLifeDate: applicationInterface.endOfLifeDate ?? null,
       responsiblePerson:
-        applicationInterface.responsiblePerson?.map((person: any) => person.id) || [],
+        applicationInterface.responsiblePerson && applicationInterface.responsiblePerson.length > 0
+          ? applicationInterface.responsiblePerson[0].id
+          : null,
       sourceApplications: applicationInterface.sourceApplications?.map((app: any) => app.id) || [],
       targetApplications: applicationInterface.targetApplications?.map((app: any) => app.id) || [],
       dataObjects: applicationInterface.dataObjects?.map(obj => obj.id) ?? [],
