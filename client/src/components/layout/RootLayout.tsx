@@ -16,6 +16,8 @@ import { useAuth } from '@/lib/auth'
 
 import AppHeader from './AppHeader'
 import Sidebar, { drawerWidth } from './Sidebar'
+import ExcelIcon from '../icons/ExcelIcon'
+import ExcelImportExport from '../excel/ExcelImportExport'
 
 // Styled-Komponenten für das Layout
 const Main = styled('main')(({ theme }) => ({
@@ -36,9 +38,18 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
   const pathname = usePathname()
   const { keycloak, authenticated, initialized } = useAuth()
   const [open, setOpen] = useState(true)
+  const [excelDialogOpen, setExcelDialogOpen] = useState(false)
 
   const handleDrawerToggle = () => {
     setOpen(!open)
+  }
+
+  const handleExcelDialogOpen = () => {
+    setExcelDialogOpen(true)
+  }
+
+  const handleExcelDialogClose = () => {
+    setExcelDialogOpen(false)
   }
 
   // Wenn Keycloak initialisiert ist, aber der Benutzer nicht authentifiziert ist,
@@ -58,6 +69,9 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
     { text: 'Datenobjekte', icon: <DataObjectIcon />, href: '/dataobjects' },
     { text: 'Schnittstellen', icon: <ApiIcon />, href: '/interfaces' },
     { text: 'Personen', icon: <PersonIcon />, href: '/persons' },
+    // Divider vor Excel Import/Export
+    { isDivider: true, text: 'divider', icon: null },
+    { text: 'Excel Import/Export', icon: <ExcelIcon />, onClick: handleExcelDialogOpen },
   ]
 
   const isActive = (href: string) => {
@@ -87,6 +101,9 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
         <Toolbar /> {/* Spacer für die AppBar */}
         {children}
       </Main>
+
+      {/* Excel Import/Export Dialog */}
+      <ExcelImportExport isOpen={excelDialogOpen} onClose={handleExcelDialogClose} />
     </Box>
   )
 }

@@ -63,7 +63,9 @@ const StyledDrawer = styled(MuiDrawer, {
 interface MenuItem {
   text: string
   icon: React.ReactNode
-  href: string
+  href?: string
+  onClick?: () => void
+  isDivider?: boolean
 }
 
 interface SidebarProps {
@@ -93,51 +95,66 @@ const Sidebar: React.FC<SidebarProps> = ({ open, menuItems, handleDrawerToggle, 
       </Toolbar>
       <Divider />
       <List>
-        {menuItems.map(item => (
-          <ListItem key={item.text} disablePadding>
-            <Link
-              href={item.href}
-              style={{
-                textDecoration: 'none',
-                color: 'inherit',
-                display: 'block',
-                width: '100%',
+        {menuItems.map((item, index) => {
+          // Render divider if isDivider is true
+          if (item.isDivider) {
+            return <Divider key={`divider-${index}`} sx={{ my: 1 }} />
+          }
+
+          const content = (
+            <ListItemButton
+              sx={{
+                minHeight: 48,
+                justifyContent: open ? 'initial' : 'center',
+                px: 2.5,
+                backgroundColor:
+                  item.href && isActive(item.href) ? theme.palette.primary.light : 'transparent',
+                color: item.href && isActive(item.href) ? theme.palette.primary.main : 'inherit',
               }}
+              onClick={item.onClick}
             >
-              <ListItemButton
+              <ListItemIcon
                 sx={{
-                  minHeight: 48,
-                  justifyContent: open ? 'initial' : 'center',
-                  px: 2.5,
-                  backgroundColor: isActive(item.href)
-                    ? theme.palette.primary.light
-                    : 'transparent',
-                  color: isActive(item.href) ? theme.palette.primary.main : 'inherit',
+                  minWidth: 0,
+                  mr: open ? 3 : 'auto',
+                  justifyContent: 'center',
+                  color: item.href && isActive(item.href) ? theme.palette.primary.main : 'inherit',
                 }}
               >
-                <ListItemIcon
-                  sx={{
-                    minWidth: 0,
-                    mr: open ? 3 : 'auto',
-                    justifyContent: 'center',
-                    color: isActive(item.href) ? theme.palette.primary.main : 'inherit',
+                {item.icon}
+              </ListItemIcon>
+              <ListItemText
+                primary={item.text}
+                sx={{
+                  opacity: open ? 1 : 0,
+                  '& .MuiTypography-root': {
+                    fontWeight: item.href && isActive(item.href) ? 500 : 400,
+                  },
+                }}
+              />
+            </ListItemButton>
+          )
+
+          return (
+            <ListItem key={item.text} disablePadding>
+              {item.href ? (
+                <Link
+                  href={item.href}
+                  style={{
+                    textDecoration: 'none',
+                    color: 'inherit',
+                    display: 'block',
+                    width: '100%',
                   }}
                 >
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText
-                  primary={item.text}
-                  sx={{
-                    opacity: open ? 1 : 0,
-                    '& .MuiTypography-root': {
-                      fontWeight: isActive(item.href) ? 500 : 400,
-                    },
-                  }}
-                />
-              </ListItemButton>
-            </Link>
-          </ListItem>
-        ))}
+                  {content}
+                </Link>
+              ) : (
+                content
+              )}
+            </ListItem>
+          )
+        })}
       </List>
     </StyledDrawer>
   )
