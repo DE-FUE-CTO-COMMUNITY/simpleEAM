@@ -19,8 +19,26 @@ export const GET_APPLICATION_INTERFACES = gql`
       name
       description
       interfaceType
+      protocol
+      version
+      status
+      introductionDate
+      endOfLifeDate
       createdAt
       updatedAt
+      responsiblePerson {
+        id
+        firstName
+        lastName
+      }
+      sourceApplications {
+        id
+        name
+      }
+      targetApplications {
+        id
+        name
+      }
       dataObjects {
         id
         name
@@ -36,8 +54,26 @@ export const GET_APPLICATION_INTERFACE = gql`
       name
       description
       interfaceType
+      protocol
+      version
+      status
+      introductionDate
+      endOfLifeDate
       createdAt
       updatedAt
+      responsiblePerson {
+        id
+        firstName
+        lastName
+      }
+      sourceApplications {
+        id
+        name
+      }
+      targetApplications {
+        id
+        name
+      }
       dataObjects {
         id
         name
@@ -54,12 +90,30 @@ export const CREATE_APPLICATION_INTERFACE = gql`
         name
         description
         interfaceType
+        protocol
+        version
+        status
+        introductionDate
+        endOfLifeDate
+        createdAt
+        updatedAt
+        responsiblePerson {
+          id
+          firstName
+          lastName
+        }
+        sourceApplications {
+          id
+          name
+        }
+        targetApplications {
+          id
+          name
+        }
         dataObjects {
           id
           name
         }
-        createdAt
-        updatedAt
       }
     }
   }
@@ -73,12 +127,30 @@ export const UPDATE_APPLICATION_INTERFACE = gql`
         name
         description
         interfaceType
+        protocol
+        version
+        status
+        introductionDate
+        endOfLifeDate
+        createdAt
+        updatedAt
+        responsiblePerson {
+          id
+          firstName
+          lastName
+        }
+        sourceApplications {
+          id
+          name
+        }
+        targetApplications {
+          id
+          name
+        }
         dataObjects {
           id
           name
         }
-        createdAt
-        updatedAt
       }
     }
   }

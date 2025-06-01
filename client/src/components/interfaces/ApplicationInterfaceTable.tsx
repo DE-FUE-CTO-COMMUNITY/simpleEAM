@@ -9,7 +9,7 @@ import { createColumnHelper } from '@tanstack/react-table'
 import { SortingState } from '@tanstack/react-table'
 import { Chip } from '@mui/material'
 import { getInterfaceTypeLabel, formatDate } from './utils'
-import { DataObject } from '@/gql/generated'
+import { DataObject, Application, Person } from '@/gql/generated'
 
 interface ApplicationInterfaceTableProps {
   id?: string
@@ -22,6 +22,8 @@ interface ApplicationInterfaceTableProps {
   onUpdateApplicationInterface?: (id: string, data: ApplicationInterfaceFormValues) => Promise<void>
   onDeleteApplicationInterface?: (id: string) => Promise<void>
   dataObjects?: DataObject[]
+  applications?: Application[]
+  persons?: Person[]
 }
 
 const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
@@ -34,6 +36,8 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
   onUpdateApplicationInterface,
   onDeleteApplicationInterface,
   dataObjects = [],
+  applications = [],
+  persons = [],
 }) => {
   const columnHelper = createColumnHelper<ApplicationInterface>()
 
@@ -87,14 +91,20 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
   const mapToFormValues = (
     applicationInterface: ApplicationInterface
   ): ApplicationInterfaceFormValues => {
-    // Für autocomplete-Felder müssen wir sicherstellen, dass die IDs als reine Strings übergeben werden
-    const dataObjectIds = applicationInterface.dataObjects?.map(obj => obj.id) ?? []
-
     return {
       name: applicationInterface.name ?? '',
       description: applicationInterface.description ?? null,
       interfaceType: applicationInterface.interfaceType,
-      dataObjects: dataObjectIds,
+      protocol: applicationInterface.protocol ?? null,
+      version: applicationInterface.version ?? null,
+      status: applicationInterface.status,
+      introductionDate: applicationInterface.introductionDate ?? null,
+      endOfLifeDate: applicationInterface.endOfLifeDate ?? null,
+      responsiblePerson:
+        applicationInterface.responsiblePerson?.map((person: any) => person.id) || [],
+      sourceApplications: applicationInterface.sourceApplications?.map((app: any) => app.id) || [],
+      targetApplications: applicationInterface.targetApplications?.map((app: any) => app.id) || [],
+      dataObjects: applicationInterface.dataObjects?.map(obj => obj.id) ?? [],
     }
   }
 
@@ -117,6 +127,8 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
       mapDataToFormValues={mapToFormValues}
       additionalProps={{
         dataObjects,
+        applications,
+        persons,
       }}
     />
   )

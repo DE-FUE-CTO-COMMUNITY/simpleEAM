@@ -119,7 +119,8 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
       costs: app.costs ?? 0,
       technologyStack: app.technologyStack ?? [],
       usesDataObjectIds: app.usesDataObjects?.map(obj => obj.id) ?? [],
-      interfacesToApplicationIds: app.interfacesToApplications?.map(a => a.id) ?? [],
+      sourceOfInterfaceIds: app.sourceOfInterfaces?.map(iface => iface.id) ?? [],
+      targetOfInterfaceIds: app.targetOfInterfaces?.map(iface => iface.id) ?? [],
       supportsCapabilityIds: app.supportsCapabilities?.map(cap => cap.id) ?? [],
     }
   }

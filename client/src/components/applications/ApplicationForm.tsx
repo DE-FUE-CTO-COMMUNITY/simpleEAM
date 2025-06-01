@@ -54,7 +54,8 @@ export const applicationSchema = z.object({
   ownerId: z.string().optional(),
   supportsCapabilityIds: z.array(z.string()).optional(),
   usesDataObjectIds: z.array(z.string()).optional(),
-  interfacesToApplicationIds: z.array(z.string()).optional(),
+  sourceOfInterfaceIds: z.array(z.string()).optional(),
+  targetOfInterfaceIds: z.array(z.string()).optional(),
 })
 
 // TypeScript Typen basierend auf dem Schema
@@ -135,7 +136,8 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
       application?.owners && application.owners.length > 0 ? application.owners[0].id : undefined,
     supportsCapabilityIds: application?.supportsCapabilities?.map(cap => cap.id) ?? [],
     usesDataObjectIds: application?.usesDataObjects?.map(obj => obj.id) ?? [],
-    interfacesToApplicationIds: application?.interfacesToApplications?.map(iface => iface.id) ?? [],
+    sourceOfInterfaceIds: application?.sourceOfInterfaces?.map(iface => iface.id) ?? [],
+    targetOfInterfaceIds: application?.targetOfInterfaces?.map(iface => iface.id) ?? [],
   }
 
   // TanStack Form konfigurieren
@@ -175,8 +177,8 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
             : undefined,
         supportsCapabilityIds: application.supportsCapabilities?.map(cap => cap.id) ?? [],
         usesDataObjectIds: application.usesDataObjects?.map(obj => obj.id) ?? [],
-        interfacesToApplicationIds:
-          application.interfacesToApplications?.map(iface => iface.id) ?? [],
+        sourceOfInterfaceIds: application.sourceOfInterfaces?.map(iface => iface.id) ?? [],
+        targetOfInterfaceIds: application.targetOfInterfaces?.map(iface => iface.id) ?? [],
       })
     } else if (!isOpen) {
       form.reset()
@@ -373,8 +375,8 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
       },
     },
     {
-      name: 'interfacesToApplicationIds',
-      label: 'Schnittstellen',
+      name: 'sourceOfInterfaceIds',
+      label: 'Ausgehende Schnittstellen (als Quelle)',
       type: 'autocomplete',
       tabId: 'relationships',
       multiple: true,
@@ -383,7 +385,36 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
         label: iface.name,
       })),
       loadingOptions: interfacesLoading,
-      size: 12,
+      size: 6,
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          // Direkte ID - suche passende Option
+          const matchingIface = interfacesData?.applicationInterfaces?.find(
+            (iface: ApplicationInterface) => iface.id === option
+          )
+          return matchingIface?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
+    },
+    {
+      name: 'targetOfInterfaceIds',
+      label: 'Eingehende Schnittstellen (als Ziel)',
+      type: 'autocomplete',
+      tabId: 'relationships',
+      multiple: true,
+      options: (interfacesData?.applicationInterfaces || []).map((iface: ApplicationInterface) => ({
+        value: iface.id,
+        label: iface.name,
+      })),
+      loadingOptions: interfacesLoading,
+      size: 6,
       getOptionLabel: (option: any) => {
         if (typeof option === 'string') {
           // Direkte ID - suche passende Option

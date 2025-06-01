@@ -61,6 +61,8 @@ type Person
   ownedDataObjects: [DataObject!]! @relationship(type: "OWNED_BY", direction: IN)
   ownedArchitectures: [Architecture!]! @relationship(type: "OWNED_BY", direction: IN)
   ownedDiagrams: [Diagram!]! @relationship(type: "CREATED_BY", direction: IN)
+  responsibleForInterfaces: [ApplicationInterface!]!
+    @relationship(type: "RESPONSIBLE_FOR", direction: OUT)
 }
 
 """
@@ -90,8 +92,11 @@ type Application
   owners: [Person!]! @relationship(type: "OWNED_BY", direction: OUT)
   supportsCapabilities: [BusinessCapability!]! @relationship(type: "SUPPORTS", direction: OUT)
   usesDataObjects: [DataObject!]! @relationship(type: "USES", direction: OUT)
-  interfacesToApplications: [ApplicationInterface!]!
-    @relationship(type: "HAS_INTERFACE", direction: OUT)
+  isDataSourceFor: [DataObject!]! @relationship(type: "DATA_SOURCE", direction: IN)
+  sourceOfInterfaces: [ApplicationInterface!]!
+    @relationship(type: "INTERFACE_SOURCE", direction: OUT)
+  targetOfInterfaces: [ApplicationInterface!]!
+    @relationship(type: "INTERFACE_TARGET", direction: OUT)
   partOfArchitectures: [Architecture!]! @relationship(type: "CONTAINS", direction: IN)
 }
 
@@ -109,9 +114,17 @@ type ApplicationInterface
   name: String!
   description: String
   interfaceType: InterfaceType!
-  dataObjects: [DataObject!]! @relationship(type: "TRANSFERS", direction: OUT)
+  protocol: InterfaceProtocol
+  version: String
+  status: InterfaceStatus!
+  introductionDate: Date
+  endOfLifeDate: Date
   createdAt: DateTime! @timestamp(operations: [CREATE])
   updatedAt: DateTime @timestamp(operations: [UPDATE])
+  responsiblePerson: [Person!]! @relationship(type: "RESPONSIBLE_FOR", direction: IN)
+  sourceApplications: [Application!]! @relationship(type: "INTERFACE_SOURCE", direction: IN)
+  targetApplications: [Application!]! @relationship(type: "INTERFACE_TARGET", direction: IN)
+  dataObjects: [DataObject!]! @relationship(type: "TRANSFERS", direction: OUT)
 }
 
 """
@@ -128,11 +141,13 @@ type DataObject
   name: String!
   description: String
   classification: DataClassification!
-  source: String
   format: String
+  introductionDate: Date
+  endOfLifeDate: Date
   createdAt: DateTime! @timestamp(operations: [CREATE])
   updatedAt: DateTime @timestamp(operations: [UPDATE])
   owners: [Person!]! @relationship(type: "OWNED_BY", direction: OUT)
+  dataSources: [Application!]! @relationship(type: "DATA_SOURCE", direction: OUT)
   usedByApplications: [Application!]! @relationship(type: "USES", direction: IN)
   relatedToCapabilities: [BusinessCapability!]! @relationship(type: "RELATED_TO", direction: IN)
   transferredInInterfaces: [ApplicationInterface!]! @relationship(type: "TRANSFERS", direction: IN)
@@ -186,6 +201,37 @@ enum InterfaceType {
   DATABASE
   MESSAGE_QUEUE
   OTHER
+}
+
+"""
+Protokolle für Applikationsschnittstellen
+"""
+enum InterfaceProtocol {
+  REST
+  SOAP
+  GRAPHQL
+  HTTP
+  HTTPS
+  FTP
+  SFTP
+  TCP
+  UDP
+  SMTP
+  LDAP
+  JDBC
+  ODBC
+  OTHER
+}
+
+"""
+Status für Applikationsschnittstellen
+"""
+enum InterfaceStatus {
+  ACTIVE
+  IN_DEVELOPMENT
+  OUT_OF_SERVICE
+  PLANNED
+  DEPRECATED
 }
 
 """

@@ -101,9 +101,14 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
         header: 'Format',
         cell: info => info.getValue() || '-',
       }),
-      columnHelper.accessor('source', {
-        header: 'Quelle',
-        cell: info => info.getValue() || '-',
+      columnHelper.accessor('dataSources', {
+        header: 'Datenquellen',
+        cell: info => {
+          const dataSources = info.getValue()
+          if (!dataSources || dataSources.length === 0) return '-'
+          if (dataSources.length === 1) return dataSources[0].name
+          return `${dataSources[0].name} (+${dataSources.length - 1} weitere)`
+        },
       }),
       columnHelper.accessor('owners', {
         header: 'Verantwortlicher',
@@ -134,7 +139,9 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
       description: dataObject.description || undefined,
       classification: dataObject.classification,
       format: dataObject.format || undefined,
-      source: dataObject.source || undefined,
+      dataSources: dataObject.dataSources?.map(app => app.id) || [],
+      introductionDate: dataObject.introductionDate || undefined,
+      endOfLifeDate: dataObject.endOfLifeDate || undefined,
       ownerId:
         dataObject.owners && dataObject.owners.length > 0 ? dataObject.owners[0].id : undefined,
     }

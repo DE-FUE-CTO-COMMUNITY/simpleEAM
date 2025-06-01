@@ -13,6 +13,8 @@ import {
   DELETE_APPLICATION_INTERFACE,
 } from '@/graphql/applicationInterface'
 import { GET_DATA_OBJECTS } from '@/graphql/dataObject'
+import { GET_APPLICATIONS } from '@/graphql/application'
+import { GET_PERSONS } from '@/graphql/person'
 import ApplicationInterfaceForm, {
   ApplicationInterfaceFormValues,
 } from '@/components/interfaces/ApplicationInterfaceForm'
@@ -62,7 +64,21 @@ function ApplicationInterfacesPage() {
     fetchPolicy: 'cache-and-network',
   })
 
+  // Anwendungen laden für Formular-Auswahlmöglichkeiten
+  const { data: applicationsData } = useQuery(GET_APPLICATIONS, {
+    skip: !authenticated,
+    fetchPolicy: 'cache-and-network',
+  })
+
+  // Personen laden für Formular-Auswahlmöglichkeiten
+  const { data: personsData } = useQuery(GET_PERSONS, {
+    skip: !authenticated,
+    fetchPolicy: 'cache-and-network',
+  })
+
   const dataObjects = dataObjectsData?.dataObjects || []
+  const applications = applicationsData?.applications || []
+  const persons = personsData?.people || []
 
   // Fehlerbehandlung
   useEffect(() => {
@@ -127,6 +143,38 @@ function ApplicationInterfacesPage() {
       name: data.name,
       description: data.description,
       interfaceType: data.interfaceType,
+      protocol: data.protocol,
+      version: data.version,
+      status: data.status,
+      introductionDate: data.introductionDate,
+      endOfLifeDate: data.endOfLifeDate,
+      responsiblePerson: data.responsiblePerson?.length
+        ? {
+            connect: data.responsiblePerson.map(id => ({
+              where: {
+                node: { id: { eq: id } },
+              },
+            })),
+          }
+        : undefined,
+      sourceApplications: data.sourceApplications?.length
+        ? {
+            connect: data.sourceApplications.map(id => ({
+              where: {
+                node: { id: { eq: id } },
+              },
+            })),
+          }
+        : undefined,
+      targetApplications: data.targetApplications?.length
+        ? {
+            connect: data.targetApplications.map(id => ({
+              where: {
+                node: { id: { eq: id } },
+              },
+            })),
+          }
+        : undefined,
       dataObjects: data.dataObjects?.length
         ? {
             connect: data.dataObjects.map(id => ({
@@ -156,6 +204,41 @@ function ApplicationInterfacesPage() {
       name: { set: data.name },
       description: { set: data.description },
       interfaceType: { set: data.interfaceType },
+      protocol: { set: data.protocol },
+      version: { set: data.version },
+      status: { set: data.status },
+      introductionDate: { set: data.introductionDate },
+      endOfLifeDate: { set: data.endOfLifeDate },
+      responsiblePerson: data.responsiblePerson?.length
+        ? {
+            disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
+            connect: data.responsiblePerson.map(id => ({
+              where: {
+                node: { id: { eq: id } },
+              },
+            })),
+          }
+        : { disconnect: [{ where: {} }] },
+      sourceApplications: data.sourceApplications?.length
+        ? {
+            disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
+            connect: data.sourceApplications.map(id => ({
+              where: {
+                node: { id: { eq: id } },
+              },
+            })),
+          }
+        : { disconnect: [{ where: {} }] },
+      targetApplications: data.targetApplications?.length
+        ? {
+            disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
+            connect: data.targetApplications.map(id => ({
+              where: {
+                node: { id: { eq: id } },
+              },
+            })),
+          }
+        : { disconnect: [{ where: {} }] },
       dataObjects: data.dataObjects?.length
         ? {
             disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
@@ -165,7 +248,7 @@ function ApplicationInterfacesPage() {
               },
             })),
           }
-        : undefined,
+        : { disconnect: [{ where: {} }] },
     }
 
     await updateApplicationInterface({
@@ -240,6 +323,8 @@ function ApplicationInterfacesPage() {
             onUpdateApplicationInterface={handleUpdateApplicationInterfaceSubmit}
             onDeleteApplicationInterface={handleDeleteApplicationInterface}
             dataObjects={dataObjects as DataObject[]}
+            applications={applications}
+            persons={persons}
           />
         </Paper>
       </Card>
@@ -267,6 +352,8 @@ function ApplicationInterfacesPage() {
           mode="create"
           loading={isCreating}
           dataObjects={dataObjects as DataObject[]}
+          applications={applications}
+          persons={persons}
         />
       )}
     </Box>

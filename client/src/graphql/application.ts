@@ -42,7 +42,11 @@ export const GET_APPLICATIONS = gql`
         id
         name
       }
-      interfacesToApplications {
+      sourceOfInterfaces {
+        id
+        name
+      }
+      targetOfInterfaces {
         id
         name
       }
@@ -84,7 +88,11 @@ export const GET_APPLICATION = gql`
         id
         name
       }
-      interfacesToApplications {
+      sourceOfInterfaces {
+        id
+        name
+      }
+      targetOfInterfaces {
         id
         name
       }

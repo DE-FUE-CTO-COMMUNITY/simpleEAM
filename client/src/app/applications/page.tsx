@@ -165,7 +165,8 @@ const ApplicationsPage = () => {
       ownerId,
       supportsCapabilityIds,
       usesDataObjectIds,
-      interfacesToApplicationIds,
+      sourceOfInterfaceIds,
+      targetOfInterfaceIds,
       ...applicationData
     } = data
     // Bei CREATE wird kein spezielles Mutation-Objekt benötigt, da direkte Werte erlaubt sind
@@ -210,10 +211,19 @@ const ApplicationsPage = () => {
           }
         : {}),
       // Wenn Schnittstellen ausgewählt wurden, verbinden wir sie mit der Applikation
-      ...(interfacesToApplicationIds && interfacesToApplicationIds.length > 0
+      ...(sourceOfInterfaceIds && sourceOfInterfaceIds.length > 0
         ? {
-            interfacesToApplications: {
-              connect: interfacesToApplicationIds.map(id => ({
+            sourceOfInterfaces: {
+              connect: sourceOfInterfaceIds.map(id => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }
+        : {}),
+      ...(targetOfInterfaceIds && targetOfInterfaceIds.length > 0
+        ? {
+            targetOfInterfaces: {
+              connect: targetOfInterfaceIds.map(id => ({
                 where: { node: { id: { eq: id } } },
               })),
             },
@@ -236,7 +246,8 @@ const ApplicationsPage = () => {
       ownerId,
       supportsCapabilityIds,
       usesDataObjectIds,
-      interfacesToApplicationIds,
+      sourceOfInterfaceIds,
+      targetOfInterfaceIds,
       ...applicationData
     } = data
 
@@ -318,12 +329,12 @@ const ApplicationsPage = () => {
       }
     }
 
-    // Aktualisierung der ApplicationInterface-Beziehungen
-    if (interfacesToApplicationIds && interfacesToApplicationIds.length > 0) {
-      // Wir setzen die interfacesToApplications-Beziehung
-      input.interfacesToApplications = {
+    // Aktualisierung der Source Interface-Beziehungen
+    if (sourceOfInterfaceIds && sourceOfInterfaceIds.length > 0) {
+      // Wir setzen die sourceOfInterfaces-Beziehung
+      input.sourceOfInterfaces = {
         disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
-        connect: interfacesToApplicationIds.map(intfId => ({
+        connect: sourceOfInterfaceIds.map(intfId => ({
           where: {
             node: {
               id: { eq: intfId }, // ID muss als IdScalarFilters-Objekt übergeben werden
@@ -332,8 +343,28 @@ const ApplicationsPage = () => {
         })), // Verbinde mit den neuen Interfaces
       }
     } else {
-      // Wenn keine Interfaces ausgewählt wurden, entfernen wir alle Verbindungen
-      input.interfacesToApplications = {
+      // Wenn keine Source Interfaces ausgewählt wurden, entfernen wir alle Verbindungen
+      input.sourceOfInterfaces = {
+        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+      }
+    }
+
+    // Aktualisierung der Target Interface-Beziehungen
+    if (targetOfInterfaceIds && targetOfInterfaceIds.length > 0) {
+      // Wir setzen die targetOfInterfaces-Beziehung
+      input.targetOfInterfaces = {
+        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+        connect: targetOfInterfaceIds.map(intfId => ({
+          where: {
+            node: {
+              id: { eq: intfId }, // ID muss als IdScalarFilters-Objekt übergeben werden
+            },
+          },
+        })), // Verbinde mit den neuen Interfaces
+      }
+    } else {
+      // Wenn keine Target Interfaces ausgewählt wurden, entfernen wir alle Verbindungen
+      input.targetOfInterfaces = {
         disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
       }
     }

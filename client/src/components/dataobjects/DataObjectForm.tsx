@@ -5,7 +5,8 @@ import { useForm } from '@tanstack/react-form'
 import { z } from 'zod'
 import { useQuery } from '@apollo/client'
 import { GET_PERSONS } from '@/graphql/person'
-import { DataObject, DataClassification } from '../../gql/generated'
+import { GET_APPLICATIONS } from '@/graphql/application'
+import { DataObject, DataClassification, Application } from '../../gql/generated'
 import GenericForm, { FieldConfig } from '../common/GenericForm'
 import { isArchitect } from '@/lib/auth'
 
@@ -23,11 +24,9 @@ export const dataObjectSchema = z.object({
     .nullable(),
   classification: z.nativeEnum(DataClassification),
   format: z.string().max(50, 'Das Format darf maximal 50 Zeichen lang sein').optional().nullable(),
-  source: z
-    .string()
-    .max(100, 'Die Quelle darf maximal 100 Zeichen lang sein')
-    .optional()
-    .nullable(),
+  dataSources: z.array(z.string()).optional(),
+  introductionDate: z.string().optional().nullable(),
+  endOfLifeDate: z.string().optional().nullable(),
   ownerId: z.string().optional(),
 })
 
@@ -36,6 +35,7 @@ export type DataObjectFormValues = z.infer<typeof dataObjectSchema>
 
 export interface DataObjectFormProps {
   dataObject?: DataObject | null
+  applications?: Application[]
   isOpen: boolean
   onClose: () => void
   onSubmit: (data: DataObjectFormValues) => Promise<void>
@@ -62,6 +62,7 @@ const getClassificationLabel = (classification: DataClassification): string => {
 
 const DataObjectForm: React.FC<DataObjectFormProps> = ({
   dataObject,
+  applications = [],
   isOpen,
   onClose,
   onSubmit,
@@ -72,6 +73,8 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
 }) => {
   // Personen laden
   const { data: personData, loading: personLoading } = useQuery(GET_PERSONS)
+  // Anwendungen laden
+  const { data: applicationData, loading: applicationLoading } = useQuery(GET_APPLICATIONS)
 
   // Formulardaten initialisieren
   const defaultValues: DataObjectFormValues = {
@@ -79,7 +82,9 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
     description: dataObject?.description ?? null,
     classification: dataObject?.classification ?? DataClassification.INTERNAL,
     format: dataObject?.format ?? null,
-    source: dataObject?.source ?? null,
+    dataSources: dataObject?.dataSources?.map(app => app.id) ?? [],
+    introductionDate: dataObject?.introductionDate ?? null,
+    endOfLifeDate: dataObject?.endOfLifeDate ?? null,
     ownerId:
       dataObject?.owners && dataObject.owners.length > 0 ? dataObject.owners[0].id : undefined,
   }
@@ -103,7 +108,9 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
   const dataObjectDescription = dataObject?.description
   const dataObjectClassification = dataObject?.classification
   const dataObjectFormat = dataObject?.format
-  const dataObjectSource = dataObject?.source
+  const dataObjectDataSources = dataObject?.dataSources?.map(app => app.id)
+  const dataObjectIntroductionDate = dataObject?.introductionDate
+  const dataObjectEndOfLifeDate = dataObject?.endOfLifeDate
   const dataObjectOwnerId =
     dataObject?.owners && dataObject.owners.length > 0 ? dataObject.owners[0]?.id : undefined
 
@@ -117,7 +124,9 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
         description: dataObjectDescription ?? null,
         classification: dataObjectClassification ?? DataClassification.INTERNAL,
         format: dataObjectFormat ?? null,
-        source: dataObjectSource ?? null,
+        dataSources: dataObjectDataSources ?? [],
+        introductionDate: dataObjectIntroductionDate ?? null,
+        endOfLifeDate: dataObjectEndOfLifeDate ?? null,
         ownerId: dataObjectOwnerId ?? '',
       })
     }
@@ -129,7 +138,9 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
     dataObjectDescription,
     dataObjectClassification,
     dataObjectFormat,
-    dataObjectSource,
+    dataObjectDataSources,
+    dataObjectIntroductionDate,
+    dataObjectEndOfLifeDate,
     dataObjectOwnerId,
   ])
 
@@ -185,10 +196,48 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
       size: { xs: 12, md: 6 },
     },
     {
-      name: 'source',
-      label: 'Quelle',
-      type: 'text',
-      validators: dataObjectSchema.shape.source,
+      name: 'dataSources',
+      label: 'Datenquellen',
+      type: 'autocomplete',
+      validators: dataObjectSchema.shape.dataSources,
+      size: { xs: 12, md: 6 },
+      options:
+        applicationData?.applications?.map(
+          (app: { id: string; name: string }): SelectOption => ({
+            value: app.id,
+            label: app.name,
+          })
+        ) || [],
+      multiple: true,
+      loadingOptions: applicationLoading,
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          const matchingApp = applicationData?.applications?.find(
+            (app: { id: string; name: string }) => app.id === option
+          )
+          return matchingApp?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
+    },
+    {
+      name: 'introductionDate',
+      label: 'Einführungsdatum',
+      type: 'date',
+      validators: dataObjectSchema.shape.introductionDate,
+      size: { xs: 12, md: 6 },
+    },
+    {
+      name: 'endOfLifeDate',
+      label: 'End-of-Life Datum',
+      type: 'date',
+      validators: dataObjectSchema.shape.endOfLifeDate,
       size: { xs: 12, md: 6 },
     },
     {

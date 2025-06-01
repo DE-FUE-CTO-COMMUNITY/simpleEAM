@@ -24,8 +24,13 @@ export const GET_DATA_OBJECTS = gql`
         lastName
       }
       classification
-      source
       format
+      introductionDate
+      endOfLifeDate
+      dataSources {
+        id
+        name
+      }
       createdAt
       updatedAt
     }
@@ -44,8 +49,13 @@ export const GET_DATA_OBJECT = gql`
         lastName
       }
       classification
-      source
       format
+      introductionDate
+      endOfLifeDate
+      dataSources {
+        id
+        name
+      }
       createdAt
       updatedAt
       usedByApplications {
@@ -73,8 +83,13 @@ export const CREATE_DATA_OBJECT = gql`
           lastName
         }
         classification
-        source
         format
+        introductionDate
+        endOfLifeDate
+        dataSources {
+          id
+          name
+        }
         createdAt
         updatedAt
       }
@@ -95,8 +110,13 @@ export const UPDATE_DATA_OBJECT = gql`
           lastName
         }
         classification
-        source
         format
+        introductionDate
+        endOfLifeDate
+        dataSources {
+          id
+          name
+        }
         createdAt
         updatedAt
       }

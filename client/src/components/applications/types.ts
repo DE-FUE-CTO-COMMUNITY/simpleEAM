@@ -20,7 +20,8 @@ export type ApplicationType = Pick<
   | 'updatedAt'
   | 'supportsCapabilities'
   | 'usesDataObjects'
-  | 'interfacesToApplications'
+  | 'sourceOfInterfaces'
+  | 'targetOfInterfaces'
   | 'partOfArchitectures'
 >
 

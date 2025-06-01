@@ -118,11 +118,15 @@ const DataObjectsPage = () => {
       }
 
       // Quellenfilter anwenden
-      if (filters.sources.length > 0 && (!obj.source || !filters.sources.includes(obj.source))) {
-        return false
+      if (filters.sources.length > 0) {
+        if (!obj.dataSources || obj.dataSources.length === 0) return false
+        const hasMatchingSource = obj.dataSources.some(source =>
+          filters.sources.includes(source.name)
+        )
+        if (!hasMatchingSource) return false
       }
 
-      // Globalen Filter anwenden (suche in Name, Beschreibung, Format, Quelle)
+      // Globalen Filter anwenden (suche in Name, Beschreibung, Format, Datenquellen)
       if (globalFilter && globalFilter.trim() !== '') {
         const searchTerm = globalFilter.toLowerCase().trim()
         const matchesName = obj.name.toLowerCase().includes(searchTerm)
@@ -130,9 +134,11 @@ const DataObjectsPage = () => {
           ? obj.description.toLowerCase().includes(searchTerm)
           : false
         const matchesFormat = obj.format ? obj.format.toLowerCase().includes(searchTerm) : false
-        const matchesSource = obj.source ? obj.source.toLowerCase().includes(searchTerm) : false
+        const matchesDataSources = obj.dataSources
+          ? obj.dataSources.some(source => source.name.toLowerCase().includes(searchTerm))
+          : false
 
-        if (!matchesName && !matchesDescription && !matchesFormat && !matchesSource) {
+        if (!matchesName && !matchesDescription && !matchesFormat && !matchesDataSources) {
           return false
         }
       }
@@ -148,7 +154,9 @@ const DataObjectsPage = () => {
 
     dataObjects.forEach(obj => {
       if (obj.format) formats.add(obj.format)
-      if (obj.source) sources.add(obj.source)
+      if (obj.dataSources) {
+        obj.dataSources.forEach(source => sources.add(source.name))
+      }
     })
 
     return {
@@ -184,7 +192,17 @@ const DataObjectsPage = () => {
         description: data.description,
         classification: data.classification,
         format: data.format,
-        source: data.source,
+        introductionDate: data.introductionDate,
+        endOfLifeDate: data.endOfLifeDate,
+        dataSources: data.dataSources?.length
+          ? {
+              connect: data.dataSources.map(id => ({
+                where: {
+                  node: { id: { eq: id } },
+                },
+              })),
+            }
+          : undefined,
         ...(data.ownerId
           ? { owners: { connect: [{ where: { node: { id: { eq: data.ownerId } } } }] } }
           : {}),
@@ -211,7 +229,18 @@ const DataObjectsPage = () => {
         description: { set: data.description },
         classification: { set: data.classification },
         format: { set: data.format },
-        source: { set: data.source },
+        introductionDate: { set: data.introductionDate },
+        endOfLifeDate: { set: data.endOfLifeDate },
+        dataSources: data.dataSources?.length
+          ? {
+              disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
+              connect: data.dataSources.map(id => ({
+                where: {
+                  node: { id: { eq: id } },
+                },
+              })),
+            }
+          : { disconnect: [{ where: {} }] },
       }
 
       // Wenn ownerId vorhanden ist, fügen wir die owners-Beziehung hinzu

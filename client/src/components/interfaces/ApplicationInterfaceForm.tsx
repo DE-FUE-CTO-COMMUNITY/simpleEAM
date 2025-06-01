@@ -3,7 +3,17 @@
 import React, { useEffect } from 'react'
 import { useForm } from '@tanstack/react-form'
 import { z } from 'zod'
-import { ApplicationInterface, InterfaceType } from '../../gql/generated'
+import { useQuery } from '@apollo/client'
+import { GET_PERSONS } from '@/graphql/person'
+import { GET_APPLICATIONS } from '@/graphql/application'
+import {
+  ApplicationInterface,
+  InterfaceType,
+  InterfaceProtocol,
+  InterfaceStatus,
+  Application,
+  Person,
+} from '../../gql/generated'
 import GenericForm, { FieldConfig } from '../common/GenericForm'
 import { isArchitect } from '@/lib/auth'
 import { DataObject } from '@/gql/generated'
@@ -18,6 +28,18 @@ export const applicationInterfaceSchema = z.object({
   interfaceType: z.nativeEnum(InterfaceType, {
     errorMap: () => ({ message: 'Bitte wählen Sie einen Schnittstellentyp' }),
   }),
+  protocol: z.nativeEnum(InterfaceProtocol).optional().nullable(),
+  version: z
+    .string()
+    .max(50, 'Die Version darf maximal 50 Zeichen lang sein')
+    .optional()
+    .nullable(),
+  status: z.nativeEnum(InterfaceStatus),
+  introductionDate: z.string().optional().nullable(),
+  endOfLifeDate: z.string().optional().nullable(),
+  responsiblePerson: z.array(z.string()).optional(),
+  sourceApplications: z.array(z.string()).optional(),
+  targetApplications: z.array(z.string()).optional(),
   dataObjects: z.array(z.string()).optional(),
 })
 
@@ -27,6 +49,8 @@ export type ApplicationInterfaceFormValues = z.infer<typeof applicationInterface
 export interface ApplicationInterfaceFormProps {
   applicationInterface?: ApplicationInterface | null
   dataObjects?: DataObject[]
+  applications?: Application[]
+  persons?: Person[]
   isOpen: boolean
   onClose: () => void
   onSubmit: (data: ApplicationInterfaceFormValues) => Promise<void>
@@ -39,6 +63,8 @@ export interface ApplicationInterfaceFormProps {
 const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
   applicationInterface,
   dataObjects = [],
+  applications = [],
+  persons = [],
   isOpen,
   onClose,
   onSubmit,
@@ -47,12 +73,24 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
   loading = false,
   onEditMode,
 }) => {
+  // Daten laden
+  const { data: personData, loading: personLoading } = useQuery(GET_PERSONS)
+  const { data: applicationData, loading: applicationLoading } = useQuery(GET_APPLICATIONS)
+
   // Formulardaten initialisieren - leere Standardwerte für neues Formular
   const defaultValues = React.useMemo<ApplicationInterfaceFormValues>(
     () => ({
       name: '',
       description: null,
       interfaceType: InterfaceType.API,
+      protocol: null,
+      version: null,
+      status: InterfaceStatus.PLANNED,
+      introductionDate: null,
+      endOfLifeDate: null,
+      responsiblePerson: [],
+      sourceApplications: [],
+      targetApplications: [],
       dataObjects: [],
     }),
     []
@@ -68,6 +106,14 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
         name: value.name,
         description: value.description,
         interfaceType: value.interfaceType,
+        protocol: value.protocol,
+        version: value.version,
+        status: value.status,
+        introductionDate: value.introductionDate,
+        endOfLifeDate: value.endOfLifeDate,
+        responsiblePerson: value.responsiblePerson || [],
+        sourceApplications: value.sourceApplications || [],
+        targetApplications: value.targetApplications || [],
         dataObjects: value.dataObjects || [],
       }
 
@@ -102,14 +148,19 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       applicationInterface.id
     ) {
       // Im edit/view Mode mit Werten aus applicationInterface initialisieren
-      // Für Autocomplete müssen wir die dataObjects als String-IDs übergeben
-      const dataObjectIds = applicationInterface.dataObjects?.map(obj => obj.id) || []
-
       const formValues = {
         name: applicationInterface.name ?? '',
         description: applicationInterface.description ?? null,
         interfaceType: applicationInterface.interfaceType,
-        dataObjects: dataObjectIds,
+        protocol: applicationInterface.protocol ?? null,
+        version: applicationInterface.version ?? null,
+        status: applicationInterface.status,
+        introductionDate: applicationInterface.introductionDate ?? null,
+        endOfLifeDate: applicationInterface.endOfLifeDate ?? null,
+        responsiblePerson: applicationInterface.responsiblePerson?.map(person => person.id) || [],
+        sourceApplications: applicationInterface.sourceApplications?.map(app => app.id) || [],
+        targetApplications: applicationInterface.targetApplications?.map(app => app.id) || [],
+        dataObjects: applicationInterface.dataObjects?.map(obj => obj.id) || [],
       }
 
       // Formular mit den Werten aus der vorhandenen Schnittstelle zurücksetzen
@@ -163,6 +214,146 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
                   ? 'Nachrichtenwarteschlange'
                   : 'Sonstige',
       })),
+    },
+    {
+      name: 'protocol',
+      label: 'Protokoll',
+      type: 'select',
+      validators: applicationInterfaceSchema.shape.protocol,
+      size: { xs: 12, md: 6 },
+      options: [
+        { value: '', label: 'Kein Protokoll' },
+        ...Object.values(InterfaceProtocol).map(protocol => ({
+          value: protocol,
+          label: protocol,
+        })),
+      ],
+    },
+    {
+      name: 'version',
+      label: 'Version',
+      type: 'text',
+      validators: applicationInterfaceSchema.shape.version,
+      size: { xs: 12, md: 6 },
+    },
+    {
+      name: 'status',
+      label: 'Status',
+      type: 'select',
+      required: true,
+      validators: applicationInterfaceSchema.shape.status,
+      size: { xs: 12, md: 6 },
+      options: Object.values(InterfaceStatus).map(status => ({
+        value: status,
+        label:
+          status === InterfaceStatus.ACTIVE
+            ? 'Aktiv'
+            : status === InterfaceStatus.IN_DEVELOPMENT
+              ? 'In Entwicklung'
+              : status === InterfaceStatus.OUT_OF_SERVICE
+                ? 'Außer Betrieb'
+                : status === InterfaceStatus.PLANNED
+                  ? 'Geplant'
+                  : 'Veraltet',
+      })),
+    },
+    {
+      name: 'introductionDate',
+      label: 'Einführungsdatum',
+      type: 'date',
+      validators: applicationInterfaceSchema.shape.introductionDate,
+      size: { xs: 12, md: 6 },
+    },
+    {
+      name: 'endOfLifeDate',
+      label: 'End-of-Life Datum',
+      type: 'date',
+      validators: applicationInterfaceSchema.shape.endOfLifeDate,
+      size: { xs: 12, md: 6 },
+    },
+    {
+      name: 'responsiblePerson',
+      label: 'Verantwortliche Personen',
+      type: 'autocomplete',
+      size: { xs: 12 },
+      options:
+        personData?.people?.map((person: { id: string; firstName: string; lastName: string }) => ({
+          value: person.id,
+          label: `${person.firstName} ${person.lastName}`,
+        })) || [],
+      multiple: true,
+      loadingOptions: personLoading,
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          const matchingPerson = personData?.people?.find(
+            (person: { id: string; firstName: string; lastName: string }) => person.id === option
+          )
+          return matchingPerson ? `${matchingPerson.firstName} ${matchingPerson.lastName}` : option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
+    },
+    {
+      name: 'sourceApplications',
+      label: 'Quellanwendungen',
+      type: 'autocomplete',
+      size: { xs: 12, md: 6 },
+      options:
+        applicationData?.applications?.map((app: { id: string; name: string }) => ({
+          value: app.id,
+          label: app.name,
+        })) || [],
+      multiple: true,
+      loadingOptions: applicationLoading,
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          const matchingApp = applicationData?.applications?.find(
+            (app: { id: string; name: string }) => app.id === option
+          )
+          return matchingApp?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
+    },
+    {
+      name: 'targetApplications',
+      label: 'Zielanwendungen',
+      type: 'autocomplete',
+      size: { xs: 12, md: 6 },
+      options:
+        applicationData?.applications?.map((app: { id: string; name: string }) => ({
+          value: app.id,
+          label: app.name,
+        })) || [],
+      multiple: true,
+      loadingOptions: applicationLoading,
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          const matchingApp = applicationData?.applications?.find(
+            (app: { id: string; name: string }) => app.id === option
+          )
+          return matchingApp?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
     },
     {
       name: 'dataObjects',
