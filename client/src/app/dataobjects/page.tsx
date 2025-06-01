@@ -224,34 +224,115 @@ const DataObjectsPage = () => {
   // Handler für das Aktualisieren eines Datenobjekts
   const handleUpdateDataObjectSubmit = async (id: string, data: DataObjectFormValues) => {
     try {
-      const input = {
+      // Find the current data object to compare changes
+      const currentDataObject = dataObjects.find(obj => obj.id === id)
+      if (!currentDataObject) {
+        console.error('DataObject not found for update')
+        return
+      }
+
+      const input: any = {
         name: { set: data.name },
         description: { set: data.description },
         classification: { set: data.classification },
         format: { set: data.format },
         introductionDate: { set: data.introductionDate },
         endOfLifeDate: { set: data.endOfLifeDate },
-        dataSources: data.dataSources?.length
-          ? {
+      }
+
+      // DataSources Update - only update if changed
+      const currentDataSourceIds = currentDataObject.dataSources?.map(app => app.id).sort() || []
+      const newDataSourceIds = data.dataSources?.sort() || []
+      
+      // Debug-Ausgabe für DataSources-Vergleich
+      console.log('DataSources comparison:', {
+        current: currentDataSourceIds,
+        new: newDataSourceIds,
+        currentString: JSON.stringify(currentDataSourceIds),
+        newString: JSON.stringify(newDataSourceIds)
+      })
+      
+      const dataSourcesChanged = JSON.stringify(currentDataSourceIds) !== JSON.stringify(newDataSourceIds)
+      
+      if (dataSourcesChanged) {
+        console.log('DataSources changed - updating:', {
+          current: currentDataSourceIds,
+          new: newDataSourceIds
+        })
+        
+        if (newDataSourceIds.length > 0) {
+          input.dataSources = [
+            {
               disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
-              connect: data.dataSources.map(id => ({
+              connect: newDataSourceIds.map(id => ({
                 where: {
                   node: { id: { eq: id } },
                 },
               })),
-            }
-          : { disconnect: [{ where: {} }] },
+            },
+          ]
+        } else {
+          // Wenn keine DataSources ausgewählt sind, alle Verbindungen trennen
+          input.dataSources = [
+            {
+              disconnect: [{ where: {} }],
+            },
+          ]
+        }
       }
 
-      // Wenn ownerId vorhanden ist, fügen wir die owners-Beziehung hinzu
-      if (data.ownerId) {
-        Object.assign(input, {
-          owners: {
-            disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
-            connect: [{ where: { node: { id: { eq: data.ownerId } } } }], // Neue Verbindung herstellen
-          },
+      // Owners Update - only update if changed
+      const currentOwnerId = currentDataObject.owners?.[0]?.id || ''
+      const newOwnerId = data.ownerId || ''
+      
+      // Debug-Ausgabe für Owner-Vergleich
+      console.log('Owner comparison:', {
+        current: currentOwnerId,
+        new: newOwnerId,
+        currentType: typeof currentOwnerId,
+        newType: typeof newOwnerId,
+        currentOwnerObject: currentDataObject.owners?.[0],
+        formOwnerId: data.ownerId
+      })
+      
+      const ownerChanged = currentOwnerId !== newOwnerId
+      
+      if (ownerChanged) {
+        console.log('Owner changed - updating:', {
+          current: currentOwnerId,
+          new: newOwnerId
         })
+        
+        if (newOwnerId) {
+          input.owners = [
+            {
+              disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
+              connect: [{ where: { node: { id: { eq: newOwnerId } } } }], // Neue Verbindung herstellen
+            },
+          ]
+        } else {
+          input.owners = [
+            {
+              disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
+            },
+          ]
+        }
       }
+
+      // Debug-Ausgabe vor Update
+      console.log('Current DataObject:', {
+        id: currentDataObject.id,
+        name: currentDataObject.name,
+        classification: currentDataObject.classification,
+        dataSources: currentDataObject.dataSources,
+        owners: currentDataObject.owners
+      })
+      console.log('Form Data:', data)
+
+      // Debug-Ausgabe
+      console.log('DataObject Update Input:', JSON.stringify(input, null, 2))
+      console.log('DataSources changed:', dataSourcesChanged)
+      console.log('Owner changed:', ownerChanged)
 
       await updateDataObject({
         variables: {
@@ -259,6 +340,8 @@ const DataObjectsPage = () => {
           input,
         },
       })
+      
+      console.log('DataObject update completed successfully')
     } catch (error) {
       console.error('Fehler beim Aktualisieren des Datenobjekts:', error)
     }

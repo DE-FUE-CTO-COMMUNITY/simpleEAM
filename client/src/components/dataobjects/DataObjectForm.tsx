@@ -1,12 +1,12 @@
 'use client'
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { useForm } from '@tanstack/react-form'
 import { z } from 'zod'
 import { useQuery } from '@apollo/client'
 import { GET_PERSONS } from '@/graphql/person'
 import { GET_APPLICATIONS } from '@/graphql/application'
-import { DataObject, DataClassification, Application } from '../../gql/generated'
+import { DataObject, DataClassification } from '../../gql/generated'
 import GenericForm, { FieldConfig } from '../common/GenericForm'
 import { isArchitect } from '@/lib/auth'
 
@@ -35,7 +35,6 @@ export type DataObjectFormValues = z.infer<typeof dataObjectSchema>
 
 export interface DataObjectFormProps {
   dataObject?: DataObject | null
-  applications?: Application[]
   isOpen: boolean
   onClose: () => void
   onSubmit: (data: DataObjectFormValues) => Promise<void>
@@ -62,7 +61,6 @@ const getClassificationLabel = (classification: DataClassification): string => {
 
 const DataObjectForm: React.FC<DataObjectFormProps> = ({
   dataObject,
-  applications = [],
   isOpen,
   onClose,
   onSubmit,
@@ -114,11 +112,15 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
   const dataObjectOwnerId =
     dataObject?.owners && dataObject.owners.length > 0 ? dataObject.owners[0]?.id : undefined
 
+  // Ref um zu verfolgen, ob das Formular bereits initialisiert wurde
+  const formInitialized = useRef(false)
+
   useEffect(() => {
     if (!isOpen) {
       form.reset()
-    } else if (dataObject) {
-      // Aktualisiere das Formular bei Änderungen am DataObject-Objekt
+      formInitialized.current = false
+    } else if (dataObject && !formInitialized.current) {
+      // Nur beim ersten Öffnen des Formulars zurücksetzen
       form.reset({
         name: dataObjectName ?? '',
         description: dataObjectDescription ?? null,
@@ -129,6 +131,7 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
         endOfLifeDate: dataObjectEndOfLifeDate ?? null,
         ownerId: dataObjectOwnerId ?? '',
       })
+      formInitialized.current = true
     }
   }, [
     isOpen,
