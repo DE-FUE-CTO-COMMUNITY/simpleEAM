@@ -485,7 +485,7 @@ export const downloadTemplate = (
 /**
  * Erstellt eine Excel-Template-Datei mit echten GraphQL-Feldnamen
  */
-export const downloadTemplateWithRealFields = (
+export const downloadTemplateWithRealFields = async (
   entityType:
     | 'businessCapabilities'
     | 'applications'
@@ -495,8 +495,9 @@ export const downloadTemplateWithRealFields = (
     | 'architectures'
     | 'diagrams'
     | 'all'
-): void => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
+): Promise<void> => {
+  // Dynamischen Import für ES-Module-Kompatibilität verwenden
+  const moduleImport = await import('./excelDataService')
   const {
     getTemplateByEntityType,
     getBusinessCapabilitiesTemplate,
@@ -506,7 +507,7 @@ export const downloadTemplateWithRealFields = (
     getPersonsTemplate,
     getArchitecturesTemplate,
     getDiagramsTemplate,
-  } = require('./excelDataService')
+  } = moduleImport
 
   if (entityType === 'all') {
     // Multi-Tab Template für Admin

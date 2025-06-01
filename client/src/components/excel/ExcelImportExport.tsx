@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -188,6 +188,9 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
   })
   const [isDeleting, setIsDeleting] = useState(false)
 
+  // Ref für das Datei-Input-Element
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
   // Entity Type Labels
   const entityTypeLabels = {
     businessCapabilities: 'Business Capabilities',
@@ -206,10 +209,9 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
     setValidationResult(null)
     setImportProgress(0)
 
-    // Input-Element zurücksetzen
-    const fileInput = document.getElementById('excel-file-upload') as HTMLInputElement
-    if (fileInput) {
-      fileInput.value = ''
+    // Input-Element zurücksetzen mit React Ref
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
     }
   }
 
@@ -459,7 +461,7 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
   // Optionale Validierung von Beziehungs-IDs (kann später erweitert werden)
   const validateRelationshipIds = async (
     relationshipString: string | undefined,
-    targetEntityType: string
+    _targetEntityType: string
   ): Promise<string[]> => {
     if (!relationshipString || relationshipString.trim() === '') {
       return []
@@ -961,6 +963,7 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
                 id="excel-file-upload"
                 type="file"
                 onChange={handleFileUpload}
+                ref={fileInputRef}
               />
               <label htmlFor="excel-file-upload">
                 <Button variant="contained" startIcon={<UploadIcon />} component="span" fullWidth>
