@@ -29,7 +29,10 @@ export const GET_LIBRARY_ELEMENTS = gql`
       name
       description
       classification
-      source
+      dataSources {
+        id
+        name
+      }
       format
     }
     applicationInterfaces {
@@ -70,7 +73,10 @@ export interface LibraryDataObject {
   name: string
   description?: string
   classification?: string
-  source?: string
+  dataSources?: Array<{
+    id: string
+    name: string
+  }>
   format?: string
 }
 
