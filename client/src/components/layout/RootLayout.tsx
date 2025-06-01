@@ -69,9 +69,9 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
     { text: 'Datenobjekte', icon: <DataObjectIcon />, href: '/dataobjects' },
     { text: 'Schnittstellen', icon: <ApiIcon />, href: '/interfaces' },
     { text: 'Personen', icon: <PersonIcon />, href: '/persons' },
-    // Divider vor Excel Import/Export
+    // Divider vor Import/Export
     { isDivider: true, text: 'divider', icon: null },
-    { text: 'Excel Import/Export', icon: <ExcelIcon />, onClick: handleExcelDialogOpen },
+    { text: 'Import/Export', icon: <ExcelIcon />, onClick: handleExcelDialogOpen },
   ]
 
   const isActive = (href: string) => {

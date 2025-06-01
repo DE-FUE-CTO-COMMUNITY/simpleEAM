@@ -11,6 +11,12 @@ interface ExcelExportOptions {
   includeHeaders: boolean
 }
 
+interface MultiTabExportOptions {
+  filename: string
+  format: 'xlsx'
+  includeHeaders: boolean
+}
+
 /**
  * Exportiert Daten in eine Excel- oder CSV-Datei
  */
@@ -47,6 +53,58 @@ export const exportToExcel = (data: ExcelExportData[], options: ExcelExportOptio
 
   // Erstelle Blob und löse Download aus
   const blob = new Blob([wbout], { type: mimeType })
+  const url = window.URL.createObjectURL(blob)
+
+  const link = document.createElement('a')
+  link.href = url
+  link.download = fullFilename
+  document.body.appendChild(link)
+  link.click()
+
+  // Cleanup
+  document.body.removeChild(link)
+  window.URL.revokeObjectURL(url)
+}
+
+/**
+ * Exportiert Multi-Tab-Daten in eine Excel-Datei (Admin-Funktion)
+ */
+export const exportMultiTabToExcel = (
+  data: { [tabName: string]: ExcelExportData[] },
+  options: MultiTabExportOptions
+): void => {
+  if (!data || Object.keys(data).length === 0) {
+    throw new Error('Keine Daten zum Exportieren vorhanden')
+  }
+
+  // Erstelle ein neues Arbeitsbuch
+  const workbook = XLSX.utils.book_new()
+
+  // Füge für jeden Entity-Typ ein Tab hinzu
+  Object.entries(data).forEach(([tabName, tabData]) => {
+    if (tabData && tabData.length > 0) {
+      const worksheet = XLSX.utils.json_to_sheet(tabData, {
+        header: options.includeHeaders ? undefined : [],
+      })
+      XLSX.utils.book_append_sheet(workbook, worksheet, tabName)
+    }
+  })
+
+  const extension = '.xlsx'
+  const fullFilename = options.filename.endsWith(extension)
+    ? options.filename
+    : `${options.filename}${extension}`
+
+  // Schreibe die Datei
+  const wbout = XLSX.write(workbook, {
+    bookType: 'xlsx',
+    type: 'array',
+  })
+
+  // Erstelle Blob und löse Download aus
+  const blob = new Blob([wbout], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  })
   const url = window.URL.createObjectURL(blob)
 
   const link = document.createElement('a')
@@ -105,6 +163,73 @@ export const importFromExcel = (file: File): Promise<ExcelExportData[]> => {
         reject(
           new Error(
             `Fehler beim Lesen der Datei: ${error instanceof Error ? error.message : 'Unbekannter Fehler'}`
+          )
+        )
+      }
+    }
+
+    reader.onerror = () => {
+      reject(new Error('Fehler beim Lesen der Datei'))
+    }
+
+    reader.readAsArrayBuffer(file)
+  })
+}
+
+/**
+ * Liest eine Multi-Tab Excel-Datei und gibt die Daten strukturiert zurück (Admin-Funktion)
+ */
+export const importMultiTabFromExcel = (
+  file: File
+): Promise<{ [tabName: string]: ExcelExportData[] }> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+
+    reader.onload = e => {
+      try {
+        const data = new Uint8Array(e.target?.result as ArrayBuffer)
+        const workbook = XLSX.read(data, { type: 'array' })
+
+        if (workbook.SheetNames.length === 0) {
+          reject(new Error('Die Datei enthält keine Arbeitsblätter'))
+          return
+        }
+
+        const result: { [tabName: string]: ExcelExportData[] } = {}
+
+        // Verarbeite alle Arbeitsblätter
+        workbook.SheetNames.forEach(sheetName => {
+          const worksheet = workbook.Sheets[sheetName]
+
+          // Konvertiere zu JSON
+          const jsonData = XLSX.utils.sheet_to_json(worksheet, {
+            header: 1, // Erste Zeile als Header verwenden
+            defval: '', // Standardwert für leere Zellen
+          }) as string[][]
+
+          if (jsonData.length > 0) {
+            // Erste Zeile als Header verwenden
+            const headers = jsonData[0] as string[]
+            const rows = jsonData.slice(1)
+
+            // Konvertiere zu Objekten
+            const tabData: ExcelExportData[] = rows.map(row => {
+              const obj: ExcelExportData = {}
+              headers.forEach((header, index) => {
+                obj[header] = row[index] || ''
+              })
+              return obj
+            })
+
+            result[sheetName] = tabData
+          }
+        })
+
+        resolve(result)
+      } catch (error) {
+        reject(
+          new Error(
+            `Fehler beim Lesen der Multi-Tab-Datei: ${error instanceof Error ? error.message : 'Unbekannter Fehler'}`
           )
         )
       }
@@ -361,10 +486,48 @@ export const downloadTemplate = (
  * Erstellt eine Excel-Template-Datei mit echten GraphQL-Feldnamen
  */
 export const downloadTemplateWithRealFields = (
-  entityType: 'businessCapabilities' | 'applications' | 'dataObjects' | 'interfaces'
+  entityType:
+    | 'businessCapabilities'
+    | 'applications'
+    | 'dataObjects'
+    | 'interfaces'
+    | 'persons'
+    | 'architectures'
+    | 'diagrams'
+    | 'all'
 ): void => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { getTemplateByEntityType } = require('./excelDataService')
+  const {
+    getTemplateByEntityType,
+    getBusinessCapabilitiesTemplate,
+    getApplicationsTemplate,
+    getDataObjectsTemplate,
+    getInterfacesTemplate,
+    getPersonsTemplate,
+    getArchitecturesTemplate,
+    getDiagramsTemplate,
+  } = require('./excelDataService')
+
+  if (entityType === 'all') {
+    // Multi-Tab Template für Admin
+    const allTemplates = {
+      'Business Capabilities': [getBusinessCapabilitiesTemplate()],
+      Applications: [getApplicationsTemplate()],
+      'Data Objects': [getDataObjectsTemplate()],
+      Interfaces: [getInterfacesTemplate()],
+      Persons: [getPersonsTemplate()],
+      Architectures: [getArchitecturesTemplate()],
+      Diagrams: [getDiagramsTemplate()],
+    }
+
+    exportMultiTabToExcel(allTemplates, {
+      filename: 'SimpleEAM_Complete_Import_Template',
+      format: 'xlsx',
+      includeHeaders: true,
+    })
+    return
+  }
+
   const template = getTemplateByEntityType(entityType)
 
   const entityTypeLabels = {
@@ -372,6 +535,9 @@ export const downloadTemplateWithRealFields = (
     applications: 'Applications',
     dataObjects: 'Data Objects',
     interfaces: 'Interfaces',
+    persons: 'Persons',
+    architectures: 'Architectures',
+    diagrams: 'Diagrams',
   }
 
   exportToExcel([template], {

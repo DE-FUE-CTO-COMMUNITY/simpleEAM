@@ -3,12 +3,23 @@ import { GET_CAPABILITIES } from '../graphql/capability'
 import { GET_APPLICATIONS } from '../graphql/application'
 import { GET_APPLICATION_INTERFACES } from '../graphql/applicationInterface'
 import { GET_DATA_OBJECTS } from '../graphql/dataObject'
+import { GET_PERSONS } from '../graphql/person'
+import { GET_ARCHITECTURES } from '../graphql/architecture'
+import { GET_DIAGRAMS } from '../graphql/diagram'
 
 export interface ExcelExportData {
   [key: string]: string | number | boolean | Date
 }
 
-export type EntityType = 'businessCapabilities' | 'applications' | 'dataObjects' | 'interfaces'
+export type EntityType =
+  | 'businessCapabilities'
+  | 'applications'
+  | 'dataObjects'
+  | 'interfaces'
+  | 'persons'
+  | 'architectures'
+  | 'diagrams'
+  | 'all'
 
 /**
  * Formatiert ein Datum in ISO-Format für re-import-fähigen Export
@@ -185,12 +196,174 @@ export const fetchInterfacesForExport = async (
 }
 
 /**
+ * Holt echte Personen Daten für Excel Export
+ * Verwendet GraphQL-Feldnamen als Spaltenüberschriften und IDs für Relationen
+ */
+export const fetchPersonsForExport = async (
+  client: ApolloClient<any>
+): Promise<ExcelExportData[]> => {
+  try {
+    const { data } = await client.query({
+      query: GET_PERSONS,
+      fetchPolicy: 'network-only',
+    })
+
+    if (!data?.people) {
+      return []
+    }
+
+    return data.people.map((person: any) => ({
+      id: person.id,
+      firstName: person.firstName,
+      lastName: person.lastName,
+      email: person.email || '',
+      department: person.department || '',
+      role: person.role || '',
+      phone: person.phone || '',
+      createdAt: formatDateForExport(person.createdAt),
+      updatedAt: formatDateForExport(person.updatedAt),
+      ownedCapabilities: person.ownedCapabilities?.map((cap: any) => cap.id).join(',') || '',
+      ownedApplications: person.ownedApplications?.map((app: any) => app.id).join(',') || '',
+      ownedDataObjects: person.ownedDataObjects?.map((obj: any) => obj.id).join(',') || '',
+    }))
+  } catch (error) {
+    console.error('Fehler beim Laden der Personen:', error)
+    throw new Error('Personen konnten nicht geladen werden')
+  }
+}
+
+/**
+ * Holt echte Architekturen Daten für Excel Export
+ * Verwendet GraphQL-Feldnamen als Spaltenüberschriften und IDs für Relationen
+ */
+export const fetchArchitecturesForExport = async (
+  client: ApolloClient<any>
+): Promise<ExcelExportData[]> => {
+  try {
+    const { data } = await client.query({
+      query: GET_ARCHITECTURES,
+      fetchPolicy: 'network-only',
+    })
+
+    if (!data?.architectures) {
+      return []
+    }
+
+    return data.architectures.map((arch: any) => ({
+      id: arch.id,
+      name: arch.name,
+      description: arch.description || '',
+      domain: arch.domain,
+      type: arch.type,
+      timestamp: formatDateForExport(arch.timestamp),
+      tags: arch.tags?.join(',') || '',
+      createdAt: formatDateForExport(arch.createdAt),
+      updatedAt: formatDateForExport(arch.updatedAt),
+      owners: arch.owners?.map((owner: any) => owner.id).join(',') || '',
+      containsApplications: arch.containsApplications?.map((app: any) => app.id).join(',') || '',
+      containsCapabilities: arch.containsCapabilities?.map((cap: any) => cap.id).join(',') || '',
+      containsDataObjects: arch.containsDataObjects?.map((obj: any) => obj.id).join(',') || '',
+      diagrams: arch.diagrams?.map((diag: any) => diag.id).join(',') || '',
+      childArchitectures: arch.childArchitectures?.map((child: any) => child.id).join(',') || '',
+      parentArchitecture: arch.parentArchitecture?.map((parent: any) => parent.id).join(',') || '',
+    }))
+  } catch (error) {
+    console.error('Fehler beim Laden der Architekturen:', error)
+    throw new Error('Architekturen konnten nicht geladen werden')
+  }
+}
+
+/**
+ * Holt echte Diagramme Daten für Excel Export
+ * Verwendet GraphQL-Feldnamen als Spaltenüberschriften und IDs für Relationen
+ */
+export const fetchDiagramsForExport = async (
+  client: ApolloClient<any>
+): Promise<ExcelExportData[]> => {
+  try {
+    const { data } = await client.query({
+      query: GET_DIAGRAMS,
+      fetchPolicy: 'network-only',
+    })
+
+    if (!data?.diagrams) {
+      return []
+    }
+
+    return data.diagrams.map((diagram: any) => ({
+      id: diagram.id,
+      title: diagram.title,
+      description: diagram.description || '',
+      diagramType: diagram.diagramType || '',
+      diagramJson: diagram.diagramJson || '',
+      createdAt: formatDateForExport(diagram.createdAt),
+      updatedAt: formatDateForExport(diagram.updatedAt),
+      creator: diagram.creator?.map((creator: any) => creator.id).join(',') || '',
+      architecture: diagram.architecture?.map((arch: any) => arch.id).join(',') || '',
+    }))
+  } catch (error) {
+    console.error('Fehler beim Laden der Diagramme:', error)
+    throw new Error('Diagramme konnten nicht geladen werden')
+  }
+}
+
+/**
+ * Holt alle Entitäten für Admin-Export (Multi-Tab Excel)
+ */
+export const fetchAllEntitiesForExport = async (
+  client: ApolloClient<any>
+): Promise<{ [tabName: string]: ExcelExportData[] }> => {
+  try {
+    console.log('Lade alle Entitäten für Admin-Export...')
+
+    const [
+      businessCapabilities,
+      applications,
+      dataObjects,
+      interfaces,
+      persons,
+      architectures,
+      diagrams,
+    ] = await Promise.all([
+      fetchBusinessCapabilitiesForExport(client),
+      fetchApplicationsForExport(client),
+      fetchDataObjectsForExport(client),
+      fetchInterfacesForExport(client),
+      fetchPersonsForExport(client),
+      fetchArchitecturesForExport(client),
+      fetchDiagramsForExport(client),
+    ])
+
+    return {
+      'Business Capabilities': businessCapabilities,
+      Applications: applications,
+      'Data Objects': dataObjects,
+      Interfaces: interfaces,
+      Persons: persons,
+      Architectures: architectures,
+      Diagrams: diagrams,
+    }
+  } catch (error) {
+    console.error('Fehler beim Laden aller Entitäten:', error)
+    throw new Error('Fehler beim Laden der kompletten Datenbank')
+  }
+}
+
+/**
  * Holt echte Daten basierend auf dem Entity-Typ
  */
 export const fetchDataByEntityType = async (
   client: ApolloClient<any>,
-  entityType: 'businessCapabilities' | 'applications' | 'dataObjects' | 'interfaces'
-): Promise<ExcelExportData[]> => {
+  entityType:
+    | 'businessCapabilities'
+    | 'applications'
+    | 'dataObjects'
+    | 'interfaces'
+    | 'persons'
+    | 'architectures'
+    | 'diagrams'
+    | 'all'
+): Promise<ExcelExportData[] | { [tabName: string]: ExcelExportData[] }> => {
   switch (entityType) {
     case 'businessCapabilities':
       return fetchBusinessCapabilitiesForExport(client)
@@ -200,6 +373,14 @@ export const fetchDataByEntityType = async (
       return fetchDataObjectsForExport(client)
     case 'interfaces':
       return fetchInterfacesForExport(client)
+    case 'persons':
+      return fetchPersonsForExport(client)
+    case 'architectures':
+      return fetchArchitecturesForExport(client)
+    case 'diagrams':
+      return fetchDiagramsForExport(client)
+    case 'all':
+      return fetchAllEntitiesForExport(client)
     default:
       throw new Error(`Unbekannter Entity-Typ: ${entityType}`)
   }
@@ -288,10 +469,72 @@ export const getInterfacesTemplate = (): ExcelExportData => ({
 })
 
 /**
+ * Erstellt Template-Daten mit echten GraphQL-Feldnamen für Personen
+ */
+export const getPersonsTemplate = (): ExcelExportData => ({
+  id: '',
+  firstName: '',
+  lastName: '',
+  email: '',
+  phone: '',
+  role: '',
+  department: '',
+  ownedCapabilities: '', // Komma-getrennte Capability-IDs
+  ownedApplications: '', // Komma-getrennte Application-IDs
+  ownedDataObjects: '', // Komma-getrennte DataObject-IDs
+  createdAt: '', // ISO-Format: 2024-01-01T12:00:00.000Z
+  updatedAt: '', // ISO-Format: 2024-01-01T12:00:00.000Z
+})
+
+/**
+ * Erstellt Template-Daten mit echten GraphQL-Feldnamen für Architekturen
+ */
+export const getArchitecturesTemplate = (): ExcelExportData => ({
+  id: '',
+  name: '',
+  description: '',
+  domain: '', // BUSINESS, DATA, APPLICATION, TECHNOLOGY, SECURITY, ENTERPRISE
+  type: '', // CURRENT_STATE, FUTURE_STATE, TRANSITION, CONCEPTUAL
+  timestamp: '', // ISO-Format: 2024-01-01T12:00:00.000Z
+  tags: '', // Komma-getrennte Tags
+  owners: '', // Komma-getrennte Owner-IDs
+  containsApplications: '', // Komma-getrennte Application-IDs
+  containsCapabilities: '', // Komma-getrennte Capability-IDs
+  containsDataObjects: '', // Komma-getrennte DataObject-IDs
+  diagrams: '', // Komma-getrennte Diagram-IDs
+  childArchitectures: '', // Komma-getrennte Architecture-IDs
+  parentArchitecture: '', // Komma-getrennte Parent Architecture-IDs
+  createdAt: '', // ISO-Format: 2024-01-01T12:00:00.000Z
+  updatedAt: '', // ISO-Format: 2024-01-01T12:00:00.000Z
+})
+
+/**
+ * Erstellt Template-Daten mit echten GraphQL-Feldnamen für Diagramme
+ */
+export const getDiagramsTemplate = (): ExcelExportData => ({
+  id: '',
+  title: '',
+  description: '',
+  diagramType: '', // APPLICATION_LANDSCAPE, ARCHITECTURE, CAPABILITY_MAP, CONCEPTUAL, DATA_FLOW, INTEGRATION_ARCHITECTURE, NETWORK, OTHER, PROCESS, SECURITY_ARCHITECTURE
+  diagramJson: '', // Excalidraw JSON data
+  creator: '', // Komma-getrennte Creator-IDs (Person)
+  architecture: '', // Komma-getrennte Architecture-IDs
+  createdAt: '', // ISO-Format: 2024-01-01T12:00:00.000Z
+  updatedAt: '', // ISO-Format: 2024-01-01T12:00:00.000Z
+})
+
+/**
  * Holt Template-Daten basierend auf dem Entity-Typ mit echten GraphQL-Feldnamen
  */
 export const getTemplateByEntityType = (
-  entityType: 'businessCapabilities' | 'applications' | 'dataObjects' | 'interfaces'
+  entityType:
+    | 'businessCapabilities'
+    | 'applications'
+    | 'dataObjects'
+    | 'interfaces'
+    | 'persons'
+    | 'architectures'
+    | 'diagrams'
 ): ExcelExportData => {
   switch (entityType) {
     case 'businessCapabilities':
@@ -302,6 +545,12 @@ export const getTemplateByEntityType = (
       return getDataObjectsTemplate()
     case 'interfaces':
       return getInterfacesTemplate()
+    case 'persons':
+      return getPersonsTemplate()
+    case 'architectures':
+      return getArchitecturesTemplate()
+    case 'diagrams':
+      return getDiagramsTemplate()
     default:
       throw new Error(`Unbekannter Entity-Typ: ${entityType}`)
   }
@@ -311,8 +560,28 @@ export const getTemplateByEntityType = (
  * Holt die Feldnamen für die Export-Vorschau
  */
 export const getFieldNamesByEntityType = (
-  entityType: 'businessCapabilities' | 'applications' | 'dataObjects' | 'interfaces'
-): string[] => {
+  entityType:
+    | 'businessCapabilities'
+    | 'applications'
+    | 'dataObjects'
+    | 'interfaces'
+    | 'persons'
+    | 'architectures'
+    | 'diagrams'
+    | 'all'
+): string[] | { [tabName: string]: string[] } => {
+  if (entityType === 'all') {
+    return {
+      'Business Capabilities': Object.keys(getBusinessCapabilitiesTemplate()),
+      Applications: Object.keys(getApplicationsTemplate()),
+      'Data Objects': Object.keys(getDataObjectsTemplate()),
+      Interfaces: Object.keys(getInterfacesTemplate()),
+      Persons: Object.keys(getPersonsTemplate()),
+      Architectures: Object.keys(getArchitecturesTemplate()),
+      Diagrams: Object.keys(getDiagramsTemplate()),
+    }
+  }
+
   const template = getTemplateByEntityType(entityType)
   return Object.keys(template)
 }
@@ -348,7 +617,14 @@ export interface ValidationWarning {
  */
 export const validateImportData = (
   data: any[],
-  entityType: 'businessCapabilities' | 'applications' | 'dataObjects' | 'interfaces'
+  entityType:
+    | 'businessCapabilities'
+    | 'applications'
+    | 'dataObjects'
+    | 'interfaces'
+    | 'persons'
+    | 'architectures'
+    | 'diagrams'
 ): ValidationResult => {
   const errors: ValidationError[] = []
   const warnings: ValidationWarning[] = []
@@ -451,7 +727,14 @@ export const validateImportData = (
  * Erstellt ein Template mit Beispieldaten für bessere Benutzer-Guidance
  */
 export const getTemplateWithExamples = (
-  entityType: 'businessCapabilities' | 'applications' | 'dataObjects' | 'interfaces'
+  entityType:
+    | 'businessCapabilities'
+    | 'applications'
+    | 'dataObjects'
+    | 'interfaces'
+    | 'persons'
+    | 'architectures'
+    | 'diagrams'
 ): ExcelExportData[] => {
   const emptyTemplate = getTemplateByEntityType(entityType)
 
@@ -538,6 +821,62 @@ export const getTemplateWithExamples = (
           updatedAt: '2024-06-01T15:30:00.000Z',
         },
       ]
+    case 'persons':
+      return [
+        emptyTemplate,
+        {
+          id: 'user-001',
+          firstName: 'Max',
+          lastName: 'Mustermann',
+          email: 'max.mustermann@example.com',
+          phone: '+491234567890',
+          role: 'admin',
+          department: 'IT',
+          ownedCapabilities: 'cap-001,cap-002',
+          ownedApplications: 'app-001,app-002',
+          ownedDataObjects: 'data-001',
+          createdAt: '2024-01-01T10:00:00.000Z',
+          updatedAt: '2024-06-01T15:30:00.000Z',
+        },
+      ]
+    case 'architectures':
+      return [
+        emptyTemplate,
+        {
+          id: 'arch-001',
+          name: 'Microservices Architecture',
+          description: 'Decomposed architecture with microservices',
+          domain: 'APPLICATION',
+          type: 'FUTURE_STATE',
+          timestamp: '2024-06-01T00:00:00.000Z',
+          tags: 'microservices,scalable,cloud',
+          owners: 'user-001,user-002',
+          containsApplications: 'app-001,app-002',
+          containsCapabilities: 'cap-001,cap-002',
+          containsDataObjects: 'data-001',
+          diagrams: 'diag-001',
+          childArchitectures: 'arch-002',
+          parentArchitecture: 'arch-parent-001',
+          createdAt: '2024-01-01T10:00:00.000Z',
+          updatedAt: '2024-06-01T15:30:00.000Z',
+        },
+      ]
+    case 'diagrams':
+      return [
+        emptyTemplate,
+        {
+          id: 'diag-001',
+          title: 'Customer Journey Map',
+          description: 'Visual representation of the customer journey',
+          diagramType: 'PROCESS',
+          diagramJson:
+            '{"type":"excalidraw","version":2,"source":"","elements":[],"appState":{"gridSize":null,"viewBackgroundColor":"#ffffff"}}',
+          creator: 'user-001',
+          architecture: 'arch-001',
+          createdAt: '2024-01-01T10:00:00.000Z',
+          updatedAt: '2024-06-01T15:30:00.000Z',
+        },
+      ]
     default:
       return [emptyTemplate]
   }
@@ -554,6 +893,12 @@ export function getRequiredFieldsByEntityType(entityType: EntityType): string[] 
       return ['id', 'name', 'protocol']
     case 'dataObjects':
       return ['id', 'name']
+    case 'persons':
+      return ['id', 'firstName', 'lastName']
+    case 'architectures':
+      return ['id', 'name', 'domain', 'type', 'timestamp']
+    case 'diagrams':
+      return ['id', 'title', 'diagramJson']
     default:
       return ['id', 'name']
   }
@@ -621,6 +966,34 @@ export function getOptionalFieldsByEntityType(entityType: EntityType): string[] 
         'createdAt',
         'updatedAt',
       ]
+    case 'persons':
+      return [
+        'email',
+        'phone',
+        'role',
+        'department',
+        'ownedCapabilities',
+        'ownedApplications',
+        'ownedDataObjects',
+        'createdAt',
+        'updatedAt',
+      ]
+    case 'architectures':
+      return [
+        'description',
+        'tags',
+        'owners',
+        'containsApplications',
+        'containsCapabilities',
+        'containsDataObjects',
+        'diagrams',
+        'childArchitectures',
+        'parentArchitecture',
+        'createdAt',
+        'updatedAt',
+      ]
+    case 'diagrams':
+      return ['description', 'diagramType', 'creator', 'architecture', 'createdAt', 'updatedAt']
     default:
       return ['description', 'createdAt', 'updatedAt']
   }
