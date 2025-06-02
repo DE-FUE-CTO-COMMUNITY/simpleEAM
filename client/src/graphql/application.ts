@@ -1,5 +1,13 @@
 import { gql } from '@apollo/client'
 
+export const CHECK_APPLICATION_EXISTS = gql`
+  query CheckApplicationExists($id: ID!) {
+    applications(where: { id: { eq: $id } }) {
+      id
+    }
+  }
+`
+
 export const GET_APPLICATIONS_COUNT = gql`
   query GetApplicationsCount {
     applicationsConnection {

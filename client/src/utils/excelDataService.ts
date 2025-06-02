@@ -138,7 +138,10 @@ export const fetchDataObjectsForExport = async (
       id: obj.id,
       name: obj.name,
       description: obj.description || '',
+      classification: obj.classification || '',
       format: obj.format || '',
+      introductionDate: formatDateForExport(obj.introductionDate),
+      endOfLifeDate: formatDateForExport(obj.endOfLifeDate),
       owners: obj.owners?.map((owner: any) => owner.id).join(',') || '',
       dataSources: obj.dataSources?.map((app: any) => app.id).join(',') || '',
       usedByApplications: obj.usedByApplications?.map((app: any) => app.id).join(',') || '',
@@ -436,7 +439,10 @@ export const getDataObjectsTemplate = (): ExcelExportData => ({
   id: '',
   name: '',
   description: '',
+  classification: '', // DataClassification enum: PUBLIC, INTERNAL, CONFIDENTIAL, STRICTLY_CONFIDENTIAL
   format: '',
+  introductionDate: '', // ISO-Format: 2024-01-01T12:00:00.000Z
+  endOfLifeDate: '', // ISO-Format: 2024-01-01T12:00:00.000Z
   owners: '', // Komma-getrennte Owner-IDs
   dataSources: '', // Komma-getrennte Application-IDs
   usedByApplications: '', // Komma-getrennte Application-IDs
@@ -789,7 +795,10 @@ export const getTemplateWithExamples = (
           id: 'data-001',
           name: 'Customer Data',
           description: 'Core customer information',
+          classification: 'CONFIDENTIAL',
           format: 'JSON',
+          introductionDate: '2023-01-01T00:00:00.000Z',
+          endOfLifeDate: '2028-12-31T23:59:59.000Z',
           owners: 'user-123',
           dataSources: 'app-001',
           usedByApplications: 'app-001,app-002',

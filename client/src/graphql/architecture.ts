@@ -109,3 +109,11 @@ export const DELETE_ARCHITECTURE = gql`
     }
   }
 `
+
+export const CHECK_ARCHITECTURE_EXISTS = gql`
+  query CheckArchitectureExists($id: ID!) {
+    architectures(where: { id: { eq: $id } }) {
+      id
+    }
+  }
+`

@@ -129,3 +129,11 @@ export const GET_ARCHITECTURES_FOR_DIAGRAM = gql`
     }
   }
 `
+
+export const CHECK_DIAGRAM_EXISTS = gql`
+  query CheckDiagramExists($id: ID!) {
+    diagrams(where: { id: { eq: $id } }) {
+      id
+    }
+  }
+`

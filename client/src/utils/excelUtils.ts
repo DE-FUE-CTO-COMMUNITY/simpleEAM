@@ -20,7 +20,10 @@ interface MultiTabExportOptions {
 /**
  * Exportiert Daten in eine Excel- oder CSV-Datei
  */
-export const exportToExcel = (data: ExcelExportData[], options: ExcelExportOptions): void => {
+export const exportToExcel = async (
+  data: ExcelExportData[],
+  options: ExcelExportOptions
+): Promise<void> => {
   if (!data || data.length === 0) {
     throw new Error('Keine Daten zum Exportieren vorhanden')
   }
@@ -40,39 +43,36 @@ export const exportToExcel = (data: ExcelExportData[], options: ExcelExportOptio
       ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       : 'text/csv'
 
-  const extension = options.format === 'xlsx' ? '.xlsx' : '.csv'
-  const fullFilename = options.filename.endsWith(extension)
-    ? options.filename
-    : `${options.filename}${extension}`
-
   // Schreibe die Datei
   const wbout = XLSX.write(workbook, {
     bookType: options.format,
     type: 'array',
   })
 
-  // Erstelle Blob und löse Download aus
+  // Erstelle Blob und nutze fileSave für sicheren Download
   const blob = new Blob([wbout], { type: mimeType })
-  const url = window.URL.createObjectURL(blob)
 
-  const link = document.createElement('a')
-  link.href = url
-  link.download = fullFilename
-  document.body.appendChild(link)
-  link.click()
+  // Verwende fileSave für benutzerinitiierte Downloads (verhindert "unsafe download blocked")
+  const fileExtension = options.format === 'xlsx' ? 'xlsx' : 'csv'
+  const baseName = options.filename.replace(/\.(xlsx|csv)$/i, '')
 
-  // Cleanup
-  document.body.removeChild(link)
-  window.URL.revokeObjectURL(url)
+  // @ts-expect-error - browser-fs-access module resolution
+  const { fileSave } = await import('browser-fs-access')
+  await fileSave(blob, {
+    fileName: `${baseName}.${fileExtension}`,
+    description: `${options.format.toUpperCase()} file`,
+    extensions: [`.${fileExtension}`],
+    mimeTypes: [mimeType],
+  })
 }
 
 /**
  * Exportiert Multi-Tab-Daten in eine Excel-Datei (Admin-Funktion)
  */
-export const exportMultiTabToExcel = (
+export const exportMultiTabToExcel = async (
   data: { [tabName: string]: ExcelExportData[] },
   options: MultiTabExportOptions
-): void => {
+): Promise<void> => {
   if (!data || Object.keys(data).length === 0) {
     throw new Error('Keine Daten zum Exportieren vorhanden')
   }
@@ -90,32 +90,28 @@ export const exportMultiTabToExcel = (
     }
   })
 
-  const extension = '.xlsx'
-  const fullFilename = options.filename.endsWith(extension)
-    ? options.filename
-    : `${options.filename}${extension}`
-
   // Schreibe die Datei
   const wbout = XLSX.write(workbook, {
     bookType: 'xlsx',
     type: 'array',
   })
 
-  // Erstelle Blob und löse Download aus
+  // Erstelle Blob und nutze fileSave für sicheren Download
   const blob = new Blob([wbout], {
     type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   })
-  const url = window.URL.createObjectURL(blob)
 
-  const link = document.createElement('a')
-  link.href = url
-  link.download = fullFilename
-  document.body.appendChild(link)
-  link.click()
+  // Verwende fileSave für benutzerinitiierte Downloads (verhindert "unsafe download blocked")
+  const baseName = options.filename.replace(/\.xlsx$/i, '')
 
-  // Cleanup
-  document.body.removeChild(link)
-  window.URL.revokeObjectURL(url)
+  // @ts-expect-error - browser-fs-access type resolution issue
+  const { fileSave } = await import('browser-fs-access')
+  await fileSave(blob, {
+    fileName: `${baseName}.xlsx`,
+    description: 'Excel file',
+    extensions: ['.xlsx'],
+    mimeTypes: ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'],
+  })
 }
 
 /**
@@ -459,9 +455,9 @@ export const getMockDataByEntityType = (
 /**
  * Erstellt eine Excel-Template-Datei für einen bestimmten Entity-Typ (DEPRECATED - verwende downloadTemplateWithRealFields)
  */
-export const downloadTemplate = (
+export const downloadTemplate = async (
   entityType: 'businessCapabilities' | 'applications' | 'dataObjects' | 'interfaces'
-): void => {
+): Promise<void> => {
   const templateData = getMockDataByEntityType(entityType)
 
   // Nimm nur die erste Zeile als Template (Header + eine Beispielzeile)
@@ -474,7 +470,7 @@ export const downloadTemplate = (
     interfaces: 'Interfaces',
   }
 
-  exportToExcel(template, {
+  await exportToExcel(template, {
     filename: `${entityTypeLabels[entityType]}_Template`,
     sheetName: 'Template',
     format: 'xlsx',
@@ -521,7 +517,7 @@ export const downloadTemplateWithRealFields = async (
       Diagrams: [getDiagramsTemplate()],
     }
 
-    exportMultiTabToExcel(allTemplates, {
+    await exportMultiTabToExcel(allTemplates, {
       filename: 'SimpleEAM_Complete_Import_Template',
       format: 'xlsx',
       includeHeaders: true,
@@ -529,7 +525,8 @@ export const downloadTemplateWithRealFields = async (
     return
   }
 
-  const template = getTemplateByEntityType(entityType)
+  // TypeScript knows entityType is not 'all' here
+  const template = getTemplateByEntityType(entityType as Exclude<typeof entityType, 'all'>)
 
   const entityTypeLabels = {
     businessCapabilities: 'Business Capabilities',
@@ -541,8 +538,8 @@ export const downloadTemplateWithRealFields = async (
     diagrams: 'Diagrams',
   }
 
-  exportToExcel([template], {
-    filename: `${entityTypeLabels[entityType]}_Import_Template`,
+  await exportToExcel([template], {
+    filename: `${entityTypeLabels[entityType as Exclude<typeof entityType, 'all'>]}_Import_Template`,
     sheetName: 'Import Template',
     format: 'xlsx',
     includeHeaders: true,

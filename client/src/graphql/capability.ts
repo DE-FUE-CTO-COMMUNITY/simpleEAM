@@ -113,3 +113,11 @@ export const DELETE_CAPABILITY = gql`
     }
   }
 `
+
+export const CHECK_CAPABILITY_EXISTS = gql`
+  query CheckCapabilityExists($id: ID!) {
+    businessCapabilities(where: { id: { eq: $id } }) {
+      id
+    }
+  }
+`

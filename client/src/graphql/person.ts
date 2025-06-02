@@ -109,3 +109,11 @@ export const DELETE_PERSON = gql`
     }
   }
 `
+
+export const CHECK_PERSON_EXISTS = gql`
+  query CheckPersonExists($id: ID!) {
+    people(where: { id: { eq: $id } }) {
+      id
+    }
+  }
+`

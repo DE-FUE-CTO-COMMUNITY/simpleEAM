@@ -1,5 +1,13 @@
 import { gql } from '@apollo/client'
 
+export const CHECK_DATA_OBJECT_EXISTS = gql`
+  query CheckDataObjectExists($id: ID!) {
+    dataObjects(where: { id: { eq: $id } }) {
+      id
+    }
+  }
+`
+
 export const GET_DATA_OBJECTS_COUNT = gql`
   query GetDataObjectsCount {
     dataObjectsConnection {
