@@ -299,8 +299,7 @@ const checkEntityExists = async (client: any, entityType: string, id: string): P
     // Check if any entities were returned
     const entities = Object.values(result.data)[0] as any[]
     return entities && entities.length > 0
-  } catch (error) {
-    console.error(`Error checking existence for ${entityType} with id ${id}:`, error)
+  } catch {
     return false // If there's an error, assume entity doesn't exist and try to create
   }
 }
@@ -343,256 +342,228 @@ const importEntityDataWithMapping = async (
   }
 
   for (const row of data) {
-    try {
-      // Store original ID before processing and validate it
-      const originalId = String(row.id || '').trim()
+    // Store original ID before processing and validate it
+    const originalId = String(row.id || '').trim()
 
-      // Skip rows with empty or invalid Excel IDs - this prevents mapping issues
-      if (!originalId || originalId === '') {
-        console.warn(`Skipping row with empty ID for ${entityType}:`, row)
-        continue
-      }
-
-      // Prepare input data based on entity type (same logic as before)
-      let input: any = {}
-
-      switch (entityType) {
-        case 'Business Capabilities':
-          input = {
-            name: row.name || '',
-            description: row.description || '',
-            maturityLevel: row.maturityLevel || '',
-            status: row.status || '',
-            businessValue: row.businessValue || '',
-            tags: row.tags ? row.tags.split(',').map((tag: string) => tag.trim()) : [],
-          }
-          break
-
-        case 'Applications': {
-          const validStatus = Object.values(ApplicationStatus).includes(
-            row.status as ApplicationStatus
-          )
-            ? (row.status as ApplicationStatus)
-            : ApplicationStatus.ACTIVE
-          const validCriticality = Object.values(CriticalityLevel).includes(
-            row.criticality as CriticalityLevel
-          )
-            ? (row.criticality as CriticalityLevel)
-            : CriticalityLevel.MEDIUM
-
-          input = {
-            name: row.name || '',
-            description: row.description || '',
-            version: row.version || '',
-            status: validStatus,
-            criticality: validCriticality,
-            vendor: row.vendor || '',
-            hostingEnvironment: row.hostingEnvironment || '',
-            costs: row.costs ? parseFloat(row.costs) : undefined,
-            technologyStack: row.technologyStack
-              ? row.technologyStack.split(',').map((tech: string) => tech.trim())
-              : [],
-            introductionDate: row.introductionDate || undefined,
-            endOfLifeDate: row.endOfLifeDate || undefined,
-          }
-          break
-        }
-
-        case 'Data Objects': {
-          // Validate classification enum value
-          const validClassification = Object.values(DataClassification).includes(
-            row.classification as DataClassification
-          )
-            ? (row.classification as DataClassification)
-            : DataClassification.INTERNAL // Default fallback
-
-          input = {
-            name: row.name || '',
-            description: row.description || '',
-            format: row.format || '',
-            classification: validClassification,
-          }
-          break
-        }
-
-        case 'Interfaces': {
-          // Validate interfaceType enum value
-          const validInterfaceType = Object.values(InterfaceType).includes(
-            row.interfaceType as InterfaceType
-          )
-            ? (row.interfaceType as InterfaceType)
-            : InterfaceType.API // Default fallback
-
-          // Validate status enum value
-          const validStatus = Object.values(InterfaceStatus).includes(row.status as InterfaceStatus)
-            ? (row.status as InterfaceStatus)
-            : InterfaceStatus.PLANNED // Default fallback
-
-          input = {
-            name: row.name || '',
-            description: row.description || '',
-            interfaceType: validInterfaceType,
-            protocol: row.protocol || '',
-            version: row.version || '',
-            status: validStatus,
-            introductionDate: row.introductionDate || undefined,
-            endOfLifeDate: row.endOfLifeDate || undefined,
-          }
-          break
-        }
-
-        case 'Persons':
-          input = {
-            firstName: row.firstName || '',
-            lastName: row.lastName || '',
-            email: row.email || '',
-            role: row.role || '',
-            department: row.department || '',
-          }
-          break
-
-        case 'Architectures': {
-          // Validate enum values
-          const domainValue = row.domain?.toUpperCase()
-          const typeValue = row.type?.toUpperCase()
-
-          // Validate domain enum
-          const validDomain = Object.values(ArchitectureDomain).includes(
-            domainValue as ArchitectureDomain
-          )
-            ? (domainValue as ArchitectureDomain)
-            : ArchitectureDomain.ENTERPRISE // default
-
-          // Validate type enum
-          const validType = Object.values(ArchitectureType).includes(typeValue as ArchitectureType)
-            ? (typeValue as ArchitectureType)
-            : ArchitectureType.CURRENT_STATE // default
-
-          // Ensure timestamp is provided or use current timestamp
-          const timestamp = row.timestamp
-            ? new Date(row.timestamp).toISOString()
-            : new Date().toISOString()
-
-          input = {
-            name: row.name || '',
-            description: row.description || '',
-            domain: validDomain,
-            type: validType,
-            timestamp: timestamp,
-          }
-          break
-        }
-
-        case 'Diagrams':
-          input = {
-            title: row.title || row.name || '',
-            description: row.description || '',
-            diagramJson: row.diagramJson || row.content || '{}',
-          }
-          break
-
-        default:
-          throw new Error(`Unsupported entity type: ${entityType}`)
-      }
-
-      // Execute the mutation
-      let shouldUpdate = false
-      if (row.id && row.id.trim() !== '') {
-        shouldUpdate = await checkEntityExists(client, entityType, row.id)
-      }
-
-      if (shouldUpdate && updateMutation) {
-        // Update existing record - keep original ID mapping
-        await client.mutate({
-          mutation: updateMutation,
-          variables: {
-            id: row.id,
-            input: transformInputForUpdate(input),
-          },
-        })
-        // For updates, map original ID to itself (since we're keeping the same ID)
-        entityMappings[originalId] = row.id
-        console.log(
-          `DEBUG: Updated entity - Original ID: ${originalId}, keeping same ID: ${row.id}`
-        )
-      } else {
-        // Create new record and capture the created ID
-        const result = await client.mutate({
-          mutation: createMutation,
-          variables: {
-            input: [input],
-          },
-        })
-
-        // Extract the actual database ID from the response
-        if (result.data) {
-          // Get the mutation response object based on entity type
-          let createdEntities: any[] | undefined
-
-          switch (entityType) {
-            case 'Business Capabilities':
-              createdEntities = result.data.createBusinessCapabilities?.businessCapabilities
-              break
-            case 'Applications':
-              createdEntities = result.data.createApplications?.applications
-              break
-            case 'Data Objects':
-              createdEntities = result.data.createDataObjects?.dataObjects
-              break
-            case 'Interfaces':
-              createdEntities = result.data.createApplicationInterfaces?.applicationInterfaces
-              break
-            case 'Persons':
-              createdEntities = result.data.createPeople?.people
-              break
-            case 'Architectures':
-              createdEntities = result.data.createArchitectures?.architectures
-              break
-            case 'Diagrams':
-              createdEntities = result.data.createDiagrams?.diagrams
-              break
-            default:
-              console.error(`ERROR: Unknown entity type for mapping extraction: ${entityType}`)
-              break
-          }
-
-          if (createdEntities && createdEntities.length > 0) {
-            const createdEntity = createdEntities[0]
-            if (createdEntity && createdEntity.id) {
-              const actualDbId = createdEntity.id
-              console.log(`Created entity - Original ID: ${originalId}, Database ID: ${actualDbId}`)
-
-              // Map original Excel ID to actual database ID (originalId is guaranteed to be valid due to validation above)
-              entityMappings[originalId] = actualDbId
-              console.log(`DEBUG: Added mapping: ${originalId} -> ${actualDbId}`)
-            } else {
-              console.error(
-                `ERROR: Created entity missing ID for ${entityType}, originalId: ${originalId}`
-              )
-            }
-          } else {
-            console.error(
-              `ERROR: No entities returned from create mutation for ${entityType}, originalId: ${originalId}`
-            )
-          }
-        } else {
-          console.error(
-            `ERROR: No data returned from create mutation for ${entityType}, originalId: ${originalId}`
-          )
-        }
-      }
-
-      importedCount++
-    } catch (error) {
-      console.error(`Error importing ${entityType} row:`, error, row)
-      throw error
+    // Skip rows with empty or invalid Excel IDs - this prevents mapping issues
+    if (!originalId || originalId === '') {
+      continue
     }
+
+    // Prepare input data based on entity type (same logic as before)
+    let input: any = {}
+
+    switch (entityType) {
+      case 'Business Capabilities':
+        input = {
+          name: row.name || '',
+          description: row.description || '',
+          maturityLevel: row.maturityLevel || '',
+          status: row.status || '',
+          businessValue: row.businessValue || '',
+          tags: row.tags ? row.tags.split(',').map((tag: string) => tag.trim()) : [],
+        }
+        break
+
+      case 'Applications': {
+        const validStatus = Object.values(ApplicationStatus).includes(
+          row.status as ApplicationStatus
+        )
+          ? (row.status as ApplicationStatus)
+          : ApplicationStatus.ACTIVE
+        const validCriticality = Object.values(CriticalityLevel).includes(
+          row.criticality as CriticalityLevel
+        )
+          ? (row.criticality as CriticalityLevel)
+          : CriticalityLevel.MEDIUM
+
+        input = {
+          name: row.name || '',
+          description: row.description || '',
+          version: row.version || '',
+          status: validStatus,
+          criticality: validCriticality,
+          vendor: row.vendor || '',
+          hostingEnvironment: row.hostingEnvironment || '',
+          costs: row.costs ? parseFloat(row.costs) : undefined,
+          technologyStack: row.technologyStack
+            ? row.technologyStack.split(',').map((tech: string) => tech.trim())
+            : [],
+          introductionDate: row.introductionDate || undefined,
+          endOfLifeDate: row.endOfLifeDate || undefined,
+        }
+        break
+      }
+
+      case 'Data Objects': {
+        // Validate classification enum value
+        const validClassification = Object.values(DataClassification).includes(
+          row.classification as DataClassification
+        )
+          ? (row.classification as DataClassification)
+          : DataClassification.INTERNAL // Default fallback
+
+        input = {
+          name: row.name || '',
+          description: row.description || '',
+          format: row.format || '',
+          classification: validClassification,
+        }
+        break
+      }
+
+      case 'Interfaces': {
+        // Validate interfaceType enum value
+        const validInterfaceType = Object.values(InterfaceType).includes(
+          row.interfaceType as InterfaceType
+        )
+          ? (row.interfaceType as InterfaceType)
+          : InterfaceType.API // Default fallback
+
+        // Validate status enum value
+        const validStatus = Object.values(InterfaceStatus).includes(row.status as InterfaceStatus)
+          ? (row.status as InterfaceStatus)
+          : InterfaceStatus.PLANNED // Default fallback
+
+        input = {
+          name: row.name || '',
+          description: row.description || '',
+          interfaceType: validInterfaceType,
+          protocol: row.protocol || '',
+          version: row.version || '',
+          status: validStatus,
+          introductionDate: row.introductionDate || undefined,
+          endOfLifeDate: row.endOfLifeDate || undefined,
+        }
+        break
+      }
+
+      case 'Persons':
+        input = {
+          firstName: row.firstName || '',
+          lastName: row.lastName || '',
+          email: row.email || '',
+          role: row.role || '',
+          department: row.department || '',
+        }
+        break
+
+      case 'Architectures': {
+        // Validate enum values
+        const domainValue = row.domain?.toUpperCase()
+        const typeValue = row.type?.toUpperCase()
+
+        // Validate domain enum
+        const validDomain = Object.values(ArchitectureDomain).includes(
+          domainValue as ArchitectureDomain
+        )
+          ? (domainValue as ArchitectureDomain)
+          : ArchitectureDomain.ENTERPRISE // default
+
+        // Validate type enum
+        const validType = Object.values(ArchitectureType).includes(typeValue as ArchitectureType)
+          ? (typeValue as ArchitectureType)
+          : ArchitectureType.CURRENT_STATE // default
+
+        // Ensure timestamp is provided or use current timestamp
+        const timestamp = row.timestamp
+          ? new Date(row.timestamp).toISOString()
+          : new Date().toISOString()
+
+        input = {
+          name: row.name || '',
+          description: row.description || '',
+          domain: validDomain,
+          type: validType,
+          timestamp: timestamp,
+        }
+        break
+      }
+
+      case 'Diagrams':
+        input = {
+          title: row.title || row.name || '',
+          description: row.description || '',
+          diagramJson: row.diagramJson || row.content || '{}',
+        }
+        break
+
+      default:
+        throw new Error(`Unsupported entity type: ${entityType}`)
+    }
+
+    // Execute the mutation
+    let shouldUpdate = false
+    if (row.id && row.id.trim() !== '') {
+      shouldUpdate = await checkEntityExists(client, entityType, row.id)
+    }
+
+    if (shouldUpdate && updateMutation) {
+      // Update existing record - keep original ID mapping
+      await client.mutate({
+        mutation: updateMutation,
+        variables: {
+          id: row.id,
+          input: transformInputForUpdate(input),
+        },
+      })
+      // For updates, map original ID to itself (since we're keeping the same ID)
+      entityMappings[originalId] = row.id
+    } else {
+      // Create new record and capture the created ID
+      const result = await client.mutate({
+        mutation: createMutation,
+        variables: {
+          input: [input],
+        },
+      })
+
+      // Extract the actual database ID from the response
+      if (result.data) {
+        // Get the mutation response object based on entity type
+        let createdEntities: any[] | undefined
+
+        switch (entityType) {
+          case 'Business Capabilities':
+            createdEntities = result.data.createBusinessCapabilities?.businessCapabilities
+            break
+          case 'Applications':
+            createdEntities = result.data.createApplications?.applications
+            break
+          case 'Data Objects':
+            createdEntities = result.data.createDataObjects?.dataObjects
+            break
+          case 'Interfaces':
+            createdEntities = result.data.createApplicationInterfaces?.applicationInterfaces
+            break
+          case 'Persons':
+            createdEntities = result.data.createPeople?.people
+            break
+          case 'Architectures':
+            createdEntities = result.data.createArchitectures?.architectures
+            break
+          case 'Diagrams':
+            createdEntities = result.data.createDiagrams?.diagrams
+            break
+          default:
+            break
+        }
+
+        if (createdEntities && createdEntities.length > 0) {
+          const createdEntity = createdEntities[0]
+          if (createdEntity && createdEntity.id) {
+            const actualDbId = createdEntity.id
+
+            // Map original Excel ID to actual database ID (originalId is guaranteed to be valid due to validation above)
+            entityMappings[originalId] = actualDbId
+          }
+        }
+      }
+    }
+
+    importedCount++
   }
 
-  console.log(
-    `DEBUG: importEntityDataWithMapping completed for ${entityType} - returning ${importedCount} imported, ${Object.keys(entityMappings).length} mappings:`,
-    entityMappings
-  )
   return { imported: importedCount, entityMappings }
 }
 
@@ -607,9 +578,19 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
   // Function to refresh dashboard cache after successful imports
   const refreshDashboardCache = async () => {
     try {
-      // Refetch all dashboard count queries to update the dashboard
+      // Import main entity queries to also refresh entity table data
+      const { GET_CAPABILITIES } = await import('../../graphql/capability')
+      const { GET_APPLICATIONS } = await import('../../graphql/application')
+      const { GET_DATA_OBJECTS } = await import('../../graphql/dataObject')
+      const { GET_ARCHITECTURES } = await import('../../graphql/architecture')
+      const { GET_DIAGRAMS } = await import('../../graphql/diagram')
+      const { GET_APPLICATION_INTERFACES } = await import('../../graphql/applicationInterface')
+      const { GET_PERSONS } = await import('../../graphql/person')
+
+      // Refetch all dashboard count queries AND main entity list queries to update both dashboard and entity tables
       await apolloClient.refetchQueries({
         include: [
+          // Dashboard count queries
           GET_CAPABILITIES_COUNT,
           GET_APPLICATIONS_COUNT,
           GET_DATA_OBJECTS_COUNT,
@@ -617,10 +598,18 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
           GET_DIAGRAMS_COUNT,
           GET_APPLICATION_INTERFACES_COUNT,
           GET_PERSONS_COUNT,
+          // Main entity list queries for table refresh
+          GET_CAPABILITIES,
+          GET_APPLICATIONS,
+          GET_DATA_OBJECTS,
+          GET_ARCHITECTURES,
+          GET_DIAGRAMS,
+          GET_APPLICATION_INTERFACES,
+          GET_PERSONS,
         ],
       })
-    } catch (error) {
-      console.error('Error refreshing dashboard cache:', error)
+    } catch {
+      // Error refreshing dashboard cache - continue silently
     }
   }
 
@@ -854,7 +843,6 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
         const createdEntityMappings: { [tabName: string]: { [originalId: string]: string } } = {}
 
         // PHASE 1: Import all entities without relationships
-        console.log('Phase 1: Importing entities without relationships...')
         for (let i = 0; i < tabEntries.length; i++) {
           const [tabName, tabData] = tabEntries[i]
           const entityType = entityTypeMapping[tabName]
@@ -876,7 +864,6 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
                 errors: [],
               })
             } catch (error) {
-              console.error(`Fehler beim Import von ${tabName} (Phase 1):`, error)
               importResults.push({
                 entityType: tabName,
                 imported: 0,
@@ -889,16 +876,12 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
         }
 
         // PHASE 2: Update entities with relationships using actual database IDs
-        console.log('Phase 2: Adding relationships...')
 
         // Create comprehensive mapping from all entity types
         const allEntityMappings: { [originalId: string]: string } = {}
         Object.values(createdEntityMappings).forEach(entityTypeMapping => {
           Object.assign(allEntityMappings, entityTypeMapping)
         })
-        console.log(`DEBUG: Total mappings available: ${Object.keys(allEntityMappings).length}`)
-        console.log(`DEBUG: createdEntityMappings structure:`, createdEntityMappings)
-        console.log(`DEBUG: allEntityMappings:`, allEntityMappings)
 
         for (let i = 0; i < tabEntries.length; i++) {
           const [tabName, tabData] = tabEntries[i]
@@ -910,10 +893,6 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
               const updatedTabData = tabData.map(row => {
                 const originalId = String(row.id || '')
                 const actualDbId = createdEntityMappings[tabName]?.[originalId]
-
-                console.log(
-                  `DEBUG: Processing ${tabName} entity - Original ID: ${originalId}, Mapped ID: ${actualDbId}`
-                )
 
                 // Update the main entity ID
                 const updatedRow: any = actualDbId ? { ...row, id: actualDbId } : { ...row }
@@ -929,28 +908,14 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
 
                     if (mappedIds.length > 0) {
                       updatedRow[fieldName] = mappedIds.join(',')
-                      console.log(
-                        `DEBUG: Mapped ${fieldName} from [${originalIds.join(',')}] to [${mappedIds.join(',')}]`
-                      )
                     }
                   }
-                })
-
-                console.log(`DEBUG: Final updated row for ${tabName}:`, {
-                  id: updatedRow.id,
-                  originalId,
-                  mappedCorrectly: updatedRow.id !== originalId,
                 })
                 return updatedRow
               })
 
-              console.log(
-                `DEBUG: Updated ${updatedTabData.length} ${tabName} entities with actual database IDs`
-              )
-
               await updateEntityRelationships(updatedTabData, entityType as any)
             } catch (error) {
-              console.error(`Fehler beim Relationship-Update von ${tabName} (Phase 2):`, error)
               // Update error in existing result
               const existingResult = importResults.find(r => r.entityType === tabName)
               if (existingResult) {
@@ -986,7 +951,6 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
 
         try {
           // PHASE 1: Import entities without relationships
-          console.log('Phase 1: Importing entities without relationships...')
           const { imported, entityMappings } = await importEntityDataWithMapping(
             apolloClient,
             data,
@@ -997,7 +961,6 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
           setImportProgress(60)
 
           // PHASE 2: Update entities with relationships using actual database IDs
-          console.log('Phase 2: Adding relationships...')
           const updatedData = data.map(row => {
             const originalId = String(row.id || '')
             const actualDbId = entityMappings[originalId]
@@ -1016,17 +979,12 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
 
                 if (mappedIds.length > 0) {
                   updatedRow[fieldName] = mappedIds.join(',')
-                  console.log(
-                    `DEBUG: Mapped ${fieldName} from [${originalIds.join(',')}] to [${mappedIds.join(',')}]`
-                  )
                 }
               }
             })
 
             return updatedRow
           })
-
-          console.log(`DEBUG: Updated ${updatedData.length} entities with actual database IDs`)
 
           await updateEntityRelationships(updatedData, importSettings.entityType as any)
           setImportProgress(90)
@@ -1037,7 +995,6 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
             errors: [],
           })
         } catch (error) {
-          console.error(`Fehler beim Import:`, error)
           importResults.push({
             entityType: entityTypeLabels[importSettings.entityType],
             imported: 0,
@@ -1079,7 +1036,6 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
         onClose()
       }
     } catch (err) {
-      console.error('Import error:', err)
       enqueueSnackbar(
         `Fehler beim Import: ${err instanceof Error ? err.message : 'Unbekannter Fehler'}`,
         { variant: 'error' }
@@ -1147,11 +1103,8 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
     })
 
     if (rowsWithRelationships.length === 0) {
-      console.log(`No relationships to update for ${entityType}`)
       return
     }
-
-    console.log(`Updating relationships for ${rowsWithRelationships.length} ${entityType} entities`)
 
     // Update relationships using GraphQL update mutations
     switch (entityType) {
@@ -1174,30 +1127,20 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
         await updateDiagramRelationships(rowsWithRelationships)
         break
       default:
-        console.log(`Relationship updates not implemented for ${entityType}`)
     }
   }
 
   // Helper functions for updating relationships per entity type
   const updateBusinessCapabilityRelationships = async (data: any[]): Promise<void> => {
     const { UPDATE_CAPABILITY } = await import('../../graphql/capability')
-
-    console.log(`DEBUG: updateBusinessCapabilityRelationships called with ${data.length} entities`)
-    data.forEach((row, index) => {
-      console.log(`DEBUG: Entity ${index}: ID = ${row.id}, owners = ${row.owners}`)
-    })
-
     for (const row of data) {
       if (!row.id) continue
-
-      console.log(`DEBUG: Updating relationships for BusinessCapability with ID: ${row.id}`)
 
       const updateInput: any = {}
 
       if (row.owners) {
         const ownerIds = parseRelationshipIds(row.owners)
         if (ownerIds.length > 0) {
-          console.log(`DEBUG: Adding owners: ${ownerIds.join(', ')}`)
           updateInput.owners = [
             {
               connect: ownerIds.map(id => ({ where: { node: { id: { eq: id } } } })),
@@ -1209,7 +1152,6 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
       if (row.parents) {
         const parentIds = parseRelationshipIds(row.parents)
         if (parentIds.length > 0) {
-          console.log(`DEBUG: Adding parents: ${parentIds.join(', ')}`)
           updateInput.parents = [
             {
               connect: parentIds.map(id => ({ where: { node: { id: { eq: id } } } })),
@@ -1220,14 +1162,12 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
 
       if (Object.keys(updateInput).length > 0) {
         try {
-          console.log(`DEBUG: Mutation variables:`, { id: row.id, input: updateInput })
-          const result = await apolloClient.mutate({
+          await apolloClient.mutate({
             mutation: UPDATE_CAPABILITY,
             variables: { id: row.id, input: updateInput },
           })
-          console.log(`DEBUG: Mutation result:`, result.data)
-        } catch (error) {
-          console.error(`Failed to update relationships for capability ${row.id}:`, error)
+        } catch {
+          // Relationship update failed, but continue processing
         }
       }
     }

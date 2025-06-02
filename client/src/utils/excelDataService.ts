@@ -31,7 +31,6 @@ const formatDateForExport = (dateValue: string | Date | null | undefined): strin
     const date = typeof dateValue === 'string' ? new Date(dateValue) : dateValue
     return date.toISOString()
   } catch {
-    console.warn('Ungültiges Datum:', dateValue)
     return ''
   }
 }
@@ -66,8 +65,7 @@ export const fetchBusinessCapabilitiesForExport = async (
       updatedAt: formatDateForExport(cap.updatedAt),
       parents: cap.parents?.map((parent: any) => parent.id).join(',') || '',
     }))
-  } catch (error) {
-    console.error('Fehler beim Laden der Business Capabilities:', error)
+  } catch {
     throw new Error('Fehler beim Laden der Business Capabilities für Export')
   }
 }
@@ -111,8 +109,7 @@ export const fetchApplicationsForExport = async (
       createdAt: formatDateForExport(app.createdAt),
       updatedAt: formatDateForExport(app.updatedAt),
     }))
-  } catch (error) {
-    console.error('Fehler beim Laden der Anwendungen:', error)
+  } catch {
     throw new Error('Fehler beim Laden der Anwendungen für Export')
   }
 }
@@ -152,8 +149,7 @@ export const fetchDataObjectsForExport = async (
       createdAt: formatDateForExport(obj.createdAt),
       updatedAt: formatDateForExport(obj.updatedAt),
     }))
-  } catch (error) {
-    console.error('Fehler beim Laden der Datenobjekte:', error)
+  } catch {
     throw new Error('Fehler beim Laden der Datenobjekte für Export')
   }
 }
@@ -192,8 +188,7 @@ export const fetchInterfacesForExport = async (
       createdAt: formatDateForExport(iface.createdAt),
       updatedAt: formatDateForExport(iface.updatedAt),
     }))
-  } catch (error) {
-    console.error('Fehler beim Laden der Schnittstellen:', error)
+  } catch {
     throw new Error('Fehler beim Laden der Schnittstellen für Export')
   }
 }
@@ -229,8 +224,7 @@ export const fetchPersonsForExport = async (
       ownedApplications: person.ownedApplications?.map((app: any) => app.id).join(',') || '',
       ownedDataObjects: person.ownedDataObjects?.map((obj: any) => obj.id).join(',') || '',
     }))
-  } catch (error) {
-    console.error('Fehler beim Laden der Personen:', error)
+  } catch {
     throw new Error('Personen konnten nicht geladen werden')
   }
 }
@@ -270,8 +264,7 @@ export const fetchArchitecturesForExport = async (
       childArchitectures: arch.childArchitectures?.map((child: any) => child.id).join(',') || '',
       parentArchitecture: arch.parentArchitecture?.map((parent: any) => parent.id).join(',') || '',
     }))
-  } catch (error) {
-    console.error('Fehler beim Laden der Architekturen:', error)
+  } catch {
     throw new Error('Architekturen konnten nicht geladen werden')
   }
 }
@@ -304,8 +297,7 @@ export const fetchDiagramsForExport = async (
       creator: diagram.creator?.map((creator: any) => creator.id).join(',') || '',
       architecture: diagram.architecture?.map((arch: any) => arch.id).join(',') || '',
     }))
-  } catch (error) {
-    console.error('Fehler beim Laden der Diagramme:', error)
+  } catch {
     throw new Error('Diagramme konnten nicht geladen werden')
   }
 }
@@ -317,8 +309,6 @@ export const fetchAllEntitiesForExport = async (
   client: ApolloClient<any>
 ): Promise<{ [tabName: string]: ExcelExportData[] }> => {
   try {
-    console.log('Lade alle Entitäten für Admin-Export...')
-
     const [
       businessCapabilities,
       applications,
@@ -346,8 +336,7 @@ export const fetchAllEntitiesForExport = async (
       Architectures: architectures,
       Diagrams: diagrams,
     }
-  } catch (error) {
-    console.error('Fehler beim Laden aller Entitäten:', error)
+  } catch {
     throw new Error('Fehler beim Laden der kompletten Datenbank')
   }
 }
