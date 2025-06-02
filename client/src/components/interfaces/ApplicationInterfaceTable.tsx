@@ -8,7 +8,7 @@ import ApplicationInterfaceForm from './ApplicationInterfaceForm'
 import { createColumnHelper } from '@tanstack/react-table'
 import { SortingState } from '@tanstack/react-table'
 import { Chip } from '@mui/material'
-import { getInterfaceTypeLabel, formatDate } from './utils'
+import { getInterfaceTypeLabel, getProtocolLabel, formatDate } from './utils'
 import { DataObject, Application, Person } from '@/gql/generated'
 
 interface ApplicationInterfaceTableProps {
@@ -60,6 +60,20 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
             <Chip
               label={getInterfaceTypeLabel(type)}
               color={type === 'API' ? 'primary' : 'default'}
+              size="small"
+              variant="outlined"
+            />
+          )
+        },
+      }),
+      columnHelper.accessor('protocol', {
+        header: 'Protokoll',
+        cell: info => {
+          const protocol = info.getValue()
+          return (
+            <Chip
+              label={getProtocolLabel(protocol)}
+              color={protocol ? 'secondary' : 'default'}
               size="small"
               variant="outlined"
             />

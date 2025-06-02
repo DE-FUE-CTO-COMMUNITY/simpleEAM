@@ -36,6 +36,16 @@ export const getInterfaceTypeLabel = (type: InterfaceType): string => {
 }
 
 /**
+ * Konvertiert den InterfaceProtocol-Enum in einen benutzerfreundlichen String
+ */
+export const getProtocolLabel = (protocol: any): string => {
+  if (!protocol) return '-'
+
+  // Direkt den Protokoll-String zurückgeben, da die Enum-Werte bereits aussagekräftig sind
+  return protocol
+}
+
+/**
  * Zählt die Anzahl der aktiven Filter im FilterState
  */
 export const countActiveFilters = (filterState: GenericFilterState): number => {
