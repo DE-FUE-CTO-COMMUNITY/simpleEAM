@@ -10,34 +10,39 @@
 const mockExcelData = {
   'Business Capabilities': [
     { id: 'bc-001', name: 'Customer Management', owners: 'person-001,person-002' },
-    { id: 'bc-002', name: 'Order Processing', owners: 'person-001', parents: 'bc-001' }
+    { id: 'bc-002', name: 'Order Processing', owners: 'person-001', parents: 'bc-001' },
   ],
-  'Persons': [
+  Persons: [
     { id: 'person-001', name: 'John Doe', email: 'john@company.com' },
-    { id: 'person-002', name: 'Jane Smith', email: 'jane@company.com' }
+    { id: 'person-002', name: 'Jane Smith', email: 'jane@company.com' },
   ],
-  'Applications': [
-    { id: 'app-001', name: 'CRM System', owners: 'person-001', supportsCapabilities: 'bc-001,bc-002' }
-  ]
+  Applications: [
+    {
+      id: 'app-001',
+      name: 'CRM System',
+      owners: 'person-001',
+      supportsCapabilities: 'bc-001,bc-002',
+    },
+  ],
 }
 
 // Mock entity mappings (what would be created in Phase 1)
 const mockEntityMappings = {
   'Business Capabilities': {
     'bc-001': '123e4567-e89b-12d3-a456-426614174001',
-    'bc-002': '123e4567-e89b-12d3-a456-426614174002'
+    'bc-002': '123e4567-e89b-12d3-a456-426614174002',
   },
-  'Persons': {
+  Persons: {
     'person-001': '123e4567-e89b-12d3-a456-426614174011',
-    'person-002': '123e4567-e89b-12d3-a456-426614174012'
+    'person-002': '123e4567-e89b-12d3-a456-426614174012',
   },
-  'Applications': {
-    'app-001': '123e4567-e89b-12d3-a456-426614174021'
-  }
+  Applications: {
+    'app-001': '123e4567-e89b-12d3-a456-426614174021',
+  },
 }
 
 // Helper functions (simplified versions from the actual code)
-const parseRelationshipIds = (value) => {
+const parseRelationshipIds = value => {
   if (!value || typeof value !== 'string') return []
   return value
     .split(',')
@@ -45,7 +50,7 @@ const parseRelationshipIds = (value) => {
     .filter(id => id.length > 0)
 }
 
-const getRelationshipFields = (entityType) => {
+const getRelationshipFields = entityType => {
   switch (entityType) {
     case 'businessCapabilities':
       return ['owners', 'parents']
@@ -76,46 +81,48 @@ console.log()
 // Simulate Phase 2 for each entity type
 const entityTypeMapping = {
   'Business Capabilities': 'businessCapabilities',
-  'Applications': 'applications', 
-  'Persons': 'persons'
+  Applications: 'applications',
+  Persons: 'persons',
 }
 
 Object.entries(mockExcelData).forEach(([tabName, tabData]) => {
   const entityType = entityTypeMapping[tabName]
-  
+
   console.log(`=== Processing ${tabName} (${entityType}) ===`)
-  
+
   // Update tabData with actual database IDs AND map relationship field values
   const updatedTabData = tabData.map(row => {
     const originalId = String(row.id || '')
     const actualDbId = mockEntityMappings[tabName]?.[originalId]
-    
+
     console.log(`\nProcessing entity: ${originalId}`)
     console.log(`  Original row:`, row)
-    
+
     // Update the main entity ID
     const updatedRow = actualDbId ? { ...row, id: actualDbId } : { ...row }
-    
+
     // Map all relationship field values to actual database UUIDs
     const relationshipFields = getRelationshipFields(entityType)
     relationshipFields.forEach(fieldName => {
       if (updatedRow[fieldName]) {
         const originalIds = parseRelationshipIds(updatedRow[fieldName])
-        const mappedIds = originalIds.map(originalId => 
-          allEntityMappings[originalId] || originalId
-        ).filter(id => id)
-        
+        const mappedIds = originalIds
+          .map(originalId => allEntityMappings[originalId] || originalId)
+          .filter(id => id)
+
         if (mappedIds.length > 0) {
-          console.log(`  Mapping ${fieldName}: [${originalIds.join(',')}] -> [${mappedIds.join(',')}]`)
+          console.log(
+            `  Mapping ${fieldName}: [${originalIds.join(',')}] -> [${mappedIds.join(',')}]`
+          )
           updatedRow[fieldName] = mappedIds.join(',')
         }
       }
     })
-    
+
     console.log(`  Updated row:`, updatedRow)
     return updatedRow
   })
-  
+
   console.log(`\nCompleted processing ${updatedTabData.length} ${tabName} entities`)
 })
 

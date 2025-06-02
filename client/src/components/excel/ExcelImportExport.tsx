@@ -92,7 +92,15 @@ import {
 } from '../../graphql/diagram'
 
 // GraphQL enums
-import { ApplicationStatus, CriticalityLevel, DataClassification, InterfaceType, InterfaceStatus } from '../../gql/generated'
+import {
+  ApplicationStatus,
+  CriticalityLevel,
+  DataClassification,
+  InterfaceType,
+  InterfaceStatus,
+  ArchitectureDomain,
+  ArchitectureType,
+} from '../../gql/generated'
 
 // GraphQL Mutations für Datenlöschung
 const DELETE_BUSINESS_CAPABILITIES = `
@@ -203,13 +211,33 @@ const getRelationshipFields = (entityType: string): string[] => {
     case 'applications':
       return ['owners', 'supportsCapabilities', 'usesDataObjects', 'partOfArchitectures']
     case 'dataObjects':
-      return ['owners', 'dataSources', 'usedByApplications', 'relatedToCapabilities', 'transferredInInterfaces', 'partOfArchitectures']
+      return [
+        'owners',
+        'dataSources',
+        'usedByApplications',
+        'relatedToCapabilities',
+        'transferredInInterfaces',
+        'partOfArchitectures',
+      ]
     case 'interfaces':
-      return ['responsiblePerson', 'sourceApplications', 'targetApplications', 'dataObjects', 'partOfArchitectures']
+      return [
+        'responsiblePerson',
+        'sourceApplications',
+        'targetApplications',
+        'dataObjects',
+        'partOfArchitectures',
+      ]
     case 'persons':
       return [] // Persons typically don't have relationships in our model
     case 'architectures':
-      return ['owners', 'containsApplications', 'containsCapabilities', 'containsDataObjects', 'diagrams', 'parentArchitecture']
+      return [
+        'owners',
+        'containsApplications',
+        'containsCapabilities',
+        'containsDataObjects',
+        'diagrams',
+        'parentArchitecture',
+      ]
     case 'diagrams':
       return ['creator', 'architecture']
     default:
@@ -318,7 +346,7 @@ const importEntityDataWithMapping = async (
     try {
       // Store original ID before processing and validate it
       const originalId = String(row.id || '').trim()
-      
+
       // Skip rows with empty or invalid Excel IDs - this prevents mapping issues
       if (!originalId || originalId === '') {
         console.warn(`Skipping row with empty ID for ${entityType}:`, row)
@@ -377,7 +405,7 @@ const importEntityDataWithMapping = async (
           )
             ? (row.classification as DataClassification)
             : DataClassification.INTERNAL // Default fallback
-          
+
           input = {
             name: row.name || '',
             description: row.description || '',
@@ -396,9 +424,7 @@ const importEntityDataWithMapping = async (
             : InterfaceType.API // Default fallback
 
           // Validate status enum value
-          const validStatus = Object.values(InterfaceStatus).includes(
-            row.status as InterfaceStatus
-          )
+          const validStatus = Object.values(InterfaceStatus).includes(row.status as InterfaceStatus)
             ? (row.status as InterfaceStatus)
             : InterfaceStatus.PLANNED // Default fallback
 
@@ -425,24 +451,43 @@ const importEntityDataWithMapping = async (
           }
           break
 
-        case 'Architectures':
+        case 'Architectures': {
+          // Validate enum values
+          const domainValue = row.domain?.toUpperCase()
+          const typeValue = row.type?.toUpperCase()
+
+          // Validate domain enum
+          const validDomain = Object.values(ArchitectureDomain).includes(
+            domainValue as ArchitectureDomain
+          )
+            ? (domainValue as ArchitectureDomain)
+            : ArchitectureDomain.ENTERPRISE // default
+
+          // Validate type enum
+          const validType = Object.values(ArchitectureType).includes(typeValue as ArchitectureType)
+            ? (typeValue as ArchitectureType)
+            : ArchitectureType.CURRENT_STATE // default
+
+          // Ensure timestamp is provided or use current timestamp
+          const timestamp = row.timestamp
+            ? new Date(row.timestamp).toISOString()
+            : new Date().toISOString()
+
           input = {
             name: row.name || '',
             description: row.description || '',
-            type: row.type || '',
-            status: row.status || '',
-            version: row.version || '',
-            tags: row.tags ? row.tags.split(',').map((tag: string) => tag.trim()) : [],
+            domain: validDomain,
+            type: validType,
+            timestamp: timestamp,
           }
           break
+        }
 
         case 'Diagrams':
           input = {
-            name: row.name || '',
+            title: row.title || row.name || '',
             description: row.description || '',
-            type: row.type || '',
-            content: row.content || '',
-            tags: row.tags ? row.tags.split(',').map((tag: string) => tag.trim()) : [],
+            diagramJson: row.diagramJson || row.content || '{}',
           }
           break
 
@@ -467,7 +512,9 @@ const importEntityDataWithMapping = async (
         })
         // For updates, map original ID to itself (since we're keeping the same ID)
         entityMappings[originalId] = row.id
-        console.log(`DEBUG: Updated entity - Original ID: ${originalId}, keeping same ID: ${row.id}`)
+        console.log(
+          `DEBUG: Updated entity - Original ID: ${originalId}, keeping same ID: ${row.id}`
+        )
       } else {
         // Create new record and capture the created ID
         const result = await client.mutate({
@@ -481,7 +528,7 @@ const importEntityDataWithMapping = async (
         if (result.data) {
           // Get the mutation response object based on entity type
           let createdEntities: any[] | undefined
-          
+
           switch (entityType) {
             case 'Business Capabilities':
               createdEntities = result.data.createBusinessCapabilities?.businessCapabilities
@@ -508,24 +555,30 @@ const importEntityDataWithMapping = async (
               console.error(`ERROR: Unknown entity type for mapping extraction: ${entityType}`)
               break
           }
-          
+
           if (createdEntities && createdEntities.length > 0) {
             const createdEntity = createdEntities[0]
             if (createdEntity && createdEntity.id) {
               const actualDbId = createdEntity.id
               console.log(`Created entity - Original ID: ${originalId}, Database ID: ${actualDbId}`)
-              
+
               // Map original Excel ID to actual database ID (originalId is guaranteed to be valid due to validation above)
               entityMappings[originalId] = actualDbId
               console.log(`DEBUG: Added mapping: ${originalId} -> ${actualDbId}`)
             } else {
-              console.error(`ERROR: Created entity missing ID for ${entityType}, originalId: ${originalId}`)
+              console.error(
+                `ERROR: Created entity missing ID for ${entityType}, originalId: ${originalId}`
+              )
             }
           } else {
-            console.error(`ERROR: No entities returned from create mutation for ${entityType}, originalId: ${originalId}`)
+            console.error(
+              `ERROR: No entities returned from create mutation for ${entityType}, originalId: ${originalId}`
+            )
           }
         } else {
-          console.error(`ERROR: No data returned from create mutation for ${entityType}, originalId: ${originalId}`)
+          console.error(
+            `ERROR: No data returned from create mutation for ${entityType}, originalId: ${originalId}`
+          )
         }
       }
 
@@ -536,7 +589,10 @@ const importEntityDataWithMapping = async (
     }
   }
 
-  console.log(`DEBUG: importEntityDataWithMapping completed for ${entityType} - returning ${importedCount} imported, ${Object.keys(entityMappings).length} mappings:`, entityMappings)
+  console.log(
+    `DEBUG: importEntityDataWithMapping completed for ${entityType} - returning ${importedCount} imported, ${Object.keys(entityMappings).length} mappings:`,
+    entityMappings
+  )
   return { imported: importedCount, entityMappings }
 }
 
@@ -806,7 +862,12 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
 
           if (entityType && displayName && Array.isArray(tabData) && tabData.length > 0) {
             try {
-              const { imported, entityMappings } = await importEntityDataWithMapping(apolloClient, tabData, displayName, true) // true = skipRelationships
+              const { imported, entityMappings } = await importEntityDataWithMapping(
+                apolloClient,
+                tabData,
+                displayName,
+                true
+              ) // true = skipRelationships
               totalImported += imported
               createdEntityMappings[tabName] = entityMappings
               importResults.push({
@@ -829,7 +890,7 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
 
         // PHASE 2: Update entities with relationships using actual database IDs
         console.log('Phase 2: Adding relationships...')
-        
+
         // Create comprehensive mapping from all entity types
         const allEntityMappings: { [originalId: string]: string } = {}
         Object.values(createdEntityMappings).forEach(entityTypeMapping => {
@@ -838,7 +899,7 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
         console.log(`DEBUG: Total mappings available: ${Object.keys(allEntityMappings).length}`)
         console.log(`DEBUG: createdEntityMappings structure:`, createdEntityMappings)
         console.log(`DEBUG: allEntityMappings:`, allEntityMappings)
-        
+
         for (let i = 0; i < tabEntries.length; i++) {
           const [tabName, tabData] = tabEntries[i]
           const entityType = entityTypeMapping[tabName]
@@ -849,34 +910,44 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
               const updatedTabData = tabData.map(row => {
                 const originalId = String(row.id || '')
                 const actualDbId = createdEntityMappings[tabName]?.[originalId]
-                
-                console.log(`DEBUG: Processing ${tabName} entity - Original ID: ${originalId}, Mapped ID: ${actualDbId}`)
-                
+
+                console.log(
+                  `DEBUG: Processing ${tabName} entity - Original ID: ${originalId}, Mapped ID: ${actualDbId}`
+                )
+
                 // Update the main entity ID
                 const updatedRow: any = actualDbId ? { ...row, id: actualDbId } : { ...row }
-                
+
                 // Map all relationship field values to actual database UUIDs
                 const relationshipFields = getRelationshipFields(entityType as any)
                 relationshipFields.forEach((fieldName: string) => {
                   if (updatedRow[fieldName]) {
                     const originalIds = parseRelationshipIds(updatedRow[fieldName])
-                    const mappedIds = originalIds.map(originalId => 
-                      allEntityMappings[originalId] || originalId
-                    ).filter(id => id) // Remove any null/undefined values
-                    
+                    const mappedIds = originalIds
+                      .map(originalId => allEntityMappings[originalId] || originalId)
+                      .filter(id => id) // Remove any null/undefined values
+
                     if (mappedIds.length > 0) {
                       updatedRow[fieldName] = mappedIds.join(',')
-                      console.log(`DEBUG: Mapped ${fieldName} from [${originalIds.join(',')}] to [${mappedIds.join(',')}]`)
+                      console.log(
+                        `DEBUG: Mapped ${fieldName} from [${originalIds.join(',')}] to [${mappedIds.join(',')}]`
+                      )
                     }
                   }
                 })
-                
-                console.log(`DEBUG: Final updated row for ${tabName}:`, { id: updatedRow.id, originalId, mappedCorrectly: updatedRow.id !== originalId })
+
+                console.log(`DEBUG: Final updated row for ${tabName}:`, {
+                  id: updatedRow.id,
+                  originalId,
+                  mappedCorrectly: updatedRow.id !== originalId,
+                })
                 return updatedRow
               })
-              
-              console.log(`DEBUG: Updated ${updatedTabData.length} ${tabName} entities with actual database IDs`)
-              
+
+              console.log(
+                `DEBUG: Updated ${updatedTabData.length} ${tabName} entities with actual database IDs`
+              )
+
               await updateEntityRelationships(updatedTabData, entityType as any)
             } catch (error) {
               console.error(`Fehler beim Relationship-Update von ${tabName} (Phase 2):`, error)
@@ -916,7 +987,12 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
         try {
           // PHASE 1: Import entities without relationships
           console.log('Phase 1: Importing entities without relationships...')
-          const { imported, entityMappings } = await importEntityDataWithMapping(apolloClient, data, displayName, true) // true = skipRelationships
+          const { imported, entityMappings } = await importEntityDataWithMapping(
+            apolloClient,
+            data,
+            displayName,
+            true
+          ) // true = skipRelationships
           totalImported = imported
           setImportProgress(60)
 
@@ -925,31 +1001,33 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
           const updatedData = data.map(row => {
             const originalId = String(row.id || '')
             const actualDbId = entityMappings[originalId]
-            
+
             // Update the main entity ID
             const updatedRow: any = actualDbId ? { ...row, id: actualDbId } : { ...row }
-            
+
             // Map all relationship field values to actual database UUIDs
             const relationshipFields = getRelationshipFields(importSettings.entityType)
             relationshipFields.forEach((fieldName: string) => {
               if (updatedRow[fieldName]) {
                 const originalIds = parseRelationshipIds(updatedRow[fieldName])
-                const mappedIds = originalIds.map(originalId => 
-                  entityMappings[originalId] || originalId
-                ).filter(id => id) // Remove any null/undefined values
-                
+                const mappedIds = originalIds
+                  .map(originalId => entityMappings[originalId] || originalId)
+                  .filter(id => id) // Remove any null/undefined values
+
                 if (mappedIds.length > 0) {
                   updatedRow[fieldName] = mappedIds.join(',')
-                  console.log(`DEBUG: Mapped ${fieldName} from [${originalIds.join(',')}] to [${mappedIds.join(',')}]`)
+                  console.log(
+                    `DEBUG: Mapped ${fieldName} from [${originalIds.join(',')}] to [${mappedIds.join(',')}]`
+                  )
                 }
               }
             })
-            
+
             return updatedRow
           })
-          
+
           console.log(`DEBUG: Updated ${updatedData.length} entities with actual database IDs`)
-          
+
           await updateEntityRelationships(updatedData, importSettings.entityType as any)
           setImportProgress(90)
 
@@ -1239,6 +1317,28 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
         }
       }
 
+      if (row.dataSources) {
+        const dataSourceIds = parseRelationshipIds(row.dataSources)
+        if (dataSourceIds) {
+          updateInput.dataSources = [
+            {
+              connect: dataSourceIds.map(id => ({ where: { node: { id: { eq: id } } } })),
+            },
+          ]
+        }
+      }
+
+      if (row.usedByApplications) {
+        const appIds = parseRelationshipIds(row.usedByApplications)
+        if (appIds) {
+          updateInput.usedByApplications = [
+            {
+              connect: appIds.map(id => ({ where: { node: { id: { eq: id } } } })),
+            },
+          ]
+        }
+      }
+
       if (row.relatedToCapabilities) {
         const capabilityIds = parseRelationshipIds(row.relatedToCapabilities)
         if (capabilityIds) {
@@ -1250,7 +1350,27 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
         }
       }
 
-      // Add other relationships as needed
+      if (row.transferredInInterfaces) {
+        const interfaceIds = parseRelationshipIds(row.transferredInInterfaces)
+        if (interfaceIds) {
+          updateInput.transferredInInterfaces = [
+            {
+              connect: interfaceIds.map(id => ({ where: { node: { id: { eq: id } } } })),
+            },
+          ]
+        }
+      }
+
+      if (row.partOfArchitectures) {
+        const architectureIds = parseRelationshipIds(row.partOfArchitectures)
+        if (architectureIds) {
+          updateInput.partOfArchitectures = [
+            {
+              connect: architectureIds.map(id => ({ where: { node: { id: { eq: id } } } })),
+            },
+          ]
+        }
+      }
       if (Object.keys(updateInput).length > 0) {
         try {
           await apolloClient.mutate({
@@ -1811,7 +1931,7 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
               </Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                 <CircularProgress variant="determinate" value={importProgress} />
-                <Typography variant="body2">{importProgress}% abgeschlossen</Typography>
+                <Typography variant="body2">{importProgress.toFixed(1)}% abgeschlossen</Typography>
               </Box>
             </Paper>
           </Grid>

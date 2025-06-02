@@ -3,6 +3,7 @@
 ## Problem Resolved
 
 The Excel import functionality was experiencing an issue where relationship updates were using original Excel IDs instead of actual database UUIDs. During the two-phase import process:
+
 - **Phase 1**: Create entities (correctly mapped Excel IDs to database UUIDs)
 - **Phase 2**: Update relationships (was still using original Excel IDs)
 
@@ -23,13 +24,33 @@ const getRelationshipFields = (entityType: string): string[] => {
     case 'applications':
       return ['owners', 'supportsCapabilities', 'usesDataObjects', 'partOfArchitectures']
     case 'dataObjects':
-      return ['owners', 'dataSources', 'usedByApplications', 'relatedToCapabilities', 'transferredInInterfaces', 'partOfArchitectures']
+      return [
+        'owners',
+        'dataSources',
+        'usedByApplications',
+        'relatedToCapabilities',
+        'transferredInInterfaces',
+        'partOfArchitectures',
+      ]
     case 'interfaces':
-      return ['responsiblePerson', 'sourceApplications', 'targetApplications', 'dataObjects', 'partOfArchitectures']
+      return [
+        'responsiblePerson',
+        'sourceApplications',
+        'targetApplications',
+        'dataObjects',
+        'partOfArchitectures',
+      ]
     case 'persons':
       return [] // Persons typically don't have relationships in our model
     case 'architectures':
-      return ['owners', 'containsApplications', 'containsCapabilities', 'containsDataObjects', 'diagrams', 'parentArchitecture']
+      return [
+        'owners',
+        'containsApplications',
+        'containsCapabilities',
+        'containsDataObjects',
+        'diagrams',
+        'parentArchitecture',
+      ]
     case 'diagrams':
       return ['creator', 'architecture']
     default:
@@ -53,25 +74,25 @@ Object.values(createdEntityMappings).forEach(entityTypeMapping => {
 const updatedTabData = tabData.map(row => {
   const originalId = String(row.id || '')
   const actualDbId = createdEntityMappings[tabName]?.[originalId]
-  
+
   // Update the main entity ID
   const updatedRow: any = actualDbId ? { ...row, id: actualDbId } : { ...row }
-  
+
   // Map all relationship field values to actual database UUIDs
   const relationshipFields = getRelationshipFields(entityType as any)
   relationshipFields.forEach((fieldName: string) => {
     if (updatedRow[fieldName]) {
       const originalIds = parseRelationshipIds(updatedRow[fieldName])
-      const mappedIds = originalIds.map(originalId => 
-        allEntityMappings[originalId] || originalId
-      ).filter(id => id) // Remove any null/undefined values
-      
+      const mappedIds = originalIds
+        .map(originalId => allEntityMappings[originalId] || originalId)
+        .filter(id => id) // Remove any null/undefined values
+
       if (mappedIds.length > 0) {
         updatedRow[fieldName] = mappedIds.join(',')
       }
     }
   })
-  
+
   return updatedRow
 })
 ```
@@ -85,26 +106,28 @@ For single entity type imports:
 const updatedData = data.map(row => {
   const originalId = String(row.id || '')
   const actualDbId = entityMappings[originalId]
-  
+
   // Update the main entity ID
   const updatedRow: any = actualDbId ? { ...row, id: actualDbId } : { ...row }
-  
+
   // Map all relationship field values to actual database UUIDs
   const relationshipFields = getRelationshipFields(importSettings.entityType)
   relationshipFields.forEach((fieldName: string) => {
     if (updatedRow[fieldName]) {
       const originalIds = parseRelationshipIds(updatedRow[fieldName])
-      const mappedIds = originalIds.map(originalId => 
-        entityMappings[originalId] || originalId
-      ).filter(id => id) // Remove any null/undefined values
-      
+      const mappedIds = originalIds
+        .map(originalId => entityMappings[originalId] || originalId)
+        .filter(id => id) // Remove any null/undefined values
+
       if (mappedIds.length > 0) {
         updatedRow[fieldName] = mappedIds.join(',')
-        console.log(`DEBUG: Mapped ${fieldName} from [${originalIds.join(',')}] to [${mappedIds.join(',')}]`)
+        console.log(
+          `DEBUG: Mapped ${fieldName} from [${originalIds.join(',')}] to [${mappedIds.join(',')}]`
+        )
       }
     }
   })
-  
+
   return updatedRow
 })
 ```

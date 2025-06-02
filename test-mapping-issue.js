@@ -9,16 +9,14 @@ console.log('=== Reproducing Entity Mapping Issue ===\n')
 // Simulate the exact scenario from the error
 const mockCreatedEntityMappings = {
   'Business Capabilities': {
-    'bc-019': '123e4567-e89b-12d3-a456-426614174019'
+    'bc-019': '123e4567-e89b-12d3-a456-426614174019',
   },
-  'Persons': {
-    'person-006': '123e4567-e89b-12d3-a456-426614174006'
-  }
+  Persons: {
+    'person-006': '123e4567-e89b-12d3-a456-426614174006',
+  },
 }
 
-const mockTabData = [
-  { id: 'bc-019', name: 'Test Capability', owners: 'person-006' }
-]
+const mockTabData = [{ id: 'bc-019', name: 'Test Capability', owners: 'person-006' }]
 
 console.log('Mock data setup:')
 console.log('createdEntityMappings:', mockCreatedEntityMappings)
@@ -43,19 +41,21 @@ console.log()
 const updatedTabData = tabData.map(row => {
   const originalId = String(row.id || '')
   const actualDbId = mockCreatedEntityMappings[tabName]?.[originalId]
-  
+
   console.log(`Processing entity:`)
   console.log(`  originalId: ${originalId}`)
   console.log(`  tabName: ${tabName}`)
-  console.log(`  mockCreatedEntityMappings[tabName]: ${JSON.stringify(mockCreatedEntityMappings[tabName])}`)
+  console.log(
+    `  mockCreatedEntityMappings[tabName]: ${JSON.stringify(mockCreatedEntityMappings[tabName])}`
+  )
   console.log(`  actualDbId from lookup: ${actualDbId}`)
-  
+
   // Update the main entity ID
   const updatedRow = actualDbId ? { ...row, id: actualDbId } : { ...row }
-  
+
   console.log(`  Updated row ID: ${updatedRow.id}`)
   console.log(`  ID mapping successful: ${updatedRow.id !== originalId}`)
-  
+
   return updatedRow
 })
 

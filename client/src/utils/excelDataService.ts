@@ -185,7 +185,7 @@ export const fetchInterfacesForExport = async (
       status: iface.status || '',
       introductionDate: formatDateForExport(iface.introductionDate),
       endOfLifeDate: formatDateForExport(iface.endOfLifeDate),
-      responsiblePerson: iface.responsiblePerson?.id || '',
+      responsiblePerson: iface.responsiblePerson?.map((person: any) => person.id).join(',') || '',
       sourceApplications: iface.sourceApplications?.map((app: any) => app.id).join(',') || '',
       targetApplications: iface.targetApplications?.map((app: any) => app.id).join(',') || '',
       dataObjects: iface.dataObjects?.map((obj: any) => obj.id).join(',') || '',
@@ -899,7 +899,7 @@ export function getRequiredFieldsByEntityType(entityType: EntityType): string[] 
     case 'applications':
       return ['id', 'name', 'status']
     case 'interfaces':
-      return ['id', 'name', 'protocol']
+      return ['id', 'name', 'interfaceType', 'status']
     case 'dataObjects':
       return ['id', 'name']
     case 'persons':
@@ -950,9 +950,8 @@ export function getOptionalFieldsByEntityType(entityType: EntityType): string[] 
     case 'interfaces':
       return [
         'description',
-        'interfaceType',
+        'protocol',
         'version',
-        'status',
         'introductionDate',
         'endOfLifeDate',
         'responsiblePerson',
@@ -965,7 +964,10 @@ export function getOptionalFieldsByEntityType(entityType: EntityType): string[] 
     case 'dataObjects':
       return [
         'description',
+        'classification',
         'format',
+        'introductionDate',
+        'endOfLifeDate',
         'owners',
         'dataSources',
         'usedByApplications',
