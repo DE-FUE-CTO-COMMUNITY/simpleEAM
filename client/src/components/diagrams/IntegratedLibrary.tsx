@@ -224,6 +224,9 @@ function createLibraryItemFromDatabaseElement(dbElement: any, elementType: strin
       newElement.text = dbElement.name
       newElement.originalText = dbElement.name
       newElement.rawText = dbElement.name
+      // Set text alignment properties directly on the text element
+      newElement.textAlign = 'center'
+      newElement.verticalAlign = 'middle'
     }
 
     // Store database metadata in customData
