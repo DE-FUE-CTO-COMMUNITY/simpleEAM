@@ -40,6 +40,7 @@ import { useAuth, getRoles } from '@/lib/auth'
 import { useQuery, useMutation } from '@apollo/client'
 import { useSnackbar } from 'notistack'
 import { GET_PERSON_BY_EMAIL, UPDATE_PERSON } from '@/graphql/person'
+import PasswordChangeDialog from './PasswordChangeDialog'
 
 interface UserProfileDialogProps {
   open: boolean
@@ -67,6 +68,7 @@ const UserProfileDialog: React.FC<UserProfileDialogProps> = ({
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'))
   const [isEditing, setIsEditing] = useState(false)
   const [userEmail, setUserEmail] = useState<string | null>(null)
+  const [passwordDialogOpen, setPasswordDialogOpen] = useState(false)
   
   // Auth-Kontext
   const { authenticated } = useAuth()
@@ -163,13 +165,7 @@ const UserProfileDialog: React.FC<UserProfileDialogProps> = ({
   }, [data?.people, form])
 
   const handleChangePassword = () => {
-    if (keycloak) {
-      // Öffne die Keycloak-Account-Verwaltung in einem neuen Tab
-      const accountUrl = keycloak.createAccountUrl()
-      window.open(accountUrl, '_blank')
-    } else {
-      enqueueSnackbar('Keycloak nicht verfügbar', { variant: 'error' })
-    }
+    setPasswordDialogOpen(true)
   }
 
   const handleClose = () => {
@@ -372,7 +368,7 @@ const UserProfileDialog: React.FC<UserProfileDialogProps> = ({
                   <Box>
                     <Typography variant="subtitle1">Passwort ändern</Typography>
                     <Typography variant="body2" color="text.secondary">
-                      Ändern Sie Ihr Passwort über die Konto-Verwaltung
+                      Ändern Sie Ihr Passwort sicher über den Dialog
                     </Typography>
                   </Box>
                 </Box>
@@ -420,6 +416,12 @@ const UserProfileDialog: React.FC<UserProfileDialogProps> = ({
           </Button>
         )}
       </DialogActions>
+
+      {/* Password Change Dialog */}
+      <PasswordChangeDialog 
+        open={passwordDialogOpen} 
+        onClose={() => setPasswordDialogOpen(false)} 
+      />
     </Dialog>
   )
 }
