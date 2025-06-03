@@ -39,7 +39,7 @@ import { useRouter } from 'next/navigation'
 import { useAuth, getRoles } from '@/lib/auth'
 import { useQuery, useMutation } from '@apollo/client'
 import { useSnackbar } from 'notistack'
-import { GET_PERSON_BY_EMAIL, UPDATE_PERSON } from '@/graphql/person'
+import { GET_PERSON_BY_EMAIL, UPDATE_PERSON, CREATE_PERSON } from '@/graphql/person'
 import PasswordChangeDialog from './PasswordChangeDialog'
 import AvatarUploadDialog from './AvatarUploadDialog'
 
@@ -111,6 +111,18 @@ const UserProfileDialog: React.FC<UserProfileDialogProps> = ({
     },
   })
 
+  // Create-Mutation für neue Personen
+  const [createPerson, { loading: createLoading }] = useMutation(CREATE_PERSON, {
+    onCompleted: () => {
+      enqueueSnackbar('Profil erfolgreich erstellt', { variant: 'success' })
+      setIsEditing(false)
+      refetch()
+    },
+    onError: error => {
+      enqueueSnackbar(`Fehler beim Erstellen: ${error.message}`, { variant: 'error' })
+    },
+  })
+
   const form = useForm({
     defaultValues: {
       firstName: '',
@@ -121,28 +133,42 @@ const UserProfileDialog: React.FC<UserProfileDialogProps> = ({
       phone: '',
     },
     onSubmit: async value => {
-      if (!data?.people || data.people.length === 0) {
-        enqueueSnackbar('Keine Person-Daten verfügbar', { variant: 'error' })
-        return
-      }
-
-      const person = data.people[0]
       try {
-        await updatePerson({
-          variables: {
-            id: person.id,
-            input: {
-              firstName: { set: value.value.firstName },
-              lastName: { set: value.value.lastName },
-              email: { set: value.value.email },
-              department: { set: value.value.department },
-              role: { set: value.value.role },
-              phone: { set: value.value.phone },
+        if (!data?.people || data.people.length === 0) {
+          // Neue Person erstellen
+          await createPerson({
+            variables: {
+              input: [
+                {
+                  firstName: value.value.firstName,
+                  lastName: value.value.lastName,
+                  email: value.value.email,
+                  department: value.value.department,
+                  role: value.value.role,
+                  phone: value.value.phone,
+                },
+              ],
             },
-          },
-        })
+          })
+        } else {
+          // Bestehende Person aktualisieren
+          const person = data.people[0]
+          await updatePerson({
+            variables: {
+              id: person.id,
+              input: {
+                firstName: { set: value.value.firstName },
+                lastName: { set: value.value.lastName },
+                email: { set: value.value.email },
+                department: { set: value.value.department },
+                role: { set: value.value.role },
+                phone: { set: value.value.phone },
+              },
+            },
+          })
+        }
       } catch (err) {
-        console.error('Update error:', err)
+        console.error('Submit error:', err)
       }
     },
     validators: {
@@ -156,15 +182,36 @@ const UserProfileDialog: React.FC<UserProfileDialogProps> = ({
   // Formular mit aktuellen Daten füllen
   useEffect(() => {
     if (data?.people && data.people.length > 0) {
-      const person = data.people[0] // Erste gefundene Person mit dieser E-Mail
+      // Person gefunden - mit Datenbankdaten füllen
+      const person = data.people[0]
       form.setFieldValue('firstName', person.firstName || '')
       form.setFieldValue('lastName', person.lastName || '')
       form.setFieldValue('email', person.email || '')
       form.setFieldValue('department', person.department || '')
       form.setFieldValue('role', person.role || '')
       form.setFieldValue('phone', person.phone || '')
+    } else if (keycloak?.tokenParsed && userEmail && !loading) {
+      // Keine Person gefunden - mit Keycloak-Daten initialisieren
+      const tokenData = keycloak.tokenParsed
+      form.setFieldValue('firstName', tokenData.given_name || '')
+      form.setFieldValue('lastName', tokenData.family_name || '')
+      form.setFieldValue('email', userEmail)
+      form.setFieldValue('department', tokenData.department || '')
+      form.setFieldValue(
+        'role',
+        tokenData.realm_access?.roles?.find(
+          (role: string) =>
+            role !== 'offline_access' &&
+            role !== 'uma_authorization' &&
+            role !== 'default-roles-simple-eam'
+        ) || ''
+      )
+      form.setFieldValue('phone', tokenData.phone_number || '')
+
+      // Automatisch in Bearbeitungsmodus setzen für neue Profile
+      setIsEditing(true)
     }
-  }, [data?.people, form])
+  }, [data?.people, keycloak?.tokenParsed, userEmail, loading, form])
 
   const handleChangePassword = () => {
     setPasswordDialogOpen(true)
@@ -182,6 +229,7 @@ const UserProfileDialog: React.FC<UserProfileDialogProps> = ({
     if (isEditing) {
       // Änderungen verwerfen
       if (data?.people && data.people.length > 0) {
+        // Bestehende Person - Datenbankdaten wiederherstellen
         const person = data.people[0]
         form.setFieldValue('firstName', person.firstName || '')
         form.setFieldValue('lastName', person.lastName || '')
@@ -189,6 +237,23 @@ const UserProfileDialog: React.FC<UserProfileDialogProps> = ({
         form.setFieldValue('department', person.department || '')
         form.setFieldValue('role', person.role || '')
         form.setFieldValue('phone', person.phone || '')
+      } else if (keycloak?.tokenParsed && userEmail) {
+        // Neue Person - Keycloak-Daten wiederherstellen
+        const tokenData = keycloak.tokenParsed
+        form.setFieldValue('firstName', tokenData.given_name || '')
+        form.setFieldValue('lastName', tokenData.family_name || '')
+        form.setFieldValue('email', userEmail)
+        form.setFieldValue('department', tokenData.department || '')
+        form.setFieldValue(
+          'role',
+          tokenData.realm_access?.roles?.find(
+            (role: string) =>
+              role !== 'offline_access' &&
+              role !== 'uma_authorization' &&
+              role !== 'default-roles-simple-eam'
+          ) || ''
+        )
+        form.setFieldValue('phone', tokenData.phone_number || '')
       }
     }
     setIsEditing(!isEditing)
@@ -348,6 +413,16 @@ const UserProfileDialog: React.FC<UserProfileDialogProps> = ({
 
         <Divider sx={{ mb: 3 }} />
 
+        {/* Info für neue Profile */}
+        {!loading && (!data?.people || data.people.length === 0) && (
+          <Alert severity="info" sx={{ mb: 3 }}>
+            <Typography variant="body2">
+              Ihr Profil wurde noch nicht erstellt. Die Felder wurden automatisch mit Ihren
+              Keycloak-Daten befüllt. Bitte überprüfen und speichern Sie Ihre Daten.
+            </Typography>
+          </Alert>
+        )}
+
         <form
           onSubmit={e => {
             e.preventDefault()
@@ -420,9 +495,9 @@ const UserProfileDialog: React.FC<UserProfileDialogProps> = ({
               onClick={() => form.handleSubmit()}
               startIcon={<SaveIcon />}
               variant="contained"
-              disabled={loading || updateLoading || !data?.people || data.people.length === 0}
+              disabled={loading || updateLoading || createLoading}
             >
-              Speichern
+              {!data?.people || data.people.length === 0 ? 'Profil erstellen' : 'Speichern'}
             </Button>
           </Box>
         ) : (
