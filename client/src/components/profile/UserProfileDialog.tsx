@@ -41,6 +41,7 @@ import { useQuery, useMutation } from '@apollo/client'
 import { useSnackbar } from 'notistack'
 import { GET_PERSON_BY_EMAIL, UPDATE_PERSON } from '@/graphql/person'
 import PasswordChangeDialog from './PasswordChangeDialog'
+import AvatarUploadDialog from './AvatarUploadDialog'
 
 interface UserProfileDialogProps {
   open: boolean
@@ -57,10 +58,10 @@ interface UserProfileFormData {
   phone: string
 }
 
-const UserProfileDialog: React.FC<UserProfileDialogProps> = ({ 
-  open, 
-  onClose, 
-  fullScreen = false 
+const UserProfileDialog: React.FC<UserProfileDialogProps> = ({
+  open,
+  onClose,
+  fullScreen = false,
 }) => {
   const theme = useTheme()
   const router = useRouter()
@@ -69,7 +70,8 @@ const UserProfileDialog: React.FC<UserProfileDialogProps> = ({
   const [isEditing, setIsEditing] = useState(false)
   const [userEmail, setUserEmail] = useState<string | null>(null)
   const [passwordDialogOpen, setPasswordDialogOpen] = useState(false)
-  
+  const [avatarDialogOpen, setAvatarDialogOpen] = useState(false)
+
   // Auth-Kontext
   const { authenticated } = useAuth()
   const userRoles = getRoles()
@@ -82,7 +84,7 @@ const UserProfileDialog: React.FC<UserProfileDialogProps> = ({
       import('@/lib/auth').then(({ getKeycloak }) => {
         const kc = getKeycloak()
         setKeycloak(kc)
-        
+
         // E-Mail aus dem Keycloak-Token extrahieren
         if (kc?.tokenParsed?.email) {
           setUserEmail(kc.tokenParsed.email)
@@ -104,7 +106,7 @@ const UserProfileDialog: React.FC<UserProfileDialogProps> = ({
       setIsEditing(false)
       refetch()
     },
-    onError: (error) => {
+    onError: error => {
       enqueueSnackbar(`Fehler beim Aktualisieren: ${error.message}`, { variant: 'error' })
     },
   })
@@ -118,7 +120,7 @@ const UserProfileDialog: React.FC<UserProfileDialogProps> = ({
       role: '',
       phone: '',
     },
-    onSubmit: async (value) => {
+    onSubmit: async value => {
       if (!data?.people || data.people.length === 0) {
         enqueueSnackbar('Keine Person-Daten verfügbar', { variant: 'error' })
         return
@@ -205,7 +207,11 @@ const UserProfileDialog: React.FC<UserProfileDialogProps> = ({
     if (keycloak?.tokenParsed) {
       const firstName = keycloak.tokenParsed.given_name || ''
       const lastName = keycloak.tokenParsed.family_name || ''
-      return `${firstName} ${lastName}`.trim() || keycloak.tokenParsed.preferred_username || 'Unbekannter Benutzer'
+      return (
+        `${firstName} ${lastName}`.trim() ||
+        keycloak.tokenParsed.preferred_username ||
+        'Unbekannter Benutzer'
+      )
     }
     return 'Unbekannter Benutzer'
   }
@@ -221,19 +227,17 @@ const UserProfileDialog: React.FC<UserProfileDialogProps> = ({
     multiline = false
   ) => (
     <form.Field name={name}>
-      {(field) => (
+      {field => (
         <Grid size={{ xs: 12, sm: multiline ? 12 : 6 }}>
           <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-            <Box sx={{ mt: 2, color: 'text.secondary' }}>
-              {icon}
-            </Box>
+            <Box sx={{ mt: 2, color: 'text.secondary' }}>{icon}</Box>
             <Box sx={{ flex: 1 }}>
               {isEditing ? (
                 <TextField
                   fullWidth
                   label={label}
                   value={field.state.value}
-                  onChange={(e) => field.handleChange(e.target.value)}
+                  onChange={e => field.handleChange(e.target.value)}
                   onBlur={field.handleBlur}
                   multiline={multiline}
                   rows={multiline ? 3 : 1}
@@ -245,9 +249,7 @@ const UserProfileDialog: React.FC<UserProfileDialogProps> = ({
                   <Typography variant="body2" color="text.secondary" gutterBottom>
                     {label}
                   </Typography>
-                  <Typography variant="body1">
-                    {field.state.value || '-'}
-                  </Typography>
+                  <Typography variant="body1">{field.state.value || '-'}</Typography>
                 </Box>
               )}
             </Box>
@@ -290,16 +292,35 @@ const UserProfileDialog: React.FC<UserProfileDialogProps> = ({
           <Card elevation={0} sx={{ bgcolor: 'background.default' }}>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <Avatar
-                  sx={{
-                    width: 80,
-                    height: 80,
-                    bgcolor: theme.palette.primary.main,
-                    fontSize: '2rem',
-                  }}
-                >
-                  {getUserInitials()}
-                </Avatar>
+                <Box sx={{ position: 'relative' }}>
+                  <Avatar
+                    src={data?.people?.[0]?.avatarUrl || undefined}
+                    sx={{
+                      width: 80,
+                      height: 80,
+                      bgcolor: theme.palette.primary.main,
+                      fontSize: '2rem',
+                    }}
+                  >
+                    {!data?.people?.[0]?.avatarUrl && getUserInitials()}
+                  </Avatar>
+                  <IconButton
+                    size="small"
+                    onClick={() => setAvatarDialogOpen(true)}
+                    sx={{
+                      position: 'absolute',
+                      bottom: -4,
+                      right: -4,
+                      bgcolor: 'background.paper',
+                      boxShadow: 1,
+                      '&:hover': {
+                        bgcolor: 'background.paper',
+                      },
+                    }}
+                  >
+                    <EditIcon fontSize="small" />
+                  </IconButton>
+                </Box>
                 <Box sx={{ flex: 1 }}>
                   <Typography variant="h5" gutterBottom>
                     {getDisplayName()}
@@ -308,7 +329,7 @@ const UserProfileDialog: React.FC<UserProfileDialogProps> = ({
                     {getUserEmail()}
                   </Typography>
                   <Box sx={{ mt: 1 }}>
-                    {userRoles.map((role) => (
+                    {userRoles.map(role => (
                       <Chip
                         key={role}
                         label={role}
@@ -328,30 +349,32 @@ const UserProfileDialog: React.FC<UserProfileDialogProps> = ({
         <Divider sx={{ mb: 3 }} />
 
         <form
-          onSubmit={(e) => {
+          onSubmit={e => {
             e.preventDefault()
             e.stopPropagation()
             form.handleSubmit()
           }}
-        >        <Grid container spacing={3}>
-          {loading ? (
-            // Loading-Skeleton
-            Array.from({ length: 6 }).map((_, index) => (
-              <Grid size={{ xs: 12, sm: 6 }} key={index}>
-                <Skeleton variant="rectangular" height={56} />
-              </Grid>
-            ))
-          ) : (
-            <>
-              {renderField('firstName', 'Vorname', <PersonIcon />)}
-              {renderField('lastName', 'Nachname', <PersonIcon />)}
-              {renderField('email', 'E-Mail', <EmailIcon />)}
-              {renderField('department', 'Abteilung', <BusinessIcon />)}
-              {renderField('role', 'Rolle', <BadgeIcon />)}
-              {renderField('phone', 'Telefon', <PhoneIcon />)}
-            </>
-          )}
-        </Grid>
+        >
+          {' '}
+          <Grid container spacing={3}>
+            {loading ? (
+              // Loading-Skeleton
+              Array.from({ length: 6 }).map((_, index) => (
+                <Grid size={{ xs: 12, sm: 6 }} key={index}>
+                  <Skeleton variant="rectangular" height={56} />
+                </Grid>
+              ))
+            ) : (
+              <>
+                {renderField('firstName', 'Vorname', <PersonIcon />)}
+                {renderField('lastName', 'Nachname', <PersonIcon />)}
+                {renderField('email', 'E-Mail', <EmailIcon />)}
+                {renderField('department', 'Abteilung', <BusinessIcon />)}
+                {renderField('role', 'Rolle', <BadgeIcon />)}
+                {renderField('phone', 'Telefon', <PhoneIcon />)}
+              </>
+            )}
+          </Grid>
         </form>
 
         <Divider sx={{ my: 3 }} />
@@ -372,11 +395,7 @@ const UserProfileDialog: React.FC<UserProfileDialogProps> = ({
                     </Typography>
                   </Box>
                 </Box>
-                <Button
-                  variant="outlined"
-                  startIcon={<KeyIcon />}
-                  onClick={handleChangePassword}
-                >
+                <Button variant="outlined" startIcon={<KeyIcon />} onClick={handleChangePassword}>
                   Passwort ändern
                 </Button>
               </Box>
@@ -394,11 +413,7 @@ const UserProfileDialog: React.FC<UserProfileDialogProps> = ({
       <DialogActions sx={{ px: 3, pb: 2 }}>
         {isEditing ? (
           <Box sx={{ display: 'flex', gap: 1 }}>
-            <Button
-              onClick={handleEditToggle}
-              startIcon={<CancelIcon />}
-              variant="outlined"
-            >
+            <Button onClick={handleEditToggle} startIcon={<CancelIcon />} variant="outlined">
               Abbrechen
             </Button>
             <Button
@@ -418,9 +433,19 @@ const UserProfileDialog: React.FC<UserProfileDialogProps> = ({
       </DialogActions>
 
       {/* Password Change Dialog */}
-      <PasswordChangeDialog 
-        open={passwordDialogOpen} 
-        onClose={() => setPasswordDialogOpen(false)} 
+      <PasswordChangeDialog
+        open={passwordDialogOpen}
+        onClose={() => setPasswordDialogOpen(false)}
+      />
+
+      {/* Avatar Upload Dialog */}
+      <AvatarUploadDialog
+        open={avatarDialogOpen}
+        onClose={() => setAvatarDialogOpen(false)}
+        currentAvatarUrl={data?.people?.[0]?.avatarUrl}
+        onAvatarChanged={() => {
+          refetch() // Profildaten aktualisieren
+        }}
       />
     </Dialog>
   )

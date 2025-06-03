@@ -6,27 +6,25 @@ export async function POST(request: NextRequest) {
     const authHeader = request.headers.get('authorization')
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json(
-        { message: 'Nicht authentifiziert' },
-        { status: 401 }
-      )
+      return NextResponse.json({ message: 'Nicht authentifiziert' }, { status: 401 })
     }
 
     const token = authHeader.substring(7)
 
     // Keycloak Token Introspection Endpoint für Passwort-Validierung verwenden
-    const keycloakUrl = process.env.NEXT_PUBLIC_KEYCLOAK_URL || process.env.KEYCLOAK_URL || 'https://auth.dev-server.mf2.eu'
-    const realm = process.env.NEXT_PUBLIC_KEYCLOAK_REALM || process.env.KEYCLOAK_REALM || 'simple-eam'
-    
+    const keycloakUrl =
+      process.env.NEXT_PUBLIC_KEYCLOAK_URL ||
+      process.env.KEYCLOAK_URL ||
+      'https://auth.dev-server.mf2.eu'
+    const realm =
+      process.env.NEXT_PUBLIC_KEYCLOAK_REALM || process.env.KEYCLOAK_REALM || 'simple-eam'
+
     // Entschlüssele das Token, um den Benutzernamen zu erhalten
     const tokenPayload = JSON.parse(atob(token.split('.')[1]))
     const username = tokenPayload.preferred_username
 
     if (!username) {
-      return NextResponse.json(
-        { message: 'Benutzername nicht im Token gefunden' },
-        { status: 400 }
-      )
+      return NextResponse.json({ message: 'Benutzername nicht im Token gefunden' }, { status: 400 })
     }
 
     // Versuche Anmeldung mit dem aktuellen Passwort über Keycloak Token Endpoint
@@ -49,16 +47,10 @@ export async function POST(request: NextRequest) {
     if (tokenResponse.ok) {
       return NextResponse.json({ valid: true })
     } else {
-      return NextResponse.json(
-        { message: 'Passwort ist nicht korrekt' },
-        { status: 400 }
-      )
+      return NextResponse.json({ message: 'Passwort ist nicht korrekt' }, { status: 400 })
     }
   } catch (error) {
     console.error('Fehler bei Passwort-Validierung:', error)
-    return NextResponse.json(
-      { message: 'Fehler bei der Passwort-Validierung' },
-      { status: 500 }
-    )
+    return NextResponse.json({ message: 'Fehler bei der Passwort-Validierung' }, { status: 500 })
   }
 }

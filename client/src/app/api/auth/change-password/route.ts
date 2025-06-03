@@ -6,10 +6,7 @@ export async function POST(request: NextRequest) {
     const authHeader = request.headers.get('authorization')
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json(
-        { message: 'Nicht authentifiziert' },
-        { status: 401 }
-      )
+      return NextResponse.json({ message: 'Nicht authentifiziert' }, { status: 401 })
     }
 
     const token = authHeader.substring(7)
@@ -27,8 +24,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Keycloak Admin API Konfiguration
-    const keycloakUrl = process.env.NEXT_PUBLIC_KEYCLOAK_URL || process.env.KEYCLOAK_URL || 'https://auth.dev-server.mf2.eu'
-    const realm = process.env.NEXT_PUBLIC_KEYCLOAK_REALM || process.env.KEYCLOAK_REALM || 'simple-eam'
+    const keycloakUrl =
+      process.env.NEXT_PUBLIC_KEYCLOAK_URL ||
+      process.env.KEYCLOAK_URL ||
+      'https://auth.dev-server.mf2.eu'
+    const realm =
+      process.env.NEXT_PUBLIC_KEYCLOAK_REALM || process.env.KEYCLOAK_REALM || 'simple-eam'
     const adminUsername = process.env.KEYCLOAK_ADMIN || 'admin'
     const adminPassword = process.env.KEYCLOAK_ADMIN_PASSWORD
 
@@ -40,7 +41,10 @@ export async function POST(request: NextRequest) {
 
     if (!adminPassword) {
       console.error('KEYCLOAK_ADMIN_PASSWORD Umgebungsvariable nicht gesetzt')
-      console.error('Verfügbare Umgebungsvariablen:', Object.keys(process.env).filter(key => key.includes('KEYCLOAK')))
+      console.error(
+        'Verfügbare Umgebungsvariablen:',
+        Object.keys(process.env).filter(key => key.includes('KEYCLOAK'))
+      )
       return NextResponse.json(
         { message: 'Server-Konfigurationsfehler: Admin-Passwort nicht verfügbar' },
         { status: 500 }
@@ -82,7 +86,7 @@ export async function POST(request: NextRequest) {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${adminToken}`,
+          Authorization: `Bearer ${adminToken}`,
         },
         body: JSON.stringify({
           type: 'password',
@@ -95,22 +99,15 @@ export async function POST(request: NextRequest) {
     if (!changePasswordResponse.ok) {
       const errorText = await changePasswordResponse.text()
       console.error('Fehler beim Ändern des Passworts:', errorText)
-      return NextResponse.json(
-        { message: 'Fehler beim Ändern des Passworts' },
-        { status: 500 }
-      )
+      return NextResponse.json({ message: 'Fehler beim Ändern des Passworts' }, { status: 500 })
     }
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       message: 'Passwort erfolgreich geändert',
-      success: true 
+      success: true,
     })
-
   } catch (error) {
     console.error('Fehler bei Passwort-Änderung:', error)
-    return NextResponse.json(
-      { message: 'Fehler bei der Passwort-Änderung' },
-      { status: 500 }
-    )
+    return NextResponse.json({ message: 'Fehler bei der Passwort-Änderung' }, { status: 500 })
   }
 }

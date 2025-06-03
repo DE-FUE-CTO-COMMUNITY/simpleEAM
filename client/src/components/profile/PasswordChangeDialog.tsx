@@ -48,7 +48,7 @@ const PasswordChangeDialog: React.FC<PasswordChangeDialogProps> = ({ open, onClo
       newPassword: '',
       confirmPassword: '',
     },
-    onSubmit: async (value) => {
+    onSubmit: async value => {
       setLoading(true)
       try {
         await changePassword(value.value)
@@ -88,7 +88,7 @@ const PasswordChangeDialog: React.FC<PasswordChangeDialogProps> = ({ open, onClo
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${keycloak.token}`,
+          Authorization: `Bearer ${keycloak.token}`,
         },
         body: JSON.stringify({
           password: formData.currentPassword,
@@ -104,7 +104,7 @@ const PasswordChangeDialog: React.FC<PasswordChangeDialogProps> = ({ open, onClo
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${keycloak.token}`,
+          Authorization: `Bearer ${keycloak.token}`,
         },
         body: JSON.stringify({
           newPassword: formData.newPassword,
@@ -145,7 +145,7 @@ const PasswordChangeDialog: React.FC<PasswordChangeDialogProps> = ({ open, onClo
           </Alert>
 
           <form
-            onSubmit={(e) => {
+            onSubmit={e => {
               e.preventDefault()
               e.stopPropagation()
               form.handleSubmit()
@@ -154,13 +154,13 @@ const PasswordChangeDialog: React.FC<PasswordChangeDialogProps> = ({ open, onClo
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               {/* Aktuelles Passwort */}
               <form.Field name="currentPassword">
-                {(field) => (
+                {field => (
                   <TextField
                     fullWidth
                     label="Aktuelles Passwort"
                     type={showCurrentPassword ? 'text' : 'password'}
                     value={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.value)}
+                    onChange={e => field.handleChange(e.target.value)}
                     onBlur={field.handleBlur}
                     error={field.state.meta.errors.length > 0}
                     helperText={field.state.meta.errors[0]}
@@ -184,13 +184,13 @@ const PasswordChangeDialog: React.FC<PasswordChangeDialogProps> = ({ open, onClo
 
               {/* Neues Passwort */}
               <form.Field name="newPassword">
-                {(field) => (
+                {field => (
                   <TextField
                     fullWidth
                     label="Neues Passwort"
                     type={showNewPassword ? 'text' : 'password'}
                     value={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.value)}
+                    onChange={e => field.handleChange(e.target.value)}
                     onBlur={field.handleBlur}
                     error={field.state.meta.errors.length > 0}
                     helperText={field.state.meta.errors[0]}
@@ -214,13 +214,13 @@ const PasswordChangeDialog: React.FC<PasswordChangeDialogProps> = ({ open, onClo
 
               {/* Passwort bestätigen */}
               <form.Field name="confirmPassword">
-                {(field) => (
+                {field => (
                   <TextField
                     fullWidth
                     label="Neues Passwort bestätigen"
                     type={showConfirmPassword ? 'text' : 'password'}
                     value={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.value)}
+                    onChange={e => field.handleChange(e.target.value)}
                     onBlur={field.handleBlur}
                     error={field.state.meta.errors.length > 0}
                     helperText={field.state.meta.errors[0]}
@@ -256,11 +256,7 @@ const PasswordChangeDialog: React.FC<PasswordChangeDialogProps> = ({ open, onClo
         <Button onClick={handleClose} disabled={loading}>
           Abbrechen
         </Button>
-        <Button
-          onClick={() => form.handleSubmit()}
-          variant="contained"
-          disabled={loading}
-        >
+        <Button onClick={() => form.handleSubmit()} variant="contained" disabled={loading}>
           {loading ? 'Wird geändert...' : 'Passwort ändern'}
         </Button>
       </DialogActions>

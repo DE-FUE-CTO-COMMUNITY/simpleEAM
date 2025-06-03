@@ -96,6 +96,7 @@ export const UPDATE_PERSON = gql`
         department
         role
         phone
+        avatarUrl
         updatedAt
       }
     }
@@ -128,6 +129,7 @@ export const GET_PERSON_BY_EMAIL = gql`
       department
       role
       phone
+      avatarUrl
       createdAt
       updatedAt
       ownedCapabilities {

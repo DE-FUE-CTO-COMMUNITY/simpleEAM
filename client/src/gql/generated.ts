@@ -670,6 +670,7 @@ export type ApplicationInterfacePersonResponsiblePersonAggregateSelection = {
 
 export type ApplicationInterfacePersonResponsiblePersonNodeAggregateSelection = {
   __typename?: 'ApplicationInterfacePersonResponsiblePersonNodeAggregateSelection';
+  avatarUrl: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   department: StringAggregateSelection;
   email: StringAggregateSelection;
@@ -772,6 +773,7 @@ export type ApplicationInterfaceResponsiblePersonNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<ApplicationInterfaceResponsiblePersonNodeAggregationWhereInput>>;
   NOT?: InputMaybe<ApplicationInterfaceResponsiblePersonNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<ApplicationInterfaceResponsiblePersonNodeAggregationWhereInput>>;
+  avatarUrl?: InputMaybe<StringScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   department?: InputMaybe<StringScalarAggregationFilters>;
   email?: InputMaybe<StringScalarAggregationFilters>;
@@ -1273,6 +1275,7 @@ export type ApplicationOwnersNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<ApplicationOwnersNodeAggregationWhereInput>>;
   NOT?: InputMaybe<ApplicationOwnersNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<ApplicationOwnersNodeAggregationWhereInput>>;
+  avatarUrl?: InputMaybe<StringScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   department?: InputMaybe<StringScalarAggregationFilters>;
   email?: InputMaybe<StringScalarAggregationFilters>;
@@ -1417,6 +1420,7 @@ export type ApplicationPersonOwnersAggregateSelection = {
 
 export type ApplicationPersonOwnersNodeAggregateSelection = {
   __typename?: 'ApplicationPersonOwnersNodeAggregateSelection';
+  avatarUrl: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   department: StringAggregateSelection;
   email: StringAggregateSelection;
@@ -2928,6 +2932,7 @@ export type ArchitectureOwnersNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<ArchitectureOwnersNodeAggregationWhereInput>>;
   NOT?: InputMaybe<ArchitectureOwnersNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<ArchitectureOwnersNodeAggregationWhereInput>>;
+  avatarUrl?: InputMaybe<StringScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   department?: InputMaybe<StringScalarAggregationFilters>;
   email?: InputMaybe<StringScalarAggregationFilters>;
@@ -3072,6 +3077,7 @@ export type ArchitecturePersonOwnersAggregateSelection = {
 
 export type ArchitecturePersonOwnersNodeAggregateSelection = {
   __typename?: 'ArchitecturePersonOwnersNodeAggregateSelection';
+  avatarUrl: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   department: StringAggregateSelection;
   email: StringAggregateSelection;
@@ -3658,6 +3664,7 @@ export type BusinessCapabilityOwnersNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<BusinessCapabilityOwnersNodeAggregationWhereInput>>;
   NOT?: InputMaybe<BusinessCapabilityOwnersNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<BusinessCapabilityOwnersNodeAggregationWhereInput>>;
+  avatarUrl?: InputMaybe<StringScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   department?: InputMaybe<StringScalarAggregationFilters>;
   email?: InputMaybe<StringScalarAggregationFilters>;
@@ -3910,6 +3917,7 @@ export type BusinessCapabilityPersonOwnersAggregateSelection = {
 
 export type BusinessCapabilityPersonOwnersNodeAggregateSelection = {
   __typename?: 'BusinessCapabilityPersonOwnersNodeAggregateSelection';
+  avatarUrl: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   department: StringAggregateSelection;
   email: StringAggregateSelection;
@@ -4799,6 +4807,7 @@ export type DataObjectOwnersNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<DataObjectOwnersNodeAggregationWhereInput>>;
   NOT?: InputMaybe<DataObjectOwnersNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<DataObjectOwnersNodeAggregationWhereInput>>;
+  avatarUrl?: InputMaybe<StringScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   department?: InputMaybe<StringScalarAggregationFilters>;
   email?: InputMaybe<StringScalarAggregationFilters>;
@@ -4943,6 +4952,7 @@ export type DataObjectPersonOwnersAggregateSelection = {
 
 export type DataObjectPersonOwnersNodeAggregateSelection = {
   __typename?: 'DataObjectPersonOwnersNodeAggregateSelection';
+  avatarUrl: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   department: StringAggregateSelection;
   email: StringAggregateSelection;
@@ -5691,6 +5701,7 @@ export type DiagramCreatorNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<DiagramCreatorNodeAggregationWhereInput>>;
   NOT?: InputMaybe<DiagramCreatorNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<DiagramCreatorNodeAggregationWhereInput>>;
+  avatarUrl?: InputMaybe<StringScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   department?: InputMaybe<StringScalarAggregationFilters>;
   email?: InputMaybe<StringScalarAggregationFilters>;
@@ -5744,6 +5755,7 @@ export type DiagramPersonCreatorAggregateSelection = {
 
 export type DiagramPersonCreatorNodeAggregateSelection = {
   __typename?: 'DiagramPersonCreatorNodeAggregateSelection';
+  avatarUrl: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   department: StringAggregateSelection;
   email: StringAggregateSelection;
@@ -6153,6 +6165,7 @@ export type PeopleConnection = {
 /** Person - repräsentiert eine Person im Unternehmen */
 export type Person = {
   __typename?: 'Person';
+  avatarUrl?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
   department?: Maybe<Scalars['String']['output']>;
   email?: Maybe<Scalars['String']['output']>;
@@ -6292,6 +6305,7 @@ export type PersonAggregate = {
 
 export type PersonAggregateNode = {
   __typename?: 'PersonAggregateNode';
+  avatarUrl: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   department: StringAggregateSelection;
   email: StringAggregateSelection;
@@ -6380,6 +6394,7 @@ export type PersonConnectWhere = {
 };
 
 export type PersonCreateInput = {
+  avatarUrl?: InputMaybe<Scalars['String']['input']>;
   department?: InputMaybe<Scalars['String']['input']>;
   email?: InputMaybe<Scalars['String']['input']>;
   firstName: Scalars['String']['input'];
@@ -7108,6 +7123,7 @@ export type PersonResponsibleForInterfacesUpdateFieldInput = {
 
 /** Fields to sort People by. The order in which sorts are applied is not guaranteed when specifying many fields in one PersonSort object. */
 export type PersonSort = {
+  avatarUrl?: InputMaybe<SortDirection>;
   createdAt?: InputMaybe<SortDirection>;
   department?: InputMaybe<SortDirection>;
   email?: InputMaybe<SortDirection>;
@@ -7120,6 +7136,7 @@ export type PersonSort = {
 };
 
 export type PersonUpdateInput = {
+  avatarUrl?: InputMaybe<StringScalarMutations>;
   createdAt?: InputMaybe<DateTimeScalarMutations>;
   department?: InputMaybe<StringScalarMutations>;
   email?: InputMaybe<StringScalarMutations>;
@@ -7139,6 +7156,7 @@ export type PersonWhere = {
   AND?: InputMaybe<Array<PersonWhere>>;
   NOT?: InputMaybe<PersonWhere>;
   OR?: InputMaybe<Array<PersonWhere>>;
+  avatarUrl?: InputMaybe<StringScalarFilters>;
   createdAt?: InputMaybe<DateTimeScalarFilters>;
   department?: InputMaybe<StringScalarFilters>;
   email?: InputMaybe<StringScalarFilters>;
