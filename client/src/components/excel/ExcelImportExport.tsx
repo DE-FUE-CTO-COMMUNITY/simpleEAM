@@ -33,6 +33,7 @@ import {
 } from '@mui/icons-material'
 import { useSnackbar } from 'notistack'
 import { useApolloClient, gql } from '@apollo/client'
+import { isAdmin } from '@/lib/auth'
 
 import {
   exportToExcel,
@@ -674,7 +675,7 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
     persons: 'Personen',
     architectures: 'Architekturen',
     diagrams: 'Diagramme',
-    all: 'Alle Entitäten (Admin)',
+    ...(isAdmin() && { all: 'Alle Entitäten (Admin)' }),
   }
 
   // Reset-Funktionen für Datei und Validierung
@@ -2028,7 +2029,7 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
     setDeleteConfirmDialog({
       isOpen: true,
       entityType,
-      entityLabel: label,
+      entityLabel: label || '',
     })
   }
 
@@ -2314,17 +2315,19 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
           <Tabs value={currentTab} onChange={(_, newTab) => setCurrentTab(newTab)} sx={{ mb: 2 }}>
             <Tab label="Import" value="import" icon={<UploadIcon />} iconPosition="start" />
             <Tab label="Export" value="export" icon={<DownloadIcon />} iconPosition="start" />
-            <Tab
-              label="Datenverwaltung"
-              value="management"
-              icon={<TableIcon />}
-              iconPosition="start"
-            />
+            {isAdmin() && (
+              <Tab
+                label="Datenverwaltung"
+                value="management"
+                icon={<TableIcon />}
+                iconPosition="start"
+              />
+            )}
           </Tabs>
 
           {currentTab === 'import' && renderImportTab()}
           {currentTab === 'export' && renderExportTab()}
-          {currentTab === 'management' && renderManagementTab()}
+          {currentTab === 'management' && isAdmin() && renderManagementTab()}
         </DialogContent>
 
         <DialogActions sx={{ justifyContent: 'space-between', px: 3, py: 2 }}>
