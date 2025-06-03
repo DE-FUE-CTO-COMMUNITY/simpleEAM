@@ -42,12 +42,12 @@ const PasswordChangeDialog: React.FC<PasswordChangeDialogProps> = ({ open, onClo
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
-  const form = useForm<PasswordFormData>({
+  const form = useForm({
     defaultValues: {
       currentPassword: '',
       newPassword: '',
       confirmPassword: '',
-    },
+    } as PasswordFormData,
     onSubmit: async value => {
       setLoading(true)
       try {
