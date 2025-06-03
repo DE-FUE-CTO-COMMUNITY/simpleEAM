@@ -121,3 +121,10 @@ export const isArchitect = (): boolean => {
 export const isViewer = (): boolean => {
   return hasRole('viewer') && !isArchitect() && !isAdmin()
 }
+
+/**
+ * Gibt die Keycloak-Instanz zurück
+ */
+export const getKeycloak = () => {
+  return keycloak
+}

@@ -117,3 +117,31 @@ export const CHECK_PERSON_EXISTS = gql`
     }
   }
 `
+
+export const GET_PERSON_BY_EMAIL = gql`
+  query GetPersonByEmail($email: String!) {
+    people(where: { email: { eq: $email } }) {
+      id
+      firstName
+      lastName
+      email
+      department
+      role
+      phone
+      createdAt
+      updatedAt
+      ownedCapabilities {
+        id
+        name
+      }
+      ownedApplications {
+        id
+        name
+      }
+      ownedDataObjects {
+        id
+        name
+      }
+    }
+  }
+`

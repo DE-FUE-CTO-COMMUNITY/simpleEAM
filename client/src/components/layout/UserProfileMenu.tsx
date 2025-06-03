@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   IconButton,
   Avatar,
@@ -18,6 +18,7 @@ import {
 } from '@mui/icons-material'
 import { useRouter } from 'next/navigation'
 import { isAdmin, logout } from '@/lib/auth'
+import UserProfileDialog from '@/components/profile/UserProfileDialog'
 
 interface UserProfileMenuProps {
   userName: string
@@ -27,6 +28,7 @@ const UserProfileMenu: React.FC<UserProfileMenuProps> = ({ userName }) => {
   const theme = useTheme()
   const router = useRouter()
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
+  const [profileDialogOpen, setProfileDialogOpen] = useState(false)
   const userInitial = userName.charAt(0).toUpperCase()
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -35,6 +37,11 @@ const UserProfileMenu: React.FC<UserProfileMenuProps> = ({ userName }) => {
 
   const handleProfileMenuClose = () => {
     setAnchorEl(null)
+  }
+
+  const handleProfileClick = () => {
+    handleProfileMenuClose()
+    setProfileDialogOpen(true)
   }
 
   const handleLogout = () => {
@@ -78,7 +85,7 @@ const UserProfileMenu: React.FC<UserProfileMenuProps> = ({ userName }) => {
             <ListItemText>Administration</ListItemText>
           </MenuItem>
         )}
-        <MenuItem onClick={() => router.push('/profile')}>
+        <MenuItem onClick={handleProfileClick}>
           <ListItemIcon>
             <PersonIcon fontSize="small" />
           </ListItemIcon>
@@ -91,6 +98,11 @@ const UserProfileMenu: React.FC<UserProfileMenuProps> = ({ userName }) => {
           <ListItemText>Abmelden</ListItemText>
         </MenuItem>
       </Menu>
+      
+      <UserProfileDialog 
+        open={profileDialogOpen} 
+        onClose={() => setProfileDialogOpen(false)} 
+      />
     </>
   )
 }
