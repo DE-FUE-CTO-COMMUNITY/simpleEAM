@@ -12,7 +12,7 @@ import {
   Api as ApiIcon,
 } from '@mui/icons-material'
 import { usePathname } from 'next/navigation'
-import { useAuth } from '@/lib/auth'
+import { useAuth, isAdmin } from '@/lib/auth'
 
 import AppHeader from './AppHeader'
 import Sidebar, { drawerWidth } from './Sidebar'
@@ -69,9 +69,13 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
     { text: 'Datenobjekte', icon: <DataObjectIcon />, href: '/dataobjects' },
     { text: 'Schnittstellen', icon: <ApiIcon />, href: '/interfaces' },
     { text: 'Personen', icon: <PersonIcon />, href: '/persons' },
-    // Divider vor Import/Export
-    { isDivider: true, text: 'divider', icon: null },
-    { text: 'Import/Export', icon: <ExcelIcon />, onClick: handleExcelDialogOpen },
+    // Import/Export nur für Admin-Benutzer
+    ...(isAdmin()
+      ? [
+          { isDivider: true, text: 'divider', icon: null },
+          { text: 'Import/Export', icon: <ExcelIcon />, onClick: handleExcelDialogOpen },
+        ]
+      : []),
   ]
 
   const isActive = (href: string) => {
@@ -102,8 +106,8 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
         {children}
       </Main>
 
-      {/* Excel Import/Export Dialog */}
-      <ExcelImportExport isOpen={excelDialogOpen} onClose={handleExcelDialogClose} />
+      {/* Excel Import/Export Dialog - nur für Admin-Benutzer */}
+      {isAdmin() && <ExcelImportExport isOpen={excelDialogOpen} onClose={handleExcelDialogClose} />}
     </Box>
   )
 }
