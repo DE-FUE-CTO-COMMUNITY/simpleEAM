@@ -13,12 +13,12 @@ import { isViewer } from '@/lib/auth'
 const ExcalidrawWrapper = dynamic(
   async () => {
     // Wichtig: Zuerst das CSS importieren, dann die Komponente
-    await import('@excalidraw/excalidraw/index.css')
+    await import('@simple-eam/excalidraw/index.css')
     // Import Material UI theme customizations for Excalidraw
     await import('@/styles/excalidraw-material-theme.css')
-    const { Excalidraw, MainMenu } = await import('@excalidraw/excalidraw')
+    const { Excalidraw, MainMenu } = await import('@simple-eam/excalidraw')
 
-    const ExcalidrawComponent: React.FC<{
+    interface ExcalidrawComponentProps {
       onOpenDialog: () => void
       onSaveDialog: () => void
       onSaveAsDialog: () => void
@@ -29,7 +29,9 @@ const ExcalidrawWrapper = dynamic(
       initialData: any
       viewModeEnabled?: boolean
       currentDiagram?: any
-    }> = ({
+    }
+
+    const ExcalidrawComponent = ({
       onOpenDialog,
       onSaveDialog,
       onSaveAsDialog,
@@ -40,10 +42,16 @@ const ExcalidrawWrapper = dynamic(
       initialData,
       viewModeEnabled,
       currentDiagram,
-    }) => {
+    }: ExcalidrawComponentProps) => {
+      // Type cast to avoid TypeScript errors with MemoExoticComponent
+      const ExcalidrawTyped = Excalidraw as React.ComponentType<any>
+      const MainMenuTyped = MainMenu as React.ComponentType<any> & {
+        Item: React.ComponentType<any>
+      }
+      
       return (
         <div style={{ height: '100%', width: '100%' }}>
-          <Excalidraw
+          <ExcalidrawTyped
             theme="light"
             name="simple-eam-diagram"
             UIOptions={uiOptions}
@@ -51,10 +59,10 @@ const ExcalidrawWrapper = dynamic(
             excalidrawAPI={excalidrawAPI}
             viewModeEnabled={viewModeEnabled}
           >
-            <MainMenu>
+            <MainMenuTyped>
               {/* Custom New Diagram Menu Item - only for non-viewer users */}
               {!viewModeEnabled && (
-                <MainMenu.Item
+                <MainMenuTyped.Item
                   onSelect={onNewDiagram}
                   icon={
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -64,11 +72,11 @@ const ExcalidrawWrapper = dynamic(
                   shortcut="Ctrl+N"
                 >
                   Neues Diagramm
-                </MainMenu.Item>
+                </MainMenuTyped.Item>
               )}
 
               {/* Custom Open Menu Item - available for all users */}
-              <MainMenu.Item
+              <MainMenuTyped.Item
                 onSelect={onOpenDialog}
                 icon={
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -78,11 +86,11 @@ const ExcalidrawWrapper = dynamic(
                 shortcut="Ctrl+O"
               >
                 Öffnen
-              </MainMenu.Item>
+              </MainMenuTyped.Item>
 
               {/* Custom Save Menu Item - only for non-viewer users */}
               {!viewModeEnabled && (
-                <MainMenu.Item
+                <MainMenuTyped.Item
                   onSelect={onSaveDialog}
                   icon={
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -92,12 +100,12 @@ const ExcalidrawWrapper = dynamic(
                   shortcut="Ctrl+S"
                 >
                   {currentDiagram ? 'Speichern' : 'Speichern als...'}
-                </MainMenu.Item>
+                </MainMenuTyped.Item>
               )}
 
               {/* Custom Save As Menu Item - only for non-viewer users and when a diagram is loaded */}
               {!viewModeEnabled && currentDiagram && (
-                <MainMenu.Item
+                <MainMenuTyped.Item
                   onSelect={onSaveAsDialog}
                   icon={
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -107,12 +115,12 @@ const ExcalidrawWrapper = dynamic(
                   shortcut="Ctrl+Shift+S"
                 >
                   Speichern unter...
-                </MainMenu.Item>
+                </MainMenuTyped.Item>
               )}
 
               {/* Custom Delete Menu Item - only for non-viewer users and when a diagram is loaded */}
               {!viewModeEnabled && currentDiagram && (
-                <MainMenu.Item
+                <MainMenuTyped.Item
                   onSelect={onDeleteDialog}
                   icon={
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -122,10 +130,10 @@ const ExcalidrawWrapper = dynamic(
                   shortcut="Del"
                 >
                   Löschen
-                </MainMenu.Item>
+                </MainMenuTyped.Item>
               )}
-            </MainMenu>
-          </Excalidraw>
+            </MainMenuTyped>
+          </ExcalidrawTyped>
         </div>
       )
     }

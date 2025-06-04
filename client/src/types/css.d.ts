@@ -5,7 +5,7 @@ declare module '*.css' {
 }
 
 /* Spezifische Typdeklaration für Excalidraw CSS */
-declare module '@excalidraw/excalidraw/index.css' {
+declare module '@simple-eam/excalidraw/index.css' {
   const content: any
   export default content
 }

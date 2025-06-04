@@ -5,7 +5,8 @@
   "private": true,
   "workspaces": [
     "client",
-    "server"
+    "server",
+    "packages/simple-eam-excalidraw/packages/excalidraw"
   ],
   "scripts": {
     "start": "docker-compose up -d",
