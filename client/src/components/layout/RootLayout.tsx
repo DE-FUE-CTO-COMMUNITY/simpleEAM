@@ -3,14 +3,16 @@ import React, { useState } from 'react'
 import { Box, CssBaseline, Toolbar, styled } from '@mui/material'
 import {
   Dashboard as DashboardIcon,
-  Business as BusinessIcon,
-  Apps as AppsIcon,
-  DataObject as DataObjectIcon,
   Person as PersonIcon,
   Architecture as ArchitectureIcon,
   AccountTree as DiagramIcon,
-  Api as ApiIcon,
 } from '@mui/icons-material'
+import {
+  BusinessCapabilityIcon,
+  ApplicationComponentIcon,
+  ApplicationInterfaceIcon,
+  BusinessObjectIcon,
+} from '@/components/icons'
 import { usePathname } from 'next/navigation'
 import { useAuth, isAdmin } from '@/lib/auth'
 
@@ -64,10 +66,10 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
     { text: 'Dashboard', icon: <DashboardIcon />, href: '/' },
     { text: 'Diagram-Editor', icon: <DiagramIcon />, href: '/diagrams' },
     { text: 'Architekturen', icon: <ArchitectureIcon />, href: '/architectures' },
-    { text: 'Business Capabilities', icon: <BusinessIcon />, href: '/capabilities' },
-    { text: 'Applikationen', icon: <AppsIcon />, href: '/applications' },
-    { text: 'Datenobjekte', icon: <DataObjectIcon />, href: '/dataobjects' },
-    { text: 'Schnittstellen', icon: <ApiIcon />, href: '/interfaces' },
+    { text: 'Business Capabilities', icon: <BusinessCapabilityIcon />, href: '/capabilities' },
+    { text: 'Applikationen', icon: <ApplicationComponentIcon />, href: '/applications' },
+    { text: 'Datenobjekte', icon: <BusinessObjectIcon />, href: '/dataobjects' },
+    { text: 'Schnittstellen', icon: <ApplicationInterfaceIcon />, href: '/interfaces' },
     { text: 'Personen', icon: <PersonIcon />, href: '/persons' },
     // Import/Export nur für Admin-Benutzer
     ...(isAdmin()

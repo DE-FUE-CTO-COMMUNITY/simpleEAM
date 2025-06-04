@@ -22,7 +22,13 @@ import {
   CircularProgress,
   Alert,
 } from '@mui/material'
-import { Search, ExpandMore, Business, Apps, Storage, Api } from '@mui/icons-material'
+import { Search, ExpandMore } from '@mui/icons-material'
+import {
+  BusinessCapabilityIcon,
+  ApplicationComponentIcon,
+  ApplicationInterfaceIcon,
+  BusinessObjectIcon,
+} from '@/components/icons'
 import { useQuery } from '@apollo/client'
 import {
   GET_LIBRARY_ELEMENTS,
@@ -109,15 +115,15 @@ const DatabaseLibraryPanel: React.FC<DatabaseLibraryPanelProps> = ({ onElementDr
   const getElementIcon = (elementType: ElementType) => {
     switch (elementType) {
       case 'capability':
-        return <Business sx={{ color: ELEMENT_TYPE_CONFIG.capability.color }} />
+        return <BusinessCapabilityIcon sx={{ color: ELEMENT_TYPE_CONFIG.capability.color }} />
       case 'application':
-        return <Apps sx={{ color: ELEMENT_TYPE_CONFIG.application.color }} />
+        return <ApplicationComponentIcon sx={{ color: ELEMENT_TYPE_CONFIG.application.color }} />
       case 'dataObject':
-        return <Storage sx={{ color: ELEMENT_TYPE_CONFIG.dataObject.color }} />
+        return <BusinessObjectIcon sx={{ color: ELEMENT_TYPE_CONFIG.dataObject.color }} />
       case 'interface':
-        return <Api sx={{ color: ELEMENT_TYPE_CONFIG.interface.color }} />
+        return <ApplicationInterfaceIcon sx={{ color: ELEMENT_TYPE_CONFIG.interface.color }} />
       default:
-        return <Business />
+        return <BusinessCapabilityIcon />
     }
   }
 

@@ -12,15 +12,17 @@ import {
   useTheme,
 } from '@mui/material'
 import {
-  Business as BusinessIcon,
-  Apps as AppsIcon,
-  DataObject as DataObjectIcon,
   Architecture as ArchitectureIcon,
   AccountTree as DiagramIcon,
-  Api as ApiIcon,
   Person as PersonIcon,
   Construction as ConstructionIcon,
 } from '@mui/icons-material'
+import {
+  BusinessCapabilityIcon,
+  ApplicationComponentIcon,
+  ApplicationInterfaceIcon,
+  BusinessObjectIcon,
+} from '@/components/icons'
 import { useQuery } from '@apollo/client'
 import { useSnackbar } from 'notistack'
 import {
@@ -166,17 +168,17 @@ const Dashboard = () => {
   const getCardIcon = (type: string) => {
     switch (type) {
       case 'capability':
-        return <BusinessIcon sx={{ fontSize: 40, color: theme.palette.primary.main }} />
+        return <BusinessCapabilityIcon sx={{ fontSize: 40, color: theme.palette.primary.main }} />
       case 'application':
-        return <AppsIcon sx={{ fontSize: 40, color: theme.palette.secondary.main }} />
+        return <ApplicationComponentIcon sx={{ fontSize: 40, color: theme.palette.secondary.main }} />
       case 'dataObject':
-        return <DataObjectIcon sx={{ fontSize: 40, color: theme.palette.info.main }} />
+        return <BusinessObjectIcon sx={{ fontSize: 40, color: theme.palette.info.main }} />
       case 'architecture':
         return <ArchitectureIcon sx={{ fontSize: 40, color: theme.palette.success.main }} />
       case 'diagram':
         return <DiagramIcon sx={{ fontSize: 40, color: theme.palette.warning.main }} />
       case 'interface':
-        return <ApiIcon sx={{ fontSize: 40, color: theme.palette.error.main }} />
+        return <ApplicationInterfaceIcon sx={{ fontSize: 40, color: theme.palette.error.main }} />
       case 'person':
         return <PersonIcon sx={{ fontSize: 40, color: theme.palette.grey[800] }} />
       default:
