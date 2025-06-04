@@ -48,7 +48,7 @@ const ExcalidrawWrapper = dynamic(
       const MainMenuTyped = MainMenu as React.ComponentType<any> & {
         Item: React.ComponentType<any>
       }
-      
+
       return (
         <div style={{ height: '100%', width: '100%' }}>
           <ExcalidrawTyped
