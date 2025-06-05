@@ -5,7 +5,13 @@ declare module '*.css' {
 }
 
 /* Spezifische Typdeklaration für Excalidraw CSS */
-declare module '@simple-eam/excalidraw/index.css' {
+declare module '@excalidraw/excalidraw/index.css' {
+  const content: any
+  export default content
+}
+
+/* Typdeklaration für unsere Excalidraw Override-Styles */
+declare module '@/styles/excalidraw-override.css' {
   const content: any
   export default content
 }

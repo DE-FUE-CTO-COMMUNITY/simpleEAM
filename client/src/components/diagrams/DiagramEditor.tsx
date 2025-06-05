@@ -13,10 +13,12 @@ import { isViewer } from '@/lib/auth'
 const ExcalidrawWrapper = dynamic(
   async () => {
     // Wichtig: Zuerst das CSS importieren, dann die Komponente
-    await import('@simple-eam/excalidraw/index.css')
+    await import('@excalidraw/excalidraw/index.css')
     // Import Material UI theme customizations for Excalidraw
     await import('@/styles/excalidraw-material-theme.css')
-    const { Excalidraw, MainMenu } = await import('@simple-eam/excalidraw')
+    // Import additional overrides to ensure our styles take priority
+    await import('@/styles/excalidraw-override.css')
+    const { Excalidraw, MainMenu } = await import('@excalidraw/excalidraw')
 
     interface ExcalidrawComponentProps {
       onOpenDialog: () => void
