@@ -20,9 +20,7 @@ import { GET_CAPABILITIES } from '@/graphql/capability'
 import { GET_DATA_OBJECTS } from '@/graphql/dataObject'
 import { GET_APPLICATION_INTERFACES } from '@/graphql/applicationInterface'
 import GenericForm, { FieldConfig, TabConfig } from '../common/GenericForm'
-import {
-  getValidSevenRStrategies,
-} from './timeCategoryDependencies'
+import { getValidSevenRStrategies } from './timeCategoryDependencies'
 import { isArchitect } from '@/lib/auth'
 
 // Basis-Schema ohne Validierung
@@ -251,11 +249,11 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
   // Verfolge Änderungen der TIME-Kategorie und setze 7R-Strategie zurück falls nötig
   const handleTimeCategoryChange = (newTimeCategory: TimeCategory | null) => {
     setCurrentTimeCategory(newTimeCategory)
-    
+
     if (newTimeCategory) {
       const currentSevenRStrategy = form.getFieldValue('sevenRStrategy')
       const validStrategies = getValidSevenRStrategies(newTimeCategory)
-      
+
       // Wenn die aktuelle 7R-Strategie nicht mehr gültig ist, zurücksetzen
       if (currentSevenRStrategy && !validStrategies.includes(currentSevenRStrategy)) {
         form.setFieldValue('sevenRStrategy', null)

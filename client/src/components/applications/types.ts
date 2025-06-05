@@ -27,7 +27,7 @@ export const baseApplicationSchema = z.object({
 
 // Schema mit cross-field validation
 export const applicationSchema = baseApplicationSchema.refine(
-  (data) => {
+  data => {
     if (data.timeCategory && data.sevenRStrategy) {
       return isValidCombination(data.timeCategory, data.sevenRStrategy)
     }

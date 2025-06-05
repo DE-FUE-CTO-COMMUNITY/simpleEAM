@@ -2,6 +2,7 @@
 
 import React from 'react'
 import GenericToolbar from '../common/GenericToolbar'
+import { Table } from '@tanstack/react-table'
 
 interface ArchitectureToolbarProps {
   globalFilter: string
@@ -10,6 +11,8 @@ interface ArchitectureToolbarProps {
   onFilterClick: () => void
   onResetFilters: () => void
   onAddClick?: () => void
+  table?: Table<any>
+  enableColumnVisibilityToggle?: boolean
 }
 
 /**
@@ -22,6 +25,8 @@ const ArchitectureToolbar: React.FC<ArchitectureToolbarProps> = ({
   onFilterClick,
   onResetFilters,
   onAddClick: _onAddClick,
+  table,
+  enableColumnVisibilityToggle,
 }) => {
   return (
     <GenericToolbar
@@ -34,6 +39,8 @@ const ArchitectureToolbar: React.FC<ArchitectureToolbarProps> = ({
       filterTooltip="Architekturfilter hinzufügen"
       editFilterTooltip="Architekturfilter bearbeiten"
       resetFilterTooltip="Architekturfilter zurücksetzen"
+      table={table}
+      enableColumnVisibilityToggle={enableColumnVisibilityToggle}
     />
   )
 }

@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { Box, Typography, Card, Button, Paper } from '@mui/material'
 import { Add as AddIcon } from '@mui/icons-material'
 import { useAuth, login, isArchitect } from '@/lib/auth'
-import { SortingState } from '@tanstack/react-table'
+import { SortingState, VisibilityState } from '@tanstack/react-table'
 import { useQuery, useMutation } from '@apollo/client'
 import { useSnackbar } from 'notistack'
 import {
@@ -25,6 +25,8 @@ const DataObjectsPage = () => {
   const { enqueueSnackbar } = useSnackbar()
   const [globalFilter, setGlobalFilter] = useState('')
   const [sorting, setSorting] = useState<SortingState>([])
+  const [tableInstance, setTableInstance] = useState<any>(null)
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false)
   const [filters, setFilters] = useState<DataObjectFilterState>({
     classifications: [],
@@ -339,6 +341,8 @@ const DataObjectsPage = () => {
           activeFiltersCount={activeFiltersCount}
           onFilterClick={() => setIsFilterDialogOpen(true)}
           onResetFilters={handleResetFilters}
+          table={tableInstance}
+          enableColumnVisibilityToggle={true}
         />
 
         <Paper sx={{ overflow: 'hidden' }}>
@@ -351,6 +355,9 @@ const DataObjectsPage = () => {
             onCreateDataObject={handleCreateDataObjectSubmit}
             onUpdateDataObject={handleUpdateDataObjectSubmit}
             onDeleteDataObject={handleDeleteDataObject}
+            onTableReady={setTableInstance}
+            columnVisibility={columnVisibility}
+            onColumnVisibilityChange={setColumnVisibility}
           />
         </Paper>
       </Card>

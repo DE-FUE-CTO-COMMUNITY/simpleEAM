@@ -9,7 +9,7 @@ import {
   ArchitectureType as GeneratedArchitectureType,
 } from '../../gql/generated'
 import { createColumnHelper } from '@tanstack/react-table'
-import { SortingState } from '@tanstack/react-table'
+import { SortingState, VisibilityState } from '@tanstack/react-table'
 import { formatDate, getDomainLabel, getTypeLabel } from './utils'
 import ArchitectureForm, { ArchitectureFormValues } from './ArchitectureForm'
 
@@ -24,6 +24,11 @@ interface ArchitectureTableProps {
   onUpdateArchitecture?: (id: string, data: ArchitectureFormValues) => Promise<void>
   onDeleteArchitecture?: (id: string) => Promise<void>
   availableArchitectures?: ArchitectureType[]
+  onTableReady?: (table: any) => void
+  columnVisibility?: VisibilityState
+  onColumnVisibilityChange?: (
+    updater: VisibilityState | ((old: VisibilityState) => VisibilityState)
+  ) => void
 }
 
 const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
@@ -36,6 +41,9 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
   onUpdateArchitecture,
   onDeleteArchitecture,
   availableArchitectures = [],
+  onTableReady,
+  columnVisibility,
+  onColumnVisibilityChange,
 }) => {
   const columnHelper = createColumnHelper<ArchitectureType>()
 
@@ -157,9 +165,12 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
       FormComponent={ArchitectureForm}
       getIdFromData={(item: ArchitectureType) => item.id}
       mapDataToFormValues={mapToFormValues}
+      onTableReady={onTableReady}
       additionalProps={{
         availableArchitectures,
       }}
+      columnVisibility={columnVisibility}
+      onColumnVisibilityChange={onColumnVisibilityChange}
     />
   )
 }

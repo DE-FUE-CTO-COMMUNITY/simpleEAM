@@ -8,7 +8,7 @@ import { formatDate, getCriticalityLabel, formatCosts } from './utils'
 import { CriticalityLevel } from '../../gql/generated'
 import ApplicationForm, { ApplicationFormValues } from './ApplicationForm'
 import { createColumnHelper } from '@tanstack/react-table'
-import { SortingState } from '@tanstack/react-table'
+import { SortingState, VisibilityState } from '@tanstack/react-table'
 
 interface ApplicationTableProps {
   id?: string
@@ -21,6 +21,11 @@ interface ApplicationTableProps {
   onUpdateApplication?: (id: string, data: ApplicationFormValues) => Promise<void>
   onDeleteApplication?: (id: string) => Promise<void>
   availableTechStack?: string[]
+  onTableReady?: (table: any) => void
+  columnVisibility?: VisibilityState
+  onColumnVisibilityChange?: (
+    updater: VisibilityState | ((old: VisibilityState) => VisibilityState)
+  ) => void
 }
 
 const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
@@ -33,6 +38,9 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
   onUpdateApplication,
   onDeleteApplication,
   availableTechStack = [],
+  onTableReady,
+  columnVisibility,
+  onColumnVisibilityChange,
 }) => {
   const columnHelper = createColumnHelper<ApplicationType>()
 
@@ -188,9 +196,12 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
       FormComponent={ApplicationForm}
       getIdFromData={(item: ApplicationType) => item.id}
       mapDataToFormValues={mapToFormValues}
+      columnVisibility={columnVisibility}
+      onColumnVisibilityChange={onColumnVisibilityChange}
       additionalProps={{
         availableTechStack,
       }}
+      onTableReady={onTableReady}
     />
   )
 }

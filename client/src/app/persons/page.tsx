@@ -6,6 +6,7 @@ import { Add as AddIcon } from '@mui/icons-material'
 import { useQuery, useMutation } from '@apollo/client'
 import { useSnackbar } from 'notistack'
 import { useAuth, login, isArchitect } from '@/lib/auth'
+import { VisibilityState } from '@tanstack/react-table'
 import { GET_PERSONS, CREATE_PERSON, UPDATE_PERSON, DELETE_PERSON } from '@/graphql/person'
 import PersonForm, { PersonFormValues } from '@/components/persons/PersonForm'
 
@@ -21,6 +22,8 @@ function PersonsPage() {
   const { enqueueSnackbar } = useSnackbar()
   const [globalFilter, setGlobalFilter] = useState<string>('')
   const [sorting, setSorting] = useState([{ id: 'lastName', desc: false }])
+  const [tableInstance, setTableInstance] = useState<any>(null)
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
 
   // Filter-Zustand
   const [filterOpen, setFilterOpen] = useState(false)
@@ -216,6 +219,8 @@ function PersonsPage() {
           activeFiltersCount={activeFiltersCount}
           onFilterClick={() => setFilterOpen(true)}
           onResetFilters={handleResetFilter}
+          table={tableInstance}
+          enableColumnVisibilityToggle={true}
         />
 
         <Paper sx={{ overflow: 'hidden' }}>
@@ -229,6 +234,9 @@ function PersonsPage() {
             onCreatePerson={handleCreatePersonSubmit}
             onUpdatePerson={handleUpdatePersonSubmit}
             onDeletePerson={handleDeletePerson}
+            onTableReady={setTableInstance}
+            columnVisibility={columnVisibility}
+            onColumnVisibilityChange={setColumnVisibility}
           />
         </Paper>
       </Card>

@@ -6,6 +6,7 @@ import { Add as AddIcon } from '@mui/icons-material'
 import { useQuery, useMutation } from '@apollo/client'
 import { useSnackbar } from 'notistack'
 import { useAuth, login, isArchitect } from '@/lib/auth'
+import { SortingState, VisibilityState } from '@tanstack/react-table'
 import {
   GET_ARCHITECTURES,
   CREATE_ARCHITECTURE,
@@ -29,6 +30,8 @@ const ArchitecturesPage = () => {
   const { enqueueSnackbar } = useSnackbar()
   const [globalFilter, setGlobalFilter] = useState<string>('')
   const [sorting, setSorting] = useState([{ id: 'name', desc: false }])
+  const [tableInstance, setTableInstance] = useState<any>(null)
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
 
   // Filter-Zustand
   const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false)
@@ -492,6 +495,8 @@ const ArchitecturesPage = () => {
           onAddClick={handleCreateArchitecture}
           activeFiltersCount={activeFiltersCount}
           onResetFilters={handleResetFilter}
+          table={tableInstance}
+          enableColumnVisibilityToggle={true}
         />
 
         {/* Tabelle der Architekturen */}
@@ -505,6 +510,9 @@ const ArchitecturesPage = () => {
           onUpdateArchitecture={handleUpdateArchitectureSubmit}
           onDeleteArchitecture={handleDeleteArchitecture}
           availableArchitectures={architectures}
+          onTableReady={setTableInstance}
+          columnVisibility={columnVisibility}
+          onColumnVisibilityChange={setColumnVisibility}
         />
       </Card>
     </Box>

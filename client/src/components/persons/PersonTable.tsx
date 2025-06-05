@@ -4,7 +4,7 @@ import { Person } from './types'
 import { PersonFormValues } from './PersonForm'
 import PersonForm from './PersonForm'
 import { createColumnHelper } from '@tanstack/react-table'
-import { SortingState } from '@tanstack/react-table'
+import { SortingState, VisibilityState } from '@tanstack/react-table'
 
 // Hilfsfunktion zum Formatieren von Datum
 const formatDate = (date: string) => {
@@ -26,6 +26,11 @@ interface PersonTableProps {
   onCreatePerson?: (data: PersonFormValues) => Promise<void>
   onUpdatePerson?: (id: string, data: PersonFormValues) => Promise<void>
   onDeletePerson?: (id: string) => Promise<void>
+  onTableReady?: (table: any) => void
+  columnVisibility?: VisibilityState
+  onColumnVisibilityChange?: (
+    updater: VisibilityState | ((old: VisibilityState) => VisibilityState)
+  ) => void
 }
 
 const PersonTableWithGenericTable: React.FC<PersonTableProps> = ({
@@ -37,6 +42,9 @@ const PersonTableWithGenericTable: React.FC<PersonTableProps> = ({
   onCreatePerson,
   onUpdatePerson,
   onDeletePerson,
+  onTableReady,
+  columnVisibility,
+  onColumnVisibilityChange,
 }) => {
   const columnHelper = createColumnHelper<Person>()
 
@@ -126,6 +134,9 @@ const PersonTableWithGenericTable: React.FC<PersonTableProps> = ({
       FormComponent={PersonForm}
       getIdFromData={(item: Person) => item.id}
       mapDataToFormValues={mapToFormValues}
+      columnVisibility={columnVisibility}
+      onColumnVisibilityChange={onColumnVisibilityChange}
+      onTableReady={onTableReady}
     />
   )
 }

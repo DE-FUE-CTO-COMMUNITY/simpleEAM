@@ -8,7 +8,7 @@ import { formatDate, getLevelLabel } from './utils'
 import { CapabilityStatus, BusinessCapability } from '../../gql/generated'
 import CapabilityForm, { CapabilityFormValues } from './CapabilityForm'
 import { createColumnHelper } from '@tanstack/react-table'
-import { SortingState } from '@tanstack/react-table'
+import { SortingState, VisibilityState } from '@tanstack/react-table'
 
 interface CapabilityTableProps {
   id?: string
@@ -22,6 +22,11 @@ interface CapabilityTableProps {
   onDeleteCapability?: (id: string) => Promise<void>
   availableTags?: string[]
   availableCapabilities?: BusinessCapability[]
+  onTableReady?: (table: any) => void
+  columnVisibility?: VisibilityState
+  onColumnVisibilityChange?: (
+    updater: VisibilityState | ((old: VisibilityState) => VisibilityState)
+  ) => void
 }
 
 const CapabilityTable: React.FC<CapabilityTableProps> = ({
@@ -35,6 +40,9 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
   onDeleteCapability,
   availableTags = [],
   availableCapabilities = [],
+  onTableReady,
+  columnVisibility,
+  onColumnVisibilityChange,
 }) => {
   const theme = useTheme()
   const columnHelper = createColumnHelper<Capability>()
@@ -147,10 +155,13 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
       FormComponent={CapabilityForm}
       getIdFromData={(item: Capability) => item.id}
       mapDataToFormValues={mapToFormValues}
+      onTableReady={onTableReady}
       additionalProps={{
         availableTags,
         availableCapabilities,
       }}
+      columnVisibility={columnVisibility}
+      onColumnVisibilityChange={onColumnVisibilityChange}
     />
   )
 }

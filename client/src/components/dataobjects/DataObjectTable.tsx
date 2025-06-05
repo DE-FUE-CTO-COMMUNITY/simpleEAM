@@ -7,7 +7,7 @@ import DataObjectForm, { DataObjectFormValues } from './DataObjectForm'
 import { formatDate } from './utils'
 import { DataClassification, DataObject } from '../../gql/generated'
 import { createColumnHelper } from '@tanstack/react-table'
-import { SortingState } from '@tanstack/react-table'
+import { SortingState, VisibilityState } from '@tanstack/react-table'
 
 interface DataObjectTableProps {
   id?: string
@@ -19,6 +19,11 @@ interface DataObjectTableProps {
   onCreateDataObject?: (data: DataObjectFormValues) => Promise<void>
   onUpdateDataObject?: (id: string, data: DataObjectFormValues) => Promise<void>
   onDeleteDataObject?: (id: string) => Promise<void>
+  onTableReady?: (table: any) => void
+  columnVisibility?: VisibilityState
+  onColumnVisibilityChange?: (
+    updater: VisibilityState | ((old: VisibilityState) => VisibilityState)
+  ) => void
 }
 
 const DataObjectTable: React.FC<DataObjectTableProps> = ({
@@ -30,6 +35,9 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
   onCreateDataObject,
   onUpdateDataObject,
   onDeleteDataObject,
+  onTableReady,
+  columnVisibility,
+  onColumnVisibilityChange,
 }) => {
   const theme = useTheme()
   const columnHelper = createColumnHelper<DataObject>()
@@ -164,6 +172,9 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
       FormComponent={DataObjectForm}
       getIdFromData={(item: DataObject) => item.id}
       mapDataToFormValues={mapDataObjectToFormValues}
+      onTableReady={onTableReady}
+      columnVisibility={columnVisibility}
+      onColumnVisibilityChange={onColumnVisibilityChange}
     />
   )
 }

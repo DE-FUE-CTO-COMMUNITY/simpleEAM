@@ -6,7 +6,7 @@ import { ApplicationInterface } from './types'
 import { ApplicationInterfaceFormValues } from './ApplicationInterfaceForm'
 import ApplicationInterfaceForm from './ApplicationInterfaceForm'
 import { createColumnHelper } from '@tanstack/react-table'
-import { SortingState } from '@tanstack/react-table'
+import { SortingState, VisibilityState } from '@tanstack/react-table'
 import { Chip } from '@mui/material'
 import { getInterfaceTypeLabel, getProtocolLabel, formatDate } from './utils'
 import { DataObject, Application, Person } from '@/gql/generated'
@@ -24,6 +24,11 @@ interface ApplicationInterfaceTableProps {
   dataObjects?: DataObject[]
   applications?: Application[]
   persons?: Person[]
+  onTableReady?: (table: any) => void
+  columnVisibility?: VisibilityState
+  onColumnVisibilityChange?: (
+    updater: VisibilityState | ((old: VisibilityState) => VisibilityState)
+  ) => void
 }
 
 const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
@@ -38,6 +43,9 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
   dataObjects = [],
   applications = [],
   persons = [],
+  onTableReady,
+  columnVisibility,
+  onColumnVisibilityChange,
 }) => {
   const columnHelper = createColumnHelper<ApplicationInterface>()
 
@@ -170,11 +178,14 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
       FormComponent={ApplicationInterfaceForm}
       getIdFromData={(item: ApplicationInterface) => item.id}
       mapDataToFormValues={mapToFormValues}
+      onTableReady={onTableReady}
       additionalProps={{
         dataObjects,
         applications,
         persons,
       }}
+      columnVisibility={columnVisibility}
+      onColumnVisibilityChange={onColumnVisibilityChange}
     />
   )
 }

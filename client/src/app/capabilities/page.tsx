@@ -6,6 +6,7 @@ import { Add as AddIcon } from '@mui/icons-material'
 import { useQuery, useMutation } from '@apollo/client'
 import { useSnackbar } from 'notistack'
 import { useAuth, login, isArchitect } from '@/lib/auth'
+import { SortingState, VisibilityState } from '@tanstack/react-table'
 import {
   GET_CAPABILITIES,
   CREATE_CAPABILITY,
@@ -27,6 +28,8 @@ const CapabilitiesPage = () => {
   const { enqueueSnackbar } = useSnackbar()
   const [globalFilter, setGlobalFilter] = useState<string>('')
   const [sorting, setSorting] = useState([{ id: 'name', desc: false }])
+  const [tableInstance, setTableInstance] = useState<any>(null)
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
 
   // Filter-Zustand
   const [filterOpen, setFilterOpen] = useState(false)
@@ -302,6 +305,8 @@ const CapabilitiesPage = () => {
           activeFiltersCount={activeFiltersCount}
           onFilterClick={() => setFilterOpen(true)}
           onResetFilters={handleResetFilter}
+          table={tableInstance}
+          enableColumnVisibilityToggle={true}
         />
 
         <Paper sx={{ overflow: 'hidden' }}>
@@ -317,6 +322,9 @@ const CapabilitiesPage = () => {
             onDeleteCapability={handleDeleteCapability}
             availableTags={availableTags}
             availableCapabilities={capabilities as unknown as BusinessCapability[]}
+            onTableReady={setTableInstance}
+            columnVisibility={columnVisibility}
+            onColumnVisibilityChange={setColumnVisibility}
           />
         </Paper>
       </Card>

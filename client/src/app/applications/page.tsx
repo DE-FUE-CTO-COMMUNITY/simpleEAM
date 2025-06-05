@@ -6,6 +6,8 @@ import { Add as AddIcon } from '@mui/icons-material'
 import { useQuery, useMutation } from '@apollo/client'
 import { useSnackbar } from 'notistack'
 import { useAuth, login, isArchitect } from '@/lib/auth'
+import { VisibilityState } from '@tanstack/react-table'
+
 import {
   GET_APPLICATIONS,
   CREATE_APPLICATION,
@@ -33,6 +35,34 @@ const ApplicationsPage = () => {
   const { enqueueSnackbar } = useSnackbar()
   const [globalFilter, setGlobalFilter] = useState<string>('')
   const [sorting, setSorting] = useState([{ id: 'name', desc: false }])
+
+  // Table instance for column visibility
+  const [tableInstance, setTableInstance] = useState<any>(null)
+  // Column visibility state mit Default-Werten für alle Spalten (sichtbar)
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
+    name: true,
+    status: true,
+    criticality: true,
+    timeCategory: true,
+    sevenRStrategy: true,
+    vendor: true,
+    version: true,
+    owners: true,
+    supportsCapabilities: true,
+    usesDataObjects: true,
+    costs: true,
+    createdAt: true,
+    updatedAt: true,
+    actions: true,
+  })
+
+  // Hilfsfunktion zum effizienten Aktualisieren der Spaltenvisibilität
+  const handleColumnVisibilityChange = (
+    updater: VisibilityState | ((old: VisibilityState) => VisibilityState)
+  ) => {
+    // Sofort den Zustand aktualisieren, um Verzögerungen zu vermeiden
+    setColumnVisibility(updater)
+  }
 
   // Filter-Zustand
   const [filterOpen, setFilterOpen] = useState(false)
@@ -467,6 +497,8 @@ const ApplicationsPage = () => {
           activeFiltersCount={activeFiltersCount}
           onFilterClick={() => setFilterOpen(true)}
           onResetFilters={handleResetFilter}
+          table={tableInstance}
+          enableColumnVisibilityToggle={true}
         />
 
         <Paper sx={{ overflow: 'hidden' }}>
@@ -481,6 +513,9 @@ const ApplicationsPage = () => {
             onUpdateApplication={handleUpdateApplicationSubmit}
             onDeleteApplication={handleDeleteApplication}
             availableTechStack={availableTechStack}
+            onTableReady={setTableInstance}
+            columnVisibility={columnVisibility}
+            onColumnVisibilityChange={handleColumnVisibilityChange}
           />
         </Paper>
       </Card>

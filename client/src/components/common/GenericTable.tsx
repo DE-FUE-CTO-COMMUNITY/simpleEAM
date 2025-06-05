@@ -1,15 +1,15 @@
 'use client'
 
 import React, { useState, useCallback, useMemo } from 'react'
-import { 
-  Box, 
-  Tooltip, 
-  IconButton, 
-  CircularProgress, 
-  Button, 
-  useTheme, 
+import {
+  Box,
+  Tooltip,
+  IconButton,
+  CircularProgress,
+  Button,
+  useTheme,
   useMediaQuery,
-  Typography 
+  Typography,
 } from '@mui/material'
 import {
   Edit as EditIcon,
@@ -26,6 +26,7 @@ import {
   getPaginationRowModel,
   SortingState,
   ColumnDef,
+  VisibilityState,
 } from '@tanstack/react-table'
 import { isArchitect } from '@/lib/auth'
 
@@ -52,6 +53,13 @@ export interface GenericTableProps<T, F> {
   getIdFromData?: (item: T) => string // Funktion zum Extrahieren der ID aus den Daten
   mapDataToFormValues?: (item: T) => F // Funktion zum Mapping der Daten zu Formularwerten
   additionalProps?: Record<string, any> // Zusätzliche Props für das Formular
+  // Column Visibility Props
+  columnVisibility?: VisibilityState // Externe Kontrolle der Spalten-Sichtbarkeit
+  onColumnVisibilityChange?: (
+    updater: VisibilityState | ((old: VisibilityState) => VisibilityState)
+  ) => void // Callback für Spalten-Sichtbarkeits-Änderungen
+  // Table Instance Callback
+  onTableReady?: (table: any) => void // Callback um die Table-Instanz bereitzustellen
 }
 
 /**
@@ -74,6 +82,11 @@ export function GenericTable<T extends { id: string }, F>({
   getIdFromData = (item: T) => item.id,
   mapDataToFormValues,
   additionalProps = {},
+  // Column Visibility Props
+  columnVisibility: _externalColumnVisibility,
+  onColumnVisibilityChange: _externalOnColumnVisibilityChange,
+  // Table Instance Callback
+  onTableReady,
 }: GenericTableProps<T, F>) {
   // State für das Formular-Dialog
   const [formMode, setFormMode] = useState<'create' | 'edit' | 'view'>('view')
@@ -181,17 +194,19 @@ export function GenericTable<T extends { id: string }, F>({
       id: 'actions',
       header: 'Aktionen',
       cell: info => (
-        <Box sx={{ 
-          display: 'flex', 
-          justifyContent: 'center',
-          gap: isMobile ? 1 : 0.5,
-          flexWrap: 'nowrap',
-        }}>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            gap: isMobile ? 1 : 0.5,
+            flexWrap: 'nowrap',
+          }}
+        >
           <Tooltip title="Details anzeigen">
             <IconButton
               size={isMobile ? 'medium' : 'small'}
               color="primary"
-              sx={{ 
+              sx={{
                 mx: isMobile ? 0 : 0.5,
                 minWidth: isMobile ? '44px' : 'auto',
                 minHeight: isMobile ? '44px' : 'auto',
@@ -209,7 +224,7 @@ export function GenericTable<T extends { id: string }, F>({
               <IconButton
                 size={isMobile ? 'medium' : 'small'}
                 color="secondary"
-                sx={{ 
+                sx={{
                   mx: isMobile ? 0 : 0.5,
                   minWidth: isMobile ? '44px' : 'auto',
                   minHeight: isMobile ? '44px' : 'auto',
@@ -237,9 +252,22 @@ export function GenericTable<T extends { id: string }, F>({
     state: {
       sorting,
       globalFilter,
+      // Externes State-Management für die Spaltenvisibilität
+      columnVisibility: _externalColumnVisibility,
     },
     onSortingChange: updater =>
       onSortingChange(typeof updater === 'function' ? updater(sorting) : updater),
+    // Spaltenvisibilitätsänderungen an den externen State übergeben
+    onColumnVisibilityChange: updater => {
+      if (_externalOnColumnVisibilityChange) {
+        // Bestimme den neuen Zustand
+        const newState =
+          typeof updater === 'function' ? updater(_externalColumnVisibility || {}) : updater
+
+        // Update des externen States
+        _externalOnColumnVisibilityChange(newState)
+      }
+    },
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -250,6 +278,15 @@ export function GenericTable<T extends { id: string }, F>({
       },
     },
   })
+
+  // Table-Instanz über Callback bereitstellen
+  React.useEffect(() => {
+    if (onTableReady) {
+      onTableReady(table)
+    }
+
+    // Debug-Log für Column Visibility deaktiviert, um ggf. Konsolenausgaben zu vermeiden
+  }, [table, onTableReady])
 
   // Zeige Ladezustand an
   if (loading) {
@@ -262,16 +299,18 @@ export function GenericTable<T extends { id: string }, F>({
 
   return (
     <>
-      <Box sx={{ 
-        overflow: 'auto',
-        // Add momentum scrolling for iOS
-        WebkitOverflowScrolling: 'touch',
-        // Better responsive table handling
-        '& table': {
-          minWidth: isTablet ? '800px' : isMobile ? '600px' : '100%',
-          tableLayout: 'fixed', // Fixed layout for better column control
-        }
-      }}>
+      <Box
+        sx={{
+          overflow: 'auto',
+          // Add momentum scrolling for iOS
+          WebkitOverflowScrolling: 'touch',
+          // Better responsive table handling
+          '& table': {
+            minWidth: isTablet ? '800px' : isMobile ? '600px' : '100%',
+            tableLayout: 'fixed', // Fixed layout for better column control
+          },
+        }}
+      >
         <Box
           component="table"
           sx={{
@@ -326,30 +365,6 @@ export function GenericTable<T extends { id: string }, F>({
                       verticalAlign: 'middle',
                       whiteSpace: isMobile ? 'normal' : 'nowrap',
                       color: theme.palette.text.primary,
-                      // Progressive column hiding based on screen size
-                      [theme.breakpoints.down('xl')]: { // < 1536px (including 1800px)
-                        display: header.column.id === 'actions' || 
-                                header.id === headerGroup.headers[0].id || 
-                                header.id === headerGroup.headers[1]?.id || 
-                                (headerGroup.headers.length > 4 && header.id === headerGroup.headers[2]?.id) 
-                                ? 'table-cell' : 'none',
-                      },
-                      [theme.breakpoints.down('lg')]: { // < 1200px
-                        display: header.column.id === 'actions' || 
-                                header.id === headerGroup.headers[0].id || 
-                                header.id === headerGroup.headers[1]?.id
-                                ? 'table-cell' : 'none',
-                      },
-                      [theme.breakpoints.down('md')]: { // < 900px
-                        fontSize: '0.75rem',
-                        minWidth: header.column.id === 'actions' ? '100px' : 'auto',
-                        display: header.column.id === 'actions' || 
-                                header.id === headerGroup.headers[0].id 
-                                ? 'table-cell' : 'none',
-                      },
-                      [theme.breakpoints.down('sm')]: { // < 600px
-                        display: header.column.id === 'actions' || header.id === headerGroup.headers[0].id ? 'table-cell' : 'none',
-                      },
                     }}
                     onClick={header.column.getToggleSortingHandler()}
                   >
@@ -403,7 +418,7 @@ export function GenericTable<T extends { id: string }, F>({
                   }
                 }}
               >
-                {row.getVisibleCells().map((cell, index) => (
+                {row.getVisibleCells().map(cell => (
                   <Box
                     component="td"
                     key={cell.id}
@@ -412,29 +427,6 @@ export function GenericTable<T extends { id: string }, F>({
                       padding: isMobile ? '8px 4px' : '16px',
                       verticalAlign: 'middle',
                       color: theme.palette.text.secondary,
-                      // Progressive column hiding based on screen size - match header logic
-                      [theme.breakpoints.down('xl')]: { // < 1536px (including 1800px)
-                        display: cell.column.id === 'actions' || 
-                                index === 0 || 
-                                index === 1 || 
-                                (row.getVisibleCells().length > 4 && index === 2) 
-                                ? 'table-cell' : 'none',
-                      },
-                      [theme.breakpoints.down('lg')]: { // < 1200px
-                        display: cell.column.id === 'actions' || 
-                                index === 0 || 
-                                index === 1
-                                ? 'table-cell' : 'none',
-                      },
-                      [theme.breakpoints.down('md')]: { // < 900px
-                        fontSize: '0.875rem',
-                        display: cell.column.id === 'actions' || 
-                                index === 0 
-                                ? 'table-cell' : 'none',
-                      },
-                      [theme.breakpoints.down('sm')]: { // < 600px
-                        display: cell.column.id === 'actions' || index === 0 ? 'table-cell' : 'none',
-                      },
                       '&:last-of-type': {
                         textAlign: cell.column.id === 'actions' ? 'center' : 'left',
                       },
@@ -447,7 +439,11 @@ export function GenericTable<T extends { id: string }, F>({
                         whiteSpace: 'nowrap',
                         maxWidth: '100%',
                       }}
-                      title={typeof cell.getValue() === 'string' ? cell.getValue() as string : undefined}
+                      title={
+                        typeof cell.getValue() === 'string'
+                          ? (cell.getValue() as string)
+                          : undefined
+                      }
                     >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </Box>
@@ -471,12 +467,14 @@ export function GenericTable<T extends { id: string }, F>({
           borderTop: `1px solid ${theme.palette.divider}`,
         }}
       >
-        <Box sx={{ 
-          display: 'flex', 
-          alignItems: isMobile ? 'stretch' : 'center',
-          gap: 2,
-          flexDirection: isMobile ? 'column' : 'row',
-        }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: isMobile ? 'stretch' : 'center',
+            gap: 2,
+            flexDirection: isMobile ? 'column' : 'row',
+          }}
+        >
           <Typography variant="body2" sx={{ textAlign: isMobile ? 'center' : 'left' }}>
             Zeige {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1}{' '}
             bis{' '}
@@ -507,12 +505,14 @@ export function GenericTable<T extends { id: string }, F>({
             </select>
           </Box>
         </Box>
-        <Box sx={{ 
-          display: 'flex', 
-          gap: 1,
-          justifyContent: isMobile ? 'center' : 'flex-end',
-          flexWrap: 'wrap',
-        }}>
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 1,
+            justifyContent: isMobile ? 'center' : 'flex-end',
+            flexWrap: 'wrap',
+          }}
+        >
           <Button
             variant="outlined"
             size={isMobile ? 'medium' : 'small'}
@@ -525,92 +525,103 @@ export function GenericTable<T extends { id: string }, F>({
           >
             Zurück
           </Button>
-          <Box sx={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: 1,
-            flexWrap: 'wrap',
-            justifyContent: 'center',
-          }}>
-            {Array.from({ length: isMobile ? Math.min(table.getPageCount(), 5) : (table.getPageCount() > 7 ? 7 : table.getPageCount()) }, (_, i) => {
-              // Zeige maximal 5 Seitenzahlen auf mobile, 7 auf Desktop
-              let pageIndex
-              const currentPage = table.getState().pagination.pageIndex
-              const totalPages = table.getPageCount()
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+            }}
+          >
+            {Array.from(
+              {
+                length: isMobile
+                  ? Math.min(table.getPageCount(), 5)
+                  : table.getPageCount() > 7
+                    ? 7
+                    : table.getPageCount(),
+              },
+              (_, i) => {
+                // Zeige maximal 5 Seitenzahlen auf mobile, 7 auf Desktop
+                let pageIndex
+                const currentPage = table.getState().pagination.pageIndex
+                const totalPages = table.getPageCount()
 
-              if (totalPages <= 7) {
-                // Wenn weniger als 7 Seiten, zeige alle an
-                pageIndex = i
-              } else if (currentPage < 3) {
-                // Wenn aktuelle Seite weniger als 3 ist
-                if (i < 5) {
+                if (totalPages <= 7) {
+                  // Wenn weniger als 7 Seiten, zeige alle an
                   pageIndex = i
-                } else if (i === 5) {
-                  return (
-                    <Box key="ellipsis-end" sx={{ mx: 1 }}>
-                      ...
-                    </Box>
-                  )
+                } else if (currentPage < 3) {
+                  // Wenn aktuelle Seite weniger als 3 ist
+                  if (i < 5) {
+                    pageIndex = i
+                  } else if (i === 5) {
+                    return (
+                      <Box key="ellipsis-end" sx={{ mx: 1 }}>
+                        ...
+                      </Box>
+                    )
+                  } else {
+                    pageIndex = totalPages - 1
+                  }
+                } else if (currentPage > totalPages - 4) {
+                  // Wenn aktuelle Seite nahe am Ende ist
+                  if (i === 0) {
+                    pageIndex = 0
+                  } else if (i === 1) {
+                    return (
+                      <Box key="ellipsis-start" sx={{ mx: 1 }}>
+                        ...
+                      </Box>
+                    )
+                  } else {
+                    pageIndex = totalPages - 7 + i
+                  }
                 } else {
-                  pageIndex = totalPages - 1
+                  // Wenn aktuelle Seite in der Mitte ist
+                  if (i === 0) {
+                    pageIndex = 0
+                  } else if (i === 1) {
+                    return (
+                      <Box key="ellipsis-start" sx={{ mx: 1 }}>
+                        ...
+                      </Box>
+                    )
+                  } else if (i === 6) {
+                    return (
+                      <Box key="ellipsis-end" sx={{ mx: 1 }}>
+                        ...
+                      </Box>
+                    )
+                  } else if (i === 5) {
+                    pageIndex = totalPages - 1
+                  } else {
+                    pageIndex = currentPage + (i - 3)
+                  }
                 }
-              } else if (currentPage > totalPages - 4) {
-                // Wenn aktuelle Seite nahe am Ende ist
-                if (i === 0) {
-                  pageIndex = 0
-                } else if (i === 1) {
-                  return (
-                    <Box key="ellipsis-start" sx={{ mx: 1 }}>
-                      ...
-                    </Box>
-                  )
-                } else {
-                  pageIndex = totalPages - 7 + i
-                }
-              } else {
-                // Wenn aktuelle Seite in der Mitte ist
-                if (i === 0) {
-                  pageIndex = 0
-                } else if (i === 1) {
-                  return (
-                    <Box key="ellipsis-start" sx={{ mx: 1 }}>
-                      ...
-                    </Box>
-                  )
-                } else if (i === 6) {
-                  return (
-                    <Box key="ellipsis-end" sx={{ mx: 1 }}>
-                      ...
-                    </Box>
-                  )
-                } else if (i === 5) {
-                  pageIndex = totalPages - 1
-                } else {
-                  pageIndex = currentPage + (i - 3)
-                }
+
+                // Prüfen und anpassen bei ungültigen pageIndex-Werten
+                if (pageIndex < 0) pageIndex = 0
+                if (pageIndex >= totalPages) pageIndex = totalPages - 1
+
+                return (
+                  <Button
+                    key={pageIndex}
+                    variant={pageIndex === currentPage ? 'contained' : 'outlined'}
+                    size={isMobile ? 'medium' : 'small'}
+                    onClick={() => table.setPageIndex(pageIndex)}
+                    sx={{
+                      minWidth: isMobile ? '44px' : '36px',
+                      minHeight: isMobile ? '44px' : '32px',
+                      px: 1,
+                      fontSize: isMobile ? '16px' : '14px',
+                    }}
+                  >
+                    {pageIndex + 1}
+                  </Button>
+                )
               }
-
-              // Prüfen und anpassen bei ungültigen pageIndex-Werten
-              if (pageIndex < 0) pageIndex = 0
-              if (pageIndex >= totalPages) pageIndex = totalPages - 1
-
-              return (
-                <Button
-                  key={pageIndex}
-                  variant={pageIndex === currentPage ? 'contained' : 'outlined'}
-                  size={isMobile ? 'medium' : 'small'}
-                  onClick={() => table.setPageIndex(pageIndex)}
-                  sx={{
-                    minWidth: isMobile ? '44px' : '36px',
-                    minHeight: isMobile ? '44px' : '32px',
-                    px: 1,
-                    fontSize: isMobile ? '16px' : '14px',
-                  }}
-                >
-                  {pageIndex + 1}
-                </Button>
-              )
-            })}
+            )}
           </Box>
           <Button
             variant="outlined"

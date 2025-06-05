@@ -1,13 +1,28 @@
 'use client'
 
-import React from 'react'
-import { Box, TextField, InputAdornment, IconButton, Tooltip, Badge, Toolbar } from '@mui/material'
+import React, { useState, useEffect } from 'react'
+import {
+  Box,
+  TextField,
+  InputAdornment,
+  IconButton,
+  Tooltip,
+  Badge,
+  Toolbar,
+  Popover,
+  Typography,
+  FormGroup,
+  FormControlLabel,
+  Checkbox,
+} from '@mui/material'
 import {
   Search as SearchIcon,
   FilterList as FilterIcon,
   ClearAll as ClearAllIcon,
   Clear as ClearIcon,
+  ViewColumn as ViewColumnIcon,
 } from '@mui/icons-material'
+import { Table, VisibilityState } from '@tanstack/react-table'
 
 export interface GenericToolbarProps {
   /**
@@ -70,6 +85,28 @@ export interface GenericToolbarProps {
    * @default "300px"
    */
   searchFieldWidth?: string
+
+  /**
+   * Die Tabellen-Instanz für Column Visibility
+   */
+  table?: Table<any>
+
+  /**
+   * Ob der Column Visibility Toggle angezeigt werden soll
+   * @default false
+   */
+  enableColumnVisibilityToggle?: boolean
+
+  /**
+   * Aktueller Column Visibility State
+   */
+  columnVisibility?: VisibilityState
+
+  /**
+   * Tooltiptext für den Column Visibility Button
+   * @default "Spalten ein-/ausblenden"
+   */
+  columnVisibilityTooltip?: string
 }
 
 /**
@@ -87,7 +124,56 @@ const GenericToolbar: React.FC<GenericToolbarProps> = ({
   resetFilterTooltip = 'Filter zurücksetzen',
   showClearSearchButton = true,
   searchFieldWidth = '300px',
+  table,
+  enableColumnVisibilityToggle = false,
+  // Der columnVisibility Prop wird nicht mehr direkt verwendet, da wir nun
+  // direkt die Table-Instanz und deren Methoden verwenden, die den State verwalten
+  columnVisibility: _unused, // Umbenannt, um ESLint-Warnung zu vermeiden
+  columnVisibilityTooltip = 'Spalten ein-/ausblenden',
 }) => {
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
+  // Lokaler State für die Spaltenvisibilität
+  const [localVisibility, setLocalVisibility] = useState<Record<string, boolean>>({})
+
+  // Bei Änderungen der Tabelle den lokalen Zustand aktualisieren
+  useEffect(() => {
+    if (table) {
+      // Lokalen Zustand mit dem aktuellen Tabellenzustand initialisieren
+      const columns = table.getAllLeafColumns()
+      const visibilityState: Record<string, boolean> = {}
+
+      columns.forEach(column => {
+        if (column.id !== 'actions') {
+          visibilityState[column.id] = column.getIsVisible()
+        }
+      })
+
+      setLocalVisibility(visibilityState)
+    }
+  }, [table])
+
+  // Funktion zum Umschalten der Spaltenvisibilität
+  const handleColumnVisibilityChange = (columnId: string) => {
+    // Spalte in der Tabelle umschalten
+    const column = table?.getColumn(columnId)
+    if (column) {
+      // Aktuellen Zustand merken
+      const currentVisibility = localVisibility[columnId] ?? false
+
+      // Neuen Zustand berechnen (invertieren)
+      const newVisibility = !currentVisibility
+
+      // Lokalen Zustand direkt aktualisieren für sofortige UI-Reaktion
+      setLocalVisibility(prev => ({
+        ...prev,
+        [columnId]: newVisibility,
+      }))
+
+      // Spalte in der Tabelle umschalten
+      column.toggleVisibility()
+    }
+  }
+
   return (
     <Toolbar
       sx={{
@@ -140,6 +226,94 @@ const GenericToolbar: React.FC<GenericToolbarProps> = ({
               <ClearAllIcon />
             </IconButton>
           </Tooltip>
+        )}
+        {enableColumnVisibilityToggle && table && (
+          <>
+            <Tooltip title={columnVisibilityTooltip}>
+              <IconButton
+                onClick={event => {
+                  // Beim Öffnen des Popovers den lokalen Zustand aktualisieren
+                  if (table) {
+                    const columns = table.getAllLeafColumns()
+                    const visibilityState: Record<string, boolean> = {}
+
+                    columns.forEach(column => {
+                      if (column.id !== 'actions') {
+                        visibilityState[column.id] = column.getIsVisible()
+                      }
+                    })
+
+                    setLocalVisibility(visibilityState)
+                  }
+                  setAnchorEl(event.currentTarget)
+                }}
+                color="default"
+              >
+                <ViewColumnIcon />
+              </IconButton>
+            </Tooltip>
+            <Popover
+              open={Boolean(anchorEl)}
+              anchorEl={anchorEl}
+              onClose={() => {
+                // Wenn das Popover geschlossen wird, aktualisieren wir den lokalen Zustand
+                if (table) {
+                  const columns = table.getAllLeafColumns()
+                  const visibilityState: Record<string, boolean> = {}
+
+                  columns.forEach(column => {
+                    if (column.id !== 'actions') {
+                      visibilityState[column.id] = column.getIsVisible()
+                    }
+                  })
+
+                  setLocalVisibility(visibilityState)
+                }
+                setAnchorEl(null)
+              }}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'right',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+            >
+              <Box sx={{ p: 2, minWidth: 200 }}>
+                <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold' }}>
+                  Spalten anzeigen
+                </Typography>
+                <FormGroup>
+                  {/* Spalten-Checkboxen: Aktiviert = Spalte sichtbar, Deaktiviert = Spalte ausgeblendet */}
+                  {table.getAllLeafColumns().map(column => {
+                    // Skip actions column from visibility toggle
+                    if (column.id === 'actions') return null
+
+                    return (
+                      <FormControlLabel
+                        key={column.id}
+                        control={
+                          <Checkbox
+                            // Verwende den lokalen Zustand für eine konsistente Darstellung
+                            checked={localVisibility[column.id] ?? false}
+                            disabled={!column.getCanHide()}
+                            onChange={() => handleColumnVisibilityChange(column.id)}
+                            // Beseitigen von React-Warnings durch Entfernung des key-Props auf der Checkbox
+                          />
+                        }
+                        label={
+                          typeof column.columnDef.header === 'string'
+                            ? column.columnDef.header
+                            : column.id
+                        }
+                      />
+                    )
+                  })}
+                </FormGroup>
+              </Box>
+            </Popover>
+          </>
         )}
       </Box>
     </Toolbar>
