@@ -1,7 +1,16 @@
 'use client'
 
 import React, { useState, useCallback, useMemo } from 'react'
-import { Box, Tooltip, IconButton, CircularProgress, Button, useTheme } from '@mui/material'
+import { 
+  Box, 
+  Tooltip, 
+  IconButton, 
+  CircularProgress, 
+  Button, 
+  useTheme, 
+  useMediaQuery,
+  Typography 
+} from '@mui/material'
 import {
   Edit as EditIcon,
   Visibility as VisibilityIcon,
@@ -72,6 +81,8 @@ export function GenericTable<T extends { id: string }, F>({
   const [selectedItem, setSelectedItem] = useState<T | null>(null)
   const [formLoading, setFormLoading] = useState(false)
   const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+  const isTablet = useMediaQuery(theme.breakpoints.down('lg'))
 
   // Handler für das Öffnen des Formulars zur Detailansicht
   const handleViewItemClick = useCallback(
@@ -170,32 +181,45 @@ export function GenericTable<T extends { id: string }, F>({
       id: 'actions',
       header: 'Aktionen',
       cell: info => (
-        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'center',
+          gap: isMobile ? 1 : 0.5,
+          flexWrap: 'nowrap',
+        }}>
           <Tooltip title="Details anzeigen">
             <IconButton
-              size="small"
+              size={isMobile ? 'medium' : 'small'}
               color="primary"
-              sx={{ mx: 0.5 }}
+              sx={{ 
+                mx: isMobile ? 0 : 0.5,
+                minWidth: isMobile ? '44px' : 'auto',
+                minHeight: isMobile ? '44px' : 'auto',
+              }}
               onClick={e => {
                 e.stopPropagation()
                 handleViewItemClick(getIdFromData(info.row.original))
               }}
             >
-              <VisibilityIcon fontSize="small" />
+              <VisibilityIcon fontSize={isMobile ? 'medium' : 'small'} />
             </IconButton>
           </Tooltip>
           {isArchitect() && (
             <Tooltip title="Bearbeiten">
               <IconButton
-                size="small"
+                size={isMobile ? 'medium' : 'small'}
                 color="secondary"
-                sx={{ mx: 0.5 }}
+                sx={{ 
+                  mx: isMobile ? 0 : 0.5,
+                  minWidth: isMobile ? '44px' : 'auto',
+                  minHeight: isMobile ? '44px' : 'auto',
+                }}
                 onClick={e => {
                   e.stopPropagation()
                   handleEditItemClick(getIdFromData(info.row.original))
                 }}
               >
-                <EditIcon fontSize="small" />
+                <EditIcon fontSize={isMobile ? 'medium' : 'small'} />
               </IconButton>
             </Tooltip>
           )}
@@ -204,7 +228,7 @@ export function GenericTable<T extends { id: string }, F>({
     }
 
     return [...columns, actionColumn]
-  }, [columns, handleViewItemClick, handleEditItemClick, getIdFromData])
+  }, [columns, handleViewItemClick, handleEditItemClick, getIdFromData, isMobile])
 
   // TanStack Table initialisieren
   const table = useReactTable({
@@ -238,13 +262,43 @@ export function GenericTable<T extends { id: string }, F>({
 
   return (
     <>
-      <Box sx={{ overflow: 'auto' }}>
+      <Box sx={{ 
+        overflow: 'auto',
+        // Add momentum scrolling for iOS
+        WebkitOverflowScrolling: 'touch',
+        // Better responsive table handling
+        '& table': {
+          minWidth: isTablet ? '800px' : isMobile ? '600px' : '100%',
+          tableLayout: 'fixed', // Fixed layout for better column control
+        }
+      }}>
         <Box
           component="table"
           sx={{
             width: '100%',
             borderCollapse: 'collapse',
             border: `1px solid ${theme.palette.divider}`,
+            tableLayout: 'fixed', // Enforce fixed layout for better control
+            // Responsive column widths
+            '& th, & td': {
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              [theme.breakpoints.down('xl')]: {
+                maxWidth: '200px', // Limit column width for 1800px screens
+              },
+              [theme.breakpoints.down('lg')]: {
+                maxWidth: '150px',
+              },
+              [theme.breakpoints.down('md')]: {
+                maxWidth: '120px',
+              },
+            },
+            // Actions column specific width
+            '& th:last-child, & td:last-child': {
+              width: isTablet ? '120px' : isMobile ? '100px' : '140px',
+              minWidth: isTablet ? '120px' : isMobile ? '100px' : '140px',
+              maxWidth: isTablet ? '120px' : isMobile ? '100px' : '140px',
+            },
           }}
         >
           <Box component="thead" sx={{ backgroundColor: theme.palette.background.paper }}>
@@ -263,15 +317,39 @@ export function GenericTable<T extends { id: string }, F>({
                     colSpan={header.colSpan}
                     scope="col"
                     sx={{
-                      padding: '16px',
+                      padding: isMobile ? '8px 4px' : '16px',
                       textAlign: 'left',
                       position: 'relative',
                       fontWeight: 'bold',
                       cursor: header.column.getCanSort() ? 'pointer' : 'default',
                       userSelect: 'none',
                       verticalAlign: 'middle',
-                      whiteSpace: 'nowrap',
+                      whiteSpace: isMobile ? 'normal' : 'nowrap',
                       color: theme.palette.text.primary,
+                      // Progressive column hiding based on screen size
+                      [theme.breakpoints.down('xl')]: { // < 1536px (including 1800px)
+                        display: header.column.id === 'actions' || 
+                                header.id === headerGroup.headers[0].id || 
+                                header.id === headerGroup.headers[1]?.id || 
+                                (headerGroup.headers.length > 4 && header.id === headerGroup.headers[2]?.id) 
+                                ? 'table-cell' : 'none',
+                      },
+                      [theme.breakpoints.down('lg')]: { // < 1200px
+                        display: header.column.id === 'actions' || 
+                                header.id === headerGroup.headers[0].id || 
+                                header.id === headerGroup.headers[1]?.id
+                                ? 'table-cell' : 'none',
+                      },
+                      [theme.breakpoints.down('md')]: { // < 900px
+                        fontSize: '0.75rem',
+                        minWidth: header.column.id === 'actions' ? '100px' : 'auto',
+                        display: header.column.id === 'actions' || 
+                                header.id === headerGroup.headers[0].id 
+                                ? 'table-cell' : 'none',
+                      },
+                      [theme.breakpoints.down('sm')]: { // < 600px
+                        display: header.column.id === 'actions' || header.id === headerGroup.headers[0].id ? 'table-cell' : 'none',
+                      },
                     }}
                     onClick={header.column.getToggleSortingHandler()}
                   >
@@ -280,6 +358,7 @@ export function GenericTable<T extends { id: string }, F>({
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
+                        flexWrap: isMobile ? 'wrap' : 'nowrap',
                       }}
                     >
                       {flexRender(header.column.columnDef.header, header.getContext())}
@@ -324,21 +403,54 @@ export function GenericTable<T extends { id: string }, F>({
                   }
                 }}
               >
-                {row.getVisibleCells().map(cell => (
+                {row.getVisibleCells().map((cell, index) => (
                   <Box
                     component="td"
                     key={cell.id}
                     onClick={cell.column.id === 'actions' ? e => e.stopPropagation() : undefined}
                     sx={{
-                      padding: '16px',
+                      padding: isMobile ? '8px 4px' : '16px',
                       verticalAlign: 'middle',
                       color: theme.palette.text.secondary,
+                      // Progressive column hiding based on screen size - match header logic
+                      [theme.breakpoints.down('xl')]: { // < 1536px (including 1800px)
+                        display: cell.column.id === 'actions' || 
+                                index === 0 || 
+                                index === 1 || 
+                                (row.getVisibleCells().length > 4 && index === 2) 
+                                ? 'table-cell' : 'none',
+                      },
+                      [theme.breakpoints.down('lg')]: { // < 1200px
+                        display: cell.column.id === 'actions' || 
+                                index === 0 || 
+                                index === 1
+                                ? 'table-cell' : 'none',
+                      },
+                      [theme.breakpoints.down('md')]: { // < 900px
+                        fontSize: '0.875rem',
+                        display: cell.column.id === 'actions' || 
+                                index === 0 
+                                ? 'table-cell' : 'none',
+                      },
+                      [theme.breakpoints.down('sm')]: { // < 600px
+                        display: cell.column.id === 'actions' || index === 0 ? 'table-cell' : 'none',
+                      },
                       '&:last-of-type': {
                         textAlign: cell.column.id === 'actions' ? 'center' : 'left',
                       },
                     }}
                   >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    <Box
+                      sx={{
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        maxWidth: '100%',
+                      }}
+                      title={typeof cell.getValue() === 'string' ? cell.getValue() as string : undefined}
+                    >
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </Box>
                   </Box>
                 ))}
               </Box>
@@ -351,14 +463,21 @@ export function GenericTable<T extends { id: string }, F>({
       <Box
         sx={{
           display: 'flex',
+          flexDirection: isMobile ? 'column' : 'row',
           justifyContent: 'space-between',
-          alignItems: 'center',
+          alignItems: isMobile ? 'stretch' : 'center',
           p: 2,
+          gap: isMobile ? 2 : 0,
           borderTop: `1px solid ${theme.palette.divider}`,
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Box>
+        <Box sx={{ 
+          display: 'flex', 
+          alignItems: isMobile ? 'stretch' : 'center',
+          gap: 2,
+          flexDirection: isMobile ? 'column' : 'row',
+        }}>
+          <Typography variant="body2" sx={{ textAlign: isMobile ? 'center' : 'left' }}>
             Zeige {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1}{' '}
             bis{' '}
             {Math.min(
@@ -366,37 +485,55 @@ export function GenericTable<T extends { id: string }, F>({
               table.getFilteredRowModel().rows.length
             )}{' '}
             von {table.getFilteredRowModel().rows.length} Einträgen
+          </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+            <select
+              value={table.getState().pagination.pageSize}
+              onChange={e => {
+                table.setPageSize(Number(e.target.value))
+              }}
+              style={{
+                padding: isMobile ? '8px 12px' : '4px 8px',
+                borderRadius: '4px',
+                border: `1px solid ${theme.palette.divider}`,
+                fontSize: isMobile ? '16px' : '14px', // Prevent zoom on iOS
+              }}
+            >
+              {[5, 10, 25, 50].map(pageSize => (
+                <option key={pageSize} value={pageSize}>
+                  {pageSize} pro Seite
+                </option>
+              ))}
+            </select>
           </Box>
-          <select
-            value={table.getState().pagination.pageSize}
-            onChange={e => {
-              table.setPageSize(Number(e.target.value))
-            }}
-            style={{
-              padding: '4px 8px',
-              borderRadius: '4px',
-              border: `1px solid ${theme.palette.divider}`,
-            }}
-          >
-            {[5, 10, 25, 50].map(pageSize => (
-              <option key={pageSize} value={pageSize}>
-                {pageSize} pro Seite
-              </option>
-            ))}
-          </select>
         </Box>
-        <Box sx={{ display: 'flex', gap: 1 }}>
+        <Box sx={{ 
+          display: 'flex', 
+          gap: 1,
+          justifyContent: isMobile ? 'center' : 'flex-end',
+          flexWrap: 'wrap',
+        }}>
           <Button
             variant="outlined"
-            size="small"
+            size={isMobile ? 'medium' : 'small'}
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
+            sx={{
+              minWidth: isMobile ? '80px' : 'auto',
+              fontSize: isMobile ? '16px' : '14px',
+            }}
           >
             Zurück
           </Button>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {Array.from({ length: table.getPageCount() > 7 ? 7 : table.getPageCount() }, (_, i) => {
-              // Zeige maximal 7 Seitenzahlen an
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: 1,
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+          }}>
+            {Array.from({ length: isMobile ? Math.min(table.getPageCount(), 5) : (table.getPageCount() > 7 ? 7 : table.getPageCount()) }, (_, i) => {
+              // Zeige maximal 5 Seitenzahlen auf mobile, 7 auf Desktop
               let pageIndex
               const currentPage = table.getState().pagination.pageIndex
               const totalPages = table.getPageCount()
@@ -461,11 +598,13 @@ export function GenericTable<T extends { id: string }, F>({
                 <Button
                   key={pageIndex}
                   variant={pageIndex === currentPage ? 'contained' : 'outlined'}
-                  size="small"
+                  size={isMobile ? 'medium' : 'small'}
                   onClick={() => table.setPageIndex(pageIndex)}
                   sx={{
-                    minWidth: '36px',
+                    minWidth: isMobile ? '44px' : '36px',
+                    minHeight: isMobile ? '44px' : '32px',
                     px: 1,
+                    fontSize: isMobile ? '16px' : '14px',
                   }}
                 >
                   {pageIndex + 1}
@@ -475,9 +614,13 @@ export function GenericTable<T extends { id: string }, F>({
           </Box>
           <Button
             variant="outlined"
-            size="small"
+            size={isMobile ? 'medium' : 'small'}
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
+            sx={{
+              minWidth: isMobile ? '80px' : 'auto',
+              fontSize: isMobile ? '16px' : '14px',
+            }}
           >
             Weiter
           </Button>
