@@ -12,16 +12,21 @@ import {
   BusinessCapability,
   DataObject,
   ApplicationInterface,
+  TimeCategory,
+  SevenRStrategy,
 } from '../../gql/generated'
 import { GET_PERSONS } from '@/graphql/person'
 import { GET_CAPABILITIES } from '@/graphql/capability'
 import { GET_DATA_OBJECTS } from '@/graphql/dataObject'
 import { GET_APPLICATION_INTERFACES } from '@/graphql/applicationInterface'
 import GenericForm, { FieldConfig, TabConfig } from '../common/GenericForm'
+import {
+  getValidSevenRStrategies,
+} from './timeCategoryDependencies'
 import { isArchitect } from '@/lib/auth'
 
-// Schema für die Formularvalidierung
-export const applicationSchema = z.object({
+// Basis-Schema ohne Validierung
+const baseApplicationSchema = z.object({
   name: z
     .string()
     .min(3, 'Der Name muss mindestens 3 Zeichen lang sein')
@@ -56,7 +61,12 @@ export const applicationSchema = z.object({
   usesDataObjectIds: z.array(z.string()).optional(),
   sourceOfInterfaceIds: z.array(z.string()).optional(),
   targetOfInterfaceIds: z.array(z.string()).optional(),
+  timeCategory: z.nativeEnum(TimeCategory).optional().nullable().or(z.literal('')),
+  sevenRStrategy: z.nativeEnum(SevenRStrategy).optional().nullable().or(z.literal('')),
 })
+
+// Schema für die Formularvalidierung
+export const applicationSchema = baseApplicationSchema
 
 // TypeScript Typen basierend auf dem Schema
 export type ApplicationFormValues = z.infer<typeof applicationSchema>
@@ -102,6 +112,42 @@ const getStatusLabel = (status: ApplicationStatus): string => {
   }
 }
 
+const getTimeCategoryLabel = (category: TimeCategory): string => {
+  switch (category) {
+    case TimeCategory.TOLERATE:
+      return 'Tolerate (Tolerieren)'
+    case TimeCategory.INVEST:
+      return 'Invest (Investieren)'
+    case TimeCategory.MIGRATE:
+      return 'Migrate (Migrieren)'
+    case TimeCategory.ELIMINATE:
+      return 'Eliminate (Eliminieren)'
+    default:
+      return category
+  }
+}
+
+const getSevenRStrategyLabel = (strategy: SevenRStrategy): string => {
+  switch (strategy) {
+    case SevenRStrategy.RETIRE:
+      return 'Retire (Stilllegen)'
+    case SevenRStrategy.RETAIN:
+      return 'Retain (Beibehalten)'
+    case SevenRStrategy.REHOST:
+      return 'Rehost (Lift & Shift)'
+    case SevenRStrategy.REPLATFORM:
+      return 'Replatform (Lift & Reshape)'
+    case SevenRStrategy.REFACTOR:
+      return 'Refactor (Re-architect)'
+    case SevenRStrategy.REARCHITECT:
+      return 'Rearchitect (Rebuild)'
+    case SevenRStrategy.REPLACE:
+      return 'Replace (Buy new)'
+    default:
+      return strategy
+  }
+}
+
 const ApplicationForm: React.FC<ApplicationFormProps> = ({
   application,
   availableTechStack = [],
@@ -138,13 +184,21 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     usesDataObjectIds: application?.usesDataObjects?.map(obj => obj.id) ?? [],
     sourceOfInterfaceIds: application?.sourceOfInterfaces?.map(iface => iface.id) ?? [],
     targetOfInterfaceIds: application?.targetOfInterfaces?.map(iface => iface.id) ?? [],
+    timeCategory: application?.timeCategory ?? null,
+    sevenRStrategy: application?.sevenRStrategy ?? null,
   }
 
   // TanStack Form konfigurieren
   const form = useForm({
     defaultValues,
     onSubmit: async ({ value }) => {
-      await onSubmit(value)
+      // Konvertiere leere Strings zu null für enum-Felder
+      const processedValue = {
+        ...value,
+        timeCategory: value.timeCategory === '' ? null : value.timeCategory,
+        sevenRStrategy: value.sevenRStrategy === '' ? null : value.sevenRStrategy,
+      }
+      await onSubmit(processedValue)
     },
     validators: {
       // Primäre Validierung bei Änderungen
@@ -157,6 +211,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
   // Formular aktualisieren, wenn sich die Daten ändern
   useEffect(() => {
     if (isOpen && application) {
+      setCurrentTimeCategory(application.timeCategory ?? null)
       form.reset({
         name: application.name ?? '',
         description: application.description ?? '',
@@ -179,11 +234,34 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
         usesDataObjectIds: application.usesDataObjects?.map(obj => obj.id) ?? [],
         sourceOfInterfaceIds: application.sourceOfInterfaces?.map(iface => iface.id) ?? [],
         targetOfInterfaceIds: application.targetOfInterfaces?.map(iface => iface.id) ?? [],
+        timeCategory: application.timeCategory ?? null,
+        sevenRStrategy: application.sevenRStrategy ?? null,
       })
     } else if (!isOpen) {
+      setCurrentTimeCategory(null)
       form.reset()
     }
   }, [form, application, isOpen])
+
+  // Dynamisches Zurücksetzen der 7R-Strategie bei TIME-Kategorie-Änderung
+  const [currentTimeCategory, setCurrentTimeCategory] = React.useState<TimeCategory | null>(
+    application?.timeCategory ?? null
+  )
+
+  // Verfolge Änderungen der TIME-Kategorie und setze 7R-Strategie zurück falls nötig
+  const handleTimeCategoryChange = (newTimeCategory: TimeCategory | null) => {
+    setCurrentTimeCategory(newTimeCategory)
+    
+    if (newTimeCategory) {
+      const currentSevenRStrategy = form.getFieldValue('sevenRStrategy')
+      const validStrategies = getValidSevenRStrategies(newTimeCategory)
+      
+      // Wenn die aktuelle 7R-Strategie nicht mehr gültig ist, zurücksetzen
+      if (currentSevenRStrategy && !validStrategies.includes(currentSevenRStrategy)) {
+        form.setFieldValue('sevenRStrategy', null)
+      }
+    }
+  }
 
   // Tabs für das Formular definieren
   const tabs: TabConfig[] = [
@@ -202,7 +280,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
       type: 'text',
       required: true,
       tabId: 'general',
-      validators: applicationSchema.shape.name,
+      validators: baseApplicationSchema.shape.name,
       size: { xs: 12, md: 6 },
     },
     {
@@ -211,7 +289,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
       type: 'textarea',
       required: true,
       tabId: 'general',
-      validators: applicationSchema.shape.description,
+      validators: baseApplicationSchema.shape.description,
       rows: 4,
       size: 12,
     },
@@ -221,7 +299,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
       type: 'select',
       required: true,
       tabId: 'general',
-      validators: applicationSchema.shape.status,
+      validators: baseApplicationSchema.shape.status,
       options: Object.values(ApplicationStatus).map(status => ({
         value: status,
         label: getStatusLabel(status),
@@ -234,7 +312,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
       type: 'select',
       required: true,
       tabId: 'general',
-      validators: applicationSchema.shape.criticality,
+      validators: baseApplicationSchema.shape.criticality,
       options: Object.values(CriticalityLevel).map(level => ({
         value: level,
         label: getCriticalityLabel(level),
@@ -246,7 +324,40 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
       label: 'Kosten',
       type: 'number',
       tabId: 'general',
-      validators: applicationSchema.shape.costs,
+      validators: baseApplicationSchema.shape.costs,
+      size: { xs: 12, md: 6 },
+    },
+    {
+      name: 'timeCategory',
+      label: 'TIME-Kategorie',
+      type: 'select',
+      tabId: 'general',
+      required: false,
+      options: [
+        { value: '', label: 'Keine Auswahl' },
+        ...Object.values(TimeCategory).map(category => ({
+          value: category,
+          label: getTimeCategoryLabel(category),
+        })),
+      ],
+      size: { xs: 12, md: 6 },
+      onChange: (value: TimeCategory | null) => {
+        handleTimeCategoryChange(value)
+      },
+    },
+    {
+      name: 'sevenRStrategy',
+      label: '7R-Strategie',
+      type: 'select',
+      tabId: 'general',
+      required: false,
+      options: [
+        { value: '', label: 'Keine Auswahl' },
+        ...getValidSevenRStrategies(currentTimeCategory).map(strategy => ({
+          value: strategy,
+          label: getSevenRStrategyLabel(strategy),
+        })),
+      ],
       size: { xs: 12, md: 6 },
     },
     {
@@ -271,7 +382,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
       label: 'Anbieter',
       type: 'text',
       tabId: 'technical',
-      validators: applicationSchema.shape.vendor,
+      validators: baseApplicationSchema.shape.vendor,
       size: { xs: 12, md: 6 },
     },
     {
@@ -279,7 +390,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
       label: 'Version',
       type: 'text',
       tabId: 'technical',
-      validators: applicationSchema.shape.version,
+      validators: baseApplicationSchema.shape.version,
       size: { xs: 12, md: 6 },
     },
     {
@@ -287,7 +398,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
       label: 'Hosting-Umgebung',
       type: 'text',
       tabId: 'technical',
-      validators: applicationSchema.shape.hostingEnvironment,
+      validators: baseApplicationSchema.shape.hostingEnvironment,
       size: { xs: 12, md: 6 },
     },
     {

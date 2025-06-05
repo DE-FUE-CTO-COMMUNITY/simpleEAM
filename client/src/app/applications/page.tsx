@@ -12,7 +12,13 @@ import {
   UPDATE_APPLICATION,
   DELETE_APPLICATION,
 } from '@/graphql/application'
-import { ApplicationStatus, CriticalityLevel, Application } from '@/gql/generated'
+import {
+  ApplicationStatus,
+  CriticalityLevel,
+  TimeCategory,
+  SevenRStrategy,
+  Application,
+} from '@/gql/generated'
 import ApplicationForm, { ApplicationFormValues } from '@/components/applications/ApplicationForm'
 
 // Importiere die ausgelagerten Komponenten
@@ -39,6 +45,8 @@ const ApplicationsPage = () => {
     ownerFilter: '',
     updatedDateRange: ['', ''],
     vendorFilter: '',
+    timeCategoryFilter: [] as TimeCategory[],
+    sevenRStrategyFilter: [] as SevenRStrategy[],
   })
   const [activeFiltersCount, setActiveFiltersCount] = useState<number>(0)
 
@@ -47,6 +55,8 @@ const ApplicationsPage = () => {
   const [availableCriticalities, setAvailableCriticalities] = useState<CriticalityLevel[]>([])
   const [availableTechStack, setAvailableTechStack] = useState<string[]>([])
   const [availableVendors, setAvailableVendors] = useState<string[]>([])
+  const [availableTimeCategories, setAvailableTimeCategories] = useState<TimeCategory[]>([])
+  const [availableSevenRStrategies, setAvailableSevenRStrategies] = useState<SevenRStrategy[]>([])
 
   // State für das neue Application-Formular
   const [showNewApplicationForm, setShowNewApplicationForm] = useState(false)
@@ -103,6 +113,22 @@ const ApplicationsPage = () => {
 
       const uniqueVendors = Array.from(new Set(allVendors)).sort()
       setAvailableVendors(uniqueVendors)
+
+      // Alle TIME-Kategorien extrahieren und Duplikate entfernen
+      const allTimeCategories: TimeCategory[] = applications
+        .map((app: ApplicationType) => app.timeCategory)
+        .filter(Boolean) as TimeCategory[]
+
+      const uniqueTimeCategories = Array.from(new Set(allTimeCategories)).sort()
+      setAvailableTimeCategories(uniqueTimeCategories)
+
+      // Alle 7R-Strategien extrahieren und Duplikate entfernen
+      const allSevenRStrategies: SevenRStrategy[] = applications
+        .map((app: ApplicationType) => app.sevenRStrategy)
+        .filter(Boolean) as SevenRStrategy[]
+
+      const uniqueSevenRStrategies = Array.from(new Set(allSevenRStrategies)).sort()
+      setAvailableSevenRStrategies(uniqueSevenRStrategies)
     }
   }, [data])
 
@@ -175,6 +201,8 @@ const ApplicationsPage = () => {
       description: applicationData.description,
       status: applicationData.status,
       criticality: applicationData.criticality,
+      timeCategory: applicationData.timeCategory,
+      sevenRStrategy: applicationData.sevenRStrategy,
       costs: applicationData.costs,
       vendor: applicationData.vendor,
       version: applicationData.version,
@@ -265,6 +293,8 @@ const ApplicationsPage = () => {
       technologyStack: { set: applicationData.technologyStack },
       introductionDate: { set: applicationData.introductionDate },
       endOfLifeDate: { set: applicationData.endOfLifeDate },
+      timeCategory: { set: applicationData.timeCategory },
+      sevenRStrategy: { set: applicationData.sevenRStrategy },
     }
 
     // Aktualisierung der Owner-Beziehung, wenn ein Besitzer ausgewählt wurde
@@ -406,6 +436,8 @@ const ApplicationsPage = () => {
       ownerFilter: '',
       updatedDateRange: ['', ''],
       vendorFilter: '',
+      timeCategoryFilter: [],
+      sevenRStrategyFilter: [],
     })
     setActiveFiltersCount(0)
   }
@@ -460,6 +492,8 @@ const ApplicationsPage = () => {
           availableCriticalities={availableCriticalities}
           availableTechStack={availableTechStack}
           availableVendors={availableVendors}
+          availableTimeCategories={availableTimeCategories}
+          availableSevenRStrategies={availableSevenRStrategies}
           onFilterChange={handleFilterChange}
           onResetFilter={handleResetFilter}
           onClose={() => setFilterOpen(false)}

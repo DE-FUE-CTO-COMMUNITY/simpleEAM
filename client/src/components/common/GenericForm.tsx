@@ -95,6 +95,7 @@ export interface FieldConfig {
   renderOption?: (props: React.HTMLAttributes<HTMLLIElement>, option: any) => React.ReactNode // Für benutzerdefinierte Darstellung von Optionen
   loadingOptions?: boolean // Für Autocomplete während des Ladens
   loadingText?: string // Text während des Ladens
+  onChange?: (value: any) => void // Callback für Feldwert-Änderungen
 }
 
 /**
@@ -418,7 +419,11 @@ const GenericForm: React.FC<GenericFormProps> = ({
                   <TextField
                     label={field.label + (field.required ? ' *' : '')}
                     value={formField.state.value === null ? '' : formField.state.value}
-                    onChange={e => formField.handleChange(e.target.value)}
+                    onChange={e => {
+                      const value = e.target.value
+                      formField.handleChange(value)
+                      field.onChange?.(value)
+                    }}
                     onBlur={formField.handleBlur}
                     disabled={disabled}
                     multiline
@@ -435,7 +440,11 @@ const GenericForm: React.FC<GenericFormProps> = ({
                   <TextField
                     label={field.label + (field.required ? ' *' : '')}
                     value={formField.state.value === null ? '' : formField.state.value}
-                    onChange={e => formField.handleChange(e.target.value)}
+                    onChange={e => {
+                      const value = e.target.value
+                      formField.handleChange(value)
+                      field.onChange?.(value)
+                    }}
                     onBlur={formField.handleBlur}
                     disabled={disabled}
                     select
@@ -460,6 +469,7 @@ const GenericForm: React.FC<GenericFormProps> = ({
                     onChange={e => {
                       const value = e.target.value === '' ? null : Number(e.target.value)
                       formField.handleChange(value)
+                      field.onChange?.(value)
                     }}
                     onBlur={formField.handleBlur}
                     disabled={disabled}
@@ -476,7 +486,9 @@ const GenericForm: React.FC<GenericFormProps> = ({
                     label={field.label + (field.required ? ' *' : '')}
                     value={formField.state.value ? dayjs(formField.state.value) : null}
                     onChange={newValue => {
-                      formField.handleChange(newValue ? newValue.toDate() : null)
+                      const value = newValue ? newValue.toDate() : null
+                      formField.handleChange(value)
+                      field.onChange?.(value)
                     }}
                     disabled={disabled}
                     slotProps={{
@@ -500,7 +512,9 @@ const GenericForm: React.FC<GenericFormProps> = ({
                     label={field.label + (field.required ? ' *' : '')}
                     value={formField.state.value ? dayjs(formField.state.value) : null}
                     onChange={newValue => {
-                      formField.handleChange(newValue ? newValue.toDate() : null)
+                      const value = newValue ? newValue.toDate() : null
+                      formField.handleChange(value)
+                      field.onChange?.(value)
                     }}
                     disabled={disabled}
                     slotProps={{
@@ -546,6 +560,7 @@ const GenericForm: React.FC<GenericFormProps> = ({
                       }
 
                       formField.handleChange(processedValue)
+                      field.onChange?.(processedValue)
                     }}
                     disabled={disabled}
                     multiple={field.multiple}
@@ -624,7 +639,10 @@ const GenericForm: React.FC<GenericFormProps> = ({
                     freeSolo
                     options={field.options?.map(o => o.label) || []}
                     value={formField.state.value || []}
-                    onChange={(_, newValue) => formField.handleChange(newValue)}
+                    onChange={(_, newValue) => {
+                      formField.handleChange(newValue)
+                      field.onChange?.(newValue)
+                    }}
                     disabled={disabled}
                     isOptionEqualToValue={(option, value) => option === value}
                     renderValue={(value, getItemProps) =>
@@ -665,7 +683,11 @@ const GenericForm: React.FC<GenericFormProps> = ({
                   <TextField
                     label={field.label + (field.required ? ' *' : '')}
                     value={formField.state.value === null ? '' : formField.state.value}
-                    onChange={e => formField.handleChange(e.target.value)}
+                    onChange={e => {
+                      const value = e.target.value
+                      formField.handleChange(value)
+                      field.onChange?.(value)
+                    }}
                     onBlur={formField.handleBlur}
                     disabled={disabled}
                     error={finalShouldShowError}

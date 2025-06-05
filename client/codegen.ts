@@ -2,9 +2,11 @@ import type { CodegenConfig } from '@graphql-codegen/cli'
 
 const config: CodegenConfig = {
   overwrite: true,
-  // This assumes your server is running on the standard port
-  // and with the default admin API path. Adjust accordingly.
-  schema: 'http://localhost:4500/graphql',
+  // WICHTIG: Das Remote-Schema MUSS verwendet werden, da die Neo4j GraphQL Library
+  // automatisch Queries und Mutations aus der lokalen Schema-Datei generiert.
+  // Diese generierten Operationen sind nur über das laufende GraphQL-Server verfügbar
+  // und nicht in der statischen Schema-Datei enthalten.
+  schema: 'https://api.dev-server.mf2.eu/graphql',
   config: {
     // This tells codegen that the `Money` scalar is a number
     scalars: { Money: 'number' },

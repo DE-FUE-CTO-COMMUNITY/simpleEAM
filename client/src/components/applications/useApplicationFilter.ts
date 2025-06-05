@@ -2,7 +2,12 @@
 
 import { useMemo } from 'react'
 import { ApplicationType, FilterState } from './types'
-import { ApplicationStatus, CriticalityLevel } from '../../gql/generated'
+import {
+  ApplicationStatus,
+  CriticalityLevel,
+  TimeCategory,
+  SevenRStrategy,
+} from '../../gql/generated'
 
 interface UseApplicationFilterProps {
   applications: ApplicationType[]
@@ -19,6 +24,8 @@ export const useApplicationFilter = ({ applications, filterState }: UseApplicati
     ownerFilter,
     updatedDateRange,
     vendorFilter,
+    timeCategoryFilter,
+    sevenRStrategyFilter,
   } = filterState
 
   // Filterfunktion für erweiterte Filter
@@ -109,6 +116,26 @@ export const useApplicationFilter = ({ applications, filterState }: UseApplicati
         }
       }
 
+      // TIME-Kategorie Filter
+      if (
+        timeCategoryFilter.length > 0 &&
+        application.timeCategory !== null &&
+        application.timeCategory !== undefined &&
+        !timeCategoryFilter.includes(application.timeCategory as TimeCategory)
+      ) {
+        return false
+      }
+
+      // 7R-Strategie Filter
+      if (
+        sevenRStrategyFilter.length > 0 &&
+        application.sevenRStrategy !== null &&
+        application.sevenRStrategy !== undefined &&
+        !sevenRStrategyFilter.includes(application.sevenRStrategy as SevenRStrategy)
+      ) {
+        return false
+      }
+
       return true
     })
   }, [
@@ -121,6 +148,8 @@ export const useApplicationFilter = ({ applications, filterState }: UseApplicati
     ownerFilter,
     updatedDateRange,
     vendorFilter,
+    timeCategoryFilter,
+    sevenRStrategyFilter,
   ])
 
   return filteredData

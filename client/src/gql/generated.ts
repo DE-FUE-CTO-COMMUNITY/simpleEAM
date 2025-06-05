@@ -34,6 +34,7 @@ export type Application = {
   ownersConnection: ApplicationOwnersConnection;
   partOfArchitectures: Array<Architecture>;
   partOfArchitecturesConnection: ApplicationPartOfArchitecturesConnection;
+  sevenRStrategy?: Maybe<SevenRStrategy>;
   sourceOfInterfaces: Array<ApplicationInterface>;
   sourceOfInterfacesConnection: ApplicationSourceOfInterfacesConnection;
   status: ApplicationStatus;
@@ -42,6 +43,7 @@ export type Application = {
   targetOfInterfaces: Array<ApplicationInterface>;
   targetOfInterfacesConnection: ApplicationTargetOfInterfacesConnection;
   technologyStack?: Maybe<Array<Scalars['String']['output']>>;
+  timeCategory?: Maybe<TimeCategory>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
   usesDataObjects: Array<DataObject>;
   usesDataObjectsConnection: ApplicationUsesDataObjectsConnection;
@@ -279,11 +281,13 @@ export type ApplicationCreateInput = {
   name: Scalars['String']['input'];
   owners?: InputMaybe<ApplicationOwnersFieldInput>;
   partOfArchitectures?: InputMaybe<ApplicationPartOfArchitecturesFieldInput>;
+  sevenRStrategy?: InputMaybe<SevenRStrategy>;
   sourceOfInterfaces?: InputMaybe<ApplicationSourceOfInterfacesFieldInput>;
   status: ApplicationStatus;
   supportsCapabilities?: InputMaybe<ApplicationSupportsCapabilitiesFieldInput>;
   targetOfInterfaces?: InputMaybe<ApplicationTargetOfInterfacesFieldInput>;
   technologyStack?: InputMaybe<Array<Scalars['String']['input']>>;
+  timeCategory?: InputMaybe<TimeCategory>;
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
   usesDataObjects?: InputMaybe<ApplicationUsesDataObjectsFieldInput>;
   vendor?: InputMaybe<Scalars['String']['input']>;
@@ -1453,7 +1457,9 @@ export type ApplicationSort = {
   id?: InputMaybe<SortDirection>;
   introductionDate?: InputMaybe<SortDirection>;
   name?: InputMaybe<SortDirection>;
+  sevenRStrategy?: InputMaybe<SortDirection>;
   status?: InputMaybe<SortDirection>;
+  timeCategory?: InputMaybe<SortDirection>;
   updatedAt?: InputMaybe<SortDirection>;
   vendor?: InputMaybe<SortDirection>;
   version?: InputMaybe<SortDirection>;
@@ -1811,11 +1817,13 @@ export type ApplicationUpdateInput = {
   name?: InputMaybe<StringScalarMutations>;
   owners?: InputMaybe<Array<ApplicationOwnersUpdateFieldInput>>;
   partOfArchitectures?: InputMaybe<Array<ApplicationPartOfArchitecturesUpdateFieldInput>>;
+  sevenRStrategy?: InputMaybe<SevenRStrategyEnumScalarMutations>;
   sourceOfInterfaces?: InputMaybe<Array<ApplicationSourceOfInterfacesUpdateFieldInput>>;
   status?: InputMaybe<ApplicationStatusEnumScalarMutations>;
   supportsCapabilities?: InputMaybe<Array<ApplicationSupportsCapabilitiesUpdateFieldInput>>;
   targetOfInterfaces?: InputMaybe<Array<ApplicationTargetOfInterfacesUpdateFieldInput>>;
   technologyStack?: InputMaybe<ListStringMutations>;
+  timeCategory?: InputMaybe<TimeCategoryEnumScalarMutations>;
   usesDataObjects?: InputMaybe<Array<ApplicationUsesDataObjectsUpdateFieldInput>>;
   vendor?: InputMaybe<StringScalarMutations>;
   version?: InputMaybe<StringScalarMutations>;
@@ -1947,6 +1955,7 @@ export type ApplicationWhere = {
   ownersConnection?: InputMaybe<ApplicationOwnersConnectionFilters>;
   partOfArchitectures?: InputMaybe<ArchitectureRelationshipFilters>;
   partOfArchitecturesConnection?: InputMaybe<ApplicationPartOfArchitecturesConnectionFilters>;
+  sevenRStrategy?: InputMaybe<SevenRStrategyEnumScalarFilters>;
   sourceOfInterfaces?: InputMaybe<ApplicationInterfaceRelationshipFilters>;
   sourceOfInterfacesConnection?: InputMaybe<ApplicationSourceOfInterfacesConnectionFilters>;
   status?: InputMaybe<ApplicationStatusEnumScalarFilters>;
@@ -1955,6 +1964,7 @@ export type ApplicationWhere = {
   targetOfInterfaces?: InputMaybe<ApplicationInterfaceRelationshipFilters>;
   targetOfInterfacesConnection?: InputMaybe<ApplicationTargetOfInterfacesConnectionFilters>;
   technologyStack?: InputMaybe<StringListFilters>;
+  timeCategory?: InputMaybe<TimeCategoryEnumScalarFilters>;
   updatedAt?: InputMaybe<DateTimeScalarFilters>;
   usesDataObjects?: InputMaybe<DataObjectRelationshipFilters>;
   usesDataObjectsConnection?: InputMaybe<ApplicationUsesDataObjectsConnectionFilters>;
@@ -7310,6 +7320,28 @@ export type QueryPeopleConnectionArgs = {
   where?: InputMaybe<PersonWhere>;
 };
 
+/** 7R-Strategien für Cloud-Migration und Applikationsportfolio-Management */
+export enum SevenRStrategy {
+  REARCHITECT = 'REARCHITECT',
+  REFACTOR = 'REFACTOR',
+  REHOST = 'REHOST',
+  REPLACE = 'REPLACE',
+  REPLATFORM = 'REPLATFORM',
+  RETAIN = 'RETAIN',
+  RETIRE = 'RETIRE'
+}
+
+/** SevenRStrategy filters */
+export type SevenRStrategyEnumScalarFilters = {
+  eq?: InputMaybe<SevenRStrategy>;
+  in?: InputMaybe<Array<SevenRStrategy>>;
+};
+
+/** SevenRStrategy mutations */
+export type SevenRStrategyEnumScalarMutations = {
+  set?: InputMaybe<SevenRStrategy>;
+};
+
 /** An enum for sorting in either ascending or descending order. */
 export enum SortDirection {
   /** Sort by field values in ascending order. */
@@ -7349,6 +7381,25 @@ export type StringScalarFilters = {
 /** String mutations */
 export type StringScalarMutations = {
   set?: InputMaybe<Scalars['String']['input']>;
+};
+
+/** TIME-Kategorien für Applikationen zur strategischen Klassifizierung */
+export enum TimeCategory {
+  ELIMINATE = 'ELIMINATE',
+  INVEST = 'INVEST',
+  MIGRATE = 'MIGRATE',
+  TOLERATE = 'TOLERATE'
+}
+
+/** TimeCategory filters */
+export type TimeCategoryEnumScalarFilters = {
+  eq?: InputMaybe<TimeCategory>;
+  in?: InputMaybe<Array<TimeCategory>>;
+};
+
+/** TimeCategory mutations */
+export type TimeCategoryEnumScalarMutations = {
+  set?: InputMaybe<TimeCategory>;
 };
 
 export type UpdateApplicationInterfacesMutationResponse = {

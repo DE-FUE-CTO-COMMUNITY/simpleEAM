@@ -3,8 +3,13 @@
 import React from 'react'
 import GenericFilterDialog, { FilterField } from '../common/GenericFilterDialog'
 import { FilterProps } from './types'
-import { getCriticalityLabel, countActiveFilters } from './utils'
-import { CriticalityLevel } from '../../gql/generated'
+import {
+  getCriticalityLabel,
+  getTimeCategoryLabel,
+  getSevenRStrategyLabel,
+  countActiveFilters,
+} from './utils'
+import { CriticalityLevel, TimeCategory, SevenRStrategy } from '../../gql/generated'
 
 const ApplicationFilterDialogWithGeneric: React.FC<FilterProps> = ({
   filterState,
@@ -12,6 +17,8 @@ const ApplicationFilterDialogWithGeneric: React.FC<FilterProps> = ({
   availableCriticalities,
   availableTechStack,
   availableVendors,
+  availableTimeCategories,
+  availableSevenRStrategies,
   onFilterChange,
   onResetFilter,
   onClose,
@@ -91,6 +98,28 @@ const ApplicationFilterDialogWithGeneric: React.FC<FilterProps> = ({
       type: 'dateRange',
       fromLabel: 'Von',
       toLabel: 'Bis',
+    },
+    // TIME-Kategorie Filter
+    {
+      id: 'timeCategoryFilter',
+      label: 'TIME-Kategorie',
+      type: 'multiSelect',
+      options: availableTimeCategories.map(category => ({
+        value: category,
+        label: getTimeCategoryLabel(category),
+      })),
+      valueFormatter: value => getTimeCategoryLabel(value as TimeCategory),
+    },
+    // 7R-Strategie Filter
+    {
+      id: 'sevenRStrategyFilter',
+      label: '7R-Strategie',
+      type: 'multiSelect',
+      options: availableSevenRStrategies.map(strategy => ({
+        value: strategy,
+        label: getSevenRStrategyLabel(strategy),
+      })),
+      valueFormatter: value => getSevenRStrategyLabel(value as SevenRStrategy),
     },
   ]
 

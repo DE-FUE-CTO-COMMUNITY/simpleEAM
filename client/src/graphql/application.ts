@@ -28,6 +28,8 @@ export const GET_APPLICATIONS = gql`
       description
       status
       criticality
+      timeCategory
+      sevenRStrategy
       costs
       vendor
       version
@@ -74,6 +76,8 @@ export const GET_APPLICATION = gql`
       description
       status
       criticality
+      timeCategory
+      sevenRStrategy
       costs
       vendor
       version
@@ -121,6 +125,8 @@ export const CREATE_APPLICATION = gql`
         description
         status
         criticality
+        timeCategory
+        sevenRStrategy
         vendor
         version
         createdAt
@@ -138,6 +144,8 @@ export const UPDATE_APPLICATION = gql`
         description
         status
         criticality
+        timeCategory
+        sevenRStrategy
         vendor
         version
         updatedAt

@@ -438,6 +438,8 @@ async function createSampleData(session: Session) {
         costs: 125000.00,
         introductionDate: date("2020-06-15"),
         endOfLifeDate: date("2030-06-15"),
+        timeCategory: "TOLERATE",
+        sevenRStrategy: "RETAIN",
         createdAt: datetime(),
         updatedAt: datetime()
       }),
@@ -454,6 +456,8 @@ async function createSampleData(session: Session) {
         costs: 450000.00,
         introductionDate: date("2018-01-15"),
         endOfLifeDate: date("2035-12-31"),
+        timeCategory: "INVEST",
+        sevenRStrategy: "REPLATFORM",
         createdAt: datetime(),
         updatedAt: datetime()
       }),
@@ -469,6 +473,8 @@ async function createSampleData(session: Session) {
         vendor: "Microsoft",
         costs: 95000.00,
         introductionDate: date("2019-03-01"),
+        timeCategory: "TOLERATE",
+        sevenRStrategy: "RETAIN",
         createdAt: datetime(),
         updatedAt: datetime()
       }),
@@ -485,6 +491,8 @@ async function createSampleData(session: Session) {
         costs: 75000.00,
         introductionDate: date("2021-09-01"),
         endOfLifeDate: date("2031-09-01"),
+        timeCategory: "MIGRATE",
+        sevenRStrategy: "REHOST",
         createdAt: datetime(),
         updatedAt: datetime()
       }),
@@ -500,6 +508,8 @@ async function createSampleData(session: Session) {
         vendor: "Salesforce",
         costs: 65000.00,
         introductionDate: date("2022-02-15"),
+        timeCategory: "MIGRATE",
+        sevenRStrategy: "REFACTOR",
         createdAt: datetime(),
         updatedAt: datetime()
       }),
@@ -516,6 +526,8 @@ async function createSampleData(session: Session) {
         costs: 120000.00,
         introductionDate: date("2023-01-01"),
         endOfLifeDate: date("2033-01-01"),
+        timeCategory: "TOLERATE",
+        sevenRStrategy: "RETAIN",
         createdAt: datetime(),
         updatedAt: datetime()
       }),
@@ -531,6 +543,8 @@ async function createSampleData(session: Session) {
         vendor: "Atlassian",
         costs: 25000.00,
         introductionDate: date("2020-11-15"),
+        timeCategory: "ELIMINATE",
+        sevenRStrategy: "RETIRE",
         createdAt: datetime(),
         updatedAt: datetime()
       }),
@@ -546,6 +560,8 @@ async function createSampleData(session: Session) {
         vendor: "Atlassian",
         costs: 35000.00,
         introductionDate: date("2019-05-01"),
+        timeCategory: "MIGRATE",
+        sevenRStrategy: "REPLATFORM",
         createdAt: datetime(),
         updatedAt: datetime()
       }),
@@ -561,6 +577,8 @@ async function createSampleData(session: Session) {
         vendor: "Salesforce",
         costs: 45000.00,
         introductionDate: date("2021-06-01"),
+        timeCategory: "TOLERATE",
+        sevenRStrategy: "RETAIN",
         createdAt: datetime(),
         updatedAt: datetime()
       }),
@@ -576,6 +594,8 @@ async function createSampleData(session: Session) {
         vendor: "DocuSign",
         costs: 30000.00,
         introductionDate: date("2022-08-15"),
+        timeCategory: "INVEST",
+        sevenRStrategy: "REFACTOR",
         createdAt: datetime(),
         updatedAt: datetime()
       }),
@@ -592,6 +612,8 @@ async function createSampleData(session: Session) {
         costs: 180000.00,
         introductionDate: date("2021-03-01"),
         endOfLifeDate: date("2031-03-01"),
+        timeCategory: "INVEST",
+        sevenRStrategy: "REPLACE",
         createdAt: datetime(),
         updatedAt: datetime()
       }),
@@ -608,6 +630,8 @@ async function createSampleData(session: Session) {
         costs: 200000.00,
         introductionDate: date("2017-09-01"),
         endOfLifeDate: date("2032-04-30"),
+        timeCategory: "MIGRATE",
+        sevenRStrategy: "REFACTOR",
         createdAt: datetime(),
         updatedAt: datetime()
       })

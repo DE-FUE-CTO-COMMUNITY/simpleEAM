@@ -2,7 +2,7 @@
 
 import { format } from 'date-fns'
 import { FilterState } from './types'
-import { CriticalityLevel } from '../../gql/generated'
+import { CriticalityLevel, TimeCategory, SevenRStrategy } from '../../gql/generated'
 
 // Formatiert das Datum für die Anzeige
 export const formatDate = (dateString: string): string => {
@@ -57,6 +57,8 @@ export const countActiveFilters = (filterState: FilterState): number => {
     ownerFilter,
     updatedDateRange,
     vendorFilter,
+    timeCategoryFilter,
+    sevenRStrategyFilter,
   } = filterState
 
   return (
@@ -67,6 +69,46 @@ export const countActiveFilters = (filterState: FilterState): number => {
     (descriptionFilter ? 1 : 0) +
     (ownerFilter ? 1 : 0) +
     (updatedDateRange[0] || updatedDateRange[1] ? 1 : 0) +
-    (vendorFilter ? 1 : 0)
+    (vendorFilter ? 1 : 0) +
+    (timeCategoryFilter.length > 0 ? 1 : 0) +
+    (sevenRStrategyFilter.length > 0 ? 1 : 0)
   )
+}
+
+// Label-Funktionen für TIME-Kategorie
+export const getTimeCategoryLabel = (category: TimeCategory): string => {
+  switch (category) {
+    case TimeCategory.TOLERATE:
+      return 'Tolerate (Tolerieren)'
+    case TimeCategory.INVEST:
+      return 'Invest (Investieren)'
+    case TimeCategory.MIGRATE:
+      return 'Migrate (Migrieren)'
+    case TimeCategory.ELIMINATE:
+      return 'Eliminate (Eliminieren)'
+    default:
+      return category
+  }
+}
+
+// Label-Funktionen für 7R-Strategie
+export const getSevenRStrategyLabel = (strategy: SevenRStrategy): string => {
+  switch (strategy) {
+    case SevenRStrategy.RETIRE:
+      return 'Retire (Stilllegen)'
+    case SevenRStrategy.RETAIN:
+      return 'Retain (Beibehalten)'
+    case SevenRStrategy.REHOST:
+      return 'Rehost (Lift & Shift)'
+    case SevenRStrategy.REPLATFORM:
+      return 'Replatform (Lift & Reshape)'
+    case SevenRStrategy.REFACTOR:
+      return 'Refactor (Re-architect)'
+    case SevenRStrategy.REARCHITECT:
+      return 'Rearchitect (Rebuild)'
+    case SevenRStrategy.REPLACE:
+      return 'Replace (Buy new)'
+    default:
+      return strategy
+  }
 }

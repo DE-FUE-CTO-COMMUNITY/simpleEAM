@@ -84,6 +84,8 @@ type Application
   description: String
   status: ApplicationStatus!
   criticality: CriticalityLevel!
+  timeCategory: TimeCategory
+  sevenRStrategy: SevenRStrategy
   technologyStack: [String!]
   version: String
   hostingEnvironment: String
@@ -186,6 +188,29 @@ enum CriticalityLevel {
   MEDIUM
   HIGH
   CRITICAL
+}
+
+"""
+TIME-Kategorien für Applikationen zur strategischen Klassifizierung
+"""
+enum TimeCategory {
+  TOLERATE
+  INVEST
+  MIGRATE
+  ELIMINATE
+}
+
+"""
+7R-Strategien für Cloud-Migration und Applikationsportfolio-Management
+"""
+enum SevenRStrategy {
+  RETIRE
+  RETAIN
+  REHOST
+  REPLATFORM
+  REFACTOR
+  REARCHITECT
+  REPLACE
 }
 
 """

@@ -51,6 +51,50 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
         header: 'Kritikalität',
         cell: info => getCriticalityLabel(info.getValue() as CriticalityLevel),
       }),
+      columnHelper.accessor('timeCategory', {
+        header: 'TIME-Kategorie',
+        cell: info => {
+          const category = info.getValue()
+          if (!category) return '-'
+          switch (category) {
+            case 'TOLERATE':
+              return 'Tolerate'
+            case 'INVEST':
+              return 'Invest'
+            case 'MIGRATE':
+              return 'Migrate'
+            case 'ELIMINATE':
+              return 'Eliminate'
+            default:
+              return category
+          }
+        },
+      }),
+      columnHelper.accessor('sevenRStrategy', {
+        header: '7R-Strategie',
+        cell: info => {
+          const strategy = info.getValue()
+          if (!strategy) return '-'
+          switch (strategy) {
+            case 'RETIRE':
+              return 'Retire'
+            case 'RETAIN':
+              return 'Retain'
+            case 'REHOST':
+              return 'Rehost'
+            case 'REPLATFORM':
+              return 'Replatform'
+            case 'REFACTOR':
+              return 'Refactor'
+            case 'REARCHITECT':
+              return 'Rearchitect'
+            case 'REPLACE':
+              return 'Replace'
+            default:
+              return strategy
+          }
+        },
+      }),
       columnHelper.accessor('vendor', {
         header: 'Anbieter',
         cell: info => info.getValue() || '-',
@@ -122,6 +166,8 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
       sourceOfInterfaceIds: app.sourceOfInterfaces?.map(iface => iface.id) ?? [],
       targetOfInterfaceIds: app.targetOfInterfaces?.map(iface => iface.id) ?? [],
       supportsCapabilityIds: app.supportsCapabilities?.map(cap => cap.id) ?? [],
+      timeCategory: app.timeCategory ?? null,
+      sevenRStrategy: app.sevenRStrategy ?? null,
     }
   }
 
