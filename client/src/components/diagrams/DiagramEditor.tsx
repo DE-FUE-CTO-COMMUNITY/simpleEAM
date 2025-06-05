@@ -401,15 +401,15 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     })
   }
 
-  // UI Optionen für Excalidraw - Vollständige Anpassung des Menüs
+  // UI Optionen für Excalidraw - Anpassung basierend auf Benutzerrolle
   const uiOptions = {
     canvasActions: {
-      export: false as const, // Deaktiviere Export komplett
+      export: isViewer() ? (false as const) : { saveFileToDisk: true }, // Export nur für Viewer deaktivieren
       saveAsImage: true,
       loadScene: false, // Deaktiviere Standard-Load
       saveToActiveFile: false, // Deaktiviere Standard-Save
       toggleTheme: null, // Deaktiviere Theme-Toggle komplett
-      clearCanvas: true,
+      clearCanvas: !isViewer(), // Nur non-Viewer können Canvas löschen
       changeViewBackgroundColor: true,
     },
     tools: {

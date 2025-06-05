@@ -14,7 +14,7 @@ import {
   BusinessObjectIcon,
 } from '@/components/icons'
 import { usePathname } from 'next/navigation'
-import { useAuth, isAdmin } from '@/lib/auth'
+import { useAuth, isAdmin, isArchitect } from '@/lib/auth'
 
 import AppHeader from './AppHeader'
 import Sidebar, { drawerWidth } from './Sidebar'
@@ -71,8 +71,8 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
     { text: 'Datenobjekte', icon: <BusinessObjectIcon />, href: '/dataobjects' },
     { text: 'Schnittstellen', icon: <ApplicationInterfaceIcon />, href: '/interfaces' },
     { text: 'Personen', icon: <PersonIcon />, href: '/persons' },
-    // Import/Export nur für Admin-Benutzer
-    ...(isAdmin()
+    // Import/Export für Admin- und Architect-Benutzer
+    ...(isAdmin() || isArchitect()
       ? [
           { isDivider: true, text: 'divider', icon: null },
           { text: 'Import/Export', icon: <ExcelIcon />, onClick: handleExcelDialogOpen },
@@ -108,8 +108,10 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
         {children}
       </Main>
 
-      {/* Excel Import/Export Dialog - nur für Admin-Benutzer */}
-      {isAdmin() && <ExcelImportExport isOpen={excelDialogOpen} onClose={handleExcelDialogClose} />}
+      {/* Excel Import/Export Dialog - für Admin- und Architect-Benutzer */}
+      {(isAdmin() || isArchitect()) && (
+        <ExcelImportExport isOpen={excelDialogOpen} onClose={handleExcelDialogClose} />
+      )}
     </Box>
   )
 }
