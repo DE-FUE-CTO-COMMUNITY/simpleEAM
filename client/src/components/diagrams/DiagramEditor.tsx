@@ -237,6 +237,8 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
 
     // Load persisted scene from localStorage
     const persistedScene = localStorage.getItem('excalidraw-scene')
+    const persistedDiagram = localStorage.getItem('excalidraw-current-diagram')
+    
     if (persistedScene) {
       try {
         const sceneData = JSON.parse(persistedScene)
@@ -245,10 +247,22 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
         // Fehler beim Laden der gespeicherten Szene
       }
     }
+
+    if (persistedDiagram) {
+      try {
+        const diagramData = JSON.parse(persistedDiagram)
+        setCurrentDiagram(diagramData)
+      } catch {
+        // Fehler beim Laden des gespeicherten Diagramms
+        localStorage.removeItem('excalidraw-current-diagram')
+      }
+    }
   }, [])
 
   const handleSaveDiagram = useCallback((savedDiagram: any) => {
     setCurrentDiagram(savedDiagram)
+    // Persist current diagram to localStorage
+    localStorage.setItem('excalidraw-current-diagram', JSON.stringify(savedDiagram))
     setNotification({
       open: true,
       message: `Diagramm "${savedDiagram.title}" erfolgreich gespeichert!`,
@@ -273,6 +287,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
           setCurrentScene(sceneData)
           // Persist to localStorage
           localStorage.setItem('excalidraw-scene', JSON.stringify(sceneData))
+          localStorage.setItem('excalidraw-current-diagram', JSON.stringify(diagram))
           setNotification({
             open: true,
             message: `Diagramm "${diagram.title}" erfolgreich geladen!`,
@@ -304,6 +319,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
       setCurrentScene(emptyScene)
       // Clear localStorage
       localStorage.removeItem('excalidraw-scene')
+      localStorage.removeItem('excalidraw-current-diagram')
       setNotification({
         open: true,
         message: 'Neues Diagramm erstellt',
@@ -327,6 +343,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     setCurrentScene(emptyScene)
     // Clear localStorage
     localStorage.removeItem('excalidraw-scene')
+    localStorage.removeItem('excalidraw-current-diagram')
     setNotification({
       open: true,
       message: 'Diagramm erfolgreich gelöscht',
@@ -452,6 +469,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
           setCurrentDiagram(null)
           // Persist to localStorage
           localStorage.setItem('excalidraw-scene', JSON.stringify(sceneData))
+          localStorage.removeItem('excalidraw-current-diagram')
         }
 
         setNotification({
@@ -515,6 +533,8 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
 
   const handleSaveAsDiagram = useCallback((savedDiagram: any) => {
     setCurrentDiagram(savedDiagram)
+    // Persist current diagram to localStorage
+    localStorage.setItem('excalidraw-current-diagram', JSON.stringify(savedDiagram))
     setNotification({
       open: true,
       message: `Diagramm "${savedDiagram.title}" erfolgreich als Kopie gespeichert!`,
