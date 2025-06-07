@@ -37,7 +37,7 @@ export const initKeycloak = () => {
   // Initialisiere Keycloak und speichere die Promise
   keycloakInitPromise = keycloak
     .init({
-      onLoad: 'check-sso', // Zurück zu 'check-sso' für bessere UX
+      onLoad: 'login-required', // Zurück zu 'login-required' für automatische Weiterleitung
       silentCheckSsoRedirectUri: window.location.origin + '/silent-check-sso.html',
       pkceMethod: 'S256',
       redirectUri: window.location.origin,
