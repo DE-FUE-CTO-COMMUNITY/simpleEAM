@@ -266,10 +266,10 @@ const ArchitecturesPage = () => {
       try {
         timestamp = new Date(architectureData.timestamp)
       } catch {
-        timestamp = new Date()
+        timestamp = new Date(Date.now()) // Use explicit timestamp for consistency
       }
     } else {
-      timestamp = new Date()
+      timestamp = new Date(Date.now()) // Use explicit timestamp for consistency
     }
 
     // Basis-Input-Daten vorbereiten

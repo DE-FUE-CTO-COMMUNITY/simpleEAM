@@ -191,8 +191,13 @@ function createLibraryItemFromDatabaseElement(dbElement: any, elementType: strin
     return null
   }
 
-  // Generate unique IDs for the elements
-  const generateId = () => Math.random().toString(36).substr(2, 9)
+  // Generate unique IDs for the elements - only client-side to avoid hydration issues
+  const generateId = () => {
+    if (typeof window !== 'undefined') {
+      return Math.random().toString(36).substr(2, 9) + Date.now().toString(36).substr(-4)
+    }
+    return 'temp-' + Date.now().toString(36).substr(-6)
+  }
 
   // Create a mapping from old IDs to new IDs to maintain relationships
   const idMapping = new Map<string, string>()
@@ -260,7 +265,7 @@ function createLibraryItemFromDatabaseElement(dbElement: any, elementType: strin
     status: 'published' as const,
     elements,
     id: `db-${elementType}-${dbElement.id}`,
-    created: Date.now(),
+    created: typeof window !== 'undefined' ? Date.now() : 0, // Avoid hydration mismatch
     name: dbElement.name, // This should show in the library
   }
 

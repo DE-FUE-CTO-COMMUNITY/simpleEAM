@@ -87,7 +87,7 @@ const TableSettingsManager: React.FC<TableSettingsManagerProps> = ({ isOpen, onC
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
-    link.download = `simple-eam-table-settings-${new Date().toISOString().split('T')[0]}.json`
+    link.download = `simple-eam-table-settings-${new Date(Date.now()).toISOString().split('T')[0]}.json`
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
@@ -113,7 +113,8 @@ const TableSettingsManager: React.FC<TableSettingsManagerProps> = ({ isOpen, onC
       } else {
         setImportError('Import fehlgeschlagen')
       }
-    } catch (error) {
+    } catch (importError) {
+      console.warn('JSON Import Fehler:', importError)
       setImportError('Ungültiges JSON-Format')
     }
   }

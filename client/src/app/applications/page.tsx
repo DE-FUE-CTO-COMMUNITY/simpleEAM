@@ -556,7 +556,7 @@ const ApplicationsPage = () => {
               introductionDate: null,
               endOfLifeDate: null,
               owners: [],
-              createdAt: new Date().toISOString(),
+              createdAt: new Date(0).toISOString(), // Fixed timestamp to avoid hydration mismatch
               updatedAt: null,
               supportsCapabilities: [],
               usesDataObjects: [],

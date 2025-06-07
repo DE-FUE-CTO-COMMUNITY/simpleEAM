@@ -246,30 +246,32 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
   }
 
   useEffect(() => {
-    // Nur Client-seitig rendern
-    setIsClient(true)
+    // Nur Client-seitig rendern und localStorage zugreifen
+    if (typeof window !== 'undefined') {
+      setIsClient(true)
 
-    // Load persisted scene from localStorage
-    const persistedScene = localStorage.getItem('excalidraw-scene')
-    const persistedDiagram = localStorage.getItem('excalidraw-current-diagram')
-    
-    if (persistedScene) {
-      try {
-        const sceneData = JSON.parse(persistedScene)
-        const restoredScene = restoreSceneData(sceneData)
-        setCurrentScene(restoredScene)
-      } catch {
-        // Fehler beim Laden der gespeicherten Szene
+      // Load persisted scene from localStorage
+      const persistedScene = localStorage.getItem('excalidraw-scene')
+      const persistedDiagram = localStorage.getItem('excalidraw-current-diagram')
+      
+      if (persistedScene) {
+        try {
+          const sceneData = JSON.parse(persistedScene)
+          const restoredScene = restoreSceneData(sceneData)
+          setCurrentScene(restoredScene)
+        } catch {
+          // Fehler beim Laden der gespeicherten Szene
+        }
       }
-    }
 
-    if (persistedDiagram) {
-      try {
-        const diagramData = JSON.parse(persistedDiagram)
-        setCurrentDiagram(diagramData)
-      } catch {
-        // Fehler beim Laden des gespeicherten Diagramms
-        localStorage.removeItem('excalidraw-current-diagram')
+      if (persistedDiagram) {
+        try {
+          const diagramData = JSON.parse(persistedDiagram)
+          setCurrentDiagram(diagramData)
+        } catch {
+          // Fehler beim Laden des gespeicherten Diagramms
+          localStorage.removeItem('excalidraw-current-diagram')
+        }
       }
     }
   }, [])
@@ -424,7 +426,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
         const url = URL.createObjectURL(dataBlob)
 
         // Generate filename with diagram name if available
-        const timestamp = new Date().toISOString().split('T')[0]
+        const timestamp = new Date(Date.now()).toISOString().split('T')[0] // Use explicit timestamp for consistency
         let filename = `diagram-export-${timestamp}.json`
         
         if (currentDiagram && currentDiagram.title) {

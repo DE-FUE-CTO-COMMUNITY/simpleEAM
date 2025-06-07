@@ -4,7 +4,13 @@ import { ElementType, LibraryElement, ELEMENT_TYPE_CONFIG } from '@/graphql/libr
 
 // Generiere eindeutige IDs für Excalidraw-Elemente
 export const generateElementId = (): string => {
-  return Math.random().toString(36).substr(2, 16)
+  // Verwende eine Kombination aus Timestamp und Random für bessere Eindeutigkeit
+  // Nur clientseitig ausführen
+  if (typeof window !== 'undefined') {
+    return Math.random().toString(36).substr(2, 16) + Date.now().toString(36)
+  }
+  // Fallback für SSR - wird clientseitig ersetzt
+  return 'temp-id-' + Date.now().toString(36)
 }
 
 // Erstelle ein Excalidraw-Element aus einem Datenbank-Element
@@ -57,7 +63,7 @@ export const createExcalidrawElementFromLibraryItem = (
         id: textId,
       },
     ],
-    updated: Date.now(),
+    updated: typeof window !== 'undefined' ? Date.now() : 0, // Avoid hydration mismatch
     link: null,
     locked: false,
     // Speichere Datenbank-Informationen in customData
@@ -96,7 +102,7 @@ export const createExcalidrawElementFromLibraryItem = (
     versionNonce: Math.floor(Math.random() * 1000000000),
     isDeleted: false,
     boundElements: [],
-    updated: Date.now(),
+    updated: typeof window !== 'undefined' ? Date.now() : 0, // Avoid hydration mismatch
     link: null,
     locked: false,
     text: displayText,
@@ -150,7 +156,7 @@ const createIconElement = (
     versionNonce: Math.floor(Math.random() * 1000000000),
     isDeleted: false,
     boundElements: [],
-    updated: Date.now(),
+    updated: typeof window !== 'undefined' ? Date.now() : 0, // Avoid hydration mismatch
     link: null,
     locked: false,
   }
@@ -316,6 +322,6 @@ export const updateExcalidrawElementFromLibraryItem = (
       text: displayText,
       originalText: displayText,
     }),
-    updated: Date.now(),
+    updated: typeof window !== 'undefined' ? Date.now() : 0, // Avoid hydration mismatch
   }
 }

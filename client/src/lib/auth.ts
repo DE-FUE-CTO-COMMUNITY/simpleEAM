@@ -38,7 +38,9 @@ export const initKeycloak = () => {
   keycloakInitPromise = keycloak
     .init({
       onLoad: 'login-required', // Zurück zu 'login-required' für automatische Weiterleitung
-      silentCheckSsoRedirectUri: window.location.origin + '/silent-check-sso.html',
+      silentCheckSsoRedirectUri: typeof window !== 'undefined' 
+        ? window.location.origin + '/silent-check-sso.html'
+        : '/silent-check-sso.html',
       pkceMethod: 'S256',
       // redirectUri entfernt - Keycloak verwendet dann automatisch die aktuelle URL
       checkLoginIframe: true, // Silent token refresh aktivieren

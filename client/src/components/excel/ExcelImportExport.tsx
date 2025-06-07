@@ -469,7 +469,7 @@ const importEntityDataWithMapping = async (
         // Ensure timestamp is provided or use current timestamp
         const timestamp = row.timestamp
           ? new Date(row.timestamp).toISOString()
-          : new Date().toISOString()
+          : new Date(Date.now()).toISOString() // Use explicit timestamp for consistency
 
         input = {
           name: row.name || '',

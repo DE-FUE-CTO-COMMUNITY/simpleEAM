@@ -28,8 +28,8 @@ export const architectureSchema = z.object({
     .date({
       required_error: 'Architekturdatum ist erforderlich',
       invalid_type_error: 'Architekturdatum muss ein gültiges Datum sein',
-    })
-    .default(new Date()),
+    }),
+    // Default wird in defaultValues gesetzt, um Hydration-Probleme zu vermeiden
   domain: z.nativeEnum(ArchitectureDomain),
   type: z.nativeEnum(ArchitectureType),
   tags: z.array(z.string()).optional(),
@@ -89,7 +89,7 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
       description: '',
       domain: ArchitectureDomain.ENTERPRISE,
       type: ArchitectureType.CURRENT_STATE,
-      timestamp: new Date(),
+      timestamp: new Date(), // Wird clientseitig durch useEffect aktualisiert
       tags: [],
       ownerId: '',
       containsApplicationIds: [],
@@ -211,6 +211,13 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
     },
   })
 
+  // Clientseitige Initialisierung des Timestamps um Hydration-Probleme zu vermeiden
+  React.useEffect(() => {
+    if (!architecture && mode === 'create') {
+      form.setFieldValue('timestamp', new Date())
+    }
+  }, [form, architecture, mode])
+
   // Alle Werte werden direkt im useEffect-Hook extrahiert
 
   useEffect(() => {
@@ -242,8 +249,9 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
         }
 
         form.reset(resetValues)
-      } catch (_) {
+      } catch (error) {
         // Bei Fehler auf Standardwerte zurückfallen
+        console.warn('Fehler beim Zurücksetzen des Formulars:', error)
         form.reset(defaultValues)
       }
     } else {

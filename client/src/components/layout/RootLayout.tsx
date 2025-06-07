@@ -71,8 +71,8 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
     { text: 'Datenobjekte', icon: <BusinessObjectIcon />, href: '/dataobjects' },
     { text: 'Schnittstellen', icon: <ApplicationInterfaceIcon />, href: '/interfaces' },
     { text: 'Personen', icon: <PersonIcon />, href: '/persons' },
-    // Import/Export für Admin- und Architect-Benutzer
-    ...(isAdmin() || isArchitect()
+    // Import/Export für Admin- und Architect-Benutzer (Hydration-Fix: nur wenn initialisiert)
+    ...(initialized && (isAdmin() || isArchitect())
       ? [
           { isDivider: true, text: 'divider', icon: null },
           { text: 'Import/Export', icon: <ExcelIcon />, onClick: handleExcelDialogOpen },
@@ -109,7 +109,8 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
       </Main>
 
       {/* Excel Import/Export Dialog - für Admin- und Architect-Benutzer */}
-      {(isAdmin() || isArchitect()) && (
+      {/* Hydration-Fix: Nur rendern wenn Auth initialisiert ist */}
+      {initialized && (isAdmin() || isArchitect()) && (
         <ExcelImportExport isOpen={excelDialogOpen} onClose={handleExcelDialogClose} />
       )}
     </Box>
