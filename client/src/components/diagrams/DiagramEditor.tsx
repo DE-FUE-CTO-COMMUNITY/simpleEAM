@@ -26,6 +26,9 @@ const ExcalidrawWrapper = dynamic(
       onSaveAsDialog: () => void
       onNewDiagram: () => void
       onDeleteDialog: () => void
+      onExportJSON: () => void
+      onImportJSON: () => void
+      onExportPNG: () => void
       excalidrawAPI: (api: any) => void
       uiOptions: any
       initialData: any
@@ -39,6 +42,9 @@ const ExcalidrawWrapper = dynamic(
       onSaveAsDialog,
       onNewDiagram,
       onDeleteDialog,
+      onExportJSON,
+      onImportJSON,
+      onExportPNG,
       excalidrawAPI,
       uiOptions,
       initialData,
@@ -132,6 +138,50 @@ const ExcalidrawWrapper = dynamic(
                   shortcut="Del"
                 >
                   Löschen
+                </MainMenuTyped.Item>
+              )}
+
+              {/* Separator */}
+              <MainMenuTyped.Item onSelect={() => {}} className="hr" />
+
+              {/* Export JSON Menu Item */}
+              <MainMenuTyped.Item
+                onSelect={onExportJSON}
+                icon={
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z M8,12V14H16V12H8Z" />
+                  </svg>
+                }
+                shortcut="Ctrl+E"
+              >
+                JSON exportieren
+              </MainMenuTyped.Item>
+
+              {/* Export PNG Menu Item */}
+              <MainMenuTyped.Item
+                onSelect={onExportPNG}
+                icon={
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z M12,16L16,12H13.5V9H10.5V12H8L12,16Z" />
+                  </svg>
+                }
+                shortcut="Ctrl+P"
+              >
+                PNG exportieren
+              </MainMenuTyped.Item>
+
+              {/* Import JSON Menu Item - only for non-viewer users */}
+              {!viewModeEnabled && (
+                <MainMenuTyped.Item
+                  onSelect={onImportJSON}
+                  icon={
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z M8,12V14H16V12H8Z M10,10V16H14V10H10Z" />
+                    </svg>
+                  }
+                  shortcut="Ctrl+I"
+                >
+                  JSON importieren
                 </MainMenuTyped.Item>
               )}
             </MainMenuTyped>
@@ -284,6 +334,185 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     })
   }, [excalidrawAPI])
 
+  // JSON Export Handler
+  const handleExportJSON = useCallback(() => {
+    if (excalidrawAPI) {
+      try {
+        const elements = excalidrawAPI.getSceneElements()
+        const appState = excalidrawAPI.getAppState()
+
+        const exportData = {
+          type: 'excalidraw',
+          version: 2,
+          source: 'simple-eam',
+          elements: elements,
+          appState: {
+            // Only include essential and serializable app state properties
+            viewBackgroundColor: appState.viewBackgroundColor || '#ffffff',
+            currentItemFontFamily: appState.currentItemFontFamily,
+            currentItemFontSize: appState.currentItemFontSize,
+            currentItemTextAlign: appState.currentItemTextAlign,
+            currentItemStrokeColor: appState.currentItemStrokeColor,
+            currentItemBackgroundColor: appState.currentItemBackgroundColor,
+            currentItemFillStyle: appState.currentItemFillStyle,
+            currentItemStrokeWidth: appState.currentItemStrokeWidth,
+            currentItemStrokeStyle: appState.currentItemStrokeStyle,
+            currentItemRoughness: appState.currentItemRoughness,
+            currentItemOpacity: appState.currentItemOpacity,
+            gridSize: appState.gridSize,
+            showGrid: appState.showGrid,
+            zenModeEnabled: appState.zenModeEnabled,
+            theme: appState.theme,
+            // Exclude problematic properties
+            // collaborators, selectedElementIds, etc. are intentionally omitted
+          },
+        }
+
+        const dataStr = JSON.stringify(exportData, null, 2)
+        const dataBlob = new Blob([dataStr], { type: 'application/json' })
+        const url = URL.createObjectURL(dataBlob)
+
+        const link = document.createElement('a')
+        link.href = url
+        link.download = `diagram-export-${new Date().toISOString().split('T')[0]}.json`
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        URL.revokeObjectURL(url)
+
+        setNotification({
+          open: true,
+          message: 'Diagramm erfolgreich als JSON exportiert',
+          severity: 'success',
+        })
+      } catch (error) {
+        console.error('JSON Export Error:', error)
+        setNotification({
+          open: true,
+          message: 'Fehler beim JSON-Export',
+          severity: 'error',
+        })
+      }
+    }
+  }, [excalidrawAPI])
+
+  // JSON Import Handler
+  const handleImportJSON = useCallback(() => {
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = '.json'
+
+    input.onchange = async (event: any) => {
+      const file = event.target.files?.[0]
+      if (!file) return
+
+      try {
+        const text = await file.text()
+        const data = JSON.parse(text)
+
+        // Validate the JSON structure
+        if (!data.elements || !Array.isArray(data.elements)) {
+          throw new Error('Ungültiges Diagramm-Format: Elemente fehlen oder sind kein Array')
+        }
+
+        // Ensure each element has required properties
+        const validElements = data.elements.filter(
+          (el: any) => el && typeof el === 'object' && el.type && el.id
+        )
+
+        if (validElements.length !== data.elements.length) {
+          console.warn('Einige Elemente wurden gefiltert aufgrund ungültiger Struktur')
+        }
+
+        const sceneData = {
+          elements: validElements,
+          appState: {
+            viewBackgroundColor: data.appState?.viewBackgroundColor || '#ffffff',
+            // Only include safe, basic app state properties
+            currentItemFontFamily: data.appState?.currentItemFontFamily,
+            currentItemFontSize: data.appState?.currentItemFontSize,
+            gridSize: data.appState?.gridSize,
+            showGrid: data.appState?.showGrid,
+            theme: data.appState?.theme || 'light',
+            // Ensure all problematic properties are reset to safe defaults
+            collaborators: new Map(),
+            isLoading: false,
+            errorMessage: null,
+            selectedElementIds: {},
+            hoveredElementIds: {},
+            selectedGroupIds: {},
+            activeTool: { type: 'selection' },
+          },
+        }
+
+        if (excalidrawAPI) {
+          excalidrawAPI.updateScene(sceneData)
+          setCurrentScene(sceneData)
+          // Clear current diagram as this is imported data
+          setCurrentDiagram(null)
+          // Persist to localStorage
+          localStorage.setItem('excalidraw-scene', JSON.stringify(sceneData))
+        }
+
+        setNotification({
+          open: true,
+          message: 'Diagramm erfolgreich aus JSON importiert',
+          severity: 'success',
+        })
+      } catch (error) {
+        setNotification({
+          open: true,
+          message: `Fehler beim JSON-Import: ${error instanceof Error ? error.message : 'Unbekannter Fehler'}`,
+          severity: 'error',
+        })
+      }
+    }
+
+    input.click()
+  }, [excalidrawAPI])
+
+  // PNG Export Handler
+  const handleExportPNG = useCallback(async () => {
+    if (excalidrawAPI) {
+      try {
+        const { exportToBlob } = await import('@excalidraw/excalidraw')
+        const elements = excalidrawAPI.getSceneElements()
+        const appState = excalidrawAPI.getAppState()
+
+        const blob = await exportToBlob({
+          elements,
+          appState,
+          files: excalidrawAPI.getFiles(),
+          mimeType: 'image/png',
+          quality: 1.0,
+          exportBackground: true,
+          exportPadding: 10,
+        })
+
+        const url = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = `diagram-export-${new Date().toISOString().split('T')[0]}.png`
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        URL.revokeObjectURL(url)
+
+        setNotification({
+          open: true,
+          message: 'Diagramm erfolgreich als PNG exportiert',
+          severity: 'success',
+        })
+      } catch {
+        setNotification({
+          open: true,
+          message: 'Fehler beim PNG-Export',
+          severity: 'error',
+        })
+      }
+    }
+  }, [excalidrawAPI])
+
   const handleSaveAsDiagram = useCallback((savedDiagram: any) => {
     setCurrentDiagram(savedDiagram)
     setNotification({
@@ -364,6 +593,21 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
               setSaveDialogOpen(true)
             }
             break
+          case 'e':
+            event.preventDefault()
+            // Ctrl+E - Export JSON
+            handleExportJSON()
+            break
+          case 'i':
+            event.preventDefault()
+            // Ctrl+I - Import JSON
+            handleImportJSON()
+            break
+          case 'p':
+            event.preventDefault()
+            // Ctrl+P - Export PNG
+            handleExportPNG()
+            break
         }
       } else if (event.key === 'Delete' && currentDiagram && !isViewer()) {
         event.preventDefault()
@@ -375,7 +619,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     return () => {
       document.removeEventListener('keydown', handleKeyboardShortcuts)
     }
-  }, [handleNewDiagram, currentDiagram])
+  }, [handleNewDiagram, currentDiagram, handleExportJSON, handleImportJSON, handleExportPNG])
 
   const handleLibraryUpdate = useCallback((library: any) => {
     const itemCount = Array.isArray(library) ? library.length : library.libraryItems?.length || 0
@@ -446,6 +690,9 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
           onSaveAsDialog={() => setSaveAsDialogOpen(true)}
           onNewDiagram={handleNewDiagram}
           onDeleteDialog={() => setDeleteDialogOpen(true)}
+          onExportJSON={handleExportJSON}
+          onImportJSON={handleImportJSON}
+          onExportPNG={handleExportPNG}
           excalidrawAPI={handleExcalidrawAPI}
           uiOptions={uiOptions}
           initialData={initialData}
