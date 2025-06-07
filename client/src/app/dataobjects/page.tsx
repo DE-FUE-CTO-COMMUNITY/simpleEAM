@@ -1,9 +1,9 @@
 'use client'
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import React, { useState, useCallback, useMemo } from 'react'
 import { Box, Typography, Card, Button, Paper } from '@mui/material'
 import { Add as AddIcon } from '@mui/icons-material'
-import { useAuth, login, isArchitect } from '@/lib/auth'
+import { useAuth, isArchitect } from '@/lib/auth'
 import { SortingState, VisibilityState } from '@tanstack/react-table'
 import { useQuery, useMutation } from '@apollo/client'
 import { useSnackbar } from 'notistack'
@@ -80,14 +80,7 @@ const DataObjectsPage = () => {
     },
   })
 
-  // Weiterleitung zum Login, falls nicht authentifiziert
-  useEffect(() => {
-    if (authenticated === false) {
-      login()
-    }
-  }, [authenticated])
-
-  // Echte Daten aus GraphQL oder Fallback auf leeres Array
+  // Echte Daten aus GraphQL oder Fallback auf leeres Array - Auth-Check erfolgt bereits in layout.tsx
   const dataObjects: DataObject[] = useMemo(() => {
     return data?.dataObjects || []
   }, [data])

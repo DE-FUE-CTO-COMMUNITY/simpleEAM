@@ -2,19 +2,11 @@
 
 import React from 'react'
 import { Box, Paper, Typography } from '@mui/material'
-import { useAuth, login } from '@/lib/auth'
+import { useAuth } from '@/lib/auth'
 import UserProfileDialog from '@/components/profile/UserProfileDialog'
-import { useEffect } from 'react'
 
 function ProfilePage() {
   const { authenticated } = useAuth()
-
-  // Weiterleitung zum Login, falls nicht authentifiziert
-  useEffect(() => {
-    if (authenticated === false) {
-      login()
-    }
-  }, [authenticated])
 
   if (!authenticated) {
     return (

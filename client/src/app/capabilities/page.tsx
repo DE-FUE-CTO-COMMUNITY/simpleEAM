@@ -5,7 +5,7 @@ import { Box, Typography, Button, Card, Paper } from '@mui/material'
 import { Add as AddIcon } from '@mui/icons-material'
 import { useQuery, useMutation } from '@apollo/client'
 import { useSnackbar } from 'notistack'
-import { useAuth, login, isArchitect } from '@/lib/auth'
+import { useAuth, isArchitect } from '@/lib/auth'
 import { SortingState, VisibilityState } from '@tanstack/react-table'
 import {
   GET_CAPABILITIES,
@@ -51,14 +51,7 @@ const CapabilitiesPage = () => {
   // State für das neue Capability-Formular
   const [showNewCapabilityForm, setShowNewCapabilityForm] = useState(false)
 
-  // Weiterleitung zum Login, falls nicht authentifiziert
-  useEffect(() => {
-    if (authenticated === false) {
-      login()
-    }
-  }, [authenticated])
-
-  // Business Capabilities laden
+  // Business Capabilities laden - Auth-Check erfolgt bereits in layout.tsx
   const { loading, error, data, refetch } = useQuery(GET_CAPABILITIES, {
     skip: !authenticated,
     fetchPolicy: 'cache-and-network',

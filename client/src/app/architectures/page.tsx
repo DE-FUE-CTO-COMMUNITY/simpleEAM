@@ -5,7 +5,7 @@ import { Box, Typography, Button, Card } from '@mui/material'
 import { Add as AddIcon } from '@mui/icons-material'
 import { useQuery, useMutation } from '@apollo/client'
 import { useSnackbar } from 'notistack'
-import { useAuth, login, isArchitect } from '@/lib/auth'
+import { useAuth, isArchitect } from '@/lib/auth'
 import { SortingState, VisibilityState } from '@tanstack/react-table'
 import {
   GET_ARCHITECTURES,
@@ -53,14 +53,7 @@ const ArchitecturesPage = () => {
   // State für das neue Architecture-Formular
   const [showNewArchitectureForm, setShowNewArchitectureForm] = useState(false)
 
-  // Weiterleitung zum Login, falls nicht authentifiziert
-  useEffect(() => {
-    if (authenticated === false) {
-      login()
-    }
-  }, [authenticated])
-
-  // Architekturen laden
+  // Architekturen laden - Auth-Check erfolgt bereits in layout.tsx
   const { loading, error, data, refetch } = useQuery(GET_ARCHITECTURES, {
     skip: !authenticated,
     fetchPolicy: 'cache-and-network',

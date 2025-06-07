@@ -5,7 +5,7 @@ import { Box, Typography, Button, Card, Paper } from '@mui/material'
 import { Add as AddIcon } from '@mui/icons-material'
 import { useQuery, useMutation } from '@apollo/client'
 import { useSnackbar } from 'notistack'
-import { useAuth, login, isArchitect } from '@/lib/auth'
+import { useAuth, isArchitect } from '@/lib/auth'
 import { VisibilityState } from '@tanstack/react-table'
 import { GET_PERSONS, CREATE_PERSON, UPDATE_PERSON, DELETE_PERSON } from '@/graphql/person'
 import PersonForm, { PersonFormValues } from '@/components/persons/PersonForm'
@@ -42,14 +42,7 @@ function PersonsPage() {
   // State für das neue Person-Formular
   const [showNewPersonForm, setShowNewPersonForm] = useState(false)
 
-  // Weiterleitung zum Login, falls nicht authentifiziert
-  useEffect(() => {
-    if (authenticated === false) {
-      login()
-    }
-  }, [authenticated])
-
-  // Personen laden
+  // Personen laden - Auth-Check erfolgt bereits in layout.tsx
   const { loading, error, data, refetch } = useQuery(GET_PERSONS, {
     skip: !authenticated,
     fetchPolicy: 'cache-and-network',

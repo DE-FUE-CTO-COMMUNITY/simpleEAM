@@ -5,7 +5,7 @@ import { Box, Typography, Button, Card, Paper } from '@mui/material'
 import { Add as AddIcon } from '@mui/icons-material'
 import { useQuery, useMutation } from '@apollo/client'
 import { useSnackbar } from 'notistack'
-import { useAuth, login, isArchitect } from '@/lib/auth'
+import { useAuth, isArchitect } from '@/lib/auth'
 import { VisibilityState } from '@tanstack/react-table'
 
 import {
@@ -91,14 +91,7 @@ const ApplicationsPage = () => {
   // State für das neue Application-Formular
   const [showNewApplicationForm, setShowNewApplicationForm] = useState(false)
 
-  // Weiterleitung zum Login, falls nicht authentifiziert
-  useEffect(() => {
-    if (authenticated === false) {
-      login()
-    }
-  }, [authenticated])
-
-  // Applikationen laden
+  // Applikationen laden - Auth-Check erfolgt bereits in layout.tsx
   const { loading, error, data, refetch } = useQuery(GET_APPLICATIONS, {
     skip: !authenticated,
     fetchPolicy: 'cache-and-network',
