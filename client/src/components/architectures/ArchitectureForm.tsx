@@ -89,7 +89,7 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
       description: '',
       domain: ArchitectureDomain.ENTERPRISE,
       type: ArchitectureType.CURRENT_STATE,
-      timestamp: new Date(), // Wird clientseitig durch useEffect aktualisiert
+      timestamp: new Date(1735689600000), // Fixed timestamp for SSR consistency
       tags: [],
       ownerId: '',
       containsApplicationIds: [],
@@ -106,7 +106,7 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
     defaultValues,
     onSubmit: async ({ value }) => {
       // Prüfen und validieren des Timestamps
-      let timestampValue = new Date()
+      let timestampValue = new Date(1735689600000) // Fixed timestamp for SSR consistency
 
       if (value.timestamp) {
         if (value.timestamp instanceof Date) {
@@ -165,7 +165,7 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
             description: values.description || '',
             domain: values.domain || ArchitectureDomain.ENTERPRISE,
             type: values.type || ArchitectureType.CURRENT_STATE,
-            timestamp: values.timestamp instanceof Date ? values.timestamp : new Date(),
+            timestamp: values.timestamp instanceof Date ? values.timestamp : new Date(1735689600000),
           }
 
           // Schema-Validierung durchführen
@@ -195,7 +195,7 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
             description: values.description || '',
             domain: values.domain || ArchitectureDomain.ENTERPRISE,
             type: values.type || ArchitectureType.CURRENT_STATE,
-            timestamp: values.timestamp instanceof Date ? values.timestamp : new Date(),
+            timestamp: values.timestamp instanceof Date ? values.timestamp : new Date(1735689600000),
           }
 
           // Schema-Validierung durchführen
@@ -227,7 +227,7 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
       // Aktualisiere das Formular bei Änderungen am Architecture-Objekt
       try {
         // Sicherstellen, dass wir ein gültiges Date-Objekt haben
-        const timestamp = architecture.timestamp ? new Date(architecture.timestamp) : new Date()
+        const timestamp = architecture.timestamp ? new Date(architecture.timestamp) : new Date(1735689600000)
 
         const resetValues = {
           name: architecture.name || '',

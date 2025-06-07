@@ -153,7 +153,7 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
       description: arch.description ?? '',
       domain: arch.domain,
       type: arch.type,
-      timestamp: arch.timestamp ? new Date(arch.timestamp) : new Date(Date.now()), // Use explicit timestamp for consistency
+      timestamp: arch.timestamp ? new Date(arch.timestamp) : new Date(1735689600000), // Fixed timestamp for SSR consistency
       tags: arch.tags ?? [],
       ownerId: arch.owners && arch.owners.length > 0 ? arch.owners[0].id : undefined,
       containsApplicationIds: arch.containsApplications?.map(app => app.id) ?? [],

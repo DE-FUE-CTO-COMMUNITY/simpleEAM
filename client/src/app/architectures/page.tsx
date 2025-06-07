@@ -6,7 +6,7 @@ import { Add as AddIcon } from '@mui/icons-material'
 import { useQuery, useMutation } from '@apollo/client'
 import { useSnackbar } from 'notistack'
 import { useAuth, isArchitect } from '@/lib/auth'
-import { SortingState, VisibilityState } from '@tanstack/react-table'
+import { VisibilityState } from '@tanstack/react-table'
 import {
   GET_ARCHITECTURES,
   CREATE_ARCHITECTURE,
@@ -266,10 +266,10 @@ const ArchitecturesPage = () => {
       try {
         timestamp = new Date(architectureData.timestamp)
       } catch {
-        timestamp = new Date(Date.now()) // Use explicit timestamp for consistency
+        timestamp = new Date(1735689600000) // Fixed timestamp for SSR consistency
       }
     } else {
-      timestamp = new Date(Date.now()) // Use explicit timestamp for consistency
+      timestamp = new Date(1735689600000) // Fixed timestamp for SSR consistency
     }
 
     // Basis-Input-Daten vorbereiten

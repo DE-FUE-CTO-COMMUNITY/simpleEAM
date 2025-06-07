@@ -87,7 +87,7 @@ const TableSettingsManager: React.FC<TableSettingsManagerProps> = ({ isOpen, onC
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
-    link.download = `simple-eam-table-settings-${new Date(Date.now()).toISOString().split('T')[0]}.json`
+    link.download = `simple-eam-table-settings-${new Date().toISOString().split('T')[0]}.json`
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
@@ -140,12 +140,14 @@ const TableSettingsManager: React.FC<TableSettingsManagerProps> = ({ isOpen, onC
     const storedKeys: string[] = []
 
     // Prüfe welche Tabellen gespeicherte Einstellungen haben
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i)
-      if (key && key.startsWith('simple-eam-column-visibility-')) {
-        const tableKey = key.replace('simple-eam-column-visibility-', '')
-        if (!storedKeys.includes(tableKey)) {
-          storedKeys.push(tableKey)
+    if (typeof window !== 'undefined') {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i)
+        if (key && key.startsWith('simple-eam-column-visibility-')) {
+          const tableKey = key.replace('simple-eam-column-visibility-', '')
+          if (!storedKeys.includes(tableKey)) {
+            storedKeys.push(tableKey)
+          }
         }
       }
     }

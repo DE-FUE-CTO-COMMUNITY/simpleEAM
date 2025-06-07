@@ -426,7 +426,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
         const url = URL.createObjectURL(dataBlob)
 
         // Generate filename with diagram name if available
-        const timestamp = new Date(Date.now()).toISOString().split('T')[0] // Use explicit timestamp for consistency
+        const timestamp = new Date(1735689600000).toISOString().split('T')[0] // Fixed timestamp for consistency
         let filename = `diagram-export-${timestamp}.json`
         
         if (currentDiagram && currentDiagram.title) {
