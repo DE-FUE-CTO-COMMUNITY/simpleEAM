@@ -231,6 +231,20 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     severity: 'info',
   })
 
+  // Helper function to restore Maps and fix serialization issues
+  const restoreSceneData = (sceneData: any) => {
+    if (sceneData && sceneData.appState) {
+      // Ensure collaborators is always a Map, not a plain object
+      sceneData.appState.collaborators = new Map()
+      // Fix other problematic properties that might cause issues
+      sceneData.appState.selectedElementIds = sceneData.appState.selectedElementIds || {}
+      sceneData.appState.hoveredElementIds = sceneData.appState.hoveredElementIds || {}
+      sceneData.appState.selectedGroupIds = sceneData.appState.selectedGroupIds || {}
+      sceneData.appState.activeTool = sceneData.appState.activeTool || { type: 'selection' }
+    }
+    return sceneData
+  }
+
   useEffect(() => {
     // Nur Client-seitig rendern
     setIsClient(true)
@@ -242,7 +256,8 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     if (persistedScene) {
       try {
         const sceneData = JSON.parse(persistedScene)
-        setCurrentScene(sceneData)
+        const restoredScene = restoreSceneData(sceneData)
+        setCurrentScene(restoredScene)
       } catch {
         // Fehler beim Laden der gespeicherten Szene
       }
@@ -280,13 +295,20 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
             appState: {
               ...diagramData.appState,
               viewBackgroundColor: '#ffffff',
+              // Ensure proper restoration of Maps and other properties
+              collaborators: new Map(),
+              selectedElementIds: {},
+              hoveredElementIds: {},
+              selectedGroupIds: {},
+              activeTool: { type: 'selection' },
             },
           }
-          excalidrawAPI.updateScene(sceneData)
+          const restoredScene = restoreSceneData(sceneData)
+          excalidrawAPI.updateScene(restoredScene)
           setCurrentDiagram(diagram)
-          setCurrentScene(sceneData)
+          setCurrentScene(restoredScene)
           // Persist to localStorage
-          localStorage.setItem('excalidraw-scene', JSON.stringify(sceneData))
+          localStorage.setItem('excalidraw-scene', JSON.stringify(restoredScene))
           localStorage.setItem('excalidraw-current-diagram', JSON.stringify(diagram))
           setNotification({
             open: true,
@@ -312,11 +334,17 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
         elements: [],
         appState: {
           viewBackgroundColor: '#ffffff',
+          collaborators: new Map(),
+          selectedElementIds: {},
+          hoveredElementIds: {},
+          selectedGroupIds: {},
+          activeTool: { type: 'selection' },
         },
       }
-      excalidrawAPI.updateScene(emptyScene)
+      const restoredScene = restoreSceneData(emptyScene)
+      excalidrawAPI.updateScene(restoredScene)
       setCurrentDiagram(null)
-      setCurrentScene(emptyScene)
+      setCurrentScene(restoredScene)
       // Clear localStorage
       localStorage.removeItem('excalidraw-scene')
       localStorage.removeItem('excalidraw-current-diagram')
@@ -335,12 +363,18 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
       elements: [],
       appState: {
         viewBackgroundColor: '#ffffff',
+        collaborators: new Map(),
+        selectedElementIds: {},
+        hoveredElementIds: {},
+        selectedGroupIds: {},
+        activeTool: { type: 'selection' },
       },
     }
+    const restoredScene = restoreSceneData(emptyScene)
     if (excalidrawAPI) {
-      excalidrawAPI.updateScene(emptyScene)
+      excalidrawAPI.updateScene(restoredScene)
     }
-    setCurrentScene(emptyScene)
+    setCurrentScene(restoredScene)
     // Clear localStorage
     localStorage.removeItem('excalidraw-scene')
     localStorage.removeItem('excalidraw-current-diagram')
@@ -389,9 +423,22 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
         const dataBlob = new Blob([dataStr], { type: 'application/json' })
         const url = URL.createObjectURL(dataBlob)
 
+        // Generate filename with diagram name if available
+        const timestamp = new Date().toISOString().split('T')[0]
+        let filename = `diagram-export-${timestamp}.json`
+        
+        if (currentDiagram && currentDiagram.title) {
+          // Sanitize the diagram name for use in filename
+          const sanitizedTitle = currentDiagram.title
+            .replace(/[^a-zA-Z0-9\-_\s]/g, '') // Remove special characters except spaces, hyphens, underscores
+            .replace(/\s+/g, '-') // Replace spaces with hyphens
+            .toLowerCase()
+          filename = `${sanitizedTitle}-${timestamp}.json`
+        }
+
         const link = document.createElement('a')
         link.href = url
-        link.download = `diagram-export-${new Date().toISOString().split('T')[0]}.json`
+        link.download = filename
         document.body.appendChild(link)
         link.click()
         document.body.removeChild(link)
@@ -411,7 +458,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
         })
       }
     }
-  }, [excalidrawAPI])
+  }, [excalidrawAPI, currentDiagram])
 
   // JSON Import Handler
   const handleImportJSON = useCallback(() => {
@@ -462,13 +509,15 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
           },
         }
 
+        const restoredScene = restoreSceneData(sceneData)
+
         if (excalidrawAPI) {
-          excalidrawAPI.updateScene(sceneData)
-          setCurrentScene(sceneData)
+          excalidrawAPI.updateScene(restoredScene)
+          setCurrentScene(restoredScene)
           // Clear current diagram as this is imported data
           setCurrentDiagram(null)
           // Persist to localStorage
-          localStorage.setItem('excalidraw-scene', JSON.stringify(sceneData))
+          localStorage.setItem('excalidraw-scene', JSON.stringify(restoredScene))
           localStorage.removeItem('excalidraw-current-diagram')
         }
 
@@ -508,9 +557,23 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
         })
 
         const url = URL.createObjectURL(blob)
+        
+        // Generate filename with diagram name if available
+        const timestamp = new Date().toISOString().split('T')[0]
+        let filename = `diagram-export-${timestamp}.png`
+        
+        if (currentDiagram && currentDiagram.title) {
+          // Sanitize the diagram name for use in filename
+          const sanitizedTitle = currentDiagram.title
+            .replace(/[^a-zA-Z0-9\-_\s]/g, '') // Remove special characters except spaces, hyphens, underscores
+            .replace(/\s+/g, '-') // Replace spaces with hyphens
+            .toLowerCase()
+          filename = `${sanitizedTitle}-${timestamp}.png`
+        }
+        
         const link = document.createElement('a')
         link.href = url
-        link.download = `diagram-export-${new Date().toISOString().split('T')[0]}.png`
+        link.download = filename
         document.body.appendChild(link)
         link.click()
         document.body.removeChild(link)
@@ -529,7 +592,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
         })
       }
     }
-  }, [excalidrawAPI])
+  }, [excalidrawAPI, currentDiagram])
 
   const handleSaveAsDiagram = useCallback((savedDiagram: any) => {
     setCurrentDiagram(savedDiagram)
@@ -558,10 +621,16 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
             viewBackgroundColor: appState.viewBackgroundColor,
             currentItemFontFamily: appState.currentItemFontFamily,
             // Only save essential app state properties
+            collaborators: new Map(), // Always ensure this is a proper Map
+            selectedElementIds: {},
+            hoveredElementIds: {},
+            selectedGroupIds: {},
+            activeTool: { type: 'selection' },
           },
         }
-        localStorage.setItem('excalidraw-scene', JSON.stringify(sceneData))
-        setCurrentScene(sceneData)
+        const restoredScene = restoreSceneData(sceneData)
+        localStorage.setItem('excalidraw-scene', JSON.stringify(restoredScene))
+        setCurrentScene(restoredScene)
       }
     }
 
@@ -582,7 +651,8 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     if (excalidrawAPI && currentScene && currentScene.elements) {
       // Only load if there are actually elements to load
       if (currentScene.elements.length > 0) {
-        excalidrawAPI.updateScene(currentScene)
+        const restoredScene = restoreSceneData(currentScene)
+        excalidrawAPI.updateScene(restoredScene)
       }
     }
   }, [excalidrawAPI, currentScene])
