@@ -12,7 +12,7 @@ import { AuthContext, initKeycloak, keycloak } from '@/lib/auth'
 import { setupSessionMonitoring } from '@/utils/sessionUtils'
 import { createApolloClient } from '@/lib/apollo-client'
 import theme from '@/theme/theme'
-import { CircularProgress } from '@mui/material'
+import { CircularProgress, Box } from '@mui/material'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import RootLayout from '@/components/layout/RootLayout'
@@ -49,6 +49,9 @@ export function useClientStyleRegistry() {
   })
 
   useServerInsertedHTML(() => {
+    // Nur auf dem Server ausführen
+    if (typeof window !== 'undefined') return null
+
     const names = new Set()
     const styles = Array.from(cache.sheet.tags)
       .map(tag => {
@@ -171,42 +174,51 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const renderContent = () => {
     const apolloClient = client || createApolloClient()
 
+    // Verwende eine einfachere, konsistente DOM-Struktur
     return (
-      <>
-        {/* Loading-Zustand: Konsistente Struktur für Server und Client */}
-        <div
-          style={{
-            display: 'none', // Initial IMMER verstecken für SSR, wird nur client-seitig aktualisiert
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '100vh',
-            width: '100vw',
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            zIndex: 9999,
-            background: 'white',
-          }}
-          id="loading-overlay"
-        >
-          <CircularProgress size={40} />
-        </div>
-
-        {/* Haupt-Content: Immer konsistente Struktur */}
-        <div
-          style={{
-            width: '100%',
-            height: '100%',
-          }}
-          id="main-content"
-        >
-          <AuthContext.Provider value={{ keycloak, initialized, authenticated }}>
-            <ApolloProvider client={apolloClient}>
+      <AuthContext.Provider value={{ keycloak, initialized, authenticated }}>
+        <ApolloProvider client={apolloClient}>
+          <Box
+            sx={{
+              width: '100%',
+              height: '100vh',
+              position: 'relative',
+            }}
+          >
+            {/* Loading-Zustand mit Material-UI Box für konsistente Styles */}
+            {!initialized && (
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  zIndex: 9999,
+                  bgcolor: 'background.default',
+                }}
+              >
+                <CircularProgress size={40} />
+              </Box>
+            )}
+            
+            {/* Haupt-Content */}
+            <Box
+              sx={{
+                width: '100%',
+                height: '100%',
+                opacity: initialized ? 1 : 0,
+                transition: 'opacity 0.3s ease-in-out',
+              }}
+            >
               <RootLayout>{children}</RootLayout>
-            </ApolloProvider>
-          </AuthContext.Provider>
-        </div>
-      </>
+            </Box>
+          </Box>
+        </ApolloProvider>
+      </AuthContext.Provider>
     )
   }
 

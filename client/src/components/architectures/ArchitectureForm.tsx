@@ -24,12 +24,11 @@ export const architectureSchema = z.object({
     .string()
     .min(10, 'Die Beschreibung muss mindestens 10 Zeichen lang sein')
     .max(1000, 'Die Beschreibung darf maximal 1000 Zeichen lang sein'),
-  timestamp: z
-    .date({
-      required_error: 'Architekturdatum ist erforderlich',
-      invalid_type_error: 'Architekturdatum muss ein gültiges Datum sein',
-    }),
-    // Default wird in defaultValues gesetzt, um Hydration-Probleme zu vermeiden
+  timestamp: z.date({
+    required_error: 'Architekturdatum ist erforderlich',
+    invalid_type_error: 'Architekturdatum muss ein gültiges Datum sein',
+  }),
+  // Default wird in defaultValues gesetzt, um Hydration-Probleme zu vermeiden
   domain: z.nativeEnum(ArchitectureDomain),
   type: z.nativeEnum(ArchitectureType),
   tags: z.array(z.string()).optional(),
@@ -165,7 +164,8 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
             description: values.description || '',
             domain: values.domain || ArchitectureDomain.ENTERPRISE,
             type: values.type || ArchitectureType.CURRENT_STATE,
-            timestamp: values.timestamp instanceof Date ? values.timestamp : new Date(1735689600000),
+            timestamp:
+              values.timestamp instanceof Date ? values.timestamp : new Date(1735689600000),
           }
 
           // Schema-Validierung durchführen
@@ -195,7 +195,8 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
             description: values.description || '',
             domain: values.domain || ArchitectureDomain.ENTERPRISE,
             type: values.type || ArchitectureType.CURRENT_STATE,
-            timestamp: values.timestamp instanceof Date ? values.timestamp : new Date(1735689600000),
+            timestamp:
+              values.timestamp instanceof Date ? values.timestamp : new Date(1735689600000),
           }
 
           // Schema-Validierung durchführen
@@ -227,7 +228,9 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
       // Aktualisiere das Formular bei Änderungen am Architecture-Objekt
       try {
         // Sicherstellen, dass wir ein gültiges Date-Objekt haben
-        const timestamp = architecture.timestamp ? new Date(architecture.timestamp) : new Date(1735689600000)
+        const timestamp = architecture.timestamp
+          ? new Date(architecture.timestamp)
+          : new Date(1735689600000)
 
         const resetValues = {
           name: architecture.name || '',

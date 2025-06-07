@@ -253,7 +253,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
       // Load persisted scene from localStorage
       const persistedScene = localStorage.getItem('excalidraw-scene')
       const persistedDiagram = localStorage.getItem('excalidraw-current-diagram')
-      
+
       if (persistedScene) {
         try {
           const sceneData = JSON.parse(persistedScene)
@@ -428,7 +428,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
         // Generate filename with diagram name if available
         const timestamp = new Date(1735689600000).toISOString().split('T')[0] // Fixed timestamp for consistency
         let filename = `diagram-export-${timestamp}.json`
-        
+
         if (currentDiagram && currentDiagram.title) {
           // Sanitize the diagram name for use in filename
           const sanitizedTitle = currentDiagram.title
@@ -559,11 +559,11 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
         })
 
         const url = URL.createObjectURL(blob)
-        
+
         // Generate filename with diagram name if available
         const timestamp = new Date().toISOString().split('T')[0]
         let filename = `diagram-export-${timestamp}.png`
-        
+
         if (currentDiagram && currentDiagram.title) {
           // Sanitize the diagram name for use in filename
           const sanitizedTitle = currentDiagram.title
@@ -572,7 +572,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
             .toLowerCase()
           filename = `${sanitizedTitle}-${timestamp}.png`
         }
-        
+
         const link = document.createElement('a')
         link.href = url
         link.download = filename

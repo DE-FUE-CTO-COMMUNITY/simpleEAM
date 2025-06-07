@@ -1,6 +1,6 @@
 // filepath: /home/mf2admin/simple-eam/client/src/components/layout/RootLayout.tsx
 import React, { useState } from 'react'
-import { Box, CssBaseline, Toolbar, styled } from '@mui/material'
+import { Box, Toolbar, styled } from '@mui/material'
 import {
   Dashboard as DashboardIcon,
   Person as PersonIcon,
@@ -86,7 +86,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-      <CssBaseline />
+      {/* CssBaseline wird bereits im layout.tsx verwendet */}
 
       <AppHeader
         open={open}
