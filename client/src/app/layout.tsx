@@ -9,6 +9,7 @@ import createCache from '@emotion/cache'
 import { ApolloProvider } from '@apollo/client'
 import { SnackbarProvider } from 'notistack'
 import { AuthContext, initKeycloak, keycloak } from '@/lib/auth'
+import { setupSessionMonitoring } from '@/utils/sessionUtils'
 import { createApolloClient } from '@/lib/apollo-client'
 import theme from '@/theme/theme'
 import { CircularProgress } from '@mui/material'
@@ -105,26 +106,27 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         const authenticated = await initKeycloak()
         setAuthenticated(authenticated)
 
+        // Session-Monitoring einrichten
+        setupSessionMonitoring()
+
         // Apollo-Client mit Token initialisieren, wenn keycloak und token vorhanden sind
         if (keycloak && keycloak.token) {
           const apolloClient = createApolloClient(keycloak.token)
           setClient(apolloClient)
+        }
 
-          // Token-Refresh-Handler
-          const kc = keycloak
-          kc.onTokenExpired = () => {
-            kc.updateToken(30)
-              .then(refreshed => {
-                if (refreshed && kc.token) {
-                  const newToken = kc.token
-                  const refreshedClient = createApolloClient(newToken)
-                  setClient(refreshedClient)
-                }
-              })
-              .catch(() => {
-                // Error bei Token-Refresh aufgetreten - aber nicht im Log ausgeben wegen ESLint
-              })
-          }
+        // Event-Listener für Token-Updates
+        const handleTokenRefreshed = (event: CustomEvent) => {
+          console.log('Token wurde aktualisiert, Apollo-Client wird neu erstellt...')
+          const newToken = event.detail.token
+          const refreshedClient = createApolloClient(newToken)
+          setClient(refreshedClient)
+        }
+
+        window.addEventListener('tokenRefreshed', handleTokenRefreshed as EventListener)
+
+        return () => {
+          window.removeEventListener('tokenRefreshed', handleTokenRefreshed as EventListener)
         }
       } catch {
         // Keycloak Initialisierungsfehler - aber nicht im Log ausgeben wegen ESLint
@@ -136,7 +138,18 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       }
     }
 
-    initAuth()
+    const cleanup = initAuth()
+
+    // Cleanup-Funktion zurückgeben
+    return () => {
+      if (cleanup instanceof Promise) {
+        cleanup.then(cleanupFn => {
+          if (typeof cleanupFn === 'function') {
+            cleanupFn()
+          }
+        })
+      }
+    }
   }, [mounted])
 
   // Client-Side Effekt nach dem Rendering

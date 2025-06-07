@@ -31,12 +31,26 @@ export function createApolloClient(token?: string) {
             locations
           )}, Path: ${path}`
         )
+
+        // Bei Authentifizierungsfehlern versuche Token-Refresh
+        if (message.includes('unauthenticated') || message.includes('Unauthorized')) {
+          console.log('Authentifizierungsfehler erkannt, versuche Token-Refresh...')
+          // Trigger token refresh via custom event
+          window.dispatchEvent(new CustomEvent('authError'))
+        }
       })
     }
     if (networkError) {
       console.error(`[Apollo Network Error]: ${networkError.message}`, networkError)
       if ('statusCode' in networkError) {
-        console.error(`Status Code: ${(networkError as any).statusCode}`)
+        const statusCode = (networkError as any).statusCode
+        console.error(`Status Code: ${statusCode}`)
+
+        // Bei 401/403 Fehlern Token-Refresh versuchen
+        if (statusCode === 401 || statusCode === 403) {
+          console.log('HTTP Authentifizierungsfehler erkannt, versuche Token-Refresh...')
+          window.dispatchEvent(new CustomEvent('authError'))
+        }
       }
       // Bei Netzwerkfehlern können wir es erneut versuchen
       return forward(operation)

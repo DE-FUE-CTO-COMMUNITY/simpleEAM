@@ -26,7 +26,7 @@ interface ArchitectureTableProps {
   onDeleteArchitecture?: (id: string) => Promise<void>
   availableArchitectures?: ArchitectureType[]
   onTableReady?: (table: any) => void
-  // Diese Props sind jetzt optional, da die Persistierung intern verwaltet wird  
+  // Diese Props sind jetzt optional, da die Persistierung intern verwaltet wird
   columnVisibility?: VisibilityState
   onColumnVisibilityChange?: (
     updater: VisibilityState | ((old: VisibilityState) => VisibilityState)
@@ -54,8 +54,8 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
     columnVisibility,
     onTableReady: persistentOnTableReady,
     onColumnVisibilityChange,
-  } = usePersistentColumnVisibility({ 
-    tableKey: 'architectures'
+  } = usePersistentColumnVisibility({
+    tableKey: 'architectures',
   })
 
   // Kombiniere externe und persistente onTableReady Callbacks

@@ -83,7 +83,7 @@ export interface TableSettings {
  * Lädt die gespeicherten Column Visibility-Einstellungen für eine Tabelle
  */
 export function loadColumnVisibility(
-  tableKey: string, 
+  tableKey: string,
   defaultVisibility?: VisibilityState
 ): VisibilityState {
   if (typeof window === 'undefined') {
@@ -93,11 +93,11 @@ export function loadColumnVisibility(
   try {
     const storageKey = `${STORAGE_KEYS.COLUMN_VISIBILITY}-${tableKey}`
     const saved = localStorage.getItem(storageKey)
-    
+
     if (saved) {
       const parsed = JSON.parse(saved) as VisibilityState
       const fallback = defaultVisibility || DEFAULT_COLUMN_VISIBILITY[tableKey] || {}
-      
+
       // Merge mit Default-Werten, falls neue Spalten hinzugefügt wurden
       return { ...fallback, ...parsed }
     }
@@ -111,10 +111,7 @@ export function loadColumnVisibility(
 /**
  * Speichert die Column Visibility-Einstellungen für eine Tabelle
  */
-export function saveColumnVisibility(
-  tableKey: string, 
-  columnVisibility: VisibilityState
-): void {
+export function saveColumnVisibility(tableKey: string, columnVisibility: VisibilityState): void {
   if (typeof window === 'undefined') return
 
   try {
@@ -134,7 +131,7 @@ export function loadTableSettings(tableKey: string): TableSettings | null {
   try {
     const storageKey = `${STORAGE_KEYS.TABLE_SETTINGS}-${tableKey}`
     const saved = localStorage.getItem(storageKey)
-    
+
     if (saved) {
       return JSON.parse(saved) as TableSettings
     }
@@ -148,10 +145,7 @@ export function loadTableSettings(tableKey: string): TableSettings | null {
 /**
  * Speichert alle Tabellen-Einstellungen
  */
-export function saveTableSettings(
-  tableKey: string, 
-  settings: TableSettings
-): void {
+export function saveTableSettings(tableKey: string, settings: TableSettings): void {
   if (typeof window === 'undefined') return
 
   try {
@@ -172,7 +166,7 @@ export function clearTableSettings(tableKey: string): void {
     // Lösche Column Visibility
     const columnVisibilityKey = `${STORAGE_KEYS.COLUMN_VISIBILITY}-${tableKey}`
     localStorage.removeItem(columnVisibilityKey)
-    
+
     // Lösche erweiterte Tabellen-Einstellungen
     const tableSettingsKey = `${STORAGE_KEYS.TABLE_SETTINGS}-${tableKey}`
     localStorage.removeItem(tableSettingsKey)
@@ -189,21 +183,22 @@ export function clearAllTableSettings(): void {
 
   try {
     const keysToRemove: string[] = []
-    
+
     // Finde alle relevanten Schlüssel
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i)
-      if (key && (
-        key.startsWith(STORAGE_KEYS.COLUMN_VISIBILITY) || 
-        key.startsWith(STORAGE_KEYS.TABLE_SETTINGS)
-      )) {
+      if (
+        key &&
+        (key.startsWith(STORAGE_KEYS.COLUMN_VISIBILITY) ||
+          key.startsWith(STORAGE_KEYS.TABLE_SETTINGS))
+      ) {
         keysToRemove.push(key)
       }
     }
-    
+
     // Lösche alle gefundenen Schlüssel
     keysToRemove.forEach(key => localStorage.removeItem(key))
-    
+
     console.log(`${keysToRemove.length} gespeicherte Tabellen-Einstellungen gelöscht`)
   } catch (error) {
     console.warn('Fehler beim Löschen aller Tabellen-Einstellungen:', error)
@@ -218,20 +213,21 @@ export function exportTableSettings(): string {
 
   try {
     const settings: Record<string, any> = {}
-    
+
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i)
-      if (key && (
-        key.startsWith(STORAGE_KEYS.COLUMN_VISIBILITY) || 
-        key.startsWith(STORAGE_KEYS.TABLE_SETTINGS)
-      )) {
+      if (
+        key &&
+        (key.startsWith(STORAGE_KEYS.COLUMN_VISIBILITY) ||
+          key.startsWith(STORAGE_KEYS.TABLE_SETTINGS))
+      ) {
         const value = localStorage.getItem(key)
         if (value) {
           settings[key] = JSON.parse(value)
         }
       }
     }
-    
+
     return JSON.stringify(settings, null, 2)
   } catch (error) {
     console.warn('Fehler beim Exportieren der Tabellen-Einstellungen:', error)
@@ -247,14 +243,16 @@ export function importTableSettings(jsonString: string): boolean {
 
   try {
     const settings = JSON.parse(jsonString)
-    
+
     Object.entries(settings).forEach(([key, value]) => {
-      if (key.startsWith(STORAGE_KEYS.COLUMN_VISIBILITY) || 
-          key.startsWith(STORAGE_KEYS.TABLE_SETTINGS)) {
+      if (
+        key.startsWith(STORAGE_KEYS.COLUMN_VISIBILITY) ||
+        key.startsWith(STORAGE_KEYS.TABLE_SETTINGS)
+      ) {
         localStorage.setItem(key, JSON.stringify(value))
       }
     })
-    
+
     return true
   } catch (error) {
     console.warn('Fehler beim Importieren der Tabellen-Einstellungen:', error)

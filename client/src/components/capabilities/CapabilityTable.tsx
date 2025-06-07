@@ -54,8 +54,8 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
     columnVisibility,
     onTableReady: persistentOnTableReady,
     onColumnVisibilityChange,
-  } = usePersistentColumnVisibility({ 
-    tableKey: 'capabilities'
+  } = usePersistentColumnVisibility({
+    tableKey: 'capabilities',
   })
 
   // Kombiniere externe und persistente onTableReady Callbacks

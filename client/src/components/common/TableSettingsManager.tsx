@@ -43,10 +43,7 @@ interface TableSettingsManagerProps {
   onClose: () => void
 }
 
-const TableSettingsManager: React.FC<TableSettingsManagerProps> = ({
-  isOpen,
-  onClose,
-}) => {
+const TableSettingsManager: React.FC<TableSettingsManagerProps> = ({ isOpen, onClose }) => {
   const [importJson, setImportJson] = useState('')
   const [importError, setImportError] = useState('')
   const [importSuccess, setImportSuccess] = useState(false)
@@ -61,7 +58,11 @@ const TableSettingsManager: React.FC<TableSettingsManagerProps> = ({
 
   // Einstellungen für eine spezifische Tabelle löschen
   const handleClearTableSettings = (tableKey: string) => {
-    if (confirm(`Möchten Sie wirklich alle gespeicherten Einstellungen für die ${tableKey}-Tabelle löschen?`)) {
+    if (
+      confirm(
+        `Möchten Sie wirklich alle gespeicherten Einstellungen für die ${tableKey}-Tabelle löschen?`
+      )
+    ) {
       clearTableSettings(tableKey)
       handleRefresh()
     }
@@ -69,7 +70,11 @@ const TableSettingsManager: React.FC<TableSettingsManagerProps> = ({
 
   // Alle Einstellungen löschen
   const handleClearAllSettings = () => {
-    if (confirm('Möchten Sie wirklich ALLE gespeicherten Tabellen-Einstellungen löschen? Diese Aktion kann nicht rückgängig gemacht werden.')) {
+    if (
+      confirm(
+        'Möchten Sie wirklich ALLE gespeicherten Tabellen-Einstellungen löschen? Diese Aktion kann nicht rückgängig gemacht werden.'
+      )
+    ) {
       clearAllTableSettings()
       handleRefresh()
     }
@@ -119,7 +124,7 @@ const TableSettingsManager: React.FC<TableSettingsManagerProps> = ({
     if (!file) return
 
     const reader = new FileReader()
-    reader.onload = (e) => {
+    reader.onload = e => {
       const content = e.target?.result as string
       setImportJson(content)
     }
@@ -164,7 +169,7 @@ const TableSettingsManager: React.FC<TableSettingsManagerProps> = ({
                   </Box>
                 }
                 secondary={
-                  hasStoredSettings 
+                  hasStoredSettings
                     ? 'Benutzerdefinierte Spalten-Einstellungen gespeichert'
                     : 'Verwendet Standard-Einstellungen'
                 }
@@ -189,10 +194,10 @@ const TableSettingsManager: React.FC<TableSettingsManagerProps> = ({
   }
 
   return (
-    <Dialog 
-      open={isOpen} 
-      onClose={onClose} 
-      maxWidth="md" 
+    <Dialog
+      open={isOpen}
+      onClose={onClose}
+      maxWidth="md"
       fullWidth
       PaperProps={{ sx: { minHeight: '60vh' } }}
     >
@@ -207,7 +212,8 @@ const TableSettingsManager: React.FC<TableSettingsManagerProps> = ({
         <Box sx={{ mb: 3 }}>
           <Alert severity="info" sx={{ mb: 2 }}>
             Hier können Sie Ihre gespeicherten Spalten-Einstellungen für alle Tabellen verwalten.
-            Diese Einstellungen werden automatisch beim nächsten Besuch der entsprechenden Seiten geladen.
+            Diese Einstellungen werden automatisch beim nächsten Besuch der entsprechenden Seiten
+            geladen.
           </Alert>
 
           {/* Gespeicherte Einstellungen */}
@@ -216,15 +222,9 @@ const TableSettingsManager: React.FC<TableSettingsManagerProps> = ({
               <Typography variant="h6">Gespeicherte Einstellungen</Typography>
             </AccordionSummary>
             <AccordionDetails>
-              <Box key={refreshKey}>
-                {renderStoredSettings()}
-              </Box>
+              <Box key={refreshKey}>{renderStoredSettings()}</Box>
               <Box sx={{ mt: 2, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                <Button
-                  variant="outlined"
-                  startIcon={<RefreshIcon />}
-                  onClick={handleRefresh}
-                >
+                <Button variant="outlined" startIcon={<RefreshIcon />} onClick={handleRefresh}>
                   Aktualisieren
                 </Button>
                 <Button
@@ -246,7 +246,6 @@ const TableSettingsManager: React.FC<TableSettingsManagerProps> = ({
             </AccordionSummary>
             <AccordionDetails>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                
                 {/* Export */}
                 <Box>
                   <Typography variant="subtitle1" sx={{ mb: 1 }}>
@@ -272,7 +271,8 @@ const TableSettingsManager: React.FC<TableSettingsManagerProps> = ({
                     Einstellungen importieren
                   </Typography>
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                    Importieren Sie gespeicherte Tabellen-Einstellungen aus einer JSON-Datei oder fügen Sie JSON direkt ein.
+                    Importieren Sie gespeicherte Tabellen-Einstellungen aus einer JSON-Datei oder
+                    fügen Sie JSON direkt ein.
                   </Typography>
 
                   {/* Datei-Upload */}
@@ -299,7 +299,7 @@ const TableSettingsManager: React.FC<TableSettingsManagerProps> = ({
                     label="JSON-Einstellungen"
                     placeholder="Fügen Sie hier das JSON mit den Tabellen-Einstellungen ein..."
                     value={importJson}
-                    onChange={(e) => {
+                    onChange={e => {
                       setImportJson(e.target.value)
                       setImportError('')
                       setImportSuccess(false)

@@ -56,8 +56,8 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
     columnVisibility,
     onTableReady: persistentOnTableReady,
     onColumnVisibilityChange,
-  } = usePersistentColumnVisibility({ 
-    tableKey: 'applicationInterfaces'
+  } = usePersistentColumnVisibility({
+    tableKey: 'applicationInterfaces',
   })
 
   // Kombiniere externe und persistente onTableReady Callbacks

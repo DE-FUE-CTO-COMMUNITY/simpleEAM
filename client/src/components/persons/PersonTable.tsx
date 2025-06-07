@@ -55,8 +55,8 @@ const PersonTableWithGenericTable: React.FC<PersonTableProps> = ({
     columnVisibility,
     onTableReady: persistentOnTableReady,
     onColumnVisibilityChange,
-  } = usePersistentColumnVisibility({ 
-    tableKey: 'persons'
+  } = usePersistentColumnVisibility({
+    tableKey: 'persons',
   })
 
   // Kombiniere externe und persistente onTableReady Callbacks

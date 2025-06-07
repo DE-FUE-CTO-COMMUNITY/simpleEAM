@@ -8,12 +8,12 @@ interface UsePersistentColumnVisibilityOptions {
    * Eindeutiger Schlüssel für diese Tabelle (z.B. 'applications', 'capabilities', etc.)
    */
   tableKey: string
-  
+
   /**
    * Standard-Spaltenvisibilität, falls keine gespeicherten Einstellungen vorhanden sind
    */
   defaultColumnVisibility?: VisibilityState
-  
+
   /**
    * Speicher-Präfix für localStorage-Schlüssel
    * @default 'simple-eam-column-visibility'
@@ -23,7 +23,7 @@ interface UsePersistentColumnVisibilityOptions {
 
 /**
  * Hook für persistente Column Visibility Funktionalität in TanStack Table
- * 
+ *
  * Dieser Hook erweitert die Column Visibility um localStorage-Persistierung,
  * sodass Benutzereinstellungen nach Seitenwechsel oder Browser-Restart erhalten bleiben.
  *
@@ -33,9 +33,8 @@ interface UsePersistentColumnVisibilityOptions {
 export function usePersistentColumnVisibility({
   tableKey,
   defaultColumnVisibility = {},
-  storagePrefix = 'simple-eam-column-visibility'
+  storagePrefix = 'simple-eam-column-visibility',
 }: UsePersistentColumnVisibilityOptions) {
-  
   // Lade gespeicherte Column Visibility beim ersten Laden
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(() => {
     if (typeof window === 'undefined') {
@@ -46,7 +45,7 @@ export function usePersistentColumnVisibility({
     try {
       const storageKey = `${storagePrefix}-${tableKey}`
       const saved = localStorage.getItem(storageKey)
-      
+
       if (saved) {
         const parsed = JSON.parse(saved) as VisibilityState
         // Merge mit Default-Werten, falls neue Spalten hinzugefügt wurden
@@ -80,12 +79,15 @@ export function usePersistentColumnVisibility({
   }, [])
 
   // Column Visibility Update-Funktion
-  const updateColumnVisibility = useCallback((updater: VisibilityState | ((old: VisibilityState) => VisibilityState)) => {
-    setColumnVisibility(prev => {
-      const newState = typeof updater === 'function' ? updater(prev) : updater
-      return newState
-    })
-  }, [])
+  const updateColumnVisibility = useCallback(
+    (updater: VisibilityState | ((old: VisibilityState) => VisibilityState)) => {
+      setColumnVisibility(prev => {
+        const newState = typeof updater === 'function' ? updater(prev) : updater
+        return newState
+      })
+    },
+    []
+  )
 
   // Responsive Column Visibility Helfer-Funktion
   const getResponsiveVisibility = useCallback(
@@ -176,7 +178,10 @@ export function usePersistentColumnVisibility({
       localStorage.removeItem(storageKey)
       setColumnVisibility(defaultColumnVisibility)
     } catch (error) {
-      console.warn(`Fehler beim Löschen der gespeicherten Column Visibility für ${tableKey}:`, error)
+      console.warn(
+        `Fehler beim Löschen der gespeicherten Column Visibility für ${tableKey}:`,
+        error
+      )
     }
   }, [tableKey, storagePrefix, defaultColumnVisibility])
 

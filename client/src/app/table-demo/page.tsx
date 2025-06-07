@@ -1,16 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { 
-  Container, 
-  Typography, 
-  Box, 
-  Tabs, 
-  Tab, 
-  Paper,
-  Alert,
-  Chip
-} from '@mui/material'
+import { Container, Typography, Box, Tabs, Tab, Paper, Alert, Chip } from '@mui/material'
 import { SortingState } from '@tanstack/react-table'
 import ApplicationTableWithGenericTable from '@/components/applications/ApplicationTable'
 import CapabilityTable from '@/components/capabilities/CapabilityTable'
@@ -38,7 +29,7 @@ const mockApplications = [
   {
     id: '2',
     name: 'ERP System',
-    status: 'ACTIVE', 
+    status: 'ACTIVE',
     criticality: 'MEDIUM',
     timeCategory: 'TOLERATE',
     sevenRStrategy: 'REHOST',
@@ -50,7 +41,7 @@ const mockApplications = [
     costs: 150000,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-  }
+  },
 ] as any[]
 
 const mockCapabilities = [
@@ -65,7 +56,7 @@ const mockCapabilities = [
     tags: ['CRM', 'Customer'],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-  }
+  },
 ] as any[]
 
 const mockDataObjects = [
@@ -77,7 +68,7 @@ const mockDataObjects = [
     owners: [{ id: '1', firstName: 'Max', lastName: 'Mustermann' }],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-  }
+  },
 ] as any[]
 
 const mockPersons = [
@@ -89,10 +80,18 @@ const mockPersons = [
     role: 'ADMIN',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-  }
+  },
 ] as any[]
 
-function TabPanel({ children, value, index }: { children: React.ReactNode; value: number; index: number }) {
+function TabPanel({
+  children,
+  value,
+  index,
+}: {
+  children: React.ReactNode
+  value: number
+  index: number
+}) {
   return (
     <div role="tabpanel" hidden={value !== index}>
       {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
@@ -115,7 +114,7 @@ export default function TableDemoPage() {
         <Typography variant="h4" component="h1" gutterBottom>
           Tabellen Demo - Persistente Spaltensichtbarkeit
         </Typography>
-        
+
         <Alert severity="info" sx={{ mb: 3 }}>
           <Typography variant="body2">
             <strong>Test die persistente Spaltensichtbarkeit:</strong>
@@ -126,7 +125,8 @@ export default function TableDemoPage() {
             <br />
             3. Deine Einstellungen werden automatisch gespeichert und wiederhergestellt
             <br />
-            4. Gehe zur <Chip size="small" label="Admin-Seite" /> um alle gespeicherten Einstellungen zu verwalten
+            4. Gehe zur <Chip size="small" label="Admin-Seite" /> um alle gespeicherten
+            Einstellungen zu verwalten
           </Typography>
         </Alert>
 

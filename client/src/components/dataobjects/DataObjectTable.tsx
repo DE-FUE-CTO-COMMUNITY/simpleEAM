@@ -49,8 +49,8 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
     columnVisibility,
     onTableReady: persistentOnTableReady,
     onColumnVisibilityChange,
-  } = usePersistentColumnVisibility({ 
-    tableKey: 'dataObjects'
+  } = usePersistentColumnVisibility({
+    tableKey: 'dataObjects',
   })
 
   // Kombiniere externe und persistente onTableReady Callbacks

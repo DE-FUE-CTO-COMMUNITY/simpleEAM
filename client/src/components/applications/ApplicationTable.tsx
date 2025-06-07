@@ -51,8 +51,8 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
     columnVisibility,
     onTableReady: persistentOnTableReady,
     onColumnVisibilityChange,
-  } = usePersistentColumnVisibility({ 
-    tableKey: 'applications'
+  } = usePersistentColumnVisibility({
+    tableKey: 'applications',
   })
 
   // Kombiniere externe und persistente onTableReady Callbacks
