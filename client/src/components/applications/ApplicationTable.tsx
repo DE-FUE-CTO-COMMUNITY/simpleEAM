@@ -9,6 +9,7 @@ import { CriticalityLevel } from '../../gql/generated'
 import ApplicationForm, { ApplicationFormValues } from './ApplicationForm'
 import { createColumnHelper } from '@tanstack/react-table'
 import { SortingState, VisibilityState } from '@tanstack/react-table'
+import usePersistentColumnVisibility from '../../hooks/usePersistentColumnVisibility'
 
 interface ApplicationTableProps {
   id?: string
@@ -22,6 +23,7 @@ interface ApplicationTableProps {
   onDeleteApplication?: (id: string) => Promise<void>
   availableTechStack?: string[]
   onTableReady?: (table: any) => void
+  // Diese Props sind jetzt optional, da die Persistierung intern verwaltet wird
   columnVisibility?: VisibilityState
   onColumnVisibilityChange?: (
     updater: VisibilityState | ((old: VisibilityState) => VisibilityState)
@@ -39,10 +41,27 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
   onDeleteApplication,
   availableTechStack = [],
   onTableReady,
-  columnVisibility,
-  onColumnVisibilityChange,
+  columnVisibility: _externalColumnVisibility,
+  onColumnVisibilityChange: _externalOnColumnVisibilityChange,
 }) => {
   const columnHelper = createColumnHelper<ApplicationType>()
+
+  // Verwende persistente Spaltensichtbarkeit
+  const {
+    columnVisibility,
+    onTableReady: persistentOnTableReady,
+    onColumnVisibilityChange,
+  } = usePersistentColumnVisibility({ 
+    tableKey: 'applications'
+  })
+
+  // Kombiniere externe und persistente onTableReady Callbacks
+  const handleTableReady = (table: any) => {
+    persistentOnTableReady(table)
+    if (onTableReady) {
+      onTableReady(table)
+    }
+  }
 
   // Spalten-Definition für die Application-Tabelle
   const columns = useMemo(
@@ -201,7 +220,7 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
       additionalProps={{
         availableTechStack,
       }}
-      onTableReady={onTableReady}
+      onTableReady={handleTableReady}
     />
   )
 }

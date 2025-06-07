@@ -12,6 +12,7 @@ import { createColumnHelper } from '@tanstack/react-table'
 import { SortingState, VisibilityState } from '@tanstack/react-table'
 import { formatDate, getDomainLabel, getTypeLabel } from './utils'
 import ArchitectureForm, { ArchitectureFormValues } from './ArchitectureForm'
+import usePersistentColumnVisibility from '../../hooks/usePersistentColumnVisibility'
 
 interface ArchitectureTableProps {
   id?: string
@@ -25,6 +26,7 @@ interface ArchitectureTableProps {
   onDeleteArchitecture?: (id: string) => Promise<void>
   availableArchitectures?: ArchitectureType[]
   onTableReady?: (table: any) => void
+  // Diese Props sind jetzt optional, da die Persistierung intern verwaltet wird  
   columnVisibility?: VisibilityState
   onColumnVisibilityChange?: (
     updater: VisibilityState | ((old: VisibilityState) => VisibilityState)
@@ -42,10 +44,27 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
   onDeleteArchitecture,
   availableArchitectures = [],
   onTableReady,
-  columnVisibility,
-  onColumnVisibilityChange,
+  columnVisibility: _externalColumnVisibility,
+  onColumnVisibilityChange: _externalOnColumnVisibilityChange,
 }) => {
   const columnHelper = createColumnHelper<ArchitectureType>()
+
+  // Verwende persistente Spaltensichtbarkeit
+  const {
+    columnVisibility,
+    onTableReady: persistentOnTableReady,
+    onColumnVisibilityChange,
+  } = usePersistentColumnVisibility({ 
+    tableKey: 'architectures'
+  })
+
+  // Kombiniere externe und persistente onTableReady Callbacks
+  const handleTableReady = (table: any) => {
+    persistentOnTableReady(table)
+    if (onTableReady) {
+      onTableReady(table)
+    }
+  }
 
   // Spalten-Definition für die Architecture-Tabelle
   const columns = useMemo(
@@ -165,7 +184,7 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
       FormComponent={ArchitectureForm}
       getIdFromData={(item: ArchitectureType) => item.id}
       mapDataToFormValues={mapToFormValues}
-      onTableReady={onTableReady}
+      onTableReady={handleTableReady}
       additionalProps={{
         availableArchitectures,
       }}

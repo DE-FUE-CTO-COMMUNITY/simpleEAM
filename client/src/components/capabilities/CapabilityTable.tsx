@@ -9,6 +9,7 @@ import { CapabilityStatus, BusinessCapability } from '../../gql/generated'
 import CapabilityForm, { CapabilityFormValues } from './CapabilityForm'
 import { createColumnHelper } from '@tanstack/react-table'
 import { SortingState, VisibilityState } from '@tanstack/react-table'
+import usePersistentColumnVisibility from '../../hooks/usePersistentColumnVisibility'
 
 interface CapabilityTableProps {
   id?: string
@@ -23,6 +24,7 @@ interface CapabilityTableProps {
   availableTags?: string[]
   availableCapabilities?: BusinessCapability[]
   onTableReady?: (table: any) => void
+  // Diese Props sind jetzt optional, da die Persistierung intern verwaltet wird
   columnVisibility?: VisibilityState
   onColumnVisibilityChange?: (
     updater: VisibilityState | ((old: VisibilityState) => VisibilityState)
@@ -41,11 +43,28 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
   availableTags = [],
   availableCapabilities = [],
   onTableReady,
-  columnVisibility,
-  onColumnVisibilityChange,
+  columnVisibility: _externalColumnVisibility,
+  onColumnVisibilityChange: _externalOnColumnVisibilityChange,
 }) => {
   const theme = useTheme()
   const columnHelper = createColumnHelper<Capability>()
+
+  // Verwende persistente Spaltensichtbarkeit
+  const {
+    columnVisibility,
+    onTableReady: persistentOnTableReady,
+    onColumnVisibilityChange,
+  } = usePersistentColumnVisibility({ 
+    tableKey: 'capabilities'
+  })
+
+  // Kombiniere externe und persistente onTableReady Callbacks
+  const handleTableReady = (table: any) => {
+    persistentOnTableReady(table)
+    if (onTableReady) {
+      onTableReady(table)
+    }
+  }
 
   // Spalten-Definition für die Capability-Tabelle
   const columns = useMemo(
@@ -155,7 +174,7 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
       FormComponent={CapabilityForm}
       getIdFromData={(item: Capability) => item.id}
       mapDataToFormValues={mapToFormValues}
-      onTableReady={onTableReady}
+      onTableReady={handleTableReady}
       additionalProps={{
         availableTags,
         availableCapabilities,

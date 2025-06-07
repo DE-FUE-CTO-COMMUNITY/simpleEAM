@@ -8,6 +8,7 @@ import { formatDate } from './utils'
 import { DataClassification, DataObject } from '../../gql/generated'
 import { createColumnHelper } from '@tanstack/react-table'
 import { SortingState, VisibilityState } from '@tanstack/react-table'
+import usePersistentColumnVisibility from '../../hooks/usePersistentColumnVisibility'
 
 interface DataObjectTableProps {
   id?: string
@@ -20,6 +21,7 @@ interface DataObjectTableProps {
   onUpdateDataObject?: (id: string, data: DataObjectFormValues) => Promise<void>
   onDeleteDataObject?: (id: string) => Promise<void>
   onTableReady?: (table: any) => void
+  // Diese Props sind jetzt optional, da die Persistierung intern verwaltet wird
   columnVisibility?: VisibilityState
   onColumnVisibilityChange?: (
     updater: VisibilityState | ((old: VisibilityState) => VisibilityState)
@@ -36,11 +38,28 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
   onUpdateDataObject,
   onDeleteDataObject,
   onTableReady,
-  columnVisibility,
-  onColumnVisibilityChange,
+  columnVisibility: _externalColumnVisibility,
+  onColumnVisibilityChange: _externalOnColumnVisibilityChange,
 }) => {
   const theme = useTheme()
   const columnHelper = createColumnHelper<DataObject>()
+
+  // Verwende persistente Spaltensichtbarkeit
+  const {
+    columnVisibility,
+    onTableReady: persistentOnTableReady,
+    onColumnVisibilityChange,
+  } = usePersistentColumnVisibility({ 
+    tableKey: 'dataObjects'
+  })
+
+  // Kombiniere externe und persistente onTableReady Callbacks
+  const handleTableReady = (table: any) => {
+    persistentOnTableReady(table)
+    if (onTableReady) {
+      onTableReady(table)
+    }
+  }
 
   // Hilfsfunktion für die Anzeige der Datenschutzklasse mit farblichem Chip
   const getClassificationChip = (classification: DataClassification) => {
@@ -172,7 +191,7 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
       FormComponent={DataObjectForm}
       getIdFromData={(item: DataObject) => item.id}
       mapDataToFormValues={mapDataObjectToFormValues}
-      onTableReady={onTableReady}
+      onTableReady={handleTableReady}
       columnVisibility={columnVisibility}
       onColumnVisibilityChange={onColumnVisibilityChange}
     />

@@ -5,6 +5,7 @@ import { PersonFormValues } from './PersonForm'
 import PersonForm from './PersonForm'
 import { createColumnHelper } from '@tanstack/react-table'
 import { SortingState, VisibilityState } from '@tanstack/react-table'
+import usePersistentColumnVisibility from '../../hooks/usePersistentColumnVisibility'
 
 // Hilfsfunktion zum Formatieren von Datum
 const formatDate = (date: string) => {
@@ -27,6 +28,7 @@ interface PersonTableProps {
   onUpdatePerson?: (id: string, data: PersonFormValues) => Promise<void>
   onDeletePerson?: (id: string) => Promise<void>
   onTableReady?: (table: any) => void
+  // Diese Props sind jetzt optional, da die Persistierung intern verwaltet wird
   columnVisibility?: VisibilityState
   onColumnVisibilityChange?: (
     updater: VisibilityState | ((old: VisibilityState) => VisibilityState)
@@ -43,10 +45,27 @@ const PersonTableWithGenericTable: React.FC<PersonTableProps> = ({
   onUpdatePerson,
   onDeletePerson,
   onTableReady,
-  columnVisibility,
-  onColumnVisibilityChange,
+  columnVisibility: _externalColumnVisibility,
+  onColumnVisibilityChange: _externalOnColumnVisibilityChange,
 }) => {
   const columnHelper = createColumnHelper<Person>()
+
+  // Verwende persistente Spaltensichtbarkeit
+  const {
+    columnVisibility,
+    onTableReady: persistentOnTableReady,
+    onColumnVisibilityChange,
+  } = usePersistentColumnVisibility({ 
+    tableKey: 'persons'
+  })
+
+  // Kombiniere externe und persistente onTableReady Callbacks
+  const handleTableReady = (table: any) => {
+    persistentOnTableReady(table)
+    if (onTableReady) {
+      onTableReady(table)
+    }
+  }
 
   // Spalten-Definition für die Person-Tabelle
   const columns = useMemo(
@@ -136,7 +155,7 @@ const PersonTableWithGenericTable: React.FC<PersonTableProps> = ({
       mapDataToFormValues={mapToFormValues}
       columnVisibility={columnVisibility}
       onColumnVisibilityChange={onColumnVisibilityChange}
-      onTableReady={onTableReady}
+      onTableReady={handleTableReady}
     />
   )
 }

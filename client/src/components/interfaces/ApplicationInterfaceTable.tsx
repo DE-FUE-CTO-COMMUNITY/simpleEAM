@@ -10,6 +10,7 @@ import { SortingState, VisibilityState } from '@tanstack/react-table'
 import { Chip } from '@mui/material'
 import { getInterfaceTypeLabel, getProtocolLabel, formatDate } from './utils'
 import { DataObject, Application, Person } from '@/gql/generated'
+import usePersistentColumnVisibility from '../../hooks/usePersistentColumnVisibility'
 
 interface ApplicationInterfaceTableProps {
   id?: string
@@ -25,6 +26,7 @@ interface ApplicationInterfaceTableProps {
   applications?: Application[]
   persons?: Person[]
   onTableReady?: (table: any) => void
+  // Diese Props sind jetzt optional, da die Persistierung intern verwaltet wird
   columnVisibility?: VisibilityState
   onColumnVisibilityChange?: (
     updater: VisibilityState | ((old: VisibilityState) => VisibilityState)
@@ -44,10 +46,27 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
   applications = [],
   persons = [],
   onTableReady,
-  columnVisibility,
-  onColumnVisibilityChange,
+  columnVisibility: _externalColumnVisibility,
+  onColumnVisibilityChange: _externalOnColumnVisibilityChange,
 }) => {
   const columnHelper = createColumnHelper<ApplicationInterface>()
+
+  // Verwende persistente Spaltensichtbarkeit
+  const {
+    columnVisibility,
+    onTableReady: persistentOnTableReady,
+    onColumnVisibilityChange,
+  } = usePersistentColumnVisibility({ 
+    tableKey: 'applicationInterfaces'
+  })
+
+  // Kombiniere externe und persistente onTableReady Callbacks
+  const handleTableReady = (table: any) => {
+    persistentOnTableReady(table)
+    if (onTableReady) {
+      onTableReady(table)
+    }
+  }
 
   // Spalten-Definition für die Schnittstellen-Tabelle
   const columns = useMemo(
@@ -178,7 +197,7 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
       FormComponent={ApplicationInterfaceForm}
       getIdFromData={(item: ApplicationInterface) => item.id}
       mapDataToFormValues={mapToFormValues}
-      onTableReady={onTableReady}
+      onTableReady={handleTableReady}
       additionalProps={{
         dataObjects,
         applications,
