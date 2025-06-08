@@ -125,12 +125,7 @@ export const groupElementsByType = (elements: DatabaseElementReference[]) => {
         grouped.interfaces.push(element.id)
         break
       default:
-        console.warn(
-          'Unknown elementType:',
-          element.elementType,
-          'for element:',
-          element.id
-        )
+        console.warn('Unknown elementType:', element.elementType, 'for element:', element.id)
     }
   }
 

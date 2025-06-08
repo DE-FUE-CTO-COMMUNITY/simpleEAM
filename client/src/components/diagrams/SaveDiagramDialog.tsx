@@ -227,8 +227,6 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
         // Update bestehende Diagramm
         const relationshipUpdates = createDiagramRelationshipUpdatesWithDisconnect(diagramData)
 
-
-
         const updateInput = {
           title: { set: title.trim() },
           description: { set: description.trim() || undefined },
@@ -247,8 +245,6 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
           ...relationshipUpdates, // Automatische Beziehungen zu Datenbankelementen
         }
 
-
-
         result = await updateDiagram({
           variables: {
             id: existingDiagram.id,
@@ -256,28 +252,21 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
           },
         })
 
-
-
         onSave(result.data.updateDiagrams.diagrams[0])
       } else {
         // Neue Diagramm erstellen (auch bei forceSaveAs)
         const relationshipUpdates = createDiagramRelationshipUpdates(diagramData)
-
-
 
         const input = {
           ...baseInput,
           ...relationshipUpdates, // Automatische Beziehungen zu Datenbankelementen
         }
 
-
-
         result = await createDiagram({
           variables: {
             input: [input],
           },
         })
-
 
         onSave(result.data.createDiagrams.diagrams[0])
       }

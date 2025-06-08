@@ -198,7 +198,6 @@ export function clearAllTableSettings(): void {
 
     // Lösche alle gefundenen Schlüssel
     keysToRemove.forEach(key => localStorage.removeItem(key))
-
   } catch (error) {
     console.warn('Fehler beim Löschen aller Tabellen-Einstellungen:', error)
   }
