@@ -7,6 +7,7 @@ import SaveDiagramDialog from './SaveDiagramDialog'
 import OpenDiagramDialog from './OpenDiagramDialog'
 import DeleteDiagramDialog from './DeleteDiagramDialog'
 import IntegratedLibrary from './IntegratedLibrary'
+import DiagramNameDisplay from './DiagramNameDisplay'
 import { isViewer } from '@/lib/auth'
 
 // Dynamischer Import von Excalidraw, um Server-Side-Rendering zu vermeiden
@@ -30,6 +31,7 @@ const ExcalidrawWrapper = dynamic(
       onImportJSON: () => void
       onExportPNG: () => void
       excalidrawAPI: (api: any) => void
+      onChange?: (elements: any[], appState: any) => void
       uiOptions: any
       initialData: any
       viewModeEnabled?: boolean
@@ -46,6 +48,7 @@ const ExcalidrawWrapper = dynamic(
       onImportJSON,
       onExportPNG,
       excalidrawAPI,
+      onChange,
       uiOptions,
       initialData,
       viewModeEnabled,
@@ -65,6 +68,7 @@ const ExcalidrawWrapper = dynamic(
             UIOptions={uiOptions}
             initialData={initialData}
             excalidrawAPI={excalidrawAPI}
+            onChange={onChange}
             viewModeEnabled={viewModeEnabled}
           >
             <MainMenuTyped>
@@ -213,6 +217,8 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
   const [excalidrawAPI, setExcalidrawAPI] = useState<any>(null)
   const [currentDiagram, setCurrentDiagram] = useState<any>(null)
   const [currentScene, setCurrentScene] = useState<any>(null)
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const [lastSavedScene, setLastSavedScene] = useState<any>(null)
 
   // Dialog-States
   const [saveDialogOpen, setSaveDialogOpen] = useState(false)
@@ -253,6 +259,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
       // Load persisted scene from localStorage
       const persistedScene = localStorage.getItem('excalidraw-scene')
       const persistedDiagram = localStorage.getItem('excalidraw-current-diagram')
+      const persistedLastSaved = localStorage.getItem('excalidraw-last-saved-scene')
 
       if (persistedScene) {
         try {
@@ -273,19 +280,41 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
           localStorage.removeItem('excalidraw-current-diagram')
         }
       }
+
+      if (persistedLastSaved) {
+        try {
+          const lastSavedData = JSON.parse(persistedLastSaved)
+          setLastSavedScene(lastSavedData)
+        } catch {
+          // Fehler beim Laden des letzten gespeicherten Zustands
+          localStorage.removeItem('excalidraw-last-saved-scene')
+        }
+      }
     }
   }, [])
 
-  const handleSaveDiagram = useCallback((savedDiagram: any) => {
-    setCurrentDiagram(savedDiagram)
-    // Persist current diagram to localStorage
-    localStorage.setItem('excalidraw-current-diagram', JSON.stringify(savedDiagram))
-    setNotification({
-      open: true,
-      message: `Diagramm "${savedDiagram.title}" erfolgreich gespeichert!`,
-      severity: 'success',
-    })
-  }, [])
+  const handleSaveDiagram = useCallback(
+    (savedDiagram: any) => {
+      setCurrentDiagram(savedDiagram)
+      setHasUnsavedChanges(false) // Reset unsaved changes flag
+      // Persist current diagram to localStorage
+      localStorage.setItem('excalidraw-current-diagram', JSON.stringify(savedDiagram))
+      // Store current scene as last saved state
+      if (excalidrawAPI) {
+        const currentElements = excalidrawAPI.getSceneElements()
+        const currentAppState = excalidrawAPI.getAppState()
+        const sceneToSave = { elements: currentElements, appState: currentAppState }
+        setLastSavedScene(sceneToSave)
+        localStorage.setItem('excalidraw-last-saved-scene', JSON.stringify(sceneToSave))
+      }
+      setNotification({
+        open: true,
+        message: `Diagramm "${savedDiagram.title}" erfolgreich gespeichert!`,
+        severity: 'success',
+      })
+    },
+    [excalidrawAPI]
+  )
 
   const handleOpenDiagram = useCallback(
     (diagram: any) => {
@@ -309,6 +338,8 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
           excalidrawAPI.updateScene(restoredScene)
           setCurrentDiagram(diagram)
           setCurrentScene(restoredScene)
+          setHasUnsavedChanges(false) // Reset unsaved changes flag
+          setLastSavedScene(restoredScene) // Set as last saved state
           // Persist to localStorage
           localStorage.setItem('excalidraw-scene', JSON.stringify(restoredScene))
           localStorage.setItem('excalidraw-current-diagram', JSON.stringify(diagram))
@@ -347,6 +378,8 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
       excalidrawAPI.updateScene(restoredScene)
       setCurrentDiagram(null)
       setCurrentScene(restoredScene)
+      setHasUnsavedChanges(false) // Reset unsaved changes flag
+      setLastSavedScene(restoredScene) // Set as last saved state
       // Clear localStorage
       localStorage.removeItem('excalidraw-scene')
       localStorage.removeItem('excalidraw-current-diagram')
@@ -607,6 +640,32 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     })
   }, [])
 
+  // Handler to track changes and detect unsaved state
+  const handleChange = useCallback(
+    (elements: any[], appState: any) => {
+      // Only track changes if we have a current diagram loaded
+      if (currentDiagram && lastSavedScene) {
+        // Compare current state with last saved state
+        const currentElementsStr = JSON.stringify(elements)
+        const lastSavedElementsStr = JSON.stringify(lastSavedScene.elements || [])
+
+        const hasChanges = currentElementsStr !== lastSavedElementsStr
+        setHasUnsavedChanges(hasChanges)
+      } else if (!currentDiagram && elements.length > 0) {
+        // If no diagram is loaded but there are elements, mark as unsaved
+        setHasUnsavedChanges(true)
+      } else if (!currentDiagram && elements.length === 0) {
+        // If no diagram and no elements, no unsaved changes
+        setHasUnsavedChanges(false)
+      }
+
+      // Auto-save to localStorage
+      const sceneData = { elements, appState }
+      localStorage.setItem('excalidraw-scene', JSON.stringify(sceneData))
+    },
+    [currentDiagram, lastSavedScene]
+  )
+
   // Initialisiert die API und ruft sie bei Bedarf auf
   const handleExcalidrawAPI = useCallback((api: any) => {
     setExcalidrawAPI(api)
@@ -776,6 +835,13 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     >
       {/* Hauptcontainer für Excalidraw */}
       <Box sx={{ height: '100%', width: '100%', position: 'relative' }}>
+        {/* Diagram Name Display - positioned next to MainMenu */}
+        <DiagramNameDisplay
+          currentDiagram={currentDiagram}
+          hasUnsavedChanges={hasUnsavedChanges}
+          onSaveClick={() => setSaveDialogOpen(true)}
+        />
+
         <ExcalidrawWrapper
           onOpenDialog={() => setOpenDialogOpen(true)}
           onSaveDialog={() => setSaveDialogOpen(true)}
@@ -786,6 +852,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
           onImportJSON={handleImportJSON}
           onExportPNG={handleExportPNG}
           excalidrawAPI={handleExcalidrawAPI}
+          onChange={handleChange}
           uiOptions={uiOptions}
           initialData={initialData}
           viewModeEnabled={isViewer()}
