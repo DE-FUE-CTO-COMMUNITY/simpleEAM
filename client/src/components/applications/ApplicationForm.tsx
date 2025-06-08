@@ -12,6 +12,7 @@ import {
   BusinessCapability,
   DataObject,
   ApplicationInterface,
+  Architecture,
   TimeCategory,
   SevenRStrategy,
 } from '../../gql/generated'
@@ -19,6 +20,7 @@ import { GET_PERSONS } from '@/graphql/person'
 import { GET_CAPABILITIES } from '@/graphql/capability'
 import { GET_DATA_OBJECTS } from '@/graphql/dataObject'
 import { GET_APPLICATION_INTERFACES } from '@/graphql/applicationInterface'
+import { GET_ARCHITECTURES } from '@/graphql/architecture'
 import GenericForm, { FieldConfig, TabConfig } from '../common/GenericForm'
 import { getValidSevenRStrategies } from './timeCategoryDependencies'
 import { isArchitect } from '@/lib/auth'
@@ -59,6 +61,7 @@ const baseApplicationSchema = z.object({
   usesDataObjectIds: z.array(z.string()).optional(),
   sourceOfInterfaceIds: z.array(z.string()).optional(),
   targetOfInterfaceIds: z.array(z.string()).optional(),
+  partOfArchitectures: z.array(z.string()).optional(),
   timeCategory: z.nativeEnum(TimeCategory).optional().nullable().or(z.literal('')),
   sevenRStrategy: z.nativeEnum(SevenRStrategy).optional().nullable().or(z.literal('')),
 })
@@ -162,6 +165,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
   const { data: capabilitiesData, loading: capabilitiesLoading } = useQuery(GET_CAPABILITIES)
   const { data: dataObjectsData, loading: dataObjectsLoading } = useQuery(GET_DATA_OBJECTS)
   const { data: interfacesData, loading: interfacesLoading } = useQuery(GET_APPLICATION_INTERFACES)
+  const { data: architecturesData, loading: architecturesLoading } = useQuery(GET_ARCHITECTURES)
 
   // Standardwerte für das Formular
   const defaultValues: ApplicationFormValues = {
@@ -182,6 +186,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     usesDataObjectIds: application?.usesDataObjects?.map(obj => obj.id) ?? [],
     sourceOfInterfaceIds: application?.sourceOfInterfaces?.map(iface => iface.id) ?? [],
     targetOfInterfaceIds: application?.targetOfInterfaces?.map(iface => iface.id) ?? [],
+    partOfArchitectures: application?.partOfArchitectures?.map(arch => arch.id) ?? [],
     timeCategory: application?.timeCategory ?? null,
     sevenRStrategy: application?.sevenRStrategy ?? null,
   }
@@ -232,6 +237,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
         usesDataObjectIds: application.usesDataObjects?.map(obj => obj.id) ?? [],
         sourceOfInterfaceIds: application.sourceOfInterfaces?.map(iface => iface.id) ?? [],
         targetOfInterfaceIds: application.targetOfInterfaces?.map(iface => iface.id) ?? [],
+        partOfArchitectures: application.partOfArchitectures?.map(arch => arch.id) ?? [],
         timeCategory: application.timeCategory ?? null,
         sevenRStrategy: application.sevenRStrategy ?? null,
       })
@@ -267,6 +273,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     { id: 'technical', label: 'Technisch' },
     { id: 'lifecycle', label: 'Lebenszyklus' },
     { id: 'relationships', label: 'Beziehungen' },
+    { id: 'architectures', label: 'Architekturen' },
   ]
 
   // Felder für das Formular definieren
@@ -531,6 +538,36 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
             (iface: ApplicationInterface) => iface.id === option
           )
           return matchingIface?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
+    },
+    // Architekturen (Tab: architectures)
+    {
+      name: 'partOfArchitectures',
+      label: 'Teil von Architekturen',
+      type: 'autocomplete',
+      tabId: 'architectures',
+      multiple: true,
+      options: (architecturesData?.architectures || []).map((arch: Architecture) => ({
+        value: arch.id,
+        label: arch.name,
+      })),
+      loadingOptions: architecturesLoading,
+      size: 12,
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          // Direkte ID - suche passende Option
+          const matchingArch = architecturesData?.architectures?.find(
+            (arch: Architecture) => arch.id === option
+          )
+          return matchingArch?.name || option
         }
         return option?.label || ''
       },

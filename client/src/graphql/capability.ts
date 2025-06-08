@@ -37,6 +37,14 @@ export const GET_CAPABILITIES = gql`
         id
         name
       }
+      supportedByApplications {
+        id
+        name
+      }
+      partOfArchitectures {
+        id
+        name
+      }
     }
   }
 `
@@ -67,6 +75,10 @@ export const GET_CAPABILITY = gql`
         name
       }
       supportedByApplications {
+        id
+        name
+      }
+      partOfArchitectures {
         id
         name
       }

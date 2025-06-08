@@ -1,12 +1,13 @@
 'use client'
 
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect } from 'react'
 import { useForm } from '@tanstack/react-form'
 import { z } from 'zod'
 import { useQuery } from '@apollo/client'
 import { GET_PERSONS } from '@/graphql/person'
 import { GET_APPLICATIONS } from '@/graphql/application'
-import { DataObject, DataClassification } from '../../gql/generated'
+import { GET_ARCHITECTURES } from '@/graphql/architecture'
+import { DataObject, DataClassification, Architecture } from '../../gql/generated'
 import GenericForm, { FieldConfig } from '../common/GenericForm'
 import { isArchitect } from '@/lib/auth'
 
@@ -28,6 +29,7 @@ export const dataObjectSchema = z.object({
   introductionDate: z.string().optional().nullable(),
   endOfLifeDate: z.string().optional().nullable(),
   ownerId: z.string().optional(),
+  partOfArchitectures: z.array(z.string()).optional(),
 })
 
 // TypeScript Typen basierend auf dem Schema
@@ -59,6 +61,13 @@ const getClassificationLabel = (classification: DataClassification): string => {
   }
 }
 
+const DATA_OBJECT_TABS = [
+  { id: 'general', label: 'Allgemein' },
+  { id: 'lifecycle', label: 'Lebenszyklus' },
+  { id: 'relationships', label: 'Beziehungen' },
+  { id: 'architectures', label: 'Architekturen' },
+]
+
 const DataObjectForm: React.FC<DataObjectFormProps> = ({
   dataObject,
   isOpen,
@@ -73,6 +82,8 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
   const { data: personData, loading: personLoading } = useQuery(GET_PERSONS)
   // Anwendungen laden
   const { data: applicationData, loading: applicationLoading } = useQuery(GET_APPLICATIONS)
+  // Architekturen laden
+  const { data: architecturesData, loading: architecturesLoading } = useQuery(GET_ARCHITECTURES)
 
   // Formulardaten initialisieren
   const defaultValues: DataObjectFormValues = {
@@ -85,6 +96,7 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
     endOfLifeDate: dataObject?.endOfLifeDate ?? null,
     ownerId:
       dataObject?.owners && dataObject.owners.length > 0 ? dataObject.owners[0].id : undefined,
+    partOfArchitectures: dataObject?.partOfArchitectures?.map(arch => arch.id) ?? [],
   }
 
   // TanStack Form konfigurieren
@@ -102,50 +114,27 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
   })
 
   // Zurücksetzen des Formulars bei Schließen des Dialogs und Aktualisieren bei neuem DataObject
-  const dataObjectName = dataObject?.name
-  const dataObjectDescription = dataObject?.description
-  const dataObjectClassification = dataObject?.classification
-  const dataObjectFormat = dataObject?.format
-  const dataObjectDataSources = dataObject?.dataSources?.map(app => app.id)
-  const dataObjectIntroductionDate = dataObject?.introductionDate
-  const dataObjectEndOfLifeDate = dataObject?.endOfLifeDate
-  const dataObjectOwnerId =
-    dataObject?.owners && dataObject.owners.length > 0 ? dataObject.owners[0]?.id : undefined
-
-  // Ref um zu verfolgen, ob das Formular bereits initialisiert wurde
-  const formInitialized = useRef(false)
-
   useEffect(() => {
     if (!isOpen) {
       form.reset()
-      formInitialized.current = false
-    } else if (dataObject && !formInitialized.current) {
-      // Nur beim ersten Öffnen des Formulars zurücksetzen
+    } else if (dataObject) {
+      // Aktualisiere das Formular bei Änderungen am DataObject-Objekt
       form.reset({
-        name: dataObjectName ?? '',
-        description: dataObjectDescription ?? null,
-        classification: dataObjectClassification ?? DataClassification.INTERNAL,
-        format: dataObjectFormat ?? null,
-        dataSources: dataObjectDataSources ?? [],
-        introductionDate: dataObjectIntroductionDate ?? null,
-        endOfLifeDate: dataObjectEndOfLifeDate ?? null,
-        ownerId: dataObjectOwnerId ?? '',
+        name: dataObject.name ?? '',
+        description: dataObject.description ?? null,
+        classification: dataObject.classification ?? DataClassification.INTERNAL,
+        format: dataObject.format ?? null,
+        dataSources: dataObject.dataSources?.map(app => app.id) ?? [],
+        introductionDate: dataObject.introductionDate ?? null,
+        endOfLifeDate: dataObject.endOfLifeDate ?? null,
+        ownerId: dataObject.owners && dataObject.owners.length > 0 ? dataObject.owners[0].id : '',
+        partOfArchitectures: dataObject.partOfArchitectures?.map(arch => arch.id) ?? [],
       })
-      formInitialized.current = true
+    } else {
+      // Für neue DataObjects leere Werte setzen
+      form.reset(defaultValues)
     }
-  }, [
-    isOpen,
-    form,
-    dataObject,
-    dataObjectName,
-    dataObjectDescription,
-    dataObjectClassification,
-    dataObjectFormat,
-    dataObjectDataSources,
-    dataObjectIntroductionDate,
-    dataObjectEndOfLifeDate,
-    dataObjectOwnerId,
-  ])
+  }, [isOpen, form, dataObject, defaultValues])
 
   // Feldkonfiguration für das generische Formular
   interface SelectOption {
@@ -168,6 +157,7 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
       required: true,
       validators: dataObjectSchema.shape.name,
       size: { xs: 12, md: 6 },
+      tabId: 'general',
     },
     {
       name: 'classification',
@@ -182,6 +172,7 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
         })
       ),
       size: { xs: 12, md: 6 },
+      tabId: 'general',
     },
     {
       name: 'description',
@@ -190,6 +181,7 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
       validators: dataObjectSchema.shape.description,
       rows: 4,
       size: 12,
+      tabId: 'general',
     },
     {
       name: 'format',
@@ -197,6 +189,40 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
       type: 'text',
       validators: dataObjectSchema.shape.format,
       size: { xs: 12, md: 6 },
+      tabId: 'general',
+    },
+    {
+      name: 'introductionDate',
+      label: 'Einführungsdatum',
+      type: 'date',
+      validators: dataObjectSchema.shape.introductionDate,
+      size: { xs: 12, md: 6 },
+      tabId: 'lifecycle',
+    },
+    {
+      name: 'endOfLifeDate',
+      label: 'End-of-Life Datum',
+      type: 'date',
+      validators: dataObjectSchema.shape.endOfLifeDate,
+      size: { xs: 12, md: 6 },
+      tabId: 'lifecycle',
+    },
+    {
+      name: 'ownerId',
+      label: 'Verantwortlicher',
+      type: 'select',
+      options: [
+        { value: '', label: 'Keine' },
+        ...(personData?.people?.map(
+          (person: { id: string; firstName: string; lastName: string }): SelectOption => ({
+            value: person.id,
+            label: `${person.firstName} ${person.lastName}`,
+          })
+        ) || []),
+      ],
+      size: { xs: 12, md: 6 },
+      loadingOptions: personLoading,
+      tabId: 'general',
     },
     {
       name: 'dataSources',
@@ -228,36 +254,36 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
         }
         return option.value === value?.value || option.value === value
       },
+      tabId: 'relationships',
     },
     {
-      name: 'introductionDate',
-      label: 'Einführungsdatum',
-      type: 'date',
-      validators: dataObjectSchema.shape.introductionDate,
+      name: 'partOfArchitectures',
+      label: 'Teil von Architekturen',
+      type: 'autocomplete',
+      multiple: true,
+      options: (architecturesData?.architectures || []).map((arch: Architecture) => ({
+        value: arch.id,
+        label: arch.name,
+      })),
+      loadingOptions: architecturesLoading,
       size: { xs: 12, md: 6 },
-    },
-    {
-      name: 'endOfLifeDate',
-      label: 'End-of-Life Datum',
-      type: 'date',
-      validators: dataObjectSchema.shape.endOfLifeDate,
-      size: { xs: 12, md: 6 },
-    },
-    {
-      name: 'ownerId',
-      label: 'Verantwortlicher',
-      type: 'select',
-      options: [
-        { value: '', label: 'Keine' },
-        ...(personData?.people?.map(
-          (person: { id: string; firstName: string; lastName: string }): SelectOption => ({
-            value: person.id,
-            label: `${person.firstName} ${person.lastName}`,
-          })
-        ) || []),
-      ],
-      size: { xs: 12, md: 6 },
-      loadingOptions: personLoading,
+      tabId: 'architectures',
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          // Direkte ID - suche passende Option
+          const matchingArch = architecturesData?.architectures?.find(
+            (arch: Architecture) => arch.id === option
+          )
+          return matchingArch?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
     },
   ]
 
@@ -290,6 +316,7 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
             }
           : undefined
       }
+      tabs={DATA_OBJECT_TABS}
     />
   )
 }

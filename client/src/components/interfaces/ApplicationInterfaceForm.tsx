@@ -60,6 +60,13 @@ export interface ApplicationInterfaceFormProps {
   onEditMode?: () => void
 }
 
+const APPLICATION_INTERFACE_TABS = [
+  { id: 'general', label: 'Allgemein' },
+  { id: 'technical', label: 'Technisch' },
+  { id: 'lifecycle', label: 'Lebenszyklus' },
+  { id: 'relationships', label: 'Beziehungen' },
+]
+
 const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
   applicationInterface,
   dataObjects = [],
@@ -77,24 +84,24 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
   const { data: personData, loading: personLoading } = useQuery(GET_PERSONS)
   const { data: applicationData, loading: applicationLoading } = useQuery(GET_APPLICATIONS)
 
-  // Formulardaten initialisieren - leere Standardwerte für neues Formular
-  const defaultValues = React.useMemo<ApplicationInterfaceFormValues>(
-    () => ({
-      name: '',
-      description: null,
-      interfaceType: InterfaceType.API,
-      protocol: null,
-      version: null,
-      status: InterfaceStatus.PLANNED,
-      introductionDate: null,
-      endOfLifeDate: null,
-      responsiblePerson: null,
-      sourceApplications: [],
-      targetApplications: [],
-      dataObjects: [],
-    }),
-    []
-  )
+  // Formulardaten basierend auf den aktuellen Interface-Daten initialisieren
+  const defaultValues: ApplicationInterfaceFormValues = {
+    name: applicationInterface?.name ?? '',
+    description: applicationInterface?.description ?? null,
+    interfaceType: applicationInterface?.interfaceType ?? InterfaceType.API,
+    protocol: applicationInterface?.protocol ?? null,
+    version: applicationInterface?.version ?? null,
+    status: applicationInterface?.status ?? InterfaceStatus.PLANNED,
+    introductionDate: applicationInterface?.introductionDate ?? null,
+    endOfLifeDate: applicationInterface?.endOfLifeDate ?? null,
+    responsiblePerson:
+      applicationInterface?.responsiblePerson && applicationInterface.responsiblePerson.length > 0
+        ? applicationInterface.responsiblePerson[0].id
+        : null,
+    sourceApplications: applicationInterface?.sourceApplications?.map(app => app.id) ?? [],
+    targetApplications: applicationInterface?.targetApplications?.map(app => app.id) ?? [],
+    dataObjects: applicationInterface?.dataObjects?.map(obj => obj.id) ?? [],
+  }
 
   // TanStack Form konfigurieren
   const form = useForm({
@@ -188,6 +195,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       required: true,
       validators: applicationInterfaceSchema.shape.name,
       size: { xs: 12 },
+      tabId: 'general',
     },
     {
       name: 'description',
@@ -197,6 +205,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       rows: 3,
       validators: applicationInterfaceSchema.shape.description,
       size: { xs: 12 },
+      tabId: 'general',
     },
     {
       name: 'interfaceType',
@@ -205,6 +214,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       required: true,
       validators: applicationInterfaceSchema.shape.interfaceType,
       size: { xs: 12, md: 6 },
+      tabId: 'technical',
       options: Object.values(InterfaceType).map(type => ({
         value: type,
         label:
@@ -225,6 +235,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       type: 'select',
       validators: applicationInterfaceSchema.shape.protocol,
       size: { xs: 12, md: 6 },
+      tabId: 'technical',
       options: [
         { value: '', label: 'Kein Protokoll' },
         ...Object.values(InterfaceProtocol).map(protocol => ({
@@ -239,6 +250,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       type: 'text',
       validators: applicationInterfaceSchema.shape.version,
       size: { xs: 12, md: 6 },
+      tabId: 'technical',
     },
     {
       name: 'status',
@@ -247,6 +259,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       required: true,
       validators: applicationInterfaceSchema.shape.status,
       size: { xs: 12, md: 6 },
+      tabId: 'general',
       options: Object.values(InterfaceStatus).map(status => ({
         value: status,
         label:
@@ -267,6 +280,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       type: 'date',
       validators: applicationInterfaceSchema.shape.introductionDate,
       size: { xs: 12, md: 6 },
+      tabId: 'lifecycle',
     },
     {
       name: 'endOfLifeDate',
@@ -274,12 +288,14 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       type: 'date',
       validators: applicationInterfaceSchema.shape.endOfLifeDate,
       size: { xs: 12, md: 6 },
+      tabId: 'lifecycle',
     },
     {
       name: 'responsiblePerson',
       label: 'Verantwortliche Person',
       type: 'autocomplete',
       size: { xs: 12 },
+      tabId: 'general',
       options:
         personData?.people?.map((person: { id: string; firstName: string; lastName: string }) => ({
           value: person.id,
@@ -308,6 +324,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       label: 'Quellanwendungen',
       type: 'autocomplete',
       size: { xs: 12, md: 6 },
+      tabId: 'relationships',
       options:
         applicationData?.applications?.map((app: { id: string; name: string }) => ({
           value: app.id,
@@ -336,6 +353,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       label: 'Zielanwendungen',
       type: 'autocomplete',
       size: { xs: 12, md: 6 },
+      tabId: 'relationships',
       options:
         applicationData?.applications?.map((app: { id: string; name: string }) => ({
           value: app.id,
@@ -364,6 +382,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       label: 'Datenobjekte',
       type: 'autocomplete',
       size: { xs: 12 },
+      tabId: 'relationships',
       options: dataObjects.map(obj => ({
         value: obj.id,
         label: obj.name,
@@ -401,6 +420,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       isLoading={loading}
       mode={mode}
       fields={fields}
+      tabs={APPLICATION_INTERFACE_TABS}
       form={form}
       enableDelete={mode === 'edit' && !!applicationInterface && isArchitect()}
       onDelete={applicationInterface?.id ? () => onDelete?.(applicationInterface.id) : undefined}

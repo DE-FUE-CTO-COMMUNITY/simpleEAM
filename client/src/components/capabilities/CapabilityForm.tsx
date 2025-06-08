@@ -5,7 +5,14 @@ import { useForm } from '@tanstack/react-form'
 import { z } from 'zod'
 import { useQuery } from '@apollo/client'
 import { GET_PERSONS } from '@/graphql/person'
-import { BusinessCapability, CapabilityStatus } from '../../gql/generated'
+import { GET_APPLICATIONS } from '@/graphql/application'
+import { GET_ARCHITECTURES } from '@/graphql/architecture'
+import {
+  BusinessCapability,
+  CapabilityStatus,
+  Application,
+  Architecture,
+} from '../../gql/generated'
 import GenericForm, { FieldConfig } from '../common/GenericForm'
 import { isArchitect } from '@/lib/auth'
 
@@ -33,6 +40,9 @@ export const capabilitySchema = z.object({
   ownerId: z.string().optional(),
   tags: z.array(z.string()).optional(),
   parentId: z.string().optional(),
+  children: z.array(z.string()).optional(),
+  supportedByApplications: z.array(z.string()).optional(),
+  partOfArchitectures: z.array(z.string()).optional(),
 })
 
 // TypeScript Typen basierend auf dem Schema
@@ -98,6 +108,12 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
   // Personen laden
   const { data: personData, loading: personLoading } = useQuery(GET_PERSONS)
 
+  // Applikationen laden
+  const { data: applicationData, loading: applicationLoading } = useQuery(GET_APPLICATIONS)
+
+  // Architekturen laden
+  const { data: architectureData, loading: architectureLoading } = useQuery(GET_ARCHITECTURES)
+
   // Formulardaten mit useMemo initialisieren, um unnötige Re-Renders zu vermeiden
   const defaultValues = React.useMemo<CapabilityFormValues>(
     () => ({
@@ -109,6 +125,9 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
       ownerId: '',
       tags: [],
       parentId: '',
+      children: [],
+      supportedByApplications: [],
+      partOfArchitectures: [],
     }),
     []
   )
@@ -139,6 +158,18 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
   const capabilityTags = capability?.tags
   const capabilityParentId =
     capability?.parents && capability.parents.length > 0 ? capability.parents[0]?.id : undefined
+  const capabilityChildren = React.useMemo(
+    () => capability?.children?.map(child => child.id) ?? [],
+    [capability?.children]
+  )
+  const capabilitySupportedByApplications = React.useMemo(
+    () => capability?.supportedByApplications?.map(app => app.id) ?? [],
+    [capability?.supportedByApplications]
+  )
+  const capabilityPartOfArchitectures = React.useMemo(
+    () => capability?.partOfArchitectures?.map(arch => arch.id) ?? [],
+    [capability?.partOfArchitectures]
+  )
 
   useEffect(() => {
     if (!isOpen) {
@@ -154,6 +185,9 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
         ownerId: capabilityOwnerId ?? '',
         tags: capabilityTags ?? [],
         parentId: capabilityParentId ?? '',
+        children: capabilityChildren,
+        supportedByApplications: capabilitySupportedByApplications,
+        partOfArchitectures: capabilityPartOfArchitectures,
       })
     }
   }, [
@@ -168,6 +202,9 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
     capabilityOwnerId,
     capabilityTags,
     capabilityParentId,
+    capabilityChildren,
+    capabilitySupportedByApplications,
+    capabilityPartOfArchitectures,
   ])
 
   // Feldkonfiguration für das generische Formular
@@ -191,6 +228,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
       required: true,
       validators: capabilitySchema.shape.name,
       size: { xs: 12, md: 6 },
+      tabId: 'general',
     },
     {
       name: 'status',
@@ -205,6 +243,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
         })
       ),
       size: { xs: 12, md: 6 },
+      tabId: 'general',
     },
     {
       name: 'description',
@@ -214,6 +253,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
       validators: capabilitySchema.shape.description,
       rows: 4,
       size: 12,
+      tabId: 'general',
     },
     {
       name: 'maturityLevel',
@@ -228,6 +268,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
         })
       ),
       size: { xs: 12, md: 6 },
+      tabId: 'general',
     },
     {
       name: 'businessValue',
@@ -243,6 +284,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
         })
       ),
       size: { xs: 12, md: 6 },
+      tabId: 'general',
     },
     {
       name: 'tags',
@@ -250,6 +292,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
       type: 'tags',
       options: availableTags.map((tag): SelectOption => ({ value: tag, label: tag })),
       size: { xs: 12, md: 6 },
+      tabId: 'general',
     },
     {
       name: 'ownerId',
@@ -264,6 +307,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
         ) || [],
       size: { xs: 12, md: 6 },
       loadingOptions: personLoading,
+      tabId: 'general',
     },
     {
       name: 'parentId',
@@ -280,8 +324,107 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
             })
           ),
       ],
-      size: { xs: 12, md: 6 },
+      size: 12,
+      tabId: 'relationships',
     },
+    {
+      name: 'children',
+      label: 'Untergeordnete Capabilities',
+      type: 'autocomplete',
+      multiple: true,
+      options: availableCapabilities
+        .filter(cap => cap.id !== capability?.id)
+        .map(
+          (cap): SelectOption => ({
+            value: cap.id,
+            label: cap.name,
+          })
+        ),
+      size: 12,
+      tabId: 'relationships',
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          const matchingCap = availableCapabilities.find(cap => cap.id === option)
+          return matchingCap?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
+    },
+    {
+      name: 'supportedByApplications',
+      label: 'Unterstützende Applikationen',
+      type: 'autocomplete',
+      multiple: true,
+      options:
+        applicationData?.applications?.map(
+          (app: Application): SelectOption => ({
+            value: app.id,
+            label: app.name,
+          })
+        ) || [],
+      loadingOptions: applicationLoading,
+      size: 12,
+      tabId: 'relationships',
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          const matchingApp = applicationData?.applications?.find(
+            (app: Application) => app.id === option
+          )
+          return matchingApp?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
+    },
+    {
+      name: 'partOfArchitectures',
+      label: 'Teil von Architekturen',
+      type: 'autocomplete',
+      multiple: true,
+      options:
+        architectureData?.architectures?.map(
+          (arch: Architecture): SelectOption => ({
+            value: arch.id,
+            label: arch.name,
+          })
+        ) || [],
+      loadingOptions: architectureLoading,
+      size: 12,
+      tabId: 'architectures',
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          const matchingArch = architectureData?.architectures?.find(
+            (arch: Architecture) => arch.id === option
+          )
+          return matchingArch?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
+    },
+  ]
+
+  // Tabs-Konfiguration
+  const tabs = [
+    { id: 'general', label: 'Allgemein' },
+    { id: 'relationships', label: 'Beziehungen' },
+    { id: 'architectures', label: 'Architekturen' },
   ]
 
   return (
@@ -299,6 +442,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
       isLoading={loading}
       mode={mode}
       fields={fields}
+      tabs={tabs}
       form={form}
       enableDelete={mode === 'edit' && !!capability && isArchitect()}
       onDelete={capability?.id ? () => onDelete?.(capability.id) : undefined}
