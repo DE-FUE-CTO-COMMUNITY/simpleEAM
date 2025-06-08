@@ -218,7 +218,7 @@ function createLibraryItemFromDatabaseElement(dbElement: any, elementType: strin
   })
 
   // Clone template elements with new IDs and updated content
-  const elements = template.elements.map((element: any) => {
+  const elements = template.elements.map((element: any, index: number) => {
     const newElement = { ...element }
 
     // Use the mapped ID for this element
@@ -234,12 +234,23 @@ function createLibraryItemFromDatabaseElement(dbElement: any, elementType: strin
       newElement.verticalAlign = 'middle'
     }
 
-    // Store database metadata in customData
-    newElement.customData = {
-      databaseId: dbElement.id,
-      elementType,
-      originalElement: dbElement,
-      isFromDatabase: true,
+    // Store database metadata in customData - ONLY in the first element to avoid redundancy
+    if (index === 0) {
+      // Das erste Element (Hauptelement) erhält alle Datenbank-Metadaten
+      newElement.customData = {
+        databaseId: dbElement.id,
+        elementType,
+        originalElement: dbElement,
+        isFromDatabase: true,
+        isMainElement: true, // Markiere als Hauptelement
+      }
+    } else {
+      // Andere Elemente erhalten nur einen Verweis auf das Hauptelement
+      newElement.customData = {
+        isFromDatabase: true,
+        isMainElement: false,
+        mainElementId: idMapping.get(template.elements[0]?.id), // Verweis auf das Hauptelement-ID
+      }
     }
 
     // Preserve group IDs using the mapping to maintain grouping

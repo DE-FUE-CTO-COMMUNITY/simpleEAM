@@ -66,12 +66,13 @@ export const createExcalidrawElementFromLibraryItem = (
     updated: typeof window !== 'undefined' ? Date.now() : 0, // Avoid hydration mismatch
     link: null,
     locked: false,
-    // Speichere Datenbank-Informationen in customData
+    // Speichere Datenbank-Informationen in customData - das Hauptelement erhält alle Metadaten
     customData: {
-      libraryElementId: libraryElement.id,
+      databaseId: libraryElement.id,
       elementType: elementType,
-      originalName: libraryElement.name,
-      originalDescription: libraryElement.description,
+      originalElement: libraryElement,
+      isFromDatabase: true,
+      isMainElement: true, // Markiere als Hauptelement
       // Typ-spezifische Metadaten
       ...getTypeSpecificMetadata(libraryElement, elementType),
     },
@@ -114,6 +115,12 @@ export const createExcalidrawElementFromLibraryItem = (
     originalText: displayText,
     autoResize: true,
     lineHeight: 1.25,
+    // Text-Element erhält nur Verweis auf das Hauptelement
+    customData: {
+      isFromDatabase: true,
+      isMainElement: false,
+      mainElementId: elementId, // Verweis auf das Hauptelement
+    },
   }
 
   // Icon-Element hinzufügen (falls gewünscht)
@@ -159,6 +166,12 @@ const createIconElement = (
     updated: typeof window !== 'undefined' ? Date.now() : 0, // Avoid hydration mismatch
     link: null,
     locked: false,
+    // Icon-Element erhält nur Verweis auf das Hauptelement
+    customData: {
+      isFromDatabase: true,
+      isMainElement: false,
+      mainElementId: groupId, // Verweis auf das Hauptelement (groupId ist die ID des Hauptelements)
+    },
   }
 
   // Typ-spezifische Icons
@@ -283,27 +296,74 @@ const getTypeSpecificMetadata = (
   }
 }
 
+/**
+ * WICHTIG: Neue Struktur für Library-Element-Metadaten
+ * 
+ * Problem: Vorher wurden Datenbank-Beziehungen redundant in jedem Element eines Library-Items gespeichert.
+ * Lösung: Jetzt wird die Beziehung nur einmal im Hauptelement gespeichert.
+ * 
+ * Struktur:
+ * - Hauptelement (erstes Element): Enthält vollständige customData mit databaseId, elementType, originalElement
+ * - Andere Elemente: Enthalten nur Verweis auf Hauptelement über mainElementId
+ * 
+ * Vorteile:
+ * - Keine redundante Datenspeicherung
+ * - Einfachere Synchronisation bei Datenbank-Updates
+ * - Reduzierte Diagramm-Dateigröße
+ * - Konsistente Datenintegrität
+ */
+
 // Hilfsfunktion: Prüfe ob ein Excalidraw-Element von der Datenbank stammt
 export const isLibraryBasedElement = (element: ExcalidrawElement): boolean => {
-  return !!(element.customData?.libraryElementId && element.customData?.elementType)
+  return !!(element.customData?.isFromDatabase)
 }
 
-// Hilfsfunktion: Extrahiere Datenbank-ID aus Excalidraw-Element
+// Hilfsfunktion: Prüfe ob es sich um das Hauptelement mit vollständigen Datenbank-Metadaten handelt
+export const isMainLibraryElement = (element: ExcalidrawElement): boolean => {
+  return !!(element.customData?.isFromDatabase && element.customData?.isMainElement)
+}
+
+// Hilfsfunktion: Extrahiere Datenbank-ID aus Excalidraw-Element (nur vom Hauptelement)
 export const getLibraryElementId = (element: ExcalidrawElement): string | null => {
-  return element.customData?.libraryElementId || null
+  if (element.customData?.isMainElement) {
+    return element.customData?.databaseId || null
+  }
+  return null
 }
 
-// Hilfsfunktion: Extrahiere Element-Typ aus Excalidraw-Element
+// Hilfsfunktion: Extrahiere Element-Typ aus Excalidraw-Element (nur vom Hauptelement)
 export const getLibraryElementType = (element: ExcalidrawElement): ElementType | null => {
-  return element.customData?.elementType || null
+  if (element.customData?.isMainElement) {
+    return element.customData?.elementType || null
+  }
+  return null
 }
 
-// Aktualisiere ein bestehendes Excalidraw-Element mit neuen Datenbank-Daten
+// Hilfsfunktion: Finde das Hauptelement einer Gruppe von Library-basierten Elementen
+export const findMainLibraryElement = (elements: ExcalidrawElement[]): ExcalidrawElement | null => {
+  return elements.find(element => isMainLibraryElement(element)) || null
+}
+
+// Hilfsfunktion: Extrahiere das ursprüngliche Datenbank-Element (nur vom Hauptelement)
+export const getOriginalDatabaseElement = (element: ExcalidrawElement): any | null => {
+  if (element.customData?.isMainElement) {
+    return element.customData?.originalElement || null
+  }
+  return null
+}
+
+// Aktualisiere ein bestehendes Excalidraw-Element mit neuen Datenbank-Daten (nur für Hauptelemente)
 export const updateExcalidrawElementFromLibraryItem = (
   excalidrawElement: ExcalidrawElement,
   libraryElement: LibraryElement,
   elementType: ElementType
 ): ExcalidrawElement => {
+  // Nur Hauptelemente sollten aktualisiert werden
+  if (!isMainLibraryElement(excalidrawElement)) {
+    console.warn('⚠️ Versuche nicht-Hauptelement zu aktualisieren:', excalidrawElement.id)
+    return excalidrawElement
+  }
+
   const secondaryText = getSecondaryText(libraryElement, elementType)
   const displayText = secondaryText
     ? `${libraryElement.name}\n${secondaryText}`
@@ -313,15 +373,59 @@ export const updateExcalidrawElementFromLibraryItem = (
     ...excalidrawElement,
     customData: {
       ...excalidrawElement.customData,
-      originalName: libraryElement.name,
-      originalDescription: libraryElement.description,
+      // Aktualisiere die Datenbank-Metadaten im Hauptelement
+      databaseId: libraryElement.id,
+      elementType,
+      originalElement: libraryElement,
+      isFromDatabase: true,
+      isMainElement: true,
+      // Behalte typ-spezifische Metadaten
       ...getTypeSpecificMetadata(libraryElement, elementType),
     },
     // Wenn es ein Text-Element ist, aktualisiere den Text
     ...(excalidrawElement.type === 'text' && {
       text: displayText,
       originalText: displayText,
+      rawText: displayText,
     }),
     updated: typeof window !== 'undefined' ? Date.now() : 0, // Avoid hydration mismatch
   }
+}
+
+// Hilfsfunktion: Finde alle verwandten Elemente einer Library-Gruppe
+export const findRelatedLibraryElements = (
+  elements: ExcalidrawElement[],
+  targetElement: ExcalidrawElement
+): ExcalidrawElement[] => {
+  // Wenn es das Hauptelement ist, finde alle Elemente die darauf verweisen
+  if (isMainLibraryElement(targetElement)) {
+    return elements.filter(el =>
+      el.customData?.mainElementId === targetElement.id || el.id === targetElement.id
+    )
+  }
+
+  // Wenn es ein verweisendes Element ist, finde das Hauptelement und alle verwandten
+  if (targetElement.customData?.mainElementId) {
+    const mainElementId = targetElement.customData.mainElementId
+    return elements.filter(el =>
+      el.id === mainElementId || el.customData?.mainElementId === mainElementId
+    )
+  }
+
+  return [targetElement]
+}
+
+// Hilfsfunktion: Aktualisiere alle verwandten Elemente einer Library-Gruppe
+export const updateLibraryElementGroup = (
+  elements: ExcalidrawElement[],
+  updatedLibraryData: LibraryElement,
+  elementType: ElementType
+): ExcalidrawElement[] => {
+  return elements.map(element => {
+    // Nur das Hauptelement wird mit neuen Daten aktualisiert
+    if (isMainLibraryElement(element)) {
+      return updateExcalidrawElementFromLibraryItem(element, updatedLibraryData, elementType)
+    }
+    return element
+  })
 }
