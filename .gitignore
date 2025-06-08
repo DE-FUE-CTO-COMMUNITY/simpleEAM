@@ -68,6 +68,7 @@ lib-cov/
 
 # Keycloak
 auth/src/*.jar
+auth/data/
 
 # Temporäre Dateien
 tmp/
