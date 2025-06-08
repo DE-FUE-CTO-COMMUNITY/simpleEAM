@@ -29,17 +29,14 @@ export const isTokenValid = (): boolean => {
  */
 export const refreshToken = async (): Promise<string | null> => {
   if (!keycloak?.authenticated) {
-    console.log('Benutzer nicht authentifiziert')
     return null
   }
 
   try {
     const refreshed = await keycloak.updateToken(30)
     if (refreshed && keycloak.token) {
-      console.log('Token erfolgreich aktualisiert')
       return keycloak.token
     } else {
-      console.log('Token noch gültig, kein Refresh nötig')
       return keycloak.token || null
     }
   } catch (error) {
@@ -58,7 +55,6 @@ export const secureApiCall = async <T>(apiCall: (token: string) => Promise<T>): 
 
   // Prüfe Token-Gültigkeit
   if (!isTokenValid()) {
-    console.log('Token abgelaufen, versuche Refresh...')
     const newToken = await refreshToken()
     if (!newToken) {
       throw new Error('Token-Refresh fehlgeschlagen')
@@ -74,8 +70,6 @@ export const secureApiCall = async <T>(apiCall: (token: string) => Promise<T>): 
       error.status === 401 ||
       error.status === 403
     ) {
-      console.log('Auth-Fehler erkannt, versuche Token-Refresh...')
-
       const newToken = await refreshToken()
       if (!newToken) {
         throw new Error('Token-Refresh nach Auth-Fehler fehlgeschlagen')
@@ -101,7 +95,6 @@ export const setupSessionMonitoring = () => {
     if (!document.hidden && keycloak?.authenticated) {
       // Wenn Tab wieder aktiv wird, prüfe Token-Gültigkeit
       if (!isTokenValid()) {
-        console.log('Tab wieder aktiv, Token abgelaufen - refreshe...')
         refreshToken().then(newToken => {
           if (newToken) {
             window.dispatchEvent(
@@ -118,7 +111,6 @@ export const setupSessionMonitoring = () => {
   // Überwache Online-Status
   window.addEventListener('online', () => {
     if (keycloak?.authenticated) {
-      console.log('Verbindung wiederhergestellt, prüfe Session...')
       refreshToken().then(newToken => {
         if (newToken) {
           window.dispatchEvent(
@@ -134,7 +126,6 @@ export const setupSessionMonitoring = () => {
   // Überwache Storage-Events für SSO-Logout
   window.addEventListener('storage', event => {
     if (event.key === 'kc-logout' && event.newValue) {
-      console.log('SSO-Logout erkannt')
       if (keycloak) {
         keycloak.logout()
       }

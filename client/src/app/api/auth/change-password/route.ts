@@ -33,12 +33,6 @@ export async function POST(request: NextRequest) {
     const adminUsername = process.env.KEYCLOAK_ADMIN || 'admin'
     const adminPassword = process.env.KEYCLOAK_ADMIN_PASSWORD
 
-    console.log('Keycloak Config Debug:')
-    console.log('- URL:', keycloakUrl)
-    console.log('- Realm:', realm)
-    console.log('- Admin Username:', adminUsername)
-    console.log('- Admin Password Available:', !!adminPassword)
-
     if (!adminPassword) {
       console.error('KEYCLOAK_ADMIN_PASSWORD Umgebungsvariable nicht gesetzt')
       console.error(

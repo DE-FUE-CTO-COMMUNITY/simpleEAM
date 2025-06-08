@@ -19,6 +19,10 @@ import {
 import { useMutation, useQuery } from '@apollo/client'
 import { CREATE_DIAGRAM, UPDATE_DIAGRAM, GET_ARCHITECTURES_FOR_DIAGRAM } from '@/graphql/diagram'
 import { useAuth } from '@/contexts/AuthContext'
+import {
+  createDiagramRelationshipUpdates,
+  createDiagramRelationshipUpdatesWithDisconnect,
+} from './diagramRelationshipUtils'
 
 export interface DiagramType {
   value: string
@@ -191,11 +195,11 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
 
     setSaving(true)
     try {
-      const input = {
+      const baseInput = {
         title: title.trim(),
         description: description.trim() || undefined,
         diagramJson: diagramData,
-        diagramType: diagramType, // Hinzufügen des diagramType-Felds
+        diagramType: diagramType,
         architecture: {
           connect: [
             {
@@ -221,11 +225,15 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
       let result
       if (existingDiagram?.id && !forceSaveAs) {
         // Update bestehende Diagramm
+        const relationshipUpdates = createDiagramRelationshipUpdatesWithDisconnect(diagramData)
+
+
+
         const updateInput = {
           title: { set: title.trim() },
           description: { set: description.trim() || undefined },
           diagramJson: { set: diagramData },
-          diagramType: { set: diagramType }, // Hinzufügen des diagramType-Felds für Updates
+          diagramType: { set: diagramType },
           architecture: {
             disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
             connect: [
@@ -236,7 +244,10 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
               },
             ],
           },
+          ...relationshipUpdates, // Automatische Beziehungen zu Datenbankelementen
         }
+
+
 
         result = await updateDiagram({
           variables: {
@@ -245,20 +256,35 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
           },
         })
 
+
+
         onSave(result.data.updateDiagrams.diagrams[0])
       } else {
         // Neue Diagramm erstellen (auch bei forceSaveAs)
+        const relationshipUpdates = createDiagramRelationshipUpdates(diagramData)
+
+
+
+        const input = {
+          ...baseInput,
+          ...relationshipUpdates, // Automatische Beziehungen zu Datenbankelementen
+        }
+
+
+
         result = await createDiagram({
           variables: {
             input: [input],
           },
         })
 
+
         onSave(result.data.createDiagrams.diagrams[0])
       }
 
       onClose()
-    } catch {
+    } catch (error) {
+      console.error('Fehler beim Speichern des Diagramms:', error)
       // Fehler beim Speichern des Diagramms
     } finally {
       setSaving(false)

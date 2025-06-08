@@ -22,6 +22,8 @@ export type Application = {
   costs?: Maybe<Scalars['Float']['output']>;
   createdAt: Scalars['DateTime']['output'];
   criticality: CriticalityLevel;
+  depictedInDiagrams: Array<Diagram>;
+  depictedInDiagramsConnection: ApplicationDepictedInDiagramsConnection;
   description?: Maybe<Scalars['String']['output']>;
   endOfLifeDate?: Maybe<Scalars['Date']['output']>;
   hostingEnvironment?: Maybe<Scalars['String']['output']>;
@@ -49,6 +51,24 @@ export type Application = {
   usesDataObjectsConnection: ApplicationUsesDataObjectsConnection;
   vendor?: Maybe<Scalars['String']['output']>;
   version?: Maybe<Scalars['String']['output']>;
+};
+
+
+/** Application - repräsentiert eine Business-Applikation im Enterprise Architecture Management */
+export type ApplicationDepictedInDiagramsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<DiagramSort>>;
+  where?: InputMaybe<DiagramWhere>;
+};
+
+
+/** Application - repräsentiert eine Business-Applikation im Enterprise Architecture Management */
+export type ApplicationDepictedInDiagramsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<ApplicationDepictedInDiagramsConnectionSort>>;
+  where?: InputMaybe<ApplicationDepictedInDiagramsConnectionWhere>;
 };
 
 
@@ -257,6 +277,7 @@ export type ApplicationBusinessCapabilitySupportsCapabilitiesNodeAggregateSelect
 };
 
 export type ApplicationConnectInput = {
+  depictedInDiagrams?: InputMaybe<Array<ApplicationDepictedInDiagramsConnectFieldInput>>;
   isDataSourceFor?: InputMaybe<Array<ApplicationIsDataSourceForConnectFieldInput>>;
   owners?: InputMaybe<Array<ApplicationOwnersConnectFieldInput>>;
   partOfArchitectures?: InputMaybe<Array<ApplicationPartOfArchitecturesConnectFieldInput>>;
@@ -273,6 +294,7 @@ export type ApplicationConnectWhere = {
 export type ApplicationCreateInput = {
   costs?: InputMaybe<Scalars['Float']['input']>;
   criticality: CriticalityLevel;
+  depictedInDiagrams?: InputMaybe<ApplicationDepictedInDiagramsFieldInput>;
   description?: InputMaybe<Scalars['String']['input']>;
   endOfLifeDate?: InputMaybe<Scalars['Date']['input']>;
   hostingEnvironment?: InputMaybe<Scalars['String']['input']>;
@@ -325,6 +347,7 @@ export type ApplicationDataObjectUsesDataObjectsNodeAggregateSelection = {
 };
 
 export type ApplicationDeleteInput = {
+  depictedInDiagrams?: InputMaybe<Array<ApplicationDepictedInDiagramsDeleteFieldInput>>;
   isDataSourceFor?: InputMaybe<Array<ApplicationIsDataSourceForDeleteFieldInput>>;
   owners?: InputMaybe<Array<ApplicationOwnersDeleteFieldInput>>;
   partOfArchitectures?: InputMaybe<Array<ApplicationPartOfArchitecturesDeleteFieldInput>>;
@@ -334,7 +357,130 @@ export type ApplicationDeleteInput = {
   usesDataObjects?: InputMaybe<Array<ApplicationUsesDataObjectsDeleteFieldInput>>;
 };
 
+export type ApplicationDepictedInDiagramsAggregateInput = {
+  AND?: InputMaybe<Array<ApplicationDepictedInDiagramsAggregateInput>>;
+  NOT?: InputMaybe<ApplicationDepictedInDiagramsAggregateInput>;
+  OR?: InputMaybe<Array<ApplicationDepictedInDiagramsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<ApplicationDepictedInDiagramsNodeAggregationWhereInput>;
+};
+
+export type ApplicationDepictedInDiagramsConnectFieldInput = {
+  connect?: InputMaybe<Array<DiagramConnectInput>>;
+  where?: InputMaybe<DiagramConnectWhere>;
+};
+
+export type ApplicationDepictedInDiagramsConnection = {
+  __typename?: 'ApplicationDepictedInDiagramsConnection';
+  aggregate: ApplicationDiagramDepictedInDiagramsAggregateSelection;
+  edges: Array<ApplicationDepictedInDiagramsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type ApplicationDepictedInDiagramsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<ApplicationDepictedInDiagramsConnectionAggregateInput>>;
+  NOT?: InputMaybe<ApplicationDepictedInDiagramsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<ApplicationDepictedInDiagramsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<ApplicationDepictedInDiagramsNodeAggregationWhereInput>;
+};
+
+export type ApplicationDepictedInDiagramsConnectionFilters = {
+  /** Filter Applications by aggregating results on related ApplicationDepictedInDiagramsConnections */
+  aggregate?: InputMaybe<ApplicationDepictedInDiagramsConnectionAggregateInput>;
+  /** Return Applications where all of the related ApplicationDepictedInDiagramsConnections match this filter */
+  all?: InputMaybe<ApplicationDepictedInDiagramsConnectionWhere>;
+  /** Return Applications where none of the related ApplicationDepictedInDiagramsConnections match this filter */
+  none?: InputMaybe<ApplicationDepictedInDiagramsConnectionWhere>;
+  /** Return Applications where one of the related ApplicationDepictedInDiagramsConnections match this filter */
+  single?: InputMaybe<ApplicationDepictedInDiagramsConnectionWhere>;
+  /** Return Applications where some of the related ApplicationDepictedInDiagramsConnections match this filter */
+  some?: InputMaybe<ApplicationDepictedInDiagramsConnectionWhere>;
+};
+
+export type ApplicationDepictedInDiagramsConnectionSort = {
+  node?: InputMaybe<DiagramSort>;
+};
+
+export type ApplicationDepictedInDiagramsConnectionWhere = {
+  AND?: InputMaybe<Array<ApplicationDepictedInDiagramsConnectionWhere>>;
+  NOT?: InputMaybe<ApplicationDepictedInDiagramsConnectionWhere>;
+  OR?: InputMaybe<Array<ApplicationDepictedInDiagramsConnectionWhere>>;
+  node?: InputMaybe<DiagramWhere>;
+};
+
+export type ApplicationDepictedInDiagramsCreateFieldInput = {
+  node: DiagramCreateInput;
+};
+
+export type ApplicationDepictedInDiagramsDeleteFieldInput = {
+  delete?: InputMaybe<DiagramDeleteInput>;
+  where?: InputMaybe<ApplicationDepictedInDiagramsConnectionWhere>;
+};
+
+export type ApplicationDepictedInDiagramsDisconnectFieldInput = {
+  disconnect?: InputMaybe<DiagramDisconnectInput>;
+  where?: InputMaybe<ApplicationDepictedInDiagramsConnectionWhere>;
+};
+
+export type ApplicationDepictedInDiagramsFieldInput = {
+  connect?: InputMaybe<Array<ApplicationDepictedInDiagramsConnectFieldInput>>;
+  create?: InputMaybe<Array<ApplicationDepictedInDiagramsCreateFieldInput>>;
+};
+
+export type ApplicationDepictedInDiagramsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<ApplicationDepictedInDiagramsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<ApplicationDepictedInDiagramsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<ApplicationDepictedInDiagramsNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  diagramJson?: InputMaybe<StringScalarAggregationFilters>;
+  title?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type ApplicationDepictedInDiagramsRelationship = {
+  __typename?: 'ApplicationDepictedInDiagramsRelationship';
+  cursor: Scalars['String']['output'];
+  node: Diagram;
+};
+
+export type ApplicationDepictedInDiagramsUpdateConnectionInput = {
+  node?: InputMaybe<DiagramUpdateInput>;
+  where?: InputMaybe<ApplicationDepictedInDiagramsConnectionWhere>;
+};
+
+export type ApplicationDepictedInDiagramsUpdateFieldInput = {
+  connect?: InputMaybe<Array<ApplicationDepictedInDiagramsConnectFieldInput>>;
+  create?: InputMaybe<Array<ApplicationDepictedInDiagramsCreateFieldInput>>;
+  delete?: InputMaybe<Array<ApplicationDepictedInDiagramsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<ApplicationDepictedInDiagramsDisconnectFieldInput>>;
+  update?: InputMaybe<ApplicationDepictedInDiagramsUpdateConnectionInput>;
+};
+
+export type ApplicationDiagramDepictedInDiagramsAggregateSelection = {
+  __typename?: 'ApplicationDiagramDepictedInDiagramsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<ApplicationDiagramDepictedInDiagramsNodeAggregateSelection>;
+};
+
+export type ApplicationDiagramDepictedInDiagramsNodeAggregateSelection = {
+  __typename?: 'ApplicationDiagramDepictedInDiagramsNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  diagramJson: StringAggregateSelection;
+  title: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
 export type ApplicationDisconnectInput = {
+  depictedInDiagrams?: InputMaybe<Array<ApplicationDepictedInDiagramsDisconnectFieldInput>>;
   isDataSourceFor?: InputMaybe<Array<ApplicationIsDataSourceForDisconnectFieldInput>>;
   owners?: InputMaybe<Array<ApplicationOwnersDisconnectFieldInput>>;
   partOfArchitectures?: InputMaybe<Array<ApplicationPartOfArchitecturesDisconnectFieldInput>>;
@@ -356,6 +502,8 @@ export type ApplicationInterface = {
   createdAt: Scalars['DateTime']['output'];
   dataObjects: Array<DataObject>;
   dataObjectsConnection: ApplicationInterfaceDataObjectsConnection;
+  depictedInDiagrams: Array<Diagram>;
+  depictedInDiagramsConnection: ApplicationInterfaceDepictedInDiagramsConnection;
   description?: Maybe<Scalars['String']['output']>;
   endOfLifeDate?: Maybe<Scalars['Date']['output']>;
   id: Scalars['ID']['output'];
@@ -390,6 +538,24 @@ export type ApplicationInterfaceDataObjectsConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<ApplicationInterfaceDataObjectsConnectionSort>>;
   where?: InputMaybe<ApplicationInterfaceDataObjectsConnectionWhere>;
+};
+
+
+/** ApplicationInterface - repräsentiert eine Schnittstelle zwischen Applikationen */
+export type ApplicationInterfaceDepictedInDiagramsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<DiagramSort>>;
+  where?: InputMaybe<DiagramWhere>;
+};
+
+
+/** ApplicationInterface - repräsentiert eine Schnittstelle zwischen Applikationen */
+export type ApplicationInterfaceDepictedInDiagramsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<ApplicationInterfaceDepictedInDiagramsConnectionSort>>;
+  where?: InputMaybe<ApplicationInterfaceDepictedInDiagramsConnectionWhere>;
 };
 
 
@@ -499,6 +665,7 @@ export type ApplicationInterfaceApplicationTargetApplicationsNodeAggregateSelect
 
 export type ApplicationInterfaceConnectInput = {
   dataObjects?: InputMaybe<Array<ApplicationInterfaceDataObjectsConnectFieldInput>>;
+  depictedInDiagrams?: InputMaybe<Array<ApplicationInterfaceDepictedInDiagramsConnectFieldInput>>;
   responsiblePerson?: InputMaybe<Array<ApplicationInterfaceResponsiblePersonConnectFieldInput>>;
   sourceApplications?: InputMaybe<Array<ApplicationInterfaceSourceApplicationsConnectFieldInput>>;
   targetApplications?: InputMaybe<Array<ApplicationInterfaceTargetApplicationsConnectFieldInput>>;
@@ -510,6 +677,7 @@ export type ApplicationInterfaceConnectWhere = {
 
 export type ApplicationInterfaceCreateInput = {
   dataObjects?: InputMaybe<ApplicationInterfaceDataObjectsFieldInput>;
+  depictedInDiagrams?: InputMaybe<ApplicationInterfaceDepictedInDiagramsFieldInput>;
   description?: InputMaybe<Scalars['String']['input']>;
   endOfLifeDate?: InputMaybe<Scalars['Date']['input']>;
   interfaceType: InterfaceType;
@@ -648,13 +816,137 @@ export type ApplicationInterfaceDataObjectsUpdateFieldInput = {
 
 export type ApplicationInterfaceDeleteInput = {
   dataObjects?: InputMaybe<Array<ApplicationInterfaceDataObjectsDeleteFieldInput>>;
+  depictedInDiagrams?: InputMaybe<Array<ApplicationInterfaceDepictedInDiagramsDeleteFieldInput>>;
   responsiblePerson?: InputMaybe<Array<ApplicationInterfaceResponsiblePersonDeleteFieldInput>>;
   sourceApplications?: InputMaybe<Array<ApplicationInterfaceSourceApplicationsDeleteFieldInput>>;
   targetApplications?: InputMaybe<Array<ApplicationInterfaceTargetApplicationsDeleteFieldInput>>;
 };
 
+export type ApplicationInterfaceDepictedInDiagramsAggregateInput = {
+  AND?: InputMaybe<Array<ApplicationInterfaceDepictedInDiagramsAggregateInput>>;
+  NOT?: InputMaybe<ApplicationInterfaceDepictedInDiagramsAggregateInput>;
+  OR?: InputMaybe<Array<ApplicationInterfaceDepictedInDiagramsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<ApplicationInterfaceDepictedInDiagramsNodeAggregationWhereInput>;
+};
+
+export type ApplicationInterfaceDepictedInDiagramsConnectFieldInput = {
+  connect?: InputMaybe<Array<DiagramConnectInput>>;
+  where?: InputMaybe<DiagramConnectWhere>;
+};
+
+export type ApplicationInterfaceDepictedInDiagramsConnection = {
+  __typename?: 'ApplicationInterfaceDepictedInDiagramsConnection';
+  aggregate: ApplicationInterfaceDiagramDepictedInDiagramsAggregateSelection;
+  edges: Array<ApplicationInterfaceDepictedInDiagramsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type ApplicationInterfaceDepictedInDiagramsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<ApplicationInterfaceDepictedInDiagramsConnectionAggregateInput>>;
+  NOT?: InputMaybe<ApplicationInterfaceDepictedInDiagramsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<ApplicationInterfaceDepictedInDiagramsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<ApplicationInterfaceDepictedInDiagramsNodeAggregationWhereInput>;
+};
+
+export type ApplicationInterfaceDepictedInDiagramsConnectionFilters = {
+  /** Filter ApplicationInterfaces by aggregating results on related ApplicationInterfaceDepictedInDiagramsConnections */
+  aggregate?: InputMaybe<ApplicationInterfaceDepictedInDiagramsConnectionAggregateInput>;
+  /** Return ApplicationInterfaces where all of the related ApplicationInterfaceDepictedInDiagramsConnections match this filter */
+  all?: InputMaybe<ApplicationInterfaceDepictedInDiagramsConnectionWhere>;
+  /** Return ApplicationInterfaces where none of the related ApplicationInterfaceDepictedInDiagramsConnections match this filter */
+  none?: InputMaybe<ApplicationInterfaceDepictedInDiagramsConnectionWhere>;
+  /** Return ApplicationInterfaces where one of the related ApplicationInterfaceDepictedInDiagramsConnections match this filter */
+  single?: InputMaybe<ApplicationInterfaceDepictedInDiagramsConnectionWhere>;
+  /** Return ApplicationInterfaces where some of the related ApplicationInterfaceDepictedInDiagramsConnections match this filter */
+  some?: InputMaybe<ApplicationInterfaceDepictedInDiagramsConnectionWhere>;
+};
+
+export type ApplicationInterfaceDepictedInDiagramsConnectionSort = {
+  node?: InputMaybe<DiagramSort>;
+};
+
+export type ApplicationInterfaceDepictedInDiagramsConnectionWhere = {
+  AND?: InputMaybe<Array<ApplicationInterfaceDepictedInDiagramsConnectionWhere>>;
+  NOT?: InputMaybe<ApplicationInterfaceDepictedInDiagramsConnectionWhere>;
+  OR?: InputMaybe<Array<ApplicationInterfaceDepictedInDiagramsConnectionWhere>>;
+  node?: InputMaybe<DiagramWhere>;
+};
+
+export type ApplicationInterfaceDepictedInDiagramsCreateFieldInput = {
+  node: DiagramCreateInput;
+};
+
+export type ApplicationInterfaceDepictedInDiagramsDeleteFieldInput = {
+  delete?: InputMaybe<DiagramDeleteInput>;
+  where?: InputMaybe<ApplicationInterfaceDepictedInDiagramsConnectionWhere>;
+};
+
+export type ApplicationInterfaceDepictedInDiagramsDisconnectFieldInput = {
+  disconnect?: InputMaybe<DiagramDisconnectInput>;
+  where?: InputMaybe<ApplicationInterfaceDepictedInDiagramsConnectionWhere>;
+};
+
+export type ApplicationInterfaceDepictedInDiagramsFieldInput = {
+  connect?: InputMaybe<Array<ApplicationInterfaceDepictedInDiagramsConnectFieldInput>>;
+  create?: InputMaybe<Array<ApplicationInterfaceDepictedInDiagramsCreateFieldInput>>;
+};
+
+export type ApplicationInterfaceDepictedInDiagramsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<ApplicationInterfaceDepictedInDiagramsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<ApplicationInterfaceDepictedInDiagramsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<ApplicationInterfaceDepictedInDiagramsNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  diagramJson?: InputMaybe<StringScalarAggregationFilters>;
+  title?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type ApplicationInterfaceDepictedInDiagramsRelationship = {
+  __typename?: 'ApplicationInterfaceDepictedInDiagramsRelationship';
+  cursor: Scalars['String']['output'];
+  node: Diagram;
+};
+
+export type ApplicationInterfaceDepictedInDiagramsUpdateConnectionInput = {
+  node?: InputMaybe<DiagramUpdateInput>;
+  where?: InputMaybe<ApplicationInterfaceDepictedInDiagramsConnectionWhere>;
+};
+
+export type ApplicationInterfaceDepictedInDiagramsUpdateFieldInput = {
+  connect?: InputMaybe<Array<ApplicationInterfaceDepictedInDiagramsConnectFieldInput>>;
+  create?: InputMaybe<Array<ApplicationInterfaceDepictedInDiagramsCreateFieldInput>>;
+  delete?: InputMaybe<Array<ApplicationInterfaceDepictedInDiagramsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<ApplicationInterfaceDepictedInDiagramsDisconnectFieldInput>>;
+  update?: InputMaybe<ApplicationInterfaceDepictedInDiagramsUpdateConnectionInput>;
+};
+
+export type ApplicationInterfaceDiagramDepictedInDiagramsAggregateSelection = {
+  __typename?: 'ApplicationInterfaceDiagramDepictedInDiagramsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<ApplicationInterfaceDiagramDepictedInDiagramsNodeAggregateSelection>;
+};
+
+export type ApplicationInterfaceDiagramDepictedInDiagramsNodeAggregateSelection = {
+  __typename?: 'ApplicationInterfaceDiagramDepictedInDiagramsNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  diagramJson: StringAggregateSelection;
+  title: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
 export type ApplicationInterfaceDisconnectInput = {
   dataObjects?: InputMaybe<Array<ApplicationInterfaceDataObjectsDisconnectFieldInput>>;
+  depictedInDiagrams?: InputMaybe<Array<ApplicationInterfaceDepictedInDiagramsDisconnectFieldInput>>;
   responsiblePerson?: InputMaybe<Array<ApplicationInterfaceResponsiblePersonDisconnectFieldInput>>;
   sourceApplications?: InputMaybe<Array<ApplicationInterfaceSourceApplicationsDisconnectFieldInput>>;
   targetApplications?: InputMaybe<Array<ApplicationInterfaceTargetApplicationsDisconnectFieldInput>>;
@@ -1045,6 +1337,7 @@ export type ApplicationInterfaceTargetApplicationsUpdateFieldInput = {
 export type ApplicationInterfaceUpdateInput = {
   createdAt?: InputMaybe<DateTimeScalarMutations>;
   dataObjects?: InputMaybe<Array<ApplicationInterfaceDataObjectsUpdateFieldInput>>;
+  depictedInDiagrams?: InputMaybe<Array<ApplicationInterfaceDepictedInDiagramsUpdateFieldInput>>;
   description?: InputMaybe<StringScalarMutations>;
   endOfLifeDate?: InputMaybe<DateScalarMutations>;
   interfaceType?: InputMaybe<InterfaceTypeEnumScalarMutations>;
@@ -1065,6 +1358,8 @@ export type ApplicationInterfaceWhere = {
   createdAt?: InputMaybe<DateTimeScalarFilters>;
   dataObjects?: InputMaybe<DataObjectRelationshipFilters>;
   dataObjectsConnection?: InputMaybe<ApplicationInterfaceDataObjectsConnectionFilters>;
+  depictedInDiagrams?: InputMaybe<DiagramRelationshipFilters>;
+  depictedInDiagramsConnection?: InputMaybe<ApplicationInterfaceDepictedInDiagramsConnectionFilters>;
   description?: InputMaybe<StringScalarFilters>;
   endOfLifeDate?: InputMaybe<DateScalarFilters>;
   id?: InputMaybe<IdScalarFilters>;
@@ -1809,6 +2104,7 @@ export type ApplicationUpdateInput = {
   costs?: InputMaybe<FloatScalarMutations>;
   createdAt?: InputMaybe<DateTimeScalarMutations>;
   criticality?: InputMaybe<CriticalityLevelEnumScalarMutations>;
+  depictedInDiagrams?: InputMaybe<Array<ApplicationDepictedInDiagramsUpdateFieldInput>>;
   description?: InputMaybe<StringScalarMutations>;
   endOfLifeDate?: InputMaybe<DateScalarMutations>;
   hostingEnvironment?: InputMaybe<StringScalarMutations>;
@@ -1943,6 +2239,8 @@ export type ApplicationWhere = {
   costs?: InputMaybe<FloatScalarFilters>;
   createdAt?: InputMaybe<DateTimeScalarFilters>;
   criticality?: InputMaybe<CriticalityLevelEnumScalarFilters>;
+  depictedInDiagrams?: InputMaybe<DiagramRelationshipFilters>;
+  depictedInDiagramsConnection?: InputMaybe<ApplicationDepictedInDiagramsConnectionFilters>;
   description?: InputMaybe<StringScalarFilters>;
   endOfLifeDate?: InputMaybe<DateScalarFilters>;
   hostingEnvironment?: InputMaybe<StringScalarFilters>;
@@ -3209,6 +3507,8 @@ export type BusinessCapability = {
   children: Array<BusinessCapability>;
   childrenConnection: BusinessCapabilityChildrenConnection;
   createdAt: Scalars['DateTime']['output'];
+  depictedInDiagrams: Array<Diagram>;
+  depictedInDiagramsConnection: BusinessCapabilityDepictedInDiagramsConnection;
   description?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   maturityLevel?: Maybe<Scalars['Int']['output']>;
@@ -3244,6 +3544,24 @@ export type BusinessCapabilityChildrenConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<BusinessCapabilityChildrenConnectionSort>>;
   where?: InputMaybe<BusinessCapabilityChildrenConnectionWhere>;
+};
+
+
+/** Business Capability - repräsentiert eine Geschäftsfähigkeit im Enterprise Architecture Management */
+export type BusinessCapabilityDepictedInDiagramsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<DiagramSort>>;
+  where?: InputMaybe<DiagramWhere>;
+};
+
+
+/** Business Capability - repräsentiert eine Geschäftsfähigkeit im Enterprise Architecture Management */
+export type BusinessCapabilityDepictedInDiagramsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<BusinessCapabilityDepictedInDiagramsConnectionSort>>;
+  where?: InputMaybe<BusinessCapabilityDepictedInDiagramsConnectionWhere>;
 };
 
 
@@ -3527,6 +3845,7 @@ export type BusinessCapabilityChildrenUpdateFieldInput = {
 
 export type BusinessCapabilityConnectInput = {
   children?: InputMaybe<Array<BusinessCapabilityChildrenConnectFieldInput>>;
+  depictedInDiagrams?: InputMaybe<Array<BusinessCapabilityDepictedInDiagramsConnectFieldInput>>;
   owners?: InputMaybe<Array<BusinessCapabilityOwnersConnectFieldInput>>;
   parents?: InputMaybe<Array<BusinessCapabilityParentsConnectFieldInput>>;
   partOfArchitectures?: InputMaybe<Array<BusinessCapabilityPartOfArchitecturesConnectFieldInput>>;
@@ -3541,6 +3860,7 @@ export type BusinessCapabilityConnectWhere = {
 export type BusinessCapabilityCreateInput = {
   businessValue?: InputMaybe<Scalars['Int']['input']>;
   children?: InputMaybe<BusinessCapabilityChildrenFieldInput>;
+  depictedInDiagrams?: InputMaybe<BusinessCapabilityDepictedInDiagramsFieldInput>;
   description?: InputMaybe<Scalars['String']['input']>;
   maturityLevel?: InputMaybe<Scalars['Int']['input']>;
   name: Scalars['String']['input'];
@@ -3571,6 +3891,7 @@ export type BusinessCapabilityDataObjectRelatedDataObjectsNodeAggregateSelection
 
 export type BusinessCapabilityDeleteInput = {
   children?: InputMaybe<Array<BusinessCapabilityChildrenDeleteFieldInput>>;
+  depictedInDiagrams?: InputMaybe<Array<BusinessCapabilityDepictedInDiagramsDeleteFieldInput>>;
   owners?: InputMaybe<Array<BusinessCapabilityOwnersDeleteFieldInput>>;
   parents?: InputMaybe<Array<BusinessCapabilityParentsDeleteFieldInput>>;
   partOfArchitectures?: InputMaybe<Array<BusinessCapabilityPartOfArchitecturesDeleteFieldInput>>;
@@ -3578,8 +3899,131 @@ export type BusinessCapabilityDeleteInput = {
   supportedByApplications?: InputMaybe<Array<BusinessCapabilitySupportedByApplicationsDeleteFieldInput>>;
 };
 
+export type BusinessCapabilityDepictedInDiagramsAggregateInput = {
+  AND?: InputMaybe<Array<BusinessCapabilityDepictedInDiagramsAggregateInput>>;
+  NOT?: InputMaybe<BusinessCapabilityDepictedInDiagramsAggregateInput>;
+  OR?: InputMaybe<Array<BusinessCapabilityDepictedInDiagramsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<BusinessCapabilityDepictedInDiagramsNodeAggregationWhereInput>;
+};
+
+export type BusinessCapabilityDepictedInDiagramsConnectFieldInput = {
+  connect?: InputMaybe<Array<DiagramConnectInput>>;
+  where?: InputMaybe<DiagramConnectWhere>;
+};
+
+export type BusinessCapabilityDepictedInDiagramsConnection = {
+  __typename?: 'BusinessCapabilityDepictedInDiagramsConnection';
+  aggregate: BusinessCapabilityDiagramDepictedInDiagramsAggregateSelection;
+  edges: Array<BusinessCapabilityDepictedInDiagramsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type BusinessCapabilityDepictedInDiagramsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<BusinessCapabilityDepictedInDiagramsConnectionAggregateInput>>;
+  NOT?: InputMaybe<BusinessCapabilityDepictedInDiagramsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<BusinessCapabilityDepictedInDiagramsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<BusinessCapabilityDepictedInDiagramsNodeAggregationWhereInput>;
+};
+
+export type BusinessCapabilityDepictedInDiagramsConnectionFilters = {
+  /** Filter BusinessCapabilities by aggregating results on related BusinessCapabilityDepictedInDiagramsConnections */
+  aggregate?: InputMaybe<BusinessCapabilityDepictedInDiagramsConnectionAggregateInput>;
+  /** Return BusinessCapabilities where all of the related BusinessCapabilityDepictedInDiagramsConnections match this filter */
+  all?: InputMaybe<BusinessCapabilityDepictedInDiagramsConnectionWhere>;
+  /** Return BusinessCapabilities where none of the related BusinessCapabilityDepictedInDiagramsConnections match this filter */
+  none?: InputMaybe<BusinessCapabilityDepictedInDiagramsConnectionWhere>;
+  /** Return BusinessCapabilities where one of the related BusinessCapabilityDepictedInDiagramsConnections match this filter */
+  single?: InputMaybe<BusinessCapabilityDepictedInDiagramsConnectionWhere>;
+  /** Return BusinessCapabilities where some of the related BusinessCapabilityDepictedInDiagramsConnections match this filter */
+  some?: InputMaybe<BusinessCapabilityDepictedInDiagramsConnectionWhere>;
+};
+
+export type BusinessCapabilityDepictedInDiagramsConnectionSort = {
+  node?: InputMaybe<DiagramSort>;
+};
+
+export type BusinessCapabilityDepictedInDiagramsConnectionWhere = {
+  AND?: InputMaybe<Array<BusinessCapabilityDepictedInDiagramsConnectionWhere>>;
+  NOT?: InputMaybe<BusinessCapabilityDepictedInDiagramsConnectionWhere>;
+  OR?: InputMaybe<Array<BusinessCapabilityDepictedInDiagramsConnectionWhere>>;
+  node?: InputMaybe<DiagramWhere>;
+};
+
+export type BusinessCapabilityDepictedInDiagramsCreateFieldInput = {
+  node: DiagramCreateInput;
+};
+
+export type BusinessCapabilityDepictedInDiagramsDeleteFieldInput = {
+  delete?: InputMaybe<DiagramDeleteInput>;
+  where?: InputMaybe<BusinessCapabilityDepictedInDiagramsConnectionWhere>;
+};
+
+export type BusinessCapabilityDepictedInDiagramsDisconnectFieldInput = {
+  disconnect?: InputMaybe<DiagramDisconnectInput>;
+  where?: InputMaybe<BusinessCapabilityDepictedInDiagramsConnectionWhere>;
+};
+
+export type BusinessCapabilityDepictedInDiagramsFieldInput = {
+  connect?: InputMaybe<Array<BusinessCapabilityDepictedInDiagramsConnectFieldInput>>;
+  create?: InputMaybe<Array<BusinessCapabilityDepictedInDiagramsCreateFieldInput>>;
+};
+
+export type BusinessCapabilityDepictedInDiagramsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<BusinessCapabilityDepictedInDiagramsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<BusinessCapabilityDepictedInDiagramsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<BusinessCapabilityDepictedInDiagramsNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  diagramJson?: InputMaybe<StringScalarAggregationFilters>;
+  title?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type BusinessCapabilityDepictedInDiagramsRelationship = {
+  __typename?: 'BusinessCapabilityDepictedInDiagramsRelationship';
+  cursor: Scalars['String']['output'];
+  node: Diagram;
+};
+
+export type BusinessCapabilityDepictedInDiagramsUpdateConnectionInput = {
+  node?: InputMaybe<DiagramUpdateInput>;
+  where?: InputMaybe<BusinessCapabilityDepictedInDiagramsConnectionWhere>;
+};
+
+export type BusinessCapabilityDepictedInDiagramsUpdateFieldInput = {
+  connect?: InputMaybe<Array<BusinessCapabilityDepictedInDiagramsConnectFieldInput>>;
+  create?: InputMaybe<Array<BusinessCapabilityDepictedInDiagramsCreateFieldInput>>;
+  delete?: InputMaybe<Array<BusinessCapabilityDepictedInDiagramsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<BusinessCapabilityDepictedInDiagramsDisconnectFieldInput>>;
+  update?: InputMaybe<BusinessCapabilityDepictedInDiagramsUpdateConnectionInput>;
+};
+
+export type BusinessCapabilityDiagramDepictedInDiagramsAggregateSelection = {
+  __typename?: 'BusinessCapabilityDiagramDepictedInDiagramsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<BusinessCapabilityDiagramDepictedInDiagramsNodeAggregateSelection>;
+};
+
+export type BusinessCapabilityDiagramDepictedInDiagramsNodeAggregateSelection = {
+  __typename?: 'BusinessCapabilityDiagramDepictedInDiagramsNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  diagramJson: StringAggregateSelection;
+  title: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
 export type BusinessCapabilityDisconnectInput = {
   children?: InputMaybe<Array<BusinessCapabilityChildrenDisconnectFieldInput>>;
+  depictedInDiagrams?: InputMaybe<Array<BusinessCapabilityDepictedInDiagramsDisconnectFieldInput>>;
   owners?: InputMaybe<Array<BusinessCapabilityOwnersDisconnectFieldInput>>;
   parents?: InputMaybe<Array<BusinessCapabilityParentsDisconnectFieldInput>>;
   partOfArchitectures?: InputMaybe<Array<BusinessCapabilityPartOfArchitecturesDisconnectFieldInput>>;
@@ -4182,6 +4626,7 @@ export type BusinessCapabilityUpdateInput = {
   businessValue?: InputMaybe<IntScalarMutations>;
   children?: InputMaybe<Array<BusinessCapabilityChildrenUpdateFieldInput>>;
   createdAt?: InputMaybe<DateTimeScalarMutations>;
+  depictedInDiagrams?: InputMaybe<Array<BusinessCapabilityDepictedInDiagramsUpdateFieldInput>>;
   description?: InputMaybe<StringScalarMutations>;
   maturityLevel?: InputMaybe<IntScalarMutations>;
   name?: InputMaybe<StringScalarMutations>;
@@ -4202,6 +4647,8 @@ export type BusinessCapabilityWhere = {
   children?: InputMaybe<BusinessCapabilityRelationshipFilters>;
   childrenConnection?: InputMaybe<BusinessCapabilityChildrenConnectionFilters>;
   createdAt?: InputMaybe<DateTimeScalarFilters>;
+  depictedInDiagrams?: InputMaybe<DiagramRelationshipFilters>;
+  depictedInDiagramsConnection?: InputMaybe<BusinessCapabilityDepictedInDiagramsConnectionFilters>;
   description?: InputMaybe<StringScalarFilters>;
   id?: InputMaybe<IdScalarFilters>;
   maturityLevel?: InputMaybe<IntScalarFilters>;
@@ -4349,6 +4796,8 @@ export type DataObject = {
   createdAt: Scalars['DateTime']['output'];
   dataSources: Array<Application>;
   dataSourcesConnection: DataObjectDataSourcesConnection;
+  depictedInDiagrams: Array<Diagram>;
+  depictedInDiagramsConnection: DataObjectDepictedInDiagramsConnection;
   description?: Maybe<Scalars['String']['output']>;
   endOfLifeDate?: Maybe<Scalars['Date']['output']>;
   format?: Maybe<Scalars['String']['output']>;
@@ -4384,6 +4833,24 @@ export type DataObjectDataSourcesConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<DataObjectDataSourcesConnectionSort>>;
   where?: InputMaybe<DataObjectDataSourcesConnectionWhere>;
+};
+
+
+/** DataObject - repräsentiert ein Business-Datenobjekt im Enterprise Architecture Management */
+export type DataObjectDepictedInDiagramsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<DiagramSort>>;
+  where?: InputMaybe<DiagramWhere>;
+};
+
+
+/** DataObject - repräsentiert ein Business-Datenobjekt im Enterprise Architecture Management */
+export type DataObjectDepictedInDiagramsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<DataObjectDepictedInDiagramsConnectionSort>>;
+  where?: InputMaybe<DataObjectDepictedInDiagramsConnectionWhere>;
 };
 
 
@@ -4575,6 +5042,7 @@ export type DataObjectBusinessCapabilityRelatedToCapabilitiesNodeAggregateSelect
 
 export type DataObjectConnectInput = {
   dataSources?: InputMaybe<Array<DataObjectDataSourcesConnectFieldInput>>;
+  depictedInDiagrams?: InputMaybe<Array<DataObjectDepictedInDiagramsConnectFieldInput>>;
   owners?: InputMaybe<Array<DataObjectOwnersConnectFieldInput>>;
   partOfArchitectures?: InputMaybe<Array<DataObjectPartOfArchitecturesConnectFieldInput>>;
   relatedToCapabilities?: InputMaybe<Array<DataObjectRelatedToCapabilitiesConnectFieldInput>>;
@@ -4589,6 +5057,7 @@ export type DataObjectConnectWhere = {
 export type DataObjectCreateInput = {
   classification: DataClassification;
   dataSources?: InputMaybe<DataObjectDataSourcesFieldInput>;
+  depictedInDiagrams?: InputMaybe<DataObjectDepictedInDiagramsFieldInput>;
   description?: InputMaybe<Scalars['String']['input']>;
   endOfLifeDate?: InputMaybe<Scalars['Date']['input']>;
   format?: InputMaybe<Scalars['String']['input']>;
@@ -4714,6 +5183,7 @@ export type DataObjectDataSourcesUpdateFieldInput = {
 
 export type DataObjectDeleteInput = {
   dataSources?: InputMaybe<Array<DataObjectDataSourcesDeleteFieldInput>>;
+  depictedInDiagrams?: InputMaybe<Array<DataObjectDepictedInDiagramsDeleteFieldInput>>;
   owners?: InputMaybe<Array<DataObjectOwnersDeleteFieldInput>>;
   partOfArchitectures?: InputMaybe<Array<DataObjectPartOfArchitecturesDeleteFieldInput>>;
   relatedToCapabilities?: InputMaybe<Array<DataObjectRelatedToCapabilitiesDeleteFieldInput>>;
@@ -4721,8 +5191,131 @@ export type DataObjectDeleteInput = {
   usedByApplications?: InputMaybe<Array<DataObjectUsedByApplicationsDeleteFieldInput>>;
 };
 
+export type DataObjectDepictedInDiagramsAggregateInput = {
+  AND?: InputMaybe<Array<DataObjectDepictedInDiagramsAggregateInput>>;
+  NOT?: InputMaybe<DataObjectDepictedInDiagramsAggregateInput>;
+  OR?: InputMaybe<Array<DataObjectDepictedInDiagramsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<DataObjectDepictedInDiagramsNodeAggregationWhereInput>;
+};
+
+export type DataObjectDepictedInDiagramsConnectFieldInput = {
+  connect?: InputMaybe<Array<DiagramConnectInput>>;
+  where?: InputMaybe<DiagramConnectWhere>;
+};
+
+export type DataObjectDepictedInDiagramsConnection = {
+  __typename?: 'DataObjectDepictedInDiagramsConnection';
+  aggregate: DataObjectDiagramDepictedInDiagramsAggregateSelection;
+  edges: Array<DataObjectDepictedInDiagramsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type DataObjectDepictedInDiagramsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<DataObjectDepictedInDiagramsConnectionAggregateInput>>;
+  NOT?: InputMaybe<DataObjectDepictedInDiagramsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<DataObjectDepictedInDiagramsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<DataObjectDepictedInDiagramsNodeAggregationWhereInput>;
+};
+
+export type DataObjectDepictedInDiagramsConnectionFilters = {
+  /** Filter DataObjects by aggregating results on related DataObjectDepictedInDiagramsConnections */
+  aggregate?: InputMaybe<DataObjectDepictedInDiagramsConnectionAggregateInput>;
+  /** Return DataObjects where all of the related DataObjectDepictedInDiagramsConnections match this filter */
+  all?: InputMaybe<DataObjectDepictedInDiagramsConnectionWhere>;
+  /** Return DataObjects where none of the related DataObjectDepictedInDiagramsConnections match this filter */
+  none?: InputMaybe<DataObjectDepictedInDiagramsConnectionWhere>;
+  /** Return DataObjects where one of the related DataObjectDepictedInDiagramsConnections match this filter */
+  single?: InputMaybe<DataObjectDepictedInDiagramsConnectionWhere>;
+  /** Return DataObjects where some of the related DataObjectDepictedInDiagramsConnections match this filter */
+  some?: InputMaybe<DataObjectDepictedInDiagramsConnectionWhere>;
+};
+
+export type DataObjectDepictedInDiagramsConnectionSort = {
+  node?: InputMaybe<DiagramSort>;
+};
+
+export type DataObjectDepictedInDiagramsConnectionWhere = {
+  AND?: InputMaybe<Array<DataObjectDepictedInDiagramsConnectionWhere>>;
+  NOT?: InputMaybe<DataObjectDepictedInDiagramsConnectionWhere>;
+  OR?: InputMaybe<Array<DataObjectDepictedInDiagramsConnectionWhere>>;
+  node?: InputMaybe<DiagramWhere>;
+};
+
+export type DataObjectDepictedInDiagramsCreateFieldInput = {
+  node: DiagramCreateInput;
+};
+
+export type DataObjectDepictedInDiagramsDeleteFieldInput = {
+  delete?: InputMaybe<DiagramDeleteInput>;
+  where?: InputMaybe<DataObjectDepictedInDiagramsConnectionWhere>;
+};
+
+export type DataObjectDepictedInDiagramsDisconnectFieldInput = {
+  disconnect?: InputMaybe<DiagramDisconnectInput>;
+  where?: InputMaybe<DataObjectDepictedInDiagramsConnectionWhere>;
+};
+
+export type DataObjectDepictedInDiagramsFieldInput = {
+  connect?: InputMaybe<Array<DataObjectDepictedInDiagramsConnectFieldInput>>;
+  create?: InputMaybe<Array<DataObjectDepictedInDiagramsCreateFieldInput>>;
+};
+
+export type DataObjectDepictedInDiagramsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<DataObjectDepictedInDiagramsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<DataObjectDepictedInDiagramsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<DataObjectDepictedInDiagramsNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  diagramJson?: InputMaybe<StringScalarAggregationFilters>;
+  title?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type DataObjectDepictedInDiagramsRelationship = {
+  __typename?: 'DataObjectDepictedInDiagramsRelationship';
+  cursor: Scalars['String']['output'];
+  node: Diagram;
+};
+
+export type DataObjectDepictedInDiagramsUpdateConnectionInput = {
+  node?: InputMaybe<DiagramUpdateInput>;
+  where?: InputMaybe<DataObjectDepictedInDiagramsConnectionWhere>;
+};
+
+export type DataObjectDepictedInDiagramsUpdateFieldInput = {
+  connect?: InputMaybe<Array<DataObjectDepictedInDiagramsConnectFieldInput>>;
+  create?: InputMaybe<Array<DataObjectDepictedInDiagramsCreateFieldInput>>;
+  delete?: InputMaybe<Array<DataObjectDepictedInDiagramsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<DataObjectDepictedInDiagramsDisconnectFieldInput>>;
+  update?: InputMaybe<DataObjectDepictedInDiagramsUpdateConnectionInput>;
+};
+
+export type DataObjectDiagramDepictedInDiagramsAggregateSelection = {
+  __typename?: 'DataObjectDiagramDepictedInDiagramsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<DataObjectDiagramDepictedInDiagramsNodeAggregateSelection>;
+};
+
+export type DataObjectDiagramDepictedInDiagramsNodeAggregateSelection = {
+  __typename?: 'DataObjectDiagramDepictedInDiagramsNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  diagramJson: StringAggregateSelection;
+  title: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
 export type DataObjectDisconnectInput = {
   dataSources?: InputMaybe<Array<DataObjectDataSourcesDisconnectFieldInput>>;
+  depictedInDiagrams?: InputMaybe<Array<DataObjectDepictedInDiagramsDisconnectFieldInput>>;
   owners?: InputMaybe<Array<DataObjectOwnersDisconnectFieldInput>>;
   partOfArchitectures?: InputMaybe<Array<DataObjectPartOfArchitecturesDisconnectFieldInput>>;
   relatedToCapabilities?: InputMaybe<Array<DataObjectRelatedToCapabilitiesDisconnectFieldInput>>;
@@ -5216,6 +5809,7 @@ export type DataObjectUpdateInput = {
   classification?: InputMaybe<DataClassificationEnumScalarMutations>;
   createdAt?: InputMaybe<DateTimeScalarMutations>;
   dataSources?: InputMaybe<Array<DataObjectDataSourcesUpdateFieldInput>>;
+  depictedInDiagrams?: InputMaybe<Array<DataObjectDepictedInDiagramsUpdateFieldInput>>;
   description?: InputMaybe<StringScalarMutations>;
   endOfLifeDate?: InputMaybe<DateScalarMutations>;
   format?: InputMaybe<StringScalarMutations>;
@@ -5346,6 +5940,8 @@ export type DataObjectWhere = {
   createdAt?: InputMaybe<DateTimeScalarFilters>;
   dataSources?: InputMaybe<ApplicationRelationshipFilters>;
   dataSourcesConnection?: InputMaybe<DataObjectDataSourcesConnectionFilters>;
+  depictedInDiagrams?: InputMaybe<DiagramRelationshipFilters>;
+  depictedInDiagramsConnection?: InputMaybe<DataObjectDepictedInDiagramsConnectionFilters>;
   description?: InputMaybe<StringScalarFilters>;
   endOfLifeDate?: InputMaybe<DateScalarFilters>;
   format?: InputMaybe<StringScalarFilters>;
@@ -5427,6 +6023,14 @@ export type Diagram = {
   __typename?: 'Diagram';
   architecture: Array<Architecture>;
   architectureConnection: DiagramArchitectureConnection;
+  containsApplications: Array<Application>;
+  containsApplicationsConnection: DiagramContainsApplicationsConnection;
+  containsCapabilities: Array<BusinessCapability>;
+  containsCapabilitiesConnection: DiagramContainsCapabilitiesConnection;
+  containsDataObjects: Array<DataObject>;
+  containsDataObjectsConnection: DiagramContainsDataObjectsConnection;
+  containsInterfaces: Array<ApplicationInterface>;
+  containsInterfacesConnection: DiagramContainsInterfacesConnection;
   createdAt: Scalars['DateTime']['output'];
   creator: Array<Person>;
   creatorConnection: DiagramCreatorConnection;
@@ -5454,6 +6058,78 @@ export type DiagramArchitectureConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<DiagramArchitectureConnectionSort>>;
   where?: InputMaybe<DiagramArchitectureConnectionWhere>;
+};
+
+
+/** Diagram - repräsentiert ein Excalidraw-Diagramm */
+export type DiagramContainsApplicationsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<ApplicationSort>>;
+  where?: InputMaybe<ApplicationWhere>;
+};
+
+
+/** Diagram - repräsentiert ein Excalidraw-Diagramm */
+export type DiagramContainsApplicationsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<DiagramContainsApplicationsConnectionSort>>;
+  where?: InputMaybe<DiagramContainsApplicationsConnectionWhere>;
+};
+
+
+/** Diagram - repräsentiert ein Excalidraw-Diagramm */
+export type DiagramContainsCapabilitiesArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<BusinessCapabilitySort>>;
+  where?: InputMaybe<BusinessCapabilityWhere>;
+};
+
+
+/** Diagram - repräsentiert ein Excalidraw-Diagramm */
+export type DiagramContainsCapabilitiesConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<DiagramContainsCapabilitiesConnectionSort>>;
+  where?: InputMaybe<DiagramContainsCapabilitiesConnectionWhere>;
+};
+
+
+/** Diagram - repräsentiert ein Excalidraw-Diagramm */
+export type DiagramContainsDataObjectsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<DataObjectSort>>;
+  where?: InputMaybe<DataObjectWhere>;
+};
+
+
+/** Diagram - repräsentiert ein Excalidraw-Diagramm */
+export type DiagramContainsDataObjectsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<DiagramContainsDataObjectsConnectionSort>>;
+  where?: InputMaybe<DiagramContainsDataObjectsConnectionWhere>;
+};
+
+
+/** Diagram - repräsentiert ein Excalidraw-Diagramm */
+export type DiagramContainsInterfacesArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<ApplicationInterfaceSort>>;
+  where?: InputMaybe<ApplicationInterfaceWhere>;
+};
+
+
+/** Diagram - repräsentiert ein Excalidraw-Diagramm */
+export type DiagramContainsInterfacesConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<DiagramContainsInterfacesConnectionSort>>;
+  where?: InputMaybe<DiagramContainsInterfacesConnectionWhere>;
 };
 
 
@@ -5487,6 +6163,39 @@ export type DiagramAggregateNode = {
   diagramJson: StringAggregateSelection;
   title: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
+};
+
+export type DiagramApplicationContainsApplicationsAggregateSelection = {
+  __typename?: 'DiagramApplicationContainsApplicationsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<DiagramApplicationContainsApplicationsNodeAggregateSelection>;
+};
+
+export type DiagramApplicationContainsApplicationsNodeAggregateSelection = {
+  __typename?: 'DiagramApplicationContainsApplicationsNodeAggregateSelection';
+  costs: FloatAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  hostingEnvironment: StringAggregateSelection;
+  name: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  vendor: StringAggregateSelection;
+  version: StringAggregateSelection;
+};
+
+export type DiagramApplicationInterfaceContainsInterfacesAggregateSelection = {
+  __typename?: 'DiagramApplicationInterfaceContainsInterfacesAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<DiagramApplicationInterfaceContainsInterfacesNodeAggregateSelection>;
+};
+
+export type DiagramApplicationInterfaceContainsInterfacesNodeAggregateSelection = {
+  __typename?: 'DiagramApplicationInterfaceContainsInterfacesNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  name: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  version: StringAggregateSelection;
 };
 
 export type DiagramArchitectureAggregateInput = {
@@ -5611,8 +6320,28 @@ export type DiagramArchitectureUpdateFieldInput = {
   update?: InputMaybe<DiagramArchitectureUpdateConnectionInput>;
 };
 
+export type DiagramBusinessCapabilityContainsCapabilitiesAggregateSelection = {
+  __typename?: 'DiagramBusinessCapabilityContainsCapabilitiesAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<DiagramBusinessCapabilityContainsCapabilitiesNodeAggregateSelection>;
+};
+
+export type DiagramBusinessCapabilityContainsCapabilitiesNodeAggregateSelection = {
+  __typename?: 'DiagramBusinessCapabilityContainsCapabilitiesNodeAggregateSelection';
+  businessValue: IntAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  maturityLevel: IntAggregateSelection;
+  name: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
 export type DiagramConnectInput = {
   architecture?: InputMaybe<Array<DiagramArchitectureConnectFieldInput>>;
+  containsApplications?: InputMaybe<Array<DiagramContainsApplicationsConnectFieldInput>>;
+  containsCapabilities?: InputMaybe<Array<DiagramContainsCapabilitiesConnectFieldInput>>;
+  containsDataObjects?: InputMaybe<Array<DiagramContainsDataObjectsConnectFieldInput>>;
+  containsInterfaces?: InputMaybe<Array<DiagramContainsInterfacesConnectFieldInput>>;
   creator?: InputMaybe<Array<DiagramCreatorConnectFieldInput>>;
 };
 
@@ -5620,8 +6349,444 @@ export type DiagramConnectWhere = {
   node: DiagramWhere;
 };
 
+export type DiagramContainsApplicationsAggregateInput = {
+  AND?: InputMaybe<Array<DiagramContainsApplicationsAggregateInput>>;
+  NOT?: InputMaybe<DiagramContainsApplicationsAggregateInput>;
+  OR?: InputMaybe<Array<DiagramContainsApplicationsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<DiagramContainsApplicationsNodeAggregationWhereInput>;
+};
+
+export type DiagramContainsApplicationsConnectFieldInput = {
+  connect?: InputMaybe<Array<ApplicationConnectInput>>;
+  where?: InputMaybe<ApplicationConnectWhere>;
+};
+
+export type DiagramContainsApplicationsConnection = {
+  __typename?: 'DiagramContainsApplicationsConnection';
+  aggregate: DiagramApplicationContainsApplicationsAggregateSelection;
+  edges: Array<DiagramContainsApplicationsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type DiagramContainsApplicationsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<DiagramContainsApplicationsConnectionAggregateInput>>;
+  NOT?: InputMaybe<DiagramContainsApplicationsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<DiagramContainsApplicationsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<DiagramContainsApplicationsNodeAggregationWhereInput>;
+};
+
+export type DiagramContainsApplicationsConnectionFilters = {
+  /** Filter Diagrams by aggregating results on related DiagramContainsApplicationsConnections */
+  aggregate?: InputMaybe<DiagramContainsApplicationsConnectionAggregateInput>;
+  /** Return Diagrams where all of the related DiagramContainsApplicationsConnections match this filter */
+  all?: InputMaybe<DiagramContainsApplicationsConnectionWhere>;
+  /** Return Diagrams where none of the related DiagramContainsApplicationsConnections match this filter */
+  none?: InputMaybe<DiagramContainsApplicationsConnectionWhere>;
+  /** Return Diagrams where one of the related DiagramContainsApplicationsConnections match this filter */
+  single?: InputMaybe<DiagramContainsApplicationsConnectionWhere>;
+  /** Return Diagrams where some of the related DiagramContainsApplicationsConnections match this filter */
+  some?: InputMaybe<DiagramContainsApplicationsConnectionWhere>;
+};
+
+export type DiagramContainsApplicationsConnectionSort = {
+  node?: InputMaybe<ApplicationSort>;
+};
+
+export type DiagramContainsApplicationsConnectionWhere = {
+  AND?: InputMaybe<Array<DiagramContainsApplicationsConnectionWhere>>;
+  NOT?: InputMaybe<DiagramContainsApplicationsConnectionWhere>;
+  OR?: InputMaybe<Array<DiagramContainsApplicationsConnectionWhere>>;
+  node?: InputMaybe<ApplicationWhere>;
+};
+
+export type DiagramContainsApplicationsCreateFieldInput = {
+  node: ApplicationCreateInput;
+};
+
+export type DiagramContainsApplicationsDeleteFieldInput = {
+  delete?: InputMaybe<ApplicationDeleteInput>;
+  where?: InputMaybe<DiagramContainsApplicationsConnectionWhere>;
+};
+
+export type DiagramContainsApplicationsDisconnectFieldInput = {
+  disconnect?: InputMaybe<ApplicationDisconnectInput>;
+  where?: InputMaybe<DiagramContainsApplicationsConnectionWhere>;
+};
+
+export type DiagramContainsApplicationsFieldInput = {
+  connect?: InputMaybe<Array<DiagramContainsApplicationsConnectFieldInput>>;
+  create?: InputMaybe<Array<DiagramContainsApplicationsCreateFieldInput>>;
+};
+
+export type DiagramContainsApplicationsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<DiagramContainsApplicationsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<DiagramContainsApplicationsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<DiagramContainsApplicationsNodeAggregationWhereInput>>;
+  costs?: InputMaybe<FloatScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  vendor?: InputMaybe<StringScalarAggregationFilters>;
+  version?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type DiagramContainsApplicationsRelationship = {
+  __typename?: 'DiagramContainsApplicationsRelationship';
+  cursor: Scalars['String']['output'];
+  node: Application;
+};
+
+export type DiagramContainsApplicationsUpdateConnectionInput = {
+  node?: InputMaybe<ApplicationUpdateInput>;
+  where?: InputMaybe<DiagramContainsApplicationsConnectionWhere>;
+};
+
+export type DiagramContainsApplicationsUpdateFieldInput = {
+  connect?: InputMaybe<Array<DiagramContainsApplicationsConnectFieldInput>>;
+  create?: InputMaybe<Array<DiagramContainsApplicationsCreateFieldInput>>;
+  delete?: InputMaybe<Array<DiagramContainsApplicationsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<DiagramContainsApplicationsDisconnectFieldInput>>;
+  update?: InputMaybe<DiagramContainsApplicationsUpdateConnectionInput>;
+};
+
+export type DiagramContainsCapabilitiesAggregateInput = {
+  AND?: InputMaybe<Array<DiagramContainsCapabilitiesAggregateInput>>;
+  NOT?: InputMaybe<DiagramContainsCapabilitiesAggregateInput>;
+  OR?: InputMaybe<Array<DiagramContainsCapabilitiesAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<DiagramContainsCapabilitiesNodeAggregationWhereInput>;
+};
+
+export type DiagramContainsCapabilitiesConnectFieldInput = {
+  connect?: InputMaybe<Array<BusinessCapabilityConnectInput>>;
+  where?: InputMaybe<BusinessCapabilityConnectWhere>;
+};
+
+export type DiagramContainsCapabilitiesConnection = {
+  __typename?: 'DiagramContainsCapabilitiesConnection';
+  aggregate: DiagramBusinessCapabilityContainsCapabilitiesAggregateSelection;
+  edges: Array<DiagramContainsCapabilitiesRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type DiagramContainsCapabilitiesConnectionAggregateInput = {
+  AND?: InputMaybe<Array<DiagramContainsCapabilitiesConnectionAggregateInput>>;
+  NOT?: InputMaybe<DiagramContainsCapabilitiesConnectionAggregateInput>;
+  OR?: InputMaybe<Array<DiagramContainsCapabilitiesConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<DiagramContainsCapabilitiesNodeAggregationWhereInput>;
+};
+
+export type DiagramContainsCapabilitiesConnectionFilters = {
+  /** Filter Diagrams by aggregating results on related DiagramContainsCapabilitiesConnections */
+  aggregate?: InputMaybe<DiagramContainsCapabilitiesConnectionAggregateInput>;
+  /** Return Diagrams where all of the related DiagramContainsCapabilitiesConnections match this filter */
+  all?: InputMaybe<DiagramContainsCapabilitiesConnectionWhere>;
+  /** Return Diagrams where none of the related DiagramContainsCapabilitiesConnections match this filter */
+  none?: InputMaybe<DiagramContainsCapabilitiesConnectionWhere>;
+  /** Return Diagrams where one of the related DiagramContainsCapabilitiesConnections match this filter */
+  single?: InputMaybe<DiagramContainsCapabilitiesConnectionWhere>;
+  /** Return Diagrams where some of the related DiagramContainsCapabilitiesConnections match this filter */
+  some?: InputMaybe<DiagramContainsCapabilitiesConnectionWhere>;
+};
+
+export type DiagramContainsCapabilitiesConnectionSort = {
+  node?: InputMaybe<BusinessCapabilitySort>;
+};
+
+export type DiagramContainsCapabilitiesConnectionWhere = {
+  AND?: InputMaybe<Array<DiagramContainsCapabilitiesConnectionWhere>>;
+  NOT?: InputMaybe<DiagramContainsCapabilitiesConnectionWhere>;
+  OR?: InputMaybe<Array<DiagramContainsCapabilitiesConnectionWhere>>;
+  node?: InputMaybe<BusinessCapabilityWhere>;
+};
+
+export type DiagramContainsCapabilitiesCreateFieldInput = {
+  node: BusinessCapabilityCreateInput;
+};
+
+export type DiagramContainsCapabilitiesDeleteFieldInput = {
+  delete?: InputMaybe<BusinessCapabilityDeleteInput>;
+  where?: InputMaybe<DiagramContainsCapabilitiesConnectionWhere>;
+};
+
+export type DiagramContainsCapabilitiesDisconnectFieldInput = {
+  disconnect?: InputMaybe<BusinessCapabilityDisconnectInput>;
+  where?: InputMaybe<DiagramContainsCapabilitiesConnectionWhere>;
+};
+
+export type DiagramContainsCapabilitiesFieldInput = {
+  connect?: InputMaybe<Array<DiagramContainsCapabilitiesConnectFieldInput>>;
+  create?: InputMaybe<Array<DiagramContainsCapabilitiesCreateFieldInput>>;
+};
+
+export type DiagramContainsCapabilitiesNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<DiagramContainsCapabilitiesNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<DiagramContainsCapabilitiesNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<DiagramContainsCapabilitiesNodeAggregationWhereInput>>;
+  businessValue?: InputMaybe<IntScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  maturityLevel?: InputMaybe<IntScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type DiagramContainsCapabilitiesRelationship = {
+  __typename?: 'DiagramContainsCapabilitiesRelationship';
+  cursor: Scalars['String']['output'];
+  node: BusinessCapability;
+};
+
+export type DiagramContainsCapabilitiesUpdateConnectionInput = {
+  node?: InputMaybe<BusinessCapabilityUpdateInput>;
+  where?: InputMaybe<DiagramContainsCapabilitiesConnectionWhere>;
+};
+
+export type DiagramContainsCapabilitiesUpdateFieldInput = {
+  connect?: InputMaybe<Array<DiagramContainsCapabilitiesConnectFieldInput>>;
+  create?: InputMaybe<Array<DiagramContainsCapabilitiesCreateFieldInput>>;
+  delete?: InputMaybe<Array<DiagramContainsCapabilitiesDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<DiagramContainsCapabilitiesDisconnectFieldInput>>;
+  update?: InputMaybe<DiagramContainsCapabilitiesUpdateConnectionInput>;
+};
+
+export type DiagramContainsDataObjectsAggregateInput = {
+  AND?: InputMaybe<Array<DiagramContainsDataObjectsAggregateInput>>;
+  NOT?: InputMaybe<DiagramContainsDataObjectsAggregateInput>;
+  OR?: InputMaybe<Array<DiagramContainsDataObjectsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<DiagramContainsDataObjectsNodeAggregationWhereInput>;
+};
+
+export type DiagramContainsDataObjectsConnectFieldInput = {
+  connect?: InputMaybe<Array<DataObjectConnectInput>>;
+  where?: InputMaybe<DataObjectConnectWhere>;
+};
+
+export type DiagramContainsDataObjectsConnection = {
+  __typename?: 'DiagramContainsDataObjectsConnection';
+  aggregate: DiagramDataObjectContainsDataObjectsAggregateSelection;
+  edges: Array<DiagramContainsDataObjectsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type DiagramContainsDataObjectsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<DiagramContainsDataObjectsConnectionAggregateInput>>;
+  NOT?: InputMaybe<DiagramContainsDataObjectsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<DiagramContainsDataObjectsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<DiagramContainsDataObjectsNodeAggregationWhereInput>;
+};
+
+export type DiagramContainsDataObjectsConnectionFilters = {
+  /** Filter Diagrams by aggregating results on related DiagramContainsDataObjectsConnections */
+  aggregate?: InputMaybe<DiagramContainsDataObjectsConnectionAggregateInput>;
+  /** Return Diagrams where all of the related DiagramContainsDataObjectsConnections match this filter */
+  all?: InputMaybe<DiagramContainsDataObjectsConnectionWhere>;
+  /** Return Diagrams where none of the related DiagramContainsDataObjectsConnections match this filter */
+  none?: InputMaybe<DiagramContainsDataObjectsConnectionWhere>;
+  /** Return Diagrams where one of the related DiagramContainsDataObjectsConnections match this filter */
+  single?: InputMaybe<DiagramContainsDataObjectsConnectionWhere>;
+  /** Return Diagrams where some of the related DiagramContainsDataObjectsConnections match this filter */
+  some?: InputMaybe<DiagramContainsDataObjectsConnectionWhere>;
+};
+
+export type DiagramContainsDataObjectsConnectionSort = {
+  node?: InputMaybe<DataObjectSort>;
+};
+
+export type DiagramContainsDataObjectsConnectionWhere = {
+  AND?: InputMaybe<Array<DiagramContainsDataObjectsConnectionWhere>>;
+  NOT?: InputMaybe<DiagramContainsDataObjectsConnectionWhere>;
+  OR?: InputMaybe<Array<DiagramContainsDataObjectsConnectionWhere>>;
+  node?: InputMaybe<DataObjectWhere>;
+};
+
+export type DiagramContainsDataObjectsCreateFieldInput = {
+  node: DataObjectCreateInput;
+};
+
+export type DiagramContainsDataObjectsDeleteFieldInput = {
+  delete?: InputMaybe<DataObjectDeleteInput>;
+  where?: InputMaybe<DiagramContainsDataObjectsConnectionWhere>;
+};
+
+export type DiagramContainsDataObjectsDisconnectFieldInput = {
+  disconnect?: InputMaybe<DataObjectDisconnectInput>;
+  where?: InputMaybe<DiagramContainsDataObjectsConnectionWhere>;
+};
+
+export type DiagramContainsDataObjectsFieldInput = {
+  connect?: InputMaybe<Array<DiagramContainsDataObjectsConnectFieldInput>>;
+  create?: InputMaybe<Array<DiagramContainsDataObjectsCreateFieldInput>>;
+};
+
+export type DiagramContainsDataObjectsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<DiagramContainsDataObjectsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<DiagramContainsDataObjectsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<DiagramContainsDataObjectsNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  format?: InputMaybe<StringScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type DiagramContainsDataObjectsRelationship = {
+  __typename?: 'DiagramContainsDataObjectsRelationship';
+  cursor: Scalars['String']['output'];
+  node: DataObject;
+};
+
+export type DiagramContainsDataObjectsUpdateConnectionInput = {
+  node?: InputMaybe<DataObjectUpdateInput>;
+  where?: InputMaybe<DiagramContainsDataObjectsConnectionWhere>;
+};
+
+export type DiagramContainsDataObjectsUpdateFieldInput = {
+  connect?: InputMaybe<Array<DiagramContainsDataObjectsConnectFieldInput>>;
+  create?: InputMaybe<Array<DiagramContainsDataObjectsCreateFieldInput>>;
+  delete?: InputMaybe<Array<DiagramContainsDataObjectsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<DiagramContainsDataObjectsDisconnectFieldInput>>;
+  update?: InputMaybe<DiagramContainsDataObjectsUpdateConnectionInput>;
+};
+
+export type DiagramContainsInterfacesAggregateInput = {
+  AND?: InputMaybe<Array<DiagramContainsInterfacesAggregateInput>>;
+  NOT?: InputMaybe<DiagramContainsInterfacesAggregateInput>;
+  OR?: InputMaybe<Array<DiagramContainsInterfacesAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<DiagramContainsInterfacesNodeAggregationWhereInput>;
+};
+
+export type DiagramContainsInterfacesConnectFieldInput = {
+  connect?: InputMaybe<Array<ApplicationInterfaceConnectInput>>;
+  where?: InputMaybe<ApplicationInterfaceConnectWhere>;
+};
+
+export type DiagramContainsInterfacesConnection = {
+  __typename?: 'DiagramContainsInterfacesConnection';
+  aggregate: DiagramApplicationInterfaceContainsInterfacesAggregateSelection;
+  edges: Array<DiagramContainsInterfacesRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type DiagramContainsInterfacesConnectionAggregateInput = {
+  AND?: InputMaybe<Array<DiagramContainsInterfacesConnectionAggregateInput>>;
+  NOT?: InputMaybe<DiagramContainsInterfacesConnectionAggregateInput>;
+  OR?: InputMaybe<Array<DiagramContainsInterfacesConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<DiagramContainsInterfacesNodeAggregationWhereInput>;
+};
+
+export type DiagramContainsInterfacesConnectionFilters = {
+  /** Filter Diagrams by aggregating results on related DiagramContainsInterfacesConnections */
+  aggregate?: InputMaybe<DiagramContainsInterfacesConnectionAggregateInput>;
+  /** Return Diagrams where all of the related DiagramContainsInterfacesConnections match this filter */
+  all?: InputMaybe<DiagramContainsInterfacesConnectionWhere>;
+  /** Return Diagrams where none of the related DiagramContainsInterfacesConnections match this filter */
+  none?: InputMaybe<DiagramContainsInterfacesConnectionWhere>;
+  /** Return Diagrams where one of the related DiagramContainsInterfacesConnections match this filter */
+  single?: InputMaybe<DiagramContainsInterfacesConnectionWhere>;
+  /** Return Diagrams where some of the related DiagramContainsInterfacesConnections match this filter */
+  some?: InputMaybe<DiagramContainsInterfacesConnectionWhere>;
+};
+
+export type DiagramContainsInterfacesConnectionSort = {
+  node?: InputMaybe<ApplicationInterfaceSort>;
+};
+
+export type DiagramContainsInterfacesConnectionWhere = {
+  AND?: InputMaybe<Array<DiagramContainsInterfacesConnectionWhere>>;
+  NOT?: InputMaybe<DiagramContainsInterfacesConnectionWhere>;
+  OR?: InputMaybe<Array<DiagramContainsInterfacesConnectionWhere>>;
+  node?: InputMaybe<ApplicationInterfaceWhere>;
+};
+
+export type DiagramContainsInterfacesCreateFieldInput = {
+  node: ApplicationInterfaceCreateInput;
+};
+
+export type DiagramContainsInterfacesDeleteFieldInput = {
+  delete?: InputMaybe<ApplicationInterfaceDeleteInput>;
+  where?: InputMaybe<DiagramContainsInterfacesConnectionWhere>;
+};
+
+export type DiagramContainsInterfacesDisconnectFieldInput = {
+  disconnect?: InputMaybe<ApplicationInterfaceDisconnectInput>;
+  where?: InputMaybe<DiagramContainsInterfacesConnectionWhere>;
+};
+
+export type DiagramContainsInterfacesFieldInput = {
+  connect?: InputMaybe<Array<DiagramContainsInterfacesConnectFieldInput>>;
+  create?: InputMaybe<Array<DiagramContainsInterfacesCreateFieldInput>>;
+};
+
+export type DiagramContainsInterfacesNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<DiagramContainsInterfacesNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<DiagramContainsInterfacesNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<DiagramContainsInterfacesNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  version?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type DiagramContainsInterfacesRelationship = {
+  __typename?: 'DiagramContainsInterfacesRelationship';
+  cursor: Scalars['String']['output'];
+  node: ApplicationInterface;
+};
+
+export type DiagramContainsInterfacesUpdateConnectionInput = {
+  node?: InputMaybe<ApplicationInterfaceUpdateInput>;
+  where?: InputMaybe<DiagramContainsInterfacesConnectionWhere>;
+};
+
+export type DiagramContainsInterfacesUpdateFieldInput = {
+  connect?: InputMaybe<Array<DiagramContainsInterfacesConnectFieldInput>>;
+  create?: InputMaybe<Array<DiagramContainsInterfacesCreateFieldInput>>;
+  delete?: InputMaybe<Array<DiagramContainsInterfacesDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<DiagramContainsInterfacesDisconnectFieldInput>>;
+  update?: InputMaybe<DiagramContainsInterfacesUpdateConnectionInput>;
+};
+
 export type DiagramCreateInput = {
   architecture?: InputMaybe<DiagramArchitectureFieldInput>;
+  containsApplications?: InputMaybe<DiagramContainsApplicationsFieldInput>;
+  containsCapabilities?: InputMaybe<DiagramContainsCapabilitiesFieldInput>;
+  containsDataObjects?: InputMaybe<DiagramContainsDataObjectsFieldInput>;
+  containsInterfaces?: InputMaybe<DiagramContainsInterfacesFieldInput>;
   creator?: InputMaybe<DiagramCreatorFieldInput>;
   description?: InputMaybe<Scalars['String']['input']>;
   diagramJson: Scalars['String']['input'];
@@ -5741,13 +6906,36 @@ export type DiagramCreatorUpdateFieldInput = {
   update?: InputMaybe<DiagramCreatorUpdateConnectionInput>;
 };
 
+export type DiagramDataObjectContainsDataObjectsAggregateSelection = {
+  __typename?: 'DiagramDataObjectContainsDataObjectsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<DiagramDataObjectContainsDataObjectsNodeAggregateSelection>;
+};
+
+export type DiagramDataObjectContainsDataObjectsNodeAggregateSelection = {
+  __typename?: 'DiagramDataObjectContainsDataObjectsNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  format: StringAggregateSelection;
+  name: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
 export type DiagramDeleteInput = {
   architecture?: InputMaybe<Array<DiagramArchitectureDeleteFieldInput>>;
+  containsApplications?: InputMaybe<Array<DiagramContainsApplicationsDeleteFieldInput>>;
+  containsCapabilities?: InputMaybe<Array<DiagramContainsCapabilitiesDeleteFieldInput>>;
+  containsDataObjects?: InputMaybe<Array<DiagramContainsDataObjectsDeleteFieldInput>>;
+  containsInterfaces?: InputMaybe<Array<DiagramContainsInterfacesDeleteFieldInput>>;
   creator?: InputMaybe<Array<DiagramCreatorDeleteFieldInput>>;
 };
 
 export type DiagramDisconnectInput = {
   architecture?: InputMaybe<Array<DiagramArchitectureDisconnectFieldInput>>;
+  containsApplications?: InputMaybe<Array<DiagramContainsApplicationsDisconnectFieldInput>>;
+  containsCapabilities?: InputMaybe<Array<DiagramContainsCapabilitiesDisconnectFieldInput>>;
+  containsDataObjects?: InputMaybe<Array<DiagramContainsDataObjectsDisconnectFieldInput>>;
+  containsInterfaces?: InputMaybe<Array<DiagramContainsInterfacesDisconnectFieldInput>>;
   creator?: InputMaybe<Array<DiagramCreatorDisconnectFieldInput>>;
 };
 
@@ -5825,6 +7013,10 @@ export type DiagramTypeEnumScalarMutations = {
 
 export type DiagramUpdateInput = {
   architecture?: InputMaybe<Array<DiagramArchitectureUpdateFieldInput>>;
+  containsApplications?: InputMaybe<Array<DiagramContainsApplicationsUpdateFieldInput>>;
+  containsCapabilities?: InputMaybe<Array<DiagramContainsCapabilitiesUpdateFieldInput>>;
+  containsDataObjects?: InputMaybe<Array<DiagramContainsDataObjectsUpdateFieldInput>>;
+  containsInterfaces?: InputMaybe<Array<DiagramContainsInterfacesUpdateFieldInput>>;
   createdAt?: InputMaybe<DateTimeScalarMutations>;
   creator?: InputMaybe<Array<DiagramCreatorUpdateFieldInput>>;
   description?: InputMaybe<StringScalarMutations>;
@@ -5839,6 +7031,14 @@ export type DiagramWhere = {
   OR?: InputMaybe<Array<DiagramWhere>>;
   architecture?: InputMaybe<ArchitectureRelationshipFilters>;
   architectureConnection?: InputMaybe<DiagramArchitectureConnectionFilters>;
+  containsApplications?: InputMaybe<ApplicationRelationshipFilters>;
+  containsApplicationsConnection?: InputMaybe<DiagramContainsApplicationsConnectionFilters>;
+  containsCapabilities?: InputMaybe<BusinessCapabilityRelationshipFilters>;
+  containsCapabilitiesConnection?: InputMaybe<DiagramContainsCapabilitiesConnectionFilters>;
+  containsDataObjects?: InputMaybe<DataObjectRelationshipFilters>;
+  containsDataObjectsConnection?: InputMaybe<DiagramContainsDataObjectsConnectionFilters>;
+  containsInterfaces?: InputMaybe<ApplicationInterfaceRelationshipFilters>;
+  containsInterfacesConnection?: InputMaybe<DiagramContainsInterfacesConnectionFilters>;
   createdAt?: InputMaybe<DateTimeScalarFilters>;
   creator?: InputMaybe<PersonRelationshipFilters>;
   creatorConnection?: InputMaybe<DiagramCreatorConnectionFilters>;

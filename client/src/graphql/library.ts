@@ -121,6 +121,11 @@ export const ELEMENT_TYPE_CONFIG = {
     color: '#a5d8ff',
     iconType: 'rectangle',
   },
+  applicationInterface: {
+    label: 'Application Interfaces',
+    color: '#a5d8ff',
+    iconType: 'rectangle',
+  },
 } as const
 
 export type ElementType = keyof typeof ELEMENT_TYPE_CONFIG

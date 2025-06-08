@@ -67,22 +67,18 @@ const setupTokenRefresh = () => {
 
   // Token-Refresh bei Ablauf
   keycloak.onTokenExpired = () => {
-    console.log('Token abgelaufen, versuche Refresh...')
     if (!keycloak) return
 
     keycloak
       .updateToken(30)
       .then(refreshed => {
         if (refreshed && keycloak) {
-          console.log('Token erfolgreich aktualisiert')
           // Event für Token-Update auslösen
           window.dispatchEvent(
             new CustomEvent('tokenRefreshed', {
               detail: { token: keycloak.token },
             })
           )
-        } else {
-          console.log('Token noch gültig')
         }
       })
       .catch(() => {
@@ -101,7 +97,6 @@ const setupTokenRefresh = () => {
           .updateToken(70) // Refresh wenn weniger als 70 Sekunden verbleiben
           .then(refreshed => {
             if (refreshed && keycloak) {
-              console.log('Token präventiv aktualisiert')
               window.dispatchEvent(
                 new CustomEvent('tokenRefreshed', {
                   detail: { token: keycloak.token },
@@ -119,20 +114,17 @@ const setupTokenRefresh = () => {
 
   // Event-Listener für Auth-Fehler
   const handleAuthError = () => {
-    console.log('Auth-Fehler erkannt, versuche Token-Refresh...')
     if (keycloak?.authenticated) {
       keycloak
         .updateToken(0) // Erzwinge Token-Refresh
         .then(refreshed => {
           if (refreshed && keycloak) {
-            console.log('Token nach Auth-Fehler aktualisiert')
             window.dispatchEvent(
               new CustomEvent('tokenRefreshed', {
                 detail: { token: keycloak.token },
               })
             )
           } else {
-            console.log('Token-Refresh nach Auth-Fehler fehlgeschlagen, leite zu Login weiter')
             if (keycloak) {
               keycloak.login()
             }

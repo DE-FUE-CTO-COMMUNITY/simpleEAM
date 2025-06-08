@@ -34,7 +34,6 @@ export function createApolloClient(token?: string) {
 
         // Bei Authentifizierungsfehlern versuche Token-Refresh
         if (message.includes('unauthenticated') || message.includes('Unauthorized')) {
-          console.log('Authentifizierungsfehler erkannt, versuche Token-Refresh...')
           // Trigger token refresh via custom event
           window.dispatchEvent(new CustomEvent('authError'))
         }
@@ -48,7 +47,6 @@ export function createApolloClient(token?: string) {
 
         // Bei 401/403 Fehlern Token-Refresh versuchen
         if (statusCode === 401 || statusCode === 403) {
-          console.log('HTTP Authentifizierungsfehler erkannt, versuche Token-Refresh...')
           window.dispatchEvent(new CustomEvent('authError'))
         }
       }

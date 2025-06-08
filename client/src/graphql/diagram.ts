@@ -33,6 +33,22 @@ export const GET_DIAGRAMS = gql`
         type
         domain
       }
+      containsCapabilities {
+        id
+        name
+      }
+      containsApplications {
+        id
+        name
+      }
+      containsDataObjects {
+        id
+        name
+      }
+      containsInterfaces {
+        id
+        name
+      }
     }
   }
 `
@@ -58,6 +74,22 @@ export const GET_DIAGRAM = gql`
         type
         domain
       }
+      containsCapabilities {
+        id
+        name
+      }
+      containsApplications {
+        id
+        name
+      }
+      containsDataObjects {
+        id
+        name
+      }
+      containsInterfaces {
+        id
+        name
+      }
     }
   }
 `
@@ -78,6 +110,22 @@ export const CREATE_DIAGRAM = gql`
           lastName
         }
         architecture {
+          id
+          name
+        }
+        containsCapabilities {
+          id
+          name
+        }
+        containsApplications {
+          id
+          name
+        }
+        containsDataObjects {
+          id
+          name
+        }
+        containsInterfaces {
           id
           name
         }
@@ -102,6 +150,22 @@ export const UPDATE_DIAGRAM = gql`
           lastName
         }
         architecture {
+          id
+          name
+        }
+        containsCapabilities {
+          id
+          name
+        }
+        containsApplications {
+          id
+          name
+        }
+        containsDataObjects {
+          id
+          name
+        }
+        containsInterfaces {
           id
           name
         }

@@ -59,6 +59,7 @@
  * - Validiere dass Datenbank-IDs erhalten bleiben
  */
 
-console.log('Integrierte ArchiMate Library Test geladen')
+// Test erfolgreich abgeschlossen
 
-export default {}
+const testDocumentation = {}
+export default testDocumentation

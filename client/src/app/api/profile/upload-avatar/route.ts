@@ -112,8 +112,6 @@ export async function POST(request: NextRequest) {
 
     const graphqlResult = await graphqlResponse.json()
 
-    console.log('GraphQL-Antwort:', JSON.stringify(graphqlResult, null, 2))
-
     if (graphqlResult.errors) {
       console.error('GraphQL-Errors:', graphqlResult.errors)
       return NextResponse.json(
