@@ -956,42 +956,6 @@ async function createSampleData(session: Session) {
       })
     `)
 
-    console.log('Erstelle Diagramme...')
-    // Diagramme erstellen
-    await session.run(`
-      CREATE 
-      (diag1:Diagram {
-        id: "diag-001",
-        title: "CRM System Overview",
-        description: "Übersicht des CRM-Systems und Integrationen",
-        diagramJson: '{"type":"excalidraw","version":2,"source":"simple-eam","elements":[{"type":"rectangle","x":100,"y":100,"width":200,"height":100,"text":"CRM System"}]}',
-        tags: ["CRM", "Overview", "Integration"],
-        isPublic: true,
-        createdAt: datetime(),
-        updatedAt: datetime()
-      }),
-      (diag2:Diagram {
-        id: "diag-002",
-        title: "Data Flow Architecture",
-        description: "Datenfluss zwischen Systemen",
-        diagramJson: '{"type":"excalidraw","version":2,"source":"simple-eam","elements":[{"type":"arrow","x":50,"y":50,"width":300,"height":2}]}',
-        tags: ["Data", "Flow", "Architecture"],
-        isPublic: true,
-        createdAt: datetime(),
-        updatedAt: datetime()
-      }),
-      (diag3:Diagram {
-        id: "diag-003",
-        title: "Security Architecture Model",
-        description: "IT-Sicherheitsarchitektur Übersicht",
-        diagramJson: '{"type":"excalidraw","version":2,"source":"simple-eam","elements":[{"type":"diamond","x":150,"y":150,"width":100,"height":100,"text":"Security"}]}',
-        tags: ["Security", "Architecture", "Model"],
-        isPublic: false,
-        createdAt: datetime(),
-        updatedAt: datetime()
-      })
-    `)
-
     console.log('Erstelle Beziehungen zwischen Entitäten...')
     // Ownership-Beziehungen
     await session.run(`
@@ -1004,10 +968,7 @@ async function createSampleData(session: Session) {
         (p4:Person {id: "person-004"}), (c3),
         (p5:Person {id: "person-005"}), (c4:BusinessCapability {id: "bc-004"}),
         (p6:Person {id: "person-006"}), (d1:DataObject {id: "do-001"}),
-        (p6), (d8:DataObject {id: "do-008"}),
-        (p1), (diag1:Diagram {id: "diag-001"}),
-        (p1), (diag2:Diagram {id: "diag-002"}),
-        (p2), (diag3:Diagram {id: "diag-003"})
+        (p6), (d8:DataObject {id: "do-008"})
       CREATE 
         (arch1)-[:OWNED_BY]->(p1),
         (arch2)-[:OWNED_BY]->(p1),
@@ -1016,10 +977,7 @@ async function createSampleData(session: Session) {
         (c3)-[:OWNED_BY]->(p3),
         (c4)-[:OWNED_BY]->(p5),
         (d1)-[:OWNED_BY]->(p6),
-        (d8)-[:OWNED_BY]->(p6),
-        (diag1)-[:CREATED_BY]->(p1),
-        (diag2)-[:CREATED_BY]->(p1),
-        (diag3)-[:CREATED_BY]->(p2)
+        (d8)-[:OWNED_BY]->(p6)
     `)
 
     // Fehlende Architektur-Verantwortlichkeiten ergänzen
@@ -1319,14 +1277,12 @@ async function createSampleData(session: Session) {
     // Fehlende DataObject-Verantwortlichkeiten ergänzen
     await session.run(`
       MATCH 
-        (p2:Person {id: "person-002"}), (d2:DataObject {id: "do-002"}),
-        (p3:Person {id: "person-003"}), (d3:DataObject {id: "do-003"}),
+        (p1:Person {id: "person-001"}), (d7:DataObject {id: "do-007"}),
+        (p2:Person {id: "person-002"}), (d2:DataObject {id: "do-002"}), (d9:DataObject {id: "do-009"}),
+        (p3:Person {id: "person-003"}), (d3:DataObject {id: "do-003"}), (d10:DataObject {id: "do-010"}),
         (p4:Person {id: "person-004"}), (d4:DataObject {id: "do-004"}),
         (p5:Person {id: "person-005"}), (d5:DataObject {id: "do-005"}),
-        (p6), (d6:DataObject {id: "do-006"}),
-        (p1:Person {id: "person-001"}), (d7:DataObject {id: "do-007"}),
-        (p2), (d9:DataObject {id: "do-009"}),
-        (p3), (d10:DataObject {id: "do-010"})
+        (p6:Person {id: "person-006"}), (d6:DataObject {id: "do-006"})
       CREATE 
         (d2)-[:OWNED_BY]->(p2),
         (d3)-[:OWNED_BY]->(p3),
@@ -1336,18 +1292,6 @@ async function createSampleData(session: Session) {
         (d7)-[:OWNED_BY]->(p1),
         (d9)-[:OWNED_BY]->(p2),
         (d10)-[:OWNED_BY]->(p3)
-    `)
-
-    // Diagramm-Architektur Zuordnungen
-    await session.run(`
-      MATCH 
-        (diag1:Diagram {id: "diag-001"}), (arch1:Architecture {id: "arch-001"}),
-        (diag2:Diagram {id: "diag-002"}), (arch2:Architecture {id: "arch-002"}),
-        (diag3:Diagram {id: "diag-003"}), (arch3:Architecture {id: "arch-003"})
-      CREATE 
-        (diag1)-[:BELONGS_TO]->(arch1),
-        (diag2)-[:BELONGS_TO]->(arch2),
-        (diag3)-[:BELONGS_TO]->(arch3)
     `)
 
     // Architecture-Entity Beziehungen
@@ -1387,7 +1331,6 @@ async function createSampleData(session: Session) {
     console.log('- 10 DataObjects (alle mit Verantwortlichen)')
     console.log('- 12 ApplicationInterfaces (alle mit Quell- und Zielanwendungen)')
     console.log('- 5 Architectures (alle mit Verantwortlichen)')
-    console.log('- 3 Diagrams (alle Architekturen zugeordnet)')
     console.log('- Vollständige Beziehungen zwischen allen Entitäten')
     console.log('- Alle Entitäten haben genau einen Verantwortlichen')
   } catch (error) {

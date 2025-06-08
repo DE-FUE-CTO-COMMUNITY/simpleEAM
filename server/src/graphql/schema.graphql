@@ -36,6 +36,7 @@ type BusinessCapability
   supportedByApplications: [Application!]! @relationship(type: "SUPPORTS", direction: IN)
   relatedDataObjects: [DataObject!]! @relationship(type: "RELATED_TO", direction: OUT)
   partOfArchitectures: [Architecture!]! @relationship(type: "CONTAINS", direction: IN)
+  depictedInDiagrams: [Diagram!]! @relationship(type: "DEPICTED_IN", direction: OUT)
 }
 
 """
@@ -104,6 +105,7 @@ type Application
   targetOfInterfaces: [ApplicationInterface!]!
     @relationship(type: "INTERFACE_TARGET", direction: OUT)
   partOfArchitectures: [Architecture!]! @relationship(type: "CONTAINS", direction: IN)
+  depictedInDiagrams: [Diagram!]! @relationship(type: "DEPICTED_IN", direction: OUT)
 }
 
 """
@@ -132,6 +134,7 @@ type ApplicationInterface
   sourceApplications: [Application!]! @relationship(type: "INTERFACE_SOURCE", direction: IN)
   targetApplications: [Application!]! @relationship(type: "INTERFACE_TARGET", direction: IN)
   dataObjects: [DataObject!]! @relationship(type: "TRANSFERS", direction: OUT)
+  depictedInDiagrams: [Diagram!]! @relationship(type: "DEPICTED_IN", direction: OUT)
 }
 
 """
@@ -160,6 +163,7 @@ type DataObject
   relatedToCapabilities: [BusinessCapability!]! @relationship(type: "RELATED_TO", direction: IN)
   transferredInInterfaces: [ApplicationInterface!]! @relationship(type: "TRANSFERS", direction: IN)
   partOfArchitectures: [Architecture!]! @relationship(type: "CONTAINS", direction: IN)
+  depictedInDiagrams: [Diagram!]! @relationship(type: "DEPICTED_IN", direction: OUT)
 }
 
 """
@@ -314,6 +318,10 @@ type Diagram
   updatedAt: DateTime @timestamp(operations: [UPDATE])
   architecture: [Architecture!]! @relationship(type: "BELONGS_TO", direction: OUT)
   creator: [Person!]! @relationship(type: "CREATED_BY", direction: OUT)
+  containsCapabilities: [BusinessCapability!]! @relationship(type: "DEPICTED_IN", direction: IN)
+  containsApplications: [Application!]! @relationship(type: "DEPICTED_IN", direction: IN)
+  containsDataObjects: [DataObject!]! @relationship(type: "DEPICTED_IN", direction: IN)
+  containsInterfaces: [ApplicationInterface!]! @relationship(type: "DEPICTED_IN", direction: IN)
 }
 
 """

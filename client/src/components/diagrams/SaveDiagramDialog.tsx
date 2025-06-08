@@ -347,16 +347,19 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
               if (!option || !value) return false
               return option.id === value.id
             }}
-            renderOption={(props, option) => (
-              <Box component="li" {...props}>
-                <Box>
-                  <Typography variant="body2">{option.name}</Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    {option.type} • {option.domain}
-                  </Typography>
+            renderOption={(props, option) => {
+              const { key, ...otherProps } = props
+              return (
+                <Box key={key} component="li" {...otherProps}>
+                  <Box>
+                    <Typography variant="body2">{option.name}</Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {option.type} • {option.domain}
+                    </Typography>
+                  </Box>
                 </Box>
-              </Box>
-            )}
+              )
+            }}
             renderInput={params => (
               <TextField
                 {...params}
