@@ -173,6 +173,50 @@ export const themeOptions: ThemeOptions = {
         root: {
           borderRadius: '8px',
           boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.1)',
+          // Entferne das Standard-24px Margin von Material UI 7
+          margin: '0 !important',
+          // Entferne auch mögliche margin-bottom Einstellungen
+          marginBottom: '0 !important',
+        },
+      },
+    },
+    MuiCardContent: {
+      styleOverrides: {
+        root: {
+          // Entferne das Standard-Margin von CardContent
+          margin: '0 !important',
+          marginBottom: '0 !important',
+          '&:last-child': {
+            paddingBottom: '16px', // Standard-Padding beibehalten
+          },
+        },
+      },
+    },
+    MuiCardHeader: {
+      styleOverrides: {
+        root: {
+          // Entferne das Standard-Margin von CardHeader
+          margin: '0 !important',
+          marginBottom: '0 !important',
+        },
+      },
+    },
+    MuiCardActions: {
+      styleOverrides: {
+        root: {
+          // Entferne das Standard-Margin von CardActions
+          margin: '0 !important',
+          marginBottom: '0 !important',
+        },
+      },
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          // Entferne das Standard-24px Margin von Material UI 7
+          margin: '0 !important',
+          // Entferne auch mögliche margin-bottom Einstellungen
+          marginBottom: '0 !important',
         },
       },
     },

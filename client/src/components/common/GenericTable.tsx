@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useCallback, useMemo } from 'react'
+import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react'
 import {
   Box,
   Tooltip,
@@ -16,6 +16,10 @@ import {
   Visibility as VisibilityIcon,
   KeyboardArrowDown as SortDownIcon,
   KeyboardArrowUp as SortUpIcon,
+  FirstPage as FirstPageIcon,
+  LastPage as LastPageIcon,
+  ArrowBack as BackIcon,
+  ArrowForward as ForwardIcon,
 } from '@mui/icons-material'
 import {
   flexRender,
@@ -29,6 +33,7 @@ import {
   VisibilityState,
 } from '@tanstack/react-table'
 import { isArchitect } from '@/lib/auth'
+import useAutomaticPageSize from '../../hooks/useAutomaticPageSize'
 
 /**
  * GenericTableProps definiert die gemeinsamen Eigenschaften für alle Tabellen
@@ -96,6 +101,29 @@ export function GenericTable<T extends { id: string }, F>({
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const isTablet = useMediaQuery(theme.breakpoints.down('lg'))
+
+  // Ref für automatische Seitengrößenberechnung
+  const tableContainerRef = useRef<HTMLDivElement>(null)
+
+  // Automatische Seitengrößenberechnung basierend auf Fensterhöhe
+  const automaticPageSize = useAutomaticPageSize(
+    tableContainerRef,
+    60, // Header height
+    80, // Footer height
+    isMobile ? 80 : 60, // Row height (mobil höher)
+    200 // Offset height
+  )
+
+  // State für die Seitengröße und Seitenindex
+  const [pageSize, setPageSize] = useState(automaticPageSize)
+  const [pageIndex, setPageIndex] = useState(0)
+
+  // Aktualisiere pageSize wenn sich automaticPageSize ändert
+  useEffect(() => {
+    setPageSize(automaticPageSize)
+    // Reset auf erste Seite wenn sich die Seitengröße ändert
+    setPageIndex(0)
+  }, [automaticPageSize])
 
   // Handler für das Öffnen des Formulars zur Detailansicht
   const handleViewItemClick = useCallback(
@@ -254,6 +282,11 @@ export function GenericTable<T extends { id: string }, F>({
       globalFilter,
       // Externes State-Management für die Spaltenvisibilität
       columnVisibility: _externalColumnVisibility,
+      // Lokale Pagination State
+      pagination: {
+        pageIndex: pageIndex,
+        pageSize: pageSize,
+      },
     },
     onSortingChange: updater =>
       onSortingChange(typeof updater === 'function' ? updater(sorting) : updater),
@@ -268,15 +301,25 @@ export function GenericTable<T extends { id: string }, F>({
         _externalOnColumnVisibilityChange(newState)
       }
     },
+    // Pagination State Updates handhaben
+    onPaginationChange: updater => {
+      const currentState = { pageIndex, pageSize }
+      const newState = typeof updater === 'function' ? updater(currentState) : updater
+
+      // Update lokale State
+      if (newState.pageIndex !== pageIndex) {
+        setPageIndex(newState.pageIndex)
+      }
+      if (newState.pageSize !== pageSize) {
+        setPageSize(newState.pageSize)
+      }
+    },
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    initialState: {
-      pagination: {
-        pageSize: 10,
-      },
-    },
+    manualPagination: false,
+    enableRowSelection: false,
   })
 
   // Table-Instanz über Callback bereitstellen
@@ -457,6 +500,7 @@ export function GenericTable<T extends { id: string }, F>({
 
       {/* Paginierung */}
       <Box
+        ref={tableContainerRef}
         sx={{
           display: 'flex',
           flexDirection: isMobile ? 'column' : 'row',
@@ -476,34 +520,10 @@ export function GenericTable<T extends { id: string }, F>({
           }}
         >
           <Typography variant="body2" sx={{ textAlign: isMobile ? 'center' : 'left' }}>
-            Zeige {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1}{' '}
-            bis{' '}
-            {Math.min(
-              (table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
-              table.getFilteredRowModel().rows.length
-            )}{' '}
-            von {table.getFilteredRowModel().rows.length} Einträgen
+            Zeige {pageIndex * pageSize + 1} bis{' '}
+            {Math.min((pageIndex + 1) * pageSize, table.getFilteredRowModel().rows.length)} von{' '}
+            {table.getFilteredRowModel().rows.length} Einträgen ({pageSize} pro Seite)
           </Typography>
-          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-            <select
-              value={table.getState().pagination.pageSize}
-              onChange={e => {
-                table.setPageSize(Number(e.target.value))
-              }}
-              style={{
-                padding: isMobile ? '8px 12px' : '4px 8px',
-                borderRadius: '4px',
-                border: `1px solid ${theme.palette.divider}`,
-                fontSize: isMobile ? '16px' : '14px', // Prevent zoom on iOS
-              }}
-            >
-              {[5, 10, 25, 50].map(pageSize => (
-                <option key={pageSize} value={pageSize}>
-                  {pageSize} pro Seite
-                </option>
-              ))}
-            </select>
-          </Box>
         </Box>
         <Box
           sx={{
@@ -513,18 +533,40 @@ export function GenericTable<T extends { id: string }, F>({
             flexWrap: 'wrap',
           }}
         >
+          {/* Anfang Button */}
+          <Button
+            variant="outlined"
+            size={isMobile ? 'medium' : 'small'}
+            onClick={() => table.setPageIndex(0)}
+            disabled={!table.getCanPreviousPage()}
+            startIcon={<FirstPageIcon />}
+            sx={{
+              minWidth: isMobile ? '120px' : 'auto',
+              fontSize: isMobile ? '16px' : '14px',
+            }}
+          >
+            Anfang
+          </Button>
+
+          {/* Zurück Button */}
           <Button
             variant="outlined"
             size={isMobile ? 'medium' : 'small'}
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
+            startIcon={<BackIcon />}
             sx={{
-              minWidth: isMobile ? '80px' : 'auto',
+              minWidth: isMobile ? '44px' : '80px',
               fontSize: isMobile ? '16px' : '14px',
+              '& .MuiButton-startIcon': {
+                marginRight: isMobile ? 0 : '8px',
+              },
             }}
           >
-            Zurück
+            {!isMobile && 'Zurück'}
           </Button>
+
+          {/* Seitenzahlen */}
           <Box
             sx={{
               display: 'flex',
@@ -537,79 +579,71 @@ export function GenericTable<T extends { id: string }, F>({
             {Array.from(
               {
                 length: isMobile
-                  ? Math.min(table.getPageCount(), 5)
-                  : table.getPageCount() > 7
-                    ? 7
+                  ? Math.min(table.getPageCount(), 3)
+                  : table.getPageCount() > 5
+                    ? 5
                     : table.getPageCount(),
               },
               (_, i) => {
-                // Zeige maximal 5 Seitenzahlen auf mobile, 7 auf Desktop
-                let pageIndex
-                const currentPage = table.getState().pagination.pageIndex
+                // Zeige maximal 3 Seitenzahlen auf mobile, 5 auf Desktop
+                let displayPageIndex
+                const currentPage = pageIndex
                 const totalPages = table.getPageCount()
 
-                if (totalPages <= 7) {
-                  // Wenn weniger als 7 Seiten, zeige alle an
-                  pageIndex = i
-                } else if (currentPage < 3) {
-                  // Wenn aktuelle Seite weniger als 3 ist
-                  if (i < 5) {
-                    pageIndex = i
-                  } else if (i === 5) {
+                if (totalPages <= 5) {
+                  // Wenn weniger als 5 Seiten, zeige alle an
+                  displayPageIndex = i
+                } else if (currentPage < 2) {
+                  // Wenn aktuelle Seite weniger als 2 ist
+                  if (i < 4) {
+                    displayPageIndex = i
+                  } else {
                     return (
                       <Box key="ellipsis-end" sx={{ mx: 1 }}>
                         ...
                       </Box>
                     )
-                  } else {
-                    pageIndex = totalPages - 1
                   }
-                } else if (currentPage > totalPages - 4) {
+                } else if (currentPage > totalPages - 3) {
                   // Wenn aktuelle Seite nahe am Ende ist
                   if (i === 0) {
-                    pageIndex = 0
-                  } else if (i === 1) {
                     return (
                       <Box key="ellipsis-start" sx={{ mx: 1 }}>
                         ...
                       </Box>
                     )
                   } else {
-                    pageIndex = totalPages - 7 + i
+                    displayPageIndex = totalPages - 4 + i
                   }
                 } else {
                   // Wenn aktuelle Seite in der Mitte ist
                   if (i === 0) {
-                    pageIndex = 0
-                  } else if (i === 1) {
                     return (
                       <Box key="ellipsis-start" sx={{ mx: 1 }}>
                         ...
                       </Box>
                     )
-                  } else if (i === 6) {
+                  } else if (i === 4) {
                     return (
                       <Box key="ellipsis-end" sx={{ mx: 1 }}>
                         ...
                       </Box>
                     )
-                  } else if (i === 5) {
-                    pageIndex = totalPages - 1
                   } else {
-                    pageIndex = currentPage + (i - 3)
+                    displayPageIndex = currentPage + (i - 2)
                   }
                 }
 
-                // Prüfen und anpassen bei ungültigen pageIndex-Werten
-                if (pageIndex < 0) pageIndex = 0
-                if (pageIndex >= totalPages) pageIndex = totalPages - 1
+                // Prüfen und anpassen bei ungültigen displayPageIndex-Werten
+                if (displayPageIndex < 0) displayPageIndex = 0
+                if (displayPageIndex >= totalPages) displayPageIndex = totalPages - 1
 
                 return (
                   <Button
-                    key={pageIndex}
-                    variant={pageIndex === currentPage ? 'contained' : 'outlined'}
+                    key={displayPageIndex}
+                    variant={displayPageIndex === currentPage ? 'contained' : 'outlined'}
                     size={isMobile ? 'medium' : 'small'}
-                    onClick={() => table.setPageIndex(pageIndex)}
+                    onClick={() => table.setPageIndex(displayPageIndex)}
                     sx={{
                       minWidth: isMobile ? '44px' : '36px',
                       minHeight: isMobile ? '44px' : '32px',
@@ -617,23 +651,44 @@ export function GenericTable<T extends { id: string }, F>({
                       fontSize: isMobile ? '16px' : '14px',
                     }}
                   >
-                    {pageIndex + 1}
+                    {displayPageIndex + 1}
                   </Button>
                 )
               }
             )}
           </Box>
+
+          {/* Weiter Button */}
           <Button
             variant="outlined"
             size={isMobile ? 'medium' : 'small'}
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
+            endIcon={<ForwardIcon />}
             sx={{
-              minWidth: isMobile ? '80px' : 'auto',
+              minWidth: isMobile ? '44px' : '80px',
+              fontSize: isMobile ? '16px' : '14px',
+              '& .MuiButton-endIcon': {
+                marginLeft: isMobile ? 0 : '8px',
+              },
+            }}
+          >
+            {!isMobile && 'Weiter'}
+          </Button>
+
+          {/* Ende Button */}
+          <Button
+            variant="outlined"
+            size={isMobile ? 'medium' : 'small'}
+            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+            disabled={!table.getCanNextPage()}
+            endIcon={<LastPageIcon />}
+            sx={{
+              minWidth: isMobile ? '120px' : 'auto',
               fontSize: isMobile ? '16px' : '14px',
             }}
           >
-            Weiter
+            Ende
           </Button>
         </Box>
       </Box>
