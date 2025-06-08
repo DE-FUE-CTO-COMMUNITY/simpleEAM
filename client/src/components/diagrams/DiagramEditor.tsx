@@ -139,7 +139,7 @@ const ExcalidrawWrapper = dynamic(
                       <path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" />
                     </svg>
                   }
-                  shortcut="Del"
+                  shortcut="Shift+Del"
                 >
                   Löschen
                 </MainMenuTyped.Item>
@@ -724,6 +724,13 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
       // Only handle shortcuts for non-viewer users
       if (isViewer()) return
 
+      // Handle Shift+Delete for diagram deletion
+      if (event.key === 'Delete' && event.shiftKey && currentDiagram) {
+        event.preventDefault()
+        setDeleteDialogOpen(true)
+        return
+      }
+
       if (event.ctrlKey || event.metaKey) {
         switch (event.key.toLowerCase()) {
           case 'n':
@@ -760,9 +767,6 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
             handleExportPNG()
             break
         }
-      } else if (event.key === 'Delete' && currentDiagram && !isViewer()) {
-        event.preventDefault()
-        setDeleteDialogOpen(true)
       }
     }
 
