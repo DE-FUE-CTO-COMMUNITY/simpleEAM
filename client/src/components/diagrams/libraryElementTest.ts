@@ -1,13 +1,13 @@
 /**
  * Test für die neue Library-Element-Struktur ohne redundante Beziehungs-Speicherung
- * 
+ *
  * Diese Datei testet, ob die Implementierung korrekt funktioniert:
  * - Nur das Hauptelement enthält vollständige Datenbank-Metadaten
  * - Andere Elemente verweisen nur auf das Hauptelement
  * - Hilfsfunktionen arbeiten korrekt mit der neuen Struktur
  */
 
-import { 
+import {
   isLibraryBasedElement,
   isMainLibraryElement,
   findMainLibraryElement,
@@ -15,7 +15,7 @@ import {
   getLibraryElementType,
   getOriginalDatabaseElement,
   findRelatedLibraryElements,
-  updateLibraryElementGroup
+  updateLibraryElementGroup,
 } from './excalidrawLibraryUtils'
 
 // Mock-Daten für Tests
@@ -23,7 +23,7 @@ const mockDatabaseElement = {
   id: 'test-db-id-123',
   name: 'Test Application',
   description: 'Test application description',
-  status: 'active'
+  status: 'active',
 }
 
 const mockMainElement = {
@@ -34,8 +34,8 @@ const mockMainElement = {
     elementType: 'application',
     originalElement: mockDatabaseElement,
     isFromDatabase: true,
-    isMainElement: true
-  }
+    isMainElement: true,
+  },
 }
 
 const mockTextElement = {
@@ -44,8 +44,8 @@ const mockTextElement = {
   customData: {
     isFromDatabase: true,
     isMainElement: false,
-    mainElementId: 'main-element-id'
-  }
+    mainElementId: 'main-element-id',
+  },
 }
 
 const mockIconElement = {
@@ -54,15 +54,15 @@ const mockIconElement = {
   customData: {
     isFromDatabase: true,
     isMainElement: false,
-    mainElementId: 'main-element-id'
-  }
+    mainElementId: 'main-element-id',
+  },
 }
 
 const mockElements = [mockMainElement, mockTextElement, mockIconElement]
 
 /**
  * Test-Funktionen - Diese können in der Browser-Konsole ausgeführt werden
- * 
+ *
  * Um zu testen:
  * 1. Öffne die Diagramm-Seite
  * 2. Öffne die Browser-Entwicklertools
@@ -101,7 +101,10 @@ console.log('Gefundenes Hauptelement:', foundMainElement?.id) // sollte 'main-el
 console.log('\nTest 6: Verwandte Elemente finden')
 const relatedElements = findRelatedLibraryElements(mockElements, mockMainElement)
 console.log('Anzahl verwandter Elemente:', relatedElements.length) // sollte 3 sein (alle)
-console.log('Verwandte Element-IDs:', relatedElements.map(el => el.id))
+console.log(
+  'Verwandte Element-IDs:',
+  relatedElements.map(el => el.id)
+)
 
 console.groupEnd()
 

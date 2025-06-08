@@ -298,14 +298,14 @@ const getTypeSpecificMetadata = (
 
 /**
  * WICHTIG: Neue Struktur für Library-Element-Metadaten
- * 
+ *
  * Problem: Vorher wurden Datenbank-Beziehungen redundant in jedem Element eines Library-Items gespeichert.
  * Lösung: Jetzt wird die Beziehung nur einmal im Hauptelement gespeichert.
- * 
+ *
  * Struktur:
  * - Hauptelement (erstes Element): Enthält vollständige customData mit databaseId, elementType, originalElement
  * - Andere Elemente: Enthalten nur Verweis auf Hauptelement über mainElementId
- * 
+ *
  * Vorteile:
  * - Keine redundante Datenspeicherung
  * - Einfachere Synchronisation bei Datenbank-Updates
@@ -315,7 +315,7 @@ const getTypeSpecificMetadata = (
 
 // Hilfsfunktion: Prüfe ob ein Excalidraw-Element von der Datenbank stammt
 export const isLibraryBasedElement = (element: ExcalidrawElement): boolean => {
-  return !!(element.customData?.isFromDatabase)
+  return !!element.customData?.isFromDatabase
 }
 
 // Hilfsfunktion: Prüfe ob es sich um das Hauptelement mit vollständigen Datenbank-Metadaten handelt
@@ -399,16 +399,16 @@ export const findRelatedLibraryElements = (
 ): ExcalidrawElement[] => {
   // Wenn es das Hauptelement ist, finde alle Elemente die darauf verweisen
   if (isMainLibraryElement(targetElement)) {
-    return elements.filter(el =>
-      el.customData?.mainElementId === targetElement.id || el.id === targetElement.id
+    return elements.filter(
+      el => el.customData?.mainElementId === targetElement.id || el.id === targetElement.id
     )
   }
 
   // Wenn es ein verweisendes Element ist, finde das Hauptelement und alle verwandten
   if (targetElement.customData?.mainElementId) {
     const mainElementId = targetElement.customData.mainElementId
-    return elements.filter(el =>
-      el.id === mainElementId || el.customData?.mainElementId === mainElementId
+    return elements.filter(
+      el => el.id === mainElementId || el.customData?.mainElementId === mainElementId
     )
   }
 
