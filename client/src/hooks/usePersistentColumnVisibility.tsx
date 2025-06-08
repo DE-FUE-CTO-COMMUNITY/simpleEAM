@@ -35,12 +35,13 @@ export function usePersistentColumnVisibility({
   defaultColumnVisibility = {},
   storagePrefix = 'simple-eam-column-visibility',
 }: UsePersistentColumnVisibilityOptions) {
-  // Lade gespeicherte Column Visibility beim ersten Laden
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(() => {
-    if (typeof window === 'undefined') {
-      // SSR: Verwende Default-Werte
-      return defaultColumnVisibility
-    }
+  // Verwende immer defaultColumnVisibility als initialen State
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(defaultColumnVisibility)
+  const [isInitialized, setIsInitialized] = useState(false)
+
+  // Lade gespeicherte Column Visibility nach dem ersten Render (Client-Side)
+  useEffect(() => {
+    if (typeof window === 'undefined' || isInitialized) return
 
     try {
       const storageKey = `${storagePrefix}-${tableKey}`
@@ -49,21 +50,21 @@ export function usePersistentColumnVisibility({
       if (saved) {
         const parsed = JSON.parse(saved) as VisibilityState
         // Merge mit Default-Werten, falls neue Spalten hinzugefügt wurden
-        return { ...defaultColumnVisibility, ...parsed }
+        setColumnVisibility({ ...defaultColumnVisibility, ...parsed })
       }
     } catch (error) {
       console.warn(`Fehler beim Laden der gespeicherten Column Visibility für ${tableKey}:`, error)
     }
 
-    return defaultColumnVisibility
-  })
+    setIsInitialized(true)
+  }, [defaultColumnVisibility, tableKey, storagePrefix, isInitialized])
 
   // State für die Table-Instanz
   const [tableInstance, setTableInstance] = useState<Table<any> | null>(null)
 
-  // Speichere Column Visibility bei Änderungen
+  // Speichere Column Visibility bei Änderungen (nur nach Initialisierung)
   useEffect(() => {
-    if (typeof window === 'undefined') return
+    if (typeof window === 'undefined' || !isInitialized) return
 
     try {
       const storageKey = `${storagePrefix}-${tableKey}`
@@ -71,7 +72,7 @@ export function usePersistentColumnVisibility({
     } catch (error) {
       console.warn(`Fehler beim Speichern der Column Visibility für ${tableKey}:`, error)
     }
-  }, [columnVisibility, tableKey, storagePrefix])
+  }, [columnVisibility, tableKey, storagePrefix, isInitialized])
 
   // Callback zum Speichern der Table-Instanz
   const handleTableReady = useCallback((table: Table<any>) => {
