@@ -163,7 +163,7 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
   const mapDataObjectToFormValues = (dataObject: DataObject): DataObjectFormValues => {
     return {
       name: dataObject.name,
-      description: dataObject.description || undefined,
+      description: dataObject.description || '',
       classification: dataObject.classification,
       format: dataObject.format || undefined,
       dataSources: dataObject.dataSources?.map(app => app.id) || [],

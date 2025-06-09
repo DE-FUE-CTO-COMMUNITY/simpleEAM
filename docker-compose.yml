@@ -1,4 +1,4 @@
-# filepath: /home/mf2admin/simple-eam-try2/docker-compose.yml
+# filepath: /home/mf2admin/simple-eam/docker-compose.yml
 services:
   # Neo4j-Datenbank
   neo4j:

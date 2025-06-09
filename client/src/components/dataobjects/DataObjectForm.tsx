@@ -20,9 +20,7 @@ export const dataObjectSchema = z.object({
   description: z
     .string()
     .min(10, 'Die Beschreibung muss mindestens 10 Zeichen lang sein')
-    .max(1000, 'Die Beschreibung darf maximal 1000 Zeichen lang sein')
-    .optional()
-    .nullable(),
+    .max(1000, 'Die Beschreibung darf maximal 1000 Zeichen lang sein'),
   classification: z.nativeEnum(DataClassification),
   format: z.string().max(50, 'Das Format darf maximal 50 Zeichen lang sein').optional().nullable(),
   dataSources: z.array(z.string()).optional(),
@@ -85,19 +83,21 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
   // Architekturen laden
   const { data: architecturesData, loading: architecturesLoading } = useQuery(GET_ARCHITECTURES)
 
-  // Formulardaten initialisieren
-  const defaultValues: DataObjectFormValues = {
-    name: dataObject?.name ?? '',
-    description: dataObject?.description ?? null,
-    classification: dataObject?.classification ?? DataClassification.INTERNAL,
-    format: dataObject?.format ?? null,
-    dataSources: dataObject?.dataSources?.map(app => app.id) ?? [],
-    introductionDate: dataObject?.introductionDate ?? null,
-    endOfLifeDate: dataObject?.endOfLifeDate ?? null,
-    ownerId:
-      dataObject?.owners && dataObject.owners.length > 0 ? dataObject.owners[0].id : undefined,
-    partOfArchitectures: dataObject?.partOfArchitectures?.map(arch => arch.id) ?? [],
-  }
+  // Formulardaten mit useMemo initialisieren, um unnötige Re-Renders zu vermeiden
+  const defaultValues = React.useMemo<DataObjectFormValues>(
+    () => ({
+      name: '',
+      description: '',
+      classification: DataClassification.INTERNAL,
+      format: null,
+      dataSources: [],
+      introductionDate: null,
+      endOfLifeDate: null,
+      ownerId: undefined,
+      partOfArchitectures: [],
+    }),
+    []
+  )
 
   // TanStack Form konfigurieren
   const form = useForm({
@@ -113,28 +113,47 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
     },
   })
 
-  // Zurücksetzen des Formulars bei Schließen des Dialogs und Aktualisieren bei neuem DataObject
+  // Formular aktualisieren, wenn sich die Daten ändern
   useEffect(() => {
+    // Nicht-reaktives Flag für unerwartete Zustandsbehandlung
+    let hasHandledForm = false
+
     if (!isOpen) {
+      // Dialog geschlossen - Formular zurücksetzen
       form.reset()
-    } else if (dataObject) {
-      // Aktualisiere das Formular bei Änderungen am DataObject-Objekt
-      form.reset({
+      return
+    }
+
+    if (mode === 'create') {
+      // Im CREATE-Modus mit leeren Standardwerten initialisieren
+      form.reset(defaultValues)
+      hasHandledForm = true
+    } else if ((mode === 'view' || mode === 'edit') && dataObject && dataObject.id) {
+      // Im edit/view Mode mit Werten aus dataObject initialisieren
+      const formValues = {
         name: dataObject.name ?? '',
-        description: dataObject.description ?? null,
+        description: dataObject.description ?? '',
         classification: dataObject.classification ?? DataClassification.INTERNAL,
         format: dataObject.format ?? null,
         dataSources: dataObject.dataSources?.map(app => app.id) ?? [],
         introductionDate: dataObject.introductionDate ?? null,
         endOfLifeDate: dataObject.endOfLifeDate ?? null,
-        ownerId: dataObject.owners && dataObject.owners.length > 0 ? dataObject.owners[0].id : '',
+        ownerId:
+          dataObject.owners && dataObject.owners.length > 0 ? dataObject.owners[0].id : undefined,
         partOfArchitectures: dataObject.partOfArchitectures?.map(arch => arch.id) ?? [],
-      })
-    } else {
-      // Für neue DataObjects leere Werte setzen
+      }
+
+      // Formular mit den Werten aus dem vorhandenen DataObject zurücksetzen
+      form.reset(formValues)
+      hasHandledForm = true
+    }
+
+    // Final Fallback - nur ausführen, wenn keine der vorherigen Bedingungen zutraf
+    if (!hasHandledForm) {
+      // Immer mit Standardwerten zurücksetzen, aber Dialog nicht automatisch schließen
       form.reset(defaultValues)
     }
-  }, [isOpen, form, dataObject, defaultValues])
+  }, [form, dataObject, isOpen, defaultValues, mode])
 
   // Feldkonfiguration für das generische Formular
   interface SelectOption {
@@ -178,6 +197,7 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
       name: 'description',
       label: 'Beschreibung',
       type: 'textarea',
+      required: true,
       validators: dataObjectSchema.shape.description,
       rows: 4,
       size: 12,

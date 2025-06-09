@@ -24,7 +24,10 @@ export const applicationInterfaceSchema = z.object({
     .string()
     .min(2, 'Der Name muss mindestens 2 Zeichen lang sein')
     .max(100, 'Der Name darf maximal 100 Zeichen lang sein'),
-  description: z.string().nullable().optional(),
+  description: z
+    .string()
+    .min(10, 'Die Beschreibung muss mindestens 10 Zeichen lang sein')
+    .max(1000, 'Die Beschreibung darf maximal 1000 Zeichen lang sein'),
   interfaceType: z.nativeEnum(InterfaceType, {
     errorMap: () => ({ message: 'Bitte wählen Sie einen Schnittstellentyp' }),
   }),
@@ -84,24 +87,24 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
   const { data: personData, loading: personLoading } = useQuery(GET_PERSONS)
   const { data: applicationData, loading: applicationLoading } = useQuery(GET_APPLICATIONS)
 
-  // Formulardaten basierend auf den aktuellen Interface-Daten initialisieren
-  const defaultValues: ApplicationInterfaceFormValues = {
-    name: applicationInterface?.name ?? '',
-    description: applicationInterface?.description ?? null,
-    interfaceType: applicationInterface?.interfaceType ?? InterfaceType.API,
-    protocol: applicationInterface?.protocol ?? null,
-    version: applicationInterface?.version ?? null,
-    status: applicationInterface?.status ?? InterfaceStatus.PLANNED,
-    introductionDate: applicationInterface?.introductionDate ?? null,
-    endOfLifeDate: applicationInterface?.endOfLifeDate ?? null,
-    responsiblePerson:
-      applicationInterface?.responsiblePerson && applicationInterface.responsiblePerson.length > 0
-        ? applicationInterface.responsiblePerson[0].id
-        : null,
-    sourceApplications: applicationInterface?.sourceApplications?.map(app => app.id) ?? [],
-    targetApplications: applicationInterface?.targetApplications?.map(app => app.id) ?? [],
-    dataObjects: applicationInterface?.dataObjects?.map(obj => obj.id) ?? [],
-  }
+  // Formulardaten mit useMemo initialisieren, um unnötige Re-Renders zu vermeiden
+  const defaultValues = React.useMemo<ApplicationInterfaceFormValues>(
+    () => ({
+      name: '',
+      description: '',
+      interfaceType: InterfaceType.API,
+      protocol: null,
+      version: null,
+      status: InterfaceStatus.PLANNED,
+      introductionDate: null,
+      endOfLifeDate: null,
+      responsiblePerson: null,
+      sourceApplications: [],
+      targetApplications: [],
+      dataObjects: [],
+    }),
+    []
+  )
 
   // TanStack Form konfigurieren
   const form = useForm({
@@ -157,7 +160,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       // Im edit/view Mode mit Werten aus applicationInterface initialisieren
       const formValues = {
         name: applicationInterface.name ?? '',
-        description: applicationInterface.description ?? null,
+        description: applicationInterface.description ?? '',
         interfaceType: applicationInterface.interfaceType,
         protocol: applicationInterface.protocol ?? null,
         version: applicationInterface.version ?? null,
@@ -203,6 +206,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       type: 'text',
       multiline: true,
       rows: 3,
+      required: true,
       validators: applicationInterfaceSchema.shape.description,
       size: { xs: 12 },
       tabId: 'general',

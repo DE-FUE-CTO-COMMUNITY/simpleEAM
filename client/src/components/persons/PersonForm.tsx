@@ -181,7 +181,7 @@ const PersonForm: React.FC<PersonFormProps> = ({
       }
       isOpen={isOpen}
       onClose={onClose}
-      onSubmit={form.handleSubmit}
+      onSubmit={onSubmit}
       isLoading={loading}
       mode={mode}
       fields={fields}

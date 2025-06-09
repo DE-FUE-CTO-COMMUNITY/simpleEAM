@@ -163,7 +163,7 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
   ): ApplicationInterfaceFormValues => {
     return {
       name: applicationInterface.name ?? '',
-      description: applicationInterface.description ?? null,
+      description: applicationInterface.description ?? '',
       interfaceType: applicationInterface.interfaceType,
       protocol: applicationInterface.protocol ?? null,
       version: applicationInterface.version ?? null,
