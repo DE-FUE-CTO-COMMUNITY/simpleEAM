@@ -1,4 +1,5 @@
 import { useCallback } from 'react'
+import { useApolloClient } from '@apollo/client'
 import { NotificationState } from '../types/DiagramTypes'
 import {
   syncDiagramOnOpen,
@@ -25,12 +26,10 @@ export const useDiagramHandlers = (
   setSaveAsDialogOpen: (open: boolean) => void,
   lastSavedScene: any
 ) => {
+  const apolloClient = useApolloClient()
   // New Diagram Handler
   const handleNewDiagram = useCallback(() => {
     if (!excalidrawAPI) return
-
-    // Reset the current diagram
-    setCurrentDiagram(null)
 
     const emptyScene = {
       elements: [],
@@ -49,9 +48,11 @@ export const useDiagramHandlers = (
     }
     const restoredScene = restoreSceneData(emptyScene)
 
-    // Use setTimeout to ensure proper state reset in Docker containers
+    // Sofort die Excalidraw-Szene aktualisieren
+    excalidrawAPI.updateScene(restoredScene)
+
+    // State-Updates können asynchron erfolgen
     setTimeout(() => {
-      excalidrawAPI.updateScene(restoredScene)
       setCurrentDiagram(null)
       setCurrentScene(restoredScene)
       setHasUnsavedChanges(false)
@@ -109,57 +110,92 @@ export const useDiagramHandlers = (
   // Open Diagram Handler
   const handleOpenDiagram = useCallback(
     async (diagram: any) => {
+      console.log('handleOpenDiagram: Starting to open diagram', {
+        diagramId: diagram.id,
+        diagramTitle: diagram.title,
+        hasJson: !!diagram.diagramJson,
+      })
+
+      if (!excalidrawAPI || !diagram.diagramJson) {
+        console.warn('Cannot open diagram: missing API or diagram data')
+        setNotification({
+          open: true,
+          message: 'Diagramm kann nicht geöffnet werden - fehlende Daten',
+          severity: 'error',
+        })
+        return
+      }
+
       try {
+        // Parse the diagram JSON data
+        const diagramData = JSON.parse(diagram.diagramJson)
+        console.log('handleOpenDiagram: Parsed diagram data', {
+          elementsCount: diagramData.elements?.length || 0,
+        })
+
         // Try to sync from database with Docker-safe error handling
         let syncedDiagramData
         try {
-          syncedDiagramData = await syncDiagramOnOpen(diagram.id)
+          syncedDiagramData = await syncDiagramOnOpen(apolloClient, diagramData)
+          console.log('handleOpenDiagram: Synced from database', {
+            elementsCount: syncedDiagramData?.elements?.length || 0,
+          })
         } catch (syncError) {
           console.warn('Database sync failed, using local data:', syncError)
-          syncedDiagramData = JSON.parse(diagram.data)
-        }
-
-        if (excalidrawAPI && syncedDiagramData) {
-          const sceneData = {
-            elements: syncedDiagramData.elements || [],
-            appState: {
-              ...syncedDiagramData.appState,
-              viewBackgroundColor: syncedDiagramData.appState?.viewBackgroundColor || '#ffffff',
-              // Docker-safe state restoration - reset problematic properties
-              collaborators: new Map(),
-              selectedElementIds: {},
-              hoveredElementIds: {},
-              selectedGroupIds: {},
-              selectedLinearElement: null,
-              editingLinearElement: null,
-              activeTool: { type: 'selection' },
-              isLoading: false,
-              errorMessage: null,
-            },
-          }
-          const restoredScene = restoreSceneData(sceneData)
-
-          // Use setTimeout to ensure proper state update in Docker containers
-          setTimeout(() => {
-            excalidrawAPI.updateScene(restoredScene)
-            setCurrentDiagram(diagram)
-            setCurrentScene(restoredScene)
-            setHasUnsavedChanges(false)
-            setLastSavedScene(restoredScene)
-
-            // Persist to localStorage
-            saveSceneToStorage(restoredScene)
-            saveDiagramToStorage(diagram)
-          }, 0)
-
-          setNotification({
-            open: true,
-            message: `Diagramm "${diagram.title}" erfolgreich geladen!`,
-            severity: 'success',
+          syncedDiagramData = diagramData
+          console.log('handleOpenDiagram: Using local data', {
+            elementsCount: syncedDiagramData?.elements?.length || 0,
           })
         }
-      } catch (error) {
-        console.error('Error opening diagram:', error)
+
+        const sceneData = {
+          elements: syncedDiagramData.elements || [],
+          appState: {
+            ...syncedDiagramData.appState,
+            viewBackgroundColor: syncedDiagramData.appState?.viewBackgroundColor || '#ffffff',
+            // Docker-safe state restoration - reset problematic properties
+            collaborators: new Map(),
+            selectedElementIds: {},
+            hoveredElementIds: {},
+            selectedGroupIds: {},
+            selectedLinearElement: null,
+            editingLinearElement: null,
+            activeTool: { type: 'selection' },
+            isLoading: false,
+            errorMessage: null,
+          },
+        }
+        const restoredScene = restoreSceneData(sceneData)
+
+        console.log('handleOpenDiagram: Scene prepared', {
+          elementsCount: restoredScene.elements?.length || 0,
+          hasAppState: !!restoredScene.appState,
+        })
+
+        // Sofort die Excalidraw-Szene aktualisieren
+        console.log('handleOpenDiagram: Updating scene immediately')
+        excalidrawAPI.updateScene(restoredScene)
+
+        // State-Updates können asynchron erfolgen
+        setTimeout(() => {
+          console.log('handleOpenDiagram: Updating React state')
+          setCurrentDiagram(diagram)
+          setCurrentScene(restoredScene)
+          setHasUnsavedChanges(false)
+          setLastSavedScene(restoredScene)
+
+          // Persist to localStorage
+          saveSceneToStorage(restoredScene)
+          saveDiagramToStorage(diagram)
+        }, 0)
+
+        setNotification({
+          open: true,
+          message: `Diagramm "${diagram.title}" erfolgreich geladen!`,
+          severity: 'success',
+        })
+      } catch (err) {
+        console.error('Error opening diagram:', err)
         setNotification({
           open: true,
           message: 'Fehler beim Öffnen des Diagramms',
@@ -168,6 +204,7 @@ export const useDiagramHandlers = (
       }
     },
     [
+      apolloClient,
       excalidrawAPI,
       setCurrentDiagram,
       setCurrentScene,
@@ -196,7 +233,7 @@ export const useDiagramHandlers = (
 
         // Try to sync to database with error handling
         try {
-          await syncDiagramOnSave(sceneData)
+          await syncDiagramOnSave(apolloClient, sceneData)
         } catch (syncError) {
           console.warn('Database sync failed during save:', syncError)
           // Continue with local saving even if sync fails
@@ -216,8 +253,8 @@ export const useDiagramHandlers = (
           message: `Diagramm "${savedDiagram.title}" erfolgreich gespeichert!`,
           severity: 'success',
         })
-      } catch (error) {
-        console.error('Error saving diagram:', error)
+      } catch (err) {
+        console.error('Error saving diagram:', err)
         setNotification({
           open: true,
           message: 'Fehler beim Speichern des Diagramms',
@@ -225,7 +262,14 @@ export const useDiagramHandlers = (
         })
       }
     },
-    [excalidrawAPI, setCurrentDiagram, setHasUnsavedChanges, setLastSavedScene, setNotification]
+    [
+      apolloClient,
+      excalidrawAPI,
+      setCurrentDiagram,
+      setHasUnsavedChanges,
+      setLastSavedScene,
+      setNotification,
+    ]
   )
 
   // Save As Diagram Handler
@@ -257,7 +301,7 @@ export const useDiagramHandlers = (
         const hasChanges = currentElementsStr !== lastSavedElementsStr
         setHasUnsavedChanges(hasChanges)
 
-        // Update current scene for persistence
+        // Create scene data for persistence without triggering state update
         const currentScene = {
           elements,
           appState: {
@@ -265,13 +309,13 @@ export const useDiagramHandlers = (
             currentItemFontFamily: appState.currentItemFontFamily,
           },
         }
-        setCurrentScene(currentScene)
 
-        // Persist current state to localStorage for crash recovery
+        // Persist current state to localStorage for crash recovery only
+        // Do NOT call setCurrentScene here to prevent infinite loops
         saveSceneToStorage(currentScene)
       }
     },
-    [currentDiagram, lastSavedScene, setHasUnsavedChanges, setCurrentScene]
+    [currentDiagram, lastSavedScene, setHasUnsavedChanges]
   )
 
   // JSON Export Handler
@@ -322,7 +366,8 @@ export const useDiagramHandlers = (
           message: 'JSON erfolgreich exportiert!',
           severity: 'success',
         })
-      } catch (error) {
+      } catch (err) {
+        console.error('Error exporting JSON:', err)
         setNotification({
           open: true,
           message: 'Fehler beim JSON Export',
@@ -364,7 +409,8 @@ export const useDiagramHandlers = (
             } else {
               throw new Error('Invalid file format')
             }
-          } catch (error) {
+          } catch (err) {
+            console.error('Error importing JSON:', err)
             setNotification({
               open: true,
               message: 'Fehler beim JSON Import - ungültiges Format',
@@ -383,13 +429,14 @@ export const useDiagramHandlers = (
     if (excalidrawAPI) {
       try {
         // Use the built-in export function from Excalidraw
-        const canvas = excalidrawAPI.getSceneElementsIncludingDeleted()
+        excalidrawAPI.getSceneElementsIncludingDeleted()
         setNotification({
           open: true,
           message: 'PNG Export gestartet...',
           severity: 'info',
         })
-      } catch (error) {
+      } catch (err) {
+        console.error('Error exporting PNG:', err)
         setNotification({
           open: true,
           message: 'Fehler beim PNG Export',
@@ -423,7 +470,7 @@ export const useDiagramHandlers = (
       }
 
       // Try manual database synchronization
-      await syncDiagramOnSave(sceneData)
+      await syncDiagramOnSave(apolloClient, sceneData)
 
       // Also try to clear any missing element markers from the current elements
       const cleanedElements = clearMissingElementMarkers(sceneData.elements)
@@ -438,15 +485,15 @@ export const useDiagramHandlers = (
         message: 'Datenbankssynchronisation erfolgreich!',
         severity: 'success',
       })
-    } catch (error) {
-      console.error('Manual sync failed:', error)
+    } catch (err) {
+      console.error('Manual sync failed:', err)
       setNotification({
         open: true,
         message: 'Fehler bei der Datenbank-Synchronisation',
         severity: 'error',
       })
     }
-  }, [excalidrawAPI, currentDiagram, setNotification])
+  }, [apolloClient, excalidrawAPI, currentDiagram, setNotification])
 
   return {
     handleNewDiagram,

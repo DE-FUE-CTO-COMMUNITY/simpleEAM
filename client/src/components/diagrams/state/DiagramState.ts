@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { DiagramState, DialogStates, NotificationState } from '../types/DiagramTypes'
+import { useState, useEffect, useRef } from 'react'
+import { DialogStates, NotificationState } from '../types/DiagramTypes'
 import { isViewer } from '@/lib/auth'
 import { loadPersistedScene, loadPersistedDiagram } from '../utils/DiagramStorage'
 
@@ -11,6 +11,14 @@ export const useDiagramState = () => {
   const [currentScene, setCurrentScene] = useState<any>(null)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [lastSavedScene, setLastSavedScene] = useState<any>(null)
+
+  // Track if scene has been restored to prevent multiple restorations
+  const sceneRestoredRef = useRef(false)
+
+  // Reset restoration flag when currentScene changes significantly
+  useEffect(() => {
+    sceneRestoredRef.current = false
+  }, [currentScene?.elements?.length, currentDiagram?.id])
 
   // Dialog States
   const [dialogStates, setDialogStates] = useState<DialogStates>({
@@ -61,24 +69,36 @@ export const useDiagramState = () => {
       const timeoutId = setTimeout(initializeClient, 50)
       return () => clearTimeout(timeoutId)
     }
-  }, [])
-
-  // Scene restoration effect
+  }, []) // Scene restoration effect - only restore once when API becomes available
   useEffect(() => {
-    if (excalidrawAPI && currentScene) {
+    if (excalidrawAPI && isClient && currentScene && !sceneRestoredRef.current) {
       // Use setTimeout to ensure proper timing in Docker containers
       const restoreTimeout = setTimeout(() => {
         try {
-          const restoredScene = restoreSceneData(currentScene)
-          excalidrawAPI.updateScene(restoredScene)
+          // Always try to restore scene if we have data, regardless of element count
+          if (currentScene && (currentScene.elements || currentScene.appState)) {
+            const currentElements = excalidrawAPI.getSceneElements()
+
+            // Update scene if we have saved data and it's different from current
+            const hasElements = currentScene.elements && currentScene.elements.length > 0
+            const shouldRestore = hasElements || !currentElements || currentElements.length === 0
+
+            if (shouldRestore) {
+              const restoredScene = restoreSceneData(currentScene)
+              excalidrawAPI.updateScene(restoredScene)
+              sceneRestoredRef.current = true // Mark as restored
+
+              console.log('Scene restored with', currentScene.elements?.length || 0, 'elements')
+            }
+          }
         } catch (error) {
           console.warn('Failed to restore scene:', error)
         }
-      }, 100)
+      }, 150) // Increased delay for Docker timing
 
       return () => clearTimeout(restoreTimeout)
     }
-  }, [excalidrawAPI, currentScene])
+  }, [excalidrawAPI, isClient, currentScene]) // Include currentScene but with proper loop prevention
 
   const updateDialogState = (dialogName: keyof DialogStates, open: boolean) => {
     setDialogStates(prev => ({

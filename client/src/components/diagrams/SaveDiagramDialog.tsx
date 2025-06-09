@@ -18,7 +18,7 @@ import {
 } from '@mui/material'
 import { useMutation, useQuery } from '@apollo/client'
 import { CREATE_DIAGRAM, UPDATE_DIAGRAM, GET_ARCHITECTURES_FOR_DIAGRAM } from '@/graphql/diagram'
-import { useAuth } from '@/contexts/AuthContext'
+import { useAuth } from '@/lib/auth'
 import {
   createDiagramRelationshipUpdates,
   createDiagramRelationshipUpdatesWithDisconnect,
@@ -98,7 +98,26 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
   existingDiagram,
   forceSaveAs = false,
 }) => {
-  const { user } = useAuth()
+  const { keycloak } = useAuth()
+
+  // Extrahiere Benutzerinformationen aus dem Keycloak-Token
+  const user = React.useMemo(() => {
+    if (!keycloak?.token) return null
+
+    try {
+      const tokenPayload = JSON.parse(atob(keycloak.token.split('.')[1]))
+      return {
+        id: tokenPayload.sub,
+        preferred_username: tokenPayload.preferred_username,
+        given_name: tokenPayload.given_name,
+        family_name: tokenPayload.family_name,
+        email: tokenPayload.email,
+      }
+    } catch (error) {
+      console.error('Fehler beim Parsen des Tokens:', error)
+      return null
+    }
+  }, [keycloak?.token])
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [diagramType, setDiagramType] = useState('ARCHITECTURE')
@@ -107,7 +126,36 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
   const [titleError, setTitleError] = useState(false)
   const [architectureError, setArchitectureError] = useState(false)
 
-  const { data: architecturesData } = useQuery(GET_ARCHITECTURES_FOR_DIAGRAM)
+  // Führe die Query nur aus, wenn der Benutzer authentifiziert ist
+  const {
+    data: architecturesData,
+    loading: architecturesLoading,
+    error: architecturesError,
+  } = useQuery(GET_ARCHITECTURES_FOR_DIAGRAM, {
+    skip: !keycloak?.authenticated || !keycloak?.token,
+    errorPolicy: 'all',
+    fetchPolicy: 'cache-and-network',
+  })
+
+  // Debug-Logging für Authentifizierung
+  React.useEffect(() => {
+    if (open) {
+      console.log('SaveDiagramDialog geöffnet - Auth Status:', {
+        authenticated: keycloak?.authenticated,
+        hasToken: !!keycloak?.token,
+        user: user?.preferred_username,
+        architecturesLoading,
+        architecturesError: architecturesError?.message,
+      })
+    }
+  }, [
+    open,
+    keycloak?.authenticated,
+    keycloak?.token,
+    user,
+    architecturesLoading,
+    architecturesError,
+  ])
 
   const [createDiagram] = useMutation(CREATE_DIAGRAM)
   const [updateDiagram] = useMutation(UPDATE_DIAGRAM)
@@ -354,6 +402,8 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
             options={architecturesData?.architectures || []}
             value={selectedArchitecture}
             onChange={handleArchitectureChange}
+            disabled={architecturesLoading || !!architecturesError}
+            loading={architecturesLoading}
             getOptionLabel={option => {
               if (!option || !option.name || !option.type) return ''
               return `${option.name} (${option.type})`
@@ -384,7 +434,11 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
                 helperText={
                   architectureError
                     ? 'Architektur ist ein Pflichtfeld'
-                    : 'Pflichtfeld: Ordnet das Diagramm einer bestimmten Architektur zu'
+                    : architecturesError
+                      ? `Fehler beim Laden der Architekturen: ${architecturesError.message}`
+                      : architecturesLoading
+                        ? 'Lade Architekturen...'
+                        : 'Pflichtfeld: Ordnet das Diagramm einer bestimmten Architektur zu'
                 }
               />
             )}

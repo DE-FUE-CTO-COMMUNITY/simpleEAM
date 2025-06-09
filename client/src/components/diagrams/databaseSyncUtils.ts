@@ -1,9 +1,5 @@
 // Database synchronization utilities for diagram elements
 import { gql } from '@apollo/client'
-import { createApolloClient } from '@/lib/apollo-client'
-
-// Create Apollo client instance for database operations
-const apolloClient = createApolloClient()
 
 interface DiagramElement {
   id: string
@@ -71,6 +67,7 @@ export const extractDatabaseElements = (elements: DiagramElement[]): DiagramElem
  * Holt aktuelle Daten für ein Datenbankelement
  */
 export const fetchElementData = async (
+  apolloClient: any,
   databaseId: string,
   elementType: string
 ): Promise<any | null> => {
@@ -160,6 +157,7 @@ export const fetchElementData = async (
  * Aktualisiert den Namen eines Datenbankelements
  */
 export const updateElementName = async (
+  apolloClient: any,
   databaseId: string,
   elementType: string,
   newName: string
@@ -247,6 +245,7 @@ export const updateElementName = async (
  * Validiert Datenbankverbindungen und aktualisiert Elementnamen
  */
 export const validateAndSyncElements = async (
+  apolloClient: any,
   elements: DiagramElement[]
 ): Promise<ValidationResult> => {
   const databaseElements = extractDatabaseElements(elements)
@@ -260,7 +259,7 @@ export const validateAndSyncElements = async (
     const elementType = element.customData.elementType
 
     // Aktuelle Daten aus der Datenbank abrufen
-    const currentData = await fetchElementData(databaseId, elementType)
+    const currentData = await fetchElementData(apolloClient, databaseId, elementType)
 
     if (!currentData) {
       // Element nicht mehr in Datenbank vorhanden
@@ -333,14 +332,14 @@ export const markMissingElements = (
 /**
  * Synchronisiert Diagrammelemente beim Öffnen
  */
-export const syncDiagramOnOpen = async (diagramData: any): Promise<any> => {
+export const syncDiagramOnOpen = async (apolloClient: any, diagramData: any): Promise<any> => {
   if (!diagramData.elements || !Array.isArray(diagramData.elements)) {
     return diagramData
   }
 
   console.log('Synchronizing diagram elements with database...')
 
-  const validationResult = await validateAndSyncElements(diagramData.elements)
+  const validationResult = await validateAndSyncElements(apolloClient, diagramData.elements)
 
   // Aktualisiere Elemente mit neuen Namen
   let updatedElements = [...diagramData.elements]
@@ -402,6 +401,7 @@ export const syncDiagramOnOpen = async (diagramData: any): Promise<any> => {
  * Synchronisiert Änderungen zurück zur Datenbank beim Speichern
  */
 export const syncDiagramOnSave = async (
+  apolloClient: any,
   diagramData: any
 ): Promise<{ success: boolean; updatedCount: number }> => {
   if (!diagramData.elements || !Array.isArray(diagramData.elements)) {
@@ -430,6 +430,7 @@ export const syncDiagramOnSave = async (
     // Prüfe ob sich der Name geändert hat
     if (currentName && currentName.trim() !== '' && currentName !== lastSyncedName) {
       const success = await updateElementName(
+        apolloClient,
         element.customData.databaseId,
         element.customData.elementType,
         currentName.trim()

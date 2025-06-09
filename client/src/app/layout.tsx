@@ -101,34 +101,41 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
     const initializeApp = async () => {
       try {
-        // Erstelle einen Standard Apollo Client
-        const defaultClient = createApolloClient()
-        setClient(defaultClient)
-
-        // Keycloak Initialisierung
+        // Keycloak Initialisierung zuerst
         const isAuthenticated = await initKeycloak()
         setAuthenticated(isAuthenticated)
 
         // Session Monitoring
         setupSessionMonitoring()
 
-        // Apollo Client mit Token wenn verfügbar
-        if (keycloak?.token) {
-          const authenticatedClient = createApolloClient(keycloak.token)
-          setClient(authenticatedClient)
-        }
+        // Apollo Client mit Token erstellen
+        const initialToken = keycloak?.token || undefined
+        const authenticatedClient = createApolloClient(initialToken)
+        setClient(authenticatedClient)
+
+        console.log('Apollo Client initialisiert mit Token:', !!initialToken)
 
         // Token Refresh Listener
         const handleTokenRefresh = (event: CustomEvent) => {
           const newToken = event.detail.token
+          console.log('Token aktualisiert, erstelle neuen Apollo Client')
           const refreshedClient = createApolloClient(newToken)
           setClient(refreshedClient)
         }
 
+        // Auth Error Listener - erstelle Client ohne Token
+        const handleAuthError = () => {
+          console.log('Auth-Fehler, erstelle Apollo Client ohne Token')
+          const unauthenticatedClient = createApolloClient()
+          setClient(unauthenticatedClient)
+        }
+
         window.addEventListener('tokenRefreshed', handleTokenRefresh as EventListener)
+        window.addEventListener('authError', handleAuthError as EventListener)
 
         return () => {
           window.removeEventListener('tokenRefreshed', handleTokenRefresh as EventListener)
+          window.removeEventListener('authError', handleAuthError as EventListener)
         }
       } catch (error) {
         console.warn('Authentication initialization failed:', error)

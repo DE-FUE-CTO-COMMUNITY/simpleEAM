@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useRef, useCallback } from 'react'
+import React, { useRef, useCallback, useMemo } from 'react'
 import { Box, Alert, Snackbar } from '@mui/material'
 import SaveDiagramDialog from './SaveDiagramDialog'
 import OpenDiagramDialog from './OpenDiagramDialog'
@@ -115,10 +115,65 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     })
   }
 
-  const initialData = currentScene || {
-    appState: { viewBackgroundColor: '#ffffff' },
-    scrollToContent: true,
-  }
+  // Create stable initialData to prevent controlled/uncontrolled input issues
+  const initialData = useMemo(() => {
+    console.log('DiagramEditor: Creating initialData', {
+      currentScene,
+      hasElements: currentScene?.elements?.length || 0,
+      currentDiagram: currentDiagram?.title || 'none',
+    })
+
+    // Always return a consistent structure regardless of currentScene state
+    const baseAppState = {
+      viewBackgroundColor: '#ffffff',
+      collaborators: new Map(),
+      selectedElementIds: {},
+      hoveredElementIds: {},
+      selectedGroupIds: {},
+      selectedLinearElement: null,
+      editingLinearElement: null,
+      activeTool: { type: 'selection' },
+      isLoading: false,
+      errorMessage: null,
+      currentItemFontFamily: 1,
+      currentItemFontSize: 20,
+      currentItemTextAlign: 'left',
+      currentItemStrokeColor: '#1e1e1e',
+      currentItemBackgroundColor: 'transparent',
+      currentItemFillStyle: 'solid',
+      currentItemStrokeWidth: 2,
+      currentItemStrokeStyle: 'solid',
+      currentItemRoughness: 1,
+      currentItemOpacity: 100,
+    }
+
+    // Safely extract elements and appState properties
+    const elements =
+      currentScene?.elements && Array.isArray(currentScene.elements) ? currentScene.elements : []
+
+    const savedBackgroundColor = currentScene?.appState?.viewBackgroundColor
+    const savedFontFamily = currentScene?.appState?.currentItemFontFamily
+
+    console.log('DiagramEditor: initialData created with', elements.length, 'elements')
+
+    return {
+      elements,
+      appState: {
+        ...baseAppState,
+        // Only override specific properties from saved state
+        viewBackgroundColor: savedBackgroundColor || '#ffffff',
+        currentItemFontFamily: savedFontFamily || 1,
+      },
+      scrollToContent: false, // Prevent auto-scroll on restore
+    }
+  }, [currentScene])
+
+  // Debug log for initialData
+  console.log(
+    'DiagramEditor: initialData created with',
+    initialData?.elements?.length || 0,
+    'elements'
+  )
 
   if (!isClient) {
     return null
@@ -146,6 +201,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
         />
 
         <ExcalidrawWrapper
+          key={`excalidraw-${currentDiagram?.id || 'new'}`}
           onOpenDialog={() => updateDialogState('openDialogOpen', true)}
           onSaveDialog={() => updateDialogState('saveDialogOpen', true)}
           onSaveAsDialog={() => updateDialogState('saveAsDialogOpen', true)}

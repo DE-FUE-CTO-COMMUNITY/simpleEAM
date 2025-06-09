@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useRef, useCallback } from 'react'
 import { Box, Typography, Alert, Snackbar } from '@mui/material'
+import { useApolloClient } from '@apollo/client'
 import dynamic from 'next/dynamic'
 import SaveDiagramDialog from './SaveDiagramDialog'
 import OpenDiagramDialog from './OpenDiagramDialog'
@@ -232,6 +233,7 @@ export interface DiagramEditorProps {
 }
 
 const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
+  const apolloClient = useApolloClient()
   const [isClient, setIsClient] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const [excalidrawAPI, setExcalidrawAPI] = useState<any>(null)
@@ -338,7 +340,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
           const currentAppState = excalidrawAPI.getAppState()
           const diagramData = { elements: currentElements, appState: currentAppState }
 
-          const syncResult = await syncDiagramOnSave(diagramData)
+          const syncResult = await syncDiagramOnSave(apolloClient, diagramData)
 
           if (syncResult.updatedCount > 0) {
             setNotification({
@@ -371,7 +373,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
       // Persist current diagram to localStorage
       localStorage.setItem('excalidraw-current-diagram', JSON.stringify(savedDiagram))
     },
-    [excalidrawAPI]
+    [apolloClient, excalidrawAPI]
   )
 
   const handleOpenDiagram = useCallback(
@@ -381,7 +383,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
           const diagramData = JSON.parse(diagram.diagramJson)
 
           // Synchronisiere Elemente mit der Datenbank
-          const syncedDiagramData = await syncDiagramOnOpen(diagramData)
+          const syncedDiagramData = await syncDiagramOnOpen(apolloClient, diagramData)
 
           const sceneData = {
             elements: syncedDiagramData.elements || [],
@@ -402,9 +404,11 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
           }
           const restoredScene = restoreSceneData(sceneData)
 
-          // Use setTimeout to ensure proper state update in Docker containers
+          // Sofort die Excalidraw-Szene aktualisieren
+          excalidrawAPI.updateScene(restoredScene)
+
+          // State-Updates können asynchron erfolgen
           setTimeout(() => {
-            excalidrawAPI.updateScene(restoredScene)
             setCurrentDiagram(diagram)
             setCurrentScene(restoredScene)
             setHasUnsavedChanges(false)
@@ -430,7 +434,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
         }
       }
     },
-    [excalidrawAPI]
+    [apolloClient, excalidrawAPI]
   )
 
   // Manual sync handler
@@ -443,7 +447,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
       const diagramData = { elements: currentElements, appState: currentAppState }
 
       // Sync with database
-      const syncedDiagramData = await syncDiagramOnOpen(diagramData)
+      const syncedDiagramData = await syncDiagramOnOpen(apolloClient, diagramData)
 
       // Clear missing element markers if requested
       const cleanedElements = clearMissingElementMarkers(syncedDiagramData.elements)
@@ -470,7 +474,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
         severity: 'error',
       })
     }
-  }, [excalidrawAPI])
+  }, [apolloClient, excalidrawAPI])
 
   const handleNewDiagram = useCallback(() => {
     if (excalidrawAPI) {
@@ -492,9 +496,11 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
       }
       const restoredScene = restoreSceneData(emptyScene)
 
-      // Use setTimeout to ensure proper state reset in Docker containers
+      // Sofort die Excalidraw-Szene aktualisieren
+      excalidrawAPI.updateScene(restoredScene)
+
+      // State-Updates können asynchron erfolgen
       setTimeout(() => {
-        excalidrawAPI.updateScene(restoredScene)
         setCurrentDiagram(null)
         setCurrentScene(restoredScene)
         setHasUnsavedChanges(false)
@@ -667,7 +673,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
         }
 
         // Synchronize with database before importing
-        const syncedSceneData = await syncDiagramOnOpen(sceneData)
+        const syncedSceneData = await syncDiagramOnOpen(apolloClient, sceneData)
 
         const restoredScene = restoreSceneData(syncedSceneData)
 
@@ -696,7 +702,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     }
 
     input.click()
-  }, [excalidrawAPI])
+  }, [apolloClient, excalidrawAPI])
 
   // PNG Export Handler
   const handleExportPNG = useCallback(async () => {

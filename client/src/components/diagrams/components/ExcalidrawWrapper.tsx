@@ -22,7 +22,7 @@ const ExcalidrawWrapper = dynamic(
       onDeleteDialog,
       onExportJSON,
       onImportJSON,
-      onExportPNG,
+      onExportPNG: _onExportPNG,
       onManualSync,
       excalidrawAPI,
       onChange,
@@ -34,13 +34,31 @@ const ExcalidrawWrapper = dynamic(
       const ExcalidrawTyped = Excalidraw as any
       const MainMenuTyped = MainMenu as any
 
+      // Debug initialData to ensure it's never undefined
+      const safeInitialData = initialData || {
+        elements: [],
+        appState: {
+          viewBackgroundColor: '#ffffff',
+          collaborators: new Map(),
+          selectedElementIds: {},
+          hoveredElementIds: {},
+          selectedGroupIds: {},
+          selectedLinearElement: null,
+          editingLinearElement: null,
+          activeTool: { type: 'selection' },
+          isLoading: false,
+          errorMessage: null,
+        },
+        scrollToContent: false,
+      }
+
       return (
         <div style={{ height: '100%', width: '100%' }}>
           <ExcalidrawTyped
             theme="light"
             name="simple-eam-diagram"
             UIOptions={uiOptions}
-            initialData={initialData}
+            initialData={safeInitialData}
             excalidrawAPI={excalidrawAPI}
             onChange={onChange}
             viewModeEnabled={viewModeEnabled}
