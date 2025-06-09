@@ -242,56 +242,169 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     if (sceneData && sceneData.appState) {
       // Ensure collaborators is always a Map, not a plain object
       sceneData.appState.collaborators = new Map()
-      // Fix other problematic properties that might cause issues
+      // Fix other problematic properties that might cause issues in Docker containers
       sceneData.appState.selectedElementIds = sceneData.appState.selectedElementIds || {}
       sceneData.appState.hoveredElementIds = sceneData.appState.hoveredElementIds || {}
       sceneData.appState.selectedGroupIds = sceneData.appState.selectedGroupIds || {}
       sceneData.appState.activeTool = sceneData.appState.activeTool || { type: 'selection' }
+      // Force reset of linear element selection states to prevent Docker container issues
+      sceneData.appState.selectedLinearElement = null
+      sceneData.appState.editingLinearElement = null
+      // Ensure proper timing-independent state
+      sceneData.appState.isLoading = false
+      sceneData.appState.errorMessage = null
     }
     return sceneData
   }
 
   useEffect(() => {
-    // Nur Client-seitig rendern und localStorage zugreifen
+    // Ensure proper client-side initialization for Docker containers
     if (typeof window !== 'undefined') {
-      setIsClient(true)
+      // Use setTimeout to ensure DOM is ready and prevent hydration mismatches
+      const initializeClient = () => {
+        setIsClient(true)
 
-      // Load persisted scene from localStorage
-      const persistedScene = localStorage.getItem('excalidraw-scene')
-      const persistedDiagram = localStorage.getItem('excalidraw-current-diagram')
-      const persistedLastSaved = localStorage.getItem('excalidraw-last-saved-scene')
-
-      if (persistedScene) {
+        // Load persisted scene from localStorage with Docker-safe error handling
         try {
-          const sceneData = JSON.parse(persistedScene)
-          const restoredScene = restoreSceneData(sceneData)
-          setCurrentScene(restoredScene)
-        } catch {
-          // Fehler beim Laden der gespeicherten Szene
+          const persistedScene = localStorage.getItem('excalidraw-scene')
+          if (persistedScene) {
+            const sceneData = JSON.parse(persistedScene)
+            const restoredScene = restoreSceneData(sceneData)
+            setCurrentScene(restoredScene)
+          }
+        } catch (error) {
+          console.warn('Failed to load persisted scene:', error)
+          localStorage.removeItem('excalidraw-scene')
         }
-      }
 
-      if (persistedDiagram) {
         try {
-          const diagramData = JSON.parse(persistedDiagram)
-          setCurrentDiagram(diagramData)
-        } catch {
-          // Fehler beim Laden des gespeicherten Diagramms
+          const persistedDiagram = localStorage.getItem('excalidraw-current-diagram')
+          if (persistedDiagram) {
+            const diagramData = JSON.parse(persistedDiagram)
+            setCurrentDiagram(diagramData)
+          }
+        } catch (error) {
+          console.warn('Failed to load persisted diagram:', error)
           localStorage.removeItem('excalidraw-current-diagram')
         }
-      }
 
-      if (persistedLastSaved) {
         try {
-          const lastSavedData = JSON.parse(persistedLastSaved)
-          setLastSavedScene(lastSavedData)
-        } catch {
-          // Fehler beim Laden des letzten gespeicherten Zustands
+          const persistedLastSaved = localStorage.getItem('excalidraw-last-saved-scene')
+          if (persistedLastSaved) {
+            const lastSavedData = JSON.parse(persistedLastSaved)
+            setLastSavedScene(lastSavedData)
+          }
+        } catch (error) {
+          console.warn('Failed to load last saved scene:', error)
           localStorage.removeItem('excalidraw-last-saved-scene')
         }
       }
+
+      // Use setTimeout to prevent hydration issues in Docker containers
+      const timeoutId = setTimeout(initializeClient, 0)
+      return () => clearTimeout(timeoutId)
     }
   }, [])
+
+  // Docker-specific: Monitor and preserve selection states to prevent disappearing selections
+  useEffect(() => {
+    if (!excalidrawAPI || !isClient) return
+
+    let lastKnownSelectedElements: Record<string, boolean> = {}
+    let lastInteractionTime = Date.now()
+    let isUserInteracting = false
+    let lastPointerEvent: string | null = null
+
+    // Track user interactions to distinguish between intentional and unintentional selection clearing
+    const trackUserInteraction = (eventType: string) => {
+      lastInteractionTime = Date.now()
+      isUserInteracting = true
+      lastPointerEvent = eventType
+
+      // Reset interaction flag after a short delay
+      setTimeout(() => {
+        isUserInteracting = false
+        lastPointerEvent = null
+      }, 300) // 300ms window for user interaction
+    }
+
+    // Add event listeners to track user interactions on the entire document
+    // This ensures we catch all pointer events, even if canvas structure changes
+    const handlePointerDown = (e: PointerEvent) => {
+      // Check if the click is within the Excalidraw area
+      const excalidrawContainer = document.querySelector('.excalidraw')
+      if (excalidrawContainer && excalidrawContainer.contains(e.target as Node)) {
+        trackUserInteraction('pointerdown')
+      }
+    }
+
+    const handlePointerUp = (e: PointerEvent) => {
+      const excalidrawContainer = document.querySelector('.excalidraw')
+      if (excalidrawContainer && excalidrawContainer.contains(e.target as Node)) {
+        trackUserInteraction('pointerup')
+      }
+    }
+
+    // Use capture phase to ensure we catch all events
+    document.addEventListener('pointerdown', handlePointerDown, true)
+    document.addEventListener('pointerup', handlePointerUp, true)
+
+    const monitorSelection = () => {
+      try {
+        const appState = excalidrawAPI.getAppState()
+        const currentSelectedElements = appState?.selectedElementIds || {}
+
+        // Check if selection was unexpectedly cleared (Docker container issue)
+        const hasSelection = Object.keys(currentSelectedElements).length > 0
+        const hadSelection = Object.keys(lastKnownSelectedElements).length > 0
+
+        // Only restore selection if:
+        // 1. We had a selection that disappeared
+        // 2. No recent user interaction (to allow intentional deselection)
+        // 3. Selection tool is active
+        // 4. Enough time has passed since last interaction
+        // 5. It's not immediately after a pointer event (which might be intentional deselection)
+        const timeSinceInteraction = Date.now() - lastInteractionTime
+        const shouldRestore =
+          hadSelection &&
+          !hasSelection &&
+          !isUserInteracting &&
+          timeSinceInteraction > 1500 && // Wait at least 1.5 seconds after user interaction
+          appState?.activeTool?.type === 'selection' &&
+          lastPointerEvent !== 'pointerup' // Don't restore immediately after pointer up
+
+        if (shouldRestore) {
+          console.log('Docker container selection recovery: Restoring lost selection state')
+          // Restore the last known selection
+          excalidrawAPI.updateScene({
+            appState: {
+              ...appState,
+              selectedElementIds: lastKnownSelectedElements,
+            },
+          })
+        } else if (hasSelection) {
+          // Update our tracking of the selection state
+          lastKnownSelectedElements = { ...currentSelectedElements }
+        } else if (!hasSelection && timeSinceInteraction > 500) {
+          // If no selection and some time has passed, clear our tracking
+          // This allows for natural deselection while preventing immediate clearing
+          lastKnownSelectedElements = {}
+        }
+      } catch (error) {
+        console.warn('Selection monitoring error:', error)
+      }
+    }
+
+    // Start monitoring selection state every 500ms (Docker-safe interval)
+    const monitorInterval = setInterval(monitorSelection, 500)
+
+    return () => {
+      clearInterval(monitorInterval)
+      // Clean up event listeners
+      document.removeEventListener('pointerdown', handlePointerDown, true)
+      document.removeEventListener('pointerup', handlePointerUp, true)
+    }
+  }, [excalidrawAPI, isClient])
 
   const handleSaveDiagram = useCallback(
     (savedDiagram: any) => {
@@ -325,30 +438,41 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
             elements: diagramData.elements || [],
             appState: {
               ...diagramData.appState,
-              viewBackgroundColor: '#ffffff',
-              // Ensure proper restoration of Maps and other properties
+              viewBackgroundColor: diagramData.appState?.viewBackgroundColor || '#ffffff',
+              // Docker-safe state restoration - reset problematic properties
               collaborators: new Map(),
               selectedElementIds: {},
               hoveredElementIds: {},
               selectedGroupIds: {},
+              selectedLinearElement: null,
+              editingLinearElement: null,
               activeTool: { type: 'selection' },
+              isLoading: false,
+              errorMessage: null,
             },
           }
           const restoredScene = restoreSceneData(sceneData)
-          excalidrawAPI.updateScene(restoredScene)
-          setCurrentDiagram(diagram)
-          setCurrentScene(restoredScene)
-          setHasUnsavedChanges(false) // Reset unsaved changes flag
-          setLastSavedScene(restoredScene) // Set as last saved state
-          // Persist to localStorage
-          localStorage.setItem('excalidraw-scene', JSON.stringify(restoredScene))
-          localStorage.setItem('excalidraw-current-diagram', JSON.stringify(diagram))
+
+          // Use setTimeout to ensure proper state update in Docker containers
+          setTimeout(() => {
+            excalidrawAPI.updateScene(restoredScene)
+            setCurrentDiagram(diagram)
+            setCurrentScene(restoredScene)
+            setHasUnsavedChanges(false)
+            setLastSavedScene(restoredScene)
+
+            // Persist to localStorage
+            localStorage.setItem('excalidraw-scene', JSON.stringify(restoredScene))
+            localStorage.setItem('excalidraw-current-diagram', JSON.stringify(diagram))
+          }, 0)
+
           setNotification({
             open: true,
             message: `Diagramm "${diagram.title}" erfolgreich geladen!`,
             severity: 'success',
           })
-        } catch {
+        } catch (error) {
+          console.error('Error loading diagram:', error)
           setNotification({
             open: true,
             message: 'Fehler beim Laden des Diagramms',
@@ -362,7 +486,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
 
   const handleNewDiagram = useCallback(() => {
     if (excalidrawAPI) {
-      // Canvas leeren
+      // Canvas leeren - Docker-safe empty scene
       const emptyScene = {
         elements: [],
         appState: {
@@ -371,18 +495,28 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
           selectedElementIds: {},
           hoveredElementIds: {},
           selectedGroupIds: {},
+          selectedLinearElement: null,
+          editingLinearElement: null,
           activeTool: { type: 'selection' },
+          isLoading: false,
+          errorMessage: null,
         },
       }
       const restoredScene = restoreSceneData(emptyScene)
-      excalidrawAPI.updateScene(restoredScene)
-      setCurrentDiagram(null)
-      setCurrentScene(restoredScene)
-      setHasUnsavedChanges(false) // Reset unsaved changes flag
-      setLastSavedScene(restoredScene) // Set as last saved state
-      // Clear localStorage
-      localStorage.removeItem('excalidraw-scene')
-      localStorage.removeItem('excalidraw-current-diagram')
+
+      // Use setTimeout to ensure proper state reset in Docker containers
+      setTimeout(() => {
+        excalidrawAPI.updateScene(restoredScene)
+        setCurrentDiagram(null)
+        setCurrentScene(restoredScene)
+        setHasUnsavedChanges(false)
+        setLastSavedScene(restoredScene)
+
+        // Clear localStorage
+        localStorage.removeItem('excalidraw-scene')
+        localStorage.removeItem('excalidraw-current-diagram')
+      }, 0)
+
       setNotification({
         open: true,
         message: 'Neues Diagramm erstellt',
@@ -459,7 +593,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
         const url = URL.createObjectURL(dataBlob)
 
         // Generate filename with diagram name if available
-        const timestamp = new Date(1735689600000).toISOString().split('T')[0] // Fixed timestamp for consistency
+        const timestamp = new Date().toISOString().split('T')[0]
         let filename = `diagram-export-${timestamp}.json`
 
         if (currentDiagram && currentDiagram.title) {
@@ -670,40 +804,55 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
   const handleExcalidrawAPI = useCallback((api: any) => {
     setExcalidrawAPI(api)
 
-    // Set up auto-save to localStorage
+    // Set up auto-save to localStorage with Docker-safe state preservation
     let saveTimeout: NodeJS.Timeout
     const autoSaveScene = () => {
       if (api) {
         const scene = api.getSceneElements()
         const appState = api.getAppState()
+
+        // Create minimal scene data for storage - preserve selection states
         const sceneData = {
           elements: scene,
           appState: {
             viewBackgroundColor: appState.viewBackgroundColor,
             currentItemFontFamily: appState.currentItemFontFamily,
-            // Only save essential app state properties
-            collaborators: new Map(), // Always ensure this is a proper Map
-            selectedElementIds: {},
-            hoveredElementIds: {},
-            selectedGroupIds: {},
-            activeTool: { type: 'selection' },
+            // Preserve selection states to prevent disappearing selections in Docker
+            selectedElementIds: appState.selectedElementIds || {},
+            hoveredElementIds: appState.hoveredElementIds || {},
+            selectedGroupIds: appState.selectedGroupIds || {},
+            selectedLinearElement: appState.selectedLinearElement || null,
+            editingLinearElement: appState.editingLinearElement || null,
+            activeTool: appState.activeTool || { type: 'selection' },
+            // Always ensure collaborators is a proper Map for Docker compatibility
+            collaborators: new Map(),
+            // Ensure other Docker-safe properties
+            isLoading: false,
+            errorMessage: null,
           },
         }
-        const restoredScene = restoreSceneData(sceneData)
-        localStorage.setItem('excalidraw-scene', JSON.stringify(restoredScene))
-        setCurrentScene(restoredScene)
+
+        // Only save to localStorage, don't update current scene to preserve active state
+        localStorage.setItem('excalidraw-scene', JSON.stringify(sceneData))
       }
     }
 
-    // Set up onChange listener for auto-save
+    // Set up onChange listener for auto-save with debouncing for Docker performance
     const onChangeHandler = () => {
       clearTimeout(saveTimeout)
-      saveTimeout = setTimeout(autoSaveScene, 1000) // Save after 1 second of no changes
+      saveTimeout = setTimeout(autoSaveScene, 1500) // Increased timeout for Docker containers
     }
 
     // Store the change handler reference for cleanup
     if (api && api.onChange) {
       api.onChange(onChangeHandler)
+    }
+
+    // Docker-specific: Ensure proper cleanup on unmount
+    return () => {
+      if (saveTimeout) {
+        clearTimeout(saveTimeout)
+      }
     }
   }, [])
 
