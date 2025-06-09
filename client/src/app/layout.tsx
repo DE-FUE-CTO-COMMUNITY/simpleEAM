@@ -28,7 +28,7 @@ dayjs.locale('de')
 // Emotion Cache für Server-Side Rendering mit besserer Hydration-Kompatibilität
 let clientSideCache: ReturnType<typeof createCache> | null = null
 
-export function useClientStyleRegistry() {
+function useClientStyleRegistry() {
   const [cache] = useState(() => {
     // Cache nur einmal erstellen und wiederverwenden
     if (typeof window !== 'undefined' && clientSideCache) {
