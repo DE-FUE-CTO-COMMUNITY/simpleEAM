@@ -257,12 +257,53 @@ function createLibraryItemFromDatabaseElement(dbElement: any, elementType: strin
       newElement.text = wrappedText
       newElement.originalText = wrappedText
       newElement.rawText = wrappedText
-      // Set text alignment properties directly on the text element
-      newElement.textAlign = 'center'
-      newElement.verticalAlign = 'middle'
 
-      // Set font size
+      // Preserve the original template's text alignment if it exists, otherwise set defaults
+      newElement.textAlign = element.textAlign || 'center'
+      newElement.verticalAlign = element.verticalAlign || 'middle'
+
+      // Set font size and ensure it's properly applied
       newElement.fontSize = fontSize
+
+      // Calculate text dimensions based on content and font size
+      // This helps ensure proper rendering in the library
+      const lineCount = (wrappedText.match(/\n/g) || []).length + 1
+      const avgLineWidth = Math.max(...wrappedText.split('\n').map(line => line.length))
+
+      // Estimate text dimensions (rough calculation for library display)
+      const estimatedWidth = Math.min(avgLineWidth * fontSize * 0.6, availableWidth)
+      const estimatedHeight = lineCount * fontSize * 1.2 // 1.2 is line height factor
+
+      // Preserve the original element's dimensions if they exist and are reasonable,
+      // otherwise use calculated dimensions
+      newElement.width = element.width && element.width > 0 ? element.width : estimatedWidth
+      newElement.height = element.height && element.height > 0 ? element.height : estimatedHeight
+
+      // CRITICAL: Maintain container binding for proper text rendering
+      if (containerRect) {
+        // Find the new container ID from the mapping
+        const containerElement = template.elements.find(
+          (el: any) =>
+            el.type === 'rectangle' &&
+            el.boundElements?.some((bound: any) => bound.id === element.id)
+        )
+
+        if (containerElement) {
+          const newContainerId = idMapping.get(containerElement.id)
+          if (newContainerId) {
+            // Set the containerId to establish the bound text relationship
+            newElement.containerId = newContainerId
+
+            // Calculate proper text position relative to container center
+            const textCenterX = containerRect.x + containerRect.width / 2
+            const textCenterY = containerRect.y + containerRect.height / 2
+
+            // Position text at container center (accounting for text dimensions)
+            newElement.x = textCenterX - newElement.width / 2
+            newElement.y = textCenterY - newElement.height / 2
+          }
+        }
+      }
     }
 
     // Store database metadata in customData - ONLY in the first element to avoid redundancy
@@ -300,6 +341,40 @@ function createLibraryItemFromDatabaseElement(dbElement: any, elementType: strin
     }
 
     return newElement
+  })
+
+  // CRITICAL: Update boundElements references to use new IDs for proper text-container binding
+  elements.forEach((element: any) => {
+    if (element.type === 'rectangle' && element.boundElements) {
+      element.boundElements = element.boundElements.map((bound: any) => ({
+        ...bound,
+        id: idMapping.get(bound.id) || bound.id,
+      }))
+    }
+  })
+
+  // Validate and ensure text-container relationships are properly established
+  const textElements = elements.filter((el: any) => el.type === 'text')
+  const rectangleElements = elements.filter((el: any) => el.type === 'rectangle')
+
+  textElements.forEach((textEl: any) => {
+    if (textEl.containerId) {
+      // Find the corresponding rectangle
+      const container = rectangleElements.find((rect: any) => rect.id === textEl.containerId)
+      if (container) {
+        // Ensure the container has the text in its boundElements
+        if (!container.boundElements) {
+          container.boundElements = []
+        }
+        const hasTextBinding = container.boundElements.some((bound: any) => bound.id === textEl.id)
+        if (!hasTextBinding) {
+          container.boundElements.push({
+            type: 'text',
+            id: textEl.id,
+          })
+        }
+      }
+    }
   })
 
   // Create the library item according to Excalidraw 0.18 format
@@ -371,15 +446,15 @@ function wrapTextToFitWidth(text: string, maxWidth: number, fontSize: number = 2
     lines.push(currentLine.trim())
   }
 
-  // Limit to maximum 3 lines to prevent boxes from becoming too tall
-  if (lines.length > 3) {
-    const lastLine = lines[2]
+  // Limit to maximum 2 lines for better formatting in library elements
+  if (lines.length > 2) {
+    const lastLine = lines[1]
     const maxLastLineLength = Math.max(0, maxCharsPerLine - 3)
-    lines[2] =
+    lines[1] =
       lastLine.length > maxLastLineLength
         ? lastLine.substring(0, maxLastLineLength) + '...'
         : lastLine
-    return lines.slice(0, 3).join('\n')
+    return lines.slice(0, 2).join('\n')
   }
 
   return lines.join('\n')

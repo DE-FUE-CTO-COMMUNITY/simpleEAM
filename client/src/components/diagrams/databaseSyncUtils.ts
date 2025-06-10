@@ -1,13 +1,12 @@
 // Database synchronization utilities for diagram elements
 import { gql } from '@apollo/client'
-
-/**
- * Entfernt Zeilenumbrüche und normalisiert Text für Vergleiche
- */
-const normalizeText = (text: string | undefined | null): string => {
-  if (!text) return ''
-  return text.replace(/\r?\n/g, ' ').trim()
-}
+import { 
+  normalizeText, 
+  wrapTextToFitWidth,
+  findLinkedTextElement,
+  ensureTextContainerBindings,
+  updateTextWithContainerBinding 
+} from './textContainerUtils'
 
 interface DiagramElement {
   id: string
@@ -334,38 +333,8 @@ export const validateAndSyncElements = async (
     const lastSyncedName = element.customData.lastSyncedName
     const databaseName = currentData.name
 
-    // Robuste Text-Element-Suche mit verschiedenen Verknüpfungsstrategien
-    let textElement = elements.find(
-      el =>
-        el.type === 'text' &&
-        // 1. Direkte Verknüpfung über mainElementId
-        (el.customData?.mainElementId === element.id ||
-          // 2. Verknüpfung über dieselbe databaseId
-          (el.customData?.databaseId === databaseId && databaseId) ||
-          // 3. Text-Inhalt stimmt mit aktuellem Namen überein
-          normalizeText(el.text) === normalizeText(currentElementName) ||
-          normalizeText(el.rawText) === normalizeText(currentElementName) ||
-          // 4. Text-Inhalt stimmt mit letztem synchronisierten Namen überein
-          (lastSyncedName &&
-            (normalizeText(el.text) === normalizeText(lastSyncedName) ||
-              normalizeText(el.rawText) === normalizeText(lastSyncedName))))
-    )
-
-    // Fallback: Suche nach Text-Elementen in der Nähe des Hauptelements
-    if (!textElement && element.x !== undefined && element.y !== undefined) {
-      const tolerance = 100 // Pixel-Toleranz für Nähe-Suche
-      textElement = elements.find(
-        el =>
-          el.type === 'text' &&
-          el.x !== undefined &&
-          el.y !== undefined &&
-          Math.abs(el.x - element.x) < tolerance &&
-          Math.abs(el.y - element.y) < tolerance &&
-          // Zusätzlich: Text sollte ähnlich zum erwarteten Namen sein
-          (normalizeText(el.text).includes(normalizeText(currentElementName).split(' ')[0]) ||
-            normalizeText(currentElementName).includes(normalizeText(el.text).split(' ')[0]))
-      )
-    }
+    // Verwende die gemeinsame Funktion für robuste Text-Element-Suche
+    const textElement = findLinkedTextElement(element, elements)
 
     const displayedName = textElement?.text || textElement?.rawText
 
@@ -503,17 +472,12 @@ const debugElementStructure = (elements: DiagramElement[]): void => {
   console.log(`Text elements: ${textElements.length}`)
 
   databaseElements.forEach(dbEl => {
-    const linkedTexts = textElements.filter(
-      textEl =>
-        textEl.customData?.mainElementId === dbEl.id ||
-        textEl.customData?.databaseId === dbEl.customData?.databaseId ||
-        normalizeText(textEl.text) === normalizeText(dbEl.customData?.originalElement?.name)
-    )
+    // Verwende die gemeinsame Funktion für Text-Element-Suche
+    const linkedText = findLinkedTextElement(dbEl, elements)
 
     console.log(`🔗 DB Element ${dbEl.customData?.databaseId} (${dbEl.customData?.elementType}):`)
     console.log(`   Name: "${dbEl.customData?.originalElement?.name}"`)
-    console.log(`   Linked texts: ${linkedTexts.length}`)
-    linkedTexts.forEach(text => console.log(`     - "${text.text}" (id: ${text.id})`))
+    console.log(`   Linked text: ${linkedText ? `"${linkedText.text}" (id: ${linkedText.id})` : 'none'}`)
   })
 
   console.groupEnd()
@@ -601,17 +565,48 @@ export const syncDiagramOnOpen = async (apolloClient: any, diagramData: any): Pr
                 normalizeText(element.text).split(' ')[0]
               ))))
 
+      // Text-Elemente aktualisieren - verwende updateTextWithContainerBinding
       if (isLinkedTextElement) {
         console.log(
           `Updating text element ${element.id}: "${element.text}" -> "${normalizedNewName}"`
         )
+        
+        // Finde den tatsächlichen Container-Element (Rectangle, Diamond, etc.)
+        const containerElement = updatedElements.find(
+          el => 
+            (el.type === 'rectangle' || el.type === 'diamond' || el.type === 'ellipse') &&
+            (el.boundElements?.some((bound: any) => bound.id === element.id) ||
+             el.customData?.databaseId === updatedElement.customData?.databaseId ||
+             el.id === updatedElement.id)
+        )
+        
+        let finalText = normalizedNewName
+        
+        // Wenn ein Container gefunden wird, berücksichtige die Breite für Text-Umbruch
+        if (containerElement && containerElement.width) {
+          const availableWidth = containerElement.width - 20 // Padding berücksichtigen
+          const fontSize = element.fontSize || 20
+          
+          // Verwende wrapTextToFitWidth für automatischen Umbruch
+          finalText = wrapTextToFitWidth(normalizedNewName, availableWidth, fontSize)
+          
+          console.log(
+            `Applied text wrapping for container width ${containerElement.width}px: "${normalizedNewName}" -> "${finalText}"`
+          )
+        }
+        
+        // Verwende den tatsächlichen Container-Element für korrekte Positionierung
+        const updatedTextElement = updateTextWithContainerBinding(
+          element,
+          finalText,
+          containerElement // Verwende den gefundenen Container, nicht das DB-Element
+        )
+        
         return {
-          ...element,
-          text: normalizedNewName,
-          rawText: normalizedNewName,
+          ...updatedTextElement,
           customData: {
             ...element.customData,
-            lastSyncedName: normalizedNewName,
+            lastSyncedName: normalizedNewName, // Store original name for sync tracking
           },
         }
       }
@@ -623,6 +618,10 @@ export const syncDiagramOnOpen = async (apolloClient: any, diagramData: any): Pr
   // WICHTIG: Markiere fehlende UND entferne Markierungen für gefundene Elemente
   console.log(`Processing missing elements: ${validationResult.missingElements.length} missing`)
   updatedElements = markMissingElements(updatedElements, validationResult.missingElements)
+
+  // Stelle sicher, dass Text-Container-Bindungen korrekt sind
+  console.log('Ensuring text-container bindings are correct...')
+  updatedElements = ensureTextContainerBindings(updatedElements)
 
   if (validationResult.missingElements.length > 0) {
     console.warn(
@@ -662,41 +661,8 @@ export const syncDiagramOnSave = async (
   for (const element of databaseElements) {
     if (!element.customData?.databaseId || !element.customData?.elementType) continue
 
-    // Finde das Text-Element für dieses Hauptelement - robuste erweiterte Suche
-    let textElement = diagramData.elements.find(
-      (el: DiagramElement) =>
-        el.type === 'text' &&
-        // 1. Direkte Verknüpfung über mainElementId
-        (el.customData?.mainElementId === element.id ||
-          // 2. Verknüpfung über dieselbe databaseId
-          el.customData?.databaseId === element.customData?.databaseId ||
-          // 3. Text-Elemente ohne customData, die Namen-Match haben
-          (!el.customData?.isFromDatabase &&
-            (normalizeText(el.text) === normalizeText(element.customData?.lastSyncedName) ||
-              normalizeText(el.rawText) === normalizeText(element.customData?.lastSyncedName) ||
-              normalizeText(el.text) === normalizeText(element.customData?.originalElement?.name) ||
-              normalizeText(el.rawText) ===
-                normalizeText(element.customData?.originalElement?.name))))
-    )
-
-    // Fallback: Proximity-basierte Suche für Text-Elemente in der Nähe
-    if (!textElement && element.x !== undefined && element.y !== undefined) {
-      const tolerance = 100
-      textElement = diagramData.elements.find(
-        (el: DiagramElement) =>
-          el.type === 'text' &&
-          el.x !== undefined &&
-          el.y !== undefined &&
-          Math.abs(el.x - element.x) < tolerance &&
-          Math.abs(el.y - element.y) < tolerance &&
-          (normalizeText(el.text).includes(
-            normalizeText(element.customData?.originalElement?.name).split(' ')[0]
-          ) ||
-            normalizeText(element.customData?.originalElement?.name).includes(
-              normalizeText(el.text).split(' ')[0]
-            ))
-      )
-    }
+    // Verwende die gemeinsame Funktion für robuste Text-Element-Suche
+    const textElement = findLinkedTextElement(element, diagramData.elements)
 
     if (!textElement) {
       console.warn(`No text element found for database element ${element.customData.databaseId}`)
