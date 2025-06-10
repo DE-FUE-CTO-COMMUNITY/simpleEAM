@@ -20,13 +20,22 @@ export const restoreSceneData = (sceneData: any) => {
 
   // Initialize editing states ONLY if they are undefined/null to prevent controlled/uncontrolled issues
   // DO NOT reset existing valid values as this causes React warnings
-  if (sceneData.appState.selectedElementIds === undefined || sceneData.appState.selectedElementIds === null) {
+  if (
+    sceneData.appState.selectedElementIds === undefined ||
+    sceneData.appState.selectedElementIds === null
+  ) {
     sceneData.appState.selectedElementIds = {}
   }
-  if (sceneData.appState.hoveredElementIds === undefined || sceneData.appState.hoveredElementIds === null) {
+  if (
+    sceneData.appState.hoveredElementIds === undefined ||
+    sceneData.appState.hoveredElementIds === null
+  ) {
     sceneData.appState.hoveredElementIds = {}
   }
-  if (sceneData.appState.selectedGroupIds === undefined || sceneData.appState.selectedGroupIds === null) {
+  if (
+    sceneData.appState.selectedGroupIds === undefined ||
+    sceneData.appState.selectedGroupIds === null
+  ) {
     sceneData.appState.selectedGroupIds = {}
   }
   if (sceneData.appState.selectedLinearElement === undefined) {

@@ -264,16 +264,25 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     if (sceneData && sceneData.appState) {
       // Ensure collaborators is always a Map, not a plain object
       sceneData.appState.collaborators = new Map()
-      
+
       // Initialize properties ONLY if they are undefined/null to prevent controlled/uncontrolled issues
       // DO NOT reset existing valid values as this causes React warnings
-      if (sceneData.appState.selectedElementIds === undefined || sceneData.appState.selectedElementIds === null) {
+      if (
+        sceneData.appState.selectedElementIds === undefined ||
+        sceneData.appState.selectedElementIds === null
+      ) {
         sceneData.appState.selectedElementIds = {}
       }
-      if (sceneData.appState.hoveredElementIds === undefined || sceneData.appState.hoveredElementIds === null) {
+      if (
+        sceneData.appState.hoveredElementIds === undefined ||
+        sceneData.appState.hoveredElementIds === null
+      ) {
         sceneData.appState.hoveredElementIds = {}
       }
-      if (sceneData.appState.selectedGroupIds === undefined || sceneData.appState.selectedGroupIds === null) {
+      if (
+        sceneData.appState.selectedGroupIds === undefined ||
+        sceneData.appState.selectedGroupIds === null
+      ) {
         sceneData.appState.selectedGroupIds = {}
       }
       if (sceneData.appState.activeTool === undefined || sceneData.appState.activeTool === null) {
