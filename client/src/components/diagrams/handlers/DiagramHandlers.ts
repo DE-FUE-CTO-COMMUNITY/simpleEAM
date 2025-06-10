@@ -448,11 +448,11 @@ export const useDiagramHandlers = (
 
   // Manual Sync Handler
   const handleManualSync = useCallback(async () => {
-    if (!excalidrawAPI || !currentDiagram) {
+    if (!excalidrawAPI) {
       setNotification({
         open: true,
-        message: 'Kein Diagramm zum Synchronisieren geladen',
-        severity: 'info',
+        message: 'Excalidraw API nicht verfügbar',
+        severity: 'error',
       })
       return
     }
@@ -469,31 +469,40 @@ export const useDiagramHandlers = (
         },
       }
 
-      // Try manual database synchronization
-      await syncDiagramOnSave(apolloClient, sceneData)
+      console.log('Starting manual database synchronization...')
 
-      // Also try to clear any missing element markers from the current elements
-      const cleanedElements = clearMissingElementMarkers(sceneData.elements)
+      // Use syncDiagramOnOpen for manual synchronization (loads fresh data from database)
+      const syncedDiagramData = await syncDiagramOnOpen(apolloClient, sceneData)
 
-      // Update the scene with cleaned elements
+      // Clear any missing element markers if no missing elements found
+      const cleanedElements = clearMissingElementMarkers(syncedDiagramData.elements)
+
+      // Update the scene with synced and cleaned elements
       if (excalidrawAPI) {
-        excalidrawAPI.updateScene({ elements: cleanedElements })
+        excalidrawAPI.updateScene({
+          elements: cleanedElements,
+          appState: {
+            ...syncedDiagramData.appState,
+            viewBackgroundColor: appState.viewBackgroundColor,
+            currentItemFontFamily: appState.currentItemFontFamily,
+          },
+        })
       }
 
       setNotification({
         open: true,
-        message: 'Datenbankssynchronisation erfolgreich!',
+        message: 'Datenbankssynchronisation erfolgreich abgeschlossen!',
         severity: 'success',
       })
     } catch (err) {
       console.error('Manual sync failed:', err)
       setNotification({
         open: true,
-        message: 'Fehler bei der Datenbank-Synchronisation',
+        message: `Fehler bei der Datenbank-Synchronisation: ${err instanceof Error ? err.message : 'Unbekannter Fehler'}`,
         severity: 'error',
       })
     }
-  }, [apolloClient, excalidrawAPI, currentDiagram, setNotification])
+  }, [apolloClient, excalidrawAPI, setNotification])
 
   return {
     handleNewDiagram,

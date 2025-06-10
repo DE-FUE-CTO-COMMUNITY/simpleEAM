@@ -3,10 +3,7 @@
 import React, { useEffect, useState, useMemo } from 'react'
 import { useQuery } from '@apollo/client'
 import { GET_LIBRARY_ELEMENTS } from '@/graphql/library'
-import { 
-  wrapTextToFitWidth, 
-  calculateCenteredTextPosition 
-} from './textContainerUtils'
+import { wrapTextToFitWidth, calculateCenteredTextPosition } from './textContainerUtils'
 
 interface IntegratedLibraryProps {
   excalidrawAPI: any
@@ -285,8 +282,12 @@ function createLibraryItemFromDatabaseElement(dbElement: any, elementType: strin
             newElement.containerId = newContainerId
 
             // Verwende die gemeinsame calculateCenteredTextPosition Funktion für konsistente Zentrierung
-            const centeredPosition = calculateCenteredTextPosition(wrappedText, containerRect, fontSize)
-            
+            const centeredPosition = calculateCenteredTextPosition(
+              wrappedText,
+              containerRect,
+              fontSize
+            )
+
             // Setze Position und Dimensionen aus der gemeinsamen Funktion
             newElement.x = centeredPosition.x
             newElement.y = centeredPosition.y
@@ -298,10 +299,10 @@ function createLibraryItemFromDatabaseElement(dbElement: any, elementType: strin
         // Fallback für Texte ohne Container: Verwende geschätzte Dimensionen
         const lineCount = (wrappedText.match(/\n/g) || []).length + 1
         const avgLineWidth = Math.max(...wrappedText.split('\n').map(line => line.length))
-        
+
         const estimatedWidth = Math.min(avgLineWidth * fontSize * 0.6, availableWidth)
         const estimatedHeight = lineCount * fontSize * 1.2
-        
+
         newElement.width = element.width && element.width > 0 ? element.width : estimatedWidth
         newElement.height = element.height && element.height > 0 ? element.height : estimatedHeight
       }

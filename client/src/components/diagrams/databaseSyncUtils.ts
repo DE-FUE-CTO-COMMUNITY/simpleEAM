@@ -1,11 +1,11 @@
 // Database synchronization utilities for diagram elements
 import { gql } from '@apollo/client'
-import { 
-  normalizeText, 
+import {
+  normalizeText,
   wrapTextToFitWidth,
   findLinkedTextElement,
   ensureTextContainerBindings,
-  updateTextWithContainerBinding 
+  updateTextWithContainerBinding,
 } from './textContainerUtils'
 
 interface DiagramElement {
@@ -477,7 +477,9 @@ const debugElementStructure = (elements: DiagramElement[]): void => {
 
     console.log(`🔗 DB Element ${dbEl.customData?.databaseId} (${dbEl.customData?.elementType}):`)
     console.log(`   Name: "${dbEl.customData?.originalElement?.name}"`)
-    console.log(`   Linked text: ${linkedText ? `"${linkedText.text}" (id: ${linkedText.id})` : 'none'}`)
+    console.log(
+      `   Linked text: ${linkedText ? `"${linkedText.text}" (id: ${linkedText.id})` : 'none'}`
+    )
   })
 
   console.groupEnd()
@@ -570,38 +572,38 @@ export const syncDiagramOnOpen = async (apolloClient: any, diagramData: any): Pr
         console.log(
           `Updating text element ${element.id}: "${element.text}" -> "${normalizedNewName}"`
         )
-        
+
         // Finde den tatsächlichen Container-Element (Rectangle, Diamond, etc.)
         const containerElement = updatedElements.find(
-          el => 
+          el =>
             (el.type === 'rectangle' || el.type === 'diamond' || el.type === 'ellipse') &&
             (el.boundElements?.some((bound: any) => bound.id === element.id) ||
-             el.customData?.databaseId === updatedElement.customData?.databaseId ||
-             el.id === updatedElement.id)
+              el.customData?.databaseId === updatedElement.customData?.databaseId ||
+              el.id === updatedElement.id)
         )
-        
+
         let finalText = normalizedNewName
-        
+
         // Wenn ein Container gefunden wird, berücksichtige die Breite für Text-Umbruch
         if (containerElement && containerElement.width) {
           const availableWidth = containerElement.width - 20 // Padding berücksichtigen
           const fontSize = element.fontSize || 20
-          
+
           // Verwende wrapTextToFitWidth für automatischen Umbruch
           finalText = wrapTextToFitWidth(normalizedNewName, availableWidth, fontSize)
-          
+
           console.log(
             `Applied text wrapping for container width ${containerElement.width}px: "${normalizedNewName}" -> "${finalText}"`
           )
         }
-        
+
         // Verwende den tatsächlichen Container-Element für korrekte Positionierung
         const updatedTextElement = updateTextWithContainerBinding(
           element,
           finalText,
           containerElement // Verwende den gefundenen Container, nicht das DB-Element
         )
-        
+
         return {
           ...updatedTextElement,
           customData: {

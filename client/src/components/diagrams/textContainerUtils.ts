@@ -58,16 +58,16 @@ export const updateTextWithContainerBinding = (
   // KRITISCH: Berechne korrekte Text-Position relativ zum Container-Zentrum
   if (containerElement && containerElement.x !== undefined && containerElement.y !== undefined) {
     const fontSize = updatedText.fontSize || 20
-    
+
     // Verwende die einheitliche calculateCenteredTextPosition Funktion für konsistente Zentrierung
     const centeredPosition = calculateCenteredTextPosition(newText, containerElement, fontSize)
-    
+
     // Aktualisiere Text-Position und -Dimensionen
     updatedText.x = centeredPosition.x
     updatedText.y = centeredPosition.y
     updatedText.width = centeredPosition.width
     updatedText.height = centeredPosition.height
-    
+
     const lineCount = (newText.match(/\n/g) || []).length + 1
     console.log(
       `Repositioned ${lineCount}-line text "${newText}" to center of container:`,
@@ -182,9 +182,7 @@ export const findLinkedTextElement = (
 
   // Strategie 3: Text-Element mit mainElementId Verweis
   const textWithMainRef = allElements.find(
-    el => 
-      el.type === 'text' && 
-      el.customData?.mainElementId === containerElement.id
+    el => el.type === 'text' && el.customData?.mainElementId === containerElement.id
   )
   if (textWithMainRef) return textWithMainRef
 
@@ -192,8 +190,7 @@ export const findLinkedTextElement = (
   if (containerElement.customData?.databaseId) {
     const textWithSameDbId = allElements.find(
       el =>
-        el.type === 'text' &&
-        el.customData?.databaseId === containerElement.customData.databaseId
+        el.type === 'text' && el.customData?.databaseId === containerElement.customData.databaseId
     )
     if (textWithSameDbId) return textWithSameDbId
   }
@@ -215,8 +212,10 @@ export const findLinkedTextElement = (
       const expectedName = normalizeText(containerElement.customData.originalElement.name)
       for (const textEl of nearbyTexts) {
         const textContent = normalizeText(textEl.text || textEl.rawText)
-        if (textContent.includes(expectedName.split(' ')[0]) || 
-            expectedName.includes(textContent.split(' ')[0])) {
+        if (
+          textContent.includes(expectedName.split(' ')[0]) ||
+          expectedName.includes(textContent.split(' ')[0])
+        ) {
           return textEl
         }
       }
@@ -237,8 +236,8 @@ export const findLinkedTextElement = (
  */
 export const ensureTextContainerBindings = (elements: ExcalidrawElement[]): ExcalidrawElement[] => {
   const textElements = elements.filter(el => el.type === 'text')
-  const containerElements = elements.filter(el => 
-    el.type === 'rectangle' || el.type === 'diamond' || el.type === 'ellipse'
+  const containerElements = elements.filter(
+    el => el.type === 'rectangle' || el.type === 'diamond' || el.type === 'ellipse'
   )
 
   // Map für ID-Updates
@@ -248,18 +247,18 @@ export const ensureTextContainerBindings = (elements: ExcalidrawElement[]): Exca
     if (textEl.containerId) {
       // Text hat einen Container - stelle sicher, dass die Bindung bidirektional ist
       const containerIndex = updatedElements.findIndex(el => el.id === textEl.containerId)
-      
+
       if (containerIndex !== -1) {
         const container = updatedElements[containerIndex]
-        
+
         // Stelle sicher, dass der Container boundElements hat
         if (!container.boundElements) {
           container.boundElements = []
         }
-        
+
         // Prüfe, ob die Text-Bindung bereits vorhanden ist
         const hasTextBinding = container.boundElements.some(bound => bound.id === textEl.id)
-        
+
         if (!hasTextBinding) {
           container.boundElements.push({
             type: 'text',
@@ -284,7 +283,7 @@ export const ensureTextContainerBindings = (elements: ExcalidrawElement[]): Exca
       const potentialContainer = containerElements.find(container =>
         container.boundElements?.some(bound => bound.type === 'text' && bound.id === textEl.id)
       )
-      
+
       if (potentialContainer) {
         const textIndex = updatedElements.findIndex(el => el.id === textEl.id)
         if (textIndex !== -1) {
@@ -294,7 +293,9 @@ export const ensureTextContainerBindings = (elements: ExcalidrawElement[]): Exca
             potentialContainer
           )
           updatedElements[textIndex] = updatedTextElement
-          console.log(`Set containerId and repositioned text ${textEl.id} -> container ${potentialContainer.id}`)
+          console.log(
+            `Set containerId and repositioned text ${textEl.id} -> container ${potentialContainer.id}`
+          )
         }
       }
     }
@@ -313,11 +314,11 @@ export const calculateCenteredTextPosition = (
   fontSize: number = 20
 ): { x: number; y: number; width: number; height: number } => {
   const lineCount = (text.match(/\n/g) || []).length + 1
-  
+
   // Berechne Text-Dimensionen entsprechend der IntegratedLibrary-Logik
   let estimatedWidth: number
   let estimatedHeight: number
-  
+
   if (lineCount === 1) {
     // Einzeilige Texte: Präzisere Berechnung basierend auf Zeichenanzahl
     estimatedWidth = Math.min(text.length * fontSize * 0.6, (containerElement.width || 200) - 20)
@@ -328,19 +329,19 @@ export const calculateCenteredTextPosition = (
     estimatedWidth = Math.min(maxLineLength * fontSize * 0.6, (containerElement.width || 200) - 20)
     estimatedHeight = lineCount * fontSize * 1.2
   }
-  
+
   // Berechne Container-Zentrum
   const containerCenterX = (containerElement.x || 0) + (containerElement.width || 0) / 2
   const containerCenterY = (containerElement.y || 0) + (containerElement.height || 0) / 2
-  
+
   // Positioniere Text genau im Zentrum
   const x = containerCenterX - estimatedWidth / 2
   const y = containerCenterY - estimatedHeight / 2
-  
+
   return {
     x,
     y,
     width: estimatedWidth,
-    height: estimatedHeight
+    height: estimatedHeight,
   }
 }
