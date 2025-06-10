@@ -18,15 +18,30 @@ export const restoreSceneData = (sceneData: any) => {
     sceneData.appState.collaborators = new Map()
   }
 
-  // Reset editing states that can cause problems
-  sceneData.appState.selectedElementIds = {}
-  sceneData.appState.hoveredElementIds = {}
-  sceneData.appState.selectedGroupIds = {}
-  sceneData.appState.selectedLinearElement = null
-  sceneData.appState.editingLinearElement = null
+  // Initialize editing states ONLY if they are undefined/null to prevent controlled/uncontrolled issues
+  // DO NOT reset existing valid values as this causes React warnings
+  if (sceneData.appState.selectedElementIds === undefined || sceneData.appState.selectedElementIds === null) {
+    sceneData.appState.selectedElementIds = {}
+  }
+  if (sceneData.appState.hoveredElementIds === undefined || sceneData.appState.hoveredElementIds === null) {
+    sceneData.appState.hoveredElementIds = {}
+  }
+  if (sceneData.appState.selectedGroupIds === undefined || sceneData.appState.selectedGroupIds === null) {
+    sceneData.appState.selectedGroupIds = {}
+  }
+  if (sceneData.appState.selectedLinearElement === undefined) {
+    sceneData.appState.selectedLinearElement = null
+  }
+  if (sceneData.appState.editingLinearElement === undefined) {
+    sceneData.appState.editingLinearElement = null
+  }
   // Ensure proper timing-independent state
-  sceneData.appState.isLoading = false
-  sceneData.appState.errorMessage = null
+  if (sceneData.appState.isLoading === undefined || sceneData.appState.isLoading === null) {
+    sceneData.appState.isLoading = false
+  }
+  if (sceneData.appState.errorMessage === undefined) {
+    sceneData.appState.errorMessage = null
+  }
 
   return sceneData
 }

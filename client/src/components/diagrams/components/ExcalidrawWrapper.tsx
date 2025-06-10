@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { Box, Typography } from '@mui/material'
 import dynamic from 'next/dynamic'
 import { ExcalidrawComponentProps } from '../types/DiagramTypes'
@@ -27,30 +27,38 @@ const ExcalidrawWrapper = dynamic(
       excalidrawAPI,
       onChange,
       uiOptions,
-      initialData,
+      initialData: _initialData, // Not used - scene updates happen via excalidrawAPI
       viewModeEnabled,
       currentDiagram,
     }: ExcalidrawComponentProps) => {
       const ExcalidrawTyped = Excalidraw as any
       const MainMenuTyped = MainMenu as any
 
-      // Debug initialData to ensure it's never undefined
-      const safeInitialData = initialData || {
-        elements: [],
-        appState: {
-          viewBackgroundColor: '#ffffff',
-          collaborators: new Map(),
-          selectedElementIds: {},
-          hoveredElementIds: {},
-          selectedGroupIds: {},
-          selectedLinearElement: null,
-          editingLinearElement: null,
-          activeTool: { type: 'selection' },
-          isLoading: false,
-          errorMessage: null,
-        },
-        scrollToContent: false,
-      }
+      // Ensure initialData is always a valid, stable object to prevent controlled/uncontrolled issues
+      const safeInitialData = useMemo(() => {
+        // Always return a completely stable default structure regardless of props
+        // Scene updates should happen via excalidrawAPI.updateScene(), not via initialData
+        return {
+          elements: [],
+          appState: {
+            viewBackgroundColor: '#ffffff',
+            collaborators: new Map(),
+            selectedElementIds: {},
+            hoveredElementIds: {},
+            selectedGroupIds: {},
+            selectedLinearElement: null,
+            editingLinearElement: null,
+            activeTool: { type: 'selection' },
+            isLoading: false,
+            errorMessage: null,
+            theme: 'light',
+            zenModeEnabled: false,
+            gridModeEnabled: false,
+            viewModeEnabled: false,
+          },
+          scrollToContent: false,
+        }
+      }, []) // Empty dependency array - this should NEVER change!
 
       return (
         <div style={{ height: '100%', width: '100%' }}>

@@ -22,7 +22,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     isClient,
     excalidrawAPI,
     currentDiagram,
-    currentScene,
+    // currentScene, // Not used in initialData anymore
     hasUnsavedChanges,
     lastSavedScene,
     dialogStates,
@@ -115,15 +115,11 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     })
   }
 
-  // Create stable initialData to prevent controlled/uncontrolled input issues
+  // Create stable initialData that never changes to prevent controlled/uncontrolled input issues
   const initialData = useMemo(() => {
-    console.log('DiagramEditor: Creating initialData', {
-      currentScene,
-      hasElements: currentScene?.elements?.length || 0,
-      currentDiagram: currentDiagram?.title || 'none',
-    })
+    console.log('DiagramEditor: Creating stable initialData')
 
-    // Always return a consistent structure regardless of currentScene state
+    // Always return a consistent, minimal structure that never changes
     const baseAppState = {
       viewBackgroundColor: '#ffffff',
       collaborators: new Map(),
@@ -147,33 +143,15 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
       currentItemOpacity: 100,
     }
 
-    // Safely extract elements and appState properties
-    const elements =
-      currentScene?.elements && Array.isArray(currentScene.elements) ? currentScene.elements : []
-
-    const savedBackgroundColor = currentScene?.appState?.viewBackgroundColor
-    const savedFontFamily = currentScene?.appState?.currentItemFontFamily
-
-    console.log('DiagramEditor: initialData created with', elements.length, 'elements')
-
     return {
-      elements,
-      appState: {
-        ...baseAppState,
-        // Only override specific properties from saved state
-        viewBackgroundColor: savedBackgroundColor || '#ffffff',
-        currentItemFontFamily: savedFontFamily || 1,
-      },
-      scrollToContent: false, // Prevent auto-scroll on restore
+      elements: [], // Always start with empty elements
+      appState: baseAppState,
+      scrollToContent: false,
     }
-  }, [currentScene])
+  }, []) // Empty dependency array - this should never change!
 
   // Debug log for initialData
-  console.log(
-    'DiagramEditor: initialData created with',
-    initialData?.elements?.length || 0,
-    'elements'
-  )
+  console.log('DiagramEditor: Stable initialData created')
 
   if (!isClient) {
     return null
@@ -201,7 +179,8 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
         />
 
         <ExcalidrawWrapper
-          key={`excalidraw-${currentDiagram?.id || 'new'}`}
+          // Remove dynamic key to prevent controlled/uncontrolled input issues
+          // The component should persist throughout the app lifecycle
           onOpenDialog={() => updateDialogState('openDialogOpen', true)}
           onSaveDialog={() => updateDialogState('saveDialogOpen', true)}
           onSaveAsDialog={() => updateDialogState('saveAsDialogOpen', true)}
