@@ -3,6 +3,10 @@
 import React, { useEffect, useState, useMemo } from 'react'
 import { useQuery } from '@apollo/client'
 import { GET_LIBRARY_ELEMENTS } from '@/graphql/library'
+import { 
+  wrapTextToFitWidth, 
+  calculateCenteredTextPosition 
+} from './textContainerUtils'
 
 interface IntegratedLibraryProps {
   excalidrawAPI: any
@@ -265,20 +269,6 @@ function createLibraryItemFromDatabaseElement(dbElement: any, elementType: strin
       // Set font size and ensure it's properly applied
       newElement.fontSize = fontSize
 
-      // Calculate text dimensions based on content and font size
-      // This helps ensure proper rendering in the library
-      const lineCount = (wrappedText.match(/\n/g) || []).length + 1
-      const avgLineWidth = Math.max(...wrappedText.split('\n').map(line => line.length))
-
-      // Estimate text dimensions (rough calculation for library display)
-      const estimatedWidth = Math.min(avgLineWidth * fontSize * 0.6, availableWidth)
-      const estimatedHeight = lineCount * fontSize * 1.2 // 1.2 is line height factor
-
-      // Preserve the original element's dimensions if they exist and are reasonable,
-      // otherwise use calculated dimensions
-      newElement.width = element.width && element.width > 0 ? element.width : estimatedWidth
-      newElement.height = element.height && element.height > 0 ? element.height : estimatedHeight
-
       // CRITICAL: Maintain container binding for proper text rendering
       if (containerRect) {
         // Find the new container ID from the mapping
@@ -294,15 +284,26 @@ function createLibraryItemFromDatabaseElement(dbElement: any, elementType: strin
             // Set the containerId to establish the bound text relationship
             newElement.containerId = newContainerId
 
-            // Calculate proper text position relative to container center
-            const textCenterX = containerRect.x + containerRect.width / 2
-            const textCenterY = containerRect.y + containerRect.height / 2
-
-            // Position text at container center (accounting for text dimensions)
-            newElement.x = textCenterX - newElement.width / 2
-            newElement.y = textCenterY - newElement.height / 2
+            // Verwende die gemeinsame calculateCenteredTextPosition Funktion für konsistente Zentrierung
+            const centeredPosition = calculateCenteredTextPosition(wrappedText, containerRect, fontSize)
+            
+            // Setze Position und Dimensionen aus der gemeinsamen Funktion
+            newElement.x = centeredPosition.x
+            newElement.y = centeredPosition.y
+            newElement.width = centeredPosition.width
+            newElement.height = centeredPosition.height
           }
         }
+      } else {
+        // Fallback für Texte ohne Container: Verwende geschätzte Dimensionen
+        const lineCount = (wrappedText.match(/\n/g) || []).length + 1
+        const avgLineWidth = Math.max(...wrappedText.split('\n').map(line => line.length))
+        
+        const estimatedWidth = Math.min(avgLineWidth * fontSize * 0.6, availableWidth)
+        const estimatedHeight = lineCount * fontSize * 1.2
+        
+        newElement.width = element.width && element.width > 0 ? element.width : estimatedWidth
+        newElement.height = element.height && element.height > 0 ? element.height : estimatedHeight
       }
     }
 
@@ -387,77 +388,6 @@ function createLibraryItemFromDatabaseElement(dbElement: any, elementType: strin
   }
 
   return libraryItem
-}
-
-// Helper function to wrap text to fit within a specific width
-function wrapTextToFitWidth(text: string, maxWidth: number, fontSize: number = 20): string {
-  // Approximate character width based on font size (rough estimation)
-  // Most fonts have a character width of approximately 0.5-0.6 times the font size
-  const avgCharWidth = fontSize * 0.55
-
-  // Calculate maximum characters per line
-  const maxCharsPerLine = Math.floor(maxWidth / avgCharWidth)
-
-  // If text fits in one line, return as is
-  if (text.length <= maxCharsPerLine) {
-    return text
-  }
-
-  // Split text into words (considering various separators)
-  const words = text.split(/(\s+|-|_)/).filter(part => part.trim() || part === ' ')
-  const lines: string[] = []
-  let currentLine = ''
-
-  for (let i = 0; i < words.length; i++) {
-    const word = words[i]
-
-    // Skip pure whitespace unless it's a space between words
-    if (word.trim() === '' && word !== ' ') continue
-
-    // Check if adding this word would exceed the line length
-    const testLine = currentLine + word
-
-    if (testLine.length <= maxCharsPerLine) {
-      currentLine = testLine
-    } else {
-      // If current line has content, push it and start new line
-      if (currentLine.trim()) {
-        lines.push(currentLine.trim())
-        currentLine = word.trim() === '' ? '' : word
-      } else {
-        // If single word is too long, break it
-        if (word.length > maxCharsPerLine) {
-          // Break long word into chunks
-          let remainingWord = word
-          while (remainingWord.length > maxCharsPerLine) {
-            lines.push(remainingWord.substring(0, maxCharsPerLine - 1) + '-')
-            remainingWord = remainingWord.substring(maxCharsPerLine - 1)
-          }
-          currentLine = remainingWord
-        } else {
-          currentLine = word
-        }
-      }
-    }
-  }
-
-  // Add the last line if it has content
-  if (currentLine.trim()) {
-    lines.push(currentLine.trim())
-  }
-
-  // Limit to maximum 2 lines for better formatting in library elements
-  if (lines.length > 2) {
-    const lastLine = lines[1]
-    const maxLastLineLength = Math.max(0, maxCharsPerLine - 3)
-    lines[1] =
-      lastLine.length > maxLastLineLength
-        ? lastLine.substring(0, maxLastLineLength) + '...'
-        : lastLine
-    return lines.slice(0, 2).join('\n')
-  }
-
-  return lines.join('\n')
 }
 
 export default IntegratedLibrary
