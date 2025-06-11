@@ -21,10 +21,13 @@ const ExcalidrawWrapper = dynamic(
   async () => {
     // Wichtig: Zuerst das CSS importieren, dann die Komponente
     await import('@excalidraw/excalidraw/index.css')
-    // Import Material UI theme customizations for Excalidraw
-    await import('@/styles/excalidraw-material-theme.css')
-    // Import additional overrides to ensure our styles take priority
-    await import('@/styles/excalidraw-override.css')
+    // Import GENERIC Material UI theme customizations for Excalidraw
+    await import('@/styles/excalidraw-material-theme-generic.css')
+    // Import GENERIC additional overrides to ensure our styles take priority
+    await import('@/styles/excalidraw-override-generic.css')
+
+    // Import dynamic theme system for environment variable integration
+    const { injectExcalidrawThemeCSS } = await import('@/styles/excalidraw-dynamic-theme')
     const { Excalidraw, MainMenu } = await import('@excalidraw/excalidraw')
 
     interface ExcalidrawComponentProps {
