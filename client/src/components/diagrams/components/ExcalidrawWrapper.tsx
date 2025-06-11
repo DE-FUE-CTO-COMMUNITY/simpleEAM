@@ -12,6 +12,10 @@ const ExcalidrawWrapper = dynamic(
     await import('@/styles/excalidraw-material-theme.css')
     // Import additional overrides to ensure our styles take priority
     await import('@/styles/excalidraw-override.css')
+    
+    // Import dynamic theme system for environment variable integration
+    const { injectExcalidrawThemeCSS } = await import('@/styles/excalidraw-dynamic-theme')
+    
     const { Excalidraw, MainMenu } = await import('@excalidraw/excalidraw')
 
     const ExcalidrawComponent = ({
@@ -33,6 +37,11 @@ const ExcalidrawWrapper = dynamic(
     }: ExcalidrawComponentProps) => {
       const ExcalidrawTyped = Excalidraw as any
       const MainMenuTyped = MainMenu as any
+
+      // Inject dynamic theme CSS based on environment variables
+      React.useEffect(() => {
+        injectExcalidrawThemeCSS()
+      }, [])
 
       // Ensure initialData is always a valid, stable object to prevent controlled/uncontrolled issues
       const safeInitialData = useMemo(() => {
