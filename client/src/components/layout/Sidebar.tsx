@@ -15,7 +15,7 @@ import {
 import { ChevronLeft as ChevronLeftIcon } from '@mui/icons-material'
 import MuiDrawer from '@mui/material/Drawer'
 import Link from 'next/link'
-import AtosLogo from '../common/AtosLogo'
+import Logo from '../common/Logo'
 
 // Konstanten und Styles
 const drawerWidth = 240
@@ -88,7 +88,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, menuItems, handleDrawerToggle, 
           px: [1],
         }}
       >
-        {open && <AtosLogo height={30} />}
+        {open && <Logo height={30} />}
         <IconButton onClick={handleDrawerToggle}>
           <ChevronLeftIcon />
         </IconButton>
