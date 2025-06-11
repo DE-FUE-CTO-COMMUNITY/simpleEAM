@@ -11,7 +11,7 @@ import { SnackbarProvider } from 'notistack'
 import { AuthContext, initKeycloak, keycloak } from '@/lib/auth'
 import { setupSessionMonitoring } from '@/utils/sessionUtils'
 import { createApolloClient } from '@/lib/apollo-client'
-import theme from '@/theme/theme'
+import { createDynamicTheme } from '@/theme/dynamic-theme'
 import { CircularProgress, Box } from '@mui/material'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
@@ -83,6 +83,9 @@ import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { cache } = useClientStyleRegistry()
+
+  // Dynamisches Theme erstellen
+  const dynamicTheme = createDynamicTheme()
 
   // Vereinfachte State-Verwaltung für bessere Hydration
   const [mounted, setMounted] = useState(false)
@@ -189,7 +192,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <CacheProvider value={cache}>
-          <ThemeProvider theme={theme}>
+          <ThemeProvider theme={dynamicTheme}>
             <CssBaseline />
             <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="de">
               <SnackbarProvider
