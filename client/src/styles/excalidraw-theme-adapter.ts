@@ -1,6 +1,6 @@
 /**
  * Excalidraw Theme Adapter
- * 
+ *
  * Dieses Modul stellt eine generische Brücke zwischen den Umgebungsvariablen
  * und der Excalidraw-Library dar. Es konvertiert Material UI Theme-Farben
  * automatisch zu Excalidraw CSS-Variablen.
@@ -19,7 +19,7 @@ function generateExcalidrawColorVariants(mainColor: string) {
     dark: darkenColor(mainColor, 0.2),
     darker: darkenColor(mainColor, 0.4),
     darkest: darkenColor(mainColor, 0.6),
-    hover: lightenColor(mainColor, 0.1)
+    hover: lightenColor(mainColor, 0.1),
   }
 }
 
@@ -63,7 +63,7 @@ export function generateExcalidrawThemeVariables() {
   // Theme-Farben aus Umgebungsvariablen lesen
   const primaryColor = process.env.NEXT_PUBLIC_THEME_PRIMARY_COLOR || '#0066CC'
   const secondaryColor = process.env.NEXT_PUBLIC_THEME_SECONDARY_COLOR || '#00AEEF'
-  
+
   // Farbvarianten generieren
   const primaryVariants = generateExcalidrawColorVariants(primaryColor)
   const secondaryVariants = generateExcalidrawColorVariants(secondaryColor)
@@ -146,8 +146,8 @@ export function generateExcalidrawThemeVariables() {
       primaryColor,
       secondaryColor,
       primaryVariants,
-      secondaryVariants
-    }
+      secondaryVariants,
+    },
   }
 }
 
@@ -156,7 +156,7 @@ export function generateExcalidrawThemeVariables() {
  */
 export function generateExcalidrawThemeCSS(): string {
   const themeVars = generateExcalidrawThemeVariables()
-  
+
   const lightCSS = Object.entries(themeVars.light)
     .map(([key, value]) => `  ${key}: ${value} !important;`)
     .join('\n')
@@ -199,7 +199,10 @@ ${darkCSS}
 /**
  * Wendet die Theme-Variablen direkt auf ein HTML-Element an
  */
-export function applyExcalidrawThemeVariables(element: HTMLElement, theme: 'light' | 'dark' = 'light') {
+export function applyExcalidrawThemeVariables(
+  element: HTMLElement,
+  theme: 'light' | 'dark' = 'light'
+) {
   const themeVars = generateExcalidrawThemeVariables()
   const variables = themeVars[theme]
 

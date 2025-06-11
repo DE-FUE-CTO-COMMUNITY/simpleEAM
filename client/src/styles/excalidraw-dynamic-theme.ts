@@ -1,6 +1,6 @@
 /**
  * Dynamische Excalidraw Theme CSS-Generierung
- * 
+ *
  * Diese Datei wird zur Build-Zeit oder zur Laufzeit generiert und wendet
  * die Farben aus den Umgebungsvariablen auf Excalidraw an.
  */
