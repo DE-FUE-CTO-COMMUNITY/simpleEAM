@@ -462,27 +462,13 @@ export const markMissingElements = (
  * Debug-Hilfsfunktion: Analysiert alle Elemente und deren Verknüpfungen
  */
 const debugElementStructure = (elements: DiagramElement[]): void => {
-  console.group('📊 Element Structure Analysis')
-
   const databaseElements = elements.filter(el => el.customData?.isFromDatabase)
   const textElements = elements.filter(el => el.type === 'text')
-
-  console.log(`Total elements: ${elements.length}`)
-  console.log(`Database elements: ${databaseElements.length}`)
-  console.log(`Text elements: ${textElements.length}`)
 
   databaseElements.forEach(dbEl => {
     // Verwende die gemeinsame Funktion für Text-Element-Suche
     const linkedText = findLinkedTextElement(dbEl, elements)
-
-    console.log(`🔗 DB Element ${dbEl.customData?.databaseId} (${dbEl.customData?.elementType}):`)
-    console.log(`   Name: "${dbEl.customData?.originalElement?.name}"`)
-    console.log(
-      `   Linked text: ${linkedText ? `"${linkedText.text}" (id: ${linkedText.id})` : 'none'}`
-    )
   })
-
-  console.groupEnd()
 }
 
 /**
@@ -492,8 +478,6 @@ export const syncDiagramOnOpen = async (apolloClient: any, diagramData: any): Pr
   if (!diagramData.elements || !Array.isArray(diagramData.elements)) {
     return diagramData
   }
-
-  console.log('Synchronizing diagram elements with database...')
 
   // Debug: Analysiere Element-Struktur
   debugElementStructure(diagramData.elements)

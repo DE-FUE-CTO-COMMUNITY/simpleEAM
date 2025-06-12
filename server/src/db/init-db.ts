@@ -5,14 +5,12 @@ import { Session } from 'neo4j-driver'
  * Löscht alle Daten aus der Datenbank
  */
 async function clearDatabase(session: Session) {
-  console.log('Lösche alle vorhandenen Daten aus der Datenbank...')
   try {
     // Alle Knoten und Beziehungen löschen
     await session.run(`
       MATCH (n)
       DETACH DELETE n
     `)
-    console.log('Alle Daten wurden erfolgreich gelöscht.')
   } catch (error) {
     console.error('Fehler beim Löschen der Daten:', error)
     throw error
@@ -23,8 +21,6 @@ async function clearDatabase(session: Session) {
  * Initialisiert die Neo4j-Datenbank mit Constraints und Indizes
  */
 async function initDatabase(reset: boolean = false) {
-  console.log('Initialisiere Datenbank...')
-
   const session = neo4jDriver.session()
   try {
     // Wenn reset=true, dann zuerst alle Daten löschen
@@ -78,16 +74,12 @@ async function initDatabase(reset: boolean = false) {
       FOR (d:DataObject) ON (d.name)
     `)
 
-    console.log('Datenbank-Constraints und -Indizes erfolgreich erstellt.')
-
     // Optional: Testdaten einfügen, falls die Datenbank leer ist
     const result = await session.run('MATCH (n) RETURN count(n) AS nodeCount')
     const nodeCount = result.records[0].get('nodeCount').toNumber()
 
     if (nodeCount === 0 && process.env.NODE_ENV !== 'production') {
-      console.log('Keine Daten gefunden. Erstelle Testdaten...')
       await createSampleData(session)
-      console.log('Testdaten erfolgreich erstellt.')
     } else {
       console.log(`Datenbank enthält bereits ${nodeCount} Knoten. Überspringe Testdatenerstellung.`)
     }

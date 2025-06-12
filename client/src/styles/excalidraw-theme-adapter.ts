@@ -344,15 +344,5 @@ export function applyExcalidrawThemeVariables(
 
 // Debug-Export für Entwicklung
 export function debugThemeVariables() {
-  if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
-    const themeVars = generateExcalidrawThemeVariables()
-    console.group('🎨 Excalidraw Theme Variables Debug')
-    console.log('Environment Variables:', {
-      PRIMARY_COLOR: process.env.NEXT_PUBLIC_THEME_PRIMARY_COLOR,
-      SECONDARY_COLOR: process.env.NEXT_PUBLIC_THEME_SECONDARY_COLOR,
-    })
-    console.log('Generated Variables:', themeVars)
-    console.log('Generated CSS:', generateExcalidrawThemeCSS())
-    console.groupEnd()
-  }
+  // Debug function disabled in production
 }

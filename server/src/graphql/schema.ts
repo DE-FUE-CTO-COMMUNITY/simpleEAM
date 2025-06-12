@@ -15,11 +15,6 @@ const KEYCLOAK_URL = process.env.KEYCLOAK_URL || 'https://auth.dev-server.mf2.eu
 const KEYCLOAK_REALM = process.env.KEYCLOAK_REALM || 'simple-eam'
 const jwksUrl = `${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/certs`
 
-console.log('Neo4j GraphQL JWT-Konfiguration:')
-console.log('KEYCLOAK_URL:', KEYCLOAK_URL)
-console.log('KEYCLOAK_REALM:', KEYCLOAK_REALM)
-console.log('JWKS URL:', jwksUrl)
-
 // Neo4j GraphQL-Instanz erstellen mit JWT-Konfiguration
 export const neoSchema = new Neo4jGraphQL({
   typeDefs,

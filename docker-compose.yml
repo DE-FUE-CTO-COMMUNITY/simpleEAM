@@ -1,4 +1,3 @@
-# filepath: /home/mf2admin/simple-eam/docker-compose.yml
 services:
   # Neo4j-Datenbank
   neo4j:
@@ -19,6 +18,9 @@ services:
     networks:
       - eam-network
       - ${TRAEFIK_NETWORK}
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.neo4j.rule=Host(`${NEO4J_SUBDOMAIN}.${BASE_DOMAIN}`)
       - traefik.http.routers.neo4j.entrypoints=websecure
       - traefik.http.routers.neo4j.tls=true
       - traefik.http.routers.neo4j.tls.certresolver=${TRAEFIK_CERTRESOLVER}
