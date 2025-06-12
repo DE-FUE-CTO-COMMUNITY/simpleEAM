@@ -16,13 +16,19 @@ import {
   Select,
   MenuItem,
 } from '@mui/material'
-import { useMutation, useQuery } from '@apollo/client'
+import { useMutation, useQuery, useApolloClient } from '@apollo/client'
 import { CREATE_DIAGRAM, UPDATE_DIAGRAM, GET_ARCHITECTURES_FOR_DIAGRAM } from '@/graphql/diagram'
 import { useAuth } from '@/lib/auth'
 import {
   createDiagramRelationshipUpdates,
   createDiagramRelationshipUpdatesWithDisconnect,
 } from './diagramRelationshipUtils'
+import {
+  detectNewElements,
+  createNewElementsInDatabase,
+  updateElementsWithDatabaseReferences,
+} from './newElementsUtils'
+import { NewElementsDialog } from './NewElementsDialog'
 
 export interface DiagramType {
   value: string
@@ -68,6 +74,7 @@ export interface SaveDiagramDialogProps {
   onClose: () => void
   onSave: (savedDiagram: any) => void
   diagramData: string // JSON string des Excalidraw-Diagramms
+  onDiagramUpdate?: (updatedDiagramData: string) => void // Callback für Canvas-Updates
   existingDiagram?: {
     id: string
     title: string
@@ -95,10 +102,12 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
   onClose,
   onSave,
   diagramData,
+  onDiagramUpdate,
   existingDiagram,
   forceSaveAs = false,
 }) => {
   const { keycloak } = useAuth()
+  const apolloClient = useApolloClient()
 
   // Extrahiere Benutzerinformationen aus dem Keycloak-Token
   const user = React.useMemo(() => {
@@ -125,6 +134,11 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
   const [saving, setSaving] = useState(false)
   const [titleError, setTitleError] = useState(false)
   const [architectureError, setArchitectureError] = useState(false)
+
+  // State für neue Elemente
+  const [newElementsDialogOpen, setNewElementsDialogOpen] = useState(false)
+  const [detectedNewElements, setDetectedNewElements] = useState<any[]>([])
+  const [creatingElements, setCreatingElements] = useState(false)
 
   // Führe die Query nur aus, wenn der Benutzer authentifiziert ist
   const {
@@ -241,12 +255,76 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
       return
     }
 
+    // Prüfe auf neue Elemente im Diagramm
+    try {
+      const parsedDiagramData = JSON.parse(diagramData)
+      const newElements = detectNewElements(parsedDiagramData.elements || [])
+
+      if (newElements.length > 0) {
+        // Neue Elemente gefunden - Dialog öffnen
+        setDetectedNewElements(newElements)
+        setNewElementsDialogOpen(true)
+        return
+      }
+    } catch (error) {
+      console.warn('Fehler beim Parsen der Diagrammdaten:', error)
+    }
+
+    // Keine neuen Elemente oder Parsing-Fehler - normales Speichern
+    await performSave()
+  }
+
+  const handleNewElementsConfirm = async (selectedElements: any[]) => {
+    setNewElementsDialogOpen(false)
+    setCreatingElements(true)
+
+    try {
+      // Erstelle die ausgewählten Elemente in der Datenbank
+      const creationResult = await createNewElementsInDatabase(apolloClient, selectedElements)
+
+      if (creationResult.success) {
+        // Aktualisiere die Diagrammdaten mit den neuen Datenbankreferenzen
+        const parsedDiagramData = JSON.parse(diagramData)
+        const updatedElements = updateElementsWithDatabaseReferences(
+          parsedDiagramData.elements,
+          creationResult.createdElements
+        )
+
+        // Aktualisiere diagramData für das Speichern
+        const updatedDiagramData = JSON.stringify({
+          ...parsedDiagramData,
+          elements: updatedElements,
+        })
+
+        // Aktualisiere das Canvas mit den neuen Elementen (schwarzer Rahmen)
+        if (onDiagramUpdate) {
+          onDiagramUpdate(updatedDiagramData)
+        }
+
+        // Führe das Speichern mit den aktualisierten Daten durch
+        await performSave(updatedDiagramData)
+      } else {
+        // Zeige Fehler bei der Elementerstellung
+        console.error('Fehler beim Erstellen der Elemente:', creationResult.errors)
+        await performSave() // Speichere trotzdem ohne die neuen Elemente
+      }
+    } catch (error) {
+      console.error('Fehler beim Erstellen neuer Elemente:', error)
+      await performSave() // Speichere trotzdem ohne die neuen Elemente
+    } finally {
+      setCreatingElements(false)
+    }
+  }
+
+  const performSave = async (customDiagramData?: string) => {
+    const dataToSave = customDiagramData || diagramData
+
     setSaving(true)
     try {
       const baseInput = {
         title: title.trim(),
         description: description.trim() || undefined,
-        diagramJson: diagramData,
+        diagramJson: dataToSave,
         diagramType: diagramType,
         architecture: {
           connect: [
@@ -273,12 +351,12 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
       let result
       if (existingDiagram?.id && !forceSaveAs) {
         // Update bestehende Diagramm
-        const relationshipUpdates = createDiagramRelationshipUpdatesWithDisconnect(diagramData)
+        const relationshipUpdates = createDiagramRelationshipUpdatesWithDisconnect(dataToSave)
 
         const updateInput = {
           title: { set: title.trim() },
           description: { set: description.trim() || undefined },
-          diagramJson: { set: diagramData },
+          diagramJson: { set: dataToSave },
           diagramType: { set: diagramType },
           architecture: {
             disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
@@ -303,7 +381,7 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
         onSave(result.data.updateDiagrams.diagrams[0])
       } else {
         // Neue Diagramm erstellen (auch bei forceSaveAs)
-        const relationshipUpdates = createDiagramRelationshipUpdates(diagramData)
+        const relationshipUpdates = createDiagramRelationshipUpdates(dataToSave)
 
         const input = {
           ...baseInput,
@@ -346,125 +424,136 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>
-        {forceSaveAs
-          ? 'Diagramm speichern unter...'
-          : existingDiagram
-            ? 'Diagramm aktualisieren'
-            : 'Diagramm speichern'}
-      </DialogTitle>
-      <DialogContent>
-        <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 3 }}>
-          <TextField
-            label="Titel"
-            value={title}
-            onChange={handleTitleChange}
-            fullWidth
-            required
-            error={titleError}
-            helperText={
-              titleError ? 'Titel ist ein Pflichtfeld' : 'Eindeutiger Name für das Diagramm'
-            }
-          />
+    <>
+      <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+        <DialogTitle>
+          {forceSaveAs
+            ? 'Diagramm speichern unter...'
+            : existingDiagram
+              ? 'Diagramm aktualisieren'
+              : 'Diagramm speichern'}
+        </DialogTitle>
+        <DialogContent>
+          <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <TextField
+              label="Titel"
+              value={title}
+              onChange={handleTitleChange}
+              fullWidth
+              required
+              error={titleError}
+              helperText={
+                titleError ? 'Titel ist ein Pflichtfeld' : 'Eindeutiger Name für das Diagramm'
+              }
+            />
 
-          <TextField
-            label="Beschreibung"
-            value={description}
-            onChange={e => setDescription(e.target.value)}
-            fullWidth
-            multiline
-            rows={3}
-            helperText="Optionale Beschreibung des Diagramms"
-          />
+            <TextField
+              label="Beschreibung"
+              value={description}
+              onChange={e => setDescription(e.target.value)}
+              fullWidth
+              multiline
+              rows={3}
+              helperText="Optionale Beschreibung des Diagramms"
+            />
 
-          <FormControl fullWidth>
-            <InputLabel>Diagrammtyp</InputLabel>
-            <Select
-              value={diagramType}
-              label="Diagrammtyp"
-              onChange={e => setDiagramType(e.target.value)}
-            >
-              {DIAGRAM_TYPES.map(type => (
-                <MenuItem key={type.value} value={type.value}>
-                  {type.label}
-                </MenuItem>
-              ))}
-            </Select>
-            {selectedDiagramType && (
-              <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
-                {selectedDiagramType.description}
-              </Typography>
-            )}
-          </FormControl>
+            <FormControl fullWidth>
+              <InputLabel>Diagrammtyp</InputLabel>
+              <Select
+                value={diagramType}
+                label="Diagrammtyp"
+                onChange={e => setDiagramType(e.target.value)}
+              >
+                {DIAGRAM_TYPES.map(type => (
+                  <MenuItem key={type.value} value={type.value}>
+                    {type.label}
+                  </MenuItem>
+                ))}
+              </Select>
+              {selectedDiagramType && (
+                <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
+                  {selectedDiagramType.description}
+                </Typography>
+              )}
+            </FormControl>
 
-          <Autocomplete
-            options={architecturesData?.architectures || []}
-            value={selectedArchitecture}
-            onChange={handleArchitectureChange}
-            disabled={architecturesLoading || !!architecturesError}
-            loading={architecturesLoading}
-            getOptionLabel={option => {
-              if (!option || !option.name || !option.type) return ''
-              return `${option.name} (${option.type})`
-            }}
-            isOptionEqualToValue={(option, value) => {
-              if (!option || !value) return false
-              return option.id === value.id
-            }}
-            renderOption={(props, option) => {
-              const { key, ...otherProps } = props
-              return (
-                <Box key={key} component="li" {...otherProps}>
-                  <Box>
-                    <Typography variant="body2">{option.name}</Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {option.type} • {option.domain}
-                    </Typography>
+            <Autocomplete
+              options={architecturesData?.architectures || []}
+              value={selectedArchitecture}
+              onChange={handleArchitectureChange}
+              disabled={architecturesLoading || !!architecturesError}
+              loading={architecturesLoading}
+              getOptionLabel={option => {
+                if (!option || !option.name || !option.type) return ''
+                return `${option.name} (${option.type})`
+              }}
+              isOptionEqualToValue={(option, value) => {
+                if (!option || !value) return false
+                return option.id === value.id
+              }}
+              renderOption={(props, option) => {
+                const { key, ...otherProps } = props
+                return (
+                  <Box key={key} component="li" {...otherProps}>
+                    <Box>
+                      <Typography variant="body2">{option.name}</Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {option.type} • {option.domain}
+                      </Typography>
+                    </Box>
                   </Box>
-                </Box>
-              )
-            }}
-            renderInput={params => (
-              <TextField
-                {...params}
-                label="Zugehörige Architektur"
-                required
-                error={architectureError}
-                helperText={
-                  architectureError
-                    ? 'Architektur ist ein Pflichtfeld'
-                    : architecturesError
-                      ? `Fehler beim Laden der Architekturen: ${architecturesError.message}`
-                      : architecturesLoading
-                        ? 'Lade Architekturen...'
-                        : 'Pflichtfeld: Ordnet das Diagramm einer bestimmten Architektur zu'
-                }
-              />
-            )}
-            fullWidth
-          />
-        </Box>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} disabled={saving}>
-          Abbrechen
-        </Button>
-        <Button
-          onClick={handleSave}
-          variant="contained"
-          disabled={!title.trim() || !selectedArchitecture || saving}
-        >
-          {saving
-            ? 'Speichere...'
-            : forceSaveAs
-              ? 'Als Kopie speichern'
-              : existingDiagram
-                ? 'Aktualisieren'
-                : 'Speichern'}
-        </Button>
-      </DialogActions>
-    </Dialog>
+                )
+              }}
+              renderInput={params => (
+                <TextField
+                  {...params}
+                  label="Zugehörige Architektur"
+                  required
+                  error={architectureError}
+                  helperText={
+                    architectureError
+                      ? 'Architektur ist ein Pflichtfeld'
+                      : architecturesError
+                        ? `Fehler beim Laden der Architekturen: ${architecturesError.message}`
+                        : architecturesLoading
+                          ? 'Lade Architekturen...'
+                          : 'Pflichtfeld: Ordnet das Diagramm einer bestimmten Architektur zu'
+                  }
+                />
+              )}
+              fullWidth
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={onClose} disabled={saving}>
+            Abbrechen
+          </Button>
+          <Button
+            onClick={handleSave}
+            variant="contained"
+            disabled={!title.trim() || !selectedArchitecture || saving}
+          >
+            {saving
+              ? 'Speichere...'
+              : forceSaveAs
+                ? 'Als Kopie speichern'
+                : existingDiagram
+                  ? 'Aktualisieren'
+                  : 'Speichern'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Dialog für neue Elemente */}
+      <NewElementsDialog
+        open={newElementsDialogOpen}
+        onClose={() => setNewElementsDialogOpen(false)}
+        onConfirm={handleNewElementsConfirm}
+        newElements={detectedNewElements}
+        loading={creatingElements}
+      />
+    </>
   )
 }
 
