@@ -20,12 +20,12 @@ services:
       - ${TRAEFIK_NETWORK}
     labels:
       - traefik.enable=true
-      - traefik.http.routers.neo4j.rule=Host(`${NEO4J_SUBDOMAIN}.${BASE_DOMAIN}`)
-      - traefik.http.routers.neo4j.entrypoints=websecure
-      - traefik.http.routers.neo4j.tls=true
-      - traefik.http.routers.neo4j.tls.certresolver=${TRAEFIK_CERTRESOLVER}
-      - traefik.http.routers.neo4j.tls.domains[0].main=${NEO4J_SUBDOMAIN}.${BASE_DOMAIN}
-      - traefik.http.services.neo4j.loadbalancer.server.port=${NEO4J_PORT}
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-neo4j.rule=Host(`${NEO4J_SUBDOMAIN}.${BASE_DOMAIN}`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-neo4j.entrypoints=websecure
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-neo4j.tls=true
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-neo4j.tls.certresolver=${TRAEFIK_CERTRESOLVER}
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-neo4j.tls.domains[0].main=${NEO4J_SUBDOMAIN}.${BASE_DOMAIN}
+      - traefik.http.services.${COMPOSE_PROJECT_NAME:-simple-eam}-neo4j.loadbalancer.server.port=${NEO4J_PORT}
       - 'traefik.docker.network=${TRAEFIK_NETWORK}'
 
   # Server
@@ -56,12 +56,12 @@ services:
       - ${TRAEFIK_NETWORK}
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.graphql.rule=Host(`${API_SUBDOMAIN}.${BASE_DOMAIN}`)'
-      - 'traefik.http.routers.graphql.entrypoints=websecure'
-      - 'traefik.http.routers.graphql.tls=true'
-      - 'traefik.http.routers.graphql.tls.certresolver=${TRAEFIK_CERTRESOLVER}'
-      - traefik.http.routers.graphql.tls.domains[0].main=${API_SUBDOMAIN}.${BASE_DOMAIN}
-      - 'traefik.http.services.graphql.loadbalancer.server.port=${GRAPHQL_INTERNAL_PORT}'
+      - 'traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-graphql.rule=Host(`${API_SUBDOMAIN}.${BASE_DOMAIN}`)'
+      - 'traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-graphql.entrypoints=websecure'
+      - 'traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-graphql.tls=true'
+      - 'traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-graphql.tls.certresolver=${TRAEFIK_CERTRESOLVER}'
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-graphql.tls.domains[0].main=${API_SUBDOMAIN}.${BASE_DOMAIN}
+      - 'traefik.http.services.${COMPOSE_PROJECT_NAME:-simple-eam}-graphql.loadbalancer.server.port=${GRAPHQL_INTERNAL_PORT}'
       - 'traefik.docker.network=${TRAEFIK_NETWORK}'
 
   # Keycloak für Authentifizierung
@@ -91,12 +91,12 @@ services:
       - ${TRAEFIK_NETWORK}
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.keycloak-eam.rule=Host(`${AUTH_SUBDOMAIN}.${BASE_DOMAIN}`)'
-      - 'traefik.http.routers.keycloak-eam.entrypoints=websecure'
-      - 'traefik.http.routers.keycloak-eam.tls=true'
-      - 'traefik.http.routers.keycloak-eam.tls.certresolver=${TRAEFIK_CERTRESOLVER}'
-      - 'traefik.http.routers.keycloak-eam.tls.domains[0].main=${AUTH_SUBDOMAIN}.${BASE_DOMAIN}'
-      - 'traefik.http.services.keycloak-eam.loadbalancer.server.port=${KEYCLOAK_INTERNAL_PORT}'
+      - 'traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-keycloak.rule=Host(`${AUTH_SUBDOMAIN}.${BASE_DOMAIN}`)'
+      - 'traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-keycloak.entrypoints=websecure'
+      - 'traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-keycloak.tls=true'
+      - 'traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-keycloak.tls.certresolver=${TRAEFIK_CERTRESOLVER}'
+      - 'traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-keycloak.tls.domains[0].main=${AUTH_SUBDOMAIN}.${BASE_DOMAIN}'
+      - 'traefik.http.services.${COMPOSE_PROJECT_NAME:-simple-eam}-keycloak.loadbalancer.server.port=${KEYCLOAK_INTERNAL_PORT}'
       - 'traefik.docker.network=${TRAEFIK_NETWORK}'
 
   # Keycloak-Datenbank
@@ -130,12 +130,12 @@ services:
       - ${TRAEFIK_NETWORK}
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.client.rule=Host(`${CLIENT_SUBDOMAIN}.${BASE_DOMAIN}`)'
-      - 'traefik.http.routers.client.entrypoints=websecure'
-      - 'traefik.http.routers.client.tls=true'
-      - 'traefik.http.routers.client.tls.certresolver=${TRAEFIK_CERTRESOLVER}'
-      - 'traefik.http.routers.client.tls.domains[0].main=${CLIENT_SUBDOMAIN}.${BASE_DOMAIN}'
-      - 'traefik.http.services.client.loadbalancer.server.port=${CLIENT_PORT}'
+      - 'traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-client.rule=Host(`${CLIENT_SUBDOMAIN}.${BASE_DOMAIN}`)'
+      - 'traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-client.entrypoints=websecure'
+      - 'traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-client.tls=true'
+      - 'traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-client.tls.certresolver=${TRAEFIK_CERTRESOLVER}'
+      - 'traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-client.tls.domains[0].main=${CLIENT_SUBDOMAIN}.${BASE_DOMAIN}'
+      - 'traefik.http.services.${COMPOSE_PROJECT_NAME:-simple-eam}-client.loadbalancer.server.port=${CLIENT_PORT}'
       - 'traefik.docker.network=${TRAEFIK_NETWORK}'
 
 networks:

@@ -144,6 +144,38 @@ Jede Instanz erhält ihr eigenes Docker-Netzwerk:
 - `simple-eam-staging-network`
 - `simple-eam-prod-network`
 
+## Traefik-Router Konflikte vermeiden
+
+Das Docker Compose Setup verwendet automatisch eindeutige Traefik-Router-Namen basierend auf dem `COMPOSE_PROJECT_NAME`. Dadurch werden Konflikte zwischen mehreren Instanzen vermieden:
+
+### Automatische Router-Benennung
+
+Jeder Service erhält eindeutige Traefik-Labels mit dem Projekt-Präfix:
+
+```yaml
+# Beispiel für den Client-Service
+traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-client.rule=Host(`${CLIENT_SUBDOMAIN}.${BASE_DOMAIN}`)
+traefik.http.services.${COMPOSE_PROJECT_NAME:-simple-eam}-client.loadbalancer.server.port=${CLIENT_PORT}
+```
+
+### Resultierende Router-Namen
+
+**Standard-Instanz (COMPOSE_PROJECT_NAME=simple-eam):**
+
+- `simple-eam-client`
+- `simple-eam-graphql`
+- `simple-eam-keycloak`
+- `simple-eam-neo4j`
+
+**Staging-Instanz (COMPOSE_PROJECT_NAME=staging-eam):**
+
+- `staging-eam-client`
+- `staging-eam-graphql`
+- `staging-eam-keycloak`
+- `staging-eam-neo4j`
+
+Diese automatische Benennung stellt sicher, dass mehrere Instanzen problemlos auf demselben Docker-Host mit demselben Traefik laufen können.
+
 ## Best Practices
 
 1. **Konsistente Namensgebung**: Verwenden Sie aussagekräftige Projekt-Namen
