@@ -109,7 +109,8 @@ const Sidebar: React.FC<SidebarProps> = ({ open, menuItems, handleDrawerToggle, 
                 px: 2.5,
                 backgroundColor:
                   item.href && isActive(item.href) ? theme.palette.primary.main : 'transparent',
-                color: item.href && isActive(item.href) ? theme.palette.primary.contrastText : 'inherit',
+                color:
+                  item.href && isActive(item.href) ? theme.palette.primary.contrastText : 'inherit',
               }}
               onClick={item.onClick}
             >
@@ -118,7 +119,10 @@ const Sidebar: React.FC<SidebarProps> = ({ open, menuItems, handleDrawerToggle, 
                   minWidth: 0,
                   mr: open ? 3 : 'auto',
                   justifyContent: 'center',
-                  color: item.href && isActive(item.href) ? theme.palette.primary.contrastText : 'inherit',
+                  color:
+                    item.href && isActive(item.href)
+                      ? theme.palette.primary.contrastText
+                      : 'inherit',
                 }}
               >
                 {item.icon}

@@ -8,7 +8,7 @@ const ExcalidrawWrapper = dynamic(
   async () => {
     // Wichtig: Zuerst das CSS importieren, dann die Komponente
     await import('@excalidraw/excalidraw/index.css')
-    
+
     // Import dynamic theme system - this handles ALL styling including structure and colors
     const { injectExcalidrawThemeCSS } = await import('@/styles/excalidraw-dynamic-theme')
 
