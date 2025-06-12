@@ -153,6 +153,67 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
   // Debug log for initialData
   console.log('DiagramEditor: Stable initialData created')
 
+  // Diagram Update Handler for new elements
+  const handleDiagramUpdate = useCallback(
+    (updatedDiagramData: string) => {
+      if (!excalidrawAPI) {
+        console.warn('Excalidraw API nicht verfügbar für Canvas-Update')
+        return
+      }
+
+      try {
+        const parsedData = JSON.parse(updatedDiagramData)
+        const { elements, appState } = parsedData
+
+        console.log('Aktualisiere Canvas mit neuen Elementen:', elements?.length || 0)
+
+        // Restore scene data to ensure proper structure
+        const restoreSceneData = (sceneData: any) => {
+          if (!sceneData || !sceneData.appState) {
+            return sceneData
+          }
+
+          // Ensure collaborators is a Map
+          if (
+            sceneData.appState.collaborators &&
+            typeof sceneData.appState.collaborators.clear === 'function'
+          ) {
+            sceneData.appState.collaborators.clear()
+          } else {
+            sceneData.appState.collaborators = new Map()
+          }
+
+          return sceneData
+        }
+
+        // Update the canvas with the new elements
+        const restoredData = restoreSceneData({ elements: elements || [], appState })
+        excalidrawAPI.updateScene(restoredData)
+
+        // Update current scene state
+        setCurrentScene(restoredData)
+
+        // Mark that there are no unsaved changes since we just saved
+        setHasUnsavedChanges(false)
+
+        setNotification({
+          open: true,
+          message:
+            'Neue Elemente wurden erfolgreich in der Datenbank erstellt und sind nun verknüpft!',
+          severity: 'success',
+        })
+      } catch (error) {
+        console.error('Fehler beim Aktualisieren des Canvas:', error)
+        setNotification({
+          open: true,
+          message: 'Fehler beim Aktualisieren der Elementdarstellung',
+          severity: 'error',
+        })
+      }
+    },
+    [excalidrawAPI, setCurrentScene, setHasUnsavedChanges, setNotification]
+  )
+
   if (!isClient) {
     return null
   }
@@ -212,6 +273,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
           onSave={handleSaveDiagram}
           diagramData={getCurrentDiagramData()}
           existingDiagram={currentDiagram}
+          onDiagramUpdate={handleDiagramUpdate}
         />
       )}
 
@@ -224,6 +286,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
           diagramData={getCurrentDiagramData()}
           existingDiagram={currentDiagram}
           forceSaveAs={true}
+          onDiagramUpdate={handleDiagramUpdate}
         />
       )}
 

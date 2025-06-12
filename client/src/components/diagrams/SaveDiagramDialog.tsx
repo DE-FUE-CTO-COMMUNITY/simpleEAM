@@ -74,7 +74,7 @@ export interface SaveDiagramDialogProps {
   onClose: () => void
   onSave: (savedDiagram: any) => void
   diagramData: string // JSON string des Excalidraw-Diagramms
-  onDiagramUpdate?: (updatedDiagramData: string) => void // Callback für Canvas-Updates
+  onDiagramUpdate?: (updatedDiagramData: string) => void // Handler für Canvas-Updates nach Element-Erstellung
   existingDiagram?: {
     id: string
     title: string
@@ -271,24 +271,40 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
     }
 
     // Keine neuen Elemente oder Parsing-Fehler - normales Speichern
-    await performSave()
+    const savedDiagram = await performSave()
+    if (savedDiagram) {
+      onClose() // Dialog schließen
+      onSave(savedDiagram) // Parent über Speichern informieren
+    }
   }
 
   const handleNewElementsConfirm = async (selectedElements: any[]) => {
     setNewElementsDialogOpen(false)
     setCreatingElements(true)
 
+    console.log(
+      'handleNewElementsConfirm - Starte Erstellung von',
+      selectedElements.length,
+      'Elementen'
+    )
+
     try {
       // Erstelle die ausgewählten Elemente in der Datenbank
       const creationResult = await createNewElementsInDatabase(apolloClient, selectedElements)
 
+      console.log('Element-Erstellung Ergebnis:', creationResult)
+
       if (creationResult.success) {
         // Aktualisiere die Diagrammdaten mit den neuen Datenbankreferenzen
         const parsedDiagramData = JSON.parse(diagramData)
+        console.log('Original Diagrammdaten:', parsedDiagramData.elements?.length, 'Elemente')
+
         const updatedElements = updateElementsWithDatabaseReferences(
           parsedDiagramData.elements,
           creationResult.createdElements
         )
+
+        console.log('Aktualisierte Elemente:', updatedElements.length, 'Elemente')
 
         // Aktualisiere diagramData für das Speichern
         const updatedDiagramData = JSON.stringify({
@@ -296,21 +312,51 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
           elements: updatedElements,
         })
 
-        // Aktualisiere das Canvas mit den neuen Elementen (schwarzer Rahmen)
-        if (onDiagramUpdate) {
-          onDiagramUpdate(updatedDiagramData)
-        }
+        console.log('Aktualisierte Diagrammdaten erstellt')
 
         // Führe das Speichern mit den aktualisierten Daten durch
-        await performSave(updatedDiagramData)
+        const savedDiagram = await performSave(updatedDiagramData)
+
+        // Nach erfolgreichem Speichern: Dialog schließen und Canvas-Update
+        if (savedDiagram) {
+          console.log(
+            `${creationResult.createdElements.length} neue Elemente wurden erfolgreich erstellt und verknüpft.`
+          )
+
+          // Dialog sofort schließen
+          onClose()
+
+          // Canvas sofort mit den neuen Daten aktualisieren
+          if (onDiagramUpdate) {
+            onDiagramUpdate(updatedDiagramData)
+          }
+
+          // Verwende die gespeicherten Diagrammdaten (mit Datenbankreferenzen) für Parent-Callback
+          const diagramWithUpdatedElements = {
+            ...savedDiagram,
+            diagramJson: updatedDiagramData, // Verwende die aktualisierten Daten
+          }
+
+          // Parent-Component über das gespeicherte Diagramm informieren
+          onSave(diagramWithUpdatedElements)
+        }
       } else {
-        // Zeige Fehler bei der Elementerstellung
+        // Zeige Fehler bei der Elementerstellung, aber speichere trotzdem
         console.error('Fehler beim Erstellen der Elemente:', creationResult.errors)
-        await performSave() // Speichere trotzdem ohne die neuen Elemente
+        const savedDiagram = await performSave()
+        if (savedDiagram) {
+          onClose()
+          onSave(savedDiagram)
+        }
       }
     } catch (error) {
       console.error('Fehler beim Erstellen neuer Elemente:', error)
-      await performSave() // Speichere trotzdem ohne die neuen Elemente
+      // Bei Fehler trotzdem normal speichern
+      const savedDiagram = await performSave()
+      if (savedDiagram) {
+        onClose()
+        onSave(savedDiagram)
+      }
     } finally {
       setCreatingElements(false)
     }
@@ -378,7 +424,8 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
           },
         })
 
-        onSave(result.data.updateDiagrams.diagrams[0])
+        const savedDiagram = result.data.updateDiagrams.diagrams[0]
+        return savedDiagram
       } else {
         // Neue Diagramm erstellen (auch bei forceSaveAs)
         const relationshipUpdates = createDiagramRelationshipUpdates(dataToSave)
@@ -394,13 +441,12 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
           },
         })
 
-        onSave(result.data.createDiagrams.diagrams[0])
+        const savedDiagram = result.data.createDiagrams.diagrams[0]
+        return savedDiagram
       }
-
-      onClose()
     } catch (error) {
       console.error('Fehler beim Speichern des Diagramms:', error)
-      // Fehler beim Speichern des Diagramms
+      return null
     } finally {
       setSaving(false)
     }

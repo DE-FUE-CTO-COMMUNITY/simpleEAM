@@ -160,7 +160,7 @@ export const NewElementsDialog: React.FC<NewElementsDialogProps> = ({
         <Button
           onClick={handleConfirm}
           variant="contained"
-          disabled={loading || selectedCount === 0}
+          disabled={loading}
           startIcon={loading ? <CircularProgress size={20} /> : undefined}
         >
           {loading

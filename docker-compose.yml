@@ -3,7 +3,6 @@ services:
   # Neo4j-Datenbank
   neo4j:
     image: neo4j:5.26
-    container_name: simple-eam-neo4j
     ports:
       - '${NEO4J_EXTERNAL_PORT}:${NEO4J_PORT}' # HTTP
       - '${NEO4J_EXTERNAL_BOLT_PORT}:${NEO4J_BOLT_PORT}' # Bolt (externer Port auf 7688 geändert, um Konflikt zu vermeiden)
@@ -20,9 +19,6 @@ services:
     networks:
       - eam-network
       - ${TRAEFIK_NETWORK}
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.neo4j.rule=Host(`${NEO4J_SUBDOMAIN}.${BASE_DOMAIN}`)
       - traefik.http.routers.neo4j.entrypoints=websecure
       - traefik.http.routers.neo4j.tls=true
       - traefik.http.routers.neo4j.tls.certresolver=${TRAEFIK_CERTRESOLVER}
@@ -35,7 +31,6 @@ services:
     build:
       context: .
       dockerfile: server/Dockerfile
-    container_name: simple-eam-server
     ports:
       - '${GRAPHQL_EXTERNAL_PORT}:${GRAPHQL_INTERNAL_PORT}'
     depends_on:
@@ -70,7 +65,6 @@ services:
   # Keycloak für Authentifizierung
   keycloak:
     image: quay.io/keycloak/keycloak:23.0
-    container_name: simple-eam-keycloak
     environment:
       - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN}
       - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
@@ -106,7 +100,6 @@ services:
   # Keycloak-Datenbank
   keycloak-db:
     image: postgres:15
-    container_name: simple-eam-keycloak-db
     volumes:
       - ./auth/data:/var/lib/postgresql/data
     environment:
@@ -121,7 +114,6 @@ services:
     build:
       context: .
       dockerfile: client/Dockerfile
-    container_name: simple-eam-client
 
     depends_on:
       - server
