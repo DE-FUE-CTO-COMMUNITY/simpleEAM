@@ -359,9 +359,9 @@ const importEntityDataWithMapping = async (
         input = {
           name: row.name || '',
           description: row.description || '',
-          maturityLevel: row.maturityLevel || '',
+          maturityLevel: row.maturityLevel ? parseInt(String(row.maturityLevel), 10) : undefined,
           status: row.status || '',
-          businessValue: row.businessValue || '',
+          businessValue: row.businessValue ? parseInt(String(row.businessValue), 10) : undefined,
           tags: row.tags ? row.tags.split(',').map((tag: string) => tag.trim()) : [],
         }
         break
