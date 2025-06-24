@@ -35,7 +35,10 @@ async function startServer() {
   app.use(
     helmet({ contentSecurityPolicy: process.env.NODE_ENV === 'production' ? undefined : false })
   )
-  app.use(express.json())
+
+  // Erhöhe die Body-Parser-Limits für große Diagramm-Payloads
+  app.use(express.json({ limit: '50mb' }))
+  app.use(express.urlencoded({ limit: '50mb', extended: true }))
 
   // GraphQL-Schema erstellen
   const schema = await neoSchema.getSchema()
@@ -53,8 +56,14 @@ async function startServer() {
   // Apollo-Server starten
   await server.start()
 
-  // Apollo-Middleware an Express anbinden
-  server.applyMiddleware({ app, path: '/graphql' })
+  // Apollo-Middleware an Express anbinden mit erweiterten Body-Parser-Optionen
+  server.applyMiddleware({
+    app,
+    path: '/graphql',
+    bodyParserConfig: {
+      limit: '50mb',
+    },
+  })
 
   // Gesundheitsprüfung-Endpunkt
   app.get('/health', (_, res) => {
