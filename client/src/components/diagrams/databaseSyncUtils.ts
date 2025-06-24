@@ -6,6 +6,7 @@ import {
   findLinkedTextElement,
   ensureTextContainerBindings,
   updateTextWithContainerBinding,
+  updateTextContentOnly,
 } from './textContainerUtils'
 
 interface DiagramElement {
@@ -463,11 +464,10 @@ export const markMissingElements = (
  */
 const debugElementStructure = (elements: DiagramElement[]): void => {
   const databaseElements = elements.filter(el => el.customData?.isFromDatabase)
-  const textElements = elements.filter(el => el.type === 'text')
 
   databaseElements.forEach(dbEl => {
     // Verwende die gemeinsame Funktion für Text-Element-Suche
-    const linkedText = findLinkedTextElement(dbEl, elements)
+    findLinkedTextElement(dbEl, elements)
   })
 }
 
@@ -581,12 +581,19 @@ export const syncDiagramOnOpen = async (apolloClient: any, diagramData: any): Pr
           )
         }
 
-        // Verwende den tatsächlichen Container-Element für korrekte Positionierung
-        const updatedTextElement = updateTextWithContainerBinding(
-          element,
-          finalText,
-          containerElement // Verwende den gefundenen Container, nicht das DB-Element
-        )
+        // Verwende updateTextContentOnly für Datenbank-Sync um Position zu erhalten
+        let updatedTextElement = updateTextContentOnly(element, finalText)
+
+        // Nur bei neuen Elementen oder wenn explizit gewünscht, verwende Container-Binding
+        const isNewElement = !element.x || !element.y || element.x === 0 || element.y === 0
+        if (isNewElement && containerElement) {
+          console.log(`Element appears to be new (no valid position), applying container binding`)
+          updatedTextElement = updateTextWithContainerBinding(element, finalText, containerElement)
+        } else {
+          console.log(
+            `Preserving existing text position during database sync for element: ${element.id}`
+          )
+        }
 
         return {
           ...updatedTextElement,

@@ -47,22 +47,35 @@ export const updateTextWithContainerBinding = (
     updatedText.containerId = containerElement.id
   }
 
-  // Behalte Text-Alignment bei
-  if (!updatedText.textAlign) {
+  // KRITISCH: Behalte ursprüngliches Text-Alignment bei (nicht überschreiben!)
+  // Verwende ?? statt || um explizit gesetzte leere Strings zu respektieren
+  if (updatedText.textAlign === undefined || updatedText.textAlign === null) {
     updatedText.textAlign = 'center'
   }
-  if (!updatedText.verticalAlign) {
+  if (updatedText.verticalAlign === undefined || updatedText.verticalAlign === null) {
     updatedText.verticalAlign = 'middle'
   }
 
-  // KRITISCH: Berechne korrekte Text-Position relativ zum Container-Zentrum
-  if (containerElement && containerElement.x !== undefined && containerElement.y !== undefined) {
+  // KRITISCH: Nur Position neu berechnen wenn Text keine gültige Position hat
+  // Dies verhindert das Überschreiben von benutzerdefinierten Positionen
+  const hasValidPosition =
+    updatedText.x !== undefined &&
+    updatedText.y !== undefined &&
+    updatedText.x !== 0 &&
+    updatedText.y !== 0
+
+  if (
+    containerElement &&
+    containerElement.x !== undefined &&
+    containerElement.y !== undefined &&
+    !hasValidPosition
+  ) {
     const fontSize = updatedText.fontSize || 20
 
     // Verwende die einheitliche calculateCenteredTextPosition Funktion für konsistente Zentrierung
     const centeredPosition = calculateCenteredTextPosition(newText, containerElement, fontSize)
 
-    // Aktualisiere Text-Position und -Dimensionen
+    // Aktualisiere Text-Position und -Dimensionen nur wenn keine gültige Position vorhanden
     updatedText.x = centeredPosition.x
     updatedText.y = centeredPosition.y
     updatedText.width = centeredPosition.width
@@ -70,9 +83,13 @@ export const updateTextWithContainerBinding = (
 
     const lineCount = (newText.match(/\n/g) || []).length + 1
     console.log(
-      `Repositioned ${lineCount}-line text "${newText}" to center of container:`,
+      `Repositioned ${lineCount}-line text "${newText}" to center of container (no valid position found):`,
       `Container: (${containerElement.x}, ${containerElement.y}, ${containerElement.width}x${containerElement.height})`,
       `Text: (${updatedText.x}, ${updatedText.y}, ${centeredPosition.width}x${centeredPosition.height})`
+    )
+  } else if (hasValidPosition) {
+    console.log(
+      `Preserving existing text position for "${newText}": (${updatedText.x}, ${updatedText.y}) with alignment: ${updatedText.textAlign}/${updatedText.verticalAlign}`
     )
   }
 
@@ -267,15 +284,38 @@ export const ensureTextContainerBindings = (elements: ExcalidrawElement[]): Exca
           console.log(`Added text binding for container ${container.id} -> text ${textEl.id}`)
         }
 
-        // KRITISCH: Repositioniere Text im Zentrum des Containers
+        // Nur Bindungen sicherstellen, Position NICHT ändern während Sync
+        // Die Repositionierung sollte nur bei neu erstellten Elementen erfolgen
         const textIndex = updatedElements.findIndex(el => el.id === textEl.id)
         if (textIndex !== -1) {
-          const updatedTextElement = updateTextWithContainerBinding(
-            updatedElements[textIndex],
-            textEl.text || textEl.rawText || '',
-            container
-          )
-          updatedElements[textIndex] = updatedTextElement
+          const currentText = updatedElements[textIndex]
+          const hasValidPosition =
+            currentText.x !== undefined &&
+            currentText.y !== undefined &&
+            currentText.x !== 0 &&
+            currentText.y !== 0
+
+          if (!hasValidPosition) {
+            // Nur repositionieren wenn keine gültige Position vorhanden (neues Element)
+            const updatedTextElement = updateTextWithContainerBinding(
+              currentText,
+              textEl.text || textEl.rawText || '',
+              container
+            )
+            updatedElements[textIndex] = updatedTextElement
+            console.log(`Repositioned new text element ${textEl.id} in container ${container.id}`)
+          } else {
+            // Nur containerId setzen, Position beibehalten
+            if (!currentText.containerId) {
+              updatedElements[textIndex] = {
+                ...currentText,
+                containerId: container.id,
+              }
+              console.log(
+                `Set containerId for existing text ${textEl.id} -> container ${container.id} (position preserved)`
+              )
+            }
+          }
         }
       }
     } else {
@@ -287,15 +327,34 @@ export const ensureTextContainerBindings = (elements: ExcalidrawElement[]): Exca
       if (potentialContainer) {
         const textIndex = updatedElements.findIndex(el => el.id === textEl.id)
         if (textIndex !== -1) {
-          const updatedTextElement = updateTextWithContainerBinding(
-            updatedElements[textIndex],
-            textEl.text || textEl.rawText || '',
-            potentialContainer
-          )
-          updatedElements[textIndex] = updatedTextElement
-          console.log(
-            `Set containerId and repositioned text ${textEl.id} -> container ${potentialContainer.id}`
-          )
+          const currentText = updatedElements[textIndex]
+          const hasValidPosition =
+            currentText.x !== undefined &&
+            currentText.y !== undefined &&
+            currentText.x !== 0 &&
+            currentText.y !== 0
+
+          if (!hasValidPosition) {
+            // Nur repositionieren wenn keine gültige Position vorhanden (neues Element)
+            const updatedTextElement = updateTextWithContainerBinding(
+              currentText,
+              textEl.text || textEl.rawText || '',
+              potentialContainer
+            )
+            updatedElements[textIndex] = updatedTextElement
+            console.log(
+              `Set containerId and repositioned new text ${textEl.id} -> container ${potentialContainer.id}`
+            )
+          } else {
+            // Nur containerId setzen, Position beibehalten
+            updatedElements[textIndex] = {
+              ...currentText,
+              containerId: potentialContainer.id,
+            }
+            console.log(
+              `Set containerId for existing text ${textEl.id} -> container ${potentialContainer.id} (position preserved)`
+            )
+          }
         }
       }
     }
@@ -343,5 +402,21 @@ export const calculateCenteredTextPosition = (
     y,
     width: estimatedWidth,
     height: estimatedHeight,
+  }
+}
+
+/**
+ * Aktualisiert nur den Text-Inhalt ohne Position oder Alignment zu verändern
+ * Diese Funktion wird für Datenbank-Synchronisation verwendet, um bestehende Positionen zu erhalten
+ */
+export const updateTextContentOnly = (
+  textElement: ExcalidrawElement,
+  newText: string
+): ExcalidrawElement => {
+  return {
+    ...textElement,
+    text: newText,
+    rawText: newText,
+    originalText: newText,
   }
 }
