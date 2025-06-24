@@ -53,9 +53,14 @@ const IntegratedLibrary: React.FC<IntegratedLibraryProps> = ({
 
     const newLibraryItems: any[] = []
 
-    // Add database elements as library items
+    // Add database elements as library items (sorted alphabetically within each type)
     if (data.businessCapabilities) {
-      data.businessCapabilities.forEach((capability: any) => {
+      // Sort business capabilities alphabetically by name
+      const sortedCapabilities = [...data.businessCapabilities].sort((a: any, b: any) =>
+        a.name.localeCompare(b.name, 'de', { sensitivity: 'base' })
+      )
+
+      sortedCapabilities.forEach((capability: any) => {
         const libraryItem = createLibraryItemFromDatabaseElement(
           capability,
           'businessCapability',
@@ -66,7 +71,12 @@ const IntegratedLibrary: React.FC<IntegratedLibraryProps> = ({
     }
 
     if (data.applications) {
-      data.applications.forEach((application: any) => {
+      // Sort applications alphabetically by name
+      const sortedApplications = [...data.applications].sort((a: any, b: any) =>
+        a.name.localeCompare(b.name, 'de', { sensitivity: 'base' })
+      )
+
+      sortedApplications.forEach((application: any) => {
         const libraryItem = createLibraryItemFromDatabaseElement(
           application,
           'application',
@@ -77,7 +87,12 @@ const IntegratedLibrary: React.FC<IntegratedLibraryProps> = ({
     }
 
     if (data.dataObjects) {
-      data.dataObjects.forEach((dataObject: any) => {
+      // Sort data objects alphabetically by name
+      const sortedDataObjects = [...data.dataObjects].sort((a: any, b: any) =>
+        a.name.localeCompare(b.name, 'de', { sensitivity: 'base' })
+      )
+
+      sortedDataObjects.forEach((dataObject: any) => {
         const libraryItem = createLibraryItemFromDatabaseElement(
           dataObject,
           'dataObject',
@@ -88,7 +103,12 @@ const IntegratedLibrary: React.FC<IntegratedLibraryProps> = ({
     }
 
     if (data.applicationInterfaces) {
-      data.applicationInterfaces.forEach((interface_: any) => {
+      // Sort application interfaces alphabetically by name
+      const sortedInterfaces = [...data.applicationInterfaces].sort((a: any, b: any) =>
+        a.name.localeCompare(b.name, 'de', { sensitivity: 'base' })
+      )
+
+      sortedInterfaces.forEach((interface_: any) => {
         const libraryItem = createLibraryItemFromDatabaseElement(
           interface_,
           'applicationInterface',

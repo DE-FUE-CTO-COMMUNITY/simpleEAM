@@ -535,7 +535,14 @@ const GenericForm: React.FC<GenericFormProps> = ({
 
                 {field.type === 'autocomplete' && (
                   <Autocomplete
-                    options={field.options || []}
+                    options={
+                      // Sortiere die Optionen alphabetisch nach dem Label
+                      (field.options || []).slice().sort((a, b) => {
+                        const labelA = typeof a === 'string' ? a : a?.label || ''
+                        const labelB = typeof b === 'string' ? b : b?.label || ''
+                        return labelA.localeCompare(labelB, 'de', { sensitivity: 'base' })
+                      })
+                    }
                     value={formField.state.value}
                     onChange={(_, newValue) => {
                       // Extrahiere IDs/Werte aus Objekten bei Multiple-Auswahl
