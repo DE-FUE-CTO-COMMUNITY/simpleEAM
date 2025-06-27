@@ -691,19 +691,24 @@ export const syncDiagramOnSave = async (
     // Prüfe ob sich der Name geändert hat (mit normalisiertem Text)
     if (currentName && currentName.trim() !== '' && currentName !== lastSyncedName) {
       console.log(`Name changed, updating database: "${lastSyncedName}" -> "${currentName}"`)
+      
+      // WICHTIG: Normalisiere den Namen vor dem Speichern (entferne Zeilenumbrüche)
+      const normalizedName = currentName.trim().replace(/\n/g, ' ').replace(/\s+/g, ' ')
+      
       const success = await updateElementName(
         apolloClient,
         element.customData.databaseId,
         element.customData.elementType,
-        currentName.trim()
+        normalizedName
       )
 
       if (success) {
-        // Aktualisiere lastSyncedName
-        element.customData.lastSyncedName = currentName.trim()
+        // Aktualisiere lastSyncedName mit normalisiertem Namen
+        element.customData.lastSyncedName = normalizedName
+        // WICHTIG: originalElement.name muss immer der saubere Datenbankname sein (ohne Zeilenumbrüche)
         element.customData.originalElement = {
           ...element.customData.originalElement,
-          name: currentName.trim(),
+          name: normalizedName, // Verwende normalisierten Namen, nicht den angezeigten Text
         }
         updatedCount++
         console.log(`Successfully updated name for ${element.customData.databaseId}`)

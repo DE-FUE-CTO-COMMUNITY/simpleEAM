@@ -389,7 +389,8 @@ export const updateElementsWithDatabaseReferences = (
         isMainElement: true,
         originalElement: {
           id: createdElement.databaseId,
-          name: extractElementText(element, []),
+          // WICHTIG: Normalisiere den Namen (entferne Zeilenumbrüche)
+          name: extractElementText(element, []).trim().replace(/\n/g, ' ').replace(/\s+/g, ' '),
           elementType: createdElement.elementType,
         },
       },
