@@ -25,7 +25,7 @@ export interface ExcalidrawComponentProps {
 export interface NotificationState {
   open: boolean
   message: string
-  severity: 'success' | 'error' | 'info'
+  severity: 'success' | 'error' | 'info' | 'warning'
 }
 
 export interface DiagramState {

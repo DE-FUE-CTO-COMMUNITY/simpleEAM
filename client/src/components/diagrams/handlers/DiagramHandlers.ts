@@ -194,7 +194,10 @@ export const useDiagramHandlers = (
         // Apply viewport state with delay to ensure it takes effect after Excalidraw initialization
         if (savedViewportState) {
           setTimeout(() => {
-            console.log('handleOpenDiagram: Re-applying viewport state with delay', savedViewportState)
+            console.log(
+              'handleOpenDiagram: Re-applying viewport state with delay',
+              savedViewportState
+            )
             excalidrawAPI.updateScene({
               appState: {
                 scrollX: savedViewportState.scrollX,
@@ -323,23 +326,26 @@ export const useDiagramHandlers = (
     (elements: any[], appState: any) => {
       // Save viewport state (scrollX, scrollY, zoom) to localStorage whenever it changes
       // Use a debounced approach to avoid excessive localStorage writes
-      if (appState && 
-          typeof appState.scrollX === 'number' && 
-          typeof appState.scrollY === 'number' && 
-          appState.zoom?.value) {
-        
+      if (
+        appState &&
+        typeof appState.scrollX === 'number' &&
+        typeof appState.scrollY === 'number' &&
+        appState.zoom?.value
+      ) {
         const viewportState = {
           scrollX: appState.scrollX,
           scrollY: appState.scrollY,
           zoom: appState.zoom.value, // Extract the actual zoom value
         }
-        
+
         // Only save if viewport has actually changed to avoid excessive writes
         const existingState = loadViewportStateFromStorage()
-        if (!existingState || 
-            Math.abs(existingState.scrollX - viewportState.scrollX) > 1 ||
-            Math.abs(existingState.scrollY - viewportState.scrollY) > 1 ||
-            Math.abs(existingState.zoom - viewportState.zoom) > 0.01) {
+        if (
+          !existingState ||
+          Math.abs(existingState.scrollX - viewportState.scrollX) > 1 ||
+          Math.abs(existingState.scrollY - viewportState.scrollY) > 1 ||
+          Math.abs(existingState.zoom - viewportState.zoom) > 0.01
+        ) {
           saveViewportStateToStorage(viewportState)
         }
       }
@@ -477,26 +483,92 @@ export const useDiagramHandlers = (
   }, [excalidrawAPI, setCurrentScene, setCurrentDiagram, setNotification])
 
   // PNG Export Handler
-  const handleExportPNG = useCallback(() => {
-    if (excalidrawAPI) {
-      try {
-        // Use the built-in export function from Excalidraw
-        excalidrawAPI.getSceneElementsIncludingDeleted()
-        setNotification({
-          open: true,
-          message: 'PNG Export gestartet...',
-          severity: 'info',
-        })
-      } catch (err) {
-        console.error('Error exporting PNG:', err)
-        setNotification({
-          open: true,
-          message: 'Fehler beim PNG Export',
-          severity: 'error',
-        })
-      }
+  const handleExportPNG = useCallback(async () => {
+    if (!excalidrawAPI) {
+      setNotification({
+        open: true,
+        message: 'Excalidraw API nicht verfügbar',
+        severity: 'error',
+      })
+      return
     }
-  }, [excalidrawAPI, setNotification])
+
+    try {
+      // Import export function dynamically
+      const { exportToBlob } = await import('@excalidraw/excalidraw')
+
+      const elements = excalidrawAPI.getSceneElements()
+      const appState = excalidrawAPI.getAppState()
+      const files = excalidrawAPI.getFiles()
+
+      if (!elements || elements.length === 0) {
+        setNotification({
+          open: true,
+          message: 'Keine Elemente zum Exportieren vorhanden',
+          severity: 'warning',
+        })
+        return
+      }
+
+      setNotification({
+        open: true,
+        message: 'PNG Export wird vorbereitet...',
+        severity: 'info',
+      })
+
+      // Export to PNG blob
+      const blob = await exportToBlob({
+        elements,
+        appState: {
+          ...appState,
+          exportBackground: true,
+          viewBackgroundColor: appState.viewBackgroundColor || '#ffffff',
+          exportWithDarkMode: false,
+          exportEmbedScene: false, // Don't embed scene data to keep file size smaller
+        },
+        files,
+        mimeType: 'image/png',
+        quality: 0.95,
+        exportPadding: 20, // Add some padding around the drawing
+      })
+
+      if (!blob) {
+        throw new Error('Export failed - no blob generated')
+      }
+
+      // Create download link
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+
+      // Generate filename
+      const timestamp = new Date().toISOString().slice(0, 19).replace(/[:.]/g, '-')
+      const filename = currentDiagram
+        ? `${currentDiagram.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_${timestamp}.png`
+        : `diagram_${timestamp}.png`
+
+      link.download = filename
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+
+      // Clean up the URL object
+      URL.revokeObjectURL(url)
+
+      setNotification({
+        open: true,
+        message: `PNG erfolgreich exportiert: ${filename}`,
+        severity: 'success',
+      })
+    } catch (err) {
+      console.error('Error exporting PNG:', err)
+      setNotification({
+        open: true,
+        message: `Fehler beim PNG Export: ${err instanceof Error ? err.message : 'Unbekannter Fehler'}`,
+        severity: 'error',
+      })
+    }
+  }, [excalidrawAPI, currentDiagram, setNotification])
 
   // Manual Sync Handler
   const handleManualSync = useCallback(async () => {

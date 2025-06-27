@@ -1,7 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
 import { DialogStates, NotificationState } from '../types/DiagramTypes'
 import { isViewer } from '@/lib/auth'
-import { loadPersistedScene, loadPersistedDiagram, loadViewportStateFromStorage } from '../utils/DiagramStorage'
+import {
+  loadPersistedScene,
+  loadPersistedDiagram,
+  loadViewportStateFromStorage,
+} from '../utils/DiagramStorage'
 
 // Custom Hook für den Diagram State
 export const useDiagramState = () => {
@@ -85,11 +89,14 @@ export const useDiagramState = () => {
 
             if (shouldRestore) {
               const restoredScene = restoreSceneData(currentScene)
-              
+
               // Load and apply viewport state if available
               const savedViewportState = loadViewportStateFromStorage()
               if (savedViewportState) {
-                console.log('DiagramState: Applying saved viewport state during scene restoration', savedViewportState)
+                console.log(
+                  'DiagramState: Applying saved viewport state during scene restoration',
+                  savedViewportState
+                )
                 restoredScene.appState = {
                   ...restoredScene.appState,
                   scrollX: savedViewportState.scrollX,
@@ -97,13 +104,16 @@ export const useDiagramState = () => {
                   zoom: { value: savedViewportState.zoom },
                 }
               }
-              
+
               excalidrawAPI.updateScene(restoredScene)
-              
+
               // Additional viewport restoration with delay for better reliability
               if (savedViewportState) {
                 setTimeout(() => {
-                  console.log('DiagramState: Confirming viewport state with delayed update', savedViewportState)
+                  console.log(
+                    'DiagramState: Confirming viewport state with delayed update',
+                    savedViewportState
+                  )
                   excalidrawAPI.updateScene({
                     appState: {
                       scrollX: savedViewportState.scrollX,
@@ -113,7 +123,7 @@ export const useDiagramState = () => {
                   })
                 }, 200) // Increased delay for better reliability
               }
-              
+
               sceneRestoredRef.current = true // Mark as restored
 
               console.log('Scene restored with', currentScene.elements?.length || 0, 'elements')

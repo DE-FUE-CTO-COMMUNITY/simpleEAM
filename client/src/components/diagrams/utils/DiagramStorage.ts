@@ -179,7 +179,11 @@ export const loadViewportStateFromStorage = (): ViewportState | null => {
     if (saved) {
       const parsed = JSON.parse(saved)
       // Validate the structure
-      if (typeof parsed.scrollX === 'number' && typeof parsed.scrollY === 'number' && typeof parsed.zoom === 'number') {
+      if (
+        typeof parsed.scrollX === 'number' &&
+        typeof parsed.scrollY === 'number' &&
+        typeof parsed.zoom === 'number'
+      ) {
         console.log('Loaded viewport state:', parsed)
         return parsed
       } else {

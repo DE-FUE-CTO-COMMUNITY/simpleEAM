@@ -42,7 +42,7 @@ const ExcalidrawWrapper = dynamic(
       // Process initialData - use provided data or fallback to safe defaults
       const safeInitialData = useMemo(() => {
         console.log('ExcalidrawWrapper: Processing initialData', _initialData)
-        
+
         if (_initialData && typeof _initialData === 'object') {
           // Use provided initialData but ensure safe structure
           const processedData = {
@@ -68,17 +68,17 @@ const ExcalidrawWrapper = dynamic(
             // Important: scrollToContent must be false to preserve viewport position
             scrollToContent: false,
           }
-          
+
           console.log('ExcalidrawWrapper: Using provided initialData with viewport', {
             elementsCount: processedData.elements.length,
             scrollX: processedData.appState.scrollX,
             scrollY: processedData.appState.scrollY,
             zoom: processedData.appState.zoom?.value,
           })
-          
+
           return processedData
         }
-        
+
         // Fallback to empty scene
         const defaultData = {
           elements: [],
@@ -100,7 +100,7 @@ const ExcalidrawWrapper = dynamic(
           },
           scrollToContent: false,
         }
-        
+
         console.log('ExcalidrawWrapper: Using default empty initialData')
         return defaultData
       }, [_initialData]) // Depend on actual initialData prop
@@ -237,6 +237,19 @@ const ExcalidrawWrapper = dynamic(
                   JSON importieren
                 </MainMenuTyped.Item>
               )}
+
+              {/* Custom Export PNG Menu Item - available for all users */}
+              <MainMenuTyped.Item
+                onSelect={_onExportPNG}
+                icon={
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z M12,17L16,12H13V8H11V12H8L12,17Z" />
+                  </svg>
+                }
+                shortcut="Ctrl+Shift+E"
+              >
+                PNG exportieren
+              </MainMenuTyped.Item>
             </MainMenuTyped>
           </ExcalidrawTyped>
         </div>
