@@ -436,7 +436,7 @@ export const useDiagramHandlers = (
   }, [excalidrawAPI, currentDiagram, setNotification])
 
   // JSON Import Handler
-  const handleImportJSON = useCallback(() => {
+  const handleImportJSON = useCallback(async () => {
     const input = document.createElement('input')
     input.type = 'file'
     input.accept = '.excalidraw,.json'
@@ -444,34 +444,67 @@ export const useDiagramHandlers = (
       const file = e.target.files[0]
       if (file) {
         const reader = new FileReader()
-        reader.onload = (e: any) => {
+        reader.onload = async (e: any) => {
           try {
             const importedData = JSON.parse(e.target.result)
-            if (importedData.elements && excalidrawAPI) {
-              const restoredScene = restoreSceneData({
+
+            if (!importedData.elements || !excalidrawAPI) {
+              throw new Error('Invalid file format')
+            }
+
+            setNotification({
+              open: true,
+              message: 'JSON Import wird verarbeitet...',
+              severity: 'info',
+            })
+
+            // Importiere ID-Mapping-Funktionalität
+            const { processImportedDiagramData } = await import('../importIdMappingUtils')
+
+            // Verarbeite importierte Daten und mappe IDs bei Bedarf
+            const { processedData, mappings, summary } = await processImportedDiagramData(
+              apolloClient,
+              {
                 elements: importedData.elements,
                 appState: importedData.appState || { viewBackgroundColor: '#ffffff' },
-              })
-              excalidrawAPI.updateScene(restoredScene)
-              setCurrentScene(restoredScene)
+              }
+            )
 
-              // Clear current diagram since this is an import
-              setCurrentDiagram(null)
-              clearDiagramStorage()
+            const restoredScene = restoreSceneData(processedData)
+            excalidrawAPI.updateScene(restoredScene)
+            setCurrentScene(restoredScene)
 
-              setNotification({
-                open: true,
-                message: 'JSON erfolgreich importiert!',
-                severity: 'success',
-              })
-            } else {
-              throw new Error('Invalid file format')
+            // Clear current diagram since this is an import
+            setCurrentDiagram(null)
+            clearDiagramStorage()
+
+            // Zeige detaillierte Erfolgs-Nachricht mit ID-Mapping-Info
+            const successMessage =
+              mappings.length > 0
+                ? `JSON erfolgreich importiert!\n\n${summary}`
+                : 'JSON erfolgreich importiert!'
+
+            setNotification({
+              open: true,
+              message: successMessage,
+              severity: 'success',
+            })
+
+            // Zusätzliche Warnung bei ID-Mappings
+            if (mappings.length > 0) {
+              setTimeout(() => {
+                setNotification({
+                  open: true,
+                  message: `Hinweis: ${mappings.length} Element-IDs wurden automatisch an die lokale Datenbank angepasst. Bitte prüfen Sie die Elemente.`,
+                  severity: 'warning',
+                })
+              }, 3000)
             }
           } catch (err) {
             console.error('Error importing JSON:', err)
             setNotification({
               open: true,
-              message: 'Fehler beim JSON Import - ungültiges Format',
+              message: `Fehler beim JSON Import: ${err instanceof Error ? err.message : 'Unbekannter Fehler'}`,
               severity: 'error',
             })
           }
@@ -480,7 +513,7 @@ export const useDiagramHandlers = (
       }
     }
     input.click()
-  }, [excalidrawAPI, setCurrentScene, setCurrentDiagram, setNotification])
+  }, [apolloClient, excalidrawAPI, setCurrentScene, setCurrentDiagram, setNotification])
 
   // PNG Export Handler
   const handleExportPNG = useCallback(async () => {
