@@ -30,6 +30,7 @@ export const useDiagramState = () => {
     saveAsDialogOpen: false,
     openDialogOpen: false,
     deleteDialogOpen: false,
+    capabilityMapGeneratorOpen: false,
   })
 
   // Notification State

@@ -8,6 +8,7 @@ import DeleteDiagramDialog from './DeleteDiagramDialog'
 import IntegratedLibrary from './IntegratedLibrary'
 import DiagramNameDisplay from './DiagramNameDisplay'
 import ExcalidrawWrapper from './components/ExcalidrawWrapper'
+import CapabilityMapGenerator from './CapabilityMapGenerator'
 import { DiagramEditorProps } from './types/DiagramTypes'
 import { useDiagramState, useUIOptions } from './state/DiagramState'
 import { useDiagramHandlers } from './handlers/DiagramHandlers'
@@ -65,6 +66,11 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     lastSavedScene
   )
 
+  // Capability Map Generator Handler
+  const handleCapabilityMapGenerator = useCallback(() => {
+    updateDialogState('capabilityMapGeneratorOpen', true)
+  }, [updateDialogState])
+
   // Keyboard shortcuts
   useKeyboardShortcuts(
     handleNewDiagram,
@@ -72,6 +78,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     handleImportJSON,
     handleExportPNG,
     handleManualSync,
+    handleCapabilityMapGenerator,
     currentDiagram,
     open => updateDialogState('saveDialogOpen', open),
     open => updateDialogState('saveAsDialogOpen', open),
@@ -278,6 +285,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
           onImportJSON={handleImportJSON}
           onExportPNG={handleExportPNG}
           onManualSync={handleManualSync}
+          onCapabilityMapGenerator={handleCapabilityMapGenerator}
           excalidrawAPI={handleExcalidrawAPI}
           onChange={handleChange}
           uiOptions={uiOptions}
@@ -331,6 +339,14 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
           onClose={() => updateDialogState('deleteDialogOpen', false)}
           onDelete={handleDeleteDiagram}
           diagram={currentDiagram}
+        />
+      )}
+
+      {/* Capability Map Generator Dialog - only for non-viewer users */}
+      {!isViewer() && (
+        <CapabilityMapGenerator
+          open={dialogStates.capabilityMapGeneratorOpen}
+          onClose={() => updateDialogState('capabilityMapGeneratorOpen', false)}
         />
       )}
 

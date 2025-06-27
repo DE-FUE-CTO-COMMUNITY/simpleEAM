@@ -24,6 +24,7 @@ const ExcalidrawWrapper = dynamic(
       onImportJSON,
       onExportPNG: _onExportPNG,
       onManualSync,
+      onCapabilityMapGenerator,
       excalidrawAPI,
       onChange,
       uiOptions,
@@ -202,6 +203,21 @@ const ExcalidrawWrapper = dynamic(
                   shortcut="Ctrl+R"
                 >
                   DB Synchronisieren
+                </MainMenuTyped.Item>
+              )}
+
+              {/* Capability Map Generator Menu Item - only for non-viewer users */}
+              {!viewModeEnabled && (
+                <MainMenuTyped.Item
+                  onSelect={onCapabilityMapGenerator}
+                  icon={
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3M19,19H5V5H19V19Z M13,17V15H18V13H13V11L10,14L13,17Z M11,10V8H6V10H11V12L14,9L11,6V8Z" />
+                    </svg>
+                  }
+                  shortcut="Ctrl+M"
+                >
+                  Capability Map generieren
                 </MainMenuTyped.Item>
               )}
 

@@ -8,6 +8,7 @@ export const useKeyboardShortcuts = (
   handleImportJSON: () => void,
   handleExportPNG: () => void,
   handleManualSync: () => void,
+  handleCapabilityMapGenerator: () => void,
   currentDiagram: any,
   setSaveDialogOpen: (open: boolean) => void,
   setSaveAsDialogOpen: (open: boolean) => void,
@@ -66,6 +67,11 @@ export const useKeyboardShortcuts = (
             // Ctrl+R - Manual Database Sync
             handleManualSync()
             break
+          case 'm':
+            event.preventDefault()
+            // Ctrl+M - Capability Map Generator
+            handleCapabilityMapGenerator()
+            break
         }
       }
     }
@@ -81,6 +87,7 @@ export const useKeyboardShortcuts = (
     handleImportJSON,
     handleExportPNG,
     handleManualSync,
+    handleCapabilityMapGenerator,
     setSaveDialogOpen,
     setSaveAsDialogOpen,
     setOpenDialogOpen,

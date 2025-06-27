@@ -14,6 +14,7 @@ export interface ExcalidrawComponentProps {
   onImportJSON: () => void
   onExportPNG: () => void
   onManualSync: () => void
+  onCapabilityMapGenerator: () => void
   excalidrawAPI: (api: any) => void
   onChange?: (elements: any[], appState: any) => void
   uiOptions: any
@@ -42,6 +43,7 @@ export interface DialogStates {
   saveAsDialogOpen: boolean
   openDialogOpen: boolean
   deleteDialogOpen: boolean
+  capabilityMapGeneratorOpen: boolean
 }
 
 export interface DiagramHandlers {
