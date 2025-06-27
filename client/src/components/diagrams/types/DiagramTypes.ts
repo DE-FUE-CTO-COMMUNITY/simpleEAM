@@ -62,4 +62,5 @@ export const STORAGE_KEYS = {
   SCENE: 'excalidraw-scene',
   CURRENT_DIAGRAM: 'excalidraw-current-diagram',
   LAST_SAVED_SCENE: 'excalidraw-last-saved-scene',
+  VIEWPORT_STATE: 'excalidraw-viewport-state',
 } as const

@@ -39,7 +39,10 @@
           ],
           "updated": 1738336109979,
           "link": null,
-          "locked": false
+          "locked": false,
+          "customData": {
+            "elementType": "application"
+          }
         },
         {
           "id": "_WhogOWrDa82qiFwBtrzG",
@@ -214,7 +217,10 @@
           ],
           "updated": 1738336133344,
           "link": null,
-          "locked": false
+          "locked": false,
+          "customData": {
+            "elementType": "interface"
+          }
         },
         {
           "id": "VjqcvcHJU3yocmctn_2L-",
@@ -375,7 +381,10 @@
           ],
           "updated": 1738336012611,
           "link": null,
-          "locked": false
+          "locked": false,
+          "customData": {
+            "elementType": "dataObject"
+          }
         },
         {
           "id": "_KRjWwqPH-ZrfIAPPGnrr",
@@ -532,7 +541,10 @@
           ],
           "updated": 1738336012611,
           "link": null,
-          "locked": false
+          "locked": false,
+          "customData": {
+            "elementType": "capability"
+          }
         },
         {
           "id": "_KRjWwqPH-ZrfIAPPGnrQ",

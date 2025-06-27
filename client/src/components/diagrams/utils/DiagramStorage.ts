@@ -1,5 +1,12 @@
 import { STORAGE_KEYS } from '../types/DiagramTypes'
 
+// Viewport State Interface
+export interface ViewportState {
+  scrollX: number
+  scrollY: number
+  zoom: number
+}
+
 /**
  * Helper function to restore Maps and fix serialization issues
  */
@@ -145,7 +152,54 @@ export const clearDiagramStorage = (): void => {
     localStorage.removeItem(STORAGE_KEYS.SCENE)
     localStorage.removeItem(STORAGE_KEYS.CURRENT_DIAGRAM)
     localStorage.removeItem(STORAGE_KEYS.LAST_SAVED_SCENE)
+    localStorage.removeItem(STORAGE_KEYS.VIEWPORT_STATE)
   } catch (error) {
     console.warn('Failed to clear diagram storage:', error)
+  }
+}
+
+/**
+ * Save viewport state (position and zoom) to localStorage
+ */
+export const saveViewportStateToStorage = (viewportState: ViewportState): void => {
+  try {
+    console.log('Saving viewport state:', viewportState)
+    localStorage.setItem(STORAGE_KEYS.VIEWPORT_STATE, JSON.stringify(viewportState))
+  } catch (error) {
+    console.warn('Failed to save viewport state to localStorage:', error)
+  }
+}
+
+/**
+ * Load viewport state from localStorage
+ */
+export const loadViewportStateFromStorage = (): ViewportState | null => {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEYS.VIEWPORT_STATE)
+    if (saved) {
+      const parsed = JSON.parse(saved)
+      // Validate the structure
+      if (typeof parsed.scrollX === 'number' && typeof parsed.scrollY === 'number' && typeof parsed.zoom === 'number') {
+        console.log('Loaded viewport state:', parsed)
+        return parsed
+      } else {
+        console.warn('Invalid viewport state structure:', parsed)
+      }
+    }
+  } catch (error) {
+    console.warn('Failed to load viewport state:', error)
+    localStorage.removeItem(STORAGE_KEYS.VIEWPORT_STATE)
+  }
+  return null
+}
+
+/**
+ * Clear only viewport state from localStorage
+ */
+export const clearViewportStateFromStorage = (): void => {
+  try {
+    localStorage.removeItem(STORAGE_KEYS.VIEWPORT_STATE)
+  } catch (error) {
+    console.warn('Failed to clear viewport state:', error)
   }
 }

@@ -39,11 +39,48 @@ const ExcalidrawWrapper = dynamic(
         injectExcalidrawThemeCSS()
       }, [])
 
-      // Ensure initialData is always a valid, stable object to prevent controlled/uncontrolled issues
+      // Process initialData - use provided data or fallback to safe defaults
       const safeInitialData = useMemo(() => {
-        // Always return a completely stable default structure regardless of props
-        // Scene updates should happen via excalidrawAPI.updateScene(), not via initialData
-        return {
+        console.log('ExcalidrawWrapper: Processing initialData', _initialData)
+        
+        if (_initialData && typeof _initialData === 'object') {
+          // Use provided initialData but ensure safe structure
+          const processedData = {
+            elements: _initialData.elements || [],
+            appState: {
+              viewBackgroundColor: '#ffffff',
+              collaborators: new Map(),
+              selectedElementIds: {},
+              hoveredElementIds: {},
+              selectedGroupIds: {},
+              selectedLinearElement: null,
+              editingLinearElement: null,
+              activeTool: { type: 'selection' },
+              isLoading: false,
+              errorMessage: null,
+              theme: 'light',
+              zenModeEnabled: false,
+              gridModeEnabled: false,
+              viewModeEnabled: false,
+              // Preserve scrollX, scrollY, and zoom from initialData
+              ..._initialData.appState,
+            },
+            // Important: scrollToContent must be false to preserve viewport position
+            scrollToContent: false,
+          }
+          
+          console.log('ExcalidrawWrapper: Using provided initialData with viewport', {
+            elementsCount: processedData.elements.length,
+            scrollX: processedData.appState.scrollX,
+            scrollY: processedData.appState.scrollY,
+            zoom: processedData.appState.zoom?.value,
+          })
+          
+          return processedData
+        }
+        
+        // Fallback to empty scene
+        const defaultData = {
           elements: [],
           appState: {
             viewBackgroundColor: '#ffffff',
@@ -63,7 +100,10 @@ const ExcalidrawWrapper = dynamic(
           },
           scrollToContent: false,
         }
-      }, []) // Empty dependency array - this should NEVER change!
+        
+        console.log('ExcalidrawWrapper: Using default empty initialData')
+        return defaultData
+      }, [_initialData]) // Depend on actual initialData prop
 
       return (
         <div style={{ height: '100%', width: '100%' }}>

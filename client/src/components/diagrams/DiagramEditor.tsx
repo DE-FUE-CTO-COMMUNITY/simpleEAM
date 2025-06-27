@@ -12,6 +12,7 @@ import { DiagramEditorProps } from './types/DiagramTypes'
 import { useDiagramState, useUIOptions } from './state/DiagramState'
 import { useDiagramHandlers } from './handlers/DiagramHandlers'
 import { useKeyboardShortcuts } from './hooks/DiagramKeyboardShortcuts'
+import { loadViewportStateFromStorage } from './utils/DiagramStorage'
 import { isViewer } from '@/lib/auth'
 
 const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
@@ -115,11 +116,23 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     })
   }
 
-  // Create stable initialData that never changes to prevent controlled/uncontrolled input issues
+  // Create dynamic initialData that includes viewport state
   const initialData = useMemo(() => {
-    console.log('DiagramEditor: Creating stable initialData')
+    console.log('DiagramEditor: Creating initialData with viewport state')
 
-    // Always return a consistent, minimal structure that never changes
+    // Load viewport state from storage
+    let viewportState = null
+    try {
+      const savedViewportState = loadViewportStateFromStorage()
+      if (savedViewportState) {
+        viewportState = savedViewportState
+        console.log('DiagramEditor: Loaded viewport state from storage', viewportState)
+      }
+    } catch (error) {
+      console.warn('DiagramEditor: Failed to load viewport state:', error)
+    }
+
+    // Create base app state with viewport position
     const baseAppState = {
       viewBackgroundColor: '#ffffff',
       collaborators: new Map(),
@@ -141,14 +154,28 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
       currentItemStrokeStyle: 'solid',
       currentItemRoughness: 1,
       currentItemOpacity: 100,
+      // Include viewport state if available
+      ...(viewportState && {
+        scrollX: viewportState.scrollX,
+        scrollY: viewportState.scrollY,
+        zoom: { value: viewportState.zoom },
+      }),
     }
 
-    return {
-      elements: [], // Always start with empty elements
+    const data = {
+      elements: [], // Always start with empty elements - they get loaded separately
       appState: baseAppState,
-      scrollToContent: false,
+      scrollToContent: false, // Critical: preserve viewport position
     }
-  }, []) // Empty dependency array - this should never change!
+
+    console.log('DiagramEditor: initialData created with viewport', {
+      scrollX: baseAppState.scrollX,
+      scrollY: baseAppState.scrollY,
+      zoom: baseAppState.zoom?.value,
+    })
+
+    return data
+  }, []) // Deliberately static - viewport is applied once on init
 
   // Debug log for initialData
   console.log('DiagramEditor: Stable initialData created')

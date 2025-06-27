@@ -11,6 +11,8 @@ import {
   saveDiagramToStorage,
   saveLastSavedSceneToStorage,
   clearDiagramStorage,
+  saveViewportStateToStorage,
+  loadViewportStateFromStorage,
 } from '../utils/DiagramStorage'
 
 // Handlers für alle Diagram-Operationen
@@ -165,16 +167,43 @@ export const useDiagramHandlers = (
             errorMessage: null,
           },
         }
+
+        // Restore viewport state (position and zoom) if available
+        const savedViewportState = loadViewportStateFromStorage()
+        if (savedViewportState) {
+          console.log('handleOpenDiagram: Applying saved viewport state', savedViewportState)
+          sceneData.appState.scrollX = savedViewportState.scrollX
+          sceneData.appState.scrollY = savedViewportState.scrollY
+          sceneData.appState.zoom = { value: savedViewportState.zoom }
+        }
+
         const restoredScene = restoreSceneData(sceneData)
 
         console.log('handleOpenDiagram: Scene prepared', {
           elementsCount: restoredScene.elements?.length || 0,
           hasAppState: !!restoredScene.appState,
+          scrollX: restoredScene.appState?.scrollX,
+          scrollY: restoredScene.appState?.scrollY,
+          zoom: restoredScene.appState?.zoom?.value,
         })
 
-        // Sofort die Excalidraw-Szene aktualisieren
+        // Sofort die Excalidraw-Szene aktualisieren (mit integrierter Viewport-Position)
         console.log('handleOpenDiagram: Updating scene immediately')
         excalidrawAPI.updateScene(restoredScene)
+
+        // Apply viewport state with delay to ensure it takes effect after Excalidraw initialization
+        if (savedViewportState) {
+          setTimeout(() => {
+            console.log('handleOpenDiagram: Re-applying viewport state with delay', savedViewportState)
+            excalidrawAPI.updateScene({
+              appState: {
+                scrollX: savedViewportState.scrollX,
+                scrollY: savedViewportState.scrollY,
+                zoom: { value: savedViewportState.zoom },
+              },
+            })
+          }, 100) // Small delay to ensure Excalidraw has finished its initial setup
+        }
 
         // State-Updates können asynchron erfolgen
         setTimeout(() => {
@@ -292,6 +321,29 @@ export const useDiagramHandlers = (
   // Change Handler - tracks changes and detects unsaved state
   const handleChange = useCallback(
     (elements: any[], appState: any) => {
+      // Save viewport state (scrollX, scrollY, zoom) to localStorage whenever it changes
+      // Use a debounced approach to avoid excessive localStorage writes
+      if (appState && 
+          typeof appState.scrollX === 'number' && 
+          typeof appState.scrollY === 'number' && 
+          appState.zoom?.value) {
+        
+        const viewportState = {
+          scrollX: appState.scrollX,
+          scrollY: appState.scrollY,
+          zoom: appState.zoom.value, // Extract the actual zoom value
+        }
+        
+        // Only save if viewport has actually changed to avoid excessive writes
+        const existingState = loadViewportStateFromStorage()
+        if (!existingState || 
+            Math.abs(existingState.scrollX - viewportState.scrollX) > 1 ||
+            Math.abs(existingState.scrollY - viewportState.scrollY) > 1 ||
+            Math.abs(existingState.zoom - viewportState.zoom) > 0.01) {
+          saveViewportStateToStorage(viewportState)
+        }
+      }
+
       // Only track changes if we have a current diagram loaded
       if (currentDiagram && lastSavedScene) {
         // Compare current state with last saved state

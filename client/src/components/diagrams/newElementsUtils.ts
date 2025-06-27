@@ -128,53 +128,44 @@ export const detectNewElements = (elements: DiagramElement[]): NewElement[] => {
       continue
     }
 
+    // NEUE LOGIK: Nur Elemente mit elementType aber ohne databaseId sollen erkannt werden
+    // Dies sind Symbole aus der ArchiMate-Bibliothek, die noch nicht gespeichert sind
+    if (!element.customData?.elementType) {
+      // Kein elementType definiert -> einfaches grafisches Element -> ignorieren
+      continue
+    }
+
+    if (element.customData?.databaseId) {
+      // Hat bereits eine databaseId -> bereits gespeichert -> ignorieren
+      continue
+    }
+
+    // Ab hier: Element hat elementType aber keine databaseId -> potentielles neues DB-Element
+
     // Skip if not a shape that can be converted to database element
     if (!['rectangle', 'ellipse', 'diamond'].includes(element.type)) {
       continue
     }
 
-    // Mindestgröße prüfen - beide Dimensionen müssen groß genug sein
-    const minWidth = 80 // Mindestens 80px Breite
-    const minHeight = 40 // Mindestens 40px Höhe
-    if (element.width < minWidth || element.height < minHeight) {
-      continue
-    }
-
-    // Extract text content
+    // Prüfe ob Element Text hat (sollte bei ArchiMate-Symbolen immer der Fall sein)
     const text = extractElementText(element, elements)
 
-    // Skip Elemente ohne Text
+    // Skip Elemente ohne Text oder mit leerem Text
     if (!text || text.trim().length === 0) {
       continue
     }
 
-    // Verbesserte Filterung für "Unbenannte Elemente"
     const trimmedText = text.trim()
 
-    // Skip Default-Namen und sehr kurze Texte
-    const defaultNames = ['unbenanntes element', 'unnamed element', 'element', 'neu', 'new']
-    if (defaultNames.includes(trimmedText.toLowerCase()) || trimmedText.length < 3) {
+    // Für ArchiMate-Symbole: Einfache Validierung, da diese bereits vordefiniert sind
+    // Nur sehr offensichtlich ungültige Texte ausschließen
+    if (trimmedText.length < 2) {
       continue
     }
 
-    // Skip Elemente mit nur Zahlen, Sonderzeichen oder sehr kurzen Texten
-    if (/^[0-9\s\-_.]*$/.test(trimmedText) || /^[^a-zA-ZäöüÄÖÜß]*$/.test(trimmedText)) {
-      continue
-    }
-
-    // Skip Elemente, die nur aus wenigen Zeichen bestehen
-    if (
-      trimmedText.length < 2 ||
-      (trimmedText.length === 2 && !/[a-zA-ZäöüÄÖÜß]/.test(trimmedText))
-    ) {
-      continue
-    }
-
-    // Try to determine element type based on shape and text
-    const elementType = determineElementType(element, elements)
-    if (!elementType) {
-      continue
-    }
+    // Bei ArchiMate-Symbolen können wir die meisten Validierungen überspringen,
+    // da diese bereits vordefiniert und valide sind. Nutze elementType direkt aus customData.
+    const elementType = element.customData.elementType
 
     newElements.push({
       id: element.id,
@@ -194,46 +185,6 @@ export const detectNewElements = (elements: DiagramElement[]): NewElement[] => {
 }
 
 /**
- * Bestimmt den Element-Typ basierend auf Form und Text
- */
-const determineElementType = (
-  element: DiagramElement,
-  allElements: DiagramElement[]
-): string | null => {
-  const text = extractElementText(element, allElements)?.toLowerCase() || ''
-
-  // Einfache Heuristik basierend auf Form und Textinhalt
-  switch (element.type) {
-    case 'rectangle':
-      if (text.includes('application') || text.includes('app') || text.includes('anwendung')) {
-        return ELEMENT_TYPES.APPLICATION
-      }
-      if (text.includes('data') || text.includes('daten')) {
-        return ELEMENT_TYPES.DATA_OBJECT
-      }
-      if (text.includes('interface') || text.includes('schnittstelle')) {
-        return ELEMENT_TYPES.INTERFACE
-      }
-      // Default für Rechtecke
-      return ELEMENT_TYPES.APPLICATION
-
-    case 'ellipse':
-      if (text.includes('capability') || text.includes('fähigkeit')) {
-        return ELEMENT_TYPES.CAPABILITY
-      }
-      // Default für Ellipsen
-      return ELEMENT_TYPES.CAPABILITY
-
-    case 'diamond':
-      // Diamanten als Data Objects interpretieren
-      return ELEMENT_TYPES.DATA_OBJECT
-
-    default:
-      return null
-  }
-}
-
-/**
  * Extrahiert Text aus einem Element (sucht nach verknüpften Text-Elementen)
  */
 const extractElementText = (element: DiagramElement, allElements: DiagramElement[]): string => {
@@ -242,13 +193,22 @@ const extractElementText = (element: DiagramElement, allElements: DiagramElement
     return (element as any).text || ''
   }
 
-  // Look for linked text elements
+  // Look for linked text elements (bound to container)
   const linkedTextElement = allElements.find(
     el => el.type === 'text' && (el as any).containerId === element.id
   )
 
   if (linkedTextElement) {
     return (linkedTextElement as any).text || ''
+  }
+
+  // Look for text elements with the same position (unbound text near the shape)
+  const textNearElement = allElements.find(
+    el => el.type === 'text' && Math.abs(el.x - element.x) < 50 && Math.abs(el.y - element.y) < 50
+  )
+
+  if (textNearElement) {
+    return (textNearElement as any).text || ''
   }
 
   // Fallback: use element's text property if available
