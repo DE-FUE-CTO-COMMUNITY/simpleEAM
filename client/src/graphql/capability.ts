@@ -133,3 +133,62 @@ export const CHECK_CAPABILITY_EXISTS = gql`
     }
   }
 `
+
+export const GET_CAPABILITY_MAP_DATA = gql`
+  query GetCapabilityMapData {
+    businessCapabilities {
+      id
+      name
+      description
+      status
+      businessValue
+      maturityLevel
+      children {
+        id
+        name
+        description
+        status
+        businessValue
+        maturityLevel
+        children {
+          id
+          name
+          description
+          status
+          businessValue
+          maturityLevel
+          children {
+            id
+            name
+            description
+            status
+            businessValue
+            maturityLevel
+          }
+          supportedByApplications {
+            id
+            name
+            status
+            criticality
+          }
+        }
+        supportedByApplications {
+          id
+          name
+          status
+          criticality
+        }
+      }
+      parents {
+        id
+        name
+      }
+      supportedByApplications {
+        id
+        name
+        status
+        criticality
+      }
+    }
+  }
+`

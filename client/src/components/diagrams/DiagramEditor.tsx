@@ -71,6 +71,46 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     updateDialogState('capabilityMapGeneratorOpen', true)
   }, [updateDialogState])
 
+  // Handle generated capability map elements
+  const handleCapabilityMapGenerated = useCallback(
+    (elements: any[]) => {
+      if (!excalidrawAPI) {
+        console.warn('Excalidraw API nicht verfügbar für Element-Update')
+        return
+      }
+
+      try {
+        console.log(`Lade ${elements.length} generierte Elemente in das Canvas`)
+
+        // Update the scene with generated elements
+        excalidrawAPI.updateScene({
+          elements: elements,
+          appState: {
+            viewBackgroundColor: '#ffffff',
+          },
+        })
+
+        // Mark as having unsaved changes
+        setHasUnsavedChanges(true)
+
+        // Show success notification
+        setNotification({
+          open: true,
+          message: `Capability Map erfolgreich generiert! ${elements.length} Elemente erstellt.`,
+          severity: 'success',
+        })
+      } catch (error) {
+        console.error('Fehler beim Laden der generierten Elemente:', error)
+        setNotification({
+          open: true,
+          message: 'Fehler beim Laden der generierten Capability Map',
+          severity: 'error',
+        })
+      }
+    },
+    [excalidrawAPI, setHasUnsavedChanges, setNotification]
+  )
+
   // Keyboard shortcuts
   useKeyboardShortcuts(
     handleNewDiagram,
@@ -347,6 +387,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
         <CapabilityMapGenerator
           open={dialogStates.capabilityMapGeneratorOpen}
           onClose={() => updateDialogState('capabilityMapGeneratorOpen', false)}
+          onElementsGenerated={handleCapabilityMapGenerated}
         />
       )}
 
