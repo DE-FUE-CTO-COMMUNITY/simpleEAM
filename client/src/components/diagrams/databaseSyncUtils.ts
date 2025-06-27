@@ -2,7 +2,6 @@
 import { gql } from '@apollo/client'
 import {
   normalizeText,
-  wrapTextToFitWidth,
   findLinkedTextElement,
   ensureTextContainerBindings,
   updateTextWithContainerBinding,
@@ -566,29 +565,22 @@ export const syncDiagramOnOpen = async (apolloClient: any, diagramData: any): Pr
               el.id === updatedElement.id)
         )
 
-        let finalText = normalizedNewName
-
-        // Wenn ein Container gefunden wird, berücksichtige die Breite für Text-Umbruch
-        if (containerElement && containerElement.width) {
-          const availableWidth = containerElement.width - 20 // Padding berücksichtigen
-          const fontSize = element.fontSize || 20
-
-          // Verwende wrapTextToFitWidth für automatischen Umbruch
-          finalText = wrapTextToFitWidth(normalizedNewName, availableWidth, fontSize)
-
-          console.log(
-            `Applied text wrapping for container width ${containerElement.width}px: "${normalizedNewName}" -> "${finalText}"`
-          )
-        }
+        // WICHTIG: Für Datenbank-Sync wird IMMER der ursprüngliche, ungetrennte Text verwendet!
+        // Der Text wird nur in der Anzeige getrennt, niemals in der Datenbank gespeichert.
 
         // Verwende updateTextContentOnly für Datenbank-Sync um Position zu erhalten
-        let updatedTextElement = updateTextContentOnly(element, finalText)
+        // HIER wird der ORIGINAL-Text (normalizedNewName) verwendet, NICHT der getrennte Text
+        let updatedTextElement = updateTextContentOnly(element, normalizedNewName)
 
         // Nur bei neuen Elementen oder wenn explizit gewünscht, verwende Container-Binding
         const isNewElement = !element.x || !element.y || element.x === 0 || element.y === 0
         if (isNewElement && containerElement) {
           console.log(`Element appears to be new (no valid position), applying container binding`)
-          updatedTextElement = updateTextWithContainerBinding(element, finalText, containerElement)
+          updatedTextElement = updateTextWithContainerBinding(
+            element,
+            normalizedNewName,
+            containerElement
+          )
         } else {
           console.log(
             `Preserving existing text position during database sync for element: ${element.id}`
@@ -691,10 +683,10 @@ export const syncDiagramOnSave = async (
     // Prüfe ob sich der Name geändert hat (mit normalisiertem Text)
     if (currentName && currentName.trim() !== '' && currentName !== lastSyncedName) {
       console.log(`Name changed, updating database: "${lastSyncedName}" -> "${currentName}"`)
-      
+
       // WICHTIG: Normalisiere den Namen vor dem Speichern (entferne Zeilenumbrüche)
       const normalizedName = currentName.trim().replace(/\n/g, ' ').replace(/\s+/g, ' ')
-      
+
       const success = await updateElementName(
         apolloClient,
         element.customData.databaseId,

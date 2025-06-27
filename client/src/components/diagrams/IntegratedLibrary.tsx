@@ -272,12 +272,14 @@ function createLibraryItemFromDatabaseElement(dbElement: any, elementType: strin
       // Get font size (with special handling for Application Interface)
       const fontSize = elementType === 'applicationInterface' ? 16 : element.fontSize || 20
 
-      // Auto-wrap text to fit within available width
-      const wrappedText = wrapTextToFitWidth(dbElement.name, availableWidth, fontSize)
+      // WICHTIG: Speichere den Original-Text, nicht den getrennten Text!
+      // Die Texttrennung sollte nur für die Anzeige verwendet werden, nicht für die Speicherung
+      newElement.text = dbElement.name
+      newElement.originalText = dbElement.name
+      newElement.rawText = dbElement.name
 
-      newElement.text = wrappedText
-      newElement.originalText = wrappedText
-      newElement.rawText = wrappedText
+      // Für Layout-Berechnungen verwenden wir eine getrennte Version, aber speichern sie NICHT
+      const wrappedTextForLayout = wrapTextToFitWidth(dbElement.name, availableWidth, fontSize)
 
       // Preserve the original template's text alignment if it exists, otherwise set defaults
       newElement.textAlign = element.textAlign || 'center'
@@ -303,7 +305,7 @@ function createLibraryItemFromDatabaseElement(dbElement: any, elementType: strin
 
             // Verwende die gemeinsame calculateCenteredTextPosition Funktion für konsistente Zentrierung
             const centeredPosition = calculateCenteredTextPosition(
-              wrappedText,
+              wrappedTextForLayout,
               containerRect,
               fontSize
             )
@@ -317,8 +319,10 @@ function createLibraryItemFromDatabaseElement(dbElement: any, elementType: strin
         }
       } else {
         // Fallback für Texte ohne Container: Verwende geschätzte Dimensionen
-        const lineCount = (wrappedText.match(/\n/g) || []).length + 1
-        const avgLineWidth = Math.max(...wrappedText.split('\n').map(line => line.length))
+        const lineCount = (wrappedTextForLayout.match(/\n/g) || []).length + 1
+        const avgLineWidth = Math.max(
+          ...wrappedTextForLayout.split('\n').map((line: string) => line.length)
+        )
 
         const estimatedWidth = Math.min(avgLineWidth * fontSize * 0.6, availableWidth)
         const estimatedHeight = lineCount * fontSize * 1.2

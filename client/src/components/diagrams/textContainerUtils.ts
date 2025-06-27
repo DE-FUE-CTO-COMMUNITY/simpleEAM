@@ -97,7 +97,208 @@ export const updateTextWithContainerBinding = (
 }
 
 /**
+ * Deutsche Worttrennungsregeln (erweitert und verbessert)
+ */
+const germanHyphenationRules = {
+  // Häufige Zusammensetzungsmuster (erweitert)
+  compounds: [
+    'heit',
+    'keit',
+    'ung',
+    'ing',
+    'lich',
+    'isch',
+    'bar',
+    'los',
+    'voll',
+    'arm',
+    'reich',
+    'frei',
+    'wert',
+    'würdig',
+    'schaft',
+    'tum',
+    'sam',
+    'haft',
+    'mäßig',
+    'weise',
+    'falls',
+  ],
+  // Vorsilben (erweitert)
+  prefixes: [
+    'ab',
+    'an',
+    'auf',
+    'aus',
+    'be',
+    'bei',
+    'durch',
+    'ein',
+    'ent',
+    'er',
+    'ge',
+    'mit',
+    'nach',
+    'über',
+    'um',
+    'un',
+    'unter',
+    'ver',
+    'vor',
+    'zu',
+    'zurück',
+    'zwischen',
+    'wieder',
+    'weiter',
+  ],
+  // Wortteile die nicht getrennt werden sollen (erweitert)
+  dontBreak: [
+    'sch',
+    'ch',
+    'th',
+    'ph',
+    'qu',
+    'ck',
+    'tz',
+    'st',
+    'sp',
+    'schr',
+    'spr',
+    'str',
+    'thr',
+    'phr',
+    'bl',
+    'br',
+    'cl',
+    'cr',
+    'dr',
+    'fl',
+    'fr',
+    'gl',
+    'gr',
+    'kl',
+    'kr',
+    'pl',
+    'pr',
+    'tr',
+  ],
+  // Bevorzugte Trennstellen (neue Kategorie)
+  preferredBreaks: ['tion', 'sion', 'ität', 'ieren', 'ierung', 'lich', 'isch'],
+}
+
+/**
+ * Intelligente deutsche Worttrennung (verbessert)
+ */
+const hyphenateGermanWord = (word: string, maxLength: number): string[] => {
+  if (word.length <= maxLength) {
+    return [word]
+  }
+
+  const lowerWord = word.toLowerCase()
+
+  // 1. Priorität: Versuche Trennung an bevorzugten Stellen
+  for (const preferredBreak of germanHyphenationRules.preferredBreaks) {
+    const index = lowerWord.lastIndexOf(preferredBreak)
+    if (index > 2 && index < word.length - 2) {
+      const firstPart = word.substring(0, index)
+      const secondPart = word.substring(index)
+
+      if (firstPart.length <= maxLength && secondPart.length <= maxLength) {
+        return [firstPart, secondPart]
+      } else if (firstPart.length <= maxLength) {
+        return [firstPart, ...hyphenateGermanWord(secondPart, maxLength)]
+      }
+    }
+  }
+
+  // 2. Priorität: Versuche Trennung an Zusammensetzungsmustern
+  for (const suffix of germanHyphenationRules.compounds) {
+    const index = lowerWord.lastIndexOf(suffix)
+    if (index > 2 && index < word.length - 2) {
+      const firstPart = word.substring(0, index)
+      const secondPart = word.substring(index)
+
+      if (firstPart.length <= maxLength && secondPart.length <= maxLength) {
+        return [firstPart, secondPart]
+      } else if (firstPart.length <= maxLength) {
+        return [firstPart, ...hyphenateGermanWord(secondPart, maxLength)]
+      }
+    }
+  }
+
+  // 3. Priorität: Versuche Trennung nach Vorsilben
+  for (const prefix of germanHyphenationRules.prefixes) {
+    if (lowerWord.startsWith(prefix) && word.length > prefix.length + 2) {
+      const firstPart = word.substring(0, prefix.length)
+      const secondPart = word.substring(prefix.length)
+
+      if (firstPart.length <= maxLength && secondPart.length <= maxLength) {
+        return [firstPart, secondPart]
+      } else if (secondPart.length <= maxLength) {
+        return [...hyphenateGermanWord(firstPart, maxLength), secondPart]
+      }
+    }
+  }
+
+  // 4. Priorität: Intelligente Vokal-Konsonant-Trennung
+  for (let i = Math.min(maxLength - 1, word.length - 3); i >= 3; i--) {
+    const char = word[i].toLowerCase()
+    const nextChar = word[i + 1]?.toLowerCase() || ''
+    const prevChar = word[i - 1]?.toLowerCase() || ''
+
+    // Prüfe Kombinationen die nicht getrennt werden sollen
+    const beforeBreak = prevChar + char
+    const afterBreak = char + nextChar
+    const tripleBreak = prevChar + char + nextChar
+
+    // Erweiterte Überprüfung für bessere Trennqualität
+    const isValidBreakPoint =
+      !germanHyphenationRules.dontBreak.includes(beforeBreak) &&
+      !germanHyphenationRules.dontBreak.includes(afterBreak) &&
+      !germanHyphenationRules.dontBreak.includes(tripleBreak) &&
+      // Vokal vor Konsonant ist eine natürliche Trennstelle
+      'aeiouäöü'.includes(prevChar) &&
+      !'aeiouäöü'.includes(char) &&
+      // Vermeide Trennung von Doppelkonsonanten
+      !(char === nextChar) &&
+      // Vermeide Trennung direkt vor oder nach 'h'
+      !(char === 'h' || nextChar === 'h' || prevChar === 'h')
+
+    if (isValidBreakPoint) {
+      const firstPart = word.substring(0, i)
+      const secondPart = word.substring(i)
+
+      if (firstPart.length >= 3 && secondPart.length >= 3) {
+        return [firstPart, ...hyphenateGermanWord(secondPart, maxLength)]
+      }
+    }
+  }
+
+  // 5. Letzter Ausweg: Intelligente harte Trennung
+  // Versuche an besseren Stellen zu trennen als mitten im Wort
+  const breakPoint = Math.min(maxLength - 1, word.length - 2)
+  return [
+    word.substring(0, breakPoint),
+    ...hyphenateGermanWord(word.substring(breakPoint), maxLength),
+  ]
+}
+
+/**
  * Wrapping-Funktion für Text basierend auf verfügbarer Breite
+ *
+ * ⚠️  KRITISCH: Diese Funktion ist AUSSCHLIESSLICH für die ANZEIGE gedacht! ⚠️
+ *
+ * Der ursprüngliche, ungetrennte Text MUSS für alle Datenbank-Operationen verwendet werden.
+ * Diese Funktion dient nur dazu, Text für die visuelle Darstellung in Containern zu umbrechen.
+ *
+ * Verwendung:
+ * - ✅ Für Anzeige und Layout-Berechnungen
+ * - ❌ NIEMALS für Speicherung in Datenbank oder Element.text
+ *
+ * Beispiel:
+ * - Original: "Qualitätssicherung"
+ * - Anzeige: "Qualitäts-\nsicherung"
+ * - Datenbank: "Qualitätssicherung" (Original bleibt unverändert!)
  */
 export const wrapTextToFitWidth = (
   text: string,
@@ -115,16 +316,21 @@ export const wrapTextToFitWidth = (
     return text
   }
 
-  // Text in Wörter aufteilen (verschiedene Trennzeichen berücksichtigen)
-  const words = text.split(/(\s+|-|_)/).filter(part => part.trim() || part === ' ')
+  // Text in Wörter aufteilen (nur an echten Wortgrenzen)
+  const words = text.split(/(\s+)/).filter(part => part.length > 0)
   const lines: string[] = []
   let currentLine = ''
 
   for (let i = 0; i < words.length; i++) {
     const word = words[i]
 
-    // Reine Leerzeichen überspringen, außer Leerzeichen zwischen Wörtern
-    if (word.trim() === '' && word !== ' ') continue
+    // Leerzeichen beibehalten
+    if (/^\s+$/.test(word)) {
+      if (currentLine.length + word.length <= maxCharsPerLine) {
+        currentLine += word
+      }
+      continue
+    }
 
     // Prüfen, ob das Hinzufügen dieses Wortes die Zeilenlänge überschreitet
     const testLine = currentLine + word
@@ -134,28 +340,30 @@ export const wrapTextToFitWidth = (
     } else {
       // Wenn aktuelle Zeile Inhalt hat, sie hinzufügen und neue Zeile beginnen
       if (currentLine.trim()) {
-        lines.push(currentLine.trim())
-        currentLine = word.trim() === '' ? '' : word
-      } else {
-        // Wenn einzelnes Wort zu lang ist, es aufteilen
-        if (word.length > maxCharsPerLine) {
-          // Langes Wort in Chunks aufteilen
-          let remainingWord = word
-          while (remainingWord.length > maxCharsPerLine) {
-            lines.push(remainingWord.substring(0, maxCharsPerLine - 1) + '-')
-            remainingWord = remainingWord.substring(maxCharsPerLine - 1)
-          }
-          currentLine = remainingWord
-        } else {
-          currentLine = word
+        lines.push(currentLine.trimEnd()) // Entferne nur nachfolgende Leerzeichen
+        currentLine = ''
+      }
+
+      // Wenn einzelnes Wort zu lang ist, verwende intelligente deutsche Trennung
+      if (word.length > maxCharsPerLine) {
+        const hyphenatedParts = hyphenateGermanWord(word, maxCharsPerLine)
+
+        // Füge alle Teile außer dem letzten zu den Zeilen hinzu
+        for (let j = 0; j < hyphenatedParts.length - 1; j++) {
+          lines.push(hyphenatedParts[j] + '-')
         }
+
+        // Der letzte Teil wird zur aktuellen Zeile
+        currentLine = hyphenatedParts[hyphenatedParts.length - 1]
+      } else {
+        currentLine = word
       }
     }
   }
 
   // Letzte Zeile hinzufügen, wenn sie Inhalt hat
   if (currentLine.trim()) {
-    lines.push(currentLine.trim())
+    lines.push(currentLine.trimEnd())
   }
 
   // Auf maximal 2 Zeilen begrenzen für bessere Formatierung in Library-Elementen
