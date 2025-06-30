@@ -97,10 +97,10 @@ export function createCapabilityElementsFromTemplate(
     }
   })
 
-  // Calculate offset to position template at target coordinates
-  const templateRect = template.elements.find((el: any) => el.type === 'rectangle')
-  const offsetX = templateRect ? targetX - templateRect.x : targetX
-  const offsetY = templateRect ? targetY - templateRect.y : targetY
+  // Since the library is now normalized to start at (0,0),
+  // we can directly position the template at the target coordinates
+  const offsetX = targetX
+  const offsetY = targetY
 
   // Clone template elements with new IDs and updated content
   const elements = template.elements.map((element: any, index: number) => {
@@ -754,6 +754,5 @@ export const generateCapabilityMapElements = (
     }
   })
 
-  console.log(`Generated ${elements.length} elements for capability map (fallback)`)
   return elements
 }

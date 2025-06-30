@@ -116,6 +116,8 @@ export async function loadArchimateLibrary(): Promise<ArchiMateLibrary | null> {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
     const library = await response.json()
+
+    console.log('📚 ArchiMate library loaded successfully')
     return library
   } catch (error) {
     console.warn('Fehler beim Laden der ArchiMate-Bibliothek:', error)
