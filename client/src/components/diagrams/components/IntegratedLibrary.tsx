@@ -4,6 +4,7 @@ import React, { useEffect, useState, useMemo } from 'react'
 import { useQuery } from '@apollo/client'
 import { GET_LIBRARY_ELEMENTS } from '@/graphql/library'
 import { wrapTextToFitWidth, calculateCenteredTextPosition } from '../utils/textContainerUtils'
+import { findArchimateTemplate, loadArchimateLibrary } from '../utils/archimateLibraryUtils'
 
 interface IntegratedLibraryProps {
   excalidrawAPI: any
@@ -23,20 +24,16 @@ const IntegratedLibrary: React.FC<IntegratedLibraryProps> = ({
 
   // Load original ArchiMate library
   useEffect(() => {
-    const loadArchimateLibrary = async () => {
+    const loadLibrary = async () => {
       try {
-        const response = await fetch('/libraries/archimate-symbols.excalidrawlib')
-        if (!response.ok) {
-          throw new Error('Fehler beim Laden der ArchiMate-Bibliothek')
-        }
-        const library = await response.json()
+        const library = await loadArchimateLibrary()
         setArchimateLibrary(library)
       } catch {
         // Fehler beim Laden der ArchiMate-Bibliothek
       }
     }
 
-    loadArchimateLibrary()
+    loadLibrary()
   }, [])
 
   // Create integrated library combining ArchiMate symbols with database elements
@@ -153,56 +150,6 @@ const IntegratedLibrary: React.FC<IntegratedLibraryProps> = ({
   }, [integratedLibrary, excalidrawAPI, onLibraryUpdate, archimateLibrary])
 
   return null // This component doesn't render anything
-}
-
-// Helper function to find ArchiMate template by name or type
-function findArchimateTemplate(library: any, templateName: string) {
-  // First try to find by name property
-  let item = library.libraryItems.find((item: any) => item.name === templateName)
-
-  // If not found, try to find by text content
-  if (!item) {
-    item = library.libraryItems.find((item: any) =>
-      item.elements.some(
-        (element: any) =>
-          element.type === 'text' && element.text && element.text.includes(templateName)
-      )
-    )
-  }
-
-  // If not found, try alternative names
-  if (!item) {
-    const alternatives = {
-      Capability: ['Business Function', 'Business Capability', 'Business'],
-      'Application Component': ['Application', 'App Component'],
-      'Business Object': ['Data Object', 'Data', 'Object'],
-      'Application Interface': ['Interface', 'API'],
-    }
-
-    const alts = alternatives[templateName as keyof typeof alternatives] || []
-    for (const alt of alts) {
-      // Try by name first
-      item = library.libraryItems.find((libItem: any) => libItem.name === alt)
-      if (item) break
-
-      // Then try by text content
-      item = library.libraryItems.find((libItem: any) =>
-        libItem.elements.some(
-          (element: any) => element.type === 'text' && element.text && element.text.includes(alt)
-        )
-      )
-      if (item) break
-    }
-  }
-
-  // If still not found, use the first rectangular item as fallback
-  if (!item) {
-    item = library.libraryItems.find((libItem: any) =>
-      libItem.elements.some((element: any) => element.type === 'rectangle')
-    )
-  }
-
-  return item || null
 }
 
 // Helper function to create library item from database element
