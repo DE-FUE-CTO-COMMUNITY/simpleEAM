@@ -14,8 +14,51 @@ export function findArchimateTemplate(
   library: ArchiMateLibrary,
   templateName: string
 ): LibraryTemplate | null {
+  // Debug: Log all available templates
+  if (typeof window !== 'undefined' && templateName === 'Capability') {
+    console.log(
+      '🔍 Available templates in library:',
+      library.libraryItems.map(item => ({
+        name: item.name,
+        id: item.id,
+        elementCount: item.elements?.length || 0,
+        textElements:
+          item.elements?.filter((el: any) => el.type === 'text').map((el: any) => el.text) || [],
+      }))
+    )
+  }
+
   // First try to find by name property
   let item = library.libraryItems.find((item: any) => item.name === templateName)
+
+  // Debug: Log result
+  if (typeof window !== 'undefined' && templateName === 'Capability') {
+    console.log(
+      `🎯 Found template by name "${templateName}":`,
+      item
+        ? {
+            name: item.name,
+            id: item.id,
+            elementCount: item.elements?.length || 0,
+          }
+        : 'NOT FOUND'
+    )
+
+    // Debug: Log actual template coordinates
+    if (item) {
+      console.log(
+        '🔍 Template element coordinates:',
+        item.elements.map((el: any) => ({
+          id: el.id,
+          type: el.type,
+          x: el.x,
+          y: el.y,
+          width: el.width,
+          height: el.height,
+        }))
+      )
+    }
+  }
 
   // If not found, try to find by text content
   if (!item) {

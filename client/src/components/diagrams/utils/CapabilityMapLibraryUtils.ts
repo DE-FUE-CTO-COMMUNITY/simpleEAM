@@ -97,10 +97,41 @@ export function createCapabilityElementsFromTemplate(
     }
   })
 
-  // Since the library is now normalized to start at (0,0),
-  // we can directly position the template at the target coordinates
-  const offsetX = targetX
-  const offsetY = targetY
+  // Calculate template bounding box for proper positioning
+  const templateBounds = {
+    minX: Math.min(...template.elements.map((el: any) => el.x)),
+    minY: Math.min(...template.elements.map((el: any) => el.y)),
+    maxX: Math.max(...template.elements.map((el: any) => el.x + (el.width || 0))),
+    maxY: Math.max(...template.elements.map((el: any) => el.y + (el.height || 0))),
+  }
+
+  // Calculate offset to position template at target coordinates
+  // We want the template's top-left corner to be at (targetX, targetY)
+  const offsetX = targetX - templateBounds.minX
+  const offsetY = targetY - templateBounds.minY
+
+  // Debug: Log template positioning calculations
+  if (
+    typeof window !== 'undefined' &&
+    (elementType === 'capability' || elementType === 'businessCapability')
+  ) {
+    console.log('📐 Template bounding box:', templateBounds)
+    console.log('🎯 Target position:', { targetX, targetY })
+    console.log('📍 Calculated offset:', { offsetX, offsetY })
+    console.log(
+      '📋 Template elements before positioning:',
+      template.elements.map(el => ({
+        id: el.id,
+        type: el.type,
+        x: el.x,
+        y: el.y,
+        width: el.width,
+        height: el.height,
+        groupIds: el.groupIds,
+        text: el.type === 'text' ? el.text : undefined,
+      }))
+    )
+  }
 
   // Clone template elements with new IDs and updated content
   const elements = template.elements.map((element: any, index: number) => {
@@ -133,6 +164,46 @@ export function createCapabilityElementsFromTemplate(
         }
         if (customizations?.backgroundColor) {
           newElement.backgroundColor = customizations.backgroundColor
+        }
+      } else {
+        // This is likely an icon element - check if it needs repositioning
+        const mainContainer = template.elements.find(
+          (el: any, idx: number) =>
+            el.type === 'rectangle' &&
+            ((el.boundElements && el.boundElements.length > 0) ||
+              (el.width > 100 && el.height > 50) ||
+              idx === 0)
+        )
+
+        if (mainContainer && element.id.includes('icon')) {
+          // Calculate the relative position of the icon within the main container
+          const relativeX = element.x - mainContainer.x
+          const relativeY = element.y - mainContainer.y
+
+          // Apply the custom width adjustment if provided
+          const containerWidth = customizations?.width || mainContainer.width
+          const containerHeight = customizations?.height || mainContainer.height
+
+          // If icon is positioned beyond the original container width, adjust it
+          if (relativeX > mainContainer.width - 30) {
+            // Icons should be within 30px of right edge
+            const iconOffsetFromRight = mainContainer.width - relativeX
+            newElement.x = targetX + containerWidth - iconOffsetFromRight
+          }
+
+          // Debug: Log icon repositioning
+          if (
+            typeof window !== 'undefined' &&
+            (elementType === 'capability' || elementType === 'businessCapability')
+          ) {
+            console.log(`🔧 Icon ${element.id} repositioning:`, {
+              original: { x: element.x, y: element.y },
+              relative: { x: relativeX, y: relativeY },
+              mainContainer: { width: mainContainer.width, height: mainContainer.height },
+              customContainer: { width: containerWidth, height: containerHeight },
+              final: { x: newElement.x, y: newElement.y },
+            })
+          }
         }
       }
     }
@@ -243,6 +314,36 @@ export function createCapabilityElementsFromTemplate(
 
     return newElement
   })
+
+  // Debug: Log final positioned elements
+  if (
+    typeof window !== 'undefined' &&
+    (elementType === 'capability' || elementType === 'businessCapability')
+  ) {
+    console.log(
+      '🔧 Final positioned elements:',
+      elements.map(el => ({
+        id: el.id.slice(0, 8) + '...',
+        type: el.type,
+        x: el.x,
+        y: el.y,
+        width: el.width,
+        height: el.height,
+        groupIds: el.groupIds?.length || 0,
+        text: el.type === 'text' ? el.text : undefined,
+      }))
+    )
+
+    // Verify relative positioning is maintained
+    const finalBounds = {
+      minX: Math.min(...elements.map((el: any) => el.x)),
+      minY: Math.min(...elements.map((el: any) => el.y)),
+      maxX: Math.max(...elements.map((el: any) => el.x + (el.width || 0))),
+      maxY: Math.max(...elements.map((el: any) => el.y + (el.height || 0))),
+    }
+    console.log('📦 Final element bounds:', finalBounds)
+    console.log('✅ Top-left should be at:', { x: targetX, y: targetY })
+  }
 
   // CRITICAL: Update boundElements references to use new IDs for proper text-container binding
   elements.forEach((element: any) => {
@@ -362,23 +463,36 @@ export const generateCapabilityMapWithLibrary = async (
   const baseWidth = templateWidth
   const baseHeight = templateHeight
 
+  // Calculate uniform container height based on maximum children across all top-level capabilities
+  let uniformContainerHeight = baseHeight
+  if (settings.maxLevels > 1) {
+    let maxChildrenCount = 0
+    
+    // Find the maximum number of children among all top-level capabilities
+    topLevelCapabilities.forEach((capability) => {
+      const children = findChildCapabilities(capability.id, capabilities)
+      const childrenToShow = children.slice(0, settings.maxLevels > 2 ? 10 : children.length)
+      maxChildrenCount = Math.max(maxChildrenCount, childrenToShow.length)
+    })
+
+    // Calculate needed height for the maximum number of children
+    const childSpacing = 10
+    const childAreaHeight = maxChildrenCount * (baseHeight + childSpacing)
+    uniformContainerHeight = Math.max(baseHeight, baseHeight + childAreaHeight + 40)
+    
+    console.log('📏 Uniform height calculation:', {
+      maxChildrenCount,
+      baseHeight,
+      childAreaHeight,
+      uniformContainerHeight
+    })
+  }
+
   // Generate top-level capabilities horizontally
   topLevelCapabilities.forEach((capability, index) => {
     const x = startX + index * (baseWidth + settings.horizontalSpacing)
     const y = startY
     const capabilityGroupId = generateId()
-
-    // Calculate container height based on children if we're showing multiple levels
-    let containerHeight = baseHeight
-    if (settings.maxLevels > 1) {
-      const children = findChildCapabilities(capability.id, capabilities)
-      const childrenToShow = children.slice(0, settings.maxLevels > 2 ? 10 : children.length)
-
-      // Calculate needed height for children (each child uses template height + spacing)
-      const childSpacing = 10
-      const childAreaHeight = childrenToShow.length * (baseHeight + childSpacing)
-      containerHeight = Math.max(baseHeight, baseHeight + childAreaHeight + 40)
-    }
 
     // Create main capability using the refactored helper function
     const capabilityElements = createCapabilityElementsFromTemplate(
@@ -389,7 +503,7 @@ export const generateCapabilityMapWithLibrary = async (
       y,
       capabilityGroupId,
       {
-        height: containerHeight,
+        height: uniformContainerHeight,
         backgroundColor: '#ffffff',
       }
     )
@@ -483,6 +597,28 @@ export const generateCapabilityMapElements = (
   // Initialize indices for this fallback function
   initializeIndices(100)
 
+  // Calculate uniform container height based on maximum children across all top-level capabilities
+  let uniformContainerHeight = baseHeight
+  if (settings.maxLevels > 1) {
+    let maxChildrenCount = 0
+    
+    // Find the maximum number of children among all top-level capabilities
+    topLevelCapabilities.forEach((capability) => {
+      const children = findChildCapabilities(capability.id, capabilities)
+      const childrenToShow = children.slice(0, settings.maxLevels > 2 ? 10 : children.length)
+      maxChildrenCount = Math.max(maxChildrenCount, childrenToShow.length)
+    })
+
+    // Calculate needed height for the maximum number of children
+    uniformContainerHeight = Math.max(baseHeight, (maxChildrenCount + 1) * (baseHeight + 20) + 40)
+    
+    console.log('📏 Fallback uniform height calculation:', {
+      maxChildrenCount,
+      baseHeight,
+      uniformContainerHeight
+    })
+  }
+
   // Generate top-level capabilities horizontally
   topLevelCapabilities.forEach((capability, index) => {
     const x = startX + index * (baseWidth + settings.horizontalSpacing)
@@ -493,14 +629,6 @@ export const generateCapabilityMapElements = (
     const textElementId = generateId()
     const capabilityGroupId = generateId()
 
-    // Calculate height based on children if we're showing multiple levels
-    let containerHeight = baseHeight
-    if (settings.maxLevels > 1) {
-      const children = findChildCapabilities(capability.id, capabilities)
-      const childrenToShow = children.slice(0, settings.maxLevels > 2 ? 10 : children.length)
-      containerHeight = Math.max(baseHeight, (childrenToShow.length + 1) * (baseHeight + 20) + 40)
-    }
-
     // Main capability rectangle
     const mainRect: ExcalidrawElement = {
       id: mainElementId,
@@ -508,7 +636,7 @@ export const generateCapabilityMapElements = (
       x,
       y,
       width: baseWidth,
-      height: containerHeight,
+      height: uniformContainerHeight,
       angle: 0,
       strokeColor: '#1e1e1e',
       backgroundColor: 'transparent',

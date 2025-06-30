@@ -16,10 +16,10 @@ import {
 } from '@mui/material'
 import { useQuery } from '@apollo/client'
 import { GET_CAPABILITY_MAP_DATA } from '@/graphql/capability'
-import { 
-  generateCapabilityMapWithLibrary, 
+import {
+  generateCapabilityMapWithLibrary,
   generateCapabilityMapElements,
-  type CapabilityMapSettings 
+  type CapabilityMapSettings,
 } from '../utils/CapabilityMapLibraryUtils'
 
 interface CapabilityMapGeneratorProps {
@@ -28,16 +28,16 @@ interface CapabilityMapGeneratorProps {
   onElementsGenerated?: (elements: any[]) => void
 }
 
-const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({ 
-  open, 
-  onClose, 
-  onElementsGenerated 
+const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
+  open,
+  onClose,
+  onElementsGenerated,
 }) => {
   const [settings, setSettings] = useState<CapabilityMapSettings>({
     maxLevels: 3,
     includeApplications: true,
-    horizontalSpacing: 200,
-    verticalSpacing: 100,
+    horizontalSpacing: 10,
+    verticalSpacing: 10,
   })
 
   const [useArchimateSymbols, setUseArchimateSymbols] = useState(true)
@@ -59,7 +59,7 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
       if (useArchimateSymbols) {
         // Try to use ArchiMate symbols from library
         elements = await generateCapabilityMapWithLibrary(data.businessCapabilities, settings)
-        
+
         // If ArchiMate generation failed, fallback to simple rectangles
         if (elements.length === 0) {
           console.warn('ArchiMate-Generierung fehlgeschlagen, verwende einfache Rechtecke')
@@ -69,12 +69,12 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
         // Use simple rectangles
         elements = generateCapabilityMapElements(data.businessCapabilities, settings)
       }
-      
+
       console.log('Capability Map Generator erfolgreich:', {
         settings,
         useArchimateSymbols,
         capabilitiesCount: data.businessCapabilities.length,
-        elementsGenerated: elements.length,
+        capabilitiesGenerated: data.businessCapabilities.length,
       })
 
       // Pass elements to parent component if callback provided
@@ -130,7 +130,7 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
                   control={
                     <Switch
                       checked={useArchimateSymbols}
-                      onChange={(e) => setUseArchimateSymbols(e.target.checked)}
+                      onChange={e => setUseArchimateSymbols(e.target.checked)}
                     />
                   }
                   label="ArchiMate-Symbole verwenden"
@@ -143,9 +143,7 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
                   label="Maximale Hierarchie-Ebenen"
                   type="number"
                   value={settings.maxLevels}
-                  onChange={e =>
-                    handleSettingChange('maxLevels', parseInt(e.target.value) || 1)
-                  }
+                  onChange={e => handleSettingChange('maxLevels', parseInt(e.target.value) || 1)}
                   inputProps={{ min: 1, max: 5 }}
                   fullWidth
                   margin="normal"
@@ -167,9 +165,9 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
                   type="number"
                   value={settings.horizontalSpacing}
                   onChange={e =>
-                    handleSettingChange('horizontalSpacing', parseInt(e.target.value) || 200)
+                    handleSettingChange('horizontalSpacing', parseInt(e.target.value) || 10)
                   }
-                  inputProps={{ min: 100, max: 500 }}
+                  inputProps={{ min: 10, max: 500 }}
                   fullWidth
                   margin="normal"
                   helperText="Abstand zwischen Capabilities in Pixeln"
@@ -180,9 +178,9 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
                   type="number"
                   value={settings.verticalSpacing}
                   onChange={e =>
-                    handleSettingChange('verticalSpacing', parseInt(e.target.value) || 100)
+                    handleSettingChange('verticalSpacing', parseInt(e.target.value) || 10)
                   }
-                  inputProps={{ min: 50, max: 300 }}
+                  inputProps={{ min: 10, max: 300 }}
                   fullWidth
                   margin="normal"
                   helperText="Abstand zwischen Hierarchie-Ebenen in Pixeln"
