@@ -22,12 +22,12 @@ import { useAuth } from '@/lib/auth'
 import {
   createDiagramRelationshipUpdates,
   createDiagramRelationshipUpdatesWithDisconnect,
-} from './diagramRelationshipUtils'
+} from '../utils/diagramRelationshipUtils'
 import {
   detectNewElements,
   createNewElementsInDatabase,
   updateElementsWithDatabaseReferences,
-} from './newElementsUtils'
+} from '../utils/newElementsUtils'
 import { NewElementsDialog } from './NewElementsDialog'
 
 export interface DiagramType {

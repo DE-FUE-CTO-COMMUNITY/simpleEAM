@@ -20,7 +20,7 @@ import {
   generateCapabilityMapWithLibrary, 
   generateCapabilityMapElements,
   type CapabilityMapSettings 
-} from './utils/CapabilityMapGeneratorWithLibrary'
+} from '../utils/CapabilityMapLibraryUtils'
 
 interface CapabilityMapGeneratorProps {
   open: boolean
