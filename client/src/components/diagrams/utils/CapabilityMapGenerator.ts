@@ -1,5 +1,5 @@
 import type { BusinessCapability } from '@/gql/generated'
-import { generateNKeysBetween } from "fractional-indexing"
+import { generateNKeysBetween } from 'fractional-indexing'
 
 export interface CapabilityMapSettings {
   maxLevels: number
@@ -66,19 +66,39 @@ export const generateSeed = (): number => {
   return Math.floor(Math.random() * 2 ** 31)
 }
 
-// Index generation for proper z-ordering using Excalidraw's fractional indexing
-export const generateIndices = (count: number, after?: string, before?: string): string[] => {
+// Simple but robust index generation for z-ordering
+let indexCounter = 0
+
+export const generateIndex = (): string => {
   try {
-    return generateNKeysBetween(after || null, before || null, count) as string[]
-  } catch (error) {
-    console.warn('Failed to generate fractional indices, falling back to simple generation:', error)
-    // Fallback to simple sequential generation
-    const indices: string[] = []
-    for (let i = 0; i < count; i++) {
-      indices.push(`a${i.toString().padStart(2, '0')}`)
+    // Try to use Excalidraw's fractional indexing API if available
+    if (typeof generateNKeysBetween === 'function') {
+      const indices = generateNKeysBetween(null, null, 1)
+      if (indices && indices.length > 0) {
+        return indices[0]
+      }
     }
-    return indices
+  } catch (error) {
+    console.warn('Fractional indexing failed, using fallback:', error)
   }
+
+  // Fallback to simple, reliable index generation
+  indexCounter++
+  return `a${indexCounter.toString(36)}`
+}
+
+// Reset index generation for new batches
+export const resetIndexGeneration = (): void => {
+  indexCounter = 0
+}
+
+// Legacy function for compatibility
+export const generateIndices = (count: number, _after?: string, _before?: string): string[] => {
+  const indices: string[] = []
+  for (let i = 0; i < count; i++) {
+    indices.push(generateIndex())
+  }
+  return indices
 }
 
 // Helper function to calculate text width (approximation)
@@ -97,7 +117,9 @@ export const calculateCenteredTextPosition = (
 }
 
 // Helper function to find top-level capabilities (no parents)
-export const findTopLevelCapabilities = (capabilities: BusinessCapability[]): BusinessCapability[] => {
+export const findTopLevelCapabilities = (
+  capabilities: BusinessCapability[]
+): BusinessCapability[] => {
   return capabilities.filter(cap => !cap.parents || cap.parents.length === 0)
 }
 
@@ -106,8 +128,8 @@ export const findChildCapabilities = (
   parentId: string,
   capabilities: BusinessCapability[]
 ): BusinessCapability[] => {
-  return capabilities.filter(cap => 
-    cap.parents && cap.parents.some(parent => parent.id === parentId)
+  return capabilities.filter(
+    cap => cap.parents && cap.parents.some(parent => parent.id === parentId)
   )
 }
 
@@ -117,10 +139,13 @@ export const generateCapabilityMapElements = (
   settings: CapabilityMapSettings
 ): ExcalidrawElement[] => {
   const elements: ExcalidrawElement[] = []
-  
+
+  // Reset index generation for consistent ordering
+  resetIndexGeneration()
+
   // Find top-level capabilities
   const topLevelCapabilities = findTopLevelCapabilities(capabilities)
-  
+
   if (topLevelCapabilities.length === 0) {
     console.warn('No top-level capabilities found')
     return elements
@@ -131,32 +156,9 @@ export const generateCapabilityMapElements = (
   const baseWidth = 250
   const baseHeight = 80
 
-  // Calculate total number of elements to generate proper indices
-  let totalElements = 0
-  topLevelCapabilities.forEach(capability => {
-    totalElements += 2 // rectangle + text
-    if (settings.maxLevels > 1) {
-      const children = findChildCapabilities(capability.id, capabilities)
-      const childrenToShow = children.slice(0, settings.maxLevels > 2 ? 10 : children.length)
-      totalElements += childrenToShow.length * 2 // each child has rectangle + text
-      
-      if (settings.includeApplications) {
-        childrenToShow.forEach(child => {
-          if (child.supportedByApplications) {
-            totalElements += Math.min(child.supportedByApplications.length, 3) // max 3 apps per child
-          }
-        })
-      }
-    }
-  })
-
-  // Generate indices for all elements
-  const indices = generateIndices(totalElements)
-  let currentIndex = 0
-
   // Generate top-level capabilities horizontally
   topLevelCapabilities.forEach((capability, index) => {
-    const x = startX + (index * (baseWidth + settings.horizontalSpacing))
+    const x = startX + index * (baseWidth + settings.horizontalSpacing)
     const y = startY
 
     // Create main capability container
@@ -190,7 +192,7 @@ export const generateCapabilityMapElements = (
       opacity: 100,
       groupIds: [capabilityGroupId],
       frameId: null,
-      index: indices[currentIndex++],
+      index: generateIndex(),
       roundness: null,
       seed: generateSeed(),
       version: 1,
@@ -231,7 +233,7 @@ export const generateCapabilityMapElements = (
       opacity: 100,
       groupIds: [capabilityGroupId],
       frameId: null,
-      index: indices[currentIndex++],
+      index: generateIndex(),
       roundness: null,
       seed: generateSeed(),
       version: 1,
@@ -267,7 +269,7 @@ export const generateCapabilityMapElements = (
 
       childrenToShow.forEach((child, childIndex) => {
         const childX = x + 10
-        const childY = y + baseHeight + 20 + (childIndex * (50 + 10))
+        const childY = y + baseHeight + 20 + childIndex * (50 + 10)
         const childWidth = baseWidth - 20
         const childHeight = 40
 
@@ -292,7 +294,7 @@ export const generateCapabilityMapElements = (
           opacity: 100,
           groupIds: [capabilityGroupId],
           frameId: null,
-          index: indices[currentIndex++],
+          index: generateIndex(),
           roundness: null,
           seed: generateSeed(),
           version: 1,
@@ -333,7 +335,7 @@ export const generateCapabilityMapElements = (
           opacity: 100,
           groupIds: [capabilityGroupId],
           frameId: null,
-          index: indices[currentIndex++],
+          index: generateIndex(),
           roundness: null,
           seed: generateSeed(),
           version: 1,
@@ -363,10 +365,14 @@ export const generateCapabilityMapElements = (
         elements.push(childRect, childText)
 
         // Add applications if enabled
-        if (settings.includeApplications && child.supportedByApplications && child.supportedByApplications.length > 0) {
+        if (
+          settings.includeApplications &&
+          child.supportedByApplications &&
+          child.supportedByApplications.length > 0
+        ) {
           child.supportedByApplications.slice(0, 3).forEach((app, appIndex) => {
             const appX = childX + 5
-            const appY = childY + childHeight + 5 + (appIndex * 15)
+            const appY = childY + childHeight + 5 + appIndex * 15
             const appTextId = generateId()
 
             const appText: ExcalidrawElement = {
@@ -386,7 +392,7 @@ export const generateCapabilityMapElements = (
               opacity: 100,
               groupIds: [capabilityGroupId],
               frameId: null,
-              index: indices[currentIndex++],
+              index: generateIndex(),
               roundness: null,
               seed: generateSeed(),
               version: 1,
