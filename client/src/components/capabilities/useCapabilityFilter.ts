@@ -1,11 +1,11 @@
 'use client'
 
 import { useMemo } from 'react'
-import { Capability, FilterState } from './types'
-import { CapabilityStatus } from '../../gql/generated'
+import { FilterState } from './types'
+import { CapabilityStatus, BusinessCapability } from '../../gql/generated'
 
 interface UseCapabilityFilterProps {
-  capabilities: Capability[]
+  capabilities: BusinessCapability[]
   filterState: FilterState
 }
 
@@ -22,7 +22,7 @@ export const useCapabilityFilter = ({ capabilities, filterState }: UseCapability
 
   // Filterfunktion für erweiterte Filter
   const filteredData = useMemo(() => {
-    return capabilities.filter((capability: Capability) => {
+    return capabilities.filter((capability: BusinessCapability) => {
       // Status Filter
       if (
         statusFilter.length > 0 &&
@@ -50,7 +50,7 @@ export const useCapabilityFilter = ({ capabilities, filterState }: UseCapability
       // Tags Filter
       if (
         tagsFilter.length > 0 &&
-        (!capability.tags || !capability.tags.some(tag => tagsFilter.includes(tag)))
+        (!capability.tags || !capability.tags.some((tag: string) => tagsFilter.includes(tag)))
       ) {
         return false
       }
@@ -67,8 +67,7 @@ export const useCapabilityFilter = ({ capabilities, filterState }: UseCapability
       // Verantwortlicher-Filter
       if (
         ownerFilter &&
-        (!capability.owners ||
-          !capability.owners.some(owner => owner.id === ownerFilter))
+        (!capability.owners || !capability.owners.some((owner: any) => owner.id === ownerFilter))
       ) {
         return false
       }

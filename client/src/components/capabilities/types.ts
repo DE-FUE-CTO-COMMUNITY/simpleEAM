@@ -14,6 +14,9 @@ export type Capability = Pick<
   | 'createdAt'
   | 'updatedAt'
   | 'children'
+  | 'parents'
+  | 'supportedByApplications'
+  | 'partOfArchitectures'
 >
 
 export interface FilterState {

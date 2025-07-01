@@ -21,7 +21,7 @@ import CapabilityTable from '@/components/capabilities/CapabilityTable'
 import CapabilityToolbar from '@/components/capabilities/CapabilityToolbar'
 import CapabilityFilterDialog from '@/components/capabilities/CapabilityFilterDialog'
 import { useCapabilityFilter } from '@/components/capabilities/useCapabilityFilter'
-import { Capability, FilterState } from '@/components/capabilities/types'
+import { FilterState } from '@/components/capabilities/types'
 
 const CapabilitiesPage = () => {
   const { authenticated } = useAuth()
@@ -60,11 +60,11 @@ const CapabilitiesPage = () => {
   // Verfügbare Status und Tags aus den geladenen Daten extrahieren
   useEffect(() => {
     if (data?.businessCapabilities?.length) {
-      const capabilities = data.businessCapabilities as Capability[]
+      const capabilities = data.businessCapabilities as BusinessCapability[]
 
       // Alle Status extrahieren und Duplikate entfernen
       const allStatuses: CapabilityStatus[] = capabilities
-        .map((cap: Capability) => cap.status)
+        .map((cap: BusinessCapability) => cap.status)
         .filter(Boolean) as CapabilityStatus[]
 
       const uniqueStatuses = Array.from(new Set(allStatuses)).sort()
@@ -72,7 +72,7 @@ const CapabilitiesPage = () => {
 
       // Alle Tags sammeln und Duplikate entfernen
       const allTags: string[] = []
-      capabilities.forEach((cap: Capability) => {
+      capabilities.forEach((cap: BusinessCapability) => {
         if (cap.tags && Array.isArray(cap.tags)) {
           allTags.push(...cap.tags)
         }
@@ -138,7 +138,15 @@ const CapabilitiesPage = () => {
 
   // Handler für das Erstellen einer neuen Business Capability
   const handleCreateCapabilitySubmit = async (data: CapabilityFormValues) => {
-    const { parentId: parent, ownerId, ...capabilityData } = data
+    const {
+      parentId: parent,
+      ownerId,
+      children,
+      supportedByApplications,
+      partOfArchitectures,
+      ...capabilityData
+    } = data
+
     // Bei CREATE wird kein spezielles Mutation-Objekt benötigt, da direkte Werte erlaubt sind
     const input = {
       name: capabilityData.name,
@@ -162,6 +170,36 @@ const CapabilitiesPage = () => {
             },
           }
         : {}),
+      // Untergeordnete Capabilities
+      ...(children && children.length > 0
+        ? {
+            children: {
+              connect: children.map((childId: string) => ({
+                where: { node: { id: { eq: childId } } },
+              })),
+            },
+          }
+        : {}),
+      // Unterstützende Applikationen
+      ...(supportedByApplications && supportedByApplications.length > 0
+        ? {
+            supportedByApplications: {
+              connect: supportedByApplications.map((appId: string) => ({
+                where: { node: { id: { eq: appId } } },
+              })),
+            },
+          }
+        : {}),
+      // Architekturen
+      ...(partOfArchitectures && partOfArchitectures.length > 0
+        ? {
+            partOfArchitectures: {
+              connect: partOfArchitectures.map((archId: string) => ({
+                where: { node: { id: { eq: archId } } },
+              })),
+            },
+          }
+        : {}),
     }
 
     await createCapability({
@@ -174,8 +212,14 @@ const CapabilitiesPage = () => {
 
   // Handler für das Aktualisieren einer bestehenden Business Capability
   const handleUpdateCapabilitySubmit = async (id: string, data: CapabilityFormValues) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { parentId, ownerId, ...capabilityData } = data
+    const {
+      parentId,
+      ownerId,
+      children,
+      supportedByApplications,
+      partOfArchitectures,
+      ...capabilityData
+    } = data
 
     // Basis-Input-Daten vorbereiten
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -190,46 +234,95 @@ const CapabilitiesPage = () => {
 
     // Aktualisierung der Owner-Beziehung, wenn ein Besitzer ausgewählt wurde
     if (ownerId) {
-      // Wir setzen die owners-Beziehung (nur einen Owner, auch wenn das Datenmodell mehrere unterstützt)
-      // Gemäß den generierten GraphQL-Typen benötigen wir die richtige Struktur ohne disconnectAll
       input.owners = {
         disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
         connect: [
           {
             where: {
               node: {
-                id: { eq: ownerId }, // ID muss als IdScalarFilters-Objekt übergeben werden
+                id: { eq: ownerId },
               },
             },
           },
-        ], // Verbinde mit dem neuen Besitzer
+        ],
       }
     } else {
-      // Wenn kein Besitzer ausgewählt wurde, entfernen wir alle Besitzer
       input.owners = {
-        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+        disconnect: [{ where: {} }],
       }
     }
 
-    // Aktualisierung der übergeordneten Capability, wenn eine ausgewählt wurde
+    // Aktualisierung der übergeordneten Capability
     if (parentId) {
-      // Wir setzen die parents-Beziehung
       input.parents = {
-        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+        disconnect: [{ where: {} }],
         connect: [
           {
             where: {
               node: {
-                id: { eq: parentId }, // ID muss als IdScalarFilters-Objekt übergeben werden
+                id: { eq: parentId },
               },
             },
           },
-        ], // Verbinde mit der neuen übergeordneten Capability
+        ],
       }
     } else {
-      // Wenn keine übergeordnete Capability ausgewählt wurde, entfernen wir alle Verbindungen
       input.parents = {
-        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+        disconnect: [{ where: {} }],
+      }
+    }
+
+    // Aktualisierung der untergeordneten Capabilities
+    if (children && children.length > 0) {
+      input.children = {
+        disconnect: [{ where: {} }],
+        connect: children.map((childId: string) => ({
+          where: {
+            node: {
+              id: { eq: childId },
+            },
+          },
+        })),
+      }
+    } else {
+      input.children = {
+        disconnect: [{ where: {} }],
+      }
+    }
+
+    // Aktualisierung der unterstützenden Applikationen
+    if (supportedByApplications && supportedByApplications.length > 0) {
+      input.supportedByApplications = {
+        disconnect: [{ where: {} }],
+        connect: supportedByApplications.map((appId: string) => ({
+          where: {
+            node: {
+              id: { eq: appId },
+            },
+          },
+        })),
+      }
+    } else {
+      input.supportedByApplications = {
+        disconnect: [{ where: {} }],
+      }
+    }
+
+    // Aktualisierung der Architekturen
+    if (partOfArchitectures && partOfArchitectures.length > 0) {
+      input.partOfArchitectures = {
+        disconnect: [{ where: {} }],
+        connect: partOfArchitectures.map((archId: string) => ({
+          where: {
+            node: {
+              id: { eq: archId },
+            },
+          },
+        })),
+      }
+    } else {
+      input.partOfArchitectures = {
+        disconnect: [{ where: {} }],
       }
     }
 
@@ -305,7 +398,7 @@ const CapabilitiesPage = () => {
         <Paper sx={{ overflow: 'hidden' }}>
           <CapabilityTable
             id="capability-table"
-            capabilities={filteredData}
+            capabilities={filteredData as BusinessCapability[]}
             loading={loading}
             globalFilter={globalFilter}
             sorting={sorting}
@@ -314,7 +407,7 @@ const CapabilitiesPage = () => {
             onUpdateCapability={handleUpdateCapabilitySubmit}
             onDeleteCapability={handleDeleteCapability}
             availableTags={availableTags}
-            availableCapabilities={capabilities as unknown as BusinessCapability[]}
+            availableCapabilities={capabilities as BusinessCapability[]}
             onTableReady={setTableInstance}
             columnVisibility={columnVisibility}
             onColumnVisibilityChange={setColumnVisibility}
@@ -344,7 +437,7 @@ const CapabilitiesPage = () => {
           onClose={() => setShowNewCapabilityForm(false)}
           onSubmit={handleCreateCapabilitySubmit}
           mode="create"
-          availableCapabilities={capabilities as unknown as BusinessCapability[]}
+          availableCapabilities={capabilities as BusinessCapability[]}
           availableTags={availableTags}
         />
       )}

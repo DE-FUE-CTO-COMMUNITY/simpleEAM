@@ -3,7 +3,6 @@
 import React, { useMemo } from 'react'
 import { Chip, useTheme } from '@mui/material'
 import { GenericTable } from '../common/GenericTable'
-import { Capability } from './types'
 import { formatDate, getLevelLabel } from './utils'
 import { CapabilityStatus, BusinessCapability } from '../../gql/generated'
 import CapabilityForm, { CapabilityFormValues } from './CapabilityForm'
@@ -13,7 +12,7 @@ import usePersistentColumnVisibility from '../../hooks/usePersistentColumnVisibi
 
 interface CapabilityTableProps {
   id?: string
-  capabilities: Capability[]
+  capabilities: BusinessCapability[]
   loading: boolean
   globalFilter: string
   sorting: SortingState
@@ -47,7 +46,7 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
   onColumnVisibilityChange: _externalOnColumnVisibilityChange,
 }) => {
   const theme = useTheme()
-  const columnHelper = createColumnHelper<Capability>()
+  const columnHelper = createColumnHelper<BusinessCapability>()
 
   // Verwende persistente Spaltensichtbarkeit
   const {
@@ -125,7 +124,7 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
         header: 'Untergeordnete Capabilities',
         cell: info => {
           const children = info.getValue()
-          return children ? children.map(child => child.name).join(', ') : '-'
+          return children ? children.map((child: BusinessCapability) => child.name).join(', ') : '-'
         },
       }),
       columnHelper.accessor('createdAt', {
@@ -144,7 +143,7 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
   )
 
   // Mapping von Capability zu den erwarteten FormValues für das Formular
-  const mapToFormValues = (capability: Capability): CapabilityFormValues => {
+  const mapToFormValues = (capability: BusinessCapability): CapabilityFormValues => {
     return {
       name: capability.name ?? '',
       description: capability.description ?? '',
@@ -153,12 +152,15 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
       status: capability.status ?? CapabilityStatus.ACTIVE,
       ownerId: capability.owners && capability.owners.length > 0 ? capability.owners[0].id : '',
       tags: capability.tags ?? [],
-      parentId: '',
+      parentId: capability.parents && capability.parents.length > 0 ? capability.parents[0].id : '',
+      children: capability.children?.map((child: BusinessCapability) => child.id) ?? [],
+      supportedByApplications: capability.supportedByApplications?.map((app: any) => app.id) ?? [],
+      partOfArchitectures: capability.partOfArchitectures?.map((arch: any) => arch.id) ?? [],
     }
   }
 
   return (
-    <GenericTable<Capability, CapabilityFormValues>
+    <GenericTable<BusinessCapability, CapabilityFormValues>
       data={capabilities}
       loading={loading}
       globalFilter={globalFilter}
@@ -172,7 +174,7 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
       createButtonLabel="Neue Business Capability erstellen"
       entityName="Capability"
       FormComponent={CapabilityForm}
-      getIdFromData={(item: Capability) => item.id}
+      getIdFromData={(item: BusinessCapability) => item.id}
       mapDataToFormValues={mapToFormValues}
       onTableReady={handleTableReady}
       additionalProps={{
