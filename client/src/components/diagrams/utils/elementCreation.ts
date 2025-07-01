@@ -102,12 +102,15 @@ export function createCapabilityElementsFromTemplate(
         )
 
         if (mainContainer && customizations?.width) {
-          // Calculate the scale factor for positioning adjustments
-          const scaleFactor = customizations.width / mainContainer.width
-
-          // Only adjust X position for width changes
-          const relativeX = element.x - mainContainer.x
-          newElement.x = targetX + relativeX * scaleFactor
+          // Calculate the original distance from the right edge of the main container
+          const originalRightEdge = mainContainer.x + mainContainer.width
+          const originalDistanceFromRight = originalRightEdge - (element.x + (element.width || 0))
+          
+          // Calculate the new right edge position with custom width
+          const newRightEdge = targetX + customizations.width
+          
+          // Position the element to maintain the same distance from the right edge
+          newElement.x = newRightEdge - originalDistanceFromRight - (element.width || 0)
         }
       }
     }
@@ -388,12 +391,15 @@ export function createApplicationElementsFromTemplate(
         )
 
         if (mainContainer && customizations?.width) {
-          // Calculate the scale factor for positioning adjustments
-          const scaleFactor = customizations.width / mainContainer.width
-
-          // Only adjust X position for width changes
-          const relativeX = element.x - mainContainer.x
-          newElement.x = targetX + relativeX * scaleFactor
+          // Calculate the original distance from the right edge of the main container
+          const originalRightEdge = mainContainer.x + mainContainer.width
+          const originalDistanceFromRight = originalRightEdge - (element.x + (element.width || 0))
+          
+          // Calculate the new right edge position with custom width
+          const newRightEdge = targetX + customizations.width
+          
+          // Position the element to maintain the same distance from the right edge
+          newElement.x = newRightEdge - originalDistanceFromRight - (element.width || 0)
         }
       }
     }
