@@ -19,6 +19,8 @@ import { GET_CAPABILITY_MAP_DATA } from '@/graphql/capability'
 import {
   generateCapabilityMapWithLibrary,
   generateCapabilityMapElements,
+  calculateRenderedCapabilitiesCount,
+  debugCapabilityHierarchy,
   type CapabilityMapSettings,
 } from '../utils/CapabilityMapLibraryUtils'
 
@@ -54,6 +56,10 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
     }
 
     try {
+      // Debug the capability hierarchy before generation
+      console.log('🚀 Starting capability map generation...')
+      debugCapabilityHierarchy(data.businessCapabilities, settings)
+
       let elements: any[] = []
 
       if (useArchimateSymbols) {
@@ -73,8 +79,11 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
       console.log('Capability Map Generator erfolgreich:', {
         settings,
         useArchimateSymbols,
-        capabilitiesCount: data.businessCapabilities.length,
-        capabilitiesGenerated: data.businessCapabilities.length,
+        capabilitiesTotal: data.businessCapabilities.length,
+        capabilitiesRendered: calculateRenderedCapabilitiesCount(
+          data.businessCapabilities,
+          settings
+        ),
       })
 
       // Pass elements to parent component if callback provided
@@ -94,6 +103,11 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
       [field]: value,
     }))
   }
+
+  // Calculate rendered capabilities count whenever settings change
+  const renderedCapabilitiesCount = data
+    ? calculateRenderedCapabilitiesCount(data.businessCapabilities, settings)
+    : 0
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -122,7 +136,8 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
           {data && (
             <>
               <Alert severity="info" sx={{ my: 2 }}>
-                {data.businessCapabilities.length} Capabilities gefunden
+                {data.businessCapabilities.length} Capabilities gesamt gefunden,{' '}
+                {renderedCapabilitiesCount} werden auf der Map dargestellt
               </Alert>
 
               <Box sx={{ mt: 3 }}>

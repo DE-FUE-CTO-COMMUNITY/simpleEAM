@@ -170,7 +170,8 @@ export const generateCapabilityMapElements = (
     let containerHeight = baseHeight
     if (settings.maxLevels > 1) {
       const children = findChildCapabilities(capability.id, capabilities)
-      const childrenToShow = children.slice(0, settings.maxLevels > 2 ? 10 : children.length)
+      // Show all children regardless of maxLevels setting
+      const childrenToShow = children
       containerHeight = Math.max(baseHeight, (childrenToShow.length + 1) * (baseHeight + 20) + 40)
     }
 
@@ -265,7 +266,8 @@ export const generateCapabilityMapElements = (
     // Generate child capabilities if maxLevels > 1
     if (settings.maxLevels > 1) {
       const children = findChildCapabilities(capability.id, capabilities)
-      const childrenToShow = children.slice(0, settings.maxLevels > 2 ? 10 : children.length)
+      // Show all children regardless of maxLevels setting
+      const childrenToShow = children
 
       childrenToShow.forEach((child, childIndex) => {
         const childX = x + 10

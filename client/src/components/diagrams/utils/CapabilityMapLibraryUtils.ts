@@ -396,6 +396,75 @@ export function findChildCapabilities(
   )
 }
 
+// Function to calculate the actual number of capabilities that will be rendered on the map
+export function calculateRenderedCapabilitiesCount(
+  capabilities: BusinessCapability[],
+  settings: CapabilityMapSettings
+): number {
+  const topLevelCapabilities = findTopLevelCapabilities(capabilities)
+  let count = topLevelCapabilities.length
+
+  if (settings.maxLevels > 1) {
+    topLevelCapabilities.forEach(capability => {
+      const children = findChildCapabilities(capability.id, capabilities)
+      // Show all children regardless of maxLevels setting - no artificial limits
+      const childrenToShow = children
+      count += childrenToShow.length
+    })
+  }
+
+  return count
+}
+
+// Debug function to analyze capability hierarchy
+export function debugCapabilityHierarchy(
+  capabilities: BusinessCapability[],
+  settings: CapabilityMapSettings
+) {
+  console.log('🔍 DEBUG: Capability Hierarchy Analysis')
+  console.log('Total capabilities in data:', capabilities.length)
+
+  const topLevelCapabilities = findTopLevelCapabilities(capabilities)
+  console.log('Top-level capabilities found:', topLevelCapabilities.length)
+  console.log(
+    'Top-level capability names:',
+    topLevelCapabilities.map(cap => cap.name)
+  )
+
+  const allParents = capabilities.filter(cap => cap.parents && cap.parents.length > 0)
+  console.log('Capabilities with parents:', allParents.length)
+  console.log(
+    'Child capability names:',
+    allParents.map(
+      cap => `${cap.name} (parents: ${cap.parents?.map(p => p.name || p.id).join(', ')})`
+    )
+  )
+
+  let totalChildrenToRender = 0
+  if (settings.maxLevels > 1) {
+    topLevelCapabilities.forEach(capability => {
+      const children = findChildCapabilities(capability.id, capabilities)
+      // Show all children regardless of maxLevels setting
+      const childrenToShow = children
+      console.log(
+        `Parent "${capability.name}": ${children.length} children total, ${childrenToShow.length} will be shown (maxLevels: ${settings.maxLevels})`
+      )
+      totalChildrenToRender += childrenToShow.length
+    })
+  }
+
+  const expectedTotal = topLevelCapabilities.length + totalChildrenToRender
+  console.log('Expected total capabilities on map:', expectedTotal)
+  console.log('Settings:', settings)
+
+  return {
+    totalCapabilities: capabilities.length,
+    topLevelCapabilities: topLevelCapabilities.length,
+    childrenToRender: totalChildrenToRender,
+    expectedTotal,
+  }
+}
+
 // Function to load ArchiMate library (this should match the implementation from IntegratedLibrary)
 // Main function to generate capability map with ArchiMate symbols (REFACTORED)
 export const generateCapabilityMapWithLibrary = async (
@@ -403,6 +472,9 @@ export const generateCapabilityMapWithLibrary = async (
   settings: CapabilityMapSettings
 ): Promise<ExcalidrawElement[]> => {
   const elements: ExcalidrawElement[] = []
+
+  // Debug capability hierarchy
+  debugCapabilityHierarchy(capabilities, settings)
 
   // Load ArchiMate library
   const archimateLibrary = await loadArchimateLibrary()
@@ -434,7 +506,8 @@ export const generateCapabilityMapWithLibrary = async (
     totalElements += capabilityTemplate.elements.length // Actual template elements count
     if (settings.maxLevels > 1) {
       const children = findChildCapabilities(capability.id, capabilities)
-      const childrenToShow = children.slice(0, settings.maxLevels > 2 ? 10 : children.length)
+      // Show all children regardless of maxLevels setting
+      const childrenToShow = children
       totalElements += childrenToShow.length * capabilityTemplate.elements.length
 
       if (settings.includeApplications && applicationTemplate) {
@@ -467,11 +540,12 @@ export const generateCapabilityMapWithLibrary = async (
   let uniformContainerHeight = baseHeight
   if (settings.maxLevels > 1) {
     let maxChildrenCount = 0
-    
+
     // Find the maximum number of children among all top-level capabilities
-    topLevelCapabilities.forEach((capability) => {
+    topLevelCapabilities.forEach(capability => {
       const children = findChildCapabilities(capability.id, capabilities)
-      const childrenToShow = children.slice(0, settings.maxLevels > 2 ? 10 : children.length)
+      // Show all children regardless of maxLevels setting
+      const childrenToShow = children
       maxChildrenCount = Math.max(maxChildrenCount, childrenToShow.length)
     })
 
@@ -479,12 +553,12 @@ export const generateCapabilityMapWithLibrary = async (
     const childSpacing = 10
     const childAreaHeight = maxChildrenCount * (baseHeight + childSpacing)
     uniformContainerHeight = Math.max(baseHeight, baseHeight + childAreaHeight + 40)
-    
+
     console.log('📏 Uniform height calculation:', {
       maxChildrenCount,
       baseHeight,
       childAreaHeight,
-      uniformContainerHeight
+      uniformContainerHeight,
     })
   }
 
@@ -513,7 +587,8 @@ export const generateCapabilityMapWithLibrary = async (
     // Generate child capabilities if maxLevels > 1
     if (settings.maxLevels > 1) {
       const children = findChildCapabilities(capability.id, capabilities)
-      const childrenToShow = children.slice(0, settings.maxLevels > 2 ? 10 : children.length)
+      // Show all children regardless of maxLevels setting
+      const childrenToShow = children
 
       childrenToShow.forEach((child, childIndex) => {
         const childX = x + 10
@@ -601,21 +676,23 @@ export const generateCapabilityMapElements = (
   let uniformContainerHeight = baseHeight
   if (settings.maxLevels > 1) {
     let maxChildrenCount = 0
-    
+
     // Find the maximum number of children among all top-level capabilities
-    topLevelCapabilities.forEach((capability) => {
+    topLevelCapabilities.forEach(capability => {
       const children = findChildCapabilities(capability.id, capabilities)
-      const childrenToShow = children.slice(0, settings.maxLevels > 2 ? 10 : children.length)
+      // Show all children regardless of maxLevels setting
+      const childrenToShow = children
+
       maxChildrenCount = Math.max(maxChildrenCount, childrenToShow.length)
     })
 
     // Calculate needed height for the maximum number of children
     uniformContainerHeight = Math.max(baseHeight, (maxChildrenCount + 1) * (baseHeight + 20) + 40)
-    
+
     console.log('📏 Fallback uniform height calculation:', {
       maxChildrenCount,
       baseHeight,
-      uniformContainerHeight
+      uniformContainerHeight,
     })
   }
 
@@ -720,7 +797,8 @@ export const generateCapabilityMapElements = (
     // Generate child capabilities if maxLevels > 1
     if (settings.maxLevels > 1) {
       const children = findChildCapabilities(capability.id, capabilities)
-      const childrenToShow = children.slice(0, settings.maxLevels > 2 ? 10 : children.length)
+      // Show all children regardless of maxLevels setting
+      const childrenToShow = children
 
       childrenToShow.forEach((child, childIndex) => {
         const childX = x + 10
