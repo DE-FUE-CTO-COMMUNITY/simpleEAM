@@ -5,7 +5,7 @@ import {
   loadPersistedScene,
   loadPersistedDiagram,
   loadViewportStateFromStorage,
-} from '../utils/DiagramStorage'
+} from '../utils/DiagramStorageUtils'
 
 // Custom Hook für den Diagram State
 export const useDiagramState = () => {

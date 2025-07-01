@@ -7,13 +7,13 @@ import OpenDiagramDialog from './OpenDiagramDialog'
 import DeleteDiagramDialog from './DeleteDiagramDialog'
 import IntegratedLibrary from './IntegratedLibrary'
 import DiagramNameDisplay from './DiagramNameDisplay'
-import ExcalidrawWrapper from './components/ExcalidrawWrapper'
+import ExcalidrawWrapper from './ExcalidrawWrapper'
 import CapabilityMapGenerator from './CapabilityMapGenerator'
-import { DiagramEditorProps } from './types/DiagramTypes'
-import { useDiagramState, useUIOptions } from './state/DiagramState'
-import { useDiagramHandlers } from './handlers/DiagramHandlers'
-import { useKeyboardShortcuts } from './hooks/DiagramKeyboardShortcuts'
-import { loadViewportStateFromStorage } from './utils/DiagramStorage'
+import { DiagramEditorProps } from '../types/DiagramTypes'
+import { useDiagramState, useUIOptions } from '../state/DiagramState'
+import { useDiagramHandlers } from '../handlers/DiagramHandlers'
+import { useKeyboardShortcuts } from '../hooks/DiagramKeyboardShortcuts'
+import { loadViewportStateFromStorage } from '../utils/DiagramStorageUtils'
 import { isViewer } from '@/lib/auth'
 
 const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
@@ -93,10 +93,15 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
         // Mark as having unsaved changes
         setHasUnsavedChanges(true)
 
+        // Count actual capabilities (main elements) instead of all technical elements
+        const capabilityCount = elements.filter(
+          (el: any) => el.customData?.isMainElement === true
+        ).length
+
         // Show success notification
         setNotification({
           open: true,
-          message: `Capability Map erfolgreich generiert! ${elements.length} Elemente erstellt.`,
+          message: `Capability Map erfolgreich generiert! ${capabilityCount} Capabilities erstellt.`,
           severity: 'success',
         })
       } catch (error) {

@@ -1,4 +1,6 @@
 import type { BusinessCapability } from '@/gql/generated'
+import { generateNKeysBetween } from 'fractional-indexing'
+import { collectApplicationsForDisplay } from './capabilityHierarchy'
 
 export interface CapabilityMapSettings {
   maxLevels: number
@@ -65,22 +67,39 @@ export const generateSeed = (): number => {
   return Math.floor(Math.random() * 2 ** 31)
 }
 
-// Helper function to generate valid Excalidraw index values
+// Simple but robust index generation for z-ordering
 let indexCounter = 0
+
 export const generateIndex = (): string => {
-  const chars = 'abcdefghijklmnopqrstuvwxyz'
-  let result = ''
-  let num = indexCounter++
-
-  if (num === 0) return 'a0'
-
-  while (num >= 0) {
-    result = chars[num % 26] + result
-    num = Math.floor(num / 26) - 1
-    if (num < 0) break
+  try {
+    // Try to use Excalidraw's fractional indexing API if available
+    if (typeof generateNKeysBetween === 'function') {
+      const indices = generateNKeysBetween(null, null, 1)
+      if (indices && indices.length > 0) {
+        return indices[0]
+      }
+    }
+  } catch (error) {
+    console.warn('Fractional indexing failed, using fallback:', error)
   }
 
-  return result + '0'
+  // Fallback to simple, reliable index generation
+  indexCounter++
+  return `a${indexCounter.toString(36)}`
+}
+
+// Reset index generation for new batches
+export const resetIndexGeneration = (): void => {
+  indexCounter = 0
+}
+
+// Legacy function for compatibility
+export const generateIndices = (count: number, _after?: string, _before?: string): string[] => {
+  const indices: string[] = []
+  for (let i = 0; i < count; i++) {
+    indices.push(generateIndex())
+  }
+  return indices
 }
 
 // Helper function to calculate text width (approximation)
@@ -122,8 +141,8 @@ export const generateCapabilityMapElements = (
 ): ExcalidrawElement[] => {
   const elements: ExcalidrawElement[] = []
 
-  // Reset index counter for consistent ordering
-  indexCounter = 0
+  // Reset index generation for consistent ordering
+  resetIndexGeneration()
 
   // Find top-level capabilities
   const topLevelCapabilities = findTopLevelCapabilities(capabilities)
@@ -152,7 +171,8 @@ export const generateCapabilityMapElements = (
     let containerHeight = baseHeight
     if (settings.maxLevels > 1) {
       const children = findChildCapabilities(capability.id, capabilities)
-      const childrenToShow = children.slice(0, settings.maxLevels > 2 ? 10 : children.length)
+      // Show all children regardless of maxLevels setting
+      const childrenToShow = children
       containerHeight = Math.max(baseHeight, (childrenToShow.length + 1) * (baseHeight + 20) + 40)
     }
 
@@ -247,7 +267,8 @@ export const generateCapabilityMapElements = (
     // Generate child capabilities if maxLevels > 1
     if (settings.maxLevels > 1) {
       const children = findChildCapabilities(capability.id, capabilities)
-      const childrenToShow = children.slice(0, settings.maxLevels > 2 ? 10 : children.length)
+      // Show all children regardless of maxLevels setting
+      const childrenToShow = children
 
       childrenToShow.forEach((child, childIndex) => {
         const childX = x + 10
@@ -345,70 +366,81 @@ export const generateCapabilityMapElements = (
         }
 
         elements.push(childRect, childText)
-
-        // Add applications if enabled
-        if (
-          settings.includeApplications &&
-          child.supportedByApplications &&
-          child.supportedByApplications.length > 0
-        ) {
-          child.supportedByApplications.slice(0, 3).forEach((app, appIndex) => {
-            const appX = childX + 5
-            const appY = childY + childHeight + 5 + appIndex * 15
-            const appTextId = generateId()
-
-            const appText: ExcalidrawElement = {
-              id: appTextId,
-              type: 'text',
-              x: appX,
-              y: appY,
-              width: calculateTextWidth(app.name, 12),
-              height: 15,
-              angle: 0,
-              strokeColor: '#666666',
-              backgroundColor: 'transparent',
-              fillStyle: 'solid',
-              strokeWidth: 1,
-              strokeStyle: 'solid',
-              roughness: 1,
-              opacity: 100,
-              groupIds: [capabilityGroupId],
-              frameId: null,
-              index: `a${elements.length}`,
-              roundness: null,
-              seed: generateSeed(),
-              version: 1,
-              versionNonce: generateSeed(),
-              isDeleted: false,
-              boundElements: [],
-              updated: Date.now(),
-              link: null,
-              locked: false,
-              text: `• ${app.name}`,
-              fontSize: 12,
-              fontFamily: 1,
-              textAlign: 'left',
-              verticalAlign: 'top',
-              originalText: `• ${app.name}`,
-              autoResize: true,
-              lineHeight: 1.25,
-              rawText: `• ${app.name}`,
-              customData: {
-                databaseId: app.id,
-                elementType: 'application',
-                originalElement: app,
-                isFromDatabase: true,
-                isMainElement: false,
-              },
-            }
-
-            elements.push(appText)
-          })
-        }
       })
+    }
+
+    // Add applications if enabled - smart rollup logic
+    if (settings.includeApplications) {
+      // FIXME: This is wrong! We're always passing currentLevel: 0, but this function
+      // is used for top-level capabilities, so it should be 0. The real rendering
+      // happens in capabilityRenderer.ts with the correct levels.
+      const allApplications = collectApplicationsForDisplay(
+        capability,
+        capabilities,
+        0,
+        settings.maxLevels
+      )
+
+      if (allApplications.length > 0) {
+        // Position applications below the capability container
+        const appStartY = y + containerHeight + 10
+
+        allApplications.slice(0, 3).forEach((app, appIndex) => {
+          const appX = x + 10
+          const appY = appStartY + appIndex * 20
+          const appTextId = generateId()
+
+          const appText: ExcalidrawElement = {
+            id: appTextId,
+            type: 'text',
+            x: appX,
+            y: appY,
+            width: calculateTextWidth(app.name, 12),
+            height: 15,
+            angle: 0,
+            strokeColor: '#666666',
+            backgroundColor: 'transparent',
+            fillStyle: 'solid',
+            strokeWidth: 1,
+            strokeStyle: 'solid',
+            roughness: 1,
+            opacity: 100,
+            groupIds: [capabilityGroupId],
+            frameId: null,
+            index: generateIndex(),
+            roundness: null,
+            seed: generateSeed(),
+            version: 1,
+            versionNonce: generateSeed(),
+            isDeleted: false,
+            boundElements: [],
+            updated: Date.now(),
+            link: null,
+            locked: false,
+            text: `• ${app.name}`,
+            fontSize: 12,
+            fontFamily: 1,
+            textAlign: 'left',
+            verticalAlign: 'top',
+            originalText: `• ${app.name}`,
+            autoResize: true,
+            lineHeight: 1.25,
+            rawText: `• ${app.name}`,
+            customData: {
+              databaseId: app.id,
+              elementType: 'application',
+              originalElement: app,
+              isFromDatabase: true,
+              isMainElement: false,
+            },
+          }
+
+          elements.push(appText)
+        })
+      }
     }
   })
 
-  console.log(`Generated ${elements.length} elements for capability map`)
+  // Generated capability map elements
   return elements
 }

@@ -5,7 +5,7 @@ import {
   syncDiagramOnOpen,
   syncDiagramOnSave,
   clearMissingElementMarkers,
-} from '../databaseSyncUtils'
+} from '../utils/databaseSyncUtils'
 import {
   saveSceneToStorage,
   saveDiagramToStorage,
@@ -13,7 +13,7 @@ import {
   clearDiagramStorage,
   saveViewportStateToStorage,
   loadViewportStateFromStorage,
-} from '../utils/DiagramStorage'
+} from '../utils/DiagramStorageUtils'
 
 // Handlers für alle Diagram-Operationen
 export const useDiagramHandlers = (
@@ -459,7 +459,7 @@ export const useDiagramHandlers = (
             })
 
             // Importiere ID-Mapping-Funktionalität
-            const { processImportedDiagramData } = await import('../importIdMappingUtils')
+            const { processImportedDiagramData } = await import('../utils/importIdMappingUtils')
 
             // Verarbeite importierte Daten und mappe IDs bei Bedarf
             const { processedData, mappings, summary } = await processImportedDiagramData(

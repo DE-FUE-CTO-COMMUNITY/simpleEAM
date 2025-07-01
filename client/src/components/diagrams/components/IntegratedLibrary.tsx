@@ -3,7 +3,8 @@
 import React, { useEffect, useState, useMemo } from 'react'
 import { useQuery } from '@apollo/client'
 import { GET_LIBRARY_ELEMENTS } from '@/graphql/library'
-import { wrapTextToFitWidth, calculateCenteredTextPosition } from './textContainerUtils'
+import { wrapTextToFitWidth, calculateCenteredTextPosition } from '../utils/textContainerUtils'
+import { findArchimateTemplate, loadArchimateLibrary } from '../utils/archimateLibraryUtils'
 
 interface IntegratedLibraryProps {
   excalidrawAPI: any
@@ -23,20 +24,16 @@ const IntegratedLibrary: React.FC<IntegratedLibraryProps> = ({
 
   // Load original ArchiMate library
   useEffect(() => {
-    const loadArchimateLibrary = async () => {
+    const loadLibrary = async () => {
       try {
-        const response = await fetch('/libraries/archimate-symbols.excalidrawlib')
-        if (!response.ok) {
-          throw new Error('Fehler beim Laden der ArchiMate-Bibliothek')
-        }
-        const library = await response.json()
+        const library = await loadArchimateLibrary()
         setArchimateLibrary(library)
       } catch {
         // Fehler beim Laden der ArchiMate-Bibliothek
       }
     }
 
-    loadArchimateLibrary()
+    loadLibrary()
   }, [])
 
   // Create integrated library combining ArchiMate symbols with database elements
@@ -155,56 +152,6 @@ const IntegratedLibrary: React.FC<IntegratedLibraryProps> = ({
   return null // This component doesn't render anything
 }
 
-// Helper function to find ArchiMate template by name or type
-function findArchimateTemplate(library: any, templateName: string) {
-  // First try to find by name property
-  let item = library.libraryItems.find((item: any) => item.name === templateName)
-
-  // If not found, try to find by text content
-  if (!item) {
-    item = library.libraryItems.find((item: any) =>
-      item.elements.some(
-        (element: any) =>
-          element.type === 'text' && element.text && element.text.includes(templateName)
-      )
-    )
-  }
-
-  // If not found, try alternative names
-  if (!item) {
-    const alternatives = {
-      Capability: ['Business Function', 'Business Capability', 'Business'],
-      'Application Component': ['Application', 'App Component'],
-      'Business Object': ['Data Object', 'Data', 'Object'],
-      'Application Interface': ['Interface', 'API'],
-    }
-
-    const alts = alternatives[templateName as keyof typeof alternatives] || []
-    for (const alt of alts) {
-      // Try by name first
-      item = library.libraryItems.find((libItem: any) => libItem.name === alt)
-      if (item) break
-
-      // Then try by text content
-      item = library.libraryItems.find((libItem: any) =>
-        libItem.elements.some(
-          (element: any) => element.type === 'text' && element.text && element.text.includes(alt)
-        )
-      )
-      if (item) break
-    }
-  }
-
-  // If still not found, use the first rectangular item as fallback
-  if (!item) {
-    item = library.libraryItems.find((libItem: any) =>
-      libItem.elements.some((element: any) => element.type === 'rectangle')
-    )
-  }
-
-  return item || null
-}
-
 // Helper function to create library item from database element
 function createLibraryItemFromDatabaseElement(dbElement: any, elementType: string, template: any) {
   if (!template) {
@@ -272,14 +219,12 @@ function createLibraryItemFromDatabaseElement(dbElement: any, elementType: strin
       // Get font size (with special handling for Application Interface)
       const fontSize = elementType === 'applicationInterface' ? 16 : element.fontSize || 20
 
-      // WICHTIG: Speichere den Original-Text, nicht den getrennten Text!
-      // Die Texttrennung sollte nur für die Anzeige verwendet werden, nicht für die Speicherung
-      newElement.text = dbElement.name
-      newElement.originalText = dbElement.name
-      newElement.rawText = dbElement.name
+      // Auto-wrap text to fit within available width
+      const wrappedText = wrapTextToFitWidth(dbElement.name, availableWidth, fontSize)
 
-      // Für Layout-Berechnungen verwenden wir eine getrennte Version, aber speichern sie NICHT
-      const wrappedTextForLayout = wrapTextToFitWidth(dbElement.name, availableWidth, fontSize)
+      newElement.text = wrappedText
+      newElement.originalText = wrappedText
+      newElement.rawText = wrappedText
 
       // Preserve the original template's text alignment if it exists, otherwise set defaults
       newElement.textAlign = element.textAlign || 'center'
@@ -305,7 +250,7 @@ function createLibraryItemFromDatabaseElement(dbElement: any, elementType: strin
 
             // Verwende die gemeinsame calculateCenteredTextPosition Funktion für konsistente Zentrierung
             const centeredPosition = calculateCenteredTextPosition(
-              wrappedTextForLayout,
+              wrappedText,
               containerRect,
               fontSize
             )
@@ -319,10 +264,8 @@ function createLibraryItemFromDatabaseElement(dbElement: any, elementType: strin
         }
       } else {
         // Fallback für Texte ohne Container: Verwende geschätzte Dimensionen
-        const lineCount = (wrappedTextForLayout.match(/\n/g) || []).length + 1
-        const avgLineWidth = Math.max(
-          ...wrappedTextForLayout.split('\n').map((line: string) => line.length)
-        )
+        const lineCount = (wrappedText.match(/\n/g) || []).length + 1
+        const avgLineWidth = Math.max(...wrappedText.split('\n').map(line => line.length))
 
         const estimatedWidth = Math.min(avgLineWidth * fontSize * 0.6, availableWidth)
         const estimatedHeight = lineCount * fontSize * 1.2

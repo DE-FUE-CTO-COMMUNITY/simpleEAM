@@ -15,7 +15,7 @@ import {
   Divider,
   CircularProgress,
 } from '@mui/material'
-import { getElementTypeLabel } from './newElementsUtils'
+import { getElementTypeLabel } from '../utils/newElementsUtils'
 
 interface NewElement {
   id: string

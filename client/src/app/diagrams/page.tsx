@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { Box } from '@mui/material'
-import DiagramEditor from '@/components/diagrams/DiagramEditor'
+import { DiagramEditor } from '@/components/diagrams'
 import { MockAuthProvider } from '@/contexts/AuthContext'
 
 const DiagramEditorPage: React.FC = () => {
