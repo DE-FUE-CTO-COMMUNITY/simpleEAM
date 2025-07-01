@@ -77,13 +77,13 @@ export function collectApplicationsForDisplay(
     // We are at the last visible level (e.g., Level 2 when maxLevels = 3)
     // Any children of this capability will be hidden, so roll up their applications
     const hiddenChildren = findChildCapabilities(capability.id, allCapabilities)
-    
+
     hiddenChildren.forEach(hiddenChild => {
       // Add applications from this hidden child
       if (hiddenChild.supportedByApplications && hiddenChild.supportedByApplications.length > 0) {
         applications.push(...hiddenChild.supportedByApplications)
       }
-      
+
       // Recursively add applications from all descendants of this hidden child
       const hiddenDescendants = findAllDescendantsUnlimited(hiddenChild.id, allCapabilities)
       hiddenDescendants.forEach(descendant => {
@@ -95,10 +95,10 @@ export function collectApplicationsForDisplay(
   }
 
   // Remove duplicates and limit to max 3 applications
-  const uniqueApplications = applications.filter((app, index, self) => 
-    index === self.findIndex(a => a.id === app.id)
+  const uniqueApplications = applications.filter(
+    (app, index, self) => index === self.findIndex(a => a.id === app.id)
   )
-  
+
   return uniqueApplications.slice(0, 3)
 }
 
@@ -143,7 +143,7 @@ export const calculateSubtreeHeight = (
   const visibleChildren = currentLevel + 1 < maxLevels ? allChildren : []
 
   // Find applications that should be displayed for this capability (using the same logic as rendering)
-  const applications = settings.includeApplications 
+  const applications = settings.includeApplications
     ? collectApplicationsForDisplay(capability, allCapabilities, currentLevel, maxLevels)
     : []
 

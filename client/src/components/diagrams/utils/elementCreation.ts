@@ -1,6 +1,6 @@
 import type { BusinessCapability } from '@/gql/generated'
 import type { LibraryTemplate } from './archimateLibraryUtils'
-import type { ExcalidrawElement } from './CapabilityMapUtils'
+import type { ExcalidrawElement } from './capabilityMapTypes'
 import type { ElementCustomizations } from './capabilityMapTypes'
 import { generateElementId, generateSeed, getNextIndex } from './elementIdManager'
 import {

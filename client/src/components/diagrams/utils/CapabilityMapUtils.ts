@@ -374,7 +374,12 @@ export const generateCapabilityMapElements = (
       // FIXME: This is wrong! We're always passing currentLevel: 0, but this function
       // is used for top-level capabilities, so it should be 0. The real rendering
       // happens in capabilityRenderer.ts with the correct levels.
-      const allApplications = collectApplicationsForDisplay(capability, capabilities, 0, settings.maxLevels)
+      const allApplications = collectApplicationsForDisplay(
+        capability,
+        capabilities,
+        0,
+        settings.maxLevels
+      )
 
       if (allApplications.length > 0) {
         // Position applications below the capability container

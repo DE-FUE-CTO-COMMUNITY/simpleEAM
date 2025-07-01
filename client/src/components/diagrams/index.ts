@@ -11,8 +11,8 @@ export { default as OpenDiagramDialog } from './components/OpenDiagramDialog'
 export { default as SaveDiagramDialog } from './components/SaveDiagramDialog'
 
 // Export utils (avoiding duplicates)
-export * from './utils/CapabilityMapUtils'
 export { generateCapabilityMapWithLibrary } from './utils/CapabilityMapLibraryUtils'
+export * from './utils/capabilityMapTypes'
 export * from './utils/DiagramStorageUtils'
 export * from './utils/databaseSyncUtils'
 export * from './utils/diagramRelationshipUtils'

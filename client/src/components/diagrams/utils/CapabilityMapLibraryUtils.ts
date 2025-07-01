@@ -1,7 +1,6 @@
 import type { BusinessCapability } from '@/gql/generated'
-import type { ExcalidrawElement } from './CapabilityMapUtils'
+import type { ExcalidrawElement } from './capabilityMapTypes'
 import { findArchimateTemplate, loadArchimateLibrary } from './archimateLibraryUtils'
-import { generateCapabilityMapElements as fallbackCapabilityMapElements } from './CapabilityMapUtils'
 
 // Re-export all types and functions from the refactored modules
 export type { CapabilityMapSettings, ElementCustomizations } from './capabilityMapTypes'
@@ -211,14 +210,4 @@ export const generateCapabilityMapWithLibrary = async (
   })
 
   return elements
-}
-
-// Fallback function that uses simple rectangles - delegate to the proper implementation
-export const generateCapabilityMapElements = (
-  capabilities: BusinessCapability[],
-  settings: CapabilityMapSettings
-): ExcalidrawElement[] => {
-  // Use the proper implementation from CapabilityMapUtils
-  // This ensures we use the same logic with the correct level-aware application rollup
-  return fallbackCapabilityMapElements(capabilities, settings)
 }

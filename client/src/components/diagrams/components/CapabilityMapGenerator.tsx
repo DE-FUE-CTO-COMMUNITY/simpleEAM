@@ -12,14 +12,12 @@ import {
   TextField,
   CircularProgress,
   Alert,
-  Switch,
 } from '@mui/material'
 import { useQuery } from '@apollo/client'
 import { GET_CAPABILITY_MAP_DATA } from '@/graphql/capability'
 import { GET_APPLICATIONS_COUNT } from '@/graphql/application'
 import {
   generateCapabilityMapWithLibrary,
-  generateCapabilityMapElements,
   calculateRenderedCapabilitiesCount,
   calculateTotalApplicationsCount,
   debugCapabilityHierarchy,
@@ -44,8 +42,6 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
     horizontalSpacing: 10,
     verticalSpacing: 10,
   })
-
-  const [useArchimateSymbols, setUseArchimateSymbols] = useState(true)
 
   const { data, loading, error } = useQuery(GET_CAPABILITY_MAP_DATA, {
     skip: !open,
@@ -74,23 +70,16 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
 
       let elements: any[] = []
 
-      if (useArchimateSymbols) {
-        // Try to use ArchiMate symbols from library
-        elements = await generateCapabilityMapWithLibrary(data.businessCapabilities, settings)
+      // Generate capability map with ArchiMate symbols
+      elements = await generateCapabilityMapWithLibrary(data.businessCapabilities, settings)
 
-        // If ArchiMate generation failed, fallback to simple rectangles
-        if (elements.length === 0) {
-          console.warn('ArchiMate-Generierung fehlgeschlagen, verwende einfache Rechtecke')
-          elements = generateCapabilityMapElements(data.businessCapabilities, settings)
-        }
-      } else {
-        // Use simple rectangles
-        elements = generateCapabilityMapElements(data.businessCapabilities, settings)
+      if (elements.length === 0) {
+        console.warn('Capability Map konnte nicht generiert werden')
+        return
       }
 
       console.log('Capability Map Generator erfolgreich:', {
         settings,
-        useArchimateSymbols,
         capabilitiesTotal: data.businessCapabilities.length,
         capabilitiesRendered: calculateRenderedCapabilitiesCount(
           data.businessCapabilities,
@@ -168,19 +157,6 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
               </Alert>
 
               <Box sx={{ mt: 3 }}>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={useArchimateSymbols}
-                      onChange={e => setUseArchimateSymbols(e.target.checked)}
-                    />
-                  }
-                  label="ArchiMate-Symbole verwenden"
-                />
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                  Verwende professionelle ArchiMate-Symbole anstatt einfacher Rechtecke
-                </Typography>
-
                 <TextField
                   label="Maximale Hierarchie-Ebenen"
                   type="number"

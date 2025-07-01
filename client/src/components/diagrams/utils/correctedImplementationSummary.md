@@ -13,6 +13,7 @@ The application display logic had a critical issue where applications were not s
 ## Root Cause Analysis
 
 The problem was in the `collectApplicationsForDisplay` function logic:
+
 - The function was only adding applications when there were hidden children to roll up from
 - It was not consistently showing applications that were directly assigned to each capability
 - The condition for showing applications was too restrictive
@@ -54,7 +55,7 @@ export function collectApplicationsForDisplay(
       if (hiddenChild.supportedByApplications && hiddenChild.supportedByApplications.length > 0) {
         applications.push(...hiddenChild.supportedByApplications)
       }
-      
+
       // Recursively add applications from all descendants of this hidden child
       const hiddenDescendants = findAllDescendantsUnlimited(hiddenChild.id, allCapabilities)
       hiddenDescendants.forEach(descendant => {
@@ -66,10 +67,10 @@ export function collectApplicationsForDisplay(
   }
 
   // Remove duplicates and limit to max 3 applications
-  const uniqueApplications = applications.filter((app, index, self) => 
-    index === self.findIndex(a => a.id === app.id)
+  const uniqueApplications = applications.filter(
+    (app, index, self) => index === self.findIndex(a => a.id === app.id)
   )
-  
+
   return uniqueApplications.slice(0, 3)
 }
 ```
@@ -88,6 +89,7 @@ Root Capability (Level 0) [with App X]
 ```
 
 **Display Result (Corrected):**
+
 - Root Capability: App X (its own application)
 - Child 1: App A (its own application)
 - Grandchild 1.1: App B (its own application)
@@ -107,6 +109,7 @@ Root Capability (Level 0) [with App X]
 ```
 
 **Display Result (Corrected):**
+
 - Root Capability: App X (its own application)
 - Child 1: App A, App B, App C (own + rolled up from hidden grandchildren)
 - Child 2: App D, App E (own + rolled up from hidden grandchild)
@@ -123,6 +126,7 @@ Root Capability (Level 0) [with App X]
 ```
 
 **Display Result (Corrected):**
+
 - Root Capability: App X, App A, App B, App C, App D, App E (own + all rolled up from hidden descendants, limited to 3)
 
 ## Key Changes Made
@@ -142,7 +146,7 @@ Root Capability (Level 0) [with App X]
 
 1. Test with maxLevels = 1, 2, 3, 4
 2. Test capabilities with applications at every level
-3. Test capabilities without applications 
+3. Test capabilities without applications
 4. Test capabilities with applications but no children
 5. Test deep hierarchies to ensure rollup works correctly
 6. Verify that every visible capability shows its directly assigned applications

@@ -1,5 +1,5 @@
 import type { BusinessCapability } from '@/gql/generated'
-import type { ExcalidrawElement } from './CapabilityMapUtils'
+import type { ExcalidrawElement } from './capabilityMapTypes'
 import type { CapabilityMapSettings, RenderResult } from './capabilityMapTypes'
 import type { LibraryTemplate } from './archimateLibraryUtils'
 import {
@@ -55,7 +55,8 @@ export const renderCapabilityHierarchy = (
 
   // Determine if this is a leaf node (no visible children and no applications to render)
   const isLeaf =
-    (visibleChildren.length === 0 && applications.length === 0) || currentLevel === settings.maxLevels - 1
+    (visibleChildren.length === 0 && applications.length === 0) ||
+    currentLevel === settings.maxLevels - 1
 
   // Create the capability box itself
   // For level-0 capabilities, use uniform height if provided; otherwise use calculated height
