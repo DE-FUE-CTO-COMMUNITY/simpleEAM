@@ -9,10 +9,11 @@ import {
   Box,
   FormControlLabel,
   Checkbox,
-  TextField,
   CircularProgress,
   Alert,
+  TextField,
 } from '@mui/material'
+import { BusinessCapabilityIcon, ApplicationComponentIcon } from '@/components/icons'
 import { useQuery } from '@apollo/client'
 import { GET_CAPABILITY_MAP_DATA } from '@/graphql/capability'
 import { GET_APPLICATIONS_COUNT } from '@/graphql/application'
@@ -115,6 +116,19 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
     ? calculateTotalApplicationsCount(data.businessCapabilities, settings)
     : 0
 
+  // Calculate applications with capability assignment
+  const applicationsWithCapabilityCount = data
+    ? (() => {
+        const uniqueApps = new Set()
+        data.businessCapabilities.forEach((cap: any) => {
+          if (cap.supportedByApplications) {
+            cap.supportedByApplications.forEach((app: any) => uniqueApps.add(app.id))
+          }
+        })
+        return uniqueApps.size
+      })()
+    : 0
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>Capability Map generieren</DialogTitle>
@@ -142,18 +156,38 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
           {data && (
             <>
               <Alert severity="info" sx={{ my: 2 }}>
-                {data.businessCapabilities.length} Capabilities gesamt gefunden,{' '}
-                {renderedCapabilitiesCount} werden auf der Map dargestellt
-                {totalApplicationsCount > 0 && (
-                  <> • {totalApplicationsCount} Anwendungen gefunden</>
-                )}
-                {appCountData && (
-                  <>
-                    {' '}
-                    • {appCountData.applicationsConnection.aggregate.count.nodes} Anwendungen in der
-                    Datenbank
-                  </>
-                )}
+                <Box component="div">
+                  <Typography variant="body2" component="div" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <BusinessCapabilityIcon sx={{ color: '#1976d2', fontSize: 16 }} />
+                    {data.businessCapabilities.length} Capabilities gesamt gefunden
+                  </Typography>
+                  <Typography variant="body2" component="div" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <BusinessCapabilityIcon sx={{ color: '#388e3c', fontSize: 16 }} />
+                    {renderedCapabilitiesCount} Capabilities werden dargestellt
+                  </Typography>
+                  {settings.includeApplications && (
+                    <>
+                      {appCountData && (
+                        <Typography variant="body2" component="div" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <ApplicationComponentIcon sx={{ color: '#1976d2', fontSize: 16 }} />
+                          {appCountData.applicationsConnection.aggregate.count.nodes} Applikationen gesamt gefunden
+                        </Typography>
+                      )}
+                      {applicationsWithCapabilityCount > 0 && (
+                        <Typography variant="body2" component="div" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <ApplicationComponentIcon sx={{ color: '#ff9800', fontSize: 16 }} />
+                          {applicationsWithCapabilityCount} Applikationen mit Capability-Zuordnung
+                        </Typography>
+                      )}
+                      {totalApplicationsCount > 0 && (
+                        <Typography variant="body2" component="div" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <ApplicationComponentIcon sx={{ color: '#388e3c', fontSize: 16 }} />
+                          {totalApplicationsCount} Applikationen werden dargestellt
+                        </Typography>
+                      )}
+                    </>
+                  )}
+                </Box>
               </Alert>
 
               <Box sx={{ mt: 3 }}>
@@ -175,7 +209,7 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
                       onChange={e => handleSettingChange('includeApplications', e.target.checked)}
                     />
                   }
-                  label="Unterstützende Anwendungen einbeziehen"
+                  label="Unterstützende Applikationen einbeziehen"
                 />
 
                 <TextField
