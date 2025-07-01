@@ -125,7 +125,7 @@ export function calculateRenderedCapabilitiesCount(
   return count
 }
 
-// Helper function to calculate the total height needed for a capability subtree
+// Simplified and robust height calculation that matches the renderer exactly
 export const calculateSubtreeHeight = (
   capability: BusinessCapability,
   allCapabilities: BusinessCapability[],
@@ -133,7 +133,7 @@ export const calculateSubtreeHeight = (
   currentLevel: number,
   maxLevels: number,
   settings: CapabilityMapSettings,
-  applicationTemplate?: any // Add applicationTemplate parameter
+  applicationTemplate?: any
 ): number => {
   // Check if we've reached the maximum level
   if (currentLevel >= maxLevels) {
@@ -144,7 +144,7 @@ export const calculateSubtreeHeight = (
   const allChildren = findChildCapabilities(capability.id, allCapabilities)
   const visibleChildren = currentLevel + 1 < maxLevels ? allChildren : []
 
-  // Find applications that should be displayed for this capability (using the same logic as rendering)
+  // Find applications that should be displayed for this capability
   const applications = settings.includeApplications
     ? collectApplicationsForDisplay(capability, allCapabilities, currentLevel, maxLevels)
     : []
@@ -157,46 +157,16 @@ export const calculateSubtreeHeight = (
     return baseHeight
   }
 
-  // Special case: For maxLevels = 1, we need to ensure applications are properly sized
-  // Even if there are no visible children, applications need space
-  if (maxLevels === 1 && visibleChildren.length === 0 && applications.length > 0) {
-    // Calculate height needed for applications only (no children)
-    let applicationHeight = baseHeight * 0.8 // Default fallback
-    if (applicationTemplate) {
-      const appTemplateRect = applicationTemplate.elements.find(
-        (el: any) => el.type === 'rectangle'
-      )
-      if (appTemplateRect) {
-        applicationHeight = Math.max(appTemplateRect.height, baseHeight * 0.8)
-      }
-    }
-
-    // Calculate total height for applications
-    const textAreaHeight = 50
-    const childPadding = 10
-    const childSpacing = 10
-    const bottomPadding = 10
-
-    let totalApplicationHeight = textAreaHeight + childPadding
-    applications.forEach(() => {
-      totalApplicationHeight += applicationHeight + childSpacing
-    })
-    totalApplicationHeight += bottomPadding
-
-    return Math.max(baseHeight, totalApplicationHeight)
-  }
-
   // For non-leaf nodes, calculate height exactly as the renderer does
   // These constants MUST MATCH the renderer values exactly!
   const textAreaHeight = 50 // Space reserved for the capability text at the top
   const childPadding = 10 // Padding between text area and first child
-  const childSpacing = 10 // Spacing between children and applications (matches renderer)
-  const bottomPadding = 10 // Padding at the bottom (matches renderer)
+  const childSpacing = 10 // Spacing between children and applications
+  const bottomPadding = 10 // Padding at the bottom
 
-  // Start position calculation exactly like in renderer
-  let currentChildY = textAreaHeight + childPadding
+  let totalContentHeight = textAreaHeight + childPadding
 
-  // First, calculate space for all visible children
+  // Calculate space for all visible children
   visibleChildren.forEach((child, _childIndex) => {
     const childHeight = calculateSubtreeHeight(
       child,
@@ -208,13 +178,13 @@ export const calculateSubtreeHeight = (
       applicationTemplate
     )
 
-    currentChildY += childHeight
-
-    // Add spacing after each child (matches renderer: currentChildY += childResult.totalHeight + childSpacing)
-    currentChildY += childSpacing
+    totalContentHeight += childHeight
+    
+    // Add spacing after EVERY child (matches renderer: currentChildY += childResult.totalHeight + childSpacing)
+    totalContentHeight += childSpacing
   })
 
-  // Then, calculate space for applications (if any and template available)
+  // Calculate space for applications
   if (applications.length > 0) {
     // Calculate application height exactly like the renderer does
     let applicationHeight = baseHeight * 0.8 // Default fallback
@@ -227,48 +197,21 @@ export const calculateSubtreeHeight = (
       }
     }
 
-    applications.forEach(_app => {
-      currentChildY += applicationHeight
-
-      // Add spacing after each application (matches renderer: currentChildY += appHeight + childSpacing)
-      currentChildY += childSpacing
+    applications.forEach((_app, _appIndex) => {
+      totalContentHeight += applicationHeight
+      
+      // Add spacing after EVERY application (matches renderer: currentChildY += appHeight + childSpacing)
+      totalContentHeight += childSpacing
     })
   }
 
-  // Calculate the total height including bottom padding
-  const contentHeight = currentChildY + bottomPadding
+  // Add bottom padding
+  totalContentHeight += bottomPadding
 
-  // Dynamic adjustment buffer based on level depth, content type and complexity
-  let adjustmentBuffer = 0
-
-  // Base buffer calculation
-  if (maxLevels === 1) {
-    // For single level, minimal buffer needed since it's mostly applications
-    adjustmentBuffer = applications.length > 0 ? 5 : 0
-  } else if (maxLevels === 2) {
-    // For two levels, need significantly more buffer
-    if (visibleChildren.length > 0 && applications.length > 0) {
-      adjustmentBuffer = 40 // Both children and apps - increased from 25
-    } else if (visibleChildren.length > 0 || applications.length > 0) {
-      adjustmentBuffer = 35 // Either children or apps - increased from 20
-    } else {
-      adjustmentBuffer = 0 // Neither
-    }
-  } else if (maxLevels === 3) {
-    // For three levels, the originally tuned buffer
-    adjustmentBuffer = 20
-  } else {
-    // For 4+ levels, reduce buffer as it was too much
-    const baseBuffer = 15 // Reduced from 25
-    const complexityFactor = (maxLevels - 4) * 3 // Reduced from 5
-    const contentComplexity =
-      (visibleChildren.length > 2 ? 3 : 0) + (applications.length > 2 ? 3 : 0) // Reduced from 5
-    adjustmentBuffer = baseBuffer + complexityFactor + contentComplexity
-  }
-
-  const totalHeight = Math.max(baseHeight, contentHeight + adjustmentBuffer)
-
-  return totalHeight
+  // Return the maximum of base height and calculated content height
+  // Note: The renderer calculates actualUsedHeight as currentChildY - y + bottomPadding
+  // Since currentChildY includes spacing after the last element, we keep all spacing as calculated
+  return Math.max(baseHeight, totalContentHeight)
 }
 
 // DEPRECATED: This function doesn't account for rollup behavior

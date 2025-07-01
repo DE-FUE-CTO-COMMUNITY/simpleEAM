@@ -50,7 +50,8 @@ export const renderCapabilityHierarchy = (
     baseHeight,
     currentLevel,
     settings.maxLevels,
-    settings
+    settings,
+    applicationTemplate // Pass the applicationTemplate for consistent height calculations
   )
 
   // Determine if this is a leaf node (no visible children and no applications to render)
