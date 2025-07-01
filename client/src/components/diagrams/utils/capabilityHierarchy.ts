@@ -179,7 +179,7 @@ export const calculateSubtreeHeight = (
     )
 
     totalContentHeight += childHeight
-    
+
     // Add spacing after EVERY child (matches renderer: currentChildY += childResult.totalHeight + childSpacing)
     totalContentHeight += childSpacing
   })
@@ -199,7 +199,7 @@ export const calculateSubtreeHeight = (
 
     applications.forEach((_app, _appIndex) => {
       totalContentHeight += applicationHeight
-      
+
       // Add spacing after EVERY application (matches renderer: currentChildY += appHeight + childSpacing)
       totalContentHeight += childSpacing
     })
