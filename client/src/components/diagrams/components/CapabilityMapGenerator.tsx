@@ -20,9 +20,10 @@ import { GET_APPLICATIONS_COUNT } from '@/graphql/application'
 import {
   generateCapabilityMapWithLibrary,
   calculateRenderedCapabilitiesCount,
-  calculateTotalApplicationsCount,
+  calculateDisplayedApplicationsCount,
   debugCapabilityHierarchy,
   debugMissingCapabilities,
+  debugApplicationRollup,
   type CapabilityMapSettings,
 } from '../utils/CapabilityMapLibraryUtils'
 
@@ -63,11 +64,13 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
 
     try {
       // Debug the capability hierarchy before generation
-      console.log('🚀 Starting capability map generation...')
       debugCapabilityHierarchy(data.businessCapabilities, settings)
 
       // Enhanced debug analysis to find missing capabilities
       debugMissingCapabilities(data.businessCapabilities, settings)
+
+      // Debug application rollup behavior
+      debugApplicationRollup(data.businessCapabilities, settings)
 
       let elements: any[] = []
 
@@ -78,15 +81,6 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
         console.warn('Capability Map konnte nicht generiert werden')
         return
       }
-
-      console.log('Capability Map Generator erfolgreich:', {
-        settings,
-        capabilitiesTotal: data.businessCapabilities.length,
-        capabilitiesRendered: calculateRenderedCapabilitiesCount(
-          data.businessCapabilities,
-          settings
-        ),
-      })
 
       // Pass elements to parent component if callback provided
       if (onElementsGenerated) {
@@ -111,9 +105,9 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
     ? calculateRenderedCapabilitiesCount(data.businessCapabilities, settings)
     : 0
 
-  // Calculate total applications count
+  // Calculate displayed applications count (using the corrected rollup logic)
   const totalApplicationsCount = data
-    ? calculateTotalApplicationsCount(data.businessCapabilities, settings)
+    ? calculateDisplayedApplicationsCount(data.businessCapabilities, settings)
     : 0
 
   // Calculate applications with capability assignment
@@ -157,30 +151,51 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
             <>
               <Alert severity="info" sx={{ my: 2 }}>
                 <Box component="div">
-                  <Typography variant="body2" component="div" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Typography
+                    variant="body2"
+                    component="div"
+                    sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                  >
                     <BusinessCapabilityIcon sx={{ color: '#1976d2', fontSize: 16 }} />
                     {data.businessCapabilities.length} Capabilities gesamt gefunden
                   </Typography>
-                  <Typography variant="body2" component="div" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Typography
+                    variant="body2"
+                    component="div"
+                    sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                  >
                     <BusinessCapabilityIcon sx={{ color: '#388e3c', fontSize: 16 }} />
                     {renderedCapabilitiesCount} Capabilities werden dargestellt
                   </Typography>
                   {settings.includeApplications && (
                     <>
                       {appCountData && (
-                        <Typography variant="body2" component="div" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Typography
+                          variant="body2"
+                          component="div"
+                          sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                        >
                           <ApplicationComponentIcon sx={{ color: '#1976d2', fontSize: 16 }} />
-                          {appCountData.applicationsConnection.aggregate.count.nodes} Applikationen gesamt gefunden
+                          {appCountData.applicationsConnection.aggregate.count.nodes} Applikationen
+                          gesamt gefunden
                         </Typography>
                       )}
                       {applicationsWithCapabilityCount > 0 && (
-                        <Typography variant="body2" component="div" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Typography
+                          variant="body2"
+                          component="div"
+                          sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                        >
                           <ApplicationComponentIcon sx={{ color: '#ff9800', fontSize: 16 }} />
                           {applicationsWithCapabilityCount} Applikationen mit Capability-Zuordnung
                         </Typography>
                       )}
                       {totalApplicationsCount > 0 && (
-                        <Typography variant="body2" component="div" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Typography
+                          variant="body2"
+                          component="div"
+                          sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                        >
                           <ApplicationComponentIcon sx={{ color: '#388e3c', fontSize: 16 }} />
                           {totalApplicationsCount} Applikationen werden dargestellt
                         </Typography>

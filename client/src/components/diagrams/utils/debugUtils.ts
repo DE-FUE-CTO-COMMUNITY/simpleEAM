@@ -80,3 +80,121 @@ export function debugMissingCapabilities(
     missingDetails: [],
   }
 }
+
+// Debug function to analyze application rollup behavior
+export function debugApplicationRollup(
+  capabilities: BusinessCapability[],
+  settings: CapabilityMapSettings
+): any {
+  if (!settings.includeApplications) {
+    console.log('🔍 Application rollup debug: Applications are disabled in settings')
+    return { disabled: true }
+  }
+
+  console.log('🔍 Application rollup debug analysis:')
+  console.log(
+    `Settings: maxLevels=${settings.maxLevels}, includeApplications=${settings.includeApplications}`
+  )
+
+  const topLevelCapabilities = findTopLevelCapabilities(capabilities)
+  const analysis = {
+    totalUniqueApps: 0,
+    directlyAssignedApps: 0,
+    rolledUpApps: 0,
+    details: [] as any[],
+  }
+
+  const processCapability = (capability: BusinessCapability, currentLevel: number, indent = '') => {
+    // Only process if this capability will be rendered
+    if (currentLevel >= settings.maxLevels) {
+      return
+    }
+
+    const directApps = capability.supportedByApplications || []
+    const isLastVisibleLevel = currentLevel === settings.maxLevels - 1
+
+    console.log(`${indent}📊 ${capability.name} (Level ${currentLevel})`)
+    console.log(`${indent}   Direct apps: ${directApps.length}`)
+
+    const rolledUpApps: any[] = []
+    if (isLastVisibleLevel) {
+      // This capability is at the last visible level, so roll up from hidden children
+      const children = findChildCapabilities(capability.id, capabilities)
+      children.forEach(child => {
+        const childApps = child.supportedByApplications || []
+        rolledUpApps.push(...childApps)
+        console.log(`${indent}   Hidden child "${child.name}": ${childApps.length} apps`)
+
+        // Recursively collect from hidden descendants
+        const collectFromDescendants = (desc: BusinessCapability, descLevel: number) => {
+          const grandChildren = findChildCapabilities(desc.id, capabilities)
+          grandChildren.forEach(grandChild => {
+            const grandChildApps = grandChild.supportedByApplications || []
+            rolledUpApps.push(...grandChildApps)
+            console.log(
+              `${indent}     Hidden descendant "${grandChild.name}": ${grandChildApps.length} apps`
+            )
+            collectFromDescendants(grandChild, descLevel + 1)
+          })
+        }
+        collectFromDescendants(child, currentLevel + 2)
+      })
+    }
+
+    const uniqueRolledUp = rolledUpApps.filter(
+      (app, index, self) => index === self.findIndex(a => a.id === app.id)
+    )
+
+    const totalAppsForCapability = [...directApps, ...uniqueRolledUp].filter(
+      (app, index, self) => index === self.findIndex(a => a.id === app.id)
+    )
+
+    console.log(`${indent}   Rolled up apps: ${uniqueRolledUp.length}`)
+    console.log(`${indent}   Total apps to display: ${Math.min(totalAppsForCapability.length, 3)}`)
+
+    analysis.details.push({
+      name: capability.name,
+      level: currentLevel,
+      directApps: directApps.length,
+      rolledUpApps: uniqueRolledUp.length,
+      totalApps: totalAppsForCapability.length,
+      displayedApps: Math.min(totalAppsForCapability.length, 3),
+      isLastVisibleLevel,
+    })
+
+    // Process visible children
+    if (currentLevel + 1 < settings.maxLevels) {
+      const children = findChildCapabilities(capability.id, capabilities)
+      children.forEach(child => {
+        processCapability(child, currentLevel + 1, indent + '  ')
+      })
+    }
+  }
+
+  topLevelCapabilities.forEach(capability => {
+    processCapability(capability, 0)
+  })
+
+  // Calculate totals
+  const allUniqueApps = new Set()
+  capabilities.forEach(cap => {
+    if (cap.supportedByApplications) {
+      cap.supportedByApplications.forEach(app => allUniqueApps.add(app.id))
+    }
+  })
+
+  analysis.totalUniqueApps = allUniqueApps.size
+  analysis.directlyAssignedApps = analysis.details.reduce(
+    (sum, detail) => sum + detail.directApps,
+    0
+  )
+  analysis.rolledUpApps = analysis.details.reduce((sum, detail) => sum + detail.rolledUpApps, 0)
+
+  console.log('🔍 Rollup Analysis Summary:')
+  console.log(`   Total unique apps in system: ${analysis.totalUniqueApps}`)
+  console.log(
+    `   Apps displayed on map: ${analysis.details.reduce((sum, detail) => sum + detail.displayedApps, 0)}`
+  )
+
+  return analysis
+}

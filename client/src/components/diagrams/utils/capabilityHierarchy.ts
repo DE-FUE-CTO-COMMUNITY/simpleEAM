@@ -130,12 +130,9 @@ export const calculateSubtreeHeight = (
   settings: CapabilityMapSettings,
   applicationTemplate?: any // Add applicationTemplate parameter
 ): number => {
-  // Base height for the capability itself
-  let totalHeight = baseHeight
-
-  // If we've reached max levels, return just the base height
+  // Check if we've reached the maximum level
   if (currentLevel >= maxLevels) {
-    return totalHeight
+    return 0
   }
 
   // Find visible children (only those that will be displayed)
@@ -147,27 +144,26 @@ export const calculateSubtreeHeight = (
     ? collectApplicationsForDisplay(capability, allCapabilities, currentLevel, maxLevels)
     : []
 
-  // If no visible children and no applications, return base height
-  if (visibleChildren.length === 0 && applications.length === 0) {
-    return totalHeight
+  // Determine if this is a leaf node (no visible children and no applications to render)
+  const isLeaf = visibleChildren.length === 0 && applications.length === 0
+
+  // If this is a leaf node, return the base height
+  if (isLeaf) {
+    return baseHeight
   }
 
-  // Add space for text area and padding - increased for better text display
-  const textAreaHeight = 50 // Increased from 30 to 50 for better text visibility
-  const childSpacing = 10
+  // For non-leaf nodes, calculate height exactly as the renderer does
+  // These constants MUST MATCH the renderer values exactly!
+  const textAreaHeight = 50 // Space reserved for the capability text at the top
+  const childPadding = 10 // Padding between text area and first child
+  const childSpacing = 10 // Spacing between children and applications (matches renderer)
+  const bottomPadding = 10 // Padding at the bottom (matches renderer)
 
-  // Calculate application height from template or use fallback
-  let applicationHeight = baseHeight * 0.8 // Default fallback
-  if (applicationTemplate) {
-    const appTemplateRect = applicationTemplate.elements.find((el: any) => el.type === 'rectangle')
-    if (appTemplateRect) {
-      applicationHeight = Math.max(appTemplateRect.height, baseHeight * 0.8)
-    }
-  }
+  // Start position calculation exactly like in renderer
+  let currentChildY = textAreaHeight + childPadding
 
-  // Calculate height for visible children recursively
-  let childrenTotalHeight = 0
-  visibleChildren.forEach(child => {
+  // First, calculate space for all visible children
+  visibleChildren.forEach((child, _childIndex) => {
     const childHeight = calculateSubtreeHeight(
       child,
       allCapabilities,
@@ -175,23 +171,47 @@ export const calculateSubtreeHeight = (
       currentLevel + 1,
       maxLevels,
       settings,
-      applicationTemplate // Pass the applicationTemplate down
+      applicationTemplate
     )
-    childrenTotalHeight += childHeight + childSpacing
+
+    currentChildY += childHeight
+
+    // Add spacing after each child (matches renderer: currentChildY += childResult.totalHeight + childSpacing)
+    currentChildY += childSpacing
   })
 
-  // Calculate height for applications (if any)
-  let applicationsTotalHeight = 0
+  // Then, calculate space for applications (if any and template available)
   if (applications.length > 0) {
-    applicationsTotalHeight = applications.length * (applicationHeight + childSpacing)
+    // Calculate application height exactly like the renderer does
+    let applicationHeight = baseHeight * 0.8 // Default fallback
+    if (applicationTemplate) {
+      const appTemplateRect = applicationTemplate.elements.find(
+        (el: any) => el.type === 'rectangle'
+      )
+      if (appTemplateRect) {
+        applicationHeight = Math.max(appTemplateRect.height, baseHeight * 0.8)
+      }
+    }
+
+    applications.forEach(_app => {
+      currentChildY += applicationHeight
+
+      // Add spacing after each application (matches renderer: currentChildY += appHeight + childSpacing)
+      currentChildY += childSpacing
+    })
   }
 
-  // Total height = text area + padding + all visible children heights + all application heights
-  totalHeight = textAreaHeight + 10 + childrenTotalHeight + applicationsTotalHeight + 10
+  // Calculate the total height including bottom padding
+  const contentHeight = currentChildY + bottomPadding
+
+  // Add adjustment buffer to match actual renderer behavior
+  const adjustmentBuffer = 20
+  const totalHeight = Math.max(baseHeight, contentHeight + adjustmentBuffer)
 
   return totalHeight
 }
 
+// DEPRECATED: This function doesn't account for rollup behavior
 export function calculateTotalApplicationsCount(
   capabilities: BusinessCapability[],
   settings: CapabilityMapSettings
@@ -208,4 +228,54 @@ export function calculateTotalApplicationsCount(
   })
 
   return totalApplications
+}
+
+// NEW: Function to calculate how many applications will actually be displayed on the map
+// This accounts for the smart rollup logic and only counts rendered capabilities
+export function calculateDisplayedApplicationsCount(
+  capabilities: BusinessCapability[],
+  settings: CapabilityMapSettings
+): number {
+  if (!settings.includeApplications) {
+    return 0
+  }
+
+  const uniqueDisplayedApps = new Set<string>()
+
+  // Helper function to process a capability and count its displayed applications
+  const processCapability = (capability: BusinessCapability, currentLevel: number) => {
+    // Only process if this capability will be rendered (within maxLevels)
+    if (currentLevel >= settings.maxLevels) {
+      return
+    }
+
+    // Get applications that will be displayed for this capability using the same logic as rendering
+    const displayedApps = collectApplicationsForDisplay(
+      capability,
+      capabilities,
+      currentLevel,
+      settings.maxLevels
+    )
+
+    // Add each application to our set (ensures uniqueness)
+    displayedApps.forEach(app => {
+      uniqueDisplayedApps.add(app.id)
+    })
+
+    // Process visible child capabilities
+    if (currentLevel + 1 < settings.maxLevels) {
+      const children = findChildCapabilities(capability.id, capabilities)
+      children.forEach(child => {
+        processCapability(child, currentLevel + 1)
+      })
+    }
+  }
+
+  // Start with top-level capabilities
+  const topLevelCapabilities = findTopLevelCapabilities(capabilities)
+  topLevelCapabilities.forEach(capability => {
+    processCapability(capability, 0)
+  })
+
+  return uniqueDisplayedApps.size
 }

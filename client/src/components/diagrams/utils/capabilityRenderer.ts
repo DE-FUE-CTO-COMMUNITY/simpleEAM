@@ -54,9 +54,8 @@ export const renderCapabilityHierarchy = (
   )
 
   // Determine if this is a leaf node (no visible children and no applications to render)
-  const isLeaf =
-    (visibleChildren.length === 0 && applications.length === 0) ||
-    currentLevel === settings.maxLevels - 1
+  // A capability is a leaf ONLY if it has neither visible children NOR applications to display
+  const isLeaf = visibleChildren.length === 0 && applications.length === 0
 
   // Create the capability box itself
   // For level-0 capabilities, use uniform height if provided; otherwise use calculated height
@@ -158,6 +157,16 @@ export const renderCapabilityHierarchy = (
         currentChildY += appHeight + childSpacing
       })
     }
+
+    // Calculate the actual used height including content and padding
+    const actualUsedHeight = Math.max(
+      capabilityHeight, // Minimum height is the calculated capability height
+      currentChildY - y + 10 // Actual content height plus bottom padding
+    )
+
+    return { elements, totalHeight: actualUsedHeight }
+  } else {
+    // Leaf capability - no content to render inside
   }
 
   return { elements, totalHeight: capabilityHeight }

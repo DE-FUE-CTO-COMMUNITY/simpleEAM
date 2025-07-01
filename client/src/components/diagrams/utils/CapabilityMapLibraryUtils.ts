@@ -11,6 +11,7 @@ export {
   findAllDescendants,
   calculateRenderedCapabilitiesCount,
   calculateTotalApplicationsCount,
+  calculateDisplayedApplicationsCount,
   calculateSubtreeHeight,
   collectApplicationsForDisplay,
 } from './capabilityHierarchy'
@@ -18,7 +19,11 @@ export {
   createCapabilityElementsFromTemplate,
   createApplicationElementsFromTemplate,
 } from './elementCreation'
-export { debugCapabilityHierarchy, debugMissingCapabilities } from './debugUtils'
+export {
+  debugCapabilityHierarchy,
+  debugMissingCapabilities,
+  debugApplicationRollup,
+} from './debugUtils'
 export { renderCapabilityHierarchy } from './capabilityRenderer'
 
 // Import what we need for the main functions
@@ -65,36 +70,6 @@ export const generateCapabilityMapWithLibrary = async (
     applicationTemplate = archimateLibrary.libraryItems.find(
       (item: any) => item.name && item.name.toLowerCase().includes('application')
     )
-  }
-
-  // Debug: Always log available templates and found templates in development
-  if (process.env.NODE_ENV === 'development') {
-    console.log('🔍 ArchiMate Library Templates:')
-    archimateLibrary.libraryItems.forEach((item: any) => {
-      console.log(`- "${item.name}" (elements: ${item.elements?.length || 0})`)
-      if (item.elements && item.elements.length > 0) {
-        const rectElements = item.elements.filter((el: any) => el.type === 'rectangle')
-        const textElements = item.elements.filter((el: any) => el.type === 'text')
-        console.log(`  → Rectangles: ${rectElements.length}, Texts: ${textElements.length}`)
-        if (textElements.length > 0) {
-          console.log(
-            `  → Text content: ${textElements.map((el: any) => `"${el.text}"`).join(', ')}`
-          )
-        }
-      }
-    })
-
-    console.log(`✅ Capability Template: ${capabilityTemplate ? 'Found' : 'NOT FOUND'}`)
-    console.log(`✅ Application Template: ${applicationTemplate ? 'Found' : 'NOT FOUND'}`)
-
-    if (applicationTemplate) {
-      console.log('📦 Application Template Details:')
-      applicationTemplate.elements.forEach((el: any, idx: number) => {
-        console.log(`  ${idx}: ${el.type} (${el.x}, ${el.y}) ${el.width}x${el.height}`)
-        if (el.type === 'text') console.log(`      Text: "${el.text}"`)
-        if (el.backgroundColor) console.log(`      BG: ${el.backgroundColor}`)
-      })
-    }
   }
 
   if (!capabilityTemplate) {
