@@ -2,7 +2,11 @@ import type { BusinessCapability } from '@/gql/generated'
 import type { ExcalidrawElement } from './CapabilityMapUtils'
 import type { CapabilityMapSettings, RenderResult } from './capabilityMapTypes'
 import type { LibraryTemplate } from './archimateLibraryUtils'
-import { findChildCapabilities, calculateSubtreeHeight } from './capabilityHierarchy'
+import {
+  findChildCapabilities,
+  calculateSubtreeHeight,
+  collectApplicationsForDisplay,
+} from './capabilityHierarchy'
 import {
   createCapabilityElementsFromTemplate,
   createApplicationElementsFromTemplate,
@@ -30,14 +34,14 @@ export const renderCapabilityHierarchy = (
     return { elements, totalHeight: 0 }
   }
 
-  // Find children
-  const children = findChildCapabilities(capability.id, allCapabilities)
+  // Find visible children (only render children that are within maxLevels)
+  const allChildren = findChildCapabilities(capability.id, allCapabilities)
+  const visibleChildren = currentLevel + 1 < settings.maxLevels ? allChildren : []
 
-  // Find applications that should be included for this capability
-  const applications =
-    settings.includeApplications && capability.supportedByApplications
-      ? capability.supportedByApplications.slice(0, 3)
-      : []
+  // Find applications that should be displayed for this capability (smart rollup logic)
+  const applications = settings.includeApplications
+    ? collectApplicationsForDisplay(capability, allCapabilities, currentLevel, settings.maxLevels)
+    : []
 
   // Calculate the total height needed for this subtree
   const subtreeHeight = calculateSubtreeHeight(
@@ -49,9 +53,9 @@ export const renderCapabilityHierarchy = (
     settings
   )
 
-  // Determine if this is a leaf node (no children and no applications to render)
+  // Determine if this is a leaf node (no visible children and no applications to render)
   const isLeaf =
-    (children.length === 0 && applications.length === 0) || currentLevel === settings.maxLevels - 1
+    (visibleChildren.length === 0 && applications.length === 0) || currentLevel === settings.maxLevels - 1
 
   // Create the capability box itself
   // For level-0 capabilities, use uniform height if provided; otherwise use calculated height
@@ -82,8 +86,8 @@ export const renderCapabilityHierarchy = (
 
   elements.push(...capabilityElements)
 
-  // If this is not a leaf, render children and applications inside the box
-  if (!isLeaf && (children.length > 0 || applications.length > 0)) {
+  // If this is not a leaf, render visible children and applications inside the box
+  if (!isLeaf && (visibleChildren.length > 0 || applications.length > 0)) {
     const textAreaHeight = 50 // Increased space for text at the top - matches the calculation function
     const childPadding = 10
     const childSpacing = 10
@@ -91,8 +95,8 @@ export const renderCapabilityHierarchy = (
 
     let currentChildY = y + textAreaHeight + childPadding
 
-    // First, render all child capabilities
-    children.forEach((child, _childIndex) => {
+    // First, render all visible child capabilities
+    visibleChildren.forEach((child, _childIndex) => {
       // Calculate child dimensions
       const childWidth = width - childIndent - 10
       const childX = x + childIndent

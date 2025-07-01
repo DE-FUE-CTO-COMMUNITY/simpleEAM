@@ -1,6 +1,7 @@
 import type { BusinessCapability } from '@/gql/generated'
 import type { ExcalidrawElement } from './CapabilityMapUtils'
 import { findArchimateTemplate, loadArchimateLibrary } from './archimateLibraryUtils'
+import { generateCapabilityMapElements as fallbackCapabilityMapElements } from './CapabilityMapUtils'
 
 // Re-export all types and functions from the refactored modules
 export type { CapabilityMapSettings, ElementCustomizations } from './capabilityMapTypes'
@@ -12,6 +13,7 @@ export {
   calculateRenderedCapabilitiesCount,
   calculateTotalApplicationsCount,
   calculateSubtreeHeight,
+  collectApplicationsForDisplay,
 } from './capabilityHierarchy'
 export {
   createCapabilityElementsFromTemplate,
@@ -22,7 +24,7 @@ export { renderCapabilityHierarchy } from './capabilityRenderer'
 
 // Import what we need for the main functions
 import type { CapabilityMapSettings } from './capabilityMapTypes'
-import { initializeIndices, generateId, generateSeed } from './elementIdManager'
+import { initializeIndices, generateId } from './elementIdManager'
 import {
   findTopLevelCapabilities,
   findChildCapabilities,
@@ -211,93 +213,12 @@ export const generateCapabilityMapWithLibrary = async (
   return elements
 }
 
-// Fallback function that uses simple rectangles (updated to support recursive rendering)
+// Fallback function that uses simple rectangles - delegate to the proper implementation
 export const generateCapabilityMapElements = (
   capabilities: BusinessCapability[],
   settings: CapabilityMapSettings
 ): ExcalidrawElement[] => {
-  const elements: ExcalidrawElement[] = []
-
-  // Find top-level capabilities
-  const topLevelCapabilities = findTopLevelCapabilities(capabilities)
-
-  if (topLevelCapabilities.length === 0) {
-    console.warn('No top-level capabilities found')
-    return elements
-  }
-
-  const startX = 100
-  const startY = 100
-  const baseWidth = 250
-  const baseHeight = 80
-
-  // Initialize indices for this fallback function
-  initializeIndices(100)
-
-  // Calculate uniform container height based on maximum descendant count across all top-level capabilities
-  let uniformContainerHeight = baseHeight
-  if (settings.maxLevels > 1) {
-    let maxDescendantCount = 0
-
-    // Find the maximum number of descendants among all top-level capabilities
-    topLevelCapabilities.forEach(capability => {
-      const descendants = findAllDescendants(capability.id, capabilities, 1, settings.maxLevels)
-      maxDescendantCount = Math.max(maxDescendantCount, descendants.length)
-    })
-
-    // Calculate needed height for the maximum number of descendants
-    uniformContainerHeight = Math.max(baseHeight, (maxDescendantCount + 1) * (baseHeight + 20) + 40)
-  }
-
-  // Generate top-level capabilities horizontally
-  topLevelCapabilities.forEach((capability, index) => {
-    const x = startX + index * (baseWidth + settings.horizontalSpacing)
-    const y = startY
-
-    // Create main capability container
-    const mainElementId = generateId()
-    const textElementId = generateId()
-    const capabilityGroupId = generateId()
-
-    // Main capability rectangle
-    const mainRect: ExcalidrawElement = {
-      id: mainElementId,
-      type: 'rectangle',
-      x,
-      y,
-      width: baseWidth,
-      height: uniformContainerHeight,
-      angle: 0,
-      strokeColor: '#1e1e1e',
-      backgroundColor: 'transparent',
-      fillStyle: 'solid',
-      strokeWidth: 2,
-      strokeStyle: 'solid',
-      roughness: 1,
-      opacity: 100,
-      groupIds: [capabilityGroupId],
-      frameId: null,
-      index: 'a0' as any, // Simplified for fallback
-      roundness: null,
-      seed: generateSeed(),
-      version: 1,
-      versionNonce: generateSeed(),
-      isDeleted: false,
-      boundElements: [{ id: textElementId, type: 'text' }],
-      updated: Date.now(),
-      link: null,
-      locked: false,
-      customData: {
-        databaseId: capability.id,
-        elementType: 'businessCapability',
-        originalElement: capability,
-        isFromDatabase: true,
-        isMainElement: true,
-      },
-    }
-
-    elements.push(mainRect)
-  })
-
-  return elements
+  // Use the proper implementation from CapabilityMapUtils
+  // This ensures we use the same logic with the correct level-aware application rollup
+  return fallbackCapabilityMapElements(capabilities, settings)
 }

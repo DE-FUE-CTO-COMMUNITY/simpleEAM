@@ -1,5 +1,6 @@
 import type { BusinessCapability } from '@/gql/generated'
 import { generateNKeysBetween } from 'fractional-indexing'
+import { collectApplicationsForDisplay } from './capabilityHierarchy'
 
 export interface CapabilityMapSettings {
   maxLevels: number
@@ -365,67 +366,73 @@ export const generateCapabilityMapElements = (
         }
 
         elements.push(childRect, childText)
-
-        // Add applications if enabled
-        if (
-          settings.includeApplications &&
-          child.supportedByApplications &&
-          child.supportedByApplications.length > 0
-        ) {
-          child.supportedByApplications.slice(0, 3).forEach((app, appIndex) => {
-            const appX = childX + 5
-            const appY = childY + childHeight + 5 + appIndex * 15
-            const appTextId = generateId()
-
-            const appText: ExcalidrawElement = {
-              id: appTextId,
-              type: 'text',
-              x: appX,
-              y: appY,
-              width: calculateTextWidth(app.name, 12),
-              height: 15,
-              angle: 0,
-              strokeColor: '#666666',
-              backgroundColor: 'transparent',
-              fillStyle: 'solid',
-              strokeWidth: 1,
-              strokeStyle: 'solid',
-              roughness: 1,
-              opacity: 100,
-              groupIds: [capabilityGroupId],
-              frameId: null,
-              index: generateIndex(),
-              roundness: null,
-              seed: generateSeed(),
-              version: 1,
-              versionNonce: generateSeed(),
-              isDeleted: false,
-              boundElements: [],
-              updated: Date.now(),
-              link: null,
-              locked: false,
-              text: `• ${app.name}`,
-              fontSize: 12,
-              fontFamily: 1,
-              textAlign: 'left',
-              verticalAlign: 'top',
-              originalText: `• ${app.name}`,
-              autoResize: true,
-              lineHeight: 1.25,
-              rawText: `• ${app.name}`,
-              customData: {
-                databaseId: app.id,
-                elementType: 'application',
-                originalElement: app,
-                isFromDatabase: true,
-                isMainElement: false,
-              },
-            }
-
-            elements.push(appText)
-          })
-        }
       })
+    }
+
+    // Add applications if enabled - smart rollup logic
+    if (settings.includeApplications) {
+      // FIXME: This is wrong! We're always passing currentLevel: 0, but this function
+      // is used for top-level capabilities, so it should be 0. The real rendering
+      // happens in capabilityRenderer.ts with the correct levels.
+      const allApplications = collectApplicationsForDisplay(capability, capabilities, 0, settings.maxLevels)
+
+      if (allApplications.length > 0) {
+        // Position applications below the capability container
+        const appStartY = y + containerHeight + 10
+
+        allApplications.slice(0, 3).forEach((app, appIndex) => {
+          const appX = x + 10
+          const appY = appStartY + appIndex * 20
+          const appTextId = generateId()
+
+          const appText: ExcalidrawElement = {
+            id: appTextId,
+            type: 'text',
+            x: appX,
+            y: appY,
+            width: calculateTextWidth(app.name, 12),
+            height: 15,
+            angle: 0,
+            strokeColor: '#666666',
+            backgroundColor: 'transparent',
+            fillStyle: 'solid',
+            strokeWidth: 1,
+            strokeStyle: 'solid',
+            roughness: 1,
+            opacity: 100,
+            groupIds: [capabilityGroupId],
+            frameId: null,
+            index: generateIndex(),
+            roundness: null,
+            seed: generateSeed(),
+            version: 1,
+            versionNonce: generateSeed(),
+            isDeleted: false,
+            boundElements: [],
+            updated: Date.now(),
+            link: null,
+            locked: false,
+            text: `• ${app.name}`,
+            fontSize: 12,
+            fontFamily: 1,
+            textAlign: 'left',
+            verticalAlign: 'top',
+            originalText: `• ${app.name}`,
+            autoResize: true,
+            lineHeight: 1.25,
+            rawText: `• ${app.name}`,
+            customData: {
+              databaseId: app.id,
+              elementType: 'application',
+              originalElement: app,
+              isFromDatabase: true,
+              isMainElement: false,
+            },
+          }
+
+          elements.push(appText)
+        })
+      }
     }
   })
 
