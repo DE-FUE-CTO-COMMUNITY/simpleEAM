@@ -6,6 +6,7 @@ import {
   loadArchimateLibrary,
   type LibraryTemplate,
 } from './archimateLibraryUtils'
+import { calculateCenteredTextPosition, calculateTopCenteredTextPosition } from './textContainerUtils'
 import type { ExcalidrawElement } from './CapabilityMapUtils'
 
 export interface CapabilityMapSettings {
@@ -64,6 +65,7 @@ export function createCapabilityElementsFromTemplate(
     height?: number
     backgroundColor?: string
     fontSize?: number
+    useTopCenteredText?: boolean // Neue Option für oben mittige Textausrichtung
   }
 ): ExcalidrawElement[] {
   if (!template) {
@@ -255,8 +257,52 @@ export function createCapabilityElementsFromTemplate(
           if (newContainerId) {
             // Set the containerId to establish the bound text relationship
             newElement.containerId = newContainerId
+
+            // CRITICAL: Use the appropriate text positioning function based on customization
+            // Top-level capabilities use top-centered alignment, others use center alignment
+            const containerWithCustomizations = {
+              ...containerElement,
+              x: containerElement.x + offsetX,
+              y: containerElement.y + offsetY,
+              width: customizations?.width || containerElement.width,
+              height: customizations?.height || containerElement.height,
+            }
+
+            let textPosition
+            if (customizations?.useTopCenteredText) {
+              // Use top-centered positioning for top-level capabilities
+              textPosition = calculateTopCenteredTextPosition(
+                wrappedText,
+                containerWithCustomizations,
+                fontSize,
+                10 // 10px top padding
+              )
+            } else {
+              // Use center positioning for child capabilities and applications
+              textPosition = calculateCenteredTextPosition(
+                wrappedText,
+                containerWithCustomizations,
+                fontSize
+              )
+            }
+
+            // Set position and dimensions from the positioning function
+            newElement.x = textPosition.x
+            newElement.y = textPosition.y
+            newElement.width = textPosition.width
+            newElement.height = textPosition.height
           }
         }
+      } else {
+        // Fallback for texts without container: Use estimated dimensions
+        const lineCount = (wrappedText.match(/\n/g) || []).length + 1
+        const avgLineWidth = Math.max(...wrappedText.split('\n').map(line => line.length))
+
+        const estimatedWidth = Math.min(avgLineWidth * fontSize * 0.6, availableWidth)
+        const estimatedHeight = lineCount * fontSize * 1.2
+
+        newElement.width = element.width && element.width > 0 ? element.width : estimatedWidth
+        newElement.height = element.height && element.height > 0 ? element.height : estimatedHeight
       }
     }
 
@@ -579,6 +625,7 @@ export const generateCapabilityMapWithLibrary = async (
       {
         height: uniformContainerHeight,
         backgroundColor: '#ffffff',
+        useTopCenteredText: true, // Top-level capabilities use top-centered text alignment
       }
     )
 

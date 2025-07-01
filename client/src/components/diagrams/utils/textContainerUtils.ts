@@ -406,6 +406,49 @@ export const calculateCenteredTextPosition = (
 }
 
 /**
+ * Berechnet die Position für Text, der oben mittig im Container positioniert werden soll
+ * Verwendet für Top-Level Capabilities in der Capability Map
+ */
+export const calculateTopCenteredTextPosition = (
+  text: string,
+  containerElement: ExcalidrawElement,
+  fontSize: number = 20,
+  topPadding: number = 10
+): { x: number; y: number; width: number; height: number } => {
+  const lineCount = (text.match(/\n/g) || []).length + 1
+
+  // Berechne Text-Dimensionen entsprechend der IntegratedLibrary-Logik
+  let estimatedWidth: number
+  let estimatedHeight: number
+
+  if (lineCount === 1) {
+    // Einzeilige Texte: Präzisere Berechnung basierend auf Zeichenanzahl
+    estimatedWidth = Math.min(text.length * fontSize * 0.6, (containerElement.width || 200) - 20)
+    estimatedHeight = fontSize * 1.2
+  } else {
+    // Mehrzeilige Texte: Verwende die längste Zeile
+    const maxLineLength = Math.max(...text.split('\n').map(line => line.length))
+    estimatedWidth = Math.min(maxLineLength * fontSize * 0.6, (containerElement.width || 200) - 20)
+    estimatedHeight = lineCount * fontSize * 1.2
+  }
+
+  // Berechne horizontale Zentrierung und vertikale Top-Position
+  const containerCenterX = (containerElement.x || 0) + (containerElement.width || 0) / 2
+  const containerTop = containerElement.y || 0
+
+  // Positioniere Text horizontal zentriert und vertikal oben mit Abstand
+  const x = containerCenterX - estimatedWidth / 2
+  const y = containerTop + topPadding
+
+  return {
+    x,
+    y,
+    width: estimatedWidth,
+    height: estimatedHeight,
+  }
+}
+
+/**
  * Aktualisiert nur den Text-Inhalt ohne Position oder Alignment zu verändern
  * Diese Funktion wird für Datenbank-Synchronisation verwendet, um bestehende Positionen zu erhalten
  */
