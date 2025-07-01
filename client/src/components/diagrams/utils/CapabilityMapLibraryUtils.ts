@@ -25,6 +25,7 @@ import type { CapabilityMapSettings } from './capabilityMapTypes'
 import { initializeIndices, generateId, generateSeed } from './elementIdManager'
 import {
   findTopLevelCapabilities,
+  findChildCapabilities,
   findAllDescendants,
   calculateSubtreeHeight,
 } from './capabilityHierarchy'
@@ -47,13 +48,52 @@ export const generateCapabilityMapWithLibrary = async (
   // Get templates from library using the proven helper
   const capabilityTemplate = findArchimateTemplate(archimateLibrary, 'Capability')
 
-  // Try different possible names for application template
+  // Try comprehensive search for application template with multiple name variants
   let applicationTemplate = findArchimateTemplate(archimateLibrary, 'Application Component')
   if (!applicationTemplate) {
     applicationTemplate = findArchimateTemplate(archimateLibrary, 'Application')
   }
   if (!applicationTemplate) {
     applicationTemplate = findArchimateTemplate(archimateLibrary, 'ApplicationComponent')
+  }
+  if (!applicationTemplate) {
+    applicationTemplate = findArchimateTemplate(archimateLibrary, 'App Component')
+  }
+  if (!applicationTemplate) {
+    // Try to find any template that contains "Application" in the name
+    applicationTemplate = archimateLibrary.libraryItems.find(
+      (item: any) => item.name && item.name.toLowerCase().includes('application')
+    )
+  }
+
+  // Debug: Always log available templates and found templates in development
+  if (process.env.NODE_ENV === 'development') {
+    console.log('🔍 ArchiMate Library Templates:')
+    archimateLibrary.libraryItems.forEach((item: any) => {
+      console.log(`- "${item.name}" (elements: ${item.elements?.length || 0})`)
+      if (item.elements && item.elements.length > 0) {
+        const rectElements = item.elements.filter((el: any) => el.type === 'rectangle')
+        const textElements = item.elements.filter((el: any) => el.type === 'text')
+        console.log(`  → Rectangles: ${rectElements.length}, Texts: ${textElements.length}`)
+        if (textElements.length > 0) {
+          console.log(
+            `  → Text content: ${textElements.map((el: any) => `"${el.text}"`).join(', ')}`
+          )
+        }
+      }
+    })
+
+    console.log(`✅ Capability Template: ${capabilityTemplate ? 'Found' : 'NOT FOUND'}`)
+    console.log(`✅ Application Template: ${applicationTemplate ? 'Found' : 'NOT FOUND'}`)
+
+    if (applicationTemplate) {
+      console.log('📦 Application Template Details:')
+      applicationTemplate.elements.forEach((el: any, idx: number) => {
+        console.log(`  ${idx}: ${el.type} (${el.x}, ${el.y}) ${el.width}x${el.height}`)
+        if (el.type === 'text') console.log(`      Text: "${el.text}"`)
+        if (el.backgroundColor) console.log(`      BG: ${el.backgroundColor}`)
+      })
+    }
   }
 
   if (!capabilityTemplate) {
@@ -77,17 +117,37 @@ export const generateCapabilityMapWithLibrary = async (
 
   // Calculate total number of elements needed for index generation (recursive count)
   let totalElements = 0
+
+  // Helper function to recursively count applications in capability tree
+  const countApplicationsInCapability = (cap: BusinessCapability, level: number): number => {
+    let appCount = 0
+
+    // Count applications for this capability if we haven't exceeded maxLevels
+    if (level < settings.maxLevels && settings.includeApplications && applicationTemplate) {
+      const apps = cap.supportedByApplications || []
+      appCount += apps.length * applicationTemplate.elements.length
+    }
+
+    // Recursively count applications in child capabilities
+    if (level + 1 < settings.maxLevels) {
+      const children = findChildCapabilities(cap.id, capabilities)
+      children.forEach(child => {
+        appCount += countApplicationsInCapability(child, level + 1)
+      })
+    }
+
+    return appCount
+  }
+
   topLevelCapabilities.forEach(capability => {
     totalElements += capabilityTemplate.elements.length // Actual template elements count
+
     // Count all descendants recursively
     const allDescendants = findAllDescendants(capability.id, capabilities, 1, settings.maxLevels)
     totalElements += allDescendants.length * capabilityTemplate.elements.length
 
-    if (settings.includeApplications && applicationTemplate) {
-      // Only count applications for direct children (level 1)
-      const directChildren = capability.supportedByApplications || []
-      totalElements += Math.min(directChildren.length, 3) * applicationTemplate.elements.length
-    }
+    // Count all applications in the capability tree recursively
+    totalElements += countApplicationsInCapability(capability, 0)
   })
 
   // Initialize indices for all elements
@@ -116,7 +176,8 @@ export const generateCapabilityMapWithLibrary = async (
         baseHeight,
         0,
         settings.maxLevels,
-        settings
+        settings,
+        applicationTemplate // Pass the applicationTemplate
       )
       maxRequiredHeight = Math.max(maxRequiredHeight, requiredHeight)
     })

@@ -31,7 +31,14 @@ export function findArchimateTemplate(
   if (!item) {
     const alternatives = {
       Capability: ['Business Function', 'Business Capability', 'Business'],
-      'Application Component': ['Application', 'App Component'],
+      'Application Component': [
+        'Application',
+        'App Component',
+        'ApplicationComponent',
+        'App',
+        'Software Component',
+        'System Component',
+      ],
       'Business Object': ['Data Object', 'Data', 'Object'],
       'Application Interface': ['Interface', 'API'],
     }

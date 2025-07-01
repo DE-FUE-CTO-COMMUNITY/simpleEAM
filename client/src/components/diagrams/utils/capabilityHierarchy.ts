@@ -63,7 +63,8 @@ export const calculateSubtreeHeight = (
   baseHeight: number,
   currentLevel: number,
   maxLevels: number,
-  settings: CapabilityMapSettings
+  settings: CapabilityMapSettings,
+  applicationTemplate?: any // Add applicationTemplate parameter
 ): number => {
   // Base height for the capability itself
   let totalHeight = baseHeight
@@ -90,7 +91,15 @@ export const calculateSubtreeHeight = (
   // Add space for text area and padding - increased for better text display
   const textAreaHeight = 50 // Increased from 30 to 50 for better text visibility
   const childSpacing = 10
-  const applicationHeight = 40 // Standard height for application elements
+
+  // Calculate application height from template or use fallback
+  let applicationHeight = baseHeight * 0.8 // Default fallback
+  if (applicationTemplate) {
+    const appTemplateRect = applicationTemplate.elements.find((el: any) => el.type === 'rectangle')
+    if (appTemplateRect) {
+      applicationHeight = Math.max(appTemplateRect.height, baseHeight * 0.8)
+    }
+  }
 
   // Calculate height for all children recursively
   let childrenTotalHeight = 0
@@ -101,7 +110,8 @@ export const calculateSubtreeHeight = (
       baseHeight,
       currentLevel + 1,
       maxLevels,
-      settings
+      settings,
+      applicationTemplate // Pass the applicationTemplate down
     )
     childrenTotalHeight += childHeight + childSpacing
   })

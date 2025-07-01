@@ -72,13 +72,16 @@ export function createCapabilityElementsFromTemplate(
         (element.width > 100 && element.height > 50) || // Large enough to be main container
         index === 0 // Fallback: first rectangle
 
-      // Always apply custom background color if provided, regardless of container status
+      // Only apply custom background color if provided, otherwise keep template color
       if (customizations?.backgroundColor) {
         newElement.backgroundColor = customizations.backgroundColor
+      } else {
+        // Keep the original template background color
+        newElement.backgroundColor = element.backgroundColor || 'transparent'
       }
 
       if (isMainContainer) {
-        // Reset stroke color to black for database elements (override green ArchiMate template color)
+        // Always use black stroke color for main containers (Capabilities and Applications)
         newElement.strokeColor = '#1e1e1e'
 
         // Apply custom dimensions if provided
@@ -98,19 +101,13 @@ export function createCapabilityElementsFromTemplate(
               idx === 0)
         )
 
-        if (mainContainer && element.id.includes('icon')) {
-          // Calculate the relative position of the icon within the main container
+        if (mainContainer && customizations?.width) {
+          // Calculate the scale factor for positioning adjustments
+          const scaleFactor = customizations.width / mainContainer.width
+
+          // Only adjust X position for width changes
           const relativeX = element.x - mainContainer.x
-
-          // Apply the custom width adjustment if provided
-          const containerWidth = customizations?.width || mainContainer.width
-
-          // If icon is positioned beyond the original container width, adjust it
-          if (relativeX > mainContainer.width - 30) {
-            // Icons should be within 30px of right edge
-            const iconOffsetFromRight = mainContainer.width - relativeX
-            newElement.x = targetX + containerWidth - iconOffsetFromRight
-          }
+          newElement.x = targetX + relativeX * scaleFactor
         }
       }
     }
@@ -354,40 +351,49 @@ export function createApplicationElementsFromTemplate(
     newElement.x = element.x + offsetX
     newElement.y = element.y + offsetY
 
-    // Handle rectangles - apply customizations and ensure proper background color
+    // Handle rectangles - apply customizations but preserve template styling
     if (element.type === 'rectangle') {
-      // Reset stroke color to black for consistency
-      newElement.strokeColor = '#1e1e1e'
+      const isMainContainer =
+        (element.boundElements && element.boundElements.length > 0) || // Has bound text elements
+        (element.width > 100 && element.height > 50) || // Large enough to be main container
+        index === 0 // Fallback: first rectangle
 
-      // Apply custom dimensions if provided
-      if (customizations?.width) {
-        newElement.width = customizations.width
-      }
-      if (customizations?.height) {
-        newElement.height = customizations.height
-      }
+      if (isMainContainer) {
+        // Always use black stroke color for Applications (same as Capabilities)
+        newElement.strokeColor = '#1e1e1e'
 
-      // CRITICAL: Always apply application background color
-      if (customizations?.backgroundColor) {
-        newElement.backgroundColor = customizations.backgroundColor
-      }
+        // Apply custom dimensions if provided
+        if (customizations?.width) {
+          newElement.width = customizations.width
+        }
+        if (customizations?.height) {
+          newElement.height = customizations.height
+        }
 
-      // Handle icon repositioning for resized containers
-      if (element.id && element.id.includes('icon') && customizations?.width) {
-        // Find the main container to calculate relative positioning
+        // CRITICAL: Only override background color if explicitly provided, otherwise keep template color
+        if (customizations?.backgroundColor) {
+          newElement.backgroundColor = customizations.backgroundColor
+        } else {
+          // Keep the original template background color
+          newElement.backgroundColor = element.backgroundColor || 'transparent'
+        }
+      } else {
+        // Handle icon repositioning for resized containers (same logic as Capabilities)
         const mainContainer = template.elements.find(
           (el: any, idx: number) =>
             el.type === 'rectangle' &&
-            ((el.boundElements && el.boundElements.length > 0) || idx === 0)
+            ((el.boundElements && el.boundElements.length > 0) ||
+              (el.width > 100 && el.height > 50) ||
+              idx === 0)
         )
 
-        if (mainContainer) {
+        if (mainContainer && customizations?.width) {
+          // Calculate the scale factor for positioning adjustments
+          const scaleFactor = customizations.width / mainContainer.width
+
+          // Only adjust X position for width changes
           const relativeX = element.x - mainContainer.x
-          // If icon is positioned beyond the original container width, adjust it
-          if (relativeX > mainContainer.width - 30) {
-            const iconOffsetFromRight = mainContainer.width - relativeX
-            newElement.x = targetX + customizations.width - iconOffsetFromRight
-          }
+          newElement.x = targetX + relativeX * scaleFactor
         }
       }
     }

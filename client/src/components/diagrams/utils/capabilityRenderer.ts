@@ -61,8 +61,8 @@ export const renderCapabilityHierarchy = (
   // Determine text alignment: leaf capabilities get centered text, parents get top-centered text
   const useTopCenteredText = !isLeaf // Only parents use top-centered text
 
-  // Determine background color: only level 0 gets white background
-  const backgroundColor = currentLevel === 0 ? '#ffffff' : undefined // Let other levels use default background
+  // Determine background color: Level-0 capabilities get white background
+  const backgroundColor = currentLevel === 0 ? '#ffffff' : undefined
 
   const capabilityElements = createCapabilityElementsFromTemplate(
     capability,
@@ -122,10 +122,16 @@ export const renderCapabilityHierarchy = (
     // Then, render applications (if any and template available)
     if (applications.length > 0 && applicationTemplate) {
       applications.forEach((app, _appIndex) => {
-        // Calculate application dimensions (same as child capabilities)
+        // Use the same positioning and sizing logic as capabilities
         const appWidth = width - childIndent - 10
         const appX = x + childIndent
-        const appHeight = 40
+
+        // Get template dimensions like we do for capabilities
+        const appTemplateRect = applicationTemplate.elements.find(el => el.type === 'rectangle')
+        const appTemplateHeight = appTemplateRect ? appTemplateRect.height : baseHeight
+
+        // Use template height but ensure minimum height
+        const appHeight = Math.max(appTemplateHeight, baseHeight * 0.8) // Applications slightly smaller than capabilities
 
         const appElements = createApplicationElementsFromTemplate(
           app,
@@ -137,7 +143,7 @@ export const renderCapabilityHierarchy = (
             width: appWidth,
             height: appHeight,
             fontSize: Math.max(10, 14 - currentLevel - 1),
-            backgroundColor: '#e8f4fd',
+            // backgroundColor: removed to use template's original color
           }
         )
 
