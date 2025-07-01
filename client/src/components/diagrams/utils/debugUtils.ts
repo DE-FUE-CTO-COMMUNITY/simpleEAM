@@ -150,7 +150,7 @@ export function debugApplicationRollup(
     )
 
     console.log(`${indent}   Rolled up apps: ${uniqueRolledUp.length}`)
-    console.log(`${indent}   Total apps to display: ${Math.min(totalAppsForCapability.length, 3)}`)
+    console.log(`${indent}   Total apps to display: ${totalAppsForCapability.length}`)
 
     analysis.details.push({
       name: capability.name,
@@ -158,7 +158,7 @@ export function debugApplicationRollup(
       directApps: directApps.length,
       rolledUpApps: uniqueRolledUp.length,
       totalApps: totalAppsForCapability.length,
-      displayedApps: Math.min(totalAppsForCapability.length, 3),
+      displayedApps: totalAppsForCapability.length,
       isLastVisibleLevel,
     })
 

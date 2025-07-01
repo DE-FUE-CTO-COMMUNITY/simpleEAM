@@ -94,12 +94,17 @@ export function collectApplicationsForDisplay(
     })
   }
 
-  // Remove duplicates and limit to max 3 applications
+  // Remove duplicates - no limit on number of applications
   const uniqueApplications = applications.filter(
     (app, index, self) => index === self.findIndex(a => a.id === app.id)
   )
 
-  return uniqueApplications.slice(0, 3)
+  // Sort applications alphabetically by name
+  return uniqueApplications.sort((a, b) => {
+    const nameA = a.name?.toLowerCase() || ''
+    const nameB = b.name?.toLowerCase() || ''
+    return nameA.localeCompare(nameB)
+  })
 }
 
 // Function to calculate the actual number of capabilities that will be rendered on the map
@@ -278,7 +283,7 @@ export function calculateTotalApplicationsCount(
   let totalApplications = 0
   capabilities.forEach(capability => {
     if (capability.supportedByApplications) {
-      totalApplications += Math.min(capability.supportedByApplications.length, 3) // Max 3 applications per capability
+      totalApplications += capability.supportedByApplications.length // No limit on applications per capability
     }
   })
 

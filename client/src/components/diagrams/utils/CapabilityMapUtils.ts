@@ -385,7 +385,7 @@ export const generateCapabilityMapElements = (
         // Position applications below the capability container
         const appStartY = y + containerHeight + 10
 
-        allApplications.slice(0, 3).forEach((app, appIndex) => {
+        allApplications.forEach((app, appIndex) => {
           const appX = x + 10
           const appY = appStartY + appIndex * 20
           const appTextId = generateId()
