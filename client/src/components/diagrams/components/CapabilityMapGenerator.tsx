@@ -21,6 +21,7 @@ import {
   generateCapabilityMapElements,
   calculateRenderedCapabilitiesCount,
   debugCapabilityHierarchy,
+  debugMissingCapabilities,
   type CapabilityMapSettings,
 } from '../utils/CapabilityMapLibraryUtils'
 
@@ -59,6 +60,9 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
       // Debug the capability hierarchy before generation
       console.log('🚀 Starting capability map generation...')
       debugCapabilityHierarchy(data.businessCapabilities, settings)
+      
+      // Enhanced debug analysis to find missing capabilities
+      debugMissingCapabilities(data.businessCapabilities, settings)
 
       let elements: any[] = []
 

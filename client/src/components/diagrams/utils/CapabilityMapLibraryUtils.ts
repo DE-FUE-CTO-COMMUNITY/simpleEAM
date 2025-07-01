@@ -6,7 +6,10 @@ import {
   loadArchimateLibrary,
   type LibraryTemplate,
 } from './archimateLibraryUtils'
-import { calculateCenteredTextPosition, calculateTopCenteredTextPosition } from './textContainerUtils'
+import {
+  calculateCenteredTextPosition,
+  calculateTopCenteredTextPosition,
+} from './textContainerUtils'
 import type { ExcalidrawElement } from './CapabilityMapUtils'
 
 export interface CapabilityMapSettings {
@@ -442,6 +445,29 @@ export function findChildCapabilities(
   )
 }
 
+// Helper function to recursively find all descendants up to maxLevels
+function findAllDescendants(
+  parentId: string,
+  capabilities: BusinessCapability[],
+  currentLevel: number,
+  maxLevels: number
+): BusinessCapability[] {
+  if (currentLevel >= maxLevels) {
+    return []
+  }
+
+  const directChildren = findChildCapabilities(parentId, capabilities)
+  const allDescendants = [...directChildren]
+
+  // Recursively add descendants from each child
+  directChildren.forEach(child => {
+    const childDescendants = findAllDescendants(child.id, capabilities, currentLevel + 1, maxLevels)
+    allDescendants.push(...childDescendants)
+  })
+
+  return allDescendants
+}
+
 // Function to calculate the actual number of capabilities that will be rendered on the map
 export function calculateRenderedCapabilitiesCount(
   capabilities: BusinessCapability[],
@@ -452,10 +478,8 @@ export function calculateRenderedCapabilitiesCount(
 
   if (settings.maxLevels > 1) {
     topLevelCapabilities.forEach(capability => {
-      const children = findChildCapabilities(capability.id, capabilities)
-      // Show all children regardless of maxLevels setting - no artificial limits
-      const childrenToShow = children
-      count += childrenToShow.length
+      const descendants = findAllDescendants(capability.id, capabilities, 1, settings.maxLevels)
+      count += descendants.length
     })
   }
 
@@ -511,6 +535,316 @@ export function debugCapabilityHierarchy(
   }
 }
 
+// Enhanced debug function to identify missing capabilities
+export function debugMissingCapabilities(
+  capabilities: BusinessCapability[],
+  settings: CapabilityMapSettings
+) {
+  console.log('🔍 ENHANCED DEBUG: Missing Capabilities Analysis')
+  console.log('=' .repeat(50))
+  
+  const topLevelCapabilities = findTopLevelCapabilities(capabilities)
+  console.log(`Total capabilities in data: ${capabilities.length}`)
+  console.log(`Top-level capabilities: ${topLevelCapabilities.length}`)
+  
+  // Find all capabilities that would be rendered
+  const renderedCapabilities = new Set<string>()
+  
+  // Add top-level capabilities
+  topLevelCapabilities.forEach(cap => {
+    renderedCapabilities.add(cap.id)
+    console.log(`✅ Top-level: "${cap.name}" (ID: ${cap.id})`)
+  })
+  
+  // Add child capabilities (if maxLevels > 1)
+  if (settings.maxLevels > 1) {
+    topLevelCapabilities.forEach(topLevel => {
+      const children = findChildCapabilities(topLevel.id, capabilities)
+      
+      children.forEach(child => {
+        renderedCapabilities.add(child.id)
+        console.log(`✅ Child of "${topLevel.name}": "${child.name}" (ID: ${child.id})`)
+      })
+      
+      if (children.length === 0) {
+        console.log(`⚠️ No children found for top-level: "${topLevel.name}"`)
+      }
+    })
+  }
+  
+  console.log(`\nRendered capabilities: ${renderedCapabilities.size}`)
+  console.log(`Missing capabilities: ${capabilities.length - renderedCapabilities.size}`)
+  
+  // Find and analyze missing capabilities
+  const missingCapabilities = capabilities.filter(cap => !renderedCapabilities.has(cap.id))
+  
+  if (missingCapabilities.length > 0) {
+    console.log('\n❌ MISSING CAPABILITIES:')
+    missingCapabilities.forEach(cap => {
+      console.log(`❌ Missing: "${cap.name}" (ID: ${cap.id})`)
+      
+      // Analyze why it's missing
+      if (!cap.parents || cap.parents.length === 0) {
+        console.log(`   ⚠️ This appears to be a top-level capability but wasn't found by findTopLevelCapabilities`)
+      } else {
+        console.log(`   📋 Has ${cap.parents.length} parent(s):`)
+        cap.parents.forEach(parent => {
+          console.log(`      - Parent: "${parent.name || parent.id}" (ID: ${parent.id})`)
+          
+          // Check if parent exists in data
+          const parentExists = capabilities.find(c => c.id === parent.id)
+          if (!parentExists) {
+            console.log(`        ❌ Parent not found in data!`)
+          } else {
+            // Check if parent is top-level
+            const isParentTopLevel = topLevelCapabilities.find(tl => tl.id === parent.id)
+            if (isParentTopLevel) {
+              console.log(`        ✅ Parent is top-level`)
+            } else {
+              console.log(`        ⚠️ Parent is not top-level - this could be a multi-level hierarchy`)
+            }
+          }
+        })
+      }
+      
+      // Check if it has children
+      const children = findChildCapabilities(cap.id, capabilities)
+      if (children.length > 0) {
+        console.log(`   👥 Has ${children.length} children - might be a middle-level capability`)
+      }
+    })
+  }
+  
+  // Analyze hierarchy levels
+  console.log('\n📊 HIERARCHY ANALYSIS:')
+  const hierarchyLevels = new Map<number, BusinessCapability[]>()
+  
+  // Level 0: Top-level capabilities
+  hierarchyLevels.set(0, topLevelCapabilities)
+  
+  // Find deeper levels
+  let currentLevel = 0
+  let hasMoreLevels = true
+  
+  while (hasMoreLevels && currentLevel < 5) { // Max 5 levels to prevent infinite loop
+    const currentLevelCapabilities = hierarchyLevels.get(currentLevel) || []
+    const nextLevelCapabilities: BusinessCapability[] = []
+    
+    currentLevelCapabilities.forEach(cap => {
+      const children = findChildCapabilities(cap.id, capabilities)
+      nextLevelCapabilities.push(...children)
+    })
+    
+    if (nextLevelCapabilities.length > 0) {
+      hierarchyLevels.set(currentLevel + 1, nextLevelCapabilities)
+      console.log(`Level ${currentLevel + 1}: ${nextLevelCapabilities.length} capabilities`)
+      nextLevelCapabilities.forEach(cap => {
+        console.log(`  - "${cap.name}" (ID: ${cap.id})`)
+      })
+    } else {
+      hasMoreLevels = false
+    }
+    
+    currentLevel++
+  }
+  
+  // Calculate what should be rendered based on maxLevels
+  let shouldRender = 0
+  for (let level = 0; level < settings.maxLevels && level < hierarchyLevels.size; level++) {
+    const levelCaps = hierarchyLevels.get(level) || []
+    shouldRender += levelCaps.length
+    console.log(`Should render Level ${level}: ${levelCaps.length} capabilities`)
+  }
+  
+  console.log(`\nShould render total: ${shouldRender} capabilities (maxLevels: ${settings.maxLevels})`)
+  console.log(`Actually renders: ${renderedCapabilities.size} capabilities`)
+  console.log(`Difference: ${shouldRender - renderedCapabilities.size}`)
+  
+  return {
+    totalCapabilities: capabilities.length,
+    renderedCapabilities: renderedCapabilities.size,
+    missingCapabilities: missingCapabilities.length,
+    shouldRender,
+    hierarchyLevels,
+    missingDetails: missingCapabilities
+  }
+}
+
+// Helper function to calculate the total height needed for a capability subtree
+const calculateSubtreeHeight = (
+  capability: BusinessCapability,
+  allCapabilities: BusinessCapability[],
+  baseHeight: number,
+  currentLevel: number,
+  maxLevels: number
+): number => {
+  // Base height for the capability itself
+  let totalHeight = baseHeight
+
+  // If we've reached max levels, return just the base height
+  if (currentLevel >= maxLevels) {
+    return totalHeight
+  }
+
+  // Find children
+  const children = findChildCapabilities(capability.id, allCapabilities)
+  
+  if (children.length === 0) {
+    return totalHeight
+  }
+
+  // Add space for text area and padding - increased for better text display
+  const textAreaHeight = 50 // Increased from 30 to 50 for better text visibility
+  const childSpacing = 10
+  
+  // Calculate height for all children recursively
+  let childrenTotalHeight = 0
+  children.forEach(child => {
+    const childHeight = calculateSubtreeHeight(child, allCapabilities, baseHeight, currentLevel + 1, maxLevels)
+    childrenTotalHeight += childHeight + childSpacing
+  })
+
+  // Total height = text area + padding + all children heights
+  totalHeight = textAreaHeight + 10 + childrenTotalHeight + 10
+
+  return totalHeight
+}
+
+// Recursive function to render capability hierarchy with proper layout
+const renderCapabilityHierarchy = (
+  capability: BusinessCapability,
+  allCapabilities: BusinessCapability[],
+  capabilityTemplate: any,
+  applicationTemplate: any,
+  x: number,
+  y: number,
+  width: number,
+  baseHeight: number,
+  parentGroupId: string,
+  settings: CapabilityMapSettings,
+  currentLevel: number,
+  uniformHeight?: number // Optional uniform height for level-0 capabilities
+): { elements: ExcalidrawElement[], totalHeight: number } => {
+  const elements: ExcalidrawElement[] = []
+
+  // Check if we've reached the maximum level
+  if (currentLevel >= settings.maxLevels) {
+    return { elements, totalHeight: 0 }
+  }
+
+  // Find children
+  const children = findChildCapabilities(capability.id, allCapabilities)
+  
+  // Calculate the total height needed for this subtree
+  const subtreeHeight = calculateSubtreeHeight(capability, allCapabilities, baseHeight, currentLevel, settings.maxLevels)
+  
+  // Determine if this is a leaf node (no children to render)
+  const isLeaf = children.length === 0 || currentLevel === settings.maxLevels - 1
+
+  // Create the capability box itself
+  // For level-0 capabilities, use uniform height if provided; otherwise use calculated height
+  const capabilityHeight = currentLevel === 0 && uniformHeight ? uniformHeight : (isLeaf ? baseHeight : subtreeHeight)
+
+  console.log(`🔄 Rendering Level ${currentLevel}: "${capability.name}" (${children.length} children, isLeaf: ${isLeaf}, calculated height: ${subtreeHeight}, final height: ${capabilityHeight})`)
+  
+  // Determine text alignment: leaf capabilities get centered text, parents get top-centered text
+  const useTopCenteredText = !isLeaf // Only parents use top-centered text
+  
+  // Determine background color: only level 0 gets white background
+  const backgroundColor = currentLevel === 0 ? '#ffffff' : undefined // Let other levels use default background
+  
+  const capabilityElements = createCapabilityElementsFromTemplate(
+    capability,
+    'businessCapability',
+    capabilityTemplate,
+    x,
+    y,
+    parentGroupId,
+    {
+      width: width,
+      height: capabilityHeight,
+      fontSize: currentLevel === 0 ? 14 : Math.max(10, 14 - currentLevel),
+      useTopCenteredText: useTopCenteredText,
+      backgroundColor: backgroundColor,
+    }
+  )
+
+  elements.push(...capabilityElements)
+
+  // If this is not a leaf, render children inside the box
+  if (!isLeaf && children.length > 0) {
+    const textAreaHeight = 50 // Increased space for text at the top - matches the calculation function
+    const childPadding = 10
+    const childSpacing = 10
+    const childIndent = 15
+
+    let currentChildY = y + textAreaHeight + childPadding
+
+    children.forEach((child, _childIndex) => {
+      // Calculate child dimensions
+      const childWidth = width - childIndent - 10
+      const childX = x + childIndent
+
+      console.log(`📍 Positioning Level ${currentLevel + 1} child "${child.name}" at (${childX}, ${currentChildY})`)
+
+      // Recursively render child
+      const childResult = renderCapabilityHierarchy(
+        child,
+        allCapabilities,
+        capabilityTemplate,
+        applicationTemplate,
+        childX,
+        currentChildY,
+        childWidth,
+        baseHeight,
+        parentGroupId,
+        settings,
+        currentLevel + 1,
+        undefined // Children don't need uniform height, only level-0 capabilities do
+      )
+
+      elements.push(...childResult.elements)
+
+      // Add applications for direct children only (level 1)
+      if (
+        currentLevel === 0 && // Only for direct children of top-level
+        settings.includeApplications &&
+        applicationTemplate &&
+        child.supportedByApplications &&
+        child.supportedByApplications.length > 0
+      ) {
+        const appsToShow = child.supportedByApplications.slice(0, 3)
+
+        appsToShow.forEach((app, appIndex) => {
+          const appX = childX + childWidth + 10
+          const appY = currentChildY + appIndex * 45
+
+          const appElements = createCapabilityElementsFromTemplate(
+            app as any,
+            'application',
+            applicationTemplate,
+            appX,
+            appY,
+            undefined,
+            {
+              width: Math.min(160, width - 40),
+              height: 40,
+              fontSize: 12,
+            }
+          )
+
+          elements.push(...appElements)
+        })
+      }
+
+      // Move to next child position
+      currentChildY += childResult.totalHeight + childSpacing
+    })
+  }
+
+  return { elements, totalHeight: capabilityHeight }
+}
+
 // Function to load ArchiMate library (this should match the implementation from IntegratedLibrary)
 // Main function to generate capability map with ArchiMate symbols (REFACTORED)
 export const generateCapabilityMapWithLibrary = async (
@@ -529,7 +863,7 @@ export const generateCapabilityMapWithLibrary = async (
     return []
   }
 
-  // Get templates from library using the proven helper function
+  // Get templates from library using the proven helper
   const capabilityTemplate = findArchimateTemplate(archimateLibrary, 'Capability')
   const applicationTemplate = findArchimateTemplate(archimateLibrary, 'Application Component')
 
@@ -546,25 +880,24 @@ export const generateCapabilityMapWithLibrary = async (
     return elements
   }
 
-  // Calculate total number of elements needed for index generation
+  // Calculate total number of elements needed for index generation (recursive count)
   let totalElements = 0
   topLevelCapabilities.forEach(capability => {
     totalElements += capabilityTemplate.elements.length // Actual template elements count
-    if (settings.maxLevels > 1) {
-      const children = findChildCapabilities(capability.id, capabilities)
-      // Show all children regardless of maxLevels setting
-      const childrenToShow = children
-      totalElements += childrenToShow.length * capabilityTemplate.elements.length
+    // Count all descendants recursively
+    const allDescendants = findAllDescendants(capability.id, capabilities, 1, settings.maxLevels)
+    totalElements += allDescendants.length * capabilityTemplate.elements.length
 
-      if (settings.includeApplications && applicationTemplate) {
-        childrenToShow.forEach(child => {
-          if (child.supportedByApplications) {
-            totalElements +=
-              Math.min(child.supportedByApplications.length, 3) *
-              applicationTemplate.elements.length
-          }
-        })
-      }
+    if (settings.includeApplications && applicationTemplate) {
+      // Only count applications for direct children (level 1)
+      const directChildren = findChildCapabilities(capability.id, capabilities)
+      directChildren.forEach(child => {
+        if (child.supportedByApplications) {
+          totalElements +=
+            Math.min(child.supportedByApplications.length, 3) *
+            applicationTemplate.elements.length
+        }
+      })
     }
   })
 
@@ -582,121 +915,56 @@ export const generateCapabilityMapWithLibrary = async (
   const baseWidth = templateWidth
   const baseHeight = templateHeight
 
-  // Calculate uniform container height based on maximum children across all top-level capabilities
-  let uniformContainerHeight = baseHeight
+  // Calculate uniform height for all top-level capabilities
+  // Find the maximum height needed among all top-level capabilities
+  let maxRequiredHeight = baseHeight
+  
   if (settings.maxLevels > 1) {
-    let maxChildrenCount = 0
-
-    // Find the maximum number of children among all top-level capabilities
     topLevelCapabilities.forEach(capability => {
-      const children = findChildCapabilities(capability.id, capabilities)
-      // Show all children regardless of maxLevels setting
-      const childrenToShow = children
-      maxChildrenCount = Math.max(maxChildrenCount, childrenToShow.length)
+      const requiredHeight = calculateSubtreeHeight(capability, capabilities, baseHeight, 0, settings.maxLevels)
+      maxRequiredHeight = Math.max(maxRequiredHeight, requiredHeight)
     })
-
-    // Calculate needed height for the maximum number of children
-    const childSpacing = 10
-    const childAreaHeight = maxChildrenCount * (baseHeight + childSpacing)
-    uniformContainerHeight = Math.max(baseHeight, baseHeight + childAreaHeight + 40)
-
-    console.log('📏 Uniform height calculation:', {
-      maxChildrenCount,
+    
+    console.log('📏 Uniform height calculation for Level-0 capabilities:', {
       baseHeight,
-      childAreaHeight,
-      uniformContainerHeight,
+      maxRequiredHeight,
+      topLevelCount: topLevelCapabilities.length,
     })
   }
 
-  // Generate top-level capabilities horizontally
+  // Generate top-level capabilities horizontally using the new recursive approach
   topLevelCapabilities.forEach((capability, index) => {
     const x = startX + index * (baseWidth + settings.horizontalSpacing)
     const y = startY
     const capabilityGroupId = generateId()
 
-    // Create main capability using the refactored helper function
-    const capabilityElements = createCapabilityElementsFromTemplate(
+    console.log(`🚀 Rendering top-level capability: "${capability.name}" at (${x}, ${y}) with uniform height: ${maxRequiredHeight}`)
+
+    // Use the new recursive rendering function with uniform height for level-0
+    const result = renderCapabilityHierarchy(
       capability,
-      'businessCapability',
+      capabilities,
       capabilityTemplate,
+      applicationTemplate,
       x,
       y,
+      baseWidth,
+      baseHeight,
       capabilityGroupId,
-      {
-        height: uniformContainerHeight,
-        backgroundColor: '#ffffff',
-        useTopCenteredText: true, // Top-level capabilities use top-centered text alignment
-      }
+      settings,
+      0, // Start at level 0 for top-level capabilities
+      maxRequiredHeight // Pass the uniform height for level-0 capabilities
     )
 
-    elements.push(...capabilityElements)
+    elements.push(...result.elements)
 
-    // Generate child capabilities if maxLevels > 1
-    if (settings.maxLevels > 1) {
-      const children = findChildCapabilities(capability.id, capabilities)
-      // Show all children regardless of maxLevels setting
-      const childrenToShow = children
-
-      childrenToShow.forEach((child, childIndex) => {
-        const childX = x + 10
-        const childY = y + baseHeight + 20 + childIndex * (baseHeight + 10)
-
-        // Create child capability using the refactored helper function
-        const childElements = createCapabilityElementsFromTemplate(
-          child,
-          'businessCapability',
-          capabilityTemplate,
-          childX,
-          childY,
-          capabilityGroupId,
-          {
-            width: baseWidth - 20, // Fit within parent with padding
-            height: Math.min(60, baseHeight), // Limit height for child capabilities
-            fontSize: 14,
-          }
-        )
-
-        elements.push(...childElements)
-
-        // Add applications if enabled and template available
-        if (
-          settings.includeApplications &&
-          applicationTemplate &&
-          child.supportedByApplications &&
-          child.supportedByApplications.length > 0
-        ) {
-          const appsToShow = child.supportedByApplications.slice(0, 3)
-
-          appsToShow.forEach((app, appIndex) => {
-            const appX = childX + (baseWidth - 20) + 10
-            const appY = childY + appIndex * 45
-
-            // Applications erhalten KEINE zusätzliche Gruppierung - nur ihre interne ArchiMate-Gruppierung
-            const appElements = createCapabilityElementsFromTemplate(
-              app as any, // Cast to BusinessCapability for compatibility
-              'application',
-              applicationTemplate,
-              appX,
-              appY,
-              undefined, // WICHTIG: Keine externe Gruppierung für Applications
-              {
-                width: Math.min(160, baseWidth - 40),
-                height: 40,
-                fontSize: 12,
-              }
-            )
-
-            elements.push(...appElements)
-          })
-        }
-      })
-    }
+    console.log(`✅ Completed rendering "${capability.name}" with uniform height: ${maxRequiredHeight}`)
   })
 
   return elements
 }
 
-// Fallback function that uses simple rectangles (original implementation)
+// Fallback function that uses simple rectangles (updated to support recursive rendering)
 export const generateCapabilityMapElements = (
   capabilities: BusinessCapability[],
   settings: CapabilityMapSettings
@@ -719,25 +987,22 @@ export const generateCapabilityMapElements = (
   // Initialize indices for this fallback function
   initializeIndices(100)
 
-  // Calculate uniform container height based on maximum children across all top-level capabilities
+  // Calculate uniform container height based on maximum descendant count across all top-level capabilities
   let uniformContainerHeight = baseHeight
   if (settings.maxLevels > 1) {
-    let maxChildrenCount = 0
+    let maxDescendantCount = 0
 
-    // Find the maximum number of children among all top-level capabilities
+    // Find the maximum number of descendants among all top-level capabilities
     topLevelCapabilities.forEach(capability => {
-      const children = findChildCapabilities(capability.id, capabilities)
-      // Show all children regardless of maxLevels setting
-      const childrenToShow = children
-
-      maxChildrenCount = Math.max(maxChildrenCount, childrenToShow.length)
+      const allDescendants = findAllDescendants(capability.id, capabilities, 1, settings.maxLevels)
+      maxDescendantCount = Math.max(maxDescendantCount, allDescendants.length)
     })
 
-    // Calculate needed height for the maximum number of children
-    uniformContainerHeight = Math.max(baseHeight, (maxChildrenCount + 1) * (baseHeight + 20) + 40)
+    // Calculate needed height for the maximum number of descendants
+    uniformContainerHeight = Math.max(baseHeight, (maxDescendantCount + 1) * (baseHeight + 20) + 40)
 
-    console.log('📏 Fallback uniform height calculation:', {
-      maxChildrenCount,
+    console.log('📏 Fallback uniform height calculation (recursive):', {
+      maxDescendantCount,
       baseHeight,
       uniformContainerHeight,
     })
@@ -790,23 +1055,26 @@ export const generateCapabilityMapElements = (
       },
     }
 
-    // Main capability text
-    const textWidth = Math.max(capability.name.length * 12, 50)
-    const textX = x + (baseWidth - textWidth) / 2
-    const textY = y + 5
+    // Calculate centered text position using the proven approach
+    const centerPosition = calculateTopCenteredTextPosition(
+      capability.name,
+      mainRect,
+      16
+    )
 
+    // Main capability text
     const mainText: ExcalidrawElement = {
       id: textElementId,
       type: 'text',
-      x: textX,
-      y: textY,
-      width: textWidth,
-      height: 25,
+      x: centerPosition.x,
+      y: centerPosition.y,
+      width: centerPosition.width,
+      height: centerPosition.height,
       angle: 0,
       strokeColor: '#1e1e1e',
       backgroundColor: 'transparent',
       fillStyle: 'solid',
-      strokeWidth: 2,
+      strokeWidth: 1,
       strokeStyle: 'solid',
       roughness: 1,
       opacity: 100,
@@ -818,193 +1086,194 @@ export const generateCapabilityMapElements = (
       version: 1,
       versionNonce: generateSeed(),
       isDeleted: false,
-      boundElements: [],
-      updated: Date.now(),
-      link: null,
-      locked: false,
       text: capability.name,
-      fontSize: 20,
+      fontSize: 16,
       fontFamily: 1,
       textAlign: 'center',
-      verticalAlign: 'top',
+      verticalAlign: 'middle',
       containerId: mainElementId,
       originalText: capability.name,
       autoResize: true,
       lineHeight: 1.25,
-      rawText: capability.name,
+      updated: Date.now(),
+      link: null,
+      locked: false,
       customData: {
+        databaseId: capability.id,
+        elementType: 'businessCapability',
+        originalElement: capability,
         isFromDatabase: true,
-        isMainElement: false,
-        mainElementId: mainElementId,
       },
     }
 
     elements.push(mainRect, mainText)
 
-    // Generate child capabilities if maxLevels > 1
+    // Generate child capabilities recursively if maxLevels > 1
     if (settings.maxLevels > 1) {
-      const children = findChildCapabilities(capability.id, capabilities)
-      // Show all children regardless of maxLevels setting
-      const childrenToShow = children
-
-      childrenToShow.forEach((child, childIndex) => {
-        const childX = x + 10
-        const childY = y + baseHeight + 20 + childIndex * (50 + 10)
-        const childWidth = baseWidth - 20
-        const childHeight = 40
-
-        const childRectId = generateId()
-        const childTextId = generateId()
-
-        // Child capability rectangle
-        const childRect: ExcalidrawElement = {
-          id: childRectId,
-          type: 'rectangle',
-          x: childX,
-          y: childY,
-          width: childWidth,
-          height: childHeight,
-          angle: 0,
-          strokeColor: '#1e1e1e',
-          backgroundColor: 'transparent',
-          fillStyle: 'solid',
-          strokeWidth: 1,
-          strokeStyle: 'solid',
-          roughness: 1,
-          opacity: 100,
-          groupIds: [capabilityGroupId],
-          frameId: null,
-          index: getNextIndex(),
-          roundness: null,
-          seed: generateSeed(),
-          version: 1,
-          versionNonce: generateSeed(),
-          isDeleted: false,
-          boundElements: [{ id: childTextId, type: 'text' }],
-          updated: Date.now(),
-          link: null,
-          locked: false,
-          customData: {
-            databaseId: child.id,
-            elementType: 'businessCapability',
-            originalElement: child,
-            isFromDatabase: true,
-            isMainElement: true,
-          },
-        }
-
-        // Child capability text
-        const childTextWidth = Math.max(child.name.length * 9.6, 40)
-        const childTextX = childX + (childWidth - childTextWidth) / 2
-        const childTextY = childY + 5
-
-        const childText: ExcalidrawElement = {
-          id: childTextId,
-          type: 'text',
-          x: childTextX,
-          y: childTextY,
-          width: childTextWidth,
-          height: 20,
-          angle: 0,
-          strokeColor: '#1e1e1e',
-          backgroundColor: 'transparent',
-          fillStyle: 'solid',
-          strokeWidth: 1,
-          strokeStyle: 'solid',
-          roughness: 1,
-          opacity: 100,
-          groupIds: [capabilityGroupId],
-          frameId: null,
-          index: getNextIndex(),
-          roundness: null,
-          seed: generateSeed(),
-          version: 1,
-          versionNonce: generateSeed(),
-          isDeleted: false,
-          boundElements: [],
-          updated: Date.now(),
-          link: null,
-          locked: false,
-          text: child.name,
-          fontSize: 16,
-          fontFamily: 1,
-          textAlign: 'center',
-          verticalAlign: 'top',
-          containerId: childRectId,
-          originalText: child.name,
-          autoResize: true,
-          lineHeight: 1.25,
-          rawText: child.name,
-          customData: {
-            isFromDatabase: true,
-            isMainElement: false,
-            mainElementId: childRectId,
-          },
-        }
-
-        elements.push(childRect, childText)
-
-        // Add applications if enabled
-        if (
-          settings.includeApplications &&
-          child.supportedByApplications &&
-          child.supportedByApplications.length > 0
-        ) {
-          child.supportedByApplications.slice(0, 3).forEach((app, appIndex) => {
-            const appX = childX + 5
-            const appY = childY + childHeight + 5 + appIndex * 15
-            const appTextId = generateId()
-
-            const appText: ExcalidrawElement = {
-              id: appTextId,
-              type: 'text',
-              x: appX,
-              y: appY,
-              width: Math.max(app.name.length * 7.2, 30),
-              height: 15,
-              angle: 0,
-              strokeColor: '#666666',
-              backgroundColor: 'transparent',
-              fillStyle: 'solid',
-              strokeWidth: 1,
-              strokeStyle: 'solid',
-              roughness: 1,
-              opacity: 100,
-              groupIds: [capabilityGroupId],
-              frameId: null,
-              index: getNextIndex(),
-              roundness: null,
-              seed: generateSeed(),
-              version: 1,
-              versionNonce: generateSeed(),
-              isDeleted: false,
-              boundElements: [],
-              updated: Date.now(),
-              link: null,
-              locked: false,
-              text: `• ${app.name}`,
-              fontSize: 12,
-              fontFamily: 1,
-              textAlign: 'left',
-              verticalAlign: 'top',
-              originalText: `• ${app.name}`,
-              autoResize: true,
-              lineHeight: 1.25,
-              rawText: `• ${app.name}`,
-              customData: {
-                databaseId: app.id,
-                elementType: 'application',
-                originalElement: app,
-                isFromDatabase: true,
-                isMainElement: false,
-              },
-            }
-
-            elements.push(appText)
-          })
-        }
-      })
+      const childElements = generateChildCapabilitiesRecursivelyFallback(
+        capability,
+        capabilities,
+        x,
+        y,
+        baseWidth,
+        baseHeight,
+        capabilityGroupId,
+        settings,
+        1 // Current level (top level is 0, children start at 1)
+      )
+      elements.push(...childElements)
     }
+  })
+
+  return elements
+}
+
+// Recursive function for fallback rendering (simple rectangles)
+const generateChildCapabilitiesRecursivelyFallback = (
+  parentCapability: BusinessCapability,
+  allCapabilities: BusinessCapability[],
+  parentX: number,
+  parentY: number,
+  baseWidth: number,
+  baseHeight: number,
+  parentGroupId: string,
+  settings: CapabilityMapSettings,
+  currentLevel: number
+): ExcalidrawElement[] => {
+  const elements: ExcalidrawElement[] = []
+
+  // Check if we've reached the maximum level
+  if (currentLevel >= settings.maxLevels) {
+    return elements
+  }
+
+  // Find children of the current parent
+  const children = findChildCapabilities(parentCapability.id, allCapabilities)
+  
+  if (children.length === 0) {
+    return elements
+  }
+
+  console.log(`🔄 Fallback Rendering Level ${currentLevel}: ${children.length} capabilities under "${parentCapability.name}"`)
+
+  // Calculate positioning for children
+  const childIndent = 10 + (currentLevel - 1) * 15 // Increase indent for deeper levels
+  const childWidth = baseWidth - childIndent - 10 // Decrease width for deeper levels
+  const childHeight = Math.max(40, baseHeight - currentLevel * 10) // Decrease height for deeper levels
+  const fontSize = Math.max(10, 14 - currentLevel * 2) // Decrease font size for deeper levels
+
+  children.forEach((child, childIndex) => {
+    const childX = parentX + childIndent
+    const childY = parentY + baseHeight + 20 + childIndex * (childHeight + 10)
+
+    // Create child capability elements (rectangle + text)
+    const childElementId = generateId()
+    const childTextElementId = generateId()
+
+    // Child capability rectangle
+    const childRect: ExcalidrawElement = {
+      id: childElementId,
+      type: 'rectangle',
+      x: childX,
+      y: childY,
+      width: childWidth,
+      height: childHeight,
+      angle: 0,
+      strokeColor: '#1e1e1e',
+      backgroundColor: 'transparent',
+      fillStyle: 'solid',
+      strokeWidth: 1,
+      strokeStyle: 'solid',
+      roughness: 1,
+      opacity: 100,
+      groupIds: [parentGroupId],
+      frameId: null,
+      index: getNextIndex(),
+      roundness: null,
+      seed: generateSeed(),
+      version: 1,
+      versionNonce: generateSeed(),
+      isDeleted: false,
+      boundElements: [{ id: childTextElementId, type: 'text' }],
+      updated: Date.now(),
+      link: null,
+      locked: false,
+      customData: {
+        databaseId: child.id,
+        elementType: 'businessCapability',
+        originalElement: child,
+        isFromDatabase: true,
+        isMainElement: true,
+      },
+    }
+
+    // Calculate centered text position
+    const centerPosition = calculateCenteredTextPosition(
+      child.name,
+      childRect,
+      fontSize
+    )
+
+    // Child capability text
+    const childText: ExcalidrawElement = {
+      id: childTextElementId,
+      type: 'text',
+      x: centerPosition.x,
+      y: centerPosition.y,
+      width: centerPosition.width,
+      height: centerPosition.height,
+      angle: 0,
+      strokeColor: '#1e1e1e',
+      backgroundColor: 'transparent',
+      fillStyle: 'solid',
+      strokeWidth: 1,
+      strokeStyle: 'solid',
+      roughness: 1,
+      opacity: 100,
+      groupIds: [parentGroupId],
+      frameId: null,
+      index: getNextIndex(),
+      roundness: null,
+      seed: generateSeed(),
+      version: 1,
+      versionNonce: generateSeed(),
+      isDeleted: false,
+      text: child.name,
+      fontSize: fontSize,
+      fontFamily: 1,
+      textAlign: 'center',
+      verticalAlign: 'middle',
+      containerId: childElementId,
+      originalText: child.name,
+      autoResize: true,
+      lineHeight: 1.25,
+      updated: Date.now(),
+      link: null,
+      locked: false,
+      customData: {
+        databaseId: child.id,
+        elementType: 'businessCapability',
+        originalElement: child,
+        isFromDatabase: true,
+      },
+    }
+
+    elements.push(childRect, childText)
+
+    // Recursively generate children of this child
+    const grandChildElements = generateChildCapabilitiesRecursivelyFallback(
+      child,
+      allCapabilities,
+      childX,
+      childY,
+      baseWidth,
+      baseHeight,
+      parentGroupId,
+      settings,
+      currentLevel + 1
+    )
+
+    elements.push(...grandChildElements)
   })
 
   return elements
