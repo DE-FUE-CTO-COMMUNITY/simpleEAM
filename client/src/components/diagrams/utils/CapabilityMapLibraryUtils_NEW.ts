@@ -28,6 +28,7 @@ import {
   findAllDescendants,
   calculateSubtreeHeight,
 } from './capabilityHierarchy'
+import { debugCapabilityHierarchy } from './debugUtils'
 import { renderCapabilityHierarchy } from './capabilityRenderer'
 
 // Main function to generate capability map with ArchiMate symbols (REFACTORED)
@@ -36,6 +37,25 @@ export const generateCapabilityMapWithLibrary = async (
   settings: CapabilityMapSettings
 ): Promise<ExcalidrawElement[]> => {
   const elements: ExcalidrawElement[] = []
+
+  // Debug capability hierarchy and application data
+  debugCapabilityHierarchy(capabilities, settings)
+
+  // Debug: Check for capabilities with applications
+  if (settings.includeApplications) {
+    const capabilitiesWithApps = capabilities.filter(
+      cap => cap.supportedByApplications && cap.supportedByApplications.length > 0
+    )
+    console.log('🔍 DEBUG: Capabilities with applications:', {
+      totalCapabilities: capabilities.length,
+      capabilitiesWithApps: capabilitiesWithApps.length,
+      details: capabilitiesWithApps.map(cap => ({
+        name: cap.name,
+        appsCount: cap.supportedByApplications?.length || 0,
+        apps: cap.supportedByApplications?.map(app => app.name) || [],
+      })),
+    })
+  }
 
   // Load ArchiMate library
   const archimateLibrary = await loadArchimateLibrary()
@@ -61,10 +81,44 @@ export const generateCapabilityMapWithLibrary = async (
     return []
   }
 
+  // Debug: Check if application template is found
+  console.log('🔍 DEBUG: Application template status:', {
+    applicationTemplateFound: !!applicationTemplate,
+    includeApplications: settings.includeApplications,
+    applicationTemplateElements: applicationTemplate ? applicationTemplate.elements.length : 0,
+  })
+
   if (settings.includeApplications && !applicationTemplate) {
     console.warn(
-      'Applications sind aktiviert, aber Application Component Template wurde nicht gefunden'
+      '⚠️ Applications are enabled but Application Component template not found in ArchiMate library'
     )
+    // List available templates for debugging
+    if (archimateLibrary && archimateLibrary.libraryItems) {
+      console.log(
+        'Available templates:',
+        archimateLibrary.libraryItems.map(item => item.name)
+      )
+
+      // Try to find any template with "Application" in the name
+      const appTemplates = archimateLibrary.libraryItems.filter(item =>
+        item.name.toLowerCase().includes('application')
+      )
+      console.log(
+        'Templates containing "Application":',
+        appTemplates.map(t => t.name)
+      )
+    }
+  } else if (applicationTemplate) {
+    console.log('✅ Application template found:', {
+      elements: applicationTemplate.elements.map((el: any) => ({
+        type: el.type,
+        id: el.id,
+        width: el.width,
+        height: el.height,
+        x: el.x,
+        y: el.y,
+      })),
+    })
   }
 
   // Find top-level capabilities
@@ -120,6 +174,12 @@ export const generateCapabilityMapWithLibrary = async (
       )
       maxRequiredHeight = Math.max(maxRequiredHeight, requiredHeight)
     })
+
+    console.log('📏 Uniform height calculation for Level-0 capabilities:', {
+      baseHeight,
+      maxRequiredHeight,
+      topLevelCount: topLevelCapabilities.length,
+    })
   }
 
   // Generate top-level capabilities horizontally using the new recursive approach
@@ -127,6 +187,10 @@ export const generateCapabilityMapWithLibrary = async (
     const x = startX + index * (baseWidth + settings.horizontalSpacing)
     const y = startY
     const capabilityGroupId = generateId()
+
+    console.log(
+      `🚀 Rendering top-level capability: "${capability.name}" at (${x}, ${y}) with uniform height: ${maxRequiredHeight}`
+    )
 
     // Use the new recursive rendering function with uniform height for level-0
     const result = renderCapabilityHierarchy(
@@ -145,6 +209,10 @@ export const generateCapabilityMapWithLibrary = async (
     )
 
     elements.push(...result.elements)
+
+    console.log(
+      `✅ Completed rendering "${capability.name}" with uniform height: ${maxRequiredHeight}`
+    )
   })
 
   return elements
@@ -186,6 +254,12 @@ export const generateCapabilityMapElements = (
 
     // Calculate needed height for the maximum number of descendants
     uniformContainerHeight = Math.max(baseHeight, (maxDescendantCount + 1) * (baseHeight + 20) + 40)
+
+    console.log('📏 Fallback uniform height calculation (recursive):', {
+      maxDescendantCount,
+      baseHeight,
+      uniformContainerHeight,
+    })
   }
 
   // Generate top-level capabilities horizontally

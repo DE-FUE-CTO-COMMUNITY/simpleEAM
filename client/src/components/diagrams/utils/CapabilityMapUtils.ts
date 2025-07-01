@@ -429,6 +429,6 @@ export const generateCapabilityMapElements = (
     }
   })
 
-  console.log(`Generated ${elements.length} elements for capability map`)
+  // Generated capability map elements
   return elements
 }

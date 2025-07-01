@@ -16,10 +16,12 @@ import {
 } from '@mui/material'
 import { useQuery } from '@apollo/client'
 import { GET_CAPABILITY_MAP_DATA } from '@/graphql/capability'
+import { GET_APPLICATIONS_COUNT } from '@/graphql/application'
 import {
   generateCapabilityMapWithLibrary,
   generateCapabilityMapElements,
   calculateRenderedCapabilitiesCount,
+  calculateTotalApplicationsCount,
   debugCapabilityHierarchy,
   debugMissingCapabilities,
   type CapabilityMapSettings,
@@ -50,6 +52,12 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
     errorPolicy: 'all',
   })
 
+  // Get applications count for debugging
+  const { data: appCountData } = useQuery(GET_APPLICATIONS_COUNT, {
+    skip: !open,
+    errorPolicy: 'all',
+  })
+
   const handleGenerate = async () => {
     if (!data?.businessCapabilities) {
       console.warn('Keine Capability-Daten verfügbar')
@@ -60,7 +68,7 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
       // Debug the capability hierarchy before generation
       console.log('🚀 Starting capability map generation...')
       debugCapabilityHierarchy(data.businessCapabilities, settings)
-      
+
       // Enhanced debug analysis to find missing capabilities
       debugMissingCapabilities(data.businessCapabilities, settings)
 
@@ -113,6 +121,11 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
     ? calculateRenderedCapabilitiesCount(data.businessCapabilities, settings)
     : 0
 
+  // Calculate total applications count
+  const totalApplicationsCount = data
+    ? calculateTotalApplicationsCount(data.businessCapabilities, settings)
+    : 0
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>Capability Map generieren</DialogTitle>
@@ -142,6 +155,16 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
               <Alert severity="info" sx={{ my: 2 }}>
                 {data.businessCapabilities.length} Capabilities gesamt gefunden,{' '}
                 {renderedCapabilitiesCount} werden auf der Map dargestellt
+                {totalApplicationsCount > 0 && (
+                  <> • {totalApplicationsCount} Anwendungen gefunden</>
+                )}
+                {appCountData && (
+                  <>
+                    {' '}
+                    • {appCountData.applicationsConnection.aggregate.count.nodes} Anwendungen in der
+                    Datenbank
+                  </>
+                )}
               </Alert>
 
               <Box sx={{ mt: 3 }}>
