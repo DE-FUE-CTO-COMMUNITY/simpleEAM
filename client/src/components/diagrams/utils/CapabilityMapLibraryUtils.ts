@@ -144,20 +144,19 @@ export const generateCapabilityMapWithLibrary = async (
   // Find the maximum height needed among all top-level capabilities
   let maxRequiredHeight = baseHeight
 
-  if (settings.maxLevels > 1) {
-    topLevelCapabilities.forEach(capability => {
-      const requiredHeight = calculateSubtreeHeight(
-        capability,
-        capabilities,
-        baseHeight,
-        0,
-        settings.maxLevels,
-        settings,
-        applicationTemplate // Pass the applicationTemplate
-      )
-      maxRequiredHeight = Math.max(maxRequiredHeight, requiredHeight)
-    })
-  }
+  // Always calculate height, even for Level 1 (applications need space)
+  topLevelCapabilities.forEach(capability => {
+    const requiredHeight = calculateSubtreeHeight(
+      capability,
+      capabilities,
+      baseHeight,
+      0,
+      settings.maxLevels,
+      settings,
+      applicationTemplate // Pass the applicationTemplate
+    )
+    maxRequiredHeight = Math.max(maxRequiredHeight, requiredHeight)
+  })
 
   // Generate top-level capabilities horizontally using the new recursive approach
   topLevelCapabilities.forEach((capability, index) => {

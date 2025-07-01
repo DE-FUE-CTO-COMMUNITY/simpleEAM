@@ -152,6 +152,35 @@ export const calculateSubtreeHeight = (
     return baseHeight
   }
 
+  // Special case: For maxLevels = 1, we need to ensure applications are properly sized
+  // Even if there are no visible children, applications need space
+  if (maxLevels === 1 && visibleChildren.length === 0 && applications.length > 0) {
+    // Calculate height needed for applications only (no children)
+    let applicationHeight = baseHeight * 0.8 // Default fallback
+    if (applicationTemplate) {
+      const appTemplateRect = applicationTemplate.elements.find(
+        (el: any) => el.type === 'rectangle'
+      )
+      if (appTemplateRect) {
+        applicationHeight = Math.max(appTemplateRect.height, baseHeight * 0.8)
+      }
+    }
+
+    // Calculate total height for applications
+    const textAreaHeight = 50
+    const childPadding = 10
+    const childSpacing = 10
+    const bottomPadding = 10
+
+    let totalApplicationHeight = textAreaHeight + childPadding
+    applications.forEach(() => {
+      totalApplicationHeight += applicationHeight + childSpacing
+    })
+    totalApplicationHeight += bottomPadding
+
+    return Math.max(baseHeight, totalApplicationHeight)
+  }
+
   // For non-leaf nodes, calculate height exactly as the renderer does
   // These constants MUST MATCH the renderer values exactly!
   const textAreaHeight = 50 // Space reserved for the capability text at the top
@@ -204,8 +233,34 @@ export const calculateSubtreeHeight = (
   // Calculate the total height including bottom padding
   const contentHeight = currentChildY + bottomPadding
 
-  // Add adjustment buffer to match actual renderer behavior
-  const adjustmentBuffer = 20
+  // Dynamic adjustment buffer based on level depth, content type and complexity
+  let adjustmentBuffer = 0
+
+  // Base buffer calculation
+  if (maxLevels === 1) {
+    // For single level, minimal buffer needed since it's mostly applications
+    adjustmentBuffer = applications.length > 0 ? 5 : 0
+  } else if (maxLevels === 2) {
+    // For two levels, need significantly more buffer
+    if (visibleChildren.length > 0 && applications.length > 0) {
+      adjustmentBuffer = 40 // Both children and apps - increased from 25
+    } else if (visibleChildren.length > 0 || applications.length > 0) {
+      adjustmentBuffer = 35 // Either children or apps - increased from 20
+    } else {
+      adjustmentBuffer = 0 // Neither
+    }
+  } else if (maxLevels === 3) {
+    // For three levels, the originally tuned buffer
+    adjustmentBuffer = 20
+  } else {
+    // For 4+ levels, reduce buffer as it was too much
+    const baseBuffer = 15 // Reduced from 25
+    const complexityFactor = (maxLevels - 4) * 3 // Reduced from 5
+    const contentComplexity =
+      (visibleChildren.length > 2 ? 3 : 0) + (applications.length > 2 ? 3 : 0) // Reduced from 5
+    adjustmentBuffer = baseBuffer + complexityFactor + contentComplexity
+  }
+
   const totalHeight = Math.max(baseHeight, contentHeight + adjustmentBuffer)
 
   return totalHeight

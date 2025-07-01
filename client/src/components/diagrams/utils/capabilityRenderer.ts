@@ -62,8 +62,10 @@ export const renderCapabilityHierarchy = (
   const capabilityHeight =
     currentLevel === 0 && uniformHeight ? uniformHeight : isLeaf ? baseHeight : subtreeHeight
 
-  // Determine text alignment: leaf capabilities get centered text, parents get top-centered text
-  const useTopCenteredText = !isLeaf // Only parents use top-centered text
+  // Determine text alignment:
+  // - Level-0 capabilities ALWAYS get top-centered text
+  // - Other levels: leaf capabilities get centered text, parents get top-centered text
+  const useTopCenteredText = currentLevel === 0 || !isLeaf
 
   // Determine background color: Level-0 capabilities get white background
   const backgroundColor = currentLevel === 0 ? '#ffffff' : undefined
