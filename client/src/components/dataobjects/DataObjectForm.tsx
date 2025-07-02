@@ -7,6 +7,7 @@ import { useQuery } from '@apollo/client'
 import { GET_PERSONS } from '@/graphql/person'
 import { GET_APPLICATIONS } from '@/graphql/application'
 import { GET_ARCHITECTURES } from '@/graphql/architecture'
+import { GET_DIAGRAMS } from '@/graphql/diagram'
 import { DataObject, DataClassification, Architecture } from '../../gql/generated'
 import GenericForm, { FieldConfig } from '../common/GenericForm'
 import { isArchitect } from '@/lib/auth'
@@ -28,6 +29,7 @@ export const dataObjectSchema = z.object({
   endOfLifeDate: z.string().optional().nullable(),
   ownerId: z.string().optional(),
   partOfArchitectures: z.array(z.string()).optional(),
+  partOfDiagrams: z.array(z.string()).optional(),
 })
 
 // TypeScript Typen basierend auf dem Schema
@@ -82,6 +84,8 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
   const { data: applicationData, loading: applicationLoading } = useQuery(GET_APPLICATIONS)
   // Architekturen laden
   const { data: architecturesData, loading: architecturesLoading } = useQuery(GET_ARCHITECTURES)
+  // Diagramme laden
+  const { data: diagramsData, loading: diagramsLoading } = useQuery(GET_DIAGRAMS)
 
   // Formulardaten mit useMemo initialisieren, um unnötige Re-Renders zu vermeiden
   const defaultValues = React.useMemo<DataObjectFormValues>(
@@ -95,6 +99,7 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
       endOfLifeDate: null,
       ownerId: undefined,
       partOfArchitectures: [],
+      partOfDiagrams: [],
     }),
     []
   )
@@ -141,6 +146,7 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
         ownerId:
           dataObject.owners && dataObject.owners.length > 0 ? dataObject.owners[0].id : undefined,
         partOfArchitectures: dataObject.partOfArchitectures?.map(arch => arch.id) ?? [],
+        partOfDiagrams: dataObject.depictedInDiagrams?.map(diagram => diagram.id) ?? [],
       }
 
       // Formular mit den Werten aus dem vorhandenen DataObject zurücksetzen
@@ -295,6 +301,35 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
             (arch: Architecture) => arch.id === option
           )
           return matchingArch?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
+    },
+    {
+      name: 'partOfDiagrams',
+      label: 'Dargestellt in Diagrammen',
+      type: 'autocomplete',
+      multiple: true,
+      options: (diagramsData?.diagrams || []).map((diagram: any) => ({
+        value: diagram.id,
+        label: diagram.title,
+      })),
+      loadingOptions: diagramsLoading,
+      size: { xs: 12, md: 6 },
+      tabId: 'architectures',
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          // Direkte ID - suche passende Option
+          const matchingDiagram = diagramsData?.diagrams?.find(
+            (diagram: any) => diagram.id === option
+          )
+          return matchingDiagram?.title || option
         }
         return option?.label || ''
       },

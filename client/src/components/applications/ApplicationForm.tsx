@@ -21,6 +21,7 @@ import { GET_CAPABILITIES } from '@/graphql/capability'
 import { GET_DATA_OBJECTS } from '@/graphql/dataObject'
 import { GET_APPLICATION_INTERFACES } from '@/graphql/applicationInterface'
 import { GET_ARCHITECTURES } from '@/graphql/architecture'
+import { GET_DIAGRAMS } from '@/graphql/diagram'
 import GenericForm, { FieldConfig, TabConfig } from '../common/GenericForm'
 import { getValidSevenRStrategies } from './timeCategoryDependencies'
 import { isArchitect } from '@/lib/auth'
@@ -62,6 +63,7 @@ const baseApplicationSchema = z.object({
   sourceOfInterfaceIds: z.array(z.string()).optional(),
   targetOfInterfaceIds: z.array(z.string()).optional(),
   partOfArchitectures: z.array(z.string()).optional(),
+  partOfDiagrams: z.array(z.string()).optional(),
   timeCategory: z.nativeEnum(TimeCategory).optional().nullable().or(z.literal('')),
   sevenRStrategy: z.nativeEnum(SevenRStrategy).optional().nullable().or(z.literal('')),
 })
@@ -166,6 +168,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
   const { data: dataObjectsData, loading: dataObjectsLoading } = useQuery(GET_DATA_OBJECTS)
   const { data: interfacesData, loading: interfacesLoading } = useQuery(GET_APPLICATION_INTERFACES)
   const { data: architecturesData, loading: architecturesLoading } = useQuery(GET_ARCHITECTURES)
+  const { data: diagramsData, loading: diagramsLoading } = useQuery(GET_DIAGRAMS)
 
   // Standardwerte für das Formular
   const defaultValues: ApplicationFormValues = {
@@ -187,6 +190,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     sourceOfInterfaceIds: application?.sourceOfInterfaces?.map(iface => iface.id) ?? [],
     targetOfInterfaceIds: application?.targetOfInterfaces?.map(iface => iface.id) ?? [],
     partOfArchitectures: application?.partOfArchitectures?.map(arch => arch.id) ?? [],
+    partOfDiagrams: [], // TODO: Das Feld existiert noch nicht im Application Typ
     timeCategory: application?.timeCategory ?? null,
     sevenRStrategy: application?.sevenRStrategy ?? null,
   }
@@ -560,7 +564,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
         label: arch.name,
       })),
       loadingOptions: architecturesLoading,
-      size: 12,
+      size: { xs: 12, md: 6 },
       getOptionLabel: (option: any) => {
         if (typeof option === 'string') {
           // Direkte ID - suche passende Option
@@ -568,6 +572,36 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
             (arch: Architecture) => arch.id === option
           )
           return matchingArch?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
+    },
+    // Diagramme (Tab: architectures)
+    {
+      name: 'partOfDiagrams',
+      label: 'Dargestellt in Diagrammen',
+      type: 'autocomplete',
+      tabId: 'architectures',
+      multiple: true,
+      options: (diagramsData?.diagrams || []).map((diagram: any) => ({
+        value: diagram.id,
+        label: diagram.title,
+      })),
+      loadingOptions: diagramsLoading,
+      size: { xs: 12, md: 6 },
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          // Direkte ID - suche passende Option
+          const matchingDiagram = diagramsData?.diagrams?.find(
+            (diagram: any) => diagram.id === option
+          )
+          return matchingDiagram?.title || option
         }
         return option?.label || ''
       },

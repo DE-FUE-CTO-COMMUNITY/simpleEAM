@@ -7,6 +7,7 @@ import { useQuery } from '@apollo/client'
 import { GET_PERSONS } from '@/graphql/person'
 import { GET_APPLICATIONS } from '@/graphql/application'
 import { GET_ARCHITECTURES } from '@/graphql/architecture'
+import { GET_DIAGRAMS } from '@/graphql/diagram'
 import {
   BusinessCapability,
   CapabilityStatus,
@@ -43,6 +44,7 @@ export const capabilitySchema = z.object({
   children: z.array(z.string()).optional(),
   supportedByApplications: z.array(z.string()).optional(),
   partOfArchitectures: z.array(z.string()).optional(),
+  partOfDiagrams: z.array(z.string()).optional(),
 })
 
 // TypeScript Typen basierend auf dem Schema
@@ -114,6 +116,9 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
   // Architekturen laden
   const { data: architectureData, loading: architectureLoading } = useQuery(GET_ARCHITECTURES)
 
+  // Diagramme laden
+  const { data: diagramData, loading: diagramLoading } = useQuery(GET_DIAGRAMS)
+
   // Formulardaten mit useMemo initialisieren, um unnötige Re-Renders zu vermeiden
   const defaultValues = React.useMemo<CapabilityFormValues>(
     () => ({
@@ -128,6 +133,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
       children: [],
       supportedByApplications: [],
       partOfArchitectures: [],
+      partOfDiagrams: [],
     }),
     []
   )
@@ -170,6 +176,8 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
     () => capability?.partOfArchitectures?.map(arch => arch.id) ?? [],
     [capability?.partOfArchitectures]
   )
+  // Vorläufig leerer Array, da partOfDiagrams noch nicht im BusinessCapability Typ enthalten ist
+  const capabilityPartOfDiagrams = React.useMemo(() => [], [])
 
   useEffect(() => {
     if (!isOpen) {
@@ -188,6 +196,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
         children: capabilityChildren,
         supportedByApplications: capabilitySupportedByApplications,
         partOfArchitectures: capabilityPartOfArchitectures,
+        partOfDiagrams: capabilityPartOfDiagrams,
       })
     }
   }, [
@@ -205,6 +214,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
     capabilityChildren,
     capabilitySupportedByApplications,
     capabilityPartOfArchitectures,
+    capabilityPartOfDiagrams,
   ])
 
   // Feldkonfiguration für das generische Formular
@@ -408,6 +418,37 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
             (arch: Architecture) => arch.id === option
           )
           return matchingArch?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
+    },
+    {
+      name: 'partOfDiagrams',
+      label: 'Teil von Diagrammen',
+      type: 'autocomplete',
+      multiple: true,
+      options:
+        diagramData?.diagrams?.map(
+          (diagram: any): SelectOption => ({
+            value: diagram.id,
+            label: diagram.name,
+          })
+        ) || [],
+      loadingOptions: diagramLoading,
+      size: 12,
+      tabId: 'architectures',
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          const matchingDiagram = diagramData?.diagrams?.find(
+            (diagram: any) => diagram.id === option
+          )
+          return matchingDiagram?.name || option
         }
         return option?.label || ''
       },

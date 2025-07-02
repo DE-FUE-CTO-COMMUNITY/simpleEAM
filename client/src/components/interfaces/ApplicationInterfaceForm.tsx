@@ -6,6 +6,7 @@ import { z } from 'zod'
 import { useQuery } from '@apollo/client'
 import { GET_PERSONS } from '@/graphql/person'
 import { GET_APPLICATIONS } from '@/graphql/application'
+import { GET_DIAGRAMS } from '@/graphql/diagram'
 import {
   ApplicationInterface,
   InterfaceType,
@@ -44,6 +45,7 @@ export const applicationInterfaceSchema = z.object({
   sourceApplications: z.array(z.string()).optional(),
   targetApplications: z.array(z.string()).optional(),
   dataObjects: z.array(z.string()).optional(),
+  partOfDiagrams: z.array(z.string()).optional(),
 })
 
 // TypeScript Typen basierend auf dem Schema
@@ -68,6 +70,7 @@ const APPLICATION_INTERFACE_TABS = [
   { id: 'technical', label: 'Technisch' },
   { id: 'lifecycle', label: 'Lebenszyklus' },
   { id: 'relationships', label: 'Beziehungen' },
+  { id: 'architectures', label: 'Architekturen' },
 ]
 
 const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
@@ -86,6 +89,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
   // Daten laden
   const { data: personData, loading: personLoading } = useQuery(GET_PERSONS)
   const { data: applicationData, loading: applicationLoading } = useQuery(GET_APPLICATIONS)
+  const { data: diagramsData, loading: diagramsLoading } = useQuery(GET_DIAGRAMS)
 
   // Formulardaten mit useMemo initialisieren, um unnötige Re-Renders zu vermeiden
   const defaultValues = React.useMemo<ApplicationInterfaceFormValues>(
@@ -102,6 +106,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       sourceApplications: [],
       targetApplications: [],
       dataObjects: [],
+      partOfDiagrams: [],
     }),
     []
   )
@@ -125,6 +130,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
         sourceApplications: value.sourceApplications || [],
         targetApplications: value.targetApplications || [],
         dataObjects: value.dataObjects || [],
+        partOfDiagrams: value.partOfDiagrams || [],
       }
 
       await onSubmit(formattedValues)
@@ -175,6 +181,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
         sourceApplications: applicationInterface.sourceApplications?.map(app => app.id) || [],
         targetApplications: applicationInterface.targetApplications?.map(app => app.id) || [],
         dataObjects: applicationInterface.dataObjects?.map(obj => obj.id) || [],
+        partOfDiagrams: [], // TODO: Das Feld existiert noch nicht im ApplicationInterface Typ
       }
 
       // Formular mit den Werten aus der vorhandenen Schnittstelle zurücksetzen
@@ -397,6 +404,35 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
           // Direkte ID - suche passende Option
           const matchingObj = dataObjects.find(obj => obj.id === option)
           return matchingObj?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
+    },
+    {
+      name: 'partOfDiagrams',
+      label: 'Dargestellt in Diagrammen',
+      type: 'autocomplete',
+      size: { xs: 12, md: 6 },
+      tabId: 'architectures',
+      options: (diagramsData?.diagrams || []).map((diagram: any) => ({
+        value: diagram.id,
+        label: diagram.title,
+      })),
+      loadingOptions: diagramsLoading,
+      multiple: true,
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          // Direkte ID - suche passende Option
+          const matchingDiagram = diagramsData?.diagrams?.find(
+            (diagram: any) => diagram.id === option
+          )
+          return matchingDiagram?.title || option
         }
         return option?.label || ''
       },
