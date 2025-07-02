@@ -6,7 +6,7 @@ import { Add as AddIcon } from '@mui/icons-material'
 import { useQuery, useMutation } from '@apollo/client'
 import { useSnackbar } from 'notistack'
 import { useAuth, isArchitect } from '@/lib/auth'
-import { SortingState, VisibilityState } from '@tanstack/react-table'
+import { VisibilityState } from '@tanstack/react-table'
 import {
   GET_APPLICATION_INTERFACES,
   CREATE_APPLICATION_INTERFACE,
@@ -38,11 +38,6 @@ function ApplicationInterfacesPage() {
 
   // Filter-Zustand
   const [filterOpen, setFilterOpen] = useState(false)
-  const [filterState, setFilterState] = useState<FilterState>({
-    interfaceTypeFilter: [],
-    searchFilter: '',
-    updatedDateRange: ['', ''],
-  })
   const [activeFiltersCount, setActiveFiltersCount] = useState<number>(0)
 
   // State für das neue Formular
@@ -86,10 +81,22 @@ function ApplicationInterfacesPage() {
   const applicationInterfaces = data?.applicationInterfaces || []
 
   // Filter auf Schnittstellen anwenden
-  const { filteredApplicationInterfaces: filteredData, availableInterfaceTypes } =
-    useApplicationInterfaceFilter({
-      applicationInterfaces,
-    })
+  const {
+    filterState,
+    setFilterState,
+    filteredApplicationInterfaces: filteredData,
+    resetFilters,
+    availableInterfaceTypes,
+    availableProtocols,
+    availableStatuses,
+    availableResponsiblePersons,
+    availableSourceApplications,
+    availableTargetApplications,
+    availableDataObjects,
+    availableVersions,
+  } = useApplicationInterfaceFilter({
+    applicationInterfaces,
+  })
 
   // Mutation zum Erstellen einer neuen Schnittstelle
   const [createApplicationInterface, { loading: isCreating }] = useMutation(
@@ -272,11 +279,7 @@ function ApplicationInterfacesPage() {
 
   // Filter zurücksetzen
   const handleResetFilter = () => {
-    setFilterState({
-      interfaceTypeFilter: [],
-      searchFilter: '',
-      updatedDateRange: ['', ''],
-    })
+    resetFilters()
     setActiveFiltersCount(0)
   }
 
@@ -334,6 +337,13 @@ function ApplicationInterfacesPage() {
         <ApplicationInterfaceFilterDialog
           filterState={filterState}
           availableInterfaceTypes={availableInterfaceTypes}
+          availableProtocols={availableProtocols}
+          availableStatuses={availableStatuses}
+          availableResponsiblePersons={availableResponsiblePersons}
+          availableSourceApplications={availableSourceApplications}
+          availableTargetApplications={availableTargetApplications}
+          availableDataObjects={availableDataObjects}
+          availableVersions={availableVersions}
           onFilterChange={handleFilterChange}
           onResetFilter={handleResetFilter}
           onClose={() => setFilterOpen(false)}

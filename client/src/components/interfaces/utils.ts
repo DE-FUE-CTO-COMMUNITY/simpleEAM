@@ -1,7 +1,7 @@
 'use client'
 
 import { GenericFilterState } from '../common/GenericFilterDialog'
-import { InterfaceType } from '../../gql/generated'
+import { InterfaceType, InterfaceProtocol, InterfaceStatus } from '../../gql/generated'
 
 /**
  * Hilfsfunktion zur Formatierung von Datum
@@ -36,6 +36,26 @@ export const getInterfaceTypeLabel = (type: InterfaceType): string => {
 }
 
 /**
+ * Konvertiert den InterfaceStatus-Enum in einen benutzerfreundlichen String
+ */
+export const getStatusLabel = (status: InterfaceStatus): string => {
+  switch (status) {
+    case InterfaceStatus.ACTIVE:
+      return 'Aktiv'
+    case InterfaceStatus.DEPRECATED:
+      return 'Veraltet'
+    case InterfaceStatus.IN_DEVELOPMENT:
+      return 'In Entwicklung'
+    case InterfaceStatus.OUT_OF_SERVICE:
+      return 'Außer Betrieb'
+    case InterfaceStatus.PLANNED:
+      return 'Geplant'
+    default:
+      return 'Unbekannt'
+  }
+}
+
+/**
  * Konvertiert den InterfaceProtocol-Enum in einen benutzerfreundlichen String
  */
 export const getProtocolLabel = (protocol: any): string => {
@@ -59,8 +79,60 @@ export const countActiveFilters = (filterState: GenericFilterState): number => {
     count++
   }
 
+  // Protocol-Filter
+  if (
+    filterState.protocolFilter &&
+    (filterState.protocolFilter as InterfaceProtocol[]).length > 0
+  ) {
+    count++
+  }
+
+  // Status-Filter
+  if (filterState.statusFilter && (filterState.statusFilter as InterfaceStatus[]).length > 0) {
+    count++
+  }
+
+  // Verantwortliche-Filter
+  if (
+    filterState.responsiblePersonFilter &&
+    (filterState.responsiblePersonFilter as string[]).length > 0
+  ) {
+    count++
+  }
+
+  // Source Applications-Filter
+  if (
+    filterState.sourceApplicationsFilter &&
+    (filterState.sourceApplicationsFilter as string[]).length > 0
+  ) {
+    count++
+  }
+
+  // Target Applications-Filter
+  if (
+    filterState.targetApplicationsFilter &&
+    (filterState.targetApplicationsFilter as string[]).length > 0
+  ) {
+    count++
+  }
+
+  // Data Objects-Filter
+  if (filterState.dataObjectsFilter && (filterState.dataObjectsFilter as string[]).length > 0) {
+    count++
+  }
+
+  // Version-Filter
+  if (filterState.versionFilter && (filterState.versionFilter as string).trim() !== '') {
+    count++
+  }
+
   // Suchfilter
   if (filterState.searchFilter && (filterState.searchFilter as string).trim() !== '') {
+    count++
+  }
+
+  // Beschreibungsfilter
+  if (filterState.descriptionFilter && (filterState.descriptionFilter as string).trim() !== '') {
     count++
   }
 
@@ -75,4 +147,42 @@ export const countActiveFilters = (filterState: GenericFilterState): number => {
   }
 
   return count
+}
+
+/**
+ * Konvertiert den InterfaceProtocol-Enum in einen benutzerfreundlichen String
+ */
+export const getProtocolDisplayLabel = (protocol: InterfaceProtocol): string => {
+  switch (protocol) {
+    case InterfaceProtocol.FTP:
+      return 'FTP'
+    case InterfaceProtocol.GRAPHQL:
+      return 'GraphQL'
+    case InterfaceProtocol.HTTP:
+      return 'HTTP'
+    case InterfaceProtocol.HTTPS:
+      return 'HTTPS'
+    case InterfaceProtocol.JDBC:
+      return 'JDBC'
+    case InterfaceProtocol.LDAP:
+      return 'LDAP'
+    case InterfaceProtocol.ODBC:
+      return 'ODBC'
+    case InterfaceProtocol.OTHER:
+      return 'Sonstige'
+    case InterfaceProtocol.REST:
+      return 'REST'
+    case InterfaceProtocol.SFTP:
+      return 'SFTP'
+    case InterfaceProtocol.SMTP:
+      return 'SMTP'
+    case InterfaceProtocol.SOAP:
+      return 'SOAP'
+    case InterfaceProtocol.TCP:
+      return 'TCP'
+    case InterfaceProtocol.UDP:
+      return 'UDP'
+    default:
+      return 'Unbekannt'
+  }
 }
