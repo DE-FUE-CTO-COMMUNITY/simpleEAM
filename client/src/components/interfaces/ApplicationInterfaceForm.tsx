@@ -57,81 +57,83 @@ const baseApplicationInterfaceSchema = z.object({
 })
 
 // Erweiterte Schema-Validierung mit Lifecycle-Logik
-export const applicationInterfaceSchema = baseApplicationInterfaceSchema.superRefine((data, ctx) => {
-  // Lifecycle-Datums-Validierung mit individuellen Fehlermeldungen
-  const dates = [
-    { field: 'planningDate', date: data.planningDate, label: 'Planungsdatum' },
-    { field: 'introductionDate', date: data.introductionDate, label: 'Einführungsdatum' },
-    { field: 'endOfUseDate', date: data.endOfUseDate, label: 'Ende der Nutzung' },
-    { field: 'endOfLifeDate', date: data.endOfLifeDate, label: 'End-of-Life-Datum' },
-  ] as const
+export const applicationInterfaceSchema = baseApplicationInterfaceSchema.superRefine(
+  (data, ctx) => {
+    // Lifecycle-Datums-Validierung mit individuellen Fehlermeldungen
+    const dates = [
+      { field: 'planningDate', date: data.planningDate, label: 'Planungsdatum' },
+      { field: 'introductionDate', date: data.introductionDate, label: 'Einführungsdatum' },
+      { field: 'endOfUseDate', date: data.endOfUseDate, label: 'Ende der Nutzung' },
+      { field: 'endOfLifeDate', date: data.endOfLifeDate, label: 'End-of-Life-Datum' },
+    ] as const
 
-  const setDates = dates.filter(d => d.date && d.date instanceof Date && !isNaN(d.date.getTime()))
+    const setDates = dates.filter(d => d.date && d.date instanceof Date && !isNaN(d.date.getTime()))
 
-  // Prüfe chronologische Reihenfolge zwischen allen aufeinanderfolgenden Daten
-  for (let i = 0; i < setDates.length - 1; i++) {
-    const currentDate = setDates[i]
-    const nextDate = setDates[i + 1]
-    
-    if (currentDate.date! > nextDate.date!) {
-      // Füge Fehlermeldung zum späteren Datum hinzu
-      ctx.addIssue({
-        code: 'custom',
-        message: `${nextDate.label} muss nach ${currentDate.label} liegen.`,
-        path: [nextDate.field],
-      })
+    // Prüfe chronologische Reihenfolge zwischen allen aufeinanderfolgenden Daten
+    for (let i = 0; i < setDates.length - 1; i++) {
+      const currentDate = setDates[i]
+      const nextDate = setDates[i + 1]
+
+      if (currentDate.date! > nextDate.date!) {
+        // Füge Fehlermeldung zum späteren Datum hinzu
+        ctx.addIssue({
+          code: 'custom',
+          message: `${nextDate.label} muss nach ${currentDate.label} liegen.`,
+          path: [nextDate.field],
+        })
+      }
+    }
+
+    // Status-Lifecycle-Validierung basierend auf dem aktuellen Datum
+    const status = data.status
+    const now = new Date()
+    const introductionDate = data.introductionDate
+    const endOfUseDate = data.endOfUseDate
+
+    switch (status) {
+      case InterfaceStatus.IN_DEVELOPMENT:
+      case InterfaceStatus.PLANNED:
+        // IN_DEVELOPMENT/PLANNED: Einführungsdatum muss in der Zukunft liegen (oder nicht gesetzt sein)
+        if (introductionDate && introductionDate <= now) {
+          ctx.addIssue({
+            code: 'custom',
+            message: `Bei Status "${status === InterfaceStatus.PLANNED ? 'Geplant' : 'In Entwicklung'}" muss das Einführungsdatum in der Zukunft liegen.`,
+            path: ['introductionDate'],
+          })
+        }
+        break
+      case InterfaceStatus.ACTIVE:
+        // ACTIVE: Einführungsdatum muss in der Vergangenheit liegen
+        if (!introductionDate || introductionDate > now) {
+          ctx.addIssue({
+            code: 'custom',
+            message: 'Bei Status "Aktiv" muss das Einführungsdatum in der Vergangenheit liegen.',
+            path: ['introductionDate'],
+          })
+        }
+        // UND End-of-Use muss in der Zukunft liegen (oder nicht gesetzt sein)
+        if (endOfUseDate && endOfUseDate <= now) {
+          ctx.addIssue({
+            code: 'custom',
+            message: 'Bei Status "Aktiv" muss das Ende der Nutzung in der Zukunft liegen.',
+            path: ['endOfUseDate'],
+          })
+        }
+        break
+      case InterfaceStatus.DEPRECATED:
+      case InterfaceStatus.OUT_OF_SERVICE:
+        // DEPRECATED/OUT_OF_SERVICE: End-of-Use-Datum muss in der Vergangenheit liegen
+        if (!endOfUseDate || endOfUseDate > now) {
+          ctx.addIssue({
+            code: 'custom',
+            message: `Bei Status "${status === InterfaceStatus.DEPRECATED ? 'Veraltet' : 'Außer Betrieb'}" muss das Ende der Nutzung in der Vergangenheit liegen.`,
+            path: ['endOfUseDate'],
+          })
+        }
+        break
     }
   }
-
-  // Status-Lifecycle-Validierung basierend auf dem aktuellen Datum
-  const status = data.status
-  const now = new Date()
-  const introductionDate = data.introductionDate
-  const endOfUseDate = data.endOfUseDate
-
-  switch (status) {
-    case InterfaceStatus.IN_DEVELOPMENT:
-    case InterfaceStatus.PLANNED:
-      // IN_DEVELOPMENT/PLANNED: Einführungsdatum muss in der Zukunft liegen (oder nicht gesetzt sein)
-      if (introductionDate && introductionDate <= now) {
-        ctx.addIssue({
-          code: 'custom',
-          message: `Bei Status "${status === InterfaceStatus.PLANNED ? 'Geplant' : 'In Entwicklung'}" muss das Einführungsdatum in der Zukunft liegen.`,
-          path: ['introductionDate'],
-        })
-      }
-      break
-    case InterfaceStatus.ACTIVE:
-      // ACTIVE: Einführungsdatum muss in der Vergangenheit liegen
-      if (!introductionDate || introductionDate > now) {
-        ctx.addIssue({
-          code: 'custom',
-          message: 'Bei Status "Aktiv" muss das Einführungsdatum in der Vergangenheit liegen.',
-          path: ['introductionDate'],
-        })
-      }
-      // UND End-of-Use muss in der Zukunft liegen (oder nicht gesetzt sein)
-      if (endOfUseDate && endOfUseDate <= now) {
-        ctx.addIssue({
-          code: 'custom',
-          message: 'Bei Status "Aktiv" muss das Ende der Nutzung in der Zukunft liegen.',
-          path: ['endOfUseDate'],
-        })
-      }
-      break
-    case InterfaceStatus.DEPRECATED:
-    case InterfaceStatus.OUT_OF_SERVICE:
-      // DEPRECATED/OUT_OF_SERVICE: End-of-Use-Datum muss in der Vergangenheit liegen
-      if (!endOfUseDate || endOfUseDate > now) {
-        ctx.addIssue({
-          code: 'custom',
-          message: `Bei Status "${status === InterfaceStatus.DEPRECATED ? 'Veraltet' : 'Außer Betrieb'}" muss das Ende der Nutzung in der Vergangenheit liegen.`,
-          path: ['endOfUseDate'],
-        })
-      }
-      break
-  }
-})
+)
 
 // TypeScript Typen basierend auf dem Schema
 export type ApplicationInterfaceFormValues = z.infer<typeof applicationInterfaceSchema>

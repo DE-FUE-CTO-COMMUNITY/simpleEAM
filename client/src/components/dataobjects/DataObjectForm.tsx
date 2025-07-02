@@ -56,7 +56,7 @@ export const dataObjectSchema = baseDataObjectSchema.superRefine((data, ctx) => 
   for (let i = 0; i < setDates.length - 1; i++) {
     const currentDate = setDates[i]
     const nextDate = setDates[i + 1]
-    
+
     if (currentDate.date! >= nextDate.date!) {
       // Füge Fehlermeldung zum späteren Datum hinzu
       ctx.addIssue({

@@ -77,80 +77,80 @@ const baseApplicationSchema = z.object({
 })
 
 // Schema für die Formularvalidierung mit erweiterten Validierungen
-export const applicationSchema = baseApplicationSchema
-  .superRefine((data, ctx) => {
-    // Lifecycle-Datums-Validierung mit individuellen Fehlermeldungen
-    const dates = [
-      { field: 'planningDate', date: data.planningDate, label: 'Planungsdatum' },
-      { field: 'introductionDate', date: data.introductionDate, label: 'Einführungsdatum' },
-      { field: 'endOfUseDate', date: data.endOfUseDate, label: 'Ende der Nutzung' },
-      { field: 'endOfLifeDate', date: data.endOfLifeDate, label: 'End-of-Life-Datum' },
-    ] as const
+export const applicationSchema = baseApplicationSchema.superRefine((data, ctx) => {
+  // Lifecycle-Datums-Validierung mit individuellen Fehlermeldungen
+  const dates = [
+    { field: 'planningDate', date: data.planningDate, label: 'Planungsdatum' },
+    { field: 'introductionDate', date: data.introductionDate, label: 'Einführungsdatum' },
+    { field: 'endOfUseDate', date: data.endOfUseDate, label: 'Ende der Nutzung' },
+    { field: 'endOfLifeDate', date: data.endOfLifeDate, label: 'End-of-Life-Datum' },
+  ] as const
 
-    const setDates = dates.filter(d => d.date !== null && d.date !== undefined)
+  const setDates = dates.filter(d => d.date !== null && d.date !== undefined)
 
-    // Prüfe chronologische Reihenfolge zwischen allen aufeinanderfolgenden Daten
-    for (let i = 0; i < setDates.length - 1; i++) {
-      const currentDate = setDates[i]
-      const nextDate = setDates[i + 1]
-      
-      if (currentDate.date! >= nextDate.date!) {
-        // Füge Fehlermeldung zum späteren Datum hinzu
+  // Prüfe chronologische Reihenfolge zwischen allen aufeinanderfolgenden Daten
+  for (let i = 0; i < setDates.length - 1; i++) {
+    const currentDate = setDates[i]
+    const nextDate = setDates[i + 1]
+
+    if (currentDate.date! >= nextDate.date!) {
+      // Füge Fehlermeldung zum späteren Datum hinzu
+      ctx.addIssue({
+        code: 'custom',
+        message: `${nextDate.label} muss nach ${currentDate.label} liegen.`,
+        path: [nextDate.field],
+      })
+    }
+  }
+
+  // Status-Lifecycle-Validierung basierend auf dem aktuellen Datum
+  const status = data.status
+  const now = new Date()
+  const introductionDate = data.introductionDate
+  const endOfUseDate = data.endOfUseDate
+
+  switch (status) {
+    case ApplicationStatus.IN_DEVELOPMENT:
+      // IN_DEVELOPMENT: Einführungsdatum muss in der Zukunft liegen (oder nicht gesetzt sein)
+      if (introductionDate && introductionDate <= now) {
         ctx.addIssue({
           code: 'custom',
-          message: `${nextDate.label} muss nach ${currentDate.label} liegen.`,
-          path: [nextDate.field],
+          message: 'Bei Status "In Entwicklung" muss das Einführungsdatum in der Zukunft liegen.',
+          path: ['introductionDate'],
         })
       }
-    }
-
-    // Status-Lifecycle-Validierung basierend auf dem aktuellen Datum
-    const status = data.status
-    const now = new Date()
-    const introductionDate = data.introductionDate
-    const endOfUseDate = data.endOfUseDate
-
-    switch (status) {
-      case ApplicationStatus.IN_DEVELOPMENT:
-        // IN_DEVELOPMENT: Einführungsdatum muss in der Zukunft liegen (oder nicht gesetzt sein)
-        if (introductionDate && introductionDate <= now) {
-          ctx.addIssue({
-            code: 'custom',
-            message: 'Bei Status "In Entwicklung" muss das Einführungsdatum in der Zukunft liegen.',
-            path: ['introductionDate'],
-          })
-        }
-        break
-      case ApplicationStatus.ACTIVE:
-        // ACTIVE: Einführungsdatum muss in der Vergangenheit liegen
-        if (!introductionDate || introductionDate > now) {
-          ctx.addIssue({
-            code: 'custom',
-            message: 'Bei Status "Aktiv" muss das Einführungsdatum in der Vergangenheit liegen.',
-            path: ['introductionDate'],
-          })
-        }
-        // UND End-of-Use muss in der Zukunft liegen (oder nicht gesetzt sein)
-        if (endOfUseDate && endOfUseDate <= now) {
-          ctx.addIssue({
-            code: 'custom',
-            message: 'Bei Status "Aktiv" muss das Ende der Nutzung in der Zukunft liegen.',
-            path: ['endOfUseDate'],
-          })
-        }
-        break
-      case ApplicationStatus.RETIRED:
-        // RETIRED: End-of-Use-Datum muss in der Vergangenheit liegen
-        if (!endOfUseDate || endOfUseDate > now) {
-          ctx.addIssue({
-            code: 'custom',
-            message: 'Bei Status "Stillgelegt" muss das Ende der Nutzung in der Vergangenheit liegen.',
-            path: ['endOfUseDate'],
-          })
-        }
-        break
-    }
-  })
+      break
+    case ApplicationStatus.ACTIVE:
+      // ACTIVE: Einführungsdatum muss in der Vergangenheit liegen
+      if (!introductionDate || introductionDate > now) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'Bei Status "Aktiv" muss das Einführungsdatum in der Vergangenheit liegen.',
+          path: ['introductionDate'],
+        })
+      }
+      // UND End-of-Use muss in der Zukunft liegen (oder nicht gesetzt sein)
+      if (endOfUseDate && endOfUseDate <= now) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'Bei Status "Aktiv" muss das Ende der Nutzung in der Zukunft liegen.',
+          path: ['endOfUseDate'],
+        })
+      }
+      break
+    case ApplicationStatus.RETIRED:
+      // RETIRED: End-of-Use-Datum muss in der Vergangenheit liegen
+      if (!endOfUseDate || endOfUseDate > now) {
+        ctx.addIssue({
+          code: 'custom',
+          message:
+            'Bei Status "Stillgelegt" muss das Ende der Nutzung in der Vergangenheit liegen.',
+          path: ['endOfUseDate'],
+        })
+      }
+      break
+  }
+})
 
 // TypeScript Typen basierend auf dem Schema
 export type ApplicationFormValues = z.infer<typeof applicationSchema>
