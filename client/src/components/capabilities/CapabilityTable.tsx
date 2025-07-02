@@ -4,7 +4,7 @@ import React, { useMemo } from 'react'
 import { Chip, useTheme } from '@mui/material'
 import { GenericTable } from '../common/GenericTable'
 import { formatDate, getLevelLabel } from './utils'
-import { CapabilityStatus, BusinessCapability } from '../../gql/generated'
+import { CapabilityStatus, CapabilityType, BusinessCapability } from '../../gql/generated'
 import CapabilityForm, { CapabilityFormValues } from './CapabilityForm'
 import { createColumnHelper } from '@tanstack/react-table'
 import { SortingState, VisibilityState } from '@tanstack/react-table'
@@ -150,12 +150,15 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
       maturityLevel: capability.maturityLevel ?? 0,
       businessValue: capability.businessValue ?? 0,
       status: capability.status ?? CapabilityStatus.ACTIVE,
+      type: capability.type ?? CapabilityType.OPERATIONAL,
       ownerId: capability.owners && capability.owners.length > 0 ? capability.owners[0].id : '',
       tags: capability.tags ?? [],
       parentId: capability.parents && capability.parents.length > 0 ? capability.parents[0].id : '',
       children: capability.children?.map((child: BusinessCapability) => child.id) ?? [],
       supportedByApplications: capability.supportedByApplications?.map((app: any) => app.id) ?? [],
       partOfArchitectures: capability.partOfArchitectures?.map((arch: any) => arch.id) ?? [],
+      partOfDiagrams: [], // Vorläufig leerer Array
+      sequenceNumber: capability.sequenceNumber ?? 0,
     }
   }
 

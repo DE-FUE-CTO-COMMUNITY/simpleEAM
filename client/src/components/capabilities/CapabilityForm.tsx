@@ -11,6 +11,7 @@ import { GET_DIAGRAMS } from '@/graphql/diagram'
 import {
   BusinessCapability,
   CapabilityStatus,
+  CapabilityType,
   Application,
   Architecture,
 } from '../../gql/generated'
@@ -32,12 +33,14 @@ export const capabilitySchema = z.object({
     .int()
     .min(0, 'Level muss 0 oder höher sein')
     .max(3, 'Level darf maximal 3 sein'),
+  status: z.nativeEnum(CapabilityStatus),
+  type: z.nativeEnum(CapabilityType).optional(),
   businessValue: z
     .number()
     .int()
     .min(0, 'Geschäftswert muss 0 oder höher sein')
     .max(10, 'Geschäftswert darf maximal 10 sein'),
-  status: z.nativeEnum(CapabilityStatus),
+  sequenceNumber: z.number().int().min(0, 'Sequenznummer muss 0 oder höher sein').optional(),
   ownerId: z.string().optional(),
   tags: z.array(z.string()).optional(),
   parentId: z.string().optional(),
@@ -95,6 +98,19 @@ const getStatusLabel = (status: CapabilityStatus): string => {
   }
 }
 
+const getTypeLabel = (type: CapabilityType): string => {
+  switch (type) {
+    case CapabilityType.STRATEGIC:
+      return 'Strategisch'
+    case CapabilityType.OPERATIONAL:
+      return 'Operativ'
+    case CapabilityType.SUPPORT:
+      return 'Unterstützend'
+    default:
+      return type
+  }
+}
+
 const CapabilityForm: React.FC<CapabilityFormProps> = ({
   capability,
   availableCapabilities = [],
@@ -127,6 +143,8 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
       maturityLevel: 0,
       businessValue: 0,
       status: CapabilityStatus.ACTIVE,
+      type: CapabilityType.OPERATIONAL,
+      sequenceNumber: 0,
       ownerId: '',
       tags: [],
       parentId: '',
@@ -159,6 +177,8 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
   const capabilityMaturityLevel = capability?.maturityLevel
   const capabilityBusinessValue = capability?.businessValue
   const capabilityStatus = capability?.status
+  const capabilityType = capability?.type
+  const capabilitySequenceNumber = capability?.sequenceNumber
   const capabilityOwnerId =
     capability?.owners && capability.owners.length > 0 ? capability.owners[0]?.id : undefined
   const capabilityTags = capability?.tags
@@ -190,6 +210,8 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
         maturityLevel: capabilityMaturityLevel ?? 0,
         businessValue: capabilityBusinessValue ?? 0,
         status: capabilityStatus ?? CapabilityStatus.ACTIVE,
+        type: capabilityType ?? CapabilityType.OPERATIONAL,
+        sequenceNumber: capabilitySequenceNumber ?? 0,
         ownerId: capabilityOwnerId ?? '',
         tags: capabilityTags ?? [],
         parentId: capabilityParentId ?? '',
@@ -208,6 +230,8 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
     capabilityMaturityLevel,
     capabilityBusinessValue,
     capabilityStatus,
+    capabilityType,
+    capabilitySequenceNumber,
     capabilityOwnerId,
     capabilityTags,
     capabilityParentId,
@@ -252,6 +276,29 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
           label: getStatusLabel(status),
         })
       ),
+      size: { xs: 12, md: 6 },
+      tabId: 'general',
+    },
+    {
+      name: 'type',
+      label: 'Typ',
+      type: 'select',
+      required: true,
+      validators: capabilitySchema.shape.type,
+      options: Object.values(CapabilityType).map(
+        (type): SelectOption => ({
+          value: type,
+          label: getTypeLabel(type),
+        })
+      ),
+      size: { xs: 12, md: 6 },
+      tabId: 'general',
+    },
+    {
+      name: 'sequenceNumber',
+      label: 'Sequenznummer',
+      type: 'number',
+      validators: capabilitySchema.shape.sequenceNumber,
       size: { xs: 12, md: 6 },
       tabId: 'general',
     },
@@ -301,7 +348,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
       label: 'Tags',
       type: 'tags',
       options: availableTags.map((tag): SelectOption => ({ value: tag, label: tag })),
-      size: { xs: 12, md: 6 },
+      size: 12,
       tabId: 'general',
     },
     {

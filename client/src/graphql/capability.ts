@@ -20,7 +20,9 @@ export const GET_CAPABILITIES = gql`
       description
       maturityLevel
       status
+      type
       businessValue
+      sequenceNumber
       owners {
         id
         firstName
@@ -57,7 +59,9 @@ export const GET_CAPABILITY = gql`
       description
       maturityLevel
       status
+      type
       businessValue
+      sequenceNumber
       owners {
         id
         firstName
@@ -95,7 +99,9 @@ export const CREATE_CAPABILITY = gql`
         description
         maturityLevel
         status
+        type
         businessValue
+        sequenceNumber
         createdAt
       }
     }
@@ -111,7 +117,9 @@ export const UPDATE_CAPABILITY = gql`
         description
         maturityLevel
         status
+        type
         businessValue
+        sequenceNumber
         updatedAt
       }
     }
@@ -141,29 +149,37 @@ export const GET_CAPABILITY_MAP_DATA = gql`
       name
       description
       status
+      type
       businessValue
       maturityLevel
+      sequenceNumber
       children {
         id
         name
         description
         status
+        type
         businessValue
         maturityLevel
+        sequenceNumber
         children {
           id
           name
           description
           status
+          type
           businessValue
           maturityLevel
+          sequenceNumber
           children {
             id
             name
             description
             status
+            type
             businessValue
             maturityLevel
+            sequenceNumber
           }
           supportedByApplications {
             id

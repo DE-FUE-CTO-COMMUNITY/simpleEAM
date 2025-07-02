@@ -74,6 +74,7 @@ export interface FieldConfig {
   name: string
   label: string
   type: FieldType
+  icon?: React.ReactNode // Icon vor dem Feld
   required?: boolean
   disabled?: boolean
   readOnly?: boolean
@@ -431,7 +432,16 @@ const GenericForm: React.FC<GenericFormProps> = ({
                     error={finalShouldShowError}
                     placeholder={field.placeholder}
                     fullWidth={field.fullWidth !== false}
-                    InputProps={{ readOnly: !!field.readOnly }}
+                    InputProps={{ 
+                      readOnly: !!field.readOnly,
+                      ...(field.icon && {
+                        startAdornment: (
+                          <Box sx={{ mr: 1, display: 'flex', alignItems: 'center' }}>
+                            {field.icon}
+                          </Box>
+                        )
+                      })
+                    }}
                     helperText={getHelperText()}
                   />
                 )}
@@ -450,7 +460,16 @@ const GenericForm: React.FC<GenericFormProps> = ({
                     select
                     error={finalShouldShowError}
                     fullWidth={field.fullWidth !== false}
-                    InputProps={{ readOnly: !!field.readOnly }}
+                    InputProps={{ 
+                      readOnly: !!field.readOnly,
+                      ...(field.icon && {
+                        startAdornment: (
+                          <Box sx={{ mr: 1, display: 'flex', alignItems: 'center' }}>
+                            {field.icon}
+                          </Box>
+                        )
+                      })
+                    }}
                     helperText={getHelperText()}
                   >
                     {field.options?.map(option => (
@@ -476,7 +495,16 @@ const GenericForm: React.FC<GenericFormProps> = ({
                     error={finalShouldShowError}
                     placeholder={field.placeholder}
                     fullWidth={field.fullWidth !== false}
-                    InputProps={{ readOnly: !!field.readOnly }}
+                    InputProps={{ 
+                      readOnly: !!field.readOnly,
+                      ...(field.icon && {
+                        startAdornment: (
+                          <Box sx={{ mr: 1, display: 'flex', alignItems: 'center' }}>
+                            {field.icon}
+                          </Box>
+                        )
+                      })
+                    }}
                     helperText={getHelperText()}
                   />
                 )}
@@ -497,7 +525,16 @@ const GenericForm: React.FC<GenericFormProps> = ({
                         error: finalShouldShowError,
                         helperText: getHelperText(),
                         onBlur: formField.handleBlur,
-                        InputProps: { readOnly: !!field.readOnly },
+                        InputProps: { 
+                          readOnly: !!field.readOnly,
+                          ...(field.icon && {
+                            startAdornment: (
+                              <Box sx={{ mr: 1, display: 'flex', alignItems: 'center' }}>
+                                {field.icon}
+                              </Box>
+                            )
+                          })
+                        },
                       },
                       field: {
                         clearable: true,
@@ -702,7 +739,16 @@ const GenericForm: React.FC<GenericFormProps> = ({
                     fullWidth={field.fullWidth !== false}
                     multiline={field.multiline}
                     rows={field.rows}
-                    InputProps={{ readOnly: !!field.readOnly }}
+                    InputProps={{ 
+                      readOnly: !!field.readOnly,
+                      ...(field.icon && {
+                        startAdornment: (
+                          <Box sx={{ mr: 1, display: 'flex', alignItems: 'center' }}>
+                            {field.icon}
+                          </Box>
+                        )
+                      })
+                    }}
                     helperText={getHelperText()}
                   />
                 )}

@@ -231,7 +231,9 @@ const ApplicationsPage = () => {
       version: applicationData.version,
       hostingEnvironment: applicationData.hostingEnvironment,
       technologyStack: applicationData.technologyStack,
+      planningDate: applicationData.planningDate,
       introductionDate: applicationData.introductionDate,
+      endOfUseDate: applicationData.endOfUseDate,
       endOfLifeDate: applicationData.endOfLifeDate,
       // Wenn ein Besitzer ausgewählt wurde, verwenden wir die neue owners-Struktur
       ...(ownerId
@@ -314,7 +316,9 @@ const ApplicationsPage = () => {
       version: { set: applicationData.version },
       hostingEnvironment: { set: applicationData.hostingEnvironment },
       technologyStack: { set: applicationData.technologyStack },
+      planningDate: { set: applicationData.planningDate },
       introductionDate: { set: applicationData.introductionDate },
+      endOfUseDate: { set: applicationData.endOfUseDate },
       endOfLifeDate: { set: applicationData.endOfLifeDate },
       timeCategory: { set: applicationData.timeCategory },
       sevenRStrategy: { set: applicationData.sevenRStrategy },

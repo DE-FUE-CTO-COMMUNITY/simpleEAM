@@ -35,7 +35,9 @@ export const GET_APPLICATIONS = gql`
       version
       hostingEnvironment
       technologyStack
+      planningDate
       introductionDate
+      endOfUseDate
       endOfLifeDate
       owners {
         id
@@ -83,7 +85,9 @@ export const GET_APPLICATION = gql`
       version
       hostingEnvironment
       technologyStack
+      planningDate
       introductionDate
+      endOfUseDate
       endOfLifeDate
       owners {
         id
@@ -129,6 +133,10 @@ export const CREATE_APPLICATION = gql`
         sevenRStrategy
         vendor
         version
+        planningDate
+        introductionDate
+        endOfUseDate
+        endOfLifeDate
         createdAt
       }
     }
@@ -148,6 +156,10 @@ export const UPDATE_APPLICATION = gql`
         sevenRStrategy
         vendor
         version
+        planningDate
+        introductionDate
+        endOfUseDate
+        endOfLifeDate
         updatedAt
       }
     }

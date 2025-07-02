@@ -30,7 +30,9 @@ export const GET_APPLICATION_INTERFACES = gql`
       protocol
       version
       status
+      planningDate
       introductionDate
+      endOfUseDate
       endOfLifeDate
       createdAt
       updatedAt
@@ -65,7 +67,9 @@ export const GET_APPLICATION_INTERFACE = gql`
       protocol
       version
       status
+      planningDate
       introductionDate
+      endOfUseDate
       endOfLifeDate
       createdAt
       updatedAt
@@ -101,7 +105,9 @@ export const CREATE_APPLICATION_INTERFACE = gql`
         protocol
         version
         status
+        planningDate
         introductionDate
+        endOfUseDate
         endOfLifeDate
         createdAt
         updatedAt
@@ -138,7 +144,9 @@ export const UPDATE_APPLICATION_INTERFACE = gql`
         protocol
         version
         status
+        planningDate
         introductionDate
+        endOfUseDate
         endOfLifeDate
         createdAt
         updatedAt

@@ -3848,7 +3848,7 @@ export type BusinessCapability = {
   supportedByApplications: Array<Application>;
   supportedByApplicationsConnection: BusinessCapabilitySupportedByApplicationsConnection;
   tags?: Maybe<Array<Scalars['String']['output']>>;
-  type: CapabilityType;
+  type?: Maybe<CapabilityType>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
 };
 
@@ -4200,7 +4200,7 @@ export type BusinessCapabilityCreateInput = {
   status: CapabilityStatus;
   supportedByApplications?: InputMaybe<BusinessCapabilitySupportedByApplicationsFieldInput>;
   tags?: InputMaybe<Array<Scalars['String']['input']>>;
-  type: CapabilityType;
+  type?: InputMaybe<CapabilityType>;
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
 };
 

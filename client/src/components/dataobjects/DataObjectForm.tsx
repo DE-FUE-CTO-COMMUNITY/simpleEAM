@@ -4,6 +4,12 @@ import React, { useEffect } from 'react'
 import { useForm } from '@tanstack/react-form'
 import { z } from 'zod'
 import { useQuery } from '@apollo/client'
+import {
+  Assignment as PlanningIcon,
+  RocketLaunch as LaunchIcon,
+  Pause as PauseIcon,
+  Delete as DeleteIcon,
+} from '@mui/icons-material'
 import { GET_PERSONS } from '@/graphql/person'
 import { GET_APPLICATIONS } from '@/graphql/application'
 import { GET_ARCHITECTURES } from '@/graphql/architecture'
@@ -27,6 +33,8 @@ export const dataObjectSchema = z.object({
   dataSources: z.array(z.string()).optional(),
   introductionDate: z.string().optional().nullable(),
   endOfLifeDate: z.string().optional().nullable(),
+  planningDate: z.string().optional().nullable(),
+  endOfUseDate: z.string().optional().nullable(),
   ownerId: z.string().optional(),
   partOfArchitectures: z.array(z.string()).optional(),
   partOfDiagrams: z.array(z.string()).optional(),
@@ -97,6 +105,8 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
       dataSources: [],
       introductionDate: null,
       endOfLifeDate: null,
+      planningDate: null,
+      endOfUseDate: null,
       ownerId: undefined,
       partOfArchitectures: [],
       partOfDiagrams: [],
@@ -143,6 +153,8 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
         dataSources: dataObject.dataSources?.map(app => app.id) ?? [],
         introductionDate: dataObject.introductionDate ?? null,
         endOfLifeDate: dataObject.endOfLifeDate ?? null,
+        planningDate: dataObject.planningDate ?? null,
+        endOfUseDate: dataObject.endOfUseDate ?? null,
         ownerId:
           dataObject.owners && dataObject.owners.length > 0 ? dataObject.owners[0].id : undefined,
         partOfArchitectures: dataObject.partOfArchitectures?.map(arch => arch.id) ?? [],
@@ -217,20 +229,41 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
       size: { xs: 12, md: 6 },
       tabId: 'general',
     },
+    // Lebenszyklus (Tab: lifecycle) - in chronologischer Reihenfolge
+    {
+      name: 'planningDate',
+      label: 'Planungsdatum',
+      icon: <PlanningIcon />,
+      type: 'date',
+      validators: dataObjectSchema.shape.planningDate,
+      size: { xs: 12, md: 12 },
+      tabId: 'lifecycle',
+    },
     {
       name: 'introductionDate',
       label: 'Einführungsdatum',
+      icon: <LaunchIcon />,
       type: 'date',
       validators: dataObjectSchema.shape.introductionDate,
-      size: { xs: 12, md: 6 },
+      size: { xs: 12, md: 12 },
+      tabId: 'lifecycle',
+    },
+    {
+      name: 'endOfUseDate',
+      label: 'Ende der Nutzung',
+      icon: <PauseIcon />,
+      type: 'date',
+      validators: dataObjectSchema.shape.endOfUseDate,
+      size: { xs: 12, md: 12 },
       tabId: 'lifecycle',
     },
     {
       name: 'endOfLifeDate',
       label: 'End-of-Life Datum',
+      icon: <DeleteIcon />,
       type: 'date',
       validators: dataObjectSchema.shape.endOfLifeDate,
-      size: { xs: 12, md: 6 },
+      size: { xs: 12, md: 12 },
       tabId: 'lifecycle',
     },
     {

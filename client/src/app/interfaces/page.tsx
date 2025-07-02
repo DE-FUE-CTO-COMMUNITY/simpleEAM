@@ -149,7 +149,9 @@ function ApplicationInterfacesPage() {
       protocol: data.protocol,
       version: data.version,
       status: data.status,
+      planningDate: data.planningDate,
       introductionDate: data.introductionDate,
+      endOfUseDate: data.endOfUseDate,
       endOfLifeDate: data.endOfLifeDate,
       responsiblePerson: data.responsiblePerson
         ? {
@@ -210,7 +212,9 @@ function ApplicationInterfacesPage() {
       protocol: { set: data.protocol },
       version: { set: data.version },
       status: { set: data.status },
+      planningDate: { set: data.planningDate },
       introductionDate: { set: data.introductionDate },
+      endOfUseDate: { set: data.endOfUseDate },
       endOfLifeDate: { set: data.endOfLifeDate },
       responsiblePerson: data.responsiblePerson
         ? {

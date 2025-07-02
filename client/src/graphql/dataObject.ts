@@ -33,7 +33,9 @@ export const GET_DATA_OBJECTS = gql`
       }
       classification
       format
+      planningDate
       introductionDate
+      endOfUseDate
       endOfLifeDate
       dataSources {
         id
@@ -70,7 +72,9 @@ export const GET_DATA_OBJECT = gql`
       }
       classification
       format
+      planningDate
       introductionDate
+      endOfUseDate
       endOfLifeDate
       dataSources {
         id
@@ -104,7 +108,9 @@ export const CREATE_DATA_OBJECT = gql`
         }
         classification
         format
+        planningDate
         introductionDate
+        endOfUseDate
         endOfLifeDate
         dataSources {
           id
@@ -131,7 +137,9 @@ export const UPDATE_DATA_OBJECT = gql`
         }
         classification
         format
+        planningDate
         introductionDate
+        endOfUseDate
         endOfLifeDate
         dataSources {
           id

@@ -293,7 +293,9 @@ const DataObjectsPage = () => {
         description: data.description,
         classification: data.classification,
         format: data.format,
+        planningDate: data.planningDate,
         introductionDate: data.introductionDate,
+        endOfUseDate: data.endOfUseDate,
         endOfLifeDate: data.endOfLifeDate,
         dataSources: data.dataSources?.length
           ? {
@@ -337,7 +339,9 @@ const DataObjectsPage = () => {
         description: { set: data.description },
         classification: { set: data.classification },
         format: { set: data.format },
+        planningDate: { set: data.planningDate },
         introductionDate: { set: data.introductionDate },
+        endOfUseDate: { set: data.endOfUseDate },
         endOfLifeDate: { set: data.endOfLifeDate },
       }
 

@@ -5,6 +5,12 @@ import { useForm } from '@tanstack/react-form'
 import { z } from 'zod'
 import { useQuery } from '@apollo/client'
 import {
+  Assignment as PlanningIcon,
+  RocketLaunch as LaunchIcon,
+  Pause as PauseIcon,
+  Delete as DeleteIcon,
+} from '@mui/icons-material'
+import {
   Application,
   ApplicationStatus,
   CriticalityLevel,
@@ -57,6 +63,8 @@ const baseApplicationSchema = z.object({
   technologyStack: z.array(z.string()).optional().nullable(),
   introductionDate: z.date().optional().nullable(),
   endOfLifeDate: z.date().optional().nullable(),
+  planningDate: z.date().optional().nullable(),
+  endOfUseDate: z.date().optional().nullable(),
   ownerId: z.string().optional(),
   supportsCapabilityIds: z.array(z.string()).optional(),
   usesDataObjectIds: z.array(z.string()).optional(),
@@ -183,6 +191,8 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     technologyStack: application?.technologyStack ?? [],
     introductionDate: application?.introductionDate ? new Date(application.introductionDate) : null,
     endOfLifeDate: application?.endOfLifeDate ? new Date(application.endOfLifeDate) : null,
+    planningDate: application?.planningDate ? new Date(application.planningDate) : null,
+    endOfUseDate: application?.endOfUseDate ? new Date(application.endOfUseDate) : null,
     ownerId:
       application?.owners && application.owners.length > 0 ? application.owners[0].id : undefined,
     supportsCapabilityIds: application?.supportsCapabilities?.map(cap => cap.id) ?? [],
@@ -233,6 +243,8 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
           ? new Date(application.introductionDate)
           : null,
         endOfLifeDate: application.endOfLifeDate ? new Date(application.endOfLifeDate) : null,
+        planningDate: application.planningDate ? new Date(application.planningDate) : null,
+        endOfUseDate: application.endOfUseDate ? new Date(application.endOfUseDate) : null,
         ownerId:
           application.owners && application.owners.length > 0
             ? application.owners[0].id
@@ -419,20 +431,38 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
       size: { xs: 12 },
     },
 
-    // Lebenszyklus (Tab: lifecycle)
+    // Lebenszyklus (Tab: lifecycle) - in chronologischer Reihenfolge
+    {
+      name: 'planningDate',
+      label: 'Planungsdatum',
+      icon: <PlanningIcon />,
+      type: 'date',
+      tabId: 'lifecycle',
+      size: { xs: 12 },
+    },
     {
       name: 'introductionDate',
       label: 'Einführungsdatum',
+      icon: <LaunchIcon />,
       type: 'date',
       tabId: 'lifecycle',
-      size: { xs: 12, md: 6 },
+      size: { xs: 12 },
+    },
+    {
+      name: 'endOfUseDate',
+      label: 'Ende der Nutzung',
+      icon: <PauseIcon />,
+      type: 'date',
+      tabId: 'lifecycle',
+      size: { xs: 12 },
     },
     {
       name: 'endOfLifeDate',
       label: 'End-of-Life Datum',
+      icon: <DeleteIcon />,
       type: 'date',
       tabId: 'lifecycle',
-      size: { xs: 12, md: 6 },
+      size: { xs: 12 },
     },
 
     // Beziehungen (Tab: relationships)

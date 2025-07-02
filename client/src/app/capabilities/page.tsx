@@ -6,7 +6,7 @@ import { Add as AddIcon } from '@mui/icons-material'
 import { useQuery, useMutation } from '@apollo/client'
 import { useSnackbar } from 'notistack'
 import { useAuth, isArchitect } from '@/lib/auth'
-import { SortingState, VisibilityState } from '@tanstack/react-table'
+import { VisibilityState } from '@tanstack/react-table'
 import {
   GET_CAPABILITIES,
   CREATE_CAPABILITY,
@@ -154,6 +154,8 @@ const CapabilitiesPage = () => {
       maturityLevel: capabilityData.maturityLevel,
       businessValue: capabilityData.businessValue,
       status: capabilityData.status,
+      ...(capabilityData.type ? { type: capabilityData.type } : {}),
+      sequenceNumber: capabilityData.sequenceNumber,
       tags: capabilityData.tags,
       // Wenn ein Besitzer ausgewählt wurde, verwenden wir die neue owners-Struktur (nur ein Owner)
       ...(ownerId
@@ -229,7 +231,13 @@ const CapabilitiesPage = () => {
       maturityLevel: { set: capabilityData.maturityLevel },
       businessValue: { set: capabilityData.businessValue },
       status: { set: capabilityData.status },
+      sequenceNumber: { set: capabilityData.sequenceNumber },
       tags: { set: capabilityData.tags },
+    }
+
+    // Nur type setzen, wenn es einen Wert hat
+    if (capabilityData.type) {
+      input.type = { set: capabilityData.type }
     }
 
     // Aktualisierung der Owner-Beziehung, wenn ein Besitzer ausgewählt wurde

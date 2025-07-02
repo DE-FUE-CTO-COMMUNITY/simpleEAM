@@ -4,6 +4,12 @@ import React, { useEffect } from 'react'
 import { useForm } from '@tanstack/react-form'
 import { z } from 'zod'
 import { useQuery } from '@apollo/client'
+import {
+  Assignment as PlanningIcon,
+  RocketLaunch as LaunchIcon,
+  Pause as PauseIcon,
+  Delete as DeleteIcon,
+} from '@mui/icons-material'
 import { GET_PERSONS } from '@/graphql/person'
 import { GET_APPLICATIONS } from '@/graphql/application'
 import { GET_DIAGRAMS } from '@/graphql/diagram'
@@ -41,6 +47,8 @@ export const applicationInterfaceSchema = z.object({
   status: z.nativeEnum(InterfaceStatus),
   introductionDate: z.string().optional().nullable(),
   endOfLifeDate: z.string().optional().nullable(),
+  planningDate: z.string().optional().nullable(),
+  endOfUseDate: z.string().optional().nullable(),
   responsiblePerson: z.string().optional().nullable(),
   sourceApplications: z.array(z.string()).optional(),
   targetApplications: z.array(z.string()).optional(),
@@ -102,6 +110,8 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       status: InterfaceStatus.PLANNED,
       introductionDate: null,
       endOfLifeDate: null,
+      planningDate: null,
+      endOfUseDate: null,
       responsiblePerson: null,
       sourceApplications: [],
       targetApplications: [],
@@ -173,6 +183,8 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
         status: applicationInterface.status,
         introductionDate: applicationInterface.introductionDate ?? null,
         endOfLifeDate: applicationInterface.endOfLifeDate ?? null,
+        planningDate: applicationInterface.planningDate ?? null,
+        endOfUseDate: applicationInterface.endOfUseDate ?? null,
         responsiblePerson:
           applicationInterface.responsiblePerson &&
           applicationInterface.responsiblePerson.length > 0
@@ -286,20 +298,40 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       })),
     },
     {
+      name: 'planningDate',
+      label: 'Planungsdatum',
+      type: 'date',
+      validators: applicationInterfaceSchema.shape.planningDate,
+      size: { xs: 12, md: 12 },
+      tabId: 'lifecycle',
+      icon: <PlanningIcon />,
+    },
+    {
       name: 'introductionDate',
       label: 'Einführungsdatum',
       type: 'date',
       validators: applicationInterfaceSchema.shape.introductionDate,
-      size: { xs: 12, md: 6 },
+      size: { xs: 12, md: 12 },
       tabId: 'lifecycle',
+      icon: <LaunchIcon />,
+    },
+    {
+      name: 'endOfUseDate',
+      label: 'Ende der Nutzung',
+      type: 'date',
+      validators: applicationInterfaceSchema.shape.endOfUseDate,
+      size: { xs: 12, md: 12 },
+      tabId: 'lifecycle',
+      icon: <PauseIcon />,
     },
     {
       name: 'endOfLifeDate',
       label: 'End-of-Life Datum',
       type: 'date',
       validators: applicationInterfaceSchema.shape.endOfLifeDate,
-      size: { xs: 12, md: 6 },
+      size: { xs: 12, md: 12 },
       tabId: 'lifecycle',
+      icon: <DeleteIcon />,
     },
     {
       name: 'responsiblePerson',
