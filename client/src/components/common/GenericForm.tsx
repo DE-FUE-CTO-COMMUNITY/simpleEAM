@@ -432,15 +432,15 @@ const GenericForm: React.FC<GenericFormProps> = ({
                     error={finalShouldShowError}
                     placeholder={field.placeholder}
                     fullWidth={field.fullWidth !== false}
-                    InputProps={{ 
+                    InputProps={{
                       readOnly: !!field.readOnly,
                       ...(field.icon && {
                         startAdornment: (
                           <Box sx={{ mr: 1, display: 'flex', alignItems: 'center' }}>
                             {field.icon}
                           </Box>
-                        )
-                      })
+                        ),
+                      }),
                     }}
                     helperText={getHelperText()}
                   />
@@ -460,15 +460,15 @@ const GenericForm: React.FC<GenericFormProps> = ({
                     select
                     error={finalShouldShowError}
                     fullWidth={field.fullWidth !== false}
-                    InputProps={{ 
+                    InputProps={{
                       readOnly: !!field.readOnly,
                       ...(field.icon && {
                         startAdornment: (
                           <Box sx={{ mr: 1, display: 'flex', alignItems: 'center' }}>
                             {field.icon}
                           </Box>
-                        )
-                      })
+                        ),
+                      }),
                     }}
                     helperText={getHelperText()}
                   >
@@ -495,15 +495,15 @@ const GenericForm: React.FC<GenericFormProps> = ({
                     error={finalShouldShowError}
                     placeholder={field.placeholder}
                     fullWidth={field.fullWidth !== false}
-                    InputProps={{ 
+                    InputProps={{
                       readOnly: !!field.readOnly,
                       ...(field.icon && {
                         startAdornment: (
                           <Box sx={{ mr: 1, display: 'flex', alignItems: 'center' }}>
                             {field.icon}
                           </Box>
-                        )
-                      })
+                        ),
+                      }),
                     }}
                     helperText={getHelperText()}
                   />
@@ -525,15 +525,15 @@ const GenericForm: React.FC<GenericFormProps> = ({
                         error: finalShouldShowError,
                         helperText: getHelperText(),
                         onBlur: formField.handleBlur,
-                        InputProps: { 
+                        InputProps: {
                           readOnly: !!field.readOnly,
                           ...(field.icon && {
                             startAdornment: (
                               <Box sx={{ mr: 1, display: 'flex', alignItems: 'center' }}>
                                 {field.icon}
                               </Box>
-                            )
-                          })
+                            ),
+                          }),
                         },
                       },
                       field: {
@@ -739,15 +739,15 @@ const GenericForm: React.FC<GenericFormProps> = ({
                     fullWidth={field.fullWidth !== false}
                     multiline={field.multiline}
                     rows={field.rows}
-                    InputProps={{ 
+                    InputProps={{
                       readOnly: !!field.readOnly,
                       ...(field.icon && {
                         startAdornment: (
                           <Box sx={{ mr: 1, display: 'flex', alignItems: 'center' }}>
                             {field.icon}
                           </Box>
-                        )
-                      })
+                        ),
+                      }),
                     }}
                     helperText={getHelperText()}
                   />

@@ -25,8 +25,8 @@ import GenericForm, { FieldConfig } from '../common/GenericForm'
 import { isArchitect } from '@/lib/auth'
 import { DataObject } from '@/gql/generated'
 
-// Schema für die Formularvalidierung
-export const applicationInterfaceSchema = z.object({
+// Basis-Schema für die Formularvalidierung
+const baseApplicationInterfaceSchema = z.object({
   name: z
     .string()
     .min(2, 'Der Name muss mindestens 2 Zeichen lang sein')
@@ -45,15 +45,92 @@ export const applicationInterfaceSchema = z.object({
     .optional()
     .nullable(),
   status: z.nativeEnum(InterfaceStatus),
-  introductionDate: z.string().optional().nullable(),
-  endOfLifeDate: z.string().optional().nullable(),
-  planningDate: z.string().optional().nullable(),
-  endOfUseDate: z.string().optional().nullable(),
+  introductionDate: z.date().optional().nullable(),
+  endOfLifeDate: z.date().optional().nullable(),
+  planningDate: z.date().optional().nullable(),
+  endOfUseDate: z.date().optional().nullable(),
   responsiblePerson: z.string().optional().nullable(),
   sourceApplications: z.array(z.string()).optional(),
   targetApplications: z.array(z.string()).optional(),
   dataObjects: z.array(z.string()).optional(),
   partOfDiagrams: z.array(z.string()).optional(),
+})
+
+// Erweiterte Schema-Validierung mit Lifecycle-Logik
+export const applicationInterfaceSchema = baseApplicationInterfaceSchema.superRefine((data, ctx) => {
+  // Lifecycle-Datums-Validierung mit individuellen Fehlermeldungen
+  const dates = [
+    { field: 'planningDate', date: data.planningDate, label: 'Planungsdatum' },
+    { field: 'introductionDate', date: data.introductionDate, label: 'Einführungsdatum' },
+    { field: 'endOfUseDate', date: data.endOfUseDate, label: 'Ende der Nutzung' },
+    { field: 'endOfLifeDate', date: data.endOfLifeDate, label: 'End-of-Life-Datum' },
+  ] as const
+
+  const setDates = dates.filter(d => d.date && d.date instanceof Date && !isNaN(d.date.getTime()))
+
+  // Prüfe chronologische Reihenfolge zwischen allen aufeinanderfolgenden Daten
+  for (let i = 0; i < setDates.length - 1; i++) {
+    const currentDate = setDates[i]
+    const nextDate = setDates[i + 1]
+    
+    if (currentDate.date! > nextDate.date!) {
+      // Füge Fehlermeldung zum späteren Datum hinzu
+      ctx.addIssue({
+        code: 'custom',
+        message: `${nextDate.label} muss nach ${currentDate.label} liegen.`,
+        path: [nextDate.field],
+      })
+    }
+  }
+
+  // Status-Lifecycle-Validierung basierend auf dem aktuellen Datum
+  const status = data.status
+  const now = new Date()
+  const introductionDate = data.introductionDate
+  const endOfUseDate = data.endOfUseDate
+
+  switch (status) {
+    case InterfaceStatus.IN_DEVELOPMENT:
+    case InterfaceStatus.PLANNED:
+      // IN_DEVELOPMENT/PLANNED: Einführungsdatum muss in der Zukunft liegen (oder nicht gesetzt sein)
+      if (introductionDate && introductionDate <= now) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `Bei Status "${status === InterfaceStatus.PLANNED ? 'Geplant' : 'In Entwicklung'}" muss das Einführungsdatum in der Zukunft liegen.`,
+          path: ['introductionDate'],
+        })
+      }
+      break
+    case InterfaceStatus.ACTIVE:
+      // ACTIVE: Einführungsdatum muss in der Vergangenheit liegen
+      if (!introductionDate || introductionDate > now) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'Bei Status "Aktiv" muss das Einführungsdatum in der Vergangenheit liegen.',
+          path: ['introductionDate'],
+        })
+      }
+      // UND End-of-Use muss in der Zukunft liegen (oder nicht gesetzt sein)
+      if (endOfUseDate && endOfUseDate <= now) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'Bei Status "Aktiv" muss das Ende der Nutzung in der Zukunft liegen.',
+          path: ['endOfUseDate'],
+        })
+      }
+      break
+    case InterfaceStatus.DEPRECATED:
+    case InterfaceStatus.OUT_OF_SERVICE:
+      // DEPRECATED/OUT_OF_SERVICE: End-of-Use-Datum muss in der Vergangenheit liegen
+      if (!endOfUseDate || endOfUseDate > now) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `Bei Status "${status === InterfaceStatus.DEPRECATED ? 'Veraltet' : 'Außer Betrieb'}" muss das Ende der Nutzung in der Vergangenheit liegen.`,
+          path: ['endOfUseDate'],
+        })
+      }
+      break
+  }
 })
 
 // TypeScript Typen basierend auf dem Schema
@@ -108,10 +185,10 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       protocol: null,
       version: null,
       status: InterfaceStatus.PLANNED,
-      introductionDate: null,
-      endOfLifeDate: null,
       planningDate: null,
+      introductionDate: null,
       endOfUseDate: null,
+      endOfLifeDate: null,
       responsiblePerson: null,
       sourceApplications: [],
       targetApplications: [],
@@ -134,7 +211,9 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
         protocol: value.protocol,
         version: value.version,
         status: value.status,
+        planningDate: value.planningDate,
         introductionDate: value.introductionDate,
+        endOfUseDate: value.endOfUseDate,
         endOfLifeDate: value.endOfLifeDate,
         responsiblePerson: value.responsiblePerson || null,
         sourceApplications: value.sourceApplications || [],
@@ -181,10 +260,18 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
         protocol: applicationInterface.protocol ?? null,
         version: applicationInterface.version ?? null,
         status: applicationInterface.status,
-        introductionDate: applicationInterface.introductionDate ?? null,
-        endOfLifeDate: applicationInterface.endOfLifeDate ?? null,
-        planningDate: applicationInterface.planningDate ?? null,
-        endOfUseDate: applicationInterface.endOfUseDate ?? null,
+        planningDate: applicationInterface.planningDate
+          ? new Date(applicationInterface.planningDate)
+          : null,
+        introductionDate: applicationInterface.introductionDate
+          ? new Date(applicationInterface.introductionDate)
+          : null,
+        endOfUseDate: applicationInterface.endOfUseDate
+          ? new Date(applicationInterface.endOfUseDate)
+          : null,
+        endOfLifeDate: applicationInterface.endOfLifeDate
+          ? new Date(applicationInterface.endOfLifeDate)
+          : null,
         responsiblePerson:
           applicationInterface.responsiblePerson &&
           applicationInterface.responsiblePerson.length > 0
@@ -215,7 +302,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       label: 'Name',
       type: 'text',
       required: true,
-      validators: applicationInterfaceSchema.shape.name,
+      validators: baseApplicationInterfaceSchema.shape.name,
       size: { xs: 12 },
       tabId: 'general',
     },
@@ -226,7 +313,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       multiline: true,
       rows: 3,
       required: true,
-      validators: applicationInterfaceSchema.shape.description,
+      validators: baseApplicationInterfaceSchema.shape.description,
       size: { xs: 12 },
       tabId: 'general',
     },
@@ -235,7 +322,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       label: 'Schnittstellentyp',
       type: 'select',
       required: true,
-      validators: applicationInterfaceSchema.shape.interfaceType,
+      validators: baseApplicationInterfaceSchema.shape.interfaceType,
       size: { xs: 12, md: 6 },
       tabId: 'technical',
       options: Object.values(InterfaceType).map(type => ({
@@ -256,7 +343,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       name: 'protocol',
       label: 'Protokoll',
       type: 'select',
-      validators: applicationInterfaceSchema.shape.protocol,
+      validators: baseApplicationInterfaceSchema.shape.protocol,
       size: { xs: 12, md: 6 },
       tabId: 'technical',
       options: [
@@ -271,7 +358,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       name: 'version',
       label: 'Version',
       type: 'text',
-      validators: applicationInterfaceSchema.shape.version,
+      validators: baseApplicationInterfaceSchema.shape.version,
       size: { xs: 12, md: 6 },
       tabId: 'technical',
     },
@@ -280,7 +367,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       label: 'Status',
       type: 'select',
       required: true,
-      validators: applicationInterfaceSchema.shape.status,
+      validators: baseApplicationInterfaceSchema.shape.status,
       size: { xs: 12, md: 6 },
       tabId: 'general',
       options: Object.values(InterfaceStatus).map(status => ({
@@ -301,7 +388,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       name: 'planningDate',
       label: 'Planungsdatum',
       type: 'date',
-      validators: applicationInterfaceSchema.shape.planningDate,
+      validators: baseApplicationInterfaceSchema.shape.planningDate,
       size: { xs: 12, md: 12 },
       tabId: 'lifecycle',
       icon: <PlanningIcon />,
@@ -310,7 +397,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       name: 'introductionDate',
       label: 'Einführungsdatum',
       type: 'date',
-      validators: applicationInterfaceSchema.shape.introductionDate,
+      validators: baseApplicationInterfaceSchema.shape.introductionDate,
       size: { xs: 12, md: 12 },
       tabId: 'lifecycle',
       icon: <LaunchIcon />,
@@ -319,7 +406,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       name: 'endOfUseDate',
       label: 'Ende der Nutzung',
       type: 'date',
-      validators: applicationInterfaceSchema.shape.endOfUseDate,
+      validators: baseApplicationInterfaceSchema.shape.endOfUseDate,
       size: { xs: 12, md: 12 },
       tabId: 'lifecycle',
       icon: <PauseIcon />,
@@ -328,7 +415,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       name: 'endOfLifeDate',
       label: 'End-of-Life Datum',
       type: 'date',
-      validators: applicationInterfaceSchema.shape.endOfLifeDate,
+      validators: baseApplicationInterfaceSchema.shape.endOfLifeDate,
       size: { xs: 12, md: 12 },
       tabId: 'lifecycle',
       icon: <DeleteIcon />,

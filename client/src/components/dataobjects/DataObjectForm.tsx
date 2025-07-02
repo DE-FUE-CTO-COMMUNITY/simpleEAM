@@ -18,8 +18,8 @@ import { DataObject, DataClassification, Architecture } from '../../gql/generate
 import GenericForm, { FieldConfig } from '../common/GenericForm'
 import { isArchitect } from '@/lib/auth'
 
-// Schema für die Formularvalidierung
-export const dataObjectSchema = z.object({
+// Basis-Schema ohne Validierung
+const baseDataObjectSchema = z.object({
   name: z
     .string()
     .min(3, 'Der Name muss mindestens 3 Zeichen lang sein')
@@ -31,13 +31,41 @@ export const dataObjectSchema = z.object({
   classification: z.nativeEnum(DataClassification),
   format: z.string().max(50, 'Das Format darf maximal 50 Zeichen lang sein').optional().nullable(),
   dataSources: z.array(z.string()).optional(),
-  introductionDate: z.string().optional().nullable(),
-  endOfLifeDate: z.string().optional().nullable(),
-  planningDate: z.string().optional().nullable(),
-  endOfUseDate: z.string().optional().nullable(),
+  introductionDate: z.date().optional().nullable(),
+  endOfLifeDate: z.date().optional().nullable(),
+  planningDate: z.date().optional().nullable(),
+  endOfUseDate: z.date().optional().nullable(),
   ownerId: z.string().optional(),
   partOfArchitectures: z.array(z.string()).optional(),
   partOfDiagrams: z.array(z.string()).optional(),
+})
+
+// Schema für die Formularvalidierung mit erweiterten Validierungen
+export const dataObjectSchema = baseDataObjectSchema.superRefine((data, ctx) => {
+  // Lifecycle-Datums-Validierung mit individuellen Fehlermeldungen
+  const dates = [
+    { field: 'planningDate', date: data.planningDate, label: 'Planungsdatum' },
+    { field: 'introductionDate', date: data.introductionDate, label: 'Einführungsdatum' },
+    { field: 'endOfUseDate', date: data.endOfUseDate, label: 'Ende der Nutzung' },
+    { field: 'endOfLifeDate', date: data.endOfLifeDate, label: 'End-of-Life-Datum' },
+  ] as const
+
+  const setDates = dates.filter(d => d.date && d.date instanceof Date && !isNaN(d.date.getTime()))
+
+  // Prüfe chronologische Reihenfolge zwischen allen aufeinanderfolgenden Daten
+  for (let i = 0; i < setDates.length - 1; i++) {
+    const currentDate = setDates[i]
+    const nextDate = setDates[i + 1]
+    
+    if (currentDate.date! >= nextDate.date!) {
+      // Füge Fehlermeldung zum späteren Datum hinzu
+      ctx.addIssue({
+        code: 'custom',
+        message: `${nextDate.label} muss nach ${currentDate.label} liegen.`,
+        path: [nextDate.field],
+      })
+    }
+  }
 })
 
 // TypeScript Typen basierend auf dem Schema
@@ -151,10 +179,12 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
         classification: dataObject.classification ?? DataClassification.INTERNAL,
         format: dataObject.format ?? null,
         dataSources: dataObject.dataSources?.map(app => app.id) ?? [],
-        introductionDate: dataObject.introductionDate ?? null,
-        endOfLifeDate: dataObject.endOfLifeDate ?? null,
-        planningDate: dataObject.planningDate ?? null,
-        endOfUseDate: dataObject.endOfUseDate ?? null,
+        introductionDate: dataObject.introductionDate
+          ? new Date(dataObject.introductionDate)
+          : null,
+        endOfLifeDate: dataObject.endOfLifeDate ? new Date(dataObject.endOfLifeDate) : null,
+        planningDate: dataObject.planningDate ? new Date(dataObject.planningDate) : null,
+        endOfUseDate: dataObject.endOfUseDate ? new Date(dataObject.endOfUseDate) : null,
         ownerId:
           dataObject.owners && dataObject.owners.length > 0 ? dataObject.owners[0].id : undefined,
         partOfArchitectures: dataObject.partOfArchitectures?.map(arch => arch.id) ?? [],
@@ -192,7 +222,7 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
       label: 'Name',
       type: 'text',
       required: true,
-      validators: dataObjectSchema.shape.name,
+      validators: baseDataObjectSchema.shape.name,
       size: { xs: 12, md: 6 },
       tabId: 'general',
     },
@@ -201,7 +231,7 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
       label: 'Klassifizierung',
       type: 'select',
       required: true,
-      validators: dataObjectSchema.shape.classification,
+      validators: baseDataObjectSchema.shape.classification,
       options: Object.values(DataClassification).map(
         (classification): SelectOption => ({
           value: classification,
@@ -216,7 +246,7 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
       label: 'Beschreibung',
       type: 'textarea',
       required: true,
-      validators: dataObjectSchema.shape.description,
+      validators: baseDataObjectSchema.shape.description,
       rows: 4,
       size: 12,
       tabId: 'general',
@@ -225,7 +255,7 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
       name: 'format',
       label: 'Format',
       type: 'text',
-      validators: dataObjectSchema.shape.format,
+      validators: baseDataObjectSchema.shape.format,
       size: { xs: 12, md: 6 },
       tabId: 'general',
     },
@@ -235,7 +265,7 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
       label: 'Planungsdatum',
       icon: <PlanningIcon />,
       type: 'date',
-      validators: dataObjectSchema.shape.planningDate,
+      validators: baseDataObjectSchema.shape.planningDate,
       size: { xs: 12, md: 12 },
       tabId: 'lifecycle',
     },
@@ -244,7 +274,7 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
       label: 'Einführungsdatum',
       icon: <LaunchIcon />,
       type: 'date',
-      validators: dataObjectSchema.shape.introductionDate,
+      validators: baseDataObjectSchema.shape.introductionDate,
       size: { xs: 12, md: 12 },
       tabId: 'lifecycle',
     },
@@ -253,7 +283,7 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
       label: 'Ende der Nutzung',
       icon: <PauseIcon />,
       type: 'date',
-      validators: dataObjectSchema.shape.endOfUseDate,
+      validators: baseDataObjectSchema.shape.endOfUseDate,
       size: { xs: 12, md: 12 },
       tabId: 'lifecycle',
     },
@@ -262,7 +292,7 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
       label: 'End-of-Life Datum',
       icon: <DeleteIcon />,
       type: 'date',
-      validators: dataObjectSchema.shape.endOfLifeDate,
+      validators: baseDataObjectSchema.shape.endOfLifeDate,
       size: { xs: 12, md: 12 },
       tabId: 'lifecycle',
     },
@@ -287,7 +317,7 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
       name: 'dataSources',
       label: 'Datenquellen',
       type: 'autocomplete',
-      validators: dataObjectSchema.shape.dataSources,
+      validators: baseDataObjectSchema.shape.dataSources,
       size: { xs: 12, md: 6 },
       options:
         applicationData?.applications?.map(
