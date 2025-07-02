@@ -32,6 +32,12 @@ const DataObjectsPage = () => {
     classifications: [],
     formats: [],
     sources: [],
+    owners: [],
+    usedByApplications: [],
+    relatedToCapabilities: [],
+    partOfArchitectures: [],
+    descriptionFilter: '',
+    updatedDateRange: ['', ''],
   })
 
   // State für die DataObjectForm
@@ -56,7 +62,7 @@ const DataObjectsPage = () => {
     },
   })
 
-  const [updateDataObject, { loading: isUpdating }] = useMutation(UPDATE_DATA_OBJECT, {
+  const [updateDataObject] = useMutation(UPDATE_DATA_OBJECT, {
     onCompleted: () => {
       enqueueSnackbar('Datenobjekt erfolgreich aktualisiert', { variant: 'success' })
       refetch()
@@ -68,7 +74,7 @@ const DataObjectsPage = () => {
     },
   })
 
-  const [deleteDataObject, { loading: isDeleting }] = useMutation(DELETE_DATA_OBJECT, {
+  const [deleteDataObject] = useMutation(DELETE_DATA_OBJECT, {
     onCompleted: () => {
       enqueueSnackbar('Datenobjekt erfolgreich gelöscht', { variant: 'success' })
       refetch()
@@ -92,6 +98,13 @@ const DataObjectsPage = () => {
       filters.classifications.length === 0 &&
       filters.formats.length === 0 &&
       filters.sources.length === 0 &&
+      filters.owners.length === 0 &&
+      filters.usedByApplications.length === 0 &&
+      filters.relatedToCapabilities.length === 0 &&
+      filters.partOfArchitectures.length === 0 &&
+      !filters.descriptionFilter &&
+      !filters.updatedDateRange[0] &&
+      !filters.updatedDateRange[1] &&
       !globalFilter
     ) {
       return dataObjects
@@ -121,6 +134,63 @@ const DataObjectsPage = () => {
         if (!hasMatchingSource) return false
       }
 
+      // Verantwortliche Filter anwenden
+      if (filters.owners.length > 0) {
+        if (!obj.owners || obj.owners.length === 0) return false
+        const hasMatchingOwner = obj.owners.some(owner =>
+          filters.owners.includes(`${owner.firstName} ${owner.lastName}`)
+        )
+        if (!hasMatchingOwner) return false
+      }
+
+      // Verwendet von Anwendungen Filter anwenden
+      if (filters.usedByApplications.length > 0) {
+        if (!obj.usedByApplications || obj.usedByApplications.length === 0) return false
+        const hasMatchingApp = obj.usedByApplications.some(app =>
+          filters.usedByApplications.includes(app.name)
+        )
+        if (!hasMatchingApp) return false
+      }
+
+      // Bezug zu Capabilities Filter anwenden
+      if (filters.relatedToCapabilities.length > 0) {
+        if (!obj.relatedToCapabilities || obj.relatedToCapabilities.length === 0) return false
+        const hasMatchingCapability = obj.relatedToCapabilities.some(cap =>
+          filters.relatedToCapabilities.includes(cap.name)
+        )
+        if (!hasMatchingCapability) return false
+      }
+
+      // Teil von Architekturen Filter anwenden
+      if (filters.partOfArchitectures.length > 0) {
+        if (!obj.partOfArchitectures || obj.partOfArchitectures.length === 0) return false
+        const hasMatchingArchitecture = obj.partOfArchitectures.some(arch =>
+          filters.partOfArchitectures.includes(arch.name)
+        )
+        if (!hasMatchingArchitecture) return false
+      }
+
+      // Beschreibungsfilter anwenden
+      if (filters.descriptionFilter && filters.descriptionFilter.trim() !== '') {
+        const searchTerm = filters.descriptionFilter.toLowerCase().trim()
+        if (!obj.description || !obj.description.toLowerCase().includes(searchTerm)) {
+          return false
+        }
+      }
+
+      // Datum Aktualisiert Filter anwenden
+      if (filters.updatedDateRange[0] || filters.updatedDateRange[1]) {
+        const objDate = obj.updatedAt ? new Date(obj.updatedAt).getTime() : 0
+        if (filters.updatedDateRange[0]) {
+          const fromDate = new Date(filters.updatedDateRange[0]).getTime()
+          if (objDate < fromDate) return false
+        }
+        if (filters.updatedDateRange[1]) {
+          const toDate = new Date(filters.updatedDateRange[1]).getTime()
+          if (objDate > toDate) return false
+        }
+      }
+
       // Globalen Filter anwenden (suche in Name, Beschreibung, Format, Datenquellen)
       if (globalFilter && globalFilter.trim() !== '') {
         const searchTerm = globalFilter.toLowerCase().trim()
@@ -146,23 +216,53 @@ const DataObjectsPage = () => {
   const filterOptions = useMemo(() => {
     const formats = new Set<string>()
     const sources = new Set<string>()
+    const owners = new Set<string>()
+    const usedByApplications = new Set<string>()
+    const relatedToCapabilities = new Set<string>()
+    const partOfArchitectures = new Set<string>()
 
     dataObjects.forEach(obj => {
       if (obj.format) formats.add(obj.format)
       if (obj.dataSources) {
         obj.dataSources.forEach(source => sources.add(source.name))
       }
+      if (obj.owners) {
+        obj.owners.forEach(owner => owners.add(`${owner.firstName} ${owner.lastName}`))
+      }
+      if (obj.usedByApplications) {
+        obj.usedByApplications.forEach(app => usedByApplications.add(app.name))
+      }
+      if (obj.relatedToCapabilities) {
+        obj.relatedToCapabilities.forEach(cap => relatedToCapabilities.add(cap.name))
+      }
+      if (obj.partOfArchitectures) {
+        obj.partOfArchitectures.forEach(arch => partOfArchitectures.add(arch.name))
+      }
     })
 
     return {
       availableFormats: Array.from(formats),
       availableSources: Array.from(sources),
+      availableOwners: Array.from(owners),
+      availableUsedByApplications: Array.from(usedByApplications),
+      availableRelatedToCapabilities: Array.from(relatedToCapabilities),
+      availablePartOfArchitectures: Array.from(partOfArchitectures),
     }
   }, [dataObjects])
 
   // Zählt die aktiven Filter
   const activeFiltersCount = useMemo(() => {
-    return filters.classifications.length + filters.formats.length + filters.sources.length
+    return (
+      filters.classifications.length +
+      filters.formats.length +
+      filters.sources.length +
+      filters.owners.length +
+      filters.usedByApplications.length +
+      filters.relatedToCapabilities.length +
+      filters.partOfArchitectures.length +
+      (filters.descriptionFilter ? 1 : 0) +
+      (filters.updatedDateRange[0] || filters.updatedDateRange[1] ? 1 : 0)
+    )
   }, [filters])
 
   // Handler für das Zurücksetzen der Filter
@@ -171,6 +271,12 @@ const DataObjectsPage = () => {
       classifications: [],
       formats: [],
       sources: [],
+      owners: [],
+      usedByApplications: [],
+      relatedToCapabilities: [],
+      partOfArchitectures: [],
+      descriptionFilter: '',
+      updatedDateRange: ['', ''],
     })
   }, [])
 

@@ -39,6 +39,18 @@ export const GET_DATA_OBJECTS = gql`
         id
         name
       }
+      usedByApplications {
+        id
+        name
+      }
+      relatedToCapabilities {
+        id
+        name
+      }
+      partOfArchitectures {
+        id
+        name
+      }
       createdAt
       updatedAt
     }
