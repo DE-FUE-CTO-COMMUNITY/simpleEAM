@@ -207,6 +207,15 @@ function ApplicationInterfacesPage() {
             })),
           }
         : undefined,
+      depictedInDiagrams: data.depictedInDiagrams?.length
+        ? {
+            connect: data.depictedInDiagrams.map(id => ({
+              where: {
+                node: { id: { eq: id } },
+              },
+            })),
+          }
+        : undefined,
     }
 
     await createApplicationInterface({
@@ -288,6 +297,16 @@ function ApplicationInterfacesPage() {
         ? {
             disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
             connect: data.successorIds.map(id => ({
+              where: {
+                node: { id: { eq: id } },
+              },
+            })),
+          }
+        : { disconnect: [{ where: {} }] },
+      depictedInDiagrams: data.depictedInDiagrams?.length
+        ? {
+            disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
+            connect: data.depictedInDiagrams.map(id => ({
               where: {
                 node: { id: { eq: id } },
               },

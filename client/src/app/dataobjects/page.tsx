@@ -306,6 +306,15 @@ const DataObjectsPage = () => {
               })),
             }
           : undefined,
+        depictedInDiagrams: data.depictedInDiagrams?.length
+          ? {
+              connect: data.depictedInDiagrams.map(id => ({
+                where: {
+                  node: { id: { eq: id } },
+                },
+              })),
+            }
+          : undefined,
         ...(data.ownerId
           ? { owners: { connect: [{ where: { node: { id: { eq: data.ownerId } } } }] } }
           : {}),
@@ -392,6 +401,35 @@ const DataObjectsPage = () => {
           input.owners = [
             {
               disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
+            },
+          ]
+        }
+      }
+
+      // DepictedInDiagrams Update - only update if changed
+      const currentDepictedInDiagramIds = currentDataObject.depictedInDiagrams?.map(diag => diag.id).sort() || []
+      const newDepictedInDiagramIds = data.depictedInDiagrams?.sort() || []
+
+      const depictedInDiagramsChanged =
+        JSON.stringify(currentDepictedInDiagramIds) !== JSON.stringify(newDepictedInDiagramIds)
+
+      if (depictedInDiagramsChanged) {
+        if (newDepictedInDiagramIds.length > 0) {
+          input.depictedInDiagrams = [
+            {
+              disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
+              connect: newDepictedInDiagramIds.map(id => ({
+                where: {
+                  node: { id: { eq: id } },
+                },
+              })),
+            },
+          ]
+        } else {
+          // Wenn keine Diagramme ausgewählt sind, alle Verbindungen trennen
+          input.depictedInDiagrams = [
+            {
+              disconnect: [{ where: {} }],
             },
           ]
         }

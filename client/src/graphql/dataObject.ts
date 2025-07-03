@@ -53,6 +53,10 @@ export const GET_DATA_OBJECTS = gql`
         id
         name
       }
+      depictedInDiagrams {
+        id
+        title
+      }
       createdAt
       updatedAt
     }
@@ -90,6 +94,10 @@ export const GET_DATA_OBJECT = gql`
         id
         name
       }
+      depictedInDiagrams {
+        id
+        title
+      }
     }
   }
 `
@@ -115,6 +123,10 @@ export const CREATE_DATA_OBJECT = gql`
         dataSources {
           id
           name
+        }
+        depictedInDiagrams {
+          id
+          title
         }
         createdAt
         updatedAt
@@ -144,6 +156,10 @@ export const UPDATE_DATA_OBJECT = gql`
         dataSources {
           id
           name
+        }
+        depictedInDiagrams {
+          id
+          title
         }
         createdAt
         updatedAt

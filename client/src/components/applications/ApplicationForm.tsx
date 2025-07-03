@@ -71,7 +71,7 @@ const baseApplicationSchema = z.object({
   sourceOfInterfaceIds: z.array(z.string()).optional(),
   targetOfInterfaceIds: z.array(z.string()).optional(),
   partOfArchitectures: z.array(z.string()).optional(),
-  partOfDiagrams: z.array(z.string()).optional(),
+  depictedInDiagrams: z.array(z.string()).optional(),
   parentIds: z.array(z.string()).optional(),
   componentIds: z.array(z.string()).optional(),
   predecessorIds: z.array(z.string()).optional(),
@@ -278,7 +278,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     sourceOfInterfaceIds: application?.sourceOfInterfaces?.map(iface => iface.id) ?? [],
     targetOfInterfaceIds: application?.targetOfInterfaces?.map(iface => iface.id) ?? [],
     partOfArchitectures: application?.partOfArchitectures?.map(arch => arch.id) ?? [],
-    partOfDiagrams: [], // TODO: Das Feld existiert noch nicht im Application Typ
+    depictedInDiagrams: application?.depictedInDiagrams?.map(diag => diag.id) ?? [],
     parentIds: application?.parents?.map(app => app.id) ?? [],
     componentIds: application?.components?.map(app => app.id) ?? [],
     predecessorIds: application?.predecessors?.map(app => app.id) ?? [],
@@ -805,7 +805,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     },
     // Diagramme (Tab: architectures)
     {
-      name: 'partOfDiagrams',
+      name: 'depictedInDiagrams',
       label: 'Dargestellt in Diagrammen',
       type: 'autocomplete',
       tabId: 'architectures',

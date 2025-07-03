@@ -54,7 +54,7 @@ const baseApplicationInterfaceSchema = z.object({
   sourceApplications: z.array(z.string()).optional(),
   targetApplications: z.array(z.string()).optional(),
   dataObjects: z.array(z.string()).optional(),
-  partOfDiagrams: z.array(z.string()).optional(),
+  depictedInDiagrams: z.array(z.string()).optional(),
   predecessorIds: z.array(z.string()).optional(),
   successorIds: z.array(z.string()).optional(),
 })
@@ -176,45 +176,68 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
   loading = false,
   onEditMode,
 }) => {
-  // Daten laden
+  // Daten laden mit cache-and-network Policy für frische Daten
   const { data: personData, loading: personLoading } = useQuery(GET_PERSONS)
-  const { data: applicationData, loading: applicationLoading } = useQuery(GET_APPLICATIONS)
-  const { data: diagramsData, loading: diagramsLoading } = useQuery(GET_DIAGRAMS)
+  const { data: applicationData, loading: applicationLoading } = useQuery(GET_APPLICATIONS, {
+    fetchPolicy: 'cache-and-network',
+  })
+  const { data: diagramsData, loading: diagramsLoading } = useQuery(GET_DIAGRAMS, {
+    fetchPolicy: 'cache-and-network',
+  })
   const { data: applicationInterfacesData, loading: applicationInterfacesLoading } = useQuery(
-    GET_APPLICATION_INTERFACES
+    GET_APPLICATION_INTERFACES,
+    {
+      fetchPolicy: 'cache-and-network',
+    }
   )
 
   // Debug-Logs für die Interface-Daten
   React.useEffect(() => {
     console.log('ApplicationInterface Debug:', {
+      applicationInterface,
       applicationInterfacesLoading,
-      applicationInterfacesCount: applicationInterfacesData?.applicationInterfaces?.length,
-      applicationInterfacesData: applicationInterfacesData?.applicationInterfaces?.slice(0, 3), // Erste 3 für Debug
+      diagramsLoading,
+      diagramsCount: diagramsData?.diagrams?.length,
+      depictedInDiagrams: applicationInterface?.depictedInDiagrams,
     })
-  }, [applicationInterfacesData, applicationInterfacesLoading])
+  }, [
+    applicationInterface,
+    applicationInterfacesData,
+    applicationInterfacesLoading,
+    diagramsData,
+    diagramsLoading,
+  ])
 
   // Formulardaten mit useMemo initialisieren, um unnötige Re-Renders zu vermeiden
   const defaultValues = React.useMemo<ApplicationInterfaceFormValues>(
     () => ({
-      name: '',
-      description: '',
-      interfaceType: InterfaceType.API,
-      protocol: null,
-      version: null,
-      status: InterfaceStatus.PLANNED,
-      planningDate: null,
-      introductionDate: null,
-      endOfUseDate: null,
-      endOfLifeDate: null,
-      responsiblePerson: null,
-      sourceApplications: [],
-      targetApplications: [],
-      dataObjects: [],
-      partOfDiagrams: [],
-      predecessorIds: [],
-      successorIds: [],
+      name: applicationInterface?.name || '',
+      description: applicationInterface?.description || '',
+      interfaceType: applicationInterface?.interfaceType || InterfaceType.API,
+      protocol: applicationInterface?.protocol || null,
+      version: applicationInterface?.version || null,
+      status: applicationInterface?.status || InterfaceStatus.PLANNED,
+      planningDate: applicationInterface?.planningDate
+        ? new Date(applicationInterface.planningDate)
+        : null,
+      introductionDate: applicationInterface?.introductionDate
+        ? new Date(applicationInterface.introductionDate)
+        : null,
+      endOfUseDate: applicationInterface?.endOfUseDate
+        ? new Date(applicationInterface.endOfUseDate)
+        : null,
+      endOfLifeDate: applicationInterface?.endOfLifeDate
+        ? new Date(applicationInterface.endOfLifeDate)
+        : null,
+      responsiblePerson: applicationInterface?.responsiblePerson?.[0]?.id || null,
+      sourceApplications: applicationInterface?.sourceApplications?.map(app => app.id) || [],
+      targetApplications: applicationInterface?.targetApplications?.map(app => app.id) || [],
+      dataObjects: applicationInterface?.dataObjects?.map(obj => obj.id) || [],
+      depictedInDiagrams: applicationInterface?.depictedInDiagrams?.map(diag => diag.id) || [],
+      predecessorIds: applicationInterface?.predecessors?.map(pred => pred.id) || [],
+      successorIds: applicationInterface?.successors?.map(succ => succ.id) || [],
     }),
-    []
+    [applicationInterface]
   )
 
   // TanStack Form konfigurieren
@@ -238,7 +261,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
         sourceApplications: value.sourceApplications || [],
         targetApplications: value.targetApplications || [],
         dataObjects: value.dataObjects || [],
-        partOfDiagrams: value.partOfDiagrams || [],
+        depictedInDiagrams: value.depictedInDiagrams || [],
         predecessorIds: value.predecessorIds || [],
         successorIds: value.successorIds || [],
       }
@@ -619,7 +642,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       },
     },
     {
-      name: 'partOfDiagrams',
+      name: 'depictedInDiagrams',
       label: 'Dargestellt in Diagrammen',
       type: 'autocomplete',
       size: { xs: 12, md: 6 },

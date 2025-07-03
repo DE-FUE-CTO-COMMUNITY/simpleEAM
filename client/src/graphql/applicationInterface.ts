@@ -61,6 +61,10 @@ export const GET_APPLICATION_INTERFACES = gql`
         id
         name
       }
+      depictedInDiagrams {
+        id
+        title
+      }
     }
   }
 `
@@ -105,6 +109,10 @@ export const GET_APPLICATION_INTERFACE = gql`
       successors {
         id
         name
+      }
+      depictedInDiagrams {
+        id
+        title
       }
     }
   }
@@ -152,6 +160,10 @@ export const CREATE_APPLICATION_INTERFACE = gql`
           id
           name
         }
+        depictedInDiagrams {
+          id
+          title
+        }
       }
     }
   }
@@ -198,6 +210,10 @@ export const UPDATE_APPLICATION_INTERFACE = gql`
         successors {
           id
           name
+        }
+        depictedInDiagrams {
+          id
+          title
         }
       }
     }

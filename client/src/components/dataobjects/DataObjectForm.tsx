@@ -37,7 +37,7 @@ const baseDataObjectSchema = z.object({
   endOfUseDate: z.date().optional().nullable(),
   ownerId: z.string().optional(),
   partOfArchitectures: z.array(z.string()).optional(),
-  partOfDiagrams: z.array(z.string()).optional(),
+  depictedInDiagrams: z.array(z.string()).optional(),
 })
 
 // Schema für die Formularvalidierung mit erweiterten Validierungen
@@ -117,29 +117,44 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
   // Personen laden
   const { data: personData, loading: personLoading } = useQuery(GET_PERSONS)
   // Anwendungen laden
-  const { data: applicationData, loading: applicationLoading } = useQuery(GET_APPLICATIONS)
+  const { data: applicationData, loading: applicationLoading } = useQuery(GET_APPLICATIONS, {
+    fetchPolicy: 'cache-and-network',
+  })
   // Architekturen laden
   const { data: architecturesData, loading: architecturesLoading } = useQuery(GET_ARCHITECTURES)
   // Diagramme laden
-  const { data: diagramsData, loading: diagramsLoading } = useQuery(GET_DIAGRAMS)
+  const { data: diagramsData, loading: diagramsLoading } = useQuery(GET_DIAGRAMS, {
+    fetchPolicy: 'cache-and-network',
+  })
+
+  // Debug-Logs für die geladenen Daten
+  React.useEffect(() => {
+    console.log('DataObject Debug:', {
+      dataObject,
+      diagramsLoading,
+      diagramsCount: diagramsData?.diagrams?.length,
+      depictedInDiagrams: dataObject?.depictedInDiagrams,
+    })
+  }, [dataObject, diagramsData, diagramsLoading])
 
   // Formulardaten mit useMemo initialisieren, um unnötige Re-Renders zu vermeiden
   const defaultValues = React.useMemo<DataObjectFormValues>(
     () => ({
-      name: '',
-      description: '',
-      classification: DataClassification.INTERNAL,
-      format: null,
-      dataSources: [],
-      introductionDate: null,
-      endOfLifeDate: null,
-      planningDate: null,
-      endOfUseDate: null,
-      ownerId: undefined,
-      partOfArchitectures: [],
-      partOfDiagrams: [],
+      name: dataObject?.name || '',
+      description: dataObject?.description || '',
+      classification: dataObject?.classification || DataClassification.INTERNAL,
+      format: dataObject?.format || null,
+      dataSources: dataObject?.dataSources?.map(source => source.id) || [],
+      introductionDate: dataObject?.introductionDate ? new Date(dataObject.introductionDate) : null,
+      endOfLifeDate: dataObject?.endOfLifeDate ? new Date(dataObject.endOfLifeDate) : null,
+      planningDate: dataObject?.planningDate ? new Date(dataObject.planningDate) : null,
+      endOfUseDate: dataObject?.endOfUseDate ? new Date(dataObject.endOfUseDate) : null,
+      ownerId:
+        dataObject?.owners && dataObject.owners.length > 0 ? dataObject.owners[0].id : undefined,
+      partOfArchitectures: dataObject?.partOfArchitectures?.map(arch => arch.id) || [],
+      depictedInDiagrams: dataObject?.depictedInDiagrams?.map(diag => diag.id) || [],
     }),
-    []
+    [dataObject]
   )
 
   // TanStack Form konfigurieren
@@ -188,7 +203,7 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
         ownerId:
           dataObject.owners && dataObject.owners.length > 0 ? dataObject.owners[0].id : undefined,
         partOfArchitectures: dataObject.partOfArchitectures?.map(arch => arch.id) ?? [],
-        partOfDiagrams: dataObject.depictedInDiagrams?.map(diagram => diagram.id) ?? [],
+        depictedInDiagrams: dataObject.depictedInDiagrams?.map(diagram => diagram.id) ?? [],
       }
 
       // Formular mit den Werten aus dem vorhandenen DataObject zurücksetzen
@@ -375,7 +390,7 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
       },
     },
     {
-      name: 'partOfDiagrams',
+      name: 'depictedInDiagrams',
       label: 'Dargestellt in Diagrammen',
       type: 'autocomplete',
       multiple: true,

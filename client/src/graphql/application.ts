@@ -66,6 +66,10 @@ export const GET_APPLICATIONS = gql`
         id
         name
       }
+      depictedInDiagrams {
+        id
+        title
+      }
       parents {
         id
         name
@@ -131,6 +135,10 @@ export const GET_APPLICATION = gql`
       partOfArchitectures {
         id
         name
+      }
+      depictedInDiagrams {
+        id
+        title
       }
       parents {
         id
