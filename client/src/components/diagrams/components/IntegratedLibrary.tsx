@@ -60,7 +60,7 @@ const IntegratedLibrary: React.FC<IntegratedLibraryProps> = ({
       sortedCapabilities.forEach((capability: any) => {
         const libraryItem = createLibraryItemFromDatabaseElement(
           capability,
-          'businessCapability',
+          'capability', // Fix: elementType muss 'capability' sein!
           templates.businessCapability
         )
         if (libraryItem) newLibraryItems.push(libraryItem)

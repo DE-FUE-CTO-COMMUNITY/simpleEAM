@@ -397,7 +397,9 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
       let result
       if (existingDiagram?.id && !forceSaveAs) {
         // Update bestehende Diagramm
+        console.log('🔄 Aktualisiere bestehendes Diagramm:', existingDiagram.id)
         const relationshipUpdates = createDiagramRelationshipUpdatesWithDisconnect(dataToSave)
+        console.log('📊 Beziehungs-Updates für Update:', relationshipUpdates)
 
         const updateInput = {
           title: { set: title.trim() },
@@ -417,6 +419,8 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
           ...relationshipUpdates, // Automatische Beziehungen zu Datenbankelementen
         }
 
+        console.log('📤 Sende Update-Mutation mit Input:', updateInput)
+
         result = await updateDiagram({
           variables: {
             id: existingDiagram.id,
@@ -425,15 +429,20 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
         })
 
         const savedDiagram = result.data.updateDiagrams.diagrams[0]
+        console.log('✅ Diagramm erfolgreich aktualisiert:', savedDiagram)
         return savedDiagram
       } else {
         // Neue Diagramm erstellen (auch bei forceSaveAs)
+        console.log('🆕 Erstelle neues Diagramm')
         const relationshipUpdates = createDiagramRelationshipUpdates(dataToSave)
+        console.log('📊 Beziehungs-Updates für Create:', relationshipUpdates)
 
         const input = {
           ...baseInput,
           ...relationshipUpdates, // Automatische Beziehungen zu Datenbankelementen
         }
+
+        console.log('📤 Sende Create-Mutation mit Input:', input)
 
         result = await createDiagram({
           variables: {
@@ -442,6 +451,7 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
         })
 
         const savedDiagram = result.data.createDiagrams.diagrams[0]
+        console.log('✅ Diagramm erfolgreich erstellt:', savedDiagram)
         return savedDiagram
       }
     } catch (error) {
