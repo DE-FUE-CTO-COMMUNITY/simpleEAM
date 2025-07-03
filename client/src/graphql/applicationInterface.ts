@@ -53,6 +53,14 @@ export const GET_APPLICATION_INTERFACES = gql`
         id
         name
       }
+      predecessors {
+        id
+        name
+      }
+      successors {
+        id
+        name
+      }
     }
   }
 `
@@ -87,6 +95,14 @@ export const GET_APPLICATION_INTERFACE = gql`
         name
       }
       dataObjects {
+        id
+        name
+      }
+      predecessors {
+        id
+        name
+      }
+      successors {
         id
         name
       }
@@ -128,6 +144,14 @@ export const CREATE_APPLICATION_INTERFACE = gql`
           id
           name
         }
+        predecessors {
+          id
+          name
+        }
+        successors {
+          id
+          name
+        }
       }
     }
   }
@@ -164,6 +188,14 @@ export const UPDATE_APPLICATION_INTERFACE = gql`
           name
         }
         dataObjects {
+          id
+          name
+        }
+        predecessors {
+          id
+          name
+        }
+        successors {
           id
           name
         }

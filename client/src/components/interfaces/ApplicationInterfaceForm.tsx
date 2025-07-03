@@ -13,6 +13,7 @@ import {
 import { GET_PERSONS } from '@/graphql/person'
 import { GET_APPLICATIONS } from '@/graphql/application'
 import { GET_DIAGRAMS } from '@/graphql/diagram'
+import { GET_APPLICATION_INTERFACES } from '@/graphql/applicationInterface'
 import {
   ApplicationInterface,
   InterfaceType,
@@ -54,6 +55,8 @@ const baseApplicationInterfaceSchema = z.object({
   targetApplications: z.array(z.string()).optional(),
   dataObjects: z.array(z.string()).optional(),
   partOfDiagrams: z.array(z.string()).optional(),
+  predecessorIds: z.array(z.string()).optional(),
+  successorIds: z.array(z.string()).optional(),
 })
 
 // Erweiterte Schema-Validierung mit Lifecycle-Logik
@@ -177,6 +180,18 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
   const { data: personData, loading: personLoading } = useQuery(GET_PERSONS)
   const { data: applicationData, loading: applicationLoading } = useQuery(GET_APPLICATIONS)
   const { data: diagramsData, loading: diagramsLoading } = useQuery(GET_DIAGRAMS)
+  const { data: applicationInterfacesData, loading: applicationInterfacesLoading } = useQuery(
+    GET_APPLICATION_INTERFACES
+  )
+
+  // Debug-Logs für die Interface-Daten
+  React.useEffect(() => {
+    console.log('ApplicationInterface Debug:', {
+      applicationInterfacesLoading,
+      applicationInterfacesCount: applicationInterfacesData?.applicationInterfaces?.length,
+      applicationInterfacesData: applicationInterfacesData?.applicationInterfaces?.slice(0, 3), // Erste 3 für Debug
+    })
+  }, [applicationInterfacesData, applicationInterfacesLoading])
 
   // Formulardaten mit useMemo initialisieren, um unnötige Re-Renders zu vermeiden
   const defaultValues = React.useMemo<ApplicationInterfaceFormValues>(
@@ -196,6 +211,8 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       targetApplications: [],
       dataObjects: [],
       partOfDiagrams: [],
+      predecessorIds: [],
+      successorIds: [],
     }),
     []
   )
@@ -222,6 +239,8 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
         targetApplications: value.targetApplications || [],
         dataObjects: value.dataObjects || [],
         partOfDiagrams: value.partOfDiagrams || [],
+        predecessorIds: value.predecessorIds || [],
+        successorIds: value.successorIds || [],
       }
 
       await onSubmit(formattedValues)
@@ -283,6 +302,8 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
         targetApplications: applicationInterface.targetApplications?.map(app => app.id) || [],
         dataObjects: applicationInterface.dataObjects?.map(obj => obj.id) || [],
         partOfDiagrams: [], // TODO: Das Feld existiert noch nicht im ApplicationInterface Typ
+        predecessorIds: applicationInterface.predecessors?.map(iface => iface.id) || [],
+        successorIds: applicationInterface.successors?.map(iface => iface.id) || [],
       }
 
       // Formular mit den Werten aus der vorhandenen Schnittstelle zurücksetzen
@@ -452,6 +473,68 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       },
     },
     {
+      name: 'predecessorIds',
+      label: 'Vorgänger-Schnittstellen',
+      type: 'autocomplete',
+      tabId: 'general',
+      multiple: true,
+      options:
+        applicationInterfacesData?.applicationInterfaces
+          ?.filter((iface: ApplicationInterface) => iface.id !== applicationInterface?.id) // Exclude self
+          ?.map((iface: ApplicationInterface) => ({
+            value: iface.id,
+            label: iface.name,
+          })) || [],
+      size: { xs: 12, md: 6 },
+      loadingOptions: applicationInterfacesLoading,
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          const matchingInterface = applicationInterfacesData?.applicationInterfaces?.find(
+            (iface: ApplicationInterface) => iface.id === option
+          )
+          return matchingInterface?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
+    },
+    {
+      name: 'successorIds',
+      label: 'Nachfolger-Schnittstellen',
+      type: 'autocomplete',
+      tabId: 'general',
+      multiple: true,
+      options:
+        applicationInterfacesData?.applicationInterfaces
+          ?.filter((iface: ApplicationInterface) => iface.id !== applicationInterface?.id) // Exclude self
+          ?.map((iface: ApplicationInterface) => ({
+            value: iface.id,
+            label: iface.name,
+          })) || [],
+      size: { xs: 12, md: 6 },
+      loadingOptions: applicationInterfacesLoading,
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          const matchingInterface = applicationInterfacesData?.applicationInterfaces?.find(
+            (iface: ApplicationInterface) => iface.id === option
+          )
+          return matchingInterface?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
+    },
+    {
       name: 'sourceApplications',
       label: 'Quellanwendungen',
       type: 'autocomplete',
@@ -578,7 +661,13 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={onSubmit}
-      isLoading={loading}
+      isLoading={
+        loading ||
+        personLoading ||
+        applicationLoading ||
+        diagramsLoading ||
+        applicationInterfacesLoading
+      }
       mode={mode}
       fields={fields}
       tabs={APPLICATION_INTERFACE_TABS}

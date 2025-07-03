@@ -66,6 +66,22 @@ export const GET_APPLICATIONS = gql`
         id
         name
       }
+      parents {
+        id
+        name
+      }
+      components {
+        id
+        name
+      }
+      predecessors {
+        id
+        name
+      }
+      successors {
+        id
+        name
+      }
     }
   }
 `
@@ -116,6 +132,22 @@ export const GET_APPLICATION = gql`
         id
         name
       }
+      parents {
+        id
+        name
+      }
+      components {
+        id
+        name
+      }
+      predecessors {
+        id
+        name
+      }
+      successors {
+        id
+        name
+      }
     }
   }
 `
@@ -138,6 +170,22 @@ export const CREATE_APPLICATION = gql`
         endOfUseDate
         endOfLifeDate
         createdAt
+        parents {
+          id
+          name
+        }
+        components {
+          id
+          name
+        }
+        predecessors {
+          id
+          name
+        }
+        successors {
+          id
+          name
+        }
       }
     }
   }
@@ -161,6 +209,22 @@ export const UPDATE_APPLICATION = gql`
         endOfUseDate
         endOfLifeDate
         updatedAt
+        parents {
+          id
+          name
+        }
+        components {
+          id
+          name
+        }
+        predecessors {
+          id
+          name
+        }
+        successors {
+          id
+          name
+        }
       }
     }
   }

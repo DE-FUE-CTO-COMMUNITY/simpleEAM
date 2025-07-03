@@ -189,6 +189,24 @@ function ApplicationInterfacesPage() {
             })),
           }
         : undefined,
+      predecessors: data.predecessorIds?.length
+        ? {
+            connect: data.predecessorIds.map(id => ({
+              where: {
+                node: { id: { eq: id } },
+              },
+            })),
+          }
+        : undefined,
+      successors: data.successorIds?.length
+        ? {
+            connect: data.successorIds.map(id => ({
+              where: {
+                node: { id: { eq: id } },
+              },
+            })),
+          }
+        : undefined,
     }
 
     await createApplicationInterface({
@@ -250,6 +268,26 @@ function ApplicationInterfacesPage() {
         ? {
             disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
             connect: data.dataObjects.map(id => ({
+              where: {
+                node: { id: { eq: id } },
+              },
+            })),
+          }
+        : { disconnect: [{ where: {} }] },
+      predecessors: data.predecessorIds?.length
+        ? {
+            disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
+            connect: data.predecessorIds.map(id => ({
+              where: {
+                node: { id: { eq: id } },
+              },
+            })),
+          }
+        : { disconnect: [{ where: {} }] },
+      successors: data.successorIds?.length
+        ? {
+            disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
+            connect: data.successorIds.map(id => ({
               where: {
                 node: { id: { eq: id } },
               },

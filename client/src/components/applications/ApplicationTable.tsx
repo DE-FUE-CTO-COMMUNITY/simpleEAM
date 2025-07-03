@@ -10,6 +10,7 @@ import ApplicationForm, { ApplicationFormValues } from './ApplicationForm'
 import { createColumnHelper } from '@tanstack/react-table'
 import { SortingState, VisibilityState } from '@tanstack/react-table'
 import usePersistentColumnVisibility from '../../hooks/usePersistentColumnVisibility'
+import { Application } from '../../gql/generated'
 
 interface ApplicationTableProps {
   id?: string
@@ -22,6 +23,7 @@ interface ApplicationTableProps {
   onUpdateApplication?: (id: string, data: ApplicationFormValues) => Promise<void>
   onDeleteApplication?: (id: string) => Promise<void>
   availableTechStack?: string[]
+  availableApplications?: Application[] // Hinzugefügt für die Dropdowns
   onTableReady?: (table: any) => void
   // Diese Props sind jetzt optional, da die Persistierung intern verwaltet wird
   columnVisibility?: VisibilityState
@@ -40,6 +42,7 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
   onUpdateApplication,
   onDeleteApplication,
   availableTechStack = [],
+  availableApplications = [], // Hinzugefügt
   onTableReady,
   columnVisibility: _externalColumnVisibility,
   onColumnVisibilityChange: _externalOnColumnVisibilityChange,
@@ -219,6 +222,7 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
       onColumnVisibilityChange={onColumnVisibilityChange}
       additionalProps={{
         availableTechStack,
+        availableApplications, // Hinzugefügt
       }}
       onTableReady={handleTableReady}
     />

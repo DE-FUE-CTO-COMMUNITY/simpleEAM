@@ -72,6 +72,10 @@ const baseApplicationSchema = z.object({
   targetOfInterfaceIds: z.array(z.string()).optional(),
   partOfArchitectures: z.array(z.string()).optional(),
   partOfDiagrams: z.array(z.string()).optional(),
+  parentIds: z.array(z.string()).optional(),
+  componentIds: z.array(z.string()).optional(),
+  predecessorIds: z.array(z.string()).optional(),
+  successorIds: z.array(z.string()).optional(),
   timeCategory: z.nativeEnum(TimeCategory).optional().nullable().or(z.literal('')),
   sevenRStrategy: z.nativeEnum(SevenRStrategy).optional().nullable().or(z.literal('')),
 })
@@ -234,6 +238,7 @@ const getSevenRStrategyLabel = (strategy: SevenRStrategy): string => {
 
 const ApplicationForm: React.FC<ApplicationFormProps> = ({
   application,
+  availableApplications = [],
   availableTechStack = [],
   mode,
   isOpen,
@@ -274,6 +279,10 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     targetOfInterfaceIds: application?.targetOfInterfaces?.map(iface => iface.id) ?? [],
     partOfArchitectures: application?.partOfArchitectures?.map(arch => arch.id) ?? [],
     partOfDiagrams: [], // TODO: Das Feld existiert noch nicht im Application Typ
+    parentIds: application?.parents?.map(app => app.id) ?? [],
+    componentIds: application?.components?.map(app => app.id) ?? [],
+    predecessorIds: application?.predecessors?.map(app => app.id) ?? [],
+    successorIds: application?.successors?.map(app => app.id) ?? [],
     timeCategory: application?.timeCategory ?? null,
     sevenRStrategy: application?.sevenRStrategy ?? null,
   }
@@ -469,6 +478,60 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
       loadingOptions: personsLoading,
       size: { xs: 12, md: 6 },
     },
+    {
+      name: 'predecessorIds',
+      label: 'Vorgänger-Anwendungen',
+      type: 'autocomplete',
+      tabId: 'general',
+      multiple: true,
+      options: (availableApplications || [])
+        .filter((app: Application) => app.id !== application?.id)
+        .map((app: Application) => ({
+          value: app.id,
+          label: app.name,
+        })),
+      size: { xs: 12, md: 6 },
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          const matchingApp = availableApplications?.find((app: Application) => app.id === option)
+          return matchingApp?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
+    },
+    {
+      name: 'successorIds',
+      label: 'Nachfolger-Anwendungen',
+      type: 'autocomplete',
+      tabId: 'general',
+      multiple: true,
+      options: (availableApplications || [])
+        .filter((app: Application) => app.id !== application?.id)
+        .map((app: Application) => ({
+          value: app.id,
+          label: app.name,
+        })),
+      size: { xs: 12, md: 6 },
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          const matchingApp = availableApplications?.find((app: Application) => app.id === option)
+          return matchingApp?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
+    },
 
     // Technische Informationen (Tab: technical)
     {
@@ -655,6 +718,61 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
         return option.value === value?.value || option.value === value
       },
     },
+    {
+      name: 'parentIds',
+      label: 'Übergeordnete Anwendungen',
+      type: 'autocomplete',
+      tabId: 'relationships',
+      multiple: true,
+      options: (availableApplications || [])
+        .filter((app: Application) => app.id !== application?.id)
+        .map((app: Application) => ({
+          value: app.id,
+          label: app.name,
+        })),
+      size: { xs: 12, md: 6 },
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          const matchingApp = availableApplications?.find((app: Application) => app.id === option)
+          return matchingApp?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
+    },
+    {
+      name: 'componentIds',
+      label: 'Komponenten (untergeordnete Anwendungen)',
+      type: 'autocomplete',
+      tabId: 'relationships',
+      multiple: true,
+      options: (availableApplications || [])
+        .filter((app: Application) => app.id !== application?.id)
+        .map((app: Application) => ({
+          value: app.id,
+          label: app.name,
+        })),
+      size: { xs: 12, md: 6 },
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          const matchingApp = availableApplications?.find((app: Application) => app.id === option)
+          return matchingApp?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
+    },
+
     // Architekturen (Tab: architectures)
     {
       name: 'partOfArchitectures',

@@ -1,11 +1,11 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { Box, Typography, Button, Card, Paper } from '@mui/material'
 import { Add as AddIcon } from '@mui/icons-material'
 import { useQuery, useMutation } from '@apollo/client'
 import { useSnackbar } from 'notistack'
-import { useAuth, isArchitect } from '@/lib/auth'
+import { isArchitect } from '@/lib/auth'
 import { VisibilityState } from '@tanstack/react-table'
 
 import {
@@ -31,7 +31,6 @@ import { useApplicationFilter } from '@/components/applications/useApplicationFi
 import { ApplicationType, FilterState } from '@/components/applications/types'
 
 const ApplicationsPage = () => {
-  const { authenticated } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
   const [globalFilter, setGlobalFilter] = useState<string>('')
   const [sorting, setSorting] = useState([{ id: 'name', desc: false }])
@@ -93,17 +92,19 @@ const ApplicationsPage = () => {
 
   // Applikationen laden - Auth-Check erfolgt bereits in layout.tsx
   const { loading, error, data, refetch } = useQuery(GET_APPLICATIONS, {
-    skip: !authenticated,
     fetchPolicy: 'cache-and-network',
+    notifyOnNetworkStatusChange: true,
   })
 
   // Verfügbare Werte aus den geladenen Daten extrahieren
+  const applications = useMemo(() => data?.applications || [], [data?.applications])
+
   useEffect(() => {
-    if (data?.applications?.length) {
-      const applications = data.applications as ApplicationType[]
+    if (applications.length) {
+      const applicationsData = applications as ApplicationType[]
 
       // Alle Status extrahieren und Duplikate entfernen
-      const allStatuses: ApplicationStatus[] = applications
+      const allStatuses: ApplicationStatus[] = applicationsData
         .map((app: ApplicationType) => app.status)
         .filter(Boolean) as ApplicationStatus[]
 
@@ -111,7 +112,7 @@ const ApplicationsPage = () => {
       setAvailableStatuses(uniqueStatuses)
 
       // Alle Kritikalitäten extrahieren und Duplikate entfernen
-      const allCriticalities: CriticalityLevel[] = applications
+      const allCriticalities: CriticalityLevel[] = applicationsData
         .map((app: ApplicationType) => app.criticality)
         .filter(Boolean) as CriticalityLevel[]
 
@@ -120,7 +121,7 @@ const ApplicationsPage = () => {
 
       // Alle Technology Stack Tags sammeln und Duplikate entfernen
       const allTechTags: string[] = []
-      applications.forEach((app: ApplicationType) => {
+      applicationsData.forEach((app: ApplicationType) => {
         if (app.technologyStack && Array.isArray(app.technologyStack)) {
           allTechTags.push(...app.technologyStack)
         }
@@ -130,7 +131,7 @@ const ApplicationsPage = () => {
       setAvailableTechStack(uniqueTechTags)
 
       // Alle Vendors sammeln und Duplikate entfernen
-      const allVendors: string[] = applications
+      const allVendors: string[] = applicationsData
         .map((app: ApplicationType) => app.vendor)
         .filter(Boolean) as string[]
 
@@ -138,7 +139,7 @@ const ApplicationsPage = () => {
       setAvailableVendors(uniqueVendors)
 
       // Alle TIME-Kategorien extrahieren und Duplikate entfernen
-      const allTimeCategories: TimeCategory[] = applications
+      const allTimeCategories: TimeCategory[] = applicationsData
         .map((app: ApplicationType) => app.timeCategory)
         .filter(Boolean) as TimeCategory[]
 
@@ -146,14 +147,14 @@ const ApplicationsPage = () => {
       setAvailableTimeCategories(uniqueTimeCategories)
 
       // Alle 7R-Strategien extrahieren und Duplikate entfernen
-      const allSevenRStrategies: SevenRStrategy[] = applications
+      const allSevenRStrategies: SevenRStrategy[] = applicationsData
         .map((app: ApplicationType) => app.sevenRStrategy)
         .filter(Boolean) as SevenRStrategy[]
 
       const uniqueSevenRStrategies = Array.from(new Set(allSevenRStrategies)).sort()
       setAvailableSevenRStrategies(uniqueSevenRStrategies)
     }
-  }, [data])
+  }, [applications])
 
   // Fehlerbehandlung
   useEffect(() => {
@@ -161,8 +162,6 @@ const ApplicationsPage = () => {
       enqueueSnackbar('Fehler beim Laden der Applikationen', { variant: 'error' })
     }
   }, [error, enqueueSnackbar])
-
-  const applications = data?.applications || []
 
   // Filter auf Applikationen anwenden
   const filteredData = useApplicationFilter({ applications, filterState })
@@ -216,6 +215,10 @@ const ApplicationsPage = () => {
       usesDataObjectIds,
       sourceOfInterfaceIds,
       targetOfInterfaceIds,
+      parentIds,
+      componentIds,
+      predecessorIds,
+      successorIds,
       ...applicationData
     } = data
     // Bei CREATE wird kein spezielles Mutation-Objekt benötigt, da direkte Werte erlaubt sind
@@ -282,6 +285,46 @@ const ApplicationsPage = () => {
             },
           }
         : {}),
+      // Wenn Parent-Applikationen ausgewählt wurden, verbinden wir sie
+      ...(parentIds && parentIds.length > 0
+        ? {
+            parents: {
+              connect: parentIds.map(id => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }
+        : {}),
+      // Wenn Komponenten ausgewählt wurden, verbinden wir sie
+      ...(componentIds && componentIds.length > 0
+        ? {
+            components: {
+              connect: componentIds.map(id => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }
+        : {}),
+      // Wenn Vorgänger-Applikationen ausgewählt wurden, verbinden wir sie
+      ...(predecessorIds && predecessorIds.length > 0
+        ? {
+            predecessors: {
+              connect: predecessorIds.map(id => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }
+        : {}),
+      // Wenn Nachfolger-Applikationen ausgewählt wurden, verbinden wir sie
+      ...(successorIds && successorIds.length > 0
+        ? {
+            successors: {
+              connect: successorIds.map(id => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }
+        : {}),
     }
 
     await createApplication({
@@ -301,6 +344,10 @@ const ApplicationsPage = () => {
       usesDataObjectIds,
       sourceOfInterfaceIds,
       targetOfInterfaceIds,
+      parentIds,
+      componentIds,
+      predecessorIds,
+      successorIds,
       ...applicationData
     } = data
 
@@ -426,6 +473,78 @@ const ApplicationsPage = () => {
       }
     }
 
+    // Aktualisierung der Parent-Application-Beziehungen
+    if (parentIds && parentIds.length > 0) {
+      input.parents = {
+        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+        connect: parentIds.map(parentId => ({
+          where: {
+            node: {
+              id: { eq: parentId },
+            },
+          },
+        })),
+      }
+    } else {
+      input.parents = {
+        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+      }
+    }
+
+    // Aktualisierung der Component-Application-Beziehungen
+    if (componentIds && componentIds.length > 0) {
+      input.components = {
+        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+        connect: componentIds.map(componentId => ({
+          where: {
+            node: {
+              id: { eq: componentId },
+            },
+          },
+        })),
+      }
+    } else {
+      input.components = {
+        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+      }
+    }
+
+    // Aktualisierung der Predecessor-Application-Beziehungen
+    if (predecessorIds && predecessorIds.length > 0) {
+      input.predecessors = {
+        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+        connect: predecessorIds.map(predecessorId => ({
+          where: {
+            node: {
+              id: { eq: predecessorId },
+            },
+          },
+        })),
+      }
+    } else {
+      input.predecessors = {
+        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+      }
+    }
+
+    // Aktualisierung der Successor-Application-Beziehungen
+    if (successorIds && successorIds.length > 0) {
+      input.successors = {
+        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+        connect: successorIds.map(successorId => ({
+          where: {
+            node: {
+              id: { eq: successorId },
+            },
+          },
+        })),
+      }
+    } else {
+      input.successors = {
+        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+      }
+    }
+
     await updateApplication({
       variables: { id, input },
     })
@@ -433,8 +552,11 @@ const ApplicationsPage = () => {
 
   // Neue Applikation erstellen
   const handleCreateApplication = () => {
-    // Hier fügen wir direkt die Logik für das Erstellen einer neuen Applikation ein,
-    // anstatt einen versteckten Button zu verwenden
+    // Warten, bis die Daten geladen sind, bevor das Formular geöffnet wird
+    if (loading || !data?.applications) {
+      enqueueSnackbar('Bitte warten Sie, bis die Daten geladen sind.', { variant: 'info' })
+      return
+    }
     setShowNewApplicationForm(true)
   }
 
@@ -510,6 +632,7 @@ const ApplicationsPage = () => {
             onUpdateApplication={handleUpdateApplicationSubmit}
             onDeleteApplication={handleDeleteApplication}
             availableTechStack={availableTechStack}
+            availableApplications={applications as unknown as Application[]} // Hinzugefügt
             onTableReady={setTableInstance}
             columnVisibility={columnVisibility}
             onColumnVisibilityChange={handleColumnVisibilityChange}
@@ -569,6 +692,7 @@ const ApplicationsPage = () => {
               __typename: 'Application',
             } as unknown as Application
           }
+          loading={loading || applications.length === 0}
         />
       )}
     </Box>
