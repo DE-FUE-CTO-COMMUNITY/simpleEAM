@@ -207,6 +207,15 @@ function ApplicationInterfacesPage() {
             })),
           }
         : undefined,
+      partOfArchitectures: data.partOfArchitectures?.length
+        ? {
+            connect: data.partOfArchitectures.map(id => ({
+              where: {
+                node: { id: { eq: id } },
+              },
+            })),
+          }
+        : undefined,
       depictedInDiagrams: data.depictedInDiagrams?.length
         ? {
             connect: data.depictedInDiagrams.map(id => ({
@@ -297,6 +306,16 @@ function ApplicationInterfacesPage() {
         ? {
             disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
             connect: data.successorIds.map(id => ({
+              where: {
+                node: { id: { eq: id } },
+              },
+            })),
+          }
+        : { disconnect: [{ where: {} }] },
+      partOfArchitectures: data.partOfArchitectures?.length
+        ? {
+            disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
+            connect: data.partOfArchitectures.map(id => ({
               where: {
                 node: { id: { eq: id } },
               },

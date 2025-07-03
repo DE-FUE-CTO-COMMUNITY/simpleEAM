@@ -785,7 +785,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
         label: arch.name,
       })),
       loadingOptions: architecturesLoading,
-      size: { xs: 12, md: 6 },
+      size: 12,
       getOptionLabel: (option: any) => {
         if (typeof option === 'string') {
           // Direkte ID - suche passende Option
@@ -815,7 +815,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
         label: diagram.title,
       })),
       loadingOptions: diagramsLoading,
-      size: { xs: 12, md: 6 },
+      size: 12,
       getOptionLabel: (option: any) => {
         if (typeof option === 'string') {
           // Direkte ID - suche passende Option

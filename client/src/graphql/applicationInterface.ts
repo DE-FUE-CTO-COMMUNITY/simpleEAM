@@ -61,6 +61,10 @@ export const GET_APPLICATION_INTERFACES = gql`
         id
         name
       }
+      partOfArchitectures {
+        id
+        name
+      }
       depictedInDiagrams {
         id
         title
@@ -107,6 +111,10 @@ export const GET_APPLICATION_INTERFACE = gql`
         name
       }
       successors {
+        id
+        name
+      }
+      partOfArchitectures {
         id
         name
       }
@@ -208,6 +216,10 @@ export const UPDATE_APPLICATION_INTERFACE = gql`
           name
         }
         successors {
+          id
+          name
+        }
+        partOfArchitectures {
           id
           name
         }

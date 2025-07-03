@@ -370,7 +370,7 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
         label: arch.name,
       })),
       loadingOptions: architecturesLoading,
-      size: { xs: 12, md: 6 },
+      size: 12,
       tabId: 'architectures',
       getOptionLabel: (option: any) => {
         if (typeof option === 'string') {
@@ -399,7 +399,7 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
         label: diagram.title,
       })),
       loadingOptions: diagramsLoading,
-      size: { xs: 12, md: 6 },
+      size: 12,
       tabId: 'architectures',
       getOptionLabel: (option: any) => {
         if (typeof option === 'string') {

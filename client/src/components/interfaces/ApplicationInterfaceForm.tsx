@@ -12,6 +12,7 @@ import {
 } from '@mui/icons-material'
 import { GET_PERSONS } from '@/graphql/person'
 import { GET_APPLICATIONS } from '@/graphql/application'
+import { GET_ARCHITECTURES } from '@/graphql/architecture'
 import { GET_DIAGRAMS } from '@/graphql/diagram'
 import { GET_APPLICATION_INTERFACES } from '@/graphql/applicationInterface'
 import {
@@ -54,6 +55,7 @@ const baseApplicationInterfaceSchema = z.object({
   sourceApplications: z.array(z.string()).optional(),
   targetApplications: z.array(z.string()).optional(),
   dataObjects: z.array(z.string()).optional(),
+  partOfArchitectures: z.array(z.string()).optional(),
   depictedInDiagrams: z.array(z.string()).optional(),
   predecessorIds: z.array(z.string()).optional(),
   successorIds: z.array(z.string()).optional(),
@@ -181,6 +183,9 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
   const { data: applicationData, loading: applicationLoading } = useQuery(GET_APPLICATIONS, {
     fetchPolicy: 'cache-and-network',
   })
+  const { data: architectureData, loading: architectureLoading } = useQuery(GET_ARCHITECTURES, {
+    fetchPolicy: 'cache-and-network',
+  })
   const { data: diagramsData, loading: diagramsLoading } = useQuery(GET_DIAGRAMS, {
     fetchPolicy: 'cache-and-network',
   })
@@ -234,6 +239,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       sourceApplications: applicationInterface?.sourceApplications?.map(app => app.id) || [],
       targetApplications: applicationInterface?.targetApplications?.map(app => app.id) || [],
       dataObjects: applicationInterface?.dataObjects?.map(obj => obj.id) || [],
+      partOfArchitectures: applicationInterface?.partOfArchitectures?.map(arch => arch.id) || [],
       depictedInDiagrams: applicationInterface?.depictedInDiagrams?.map(diag => diag.id) || [],
       predecessorIds: applicationInterface?.predecessors?.map(pred => pred.id) || [],
       successorIds: applicationInterface?.successors?.map(succ => succ.id) || [],
@@ -270,6 +276,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
         sourceApplications: value.sourceApplications || [],
         targetApplications: value.targetApplications || [],
         dataObjects: value.dataObjects || [],
+        partOfArchitectures: value.partOfArchitectures || [],
         depictedInDiagrams: value.depictedInDiagrams || [],
         predecessorIds: value.predecessorIds || [],
         successorIds: value.successorIds || [],
@@ -333,6 +340,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
         sourceApplications: applicationInterface.sourceApplications?.map(app => app.id) || [],
         targetApplications: applicationInterface.targetApplications?.map(app => app.id) || [],
         dataObjects: applicationInterface.dataObjects?.map(obj => obj.id) || [],
+        partOfArchitectures: applicationInterface.partOfArchitectures?.map(arch => arch.id) || [],
         depictedInDiagrams: applicationInterface.depictedInDiagrams?.map(diag => diag.id) || [],
         predecessorIds: applicationInterface.predecessors?.map(iface => iface.id) || [],
         successorIds: applicationInterface.successors?.map(iface => iface.id) || [],
@@ -651,10 +659,42 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       },
     },
     {
+      name: 'partOfArchitectures',
+      label: 'Teil von Architekturen',
+      type: 'autocomplete',
+      size: 12,
+      tabId: 'architectures',
+      options:
+        architectureData?.architectures?.map((arch: any) => ({
+          value: arch.id,
+          label: arch.name,
+        })) || [],
+      loadingOptions: architectureLoading,
+      multiple: true,
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          const matchingArch = architectureData?.architectures?.find(
+            (arch: any) => arch.id === option
+          )
+          return matchingArch?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        if (typeof option === 'string') {
+          return option === value
+        }
+        return option?.value === value?.value || option?.value === value
+      },
+    },
+    {
       name: 'depictedInDiagrams',
       label: 'Dargestellt in Diagrammen',
       type: 'autocomplete',
-      size: { xs: 12, md: 6 },
+      size: 12,
       tabId: 'architectures',
       options: (diagramsData?.diagrams || []).map((diagram: any) => ({
         value: diagram.id,
@@ -674,8 +714,12 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       },
       isOptionEqualToValue: (option: any, value: any) => {
         // Debug-Log für die Vergleiche
-        console.log('depictedInDiagrams isOptionEqualToValue Debug:', { option, value, optionValue: option?.value })
-        
+        console.log('depictedInDiagrams isOptionEqualToValue Debug:', {
+          option,
+          value,
+          optionValue: option?.value,
+        })
+
         if (typeof value === 'string') {
           return option.value === value
         }
@@ -703,6 +747,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
         loading ||
         personLoading ||
         applicationLoading ||
+        architectureLoading ||
         diagramsLoading ||
         applicationInterfacesLoading
       }
