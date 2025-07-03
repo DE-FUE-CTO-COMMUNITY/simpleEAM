@@ -407,7 +407,8 @@ const DataObjectsPage = () => {
       }
 
       // DepictedInDiagrams Update - only update if changed
-      const currentDepictedInDiagramIds = currentDataObject.depictedInDiagrams?.map(diag => diag.id).sort() || []
+      const currentDepictedInDiagramIds =
+        currentDataObject.depictedInDiagrams?.map(diag => diag.id).sort() || []
       const newDepictedInDiagramIds = data.depictedInDiagrams?.sort() || []
 
       const depictedInDiagramsChanged =

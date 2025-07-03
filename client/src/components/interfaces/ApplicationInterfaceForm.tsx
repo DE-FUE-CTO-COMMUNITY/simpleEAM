@@ -199,6 +199,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       diagramsLoading,
       diagramsCount: diagramsData?.diagrams?.length,
       depictedInDiagrams: applicationInterface?.depictedInDiagrams,
+      diagramsData: diagramsData?.diagrams,
     })
   }, [
     applicationInterface,
@@ -239,6 +240,14 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
     }),
     [applicationInterface]
   )
+
+  // Debug-Log für defaultValues
+  React.useEffect(() => {
+    console.log('ApplicationInterface DefaultValues Debug:', {
+      defaultValues,
+      depictedInDiagramsFromDefaultValues: defaultValues.depictedInDiagrams,
+    })
+  }, [defaultValues])
 
   // TanStack Form konfigurieren
   const form = useForm({
@@ -324,7 +333,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
         sourceApplications: applicationInterface.sourceApplications?.map(app => app.id) || [],
         targetApplications: applicationInterface.targetApplications?.map(app => app.id) || [],
         dataObjects: applicationInterface.dataObjects?.map(obj => obj.id) || [],
-        partOfDiagrams: [], // TODO: Das Feld existiert noch nicht im ApplicationInterface Typ
+        depictedInDiagrams: applicationInterface.depictedInDiagrams?.map(diag => diag.id) || [],
         predecessorIds: applicationInterface.predecessors?.map(iface => iface.id) || [],
         successorIds: applicationInterface.successors?.map(iface => iface.id) || [],
       }
@@ -664,10 +673,16 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
         return option?.label || ''
       },
       isOptionEqualToValue: (option: any, value: any) => {
+        // Debug-Log für die Vergleiche
+        console.log('depictedInDiagrams isOptionEqualToValue Debug:', { option, value, optionValue: option?.value })
+        
         if (typeof value === 'string') {
           return option.value === value
         }
-        return option.value === value?.value || option.value === value
+        if (typeof option === 'string') {
+          return option === value
+        }
+        return option?.value === value?.value || option?.value === value
       },
     },
   ]
