@@ -41,6 +41,7 @@ export const architectureSchema = z.object({
   containsInterfaceIds: z.array(z.string()).optional(),
   diagramIds: z.array(z.string()).optional(),
   parentArchitectureId: z.string().optional(),
+  elementsNote: z.string().optional(),
 })
 
 // TypeScript Typen basierend auf dem Schema
@@ -104,6 +105,8 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
       containsInterfaceIds: [],
       diagramIds: [],
       parentArchitectureId: '',
+      elementsNote:
+        'Hinweis: Gelb markierte Elemente sind in keinem Diagramm dieser Architektur enthalten. Es wird empfohlen, alle Elemente in mindestens einem Diagramm darzustellen.',
     }),
     []
   )
@@ -283,6 +286,8 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
           architecture.parentArchitecture && architecture.parentArchitecture.length > 0
             ? architecture.parentArchitecture[0].id
             : '',
+        elementsNote:
+          'Hinweis: Gelb markierte Elemente sind in keinem Diagramm dieser Architektur enthalten. Es wird empfohlen, alle Elemente in mindestens einem Diagramm darzustellen.',
       }
 
       // Verwende setValues statt reset, um keine neuen Re-Renders auszulösen
@@ -740,6 +745,22 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
       },
     },
   ]
+
+  // Hinweistext für den Tab "Architekturelemente" hinzufügen
+  elementsFields.push({
+    name: 'elementsNote',
+    label: '', // Label leer lassen, um Doppelung zu vermeiden
+    type: 'displayText',
+    tabId: 'elements',
+    size: { xs: 12, md: 12 },
+    variant: 'body1',
+    sx: {
+      marginTop: 3,
+      marginBottom: 1,
+      color: 'text.primary',
+      fontWeight: 'normal',
+    },
+  })
 
   // Felder für den dritten Tab (Diagramme)
   const diagramFields: FieldConfigWithSelect[] = [

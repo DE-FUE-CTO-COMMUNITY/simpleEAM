@@ -58,6 +58,7 @@ export type FieldType =
   | 'autocomplete'
   | 'tags'
   | 'custom'
+  | 'displayText'
 
 /**
  * Option für Select und Autocomplete Felder
@@ -99,6 +100,23 @@ export interface FieldConfig {
   loadingOptions?: boolean // Für Autocomplete während des Ladens
   loadingText?: string // Text während des Ladens
   onChange?: (value: any) => void // Callback für Feldwert-Änderungen
+  // Eigenschaften für displayText
+  variant?:
+    | 'body1'
+    | 'body2'
+    | 'h1'
+    | 'h2'
+    | 'h3'
+    | 'h4'
+    | 'h5'
+    | 'h6'
+    | 'subtitle1'
+    | 'subtitle2'
+    | 'caption'
+    | 'overline' // Typography-Variante für displayText
+  preserveWhitespace?: boolean // Leerzeichen in displayText beibehalten
+  emptyText?: string // Text, der angezeigt wird, wenn der Wert leer ist
+  sx?: SxProps<Theme> // Zusätzliche Styling-Eigenschaften
 }
 
 /**
@@ -419,7 +437,7 @@ const GenericForm: React.FC<GenericFormProps> = ({
             }
 
             return (
-              <Box sx={{ mb: 2 }}>
+              <Box sx={{ mb: field.type === 'displayText' ? 0.25 : 2 }}>
                 {/* FormLabel nur für Felder anzeigen, die kein eigenes Label haben */}
                 {![
                   'date',
@@ -429,6 +447,7 @@ const GenericForm: React.FC<GenericFormProps> = ({
                   'select',
                   'number',
                   'autocomplete',
+                  'displayText',
                 ].includes(field.type) && (
                   <FormLabel sx={{ mb: 1, display: 'block' }}>
                     {field.label}
@@ -843,6 +862,39 @@ const GenericForm: React.FC<GenericFormProps> = ({
                     }}
                     helperText={getHelperText()}
                   />
+                )}
+
+                {field.type === 'displayText' && (
+                  <Box>
+                    {field.label && (
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        display="block"
+                        sx={{ mb: 0.25, mt: 0 }}
+                      >
+                        {field.label}
+                      </Typography>
+                    )}
+                    <Typography
+                      variant={field.variant || 'body1'}
+                      sx={{
+                        ...field.sx,
+                        wordBreak: 'break-word',
+                        whiteSpace: field.preserveWhitespace ? 'pre-wrap' : 'normal',
+                        margin: 0,
+                      }}
+                    >
+                      {formField.state.value === null || formField.state.value === ''
+                        ? field.emptyText || '-'
+                        : formField.state.value}
+                    </Typography>
+                    {field.helperText && (
+                      <Typography variant="caption" color="text.secondary" sx={{ mt: 0.25, mb: 0 }}>
+                        {field.helperText}
+                      </Typography>
+                    )}
+                  </Box>
                 )}
               </Box>
             )
