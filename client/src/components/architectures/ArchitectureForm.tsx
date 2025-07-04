@@ -11,6 +11,7 @@ import { GET_APPLICATIONS } from '@/graphql/application'
 import { GET_CAPABILITIES } from '@/graphql/capability'
 import { GET_DATA_OBJECTS } from '@/graphql/dataObject'
 import { GET_DIAGRAMS } from '@/graphql/diagram'
+import { GET_APPLICATION_INTERFACES } from '@/graphql/applicationInterface'
 import GenericForm, { FieldConfig, TabConfig } from '../common/GenericForm'
 import { isArchitect } from '@/lib/auth'
 import { getDomainLabel, getTypeLabel } from './utils'
@@ -37,6 +38,7 @@ export const architectureSchema = z.object({
   containsApplicationIds: z.array(z.string()).optional(),
   containsCapabilityIds: z.array(z.string()).optional(),
   containsDataObjectIds: z.array(z.string()).optional(),
+  containsInterfaceIds: z.array(z.string()).optional(),
   diagramIds: z.array(z.string()).optional(),
   parentArchitectureId: z.string().optional(),
 })
@@ -84,6 +86,8 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
   // Diagramme laden
   const { data: diagramData, loading: diagramLoading } = useQuery(GET_DIAGRAMS)
 
+  // Schnittstellen laden
+  const { data: interfaceData, loading: interfaceLoading } = useQuery(GET_APPLICATION_INTERFACES)
   // Formulardaten mit useMemo initialisieren
   const defaultValues = React.useMemo<ArchitectureFormValues>(
     () => ({
@@ -97,6 +101,7 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
       containsApplicationIds: [],
       containsCapabilityIds: [],
       containsDataObjectIds: [],
+      containsInterfaceIds: [],
       diagramIds: [],
       parentArchitectureId: '',
     }),
@@ -141,6 +146,9 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
             : [],
           containsDataObjectIds: Array.isArray(value.containsDataObjectIds)
             ? value.containsDataObjectIds
+            : [],
+          containsInterfaceIds: Array.isArray(value.containsInterfaceIds)
+            ? value.containsInterfaceIds
             : [],
           diagramIds: Array.isArray(value.diagramIds) ? value.diagramIds : [],
         }
@@ -269,6 +277,7 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
         containsApplicationIds: architecture.containsApplications?.map(app => app.id) || [],
         containsCapabilityIds: architecture.containsCapabilities?.map(cap => cap.id) || [],
         containsDataObjectIds: architecture.containsDataObjects?.map(obj => obj.id) || [],
+        containsInterfaceIds: architecture.containsInterfaces?.map(iface => iface.id) || [],
         diagramIds: architecture.diagrams?.map(diag => diag.id) || [],
         parentArchitectureId:
           architecture.parentArchitecture && architecture.parentArchitecture.length > 0
@@ -439,80 +448,6 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
   // Felder für den zweiten Tab (Architekturelemente) mit Debug-Ausgaben
   const elementsFields: FieldConfigWithSelect[] = [
     {
-      name: 'containsApplicationIds',
-      label: 'Applikationen',
-      type: 'autocomplete',
-      tabId: 'elements',
-      multiple: true,
-      size: { xs: 12, md: 12 },
-      options: (() => {
-        const options =
-          applicationData?.applications?.map(
-            (app: { id: string; name: string }): SelectOption => ({
-              value: app.id,
-              label: app.name,
-            })
-          ) || []
-        return options
-      })(),
-      loadingOptions: applicationLoading,
-      getOptionLabel: (option: any) => {
-        if (typeof option === 'string') {
-          // Direkte ID - suche passende Option
-          const matchingApp = applicationData?.applications?.find(
-            (app: { id: string; name: string }) => app.id === option
-          )
-          const result = matchingApp?.name || option
-          return result
-        }
-        return option?.label || ''
-      },
-      getOptionBackgroundColor: (option: any) => {
-        try {
-          // Finde die Application und prüfe, ob sie in Diagrammen der aktuellen Architektur dargestellt ist
-          const appId = typeof option === 'string' ? option : option?.value
-
-          // Sicherstellen, dass applicationData und applications existieren
-          if (!applicationData?.applications) {
-            return undefined
-          }
-
-          const app = applicationData.applications.find((app: any) => app.id === appId)
-
-          // Wenn die App nicht gefunden wurde, keine Hintergrundfarbe anwenden
-          if (!app) {
-            return undefined
-          }
-
-          // Hole die IDs der Diagramme, die zu dieser Architektur gehören
-          const architectureDiagramIds = form.getFieldValue('diagramIds') || []
-
-          // Prüfe, ob die App in mindestens einem Diagramm dieser Architektur dargestellt ist
-          const appDiagramIds = (app.depictedInDiagrams || []).map((diag: any) => diag.id)
-
-          // Schnittmenge zwischen den Diagrammen der App und den Diagrammen der Architektur
-          const isDepictedInArchitectureDiagrams = appDiagramIds.some((diagId: string) =>
-            architectureDiagramIds.includes(diagId)
-          )
-
-          // Markiere gelb, wenn die App nicht in einem Diagramm dieser Architektur dargestellt ist
-          const backgroundColor = !isDepictedInArchitectureDiagrams
-            ? theme.palette.warning.light
-            : undefined
-          return backgroundColor
-        } catch (error) {
-          console.error('Error in application getOptionBackgroundColor:', error)
-          return undefined
-        }
-      },
-      isOptionEqualToValue: (option: any, value: any) => {
-        if (typeof value === 'string') {
-          return option.value === value
-        }
-        return option.value === value?.value || option.value === value
-      },
-    },
-    {
       name: 'containsCapabilityIds',
       label: 'Capabilities',
       type: 'autocomplete',
@@ -587,6 +522,80 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
       },
     },
     {
+      name: 'containsApplicationIds',
+      label: 'Applikationen',
+      type: 'autocomplete',
+      tabId: 'elements',
+      multiple: true,
+      size: { xs: 12, md: 12 },
+      options: (() => {
+        const options =
+          applicationData?.applications?.map(
+            (app: { id: string; name: string }): SelectOption => ({
+              value: app.id,
+              label: app.name,
+            })
+          ) || []
+        return options
+      })(),
+      loadingOptions: applicationLoading,
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          // Direkte ID - suche passende Option
+          const matchingApp = applicationData?.applications?.find(
+            (app: { id: string; name: string }) => app.id === option
+          )
+          const result = matchingApp?.name || option
+          return result
+        }
+        return option?.label || ''
+      },
+      getOptionBackgroundColor: (option: any) => {
+        try {
+          // Finde die Application und prüfe, ob sie in Diagrammen der aktuellen Architektur dargestellt ist
+          const appId = typeof option === 'string' ? option : option?.value
+
+          // Sicherstellen, dass applicationData und applications existieren
+          if (!applicationData?.applications) {
+            return undefined
+          }
+
+          const app = applicationData.applications.find((app: any) => app.id === appId)
+
+          // Wenn die App nicht gefunden wurde, keine Hintergrundfarbe anwenden
+          if (!app) {
+            return undefined
+          }
+
+          // Hole die IDs der Diagramme, die zu dieser Architektur gehören
+          const architectureDiagramIds = form.getFieldValue('diagramIds') || []
+
+          // Prüfe, ob die App in mindestens einem Diagramm dieser Architektur dargestellt ist
+          const appDiagramIds = (app.depictedInDiagrams || []).map((diag: any) => diag.id)
+
+          // Schnittmenge zwischen den Diagrammen der App und den Diagrammen der Architektur
+          const isDepictedInArchitectureDiagrams = appDiagramIds.some((diagId: string) =>
+            architectureDiagramIds.includes(diagId)
+          )
+
+          // Markiere gelb, wenn die App nicht in einem Diagramm dieser Architektur dargestellt ist
+          const backgroundColor = !isDepictedInArchitectureDiagrams
+            ? theme.palette.warning.light
+            : undefined
+          return backgroundColor
+        } catch (error) {
+          console.error('Error in application getOptionBackgroundColor:', error)
+          return undefined
+        }
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
+    },
+    {
       name: 'containsDataObjectIds',
       label: 'Datenobjekte',
       type: 'autocomplete',
@@ -648,6 +657,78 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
           return backgroundColor
         } catch (error) {
           console.error('Error in dataObject getOptionBackgroundColor:', error)
+          return undefined
+        }
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
+    },
+    {
+      name: 'containsInterfaceIds',
+      label: 'Schnittstellen',
+      type: 'autocomplete',
+      tabId: 'elements',
+      multiple: true,
+      size: { xs: 12, md: 12 },
+      options:
+        interfaceData?.applicationInterfaces?.map(
+          (iface: { id: string; name: string }): SelectOption => ({
+            value: iface.id,
+            label: iface.name,
+          })
+        ) || [],
+      loadingOptions: interfaceLoading,
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          const matchingInterface = interfaceData?.applicationInterfaces?.find(
+            (iface: { id: string; name: string }) => iface.id === option
+          )
+          const result = matchingInterface?.name || option
+          return result
+        }
+        return option?.label || ''
+      },
+      getOptionBackgroundColor: (option: any) => {
+        try {
+          // Finde die Schnittstelle und prüfe, ob sie in Diagrammen der aktuellen Architektur dargestellt ist
+          const ifaceId = typeof option === 'string' ? option : option?.value
+
+          // Sicherstellen, dass interfaceData existiert
+          if (!interfaceData?.applicationInterfaces) {
+            return undefined
+          }
+
+          const iface = interfaceData.applicationInterfaces.find(
+            (iface: any) => iface.id === ifaceId
+          )
+
+          // Wenn die Schnittstelle nicht gefunden wurde, keine Hintergrundfarbe anwenden
+          if (!iface) {
+            return undefined
+          }
+
+          // Hole die IDs der Diagramme, die zu dieser Architektur gehören
+          const architectureDiagramIds = form.getFieldValue('diagramIds') || []
+
+          // Prüfe, ob die Schnittstelle in mindestens einem Diagramm dieser Architektur dargestellt ist
+          const interfaceDiagramIds = (iface.depictedInDiagrams || []).map((diag: any) => diag.id)
+
+          // Schnittmenge zwischen den Diagrammen der Schnittstelle und den Diagrammen der Architektur
+          const isDepictedInArchitectureDiagrams = interfaceDiagramIds.some((diagId: string) =>
+            architectureDiagramIds.includes(diagId)
+          )
+
+          // Markiere gelb, wenn die Schnittstelle nicht in einem Diagramm dieser Architektur dargestellt ist
+          const backgroundColor = !isDepictedInArchitectureDiagrams
+            ? theme.palette.warning.light
+            : undefined
+          return backgroundColor
+        } catch (error) {
+          console.error('Error in interface getOptionBackgroundColor:', error)
           return undefined
         }
       },

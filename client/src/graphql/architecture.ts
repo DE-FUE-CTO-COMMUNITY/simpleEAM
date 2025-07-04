@@ -42,6 +42,10 @@ export const GET_ARCHITECTURES = gql`
         id
         name
       }
+      containsInterfaces {
+        id
+        name
+      }
       diagrams {
         id
         title
