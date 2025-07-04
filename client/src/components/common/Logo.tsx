@@ -21,19 +21,6 @@ const Logo: React.FC<LogoProps> = ({ height = 40, ...boxProps }) => {
   const logoName =
     process.env.NEXT_PUBLIC_LOGO_NAME || process.env.NEXT_PUBLIC_LOGO_ALT || 'Simple-EAM'
 
-  // Debug: Umgebungsvariablen ausgeben
-  console.log('🔍 Logo Debug Information:')
-  console.log('NEXT_PUBLIC_LOGO_PATH:', process.env.NEXT_PUBLIC_LOGO_PATH)
-  console.log('NEXT_PUBLIC_LOGO_NAME:', process.env.NEXT_PUBLIC_LOGO_NAME)
-  console.log('NEXT_PUBLIC_LOGO_URL:', process.env.NEXT_PUBLIC_LOGO_URL)
-  console.log('NEXT_PUBLIC_LOGO_ALT:', process.env.NEXT_PUBLIC_LOGO_ALT)
-  console.log('Resolved logoPath:', logoPath)
-  console.log('Resolved logoName:', logoName)
-  console.log(
-    'All NEXT_PUBLIC env vars:',
-    Object.keys(process.env).filter(key => key.startsWith('NEXT_PUBLIC_'))
-  )
-
   return (
     <Box {...boxProps} sx={{ display: 'inline-flex', alignItems: 'center', ...boxProps.sx }}>
       <Box
@@ -54,8 +41,6 @@ const Logo: React.FC<LogoProps> = ({ height = 40, ...boxProps }) => {
           }}
           sizes={`${height * 2.5}px`}
           priority
-          onLoad={() => console.log('✅ Logo erfolgreich geladen:', logoPath)}
-          onError={e => console.error('❌ Logo konnte nicht geladen werden:', logoPath, e)}
         />
       </Box>
     </Box>

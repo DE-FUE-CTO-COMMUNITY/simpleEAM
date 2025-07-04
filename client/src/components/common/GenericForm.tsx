@@ -207,9 +207,6 @@ const GenericForm: React.FC<GenericFormProps> = ({
           ? option.value // Wenn option ein Objekt mit value-Property ist
           : option // Sonst direkt option verwenden (String)
 
-      // Debug-Ausgabe
-      console.debug('Getting background color for option:', option, 'optionValue:', optionValue)
-
       const backgroundColor = field.getOptionBackgroundColor(optionValue)
       if (backgroundColor) {
         // Wenn eine benutzerdefinierte Farbe zurückgegeben wird, verwende sie
@@ -596,21 +593,12 @@ const GenericForm: React.FC<GenericFormProps> = ({
 
                 {field.type === 'autocomplete' && (
                   <Autocomplete
-                    options={
-                      // Debug-Log für Optionen
-                      (() => {
-                        console.log(`Autocomplete options for ${field.name}:`, field.options);
-                        return (field.options || []).slice().sort((a, b) => {
-                          const labelA = typeof a === 'string' ? a : a?.label || '';
-                          const labelB = typeof b === 'string' ? b : b?.label || '';
-                          return labelA.localeCompare(labelB, 'de', { sensitivity: 'base' });
-                        });
-                      })()
-                    }
-                    value={(() => {
-                      console.log(`Autocomplete value for ${field.name}:`, formField.state.value);
-                      return formField.state.value;
-                    })()}
+                    options={(field.options || []).slice().sort((a, b) => {
+                      const labelA = typeof a === 'string' ? a : a?.label || ''
+                      const labelB = typeof b === 'string' ? b : b?.label || ''
+                      return labelA.localeCompare(labelB, 'de', { sensitivity: 'base' })
+                    })}
+                    value={formField.state.value}
                     onChange={(_, newValue) => {
                       // Extrahiere IDs/Werte aus Objekten bei Multiple-Auswahl
                       let processedValue = newValue

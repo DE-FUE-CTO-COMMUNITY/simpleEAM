@@ -42,8 +42,6 @@ const ExcalidrawWrapper = dynamic(
 
       // Process initialData - use provided data or fallback to safe defaults
       const safeInitialData = useMemo(() => {
-        console.log('ExcalidrawWrapper: Processing initialData', _initialData)
-
         if (_initialData && typeof _initialData === 'object') {
           // Use provided initialData but ensure safe structure
           const processedData = {
@@ -70,13 +68,6 @@ const ExcalidrawWrapper = dynamic(
             scrollToContent: false,
           }
 
-          console.log('ExcalidrawWrapper: Using provided initialData with viewport', {
-            elementsCount: processedData.elements.length,
-            scrollX: processedData.appState.scrollX,
-            scrollY: processedData.appState.scrollY,
-            zoom: processedData.appState.zoom?.value,
-          })
-
           return processedData
         }
 
@@ -102,7 +93,6 @@ const ExcalidrawWrapper = dynamic(
           scrollToContent: false,
         }
 
-        console.log('ExcalidrawWrapper: Using default empty initialData')
         return defaultData
       }, [_initialData]) // Depend on actual initialData prop
 

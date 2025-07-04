@@ -75,13 +75,10 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
   const handleCapabilityMapGenerated = useCallback(
     (elements: any[]) => {
       if (!excalidrawAPI) {
-        console.warn('Excalidraw API nicht verfügbar für Element-Update')
         return
       }
 
       try {
-        console.log(`Lade ${elements.length} generierte Elemente in das Canvas`)
-
         // Update the scene with generated elements
         excalidrawAPI.updateScene({
           elements: elements,
@@ -104,8 +101,8 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
           message: `Capability Map erfolgreich generiert! ${capabilityCount} Capabilities erstellt.`,
           severity: 'success',
         })
-      } catch (error) {
-        console.error('Fehler beim Laden der generierten Elemente:', error)
+      } catch {
+        // Fehlerbehandlung
         setNotification({
           open: true,
           message: 'Fehler beim Laden der generierten Capability Map',
@@ -170,15 +167,12 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
 
   // Create dynamic initialData that includes viewport state
   const initialData = useMemo(() => {
-    console.log('DiagramEditor: Creating initialData with viewport state')
-
     // Load viewport state from storage
     let viewportState = null
     try {
       const savedViewportState = loadViewportStateFromStorage()
       if (savedViewportState) {
         viewportState = savedViewportState
-        console.log('DiagramEditor: Loaded viewport state from storage', viewportState)
       }
     } catch (error) {
       console.warn('DiagramEditor: Failed to load viewport state:', error)
@@ -220,17 +214,10 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
       scrollToContent: false, // Critical: preserve viewport position
     }
 
-    console.log('DiagramEditor: initialData created with viewport', {
-      scrollX: baseAppState.scrollX,
-      scrollY: baseAppState.scrollY,
-      zoom: baseAppState.zoom?.value,
-    })
-
     return data
   }, []) // Deliberately static - viewport is applied once on init
 
   // Debug log for initialData
-  console.log('DiagramEditor: Stable initialData created')
 
   // Diagram Update Handler for new elements
   const handleDiagramUpdate = useCallback(
@@ -243,8 +230,6 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
       try {
         const parsedData = JSON.parse(updatedDiagramData)
         const { elements, appState } = parsedData
-
-        console.log('Aktualisiere Canvas mit neuen Elementen:', elements?.length || 0)
 
         // Restore scene data to ensure proper structure
         const restoreSceneData = (sceneData: any) => {
