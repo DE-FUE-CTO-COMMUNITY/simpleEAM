@@ -170,7 +170,6 @@ export const createDiagramRelationshipUpdates = (diagramJsonString: string) => {
     relationships.containsCapabilities = {
       connect: createConnectClause(grouped.capabilities),
     }
-  } else {
   }
 
   // Applications

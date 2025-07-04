@@ -1,4 +1,4 @@
-import { DataObject as GQLDataObject, DataClassification } from '../../gql/generated'
+import { DataClassification } from '../../gql/generated'
 
 /**
  * Vereinfachte Version des Owner-Typs für Beispieldaten

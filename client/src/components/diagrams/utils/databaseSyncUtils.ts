@@ -320,7 +320,6 @@ export const validateAndSyncElements = async (
 
     // Namen synchronisieren wenn nötig - prüfe verschiedene Quellen für aktuellen Namen
     const currentElementName = element.customData.originalElement?.name
-    const lastSyncedName = element.customData.lastSyncedName
     const databaseName = currentData.name
 
     // Verwende die gemeinsame Funktion für robuste Text-Element-Suche

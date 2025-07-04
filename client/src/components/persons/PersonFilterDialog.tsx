@@ -4,7 +4,6 @@ import React from 'react'
 import GenericFilterDialog, { FilterField } from '../common/GenericFilterDialog'
 import { FilterProps } from './types'
 import { countActiveFilters } from './utils'
-import { GenericFilterState } from '../common/GenericFilterDialog'
 
 const PersonFilterDialog: React.FC<FilterProps> = ({
   filterState,

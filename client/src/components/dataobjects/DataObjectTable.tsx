@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useMemo } from 'react'
+import React, { useMemo, useCallback } from 'react'
 import { Chip, useTheme } from '@mui/material'
 import { GenericTable } from '../common/GenericTable'
 import DataObjectForm, { DataObjectFormValues } from './DataObjectForm'
@@ -62,7 +62,7 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
   }
 
   // Hilfsfunktion für die Anzeige der Datenschutzklasse mit farblichem Chip
-  const getClassificationChip = (classification: DataClassification) => {
+  const getClassificationChip = useCallback((classification: DataClassification) => {
     let color
     let backgroundColor
     let label
@@ -104,7 +104,7 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
         }}
       />
     )
-  }
+  }, [theme])
 
   // Spalten-Definition für die DataObject-Tabelle
   const columns = useMemo(

@@ -4,7 +4,6 @@ import React from 'react'
 import GenericFilterDialog, { FilterField } from '../common/GenericFilterDialog'
 import { FilterProps } from './types'
 import { getLevelLabel, countActiveFilters } from './utils'
-import { CapabilityStatus } from '../../gql/generated'
 
 const CapabilityFilterDialogWithGeneric: React.FC<FilterProps> = ({
   filterState,

@@ -20,7 +20,6 @@ import {
   Chip,
   Autocomplete,
   DialogContentText,
-  useTheme,
 } from '@mui/material'
 import {
   Save as SaveIcon,
