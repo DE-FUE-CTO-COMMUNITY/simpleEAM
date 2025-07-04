@@ -17,11 +17,22 @@ import {
   MenuItem,
 } from '@mui/material'
 import { useMutation, useQuery, useApolloClient } from '@apollo/client'
-import { CREATE_DIAGRAM, UPDATE_DIAGRAM, GET_ARCHITECTURES_FOR_DIAGRAM } from '@/graphql/diagram'
+import {
+  CREATE_DIAGRAM,
+  UPDATE_DIAGRAM,
+  GET_ARCHITECTURES_FOR_DIAGRAM,
+} from '@/graphql/diagram'
+import {
+  LINK_CAPABILITY_TO_ARCHITECTURE,
+  LINK_APPLICATION_TO_ARCHITECTURE,
+  LINK_DATA_OBJECT_TO_ARCHITECTURE,
+  LINK_APPLICATION_INTERFACE_TO_ARCHITECTURE,
+} from '@/graphql/architectureLinking'
 import { useAuth } from '@/lib/auth'
 import {
   createDiagramRelationshipUpdates,
   createDiagramRelationshipUpdatesWithDisconnect,
+  createArchitectureLinkingUpdates,
 } from '../utils/diagramRelationshipUtils'
 import {
   detectNewElements,
@@ -173,6 +184,73 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
 
   const [createDiagram] = useMutation(CREATE_DIAGRAM)
   const [updateDiagram] = useMutation(UPDATE_DIAGRAM)
+
+  // Mutations für Architektur-Verknüpfungen
+  const [linkCapabilityToArchitecture] = useMutation(LINK_CAPABILITY_TO_ARCHITECTURE)
+  const [linkApplicationToArchitecture] = useMutation(LINK_APPLICATION_TO_ARCHITECTURE)
+  const [linkDataObjectToArchitecture] = useMutation(LINK_DATA_OBJECT_TO_ARCHITECTURE)
+  const [linkApplicationInterfaceToArchitecture] = useMutation(LINK_APPLICATION_INTERFACE_TO_ARCHITECTURE)
+
+  // Funktion zum Verknüpfen aller Diagramm-Elemente mit der Architektur
+  const linkElementsToArchitecture = async (diagramJsonString: string, architectureId: string) => {
+    console.log('🔗 Verknüpfe alle Diagramm-Elemente mit Architektur:', architectureId)
+
+    const linkingData = createArchitectureLinkingUpdates(diagramJsonString, architectureId)
+    const promises: Promise<any>[] = []
+
+    // BusinessCapabilities verknüpfen
+    for (const capabilityId of linkingData.capabilities) {
+      promises.push(
+        linkCapabilityToArchitecture({
+          variables: { id: capabilityId, architectureId },
+        }).catch(error => {
+          console.warn('⚠️ Fehler beim Verknüpfen von BusinessCapability', capabilityId, ':', error)
+        })
+      )
+    }
+
+    // Applications verknüpfen
+    for (const applicationId of linkingData.applications) {
+      promises.push(
+        linkApplicationToArchitecture({
+          variables: { id: applicationId, architectureId },
+        }).catch(error => {
+          console.warn('⚠️ Fehler beim Verknüpfen von Application', applicationId, ':', error)
+        })
+      )
+    }
+
+    // DataObjects verknüpfen
+    for (const dataObjectId of linkingData.dataObjects) {
+      promises.push(
+        linkDataObjectToArchitecture({
+          variables: { id: dataObjectId, architectureId },
+        }).catch(error => {
+          console.warn('⚠️ Fehler beim Verknüpfen von DataObject', dataObjectId, ':', error)
+        })
+      )
+    }
+
+    // ApplicationInterfaces verknüpfen
+    for (const interfaceId of linkingData.interfaces) {
+      promises.push(
+        linkApplicationInterfaceToArchitecture({
+          variables: { id: interfaceId, architectureId },
+        }).catch(error => {
+          console.warn('⚠️ Fehler beim Verknüpfen von ApplicationInterface', interfaceId, ':', error)
+        })
+      )
+    }
+
+    // Alle Verknüpfungen parallel ausführen
+    const results = await Promise.allSettled(promises)
+    const successCount = results.filter(result => result.status === 'fulfilled').length
+    const errorCount = results.filter(result => result.status === 'rejected').length
+
+    console.log(`✅ Architektur-Verknüpfung abgeschlossen: ${successCount} erfolgreich, ${errorCount} Fehler`)
+
+    return { successCount, errorCount }
+  }
 
   // Update form fields when dialog opens
   React.useEffect(() => {
@@ -430,6 +508,14 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
 
         const savedDiagram = result.data.updateDiagrams.diagrams[0]
         console.log('✅ Diagramm erfolgreich aktualisiert:', savedDiagram)
+        
+        // Nach erfolgreichem Update: Alle Diagramm-Elemente mit der Architektur verknüpfen
+        try {
+          await linkElementsToArchitecture(dataToSave, selectedArchitecture.id)
+        } catch (linkingError) {
+          console.warn('⚠️ Fehler bei Architektur-Verknüpfung (Diagramm wurde trotzdem gespeichert):', linkingError)
+        }
+        
         return savedDiagram
       } else {
         // Neue Diagramm erstellen (auch bei forceSaveAs)
@@ -452,6 +538,14 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
 
         const savedDiagram = result.data.createDiagrams.diagrams[0]
         console.log('✅ Diagramm erfolgreich erstellt:', savedDiagram)
+        
+        // Nach erfolgreichem Speichern: Alle Diagramm-Elemente mit der Architektur verknüpfen
+        try {
+          await linkElementsToArchitecture(dataToSave, selectedArchitecture.id)
+        } catch (linkingError) {
+          console.warn('⚠️ Fehler bei Architektur-Verknüpfung (Diagramm wurde trotzdem gespeichert):', linkingError)
+        }
+        
         return savedDiagram
       }
     } catch (error) {

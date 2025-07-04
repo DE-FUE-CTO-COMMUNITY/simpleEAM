@@ -298,3 +298,30 @@ export const createDiagramRelationshipUpdatesWithDisconnect = (diagramJsonString
 
   return relationships
 }
+
+/**
+ * Erstellt Architektur-Verknüpfungen für alle Elemente im Diagramm
+ * @param diagramJsonString JSON-String des Diagramms
+ * @param architectureId ID der Architektur, mit der alle Elemente verknüpft werden sollen
+ * @returns Objekt mit gruppierten Element-IDs für Architektur-Verknüpfungen
+ */
+export const createArchitectureLinkingUpdates = (
+  diagramJsonString: string,
+  architectureId: string
+) => {
+  console.log('🏗️ Erstelle Architektur-Verknüpfungen für Architektur:', architectureId)
+  
+  const elements = extractDatabaseElementsFromDiagram(diagramJsonString)
+  const grouped = groupElementsByType(elements)
+
+  const linkingData = {
+    architectureId,
+    capabilities: grouped.capabilities,
+    applications: grouped.applications,
+    dataObjects: grouped.dataObjects,
+    interfaces: grouped.interfaces,
+  }
+
+  console.log('📋 Architektur-Verknüpfungs-Daten:', linkingData)
+  return linkingData
+}
