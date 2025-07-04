@@ -20,6 +20,7 @@ import {
   Chip,
   Autocomplete,
   DialogContentText,
+  useTheme,
 } from '@mui/material'
 import {
   Save as SaveIcon,
@@ -94,6 +95,7 @@ export interface FieldConfig {
   getOptionLabel?: (option: any) => string // Für Autocomplete
   isOptionEqualToValue?: (option: any, value: any) => boolean // Für korrekten Objektvergleich in Autocomplete
   renderOption?: (props: React.HTMLAttributes<HTMLLIElement>, option: any) => React.ReactNode // Für benutzerdefinierte Darstellung von Optionen
+  getOptionBackgroundColor?: (option: any) => string | undefined // Für farbliche Markierung von Optionen (wird für Chip-Hintergrund verwendet)
   loadingOptions?: boolean // Für Autocomplete während des Ladens
   loadingText?: string // Text während des Ladens
   onChange?: (value: any) => void // Callback für Feldwert-Änderungen
@@ -192,8 +194,30 @@ const GenericForm: React.FC<GenericFormProps> = ({
   entityName = 'Eintrag',
   metadata,
 }) => {
+  const theme = useTheme()
   const [activeTab, setActiveTab] = useState(0)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+
+  // Helper-Funktion um die Chip-Farbe zu bestimmen
+  const getChipBackgroundColor = (field: FieldConfig, option: any): string | undefined => {
+    if (field.getOptionBackgroundColor) {
+      // Hier müssen wir sicherstellen, dass wir die ID richtig extrahieren
+      const optionValue =
+        typeof option === 'object' && 'value' in option
+          ? option.value // Wenn option ein Objekt mit value-Property ist
+          : option // Sonst direkt option verwenden (String)
+
+      // Debug-Ausgabe
+      console.debug('Getting background color for option:', option, 'optionValue:', optionValue)
+
+      const backgroundColor = field.getOptionBackgroundColor(optionValue)
+      if (backgroundColor) {
+        // Wenn eine benutzerdefinierte Farbe zurückgegeben wird, verwende sie
+        return backgroundColor
+      }
+    }
+    return undefined
+  }
 
   // Reactive form state tracking using useStore für bessere Performance
   const formState = useStore(form.store, state => ({
@@ -573,14 +597,20 @@ const GenericForm: React.FC<GenericFormProps> = ({
                 {field.type === 'autocomplete' && (
                   <Autocomplete
                     options={
-                      // Sortiere die Optionen alphabetisch nach dem Label
-                      (field.options || []).slice().sort((a, b) => {
-                        const labelA = typeof a === 'string' ? a : a?.label || ''
-                        const labelB = typeof b === 'string' ? b : b?.label || ''
-                        return labelA.localeCompare(labelB, 'de', { sensitivity: 'base' })
-                      })
+                      // Debug-Log für Optionen
+                      (() => {
+                        console.log(`Autocomplete options for ${field.name}:`, field.options);
+                        return (field.options || []).slice().sort((a, b) => {
+                          const labelA = typeof a === 'string' ? a : a?.label || '';
+                          const labelB = typeof b === 'string' ? b : b?.label || '';
+                          return labelA.localeCompare(labelB, 'de', { sensitivity: 'base' });
+                        });
+                      })()
                     }
-                    value={formField.state.value}
+                    value={(() => {
+                      console.log(`Autocomplete value for ${field.name}:`, formField.state.value);
+                      return formField.state.value;
+                    })()}
                     onChange={(_, newValue) => {
                       // Extrahiere IDs/Werte aus Objekten bei Multiple-Auswahl
                       let processedValue = newValue
@@ -658,7 +688,91 @@ const GenericForm: React.FC<GenericFormProps> = ({
                     }
                     loading={field.loadingOptions}
                     loadingText={field.loadingText || 'Wird geladen...'}
-                    renderOption={field.renderOption}
+                    renderOption={
+                      field.renderOption ||
+                      ((props, option) => {
+                        // Standard-Rendering für Options mit optionaler Farbhinterlegung
+                        let backgroundColor
+                        try {
+                          // Extrahiere die Option-ID für die Farbbestimmung
+                          const optionId =
+                            typeof option === 'object' && 'value' in option ? option.value : option
+
+                          if (field.getOptionBackgroundColor) {
+                            backgroundColor = field.getOptionBackgroundColor(optionId)
+                          }
+                        } catch (error) {
+                          console.error('Error in renderOption:', error)
+                        }
+
+                        return (
+                          <li {...props} style={{ backgroundColor: backgroundColor || undefined }}>
+                            {typeof option === 'object' && 'label' in option
+                              ? option.label
+                              : option}
+                          </li>
+                        )
+                      })
+                    }
+                    renderTags={
+                      field.multiple
+                        ? (value, getTagProps) =>
+                            value.map((option, index) => {
+                              const tagProps = getTagProps({ index })
+                              // Für die Farbbestimmung und Label-Anzeige müssen wir das ursprüngliche Option-Objekt finden
+                              const originalOption = field.options?.find(opt => {
+                                if (typeof opt === 'object' && 'value' in opt) {
+                                  // Vergleiche die Werte direkt
+                                  if (typeof option === 'object' && 'value' in option) {
+                                    return opt.value === option.value
+                                  }
+                                  return opt.value === option
+                                }
+                                return opt === option
+                              })
+
+                              // Für die Farbmarkierung verwenden wir die ID (value oder direkter String)
+                              const optionId =
+                                typeof option === 'object' && 'value' in option
+                                  ? option.value
+                                  : option
+
+                              // Hier liegt der Schlüssel - wir müssen die ID direkt verwenden, nicht das Objekt
+                              let chipBackgroundColor = undefined
+                              if (field.getOptionBackgroundColor) {
+                                try {
+                                  chipBackgroundColor = field.getOptionBackgroundColor(optionId)
+                                } catch (error) {
+                                  console.error('Error getting background color:', error)
+                                }
+                              }
+
+                              // Label richtig extrahieren - entweder aus dem Original-Option Objekt oder über getOptionLabel
+                              let chipLabel = option
+                              if (originalOption) {
+                                chipLabel =
+                                  typeof originalOption === 'object' && 'label' in originalOption
+                                    ? originalOption.label
+                                    : originalOption
+                              } else if (field.getOptionLabel) {
+                                chipLabel = field.getOptionLabel(option)
+                              }
+
+                              return (
+                                <Chip
+                                  variant="outlined"
+                                  key={tagProps.key}
+                                  label={chipLabel}
+                                  disabled={tagProps.disabled}
+                                  onDelete={tagProps.onDelete}
+                                  sx={{
+                                    backgroundColor: chipBackgroundColor || 'transparent',
+                                  }}
+                                />
+                              )
+                            })
+                        : undefined
+                    }
                     renderInput={params => (
                       <TextField
                         {...params}
@@ -692,6 +806,7 @@ const GenericForm: React.FC<GenericFormProps> = ({
                     renderValue={(value, getItemProps) =>
                       value.map((option, index) => {
                         const itemProps = getItemProps({ index })
+                        const chipBackgroundColor = getChipBackgroundColor(field, option)
                         return (
                           <Chip
                             variant="outlined"
@@ -702,6 +817,9 @@ const GenericForm: React.FC<GenericFormProps> = ({
                             data-tag-index={itemProps['data-item-index']}
                             tabIndex={itemProps.tabIndex}
                             className={itemProps.className}
+                            sx={{
+                              backgroundColor: chipBackgroundColor || 'transparent',
+                            }}
                           />
                         )
                       })

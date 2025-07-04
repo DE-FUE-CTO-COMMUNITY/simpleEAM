@@ -310,7 +310,7 @@ export const createArchitectureLinkingUpdates = (
   architectureId: string
 ) => {
   console.log('🏗️ Erstelle Architektur-Verknüpfungen für Architektur:', architectureId)
-  
+
   const elements = extractDatabaseElementsFromDiagram(diagramJsonString)
   const grouped = groupElementsByType(elements)
 

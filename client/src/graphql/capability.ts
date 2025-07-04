@@ -47,6 +47,10 @@ export const GET_CAPABILITIES = gql`
         id
         name
       }
+      depictedInDiagrams {
+        id
+        title
+      }
     }
   }
 `
@@ -85,6 +89,10 @@ export const GET_CAPABILITY = gql`
       partOfArchitectures {
         id
         name
+      }
+      depictedInDiagrams {
+        id
+        title
       }
     }
   }

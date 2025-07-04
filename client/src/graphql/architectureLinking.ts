@@ -6,9 +6,7 @@ export const LINK_CAPABILITY_TO_ARCHITECTURE = gql`
     updateBusinessCapabilities(
       where: { id: { eq: $id } }
       update: {
-        partOfArchitectures: {
-          connect: [{ where: { node: { id: { eq: $architectureId } } } }]
-        }
+        partOfArchitectures: { connect: [{ where: { node: { id: { eq: $architectureId } } } }] }
       }
     ) {
       businessCapabilities {
@@ -29,9 +27,7 @@ export const LINK_APPLICATION_TO_ARCHITECTURE = gql`
     updateApplications(
       where: { id: { eq: $id } }
       update: {
-        partOfArchitectures: {
-          connect: [{ where: { node: { id: { eq: $architectureId } } } }]
-        }
+        partOfArchitectures: { connect: [{ where: { node: { id: { eq: $architectureId } } } }] }
       }
     ) {
       applications {
@@ -52,9 +48,7 @@ export const LINK_DATA_OBJECT_TO_ARCHITECTURE = gql`
     updateDataObjects(
       where: { id: { eq: $id } }
       update: {
-        partOfArchitectures: {
-          connect: [{ where: { node: { id: { eq: $architectureId } } } }]
-        }
+        partOfArchitectures: { connect: [{ where: { node: { id: { eq: $architectureId } } } }] }
       }
     ) {
       dataObjects {
@@ -75,9 +69,7 @@ export const LINK_APPLICATION_INTERFACE_TO_ARCHITECTURE = gql`
     updateApplicationInterfaces(
       where: { id: { eq: $id } }
       update: {
-        partOfArchitectures: {
-          connect: [{ where: { node: { id: { eq: $architectureId } } } }]
-        }
+        partOfArchitectures: { connect: [{ where: { node: { id: { eq: $architectureId } } } }] }
       }
     ) {
       applicationInterfaces {

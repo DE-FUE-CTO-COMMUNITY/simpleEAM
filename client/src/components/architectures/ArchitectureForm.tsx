@@ -1,9 +1,10 @@
 'use client'
 
 import React, { useEffect } from 'react'
-import { useForm } from '@tanstack/react-form'
+import { useForm, useStore } from '@tanstack/react-form'
 import { z } from 'zod'
 import { useQuery } from '@apollo/client'
+import { useTheme } from '@mui/material/styles'
 import { Architecture, ArchitectureDomain, ArchitectureType } from '../../gql/generated'
 import { GET_PERSONS } from '@/graphql/person'
 import { GET_APPLICATIONS } from '@/graphql/application'
@@ -66,6 +67,8 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
   loading = false,
   onEditMode,
 }) => {
+  const theme = useTheme()
+
   // Personen laden
   const { data: personData, loading: personLoading } = useQuery(GET_PERSONS)
 
@@ -221,47 +224,119 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
 
   // Alle Werte werden direkt im useEffect-Hook extrahiert
 
+  // 1. useEffect für das Initialisieren und Zurücksetzen des Formulars beim Öffnen/Schließen
   useEffect(() => {
     if (!isOpen) {
+      // Dialog wird geschlossen - setze Form zurück
       form.reset()
-    } else if (architecture) {
-      // Aktualisiere das Formular bei Änderungen am Architecture-Objekt
-      try {
-        // Sicherstellen, dass wir ein gültiges Date-Objekt haben
-        const timestamp = architecture.timestamp
-          ? new Date(architecture.timestamp)
-          : new Date(1735689600000)
-
-        const resetValues = {
-          name: architecture.name || '',
-          description: architecture.description || '',
-          domain: architecture.domain || ArchitectureDomain.ENTERPRISE,
-          type: architecture.type || ArchitectureType.CURRENT_STATE,
-          timestamp: timestamp,
-          tags: architecture.tags || [],
-          ownerId:
-            architecture.owners && architecture.owners.length > 0 ? architecture.owners[0].id : '',
-          containsApplicationIds: architecture.containsApplications?.map(app => app.id) || [],
-          containsCapabilityIds: architecture.containsCapabilities?.map(cap => cap.id) || [],
-          containsDataObjectIds: architecture.containsDataObjects?.map(obj => obj.id) || [],
-          diagramIds: architecture.diagrams?.map(diag => diag.id) || [],
-          parentArchitectureId:
-            architecture.parentArchitecture && architecture.parentArchitecture.length > 0
-              ? architecture.parentArchitecture[0].id
-              : '',
-        }
-
-        form.reset(resetValues)
-      } catch (error) {
-        // Bei Fehler auf Standardwerte zurückfallen
-        console.warn('Fehler beim Zurücksetzen des Formulars:', error)
-        form.reset(defaultValues)
-      }
-    } else {
-      // Wenn kein Architecture-Objekt übergeben wurde, aber das Formular geöffnet ist
+      return
+    }
+    
+    // Dialog wurde gerade geöffnet - form initialisieren
+    if (mode === 'create') {
+      // Im Create-Modus mit defaultValues initialisieren
+      console.log('[DEBUG] Initializing form for create mode')
       form.reset(defaultValues)
     }
-  }, [isOpen, form, architecture, defaultValues])
+    // Bei 'edit' und 'view' wird das Form separat mit architecture-Daten initialisiert
+  }, [isOpen]) // Nur abhängig vom Dialog-Status
+  
+  // 2. Separater useEffect für die Aktualisierung mit Architecture-Daten
+  // Dieser wird nur ausgeführt, wenn architecture sich ändert oder der Mode wechselt
+  const architectureId = architecture?.id // Stabile ID-Referenz
+  
+  useEffect(() => {
+    // Wenn kein Architecture-Objekt oder Dialog nicht geöffnet, nichts tun
+    if (!architecture || !isOpen || mode === 'create') {
+      return
+    }
+    
+    // Aktualisiere das Formular mit Architecture-Daten
+    try {
+      console.log('[DEBUG] Updating form with architecture data', architectureId)
+      
+      // Sicherstellen, dass wir ein gültiges Date-Objekt haben
+      const timestamp = architecture.timestamp
+        ? new Date(architecture.timestamp)
+        : new Date(1735689600000)
+
+      const resetValues = {
+        name: architecture.name || '',
+        description: architecture.description || '',
+        domain: architecture.domain || ArchitectureDomain.ENTERPRISE,
+        type: architecture.type || ArchitectureType.CURRENT_STATE,
+        timestamp: timestamp,
+        tags: architecture.tags || [],
+        ownerId:
+          architecture.owners && architecture.owners.length > 0 ? architecture.owners[0].id : '',
+        containsApplicationIds: architecture.containsApplications?.map(app => app.id) || [],
+        containsCapabilityIds: architecture.containsCapabilities?.map(cap => cap.id) || [],
+        containsDataObjectIds: architecture.containsDataObjects?.map(obj => obj.id) || [],
+        diagramIds: architecture.diagrams?.map(diag => diag.id) || [],
+        parentArchitectureId:
+          architecture.parentArchitecture && architecture.parentArchitecture.length > 0
+            ? architecture.parentArchitecture[0].id
+            : '',
+      }
+
+      console.log('[DEBUG] Setting form values:', resetValues);
+      
+      // Verwende setValues statt reset, um keine neuen Re-Renders auszulösen
+      Object.entries(resetValues).forEach(([key, value]) => {
+        form.setFieldValue(key as any, value)
+      })
+    } catch (error) {
+      console.warn('Fehler beim Aktualisieren des Formulars:', error)
+    }
+  }, [architectureId, isOpen, mode])
+
+  // Beobachte das diagramIds-Feld
+  const diagramIds = useStore(form.store, (state: any) => state.values.diagramIds)
+
+  // Verwende useRef, um den vorherigen Zustand zu speichern, ohne Rerendering auszulösen
+  const prevDiagramIdsRef = React.useRef<string[]>()
+
+  // Debug-Output für die Form-Werte
+  console.log('Form values:', {
+    containsApplicationIds: form.getFieldValue('containsApplicationIds'),
+    containsCapabilityIds: form.getFieldValue('containsCapabilityIds'),
+    containsDataObjectIds: form.getFieldValue('containsDataObjectIds'),
+    diagramIds: form.getFieldValue('diagramIds')
+  });
+
+  // Debug-Output für Daten
+  console.log('Data:', {
+    applicationData: applicationData?.applications?.length,
+    capabilityData: capabilityData?.businessCapabilities?.length,
+    dataObjectData: dataObjectData?.dataObjects?.length,
+    diagramData: diagramData?.diagrams?.length
+  });
+
+  // Debug-Output für Modus und Architecture
+  console.log('[DEBUG] Mode:', mode, 'Architecture:', !!architecture, 'isOpen:', isOpen);
+
+  useEffect(() => {
+    // Vergleiche aktuelle mit vorherigen Diagramm-IDs
+    const prevDiagramIds = prevDiagramIdsRef.current
+
+    // Aktualisiere Referenz für nächsten Durchlauf
+    prevDiagramIdsRef.current = diagramIds
+
+    // Nur fortfahren, wenn es eine tatsächliche Änderung gibt und nicht beim ersten Render
+    if (prevDiagramIds && JSON.stringify(prevDiagramIds) !== JSON.stringify(diagramIds)) {
+      // Verzögerung für bessere UI-Erfahrung
+      setTimeout(() => {
+        // Setze die Felder zurück, um ein Re-Rendering zu erzwingen
+        const appIds = form.getFieldValue('containsApplicationIds')
+        const capIds = form.getFieldValue('containsCapabilityIds')
+        const objIds = form.getFieldValue('containsDataObjectIds')
+
+        if (appIds) form.setFieldValue('containsApplicationIds', [...appIds])
+        if (capIds) form.setFieldValue('containsCapabilityIds', [...capIds])
+        if (objIds) form.setFieldValue('containsDataObjectIds', [...objIds])
+      }, 100)
+    }
+  }, [diagramIds, form])
 
   // Tab-Konfiguration für die drei Tabs
   const tabs: TabConfig[] = [
@@ -383,7 +458,7 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
     },
   ]
 
-  // Felder für den zweiten Tab (Architekturelemente)
+  // Felder für den zweiten Tab (Architekturelemente) mit Debug-Ausgaben
   const elementsFields: FieldConfigWithSelect[] = [
     {
       name: 'containsApplicationIds',
@@ -392,23 +467,75 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
       tabId: 'elements',
       multiple: true,
       size: { xs: 12, md: 12 },
-      options:
-        applicationData?.applications?.map(
+      options: (() => {
+        console.log('[DEBUG] ApplicationData:', applicationData?.applications);
+        const options = applicationData?.applications?.map(
           (app: { id: string; name: string }): SelectOption => ({
             value: app.id,
             label: app.name,
           })
-        ) || [],
+        ) || [];
+        console.log('[DEBUG] Application options generated:', options);
+        return options;
+      })(),
       loadingOptions: applicationLoading,
       getOptionLabel: (option: any) => {
+        console.log('[DEBUG] getOptionLabel for application called with:', option);
         if (typeof option === 'string') {
           // Direkte ID - suche passende Option
           const matchingApp = applicationData?.applications?.find(
             (app: { id: string; name: string }) => app.id === option
           )
-          return matchingApp?.name || option
+          const result = matchingApp?.name || option;
+          console.log('[DEBUG] getOptionLabel for application returning for string:', result);
+          return result;
         }
+        console.log('[DEBUG] getOptionLabel for application returning for object:', option?.label || '');
         return option?.label || ''
+      },
+      getOptionBackgroundColor: (option: any) => {
+        console.log('[DEBUG] getOptionBackgroundColor for application called with:', option);
+        try {
+          // Finde die Application und prüfe, ob sie in Diagrammen der aktuellen Architektur dargestellt ist
+          const appId = typeof option === 'string' ? option : option?.value
+          console.log('[DEBUG] Application ID extracted:', appId);
+
+          // Sicherstellen, dass applicationData und applications existieren
+          if (!applicationData?.applications) {
+            console.log('applicationData?.applications nicht verfügbar');
+            return undefined
+          }
+
+          const app = applicationData.applications.find((app: any) => app.id === appId)
+
+          // Wenn die App nicht gefunden wurde, keine Hintergrundfarbe anwenden
+          if (!app) {
+            console.log(`Application mit ID ${appId} nicht gefunden`);
+            return undefined
+          }
+
+          // Hole die IDs der Diagramme, die zu dieser Architektur gehören
+          const architectureDiagramIds = form.getFieldValue('diagramIds') || []
+          console.log('architectureDiagramIds:', architectureDiagramIds);
+
+          // Prüfe, ob die App in mindestens einem Diagramm dieser Architektur dargestellt ist
+          const appDiagramIds = (app.depictedInDiagrams || []).map((diag: any) => diag.id)
+          console.log('appDiagramIds:', appDiagramIds);
+
+          // Schnittmenge zwischen den Diagrammen der App und den Diagrammen der Architektur
+          const isDepictedInArchitectureDiagrams = appDiagramIds.some((diagId: string) =>
+            architectureDiagramIds.includes(diagId)
+          )
+          console.log('isDepictedInArchitectureDiagrams:', isDepictedInArchitectureDiagrams);
+
+          // Markiere gelb, wenn die App nicht in einem Diagramm dieser Architektur dargestellt ist
+          const backgroundColor = !isDepictedInArchitectureDiagrams ? theme.palette.warning.light : undefined;
+          console.log('[DEBUG] Application background color returning:', backgroundColor);
+          return backgroundColor;
+        } catch (error) {
+          console.error('Error in application getOptionBackgroundColor:', error)
+          return undefined
+        }
       },
       isOptionEqualToValue: (option: any, value: any) => {
         if (typeof value === 'string') {
@@ -433,13 +560,63 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
         ) || [],
       loadingOptions: capabilityLoading,
       getOptionLabel: (option: any) => {
+        console.log('[DEBUG] getOptionLabel for capability called with:', option);
         if (typeof option === 'string') {
           const matchingCap = capabilityData?.businessCapabilities?.find(
             (cap: { id: string; name: string }) => cap.id === option
           )
-          return matchingCap?.name || option
+          const result = matchingCap?.name || option;
+          console.log('[DEBUG] getOptionLabel for capability returning for string:', result);
+          return result;
         }
+        console.log('[DEBUG] getOptionLabel for capability returning for object:', option?.label || '');
         return option?.label || ''
+      },
+      getOptionBackgroundColor: (option: any) => {
+        console.log('[DEBUG] getOptionBackgroundColor for capability called with:', option);
+        try {
+          // Finde die BusinessCapability und prüfe, ob sie in Diagrammen der aktuellen Architektur dargestellt ist
+          const capId = typeof option === 'string' ? option : option?.value
+          console.log('[DEBUG] Capability ID extracted:', capId);
+
+          // Sicherstellen, dass capabilityData und businessCapabilities existieren
+          if (!capabilityData?.businessCapabilities) {
+            return undefined
+          }
+
+          const capability = capabilityData.businessCapabilities.find(
+            (cap: any) => cap.id === capId
+          )
+
+          // Wenn die Capability nicht gefunden wurde, keine Hintergrundfarbe anwenden
+          if (!capability) {
+            return undefined
+          }
+
+          // Hole die IDs der Diagramme, die zu dieser Architektur gehören
+          const architectureDiagramIds = form.getFieldValue('diagramIds') || []
+          console.log('[DEBUG] Capability architectureDiagramIds:', architectureDiagramIds);
+
+          // Prüfe, ob die Capability in mindestens einem Diagramm dieser Architektur dargestellt ist
+          const capabilityDiagramIds = (capability.depictedInDiagrams || []).map(
+            (diag: any) => diag.id
+          )
+          console.log('[DEBUG] capabilityDiagramIds:', capabilityDiagramIds);
+
+          // Schnittmenge zwischen den Diagrammen der Capability und den Diagrammen der Architektur
+          const isDepictedInArchitectureDiagrams = capabilityDiagramIds.some((diagId: string) =>
+            architectureDiagramIds.includes(diagId)
+          )
+          console.log('[DEBUG] Capability isDepictedInArchitectureDiagrams:', isDepictedInArchitectureDiagrams);
+
+          // Markiere gelb, wenn die Capability nicht in einem Diagramm dieser Architektur dargestellt ist
+          const backgroundColor = !isDepictedInArchitectureDiagrams ? theme.palette.warning.light : undefined;
+          console.log('[DEBUG] Capability background color returning:', backgroundColor);
+          return backgroundColor;
+        } catch (error) {
+          console.error('Error in capability getOptionBackgroundColor:', error)
+          return undefined
+        }
       },
       isOptionEqualToValue: (option: any, value: any) => {
         if (typeof value === 'string') {
@@ -464,13 +641,61 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
         ) || [],
       loadingOptions: dataObjectLoading,
       getOptionLabel: (option: any) => {
+        console.log('[DEBUG] getOptionLabel for dataObject called with:', option);
         if (typeof option === 'string') {
           const matchingObj = dataObjectData?.dataObjects?.find(
             (obj: { id: string; name: string }) => obj.id === option
           )
-          return matchingObj?.name || option
+          const result = matchingObj?.name || option;
+          console.log('[DEBUG] getOptionLabel for dataObject returning for string:', result);
+          return result;
         }
+        console.log('[DEBUG] getOptionLabel for dataObject returning for object:', option?.label || '');
         return option?.label || ''
+      },
+      getOptionBackgroundColor: (option: any) => {
+        console.log('[DEBUG] getOptionBackgroundColor for dataObject called with:', option);
+        try {
+          // Finde das DataObject und prüfe, ob es in Diagrammen der aktuellen Architektur dargestellt ist
+          const objId = typeof option === 'string' ? option : option?.value
+          console.log('[DEBUG] DataObject ID extracted:', objId);
+
+          // Sicherstellen, dass dataObjectData existiert
+          if (!dataObjectData?.dataObjects) {
+            return undefined
+          }
+
+          const dataObject = dataObjectData.dataObjects.find((obj: any) => obj.id === objId)
+
+          // Wenn das DataObject nicht gefunden wurde, keine Hintergrundfarbe anwenden
+          if (!dataObject) {
+            return undefined
+          }
+
+          // Hole die IDs der Diagramme, die zu dieser Architektur gehören
+          const architectureDiagramIds = form.getFieldValue('diagramIds') || []
+          console.log('[DEBUG] DataObject architectureDiagramIds:', architectureDiagramIds);
+
+          // Prüfe, ob das DataObject in mindestens einem Diagramm dieser Architektur dargestellt ist
+          const dataObjectDiagramIds = (dataObject.depictedInDiagrams || []).map(
+            (diag: any) => diag.id
+          )
+          console.log('[DEBUG] dataObjectDiagramIds:', dataObjectDiagramIds);
+
+          // Schnittmenge zwischen den Diagrammen des DataObjects und den Diagrammen der Architektur
+          const isDepictedInArchitectureDiagrams = dataObjectDiagramIds.some((diagId: string) =>
+            architectureDiagramIds.includes(diagId)
+          )
+          console.log('[DEBUG] DataObject isDepictedInArchitectureDiagrams:', isDepictedInArchitectureDiagrams);
+
+          // Markiere gelb, wenn das DataObject nicht in einem Diagramm dieser Architektur dargestellt ist
+          const backgroundColor = !isDepictedInArchitectureDiagrams ? theme.palette.warning.light : undefined;
+          console.log('[DEBUG] DataObject background color returning:', backgroundColor);
+          return backgroundColor;
+        } catch (error) {
+          console.error('Error in dataObject getOptionBackgroundColor:', error)
+          return undefined
+        }
       },
       isOptionEqualToValue: (option: any, value: any) => {
         if (typeof value === 'string') {
