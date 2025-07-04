@@ -196,8 +196,11 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
     () => capability?.partOfArchitectures?.map(arch => arch.id) ?? [],
     [capability?.partOfArchitectures]
   )
-  // Vorläufig leerer Array, da partOfDiagrams noch nicht im BusinessCapability Typ enthalten ist
-  const capabilityPartOfDiagrams = React.useMemo(() => [], [])
+  // Diagramme, in denen die Capability dargestellt wird
+  const capabilityPartOfDiagrams = React.useMemo(
+    () => capability?.depictedInDiagrams?.map(diagram => diagram.id) ?? [],
+    [capability?.depictedInDiagrams]
+  )
 
   useEffect(() => {
     if (!isOpen) {
@@ -484,7 +487,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
         diagramData?.diagrams?.map(
           (diagram: any): SelectOption => ({
             value: diagram.id,
-            label: diagram.name,
+            label: diagram.title,
           })
         ) || [],
       loadingOptions: diagramLoading,
@@ -495,7 +498,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
           const matchingDiagram = diagramData?.diagrams?.find(
             (diagram: any) => diagram.id === option
           )
-          return matchingDiagram?.name || option
+          return matchingDiagram?.title || option
         }
         return option?.label || ''
       },
