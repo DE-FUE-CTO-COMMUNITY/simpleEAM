@@ -194,7 +194,6 @@ const GenericForm: React.FC<GenericFormProps> = ({
   entityName = 'Eintrag',
   metadata,
 }) => {
-  const theme = useTheme()
   const [activeTab, setActiveTab] = useState(0)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
@@ -679,22 +678,9 @@ const GenericForm: React.FC<GenericFormProps> = ({
                     renderOption={
                       field.renderOption ||
                       ((props, option) => {
-                        // Standard-Rendering für Options mit optionaler Farbhinterlegung
-                        let backgroundColor
-                        try {
-                          // Extrahiere die Option-ID für die Farbbestimmung
-                          const optionId =
-                            typeof option === 'object' && 'value' in option ? option.value : option
-
-                          if (field.getOptionBackgroundColor) {
-                            backgroundColor = field.getOptionBackgroundColor(optionId)
-                          }
-                        } catch (error) {
-                          console.error('Error in renderOption:', error)
-                        }
-
+                        // Standard-Rendering für Options ohne Farbhinterlegung
                         return (
-                          <li {...props} style={{ backgroundColor: backgroundColor || undefined }}>
+                          <li {...props}>
                             {typeof option === 'object' && 'label' in option
                               ? option.label
                               : option}
