@@ -112,12 +112,6 @@ export const useDiagramHandlers = (
   // Open Diagram Handler
   const handleOpenDiagram = useCallback(
     async (diagram: any) => {
-      console.log('handleOpenDiagram: Starting to open diagram', {
-        diagramId: diagram.id,
-        diagramTitle: diagram.title,
-        hasJson: !!diagram.diagramJson,
-      })
-
       if (!excalidrawAPI || !diagram.diagramJson) {
         console.warn('Cannot open diagram: missing API or diagram data')
         setNotification({
@@ -131,23 +125,13 @@ export const useDiagramHandlers = (
       try {
         // Parse the diagram JSON data
         const diagramData = JSON.parse(diagram.diagramJson)
-        console.log('handleOpenDiagram: Parsed diagram data', {
-          elementsCount: diagramData.elements?.length || 0,
-        })
-
         // Try to sync from database with Docker-safe error handling
         let syncedDiagramData
         try {
           syncedDiagramData = await syncDiagramOnOpen(apolloClient, diagramData)
-          console.log('handleOpenDiagram: Synced from database', {
-            elementsCount: syncedDiagramData?.elements?.length || 0,
-          })
         } catch (syncError) {
           console.warn('Database sync failed, using local data:', syncError)
           syncedDiagramData = diagramData
-          console.log('handleOpenDiagram: Using local data', {
-            elementsCount: syncedDiagramData?.elements?.length || 0,
-          })
         }
 
         const sceneData = {
@@ -171,7 +155,6 @@ export const useDiagramHandlers = (
         // Restore viewport state (position and zoom) if available
         const savedViewportState = loadViewportStateFromStorage()
         if (savedViewportState) {
-          console.log('handleOpenDiagram: Applying saved viewport state', savedViewportState)
           sceneData.appState.scrollX = savedViewportState.scrollX
           sceneData.appState.scrollY = savedViewportState.scrollY
           sceneData.appState.zoom = { value: savedViewportState.zoom }
@@ -179,25 +162,12 @@ export const useDiagramHandlers = (
 
         const restoredScene = restoreSceneData(sceneData)
 
-        console.log('handleOpenDiagram: Scene prepared', {
-          elementsCount: restoredScene.elements?.length || 0,
-          hasAppState: !!restoredScene.appState,
-          scrollX: restoredScene.appState?.scrollX,
-          scrollY: restoredScene.appState?.scrollY,
-          zoom: restoredScene.appState?.zoom?.value,
-        })
-
         // Sofort die Excalidraw-Szene aktualisieren (mit integrierter Viewport-Position)
-        console.log('handleOpenDiagram: Updating scene immediately')
         excalidrawAPI.updateScene(restoredScene)
 
         // Apply viewport state with delay to ensure it takes effect after Excalidraw initialization
         if (savedViewportState) {
           setTimeout(() => {
-            console.log(
-              'handleOpenDiagram: Re-applying viewport state with delay',
-              savedViewportState
-            )
             excalidrawAPI.updateScene({
               appState: {
                 scrollX: savedViewportState.scrollX,
@@ -210,7 +180,6 @@ export const useDiagramHandlers = (
 
         // State-Updates können asynchron erfolgen
         setTimeout(() => {
-          console.log('handleOpenDiagram: Updating React state')
           setCurrentDiagram(diagram)
           setCurrentScene(restoredScene)
           setHasUnsavedChanges(false)
@@ -625,8 +594,6 @@ export const useDiagramHandlers = (
           currentItemFontFamily: appState.currentItemFontFamily,
         },
       }
-
-      console.log('Starting manual database synchronization...')
 
       // Use syncDiagramOnOpen for manual synchronization (loads fresh data from database)
       const syncedDiagramData = await syncDiagramOnOpen(apolloClient, sceneData)

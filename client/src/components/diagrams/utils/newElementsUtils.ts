@@ -354,26 +354,11 @@ export const updateElementsWithDatabaseReferences = (
 ): DiagramElement[] => {
   const elementMap = new Map(createdElements.map(el => [el.elementId, el]))
 
-  console.log('updateElementsWithDatabaseReferences:', {
-    totalElements: elements.length,
-    createdElements: createdElements.length,
-    elementMap: Array.from(elementMap.keys()),
-  })
-
   return elements.map(element => {
     const createdElement = elementMap.get(element.id)
     if (!createdElement) {
       return element
     }
-
-    console.log(`Updating element ${element.id} with database reference:`, {
-      originalStrokeColor: element.strokeColor,
-      originalStrokeWidth: element.strokeWidth,
-      newStrokeColor: '#000000',
-      newStrokeWidth: 2,
-      databaseId: createdElement.databaseId,
-      elementType: createdElement.elementType,
-    })
 
     // Update element with database reference using correct Excalidraw properties
     const updatedElement = {
@@ -396,7 +381,6 @@ export const updateElementsWithDatabaseReferences = (
       },
     }
 
-    console.log('Updated element result:', updatedElement)
     return updatedElement
   })
 }

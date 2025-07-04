@@ -85,19 +85,6 @@ export function createDynamicTheme(): ReturnType<typeof createTheme> {
     process.env.NEXT_PUBLIC_FONT_FAMILY ||
     '"Roboto", "Helvetica", "Arial", sans-serif'
 
-  // Debug-Ausgabe
-  console.log('🎨 Dynamic Theme Debug Information:')
-  console.log('NEXT_PUBLIC_THEME_PRIMARY_COLOR:', process.env.NEXT_PUBLIC_THEME_PRIMARY_COLOR)
-  console.log('NEXT_PUBLIC_THEME_SECONDARY_COLOR:', process.env.NEXT_PUBLIC_THEME_SECONDARY_COLOR)
-  console.log('NEXT_PUBLIC_THEME_FONT_FAMILY:', process.env.NEXT_PUBLIC_THEME_FONT_FAMILY)
-  console.log('Resolved Primary Color:', primaryColor)
-  console.log('Resolved Secondary Color:', secondaryColor)
-  console.log('Resolved Font Family:', fontFamily)
-  console.log(
-    'All NEXT_PUBLIC_THEME env vars:',
-    Object.keys(process.env).filter(key => key.startsWith('NEXT_PUBLIC_THEME_'))
-  )
-
   // Farbvarianten generieren
   const primaryVariants = generateColorVariants(primaryColor)
   const secondaryVariants = generateColorVariants(secondaryColor)

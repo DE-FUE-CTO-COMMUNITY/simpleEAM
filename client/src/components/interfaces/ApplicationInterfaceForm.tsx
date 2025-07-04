@@ -196,24 +196,6 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
     }
   )
 
-  // Debug-Logs für die Interface-Daten
-  React.useEffect(() => {
-    console.log('ApplicationInterface Debug:', {
-      applicationInterface,
-      applicationInterfacesLoading,
-      diagramsLoading,
-      diagramsCount: diagramsData?.diagrams?.length,
-      depictedInDiagrams: applicationInterface?.depictedInDiagrams,
-      diagramsData: diagramsData?.diagrams,
-    })
-  }, [
-    applicationInterface,
-    applicationInterfacesData,
-    applicationInterfacesLoading,
-    diagramsData,
-    diagramsLoading,
-  ])
-
   // Formulardaten mit useMemo initialisieren, um unnötige Re-Renders zu vermeiden
   const defaultValues = React.useMemo<ApplicationInterfaceFormValues>(
     () => ({
@@ -246,14 +228,6 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
     }),
     [applicationInterface]
   )
-
-  // Debug-Log für defaultValues
-  React.useEffect(() => {
-    console.log('ApplicationInterface DefaultValues Debug:', {
-      defaultValues,
-      depictedInDiagramsFromDefaultValues: defaultValues.depictedInDiagrams,
-    })
-  }, [defaultValues])
 
   // TanStack Form konfigurieren
   const form = useForm({
@@ -713,13 +687,6 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
         return option?.label || ''
       },
       isOptionEqualToValue: (option: any, value: any) => {
-        // Debug-Log für die Vergleiche
-        console.log('depictedInDiagrams isOptionEqualToValue Debug:', {
-          option,
-          value,
-          optionValue: option?.value,
-        })
-
         if (typeof value === 'string') {
           return option.value === value
         }

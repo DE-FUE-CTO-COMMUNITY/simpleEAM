@@ -163,7 +163,6 @@ export const clearDiagramStorage = (): void => {
  */
 export const saveViewportStateToStorage = (viewportState: ViewportState): void => {
   try {
-    console.log('Saving viewport state:', viewportState)
     localStorage.setItem(STORAGE_KEYS.VIEWPORT_STATE, JSON.stringify(viewportState))
   } catch (error) {
     console.warn('Failed to save viewport state to localStorage:', error)
@@ -184,7 +183,6 @@ export const loadViewportStateFromStorage = (): ViewportState | null => {
         typeof parsed.scrollY === 'number' &&
         typeof parsed.zoom === 'number'
       ) {
-        console.log('Loaded viewport state:', parsed)
         return parsed
       } else {
         console.warn('Invalid viewport state structure:', parsed)

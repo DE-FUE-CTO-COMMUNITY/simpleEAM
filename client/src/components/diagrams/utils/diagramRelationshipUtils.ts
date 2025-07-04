@@ -36,13 +36,7 @@ export const extractDatabaseElementsFromDiagram = (
     const databaseElements: DatabaseElementReference[] = []
     const processedElements = new Set<string>() // Verhindert Duplikate
 
-    console.log('🔍 Extrahiere Datenbankelemente aus Diagramm:', {
-      totalElements: diagramData.elements?.length || 0,
-      diagramData: diagramData.elements?.slice(0, 3), // Zeige erste 3 Elemente für Debug
-    })
-
     if (!diagramData.elements || !Array.isArray(diagramData.elements)) {
-      console.log('⚠️ Keine Elemente im Diagramm gefunden')
       return []
     }
 
@@ -51,12 +45,6 @@ export const extractDatabaseElementsFromDiagram = (
       if (!element.customData?.isFromDatabase) {
         continue
       }
-
-      console.log('🔍 Element mit customData gefunden:', {
-        id: element.id,
-        type: element.type,
-        customData: element.customData,
-      })
 
       // Hauptelemente: Enthalten alle Metadaten
       if (element.customData.isMainElement && element.customData.databaseId) {
@@ -78,13 +66,6 @@ export const extractDatabaseElementsFromDiagram = (
           originalElement: element.customData.originalElement,
         }
 
-        console.log(
-          '✅ Datenbankelement extrahiert:',
-          dbElement,
-          '(Original elementType:',
-          element.customData.elementType,
-          ')'
-        )
         databaseElements.push(dbElement)
       }
       // Untergeordnete Elemente: Verweisen auf Hauptelement
@@ -113,17 +94,6 @@ export const extractDatabaseElementsFromDiagram = (
       }
     }
 
-    console.log('📊 Extraktion abgeschlossen:', {
-      totalExtracted: databaseElements.length,
-      byType: databaseElements.reduce(
-        (acc, el) => {
-          acc[el.elementType] = (acc[el.elementType] || 0) + 1
-          return acc
-        },
-        {} as Record<string, number>
-      ),
-    })
-
     return databaseElements
   } catch (error) {
     console.error('❌ Fehler beim Extrahieren der Datenbankelemente:', error)
@@ -137,8 +107,6 @@ export const extractDatabaseElementsFromDiagram = (
  * @returns Objekt mit Arrays für jeden Elementtyp
  */
 export const groupElementsByType = (elements: DatabaseElementReference[]) => {
-  console.log('🔄 Gruppiere Elemente nach Typ:', elements)
-
   const grouped = {
     capabilities: [] as string[],
     applications: [] as string[],
@@ -147,11 +115,6 @@ export const groupElementsByType = (elements: DatabaseElementReference[]) => {
   }
 
   for (const element of elements) {
-    console.log('🔍 Verarbeite Element:', {
-      id: element.id,
-      elementType: element.elementType,
-    })
-
     // Normalisiere businessCapability zu capability für Rückwärtskompatibilität
     const normalizedElementType =
       element.elementType === 'businessCapability' ? 'capability' : element.elementType
@@ -159,33 +122,22 @@ export const groupElementsByType = (elements: DatabaseElementReference[]) => {
     switch (normalizedElementType) {
       case 'capability':
         grouped.capabilities.push(element.id)
-        console.log(
-          '✅ BusinessCapability hinzugefügt:',
-          element.id,
-          '(Original:',
-          element.elementType,
-          ')'
-        )
         break
       case 'application':
         grouped.applications.push(element.id)
-        console.log('✅ Application hinzugefügt:', element.id)
         break
       case 'dataObject':
         grouped.dataObjects.push(element.id)
-        console.log('✅ DataObject hinzugefügt:', element.id)
         break
       case 'interface':
       case 'applicationInterface': // Fix: Beide Varianten unterstützen
         grouped.interfaces.push(element.id)
-        console.log('✅ Interface hinzugefügt:', element.id)
         break
       default:
         console.warn('⚠️ Unbekannter elementType:', element.elementType, 'für Element:', element.id)
     }
   }
 
-  console.log('📊 Gruppierung abgeschlossen:', grouped)
   return grouped
 }
 
@@ -208,8 +160,6 @@ export const createConnectClause = (elementIds: string[]) => {
  * @returns Objekt mit allen Relationship-Updates
  */
 export const createDiagramRelationshipUpdates = (diagramJsonString: string) => {
-  console.log('🚀 Erstelle Beziehungs-Updates für Diagramm')
-
   const elements = extractDatabaseElementsFromDiagram(diagramJsonString)
   const grouped = groupElementsByType(elements)
 
@@ -220,9 +170,7 @@ export const createDiagramRelationshipUpdates = (diagramJsonString: string) => {
     relationships.containsCapabilities = {
       connect: createConnectClause(grouped.capabilities),
     }
-    console.log('✅ containsCapabilities gesetzt:', relationships.containsCapabilities)
   } else {
-    console.log('⚠️ Keine BusinessCapabilities gefunden - containsCapabilities wird nicht gesetzt')
   }
 
   // Applications
@@ -230,7 +178,6 @@ export const createDiagramRelationshipUpdates = (diagramJsonString: string) => {
     relationships.containsApplications = {
       connect: createConnectClause(grouped.applications),
     }
-    console.log('✅ containsApplications gesetzt:', relationships.containsApplications)
   }
 
   // Data Objects
@@ -238,7 +185,6 @@ export const createDiagramRelationshipUpdates = (diagramJsonString: string) => {
     relationships.containsDataObjects = {
       connect: createConnectClause(grouped.dataObjects),
     }
-    console.log('✅ containsDataObjects gesetzt:', relationships.containsDataObjects)
   }
 
   // Interfaces
@@ -246,10 +192,8 @@ export const createDiagramRelationshipUpdates = (diagramJsonString: string) => {
     relationships.containsInterfaces = {
       connect: createConnectClause(grouped.interfaces),
     }
-    console.log('✅ containsInterfaces gesetzt:', relationships.containsInterfaces)
   }
 
-  console.log('📋 Finale Beziehungs-Updates:', relationships)
   return relationships
 }
 
@@ -309,8 +253,6 @@ export const createArchitectureLinkingUpdates = (
   diagramJsonString: string,
   architectureId: string
 ) => {
-  console.log('🏗️ Erstelle Architektur-Verknüpfungen für Architektur:', architectureId)
-
   const elements = extractDatabaseElementsFromDiagram(diagramJsonString)
   const grouped = groupElementsByType(elements)
 
@@ -321,7 +263,5 @@ export const createArchitectureLinkingUpdates = (
     dataObjects: grouped.dataObjects,
     interfaces: grouped.interfaces,
   }
-
-  console.log('📋 Architektur-Verknüpfungs-Daten:', linkingData)
   return linkingData
 }

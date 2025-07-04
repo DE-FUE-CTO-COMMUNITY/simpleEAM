@@ -94,10 +94,6 @@ export const useDiagramState = () => {
               // Load and apply viewport state if available
               const savedViewportState = loadViewportStateFromStorage()
               if (savedViewportState) {
-                console.log(
-                  'DiagramState: Applying saved viewport state during scene restoration',
-                  savedViewportState
-                )
                 restoredScene.appState = {
                   ...restoredScene.appState,
                   scrollX: savedViewportState.scrollX,
@@ -111,10 +107,6 @@ export const useDiagramState = () => {
               // Additional viewport restoration with delay for better reliability
               if (savedViewportState) {
                 setTimeout(() => {
-                  console.log(
-                    'DiagramState: Confirming viewport state with delayed update',
-                    savedViewportState
-                  )
                   excalidrawAPI.updateScene({
                     appState: {
                       scrollX: savedViewportState.scrollX,
@@ -126,8 +118,6 @@ export const useDiagramState = () => {
               }
 
               sceneRestoredRef.current = true // Mark as restored
-
-              console.log('Scene restored with', currentScene.elements?.length || 0, 'elements')
             }
           }
         } catch (error) {

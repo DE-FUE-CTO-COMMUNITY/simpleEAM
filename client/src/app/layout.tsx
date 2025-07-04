@@ -116,19 +116,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         const authenticatedClient = createApolloClient(initialToken)
         setClient(authenticatedClient)
 
-        console.log('Apollo Client initialisiert mit Token:', !!initialToken)
-
         // Token Refresh Listener
         const handleTokenRefresh = (event: CustomEvent) => {
           const newToken = event.detail.token
-          console.log('Token aktualisiert, erstelle neuen Apollo Client')
           const refreshedClient = createApolloClient(newToken)
           setClient(refreshedClient)
         }
 
         // Auth Error Listener - erstelle Client ohne Token
         const handleAuthError = () => {
-          console.log('Auth-Fehler, erstelle Apollo Client ohne Token')
           const unauthenticatedClient = createApolloClient()
           setClient(unauthenticatedClient)
         }

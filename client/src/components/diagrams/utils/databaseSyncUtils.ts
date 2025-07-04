@@ -285,7 +285,6 @@ export const updateElementName = async (
       },
     })
 
-    console.log(`Updated ${elementType} ${databaseId} name to: ${newName}`)
     return true
   } catch (error) {
     console.error(`Failed to update ${elementType} ${databaseId} name:`, error)
@@ -304,29 +303,20 @@ export const validateAndSyncElements = async (
   const missingElements: string[] = []
   const updatedElements: DiagramElement[] = []
 
-  console.log(`Validating ${databaseElements.length} database elements...`)
-
   for (const element of databaseElements) {
     if (!element.customData?.databaseId || !element.customData?.elementType) continue
 
     const databaseId = element.customData.databaseId
     const elementType = element.customData.elementType
 
-    console.log(
-      `Checking ${elementType} with ID: ${databaseId} (original elementType: ${element.customData.elementType})`
-    )
-
     // Aktuelle Daten aus der Datenbank abrufen
     const currentData = await fetchElementData(apolloClient, databaseId, elementType)
 
     if (!currentData) {
       // Element nicht mehr in Datenbank vorhanden
-      console.log(`Element ${databaseId} not found in database`)
       missingElements.push(databaseId)
       continue
     }
-
-    console.log(`Found element ${databaseId} with name: ${currentData.name}`)
 
     // Namen synchronisieren wenn nötig - prüfe verschiedene Quellen für aktuellen Namen
     const currentElementName = element.customData.originalElement?.name
@@ -338,26 +328,12 @@ export const validateAndSyncElements = async (
 
     const displayedName = textElement?.text || textElement?.rawText
 
-    console.log(`Name comparison for ${databaseId}:`)
-    console.log(`  - originalElement.name: "${currentElementName}"`)
-    console.log(`  - lastSyncedName: "${lastSyncedName}"`)
-    console.log(`  - displayedName: "${displayedName}"`)
-    console.log(`  - databaseName: "${databaseName}"`)
-    console.log(`  - textElement found: ${!!textElement} (id: ${textElement?.id})`)
-
     // Update erforderlich wenn sich der Datenbankname vom gespeicherten Namen unterscheidet
     // Verwende normalizeText für Vergleiche, um Zeilenumbrüche zu ignorieren
     // Behandle undefined/null Werte korrekt
     const normalizedCurrentElementName = normalizeText(currentElementName)
-    const normalizedLastSyncedName = lastSyncedName ? normalizeText(lastSyncedName) : ''
     const normalizedDisplayedName = normalizeText(displayedName)
     const normalizedDatabaseName = normalizeText(databaseName)
-
-    console.log(`Normalized comparison:`)
-    console.log(`  - normalizedCurrentElementName: "${normalizedCurrentElementName}"`)
-    console.log(`  - normalizedLastSyncedName: "${normalizedLastSyncedName}"`)
-    console.log(`  - normalizedDisplayedName: "${normalizedDisplayedName}"`)
-    console.log(`  - normalizedDatabaseName: "${normalizedDatabaseName}"`)
 
     // Ein Update ist NUR nötig, wenn sich Namen tatsächlich unterscheiden
     // Ignoriere lastSyncedName - das ist nur ein interner Tracking-Wert
@@ -370,18 +346,7 @@ export const validateAndSyncElements = async (
     // Update nur wenn tatsächlich eine Diskrepanz besteht
     const nameUpdateNeeded = databaseName && (isDisplayedNameDifferent || isOriginalNameDifferent)
 
-    console.log(`Update decision:`)
-    console.log(
-      `  - displayedName different from DB: ${isDisplayedNameDifferent} ("${normalizedDisplayedName}" vs "${normalizedDatabaseName}")`
-    )
-    console.log(
-      `  - originalName different from DB: ${isOriginalNameDifferent} ("${normalizedCurrentElementName}" vs "${normalizedDatabaseName}")`
-    )
-    console.log(`  - nameUpdateNeeded: ${nameUpdateNeeded}`)
-
     if (nameUpdateNeeded) {
-      console.log(`Name update needed for ${databaseId}: updating to "${databaseName}"`)
-
       // Aktualisiere originalElement mit neuen Daten
       element.customData.originalElement = {
         ...element.customData.originalElement,
@@ -389,8 +354,6 @@ export const validateAndSyncElements = async (
       }
       element.customData.lastSyncedName = databaseName
       updatedElements.push(element)
-    } else if (databaseName) {
-      console.log(`No name change needed for ${databaseId}`)
     }
   }
 
@@ -428,7 +391,6 @@ export const markMissingElements = (
     }
 
     if (isMissing) {
-      console.log(`Marking element ${databaseId} as missing (red border)`)
       return {
         ...element,
         strokeColor: '#ff0000',
@@ -442,7 +404,6 @@ export const markMissingElements = (
       }
     } else if (element.customData.isDatabaseMissing) {
       // Element war vorher als fehlend markiert, ist aber jetzt wieder da - entferne Markierung
-      console.log(`Removing missing marker for element ${databaseId} (found in database)`)
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { isDatabaseMissing, missingReason, ...cleanCustomData } = element.customData
       return {
@@ -486,10 +447,6 @@ export const syncDiagramOnOpen = async (apolloClient: any, diagramData: any): Pr
   // Aktualisiere Elemente mit neuen Namen
   let updatedElements = [...diagramData.elements]
 
-  console.log(
-    `Processing ${validationResult.updatedElements.length} updated elements for name sync`
-  )
-
   // Anwenden der Namen-Updates auf alle verwandten Elemente
   for (const updatedElement of validationResult.updatedElements) {
     const newName = updatedElement.customData?.originalElement?.name
@@ -498,8 +455,6 @@ export const syncDiagramOnOpen = async (apolloClient: any, diagramData: any): Pr
       continue
     }
 
-    console.log(`Applying name update for element ${updatedElement.id}: "${newName}"`)
-
     // Normalisiere den neuen Namen (entferne Zeilenumbrüche)
     const normalizedNewName = normalizeText(newName)
 
@@ -507,7 +462,6 @@ export const syncDiagramOnOpen = async (apolloClient: any, diagramData: any): Pr
     updatedElements = updatedElements.map(element => {
       // Hauptelement aktualisieren
       if (element.id === updatedElement.id) {
-        console.log(`Updating main element ${element.id} customData`)
         return {
           ...element,
           customData: {
@@ -552,10 +506,6 @@ export const syncDiagramOnOpen = async (apolloClient: any, diagramData: any): Pr
 
       // Text-Elemente aktualisieren - verwende updateTextWithContainerBinding
       if (isLinkedTextElement) {
-        console.log(
-          `Updating text element ${element.id}: "${element.text}" -> "${normalizedNewName}"`
-        )
-
         // Finde den tatsächlichen Container-Element (Rectangle, Diamond, etc.)
         const containerElement = updatedElements.find(
           el =>
@@ -575,15 +525,10 @@ export const syncDiagramOnOpen = async (apolloClient: any, diagramData: any): Pr
         // Nur bei neuen Elementen oder wenn explizit gewünscht, verwende Container-Binding
         const isNewElement = !element.x || !element.y || element.x === 0 || element.y === 0
         if (isNewElement && containerElement) {
-          console.log(`Element appears to be new (no valid position), applying container binding`)
           updatedTextElement = updateTextWithContainerBinding(
             element,
             normalizedNewName,
             containerElement
-          )
-        } else {
-          console.log(
-            `Preserving existing text position during database sync for element: ${element.id}`
           )
         }
 
@@ -601,23 +546,15 @@ export const syncDiagramOnOpen = async (apolloClient: any, diagramData: any): Pr
   }
 
   // WICHTIG: Markiere fehlende UND entferne Markierungen für gefundene Elemente
-  console.log(`Processing missing elements: ${validationResult.missingElements.length} missing`)
   updatedElements = markMissingElements(updatedElements, validationResult.missingElements)
 
   // Stelle sicher, dass Text-Container-Bindungen korrekt sind
-  console.log('Ensuring text-container bindings are correct...')
   updatedElements = ensureTextContainerBindings(updatedElements)
 
   if (validationResult.missingElements.length > 0) {
     console.warn(
       `Found ${validationResult.missingElements.length} missing database elements:`,
       validationResult.missingElements
-    )
-  }
-
-  if (validationResult.updatedElements.length > 0) {
-    console.log(
-      `Updated ${validationResult.updatedElements.length} elements with latest database names`
     )
   }
 
@@ -637,8 +574,6 @@ export const syncDiagramOnSave = async (
   if (!diagramData.elements || !Array.isArray(diagramData.elements)) {
     return { success: true, updatedCount: 0 }
   }
-
-  console.log('Syncing diagram changes back to database...')
 
   const databaseElements = extractDatabaseElements(diagramData.elements)
   let updatedCount = 0
@@ -667,23 +602,13 @@ export const syncDiagramOnSave = async (
       continue
     }
 
-    console.log(
-      `Found text element for ${element.customData.databaseId}: "${textElement.text}" (id: ${textElement.id})`
-    )
-
     const currentName = normalizeText(textElement.text || textElement.rawText)
     const lastSyncedName = normalizeText(
       element.customData.lastSyncedName || element.customData.originalElement?.name
     )
 
-    console.log(
-      `Checking name change for ${element.customData.databaseId}: "${lastSyncedName}" vs "${currentName}"`
-    )
-
     // Prüfe ob sich der Name geändert hat (mit normalisiertem Text)
     if (currentName && currentName.trim() !== '' && currentName !== lastSyncedName) {
-      console.log(`Name changed, updating database: "${lastSyncedName}" -> "${currentName}"`)
-
       // WICHTIG: Normalisiere den Namen vor dem Speichern (entferne Zeilenumbrüche)
       const normalizedName = currentName.trim().replace(/\n/g, ' ').replace(/\s+/g, ' ')
 
@@ -703,17 +628,10 @@ export const syncDiagramOnSave = async (
           name: normalizedName, // Verwende normalisierten Namen, nicht den angezeigten Text
         }
         updatedCount++
-        console.log(`Successfully updated name for ${element.customData.databaseId}`)
       } else {
         console.error(`Failed to update name for ${element.customData.databaseId}`)
       }
-    } else {
-      console.log(`No name change detected for ${element.customData.databaseId}`)
     }
-  }
-
-  if (updatedCount > 0) {
-    console.log(`Successfully updated ${updatedCount} database element names`)
   }
 
   return { success: true, updatedCount }

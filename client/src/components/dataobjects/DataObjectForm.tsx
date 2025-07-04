@@ -127,16 +127,6 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
     fetchPolicy: 'cache-and-network',
   })
 
-  // Debug-Logs für die geladenen Daten
-  React.useEffect(() => {
-    console.log('DataObject Debug:', {
-      dataObject,
-      diagramsLoading,
-      diagramsCount: diagramsData?.diagrams?.length,
-      depictedInDiagrams: dataObject?.depictedInDiagrams,
-    })
-  }, [dataObject, diagramsData, diagramsLoading])
-
   // Formulardaten mit useMemo initialisieren, um unnötige Re-Renders zu vermeiden
   const defaultValues = React.useMemo<DataObjectFormValues>(
     () => ({

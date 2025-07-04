@@ -106,7 +106,6 @@ export const createContext = async ({ req }: { req: Request }) => {
   const token = extractTokenFromHeader(req)
 
   if (!token) {
-    console.log('Kein Token im Request gefunden')
     return {
       req, // Request für Neo4j GraphQL Library weiterleiten
       token: null,
@@ -120,7 +119,6 @@ export const createContext = async ({ req }: { req: Request }) => {
   const user = await verifyToken(token)
 
   if (!user) {
-    console.log('Token-Verifizierung fehlgeschlagen')
     return {
       req, // Request für Neo4j GraphQL Library weiterleiten
       token: null,
@@ -129,8 +127,6 @@ export const createContext = async ({ req }: { req: Request }) => {
       user: null,
     }
   }
-
-  console.log('Token erfolgreich verifiziert für Benutzer:', user.preferred_username || user.sub)
 
   // Benutzer ist authentifiziert - Request mit Token für Neo4j GraphQL Library bereitstellen
   // Rollen aus realm_access extrahieren und direkt im JWT verfügbar machen

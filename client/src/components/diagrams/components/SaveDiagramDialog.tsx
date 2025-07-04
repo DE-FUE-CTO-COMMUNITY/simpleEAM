@@ -158,26 +158,6 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
     fetchPolicy: 'cache-and-network',
   })
 
-  // Debug-Logging für Authentifizierung
-  React.useEffect(() => {
-    if (open) {
-      console.log('SaveDiagramDialog geöffnet - Auth Status:', {
-        authenticated: keycloak?.authenticated,
-        hasToken: !!keycloak?.token,
-        user: user?.preferred_username,
-        architecturesLoading,
-        architecturesError: architecturesError?.message,
-      })
-    }
-  }, [
-    open,
-    keycloak?.authenticated,
-    keycloak?.token,
-    user,
-    architecturesLoading,
-    architecturesError,
-  ])
-
   const [createDiagram] = useMutation(CREATE_DIAGRAM)
   const [updateDiagram] = useMutation(UPDATE_DIAGRAM)
 
@@ -191,8 +171,6 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
 
   // Funktion zum Verknüpfen aller Diagramm-Elemente mit der Architektur
   const linkElementsToArchitecture = async (diagramJsonString: string, architectureId: string) => {
-    console.log('🔗 Verknüpfe alle Diagramm-Elemente mit Architektur:', architectureId)
-
     const linkingData = createArchitectureLinkingUpdates(diagramJsonString, architectureId)
     const promises: Promise<any>[] = []
 
@@ -249,10 +227,6 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
     const results = await Promise.allSettled(promises)
     const successCount = results.filter(result => result.status === 'fulfilled').length
     const errorCount = results.filter(result => result.status === 'rejected').length
-
-    console.log(
-      `✅ Architektur-Verknüpfung abgeschlossen: ${successCount} erfolgreich, ${errorCount} Fehler`
-    )
 
     return { successCount, errorCount }
   }
@@ -365,47 +339,27 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
     setNewElementsDialogOpen(false)
     setCreatingElements(true)
 
-    console.log(
-      'handleNewElementsConfirm - Starte Erstellung von',
-      selectedElements.length,
-      'Elementen'
-    )
-
     try {
       // Erstelle die ausgewählten Elemente in der Datenbank
       const creationResult = await createNewElementsInDatabase(apolloClient, selectedElements)
 
-      console.log('Element-Erstellung Ergebnis:', creationResult)
-
       if (creationResult.success) {
         // Aktualisiere die Diagrammdaten mit den neuen Datenbankreferenzen
         const parsedDiagramData = JSON.parse(diagramData)
-        console.log('Original Diagrammdaten:', parsedDiagramData.elements?.length, 'Elemente')
-
         const updatedElements = updateElementsWithDatabaseReferences(
           parsedDiagramData.elements,
           creationResult.createdElements
         )
-
-        console.log('Aktualisierte Elemente:', updatedElements.length, 'Elemente')
-
         // Aktualisiere diagramData für das Speichern
         const updatedDiagramData = JSON.stringify({
           ...parsedDiagramData,
           elements: updatedElements,
         })
-
-        console.log('Aktualisierte Diagrammdaten erstellt')
-
         // Führe das Speichern mit den aktualisierten Daten durch
         const savedDiagram = await performSave(updatedDiagramData)
 
         // Nach erfolgreichem Speichern: Dialog schließen und Canvas-Update
         if (savedDiagram) {
-          console.log(
-            `${creationResult.createdElements.length} neue Elemente wurden erfolgreich erstellt und verknüpft.`
-          )
-
           // Dialog sofort schließen
           onClose()
 
@@ -480,10 +434,7 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
       let result
       if (existingDiagram?.id && !forceSaveAs) {
         // Update bestehende Diagramm
-        console.log('🔄 Aktualisiere bestehendes Diagramm:', existingDiagram.id)
         const relationshipUpdates = createDiagramRelationshipUpdatesWithDisconnect(dataToSave)
-        console.log('📊 Beziehungs-Updates für Update:', relationshipUpdates)
-
         const updateInput = {
           title: { set: title.trim() },
           description: { set: description.trim() || undefined },
@@ -501,9 +452,6 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
           },
           ...relationshipUpdates, // Automatische Beziehungen zu Datenbankelementen
         }
-
-        console.log('📤 Sende Update-Mutation mit Input:', updateInput)
-
         result = await updateDiagram({
           variables: {
             id: existingDiagram.id,
@@ -512,8 +460,6 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
         })
 
         const savedDiagram = result.data.updateDiagrams.diagrams[0]
-        console.log('✅ Diagramm erfolgreich aktualisiert:', savedDiagram)
-
         // Nach erfolgreichem Update: Alle Diagramm-Elemente mit der Architektur verknüpfen
         try {
           await linkElementsToArchitecture(dataToSave, selectedArchitecture.id)
@@ -527,17 +473,11 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
         return savedDiagram
       } else {
         // Neue Diagramm erstellen (auch bei forceSaveAs)
-        console.log('🆕 Erstelle neues Diagramm')
         const relationshipUpdates = createDiagramRelationshipUpdates(dataToSave)
-        console.log('📊 Beziehungs-Updates für Create:', relationshipUpdates)
-
         const input = {
           ...baseInput,
           ...relationshipUpdates, // Automatische Beziehungen zu Datenbankelementen
         }
-
-        console.log('📤 Sende Create-Mutation mit Input:', input)
-
         result = await createDiagram({
           variables: {
             input: [input],
@@ -545,7 +485,6 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
         })
 
         const savedDiagram = result.data.createDiagrams.diagrams[0]
-        console.log('✅ Diagramm erfolgreich erstellt:', savedDiagram)
 
         // Nach erfolgreichem Speichern: Alle Diagramm-Elemente mit der Architektur verknüpfen
         try {

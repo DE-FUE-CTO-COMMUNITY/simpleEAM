@@ -80,17 +80,6 @@ export const updateTextWithContainerBinding = (
     updatedText.y = centeredPosition.y
     updatedText.width = centeredPosition.width
     updatedText.height = centeredPosition.height
-
-    const lineCount = (newText.match(/\n/g) || []).length + 1
-    console.log(
-      `Repositioned ${lineCount}-line text "${newText}" to center of container (no valid position found):`,
-      `Container: (${containerElement.x}, ${containerElement.y}, ${containerElement.width}x${containerElement.height})`,
-      `Text: (${updatedText.x}, ${updatedText.y}, ${centeredPosition.width}x${centeredPosition.height})`
-    )
-  } else if (hasValidPosition) {
-    console.log(
-      `Preserving existing text position for "${newText}": (${updatedText.x}, ${updatedText.y}) with alignment: ${updatedText.textAlign}/${updatedText.verticalAlign}`
-    )
   }
 
   return updatedText
@@ -281,7 +270,6 @@ export const ensureTextContainerBindings = (elements: ExcalidrawElement[]): Exca
             type: 'text',
             id: textEl.id,
           })
-          console.log(`Added text binding for container ${container.id} -> text ${textEl.id}`)
         }
 
         // Nur Bindungen sicherstellen, Position NICHT ändern während Sync
@@ -303,7 +291,6 @@ export const ensureTextContainerBindings = (elements: ExcalidrawElement[]): Exca
               container
             )
             updatedElements[textIndex] = updatedTextElement
-            console.log(`Repositioned new text element ${textEl.id} in container ${container.id}`)
           } else {
             // Nur containerId setzen, Position beibehalten
             if (!currentText.containerId) {
@@ -311,9 +298,6 @@ export const ensureTextContainerBindings = (elements: ExcalidrawElement[]): Exca
                 ...currentText,
                 containerId: container.id,
               }
-              console.log(
-                `Set containerId for existing text ${textEl.id} -> container ${container.id} (position preserved)`
-              )
             }
           }
         }
@@ -342,18 +326,12 @@ export const ensureTextContainerBindings = (elements: ExcalidrawElement[]): Exca
               potentialContainer
             )
             updatedElements[textIndex] = updatedTextElement
-            console.log(
-              `Set containerId and repositioned new text ${textEl.id} -> container ${potentialContainer.id}`
-            )
           } else {
             // Nur containerId setzen, Position beibehalten
             updatedElements[textIndex] = {
               ...currentText,
               containerId: potentialContainer.id,
             }
-            console.log(
-              `Set containerId for existing text ${textEl.id} -> container ${potentialContainer.id} (position preserved)`
-            )
           }
         }
       }

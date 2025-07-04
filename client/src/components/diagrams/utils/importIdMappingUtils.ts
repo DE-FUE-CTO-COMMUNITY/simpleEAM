@@ -182,14 +182,12 @@ const extractElementName = (
     // 1. HÖCHSTE Priorität: originalElement name (echter Datenbankname ohne Zeilenumbrüche)
     if (element.customData.originalElement?.name) {
       const dbName = normalizeElementName(element.customData.originalElement.name)
-      console.log(`Using database name from originalElement: "${dbName}" for element ${element.id}`)
       return dbName
     }
 
     // 2. Priorität: Direkt im Element gespeicherter Text (falls kein originalElement)
     if (element.text || element.rawText) {
       const directText = normalizeElementName(element.text || element.rawText || '')
-      console.log(`Using direct element text: "${directText}" for element ${element.id}`)
       return directText
     }
 
@@ -210,9 +208,6 @@ const extractElementName = (
     if (textElement && (textElement.text || textElement.rawText)) {
       // Entferne Zeilenumbrüche aus dem angezeigten Text
       const displayedText = normalizeElementName(textElement.text || textElement.rawText || '')
-      console.log(
-        `Using linked text element (cleaned): "${displayedText}" for element ${element.id}`
-      )
       return displayedText
     }
   }
@@ -220,7 +215,6 @@ const extractElementName = (
   // Für Text-Elemente: direkter Text (mit bereinigten Zeilenumbrüchen)
   if (element.type === 'text') {
     const cleanedText = normalizeElementName(element.text || element.rawText || '')
-    console.log(`Using text element (cleaned): "${cleanedText}" for element ${element.id}`)
     return cleanedText
   }
 
@@ -305,8 +299,6 @@ export const createIdMappingsForImport = async (
   const mappings: ElementIdMapping[] = []
   const processedElements = new Set<string>()
 
-  console.log('Starting ID mapping for imported diagram elements...')
-
   for (const element of importedData.elements) {
     // Nur Datenbank-Elemente verarbeiten
     if (
@@ -332,25 +324,12 @@ export const createIdMappingsForImport = async (
 
     processedElements.add(oldId)
 
-    console.log(`Processing element: ${elementType} with ID ${oldId}`)
-    console.log(`Element details:`, {
-      id: element.id,
-      type: element.type,
-      hasCustomData: !!element.customData,
-      isMainElement: element.customData?.isMainElement,
-      originalElementName: element.customData?.originalElement?.name,
-      elementType: element.customData?.elementType,
-    })
-
     // 1. Prüfe, ob die Original-ID in der aktuellen Datenbank existiert
     const existsById = await checkElementExistsById(apolloClient, oldId, elementType)
 
     if (existsById) {
-      console.log(`✓ Element ${oldId} exists in database, no mapping needed`)
       continue
     }
-
-    console.log(`✗ Element ${oldId} not found in database, attempting name-based mapping`)
 
     // 2. Element existiert nicht - suche nach Element mit gleichem Namen
     const elementName = extractElementName(element, importedData.elements)
@@ -365,24 +344,13 @@ export const createIdMappingsForImport = async (
       continue
     }
 
-    console.log(`🔍 Element ${oldId} searching for "${elementName}" of type ${elementType}`)
-
     const newId = await findElementByTypeAndName(apolloClient, elementType, elementName)
 
-    if (newId) {
-      console.log(`✓ Found matching element: "${elementName}" -> ${newId} (was ${oldId})`)
-      mappings.push({
-        oldId,
-        newId,
-        elementType,
-        elementName,
-      })
-    } else {
+    if (!newId) {
       console.warn(`✗ No matching element found for ${elementType} "${elementName}" (ID: ${oldId})`)
     }
   }
 
-  console.log(`Created ${mappings.length} ID mappings`)
   return mappings
 }
 
@@ -394,13 +362,10 @@ export const applyIdMappingsToImportedData = (
   mappings: ElementIdMapping[]
 ): ImportedDiagramData => {
   if (mappings.length === 0) {
-    console.log('No ID mappings to apply')
     return importedData
   }
 
   const mappingMap = new Map(mappings.map(m => [m.oldId, m.newId]))
-
-  console.log(`Applying ${mappings.length} ID mappings to imported data`)
 
   const updatedElements = importedData.elements.map(element => {
     // Prüfe, ob Element eine Datenbank-ID hat, die gemappt werden muss
@@ -409,8 +374,6 @@ export const applyIdMappingsToImportedData = (
       const newId = mappingMap.get(oldId)
 
       if (newId) {
-        console.log(`Mapping element ${oldId} -> ${newId}`)
-
         return {
           ...element,
           customData: {
@@ -441,8 +404,6 @@ export const processImportedDiagramData = async (
   mappings: ElementIdMapping[]
   summary: string
 }> => {
-  console.log('Processing imported diagram data for ID mapping...')
-
   // 1. Erstelle ID-Mappings
   const mappings = await createIdMappingsForImport(apolloClient, importedData)
 
@@ -456,8 +417,6 @@ export const processImportedDiagramData = async (
           .map(m => `• ${m.elementType}: "${m.elementName}" (${m.oldId} → ${m.newId})`)
           .join('\n')}`
       : 'Alle Element-IDs sind bereits korrekt, keine Anpassungen nötig.'
-
-  console.log('Import processing complete:', { mappingsCount: mappings.length })
 
   return {
     processedData,
