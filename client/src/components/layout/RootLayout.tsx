@@ -72,6 +72,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
       icon: <RuleIcon />,
       href: '/architecture-principles',
     },
+    { isDivider: true, text: 'divider', icon: null },
     { text: 'Business Capabilities', icon: <BusinessCapabilityIcon />, href: '/capabilities' },
     { text: 'Applikationen', icon: <ApplicationComponentIcon />, href: '/applications' },
     { text: 'Datenobjekte', icon: <BusinessObjectIcon />, href: '/dataobjects' },

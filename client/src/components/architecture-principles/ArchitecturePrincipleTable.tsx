@@ -53,6 +53,9 @@ const ArchitecturePrincipleTable: React.FC<ArchitecturePrincipleTableProps> = ({
     onColumnVisibilityChange,
   } = usePersistentColumnVisibility({
     tableKey: 'architecture-principles',
+    defaultColumnVisibility: {
+      description: false, // Beschreibung standardmäßig ausblenden
+    },
   })
 
   // Kombiniere externe und persistente onTableReady Callbacks
@@ -69,6 +72,15 @@ const ArchitecturePrincipleTable: React.FC<ArchitecturePrincipleTableProps> = ({
       columnHelper.accessor('name', {
         header: 'Name',
         cell: info => info.getValue(),
+      }),
+      columnHelper.accessor('description', {
+        header: 'Beschreibung',
+        cell: info => {
+          const description = info.getValue()
+          return description && description.length > 50
+            ? `${description.substring(0, 50)}...`
+            : description || '-'
+        },
       }),
       columnHelper.accessor('category', {
         header: 'Kategorie',
@@ -110,15 +122,6 @@ const ArchitecturePrincipleTable: React.FC<ArchitecturePrincipleTableProps> = ({
               variant="outlined"
             />
           )
-        },
-      }),
-      columnHelper.accessor('description', {
-        header: 'Beschreibung',
-        cell: info => {
-          const description = info.getValue()
-          return description && description.length > 50
-            ? `${description.substring(0, 50)}...`
-            : description || '-'
         },
       }),
       columnHelper.accessor('owners', {
@@ -164,11 +167,11 @@ const ArchitecturePrincipleTable: React.FC<ArchitecturePrincipleTableProps> = ({
         },
       }),
       columnHelper.accessor('createdAt', {
-        header: 'Erstellt',
+        header: 'Erstellt am',
         cell: info => formatDate(info.getValue()),
       }),
       columnHelper.accessor('updatedAt', {
-        header: 'Aktualisiert',
+        header: 'Aktualisiert am',
         cell: info => formatDate(info.getValue()),
       }),
     ],

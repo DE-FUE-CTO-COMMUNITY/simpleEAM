@@ -56,6 +56,9 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
     onColumnVisibilityChange,
   } = usePersistentColumnVisibility({
     tableKey: 'architectures',
+    defaultColumnVisibility: {
+      description: false, // Beschreibung standardmäßig ausblenden
+    },
   })
 
   // Kombiniere externe und persistente onTableReady Callbacks
@@ -72,6 +75,15 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
       columnHelper.accessor('name', {
         header: 'Name',
         cell: info => info.getValue(),
+      }),
+      columnHelper.accessor('description', {
+        header: 'Beschreibung',
+        cell: info => {
+          const description = info.getValue()
+          return description && description.length > 50
+            ? `${description.substring(0, 50)}...`
+            : description || '-'
+        },
       }),
       columnHelper.accessor('domain', {
         header: 'Domäne',
@@ -135,11 +147,11 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
         },
       }),
       columnHelper.accessor('createdAt', {
-        header: 'Erstellt',
+        header: 'Erstellt am',
         cell: info => formatDate(info.getValue()),
       }),
       columnHelper.accessor('updatedAt', {
-        header: 'Aktualisiert',
+        header: 'Aktualisiert am',
         cell: info => formatDate(info.getValue()),
       }),
     ],
