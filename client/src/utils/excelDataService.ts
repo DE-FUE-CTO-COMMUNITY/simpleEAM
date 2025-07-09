@@ -6,6 +6,7 @@ import { GET_DATA_OBJECTS } from '../graphql/dataObject'
 import { GET_PERSONS } from '../graphql/person'
 import { GET_ARCHITECTURES } from '../graphql/architecture'
 import { GET_DIAGRAMS } from '../graphql/diagram'
+import { GET_ARCHITECTURE_PRINCIPLES } from '../graphql/architecturePrinciple'
 
 export interface ExcelExportData {
   [key: string]: string | number | boolean | Date
@@ -19,6 +20,7 @@ export type EntityType =
   | 'persons'
   | 'architectures'
   | 'diagrams'
+  | 'architecturePrinciples'
   | 'all'
 
 /**
@@ -303,6 +305,44 @@ export const fetchDiagramsForExport = async (
 }
 
 /**
+ * Holt echte Architekturprinzipien Daten für Excel Export
+ * Verwendet GraphQL-Feldnamen als Spaltenüberschriften und IDs für Relationen
+ */
+export const fetchArchitecturePrinciplesForExport = async (
+  client: ApolloClient<any>
+): Promise<ExcelExportData[]> => {
+  try {
+    const { data } = await client.query({
+      query: GET_ARCHITECTURE_PRINCIPLES,
+      fetchPolicy: 'network-only',
+    })
+
+    if (!data?.architecturePrinciples) {
+      return []
+    }
+
+    return data.architecturePrinciples.map((principle: any) => ({
+      id: principle.id,
+      name: principle.name,
+      description: principle.description || '',
+      category: principle.category || '',
+      priority: principle.priority || '',
+      rationale: principle.rationale || '',
+      implications: principle.implications || '',
+      tags: Array.isArray(principle.tags) ? principle.tags.join(',') : '',
+      isActive: principle.isActive || false,
+      createdAt: formatDateForExport(principle.createdAt),
+      updatedAt: formatDateForExport(principle.updatedAt),
+      owners: principle.owners?.map((owner: any) => owner.id).join(',') || '',
+      appliedInArchitectures: principle.appliedInArchitectures?.map((arch: any) => arch.id).join(',') || '',
+      implementedByApplications: principle.implementedByApplications?.map((app: any) => app.id).join(',') || '',
+    }))
+  } catch {
+    throw new Error('Architekturprinzipien konnten nicht geladen werden')
+  }
+}
+
+/**
  * Holt alle Entitäten für Admin-Export (Multi-Tab Excel)
  */
 export const fetchAllEntitiesForExport = async (
@@ -317,6 +357,7 @@ export const fetchAllEntitiesForExport = async (
       persons,
       architectures,
       diagrams,
+      architecturePrinciples,
     ] = await Promise.all([
       fetchBusinessCapabilitiesForExport(client),
       fetchApplicationsForExport(client),
@@ -325,6 +366,7 @@ export const fetchAllEntitiesForExport = async (
       fetchPersonsForExport(client),
       fetchArchitecturesForExport(client),
       fetchDiagramsForExport(client),
+      fetchArchitecturePrinciplesForExport(client),
     ])
 
     return {
@@ -335,6 +377,7 @@ export const fetchAllEntitiesForExport = async (
       Persons: persons,
       Architectures: architectures,
       Diagrams: diagrams,
+      'Architecture Principles': architecturePrinciples,
     }
   } catch {
     throw new Error('Fehler beim Laden der kompletten Datenbank')
@@ -354,6 +397,7 @@ export const fetchDataByEntityType = async (
     | 'persons'
     | 'architectures'
     | 'diagrams'
+    | 'architecturePrinciples'
     | 'all'
 ): Promise<ExcelExportData[] | { [tabName: string]: ExcelExportData[] }> => {
   switch (entityType) {
@@ -371,6 +415,8 @@ export const fetchDataByEntityType = async (
       return fetchArchitecturesForExport(client)
     case 'diagrams':
       return fetchDiagramsForExport(client)
+    case 'architecturePrinciples':
+      return fetchArchitecturePrinciplesForExport(client)
     case 'all':
       return fetchAllEntitiesForExport(client)
     default:
@@ -519,6 +565,26 @@ export const getDiagramsTemplate = (): ExcelExportData => ({
 })
 
 /**
+ * Erstellt Template-Daten mit echten GraphQL-Feldnamen für Architekturprinzipien
+ */
+export const getArchitecturePrinciplesTemplate = (): ExcelExportData => ({
+  id: '',
+  name: '',
+  description: '',
+  category: '', // BUSINESS, TECHNICAL, GOVERNANCE, SECURITY, DATA
+  priority: '', // LOW, MEDIUM, HIGH, CRITICAL
+  rationale: '',
+  implications: '',
+  tags: '', // Komma-getrennte Tags
+  isActive: '', // true/false
+  owners: '', // Komma-getrennte Owner-IDs (Person)
+  appliedInArchitectures: '', // Komma-getrennte Architecture-IDs
+  implementedByApplications: '', // Komma-getrennte Application-IDs
+  createdAt: '', // ISO-Format: 2024-01-01T12:00:00.000Z
+  updatedAt: '', // ISO-Format: 2024-01-01T12:00:00.000Z
+})
+
+/**
  * Holt Template-Daten basierend auf dem Entity-Typ mit echten GraphQL-Feldnamen
  */
 export const getTemplateByEntityType = (
@@ -530,6 +596,7 @@ export const getTemplateByEntityType = (
     | 'persons'
     | 'architectures'
     | 'diagrams'
+    | 'architecturePrinciples'
 ): ExcelExportData => {
   switch (entityType) {
     case 'businessCapabilities':
@@ -546,6 +613,8 @@ export const getTemplateByEntityType = (
       return getArchitecturesTemplate()
     case 'diagrams':
       return getDiagramsTemplate()
+    case 'architecturePrinciples':
+      return getArchitecturePrinciplesTemplate()
     default:
       throw new Error(`Unbekannter Entity-Typ: ${entityType}`)
   }
@@ -563,6 +632,7 @@ export const getFieldNamesByEntityType = (
     | 'persons'
     | 'architectures'
     | 'diagrams'
+    | 'architecturePrinciples'
     | 'all'
 ): string[] | { [tabName: string]: string[] } => {
   if (entityType === 'all') {
@@ -574,6 +644,7 @@ export const getFieldNamesByEntityType = (
       Persons: Object.keys(getPersonsTemplate()),
       Architectures: Object.keys(getArchitecturesTemplate()),
       Diagrams: Object.keys(getDiagramsTemplate()),
+      'Architecture Principles': Object.keys(getArchitecturePrinciplesTemplate()),
     }
   }
 
@@ -620,6 +691,7 @@ export const validateImportData = (
     | 'persons'
     | 'architectures'
     | 'diagrams'
+    | 'architecturePrinciples'
 ): ValidationResult => {
   const errors: ValidationError[] = []
   const warnings: ValidationWarning[] = []
@@ -730,6 +802,7 @@ export const getTemplateWithExamples = (
     | 'persons'
     | 'architectures'
     | 'diagrams'
+    | 'architecturePrinciples'
 ): ExcelExportData[] => {
   const emptyTemplate = getTemplateByEntityType(entityType)
 
@@ -875,6 +948,26 @@ export const getTemplateWithExamples = (
           updatedAt: '2024-06-01T15:30:00.000Z',
         },
       ]
+    case 'architecturePrinciples':
+      return [
+        emptyTemplate,
+        {
+          id: 'princ-001',
+          name: 'Cloud First',
+          description: 'Prioritize cloud-native solutions over on-premise alternatives',
+          category: 'TECHNICAL',
+          priority: 'HIGH',
+          rationale: 'Cloud solutions provide better scalability, reliability, and cost efficiency',
+          implications: 'New applications must justify on-premise deployment',
+          tags: 'cloud,scalability,cost-efficiency',
+          isActive: 'true',
+          owners: 'user-001,user-002',
+          appliedInArchitectures: 'arch-001,arch-002',
+          implementedByApplications: 'app-001,app-003',
+          createdAt: '2024-01-01T10:00:00.000Z',
+          updatedAt: '2024-06-01T15:30:00.000Z',
+        },
+      ]
     default:
       return [emptyTemplate]
   }
@@ -897,6 +990,8 @@ export function getRequiredFieldsByEntityType(entityType: EntityType): string[] 
       return ['id', 'name', 'domain', 'type', 'timestamp']
     case 'diagrams':
       return ['id', 'title', 'diagramJson']
+    case 'architecturePrinciples':
+      return ['id', 'name', 'category', 'priority']
     default:
       return ['id', 'name']
   }
@@ -994,6 +1089,19 @@ export function getOptionalFieldsByEntityType(entityType: EntityType): string[] 
       ]
     case 'diagrams':
       return ['description', 'diagramType', 'creator', 'architecture', 'createdAt', 'updatedAt']
+    case 'architecturePrinciples':
+      return [
+        'description',
+        'rationale',
+        'implications',
+        'tags',
+        'isActive',
+        'owners',
+        'appliedInArchitectures',
+        'implementedByApplications',
+        'createdAt',
+        'updatedAt',
+      ]
     default:
       return ['description', 'createdAt', 'updatedAt']
   }

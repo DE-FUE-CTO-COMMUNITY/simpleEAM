@@ -91,6 +91,12 @@ import {
   CHECK_DIAGRAM_EXISTS,
   GET_DIAGRAMS_COUNT,
 } from '../../graphql/diagram'
+import {
+  CREATE_ARCHITECTURE_PRINCIPLE,
+  UPDATE_ARCHITECTURE_PRINCIPLE,
+  CHECK_ARCHITECTURE_PRINCIPLE_EXISTS,
+  GET_ARCHITECTURE_PRINCIPLES_COUNT,
+} from '../../graphql/architecturePrinciple'
 
 // GraphQL enums
 import {
@@ -101,6 +107,8 @@ import {
   InterfaceStatus,
   ArchitectureDomain,
   ArchitectureType,
+  PrincipleCategory,
+  PrinciplePriority,
 } from '../../gql/generated'
 
 // GraphQL Mutations für Datenlöschung
@@ -160,6 +168,14 @@ const DELETE_DIAGRAMS = `
   }
 `
 
+const DELETE_ARCHITECTURE_PRINCIPLES = `
+  mutation DeleteAllArchitecturePrinciples {
+    deleteArchitecturePrinciples(where: {}) {
+      nodesDeleted
+    }
+  }
+`
+
 // Import/Export Typen basierend auf den Anforderungen FR-IE-01 und FR-IE-02
 interface ImportSettings {
   entityType:
@@ -170,6 +186,7 @@ interface ImportSettings {
     | 'persons'
     | 'architectures'
     | 'diagrams'
+    | 'architecturePrinciples'
     | 'all'
   format: 'xlsx'
   updateMode: 'overwrite' | 'merge' | 'skipExisting'
@@ -185,6 +202,7 @@ interface ExportSettings {
     | 'persons'
     | 'architectures'
     | 'diagrams'
+    | 'architecturePrinciples'
     | 'all'
   format: 'xlsx' | 'csv'
 }
@@ -241,6 +259,8 @@ const getRelationshipFields = (entityType: string): string[] => {
       ]
     case 'diagrams':
       return ['creator', 'architecture']
+    case 'architecturePrinciples':
+      return ['owners', 'appliedInArchitectures', 'implementedByApplications']
     default:
       return []
   }
@@ -283,6 +303,7 @@ const checkEntityExists = async (client: any, entityType: string, id: string): P
     Persons: CHECK_PERSON_EXISTS,
     Architectures: CHECK_ARCHITECTURE_EXISTS,
     Diagrams: CHECK_DIAGRAM_EXISTS,
+    'Architecture Principles': CHECK_ARCHITECTURE_PRINCIPLE_EXISTS,
   }
 
   const query = queryMap[entityType as keyof typeof queryMap]
@@ -323,6 +344,7 @@ const importEntityDataWithMapping = async (
     Persons: CREATE_PERSON,
     Architectures: CREATE_ARCHITECTURE,
     Diagrams: CREATE_DIAGRAM,
+    'Architecture Principles': CREATE_ARCHITECTURE_PRINCIPLE,
   }
 
   const updateMutationMap = {
@@ -333,6 +355,7 @@ const importEntityDataWithMapping = async (
     Persons: UPDATE_PERSON,
     Architectures: UPDATE_ARCHITECTURE,
     Diagrams: UPDATE_DIAGRAM,
+    'Architecture Principles': UPDATE_ARCHITECTURE_PRINCIPLE,
   }
 
   const createMutation = mutationMap[entityType as keyof typeof mutationMap]
@@ -489,6 +512,46 @@ const importEntityDataWithMapping = async (
         }
         break
 
+      case 'Architecture Principles': {
+        // Validate enum values
+        const categoryValue = row.category?.toUpperCase()
+        const priorityValue = row.priority?.toUpperCase()
+
+        // Validate category enum
+        const validCategory = Object.values(PrincipleCategory).includes(
+          categoryValue as PrincipleCategory
+        )
+          ? (categoryValue as PrincipleCategory)
+          : PrincipleCategory.BUSINESS // default
+
+        // Validate priority enum
+        const validPriority = Object.values(PrinciplePriority).includes(
+          priorityValue as PrinciplePriority
+        )
+          ? (priorityValue as PrinciplePriority)
+          : PrinciplePriority.MEDIUM // default
+
+        // Parse tags from comma-separated string
+        const tags = row.tags
+          ? row.tags.split(',').map((tag: string) => tag.trim()).filter((tag: string) => tag.length > 0)
+          : []
+
+        // Parse boolean value for isActive
+        const isActive = row.isActive === 'true' || row.isActive === true || row.isActive === 1
+
+        input = {
+          name: row.name || '',
+          description: row.description || '',
+          category: validCategory,
+          priority: validPriority,
+          rationale: row.rationale || '',
+          implications: row.implications || '',
+          tags: tags,
+          isActive: isActive,
+        }
+        break
+      }
+
       default:
         throw new Error(`Unsupported entity type: ${entityType}`)
     }
@@ -546,6 +609,9 @@ const importEntityDataWithMapping = async (
           case 'Diagrams':
             createdEntities = result.data.createDiagrams?.diagrams
             break
+          case 'Architecture Principles':
+            createdEntities = result.data.createArchitecturePrinciples?.architecturePrinciples
+            break
           default:
             break
         }
@@ -587,6 +653,7 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
       const { GET_DIAGRAMS } = await import('../../graphql/diagram')
       const { GET_APPLICATION_INTERFACES } = await import('../../graphql/applicationInterface')
       const { GET_PERSONS } = await import('../../graphql/person')
+      const { GET_ARCHITECTURE_PRINCIPLES } = await import('../../graphql/architecturePrinciple')
 
       // Refetch all dashboard count queries AND main entity list queries to update both dashboard and entity tables
       await apolloClient.refetchQueries({
@@ -599,6 +666,7 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
           GET_DIAGRAMS_COUNT,
           GET_APPLICATION_INTERFACES_COUNT,
           GET_PERSONS_COUNT,
+          GET_ARCHITECTURE_PRINCIPLES_COUNT,
           // Main entity list queries for table refresh
           GET_CAPABILITIES,
           GET_APPLICATIONS,
@@ -607,6 +675,7 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
           GET_DIAGRAMS,
           GET_APPLICATION_INTERFACES,
           GET_PERSONS,
+          GET_ARCHITECTURE_PRINCIPLES,
         ],
       })
     } catch {
@@ -675,6 +744,7 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
     persons: 'Personen',
     architectures: 'Architekturen',
     diagrams: 'Diagramme',
+    architecturePrinciples: 'Architekturprinzipien',
     ...(isAdmin() && { all: 'Alle Entitäten (Admin)' }),
   }
 
@@ -915,7 +985,7 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
                 return updatedRow
               })
 
-              await updateEntityRelationships(updatedTabData, entityType as any)
+              await updateEntityRelationships(updatedTabData, entityType as 'businessCapabilities' | 'applications' | 'dataObjects' | 'interfaces' | 'persons' | 'architectures' | 'diagrams' | 'architecturePrinciples')
             } catch (error) {
               // Update error in existing result
               const existingResult = importResults.find(r => r.entityType === tabName)
@@ -987,7 +1057,7 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
             return updatedRow
           })
 
-          await updateEntityRelationships(updatedData, importSettings.entityType as any)
+          await updateEntityRelationships(updatedData, importSettings.entityType as 'businessCapabilities' | 'applications' | 'dataObjects' | 'interfaces' | 'persons' | 'architectures' | 'diagrams' | 'architecturePrinciples')
           setImportProgress(90)
 
           importResults.push({
@@ -1058,6 +1128,7 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
       | 'persons'
       | 'architectures'
       | 'diagrams'
+      | 'architecturePrinciples'
   ): Promise<void> => {
     // Filter only rows that have relationships to update
     const rowsWithRelationships = data.filter(row => {
@@ -1098,6 +1169,8 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
           )
         case 'diagrams':
           return row.creator || row.architecture
+        case 'architecturePrinciples':
+          return row.owners || row.appliedInArchitectures || row.implementedByApplications
         default:
           return false
       }
@@ -1126,6 +1199,9 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
         break
       case 'diagrams':
         await updateDiagramRelationships(rowsWithRelationships)
+        break
+      case 'architecturePrinciples':
+        await updateArchitecturePrincipleRelationships(rowsWithRelationships)
         break
       default:
     }
@@ -1523,6 +1599,60 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
     }
   }
 
+  const updateArchitecturePrincipleRelationships = async (data: any[]): Promise<void> => {
+    const { UPDATE_ARCHITECTURE_PRINCIPLE } = await import('../../graphql/architecturePrinciple')
+
+    for (const row of data) {
+      if (!row.id) continue
+
+      const updateInput: any = {}
+
+      if (row.owners) {
+        const ownerIds = parseRelationshipIds(row.owners)
+        if (ownerIds.length > 0) {
+          updateInput.owners = [
+            {
+              connect: ownerIds.map(id => ({ where: { node: { id: { eq: id } } } })),
+            },
+          ]
+        }
+      }
+
+      if (row.appliedInArchitectures) {
+        const architectureIds = parseRelationshipIds(row.appliedInArchitectures)
+        if (architectureIds.length > 0) {
+          updateInput.appliedInArchitectures = [
+            {
+              connect: architectureIds.map(id => ({ where: { node: { id: { eq: id } } } })),
+            },
+          ]
+        }
+      }
+
+      if (row.implementedByApplications) {
+        const applicationIds = parseRelationshipIds(row.implementedByApplications)
+        if (applicationIds.length > 0) {
+          updateInput.implementedByApplications = [
+            {
+              connect: applicationIds.map(id => ({ where: { node: { id: { eq: id } } } })),
+            },
+          ]
+        }
+      }
+
+      if (Object.keys(updateInput).length > 0) {
+        try {
+          await apolloClient.mutate({
+            mutation: UPDATE_ARCHITECTURE_PRINCIPLE,
+            variables: { id: row.id, input: updateInput },
+          })
+        } catch (error) {
+          console.error(`Failed to update relationships for architecture principle ${row.id}:`, error)
+        }
+      }
+    }
+  }
+
   // Template Download
   const handleDownloadTemplate = async () => {
     try {
@@ -1551,7 +1681,7 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
         return
       }
 
-      const exampleData = getTemplateWithExamples(importSettings.entityType as any)
+      const exampleData = getTemplateWithExamples(importSettings.entityType as Exclude<typeof importSettings.entityType, 'all'>)
       await exportToExcel(exampleData, {
         filename: `${importSettings.entityType}_template_mit_beispielen`,
         sheetName: 'Template',
@@ -2055,6 +2185,7 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
           { mutation: DELETE_PERSONS, name: 'Persons' },
           { mutation: DELETE_ARCHITECTURES, name: 'Architectures' },
           { mutation: DELETE_DIAGRAMS, name: 'Diagrams' },
+          { mutation: DELETE_ARCHITECTURE_PRINCIPLES, name: 'Architecture Principles' },
         ]
 
         for (const operation of deleteOperations) {
@@ -2090,6 +2221,9 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
             break
           case 'diagrams':
             mutation = DELETE_DIAGRAMS
+            break
+          case 'architecturePrinciples':
+            mutation = DELETE_ARCHITECTURE_PRINCIPLES
             break
           default:
             throw new Error('Unbekannter Entity-Typ')

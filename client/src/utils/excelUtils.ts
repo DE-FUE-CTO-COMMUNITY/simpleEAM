@@ -468,6 +468,10 @@ export const downloadTemplate = async (
     applications: 'Applications',
     dataObjects: 'Data Objects',
     interfaces: 'Interfaces',
+    persons: 'Persons',
+    architectures: 'Architectures',
+    diagrams: 'Diagrams',
+    architecturePrinciples: 'Architecture Principles',
   }
 
   await exportToExcel(template, {
@@ -490,6 +494,7 @@ export const downloadTemplateWithRealFields = async (
     | 'persons'
     | 'architectures'
     | 'diagrams'
+    | 'architecturePrinciples'
     | 'all'
 ): Promise<void> => {
   // Dynamischen Import für ES-Module-Kompatibilität verwenden
@@ -536,6 +541,7 @@ export const downloadTemplateWithRealFields = async (
     persons: 'Persons',
     architectures: 'Architectures',
     diagrams: 'Diagrams',
+    architecturePrinciples: 'Architecture Principles',
   }
 
   await exportToExcel([template], {

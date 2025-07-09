@@ -844,7 +844,12 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
   ]
 
   // Alle Felder zusammenfügen
-  const fields: FieldConfigWithSelect[] = [...generalFields, ...elementsFields, ...principleFields, ...diagramFields]
+  const fields: FieldConfigWithSelect[] = [
+    ...generalFields,
+    ...elementsFields,
+    ...principleFields,
+    ...diagramFields,
+  ]
 
   // Standardwerte für optionale Props bereitstellen
   const formMode = mode || 'view'

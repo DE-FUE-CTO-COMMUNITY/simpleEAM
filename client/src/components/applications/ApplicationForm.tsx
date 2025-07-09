@@ -341,7 +341,8 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
         sourceOfInterfaceIds: application.sourceOfInterfaces?.map(iface => iface.id) ?? [],
         targetOfInterfaceIds: application.targetOfInterfaces?.map(iface => iface.id) ?? [],
         partOfArchitectures: application.partOfArchitectures?.map(arch => arch.id) ?? [],
-        implementsPrincipleIds: application.implementsPrinciples?.map(principle => principle.id) ?? [],
+        implementsPrincipleIds:
+          application.implementsPrinciples?.map(principle => principle.id) ?? [],
         timeCategory: application.timeCategory ?? null,
         sevenRStrategy: application.sevenRStrategy ?? null,
       })
@@ -848,10 +849,12 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
       type: 'autocomplete',
       tabId: 'principles',
       multiple: true,
-      options: (principlesData?.architecturePrinciples || []).map((principle: ArchitecturePrinciple) => ({
-        value: principle.id,
-        label: principle.name,
-      })),
+      options: (principlesData?.architecturePrinciples || []).map(
+        (principle: ArchitecturePrinciple) => ({
+          value: principle.id,
+          label: principle.name,
+        })
+      ),
       loadingOptions: principlesLoading,
       size: 12,
       getOptionLabel: (option: any) => {
