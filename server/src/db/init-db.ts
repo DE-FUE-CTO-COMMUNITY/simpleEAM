@@ -948,6 +948,272 @@ async function createSampleData(session: Session) {
       })
     `)
 
+    console.log('Erstelle Architektur-Prinzipien...')
+    // Architektur-Prinzipien erstellen (20+ ArchitecturePrinciples)
+    await session.run(`
+      CREATE 
+      (ap1:ArchitecturePrinciple {
+        id: "ap-001",
+        name: "API First",
+        description: "Alle Services müssen API-first entwickelt werden",
+        category: "INTEGRATION",
+        priority: "HIGH",
+        rationale: "Ermöglicht bessere Integration und Wiederverwendbarkeit von Services",
+        implications: "Alle neuen Services benötigen eine vollständige API-Spezifikation vor der Entwicklung",
+        tags: ["API", "Integration", "Services"],
+        isActive: true,
+        createdAt: datetime(),
+        updatedAt: datetime()
+      }),
+      (ap2:ArchitecturePrinciple {
+        id: "ap-002",
+        name: "Cloud First",
+        description: "Bevorzugung von Cloud-nativen Lösungen",
+        category: "TECHNOLOGY",
+        priority: "HIGH",
+        rationale: "Reduziert Infrastrukturkosten und verbessert Skalierbarkeit",
+        implications: "On-Premises-Lösungen nur bei besonderen Compliance-Anforderungen",
+        tags: ["Cloud", "Infrastructure", "Scalability"],
+        isActive: true,
+        createdAt: datetime(),
+        updatedAt: datetime()
+      }),
+      (ap3:ArchitecturePrinciple {
+        id: "ap-003",
+        name: "Security by Design",
+        description: "Sicherheit von Anfang an mitdenken",
+        category: "SECURITY",
+        priority: "CRITICAL",
+        rationale: "Nachträgliche Sicherheitsmaßnahmen sind kostspieliger und weniger effektiv",
+        implications: "Security Reviews sind in jedem Entwicklungszyklus verpflichtend",
+        tags: ["Security", "Design", "Compliance"],
+        isActive: true,
+        createdAt: datetime(),
+        updatedAt: datetime()
+      }),
+      (ap4:ArchitecturePrinciple {
+        id: "ap-004",
+        name: "Microservices Architektur",
+        description: "Aufteilung komplexer Anwendungen in kleinere Services",
+        category: "APPLICATION",
+        priority: "MEDIUM",
+        rationale: "Verbessert Wartbarkeit, Skalierbarkeit und Entwicklungsgeschwindigkeit",
+        implications: "Erhöhte Komplexität bei Service-zu-Service-Kommunikation",
+        tags: ["Microservices", "Architecture", "Scalability"],
+        isActive: true,
+        createdAt: datetime(),
+        updatedAt: datetime()
+      }),
+      (ap5:ArchitecturePrinciple {
+        id: "ap-005",
+        name: "Data Privacy by Design",
+        description: "Datenschutz als integraler Bestandteil der Systemarchitektur",
+        category: "DATA",
+        priority: "CRITICAL",
+        rationale: "DSGVO-Compliance und Aufbau von Kundenvertrauen",
+        implications: "Alle Datenverarbeitungen müssen dokumentiert und minimiert werden",
+        tags: ["Privacy", "GDPR", "Data Protection"],
+        isActive: true,
+        createdAt: datetime(),
+        updatedAt: datetime()
+      }),
+      (ap6:ArchitecturePrinciple {
+        id: "ap-006",
+        name: "Open Source First",
+        description: "Bevorzugung von Open-Source-Lösungen",
+        category: "TECHNOLOGY",
+        priority: "MEDIUM",
+        rationale: "Reduziert Lizenzkosten und Vendor Lock-in",
+        implications: "Support und Wartung müssen intern oder über Service-Partner sichergestellt werden",
+        tags: ["Open Source", "Cost Optimization", "Vendor Independence"],
+        isActive: true,
+        createdAt: datetime(),
+        updatedAt: datetime()
+      }),
+      (ap7:ArchitecturePrinciple {
+        id: "ap-007",
+        name: "Observability by Default",
+        description: "Alle Services müssen Monitoring und Logging unterstützen",
+        category: "PERFORMANCE",
+        priority: "HIGH",
+        rationale: "Ermöglicht proaktive Problemerkennung und -behebung",
+        implications: "Zusätzlicher Aufwand für Instrumentierung in jedem Service",
+        tags: ["Monitoring", "Logging", "Observability"],
+        isActive: true,
+        createdAt: datetime(),
+        updatedAt: datetime()
+      }),
+      (ap8:ArchitecturePrinciple {
+        id: "ap-008",
+        name: "Fail Fast",
+        description: "Systeme sollen schnell und kontrolliert versagen",
+        category: "RELIABILITY",
+        priority: "HIGH",
+        rationale: "Verhindert Kaskadenausfälle und ermöglicht schnelle Wiederherstellung",
+        implications: "Circuit Breaker und Timeout-Mechanismen sind obligatorisch",
+        tags: ["Resilience", "Circuit Breaker", "Fault Tolerance"],
+        isActive: true,
+        createdAt: datetime(),
+        updatedAt: datetime()
+      }),
+      (ap9:ArchitecturePrinciple {
+        id: "ap-009",
+        name: "Immutable Infrastructure",
+        description: "Infrastructure as Code mit unveränderlichen Komponenten",
+        category: "TECHNOLOGY",
+        priority: "MEDIUM",
+        rationale: "Verbessert Reproduzierbarkeit und reduziert Konfigurationsdrift",
+        implications: "Alle Infrastrukturänderungen müssen über Code-Deployment erfolgen",
+        tags: ["IaC", "Infrastructure", "Reproducibility"],
+        isActive: true,
+        createdAt: datetime(),
+        updatedAt: datetime()
+      }),
+      (ap10:ArchitecturePrinciple {
+        id: "ap-010",
+        name: "Event-Driven Architecture",
+        description: "Lose gekoppelte Systeme über Events",
+        category: "INTEGRATION",
+        priority: "MEDIUM",
+        rationale: "Ermöglicht bessere Skalierbarkeit und Entkopplung",
+        implications: "Event-Schema-Management und Message-Ordering müssen berücksichtigt werden",
+        tags: ["Events", "Messaging", "Decoupling"],
+        isActive: true,
+        createdAt: datetime(),
+        updatedAt: datetime()
+      }),
+      (ap11:ArchitecturePrinciple {
+        id: "ap-011",
+        name: "Mobile First",
+        description: "Benutzeroberflächen primär für mobile Geräte optimieren",
+        category: "APPLICATION",
+        priority: "HIGH",
+        rationale: "Majority der Nutzer greift über mobile Geräte zu",
+        implications: "Responsive Design und Progressive Web Apps sind Standard",
+        tags: ["Mobile", "Responsive", "UX"],
+        isActive: true,
+        createdAt: datetime(),
+        updatedAt: datetime()
+      }),
+      (ap12:ArchitecturePrinciple {
+        id: "ap-012",
+        name: "Zero Trust Security",
+        description: "Vertraue niemals, verifiziere immer",
+        category: "SECURITY",
+        priority: "HIGH",
+        rationale: "Moderne Bedrohungslandschaft erfordert umfassende Verifikation",
+        implications: "Alle Zugriffe müssen authentifiziert und autorisiert werden",
+        tags: ["Zero Trust", "Authentication", "Authorization"],
+        isActive: true,
+        createdAt: datetime(),
+        updatedAt: datetime()
+      }),
+      (ap13:ArchitecturePrinciple {
+        id: "ap-013",
+        name: "Continuous Deployment",
+        description: "Automatisierte Deployments in Produktion",
+        category: "PERFORMANCE",
+        priority: "MEDIUM",
+        rationale: "Reduziert Time-to-Market und Deployment-Risiken",
+        implications: "Umfassende Test-Automatisierung und Rollback-Strategien erforderlich",
+        tags: ["CD", "Automation", "DevOps"],
+        isActive: true,
+        createdAt: datetime(),
+        updatedAt: datetime()
+      }),
+      (ap14:ArchitecturePrinciple {
+        id: "ap-014",
+        name: "Data Mesh",
+        description: "Dezentrale Datenarchitektur mit Domain-Ownership",
+        category: "DATA",
+        priority: "LOW",
+        rationale: "Skaliert besser als zentrale Data Lakes bei großen Organisationen",
+        implications: "Daten-Teams in jeder Domain benötigt, höhere Governance-Komplexität",
+        tags: ["Data Mesh", "Decentralization", "Domain"],
+        isActive: false,
+        createdAt: datetime(),
+        updatedAt: datetime()
+      }),
+      (ap15:ArchitecturePrinciple {
+        id: "ap-015",
+        name: "AI/ML by Design",
+        description: "KI-Funktionalitäten von Anfang an mitdenken",
+        category: "TECHNOLOGY",
+        priority: "MEDIUM",
+        rationale: "Ermöglicht datengetriebene Entscheidungen und Automatisierung",
+        implications: "Datenqualität und ML-Pipelines müssen von Beginn an berücksichtigt werden",
+        tags: ["AI", "ML", "Data Science"],
+        isActive: true,
+        createdAt: datetime(),
+        updatedAt: datetime()
+      }),
+      (ap16:ArchitecturePrinciple {
+        id: "ap-016",
+        name: "Vendor Neutrality",
+        description: "Vermeidung von Vendor Lock-in",
+        category: "GOVERNANCE",
+        priority: "MEDIUM",
+        rationale: "Erhält Flexibilität und Verhandlungsmacht",
+        implications: "Standards-basierte Schnittstellen und Multi-Vendor-Strategien bevorzugen",
+        tags: ["Vendor Independence", "Standards", "Flexibility"],
+        isActive: true,
+        createdAt: datetime(),
+        updatedAt: datetime()
+      }),
+      (ap17:ArchitecturePrinciple {
+        id: "ap-017",
+        name: "Cost Optimization",
+        description: "Kontinuierliche Optimierung der IT-Kosten",
+        category: "COST_OPTIMIZATION",
+        priority: "HIGH",
+        rationale: "Maximiert ROI und ermöglicht Investitionen in Innovation",
+        implications: "Regelmäßige Reviews und FinOps-Praktiken implementieren",
+        tags: ["Cost", "FinOps", "Optimization"],
+        isActive: true,
+        createdAt: datetime(),
+        updatedAt: datetime()
+      }),
+      (ap18:ArchitecturePrinciple {
+        id: "ap-018",
+        name: "Self-Service Platforms",
+        description: "Entwickler-Teams sollen sich selbst bedienen können",
+        category: "REUSABILITY",
+        priority: "MEDIUM",
+        rationale: "Reduziert Abhängigkeiten und beschleunigt Entwicklung",
+        implications: "Investment in Platform Engineering und Developer Experience",
+        tags: ["Self-Service", "Platform", "Developer Experience"],
+        isActive: true,
+        createdAt: datetime(),
+        updatedAt: datetime()
+      }),
+      (ap19:ArchitecturePrinciple {
+        id: "ap-019",
+        name: "Accessibility First",
+        description: "Barrierefreie Gestaltung aller Benutzeroberflächen",
+        category: "APPLICATION",
+        priority: "HIGH",
+        rationale: "Gesetzliche Anforderungen und gesellschaftliche Verantwortung",
+        implications: "WCAG-Compliance muss in allen UI-Komponenten sichergestellt werden",
+        tags: ["Accessibility", "WCAG", "Inclusion"],
+        isActive: true,
+        createdAt: datetime(),
+        updatedAt: datetime()
+      }),
+      (ap20:ArchitecturePrinciple {
+        id: "ap-020",
+        name: "Green IT",
+        description: "Nachhaltige und energieeffiziente IT-Praktiken",
+        category: "GOVERNANCE",
+        priority: "MEDIUM",
+        rationale: "Umweltverantwortung und Kostenreduktion durch Energieeffizienz",
+        implications: "Carbon Footprint muss bei Architekturentscheidungen berücksichtigt werden",
+        tags: ["Sustainability", "Energy Efficiency", "Green IT"],
+        isActive: true,
+        createdAt: datetime(),
+        updatedAt: datetime()
+      })
+    `)
+
     console.log('Erstelle Beziehungen zwischen Entitäten...')
     // Ownership-Beziehungen
     await session.run(`
@@ -982,6 +1248,52 @@ async function createSampleData(session: Session) {
         (arch3)-[:OWNED_BY]->(p3),
         (arch4)-[:OWNED_BY]->(p4),
         (arch5)-[:OWNED_BY]->(p5)
+    `)
+
+    // ArchitecturePrinciple-Verantwortlichkeiten
+    await session.run(`
+      MATCH 
+        (p1:Person {id: "person-001"}), (ap1:ArchitecturePrinciple {id: "ap-001"}),
+        (p1), (ap2:ArchitecturePrinciple {id: "ap-002"}),
+        (p1), (ap3:ArchitecturePrinciple {id: "ap-003"}),
+        (p1), (ap4:ArchitecturePrinciple {id: "ap-004"}),
+        (p2:Person {id: "person-002"}), (ap5:ArchitecturePrinciple {id: "ap-005"}),
+        (p2), (ap6:ArchitecturePrinciple {id: "ap-006"}),
+        (p2), (ap7:ArchitecturePrinciple {id: "ap-007"}),
+        (p3:Person {id: "person-003"}), (ap8:ArchitecturePrinciple {id: "ap-008"}),
+        (p3), (ap9:ArchitecturePrinciple {id: "ap-009"}),
+        (p3), (ap10:ArchitecturePrinciple {id: "ap-010"}),
+        (p4:Person {id: "person-004"}), (ap11:ArchitecturePrinciple {id: "ap-011"}),
+        (p4), (ap12:ArchitecturePrinciple {id: "ap-012"}),
+        (p4), (ap13:ArchitecturePrinciple {id: "ap-013"}),
+        (p4), (ap14:ArchitecturePrinciple {id: "ap-014"}),
+        (p5:Person {id: "person-005"}), (ap15:ArchitecturePrinciple {id: "ap-015"}),
+        (p5), (ap16:ArchitecturePrinciple {id: "ap-016"}),
+        (p5), (ap17:ArchitecturePrinciple {id: "ap-017"}),
+        (p6:Person {id: "person-006"}), (ap18:ArchitecturePrinciple {id: "ap-018"}),
+        (p6), (ap19:ArchitecturePrinciple {id: "ap-019"}),
+        (p6), (ap20:ArchitecturePrinciple {id: "ap-020"})
+      CREATE 
+        (ap1)-[:OWNED_BY]->(p1),
+        (ap2)-[:OWNED_BY]->(p1),
+        (ap3)-[:OWNED_BY]->(p1),
+        (ap4)-[:OWNED_BY]->(p1),
+        (ap5)-[:OWNED_BY]->(p2),
+        (ap6)-[:OWNED_BY]->(p2),
+        (ap7)-[:OWNED_BY]->(p2),
+        (ap8)-[:OWNED_BY]->(p3),
+        (ap9)-[:OWNED_BY]->(p3),
+        (ap10)-[:OWNED_BY]->(p3),
+        (ap11)-[:OWNED_BY]->(p4),
+        (ap12)-[:OWNED_BY]->(p4),
+        (ap13)-[:OWNED_BY]->(p4),
+        (ap14)-[:OWNED_BY]->(p4),
+        (ap15)-[:OWNED_BY]->(p5),
+        (ap16)-[:OWNED_BY]->(p5),
+        (ap17)-[:OWNED_BY]->(p5),
+        (ap18)-[:OWNED_BY]->(p6),
+        (ap19)-[:OWNED_BY]->(p6),
+        (ap20)-[:OWNED_BY]->(p6)
     `)
 
     // Interface-Verantwortlichkeiten
@@ -1316,6 +1628,100 @@ async function createSampleData(session: Session) {
         (arch5)-[:CONTAINS]->(a4)
     `)
 
+    // ArchitecturePrinciple-Architecture Beziehungen
+    await session.run(`
+      MATCH 
+        (ap1:ArchitecturePrinciple {id: "ap-001"}), (arch1:Architecture {id: "arch-001"}),
+        (ap1), (arch5:Architecture {id: "arch-005"}),
+        (ap2:ArchitecturePrinciple {id: "ap-002"}), (arch2:Architecture {id: "arch-002"}),
+        (ap2), (arch4:Architecture {id: "arch-004"}),
+        (ap3:ArchitecturePrinciple {id: "ap-003"}), (arch3:Architecture {id: "arch-003"}),
+        (ap3), (arch1),
+        (ap4:ArchitecturePrinciple {id: "ap-004"}), (arch1),
+        (ap4), (arch5),
+        (ap5:ArchitecturePrinciple {id: "ap-005"}), (arch2),
+        (ap5), (arch3),
+        (ap7:ArchitecturePrinciple {id: "ap-007"}), (arch2),
+        (ap7), (arch3),
+        (ap8:ArchitecturePrinciple {id: "ap-008"}), (arch5),
+        (ap11:ArchitecturePrinciple {id: "ap-011"}), (arch1),
+        (ap12:ArchitecturePrinciple {id: "ap-012"}), (arch3),
+        (ap15:ArchitecturePrinciple {id: "ap-015"}), (arch2),
+        (ap17:ArchitecturePrinciple {id: "ap-017"}), (arch4)
+      CREATE 
+        (ap1)-[:APPLIED_IN]->(arch1),
+        (ap1)-[:APPLIED_IN]->(arch5),
+        (ap2)-[:APPLIED_IN]->(arch2),
+        (ap2)-[:APPLIED_IN]->(arch4),
+        (ap3)-[:APPLIED_IN]->(arch3),
+        (ap3)-[:APPLIED_IN]->(arch1),
+        (ap4)-[:APPLIED_IN]->(arch1),
+        (ap4)-[:APPLIED_IN]->(arch5),
+        (ap5)-[:APPLIED_IN]->(arch2),
+        (ap5)-[:APPLIED_IN]->(arch3),
+        (ap7)-[:APPLIED_IN]->(arch2),
+        (ap7)-[:APPLIED_IN]->(arch3),
+        (ap8)-[:APPLIED_IN]->(arch5),
+        (ap11)-[:APPLIED_IN]->(arch1),
+        (ap12)-[:APPLIED_IN]->(arch3),
+        (ap15)-[:APPLIED_IN]->(arch2),
+        (ap17)-[:APPLIED_IN]->(arch4)
+    `)
+
+    // ArchitecturePrinciple-Application Implementierungsbeziehungen
+    await session.run(`
+      MATCH 
+        (ap1:ArchitecturePrinciple {id: "ap-001"}), (a1:Application {id: "app-001"}),
+        (ap1), (a2:Application {id: "app-002"}),
+        (ap1), (a5:Application {id: "app-005"}),
+        (ap2:ArchitecturePrinciple {id: "ap-002"}), (a5),
+        (ap2), (a9:Application {id: "app-009"}),
+        (ap3:ArchitecturePrinciple {id: "ap-003"}), (a11:Application {id: "app-011"}),
+        (ap3), (a1),
+        (ap4:ArchitecturePrinciple {id: "ap-004"}), (a2),
+        (ap4), (a3:Application {id: "app-003"}),
+        (ap6:ArchitecturePrinciple {id: "ap-006"}), (a7:Application {id: "app-007"}),
+        (ap7:ArchitecturePrinciple {id: "ap-007"}), (a5),
+        (ap7), (a11),
+        (ap8:ArchitecturePrinciple {id: "ap-008"}), (a1),
+        (ap8), (a2),
+        (ap11:ArchitecturePrinciple {id: "ap-011"}), (a1),
+        (ap11), (a4:Application {id: "app-004"}),
+        (ap12:ArchitecturePrinciple {id: "ap-012"}), (a11),
+        (ap13:ArchitecturePrinciple {id: "ap-013"}), (a3),
+        (ap13), (a5),
+        (ap15:ArchitecturePrinciple {id: "ap-015"}), (a5),
+        (ap15), (a12:Application {id: "app-012"}),
+        (ap17:ArchitecturePrinciple {id: "ap-017"}), (a8:Application {id: "app-008"}),
+        (ap19:ArchitecturePrinciple {id: "ap-019"}), (a1),
+        (ap19), (a4)
+      CREATE 
+        (ap1)-[:IMPLEMENTED_BY]->(a1),
+        (ap1)-[:IMPLEMENTED_BY]->(a2),
+        (ap1)-[:IMPLEMENTED_BY]->(a5),
+        (ap2)-[:IMPLEMENTED_BY]->(a5),
+        (ap2)-[:IMPLEMENTED_BY]->(a9),
+        (ap3)-[:IMPLEMENTED_BY]->(a11),
+        (ap3)-[:IMPLEMENTED_BY]->(a1),
+        (ap4)-[:IMPLEMENTED_BY]->(a2),
+        (ap4)-[:IMPLEMENTED_BY]->(a3),
+        (ap6)-[:IMPLEMENTED_BY]->(a7),
+        (ap7)-[:IMPLEMENTED_BY]->(a5),
+        (ap7)-[:IMPLEMENTED_BY]->(a11),
+        (ap8)-[:IMPLEMENTED_BY]->(a1),
+        (ap8)-[:IMPLEMENTED_BY]->(a2),
+        (ap11)-[:IMPLEMENTED_BY]->(a1),
+        (ap11)-[:IMPLEMENTED_BY]->(a4),
+        (ap12)-[:IMPLEMENTED_BY]->(a11),
+        (ap13)-[:IMPLEMENTED_BY]->(a3),
+        (ap13)-[:IMPLEMENTED_BY]->(a5),
+        (ap15)-[:IMPLEMENTED_BY]->(a5),
+        (ap15)-[:IMPLEMENTED_BY]->(a12),
+        (ap17)-[:IMPLEMENTED_BY]->(a8),
+        (ap19)-[:IMPLEMENTED_BY]->(a1),
+        (ap19)-[:IMPLEMENTED_BY]->(a4)
+    `)
+
     console.log('Testdaten erfolgreich erstellt!')
     console.log('- 6 Personen')
     console.log('- 20 Business Capabilities (alle mit Verantwortlichen)')
@@ -1323,6 +1729,7 @@ async function createSampleData(session: Session) {
     console.log('- 10 DataObjects (alle mit Verantwortlichen)')
     console.log('- 12 ApplicationInterfaces (alle mit Quell- und Zielanwendungen)')
     console.log('- 5 Architectures (alle mit Verantwortlichen)')
+    console.log('- 20 ArchitecturePrinciples (alle mit Verantwortlichen)')
     console.log('- Vollständige Beziehungen zwischen allen Entitäten')
     console.log('- Alle Entitäten haben genau einen Verantwortlichen')
   } catch (error) {
