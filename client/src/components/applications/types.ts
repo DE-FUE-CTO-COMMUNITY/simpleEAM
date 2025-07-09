@@ -21,6 +21,8 @@ export const baseApplicationSchema = z.object({
   technologyStack: z.array(z.string()).default([]),
   introductionDate: z.string().optional(),
   endOfLifeDate: z.string().optional(),
+  planningDate: z.string().optional(),
+  endOfUseDate: z.string().optional(),
   timeCategory: z.nativeEnum(TimeCategory).optional(),
   sevenRStrategy: z.nativeEnum(SevenRStrategy).optional(),
 })
@@ -54,6 +56,8 @@ export type ApplicationType = Pick<
   | 'technologyStack'
   | 'introductionDate'
   | 'endOfLifeDate'
+  | 'planningDate'
+  | 'endOfUseDate'
   | 'owners'
   | 'createdAt'
   | 'updatedAt'
@@ -62,6 +66,9 @@ export type ApplicationType = Pick<
   | 'sourceOfInterfaces'
   | 'targetOfInterfaces'
   | 'partOfArchitectures'
+  | 'depictedInDiagrams'
+  | 'parents'
+  | 'components'
   | 'timeCategory'
   | 'sevenRStrategy'
 >

@@ -51,6 +51,20 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
     onColumnVisibilityChange,
   } = usePersistentColumnVisibility({
     tableKey: 'dataObjects',
+    defaultColumnVisibility: {
+      description: false,
+      planningDate: false,
+      introductionDate: false,
+      endOfUseDate: false,
+      endOfLifeDate: false,
+      usedByApplications: false,
+      relatedToCapabilities: false,
+      transferredInInterfaces: false,
+      partOfArchitectures: false,
+      depictedInDiagrams: false,
+      createdAt: false,
+      updatedAt: false,
+    },
   })
 
   // Kombiniere externe und persistente onTableReady Callbacks
@@ -62,49 +76,52 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
   }
 
   // Hilfsfunktion für die Anzeige der Datenschutzklasse mit farblichem Chip
-  const getClassificationChip = useCallback((classification: DataClassification) => {
-    let color
-    let backgroundColor
-    let label
+  const getClassificationChip = useCallback(
+    (classification: DataClassification) => {
+      let color
+      let backgroundColor
+      let label
 
-    switch (classification) {
-      case DataClassification.PUBLIC:
-        color = theme.palette.success.dark
-        backgroundColor = theme.palette.success.lighter
-        label = 'Public'
-        break
-      case DataClassification.INTERNAL:
-        color = theme.palette.info.dark
-        backgroundColor = theme.palette.info.lighter
-        label = 'Internal'
-        break
-      case DataClassification.CONFIDENTIAL:
-        color = theme.palette.warning.dark
-        backgroundColor = theme.palette.warning.lighter
-        label = 'Confidential'
-        break
-      case DataClassification.STRICTLY_CONFIDENTIAL:
-        color = theme.palette.error.dark
-        backgroundColor = theme.palette.error.lighter
-        label = 'Strictly Confidential'
-        break
-      default:
-        color = theme.palette.grey[700]
-        backgroundColor = theme.palette.grey[200]
-        label = classification
-    }
+      switch (classification) {
+        case DataClassification.PUBLIC:
+          color = theme.palette.success.dark
+          backgroundColor = theme.palette.success.lighter
+          label = 'Public'
+          break
+        case DataClassification.INTERNAL:
+          color = theme.palette.info.dark
+          backgroundColor = theme.palette.info.lighter
+          label = 'Internal'
+          break
+        case DataClassification.CONFIDENTIAL:
+          color = theme.palette.warning.dark
+          backgroundColor = theme.palette.warning.lighter
+          label = 'Confidential'
+          break
+        case DataClassification.STRICTLY_CONFIDENTIAL:
+          color = theme.palette.error.dark
+          backgroundColor = theme.palette.error.lighter
+          label = 'Strictly Confidential'
+          break
+        default:
+          color = theme.palette.grey[700]
+          backgroundColor = theme.palette.grey[200]
+          label = classification
+      }
 
-    return (
-      <Chip
-        label={label}
-        size="small"
-        sx={{
-          backgroundColor,
-          color,
-        }}
-      />
-    )
-  }, [theme])
+      return (
+        <Chip
+          label={label}
+          size="small"
+          sx={{
+            backgroundColor,
+            color,
+          }}
+        />
+      )
+    },
+    [theme]
+  )
 
   // Spalten-Definition für die DataObject-Tabelle
   const columns = useMemo(
@@ -119,6 +136,7 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
           const value = info.getValue()
           return value && value.length > 50 ? `${value.substring(0, 50)}...` : value || '-'
         },
+        enableHiding: true,
       }),
       columnHelper.accessor('classification', {
         header: 'Klassifikation',
@@ -144,9 +162,92 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
           return owners && owners.length > 0 ? `${owners[0].firstName} ${owners[0].lastName}` : '-'
         },
       }),
+      // Weitere versteckte Spalten
+      columnHelper.accessor('planningDate', {
+        header: 'Planungsdatum',
+        cell: info => {
+          const date = info.getValue()
+          return date ? new Date(date).toLocaleDateString('de-DE') : '-'
+        },
+        enableHiding: true,
+      }),
+      columnHelper.accessor('introductionDate', {
+        header: 'Einführungsdatum',
+        cell: info => {
+          const date = info.getValue()
+          return date ? new Date(date).toLocaleDateString('de-DE') : '-'
+        },
+        enableHiding: true,
+      }),
+      columnHelper.accessor('endOfUseDate', {
+        header: 'Ende der Nutzung',
+        cell: info => {
+          const date = info.getValue()
+          return date ? new Date(date).toLocaleDateString('de-DE') : '-'
+        },
+        enableHiding: true,
+      }),
+      columnHelper.accessor('endOfLifeDate', {
+        header: 'Ende der Lebenszeit',
+        cell: info => {
+          const date = info.getValue()
+          return date ? new Date(date).toLocaleDateString('de-DE') : '-'
+        },
+        enableHiding: true,
+      }),
+      columnHelper.accessor('usedByApplications', {
+        header: 'Genutzt von Anwendungen',
+        cell: info => {
+          const apps = info.getValue()
+          return apps && apps.length > 0 ? apps.map((app: any) => app.name).join(', ') : '-'
+        },
+        enableHiding: true,
+      }),
+      columnHelper.accessor('relatedToCapabilities', {
+        header: 'Verwandte Capabilities',
+        cell: info => {
+          const capabilities = info.getValue()
+          return capabilities && capabilities.length > 0
+            ? capabilities.map((cap: any) => cap.name).join(', ')
+            : '-'
+        },
+        enableHiding: true,
+      }),
+      columnHelper.accessor('transferredInInterfaces', {
+        header: 'Übertragen in Schnittstellen',
+        cell: info => {
+          const interfaces = info.getValue()
+          return interfaces && interfaces.length > 0
+            ? interfaces.map((iface: any) => iface.name).join(', ')
+            : '-'
+        },
+        enableHiding: true,
+      }),
+      columnHelper.accessor('partOfArchitectures', {
+        header: 'Teil von Architekturen',
+        cell: info => {
+          const architectures = info.getValue()
+          return architectures && architectures.length > 0
+            ? architectures.map((arch: any) => arch.name).join(', ')
+            : '-'
+        },
+        enableHiding: true,
+      }),
+      columnHelper.accessor('depictedInDiagrams', {
+        header: 'Dargestellt in Diagrammen',
+        cell: info => {
+          const diagrams = info.getValue()
+          return diagrams && diagrams.length > 0
+            ? diagrams.map((diagram: any) => diagram.title).join(', ')
+            : '-'
+        },
+        enableHiding: true,
+      }),
+      // Versteckte Zeitstempel-Spalten am Ende
       columnHelper.accessor('createdAt', {
         header: 'Erstellt am',
         cell: info => formatDate(info.getValue()),
+        enableHiding: true,
       }),
       columnHelper.accessor('updatedAt', {
         header: 'Aktualisiert am',
@@ -154,6 +255,7 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
           const value = info.getValue()
           return value ? formatDate(value) : '-'
         },
+        enableHiding: true,
       }),
     ],
     [columnHelper, getClassificationChip]

@@ -56,6 +56,7 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
   } = usePersistentColumnVisibility({
     tableKey: 'capabilities',
     defaultColumnVisibility: {
+      description: false,
       type: false,
       sequenceNumber: false,
       relatedDataObjects: false,
@@ -88,6 +89,7 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
           const value = info.getValue()
           return value && value.length > 50 ? `${value.substring(0, 50)}...` : value || '-'
         },
+        enableHiding: true,
       }),
       columnHelper.accessor('maturityLevel', {
         header: 'Reifegrad',
@@ -138,6 +140,7 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
             ? parents.map((parent: BusinessCapability) => parent.name).join(', ')
             : '-'
         },
+        enableHiding: true,
       }),
       columnHelper.accessor('children', {
         header: 'Untergeordnete Capabilities',
@@ -205,6 +208,7 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
           const value = info.getValue()
           return value ? formatDate(value) : '-'
         },
+        enableHiding: true,
       }),
     ],
     [theme.palette.primary.lighter, theme.palette.primary.dark, columnHelper]

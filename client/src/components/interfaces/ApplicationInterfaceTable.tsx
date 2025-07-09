@@ -58,6 +58,21 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
     onColumnVisibilityChange,
   } = usePersistentColumnVisibility({
     tableKey: 'applicationInterfaces',
+    defaultColumnVisibility: {
+      description: false,
+      version: false,
+      status: false,
+      planningDate: false,
+      introductionDate: false,
+      endOfUseDate: false,
+      endOfLifeDate: false,
+      predecessors: false,
+      successors: false,
+      partOfArchitectures: false,
+      depictedInDiagrams: false,
+      createdAt: false,
+      updatedAt: false,
+    },
   })
 
   // Kombiniere externe und persistente onTableReady Callbacks
@@ -78,6 +93,7 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
       columnHelper.accessor('description', {
         header: 'Beschreibung',
         cell: info => info.getValue() || '-',
+        enableHiding: true,
       }),
       columnHelper.accessor('interfaceType', {
         header: 'Schnittstellentyp',
@@ -145,13 +161,109 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
             : '-'
         },
       }),
+      // Weitere versteckte Spalten
+      columnHelper.accessor('version', {
+        header: 'Version',
+        cell: info => info.getValue() || '-',
+        enableHiding: true,
+      }),
+      columnHelper.accessor('status', {
+        header: 'Status',
+        cell: info => {
+          const status = info.getValue()
+          return (
+            <Chip
+              label={status}
+              color={status === 'ACTIVE' ? 'success' : 'default'}
+              size="small"
+              variant="outlined"
+            />
+          )
+        },
+        enableHiding: true,
+      }),
+      columnHelper.accessor('planningDate', {
+        header: 'Planungsdatum',
+        cell: info => {
+          const date = info.getValue()
+          return date ? new Date(date).toLocaleDateString('de-DE') : '-'
+        },
+        enableHiding: true,
+      }),
+      columnHelper.accessor('introductionDate', {
+        header: 'Einführungsdatum',
+        cell: info => {
+          const date = info.getValue()
+          return date ? new Date(date).toLocaleDateString('de-DE') : '-'
+        },
+        enableHiding: true,
+      }),
+      columnHelper.accessor('endOfUseDate', {
+        header: 'Ende der Nutzung',
+        cell: info => {
+          const date = info.getValue()
+          return date ? new Date(date).toLocaleDateString('de-DE') : '-'
+        },
+        enableHiding: true,
+      }),
+      columnHelper.accessor('endOfLifeDate', {
+        header: 'Ende der Lebenszeit',
+        cell: info => {
+          const date = info.getValue()
+          return date ? new Date(date).toLocaleDateString('de-DE') : '-'
+        },
+        enableHiding: true,
+      }),
+      columnHelper.accessor('predecessors', {
+        header: 'Vorgänger',
+        cell: info => {
+          const predecessors = info.getValue()
+          return predecessors && predecessors.length > 0
+            ? predecessors.map((pred: any) => pred.name).join(', ')
+            : '-'
+        },
+        enableHiding: true,
+      }),
+      columnHelper.accessor('successors', {
+        header: 'Nachfolger',
+        cell: info => {
+          const successors = info.getValue()
+          return successors && successors.length > 0
+            ? successors.map((succ: any) => succ.name).join(', ')
+            : '-'
+        },
+        enableHiding: true,
+      }),
+      columnHelper.accessor('partOfArchitectures', {
+        header: 'Teil von Architekturen',
+        cell: info => {
+          const architectures = info.getValue()
+          return architectures && architectures.length > 0
+            ? architectures.map((arch: any) => arch.name).join(', ')
+            : '-'
+        },
+        enableHiding: true,
+      }),
+      columnHelper.accessor('depictedInDiagrams', {
+        header: 'Dargestellt in Diagrammen',
+        cell: info => {
+          const diagrams = info.getValue()
+          return diagrams && diagrams.length > 0
+            ? diagrams.map((diagram: any) => diagram.title).join(', ')
+            : '-'
+        },
+        enableHiding: true,
+      }),
+      // Versteckte Zeitstempel-Spalten am Ende
       columnHelper.accessor('createdAt', {
         header: 'Erstellt am',
         cell: info => formatDate(info.getValue()),
+        enableHiding: true,
       }),
       columnHelper.accessor('updatedAt', {
         header: 'Aktualisiert am',
         cell: info => formatDate(info.getValue()),
+        enableHiding: true,
       }),
     ],
     [columnHelper]
