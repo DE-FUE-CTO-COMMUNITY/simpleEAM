@@ -58,6 +58,13 @@ export const GET_ARCHITECTURES = gql`
         id
         name
       }
+      appliedPrinciples {
+        id
+        name
+        description
+        category
+        priority
+      }
     }
   }
 `
@@ -77,6 +84,12 @@ export const CREATE_ARCHITECTURE = gql`
           id
           firstName
           lastName
+        }
+        appliedPrinciples {
+          id
+          name
+          category
+          priority
         }
         createdAt
       }
@@ -99,6 +112,12 @@ export const UPDATE_ARCHITECTURE = gql`
           id
           firstName
           lastName
+        }
+        appliedPrinciples {
+          id
+          name
+          category
+          priority
         }
         updatedAt
       }

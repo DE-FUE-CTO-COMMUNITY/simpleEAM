@@ -58,6 +58,7 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
     tableKey: 'architectures',
     defaultColumnVisibility: {
       description: false, // Beschreibung standardmäßig ausblenden
+      appliedPrinciples: false, // Angewandte Prinzipien standardmäßig ausblenden
     },
   })
 
@@ -146,6 +147,18 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
             : '-'
         },
       }),
+      columnHelper.accessor('appliedPrinciples', {
+        header: 'Angewandte Prinzipien',
+        cell: info => {
+          const principles = info.getValue()
+          return principles && principles.length > 0
+            ? principles
+                .slice(0, 2)
+                .map(principle => principle.name)
+                .join(', ') + (principles.length > 2 ? '...' : '')
+            : '-'
+        },
+      }),
       columnHelper.accessor('createdAt', {
         header: 'Erstellt am',
         cell: info => formatDate(info.getValue()),
@@ -176,6 +189,7 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
         arch.parentArchitecture && arch.parentArchitecture.length > 0
           ? arch.parentArchitecture[0].id
           : undefined,
+      appliedPrincipleIds: arch.appliedPrinciples?.map(principle => principle.id) ?? [],
     }
   }
 

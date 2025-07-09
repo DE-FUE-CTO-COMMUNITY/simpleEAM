@@ -12,6 +12,7 @@ import { GET_CAPABILITIES } from '@/graphql/capability'
 import { GET_DATA_OBJECTS } from '@/graphql/dataObject'
 import { GET_DIAGRAMS } from '@/graphql/diagram'
 import { GET_APPLICATION_INTERFACES } from '@/graphql/applicationInterface'
+import { GET_ARCHITECTURE_PRINCIPLES } from '@/graphql/architecturePrinciple'
 import GenericForm, { FieldConfig, TabConfig } from '../common/GenericForm'
 import { isArchitect } from '@/lib/auth'
 import { getDomainLabel, getTypeLabel } from './utils'
@@ -41,6 +42,7 @@ export const architectureSchema = z.object({
   containsInterfaceIds: z.array(z.string()).optional(),
   diagramIds: z.array(z.string()).optional(),
   parentArchitectureId: z.string().optional(),
+  appliedPrincipleIds: z.array(z.string()).optional(),
   elementsNote: z.string().optional(),
 })
 
@@ -89,6 +91,9 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
 
   // Schnittstellen laden
   const { data: interfaceData, loading: interfaceLoading } = useQuery(GET_APPLICATION_INTERFACES)
+
+  // Architektur-Prinzipien laden
+  const { data: principleData, loading: principleLoading } = useQuery(GET_ARCHITECTURE_PRINCIPLES)
   // Formulardaten mit useMemo initialisieren
   const defaultValues = React.useMemo<ArchitectureFormValues>(
     () => ({
@@ -105,6 +110,7 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
       containsInterfaceIds: [],
       diagramIds: [],
       parentArchitectureId: '',
+      appliedPrincipleIds: [],
       elementsNote:
         'Hinweis: Gelb markierte Elemente sind in keinem Diagramm dieser Architektur enthalten. Es wird empfohlen, alle Elemente in mindestens einem Diagramm darzustellen.',
     }),
@@ -154,6 +160,9 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
             ? value.containsInterfaceIds
             : [],
           diagramIds: Array.isArray(value.diagramIds) ? value.diagramIds : [],
+          appliedPrincipleIds: Array.isArray(value.appliedPrincipleIds)
+            ? value.appliedPrincipleIds
+            : [],
         }
 
         await onSubmit(submissionData)
@@ -249,7 +258,7 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
       form.reset(defaultValues)
     }
     // Bei 'edit' und 'view' wird das Form separat mit architecture-Daten initialisiert
-  }, [isOpen]) // Nur abhängig vom Dialog-Status
+  }, [isOpen, defaultValues, form, mode]) // Alle Dependencies hinzufügen
 
   // 2. Separater useEffect für die Aktualisierung mit Architecture-Daten
   // Dieser wird nur ausgeführt, wenn architecture sich ändert oder der Mode wechselt
@@ -282,6 +291,7 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
         containsDataObjectIds: architecture.containsDataObjects?.map(obj => obj.id) || [],
         containsInterfaceIds: architecture.containsInterfaces?.map(iface => iface.id) || [],
         diagramIds: architecture.diagrams?.map(diag => diag.id) || [],
+        appliedPrincipleIds: architecture.appliedPrinciples?.map(principle => principle.id) || [],
         parentArchitectureId:
           architecture.parentArchitecture && architecture.parentArchitecture.length > 0
             ? architecture.parentArchitecture[0].id
@@ -299,7 +309,7 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
     } catch (error) {
       console.warn('Fehler beim Aktualisieren des Formulars:', error)
     }
-  }, [architectureId, isOpen, mode])
+  }, [architectureId, isOpen, mode, architecture, form]) // Alle Dependencies hinzufügen
 
   // Beobachte das diagramIds-Feld
   const diagramIds = useStore(form.store, (state: any) => state.values.diagramIds)
@@ -330,10 +340,11 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
     }
   }, [diagramIds, form])
 
-  // Tab-Konfiguration für die drei Tabs
+  // Tab-Konfiguration für die vier Tabs
   const tabs: TabConfig[] = [
     { id: 'general', label: 'Allgemein' },
     { id: 'elements', label: 'Enthaltene Architekturelemente' },
+    { id: 'principles', label: 'Architektur-Prinzipien' },
     { id: 'diagrams', label: 'Diagramme' },
   ]
 
@@ -762,7 +773,42 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
     },
   })
 
-  // Felder für den dritten Tab (Diagramme)
+  // Felder für den dritten Tab (Architektur-Prinzipien)
+  const principleFields: FieldConfigWithSelect[] = [
+    {
+      name: 'appliedPrincipleIds',
+      label: 'Angewandte Architektur-Prinzipien',
+      type: 'autocomplete',
+      tabId: 'principles',
+      multiple: true,
+      size: { xs: 12, md: 12 },
+      options:
+        principleData?.architecturePrinciples?.map(
+          (principle: { id: string; name: string; description?: string }): SelectOption => ({
+            value: principle.id,
+            label: principle.name,
+          })
+        ) || [],
+      loadingOptions: principleLoading,
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          const matchingPrinciple = principleData?.architecturePrinciples?.find(
+            (principle: { id: string; name: string }) => principle.id === option
+          )
+          return matchingPrinciple?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
+    },
+  ]
+
+  // Felder für den vierten Tab (Diagramme)
   const diagramFields: FieldConfigWithSelect[] = [
     {
       name: 'diagramIds',
@@ -798,7 +844,7 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
   ]
 
   // Alle Felder zusammenfügen
-  const fields: FieldConfigWithSelect[] = [...generalFields, ...elementsFields, ...diagramFields]
+  const fields: FieldConfigWithSelect[] = [...generalFields, ...elementsFields, ...principleFields, ...diagramFields]
 
   // Standardwerte für optionale Props bereitstellen
   const formMode = mode || 'view'

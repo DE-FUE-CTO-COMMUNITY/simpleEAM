@@ -168,6 +168,7 @@ const ArchitecturesPage = () => {
       containsDataObjectIds,
       diagramIds,
       parentArchitectureId,
+      appliedPrincipleIds,
       ...architectureData
     } = data
 
@@ -235,6 +236,16 @@ const ArchitecturesPage = () => {
             },
           }
         : {}),
+      // Wenn Prinzipien ausgewählt wurden, verbinden wir sie mit der Architektur
+      ...(appliedPrincipleIds && appliedPrincipleIds.length > 0
+        ? {
+            appliedPrinciples: {
+              connect: appliedPrincipleIds.map(id => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }
+        : {}),
     }
 
     await createArchitecture({
@@ -254,6 +265,7 @@ const ArchitecturesPage = () => {
       containsDataObjectIds,
       diagramIds,
       parentArchitectureId,
+      appliedPrincipleIds,
       ...architectureData
     } = data
 
@@ -390,6 +402,24 @@ const ArchitecturesPage = () => {
       }
     } else {
       input.parentArchitecture = {
+        disconnect: [{ where: {} }],
+      }
+    }
+
+    // Aktualisierung der AppliedPrinciples-Beziehungen
+    if (appliedPrincipleIds && appliedPrincipleIds.length > 0) {
+      input.appliedPrinciples = {
+        disconnect: [{ where: {} }],
+        connect: appliedPrincipleIds.map(principleId => ({
+          where: {
+            node: {
+              id: { eq: principleId },
+            },
+          },
+        })),
+      }
+    } else {
+      input.appliedPrinciples = {
         disconnect: [{ where: {} }],
       }
     }

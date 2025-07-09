@@ -25,6 +25,7 @@ export type ArchitectureType = Pick<
   | 'diagrams'
   | 'childArchitectures'
   | 'parentArchitecture'
+  | 'appliedPrinciples'
 >
 
 export interface FilterState {
