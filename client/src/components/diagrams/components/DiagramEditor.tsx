@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useRef, useCallback, useMemo, useEffect } from 'react'
+import React, { useRef, useCallback, useMemo } from 'react'
 import { Box, Alert, Snackbar } from '@mui/material'
 import SaveDiagramDialog from './SaveDiagramDialog'
 import OpenDiagramDialog from './OpenDiagramDialog'
@@ -210,17 +210,24 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     })
   }
 
-  // Create dynamic initialData that includes viewport state
+  // Create dynamic initialData that includes viewport state only if no diagram is being loaded via URL
   const initialData = useMemo(() => {
-    // Load viewport state from storage
+    // Load viewport state from storage only if no diagram is being loaded via URL
     let viewportState = null
-    try {
-      const savedViewportState = loadViewportStateFromStorage()
-      if (savedViewportState) {
-        viewportState = savedViewportState
+    if (!urlParams.openDiagramId) {
+      try {
+        const savedViewportState = loadViewportStateFromStorage()
+        if (savedViewportState) {
+          viewportState = savedViewportState
+        }
+      } catch (error) {
+        console.warn('DiagramEditor: Failed to load viewport state:', error)
       }
-    } catch (error) {
-      console.warn('DiagramEditor: Failed to load viewport state:', error)
+    } else {
+      console.log(
+        'DiagramEditor: Überspringe Viewport-Wiederherstellung - Diagramm wird über URL-Parameter geladen:',
+        urlParams.openDiagramId
+      )
     }
 
     // Create base app state with viewport position
@@ -245,7 +252,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
       currentItemStrokeStyle: 'solid',
       currentItemRoughness: 1,
       currentItemOpacity: 100,
-      // Include viewport state if available
+      // Include viewport state if available and no diagram is being loaded via URL
       ...(viewportState && {
         scrollX: viewportState.scrollX,
         scrollY: viewportState.scrollY,
@@ -260,7 +267,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     }
 
     return data
-  }, []) // Deliberately static - viewport is applied once on init
+  }, [urlParams.openDiagramId]) // Depend on URL parameter to reset initialData when needed
 
   // Debug log for initialData
 

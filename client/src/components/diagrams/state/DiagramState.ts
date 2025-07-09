@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { DialogStates, NotificationState } from '../types/DiagramTypes'
 import { isViewer } from '@/lib/auth'
 import {
@@ -9,6 +10,9 @@ import {
 
 // Custom Hook für den Diagram State
 export const useDiagramState = () => {
+  const searchParams = useSearchParams()
+  const openDiagramId = searchParams.get('openDiagram')
+
   const [isClient, setIsClient] = useState(false)
   const [excalidrawAPI, setExcalidrawAPI] = useState<any>(null)
   const [currentDiagram, setCurrentDiagram] = useState<any>(null)
@@ -48,6 +52,15 @@ export const useDiagramState = () => {
       const initializeClient = () => {
         setIsClient(true)
 
+        // Überspringe Local Storage-Wiederherstellung, wenn ein Diagramm über URL-Parameter geladen werden soll
+        if (openDiagramId) {
+          console.log(
+            'Überspringe Local Storage-Wiederherstellung - Diagramm wird über URL-Parameter geladen:',
+            openDiagramId
+          )
+          return
+        }
+
         // Load persisted scene from localStorage with Docker-safe error handling
         try {
           const persistedScene = loadPersistedScene()
@@ -74,9 +87,18 @@ export const useDiagramState = () => {
       const timeoutId = setTimeout(initializeClient, 50)
       return () => clearTimeout(timeoutId)
     }
-  }, []) // Scene restoration effect - only restore once when API becomes available
+  }, [openDiagramId]) // Scene restoration effect - only restore once when API becomes available
   useEffect(() => {
     if (excalidrawAPI && isClient && currentScene && !sceneRestoredRef.current) {
+      // Überspringe Local Storage-Wiederherstellung, wenn ein Diagramm über URL-Parameter geladen werden soll
+      if (openDiagramId) {
+        console.log(
+          'Überspringe Scene-Wiederherstellung - Diagramm wird über URL-Parameter geladen:',
+          openDiagramId
+        )
+        return
+      }
+
       // Use setTimeout to ensure proper timing in Docker containers
       const restoreTimeout = setTimeout(() => {
         try {
@@ -127,7 +149,7 @@ export const useDiagramState = () => {
 
       return () => clearTimeout(restoreTimeout)
     }
-  }, [excalidrawAPI, isClient, currentScene]) // Include currentScene but with proper loop prevention
+  }, [excalidrawAPI, isClient, currentScene, openDiagramId])
 
   const updateDialogState = (dialogName: keyof DialogStates, open: boolean) => {
     setDialogStates(prev => ({
