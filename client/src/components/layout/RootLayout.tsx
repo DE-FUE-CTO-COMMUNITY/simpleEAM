@@ -6,6 +6,7 @@ import {
   Person as PersonIcon,
   Architecture as ArchitectureIcon,
   AccountTree as DiagramIcon,
+  Rule as RuleIcon,
 } from '@mui/icons-material'
 import {
   BusinessCapabilityIcon,
@@ -66,6 +67,11 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
     { text: 'Dashboard', icon: <DashboardIcon />, href: '/' },
     { text: 'Diagram-Editor', icon: <DiagramIcon />, href: '/diagrams' },
     { text: 'Architekturen', icon: <ArchitectureIcon />, href: '/architectures' },
+    {
+      text: 'Architektur Prinzipien',
+      icon: <RuleIcon />,
+      href: '/architecture-principles',
+    },
     { text: 'Business Capabilities', icon: <BusinessCapabilityIcon />, href: '/capabilities' },
     { text: 'Applikationen', icon: <ApplicationComponentIcon />, href: '/applications' },
     { text: 'Datenobjekte', icon: <BusinessObjectIcon />, href: '/dataobjects' },
