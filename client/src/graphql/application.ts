@@ -86,6 +86,13 @@ export const GET_APPLICATIONS = gql`
         id
         name
       }
+      implementsPrinciples {
+        id
+        name
+        description
+        category
+        priority
+      }
     }
   }
 `
@@ -156,6 +163,13 @@ export const GET_APPLICATION = gql`
         id
         name
       }
+      implementsPrinciples {
+        id
+        name
+        description
+        category
+        priority
+      }
     }
   }
 `
@@ -193,6 +207,12 @@ export const CREATE_APPLICATION = gql`
         successors {
           id
           name
+        }
+        implementsPrinciples {
+          id
+          name
+          category
+          priority
         }
       }
     }
@@ -232,6 +252,12 @@ export const UPDATE_APPLICATION = gql`
         successors {
           id
           name
+        }
+        implementsPrinciples {
+          id
+          name
+          category
+          priority
         }
       }
     }

@@ -71,6 +71,7 @@ export type ApplicationType = Pick<
   | 'components'
   | 'timeCategory'
   | 'sevenRStrategy'
+  | 'implementsPrinciples'
 >
 
 export interface FilterState {

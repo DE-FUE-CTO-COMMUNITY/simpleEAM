@@ -215,6 +215,7 @@ const ApplicationsPage = () => {
       usesDataObjectIds,
       sourceOfInterfaceIds,
       targetOfInterfaceIds,
+      implementsPrincipleIds,
       parentIds,
       componentIds,
       predecessorIds,
@@ -325,6 +326,16 @@ const ApplicationsPage = () => {
             },
           }
         : {}),
+      // Wenn Prinzipien ausgewählt wurden, verbinden wir sie mit der Applikation
+      ...(implementsPrincipleIds && implementsPrincipleIds.length > 0
+        ? {
+            implementsPrinciples: {
+              connect: implementsPrincipleIds.map(id => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }
+        : {}),
     }
 
     await createApplication({
@@ -344,6 +355,7 @@ const ApplicationsPage = () => {
       usesDataObjectIds,
       sourceOfInterfaceIds,
       targetOfInterfaceIds,
+      implementsPrincipleIds,
       parentIds,
       componentIds,
       predecessorIds,
@@ -545,6 +557,24 @@ const ApplicationsPage = () => {
       }
     }
 
+    // Aktualisierung der Implements-Principles-Beziehungen
+    if (implementsPrincipleIds && implementsPrincipleIds.length > 0) {
+      input.implementsPrinciples = {
+        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+        connect: implementsPrincipleIds.map(principleId => ({
+          where: {
+            node: {
+              id: { eq: principleId },
+            },
+          },
+        })),
+      }
+    } else {
+      input.implementsPrinciples = {
+        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+      }
+    }
+
     await updateApplication({
       variables: { id, input },
     })
@@ -689,6 +719,7 @@ const ApplicationsPage = () => {
               usesDataObjects: [],
               interfacesToApplications: [],
               partOfArchitectures: [],
+              implementsPrinciples: [],
               __typename: 'Application',
             } as unknown as Application
           }

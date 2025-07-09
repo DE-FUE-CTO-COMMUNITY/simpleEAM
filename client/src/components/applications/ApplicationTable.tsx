@@ -273,6 +273,19 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
         },
         enableHiding: true,
       }),
+      columnHelper.accessor('implementsPrinciples', {
+        header: 'Implementierte Prinzipien',
+        cell: info => {
+          const principles = info.getValue()
+          return principles && principles.length > 0
+            ? principles
+                .slice(0, 2)
+                .map((principle: any) => principle.name)
+                .join(', ') + (principles.length > 2 ? '...' : '')
+            : '-'
+        },
+        enableHiding: true,
+      }),
       columnHelper.accessor('depictedInDiagrams', {
         header: 'Dargestellt in Diagrammen',
         cell: info => {

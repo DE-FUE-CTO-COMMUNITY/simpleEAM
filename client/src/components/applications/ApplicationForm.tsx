@@ -19,6 +19,7 @@ import {
   DataObject,
   ApplicationInterface,
   Architecture,
+  ArchitecturePrinciple,
   TimeCategory,
   SevenRStrategy,
 } from '../../gql/generated'
@@ -28,6 +29,7 @@ import { GET_DATA_OBJECTS } from '@/graphql/dataObject'
 import { GET_APPLICATION_INTERFACES } from '@/graphql/applicationInterface'
 import { GET_ARCHITECTURES } from '@/graphql/architecture'
 import { GET_DIAGRAMS } from '@/graphql/diagram'
+import { GET_ARCHITECTURE_PRINCIPLES } from '@/graphql/architecturePrinciple'
 import GenericForm, { FieldConfig, TabConfig } from '../common/GenericForm'
 import { getValidSevenRStrategies } from './timeCategoryDependencies'
 import { isArchitect } from '@/lib/auth'
@@ -71,6 +73,7 @@ const baseApplicationSchema = z.object({
   sourceOfInterfaceIds: z.array(z.string()).optional(),
   targetOfInterfaceIds: z.array(z.string()).optional(),
   partOfArchitectures: z.array(z.string()).optional(),
+  implementsPrincipleIds: z.array(z.string()).optional(),
   depictedInDiagrams: z.array(z.string()).optional(),
   parentIds: z.array(z.string()).optional(),
   componentIds: z.array(z.string()).optional(),
@@ -255,6 +258,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
   const { data: interfacesData, loading: interfacesLoading } = useQuery(GET_APPLICATION_INTERFACES)
   const { data: architecturesData, loading: architecturesLoading } = useQuery(GET_ARCHITECTURES)
   const { data: diagramsData, loading: diagramsLoading } = useQuery(GET_DIAGRAMS)
+  const { data: principlesData, loading: principlesLoading } = useQuery(GET_ARCHITECTURE_PRINCIPLES)
 
   // Standardwerte für das Formular
   const defaultValues: ApplicationFormValues = {
@@ -278,6 +282,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     sourceOfInterfaceIds: application?.sourceOfInterfaces?.map(iface => iface.id) ?? [],
     targetOfInterfaceIds: application?.targetOfInterfaces?.map(iface => iface.id) ?? [],
     partOfArchitectures: application?.partOfArchitectures?.map(arch => arch.id) ?? [],
+    implementsPrincipleIds: application?.implementsPrinciples?.map(principle => principle.id) ?? [],
     depictedInDiagrams: application?.depictedInDiagrams?.map(diag => diag.id) ?? [],
     parentIds: application?.parents?.map(app => app.id) ?? [],
     componentIds: application?.components?.map(app => app.id) ?? [],
@@ -336,6 +341,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
         sourceOfInterfaceIds: application.sourceOfInterfaces?.map(iface => iface.id) ?? [],
         targetOfInterfaceIds: application.targetOfInterfaces?.map(iface => iface.id) ?? [],
         partOfArchitectures: application.partOfArchitectures?.map(arch => arch.id) ?? [],
+        implementsPrincipleIds: application.implementsPrinciples?.map(principle => principle.id) ?? [],
         timeCategory: application.timeCategory ?? null,
         sevenRStrategy: application.sevenRStrategy ?? null,
       })
@@ -372,6 +378,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     { id: 'lifecycle', label: 'Lebenszyklus' },
     { id: 'relationships', label: 'Beziehungen' },
     { id: 'architectures', label: 'Architekturen' },
+    { id: 'principles', label: 'Prinzipien' },
   ]
 
   // Felder für das Formular definieren
@@ -823,6 +830,37 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
             (diagram: any) => diagram.id === option
           )
           return matchingDiagram?.title || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
+    },
+
+    // Prinzipien (Tab: principles)
+    {
+      name: 'implementsPrincipleIds',
+      label: 'Implementiert Prinzipien',
+      type: 'autocomplete',
+      tabId: 'principles',
+      multiple: true,
+      options: (principlesData?.architecturePrinciples || []).map((principle: ArchitecturePrinciple) => ({
+        value: principle.id,
+        label: principle.name,
+      })),
+      loadingOptions: principlesLoading,
+      size: 12,
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          // Direkte ID - suche passende Option
+          const matchingPrinciple = principlesData?.architecturePrinciples?.find(
+            (principle: ArchitecturePrinciple) => principle.id === option
+          )
+          return matchingPrinciple?.name || option
         }
         return option?.label || ''
       },
