@@ -1,0 +1,147 @@
+'use client'
+
+import React, { useState, useEffect } from 'react'
+import {
+  Box,
+  Typography,
+  Card,
+  CardHeader,
+  CardContent,
+  Divider,
+  Alert,
+  useTheme,
+  useMediaQuery,
+  Grid,
+} from '@mui/material'
+import { useQuery } from '@apollo/client'
+import { GET_RECENT_DIAGRAMS } from '@/graphql/diagram'
+import DiagramCard, { DiagramCardSkeleton } from './DiagramCard'
+
+const RecentDiagramsSection: React.FC = () => {
+  const theme = useTheme()
+  const [diagramLimit, setDiagramLimit] = useState(6)
+
+  // Responsive Breakpoints
+  const isXs = useMediaQuery(theme.breakpoints.only('xs'))
+  const isSm = useMediaQuery(theme.breakpoints.only('sm'))
+  const isMd = useMediaQuery(theme.breakpoints.only('md'))
+  const isLg = useMediaQuery(theme.breakpoints.only('lg'))
+  const isXl = useMediaQuery(theme.breakpoints.up('xl'))
+
+  // Berechne die Anzahl der anzuzeigenden Diagramme basierend auf der Bildschirmgröße
+  useEffect(() => {
+    let limit = 6 // Standard für xl und größer
+
+    if (isXs) {
+      limit = 1 // 1 Karte pro Zeile auf sehr kleinen Bildschirmen
+    } else if (isSm) {
+      limit = 2 // 2 Karten pro Zeile auf kleinen Bildschirmen
+    } else if (isMd) {
+      limit = 3 // 3 Karten pro Zeile auf mittleren Bildschirmen
+    } else if (isLg) {
+      limit = 4 // 4 Karten pro Zeile auf großen Bildschirmen
+    } else if (isXl) {
+      limit = 6 // 6 Karten pro Zeile auf sehr großen Bildschirmen
+    }
+
+    setDiagramLimit(limit)
+  }, [isXs, isSm, isMd, isLg, isXl])
+
+  const {
+    data: diagramsData,
+    loading: diagramsLoading,
+    error: diagramsError,
+  } = useQuery(GET_RECENT_DIAGRAMS, {
+    variables: { limit: diagramLimit },
+    fetchPolicy: 'cache-and-network',
+  })
+
+  const diagrams = diagramsData?.diagrams || []
+
+  if (diagramsError) {
+    return (
+      <Card sx={{ mb: 4 }}>
+        <CardHeader title="Letzte Diagramme" />
+        <Divider />
+        <CardContent>
+          <Alert severity="error">Fehler beim Laden der Diagramme: {diagramsError.message}</Alert>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  return (
+    <Box sx={{ mb: 2 }}>
+      <Card>
+        <CardHeader
+          title="Letzte Diagramme"
+          subheader={
+            diagrams.length > 0
+              ? `${diagrams.length} von ${diagrams.length === diagramLimit ? diagramLimit + '+' : diagrams.length} Diagrammen`
+              : 'Keine Diagramme verfügbar'
+          }
+        />
+        <Divider />
+        <CardContent>
+          {diagramsLoading ? (
+            <Grid container spacing={3}>
+              {Array.from({ length: diagramLimit }).map((_, index) => (
+                <Grid
+                  key={index}
+                  size={{
+                    xs: 12,
+                    sm: 6,
+                    md: 4,
+                    lg: 3,
+                    xl: 2,
+                  }}
+                >
+                  <DiagramCardSkeleton />
+                </Grid>
+              ))}
+            </Grid>
+          ) : diagrams.length === 0 ? (
+            <Box sx={{ textAlign: 'center', py: 4 }}>
+              <Typography variant="body1" color="text.secondary">
+                Noch keine Diagramme vorhanden.
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                Erstellen Sie Ihr erstes Diagramm über die Diagramm-Seite.
+              </Typography>
+            </Box>
+          ) : (
+            <Grid container spacing={3}>
+              {diagrams.map((diagram: any) => (
+                <Grid
+                  key={diagram.id}
+                  size={{
+                    xs: 12,
+                    sm: 6,
+                    md: 4,
+                    lg: 3,
+                    xl: 2,
+                  }}
+                >
+                  <DiagramCard
+                    id={diagram.id}
+                    title={diagram.title}
+                    description={diagram.description}
+                    diagramType={diagram.diagramType}
+                    diagramPng={diagram.diagramPng}
+                    createdAt={diagram.createdAt}
+                    updatedAt={diagram.updatedAt}
+                    creator={diagram.creator}
+                    architecture={diagram.architecture}
+                    diagramJson={diagram.diagramJson}
+                  />
+                </Grid>
+              ))}
+            </Grid>
+          )}
+        </CardContent>
+      </Card>
+    </Box>
+  )
+}
+
+export default RecentDiagramsSection

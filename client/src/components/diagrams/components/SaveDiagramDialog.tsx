@@ -409,13 +409,13 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
       try {
         const parsedDiagramData = JSON.parse(dataToSave)
         const elements = parsedDiagramData.elements || []
-        
+
         if (elements.length > 0) {
           // Import export function dynamically
           const { exportToBlob } = await import('@excalidraw/excalidraw')
-          
+
           const appState = parsedDiagramData.appState || {}
-          
+
           // Export to PNG blob
           const blob = await exportToBlob({
             elements,
@@ -436,7 +436,10 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
             // Convert blob to base64
             const arrayBuffer = await blob.arrayBuffer()
             const base64String = btoa(
-              new Uint8Array(arrayBuffer).reduce((data, byte) => data + String.fromCharCode(byte), '')
+              new Uint8Array(arrayBuffer).reduce(
+                (data, byte) => data + String.fromCharCode(byte),
+                ''
+              )
             )
             diagramPng = base64String
           }

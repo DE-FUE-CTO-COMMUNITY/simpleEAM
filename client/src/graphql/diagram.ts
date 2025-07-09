@@ -12,6 +12,32 @@ export const GET_DIAGRAMS_COUNT = gql`
   }
 `
 
+export const GET_RECENT_DIAGRAMS = gql`
+  query GetRecentDiagrams($limit: Int) {
+    diagrams(sort: { updatedAt: DESC }, limit: $limit) {
+      id
+      title
+      description
+      diagramType
+      diagramPng
+      diagramJson
+      createdAt
+      updatedAt
+      creator {
+        id
+        firstName
+        lastName
+      }
+      architecture {
+        id
+        name
+        type
+        domain
+      }
+    }
+  }
+`
+
 export const GET_DIAGRAMS = gql`
   query GetDiagrams {
     diagrams {

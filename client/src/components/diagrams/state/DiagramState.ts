@@ -208,6 +208,14 @@ const restoreSceneData = (sceneData: any) => {
     sceneData.appState.errorMessage = null
   }
 
+  // Debugging-Information für Docker-Umgebungen
+  console.log('SceneData für Wiederherstellung vorbereitet:', {
+    hasElements: Array.isArray(sceneData.elements) && sceneData.elements.length > 0,
+    elementCount: Array.isArray(sceneData.elements) ? sceneData.elements.length : 0,
+    hasAppState: !!sceneData.appState,
+    hasViewport: !!(sceneData.appState?.scrollX && sceneData.appState?.scrollY),
+  })
+
   return sceneData
 }
 

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useRef, useCallback, useMemo } from 'react'
+import React, { useRef, useCallback, useMemo, useEffect } from 'react'
 import { Box, Alert, Snackbar } from '@mui/material'
 import SaveDiagramDialog from './SaveDiagramDialog'
 import OpenDiagramDialog from './OpenDiagramDialog'
@@ -13,6 +13,7 @@ import { DiagramEditorProps } from '../types/DiagramTypes'
 import { useDiagramState, useUIOptions } from '../state/DiagramState'
 import { useDiagramHandlers } from '../handlers/DiagramHandlers'
 import { useKeyboardShortcuts } from '../hooks/DiagramKeyboardShortcuts'
+import { useDiagramURLParams } from '../hooks/useDiagramURLParams'
 import { loadViewportStateFromStorage } from '../utils/DiagramStorageUtils'
 import { isViewer } from '@/lib/auth'
 
@@ -37,6 +38,13 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     setNotification,
     updateDialogState,
   } = useDiagramState()
+
+  // URL-Parameter für automatisches Öffnen von Diagrammen
+  console.log('DiagramEditor: Initialisiere useDiagramURLParams')
+
+  // Variable für URL-Parameter initialisieren
+  const urlParams = useDiagramURLParams()
+  console.log('DiagramEditor: URL-Parameter:', urlParams)
 
   // UI Options
   const uiOptions = useUIOptions()
@@ -131,9 +139,46 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
   // Excalidraw API Handler
   const handleExcalidrawAPI = useCallback(
     (api: any) => {
-      setExcalidrawAPI(api)
+      console.log('Excalidraw API initialisiert:', {
+        apiExists: !!api,
+        hasMethods: api ? Object.keys(api).length : 0,
+        updateSceneExists: typeof api?.updateScene === 'function',
+        getSceneElementsExists: typeof api?.getSceneElements === 'function',
+      })
+
+      // Setze eine Bereitschafts-Eigenschaft für bessere Erkennung
+      if (api) {
+        api.ready = true
+
+        // Speichere die API global und im State für zuverlässigen Zugriff
+        // @ts-expect-error - Globale Variable für kritischen Zugriff
+        window.__excalidrawAPI = api
+        setExcalidrawAPI(api)
+
+        // Direkt mit der API arbeiten, nachdem der State aktualisiert wurde
+        if (urlParams.openDiagramId) {
+          console.log('Excalidraw API direkt verwenden, da openDiagramId vorhanden ist')
+
+          // Direkt ein Event auslösen, um den Hook zu benachrichtigen
+          if (typeof window !== 'undefined') {
+            const event = new CustomEvent('excalidrawAPIReady', {
+              detail: { id: urlParams.openDiagramId },
+            })
+            window.dispatchEvent(event)
+          }
+        }
+      }
+
+      // Explizites Logging, nachdem die API gesetzt wurde
+      setTimeout(() => {
+        console.log('Excalidraw API Status nach dem Setzen:', {
+          apiInState: !!excalidrawAPI,
+          ready: excalidrawAPI?.ready === true,
+          globalAPIExists: !!(window as any).__excalidrawAPI,
+        })
+      }, 100)
     },
-    [setExcalidrawAPI]
+    [setExcalidrawAPI, excalidrawAPI, urlParams.openDiagramId]
   )
 
   // Library Update Handler

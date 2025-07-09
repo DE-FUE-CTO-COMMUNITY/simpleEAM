@@ -25,16 +25,6 @@ import {
 } from '@/components/icons'
 import { useQuery } from '@apollo/client'
 import { useSnackbar } from 'notistack'
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip as RechartsTooltip,
-  ResponsiveContainer,
-  Cell,
-} from 'recharts'
 import { useAuth, login } from '@/lib/auth'
 import { GET_CAPABILITIES_COUNT } from '@/graphql/capability'
 import { GET_APPLICATIONS_COUNT } from '@/graphql/application'
@@ -43,6 +33,7 @@ import { GET_ARCHITECTURES_COUNT } from '@/graphql/architecture'
 import { GET_DIAGRAMS_COUNT } from '@/graphql/diagram'
 import { GET_APPLICATION_INTERFACES_COUNT } from '@/graphql/applicationInterface'
 import { GET_PERSONS_COUNT } from '@/graphql/person'
+import RecentDiagramsSection from '@/components/dashboard/RecentDiagramsSection'
 
 const Dashboard = () => {
   const { authenticated, initialized } = useAuth()
@@ -148,14 +139,6 @@ const Dashboard = () => {
 
   const totalCount = capabilitiesCount + applicationsCount + dataObjectsCount + interfacesCount
 
-  // Daten für das Balkendiagramm - nur Architekturelemente
-  const chartData = [
-    { name: 'Business Capabilities', count: capabilitiesCount },
-    { name: 'Applikationen', count: applicationsCount },
-    { name: 'Datenobjekte', count: dataObjectsCount },
-    { name: 'Schnittstellen', count: interfacesCount },
-  ]
-
   const isLoading =
     capabilitiesLoading ||
     applicationsLoading ||
@@ -170,7 +153,9 @@ const Dashboard = () => {
       case 'capability':
         return <BusinessCapabilityIcon sx={{ fontSize: 40, color: theme.palette.primary.main }} />
       case 'application':
-        return <ApplicationComponentIcon sx={{ fontSize: 40, color: theme.palette.secondary.main }} />
+        return (
+          <ApplicationComponentIcon sx={{ fontSize: 40, color: theme.palette.secondary.main }} />
+        )
       case 'dataObject':
         return <BusinessObjectIcon sx={{ fontSize: 40, color: theme.palette.info.main }} />
       case 'architecture':
@@ -186,26 +171,12 @@ const Dashboard = () => {
     }
   }
 
-  const getChartColor = (name: string) => {
-    switch (name) {
-      case 'Business Capabilities':
-        return theme.palette.primary.main
-      case 'Applikationen':
-        return theme.palette.secondary.main
-      case 'Datenobjekte':
-        return theme.palette.info.main
-      case 'Schnittstellen':
-        return theme.palette.error.main
-      default:
-        return theme.palette.grey[500]
-    }
-  }
-
   return (
     <Box sx={{ py: 2, px: 1 }}>
       <Typography variant="h4" component="h1" gutterBottom sx={{ mb: 4 }}>
         Dashboard
-      </Typography>{' '}
+      </Typography>
+
       <Grid container spacing={3} sx={{ mb: 6 }}>
         {/* Architekturelemente */}
         <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3, xl: 2 }}>
@@ -321,36 +292,11 @@ const Dashboard = () => {
           </Card>
         </Grid>
       </Grid>
-      <Card sx={{ mb: 4 }}>
-        <CardHeader title="Verteilung der Architekturelemente" />
-        <Divider />
-        <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart
-              width={500}
-              height={300}
-              data={chartData}
-              margin={{
-                top: 20,
-                right: 30,
-                left: 20,
-                bottom: 5,
-              }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <RechartsTooltip />
-              <Bar dataKey="count" name="Anzahl" radius={[4, 4, 0, 0]}>
-                {chartData.map(entry => (
-                  <Cell key={`cell-${entry.name}`} fill={getChartColor(entry.name)} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
-      <Card>
+
+      {/* Letzte Diagramme */}
+      <RecentDiagramsSection />
+
+      <Card sx={{ mt: 4 }}>
         <CardHeader title="Architekturlandschaft" />
         <Divider />
         <CardContent>

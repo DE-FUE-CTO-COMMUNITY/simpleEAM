@@ -112,8 +112,16 @@ export const useDiagramHandlers = (
   // Open Diagram Handler
   const handleOpenDiagram = useCallback(
     async (diagram: any) => {
-      if (!excalidrawAPI || !diagram.diagramJson) {
-        console.warn('Cannot open diagram: missing API or diagram data')
+      console.log('handleOpenDiagram aufgerufen', diagram?.id)
+
+      // Auf globale API-Referenz zurückgreifen, wenn nötig
+      const api = excalidrawAPI || (window as any).__excalidrawAPI
+
+      if (!api || !diagram.diagramJson) {
+        console.warn('Cannot open diagram: missing API or diagram data', {
+          excalidrawAPIExists: !!api,
+          diagramJsonExists: !!diagram.diagramJson,
+        })
         setNotification({
           open: true,
           message: 'Diagramm kann nicht geöffnet werden - fehlende Daten',
@@ -123,12 +131,25 @@ export const useDiagramHandlers = (
       }
 
       try {
+        console.log('handleOpenDiagram wird ausgeführt mit:', {
+          diagramId: diagram.id,
+          title: diagram.title,
+          apiReady: !!api,
+          jsonLength: diagram.diagramJson.length,
+        })
+
         // Parse the diagram JSON data
         const diagramData = JSON.parse(diagram.diagramJson)
+        console.log('Diagramm-JSON erfolgreich geparst', {
+          elementCount: diagramData.elements?.length || 0,
+          hasAppState: !!diagramData.appState,
+        })
+
         // Try to sync from database with Docker-safe error handling
         let syncedDiagramData
         try {
           syncedDiagramData = await syncDiagramOnOpen(apolloClient, diagramData)
+          console.log('Datenbank-Sync erfolgreich')
         } catch (syncError) {
           console.warn('Database sync failed, using local data:', syncError)
           syncedDiagramData = diagramData
@@ -161,25 +182,59 @@ export const useDiagramHandlers = (
         }
 
         const restoredScene = restoreSceneData(sceneData)
+        console.log('Szene für das Rendering vorbereitet', {
+          elementsCount: restoredScene.elements?.length || 0,
+          hasAppState: !!restoredScene.appState,
+        })
+
+        // Sicherstellen, dass die Excalidraw-API-Methoden verfügbar sind
+        if (typeof api.updateScene !== 'function') {
+          console.error('Excalidraw API fehlt updateScene-Methode!')
+          setNotification({
+            open: true,
+            message: 'Fehler beim Öffnen des Diagramms: Excalidraw API nicht bereit',
+            severity: 'error',
+          })
+          return
+        }
 
         // Sofort die Excalidraw-Szene aktualisieren (mit integrierter Viewport-Position)
-        excalidrawAPI.updateScene(restoredScene)
+        try {
+          console.log('Aktualisiere Excalidraw-Szene...')
+          api.updateScene(restoredScene)
+          console.log('Excalidraw-Szene erfolgreich aktualisiert')
+        } catch (updateError) {
+          console.error('Fehler beim Aktualisieren der Excalidraw-Szene:', updateError)
+          setNotification({
+            open: true,
+            message: 'Fehler beim Aktualisieren der Diagrammansicht',
+            severity: 'error',
+          })
+          return
+        }
 
         // Apply viewport state with delay to ensure it takes effect after Excalidraw initialization
         if (savedViewportState) {
           setTimeout(() => {
-            excalidrawAPI.updateScene({
-              appState: {
-                scrollX: savedViewportState.scrollX,
-                scrollY: savedViewportState.scrollY,
-                zoom: { value: savedViewportState.zoom },
-              },
-            })
-          }, 100) // Small delay to ensure Excalidraw has finished its initial setup
+            try {
+              console.log('Wende Viewport-Einstellungen an...')
+              api.updateScene({
+                appState: {
+                  scrollX: savedViewportState.scrollX,
+                  scrollY: savedViewportState.scrollY,
+                  zoom: { value: savedViewportState.zoom },
+                },
+              })
+              console.log('Viewport-Einstellungen erfolgreich angewendet')
+            } catch (viewportError) {
+              console.warn('Fehler beim Anwenden der Viewport-Einstellungen:', viewportError)
+            }
+          }, 300) // Increased delay to ensure Excalidraw has finished its initial setup
         }
 
         // State-Updates können asynchron erfolgen
         setTimeout(() => {
+          console.log('Aktualisiere Diagramm-Status...')
           setCurrentDiagram(diagram)
           setCurrentScene(restoredScene)
           setHasUnsavedChanges(false)
@@ -188,7 +243,8 @@ export const useDiagramHandlers = (
           // Persist to localStorage
           saveSceneToStorage(restoredScene)
           saveDiagramToStorage(diagram)
-        }, 0)
+          console.log('Diagramm-Status erfolgreich aktualisiert und im localStorage gespeichert')
+        }, 200)
 
         setNotification({
           open: true,
