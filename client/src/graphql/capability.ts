@@ -47,6 +47,10 @@ export const GET_CAPABILITIES = gql`
         id
         name
       }
+      relatedDataObjects {
+        id
+        name
+      }
       depictedInDiagrams {
         id
         title
@@ -87,6 +91,10 @@ export const GET_CAPABILITY = gql`
         name
       }
       partOfArchitectures {
+        id
+        name
+      }
+      relatedDataObjects {
         id
         name
       }

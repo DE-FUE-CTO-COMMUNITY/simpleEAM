@@ -55,6 +55,16 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
     onColumnVisibilityChange,
   } = usePersistentColumnVisibility({
     tableKey: 'capabilities',
+    defaultColumnVisibility: {
+      type: false,
+      sequenceNumber: false,
+      relatedDataObjects: false,
+      parents: false,
+      supportedByApplications: false,
+      partOfArchitectures: false,
+      createdAt: false,
+      updatedAt: false,
+    },
   })
 
   // Kombiniere externe und persistente onTableReady Callbacks
@@ -120,16 +130,74 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
           return tags ? tags.join(', ') : '-'
         },
       }),
+      columnHelper.accessor('parents', {
+        header: 'Übergeordnete Capabilities',
+        cell: info => {
+          const parents = info.getValue()
+          return parents && parents.length > 0
+            ? parents.map((parent: BusinessCapability) => parent.name).join(', ')
+            : '-'
+        },
+      }),
       columnHelper.accessor('children', {
         header: 'Untergeordnete Capabilities',
         cell: info => {
           const children = info.getValue()
           return children ? children.map((child: BusinessCapability) => child.name).join(', ') : '-'
         },
+        enableHiding: true,
       }),
+      // Versteckte Spalten für type und sequenceNumber
+      columnHelper.accessor('type', {
+        header: 'Typ',
+        cell: info => {
+          const type = info.getValue()
+          return type || '-'
+        },
+        enableHiding: true,
+      }),
+      columnHelper.accessor('sequenceNumber', {
+        header: 'Sequenz',
+        cell: info => {
+          const sequence = info.getValue()
+          return sequence !== null && sequence !== undefined ? sequence.toString() : '-'
+        },
+        enableHiding: true,
+      }),
+      // Weitere versteckte Spalten für Beziehungen
+      columnHelper.accessor('relatedDataObjects', {
+        header: 'Verwandte Datenobjekte',
+        cell: info => {
+          const relatedDataObjects = info.getValue()
+          return relatedDataObjects && relatedDataObjects.length > 0
+            ? relatedDataObjects.map((obj: any) => obj.name).join(', ')
+            : '-'
+        },
+        enableHiding: true,
+      }),
+      columnHelper.accessor('supportedByApplications', {
+        header: 'Unterstützende Applikationen',
+        cell: info => {
+          const apps = info.getValue()
+          return apps && apps.length > 0 ? apps.map((app: any) => app.name).join(', ') : '-'
+        },
+        enableHiding: true,
+      }),
+      columnHelper.accessor('partOfArchitectures', {
+        header: 'Teil von Architekturen',
+        cell: info => {
+          const architectures = info.getValue()
+          return architectures && architectures.length > 0
+            ? architectures.map((arch: any) => arch.name).join(', ')
+            : '-'
+        },
+        enableHiding: true,
+      }),
+      // Versteckte Spalten für Zeitstempel am Ende
       columnHelper.accessor('createdAt', {
         header: 'Erstellt am',
         cell: info => formatDate(info.getValue()),
+        enableHiding: true,
       }),
       columnHelper.accessor('updatedAt', {
         header: 'Aktualisiert am',
