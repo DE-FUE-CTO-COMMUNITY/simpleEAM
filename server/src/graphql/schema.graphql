@@ -67,6 +67,7 @@ type Person
   ownedDataObjects: [DataObject!]! @relationship(type: "OWNED_BY", direction: IN)
   ownedArchitectures: [Architecture!]! @relationship(type: "OWNED_BY", direction: IN)
   ownedDiagrams: [Diagram!]! @relationship(type: "CREATED_BY", direction: IN)
+  ownedInfrastructure: [Infrastructure!]! @relationship(type: "OWNED_BY", direction: IN)
   responsibleForInterfaces: [ApplicationInterface!]!
     @relationship(type: "RESPONSIBLE_FOR", direction: OUT)
 }
@@ -114,6 +115,9 @@ type Application
     @relationship(type: "INTERFACE_TARGET", direction: OUT)
   partOfArchitectures: [Architecture!]! @relationship(type: "CONTAINS", direction: IN)
   depictedInDiagrams: [Diagram!]! @relationship(type: "DEPICTED_IN", direction: OUT)
+  implementsPrinciples: [ArchitecturePrinciple!]!
+    @relationship(type: "IMPLEMENTS_PRINCIPLE", direction: OUT)
+  hostedOn: [Infrastructure!]! @relationship(type: "HOSTED_ON", direction: OUT)
 }
 
 """
@@ -178,6 +182,47 @@ type DataObject
   usedByApplications: [Application!]! @relationship(type: "USES", direction: IN)
   relatedToCapabilities: [BusinessCapability!]! @relationship(type: "RELATED_TO", direction: IN)
   transferredInInterfaces: [ApplicationInterface!]! @relationship(type: "TRANSFERS", direction: IN)
+  partOfArchitectures: [Architecture!]! @relationship(type: "CONTAINS", direction: IN)
+  depictedInDiagrams: [Diagram!]! @relationship(type: "DEPICTED_IN", direction: OUT)
+}
+
+"""
+Infrastructure - repräsentiert eine Infrastruktur-Komponente im Enterprise Architecture Management
+"""
+type Infrastructure
+  @node
+  @authorization(
+    validate: [
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "architect" } } } }
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "admin" } } } }
+    ]
+  ) {
+  id: ID! @id
+  name: String!
+  description: String
+  infrastructureType: InfrastructureType!
+  status: InfrastructureStatus!
+  vendor: String
+  version: String
+  capacity: String
+  location: String
+  ipAddress: String
+  operatingSystem: String
+  specifications: String
+  maintenanceWindow: String
+  costs: Float
+  introductionDate: Date
+  endOfLifeDate: Date
+  planningDate: Date
+  endOfUseDate: Date
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime @timestamp(operations: [UPDATE])
+  owners: [Person!]! @relationship(type: "OWNED_BY", direction: OUT)
+  parentInfrastructure: [Infrastructure!]!
+    @relationship(type: "HAS_PARENT_INFRASTRUCTURE", direction: OUT)
+  childInfrastructures: [Infrastructure!]!
+    @relationship(type: "HAS_PARENT_INFRASTRUCTURE", direction: IN)
+  hostsApplications: [Application!]! @relationship(type: "HOSTED_ON", direction: IN)
   partOfArchitectures: [Architecture!]! @relationship(type: "CONTAINS", direction: IN)
   depictedInDiagrams: [Diagram!]! @relationship(type: "DEPICTED_IN", direction: OUT)
 }
@@ -280,6 +325,7 @@ enum InterfaceProtocol {
   LDAP
   JDBC
   ODBC
+  ORACLE
   OTHER
 }
 
@@ -319,9 +365,12 @@ type Architecture
   containsApplications: [Application!]! @relationship(type: "CONTAINS", direction: OUT)
   containsDataObjects: [DataObject!]! @relationship(type: "CONTAINS", direction: OUT)
   containsInterfaces: [ApplicationInterface!]! @relationship(type: "CONTAINS", direction: OUT)
+  containsInfrastructure: [Infrastructure!]! @relationship(type: "CONTAINS", direction: OUT)
   parentArchitecture: [Architecture!]! @relationship(type: "PART_OF", direction: OUT)
   childArchitectures: [Architecture!]! @relationship(type: "PART_OF", direction: IN)
   diagrams: [Diagram!]! @relationship(type: "BELONGS_TO", direction: IN)
+  appliedPrinciples: [ArchitecturePrinciple!]!
+    @relationship(type: "APPLIES_PRINCIPLE", direction: OUT)
 }
 
 """
@@ -340,6 +389,7 @@ type Diagram
   description: String
   diagramType: DiagramType
   diagramJson: String! # Enthält den JSON-String des Excalidraw-Diagramms
+  diagramPng: String # Enthält das PNG-Bild des Diagramms als base64-codierter String
   createdAt: DateTime! @timestamp(operations: [CREATE])
   updatedAt: DateTime @timestamp(operations: [UPDATE])
   architecture: [Architecture!]! @relationship(type: "BELONGS_TO", direction: OUT)
@@ -348,6 +398,35 @@ type Diagram
   containsApplications: [Application!]! @relationship(type: "DEPICTED_IN", direction: IN)
   containsDataObjects: [DataObject!]! @relationship(type: "DEPICTED_IN", direction: IN)
   containsInterfaces: [ApplicationInterface!]! @relationship(type: "DEPICTED_IN", direction: IN)
+  containsInfrastructure: [Infrastructure!]! @relationship(type: "DEPICTED_IN", direction: IN)
+}
+
+"""
+ArchitecturePrinciple - repräsentiert ein Architektur-Prinzip im Enterprise Architecture Management
+"""
+type ArchitecturePrinciple
+  @node
+  @authorization(
+    validate: [
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "architect" } } } }
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "admin" } } } }
+    ]
+  ) {
+  id: ID! @id
+  name: String!
+  description: String
+  category: PrincipleCategory!
+  priority: PrinciplePriority!
+  rationale: String
+  implications: String
+  tags: [String!]
+  isActive: Boolean!
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime @timestamp(operations: [UPDATE])
+  owners: [Person!]! @relationship(type: "OWNED_BY", direction: OUT)
+  appliedInArchitectures: [Architecture!]! @relationship(type: "APPLIES_PRINCIPLE", direction: IN)
+  implementedByApplications: [Application!]!
+    @relationship(type: "IMPLEMENTS_PRINCIPLE", direction: IN)
 }
 
 """
@@ -387,4 +466,60 @@ enum DiagramType {
   SECURITY_ARCHITECTURE
   CONCEPTUAL
   OTHER
+}
+
+"""
+Kategorien für Architektur-Prinzipien
+"""
+enum PrincipleCategory {
+  BUSINESS
+  DATA
+  APPLICATION
+  TECHNOLOGY
+  SECURITY
+  INTEGRATION
+  GOVERNANCE
+  COMPLIANCE
+  PERFORMANCE
+  SCALABILITY
+  RELIABILITY
+  MAINTAINABILITY
+  INTEROPERABILITY
+  REUSABILITY
+  FLEXIBILITY
+  COST_OPTIMIZATION
+}
+
+"""
+Prioritätsstufen für Architektur-Prinzipien
+"""
+enum PrinciplePriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+"""
+Infrastruktur-Typen
+"""
+enum InfrastructureType {
+  CLOUD_DATACENTER
+  ON_PREMISE_DATACENTER
+  KUBERNETES_CLUSTER
+  VIRTUAL_MACHINE
+  CONTAINER_HOST
+  PHYSICAL_SERVER
+}
+
+"""
+Status-Werte für Infrastruktur-Komponenten
+"""
+enum InfrastructureStatus {
+  ACTIVE
+  INACTIVE
+  MAINTENANCE
+  PLANNED
+  DECOMMISSIONED
+  UNDER_CONSTRUCTION
 }
