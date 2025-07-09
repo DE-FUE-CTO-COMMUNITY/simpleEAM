@@ -16,6 +16,7 @@ import {
   AccountTree as DiagramIcon,
   Person as PersonIcon,
   Construction as ConstructionIcon,
+  Rule as PrincipleIcon,
 } from '@mui/icons-material'
 import {
   BusinessCapabilityIcon,
@@ -33,6 +34,7 @@ import { GET_ARCHITECTURES_COUNT } from '@/graphql/architecture'
 import { GET_DIAGRAMS_COUNT } from '@/graphql/diagram'
 import { GET_APPLICATION_INTERFACES_COUNT } from '@/graphql/applicationInterface'
 import { GET_PERSONS_COUNT } from '@/graphql/person'
+import { GET_ARCHITECTURE_PRINCIPLES_COUNT } from '@/graphql/architecturePrinciple'
 import RecentDiagramsSection from '@/components/dashboard/RecentDiagramsSection'
 
 const Dashboard = () => {
@@ -91,6 +93,12 @@ const Dashboard = () => {
     error: personsError,
   } = useQuery(GET_PERSONS_COUNT, { skip: !authenticated })
 
+  const {
+    data: principlesData,
+    loading: principlesLoading,
+    error: principlesError,
+  } = useQuery(GET_ARCHITECTURE_PRINCIPLES_COUNT, { skip: !authenticated })
+
   // Fehlerbehandlung
   useEffect(() => {
     if (capabilitiesError) {
@@ -114,6 +122,9 @@ const Dashboard = () => {
     if (personsError) {
       enqueueSnackbar('Fehler beim Laden der Personen', { variant: 'error' })
     }
+    if (principlesError) {
+      enqueueSnackbar('Fehler beim Laden der Architekturprinzipien', { variant: 'error' })
+    }
   }, [
     capabilitiesError,
     applicationsError,
@@ -122,6 +133,7 @@ const Dashboard = () => {
     diagramsError,
     interfacesError,
     personsError,
+    principlesError,
     enqueueSnackbar,
   ])
 
@@ -136,6 +148,8 @@ const Dashboard = () => {
   const interfacesCount =
     interfacesData?.applicationInterfacesConnection?.aggregate?.count?.nodes || 0
   const personsCount = personsData?.peopleConnection?.aggregate?.count?.nodes || 0
+  const principlesCount =
+    principlesData?.architecturePrinciplesConnection?.aggregate?.count?.nodes || 0
 
   const totalCount = capabilitiesCount + applicationsCount + dataObjectsCount + interfacesCount
 
@@ -146,7 +160,8 @@ const Dashboard = () => {
     architecturesLoading ||
     diagramsLoading ||
     interfacesLoading ||
-    personsLoading
+    personsLoading ||
+    principlesLoading
 
   const getCardIcon = (type: string) => {
     switch (type) {
@@ -166,6 +181,8 @@ const Dashboard = () => {
         return <ApplicationInterfaceIcon sx={{ fontSize: 40, color: theme.palette.error.main }} />
       case 'person':
         return <PersonIcon sx={{ fontSize: 40, color: theme.palette.grey[800] }} />
+      case 'principle':
+        return <PrincipleIcon sx={{ fontSize: 40, color: theme.palette.text.primary }} />
       default:
         return <ConstructionIcon sx={{ fontSize: 40, color: theme.palette.grey[500] }} />
     }
@@ -267,6 +284,22 @@ const Dashboard = () => {
             >
               <Box>
                 <Typography variant="subtitle2" color="text.secondary">
+                  Architektur Prinzipien
+                </Typography>
+                <Typography variant="h4">{isLoading ? '...' : principlesCount}</Typography>
+              </Box>
+              {getCardIcon('principle')}
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3, xl: 2 }}>
+          <Card>
+            <CardContent
+              sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+            >
+              <Box>
+                <Typography variant="subtitle2" color="text.secondary">
                   Diagramme
                 </Typography>
                 <Typography variant="h4">{isLoading ? '...' : diagramsCount}</Typography>
@@ -307,7 +340,7 @@ const Dashboard = () => {
           <Typography variant="body1" paragraph>
             Es wurden insgesamt <strong>{totalCount}</strong> Architekturelemente (Business
             Capabilities, Applikationen, Schnittstellen und Datenobjekte) erfasst. Darüber hinaus
-            gibt es {architecturesCount} Architekturen,
+            gibt es {architecturesCount} Architekturen, {principlesCount} Architektur Prinzipien,
             {diagramsCount} Diagramme und {personsCount} Personen.
           </Typography>
           <Box sx={{ mt: 2 }}>
