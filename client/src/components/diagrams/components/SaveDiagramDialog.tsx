@@ -404,11 +404,54 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
 
     setSaving(true)
     try {
+      // PNG-Generierung vor dem Speichern
+      let diagramPng: string | null = null
+      try {
+        const parsedDiagramData = JSON.parse(dataToSave)
+        const elements = parsedDiagramData.elements || []
+        
+        if (elements.length > 0) {
+          // Import export function dynamically
+          const { exportToBlob } = await import('@excalidraw/excalidraw')
+          
+          const appState = parsedDiagramData.appState || {}
+          
+          // Export to PNG blob
+          const blob = await exportToBlob({
+            elements,
+            appState: {
+              ...appState,
+              exportBackground: true,
+              viewBackgroundColor: appState.viewBackgroundColor || '#ffffff',
+              exportWithDarkMode: false,
+              exportEmbedScene: false,
+            },
+            files: {},
+            mimeType: 'image/png',
+            quality: 0.95,
+            exportPadding: 20,
+          })
+
+          if (blob) {
+            // Convert blob to base64
+            const arrayBuffer = await blob.arrayBuffer()
+            const base64String = btoa(
+              new Uint8Array(arrayBuffer).reduce((data, byte) => data + String.fromCharCode(byte), '')
+            )
+            diagramPng = base64String
+          }
+        }
+      } catch (pngError) {
+        console.warn('PNG-Generierung fehlgeschlagen:', pngError)
+        // Speichern ohne PNG fortsetzen
+      }
+
       const baseInput = {
         title: title.trim(),
         description: description.trim() || undefined,
         diagramJson: dataToSave,
         diagramType: diagramType,
+        ...(diagramPng && { diagramPng }),
         architecture: {
           connect: [
             {
@@ -440,6 +483,7 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
           description: { set: description.trim() || undefined },
           diagramJson: { set: dataToSave },
           diagramType: { set: diagramType },
+          ...(diagramPng && { diagramPng: { set: diagramPng } }),
           architecture: {
             disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
             connect: [
