@@ -286,7 +286,9 @@ export function calculateDisplayedApplicationsCount(
 }
 
 // Sortierungsfunktion für Capabilities nach Typ und Sequenz
-export function sortCapabilitiesByTypeAndSequence(capabilities: BusinessCapability[]): BusinessCapability[] {
+export function sortCapabilitiesByTypeAndSequence(
+  capabilities: BusinessCapability[]
+): BusinessCapability[] {
   return [...capabilities].sort((a, b) => {
     // Typ-Prioritäten definieren
     const getTypePriority = (type: CapabilityType | null | undefined): number => {

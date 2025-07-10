@@ -36,8 +36,18 @@ const ExcalidrawWrapper = dynamic(
       const ExcalidrawTyped = Excalidraw as any
       const MainMenuTyped = MainMenu as any
 
+      // Store the API reference for internal use
+      const apiRef = React.useRef<any>(null)
+
       // Hook für Theme-Modus (wird innerhalb der Komponente verwendet)
       const { mode: themeMode } = useThemeMode()
+
+      // Handle excalidrawAPI prop - store the API reference
+      React.useEffect(() => {
+        if (excalidrawAPI && apiRef.current) {
+          excalidrawAPI(apiRef.current)
+        }
+      }, [excalidrawAPI])
 
       // Inject dynamic theme CSS based on environment variables and current theme mode
       React.useEffect(() => {
@@ -108,7 +118,14 @@ const ExcalidrawWrapper = dynamic(
             name="simple-eam-diagram"
             UIOptions={uiOptions}
             initialData={safeInitialData}
-            excalidrawAPI={excalidrawAPI}
+            excalidrawAPI={(api: any) => {
+              // Store the API reference for internal use
+              apiRef.current = api
+              // Also call the original excalidrawAPI if provided
+              if (excalidrawAPI) {
+                excalidrawAPI(api)
+              }
+            }}
             onChange={onChange}
             viewModeEnabled={viewModeEnabled}
           >
@@ -215,6 +232,34 @@ const ExcalidrawWrapper = dynamic(
                   Capability Map generieren
                 </MainMenuTyped.Item>
               )}
+
+              {/* Find on Canvas Menu Item - available for all users */}
+              <MainMenuTyped.Item
+                onSelect={() => {
+                  // Use the API to open the search sidebar
+                  if (apiRef.current) {
+                    // Open search sidebar using the action manager
+                    apiRef.current.updateScene({
+                      appState: {
+                        ...apiRef.current.getAppState(),
+                        openSidebar: {
+                          name: 'default',
+                          tab: 'search',
+                        },
+                        openDialog: null,
+                      },
+                    })
+                  }
+                }}
+                icon={
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z" />
+                  </svg>
+                }
+                shortcut="Ctrl+F"
+              >
+                Find on Canvas
+              </MainMenuTyped.Item>
 
               {/* Separator */}
               <MainMenuTyped.Separator />

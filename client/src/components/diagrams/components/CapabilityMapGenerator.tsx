@@ -55,10 +55,12 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
   })
 
   const [filterDate, setFilterDate] = useState<Dayjs | null>(dayjs())
-  
+
   // Top-Level Capability Filter States
   const [topLevelFilterDialogOpen, setTopLevelFilterDialogOpen] = useState(false)
-  const [selectedTopLevelCapabilities, setSelectedTopLevelCapabilities] = useState<Set<string>>(new Set())
+  const [selectedTopLevelCapabilities, setSelectedTopLevelCapabilities] = useState<Set<string>>(
+    new Set()
+  )
   const [hasInitializedSelection, setHasInitializedSelection] = useState(false)
 
   const { data, loading, error } = useQuery(GET_CAPABILITY_MAP_DATA, {
@@ -130,23 +132,23 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
     // Create a recursive function to collect all descendants of selected top-level capabilities
     const collectCapabilityTree = (capability: any, allCapabilities: any[]): any[] => {
       const result = [capability]
-      
+
       // Find all children of this capability
-      const children = allCapabilities.filter(cap => 
-        cap.parents && cap.parents.some((parent: any) => parent.id === capability.id)
+      const children = allCapabilities.filter(
+        cap => cap.parents && cap.parents.some((parent: any) => parent.id === capability.id)
       )
-      
+
       // Recursively collect children and their descendants
       children.forEach(child => {
         result.push(...collectCapabilityTree(child, allCapabilities))
       })
-      
+
       return result
     }
 
     // Collect all capabilities that should be included
     const includedCapabilities = new Set()
-    
+
     // Start with selected top-level capabilities and collect their entire trees
     allTopLevelCapabilities.forEach(topLevel => {
       if (selectedTopLevelCapabilities.has(topLevel.id)) {
@@ -330,7 +332,8 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
                         sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
                       >
                         <FilterListIcon sx={{ color: '#9c27b0', fontSize: 16 }} />
-                        {selectedTopLevelCapabilities.size} von {allTopLevelCapabilities.length} Top-Level Capabilities ausgewählt
+                        {selectedTopLevelCapabilities.size} von {allTopLevelCapabilities.length}{' '}
+                        Top-Level Capabilities ausgewählt
                       </Typography>
                     )}
                     <Typography
@@ -393,7 +396,9 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
                       label="Maximale Hierarchie-Ebenen"
                       type="number"
                       value={settings.maxLevels}
-                      onChange={e => handleSettingChange('maxLevels', parseInt(e.target.value) || 1)}
+                      onChange={e =>
+                        handleSettingChange('maxLevels', parseInt(e.target.value) || 1)
+                      }
                       inputProps={{ min: 1, max: 5 }}
                       fullWidth
                       margin="normal"
@@ -464,10 +469,10 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
       </Dialog>
 
       {/* Top-Level Capability Filter Dialog */}
-      <Dialog 
-        open={topLevelFilterDialogOpen} 
-        onClose={handleCloseTopLevelFilter} 
-        maxWidth="sm" 
+      <Dialog
+        open={topLevelFilterDialogOpen}
+        onClose={handleCloseTopLevelFilter}
+        maxWidth="sm"
         fullWidth
       >
         <DialogTitle>Top-Level Capabilities auswählen</DialogTitle>
@@ -476,34 +481,27 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
             <Typography variant="body2" color="text.secondary" gutterBottom>
               Wählen Sie die Top-Level Capabilities aus, die in der Map dargestellt werden sollen:
             </Typography>
-            
+
             <Box sx={{ mt: 2, mb: 2 }}>
-              <Button 
-                size="small" 
-                onClick={handleSelectAllTopLevel}
-                sx={{ mr: 1 }}
-              >
+              <Button size="small" onClick={handleSelectAllTopLevel} sx={{ mr: 1 }}>
                 Alle auswählen
               </Button>
-              <Button 
-                size="small" 
-                onClick={handleDeselectAllTopLevel}
-              >
+              <Button size="small" onClick={handleDeselectAllTopLevel}>
                 Alle abwählen
               </Button>
             </Box>
 
             <Box sx={{ maxHeight: 300, overflow: 'auto' }}>
               {allTopLevelCapabilities.map(capability => (
-                <Box 
+                <Box
                   key={capability.id}
-                  sx={{ 
-                    display: 'flex', 
+                  sx={{
+                    display: 'flex',
                     alignItems: 'flex-start',
                     mb: 1,
                     borderBottom: '1px solid',
                     borderColor: 'divider',
-                    pb: 1
+                    pb: 1,
                   }}
                 >
                   <Checkbox
@@ -516,13 +514,13 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
                       {capability.name}
                     </Typography>
                     {capability.description && (
-                      <Typography 
-                        variant="caption" 
-                        color="text.secondary" 
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
                         display="block"
-                        sx={{ 
+                        sx={{
                           wordBreak: 'break-word',
-                          whiteSpace: 'normal'
+                          whiteSpace: 'normal',
                         }}
                       >
                         {capability.description}
@@ -536,7 +534,7 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
                   </Box>
                 </Box>
               ))}
-              
+
               {allTopLevelCapabilities.length === 0 && (
                 <Typography variant="body2" color="text.secondary" align="center">
                   Keine Top-Level Capabilities gefunden.
@@ -546,15 +544,14 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
 
             <Box sx={{ mt: 2, p: 2, bgcolor: 'background.paper', borderRadius: 1 }}>
               <Typography variant="body2" color="text.secondary">
-                <strong>Ausgewählt:</strong> {selectedTopLevelCapabilities.size} von {allTopLevelCapabilities.length} Top-Level Capabilities
+                <strong>Ausgewählt:</strong> {selectedTopLevelCapabilities.size} von{' '}
+                {allTopLevelCapabilities.length} Top-Level Capabilities
               </Typography>
             </Box>
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseTopLevelFilter}>
-            Fertig
-          </Button>
+          <Button onClick={handleCloseTopLevelFilter}>Fertig</Button>
         </DialogActions>
       </Dialog>
     </LocalizationProvider>
