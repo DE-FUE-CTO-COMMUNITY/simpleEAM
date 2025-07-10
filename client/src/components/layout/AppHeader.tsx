@@ -2,6 +2,7 @@ import React from 'react'
 import { AppBar, Toolbar, IconButton, Typography, useTheme } from '@mui/material'
 import { Menu as MenuIcon } from '@mui/icons-material'
 import UserProfileMenu from './UserProfileMenu'
+import ThemeToggleButton from '../ui/ThemeToggleButton'
 
 interface AppHeaderProps {
   open: boolean
@@ -46,6 +47,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
         <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
           Simple EAM
         </Typography>
+        <ThemeToggleButton />
         {authenticated && <UserProfileMenu userName={userName} />}
       </Toolbar>
     </AppBar>

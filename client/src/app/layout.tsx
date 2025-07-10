@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { CacheProvider } from '@emotion/react'
-import { ThemeProvider } from '@mui/material/styles'
+import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
 import { useServerInsertedHTML } from 'next/navigation'
 import createCache from '@emotion/cache'
@@ -11,7 +11,7 @@ import { SnackbarProvider } from 'notistack'
 import { AuthContext, initKeycloak, keycloak } from '@/lib/auth'
 import { setupSessionMonitoring } from '@/utils/sessionUtils'
 import { createApolloClient } from '@/lib/apollo-client'
-import { createDynamicTheme } from '@/theme/dynamic-theme'
+import ThemeProvider from '@/contexts/ThemeContext'
 import { CircularProgress, Box } from '@mui/material'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
@@ -83,9 +83,6 @@ import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { cache } = useClientStyleRegistry()
-
-  // Dynamisches Theme erstellen
-  const dynamicTheme = createDynamicTheme()
 
   // Vereinfachte State-Verwaltung für bessere Hydration
   const [mounted, setMounted] = useState(false)
@@ -188,7 +185,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <CacheProvider value={cache}>
-          <ThemeProvider theme={dynamicTheme}>
+          <ThemeProvider>
             <CssBaseline />
             <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="de">
               <SnackbarProvider

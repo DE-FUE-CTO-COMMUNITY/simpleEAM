@@ -66,7 +66,7 @@ function generateColorVariants(mainColor: string) {
  * Erstellt ein dynamisches Theme basierend auf Umgebungsvariablen
  * Unterstützt sowohl Legacy- als auch neue Variablennamen
  */
-export function createDynamicTheme(): ReturnType<typeof createTheme> {
+export function createDynamicTheme(mode: 'light' | 'dark' = 'light'): ReturnType<typeof createTheme> {
   // Primary Color aus Umgebungsvariablen laden
   const primaryColor =
     process.env.NEXT_PUBLIC_THEME_PRIMARY_COLOR ||
@@ -89,9 +89,32 @@ export function createDynamicTheme(): ReturnType<typeof createTheme> {
   const primaryVariants = generateColorVariants(primaryColor)
   const secondaryVariants = generateColorVariants(secondaryColor)
 
+  // Basis Palette-Konfiguration abhängig vom Mode
+  const basePalette = mode === 'dark' ? {
+    background: {
+      default: '#121212',
+      paper: '#1e1e1e',
+    },
+    text: {
+      primary: 'rgba(255, 255, 255, 0.87)',
+      secondary: 'rgba(255, 255, 255, 0.6)',
+      disabled: 'rgba(255, 255, 255, 0.38)',
+    },
+  } : {
+    background: {
+      default: '#F5F7FA',
+      paper: '#FFFFFF',
+    },
+    text: {
+      primary: 'rgba(0, 0, 0, 0.87)',
+      secondary: 'rgba(0, 0, 0, 0.6)',
+      disabled: 'rgba(0, 0, 0, 0.38)',
+    },
+  }
+
   const themeOptions: ThemeOptions = {
     palette: {
-      mode: 'light',
+      mode,
       primary: {
         main: primaryColor,
         light: primaryVariants.light,
@@ -140,15 +163,7 @@ export function createDynamicTheme(): ReturnType<typeof createTheme> {
         A400: '#BDBDBD',
         A700: '#616161',
       },
-      background: {
-        default: '#F5F7FA',
-        paper: '#FFFFFF',
-      },
-      text: {
-        primary: 'rgba(0, 0, 0, 0.87)',
-        secondary: 'rgba(0, 0, 0, 0.6)',
-        disabled: 'rgba(0, 0, 0, 0.38)',
-      },
+      ...basePalette,
     },
     typography: {
       fontFamily: fontFamily,
@@ -301,7 +316,7 @@ export function createDynamicTheme(): ReturnType<typeof createTheme> {
           root: {
             '& .MuiTableCell-head': {
               fontWeight: 600,
-              backgroundColor: '#F5F7FA',
+              backgroundColor: mode === 'dark' ? '#2c2c2c' : '#F5F7FA',
             },
           },
         },
