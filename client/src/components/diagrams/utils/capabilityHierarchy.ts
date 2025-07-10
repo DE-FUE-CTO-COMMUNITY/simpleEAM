@@ -1,18 +1,20 @@
-import type { BusinessCapability } from '@/gql/generated'
+import type { BusinessCapability, CapabilityType } from '@/gql/generated'
 import type { CapabilityMapSettings } from './capabilityMapTypes'
 
 // Helper functions to find capabilities
 export function findTopLevelCapabilities(capabilities: BusinessCapability[]): BusinessCapability[] {
-  return capabilities.filter(cap => !cap.parents || cap.parents.length === 0)
+  const topLevel = capabilities.filter(cap => !cap.parents || cap.parents.length === 0)
+  return sortCapabilitiesByTypeAndSequence(topLevel)
 }
 
 export function findChildCapabilities(
   parentId: string,
   capabilities: BusinessCapability[]
 ): BusinessCapability[] {
-  return capabilities.filter(
+  const children = capabilities.filter(
     cap => cap.parents && cap.parents.some(parent => parent.id === parentId)
   )
+  return sortCapabilitiesByTypeAndSequence(children)
 }
 
 // Helper function to recursively find all descendants up to maxLevels
@@ -281,4 +283,56 @@ export function calculateDisplayedApplicationsCount(
   })
 
   return uniqueDisplayedApps.size
+}
+
+// Sortierungsfunktion für Capabilities nach Typ und Sequenz
+export function sortCapabilitiesByTypeAndSequence(capabilities: BusinessCapability[]): BusinessCapability[] {
+  return [...capabilities].sort((a, b) => {
+    // Typ-Prioritäten definieren
+    const getTypePriority = (type: CapabilityType | null | undefined): number => {
+      switch (type) {
+        case 'STRATEGIC':
+          return 1
+        case 'OPERATIONAL':
+          return 2
+        case 'SUPPORT':
+          return 3
+        default:
+          return 2 // Für null/undefined -> default OPERATIONAL
+      }
+    }
+
+    const typePriorityA = getTypePriority(a.type)
+    const typePriorityB = getTypePriority(b.type)
+
+    // Zuerst nach Typ sortieren
+    if (typePriorityA !== typePriorityB) {
+      return typePriorityA - typePriorityB
+    }
+
+    // Bei gleichem Typ nach Sequenz sortieren
+    const sequenceA = a.sequenceNumber ?? 0
+    const sequenceB = b.sequenceNumber ?? 0
+
+    // Capabilities mit Sequenz > 0 zuerst (aufsteigend 1,2,3,...)
+    const hasValidSequenceA = sequenceA > 0
+    const hasValidSequenceB = sequenceB > 0
+
+    if (hasValidSequenceA && hasValidSequenceB) {
+      return sequenceA - sequenceB
+    }
+
+    if (hasValidSequenceA && !hasValidSequenceB) {
+      return -1 // A hat gültige Sequenz, B nicht -> A kommt zuerst
+    }
+
+    if (!hasValidSequenceA && hasValidSequenceB) {
+      return 1 // B hat gültige Sequenz, A nicht -> B kommt zuerst
+    }
+
+    // Beide haben Sequenz 0 oder null -> alphabetisch nach Name sortieren
+    const nameA = a.name?.toLowerCase() || ''
+    const nameB = b.name?.toLowerCase() || ''
+    return nameA.localeCompare(nameB)
+  })
 }

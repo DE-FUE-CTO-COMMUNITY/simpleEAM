@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -12,7 +12,10 @@ import {
   CircularProgress,
   Alert,
   TextField,
+  IconButton,
+  Tooltip,
 } from '@mui/material'
+import FilterListIcon from '@mui/icons-material/FilterList'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
@@ -31,6 +34,7 @@ import {
   debugApplicationRollup,
   type CapabilityMapSettings,
 } from '../utils/CapabilityMapLibraryUtils'
+import { findTopLevelCapabilities } from '../utils/capabilityHierarchy'
 
 interface CapabilityMapGeneratorProps {
   open: boolean
@@ -51,6 +55,11 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
   })
 
   const [filterDate, setFilterDate] = useState<Dayjs | null>(dayjs())
+  
+  // Top-Level Capability Filter States
+  const [topLevelFilterDialogOpen, setTopLevelFilterDialogOpen] = useState(false)
+  const [selectedTopLevelCapabilities, setSelectedTopLevelCapabilities] = useState<Set<string>>(new Set())
+  const [hasInitializedSelection, setHasInitializedSelection] = useState(false)
 
   const { data, loading, error } = useQuery(GET_CAPABILITY_MAP_DATA, {
     skip: !open,
@@ -97,14 +106,67 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
 
   const filteredCapabilities = filterCapabilitiesByDate(data?.businessCapabilities, filterDate)
 
+  // Get all top-level capabilities from filtered data
+  const allTopLevelCapabilities = useMemo(() => {
+    if (!filteredCapabilities) return []
+    return findTopLevelCapabilities(filteredCapabilities)
+  }, [filteredCapabilities])
+
+  // Initialize selected top-level capabilities when data changes (select all by default, only once)
+  useEffect(() => {
+    if (allTopLevelCapabilities.length > 0 && !hasInitializedSelection) {
+      const allIds = new Set(allTopLevelCapabilities.map(cap => cap.id))
+      setSelectedTopLevelCapabilities(allIds)
+      setHasInitializedSelection(true)
+    }
+  }, [allTopLevelCapabilities, hasInitializedSelection])
+
+  // Filter capabilities based on selected top-level capabilities
+  const finalFilteredCapabilities = useMemo(() => {
+    if (!filteredCapabilities || selectedTopLevelCapabilities.size === 0) {
+      return filteredCapabilities
+    }
+
+    // Create a recursive function to collect all descendants of selected top-level capabilities
+    const collectCapabilityTree = (capability: any, allCapabilities: any[]): any[] => {
+      const result = [capability]
+      
+      // Find all children of this capability
+      const children = allCapabilities.filter(cap => 
+        cap.parents && cap.parents.some((parent: any) => parent.id === capability.id)
+      )
+      
+      // Recursively collect children and their descendants
+      children.forEach(child => {
+        result.push(...collectCapabilityTree(child, allCapabilities))
+      })
+      
+      return result
+    }
+
+    // Collect all capabilities that should be included
+    const includedCapabilities = new Set()
+    
+    // Start with selected top-level capabilities and collect their entire trees
+    allTopLevelCapabilities.forEach(topLevel => {
+      if (selectedTopLevelCapabilities.has(topLevel.id)) {
+        const tree = collectCapabilityTree(topLevel, filteredCapabilities)
+        tree.forEach(cap => includedCapabilities.add(cap.id))
+      }
+    })
+
+    // Filter the original list to only include capabilities in our set
+    return filteredCapabilities.filter(cap => includedCapabilities.has(cap.id))
+  }, [filteredCapabilities, selectedTopLevelCapabilities, allTopLevelCapabilities])
+
   const handleGenerate = async () => {
     if (!data?.businessCapabilities) {
       console.warn('Keine Capability-Daten verfügbar')
       return
     }
 
-    // Use filtered capabilities instead of raw data
-    const capabilitiesToUse = filteredCapabilities || data.businessCapabilities
+    // Use final filtered capabilities (including top-level filter)
+    const capabilitiesToUse = finalFilteredCapabilities || data.businessCapabilities
 
     try {
       // Debug the capability hierarchy before generation
@@ -145,20 +207,20 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
   }
 
   // Calculate rendered capabilities count whenever settings change
-  const renderedCapabilitiesCount = filteredCapabilities
-    ? calculateRenderedCapabilitiesCount(filteredCapabilities, settings)
+  const renderedCapabilitiesCount = finalFilteredCapabilities
+    ? calculateRenderedCapabilitiesCount(finalFilteredCapabilities, settings)
     : 0
 
   // Calculate displayed applications count (using the corrected rollup logic)
-  const totalApplicationsCount = filteredCapabilities
-    ? calculateDisplayedApplicationsCount(filteredCapabilities, settings)
+  const totalApplicationsCount = finalFilteredCapabilities
+    ? calculateDisplayedApplicationsCount(finalFilteredCapabilities, settings)
     : 0
 
   // Calculate applications with capability assignment
-  const applicationsWithCapabilityCount = filteredCapabilities
+  const applicationsWithCapabilityCount = finalFilteredCapabilities
     ? (() => {
         const uniqueApps = new Set()
-        filteredCapabilities.forEach((cap: any) => {
+        finalFilteredCapabilities.forEach((cap: any) => {
           if (cap.supportedByApplications) {
             cap.supportedByApplications.forEach((app: any) => uniqueApps.add(app.id))
           }
@@ -166,6 +228,36 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
         return uniqueApps.size
       })()
     : 0
+
+  // Handler functions for the top-level filter dialog
+  const handleOpenTopLevelFilter = () => {
+    setTopLevelFilterDialogOpen(true)
+  }
+
+  const handleCloseTopLevelFilter = () => {
+    setTopLevelFilterDialogOpen(false)
+  }
+
+  const handleTopLevelCapabilityToggle = (capabilityId: string) => {
+    setSelectedTopLevelCapabilities(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(capabilityId)) {
+        newSet.delete(capabilityId)
+      } else {
+        newSet.add(capabilityId)
+      }
+      return newSet
+    })
+  }
+
+  const handleSelectAllTopLevel = () => {
+    const allIds = new Set(allTopLevelCapabilities.map(cap => cap.id))
+    setSelectedTopLevelCapabilities(allIds)
+  }
+
+  const handleDeselectAllTopLevel = () => {
+    setSelectedTopLevelCapabilities(new Set())
+  }
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="de">
@@ -231,6 +323,24 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
                         {filterDate.format('DD.MM.YYYY')} gefiltert
                       </Typography>
                     )}
+                    {allTopLevelCapabilities.length > 0 && (
+                      <Typography
+                        variant="body2"
+                        component="div"
+                        sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                      >
+                        <FilterListIcon sx={{ color: '#9c27b0', fontSize: 16 }} />
+                        {selectedTopLevelCapabilities.size} von {allTopLevelCapabilities.length} Top-Level Capabilities ausgewählt
+                      </Typography>
+                    )}
+                    <Typography
+                      variant="body2"
+                      component="div"
+                      sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                    >
+                      <BusinessCapabilityIcon sx={{ color: '#388e3c', fontSize: 16 }} />
+                      {finalFilteredCapabilities?.length || 0} Capabilities nach allen Filtern
+                    </Typography>
                     <Typography
                       variant="body2"
                       component="div"
@@ -278,16 +388,28 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
                 </Alert>
 
                 <Box sx={{ mt: 3 }}>
-                  <TextField
-                    label="Maximale Hierarchie-Ebenen"
-                    type="number"
-                    value={settings.maxLevels}
-                    onChange={e => handleSettingChange('maxLevels', parseInt(e.target.value) || 1)}
-                    inputProps={{ min: 1, max: 5 }}
-                    fullWidth
-                    margin="normal"
-                    helperText="Anzahl der Hierarchie-Ebenen die dargestellt werden sollen (1-5)"
-                  />
+                  <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
+                    <TextField
+                      label="Maximale Hierarchie-Ebenen"
+                      type="number"
+                      value={settings.maxLevels}
+                      onChange={e => handleSettingChange('maxLevels', parseInt(e.target.value) || 1)}
+                      inputProps={{ min: 1, max: 5 }}
+                      fullWidth
+                      margin="normal"
+                      helperText="Anzahl der Hierarchie-Ebenen die dargestellt werden sollen (1-5)"
+                    />
+                    <Tooltip title="Top-Level Capabilities auswählen">
+                      <IconButton
+                        onClick={handleOpenTopLevelFilter}
+                        sx={{ mt: 2 }}
+                        color="primary"
+                        disabled={allTopLevelCapabilities.length === 0}
+                      >
+                        <FilterListIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
 
                   <FormControlLabel
                     control={
@@ -338,6 +460,101 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
           >
             Generieren
           </Button>{' '}
+        </DialogActions>
+      </Dialog>
+
+      {/* Top-Level Capability Filter Dialog */}
+      <Dialog 
+        open={topLevelFilterDialogOpen} 
+        onClose={handleCloseTopLevelFilter} 
+        maxWidth="sm" 
+        fullWidth
+      >
+        <DialogTitle>Top-Level Capabilities auswählen</DialogTitle>
+        <DialogContent>
+          <Box sx={{ py: 2 }}>
+            <Typography variant="body2" color="text.secondary" gutterBottom>
+              Wählen Sie die Top-Level Capabilities aus, die in der Map dargestellt werden sollen:
+            </Typography>
+            
+            <Box sx={{ mt: 2, mb: 2 }}>
+              <Button 
+                size="small" 
+                onClick={handleSelectAllTopLevel}
+                sx={{ mr: 1 }}
+              >
+                Alle auswählen
+              </Button>
+              <Button 
+                size="small" 
+                onClick={handleDeselectAllTopLevel}
+              >
+                Alle abwählen
+              </Button>
+            </Box>
+
+            <Box sx={{ maxHeight: 300, overflow: 'auto' }}>
+              {allTopLevelCapabilities.map(capability => (
+                <Box 
+                  key={capability.id}
+                  sx={{ 
+                    display: 'flex', 
+                    alignItems: 'flex-start',
+                    mb: 1,
+                    borderBottom: '1px solid',
+                    borderColor: 'divider',
+                    pb: 1
+                  }}
+                >
+                  <Checkbox
+                    checked={selectedTopLevelCapabilities.has(capability.id)}
+                    onChange={() => handleTopLevelCapabilityToggle(capability.id)}
+                    sx={{ mt: 0, pt: 0 }}
+                  />
+                  <Box sx={{ flex: 1, minWidth: 0, ml: 1 }}>
+                    <Typography variant="body2" fontWeight="medium">
+                      {capability.name}
+                    </Typography>
+                    {capability.description && (
+                      <Typography 
+                        variant="caption" 
+                        color="text.secondary" 
+                        display="block"
+                        sx={{ 
+                          wordBreak: 'break-word',
+                          whiteSpace: 'normal'
+                        }}
+                      >
+                        {capability.description}
+                      </Typography>
+                    )}
+                    {capability.type && (
+                      <Typography variant="caption" color="primary" display="block">
+                        Typ: {capability.type}
+                      </Typography>
+                    )}
+                  </Box>
+                </Box>
+              ))}
+              
+              {allTopLevelCapabilities.length === 0 && (
+                <Typography variant="body2" color="text.secondary" align="center">
+                  Keine Top-Level Capabilities gefunden.
+                </Typography>
+              )}
+            </Box>
+
+            <Box sx={{ mt: 2, p: 2, bgcolor: 'background.paper', borderRadius: 1 }}>
+              <Typography variant="body2" color="text.secondary">
+                <strong>Ausgewählt:</strong> {selectedTopLevelCapabilities.size} von {allTopLevelCapabilities.length} Top-Level Capabilities
+              </Typography>
+            </Box>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseTopLevelFilter}>
+            Fertig
+          </Button>
         </DialogActions>
       </Dialog>
     </LocalizationProvider>

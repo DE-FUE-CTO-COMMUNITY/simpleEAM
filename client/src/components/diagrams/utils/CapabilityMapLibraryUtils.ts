@@ -14,6 +14,7 @@ export {
   calculateDisplayedApplicationsCount,
   calculateSubtreeHeight,
   collectApplicationsForDisplay,
+  sortCapabilitiesByTypeAndSequence,
 } from './capabilityHierarchy'
 export {
   createCapabilityElementsFromTemplate,
