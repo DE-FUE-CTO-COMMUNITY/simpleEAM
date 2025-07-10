@@ -637,14 +637,14 @@ export const getFieldNamesByEntityType = (
 ): string[] | { [tabName: string]: string[] } => {
   if (entityType === 'all') {
     return {
-      'Business Capabilities': Object.keys(getBusinessCapabilitiesTemplate()),
-      Applications: Object.keys(getApplicationsTemplate()),
-      'Data Objects': Object.keys(getDataObjectsTemplate()),
-      Interfaces: Object.keys(getInterfacesTemplate()),
-      Persons: Object.keys(getPersonsTemplate()),
-      Architectures: Object.keys(getArchitecturesTemplate()),
-      Diagrams: Object.keys(getDiagramsTemplate()),
-      'Architecture Principles': Object.keys(getArchitecturePrinciplesTemplate()),
+      businessCapabilities: Object.keys(getBusinessCapabilitiesTemplate()),
+      applications: Object.keys(getApplicationsTemplate()),
+      dataObjects: Object.keys(getDataObjectsTemplate()),
+      interfaces: Object.keys(getInterfacesTemplate()),
+      persons: Object.keys(getPersonsTemplate()),
+      architectures: Object.keys(getArchitecturesTemplate()),
+      diagrams: Object.keys(getDiagramsTemplate()),
+      architecturePrinciples: Object.keys(getArchitecturePrinciplesTemplate()),
     }
   }
 

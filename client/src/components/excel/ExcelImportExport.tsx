@@ -296,14 +296,14 @@ const transformInputForUpdate = (input: any): any => {
 // Helper function to check if entity exists in database
 const checkEntityExists = async (client: any, entityType: string, id: string): Promise<boolean> => {
   const queryMap = {
-    'Business Capabilities': CHECK_CAPABILITY_EXISTS,
-    Applications: CHECK_APPLICATION_EXISTS,
-    'Data Objects': CHECK_DATA_OBJECT_EXISTS,
-    Interfaces: CHECK_APPLICATION_INTERFACE_EXISTS,
-    Persons: CHECK_PERSON_EXISTS,
-    Architectures: CHECK_ARCHITECTURE_EXISTS,
-    Diagrams: CHECK_DIAGRAM_EXISTS,
-    'Architecture Principles': CHECK_ARCHITECTURE_PRINCIPLE_EXISTS,
+    businessCapabilities: CHECK_CAPABILITY_EXISTS,
+    applications: CHECK_APPLICATION_EXISTS,
+    dataObjects: CHECK_DATA_OBJECT_EXISTS,
+    interfaces: CHECK_APPLICATION_INTERFACE_EXISTS,
+    persons: CHECK_PERSON_EXISTS,
+    architectures: CHECK_ARCHITECTURE_EXISTS,
+    diagrams: CHECK_DIAGRAM_EXISTS,
+    architecturePrinciples: CHECK_ARCHITECTURE_PRINCIPLE_EXISTS,
   }
 
   const query = queryMap[entityType as keyof typeof queryMap]
@@ -335,27 +335,27 @@ const importEntityDataWithMapping = async (
 ): Promise<{ imported: number; entityMappings: { [originalId: string]: string } }> => {
   let importedCount = 0
   const entityMappings: { [originalId: string]: string } = {}
-
+  
   const mutationMap = {
-    'Business Capabilities': CREATE_CAPABILITY,
-    Applications: CREATE_APPLICATION,
-    'Data Objects': CREATE_DATA_OBJECT,
-    Interfaces: CREATE_APPLICATION_INTERFACE,
-    Persons: CREATE_PERSON,
-    Architectures: CREATE_ARCHITECTURE,
-    Diagrams: CREATE_DIAGRAM,
-    'Architecture Principles': CREATE_ARCHITECTURE_PRINCIPLE,
+    businessCapabilities: CREATE_CAPABILITY,
+    applications: CREATE_APPLICATION,
+    dataObjects: CREATE_DATA_OBJECT,
+    interfaces: CREATE_APPLICATION_INTERFACE,
+    persons: CREATE_PERSON,
+    architectures: CREATE_ARCHITECTURE,
+    diagrams: CREATE_DIAGRAM,
+    architecturePrinciples: CREATE_ARCHITECTURE_PRINCIPLE,
   }
 
   const updateMutationMap = {
-    'Business Capabilities': UPDATE_CAPABILITY,
-    Applications: UPDATE_APPLICATION,
-    'Data Objects': UPDATE_DATA_OBJECT,
-    Interfaces: UPDATE_APPLICATION_INTERFACE,
-    Persons: UPDATE_PERSON,
-    Architectures: UPDATE_ARCHITECTURE,
-    Diagrams: UPDATE_DIAGRAM,
-    'Architecture Principles': UPDATE_ARCHITECTURE_PRINCIPLE,
+    businessCapabilities: UPDATE_CAPABILITY,
+    applications: UPDATE_APPLICATION,
+    dataObjects: UPDATE_DATA_OBJECT,
+    interfaces: UPDATE_APPLICATION_INTERFACE,
+    persons: UPDATE_PERSON,
+    architectures: UPDATE_ARCHITECTURE,
+    diagrams: UPDATE_DIAGRAM,
+    architecturePrinciples: UPDATE_ARCHITECTURE_PRINCIPLE,
   }
 
   const createMutation = mutationMap[entityType as keyof typeof mutationMap]
@@ -378,7 +378,7 @@ const importEntityDataWithMapping = async (
     let input: any = {}
 
     switch (entityType) {
-      case 'Business Capabilities':
+      case 'businessCapabilities':
         input = {
           name: row.name || '',
           description: row.description || '',
@@ -389,7 +389,7 @@ const importEntityDataWithMapping = async (
         }
         break
 
-      case 'Applications': {
+      case 'applications': {
         const validStatus = Object.values(ApplicationStatus).includes(
           row.status as ApplicationStatus
         )
@@ -419,7 +419,7 @@ const importEntityDataWithMapping = async (
         break
       }
 
-      case 'Data Objects': {
+      case 'dataObjects': {
         // Validate classification enum value
         const validClassification = Object.values(DataClassification).includes(
           row.classification as DataClassification
@@ -436,7 +436,7 @@ const importEntityDataWithMapping = async (
         break
       }
 
-      case 'Interfaces': {
+      case 'interfaces': {
         // Validate interfaceType enum value
         const validInterfaceType = Object.values(InterfaceType).includes(
           row.interfaceType as InterfaceType
@@ -462,7 +462,7 @@ const importEntityDataWithMapping = async (
         break
       }
 
-      case 'Persons':
+      case 'persons':
         input = {
           firstName: row.firstName || '',
           lastName: row.lastName || '',
@@ -472,7 +472,7 @@ const importEntityDataWithMapping = async (
         }
         break
 
-      case 'Architectures': {
+      case 'architectures': {
         // Validate enum values
         const domainValue = row.domain?.toUpperCase()
         const typeValue = row.type?.toUpperCase()
@@ -504,7 +504,7 @@ const importEntityDataWithMapping = async (
         break
       }
 
-      case 'Diagrams':
+      case 'diagrams':
         input = {
           title: row.title || row.name || '',
           description: row.description || '',
@@ -512,7 +512,7 @@ const importEntityDataWithMapping = async (
         }
         break
 
-      case 'Architecture Principles': {
+      case 'architecturePrinciples': {
         // Validate enum values
         const categoryValue = row.category?.toUpperCase()
         const priorityValue = row.priority?.toUpperCase()
@@ -533,7 +533,10 @@ const importEntityDataWithMapping = async (
 
         // Parse tags from comma-separated string
         const tags = row.tags
-          ? row.tags.split(',').map((tag: string) => tag.trim()).filter((tag: string) => tag.length > 0)
+          ? row.tags
+              .split(',')
+              .map((tag: string) => tag.trim())
+              .filter((tag: string) => tag.length > 0)
           : []
 
         // Parse boolean value for isActive
@@ -588,28 +591,28 @@ const importEntityDataWithMapping = async (
         let createdEntities: any[] | undefined
 
         switch (entityType) {
-          case 'Business Capabilities':
+          case 'businessCapabilities':
             createdEntities = result.data.createBusinessCapabilities?.businessCapabilities
             break
-          case 'Applications':
+          case 'applications':
             createdEntities = result.data.createApplications?.applications
             break
-          case 'Data Objects':
+          case 'dataObjects':
             createdEntities = result.data.createDataObjects?.dataObjects
             break
-          case 'Interfaces':
+          case 'interfaces':
             createdEntities = result.data.createApplicationInterfaces?.applicationInterfaces
             break
-          case 'Persons':
+          case 'persons':
             createdEntities = result.data.createPeople?.people
             break
-          case 'Architectures':
+          case 'architectures':
             createdEntities = result.data.createArchitectures?.architectures
             break
-          case 'Diagrams':
+          case 'diagrams':
             createdEntities = result.data.createDiagrams?.diagrams
             break
-          case 'Architecture Principles':
+          case 'architecturePrinciples':
             createdEntities = result.data.createArchitecturePrinciples?.architecturePrinciples
             break
           default:
@@ -897,6 +900,7 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
           Persons: 'persons',
           Architectures: 'architectures',
           Diagrams: 'diagrams',
+          'Architecture Principles': 'architecturePrinciples',
         }
 
         // Mapping for import functions that expect display names
@@ -908,6 +912,7 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
           Persons: 'Persons',
           Architectures: 'Architectures',
           Diagrams: 'Diagrams',
+          'Architecture Principles': 'Architecture Principles',
         }
 
         const tabEntries = Object.entries(allData)
@@ -985,7 +990,18 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
                 return updatedRow
               })
 
-              await updateEntityRelationships(updatedTabData, entityType as 'businessCapabilities' | 'applications' | 'dataObjects' | 'interfaces' | 'persons' | 'architectures' | 'diagrams' | 'architecturePrinciples')
+              await updateEntityRelationships(
+                updatedTabData,
+                entityType as
+                  | 'businessCapabilities'
+                  | 'applications'
+                  | 'dataObjects'
+                  | 'interfaces'
+                  | 'persons'
+                  | 'architectures'
+                  | 'diagrams'
+                  | 'architecturePrinciples'
+              )
             } catch (error) {
               // Update error in existing result
               const existingResult = importResults.find(r => r.entityType === tabName)
@@ -1004,28 +1020,12 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
         const data = await importFromExcel(selectedFile)
         setImportProgress(20)
 
-        // Convert technical name to display name for import function
-        const technicalToDisplayName: { [key: string]: string } = {
-          businessCapabilities: 'Business Capabilities',
-          applications: 'Applications',
-          dataObjects: 'Data Objects',
-          interfaces: 'Interfaces',
-          persons: 'Persons',
-          architectures: 'Architectures',
-          diagrams: 'Diagrams',
-        }
-
-        const displayName = technicalToDisplayName[importSettings.entityType]
-        if (!displayName) {
-          throw new Error(`Unsupported entity type: ${importSettings.entityType}`)
-        }
-
         try {
           // PHASE 1: Import entities without relationships
           const { imported, entityMappings } = await importEntityDataWithMapping(
             apolloClient,
             data,
-            displayName,
+            importSettings.entityType,
             true
           ) // true = skipRelationships
           totalImported = imported
@@ -1057,7 +1057,18 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
             return updatedRow
           })
 
-          await updateEntityRelationships(updatedData, importSettings.entityType as 'businessCapabilities' | 'applications' | 'dataObjects' | 'interfaces' | 'persons' | 'architectures' | 'diagrams' | 'architecturePrinciples')
+          await updateEntityRelationships(
+            updatedData,
+            importSettings.entityType as
+              | 'businessCapabilities'
+              | 'applications'
+              | 'dataObjects'
+              | 'interfaces'
+              | 'persons'
+              | 'architectures'
+              | 'diagrams'
+              | 'architecturePrinciples'
+          )
           setImportProgress(90)
 
           importResults.push({
@@ -1647,7 +1658,10 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
             variables: { id: row.id, input: updateInput },
           })
         } catch (error) {
-          console.error(`Failed to update relationships for architecture principle ${row.id}:`, error)
+          console.error(
+            `Failed to update relationships for architecture principle ${row.id}:`,
+            error
+          )
         }
       }
     }
@@ -1681,7 +1695,9 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
         return
       }
 
-      const exampleData = getTemplateWithExamples(importSettings.entityType as Exclude<typeof importSettings.entityType, 'all'>)
+      const exampleData = getTemplateWithExamples(
+        importSettings.entityType as Exclude<typeof importSettings.entityType, 'all'>
+      )
       await exportToExcel(exampleData, {
         filename: `${importSettings.entityType}_template_mit_beispielen`,
         sheetName: 'Template',
