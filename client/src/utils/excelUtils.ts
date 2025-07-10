@@ -484,6 +484,7 @@ export const downloadTemplate = async (
 
 /**
  * Erstellt eine Excel-Template-Datei mit echten GraphQL-Feldnamen
+ * Hinweis: Diagramme sind für Excel-Export ausgeblendet, da JSON-Daten zu groß sind
  */
 export const downloadTemplateWithRealFields = async (
   entityType:
@@ -493,7 +494,7 @@ export const downloadTemplateWithRealFields = async (
     | 'interfaces'
     | 'persons'
     | 'architectures'
-    | 'diagrams'
+    // 'diagrams' - Ausgeblendet für Excel-Export (zu große JSON-Daten)
     | 'architecturePrinciples'
     | 'all'
 ): Promise<void> => {
@@ -507,11 +508,12 @@ export const downloadTemplateWithRealFields = async (
     getInterfacesTemplate,
     getPersonsTemplate,
     getArchitecturesTemplate,
-    getDiagramsTemplate,
+    getArchitecturePrinciplesTemplate,
+    // getDiagramsTemplate, - Ausgeblendet für Excel-Export
   } = moduleImport
 
   if (entityType === 'all') {
-    // Multi-Tab Template für Admin
+    // Multi-Tab Template für Admin (Diagramme werden bei Excel ausgeblendet)
     const allTemplates = {
       'Business Capabilities': [getBusinessCapabilitiesTemplate()],
       Applications: [getApplicationsTemplate()],
@@ -519,7 +521,8 @@ export const downloadTemplateWithRealFields = async (
       Interfaces: [getInterfacesTemplate()],
       Persons: [getPersonsTemplate()],
       Architectures: [getArchitecturesTemplate()],
-      Diagrams: [getDiagramsTemplate()],
+      'Architecture Principles': [getArchitecturePrinciplesTemplate()],
+      // Diagrams: [getDiagramsTemplate()], - Ausgeblendet für Excel (zu große JSON-Daten)
     }
 
     await exportMultiTabToExcel(allTemplates, {
@@ -540,7 +543,7 @@ export const downloadTemplateWithRealFields = async (
     interfaces: 'Interfaces',
     persons: 'Persons',
     architectures: 'Architectures',
-    diagrams: 'Diagrams',
+    // diagrams: 'Diagrams', - Ausgeblendet für Excel-Export
     architecturePrinciples: 'Architecture Principles',
   }
 

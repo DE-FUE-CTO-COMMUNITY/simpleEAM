@@ -19,7 +19,7 @@ export type EntityType =
   | 'interfaces'
   | 'persons'
   | 'architectures'
-  | 'diagrams'
+  // 'diagrams' - Ausgeblendet für Excel-Operationen (zu große JSON-Daten)
   | 'architecturePrinciples'
   | 'all'
 
@@ -346,6 +346,7 @@ export const fetchArchitecturePrinciplesForExport = async (
 
 /**
  * Holt alle Entitäten für Admin-Export (Multi-Tab Excel)
+ * Hinweis: Diagramme werden beim Excel-Export ausgeblendet, da die JSON-Daten zu groß sind
  */
 export const fetchAllEntitiesForExport = async (
   client: ApolloClient<any>
@@ -358,7 +359,7 @@ export const fetchAllEntitiesForExport = async (
       interfaces,
       persons,
       architectures,
-      diagrams,
+      // diagrams - Ausgeblendet für Excel (zu große JSON-Daten)
       architecturePrinciples,
     ] = await Promise.all([
       fetchBusinessCapabilitiesForExport(client),
@@ -367,7 +368,7 @@ export const fetchAllEntitiesForExport = async (
       fetchInterfacesForExport(client),
       fetchPersonsForExport(client),
       fetchArchitecturesForExport(client),
-      fetchDiagramsForExport(client),
+      // fetchDiagramsForExport(client), - Ausgeblendet für Excel
       fetchArchitecturePrinciplesForExport(client),
     ])
 
@@ -378,7 +379,7 @@ export const fetchAllEntitiesForExport = async (
       Interfaces: interfaces,
       Persons: persons,
       Architectures: architectures,
-      Diagrams: diagrams,
+      // Diagrams: diagrams, - Ausgeblendet für Excel-Export
       'Architecture Principles': architecturePrinciples,
     }
   } catch {
@@ -588,6 +589,7 @@ export const getArchitecturePrinciplesTemplate = (): ExcelExportData => ({
 
 /**
  * Holt Template-Daten basierend auf dem Entity-Typ mit echten GraphQL-Feldnamen
+ * Hinweis: Diagramme sind für Excel-Operationen ausgeblendet
  */
 export const getTemplateByEntityType = (
   entityType:
@@ -597,7 +599,7 @@ export const getTemplateByEntityType = (
     | 'interfaces'
     | 'persons'
     | 'architectures'
-    | 'diagrams'
+    // 'diagrams' - Ausgeblendet für Excel-Operationen
     | 'architecturePrinciples'
 ): ExcelExportData => {
   switch (entityType) {
@@ -613,8 +615,8 @@ export const getTemplateByEntityType = (
       return getPersonsTemplate()
     case 'architectures':
       return getArchitecturesTemplate()
-    case 'diagrams':
-      return getDiagramsTemplate()
+    // case 'diagrams': - Ausgeblendet für Excel-Operationen
+    //   return getDiagramsTemplate()
     case 'architecturePrinciples':
       return getArchitecturePrinciplesTemplate()
     default:
@@ -639,18 +641,18 @@ export const getFieldNamesByEntityType = (
 ): string[] | { [tabName: string]: string[] } => {
   if (entityType === 'all') {
     return {
-      businessCapabilities: Object.keys(getBusinessCapabilitiesTemplate()),
-      applications: Object.keys(getApplicationsTemplate()),
-      dataObjects: Object.keys(getDataObjectsTemplate()),
-      interfaces: Object.keys(getInterfacesTemplate()),
-      persons: Object.keys(getPersonsTemplate()),
-      architectures: Object.keys(getArchitecturesTemplate()),
-      diagrams: Object.keys(getDiagramsTemplate()),
-      architecturePrinciples: Object.keys(getArchitecturePrinciplesTemplate()),
+      'Business Capabilities': Object.keys(getBusinessCapabilitiesTemplate()),
+      Applications: Object.keys(getApplicationsTemplate()),
+      'Data Objects': Object.keys(getDataObjectsTemplate()),
+      Interfaces: Object.keys(getInterfacesTemplate()),
+      Persons: Object.keys(getPersonsTemplate()),
+      Architectures: Object.keys(getArchitecturesTemplate()),
+      // diagrams: Object.keys(getDiagramsTemplate()), - Ausgeblendet für Excel-Export
+      'Architecture Principles': Object.keys(getArchitecturePrinciplesTemplate()),
     }
   }
 
-  const template = getTemplateByEntityType(entityType)
+  const template = getTemplateByEntityType(entityType as Exclude<typeof entityType, 'diagrams'>)
   return Object.keys(template)
 }
 
@@ -692,7 +694,7 @@ export const validateImportData = (
     | 'interfaces'
     | 'persons'
     | 'architectures'
-    | 'diagrams'
+    // 'diagrams' - Ausgeblendet für Excel-Validierung
     | 'architecturePrinciples'
 ): ValidationResult => {
   const errors: ValidationError[] = []
@@ -803,10 +805,12 @@ export const getTemplateWithExamples = (
     | 'interfaces'
     | 'persons'
     | 'architectures'
-    | 'diagrams'
+    // 'diagrams' - Ausgeblendet für Excel-Operationen
     | 'architecturePrinciples'
 ): ExcelExportData[] => {
-  const emptyTemplate = getTemplateByEntityType(entityType)
+  const emptyTemplate = getTemplateByEntityType(
+    entityType as Exclude<typeof entityType, 'diagrams'>
+  )
 
   switch (entityType) {
     case 'businessCapabilities':
@@ -934,22 +938,7 @@ export const getTemplateWithExamples = (
           updatedAt: '2024-06-01T15:30:00.000Z',
         },
       ]
-    case 'diagrams':
-      return [
-        emptyTemplate,
-        {
-          id: 'diag-001',
-          title: 'Customer Journey Map',
-          description: 'Visual representation of the customer journey',
-          diagramType: 'PROCESS',
-          diagramJson:
-            '{"type":"excalidraw","version":2,"source":"","elements":[],"appState":{"gridSize":null,"viewBackgroundColor":"#ffffff"}}',
-          creator: 'user-001',
-          architecture: 'arch-001',
-          createdAt: '2024-01-01T10:00:00.000Z',
-          updatedAt: '2024-06-01T15:30:00.000Z',
-        },
-      ]
+    // case 'diagrams': - Ausgeblendet für Excel-Operationen (zu große JSON-Daten)
     case 'architecturePrinciples':
       return [
         emptyTemplate,
@@ -990,8 +979,8 @@ export function getRequiredFieldsByEntityType(entityType: EntityType): string[] 
       return ['id', 'firstName', 'lastName']
     case 'architectures':
       return ['id', 'name', 'domain', 'type', 'timestamp']
-    case 'diagrams':
-      return ['id', 'title', 'diagramJson']
+    // case 'diagrams': - Ausgeblendet für Excel-Operationen
+    //   return ['id', 'title', 'diagramJson']
     case 'architecturePrinciples':
       return ['id', 'name', 'category', 'priority']
     default:
@@ -1089,8 +1078,8 @@ export function getOptionalFieldsByEntityType(entityType: EntityType): string[] 
         'createdAt',
         'updatedAt',
       ]
-    case 'diagrams':
-      return ['description', 'diagramType', 'creator', 'architecture', 'createdAt', 'updatedAt']
+    // case 'diagrams': - Ausgeblendet für Excel-Operationen
+    //   return ['description', 'diagramType', 'creator', 'architecture', 'createdAt', 'updatedAt']
     case 'architecturePrinciples':
       return [
         'description',

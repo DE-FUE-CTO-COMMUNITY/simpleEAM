@@ -185,7 +185,7 @@ interface ImportSettings {
     | 'interfaces'
     | 'persons'
     | 'architectures'
-    | 'diagrams'
+    // 'diagrams' - Ausgeblendet für Excel-Import (zu große JSON-Daten)
     | 'architecturePrinciples'
     | 'all'
   format: 'xlsx'
@@ -201,7 +201,7 @@ interface ExportSettings {
     | 'interfaces'
     | 'persons'
     | 'architectures'
-    | 'diagrams'
+    // 'diagrams' - Ausgeblendet für Excel-Export (zu große JSON-Daten)
     | 'architecturePrinciples'
     | 'all'
   format: 'xlsx' | 'csv'
@@ -717,7 +717,7 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
       | 'interfaces'
       | 'persons'
       | 'architectures'
-      | 'diagrams'
+      // 'diagrams' - Ausgeblendet für Excel-Operationen (zu große JSON-Daten)
       | 'all'
   }>({
     entityType: 'businessCapabilities',
@@ -739,6 +739,7 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Entity Type Labels
+  // Hinweis: Diagramme werden bei Excel-Export/Import ausgeblendet, da JSON-Daten zu groß für Excel-Zellen sind
   const entityTypeLabels = {
     businessCapabilities: 'Business Capabilities',
     applications: 'Applikationen',
@@ -746,7 +747,7 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
     interfaces: 'Schnittstellen',
     persons: 'Personen',
     architectures: 'Architekturen',
-    diagrams: 'Diagramme',
+    // diagrams: 'Diagramme', - Ausgeblendet für Excel (zu große JSON-Daten)
     architecturePrinciples: 'Architekturprinzipien',
     ...(isAdmin() && { all: 'Alle Entitäten (Admin)' }),
   }
@@ -811,6 +812,7 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
             Interfaces: 'interfaces',
             Persons: 'persons',
             Architectures: 'architectures',
+            'Architecture Principles': 'architecturePrinciples',
             Diagrams: 'diagrams',
           }
 
@@ -903,18 +905,6 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
           'Architecture Principles': 'architecturePrinciples',
         }
 
-        // Mapping for import functions that expect display names
-        const displayNameMapping: { [key: string]: string } = {
-          'Business Capabilities': 'Business Capabilities',
-          Applications: 'Applications',
-          'Data Objects': 'Data Objects',
-          Interfaces: 'Interfaces',
-          Persons: 'Persons',
-          Architectures: 'Architectures',
-          Diagrams: 'Diagrams',
-          'Architecture Principles': 'Architecture Principles',
-        }
-
         const tabEntries = Object.entries(allData)
         const createdEntityMappings: { [tabName: string]: { [originalId: string]: string } } = {}
 
@@ -922,14 +912,13 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
         for (let i = 0; i < tabEntries.length; i++) {
           const [tabName, tabData] = tabEntries[i]
           const entityType = entityTypeMapping[tabName]
-          const displayName = displayNameMapping[tabName]
 
-          if (entityType && displayName && Array.isArray(tabData) && tabData.length > 0) {
+          if (entityType && Array.isArray(tabData) && tabData.length > 0) {
             try {
               const { imported, entityMappings } = await importEntityDataWithMapping(
                 apolloClient,
                 tabData,
-                displayName,
+                entityType,
                 true
               ) // true = skipRelationships
               totalImported += imported
