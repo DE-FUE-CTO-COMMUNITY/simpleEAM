@@ -6,7 +6,7 @@
 export const DiagramEventBus = {
   // Globales Objekt für die API und Handler
   api: null as any,
-  handler: null as any,
+  handler: null as ((diagram: any) => void) | null,
 
   // API-Referenz setzen
   setExcalidrawAPI(api: any) {
@@ -16,7 +16,7 @@ export const DiagramEventBus = {
   },
 
   // Handler-Referenz setzen
-  setOpenHandler(handler: Function) {
+  setOpenHandler(handler: (diagram: any) => void) {
     console.log('DiagramEventBus: Handler wird gesetzt', !!handler)
     this.handler = handler
     this.triggerEvent('handlerReady')
@@ -59,7 +59,7 @@ export const DiagramEventBus = {
   },
 
   // Event-Listener registrieren
-  on(eventName: string, callback: Function) {
+  on(eventName: string, callback: (detail?: any) => void) {
     if (typeof window !== 'undefined') {
       const handler = (event: any) => callback(event.detail)
       window.addEventListener(`diagram_${eventName}`, handler as EventListener)
