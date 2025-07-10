@@ -44,14 +44,44 @@ const DiagramCard: React.FC<DiagramCardProps> = ({
   diagramPng,
   createdAt,
   updatedAt,
+  creator,
   architecture,
+  diagramJson,
 }) => {
   const router = useRouter()
 
-  const handleClick = () => {
-    // Diagramm-ID als URL-Parameter übergeben
-    console.log('Navigiere zu Diagramm mit ID:', id)
-    router.push(`/diagrams?openDiagram=${id}`)
+  const handleClick = async () => {
+    try {
+      // Diagramm-Daten mit allen verfügbaren Metadaten vorbereiten
+      const diagramToOpen = {
+        id,
+        title,
+        description,
+        diagramType,
+        createdAt,
+        updatedAt,
+        creator,
+        architecture,
+      }
+
+      // Wenn diagramJson verfügbar ist, direkt verwenden
+      if (diagramJson) {
+        console.log('Speichere Diagramm mit verfügbarem JSON für Öffnen:', id)
+        localStorage.setItem('pendingDiagramToOpen', JSON.stringify({
+          ...diagramToOpen,
+          diagramJson
+        }))
+      } else {
+        // Nur die ID speichern, der DiagramEditor lädt das JSON dynamisch
+        console.log('Speichere Diagramm-ID für dynamisches Laden:', id)
+        localStorage.setItem('pendingDiagramToOpen', JSON.stringify(diagramToOpen))
+      }
+      
+      // Navigiere ohne URL-Parameter zum Diagram Editor
+      router.push('/diagrams')
+    } catch (error) {
+      console.error('Fehler beim Vorbereiten des Diagramm-Öffnens:', error)
+    }
   }
 
   const formatDate = (dateString: string) => {

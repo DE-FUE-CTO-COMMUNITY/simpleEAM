@@ -25,7 +25,6 @@ export * from './types/DiagramTypes'
 
 // Export hooks
 export * from './hooks/DiagramKeyboardShortcuts'
-export * from './hooks/useDiagramURLParams'
 
 // Export handlers
 export * from './handlers/DiagramHandlers'

@@ -1,7 +1,9 @@
 'use client'
 
-import React, { useRef, useCallback, useMemo } from 'react'
+import React, { useRef, useCallback, useMemo, useEffect } from 'react'
 import { Box, Alert, Snackbar } from '@mui/material'
+import { useApolloClient } from '@apollo/client'
+import { GET_DIAGRAM } from '@/graphql/diagram'
 import SaveDiagramDialog from './SaveDiagramDialog'
 import OpenDiagramDialog from './OpenDiagramDialog'
 import DeleteDiagramDialog from './DeleteDiagramDialog'
@@ -13,12 +15,12 @@ import { DiagramEditorProps } from '../types/DiagramTypes'
 import { useDiagramState, useUIOptions } from '../state/DiagramState'
 import { useDiagramHandlers } from '../handlers/DiagramHandlers'
 import { useKeyboardShortcuts } from '../hooks/DiagramKeyboardShortcuts'
-import { useDiagramURLParams } from '../hooks/useDiagramURLParams'
 import { loadViewportStateFromStorage } from '../utils/DiagramStorageUtils'
 import { isViewer } from '@/lib/auth'
 
 const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
   const containerRef = useRef<HTMLDivElement>(null)
+  const apolloClient = useApolloClient()
 
   // Custom hooks for state management
   const {
@@ -38,13 +40,6 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     setNotification,
     updateDialogState,
   } = useDiagramState()
-
-  // URL-Parameter für automatisches Öffnen von Diagrammen
-  console.log('DiagramEditor: Initialisiere useDiagramURLParams')
-
-  // Variable für URL-Parameter initialisieren
-  const urlParams = useDiagramURLParams()
-  console.log('DiagramEditor: URL-Parameter:', urlParams)
 
   // UI Options
   const uiOptions = useUIOptions()
@@ -149,24 +144,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
       // Setze eine Bereitschafts-Eigenschaft für bessere Erkennung
       if (api) {
         api.ready = true
-
-        // Speichere die API global und im State für zuverlässigen Zugriff
-        // @ts-expect-error - Globale Variable für kritischen Zugriff
-        window.__excalidrawAPI = api
         setExcalidrawAPI(api)
-
-        // Direkt mit der API arbeiten, nachdem der State aktualisiert wurde
-        if (urlParams.openDiagramId) {
-          console.log('Excalidraw API direkt verwenden, da openDiagramId vorhanden ist')
-
-          // Direkt ein Event auslösen, um den Hook zu benachrichtigen
-          if (typeof window !== 'undefined') {
-            const event = new CustomEvent('excalidrawAPIReady', {
-              detail: { id: urlParams.openDiagramId },
-            })
-            window.dispatchEvent(event)
-          }
-        }
       }
 
       // Explizites Logging, nachdem die API gesetzt wurde
@@ -174,11 +152,10 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
         console.log('Excalidraw API Status nach dem Setzen:', {
           apiInState: !!excalidrawAPI,
           ready: excalidrawAPI?.ready === true,
-          globalAPIExists: !!(window as any).__excalidrawAPI,
         })
       }, 100)
     },
-    [setExcalidrawAPI, excalidrawAPI, urlParams.openDiagramId]
+    [setExcalidrawAPI, excalidrawAPI]
   )
 
   // Library Update Handler
@@ -210,24 +187,17 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     })
   }
 
-  // Create dynamic initialData that includes viewport state only if no diagram is being loaded via URL
+  // Create dynamic initialData that includes viewport state
   const initialData = useMemo(() => {
-    // Load viewport state from storage only if no diagram is being loaded via URL
+    // Load viewport state from storage
     let viewportState = null
-    if (!urlParams.openDiagramId) {
-      try {
-        const savedViewportState = loadViewportStateFromStorage()
-        if (savedViewportState) {
-          viewportState = savedViewportState
-        }
-      } catch (error) {
-        console.warn('DiagramEditor: Failed to load viewport state:', error)
+    try {
+      const savedViewportState = loadViewportStateFromStorage()
+      if (savedViewportState) {
+        viewportState = savedViewportState
       }
-    } else {
-      console.log(
-        'DiagramEditor: Überspringe Viewport-Wiederherstellung - Diagramm wird über URL-Parameter geladen:',
-        urlParams.openDiagramId
-      )
+    } catch (error) {
+      console.warn('DiagramEditor: Failed to load viewport state:', error)
     }
 
     // Create base app state with viewport position
@@ -252,7 +222,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
       currentItemStrokeStyle: 'solid',
       currentItemRoughness: 1,
       currentItemOpacity: 100,
-      // Include viewport state if available and no diagram is being loaded via URL
+      // Include viewport state if available
       ...(viewportState && {
         scrollX: viewportState.scrollX,
         scrollY: viewportState.scrollY,
@@ -267,7 +237,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     }
 
     return data
-  }, [urlParams.openDiagramId]) // Depend on URL parameter to reset initialData when needed
+  }, []) // Deliberately static - viewport is applied once on init
 
   // Debug log for initialData
 
@@ -328,7 +298,65 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
       }
     },
     [excalidrawAPI, setCurrentScene, setHasUnsavedChanges, setNotification]
-  )
+  )  // LocalStorage-basiertes Diagramm laden beim Start
+  useEffect(() => {
+    const loadDiagramFromStorage = async () => {
+      try {
+        const pendingDiagram = localStorage.getItem('pendingDiagramToOpen')
+        if (pendingDiagram && excalidrawAPI) {
+          const diagramData = JSON.parse(pendingDiagram)
+          console.log('Lade Diagramm aus LocalStorage:', diagramData.id)
+          
+          // Entferne aus LocalStorage, damit es nur einmal geladen wird
+          localStorage.removeItem('pendingDiagramToOpen')
+          
+          // Prüfe, ob diagramJson verfügbar ist
+          if (diagramData.diagramJson) {
+            // Diagramm hat bereits JSON-Daten, direkt laden
+            console.log('Verwende verfügbare JSON-Daten aus LocalStorage')
+            handleOpenDiagram(diagramData)
+          } else {
+            // Diagramm benötigt noch JSON-Daten - setze erst die Metadaten
+            console.log('Setze Diagramm-Metadaten und lade JSON dynamisch für ID:', diagramData.id)
+            setCurrentDiagram(diagramData)
+            
+            // Lade das komplette Diagramm über GraphQL
+            try {
+              const { data } = await apolloClient.query({
+                query: GET_DIAGRAM,
+                variables: { id: diagramData.id },
+                fetchPolicy: 'network-only'
+              })
+              
+              if (data?.diagrams?.[0]) {
+                // Führe die vollständigen Diagrammdaten mit den bereits gesetzten Metadaten zusammen
+                const fullDiagram = {
+                  ...diagramData, // Metadaten aus LocalStorage
+                  ...data.diagrams[0] // Vollständige Daten inklusive diagramJson aus GraphQL
+                }
+                handleOpenDiagram(fullDiagram)
+              }
+            } catch (error) {
+              console.error('Fehler beim Laden der Diagramm-Daten:', error)
+              setNotification({
+                open: true,
+                message: 'Fehler beim Laden des Diagramms',
+                severity: 'error',
+              })
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Fehler beim Laden des Diagramms aus LocalStorage:', error)
+        localStorage.removeItem('pendingDiagramToOpen') // Cleanup bei Fehler
+      }
+    }
+
+    if (excalidrawAPI && isClient) {
+      // Kleiner Delay um sicherzustellen, dass alles initialisiert ist
+      setTimeout(loadDiagramFromStorage, 500)
+    }
+  }, [excalidrawAPI, isClient, handleOpenDiagram, setCurrentDiagram, setNotification, apolloClient])
 
   if (!isClient) {
     return null

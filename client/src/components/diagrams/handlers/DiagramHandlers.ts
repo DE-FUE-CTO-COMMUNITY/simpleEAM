@@ -174,23 +174,12 @@ export const useDiagramHandlers = (
         }
 
         // Restore viewport state (position and zoom) if available
-        // Überspringe Viewport-Wiederherstellung, wenn das Diagramm über URL-Parameter geladen wurde
-        const urlParams = new URLSearchParams(window.location.search)
-        const openDiagramId = urlParams.get('openDiagram')
-
         let savedViewportState = null
-        if (!openDiagramId) {
-          savedViewportState = loadViewportStateFromStorage()
-          if (savedViewportState) {
-            sceneData.appState.scrollX = savedViewportState.scrollX
-            sceneData.appState.scrollY = savedViewportState.scrollY
-            sceneData.appState.zoom = { value: savedViewportState.zoom }
-          }
-        } else {
-          console.log(
-            'Überspringe Viewport-Wiederherstellung - Diagramm wird über URL-Parameter geladen:',
-            openDiagramId
-          )
+        savedViewportState = loadViewportStateFromStorage()
+        if (savedViewportState) {
+          sceneData.appState.scrollX = savedViewportState.scrollX
+          sceneData.appState.scrollY = savedViewportState.scrollY
+          sceneData.appState.zoom = { value: savedViewportState.zoom }
         }
 
         const restoredScene = restoreSceneData(sceneData)
