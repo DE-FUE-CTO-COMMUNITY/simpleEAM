@@ -77,6 +77,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
     { text: 'Applikationen', icon: <ApplicationComponentIcon />, href: '/applications' },
     { text: 'Datenobjekte', icon: <BusinessObjectIcon />, href: '/dataobjects' },
     { text: 'Schnittstellen', icon: <ApplicationInterfaceIcon />, href: '/interfaces' },
+    { isDivider: true, text: 'divider', icon: null },
     { text: 'Personen', icon: <PersonIcon />, href: '/persons' },
     // Import/Export für Admin- und Architect-Benutzer (Hydration-Fix: nur wenn initialisiert)
     ...(initialized && (isAdmin() || isArchitect())
