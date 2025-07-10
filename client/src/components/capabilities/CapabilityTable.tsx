@@ -59,6 +59,8 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
       description: false,
       type: false,
       sequenceNumber: false,
+      introductionDate: false,
+      endDate: false,
       relatedDataObjects: false,
       parents: false,
       supportedByApplications: false,
@@ -167,6 +169,22 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
         },
         enableHiding: true,
       }),
+      columnHelper.accessor('introductionDate', {
+        header: 'Einführungsdatum',
+        cell: info => {
+          const date = info.getValue()
+          return date ? formatDate(date) : '-'
+        },
+        enableHiding: true,
+      }),
+      columnHelper.accessor('endDate', {
+        header: 'Enddatum',
+        cell: info => {
+          const date = info.getValue()
+          return date ? formatDate(date) : '-'
+        },
+        enableHiding: true,
+      }),
       // Weitere versteckte Spalten für Beziehungen
       columnHelper.accessor('relatedDataObjects', {
         header: 'Verwandte Datenobjekte',
@@ -231,6 +249,10 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
       partOfArchitectures: capability.partOfArchitectures?.map((arch: any) => arch.id) ?? [],
       partOfDiagrams: [], // Vorläufig leerer Array
       sequenceNumber: capability.sequenceNumber ?? 0,
+      introductionDate: capability.introductionDate
+        ? new Date(capability.introductionDate)
+        : undefined,
+      endDate: capability.endDate ? new Date(capability.endDate) : undefined,
     }
   }
 

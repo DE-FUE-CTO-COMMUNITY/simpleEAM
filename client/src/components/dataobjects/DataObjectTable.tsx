@@ -75,44 +75,34 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
   }
 
   // Hilfsfunktion für die Anzeige der Datenschutzklasse mit farblichem Chip
-  const getClassificationChip = useCallback(
-    (classification: DataClassification) => {
-      let color
-      let label
+  const getClassificationChip = useCallback((classification: DataClassification) => {
+    let color
+    let label
 
-      switch (classification) {
-        case DataClassification.PUBLIC:
-          color = 'success'
-          label = 'Public'
-          break
-        case DataClassification.INTERNAL:
-          color = 'info'
-          label = 'Internal'
-          break
-        case DataClassification.CONFIDENTIAL:
-          color = 'warning'
-          label = 'Confidential'
-          break
-        case DataClassification.STRICTLY_CONFIDENTIAL:
-          color = 'error'
-          label = 'Strictly Confidential'
-          break
-        default:
-          color = 'default'
-          label = classification
-      }
+    switch (classification) {
+      case DataClassification.PUBLIC:
+        color = 'success'
+        label = 'Public'
+        break
+      case DataClassification.INTERNAL:
+        color = 'info'
+        label = 'Internal'
+        break
+      case DataClassification.CONFIDENTIAL:
+        color = 'warning'
+        label = 'Confidential'
+        break
+      case DataClassification.STRICTLY_CONFIDENTIAL:
+        color = 'error'
+        label = 'Strictly Confidential'
+        break
+      default:
+        color = 'default'
+        label = classification
+    }
 
-      return (
-        <Chip
-          label={label}
-          size="small"
-          color={color as any}
-          variant="filled"
-        />
-      )
-    },
-    []
-  )
+    return <Chip label={label} size="small" color={color as any} variant="filled" />
+  }, [])
 
   // Spalten-Definition für die DataObject-Tabelle
   const columns = useMemo(

@@ -30,6 +30,8 @@ type BusinessCapability
   businessValue: Int
   sequenceNumber: Int
   tags: [String!]
+  introductionDate: Date
+  endDate: Date
   createdAt: DateTime! @timestamp(operations: [CREATE])
   updatedAt: DateTime @timestamp(operations: [UPDATE])
   owners: [Person!]! @relationship(type: "OWNED_BY", direction: OUT)

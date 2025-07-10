@@ -156,6 +156,12 @@ const CapabilitiesPage = () => {
       status: capabilityData.status,
       ...(capabilityData.type ? { type: capabilityData.type } : {}),
       sequenceNumber: capabilityData.sequenceNumber,
+      ...(capabilityData.introductionDate
+        ? { introductionDate: capabilityData.introductionDate.toISOString().split('T')[0] }
+        : {}),
+      ...(capabilityData.endDate
+        ? { endDate: capabilityData.endDate.toISOString().split('T')[0] }
+        : {}),
       tags: capabilityData.tags,
       // Wenn ein Besitzer ausgewählt wurde, verwenden wir die neue owners-Struktur (nur ein Owner)
       ...(ownerId
@@ -233,6 +239,14 @@ const CapabilitiesPage = () => {
       status: { set: capabilityData.status },
       sequenceNumber: { set: capabilityData.sequenceNumber },
       tags: { set: capabilityData.tags },
+    }
+
+    // Lifecycle-Felder setzen
+    if (capabilityData.introductionDate) {
+      input.introductionDate = { set: capabilityData.introductionDate.toISOString().split('T')[0] }
+    }
+    if (capabilityData.endDate) {
+      input.endDate = { set: capabilityData.endDate.toISOString().split('T')[0] }
     }
 
     // Nur type setzen, wenn es einen Wert hat

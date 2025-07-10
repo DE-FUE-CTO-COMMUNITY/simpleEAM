@@ -23,6 +23,8 @@ export const GET_CAPABILITIES = gql`
       type
       businessValue
       sequenceNumber
+      introductionDate
+      endDate
       owners {
         id
         firstName
@@ -70,6 +72,8 @@ export const GET_CAPABILITY = gql`
       type
       businessValue
       sequenceNumber
+      introductionDate
+      endDate
       owners {
         id
         firstName
@@ -118,6 +122,8 @@ export const CREATE_CAPABILITY = gql`
         type
         businessValue
         sequenceNumber
+        introductionDate
+        endDate
         createdAt
       }
     }
@@ -136,6 +142,8 @@ export const UPDATE_CAPABILITY = gql`
         type
         businessValue
         sequenceNumber
+        introductionDate
+        endDate
         updatedAt
       }
     }
@@ -169,6 +177,8 @@ export const GET_CAPABILITY_MAP_DATA = gql`
       businessValue
       maturityLevel
       sequenceNumber
+      introductionDate
+      endDate
       children {
         id
         name
@@ -178,6 +188,8 @@ export const GET_CAPABILITY_MAP_DATA = gql`
         businessValue
         maturityLevel
         sequenceNumber
+        introductionDate
+        endDate
         children {
           id
           name
@@ -187,6 +199,8 @@ export const GET_CAPABILITY_MAP_DATA = gql`
           businessValue
           maturityLevel
           sequenceNumber
+          introductionDate
+          endDate
           children {
             id
             name
@@ -196,6 +210,8 @@ export const GET_CAPABILITY_MAP_DATA = gql`
             businessValue
             maturityLevel
             sequenceNumber
+            introductionDate
+            endDate
           }
           supportedByApplications {
             id

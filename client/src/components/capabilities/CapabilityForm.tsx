@@ -41,6 +41,8 @@ export const capabilitySchema = z.object({
     .min(0, 'Geschäftswert muss 0 oder höher sein')
     .max(10, 'Geschäftswert darf maximal 10 sein'),
   sequenceNumber: z.number().int().min(0, 'Sequenznummer muss 0 oder höher sein').optional(),
+  introductionDate: z.date().optional(),
+  endDate: z.date().optional(),
   ownerId: z.string().optional(),
   tags: z.array(z.string()).optional(),
   parentId: z.string().optional(),
@@ -145,6 +147,8 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
       status: CapabilityStatus.ACTIVE,
       type: CapabilityType.OPERATIONAL,
       sequenceNumber: 0,
+      introductionDate: undefined,
+      endDate: undefined,
       ownerId: '',
       tags: [],
       parentId: '',
@@ -215,6 +219,10 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
         status: capabilityStatus ?? CapabilityStatus.ACTIVE,
         type: capabilityType ?? CapabilityType.OPERATIONAL,
         sequenceNumber: capabilitySequenceNumber ?? 0,
+        introductionDate: capability?.introductionDate
+          ? new Date(capability.introductionDate)
+          : undefined,
+        endDate: capability?.endDate ? new Date(capability.endDate) : undefined,
         ownerId: capabilityOwnerId ?? '',
         tags: capabilityTags ?? [],
         parentId: capabilityParentId ?? '',
@@ -509,11 +517,28 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
         return option.value === value?.value || option.value === value
       },
     },
+    {
+      name: 'introductionDate',
+      label: 'Einführungsdatum',
+      type: 'date',
+      validators: capabilitySchema.shape.introductionDate,
+      size: { xs: 12, md: 6 },
+      tabId: 'lifecycle',
+    },
+    {
+      name: 'endDate',
+      label: 'Enddatum',
+      type: 'date',
+      validators: capabilitySchema.shape.endDate,
+      size: { xs: 12, md: 6 },
+      tabId: 'lifecycle',
+    },
   ]
 
   // Tabs-Konfiguration
   const tabs = [
     { id: 'general', label: 'Allgemein' },
+    { id: 'lifecycle', label: 'Lebenszyklus' },
     { id: 'relationships', label: 'Beziehungen' },
     { id: 'architectures', label: 'Architekturen' },
   ]

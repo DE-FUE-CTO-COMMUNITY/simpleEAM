@@ -14,8 +14,8 @@ const DiagramNameChip = styled(Chip, {
 })<{ hasUnsavedChanges?: boolean }>(({ theme, hasUnsavedChanges }) => ({
   backgroundColor: hasUnsavedChanges ? 'rgba(244, 67, 54, 0.15)' : theme.palette.background.paper,
   color: hasUnsavedChanges ? '#d32f2f' : theme.palette.text.primary,
-  border: hasUnsavedChanges 
-    ? '1px solid rgba(244, 67, 54, 0.15)' 
+  border: hasUnsavedChanges
+    ? '1px solid rgba(244, 67, 54, 0.15)'
     : `1px solid ${theme.palette.divider}`,
   borderRadius: '4px',
   fontWeight: 500,
@@ -27,13 +27,13 @@ const DiagramNameChip = styled(Chip, {
     fontFamily: 'Assistant, system-ui, sans-serif',
   },
   '&:hover': {
-    backgroundColor: hasUnsavedChanges 
-      ? 'rgba(244, 67, 54, 0.25)' 
-      : theme.palette.mode === 'dark' 
-        ? theme.palette.grey[700] 
+    backgroundColor: hasUnsavedChanges
+      ? 'rgba(244, 67, 54, 0.25)'
+      : theme.palette.mode === 'dark'
+        ? theme.palette.grey[700]
         : theme.palette.grey[100],
-    border: hasUnsavedChanges 
-      ? '1px solid rgba(244, 67, 54, 0.25)' 
+    border: hasUnsavedChanges
+      ? '1px solid rgba(244, 67, 54, 0.25)'
       : `1px solid ${theme.palette.divider}`,
     boxShadow: hasUnsavedChanges ? '0 2px 6px rgba(0, 0, 0, 0.2)' : '0 1px 4px rgba(0, 0, 0, 0.15)',
     cursor: hasUnsavedChanges ? 'pointer' : 'default',

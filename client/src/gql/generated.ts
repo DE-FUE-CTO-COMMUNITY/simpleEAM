@@ -5984,7 +5984,9 @@ export type BusinessCapability = {
   depictedInDiagrams: Array<Diagram>;
   depictedInDiagramsConnection: BusinessCapabilityDepictedInDiagramsConnection;
   description?: Maybe<Scalars['String']['output']>;
+  endDate?: Maybe<Scalars['Date']['output']>;
   id: Scalars['ID']['output'];
+  introductionDate?: Maybe<Scalars['Date']['output']>;
   maturityLevel?: Maybe<Scalars['Int']['output']>;
   name: Scalars['String']['output'];
   owners: Array<Person>;
@@ -6342,6 +6344,8 @@ export type BusinessCapabilityCreateInput = {
   children?: InputMaybe<BusinessCapabilityChildrenFieldInput>;
   depictedInDiagrams?: InputMaybe<BusinessCapabilityDepictedInDiagramsFieldInput>;
   description?: InputMaybe<Scalars['String']['input']>;
+  endDate?: InputMaybe<Scalars['Date']['input']>;
+  introductionDate?: InputMaybe<Scalars['Date']['input']>;
   maturityLevel?: InputMaybe<Scalars['Int']['input']>;
   name: Scalars['String']['input'];
   owners?: InputMaybe<BusinessCapabilityOwnersFieldInput>;
@@ -6990,7 +6994,9 @@ export type BusinessCapabilitySort = {
   businessValue?: InputMaybe<SortDirection>;
   createdAt?: InputMaybe<SortDirection>;
   description?: InputMaybe<SortDirection>;
+  endDate?: InputMaybe<SortDirection>;
   id?: InputMaybe<SortDirection>;
+  introductionDate?: InputMaybe<SortDirection>;
   maturityLevel?: InputMaybe<SortDirection>;
   name?: InputMaybe<SortDirection>;
   sequenceNumber?: InputMaybe<SortDirection>;
@@ -7115,6 +7121,8 @@ export type BusinessCapabilityUpdateInput = {
   createdAt?: InputMaybe<DateTimeScalarMutations>;
   depictedInDiagrams?: InputMaybe<Array<BusinessCapabilityDepictedInDiagramsUpdateFieldInput>>;
   description?: InputMaybe<StringScalarMutations>;
+  endDate?: InputMaybe<DateScalarMutations>;
+  introductionDate?: InputMaybe<DateScalarMutations>;
   maturityLevel?: InputMaybe<IntScalarMutations>;
   name?: InputMaybe<StringScalarMutations>;
   owners?: InputMaybe<Array<BusinessCapabilityOwnersUpdateFieldInput>>;
@@ -7139,7 +7147,9 @@ export type BusinessCapabilityWhere = {
   depictedInDiagrams?: InputMaybe<DiagramRelationshipFilters>;
   depictedInDiagramsConnection?: InputMaybe<BusinessCapabilityDepictedInDiagramsConnectionFilters>;
   description?: InputMaybe<StringScalarFilters>;
+  endDate?: InputMaybe<DateScalarFilters>;
   id?: InputMaybe<IdScalarFilters>;
+  introductionDate?: InputMaybe<DateScalarFilters>;
   maturityLevel?: InputMaybe<IntScalarFilters>;
   name?: InputMaybe<StringScalarFilters>;
   owners?: InputMaybe<PersonRelationshipFilters>;
