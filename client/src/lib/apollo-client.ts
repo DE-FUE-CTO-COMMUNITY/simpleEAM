@@ -1,22 +1,27 @@
 import { ApolloClient, InMemoryCache, HttpLink, from } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
 import { onError } from '@apollo/client/link/error'
+import { keycloak } from './auth'
 
 /**
- * Erstellt einen Apollo-Client für GraphQL-Anfragen mit Authentifizierungs-Header
+ * Erstellt einen Apollo-Client für GraphQL-Anfragen mit dynamischer Token-Authentifizierung
  */
-export function createApolloClient(token?: string) {
+export function createApolloClient(initialToken?: string) {
   // HTTP-Link für den GraphQL-Endpunkt
   const httpLink = new HttpLink({
     uri: process.env.NEXT_PUBLIC_GRAPHQL_URL || 'https://api.dev-server.mf2.eu/graphql',
   })
 
-  // Authentifizierungs-Link für Token-Handling
+  // Authentifizierungs-Link für dynamisches Token-Handling
   const authLink = setContext((_, { headers }) => {
+    // Hole das aktuelle Token aus der Keycloak-Instanz (falls verfügbar)
+    // oder verwende das übergebene initialToken als Fallback
+    const currentToken = keycloak?.token || initialToken
+
     return {
       headers: {
         ...headers,
-        authorization: token ? `Bearer ${token}` : '',
+        authorization: currentToken ? `Bearer ${currentToken}` : '',
       },
     }
   })

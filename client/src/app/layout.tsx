@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react'
 import { CacheProvider } from '@emotion/react'
-import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
 import { useServerInsertedHTML } from 'next/navigation'
 import createCache from '@emotion/cache'
@@ -108,16 +107,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         // Session Monitoring
         setupSessionMonitoring()
 
-        // Apollo Client mit Token erstellen
-        const initialToken = keycloak?.token || undefined
-        const authenticatedClient = createApolloClient(initialToken)
-        setClient(authenticatedClient)
+        // Apollo Client mit dynamischem Token erstellen (einmalig)
+        const apolloClient = createApolloClient(keycloak?.token)
+        setClient(apolloClient)
 
-        // Token Refresh Listener
-        const handleTokenRefresh = (event: CustomEvent) => {
-          const newToken = event.detail.token
-          const refreshedClient = createApolloClient(newToken)
-          setClient(refreshedClient)
+        // Token Refresh Listener - aktualisiere nur den Token, nicht den ganzen Client
+        const handleTokenRefresh = (_event: CustomEvent) => {
+          // Der Apollo Client wird so konfiguriert, dass er das aktuelle Token
+          // aus der Keycloak-Instanz holt, daher keine weitere Aktion nötig
+          console.log('Token refreshed, Client behält seinen State')
         }
 
         // Auth Error Listener - erstelle Client ohne Token
