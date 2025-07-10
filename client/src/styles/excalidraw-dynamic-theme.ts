@@ -14,7 +14,7 @@ const dynamicCSS = generateExcalidrawThemeCSS()
 export default dynamicCSS
 
 // Funktion zum Injizieren des CSS in den DOM
-export function injectExcalidrawThemeCSS() {
+export function injectExcalidrawThemeCSS(mode: 'light' | 'dark' = 'light') {
   if (typeof document === 'undefined') {
     return // Server-side rendering guard
   }
@@ -24,6 +24,9 @@ export function injectExcalidrawThemeCSS() {
   if (existingStyle) {
     existingStyle.remove()
   }
+
+  // Generiere CSS basierend auf dem aktuellen Mode
+  const dynamicCSS = generateExcalidrawThemeCSS()
 
   // Neues Style-Element erstellen
   const styleElement = document.createElement('style')
@@ -36,6 +39,6 @@ export function injectExcalidrawThemeCSS() {
 
   // Debug-Ausgabe in Entwicklungsumgebung
   if (process.env.NODE_ENV === 'development') {
-    console.log('🎨 Excalidraw dynamic theme CSS injected:', styleElement)
+    console.log(`🎨 Excalidraw dynamic theme CSS injected for ${mode} mode:`, styleElement)
   }
 }

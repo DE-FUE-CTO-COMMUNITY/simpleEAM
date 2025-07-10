@@ -334,8 +334,10 @@ export const fetchArchitecturePrinciplesForExport = async (
       createdAt: formatDateForExport(principle.createdAt),
       updatedAt: formatDateForExport(principle.updatedAt),
       owners: principle.owners?.map((owner: any) => owner.id).join(',') || '',
-      appliedInArchitectures: principle.appliedInArchitectures?.map((arch: any) => arch.id).join(',') || '',
-      implementedByApplications: principle.implementedByApplications?.map((app: any) => app.id).join(',') || '',
+      appliedInArchitectures:
+        principle.appliedInArchitectures?.map((arch: any) => arch.id).join(',') || '',
+      implementedByApplications:
+        principle.implementedByApplications?.map((app: any) => app.id).join(',') || '',
     }))
   } catch {
     throw new Error('Architekturprinzipien konnten nicht geladen werden')

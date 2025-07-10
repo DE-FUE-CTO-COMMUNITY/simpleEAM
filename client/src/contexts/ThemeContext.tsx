@@ -38,7 +38,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   // LocalStorage Integration mit Hydration-Schutz
   useEffect(() => {
     setMounted(true)
-    
+
     // Lade gespeicherte Theme-Präferenz aus localStorage
     const savedMode = localStorage.getItem('theme-mode') as ThemeMode
     if (savedMode && (savedMode === 'light' || savedMode === 'dark')) {
@@ -60,7 +60,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   }, [mode, mounted])
 
   const toggleTheme = () => {
-    setMode(prevMode => prevMode === 'light' ? 'dark' : 'light')
+    setMode(prevMode => (prevMode === 'light' ? 'dark' : 'light'))
   }
 
   const setThemeMode = (newMode: ThemeMode) => {
@@ -80,9 +80,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
           setThemeMode: () => {},
         }}
       >
-        <MuiThemeProvider theme={createDynamicTheme('light')}>
-          {children}
-        </MuiThemeProvider>
+        <MuiThemeProvider theme={createDynamicTheme('light')}>{children}</MuiThemeProvider>
       </ThemeContext.Provider>
     )
   }
@@ -96,9 +94,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
         setThemeMode,
       }}
     >
-      <MuiThemeProvider theme={theme}>
-        {children}
-      </MuiThemeProvider>
+      <MuiThemeProvider theme={theme}>{children}</MuiThemeProvider>
     </ThemeContext.Provider>
   )
 }

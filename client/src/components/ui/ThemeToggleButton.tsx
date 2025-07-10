@@ -16,7 +16,7 @@ const ThemeToggleButton: React.FC<ThemeToggleButtonProps> = ({ sx }) => {
   const { mode, toggleTheme } = useThemeMode()
 
   return (
-    <Tooltip 
+    <Tooltip
       title={mode === 'light' ? 'Zu Dark Mode wechseln' : 'Zu Light Mode wechseln'}
       placement="bottom"
     >
@@ -29,11 +29,7 @@ const ThemeToggleButton: React.FC<ThemeToggleButtonProps> = ({ sx }) => {
         }}
         aria-label={`Zu ${mode === 'light' ? 'Dark' : 'Light'} Mode wechseln`}
       >
-        {mode === 'light' ? (
-          <DarkMode />
-        ) : (
-          <LightMode />
-        )}
+        {mode === 'light' ? <DarkMode /> : <LightMode />}
       </IconButton>
     </Tooltip>
   )

@@ -335,7 +335,7 @@ const importEntityDataWithMapping = async (
 ): Promise<{ imported: number; entityMappings: { [originalId: string]: string } }> => {
   let importedCount = 0
   const entityMappings: { [originalId: string]: string } = {}
-  
+
   const mutationMap = {
     businessCapabilities: CREATE_CAPABILITY,
     applications: CREATE_APPLICATION,

@@ -2,6 +2,7 @@ import React, { useMemo } from 'react'
 import { Box, Typography } from '@mui/material'
 import dynamic from 'next/dynamic'
 import { ExcalidrawComponentProps } from '../types/DiagramTypes'
+import { useThemeMode } from '@/contexts/ThemeContext'
 
 // Dynamischer Import von Excalidraw, um Server-Side-Rendering zu vermeiden
 const ExcalidrawWrapper = dynamic(
@@ -35,10 +36,13 @@ const ExcalidrawWrapper = dynamic(
       const ExcalidrawTyped = Excalidraw as any
       const MainMenuTyped = MainMenu as any
 
-      // Inject dynamic theme CSS based on environment variables
+      // Hook für Theme-Modus (wird innerhalb der Komponente verwendet)
+      const { mode: themeMode } = useThemeMode()
+
+      // Inject dynamic theme CSS based on environment variables and current theme mode
       React.useEffect(() => {
-        injectExcalidrawThemeCSS()
-      }, [])
+        injectExcalidrawThemeCSS(themeMode)
+      }, [themeMode])
 
       // Process initialData - use provided data or fallback to safe defaults
       const safeInitialData = useMemo(() => {
@@ -47,7 +51,7 @@ const ExcalidrawWrapper = dynamic(
           const processedData = {
             elements: _initialData.elements || [],
             appState: {
-              viewBackgroundColor: '#ffffff',
+              viewBackgroundColor: themeMode === 'dark' ? '#121212' : '#ffffff',
               collaborators: new Map(),
               selectedElementIds: {},
               hoveredElementIds: {},
@@ -57,12 +61,13 @@ const ExcalidrawWrapper = dynamic(
               activeTool: { type: 'selection' },
               isLoading: false,
               errorMessage: null,
-              theme: 'light',
               zenModeEnabled: false,
               gridModeEnabled: false,
               viewModeEnabled: false,
               // Preserve scrollX, scrollY, and zoom from initialData
               ..._initialData.appState,
+              // Override theme to ensure it matches current mode
+              theme: themeMode,
             },
             // Important: scrollToContent must be false to preserve viewport position
             scrollToContent: false,
@@ -75,7 +80,7 @@ const ExcalidrawWrapper = dynamic(
         const defaultData = {
           elements: [],
           appState: {
-            viewBackgroundColor: '#ffffff',
+            viewBackgroundColor: themeMode === 'dark' ? '#121212' : '#ffffff',
             collaborators: new Map(),
             selectedElementIds: {},
             hoveredElementIds: {},
@@ -85,7 +90,7 @@ const ExcalidrawWrapper = dynamic(
             activeTool: { type: 'selection' },
             isLoading: false,
             errorMessage: null,
-            theme: 'light',
+            theme: themeMode,
             zenModeEnabled: false,
             gridModeEnabled: false,
             viewModeEnabled: false,
@@ -94,12 +99,12 @@ const ExcalidrawWrapper = dynamic(
         }
 
         return defaultData
-      }, [_initialData]) // Depend on actual initialData prop
+      }, [_initialData, themeMode]) // Depend on actual initialData prop and theme mode
 
       return (
         <div style={{ height: '100%', width: '100%' }}>
           <ExcalidrawTyped
-            theme="light"
+            theme={themeMode}
             name="simple-eam-diagram"
             UIOptions={uiOptions}
             initialData={safeInitialData}
