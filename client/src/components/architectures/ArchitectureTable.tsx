@@ -93,7 +93,7 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
             label={getDomainLabel(info.getValue() as ArchitectureDomain)}
             color="primary"
             size="small"
-            variant="outlined"
+            variant="filled"
           />
         ),
       }),

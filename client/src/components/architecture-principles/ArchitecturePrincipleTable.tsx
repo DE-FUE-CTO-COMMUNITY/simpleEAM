@@ -89,7 +89,7 @@ const ArchitecturePrincipleTable: React.FC<ArchitecturePrincipleTableProps> = ({
             label={getCategoryLabel(info.getValue() as PrincipleCategory)}
             color="primary"
             size="small"
-            variant="outlined"
+            variant="filled"
           />
         ),
       }),
@@ -119,7 +119,7 @@ const ArchitecturePrincipleTable: React.FC<ArchitecturePrincipleTableProps> = ({
               label={formatBoolean(isActive)}
               color={isActive ? 'success' : 'default'}
               size="small"
-              variant="outlined"
+              variant="filled"
             />
           )
         },

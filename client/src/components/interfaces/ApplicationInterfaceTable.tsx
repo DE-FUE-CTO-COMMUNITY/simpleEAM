@@ -104,7 +104,7 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
               label={getInterfaceTypeLabel(type)}
               color={type === 'API' ? 'primary' : 'default'}
               size="small"
-              variant="outlined"
+              variant="filled"
             />
           )
         },
@@ -118,7 +118,7 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
               label={getProtocolLabel(protocol)}
               color={protocol ? 'secondary' : 'default'}
               size="small"
-              variant="outlined"
+              variant="filled"
             />
           )
         },
@@ -176,7 +176,7 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
               label={status}
               color={status === 'ACTIVE' ? 'success' : 'default'}
               size="small"
-              variant="outlined"
+              variant="filled"
             />
           )
         },

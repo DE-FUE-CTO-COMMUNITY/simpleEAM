@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useMemo, useCallback } from 'react'
-import { Chip, useTheme } from '@mui/material'
+import { Chip } from '@mui/material'
 import { GenericTable } from '../common/GenericTable'
 import DataObjectForm, { DataObjectFormValues } from './DataObjectForm'
 import { formatDate } from './utils'
@@ -41,7 +41,6 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
   columnVisibility: _externalColumnVisibility,
   onColumnVisibilityChange: _externalOnColumnVisibilityChange,
 }) => {
-  const theme = useTheme()
   const columnHelper = createColumnHelper<DataObject>()
 
   // Verwende persistente Spaltensichtbarkeit
@@ -79,33 +78,27 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
   const getClassificationChip = useCallback(
     (classification: DataClassification) => {
       let color
-      let backgroundColor
       let label
 
       switch (classification) {
         case DataClassification.PUBLIC:
-          color = theme.palette.success.dark
-          backgroundColor = theme.palette.success.lighter
+          color = 'success'
           label = 'Public'
           break
         case DataClassification.INTERNAL:
-          color = theme.palette.info.dark
-          backgroundColor = theme.palette.info.lighter
+          color = 'info'
           label = 'Internal'
           break
         case DataClassification.CONFIDENTIAL:
-          color = theme.palette.warning.dark
-          backgroundColor = theme.palette.warning.lighter
+          color = 'warning'
           label = 'Confidential'
           break
         case DataClassification.STRICTLY_CONFIDENTIAL:
-          color = theme.palette.error.dark
-          backgroundColor = theme.palette.error.lighter
+          color = 'error'
           label = 'Strictly Confidential'
           break
         default:
-          color = theme.palette.grey[700]
-          backgroundColor = theme.palette.grey[200]
+          color = 'default'
           label = classification
       }
 
@@ -113,14 +106,12 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
         <Chip
           label={label}
           size="small"
-          sx={{
-            backgroundColor,
-            color,
-          }}
+          color={color as any}
+          variant="filled"
         />
       )
     },
-    [theme]
+    []
   )
 
   // Spalten-Definition für die DataObject-Tabelle
