@@ -298,7 +298,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
       }
     },
     [excalidrawAPI, setCurrentScene, setHasUnsavedChanges, setNotification]
-  )  // LocalStorage-basiertes Diagramm laden beim Start
+  ) // LocalStorage-basiertes Diagramm laden beim Start
   useEffect(() => {
     const loadDiagramFromStorage = async () => {
       try {
@@ -306,10 +306,10 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
         if (pendingDiagram && excalidrawAPI) {
           const diagramData = JSON.parse(pendingDiagram)
           console.log('Lade Diagramm aus LocalStorage:', diagramData.id)
-          
+
           // Entferne aus LocalStorage, damit es nur einmal geladen wird
           localStorage.removeItem('pendingDiagramToOpen')
-          
+
           // Prüfe, ob diagramJson verfügbar ist
           if (diagramData.diagramJson) {
             // Diagramm hat bereits JSON-Daten, direkt laden
@@ -319,20 +319,20 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
             // Diagramm benötigt noch JSON-Daten - setze erst die Metadaten
             console.log('Setze Diagramm-Metadaten und lade JSON dynamisch für ID:', diagramData.id)
             setCurrentDiagram(diagramData)
-            
+
             // Lade das komplette Diagramm über GraphQL
             try {
               const { data } = await apolloClient.query({
                 query: GET_DIAGRAM,
                 variables: { id: diagramData.id },
-                fetchPolicy: 'network-only'
+                fetchPolicy: 'network-only',
               })
-              
+
               if (data?.diagrams?.[0]) {
                 // Führe die vollständigen Diagrammdaten mit den bereits gesetzten Metadaten zusammen
                 const fullDiagram = {
                   ...diagramData, // Metadaten aus LocalStorage
-                  ...data.diagrams[0] // Vollständige Daten inklusive diagramJson aus GraphQL
+                  ...data.diagrams[0], // Vollständige Daten inklusive diagramJson aus GraphQL
                 }
                 handleOpenDiagram(fullDiagram)
               }
