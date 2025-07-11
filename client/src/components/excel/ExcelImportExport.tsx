@@ -185,10 +185,10 @@ interface ImportSettings {
     | 'interfaces'
     | 'persons'
     | 'architectures'
-    // 'diagrams' - Ausgeblendet für Excel-Import (zu große JSON-Daten)
+    | 'diagrams' // Nur für JSON-Import verfügbar
     | 'architecturePrinciples'
     | 'all'
-  format: 'xlsx'
+  format: 'xlsx' | 'json'
   updateMode: 'overwrite' | 'merge' | 'skipExisting'
   createTemplate: boolean
 }
@@ -201,10 +201,10 @@ interface ExportSettings {
     | 'interfaces'
     | 'persons'
     | 'architectures'
-    // 'diagrams' - Ausgeblendet für Excel-Export (zu große JSON-Daten)
+    | 'diagrams' // Nur für JSON-Export verfügbar
     | 'architecturePrinciples'
     | 'all'
-  format: 'xlsx' | 'csv'
+  format: 'xlsx' | 'csv' | 'json'
 }
 
 interface ExcelImportExportProps {
@@ -739,7 +739,6 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Entity Type Labels
-  // Hinweis: Diagramme werden bei Excel-Export/Import ausgeblendet, da JSON-Daten zu groß für Excel-Zellen sind
   const entityTypeLabels = {
     businessCapabilities: 'Business Capabilities',
     applications: 'Applikationen',
@@ -747,7 +746,7 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
     interfaces: 'Schnittstellen',
     persons: 'Personen',
     architectures: 'Architekturen',
-    // diagrams: 'Diagramme', - Ausgeblendet für Excel (zu große JSON-Daten)
+    diagrams: 'Diagramme', // Nur für JSON-Format verfügbar
     architecturePrinciples: 'Architekturprinzipien',
     ...(isAdmin() && { all: 'Alle Entitäten (Admin)' }),
   }
@@ -784,6 +783,29 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
     }
   }, [importSettings.entityType, exportSettings.entityType, exportSettings.format])
 
+  // Zeigt das empfohlene Format für jeden Entity-Typ an
+  const getRecommendedFormat = (entityType: string): string => {
+    if (entityType === 'diagrams') {
+      return 'json'
+    }
+    return 'xlsx'
+  }
+
+  // Prüft, ob ein Format für einen Entity-Typ gesperrt werden soll
+  const isFormatLocked = (entityType: string, format: string): boolean => {
+    // Bei Diagrammen ist nur JSON erlaubt, Excel/CSV sind gesperrt
+    if (entityType === 'diagrams' && format !== 'json') {
+      return true
+    }
+    return false
+  }
+
+  // Prüft, ob das aktuelle Format empfohlen wird
+  const isRecommendedFormat = (): boolean => {
+    if (importSettings.entityType === 'all') return true
+    return importSettings.format === getRecommendedFormat(importSettings.entityType)
+  }
+
   // File Upload Handler
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -795,8 +817,15 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
     try {
       if (importSettings.entityType === 'all') {
         // Multi-Tab Import für Admin
-        const { importMultiTabFromExcel } = await import('../../utils/excelUtils')
-        const allData = await importMultiTabFromExcel(file)
+        let allData: { [tabName: string]: any[] } = {}
+
+        if (importSettings.format === 'xlsx') {
+          const { importMultiTabFromExcel } = await import('../../utils/excelUtils')
+          allData = await importMultiTabFromExcel(file)
+        } else if (importSettings.format === 'json') {
+          const { importMultiTabFromJson } = await import('../../utils/excelUtils')
+          allData = await importMultiTabFromJson(file)
+        }
 
         // Validiere alle Tabs
         const allValidations: { [tabName: string]: any } = {}
@@ -853,7 +882,15 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
         })
       } else {
         // Single-Tab Import
-        const data = await importFromExcel(file)
+        let data: any[] = []
+
+        if (importSettings.format === 'xlsx' && importSettings.entityType !== 'diagrams') {
+          const { importFromExcel } = await import('../../utils/excelUtils')
+          data = await importFromExcel(file)
+        } else if (importSettings.format === 'json' || importSettings.entityType === 'diagrams') {
+          const { importFromJson } = await import('../../utils/excelUtils')
+          data = await importFromJson(file)
+        }
 
         // Führe echte Validierung mit GraphQL-Feldnamen durch
         const validation = validateImportData(data, importSettings.entityType)
@@ -880,6 +917,19 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
   const handleImport = async () => {
     if (!selectedFile || !validationResult) return
 
+    // Validierung: Für Diagramme nur JSON-Format erlauben
+    if (importSettings.entityType === 'diagrams' && importSettings.format !== 'json') {
+      enqueueSnackbar(
+        'Für Diagramme ist nur das JSON-Format verfügbar. Format wurde automatisch angepasst.',
+        { variant: 'info' }
+      )
+      setImportSettings({
+        ...importSettings,
+        format: 'json',
+      })
+      return
+    }
+
     setIsImporting(true)
     setImportProgress(0)
 
@@ -889,8 +939,15 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
 
       if (importSettings.entityType === 'all') {
         // Multi-Tab Import with Two-Phase Approach
-        const { importMultiTabFromExcel } = await import('../../utils/excelUtils')
-        const allData = await importMultiTabFromExcel(selectedFile)
+        let allData: { [tabName: string]: any[] } = {}
+
+        if (importSettings.format === 'xlsx' && importSettings.entityType !== 'diagrams') {
+          const { importMultiTabFromExcel } = await import('../../utils/excelUtils')
+          allData = await importMultiTabFromExcel(selectedFile)
+        } else if (importSettings.format === 'json' || importSettings.entityType === 'diagrams') {
+          const { importMultiTabFromJson } = await import('../../utils/excelUtils')
+          allData = await importMultiTabFromJson(selectedFile)
+        }
 
         setImportProgress(10)
 
@@ -1006,7 +1063,16 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
         }
       } else {
         // Single-Tab Import with Two-Phase Approach
-        const data = await importFromExcel(selectedFile)
+        let data: any[] = []
+
+        if (importSettings.format === 'xlsx') {
+          const { importFromExcel } = await import('../../utils/excelUtils')
+          data = await importFromExcel(selectedFile)
+        } else if (importSettings.format === 'json') {
+          const { importFromJson } = await import('../../utils/excelUtils')
+          data = await importFromJson(selectedFile)
+        }
+
         setImportProgress(20)
 
         try {
@@ -1717,6 +1783,19 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
       return
     }
 
+    // Validierung: Für Diagramme nur JSON-Format erlauben
+    if (exportSettings.entityType === 'diagrams' && exportSettings.format !== 'json') {
+      enqueueSnackbar(
+        'Für Diagramme ist nur das JSON-Format verfügbar. Format wurde automatisch angepasst.',
+        { variant: 'info' }
+      )
+      setExportSettings({
+        ...exportSettings,
+        format: 'json',
+      })
+      return
+    }
+
     setIsExporting(true)
 
     try {
@@ -1728,27 +1807,37 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
 
       if (exportSettings.entityType === 'all') {
         // Multi-Tab Export für Admin
-        const allData = data as { [tabName: string]: any[] }
+        const allData = data as { [tabName: string]: any }
 
         if (Object.keys(allData).length === 0) {
           enqueueSnackbar('Keine Daten zum Exportieren verfügbar', { variant: 'warning' })
           return
         }
 
-        const { exportMultiTabToExcel } = await import('../../utils/excelUtils')
+        const filename = `SimpleEAM_Complete_Export_${timestamp}`
 
-        await exportMultiTabToExcel(allData, {
-          filename: `SimpleEAM_Complete_Export_${timestamp}`,
-          format: 'xlsx',
-          includeHeaders: true,
-        })
+        if (exportSettings.format === 'xlsx') {
+          const { exportMultiTabToExcel } = await import('../../utils/excelUtils')
+          await exportMultiTabToExcel(allData, {
+            filename,
+            format: 'xlsx',
+            includeHeaders: true,
+          })
+        } else if (exportSettings.format === 'json') {
+          const { exportMultiTabToJson } = await import('../../utils/excelUtils')
+          await exportMultiTabToJson(allData, {
+            filename,
+          })
+        }
 
         const totalRecords = Object.values(allData).reduce(
           (sum, tabData) => sum + tabData.length,
           0
         )
         enqueueSnackbar(
-          `Komplette Datenbank erfolgreich exportiert (${totalRecords} Datensätze in ${Object.keys(allData).length} Tabs)`,
+          `Komplette Datenbank erfolgreich als ${exportSettings.format.toUpperCase()} exportiert (${totalRecords} Datensätze in ${
+            Object.keys(allData).length
+          } Tabs)`,
           { variant: 'success' }
         )
       } else {
@@ -1762,13 +1851,24 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
 
         const filename = `${entityTypeLabels[exportSettings.entityType]}_${timestamp}`
 
-        // Führe den Export durch
-        await exportToExcel(singleData, {
-          filename,
-          sheetName: entityTypeLabels[exportSettings.entityType],
-          format: exportSettings.format,
-          includeHeaders: true,
-        })
+        // Führe den Export durch basierend auf dem gewählten Format
+        if (
+          (exportSettings.format === 'xlsx' || exportSettings.format === 'csv') &&
+          exportSettings.entityType !== 'diagrams'
+        ) {
+          const { exportToExcel } = await import('../../utils/excelUtils')
+          await exportToExcel(singleData, {
+            filename,
+            sheetName: entityTypeLabels[exportSettings.entityType],
+            format: exportSettings.format,
+            includeHeaders: true,
+          })
+        } else if (exportSettings.format === 'json' || exportSettings.entityType === 'diagrams') {
+          const { exportToJson } = await import('../../utils/excelUtils')
+          await exportToJson(singleData, {
+            filename,
+          })
+        }
 
         enqueueSnackbar(
           `${entityTypeLabels[exportSettings.entityType]} erfolgreich als ${exportSettings.format.toUpperCase()} exportiert (${singleData.length} Datensätze)`,
@@ -1803,12 +1903,27 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
               <Select
                 value={importSettings.entityType}
                 label="Datentyp"
-                onChange={e =>
-                  setImportSettings({
-                    ...importSettings,
-                    entityType: e.target.value as ImportSettings['entityType'],
-                  })
-                }
+                onChange={e => {
+                  const newEntityType = e.target.value as ImportSettings['entityType']
+
+                  // Wenn Diagramme ausgewählt werden, setze automatisch auf JSON-Format
+                  if (newEntityType === 'diagrams' && importSettings.format !== 'json') {
+                    enqueueSnackbar(
+                      'Für Diagramme ist nur das JSON-Format verfügbar. Format wurde automatisch angepasst.',
+                      { variant: 'info' }
+                    )
+                    setImportSettings({
+                      ...importSettings,
+                      entityType: newEntityType,
+                      format: 'json',
+                    })
+                  } else {
+                    setImportSettings({
+                      ...importSettings,
+                      entityType: newEntityType,
+                    })
+                  }
+                }}
               >
                 {Object.entries(entityTypeLabels).map(([key, label]) => (
                   <MenuItem key={key} value={key}>
@@ -1823,14 +1938,29 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
               <Select
                 value={importSettings.format}
                 label="Dateiformat"
-                onChange={e =>
-                  setImportSettings({
-                    ...importSettings,
-                    format: e.target.value as ImportSettings['format'],
-                  })
-                }
+                onChange={e => {
+                  // Wenn Diagramme ausgewählt sind, setze automatisch auf JSON-Format
+                  if (importSettings.entityType === 'diagrams' && e.target.value !== 'json') {
+                    enqueueSnackbar('Für Diagramme ist nur das JSON-Format verfügbar.', {
+                      variant: 'info',
+                    })
+                    setImportSettings({
+                      ...importSettings,
+                      format: 'json',
+                    })
+                  } else {
+                    setImportSettings({
+                      ...importSettings,
+                      format: e.target.value as ImportSettings['format'],
+                    })
+                  }
+                }}
               >
-                <MenuItem value="xlsx">Excel (.xlsx)</MenuItem>
+                <MenuItem value="xlsx" disabled={isFormatLocked(importSettings.entityType, 'xlsx')}>
+                  Excel (.xlsx)
+                  {importSettings.entityType === 'diagrams' && ' (nicht verfügbar für Diagramme)'}
+                </MenuItem>
+                <MenuItem value="json">JSON (.json)</MenuItem>
               </Select>
             </FormControl>
 
@@ -2031,12 +2161,27 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
               <Select
                 value={exportSettings.entityType}
                 label="Datentyp"
-                onChange={e =>
-                  setExportSettings({
-                    ...exportSettings,
-                    entityType: e.target.value as ExportSettings['entityType'],
-                  })
-                }
+                onChange={e => {
+                  const newEntityType = e.target.value as ExportSettings['entityType']
+
+                  // Wenn Diagramme ausgewählt werden, setze automatisch auf JSON-Format
+                  if (newEntityType === 'diagrams' && exportSettings.format !== 'json') {
+                    enqueueSnackbar(
+                      'Für Diagramme ist nur das JSON-Format verfügbar. Format wurde automatisch angepasst.',
+                      { variant: 'info' }
+                    )
+                    setExportSettings({
+                      ...exportSettings,
+                      entityType: newEntityType,
+                      format: 'json',
+                    })
+                  } else {
+                    setExportSettings({
+                      ...exportSettings,
+                      entityType: newEntityType,
+                    })
+                  }
+                }}
               >
                 {Object.entries(entityTypeLabels).map(([key, label]) => (
                   <MenuItem key={key} value={key}>
@@ -2051,22 +2196,47 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
               <Select
                 value={exportSettings.format}
                 label="Dateiformat"
-                onChange={e =>
-                  setExportSettings({
-                    ...exportSettings,
-                    format: e.target.value as ExportSettings['format'],
-                  })
-                }
+                onChange={e => {
+                  // Wenn Diagramme ausgewählt sind, setze automatisch auf JSON-Format
+                  if (exportSettings.entityType === 'diagrams' && e.target.value !== 'json') {
+                    enqueueSnackbar('Für Diagramme ist nur das JSON-Format verfügbar.', {
+                      variant: 'info',
+                    })
+                    setExportSettings({
+                      ...exportSettings,
+                      format: 'json',
+                    })
+                  } else {
+                    setExportSettings({
+                      ...exportSettings,
+                      format: e.target.value as ExportSettings['format'],
+                    })
+                  }
+                }}
               >
-                <MenuItem value="xlsx">Excel (.xlsx)</MenuItem>
+                <MenuItem value="xlsx" disabled={isFormatLocked(exportSettings.entityType, 'xlsx')}>
+                  Excel (.xlsx)
+                  {exportSettings.entityType === 'diagrams' && ' (nicht verfügbar für Diagramme)'}
+                </MenuItem>
                 <MenuItem
                   value="csv"
-                  disabled={exportSettings.entityType === 'all'}
-                  sx={{ color: exportSettings.entityType === 'all' ? 'text.disabled' : 'inherit' }}
+                  disabled={
+                    exportSettings.entityType === 'all' ||
+                    isFormatLocked(exportSettings.entityType, 'csv')
+                  }
+                  sx={{
+                    color:
+                      exportSettings.entityType === 'all' ||
+                      isFormatLocked(exportSettings.entityType, 'csv')
+                        ? 'text.disabled'
+                        : 'inherit',
+                  }}
                 >
                   CSV (.csv){' '}
                   {exportSettings.entityType === 'all' && '- nicht verfügbar für Multi-Tab-Export'}
+                  {exportSettings.entityType === 'diagrams' && '- nicht verfügbar für Diagramme'}
                 </MenuItem>
+                <MenuItem value="json">JSON (.json)</MenuItem>
               </Select>
             </FormControl>
           </Paper>
@@ -2245,6 +2415,7 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
       )
 
       // Refresh dashboard cache to show updated counts
+
       await refreshDashboardCache()
 
       // Dialog schließen nach erfolgreichem Löschen

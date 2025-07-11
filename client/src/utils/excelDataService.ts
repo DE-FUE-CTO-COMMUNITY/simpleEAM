@@ -19,7 +19,7 @@ export type EntityType =
   | 'interfaces'
   | 'persons'
   | 'architectures'
-  // 'diagrams' - Ausgeblendet für Excel-Operationen (zu große JSON-Daten)
+  | 'diagrams' // Nur für JSON-Format verfügbar
   | 'architecturePrinciples'
   | 'all'
 
@@ -359,7 +359,7 @@ export const fetchAllEntitiesForExport = async (
       interfaces,
       persons,
       architectures,
-      // diagrams - Ausgeblendet für Excel (zu große JSON-Daten)
+      diagrams, // Für JSON-Export verfügbar
       architecturePrinciples,
     ] = await Promise.all([
       fetchBusinessCapabilitiesForExport(client),
@@ -368,7 +368,7 @@ export const fetchAllEntitiesForExport = async (
       fetchInterfacesForExport(client),
       fetchPersonsForExport(client),
       fetchArchitecturesForExport(client),
-      // fetchDiagramsForExport(client), - Ausgeblendet für Excel
+      fetchDiagramsForExport(client), // Für JSON-Export verfügbar
       fetchArchitecturePrinciplesForExport(client),
     ])
 
@@ -379,7 +379,7 @@ export const fetchAllEntitiesForExport = async (
       Interfaces: interfaces,
       Persons: persons,
       Architectures: architectures,
-      // Diagrams: diagrams, - Ausgeblendet für Excel-Export
+      Diagrams: diagrams, // Für JSON-Export verfügbar
       'Architecture Principles': architecturePrinciples,
     }
   } catch {
@@ -589,7 +589,6 @@ export const getArchitecturePrinciplesTemplate = (): ExcelExportData => ({
 
 /**
  * Holt Template-Daten basierend auf dem Entity-Typ mit echten GraphQL-Feldnamen
- * Hinweis: Diagramme sind für Excel-Operationen ausgeblendet
  */
 export const getTemplateByEntityType = (
   entityType:
@@ -599,7 +598,7 @@ export const getTemplateByEntityType = (
     | 'interfaces'
     | 'persons'
     | 'architectures'
-    // 'diagrams' - Ausgeblendet für Excel-Operationen
+    | 'diagrams' // Für JSON-Import verfügbar
     | 'architecturePrinciples'
 ): ExcelExportData => {
   switch (entityType) {
@@ -613,6 +612,8 @@ export const getTemplateByEntityType = (
       return getInterfacesTemplate()
     case 'persons':
       return getPersonsTemplate()
+    case 'diagrams':
+      return getDiagramTemplate()
     case 'architectures':
       return getArchitecturesTemplate()
     // case 'diagrams': - Ausgeblendet für Excel-Operationen
@@ -694,7 +695,7 @@ export const validateImportData = (
     | 'interfaces'
     | 'persons'
     | 'architectures'
-    // 'diagrams' - Ausgeblendet für Excel-Validierung
+    | 'diagrams' // Hinzugefügt für JSON-Import
     | 'architecturePrinciples'
 ): ValidationResult => {
   const errors: ValidationError[] = []
@@ -776,6 +777,56 @@ export const validateImportData = (
       }
     })
 
+    // Spezielle Validierung für Diagramme (wenn importiert als JSON)
+    if (entityType === 'diagrams') {
+      data.forEach((row, index) => {
+        const rowNumber = index + 2 // Excel row numbers start at 1, plus header row
+
+        // Prüfe erforderliche Felder für Diagramme
+        if (!row.id) {
+          errors.push({
+            row: rowNumber,
+            field: 'id',
+            message: 'ID ist erforderlich',
+            severity: 'error',
+          })
+        }
+
+        if (!row.name) {
+          errors.push({
+            row: rowNumber,
+            field: 'name',
+            message: 'Name ist erforderlich',
+            severity: 'error',
+          })
+        }
+
+        // Prüfe, ob JSON-Daten vorhanden sind
+        if (!row.diagramData) {
+          errors.push({
+            row: rowNumber,
+            field: 'diagramData',
+            message: 'Diagramm-Daten sind erforderlich',
+            severity: 'error',
+          })
+        }
+
+        // Prüfe, ob die Diagramm-Daten gültiges JSON sind
+        if (row.diagramData && typeof row.diagramData === 'string') {
+          try {
+            JSON.parse(row.diagramData)
+          } catch {
+            errors.push({
+              row: rowNumber,
+              field: 'diagramData',
+              message: 'Diagramm-Daten sind kein gültiges JSON',
+              severity: 'error',
+            })
+          }
+        }
+      })
+    }
+
     if (rowIsValid) {
       validRows++
     }
@@ -808,9 +859,7 @@ export const getTemplateWithExamples = (
     // 'diagrams' - Ausgeblendet für Excel-Operationen
     | 'architecturePrinciples'
 ): ExcelExportData[] => {
-  const emptyTemplate = getTemplateByEntityType(
-    entityType as Exclude<typeof entityType, 'diagrams'>
-  )
+  const emptyTemplate = getTemplateByEntityType(entityType)
 
   switch (entityType) {
     case 'businessCapabilities':
@@ -938,7 +987,35 @@ export const getTemplateWithExamples = (
           updatedAt: '2024-06-01T15:30:00.000Z',
         },
       ]
-    // case 'diagrams': - Ausgeblendet für Excel-Operationen (zu große JSON-Daten)
+    case 'diagrams':
+      return [
+        emptyTemplate,
+        {
+          id: 'diagram-001',
+          name: 'System Architecture Diagram',
+          description: 'Overview of the system architecture',
+          createdAt: '2024-01-15T10:30:00.000Z',
+          updatedAt: '2024-06-01T14:45:00.000Z',
+          creator: 'user-123',
+          architecture: 'arch-001',
+          diagramData: JSON.stringify({
+            type: 'excalidraw',
+            version: 1,
+            source: 'SimpleEAM',
+            elements: [
+              {
+                id: 'element1',
+                type: 'rectangle',
+                x: 100,
+                y: 100,
+                width: 200,
+                height: 100,
+                label: 'Example Component',
+              },
+            ],
+          }),
+        },
+      ]
     case 'architecturePrinciples':
       return [
         emptyTemplate,
@@ -1095,5 +1172,21 @@ export function getOptionalFieldsByEntityType(entityType: EntityType): string[] 
       ]
     default:
       return ['description', 'createdAt', 'updatedAt']
+  }
+}
+
+/**
+ * Erstellt Template für Diagramme (für JSON-Import)
+ */
+export const getDiagramTemplate = (): ExcelExportData => {
+  return {
+    id: '',
+    name: '',
+    description: '',
+    createdAt: '',
+    updatedAt: '',
+    creator: '',
+    architecture: '',
+    diagramData: '',
   }
 }

@@ -240,6 +240,118 @@ export const importMultiTabFromExcel = (
 }
 
 /**
+ * Exportiert Daten als JSON-Datei
+ */
+export const exportToJson = async (data: any, options: { filename: string }): Promise<void> => {
+  if (!data) {
+    throw new Error('Keine Daten zum Exportieren vorhanden')
+  }
+
+  // Umwandlung in JSON-String mit Einrückung für bessere Lesbarkeit
+  const jsonString = JSON.stringify(data, null, 2)
+
+  // Erstelle Blob für Download
+  const blob = new Blob([jsonString], { type: 'application/json' })
+
+  // Verwende fileSave für benutzerinitiierte Downloads (verhindert "unsafe download blocked")
+  const baseName = options.filename.replace(/\.json$/i, '')
+
+  // @ts-expect-error - browser-fs-access type resolution issue
+  const { fileSave } = await import('browser-fs-access')
+  await fileSave(blob, {
+    fileName: `${baseName}.json`,
+    description: 'JSON file',
+    extensions: ['.json'],
+    mimeTypes: ['application/json'],
+  })
+}
+
+/**
+ * Exportiert Multi-Tab-Daten als JSON-Datei (Admin-Funktion)
+ */
+export const exportMultiTabToJson = async (
+  data: { [tabName: string]: any[] },
+  options: { filename: string }
+): Promise<void> => {
+  if (!data || Object.keys(data).length === 0) {
+    throw new Error('Keine Daten zum Exportieren vorhanden')
+  }
+
+  // Umwandlung in JSON-String mit Einrückung für bessere Lesbarkeit
+  const jsonString = JSON.stringify(data, null, 2)
+
+  // Erstelle Blob für Download
+  const blob = new Blob([jsonString], { type: 'application/json' })
+
+  // Verwende fileSave für benutzerinitiierte Downloads (verhindert "unsafe download blocked")
+  const baseName = options.filename.replace(/\.json$/i, '')
+
+  // @ts-expect-error - browser-fs-access type resolution issue
+  const { fileSave } = await import('browser-fs-access')
+  await fileSave(blob, {
+    fileName: `${baseName}.json`,
+    description: 'JSON file',
+    extensions: ['.json'],
+    mimeTypes: ['application/json'],
+  })
+}
+
+/**
+ * Liest eine JSON-Datei und gibt die Daten zurück
+ */
+export const importFromJson = (file: File): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+
+    reader.onload = e => {
+      try {
+        const jsonString = e.target?.result as string
+        const data = JSON.parse(jsonString)
+        resolve(data)
+      } catch (error) {
+        reject(
+          new Error(
+            `Fehler beim Lesen der JSON-Datei: ${error instanceof Error ? error.message : 'Unbekannter Fehler'}`
+          )
+        )
+      }
+    }
+
+    reader.onerror = () => {
+      reject(new Error('Fehler beim Lesen der Datei'))
+    }
+
+    reader.readAsText(file)
+  })
+}
+
+/**
+ * Liest eine Multi-Tab JSON-Datei und gibt die Daten strukturiert zurück (Admin-Funktion)
+ */
+export const importMultiTabFromJson = (file: File): Promise<{ [tabName: string]: any[] }> => {
+  return new Promise((resolve, reject) => {
+    importFromJson(file)
+      .then(data => {
+        if (typeof data !== 'object' || data === null) {
+          reject(new Error('Die JSON-Datei enthält keine gültigen Daten'))
+          return
+        }
+
+        // Überprüfe, ob das Format korrekt ist (Objekt mit Arrays für jedes Tab)
+        for (const [_, value] of Object.entries(data)) {
+          if (!Array.isArray(value)) {
+            reject(new Error('Die JSON-Datei hat nicht das erwartete Format für Multi-Tab-Daten'))
+            return
+          }
+        }
+
+        resolve(data as { [tabName: string]: any[] })
+      })
+      .catch(error => reject(error))
+  })
+}
+
+/**
  * Erstellt Mock-Daten für Business Capabilities
  */
 export const createBusinessCapabilitiesMockData = (): ExcelExportData[] => {
@@ -484,7 +596,6 @@ export const downloadTemplate = async (
 
 /**
  * Erstellt eine Excel-Template-Datei mit echten GraphQL-Feldnamen
- * Hinweis: Diagramme sind für Excel-Export ausgeblendet, da JSON-Daten zu groß sind
  */
 export const downloadTemplateWithRealFields = async (
   entityType:
@@ -494,7 +605,7 @@ export const downloadTemplateWithRealFields = async (
     | 'interfaces'
     | 'persons'
     | 'architectures'
-    // 'diagrams' - Ausgeblendet für Excel-Export (zu große JSON-Daten)
+    | 'diagrams' // Für JSON-Export verfügbar
     | 'architecturePrinciples'
     | 'all'
 ): Promise<void> => {
@@ -533,7 +644,7 @@ export const downloadTemplateWithRealFields = async (
     return
   }
 
-  // TypeScript knows entityType is not 'all' here
+  // TypeScript weiß, dass entityType hier nicht 'all' ist
   const template = getTemplateByEntityType(entityType as Exclude<typeof entityType, 'all'>)
 
   const entityTypeLabels = {
@@ -543,7 +654,7 @@ export const downloadTemplateWithRealFields = async (
     interfaces: 'Interfaces',
     persons: 'Persons',
     architectures: 'Architectures',
-    // diagrams: 'Diagrams', - Ausgeblendet für Excel-Export
+    diagrams: 'Diagrams', // Für JSON-Export verfügbar
     architecturePrinciples: 'Architecture Principles',
   }
 
