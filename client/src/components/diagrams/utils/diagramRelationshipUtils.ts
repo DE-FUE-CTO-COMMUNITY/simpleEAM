@@ -112,6 +112,7 @@ export const groupElementsByType = (elements: DatabaseElementReference[]) => {
     applications: [] as string[],
     dataObjects: [] as string[],
     interfaces: [] as string[],
+    infrastructures: [] as string[],
   }
 
   for (const element of elements) {
@@ -132,6 +133,9 @@ export const groupElementsByType = (elements: DatabaseElementReference[]) => {
       case 'interface':
       case 'applicationInterface': // Fix: Beide Varianten unterstützen
         grouped.interfaces.push(element.id)
+        break
+      case 'infrastructure':
+        grouped.infrastructures.push(element.id)
         break
       default:
         console.warn('⚠️ Unbekannter elementType:', element.elementType, 'für Element:', element.id)
@@ -193,6 +197,13 @@ export const createDiagramRelationshipUpdates = (diagramJsonString: string) => {
     }
   }
 
+  // Infrastructure
+  if (grouped.infrastructures.length > 0) {
+    relationships.containsInfrastructure = {
+      connect: createConnectClause(grouped.infrastructures),
+    }
+  }
+
   return relationships
 }
 
@@ -239,6 +250,14 @@ export const createDiagramRelationshipUpdatesWithDisconnect = (diagramJsonString
     }),
   }
 
+  // Infrastructure
+  relationships.containsInfrastructure = {
+    disconnect: [{ where: {} }],
+    ...(grouped.infrastructures.length > 0 && {
+      connect: createConnectClause(grouped.infrastructures),
+    }),
+  }
+
   return relationships
 }
 
@@ -261,6 +280,7 @@ export const createArchitectureLinkingUpdates = (
     applications: grouped.applications,
     dataObjects: grouped.dataObjects,
     interfaces: grouped.interfaces,
+    infrastructures: grouped.infrastructures,
   }
   return linkingData
 }

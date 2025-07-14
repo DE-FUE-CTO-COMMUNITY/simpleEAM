@@ -75,6 +75,10 @@ export const GET_DIAGRAMS = gql`
         id
         name
       }
+      containsInfrastructure {
+        id
+        name
+      }
     }
   }
 `
@@ -113,6 +117,10 @@ export const GET_DIAGRAM = gql`
         name
       }
       containsInterfaces {
+        id
+        name
+      }
+      containsInfrastructure {
         id
         name
       }
@@ -155,6 +163,10 @@ export const CREATE_DIAGRAM = gql`
           id
           name
         }
+        containsInfrastructure {
+          id
+          name
+        }
       }
     }
   }
@@ -192,6 +204,10 @@ export const UPDATE_DIAGRAM = gql`
           name
         }
         containsInterfaces {
+          id
+          name
+        }
+        containsInfrastructure {
           id
           name
         }

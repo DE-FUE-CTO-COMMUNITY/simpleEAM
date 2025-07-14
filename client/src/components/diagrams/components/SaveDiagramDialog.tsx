@@ -23,6 +23,7 @@ import {
   LINK_APPLICATION_TO_ARCHITECTURE,
   LINK_DATA_OBJECT_TO_ARCHITECTURE,
   LINK_APPLICATION_INTERFACE_TO_ARCHITECTURE,
+  LINK_INFRASTRUCTURE_TO_ARCHITECTURE,
 } from '@/graphql/architectureLinking'
 import { useAuth } from '@/lib/auth'
 import {
@@ -168,6 +169,7 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
   const [linkApplicationInterfaceToArchitecture] = useMutation(
     LINK_APPLICATION_INTERFACE_TO_ARCHITECTURE
   )
+  const [linkInfrastructureToArchitecture] = useMutation(LINK_INFRASTRUCTURE_TO_ARCHITECTURE)
 
   // Funktion zum Verknüpfen aller Diagramm-Elemente mit der Architektur
   const linkElementsToArchitecture = async (diagramJsonString: string, architectureId: string) => {
@@ -219,6 +221,17 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
             ':',
             error
           )
+        })
+      )
+    }
+
+    // Infrastructure verknüpfen
+    for (const infrastructureId of linkingData.infrastructures) {
+      promises.push(
+        linkInfrastructureToArchitecture({
+          variables: { id: infrastructureId, architectureId },
+        }).catch(error => {
+          console.warn('⚠️ Fehler beim Verknüpfen von Infrastructure', infrastructureId, ':', error)
         })
       )
     }

@@ -20,6 +20,7 @@ interface DiagramElement {
       | 'application'
       | 'dataObject'
       | 'interface'
+      | 'infrastructure'
       | 'businessCapability'
       | 'applicationInterface'
     originalElement?: any
@@ -60,6 +61,7 @@ export const ELEMENT_TYPES = {
   CAPABILITY: 'capability',
   DATA_OBJECT: 'dataObject',
   INTERFACE: 'interface',
+  INFRASTRUCTURE: 'infrastructure',
 } as const
 
 // GraphQL-Mutation für die Erstellung neuer Elemente
@@ -103,6 +105,18 @@ const CREATE_DATA_OBJECT_MUTATION = gql`
   mutation CreateDataObjects($input: [DataObjectCreateInput!]!) {
     createDataObjects(input: $input) {
       dataObjects {
+        id
+        name
+        description
+      }
+    }
+  }
+`
+
+const CREATE_INFRASTRUCTURE_MUTATION = gql`
+  mutation CreateInfrastructure($input: [InfrastructureCreateInput!]!) {
+    createInfrastructures(input: $input) {
+      infrastructures {
         id
         name
         description
@@ -295,6 +309,15 @@ const createElementsByType = async (
           protocol: 'HTTP',
           status: 'ACTIVE',
         }
+      case ELEMENT_TYPES.INFRASTRUCTURE:
+        return {
+          ...baseInput,
+          infrastructureType: element.text.toLowerCase().includes('cloud')
+            ? 'CLOUD_DATACENTER'
+            : 'ON_PREMISE_DATACENTER',
+          status: 'ACTIVE',
+          location: 'Nicht spezifiziert',
+        }
       default:
         return baseInput
     }
@@ -319,6 +342,10 @@ const createElementsByType = async (
     case ELEMENT_TYPES.INTERFACE:
       mutation = CREATE_INTERFACE_MUTATION
       resultPath = 'createApplicationInterfaces.applicationInterfaces'
+      break
+    case ELEMENT_TYPES.INFRASTRUCTURE:
+      mutation = CREATE_INFRASTRUCTURE_MUTATION
+      resultPath = 'createInfrastructures.infrastructures'
       break
     default:
       throw new Error(`Unsupported element type: ${elementType}`)
@@ -398,6 +425,8 @@ export const getElementTypeLabel = (elementType: string): string => {
       return 'Datenobjekt'
     case ELEMENT_TYPES.INTERFACE:
       return 'Schnittstelle'
+    case ELEMENT_TYPES.INFRASTRUCTURE:
+      return 'Infrastruktur'
     default:
       return elementType
   }

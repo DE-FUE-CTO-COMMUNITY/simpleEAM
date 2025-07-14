@@ -19,6 +19,7 @@ interface DiagramElement {
       | 'application'
       | 'dataObject'
       | 'interface'
+      | 'infrastructure'
       | 'businessCapability'
       | 'applicationInterface'
     originalElement?: any
@@ -148,6 +149,22 @@ export const fetchElementData = async (
           }
         `
         break
+      case 'infrastructure':
+        query = gql`
+          query GetInfrastructure($id: ID!) {
+            infrastructures(where: { id: { eq: $id } }) {
+              id
+              name
+              description
+              infrastructureType
+              status
+              vendor
+              version
+              location
+            }
+          }
+        `
+        break
       default:
         console.warn(`Unknown elementType: ${elementType} (normalized: ${normalizedElementType})`)
         return null
@@ -169,6 +186,8 @@ export const fetchElementData = async (
         return result.data.dataObjects?.[0] || null
       case 'interface':
         return result.data.applicationInterfaces?.[0] || null
+      case 'infrastructure':
+        return result.data.infrastructures?.[0] || null
       default:
         console.warn(`Unknown normalized elementType: ${normalizedElementType}`)
         return null
@@ -263,6 +282,18 @@ export const updateElementName = async (
               update: { name: { set: $name } }
             ) {
               applicationInterfaces {
+                id
+                name
+              }
+            }
+          }
+        `
+        break
+      case 'infrastructure':
+        mutation = gql`
+          mutation UpdateInfrastructureName($id: ID!, $name: String!) {
+            updateInfrastructures(where: { id: { eq: $id } }, update: { name: { set: $name } }) {
+              infrastructures {
                 id
                 name
               }

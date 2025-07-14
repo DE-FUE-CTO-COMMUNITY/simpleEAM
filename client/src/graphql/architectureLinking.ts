@@ -83,3 +83,24 @@ export const LINK_APPLICATION_INTERFACE_TO_ARCHITECTURE = gql`
     }
   }
 `
+
+// Mutation zum Verknüpfen einer Infrastructure mit einer Architektur
+export const LINK_INFRASTRUCTURE_TO_ARCHITECTURE = gql`
+  mutation LinkInfrastructureToArchitecture($id: ID!, $architectureId: ID!) {
+    updateInfrastructures(
+      where: { id: { eq: $id } }
+      update: {
+        partOfArchitectures: { connect: [{ where: { node: { id: { eq: $architectureId } } } }] }
+      }
+    ) {
+      infrastructures {
+        id
+        name
+        partOfArchitectures {
+          id
+          name
+        }
+      }
+    }
+  }
+`
