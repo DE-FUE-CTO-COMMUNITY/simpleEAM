@@ -108,8 +108,8 @@ export const applicationInterfaceSchema = baseApplicationInterfaceSchema.superRe
         }
         break
       case InterfaceStatus.ACTIVE:
-        // ACTIVE: Einführungsdatum muss in der Vergangenheit liegen
-        if (!introductionDate || introductionDate > now) {
+        // ACTIVE: Wenn Einführungsdatum gesetzt ist, muss es in der Vergangenheit liegen
+        if (introductionDate && introductionDate > now) {
           ctx.addIssue({
             code: 'custom',
             message: 'Bei Status "Aktiv" muss das Einführungsdatum in der Vergangenheit liegen.',
@@ -233,30 +233,12 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
   const form = useForm({
     defaultValues,
     onSubmit: async ({ value }) => {
-      // Da die GenericForm jetzt automatisch die Werte aus Autocomplete-Objekten extrahiert,
-      // ist keine manuelle Transformation mehr notwendig
-      const formattedValues: ApplicationInterfaceFormValues = {
-        name: value.name,
-        description: value.description,
-        interfaceType: value.interfaceType,
-        protocol: value.protocol,
-        version: value.version,
-        status: value.status,
-        planningDate: value.planningDate,
-        introductionDate: value.introductionDate,
-        endOfUseDate: value.endOfUseDate,
-        endOfLifeDate: value.endOfLifeDate,
-        responsiblePerson: value.responsiblePerson || null,
-        sourceApplications: value.sourceApplications || [],
-        targetApplications: value.targetApplications || [],
-        dataObjects: value.dataObjects || [],
-        partOfArchitectures: value.partOfArchitectures || [],
-        depictedInDiagrams: value.depictedInDiagrams || [],
-        predecessorIds: value.predecessorIds || [],
-        successorIds: value.successorIds || [],
+      try {
+        await onSubmit(value)
+      } catch (error) {
+        console.error('ApplicationInterfaceForm: onSubmit failed:', error)
+        throw error
       }
-
-      await onSubmit(formattedValues)
     },
     validators: {
       // Primäre Validierung bei Änderungen
