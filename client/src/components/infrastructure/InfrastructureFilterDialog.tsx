@@ -2,40 +2,39 @@
 
 import React from 'react'
 import GenericFilterDialog, { FilterField, GenericFilterState } from '../common/GenericFilterDialog'
-import { DataClassification } from '../../gql/generated'
-import { getClassificationLabel } from './utils'
+import { InfrastructureType, InfrastructureStatus } from '../../gql/generated'
+import { getInfrastructureTypeLabel, getInfrastructureStatusLabel } from './utils'
 
-export interface DataObjectFilterState {
-  classifications: DataClassification[]
-  formats: string[]
-  sources: string[]
+export interface InfrastructureFilterState {
+  infrastructureTypes: InfrastructureType[]
+  statuses: InfrastructureStatus[]
+  vendors: string[]
+  locations: string[]
   owners: string[]
-  usedByApplications: string[]
-  relatedToCapabilities: string[]
+  hostsApplications: string[]
   partOfArchitectures: string[]
   descriptionFilter: string
   updatedDateRange: [string, string]
 }
 
-export interface DataObjectFilterOptions {
-  availableFormats: string[]
-  availableSources: string[]
+export interface InfrastructureFilterOptions {
+  availableVendors: string[]
+  availableLocations: string[]
   availableOwners: string[]
-  availableUsedByApplications: string[]
-  availableRelatedToCapabilities: string[]
+  availableHostsApplications: string[]
   availablePartOfArchitectures: string[]
 }
 
-interface DataObjectFilterDialogProps {
+interface InfrastructureFilterDialogProps {
   open: boolean
   onClose: () => void
-  filters: DataObjectFilterState
-  onFiltersChange: (filters: DataObjectFilterState) => void
+  filters: InfrastructureFilterState
+  onFiltersChange: (filters: InfrastructureFilterState) => void
   onResetFilters: () => void
-  filterOptions: DataObjectFilterOptions
+  filterOptions: InfrastructureFilterOptions
 }
 
-const DataObjectFilterDialog: React.FC<DataObjectFilterDialogProps> = ({
+const InfrastructureFilterDialog: React.FC<InfrastructureFilterDialogProps> = ({
   open,
   onClose,
   filters,
@@ -46,12 +45,12 @@ const DataObjectFilterDialog: React.FC<DataObjectFilterDialogProps> = ({
   // Zähle die aktiven Filter
   const countActiveFilters = (fs: GenericFilterState) => {
     return (
-      (fs.classifications?.length || 0) +
-      (fs.formats?.length || 0) +
-      (fs.sources?.length || 0) +
+      (fs.infrastructureTypes?.length || 0) +
+      (fs.statuses?.length || 0) +
+      (fs.vendors?.length || 0) +
+      (fs.locations?.length || 0) +
       (fs.owners?.length || 0) +
-      (fs.usedByApplications?.length || 0) +
-      (fs.relatedToCapabilities?.length || 0) +
+      (fs.hostsApplications?.length || 0) +
       (fs.partOfArchitectures?.length || 0) +
       (fs.descriptionFilter ? 1 : 0) +
       (fs.updatedDateRange?.[0] || fs.updatedDateRange?.[1] ? 1 : 0)
@@ -60,35 +59,46 @@ const DataObjectFilterDialog: React.FC<DataObjectFilterDialogProps> = ({
 
   // Definiere Filterfelder für den generischen Dialog
   const filterFields: FilterField[] = [
-    // Klassifikationsfilter
+    // Infrastrukturtyp-Filter
     {
-      id: 'classifications',
-      label: 'Klassifikation',
+      id: 'infrastructureTypes',
+      label: 'Infrastrukturtyp',
       type: 'multiSelect',
-      options: Object.values(DataClassification).map(classification => ({
-        value: classification,
-        label: getClassificationLabel(classification),
+      options: Object.values(InfrastructureType).map(type => ({
+        value: type,
+        label: getInfrastructureTypeLabel(type),
       })),
-      valueFormatter: value => getClassificationLabel(value as DataClassification),
+      valueFormatter: value => getInfrastructureTypeLabel(value as InfrastructureType),
     },
-    // Formatfilter
+    // Status-Filter
     {
-      id: 'formats',
-      label: 'Format',
+      id: 'statuses',
+      label: 'Status',
       type: 'multiSelect',
-      options: filterOptions.availableFormats.map(format => ({
-        value: format,
-        label: format,
+      options: Object.values(InfrastructureStatus).map(status => ({
+        value: status,
+        label: getInfrastructureStatusLabel(status),
+      })),
+      valueFormatter: value => getInfrastructureStatusLabel(value as InfrastructureStatus),
+    },
+    // Anbieter-Filter
+    {
+      id: 'vendors',
+      label: 'Anbieter',
+      type: 'multiSelect',
+      options: filterOptions.availableVendors.map(vendor => ({
+        value: vendor,
+        label: vendor,
       })),
     },
-    // Quellenfilter
+    // Standort-Filter
     {
-      id: 'sources',
-      label: 'Datenquellen',
+      id: 'locations',
+      label: 'Standort',
       type: 'multiSelect',
-      options: filterOptions.availableSources.map(source => ({
-        value: source,
-        label: source,
+      options: filterOptions.availableLocations.map(location => ({
+        value: location,
+        label: location,
       })),
     },
     // Verantwortliche Filter
@@ -101,24 +111,14 @@ const DataObjectFilterDialog: React.FC<DataObjectFilterDialogProps> = ({
         label: owner,
       })),
     },
-    // Verwendet von Applikationen Filter
+    // Gehostete Applikationen Filter
     {
-      id: 'usedByApplications',
-      label: 'Verwendet von Applikationen',
+      id: 'hostsApplications',
+      label: 'Gehostete Applikationen',
       type: 'multiSelect',
-      options: filterOptions.availableUsedByApplications.map(app => ({
+      options: filterOptions.availableHostsApplications.map(app => ({
         value: app,
         label: app,
-      })),
-    },
-    // Bezug zu Capabilities Filter
-    {
-      id: 'relatedToCapabilities',
-      label: 'Bezug zu Capabilities',
-      type: 'multiSelect',
-      options: filterOptions.availableRelatedToCapabilities.map(cap => ({
-        value: cap,
-        label: cap,
       })),
     },
     // Teil von Architekturen Filter
@@ -158,7 +158,7 @@ const DataObjectFilterDialog: React.FC<DataObjectFilterDialogProps> = ({
 
   return (
     <GenericFilterDialog
-      title="Filter für Datenobjekte"
+      title="Filter für Infrastruktur"
       filterState={filters}
       filterFields={filterFields}
       onFilterChange={handleFilterChange}
@@ -170,4 +170,4 @@ const DataObjectFilterDialog: React.FC<DataObjectFilterDialogProps> = ({
   )
 }
 
-export default DataObjectFilterDialog
+export default InfrastructureFilterDialog

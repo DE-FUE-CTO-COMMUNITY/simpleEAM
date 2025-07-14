@@ -488,7 +488,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     },
     {
       name: 'predecessorIds',
-      label: 'Vorgänger-Anwendungen',
+      label: 'Vorgänger-Applikationen',
       type: 'autocomplete',
       tabId: 'general',
       multiple: true,
@@ -515,7 +515,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     },
     {
       name: 'successorIds',
-      label: 'Nachfolger-Anwendungen',
+      label: 'Nachfolger-Applikationen',
       type: 'autocomplete',
       tabId: 'general',
       multiple: true,
@@ -728,7 +728,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     },
     {
       name: 'parentIds',
-      label: 'Übergeordnete Anwendungen',
+      label: 'Übergeordnete Applikationen',
       type: 'autocomplete',
       tabId: 'relationships',
       multiple: true,

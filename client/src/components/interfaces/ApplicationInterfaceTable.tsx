@@ -135,7 +135,7 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
         },
       }),
       columnHelper.accessor('sourceApplications', {
-        header: 'Quellanwendungen',
+        header: 'Quellapplikationen',
         cell: info => {
           const sourceApps = info.getValue()
           return sourceApps && sourceApps.length > 0
@@ -144,7 +144,7 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
         },
       }),
       columnHelper.accessor('targetApplications', {
-        header: 'Zielanwendungen',
+        header: 'Zielapplikationen',
         cell: info => {
           const targetApps = info.getValue()
           return targetApps && targetApps.length > 0

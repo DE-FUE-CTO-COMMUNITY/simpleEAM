@@ -550,7 +550,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
     },
     {
       name: 'sourceApplications',
-      label: 'Quellanwendungen',
+      label: 'Quellapplikationen',
       type: 'autocomplete',
       size: { xs: 12, md: 6 },
       tabId: 'relationships',
@@ -579,7 +579,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
     },
     {
       name: 'targetApplications',
-      label: 'Zielanwendungen',
+      label: 'Zielapplikationen',
       type: 'autocomplete',
       size: { xs: 12, md: 6 },
       tabId: 'relationships',

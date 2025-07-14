@@ -116,7 +116,7 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
 }) => {
   // Personen laden
   const { data: personData, loading: personLoading } = useQuery(GET_PERSONS)
-  // Anwendungen laden
+  // Applikationen laden
   const { data: applicationData, loading: applicationLoading } = useQuery(GET_APPLICATIONS, {
     fetchPolicy: 'cache-and-network',
   })

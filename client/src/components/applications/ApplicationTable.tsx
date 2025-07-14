@@ -297,7 +297,7 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
         enableHiding: true,
       }),
       columnHelper.accessor('parents', {
-        header: 'Übergeordnete Anwendungen',
+        header: 'Übergeordnete Applikationen',
         cell: info => {
           const parents = info.getValue()
           return parents && parents.length > 0

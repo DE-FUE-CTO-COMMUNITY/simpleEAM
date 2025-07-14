@@ -177,7 +177,7 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
         enableHiding: true,
       }),
       columnHelper.accessor('usedByApplications', {
-        header: 'Genutzt von Anwendungen',
+        header: 'Genutzt von Applikationen',
         cell: info => {
           const apps = info.getValue()
           return apps && apps.length > 0 ? apps.map((app: any) => app.name).join(', ') : '-'

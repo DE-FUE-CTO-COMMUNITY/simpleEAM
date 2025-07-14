@@ -67,20 +67,20 @@ const ApplicationInterfaceFilterDialog: React.FC<FilterProps> = ({
         label: person,
       })),
     },
-    // Quell-Anwendungen-Filter
+    // Quell-Applikationen-Filter
     {
       id: 'sourceApplicationsFilter',
-      label: 'Quell-Anwendungen',
+      label: 'Quell-Applikationen',
       type: 'multiSelect',
       options: availableSourceApplications.map(app => ({
         value: app,
         label: app,
       })),
     },
-    // Ziel-Anwendungen-Filter
+    // Ziel-Applikationen-Filter
     {
       id: 'targetApplicationsFilter',
-      label: 'Ziel-Anwendungen',
+      label: 'Ziel-Applikationen',
       type: 'multiSelect',
       options: availableTargetApplications.map(app => ({
         value: app,

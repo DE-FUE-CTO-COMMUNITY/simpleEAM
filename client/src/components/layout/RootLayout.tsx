@@ -7,6 +7,7 @@ import {
   Architecture as ArchitectureIcon,
   AccountTree as DiagramIcon,
   Rule as RuleIcon,
+  Storage as InfrastructureIcon,
 } from '@mui/icons-material'
 import {
   BusinessCapabilityIcon,
@@ -77,6 +78,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
     { text: 'Applikationen', icon: <ApplicationComponentIcon />, href: '/applications' },
     { text: 'Datenobjekte', icon: <BusinessObjectIcon />, href: '/dataobjects' },
     { text: 'Schnittstellen', icon: <ApplicationInterfaceIcon />, href: '/interfaces' },
+    { text: 'Infrastruktur', icon: <InfrastructureIcon />, href: '/infrastructure' },
     { isDivider: true, text: 'divider', icon: null },
     { text: 'Personen', icon: <PersonIcon />, href: '/persons' },
     // Import/Export für Admin- und Architect-Benutzer (Hydration-Fix: nur wenn initialisiert)
