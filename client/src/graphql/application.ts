@@ -93,6 +93,10 @@ export const GET_APPLICATIONS = gql`
         category
         priority
       }
+      hostedOn {
+        id
+        name
+      }
     }
   }
 `
@@ -170,6 +174,10 @@ export const GET_APPLICATION = gql`
         category
         priority
       }
+      hostedOn {
+        id
+        name
+      }
     }
   }
 `
@@ -213,6 +221,10 @@ export const CREATE_APPLICATION = gql`
           name
           category
           priority
+        }
+        hostedOn {
+          id
+          name
         }
       }
     }
@@ -258,6 +270,10 @@ export const UPDATE_APPLICATION = gql`
           name
           category
           priority
+        }
+        hostedOn {
+          id
+          name
         }
       }
     }

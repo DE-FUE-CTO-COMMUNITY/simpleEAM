@@ -72,6 +72,7 @@ export type ApplicationType = Pick<
   | 'timeCategory'
   | 'sevenRStrategy'
   | 'implementsPrinciples'
+  | 'hostedOn'
 >
 
 export interface FilterState {
@@ -85,6 +86,7 @@ export interface FilterState {
   vendorFilter: string
   timeCategoryFilter: TimeCategory[]
   sevenRStrategyFilter: SevenRStrategy[]
+  hostedOnFilter: string[]
 }
 
 export interface FilterProps {
@@ -95,6 +97,7 @@ export interface FilterProps {
   availableVendors: string[]
   availableTimeCategories: TimeCategory[]
   availableSevenRStrategies: SevenRStrategy[]
+  availableInfrastructures: string[]
   onFilterChange: (newFilter: Partial<FilterState>) => void
   onResetFilter: () => void
   onClose: () => void

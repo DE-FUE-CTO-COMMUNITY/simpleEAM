@@ -147,6 +147,19 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
             : '-'
         },
       }),
+      columnHelper.accessor('containsInfrastructure', {
+        header: 'Infrastructure',
+        cell: info => {
+          const infrastructure = info.getValue()
+          return infrastructure && infrastructure.length > 0
+            ? infrastructure
+                .slice(0, 2)
+                .map(infra => infra.name)
+                .join(', ') + (infrastructure.length > 2 ? '...' : '')
+            : '-'
+        },
+        enableHiding: true,
+      }),
       columnHelper.accessor('appliedPrinciples', {
         header: 'Angewandte Prinzipien',
         cell: info => {
@@ -190,6 +203,7 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
           ? arch.parentArchitecture[0].id
           : undefined,
       appliedPrincipleIds: arch.appliedPrinciples?.map(principle => principle.id) ?? [],
+      containsInfrastructureIds: arch.containsInfrastructure?.map(infra => infra.id) ?? [],
     }
   }
 

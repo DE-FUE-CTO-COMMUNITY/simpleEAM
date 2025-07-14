@@ -20,6 +20,7 @@ import {
   ApplicationInterface,
   Architecture,
   ArchitecturePrinciple,
+  Infrastructure,
   TimeCategory,
   SevenRStrategy,
 } from '../../gql/generated'
@@ -30,6 +31,7 @@ import { GET_APPLICATION_INTERFACES } from '@/graphql/applicationInterface'
 import { GET_ARCHITECTURES } from '@/graphql/architecture'
 import { GET_DIAGRAMS } from '@/graphql/diagram'
 import { GET_ARCHITECTURE_PRINCIPLES } from '@/graphql/architecturePrinciple'
+import { GET_INFRASTRUCTURES } from '@/graphql/infrastructure'
 import GenericForm, { FieldConfig, TabConfig } from '../common/GenericForm'
 import { getValidSevenRStrategies } from './timeCategoryDependencies'
 import { isArchitect } from '@/lib/auth'
@@ -79,6 +81,7 @@ const baseApplicationSchema = z.object({
   componentIds: z.array(z.string()).optional(),
   predecessorIds: z.array(z.string()).optional(),
   successorIds: z.array(z.string()).optional(),
+  hostedOnIds: z.array(z.string()).optional(),
   timeCategory: z.nativeEnum(TimeCategory).optional().nullable().or(z.literal('')),
   sevenRStrategy: z.nativeEnum(SevenRStrategy).optional().nullable().or(z.literal('')),
 })
@@ -259,6 +262,8 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
   const { data: architecturesData, loading: architecturesLoading } = useQuery(GET_ARCHITECTURES)
   const { data: diagramsData, loading: diagramsLoading } = useQuery(GET_DIAGRAMS)
   const { data: principlesData, loading: principlesLoading } = useQuery(GET_ARCHITECTURE_PRINCIPLES)
+  const { data: infrastructuresData, loading: infrastructuresLoading } =
+    useQuery(GET_INFRASTRUCTURES)
 
   // Standardwerte für das Formular
   const defaultValues: ApplicationFormValues = {
@@ -288,6 +293,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     componentIds: application?.components?.map(app => app.id) ?? [],
     predecessorIds: application?.predecessors?.map(app => app.id) ?? [],
     successorIds: application?.successors?.map(app => app.id) ?? [],
+    hostedOnIds: application?.hostedOn?.map(app => app.id) ?? [],
     timeCategory: application?.timeCategory ?? null,
     sevenRStrategy: application?.sevenRStrategy ?? null,
   }
@@ -770,6 +776,34 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
         if (typeof option === 'string') {
           const matchingApp = availableApplications?.find((app: Application) => app.id === option)
           return matchingApp?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
+    },
+    {
+      name: 'hostedOnIds',
+      label: 'Gehostet auf (Infrastructure)',
+      type: 'autocomplete',
+      tabId: 'relationships',
+      multiple: true,
+      options: (infrastructuresData?.infrastructures || []).map((infra: Infrastructure) => ({
+        value: infra.id,
+        label: infra.name,
+      })),
+      loadingOptions: infrastructuresLoading,
+      size: { xs: 12, md: 6 },
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          const matchingInfra = infrastructuresData?.infrastructures?.find(
+            (infra: Infrastructure) => infra.id === option
+          )
+          return matchingInfra?.name || option
         }
         return option?.label || ''
       },

@@ -5,7 +5,12 @@ import { useForm, useStore } from '@tanstack/react-form'
 import { z } from 'zod'
 import { useQuery } from '@apollo/client'
 import { useTheme } from '@mui/material/styles'
-import { Architecture, ArchitectureDomain, ArchitectureType } from '../../gql/generated'
+import {
+  Architecture,
+  ArchitectureDomain,
+  ArchitectureType,
+  Infrastructure,
+} from '../../gql/generated'
 import { GET_PERSONS } from '@/graphql/person'
 import { GET_APPLICATIONS } from '@/graphql/application'
 import { GET_CAPABILITIES } from '@/graphql/capability'
@@ -13,6 +18,7 @@ import { GET_DATA_OBJECTS } from '@/graphql/dataObject'
 import { GET_DIAGRAMS } from '@/graphql/diagram'
 import { GET_APPLICATION_INTERFACES } from '@/graphql/applicationInterface'
 import { GET_ARCHITECTURE_PRINCIPLES } from '@/graphql/architecturePrinciple'
+import { GET_INFRASTRUCTURES } from '@/graphql/infrastructure'
 import GenericForm, { FieldConfig, TabConfig } from '../common/GenericForm'
 import { isArchitect } from '@/lib/auth'
 import { getDomainLabel, getTypeLabel } from './utils'
@@ -40,6 +46,7 @@ export const architectureSchema = z.object({
   containsCapabilityIds: z.array(z.string()).optional(),
   containsDataObjectIds: z.array(z.string()).optional(),
   containsInterfaceIds: z.array(z.string()).optional(),
+  containsInfrastructureIds: z.array(z.string()).optional(),
   diagramIds: z.array(z.string()).optional(),
   parentArchitectureId: z.string().optional(),
   appliedPrincipleIds: z.array(z.string()).optional(),
@@ -94,6 +101,10 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
 
   // Architektur-Prinzipien laden
   const { data: principleData, loading: principleLoading } = useQuery(GET_ARCHITECTURE_PRINCIPLES)
+
+  // Infrastruktur laden
+  const { data: infrastructureData, loading: infrastructureLoading } = useQuery(GET_INFRASTRUCTURES)
+
   // Formulardaten mit useMemo initialisieren
   const defaultValues = React.useMemo<ArchitectureFormValues>(
     () => ({
@@ -108,6 +119,7 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
       containsCapabilityIds: [],
       containsDataObjectIds: [],
       containsInterfaceIds: [],
+      containsInfrastructureIds: [],
       diagramIds: [],
       parentArchitectureId: '',
       appliedPrincipleIds: [],
@@ -290,6 +302,7 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
         containsCapabilityIds: architecture.containsCapabilities?.map(cap => cap.id) || [],
         containsDataObjectIds: architecture.containsDataObjects?.map(obj => obj.id) || [],
         containsInterfaceIds: architecture.containsInterfaces?.map(iface => iface.id) || [],
+        containsInfrastructureIds: architecture.containsInfrastructure?.map(inf => inf.id) || [],
         diagramIds: architecture.diagrams?.map(diag => diag.id) || [],
         appliedPrincipleIds: architecture.appliedPrinciples?.map(principle => principle.id) || [],
         parentArchitectureId:
@@ -747,6 +760,38 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
           console.error('Error in interface getOptionBackgroundColor:', error)
           return undefined
         }
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
+    },
+    {
+      name: 'containsInfrastructureIds',
+      label: 'Infrastructure',
+      type: 'autocomplete',
+      tabId: 'elements',
+      multiple: true,
+      size: { xs: 12, md: 12 },
+      options:
+        infrastructureData?.infrastructures?.map(
+          (infra: Infrastructure): SelectOption => ({
+            value: infra.id,
+            label: infra.name,
+          })
+        ) || [],
+      loadingOptions: infrastructureLoading,
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          const matchingInfra = infrastructureData?.infrastructures?.find(
+            (infra: Infrastructure) => infra.id === option
+          )
+          const result = matchingInfra?.name || option
+          return result
+        }
+        return option?.label || ''
       },
       isOptionEqualToValue: (option: any, value: any) => {
         if (typeof value === 'string') {

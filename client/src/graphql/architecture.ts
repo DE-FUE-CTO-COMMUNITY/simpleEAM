@@ -46,6 +46,10 @@ export const GET_ARCHITECTURES = gql`
         id
         name
       }
+      containsInfrastructure {
+        id
+        name
+      }
       diagrams {
         id
         title
@@ -91,6 +95,10 @@ export const CREATE_ARCHITECTURE = gql`
           category
           priority
         }
+        containsInfrastructure {
+          id
+          name
+        }
         createdAt
       }
     }
@@ -118,6 +126,10 @@ export const UPDATE_ARCHITECTURE = gql`
           name
           category
           priority
+        }
+        containsInfrastructure {
+          id
+          name
         }
         updatedAt
       }

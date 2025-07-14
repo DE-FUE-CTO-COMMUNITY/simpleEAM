@@ -316,6 +316,16 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
         },
         enableHiding: true,
       }),
+      columnHelper.accessor('hostedOn', {
+        header: 'Gehostet auf',
+        cell: info => {
+          const infrastructure = info.getValue()
+          return infrastructure && infrastructure.length > 0
+            ? infrastructure.map((infra: any) => infra.name).join(', ')
+            : '-'
+        },
+        enableHiding: true,
+      }),
       // Versteckte Zeitstempel-Spalten am Ende
       columnHelper.accessor('createdAt', {
         header: 'Erstellt am',
@@ -349,6 +359,7 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
       supportsCapabilityIds: app.supportsCapabilities?.map(cap => cap.id) ?? [],
       timeCategory: app.timeCategory ?? null,
       sevenRStrategy: app.sevenRStrategy ?? null,
+      hostedOnIds: app.hostedOn?.map(infra => infra.id) ?? [],
     }
   }
 

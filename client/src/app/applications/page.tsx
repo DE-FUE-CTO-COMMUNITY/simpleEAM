@@ -50,6 +50,7 @@ const ApplicationsPage = () => {
     supportsCapabilities: true,
     usesDataObjects: true,
     costs: true,
+    hostedOn: false, // Als versteckte Spalte standardmäßig ausgeblendet
     createdAt: true,
     updatedAt: true,
     actions: true,
@@ -76,6 +77,7 @@ const ApplicationsPage = () => {
     vendorFilter: '',
     timeCategoryFilter: [] as TimeCategory[],
     sevenRStrategyFilter: [] as SevenRStrategy[],
+    hostedOnFilter: [] as string[],
   })
   const [activeFiltersCount, setActiveFiltersCount] = useState<number>(0)
 
@@ -86,6 +88,7 @@ const ApplicationsPage = () => {
   const [availableVendors, setAvailableVendors] = useState<string[]>([])
   const [availableTimeCategories, setAvailableTimeCategories] = useState<TimeCategory[]>([])
   const [availableSevenRStrategies, setAvailableSevenRStrategies] = useState<SevenRStrategy[]>([])
+  const [availableInfrastructures, setAvailableInfrastructures] = useState<string[]>([])
 
   // State für das neue Application-Formular
   const [showNewApplicationForm, setShowNewApplicationForm] = useState(false)
@@ -153,6 +156,17 @@ const ApplicationsPage = () => {
 
       const uniqueSevenRStrategies = Array.from(new Set(allSevenRStrategies)).sort()
       setAvailableSevenRStrategies(uniqueSevenRStrategies)
+
+      // Alle Infrastrukturen extrahieren und Duplikate entfernen
+      const allInfrastructures: string[] = []
+      applicationsData.forEach((app: ApplicationType) => {
+        if (app.hostedOn && Array.isArray(app.hostedOn)) {
+          allInfrastructures.push(...app.hostedOn.map(infra => infra.name))
+        }
+      })
+
+      const uniqueInfrastructures = Array.from(new Set(allInfrastructures)).sort()
+      setAvailableInfrastructures(uniqueInfrastructures)
     }
   }, [applications])
 
@@ -220,6 +234,7 @@ const ApplicationsPage = () => {
       componentIds,
       predecessorIds,
       successorIds,
+      hostedOnIds,
       ...applicationData
     } = data
     // Bei CREATE wird kein spezielles Mutation-Objekt benötigt, da direkte Werte erlaubt sind
@@ -336,6 +351,16 @@ const ApplicationsPage = () => {
             },
           }
         : {}),
+      // Wenn Infrastructure ausgewählt wurde, verbinden wir sie mit der Applikation
+      ...(hostedOnIds && hostedOnIds.length > 0
+        ? {
+            hostedOn: {
+              connect: hostedOnIds.map(id => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }
+        : {}),
     }
 
     await createApplication({
@@ -360,6 +385,7 @@ const ApplicationsPage = () => {
       componentIds,
       predecessorIds,
       successorIds,
+      hostedOnIds,
       ...applicationData
     } = data
 
@@ -575,6 +601,24 @@ const ApplicationsPage = () => {
       }
     }
 
+    // Aktualisierung der Infrastructure-Beziehungen (hostedOn)
+    if (hostedOnIds && hostedOnIds.length > 0) {
+      input.hostedOn = {
+        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+        connect: hostedOnIds.map(infraId => ({
+          where: {
+            node: {
+              id: { eq: infraId },
+            },
+          },
+        })),
+      }
+    } else {
+      input.hostedOn = {
+        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+      }
+    }
+
     await updateApplication({
       variables: { id, input },
     })
@@ -617,6 +661,7 @@ const ApplicationsPage = () => {
       vendorFilter: '',
       timeCategoryFilter: [],
       sevenRStrategyFilter: [],
+      hostedOnFilter: [],
     })
     setActiveFiltersCount(0)
   }
@@ -679,6 +724,7 @@ const ApplicationsPage = () => {
           availableVendors={availableVendors}
           availableTimeCategories={availableTimeCategories}
           availableSevenRStrategies={availableSevenRStrategies}
+          availableInfrastructures={availableInfrastructures}
           onFilterChange={handleFilterChange}
           onResetFilter={handleResetFilter}
           onClose={() => setFilterOpen(false)}
