@@ -28,6 +28,7 @@ import {
   ApplicationComponentIcon,
   ApplicationInterfaceIcon,
   BusinessObjectIcon,
+  InfrastructureIcon,
 } from '@/components/icons'
 import { useQuery } from '@apollo/client'
 import {
@@ -59,6 +60,7 @@ const DatabaseLibraryPanel: React.FC<DatabaseLibraryPanelProps> = ({ onElementDr
         applications: [],
         dataObjects: [],
         applicationInterfaces: [],
+        infrastructures: [],
       }
 
     const filterBySearch = (elements: LibraryElement[]) => {
@@ -87,6 +89,10 @@ const DatabaseLibraryPanel: React.FC<DatabaseLibraryPanelProps> = ({ onElementDr
       applicationInterfaces:
         selectedType === 'all' || selectedType === 'interface'
           ? filterBySearch(data.applicationInterfaces || [])
+          : [],
+      infrastructures:
+        selectedType === 'all' || selectedType === 'infrastructure'
+          ? filterBySearch(data.infrastructures || [])
           : [],
     }
 
@@ -122,6 +128,8 @@ const DatabaseLibraryPanel: React.FC<DatabaseLibraryPanelProps> = ({ onElementDr
         return <BusinessObjectIcon sx={{ color: ELEMENT_TYPE_CONFIG.dataObject.color }} />
       case 'interface':
         return <ApplicationInterfaceIcon sx={{ color: ELEMENT_TYPE_CONFIG.interface.color }} />
+      case 'infrastructure':
+        return <InfrastructureIcon sx={{ color: ELEMENT_TYPE_CONFIG.infrastructure.color }} />
       default:
         return <BusinessCapabilityIcon />
     }
@@ -205,6 +213,21 @@ const DatabaseLibraryPanel: React.FC<DatabaseLibraryPanelProps> = ({ onElementDr
                         {element.interfaceType && (
                           <Typography variant="caption" display="block">
                             Interface-Typ: {element.interfaceType}
+                          </Typography>
+                        )}
+                        {element.infrastructureType && (
+                          <Typography variant="caption" display="block">
+                            Infrastruktur-Typ: {element.infrastructureType}
+                          </Typography>
+                        )}
+                        {element.location && (
+                          <Typography variant="caption" display="block">
+                            Standort: {element.location}
+                          </Typography>
+                        )}
+                        {element.version && (
+                          <Typography variant="caption" display="block">
+                            Version: {element.version}
                           </Typography>
                         )}
                       </Box>
@@ -400,6 +423,7 @@ const DatabaseLibraryPanel: React.FC<DatabaseLibraryPanelProps> = ({ onElementDr
               <MenuItem value="application">Applications</MenuItem>
               <MenuItem value="dataObject">Data Objects</MenuItem>
               <MenuItem value="interface">Interfaces</MenuItem>
+              <MenuItem value="infrastructure">Infrastruktur</MenuItem>
             </Select>
           </FormControl>
 
@@ -448,6 +472,13 @@ const DatabaseLibraryPanel: React.FC<DatabaseLibraryPanelProps> = ({ onElementDr
             filteredElements.applicationInterfaces,
             'interface',
             ELEMENT_TYPE_CONFIG.interface.label
+          )}
+
+        {filteredElements.infrastructures &&
+          renderElements(
+            filteredElements.infrastructures,
+            'infrastructure',
+            ELEMENT_TYPE_CONFIG.infrastructure.label
           )}
 
         {/* Leere Zustand */}

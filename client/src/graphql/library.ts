@@ -41,6 +41,16 @@ export const GET_LIBRARY_ELEMENTS = gql`
       description
       interfaceType
     }
+    infrastructures {
+      id
+      name
+      description
+      infrastructureType
+      status
+      vendor
+      version
+      location
+    }
   }
 `
 
@@ -87,11 +97,23 @@ export interface LibraryInterface {
   interfaceType?: string
 }
 
+export interface LibraryInfrastructure {
+  id: string
+  name: string
+  description?: string
+  infrastructureType?: string
+  status?: string
+  vendor?: string
+  version?: string
+  location?: string
+}
+
 export interface LibraryElementsResponse {
   businessCapabilities: LibraryCapability[]
   applications: LibraryApplication[]
   dataObjects: LibraryDataObject[]
   applicationInterfaces: LibraryInterface[]
+  infrastructures: LibraryInfrastructure[]
 }
 
 export type LibraryElement =
@@ -99,6 +121,7 @@ export type LibraryElement =
   | LibraryApplication
   | LibraryDataObject
   | LibraryInterface
+  | LibraryInfrastructure
 
 export const ELEMENT_TYPE_CONFIG = {
   capability: {
@@ -125,6 +148,11 @@ export const ELEMENT_TYPE_CONFIG = {
     label: 'Application Interfaces',
     color: '#a5d8ff',
     iconType: 'rectangle',
+  },
+  infrastructure: {
+    label: 'Infrastruktur',
+    color: '#2f9e44',
+    iconType: 'cube',
   },
 } as const
 
