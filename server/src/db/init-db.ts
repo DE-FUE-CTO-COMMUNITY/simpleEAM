@@ -58,6 +58,12 @@ async function initDatabase(reset: boolean = false) {
       FOR (p:Person) REQUIRE p.id IS UNIQUE
     `)
 
+    // Constraints für Infrastructure
+    await session.run(`
+      CREATE CONSTRAINT infrastructure_id_unique IF NOT EXISTS
+      FOR (inf:Infrastructure) REQUIRE inf.id IS UNIQUE
+    `)
+
     // Indizes für die Suche
     await session.run(`
       CREATE INDEX business_capability_name_index IF NOT EXISTS
@@ -72,6 +78,11 @@ async function initDatabase(reset: boolean = false) {
     await session.run(`
       CREATE INDEX data_object_name_index IF NOT EXISTS
       FOR (d:DataObject) ON (d.name)
+    `)
+
+    await session.run(`
+      CREATE INDEX infrastructure_name_index IF NOT EXISTS
+      FOR (inf:Infrastructure) ON (inf.name)
     `)
 
     // Optional: Testdaten einfügen, falls die Datenbank leer ist
@@ -627,6 +638,186 @@ async function createSampleData(session: Session) {
         createdAt: datetime(),
         updatedAt: datetime()
       })
+    `)
+
+    console.log('Erstelle Infrastructure-Elemente...')
+    // Infrastructure-Elemente erstellen (5 Infrastructures)
+    await session.run(`
+      CREATE 
+      (inf1:Infrastructure {
+        id: "inf-001",
+        name: "AWS Cloud Frankfurt",
+        description: "Amazon Web Services Cloud-Rechenzentrum in Frankfurt",
+        infrastructureType: "CLOUD_DATACENTER",
+        status: "ACTIVE",
+        vendor: "Amazon Web Services",
+        version: "Current",
+        capacity: "Unlimited (Auto-scaling)",
+        location: "Frankfurt, Deutschland",
+        ipAddress: "52.59.0.0/16",
+        operatingSystem: "AWS Linux 2",
+        specifications: "Multi-AZ, Auto-scaling, High Availability",
+        maintenanceWindow: "Sonntag 02:00-04:00 UTC",
+        costs: 85000.00,
+        planningDate: date("2019-01-01"),
+        introductionDate: date("2019-06-15"),
+        endOfLifeDate: date("2029-06-15"),
+        createdAt: datetime(),
+        updatedAt: datetime()
+      }),
+      (inf2:Infrastructure {
+        id: "inf-002",
+        name: "Azure Cloud West Europe",
+        description: "Microsoft Azure Cloud-Rechenzentrum in Westeuropa",
+        infrastructureType: "CLOUD_DATACENTER",
+        status: "ACTIVE",
+        vendor: "Microsoft",
+        version: "Current",
+        capacity: "Unlimited (Auto-scaling)",
+        location: "Amsterdam, Niederlande",
+        ipAddress: "20.50.0.0/16",
+        operatingSystem: "Windows Server 2022",
+        specifications: "Geo-redundant, Auto-scaling, Enterprise SLA",
+        maintenanceWindow: "Samstag 01:00-03:00 UTC",
+        costs: 95000.00,
+        planningDate: date("2020-03-01"),
+        introductionDate: date("2020-09-01"),
+        endOfLifeDate: date("2030-09-01"),
+        createdAt: datetime(),
+        updatedAt: datetime()
+      }),
+      (inf3:Infrastructure {
+        id: "inf-003",
+        name: "Hauptrechenzentrum München",
+        description: "Primäres On-Premise Rechenzentrum der Unternehmenszentrale",
+        infrastructureType: "ON_PREMISE_DATACENTER",
+        status: "ACTIVE",
+        vendor: "Dell Technologies",
+        version: "PowerEdge R750",
+        capacity: "500 TB Storage, 2048 GB RAM",
+        location: "München, Deutschland",
+        ipAddress: "192.168.1.0/24",
+        operatingSystem: "VMware vSphere 8.0",
+        specifications: "Redundante Stromversorgung, 24/7 Überwachung",
+        maintenanceWindow: "Sonntag 01:00-05:00 CET",
+        costs: 150000.00,
+        planningDate: date("2017-01-01"),
+        introductionDate: date("2018-01-15"),
+        endOfLifeDate: date("2028-01-15"),
+        createdAt: datetime(),
+        updatedAt: datetime()
+      }),
+      (inf4:Infrastructure {
+        id: "inf-004",
+        name: "Backup-Rechenzentrum Berlin",
+        description: "Sekundäres On-Premise Rechenzentrum für Disaster Recovery",
+        infrastructureType: "ON_PREMISE_DATACENTER",
+        status: "ACTIVE",
+        vendor: "HPE",
+        version: "ProLiant DL380 Gen10+",
+        capacity: "200 TB Storage, 1024 GB RAM",
+        location: "Berlin, Deutschland",
+        ipAddress: "192.168.2.0/24",
+        operatingSystem: "Red Hat Enterprise Linux 9",
+        specifications: "Disaster Recovery, Cold Standby, Geo-redundant",
+        maintenanceWindow: "Samstag 02:00-06:00 CET",
+        costs: 75000.00,
+        planningDate: date("2019-06-01"),
+        introductionDate: date("2020-02-01"),
+        endOfLifeDate: date("2030-02-01"),
+        createdAt: datetime(),
+        updatedAt: datetime()
+      }),
+      (inf5:Infrastructure {
+        id: "inf-005",
+        name: "Kubernetes Cluster Prod",
+        description: "Produktions-Kubernetes-Cluster für Container-Workloads",
+        infrastructureType: "KUBERNETES_CLUSTER",
+        status: "ACTIVE",
+        vendor: "Red Hat",
+        version: "OpenShift 4.14",
+        capacity: "50 Nodes, 200 Pods/Node",
+        location: "Hybrid (München + AWS)",
+        ipAddress: "10.0.0.0/16",
+        operatingSystem: "Red Hat CoreOS",
+        specifications: "Multi-cloud, Auto-scaling, Service Mesh",
+        maintenanceWindow: "Sonntag 03:00-05:00 CET",
+        costs: 120000.00,
+        planningDate: date("2021-01-01"),
+        introductionDate: date("2021-09-01"),
+        endOfLifeDate: date("2031-09-01"),
+        createdAt: datetime(),
+        updatedAt: datetime()
+      })
+    `)
+
+    console.log('Erstelle Infrastructure-Application Beziehungen...')
+    // Applikationen mit Infrastructure-Elementen verbinden
+    await session.run(`
+      MATCH 
+        (a1:Application {id: "app-001"}),
+        (a2:Application {id: "app-002"}),
+        (a3:Application {id: "app-003"}),
+        (a4:Application {id: "app-004"}),
+        (a5:Application {id: "app-005"}),
+        (a6:Application {id: "app-006"}),
+        (a7:Application {id: "app-007"}),
+        (a8:Application {id: "app-008"}),
+        (a9:Application {id: "app-009"}),
+        (a10:Application {id: "app-010"}),
+        (a11:Application {id: "app-011"}),
+        (a12:Application {id: "app-012"}),
+        (inf1:Infrastructure {id: "inf-001"}),
+        (inf2:Infrastructure {id: "inf-002"}),
+        (inf3:Infrastructure {id: "inf-003"}),
+        (inf4:Infrastructure {id: "inf-004"}),
+        (inf5:Infrastructure {id: "inf-005"})
+      CREATE 
+        // Cloud-basierte Applikationen auf AWS
+        (a1)-[:HOSTED_ON]->(inf1),  // Salesforce CRM auf AWS
+        (a4)-[:HOSTED_ON]->(inf1),  // ServiceNow ITSM auf AWS
+        (a5)-[:HOSTED_ON]->(inf1),  // Tableau Analytics auf AWS
+        
+        // Cloud-basierte Applikationen auf Azure
+        (a3)-[:HOSTED_ON]->(inf2),  // Microsoft 365 auf Azure
+        (a6)-[:HOSTED_ON]->(inf2),  // Workday HCM auf Azure
+        (a9)-[:HOSTED_ON]->(inf2),  // Slack Communication auf Azure
+        (a10)-[:HOSTED_ON]->(inf2), // DocuSign Digital auf Azure
+        
+        // On-Premise Applikationen im Hauptrechenzentrum München
+        (a2)-[:HOSTED_ON]->(inf3),  // SAP ERP in München
+        (a7)-[:HOSTED_ON]->(inf3),  // Confluence Wiki in München
+        (a11)-[:HOSTED_ON]->(inf3), // Splunk Security in München
+        (a12)-[:HOSTED_ON]->(inf3), // Oracle Database in München
+        
+        // Kubernetes-basierte Applikationen
+        (a8)-[:HOSTED_ON]->(inf5),  // Jira Project Management auf Kubernetes
+        
+        // Backup-Infrastruktur ist ein Child der Main-Infrastruktur
+        (inf4)-[:HAS_PARENT_INFRASTRUCTURE]->(inf3),
+        
+        // Kubernetes läuft teilweise auf der Main-Infrastruktur
+        (inf5)-[:HAS_PARENT_INFRASTRUCTURE]->(inf3)
+    `)
+
+    console.log('Erstelle Infrastructure-Verantwortliche...')
+    // Infrastructure-Verantwortliche zuweisen
+    await session.run(`
+      MATCH 
+        (p1:Person {id: "person-001"}),
+        (p2:Person {id: "person-002"}),
+        (p6:Person {id: "person-006"}),
+        (inf1:Infrastructure {id: "inf-001"}),
+        (inf2:Infrastructure {id: "inf-002"}),
+        (inf3:Infrastructure {id: "inf-003"}),
+        (inf4:Infrastructure {id: "inf-004"}),
+        (inf5:Infrastructure {id: "inf-005"})
+      CREATE 
+        (inf1)-[:HAS_RESPONSIBLE]->(p1),  // Max Mustermann für AWS
+        (inf2)-[:HAS_RESPONSIBLE]->(p1),  // Max Mustermann für Azure
+        (inf3)-[:HAS_RESPONSIBLE]->(p2),  // Anna Schmidt für Hauptrechenzentrum
+        (inf4)-[:HAS_RESPONSIBLE]->(p2),  // Anna Schmidt für Backup-Rechenzentrum
+        (inf5)-[:HAS_RESPONSIBLE]->(p6)   // Julia Wagner für Kubernetes
     `)
 
     console.log('Erstelle DataObjects...')
@@ -1728,10 +1919,12 @@ async function createSampleData(session: Session) {
     console.log('- 12 Applications (alle mit Verantwortlichen)')
     console.log('- 10 DataObjects (alle mit Verantwortlichen)')
     console.log('- 12 ApplicationInterfaces (alle mit Quell- und Zielanwendungen)')
+    console.log('- 5 Infrastructure-Elemente (2 Cloud-DC, 2 On-Premise-DC, 1 Kubernetes-Cluster)')
     console.log('- 5 Architectures (alle mit Verantwortlichen)')
     console.log('- 20 ArchitecturePrinciples (alle mit Verantwortlichen)')
     console.log('- Vollständige Beziehungen zwischen allen Entitäten')
     console.log('- Alle Entitäten haben genau einen Verantwortlichen')
+    console.log('- Infrastructure-Applikations-Beziehungen (HOSTS)')
   } catch (error) {
     console.error('Fehler beim Erstellen der Testdaten:', error)
     throw error
