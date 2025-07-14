@@ -337,40 +337,6 @@ const InfrastructureTable: React.FC<InfrastructureTableProps> = ({
     [columnHelper, getTypeChip, getStatusChip]
   )
 
-  // Mapping-Funktion für die Umwandlung von Infrastructure zu InfrastructureFormValues
-  const mapInfrastructureToFormValues = (
-    infrastructure: Infrastructure
-  ): InfrastructureFormValues => {
-    return {
-      name: infrastructure.name,
-      description: infrastructure.description || '',
-      infrastructureType: infrastructure.infrastructureType,
-      status: infrastructure.status,
-      vendor: infrastructure.vendor || '',
-      version: infrastructure.version || '',
-      capacity: infrastructure.capacity || '',
-      location: infrastructure.location || '',
-      ipAddress: infrastructure.ipAddress || '',
-      operatingSystem: infrastructure.operatingSystem || '',
-      specifications: infrastructure.specifications || '',
-      maintenanceWindow: infrastructure.maintenanceWindow || '',
-      costs: infrastructure.costs || 0,
-      planningDate: infrastructure.planningDate || undefined,
-      introductionDate: infrastructure.introductionDate || undefined,
-      endOfUseDate: infrastructure.endOfUseDate || undefined,
-      endOfLifeDate: infrastructure.endOfLifeDate || undefined,
-      ownerId:
-        infrastructure.owners && infrastructure.owners.length > 0
-          ? infrastructure.owners[0].id
-          : undefined,
-      parentInfrastructure: infrastructure.parentInfrastructure?.map(parent => parent.id) || [],
-      childInfrastructures: infrastructure.childInfrastructures?.map(child => child.id) || [],
-      hostsApplications: infrastructure.hostsApplications?.map(app => app.id) || [],
-      partOfArchitectures: infrastructure.partOfArchitectures?.map(arch => arch.id) || [],
-      depictedInDiagrams: infrastructure.depictedInDiagrams?.map(diag => diag.id) || [],
-    }
-  }
-
   return (
     <GenericTable<Infrastructure, InfrastructureFormValues>
       data={infrastructures}
@@ -387,7 +353,7 @@ const InfrastructureTable: React.FC<InfrastructureTableProps> = ({
       entityName="Infrastruktur"
       FormComponent={InfrastructureForm}
       getIdFromData={(item: Infrastructure) => item.id}
-      mapDataToFormValues={mapInfrastructureToFormValues}
+      // mapDataToFormValues entfernt - die InfrastructureForm arbeitet direkt mit der infrastructure Prop
       onTableReady={handleTableReady}
       columnVisibility={columnVisibility}
       onColumnVisibilityChange={onColumnVisibilityChange}

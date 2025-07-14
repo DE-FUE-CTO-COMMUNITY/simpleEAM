@@ -703,6 +703,7 @@ export function GenericTable<T extends { id: string }, F>({
           architecture={selectedItem} // Für ArchitectureForm
           principle={selectedItem} // Für ArchitecturePrincipleForm
           person={selectedItem} // Für PersonForm
+          infrastructure={selectedItem} // Für InfrastructureForm
           data={selectedItem} // Fallback für generische Forms
           {...(mapDataToFormValues && selectedItem ? mapDataToFormValues(selectedItem) : {})}
           mode={formMode}

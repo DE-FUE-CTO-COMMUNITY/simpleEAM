@@ -1,9 +1,8 @@
 'use client'
 
 import React, { useState, useCallback, useMemo } from 'react'
-import { Box, Typography, Card, Button, Paper } from '@mui/material'
-import { Add as AddIcon } from '@mui/icons-material'
-import { useAuth, isArchitect } from '@/lib/auth'
+import { Box, Typography, Card, Paper } from '@mui/material'
+import { useAuth } from '@/lib/auth'
 import { SortingState, VisibilityState } from '@tanstack/react-table'
 import { useQuery, useMutation } from '@apollo/client'
 import { useSnackbar } from 'notistack'
@@ -16,9 +15,7 @@ import {
 import InfrastructureTable from '@/components/infrastructure/InfrastructureTable'
 import InfrastructureToolbar from '@/components/infrastructure/InfrastructureToolbar'
 import InfrastructureFilterDialog from '@/components/infrastructure/InfrastructureFilterDialog'
-import InfrastructureForm, {
-  InfrastructureFormValues,
-} from '@/components/infrastructure/InfrastructureForm'
+import { InfrastructureFormValues } from '@/components/infrastructure/InfrastructureForm'
 import { Infrastructure } from '@/gql/generated'
 import { InfrastructureFilterState } from '@/components/infrastructure/InfrastructureFilterDialog'
 
@@ -42,8 +39,8 @@ const InfrastructurePage = () => {
     updatedDateRange: ['', ''],
   })
 
-  // State für die InfrastructureForm
-  const [showNewInfrastructureForm, setShowNewInfrastructureForm] = useState(false)
+  // State für die InfrastructureForm - ENTFERNT, wird von GenericTable verwaltet
+  // const [showNewInfrastructureForm, setShowNewInfrastructureForm] = useState(false)
 
   // GraphQL-Abfrage für Infrastrukturen
   const { data, loading, refetch } = useQuery(GET_INFRASTRUCTURES, {
@@ -52,7 +49,7 @@ const InfrastructurePage = () => {
   })
 
   // GraphQL-Mutationen für Infrastrukturen
-  const [createInfrastructure, { loading: isCreating }] = useMutation(CREATE_INFRASTRUCTURE, {
+  const [createInfrastructure] = useMutation(CREATE_INFRASTRUCTURE, {
     onCompleted: () => {
       enqueueSnackbar('Infrastruktur erfolgreich erstellt', { variant: 'success' })
       refetch()
@@ -113,40 +110,40 @@ const InfrastructurePage = () => {
     }
 
     // Daten basierend auf den Filtern filtern
-    return infrastructures.filter(infra => {
-      // Infrastrukturtyp-Filter anwenden
+    return infrastructures.filter(infrastructure => {
+      // Infrastruktur-Typ Filter anwenden
       if (
         filters.infrastructureTypes.length > 0 &&
-        !filters.infrastructureTypes.includes(infra.infrastructureType)
+        !filters.infrastructureTypes.includes(infrastructure.infrastructureType)
       ) {
         return false
       }
 
-      // Status-Filter anwenden
-      if (filters.statuses.length > 0 && !filters.statuses.includes(infra.status)) {
+      // Status Filter anwenden
+      if (filters.statuses.length > 0 && !filters.statuses.includes(infrastructure.status)) {
         return false
       }
 
-      // Anbieter-Filter anwenden
+      // Anbieter Filter anwenden
       if (
         filters.vendors.length > 0 &&
-        (!infra.vendor || !filters.vendors.includes(infra.vendor))
+        (!infrastructure.vendor || !filters.vendors.includes(infrastructure.vendor))
       ) {
         return false
       }
 
-      // Standort-Filter anwenden
+      // Standort Filter anwenden
       if (
         filters.locations.length > 0 &&
-        (!infra.location || !filters.locations.includes(infra.location))
+        (!infrastructure.location || !filters.locations.includes(infrastructure.location))
       ) {
         return false
       }
 
       // Verantwortliche Filter anwenden
       if (filters.owners.length > 0) {
-        if (!infra.owners || infra.owners.length === 0) return false
-        const hasMatchingOwner = infra.owners.some(owner =>
+        if (!infrastructure.owners || infrastructure.owners.length === 0) return false
+        const hasMatchingOwner = infrastructure.owners.some(owner =>
           filters.owners.includes(`${owner.firstName} ${owner.lastName}`)
         )
         if (!hasMatchingOwner) return false
@@ -154,8 +151,9 @@ const InfrastructurePage = () => {
 
       // Gehostete Applikationen Filter anwenden
       if (filters.hostsApplications.length > 0) {
-        if (!infra.hostsApplications || infra.hostsApplications.length === 0) return false
-        const hasMatchingApp = infra.hostsApplications.some(app =>
+        if (!infrastructure.hostsApplications || infrastructure.hostsApplications.length === 0)
+          return false
+        const hasMatchingApp = infrastructure.hostsApplications.some(app =>
           filters.hostsApplications.includes(app.name)
         )
         if (!hasMatchingApp) return false
@@ -163,8 +161,9 @@ const InfrastructurePage = () => {
 
       // Teil von Architekturen Filter anwenden
       if (filters.partOfArchitectures.length > 0) {
-        if (!infra.partOfArchitectures || infra.partOfArchitectures.length === 0) return false
-        const hasMatchingArchitecture = infra.partOfArchitectures.some(arch =>
+        if (!infrastructure.partOfArchitectures || infrastructure.partOfArchitectures.length === 0)
+          return false
+        const hasMatchingArchitecture = infrastructure.partOfArchitectures.some(arch =>
           filters.partOfArchitectures.includes(arch.name)
         )
         if (!hasMatchingArchitecture) return false
@@ -173,14 +172,19 @@ const InfrastructurePage = () => {
       // Beschreibungsfilter anwenden
       if (filters.descriptionFilter && filters.descriptionFilter.trim() !== '') {
         const searchTerm = filters.descriptionFilter.toLowerCase().trim()
-        if (!infra.description || !infra.description.toLowerCase().includes(searchTerm)) {
+        if (
+          !infrastructure.description ||
+          !infrastructure.description.toLowerCase().includes(searchTerm)
+        ) {
           return false
         }
       }
 
       // Datum Aktualisiert Filter anwenden
       if (filters.updatedDateRange[0] || filters.updatedDateRange[1]) {
-        const infraDate = infra.updatedAt ? new Date(infra.updatedAt).getTime() : 0
+        const infraDate = infrastructure.updatedAt
+          ? new Date(infrastructure.updatedAt).getTime()
+          : 0
         if (filters.updatedDateRange[0]) {
           const fromDate = new Date(filters.updatedDateRange[0]).getTime()
           if (infraDate < fromDate) return false
@@ -191,28 +195,21 @@ const InfrastructurePage = () => {
         }
       }
 
-      // Globalen Filter anwenden (suche in Name, Beschreibung, Anbieter, Standort, IP-Adresse)
+      // Globalen Filter anwenden (suche in Name, Beschreibung, Anbieter, Standort)
       if (globalFilter && globalFilter.trim() !== '') {
         const searchTerm = globalFilter.toLowerCase().trim()
-        const matchesName = infra.name.toLowerCase().includes(searchTerm)
-        const matchesDescription = infra.description
-          ? infra.description.toLowerCase().includes(searchTerm)
+        const matchesName = infrastructure.name.toLowerCase().includes(searchTerm)
+        const matchesDescription = infrastructure.description
+          ? infrastructure.description.toLowerCase().includes(searchTerm)
           : false
-        const matchesVendor = infra.vendor ? infra.vendor.toLowerCase().includes(searchTerm) : false
-        const matchesLocation = infra.location
-          ? infra.location.toLowerCase().includes(searchTerm)
+        const matchesVendor = infrastructure.vendor
+          ? infrastructure.vendor.toLowerCase().includes(searchTerm)
           : false
-        const matchesIpAddress = infra.ipAddress
-          ? infra.ipAddress.toLowerCase().includes(searchTerm)
+        const matchesLocation = infrastructure.location
+          ? infrastructure.location.toLowerCase().includes(searchTerm)
           : false
 
-        if (
-          !matchesName &&
-          !matchesDescription &&
-          !matchesVendor &&
-          !matchesLocation &&
-          !matchesIpAddress
-        ) {
+        if (!matchesName && !matchesDescription && !matchesVendor && !matchesLocation) {
           return false
         }
       }
@@ -223,27 +220,33 @@ const InfrastructurePage = () => {
 
   // Filter-Optionen ermitteln
   const filterOptions = useMemo(() => {
+    const infrastructureTypes = new Set<string>()
+    const statuses = new Set<string>()
     const vendors = new Set<string>()
     const locations = new Set<string>()
     const owners = new Set<string>()
     const hostsApplications = new Set<string>()
     const partOfArchitectures = new Set<string>()
 
-    infrastructures.forEach(infra => {
-      if (infra.vendor) vendors.add(infra.vendor)
-      if (infra.location) locations.add(infra.location)
-      if (infra.owners) {
-        infra.owners.forEach(owner => owners.add(`${owner.firstName} ${owner.lastName}`))
+    infrastructures.forEach(infrastructure => {
+      infrastructureTypes.add(infrastructure.infrastructureType)
+      statuses.add(infrastructure.status)
+      if (infrastructure.vendor) vendors.add(infrastructure.vendor)
+      if (infrastructure.location) locations.add(infrastructure.location)
+      if (infrastructure.owners) {
+        infrastructure.owners.forEach(owner => owners.add(`${owner.firstName} ${owner.lastName}`))
       }
-      if (infra.hostsApplications) {
-        infra.hostsApplications.forEach(app => hostsApplications.add(app.name))
+      if (infrastructure.hostsApplications) {
+        infrastructure.hostsApplications.forEach(app => hostsApplications.add(app.name))
       }
-      if (infra.partOfArchitectures) {
-        infra.partOfArchitectures.forEach(arch => partOfArchitectures.add(arch.name))
+      if (infrastructure.partOfArchitectures) {
+        infrastructure.partOfArchitectures.forEach(arch => partOfArchitectures.add(arch.name))
       }
     })
 
     return {
+      availableInfrastructureTypes: Array.from(infrastructureTypes),
+      availableStatuses: Array.from(statuses),
       availableVendors: Array.from(vendors),
       availableLocations: Array.from(locations),
       availableOwners: Array.from(owners),
@@ -282,10 +285,10 @@ const InfrastructurePage = () => {
     })
   }, [])
 
-  // Handler für das Öffnen der Form zum Erstellen einer neuen Infrastruktur
-  const handleCreateInfrastructure = useCallback(() => {
-    setShowNewInfrastructureForm(true)
-  }, [])
+  // Handler für das Öffnen der Form zum Erstellen einer neuen Infrastruktur - ENTFERNT
+  // const handleCreateInfrastructure = useCallback(() => {
+  //   setShowNewInfrastructureForm(true)
+  // }, [])
 
   // Handler für das Erstellen einer neuen Infrastruktur
   const handleCreateInfrastructureSubmit = async (data: InfrastructureFormValues) => {
@@ -364,8 +367,8 @@ const InfrastructurePage = () => {
         },
       })
 
-      // Formular nach dem Erstellen schließen
-      setShowNewInfrastructureForm(false)
+      // Formular nach dem Erstellen schließen - ENTFERNT, wird von GenericTable verwaltet
+      // setShowNewInfrastructureForm(false)
     } catch (error) {
       console.error('Fehler beim Erstellen der Infrastruktur:', error)
     }
@@ -402,20 +405,16 @@ const InfrastructurePage = () => {
       }
 
       // Parent Infrastructure Update - only update if changed
-      const currentParentInfrastructureIds =
+      const currentParentIds =
         currentInfrastructure.parentInfrastructure?.map(parent => parent.id).sort() || []
-      const newParentInfrastructureIds = data.parentInfrastructure?.sort() || []
+      const newParentIds = data.parentInfrastructure?.sort() || []
 
-      const parentInfrastructureChanged =
-        JSON.stringify(currentParentInfrastructureIds) !==
-        JSON.stringify(newParentInfrastructureIds)
-
-      if (parentInfrastructureChanged) {
-        if (newParentInfrastructureIds.length > 0) {
+      if (JSON.stringify(currentParentIds) !== JSON.stringify(newParentIds)) {
+        if (newParentIds.length > 0) {
           input.parentInfrastructure = [
             {
-              disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
-              connect: newParentInfrastructureIds.map(id => ({
+              disconnect: [{ where: {} }],
+              connect: newParentIds.map(id => ({
                 where: {
                   node: { id: { eq: id } },
                 },
@@ -423,52 +422,25 @@ const InfrastructurePage = () => {
             },
           ]
         } else {
-          // Wenn keine Parent Infrastructure ausgewählt ist, alle Verbindungen trennen
           input.parentInfrastructure = [
             {
               disconnect: [{ where: {} }],
-            },
-          ]
-        }
-      }
-
-      // Owners Update - only update if changed
-      const currentOwnerId = currentInfrastructure.owners?.[0]?.id || ''
-      const newOwnerId = data.ownerId || ''
-
-      const ownerChanged = currentOwnerId !== newOwnerId
-
-      if (ownerChanged) {
-        if (newOwnerId) {
-          input.owners = [
-            {
-              disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
-              connect: [{ where: { node: { id: { eq: newOwnerId } } } }], // Neue Verbindung herstellen
-            },
-          ]
-        } else {
-          input.owners = [
-            {
-              disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
             },
           ]
         }
       }
 
       // Child Infrastructures Update - only update if changed
-      const currentChildInfrastructureIds =
+      const currentChildIds =
         currentInfrastructure.childInfrastructures?.map(child => child.id).sort() || []
-      const newChildInfrastructureIds = data.childInfrastructures?.sort() || []
+      const newChildIds = data.childInfrastructures?.sort() || []
 
-      const childInfrastructuresChanged =
-        JSON.stringify(currentChildInfrastructureIds) !== JSON.stringify(newChildInfrastructureIds)
-
-      if (childInfrastructuresChanged) {
-        if (newChildInfrastructureIds.length > 0) {
+      if (JSON.stringify(currentChildIds) !== JSON.stringify(newChildIds)) {
+        if (newChildIds.length > 0) {
           input.childInfrastructures = [
             {
-              disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
-              connect: newChildInfrastructureIds.map(id => ({
+              disconnect: [{ where: {} }],
+              connect: newChildIds.map(id => ({
                 where: {
                   node: { id: { eq: id } },
                 },
@@ -476,7 +448,6 @@ const InfrastructurePage = () => {
             },
           ]
         } else {
-          // Wenn keine Child Infrastructures ausgewählt sind, alle Verbindungen trennen
           input.childInfrastructures = [
             {
               disconnect: [{ where: {} }],
@@ -485,20 +456,17 @@ const InfrastructurePage = () => {
         }
       }
 
-      // Hosts Applications Update - only update if changed
-      const currentHostsApplicationIds =
+      // Hosted Applications Update - only update if changed
+      const currentHostedAppIds =
         currentInfrastructure.hostsApplications?.map(app => app.id).sort() || []
-      const newHostsApplicationIds = data.hostsApplications?.sort() || []
+      const newHostedAppIds = data.hostsApplications?.sort() || []
 
-      const hostsApplicationsChanged =
-        JSON.stringify(currentHostsApplicationIds) !== JSON.stringify(newHostsApplicationIds)
-
-      if (hostsApplicationsChanged) {
-        if (newHostsApplicationIds.length > 0) {
+      if (JSON.stringify(currentHostedAppIds) !== JSON.stringify(newHostedAppIds)) {
+        if (newHostedAppIds.length > 0) {
           input.hostsApplications = [
             {
-              disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
-              connect: newHostsApplicationIds.map(id => ({
+              disconnect: [{ where: {} }],
+              connect: newHostedAppIds.map(id => ({
                 where: {
                   node: { id: { eq: id } },
                 },
@@ -506,7 +474,6 @@ const InfrastructurePage = () => {
             },
           ]
         } else {
-          // Wenn keine Applications ausgewählt sind, alle Verbindungen trennen
           input.hostsApplications = [
             {
               disconnect: [{ where: {} }],
@@ -516,19 +483,16 @@ const InfrastructurePage = () => {
       }
 
       // Part of Architectures Update - only update if changed
-      const currentPartOfArchitectureIds =
+      const currentArchIds =
         currentInfrastructure.partOfArchitectures?.map(arch => arch.id).sort() || []
-      const newPartOfArchitectureIds = data.partOfArchitectures?.sort() || []
+      const newArchIds = data.partOfArchitectures?.sort() || []
 
-      const partOfArchitecturesChanged =
-        JSON.stringify(currentPartOfArchitectureIds) !== JSON.stringify(newPartOfArchitectureIds)
-
-      if (partOfArchitecturesChanged) {
-        if (newPartOfArchitectureIds.length > 0) {
+      if (JSON.stringify(currentArchIds) !== JSON.stringify(newArchIds)) {
+        if (newArchIds.length > 0) {
           input.partOfArchitectures = [
             {
-              disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
-              connect: newPartOfArchitectureIds.map(id => ({
+              disconnect: [{ where: {} }],
+              connect: newArchIds.map(id => ({
                 where: {
                   node: { id: { eq: id } },
                 },
@@ -536,7 +500,6 @@ const InfrastructurePage = () => {
             },
           ]
         } else {
-          // Wenn keine Architectures ausgewählt sind, alle Verbindungen trennen
           input.partOfArchitectures = [
             {
               disconnect: [{ where: {} }],
@@ -550,14 +513,11 @@ const InfrastructurePage = () => {
         currentInfrastructure.depictedInDiagrams?.map(diag => diag.id).sort() || []
       const newDepictedInDiagramIds = data.depictedInDiagrams?.sort() || []
 
-      const depictedInDiagramsChanged =
-        JSON.stringify(currentDepictedInDiagramIds) !== JSON.stringify(newDepictedInDiagramIds)
-
-      if (depictedInDiagramsChanged) {
+      if (JSON.stringify(currentDepictedInDiagramIds) !== JSON.stringify(newDepictedInDiagramIds)) {
         if (newDepictedInDiagramIds.length > 0) {
           input.depictedInDiagrams = [
             {
-              disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
+              disconnect: [{ where: {} }],
               connect: newDepictedInDiagramIds.map(id => ({
                 where: {
                   node: { id: { eq: id } },
@@ -566,8 +526,28 @@ const InfrastructurePage = () => {
             },
           ]
         } else {
-          // Wenn keine Diagramme ausgewählt sind, alle Verbindungen trennen
           input.depictedInDiagrams = [
+            {
+              disconnect: [{ where: {} }],
+            },
+          ]
+        }
+      }
+
+      // Owners Update - only update if changed
+      const currentOwnerId = currentInfrastructure.owners?.[0]?.id || ''
+      const newOwnerId = data.ownerId || ''
+
+      if (currentOwnerId !== newOwnerId) {
+        if (newOwnerId) {
+          input.owners = [
+            {
+              disconnect: [{ where: {} }],
+              connect: [{ where: { node: { id: { eq: newOwnerId } } } }],
+            },
+          ]
+        } else {
+          input.owners = [
             {
               disconnect: [{ where: {} }],
             },
@@ -601,18 +581,9 @@ const InfrastructurePage = () => {
     <Box sx={{ py: 2, px: 1 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
         <Typography variant="h4" component="h1">
-          Infrastruktur
+          Infrastrukturen
         </Typography>
-        {isArchitect() && (
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<AddIcon />}
-            onClick={handleCreateInfrastructure}
-          >
-            Neu erstellen
-          </Button>
-        )}
+        {/* Neu erstellen Button entfernt - wird von GenericTable verwaltet */}
       </Box>
 
       <Card sx={{ mb: 3 }}>
@@ -654,16 +625,7 @@ const InfrastructurePage = () => {
         />
       )}
 
-      {/* Formular für neue Infrastruktur */}
-      {showNewInfrastructureForm && (
-        <InfrastructureForm
-          isOpen={showNewInfrastructureForm}
-          onClose={() => setShowNewInfrastructureForm(false)}
-          onSubmit={handleCreateInfrastructureSubmit}
-          mode="create"
-          loading={isCreating}
-        />
-      )}
+      {/* Formular für neue Infrastruktur - ENTFERNT, wird von GenericTable verwaltet */}
     </Box>
   )
 }
