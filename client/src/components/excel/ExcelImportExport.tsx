@@ -35,11 +35,7 @@ import { useSnackbar } from 'notistack'
 import { useApolloClient, gql } from '@apollo/client'
 import { isAdmin } from '@/lib/auth'
 
-import {
-  exportToExcel,
-  importFromExcel,
-  downloadTemplateWithRealFields,
-} from '../../utils/excelUtils'
+import { exportToExcel, downloadTemplateWithRealFields } from '../../utils/excelUtils'
 import {
   fetchDataByEntityType,
   getFieldNamesByEntityType,
@@ -783,14 +779,6 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
     }
   }, [importSettings.entityType, exportSettings.entityType, exportSettings.format])
 
-  // Zeigt das empfohlene Format für jeden Entity-Typ an
-  const getRecommendedFormat = (entityType: string): string => {
-    if (entityType === 'diagrams') {
-      return 'json'
-    }
-    return 'xlsx'
-  }
-
   // Prüft, ob ein Format für einen Entity-Typ gesperrt werden soll
   const isFormatLocked = (entityType: string, format: string): boolean => {
     // Bei Diagrammen ist nur JSON erlaubt, Excel/CSV sind gesperrt
@@ -798,12 +786,6 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
       return true
     }
     return false
-  }
-
-  // Prüft, ob das aktuelle Format empfohlen wird
-  const isRecommendedFormat = (): boolean => {
-    if (importSettings.entityType === 'all') return true
-    return importSettings.format === getRecommendedFormat(importSettings.entityType)
   }
 
   // File Upload Handler
@@ -941,10 +923,10 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
         // Multi-Tab Import with Two-Phase Approach
         let allData: { [tabName: string]: any[] } = {}
 
-        if (importSettings.format === 'xlsx' && importSettings.entityType !== 'diagrams') {
+        if (importSettings.format === 'xlsx') {
           const { importMultiTabFromExcel } = await import('../../utils/excelUtils')
           allData = await importMultiTabFromExcel(selectedFile)
-        } else if (importSettings.format === 'json' || importSettings.entityType === 'diagrams') {
+        } else if (importSettings.format === 'json') {
           const { importMultiTabFromJson } = await import('../../utils/excelUtils')
           allData = await importMultiTabFromJson(selectedFile)
         }
@@ -1750,8 +1732,17 @@ const ExcelImportExport: React.FC<ExcelImportExportProps> = ({
         return
       }
 
+      // Diagrams werden nicht für Excel-Templates unterstützt
+      if (importSettings.entityType === 'diagrams') {
+        enqueueSnackbar(
+          'Excel-Templates werden für Diagramme nicht unterstützt. Bitte verwenden Sie JSON-Format.',
+          { variant: 'warning' }
+        )
+        return
+      }
+
       const exampleData = getTemplateWithExamples(
-        importSettings.entityType as Exclude<typeof importSettings.entityType, 'all'>
+        importSettings.entityType as Exclude<typeof importSettings.entityType, 'all' | 'diagrams'>
       )
       await exportToExcel(exampleData, {
         filename: `${importSettings.entityType}_template_mit_beispielen`,

@@ -987,35 +987,6 @@ export const getTemplateWithExamples = (
           updatedAt: '2024-06-01T15:30:00.000Z',
         },
       ]
-    case 'diagrams':
-      return [
-        emptyTemplate,
-        {
-          id: 'diagram-001',
-          name: 'System Architecture Diagram',
-          description: 'Overview of the system architecture',
-          createdAt: '2024-01-15T10:30:00.000Z',
-          updatedAt: '2024-06-01T14:45:00.000Z',
-          creator: 'user-123',
-          architecture: 'arch-001',
-          diagramData: JSON.stringify({
-            type: 'excalidraw',
-            version: 1,
-            source: 'SimpleEAM',
-            elements: [
-              {
-                id: 'element1',
-                type: 'rectangle',
-                x: 100,
-                y: 100,
-                width: 200,
-                height: 100,
-                label: 'Example Component',
-              },
-            ],
-          }),
-        },
-      ]
     case 'architecturePrinciples':
       return [
         emptyTemplate,

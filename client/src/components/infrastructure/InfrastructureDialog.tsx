@@ -3,7 +3,7 @@
 import React from 'react'
 import { Dialog } from '@mui/material'
 import { DataObject } from '../../gql/generated'
-import DataObjectForm, { DataObjectFormValues } from './DataObjectForm'
+import DataObjectForm, { DataObjectFormValues } from '../dataobjects/DataObjectForm'
 
 interface DataObjectDialogProps {
   dataObject?: DataObject | null

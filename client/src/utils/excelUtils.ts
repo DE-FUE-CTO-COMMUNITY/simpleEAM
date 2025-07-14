@@ -338,7 +338,7 @@ export const importMultiTabFromJson = (file: File): Promise<{ [tabName: string]:
         }
 
         // Überprüfe, ob das Format korrekt ist (Objekt mit Arrays für jedes Tab)
-        for (const [_, value] of Object.entries(data)) {
+        for (const [, value] of Object.entries(data)) {
           if (!Array.isArray(value)) {
             reject(new Error('Die JSON-Datei hat nicht das erwartete Format für Multi-Tab-Daten'))
             return
