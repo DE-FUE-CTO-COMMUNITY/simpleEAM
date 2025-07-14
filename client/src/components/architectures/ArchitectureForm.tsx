@@ -171,6 +171,9 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
           containsInterfaceIds: Array.isArray(value.containsInterfaceIds)
             ? value.containsInterfaceIds
             : [],
+          containsInfrastructureIds: Array.isArray(value.containsInfrastructureIds)
+            ? value.containsInfrastructureIds
+            : [],
           diagramIds: Array.isArray(value.diagramIds) ? value.diagramIds : [],
           appliedPrincipleIds: Array.isArray(value.appliedPrincipleIds)
             ? value.appliedPrincipleIds
@@ -792,6 +795,46 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
           return result
         }
         return option?.label || ''
+      },
+      getOptionBackgroundColor: (option: any) => {
+        try {
+          // Finde die Infrastruktur und prüfe, ob sie in Diagrammen der aktuellen Architektur dargestellt ist
+          const infraId = typeof option === 'string' ? option : option?.value
+
+          // Sicherstellen, dass infrastructureData existiert
+          if (!infrastructureData?.infrastructures) {
+            return undefined
+          }
+
+          const infra = infrastructureData.infrastructures.find(
+            (infra: any) => infra.id === infraId
+          )
+
+          // Wenn die Infrastruktur nicht gefunden wurde, keine Hintergrundfarbe anwenden
+          if (!infra) {
+            return undefined
+          }
+
+          // Hole die IDs der Diagramme, die zu dieser Architektur gehören
+          const architectureDiagramIds = form.getFieldValue('diagramIds') || []
+
+          // Prüfe, ob die Infrastruktur in mindestens einem Diagramm dieser Architektur dargestellt ist
+          const infraDiagramIds = (infra.depictedInDiagrams || []).map((diag: any) => diag.id)
+
+          // Schnittmenge zwischen den Diagrammen der Infrastruktur und den Diagrammen der Architektur
+          const isDepictedInArchitectureDiagrams = infraDiagramIds.some((diagId: string) =>
+            architectureDiagramIds.includes(diagId)
+          )
+
+          // Markiere gelb, wenn die Infrastruktur nicht in einem Diagramm dieser Architektur dargestellt ist
+          const backgroundColor = !isDepictedInArchitectureDiagrams
+            ? theme.palette.warning.light
+            : undefined
+          return backgroundColor
+        } catch (error) {
+          console.error('Error in infrastructure getOptionBackgroundColor:', error)
+          return undefined
+        }
       },
       isOptionEqualToValue: (option: any, value: any) => {
         if (typeof value === 'string') {

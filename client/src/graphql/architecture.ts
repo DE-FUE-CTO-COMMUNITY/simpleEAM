@@ -89,15 +89,31 @@ export const CREATE_ARCHITECTURE = gql`
           firstName
           lastName
         }
+        containsApplications {
+          id
+          name
+        }
+        containsCapabilities {
+          id
+          name
+        }
+        containsDataObjects {
+          id
+          name
+        }
+        containsInterfaces {
+          id
+          name
+        }
+        containsInfrastructure {
+          id
+          name
+        }
         appliedPrinciples {
           id
           name
           category
           priority
-        }
-        containsInfrastructure {
-          id
-          name
         }
         createdAt
       }
@@ -121,15 +137,31 @@ export const UPDATE_ARCHITECTURE = gql`
           firstName
           lastName
         }
+        containsApplications {
+          id
+          name
+        }
+        containsCapabilities {
+          id
+          name
+        }
+        containsDataObjects {
+          id
+          name
+        }
+        containsInterfaces {
+          id
+          name
+        }
+        containsInfrastructure {
+          id
+          name
+        }
         appliedPrinciples {
           id
           name
           category
           priority
-        }
-        containsInfrastructure {
-          id
-          name
         }
         updatedAt
       }

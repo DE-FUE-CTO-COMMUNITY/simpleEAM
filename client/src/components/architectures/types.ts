@@ -22,6 +22,7 @@ export type ArchitectureType = Pick<
   | 'containsApplications'
   | 'containsCapabilities'
   | 'containsDataObjects'
+  | 'containsInterfaces'
   | 'diagrams'
   | 'childArchitectures'
   | 'parentArchitecture'

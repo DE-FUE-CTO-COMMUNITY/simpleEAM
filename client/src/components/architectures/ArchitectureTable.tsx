@@ -59,6 +59,11 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
     defaultColumnVisibility: {
       description: false, // Beschreibung standardmäßig ausblenden
       appliedPrinciples: false, // Angewandte Prinzipien standardmäßig ausblenden
+      containsCapabilities: false, // Capabilities standardmäßig ausblenden
+      containsApplications: false, // Applikationen standardmäßig ausblenden
+      containsDataObjects: false, // Datenobjekte standardmäßig ausblenden
+      containsInterfaces: false, // Schnittstellen standardmäßig ausblenden
+      containsInfrastructure: false, // Infrastruktur standardmäßig ausblenden
     },
   })
 
@@ -112,6 +117,18 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
           return owners && owners.length > 0 ? `${owners[0].firstName} ${owners[0].lastName}` : '-'
         },
       }),
+      columnHelper.accessor('containsCapabilities', {
+        header: 'Capabilities',
+        cell: info => {
+          const caps = info.getValue()
+          return caps && caps.length > 0
+            ? caps
+                .slice(0, 2)
+                .map(cap => cap.name)
+                .join(', ') + (caps.length > 2 ? '...' : '')
+            : '-'
+        },
+      }),
       columnHelper.accessor('containsApplications', {
         header: 'Applikationen',
         cell: info => {
@@ -124,15 +141,39 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
             : '-'
         },
       }),
-      columnHelper.accessor('containsCapabilities', {
-        header: 'Capabilities',
+      columnHelper.accessor('containsDataObjects', {
+        header: 'Datenobjekte',
         cell: info => {
-          const caps = info.getValue()
-          return caps && caps.length > 0
-            ? caps
+          const objs = info.getValue()
+          return objs && objs.length > 0
+            ? objs
                 .slice(0, 2)
-                .map(cap => cap.name)
-                .join(', ') + (caps.length > 2 ? '...' : '')
+                .map(obj => obj.name)
+                .join(', ') + (objs.length > 2 ? '...' : '')
+            : '-'
+        },
+      }),
+      columnHelper.accessor('containsInterfaces', {
+        header: 'Schnittstellen',
+        cell: info => {
+          const interfaces = info.getValue()
+          return interfaces && interfaces.length > 0
+            ? interfaces
+                .slice(0, 2)
+                .map(intf => intf.name)
+                .join(', ') + (interfaces.length > 2 ? '...' : '')
+            : '-'
+        },
+      }),
+      columnHelper.accessor('containsInfrastructure', {
+        header: 'Infrastruktur',
+        cell: info => {
+          const infrastructure = info.getValue()
+          return infrastructure && infrastructure.length > 0
+            ? infrastructure
+                .slice(0, 2)
+                .map(infra => infra.name)
+                .join(', ') + (infrastructure.length > 2 ? '...' : '')
             : '-'
         },
       }),
@@ -146,19 +187,6 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
                 .map(tag => <Chip key={tag} label={tag} size="small" sx={{ mr: 0.5, mb: 0.5 }} />)
             : '-'
         },
-      }),
-      columnHelper.accessor('containsInfrastructure', {
-        header: 'Infrastructure',
-        cell: info => {
-          const infrastructure = info.getValue()
-          return infrastructure && infrastructure.length > 0
-            ? infrastructure
-                .slice(0, 2)
-                .map(infra => infra.name)
-                .join(', ') + (infrastructure.length > 2 ? '...' : '')
-            : '-'
-        },
-        enableHiding: true,
       }),
       columnHelper.accessor('appliedPrinciples', {
         header: 'Angewandte Prinzipien',
@@ -197,6 +225,7 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
       containsApplicationIds: arch.containsApplications?.map(app => app.id) ?? [],
       containsCapabilityIds: arch.containsCapabilities?.map(cap => cap.id) ?? [],
       containsDataObjectIds: arch.containsDataObjects?.map(obj => obj.id) ?? [],
+      containsInterfaceIds: arch.containsInterfaces?.map(intf => intf.id) ?? [],
       diagramIds: arch.diagrams?.map(diagram => diagram.id) ?? [],
       parentArchitectureId:
         arch.parentArchitecture && arch.parentArchitecture.length > 0

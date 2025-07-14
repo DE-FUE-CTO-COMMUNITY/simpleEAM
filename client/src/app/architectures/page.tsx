@@ -166,6 +166,8 @@ const ArchitecturesPage = () => {
       containsApplicationIds,
       containsCapabilityIds,
       containsDataObjectIds,
+      containsInterfaceIds,
+      containsInfrastructureIds,
       diagramIds,
       parentArchitectureId,
       appliedPrincipleIds,
@@ -218,6 +220,26 @@ const ArchitecturesPage = () => {
             },
           }
         : {}),
+      // Wenn Schnittstellen ausgewählt wurden, verbinden wir sie mit der Architektur
+      ...(containsInterfaceIds && containsInterfaceIds.length > 0
+        ? {
+            containsInterfaces: {
+              connect: containsInterfaceIds.map(id => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }
+        : {}),
+      // Wenn Infrastruktur ausgewählt wurde, verbinden wir sie mit der Architektur
+      ...(containsInfrastructureIds && containsInfrastructureIds.length > 0
+        ? {
+            containsInfrastructure: {
+              connect: containsInfrastructureIds.map(id => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }
+        : {}),
       // Wenn Diagramme ausgewählt wurden, verbinden wir sie mit der Architektur
       ...(diagramIds && diagramIds.length > 0
         ? {
@@ -263,6 +285,8 @@ const ArchitecturesPage = () => {
       containsApplicationIds,
       containsCapabilityIds,
       containsDataObjectIds,
+      containsInterfaceIds,
+      containsInfrastructureIds,
       diagramIds,
       parentArchitectureId,
       appliedPrincipleIds,
@@ -366,6 +390,42 @@ const ArchitecturesPage = () => {
       }
     } else {
       input.containsDataObjects = {
+        disconnect: [{ where: {} }],
+      }
+    }
+
+    // Aktualisierung der Interface-Beziehungen
+    if (containsInterfaceIds && containsInterfaceIds.length > 0) {
+      input.containsInterfaces = {
+        disconnect: [{ where: {} }],
+        connect: containsInterfaceIds.map(intId => ({
+          where: {
+            node: {
+              id: { eq: intId },
+            },
+          },
+        })),
+      }
+    } else {
+      input.containsInterfaces = {
+        disconnect: [{ where: {} }],
+      }
+    }
+
+    // Aktualisierung der Infrastructure-Beziehungen
+    if (containsInfrastructureIds && containsInfrastructureIds.length > 0) {
+      input.containsInfrastructure = {
+        disconnect: [{ where: {} }],
+        connect: containsInfrastructureIds.map(infId => ({
+          where: {
+            node: {
+              id: { eq: infId },
+            },
+          },
+        })),
+      }
+    } else {
+      input.containsInfrastructure = {
         disconnect: [{ where: {} }],
       }
     }
