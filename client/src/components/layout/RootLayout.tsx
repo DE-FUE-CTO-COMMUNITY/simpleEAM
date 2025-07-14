@@ -7,13 +7,13 @@ import {
   Architecture as ArchitectureIcon,
   AccountTree as DiagramIcon,
   Rule as RuleIcon,
-  Storage as InfrastructureIcon,
 } from '@mui/icons-material'
 import {
   BusinessCapabilityIcon,
   ApplicationComponentIcon,
   ApplicationInterfaceIcon,
   BusinessObjectIcon,
+  InfrastructureIcon,
 } from '@/components/icons'
 import { usePathname } from 'next/navigation'
 import { useAuth, isAdmin, isArchitect } from '@/lib/auth'

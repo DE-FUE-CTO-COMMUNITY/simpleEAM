@@ -17,13 +17,13 @@ import {
   Person as PersonIcon,
   Construction as ConstructionIcon,
   Rule as PrincipleIcon,
-  Storage as InfrastructureIcon,
 } from '@mui/icons-material'
 import {
   BusinessCapabilityIcon,
   ApplicationComponentIcon,
   ApplicationInterfaceIcon,
   BusinessObjectIcon,
+  InfrastructureIcon,
 } from '@/components/icons'
 import { useQuery } from '@apollo/client'
 import { useSnackbar } from 'notistack'
@@ -165,7 +165,12 @@ const Dashboard = () => {
   const infrastructuresCount =
     infrastructuresData?.infrastructuresConnection?.aggregate?.count?.nodes || 0
 
-  const totalCount = capabilitiesCount + applicationsCount + dataObjectsCount + interfacesCount + infrastructuresCount
+  const totalCount =
+    capabilitiesCount +
+    applicationsCount +
+    dataObjectsCount +
+    interfacesCount +
+    infrastructuresCount
 
   const isLoading =
     capabilitiesLoading ||
@@ -373,8 +378,8 @@ const Dashboard = () => {
           <Typography variant="body1" paragraph>
             Es wurden insgesamt <strong>{totalCount}</strong> Architekturelemente (Business
             Capabilities, Applikationen, Datenobjekte, Schnittstellen und Infrastruktur) erfasst.
-            Darüber hinaus gibt es {architecturesCount} Architekturen, {principlesCount}{' '}
-            Architektur Prinzipien, {diagramsCount} Diagramme und {personsCount} Personen.
+            Darüber hinaus gibt es {architecturesCount} Architekturen, {principlesCount} Architektur
+            Prinzipien, {diagramsCount} Diagramme und {personsCount} Personen.
           </Typography>
           <Box sx={{ mt: 2 }}>
             <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
