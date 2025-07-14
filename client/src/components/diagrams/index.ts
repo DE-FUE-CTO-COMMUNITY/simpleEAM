@@ -1,7 +1,6 @@
 // Export all diagram components
 export { default as DiagramEditor } from './components/DiagramEditor'
 export { default as CapabilityMapGenerator } from './components/CapabilityMapGenerator'
-export { default as DatabaseLibraryPanel } from './components/DatabaseLibraryPanel'
 export { default as DeleteDiagramDialog } from './components/DeleteDiagramDialog'
 export { default as DiagramNameDisplay } from './components/DiagramNameDisplay'
 export { default as ExcalidrawWrapper } from './components/ExcalidrawWrapper'

@@ -15,27 +15,11 @@ const IntegratedLibrary: React.FC<IntegratedLibraryProps> = ({
   excalidrawAPI,
   onLibraryUpdate,
 }) => {
-  console.log('🚀 IntegratedLibrary - Component mounted/re-rendered')
-  
   const [archimateLibrary, setArchimateLibrary] = useState<any>(null)
 
-  const { data, loading, error } = useQuery(GET_LIBRARY_ELEMENTS, {
+  const { data } = useQuery(GET_LIBRARY_ELEMENTS, {
     errorPolicy: 'all',
     pollInterval: 30000,
-    onCompleted: (data) => {
-      console.log('✅ IntegratedLibrary - GraphQL Query completed:', data)
-      console.log('🔍 Infrastructure data:', data.infrastructures)
-    },
-    onError: (error) => {
-      console.error('❌ IntegratedLibrary - GraphQL Query failed:', error)
-    }
-  })
-  
-  console.log('📊 IntegratedLibrary - Current state:', { 
-    dataExists: !!data, 
-    loading, 
-    hasError: !!error,
-    archimateLibraryLoaded: !!archimateLibrary 
   })
 
   // Load original ArchiMate library
@@ -54,21 +38,9 @@ const IntegratedLibrary: React.FC<IntegratedLibraryProps> = ({
 
   // Create integrated library combining ArchiMate symbols with database elements
   const integratedLibrary = useMemo(() => {
-    console.log('🔧 IntegratedLibrary - Building integrated library')
-    console.log('🔧 archimateLibrary available:', !!archimateLibrary)
-    console.log('🔧 data available:', !!data)
-    
     if (!archimateLibrary || !data) {
-      console.log('⚠️ IntegratedLibrary - Missing archimateLibrary or data, returning null')
       return null
     }
-
-    console.log('📋 Data summary:')
-    console.log('  - businessCapabilities:', data.businessCapabilities?.length || 0)
-    console.log('  - applications:', data.applications?.length || 0)
-    console.log('  - dataObjects:', data.dataObjects?.length || 0)
-    console.log('  - applicationInterfaces:', data.applicationInterfaces?.length || 0)
-    console.log('  - infrastructures:', data.infrastructures?.length || 0)
 
     // Create template elements from ArchiMate library for each type
     const templates = {
@@ -78,11 +50,6 @@ const IntegratedLibrary: React.FC<IntegratedLibraryProps> = ({
       applicationInterface: findArchimateTemplate(archimateLibrary, 'Application Interface'),
       infrastructure: findArchimateTemplate(archimateLibrary, 'Infrastruktur'),
     }
-    
-    console.log('🎨 Templates found:')
-    Object.entries(templates).forEach(([key, template]) => {
-      console.log(`  - ${key}:`, !!template)
-    })
 
     const newLibraryItems: any[] = []
 
@@ -152,24 +119,19 @@ const IntegratedLibrary: React.FC<IntegratedLibraryProps> = ({
     }
 
     if (data.infrastructures) {
-      console.log('🏗️ Processing infrastructures:', data.infrastructures.length)
       // Sort infrastructures alphabetically by name
       const sortedInfrastructures = [...data.infrastructures].sort((a: any, b: any) =>
         a.name.localeCompare(b.name, 'de', { sensitivity: 'base' })
       )
 
       sortedInfrastructures.forEach((infrastructure: any) => {
-        console.log('🏗️ Processing infrastructure:', infrastructure.name)
         const libraryItem = createLibraryItemFromDatabaseElement(
           infrastructure,
           'infrastructure',
           templates.infrastructure
         )
         if (libraryItem) {
-          console.log('✅ Infrastructure library item created:', infrastructure.name)
           newLibraryItems.push(libraryItem)
-        } else {
-          console.log('❌ Failed to create infrastructure library item:', infrastructure.name)
         }
       })
     }
