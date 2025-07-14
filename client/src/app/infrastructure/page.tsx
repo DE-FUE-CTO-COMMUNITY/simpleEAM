@@ -1,8 +1,9 @@
 'use client'
 
 import React, { useState, useCallback, useMemo } from 'react'
-import { Box, Typography, Card, Paper } from '@mui/material'
-import { useAuth } from '@/lib/auth'
+import { Box, Typography, Button, Card, Paper } from '@mui/material'
+import { Add as AddIcon } from '@mui/icons-material'
+import { useAuth, isArchitect } from '@/lib/auth'
 import { SortingState, VisibilityState } from '@tanstack/react-table'
 import { useQuery, useMutation } from '@apollo/client'
 import { useSnackbar } from 'notistack'
@@ -15,7 +16,7 @@ import {
 import InfrastructureTable from '@/components/infrastructure/InfrastructureTable'
 import InfrastructureToolbar from '@/components/infrastructure/InfrastructureToolbar'
 import InfrastructureFilterDialog from '@/components/infrastructure/InfrastructureFilterDialog'
-import { InfrastructureFormValues } from '@/components/infrastructure/InfrastructureForm'
+import InfrastructureForm, { InfrastructureFormValues } from '@/components/infrastructure/InfrastructureForm'
 import { Infrastructure } from '@/gql/generated'
 import { InfrastructureFilterState } from '@/components/infrastructure/InfrastructureFilterDialog'
 
@@ -39,8 +40,8 @@ const InfrastructurePage = () => {
     updatedDateRange: ['', ''],
   })
 
-  // State für die InfrastructureForm - ENTFERNT, wird von GenericTable verwaltet
-  // const [showNewInfrastructureForm, setShowNewInfrastructureForm] = useState(false)
+  // State für das neue Formular
+  const [showNewInfrastructureForm, setShowNewInfrastructureForm] = useState(false)
 
   // GraphQL-Abfrage für Infrastrukturen
   const { data, loading, refetch } = useQuery(GET_INFRASTRUCTURES, {
@@ -286,9 +287,10 @@ const InfrastructurePage = () => {
   }, [])
 
   // Handler für das Öffnen der Form zum Erstellen einer neuen Infrastruktur - ENTFERNT
-  // const handleCreateInfrastructure = useCallback(() => {
-  //   setShowNewInfrastructureForm(true)
-  // }, [])
+  // Handler für das Öffnen des Formulars zur Erstellung einer neuen Infrastruktur
+  const handleCreateInfrastructure = useCallback(() => {
+    setShowNewInfrastructureForm(true)
+  }, [])
 
   // Handler für das Erstellen einer neuen Infrastruktur
   const handleCreateInfrastructureSubmit = async (data: InfrastructureFormValues) => {
@@ -367,8 +369,8 @@ const InfrastructurePage = () => {
         },
       })
 
-      // Formular nach dem Erstellen schließen - ENTFERNT, wird von GenericTable verwaltet
-      // setShowNewInfrastructureForm(false)
+      // Formular nach dem Erstellen schließen
+      setShowNewInfrastructureForm(false)
     } catch (error) {
       console.error('Fehler beim Erstellen der Infrastruktur:', error)
     }
@@ -583,7 +585,16 @@ const InfrastructurePage = () => {
         <Typography variant="h4" component="h1">
           Infrastrukturen
         </Typography>
-        {/* Neu erstellen Button entfernt - wird von GenericTable verwaltet */}
+        {isArchitect() && (
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<AddIcon />}
+            onClick={handleCreateInfrastructure}
+          >
+            Neu erstellen
+          </Button>
+        )}
       </Box>
 
       <Card sx={{ mb: 3 }}>
@@ -625,7 +636,16 @@ const InfrastructurePage = () => {
         />
       )}
 
-      {/* Formular für neue Infrastruktur - ENTFERNT, wird von GenericTable verwaltet */}
+      {/* Formular für neue Infrastruktur */}
+      {showNewInfrastructureForm && (
+        <InfrastructureForm
+          isOpen={showNewInfrastructureForm}
+          onClose={() => setShowNewInfrastructureForm(false)}
+          onSubmit={handleCreateInfrastructureSubmit}
+          mode="create"
+          loading={false}
+        />
+      )}
     </Box>
   )
 }
