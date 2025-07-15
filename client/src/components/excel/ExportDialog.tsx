@@ -61,16 +61,8 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
                     label="Dateiformat"
                     onChange={e => onFormatChange(e.target.value)}
                   >
-                    <MenuItem value="xlsx" disabled={exportSettings.entityType === 'diagrams'}>
-                      Excel (.xlsx)
-                    </MenuItem>
-                    <MenuItem
-                      value="csv"
-                      disabled={
-                        exportSettings.entityType === 'diagrams' ||
-                        exportSettings.entityType === 'all'
-                      }
-                    >
+                    <MenuItem value="xlsx">Excel (.xlsx)</MenuItem>
+                    <MenuItem value="csv" disabled={exportSettings.entityType === 'all'}>
                       CSV (.csv)
                     </MenuItem>
                     <MenuItem value="json">JSON (.json)</MenuItem>
@@ -234,22 +226,41 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
                       'parentArchitecture',
                       'appliedPrinciples',
                     ],
-                    diagrams: [
-                      'id',
-                      'title',
-                      'description',
-                      'diagramType',
-                      'diagramJson',
-                      'createdAt',
-                      'updatedAt',
-                      'creator',
-                      'architecture',
-                      'containsCapabilities',
-                      'containsApplications',
-                      'containsDataObjects',
-                      'containsInterfaces',
-                      'containsInfrastructure',
-                    ],
+                    // Diagramme werden je nach Format unterschiedlich angezeigt
+                    diagrams:
+                      exportSettings.format === 'json'
+                        ? [
+                            'id',
+                            'title',
+                            'description',
+                            'diagramType',
+                            'diagramJson',
+                            'createdAt',
+                            'updatedAt',
+                            'creator',
+                            'architecture',
+                            'containsCapabilities',
+                            'containsApplications',
+                            'containsDataObjects',
+                            'containsInterfaces',
+                            'containsInfrastructure',
+                          ]
+                        : [
+                            'id',
+                            'title',
+                            'description',
+                            'diagramType',
+                            // 'diagramJson' wird bei Excel/CSV-Export ausgeschlossen
+                            'createdAt',
+                            'updatedAt',
+                            'creator',
+                            'architecture',
+                            'containsCapabilities',
+                            'containsApplications',
+                            'containsDataObjects',
+                            'containsInterfaces',
+                            'containsInfrastructure',
+                          ],
                     architecturePrinciples: [
                       'id',
                       'name',
@@ -305,12 +316,32 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
                         <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
                           Export umfasst alle Entitätstypen mit ihren jeweiligen Feldern:
                         </Typography>
+                        {exportSettings.format !== 'json' && (
+                          <Alert severity="info" sx={{ mb: 2 }}>
+                            <Typography variant="body2">
+                              <strong>Hinweis für Excel/CSV-Export:</strong> Diagramme werden ohne
+                              ihre Inhalte (diagramJson) exportiert, da diese zu groß für
+                              Excel-Zellen sind. Alle anderen Metadaten der Diagramme sind
+                              verfügbar.
+                            </Typography>
+                          </Alert>
+                        )}
                         {Object.entries(entityFieldsMapping)
                           .filter(([key]) => key !== 'all')
                           .map(([entityType, entityFields]) => (
                             <Box key={entityType} sx={{ mb: 1 }}>
                               <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 0.5 }}>
                                 {entityTypeLabels[entityType as keyof typeof entityTypeLabels]}:
+                                {entityType === 'diagrams' && exportSettings.format !== 'json' && (
+                                  <Typography
+                                    component="span"
+                                    variant="body2"
+                                    color="textSecondary"
+                                    sx={{ ml: 1 }}
+                                  >
+                                    (ohne diagramJson)
+                                  </Typography>
+                                )}
                               </Typography>
                               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 1 }}>
                                 {entityFields.map((field, index) => (
@@ -333,6 +364,43 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
                               </Box>
                             </Box>
                           ))}
+                      </Box>
+                    )
+                  }
+
+                  // Hinweis für einzelne Diagramm-Exports
+                  if (
+                    exportSettings.entityType === 'diagrams' &&
+                    exportSettings.format !== 'json'
+                  ) {
+                    return (
+                      <Box sx={{ width: '100%' }}>
+                        <Alert severity="info" sx={{ mb: 2 }}>
+                          <Typography variant="body2">
+                            <strong>Hinweis für Excel/CSV-Export:</strong> Das Feld
+                            &quot;diagramJson&quot; wird nicht exportiert, da die Diagramminhalte zu
+                            groß für Excel-Zellen sind. Alle anderen Metadaten sind verfügbar.
+                          </Typography>
+                        </Alert>
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 2 }}>
+                          {fields.map((field, index) => (
+                            <Typography
+                              key={index}
+                              variant="body2"
+                              component="span"
+                              sx={{
+                                backgroundColor: 'primary.main',
+                                color: 'primary.contrastText',
+                                px: 1,
+                                py: 0.5,
+                                borderRadius: 1,
+                                fontSize: '0.75rem',
+                              }}
+                            >
+                              {field}
+                            </Typography>
+                          ))}
+                        </Box>
                       </Box>
                     )
                   }

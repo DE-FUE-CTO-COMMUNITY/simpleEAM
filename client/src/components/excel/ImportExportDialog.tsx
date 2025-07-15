@@ -196,11 +196,6 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
   const handleImport = async () => {
     if (!selectedFile || !validationResult) return
 
-    if (importSettings.entityType === 'diagrams' && importSettings.format !== 'json') {
-      enqueueSnackbar('Für Diagramme ist nur das JSON-Format verfügbar.', { variant: 'info' })
-      return
-    }
-
     setIsImporting(true)
     setImportProgress(0)
 
@@ -339,26 +334,13 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
 
   // Format locking logic
   const handleEntityTypeChange = (newEntityType: string) => {
-    if (newEntityType === 'diagrams' && importSettings.format !== 'json') {
-      enqueueSnackbar('Für Diagramme ist nur das JSON-Format verfügbar.', { variant: 'info' })
-      setImportSettings({
-        ...importSettings,
-        entityType: newEntityType as ImportSettings['entityType'],
-        format: 'json',
-      })
-    } else {
-      setImportSettings({
-        ...importSettings,
-        entityType: newEntityType as ImportSettings['entityType'],
-      })
-    }
+    setImportSettings({
+      ...importSettings,
+      entityType: newEntityType as ImportSettings['entityType'],
+    })
   }
 
   const handleFormatChange = (newFormat: string) => {
-    if (importSettings.entityType === 'diagrams' && newFormat !== 'json') {
-      enqueueSnackbar('Für Diagramme ist nur das JSON-Format verfügbar.', { variant: 'info' })
-      return
-    }
     setImportSettings({
       ...importSettings,
       format: newFormat as ImportSettings['format'],
@@ -367,17 +349,8 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
 
   // Export format locking logic
   const handleExportEntityTypeChange = (newEntityType: string) => {
-    // Für Diagramme: nur JSON erlaubt
-    if (newEntityType === 'diagrams' && exportSettings.format !== 'json') {
-      enqueueSnackbar('Für Diagramme ist nur das JSON-Format verfügbar.', { variant: 'info' })
-      setExportSettings({
-        ...exportSettings,
-        entityType: newEntityType as ExportSettings['entityType'],
-        format: 'json',
-      })
-    }
     // Für Alle Daten: CSV nicht erlaubt, aber Excel und JSON schon
-    else if (newEntityType === 'all' && exportSettings.format === 'csv') {
+    if (newEntityType === 'all' && exportSettings.format === 'csv') {
       enqueueSnackbar(
         'Für den Export aller Daten ist das CSV-Format nicht verfügbar. Verwenden Sie Excel oder JSON.',
         { variant: 'info' }
@@ -396,11 +369,6 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
   }
 
   const handleExportFormatChange = (newFormat: string) => {
-    // Für Diagramme: nur JSON erlaubt
-    if (exportSettings.entityType === 'diagrams' && newFormat !== 'json') {
-      enqueueSnackbar('Für Diagramme ist nur das JSON-Format verfügbar.', { variant: 'info' })
-      return
-    }
     // Für Alle Daten: CSV nicht erlaubt
     if (exportSettings.entityType === 'all' && newFormat === 'csv') {
       enqueueSnackbar(

@@ -91,8 +91,6 @@ const ImportDialog: React.FC<ImportDialogProps> = ({
                       disabled={isFormatLocked(importSettings.entityType, 'xlsx')}
                     >
                       Excel (.xlsx)
-                      {importSettings.entityType === 'diagrams' &&
-                        ' (nicht verfügbar für Diagramme)'}
                     </MenuItem>
                     <MenuItem value="json">JSON (.json)</MenuItem>
                   </Select>

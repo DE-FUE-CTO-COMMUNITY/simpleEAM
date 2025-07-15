@@ -345,6 +345,45 @@ export const fetchDiagramsForExport = async (
 }
 
 /**
+ * Holt echte Diagramme Daten für Excel Export OHNE Diagramminhalte
+ * DiagramJson wird ausgeschlossen, da es zu groß für Excel-Zellen ist
+ */
+export const fetchDiagramsForExcelExport = async (
+  client: ApolloClient<any>
+): Promise<ExcelExportData[]> => {
+  try {
+    const { data } = await client.query({
+      query: GET_DIAGRAMS,
+      fetchPolicy: 'network-only',
+    })
+
+    if (!data?.diagrams) {
+      return []
+    }
+
+    return data.diagrams.map((diagram: any) => ({
+      id: diagram.id,
+      title: diagram.title,
+      description: diagram.description || '',
+      diagramType: diagram.diagramType || '',
+      // diagramJson wird bei Excel-Export ausgeschlossen
+      createdAt: formatDateForExport(diagram.createdAt),
+      updatedAt: formatDateForExport(diagram.updatedAt),
+      creator: diagram.creator?.map((creator: any) => creator.id).join(',') || '',
+      architecture: diagram.architecture?.map((arch: any) => arch.id).join(',') || '',
+      containsCapabilities: diagram.containsCapabilities?.map((cap: any) => cap.id).join(',') || '',
+      containsApplications: diagram.containsApplications?.map((app: any) => app.id).join(',') || '',
+      containsDataObjects: diagram.containsDataObjects?.map((obj: any) => obj.id).join(',') || '',
+      containsInterfaces: diagram.containsInterfaces?.map((iface: any) => iface.id).join(',') || '',
+      containsInfrastructure:
+        diagram.containsInfrastructure?.map((infra: any) => infra.id).join(',') || '',
+    }))
+  } catch {
+    throw new Error('Diagramme konnten nicht geladen werden')
+  }
+}
+
+/**
  * Holt echte Architekturprinzipien Daten für Excel Export
  * Verwendet GraphQL-Feldnamen als Spaltenüberschriften und IDs für Relationen
  */
@@ -482,8 +521,8 @@ export const fetchAllEntitiesForExport = async (
 }
 
 /**
- * Holt alle Entitäten für Excel-Export (ohne Diagramme)
- * Diagrams werden ausgeschlossen, da sie nicht in Excel exportiert werden sollen
+ * Holt alle Entitäten für Excel-Export (mit Diagrammen ohne Inhalte)
+ * Diagrams werden mit allen Metadaten aber ohne diagramJson exportiert
  */
 export const fetchAllEntitiesForExcelExport = async (
   client: ApolloClient<any>
@@ -496,6 +535,7 @@ export const fetchAllEntitiesForExcelExport = async (
       interfaces,
       persons,
       architectures,
+      diagrams, // Für Excel-Export ohne Inhalte
       architecturePrinciples,
       infrastructures,
     ] = await Promise.all([
@@ -505,6 +545,7 @@ export const fetchAllEntitiesForExcelExport = async (
       fetchInterfacesForExport(client),
       fetchPersonsForExport(client),
       fetchArchitecturesForExport(client),
+      fetchDiagramsForExcelExport(client), // Ohne diagramJson
       fetchArchitecturePrinciplesForExport(client),
       fetchInfrastructuresForExport(client),
     ])
@@ -516,6 +557,7 @@ export const fetchAllEntitiesForExcelExport = async (
       Interfaces: interfaces,
       Persons: persons,
       Architectures: architectures,
+      Diagrams: diagrams, // Mit Metadaten aber ohne diagramJson
       'Architecture Principles': architecturePrinciples,
       Infrastructure: infrastructures,
     }
@@ -562,6 +604,56 @@ export const fetchDataByEntityType = async (
       return fetchInfrastructuresForExport(client)
     case 'all':
       return fetchAllEntitiesForExport(client)
+    default:
+      throw new Error(`Unbekannter Entity-Typ: ${entityType}`)
+  }
+}
+
+/**
+ * Holt echte Daten basierend auf dem Entity-Typ und Export-Format
+ */
+export const fetchDataByEntityTypeAndFormat = async (
+  client: ApolloClient<any>,
+  entityType:
+    | 'businessCapabilities'
+    | 'applications'
+    | 'dataObjects'
+    | 'interfaces'
+    | 'persons'
+    | 'architectures'
+    | 'diagrams'
+    | 'architecturePrinciples'
+    | 'infrastructures'
+    | 'all',
+  format: 'xlsx' | 'csv' | 'json'
+): Promise<ExcelExportData[] | { [tabName: string]: ExcelExportData[] }> => {
+  switch (entityType) {
+    case 'businessCapabilities':
+      return fetchBusinessCapabilitiesForExport(client)
+    case 'applications':
+      return fetchApplicationsForExport(client)
+    case 'dataObjects':
+      return fetchDataObjectsForExport(client)
+    case 'interfaces':
+      return fetchInterfacesForExport(client)
+    case 'persons':
+      return fetchPersonsForExport(client)
+    case 'architectures':
+      return fetchArchitecturesForExport(client)
+    case 'diagrams':
+      // Für Excel und CSV ohne diagramJson, für JSON mit diagramJson
+      return format === 'json'
+        ? fetchDiagramsForExport(client)
+        : fetchDiagramsForExcelExport(client)
+    case 'architecturePrinciples':
+      return fetchArchitecturePrinciplesForExport(client)
+    case 'infrastructures':
+      return fetchInfrastructuresForExport(client)
+    case 'all':
+      // Für Excel mit Diagrammen ohne Inhalte, für JSON mit vollständigen Diagrammen
+      return format === 'json'
+        ? fetchAllEntitiesForExport(client)
+        : fetchAllEntitiesForExcelExport(client)
     default:
       throw new Error(`Unbekannter Entity-Typ: ${entityType}`)
   }
@@ -744,6 +836,26 @@ export const getDiagramsTemplate = (): ExcelExportData => ({
 })
 
 /**
+ * Erstellt Template-Daten mit echten GraphQL-Feldnamen für Diagramme (Excel-Export ohne Inhalte)
+ */
+export const getDiagramsForExcelTemplate = (): ExcelExportData => ({
+  id: '',
+  title: '',
+  description: '',
+  diagramType: '', // APPLICATION_LANDSCAPE, ARCHITECTURE, CAPABILITY_MAP, CONCEPTUAL, DATA_FLOW, INTEGRATION_ARCHITECTURE, NETWORK, OTHER, PROCESS, SECURITY_ARCHITECTURE
+  // diagramJson wird bei Excel-Export ausgeschlossen
+  createdAt: '', // ISO-Format: 2024-01-01T12:00:00.000Z
+  updatedAt: '', // ISO-Format: 2024-01-01T12:00:00.000Z
+  creator: '', // Komma-getrennte Creator-IDs (Person)
+  architecture: '', // Komma-getrennte Architecture-IDs
+  containsCapabilities: '', // Komma-getrennte Capability-IDs
+  containsApplications: '', // Komma-getrennte Application-IDs
+  containsDataObjects: '', // Komma-getrennte DataObject-IDs
+  containsInterfaces: '', // Komma-getrennte Interface-IDs
+  containsInfrastructure: '', // Komma-getrennte Infrastructure-IDs
+})
+
+/**
  * Erstellt Template-Daten mit echten GraphQL-Feldnamen für Architekturprinzipien
  */
 export const getArchitecturePrinciplesTemplate = (): ExcelExportData => ({
@@ -822,7 +934,48 @@ export const getTemplateByEntityType = (
     case 'persons':
       return getPersonsTemplate()
     case 'diagrams':
-      return getDiagramTemplate()
+      return getDiagramsTemplate()
+    case 'architectures':
+      return getArchitecturesTemplate()
+    case 'architecturePrinciples':
+      return getArchitecturePrinciplesTemplate()
+    case 'infrastructures':
+      return getInfrastructuresTemplate()
+    default:
+      throw new Error(`Unbekannter Entity-Typ: ${entityType}`)
+  }
+}
+
+/**
+ * Holt Template-Daten basierend auf dem Entity-Typ und Export-Format
+ */
+export const getTemplateByEntityTypeAndFormat = (
+  entityType:
+    | 'businessCapabilities'
+    | 'applications'
+    | 'dataObjects'
+    | 'interfaces'
+    | 'persons'
+    | 'architectures'
+    | 'diagrams'
+    | 'architecturePrinciples'
+    | 'infrastructures',
+  format: 'xlsx' | 'csv' | 'json'
+): ExcelExportData => {
+  switch (entityType) {
+    case 'businessCapabilities':
+      return getBusinessCapabilitiesTemplate()
+    case 'applications':
+      return getApplicationsTemplate()
+    case 'dataObjects':
+      return getDataObjectsTemplate()
+    case 'interfaces':
+      return getInterfacesTemplate()
+    case 'persons':
+      return getPersonsTemplate()
+    case 'diagrams':
+      // Für Excel und CSV ohne diagramJson, für JSON mit diagramJson
+      return format === 'json' ? getDiagramsTemplate() : getDiagramsForExcelTemplate()
     case 'architectures':
       return getArchitecturesTemplate()
     case 'architecturePrinciples':
@@ -858,13 +1011,55 @@ export const getFieldNamesByEntityType = (
       Interfaces: Object.keys(getInterfacesTemplate()),
       Persons: Object.keys(getPersonsTemplate()),
       Architectures: Object.keys(getArchitecturesTemplate()),
-      // diagrams: Object.keys(getDiagramsTemplate()), - Ausgeblendet für Excel-Export
+      Diagrams: Object.keys(getDiagramsTemplate()), // Vollständig für JSON-Export
       'Architecture Principles': Object.keys(getArchitecturePrinciplesTemplate()),
       Infrastructure: Object.keys(getInfrastructuresTemplate()),
     }
   }
 
   const template = getTemplateByEntityType(entityType as Exclude<typeof entityType, 'all'>)
+  return Object.keys(template)
+}
+
+/**
+ * Holt die Feldnamen für die Export-Vorschau basierend auf Format
+ */
+export const getFieldNamesByEntityTypeAndFormat = (
+  entityType:
+    | 'businessCapabilities'
+    | 'applications'
+    | 'dataObjects'
+    | 'interfaces'
+    | 'persons'
+    | 'architectures'
+    | 'diagrams'
+    | 'architecturePrinciples'
+    | 'infrastructures'
+    | 'all',
+  format: 'xlsx' | 'csv' | 'json'
+): string[] | { [tabName: string]: string[] } => {
+  if (entityType === 'all') {
+    return {
+      'Business Capabilities': Object.keys(getBusinessCapabilitiesTemplate()),
+      Applications: Object.keys(getApplicationsTemplate()),
+      'Data Objects': Object.keys(getDataObjectsTemplate()),
+      Interfaces: Object.keys(getInterfacesTemplate()),
+      Persons: Object.keys(getPersonsTemplate()),
+      Architectures: Object.keys(getArchitecturesTemplate()),
+      // Für Excel ohne diagramJson, für JSON mit diagramJson
+      Diagrams:
+        format === 'json'
+          ? Object.keys(getDiagramsTemplate())
+          : Object.keys(getDiagramsForExcelTemplate()),
+      'Architecture Principles': Object.keys(getArchitecturePrinciplesTemplate()),
+      Infrastructure: Object.keys(getInfrastructuresTemplate()),
+    }
+  }
+
+  const template = getTemplateByEntityTypeAndFormat(
+    entityType as Exclude<typeof entityType, 'all'>,
+    format
+  )
   return Object.keys(template)
 }
 

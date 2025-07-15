@@ -71,6 +71,7 @@ export const defaultDeleteSettings: DeleteSettings = {
 }
 
 // Helper-Funktion: Prüft ob ein Format für einen Entity-Type gesperrt ist
-export const isFormatLocked = (entityType: EntityType, format: string): boolean => {
-  return entityType === 'diagrams' && format === 'xlsx'
+export const isFormatLocked = (_entityType: EntityType, _format: string): boolean => {
+  // Keine Formate sind mehr gesperrt - alle Entity-Types können in allen Formaten exportiert werden
+  return false
 }

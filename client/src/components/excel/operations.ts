@@ -176,19 +176,15 @@ export const exportEntityData = async (
 ): Promise<void> => {
   try {
     // Dynamisch importiere die notwendigen Funktionen
-    const { fetchDataByEntityType, fetchAllEntitiesForExport, fetchAllEntitiesForExcelExport } =
-      await import('../../utils/excelDataService')
+    const { fetchDataByEntityTypeAndFormat } = await import('../../utils/excelDataService')
     const { exportToExcel, exportMultiTabToExcel } = await import('../../utils/excelUtils')
 
     if (entityType === 'all') {
-      // Multi-Entity Export
-      const allData =
-        format === 'xlsx'
-          ? await fetchAllEntitiesForExcelExport(apolloClient) // Ohne Diagrams für Excel
-          : await fetchAllEntitiesForExport(apolloClient) // Mit Diagrams für JSON
+      // Multi-Entity Export mit formatspezifischer Datenauswahl
+      const allData = await fetchDataByEntityTypeAndFormat(apolloClient, 'all', format)
 
       if (format === 'xlsx') {
-        await exportMultiTabToExcel(allData, {
+        await exportMultiTabToExcel(allData as { [tabName: string]: any[] }, {
           filename: 'SimpleEAM_Complete_Export',
           format: 'xlsx',
           includeHeaders: true,
@@ -205,8 +201,12 @@ export const exportEntityData = async (
         URL.revokeObjectURL(url)
       }
     } else {
-      // Single Entity Export
-      const data = (await fetchDataByEntityType(apolloClient, entityType as any)) as any[]
+      // Single Entity Export mit formatspezifischer Datenauswahl
+      const data = (await fetchDataByEntityTypeAndFormat(
+        apolloClient,
+        entityType as any,
+        format
+      )) as any[]
 
       const entityTypeLabels: { [key: string]: string } = {
         businessCapabilities: 'Business_Capabilities',
@@ -230,9 +230,7 @@ export const exportEntityData = async (
           includeHeaders: true,
         })
       } else if (format === 'csv') {
-        if (entityType === 'diagrams') {
-          throw new Error('CSV-Export für Diagramme nicht unterstützt')
-        }
+        // CSV-Export für Diagramme ist jetzt möglich (ohne diagramJson)
         await exportToExcel(data, {
           filename,
           sheetName: entityTypeLabels[entityType] || entityType,
