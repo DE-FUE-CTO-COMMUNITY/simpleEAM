@@ -33,7 +33,7 @@ export interface DeleteSettings {
   entityType: Exclude<ImportSettings['entityType'], 'all'>
 }
 
-export interface ExcelImportExportProps {
+export interface ImportExportDialogProps {
   isOpen: boolean
   onClose: () => void
   defaultTab?: 'import' | 'export' | 'management'

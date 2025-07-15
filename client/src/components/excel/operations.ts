@@ -4,17 +4,17 @@ import {
   createEntityInput,
   checkEntityExists,
   transformInputForUpdate,
-  mapRelationshipValues,
+  // mapRelationshipValues, // Unused - commented out
 } from './utils'
 import { ImportWithMappingResult, EntityMapping, ImportResult } from './types'
-import { entityTypeMapping, reverseEntityTypeMapping } from './constants'
+import { entityTypeMapping } from './constants'
 
 // Simplified operations that work with the existing system
 export const importEntityDataWithMapping = async (
   client: ApolloClient<any>,
   data: any[],
   entityType: string,
-  skipRelationships: boolean = false
+  _skipRelationships: boolean = false
 ): Promise<ImportWithMappingResult> => {
   const mutations = getMutationsByEntityType(entityType)
   if (!mutations) {
@@ -182,7 +182,7 @@ export const deleteEntityData = async (
     mutation: gql(deleteMutation),
   })
 
-  return result.data ? Object.values(result.data)[0]?.nodesDeleted || 0 : 0
+  return result.data ? (Object.values(result.data)[0] as any)?.nodesDeleted || 0 : 0
 }
 
 export const refreshDashboardCache = async (): Promise<void> => {

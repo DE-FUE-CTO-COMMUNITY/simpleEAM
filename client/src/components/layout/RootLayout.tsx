@@ -21,7 +21,7 @@ import { useAuth, isAdmin, isArchitect } from '@/lib/auth'
 import AppHeader from './AppHeader'
 import Sidebar, { drawerWidth } from './Sidebar'
 import ExcelIcon from '../icons/ExcelIcon'
-import ExcelImportExport from '../excel/ExcelImportExport'
+import { ImportExportDialog } from '../excel'
 
 // Styled-Komponenten für das Layout
 const Main = styled('main')(({ theme }) => ({
@@ -42,18 +42,18 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
   const pathname = usePathname()
   const { keycloak, authenticated, initialized } = useAuth()
   const [open, setOpen] = useState(true)
-  const [excelDialogOpen, setExcelDialogOpen] = useState(false)
+  const [importExportDialogOpen, setImportExportDialogOpen] = useState(false)
 
   const handleDrawerToggle = () => {
     setOpen(!open)
   }
 
-  const handleExcelDialogOpen = () => {
-    setExcelDialogOpen(true)
+  const handleImportExportDialogOpen = () => {
+    setImportExportDialogOpen(true)
   }
 
-  const handleExcelDialogClose = () => {
-    setExcelDialogOpen(false)
+  const handleImportExportDialogClose = () => {
+    setImportExportDialogOpen(false)
   }
 
   // Wenn Keycloak initialisiert ist, aber der Benutzer nicht authentifiziert ist,
@@ -85,7 +85,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
     ...(initialized && (isAdmin() || isArchitect())
       ? [
           { isDivider: true, text: 'divider', icon: null },
-          { text: 'Import/Export', icon: <ExcelIcon />, onClick: handleExcelDialogOpen },
+          { text: 'Import/Export', icon: <ExcelIcon />, onClick: handleImportExportDialogOpen },
         ]
       : []),
   ]
@@ -121,7 +121,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
       {/* Excel Import/Export Dialog - für Admin- und Architect-Benutzer */}
       {/* Hydration-Fix: Nur rendern wenn Auth initialisiert ist */}
       {initialized && (isAdmin() || isArchitect()) && (
-        <ExcelImportExport isOpen={excelDialogOpen} onClose={handleExcelDialogClose} />
+        <ImportExportDialog isOpen={importExportDialogOpen} onClose={handleImportExportDialogClose} />
       )}
     </Box>
   )
