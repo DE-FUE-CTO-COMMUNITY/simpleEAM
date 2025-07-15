@@ -1,0 +1,73 @@
+import { EntityType, ImportSettings, ExportSettings, DeleteSettings } from './types'
+
+// Entity Type Labels für die UI
+export const entityTypeLabels: Record<EntityType, string> = {
+  businessCapabilities: 'Business Capabilities',
+  applications: 'Anwendungen',
+  dataObjects: 'Datenobjekte',
+  interfaces: 'Schnittstellen',
+  persons: 'Personen',
+  architectures: 'Architekturen',
+  diagrams: 'Diagramme',
+  architecturePrinciples: 'Architekturprinzipien',
+  all: 'Alle Daten',
+}
+
+// Entity Type Mapping für Tab-Namen (Import/Export)
+export const entityTypeMapping: Record<string, string> = {
+  'Business Capabilities': 'businessCapabilities',
+  Applications: 'applications',
+  'Data Objects': 'dataObjects',
+  Interfaces: 'interfaces',
+  Persons: 'persons',
+  Architectures: 'architectures',
+  'Architecture Principles': 'architecturePrinciples',
+  Diagrams: 'diagrams',
+}
+
+// Umkehrung für Export-Tab-Namen
+export const reverseEntityTypeMapping: Record<string, string> = {
+  businessCapabilities: 'Business Capabilities',
+  applications: 'Applications',
+  dataObjects: 'Data Objects',
+  interfaces: 'Interfaces',
+  persons: 'Persons',
+  architectures: 'Architectures',
+  architecturePrinciples: 'Architecture Principles',
+  diagrams: 'Diagrams',
+}
+
+// Format-Optionen
+export const formatOptions = {
+  import: ['xlsx', 'json'] as const,
+  export: ['xlsx', 'csv', 'json'] as const,
+}
+
+// Update-Modus-Optionen
+export const updateModeOptions = [
+  { value: 'overwrite', label: 'Überschreiben' },
+  { value: 'merge', label: 'Zusammenführen' },
+  { value: 'skipExisting', label: 'Bestehende überspringen' },
+] as const
+
+// Standard-Einstellungen
+export const defaultImportSettings: ImportSettings = {
+  entityType: 'businessCapabilities',
+  format: 'xlsx',
+  updateMode: 'overwrite',
+  createTemplate: false,
+}
+
+export const defaultExportSettings: ExportSettings = {
+  entityType: 'businessCapabilities',
+  format: 'xlsx',
+}
+
+export const defaultDeleteSettings: DeleteSettings = {
+  entityType: 'businessCapabilities',
+}
+
+// Helper-Funktion: Prüft ob ein Format für einen Entity-Type gesperrt ist
+export const isFormatLocked = (entityType: EntityType, format: string): boolean => {
+  return entityType === 'diagrams' && format === 'xlsx'
+}
