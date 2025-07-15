@@ -9,6 +9,7 @@ export interface ImportSettings {
     | 'architectures'
     | 'diagrams' // Nur für JSON-Import verfügbar
     | 'architecturePrinciples'
+    | 'infrastructures'
     | 'all'
   format: 'xlsx' | 'json'
   updateMode: 'overwrite' | 'merge' | 'skipExisting'
@@ -25,6 +26,7 @@ export interface ExportSettings {
     | 'architectures'
     | 'diagrams' // Nur für JSON-Export verfügbar
     | 'architecturePrinciples'
+    | 'infrastructures'
     | 'all'
   format: 'xlsx' | 'csv' | 'json'
 }

@@ -11,6 +11,21 @@ interface ExcelExportOptions {
   includeHeaders: boolean
 }
 
+/**
+ * Formatiert den aktuellen Timestamp für Dateinamen
+ */
+const formatTimestampForFilename = (): string => {
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = String(now.getMonth() + 1).padStart(2, '0')
+  const day = String(now.getDate()).padStart(2, '0')
+  const hours = String(now.getHours()).padStart(2, '0')
+  const minutes = String(now.getMinutes()).padStart(2, '0')
+  const seconds = String(now.getSeconds()).padStart(2, '0')
+
+  return `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`
+}
+
 interface MultiTabExportOptions {
   filename: string
   format: 'xlsx'
@@ -55,11 +70,13 @@ export const exportToExcel = async (
   // Verwende fileSave für benutzerinitiierte Downloads (verhindert "unsafe download blocked")
   const fileExtension = options.format === 'xlsx' ? 'xlsx' : 'csv'
   const baseName = options.filename.replace(/\.(xlsx|csv)$/i, '')
+  const timestamp = formatTimestampForFilename()
+  const filenameWithTimestamp = `${baseName}_${timestamp}.${fileExtension}`
 
   // @ts-expect-error - browser-fs-access module resolution
   const { fileSave } = await import('browser-fs-access')
   await fileSave(blob, {
-    fileName: `${baseName}.${fileExtension}`,
+    fileName: filenameWithTimestamp,
     description: `${options.format.toUpperCase()} file`,
     extensions: [`.${fileExtension}`],
     mimeTypes: [mimeType],
@@ -103,11 +120,13 @@ export const exportMultiTabToExcel = async (
 
   // Verwende fileSave für benutzerinitiierte Downloads (verhindert "unsafe download blocked")
   const baseName = options.filename.replace(/\.xlsx$/i, '')
+  const timestamp = formatTimestampForFilename()
+  const filenameWithTimestamp = `${baseName}_${timestamp}.xlsx`
 
   // @ts-expect-error - browser-fs-access type resolution issue
   const { fileSave } = await import('browser-fs-access')
   await fileSave(blob, {
-    fileName: `${baseName}.xlsx`,
+    fileName: filenameWithTimestamp,
     description: 'Excel file',
     extensions: ['.xlsx'],
     mimeTypes: ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'],
@@ -607,6 +626,7 @@ export const downloadTemplateWithRealFields = async (
     | 'architectures'
     | 'diagrams' // Für JSON-Export verfügbar
     | 'architecturePrinciples'
+    | 'infrastructures'
     | 'all'
 ): Promise<void> => {
   // Dynamischen Import für ES-Module-Kompatibilität verwenden
@@ -620,6 +640,7 @@ export const downloadTemplateWithRealFields = async (
     getPersonsTemplate,
     getArchitecturesTemplate,
     getArchitecturePrinciplesTemplate,
+    getInfrastructuresTemplate,
     // getDiagramsTemplate, - Ausgeblendet für Excel-Export
   } = moduleImport
 
@@ -633,6 +654,7 @@ export const downloadTemplateWithRealFields = async (
       Persons: [getPersonsTemplate()],
       Architectures: [getArchitecturesTemplate()],
       'Architecture Principles': [getArchitecturePrinciplesTemplate()],
+      Infrastructure: [getInfrastructuresTemplate()],
       // Diagrams: [getDiagramsTemplate()], - Ausgeblendet für Excel (zu große JSON-Daten)
     }
 
@@ -659,7 +681,7 @@ export const downloadTemplateWithRealFields = async (
   }
 
   await exportToExcel([template], {
-    filename: `${entityTypeLabels[entityType as Exclude<typeof entityType, 'all'>]}_Import_Template`,
+    filename: `${entityTypeLabels[entityType as keyof typeof entityTypeLabels]}_Import_Template`,
     sheetName: 'Import Template',
     format: 'xlsx',
     includeHeaders: true,

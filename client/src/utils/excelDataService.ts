@@ -7,6 +7,7 @@ import { GET_PERSONS } from '../graphql/person'
 import { GET_ARCHITECTURES } from '../graphql/architecture'
 import { GET_DIAGRAMS } from '../graphql/diagram'
 import { GET_ARCHITECTURE_PRINCIPLES } from '../graphql/architecturePrinciple'
+import { GET_INFRASTRUCTURES } from '../graphql/infrastructure'
 
 export interface ExcelExportData {
   [key: string]: string | number | boolean | Date
@@ -21,6 +22,7 @@ export type EntityType =
   | 'architectures'
   | 'diagrams' // Nur für JSON-Format verfügbar
   | 'architecturePrinciples'
+  | 'infrastructures'
   | 'all'
 
 /**
@@ -60,12 +62,22 @@ export const fetchBusinessCapabilitiesForExport = async (
       description: cap.description || '',
       maturityLevel: cap.maturityLevel || 0,
       status: cap.status || '',
+      type: cap.type || '',
       businessValue: cap.businessValue || 0,
+      sequenceNumber: cap.sequenceNumber || 0,
+      introductionDate: formatDateForExport(cap.introductionDate),
+      endDate: formatDateForExport(cap.endDate),
       owners: cap.owners?.map((owner: any) => owner.id).join(',') || '',
       tags: cap.tags?.join(',') || '',
       createdAt: formatDateForExport(cap.createdAt),
       updatedAt: formatDateForExport(cap.updatedAt),
+      children: cap.children?.map((child: any) => child.id).join(',') || '',
       parents: cap.parents?.map((parent: any) => parent.id).join(',') || '',
+      supportedByApplications:
+        cap.supportedByApplications?.map((app: any) => app.id).join(',') || '',
+      partOfArchitectures: cap.partOfArchitectures?.map((arch: any) => arch.id).join(',') || '',
+      relatedDataObjects: cap.relatedDataObjects?.map((obj: any) => obj.id).join(',') || '',
+      depictedInDiagrams: cap.depictedInDiagrams?.map((diag: any) => diag.id).join(',') || '',
     }))
   } catch {
     throw new Error('Fehler beim Laden der Business Capabilities für Export')
@@ -95,21 +107,32 @@ export const fetchApplicationsForExport = async (
       description: app.description || '',
       status: app.status || '',
       criticality: app.criticality || '',
+      timeCategory: app.timeCategory || '',
+      sevenRStrategy: app.sevenRStrategy || '',
       costs: app.costs || 0,
       vendor: app.vendor || '',
       version: app.version || '',
       hostingEnvironment: app.hostingEnvironment || '',
       technologyStack: app.technologyStack?.join(',') || '',
+      planningDate: formatDateForExport(app.planningDate),
       introductionDate: formatDateForExport(app.introductionDate),
+      endOfUseDate: formatDateForExport(app.endOfUseDate),
       endOfLifeDate: formatDateForExport(app.endOfLifeDate),
       owners: app.owners?.map((owner: any) => owner.id).join(',') || '',
+      createdAt: formatDateForExport(app.createdAt),
+      updatedAt: formatDateForExport(app.updatedAt),
       supportsCapabilities: app.supportsCapabilities?.map((cap: any) => cap.id).join(',') || '',
       usesDataObjects: app.usesDataObjects?.map((obj: any) => obj.id).join(',') || '',
       sourceOfInterfaces: app.sourceOfInterfaces?.map((iface: any) => iface.id).join(',') || '',
       targetOfInterfaces: app.targetOfInterfaces?.map((iface: any) => iface.id).join(',') || '',
       partOfArchitectures: app.partOfArchitectures?.map((arch: any) => arch.id).join(',') || '',
-      createdAt: formatDateForExport(app.createdAt),
-      updatedAt: formatDateForExport(app.updatedAt),
+      depictedInDiagrams: app.depictedInDiagrams?.map((diag: any) => diag.id).join(',') || '',
+      parents: app.parents?.map((parent: any) => parent.id).join(',') || '',
+      components: app.components?.map((comp: any) => comp.id).join(',') || '',
+      predecessors: app.predecessors?.map((pred: any) => pred.id).join(',') || '',
+      successors: app.successors?.map((succ: any) => succ.id).join(',') || '',
+      implementsPrinciples: app.implementsPrinciples?.map((prin: any) => prin.id).join(',') || '',
+      hostedOn: app.hostedOn?.map((infra: any) => infra.id).join(',') || '',
     }))
   } catch {
     throw new Error('Fehler beim Laden der Anwendungen für Export')
@@ -137,17 +160,18 @@ export const fetchDataObjectsForExport = async (
       id: obj.id,
       name: obj.name,
       description: obj.description || '',
+      owners: obj.owners?.map((owner: any) => owner.id).join(',') || '',
       classification: obj.classification || '',
       format: obj.format || '',
+      planningDate: formatDateForExport(obj.planningDate),
       introductionDate: formatDateForExport(obj.introductionDate),
+      endOfUseDate: formatDateForExport(obj.endOfUseDate),
       endOfLifeDate: formatDateForExport(obj.endOfLifeDate),
-      owners: obj.owners?.map((owner: any) => owner.id).join(',') || '',
       dataSources: obj.dataSources?.map((app: any) => app.id).join(',') || '',
       usedByApplications: obj.usedByApplications?.map((app: any) => app.id).join(',') || '',
       relatedToCapabilities: obj.relatedToCapabilities?.map((cap: any) => cap.id).join(',') || '',
-      transferredInInterfaces:
-        obj.transferredInInterfaces?.map((iface: any) => iface.id).join(',') || '',
       partOfArchitectures: obj.partOfArchitectures?.map((arch: any) => arch.id).join(',') || '',
+      depictedInDiagrams: obj.depictedInDiagrams?.map((diag: any) => diag.id).join(',') || '',
       createdAt: formatDateForExport(obj.createdAt),
       updatedAt: formatDateForExport(obj.updatedAt),
     }))
@@ -181,14 +205,20 @@ export const fetchInterfacesForExport = async (
       protocol: iface.protocol || '',
       version: iface.version || '',
       status: iface.status || '',
+      planningDate: formatDateForExport(iface.planningDate),
       introductionDate: formatDateForExport(iface.introductionDate),
+      endOfUseDate: formatDateForExport(iface.endOfUseDate),
       endOfLifeDate: formatDateForExport(iface.endOfLifeDate),
+      createdAt: formatDateForExport(iface.createdAt),
+      updatedAt: formatDateForExport(iface.updatedAt),
       responsiblePerson: iface.responsiblePerson?.map((person: any) => person.id).join(',') || '',
       sourceApplications: iface.sourceApplications?.map((app: any) => app.id).join(',') || '',
       targetApplications: iface.targetApplications?.map((app: any) => app.id).join(',') || '',
       dataObjects: iface.dataObjects?.map((obj: any) => obj.id).join(',') || '',
-      createdAt: formatDateForExport(iface.createdAt),
-      updatedAt: formatDateForExport(iface.updatedAt),
+      predecessors: iface.predecessors?.map((pred: any) => pred.id).join(',') || '',
+      successors: iface.successors?.map((succ: any) => succ.id).join(',') || '',
+      partOfArchitectures: iface.partOfArchitectures?.map((arch: any) => arch.id).join(',') || '',
+      depictedInDiagrams: iface.depictedInDiagrams?.map((diag: any) => diag.id).join(',') || '',
     }))
   } catch {
     throw new Error('Fehler beim Laden der Schnittstellen für Export')
@@ -262,9 +292,13 @@ export const fetchArchitecturesForExport = async (
       containsApplications: arch.containsApplications?.map((app: any) => app.id).join(',') || '',
       containsCapabilities: arch.containsCapabilities?.map((cap: any) => cap.id).join(',') || '',
       containsDataObjects: arch.containsDataObjects?.map((obj: any) => obj.id).join(',') || '',
+      containsInterfaces: arch.containsInterfaces?.map((iface: any) => iface.id).join(',') || '',
+      containsInfrastructure:
+        arch.containsInfrastructure?.map((infra: any) => infra.id).join(',') || '',
       diagrams: arch.diagrams?.map((diag: any) => diag.id).join(',') || '',
       childArchitectures: arch.childArchitectures?.map((child: any) => child.id).join(',') || '',
       parentArchitecture: arch.parentArchitecture?.map((parent: any) => parent.id).join(',') || '',
+      appliedPrinciples: arch.appliedPrinciples?.map((prin: any) => prin.id).join(',') || '',
     }))
   } catch {
     throw new Error('Architekturen konnten nicht geladen werden')
@@ -298,6 +332,12 @@ export const fetchDiagramsForExport = async (
       updatedAt: formatDateForExport(diagram.updatedAt),
       creator: diagram.creator?.map((creator: any) => creator.id).join(',') || '',
       architecture: diagram.architecture?.map((arch: any) => arch.id).join(',') || '',
+      containsCapabilities: diagram.containsCapabilities?.map((cap: any) => cap.id).join(',') || '',
+      containsApplications: diagram.containsApplications?.map((app: any) => app.id).join(',') || '',
+      containsDataObjects: diagram.containsDataObjects?.map((obj: any) => obj.id).join(',') || '',
+      containsInterfaces: diagram.containsInterfaces?.map((iface: any) => iface.id).join(',') || '',
+      containsInfrastructure:
+        diagram.containsInfrastructure?.map((infra: any) => infra.id).join(',') || '',
     }))
   } catch {
     throw new Error('Diagramme konnten nicht geladen werden')
@@ -345,6 +385,57 @@ export const fetchArchitecturePrinciplesForExport = async (
 }
 
 /**
+ * Holt echte Infrastruktur-Daten für Excel Export
+ * Verwendet GraphQL-Feldnamen als Spaltenüberschriften und IDs für Relationen
+ */
+export const fetchInfrastructuresForExport = async (
+  client: ApolloClient<any>
+): Promise<ExcelExportData[]> => {
+  try {
+    const { data } = await client.query({
+      query: GET_INFRASTRUCTURES,
+      fetchPolicy: 'network-only',
+    })
+
+    if (!data?.infrastructures) {
+      return []
+    }
+
+    return data.infrastructures.map((infra: any) => ({
+      id: infra.id,
+      name: infra.name,
+      description: infra.description || '',
+      infrastructureType: infra.infrastructureType || '',
+      status: infra.status || '',
+      vendor: infra.vendor || '',
+      version: infra.version || '',
+      capacity: infra.capacity || '',
+      location: infra.location || '',
+      ipAddress: infra.ipAddress || '',
+      operatingSystem: infra.operatingSystem || '',
+      specifications: infra.specifications || '',
+      maintenanceWindow: infra.maintenanceWindow || '',
+      costs: infra.costs || 0,
+      planningDate: formatDateForExport(infra.planningDate),
+      introductionDate: formatDateForExport(infra.introductionDate),
+      endOfUseDate: formatDateForExport(infra.endOfUseDate),
+      endOfLifeDate: formatDateForExport(infra.endOfLifeDate),
+      owners: infra.owners?.map((owner: any) => owner.id).join(',') || '',
+      parentInfrastructure: infra.parentInfrastructure?.id || '',
+      childInfrastructures:
+        infra.childInfrastructures?.map((child: any) => child.id).join(',') || '',
+      hostsApplications: infra.hostsApplications?.map((app: any) => app.id).join(',') || '',
+      partOfArchitectures: infra.partOfArchitectures?.map((arch: any) => arch.id).join(',') || '',
+      depictedInDiagrams: infra.depictedInDiagrams?.map((diag: any) => diag.id).join(',') || '',
+      createdAt: formatDateForExport(infra.createdAt),
+      updatedAt: formatDateForExport(infra.updatedAt),
+    }))
+  } catch {
+    throw new Error('Infrastruktur konnten nicht geladen werden')
+  }
+}
+
+/**
  * Holt alle Entitäten für Admin-Export (Multi-Tab Excel)
  * Hinweis: Diagramme werden beim Excel-Export ausgeblendet, da die JSON-Daten zu groß sind
  */
@@ -361,6 +452,7 @@ export const fetchAllEntitiesForExport = async (
       architectures,
       diagrams, // Für JSON-Export verfügbar
       architecturePrinciples,
+      infrastructures,
     ] = await Promise.all([
       fetchBusinessCapabilitiesForExport(client),
       fetchApplicationsForExport(client),
@@ -370,6 +462,7 @@ export const fetchAllEntitiesForExport = async (
       fetchArchitecturesForExport(client),
       fetchDiagramsForExport(client), // Für JSON-Export verfügbar
       fetchArchitecturePrinciplesForExport(client),
+      fetchInfrastructuresForExport(client),
     ])
 
     return {
@@ -381,6 +474,50 @@ export const fetchAllEntitiesForExport = async (
       Architectures: architectures,
       Diagrams: diagrams, // Für JSON-Export verfügbar
       'Architecture Principles': architecturePrinciples,
+      Infrastructure: infrastructures,
+    }
+  } catch {
+    throw new Error('Fehler beim Laden der kompletten Datenbank')
+  }
+}
+
+/**
+ * Holt alle Entitäten für Excel-Export (ohne Diagramme)
+ * Diagrams werden ausgeschlossen, da sie nicht in Excel exportiert werden sollen
+ */
+export const fetchAllEntitiesForExcelExport = async (
+  client: ApolloClient<any>
+): Promise<{ [tabName: string]: ExcelExportData[] }> => {
+  try {
+    const [
+      businessCapabilities,
+      applications,
+      dataObjects,
+      interfaces,
+      persons,
+      architectures,
+      architecturePrinciples,
+      infrastructures,
+    ] = await Promise.all([
+      fetchBusinessCapabilitiesForExport(client),
+      fetchApplicationsForExport(client),
+      fetchDataObjectsForExport(client),
+      fetchInterfacesForExport(client),
+      fetchPersonsForExport(client),
+      fetchArchitecturesForExport(client),
+      fetchArchitecturePrinciplesForExport(client),
+      fetchInfrastructuresForExport(client),
+    ])
+
+    return {
+      'Business Capabilities': businessCapabilities,
+      Applications: applications,
+      'Data Objects': dataObjects,
+      Interfaces: interfaces,
+      Persons: persons,
+      Architectures: architectures,
+      'Architecture Principles': architecturePrinciples,
+      Infrastructure: infrastructures,
     }
   } catch {
     throw new Error('Fehler beim Laden der kompletten Datenbank')
@@ -401,6 +538,7 @@ export const fetchDataByEntityType = async (
     | 'architectures'
     | 'diagrams'
     | 'architecturePrinciples'
+    | 'infrastructures'
     | 'all'
 ): Promise<ExcelExportData[] | { [tabName: string]: ExcelExportData[] }> => {
   switch (entityType) {
@@ -420,6 +558,8 @@ export const fetchDataByEntityType = async (
       return fetchDiagramsForExport(client)
     case 'architecturePrinciples':
       return fetchArchitecturePrinciplesForExport(client)
+    case 'infrastructures':
+      return fetchInfrastructuresForExport(client)
     case 'all':
       return fetchAllEntitiesForExport(client)
     default:
@@ -436,12 +576,21 @@ export const getBusinessCapabilitiesTemplate = (): ExcelExportData => ({
   description: '',
   maturityLevel: 0,
   status: '',
+  type: '',
   businessValue: 0,
+  sequenceNumber: 0,
+  introductionDate: '', // ISO-Format: 2024-01-01T12:00:00.000Z
+  endDate: '', // ISO-Format: 2024-01-01T12:00:00.000Z
   owners: '', // Komma-getrennte IDs
   tags: '', // Komma-getrennte Tags
   createdAt: '', // ISO-Format: 2024-01-01T12:00:00.000Z
   updatedAt: '', // ISO-Format: 2024-01-01T12:00:00.000Z
+  children: '', // Komma-getrennte Child-IDs
   parents: '', // Komma-getrennte Parent-IDs
+  supportedByApplications: '', // Komma-getrennte Application-IDs
+  partOfArchitectures: '', // Komma-getrennte Architecture-IDs
+  relatedDataObjects: '', // Komma-getrennte DataObject-IDs
+  depictedInDiagrams: '', // Komma-getrennte Diagram-IDs
 })
 
 /**
@@ -453,21 +602,32 @@ export const getApplicationsTemplate = (): ExcelExportData => ({
   description: '',
   status: '',
   criticality: '',
+  timeCategory: '',
+  sevenRStrategy: '',
   costs: 0,
   vendor: '',
   version: '',
   hostingEnvironment: '',
   technologyStack: '', // Komma-getrennte Technologien
+  planningDate: '', // ISO-Format: 2024-01-01T12:00:00.000Z
   introductionDate: '', // ISO-Format: 2024-01-01T12:00:00.000Z
+  endOfUseDate: '', // ISO-Format: 2024-01-01T12:00:00.000Z
   endOfLifeDate: '', // ISO-Format: 2024-01-01T12:00:00.000Z
   owners: '', // Komma-getrennte Owner-IDs
+  createdAt: '', // ISO-Format: 2024-01-01T12:00:00.000Z
+  updatedAt: '', // ISO-Format: 2024-01-01T12:00:00.000Z
   supportsCapabilities: '', // Komma-getrennte Capability-IDs
   usesDataObjects: '', // Komma-getrennte DataObject-IDs
   sourceOfInterfaces: '', // Komma-getrennte Interface-IDs
   targetOfInterfaces: '', // Komma-getrennte Interface-IDs
   partOfArchitectures: '', // Komma-getrennte Architecture-IDs
-  createdAt: '', // ISO-Format: 2024-01-01T12:00:00.000Z
-  updatedAt: '', // ISO-Format: 2024-01-01T12:00:00.000Z
+  depictedInDiagrams: '', // Komma-getrennte Diagram-IDs
+  parents: '', // Komma-getrennte Parent-IDs
+  components: '', // Komma-getrennte Component-IDs
+  predecessors: '', // Komma-getrennte Predecessor-IDs
+  successors: '', // Komma-getrennte Successor-IDs
+  implementsPrinciples: '', // Komma-getrennte Principle-IDs
+  hostedOn: '', // Komma-getrennte Infrastructure-IDs
 })
 
 /**
@@ -477,16 +637,18 @@ export const getDataObjectsTemplate = (): ExcelExportData => ({
   id: '',
   name: '',
   description: '',
+  owners: '', // Komma-getrennte Owner-IDs
   classification: '', // DataClassification enum: PUBLIC, INTERNAL, CONFIDENTIAL, STRICTLY_CONFIDENTIAL
   format: '',
+  planningDate: '', // ISO-Format: 2024-01-01T12:00:00.000Z
   introductionDate: '', // ISO-Format: 2024-01-01T12:00:00.000Z
+  endOfUseDate: '', // ISO-Format: 2024-01-01T12:00:00.000Z
   endOfLifeDate: '', // ISO-Format: 2024-01-01T12:00:00.000Z
-  owners: '', // Komma-getrennte Owner-IDs
   dataSources: '', // Komma-getrennte Application-IDs
   usedByApplications: '', // Komma-getrennte Application-IDs
   relatedToCapabilities: '', // Komma-getrennte Capability-IDs
-  transferredInInterfaces: '', // Komma-getrennte Interface-IDs
   partOfArchitectures: '', // Komma-getrennte Architecture-IDs
+  depictedInDiagrams: '', // Komma-getrennte Diagram-IDs
   createdAt: '', // ISO-Format: 2024-01-01T12:00:00.000Z
   updatedAt: '', // ISO-Format: 2024-01-01T12:00:00.000Z
 })
@@ -502,14 +664,20 @@ export const getInterfacesTemplate = (): ExcelExportData => ({
   protocol: '',
   version: '',
   status: '',
+  planningDate: '', // ISO-Format: 2024-01-01T12:00:00.000Z
   introductionDate: '', // ISO-Format: 2024-01-01T12:00:00.000Z
+  endOfUseDate: '', // ISO-Format: 2024-01-01T12:00:00.000Z
   endOfLifeDate: '', // ISO-Format: 2024-01-01T12:00:00.000Z
+  createdAt: '', // ISO-Format: 2024-01-01T12:00:00.000Z
+  updatedAt: '', // ISO-Format: 2024-01-01T12:00:00.000Z
   responsiblePerson: '', // Person-ID
   sourceApplications: '', // Komma-getrennte Application-IDs
   targetApplications: '', // Komma-getrennte Application-IDs
   dataObjects: '', // Komma-getrennte DataObject-IDs
-  createdAt: '', // ISO-Format: 2024-01-01T12:00:00.000Z
-  updatedAt: '', // ISO-Format: 2024-01-01T12:00:00.000Z
+  predecessors: '', // Komma-getrennte Predecessor-IDs
+  successors: '', // Komma-getrennte Successor-IDs
+  partOfArchitectures: '', // Komma-getrennte Architecture-IDs
+  depictedInDiagrams: '', // Komma-getrennte Diagram-IDs
 })
 
 /**
@@ -541,15 +709,18 @@ export const getArchitecturesTemplate = (): ExcelExportData => ({
   type: '', // CURRENT_STATE, FUTURE_STATE, TRANSITION, CONCEPTUAL
   timestamp: '', // ISO-Format: 2024-01-01T12:00:00.000Z
   tags: '', // Komma-getrennte Tags
+  createdAt: '', // ISO-Format: 2024-01-01T12:00:00.000Z
+  updatedAt: '', // ISO-Format: 2024-01-01T12:00:00.000Z
   owners: '', // Komma-getrennte Owner-IDs
   containsApplications: '', // Komma-getrennte Application-IDs
   containsCapabilities: '', // Komma-getrennte Capability-IDs
   containsDataObjects: '', // Komma-getrennte DataObject-IDs
+  containsInterfaces: '', // Komma-getrennte Interface-IDs
+  containsInfrastructure: '', // Komma-getrennte Infrastructure-IDs
   diagrams: '', // Komma-getrennte Diagram-IDs
   childArchitectures: '', // Komma-getrennte Architecture-IDs
   parentArchitecture: '', // Komma-getrennte Parent Architecture-IDs
-  createdAt: '', // ISO-Format: 2024-01-01T12:00:00.000Z
-  updatedAt: '', // ISO-Format: 2024-01-01T12:00:00.000Z
+  appliedPrinciples: '', // Komma-getrennte Principle-IDs
 })
 
 /**
@@ -561,10 +732,15 @@ export const getDiagramsTemplate = (): ExcelExportData => ({
   description: '',
   diagramType: '', // APPLICATION_LANDSCAPE, ARCHITECTURE, CAPABILITY_MAP, CONCEPTUAL, DATA_FLOW, INTEGRATION_ARCHITECTURE, NETWORK, OTHER, PROCESS, SECURITY_ARCHITECTURE
   diagramJson: '', // Excalidraw JSON data
-  creator: '', // Komma-getrennte Creator-IDs (Person)
-  architecture: '', // Komma-getrennte Architecture-IDs
   createdAt: '', // ISO-Format: 2024-01-01T12:00:00.000Z
   updatedAt: '', // ISO-Format: 2024-01-01T12:00:00.000Z
+  creator: '', // Komma-getrennte Creator-IDs (Person)
+  architecture: '', // Komma-getrennte Architecture-IDs
+  containsCapabilities: '', // Komma-getrennte Capability-IDs
+  containsApplications: '', // Komma-getrennte Application-IDs
+  containsDataObjects: '', // Komma-getrennte DataObject-IDs
+  containsInterfaces: '', // Komma-getrennte Interface-IDs
+  containsInfrastructure: '', // Komma-getrennte Infrastructure-IDs
 })
 
 /**
@@ -588,6 +764,38 @@ export const getArchitecturePrinciplesTemplate = (): ExcelExportData => ({
 })
 
 /**
+ * Erstellt Template-Daten mit echten GraphQL-Feldnamen für Infrastruktur
+ */
+export const getInfrastructuresTemplate = (): ExcelExportData => ({
+  id: '',
+  name: '',
+  description: '',
+  infrastructureType: '', // PHYSICAL_SERVER, VIRTUAL_SERVER, CLOUD_SERVICE, NETWORK_COMPONENT, STORAGE, DATABASE, OTHER
+  status: '', // ACTIVE, INACTIVE, PLANNED, DECOMMISSIONED
+  vendor: '',
+  version: '',
+  capacity: '', // Numerischer Wert
+  location: '',
+  ipAddress: '',
+  operatingSystem: '',
+  specifications: '',
+  maintenanceWindow: '',
+  costs: '', // Numerischer Wert
+  planningDate: '', // ISO-Format: 2024-01-01T12:00:00.000Z
+  introductionDate: '', // ISO-Format: 2024-01-01T12:00:00.000Z
+  endOfUseDate: '', // ISO-Format: 2024-01-01T12:00:00.000Z
+  endOfLifeDate: '', // ISO-Format: 2024-01-01T12:00:00.000Z
+  owners: '', // Komma-getrennte Owner-IDs (Person)
+  parentInfrastructure: '', // Parent Infrastructure-ID
+  childInfrastructures: '', // Komma-getrennte Child Infrastructure-IDs
+  hostsApplications: '', // Komma-getrennte Application-IDs
+  partOfArchitectures: '', // Komma-getrennte Architecture-IDs
+  depictedInDiagrams: '', // Komma-getrennte Diagram-IDs
+  createdAt: '', // ISO-Format: 2024-01-01T12:00:00.000Z
+  updatedAt: '', // ISO-Format: 2024-01-01T12:00:00.000Z
+})
+
+/**
  * Holt Template-Daten basierend auf dem Entity-Typ mit echten GraphQL-Feldnamen
  */
 export const getTemplateByEntityType = (
@@ -600,6 +808,7 @@ export const getTemplateByEntityType = (
     | 'architectures'
     | 'diagrams' // Für JSON-Import verfügbar
     | 'architecturePrinciples'
+    | 'infrastructures'
 ): ExcelExportData => {
   switch (entityType) {
     case 'businessCapabilities':
@@ -616,10 +825,10 @@ export const getTemplateByEntityType = (
       return getDiagramTemplate()
     case 'architectures':
       return getArchitecturesTemplate()
-    // case 'diagrams': - Ausgeblendet für Excel-Operationen
-    //   return getDiagramsTemplate()
     case 'architecturePrinciples':
       return getArchitecturePrinciplesTemplate()
+    case 'infrastructures':
+      return getInfrastructuresTemplate()
     default:
       throw new Error(`Unbekannter Entity-Typ: ${entityType}`)
   }
@@ -638,6 +847,7 @@ export const getFieldNamesByEntityType = (
     | 'architectures'
     | 'diagrams'
     | 'architecturePrinciples'
+    | 'infrastructures'
     | 'all'
 ): string[] | { [tabName: string]: string[] } => {
   if (entityType === 'all') {
@@ -650,10 +860,11 @@ export const getFieldNamesByEntityType = (
       Architectures: Object.keys(getArchitecturesTemplate()),
       // diagrams: Object.keys(getDiagramsTemplate()), - Ausgeblendet für Excel-Export
       'Architecture Principles': Object.keys(getArchitecturePrinciplesTemplate()),
+      Infrastructure: Object.keys(getInfrastructuresTemplate()),
     }
   }
 
-  const template = getTemplateByEntityType(entityType as Exclude<typeof entityType, 'diagrams'>)
+  const template = getTemplateByEntityType(entityType as Exclude<typeof entityType, 'all'>)
   return Object.keys(template)
 }
 

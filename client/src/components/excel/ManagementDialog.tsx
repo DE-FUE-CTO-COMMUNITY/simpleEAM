@@ -16,17 +16,10 @@ import {
   DialogActions,
 } from '@mui/material'
 import Grid from '@mui/material/Grid'
-import {
-  Error as ErrorIcon,
-  Warning as WarningIcon,
-} from '@mui/icons-material'
+import { Error as ErrorIcon, Warning as WarningIcon } from '@mui/icons-material'
 
-import {
-  DeleteSettings,
-} from './types'
-import {
-  entityTypeLabels,
-} from './constants'
+import { DeleteSettings } from './types'
+import { entityTypeLabels } from './constants'
 
 interface ManagementDialogProps {
   deleteSettings: DeleteSettings

@@ -25,12 +25,7 @@ import ExportDialog from './ExportDialog'
 import ManagementDialog from './ManagementDialog'
 
 // Import der Typen und Konstanten
-import {
-  ImportSettings,
-  ExportSettings,
-  DeleteSettings,
-  ValidationResult,
-} from './types'
+import { ImportSettings, ExportSettings, DeleteSettings, ValidationResult } from './types'
 import {
   entityTypeLabels,
   defaultImportSettings,
@@ -252,7 +247,7 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
   const handleExport = async () => {
     setIsExporting(true)
     try {
-      await exportEntityData(exportSettings.entityType, exportSettings.format)
+      await exportEntityData(apolloClient, exportSettings.entityType, exportSettings.format)
       enqueueSnackbar(`${entityTypeLabels[exportSettings.entityType]} erfolgreich exportiert.`, {
         variant: 'success',
       })
@@ -494,11 +489,7 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
         <Box sx={{ display: 'flex', gap: 1 }}>
           {currentTab === 'import' && (
             <>
-              <Button
-                variant="text"
-                startIcon={<DownloadIcon />}
-                onClick={handleDownloadTemplate}
-              >
+              <Button variant="text" startIcon={<DownloadIcon />} onClick={handleDownloadTemplate}>
                 Leeres Template
               </Button>
               <Button

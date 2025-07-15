@@ -9,6 +9,21 @@ import {
 import { ImportWithMappingResult, EntityMapping, ImportResult } from './types'
 import { entityTypeMapping } from './constants'
 
+/**
+ * Formatiert den aktuellen Timestamp für Dateinamen
+ */
+const formatTimestampForFilename = (): string => {
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = String(now.getMonth() + 1).padStart(2, '0')
+  const day = String(now.getDate()).padStart(2, '0')
+  const hours = String(now.getHours()).padStart(2, '0')
+  const minutes = String(now.getMinutes()).padStart(2, '0')
+  const seconds = String(now.getSeconds()).padStart(2, '0')
+
+  return `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`
+}
+
 // Simplified operations that work with the existing system
 export const importEntityDataWithMapping = async (
   client: ApolloClient<any>,
@@ -155,18 +170,91 @@ export const handleSingleTabImport = async (
 }
 
 export const exportEntityData = async (
+  apolloClient: ApolloClient<any>,
   entityType: string,
   format: 'xlsx' | 'csv' | 'json'
 ): Promise<void> => {
-  // Simplified export - just trigger download
-  const filename = `${entityType}-export.${format}`
-  const blob = new Blob(['Export functionality not fully implemented'], { type: 'text/plain' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = filename
-  a.click()
-  URL.revokeObjectURL(url)
+  try {
+    // Dynamisch importiere die notwendigen Funktionen
+    const { fetchDataByEntityType, fetchAllEntitiesForExport, fetchAllEntitiesForExcelExport } =
+      await import('../../utils/excelDataService')
+    const { exportToExcel, exportMultiTabToExcel } = await import('../../utils/excelUtils')
+
+    if (entityType === 'all') {
+      // Multi-Entity Export
+      const allData =
+        format === 'xlsx'
+          ? await fetchAllEntitiesForExcelExport(apolloClient) // Ohne Diagrams für Excel
+          : await fetchAllEntitiesForExport(apolloClient) // Mit Diagrams für JSON
+
+      if (format === 'xlsx') {
+        await exportMultiTabToExcel(allData, {
+          filename: 'SimpleEAM_Complete_Export',
+          format: 'xlsx',
+          includeHeaders: true,
+        })
+      } else if (format === 'json') {
+        const jsonData = JSON.stringify(allData, null, 2)
+        const blob = new Blob([jsonData], { type: 'application/json' })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        const timestamp = formatTimestampForFilename()
+        a.download = `SimpleEAM_Complete_Export_${timestamp}.json`
+        a.click()
+        URL.revokeObjectURL(url)
+      }
+    } else {
+      // Single Entity Export
+      const data = (await fetchDataByEntityType(apolloClient, entityType as any)) as any[]
+
+      const entityTypeLabels: { [key: string]: string } = {
+        businessCapabilities: 'Business_Capabilities',
+        applications: 'Applications',
+        dataObjects: 'Data_Objects',
+        interfaces: 'Interfaces',
+        persons: 'Persons',
+        architectures: 'Architectures',
+        diagrams: 'Diagrams',
+        architecturePrinciples: 'Architecture_Principles',
+        infrastructures: 'Infrastructure',
+      }
+
+      const filename = `${entityTypeLabels[entityType] || entityType}_Export`
+
+      if (format === 'xlsx') {
+        await exportToExcel(data, {
+          filename,
+          sheetName: entityTypeLabels[entityType] || entityType,
+          format: 'xlsx',
+          includeHeaders: true,
+        })
+      } else if (format === 'csv') {
+        if (entityType === 'diagrams') {
+          throw new Error('CSV-Export für Diagramme nicht unterstützt')
+        }
+        await exportToExcel(data, {
+          filename,
+          sheetName: entityTypeLabels[entityType] || entityType,
+          format: 'csv',
+          includeHeaders: true,
+        })
+      } else if (format === 'json') {
+        const jsonData = JSON.stringify(data, null, 2)
+        const blob = new Blob([jsonData], { type: 'application/json' })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        const timestamp = formatTimestampForFilename()
+        a.download = `${filename}_${timestamp}.json`
+        a.click()
+        URL.revokeObjectURL(url)
+      }
+    }
+  } catch (error) {
+    console.error(`Fehler beim Export von ${entityType}:`, error)
+    throw error
+  }
 }
 
 export const deleteEntityData = async (

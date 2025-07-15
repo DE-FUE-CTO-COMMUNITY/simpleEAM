@@ -23,15 +23,8 @@ import {
   Info as InfoIcon,
 } from '@mui/icons-material'
 
-import {
-  ImportSettings,
-  ValidationResult,
-} from './types'
-import {
-  entityTypeLabels,
-  isFormatLocked,
-  updateModeOptions,
-} from './constants'
+import { ImportSettings, ValidationResult } from './types'
+import { entityTypeLabels, isFormatLocked, updateModeOptions } from './constants'
 
 interface ImportDialogProps {
   importSettings: ImportSettings

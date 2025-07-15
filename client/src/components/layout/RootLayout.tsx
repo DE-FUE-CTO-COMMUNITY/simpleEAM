@@ -121,7 +121,10 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
       {/* Excel Import/Export Dialog - für Admin- und Architect-Benutzer */}
       {/* Hydration-Fix: Nur rendern wenn Auth initialisiert ist */}
       {initialized && (isAdmin() || isArchitect()) && (
-        <ImportExportDialog isOpen={importExportDialogOpen} onClose={handleImportExportDialogClose} />
+        <ImportExportDialog
+          isOpen={importExportDialogOpen}
+          onClose={handleImportExportDialogClose}
+        />
       )}
     </Box>
   )
