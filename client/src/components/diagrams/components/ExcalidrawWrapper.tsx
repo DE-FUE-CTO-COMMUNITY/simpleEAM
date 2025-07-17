@@ -115,6 +115,7 @@ const ExcalidrawWrapper = dynamic(
         <div style={{ height: '100%', width: '100%' }}>
           <ExcalidrawTyped
             theme={themeMode}
+            langCode="de-DE"
             name="simple-eam-diagram"
             UIOptions={uiOptions}
             initialData={safeInitialData}

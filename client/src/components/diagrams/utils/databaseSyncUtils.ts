@@ -2,9 +2,9 @@
 import { gql } from '@apollo/client'
 import {
   normalizeText,
+  prepareTextForDatabase,
   findLinkedTextElement,
   ensureTextContainerBindings,
-  updateTextWithContainerBinding,
   updateTextContentOnly,
 } from './textContainerUtils'
 
@@ -313,7 +313,7 @@ export const updateElementName = async (
       mutation,
       variables: {
         id: databaseId,
-        name: newName.trim(),
+        name: prepareTextForDatabase(newName),
       },
     })
 
@@ -326,6 +326,7 @@ export const updateElementName = async (
 
 /**
  * Validiert Datenbankverbindungen und aktualisiert Elementnamen
+ * WICHTIG: Aktualisiert ALLE Instanzen von Elementen mit derselben databaseId
  */
 export const validateAndSyncElements = async (
   apolloClient: any,
@@ -335,6 +336,7 @@ export const validateAndSyncElements = async (
   const missingElements: string[] = []
   const updatedElements: DiagramElement[] = []
 
+  // Verarbeite jede eindeutige databaseId
   for (const element of databaseElements) {
     if (!element.customData?.databaseId || !element.customData?.elementType) continue
 
@@ -350,39 +352,74 @@ export const validateAndSyncElements = async (
       continue
     }
 
-    // Namen synchronisieren wenn nötig - prüfe verschiedene Quellen für aktuellen Namen
-    const currentElementName =
-      element.customData.elementName || element.customData.originalElement?.name
     const databaseName = currentData.name
 
-    // Verwende die gemeinsame Funktion für robuste Text-Element-Suche
-    const textElement = findLinkedTextElement(element, elements)
+    // WICHTIG: Finde ALLE Elemente mit derselben databaseId
+    const allElementsWithSameDbId = elements.filter(el => el.customData?.databaseId === databaseId)
 
-    const displayedName = textElement?.text || textElement?.rawText
+    // Verarbeite jede Instanz des Datenbankelements
+    for (const elementInstance of allElementsWithSameDbId) {
+      // Sichere Prüfung für customData
+      if (!elementInstance.customData) continue
 
-    // Update erforderlich wenn sich der Datenbankname vom gespeicherten Namen unterscheidet
-    // Verwende normalizeText für Vergleiche, um Zeilenumbrüche zu ignorieren
-    // Behandle undefined/null Werte korrekt
-    const normalizedCurrentElementName = normalizeText(currentElementName)
-    const normalizedDisplayedName = normalizeText(displayedName)
-    const normalizedDatabaseName = normalizeText(databaseName)
+      // Namen synchronisieren wenn nötig - prüfe verschiedene Quellen für aktuellen Namen
+      const currentElementName =
+        elementInstance.customData.elementName || elementInstance.customData.originalElement?.name
 
-    // Ein Update ist NUR nötig, wenn sich Namen tatsächlich unterscheiden
-    // Ignoriere lastSyncedName - das ist nur ein interner Tracking-Wert
+      // Verwende die gemeinsame Funktion für robuste Text-Element-Suche
+      const textElement = findLinkedTextElement(elementInstance, elements)
+      const displayedName = textElement?.text || textElement?.rawText
 
-    const isDisplayedNameDifferent =
-      displayedName && normalizedDisplayedName !== normalizedDatabaseName
-    const isOriginalNameDifferent =
-      currentElementName && normalizedCurrentElementName !== normalizedDatabaseName
+      // Update erforderlich wenn sich der Datenbankname vom gespeicherten Namen unterscheidet
+      // Verwende normalizeText für Vergleiche, um Zeilenumbrüche zu ignorieren
+      // Behandle undefined/null Werte korrekt
+      const normalizedCurrentElementName = normalizeText(currentElementName)
+      const normalizedDisplayedName = normalizeText(displayedName)
+      const normalizedDatabaseName = normalizeText(databaseName)
 
-    // Update nur wenn tatsächlich eine Diskrepanz besteht
-    const nameUpdateNeeded = databaseName && (isDisplayedNameDifferent || isOriginalNameDifferent)
+      // Debug: Zeige die Vergleichswerte
+      console.log(
+        `Sync comparison for ${elementType} ${databaseId} (instance ${elementInstance.id}):`
+      )
+      console.log(`  Original displayed: "${displayedName}"`)
+      console.log(`  Normalized displayed: "${normalizedDisplayedName}"`)
+      console.log(`  Database name: "${databaseName}"`)
+      console.log(`  Normalized database: "${normalizedDatabaseName}"`)
 
-    if (nameUpdateNeeded) {
-      // Aktualisiere elementName mit neuen Daten (optimiert)
-      element.customData.elementName = databaseName
-      element.customData.lastSyncedName = databaseName
-      updatedElements.push(element)
+      // Ein Update ist NUR nötig, wenn sich Namen tatsächlich unterscheiden
+      // Ignoriere lastSyncedName - das ist nur ein interner Tracking-Wert
+
+      const isDisplayedNameDifferent =
+        displayedName && normalizedDisplayedName !== normalizedDatabaseName
+      const isOriginalNameDifferent =
+        currentElementName && normalizedCurrentElementName !== normalizedDatabaseName
+
+      // Update nur wenn tatsächlich eine Diskrepanz besteht
+      const nameUpdateNeeded = databaseName && (isDisplayedNameDifferent || isOriginalNameDifferent)
+
+      if (nameUpdateNeeded) {
+        // Aktualisiere elementName mit neuen Daten (optimiert)
+        elementInstance.customData.elementName = databaseName
+        elementInstance.customData.lastSyncedName = databaseName
+
+        // WICHTIG: Auch das zugehörige Text-Element direkt aktualisieren
+        if (textElement) {
+          // Aktualisiere den Text-Inhalt direkt
+          const updatedTextElement = updateTextContentOnly(textElement, databaseName, elements)
+
+          // Füge sowohl das Container-Element als auch das Text-Element zu den Updates hinzu
+          updatedElements.push(elementInstance, updatedTextElement)
+
+          console.log(
+            `Updated text element for ${elementType} ${databaseId} (instance ${elementInstance.id}): "${normalizedDisplayedName}" -> "${databaseName}"`
+          )
+        } else {
+          console.warn(
+            `No text element found for ${elementType} ${databaseId} (instance ${elementInstance.id})`
+          )
+          updatedElements.push(elementInstance)
+        }
+      }
     }
   }
 
@@ -476,115 +513,13 @@ export const syncDiagramOnOpen = async (apolloClient: any, diagramData: any): Pr
   // Aktualisiere Elemente mit neuen Namen
   let updatedElements = [...diagramData.elements]
 
-  // Anwenden der Namen-Updates auf alle verwandten Elemente
+  // Aktualisiere Elemente basierend auf den Validierungsergebnissen
   for (const updatedElement of validationResult.updatedElements) {
-    const newName =
-      updatedElement.customData?.elementName || updatedElement.customData?.originalElement?.name
-    if (!newName) {
-      console.warn(`No new name found for updated element ${updatedElement.id}`)
-      continue
+    const elementIndex = updatedElements.findIndex(el => el.id === updatedElement.id)
+    if (elementIndex !== -1) {
+      // Ersetze das Element im Array
+      updatedElements[elementIndex] = updatedElement
     }
-
-    // Normalisiere den neuen Namen (entferne Zeilenumbrüche)
-    const normalizedNewName = normalizeText(newName)
-
-    // Aktualisiere das Hauptelement und alle verwandten Elemente
-    updatedElements = updatedElements.map(element => {
-      // Hauptelement aktualisieren
-      if (element.id === updatedElement.id) {
-        return {
-          ...element,
-          customData: {
-            ...element.customData,
-            elementName:
-              updatedElement.customData?.elementName ||
-              updatedElement.customData?.originalElement?.name,
-            lastSyncedName: normalizedNewName,
-          },
-        }
-      }
-
-      // Text-Elemente aktualisieren - erweiterte Verknüpfungsstrategien
-      const isLinkedTextElement =
-        element.type === 'text' &&
-        // 1. Direkte Verknüpfung über mainElementId
-        (element.customData?.mainElementId === updatedElement.id ||
-          // 2. Verknüpfung über dieselbe databaseId
-          (element.customData?.databaseId === updatedElement.customData?.databaseId &&
-            updatedElement.customData?.databaseId) ||
-          // 3. Text-Elemente ohne customData, die Namen-Match haben
-          (!element.customData?.isFromDatabase &&
-            (normalizeText(element.text) ===
-              normalizeText(
-                updatedElement.customData?.elementName ||
-                  updatedElement.customData?.originalElement?.name
-              ) ||
-              normalizeText(element.rawText) ===
-                normalizeText(
-                  updatedElement.customData?.elementName ||
-                    updatedElement.customData?.originalElement?.name
-                ) ||
-              normalizeText(element.text) ===
-                normalizeText(updatedElement.customData?.lastSyncedName) ||
-              normalizeText(element.rawText) ===
-                normalizeText(updatedElement.customData?.lastSyncedName))) ||
-          // 4. Proximity-basierte Suche für Text-Elemente in der Nähe
-          (element.x !== undefined &&
-            element.y !== undefined &&
-            updatedElement.x !== undefined &&
-            updatedElement.y !== undefined &&
-            Math.abs(element.x - updatedElement.x) < 100 &&
-            Math.abs(element.y - updatedElement.y) < 100 &&
-            (normalizeText(element.text).includes(
-              normalizeText(
-                updatedElement.customData?.elementName ||
-                  updatedElement.customData?.originalElement?.name
-              ).split(' ')[0]
-            ) ||
-              normalizeText(
-                updatedElement.customData?.elementName ||
-                  updatedElement.customData?.originalElement?.name
-              ).includes(normalizeText(element.text).split(' ')[0]))))
-
-      // Text-Elemente aktualisieren - verwende updateTextWithContainerBinding
-      if (isLinkedTextElement) {
-        // Finde den tatsächlichen Container-Element (Rectangle, Diamond, etc.)
-        const containerElement = updatedElements.find(
-          el =>
-            (el.type === 'rectangle' || el.type === 'diamond' || el.type === 'ellipse') &&
-            (el.boundElements?.some((bound: any) => bound.id === element.id) ||
-              el.customData?.databaseId === updatedElement.customData?.databaseId ||
-              el.id === updatedElement.id)
-        )
-
-        // WICHTIG: Für Datenbank-Sync wird IMMER der ursprüngliche, ungetrennte Text verwendet!
-        // Der Text wird nur in der Anzeige getrennt, niemals in der Datenbank gespeichert.
-
-        // Verwende updateTextContentOnly für Datenbank-Sync um Position zu erhalten
-        // HIER wird der ORIGINAL-Text (normalizedNewName) verwendet, NICHT der getrennte Text
-        let updatedTextElement = updateTextContentOnly(element, normalizedNewName)
-
-        // Nur bei neuen Elementen oder wenn explizit gewünscht, verwende Container-Binding
-        const isNewElement = !element.x || !element.y || element.x === 0 || element.y === 0
-        if (isNewElement && containerElement) {
-          updatedTextElement = updateTextWithContainerBinding(
-            element,
-            normalizedNewName,
-            containerElement
-          )
-        }
-
-        return {
-          ...updatedTextElement,
-          customData: {
-            ...element.customData,
-            lastSyncedName: normalizedNewName, // Store original name for sync tracking
-          },
-        }
-      }
-
-      return element
-    })
   }
 
   // WICHTIG: Markiere fehlende UND entferne Markierungen für gefundene Elemente
