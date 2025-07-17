@@ -478,7 +478,8 @@ export const syncDiagramOnOpen = async (apolloClient: any, diagramData: any): Pr
 
   // Anwenden der Namen-Updates auf alle verwandten Elemente
   for (const updatedElement of validationResult.updatedElements) {
-    const newName = updatedElement.customData?.originalElement?.name
+    const newName =
+      updatedElement.customData?.elementName || updatedElement.customData?.originalElement?.name
     if (!newName) {
       console.warn(`No new name found for updated element ${updatedElement.id}`)
       continue
@@ -496,8 +497,8 @@ export const syncDiagramOnOpen = async (apolloClient: any, diagramData: any): Pr
           customData: {
             ...element.customData,
             elementName:
-              updatedElement.customData?.originalElement?.name ||
-              updatedElement.customData?.elementName,
+              updatedElement.customData?.elementName ||
+              updatedElement.customData?.originalElement?.name,
             lastSyncedName: normalizedNewName,
           },
         }
@@ -514,9 +515,15 @@ export const syncDiagramOnOpen = async (apolloClient: any, diagramData: any): Pr
           // 3. Text-Elemente ohne customData, die Namen-Match haben
           (!element.customData?.isFromDatabase &&
             (normalizeText(element.text) ===
-              normalizeText(updatedElement.customData?.originalElement?.name) ||
+              normalizeText(
+                updatedElement.customData?.elementName ||
+                  updatedElement.customData?.originalElement?.name
+              ) ||
               normalizeText(element.rawText) ===
-                normalizeText(updatedElement.customData?.originalElement?.name) ||
+                normalizeText(
+                  updatedElement.customData?.elementName ||
+                    updatedElement.customData?.originalElement?.name
+                ) ||
               normalizeText(element.text) ===
                 normalizeText(updatedElement.customData?.lastSyncedName) ||
               normalizeText(element.rawText) ===
@@ -529,11 +536,15 @@ export const syncDiagramOnOpen = async (apolloClient: any, diagramData: any): Pr
             Math.abs(element.x - updatedElement.x) < 100 &&
             Math.abs(element.y - updatedElement.y) < 100 &&
             (normalizeText(element.text).includes(
-              normalizeText(updatedElement.customData?.originalElement?.name).split(' ')[0]
+              normalizeText(
+                updatedElement.customData?.elementName ||
+                  updatedElement.customData?.originalElement?.name
+              ).split(' ')[0]
             ) ||
-              normalizeText(updatedElement.customData?.originalElement?.name).includes(
-                normalizeText(element.text).split(' ')[0]
-              ))))
+              normalizeText(
+                updatedElement.customData?.elementName ||
+                  updatedElement.customData?.originalElement?.name
+              ).includes(normalizeText(element.text).split(' ')[0]))))
 
       // Text-Elemente aktualisieren - verwende updateTextWithContainerBinding
       if (isLinkedTextElement) {
