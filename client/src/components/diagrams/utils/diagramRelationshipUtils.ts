@@ -3,7 +3,7 @@ import { ElementType } from '@/graphql/library'
 interface DatabaseElementReference {
   id: string
   elementType: ElementType | 'businessCapability' // Fix: Legacy-Typ für Rückwärtskompatibilität
-  originalElement: any
+  elementName: string // Optimierung: Nur der Name statt kompletter originalElement
 }
 
 interface DiagramElement {
@@ -13,7 +13,8 @@ interface DiagramElement {
     isFromDatabase?: boolean
     databaseId?: string
     elementType?: ElementType | 'businessCapability' // Fix: Legacy-Typ für Rückwärtskompatibilität
-    originalElement?: any
+    elementName?: string // Optimierung: Nur der Name statt kompletter originalElement
+    originalElement?: any // Für Rückwärtskompatibilität beibehalten
     isMainElement?: boolean
     mainElementId?: string
   }
@@ -63,7 +64,8 @@ export const extractDatabaseElementsFromDiagram = (
             element.customData.elementType === 'businessCapability'
               ? 'capability'
               : element.customData.elementType!, // Normalisiere legacy elementType
-          originalElement: element.customData.originalElement,
+          elementName:
+            element.customData.elementName || element.customData.originalElement?.name || '',
         }
 
         databaseElements.push(dbElement)
@@ -88,7 +90,10 @@ export const extractDatabaseElementsFromDiagram = (
           databaseElements.push({
             id: elementId,
             elementType: mainElement.customData.elementType!,
-            originalElement: mainElement.customData.originalElement,
+            elementName:
+              mainElement.customData.elementName ||
+              mainElement.customData.originalElement?.name ||
+              '',
           })
         }
       }

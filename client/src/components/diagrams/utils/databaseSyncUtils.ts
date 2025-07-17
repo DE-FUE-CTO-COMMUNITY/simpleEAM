@@ -22,7 +22,8 @@ interface DiagramElement {
       | 'infrastructure'
       | 'businessCapability'
       | 'applicationInterface'
-    originalElement?: any
+    elementName?: string // Optimierung: Nur der Name statt kompletter originalElement
+    originalElement?: any // Für Rückwärtskompatibilität beibehalten
     isMainElement?: boolean
     mainElementId?: string
     lastSyncedName?: string
@@ -350,7 +351,8 @@ export const validateAndSyncElements = async (
     }
 
     // Namen synchronisieren wenn nötig - prüfe verschiedene Quellen für aktuellen Namen
-    const currentElementName = element.customData.originalElement?.name
+    const currentElementName =
+      element.customData.elementName || element.customData.originalElement?.name
     const databaseName = currentData.name
 
     // Verwende die gemeinsame Funktion für robuste Text-Element-Suche
@@ -377,11 +379,8 @@ export const validateAndSyncElements = async (
     const nameUpdateNeeded = databaseName && (isDisplayedNameDifferent || isOriginalNameDifferent)
 
     if (nameUpdateNeeded) {
-      // Aktualisiere originalElement mit neuen Daten
-      element.customData.originalElement = {
-        ...element.customData.originalElement,
-        ...currentData,
-      }
+      // Aktualisiere elementName mit neuen Daten (optimiert)
+      element.customData.elementName = databaseName
       element.customData.lastSyncedName = databaseName
       updatedElements.push(element)
     }
@@ -496,7 +495,9 @@ export const syncDiagramOnOpen = async (apolloClient: any, diagramData: any): Pr
           ...element,
           customData: {
             ...element.customData,
-            originalElement: updatedElement.customData?.originalElement,
+            elementName:
+              updatedElement.customData?.originalElement?.name ||
+              updatedElement.customData?.elementName,
             lastSyncedName: normalizedNewName,
           },
         }
@@ -634,7 +635,9 @@ export const syncDiagramOnSave = async (
 
     const currentName = normalizeText(textElement.text || textElement.rawText)
     const lastSyncedName = normalizeText(
-      element.customData.lastSyncedName || element.customData.originalElement?.name
+      element.customData.lastSyncedName ||
+        element.customData.elementName ||
+        element.customData.originalElement?.name
     )
 
     // Prüfe ob sich der Name geändert hat (mit normalisiertem Text)
@@ -652,11 +655,8 @@ export const syncDiagramOnSave = async (
       if (success) {
         // Aktualisiere lastSyncedName mit normalisiertem Namen
         element.customData.lastSyncedName = normalizedName
-        // WICHTIG: originalElement.name muss immer der saubere Datenbankname sein (ohne Zeilenumbrüche)
-        element.customData.originalElement = {
-          ...element.customData.originalElement,
-          name: normalizedName, // Verwende normalisierten Namen, nicht den angezeigten Text
-        }
+        // WICHTIG: Verwende nur elementName, nicht originalElement.name für bessere Performance
+        element.customData.elementName = normalizedName
         updatedCount++
       } else {
         console.error(`Failed to update name for ${element.customData.databaseId}`)

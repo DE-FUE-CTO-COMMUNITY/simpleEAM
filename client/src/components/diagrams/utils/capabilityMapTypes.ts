@@ -68,7 +68,8 @@ export interface ExcalidrawElement {
   customData?: {
     databaseId?: string
     elementType?: string
-    originalElement?: any
+    elementName?: string // Optimierung: Nur der Name statt kompletter originalElement
+    originalElement?: any // Für Rückwärtskompatibilität beibehalten
     isFromDatabase?: boolean
     isMainElement?: boolean
   }

@@ -299,10 +299,11 @@ function createLibraryItemFromDatabaseElement(dbElement: any, elementType: strin
     // Store database metadata in customData - ONLY in the first element to avoid redundancy
     if (index === 0) {
       // Das erste Element (Hauptelement) erhält alle Datenbank-Metadaten
+      // Optimierung: Speichere nur elementName statt des kompletten originalElement
       newElement.customData = {
         databaseId: dbElement.id,
         elementType,
-        originalElement: dbElement,
+        elementName: dbElement.name, // Nur der Name statt kompletter originalElement
         isFromDatabase: true,
         isMainElement: true, // Markiere als Hauptelement
       }

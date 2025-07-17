@@ -23,7 +23,8 @@ interface DiagramElement {
       | 'infrastructure'
       | 'businessCapability'
       | 'applicationInterface'
-    originalElement?: any
+    elementName?: string // Optimierung: Nur der Name statt kompletter originalElement
+    originalElement?: any // Für Rückwärtskompatibilität beibehalten
     isMainElement?: boolean
     mainElementId?: string
     lastSyncedName?: string
@@ -399,12 +400,11 @@ export const updateElementsWithDatabaseReferences = (
         databaseId: createdElement.databaseId,
         elementType: createdElement.elementType as any, // Type assertion for compatibility
         isMainElement: true,
-        originalElement: {
-          id: createdElement.databaseId,
-          // WICHTIG: Normalisiere den Namen (entferne Zeilenumbrüche)
-          name: extractElementText(element, []).trim().replace(/\n/g, ' ').replace(/\s+/g, ' '),
-          elementType: createdElement.elementType,
-        },
+        // Optimierung: Speichere nur elementName statt kompletter originalElement
+        elementName: extractElementText(element, [])
+          .trim()
+          .replace(/\n/g, ' ')
+          .replace(/\s+/g, ' '),
       },
     }
 

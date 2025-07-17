@@ -214,8 +214,13 @@ export const findLinkedTextElement = (
     )
 
     // Von den nahen Texten, finde den mit passendem Inhalt
-    if (containerElement.customData?.originalElement?.name) {
-      const expectedName = normalizeText(containerElement.customData.originalElement.name)
+    if (
+      containerElement.customData?.elementName ||
+      containerElement.customData?.originalElement?.name
+    ) {
+      const expectedName = normalizeText(
+        containerElement.customData.elementName || containerElement.customData.originalElement?.name
+      )
       for (const textEl of nearbyTexts) {
         const textContent = normalizeText(textEl.text || textEl.rawText)
         if (

@@ -23,7 +23,8 @@ interface DiagramElement {
       | 'interface'
       | 'businessCapability'
       | 'applicationInterface'
-    originalElement?: any
+    elementName?: string // Optimierung: Nur der Name statt kompletter originalElement
+    originalElement?: any // Für Rückwärtskompatibilität beibehalten
     isMainElement?: boolean
     mainElementId?: string
     lastSyncedName?: string
@@ -179,13 +180,19 @@ const extractElementName = (
 ): string | null => {
   // Für Datenbank-Elemente: Priorität liegt auf dem ursprünglichen DB-Namen
   if (element.customData?.isFromDatabase) {
-    // 1. HÖCHSTE Priorität: originalElement name (echter Datenbankname ohne Zeilenumbrüche)
+    // 1. HÖCHSTE Priorität: elementName (optimiert, statt originalElement.name)
+    if (element.customData.elementName) {
+      const dbName = normalizeElementName(element.customData.elementName)
+      return dbName
+    }
+
+    // 2. Fallback: originalElement.name (für Rückwärtskompatibilität)
     if (element.customData.originalElement?.name) {
       const dbName = normalizeElementName(element.customData.originalElement.name)
       return dbName
     }
 
-    // 2. Priorität: Direkt im Element gespeicherter Text (falls kein originalElement)
+    // 3. Priorität: Direkt im Element gespeicherter Text (falls kein elementName)
     if (element.text || element.rawText) {
       const directText = normalizeElementName(element.text || element.rawText || '')
       return directText

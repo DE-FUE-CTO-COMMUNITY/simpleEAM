@@ -1,4 +1,5 @@
 import { STORAGE_KEYS } from '../types/DiagramTypes'
+import { optimizeDiagramOnOpen, optimizeDiagramOnSave } from './diagramOptimizationUtils'
 
 // Viewport State Interface
 export interface ViewportState {
@@ -15,51 +16,57 @@ export const restoreSceneData = (sceneData: any) => {
     return sceneData
   }
 
+  // Optimize diagram data by replacing originalElement with elementName
+  const optimizedSceneData = optimizeDiagramOnOpen(sceneData)
+
   // Remove problematic properties that can cause issues in Docker environments
   if (
-    sceneData.appState.collaborators &&
-    typeof sceneData.appState.collaborators.clear === 'function'
+    optimizedSceneData.appState.collaborators &&
+    typeof optimizedSceneData.appState.collaborators.clear === 'function'
   ) {
-    sceneData.appState.collaborators.clear()
+    optimizedSceneData.appState.collaborators.clear()
   } else {
-    sceneData.appState.collaborators = new Map()
+    optimizedSceneData.appState.collaborators = new Map()
   }
 
   // Initialize editing states ONLY if they are undefined/null to prevent controlled/uncontrolled issues
   // DO NOT reset existing valid values as this causes React warnings
   if (
-    sceneData.appState.selectedElementIds === undefined ||
-    sceneData.appState.selectedElementIds === null
+    optimizedSceneData.appState.selectedElementIds === undefined ||
+    optimizedSceneData.appState.selectedElementIds === null
   ) {
-    sceneData.appState.selectedElementIds = {}
+    optimizedSceneData.appState.selectedElementIds = {}
   }
   if (
-    sceneData.appState.hoveredElementIds === undefined ||
-    sceneData.appState.hoveredElementIds === null
+    optimizedSceneData.appState.hoveredElementIds === undefined ||
+    optimizedSceneData.appState.hoveredElementIds === null
   ) {
-    sceneData.appState.hoveredElementIds = {}
+    optimizedSceneData.appState.hoveredElementIds = {}
   }
   if (
-    sceneData.appState.selectedGroupIds === undefined ||
-    sceneData.appState.selectedGroupIds === null
+    optimizedSceneData.appState.selectedGroupIds === undefined ||
+    optimizedSceneData.appState.selectedGroupIds === null
   ) {
-    sceneData.appState.selectedGroupIds = {}
+    optimizedSceneData.appState.selectedGroupIds = {}
   }
-  if (sceneData.appState.selectedLinearElement === undefined) {
-    sceneData.appState.selectedLinearElement = null
+  if (optimizedSceneData.appState.selectedLinearElement === undefined) {
+    optimizedSceneData.appState.selectedLinearElement = null
   }
-  if (sceneData.appState.editingLinearElement === undefined) {
-    sceneData.appState.editingLinearElement = null
+  if (optimizedSceneData.appState.editingLinearElement === undefined) {
+    optimizedSceneData.appState.editingLinearElement = null
   }
   // Ensure proper timing-independent state
-  if (sceneData.appState.isLoading === undefined || sceneData.appState.isLoading === null) {
-    sceneData.appState.isLoading = false
+  if (
+    optimizedSceneData.appState.isLoading === undefined ||
+    optimizedSceneData.appState.isLoading === null
+  ) {
+    optimizedSceneData.appState.isLoading = false
   }
-  if (sceneData.appState.errorMessage === undefined) {
-    sceneData.appState.errorMessage = null
+  if (optimizedSceneData.appState.errorMessage === undefined) {
+    optimizedSceneData.appState.errorMessage = null
   }
 
-  return sceneData
+  return optimizedSceneData
 }
 
 /**
@@ -116,7 +123,9 @@ export const loadLastSavedScene = (): any | null => {
  */
 export const saveSceneToStorage = (sceneData: any): void => {
   try {
-    localStorage.setItem(STORAGE_KEYS.SCENE, JSON.stringify(sceneData))
+    // Optimize scene data before saving by removing redundant originalElement data
+    const optimizedSceneData = optimizeDiagramOnSave(sceneData)
+    localStorage.setItem(STORAGE_KEYS.SCENE, JSON.stringify(optimizedSceneData))
   } catch (error) {
     console.warn('Failed to save scene to localStorage:', error)
   }
@@ -138,7 +147,9 @@ export const saveDiagramToStorage = (diagram: any): void => {
  */
 export const saveLastSavedSceneToStorage = (sceneData: any): void => {
   try {
-    localStorage.setItem(STORAGE_KEYS.LAST_SAVED_SCENE, JSON.stringify(sceneData))
+    // Optimize scene data before saving by removing redundant originalElement data
+    const optimizedSceneData = optimizeDiagramOnSave(sceneData)
+    localStorage.setItem(STORAGE_KEYS.LAST_SAVED_SCENE, JSON.stringify(optimizedSceneData))
   } catch (error) {
     console.warn('Failed to save last saved scene to localStorage:', error)
   }

@@ -39,7 +39,8 @@ export interface ExcalidrawElement {
   customData?: {
     databaseId?: string
     elementType?: string
-    originalElement?: any
+    elementName?: string // Optimierung: Nur der Name statt kompletter originalElement
+    originalElement?: any // Für Rückwärtskompatibilität beibehalten
     isFromDatabase?: boolean
     isMainElement?: boolean
     mainElementId?: string
@@ -207,7 +208,7 @@ export const generateCapabilityMapElements = (
       customData: {
         databaseId: capability.id,
         elementType: 'businessCapability',
-        originalElement: capability,
+        elementName: capability.name, // Optimierung: Nur der Name statt kompletter originalElement
         isFromDatabase: true,
         isMainElement: true,
       },
@@ -310,7 +311,7 @@ export const generateCapabilityMapElements = (
           customData: {
             databaseId: child.id,
             elementType: 'businessCapability',
-            originalElement: child,
+            elementName: child.name, // Optimierung: Nur der Name statt kompletter originalElement
             isFromDatabase: true,
             isMainElement: true,
           },
@@ -429,7 +430,7 @@ export const generateCapabilityMapElements = (
             customData: {
               databaseId: app.id,
               elementType: 'application',
-              originalElement: app,
+              elementName: app.name, // Optimierung: Nur der Name statt kompletter originalElement
               isFromDatabase: true,
               isMainElement: false,
             },

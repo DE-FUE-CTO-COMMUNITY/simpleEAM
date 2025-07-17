@@ -70,7 +70,7 @@ export const createExcalidrawElementFromLibraryItem = (
     customData: {
       databaseId: libraryElement.id,
       elementType: elementType,
-      originalElement: libraryElement,
+      elementName: libraryElement.name, // Optimierung: Nur der Name statt kompletter originalElement
       isFromDatabase: true,
       isMainElement: true, // Markiere als Hauptelement
       // Typ-spezifische Metadaten
@@ -347,7 +347,12 @@ export const findMainLibraryElement = (elements: ExcalidrawElement[]): Excalidra
 // Hilfsfunktion: Extrahiere das ursprüngliche Datenbank-Element (nur vom Hauptelement)
 export const getOriginalDatabaseElement = (element: ExcalidrawElement): any | null => {
   if (element.customData?.isMainElement) {
-    return element.customData?.originalElement || null
+    // Für Optimierung: Erstelle ein minimales Objekt mit nur den wichtigsten Daten
+    return {
+      id: element.customData.databaseId,
+      name: element.customData.elementName || element.customData.originalElement?.name,
+      elementType: element.customData.elementType,
+    }
   }
   return null
 }
@@ -376,7 +381,7 @@ export const updateExcalidrawElementFromLibraryItem = (
       // Aktualisiere die Datenbank-Metadaten im Hauptelement
       databaseId: libraryElement.id,
       elementType,
-      originalElement: libraryElement,
+      elementName: libraryElement.name, // Optimierung: Nur der Name statt kompletter originalElement
       isFromDatabase: true,
       isMainElement: true,
       // Behalte typ-spezifische Metadaten

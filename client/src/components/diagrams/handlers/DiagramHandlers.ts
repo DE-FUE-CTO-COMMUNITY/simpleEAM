@@ -7,6 +7,10 @@ import {
   clearMissingElementMarkers,
 } from '../utils/databaseSyncUtils'
 import {
+  optimizeDiagramOnOpen,
+  getDiagramOptimizationStats,
+} from '../utils/diagramOptimizationUtils'
+import {
   saveSceneToStorage,
   saveDiagramToStorage,
   saveLastSavedSceneToStorage,
@@ -145,14 +149,26 @@ export const useDiagramHandlers = (
           hasAppState: !!diagramData.appState,
         })
 
+        // Optimize diagram data by replacing originalElement with elementName
+        const optimizedDiagramData = optimizeDiagramOnOpen(diagramData)
+        const optimizationStats = getDiagramOptimizationStats(diagramData, optimizedDiagramData)
+
+        if (optimizationStats.optimizedCount > 0) {
+          console.log('Diagramm-Optimierung durchgeführt:', {
+            elementsOptimized: optimizationStats.optimizedCount,
+            totalElementsWithElementName: optimizationStats.elementsWithElementName,
+            remainingOriginalElements: optimizationStats.optimizedElementsWithOriginalElement,
+          })
+        }
+
         // Try to sync from database with Docker-safe error handling
         let syncedDiagramData
         try {
-          syncedDiagramData = await syncDiagramOnOpen(apolloClient, diagramData)
+          syncedDiagramData = await syncDiagramOnOpen(apolloClient, optimizedDiagramData)
           console.log('Datenbank-Sync erfolgreich')
         } catch (syncError) {
           console.warn('Database sync failed, using local data:', syncError)
-          syncedDiagramData = diagramData
+          syncedDiagramData = optimizedDiagramData
         }
 
         const sceneData = {
