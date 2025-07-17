@@ -249,19 +249,17 @@ export const useDiagramHandlers = (
           }, 300) // Increased delay to ensure Excalidraw has finished its initial setup
         }
 
-        // State-Updates können asynchron erfolgen
-        setTimeout(() => {
-          console.log('Aktualisiere Diagramm-Status...')
-          setCurrentDiagram(diagram)
-          setCurrentScene(restoredScene)
-          setHasUnsavedChanges(false)
-          setLastSavedScene(restoredScene)
+        // State-Updates sofort synchron ausführen, um lastSavedScene zu setzen
+        console.log('Aktualisiere Diagramm-Status...')
+        setCurrentDiagram(diagram)
+        setCurrentScene(restoredScene)
+        setHasUnsavedChanges(false)
+        setLastSavedScene(restoredScene)
 
-          // Persist to localStorage
-          saveSceneToStorage(restoredScene)
-          saveDiagramToStorage(diagram)
-          console.log('Diagramm-Status erfolgreich aktualisiert und im localStorage gespeichert')
-        }, 200)
+        // Persist to localStorage
+        saveSceneToStorage(restoredScene)
+        saveDiagramToStorage(diagram)
+        console.log('Diagramm-Status erfolgreich aktualisiert und im localStorage gespeichert')
 
         setNotification({
           open: true,
@@ -363,11 +361,12 @@ export const useDiagramHandlers = (
     [setCurrentDiagram, setNotification]
   )
 
-  // Change Handler - tracks changes and detects unsaved state
+  // Change Handler - uses Excalidraw's native onChange to detect ANY change
   const handleChange = useCallback(
     (elements: any[], appState: any) => {
       // Save viewport state (scrollX, scrollY, zoom) to localStorage whenever it changes
       // Use a debounced approach to avoid excessive localStorage writes
+      console.log('handleChange aufgerufen, speichere Viewport-Status...')
       if (
         appState &&
         typeof appState.scrollX === 'number' &&
@@ -391,15 +390,12 @@ export const useDiagramHandlers = (
           saveViewportStateToStorage(viewportState)
         }
       }
-
-      // Only track changes if we have a current diagram loaded
-      if (currentDiagram && lastSavedScene) {
-        // Compare current state with last saved state
-        const currentElementsStr = JSON.stringify(elements)
-        const lastSavedElementsStr = JSON.stringify(lastSavedScene.elements || [])
-
-        const hasChanges = currentElementsStr !== lastSavedElementsStr
-        setHasUnsavedChanges(hasChanges)
+      console.log('CurrentDiagram:', currentDiagram?.id, 'lastSavedScene:', !!lastSavedScene)
+      // Track changes if we have a current diagram loaded
+      // When Excalidraw calls onChange, it means something has changed - mark as unsaved
+      if (currentDiagram) {
+        console.log('Diagrammänderung erkannt, markiere als ungespeichert')
+        setHasUnsavedChanges(true)
 
         // Create scene data for persistence without triggering state update
         const currentScene = {
