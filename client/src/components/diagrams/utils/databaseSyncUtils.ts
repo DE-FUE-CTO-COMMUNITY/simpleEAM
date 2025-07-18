@@ -557,8 +557,8 @@ export const syncDiagramOnOpenSimple = async (
           },
         }
 
-        // Aktualisiere das Text-Element mit dem Datenbanknamen
-        const updatedTextElement = updateTextContentOnly(textElement, databaseName)
+        // Aktualisiere das Text-Element mit dem Datenbanknamen - WICHTIG: mit allElements für korrekte Formatierung
+        const updatedTextElement = updateTextContentOnly(textElement, databaseName, elements)
 
         updatedElements.push(updatedElement)
         if (updatedTextElement && updatedTextElement.id !== updatedElement.id) {
