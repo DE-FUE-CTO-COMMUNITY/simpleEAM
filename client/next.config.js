@@ -1,3 +1,7 @@
+import createNextIntlPlugin from 'next-intl/plugin'
+
+const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts')
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Disable React StrictMode to prevent controlled/uncontrolled warnings in development
@@ -12,9 +16,9 @@ const nextConfig = {
   transpilePackages: [],
 
   // Webpack configuration if needed
-  webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+  webpack: config => {
     return config
   },
 }
 
-module.exports = nextConfig
+export default withNextIntl(nextConfig)

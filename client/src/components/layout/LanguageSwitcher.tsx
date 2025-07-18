@@ -1,14 +1,15 @@
 'use client'
 
 import React from 'react'
-import { useParams, usePathname, useRouter } from 'next/navigation'
+import { useLocale, useTranslations } from 'next-intl'
+import { useRouter, usePathname } from '@/i18n/navigation'
 import { MenuItem, ListItemIcon, ListItemText, Menu } from '@mui/material'
 
 // Unterstützte Sprachen
 const languages = [
   { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
   { code: 'en', name: 'English', flag: '🇺🇸' },
-]
+] as const
 
 interface LanguageSwitcherProps {
   anchorEl: HTMLElement | null
@@ -17,18 +18,14 @@ interface LanguageSwitcherProps {
 }
 
 const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ anchorEl, open, onClose }) => {
+  const t = useTranslations('language')
+  const locale = useLocale()
   const router = useRouter()
   const pathname = usePathname()
-  const params = useParams()
-  const currentLang = params.lang as string
 
-  const handleLanguageChange = (langCode: string) => {
-    // Ersetze die aktuelle Sprache in der URL
-    const segments = pathname.split('/')
-    segments[1] = langCode // Ersetze die Sprache (z.B. /de/... -> /en/...)
-    const newPath = segments.join('/')
-
-    router.push(newPath)
+  const handleLanguageChange = (langCode: 'de' | 'en') => {
+    // next-intl Navigation verwendet automatisch die richtige URL-Struktur
+    router.replace(pathname, { locale: langCode })
     onClose()
   }
 
@@ -50,14 +47,14 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ anchorEl, open, onC
         <MenuItem
           key={language.code}
           onClick={() => handleLanguageChange(language.code)}
-          selected={language.code === currentLang}
+          selected={language.code === locale}
         >
           <ListItemIcon>
             <span style={{ fontSize: '1.2em' }}>{language.flag}</span>
           </ListItemIcon>
           <ListItemText>
-            {language.name}
-            {language.code === currentLang && ' ✓'}
+            {language.code === 'de' ? t('german') : t('english')}
+            {language.code === locale && ' ✓'}
           </ListItemText>
         </MenuItem>
       ))}

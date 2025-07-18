@@ -17,7 +17,8 @@ import {
   Settings as SettingsIcon,
   Language as LanguageIcon,
 } from '@mui/icons-material'
-import { useRouter, usePathname } from 'next/navigation'
+import { useRouter } from '@/i18n/navigation'
+import { useLocale, useTranslations } from 'next-intl'
 import { isAdmin, logout, useAuth } from '@/lib/auth'
 import { useQuery } from '@apollo/client'
 import { GET_PERSON_BY_EMAIL } from '@/graphql/person'
@@ -31,7 +32,8 @@ interface UserProfileMenuProps {
 const UserProfileMenu: React.FC<UserProfileMenuProps> = ({ userName }) => {
   const theme = useTheme()
   const router = useRouter()
-  const pathname = usePathname()
+  const locale = useLocale()
+  const t = useTranslations('user')
   const { authenticated } = useAuth()
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
   const [profileDialogOpen, setProfileDialogOpen] = useState(false)
@@ -65,13 +67,6 @@ const UserProfileMenu: React.FC<UserProfileMenuProps> = ({ userName }) => {
       return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()
     }
     return userName.charAt(0).toUpperCase()
-  }
-
-  const getCurrentLanguage = () => {
-    // Extrahiere Sprache aus der URL (z.B. /de/... oder /en/...)
-    const segments = pathname.split('/')
-    const lang = segments[1]
-    return lang === 'de' ? 'DE' : lang === 'en' ? 'EN' : 'DE'
   }
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -144,26 +139,28 @@ const UserProfileMenu: React.FC<UserProfileMenuProps> = ({ userName }) => {
             <ListItemIcon>
               <SettingsIcon fontSize="small" />
             </ListItemIcon>
-            <ListItemText>Administration</ListItemText>
+            <ListItemText>{t('administration')}</ListItemText>
           </MenuItem>
         )}
         <MenuItem onClick={handleProfileClick}>
           <ListItemIcon>
             <PersonIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>Profil</ListItemText>
+          <ListItemText>{t('profile')}</ListItemText>
         </MenuItem>
         <MenuItem onClick={handleLanguageClick}>
           <ListItemIcon>
             <LanguageIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>Sprache ({getCurrentLanguage()})</ListItemText>
+          <ListItemText>
+            {t('language')} ({locale.toUpperCase()})
+          </ListItemText>
         </MenuItem>
         <MenuItem onClick={handleLogout}>
           <ListItemIcon>
             <LogoutIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>Abmelden</ListItemText>
+          <ListItemText>{t('logout')}</ListItemText>
         </MenuItem>
       </Menu>
 

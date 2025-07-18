@@ -1,0 +1,55 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "capabilities": "Capabilities",
+    "applications": "Applications",
+    "processes": "Processes",
+    "technologies": "Technologies",
+    "data": "Data",
+    "interfaces": "Interfaces",
+    "organizations": "Organizations",
+    "diagrams": "Diagrams",
+    "admin": "Administration"
+  },
+  "user": {
+    "profile": "Profile",
+    "language": "Language",
+    "logout": "Logout",
+    "administration": "Administration"
+  },
+  "language": {
+    "german": "German",
+    "english": "English",
+    "current": "Current language: {language}"
+  },
+  "errors": {
+    "generic": "An error occurred",
+    "networkError": "Network error",
+    "notFound": "Not found",
+    "unauthorized": "Unauthorized",
+    "forbidden": "Access denied"
+  },
+  "forms": {
+    "required": "This field is required",
+    "invalidEmail": "Invalid email address",
+    "minLength": "At least {count} characters required",
+    "maxLength": "Maximum {count} characters allowed"
+  }
+}

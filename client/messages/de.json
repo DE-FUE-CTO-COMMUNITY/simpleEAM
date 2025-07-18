@@ -1,0 +1,55 @@
+{
+  "common": {
+    "loading": "Wird geladen...",
+    "error": "Fehler",
+    "success": "Erfolgreich",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "create": "Erstellen",
+    "confirm": "Bestätigen",
+    "back": "Zurück",
+    "next": "Weiter",
+    "previous": "Zurück",
+    "close": "Schließen",
+    "yes": "Ja",
+    "no": "Nein"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "capabilities": "Capabilities",
+    "applications": "Anwendungen",
+    "processes": "Prozesse",
+    "technologies": "Technologien",
+    "data": "Daten",
+    "interfaces": "Schnittstellen",
+    "organizations": "Organisationen",
+    "diagrams": "Diagramme",
+    "admin": "Administration"
+  },
+  "user": {
+    "profile": "Profil",
+    "language": "Sprache",
+    "logout": "Abmelden",
+    "administration": "Administration"
+  },
+  "language": {
+    "german": "Deutsch",
+    "english": "Englisch",
+    "current": "Aktuelle Sprache: {language}"
+  },
+  "errors": {
+    "generic": "Ein Fehler ist aufgetreten",
+    "networkError": "Netzwerkfehler",
+    "notFound": "Nicht gefunden",
+    "unauthorized": "Nicht autorisiert",
+    "forbidden": "Zugriff verweigert"
+  },
+  "forms": {
+    "required": "Dieses Feld ist erforderlich",
+    "invalidEmail": "Ungültige E-Mail-Adresse",
+    "minLength": "Mindestens {count} Zeichen erforderlich",
+    "maxLength": "Maximal {count} Zeichen erlaubt"
+  }
+}
