@@ -1,4 +1,6 @@
 // filepath: /home/mf2admin/simple-eam/client/src/components/layout/RootLayout.tsx
+'use client'
+
 import React, { useState } from 'react'
 import { Box, Toolbar, styled } from '@mui/material'
 import {
@@ -16,6 +18,7 @@ import {
   InfrastructureIcon,
 } from '@/components/icons'
 import { usePathname } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { useAuth, isAdmin, isArchitect } from '@/lib/auth'
 
 import AppHeader from './AppHeader'
@@ -43,6 +46,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
   const { keycloak, authenticated, initialized } = useAuth()
   const [open, setOpen] = useState(true)
   const [importExportDialogOpen, setImportExportDialogOpen] = useState(false)
+  const t = useTranslations('navigation')
 
   const handleDrawerToggle = () => {
     setOpen(!open)
@@ -65,27 +69,27 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
   const userName = (authenticated && keycloak?.tokenParsed?.preferred_username) || 'Benutzer'
 
   const menuItems = [
-    { text: 'Dashboard', icon: <DashboardIcon />, href: '/' },
-    { text: 'Diagram-Editor', icon: <DiagramIcon />, href: '/diagrams' },
-    { text: 'Architekturen', icon: <ArchitectureIcon />, href: '/architectures' },
+    { text: t('dashboard'), icon: <DashboardIcon />, href: '/' },
+    { text: t('diagramEditor'), icon: <DiagramIcon />, href: '/diagrams' },
+    { text: t('architectures'), icon: <ArchitectureIcon />, href: '/architectures' },
     {
-      text: 'Architektur Prinzipien',
+      text: t('architecturePrinciples'),
       icon: <RuleIcon />,
       href: '/architecture-principles',
     },
     { isDivider: true, text: 'divider', icon: null },
-    { text: 'Business Capabilities', icon: <BusinessCapabilityIcon />, href: '/capabilities' },
-    { text: 'Applikationen', icon: <ApplicationComponentIcon />, href: '/applications' },
-    { text: 'Datenobjekte', icon: <BusinessObjectIcon />, href: '/dataobjects' },
-    { text: 'Schnittstellen', icon: <ApplicationInterfaceIcon />, href: '/interfaces' },
-    { text: 'Infrastruktur', icon: <InfrastructureIcon />, href: '/infrastructure' },
+    { text: t('businessCapabilities'), icon: <BusinessCapabilityIcon />, href: '/capabilities' },
+    { text: t('applications'), icon: <ApplicationComponentIcon />, href: '/applications' },
+    { text: t('dataObjects'), icon: <BusinessObjectIcon />, href: '/dataobjects' },
+    { text: t('interfaces'), icon: <ApplicationInterfaceIcon />, href: '/interfaces' },
+    { text: t('infrastructure'), icon: <InfrastructureIcon />, href: '/infrastructure' },
     { isDivider: true, text: 'divider', icon: null },
-    { text: 'Personen', icon: <PersonIcon />, href: '/persons' },
+    { text: t('persons'), icon: <PersonIcon />, href: '/persons' },
     // Import/Export für Admin- und Architect-Benutzer (Hydration-Fix: nur wenn initialisiert)
     ...(initialized && (isAdmin() || isArchitect())
       ? [
           { isDivider: true, text: 'divider', icon: null },
-          { text: 'Import/Export', icon: <ExcelIcon />, onClick: handleImportExportDialogOpen },
+          { text: t('importExport'), icon: <ExcelIcon />, onClick: handleImportExportDialogOpen },
         ]
       : []),
   ]

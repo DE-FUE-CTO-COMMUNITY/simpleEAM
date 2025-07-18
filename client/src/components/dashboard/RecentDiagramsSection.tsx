@@ -14,6 +14,7 @@ import {
   Grid,
 } from '@mui/material'
 import { useQuery } from '@apollo/client'
+import { useTranslations } from 'next-intl'
 import { GET_RECENT_DIAGRAMS } from '@/graphql/diagram'
 import DiagramCard, { DiagramCardSkeleton } from './DiagramCard'
 import { useAuth } from '@/lib/auth'
@@ -22,6 +23,7 @@ const RecentDiagramsSection: React.FC = () => {
   const theme = useTheme()
   const [diagramLimit, setDiagramLimit] = useState(6)
   const { authenticated, initialized } = useAuth()
+  const t = useTranslations('dashboard')
 
   // Responsive Breakpoints
   const isXs = useMediaQuery(theme.breakpoints.only('xs'))
@@ -65,7 +67,7 @@ const RecentDiagramsSection: React.FC = () => {
   if (!initialized || (!authenticated && initialized)) {
     return (
       <Card sx={{ mb: 4 }}>
-        <CardHeader title="Letzte Diagramme" />
+        <CardHeader title={t('recentDiagrams')} />
         <Divider />
         <CardContent>
           <Grid container spacing={2}>
@@ -83,10 +85,12 @@ const RecentDiagramsSection: React.FC = () => {
   if (diagramsError) {
     return (
       <Card sx={{ mb: 4 }}>
-        <CardHeader title="Letzte Diagramme" />
+        <CardHeader title={t('recentDiagrams')} />
         <Divider />
         <CardContent>
-          <Alert severity="error">Fehler beim Laden der Diagramme: {diagramsError.message}</Alert>
+          <Alert severity="error">
+            {t('loadingDiagramsError', { message: diagramsError.message })}
+          </Alert>
         </CardContent>
       </Card>
     )
@@ -96,11 +100,14 @@ const RecentDiagramsSection: React.FC = () => {
     <Box sx={{ mb: 2 }}>
       <Card>
         <CardHeader
-          title="Letzte Diagramme"
+          title={t('recentDiagrams')}
           subheader={
             diagrams.length > 0
-              ? `${diagrams.length} von ${diagrams.length === diagramLimit ? diagramLimit + '+' : diagrams.length} Diagrammen`
-              : 'Keine Diagramme verfügbar'
+              ? t('diagramsCount', {
+                  count: diagrams.length,
+                  total: diagrams.length === diagramLimit ? `${diagramLimit}+` : diagrams.length,
+                })
+              : t('noDiagramsAvailable')
           }
         />
         <Divider />
@@ -125,10 +132,10 @@ const RecentDiagramsSection: React.FC = () => {
           ) : diagrams.length === 0 ? (
             <Box sx={{ textAlign: 'center', py: 4 }}>
               <Typography variant="body1" color="text.secondary">
-                Noch keine Diagramme vorhanden.
+                {t('noDiagramsYet')}
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                Erstellen Sie Ihr erstes Diagramm über die Diagramm-Seite.
+                {t('createFirstDiagram')}
               </Typography>
             </Box>
           ) : (

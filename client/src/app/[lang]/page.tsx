@@ -27,6 +27,7 @@ import {
 } from '@/components/icons'
 import { useQuery } from '@apollo/client'
 import { useSnackbar } from 'notistack'
+import { useTranslations } from 'next-intl'
 import { useAuth, login } from '@/lib/auth'
 import { GET_CAPABILITIES_COUNT } from '@/graphql/capability'
 import { GET_APPLICATIONS_COUNT } from '@/graphql/application'
@@ -43,6 +44,7 @@ const Dashboard = () => {
   const { authenticated, initialized } = useAuth()
   const theme = useTheme()
   const { enqueueSnackbar } = useSnackbar()
+  const t = useTranslations('dashboard')
 
   // Weiterleitung zum Login, falls nicht authentifiziert
   useEffect(() => {
@@ -110,31 +112,31 @@ const Dashboard = () => {
   // Fehlerbehandlung
   useEffect(() => {
     if (capabilitiesError) {
-      enqueueSnackbar('Fehler beim Laden der Business Capabilities', { variant: 'error' })
+      enqueueSnackbar(t('loadingError.businessCapabilities'), { variant: 'error' })
     }
     if (applicationsError) {
-      enqueueSnackbar('Fehler beim Laden der Applikationen', { variant: 'error' })
+      enqueueSnackbar(t('loadingError.applications'), { variant: 'error' })
     }
     if (dataObjectsError) {
-      enqueueSnackbar('Fehler beim Laden der Datenobjekte', { variant: 'error' })
+      enqueueSnackbar(t('loadingError.dataObjects'), { variant: 'error' })
     }
     if (architecturesError) {
-      enqueueSnackbar('Fehler beim Laden der Architekturen', { variant: 'error' })
+      enqueueSnackbar(t('loadingError.architectures'), { variant: 'error' })
     }
     if (diagramsError) {
-      enqueueSnackbar('Fehler beim Laden der Diagramme', { variant: 'error' })
+      enqueueSnackbar(t('loadingError.diagrams'), { variant: 'error' })
     }
     if (interfacesError) {
-      enqueueSnackbar('Fehler beim Laden der Schnittstellen', { variant: 'error' })
+      enqueueSnackbar(t('loadingError.interfaces'), { variant: 'error' })
     }
     if (personsError) {
-      enqueueSnackbar('Fehler beim Laden der Personen', { variant: 'error' })
+      enqueueSnackbar(t('loadingError.persons'), { variant: 'error' })
     }
     if (principlesError) {
-      enqueueSnackbar('Fehler beim Laden der Architekturprinzipien', { variant: 'error' })
+      enqueueSnackbar(t('loadingError.architecturePrinciples'), { variant: 'error' })
     }
     if (infrastructuresError) {
-      enqueueSnackbar('Fehler beim Laden der Infrastruktur', { variant: 'error' })
+      enqueueSnackbar(t('loadingError.infrastructure'), { variant: 'error' })
     }
   }, [
     capabilitiesError,
@@ -147,6 +149,7 @@ const Dashboard = () => {
     principlesError,
     infrastructuresError,
     enqueueSnackbar,
+    t,
   ])
 
   // Anzahl der Elemente - angepasst für die neue Datenstruktur
@@ -213,7 +216,7 @@ const Dashboard = () => {
   return (
     <Box sx={{ py: 2, px: 1 }}>
       <Typography variant="h4" component="h1" gutterBottom sx={{ mb: 4 }}>
-        Dashboard
+        {t('title')}
       </Typography>
 
       <Grid container spacing={3} sx={{ mb: 6 }}>
@@ -225,7 +228,7 @@ const Dashboard = () => {
             >
               <Box>
                 <Typography variant="subtitle2" color="text.secondary">
-                  Business Capabilities
+                  {t('businessCapabilities')}
                 </Typography>
                 <Typography variant="h4">{isLoading ? '...' : capabilitiesCount}</Typography>
               </Box>
@@ -241,7 +244,7 @@ const Dashboard = () => {
             >
               <Box>
                 <Typography variant="subtitle2" color="text.secondary">
-                  Applikationen
+                  {t('applications')}
                 </Typography>
                 <Typography variant="h4">{isLoading ? '...' : applicationsCount}</Typography>
               </Box>
@@ -257,7 +260,7 @@ const Dashboard = () => {
             >
               <Box>
                 <Typography variant="subtitle2" color="text.secondary">
-                  Datenobjekte
+                  {t('dataObjects')}
                 </Typography>
                 <Typography variant="h4">{isLoading ? '...' : dataObjectsCount}</Typography>
               </Box>
@@ -273,7 +276,7 @@ const Dashboard = () => {
             >
               <Box>
                 <Typography variant="subtitle2" color="text.secondary">
-                  Schnittstellen
+                  {t('interfaces')}
                 </Typography>
                 <Typography variant="h4">{isLoading ? '...' : interfacesCount}</Typography>
               </Box>
@@ -289,7 +292,7 @@ const Dashboard = () => {
             >
               <Box>
                 <Typography variant="subtitle2" color="text.secondary">
-                  Infrastruktur
+                  {t('infrastructure')}
                 </Typography>
                 <Typography variant="h4">{isLoading ? '...' : infrastructuresCount}</Typography>
               </Box>
@@ -306,7 +309,7 @@ const Dashboard = () => {
             >
               <Box>
                 <Typography variant="subtitle2" color="text.secondary">
-                  Architekturen
+                  {t('architectures')}
                 </Typography>
                 <Typography variant="h4">{isLoading ? '...' : architecturesCount}</Typography>
               </Box>
@@ -322,7 +325,7 @@ const Dashboard = () => {
             >
               <Box>
                 <Typography variant="subtitle2" color="text.secondary">
-                  Architektur Prinzipien
+                  {t('architecturePrinciples')}
                 </Typography>
                 <Typography variant="h4">{isLoading ? '...' : principlesCount}</Typography>
               </Box>
@@ -338,7 +341,7 @@ const Dashboard = () => {
             >
               <Box>
                 <Typography variant="subtitle2" color="text.secondary">
-                  Diagramme
+                  {t('diagrams')}
                 </Typography>
                 <Typography variant="h4">{isLoading ? '...' : diagramsCount}</Typography>
               </Box>
@@ -354,7 +357,7 @@ const Dashboard = () => {
             >
               <Box>
                 <Typography variant="subtitle2" color="text.secondary">
-                  Personen
+                  {t('persons')}
                 </Typography>
                 <Typography variant="h4">{isLoading ? '...' : personsCount}</Typography>
               </Box>
@@ -368,23 +371,24 @@ const Dashboard = () => {
       <RecentDiagramsSection />
 
       <Card sx={{ mt: 4 }}>
-        <CardHeader title="Architekturlandschaft" />
+        <CardHeader title={t('architectureLandscape')} />
         <Divider />
         <CardContent>
           <Typography variant="body1" paragraph>
-            Die Enterprise-Architektur-Management-Plattform zeigt Ihnen einen Überblick über die
-            vollständige IT-Landschaft.
+            {t('overview')}
           </Typography>
           <Typography variant="body1" paragraph>
-            Es wurden insgesamt <strong>{totalCount}</strong> Architekturelemente (Business
-            Capabilities, Applikationen, Datenobjekte, Schnittstellen und Infrastruktur) erfasst.
-            Darüber hinaus gibt es {architecturesCount} Architekturen, {principlesCount} Architektur
-            Prinzipien, {diagramsCount} Diagramme und {personsCount} Personen.
+            {t('totalElements', {
+              count: totalCount,
+              architecturesCount,
+              principlesCount,
+              diagramsCount,
+              personsCount,
+            })}
           </Typography>
           <Box sx={{ mt: 2 }}>
             <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
-              Verwenden Sie die Navigation auf der linken Seite, um detaillierte Informationen zu
-              den einzelnen Architekturkomponenten zu erhalten.
+              {t('navigationHint')}
             </Typography>
           </Box>
         </CardContent>
