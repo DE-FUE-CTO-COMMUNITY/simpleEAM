@@ -1,8 +1,9 @@
 import React, { useMemo } from 'react'
-import { Box, Typography } from '@mui/material'
 import dynamic from 'next/dynamic'
+import { useLocale, useTranslations } from 'next-intl'
 import { ExcalidrawComponentProps } from '../types/DiagramTypes'
 import { useThemeMode } from '@/contexts/ThemeContext'
+import ExcalidrawLoading from './ExcalidrawLoading'
 
 // Dynamischer Import von Excalidraw, um Server-Side-Rendering zu vermeiden
 const ExcalidrawWrapper = dynamic(
@@ -41,6 +42,22 @@ const ExcalidrawWrapper = dynamic(
 
       // Hook für Theme-Modus (wird innerhalb der Komponente verwendet)
       const { mode: themeMode } = useThemeMode()
+
+      // Hook für aktuelle Sprache
+      const locale = useLocale()
+      const t = useTranslations('diagrams')
+
+      // Konvertiere locale zu Excalidraw langCode Format
+      const excalidrawLangCode = useMemo(() => {
+        switch (locale) {
+          case 'de':
+            return 'de-DE'
+          case 'en':
+            return 'en'
+          default:
+            return 'de-DE'
+        }
+      }, [locale])
 
       // Handle excalidrawAPI prop - store the API reference
       React.useEffect(() => {
@@ -115,7 +132,7 @@ const ExcalidrawWrapper = dynamic(
         <div style={{ height: '100%', width: '100%' }}>
           <ExcalidrawTyped
             theme={themeMode}
-            langCode="de-DE"
+            langCode={excalidrawLangCode}
             name="simple-eam-diagram"
             UIOptions={uiOptions}
             initialData={safeInitialData}
@@ -142,7 +159,7 @@ const ExcalidrawWrapper = dynamic(
                   }
                   shortcut="Ctrl+N"
                 >
-                  Neues Diagramm
+                  {t('actions.new')}
                 </MainMenuTyped.Item>
               )}
 
@@ -156,7 +173,7 @@ const ExcalidrawWrapper = dynamic(
                 }
                 shortcut="Ctrl+O"
               >
-                Öffnen
+                {t('actions.open')}
               </MainMenuTyped.Item>
 
               {/* Custom Save Menu Item - only for non-viewer users */}
@@ -170,7 +187,7 @@ const ExcalidrawWrapper = dynamic(
                   }
                   shortcut="Ctrl+S"
                 >
-                  {currentDiagram ? 'Speichern' : 'Speichern als...'}
+                  {currentDiagram ? t('actions.save') : t('actions.saveAs')}
                 </MainMenuTyped.Item>
               )}
 
@@ -185,7 +202,7 @@ const ExcalidrawWrapper = dynamic(
                   }
                   shortcut="Ctrl+Shift+S"
                 >
-                  Speichern unter...
+                  {t('actions.saveAs')}
                 </MainMenuTyped.Item>
               )}
 
@@ -200,7 +217,7 @@ const ExcalidrawWrapper = dynamic(
                   }
                   shortcut="Shift+Del"
                 >
-                  Löschen
+                  {t('actions.delete')}
                 </MainMenuTyped.Item>
               )}
 
@@ -215,7 +232,7 @@ const ExcalidrawWrapper = dynamic(
                   }
                   shortcut="Ctrl+R"
                 >
-                  DB Synchronisieren
+                  {t('actions.syncDatabase')}
                 </MainMenuTyped.Item>
               )}
 
@@ -230,7 +247,7 @@ const ExcalidrawWrapper = dynamic(
                   }
                   shortcut="Ctrl+M"
                 >
-                  Capability Map generieren
+                  {t('actions.generateCapabilityMap')}
                 </MainMenuTyped.Item>
               )}
 
@@ -259,7 +276,7 @@ const ExcalidrawWrapper = dynamic(
                 }
                 shortcut="Ctrl+F"
               >
-                Find on Canvas
+                {t('actions.findOnCanvas')}
               </MainMenuTyped.Item>
 
               {/* Separator */}
@@ -276,7 +293,7 @@ const ExcalidrawWrapper = dynamic(
                   }
                   shortcut="Ctrl+E"
                 >
-                  JSON exportieren
+                  {t('actions.exportJSON')}
                 </MainMenuTyped.Item>
               )}
 
@@ -291,7 +308,7 @@ const ExcalidrawWrapper = dynamic(
                   }
                   shortcut="Ctrl+I"
                 >
-                  JSON importieren
+                  {t('actions.importJSON')}
                 </MainMenuTyped.Item>
               )}
 
@@ -305,7 +322,7 @@ const ExcalidrawWrapper = dynamic(
                 }
                 shortcut="Ctrl+Shift+E"
               >
-                PNG exportieren
+                {t('actions.exportPNG')}
               </MainMenuTyped.Item>
             </MainMenuTyped>
           </ExcalidrawTyped>
@@ -317,11 +334,7 @@ const ExcalidrawWrapper = dynamic(
   },
   {
     ssr: false,
-    loading: () => (
-      <Box display="flex" justifyContent="center" alignItems="center" height="100%">
-        <Typography variant="h5">Lade Diagram-Editor...</Typography>
-      </Box>
-    ),
+    loading: () => <ExcalidrawLoading />,
   }
 )
 

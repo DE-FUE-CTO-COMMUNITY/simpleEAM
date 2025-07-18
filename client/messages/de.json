@@ -69,6 +69,105 @@
       "infrastructure": "Fehler beim Laden der Infrastruktur"
     }
   },
+  "diagrams": {
+    "title": "Diagramme",
+    "diagramTypes": {
+      "architecture": "Architekturdiagramm",
+      "capability": "Capability-Map",
+      "application": "Anwendungsdiagramm",
+      "data": "Datenflussdiagramm",
+      "infrastructure": "Infrastrukturdiagramm",
+      "process": "Prozessdiagramm",
+      "organizational": "Organisationsdiagramm",
+      "network": "Netzwerkdiagramm",
+      "security": "Sicherheitsdiagramm",
+      "integration": "Integrationsdiagramm",
+      "other": "Sonstiges",
+      "ARCHITECTURE": "Architekturdiagramm",
+      "APPLICATION_LANDSCAPE": "Anwendungslandschaft",
+      "CAPABILITY_MAP": "Capability-Map",
+      "DATA_FLOW": "Datenflussdiagramm",
+      "PROCESS": "Prozessdiagramm",
+      "NETWORK": "Netzwerkdiagramm",
+      "INTEGRATION_ARCHITECTURE": "Integrationsarchitektur",
+      "SECURITY_ARCHITECTURE": "Sicherheitsarchitektur",
+      "CONCEPTUAL": "Konzeptionell",
+      "OTHER": "Sonstiges"
+    },
+    "actions": {
+      "new": "Neues Diagramm",
+      "open": "Öffnen",
+      "save": "Speichern",
+      "saveAs": "Speichern unter",
+      "delete": "Löschen",
+      "export": "Exportieren",
+      "import": "Importieren",
+      "generateCapabilityMap": "Capability Map generieren",
+      "exportJSON": "JSON exportieren",
+      "importJSON": "JSON importieren",
+      "exportPNG": "PNG exportieren",
+      "syncDatabase": "DB Synchronisieren",
+      "findOnCanvas": "Auf Canvas finden"
+    },
+    "dialogs": {
+      "save": {
+        "title": "Diagramm speichern",
+        "titleField": "Titel",
+        "titleRequired": "Titel ist ein Pflichtfeld",
+        "titleHelperText": "Eindeutiger Name für das Diagramm",
+        "descriptionField": "Beschreibung",
+        "architectureField": "Zugehörige Architektur",
+        "typeField": "Diagrammtyp",
+        "selectArchitecture": "Architektur auswählen",
+        "selectType": "Typ auswählen",
+        "architectureRequired": "Architektur ist ein Pflichtfeld",
+        "loadingArchitectures": "Lade Architekturen...",
+        "architectureHelperText": "Pflichtfeld: Ordnet das Diagramm einer bestimmten Architektur zu",
+        "loadingArchitecturesError": "Fehler beim Laden der Architekturen: {message}",
+        "saving": "Speichere...",
+        "saveAsCopy": "Als Kopie speichern",
+        "update": "Aktualisieren",
+        "descriptionHelperText": "Optionale Beschreibung des Diagramms"
+      },
+      "open": {
+        "title": "Diagramm öffnen",
+        "searchPlaceholder": "Nach Titel oder Beschreibung suchen...",
+        "filterByType": "Nach Typ filtern",
+        "filterByArchitecture": "Nach Architektur filtern",
+        "allTypes": "Alle Typen",
+        "allArchitectures": "Alle Architekturen",
+        "noDiagramsFound": "Keine Diagramme gefunden",
+        "loadingDiagrams": "Lade Diagramme...",
+        "errorLoadingDiagrams": "Fehler beim Laden der Diagramme"
+      },
+      "delete": {
+        "title": "Diagramm löschen",
+        "confirmMessage": "Sind Sie sicher, dass Sie das Diagramm \"{title}\" löschen möchten?"
+      },
+      "newElements": {
+        "title": "Neue Elemente",
+        "description": "Die folgenden neuen Elemente wurden im Diagramm erkannt:",
+        "createButton": "Elemente erstellen"
+      }
+    },
+    "messages": {
+      "saved": "Diagramm gespeichert",
+      "deleted": "Diagramm gelöscht",
+      "exported": "Diagramm exportiert",
+      "imported": "Diagramm importiert",
+      "capabilityMapGenerated": "Capability Map generiert",
+      "unsavedChanges": "Ungespeicherte Änderungen",
+      "noArchitectures": "Keine Architekturen gefunden",
+      "loadingEditor": "Lade Diagram-Editor..."
+    },
+    "errors": {
+      "saveError": "Fehler beim Speichern",
+      "loadError": "Fehler beim Laden",
+      "deleteError": "Fehler beim Löschen",
+      "exportError": "Fehler beim Exportieren",
+      "importError": "Fehler beim Importieren"
+    }
+  },
   "user": {
     "profile": "Profil",
     "language": "Sprache",
@@ -85,7 +184,8 @@
     "networkError": "Netzwerkfehler",
     "notFound": "Nicht gefunden",
     "unauthorized": "Nicht autorisiert",
-    "forbidden": "Zugriff verweigert"
+    "forbidden": "Zugriff verweigert",
+    "loadError": "Fehler beim Laden"
   },
   "forms": {
     "required": "Dieses Feld ist erforderlich",

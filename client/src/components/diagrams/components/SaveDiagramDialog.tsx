@@ -17,6 +17,7 @@ import {
   MenuItem,
 } from '@mui/material'
 import { useMutation, useQuery, useApolloClient } from '@apollo/client'
+import { useTranslations } from 'next-intl'
 import { CREATE_DIAGRAM, UPDATE_DIAGRAM, GET_ARCHITECTURES_FOR_DIAGRAM } from '@/graphql/diagram'
 import {
   LINK_CAPABILITY_TO_ARCHITECTURE,
@@ -44,6 +45,61 @@ export interface DiagramType {
   description: string
 }
 
+// Funktion zum Erstellen übersetzter Diagrammtypen
+const createDiagramTypes = (t: any): DiagramType[] => [
+  {
+    value: 'ARCHITECTURE',
+    label: t('diagramTypes.architecture'),
+    description: 'Technische oder fachliche Architektur',
+  },
+  {
+    value: 'APPLICATION_LANDSCAPE',
+    label: t('diagramTypes.application'),
+    description: 'Übersicht über alle Anwendungen und deren Beziehungen',
+  },
+  {
+    value: 'CAPABILITY_MAP',
+    label: t('diagramTypes.capability'),
+    description: 'Fähigkeitslandkarte',
+  },
+  {
+    value: 'DATA_FLOW',
+    label: t('diagramTypes.data'),
+    description: 'Darstellung von Datenströmen',
+  },
+  {
+    value: 'PROCESS',
+    label: t('diagramTypes.process'),
+    description: 'Geschäftsprozesse und Workflows',
+  },
+  {
+    value: 'NETWORK',
+    label: t('diagramTypes.network'),
+    description: 'IT-Infrastruktur und Netzwerke',
+  },
+  {
+    value: 'INTEGRATION_ARCHITECTURE',
+    label: t('diagramTypes.integration'),
+    description: 'Systemintegration und Schnittstellen',
+  },
+  {
+    value: 'SECURITY_ARCHITECTURE',
+    label: t('diagramTypes.security'),
+    description: 'Sicherheitskonzepte und -maßnahmen',
+  },
+  {
+    value: 'CONCEPTUAL',
+    label: t('diagramTypes.other'),
+    description: 'Konzeptuelle Darstellung und Ideen',
+  },
+  {
+    value: 'OTHER',
+    label: t('diagramTypes.other'),
+    description: 'Andere Diagrammtypen',
+  },
+]
+
+// Legacy export für Kompatibilität
 export const DIAGRAM_TYPES: DiagramType[] = [
   {
     value: 'ARCHITECTURE',
@@ -116,6 +172,11 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
 }) => {
   const { keycloak } = useAuth()
   const apolloClient = useApolloClient()
+  const t = useTranslations('diagrams')
+  const tCommon = useTranslations('common')
+
+  // Übersetzte Diagrammtypen
+  const diagramTypes = React.useMemo(() => createDiagramTypes(t), [t])
 
   // Extrahiere Benutzerinformationen aus dem Keycloak-Token
   const user = React.useMemo(() => {
@@ -605,43 +666,43 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
       <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
         <DialogTitle>
           {forceSaveAs
-            ? 'Diagramm speichern unter...'
+            ? t('dialogs.save.title') + '...'
             : existingDiagram
-              ? 'Diagramm aktualisieren'
-              : 'Diagramm speichern'}
+              ? t('dialogs.save.title')
+              : t('dialogs.save.title')}
         </DialogTitle>
         <DialogContent>
           <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 3 }}>
             <TextField
-              label="Titel"
+              label={t('dialogs.save.titleField')}
               value={title}
               onChange={handleTitleChange}
               fullWidth
               required
               error={titleError}
               helperText={
-                titleError ? 'Titel ist ein Pflichtfeld' : 'Eindeutiger Name für das Diagramm'
+                titleError ? t('dialogs.save.titleRequired') : t('dialogs.save.titleHelperText')
               }
             />
 
             <TextField
-              label="Beschreibung"
+              label={t('dialogs.save.descriptionField')}
               value={description}
               onChange={e => setDescription(e.target.value)}
               fullWidth
               multiline
               rows={3}
-              helperText="Optionale Beschreibung des Diagramms"
+              helperText={t('dialogs.save.descriptionHelperText')}
             />
 
             <FormControl fullWidth>
-              <InputLabel>Diagrammtyp</InputLabel>
+              <InputLabel>{t('dialogs.save.typeField')}</InputLabel>
               <Select
                 value={diagramType}
-                label="Diagrammtyp"
+                label={t('dialogs.save.typeField')}
                 onChange={e => setDiagramType(e.target.value)}
               >
-                {DIAGRAM_TYPES.map(type => (
+                {diagramTypes.map(type => (
                   <MenuItem key={type.value} value={type.value}>
                     {type.label}
                   </MenuItem>
@@ -684,17 +745,19 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
               renderInput={params => (
                 <TextField
                   {...params}
-                  label="Zugehörige Architektur"
+                  label={t('dialogs.save.architectureField')}
                   required
                   error={architectureError}
                   helperText={
                     architectureError
-                      ? 'Architektur ist ein Pflichtfeld'
+                      ? t('dialogs.save.architectureRequired')
                       : architecturesError
-                        ? `Fehler beim Laden der Architekturen: ${architecturesError.message}`
+                        ? t('dialogs.save.loadingArchitecturesError', {
+                            message: architecturesError.message,
+                          })
                         : architecturesLoading
-                          ? 'Lade Architekturen...'
-                          : 'Pflichtfeld: Ordnet das Diagramm einer bestimmten Architektur zu'
+                          ? t('dialogs.save.loadingArchitectures')
+                          : t('dialogs.save.architectureHelperText')
                   }
                 />
               )}
@@ -704,7 +767,7 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose} disabled={saving}>
-            Abbrechen
+            {tCommon('cancel')}
           </Button>
           <Button
             onClick={handleSave}
@@ -712,12 +775,12 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
             disabled={!title.trim() || !selectedArchitecture || saving}
           >
             {saving
-              ? 'Speichere...'
+              ? t('dialogs.save.saving')
               : forceSaveAs
-                ? 'Als Kopie speichern'
+                ? t('dialogs.save.saveAsCopy')
                 : existingDiagram
-                  ? 'Aktualisieren'
-                  : 'Speichern'}
+                  ? t('dialogs.save.update')
+                  : tCommon('save')}
           </Button>
         </DialogActions>
       </Dialog>

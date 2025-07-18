@@ -12,6 +12,7 @@ import {
   CircularProgress,
 } from '@mui/material'
 import { useMutation } from '@apollo/client'
+import { useTranslations } from 'next-intl'
 import { DELETE_DIAGRAM } from '@/graphql/diagram'
 import { Warning } from '@mui/icons-material'
 
@@ -33,6 +34,8 @@ const DeleteDiagramDialog: React.FC<DeleteDiagramDialogProps> = ({
 }) => {
   const [deleting, setDeleting] = useState(false)
   const [deleteDiagram] = useMutation(DELETE_DIAGRAM)
+  const t = useTranslations('diagrams')
+  const tCommon = useTranslations('common')
 
   const handleDelete = async () => {
     if (!diagram?.id) return
@@ -64,12 +67,12 @@ const DeleteDiagramDialog: React.FC<DeleteDiagramDialogProps> = ({
       <DialogTitle>
         <Box display="flex" alignItems="center" gap={1}>
           <Warning color="warning" />
-          <Typography variant="h6">Diagramm löschen</Typography>
+          <Typography variant="h6">{t('dialogs.delete.title')}</Typography>
         </Box>
       </DialogTitle>
       <DialogContent>
         <Typography variant="body1" gutterBottom>
-          Sind Sie sicher, dass Sie das folgende Diagramm unwiderruflich löschen möchten?
+          {t('dialogs.delete.confirmMessage', { title: diagram?.title || '' })}
         </Typography>
         <Typography variant="h6" color="primary" sx={{ mt: 2, fontWeight: 'bold' }}>
           &quot;{diagram?.title}&quot;
@@ -80,7 +83,7 @@ const DeleteDiagramDialog: React.FC<DeleteDiagramDialogProps> = ({
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose} disabled={deleting}>
-          Abbrechen
+          {tCommon('cancel')}
         </Button>
         <Button
           onClick={handleDelete}
@@ -89,7 +92,7 @@ const DeleteDiagramDialog: React.FC<DeleteDiagramDialogProps> = ({
           disabled={deleting}
           startIcon={deleting ? <CircularProgress size={20} /> : undefined}
         >
-          {deleting ? 'Lösche...' : 'Löschen'}
+          {deleting ? `${tCommon('delete')}...` : tCommon('delete')}
         </Button>
       </DialogActions>
     </Dialog>

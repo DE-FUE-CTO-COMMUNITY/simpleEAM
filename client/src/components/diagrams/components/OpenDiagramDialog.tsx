@@ -24,6 +24,7 @@ import {
 } from '@mui/material'
 import { Search, Architecture, Person, CalendarToday } from '@mui/icons-material'
 import { useQuery } from '@apollo/client'
+import { useTranslations, useLocale } from 'next-intl'
 import { GET_DIAGRAMS } from '@/graphql/diagram'
 import { DIAGRAM_TYPES } from './SaveDiagramDialog'
 
@@ -37,6 +38,10 @@ const OpenDiagramDialog: React.FC<OpenDiagramDialogProps> = ({ open, onClose, on
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedType, setSelectedType] = useState('')
   const [selectedArchitecture, setSelectedArchitecture] = useState('')
+  const t = useTranslations('diagrams')
+  const tCommon = useTranslations('common')
+  const tErrors = useTranslations('errors')
+  const locale = useLocale()
 
   const { data, loading, error } = useQuery(GET_DIAGRAMS, {
     skip: !open,
@@ -93,18 +98,30 @@ const OpenDiagramDialog: React.FC<OpenDiagramDialogProps> = ({ open, onClose, on
   }
 
   const getDiagramTypeLabel = (type: string) => {
-    const diagramType = DIAGRAM_TYPES.find(t => t.value === type)
-    return diagramType?.label || type
+    // Direkte Übersetzung basierend auf Locale
+    const typeMap: Record<string, { de: string; en: string }> = {
+      ARCHITECTURE: { de: 'Architekturdiagramm', en: 'Architecture Diagram' },
+      APPLICATION_LANDSCAPE: { de: 'Anwendungslandschaft', en: 'Application Landscape' },
+      CAPABILITY_MAP: { de: 'Capability-Map', en: 'Capability Map' },
+      DATA_FLOW: { de: 'Datenflussdiagramm', en: 'Data Flow Diagram' },
+      PROCESS: { de: 'Prozessdiagramm', en: 'Process Diagram' },
+      NETWORK: { de: 'Netzwerkdiagramm', en: 'Network Diagram' },
+      INTEGRATION_ARCHITECTURE: { de: 'Integrationsarchitektur', en: 'Integration Architecture' },
+      SECURITY_ARCHITECTURE: { de: 'Sicherheitsarchitektur', en: 'Security Architecture' },
+      CONCEPTUAL: { de: 'Konzeptionell', en: 'Conceptual' },
+      OTHER: { de: 'Sonstiges', en: 'Other' },
+    }
+    return typeMap[type]?.[locale as 'de' | 'en'] || type
   }
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle>Diagramm öffnen</DialogTitle>
+      <DialogTitle>{t('dialogs.open.title')}</DialogTitle>
       <DialogContent>
         <Box sx={{ mb: 3, display: 'flex', flexDirection: 'column', gap: 2 }}>
           {/* Suchfeld */}
           <TextField
-            placeholder="Nach Titel oder Beschreibung suchen..."
+            placeholder={t('dialogs.open.searchPlaceholder')}
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
             fullWidth
@@ -120,29 +137,29 @@ const OpenDiagramDialog: React.FC<OpenDiagramDialogProps> = ({ open, onClose, on
           {/* Filter */}
           <Box sx={{ display: 'flex', gap: 2 }}>
             <FormControl sx={{ minWidth: 200 }}>
-              <InputLabel>Diagrammtyp</InputLabel>
+              <InputLabel>{t('dialogs.open.filterByType')}</InputLabel>
               <Select
                 value={selectedType}
-                label="Diagrammtyp"
+                label={t('dialogs.open.filterByType')}
                 onChange={e => setSelectedType(e.target.value)}
               >
-                <MenuItem value="">Alle Typen</MenuItem>
+                <MenuItem value="">{t('dialogs.open.allTypes')}</MenuItem>
                 {DIAGRAM_TYPES.map(type => (
                   <MenuItem key={type.value} value={type.value}>
-                    {type.label}
+                    {getDiagramTypeLabel(type.value)}
                   </MenuItem>
                 ))}
               </Select>
             </FormControl>
 
             <FormControl sx={{ minWidth: 200 }}>
-              <InputLabel>Architektur</InputLabel>
+              <InputLabel>{t('dialogs.open.filterByArchitecture')}</InputLabel>
               <Select
                 value={selectedArchitecture}
-                label="Architektur"
+                label={t('dialogs.open.filterByArchitecture')}
                 onChange={e => setSelectedArchitecture(e.target.value)}
               >
-                <MenuItem value="">Alle Architekturen</MenuItem>
+                <MenuItem value="">{t('dialogs.open.allArchitectures')}</MenuItem>
                 {architectureOptions.map((arch: any) => (
                   <MenuItem key={arch.id} value={arch.id}>
                     {arch.name}
@@ -160,13 +177,13 @@ const OpenDiagramDialog: React.FC<OpenDiagramDialogProps> = ({ open, onClose, on
           </Box>
         ) : error ? (
           <Typography color="error" align="center" sx={{ py: 4 }}>
-            Fehler beim Laden der Diagramme: {error.message}
+            {tErrors('loadError')}: {error.message}
           </Typography>
         ) : filteredDiagrams.length === 0 ? (
           <Typography color="text.secondary" align="center" sx={{ py: 4 }}>
             {diagrams.length === 0
-              ? 'Keine Diagramme vorhanden'
-              : 'Keine Diagramme entsprechen den Filterkriterien'}
+              ? t('dialogs.open.noDiagramsFound')
+              : t('dialogs.open.errorLoadingDiagrams')}
           </Typography>
         ) : (
           <List sx={{ maxHeight: 400, overflow: 'auto' }}>
@@ -247,7 +264,7 @@ const OpenDiagramDialog: React.FC<OpenDiagramDialogProps> = ({ open, onClose, on
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Abbrechen</Button>
+        <Button onClick={onClose}>{tCommon('cancel')}</Button>
       </DialogActions>
     </Dialog>
   )

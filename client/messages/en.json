@@ -28,16 +28,25 @@
     "infrastructure": "Infrastructure",
     "persons": "Persons",
     "importExport": "Import/Export",
-    "capabilities": "Capabilities",
-    "processes": "Processes",
-    "technologies": "Technologies",
-    "data": "Data",
-    "organizations": "Organizations",
-    "diagrams": "Diagrams",
-    "admin": "Administration"
+    "administration": "Administration"
   },
   "dashboard": {
     "title": "Dashboard",
+    "subtitle": "Welcome to Simple-EAM",
+    "description": "Enterprise Architecture Management System",
+    "totalArchitectures": "Total Architectures",
+    "totalDiagrams": "Total Diagrams",
+    "totalApplications": "Total Applications",
+    "totalCapabilities": "Total Capabilities",
+    "recentDiagrams": "Recent Diagrams",
+    "recentArchitectures": "Recent Architectures",
+    "noData": "No data available",
+    "loadingError": "Error loading data",
+    "viewAll": "View All",
+    "createNew": "Create New",
+    "lastModified": "Last modified",
+    "createdBy": "Created by",
+    "description_placeholder": "No description available",
     "businessCapabilities": "Business Capabilities",
     "applications": "Applications",
     "dataObjects": "Data Objects",
@@ -47,7 +56,6 @@
     "architecturePrinciples": "Architecture Principles",
     "diagrams": "Diagrams",
     "persons": "Persons",
-    "recentDiagrams": "Recent Diagrams",
     "noDiagramsAvailable": "No diagrams available",
     "noDiagramsYet": "No diagrams yet.",
     "createFirstDiagram": "Create your first diagram via the Diagrams page.",
@@ -56,17 +64,93 @@
     "architectureLandscape": "Architecture Landscape",
     "overview": "The Enterprise Architecture Management platform provides you with an overview of the complete IT landscape.",
     "totalElements": "A total of {count} architecture elements (Business Capabilities, Applications, Data Objects, Interfaces and Infrastructure) have been recorded. In addition, there are {architecturesCount} Architectures, {principlesCount} Architecture Principles, {diagramsCount} Diagrams and {personsCount} Persons.",
-    "navigationHint": "Use the navigation on the left side to get detailed information about the individual architecture components.",
-    "loadingError": {
-      "businessCapabilities": "Error loading Business Capabilities",
-      "applications": "Error loading Applications",
-      "dataObjects": "Error loading Data Objects",
-      "architectures": "Error loading Architectures",
-      "diagrams": "Error loading Diagrams",
-      "interfaces": "Error loading Interfaces",
-      "persons": "Error loading Persons",
-      "architecturePrinciples": "Error loading Architecture Principles",
-      "infrastructure": "Error loading Infrastructure"
+    "navigationHint": "Use the navigation on the left side to get detailed information about the individual architecture components."
+  },
+  "diagrams": {
+    "title": "Diagrams",
+    "diagramTypes": {
+      "ARCHITECTURE": "Architecture Diagram",
+      "APPLICATION_LANDSCAPE": "Application Landscape",
+      "CAPABILITY_MAP": "Capability Map",
+      "DATA_FLOW": "Data Flow Diagram",
+      "PROCESS": "Process Diagram",
+      "NETWORK": "Network Diagram",
+      "INTEGRATION_ARCHITECTURE": "Integration Architecture",
+      "SECURITY_ARCHITECTURE": "Security Architecture",
+      "CONCEPTUAL": "Conceptual",
+      "OTHER": "Other"
+    },
+    "actions": {
+      "new": "New",
+      "open": "Open",
+      "save": "Save",
+      "saveAs": "Save As",
+      "delete": "Delete",
+      "export": "Export",
+      "import": "Import",
+      "generateCapabilityMap": "Generate Capability Map",
+      "exportJSON": "Export JSON",
+      "importJSON": "Import JSON",
+      "exportPNG": "Export PNG",
+      "syncDatabase": "Sync Database",
+      "findOnCanvas": "Find on Canvas"
+    },
+    "dialogs": {
+      "save": {
+        "title": "Save Diagram",
+        "titleField": "Title",
+        "titleRequired": "Title is required",
+        "titleHelperText": "Unique name for the diagram",
+        "descriptionField": "Description",
+        "architectureField": "Related Architecture",
+        "typeField": "Diagram Type",
+        "selectArchitecture": "Select Architecture",
+        "selectType": "Select Type",
+        "architectureRequired": "Architecture is required",
+        "loadingArchitectures": "Loading architectures...",
+        "architectureHelperText": "Required field: Assigns the diagram to a specific architecture",
+        "loadingArchitecturesError": "Error loading architectures: {message}",
+        "saving": "Saving...",
+        "saveAsCopy": "Save as Copy",
+        "update": "Update",
+        "descriptionHelperText": "Optional description of the diagram"
+      },
+      "open": {
+        "title": "Open Diagram",
+        "searchPlaceholder": "Search by title or description...",
+        "filterByType": "Filter by Type",
+        "filterByArchitecture": "Filter by Architecture",
+        "allTypes": "All Types",
+        "allArchitectures": "All Architectures",
+        "noDiagramsFound": "No diagrams found",
+        "loadingDiagrams": "Loading diagrams...",
+        "errorLoadingDiagrams": "No diagrams match the filter criteria"
+      },
+      "delete": {
+        "title": "Delete Diagram",
+        "confirmMessage": "Are you sure you want to delete the diagram \"{name}\"?",
+        "confirmSubtext": "This action cannot be undone.",
+        "deleting": "Deleting...",
+        "successMessage": "Diagram successfully deleted",
+        "errorMessage": "Error deleting diagram"
+      }
+    },
+    "messages": {
+      "saved": "Diagram saved",
+      "deleted": "Diagram deleted",
+      "exported": "Diagram exported",
+      "imported": "Diagram imported",
+      "capabilityMapGenerated": "Capability map generated",
+      "unsavedChanges": "Unsaved changes",
+      "noArchitectures": "No architectures found",
+      "loadingEditor": "Loading Diagram Editor..."
+    },
+    "errors": {
+      "saveError": "Error saving",
+      "loadError": "Error loading",
+      "deleteError": "Error deleting",
+      "exportError": "Error exporting",
+      "importError": "Error importing"
     }
   },
   "user": {
@@ -85,12 +169,25 @@
     "networkError": "Network error",
     "notFound": "Not found",
     "unauthorized": "Unauthorized",
-    "forbidden": "Access denied"
+    "forbidden": "Access denied",
+    "loadError": "Error loading"
   },
   "forms": {
-    "required": "This field is required",
-    "invalidEmail": "Invalid email address",
-    "minLength": "At least {count} characters required",
-    "maxLength": "Maximum {count} characters allowed"
+    "validation": {
+      "required": "This field is required",
+      "minLength": "Minimum {count} characters required",
+      "maxLength": "Maximum {count} characters allowed",
+      "email": "Please enter a valid email address",
+      "url": "Please enter a valid URL",
+      "number": "Please enter a valid number",
+      "positive": "Please enter a positive number",
+      "integer": "Please enter a whole number"
+    },
+    "placeholders": {
+      "enterText": "Enter text...",
+      "selectOption": "Select an option...",
+      "chooseFile": "Choose file...",
+      "searchHere": "Search here..."
+    }
   }
 }
