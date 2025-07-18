@@ -3,6 +3,7 @@
 import React, { useRef, useCallback, useMemo, useEffect } from 'react'
 import { Box, Alert, Snackbar } from '@mui/material'
 import { useApolloClient } from '@apollo/client'
+import { useTranslations } from 'next-intl'
 import { GET_DIAGRAM } from '@/graphql/diagram'
 import SaveDiagramDialog from './SaveDiagramDialog'
 import OpenDiagramDialog from './OpenDiagramDialog'
@@ -21,6 +22,7 @@ import { isViewer } from '@/lib/auth'
 const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const apolloClient = useApolloClient()
+  const t = useTranslations('diagrams')
 
   // Custom hooks for state management
   const {
@@ -44,6 +46,37 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
   // UI Options
   const uiOptions = useUIOptions()
 
+  // Create translated notification wrapper
+  const setTranslatedNotification = useCallback(
+    (notification: {
+      open: boolean
+      message: string
+      severity: 'success' | 'error' | 'info' | 'warning'
+    }) => {
+      let translatedMessage = notification.message
+
+      // Handle translation keys with parameters
+      if (notification.message.includes(':')) {
+        const [key, param] = notification.message.split(':')
+        if (key === 'messages.diagramLoaded') {
+          translatedMessage = t('messages.diagramLoaded', { title: param })
+        }
+      } else if (notification.message.startsWith('messages.')) {
+        const key = notification.message.replace('messages.', '')
+        translatedMessage = t(`messages.${key}` as any)
+      } else if (notification.message.startsWith('errors.')) {
+        const key = notification.message.replace('errors.', '')
+        translatedMessage = t(`errors.${key}` as any)
+      }
+
+      setNotification({
+        ...notification,
+        message: translatedMessage,
+      })
+    },
+    [setNotification, t]
+  )
+
   // Handlers
   const {
     handleNewDiagram,
@@ -63,7 +96,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     setCurrentScene,
     setHasUnsavedChanges,
     setLastSavedScene,
-    setNotification,
+    setTranslatedNotification,
     open => updateDialogState('saveDialogOpen', open),
     open => updateDialogState('saveAsDialogOpen', open),
     lastSavedScene
@@ -101,19 +134,19 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
         // Show success notification
         setNotification({
           open: true,
-          message: `Capability Map erfolgreich generiert! ${capabilityCount} Capabilities erstellt.`,
+          message: t('messages.capabilityMapSuccess', { count: capabilityCount }),
           severity: 'success',
         })
       } catch {
         // Fehlerbehandlung
         setNotification({
           open: true,
-          message: 'Fehler beim Laden der generierten Capability Map',
+          message: t('errors.capabilityMapError'),
           severity: 'error',
         })
       }
     },
-    [excalidrawAPI, setHasUnsavedChanges, setNotification]
+    [excalidrawAPI, setHasUnsavedChanges, setNotification, t]
   )
 
   // Keyboard shortcuts
@@ -149,11 +182,11 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
       const itemCount = Array.isArray(library) ? library.length : library.libraryItems?.length || 0
       setNotification({
         open: true,
-        message: `Architektur-Bibliothek erfolgreich geladen! (${itemCount} Elemente)`,
+        message: t('messages.libraryLoaded', { count: itemCount }),
         severity: 'success',
       })
     },
-    [setNotification]
+    [setNotification, t]
   )
 
   // Get current diagram data for save operations
@@ -269,20 +302,19 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
 
         setNotification({
           open: true,
-          message:
-            'Neue Elemente wurden erfolgreich in der Datenbank erstellt und sind nun verknüpft!',
+          message: t('messages.elementsCreatedAndLinked'),
           severity: 'success',
         })
       } catch (error) {
         console.error('Fehler beim Aktualisieren des Canvas:', error)
         setNotification({
           open: true,
-          message: 'Fehler beim Aktualisieren der Elementdarstellung',
+          message: t('errors.updateElementsError'),
           severity: 'error',
         })
       }
     },
-    [excalidrawAPI, setCurrentScene, setHasUnsavedChanges, setNotification]
+    [excalidrawAPI, setCurrentScene, setHasUnsavedChanges, setNotification, t]
   ) // LocalStorage-basiertes Diagramm laden beim Start
   useEffect(() => {
     const loadDiagramFromStorage = async () => {
@@ -322,7 +354,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
               console.error('Fehler beim Laden der Diagramm-Daten:', error)
               setNotification({
                 open: true,
-                message: 'Fehler beim Laden des Diagramms',
+                message: t('errors.loadDiagramError'),
                 severity: 'error',
               })
             }
@@ -338,7 +370,15 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
       // Kleiner Delay um sicherzustellen, dass alles initialisiert ist
       setTimeout(loadDiagramFromStorage, 500)
     }
-  }, [excalidrawAPI, isClient, handleOpenDiagram, setCurrentDiagram, setNotification, apolloClient])
+  }, [
+    excalidrawAPI,
+    isClient,
+    handleOpenDiagram,
+    setCurrentDiagram,
+    setNotification,
+    apolloClient,
+    t,
+  ])
 
   if (!isClient) {
     return null

@@ -88,7 +88,7 @@ export const useDiagramHandlers = (
 
     setNotification({
       open: true,
-      message: 'Neues Diagramm erstellt',
+      message: 'messages.newDiagramCreated',
       severity: 'info',
     })
   }, [
@@ -126,7 +126,7 @@ export const useDiagramHandlers = (
 
     setNotification({
       open: true,
-      message: 'Diagramm erfolgreich gelöscht',
+      message: 'messages.diagramDeleted',
       severity: 'success',
     })
   }, [excalidrawAPI, setCurrentDiagram, setCurrentScene, setNotification])
@@ -149,7 +149,7 @@ export const useDiagramHandlers = (
         isLoadingRef.current = false
         setNotification({
           open: true,
-          message: 'Diagramm kann nicht geöffnet werden - fehlende Daten',
+          message: 'errors.cannotOpenDiagram',
           severity: 'error',
         })
         return
@@ -207,7 +207,7 @@ export const useDiagramHandlers = (
           isLoadingRef.current = false
           setNotification({
             open: true,
-            message: 'Fehler beim Öffnen des Diagramms: Excalidraw API nicht bereit',
+            message: 'errors.excalidrawNotReady',
             severity: 'error',
           })
           return
@@ -222,7 +222,7 @@ export const useDiagramHandlers = (
           isLoadingRef.current = false
           setNotification({
             open: true,
-            message: 'Fehler beim Aktualisieren der Diagrammansicht',
+            message: 'errors.updateViewError',
             severity: 'error',
           })
           return
@@ -242,7 +242,7 @@ export const useDiagramHandlers = (
 
           setNotification({
             open: true,
-            message: `Diagramm "${diagram.title}" erfolgreich geladen!`,
+            message: `messages.diagramLoaded:${diagram.title}`,
             severity: 'success',
           })
         }
@@ -304,7 +304,7 @@ export const useDiagramHandlers = (
         isLoadingRef.current = false
         setNotification({
           open: true,
-          message: 'Fehler beim Öffnen des Diagramms',
+          message: 'errors.loadDiagramError',
           severity: 'error',
         })
       }
@@ -359,7 +359,7 @@ export const useDiagramHandlers = (
 
         setNotification({
           open: true,
-          message: `Diagramm "${savedDiagram.title}" erfolgreich gespeichert!`,
+          message: `messages.diagramSaved:${savedDiagram.title}`,
           severity: 'success',
         })
 
@@ -373,7 +373,7 @@ export const useDiagramHandlers = (
         isSavingRef.current = false
         setNotification({
           open: true,
-          message: 'Fehler beim Speichern des Diagramms',
+          message: 'errors.saveDiagramError',
           severity: 'error',
         })
       }
@@ -402,7 +402,7 @@ export const useDiagramHandlers = (
 
       setNotification({
         open: true,
-        message: `Diagramm "${savedDiagram.title}" erfolgreich als Kopie gespeichert!`,
+        message: `messages.diagramSavedAs:${savedDiagram.title}`,
         severity: 'success',
       })
 
@@ -521,14 +521,14 @@ export const useDiagramHandlers = (
 
         setNotification({
           open: true,
-          message: 'JSON erfolgreich exportiert!',
+          message: 'messages.jsonExported',
           severity: 'success',
         })
       } catch (err) {
         console.error('Error exporting JSON:', err)
         setNotification({
           open: true,
-          message: 'Fehler beim JSON Export',
+          message: 'errors.exportJSONError',
           severity: 'error',
         })
       }
@@ -554,7 +554,7 @@ export const useDiagramHandlers = (
 
             setNotification({
               open: true,
-              message: 'JSON Import wird verarbeitet...',
+              message: 'messages.jsonImporting',
               severity: 'info',
             })
 
@@ -582,7 +582,7 @@ export const useDiagramHandlers = (
             const successMessage =
               mappings.length > 0
                 ? `JSON erfolgreich importiert!\n\n${summary}`
-                : 'JSON erfolgreich importiert!'
+                : 'messages.jsonImported'
 
             setNotification({
               open: true,
@@ -620,7 +620,7 @@ export const useDiagramHandlers = (
     if (!excalidrawAPI) {
       setNotification({
         open: true,
-        message: 'Excalidraw API nicht verfügbar',
+        message: 'errors.excalidrawNotAvailable',
         severity: 'error',
       })
       return
@@ -637,7 +637,7 @@ export const useDiagramHandlers = (
       if (!elements || elements.length === 0) {
         setNotification({
           open: true,
-          message: 'Keine Elemente zum Exportieren vorhanden',
+          message: 'errors.noElementsToExport',
           severity: 'warning',
         })
         return
@@ -645,7 +645,7 @@ export const useDiagramHandlers = (
 
       setNotification({
         open: true,
-        message: 'PNG Export wird vorbereitet...',
+        message: 'messages.pngExporting',
         severity: 'info',
       })
 
@@ -708,7 +708,7 @@ export const useDiagramHandlers = (
     if (!excalidrawAPI) {
       setNotification({
         open: true,
-        message: 'Excalidraw API nicht verfügbar',
+        message: 'errors.excalidrawNotAvailable',
         severity: 'error',
       })
       return
@@ -746,7 +746,7 @@ export const useDiagramHandlers = (
 
       setNotification({
         open: true,
-        message: 'Datenbankssynchronisation erfolgreich abgeschlossen!',
+        message: 'messages.syncCompleted',
         severity: 'success',
       })
     } catch (err) {

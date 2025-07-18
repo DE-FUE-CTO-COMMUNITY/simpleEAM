@@ -80,6 +80,18 @@
       "CONCEPTUAL": "Conceptual",
       "OTHER": "Other"
     },
+    "diagramTypeDescriptions": {
+      "ARCHITECTURE": "Technical or business architecture",
+      "APPLICATION_LANDSCAPE": "Overview of all applications and their relationships",
+      "CAPABILITY_MAP": "Capability landscape map",
+      "DATA_FLOW": "Representation of data flows",
+      "PROCESS": "Business processes and workflows",
+      "NETWORK": "IT infrastructure and networks",
+      "INTEGRATION_ARCHITECTURE": "System integration and interfaces",
+      "SECURITY_ARCHITECTURE": "Security concepts and measures",
+      "CONCEPTUAL": "Conceptual representation and ideas",
+      "OTHER": "Other diagram types"
+    },
     "actions": {
       "new": "New",
       "open": "Open",
@@ -143,14 +155,40 @@
       "capabilityMapGenerated": "Capability map generated",
       "unsavedChanges": "Unsaved changes",
       "noArchitectures": "No architectures found",
-      "loadingEditor": "Loading Diagram Editor..."
+      "loadingEditor": "Loading Diagram Editor...",
+      "newDiagramCreated": "New diagram created",
+      "diagramDeleted": "Diagram successfully deleted",
+      "diagramLoaded": "Diagram \"{title}\" successfully loaded!",
+      "diagramSaved": "Diagram \"{title}\" successfully saved!",
+      "diagramSavedAs": "Diagram \"{title}\" successfully saved as copy!",
+      "capabilityMapSuccess": "Capability Map successfully generated! {count} capabilities created.",
+      "libraryLoaded": "Architecture library successfully loaded! ({count} elements)",
+      "elementsCreatedAndLinked": "New elements were successfully created in the database and are now linked!",
+      "jsonExported": "JSON successfully exported!",
+      "jsonImporting": "Processing JSON import...",
+      "pngExporting": "Preparing PNG export...",
+      "jsonImported": "JSON successfully imported!",
+      "syncCompleted": "Database synchronization successfully completed!"
     },
     "errors": {
       "saveError": "Error saving",
       "loadError": "Error loading",
       "deleteError": "Error deleting",
       "exportError": "Error exporting",
-      "importError": "Error importing"
+      "importError": "Error importing",
+      "capabilityMapError": "Error loading generated Capability Map",
+      "cannotOpenDiagram": "Cannot open diagram - missing data",
+      "excalidrawNotReady": "Error opening diagram: Excalidraw API not ready",
+      "updateViewError": "Error updating diagram view",
+      "loadDiagramError": "Error loading diagram",
+      "updateElementsError": "Error updating element display",
+      "saveDiagramError": "Error saving diagram",
+      "exportJSONError": "Error exporting JSON",
+      "importJSONError": "Error importing JSON",
+      "exportPNGError": "Error exporting PNG",
+      "excalidrawNotAvailable": "Excalidraw API not available",
+      "noElementsToExport": "No elements available for export",
+      "syncError": "Error during database synchronization"
     }
   },
   "user": {

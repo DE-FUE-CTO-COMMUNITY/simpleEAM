@@ -83,6 +83,18 @@
       "CONCEPTUAL": "Konzeptionell",
       "OTHER": "Sonstiges"
     },
+    "diagramTypeDescriptions": {
+      "ARCHITECTURE": "Technische oder fachliche Architektur",
+      "APPLICATION_LANDSCAPE": "Übersicht über alle Anwendungen und deren Beziehungen",
+      "CAPABILITY_MAP": "Fähigkeitslandkarte",
+      "DATA_FLOW": "Darstellung von Datenströmen",
+      "PROCESS": "Geschäftsprozesse und Workflows",
+      "NETWORK": "IT-Infrastruktur und Netzwerke",
+      "INTEGRATION_ARCHITECTURE": "Systemintegration und Schnittstellen",
+      "SECURITY_ARCHITECTURE": "Sicherheitskonzepte und -maßnahmen",
+      "CONCEPTUAL": "Konzeptuelle Darstellung und Ideen",
+      "OTHER": "Andere Diagrammtypen"
+    },
     "actions": {
       "new": "Neues Diagramm",
       "open": "Öffnen",
@@ -147,14 +159,40 @@
       "capabilityMapGenerated": "Capability Map generiert",
       "unsavedChanges": "Ungespeicherte Änderungen",
       "noArchitectures": "Keine Architekturen gefunden",
-      "loadingEditor": "Lade Diagram-Editor..."
+      "loadingEditor": "Lade Diagram-Editor...",
+      "newDiagramCreated": "Neues Diagramm erstellt",
+      "diagramDeleted": "Diagramm erfolgreich gelöscht",
+      "diagramLoaded": "Diagramm \"{title}\" erfolgreich geladen!",
+      "diagramSaved": "Diagramm \"{title}\" erfolgreich gespeichert!",
+      "diagramSavedAs": "Diagramm \"{title}\" erfolgreich als Kopie gespeichert!",
+      "capabilityMapSuccess": "Capability Map erfolgreich generiert! {count} Capabilities erstellt.",
+      "libraryLoaded": "Architektur-Bibliothek erfolgreich geladen! ({count} Elemente)",
+      "elementsCreatedAndLinked": "Neue Elemente wurden erfolgreich in der Datenbank erstellt und sind nun verknüpft!",
+      "jsonExported": "JSON erfolgreich exportiert!",
+      "jsonImporting": "JSON Import wird verarbeitet...",
+      "pngExporting": "PNG Export wird vorbereitet...",
+      "jsonImported": "JSON erfolgreich importiert!",
+      "syncCompleted": "Datenbankssynchronisation erfolgreich abgeschlossen!"
     },
     "errors": {
       "saveError": "Fehler beim Speichern",
       "loadError": "Fehler beim Laden",
       "deleteError": "Fehler beim Löschen",
       "exportError": "Fehler beim Exportieren",
-      "importError": "Fehler beim Importieren"
+      "importError": "Fehler beim Importieren",
+      "capabilityMapError": "Fehler beim Laden der generierten Capability Map",
+      "cannotOpenDiagram": "Diagramm kann nicht geöffnet werden - fehlende Daten",
+      "excalidrawNotReady": "Fehler beim Öffnen des Diagramms: Excalidraw API nicht bereit",
+      "updateViewError": "Fehler beim Aktualisieren der Diagrammansicht",
+      "loadDiagramError": "Fehler beim Laden des Diagramms",
+      "updateElementsError": "Fehler beim Aktualisieren der Elementdarstellung",
+      "saveDiagramError": "Fehler beim Speichern des Diagramms",
+      "exportJSONError": "Fehler beim JSON Export",
+      "importJSONError": "Fehler beim JSON Import",
+      "exportPNGError": "Fehler beim PNG Export",
+      "excalidrawNotAvailable": "Excalidraw API nicht verfügbar",
+      "noElementsToExport": "Keine Elemente zum Exportieren vorhanden",
+      "syncError": "Fehler bei der Datenbank-Synchronisation"
     }
   },
   "user": {

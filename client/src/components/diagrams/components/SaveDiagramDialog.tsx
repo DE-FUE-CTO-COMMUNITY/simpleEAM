@@ -50,87 +50,53 @@ const createDiagramTypes = (t: any): DiagramType[] => [
   {
     value: 'ARCHITECTURE',
     label: t('diagramTypes.ARCHITECTURE'),
-    description: 'Technische oder fachliche Architektur',
+    description: t('diagramTypeDescriptions.ARCHITECTURE'),
   },
   {
     value: 'APPLICATION_LANDSCAPE',
     label: t('diagramTypes.APPLICATION_LANDSCAPE'),
-    description: 'Übersicht über alle Anwendungen und deren Beziehungen',
+    description: t('diagramTypeDescriptions.APPLICATION_LANDSCAPE'),
   },
   {
     value: 'CAPABILITY_MAP',
     label: t('diagramTypes.CAPABILITY_MAP'),
-    description: 'Fähigkeitslandkarte',
+    description: t('diagramTypeDescriptions.CAPABILITY_MAP'),
   },
   {
     value: 'DATA_FLOW',
     label: t('diagramTypes.DATA_FLOW'),
-    description: 'Darstellung von Datenströmen',
+    description: t('diagramTypeDescriptions.DATA_FLOW'),
   },
   {
     value: 'PROCESS',
     label: t('diagramTypes.PROCESS'),
-    description: 'Geschäftsprozesse und Workflows',
+    description: t('diagramTypeDescriptions.PROCESS'),
   },
   {
     value: 'NETWORK',
     label: t('diagramTypes.NETWORK'),
-    description: 'IT-Infrastruktur und Netzwerke',
+    description: t('diagramTypeDescriptions.NETWORK'),
   },
   {
     value: 'INTEGRATION_ARCHITECTURE',
     label: t('diagramTypes.INTEGRATION_ARCHITECTURE'),
-    description: 'Systemintegration und Schnittstellen',
+    description: t('diagramTypeDescriptions.INTEGRATION_ARCHITECTURE'),
   },
   {
     value: 'SECURITY_ARCHITECTURE',
     label: t('diagramTypes.SECURITY_ARCHITECTURE'),
-    description: 'Sicherheitskonzepte und -maßnahmen',
+    description: t('diagramTypeDescriptions.SECURITY_ARCHITECTURE'),
   },
   {
     value: 'CONCEPTUAL',
     label: t('diagramTypes.CONCEPTUAL'),
-    description: 'Konzeptuelle Darstellung und Ideen',
+    description: t('diagramTypeDescriptions.CONCEPTUAL'),
   },
   {
     value: 'OTHER',
     label: t('diagramTypes.OTHER'),
-    description: 'Andere Diagrammtypen',
+    description: t('diagramTypeDescriptions.OTHER'),
   },
-]
-
-// Legacy export für Kompatibilität
-export const DIAGRAM_TYPES: DiagramType[] = [
-  {
-    value: 'ARCHITECTURE',
-    label: 'Architekturdiagramm',
-    description: 'Technische oder fachliche Architektur',
-  },
-  {
-    value: 'APPLICATION_LANDSCAPE',
-    label: 'Anwendungslandschaft',
-    description: 'Übersicht über alle Anwendungen und deren Beziehungen',
-  },
-  { value: 'CAPABILITY_MAP', label: 'Capability Map', description: 'Fähigkeitslandkarte' },
-  { value: 'DATA_FLOW', label: 'Datenflussdiagramm', description: 'Darstellung von Datenströmen' },
-  { value: 'PROCESS', label: 'Prozessdiagramm', description: 'Geschäftsprozesse und Workflows' },
-  { value: 'NETWORK', label: 'Netzwerkdiagramm', description: 'IT-Infrastruktur und Netzwerke' },
-  {
-    value: 'INTEGRATION_ARCHITECTURE',
-    label: 'Integrationsarchitektur',
-    description: 'Systemintegration und Schnittstellen',
-  },
-  {
-    value: 'SECURITY_ARCHITECTURE',
-    label: 'Sicherheitsarchitektur',
-    description: 'Sicherheitskonzepte und -maßnahmen',
-  },
-  {
-    value: 'CONCEPTUAL',
-    label: 'Konzeptdiagramm',
-    description: 'Konzeptuelle Darstellung und Ideen',
-  },
-  { value: 'OTHER', label: 'Sonstige', description: 'Andere Diagrammtypen' },
 ]
 
 export interface SaveDiagramDialogProps {
@@ -644,7 +610,7 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
     }
   }
 
-  const selectedDiagramType = DIAGRAM_TYPES.find(type => type.value === diagramType)
+  const selectedDiagramType = diagramTypes.find(type => type.value === diagramType)
 
   // Handler für Titel-Änderungen mit Validierung
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

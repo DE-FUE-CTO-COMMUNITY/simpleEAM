@@ -30,7 +30,7 @@ import { GET_DIAGRAMS } from '@/graphql/diagram'
 // Verfügbare Diagrammtypen direkt als Enum-Werte
 const AVAILABLE_DIAGRAM_TYPES = [
   'ARCHITECTURE',
-  'APPLICATION_LANDSCAPE', 
+  'APPLICATION_LANDSCAPE',
   'CAPABILITY_MAP',
   'DATA_FLOW',
   'PROCESS',
@@ -38,7 +38,7 @@ const AVAILABLE_DIAGRAM_TYPES = [
   'INTEGRATION_ARCHITECTURE',
   'SECURITY_ARCHITECTURE',
   'CONCEPTUAL',
-  'OTHER'
+  'OTHER',
 ] as const
 
 export interface OpenDiagramDialogProps {
