@@ -244,7 +244,7 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
     return { successCount, errorCount }
   }
 
-  // Update form fields when dialog opens
+  // Kombinierter useEffect für Dialog-Initialisierung
   React.useEffect(() => {
     if (open) {
       if (existingDiagram) {
@@ -262,9 +262,32 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
           const architectureValue = Array.isArray(existingDiagram.architecture)
             ? existingDiagram.architecture[0]
             : existingDiagram.architecture
-          setSelectedArchitecture(architectureValue)
-          setArchitectureError(false) // Architektur ist vorhanden, kein Fehler
+          console.log('Setze Architektur aus existierendem Diagramm:', architectureValue)
+
+          // Wenn Architekturdaten bereits geladen sind, verwende sie
+          if (architecturesData?.architectures && architectureValue?.id) {
+            const foundArch = architecturesData.architectures.find(
+              (a: any) => a.id === architectureValue.id
+            )
+            if (foundArch) {
+              console.log('Architektur in verfügbaren Daten gefunden:', foundArch)
+              setSelectedArchitecture(foundArch)
+              setArchitectureError(false)
+            } else {
+              console.warn(
+                'Architektur aus Diagramm nicht in verfügbaren Architekturen gefunden:',
+                architectureValue.id
+              )
+              setSelectedArchitecture(architectureValue) // Verwende trotzdem die Original-Daten
+              setArchitectureError(false)
+            }
+          } else {
+            // Architekturdaten noch nicht geladen, verwende die Diagramm-Daten
+            setSelectedArchitecture(architectureValue)
+            setArchitectureError(false)
+          }
         } else {
+          console.log('Keine Architektur im existierenden Diagramm gefunden')
           setSelectedArchitecture(null)
           setArchitectureError(true) // Keine Architektur, Fehler anzeigen
         }
@@ -283,35 +306,33 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
         setArchitectureError(true) // Architektur ist nicht gewählt, also Fehler anzeigen
       }
     }
-  }, [open, existingDiagram, forceSaveAs])
+  }, [open, existingDiagram, forceSaveAs, architecturesData])
 
-  // Zusätzliche Validierung für Architektur wenn architecturesData geladen wird
+  // Separate useEffect für nachträgliche Architektur-Validierung wenn Daten später geladen werden
   React.useEffect(() => {
     if (
       existingDiagram?.architecture &&
       architecturesData?.architectures &&
       open &&
-      !selectedArchitecture
+      selectedArchitecture?.id
     ) {
-      // Extrahiere die Architektur-ID (Array oder Objekt)
-      const architectureFromDiagram = Array.isArray(existingDiagram.architecture)
-        ? existingDiagram.architecture[0]
-        : existingDiagram.architecture
+      // Prüfe, ob die aktuell gesetzte Architektur in den verfügbaren Daten existiert
+      const foundArch = architecturesData.architectures.find(
+        (a: any) => a.id === selectedArchitecture.id
+      )
 
-      if (architectureFromDiagram?.id) {
-        // Finde die Architektur in den geladenen Daten
-        const foundArch = architecturesData.architectures.find(
-          (a: any) => a.id === architectureFromDiagram.id
+      if (foundArch && foundArch !== selectedArchitecture) {
+        // Ersetze mit vollständigen Daten aus der API
+        console.log('Aktualisiere Architektur mit vollständigen API-Daten:', foundArch)
+        setSelectedArchitecture(foundArch)
+      } else if (!foundArch) {
+        console.warn(
+          'Gesetzte Architektur nicht in verfügbaren Daten gefunden:',
+          selectedArchitecture.id
         )
-
-        // Setze die gefundene Architektur nur wenn noch keine gesetzt ist
-        if (foundArch) {
-          setSelectedArchitecture(foundArch)
-          setArchitectureError(false)
-        }
       }
     }
-  }, [architecturesData, open, existingDiagram?.architecture, selectedArchitecture])
+  }, [architecturesData, selectedArchitecture, open, existingDiagram?.architecture])
 
   const handleSave = async () => {
     // Validierung

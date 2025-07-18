@@ -325,10 +325,11 @@ export const updateElementName = async (
 }
 
 /**
- * Validiert Datenbankverbindungen und aktualisiert Elementnamen
+ * Validiert und synchronisiert Elemente beim Import von anderen Instanzen (mit Namensvergleich für ID-Mapping)
  * WICHTIG: Aktualisiert ALLE Instanzen von Elementen mit derselben databaseId
+ * Sollte NUR beim Import verwendet werden, wo IDs nicht übereinstimmen und Namen verglichen werden müssen
  */
-export const validateAndSyncElements = async (
+export const validateAndSyncElementsForImport = async (
   apolloClient: any,
   elements: DiagramElement[]
 ): Promise<ValidationResult> => {
@@ -377,18 +378,7 @@ export const validateAndSyncElements = async (
       const normalizedDisplayedName = normalizeText(displayedName)
       const normalizedDatabaseName = normalizeText(databaseName)
 
-      // Debug: Zeige die Vergleichswerte
-      console.log(
-        `Sync comparison for ${elementType} ${databaseId} (instance ${elementInstance.id}):`
-      )
-      console.log(`  Original displayed: "${displayedName}"`)
-      console.log(`  Normalized displayed: "${normalizedDisplayedName}"`)
-      console.log(`  Database name: "${databaseName}"`)
-      console.log(`  Normalized database: "${normalizedDatabaseName}"`)
-
-      // Ein Update ist NUR nötig, wenn sich Namen tatsächlich unterscheiden
-      // Ignoriere lastSyncedName - das ist nur ein interner Tracking-Wert
-
+      // Debug: Zeige die Vergleichswerte nur wenn ein Update potentiell nötig ist
       const isDisplayedNameDifferent =
         displayedName && normalizedDisplayedName !== normalizedDatabaseName
       const isOriginalNameDifferent =
@@ -396,6 +386,17 @@ export const validateAndSyncElements = async (
 
       // Update nur wenn tatsächlich eine Diskrepanz besteht
       const nameUpdateNeeded = databaseName && (isDisplayedNameDifferent || isOriginalNameDifferent)
+
+      // Nur loggen wenn ein Update erforderlich sein könnte
+      if (nameUpdateNeeded || isDisplayedNameDifferent || isOriginalNameDifferent) {
+        console.log(
+          `Sync comparison for ${elementType} ${databaseId} (instance ${elementInstance.id}):`
+        )
+        console.log(`  Original displayed: "${displayedName}"`)
+        console.log(`  Normalized displayed: "${normalizedDisplayedName}"`)
+        console.log(`  Database name: "${databaseName}"`)
+        console.log(`  Normalized database: "${normalizedDatabaseName}"`)
+      }
 
       if (nameUpdateNeeded) {
         // Aktualisiere elementName mit neuen Daten (optimiert)
@@ -498,6 +499,101 @@ const debugElementStructure = (elements: DiagramElement[]): void => {
 }
 
 /**
+ * Einfache Synchronisation beim Öffnen von Diagrammen - lädt Namen direkt über IDs ohne Vergleich
+ */
+export const syncDiagramOnOpenSimple = async (
+  apolloClient: any,
+  elements: DiagramElement[]
+): Promise<DiagramElement[]> => {
+  const databaseElements = extractDatabaseElements(elements)
+  const missingElements: string[] = []
+  const updatedElements: DiagramElement[] = []
+
+  // Verarbeite jede eindeutige databaseId - nur ID-basierte Abfrage, kein Namensvergleich
+  for (const element of databaseElements) {
+    if (!element.customData?.databaseId || !element.customData?.elementType) continue
+
+    const databaseId = element.customData.databaseId
+    const elementType = element.customData.elementType
+
+    // Aktuelle Daten aus der Datenbank abrufen
+    const currentData = await fetchElementData(apolloClient, databaseId, elementType)
+
+    if (!currentData) {
+      // Element nicht mehr in Datenbank vorhanden
+      missingElements.push(databaseId)
+      continue
+    }
+
+    const databaseName = currentData.name
+
+    // WICHTIG: Finde ALLE Elemente mit derselben databaseId
+    const allElementsWithSameDbId = elements.filter(el => el.customData?.databaseId === databaseId)
+
+    // Verarbeite jede Instanz des Datenbankelements
+    for (const elementInstance of allElementsWithSameDbId) {
+      // Sichere Prüfung für customData
+      if (!elementInstance.customData) continue
+
+      // Verwende die gemeinsame Funktion für robuste Text-Element-Suche
+      const textElement = findLinkedTextElement(elementInstance, elements)
+
+      // Beim normalen Öffnen: IMMER den Datenbanknamen verwenden, kein Vergleich nötig
+      if (databaseName && textElement) {
+        console.log(
+          `Loading name from database for ${elementType} ${databaseId}: "${databaseName}"`
+        )
+
+        // Erstelle eine Kopie des Elements mit aktualisiertem Namen
+        const updatedElement = {
+          ...elementInstance,
+          customData: {
+            ...elementInstance.customData,
+            elementName: databaseName,
+            lastSyncedName: databaseName,
+            // Entferne die missing-Markierung falls vorhanden
+            isDatabaseMissing: false,
+            missingReason: undefined,
+          },
+        }
+
+        // Aktualisiere das Text-Element mit dem Datenbanknamen
+        const updatedTextElement = updateTextContentOnly(textElement, databaseName)
+
+        updatedElements.push(updatedElement)
+        if (updatedTextElement && updatedTextElement.id !== updatedElement.id) {
+          updatedElements.push(updatedTextElement)
+        }
+      }
+    }
+  }
+
+  // Aktualisiere Elemente mit neuen Namen
+  let finalElements = [...elements]
+
+  // Aktualisiere Elemente basierend auf den Ergebnissen
+  for (const updatedElement of updatedElements) {
+    const elementIndex = finalElements.findIndex(el => el.id === updatedElement.id)
+    if (elementIndex !== -1) {
+      // Ersetze das Element im Array
+      finalElements[elementIndex] = updatedElement
+    }
+  }
+
+  // WICHTIG: Markiere fehlende UND entferne Markierungen für gefundene Elemente
+  finalElements = markMissingElements(finalElements, missingElements)
+
+  // Stelle sicher, dass Text-Container-Bindungen korrekt sind
+  finalElements = ensureTextContainerBindings(finalElements)
+
+  if (missingElements.length > 0) {
+    console.warn(`Found ${missingElements.length} missing database elements:`, missingElements)
+  }
+
+  return finalElements
+}
+
+/**
  * Synchronisiert Diagrammelemente beim Öffnen
  */
 export const syncDiagramOnOpen = async (apolloClient: any, diagramData: any): Promise<any> => {
@@ -508,32 +604,8 @@ export const syncDiagramOnOpen = async (apolloClient: any, diagramData: any): Pr
   // Debug: Analysiere Element-Struktur
   debugElementStructure(diagramData.elements)
 
-  const validationResult = await validateAndSyncElements(apolloClient, diagramData.elements)
-
-  // Aktualisiere Elemente mit neuen Namen
-  let updatedElements = [...diagramData.elements]
-
-  // Aktualisiere Elemente basierend auf den Validierungsergebnissen
-  for (const updatedElement of validationResult.updatedElements) {
-    const elementIndex = updatedElements.findIndex(el => el.id === updatedElement.id)
-    if (elementIndex !== -1) {
-      // Ersetze das Element im Array
-      updatedElements[elementIndex] = updatedElement
-    }
-  }
-
-  // WICHTIG: Markiere fehlende UND entferne Markierungen für gefundene Elemente
-  updatedElements = markMissingElements(updatedElements, validationResult.missingElements)
-
-  // Stelle sicher, dass Text-Container-Bindungen korrekt sind
-  updatedElements = ensureTextContainerBindings(updatedElements)
-
-  if (validationResult.missingElements.length > 0) {
-    console.warn(
-      `Found ${validationResult.missingElements.length} missing database elements:`,
-      validationResult.missingElements
-    )
-  }
+  // Verwende die einfache Synchronisation ohne Namensvergleich
+  const updatedElements = await syncDiagramOnOpenSimple(apolloClient, diagramData.elements)
 
   return {
     ...diagramData,
