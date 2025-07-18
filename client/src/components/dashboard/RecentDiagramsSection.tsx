@@ -16,10 +16,12 @@ import {
 import { useQuery } from '@apollo/client'
 import { GET_RECENT_DIAGRAMS } from '@/graphql/diagram'
 import DiagramCard, { DiagramCardSkeleton } from './DiagramCard'
+import { useAuth } from '@/lib/auth'
 
 const RecentDiagramsSection: React.FC = () => {
   const theme = useTheme()
   const [diagramLimit, setDiagramLimit] = useState(6)
+  const { authenticated, initialized } = useAuth()
 
   // Responsive Breakpoints
   const isXs = useMediaQuery(theme.breakpoints.only('xs'))
@@ -54,9 +56,29 @@ const RecentDiagramsSection: React.FC = () => {
   } = useQuery(GET_RECENT_DIAGRAMS, {
     variables: { limit: diagramLimit },
     fetchPolicy: 'cache-and-network',
+    skip: !initialized || !authenticated, // Skip query wenn nicht authentifiziert
   })
 
   const diagrams = diagramsData?.diagrams || []
+
+  // Zeige Loading während Authentifizierung oder Query lädt
+  if (!initialized || (!authenticated && initialized)) {
+    return (
+      <Card sx={{ mb: 4 }}>
+        <CardHeader title="Letzte Diagramme" />
+        <Divider />
+        <CardContent>
+          <Grid container spacing={2}>
+            {Array.from({ length: diagramLimit }, (_, index) => (
+              <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3, xl: 2 }} key={index}>
+                <DiagramCardSkeleton />
+              </Grid>
+            ))}
+          </Grid>
+        </CardContent>
+      </Card>
+    )
+  }
 
   if (diagramsError) {
     return (
