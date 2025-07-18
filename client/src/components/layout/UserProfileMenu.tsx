@@ -15,12 +15,14 @@ import {
   Person as PersonIcon,
   Logout as LogoutIcon,
   Settings as SettingsIcon,
+  Language as LanguageIcon,
 } from '@mui/icons-material'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { isAdmin, logout, useAuth } from '@/lib/auth'
 import { useQuery } from '@apollo/client'
 import { GET_PERSON_BY_EMAIL } from '@/graphql/person'
 import UserProfileDialog from '@/components/profile/UserProfileDialog'
+import LanguageSwitcher from './LanguageSwitcher'
 
 interface UserProfileMenuProps {
   userName: string
@@ -29,9 +31,11 @@ interface UserProfileMenuProps {
 const UserProfileMenu: React.FC<UserProfileMenuProps> = ({ userName }) => {
   const theme = useTheme()
   const router = useRouter()
+  const pathname = usePathname()
   const { authenticated } = useAuth()
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
   const [profileDialogOpen, setProfileDialogOpen] = useState(false)
+  const [languageSwitcherAnchorEl, setLanguageSwitcherAnchorEl] = useState<null | HTMLElement>(null)
   const [userEmail, setUserEmail] = useState<string | null>(null)
   const [keycloak, setKeycloak] = useState<any>(null)
 
@@ -63,6 +67,13 @@ const UserProfileMenu: React.FC<UserProfileMenuProps> = ({ userName }) => {
     return userName.charAt(0).toUpperCase()
   }
 
+  const getCurrentLanguage = () => {
+    // Extrahiere Sprache aus der URL (z.B. /de/... oder /en/...)
+    const segments = pathname.split('/')
+    const lang = segments[1]
+    return lang === 'de' ? 'DE' : lang === 'en' ? 'EN' : 'DE'
+  }
+
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget)
   }
@@ -74,6 +85,15 @@ const UserProfileMenu: React.FC<UserProfileMenuProps> = ({ userName }) => {
   const handleProfileClick = () => {
     handleProfileMenuClose()
     setProfileDialogOpen(true)
+  }
+
+  const handleLanguageClick = (event: React.MouseEvent<HTMLElement>) => {
+    event.stopPropagation()
+    setLanguageSwitcherAnchorEl(event.currentTarget)
+  }
+
+  const handleLanguageSwitcherClose = () => {
+    setLanguageSwitcherAnchorEl(null)
   }
 
   const handleLogout = () => {
@@ -133,6 +153,12 @@ const UserProfileMenu: React.FC<UserProfileMenuProps> = ({ userName }) => {
           </ListItemIcon>
           <ListItemText>Profil</ListItemText>
         </MenuItem>
+        <MenuItem onClick={handleLanguageClick}>
+          <ListItemIcon>
+            <LanguageIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Sprache ({getCurrentLanguage()})</ListItemText>
+        </MenuItem>
         <MenuItem onClick={handleLogout}>
           <ListItemIcon>
             <LogoutIcon fontSize="small" />
@@ -142,6 +168,12 @@ const UserProfileMenu: React.FC<UserProfileMenuProps> = ({ userName }) => {
       </Menu>
 
       <UserProfileDialog open={profileDialogOpen} onClose={() => setProfileDialogOpen(false)} />
+
+      <LanguageSwitcher
+        anchorEl={languageSwitcherAnchorEl}
+        open={Boolean(languageSwitcherAnchorEl)}
+        onClose={handleLanguageSwitcherClose}
+      />
     </>
   )
 }
