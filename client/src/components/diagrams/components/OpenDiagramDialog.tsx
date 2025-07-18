@@ -24,9 +24,22 @@ import {
 } from '@mui/material'
 import { Search, Architecture, Person, CalendarToday } from '@mui/icons-material'
 import { useQuery } from '@apollo/client'
-import { useTranslations, useLocale } from 'next-intl'
+import { useTranslations } from 'next-intl'
 import { GET_DIAGRAMS } from '@/graphql/diagram'
-import { DIAGRAM_TYPES } from './SaveDiagramDialog'
+
+// Verfügbare Diagrammtypen direkt als Enum-Werte
+const AVAILABLE_DIAGRAM_TYPES = [
+  'ARCHITECTURE',
+  'APPLICATION_LANDSCAPE', 
+  'CAPABILITY_MAP',
+  'DATA_FLOW',
+  'PROCESS',
+  'NETWORK',
+  'INTEGRATION_ARCHITECTURE',
+  'SECURITY_ARCHITECTURE',
+  'CONCEPTUAL',
+  'OTHER'
+] as const
 
 export interface OpenDiagramDialogProps {
   open: boolean
@@ -41,7 +54,6 @@ const OpenDiagramDialog: React.FC<OpenDiagramDialogProps> = ({ open, onClose, on
   const t = useTranslations('diagrams')
   const tCommon = useTranslations('common')
   const tErrors = useTranslations('errors')
-  const locale = useLocale()
 
   const { data, loading, error } = useQuery(GET_DIAGRAMS, {
     skip: !open,
@@ -98,20 +110,31 @@ const OpenDiagramDialog: React.FC<OpenDiagramDialogProps> = ({ open, onClose, on
   }
 
   const getDiagramTypeLabel = (type: string) => {
-    // Direkte Übersetzung basierend auf Locale
-    const typeMap: Record<string, { de: string; en: string }> = {
-      ARCHITECTURE: { de: 'Architekturdiagramm', en: 'Architecture Diagram' },
-      APPLICATION_LANDSCAPE: { de: 'Anwendungslandschaft', en: 'Application Landscape' },
-      CAPABILITY_MAP: { de: 'Capability-Map', en: 'Capability Map' },
-      DATA_FLOW: { de: 'Datenflussdiagramm', en: 'Data Flow Diagram' },
-      PROCESS: { de: 'Prozessdiagramm', en: 'Process Diagram' },
-      NETWORK: { de: 'Netzwerkdiagramm', en: 'Network Diagram' },
-      INTEGRATION_ARCHITECTURE: { de: 'Integrationsarchitektur', en: 'Integration Architecture' },
-      SECURITY_ARCHITECTURE: { de: 'Sicherheitsarchitektur', en: 'Security Architecture' },
-      CONCEPTUAL: { de: 'Konzeptionell', en: 'Conceptual' },
-      OTHER: { de: 'Sonstiges', en: 'Other' },
+    // Typsichere Übersetzung der Diagrammtypen
+    switch (type) {
+      case 'ARCHITECTURE':
+        return t('diagramTypes.ARCHITECTURE')
+      case 'APPLICATION_LANDSCAPE':
+        return t('diagramTypes.APPLICATION_LANDSCAPE')
+      case 'CAPABILITY_MAP':
+        return t('diagramTypes.CAPABILITY_MAP')
+      case 'DATA_FLOW':
+        return t('diagramTypes.DATA_FLOW')
+      case 'PROCESS':
+        return t('diagramTypes.PROCESS')
+      case 'NETWORK':
+        return t('diagramTypes.NETWORK')
+      case 'INTEGRATION_ARCHITECTURE':
+        return t('diagramTypes.INTEGRATION_ARCHITECTURE')
+      case 'SECURITY_ARCHITECTURE':
+        return t('diagramTypes.SECURITY_ARCHITECTURE')
+      case 'CONCEPTUAL':
+        return t('diagramTypes.CONCEPTUAL')
+      case 'OTHER':
+        return t('diagramTypes.OTHER')
+      default:
+        return type
     }
-    return typeMap[type]?.[locale as 'de' | 'en'] || type
   }
 
   return (
@@ -144,9 +167,9 @@ const OpenDiagramDialog: React.FC<OpenDiagramDialogProps> = ({ open, onClose, on
                 onChange={e => setSelectedType(e.target.value)}
               >
                 <MenuItem value="">{t('dialogs.open.allTypes')}</MenuItem>
-                {DIAGRAM_TYPES.map(type => (
-                  <MenuItem key={type.value} value={type.value}>
-                    {getDiagramTypeLabel(type.value)}
+                {AVAILABLE_DIAGRAM_TYPES.map(type => (
+                  <MenuItem key={type} value={type}>
+                    {getDiagramTypeLabel(type)}
                   </MenuItem>
                 ))}
               </Select>

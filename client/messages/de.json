@@ -72,17 +72,6 @@
   "diagrams": {
     "title": "Diagramme",
     "diagramTypes": {
-      "architecture": "Architekturdiagramm",
-      "capability": "Capability-Map",
-      "application": "Anwendungsdiagramm",
-      "data": "Datenflussdiagramm",
-      "infrastructure": "Infrastrukturdiagramm",
-      "process": "Prozessdiagramm",
-      "organizational": "Organisationsdiagramm",
-      "network": "Netzwerkdiagramm",
-      "security": "Sicherheitsdiagramm",
-      "integration": "Integrationsdiagramm",
-      "other": "Sonstiges",
       "ARCHITECTURE": "Architekturdiagramm",
       "APPLICATION_LANDSCAPE": "Anwendungslandschaft",
       "CAPABILITY_MAP": "Capability-Map",

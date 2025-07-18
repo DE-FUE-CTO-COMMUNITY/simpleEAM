@@ -49,52 +49,52 @@ export interface DiagramType {
 const createDiagramTypes = (t: any): DiagramType[] => [
   {
     value: 'ARCHITECTURE',
-    label: t('diagramTypes.architecture'),
+    label: t('diagramTypes.ARCHITECTURE'),
     description: 'Technische oder fachliche Architektur',
   },
   {
     value: 'APPLICATION_LANDSCAPE',
-    label: t('diagramTypes.application'),
+    label: t('diagramTypes.APPLICATION_LANDSCAPE'),
     description: 'Übersicht über alle Anwendungen und deren Beziehungen',
   },
   {
     value: 'CAPABILITY_MAP',
-    label: t('diagramTypes.capability'),
+    label: t('diagramTypes.CAPABILITY_MAP'),
     description: 'Fähigkeitslandkarte',
   },
   {
     value: 'DATA_FLOW',
-    label: t('diagramTypes.data'),
+    label: t('diagramTypes.DATA_FLOW'),
     description: 'Darstellung von Datenströmen',
   },
   {
     value: 'PROCESS',
-    label: t('diagramTypes.process'),
+    label: t('diagramTypes.PROCESS'),
     description: 'Geschäftsprozesse und Workflows',
   },
   {
     value: 'NETWORK',
-    label: t('diagramTypes.network'),
+    label: t('diagramTypes.NETWORK'),
     description: 'IT-Infrastruktur und Netzwerke',
   },
   {
     value: 'INTEGRATION_ARCHITECTURE',
-    label: t('diagramTypes.integration'),
+    label: t('diagramTypes.INTEGRATION_ARCHITECTURE'),
     description: 'Systemintegration und Schnittstellen',
   },
   {
     value: 'SECURITY_ARCHITECTURE',
-    label: t('diagramTypes.security'),
+    label: t('diagramTypes.SECURITY_ARCHITECTURE'),
     description: 'Sicherheitskonzepte und -maßnahmen',
   },
   {
     value: 'CONCEPTUAL',
-    label: t('diagramTypes.other'),
+    label: t('diagramTypes.CONCEPTUAL'),
     description: 'Konzeptuelle Darstellung und Ideen',
   },
   {
     value: 'OTHER',
-    label: t('diagramTypes.other'),
+    label: t('diagramTypes.OTHER'),
     description: 'Andere Diagrammtypen',
   },
 ]
