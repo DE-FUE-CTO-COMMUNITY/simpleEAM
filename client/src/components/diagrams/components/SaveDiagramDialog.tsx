@@ -262,7 +262,6 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
           const architectureValue = Array.isArray(existingDiagram.architecture)
             ? existingDiagram.architecture[0]
             : existingDiagram.architecture
-          console.log('Setze Architektur aus existierendem Diagramm:', architectureValue)
 
           // Wenn Architekturdaten bereits geladen sind, verwende sie
           if (architecturesData?.architectures && architectureValue?.id) {
@@ -270,7 +269,6 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
               (a: any) => a.id === architectureValue.id
             )
             if (foundArch) {
-              console.log('Architektur in verfügbaren Daten gefunden:', foundArch)
               setSelectedArchitecture(foundArch)
               setArchitectureError(false)
             } else {
@@ -287,7 +285,6 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
             setArchitectureError(false)
           }
         } else {
-          console.log('Keine Architektur im existierenden Diagramm gefunden')
           setSelectedArchitecture(null)
           setArchitectureError(true) // Keine Architektur, Fehler anzeigen
         }
@@ -323,7 +320,6 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
 
       if (foundArch && foundArch !== selectedArchitecture) {
         // Ersetze mit vollständigen Daten aus der API
-        console.log('Aktualisiere Architektur mit vollständigen API-Daten:', foundArch)
         setSelectedArchitecture(foundArch)
       } else if (!foundArch) {
         console.warn(

@@ -134,28 +134,13 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
   // Excalidraw API Handler
   const handleExcalidrawAPI = useCallback(
     (api: any) => {
-      console.log('Excalidraw API initialisiert:', {
-        apiExists: !!api,
-        hasMethods: api ? Object.keys(api).length : 0,
-        updateSceneExists: typeof api?.updateScene === 'function',
-        getSceneElementsExists: typeof api?.getSceneElements === 'function',
-      })
-
       // Setze eine Bereitschafts-Eigenschaft für bessere Erkennung
       if (api) {
         api.ready = true
         setExcalidrawAPI(api)
       }
-
-      // Explizites Logging, nachdem die API gesetzt wurde
-      setTimeout(() => {
-        console.log('Excalidraw API Status nach dem Setzen:', {
-          apiInState: !!excalidrawAPI,
-          ready: excalidrawAPI?.ready === true,
-        })
-      }, 100)
     },
-    [setExcalidrawAPI, excalidrawAPI]
+    [setExcalidrawAPI]
   )
 
   // Library Update Handler
@@ -305,7 +290,6 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
         const pendingDiagram = localStorage.getItem('pendingDiagramToOpen')
         if (pendingDiagram && excalidrawAPI) {
           const diagramData = JSON.parse(pendingDiagram)
-          console.log('Lade Diagramm aus LocalStorage:', diagramData.id)
 
           // Entferne aus LocalStorage, damit es nur einmal geladen wird
           localStorage.removeItem('pendingDiagramToOpen')
@@ -313,11 +297,9 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
           // Prüfe, ob diagramJson verfügbar ist
           if (diagramData.diagramJson) {
             // Diagramm hat bereits JSON-Daten, direkt laden
-            console.log('Verwende verfügbare JSON-Daten aus LocalStorage')
             handleOpenDiagram(diagramData)
           } else {
             // Diagramm benötigt noch JSON-Daten - setze erst die Metadaten
-            console.log('Setze Diagramm-Metadaten und lade JSON dynamisch für ID:', diagramData.id)
             setCurrentDiagram(diagramData)
 
             // Lade das komplette Diagramm über GraphQL

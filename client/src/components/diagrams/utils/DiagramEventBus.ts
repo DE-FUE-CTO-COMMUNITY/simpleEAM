@@ -10,14 +10,12 @@ export const DiagramEventBus = {
 
   // API-Referenz setzen
   setExcalidrawAPI(api: any) {
-    console.log('DiagramEventBus: API wird gesetzt', !!api)
     this.api = api
     this.triggerEvent('apiReady')
   },
 
   // Handler-Referenz setzen
   setOpenHandler(handler: (diagram: any) => void) {
-    console.log('DiagramEventBus: Handler wird gesetzt', !!handler)
     this.handler = handler
     this.triggerEvent('handlerReady')
   },
@@ -30,15 +28,8 @@ export const DiagramEventBus = {
 
   // Diagramm öffnen
   openDiagram(diagramData: any) {
-    console.log('DiagramEventBus: Versuche Diagramm zu öffnen', {
-      apiExists: !!this.api,
-      handlerExists: !!this.handler,
-      diagramExists: !!diagramData,
-    })
-
     if (this.handler && diagramData) {
       try {
-        console.log('DiagramEventBus: Öffne Diagramm mit Handler')
         this.handler(diagramData)
         return true
       } catch (error) {
@@ -52,7 +43,6 @@ export const DiagramEventBus = {
   // Event auslösen
   triggerEvent(eventName: string, detail: any = {}) {
     if (typeof window !== 'undefined') {
-      console.log(`DiagramEventBus: Event "${eventName}" wird ausgelöst`, detail)
       const event = new CustomEvent(`diagram_${eventName}`, { detail })
       window.dispatchEvent(event)
     }

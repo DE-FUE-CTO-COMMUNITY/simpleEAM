@@ -54,10 +54,6 @@ export const useDiagramState = () => {
 
         // Überspringe Local Storage-Wiederherstellung, wenn ein Diagramm über URL-Parameter geladen werden soll
         if (openDiagramId) {
-          console.log(
-            'Überspringe Local Storage-Wiederherstellung - Diagramm wird über URL-Parameter geladen:',
-            openDiagramId
-          )
           return
         }
 
@@ -92,10 +88,6 @@ export const useDiagramState = () => {
     if (excalidrawAPI && isClient && currentScene && !sceneRestoredRef.current) {
       // Überspringe Local Storage-Wiederherstellung, wenn ein Diagramm über URL-Parameter geladen werden soll
       if (openDiagramId) {
-        console.log(
-          'Überspringe Scene-Wiederherstellung - Diagramm wird über URL-Parameter geladen:',
-          openDiagramId
-        )
         return
       }
 
@@ -229,14 +221,6 @@ const restoreSceneData = (sceneData: any) => {
   if (sceneData.appState.errorMessage === undefined) {
     sceneData.appState.errorMessage = null
   }
-
-  // Debugging-Information für Docker-Umgebungen
-  console.log('SceneData für Wiederherstellung vorbereitet:', {
-    hasElements: Array.isArray(sceneData.elements) && sceneData.elements.length > 0,
-    elementCount: Array.isArray(sceneData.elements) ? sceneData.elements.length : 0,
-    hasAppState: !!sceneData.appState,
-    hasViewport: !!(sceneData.appState?.scrollX && sceneData.appState?.scrollY),
-  })
 
   return sceneData
 }

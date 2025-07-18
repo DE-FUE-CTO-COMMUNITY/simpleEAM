@@ -115,7 +115,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         const handleTokenRefresh = (_event: CustomEvent) => {
           // Der Apollo Client wird so konfiguriert, dass er das aktuelle Token
           // aus der Keycloak-Instanz holt, daher keine weitere Aktion nötig
-          console.log('Token refreshed, Client behält seinen State')
         }
 
         // Auth Error Listener - erstelle Client ohne Token

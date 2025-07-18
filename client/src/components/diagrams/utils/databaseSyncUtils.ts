@@ -387,17 +387,6 @@ export const validateAndSyncElementsForImport = async (
       // Update nur wenn tatsächlich eine Diskrepanz besteht
       const nameUpdateNeeded = databaseName && (isDisplayedNameDifferent || isOriginalNameDifferent)
 
-      // Nur loggen wenn ein Update erforderlich sein könnte
-      if (nameUpdateNeeded || isDisplayedNameDifferent || isOriginalNameDifferent) {
-        console.log(
-          `Sync comparison for ${elementType} ${databaseId} (instance ${elementInstance.id}):`
-        )
-        console.log(`  Original displayed: "${displayedName}"`)
-        console.log(`  Normalized displayed: "${normalizedDisplayedName}"`)
-        console.log(`  Database name: "${databaseName}"`)
-        console.log(`  Normalized database: "${normalizedDatabaseName}"`)
-      }
-
       if (nameUpdateNeeded) {
         // Aktualisiere elementName mit neuen Daten (optimiert)
         elementInstance.customData.elementName = databaseName
@@ -410,10 +399,6 @@ export const validateAndSyncElementsForImport = async (
 
           // Füge sowohl das Container-Element als auch das Text-Element zu den Updates hinzu
           updatedElements.push(elementInstance, updatedTextElement)
-
-          console.log(
-            `Updated text element for ${elementType} ${databaseId} (instance ${elementInstance.id}): "${normalizedDisplayedName}" -> "${databaseName}"`
-          )
         } else {
           console.warn(
             `No text element found for ${elementType} ${databaseId} (instance ${elementInstance.id})`
@@ -540,10 +525,6 @@ export const syncDiagramOnOpenSimple = async (
 
       // Beim normalen Öffnen: IMMER den Datenbanknamen verwenden, kein Vergleich nötig
       if (databaseName && textElement) {
-        console.log(
-          `Loading name from database for ${elementType} ${databaseId}: "${databaseName}"`
-        )
-
         // Erstelle eine Kopie des Elements mit aktualisiertem Namen
         const updatedElement = {
           ...elementInstance,

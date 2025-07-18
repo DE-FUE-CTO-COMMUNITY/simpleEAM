@@ -66,7 +66,6 @@ const DiagramCard: React.FC<DiagramCardProps> = ({
 
       // Wenn diagramJson verfügbar ist, direkt verwenden
       if (diagramJson) {
-        console.log('Speichere Diagramm mit verfügbarem JSON für Öffnen:', id)
         localStorage.setItem(
           'pendingDiagramToOpen',
           JSON.stringify({
@@ -76,7 +75,6 @@ const DiagramCard: React.FC<DiagramCardProps> = ({
         )
       } else {
         // Nur die ID speichern, der DiagramEditor lädt das JSON dynamisch
-        console.log('Speichere Diagramm-ID für dynamisches Laden:', id)
         localStorage.setItem('pendingDiagramToOpen', JSON.stringify(diagramToOpen))
       }
 

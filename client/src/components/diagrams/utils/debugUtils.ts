@@ -82,48 +82,13 @@ export function debugMissingCapabilities(
 }
 
 // Debug function to analyze application rollup behavior
-export function debugApplicationRollup(
-  capabilities: BusinessCapability[],
+export const debugApplicationRollup = (
+  data: any[],
   settings: CapabilityMapSettings
-): any {
-  if (!settings.includeApplications) {
-    console.log('🔍 Application rollup debug: Applications are disabled in settings')
-    return { disabled: true }
-  }
-
-  console.log('🔍 Application rollup debug analysis:')
-  console.log(
-    `Settings: maxLevels=${settings.maxLevels}, includeApplications=${settings.includeApplications}`
-  )
-
-  const topLevelCapabilities = findTopLevelCapabilities(capabilities)
-  const analysis = {
-    totalUniqueApps: 0,
-    directlyAssignedApps: 0,
-    rolledUpApps: 0,
-    details: [] as any[],
-  }
-
-  const processCapability = (capability: BusinessCapability, currentLevel: number, indent = '') => {
-    // Only process if this capability will be rendered
-    if (currentLevel >= settings.maxLevels) {
-      return
-    }
-
-    const directApps = capability.supportedByApplications || []
-    const isLastVisibleLevel = currentLevel === settings.maxLevels - 1
-
-    console.log(`${indent}📊 ${capability.name} (Level ${currentLevel})`)
-    console.log(`${indent}   Direct apps: ${directApps.length}`)
-
-    const rolledUpApps: any[] = []
-    if (isLastVisibleLevel) {
-      // This capability is at the last visible level, so roll up from hidden children
-      const children = findChildCapabilities(capability.id, capabilities)
-      children.forEach(child => {
-        const childApps = child.supportedByApplications || []
-        rolledUpApps.push(...childApps)
-        console.log(`${indent}   Hidden child "${child.name}": ${childApps.length} apps`)
+): void => {
+  // Debug-Funktionen in Produktion deaktiviert
+  return
+} "${child.name}": ${childApps.length} apps`)
 
         // Recursively collect from hidden descendants
         const collectFromDescendants = (desc: BusinessCapability, descLevel: number) => {

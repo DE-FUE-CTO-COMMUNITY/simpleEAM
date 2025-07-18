@@ -29,9 +29,6 @@ import {
   generateCapabilityMapWithLibrary,
   calculateRenderedCapabilitiesCount,
   calculateDisplayedApplicationsCount,
-  debugCapabilityHierarchy,
-  debugMissingCapabilities,
-  debugApplicationRollup,
   type CapabilityMapSettings,
 } from '../utils/CapabilityMapLibraryUtils'
 import { findTopLevelCapabilities } from '../utils/capabilityHierarchy'
@@ -171,15 +168,6 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
     const capabilitiesToUse = finalFilteredCapabilities || data.businessCapabilities
 
     try {
-      // Debug the capability hierarchy before generation
-      debugCapabilityHierarchy(capabilitiesToUse, settings)
-
-      // Enhanced debug analysis to find missing capabilities
-      debugMissingCapabilities(capabilitiesToUse, settings)
-
-      // Debug application rollup behavior
-      debugApplicationRollup(capabilitiesToUse, settings)
-
       let elements: any[] = []
 
       // Generate capability map with ArchiMate symbols

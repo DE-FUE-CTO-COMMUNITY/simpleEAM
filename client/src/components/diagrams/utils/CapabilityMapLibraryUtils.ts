@@ -20,11 +20,6 @@ export {
   createCapabilityElementsFromTemplate,
   createApplicationElementsFromTemplate,
 } from './elementCreation'
-export {
-  debugCapabilityHierarchy,
-  debugMissingCapabilities,
-  debugApplicationRollup,
-} from './debugUtils'
 export { renderCapabilityHierarchy } from './capabilityRenderer'
 
 // Import what we need for the main functions

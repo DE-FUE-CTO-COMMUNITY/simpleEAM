@@ -273,14 +273,12 @@ export const deleteEntityData = async (
 
 export const refreshDashboardCache = async (): Promise<void> => {
   // Placeholder for cache refresh logic
-  console.log('Dashboard cache refreshed')
 }
 
 export const updateEntityRelationships = async (
-  client: ApolloClient<any>,
-  data: any[],
-  entityType: string
+  _client: ApolloClient<any>,
+  _data: any[],
+  _entityType: string
 ): Promise<void> => {
   // Simplified relationship update
-  console.log(`Updating relationships for ${entityType}`)
 }

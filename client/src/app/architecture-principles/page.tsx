@@ -157,8 +157,6 @@ const ArchitecturePrinciplesPage = () => {
 
   // Handler-Funktionen
   const handleCreatePrinciple = async (data: ArchitecturePrincipleFormValues) => {
-    console.log('🔥 handleCreatePrinciple aufgerufen mit data:', data)
-
     try {
       const input = {
         name: data.name,
@@ -199,13 +197,9 @@ const ArchitecturePrinciplesPage = () => {
           : {}),
       }
 
-      console.log('🔥 Input für GraphQL Mutation:', input)
-
       const result = await createPrincipleMutation({
         variables: { input: [input] },
       })
-
-      console.log('🔥 GraphQL Mutation erfolgreich:', result)
 
       // Formular nach dem Erstellen schließen
       setShowNewPrincipleForm(false)
@@ -274,9 +268,7 @@ const ArchitecturePrinciplesPage = () => {
 
   // Neues Architektur-Prinzip erstellen
   const handleCreatePrincipleClick = () => {
-    console.log('🔥 handleCreatePrincipleClick aufgerufen')
     setShowNewPrincipleForm(true)
-    console.log('🔥 showNewPrincipleForm auf true gesetzt')
   }
 
   const handleFilterChange = (newFilter: Partial<FilterState>) => {

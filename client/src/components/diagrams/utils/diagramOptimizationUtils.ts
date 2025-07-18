@@ -48,10 +48,6 @@ export const optimizeDiagramOnOpen = (diagramData: DiagramData): DiagramData => 
       const elementName = customData.originalElement.name
 
       if (elementName) {
-        console.log(
-          `Optimizing element ${element.id}: replacing originalElement with elementName "${elementName}"`
-        )
-
         // Erstelle optimierte customData mit elementName und entferne originalElement
         const optimizedCustomData = {
           ...customData,
@@ -72,10 +68,6 @@ export const optimizeDiagramOnOpen = (diagramData: DiagramData): DiagramData => 
     // Prüfe, ob sowohl originalElement als auch elementName vorhanden sind
     if (customData.originalElement && customData.elementName) {
       // originalElement kann entfernt werden, da elementName bereits vorhanden ist
-      console.log(
-        `Optimizing element ${element.id}: removing redundant originalElement (elementName already exists)`
-      )
-
       const optimizedCustomData = {
         ...customData,
       }
@@ -143,10 +135,6 @@ export const optimizeDiagramOnSave = (diagramData: DiagramData): DiagramData => 
     // Prüfe, ob sowohl originalElement als auch elementName vorhanden sind
     if (customData.originalElement && customData.elementName) {
       // originalElement ist redundant, da elementName bereits vorhanden ist
-      console.log(
-        `Optimizing save for element ${element.id}: removing redundant originalElement (elementName: "${customData.elementName}")`
-      )
-
       const optimizedCustomData = {
         ...customData,
       }
@@ -166,10 +154,6 @@ export const optimizeDiagramOnSave = (diagramData: DiagramData): DiagramData => 
       const elementName = customData.originalElement.name
 
       if (elementName) {
-        console.log(
-          `Optimizing save for element ${element.id}: extracting elementName "${elementName}" from originalElement`
-        )
-
         const optimizedCustomData = {
           ...customData,
           elementName: elementName,

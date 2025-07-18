@@ -6,10 +6,7 @@ import {
   syncDiagramOnSave,
   clearMissingElementMarkers,
 } from '../utils/databaseSyncUtils'
-import {
-  optimizeDiagramOnOpen,
-  getDiagramOptimizationStats,
-} from '../utils/diagramOptimizationUtils'
+import { optimizeDiagramOnOpen } from '../utils/diagramOptimizationUtils'
 import {
   saveSceneToStorage,
   saveDiagramToStorage,
@@ -42,17 +39,6 @@ export const useDiagramHandlers = (
 
   // Ref to track the timestamp when we last completed a load operation
   const lastLoadCompletedRef = useRef<number>(0)
-
-  // Add debugging to track potential sources of onChange events
-  const logChangeSource = useCallback((source: string, additionalInfo?: any) => {
-    const timestamp = new Date().toISOString()
-    const timeSinceLastLoad = Date.now() - lastLoadCompletedRef.current
-    console.log(`🔍 [${timestamp}] Change source: ${source}`)
-    console.log(`  - timeSinceLastLoad: ${timeSinceLastLoad}ms`)
-    if (additionalInfo) {
-      console.log(`  - additionalInfo:`, additionalInfo)
-    }
-  }, [])
 
   // New Diagram Handler
   const handleNewDiagram = useCallback(() => {
@@ -93,12 +79,10 @@ export const useDiagramHandlers = (
 
       // Explicitly ensure hasUnsavedChanges is false after all operations
       setTimeout(() => {
-        console.log('🔒 Final reset: ensuring hasUnsavedChanges is false after new diagram')
         setHasUnsavedChanges(false)
         isLoadingRef.current = false
         // Set timestamp to start cooldown period
         lastLoadCompletedRef.current = Date.now()
-        console.log(`⏰ Load cooldown period started (new diagram) at ${new Date().toISOString()}`)
       }, 50)
     }, 0)
 
@@ -150,8 +134,6 @@ export const useDiagramHandlers = (
   // Open Diagram Handler
   const handleOpenDiagram = useCallback(
     async (diagram: any) => {
-      console.log('handleOpenDiagram aufgerufen', diagram?.id)
-
       // Set loading flag IMMEDIATELY to prevent ANY onChange calls during the entire opening process
       isLoadingRef.current = true
 
@@ -174,37 +156,16 @@ export const useDiagramHandlers = (
       }
 
       try {
-        console.log('handleOpenDiagram wird ausgeführt mit:', {
-          diagramId: diagram.id,
-          title: diagram.title,
-          apiReady: !!api,
-          jsonLength: diagram.diagramJson.length,
-        })
-
         // Parse the diagram JSON data
         const diagramData = JSON.parse(diagram.diagramJson)
-        console.log('Diagramm-JSON erfolgreich geparst', {
-          elementCount: diagramData.elements?.length || 0,
-          hasAppState: !!diagramData.appState,
-        })
 
         // Optimize diagram data by replacing originalElement with elementName
         const optimizedDiagramData = optimizeDiagramOnOpen(diagramData)
-        const optimizationStats = getDiagramOptimizationStats(diagramData, optimizedDiagramData)
-
-        if (optimizationStats.optimizedCount > 0) {
-          console.log('Diagramm-Optimierung durchgeführt:', {
-            elementsOptimized: optimizationStats.optimizedCount,
-            totalElementsWithElementName: optimizationStats.elementsWithElementName,
-            remainingOriginalElements: optimizationStats.optimizedElementsWithOriginalElement,
-          })
-        }
 
         // Try to sync from database with Docker-safe error handling
         let syncedDiagramData
         try {
           syncedDiagramData = await syncDiagramOnOpen(apolloClient, optimizedDiagramData)
-          console.log('Datenbank-Sync erfolgreich')
         } catch (syncError) {
           console.warn('Database sync failed, using local data:', syncError)
           syncedDiagramData = optimizedDiagramData
@@ -238,10 +199,6 @@ export const useDiagramHandlers = (
         }
 
         const restoredScene = restoreSceneData(sceneData)
-        console.log('Szene für das Rendering vorbereitet', {
-          elementsCount: restoredScene.elements?.length || 0,
-          hasAppState: !!restoredScene.appState,
-        })
 
         // Sicherstellen, dass die Excalidraw-API-Methoden verfügbar sind
         if (typeof api.updateScene !== 'function') {
@@ -258,9 +215,7 @@ export const useDiagramHandlers = (
 
         // Sofort die Excalidraw-Szene aktualisieren (mit integrierter Viewport-Position)
         try {
-          console.log('Aktualisiere Excalidraw-Szene...')
           api.updateScene(restoredScene)
-          console.log('Excalidraw-Szene erfolgreich aktualisiert')
         } catch (updateError) {
           console.error('Fehler beim Aktualisieren der Excalidraw-Szene:', updateError)
           // Reset loading flag on error
@@ -276,9 +231,6 @@ export const useDiagramHandlers = (
         // Delay state updates to prevent premature onChange calls
         const updateStateAndViewport = () => {
           // State-Updates nach allen Scene-Updates ausführen
-          console.log('Aktualisiere Diagramm-Status...')
-          console.log('Diagramm-Architektur beim Laden:', diagram.architecture)
-
           setCurrentDiagram(diagram)
           setCurrentScene(restoredScene)
           setHasUnsavedChanges(false)
@@ -287,7 +239,6 @@ export const useDiagramHandlers = (
           // Persist to localStorage
           saveSceneToStorage(restoredScene)
           saveDiagramToStorage(diagram)
-          console.log('Diagramm-Status erfolgreich aktualisiert und im localStorage gespeichert')
 
           setNotification({
             open: true,
@@ -300,7 +251,6 @@ export const useDiagramHandlers = (
         if (savedViewportState) {
           setTimeout(() => {
             try {
-              console.log('Wende Viewport-Einstellungen an...')
               // Loading flag should still be set from the main updateScene call
 
               api.updateScene({
@@ -310,21 +260,16 @@ export const useDiagramHandlers = (
                   zoom: { value: savedViewportState.zoom },
                 },
               })
-              console.log('Viewport-Einstellungen erfolgreich angewendet')
 
               // Update state after viewport is applied
               setTimeout(() => {
                 updateStateAndViewport()
                 // Explicitly ensure hasUnsavedChanges is false after loading is complete
                 setTimeout(() => {
-                  console.log(
-                    '🔒 Final reset: ensuring hasUnsavedChanges is false after diagram load'
-                  )
                   setHasUnsavedChanges(false)
                   isLoadingRef.current = false
                   // Set timestamp to start cooldown period
                   lastLoadCompletedRef.current = Date.now()
-                  console.log(`⏰ Load cooldown period started at ${new Date().toISOString()}`)
                 }, 100)
               }, 50)
             } catch (viewportError) {
@@ -333,14 +278,10 @@ export const useDiagramHandlers = (
               updateStateAndViewport()
               // Explicitly ensure hasUnsavedChanges is false even on error
               setTimeout(() => {
-                console.log('🔒 Final reset on error: ensuring hasUnsavedChanges is false')
                 setHasUnsavedChanges(false)
                 isLoadingRef.current = false
                 // Set timestamp to start cooldown period even on error
                 lastLoadCompletedRef.current = Date.now()
-                console.log(
-                  `⏰ Load cooldown period started (after error) at ${new Date().toISOString()}`
-                )
               }, 50)
             }
           }, 300) // Increased delay to ensure Excalidraw has finished its initial setup
@@ -350,16 +291,10 @@ export const useDiagramHandlers = (
             updateStateAndViewport()
             // Explicitly ensure hasUnsavedChanges is false after loading is complete
             setTimeout(() => {
-              console.log(
-                '🔒 Final reset: ensuring hasUnsavedChanges is false after diagram load (no viewport)'
-              )
               setHasUnsavedChanges(false)
               isLoadingRef.current = false
               // Set timestamp to start cooldown period
               lastLoadCompletedRef.current = Date.now()
-              console.log(
-                `⏰ Load cooldown period started (no viewport) at ${new Date().toISOString()}`
-              )
             }, 100)
           }, 100)
         }
@@ -482,30 +417,8 @@ export const useDiagramHandlers = (
   // Change Handler - uses Excalidraw's native onChange to detect ANY change
   const handleChange = useCallback(
     (elements: any[], appState: any) => {
-      // Enhanced debugging - log the call stack to see what triggered onChange
-      const timestamp = new Date().toISOString()
+      // Calculate timing for cooldown logic
       const timeSinceLastLoad = Date.now() - lastLoadCompletedRef.current
-
-      console.log(`🔍 [${timestamp}] handleChange called:`)
-      console.log(`  - timeSinceLastLoad: ${timeSinceLastLoad}ms`)
-      console.log(`  - currentDiagram: ${currentDiagram?.id || 'none'}`)
-      console.log(`  - isSaving: ${isSavingRef.current}`)
-      console.log(`  - isLoading: ${isLoadingRef.current}`)
-      console.log(`  - elements count: ${elements?.length || 0}`)
-      console.log(`  - appState keys:`, appState ? Object.keys(appState) : 'none')
-
-      // Log the call stack to see what triggered this onChange
-      if (
-        timeSinceLastLoad > 2000 &&
-        currentDiagram &&
-        !isSavingRef.current &&
-        !isLoadingRef.current
-      ) {
-        console.log(
-          `🚨 POTENTIAL ISSUE: onChange triggered ${timeSinceLastLoad}ms after load completion!`
-        )
-        console.trace('Call stack for onChange trigger:')
-      }
 
       // Save viewport state (scrollX, scrollY, zoom) to localStorage whenever it changes
       // Use a debounced approach to avoid excessive localStorage writes
@@ -530,9 +443,6 @@ export const useDiagramHandlers = (
           Math.abs(existingState.zoom - viewportState.zoom) > 0.01
 
         if (viewportChanged) {
-          console.log(
-            `📍 Viewport changed: scroll(${viewportState.scrollX}, ${viewportState.scrollY}), zoom(${viewportState.zoom})`
-          )
           saveViewportStateToStorage(viewportState)
         }
       }
@@ -541,18 +451,12 @@ export const useDiagramHandlers = (
       const isInLoadCooldown = timeSinceLastLoad < 2000 // 2 seconds cooldown
 
       if (isInLoadCooldown) {
-        console.log(
-          `⏳ Ignoring onChange during load cooldown period (${timeSinceLastLoad}ms since load)`
-        )
         return
       }
 
       // Track changes if we have a current diagram loaded and we're not currently saving or loading
       // When Excalidraw calls onChange, it means something has changed - mark as unsaved
       if (currentDiagram && !isSavingRef.current && !isLoadingRef.current) {
-        console.log(
-          `💾 Diagrammänderung erkannt (${timeSinceLastLoad}ms nach Laden), markiere als ungespeichert`
-        )
         setHasUnsavedChanges(true)
 
         // Create scene data for persistence without triggering state update

@@ -26,7 +26,6 @@ const DisplayTextExample = () => {
   const form = useForm({
     defaultValues: exampleData,
     onSubmit: async ({ value }) => {
-      console.log('Formular abgesendet:', value)
       setIsOpen(false)
     },
   })
