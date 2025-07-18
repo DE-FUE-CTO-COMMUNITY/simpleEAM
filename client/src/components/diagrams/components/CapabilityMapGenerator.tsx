@@ -21,6 +21,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs, { Dayjs } from 'dayjs'
 import 'dayjs/locale/de'
+import { useTranslations } from 'next-intl'
 import { BusinessCapabilityIcon, ApplicationComponentIcon } from '@/components/icons'
 import { useQuery } from '@apollo/client'
 import { GET_CAPABILITY_MAP_DATA } from '@/graphql/capability'
@@ -44,6 +45,9 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
   onClose,
   onElementsGenerated,
 }) => {
+  const t = useTranslations('diagrams')
+  const tCommon = useTranslations('common')
+
   const [settings, setSettings] = useState<CapabilityMapSettings>({
     maxLevels: 3,
     includeApplications: true,
@@ -252,39 +256,38 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="de">
       <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-        <DialogTitle>Capability Map generieren</DialogTitle>
+        <DialogTitle>{t('dialogs.capabilityMap.title')}</DialogTitle>
         <DialogContent>
           <Box sx={{ py: 2 }}>
             <Typography variant="body1" gutterBottom>
-              Generiere automatisch eine Capability Map aus den verfügbaren Daten.
+              {t('dialogs.capabilityMap.description')}
             </Typography>
 
             {loading && (
               <Box sx={{ display: 'flex', justifyContent: 'center', my: 2 }}>
                 <CircularProgress size={24} />
                 <Typography variant="body2" sx={{ ml: 1 }}>
-                  Lade Capability-Daten...
+                  {t('dialogs.capabilityMap.loadingData')}
                 </Typography>
               </Box>
             )}
 
             {error && (
               <Alert severity="error" sx={{ my: 2 }}>
-                Fehler beim Laden der Capability-Daten: {error.message}
+                {t('dialogs.capabilityMap.errorLoadingData')}: {error.message}
               </Alert>
             )}
 
             <Box sx={{ mt: 3, mb: 2 }}>
               <DatePicker
-                label="Datum für Capability Map"
+                label={t('dialogs.capabilityMap.dateLabel')}
                 value={filterDate}
                 onChange={newValue => setFilterDate(newValue)}
                 format="DD.MM.YYYY"
                 slotProps={{
                   textField: {
                     fullWidth: true,
-                    helperText:
-                      'Capabilities werden basierend auf diesem Datum gefiltert (aktiv zwischen Einführungs- und Enddatum)',
+                    helperText: t('dialogs.capabilityMap.dateHelperText'),
                   },
                 }}
               />
@@ -300,7 +303,8 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
                       sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
                     >
                       <BusinessCapabilityIcon sx={{ color: '#1976d2', fontSize: 16 }} />
-                      {data.businessCapabilities.length} Capabilities gesamt gefunden
+                      {data.businessCapabilities.length}{' '}
+                      {t('dialogs.capabilityMap.capabilitiesTotal')}
                     </Typography>
                     {filterDate && (
                       <Typography
@@ -309,8 +313,10 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
                         sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
                       >
                         <BusinessCapabilityIcon sx={{ color: '#ff9800', fontSize: 16 }} />
-                        {filteredCapabilities?.length || 0} Capabilities für{' '}
-                        {filterDate.format('DD.MM.YYYY')} gefiltert
+                        {filteredCapabilities?.length || 0}{' '}
+                        {t('dialogs.capabilityMap.capabilitiesFiltered', {
+                          date: filterDate.format('DD.MM.YYYY'),
+                        })}
                       </Typography>
                     )}
                     {allTopLevelCapabilities.length > 0 && (
@@ -320,8 +326,10 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
                         sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
                       >
                         <FilterListIcon sx={{ color: '#9c27b0', fontSize: 16 }} />
-                        {selectedTopLevelCapabilities.size} von {allTopLevelCapabilities.length}{' '}
-                        Top-Level Capabilities ausgewählt
+                        {selectedTopLevelCapabilities.size}{' '}
+                        {t('dialogs.capabilityMap.topLevelSelected', {
+                          total: allTopLevelCapabilities.length,
+                        })}
                       </Typography>
                     )}
                     <Typography
@@ -330,7 +338,8 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
                       sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
                     >
                       <BusinessCapabilityIcon sx={{ color: '#388e3c', fontSize: 16 }} />
-                      {finalFilteredCapabilities?.length || 0} Capabilities nach allen Filtern
+                      {finalFilteredCapabilities?.length || 0}{' '}
+                      {t('dialogs.capabilityMap.capabilitiesAfterFilters')}
                     </Typography>
                     <Typography
                       variant="body2"
@@ -338,7 +347,7 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
                       sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
                     >
                       <BusinessCapabilityIcon sx={{ color: '#388e3c', fontSize: 16 }} />
-                      {renderedCapabilitiesCount} Capabilities werden dargestellt
+                      {renderedCapabilitiesCount} {t('dialogs.capabilityMap.capabilitiesDisplayed')}
                     </Typography>
                     {settings.includeApplications && (
                       <>
@@ -350,7 +359,7 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
                           >
                             <ApplicationComponentIcon sx={{ color: '#1976d2', fontSize: 16 }} />
                             {appCountData.applicationsConnection.aggregate.count.nodes}{' '}
-                            Applikationen gesamt gefunden
+                            {t('dialogs.capabilityMap.applicationsTotal')}
                           </Typography>
                         )}
                         {applicationsWithCapabilityCount > 0 && (
@@ -360,7 +369,8 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
                             sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
                           >
                             <ApplicationComponentIcon sx={{ color: '#ff9800', fontSize: 16 }} />
-                            {applicationsWithCapabilityCount} Applikationen mit Capability-Zuordnung
+                            {applicationsWithCapabilityCount}{' '}
+                            {t('dialogs.capabilityMap.applicationsWithCapability')}
                           </Typography>
                         )}
                         {totalApplicationsCount > 0 && (
@@ -370,7 +380,8 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
                             sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
                           >
                             <ApplicationComponentIcon sx={{ color: '#388e3c', fontSize: 16 }} />
-                            {totalApplicationsCount} Applikationen werden dargestellt
+                            {totalApplicationsCount}{' '}
+                            {t('dialogs.capabilityMap.applicationsDisplayed')}
                           </Typography>
                         )}
                       </>
@@ -381,7 +392,7 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
                 <Box sx={{ mt: 3 }}>
                   <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
                     <TextField
-                      label="Maximale Hierarchie-Ebenen"
+                      label={t('dialogs.capabilityMap.maxLevelsLabel')}
                       type="number"
                       value={settings.maxLevels}
                       onChange={e =>
@@ -390,9 +401,9 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
                       inputProps={{ min: 1, max: 5 }}
                       fullWidth
                       margin="normal"
-                      helperText="Anzahl der Hierarchie-Ebenen die dargestellt werden sollen (1-5)"
+                      helperText={t('dialogs.capabilityMap.maxLevelsHelperText')}
                     />
-                    <Tooltip title="Top-Level Capabilities auswählen">
+                    <Tooltip title={t('dialogs.capabilityMap.filterTooltip')}>
                       <IconButton
                         onClick={handleOpenTopLevelFilter}
                         sx={{ mt: 2 }}
@@ -411,11 +422,11 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
                         onChange={e => handleSettingChange('includeApplications', e.target.checked)}
                       />
                     }
-                    label="Unterstützende Applikationen einbeziehen"
+                    label={t('dialogs.capabilityMap.includeApplicationsLabel')}
                   />
 
                   <TextField
-                    label="Horizontaler Abstand"
+                    label={t('dialogs.capabilityMap.horizontalSpacingLabel')}
                     type="number"
                     value={settings.horizontalSpacing}
                     onChange={e =>
@@ -424,11 +435,11 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
                     inputProps={{ min: 10, max: 500 }}
                     fullWidth
                     margin="normal"
-                    helperText="Abstand zwischen Capabilities in Pixeln"
+                    helperText={t('dialogs.capabilityMap.horizontalSpacingHelperText')}
                   />
 
                   <TextField
-                    label="Vertikaler Abstand"
+                    label={t('dialogs.capabilityMap.verticalSpacingLabel')}
                     type="number"
                     value={settings.verticalSpacing}
                     onChange={e =>
@@ -437,7 +448,7 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
                     inputProps={{ min: 10, max: 300 }}
                     fullWidth
                     margin="normal"
-                    helperText="Abstand zwischen Hierarchie-Ebenen in Pixeln"
+                    helperText={t('dialogs.capabilityMap.verticalSpacingHelperText')}
                   />
                 </Box>
               </>
@@ -445,13 +456,13 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={onClose}>Abbrechen</Button>
+          <Button onClick={onClose}>{tCommon('cancel')}</Button>
           <Button
             onClick={handleGenerate}
             variant="contained"
             disabled={loading || !data?.businessCapabilities}
           >
-            Generieren
+            {t('dialogs.capabilityMap.generateButton')}
           </Button>{' '}
         </DialogActions>
       </Dialog>
@@ -463,19 +474,19 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle>Top-Level Capabilities auswählen</DialogTitle>
+        <DialogTitle>{t('dialogs.capabilityMap.topLevelFilter.title')}</DialogTitle>
         <DialogContent>
           <Box sx={{ py: 2 }}>
             <Typography variant="body2" color="text.secondary" gutterBottom>
-              Wählen Sie die Top-Level Capabilities aus, die in der Map dargestellt werden sollen:
+              {t('dialogs.capabilityMap.topLevelFilter.description')}
             </Typography>
 
             <Box sx={{ mt: 2, mb: 2 }}>
               <Button size="small" onClick={handleSelectAllTopLevel} sx={{ mr: 1 }}>
-                Alle auswählen
+                {t('dialogs.capabilityMap.topLevelFilter.selectAll')}
               </Button>
               <Button size="small" onClick={handleDeselectAllTopLevel}>
-                Alle abwählen
+                {t('dialogs.capabilityMap.topLevelFilter.deselectAll')}
               </Button>
             </Box>
 
@@ -516,7 +527,7 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
                     )}
                     {capability.type && (
                       <Typography variant="caption" color="primary" display="block">
-                        Typ: {capability.type}
+                        {t('dialogs.capabilityMap.topLevelFilter.type', { type: capability.type })}
                       </Typography>
                     )}
                   </Box>
@@ -525,21 +536,27 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
 
               {allTopLevelCapabilities.length === 0 && (
                 <Typography variant="body2" color="text.secondary" align="center">
-                  Keine Top-Level Capabilities gefunden.
+                  {t('dialogs.capabilityMap.topLevelFilter.noCapabilities')}
                 </Typography>
               )}
             </Box>
 
             <Box sx={{ mt: 2, p: 2, bgcolor: 'background.paper', borderRadius: 1 }}>
               <Typography variant="body2" color="text.secondary">
-                <strong>Ausgewählt:</strong> {selectedTopLevelCapabilities.size} von{' '}
-                {allTopLevelCapabilities.length} Top-Level Capabilities
+                <strong>
+                  {t('dialogs.capabilityMap.topLevelFilter.selectedCount', {
+                    selected: selectedTopLevelCapabilities.size,
+                    total: allTopLevelCapabilities.length,
+                  })}
+                </strong>
               </Typography>
             </Box>
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseTopLevelFilter}>Fertig</Button>
+          <Button onClick={handleCloseTopLevelFilter}>
+            {t('dialogs.capabilityMap.topLevelFilter.done')}
+          </Button>
         </DialogActions>
       </Dialog>
     </LocalizationProvider>

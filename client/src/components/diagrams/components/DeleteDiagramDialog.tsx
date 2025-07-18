@@ -78,7 +78,7 @@ const DeleteDiagramDialog: React.FC<DeleteDiagramDialogProps> = ({
           &quot;{diagram?.title}&quot;
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-          Diese Aktion kann nicht rückgängig gemacht werden.
+          {t('dialogs.delete.confirmSubtext')}
         </Typography>
       </DialogContent>
       <DialogActions>

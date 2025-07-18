@@ -140,11 +140,46 @@
       },
       "delete": {
         "title": "Delete Diagram",
-        "confirmMessage": "Are you sure you want to delete the diagram \"{name}\"?",
+        "confirmMessage": "Are you sure you want to delete the diagram \"{title}\"?",
         "confirmSubtext": "This action cannot be undone.",
         "deleting": "Deleting...",
         "successMessage": "Diagram successfully deleted",
         "errorMessage": "Error deleting diagram"
+      },
+      "capabilityMap": {
+        "title": "Generate Capability Map",
+        "description": "Automatically generate a Capability Map from available data.",
+        "loadingData": "Loading Capability data...",
+        "errorLoadingData": "Error loading Capability data",
+        "dateLabel": "Date for Capability Map",
+        "dateHelperText": "Capabilities will be filtered based on this date (active between introduction and end date)",
+        "capabilitiesTotal": "Capabilities found in total",
+        "capabilitiesFiltered": "Capabilities filtered for {date}",
+        "topLevelSelected": "of {total} Top-Level Capabilities selected",
+        "capabilitiesAfterFilters": "Capabilities after all filters",
+        "capabilitiesDisplayed": "Capabilities will be displayed",
+        "applicationsTotal": "Applications found in total",
+        "applicationsWithCapability": "Applications with Capability assignment",
+        "applicationsDisplayed": "Applications will be displayed",
+        "maxLevelsLabel": "Maximum hierarchy levels",
+        "maxLevelsHelperText": "Number of hierarchy levels to be displayed (1-5)",
+        "includeApplicationsLabel": "Include supporting applications",
+        "horizontalSpacingLabel": "Horizontal spacing",
+        "horizontalSpacingHelperText": "Distance between Capabilities in pixels",
+        "verticalSpacingLabel": "Vertical spacing",
+        "verticalSpacingHelperText": "Distance between hierarchy levels in pixels",
+        "filterTooltip": "Select Top-Level Capabilities",
+        "generateButton": "Generate",
+        "topLevelFilter": {
+          "title": "Select Top-Level Capabilities",
+          "description": "Choose the Top-Level Capabilities to be displayed in the map:",
+          "selectAll": "Select all",
+          "deselectAll": "Deselect all",
+          "noCapabilities": "No Top-Level Capabilities found.",
+          "selectedCount": "Selected: {selected} of {total} Top-Level Capabilities",
+          "type": "Type: {type}",
+          "done": "Done"
+        }
       }
     },
     "messages": {

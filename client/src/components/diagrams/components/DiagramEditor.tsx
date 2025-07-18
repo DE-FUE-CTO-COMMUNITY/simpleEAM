@@ -60,6 +60,10 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
         const [key, param] = notification.message.split(':')
         if (key === 'messages.diagramLoaded') {
           translatedMessage = t('messages.diagramLoaded', { title: param })
+        } else if (key === 'messages.diagramSaved') {
+          translatedMessage = t('messages.diagramSaved', { title: param })
+        } else if (key === 'messages.diagramSavedAs') {
+          translatedMessage = t('messages.diagramSavedAs', { title: param })
         }
       } else if (notification.message.startsWith('messages.')) {
         const key = notification.message.replace('messages.', '')

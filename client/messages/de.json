@@ -143,12 +143,48 @@
       },
       "delete": {
         "title": "Diagramm löschen",
-        "confirmMessage": "Sind Sie sicher, dass Sie das Diagramm \"{title}\" löschen möchten?"
+        "confirmMessage": "Sind Sie sicher, dass Sie das Diagramm \"{title}\" löschen möchten?",
+        "confirmSubtext": "Diese Aktion kann nicht rückgängig gemacht werden."
       },
       "newElements": {
         "title": "Neue Elemente",
         "description": "Die folgenden neuen Elemente wurden im Diagramm erkannt:",
         "createButton": "Elemente erstellen"
+      },
+      "capabilityMap": {
+        "title": "Capability Map generieren",
+        "description": "Generiere automatisch eine Capability Map aus den verfügbaren Daten.",
+        "loadingData": "Lade Capability-Daten...",
+        "errorLoadingData": "Fehler beim Laden der Capability-Daten",
+        "dateLabel": "Datum für Capability Map",
+        "dateHelperText": "Capabilities werden basierend auf diesem Datum gefiltert (aktiv zwischen Einführungs- und Enddatum)",
+        "capabilitiesTotal": "Capabilities gesamt gefunden",
+        "capabilitiesFiltered": "Capabilities für {date} gefiltert",
+        "topLevelSelected": "von {total} Top-Level Capabilities ausgewählt",
+        "capabilitiesAfterFilters": "Capabilities nach allen Filtern",
+        "capabilitiesDisplayed": "Capabilities werden dargestellt",
+        "applicationsTotal": "Applikationen gesamt gefunden",
+        "applicationsWithCapability": "Applikationen mit Capability-Zuordnung",
+        "applicationsDisplayed": "Applikationen werden dargestellt",
+        "maxLevelsLabel": "Maximale Hierarchie-Ebenen",
+        "maxLevelsHelperText": "Anzahl der Hierarchie-Ebenen die dargestellt werden sollen (1-5)",
+        "includeApplicationsLabel": "Unterstützende Applikationen einbeziehen",
+        "horizontalSpacingLabel": "Horizontaler Abstand",
+        "horizontalSpacingHelperText": "Abstand zwischen Capabilities in Pixeln",
+        "verticalSpacingLabel": "Vertikaler Abstand",
+        "verticalSpacingHelperText": "Abstand zwischen Hierarchie-Ebenen in Pixeln",
+        "filterTooltip": "Top-Level Capabilities auswählen",
+        "generateButton": "Generieren",
+        "topLevelFilter": {
+          "title": "Top-Level Capabilities auswählen",
+          "description": "Wählen Sie die Top-Level Capabilities aus, die in der Map dargestellt werden sollen:",
+          "selectAll": "Alle auswählen",
+          "deselectAll": "Alle abwählen",
+          "noCapabilities": "Keine Top-Level Capabilities gefunden.",
+          "selectedCount": "Ausgewählt: {selected} von {total} Top-Level Capabilities",
+          "type": "Typ: {type}",
+          "done": "Fertig"
+        }
       }
     },
     "messages": {
