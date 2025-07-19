@@ -419,7 +419,7 @@
       "createdAt": "Created At",
       "updatedAt": "Updated At",
       "lastModifiedBy": "Last Modified By",
-      "responsible": "Responsible",
+      "owner": "Owner",
       "tags": "Tags",
       "sources": "Sources",
       "metrics": "Metrics",
@@ -439,7 +439,7 @@
       "createdAt": "Created At",
       "updatedAt": "Updated At",
       "lastModifiedBy": "Last Modified By",
-      "responsible": "Responsible",
+      "owner": "Owner",
       "appliedInArchitectures": "Applied in Architectures",
       "implementedByApplications": "Implementing Applications",
       "actions": "Actions"
@@ -485,10 +485,10 @@
       "updatedAt": "Updated At",
       "lastModifiedBy": "Last Modified By",
       "descriptionContains": "Description contains",
-      "responsible": "Responsible",
+      "owner": "Owner",
       "dateFrom": "From",
       "dateTo": "To",
-      "allResponsible": "All Responsible"
+      "allOwners": "All Owners"
     }
   }
 }

@@ -341,7 +341,7 @@ const ArchitecturePrincipleForm: React.FC<ArchitecturePrincipleFormProps> = ({
     },
     {
       name: 'ownerId',
-      label: t('form.responsible'),
+      label: t('form.owner'),
       type: 'select',
       required: false,
       tabId: 'general',

@@ -68,10 +68,8 @@ export const useArchitecturePrincipleFilter = ({
 
       // Verantwortlicher Filter
       if (ownerFilter && principle.owners && principle.owners.length > 0) {
-        const ownerMatch = principle.owners.some(owner => {
-          const ownerFullName = `${owner.firstName} ${owner.lastName}`.toLowerCase()
-          return ownerFullName.includes(ownerFilter.toLowerCase())
-        })
+        // ownerFilter enthält eine Person-ID vom personSelect
+        const ownerMatch = principle.owners.some(owner => owner.id === ownerFilter)
         if (!ownerMatch) {
           return false
         }

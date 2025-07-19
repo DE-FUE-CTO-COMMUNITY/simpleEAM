@@ -76,9 +76,9 @@ const ArchitecturePrincipleFilterDialog: React.FC<FilterProps> = ({
     // Verantwortlicher-Filter
     {
       id: 'ownerFilter',
-      label: t('responsible'),
+      label: t('owner'),
       type: 'personSelect',
-      emptyLabel: t('allResponsible'),
+      emptyLabel: t('allOwners'),
     },
     // Aktualisiert-Filter
     {

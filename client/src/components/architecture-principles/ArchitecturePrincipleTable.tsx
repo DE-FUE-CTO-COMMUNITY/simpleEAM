@@ -133,7 +133,7 @@ const ArchitecturePrincipleTable: React.FC<ArchitecturePrincipleTableProps> = ({
         },
       }),
       columnHelper.accessor('owners', {
-        header: tTable('responsible'),
+        header: tTable('owner'),
         cell: info => {
           const owners = info.getValue()
           return owners && owners.length > 0 ? `${owners[0].firstName} ${owners[0].lastName}` : '-'

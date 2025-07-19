@@ -465,6 +465,7 @@ const GenericForm: React.FC<GenericFormProps> = ({
                   'select',
                   'number',
                   'autocomplete',
+                  'tags',
                   'displayText',
                 ].includes(field.type) && (
                   <FormLabel sx={{ mb: 1, display: 'block' }}>
