@@ -20,10 +20,13 @@ import {
   TextField,
   CircularProgress,
 } from '@mui/material'
+import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 import { ClearAll as ClearAllIcon } from '@mui/icons-material'
 import { useQuery } from '@apollo/client'
+import dayjs from 'dayjs'
 import { GET_PERSONS } from '@/graphql/person'
 import { Person } from '../../gql/generated'
+import { useTranslations } from 'next-intl'
 
 // Definiere einen generischen Typ für die Filter
 export interface FilterOption<T = string> {
@@ -161,6 +164,7 @@ const GenericFilterDialog: React.FC<GenericFilterProps> = ({
   onApply,
   countActiveFilters,
 }) => {
+  const t = useTranslations('common')
   // Lade Personen für den PersonSelect-Filter
   const { data: personsData, loading: personsLoading } = useQuery(GET_PERSONS)
   const persons = personsData?.people || []
@@ -295,17 +299,19 @@ const GenericFilterDialog: React.FC<GenericFilterProps> = ({
 
       case 'date':
         return (
-          <TextField
+          <DatePicker
             key={field.id}
-            fullWidth
             label={field.label}
-            type="date"
-            value={value || ''}
-            onChange={e => {
-              onFilterChange({ [field.id]: e.target.value })
+            value={value ? dayjs(value) : null}
+            onChange={newValue => {
+              const dateValue = newValue ? newValue.format('YYYY-MM-DD') : ''
+              onFilterChange({ [field.id]: dateValue })
             }}
-            InputLabelProps={{
-              shrink: true,
+            slotProps={{
+              textField: {
+                fullWidth: true,
+                margin: 'normal',
+              },
             }}
           />
         )
@@ -315,40 +321,44 @@ const GenericFilterDialog: React.FC<GenericFilterProps> = ({
           <Box key={field.id} sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
             <Typography variant="subtitle1">{field.label}</Typography>
             <Box sx={{ display: 'flex', gap: 2 }}>
-              <TextField
-                fullWidth
-                label={field.fromLabel || 'Von'}
-                type="date"
-                value={Array.isArray(value) && value.length >= 1 ? value[0] : ''}
-                onChange={e => {
-                  const newValue = e.target.value
+              <DatePicker
+                label={field.fromLabel || t('from')}
+                value={
+                  Array.isArray(value) && value.length >= 1 && value[0] ? dayjs(value[0]) : null
+                }
+                onChange={newValue => {
+                  const dateValue = newValue ? newValue.format('YYYY-MM-DD') : ''
                   onFilterChange({
                     [field.id]: [
-                      newValue,
+                      dateValue,
                       Array.isArray(value) && value.length >= 2 ? value[1] : '',
                     ],
                   })
                 }}
-                InputLabelProps={{
-                  shrink: true,
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                  },
                 }}
               />
-              <TextField
-                fullWidth
-                label={field.toLabel || 'Bis'}
-                type="date"
-                value={Array.isArray(value) && value.length >= 2 ? value[1] : ''}
-                onChange={e => {
-                  const newValue = e.target.value
+              <DatePicker
+                label={field.toLabel || t('to')}
+                value={
+                  Array.isArray(value) && value.length >= 2 && value[1] ? dayjs(value[1]) : null
+                }
+                onChange={newValue => {
+                  const dateValue = newValue ? newValue.format('YYYY-MM-DD') : ''
                   onFilterChange({
                     [field.id]: [
                       Array.isArray(value) && value.length >= 1 ? value[0] : '',
-                      newValue,
+                      dateValue,
                     ],
                   })
                 }}
-                InputLabelProps={{
-                  shrink: true,
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                  },
                 }}
               />
             </Box>
@@ -401,14 +411,14 @@ const GenericFilterDialog: React.FC<GenericFilterProps> = ({
           color="secondary"
           variant="outlined"
         >
-          Filter zurücksetzen
+          {t('resetFilter')}
         </Button>
         <Box sx={{ display: 'flex', gap: 1 }}>
           <Button onClick={onClose} color="inherit">
-            Abbrechen
+            {t('cancel')}
           </Button>
           <Button onClick={handleApply} color="primary" variant="contained">
-            Anwenden
+            {t('applyFilter')}
           </Button>
         </Box>
       </DialogActions>

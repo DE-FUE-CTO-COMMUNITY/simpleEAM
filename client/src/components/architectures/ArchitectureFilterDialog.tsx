@@ -3,8 +3,9 @@
 import React from 'react'
 import GenericFilterDialog, { FilterField } from '../common/GenericFilterDialog'
 import { FilterProps } from './types'
-import { getDomainLabel, getTypeLabel, countActiveFilters } from './utils'
+import { useDomainLabel, useTypeLabel, countActiveFilters } from './utils'
 import { ArchitectureDomain, ArchitectureType } from '../../gql/generated'
+import { useTranslations } from 'next-intl'
 
 const ArchitectureFilterDialog: React.FC<FilterProps> = ({
   filterState,
@@ -16,34 +17,39 @@ const ArchitectureFilterDialog: React.FC<FilterProps> = ({
   onClose,
   onApply,
 }) => {
+  const t = useTranslations('architectures.filter')
+  const tCommon = useTranslations('common')
+  const getDomainLabelTranslated = useDomainLabel()
+  const getTypeLabelTranslated = useTypeLabel()
+
   // Konfiguration der Filterfelder
   const filterFields: FilterField[] = [
     // Domain Filter
     {
       id: 'domainFilter',
-      label: 'Domain',
+      label: t('domain'),
       type: 'multiSelect',
       options: availableDomains.map(domain => ({
         value: domain,
-        label: getDomainLabel(domain),
+        label: getDomainLabelTranslated(domain),
       })),
-      valueFormatter: value => getDomainLabel(value as ArchitectureDomain),
+      valueFormatter: value => getDomainLabelTranslated(value as ArchitectureDomain),
     },
     // Typ Filter
     {
       id: 'typeFilter',
-      label: 'Typ',
+      label: t('type'),
       type: 'multiSelect',
       options: availableTypes.map(type => ({
         value: type,
-        label: getTypeLabel(type),
+        label: getTypeLabelTranslated(type),
       })),
-      valueFormatter: value => getTypeLabel(value as ArchitectureType),
+      valueFormatter: value => getTypeLabelTranslated(value as ArchitectureType),
     },
     // Tags Filter
     {
       id: 'tagsFilter',
-      label: 'Tags',
+      label: t('tags'),
       type: 'multiSelect',
       options: availableTags.map(tag => ({
         value: tag,
@@ -53,30 +59,30 @@ const ArchitectureFilterDialog: React.FC<FilterProps> = ({
     // Beschreibungs-Filter
     {
       id: 'descriptionFilter',
-      label: 'Beschreibung enthält',
+      label: t('description'),
       type: 'text',
-      placeholder: 'Geben Sie einen Text ein...',
+      placeholder: tCommon('contains'),
     },
     // Verantwortlicher-Filter
     {
       id: 'ownerFilter',
-      label: 'Verantwortlicher',
+      label: t('owner'),
       type: 'personSelect',
-      emptyLabel: 'Alle Verantwortlichen',
+      emptyLabel: tCommon('noDataFound'),
     },
     // Aktualisiert-Filter
     {
       id: 'updatedDateRange',
-      label: 'Aktualisiert (Datum)',
+      label: t('updatedDate'),
       type: 'dateRange',
-      fromLabel: 'Von',
-      toLabel: 'Bis',
+      fromLabel: t('from'),
+      toLabel: t('to'),
     },
   ]
 
   return (
     <GenericFilterDialog
-      title="Filter für Architekturen"
+      title={t('title')}
       filterState={filterState}
       filterFields={filterFields}
       countActiveFilters={countActiveFilters as (filterState: any) => number}

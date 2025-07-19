@@ -550,7 +550,7 @@ export function GenericTable<T extends { id: string }, F>({
               fontSize: isMobile ? '16px' : '14px',
             }}
           >
-            Anfang
+            {t('first')}
           </Button>
 
           {/* Zurück Button */}
@@ -568,7 +568,7 @@ export function GenericTable<T extends { id: string }, F>({
               },
             }}
           >
-            {!isMobile && 'Zurück'}
+            {!isMobile && t('back')}
           </Button>
 
           {/* Seitenzahlen */}
@@ -678,7 +678,7 @@ export function GenericTable<T extends { id: string }, F>({
               },
             }}
           >
-            {!isMobile && 'Weiter'}
+            {!isMobile && t('next')}
           </Button>
 
           {/* Ende Button */}
@@ -693,7 +693,7 @@ export function GenericTable<T extends { id: string }, F>({
               fontSize: isMobile ? '16px' : '14px',
             }}
           >
-            Ende
+            {t('last')}
           </Button>
         </Box>
       </Box>

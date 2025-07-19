@@ -11,7 +11,7 @@ import {
 } from '../../gql/generated'
 import { createColumnHelper } from '@tanstack/react-table'
 import { SortingState, VisibilityState } from '@tanstack/react-table'
-import { formatDate, getDomainLabel, getTypeLabel } from './utils'
+import { useDomainLabel, useTypeLabel, useFormatDate } from './utils'
 import ArchitectureForm, { ArchitectureFormValues } from './ArchitectureForm'
 import usePersistentColumnVisibility from '../../hooks/usePersistentColumnVisibility'
 
@@ -49,6 +49,9 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
   onColumnVisibilityChange: _externalOnColumnVisibilityChange,
 }) => {
   const t = useTranslations('architectures')
+  const getDomainLabelTranslated = useDomainLabel()
+  const getTypeLabelTranslated = useTypeLabel()
+  const formatDateTranslated = useFormatDate()
   const columnHelper = createColumnHelper<ArchitectureType>()
 
   // Verwende persistente Spaltensichtbarkeit
@@ -97,7 +100,7 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
         header: t('table.domain'),
         cell: info => (
           <Chip
-            label={getDomainLabel(info.getValue() as ArchitectureDomain)}
+            label={getDomainLabelTranslated(info.getValue() as ArchitectureDomain)}
             color="primary"
             size="small"
             variant="filled"
@@ -106,11 +109,11 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
       }),
       columnHelper.accessor('type', {
         header: t('table.type'),
-        cell: info => getTypeLabel(info.getValue() as GeneratedArchitectureType),
+        cell: info => getTypeLabelTranslated(info.getValue() as GeneratedArchitectureType),
       }),
       columnHelper.accessor('timestamp', {
         header: t('table.timestamp'),
-        cell: info => formatDate(info.getValue()),
+        cell: info => formatDateTranslated(info.getValue()),
       }),
       columnHelper.accessor('owners', {
         header: t('table.owner'),
@@ -204,14 +207,14 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
       }),
       columnHelper.accessor('createdAt', {
         header: t('table.createdAt'),
-        cell: info => formatDate(info.getValue()),
+        cell: info => formatDateTranslated(info.getValue()),
       }),
       columnHelper.accessor('updatedAt', {
         header: t('table.updatedAt'),
-        cell: info => formatDate(info.getValue()),
+        cell: info => formatDateTranslated(info.getValue()),
       }),
     ],
-    [columnHelper, t]
+    [columnHelper, t, getDomainLabelTranslated, getTypeLabelTranslated, formatDateTranslated]
   )
 
   // Mapping von ArchitectureType zu den erwarteten FormValues für das Formular
@@ -249,9 +252,9 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
       onCreate={onCreateArchitecture}
       onUpdate={onUpdateArchitecture}
       onDelete={onDeleteArchitecture}
-      emptyMessage="Keine Architekturen gefunden."
-      createButtonLabel="Neue Architektur erstellen"
-      entityName="Architektur"
+      emptyMessage={t('noData')}
+      createButtonLabel={t('createNew')}
+      entityName={t('form.entityName')}
       FormComponent={ArchitectureForm}
       getIdFromData={(item: ArchitectureType) => item.id}
       mapDataToFormValues={mapToFormValues}

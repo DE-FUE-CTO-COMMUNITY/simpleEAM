@@ -22,7 +22,7 @@ import { GET_ARCHITECTURE_PRINCIPLES } from '@/graphql/architecturePrinciple'
 import { GET_INFRASTRUCTURES } from '@/graphql/infrastructure'
 import GenericForm, { FieldConfig, TabConfig } from '../common/GenericForm'
 import { isArchitect } from '@/lib/auth'
-import { getDomainLabel, getTypeLabel } from './utils'
+import { useDomainLabel, useTypeLabel } from './utils'
 
 // Schema für die Formularvalidierung
 export const architectureSchema = z.object({
@@ -82,6 +82,8 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
 }) => {
   const theme = useTheme()
   const t = useTranslations('architectures')
+  const getDomainLabelTranslated = useDomainLabel()
+  const getTypeLabelTranslated = useTypeLabel()
 
   // Personen laden
   const { data: personData, loading: personLoading } = useQuery(GET_PERSONS)
@@ -397,7 +399,7 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
       tabId: 'general',
       options: Object.values(ArchitectureDomain).map(domain => ({
         value: domain,
-        label: getDomainLabel(domain),
+        label: getDomainLabelTranslated(domain),
       })),
       size: { xs: 12, md: 6 },
     },
@@ -410,7 +412,7 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
       tabId: 'general',
       options: Object.values(ArchitectureType).map(type => ({
         value: type,
-        label: getTypeLabel(type),
+        label: getTypeLabelTranslated(type),
       })),
       size: { xs: 12, md: 6 },
     },

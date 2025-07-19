@@ -1,7 +1,58 @@
 import { ArchitectureDomain, ArchitectureType } from '../../gql/generated'
 import { FilterState } from './types'
+import { useTranslations, useLocale } from 'next-intl'
 
-// Gibt ein menschenlesbares Label für einen Domain-Wert zurück
+// Hook für Domain-Labels mit Übersetzungen
+export const useDomainLabel = () => {
+  const t = useTranslations('architectures.domains')
+
+  return (domain: ArchitectureDomain | null): string => {
+    if (!domain) return t('unknown')
+
+    switch (domain) {
+      case ArchitectureDomain.ENTERPRISE:
+        return t('enterprise')
+      case ArchitectureDomain.BUSINESS:
+        return t('business')
+      case ArchitectureDomain.DATA:
+        return t('data')
+      case ArchitectureDomain.APPLICATION:
+        return t('application')
+      case ArchitectureDomain.INTEGRATION:
+        return t('integration')
+      case ArchitectureDomain.TECHNOLOGY:
+        return t('technology')
+      case ArchitectureDomain.SECURITY:
+        return t('security')
+      default:
+        return domain
+    }
+  }
+}
+
+// Hook für Type-Labels mit Übersetzungen
+export const useTypeLabel = () => {
+  const t = useTranslations('architectures.types')
+
+  return (type: ArchitectureType | null): string => {
+    if (!type) return t('unknown')
+
+    switch (type) {
+      case ArchitectureType.CURRENT_STATE:
+        return t('currentState')
+      case ArchitectureType.FUTURE_STATE:
+        return t('futureState')
+      case ArchitectureType.TRANSITION:
+        return t('transition')
+      case ArchitectureType.CONCEPTUAL:
+        return t('conceptual')
+      default:
+        return type
+    }
+  }
+}
+
+// Fallback-Funktionen für Kompatibilität (deprecated - verwenden Sie die Hooks)
 export const getDomainLabel = (domain: ArchitectureDomain | null): string => {
   if (!domain) return 'Unbekannt'
 
@@ -43,7 +94,22 @@ export const getTypeLabel = (type: ArchitectureType | null): string => {
   }
 }
 
-// Format date strings or Date objects to a user-friendly format
+// Hook für internationalisierte Datumsformatierung
+export const useFormatDate = () => {
+  const locale = useLocale()
+
+  return (dateString?: string | Date | null): string => {
+    if (!dateString) return '-'
+    const date = typeof dateString === 'string' ? new Date(dateString) : dateString
+    return date.toLocaleDateString(locale, {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    })
+  }
+}
+
+// Legacy format date function (deprecated - use useFormatDate hook instead)
 export const formatDate = (dateString?: string | Date | null): string => {
   if (!dateString) return '-'
   const date = typeof dateString === 'string' ? new Date(dateString) : dateString

@@ -29,7 +29,19 @@
     "showDetails": "Show Details",
     "createdAt": "Created at:",
     "updatedAt": "Updated at:",
-    "architecture": "Architecture"
+    "architecture": "Architecture",
+    "search": "Search",
+    "searchPlaceholder": "Search {entity}...",
+    "first": "First",
+    "last": "Last",
+    "showColumns": "Show Columns",
+    "filter": "Filter",
+    "filterFor": "Filter for {entity}",
+    "resetFilter": "Reset Filter",
+    "applyFilter": "Apply",
+    "from": "From",
+    "to": "To",
+    "contains": "contains"
   },
   "navigation": {
     "dashboard": "Dashboard",
@@ -291,6 +303,23 @@
       "domainRequired": "Domain is required",
       "typeRequired": "Type is required"
     },
+    "domains": {
+      "unknown": "Unknown",
+      "enterprise": "Enterprise",
+      "business": "Business",
+      "data": "Data",
+      "application": "Application",
+      "integration": "Integration",
+      "technology": "Technology",
+      "security": "Security"
+    },
+    "types": {
+      "unknown": "Unknown",
+      "currentState": "Current State",
+      "futureState": "Future State",
+      "transition": "Transition",
+      "conceptual": "Conceptual"
+    },
     "table": {
       "name": "Name",
       "description": "Description",
@@ -310,17 +339,18 @@
       "actions": "Actions"
     },
     "filter": {
-      "title": "Filter",
+      "title": "Filter for Architectures",
       "domain": "Domain",
       "type": "Type",
       "tags": "Tags",
-      "description": "Description",
+      "description": "Description contains",
       "owner": "Owner",
-      "updatedDate": "Update Date",
+      "updatedDate": "Updated (Date)",
       "from": "From",
       "to": "To",
       "reset": "Reset Filters",
-      "apply": "Apply"
+      "apply": "Apply",
+      "cancel": "Cancel"
     }
   },
   "user": {

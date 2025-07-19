@@ -29,6 +29,7 @@ import {
 } from '@mui/icons-material'
 import type { SxProps, Theme } from '@mui/material'
 import { useTranslations } from 'next-intl'
+import { useLocale } from 'next-intl'
 import type { FormApi } from '@tanstack/react-form'
 import { isViewer } from '@/lib/auth'
 import { Field, useStore } from '@tanstack/react-form'
@@ -213,6 +214,21 @@ const GenericForm: React.FC<GenericFormProps> = ({
   metadata,
 }) => {
   const t = useTranslations('common')
+  const locale = useLocale()
+
+  // Helper function for locale-aware date formatting
+  const formatLocaleDateTime = (dateString: string) => {
+    return new Date(dateString).toLocaleString(locale)
+  }
+
+  // Get locale-appropriate date format
+  const getDateFormat = () => {
+    return locale === 'en' ? 'MM/DD/YYYY' : 'DD.MM.YYYY'
+  }
+
+  const getDateTimeFormat = () => {
+    return locale === 'en' ? 'MM/DD/YYYY HH:mm' : 'DD.MM.YYYY HH:mm'
+  }
   const [activeTab, setActiveTab] = useState(0)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
@@ -581,7 +597,7 @@ const GenericForm: React.FC<GenericFormProps> = ({
                         clearable: true,
                       },
                     }}
-                    format="DD.MM.YYYY"
+                    format={getDateFormat()}
                   />
                 )}
 
@@ -607,7 +623,7 @@ const GenericForm: React.FC<GenericFormProps> = ({
                         clearable: true,
                       },
                     }}
-                    format="DD.MM.YYYY HH:mm"
+                    format={getDateTimeFormat()}
                   />
                 )}
 
@@ -954,12 +970,12 @@ const GenericForm: React.FC<GenericFormProps> = ({
                 <Divider sx={{ my: 2 }} />
                 {metadata.createdAt && (
                   <Typography variant="subtitle2" gutterBottom>
-                    {t('createdAt')} {new Date(metadata.createdAt).toLocaleString()}
+                    {t('createdAt')} {formatLocaleDateTime(metadata.createdAt)}
                   </Typography>
                 )}
                 {metadata.updatedAt && (
                   <Typography variant="subtitle2">
-                    {t('updatedAt')} {new Date(metadata.updatedAt).toLocaleString()}
+                    {t('updatedAt')} {formatLocaleDateTime(metadata.updatedAt)}
                   </Typography>
                 )}
               </Box>

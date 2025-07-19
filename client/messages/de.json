@@ -29,7 +29,19 @@
     "showDetails": "Details anzeigen",
     "createdAt": "Erstellt am:",
     "updatedAt": "Aktualisiert am:",
-    "architecture": "Architektur"
+    "architecture": "Architektur",
+    "search": "Suchen",
+    "searchPlaceholder": "{entity} durchsuchen...",
+    "first": "Anfang",
+    "last": "Ende",
+    "showColumns": "Spalten anzeigen",
+    "filter": "Filter",
+    "filterFor": "Filter für {entity}",
+    "resetFilter": "Filter zurücksetzen",
+    "applyFilter": "Anwenden",
+    "from": "Von",
+    "to": "Bis",
+    "contains": "enthält"
   },
   "navigation": {
     "dashboard": "Dashboard",
@@ -296,6 +308,23 @@
       "domainRequired": "Domäne ist erforderlich",
       "typeRequired": "Typ ist erforderlich"
     },
+    "domains": {
+      "unknown": "Unbekannt",
+      "enterprise": "Enterprise",
+      "business": "Business",
+      "data": "Daten",
+      "application": "Applikation",
+      "integration": "Integration",
+      "technology": "Technologie",
+      "security": "Sicherheit"
+    },
+    "types": {
+      "unknown": "Unbekannt",
+      "currentState": "Ist-Zustand",
+      "futureState": "Soll-Zustand",
+      "transition": "Übergang",
+      "conceptual": "Konzeptionell"
+    },
     "table": {
       "name": "Name",
       "description": "Beschreibung",
@@ -315,17 +344,18 @@
       "actions": "Aktionen"
     },
     "filter": {
-      "title": "Filter",
+      "title": "Filter für Architekturen",
       "domain": "Domäne",
       "type": "Typ",
       "tags": "Tags",
-      "description": "Beschreibung",
-      "owner": "Eigentümer",
-      "updatedDate": "Aktualisierungsdatum",
+      "description": "Beschreibung enthält",
+      "owner": "Verantwortlicher",
+      "updatedDate": "Aktualisiert (Datum)",
       "from": "Von",
       "to": "Bis",
       "reset": "Filter zurücksetzen",
-      "apply": "Anwenden"
+      "apply": "Anwenden",
+      "cancel": "Abbrechen"
     }
   },
   "user": {

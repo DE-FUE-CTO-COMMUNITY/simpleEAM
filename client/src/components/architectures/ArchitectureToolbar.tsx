@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { useTranslations } from 'next-intl'
 import GenericToolbar from '../common/GenericToolbar'
 import { Table } from '@tanstack/react-table'
 
@@ -28,6 +29,8 @@ const ArchitectureToolbar: React.FC<ArchitectureToolbarProps> = ({
   table,
   enableColumnVisibilityToggle,
 }) => {
+  const tArch = useTranslations('architectures')
+
   return (
     <GenericToolbar
       globalFilter={globalFilter}
@@ -35,10 +38,7 @@ const ArchitectureToolbar: React.FC<ArchitectureToolbarProps> = ({
       activeFiltersCount={activeFiltersCount}
       onFilterClick={onFilterClick}
       onResetFilters={onResetFilters}
-      searchPlaceholder="Architekturen durchsuchen..."
-      filterTooltip="Architekturfilter hinzufügen"
-      editFilterTooltip="Architekturfilter bearbeiten"
-      resetFilterTooltip="Architekturfilter zurücksetzen"
+      entityName={tArch('form.entityName')}
       table={table}
       enableColumnVisibilityToggle={enableColumnVisibilityToggle}
     />

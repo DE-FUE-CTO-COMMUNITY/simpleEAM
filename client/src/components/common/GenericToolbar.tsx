@@ -23,6 +23,7 @@ import {
   ViewColumn as ViewColumnIcon,
 } from '@mui/icons-material'
 import { Table, VisibilityState } from '@tanstack/react-table'
+import { useTranslations } from 'next-intl'
 
 export interface GenericToolbarProps {
   /**
@@ -107,6 +108,12 @@ export interface GenericToolbarProps {
    * @default "Spalten ein-/ausblenden"
    */
   columnVisibilityTooltip?: string
+
+  /**
+   * Name der Entität für dynamische Übersetzungen
+   * @default "Eintrag"
+   */
+  entityName?: string
 }
 
 /**
@@ -118,10 +125,10 @@ const GenericToolbar: React.FC<GenericToolbarProps> = ({
   activeFiltersCount,
   onFilterClick,
   onResetFilters,
-  searchPlaceholder = 'Suchen...',
-  filterTooltip = 'Filter hinzufügen',
-  editFilterTooltip = 'Filter bearbeiten',
-  resetFilterTooltip = 'Filter zurücksetzen',
+  searchPlaceholder,
+  filterTooltip,
+  editFilterTooltip,
+  resetFilterTooltip,
   showClearSearchButton = true,
   searchFieldWidth = '300px',
   table,
@@ -129,8 +136,10 @@ const GenericToolbar: React.FC<GenericToolbarProps> = ({
   // Der columnVisibility Prop wird nicht mehr direkt verwendet, da wir nun
   // direkt die Table-Instanz und deren Methoden verwenden, die den State verwalten
   columnVisibility: _unused, // Umbenannt, um ESLint-Warnung zu vermeiden
-  columnVisibilityTooltip = 'Spalten ein-/ausblenden',
+  columnVisibilityTooltip,
+  entityName = 'Eintrag',
 }) => {
+  const t = useTranslations('common')
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
   // Lokaler State für die Spaltenvisibilität
   const [localVisibility, setLocalVisibility] = useState<Record<string, boolean>>({})
@@ -183,7 +192,7 @@ const GenericToolbar: React.FC<GenericToolbarProps> = ({
       }}
     >
       <TextField
-        placeholder={searchPlaceholder}
+        placeholder={searchPlaceholder || t('searchPlaceholder', { entity: entityName })}
         variant="outlined"
         size="small"
         value={globalFilter || ''}
@@ -206,7 +215,11 @@ const GenericToolbar: React.FC<GenericToolbarProps> = ({
         sx={{ minWidth: searchFieldWidth }}
       />
       <Box sx={{ display: 'flex', gap: 1 }}>
-        <Tooltip title={activeFiltersCount > 0 ? editFilterTooltip : filterTooltip}>
+        <Tooltip
+          title={
+            activeFiltersCount > 0 ? editFilterTooltip || t('filter') : filterTooltip || t('filter')
+          }
+        >
           <IconButton
             onClick={onFilterClick}
             color={activeFiltersCount > 0 ? 'primary' : 'default'}
@@ -221,7 +234,7 @@ const GenericToolbar: React.FC<GenericToolbarProps> = ({
           </IconButton>
         </Tooltip>
         {activeFiltersCount > 0 && (
-          <Tooltip title={resetFilterTooltip}>
+          <Tooltip title={resetFilterTooltip || t('resetFilter')}>
             <IconButton onClick={onResetFilters}>
               <ClearAllIcon />
             </IconButton>
@@ -229,7 +242,7 @@ const GenericToolbar: React.FC<GenericToolbarProps> = ({
         )}
         {enableColumnVisibilityToggle && table && (
           <>
-            <Tooltip title={columnVisibilityTooltip}>
+            <Tooltip title={columnVisibilityTooltip || t('showColumns')}>
               <IconButton
                 onClick={event => {
                   // Beim Öffnen des Popovers den lokalen Zustand aktualisieren
@@ -282,7 +295,7 @@ const GenericToolbar: React.FC<GenericToolbarProps> = ({
             >
               <Box sx={{ p: 2, minWidth: 200 }}>
                 <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold' }}>
-                  Spalten anzeigen
+                  {t('showColumns')}
                 </Typography>
                 <FormGroup>
                   {/* Spalten-Checkboxen: Aktiviert = Spalte sichtbar, Deaktiviert = Spalte ausgeblendet */}
