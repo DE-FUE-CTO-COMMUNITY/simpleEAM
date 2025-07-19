@@ -74,9 +74,6 @@ const DeleteDiagramDialog: React.FC<DeleteDiagramDialogProps> = ({
         <Typography variant="body1" gutterBottom>
           {t('dialogs.delete.confirmMessage', { title: diagram?.title || '' })}
         </Typography>
-        <Typography variant="h6" color="primary" sx={{ mt: 2, fontWeight: 'bold' }}>
-          &quot;{diagram?.title}&quot;
-        </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
           {t('dialogs.delete.confirmSubtext')}
         </Typography>

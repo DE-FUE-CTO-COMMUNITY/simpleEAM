@@ -21,7 +21,8 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs, { Dayjs } from 'dayjs'
 import 'dayjs/locale/de'
-import { useTranslations } from 'next-intl'
+import 'dayjs/locale/en'
+import { useTranslations, useLocale } from 'next-intl'
 import { BusinessCapabilityIcon, ApplicationComponentIcon } from '@/components/icons'
 import { useQuery } from '@apollo/client'
 import { GET_CAPABILITY_MAP_DATA } from '@/graphql/capability'
@@ -47,6 +48,11 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
 }) => {
   const t = useTranslations('diagrams')
   const tCommon = useTranslations('common')
+  const locale = useLocale()
+
+  // Get locale-appropriate date format and adapter locale
+  const dateFormat = locale === 'en' ? 'MM/DD/YYYY' : 'DD.MM.YYYY'
+  const adapterLocale = locale === 'en' ? 'en' : 'de'
 
   const [settings, setSettings] = useState<CapabilityMapSettings>({
     maxLevels: 3,
@@ -254,7 +260,7 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
   }
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="de">
+    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={adapterLocale}>
       <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
         <DialogTitle>{t('dialogs.capabilityMap.title')}</DialogTitle>
         <DialogContent>
@@ -283,7 +289,7 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
                 label={t('dialogs.capabilityMap.dateLabel')}
                 value={filterDate}
                 onChange={newValue => setFilterDate(newValue)}
-                format="DD.MM.YYYY"
+                format={dateFormat}
                 slotProps={{
                   textField: {
                     fullWidth: true,
@@ -315,7 +321,7 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
                         <BusinessCapabilityIcon sx={{ color: '#ff9800', fontSize: 16 }} />
                         {filteredCapabilities?.length || 0}{' '}
                         {t('dialogs.capabilityMap.capabilitiesFiltered', {
-                          date: filterDate.format('DD.MM.YYYY'),
+                          date: filterDate.format(dateFormat),
                         })}
                       </Typography>
                     )}
