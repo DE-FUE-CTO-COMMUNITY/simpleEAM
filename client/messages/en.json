@@ -389,5 +389,104 @@
       "chooseFile": "Choose file...",
       "searchHere": "Search here..."
     }
+  },
+  "architecturePrinciples": {
+    "title": "Architecture Principles",
+    "addNew": "Add New Architecture Principle",
+    "editTitle": "Edit Architecture Principle",
+    "viewTitle": "View Architecture Principle",
+    "deleteTitle": "Delete Architecture Principle",
+    "deleteConfirmation": "Are you sure you want to delete this architecture principle?",
+    "noArchitecturePrinciplesFound": "No architecture principles found",
+    "createFirstArchitecturePrinciple": "Create your first architecture principle using the 'Add' button.",
+    "architecturePrinciplesCount": "{count} of {total} architecture principles",
+    "tabs": {
+      "general": "General",
+      "relationships": "Relationships"
+    },
+    "form": {
+      "name": "Name",
+      "description": "Description",
+      "rationale": "Rationale",
+      "implications": "Implications",
+      "category": "Category",
+      "priority": "Priority",
+      "status": "Status",
+      "applicableFrom": "Applicable From",
+      "applicableTo": "Applicable To",
+      "createdAt": "Created At",
+      "updatedAt": "Updated At",
+      "lastModifiedBy": "Last Modified By",
+      "responsible": "Responsible",
+      "tags": "Tags",
+      "sources": "Sources",
+      "metrics": "Metrics",
+      "exceptions": "Exceptions",
+      "relatedPrinciples": "Related Principles",
+      "appliedInArchitectures": "Applied in Architectures",
+      "implementedByApplications": "Implemented by Applications"
+    },
+    "table": {
+      "name": "Name",
+      "description": "Description",
+      "category": "Category",
+      "priority": "Priority",
+      "status": "Status",
+      "applicableFrom": "Applicable From",
+      "applicableTo": "Applicable To",
+      "createdAt": "Created At",
+      "updatedAt": "Updated At",
+      "lastModifiedBy": "Last Modified By",
+      "responsible": "Responsible",
+      "appliedInArchitectures": "Applied in Architectures",
+      "implementedByApplications": "Implementing Applications",
+      "actions": "Actions"
+    },
+    "categories": {
+      "APPLICATION": "Application",
+      "BUSINESS": "Business",
+      "COMPLIANCE": "Compliance",
+      "COST_OPTIMIZATION": "Cost Optimization",
+      "DATA": "Data",
+      "FLEXIBILITY": "Flexibility",
+      "GOVERNANCE": "Governance",
+      "INFRASTRUCTURE": "Infrastructure",
+      "INTEGRATION": "Integration",
+      "INTEROPERABILITY": "Interoperability",
+      "MAINTAINABILITY": "Maintainability",
+      "PERFORMANCE": "Performance",
+      "RELIABILITY": "Reliability",
+      "REUSABILITY": "Reusability",
+      "SCALABILITY": "Scalability",
+      "SECURITY": "Security",
+      "TECHNOLOGY": "Technology"
+    },
+    "priorities": {
+      "CRITICAL": "Critical",
+      "HIGH": "High",
+      "MEDIUM": "Medium",
+      "LOW": "Low"
+    },
+    "states": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "filter": {
+      "title": "Filter Architecture Principles",
+      "name": "Name",
+      "category": "Category",
+      "priority": "Priority",
+      "status": "Status",
+      "applicableFrom": "Applicable From",
+      "applicableTo": "Applicable To",
+      "createdAt": "Created At",
+      "updatedAt": "Updated At",
+      "lastModifiedBy": "Last Modified By",
+      "descriptionContains": "Description contains",
+      "responsible": "Responsible",
+      "dateFrom": "From",
+      "dateTo": "To",
+      "allResponsible": "All Responsible"
+    }
   }
 }

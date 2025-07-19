@@ -2,6 +2,7 @@
 
 import React, { useEffect } from 'react'
 import { useForm } from '@tanstack/react-form'
+import { useTranslations } from 'next-intl'
 import { z } from 'zod'
 import { useQuery } from '@apollo/client'
 import { ArchitecturePrinciple, PrincipleCategory, PrinciplePriority } from '../../gql/generated'
@@ -10,6 +11,7 @@ import { GET_ARCHITECTURES } from '@/graphql/architecture'
 import { GET_APPLICATIONS } from '@/graphql/application'
 import GenericForm, { FieldConfig, TabConfig } from '../common/GenericForm'
 import { isArchitect } from '@/lib/auth'
+import { useCategoryLabel, usePriorityLabel } from './utils'
 
 // Schema für die Formularvalidierung
 export const architecturePrincipleSchema = z.object({
@@ -56,6 +58,10 @@ const ArchitecturePrincipleForm: React.FC<ArchitecturePrincipleFormProps> = ({
   loading = false,
   onEditMode,
 }) => {
+  const t = useTranslations('architecturePrinciples')
+  const getCategoryLabel = useCategoryLabel()
+  const getPriorityLabel = usePriorityLabel()
+
   // Personen laden
   const { data: personData, loading: personLoading } = useQuery(GET_PERSONS)
 
@@ -232,8 +238,8 @@ const ArchitecturePrincipleForm: React.FC<ArchitecturePrincipleFormProps> = ({
 
   // Tab-Konfiguration für die zwei Tabs
   const tabs: TabConfig[] = [
-    { id: 'general', label: 'Allgemein' },
-    { id: 'relationships', label: 'Beziehungen' },
+    { id: 'general', label: t('tabs.general') },
+    { id: 'relationships', label: t('tabs.relationships') },
   ]
 
   // Feldkonfiguration für das generische Formular
@@ -249,42 +255,11 @@ const ArchitecturePrincipleForm: React.FC<ArchitecturePrincipleFormProps> = ({
     size?: { xs: number; md: number } | number
   }
 
-  // Hilfsfunktionen für Labels
-  const getCategoryLabel = (category: PrincipleCategory): string => {
-    switch (category) {
-      case PrincipleCategory.BUSINESS:
-        return 'Business'
-      case PrincipleCategory.DATA:
-        return 'Daten'
-      case PrincipleCategory.APPLICATION:
-        return 'Anwendung'
-      case PrincipleCategory.TECHNOLOGY:
-        return 'Technologie'
-      default:
-        return category
-    }
-  }
-
-  const getPriorityLabel = (priority: PrinciplePriority): string => {
-    switch (priority) {
-      case PrinciplePriority.LOW:
-        return 'Niedrig'
-      case PrinciplePriority.MEDIUM:
-        return 'Mittel'
-      case PrinciplePriority.HIGH:
-        return 'Hoch'
-      case PrinciplePriority.CRITICAL:
-        return 'Kritisch'
-      default:
-        return priority
-    }
-  }
-
   // Allgemeine Felder für den ersten Tab
   const generalFields: FieldConfigWithSelect[] = [
     {
       name: 'name',
-      label: 'Name',
+      label: t('form.name'),
       type: 'text',
       required: true,
       tabId: 'general',
@@ -292,7 +267,7 @@ const ArchitecturePrincipleForm: React.FC<ArchitecturePrincipleFormProps> = ({
     },
     {
       name: 'category',
-      label: 'Kategorie',
+      label: t('form.category'),
       type: 'select',
       required: true,
       tabId: 'general',
@@ -304,7 +279,7 @@ const ArchitecturePrincipleForm: React.FC<ArchitecturePrincipleFormProps> = ({
     },
     {
       name: 'priority',
-      label: 'Priorität',
+      label: t('form.priority'),
       type: 'select',
       required: true,
       tabId: 'general',
@@ -316,19 +291,19 @@ const ArchitecturePrincipleForm: React.FC<ArchitecturePrincipleFormProps> = ({
     },
     {
       name: 'isActive',
-      label: 'Status',
+      label: t('form.status'),
       type: 'select',
       required: true,
       tabId: 'general',
       size: { xs: 12, md: 6 },
       options: [
-        { value: true, label: 'Aktiv' },
-        { value: false, label: 'Inaktiv' },
+        { value: true, label: t('states.active') },
+        { value: false, label: t('states.inactive') },
       ],
     },
     {
       name: 'description',
-      label: 'Beschreibung',
+      label: t('form.description'),
       type: 'textarea',
       required: true,
       tabId: 'general',
@@ -337,7 +312,7 @@ const ArchitecturePrincipleForm: React.FC<ArchitecturePrincipleFormProps> = ({
     },
     {
       name: 'rationale',
-      label: 'Begründung',
+      label: t('form.rationale'),
       type: 'textarea',
       required: false,
       tabId: 'general',
@@ -346,7 +321,7 @@ const ArchitecturePrincipleForm: React.FC<ArchitecturePrincipleFormProps> = ({
     },
     {
       name: 'implications',
-      label: 'Auswirkungen',
+      label: t('form.implications'),
       type: 'textarea',
       required: false,
       tabId: 'general',
@@ -355,7 +330,7 @@ const ArchitecturePrincipleForm: React.FC<ArchitecturePrincipleFormProps> = ({
     },
     {
       name: 'tags',
-      label: 'Tags',
+      label: t('form.tags'),
       type: 'tags',
       required: false,
       tabId: 'general',
@@ -386,7 +361,7 @@ const ArchitecturePrincipleForm: React.FC<ArchitecturePrincipleFormProps> = ({
   const relationshipFields: FieldConfigWithSelect[] = [
     {
       name: 'appliedInArchitectureIds',
-      label: 'Angewendet in Architekturen',
+      label: t('form.appliedInArchitectures'),
       type: 'autocomplete',
       required: false,
       tabId: 'relationships',
@@ -401,7 +376,7 @@ const ArchitecturePrincipleForm: React.FC<ArchitecturePrincipleFormProps> = ({
     },
     {
       name: 'implementedByApplicationIds',
-      label: 'Implementiert durch Applikationen',
+      label: t('form.implementedByApplications'),
       type: 'autocomplete',
       required: false,
       tabId: 'relationships',
@@ -429,11 +404,7 @@ const ArchitecturePrincipleForm: React.FC<ArchitecturePrincipleFormProps> = ({
   return (
     <GenericForm
       title={
-        formMode === 'create'
-          ? 'Neues Architektur-Prinzip erstellen'
-          : formMode === 'edit'
-            ? 'Architektur-Prinzip bearbeiten'
-            : 'Architektur-Prinzip Details'
+        formMode === 'create' ? t('addNew') : formMode === 'edit' ? t('editTitle') : t('viewTitle')
       }
       isOpen={formIsOpen}
       onClose={handleClose}

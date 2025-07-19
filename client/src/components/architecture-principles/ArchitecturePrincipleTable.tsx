@@ -1,13 +1,14 @@
 'use client'
 
 import React, { useMemo } from 'react'
+import { useTranslations } from 'next-intl'
 import { Chip } from '@mui/material'
 import { GenericTable } from '../common/GenericTable'
 import { ArchitecturePrincipleType } from './types'
 import { PrincipleCategory, PrinciplePriority } from '../../gql/generated'
 import { createColumnHelper } from '@tanstack/react-table'
 import { SortingState, VisibilityState } from '@tanstack/react-table'
-import { formatDate, getCategoryLabel, getPriorityLabel, formatBoolean } from './utils'
+import { useCategoryLabel, usePriorityLabel, useFormatDate, useFormatBoolean } from './utils'
 import ArchitecturePrincipleForm, {
   ArchitecturePrincipleFormValues,
 } from './ArchitecturePrincipleForm'
@@ -32,6 +33,7 @@ interface ArchitecturePrincipleTableProps {
 }
 
 const ArchitecturePrincipleTable: React.FC<ArchitecturePrincipleTableProps> = ({
+  id: _id,
   principles,
   loading,
   globalFilter,
@@ -41,9 +43,15 @@ const ArchitecturePrincipleTable: React.FC<ArchitecturePrincipleTableProps> = ({
   onUpdatePrinciple,
   onDeletePrinciple,
   onTableReady,
-  columnVisibility: _externalColumnVisibility,
-  onColumnVisibilityChange: _externalOnColumnVisibilityChange,
 }) => {
+  const t = useTranslations('architecturePrinciples')
+  const tTable = useTranslations('architecturePrinciples.table')
+  const getCategoryLabel = useCategoryLabel()
+  const getPriorityLabel = usePriorityLabel()
+  const formatBooleanLabel = useFormatBoolean()
+  const formatDate = useFormatDate()
+
+  // Column helper für Typsicherheit
   const columnHelper = createColumnHelper<ArchitecturePrincipleType>()
 
   // Verwende persistente Spaltensichtbarkeit
@@ -70,11 +78,11 @@ const ArchitecturePrincipleTable: React.FC<ArchitecturePrincipleTableProps> = ({
   const columns = useMemo(
     () => [
       columnHelper.accessor('name', {
-        header: 'Name',
+        header: tTable('name'),
         cell: info => info.getValue(),
       }),
       columnHelper.accessor('description', {
-        header: 'Beschreibung',
+        header: tTable('description'),
         cell: info => {
           const description = info.getValue()
           return description && description.length > 50
@@ -83,7 +91,7 @@ const ArchitecturePrincipleTable: React.FC<ArchitecturePrincipleTableProps> = ({
         },
       }),
       columnHelper.accessor('category', {
-        header: 'Kategorie',
+        header: tTable('category'),
         cell: info => (
           <Chip
             label={getCategoryLabel(info.getValue() as PrincipleCategory)}
@@ -94,7 +102,7 @@ const ArchitecturePrincipleTable: React.FC<ArchitecturePrincipleTableProps> = ({
         ),
       }),
       columnHelper.accessor('priority', {
-        header: 'Priorität',
+        header: tTable('priority'),
         cell: info => {
           const priority = info.getValue() as PrinciplePriority
           const color =
@@ -111,12 +119,12 @@ const ArchitecturePrincipleTable: React.FC<ArchitecturePrincipleTableProps> = ({
         },
       }),
       columnHelper.accessor('isActive', {
-        header: 'Status',
+        header: tTable('status'),
         cell: info => {
           const isActive = info.getValue()
           return (
             <Chip
-              label={formatBoolean(isActive)}
+              label={formatBooleanLabel(isActive)}
               color={isActive ? 'success' : 'default'}
               size="small"
               variant="filled"
@@ -125,14 +133,14 @@ const ArchitecturePrincipleTable: React.FC<ArchitecturePrincipleTableProps> = ({
         },
       }),
       columnHelper.accessor('owners', {
-        header: 'Verantwortlicher',
+        header: tTable('responsible'),
         cell: info => {
           const owners = info.getValue()
           return owners && owners.length > 0 ? `${owners[0].firstName} ${owners[0].lastName}` : '-'
         },
       }),
       columnHelper.accessor('appliedInArchitectures', {
-        header: 'Angewendete Architekturen',
+        header: tTable('appliedInArchitectures'),
         cell: info => {
           const architectures = info.getValue()
           return architectures && architectures.length > 0
@@ -144,7 +152,7 @@ const ArchitecturePrincipleTable: React.FC<ArchitecturePrincipleTableProps> = ({
         },
       }),
       columnHelper.accessor('implementedByApplications', {
-        header: 'Implementierende Apps',
+        header: tTable('implementedByApplications'),
         cell: info => {
           const applications = info.getValue()
           return applications && applications.length > 0
@@ -167,15 +175,15 @@ const ArchitecturePrincipleTable: React.FC<ArchitecturePrincipleTableProps> = ({
         },
       }),
       columnHelper.accessor('createdAt', {
-        header: 'Erstellt am',
+        header: tTable('createdAt'),
         cell: info => formatDate(info.getValue()),
       }),
       columnHelper.accessor('updatedAt', {
-        header: 'Aktualisiert am',
+        header: tTable('updatedAt'),
         cell: info => formatDate(info.getValue()),
       }),
     ],
-    [columnHelper]
+    [columnHelper, tTable, getCategoryLabel, getPriorityLabel, formatDate, formatBooleanLabel]
   )
 
   // Mapping von ArchitecturePrincipleType zu den erwarteten FormValues für das Formular
@@ -206,9 +214,9 @@ const ArchitecturePrincipleTable: React.FC<ArchitecturePrincipleTableProps> = ({
       onCreate={onCreatePrinciple}
       onUpdate={onUpdatePrinciple}
       onDelete={onDeletePrinciple}
-      emptyMessage="Keine Architektur-Prinzipien gefunden."
-      createButtonLabel="Neues Architektur-Prinzip erstellen"
-      entityName="Architektur-Prinzip"
+      emptyMessage={t('noArchitecturePrinciplesFound')}
+      createButtonLabel={t('addNew')}
+      entityName={t('title')}
       FormComponent={ArchitecturePrincipleForm}
       getIdFromData={(item: ArchitecturePrincipleType) => item.id}
       mapDataToFormValues={mapToFormValues}

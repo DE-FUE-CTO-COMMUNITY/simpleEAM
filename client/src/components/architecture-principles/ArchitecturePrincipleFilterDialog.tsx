@@ -1,9 +1,10 @@
 'use client'
 
 import React from 'react'
+import { useTranslations } from 'next-intl'
 import GenericFilterDialog, { FilterField } from '../common/GenericFilterDialog'
 import { FilterProps } from './types'
-import { getCategoryLabel, getPriorityLabel, countActiveFilters } from './utils'
+import { countActiveFilters, useCategoryLabel, usePriorityLabel } from './utils'
 import { PrincipleCategory, PrinciplePriority } from '../../gql/generated'
 
 const ArchitecturePrincipleFilterDialog: React.FC<FilterProps> = ({
@@ -16,12 +17,16 @@ const ArchitecturePrincipleFilterDialog: React.FC<FilterProps> = ({
   onClose,
   onApply,
 }) => {
+  const t = useTranslations('architecturePrinciples.filter')
+  const getCategoryLabel = useCategoryLabel()
+  const getPriorityLabel = usePriorityLabel()
+
   // Konfiguration der Filterfelder
   const filterFields: FilterField[] = [
     // Kategorie Filter
     {
       id: 'categoryFilter',
-      label: 'Kategorie',
+      label: t('category'),
       type: 'multiSelect',
       options: availableCategories.map(category => ({
         value: category,
@@ -32,7 +37,7 @@ const ArchitecturePrincipleFilterDialog: React.FC<FilterProps> = ({
     // Priorität Filter
     {
       id: 'priorityFilter',
-      label: 'Priorität',
+      label: t('priority'),
       type: 'multiSelect',
       options: availablePriorities.map(priority => ({
         value: priority,
@@ -43,7 +48,7 @@ const ArchitecturePrincipleFilterDialog: React.FC<FilterProps> = ({
     // Status Filter
     {
       id: 'isActiveFilter',
-      label: 'Status',
+      label: t('status'),
       type: 'select',
       options: [
         { value: 'all', label: 'Alle' },
@@ -64,30 +69,30 @@ const ArchitecturePrincipleFilterDialog: React.FC<FilterProps> = ({
     // Beschreibungs-Filter
     {
       id: 'descriptionFilter',
-      label: 'Beschreibung enthält',
+      label: t('descriptionContains'),
       type: 'text',
       placeholder: 'Geben Sie einen Text ein...',
     },
     // Verantwortlicher-Filter
     {
       id: 'ownerFilter',
-      label: 'Verantwortlicher',
+      label: t('responsible'),
       type: 'personSelect',
-      emptyLabel: 'Alle Verantwortlichen',
+      emptyLabel: t('allResponsible'),
     },
     // Aktualisiert-Filter
     {
       id: 'updatedDateRange',
-      label: 'Aktualisiert (Datum)',
+      label: t('updatedAt'),
       type: 'dateRange',
-      fromLabel: 'Von',
-      toLabel: 'Bis',
+      fromLabel: t('dateFrom'),
+      toLabel: t('dateTo'),
     },
   ]
 
   return (
     <GenericFilterDialog
-      title="Filter für Architektur-Prinzipien"
+      title={t('title')}
       filterState={filterState}
       filterFields={filterFields}
       countActiveFilters={countActiveFilters as (filterState: any) => number}

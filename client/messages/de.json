@@ -369,6 +369,105 @@
     "english": "Englisch",
     "current": "Aktuelle Sprache: {language}"
   },
+  "architecturePrinciples": {
+    "title": "Architekturprinzipien",
+    "addNew": "Neues Architekturprinzip hinzufügen",
+    "editTitle": "Architekturprinzip bearbeiten",
+    "viewTitle": "Architekturprinzip anzeigen",
+    "deleteTitle": "Architekturprinzip löschen",
+    "deleteConfirmation": "Sind Sie sicher, dass Sie dieses Architekturprinzip löschen möchten?",
+    "noArchitecturePrinciplesFound": "Keine Architekturprinzipien gefunden",
+    "createFirstArchitecturePrinciple": "Erstellen Sie Ihr erstes Architekturprinzip über den Button 'Hinzufügen'.",
+    "architecturePrinciplesCount": "{count} von {total} Architekturprinzipien",
+    "tabs": {
+      "general": "Allgemein",
+      "relationships": "Beziehungen"
+    },
+    "form": {
+      "name": "Name",
+      "description": "Beschreibung",
+      "rationale": "Begründung",
+      "implications": "Auswirkungen",
+      "category": "Kategorie",
+      "priority": "Priorität",
+      "status": "Status",
+      "applicableFrom": "Gültig ab",
+      "applicableTo": "Gültig bis",
+      "createdAt": "Erstellt am",
+      "updatedAt": "Aktualisiert am",
+      "lastModifiedBy": "Zuletzt bearbeitet von",
+      "responsible": "Verantwortlicher",
+      "tags": "Tags",
+      "sources": "Quellen",
+      "metrics": "Metriken",
+      "exceptions": "Ausnahmen",
+      "relatedPrinciples": "Verwandte Prinzipien",
+      "appliedInArchitectures": "Angewendet in Architekturen",
+      "implementedByApplications": "Implementiert durch Applikationen"
+    },
+    "table": {
+      "name": "Name",
+      "description": "Beschreibung",
+      "category": "Kategorie",
+      "priority": "Priorität",
+      "status": "Status",
+      "applicableFrom": "Gültig ab",
+      "applicableTo": "Gültig bis",
+      "createdAt": "Erstellt am",
+      "updatedAt": "Aktualisiert am",
+      "lastModifiedBy": "Zuletzt bearbeitet von",
+      "responsible": "Verantwortlicher",
+      "appliedInArchitectures": "Angewendete Architekturen",
+      "implementedByApplications": "Implementierende Apps",
+      "actions": "Aktionen"
+    },
+    "categories": {
+      "APPLICATION": "Anwendung",
+      "BUSINESS": "Geschäft",
+      "COMPLIANCE": "Compliance",
+      "COST_OPTIMIZATION": "Kostenoptimierung",
+      "DATA": "Daten",
+      "FLEXIBILITY": "Flexibilität",
+      "GOVERNANCE": "Governance",
+      "INFRASTRUCTURE": "Infrastruktur",
+      "INTEGRATION": "Integration",
+      "INTEROPERABILITY": "Interoperabilität",
+      "MAINTAINABILITY": "Wartbarkeit",
+      "PERFORMANCE": "Performance",
+      "RELIABILITY": "Zuverlässigkeit",
+      "REUSABILITY": "Wiederverwendbarkeit",
+      "SCALABILITY": "Skalierbarkeit",
+      "SECURITY": "Sicherheit",
+      "TECHNOLOGY": "Technologie"
+    },
+    "priorities": {
+      "CRITICAL": "Kritisch",
+      "HIGH": "Hoch",
+      "MEDIUM": "Mittel",
+      "LOW": "Niedrig"
+    },
+    "states": {
+      "active": "Aktiv",
+      "inactive": "Inaktiv"
+    },
+    "filter": {
+      "title": "Architekturprinzipien filtern",
+      "name": "Name",
+      "category": "Kategorie",
+      "priority": "Priorität",
+      "status": "Status",
+      "applicableFrom": "Gültig ab",
+      "applicableTo": "Gültig bis",
+      "createdAt": "Erstellt am",
+      "updatedAt": "Aktualisiert am",
+      "lastModifiedBy": "Zuletzt geändert von",
+      "descriptionContains": "Beschreibung enthält",
+      "responsible": "Verantwortlicher",
+      "dateFrom": "Von",
+      "dateTo": "Bis",
+      "allResponsible": "Alle Verantwortlichen"
+    }
+  },
   "errors": {
     "generic": "Ein Fehler ist aufgetreten",
     "networkError": "Netzwerkfehler",
@@ -378,9 +477,21 @@
     "loadError": "Fehler beim Laden"
   },
   "forms": {
-    "required": "Dieses Feld ist erforderlich",
-    "invalidEmail": "Ungültige E-Mail-Adresse",
-    "minLength": "Mindestens {count} Zeichen erforderlich",
-    "maxLength": "Maximal {count} Zeichen erlaubt"
+    "validation": {
+      "required": "Dieses Feld ist erforderlich",
+      "minLength": "Mindestens {count} Zeichen erforderlich",
+      "maxLength": "Maximal {count} Zeichen erlaubt",
+      "email": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+      "url": "Bitte geben Sie eine gültige URL ein",
+      "number": "Bitte geben Sie eine gültige Zahl ein",
+      "positive": "Bitte geben Sie eine positive Zahl ein",
+      "integer": "Bitte geben Sie eine ganze Zahl ein"
+    },
+    "placeholders": {
+      "enterText": "Text eingeben...",
+      "selectOption": "Option auswählen...",
+      "chooseFile": "Datei auswählen...",
+      "searchHere": "Hier suchen..."
+    }
   }
 }

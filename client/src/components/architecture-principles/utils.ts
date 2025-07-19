@@ -1,10 +1,53 @@
 'use client'
 
+import { useTranslations, useLocale } from 'next-intl'
 import { PrincipleCategory, PrinciplePriority } from '../../gql/generated'
 import { FilterState } from './types'
 
 /**
- * Hilfsfunktion zum Formatieren von Daten
+ * Custom hook for translating PrincipleCategory enum values
+ */
+export const useCategoryLabel = () => {
+  const t = useTranslations('architecturePrinciples.categories')
+
+  return (category: PrincipleCategory | null | undefined): string => {
+    if (!category) return ''
+    return t(category as any)
+  }
+}
+
+/**
+ * Custom hook for translating PrinciplePriority enum values
+ */
+export const usePriorityLabel = () => {
+  const t = useTranslations('architecturePrinciples.priorities')
+
+  return (priority: PrinciplePriority | null | undefined): string => {
+    if (!priority) return ''
+    return t(priority as any)
+  }
+}
+
+/**
+ * Custom hook for formatting date values in architecture principles
+ */
+export const useFormatDate = () => {
+  const locale = useLocale()
+
+  return (date: string | null | undefined): string => {
+    if (!date) return '-'
+    try {
+      const dateObj = new Date(date)
+      return dateObj.toLocaleDateString(locale)
+    } catch {
+      return date || '-'
+    }
+  }
+}
+
+/**
+ * Legacy function for backward compatibility
+ * @deprecated Use useFormatDate hook instead
  */
 export const formatDate = (date: string | null | undefined): string => {
   if (!date) return '-'
@@ -12,7 +55,8 @@ export const formatDate = (date: string | null | undefined): string => {
 }
 
 /**
- * Hilfsfunktion zum Formatieren von Prioritäten mit deutschen Labels
+ * Legacy function for backward compatibility
+ * @deprecated Use usePriorityLabel hook instead
  */
 export const getPriorityLabel = (priority: PrinciplePriority): string => {
   const labels: Record<PrinciplePriority, string> = {
@@ -25,32 +69,45 @@ export const getPriorityLabel = (priority: PrinciplePriority): string => {
 }
 
 /**
- * Hilfsfunktion zum Formatieren von Kategorien mit deutschen Labels
+ * Legacy function for backward compatibility
+ * @deprecated Use useCategoryLabel hook instead
  */
 export const getCategoryLabel = (category: PrincipleCategory): string => {
   const labels: Record<PrincipleCategory, string> = {
-    [PrincipleCategory.BUSINESS]: 'Business',
-    [PrincipleCategory.DATA]: 'Daten',
     [PrincipleCategory.APPLICATION]: 'Anwendung',
-    [PrincipleCategory.TECHNOLOGY]: 'Technologie',
-    [PrincipleCategory.SECURITY]: 'Sicherheit',
-    [PrincipleCategory.INTEGRATION]: 'Integration',
-    [PrincipleCategory.GOVERNANCE]: 'Governance',
+    [PrincipleCategory.BUSINESS]: 'Business',
     [PrincipleCategory.COMPLIANCE]: 'Compliance',
-    [PrincipleCategory.PERFORMANCE]: 'Performance',
-    [PrincipleCategory.SCALABILITY]: 'Skalierbarkeit',
-    [PrincipleCategory.RELIABILITY]: 'Zuverlässigkeit',
-    [PrincipleCategory.MAINTAINABILITY]: 'Wartbarkeit',
-    [PrincipleCategory.INTEROPERABILITY]: 'Interoperabilität',
-    [PrincipleCategory.REUSABILITY]: 'Wiederverwendbarkeit',
-    [PrincipleCategory.FLEXIBILITY]: 'Flexibilität',
     [PrincipleCategory.COST_OPTIMIZATION]: 'Kostenoptimierung',
+    [PrincipleCategory.DATA]: 'Daten',
+    [PrincipleCategory.FLEXIBILITY]: 'Flexibilität',
+    [PrincipleCategory.GOVERNANCE]: 'Governance',
+    [PrincipleCategory.INTEGRATION]: 'Integration',
+    [PrincipleCategory.INTEROPERABILITY]: 'Interoperabilität',
+    [PrincipleCategory.MAINTAINABILITY]: 'Wartbarkeit',
+    [PrincipleCategory.PERFORMANCE]: 'Performance',
+    [PrincipleCategory.RELIABILITY]: 'Zuverlässigkeit',
+    [PrincipleCategory.REUSABILITY]: 'Wiederverwendbarkeit',
+    [PrincipleCategory.SCALABILITY]: 'Skalierbarkeit',
+    [PrincipleCategory.SECURITY]: 'Sicherheit',
+    [PrincipleCategory.TECHNOLOGY]: 'Technologie',
   }
   return labels[category] || category
 }
 
 /**
- * Hilfsfunktion zum Formatieren von Boolean-Werten
+ * Hook zum Formatieren von Boolean-Werten mit Internationalisierung
+ */
+export const useFormatBoolean = () => {
+  const t = useTranslations('architecturePrinciples.states')
+
+  return (value: boolean | null | undefined): string => {
+    if (value === null || value === undefined) return '-'
+    return value ? t('active') : t('inactive')
+  }
+}
+
+/**
+ * @deprecated Legacy-Funktion - verwenden Sie useFormatBoolean() Hook stattdessen
  */
 export const formatBoolean = (value: boolean | null | undefined): string => {
   if (value === null || value === undefined) return '-'
