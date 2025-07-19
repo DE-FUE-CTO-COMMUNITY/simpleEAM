@@ -5,6 +5,7 @@ import { Box, Typography, Button, Card, Paper } from '@mui/material'
 import { Add as AddIcon } from '@mui/icons-material'
 import { useQuery, useMutation } from '@apollo/client'
 import { useSnackbar } from 'notistack'
+import { useTranslations } from 'next-intl'
 import { useAuth, isArchitect } from '@/lib/auth'
 import { VisibilityState } from '@tanstack/react-table'
 import {
@@ -26,6 +27,7 @@ import { FilterState } from '@/components/capabilities/types'
 const CapabilitiesPage = () => {
   const { authenticated } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
+  const t = useTranslations('capabilities')
   const [globalFilter, setGlobalFilter] = useState<string>('')
   const [sorting, setSorting] = useState([{ id: 'name', desc: false }])
   const [tableInstance, setTableInstance] = useState<any>(null)
@@ -392,7 +394,7 @@ const CapabilitiesPage = () => {
     <Box sx={{ py: 2, px: 1 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
         <Typography variant="h4" component="h1">
-          Business Capabilities
+          {t('title')}
         </Typography>
         {isArchitect() && (
           <Button
@@ -401,7 +403,7 @@ const CapabilitiesPage = () => {
             startIcon={<AddIcon />}
             onClick={handleCreateCapability}
           >
-            Neu erstellen
+            {t('addNew')}
           </Button>
         )}
       </Box>

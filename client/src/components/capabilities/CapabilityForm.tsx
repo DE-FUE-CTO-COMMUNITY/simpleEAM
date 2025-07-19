@@ -4,6 +4,7 @@ import React, { useEffect } from 'react'
 import { useForm } from '@tanstack/react-form'
 import { z } from 'zod'
 import { useQuery } from '@apollo/client'
+import { useTranslations } from 'next-intl'
 import { GET_PERSONS } from '@/graphql/person'
 import { GET_APPLICATIONS } from '@/graphql/application'
 import { GET_ARCHITECTURES } from '@/graphql/architecture'
@@ -68,49 +69,20 @@ export interface CapabilityFormProps {
   onEditMode?: () => void
 }
 
-const getLevelLabel = (level: number | null | undefined): string => {
+const getLevelLabel = (level: number | null | undefined, t: any): string => {
   if (level === null || level === undefined) {
-    return 'Nicht definiert'
+    return t('capabilities.maturityLevels.undefined')
   }
 
-  switch (level) {
-    case 0:
-      return 'Niedrig'
-    case 1:
-      return 'Mittel'
-    case 2:
-      return 'Hoch'
-    case 3:
-      return 'Sehr Hoch'
-    default:
-      return `Level ${level}`
-  }
+  return t(`capabilities.maturityLevels.${level}`)
 }
 
-const getStatusLabel = (status: CapabilityStatus): string => {
-  switch (status) {
-    case CapabilityStatus.ACTIVE:
-      return 'Aktiv'
-    case CapabilityStatus.PLANNED:
-      return 'Geplant'
-    case CapabilityStatus.RETIRED:
-      return 'Zurückgezogen'
-    default:
-      return status
-  }
+const getStatusLabel = (status: CapabilityStatus, t: any): string => {
+  return t(`capabilities.statuses.${status}`)
 }
 
-const getTypeLabel = (type: CapabilityType): string => {
-  switch (type) {
-    case CapabilityType.STRATEGIC:
-      return 'Strategisch'
-    case CapabilityType.OPERATIONAL:
-      return 'Operativ'
-    case CapabilityType.SUPPORT:
-      return 'Unterstützend'
-    default:
-      return type
-  }
+const getTypeLabel = (type: CapabilityType, t: any): string => {
+  return t(`capabilities.types.${type}`)
 }
 
 const CapabilityForm: React.FC<CapabilityFormProps> = ({
@@ -125,6 +97,9 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
   loading = false,
   onEditMode,
 }) => {
+  const t = useTranslations()
+  const tForm = useTranslations('capabilities.form')
+  const tTabs = useTranslations('capabilities.tabs')
   // Personen laden
   const { data: personData, loading: personLoading } = useQuery(GET_PERSONS)
 
@@ -268,7 +243,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
   const fields: FieldConfigWithSelect[] = [
     {
       name: 'name',
-      label: 'Name',
+      label: tForm('name'),
       type: 'text',
       required: true,
       validators: capabilitySchema.shape.name,
@@ -277,14 +252,14 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
     },
     {
       name: 'status',
-      label: 'Status',
+      label: tForm('status'),
       type: 'select',
       required: true,
       validators: capabilitySchema.shape.status,
       options: Object.values(CapabilityStatus).map(
         (status): SelectOption => ({
           value: status,
-          label: getStatusLabel(status),
+          label: getStatusLabel(status, t),
         })
       ),
       size: { xs: 12, md: 6 },
@@ -292,14 +267,14 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
     },
     {
       name: 'type',
-      label: 'Typ',
+      label: tForm('type'),
       type: 'select',
       required: true,
       validators: capabilitySchema.shape.type,
       options: Object.values(CapabilityType).map(
         (type): SelectOption => ({
           value: type,
-          label: getTypeLabel(type),
+          label: getTypeLabel(type, t),
         })
       ),
       size: { xs: 12, md: 6 },
@@ -307,7 +282,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
     },
     {
       name: 'sequenceNumber',
-      label: 'Sequenznummer',
+      label: tForm('sequenceNumber'),
       type: 'number',
       validators: capabilitySchema.shape.sequenceNumber,
       size: { xs: 12, md: 6 },
@@ -315,7 +290,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
     },
     {
       name: 'description',
-      label: 'Beschreibung',
+      label: tForm('description'),
       type: 'textarea',
       required: true,
       validators: capabilitySchema.shape.description,
@@ -325,14 +300,14 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
     },
     {
       name: 'maturityLevel',
-      label: 'Reifegrad',
+      label: tForm('maturityLevel'),
       type: 'select',
       required: true,
       validators: capabilitySchema.shape.maturityLevel,
       options: [0, 1, 2, 3].map(
         (level): SelectOption => ({
           value: level,
-          label: getLevelLabel(level),
+          label: getLevelLabel(level, t),
         })
       ),
       size: { xs: 12, md: 6 },
@@ -340,7 +315,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
     },
     {
       name: 'businessValue',
-      label: 'Geschäftswert',
+      label: tForm('businessValue'),
       type: 'select',
       required: true,
       validators: capabilitySchema.shape.businessValue,
@@ -356,7 +331,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
     },
     {
       name: 'tags',
-      label: 'Tags',
+      label: tForm('tags'),
       type: 'tags',
       options: availableTags.map((tag): SelectOption => ({ value: tag, label: tag })),
       size: 12,
@@ -364,7 +339,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
     },
     {
       name: 'ownerId',
-      label: 'Verantwortlicher',
+      label: tForm('owner'),
       type: 'select',
       options:
         personData?.people?.map(
@@ -379,10 +354,10 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
     },
     {
       name: 'parentId',
-      label: 'Übergeordnete Capability',
+      label: tForm('parentCapability'),
       type: 'select',
       options: [
-        { value: '', label: 'Keine' },
+        { value: '', label: tForm('none') },
         ...availableCapabilities
           .filter(cap => cap.id !== capability?.id)
           .map(
@@ -397,7 +372,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
     },
     {
       name: 'children',
-      label: 'Untergeordnete Capabilities',
+      label: tForm('childCapabilities'),
       type: 'autocomplete',
       multiple: true,
       options: availableCapabilities
@@ -426,7 +401,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
     },
     {
       name: 'supportedByApplications',
-      label: 'Unterstützende Applikationen',
+      label: tForm('supportedByApplications'),
       type: 'autocomplete',
       multiple: true,
       options:
@@ -457,7 +432,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
     },
     {
       name: 'partOfArchitectures',
-      label: 'Teil von Architekturen',
+      label: tForm('partOfArchitectures'),
       type: 'autocomplete',
       multiple: true,
       options:
@@ -488,7 +463,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
     },
     {
       name: 'partOfDiagrams',
-      label: 'Teil von Diagrammen',
+      label: tForm('partOfDiagrams'),
       type: 'autocomplete',
       multiple: true,
       options:
@@ -519,7 +494,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
     },
     {
       name: 'introductionDate',
-      label: 'Einführungsdatum',
+      label: tForm('introductionDate'),
       type: 'date',
       validators: capabilitySchema.shape.introductionDate,
       size: { xs: 12, md: 6 },
@@ -527,7 +502,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
     },
     {
       name: 'endDate',
-      label: 'Enddatum',
+      label: tForm('endDate'),
       type: 'date',
       validators: capabilitySchema.shape.endDate,
       size: { xs: 12, md: 6 },
@@ -537,20 +512,20 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
 
   // Tabs-Konfiguration
   const tabs = [
-    { id: 'general', label: 'Allgemein' },
-    { id: 'lifecycle', label: 'Lebenszyklus' },
-    { id: 'relationships', label: 'Beziehungen' },
-    { id: 'architectures', label: 'Architekturen' },
+    { id: 'general', label: tTabs('general') },
+    { id: 'lifecycle', label: tTabs('lifecycle') },
+    { id: 'relationships', label: tTabs('relationships') },
+    { id: 'architectures', label: tTabs('architectures') },
   ]
 
   return (
     <GenericForm
       title={
         mode === 'create'
-          ? 'Neue Business Capability erstellen'
+          ? tForm('createTitle')
           : mode === 'edit'
-            ? 'Business Capability bearbeiten'
-            : 'Business Capability Details'
+            ? tForm('editTitle')
+            : tForm('viewTitle')
       }
       isOpen={isOpen}
       onClose={onClose}

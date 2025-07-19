@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { useTranslations } from 'next-intl'
 import GenericFilterDialog, { FilterField } from '../common/GenericFilterDialog'
 import { FilterProps } from './types'
 import { getLevelLabel, countActiveFilters } from './utils'
@@ -14,33 +15,37 @@ const CapabilityFilterDialogWithGeneric: React.FC<FilterProps> = ({
   onClose,
   onApply,
 }) => {
+  const t = useTranslations('capabilities.filter')
+  const tStatus = useTranslations('capabilities.statuses')
+  const tMaturity = useTranslations('capabilities.maturityLevels')
+
   // Konfiguration der Filterfelder
   const filterFields: FilterField[] = [
     // Status Filter
     {
       id: 'statusFilter',
-      label: 'Status',
+      label: t('status'),
       type: 'multiSelect',
       options: availableStatuses.map(status => ({
         value: status,
-        label: status,
+        label: tStatus(status),
       })),
     },
     // Reifegrad Filter
     {
       id: 'maturityLevelFilter',
-      label: 'Reifegrad',
+      label: t('maturityLevel'),
       type: 'multiSelect',
       options: [0, 1, 2, 3].map(level => ({
         value: level.toString(),
-        label: getLevelLabel(level),
+        label: getLevelLabel(level, tMaturity),
       })),
-      valueFormatter: value => getLevelLabel(Number(value)),
+      valueFormatter: value => getLevelLabel(Number(value), tMaturity),
     },
     // Geschäftswert Range Filter
     {
       id: 'businessValueRange',
-      label: 'Geschäftswert',
+      label: t('businessValue'),
       type: 'slider',
       min: 0,
       max: 10,
@@ -53,7 +58,7 @@ const CapabilityFilterDialogWithGeneric: React.FC<FilterProps> = ({
     // Tags Filter
     {
       id: 'tagsFilter',
-      label: 'Tags',
+      label: t('tags'),
       type: 'multiSelect',
       options: availableTags.map(tag => ({
         value: tag,
@@ -63,30 +68,30 @@ const CapabilityFilterDialogWithGeneric: React.FC<FilterProps> = ({
     // Beschreibung Filter
     {
       id: 'descriptionFilter',
-      label: 'Beschreibung enthält',
+      label: t('descriptionContains'),
       type: 'text',
-      placeholder: 'Geben Sie einen Text ein...',
+      placeholder: t('descriptionPlaceholder'),
     },
     // Verantwortlicher Filter
     {
       id: 'ownerFilter',
-      label: 'Verantwortlicher',
+      label: t('owner'),
       type: 'personSelect',
-      emptyLabel: 'Alle Verantwortlichen',
+      emptyLabel: t('allOwners'),
     },
     // Aktualisierungsdatum Filter
     {
       id: 'updatedDateRange',
-      label: 'Aktualisiert im Zeitraum',
+      label: t('updatedInPeriod'),
       type: 'dateRange',
-      fromLabel: 'Von',
-      toLabel: 'Bis',
+      fromLabel: t('dateFrom'),
+      toLabel: t('dateTo'),
     },
   ]
 
   return (
     <GenericFilterDialog
-      title="Filter für Business Capabilities"
+      title={t('title')}
       filterState={filterState}
       filterFields={filterFields}
       onFilterChange={onFilterChange}

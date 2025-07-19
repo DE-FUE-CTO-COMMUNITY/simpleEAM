@@ -2,6 +2,7 @@
 
 import React, { useMemo } from 'react'
 import { Chip, useTheme } from '@mui/material'
+import { useTranslations } from 'next-intl'
 import { GenericTable } from '../common/GenericTable'
 import { formatDate, getLevelLabel } from './utils'
 import { CapabilityStatus, CapabilityType, BusinessCapability } from '../../gql/generated'
@@ -46,6 +47,10 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
   onColumnVisibilityChange: _externalOnColumnVisibilityChange,
 }) => {
   const theme = useTheme()
+  const t = useTranslations('capabilities.table')
+  const tStatus = useTranslations('capabilities.statuses')
+  const tType = useTranslations('capabilities.types')
+  const tMaturity = useTranslations('capabilities.maturityLevels')
   const columnHelper = createColumnHelper<BusinessCapability>()
 
   // Verwende persistente Spaltensichtbarkeit
@@ -82,11 +87,11 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
   const columns = useMemo(
     () => [
       columnHelper.accessor('name', {
-        header: 'Name',
+        header: t('name'),
         cell: info => info.getValue(),
       }),
       columnHelper.accessor('description', {
-        header: 'Beschreibung',
+        header: t('description'),
         cell: info => {
           const value = info.getValue()
           return value && value.length > 50 ? `${value.substring(0, 50)}...` : value || '-'
@@ -94,12 +99,12 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
         enableHiding: true,
       }),
       columnHelper.accessor('maturityLevel', {
-        header: 'Reifegrad',
+        header: t('maturityLevel'),
         cell: info => {
           const level = info.getValue()
           return (
             <Chip
-              label={getLevelLabel(level)}
+              label={getLevelLabel(level, tMaturity)}
               size="small"
               sx={{
                 backgroundColor: theme.palette.primary.lighter,
@@ -110,32 +115,32 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
         },
       }),
       columnHelper.accessor('status', {
-        header: 'Status',
+        header: t('status'),
         cell: info => {
           const status = info.getValue() as CapabilityStatus
-          return status
+          return tStatus(status)
         },
       }),
       columnHelper.accessor('businessValue', {
-        header: 'Geschäftswert',
+        header: t('businessValue'),
         cell: info => info.getValue(),
       }),
       columnHelper.accessor('owners', {
-        header: 'Verantwortlicher',
+        header: t('owner'),
         cell: info => {
           const owners = info.getValue()
           return owners && owners.length > 0 ? `${owners[0].firstName} ${owners[0].lastName}` : '-'
         },
       }),
       columnHelper.accessor('tags', {
-        header: 'Tags',
+        header: t('tags'),
         cell: info => {
           const tags = info.getValue()
           return tags ? tags.join(', ') : '-'
         },
       }),
       columnHelper.accessor('parents', {
-        header: 'Übergeordnete Capabilities',
+        header: t('parentCapabilities'),
         cell: info => {
           const parents = info.getValue()
           return parents && parents.length > 0
@@ -145,7 +150,7 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
         enableHiding: true,
       }),
       columnHelper.accessor('children', {
-        header: 'Untergeordnete Capabilities',
+        header: t('childCapabilities'),
         cell: info => {
           const children = info.getValue()
           return children ? children.map((child: BusinessCapability) => child.name).join(', ') : '-'
@@ -154,15 +159,15 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
       }),
       // Versteckte Spalten für type und sequenceNumber
       columnHelper.accessor('type', {
-        header: 'Typ',
+        header: t('type'),
         cell: info => {
-          const type = info.getValue()
-          return type || '-'
+          const type = info.getValue() as CapabilityType
+          return type ? tType(type) : '-'
         },
         enableHiding: true,
       }),
       columnHelper.accessor('sequenceNumber', {
-        header: 'Sequenz',
+        header: t('sequenceNumber'),
         cell: info => {
           const sequence = info.getValue()
           return sequence !== null && sequence !== undefined ? sequence.toString() : '-'
@@ -170,7 +175,7 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
         enableHiding: true,
       }),
       columnHelper.accessor('introductionDate', {
-        header: 'Einführungsdatum',
+        header: t('introductionDate'),
         cell: info => {
           const date = info.getValue()
           return date ? formatDate(date) : '-'
@@ -178,7 +183,7 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
         enableHiding: true,
       }),
       columnHelper.accessor('endDate', {
-        header: 'Enddatum',
+        header: t('endDate'),
         cell: info => {
           const date = info.getValue()
           return date ? formatDate(date) : '-'
@@ -187,7 +192,7 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
       }),
       // Weitere versteckte Spalten für Beziehungen
       columnHelper.accessor('relatedDataObjects', {
-        header: 'Verwandte Datenobjekte',
+        header: t('relatedDataObjects'),
         cell: info => {
           const relatedDataObjects = info.getValue()
           return relatedDataObjects && relatedDataObjects.length > 0
@@ -197,7 +202,7 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
         enableHiding: true,
       }),
       columnHelper.accessor('supportedByApplications', {
-        header: 'Unterstützende Applikationen',
+        header: t('supportedByApplications'),
         cell: info => {
           const apps = info.getValue()
           return apps && apps.length > 0 ? apps.map((app: any) => app.name).join(', ') : '-'
@@ -205,7 +210,7 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
         enableHiding: true,
       }),
       columnHelper.accessor('partOfArchitectures', {
-        header: 'Teil von Architekturen',
+        header: t('partOfArchitectures'),
         cell: info => {
           const architectures = info.getValue()
           return architectures && architectures.length > 0
@@ -216,12 +221,12 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
       }),
       // Versteckte Spalten für Zeitstempel am Ende
       columnHelper.accessor('createdAt', {
-        header: 'Erstellt am',
+        header: t('createdAt'),
         cell: info => formatDate(info.getValue()),
         enableHiding: true,
       }),
       columnHelper.accessor('updatedAt', {
-        header: 'Aktualisiert am',
+        header: t('updatedAt'),
         cell: info => {
           const value = info.getValue()
           return value ? formatDate(value) : '-'
@@ -229,7 +234,15 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
         enableHiding: true,
       }),
     ],
-    [theme.palette.primary.lighter, theme.palette.primary.dark, columnHelper]
+    [
+      theme.palette.primary.lighter,
+      theme.palette.primary.dark,
+      columnHelper,
+      t,
+      tMaturity,
+      tStatus,
+      tType,
+    ]
   )
 
   // Mapping von Capability zu den erwarteten FormValues für das Formular

@@ -13,20 +13,20 @@ export const formatDate = (dateString: string): string => {
 }
 
 // Liefert den Label für den Reifegrad
-export const getLevelLabel = (level: number | null | undefined): string => {
+export const getLevelLabel = (level: number | null | undefined, t?: any): string => {
   if (level === null || level === undefined) {
-    return 'Nicht definiert'
+    return t ? t('undefined') : 'Nicht definiert'
   }
 
   switch (level) {
     case 0:
-      return 'Niedrig'
+      return t ? t('low') : 'Niedrig'
     case 1:
-      return 'Mittel'
+      return t ? t('medium') : 'Mittel'
     case 2:
-      return 'Hoch'
+      return t ? t('high') : 'Hoch'
     case 3:
-      return 'Sehr Hoch'
+      return t ? t('veryHigh') : 'Sehr Hoch'
     default:
       return `Level ${level}`
   }

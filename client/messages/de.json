@@ -469,6 +469,103 @@
       "allOwners": "Alle Verantwortlichen"
     }
   },
+  "capabilities": {
+    "title": "Business Capabilities",
+    "addNew": "Neue Business Capability erstellen",
+    "editTitle": "Business Capability bearbeiten",
+    "createTitle": "Neue Business Capability erstellen",
+    "viewTitle": "Business Capability Details",
+    "deleteConfirmation": "Sind Sie sicher, dass Sie diese Business Capability löschen möchten?",
+    "noCapabilitiesFound": "Keine Business Capabilities gefunden.",
+    "searchPlaceholder": "Business Capabilities durchsuchen...",
+    "form": {
+      "name": "Name",
+      "description": "Beschreibung",
+      "maturityLevel": "Reifegrad",
+      "businessValue": "Geschäftswert",
+      "status": "Status",
+      "type": "Typ",
+      "sequenceNumber": "Sequenznummer",
+      "introductionDate": "Einführungsdatum",
+      "endDate": "Enddatum",
+      "owner": "Verantwortlicher",
+      "parentCapability": "Übergeordnete Capability",
+      "childCapabilities": "Untergeordnete Capabilities",
+      "tags": "Tags",
+      "supportedByApplications": "Unterstützende Applikationen",
+      "partOfArchitectures": "Teil von Architekturen",
+      "partOfDiagrams": "Teil von Diagrammen",
+      "relatedDataObjects": "Verwandte Datenobjekte",
+      "none": "Keine",
+      "createTitle": "Neue Business Capability erstellen",
+      "editTitle": "Business Capability bearbeiten",
+      "viewTitle": "Business Capability Details"
+    },
+    "table": {
+      "name": "Name",
+      "description": "Beschreibung",
+      "maturityLevel": "Reifegrad",
+      "businessValue": "Geschäftswert",
+      "status": "Status",
+      "type": "Typ",
+      "sequenceNumber": "Sequenz",
+      "introductionDate": "Einführungsdatum",
+      "endDate": "Enddatum",
+      "owner": "Verantwortlicher",
+      "tags": "Tags",
+      "parentCapabilities": "Übergeordnete Capabilities",
+      "childCapabilities": "Untergeordnete Capabilities",
+      "relatedDataObjects": "Verwandte Datenobjekte",
+      "supportedByApplications": "Unterstützende Applikationen",
+      "partOfArchitectures": "Teil von Architekturen",
+      "createdAt": "Erstellt am",
+      "updatedAt": "Aktualisiert am",
+      "actions": "Aktionen"
+    },
+    "maturityLevels": {
+      "low": "Niedrig",
+      "medium": "Mittel",
+      "high": "Hoch",
+      "veryHigh": "Sehr Hoch",
+      "undefined": "Nicht definiert",
+      "0": "Niedrig",
+      "1": "Mittel",
+      "2": "Hoch",
+      "3": "Sehr Hoch"
+    },
+    "statuses": {
+      "ACTIVE": "Aktiv",
+      "PLANNED": "Geplant",
+      "RETIRED": "Zurückgezogen"
+    },
+    "types": {
+      "STRATEGIC": "Strategisch",
+      "OPERATIONAL": "Operativ",
+      "SUPPORT": "Unterstützend"
+    },
+    "filter": {
+      "title": "Business Capabilities filtern",
+      "status": "Status",
+      "maturityLevel": "Reifegrad",
+      "businessValue": "Geschäftswert",
+      "tags": "Tags",
+      "descriptionContains": "Beschreibung enthält",
+      "descriptionPlaceholder": "Geben Sie einen Text ein...",
+      "owner": "Verantwortlicher",
+      "allOwners": "Alle Verantwortlichen",
+      "updatedInPeriod": "Aktualisiert im Zeitraum",
+      "updatedDateRange": "Aktualisiert im Zeitraum",
+      "dateFrom": "Von",
+      "dateTo": "Bis",
+      "enterText": "Geben Sie einen Text ein..."
+    },
+    "tabs": {
+      "general": "Allgemein",
+      "lifecycle": "Lebenszyklus",
+      "relationships": "Beziehungen",
+      "architectures": "Architekturen"
+    }
+  },
   "errors": {
     "generic": "Ein Fehler ist aufgetreten",
     "networkError": "Netzwerkfehler",

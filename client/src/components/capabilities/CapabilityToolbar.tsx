@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { useTranslations } from 'next-intl'
 import GenericToolbar from '../common/GenericToolbar'
 import { Table, VisibilityState } from '@tanstack/react-table'
 
@@ -24,10 +25,12 @@ const CapabilityToolbarWithGeneric: React.FC<CapabilityToolbarWithGenericProps> 
   columnVisibility,
   ...props
 }) => {
+  const t = useTranslations('capabilities')
+
   return (
     <GenericToolbar
       {...props}
-      searchPlaceholder="Capabilities durchsuchen..."
+      searchPlaceholder={t('searchPlaceholder')}
       showClearSearchButton={true}
       table={table}
       enableColumnVisibilityToggle={enableColumnVisibilityToggle}
