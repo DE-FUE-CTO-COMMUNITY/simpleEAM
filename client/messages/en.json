@@ -41,7 +41,8 @@
     "applyFilter": "Apply",
     "from": "From",
     "to": "To",
-    "contains": "contains"
+    "contains": "contains",
+    "none": "None"
   },
   "navigation": {
     "dashboard": "Dashboard",
@@ -381,7 +382,8 @@
       "url": "Please enter a valid URL",
       "number": "Please enter a valid number",
       "positive": "Please enter a positive number",
-      "integer": "Please enter a whole number"
+      "integer": "Please enter a whole number",
+      "noFormData": "No form data available"
     },
     "placeholders": {
       "enterText": "Enter text...",

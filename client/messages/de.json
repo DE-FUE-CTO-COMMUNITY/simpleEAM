@@ -41,7 +41,8 @@
     "applyFilter": "Anwenden",
     "from": "Von",
     "to": "Bis",
-    "contains": "enthält"
+    "contains": "enthält",
+    "none": "Keine"
   },
   "navigation": {
     "dashboard": "Dashboard",
@@ -485,7 +486,8 @@
       "url": "Bitte geben Sie eine gültige URL ein",
       "number": "Bitte geben Sie eine gültige Zahl ein",
       "positive": "Bitte geben Sie eine positive Zahl ein",
-      "integer": "Bitte geben Sie eine ganze Zahl ein"
+      "integer": "Bitte geben Sie eine ganze Zahl ein",
+      "noFormData": "Keine Formulardaten vorhanden"
     },
     "placeholders": {
       "enterText": "Text eingeben...",

@@ -5,6 +5,7 @@ import { Box, Typography, Button, Card } from '@mui/material'
 import { Add as AddIcon } from '@mui/icons-material'
 import { useQuery, useMutation } from '@apollo/client'
 import { useSnackbar } from 'notistack'
+import { useTranslations } from 'next-intl'
 import { useAuth, isArchitect } from '@/lib/auth'
 import { VisibilityState } from '@tanstack/react-table'
 import {
@@ -28,6 +29,7 @@ import { FilterState } from '@/components/architecture-principles/types'
 const ArchitecturePrinciplesPage = () => {
   const { authenticated } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
+  const t = useTranslations('architecturePrinciples')
   const [globalFilter, setGlobalFilter] = useState<string>('')
   const [sorting, setSorting] = useState([{ id: 'name', desc: false }])
   const [tableInstance, setTableInstance] = useState<any>(null)
@@ -304,7 +306,7 @@ const ArchitecturePrinciplesPage = () => {
     <Box sx={{ py: 2, px: 1 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
         <Typography variant="h4" component="h1">
-          Architektur-Prinzipien
+          {t('title')}
         </Typography>
         {authenticated && isArchitect() && (
           <Button
@@ -313,7 +315,7 @@ const ArchitecturePrinciplesPage = () => {
             startIcon={<AddIcon />}
             onClick={handleCreatePrincipleClick}
           >
-            Neues Architektur-Prinzip
+            {t('addNew')}
           </Button>
         )}
       </Box>

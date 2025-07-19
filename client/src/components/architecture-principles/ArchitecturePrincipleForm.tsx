@@ -59,6 +59,8 @@ const ArchitecturePrincipleForm: React.FC<ArchitecturePrincipleFormProps> = ({
   onEditMode,
 }) => {
   const t = useTranslations('architecturePrinciples')
+  const tCommon = useTranslations('common')
+  const tForms = useTranslations('forms.validation')
   const getCategoryLabel = useCategoryLabel()
   const getPriorityLabel = usePriorityLabel()
 
@@ -156,7 +158,7 @@ const ArchitecturePrincipleForm: React.FC<ArchitecturePrincipleFormProps> = ({
           const values = formState.value
 
           if (!values) {
-            return { error: 'Keine Formulardaten vorhanden' }
+            return { error: tForms('noFormData') }
           }
 
           // Daten aus dem Formular mit Standardwerten anreichern
@@ -339,13 +341,13 @@ const ArchitecturePrincipleForm: React.FC<ArchitecturePrincipleFormProps> = ({
     },
     {
       name: 'ownerId',
-      label: 'Verantwortlicher',
+      label: t('form.responsible'),
       type: 'select',
       required: false,
       tabId: 'general',
       size: { xs: 12, md: 6 },
       options: [
-        { value: '', label: 'Keine' },
+        { value: '', label: tCommon('none') },
         ...(personData?.people || []).map(
           (person: { id: string; firstName: string; lastName: string }) => ({
             value: person.id,
