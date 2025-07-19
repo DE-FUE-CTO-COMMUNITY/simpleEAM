@@ -5,6 +5,7 @@ import { Box, Typography, Button, Card } from '@mui/material'
 import { Add as AddIcon } from '@mui/icons-material'
 import { useQuery, useMutation } from '@apollo/client'
 import { useSnackbar } from 'notistack'
+import { useTranslations } from 'next-intl'
 import { useAuth, isArchitect } from '@/lib/auth'
 import { VisibilityState } from '@tanstack/react-table'
 import {
@@ -28,6 +29,8 @@ import { ArchitectureType, FilterState } from '@/components/architectures/types'
 const ArchitecturesPage = () => {
   const { authenticated } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
+  const t = useTranslations('architectures')
+  const tCommon = useTranslations('common')
   const [globalFilter, setGlobalFilter] = useState<string>('')
   const [sorting, setSorting] = useState([{ id: 'name', desc: false }])
   const [tableInstance, setTableInstance] = useState<any>(null)
@@ -96,9 +99,9 @@ const ArchitecturesPage = () => {
   // Fehlerbehandlung
   useEffect(() => {
     if (error) {
-      enqueueSnackbar('Fehler beim Laden der Architekturen', { variant: 'error' })
+      enqueueSnackbar(t('loadingError'), { variant: 'error' })
     }
-  }, [error, enqueueSnackbar])
+  }, [error, enqueueSnackbar, t])
 
   const architectures = data?.architectures || []
 
@@ -108,11 +111,11 @@ const ArchitecturesPage = () => {
   // Mutation zum Erstellen einer neuen Architektur
   const [createArchitecture, { loading: isCreating }] = useMutation(CREATE_ARCHITECTURE, {
     onCompleted: () => {
-      enqueueSnackbar('Architektur erfolgreich erstellt', { variant: 'success' })
+      enqueueSnackbar(t('createSuccess'), { variant: 'success' })
       refetch()
     },
     onError: error => {
-      enqueueSnackbar(`Fehler beim Erstellen der Architektur: ${error.message}`, {
+      enqueueSnackbar(`${t('createError')}: ${error.message}`, {
         variant: 'error',
       })
     },
@@ -123,21 +126,18 @@ const ArchitecturesPage = () => {
     onCompleted: data => {
       // Überprüfe das Ergebnis der Mutation
       if (data?.updateArchitectures?.architectures?.length > 0) {
-        enqueueSnackbar('Architektur erfolgreich aktualisiert', { variant: 'success' })
+        enqueueSnackbar(t('updateSuccess'), { variant: 'success' })
       } else {
-        enqueueSnackbar(
-          'Architektur wurde aktualisiert, aber die Daten wurden nicht zurückgegeben',
-          {
-            variant: 'warning',
-          }
-        )
+        enqueueSnackbar(t('updateWarning'), {
+          variant: 'warning',
+        })
       }
 
       // Wir laden explizit neu, um die Änderungen zu sehen
       refetch()
     },
     onError: error => {
-      enqueueSnackbar(`Fehler beim Aktualisieren der Architektur: ${error.message}`, {
+      enqueueSnackbar(`${t('updateError')}: ${error.message}`, {
         variant: 'error',
       })
     },
@@ -149,11 +149,11 @@ const ArchitecturesPage = () => {
   // Mutation zum Löschen einer Architektur
   const [deleteArchitecture] = useMutation(DELETE_ARCHITECTURE, {
     onCompleted: () => {
-      enqueueSnackbar('Architektur erfolgreich gelöscht', { variant: 'success' })
+      enqueueSnackbar(t('deleteSuccess'), { variant: 'success' })
       refetch()
     },
     onError: error => {
-      enqueueSnackbar(`Fehler beim Löschen der Architektur: ${error.message}`, {
+      enqueueSnackbar(`${t('deleteError')}: ${error.message}`, {
         variant: 'error',
       })
     },
@@ -523,7 +523,7 @@ const ArchitecturesPage = () => {
     <Box sx={{ py: 2, px: 1 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
         <Typography variant="h4" component="h1">
-          Architekturen
+          {t('title')}
         </Typography>
         {isArchitect() && (
           <Button
@@ -532,7 +532,7 @@ const ArchitecturesPage = () => {
             startIcon={<AddIcon />}
             onClick={handleCreateArchitecture}
           >
-            Neue Architektur
+            {t('createNew')}
           </Button>
         )}
       </Box>

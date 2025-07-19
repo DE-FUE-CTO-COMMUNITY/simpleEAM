@@ -34,6 +34,7 @@ import {
 } from '@tanstack/react-table'
 import { isArchitect } from '@/lib/auth'
 import useAutomaticPageSize from '../../hooks/useAutomaticPageSize'
+import { useTranslations } from 'next-intl'
 
 /**
  * GenericTableProps definiert die gemeinsamen Eigenschaften für alle Tabellen
@@ -93,6 +94,7 @@ export function GenericTable<T extends { id: string }, F>({
   // Table Instance Callback
   onTableReady,
 }: GenericTableProps<T, F>) {
+  const t = useTranslations('common')
   // State für das Formular-Dialog
   const [formMode, setFormMode] = useState<'create' | 'edit' | 'view'>('view')
   const [isFormOpen, setIsFormOpen] = useState(false)
@@ -181,7 +183,7 @@ export function GenericTable<T extends { id: string }, F>({
           setIsFormOpen(false)
         }
       } catch (error) {
-        console.error('Fehler beim Speichern:', error)
+        console.error('Error saving:', error)
         // Dialog nicht schließen bei Fehler
       } finally {
         setFormLoading(false)
@@ -199,7 +201,7 @@ export function GenericTable<T extends { id: string }, F>({
           await onDelete(id)
           setIsFormOpen(false)
         } catch (error) {
-          console.error('Fehler beim Löschen:', error)
+          console.error('Error deleting:', error)
         } finally {
           setFormLoading(false)
         }
@@ -220,7 +222,7 @@ export function GenericTable<T extends { id: string }, F>({
     // Erstelle eine Aktionsspalte
     const actionColumn: ColumnDef<T, any> = {
       id: 'actions',
-      header: 'Aktionen',
+      header: t('actions'),
       cell: info => (
         <Box
           sx={{
@@ -230,7 +232,7 @@ export function GenericTable<T extends { id: string }, F>({
             flexWrap: 'nowrap',
           }}
         >
-          <Tooltip title="Details anzeigen">
+          <Tooltip title={t('showDetails')}>
             <IconButton
               size={isMobile ? 'medium' : 'small'}
               color="primary"
@@ -248,7 +250,7 @@ export function GenericTable<T extends { id: string }, F>({
             </IconButton>
           </Tooltip>
           {isArchitect() && (
-            <Tooltip title="Bearbeiten">
+            <Tooltip title={t('edit')}>
               <IconButton
                 size={isMobile ? 'medium' : 'small'}
                 color="secondary"
@@ -271,7 +273,7 @@ export function GenericTable<T extends { id: string }, F>({
     }
 
     return [...columns, actionColumn]
-  }, [columns, handleViewItemClick, handleEditItemClick, getIdFromData, isMobile])
+  }, [columns, handleViewItemClick, handleEditItemClick, getIdFromData, isMobile, t])
 
   // TanStack Table initialisieren
   const table = useReactTable({
@@ -520,9 +522,12 @@ export function GenericTable<T extends { id: string }, F>({
           }}
         >
           <Typography variant="body2" sx={{ textAlign: isMobile ? 'center' : 'left' }}>
-            Zeige {pageIndex * pageSize + 1} bis{' '}
-            {Math.min((pageIndex + 1) * pageSize, table.getFilteredRowModel().rows.length)} von{' '}
-            {table.getFilteredRowModel().rows.length} Einträgen ({pageSize} pro Seite)
+            {t('ofEntries', {
+              total: table.getFilteredRowModel().rows.length,
+              pageSize,
+              start: pageIndex * pageSize + 1,
+              end: Math.min((pageIndex + 1) * pageSize, table.getFilteredRowModel().rows.length),
+            })}
           </Typography>
         </Box>
         <Box

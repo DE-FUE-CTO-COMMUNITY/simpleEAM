@@ -2,6 +2,7 @@
 
 import React, { useMemo } from 'react'
 import { Chip } from '@mui/material'
+import { useTranslations } from 'next-intl'
 import { GenericTable } from '../common/GenericTable'
 import { ArchitectureType } from './types'
 import {
@@ -47,6 +48,7 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
   columnVisibility: _externalColumnVisibility,
   onColumnVisibilityChange: _externalOnColumnVisibilityChange,
 }) => {
+  const t = useTranslations('architectures')
   const columnHelper = createColumnHelper<ArchitectureType>()
 
   // Verwende persistente Spaltensichtbarkeit
@@ -79,11 +81,11 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
   const columns = useMemo(
     () => [
       columnHelper.accessor('name', {
-        header: 'Name',
+        header: t('table.name'),
         cell: info => info.getValue(),
       }),
       columnHelper.accessor('description', {
-        header: 'Beschreibung',
+        header: t('table.description'),
         cell: info => {
           const description = info.getValue()
           return description && description.length > 50
@@ -92,7 +94,7 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
         },
       }),
       columnHelper.accessor('domain', {
-        header: 'Domäne',
+        header: t('table.domain'),
         cell: info => (
           <Chip
             label={getDomainLabel(info.getValue() as ArchitectureDomain)}
@@ -103,22 +105,22 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
         ),
       }),
       columnHelper.accessor('type', {
-        header: 'Typ',
+        header: t('table.type'),
         cell: info => getTypeLabel(info.getValue() as GeneratedArchitectureType),
       }),
       columnHelper.accessor('timestamp', {
-        header: 'Architekturdatum',
+        header: t('table.timestamp'),
         cell: info => formatDate(info.getValue()),
       }),
       columnHelper.accessor('owners', {
-        header: 'Verantwortlicher',
+        header: t('table.owner'),
         cell: info => {
           const owners = info.getValue()
           return owners && owners.length > 0 ? `${owners[0].firstName} ${owners[0].lastName}` : '-'
         },
       }),
       columnHelper.accessor('containsCapabilities', {
-        header: 'Capabilities',
+        header: t('table.capabilities'),
         cell: info => {
           const caps = info.getValue()
           return caps && caps.length > 0
@@ -130,7 +132,7 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
         },
       }),
       columnHelper.accessor('containsApplications', {
-        header: 'Applikationen',
+        header: t('table.applications'),
         cell: info => {
           const apps = info.getValue()
           return apps && apps.length > 0
@@ -142,7 +144,7 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
         },
       }),
       columnHelper.accessor('containsDataObjects', {
-        header: 'Datenobjekte',
+        header: t('table.dataObjects'),
         cell: info => {
           const objs = info.getValue()
           return objs && objs.length > 0
@@ -154,7 +156,7 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
         },
       }),
       columnHelper.accessor('containsInterfaces', {
-        header: 'Schnittstellen',
+        header: t('table.interfaces'),
         cell: info => {
           const interfaces = info.getValue()
           return interfaces && interfaces.length > 0
@@ -166,7 +168,7 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
         },
       }),
       columnHelper.accessor('containsInfrastructure', {
-        header: 'Infrastruktur',
+        header: t('table.infrastructure'),
         cell: info => {
           const infrastructure = info.getValue()
           return infrastructure && infrastructure.length > 0
@@ -178,7 +180,7 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
         },
       }),
       columnHelper.accessor('tags', {
-        header: 'Tags',
+        header: t('table.tags'),
         cell: info => {
           const tags = info.getValue()
           return tags && tags.length > 0
@@ -189,7 +191,7 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
         },
       }),
       columnHelper.accessor('appliedPrinciples', {
-        header: 'Angewandte Prinzipien',
+        header: t('table.appliedPrinciples'),
         cell: info => {
           const principles = info.getValue()
           return principles && principles.length > 0
@@ -201,15 +203,15 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
         },
       }),
       columnHelper.accessor('createdAt', {
-        header: 'Erstellt am',
+        header: t('table.createdAt'),
         cell: info => formatDate(info.getValue()),
       }),
       columnHelper.accessor('updatedAt', {
-        header: 'Aktualisiert am',
+        header: t('table.updatedAt'),
         cell: info => formatDate(info.getValue()),
       }),
     ],
-    [columnHelper]
+    [columnHelper, t]
   )
 
   // Mapping von ArchitectureType zu den erwarteten FormValues für das Formular

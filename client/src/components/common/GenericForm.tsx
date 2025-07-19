@@ -28,6 +28,7 @@ import {
   Delete as DeleteIcon,
 } from '@mui/icons-material'
 import type { SxProps, Theme } from '@mui/material'
+import { useTranslations } from 'next-intl'
 import type { FormApi } from '@tanstack/react-form'
 import { isViewer } from '@/lib/auth'
 import { Field, useStore } from '@tanstack/react-form'
@@ -201,16 +202,17 @@ const GenericForm: React.FC<GenericFormProps> = ({
   formWidth = 'md',
   enableDelete = false,
   onDelete,
-  deleteButtonText = 'Löschen',
-  deleteConfirmationText = 'Sind Sie sicher, dass Sie diesen Eintrag löschen möchten?',
+  deleteButtonText,
+  deleteConfirmationText,
   _disableSubmitOnErrors = true, // Nicht mehr verwendet - behalten für abwärtskompatibilität
   sx,
   form,
   onEditMode,
   entityId,
-  entityName = 'Eintrag',
+  entityName,
   metadata,
 }) => {
+  const t = useTranslations('common')
   const [activeTab, setActiveTab] = useState(0)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
@@ -305,7 +307,7 @@ const GenericForm: React.FC<GenericFormProps> = ({
         onClose()
       } catch (error) {
         // eslint-disable-next-line no-console
-        console.error('Fehler beim Löschen:', error)
+        console.error('Error deleting (with ID):', error)
         setShowDeleteConfirm(false)
       }
     } else if (onDelete) {
@@ -315,7 +317,7 @@ const GenericForm: React.FC<GenericFormProps> = ({
         onClose()
       } catch (error) {
         // eslint-disable-next-line no-console
-        console.error('Fehler beim Löschen:', error)
+        console.error('Error deleting (without ID):', error)
         setShowDeleteConfirm(false)
       }
     }
@@ -324,9 +326,10 @@ const GenericForm: React.FC<GenericFormProps> = ({
   // Dialogtitel basierend auf dem Modus
   const getDialogTitle = () => {
     if (title) return title
-    if (isCreateMode) return `Neuen ${entityName} erstellen`
-    if (isEditMode) return `${entityName} bearbeiten`
-    return `${entityName} Details`
+    const entity = entityName || t('entity')
+    if (isCreateMode) return t('createNew', { entity })
+    if (isEditMode) return t('editEntity', { entity })
+    return `${entity} Details`
   }
 
   // Gruppiere Felder nach Tabs oder ohne Tab-Zuordnung
@@ -951,12 +954,12 @@ const GenericForm: React.FC<GenericFormProps> = ({
                 <Divider sx={{ my: 2 }} />
                 {metadata.createdAt && (
                   <Typography variant="subtitle2" gutterBottom>
-                    Erstellt am: {new Date(metadata.createdAt).toLocaleString()}
+                    {t('createdAt')} {new Date(metadata.createdAt).toLocaleString()}
                   </Typography>
                 )}
                 {metadata.updatedAt && (
                   <Typography variant="subtitle2">
-                    Aktualisiert am: {new Date(metadata.updatedAt).toLocaleString()}
+                    {t('updatedAt')} {new Date(metadata.updatedAt).toLocaleString()}
                   </Typography>
                 )}
               </Box>
@@ -973,7 +976,7 @@ const GenericForm: React.FC<GenericFormProps> = ({
                   startIcon={<DeleteIcon />}
                   disabled={isLoading}
                 >
-                  {deleteButtonText}
+                  {deleteButtonText || t('delete')}
                 </Button>
               )}
             </div>
@@ -984,7 +987,7 @@ const GenericForm: React.FC<GenericFormProps> = ({
                 disabled={isLoading}
                 startIcon={<CancelIcon />}
               >
-                {cancelButtonText || (isViewMode ? 'Schließen' : 'Abbrechen')}
+                {cancelButtonText || (isViewMode ? t('close') : t('cancel'))}
               </Button>
               {!isViewMode && (
                 <Button
@@ -998,10 +1001,10 @@ const GenericForm: React.FC<GenericFormProps> = ({
                   {isLoading || isSubmitting ? (
                     <>
                       <CircularProgress size={20} sx={{ mr: 1 }} />
-                      Wird gespeichert...
+                      {t('loading')}
                     </>
                   ) : (
-                    submitButtonText || (isCreateMode ? 'Erstellen' : 'Speichern')
+                    submitButtonText || (isCreateMode ? t('create') : t('save'))
                   )}
                 </Button>
               )}
@@ -1012,7 +1015,7 @@ const GenericForm: React.FC<GenericFormProps> = ({
                   onClick={onEditMode}
                   startIcon={<EditIcon />}
                 >
-                  Bearbeiten
+                  {t('edit')}
                 </Button>
               )}
             </div>
@@ -1022,13 +1025,13 @@ const GenericForm: React.FC<GenericFormProps> = ({
 
       {/* Lösch-Bestätigungsdialog */}
       <Dialog open={showDeleteConfirm} onClose={() => setShowDeleteConfirm(false)}>
-        <DialogTitle>Löschen bestätigen</DialogTitle>
+        <DialogTitle>{t('deleteConfirmTitle')}</DialogTitle>
         <DialogContent>
-          <DialogContentText>{deleteConfirmationText}</DialogContentText>
+          <DialogContentText>{deleteConfirmationText || t('deleteConfirmation')}</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setShowDeleteConfirm(false)} color="inherit">
-            Abbrechen
+            {t('cancel')}
           </Button>
           <Button
             onClick={handleDelete}
@@ -1036,7 +1039,7 @@ const GenericForm: React.FC<GenericFormProps> = ({
             variant="contained"
             startIcon={<DeleteIcon />}
           >
-            Löschen
+            {deleteButtonText || t('delete')}
           </Button>
         </DialogActions>
       </Dialog>

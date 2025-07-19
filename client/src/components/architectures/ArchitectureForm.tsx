@@ -5,6 +5,7 @@ import { useForm, useStore } from '@tanstack/react-form'
 import { z } from 'zod'
 import { useQuery } from '@apollo/client'
 import { useTheme } from '@mui/material/styles'
+import { useTranslations } from 'next-intl'
 import {
   Architecture,
   ArchitectureDomain,
@@ -80,6 +81,7 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
   onEditMode,
 }) => {
   const theme = useTheme()
+  const t = useTranslations('architectures')
 
   // Personen laden
   const { data: personData, loading: personLoading } = useQuery(GET_PERSONS)
@@ -123,10 +125,9 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
       diagramIds: [],
       parentArchitectureId: '',
       appliedPrincipleIds: [],
-      elementsNote:
-        'Hinweis: Gelb markierte Elemente sind in keinem Diagramm dieser Architektur enthalten. Es wird empfohlen, alle Elemente in mindestens einem Diagramm darzustellen.',
+      elementsNote: t('form.elementsNote'),
     }),
-    []
+    [t]
   )
 
   // TanStack Form konfigurieren
@@ -312,8 +313,7 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
           architecture.parentArchitecture && architecture.parentArchitecture.length > 0
             ? architecture.parentArchitecture[0].id
             : '',
-        elementsNote:
-          'Hinweis: Gelb markierte Elemente sind in keinem Diagramm dieser Architektur enthalten. Es wird empfohlen, alle Elemente in mindestens einem Diagramm darzustellen.',
+        elementsNote: t('form.elementsNote'),
       }
 
       // Verwende setValues statt reset, um keine neuen Re-Renders auszulösen
@@ -325,7 +325,7 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
     } catch (error) {
       console.warn('Fehler beim Aktualisieren des Formulars:', error)
     }
-  }, [architectureId, isOpen, mode, architecture, form]) // Alle Dependencies hinzufügen
+  }, [architectureId, isOpen, mode, architecture, form, t]) // Alle Dependencies hinzufügen
 
   // Beobachte das diagramIds-Feld
   const diagramIds = useStore(form.store, (state: any) => state.values.diagramIds)
@@ -358,10 +358,10 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
 
   // Tab-Konfiguration für die vier Tabs
   const tabs: TabConfig[] = [
-    { id: 'general', label: 'Allgemein' },
-    { id: 'elements', label: 'Enthaltene Architekturelemente' },
-    { id: 'principles', label: 'Architektur-Prinzipien' },
-    { id: 'diagrams', label: 'Diagramme' },
+    { id: 'general', label: t('form.tabs.general') },
+    { id: 'elements', label: t('form.tabs.elements') },
+    { id: 'principles', label: t('form.tabs.principles') },
+    { id: 'diagrams', label: t('form.tabs.diagrams') },
   ]
 
   // Feldkonfiguration für das generische Formular
@@ -381,7 +381,7 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
   const generalFields: FieldConfigWithSelect[] = [
     {
       name: 'name',
-      label: 'Name',
+      label: t('form.name'),
       type: 'text',
       required: true,
       validators: architectureSchema.shape.name,
@@ -390,7 +390,7 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
     },
     {
       name: 'domain',
-      label: 'Domäne',
+      label: t('form.domain'),
       type: 'select',
       required: true,
       validators: architectureSchema.shape.domain,
@@ -403,7 +403,7 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
     },
     {
       name: 'type',
-      label: 'Typ',
+      label: t('form.type'),
       type: 'select',
       required: true,
       validators: architectureSchema.shape.type,
@@ -416,7 +416,7 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
     },
     {
       name: 'timestamp',
-      label: 'Architekturdatum',
+      label: t('form.timestamp'),
       type: 'date',
       required: true,
       validators: architectureSchema.shape.timestamp,
@@ -425,7 +425,7 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
     },
     {
       name: 'description',
-      label: 'Beschreibung',
+      label: t('form.description'),
       type: 'textarea',
       required: true,
       validators: architectureSchema.shape.description,
@@ -435,18 +435,18 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
     },
     {
       name: 'tags',
-      label: 'Tags',
+      label: t('form.tags'),
       type: 'tags',
       tabId: 'general',
       size: { xs: 12, md: 6 },
     },
     {
       name: 'ownerId',
-      label: 'Verantwortlicher',
+      label: t('form.owner'),
       type: 'select',
       tabId: 'general',
       options: [
-        { value: '', label: 'Keine' },
+        { value: '', label: t('form.none') },
         ...(personData?.people || []).map(
           (person: { id: string; firstName: string; lastName: string }): SelectOption => ({
             value: person.id,
@@ -459,11 +459,11 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
     },
     {
       name: 'parentArchitectureId',
-      label: 'Übergeordnete Architektur',
+      label: t('form.parentArchitecture'),
       type: 'select',
       tabId: 'general',
       options: [
-        { value: '', label: 'Keine' },
+        { value: '', label: t('form.none') },
         ...availableArchitectures
           .filter(arch => arch.id !== architecture?.id)
           .map(
@@ -481,7 +481,7 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
   const elementsFields: FieldConfigWithSelect[] = [
     {
       name: 'containsCapabilityIds',
-      label: 'Capabilities',
+      label: t('form.capabilities'),
       type: 'autocomplete',
       tabId: 'elements',
       multiple: true,
@@ -555,7 +555,7 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
     },
     {
       name: 'containsApplicationIds',
-      label: 'Applikationen',
+      label: t('form.applications'),
       type: 'autocomplete',
       tabId: 'elements',
       multiple: true,
@@ -629,7 +629,7 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
     },
     {
       name: 'containsDataObjectIds',
-      label: 'Datenobjekte',
+      label: t('form.dataObjects'),
       type: 'autocomplete',
       tabId: 'elements',
       multiple: true,
@@ -701,7 +701,7 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
     },
     {
       name: 'containsInterfaceIds',
-      label: 'Schnittstellen',
+      label: t('form.interfaces'),
       type: 'autocomplete',
       tabId: 'elements',
       multiple: true,
@@ -773,7 +773,7 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
     },
     {
       name: 'containsInfrastructureIds',
-      label: 'Infrastructure',
+      label: t('form.infrastructure'),
       type: 'autocomplete',
       tabId: 'elements',
       multiple: true,
@@ -865,7 +865,7 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
   const principleFields: FieldConfigWithSelect[] = [
     {
       name: 'appliedPrincipleIds',
-      label: 'Angewandte Architektur-Prinzipien',
+      label: t('form.principles'),
       type: 'autocomplete',
       tabId: 'principles',
       multiple: true,
@@ -900,7 +900,7 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
   const diagramFields: FieldConfigWithSelect[] = [
     {
       name: 'diagramIds',
-      label: 'Diagramme',
+      label: t('form.diagrams'),
       type: 'autocomplete',
       tabId: 'diagrams',
       multiple: true,
@@ -950,10 +950,10 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
     <GenericForm
       title={
         formMode === 'create'
-          ? 'Neue Architektur erstellen'
+          ? t('form.createTitle')
           : formMode === 'edit'
-            ? 'Architektur bearbeiten'
-            : 'Architekturdetails'
+            ? t('form.editTitle')
+            : t('form.viewTitle')
       }
       isOpen={formIsOpen}
       onClose={handleClose}
@@ -967,7 +967,7 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
       onDelete={architecture?.id && onDelete ? () => onDelete(architecture.id) : undefined}
       onEditMode={onEditMode}
       entityId={architecture?.id}
-      entityName="Architektur"
+      entityName={t('form.entityName')}
       metadata={
         architecture
           ? {
