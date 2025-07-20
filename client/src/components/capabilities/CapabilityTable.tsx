@@ -2,7 +2,7 @@
 
 import React, { useMemo } from 'react'
 import { Chip, useTheme } from '@mui/material'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { GenericTable } from '../common/GenericTable'
 import { formatDate, getLevelLabel } from './utils'
 import { CapabilityStatus, CapabilityType, BusinessCapability } from '../../gql/generated'
@@ -48,6 +48,7 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
 }) => {
   const theme = useTheme()
   const t = useTranslations('capabilities.table')
+  const locale = useLocale()
   const tStatus = useTranslations('capabilities.statuses')
   const tType = useTranslations('capabilities.types')
   const tMaturity = useTranslations('capabilities.maturityLevels')
@@ -178,7 +179,7 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
         header: t('introductionDate'),
         cell: info => {
           const date = info.getValue()
-          return date ? formatDate(date) : '-'
+          return date ? formatDate(date, locale) : '-'
         },
         enableHiding: true,
       }),
@@ -186,7 +187,7 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
         header: t('endDate'),
         cell: info => {
           const date = info.getValue()
-          return date ? formatDate(date) : '-'
+          return date ? formatDate(date, locale) : '-'
         },
         enableHiding: true,
       }),
@@ -222,14 +223,14 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
       // Versteckte Spalten für Zeitstempel am Ende
       columnHelper.accessor('createdAt', {
         header: t('createdAt'),
-        cell: info => formatDate(info.getValue()),
+        cell: info => formatDate(info.getValue(), locale),
         enableHiding: true,
       }),
       columnHelper.accessor('updatedAt', {
         header: t('updatedAt'),
         cell: info => {
           const value = info.getValue()
-          return value ? formatDate(value) : '-'
+          return value ? formatDate(value, locale) : '-'
         },
         enableHiding: true,
       }),
@@ -242,6 +243,7 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
       tMaturity,
       tStatus,
       tType,
+      locale,
     ]
   )
 

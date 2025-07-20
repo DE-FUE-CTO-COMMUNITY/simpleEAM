@@ -42,7 +42,6 @@ export interface FilterState {
   targetApplicationsFilter: string[]
   dataObjectsFilter: string[]
   versionFilter: string
-  searchFilter: string
   descriptionFilter: string
   updatedDateRange: [string, string]
 }

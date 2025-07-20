@@ -173,13 +173,6 @@ const ApplicationInterfaceFilterDialog: React.FC<FilterProps> = ({
       type: 'text',
       placeholder: t('enterText'),
     },
-    // Suchtext Filter (Name)
-    {
-      id: 'searchFilter',
-      label: 'Name enthält',
-      type: 'text',
-      placeholder: t('descriptionPlaceholder'),
-    },
     // Beschreibungsfilter
     {
       id: 'descriptionFilter',

@@ -47,7 +47,11 @@ const InfrastructureTable: React.FC<InfrastructureTableProps> = ({
   // Utility functions for date formatting and translations
   const formatDate = (date: string | null | undefined, locale: string): string => {
     if (!date) return '-'
-    return new Date(date).toLocaleDateString(locale === 'de' ? 'de-DE' : 'en-US')
+    return new Date(date).toLocaleDateString(locale === 'de' ? 'de-DE' : 'en-US', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    })
   }
 
   const getInfrastructureTypeTranslation = (type: InfrastructureType, t: any): string => {

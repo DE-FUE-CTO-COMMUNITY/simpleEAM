@@ -2,7 +2,7 @@
 
 import React, { useMemo, useCallback } from 'react'
 import { Chip } from '@mui/material'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { GenericTable } from '../common/GenericTable'
 import DataObjectForm, { DataObjectFormValues } from './DataObjectForm'
 import { formatDate } from './utils'
@@ -44,6 +44,7 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
 }) => {
   const t = useTranslations('dataObjects.table')
   const tClassifications = useTranslations('dataObjects.classifications')
+  const locale = useLocale()
   const columnHelper = createColumnHelper<DataObject>()
 
   // Verwende persistente Spaltensichtbarkeit
@@ -153,32 +154,32 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
       columnHelper.accessor('planningDate', {
         header: t('planningDate'),
         cell: info => {
-          const date = info.getValue()
-          return date ? new Date(date).toLocaleDateString('de-DE') : '-'
+          const value = info.getValue()
+          return value ? formatDate(value, locale) : '-'
         },
         enableHiding: true,
       }),
       columnHelper.accessor('introductionDate', {
         header: t('introductionDate'),
         cell: info => {
-          const date = info.getValue()
-          return date ? new Date(date).toLocaleDateString('de-DE') : '-'
+          const value = info.getValue()
+          return value ? formatDate(value, locale) : '-'
         },
         enableHiding: true,
       }),
       columnHelper.accessor('endOfUseDate', {
         header: t('endOfUseDate'),
         cell: info => {
-          const date = info.getValue()
-          return date ? new Date(date).toLocaleDateString('de-DE') : '-'
+          const value = info.getValue()
+          return value ? formatDate(value, locale) : '-'
         },
         enableHiding: true,
       }),
       columnHelper.accessor('endOfLifeDate', {
         header: t('endOfLifeDate'),
         cell: info => {
-          const date = info.getValue()
-          return date ? new Date(date).toLocaleDateString('de-DE') : '-'
+          const value = info.getValue()
+          return value ? formatDate(value, locale) : '-'
         },
         enableHiding: true,
       }),
@@ -233,19 +234,19 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
       // Versteckte Zeitstempel-Spalten am Ende
       columnHelper.accessor('createdAt', {
         header: t('createdAt'),
-        cell: info => formatDate(info.getValue()),
+        cell: info => formatDate(info.getValue(), locale),
         enableHiding: true,
       }),
       columnHelper.accessor('updatedAt', {
         header: t('updatedAt'),
         cell: info => {
           const value = info.getValue()
-          return value ? formatDate(value) : '-'
+          return value ? formatDate(value, locale) : '-'
         },
         enableHiding: true,
       }),
     ],
-    [columnHelper, getClassificationChip, t]
+    [columnHelper, getClassificationChip, t, locale]
   )
 
   // Mapping-Funktion für die Umwandlung von DataObject zu DataObjectFormValues

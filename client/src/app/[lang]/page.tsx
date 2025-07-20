@@ -45,6 +45,7 @@ const Dashboard = () => {
   const theme = useTheme()
   const { enqueueSnackbar } = useSnackbar()
   const t = useTranslations('dashboard')
+  const tCommon = useTranslations('common')
 
   // Weiterleitung zum Login, falls nicht authentifiziert
   useEffect(() => {
@@ -112,31 +113,31 @@ const Dashboard = () => {
   // Fehlerbehandlung
   useEffect(() => {
     if (capabilitiesError) {
-      enqueueSnackbar(t('loadingError.businessCapabilities'), { variant: 'error' })
+      enqueueSnackbar(tCommon('error'), { variant: 'error' })
     }
     if (applicationsError) {
-      enqueueSnackbar(t('loadingError.applications'), { variant: 'error' })
+      enqueueSnackbar(tCommon('error'), { variant: 'error' })
     }
     if (dataObjectsError) {
-      enqueueSnackbar(t('loadingError.dataObjects'), { variant: 'error' })
+      enqueueSnackbar(tCommon('error'), { variant: 'error' })
     }
     if (architecturesError) {
-      enqueueSnackbar(t('loadingError.architectures'), { variant: 'error' })
+      enqueueSnackbar(tCommon('error'), { variant: 'error' })
     }
     if (diagramsError) {
-      enqueueSnackbar(t('loadingError.diagrams'), { variant: 'error' })
+      enqueueSnackbar(tCommon('error'), { variant: 'error' })
     }
     if (interfacesError) {
-      enqueueSnackbar(t('loadingError.interfaces'), { variant: 'error' })
+      enqueueSnackbar(tCommon('error'), { variant: 'error' })
     }
     if (personsError) {
-      enqueueSnackbar(t('loadingError.persons'), { variant: 'error' })
+      enqueueSnackbar(tCommon('error'), { variant: 'error' })
     }
     if (principlesError) {
-      enqueueSnackbar(t('loadingError.architecturePrinciples'), { variant: 'error' })
+      enqueueSnackbar(tCommon('error'), { variant: 'error' })
     }
     if (infrastructuresError) {
-      enqueueSnackbar(t('loadingError.infrastructure'), { variant: 'error' })
+      enqueueSnackbar(tCommon('error'), { variant: 'error' })
     }
   }, [
     capabilitiesError,
@@ -149,7 +150,7 @@ const Dashboard = () => {
     principlesError,
     infrastructuresError,
     enqueueSnackbar,
-    t,
+    tCommon,
   ])
 
   // Anzahl der Elemente - angepasst für die neue Datenstruktur

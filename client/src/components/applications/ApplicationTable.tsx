@@ -2,7 +2,7 @@
 
 import React, { useMemo } from 'react'
 import { Chip } from '@mui/material'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { GenericTable } from '../common/GenericTable'
 import { ApplicationType } from './types'
 import { formatDate, getCriticalityLabel, formatCosts } from './utils'
@@ -52,6 +52,7 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
   const tStatus = useTranslations('applications.statuses')
   const tTimeCategory = useTranslations('applications.timeCategories')
   const tSevenR = useTranslations('applications.sevenRStrategies')
+  const locale = useLocale()
   const columnHelper = createColumnHelper<ApplicationType>()
 
   // Verwende persistente Spaltensichtbarkeit
@@ -191,32 +192,32 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
       columnHelper.accessor('planningDate', {
         header: t('planningDate'),
         cell: info => {
-          const date = info.getValue()
-          return date ? new Date(date).toLocaleDateString('de-DE') : '-'
+          const value = info.getValue()
+          return value ? formatDate(value, locale) : '-'
         },
         enableHiding: true,
       }),
       columnHelper.accessor('introductionDate', {
         header: t('introductionDate'),
         cell: info => {
-          const date = info.getValue()
-          return date ? new Date(date).toLocaleDateString('de-DE') : '-'
+          const value = info.getValue()
+          return value ? formatDate(value, locale) : '-'
         },
         enableHiding: true,
       }),
       columnHelper.accessor('endOfUseDate', {
         header: t('endOfUseDate'),
         cell: info => {
-          const date = info.getValue()
-          return date ? new Date(date).toLocaleDateString('de-DE') : '-'
+          const value = info.getValue()
+          return value ? formatDate(value, locale) : '-'
         },
         enableHiding: true,
       }),
       columnHelper.accessor('endOfLifeDate', {
         header: t('endOfLifeDate'),
         cell: info => {
-          const date = info.getValue()
-          return date ? new Date(date).toLocaleDateString('de-DE') : '-'
+          const value = info.getValue()
+          return value ? formatDate(value, locale) : '-'
         },
         enableHiding: true,
       }),
@@ -306,16 +307,16 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
       // Versteckte Zeitstempel-Spalten am Ende
       columnHelper.accessor('createdAt', {
         header: t('createdAt'),
-        cell: info => formatDate(info.getValue()),
+        cell: info => formatDate(info.getValue(), locale),
         enableHiding: true,
       }),
       columnHelper.accessor('updatedAt', {
         header: t('updatedAt'),
-        cell: info => formatDate(info.getValue()),
+        cell: info => formatDate(info.getValue(), locale),
         enableHiding: true,
       }),
     ],
-    [columnHelper, t, tStatus, tTimeCategory, tSevenR]
+    [columnHelper, t, tStatus, tTimeCategory, tSevenR, locale]
   )
 
   // Mapping von ApplicationType zu den erwarteten FormValues für das Formular

@@ -1,12 +1,16 @@
 'use client'
 
 import { format } from 'date-fns'
+import { de, enUS } from 'date-fns/locale'
 import { FilterState } from './types'
 
 // Formatiert das Datum für die Anzeige
-export const formatDate = (dateString: string): string => {
+export const formatDate = (dateString: string, locale: string = 'de'): string => {
   try {
-    return format(new Date(dateString), 'dd.MM.yyyy HH:mm')
+    const date = new Date(dateString)
+    const dateLocale = locale === 'de' ? de : enUS
+    const formatPattern = locale === 'de' ? 'dd.MM.yyyy' : 'MM/dd/yyyy'
+    return format(date, formatPattern, { locale: dateLocale })
   } catch {
     return 'Unbekannt'
   }

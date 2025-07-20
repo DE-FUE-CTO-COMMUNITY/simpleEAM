@@ -22,7 +22,6 @@ export const useApplicationInterfaceFilter = ({
     targetApplicationsFilter: [],
     dataObjectsFilter: [],
     versionFilter: '',
-    searchFilter: '',
     descriptionFilter: '',
     updatedDateRange: ['', ''],
   })
@@ -123,7 +122,6 @@ export const useApplicationInterfaceFilter = ({
       targetApplicationsFilter,
       dataObjectsFilter,
       versionFilter,
-      searchFilter,
       descriptionFilter,
       updatedDateRange,
     } = filterState
@@ -213,15 +211,6 @@ export const useApplicationInterfaceFilter = ({
         }
       }
 
-      // Suchfilter (für Name)
-      if (searchFilter && searchFilter.trim() !== '') {
-        const name = (applicationInterface.name || '').toLowerCase()
-        const searchTerm = searchFilter.toLowerCase()
-        if (!name.includes(searchTerm)) {
-          return false
-        }
-      }
-
       // Beschreibungsfilter
       if (descriptionFilter && descriptionFilter.trim() !== '') {
         const description = (applicationInterface.description || '').toLowerCase()
@@ -268,7 +257,6 @@ export const useApplicationInterfaceFilter = ({
       targetApplicationsFilter: [],
       dataObjectsFilter: [],
       versionFilter: '',
-      searchFilter: '',
       descriptionFilter: '',
       updatedDateRange: ['', ''],
     })

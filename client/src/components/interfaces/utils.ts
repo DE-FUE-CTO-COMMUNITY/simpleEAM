@@ -126,11 +126,6 @@ export const countActiveFilters = (filterState: GenericFilterState): number => {
     count++
   }
 
-  // Suchfilter
-  if (filterState.searchFilter && (filterState.searchFilter as string).trim() !== '') {
-    count++
-  }
-
   // Beschreibungsfilter
   if (filterState.descriptionFilter && (filterState.descriptionFilter as string).trim() !== '') {
     count++
