@@ -394,7 +394,7 @@
   },
   "architecturePrinciples": {
     "title": "Architecture Principles",
-    "addNew": "Add New Architecture Principle",
+    "addNew": "Create New Architecture Principle",
     "editTitle": "Edit Architecture Principle",
     "viewTitle": "View Architecture Principle",
     "deleteTitle": "Delete Architecture Principle",
@@ -493,7 +493,7 @@
   },
   "capabilities": {
     "title": "Business Capabilities",
-    "addNew": "Add New Business Capability",
+    "addNew": "Create New Business Capability",
     "editTitle": "Edit Business Capability",
     "createTitle": "Create New Business Capability",
     "viewTitle": "Business Capability Details",

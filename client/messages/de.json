@@ -262,7 +262,7 @@
   "architectures": {
     "title": "Architekturen",
     "description": "Verwalten Sie Enterprise-Architekturen und deren Komponenten",
-    "createNew": "Neue Architektur",
+    "createNew": "Neue Architektur erstellen",
     "loadingError": "Fehler beim Laden der Architekturen",
     "createSuccess": "Architektur erfolgreich erstellt",
     "createError": "Fehler beim Erstellen der Architektur",
@@ -372,7 +372,7 @@
   },
   "architecturePrinciples": {
     "title": "Architekturprinzipien",
-    "addNew": "Neues Architekturprinzip hinzufügen",
+    "addNew": "Neues Architekturprinzip erstellen",
     "editTitle": "Architekturprinzip bearbeiten",
     "viewTitle": "Architekturprinzip anzeigen",
     "deleteTitle": "Architekturprinzip löschen",
@@ -629,6 +629,8 @@
       "endOfUseDate": "Ende der Nutzung",
       "endOfLifeDate": "Ende der Lebensdauer",
       "annualCosts": "Jährliche Kosten",
+      "vendor": "Anbieter",
+      "version": "Version",
       "owner": "Verantwortlicher",
       "parentApplication": "Übergeordnete Applikation",
       "components": "Komponenten",
