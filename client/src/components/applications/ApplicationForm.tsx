@@ -4,6 +4,7 @@ import React, { useEffect } from 'react'
 import { useForm } from '@tanstack/react-form'
 import { z } from 'zod'
 import { useQuery } from '@apollo/client'
+import { useTranslations } from 'next-intl'
 import {
   Assignment as PlanningIcon,
   RocketLaunch as LaunchIcon,
@@ -178,68 +179,80 @@ export interface ApplicationFormProps {
   onEditMode?: () => void
 }
 
-const getCriticalityLabel = (criticality: CriticalityLevel): string => {
-  switch (criticality) {
-    case CriticalityLevel.LOW:
-      return 'Niedrig'
-    case CriticalityLevel.MEDIUM:
-      return 'Mittel'
-    case CriticalityLevel.HIGH:
-      return 'Hoch'
-    case CriticalityLevel.CRITICAL:
-      return 'Kritisch'
-    default:
-      return criticality
+const getCriticalityLabel = (criticality: CriticalityLevel, t?: any): string => {
+  if (!t) {
+    switch (criticality) {
+      case CriticalityLevel.LOW:
+        return 'Niedrig'
+      case CriticalityLevel.MEDIUM:
+        return 'Mittel'
+      case CriticalityLevel.HIGH:
+        return 'Hoch'
+      case CriticalityLevel.CRITICAL:
+        return 'Kritisch'
+      default:
+        return criticality
+    }
   }
+  return t(criticality) || criticality
 }
 
-const getStatusLabel = (status: ApplicationStatus): string => {
-  switch (status) {
-    case ApplicationStatus.ACTIVE:
-      return 'Aktiv'
-    case ApplicationStatus.IN_DEVELOPMENT:
-      return 'In Entwicklung'
-    case ApplicationStatus.RETIRED:
-      return 'Zurückgezogen'
-    default:
-      return status
+const getStatusLabel = (status: ApplicationStatus, t?: any): string => {
+  if (!t) {
+    switch (status) {
+      case ApplicationStatus.ACTIVE:
+        return 'Aktiv'
+      case ApplicationStatus.IN_DEVELOPMENT:
+        return 'In Entwicklung'
+      case ApplicationStatus.RETIRED:
+        return 'Zurückgezogen'
+      default:
+        return status
+    }
   }
+  return t(status) || status
 }
 
-const getTimeCategoryLabel = (category: TimeCategory): string => {
-  switch (category) {
-    case TimeCategory.TOLERATE:
-      return 'Tolerate (Tolerieren)'
-    case TimeCategory.INVEST:
-      return 'Invest (Investieren)'
-    case TimeCategory.MIGRATE:
-      return 'Migrate (Migrieren)'
-    case TimeCategory.ELIMINATE:
-      return 'Eliminate (Eliminieren)'
-    default:
-      return category
+const getTimeCategoryLabel = (category: TimeCategory, t?: any): string => {
+  if (!t) {
+    switch (category) {
+      case TimeCategory.TOLERATE:
+        return 'Tolerate (Tolerieren)'
+      case TimeCategory.INVEST:
+        return 'Invest (Investieren)'
+      case TimeCategory.MIGRATE:
+        return 'Migrate (Migrieren)'
+      case TimeCategory.ELIMINATE:
+        return 'Eliminate (Eliminieren)'
+      default:
+        return category
+    }
   }
+  return t(category) || category
 }
 
-const getSevenRStrategyLabel = (strategy: SevenRStrategy): string => {
-  switch (strategy) {
-    case SevenRStrategy.RETIRE:
-      return 'Retire (Stilllegen)'
-    case SevenRStrategy.RETAIN:
-      return 'Retain (Beibehalten)'
-    case SevenRStrategy.REHOST:
-      return 'Rehost (Lift & Shift)'
-    case SevenRStrategy.REPLATFORM:
-      return 'Replatform (Lift & Reshape)'
-    case SevenRStrategy.REFACTOR:
-      return 'Refactor (Re-architect)'
-    case SevenRStrategy.REARCHITECT:
-      return 'Rearchitect (Rebuild)'
-    case SevenRStrategy.REPLACE:
-      return 'Replace (Buy new)'
-    default:
-      return strategy
+const getSevenRStrategyLabel = (strategy: SevenRStrategy, t?: any): string => {
+  if (!t) {
+    switch (strategy) {
+      case SevenRStrategy.RETIRE:
+        return 'Retire (Stilllegen)'
+      case SevenRStrategy.RETAIN:
+        return 'Retain (Beibehalten)'
+      case SevenRStrategy.REHOST:
+        return 'Rehost (Lift & Shift)'
+      case SevenRStrategy.REPLATFORM:
+        return 'Replatform (Lift & Reshape)'
+      case SevenRStrategy.REFACTOR:
+        return 'Refactor (Re-architect)'
+      case SevenRStrategy.REARCHITECT:
+        return 'Rearchitect (Rebuild)'
+      case SevenRStrategy.REPLACE:
+        return 'Replace (Buy new)'
+      default:
+        return strategy
+    }
   }
+  return t(strategy) || strategy
 }
 
 const ApplicationForm: React.FC<ApplicationFormProps> = ({
@@ -254,6 +267,13 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
   loading = false,
   onEditMode,
 }) => {
+  const t = useTranslations('applications.form')
+  const tStatus = useTranslations('applications.statuses')
+  const tCriticality = useTranslations('applications.criticalities')
+  const tTimeCategory = useTranslations('applications.timeCategories')
+  const tSevenR = useTranslations('applications.sevenRStrategies')
+  const tTabs = useTranslations('applications.tabs')
+
   // Daten laden
   const { data: personsData, loading: personsLoading } = useQuery(GET_PERSONS)
   const { data: capabilitiesData, loading: capabilitiesLoading } = useQuery(GET_CAPABILITIES)
@@ -380,12 +400,12 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
 
   // Tabs für das Formular definieren
   const tabs: TabConfig[] = [
-    { id: 'general', label: 'Allgemein' },
-    { id: 'technical', label: 'Technisch' },
-    { id: 'lifecycle', label: 'Lebenszyklus' },
-    { id: 'relationships', label: 'Beziehungen' },
-    { id: 'architectures', label: 'Architekturen' },
-    { id: 'principles', label: 'Prinzipien' },
+    { id: 'general', label: tTabs('general') },
+    { id: 'technical', label: tTabs('technical') },
+    { id: 'lifecycle', label: tTabs('lifecycle') },
+    { id: 'relationships', label: tTabs('relationships') },
+    { id: 'architectures', label: tTabs('architectures') },
+    { id: 'principles', label: tTabs('principles') },
   ]
 
   // Felder für das Formular definieren
@@ -393,7 +413,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     // Allgemeine Informationen (Tab: general)
     {
       name: 'name',
-      label: 'Name',
+      label: t('name'),
       type: 'text',
       required: true,
       tabId: 'general',
@@ -402,7 +422,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     },
     {
       name: 'description',
-      label: 'Beschreibung',
+      label: t('description'),
       type: 'textarea',
       required: true,
       tabId: 'general',
@@ -412,33 +432,33 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     },
     {
       name: 'status',
-      label: 'Status',
+      label: t('status'),
       type: 'select',
       required: true,
       tabId: 'general',
       validators: baseApplicationSchema.shape.status,
       options: Object.values(ApplicationStatus).map(status => ({
         value: status,
-        label: getStatusLabel(status),
+        label: getStatusLabel(status, tStatus),
       })),
       size: { xs: 12, md: 6 },
     },
     {
       name: 'criticality',
-      label: 'Kritikalität',
+      label: t('criticality'),
       type: 'select',
       required: true,
       tabId: 'general',
       validators: baseApplicationSchema.shape.criticality,
       options: Object.values(CriticalityLevel).map(level => ({
         value: level,
-        label: getCriticalityLabel(level),
+        label: getCriticalityLabel(level, tCriticality),
       })),
       size: { xs: 12, md: 6 },
     },
     {
       name: 'costs',
-      label: 'Kosten',
+      label: t('annualCosts'),
       type: 'number',
       tabId: 'general',
       validators: baseApplicationSchema.shape.costs,
@@ -446,15 +466,15 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     },
     {
       name: 'timeCategory',
-      label: 'TIME-Kategorie',
+      label: t('timeCategory'),
       type: 'select',
       tabId: 'general',
       required: false,
       options: [
-        { value: '', label: 'Keine Auswahl' },
+        { value: '', label: t('none') },
         ...Object.values(TimeCategory).map(category => ({
           value: category,
-          label: getTimeCategoryLabel(category),
+          label: getTimeCategoryLabel(category, tTimeCategory),
         })),
       ],
       size: { xs: 12, md: 6 },
@@ -464,26 +484,26 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     },
     {
       name: 'sevenRStrategy',
-      label: '7R-Strategie',
+      label: t('sevenRStrategy'),
       type: 'select',
       tabId: 'general',
       required: false,
       options: [
-        { value: '', label: 'Keine Auswahl' },
+        { value: '', label: t('none') },
         ...getValidSevenRStrategies(currentTimeCategory).map(strategy => ({
           value: strategy,
-          label: getSevenRStrategyLabel(strategy),
+          label: getSevenRStrategyLabel(strategy, tSevenR),
         })),
       ],
       size: { xs: 12, md: 6 },
     },
     {
       name: 'ownerId',
-      label: 'Verantwortlicher',
+      label: t('owner'),
       type: 'select',
       tabId: 'general',
       options: [
-        { value: '', label: 'Keine' },
+        { value: '', label: t('none') },
         ...(personsData?.people || []).map((person: Person) => ({
           value: person.id,
           label: `${person.firstName} ${person.lastName}`,
@@ -494,7 +514,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     },
     {
       name: 'predecessorIds',
-      label: 'Vorgänger-Applikationen',
+      label: t('predecessorApplications'),
       type: 'autocomplete',
       tabId: 'general',
       multiple: true,
@@ -521,7 +541,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     },
     {
       name: 'successorIds',
-      label: 'Nachfolger-Applikationen',
+      label: t('successorApplications'),
       type: 'autocomplete',
       tabId: 'general',
       multiple: true,
@@ -550,7 +570,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     // Technische Informationen (Tab: technical)
     {
       name: 'vendor',
-      label: 'Anbieter',
+      label: t('vendor'),
       type: 'text',
       tabId: 'technical',
       validators: baseApplicationSchema.shape.vendor,
@@ -558,7 +578,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     },
     {
       name: 'version',
-      label: 'Version',
+      label: t('version'),
       type: 'text',
       tabId: 'technical',
       validators: baseApplicationSchema.shape.version,
@@ -566,7 +586,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     },
     {
       name: 'hostingEnvironment',
-      label: 'Hosting-Umgebung',
+      label: t('hostingEnvironment'),
       type: 'text',
       tabId: 'technical',
       validators: baseApplicationSchema.shape.hostingEnvironment,
@@ -574,7 +594,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     },
     {
       name: 'technologyStack',
-      label: 'Technologie-Stack',
+      label: t('technologyStack'),
       type: 'tags',
       tabId: 'technical',
       options: availableTechStack.map(tech => ({ value: tech, label: tech })),
@@ -584,7 +604,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     // Lebenszyklus (Tab: lifecycle) - in chronologischer Reihenfolge
     {
       name: 'planningDate',
-      label: 'Planungsdatum',
+      label: t('planningDate'),
       icon: <PlanningIcon />,
       type: 'date',
       tabId: 'lifecycle',
@@ -592,7 +612,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     },
     {
       name: 'introductionDate',
-      label: 'Einführungsdatum',
+      label: t('introductionDate'),
       icon: <LaunchIcon />,
       type: 'date',
       tabId: 'lifecycle',
@@ -600,7 +620,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     },
     {
       name: 'endOfUseDate',
-      label: 'Ende der Nutzung',
+      label: t('endOfUseDate'),
       icon: <PauseIcon />,
       type: 'date',
       tabId: 'lifecycle',
@@ -608,7 +628,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     },
     {
       name: 'endOfLifeDate',
-      label: 'End-of-Life Datum',
+      label: t('endOfLifeDate'),
       icon: <DeleteIcon />,
       type: 'date',
       tabId: 'lifecycle',
@@ -618,7 +638,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     // Beziehungen (Tab: relationships)
     {
       name: 'supportsCapabilityIds',
-      label: 'Unterstützte Capabilities',
+      label: t('businessCapabilities'),
       type: 'autocomplete',
       tabId: 'relationships',
       multiple: true,
@@ -647,7 +667,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     },
     {
       name: 'usesDataObjectIds',
-      label: 'Verwendete Datenobjekte',
+      label: t('dataObjects'),
       type: 'autocomplete',
       tabId: 'relationships',
       multiple: true,
@@ -676,7 +696,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     },
     {
       name: 'sourceOfInterfaceIds',
-      label: 'Ausgehende Schnittstellen (als Quelle)',
+      label: t('sourceOfInterfaces'),
       type: 'autocomplete',
       tabId: 'relationships',
       multiple: true,
@@ -705,7 +725,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     },
     {
       name: 'targetOfInterfaceIds',
-      label: 'Eingehende Schnittstellen (als Ziel)',
+      label: t('targetOfInterfaces'),
       type: 'autocomplete',
       tabId: 'relationships',
       multiple: true,
@@ -734,7 +754,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     },
     {
       name: 'parentIds',
-      label: 'Übergeordnete Applikationen',
+      label: t('parentApplications'),
       type: 'autocomplete',
       tabId: 'relationships',
       multiple: true,
@@ -761,7 +781,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     },
     {
       name: 'componentIds',
-      label: 'Komponenten (untergeordnete Anwendungen)',
+      label: t('componentApplications'),
       type: 'autocomplete',
       tabId: 'relationships',
       multiple: true,
@@ -788,7 +808,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     },
     {
       name: 'hostedOnIds',
-      label: 'Gehostet auf (Infrastructure)',
+      label: t('hostedOn'),
       type: 'autocomplete',
       tabId: 'relationships',
       multiple: true,
@@ -818,7 +838,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     // Architekturen (Tab: architectures)
     {
       name: 'partOfArchitectures',
-      label: 'Teil von Architekturen',
+      label: t('partOfArchitectures'),
       type: 'autocomplete',
       tabId: 'architectures',
       multiple: true,
@@ -848,7 +868,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     // Diagramme (Tab: architectures)
     {
       name: 'depictedInDiagrams',
-      label: 'Dargestellt in Diagrammen',
+      label: t('depictedInDiagrams'),
       type: 'autocomplete',
       tabId: 'architectures',
       multiple: true,
@@ -879,7 +899,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     // Prinzipien (Tab: principles)
     {
       name: 'implementsPrincipleIds',
-      label: 'Implementiert Prinzipien',
+      label: t('implementedPrinciples'),
       type: 'autocomplete',
       tabId: 'principles',
       multiple: true,

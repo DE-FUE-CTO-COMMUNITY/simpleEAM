@@ -2,6 +2,7 @@
 
 import React, { useMemo } from 'react'
 import { Chip } from '@mui/material'
+import { useTranslations } from 'next-intl'
 import { GenericTable } from '../common/GenericTable'
 import { ApplicationType } from './types'
 import { formatDate, getCriticalityLabel, formatCosts } from './utils'
@@ -47,6 +48,10 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
   columnVisibility: _externalColumnVisibility,
   onColumnVisibilityChange: _externalOnColumnVisibilityChange,
 }) => {
+  const t = useTranslations('applications.table')
+  const tStatus = useTranslations('applications.statuses')
+  const tTimeCategory = useTranslations('applications.timeCategories')
+  const tSevenR = useTranslations('applications.sevenRStrategies')
   const columnHelper = createColumnHelper<ApplicationType>()
 
   // Verwende persistente Spaltensichtbarkeit
@@ -89,11 +94,11 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
   const columns = useMemo(
     () => [
       columnHelper.accessor('name', {
-        header: 'Name',
+        header: t('name'),
         cell: info => info.getValue(),
       }),
       columnHelper.accessor('description', {
-        header: 'Beschreibung',
+        header: t('description'),
         cell: info => {
           const value = info.getValue()
           return value && value.length > 50 ? `${value.substring(0, 50)}...` : value || '-'
@@ -101,76 +106,48 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
         enableHiding: true,
       }),
       columnHelper.accessor('status', {
-        header: 'Status',
-        cell: info => <Chip label={info.getValue()} size="small" />,
+        header: t('status'),
+        cell: info => <Chip label={tStatus(info.getValue())} size="small" />,
       }),
       columnHelper.accessor('criticality', {
-        header: 'Kritikalität',
+        header: t('criticality'),
         cell: info => getCriticalityLabel(info.getValue() as CriticalityLevel),
       }),
       columnHelper.accessor('timeCategory', {
-        header: 'TIME-Kategorie',
+        header: t('timeCategory'),
         cell: info => {
           const category = info.getValue()
           if (!category) return '-'
-          switch (category) {
-            case 'TOLERATE':
-              return 'Tolerate'
-            case 'INVEST':
-              return 'Invest'
-            case 'MIGRATE':
-              return 'Migrate'
-            case 'ELIMINATE':
-              return 'Eliminate'
-            default:
-              return category
-          }
+          return tTimeCategory(category)
         },
         enableHiding: true,
       }),
       columnHelper.accessor('sevenRStrategy', {
-        header: '7R-Strategie',
+        header: t('sevenRStrategy'),
         cell: info => {
           const strategy = info.getValue()
           if (!strategy) return '-'
-          switch (strategy) {
-            case 'RETIRE':
-              return 'Retire'
-            case 'RETAIN':
-              return 'Retain'
-            case 'REHOST':
-              return 'Rehost'
-            case 'REPLATFORM':
-              return 'Replatform'
-            case 'REFACTOR':
-              return 'Refactor'
-            case 'REARCHITECT':
-              return 'Rearchitect'
-            case 'REPLACE':
-              return 'Replace'
-            default:
-              return strategy
-          }
+          return tSevenR(strategy)
         },
         enableHiding: true,
       }),
       columnHelper.accessor('vendor', {
-        header: 'Anbieter',
+        header: t('vendor'),
         cell: info => info.getValue() || '-',
       }),
       columnHelper.accessor('version', {
-        header: 'Version',
+        header: t('version'),
         cell: info => info.getValue() || '-',
       }),
       columnHelper.accessor('owners', {
-        header: 'Verantwortlicher',
+        header: t('owner'),
         cell: info => {
           const owners = info.getValue()
           return owners && owners.length > 0 ? `${owners[0].firstName} ${owners[0].lastName}` : '-'
         },
       }),
       columnHelper.accessor('supportsCapabilities', {
-        header: 'Capabilities',
+        header: t('businessCapabilities'),
         cell: info => {
           const caps = info.getValue()
           return caps && caps.length > 0
@@ -182,7 +159,7 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
         },
       }),
       columnHelper.accessor('usesDataObjects', {
-        header: 'Datenobjekte',
+        header: t('dataObjects'),
         cell: info => {
           const objs = info.getValue()
           return objs && objs.length > 0
@@ -194,17 +171,17 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
         },
       }),
       columnHelper.accessor('costs', {
-        header: 'Kosten',
+        header: t('annualCosts'),
         cell: info => formatCosts(info.getValue()),
       }),
       // Weitere versteckte Spalten
       columnHelper.accessor('hostingEnvironment', {
-        header: 'Hosting-Umgebung',
+        header: t('hostingEnvironment'),
         cell: info => info.getValue() || '-',
         enableHiding: true,
       }),
       columnHelper.accessor('technologyStack', {
-        header: 'Technologie-Stack',
+        header: t('technologyStack'),
         cell: info => {
           const stack = info.getValue()
           return stack && stack.length > 0 ? stack.join(', ') : '-'
@@ -212,7 +189,7 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
         enableHiding: true,
       }),
       columnHelper.accessor('planningDate', {
-        header: 'Planungsdatum',
+        header: t('planningDate'),
         cell: info => {
           const date = info.getValue()
           return date ? new Date(date).toLocaleDateString('de-DE') : '-'
@@ -220,7 +197,7 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
         enableHiding: true,
       }),
       columnHelper.accessor('introductionDate', {
-        header: 'Einführungsdatum',
+        header: t('introductionDate'),
         cell: info => {
           const date = info.getValue()
           return date ? new Date(date).toLocaleDateString('de-DE') : '-'
@@ -228,7 +205,7 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
         enableHiding: true,
       }),
       columnHelper.accessor('endOfUseDate', {
-        header: 'Ende der Nutzung',
+        header: t('endOfUseDate'),
         cell: info => {
           const date = info.getValue()
           return date ? new Date(date).toLocaleDateString('de-DE') : '-'
@@ -236,7 +213,7 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
         enableHiding: true,
       }),
       columnHelper.accessor('endOfLifeDate', {
-        header: 'Ende der Lebenszeit',
+        header: t('endOfLifeDate'),
         cell: info => {
           const date = info.getValue()
           return date ? new Date(date).toLocaleDateString('de-DE') : '-'
@@ -244,7 +221,7 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
         enableHiding: true,
       }),
       columnHelper.accessor('sourceOfInterfaces', {
-        header: 'Quell-Schnittstellen',
+        header: t('sourceOfInterfaces'),
         cell: info => {
           const interfaces = info.getValue()
           return interfaces && interfaces.length > 0
@@ -254,7 +231,7 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
         enableHiding: true,
       }),
       columnHelper.accessor('targetOfInterfaces', {
-        header: 'Ziel-Schnittstellen',
+        header: t('targetOfInterfaces'),
         cell: info => {
           const interfaces = info.getValue()
           return interfaces && interfaces.length > 0
@@ -264,7 +241,7 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
         enableHiding: true,
       }),
       columnHelper.accessor('partOfArchitectures', {
-        header: 'Teil von Architekturen',
+        header: t('partOfArchitectures'),
         cell: info => {
           const architectures = info.getValue()
           return architectures && architectures.length > 0
@@ -274,7 +251,7 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
         enableHiding: true,
       }),
       columnHelper.accessor('implementsPrinciples', {
-        header: 'Implementierte Prinzipien',
+        header: t('implementedPrinciples'),
         cell: info => {
           const principles = info.getValue()
           return principles && principles.length > 0
@@ -287,7 +264,7 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
         enableHiding: true,
       }),
       columnHelper.accessor('depictedInDiagrams', {
-        header: 'Dargestellt in Diagrammen',
+        header: t('depictedInDiagrams'),
         cell: info => {
           const diagrams = info.getValue()
           return diagrams && diagrams.length > 0
@@ -297,7 +274,7 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
         enableHiding: true,
       }),
       columnHelper.accessor('parents', {
-        header: 'Übergeordnete Applikationen',
+        header: t('parentApplication'),
         cell: info => {
           const parents = info.getValue()
           return parents && parents.length > 0
@@ -307,7 +284,7 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
         enableHiding: true,
       }),
       columnHelper.accessor('components', {
-        header: 'Komponenten',
+        header: t('components'),
         cell: info => {
           const components = info.getValue()
           return components && components.length > 0
@@ -317,7 +294,7 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
         enableHiding: true,
       }),
       columnHelper.accessor('hostedOn', {
-        header: 'Gehostet auf',
+        header: t('relatedInfrastructure'),
         cell: info => {
           const infrastructure = info.getValue()
           return infrastructure && infrastructure.length > 0
@@ -328,17 +305,17 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
       }),
       // Versteckte Zeitstempel-Spalten am Ende
       columnHelper.accessor('createdAt', {
-        header: 'Erstellt am',
+        header: t('createdAt'),
         cell: info => formatDate(info.getValue()),
         enableHiding: true,
       }),
       columnHelper.accessor('updatedAt', {
-        header: 'Aktualisiert am',
+        header: t('updatedAt'),
         cell: info => formatDate(info.getValue()),
         enableHiding: true,
       }),
     ],
-    [columnHelper]
+    [columnHelper, t, tStatus, tTimeCategory, tSevenR]
   )
 
   // Mapping von ApplicationType zu den erwarteten FormValues für das Formular

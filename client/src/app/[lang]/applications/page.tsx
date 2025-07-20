@@ -5,6 +5,7 @@ import { Box, Typography, Button, Card, Paper } from '@mui/material'
 import { Add as AddIcon } from '@mui/icons-material'
 import { useQuery, useMutation } from '@apollo/client'
 import { useSnackbar } from 'notistack'
+import { useTranslations } from 'next-intl'
 import { isArchitect } from '@/lib/auth'
 import { VisibilityState } from '@tanstack/react-table'
 
@@ -31,6 +32,7 @@ import { useApplicationFilter } from '@/components/applications/useApplicationFi
 import { ApplicationType, FilterState } from '@/components/applications/types'
 
 const ApplicationsPage = () => {
+  const t = useTranslations('applications')
   const { enqueueSnackbar } = useSnackbar()
   const [globalFilter, setGlobalFilter] = useState<string>('')
   const [sorting, setSorting] = useState([{ id: 'name', desc: false }])
@@ -173,9 +175,9 @@ const ApplicationsPage = () => {
   // Fehlerbehandlung
   useEffect(() => {
     if (error) {
-      enqueueSnackbar('Fehler beim Laden der Applikationen', { variant: 'error' })
+      enqueueSnackbar(t('messages.loadError'), { variant: 'error' })
     }
-  }, [error, enqueueSnackbar])
+  }, [error, enqueueSnackbar, t])
 
   // Filter auf Applikationen anwenden
   const filteredData = useApplicationFilter({ applications, filterState })
@@ -184,11 +186,11 @@ const ApplicationsPage = () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [createApplication, { loading: isCreating }] = useMutation(CREATE_APPLICATION, {
     onCompleted: () => {
-      enqueueSnackbar('Applikation erfolgreich erstellt', { variant: 'success' })
+      enqueueSnackbar(t('messages.createSuccess'), { variant: 'success' })
       refetch()
     },
     onError: error => {
-      enqueueSnackbar(`Fehler beim Erstellen der Applikation: ${error.message}`, {
+      enqueueSnackbar(`${t('messages.createError')}: ${error.message}`, {
         variant: 'error',
       })
     },
@@ -198,11 +200,11 @@ const ApplicationsPage = () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [updateApplication, { loading: isUpdating }] = useMutation(UPDATE_APPLICATION, {
     onCompleted: () => {
-      enqueueSnackbar('Applikation erfolgreich aktualisiert', { variant: 'success' })
+      enqueueSnackbar(t('messages.updateSuccess'), { variant: 'success' })
       refetch()
     },
     onError: error => {
-      enqueueSnackbar(`Fehler beim Aktualisieren der Applikation: ${error.message}`, {
+      enqueueSnackbar(`${t('messages.updateError')}: ${error.message}`, {
         variant: 'error',
       })
     },
@@ -211,11 +213,11 @@ const ApplicationsPage = () => {
   // Mutation zum Löschen einer Applikation
   const [deleteApplication] = useMutation(DELETE_APPLICATION, {
     onCompleted: () => {
-      enqueueSnackbar('Applikation erfolgreich gelöscht', { variant: 'success' })
+      enqueueSnackbar(t('messages.deleteSuccess'), { variant: 'success' })
       refetch()
     },
     onError: error => {
-      enqueueSnackbar(`Fehler beim Löschen der Applikation: ${error.message}`, {
+      enqueueSnackbar(`${t('messages.deleteError')}: ${error.message}`, {
         variant: 'error',
       })
     },
@@ -670,7 +672,7 @@ const ApplicationsPage = () => {
     <Box sx={{ py: 2, px: 1 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
         <Typography variant="h4" component="h1">
-          Applikationen
+          {t('title')}
         </Typography>
         {isArchitect() && (
           <Button
@@ -679,7 +681,7 @@ const ApplicationsPage = () => {
             startIcon={<AddIcon />}
             onClick={handleCreateApplication}
           >
-            Neu erstellen
+            {t('addNew')}
           </Button>
         )}
       </Box>

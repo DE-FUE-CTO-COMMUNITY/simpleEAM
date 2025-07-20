@@ -1,14 +1,10 @@
 'use client'
 
 import React from 'react'
+import { useTranslations } from 'next-intl'
 import GenericFilterDialog, { FilterField } from '../common/GenericFilterDialog'
 import { FilterProps } from './types'
-import {
-  getCriticalityLabel,
-  getTimeCategoryLabel,
-  getSevenRStrategyLabel,
-  countActiveFilters,
-} from './utils'
+import { getCriticalityLabel, countActiveFilters } from './utils'
 import { CriticalityLevel, TimeCategory, SevenRStrategy } from '../../gql/generated'
 
 const ApplicationFilterDialogWithGeneric: React.FC<FilterProps> = ({
@@ -24,33 +20,38 @@ const ApplicationFilterDialogWithGeneric: React.FC<FilterProps> = ({
   onClose,
   onApply,
 }) => {
+  const t = useTranslations('applications.filter')
+  const tStatus = useTranslations('applications.statuses')
+  const tTimeCategory = useTranslations('applications.timeCategories')
+  const tSevenR = useTranslations('applications.sevenRStrategies')
+
   // Konfiguration der Filterfelder
   const filterFields: FilterField[] = [
     // Status Filter
     {
       id: 'statusFilter',
-      label: 'Status',
+      label: t('status'),
       type: 'multiSelect',
       options: availableStatuses.map(status => ({
         value: status,
-        label: status,
+        label: tStatus(status),
       })),
     },
     // Kritikalitäts-Filter
     {
       id: 'criticalityFilter',
-      label: 'Kritikalität',
+      label: t('criticality'),
       type: 'multiSelect',
       options: availableCriticalities.map(criticality => ({
         value: criticality,
-        label: getCriticalityLabel(criticality),
+        label: getCriticalityLabel(criticality), // TODO: Internationalize this function
       })),
       valueFormatter: value => getCriticalityLabel(value as CriticalityLevel),
     },
     // Kosten Range Filter
     {
       id: 'costRangeFilter',
-      label: 'Kosten Range',
+      label: t('annualCosts'),
       type: 'slider',
       min: 0,
       max: 1000000,
@@ -60,7 +61,7 @@ const ApplicationFilterDialogWithGeneric: React.FC<FilterProps> = ({
     // Technology Stack Filter
     {
       id: 'technologyStackFilter',
-      label: 'Technology Stack',
+      label: t('technologyStack'),
       type: 'multiSelect',
       options: availableTechStack.map(tech => ({
         value: tech,
@@ -70,7 +71,7 @@ const ApplicationFilterDialogWithGeneric: React.FC<FilterProps> = ({
     // Vendor Filter
     {
       id: 'vendorFilter',
-      label: 'Anbieter',
+      label: t('vendor'),
       type: 'select',
       options: availableVendors.map(vendor => ({
         value: vendor,
@@ -80,52 +81,52 @@ const ApplicationFilterDialogWithGeneric: React.FC<FilterProps> = ({
     // Beschreibungs-Filter
     {
       id: 'descriptionFilter',
-      label: 'Beschreibung enthält',
+      label: t('descriptionContains'),
       type: 'text',
-      placeholder: 'Geben Sie einen Text ein...',
+      placeholder: t('descriptionPlaceholder'),
     },
     // Verantwortlicher-Filter
     {
       id: 'ownerFilter',
-      label: 'Verantwortlicher',
+      label: t('owner'),
       type: 'personSelect',
-      emptyLabel: 'Alle Verantwortlichen',
+      emptyLabel: t('allOwners'),
     },
     // Aktualisiert-Filter
     {
       id: 'updatedDateRange',
-      label: 'Aktualisiert (Datum)',
+      label: t('updatedDateRange'),
       type: 'dateRange',
-      fromLabel: 'Von',
-      toLabel: 'Bis',
+      fromLabel: t('dateFrom'),
+      toLabel: t('dateTo'),
     },
     // TIME-Kategorie Filter
     {
       id: 'timeCategoryFilter',
-      label: 'TIME-Kategorie',
+      label: t('timeCategory'),
       type: 'multiSelect',
       options: availableTimeCategories.map(category => ({
         value: category,
-        label: getTimeCategoryLabel(category),
+        label: tTimeCategory(category),
       })),
-      valueFormatter: value => getTimeCategoryLabel(value as TimeCategory),
+      valueFormatter: value => tTimeCategory(value as TimeCategory),
     },
     // 7R-Strategie Filter
     {
       id: 'sevenRStrategyFilter',
-      label: '7R-Strategie',
+      label: t('sevenRStrategy'),
       type: 'multiSelect',
       options: availableSevenRStrategies.map(strategy => ({
         value: strategy,
-        label: getSevenRStrategyLabel(strategy),
+        label: tSevenR(strategy),
       })),
-      valueFormatter: value => getSevenRStrategyLabel(value as SevenRStrategy),
+      valueFormatter: value => tSevenR(value as SevenRStrategy),
     },
   ]
 
   return (
     <GenericFilterDialog
-      title="Filter für Applikationen"
+      title={t('title')}
       filterState={filterState}
       filterFields={filterFields}
       onFilterChange={onFilterChange}
