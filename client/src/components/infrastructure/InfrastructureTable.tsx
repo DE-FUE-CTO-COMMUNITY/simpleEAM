@@ -1,10 +1,10 @@
 'use client'
 
 import React, { useMemo, useCallback } from 'react'
+import { useTranslations, useLocale } from 'next-intl'
 import { Chip } from '@mui/material'
 import { GenericTable } from '../common/GenericTable'
 import InfrastructureForm, { InfrastructureFormValues } from './InfrastructureForm'
-import { formatDate } from './utils'
 import { Infrastructure, InfrastructureType, InfrastructureStatus } from '../../gql/generated'
 import { createColumnHelper } from '@tanstack/react-table'
 import { SortingState, VisibilityState } from '@tanstack/react-table'
@@ -41,6 +41,39 @@ const InfrastructureTable: React.FC<InfrastructureTableProps> = ({
   columnVisibility: _externalColumnVisibility,
   onColumnVisibilityChange: _externalOnColumnVisibilityChange,
 }) => {
+  const t = useTranslations('infrastructure')
+  const locale = useLocale()
+
+  // Utility functions for date formatting and translations
+  const formatDate = (date: string | null | undefined, locale: string): string => {
+    if (!date) return '-'
+    return new Date(date).toLocaleDateString(locale === 'de' ? 'de-DE' : 'en-US')
+  }
+
+  const getInfrastructureTypeTranslation = (type: InfrastructureType, t: any): string => {
+    const translations: Record<InfrastructureType, string> = {
+      [InfrastructureType.CLOUD_DATACENTER]: t('infrastructureTypes.CLOUD_DATACENTER'),
+      [InfrastructureType.CONTAINER_HOST]: t('infrastructureTypes.CONTAINER_HOST'),
+      [InfrastructureType.KUBERNETES_CLUSTER]: t('infrastructureTypes.KUBERNETES_CLUSTER'),
+      [InfrastructureType.ON_PREMISE_DATACENTER]: t('infrastructureTypes.ON_PREMISE_DATACENTER'),
+      [InfrastructureType.PHYSICAL_SERVER]: t('infrastructureTypes.PHYSICAL_SERVER'),
+      [InfrastructureType.VIRTUAL_MACHINE]: t('infrastructureTypes.VIRTUAL_MACHINE'),
+    }
+    return translations[type] || type
+  }
+
+  const getInfrastructureStatusTranslation = (status: InfrastructureStatus, t: any): string => {
+    const translations: Record<InfrastructureStatus, string> = {
+      [InfrastructureStatus.ACTIVE]: t('statuses.ACTIVE'),
+      [InfrastructureStatus.DECOMMISSIONED]: t('statuses.DECOMMISSIONED'),
+      [InfrastructureStatus.INACTIVE]: t('statuses.INACTIVE'),
+      [InfrastructureStatus.MAINTENANCE]: t('statuses.MAINTENANCE'),
+      [InfrastructureStatus.PLANNED]: t('statuses.PLANNED'),
+      [InfrastructureStatus.UNDER_CONSTRUCTION]: t('statuses.UNDER_CONSTRUCTION'),
+    }
+    return translations[status] || status
+  }
+
   const columnHelper = createColumnHelper<Infrastructure>()
 
   // Verwende persistente Spaltensichtbarkeit
@@ -83,135 +116,140 @@ const InfrastructureTable: React.FC<InfrastructureTableProps> = ({
   }
 
   // Hilfsfunktion für die Anzeige des Infrastruktur-Typs mit farblichem Chip
-  const getTypeChip = useCallback((type: InfrastructureType) => {
-    let color
-    let label
+  const getTypeChip = useCallback(
+    (type: InfrastructureType) => {
+      let color
+      let label
 
-    switch (type) {
-      case InfrastructureType.CLOUD_DATACENTER:
-        color = 'primary'
-        label = 'Cloud Datacenter'
-        break
-      case InfrastructureType.ON_PREMISE_DATACENTER:
-        color = 'secondary'
-        label = 'On-Premise Datacenter'
-        break
-      case InfrastructureType.KUBERNETES_CLUSTER:
-        color = 'info'
-        label = 'Kubernetes Cluster'
-        break
-      case InfrastructureType.VIRTUAL_MACHINE:
-        color = 'success'
-        label = 'Virtual Machine'
-        break
-      case InfrastructureType.CONTAINER_HOST:
-        color = 'warning'
-        label = 'Container Host'
-        break
-      case InfrastructureType.PHYSICAL_SERVER:
-        color = 'error'
-        label = 'Physical Server'
-        break
-      default:
-        color = 'default'
-        label = type
-    }
+      switch (type) {
+        case InfrastructureType.CLOUD_DATACENTER:
+          color = 'primary'
+          label = getInfrastructureTypeTranslation(type, t)
+          break
+        case InfrastructureType.ON_PREMISE_DATACENTER:
+          color = 'secondary'
+          label = getInfrastructureTypeTranslation(type, t)
+          break
+        case InfrastructureType.KUBERNETES_CLUSTER:
+          color = 'info'
+          label = getInfrastructureTypeTranslation(type, t)
+          break
+        case InfrastructureType.VIRTUAL_MACHINE:
+          color = 'success'
+          label = getInfrastructureTypeTranslation(type, t)
+          break
+        case InfrastructureType.CONTAINER_HOST:
+          color = 'warning'
+          label = getInfrastructureTypeTranslation(type, t)
+          break
+        case InfrastructureType.PHYSICAL_SERVER:
+          color = 'error'
+          label = getInfrastructureTypeTranslation(type, t)
+          break
+        default:
+          color = 'default'
+          label = type
+      }
 
-    return <Chip label={label} size="small" color={color as any} variant="filled" />
-  }, [])
+      return <Chip label={label} size="small" color={color as any} variant="filled" />
+    },
+    [t]
+  )
 
   // Hilfsfunktion für die Anzeige des Status mit farblichem Chip
-  const getStatusChip = useCallback((status: InfrastructureStatus) => {
-    let color
-    let label
+  const getStatusChip = useCallback(
+    (status: InfrastructureStatus) => {
+      let color
+      let label
 
-    switch (status) {
-      case InfrastructureStatus.ACTIVE:
-        color = 'success'
-        label = 'Aktiv'
-        break
-      case InfrastructureStatus.INACTIVE:
-        color = 'default'
-        label = 'Inaktiv'
-        break
-      case InfrastructureStatus.MAINTENANCE:
-        color = 'warning'
-        label = 'Wartung'
-        break
-      case InfrastructureStatus.PLANNED:
-        color = 'info'
-        label = 'Geplant'
-        break
-      case InfrastructureStatus.DECOMMISSIONED:
-        color = 'error'
-        label = 'Außer Betrieb'
-        break
-      case InfrastructureStatus.UNDER_CONSTRUCTION:
-        color = 'secondary'
-        label = 'In Bau'
-        break
-      default:
-        color = 'default'
-        label = status
-    }
+      switch (status) {
+        case InfrastructureStatus.ACTIVE:
+          color = 'success'
+          label = getInfrastructureStatusTranslation(status, t)
+          break
+        case InfrastructureStatus.INACTIVE:
+          color = 'default'
+          label = getInfrastructureStatusTranslation(status, t)
+          break
+        case InfrastructureStatus.MAINTENANCE:
+          color = 'warning'
+          label = getInfrastructureStatusTranslation(status, t)
+          break
+        case InfrastructureStatus.PLANNED:
+          color = 'info'
+          label = getInfrastructureStatusTranslation(status, t)
+          break
+        case InfrastructureStatus.DECOMMISSIONED:
+          color = 'error'
+          label = getInfrastructureStatusTranslation(status, t)
+          break
+        case InfrastructureStatus.UNDER_CONSTRUCTION:
+          color = 'secondary'
+          label = getInfrastructureStatusTranslation(status, t)
+          break
+        default:
+          color = 'default'
+          label = status
+      }
 
-    return <Chip label={label} size="small" color={color as any} variant="filled" />
-  }, [])
+      return <Chip label={label} size="small" color={color as any} variant="filled" />
+    },
+    [t]
+  )
 
   // Spalten-Definition für die Infrastructure-Tabelle
   const columns = useMemo(
     () => [
       columnHelper.accessor('name', {
-        header: 'Name',
+        header: t('form.name'),
         cell: info => info.getValue(),
       }),
       columnHelper.accessor('description', {
-        header: 'Beschreibung',
+        header: t('form.description'),
         cell: info => {
-          const value = info.getValue()
-          return value && value.length > 50 ? `${value.substring(0, 50)}...` : value || '-'
+          const description = info.getValue()
+          return description || '-'
         },
-        enableHiding: true,
       }),
       columnHelper.accessor('infrastructureType', {
-        header: 'Typ',
+        header: t('form.infrastructureType'),
         cell: info => getTypeChip(info.getValue()),
       }),
       columnHelper.accessor('status', {
-        header: 'Status',
+        header: t('form.status'),
         cell: info => getStatusChip(info.getValue()),
       }),
       columnHelper.accessor('location', {
-        header: 'Standort',
+        header: t('form.location'),
         cell: info => info.getValue() || '-',
       }),
       columnHelper.accessor('vendor', {
-        header: 'Anbieter',
+        header: t('form.vendor'),
         cell: info => info.getValue() || '-',
         enableHiding: true,
       }),
       columnHelper.accessor('version', {
-        header: 'Version',
+        header: t('form.version'),
         cell: info => info.getValue() || '-',
         enableHiding: true,
       }),
       columnHelper.accessor('capacity', {
-        header: 'Kapazität',
+        header: t('form.capacity'),
         cell: info => info.getValue() || '-',
         enableHiding: true,
       }),
       columnHelper.accessor('ipAddress', {
-        header: 'IP-Adresse',
+        header: t('form.ipAddress'),
         cell: info => info.getValue() || '-',
         enableHiding: true,
       }),
       columnHelper.accessor('operatingSystem', {
-        header: 'Betriebssystem',
+        header: t('form.operatingSystem'),
         cell: info => info.getValue() || '-',
         enableHiding: true,
       }),
       columnHelper.accessor('specifications', {
-        header: 'Spezifikationen',
+        header: t('form.specifications'),
         cell: info => {
           const value = info.getValue()
           return value && value.length > 30 ? `${value.substring(0, 30)}...` : value || '-'
@@ -219,20 +257,20 @@ const InfrastructureTable: React.FC<InfrastructureTableProps> = ({
         enableHiding: true,
       }),
       columnHelper.accessor('maintenanceWindow', {
-        header: 'Wartungsfenster',
+        header: t('form.maintenanceWindow'),
         cell: info => info.getValue() || '-',
         enableHiding: true,
       }),
       columnHelper.accessor('costs', {
-        header: 'Kosten',
+        header: t('form.costs'),
         cell: info => {
           const value = info.getValue()
-          return value ? `${value.toLocaleString('de-DE')} €` : '-'
+          return value ? `${value.toLocaleString(locale === 'de' ? 'de-DE' : 'en-US')} €` : '-'
         },
         enableHiding: true,
       }),
       columnHelper.accessor('owners', {
-        header: 'Verantwortlicher',
+        header: t('form.owner'),
         cell: info => {
           const owners = info.getValue()
           return owners && owners.length > 0 ? `${owners[0].firstName} ${owners[0].lastName}` : '-'
@@ -240,39 +278,39 @@ const InfrastructureTable: React.FC<InfrastructureTableProps> = ({
       }),
       // Weitere versteckte Spalten
       columnHelper.accessor('planningDate', {
-        header: 'Planungsdatum',
+        header: t('form.planningDate'),
         cell: info => {
           const date = info.getValue()
-          return date ? new Date(date).toLocaleDateString('de-DE') : '-'
+          return date ? formatDate(date, locale) : '-'
         },
         enableHiding: true,
       }),
       columnHelper.accessor('introductionDate', {
-        header: 'Einführungsdatum',
+        header: t('form.introductionDate'),
         cell: info => {
           const date = info.getValue()
-          return date ? new Date(date).toLocaleDateString('de-DE') : '-'
+          return date ? formatDate(date, locale) : '-'
         },
         enableHiding: true,
       }),
       columnHelper.accessor('endOfUseDate', {
-        header: 'Ende der Nutzung',
+        header: t('form.endOfUseDate'),
         cell: info => {
           const date = info.getValue()
-          return date ? new Date(date).toLocaleDateString('de-DE') : '-'
+          return date ? formatDate(date, locale) : '-'
         },
         enableHiding: true,
       }),
       columnHelper.accessor('endOfLifeDate', {
-        header: 'Ende der Lebenszeit',
+        header: t('form.endOfLifeDate'),
         cell: info => {
           const date = info.getValue()
-          return date ? new Date(date).toLocaleDateString('de-DE') : '-'
+          return date ? formatDate(date, locale) : '-'
         },
         enableHiding: true,
       }),
       columnHelper.accessor('parentInfrastructure', {
-        header: 'Übergeordnete Infrastruktur',
+        header: t('form.parentInfrastructure'),
         cell: info => {
           const parents = info.getValue()
           return parents && parents.length > 0
@@ -282,7 +320,7 @@ const InfrastructureTable: React.FC<InfrastructureTableProps> = ({
         enableHiding: true,
       }),
       columnHelper.accessor('childInfrastructures', {
-        header: 'Untergeordnete Infrastrukturen',
+        header: t('form.childInfrastructures'),
         cell: info => {
           const children = info.getValue()
           return children && children.length > 0
@@ -292,7 +330,7 @@ const InfrastructureTable: React.FC<InfrastructureTableProps> = ({
         enableHiding: true,
       }),
       columnHelper.accessor('hostsApplications', {
-        header: 'Gehostete Applikationen',
+        header: t('form.hostsApplications'),
         cell: info => {
           const apps = info.getValue()
           return apps && apps.length > 0 ? apps.map((app: any) => app.name).join(', ') : '-'
@@ -300,7 +338,7 @@ const InfrastructureTable: React.FC<InfrastructureTableProps> = ({
         enableHiding: true,
       }),
       columnHelper.accessor('partOfArchitectures', {
-        header: 'Teil von Architekturen',
+        header: t('form.partOfArchitectures'),
         cell: info => {
           const architectures = info.getValue()
           return architectures && architectures.length > 0
@@ -310,7 +348,7 @@ const InfrastructureTable: React.FC<InfrastructureTableProps> = ({
         enableHiding: true,
       }),
       columnHelper.accessor('depictedInDiagrams', {
-        header: 'Dargestellt in Diagrammen',
+        header: t('form.depictedInDiagrams'),
         cell: info => {
           const diagrams = info.getValue()
           return diagrams && diagrams.length > 0
@@ -321,20 +359,20 @@ const InfrastructureTable: React.FC<InfrastructureTableProps> = ({
       }),
       // Versteckte Zeitstempel-Spalten am Ende
       columnHelper.accessor('createdAt', {
-        header: 'Erstellt am',
-        cell: info => formatDate(info.getValue()),
+        header: t('table.createdAt'),
+        cell: info => formatDate(info.getValue(), locale),
         enableHiding: true,
       }),
       columnHelper.accessor('updatedAt', {
-        header: 'Aktualisiert am',
+        header: t('table.updatedAt'),
         cell: info => {
           const value = info.getValue()
-          return value ? formatDate(value) : '-'
+          return value ? formatDate(value, locale) : '-'
         },
         enableHiding: true,
       }),
     ],
-    [columnHelper, getTypeChip, getStatusChip]
+    [columnHelper, getTypeChip, getStatusChip, t, locale]
   )
 
   return (
@@ -348,9 +386,9 @@ const InfrastructureTable: React.FC<InfrastructureTableProps> = ({
       onCreate={onCreateInfrastructure}
       onUpdate={onUpdateInfrastructure}
       onDelete={onDeleteInfrastructure}
-      emptyMessage="Keine Infrastrukturen gefunden."
-      createButtonLabel="Neue Infrastruktur erstellen"
-      entityName="Infrastruktur"
+      emptyMessage={t('noInfrastructureFound')}
+      createButtonLabel={t('addNew')}
+      entityName={t('title')}
       FormComponent={InfrastructureForm}
       getIdFromData={(item: Infrastructure) => item.id}
       // mapDataToFormValues entfernt - die InfrastructureForm arbeitet direkt mit der infrastructure Prop

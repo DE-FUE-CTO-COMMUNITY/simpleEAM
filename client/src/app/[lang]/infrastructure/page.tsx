@@ -3,6 +3,7 @@
 import React, { useState, useCallback, useMemo } from 'react'
 import { Box, Typography, Button, Card, Paper } from '@mui/material'
 import { Add as AddIcon } from '@mui/icons-material'
+import { useTranslations } from 'next-intl'
 import { useAuth, isArchitect } from '@/lib/auth'
 import { SortingState, VisibilityState } from '@tanstack/react-table'
 import { useQuery, useMutation } from '@apollo/client'
@@ -16,13 +17,16 @@ import {
 import InfrastructureTable from '@/components/infrastructure/InfrastructureTable'
 import InfrastructureToolbar from '@/components/infrastructure/InfrastructureToolbar'
 import InfrastructureFilterDialog from '@/components/infrastructure/InfrastructureFilterDialog'
-import InfrastructureForm, { InfrastructureFormValues } from '@/components/infrastructure/InfrastructureForm'
+import InfrastructureForm, {
+  InfrastructureFormValues,
+} from '@/components/infrastructure/InfrastructureForm'
 import { Infrastructure } from '@/gql/generated'
 import { InfrastructureFilterState } from '@/components/infrastructure/InfrastructureFilterDialog'
 
 const InfrastructurePage = () => {
   const { authenticated } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
+  const t = useTranslations('infrastructure')
   const [globalFilter, setGlobalFilter] = useState('')
   const [sorting, setSorting] = useState<SortingState>([])
   const [tableInstance, setTableInstance] = useState<any>(null)
@@ -583,7 +587,7 @@ const InfrastructurePage = () => {
     <Box sx={{ py: 2, px: 1 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
         <Typography variant="h4" component="h1">
-          Infrastrukturen
+          {t('title')}
         </Typography>
         {isArchitect() && (
           <Button
@@ -592,7 +596,7 @@ const InfrastructurePage = () => {
             startIcon={<AddIcon />}
             onClick={handleCreateInfrastructure}
           >
-            Neu erstellen
+            {t('addNew')}
           </Button>
         )}
       </Box>

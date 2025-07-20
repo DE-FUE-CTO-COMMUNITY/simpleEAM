@@ -1,9 +1,9 @@
 'use client'
 
 import React from 'react'
+import { useTranslations } from 'next-intl'
 import GenericFilterDialog, { FilterField, GenericFilterState } from '../common/GenericFilterDialog'
 import { InfrastructureType, InfrastructureStatus } from '../../gql/generated'
-import { getInfrastructureTypeLabel, getInfrastructureStatusLabel } from './utils'
 
 export interface InfrastructureFilterState {
   infrastructureTypes: InfrastructureType[]
@@ -42,6 +42,33 @@ const InfrastructureFilterDialog: React.FC<InfrastructureFilterDialogProps> = ({
   onResetFilters,
   filterOptions,
 }) => {
+  const t = useTranslations('infrastructure')
+
+  // Utility functions for label translations
+  const getInfrastructureTypeLabel = (type: InfrastructureType): string => {
+    const translations: Record<InfrastructureType, string> = {
+      [InfrastructureType.CLOUD_DATACENTER]: t('infrastructureTypes.CLOUD_DATACENTER'),
+      [InfrastructureType.CONTAINER_HOST]: t('infrastructureTypes.CONTAINER_HOST'),
+      [InfrastructureType.KUBERNETES_CLUSTER]: t('infrastructureTypes.KUBERNETES_CLUSTER'),
+      [InfrastructureType.ON_PREMISE_DATACENTER]: t('infrastructureTypes.ON_PREMISE_DATACENTER'),
+      [InfrastructureType.PHYSICAL_SERVER]: t('infrastructureTypes.PHYSICAL_SERVER'),
+      [InfrastructureType.VIRTUAL_MACHINE]: t('infrastructureTypes.VIRTUAL_MACHINE'),
+    }
+    return translations[type] || type
+  }
+
+  const getInfrastructureStatusLabel = (status: InfrastructureStatus): string => {
+    const translations: Record<InfrastructureStatus, string> = {
+      [InfrastructureStatus.ACTIVE]: t('statuses.ACTIVE'),
+      [InfrastructureStatus.DECOMMISSIONED]: t('statuses.DECOMMISSIONED'),
+      [InfrastructureStatus.INACTIVE]: t('statuses.INACTIVE'),
+      [InfrastructureStatus.MAINTENANCE]: t('statuses.MAINTENANCE'),
+      [InfrastructureStatus.PLANNED]: t('statuses.PLANNED'),
+      [InfrastructureStatus.UNDER_CONSTRUCTION]: t('statuses.UNDER_CONSTRUCTION'),
+    }
+    return translations[status] || status
+  }
+
   // Zähle die aktiven Filter
   const countActiveFilters = (fs: GenericFilterState) => {
     return (
@@ -62,7 +89,7 @@ const InfrastructureFilterDialog: React.FC<InfrastructureFilterDialogProps> = ({
     // Infrastrukturtyp-Filter
     {
       id: 'infrastructureTypes',
-      label: 'Infrastrukturtyp',
+      label: t('filter.infrastructureType'),
       type: 'multiSelect',
       options: Object.values(InfrastructureType).map(type => ({
         value: type,
@@ -73,7 +100,7 @@ const InfrastructureFilterDialog: React.FC<InfrastructureFilterDialogProps> = ({
     // Status-Filter
     {
       id: 'statuses',
-      label: 'Status',
+      label: t('filter.status'),
       type: 'multiSelect',
       options: Object.values(InfrastructureStatus).map(status => ({
         value: status,
@@ -84,7 +111,7 @@ const InfrastructureFilterDialog: React.FC<InfrastructureFilterDialogProps> = ({
     // Anbieter-Filter
     {
       id: 'vendors',
-      label: 'Anbieter',
+      label: t('filter.vendor'),
       type: 'multiSelect',
       options: filterOptions.availableVendors.map(vendor => ({
         value: vendor,
@@ -94,7 +121,7 @@ const InfrastructureFilterDialog: React.FC<InfrastructureFilterDialogProps> = ({
     // Standort-Filter
     {
       id: 'locations',
-      label: 'Standort',
+      label: t('filter.location'),
       type: 'multiSelect',
       options: filterOptions.availableLocations.map(location => ({
         value: location,
@@ -104,7 +131,7 @@ const InfrastructureFilterDialog: React.FC<InfrastructureFilterDialogProps> = ({
     // Verantwortliche Filter
     {
       id: 'owners',
-      label: 'Verantwortliche',
+      label: t('filter.owner'),
       type: 'multiSelect',
       options: filterOptions.availableOwners.map(owner => ({
         value: owner,
@@ -114,7 +141,7 @@ const InfrastructureFilterDialog: React.FC<InfrastructureFilterDialogProps> = ({
     // Gehostete Applikationen Filter
     {
       id: 'hostsApplications',
-      label: 'Gehostete Applikationen',
+      label: t('filter.hostedApplications'),
       type: 'multiSelect',
       options: filterOptions.availableHostsApplications.map(app => ({
         value: app,
@@ -124,7 +151,7 @@ const InfrastructureFilterDialog: React.FC<InfrastructureFilterDialogProps> = ({
     // Teil von Architekturen Filter
     {
       id: 'partOfArchitectures',
-      label: 'Teil von Architekturen',
+      label: t('filter.partOfArchitectures'),
       type: 'multiSelect',
       options: filterOptions.availablePartOfArchitectures.map(arch => ({
         value: arch,
@@ -134,17 +161,17 @@ const InfrastructureFilterDialog: React.FC<InfrastructureFilterDialogProps> = ({
     // Beschreibungs-Filter
     {
       id: 'descriptionFilter',
-      label: 'Beschreibung enthält',
+      label: t('filter.descriptionContains'),
       type: 'text',
-      placeholder: 'Geben Sie einen Text ein...',
+      placeholder: t('filter.descriptionPlaceholder'),
     },
     // Aktualisiert-Filter
     {
       id: 'updatedDateRange',
-      label: 'Aktualisiert (Datum)',
+      label: t('filter.updatedInPeriod'),
       type: 'dateRange',
-      fromLabel: 'Von',
-      toLabel: 'Bis',
+      fromLabel: t('filter.dateFrom'),
+      toLabel: t('filter.dateTo'),
     },
   ]
 
@@ -158,7 +185,7 @@ const InfrastructureFilterDialog: React.FC<InfrastructureFilterDialogProps> = ({
 
   return (
     <GenericFilterDialog
-      title="Filter für Infrastruktur"
+      title={t('filter.title')}
       filterState={filters}
       filterFields={filterFields}
       onFilterChange={handleFilterChange}
