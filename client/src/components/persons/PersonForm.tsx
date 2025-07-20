@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react'
 import { useForm } from '@tanstack/react-form'
 import { z } from 'zod'
+import { useTranslations } from 'next-intl'
 import { Person } from '../../gql/generated'
 import GenericForm, { FieldConfig } from '../common/GenericForm'
 import { isArchitect } from '@/lib/auth'
@@ -47,6 +48,8 @@ const PersonForm: React.FC<PersonFormProps> = ({
   loading = false,
   onEditMode,
 }) => {
+  const t = useTranslations('persons.form')
+
   // Formulardaten initialisieren - leere Standardwerte für neues Formular
   const defaultValues = React.useMemo<PersonFormValues>(
     () => ({
@@ -126,7 +129,7 @@ const PersonForm: React.FC<PersonFormProps> = ({
   const fields: FieldConfig[] = [
     {
       name: 'firstName',
-      label: 'Vorname',
+      label: t('firstName'),
       type: 'text',
       required: true,
       validators: personSchema.shape.firstName,
@@ -134,7 +137,7 @@ const PersonForm: React.FC<PersonFormProps> = ({
     },
     {
       name: 'lastName',
-      label: 'Nachname',
+      label: t('lastName'),
       type: 'text',
       required: true,
       validators: personSchema.shape.lastName,
@@ -142,28 +145,28 @@ const PersonForm: React.FC<PersonFormProps> = ({
     },
     {
       name: 'email',
-      label: 'E-Mail',
+      label: t('email'),
       type: 'text',
       validators: personSchema.shape.email,
       size: { xs: 12, md: 6 },
     },
     {
       name: 'phone',
-      label: 'Telefonnummer',
+      label: t('phoneNumber'),
       type: 'text',
       validators: personSchema.shape.phone,
       size: { xs: 12, md: 6 },
     },
     {
       name: 'department',
-      label: 'Abteilung',
+      label: t('department'),
       type: 'text',
       validators: personSchema.shape.department,
       size: { xs: 12, md: 6 },
     },
     {
       name: 'role',
-      label: 'Rolle',
+      label: t('role'),
       type: 'text',
       validators: personSchema.shape.role,
       size: { xs: 12, md: 6 },
@@ -173,11 +176,7 @@ const PersonForm: React.FC<PersonFormProps> = ({
   return (
     <GenericForm
       title={
-        mode === 'create'
-          ? 'Neue Person erstellen'
-          : mode === 'edit'
-            ? 'Person bearbeiten'
-            : 'Personendetails'
+        mode === 'create' ? t('createTitle') : mode === 'edit' ? t('editTitle') : t('viewTitle')
       }
       isOpen={isOpen}
       onClose={onClose}
@@ -190,7 +189,7 @@ const PersonForm: React.FC<PersonFormProps> = ({
       onDelete={person?.id ? () => onDelete?.(person.id) : undefined}
       onEditMode={onEditMode}
       entityId={person?.id}
-      entityName="Person"
+      entityName={t('viewTitle')}
       metadata={
         person
           ? {

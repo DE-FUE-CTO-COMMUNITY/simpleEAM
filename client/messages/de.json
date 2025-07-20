@@ -1124,5 +1124,67 @@
       "relationships": "Beziehungen",
       "architectures": "Architekturen"
     }
+  },
+  "persons": {
+    "title": "Personen",
+    "addNew": "Neue Person erstellen",
+    "editTitle": "Person bearbeiten",
+    "createTitle": "Neue Person erstellen",
+    "viewTitle": "Person Details",
+    "deleteConfirmation": "Sind Sie sicher, dass Sie diese Person löschen möchten?",
+    "noPersonsFound": "Keine Personen gefunden.",
+    "searchPlaceholder": "Personen durchsuchen...",
+    "messages": {
+      "loadError": "Fehler beim Laden der Personen",
+      "createSuccess": "Person erfolgreich erstellt",
+      "createError": "Fehler beim Erstellen der Person",
+      "updateSuccess": "Person erfolgreich aktualisiert",
+      "updateError": "Fehler beim Aktualisieren der Person",
+      "deleteSuccess": "Person erfolgreich gelöscht",
+      "deleteError": "Fehler beim Löschen der Person"
+    },
+    "form": {
+      "firstName": "Vorname",
+      "lastName": "Nachname",
+      "email": "E-Mail",
+      "department": "Abteilung",
+      "role": "Rolle",
+      "phoneNumber": "Telefonnummer",
+      "none": "Keine",
+      "createTitle": "Neue Person erstellen",
+      "editTitle": "Person bearbeiten",
+      "viewTitle": "Person Details"
+    },
+    "table": {
+      "firstName": "Vorname",
+      "lastName": "Nachname",
+      "email": "E-Mail",
+      "department": "Abteilung",
+      "role": "Rolle",
+      "phoneNumber": "Telefonnummer",
+      "ownedCapabilities": "Verantwortlich für Capabilities",
+      "ownedApplications": "Verantwortlich für Anwendungen",
+      "ownedDataObjects": "Verantwortlich für Datenobjekte",
+      "ownedArchitectures": "Verantwortlich für Architekturen",
+      "ownedDiagrams": "Verantwortlich für Diagramme",
+      "ownedInfrastructure": "Verantwortlich für Infrastruktur",
+      "responsibleForInterfaces": "Verantwortlich für Schnittstellen",
+      "createdAt": "Erstellt am",
+      "updatedAt": "Aktualisiert am",
+      "actions": "Aktionen"
+    },
+    "filter": {
+      "title": "Personen filtern",
+      "department": "Abteilung",
+      "role": "Rolle",
+      "searchPlaceholder": "Name oder E-Mail eingeben...",
+      "allDepartments": "Alle Abteilungen",
+      "allRoles": "Alle Rollen",
+      "updatedInPeriod": "Aktualisiert im Zeitraum",
+      "updatedDateRange": "Aktualisiert im Zeitraum",
+      "dateFrom": "Von",
+      "dateTo": "Bis",
+      "enterText": "Text eingeben..."
+    }
   }
 }

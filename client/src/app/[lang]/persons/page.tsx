@@ -5,6 +5,7 @@ import { Box, Typography, Button, Card, Paper } from '@mui/material'
 import { Add as AddIcon } from '@mui/icons-material'
 import { useQuery, useMutation } from '@apollo/client'
 import { useSnackbar } from 'notistack'
+import { useTranslations } from 'next-intl'
 import { useAuth, isArchitect } from '@/lib/auth'
 import { VisibilityState } from '@tanstack/react-table'
 import { GET_PERSONS, CREATE_PERSON, UPDATE_PERSON, DELETE_PERSON } from '@/graphql/person'
@@ -18,6 +19,7 @@ import { usePersonFilter } from '@/components/persons/usePersonFilter'
 import { Person, FilterState } from '@/components/persons/types'
 
 function PersonsPage() {
+  const t = useTranslations('persons')
   const { authenticated } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
   const [globalFilter, setGlobalFilter] = useState<string>('')
@@ -86,11 +88,11 @@ function PersonsPage() {
   // Mutation zum Erstellen einer neuen Person
   const [createPerson, { loading: isCreating }] = useMutation(CREATE_PERSON, {
     onCompleted: () => {
-      enqueueSnackbar('Person erfolgreich erstellt', { variant: 'success' })
+      enqueueSnackbar(t('messages.createSuccess'), { variant: 'success' })
       refetch()
     },
     onError: error => {
-      enqueueSnackbar(`Fehler beim Erstellen der Person: ${error.message}`, {
+      enqueueSnackbar(t('messages.createError') + `: ${error.message}`, {
         variant: 'error',
       })
     },
@@ -99,11 +101,11 @@ function PersonsPage() {
   // Mutation zum Aktualisieren einer bestehenden Person
   const [updatePerson] = useMutation(UPDATE_PERSON, {
     onCompleted: () => {
-      enqueueSnackbar('Person erfolgreich aktualisiert', { variant: 'success' })
+      enqueueSnackbar(t('messages.updateSuccess'), { variant: 'success' })
       refetch()
     },
     onError: error => {
-      enqueueSnackbar(`Fehler beim Aktualisieren der Person: ${error.message}`, {
+      enqueueSnackbar(t('messages.updateError') + `: ${error.message}`, {
         variant: 'error',
       })
     },
@@ -112,11 +114,11 @@ function PersonsPage() {
   // Mutation zum Löschen einer Person
   const [deletePerson] = useMutation(DELETE_PERSON, {
     onCompleted: () => {
-      enqueueSnackbar('Person erfolgreich gelöscht', { variant: 'success' })
+      enqueueSnackbar(t('messages.deleteSuccess'), { variant: 'success' })
       refetch()
     },
     onError: error => {
-      enqueueSnackbar(`Fehler beim Löschen der Person: ${error.message}`, {
+      enqueueSnackbar(t('messages.deleteError') + `: ${error.message}`, {
         variant: 'error',
       })
     },
@@ -191,7 +193,7 @@ function PersonsPage() {
     <Box sx={{ py: 2, px: 1 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
         <Typography variant="h4" component="h1">
-          Personen
+          {t('title')}
         </Typography>
         {isArchitect() && (
           <Button
@@ -200,7 +202,7 @@ function PersonsPage() {
             startIcon={<AddIcon />}
             onClick={handleCreatePerson}
           >
-            Neu erstellen
+            {t('addNew')}
           </Button>
         )}
       </Box>

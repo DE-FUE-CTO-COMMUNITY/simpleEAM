@@ -1,6 +1,24 @@
 'use client'
 
+import { format } from 'date-fns'
+import { de, enUS } from 'date-fns/locale'
 import { GenericFilterState } from '../common/GenericFilterDialog'
+
+// Formatiert das Datum für die Anzeige
+export const formatDate = (dateString: string, locale: string = 'de'): string => {
+  try {
+    // Standarddatum (1.1.1970) prüfen, das als leerer Wert gilt
+    const date = new Date(dateString)
+    if (date.getFullYear() === 1970 && date.getMonth() === 0 && date.getDate() === 1) {
+      return '-'
+    }
+    const dateLocale = locale === 'de' ? de : enUS
+    const formatPattern = locale === 'de' ? 'dd.MM.yyyy' : 'MM/dd/yyyy'
+    return format(date, formatPattern, { locale: dateLocale })
+  } catch {
+    return 'Unbekannt'
+  }
+}
 
 /**
  * Zählt die Anzahl der aktiven Filter im FilterState

@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { useTranslations } from 'next-intl'
 import GenericFilterDialog, { FilterField } from '../common/GenericFilterDialog'
 import { FilterProps } from './types'
 import { countActiveFilters } from './utils'
@@ -14,12 +15,14 @@ const PersonFilterDialog: React.FC<FilterProps> = ({
   onClose,
   onApply,
 }) => {
+  const t = useTranslations('persons.filter')
+
   // Konfiguration der Filterfelder
   const filterFields: FilterField[] = [
     // Abteilungs Filter
     {
       id: 'departmentFilter',
-      label: 'Abteilung',
+      label: t('department'),
       type: 'multiSelect',
       options: availableDepartments.map(department => ({
         value: department,
@@ -29,7 +32,7 @@ const PersonFilterDialog: React.FC<FilterProps> = ({
     // Rollen Filter
     {
       id: 'roleFilter',
-      label: 'Rolle',
+      label: t('role'),
       type: 'multiSelect',
       options: availableRoles.map(role => ({
         value: role,
@@ -41,21 +44,21 @@ const PersonFilterDialog: React.FC<FilterProps> = ({
       id: 'searchFilter',
       label: 'Suche',
       type: 'text',
-      placeholder: 'Geben Sie einen Suchtext ein...',
+      placeholder: t('searchPlaceholder'),
     },
     // Aktualisierungsdatum Filter
     {
       id: 'updatedDateRange',
-      label: 'Aktualisiert im Zeitraum',
+      label: t('updatedDateRange'),
       type: 'dateRange',
-      fromLabel: 'Von',
-      toLabel: 'Bis',
+      fromLabel: t('dateFrom'),
+      toLabel: t('dateTo'),
     },
   ]
 
   return (
     <GenericFilterDialog
-      title="Filter für Personen"
+      title={t('title')}
       filterState={filterState}
       filterFields={filterFields}
       onFilterChange={onFilterChange}

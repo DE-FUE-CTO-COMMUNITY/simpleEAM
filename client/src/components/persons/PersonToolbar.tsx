@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { useTranslations } from 'next-intl'
 import GenericToolbar from '../common/GenericToolbar'
 import { Table, VisibilityState } from '@tanstack/react-table'
 
@@ -24,10 +25,12 @@ const PersonToolbar: React.FC<PersonToolbarProps> = ({
   columnVisibility,
   ...props
 }) => {
+  const t = useTranslations('persons')
+
   return (
     <GenericToolbar
       {...props}
-      searchPlaceholder="Personen durchsuchen..."
+      searchPlaceholder={t('searchPlaceholder')}
       filterTooltip="Personenfilter hinzufügen"
       editFilterTooltip="Personenfilter bearbeiten"
       resetFilterTooltip="Personenfilter zurücksetzen"

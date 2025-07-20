@@ -17,6 +17,10 @@ export type Person = Pick<
   | 'ownedCapabilities'
   | 'ownedApplications'
   | 'ownedDataObjects'
+  | 'ownedArchitectures'
+  | 'ownedDiagrams'
+  | 'ownedInfrastructure'
+  | 'responsibleForInterfaces'
 >
 
 export interface FilterState {

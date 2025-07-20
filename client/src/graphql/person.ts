@@ -36,6 +36,22 @@ export const GET_PERSONS = gql`
         id
         name
       }
+      ownedArchitectures {
+        id
+        name
+      }
+      ownedDiagrams {
+        id
+        title
+      }
+      ownedInfrastructure {
+        id
+        name
+      }
+      responsibleForInterfaces {
+        id
+        name
+      }
     }
   }
 `
@@ -61,6 +77,22 @@ export const GET_PERSON = gql`
         name
       }
       ownedDataObjects {
+        id
+        name
+      }
+      ownedArchitectures {
+        id
+        name
+      }
+      ownedDiagrams {
+        id
+        title
+      }
+      ownedInfrastructure {
+        id
+        name
+      }
+      responsibleForInterfaces {
         id
         name
       }

@@ -1121,5 +1121,67 @@
       "relationships": "Relationships",
       "architectures": "Architectures"
     }
+  },
+  "persons": {
+    "title": "Persons",
+    "addNew": "Create New Person",
+    "editTitle": "Edit Person",
+    "createTitle": "Create New Person",
+    "viewTitle": "Person Details",
+    "deleteConfirmation": "Are you sure you want to delete this person?",
+    "noPersonsFound": "No persons found.",
+    "searchPlaceholder": "Search persons...",
+    "messages": {
+      "loadError": "Error loading persons",
+      "createSuccess": "Person successfully created",
+      "createError": "Error creating person",
+      "updateSuccess": "Person successfully updated",
+      "updateError": "Error updating person",
+      "deleteSuccess": "Person successfully deleted",
+      "deleteError": "Error deleting person"
+    },
+    "form": {
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "department": "Department",
+      "role": "Role",
+      "phoneNumber": "Phone Number",
+      "none": "None",
+      "createTitle": "Create New Person",
+      "editTitle": "Edit Person",
+      "viewTitle": "Person Details"
+    },
+    "table": {
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "department": "Department",
+      "role": "Role",
+      "phoneNumber": "Phone Number",
+      "ownedCapabilities": "Responsible for Capabilities",
+      "ownedApplications": "Responsible for Applications",
+      "ownedDataObjects": "Responsible for Data Objects",
+      "ownedArchitectures": "Responsible for Architectures",
+      "ownedDiagrams": "Responsible for Diagrams",
+      "ownedInfrastructure": "Responsible for Infrastructure",
+      "responsibleForInterfaces": "Responsible for Interfaces",
+      "createdAt": "Created At",
+      "updatedAt": "Updated At",
+      "actions": "Actions"
+    },
+    "filter": {
+      "title": "Filter Persons",
+      "department": "Department",
+      "role": "Role",
+      "searchPlaceholder": "Enter name or email...",
+      "allDepartments": "All Departments",
+      "allRoles": "All Roles",
+      "updatedInPeriod": "Updated in Period",
+      "updatedDateRange": "Updated in Period",
+      "dateFrom": "From",
+      "dateTo": "To",
+      "enterText": "Enter text..."
+    }
   }
 }
