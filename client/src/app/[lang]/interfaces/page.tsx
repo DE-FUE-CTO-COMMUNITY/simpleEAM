@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { Box, Typography, Button, Card, Paper } from '@mui/material'
 import { Add as AddIcon } from '@mui/icons-material'
+import { useTranslations } from 'next-intl'
 import { useQuery, useMutation } from '@apollo/client'
 import { useSnackbar } from 'notistack'
 import { useAuth, isArchitect } from '@/lib/auth'
@@ -31,6 +32,7 @@ import { DataObject } from '@/gql/generated'
 function ApplicationInterfacesPage() {
   const { authenticated } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
+  const t = useTranslations('interfaces')
   const [globalFilter, setGlobalFilter] = useState<string>('')
   const [sorting, setSorting] = useState([{ id: 'name', desc: false }])
   const [tableInstance, setTableInstance] = useState<any>(null)
@@ -74,9 +76,9 @@ function ApplicationInterfacesPage() {
   // Fehlerbehandlung
   useEffect(() => {
     if (error) {
-      enqueueSnackbar('Fehler beim Laden der Schnittstellen', { variant: 'error' })
+      enqueueSnackbar(t('messages.loadError'), { variant: 'error' })
     }
-  }, [error, enqueueSnackbar])
+  }, [error, enqueueSnackbar, t])
 
   const applicationInterfaces = data?.applicationInterfaces || []
 
@@ -103,11 +105,11 @@ function ApplicationInterfacesPage() {
     CREATE_APPLICATION_INTERFACE,
     {
       onCompleted: () => {
-        enqueueSnackbar('Schnittstelle erfolgreich erstellt', { variant: 'success' })
+        enqueueSnackbar(t('messages.createSuccess'), { variant: 'success' })
         refetch()
       },
       onError: error => {
-        enqueueSnackbar(`Fehler beim Erstellen der Schnittstelle: ${error.message}`, {
+        enqueueSnackbar(`${t('messages.createError')}: ${error.message}`, {
           variant: 'error',
         })
       },
@@ -117,11 +119,11 @@ function ApplicationInterfacesPage() {
   // Mutation zum Aktualisieren einer bestehenden Schnittstelle
   const [updateApplicationInterface] = useMutation(UPDATE_APPLICATION_INTERFACE, {
     onCompleted: () => {
-      enqueueSnackbar('Schnittstelle erfolgreich aktualisiert', { variant: 'success' })
+      enqueueSnackbar(t('messages.updateSuccess'), { variant: 'success' })
       refetch()
     },
     onError: error => {
-      enqueueSnackbar(`Fehler beim Aktualisieren der Schnittstelle: ${error.message}`, {
+      enqueueSnackbar(`${t('messages.updateError')}: ${error.message}`, {
         variant: 'error',
       })
     },
@@ -130,11 +132,11 @@ function ApplicationInterfacesPage() {
   // Mutation zum Löschen einer Schnittstelle
   const [deleteApplicationInterface] = useMutation(DELETE_APPLICATION_INTERFACE, {
     onCompleted: () => {
-      enqueueSnackbar('Schnittstelle erfolgreich gelöscht', { variant: 'success' })
+      enqueueSnackbar(t('messages.deleteSuccess'), { variant: 'success' })
       refetch()
     },
     onError: error => {
-      enqueueSnackbar(`Fehler beim Löschen der Schnittstelle: ${error.message}`, {
+      enqueueSnackbar(`${t('messages.deleteError')}: ${error.message}`, {
         variant: 'error',
       })
     },
@@ -367,7 +369,7 @@ function ApplicationInterfacesPage() {
     <Box sx={{ py: 2, px: 1 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
         <Typography variant="h4" component="h1">
-          Schnittstellen
+          {t('title')}
         </Typography>
         {isArchitect() && (
           <Button
@@ -376,7 +378,7 @@ function ApplicationInterfacesPage() {
             startIcon={<AddIcon />}
             onClick={handleCreateApplicationInterface}
           >
-            Neu erstellen
+            {t('addNew')}
           </Button>
         )}
       </Box>

@@ -1,6 +1,7 @@
 'use client'
 
-import React, { useMemo } from 'react'
+import React, { useMemo, useCallback } from 'react'
+import { useTranslations, useLocale } from 'next-intl'
 import { GenericTable } from '../common/GenericTable'
 import { ApplicationInterface } from './types'
 import { ApplicationInterfaceFormValues } from './ApplicationInterfaceForm'
@@ -8,7 +9,7 @@ import ApplicationInterfaceForm from './ApplicationInterfaceForm'
 import { createColumnHelper } from '@tanstack/react-table'
 import { SortingState, VisibilityState } from '@tanstack/react-table'
 import { Chip } from '@mui/material'
-import { getInterfaceTypeLabel, getProtocolLabel, formatDate } from './utils'
+import { getProtocolLabel } from './utils'
 import { DataObject, Application, Person } from '@/gql/generated'
 import usePersistentColumnVisibility from '../../hooks/usePersistentColumnVisibility'
 
@@ -49,7 +50,66 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
   columnVisibility: _externalColumnVisibility,
   onColumnVisibilityChange: _externalOnColumnVisibilityChange,
 }) => {
+  const t = useTranslations('interfaces.table')
+  const tTypes = useTranslations('interfaces.interfaceTypes')
+  const tStatuses = useTranslations('interfaces.statuses')
+  const locale = useLocale()
   const columnHelper = createColumnHelper<ApplicationInterface>()
+
+  // Hilfsfunktion zur internationalisierten Datumsformatierung
+  const formatDate = useCallback(
+    (date: string) => {
+      if (!date) return '-'
+      return new Date(date).toLocaleDateString(locale === 'de' ? 'de-DE' : 'en-US', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      })
+    },
+    [locale]
+  )
+
+  // Hilfsfunktion für Interface Type Labels
+  const getInterfaceTypeLabel = useCallback(
+    (type: any) => {
+      switch (type) {
+        case 'API':
+          return tTypes('API')
+        case 'DATABASE':
+          return tTypes('DATABASE')
+        case 'FILE':
+          return tTypes('FILE')
+        case 'MESSAGE_QUEUE':
+          return tTypes('MESSAGE_QUEUE')
+        case 'OTHER':
+          return tTypes('OTHER')
+        default:
+          return type
+      }
+    },
+    [tTypes]
+  )
+
+  // Hilfsfunktion für Status Labels
+  const getInterfaceStatusLabel = useCallback(
+    (status: any) => {
+      switch (status) {
+        case 'ACTIVE':
+          return tStatuses('ACTIVE')
+        case 'IN_DEVELOPMENT':
+          return tStatuses('IN_DEVELOPMENT')
+        case 'PLANNED':
+          return tStatuses('PLANNED')
+        case 'DEPRECATED':
+          return tStatuses('DEPRECATED')
+        case 'OUT_OF_SERVICE':
+          return tStatuses('OUT_OF_SERVICE')
+        default:
+          return status
+      }
+    },
+    [tStatuses]
+  )
 
   // Verwende persistente Spaltensichtbarkeit
   const {
@@ -87,16 +147,16 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
   const columns = useMemo(
     () => [
       columnHelper.accessor('name', {
-        header: 'Name',
+        header: t('name'),
         cell: info => info.getValue(),
       }),
       columnHelper.accessor('description', {
-        header: 'Beschreibung',
+        header: t('description'),
         cell: info => info.getValue() || '-',
         enableHiding: true,
       }),
       columnHelper.accessor('interfaceType', {
-        header: 'Schnittstellentyp',
+        header: t('interfaceType'),
         cell: info => {
           const type = info.getValue()
           return (
@@ -110,7 +170,7 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
         },
       }),
       columnHelper.accessor('protocol', {
-        header: 'Protokoll',
+        header: t('protocol'),
         cell: info => {
           const protocol = info.getValue()
           return (
@@ -124,7 +184,7 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
         },
       }),
       columnHelper.accessor('responsiblePerson', {
-        header: 'Verantwortlicher',
+        header: t('responsiblePerson'),
         cell: info => {
           const responsiblePersons = info.getValue()
           return responsiblePersons && responsiblePersons.length > 0
@@ -135,7 +195,7 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
         },
       }),
       columnHelper.accessor('sourceApplications', {
-        header: 'Quellapplikationen',
+        header: t('sourceApplications'),
         cell: info => {
           const sourceApps = info.getValue()
           return sourceApps && sourceApps.length > 0
@@ -144,7 +204,7 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
         },
       }),
       columnHelper.accessor('targetApplications', {
-        header: 'Zielapplikationen',
+        header: t('targetApplications'),
         cell: info => {
           const targetApps = info.getValue()
           return targetApps && targetApps.length > 0
@@ -153,7 +213,7 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
         },
       }),
       columnHelper.accessor('dataObjects', {
-        header: 'Datenobjekte',
+        header: t('dataObjects'),
         cell: info => {
           const dataObjects = info.getValue()
           return dataObjects && dataObjects.length > 0
@@ -163,17 +223,17 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
       }),
       // Weitere versteckte Spalten
       columnHelper.accessor('version', {
-        header: 'Version',
+        header: t('version'),
         cell: info => info.getValue() || '-',
         enableHiding: true,
       }),
       columnHelper.accessor('status', {
-        header: 'Status',
+        header: t('status'),
         cell: info => {
           const status = info.getValue()
           return (
             <Chip
-              label={status}
+              label={getInterfaceStatusLabel(status)}
               color={status === 'ACTIVE' ? 'success' : 'default'}
               size="small"
               variant="filled"
@@ -183,39 +243,27 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
         enableHiding: true,
       }),
       columnHelper.accessor('planningDate', {
-        header: 'Planungsdatum',
-        cell: info => {
-          const date = info.getValue()
-          return date ? new Date(date).toLocaleDateString('de-DE') : '-'
-        },
+        header: t('planningDate'),
+        cell: info => formatDate(info.getValue()),
         enableHiding: true,
       }),
       columnHelper.accessor('introductionDate', {
-        header: 'Einführungsdatum',
-        cell: info => {
-          const date = info.getValue()
-          return date ? new Date(date).toLocaleDateString('de-DE') : '-'
-        },
+        header: t('introductionDate'),
+        cell: info => formatDate(info.getValue()),
         enableHiding: true,
       }),
       columnHelper.accessor('endOfUseDate', {
-        header: 'Ende der Nutzung',
-        cell: info => {
-          const date = info.getValue()
-          return date ? new Date(date).toLocaleDateString('de-DE') : '-'
-        },
+        header: t('endOfUseDate'),
+        cell: info => formatDate(info.getValue()),
         enableHiding: true,
       }),
       columnHelper.accessor('endOfLifeDate', {
-        header: 'Ende der Lebenszeit',
-        cell: info => {
-          const date = info.getValue()
-          return date ? new Date(date).toLocaleDateString('de-DE') : '-'
-        },
+        header: t('endOfLifeDate'),
+        cell: info => formatDate(info.getValue()),
         enableHiding: true,
       }),
       columnHelper.accessor('predecessors', {
-        header: 'Vorgänger',
+        header: t('predecessors'),
         cell: info => {
           const predecessors = info.getValue()
           return predecessors && predecessors.length > 0
@@ -225,7 +273,7 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
         enableHiding: true,
       }),
       columnHelper.accessor('successors', {
-        header: 'Nachfolger',
+        header: t('successors'),
         cell: info => {
           const successors = info.getValue()
           return successors && successors.length > 0
@@ -235,7 +283,7 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
         enableHiding: true,
       }),
       columnHelper.accessor('partOfArchitectures', {
-        header: 'Teil von Architekturen',
+        header: t('partOfArchitectures'),
         cell: info => {
           const architectures = info.getValue()
           return architectures && architectures.length > 0
@@ -245,7 +293,7 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
         enableHiding: true,
       }),
       columnHelper.accessor('depictedInDiagrams', {
-        header: 'Dargestellt in Diagrammen',
+        header: t('depictedInDiagrams'),
         cell: info => {
           const diagrams = info.getValue()
           return diagrams && diagrams.length > 0
@@ -256,17 +304,17 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
       }),
       // Versteckte Zeitstempel-Spalten am Ende
       columnHelper.accessor('createdAt', {
-        header: 'Erstellt am',
+        header: t('createdAt'),
         cell: info => formatDate(info.getValue()),
         enableHiding: true,
       }),
       columnHelper.accessor('updatedAt', {
-        header: 'Aktualisiert am',
+        header: t('updatedAt'),
         cell: info => formatDate(info.getValue()),
         enableHiding: true,
       }),
     ],
-    [columnHelper]
+    [columnHelper, t, getInterfaceTypeLabel, getInterfaceStatusLabel, formatDate]
   )
 
   // Mapping von ApplicationInterface zu den erwarteten FormValues für das Formular

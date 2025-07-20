@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { useTranslations } from 'next-intl'
 import GenericToolbar from '../common/GenericToolbar'
 import { Table } from '@tanstack/react-table'
 
@@ -22,10 +23,12 @@ const ApplicationInterfaceToolbar: React.FC<ApplicationInterfaceToolbarProps> = 
   enableColumnVisibilityToggle = true,
   ...props
 }) => {
+  const t = useTranslations('interfaces')
+
   return (
     <GenericToolbar
       {...props}
-      searchPlaceholder="Schnittstellen durchsuchen..."
+      searchPlaceholder={t('searchPlaceholder')}
       filterTooltip="Schnittstellenfilter hinzufügen"
       editFilterTooltip="Schnittstellenfilter bearbeiten"
       resetFilterTooltip="Schnittstellenfilter zurücksetzen"

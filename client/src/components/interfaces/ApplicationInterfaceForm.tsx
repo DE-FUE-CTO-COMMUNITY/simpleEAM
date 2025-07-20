@@ -4,6 +4,7 @@ import React, { useEffect } from 'react'
 import { useForm } from '@tanstack/react-form'
 import { z } from 'zod'
 import { useQuery } from '@apollo/client'
+import { useTranslations } from 'next-intl'
 import {
   Assignment as PlanningIcon,
   RocketLaunch as LaunchIcon,
@@ -157,14 +158,6 @@ export interface ApplicationInterfaceFormProps {
   onEditMode?: () => void
 }
 
-const APPLICATION_INTERFACE_TABS = [
-  { id: 'general', label: 'Allgemein' },
-  { id: 'technical', label: 'Technisch' },
-  { id: 'lifecycle', label: 'Lebenszyklus' },
-  { id: 'relationships', label: 'Beziehungen' },
-  { id: 'architectures', label: 'Architekturen' },
-]
-
 const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
   applicationInterface,
   dataObjects = [],
@@ -178,6 +171,56 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
   loading = false,
   onEditMode,
 }) => {
+  const t = useTranslations('interfaces.form')
+  const tTabs = useTranslations('interfaces.tabs')
+  const tTypes = useTranslations('interfaces.interfaceTypes')
+  const tStatuses = useTranslations('interfaces.statuses')
+
+  // Hilfsfunktion für Interface Type Labels
+  const getInterfaceTypeLabel = (type: InterfaceType) => {
+    switch (type) {
+      case InterfaceType.API:
+        return tTypes('API')
+      case InterfaceType.DATABASE:
+        return tTypes('DATABASE')
+      case InterfaceType.FILE:
+        return tTypes('FILE')
+      case InterfaceType.MESSAGE_QUEUE:
+        return tTypes('MESSAGE_QUEUE')
+      case InterfaceType.OTHER:
+        return tTypes('OTHER')
+      default:
+        return type
+    }
+  }
+
+  // Hilfsfunktion für Status Labels
+  const getStatusLabel = (status: InterfaceStatus) => {
+    switch (status) {
+      case InterfaceStatus.ACTIVE:
+        return tStatuses('ACTIVE')
+      case InterfaceStatus.IN_DEVELOPMENT:
+        return tStatuses('IN_DEVELOPMENT')
+      case InterfaceStatus.PLANNED:
+        return tStatuses('PLANNED')
+      case InterfaceStatus.DEPRECATED:
+        return tStatuses('DEPRECATED')
+      case InterfaceStatus.OUT_OF_SERVICE:
+        return tStatuses('OUT_OF_SERVICE')
+      default:
+        return status
+    }
+  }
+
+  // Tab-Konfiguration mit Übersetzungen
+  const APPLICATION_INTERFACE_TABS = [
+    { id: 'general', label: tTabs('general') },
+    { id: 'technical', label: tTabs('technical') },
+    { id: 'lifecycle', label: tTabs('lifecycle') },
+    { id: 'relationships', label: tTabs('relationships') },
+    { id: 'architectures', label: tTabs('architectures') },
+  ]
+
   // Daten laden mit cache-and-network Policy für frische Daten
   const { data: personData, loading: personLoading } = useQuery(GET_PERSONS)
   const { data: applicationData, loading: applicationLoading } = useQuery(GET_APPLICATIONS, {
@@ -318,7 +361,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
   const fields: FieldConfig[] = [
     {
       name: 'name',
-      label: 'Name',
+      label: t('name'),
       type: 'text',
       required: true,
       validators: baseApplicationInterfaceSchema.shape.name,
@@ -327,7 +370,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
     },
     {
       name: 'description',
-      label: 'Beschreibung',
+      label: t('description'),
       type: 'text',
       multiline: true,
       rows: 3,
@@ -338,7 +381,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
     },
     {
       name: 'interfaceType',
-      label: 'Schnittstellentyp',
+      label: t('interfaceType'),
       type: 'select',
       required: true,
       validators: baseApplicationInterfaceSchema.shape.interfaceType,
@@ -346,27 +389,18 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       tabId: 'technical',
       options: Object.values(InterfaceType).map(type => ({
         value: type,
-        label:
-          type === InterfaceType.API
-            ? 'API'
-            : type === InterfaceType.DATABASE
-              ? 'Datenbank'
-              : type === InterfaceType.FILE
-                ? 'Datei'
-                : type === InterfaceType.MESSAGE_QUEUE
-                  ? 'Nachrichtenwarteschlange'
-                  : 'Sonstige',
+        label: getInterfaceTypeLabel(type),
       })),
     },
     {
       name: 'protocol',
-      label: 'Protokoll',
+      label: t('protocol'),
       type: 'select',
       validators: baseApplicationInterfaceSchema.shape.protocol,
       size: { xs: 12, md: 6 },
       tabId: 'technical',
       options: [
-        { value: '', label: 'Kein Protokoll' },
+        { value: '', label: t('none') },
         ...Object.values(InterfaceProtocol).map(protocol => ({
           value: protocol,
           label: protocol,
@@ -375,7 +409,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
     },
     {
       name: 'version',
-      label: 'Version',
+      label: t('version'),
       type: 'text',
       validators: baseApplicationInterfaceSchema.shape.version,
       size: { xs: 12, md: 6 },
@@ -383,7 +417,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
     },
     {
       name: 'status',
-      label: 'Status',
+      label: t('status'),
       type: 'select',
       required: true,
       validators: baseApplicationInterfaceSchema.shape.status,
@@ -391,21 +425,12 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       tabId: 'general',
       options: Object.values(InterfaceStatus).map(status => ({
         value: status,
-        label:
-          status === InterfaceStatus.ACTIVE
-            ? 'Aktiv'
-            : status === InterfaceStatus.IN_DEVELOPMENT
-              ? 'In Entwicklung'
-              : status === InterfaceStatus.OUT_OF_SERVICE
-                ? 'Außer Betrieb'
-                : status === InterfaceStatus.PLANNED
-                  ? 'Geplant'
-                  : 'Veraltet',
+        label: getStatusLabel(status),
       })),
     },
     {
       name: 'planningDate',
-      label: 'Planungsdatum',
+      label: t('planningDate'),
       type: 'date',
       validators: baseApplicationInterfaceSchema.shape.planningDate,
       size: { xs: 12, md: 12 },
@@ -414,7 +439,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
     },
     {
       name: 'introductionDate',
-      label: 'Einführungsdatum',
+      label: t('introductionDate'),
       type: 'date',
       validators: baseApplicationInterfaceSchema.shape.introductionDate,
       size: { xs: 12, md: 12 },
@@ -423,7 +448,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
     },
     {
       name: 'endOfUseDate',
-      label: 'Ende der Nutzung',
+      label: t('endOfUseDate'),
       type: 'date',
       validators: baseApplicationInterfaceSchema.shape.endOfUseDate,
       size: { xs: 12, md: 12 },
@@ -432,7 +457,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
     },
     {
       name: 'endOfLifeDate',
-      label: 'End-of-Life Datum',
+      label: t('endOfLifeDate'),
       type: 'date',
       validators: baseApplicationInterfaceSchema.shape.endOfLifeDate,
       size: { xs: 12, md: 12 },
@@ -441,7 +466,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
     },
     {
       name: 'responsiblePerson',
-      label: 'Verantwortliche Person',
+      label: t('responsiblePerson'),
       type: 'autocomplete',
       size: { xs: 12 },
       tabId: 'general',
@@ -470,7 +495,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
     },
     {
       name: 'predecessorIds',
-      label: 'Vorgänger-Schnittstellen',
+      label: t('predecessors'),
       type: 'autocomplete',
       tabId: 'general',
       multiple: true,
@@ -501,7 +526,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
     },
     {
       name: 'successorIds',
-      label: 'Nachfolger-Schnittstellen',
+      label: t('successors'),
       type: 'autocomplete',
       tabId: 'general',
       multiple: true,
@@ -532,7 +557,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
     },
     {
       name: 'sourceApplications',
-      label: 'Quellapplikationen',
+      label: t('sourceApplications'),
       type: 'autocomplete',
       size: { xs: 12, md: 6 },
       tabId: 'relationships',
@@ -561,7 +586,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
     },
     {
       name: 'targetApplications',
-      label: 'Zielapplikationen',
+      label: t('targetApplications'),
       type: 'autocomplete',
       size: { xs: 12, md: 6 },
       tabId: 'relationships',
@@ -590,7 +615,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
     },
     {
       name: 'dataObjects',
-      label: 'Datenobjekte',
+      label: t('dataObjects'),
       type: 'autocomplete',
       size: { xs: 12 },
       tabId: 'relationships',
@@ -616,7 +641,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
     },
     {
       name: 'partOfArchitectures',
-      label: 'Teil von Architekturen',
+      label: t('partOfArchitectures'),
       type: 'autocomplete',
       size: 12,
       tabId: 'architectures',
@@ -648,7 +673,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
     },
     {
       name: 'depictedInDiagrams',
-      label: 'Dargestellt in Diagrammen',
+      label: t('depictedInDiagrams'),
       type: 'autocomplete',
       size: 12,
       tabId: 'architectures',

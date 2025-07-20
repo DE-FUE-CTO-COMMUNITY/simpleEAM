@@ -1,11 +1,11 @@
 'use client'
 
 import React from 'react'
+import { useTranslations } from 'next-intl'
 import GenericFilterDialog, { FilterField } from '../common/GenericFilterDialog'
 import { FilterProps } from './types'
 import { InterfaceType, InterfaceProtocol, InterfaceStatus } from '../../gql/generated'
 import { countActiveFilters } from './utils'
-import { getInterfaceTypeLabel, getProtocolDisplayLabel, getStatusLabel } from './utils'
 
 const ApplicationInterfaceFilterDialog: React.FC<FilterProps> = ({
   filterState,
@@ -22,12 +22,81 @@ const ApplicationInterfaceFilterDialog: React.FC<FilterProps> = ({
   onClose,
   onApply,
 }) => {
+  const t = useTranslations('interfaces.filter')
+  const tTypes = useTranslations('interfaces.interfaceTypes')
+  const tStatuses = useTranslations('interfaces.statuses')
+  const tProtocols = useTranslations('interfaces.protocols')
+
+  // Hilfsfunktion für Interface Type Labels
+  const getInterfaceTypeLabel = (type: InterfaceType) => {
+    switch (type) {
+      case InterfaceType.API:
+        return tTypes('API')
+      case InterfaceType.DATABASE:
+        return tTypes('DATABASE')
+      case InterfaceType.FILE:
+        return tTypes('FILE')
+      case InterfaceType.MESSAGE_QUEUE:
+        return tTypes('MESSAGE_QUEUE')
+      case InterfaceType.OTHER:
+        return tTypes('OTHER')
+      default:
+        return type
+    }
+  }
+
+  // Hilfsfunktion für Status Labels
+  const getStatusLabel = (status: InterfaceStatus) => {
+    switch (status) {
+      case InterfaceStatus.ACTIVE:
+        return tStatuses('ACTIVE')
+      case InterfaceStatus.IN_DEVELOPMENT:
+        return tStatuses('IN_DEVELOPMENT')
+      case InterfaceStatus.PLANNED:
+        return tStatuses('PLANNED')
+      case InterfaceStatus.DEPRECATED:
+        return tStatuses('DEPRECATED')
+      case InterfaceStatus.OUT_OF_SERVICE:
+        return tStatuses('OUT_OF_SERVICE')
+      default:
+        return status
+    }
+  }
+
+  // Hilfsfunktion für Protokoll Labels
+  const getProtocolDisplayLabel = (protocol: InterfaceProtocol) => {
+    switch (protocol) {
+      case InterfaceProtocol.HTTP:
+        return tProtocols('HTTP')
+      case InterfaceProtocol.HTTPS:
+        return tProtocols('HTTPS')
+      case InterfaceProtocol.FTP:
+        return tProtocols('FTP')
+      case InterfaceProtocol.SFTP:
+        return tProtocols('SFTP')
+      case InterfaceProtocol.SOAP:
+        return tProtocols('SOAP')
+      case InterfaceProtocol.REST:
+        return tProtocols('REST')
+      case InterfaceProtocol.GRAPHQL:
+        return tProtocols('GRAPHQL')
+      case InterfaceProtocol.TCP:
+        return tProtocols('TCP')
+      case InterfaceProtocol.UDP:
+        return tProtocols('UDP')
+      case InterfaceProtocol.OTHER:
+        return tProtocols('OTHER')
+      default:
+        return protocol
+    }
+  }
+
   // Konfiguration der Filterfelder
   const filterFields: FilterField[] = [
     // Schnittstellentyp-Filter
     {
       id: 'interfaceTypeFilter',
-      label: 'Schnittstellentyp',
+      label: t('interfaceType'),
       type: 'multiSelect',
       options: availableInterfaceTypes.map(type => ({
         value: type,
@@ -38,7 +107,7 @@ const ApplicationInterfaceFilterDialog: React.FC<FilterProps> = ({
     // Protokoll-Filter
     {
       id: 'protocolFilter',
-      label: 'Protokoll',
+      label: t('protocol'),
       type: 'multiSelect',
       options: availableProtocols.map(protocol => ({
         value: protocol,
@@ -49,7 +118,7 @@ const ApplicationInterfaceFilterDialog: React.FC<FilterProps> = ({
     // Status-Filter
     {
       id: 'statusFilter',
-      label: 'Status',
+      label: t('status'),
       type: 'multiSelect',
       options: availableStatuses.map(status => ({
         value: status,
@@ -60,7 +129,7 @@ const ApplicationInterfaceFilterDialog: React.FC<FilterProps> = ({
     // Verantwortliche Person-Filter
     {
       id: 'responsiblePersonFilter',
-      label: 'Verantwortliche Person',
+      label: t('responsiblePerson'),
       type: 'multiSelect',
       options: availableResponsiblePersons.map(person => ({
         value: person,
@@ -70,7 +139,7 @@ const ApplicationInterfaceFilterDialog: React.FC<FilterProps> = ({
     // Quell-Applikationen-Filter
     {
       id: 'sourceApplicationsFilter',
-      label: 'Quell-Applikationen',
+      label: t('sourceApplications'),
       type: 'multiSelect',
       options: availableSourceApplications.map(app => ({
         value: app,
@@ -80,7 +149,7 @@ const ApplicationInterfaceFilterDialog: React.FC<FilterProps> = ({
     // Ziel-Applikationen-Filter
     {
       id: 'targetApplicationsFilter',
-      label: 'Ziel-Applikationen',
+      label: t('targetApplications'),
       type: 'multiSelect',
       options: availableTargetApplications.map(app => ({
         value: app,
@@ -90,7 +159,7 @@ const ApplicationInterfaceFilterDialog: React.FC<FilterProps> = ({
     // Datenobjekte-Filter
     {
       id: 'dataObjectsFilter',
-      label: 'Datenobjekte',
+      label: t('dataObjects'),
       type: 'multiSelect',
       options: availableDataObjects.map(dataObject => ({
         value: dataObject,
@@ -100,37 +169,37 @@ const ApplicationInterfaceFilterDialog: React.FC<FilterProps> = ({
     // Version-Filter
     {
       id: 'versionFilter',
-      label: 'Version',
+      label: t('version'),
       type: 'text',
-      placeholder: 'z.B. v1.0, 2.3.1...',
+      placeholder: t('enterText'),
     },
     // Suchtext Filter (Name)
     {
       id: 'searchFilter',
       label: 'Name enthält',
       type: 'text',
-      placeholder: 'Suche nach Schnittstellenname...',
+      placeholder: t('descriptionPlaceholder'),
     },
     // Beschreibungsfilter
     {
       id: 'descriptionFilter',
-      label: 'Beschreibung enthält',
+      label: t('descriptionContains'),
       type: 'text',
-      placeholder: 'Geben Sie einen Text ein...',
+      placeholder: t('descriptionPlaceholder'),
     },
     // Aktualisierungsdatum Filter
     {
       id: 'updatedDateRange',
-      label: 'Aktualisiert im Zeitraum',
+      label: t('updatedInPeriod'),
       type: 'dateRange',
-      fromLabel: 'Von',
-      toLabel: 'Bis',
+      fromLabel: t('dateFrom'),
+      toLabel: t('dateTo'),
     },
   ]
 
   return (
     <GenericFilterDialog
-      title="Filter für Schnittstellen"
+      title={t('title')}
       filterState={filterState}
       filterFields={filterFields}
       onFilterChange={onFilterChange}
