@@ -744,5 +744,97 @@
       "technical": "Technical",
       "principles": "Principles"
     }
+  },
+  "dataObjects": {
+    "title": "Data Objects",
+    "addNew": "Create New Data Object",
+    "editTitle": "Edit Data Object",
+    "createTitle": "Create New Data Object",
+    "viewTitle": "Data Object Details",
+    "deleteConfirmation": "Are you sure you want to delete this data object?",
+    "noDataObjectsFound": "No data objects found.",
+    "searchPlaceholder": "Search data objects...",
+    "messages": {
+      "loadError": "Error loading data objects",
+      "createSuccess": "Data object successfully created",
+      "createError": "Error creating data object",
+      "updateSuccess": "Data object successfully updated",
+      "updateError": "Error updating data object",
+      "deleteSuccess": "Data object successfully deleted",
+      "deleteError": "Error deleting data object"
+    },
+    "form": {
+      "name": "Name",
+      "description": "Description",
+      "classification": "Classification",
+      "format": "Format",
+      "dataSources": "Data Sources",
+      "planningDate": "Planning Date",
+      "introductionDate": "Introduction Date",
+      "endOfUseDate": "End of Use Date",
+      "endOfLifeDate": "End of Life Date",
+      "owner": "Owner",
+      "usedByApplications": "Used by Applications",
+      "relatedToCapabilities": "Related to Capabilities",
+      "transferredInInterfaces": "Transferred in Interfaces",
+      "partOfArchitectures": "Part of Architectures",
+      "depictedInDiagrams": "Included in Diagrams",
+      "tags": "Tags",
+      "none": "None",
+      "createTitle": "Create New Data Object",
+      "editTitle": "Edit Data Object",
+      "viewTitle": "Data Object Details"
+    },
+    "table": {
+      "name": "Name",
+      "description": "Description",
+      "classification": "Classification",
+      "format": "Format",
+      "dataSources": "Data Sources",
+      "planningDate": "Planning Date",
+      "introductionDate": "Introduction Date",
+      "endOfUseDate": "End of Use Date",
+      "endOfLifeDate": "End of Life Date",
+      "owner": "Owner",
+      "tags": "Tags",
+      "usedByApplications": "Used by Applications",
+      "relatedToCapabilities": "Related to Capabilities",
+      "transferredInInterfaces": "Transferred in Interfaces",
+      "partOfArchitectures": "Part of Architectures",
+      "depictedInDiagrams": "Included in Diagrams",
+      "createdAt": "Created At",
+      "updatedAt": "Updated At",
+      "actions": "Actions"
+    },
+    "classifications": {
+      "PUBLIC": "Public",
+      "INTERNAL": "Internal",
+      "CONFIDENTIAL": "Confidential",
+      "STRICTLY_CONFIDENTIAL": "Strictly Confidential"
+    },
+    "filter": {
+      "title": "Filter Data Objects",
+      "classification": "Classification",
+      "format": "Format",
+      "dataSources": "Data Sources",
+      "owner": "Owner",
+      "usedByApplications": "Used by Applications",
+      "relatedToCapabilities": "Related to Capabilities",
+      "partOfArchitectures": "Part of Architectures",
+      "descriptionContains": "Description contains",
+      "descriptionPlaceholder": "Enter text...",
+      "allOwners": "All Owners",
+      "updatedInPeriod": "Updated in Period",
+      "updatedDateRange": "Updated in Period",
+      "dateFrom": "From",
+      "dateTo": "To",
+      "enterText": "Enter text..."
+    },
+    "tabs": {
+      "general": "General",
+      "lifecycle": "Lifecycle",
+      "relationships": "Relationships",
+      "architectures": "Architectures"
+    }
   }
 }

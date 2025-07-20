@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { useTranslations } from 'next-intl'
 import GenericToolbar from '../common/GenericToolbar'
 import { Table, VisibilityState } from '@tanstack/react-table'
 
@@ -25,10 +26,12 @@ const DataObjectToolbar: React.FC<DataObjectToolbarProps> = ({
   columnVisibility,
   ...props
 }) => {
+  const t = useTranslations('dataObjects')
+
   return (
     <GenericToolbar
       {...props}
-      searchPlaceholder="Datenobjekte durchsuchen..."
+      searchPlaceholder={t('searchPlaceholder')}
       searchFieldWidth="350px"
       table={table}
       enableColumnVisibilityToggle={enableColumnVisibilityToggle}

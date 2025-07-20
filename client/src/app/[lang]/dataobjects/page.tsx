@@ -3,6 +3,7 @@
 import React, { useState, useCallback, useMemo } from 'react'
 import { Box, Typography, Card, Button, Paper } from '@mui/material'
 import { Add as AddIcon } from '@mui/icons-material'
+import { useTranslations } from 'next-intl'
 import { useAuth, isArchitect } from '@/lib/auth'
 import { SortingState, VisibilityState } from '@tanstack/react-table'
 import { useQuery, useMutation } from '@apollo/client'
@@ -23,6 +24,7 @@ import { DataObjectFilterState } from '@/components/dataobjects/DataObjectFilter
 const DataObjectsPage = () => {
   const { authenticated } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
+  const t = useTranslations('dataObjects')
   const [globalFilter, setGlobalFilter] = useState('')
   const [sorting, setSorting] = useState<SortingState>([])
   const [tableInstance, setTableInstance] = useState<any>(null)
@@ -462,7 +464,7 @@ const DataObjectsPage = () => {
     <Box sx={{ py: 2, px: 1 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
         <Typography variant="h4" component="h1">
-          Datenobjekte
+          {t('title')}
         </Typography>
         {isArchitect() && (
           <Button
@@ -471,7 +473,7 @@ const DataObjectsPage = () => {
             startIcon={<AddIcon />}
             onClick={handleCreateDataObject}
           >
-            Neu erstellen
+            {t('addNew')}
           </Button>
         )}
       </Box>

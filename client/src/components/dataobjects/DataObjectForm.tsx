@@ -4,6 +4,7 @@ import React, { useEffect } from 'react'
 import { useForm } from '@tanstack/react-form'
 import { z } from 'zod'
 import { useQuery } from '@apollo/client'
+import { useTranslations } from 'next-intl'
 import {
   Assignment as PlanningIcon,
   RocketLaunch as LaunchIcon,
@@ -82,28 +83,6 @@ export interface DataObjectFormProps {
   onEditMode?: () => void
 }
 
-const getClassificationLabel = (classification: DataClassification): string => {
-  switch (classification) {
-    case DataClassification.PUBLIC:
-      return 'Öffentlich'
-    case DataClassification.INTERNAL:
-      return 'Intern'
-    case DataClassification.CONFIDENTIAL:
-      return 'Vertraulich'
-    case DataClassification.STRICTLY_CONFIDENTIAL:
-      return 'Streng vertraulich'
-    default:
-      return classification
-  }
-}
-
-const DATA_OBJECT_TABS = [
-  { id: 'general', label: 'Allgemein' },
-  { id: 'lifecycle', label: 'Lebenszyklus' },
-  { id: 'relationships', label: 'Beziehungen' },
-  { id: 'architectures', label: 'Architekturen' },
-]
-
 const DataObjectForm: React.FC<DataObjectFormProps> = ({
   dataObject,
   isOpen,
@@ -114,6 +93,10 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
   loading = false,
   onEditMode,
 }) => {
+  const t = useTranslations('dataObjects.form')
+  const tTabs = useTranslations('dataObjects.tabs')
+  const tClassifications = useTranslations('dataObjects.classifications')
+
   // Personen laden
   const { data: personData, loading: personLoading } = useQuery(GET_PERSONS)
   // Applikationen laden
@@ -221,10 +204,21 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
     size?: { xs: number; md: number } | number
   }
 
+  // Dynamische Tab-Konfiguration mit Übersetzungen
+  const tabs = React.useMemo(
+    () => [
+      { id: 'general', label: tTabs('general') },
+      { id: 'lifecycle', label: tTabs('lifecycle') },
+      { id: 'relationships', label: tTabs('relationships') },
+      { id: 'architectures', label: tTabs('architectures') },
+    ],
+    [tTabs]
+  )
+
   const fields: FieldConfigWithSelect[] = [
     {
       name: 'name',
-      label: 'Name',
+      label: t('name'),
       type: 'text',
       required: true,
       validators: baseDataObjectSchema.shape.name,
@@ -233,14 +227,14 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
     },
     {
       name: 'classification',
-      label: 'Klassifizierung',
+      label: t('classification'),
       type: 'select',
       required: true,
       validators: baseDataObjectSchema.shape.classification,
       options: Object.values(DataClassification).map(
         (classification): SelectOption => ({
           value: classification,
-          label: getClassificationLabel(classification),
+          label: tClassifications(classification),
         })
       ),
       size: { xs: 12, md: 6 },
@@ -248,7 +242,7 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
     },
     {
       name: 'description',
-      label: 'Beschreibung',
+      label: t('description'),
       type: 'textarea',
       required: true,
       validators: baseDataObjectSchema.shape.description,
@@ -258,7 +252,7 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
     },
     {
       name: 'format',
-      label: 'Format',
+      label: t('format'),
       type: 'text',
       validators: baseDataObjectSchema.shape.format,
       size: { xs: 12, md: 6 },
@@ -267,7 +261,7 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
     // Lebenszyklus (Tab: lifecycle) - in chronologischer Reihenfolge
     {
       name: 'planningDate',
-      label: 'Planungsdatum',
+      label: t('planningDate'),
       icon: <PlanningIcon />,
       type: 'date',
       validators: baseDataObjectSchema.shape.planningDate,
@@ -276,7 +270,7 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
     },
     {
       name: 'introductionDate',
-      label: 'Einführungsdatum',
+      label: t('introductionDate'),
       icon: <LaunchIcon />,
       type: 'date',
       validators: baseDataObjectSchema.shape.introductionDate,
@@ -285,7 +279,7 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
     },
     {
       name: 'endOfUseDate',
-      label: 'Ende der Nutzung',
+      label: t('endOfUseDate'),
       icon: <PauseIcon />,
       type: 'date',
       validators: baseDataObjectSchema.shape.endOfUseDate,
@@ -294,7 +288,7 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
     },
     {
       name: 'endOfLifeDate',
-      label: 'End-of-Life Datum',
+      label: t('endOfLifeDate'),
       icon: <DeleteIcon />,
       type: 'date',
       validators: baseDataObjectSchema.shape.endOfLifeDate,
@@ -303,10 +297,10 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
     },
     {
       name: 'ownerId',
-      label: 'Verantwortlicher',
+      label: t('owner'),
       type: 'select',
       options: [
-        { value: '', label: 'Keine' },
+        { value: '', label: t('none') },
         ...(personData?.people?.map(
           (person: { id: string; firstName: string; lastName: string }): SelectOption => ({
             value: person.id,
@@ -320,7 +314,7 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
     },
     {
       name: 'dataSources',
-      label: 'Datenquellen',
+      label: t('dataSources'),
       type: 'autocomplete',
       validators: baseDataObjectSchema.shape.dataSources,
       size: { xs: 12, md: 6 },
@@ -352,7 +346,7 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
     },
     {
       name: 'partOfArchitectures',
-      label: 'Teil von Architekturen',
+      label: t('partOfArchitectures'),
       type: 'autocomplete',
       multiple: true,
       options: (architecturesData?.architectures || []).map((arch: Architecture) => ({
@@ -381,7 +375,7 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
     },
     {
       name: 'depictedInDiagrams',
-      label: 'Dargestellt in Diagrammen',
+      label: t('depictedInDiagrams'),
       type: 'autocomplete',
       multiple: true,
       options: (diagramsData?.diagrams || []).map((diagram: any) => ({
@@ -413,11 +407,7 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
   return (
     <GenericForm
       title={
-        mode === 'create'
-          ? 'Neues Datenobjekt erstellen'
-          : mode === 'edit'
-            ? 'Datenobjekt bearbeiten'
-            : 'Datenobjekt Details'
+        mode === 'create' ? t('createTitle') : mode === 'edit' ? t('editTitle') : t('viewTitle')
       }
       isOpen={isOpen}
       onClose={onClose}
@@ -439,7 +429,7 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
             }
           : undefined
       }
-      tabs={DATA_OBJECT_TABS}
+      tabs={tabs}
     />
   )
 }

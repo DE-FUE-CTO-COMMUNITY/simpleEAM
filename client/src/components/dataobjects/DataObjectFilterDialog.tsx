@@ -1,9 +1,9 @@
 'use client'
 
 import React from 'react'
+import { useTranslations } from 'next-intl'
 import GenericFilterDialog, { FilterField, GenericFilterState } from '../common/GenericFilterDialog'
 import { DataClassification } from '../../gql/generated'
-import { getClassificationLabel } from './utils'
 
 export interface DataObjectFilterState {
   classifications: DataClassification[]
@@ -43,6 +43,9 @@ const DataObjectFilterDialog: React.FC<DataObjectFilterDialogProps> = ({
   onResetFilters,
   filterOptions,
 }) => {
+  const t = useTranslations('dataObjects.filter')
+  const tClassifications = useTranslations('dataObjects.classifications')
+
   // Zähle die aktiven Filter
   const countActiveFilters = (fs: GenericFilterState) => {
     return (
@@ -63,18 +66,18 @@ const DataObjectFilterDialog: React.FC<DataObjectFilterDialogProps> = ({
     // Klassifikationsfilter
     {
       id: 'classifications',
-      label: 'Klassifikation',
+      label: t('classification'),
       type: 'multiSelect',
       options: Object.values(DataClassification).map(classification => ({
         value: classification,
-        label: getClassificationLabel(classification),
+        label: tClassifications(classification),
       })),
-      valueFormatter: value => getClassificationLabel(value as DataClassification),
+      valueFormatter: value => tClassifications(value as DataClassification),
     },
     // Formatfilter
     {
       id: 'formats',
-      label: 'Format',
+      label: t('format'),
       type: 'multiSelect',
       options: filterOptions.availableFormats.map(format => ({
         value: format,
@@ -84,7 +87,7 @@ const DataObjectFilterDialog: React.FC<DataObjectFilterDialogProps> = ({
     // Quellenfilter
     {
       id: 'sources',
-      label: 'Datenquellen',
+      label: t('dataSources'),
       type: 'multiSelect',
       options: filterOptions.availableSources.map(source => ({
         value: source,
@@ -94,7 +97,7 @@ const DataObjectFilterDialog: React.FC<DataObjectFilterDialogProps> = ({
     // Verantwortliche Filter
     {
       id: 'owners',
-      label: 'Verantwortliche',
+      label: t('owner'),
       type: 'multiSelect',
       options: filterOptions.availableOwners.map(owner => ({
         value: owner,
@@ -104,7 +107,7 @@ const DataObjectFilterDialog: React.FC<DataObjectFilterDialogProps> = ({
     // Verwendet von Applikationen Filter
     {
       id: 'usedByApplications',
-      label: 'Verwendet von Applikationen',
+      label: t('usedByApplications'),
       type: 'multiSelect',
       options: filterOptions.availableUsedByApplications.map(app => ({
         value: app,
@@ -114,7 +117,7 @@ const DataObjectFilterDialog: React.FC<DataObjectFilterDialogProps> = ({
     // Bezug zu Capabilities Filter
     {
       id: 'relatedToCapabilities',
-      label: 'Bezug zu Capabilities',
+      label: t('relatedToCapabilities'),
       type: 'multiSelect',
       options: filterOptions.availableRelatedToCapabilities.map(cap => ({
         value: cap,
@@ -124,7 +127,7 @@ const DataObjectFilterDialog: React.FC<DataObjectFilterDialogProps> = ({
     // Teil von Architekturen Filter
     {
       id: 'partOfArchitectures',
-      label: 'Teil von Architekturen',
+      label: t('partOfArchitectures'),
       type: 'multiSelect',
       options: filterOptions.availablePartOfArchitectures.map(arch => ({
         value: arch,
@@ -134,17 +137,17 @@ const DataObjectFilterDialog: React.FC<DataObjectFilterDialogProps> = ({
     // Beschreibungs-Filter
     {
       id: 'descriptionFilter',
-      label: 'Beschreibung enthält',
+      label: t('descriptionContains'),
       type: 'text',
-      placeholder: 'Geben Sie einen Text ein...',
+      placeholder: t('descriptionPlaceholder'),
     },
     // Aktualisiert-Filter
     {
       id: 'updatedDateRange',
-      label: 'Aktualisiert (Datum)',
+      label: t('updatedDateRange'),
       type: 'dateRange',
-      fromLabel: 'Von',
-      toLabel: 'Bis',
+      fromLabel: t('dateFrom'),
+      toLabel: t('dateTo'),
     },
   ]
 
@@ -158,7 +161,7 @@ const DataObjectFilterDialog: React.FC<DataObjectFilterDialogProps> = ({
 
   return (
     <GenericFilterDialog
-      title="Filter für Datenobjekte"
+      title={t('title')}
       filterState={filters}
       filterFields={filterFields}
       onFilterChange={handleFilterChange}

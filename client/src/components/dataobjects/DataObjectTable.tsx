@@ -2,6 +2,7 @@
 
 import React, { useMemo, useCallback } from 'react'
 import { Chip } from '@mui/material'
+import { useTranslations } from 'next-intl'
 import { GenericTable } from '../common/GenericTable'
 import DataObjectForm, { DataObjectFormValues } from './DataObjectForm'
 import { formatDate } from './utils'
@@ -41,6 +42,8 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
   columnVisibility: _externalColumnVisibility,
   onColumnVisibilityChange: _externalOnColumnVisibilityChange,
 }) => {
+  const t = useTranslations('dataObjects.table')
+  const tClassifications = useTranslations('dataObjects.classifications')
   const columnHelper = createColumnHelper<DataObject>()
 
   // Verwende persistente Spaltensichtbarkeit
@@ -75,44 +78,47 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
   }
 
   // Hilfsfunktion für die Anzeige der Datenschutzklasse mit farblichem Chip
-  const getClassificationChip = useCallback((classification: DataClassification) => {
-    let color
-    let label
+  const getClassificationChip = useCallback(
+    (classification: DataClassification) => {
+      let color
+      let label
 
-    switch (classification) {
-      case DataClassification.PUBLIC:
-        color = 'success'
-        label = 'Public'
-        break
-      case DataClassification.INTERNAL:
-        color = 'info'
-        label = 'Internal'
-        break
-      case DataClassification.CONFIDENTIAL:
-        color = 'warning'
-        label = 'Confidential'
-        break
-      case DataClassification.STRICTLY_CONFIDENTIAL:
-        color = 'error'
-        label = 'Strictly Confidential'
-        break
-      default:
-        color = 'default'
-        label = classification
-    }
+      switch (classification) {
+        case DataClassification.PUBLIC:
+          color = 'success'
+          label = tClassifications('PUBLIC')
+          break
+        case DataClassification.INTERNAL:
+          color = 'info'
+          label = tClassifications('INTERNAL')
+          break
+        case DataClassification.CONFIDENTIAL:
+          color = 'warning'
+          label = tClassifications('CONFIDENTIAL')
+          break
+        case DataClassification.STRICTLY_CONFIDENTIAL:
+          color = 'error'
+          label = tClassifications('STRICTLY_CONFIDENTIAL')
+          break
+        default:
+          color = 'default'
+          label = classification
+      }
 
-    return <Chip label={label} size="small" color={color as any} variant="filled" />
-  }, [])
+      return <Chip label={label} size="small" color={color as any} variant="filled" />
+    },
+    [tClassifications]
+  )
 
   // Spalten-Definition für die DataObject-Tabelle
   const columns = useMemo(
     () => [
       columnHelper.accessor('name', {
-        header: 'Name',
+        header: t('name'),
         cell: info => info.getValue(),
       }),
       columnHelper.accessor('description', {
-        header: 'Beschreibung',
+        header: t('description'),
         cell: info => {
           const value = info.getValue()
           return value && value.length > 50 ? `${value.substring(0, 50)}...` : value || '-'
@@ -120,15 +126,15 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
         enableHiding: true,
       }),
       columnHelper.accessor('classification', {
-        header: 'Klassifikation',
+        header: t('classification'),
         cell: info => getClassificationChip(info.getValue()),
       }),
       columnHelper.accessor('format', {
-        header: 'Format',
+        header: t('format'),
         cell: info => info.getValue() || '-',
       }),
       columnHelper.accessor('dataSources', {
-        header: 'Datenquellen',
+        header: t('dataSources'),
         cell: info => {
           const dataSources = info.getValue()
           if (!dataSources || dataSources.length === 0) return '-'
@@ -137,7 +143,7 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
         },
       }),
       columnHelper.accessor('owners', {
-        header: 'Verantwortlicher',
+        header: t('owner'),
         cell: info => {
           const owners = info.getValue()
           return owners && owners.length > 0 ? `${owners[0].firstName} ${owners[0].lastName}` : '-'
@@ -145,7 +151,7 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
       }),
       // Weitere versteckte Spalten
       columnHelper.accessor('planningDate', {
-        header: 'Planungsdatum',
+        header: t('planningDate'),
         cell: info => {
           const date = info.getValue()
           return date ? new Date(date).toLocaleDateString('de-DE') : '-'
@@ -153,7 +159,7 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
         enableHiding: true,
       }),
       columnHelper.accessor('introductionDate', {
-        header: 'Einführungsdatum',
+        header: t('introductionDate'),
         cell: info => {
           const date = info.getValue()
           return date ? new Date(date).toLocaleDateString('de-DE') : '-'
@@ -161,7 +167,7 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
         enableHiding: true,
       }),
       columnHelper.accessor('endOfUseDate', {
-        header: 'Ende der Nutzung',
+        header: t('endOfUseDate'),
         cell: info => {
           const date = info.getValue()
           return date ? new Date(date).toLocaleDateString('de-DE') : '-'
@@ -169,7 +175,7 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
         enableHiding: true,
       }),
       columnHelper.accessor('endOfLifeDate', {
-        header: 'Ende der Lebenszeit',
+        header: t('endOfLifeDate'),
         cell: info => {
           const date = info.getValue()
           return date ? new Date(date).toLocaleDateString('de-DE') : '-'
@@ -177,7 +183,7 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
         enableHiding: true,
       }),
       columnHelper.accessor('usedByApplications', {
-        header: 'Genutzt von Applikationen',
+        header: t('usedByApplications'),
         cell: info => {
           const apps = info.getValue()
           return apps && apps.length > 0 ? apps.map((app: any) => app.name).join(', ') : '-'
@@ -185,7 +191,7 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
         enableHiding: true,
       }),
       columnHelper.accessor('relatedToCapabilities', {
-        header: 'Verwandte Capabilities',
+        header: t('relatedToCapabilities'),
         cell: info => {
           const capabilities = info.getValue()
           return capabilities && capabilities.length > 0
@@ -195,7 +201,7 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
         enableHiding: true,
       }),
       columnHelper.accessor('transferredInInterfaces', {
-        header: 'Übertragen in Schnittstellen',
+        header: t('transferredInInterfaces'),
         cell: info => {
           const interfaces = info.getValue()
           return interfaces && interfaces.length > 0
@@ -205,7 +211,7 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
         enableHiding: true,
       }),
       columnHelper.accessor('partOfArchitectures', {
-        header: 'Teil von Architekturen',
+        header: t('partOfArchitectures'),
         cell: info => {
           const architectures = info.getValue()
           return architectures && architectures.length > 0
@@ -215,7 +221,7 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
         enableHiding: true,
       }),
       columnHelper.accessor('depictedInDiagrams', {
-        header: 'Dargestellt in Diagrammen',
+        header: t('depictedInDiagrams'),
         cell: info => {
           const diagrams = info.getValue()
           return diagrams && diagrams.length > 0
@@ -226,12 +232,12 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
       }),
       // Versteckte Zeitstempel-Spalten am Ende
       columnHelper.accessor('createdAt', {
-        header: 'Erstellt am',
+        header: t('createdAt'),
         cell: info => formatDate(info.getValue()),
         enableHiding: true,
       }),
       columnHelper.accessor('updatedAt', {
-        header: 'Aktualisiert am',
+        header: t('updatedAt'),
         cell: info => {
           const value = info.getValue()
           return value ? formatDate(value) : '-'
@@ -239,7 +245,7 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
         enableHiding: true,
       }),
     ],
-    [columnHelper, getClassificationChip]
+    [columnHelper, getClassificationChip, t]
   )
 
   // Mapping-Funktion für die Umwandlung von DataObject zu DataObjectFormValues

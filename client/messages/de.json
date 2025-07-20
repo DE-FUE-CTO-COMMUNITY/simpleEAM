@@ -747,5 +747,97 @@
       "technical": "Technisch",
       "principles": "Prinzipien"
     }
+  },
+  "dataObjects": {
+    "title": "Datenobjekte",
+    "addNew": "Neues Datenobjekt erstellen",
+    "editTitle": "Datenobjekt bearbeiten",
+    "createTitle": "Neues Datenobjekt erstellen",
+    "viewTitle": "Datenobjekt Details",
+    "deleteConfirmation": "Sind Sie sicher, dass Sie dieses Datenobjekt löschen möchten?",
+    "noDataObjectsFound": "Keine Datenobjekte gefunden.",
+    "searchPlaceholder": "Datenobjekte suchen...",
+    "messages": {
+      "loadError": "Fehler beim Laden der Datenobjekte",
+      "createSuccess": "Datenobjekt erfolgreich erstellt",
+      "createError": "Fehler beim Erstellen des Datenobjekts",
+      "updateSuccess": "Datenobjekt erfolgreich aktualisiert",
+      "updateError": "Fehler beim Aktualisieren des Datenobjekts",
+      "deleteSuccess": "Datenobjekt erfolgreich gelöscht",
+      "deleteError": "Fehler beim Löschen des Datenobjekts"
+    },
+    "form": {
+      "name": "Name",
+      "description": "Beschreibung",
+      "classification": "Klassifikation",
+      "format": "Format",
+      "dataSources": "Datenquellen",
+      "planningDate": "Planungsdatum",
+      "introductionDate": "Einführungsdatum",
+      "endOfUseDate": "Ende der Nutzung",
+      "endOfLifeDate": "Ende der Lebensdauer",
+      "owner": "Verantwortlicher",
+      "usedByApplications": "Verwendet von Applikationen",
+      "relatedToCapabilities": "Verwandt mit Capabilities",
+      "transferredInInterfaces": "Übertragen in Schnittstellen",
+      "partOfArchitectures": "Teil von Architekturen",
+      "depictedInDiagrams": "In Diagrammen dargestellt",
+      "tags": "Tags",
+      "none": "Keine",
+      "createTitle": "Neues Datenobjekt erstellen",
+      "editTitle": "Datenobjekt bearbeiten",
+      "viewTitle": "Datenobjekt Details"
+    },
+    "table": {
+      "name": "Name",
+      "description": "Beschreibung",
+      "classification": "Klassifikation",
+      "format": "Format",
+      "dataSources": "Datenquellen",
+      "planningDate": "Planungsdatum",
+      "introductionDate": "Einführungsdatum",
+      "endOfUseDate": "Ende der Nutzung",
+      "endOfLifeDate": "Ende der Lebensdauer",
+      "owner": "Verantwortlicher",
+      "tags": "Tags",
+      "usedByApplications": "Verwendet von Applikationen",
+      "relatedToCapabilities": "Verwandt mit Capabilities",
+      "transferredInInterfaces": "Übertragen in Schnittstellen",
+      "partOfArchitectures": "Teil von Architekturen",
+      "depictedInDiagrams": "In Diagrammen dargestellt",
+      "createdAt": "Erstellt am",
+      "updatedAt": "Aktualisiert am",
+      "actions": "Aktionen"
+    },
+    "classifications": {
+      "PUBLIC": "Öffentlich",
+      "INTERNAL": "Intern",
+      "CONFIDENTIAL": "Vertraulich",
+      "STRICTLY_CONFIDENTIAL": "Streng vertraulich"
+    },
+    "filter": {
+      "title": "Datenobjekte filtern",
+      "classification": "Klassifikation",
+      "format": "Format",
+      "dataSources": "Datenquellen",
+      "owner": "Verantwortlicher",
+      "usedByApplications": "Verwendet von Applikationen",
+      "relatedToCapabilities": "Verwandt mit Capabilities",
+      "partOfArchitectures": "Teil von Architekturen",
+      "descriptionContains": "Beschreibung enthält",
+      "descriptionPlaceholder": "Geben Sie einen Text ein...",
+      "allOwners": "Alle Verantwortlichen",
+      "updatedInPeriod": "Aktualisiert im Zeitraum",
+      "updatedDateRange": "Aktualisiert im Zeitraum",
+      "dateFrom": "Von",
+      "dateTo": "Bis",
+      "enterText": "Geben Sie einen Text ein..."
+    },
+    "tabs": {
+      "general": "Allgemein",
+      "lifecycle": "Lebenszyklus",
+      "relationships": "Beziehungen",
+      "architectures": "Architekturen"
+    }
   }
 }
