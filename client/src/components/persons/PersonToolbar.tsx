@@ -26,14 +26,15 @@ const PersonToolbar: React.FC<PersonToolbarProps> = ({
   ...props
 }) => {
   const t = useTranslations('persons')
+  const tToolbar = useTranslations('persons.toolbar')
 
   return (
     <GenericToolbar
       {...props}
       searchPlaceholder={t('searchPlaceholder')}
-      filterTooltip="Personenfilter hinzufügen"
-      editFilterTooltip="Personenfilter bearbeiten"
-      resetFilterTooltip="Personenfilter zurücksetzen"
+      filterTooltip={tToolbar('filterTooltip')}
+      editFilterTooltip={tToolbar('editFilterTooltip')}
+      resetFilterTooltip={tToolbar('resetFilterTooltip')}
       table={table}
       enableColumnVisibilityToggle={enableColumnVisibilityToggle}
       columnVisibility={columnVisibility}

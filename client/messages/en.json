@@ -1182,6 +1182,11 @@
       "dateFrom": "From",
       "dateTo": "To",
       "enterText": "Enter text..."
+    },
+    "toolbar": {
+      "filterTooltip": "Add person filter",
+      "editFilterTooltip": "Edit person filter",
+      "resetFilterTooltip": "Reset person filter"
     }
   }
 }

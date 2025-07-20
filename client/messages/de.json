@@ -1185,6 +1185,11 @@
       "dateFrom": "Von",
       "dateTo": "Bis",
       "enterText": "Text eingeben..."
+    },
+    "toolbar": {
+      "filterTooltip": "Personenfilter hinzufügen",
+      "editFilterTooltip": "Personenfilter bearbeiten",
+      "resetFilterTooltip": "Personenfilter zurücksetzen"
     }
   }
 }
