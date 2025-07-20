@@ -1191,5 +1191,114 @@
       "editFilterTooltip": "Personenfilter bearbeiten",
       "resetFilterTooltip": "Personenfilter zurücksetzen"
     }
+  },
+  "importExport": {
+    "title": "Import/Export",
+    "tabs": {
+      "import": "Import",
+      "export": "Export",
+      "management": "Datenverwaltung"
+    },
+    "import": {
+      "title": "Import-Einstellungen",
+      "dataType": "Datentyp",
+      "fileFormat": "Dateiformat",
+      "updateMode": "Update-Modus",
+      "selectFile": "Datei auswählen",
+      "fileStatus": "Datei-Status",
+      "fileName": "Datei",
+      "fileSize": "Größe",
+      "validRecords": "{count} gültige Datensätze von {total} gesamt",
+      "errorsFound": "{count} Fehler gefunden",
+      "errors": "Fehler",
+      "moreErrors": "... und {count} weitere Fehler",
+      "rowLabel": "Zeile:",
+      "importing": "Importiere Daten... {progress}%",
+      "startImport": "Import starten",
+      "importing_": "Importiere...",
+      "messages": {
+        "multiTabValidated": "Multi-Tab-Datei erfolgreich validiert. {count} gültige Datensätze gefunden.",
+        "multiTabWarnings": "Multi-Tab-Datei geladen, aber {count} Fehler gefunden.",
+        "singleTabValidated": "Datei erfolgreich validiert. {count} gültige Datensätze gefunden.",
+        "singleTabWarnings": "Datei geladen, aber {count} Fehler gefunden.",
+        "fileLoadError": "Fehler beim Laden der Datei: {error}",
+        "multiTabImportSuccess": "Multi-Tab-Import erfolgreich abgeschlossen. {count} Datensätze importiert.",
+        "singleTabImportSuccess": "{entityType} erfolgreich importiert. {count} Datensätze importiert.",
+        "importError": "Fehler beim Import: {error}",
+        "templateNotAvailable": "Für Multi-Entity-Import ist kein Template verfügbar.",
+        "templateDownloadError": "Fehler beim Download der Vorlage: {error}"
+      }
+    },
+    "export": {
+      "title": "Export-Einstellungen",
+      "dataType": "Datentyp",
+      "fileFormat": "Dateiformat",
+      "preview": "Export-Vorschau",
+      "previewText": "Export umfasst {entityType} im {format}-Format mit GraphQL-Feldnamen für direkten Re-Import.",
+      "graphqlFields": "GraphQL-Felder (re-import-fähig)",
+      "relationInfo": "ℹ️ Relationen werden als komma-getrennte IDs exportiert, um direkten Re-Import zu ermöglichen",
+      "allEntitiesInfo": "Export umfasst alle Entitätstypen mit ihren jeweiligen Feldern:",
+      "diagramExportWarning": "Hinweis für Excel/CSV-Export: Diagramme werden ohne ihre Inhalte (diagramJson) exportiert, da diese zu groß für Excel-Zellen sind. Alle anderen Metadaten der Diagramme sind verfügbar.",
+      "singleDiagramExportWarning": "Hinweis für Excel/CSV-Export: Das Feld \"diagramJson\" wird nicht exportiert, da die Diagramminhalte zu groß für Excel-Zellen sind. Alle anderen Metadaten sind verfügbar.",
+      "startExport": "Export starten",
+      "exporting": "Exportiere...",
+      "messages": {
+        "exportSuccess": "{entityType} erfolgreich exportiert.",
+        "exportError": "Fehler beim Export: {error}",
+        "csvNotAvailable": "Für den Export aller Daten ist das CSV-Format nicht verfügbar. Verwenden Sie Excel oder JSON."
+      }
+    },
+    "management": {
+      "title": "⚠️ Admin-Bereich - Datenverwaltung",
+      "warning": "Hier können Sie Daten aus der Datenbank löschen. Diese Aktionen können nicht rückgängig gemacht werden! Stellen Sie sicher, dass Sie ein Backup haben, bevor Sie Daten löschen.",
+      "individualDelete": "Einzelne Datentypen löschen",
+      "selectDataType": "Datentyp auswählen",
+      "deleteButton": "{entityType} löschen",
+      "deleting": "Lösche...",
+      "deleteDescription": "Löscht alle Einträge des ausgewählten Datentyps aus der Datenbank.",
+      "completeDelete": "⚠️ Komplette Datenbank löschen",
+      "completeDeleteWarning": "ACHTUNG: Diese Aktion löscht ALLE Daten aus der Datenbank! Dies umfasst alle Business Capabilities, Applikationen, Datenobjekte, Schnittstellen, Personen, Architekturen und Diagramme.",
+      "deleteAllButton": "Alle Daten löschen",
+      "deleteAllDescription": "Diese Aktion kann nicht rückgängig gemacht werden. Stellen Sie sicher, dass Sie ein vollständiges Backup haben.",
+      "confirmTitle": "Löschen bestätigen",
+      "confirmText": "Sind Sie sicher, dass Sie {entityType} löschen möchten?",
+      "confirmAllText": "alle Daten",
+      "confirmWarning": "Diese Aktion kann nicht rückgängig gemacht werden!",
+      "messages": {
+        "deleteSuccess": "{entityType} erfolgreich gelöscht. {count} Datensätze entfernt.",
+        "deleteAllSuccess": "Alle Daten erfolgreich gelöscht. {count} Datensätze entfernt.",
+        "deleteError": "Fehler beim Löschen: {error}"
+      }
+    },
+    "templates": {
+      "emptyTemplate": "Leeres Template",
+      "templateWithExamples": "Template mit Beispielen"
+    },
+    "actions": {
+      "cancel": "Abbrechen",
+      "delete": "Löschen"
+    },
+    "entityTypes": {
+      "businessCapabilities": "Business Capabilities",
+      "applications": "Anwendungen",
+      "dataObjects": "Datenobjekte",
+      "interfaces": "Schnittstellen",
+      "persons": "Personen",
+      "architectures": "Architekturen",
+      "diagrams": "Diagramme",
+      "architecturePrinciples": "Architekturprinzipien",
+      "infrastructures": "Infrastruktur",
+      "all": "Alle Daten"
+    },
+    "updateModes": {
+      "overwrite": "Überschreiben",
+      "merge": "Zusammenführen",
+      "skipExisting": "Bestehende überspringen"
+    },
+    "fileFormats": {
+      "xlsx": "Excel (.xlsx)",
+      "csv": "CSV (.csv)",
+      "json": "JSON (.json)"
+    }
   }
 }

@@ -22,6 +22,7 @@ import {
   Warning as WarningIcon,
   Info as InfoIcon,
 } from '@mui/icons-material'
+import { useTranslations } from 'next-intl'
 
 import { ImportSettings, ValidationResult } from './types'
 import { entityTypeLabels, isFormatLocked, updateModeOptions } from './constants'
@@ -50,6 +51,10 @@ const ImportDialog: React.FC<ImportDialogProps> = ({
   onFormatChange,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const t = useTranslations('importExport.import')
+  const tEntityTypes = useTranslations('importExport.entityTypes')
+  const tUpdateModes = useTranslations('importExport.updateModes')
+  const tFileFormats = useTranslations('importExport.fileFormats')
 
   return (
     <Box sx={{ p: 2 }}>
@@ -57,21 +62,21 @@ const ImportDialog: React.FC<ImportDialogProps> = ({
         <Grid size={12}>
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
-              Import-Einstellungen
+              {t('title')}
             </Typography>
 
             <Grid container spacing={2}>
               <Grid size={6}>
                 <FormControl fullWidth margin="normal">
-                  <InputLabel>Datentyp</InputLabel>
+                  <InputLabel>{t('dataType')}</InputLabel>
                   <Select
                     value={importSettings.entityType}
-                    label="Datentyp"
+                    label={t('dataType')}
                     onChange={e => onEntityTypeChange(e.target.value)}
                   >
-                    {Object.entries(entityTypeLabels).map(([key, label]) => (
+                    {Object.entries(entityTypeLabels).map(([key, _label]) => (
                       <MenuItem key={key} value={key}>
-                        {label}
+                        {tEntityTypes(key as keyof typeof entityTypeLabels)}
                       </MenuItem>
                     ))}
                   </Select>
@@ -80,29 +85,29 @@ const ImportDialog: React.FC<ImportDialogProps> = ({
 
               <Grid size={6}>
                 <FormControl fullWidth margin="normal">
-                  <InputLabel>Dateiformat</InputLabel>
+                  <InputLabel>{t('fileFormat')}</InputLabel>
                   <Select
                     value={importSettings.format}
-                    label="Dateiformat"
+                    label={t('fileFormat')}
                     onChange={e => onFormatChange(e.target.value)}
                   >
                     <MenuItem
                       value="xlsx"
                       disabled={isFormatLocked(importSettings.entityType, 'xlsx')}
                     >
-                      Excel (.xlsx)
+                      {tFileFormats('xlsx')}
                     </MenuItem>
-                    <MenuItem value="json">JSON (.json)</MenuItem>
+                    <MenuItem value="json">{tFileFormats('json')}</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
 
               <Grid size={12}>
                 <FormControl fullWidth margin="normal">
-                  <InputLabel>Update-Modus</InputLabel>
+                  <InputLabel>{t('updateMode')}</InputLabel>
                   <Select
                     value={importSettings.updateMode}
-                    label="Update-Modus"
+                    label={t('updateMode')}
                     onChange={e =>
                       setImportSettings({
                         ...importSettings,
@@ -112,7 +117,7 @@ const ImportDialog: React.FC<ImportDialogProps> = ({
                   >
                     {updateModeOptions.map(option => (
                       <MenuItem key={option.value} value={option.value}>
-                        {option.label}
+                        {tUpdateModes(option.value)}
                       </MenuItem>
                     ))}
                   </Select>
@@ -136,7 +141,7 @@ const ImportDialog: React.FC<ImportDialogProps> = ({
                       component="span"
                       fullWidth
                     >
-                      Datei auswählen
+                      {t('selectFile')}
                     </Button>
                   </label>
                 </Box>
@@ -149,13 +154,13 @@ const ImportDialog: React.FC<ImportDialogProps> = ({
           <Grid size={12}>
             <Paper sx={{ p: 3 }}>
               <Typography variant="h6" gutterBottom>
-                Datei-Status
+                {t('fileStatus')}
               </Typography>
               <Typography variant="body2" color="textSecondary">
-                Datei: {selectedFile.name}
+                {t('fileName')}: {selectedFile.name}
               </Typography>
               <Typography variant="body2" color="textSecondary">
-                Größe: {(selectedFile.size / 1024).toFixed(1)} KB
+                {t('fileSize')}: {(selectedFile.size / 1024).toFixed(1)} KB
               </Typography>
 
               {validationResult && (
@@ -165,12 +170,14 @@ const ImportDialog: React.FC<ImportDialogProps> = ({
                     icon={validationResult.isValid ? <InfoIcon /> : <WarningIcon />}
                   >
                     <Typography variant="body2">
-                      {validationResult.summary.validRows} gültige Datensätze von{' '}
-                      {validationResult.summary.totalRows} gesamt
+                      {t('validRecords', {
+                        count: validationResult.summary.validRows,
+                        total: validationResult.summary.totalRows,
+                      })}
                     </Typography>
                     {validationResult.errors.length > 0 && (
                       <Typography variant="body2" color="error">
-                        {validationResult.errors.length} Fehler gefunden
+                        {t('errorsFound', { count: validationResult.errors.length })}
                       </Typography>
                     )}
                   </Alert>
@@ -178,7 +185,7 @@ const ImportDialog: React.FC<ImportDialogProps> = ({
                   {validationResult.errors.length > 0 && (
                     <Box sx={{ mt: 2 }}>
                       <Typography variant="subtitle2" gutterBottom>
-                        Fehler:
+                        {t('errors')}:
                       </Typography>
                       <List dense>
                         {validationResult.errors.slice(0, 5).map((error, index) => (
@@ -188,14 +195,16 @@ const ImportDialog: React.FC<ImportDialogProps> = ({
                             </ListItemIcon>
                             <ListItemText
                               primary={error.message || error}
-                              secondary={error.row && `Zeile: ${error.row}`}
+                              secondary={error.row && `${t('rowLabel')} ${error.row}`}
                             />
                           </ListItem>
                         ))}
                         {validationResult.errors.length > 5 && (
                           <ListItem>
                             <ListItemText
-                              primary={`... und ${validationResult.errors.length - 5} weitere Fehler`}
+                              primary={t('moreErrors', {
+                                count: validationResult.errors.length - 5,
+                              })}
                             />
                           </ListItem>
                         )}
@@ -209,7 +218,7 @@ const ImportDialog: React.FC<ImportDialogProps> = ({
                 <Box sx={{ mt: 2 }}>
                   <CircularProgress size={24} />
                   <Typography variant="body2" sx={{ mt: 1 }}>
-                    Importiere Daten... {importProgress}%
+                    {t('importing', { progress: importProgress })}
                   </Typography>
                 </Box>
               )}

@@ -1188,5 +1188,114 @@
       "editFilterTooltip": "Edit person filter",
       "resetFilterTooltip": "Reset person filter"
     }
+  },
+  "importExport": {
+    "title": "Import/Export",
+    "tabs": {
+      "import": "Import",
+      "export": "Export",
+      "management": "Data Management"
+    },
+    "import": {
+      "title": "Import Settings",
+      "dataType": "Data Type",
+      "fileFormat": "File Format",
+      "updateMode": "Update Mode",
+      "selectFile": "Select File",
+      "fileStatus": "File Status",
+      "fileName": "File",
+      "fileSize": "Size",
+      "validRecords": "{count} valid records of {total} total",
+      "errorsFound": "{count} errors found",
+      "errors": "Errors",
+      "moreErrors": "... and {count} more errors",
+      "rowLabel": "Row:",
+      "importing": "Importing data... {progress}%",
+      "startImport": "Start Import",
+      "importing_": "Importing...",
+      "messages": {
+        "multiTabValidated": "Multi-tab file successfully validated. {count} valid records found.",
+        "multiTabWarnings": "Multi-tab file loaded, but {count} errors found.",
+        "singleTabValidated": "File successfully validated. {count} valid records found.",
+        "singleTabWarnings": "File loaded, but {count} errors found.",
+        "fileLoadError": "Error loading file: {error}",
+        "multiTabImportSuccess": "Multi-tab import successfully completed. {count} records imported.",
+        "singleTabImportSuccess": "{entityType} successfully imported. {count} records imported.",
+        "importError": "Error during import: {error}",
+        "templateNotAvailable": "No template available for multi-entity import.",
+        "templateDownloadError": "Error downloading template: {error}"
+      }
+    },
+    "export": {
+      "title": "Export Settings",
+      "dataType": "Data Type",
+      "fileFormat": "File Format",
+      "preview": "Export Preview",
+      "previewText": "Export includes {entityType} in {format} format with GraphQL field names for direct re-import.",
+      "graphqlFields": "GraphQL Fields (re-import ready)",
+      "relationInfo": "ℹ️ Relations are exported as comma-separated IDs to enable direct re-import",
+      "allEntitiesInfo": "Export includes all entity types with their respective fields:",
+      "diagramExportWarning": "Note for Excel/CSV export: Diagrams are exported without their content (diagramJson) as it's too large for Excel cells. All other diagram metadata is available.",
+      "singleDiagramExportWarning": "Note for Excel/CSV export: The \"diagramJson\" field is not exported as diagram content is too large for Excel cells. All other metadata is available.",
+      "startExport": "Start Export",
+      "exporting": "Exporting...",
+      "messages": {
+        "exportSuccess": "{entityType} successfully exported.",
+        "exportError": "Error during export: {error}",
+        "csvNotAvailable": "CSV format is not available for exporting all data. Use Excel or JSON."
+      }
+    },
+    "management": {
+      "title": "⚠️ Admin Area - Data Management",
+      "warning": "Here you can delete data from the database. These actions cannot be undone! Make sure you have a backup before deleting data.",
+      "individualDelete": "Delete Individual Data Types",
+      "selectDataType": "Select Data Type",
+      "deleteButton": "Delete {entityType}",
+      "deleting": "Deleting...",
+      "deleteDescription": "Deletes all entries of the selected data type from the database.",
+      "completeDelete": "⚠️ Complete Database Deletion",
+      "completeDeleteWarning": "WARNING: This action will delete ALL data from the database! This includes all Business Capabilities, Applications, Data Objects, Interfaces, Persons, Architectures, and Diagrams.",
+      "deleteAllButton": "Delete All Data",
+      "deleteAllDescription": "This action cannot be undone. Make sure you have a complete backup.",
+      "confirmTitle": "Confirm Deletion",
+      "confirmText": "Are you sure you want to delete {entityType}?",
+      "confirmAllText": "all data",
+      "confirmWarning": "This action cannot be undone!",
+      "messages": {
+        "deleteSuccess": "{entityType} successfully deleted. {count} records removed.",
+        "deleteAllSuccess": "All data successfully deleted. {count} records removed.",
+        "deleteError": "Error during deletion: {error}"
+      }
+    },
+    "templates": {
+      "emptyTemplate": "Empty Template",
+      "templateWithExamples": "Template with Examples"
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "delete": "Delete"
+    },
+    "entityTypes": {
+      "businessCapabilities": "Business Capabilities",
+      "applications": "Applications",
+      "dataObjects": "Data Objects",
+      "interfaces": "Interfaces",
+      "persons": "Persons",
+      "architectures": "Architectures",
+      "diagrams": "Diagrams",
+      "architecturePrinciples": "Architecture Principles",
+      "infrastructures": "Infrastructure",
+      "all": "All Data"
+    },
+    "updateModes": {
+      "overwrite": "Overwrite",
+      "merge": "Merge",
+      "skipExisting": "Skip Existing"
+    },
+    "fileFormats": {
+      "xlsx": "Excel (.xlsx)",
+      "csv": "CSV (.csv)",
+      "json": "JSON (.json)"
+    }
   }
 }

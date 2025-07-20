@@ -11,6 +11,7 @@ import {
 } from '@mui/material'
 import Grid from '@mui/material/Grid'
 import { Info as InfoIcon } from '@mui/icons-material'
+import { useTranslations } from 'next-intl'
 
 import { ExportSettings } from './types'
 import { entityTypeLabels } from './constants'
@@ -26,27 +27,30 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
   onEntityTypeChange,
   onFormatChange,
 }) => {
+  const t = useTranslations('importExport.export')
+  const tEntityTypes = useTranslations('importExport.entityTypes')
+  const tFileFormats = useTranslations('importExport.fileFormats')
   return (
     <Box sx={{ p: 2 }}>
       <Grid container spacing={3} sx={{ width: '100%' }}>
         <Grid size={12}>
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
-              Export-Einstellungen
+              {t('title')}
             </Typography>
 
             <Grid container spacing={2}>
               <Grid size={6}>
                 <FormControl fullWidth margin="normal">
-                  <InputLabel>Datentyp</InputLabel>
+                  <InputLabel>{t('dataType')}</InputLabel>
                   <Select
                     value={exportSettings.entityType}
-                    label="Datentyp"
+                    label={t('dataType')}
                     onChange={e => onEntityTypeChange(e.target.value)}
                   >
-                    {Object.entries(entityTypeLabels).map(([key, label]) => (
+                    {Object.entries(entityTypeLabels).map(([key, _label]) => (
                       <MenuItem key={key} value={key}>
-                        {label}
+                        {tEntityTypes(key as keyof typeof entityTypeLabels)}
                       </MenuItem>
                     ))}
                   </Select>
@@ -55,17 +59,17 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
 
               <Grid size={6}>
                 <FormControl fullWidth margin="normal">
-                  <InputLabel>Dateiformat</InputLabel>
+                  <InputLabel>{t('fileFormat')}</InputLabel>
                   <Select
                     value={exportSettings.format}
-                    label="Dateiformat"
+                    label={t('fileFormat')}
                     onChange={e => onFormatChange(e.target.value)}
                   >
-                    <MenuItem value="xlsx">Excel (.xlsx)</MenuItem>
+                    <MenuItem value="xlsx">{tFileFormats('xlsx')}</MenuItem>
                     <MenuItem value="csv" disabled={exportSettings.entityType === 'all'}>
-                      CSV (.csv)
+                      {tFileFormats('csv')}
                     </MenuItem>
-                    <MenuItem value="json">JSON (.json)</MenuItem>
+                    <MenuItem value="json">{tFileFormats('json')}</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
@@ -76,19 +80,20 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
         <Grid size={12}>
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
-              Export-Vorschau
+              {t('preview')}
             </Typography>
             <Alert severity="info" icon={<InfoIcon />}>
               <Typography variant="body2">
-                Export umfasst <strong>{entityTypeLabels[exportSettings.entityType]}</strong> im{' '}
-                <strong>{exportSettings.format.toUpperCase()}</strong>-Format mit GraphQL-Feldnamen
-                für direkten Re-Import.
+                {t('previewText', {
+                  entityType: tEntityTypes(exportSettings.entityType),
+                  format: exportSettings.format.toUpperCase(),
+                })}
               </Typography>
             </Alert>
 
             <Box sx={{ mt: 2 }}>
               <Typography variant="body2" color="textSecondary">
-                <strong>GraphQL-Felder (re-import-fähig):</strong>
+                <strong>{t('graphqlFields')}:</strong>
               </Typography>
               <Box sx={{ mt: 1, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                 {(() => {
@@ -314,15 +319,12 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
                     return (
                       <Box sx={{ width: '100%' }}>
                         <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
-                          Export umfasst alle Entitätstypen mit ihren jeweiligen Feldern:
+                          {t('allEntitiesInfo')}
                         </Typography>
                         {exportSettings.format !== 'json' && (
                           <Alert severity="info" sx={{ mb: 2 }}>
                             <Typography variant="body2">
-                              <strong>Hinweis für Excel/CSV-Export:</strong> Diagramme werden ohne
-                              ihre Inhalte (diagramJson) exportiert, da diese zu groß für
-                              Excel-Zellen sind. Alle anderen Metadaten der Diagramme sind
-                              verfügbar.
+                              <strong>{t('diagramExportWarning')}</strong>
                             </Typography>
                           </Alert>
                         )}
@@ -377,9 +379,7 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
                       <Box sx={{ width: '100%' }}>
                         <Alert severity="info" sx={{ mb: 2 }}>
                           <Typography variant="body2">
-                            <strong>Hinweis für Excel/CSV-Export:</strong> Das Feld
-                            &quot;diagramJson&quot; wird nicht exportiert, da die Diagramminhalte zu
-                            groß für Excel-Zellen sind. Alle anderen Metadaten sind verfügbar.
+                            <strong>{t('singleDiagramExportWarning')}</strong>
                           </Typography>
                         </Alert>
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 2 }}>
@@ -426,8 +426,7 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
               </Box>
 
               <Typography variant="body2" color="textSecondary" sx={{ mt: 2 }}>
-                ℹ️ Relationen werden als komma-getrennte IDs exportiert, um direkten Re-Import zu
-                ermöglichen
+                {t('relationInfo')}
               </Typography>
             </Box>
           </Paper>

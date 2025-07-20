@@ -1,6 +1,6 @@
 import { EntityType, ImportSettings, ExportSettings, DeleteSettings } from './types'
 
-// Entity Type Labels für die UI
+// Entity Type Labels für die UI - werden durch i18n ersetzt
 export const entityTypeLabels: Record<EntityType, string> = {
   businessCapabilities: 'Business Capabilities',
   applications: 'Anwendungen',
@@ -46,7 +46,7 @@ export const formatOptions = {
   export: ['xlsx', 'csv', 'json'] as const,
 }
 
-// Update-Modus-Optionen
+// Update-Modus-Optionen - werden durch i18n ersetzt
 export const updateModeOptions = [
   { value: 'overwrite', label: 'Überschreiben' },
   { value: 'merge', label: 'Zusammenführen' },

@@ -17,6 +17,7 @@ import {
 } from '@mui/material'
 import Grid from '@mui/material/Grid'
 import { Error as ErrorIcon, Warning as WarningIcon } from '@mui/icons-material'
+import { useTranslations } from 'next-intl'
 
 import { DeleteSettings } from './types'
 import { entityTypeLabels } from './constants'
@@ -42,27 +43,31 @@ const ManagementDialog: React.FC<ManagementDialogProps> = ({
   onOpenDeleteConfirmDialog,
   onCloseDeleteConfirmDialog,
 }) => {
+  const t = useTranslations('importExport.management')
+  const tEntityTypes = useTranslations('importExport.entityTypes')
+  const tActions = useTranslations('importExport.actions')
   return (
     <>
       {/* Delete Confirmation Dialog */}
       <Dialog open={showDeleteConfirm} onClose={onCloseDeleteConfirmDialog}>
-        <DialogTitle>Löschen bestätigen</DialogTitle>
+        <DialogTitle>{t('confirmTitle')}</DialogTitle>
         <DialogContent>
           <Typography>
-            Sind Sie sicher, dass Sie{' '}
-            {deleteEntityType === 'all'
-              ? 'alle Daten'
-              : entityTypeLabels[deleteEntityType as keyof typeof entityTypeLabels]}{' '}
-            löschen möchten?
+            {t('confirmText', {
+              entityType:
+                deleteEntityType === 'all'
+                  ? t('confirmAllText')
+                  : tEntityTypes(deleteEntityType as keyof typeof entityTypeLabels),
+            })}
           </Typography>
           <Typography variant="body2" color="error" sx={{ mt: 1 }}>
-            Diese Aktion kann nicht rückgängig gemacht werden!
+            {t('confirmWarning')}
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={onCloseDeleteConfirmDialog}>Abbrechen</Button>
+          <Button onClick={onCloseDeleteConfirmDialog}>{tActions('cancel')}</Button>
           <Button onClick={onDeleteConfirm} color="error" disabled={isDeleting}>
-            {isDeleting ? 'Lösche...' : 'Löschen'}
+            {isDeleting ? t('deleting') : tActions('delete')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -73,27 +78,23 @@ const ManagementDialog: React.FC<ManagementDialogProps> = ({
           <Grid size={12}>
             <Alert severity="warning" icon={<WarningIcon />}>
               <Typography variant="h6" gutterBottom>
-                ⚠️ Admin-Bereich - Datenverwaltung
+                {t('title')}
               </Typography>
-              <Typography variant="body2">
-                Hier können Sie Daten aus der Datenbank löschen.{' '}
-                <strong>Diese Aktionen können nicht rückgängig gemacht werden!</strong>
-                Stellen Sie sicher, dass Sie ein Backup haben, bevor Sie Daten löschen.
-              </Typography>
+              <Typography variant="body2">{t('warning')}</Typography>
             </Alert>
           </Grid>
 
           <Grid size={12}>
             <Paper sx={{ p: 3 }}>
               <Typography variant="h6" gutterBottom>
-                Einzelne Datentypen löschen
+                {t('individualDelete')}
               </Typography>
 
               <FormControl fullWidth margin="normal">
-                <InputLabel>Datentyp auswählen</InputLabel>
+                <InputLabel>{t('selectDataType')}</InputLabel>
                 <Select
                   value={deleteSettings.entityType}
-                  label="Datentyp auswählen"
+                  label={t('selectDataType')}
                   onChange={e =>
                     setDeleteSettings({
                       ...deleteSettings,
@@ -103,9 +104,9 @@ const ManagementDialog: React.FC<ManagementDialogProps> = ({
                 >
                   {Object.entries(entityTypeLabels)
                     .filter(([key]) => key !== 'all')
-                    .map(([key, label]) => (
+                    .map(([key, _label]) => (
                       <MenuItem key={key} value={key}>
-                        {label}
+                        {tEntityTypes(key as keyof typeof entityTypeLabels)}
                       </MenuItem>
                     ))}
                 </Select>
@@ -120,11 +121,11 @@ const ManagementDialog: React.FC<ManagementDialogProps> = ({
                   onClick={() => onOpenDeleteConfirmDialog(deleteSettings.entityType)}
                 >
                   {isDeleting
-                    ? 'Lösche...'
-                    : `${entityTypeLabels[deleteSettings.entityType]} löschen`}
+                    ? t('deleting')
+                    : t('deleteButton', { entityType: tEntityTypes(deleteSettings.entityType) })}
                 </Button>
                 <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
-                  Löscht alle Einträge des ausgewählten Datentyps aus der Datenbank.
+                  {t('deleteDescription')}
                 </Typography>
               </Box>
             </Paper>
@@ -133,14 +134,12 @@ const ManagementDialog: React.FC<ManagementDialogProps> = ({
           <Grid size={12}>
             <Paper sx={{ p: 3, border: '2px solid', borderColor: 'error.main' }}>
               <Typography variant="h6" gutterBottom color="error">
-                ⚠️ Komplette Datenbank löschen
+                {t('completeDelete')}
               </Typography>
 
               <Alert severity="error" sx={{ mb: 2, mt: 2 }}>
                 <Typography variant="body2">
-                  <strong>ACHTUNG:</strong> Diese Aktion löscht ALLE Daten aus der Datenbank! Dies
-                  umfasst alle Business Capabilities, Applikationen, Datenobjekte, Schnittstellen,
-                  Personen, Architekturen und Diagramme.
+                  <strong>{t('completeDeleteWarning')}</strong>
                 </Typography>
               </Alert>
 
@@ -152,11 +151,10 @@ const ManagementDialog: React.FC<ManagementDialogProps> = ({
                 onClick={() => onOpenDeleteConfirmDialog('all')}
                 sx={{ mt: 2 }}
               >
-                {isDeleting ? 'Lösche...' : 'Alle Daten löschen'}
+                {isDeleting ? t('deleting') : t('deleteAllButton')}
               </Button>
               <Typography variant="body2" color="error" sx={{ mt: 1 }}>
-                Diese Aktion kann nicht rückgängig gemacht werden. Stellen Sie sicher, dass Sie ein
-                vollständiges Backup haben.
+                {t('deleteAllDescription')}
               </Typography>
             </Paper>
           </Grid>

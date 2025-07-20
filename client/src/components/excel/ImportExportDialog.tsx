@@ -17,6 +17,7 @@ import {
 } from '@mui/icons-material'
 import { useSnackbar } from 'notistack'
 import { useApolloClient } from '@apollo/client'
+import { useTranslations } from 'next-intl'
 import { isAdmin } from '@/lib/auth'
 
 // Import der Tab-Komponenten
@@ -57,6 +58,8 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
 }) => {
   const { enqueueSnackbar } = useSnackbar()
   const apolloClient = useApolloClient()
+  const t = useTranslations('importExport')
+  const tEntityTypes = useTranslations('importExport.entityTypes')
 
   // State Management
   const [currentTab, setCurrentTab] = useState<'import' | 'export' | 'management'>(defaultTab)
@@ -158,8 +161,8 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
         setValidationResult(combinedValidation)
         enqueueSnackbar(
           combinedValidation.isValid
-            ? `Multi-Tab-Datei erfolgreich validiert. ${totalValid} gültige Datensätze gefunden.`
-            : `Multi-Tab-Datei geladen, aber ${totalErrors} Fehler gefunden.`,
+            ? t('import.messages.multiTabValidated', { count: totalValid })
+            : t('import.messages.multiTabWarnings', { count: totalErrors }),
           { variant: combinedValidation.isValid ? 'success' : 'warning' }
         )
       } else {
@@ -179,14 +182,16 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
 
         enqueueSnackbar(
           validation.isValid
-            ? `Datei erfolgreich validiert. ${validation.summary.validRows} gültige Datensätze gefunden.`
-            : `Datei geladen, aber ${validation.errors.length} Fehler gefunden.`,
+            ? t('import.messages.singleTabValidated', { count: validation.summary.validRows })
+            : t('import.messages.singleTabWarnings', { count: validation.errors.length }),
           { variant: validation.isValid ? 'success' : 'warning' }
         )
       }
     } catch (err) {
       enqueueSnackbar(
-        `Fehler beim Laden der Datei: ${err instanceof Error ? err.message : 'Unbekannter Fehler'}`,
+        t('import.messages.fileLoadError', {
+          error: err instanceof Error ? err.message : 'Unbekannter Fehler',
+        }),
         { variant: 'error' }
       )
     }
@@ -219,8 +224,11 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
 
       const successMessage =
         importSettings.entityType === 'all'
-          ? `Multi-Tab-Import erfolgreich abgeschlossen. ${totalImported} Datensätze importiert.`
-          : `${entityTypeLabels[importSettings.entityType]} erfolgreich importiert. ${totalImported} Datensätze importiert.`
+          ? t('import.messages.multiTabImportSuccess', { count: totalImported })
+          : t('import.messages.singleTabImportSuccess', {
+              entityType: tEntityTypes(importSettings.entityType),
+              count: totalImported,
+            })
 
       enqueueSnackbar(successMessage, { variant: 'success' })
 
@@ -229,7 +237,9 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
       setValidationResult(null)
     } catch (error) {
       enqueueSnackbar(
-        `Fehler beim Import: ${error instanceof Error ? error.message : 'Unbekannter Fehler'}`,
+        t('import.messages.importError', {
+          error: error instanceof Error ? error.message : 'Unbekannter Fehler',
+        }),
         { variant: 'error' }
       )
     } finally {
@@ -243,12 +253,17 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
     setIsExporting(true)
     try {
       await exportEntityData(apolloClient, exportSettings.entityType, exportSettings.format)
-      enqueueSnackbar(`${entityTypeLabels[exportSettings.entityType]} erfolgreich exportiert.`, {
-        variant: 'success',
-      })
+      enqueueSnackbar(
+        t('export.messages.exportSuccess', {
+          entityType: tEntityTypes(exportSettings.entityType),
+        }),
+        { variant: 'success' }
+      )
     } catch (error) {
       enqueueSnackbar(
-        `Fehler beim Export: ${error instanceof Error ? error.message : 'Unbekannter Fehler'}`,
+        t('export.messages.exportError', {
+          error: error instanceof Error ? error.message : 'Unbekannter Fehler',
+        }),
         { variant: 'error' }
       )
     } finally {
@@ -277,15 +292,20 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
 
       enqueueSnackbar(
         deleteEntityType === 'all'
-          ? `Alle Daten erfolgreich gelöscht. ${deletedCount} Datensätze entfernt.`
-          : `${entityTypeLabels[deleteEntityType as keyof typeof entityTypeLabels]} erfolgreich gelöscht. ${deletedCount} Datensätze entfernt.`,
+          ? t('management.messages.deleteAllSuccess', { count: deletedCount })
+          : t('management.messages.deleteSuccess', {
+              entityType: tEntityTypes(deleteEntityType as keyof typeof entityTypeLabels),
+              count: deletedCount,
+            }),
         { variant: 'success' }
       )
 
       closeDeleteConfirmDialog()
     } catch (error) {
       enqueueSnackbar(
-        `Fehler beim Löschen: ${error instanceof Error ? error.message : 'Unbekannter Fehler'}`,
+        t('management.messages.deleteError', {
+          error: error instanceof Error ? error.message : 'Unbekannter Fehler',
+        }),
         { variant: 'error' }
       )
     } finally {
@@ -296,7 +316,7 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
   // Template Download Handlers
   const handleDownloadTemplate = async () => {
     if (importSettings.entityType === 'all') {
-      enqueueSnackbar('Für Multi-Entity-Import ist kein Template verfügbar.', { variant: 'info' })
+      enqueueSnackbar(t('import.messages.templateNotAvailable'), { variant: 'info' })
       return
     }
 
@@ -304,7 +324,9 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
       await downloadTemplateWithRealFields(importSettings.entityType)
     } catch (error) {
       enqueueSnackbar(
-        `Fehler beim Download der Vorlage: ${error instanceof Error ? error.message : 'Unbekannter Fehler'}`,
+        t('import.messages.templateDownloadError', {
+          error: error instanceof Error ? error.message : 'Unbekannter Fehler',
+        }),
         { variant: 'error' }
       )
     }
@@ -312,7 +334,7 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
 
   const handleDownloadTemplateWithExamples = async () => {
     if (importSettings.entityType === 'all') {
-      enqueueSnackbar('Für Multi-Entity-Import ist kein Template verfügbar.', { variant: 'info' })
+      enqueueSnackbar(t('import.messages.templateNotAvailable'), { variant: 'info' })
       return
     }
 
@@ -326,7 +348,9 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
       })
     } catch (error) {
       enqueueSnackbar(
-        `Fehler beim Download der Vorlage: ${error instanceof Error ? error.message : 'Unbekannter Fehler'}`,
+        t('import.messages.templateDownloadError', {
+          error: error instanceof Error ? error.message : 'Unbekannter Fehler',
+        }),
         { variant: 'error' }
       )
     }
@@ -351,10 +375,7 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
   const handleExportEntityTypeChange = (newEntityType: string) => {
     // Für Alle Daten: CSV nicht erlaubt, aber Excel und JSON schon
     if (newEntityType === 'all' && exportSettings.format === 'csv') {
-      enqueueSnackbar(
-        'Für den Export aller Daten ist das CSV-Format nicht verfügbar. Verwenden Sie Excel oder JSON.',
-        { variant: 'info' }
-      )
+      enqueueSnackbar(t('export.messages.csvNotAvailable'), { variant: 'info' })
       setExportSettings({
         ...exportSettings,
         entityType: newEntityType as ExportSettings['entityType'],
@@ -371,10 +392,7 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
   const handleExportFormatChange = (newFormat: string) => {
     // Für Alle Daten: CSV nicht erlaubt
     if (exportSettings.entityType === 'all' && newFormat === 'csv') {
-      enqueueSnackbar(
-        'Für den Export aller Daten ist das CSV-Format nicht verfügbar. Verwenden Sie Excel oder JSON.',
-        { variant: 'info' }
-      )
+      enqueueSnackbar(t('export.messages.csvNotAvailable'), { variant: 'info' })
       return
     }
     setExportSettings({
@@ -399,17 +417,22 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
       <DialogTitle>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <TableIcon />
-          Import/Export
+          {t('title')}
         </Box>
       </DialogTitle>
 
       <DialogContent>
         <Tabs value={currentTab} onChange={(_, newTab) => setCurrentTab(newTab)} sx={{ mb: 2 }}>
-          <Tab label="Import" value="import" icon={<UploadIcon />} iconPosition="start" />
-          <Tab label="Export" value="export" icon={<DownloadIcon />} iconPosition="start" />
+          <Tab label={t('tabs.import')} value="import" icon={<UploadIcon />} iconPosition="start" />
+          <Tab
+            label={t('tabs.export')}
+            value="export"
+            icon={<DownloadIcon />}
+            iconPosition="start"
+          />
           {isAdmin() && (
             <Tab
-              label="Datenverwaltung"
+              label={t('tabs.management')}
               value="management"
               icon={<TableIcon />}
               iconPosition="start"
@@ -458,21 +481,21 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
           {currentTab === 'import' && (
             <>
               <Button variant="text" startIcon={<DownloadIcon />} onClick={handleDownloadTemplate}>
-                Leeres Template
+                {t('templates.emptyTemplate')}
               </Button>
               <Button
                 variant="outlined"
                 startIcon={<DownloadIcon />}
                 onClick={handleDownloadTemplateWithExamples}
               >
-                Template mit Beispielen
+                {t('templates.templateWithExamples')}
               </Button>
             </>
           )}
         </Box>
 
         <Box sx={{ display: 'flex', gap: 1 }}>
-          <Button onClick={onClose}>Abbrechen</Button>
+          <Button onClick={onClose}>{t('actions.cancel')}</Button>
 
           {currentTab === 'import' ? (
             <>
@@ -487,7 +510,7 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
                   }
                   startIcon={isImporting ? <CircularProgress size={20} /> : <UploadIcon />}
                 >
-                  {isImporting ? 'Importiere...' : 'Import starten'}
+                  {isImporting ? t('import.importing_') : t('import.startImport')}
                 </Button>
               )}
             </>
@@ -498,7 +521,7 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
               disabled={isExporting}
               startIcon={isExporting ? <CircularProgress size={20} /> : <DownloadIcon />}
             >
-              {isExporting ? 'Exportiere...' : 'Export starten'}
+              {isExporting ? t('export.exporting') : t('export.startExport')}
             </Button>
           ) : null}
         </Box>
