@@ -224,6 +224,35 @@ export interface ApplicationFormProps {
   onDelete?: (id: string) => Promise<void>
   loading?: boolean
   onEditMode?: () => void
+  // Zusätzliche Props für gemappte Werte von GenericTable
+  name?: string
+  description?: string
+  status?: ApplicationStatus
+  criticality?: CriticalityLevel
+  costs?: number | null
+  vendor?: string | null
+  version?: string | null
+  hostingEnvironment?: string | null
+  technologyStack?: string[]
+  introductionDate?: Date | null
+  endOfLifeDate?: Date | null
+  planningDate?: Date | null
+  endOfUseDate?: Date | null
+  ownerId?: string
+  supportsCapabilityIds?: string[]
+  usesDataObjectIds?: string[]
+  sourceOfInterfaceIds?: string[]
+  targetOfInterfaceIds?: string[]
+  partOfArchitectures?: string[]
+  implementsPrincipleIds?: string[]
+  depictedInDiagrams?: string[]
+  parentIds?: string[]
+  componentIds?: string[]
+  predecessorIds?: string[]
+  successorIds?: string[]
+  hostedOnIds?: string[]
+  timeCategory?: TimeCategory | null
+  sevenRStrategy?: SevenRStrategy | null
 }
 
 const getCriticalityLabel = (criticality: CriticalityLevel, t?: any): string => {
@@ -313,6 +342,35 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
   onDelete,
   loading = false,
   onEditMode,
+  // Gemappte Props von GenericTable
+  name: mappedName,
+  description: mappedDescription,
+  status: mappedStatus,
+  criticality: mappedCriticality,
+  costs: mappedCosts,
+  vendor: mappedVendor,
+  version: mappedVersion,
+  hostingEnvironment: mappedHostingEnvironment,
+  technologyStack: mappedTechnologyStack,
+  introductionDate: mappedIntroductionDate,
+  endOfLifeDate: mappedEndOfLifeDate,
+  planningDate: mappedPlanningDate,
+  endOfUseDate: mappedEndOfUseDate,
+  ownerId: mappedOwnerId,
+  supportsCapabilityIds: mappedSupportsCapabilityIds,
+  usesDataObjectIds: mappedUsesDataObjectIds,
+  sourceOfInterfaceIds: mappedSourceOfInterfaceIds,
+  targetOfInterfaceIds: mappedTargetOfInterfaceIds,
+  partOfArchitectures: mappedPartOfArchitectures,
+  implementsPrincipleIds: mappedImplementsPrincipleIds,
+  depictedInDiagrams: mappedDepictedInDiagrams,
+  parentIds: mappedParentIds,
+  componentIds: mappedComponentIds,
+  predecessorIds: mappedPredecessorIds,
+  successorIds: mappedSuccessorIds,
+  hostedOnIds: mappedHostedOnIds,
+  timeCategory: mappedTimeCategory,
+  sevenRStrategy: mappedSevenRStrategy,
 }) => {
   const t = useTranslations('applications.form')
   const tStatus = useTranslations('applications.statuses')
@@ -332,37 +390,36 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
   const { data: infrastructuresData, loading: infrastructuresLoading } =
     useQuery(GET_INFRASTRUCTURES)
 
-  // Standardwerte für das Formular
+  // Standardwerte für das Formular - bevorzuge gemappte Werte vor application-Werten
   const defaultValues: ApplicationFormValues = {
-    name: application?.name ?? '',
-    description: application?.description ?? '',
-    status: application?.status ?? ApplicationStatus.ACTIVE,
-    criticality: application?.criticality ?? CriticalityLevel.MEDIUM,
-    costs: application?.costs ?? null,
-    vendor: application?.vendor ?? null,
-    version: application?.version ?? null,
-    hostingEnvironment: application?.hostingEnvironment ?? null,
-    technologyStack: application?.technologyStack ?? [],
-    introductionDate: application?.introductionDate ? new Date(application.introductionDate) : null,
-    endOfLifeDate: application?.endOfLifeDate ? new Date(application.endOfLifeDate) : null,
-    planningDate: application?.planningDate ? new Date(application.planningDate) : null,
-    endOfUseDate: application?.endOfUseDate ? new Date(application.endOfUseDate) : null,
-    ownerId:
-      application?.owners && application.owners.length > 0 ? application.owners[0].id : undefined,
-    supportsCapabilityIds: application?.supportsCapabilities?.map(cap => cap.id) ?? [],
-    usesDataObjectIds: application?.usesDataObjects?.map(obj => obj.id) ?? [],
-    sourceOfInterfaceIds: application?.sourceOfInterfaces?.map(iface => iface.id) ?? [],
-    targetOfInterfaceIds: application?.targetOfInterfaces?.map(iface => iface.id) ?? [],
-    partOfArchitectures: application?.partOfArchitectures?.map(arch => arch.id) ?? [],
-    implementsPrincipleIds: application?.implementsPrinciples?.map(principle => principle.id) ?? [],
-    depictedInDiagrams: application?.depictedInDiagrams?.map(diag => diag.id) ?? [],
-    parentIds: application?.parents?.map(app => app.id) ?? [],
-    componentIds: application?.components?.map(app => app.id) ?? [],
-    predecessorIds: application?.predecessors?.map(app => app.id) ?? [],
-    successorIds: application?.successors?.map(app => app.id) ?? [],
-    hostedOnIds: application?.hostedOn?.map(app => app.id) ?? [],
-    timeCategory: application?.timeCategory ?? null,
-    sevenRStrategy: application?.sevenRStrategy ?? null,
+    name: mappedName ?? application?.name ?? '',
+    description: mappedDescription ?? application?.description ?? '',
+    status: mappedStatus ?? application?.status ?? ApplicationStatus.ACTIVE,
+    criticality: mappedCriticality ?? application?.criticality ?? CriticalityLevel.MEDIUM,
+    costs: mappedCosts ?? application?.costs ?? null,
+    vendor: mappedVendor ?? application?.vendor ?? null,
+    version: mappedVersion ?? application?.version ?? null,
+    hostingEnvironment: mappedHostingEnvironment ?? application?.hostingEnvironment ?? null,
+    technologyStack: mappedTechnologyStack ?? application?.technologyStack ?? [],
+    introductionDate: mappedIntroductionDate ?? (application?.introductionDate ? new Date(application.introductionDate) : null),
+    endOfLifeDate: mappedEndOfLifeDate ?? (application?.endOfLifeDate ? new Date(application.endOfLifeDate) : null),
+    planningDate: mappedPlanningDate ?? (application?.planningDate ? new Date(application.planningDate) : null),
+    endOfUseDate: mappedEndOfUseDate ?? (application?.endOfUseDate ? new Date(application.endOfUseDate) : null),
+    ownerId: mappedOwnerId ?? (application?.owners && application.owners.length > 0 ? application.owners[0].id : undefined),
+    supportsCapabilityIds: mappedSupportsCapabilityIds ?? application?.supportsCapabilities?.map(cap => cap.id) ?? [],
+    usesDataObjectIds: mappedUsesDataObjectIds ?? application?.usesDataObjects?.map(obj => obj.id) ?? [],
+    sourceOfInterfaceIds: mappedSourceOfInterfaceIds ?? application?.sourceOfInterfaces?.map(iface => iface.id) ?? [],
+    targetOfInterfaceIds: mappedTargetOfInterfaceIds ?? application?.targetOfInterfaces?.map(iface => iface.id) ?? [],
+    partOfArchitectures: mappedPartOfArchitectures ?? application?.partOfArchitectures?.map(arch => arch.id) ?? [],
+    implementsPrincipleIds: mappedImplementsPrincipleIds ?? application?.implementsPrinciples?.map(principle => principle.id) ?? [],
+    depictedInDiagrams: mappedDepictedInDiagrams ?? application?.depictedInDiagrams?.map(diag => diag.id) ?? [],
+    parentIds: mappedParentIds ?? application?.parents?.map(app => app.id) ?? [],
+    componentIds: mappedComponentIds ?? application?.components?.map(app => app.id) ?? [],
+    predecessorIds: mappedPredecessorIds ?? application?.predecessors?.map(app => app.id) ?? [],
+    successorIds: mappedSuccessorIds ?? application?.successors?.map(app => app.id) ?? [],
+    hostedOnIds: mappedHostedOnIds ?? application?.hostedOn?.map(app => app.id) ?? [],
+    timeCategory: mappedTimeCategory ?? application?.timeCategory ?? null,
+    sevenRStrategy: mappedSevenRStrategy ?? application?.sevenRStrategy ?? null,
   }
 
   // TanStack Form konfigurieren
@@ -401,47 +458,83 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
 
   // Formular aktualisieren, wenn sich die Daten ändern
   useEffect(() => {
-    if (isOpen && application) {
-      setCurrentTimeCategory(application.timeCategory ?? null)
-      form.reset({
-        name: application.name ?? '',
-        description: application.description ?? '',
-        status: application.status ?? ApplicationStatus.ACTIVE,
-        criticality: application.criticality ?? CriticalityLevel.MEDIUM,
-        costs: application.costs ?? null,
-        vendor: application.vendor ?? null,
-        version: application.version ?? null,
-        hostingEnvironment: application.hostingEnvironment ?? null,
-        technologyStack: application.technologyStack ?? [],
-        introductionDate: application.introductionDate
-          ? new Date(application.introductionDate)
-          : null,
-        endOfLifeDate: application.endOfLifeDate ? new Date(application.endOfLifeDate) : null,
-        planningDate: application.planningDate ? new Date(application.planningDate) : null,
-        endOfUseDate: application.endOfUseDate ? new Date(application.endOfUseDate) : null,
-        ownerId:
-          application.owners && application.owners.length > 0
-            ? application.owners[0].id
-            : undefined,
-        supportsCapabilityIds: application.supportsCapabilities?.map(cap => cap.id) ?? [],
-        usesDataObjectIds: application.usesDataObjects?.map(obj => obj.id) ?? [],
-        sourceOfInterfaceIds: application.sourceOfInterfaces?.map(iface => iface.id) ?? [],
-        targetOfInterfaceIds: application.targetOfInterfaces?.map(iface => iface.id) ?? [],
-        partOfArchitectures: application.partOfArchitectures?.map(arch => arch.id) ?? [],
-        implementsPrincipleIds:
-          application.implementsPrinciples?.map(principle => principle.id) ?? [],
-        timeCategory: application.timeCategory ?? null,
-        sevenRStrategy: application.sevenRStrategy ?? null,
-      })
+    if (isOpen && (application || mappedName !== undefined)) {
+      // Verwende die gleiche Logik wie in defaultValues - bevorzuge gemappte Werte
+      const resetValues = {
+        name: mappedName ?? application?.name ?? '',
+        description: mappedDescription ?? application?.description ?? '',
+        status: mappedStatus ?? application?.status ?? ApplicationStatus.ACTIVE,
+        criticality: mappedCriticality ?? application?.criticality ?? CriticalityLevel.MEDIUM,
+        costs: mappedCosts ?? application?.costs ?? null,
+        vendor: mappedVendor ?? application?.vendor ?? null,
+        version: mappedVersion ?? application?.version ?? null,
+        hostingEnvironment: mappedHostingEnvironment ?? application?.hostingEnvironment ?? null,
+        technologyStack: mappedTechnologyStack ?? application?.technologyStack ?? [],
+        introductionDate: mappedIntroductionDate ?? (application?.introductionDate ? new Date(application.introductionDate) : null),
+        endOfLifeDate: mappedEndOfLifeDate ?? (application?.endOfLifeDate ? new Date(application.endOfLifeDate) : null),
+        planningDate: mappedPlanningDate ?? (application?.planningDate ? new Date(application.planningDate) : null),
+        endOfUseDate: mappedEndOfUseDate ?? (application?.endOfUseDate ? new Date(application.endOfUseDate) : null),
+        ownerId: mappedOwnerId ?? (application?.owners && application.owners.length > 0 ? application.owners[0].id : undefined),
+        supportsCapabilityIds: mappedSupportsCapabilityIds ?? application?.supportsCapabilities?.map(cap => cap.id) ?? [],
+        usesDataObjectIds: mappedUsesDataObjectIds ?? application?.usesDataObjects?.map(obj => obj.id) ?? [],
+        sourceOfInterfaceIds: mappedSourceOfInterfaceIds ?? application?.sourceOfInterfaces?.map(iface => iface.id) ?? [],
+        targetOfInterfaceIds: mappedTargetOfInterfaceIds ?? application?.targetOfInterfaces?.map(iface => iface.id) ?? [],
+        partOfArchitectures: mappedPartOfArchitectures ?? application?.partOfArchitectures?.map(arch => arch.id) ?? [],
+        implementsPrincipleIds: mappedImplementsPrincipleIds ?? application?.implementsPrinciples?.map(principle => principle.id) ?? [],
+        depictedInDiagrams: mappedDepictedInDiagrams ?? application?.depictedInDiagrams?.map(diag => diag.id) ?? [],
+        parentIds: mappedParentIds ?? application?.parents?.map(app => app.id) ?? [],
+        componentIds: mappedComponentIds ?? application?.components?.map(app => app.id) ?? [],
+        predecessorIds: mappedPredecessorIds ?? application?.predecessors?.map(app => app.id) ?? [],
+        successorIds: mappedSuccessorIds ?? application?.successors?.map(app => app.id) ?? [],
+        hostedOnIds: mappedHostedOnIds ?? application?.hostedOn?.map(app => app.id) ?? [],
+        timeCategory: mappedTimeCategory ?? application?.timeCategory ?? null,
+        sevenRStrategy: mappedSevenRStrategy ?? application?.sevenRStrategy ?? null,
+      }
+      
+      setCurrentTimeCategory(resetValues.timeCategory)
+      form.reset(resetValues)
     } else if (!isOpen) {
       setCurrentTimeCategory(null)
       form.reset()
     }
-  }, [form, application, isOpen])
+  }, [
+    form, 
+    application, 
+    isOpen,
+    // Gemappte Abhängigkeiten hinzufügen
+    mappedName,
+    mappedDescription,
+    mappedStatus,
+    mappedCriticality,
+    mappedCosts,
+    mappedVendor,
+    mappedVersion,
+    mappedHostingEnvironment,
+    mappedTechnologyStack,
+    mappedIntroductionDate,
+    mappedEndOfLifeDate,
+    mappedPlanningDate,
+    mappedEndOfUseDate,
+    mappedOwnerId,
+    mappedSupportsCapabilityIds,
+    mappedUsesDataObjectIds,
+    mappedSourceOfInterfaceIds,
+    mappedTargetOfInterfaceIds,
+    mappedPartOfArchitectures,
+    mappedImplementsPrincipleIds,
+    mappedDepictedInDiagrams,
+    mappedParentIds,
+    mappedComponentIds,
+    mappedPredecessorIds,
+    mappedSuccessorIds,
+    mappedHostedOnIds,
+    mappedTimeCategory,
+    mappedSevenRStrategy
+  ])
 
   // Dynamisches Zurücksetzen der 7R-Strategie bei TIME-Kategorie-Änderung
   const [currentTimeCategory, setCurrentTimeCategory] = React.useState<TimeCategory | null>(
-    application?.timeCategory ?? null
+    mappedTimeCategory ?? application?.timeCategory ?? null
   )
 
   // Verfolge Änderungen der TIME-Kategorie und setze 7R-Strategie zurück falls nötig
