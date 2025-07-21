@@ -55,6 +55,7 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
   } = usePersistentColumnVisibility({
     tableKey: 'dataObjects',
     defaultColumnVisibility: {
+      id: false,
       description: false,
       planningDate: false,
       introductionDate: false,
@@ -114,6 +115,11 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
   // Spalten-Definition für die DataObject-Tabelle
   const columns = useMemo(
     () => [
+      columnHelper.accessor('id', {
+        header: t('id'),
+        cell: info => info.getValue(),
+        enableHiding: true,
+      }),
       columnHelper.accessor('name', {
         header: t('name'),
         cell: info => info.getValue(),

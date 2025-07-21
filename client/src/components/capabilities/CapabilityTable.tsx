@@ -62,6 +62,7 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
   } = usePersistentColumnVisibility({
     tableKey: 'capabilities',
     defaultColumnVisibility: {
+      id: false,
       description: false,
       type: false,
       sequenceNumber: false,
@@ -87,6 +88,11 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
   // Spalten-Definition für die Capability-Tabelle
   const columns = useMemo(
     () => [
+      columnHelper.accessor('id', {
+        header: t('id'),
+        cell: info => info.getValue(),
+        enableHiding: true,
+      }),
       columnHelper.accessor('name', {
         header: t('name'),
         cell: info => info.getValue(),

@@ -119,6 +119,7 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
   } = usePersistentColumnVisibility({
     tableKey: 'applicationInterfaces',
     defaultColumnVisibility: {
+      id: false,
       description: false,
       version: false,
       status: false,
@@ -146,6 +147,11 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
   // Spalten-Definition für die Schnittstellen-Tabelle
   const columns = useMemo(
     () => [
+      columnHelper.accessor('id', {
+        header: t('id'),
+        cell: info => info.getValue(),
+        enableHiding: true,
+      }),
       columnHelper.accessor('name', {
         header: t('name'),
         cell: info => info.getValue(),

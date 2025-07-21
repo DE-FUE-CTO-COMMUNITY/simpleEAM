@@ -502,6 +502,7 @@
       "viewTitle": "Business Capability Details"
     },
     "table": {
+      "id": "ID",
       "name": "Name",
       "description": "Beschreibung",
       "maturityLevel": "Reifegrad",
@@ -655,6 +656,7 @@
       "viewTitle": "Applikation Details"
     },
     "table": {
+      "id": "ID",
       "name": "Name",
       "description": "Beschreibung",
       "status": "Status",
@@ -791,6 +793,7 @@
       "viewTitle": "Datenobjekt Details"
     },
     "table": {
+      "id": "ID",
       "name": "Name",
       "description": "Beschreibung",
       "classification": "Klassifikation",
@@ -889,6 +892,7 @@
       "viewTitle": "Schnittstellen-Details"
     },
     "table": {
+      "id": "ID",
       "name": "Name",
       "description": "Beschreibung",
       "interfaceType": "Typ",
@@ -1053,6 +1057,7 @@
       "viewTitle": "Infrastruktur-Details"
     },
     "table": {
+      "id": "ID",
       "name": "Name",
       "description": "Beschreibung",
       "infrastructureType": "Typ",

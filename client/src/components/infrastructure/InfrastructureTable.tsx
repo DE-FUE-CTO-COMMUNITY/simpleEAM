@@ -88,6 +88,7 @@ const InfrastructureTable: React.FC<InfrastructureTableProps> = ({
   } = usePersistentColumnVisibility({
     tableKey: 'infrastructures',
     defaultColumnVisibility: {
+      id: false,
       description: false,
       vendor: false,
       version: false,
@@ -204,6 +205,11 @@ const InfrastructureTable: React.FC<InfrastructureTableProps> = ({
   // Spalten-Definition für die Infrastructure-Tabelle
   const columns = useMemo(
     () => [
+      columnHelper.accessor('id', {
+        header: t('table.id'),
+        cell: info => info.getValue(),
+        enableHiding: true,
+      }),
       columnHelper.accessor('name', {
         header: t('form.name'),
         cell: info => info.getValue(),

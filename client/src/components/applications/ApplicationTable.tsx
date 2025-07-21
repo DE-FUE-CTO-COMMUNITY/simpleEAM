@@ -63,6 +63,7 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
   } = usePersistentColumnVisibility({
     tableKey: 'applications',
     defaultColumnVisibility: {
+      id: false,
       description: false,
       timeCategory: false,
       sevenRStrategy: false,
@@ -94,6 +95,11 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
   // Spalten-Definition für die Application-Tabelle
   const columns = useMemo(
     () => [
+      columnHelper.accessor('id', {
+        header: t('id'),
+        cell: info => info.getValue(),
+        enableHiding: true,
+      }),
       columnHelper.accessor('name', {
         header: t('name'),
         cell: info => info.getValue(),
