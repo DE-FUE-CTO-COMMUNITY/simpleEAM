@@ -73,6 +73,8 @@ export type ApplicationType = Pick<
   | 'sevenRStrategy'
   | 'implementsPrinciples'
   | 'hostedOn'
+  | 'predecessors'
+  | 'successors'
 >
 
 export interface FilterState {

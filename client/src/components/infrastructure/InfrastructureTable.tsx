@@ -50,7 +50,7 @@ const InfrastructureTable: React.FC<InfrastructureTableProps> = ({
     return new Date(date).toLocaleDateString(locale === 'de' ? 'de-DE' : 'en-US', {
       year: 'numeric',
       month: '2-digit',
-      day: '2-digit'
+      day: '2-digit',
     })
   }
 

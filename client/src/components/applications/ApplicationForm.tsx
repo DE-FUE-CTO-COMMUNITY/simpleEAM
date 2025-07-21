@@ -89,78 +89,131 @@ const baseApplicationSchema = z.object({
 
 // Schema für die Formularvalidierung mit erweiterten Validierungen
 export const applicationSchema = baseApplicationSchema.superRefine((data, ctx) => {
-  // Lifecycle-Datums-Validierung mit individuellen Fehlermeldungen
-  const dates = [
-    { field: 'planningDate', date: data.planningDate, label: 'Planungsdatum' },
-    { field: 'introductionDate', date: data.introductionDate, label: 'Einführungsdatum' },
-    { field: 'endOfUseDate', date: data.endOfUseDate, label: 'Ende der Nutzung' },
-    { field: 'endOfLifeDate', date: data.endOfLifeDate, label: 'End-of-Life-Datum' },
-  ] as const
+  console.log('🔍 ApplicationSchema validation started with data:', data)
 
-  const setDates = dates.filter(d => d.date !== null && d.date !== undefined)
+  // Lifecycle-Datums-Validierung - Prüfe spezifische Paarungen, nicht sequenziell
+  // Planungsdatum < Einführungsdatum
+  if (data.planningDate && data.introductionDate && data.planningDate >= data.introductionDate) {
+    console.warn('⚠️ Date validation failed: planningDate >= introductionDate')
+    ctx.addIssue({
+      code: 'custom',
+      message: 'Das Einführungsdatum muss nach dem Planungsdatum liegen.',
+      path: ['introductionDate'],
+    })
+  }
 
-  // Prüfe chronologische Reihenfolge zwischen allen aufeinanderfolgenden Daten
-  for (let i = 0; i < setDates.length - 1; i++) {
-    const currentDate = setDates[i]
-    const nextDate = setDates[i + 1]
+  // Einführungsdatum < Ende der Nutzung
+  if (data.introductionDate && data.endOfUseDate && data.introductionDate >= data.endOfUseDate) {
+    console.warn('⚠️ Date validation failed: introductionDate >= endOfUseDate')
+    ctx.addIssue({
+      code: 'custom',
+      message: 'Das Ende der Nutzung muss nach dem Einführungsdatum liegen.',
+      path: ['endOfUseDate'],
+    })
+  }
 
-    if (currentDate.date! >= nextDate.date!) {
-      // Füge Fehlermeldung zum späteren Datum hinzu
-      ctx.addIssue({
-        code: 'custom',
-        message: `${nextDate.label} muss nach ${currentDate.label} liegen.`,
-        path: [nextDate.field],
-      })
-    }
+  // Ende der Nutzung < End-of-Life
+  if (data.endOfUseDate && data.endOfLifeDate && data.endOfUseDate >= data.endOfLifeDate) {
+    console.warn('⚠️ Date validation failed: endOfUseDate >= endOfLifeDate')
+    ctx.addIssue({
+      code: 'custom',
+      message: 'Das End-of-Life-Datum muss nach dem Ende der Nutzung liegen.',
+      path: ['endOfLifeDate'],
+    })
+  }
+
+  // Direkte Prüfung: Einführungsdatum < End-of-Life (falls Ende der Nutzung nicht gesetzt)
+  if (
+    data.introductionDate &&
+    data.endOfLifeDate &&
+    !data.endOfUseDate &&
+    data.introductionDate >= data.endOfLifeDate
+  ) {
+    console.warn('⚠️ Date validation failed: introductionDate >= endOfLifeDate (no endOfUseDate)')
+    ctx.addIssue({
+      code: 'custom',
+      message: 'Das End-of-Life-Datum muss nach dem Einführungsdatum liegen.',
+      path: ['endOfLifeDate'],
+    })
   }
 
   // Status-Lifecycle-Validierung basierend auf dem aktuellen Datum
   const status = data.status
   const now = new Date()
-  const introductionDate = data.introductionDate
-  const endOfUseDate = data.endOfUseDate
+  console.log('🔍 Status validation for:', status, 'Current time:', now)
 
   switch (status) {
     case ApplicationStatus.IN_DEVELOPMENT:
       // IN_DEVELOPMENT: Einführungsdatum muss in der Zukunft liegen (oder nicht gesetzt sein)
-      if (introductionDate && introductionDate <= now) {
+      // Nur validieren wenn ein Einführungsdatum gesetzt ist
+      if (data.introductionDate && data.introductionDate <= now) {
+        console.warn('⚠️ Status validation failed: IN_DEVELOPMENT with past introductionDate')
         ctx.addIssue({
           code: 'custom',
           message: 'Bei Status "In Entwicklung" muss das Einführungsdatum in der Zukunft liegen.',
           path: ['introductionDate'],
         })
+        ctx.addIssue({
+          code: 'custom',
+          message:
+            'Status "In Entwicklung" ist nicht kompatibel mit dem gesetzten Einführungsdatum.',
+          path: ['status'],
+        })
       }
       break
     case ApplicationStatus.ACTIVE:
       // ACTIVE: Einführungsdatum muss in der Vergangenheit liegen
-      if (!introductionDate || introductionDate > now) {
+      // Nur validieren wenn ein Einführungsdatum gesetzt ist
+      if (data.introductionDate && data.introductionDate > now) {
+        console.warn('⚠️ Status validation failed: ACTIVE with future introductionDate')
         ctx.addIssue({
           code: 'custom',
-          message: 'Bei Status "Aktiv" muss das Einführungsdatum in der Vergangenheit liegen.',
+          message: 'Bei Status "Aktiv" darf das Einführungsdatum nicht in der Zukunft liegen.',
           path: ['introductionDate'],
+        })
+        ctx.addIssue({
+          code: 'custom',
+          message: 'Status "Aktiv" ist nicht kompatibel mit dem gesetzten Einführungsdatum.',
+          path: ['status'],
         })
       }
       // UND End-of-Use muss in der Zukunft liegen (oder nicht gesetzt sein)
-      if (endOfUseDate && endOfUseDate <= now) {
+      // Nur validieren wenn ein End-of-Use-Datum gesetzt ist
+      if (data.endOfUseDate && data.endOfUseDate <= now) {
+        console.warn('⚠️ Status validation failed: ACTIVE with past endOfUseDate')
         ctx.addIssue({
           code: 'custom',
           message: 'Bei Status "Aktiv" muss das Ende der Nutzung in der Zukunft liegen.',
           path: ['endOfUseDate'],
         })
+        ctx.addIssue({
+          code: 'custom',
+          message: 'Status "Aktiv" ist nicht kompatibel mit dem gesetzten Ende der Nutzung.',
+          path: ['status'],
+        })
       }
       break
     case ApplicationStatus.RETIRED:
       // RETIRED: End-of-Use-Datum muss in der Vergangenheit liegen
-      if (!endOfUseDate || endOfUseDate > now) {
+      // Nur validieren wenn ein End-of-Use-Datum gesetzt ist
+      if (data.endOfUseDate && data.endOfUseDate > now) {
+        console.warn('⚠️ Status validation failed: RETIRED with future endOfUseDate')
         ctx.addIssue({
           code: 'custom',
           message:
-            'Bei Status "Stillgelegt" muss das Ende der Nutzung in der Vergangenheit liegen.',
+            'Bei Status "Stillgelegt" darf das Ende der Nutzung nicht in der Zukunft liegen.',
           path: ['endOfUseDate'],
+        })
+        ctx.addIssue({
+          code: 'custom',
+          message: 'Status "Stillgelegt" ist nicht kompatibel mit dem gesetzten Ende der Nutzung.',
+          path: ['status'],
         })
       }
       break
   }
+
+  console.log('✅ ApplicationSchema validation completed')
 })
 
 // TypeScript Typen basierend auf dem Schema
@@ -322,16 +375,38 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
   const form = useForm({
     defaultValues,
     onSubmit: async ({ value }) => {
-      // Konvertiere leere Strings zu null für enum-Felder
-      const processedValue = {
-        ...value,
-        timeCategory: value.timeCategory === '' ? null : value.timeCategory,
-        sevenRStrategy: value.sevenRStrategy === '' ? null : value.sevenRStrategy,
+      console.log('🚀 ApplicationForm: onSubmit started')
+      console.log('📝 Form values:', value)
+
+      try {
+        // Validierung vor der Verarbeitung
+        const validationResult = applicationSchema.safeParse(value)
+        console.log('✅ Schema validation result:', validationResult)
+
+        if (!validationResult.success) {
+          console.error('❌ Validation failed:', validationResult.error.errors)
+          throw new Error('Validierung fehlgeschlagen')
+        }
+
+        // Konvertiere leere Strings zu null für enum-Felder
+        const processedValue = {
+          ...value,
+          timeCategory: value.timeCategory === '' ? null : value.timeCategory,
+          sevenRStrategy: value.sevenRStrategy === '' ? null : value.sevenRStrategy,
+        }
+
+        console.log('🔄 Processed values:', processedValue)
+        console.log('📤 Calling onSubmit with processed values...')
+
+        await onSubmit(processedValue)
+        console.log('✅ onSubmit completed successfully')
+      } catch (error) {
+        console.error('💥 ApplicationForm onSubmit error:', error)
+        throw error
       }
-      await onSubmit(processedValue)
     },
     validators: {
-      // Primäre Validierung bei Änderungen
+      // Primäre Validierung bei Änderungen - verwende das vollständige Schema
       onChange: applicationSchema,
       // Validierung beim Absenden
       onSubmit: applicationSchema,
@@ -436,7 +511,27 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
       type: 'select',
       required: true,
       tabId: 'general',
-      validators: baseApplicationSchema.shape.status,
+      validators: {
+        onChange: ({ value, fieldApi }: { value: any; fieldApi: any }) => {
+          // Führe die vollständige Form-Validierung durch
+          const currentFormValues = fieldApi.form.state.values
+          const updatedValues = { ...currentFormValues, status: value }
+
+          console.log('🔍 Status field validation with values:', updatedValues)
+
+          const validationResult = applicationSchema.safeParse(updatedValues)
+          if (!validationResult.success) {
+            // Suche nach Fehlern für das Status-Feld
+            const statusErrors = validationResult.error.errors
+              .filter(error => error.path.includes('status'))
+              .map(error => error.message)
+
+            console.log('❌ Status validation errors:', statusErrors)
+            return statusErrors.length > 0 ? statusErrors.join(', ') : undefined
+          }
+          return undefined
+        },
+      },
       options: Object.values(ApplicationStatus).map(status => ({
         value: status,
         label: getStatusLabel(status, tStatus),
@@ -608,6 +703,21 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
       icon: <PlanningIcon />,
       type: 'date',
       tabId: 'lifecycle',
+      validators: {
+        onChange: ({ value, fieldApi }: { value: any; fieldApi: any }) => {
+          const currentFormValues = fieldApi.form.state.values
+          const updatedValues = { ...currentFormValues, planningDate: value }
+
+          const validationResult = applicationSchema.safeParse(updatedValues)
+          if (!validationResult.success) {
+            const fieldErrors = validationResult.error.errors
+              .filter(error => error.path.includes('planningDate'))
+              .map(error => error.message)
+            return fieldErrors.length > 0 ? fieldErrors.join(', ') : undefined
+          }
+          return undefined
+        },
+      },
       size: { xs: 12 },
     },
     {
@@ -616,6 +726,21 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
       icon: <LaunchIcon />,
       type: 'date',
       tabId: 'lifecycle',
+      validators: {
+        onChange: ({ value, fieldApi }: { value: any; fieldApi: any }) => {
+          const currentFormValues = fieldApi.form.state.values
+          const updatedValues = { ...currentFormValues, introductionDate: value }
+
+          const validationResult = applicationSchema.safeParse(updatedValues)
+          if (!validationResult.success) {
+            const fieldErrors = validationResult.error.errors
+              .filter(error => error.path.includes('introductionDate'))
+              .map(error => error.message)
+            return fieldErrors.length > 0 ? fieldErrors.join(', ') : undefined
+          }
+          return undefined
+        },
+      },
       size: { xs: 12 },
     },
     {
@@ -624,6 +749,21 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
       icon: <PauseIcon />,
       type: 'date',
       tabId: 'lifecycle',
+      validators: {
+        onChange: ({ value, fieldApi }: { value: any; fieldApi: any }) => {
+          const currentFormValues = fieldApi.form.state.values
+          const updatedValues = { ...currentFormValues, endOfUseDate: value }
+
+          const validationResult = applicationSchema.safeParse(updatedValues)
+          if (!validationResult.success) {
+            const fieldErrors = validationResult.error.errors
+              .filter(error => error.path.includes('endOfUseDate'))
+              .map(error => error.message)
+            return fieldErrors.length > 0 ? fieldErrors.join(', ') : undefined
+          }
+          return undefined
+        },
+      },
       size: { xs: 12 },
     },
     {
@@ -632,6 +772,21 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
       icon: <DeleteIcon />,
       type: 'date',
       tabId: 'lifecycle',
+      validators: {
+        onChange: ({ value, fieldApi }: { value: any; fieldApi: any }) => {
+          const currentFormValues = fieldApi.form.state.values
+          const updatedValues = { ...currentFormValues, endOfLifeDate: value }
+
+          const validationResult = applicationSchema.safeParse(updatedValues)
+          if (!validationResult.success) {
+            const fieldErrors = validationResult.error.errors
+              .filter(error => error.path.includes('endOfLifeDate'))
+              .map(error => error.message)
+            return fieldErrors.length > 0 ? fieldErrors.join(', ') : undefined
+          }
+          return undefined
+        },
+      },
       size: { xs: 12 },
     },
 

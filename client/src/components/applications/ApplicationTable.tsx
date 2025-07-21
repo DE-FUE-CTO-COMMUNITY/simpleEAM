@@ -344,6 +344,17 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
       timeCategory: app.timeCategory ?? null,
       sevenRStrategy: app.sevenRStrategy ?? null,
       hostedOnIds: app.hostedOn?.map(infra => infra.id) ?? [],
+      introductionDate: app.introductionDate ? new Date(app.introductionDate) : null,
+      endOfLifeDate: app.endOfLifeDate ? new Date(app.endOfLifeDate) : null,
+      planningDate: app.planningDate ? new Date(app.planningDate) : null,
+      endOfUseDate: app.endOfUseDate ? new Date(app.endOfUseDate) : null,
+      partOfArchitectures: app.partOfArchitectures?.map(arch => arch.id) ?? [],
+      implementsPrincipleIds: app.implementsPrinciples?.map(principle => principle.id) ?? [],
+      depictedInDiagrams: app.depictedInDiagrams?.map(diagram => diagram.id) ?? [],
+      parentIds: app.parents?.map(parent => parent.id) ?? [],
+      componentIds: app.components?.map(component => component.id) ?? [],
+      predecessorIds: app.predecessors?.map(pred => pred.id) ?? [],
+      successorIds: app.successors?.map(succ => succ.id) ?? [],
     }
   }
 
