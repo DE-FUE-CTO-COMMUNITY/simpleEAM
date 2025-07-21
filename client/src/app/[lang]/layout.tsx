@@ -17,14 +17,10 @@ export default async function LocaleLayout({
 }) {
   const { lang } = await params
 
-  console.log('LocaleLayout', lang)
-
   // Validate that the incoming `lang` parameter is valid
   if (!routing.locales.includes(lang as any)) {
     notFound()
   }
-
-  console.log('LocaleLayout correct')
 
   // Providing all messages to the client side is the simplest setup.
   const messages = await getMessages()

@@ -171,35 +171,23 @@ export function GenericTable<T extends { id: string }, F>({
   // Handler für das Speichern des Formulars
   const handleFormSubmit = useCallback(
     async (formData: F) => {
-      console.log('🚀 GenericTable: handleFormSubmit started')
-      console.log('📋 Form mode:', formMode)
-      console.log('📝 Form data received:', formData)
-      console.log('📄 Selected item:', selectedItem)
-
       setFormLoading(true)
       try {
         if (formMode === 'create' && onCreate) {
-          console.log('➕ Calling onCreate function...')
           await onCreate(formData)
-          console.log('✅ onCreate completed successfully')
           // Nur schließen wenn erfolgreich
           setIsFormOpen(false)
-          console.log('🚪 Form dialog closed after create')
         } else if (formMode === 'edit' && selectedItem && onUpdate) {
           const itemId = getIdFromData(selectedItem)
-          console.log('✏️ Calling onUpdate function with id:', itemId)
           await onUpdate(itemId, formData)
-          console.log('✅ onUpdate completed successfully')
           // Nur schließen wenn erfolgreich
           setIsFormOpen(false)
-          console.log('🚪 Form dialog closed after update')
         }
       } catch (error) {
         console.error('💥 GenericTable handleFormSubmit error:', error)
         // Dialog nicht schließen bei Fehler
       } finally {
         setFormLoading(false)
-        console.log('🏁 GenericTable: handleFormSubmit finished')
       }
     },
     [formMode, onCreate, onUpdate, selectedItem, getIdFromData]

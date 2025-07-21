@@ -89,8 +89,6 @@ const baseApplicationSchema = z.object({
 
 // Schema für die Formularvalidierung mit erweiterten Validierungen
 export const applicationSchema = baseApplicationSchema.superRefine((data, ctx) => {
-  console.log('🔍 ApplicationSchema validation started with data:', data)
-
   // Lifecycle-Datums-Validierung - Prüfe spezifische Paarungen, nicht sequenziell
   // Planungsdatum < Einführungsdatum
   if (data.planningDate && data.introductionDate && data.planningDate >= data.introductionDate) {
@@ -140,8 +138,6 @@ export const applicationSchema = baseApplicationSchema.superRefine((data, ctx) =
   // Status-Lifecycle-Validierung basierend auf dem aktuellen Datum
   const status = data.status
   const now = new Date()
-  console.log('🔍 Status validation for:', status, 'Current time:', now)
-
   switch (status) {
     case ApplicationStatus.IN_DEVELOPMENT:
       // IN_DEVELOPMENT: Einführungsdatum muss in der Zukunft liegen (oder nicht gesetzt sein)
@@ -212,8 +208,6 @@ export const applicationSchema = baseApplicationSchema.superRefine((data, ctx) =
       }
       break
   }
-
-  console.log('✅ ApplicationSchema validation completed')
 })
 
 // TypeScript Typen basierend auf dem Schema
@@ -375,13 +369,9 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
   const form = useForm({
     defaultValues,
     onSubmit: async ({ value }) => {
-      console.log('🚀 ApplicationForm: onSubmit started')
-      console.log('📝 Form values:', value)
-
       try {
         // Validierung vor der Verarbeitung
         const validationResult = applicationSchema.safeParse(value)
-        console.log('✅ Schema validation result:', validationResult)
 
         if (!validationResult.success) {
           console.error('❌ Validation failed:', validationResult.error.errors)
@@ -395,11 +385,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
           sevenRStrategy: value.sevenRStrategy === '' ? null : value.sevenRStrategy,
         }
 
-        console.log('🔄 Processed values:', processedValue)
-        console.log('📤 Calling onSubmit with processed values...')
-
         await onSubmit(processedValue)
-        console.log('✅ onSubmit completed successfully')
       } catch (error) {
         console.error('💥 ApplicationForm onSubmit error:', error)
         throw error
@@ -517,8 +503,6 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
           const currentFormValues = fieldApi.form.state.values
           const updatedValues = { ...currentFormValues, status: value }
 
-          console.log('🔍 Status field validation with values:', updatedValues)
-
           const validationResult = applicationSchema.safeParse(updatedValues)
           if (!validationResult.success) {
             // Suche nach Fehlern für das Status-Feld
@@ -526,7 +510,6 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
               .filter(error => error.path.includes('status'))
               .map(error => error.message)
 
-            console.log('❌ Status validation errors:', statusErrors)
             return statusErrors.length > 0 ? statusErrors.join(', ') : undefined
           }
           return undefined
