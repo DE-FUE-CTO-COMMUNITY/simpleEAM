@@ -15,6 +15,7 @@ import {
   Divider,
   CircularProgress,
 } from '@mui/material'
+import { useTranslations } from 'next-intl'
 import { getElementTypeLabel } from '../utils/newElementsUtils'
 
 interface NewElement {
@@ -46,6 +47,13 @@ export const NewElementsDialog: React.FC<NewElementsDialogProps> = ({
   loading = false,
 }) => {
   const [selectedElements, setSelectedElements] = useState<NewElement[]>([])
+  const t = useTranslations('diagrams.dialogs.newElements')
+  const tCommon = useTranslations('common')
+
+  // Translate element types using internationalization
+  const getElementTypeLabelTranslated = (elementType: string): string => {
+    return t(`elementTypes.${elementType}` as any) || getElementTypeLabel(elementType)
+  }
 
   // Initialize selection state when dialog opens
   React.useEffect(() => {
@@ -77,11 +85,10 @@ export const NewElementsDialog: React.FC<NewElementsDialogProps> = ({
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth disableEscapeKeyDown={loading}>
       <DialogTitle>
         <Typography variant="h6" component="div">
-          Neue Elemente in Datenbank übernehmen
+          {t('title')}
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-          Das Diagramm enthält {newElements.length} neue Elemente, die noch nicht in der Datenbank
-          existieren. Wählen Sie aus, welche Elemente in die Datenbank übernommen werden sollen.
+          {t('description', { count: newElements.length })}
         </Typography>
       </DialogTitle>
 
@@ -99,7 +106,10 @@ export const NewElementsDialog: React.FC<NewElementsDialogProps> = ({
                 disabled={loading}
               />
             }
-            label={`Alle auswählen (${selectedCount} von ${newElements.length} ausgewählt)`}
+            label={t('selectAll', { 
+              selectedCount, 
+              totalCount: newElements.length 
+            })}
           />
         </Box>
 
@@ -129,14 +139,18 @@ export const NewElementsDialog: React.FC<NewElementsDialogProps> = ({
                 label={
                   <Box>
                     <Typography variant="subtitle1" fontWeight="medium">
-                      {element.text || `Element ${index + 1}`}
+                      {element.text || t('elementLabel', { index: index + 1 })}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      Typ: {getElementTypeLabel(element.elementType)}
+                      {t('elementType', { type: getElementTypeLabelTranslated(element.elementType) })}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      Position: ({Math.round(element.x)}, {Math.round(element.y)}) • Größe:{' '}
-                      {Math.round(element.width)} × {Math.round(element.height)}
+                      {t('elementPosition', {
+                        x: Math.round(element.x),
+                        y: Math.round(element.y),
+                        width: Math.round(element.width),
+                        height: Math.round(element.height)
+                      })}
                     </Typography>
                   </Box>
                 }
@@ -148,14 +162,14 @@ export const NewElementsDialog: React.FC<NewElementsDialogProps> = ({
 
         {newElements.length === 0 && (
           <Typography variant="body2" color="text.secondary" textAlign="center" sx={{ py: 4 }}>
-            Keine neuen Elemente gefunden.
+            {t('noElementsFound')}
           </Typography>
         )}
       </DialogContent>
 
       <DialogActions>
         <Button onClick={onClose} disabled={loading}>
-          Abbrechen
+          {tCommon('cancel')}
         </Button>
         <Button
           onClick={handleConfirm}
@@ -164,8 +178,11 @@ export const NewElementsDialog: React.FC<NewElementsDialogProps> = ({
           startIcon={loading ? <CircularProgress size={20} /> : undefined}
         >
           {loading
-            ? 'Erstelle Elemente...'
-            : `${selectedCount} ${selectedCount === 1 ? 'Element' : 'Elemente'} erstellen`}
+            ? t('creatingElements')
+            : t('createButton', { 
+                count: selectedCount, 
+                elementText: selectedCount === 1 ? 'Element' : 'Elemente' 
+              })}
         </Button>
       </DialogActions>
     </Dialog>

@@ -175,9 +175,22 @@
         "confirmSubtext": "Diese Aktion kann nicht rückgängig gemacht werden."
       },
       "newElements": {
-        "title": "Neue Elemente",
-        "description": "Die folgenden neuen Elemente wurden im Diagramm erkannt:",
-        "createButton": "Elemente erstellen"
+        "title": "Neue Elemente in Datenbank übernehmen",
+        "description": "Das Diagramm enthält {count} neue Elemente, die noch nicht in der Datenbank existieren. Wählen Sie aus, welche Elemente in die Datenbank übernommen werden sollen.",
+        "selectAll": "Alle auswählen ({selectedCount} von {totalCount} ausgewählt)",
+        "elementLabel": "Element {index}",
+        "elementType": "Typ: {type}",
+        "elementPosition": "Position: ({x}, {y}) • Größe: {width} × {height}",
+        "noElementsFound": "Keine neuen Elemente gefunden.",
+        "createButton": "{count} {elementText} erstellen",
+        "creatingElements": "Erstelle Elemente...",
+        "elementTypes": {
+          "application": "Anwendung",
+          "capability": "Capability",
+          "dataObject": "Datenobjekt",
+          "interface": "Schnittstelle",
+          "infrastructure": "Infrastruktur"
+        }
       },
       "capabilityMap": {
         "title": "Capability Map generieren",
