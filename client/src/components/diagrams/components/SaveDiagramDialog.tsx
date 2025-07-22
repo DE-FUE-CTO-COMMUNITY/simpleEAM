@@ -466,11 +466,8 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
           selectedRelationships,
           creationResult.createdElements
         )
-        
-        relationshipResult = await createRelationshipsInDatabase(
-          apolloClient,
-          updatedRelationships
-        )
+
+        relationshipResult = await createRelationshipsInDatabase(apolloClient, updatedRelationships)
       }
 
       if (creationResult.success && relationshipResult.success) {
