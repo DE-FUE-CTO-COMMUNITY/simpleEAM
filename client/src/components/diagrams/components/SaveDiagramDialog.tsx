@@ -37,7 +37,10 @@ import {
   createNewElementsInDatabase,
   updateElementsWithDatabaseReferences,
 } from '../utils/newElementsUtils'
-import { NewElementsDialog } from './NewElementsDialog'
+import { ExtendedNewElementsDialog } from './ExtendedNewElementsDialog'
+import { analyzeArrows, filterExistingRelationships } from '../utils/arrowAnalysis'
+import { NewRelationship } from '../types/relationshipTypes'
+import { createRelationshipsInDatabase } from '../utils/relationshipCreation'
 
 export interface DiagramType {
   value: string
@@ -170,9 +173,16 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
   const [titleError, setTitleError] = useState(false)
   const [architectureError, setArchitectureError] = useState(false)
 
-  // State für neue Elemente
+  // State für neue Elemente und Beziehungen
   const [newElementsDialogOpen, setNewElementsDialogOpen] = useState(false)
   const [detectedNewElements, setDetectedNewElements] = useState<any[]>([])
+  const [detectedNewRelationships, setDetectedNewRelationships] = useState<NewRelationship[]>([])
+  const [detectedIncompleteRelationships, setDetectedIncompleteRelationships] = useState<
+    NewRelationship[]
+  >([])
+  const [detectedInvalidRelationships, setDetectedInvalidRelationships] = useState<
+    NewRelationship[]
+  >([])
   const [creatingElements, setCreatingElements] = useState(false)
 
   // Führe die Query nur aus, wenn der Benutzer authentifiziert ist
@@ -369,19 +379,35 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
       return
     }
 
-    // Prüfe auf neue Elemente im Diagramm
+    // Prüfe auf neue Elemente und Beziehungen im Diagramm
     try {
       const parsedDiagramData = JSON.parse(diagramData)
-      const newElements = detectNewElements(parsedDiagramData.elements || [])
+      const elements = parsedDiagramData.elements || []
 
-      if (newElements.length > 0) {
-        // Neue Elemente gefunden - Dialog öffnen
+      // Neue Elemente erkennen
+      const newElements = detectNewElements(elements)
+
+      // Pfeilanalyse durchführen
+      const arrowAnalysis = analyzeArrows(elements)
+      const validRelationships = await filterExistingRelationships(arrowAnalysis.validRelationships)
+
+      const hasNewElements = newElements.length > 0
+      const hasNewRelationships =
+        validRelationships.length > 0 ||
+        arrowAnalysis.incompleteRelationships.length > 0 ||
+        arrowAnalysis.invalidRelationships.length > 0
+
+      if (hasNewElements || hasNewRelationships) {
+        // Neue Elemente oder Beziehungen gefunden - Dialog öffnen
         setDetectedNewElements(newElements)
+        setDetectedNewRelationships(validRelationships)
+        setDetectedIncompleteRelationships(arrowAnalysis.incompleteRelationships)
+        setDetectedInvalidRelationships(arrowAnalysis.invalidRelationships)
         setNewElementsDialogOpen(true)
         return
       }
     } catch (error) {
-      console.warn('Fehler beim Parsen der Diagrammdaten:', error)
+      console.warn('Fehler beim Parsen der Diagrammdaten oder bei der Pfeilanalyse:', error)
     }
 
     // Keine neuen Elemente oder Parsing-Fehler - normales Speichern
@@ -392,15 +418,30 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
     }
   }
 
-  const handleNewElementsConfirm = async (selectedElements: any[]) => {
+  const handleNewElementsConfirm = async (
+    selectedElements: any[],
+    selectedRelationships: NewRelationship[] = []
+  ) => {
     setNewElementsDialogOpen(false)
     setCreatingElements(true)
 
     try {
       // Erstelle die ausgewählten Elemente in der Datenbank
-      const creationResult = await createNewElementsInDatabase(apolloClient, selectedElements)
+      let creationResult: any = { success: true, createdElements: [] }
+      if (selectedElements.length > 0) {
+        creationResult = await createNewElementsInDatabase(apolloClient, selectedElements)
+      }
 
-      if (creationResult.success) {
+      // Erstelle die ausgewählten Beziehungen in der Datenbank
+      let relationshipResult: any = { success: true, createdCount: 0, errors: [] }
+      if (selectedRelationships.length > 0) {
+        relationshipResult = await createRelationshipsInDatabase(
+          apolloClient,
+          selectedRelationships
+        )
+      }
+
+      if (creationResult.success && relationshipResult.success) {
         // Aktualisiere die Diagrammdaten mit den neuen Datenbankreferenzen
         const parsedDiagramData = JSON.parse(diagramData)
         const updatedElements = updateElementsWithDatabaseReferences(
@@ -751,12 +792,15 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
         </DialogActions>
       </Dialog>
 
-      {/* Dialog für neue Elemente */}
-      <NewElementsDialog
+      {/* Dialog für neue Elemente und Beziehungen */}
+      <ExtendedNewElementsDialog
         open={newElementsDialogOpen}
         onClose={() => setNewElementsDialogOpen(false)}
         onConfirm={handleNewElementsConfirm}
         newElements={detectedNewElements}
+        newRelationships={detectedNewRelationships}
+        incompleteRelationships={detectedIncompleteRelationships}
+        invalidRelationships={detectedInvalidRelationships}
         loading={creatingElements}
       />
     </>

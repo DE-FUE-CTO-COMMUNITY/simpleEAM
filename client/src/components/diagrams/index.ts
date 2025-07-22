@@ -5,7 +5,6 @@ export { default as DeleteDiagramDialog } from './components/DeleteDiagramDialog
 export { default as DiagramNameDisplay } from './components/DiagramNameDisplay'
 export { default as ExcalidrawWrapper } from './components/ExcalidrawWrapper'
 export { default as IntegratedLibrary } from './components/IntegratedLibrary'
-export { NewElementsDialog } from './components/NewElementsDialog'
 export { default as OpenDiagramDialog } from './components/OpenDiagramDialog'
 export { default as SaveDiagramDialog } from './components/SaveDiagramDialog'
 

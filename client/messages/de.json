@@ -189,7 +189,49 @@
           "capability": "Capability",
           "dataObject": "Datenobjekt",
           "interface": "Schnittstelle",
+          "applicationInterface": "Anwendungsschnittstelle",
           "infrastructure": "Infrastruktur"
+        }
+      },
+      "newRelationships": {
+        "title": "Neue Beziehungen",
+        "description": "Gültige Beziehungen, die nicht in der Datenbank vorhanden sind:",
+        "incompleteTitle": "Unvollständige Beziehungen",
+        "incompleteDescription": "Beziehungen mit fehlenden Verbindungen:",
+        "invalidTitle": "Ungültige Beziehungen",
+        "invalidDescription": "Beziehungen zwischen inkompatiblen Elementtypen:",
+        "selectAll": "Alle auswählen ({selectedCount} von {totalCount} ausgewählt)",
+        "relationshipFormat": "{sourceElement} ({sourceType}) → {relationshipName} → {targetElement} ({targetType})",
+        "missingElement": "Fehlendes Element",
+        "newElement": "Neu: {elementName}",
+        "noValidRelationships": "Keine gültigen Beziehungen gefunden.",
+        "noIncompleteRelationships": "Keine unvollständigen Beziehungen gefunden.",
+        "noInvalidRelationships": "Keine ungültigen Beziehungen gefunden.",
+        "createButton": "{count} {relationshipText} erstellen",
+        "creatingRelationships": "Erstelle Beziehungen...",
+        "relationshipNames": {
+          "SUPPORTS": "unterstützt",
+          "USES": "verwendet",
+          "DATA_SOURCE": "ist Datenquelle für",
+          "INTERFACE_SOURCE": "ist Quell-Anwendung von",
+          "INTERFACE_TARGET": "ist Ziel-Anwendung von",
+          "HOSTED_ON": "gehostet auf",
+          "TRANSFERS": "überträgt",
+          "RELATED_TO": "bezieht sich auf"
+        },
+        "terms": {
+          "relationship": "Beziehung",
+          "relationships": "Beziehungen",
+          "creatingElementsAndRelationships": "Erstelle Elemente und Beziehungen...",
+          "element": "Element",
+          "elements": "Elemente"
+        },
+        "bindingIssues": {
+          "title": "Pfeil-Verbindungsprobleme",
+          "description": "Pfeile mit fehlenden oder fehlerhaften Verbindungen:",
+          "missingStartBinding": "Fehlende Start-Verbindung",
+          "missingEndBinding": "Fehlende End-Verbindung",
+          "bindingToNonMainElement": "Verbindung zu Nicht-Hauptelement"
         }
       },
       "capabilityMap": {

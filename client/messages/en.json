@@ -189,7 +189,49 @@
           "capability": "Capability",
           "dataObject": "Data Object",
           "interface": "Interface",
+          "applicationInterface": "Application Interface",
           "infrastructure": "Infrastructure"
+        }
+      },
+      "newRelationships": {
+        "title": "New Relationships",
+        "description": "Valid relationships that are not present in the database:",
+        "incompleteTitle": "Incomplete Relationships",
+        "incompleteDescription": "Relationships with missing connections:",
+        "invalidTitle": "Invalid Relationships",
+        "invalidDescription": "Relationships between incompatible element types:",
+        "selectAll": "Select all ({selectedCount} of {totalCount} selected)",
+        "relationshipFormat": "{sourceElement} ({sourceType}) → {relationshipName} → {targetElement} ({targetType})",
+        "missingElement": "Missing Element",
+        "newElement": "New: {elementName}",
+        "noValidRelationships": "No valid relationships found.",
+        "noIncompleteRelationships": "No incomplete relationships found.",
+        "noInvalidRelationships": "No invalid relationships found.",
+        "createButton": "Create {count} {relationshipText}",
+        "creatingRelationships": "Creating relationships...",
+        "relationshipNames": {
+          "SUPPORTS": "supports",
+          "USES": "uses",
+          "DATA_SOURCE": "is data source for",
+          "INTERFACE_SOURCE": "is source application of",
+          "INTERFACE_TARGET": "is target application of",
+          "HOSTED_ON": "hosted on",
+          "TRANSFERS": "transfers",
+          "RELATED_TO": "relates to"
+        },
+        "terms": {
+          "relationship": "Relationship",
+          "relationships": "Relationships",
+          "creatingElementsAndRelationships": "Creating elements and relationships...",
+          "element": "Element",
+          "elements": "Elements"
+        },
+        "bindingIssues": {
+          "title": "Arrow Binding Issues",
+          "description": "Arrows with missing or incorrect bindings:",
+          "missingStartBinding": "Missing start binding",
+          "missingEndBinding": "Missing end binding",
+          "bindingToNonMainElement": "Binding to non-main element"
         }
       },
       "capabilityMap": {
