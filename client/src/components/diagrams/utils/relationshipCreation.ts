@@ -315,10 +315,10 @@ const createSingleRelationship = async (
         await client.mutate({
           mutation: UPDATE_APPLICATION_SUPPORTS_CAPABILITIES,
           variables: {
-            where: { id: sourceElementId },
+            where: { id: { eq: sourceElementId } },
             update: {
               supportsCapabilities: {
-                connect: [{ where: { node: { id: targetElementId } } }],
+                connect: [{ where: { node: { id: { eq: targetElementId } } } }],
               },
             },
           },
@@ -331,10 +331,10 @@ const createSingleRelationship = async (
         await client.mutate({
           mutation: UPDATE_APPLICATION_USES_DATA_OBJECTS,
           variables: {
-            where: { id: sourceElementId },
+            where: { id: { eq: sourceElementId } },
             update: {
               usesDataObjects: {
-                connect: [{ where: { node: { id: targetElementId } } }],
+                connect: [{ where: { node: { id: { eq: targetElementId } } } }],
               },
             },
           },
@@ -347,10 +347,10 @@ const createSingleRelationship = async (
         await client.mutate({
           mutation: UPDATE_APPLICATION_HOSTED_ON,
           variables: {
-            where: { id: sourceElementId },
+            where: { id: { eq: sourceElementId } },
             update: {
               hostedOn: {
-                connect: [{ where: { node: { id: targetElementId } } }],
+                connect: [{ where: { node: { id: { eq: targetElementId } } } }],
               },
             },
           },
@@ -364,10 +364,10 @@ const createSingleRelationship = async (
         await client.mutate({
           mutation: UPDATE_APPLICATION_SOURCE_OF_INTERFACES,
           variables: {
-            where: { id: sourceElementId },
+            where: { id: { eq: sourceElementId } },
             update: {
               sourceOfInterfaces: {
-                connect: [{ where: { node: { id: targetElementId } } }],
+                connect: [{ where: { node: { id: { eq: targetElementId } } } }],
               },
             },
           },
@@ -380,10 +380,10 @@ const createSingleRelationship = async (
         await client.mutate({
           mutation: UPDATE_APPLICATION_INTERFACE_SOURCE_APPLICATIONS,
           variables: {
-            where: { id: sourceElementId },
+            where: { id: { eq: sourceElementId } },
             update: {
               sourceApplications: {
-                connect: [{ where: { node: { id: targetElementId } } }],
+                connect: [{ where: { node: { id: { eq: targetElementId } } } }],
               },
             },
           },
@@ -397,10 +397,10 @@ const createSingleRelationship = async (
         await client.mutate({
           mutation: UPDATE_APPLICATION_TARGET_OF_INTERFACES,
           variables: {
-            where: { id: sourceElementId },
+            where: { id: { eq: sourceElementId } },
             update: {
               targetOfInterfaces: {
-                connect: [{ where: { node: { id: targetElementId } } }],
+                connect: [{ where: { node: { id: { eq: targetElementId } } } }],
               },
             },
           },
@@ -413,10 +413,10 @@ const createSingleRelationship = async (
         await client.mutate({
           mutation: UPDATE_APPLICATION_INTERFACE_TARGET_APPLICATIONS,
           variables: {
-            where: { id: sourceElementId },
+            where: { id: { eq: sourceElementId } },
             update: {
               targetApplications: {
-                connect: [{ where: { node: { id: targetElementId } } }],
+                connect: [{ where: { node: { id: { eq: targetElementId } } } }],
               },
             },
           },
@@ -429,10 +429,10 @@ const createSingleRelationship = async (
         await client.mutate({
           mutation: UPDATE_BUSINESS_CAPABILITY_RELATED_DATA_OBJECTS,
           variables: {
-            where: { id: sourceElementId },
+            where: { id: { eq: sourceElementId } },
             update: {
               relatedDataObjects: {
-                connect: [{ where: { node: { id: targetElementId } } }],
+                connect: [{ where: { node: { id: { eq: targetElementId } } } }],
               },
             },
           },
@@ -489,10 +489,10 @@ const createSingleRelationship = async (
         await client.mutate({
           mutation: UPDATE_DATA_OBJECT_DATA_SOURCES,
           variables: {
-            where: { id: sourceElementId },
+            where: { id: { eq: sourceElementId } },
             update: {
               dataSources: {
-                connect: [{ where: { node: { id: targetElementId } } }],
+                connect: [{ where: { node: { id: { eq: targetElementId } } } }],
               },
             },
           },

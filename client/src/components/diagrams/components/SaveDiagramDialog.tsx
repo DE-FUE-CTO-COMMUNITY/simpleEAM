@@ -36,6 +36,7 @@ import {
   detectNewElements,
   createNewElementsInDatabase,
   updateElementsWithDatabaseReferences,
+  updateRelationshipsWithDatabaseReferences,
 } from '../utils/newElementsUtils'
 import { ExtendedNewElementsDialog } from './ExtendedNewElementsDialog'
 import { analyzeArrows } from '../utils/arrowAnalysis'
@@ -460,9 +461,15 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
       // Erstelle die ausgewählten Beziehungen in der Datenbank
       let relationshipResult: any = { success: true, createdCount: 0, errors: [] }
       if (selectedRelationships.length > 0) {
+        // Aktualisiere die Beziehungen mit den neuen Datenbank-IDs der erstellten Elemente
+        const updatedRelationships = updateRelationshipsWithDatabaseReferences(
+          selectedRelationships,
+          creationResult.createdElements
+        )
+        
         relationshipResult = await createRelationshipsInDatabase(
           apolloClient,
-          selectedRelationships
+          updatedRelationships
         )
       }
 

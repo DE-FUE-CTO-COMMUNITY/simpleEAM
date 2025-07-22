@@ -431,3 +431,33 @@ export const getElementTypeLabel = (elementType: string): string => {
       return elementType
   }
 }
+
+/**
+ * Aktualisiert Relationship-Referenzen mit Datenbank-IDs
+ */
+export const updateRelationshipsWithDatabaseReferences = (
+  relationships: any[],
+  createdElements: Array<{ elementId: string; databaseId: string; elementType: string }>
+): any[] => {
+  const elementMap = new Map(createdElements.map(el => [el.elementId, el]))
+
+  return relationships.map(relationship => {
+    const sourceElement = elementMap.get(relationship.sourceElementId)
+    const targetElement = elementMap.get(relationship.targetElementId)
+
+    // Erstelle eine Kopie der Relationship mit aktualisierten IDs
+    const updatedRelationship = { ...relationship }
+
+    // Aktualisiere Source-Element-ID wenn es neu erstellt wurde
+    if (sourceElement) {
+      updatedRelationship.sourceElementId = sourceElement.databaseId
+    }
+
+    // Aktualisiere Target-Element-ID wenn es neu erstellt wurde
+    if (targetElement) {
+      updatedRelationship.targetElementId = targetElement.databaseId
+    }
+
+    return updatedRelationship
+  })
+}

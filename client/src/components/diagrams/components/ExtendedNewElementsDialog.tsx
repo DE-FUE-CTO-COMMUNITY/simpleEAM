@@ -532,94 +532,76 @@ export const ExtendedNewElementsDialog: React.FC<ExtendedNewElementsDialogProps>
               </Accordion>
             )}
 
-            {/* Unvollständige Beziehungen */}
-            <Accordion>
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="h6" color="warning.main">
-                  {tRel('incompleteTitle')} ({incompleteRelationships.length})
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Alert severity="warning" sx={{ mb: 2 }}>
-                  {tRel('incompleteDescription')}
-                </Alert>
-
-                {/* Unvollständige Beziehungen haben KEINE Checkboxen - nur Anzeige */}
-                {selectedIncompleteRelationships.map(relationship => (
-                  <Paper
-                    key={relationship.id}
-                    variant="outlined"
-                    sx={{
-                      p: 2,
-                      mb: 2,
-                      border: '1px solid',
-                      borderColor: 'warning.main',
-                      backgroundColor: 'warning.lighter',
-                    }}
-                  >
-                    <Typography variant="body2">{formatRelationship(relationship)}</Typography>
-                  </Paper>
-                ))}
-
-                {incompleteRelationships.length === 0 && (
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    textAlign="center"
-                    sx={{ py: 2 }}
-                  >
-                    {tRel('noIncompleteRelationships')}
+            {/* Unvollständige Beziehungen - nur anzeigen wenn vorhanden */}
+            {incompleteRelationships.length > 0 && (
+              <Accordion>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <Typography variant="h6" color="warning.main">
+                    {tRel('incompleteTitle')} ({incompleteRelationships.length})
                   </Typography>
-                )}
-              </AccordionDetails>
-            </Accordion>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Alert severity="warning" sx={{ mb: 2 }}>
+                    {tRel('incompleteDescription')}
+                  </Alert>
 
-            {/* Ungültige Beziehungen */}
-            <Accordion>
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="h6" color="error.main">
-                  {tRel('invalidTitle')} ({invalidRelationships.length})
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Alert severity="error" sx={{ mb: 2 }}>
-                  {tRel('invalidDescription')}
-                </Alert>
-
-                {/* Ungültige Beziehungen haben KEINE Checkboxen - nur Anzeige */}
-                {selectedInvalidRelationships.map(relationship => (
-                  <Paper
-                    key={relationship.id}
-                    variant="outlined"
-                    sx={{
-                      p: 2,
-                      mb: 2,
-                      border: '1px solid',
-                      borderColor: 'error.main',
-                      backgroundColor: 'error.lighter',
-                    }}
-                  >
-                    <Box>
+                  {/* Unvollständige Beziehungen haben KEINE Checkboxen - nur Anzeige */}
+                  {selectedIncompleteRelationships.map(relationship => (
+                    <Paper
+                      key={relationship.id}
+                      variant="outlined"
+                      sx={{
+                        p: 2,
+                        mb: 2,
+                        border: '1px solid',
+                        borderColor: 'warning.main',
+                        backgroundColor: 'warning.lighter',
+                      }}
+                    >
                       <Typography variant="body2">{formatRelationship(relationship)}</Typography>
-                      <Typography variant="caption" color="error.main">
-                        {translateInvalidReason(relationship.invalidReason || '')}
-                      </Typography>
-                    </Box>
-                  </Paper>
-                ))}
+                    </Paper>
+                  ))}
+                </AccordionDetails>
+              </Accordion>
+            )}
 
-                {invalidRelationships.length === 0 && (
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    textAlign="center"
-                    sx={{ py: 2 }}
-                  >
-                    {tRel('noInvalidRelationships')}
+            {/* Ungültige Beziehungen - nur anzeigen wenn vorhanden */}
+            {invalidRelationships.length > 0 && (
+              <Accordion>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <Typography variant="h6" color="error.main">
+                    {tRel('invalidTitle')} ({invalidRelationships.length})
                   </Typography>
-                )}
-              </AccordionDetails>
-            </Accordion>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Alert severity="error" sx={{ mb: 2 }}>
+                    {tRel('invalidDescription')}
+                  </Alert>
+
+                  {/* Ungültige Beziehungen haben KEINE Checkboxen - nur Anzeige */}
+                  {selectedInvalidRelationships.map(relationship => (
+                    <Paper
+                      key={relationship.id}
+                      variant="outlined"
+                      sx={{
+                        p: 2,
+                        mb: 2,
+                        border: '1px solid',
+                        borderColor: 'error.main',
+                        backgroundColor: 'error.lighter',
+                      }}
+                    >
+                      <Box>
+                        <Typography variant="body2">{formatRelationship(relationship)}</Typography>
+                        <Typography variant="caption" color="error.main">
+                          {translateInvalidReason(relationship.invalidReason || '')}
+                        </Typography>
+                      </Box>
+                    </Paper>
+                  ))}
+                </AccordionDetails>
+              </Accordion>
+            )}
           </Box>
         )}
       </DialogContent>
@@ -631,7 +613,7 @@ export const ExtendedNewElementsDialog: React.FC<ExtendedNewElementsDialogProps>
         <Button
           onClick={handleConfirm}
           variant="contained"
-          disabled={loading || (selectedElementCount === 0 && selectedRelationshipCount === 0)}
+          disabled={loading}
           startIcon={loading ? <CircularProgress size={20} /> : undefined}
         >
           {loading
@@ -662,7 +644,8 @@ export const ExtendedNewElementsDialog: React.FC<ExtendedNewElementsDialogProps>
                     })
                   )
                 }
-                return parts.join(' & ')
+                // Fallback wenn nichts ausgewählt ist - trotzdem fortfahren erlauben
+                return parts.length > 0 ? parts.join(' & ') : tCommon('confirm')
               })()}
         </Button>
       </DialogActions>
