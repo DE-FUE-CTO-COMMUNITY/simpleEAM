@@ -13,6 +13,7 @@ export interface ExcalidrawElement {
   width: number
   height: number
   text?: { text: string }
+  groupIds?: string[] // Gruppen-IDs für gruppierte Elemente
   customData?: {
     isFromDatabase?: boolean
     databaseId?: string
@@ -70,7 +71,7 @@ export interface NewRelationship {
   relationshipDefinition: RelationshipDefinition
   selected: boolean
   status: 'valid' | 'incomplete' | 'invalid'
-  missingElement?: 'source' | 'target'
+  missingElement?: 'source' | 'target' | 'both'
   invalidReason?: string
 }
 
@@ -104,4 +105,5 @@ export interface ArrowAnalysisCompleteResult {
   incompleteRelationships: NewRelationship[]
   invalidRelationships: NewRelationship[]
   bindingIssues: ArrowAnalysisResult[]
+  correctedElements?: ExcalidrawElement[] // Elemente mit korrigierten Bindings
 }

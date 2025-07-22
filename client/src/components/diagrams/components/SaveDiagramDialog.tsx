@@ -38,7 +38,7 @@ import {
   updateElementsWithDatabaseReferences,
 } from '../utils/newElementsUtils'
 import { ExtendedNewElementsDialog } from './ExtendedNewElementsDialog'
-import { analyzeArrows, filterExistingRelationships } from '../utils/arrowAnalysis'
+import { analyzeArrows } from '../utils/arrowAnalysis'
 import { NewRelationship } from '../types/relationshipTypes'
 import { createRelationshipsInDatabase } from '../utils/relationshipCreation'
 
@@ -387,9 +387,34 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
       // Neue Elemente erkennen
       const newElements = detectNewElements(elements)
 
-      // Pfeilanalyse durchführen
-      const arrowAnalysis = analyzeArrows(elements)
-      const validRelationships = await filterExistingRelationships(arrowAnalysis.validRelationships)
+      // Pfeilanalyse durchführen - mit Apollo Client für Beziehungsfilterung
+      const arrowAnalysis = await analyzeArrows(elements, apolloClient)
+      const validRelationships = arrowAnalysis.validRelationships // Bereits gefiltert durch analyzeArrows
+
+      // Prüfe, ob Bindings korrigiert wurden und aktualisiere das Diagramm
+      if (arrowAnalysis.correctedElements && arrowAnalysis.correctedElements.length > 0) {
+        console.log(
+          `Correcting ${arrowAnalysis.correctedElements.length} elements with updated bindings`
+        )
+
+        // Erstelle eine neue Elementliste mit den korrigierten Elementen
+        const correctedElementMap = new Map(arrowAnalysis.correctedElements.map(el => [el.id, el]))
+        const updatedElements = elements.map((el: any) => correctedElementMap.get(el.id) || el)
+
+        // Erstelle aktualisierte Diagrammdaten
+        const updatedDiagramData = JSON.stringify({
+          ...parsedDiagramData,
+          elements: updatedElements,
+        })
+
+        // Informiere den Parent über die Aktualisierung (das aktualisiert die Canvas)
+        if (onDiagramUpdate) {
+          onDiagramUpdate(updatedDiagramData)
+        }
+
+        // Aktualisiere die lokalen diagramData für weitere Verarbeitung
+        parsedDiagramData.elements = updatedElements
+      }
 
       const hasNewElements = newElements.length > 0
       const hasNewRelationships =

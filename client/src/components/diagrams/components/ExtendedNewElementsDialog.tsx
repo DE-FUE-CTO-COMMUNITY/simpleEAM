@@ -79,6 +79,33 @@ export const ExtendedNewElementsDialog: React.FC<ExtendedNewElementsDialogProps>
     return t(`elementTypes.${elementType}` as any) || getElementTypeLabel(elementType)
   }
 
+  // Helper function to translate invalidReason text
+  const translateInvalidReason = (invalidReason: string): string => {
+    // Check if it's a translation key
+    if (invalidReason.startsWith('diagrams.dialogs.newRelationships.invalidReasons.')) {
+      // Handle parameterized translations (e.g., incompatibleElementTypes with sourceType and targetType)
+      if (invalidReason.includes(':sourceType=') && invalidReason.includes(':targetType=')) {
+        const [, params] = invalidReason.split(':sourceType=')
+        const [sourceType, targetType] = params.split(':targetType=')
+
+        return tRel('invalidReasons.incompatibleElementTypes', {
+          sourceType: getElementTypeLabelTranslated(sourceType),
+          targetType: getElementTypeLabelTranslated(targetType),
+        })
+      } else {
+        // Simple translation key
+        const translationKey = invalidReason.replace(
+          'diagrams.dialogs.newRelationships.',
+          ''
+        ) as any
+        return tRel(translationKey)
+      }
+    }
+
+    // Fallback for non-translated text (shouldn't happen after migration)
+    return invalidReason
+  }
+
   // Initialize selection state when dialog opens
   React.useEffect(() => {
     if (open && newElements.length > 0) {
@@ -111,6 +138,31 @@ export const ExtendedNewElementsDialog: React.FC<ExtendedNewElementsDialogProps>
       )
     }
   }, [open, invalidRelationships])
+
+  // Debug arrow analysis when dialog opens
+  React.useEffect(() => {
+    if (open) {
+      console.log('=== Dialog opened ===')
+      console.log('Neue Beziehungen:', newRelationships.length)
+      console.log('Unvollständige Beziehungen:', incompleteRelationships.length)
+      console.log('Ungültige Beziehungen:', invalidRelationships.length)
+
+      // Detaillierte Ausgabe der Beziehungen
+      if (incompleteRelationships.length > 0) {
+        console.log('Details der unvollständigen Beziehungen:')
+        incompleteRelationships.forEach((rel, index) => {
+          console.log(`  ${index + 1}.`, {
+            id: rel.id,
+            status: rel.status,
+            sourceElementName: rel.sourceElementName,
+            targetElementName: rel.targetElementName,
+            missingElement: rel.missingElement,
+            invalidReason: rel.invalidReason,
+          })
+        })
+      }
+    }
+  }, [open, newRelationships, incompleteRelationships, invalidRelationships])
 
   const handleElementToggle = (elementId: string) => {
     setSelectedElements(prev =>
@@ -159,11 +211,8 @@ export const ExtendedNewElementsDialog: React.FC<ExtendedNewElementsDialogProps>
 
   const handleConfirm = () => {
     const elementsToCreate = selectedElements.filter(el => el.selected)
-    const relationshipsToCreate = [
-      ...selectedRelationships.filter(rel => rel.selected),
-      ...selectedIncompleteRelationships.filter(rel => rel.selected),
-      ...selectedInvalidRelationships.filter(rel => rel.selected),
-    ]
+    // Nur gültige Beziehungen können erstellt werden
+    const relationshipsToCreate = selectedRelationships.filter(rel => rel.selected)
     onConfirm(elementsToCreate, relationshipsToCreate)
   }
 
@@ -173,6 +222,43 @@ export const ExtendedNewElementsDialog: React.FC<ExtendedNewElementsDialogProps>
       return newElements.some(el => el.id === elementId)
     }
 
+    // Hilfsfunktion: Bestimmt wie ein Element angezeigt werden soll
+    const getElementDisplay = (
+      elementId: string,
+      elementName: string,
+      missingType?: 'source' | 'target' | 'both'
+    ) => {
+      if (
+        missingType &&
+        (relationship.missingElement === missingType || relationship.missingElement === 'both')
+      ) {
+        // Physisch fehlendes Element (kein Binding im Diagramm)
+        return tRel('missingElement')
+      } else if (isNewElement(elementId)) {
+        // Neues Element (existiert im Diagramm, aber nicht in der Datenbank)
+        return tRel('newElement', { elementName })
+      } else {
+        // Bestehendes Element
+        return elementName
+      }
+    }
+
+    // Hilfsfunktion: Bestimmt den Elementtyp für die Anzeige
+    const getElementTypeDisplay = (
+      elementType: string,
+      elementName: string,
+      missingType?: 'source' | 'target' | 'both'
+    ) => {
+      // Wenn das Element physisch fehlt (Missing Element), zeige keinen Typ an
+      if (
+        missingType &&
+        (relationship.missingElement === missingType || relationship.missingElement === 'both')
+      ) {
+        return ''
+      }
+      return getElementTypeLabelTranslated(elementType)
+    }
+
     // Bei IN-Beziehungen die Reihenfolge umkehren, um die Beziehungsrichtung korrekt anzuzeigen
     const isReverseRelationship = relationship.relationshipDefinition.direction === 'IN'
 
@@ -180,40 +266,72 @@ export const ExtendedNewElementsDialog: React.FC<ExtendedNewElementsDialogProps>
 
     if (isReverseRelationship) {
       // Bei IN-Beziehungen: Zeige die Beziehungsrichtung (umgekehrt zur Pfeilrichtung)
-      const isTargetMissingOrNew =
-        relationship.missingElement === 'target' || isNewElement(relationship.targetElementId)
-      const isSourceMissingOrNew =
-        relationship.missingElement === 'source' || isNewElement(relationship.sourceElementId)
-
-      actualSourceElement = isTargetMissingOrNew
-        ? tRel('newElement', { elementName: relationship.targetElementName })
-        : relationship.targetElementName
-      actualTargetElement = isSourceMissingOrNew
-        ? tRel('newElement', { elementName: relationship.sourceElementName })
-        : relationship.sourceElementName
-      actualSourceType = getElementTypeLabelTranslated(relationship.targetElementType)
-      actualTargetType = getElementTypeLabelTranslated(relationship.sourceElementType)
+      actualSourceElement = getElementDisplay(
+        relationship.targetElementId,
+        relationship.targetElementName,
+        'target'
+      )
+      actualTargetElement = getElementDisplay(
+        relationship.sourceElementId,
+        relationship.sourceElementName,
+        'source'
+      )
+      actualSourceType = getElementTypeDisplay(
+        relationship.targetElementType,
+        relationship.targetElementName,
+        'target'
+      )
+      actualTargetType = getElementTypeDisplay(
+        relationship.sourceElementType,
+        relationship.sourceElementName,
+        'source'
+      )
     } else {
       // Bei OUT-Beziehungen: Zeige die Pfeilrichtung (gleich der Beziehungsrichtung)
-      const isSourceMissingOrNew =
-        relationship.missingElement === 'source' || isNewElement(relationship.sourceElementId)
-      const isTargetMissingOrNew =
-        relationship.missingElement === 'target' || isNewElement(relationship.targetElementId)
-
-      actualSourceElement = isSourceMissingOrNew
-        ? tRel('newElement', { elementName: relationship.sourceElementName })
-        : relationship.sourceElementName
-      actualTargetElement = isTargetMissingOrNew
-        ? tRel('newElement', { elementName: relationship.targetElementName })
-        : relationship.targetElementName
-      actualSourceType = getElementTypeLabelTranslated(relationship.sourceElementType)
-      actualTargetType = getElementTypeLabelTranslated(relationship.targetElementType)
+      actualSourceElement = getElementDisplay(
+        relationship.sourceElementId,
+        relationship.sourceElementName,
+        'source'
+      )
+      actualTargetElement = getElementDisplay(
+        relationship.targetElementId,
+        relationship.targetElementName,
+        'target'
+      )
+      actualSourceType = getElementTypeDisplay(
+        relationship.sourceElementType,
+        relationship.sourceElementName,
+        'source'
+      )
+      actualTargetType = getElementTypeDisplay(
+        relationship.targetElementType,
+        relationship.targetElementName,
+        'target'
+      )
     }
 
     const relationshipName = getRelationshipDisplayName(
       relationship.relationshipDefinition.type,
       locale
     )
+
+    // Prüfe, ob es sich um eine unvollständige Beziehung mit Missing Elements handelt
+    const sourceIsMissing =
+      relationship.missingElement === 'source' || relationship.missingElement === 'both'
+    const targetIsMissing =
+      relationship.missingElement === 'target' || relationship.missingElement === 'both'
+    const hasMissingElements = sourceIsMissing || targetIsMissing
+
+    if (hasMissingElements) {
+      // Für Missing Elements: Verwende ein einfacheres Format ohne Typen für die fehlenden Elemente
+      const sourceDisplay = sourceIsMissing
+        ? actualSourceElement
+        : `${actualSourceElement} (${actualSourceType})`
+      const targetDisplay = targetIsMissing
+        ? actualTargetElement
+        : `${actualTargetElement} (${actualTargetType})`
+      return `${sourceDisplay} → ${relationshipName} → ${targetDisplay}`
+    }
 
     return tRel('relationshipFormat', {
       sourceElement: actualSourceElement,
@@ -225,10 +343,8 @@ export const ExtendedNewElementsDialog: React.FC<ExtendedNewElementsDialogProps>
   }
 
   const selectedElementCount = selectedElements.filter(el => el.selected).length
-  const selectedRelationshipCount =
-    selectedRelationships.filter(rel => rel.selected).length +
-    selectedIncompleteRelationships.filter(rel => rel.selected).length +
-    selectedInvalidRelationships.filter(rel => rel.selected).length
+  // Nur gültige Beziehungen sind auswählbar
+  const selectedRelationshipCount = selectedRelationships.filter(rel => rel.selected).length
 
   const hasElements = newElements.length > 0
   const hasRelationships =
@@ -417,147 +533,93 @@ export const ExtendedNewElementsDialog: React.FC<ExtendedNewElementsDialogProps>
             )}
 
             {/* Unvollständige Beziehungen */}
-            {incompleteRelationships.length > 0 && (
-              <Accordion>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography variant="h6" color="warning.main">
-                    {tRel('incompleteTitle')} ({incompleteRelationships.length})
+            <Accordion>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography variant="h6" color="warning.main">
+                  {tRel('incompleteTitle')} ({incompleteRelationships.length})
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Alert severity="warning" sx={{ mb: 2 }}>
+                  {tRel('incompleteDescription')}
+                </Alert>
+
+                {/* Unvollständige Beziehungen haben KEINE Checkboxen - nur Anzeige */}
+                {selectedIncompleteRelationships.map(relationship => (
+                  <Paper
+                    key={relationship.id}
+                    variant="outlined"
+                    sx={{
+                      p: 2,
+                      mb: 2,
+                      border: '1px solid',
+                      borderColor: 'warning.main',
+                      backgroundColor: 'warning.lighter',
+                    }}
+                  >
+                    <Typography variant="body2">{formatRelationship(relationship)}</Typography>
+                  </Paper>
+                ))}
+
+                {incompleteRelationships.length === 0 && (
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    textAlign="center"
+                    sx={{ py: 2 }}
+                  >
+                    {tRel('noIncompleteRelationships')}
                   </Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Alert severity="warning" sx={{ mb: 2 }}>
-                    {tRel('incompleteDescription')}
-                  </Alert>
-
-                  <Box sx={{ mb: 2 }}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={selectedIncompleteRelationships.every(rel => rel.selected)}
-                          indeterminate={
-                            selectedIncompleteRelationships.some(rel => rel.selected) &&
-                            !selectedIncompleteRelationships.every(rel => rel.selected)
-                          }
-                          onChange={() => handleRelationshipSelectAll('incomplete')}
-                          disabled={loading}
-                        />
-                      }
-                      label={tRel('selectAll', {
-                        selectedCount: selectedIncompleteRelationships.filter(rel => rel.selected)
-                          .length,
-                        totalCount: incompleteRelationships.length,
-                      })}
-                    />
-                  </Box>
-
-                  {selectedIncompleteRelationships.map(relationship => (
-                    <Paper
-                      key={relationship.id}
-                      variant="outlined"
-                      sx={{
-                        p: 2,
-                        mb: 2,
-                        border: relationship.selected ? '2px solid' : '1px solid',
-                        borderColor: relationship.selected ? 'warning.main' : 'divider',
-                        backgroundColor: relationship.selected
-                          ? 'warning.lighter'
-                          : 'background.paper',
-                      }}
-                    >
-                      <FormControlLabel
-                        control={
-                          <Checkbox
-                            checked={relationship.selected}
-                            onChange={() => handleRelationshipToggle(relationship.id, 'incomplete')}
-                            disabled={loading}
-                          />
-                        }
-                        label={
-                          <Typography variant="body2">
-                            {formatRelationship(relationship)}
-                          </Typography>
-                        }
-                        sx={{ width: '100%', margin: 0 }}
-                      />
-                    </Paper>
-                  ))}
-                </AccordionDetails>
-              </Accordion>
-            )}
+                )}
+              </AccordionDetails>
+            </Accordion>
 
             {/* Ungültige Beziehungen */}
-            {invalidRelationships.length > 0 && (
-              <Accordion>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography variant="h6" color="error.main">
-                    {tRel('invalidTitle')} ({invalidRelationships.length})
+            <Accordion>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography variant="h6" color="error.main">
+                  {tRel('invalidTitle')} ({invalidRelationships.length})
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Alert severity="error" sx={{ mb: 2 }}>
+                  {tRel('invalidDescription')}
+                </Alert>
+
+                {/* Ungültige Beziehungen haben KEINE Checkboxen - nur Anzeige */}
+                {selectedInvalidRelationships.map(relationship => (
+                  <Paper
+                    key={relationship.id}
+                    variant="outlined"
+                    sx={{
+                      p: 2,
+                      mb: 2,
+                      border: '1px solid',
+                      borderColor: 'error.main',
+                      backgroundColor: 'error.lighter',
+                    }}
+                  >
+                    <Box>
+                      <Typography variant="body2">{formatRelationship(relationship)}</Typography>
+                      <Typography variant="caption" color="error.main">
+                        {translateInvalidReason(relationship.invalidReason || '')}
+                      </Typography>
+                    </Box>
+                  </Paper>
+                ))}
+
+                {invalidRelationships.length === 0 && (
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    textAlign="center"
+                    sx={{ py: 2 }}
+                  >
+                    {tRel('noInvalidRelationships')}
                   </Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Alert severity="error" sx={{ mb: 2 }}>
-                    {tRel('invalidDescription')}
-                  </Alert>
-
-                  <Box sx={{ mb: 2 }}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={selectedInvalidRelationships.every(rel => rel.selected)}
-                          indeterminate={
-                            selectedInvalidRelationships.some(rel => rel.selected) &&
-                            !selectedInvalidRelationships.every(rel => rel.selected)
-                          }
-                          onChange={() => handleRelationshipSelectAll('invalid')}
-                          disabled={loading}
-                        />
-                      }
-                      label={tRel('selectAll', {
-                        selectedCount: selectedInvalidRelationships.filter(rel => rel.selected)
-                          .length,
-                        totalCount: invalidRelationships.length,
-                      })}
-                    />
-                  </Box>
-
-                  {selectedInvalidRelationships.map(relationship => (
-                    <Paper
-                      key={relationship.id}
-                      variant="outlined"
-                      sx={{
-                        p: 2,
-                        mb: 2,
-                        border: relationship.selected ? '2px solid' : '1px solid',
-                        borderColor: relationship.selected ? 'error.main' : 'divider',
-                        backgroundColor: relationship.selected
-                          ? 'error.lighter'
-                          : 'background.paper',
-                      }}
-                    >
-                      <FormControlLabel
-                        control={
-                          <Checkbox
-                            checked={relationship.selected}
-                            onChange={() => handleRelationshipToggle(relationship.id, 'invalid')}
-                            disabled={loading}
-                          />
-                        }
-                        label={
-                          <Box>
-                            <Typography variant="body2">
-                              {formatRelationship(relationship)}
-                            </Typography>
-                            <Typography variant="caption" color="error.main">
-                              {relationship.invalidReason}
-                            </Typography>
-                          </Box>
-                        }
-                        sx={{ width: '100%', margin: 0 }}
-                      />
-                    </Paper>
-                  ))}
-                </AccordionDetails>
-              </Accordion>
-            )}
+                )}
+              </AccordionDetails>
+            </Accordion>
           </Box>
         )}
       </DialogContent>

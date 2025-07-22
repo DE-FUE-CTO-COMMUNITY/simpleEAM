@@ -55,11 +55,18 @@ export function createCapabilityElementsFromTemplate(
   const offsetY = targetY - templateBounds.minY
 
   // Clone template elements with new IDs and updated content
+  let mainElementNewId: string | undefined = undefined
+
   const elements = template.elements.map((element: any, index: number) => {
     const newElement = { ...element }
 
     // Use the mapped ID for this element
     newElement.id = idMapping.get(element.id) || generateElementId()
+
+    // Store the main element's new ID (first element)
+    if (index === 0) {
+      mainElementNewId = newElement.id
+    }
 
     // Apply position offset
     newElement.x = element.x + offsetX
@@ -235,10 +242,12 @@ export function createCapabilityElementsFromTemplate(
         isMainElement: true,
       }
     } else {
+      // Verwende die neue ID des ersten Elements als mainElementId
       newElement.customData = {
         isFromDatabase: true,
         isMainElement: false,
-        mainElementId: idMapping.get(template.elements[0]?.id),
+        // Verwende die neue ID des Hauptelements
+        ...(mainElementNewId && { mainElementId: mainElementNewId }),
       }
     }
 
@@ -344,11 +353,18 @@ export function createApplicationElementsFromTemplate(
   const offsetY = targetY - templateBounds.minY
 
   // Clone template elements with new IDs and updated content
+  let appMainElementNewId: string | undefined = undefined
+
   const elements = template.elements.map((element: any, index: number) => {
     const newElement = { ...element }
 
     // Use the mapped ID for this element
     newElement.id = idMapping.get(element.id) || generateElementId()
+
+    // Store the main element's new ID (first element)
+    if (index === 0) {
+      appMainElementNewId = newElement.id
+    }
 
     // Apply position offset
     newElement.x = element.x + offsetX
@@ -494,10 +510,12 @@ export function createApplicationElementsFromTemplate(
         isMainElement: true,
       }
     } else {
+      // Verwende die neue ID des ersten Elements als mainElementId
       newElement.customData = {
         isFromDatabase: true,
         isMainElement: false,
-        mainElementId: idMapping.get(template.elements[0]?.id),
+        // Verwende die neue ID des Hauptelements
+        ...(appMainElementNewId && { mainElementId: appMainElementNewId }),
       }
     }
 

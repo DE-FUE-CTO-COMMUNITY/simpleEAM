@@ -79,7 +79,14 @@ export const VALID_RELATIONSHIPS: RelationshipDefinition[] = [
     fieldName: 'dataObjects',
   },
 
-  // DataObject Beziehungen
+  // DataObject Beziehungen (umgekehrte TRANSFERS Richtung)
+  {
+    type: 'TRANSFERS',
+    direction: 'IN', // umgekehrte Richtung
+    sourceType: 'dataObject',
+    targetType: 'applicationInterface',
+    fieldName: 'transferredInInterfaces',
+  },
   {
     type: 'DATA_SOURCE',
     direction: 'OUT',

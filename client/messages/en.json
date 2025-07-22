@@ -187,6 +187,7 @@
         "elementTypes": {
           "application": "Application",
           "capability": "Capability",
+          "businessCapability": "Business Capability",
           "dataObject": "Data Object",
           "interface": "Interface",
           "applicationInterface": "Application Interface",
@@ -232,6 +233,14 @@
           "missingStartBinding": "Missing start binding",
           "missingEndBinding": "Missing end binding",
           "bindingToNonMainElement": "Binding to non-main element"
+        },
+        "invalidReasons": {
+          "missingConnections": "Arrow has missing connections",
+          "missingStartAndEndBinding": "Arrow has no start and end binding",
+          "missingStartBinding": "Arrow has no start binding",
+          "missingEndBinding": "Arrow has no end binding",
+          "invalidRelationship": "Invalid relationship",
+          "incompatibleElementTypes": "No valid relationship between {sourceType} and {targetType}"
         }
       },
       "capabilityMap": {

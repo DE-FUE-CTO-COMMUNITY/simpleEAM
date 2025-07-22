@@ -57,13 +57,24 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
 
       // Handle translation keys with parameters
       if (notification.message.includes(':')) {
-        const [key, param] = notification.message.split(':')
+        const parts = notification.message.split(':')
+        const key = parts[0]
+
         if (key === 'messages.diagramLoaded') {
-          translatedMessage = t('messages.diagramLoaded', { title: param })
+          const titleAndCorrection = parts.slice(1).join(':')
+          // Check if there's correction information in parentheses
+          if (titleAndCorrection.includes(' (') && titleAndCorrection.includes('korrigiert)')) {
+            const [title, correction] = titleAndCorrection.split(' (')
+            const correctionText = '(' + correction // Restore the opening parenthesis
+            translatedMessage =
+              t('messages.diagramLoaded', { title: title.trim() }) + ' ' + correctionText
+          } else {
+            translatedMessage = t('messages.diagramLoaded', { title: titleAndCorrection })
+          }
         } else if (key === 'messages.diagramSaved') {
-          translatedMessage = t('messages.diagramSaved', { title: param })
+          translatedMessage = t('messages.diagramSaved', { title: parts[1] })
         } else if (key === 'messages.diagramSavedAs') {
-          translatedMessage = t('messages.diagramSavedAs', { title: param })
+          translatedMessage = t('messages.diagramSavedAs', { title: parts[1] })
         }
       } else if (notification.message.startsWith('messages.')) {
         const key = notification.message.replace('messages.', '')

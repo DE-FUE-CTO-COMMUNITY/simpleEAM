@@ -187,6 +187,7 @@
         "elementTypes": {
           "application": "Anwendung",
           "capability": "Capability",
+          "businessCapability": "Geschäftsfähigkeit",
           "dataObject": "Datenobjekt",
           "interface": "Schnittstelle",
           "applicationInterface": "Anwendungsschnittstelle",
@@ -232,6 +233,14 @@
           "missingStartBinding": "Fehlende Start-Verbindung",
           "missingEndBinding": "Fehlende End-Verbindung",
           "bindingToNonMainElement": "Verbindung zu Nicht-Hauptelement"
+        },
+        "invalidReasons": {
+          "missingConnections": "Pfeil hat fehlende Verbindungen",
+          "missingStartAndEndBinding": "Pfeil hat keine Start- und End-Verbindung",
+          "missingStartBinding": "Pfeil hat keine Start-Verbindung",
+          "missingEndBinding": "Pfeil hat keine End-Verbindung",
+          "invalidRelationship": "Ungültige Beziehung",
+          "incompatibleElementTypes": "Keine gültige Beziehung zwischen {sourceType} und {targetType}"
         }
       },
       "capabilityMap": {

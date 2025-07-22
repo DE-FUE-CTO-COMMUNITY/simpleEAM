@@ -7,6 +7,7 @@ import {
   clearMissingElementMarkers,
 } from '../utils/databaseSyncUtils'
 import { optimizeDiagramOnOpen } from '../utils/diagramOptimizationUtils'
+import { analyzeArrows } from '../utils/arrowAnalysis'
 import {
   saveSceneToStorage,
   saveDiagramToStorage,
@@ -171,6 +172,51 @@ export const useDiagramHandlers = (
           syncedDiagramData = optimizedDiagramData
         }
 
+        // Apply runtime correction for mainElementId references
+        console.log('=== Runtime Correction beim Diagramm-Laden ===')
+        let correctionMessage = ''
+        try {
+          const arrowAnalysis = analyzeArrows(syncedDiagramData.elements || [])
+
+          if (arrowAnalysis.correctedElements && arrowAnalysis.correctedElements.length > 0) {
+            console.log(
+              `Runtime Correction: ${arrowAnalysis.correctedElements.length} Pfeile korrigiert`
+            )
+
+            // Replace corrected arrows in the elements array
+            const correctedElementMap = new Map(
+              arrowAnalysis.correctedElements.map((el: any) => [el.id, el])
+            )
+
+            const correctedElements = (syncedDiagramData.elements || []).map((element: any) => {
+              if (correctedElementMap.has(element.id)) {
+                console.log(`Applying correction for arrow ${element.id}`)
+                return correctedElementMap.get(element.id)
+              }
+              return element
+            })
+
+            // Update the diagram data with corrected elements
+            syncedDiagramData = {
+              ...syncedDiagramData,
+              elements: correctedElements,
+            }
+
+            // Enhanced notification with details about the corrections
+            correctionMessage =
+              arrowAnalysis.correctedElements.length === 1
+                ? ' (1 Pfeil-Verbindung automatisch korrigiert)'
+                : ` (${arrowAnalysis.correctedElements.length} Pfeil-Verbindungen automatisch korrigiert)`
+
+            console.log(`Runtime Correction applied: ${correctionMessage}`)
+          } else {
+            console.log('Runtime Correction: Keine Korrekturen erforderlich')
+          }
+        } catch (correctionError) {
+          console.warn('Runtime Correction failed, continuing with original data:', correctionError)
+        }
+        console.log('=== Ende Runtime Correction ===')
+
         const sceneData = {
           elements: syncedDiagramData.elements || [],
           appState: {
@@ -240,9 +286,14 @@ export const useDiagramHandlers = (
           saveSceneToStorage(restoredScene)
           saveDiagramToStorage(diagram)
 
+          // Enhanced notification that includes correction information
+          const loadMessage = correctionMessage
+            ? `messages.diagramLoaded:${diagram.title}${correctionMessage}`
+            : `messages.diagramLoaded:${diagram.title}`
+
           setNotification({
             open: true,
-            message: `messages.diagramLoaded:${diagram.title}`,
+            message: loadMessage,
             severity: 'success',
           })
         }

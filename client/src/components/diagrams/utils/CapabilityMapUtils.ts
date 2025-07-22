@@ -1,6 +1,7 @@
 import type { BusinessCapability } from '@/gql/generated'
 import { generateNKeysBetween } from 'fractional-indexing'
 import { collectApplicationsForDisplay } from './capabilityHierarchy'
+import { generateElementId, generateSeed as generateRandomSeed } from './elementIdManager'
 
 export interface CapabilityMapSettings {
   maxLevels: number
@@ -9,7 +10,7 @@ export interface CapabilityMapSettings {
   verticalSpacing: number
 }
 
-export interface ExcalidrawElement {
+type ExcalidrawElement = {
   id: string
   type: 'rectangle' | 'text'
   x: number
@@ -56,16 +57,6 @@ export interface ExcalidrawElement {
   autoResize?: boolean
   lineHeight?: number
   rawText?: string
-}
-
-// Helper function to generate unique IDs (alternative to Excalidraw's generateId)
-export const generateId = (): string => {
-  return Math.random().toString(36).substr(2, 9) + Date.now().toString(36)
-}
-
-// Helper function to generate random seed
-export const generateSeed = (): number => {
-  return Math.floor(Math.random() * 2 ** 31)
 }
 
 // Simple but robust index generation for z-ordering
@@ -164,9 +155,9 @@ export const generateCapabilityMapElements = (
     const y = startY
 
     // Create main capability container
-    const mainElementId = generateId()
-    const textElementId = generateId()
-    const capabilityGroupId = generateId()
+    const mainElementId = generateElementId()
+    const textElementId = generateElementId()
+    const capabilityGroupId = generateElementId()
 
     // Calculate height based on children if we're showing multiple levels
     let containerHeight = baseHeight
@@ -197,9 +188,9 @@ export const generateCapabilityMapElements = (
       frameId: null,
       index: generateIndex(),
       roundness: null,
-      seed: generateSeed(),
+      seed: generateRandomSeed(),
       version: 1,
-      versionNonce: generateSeed(),
+      versionNonce: generateRandomSeed(),
       isDeleted: false,
       boundElements: [{ id: textElementId, type: 'text' }],
       updated: Date.now(),
@@ -238,9 +229,9 @@ export const generateCapabilityMapElements = (
       frameId: null,
       index: generateIndex(),
       roundness: null,
-      seed: generateSeed(),
+      seed: generateRandomSeed(),
       version: 1,
-      versionNonce: generateSeed(),
+      versionNonce: generateRandomSeed(),
       isDeleted: false,
       boundElements: [],
       updated: Date.now(),
@@ -277,8 +268,8 @@ export const generateCapabilityMapElements = (
         const childWidth = baseWidth - 20
         const childHeight = 40
 
-        const childRectId = generateId()
-        const childTextId = generateId()
+        const childRectId = generateElementId()
+        const childTextId = generateElementId()
 
         // Child capability rectangle
         const childRect: ExcalidrawElement = {
@@ -300,9 +291,9 @@ export const generateCapabilityMapElements = (
           frameId: null,
           index: generateIndex(),
           roundness: null,
-          seed: generateSeed(),
+          seed: generateRandomSeed(),
           version: 1,
-          versionNonce: generateSeed(),
+          versionNonce: generateRandomSeed(),
           isDeleted: false,
           boundElements: [{ id: childTextId, type: 'text' }],
           updated: Date.now(),
@@ -341,9 +332,9 @@ export const generateCapabilityMapElements = (
           frameId: null,
           index: generateIndex(),
           roundness: null,
-          seed: generateSeed(),
+          seed: generateRandomSeed(),
           version: 1,
-          versionNonce: generateSeed(),
+          versionNonce: generateRandomSeed(),
           isDeleted: false,
           boundElements: [],
           updated: Date.now(),
@@ -389,7 +380,7 @@ export const generateCapabilityMapElements = (
         allApplications.forEach((app, appIndex) => {
           const appX = x + 10
           const appY = appStartY + appIndex * 20
-          const appTextId = generateId()
+          const appTextId = generateElementId()
 
           const appText: ExcalidrawElement = {
             id: appTextId,
@@ -410,9 +401,9 @@ export const generateCapabilityMapElements = (
             frameId: null,
             index: generateIndex(),
             roundness: null,
-            seed: generateSeed(),
+            seed: generateRandomSeed(),
             version: 1,
-            versionNonce: generateSeed(),
+            versionNonce: generateRandomSeed(),
             isDeleted: false,
             boundElements: [],
             updated: Date.now(),

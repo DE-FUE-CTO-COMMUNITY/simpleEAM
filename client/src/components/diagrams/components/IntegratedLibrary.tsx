@@ -207,11 +207,18 @@ function createLibraryItemFromDatabaseElement(dbElement: any, elementType: strin
   })
 
   // Clone template elements with new IDs and updated content
+  let libraryMainElementNewId: string | undefined = undefined
+
   const elements = template.elements.map((element: any, index: number) => {
     const newElement = { ...element }
 
     // Use the mapped ID for this element
     newElement.id = idMapping.get(element.id) || generateId()
+
+    // Store the main element's new ID (first element)
+    if (index === 0) {
+      libraryMainElementNewId = newElement.id
+    }
 
     // Reset stroke color to black for database elements (override green ArchiMate template color)
     // Look for the main container rectangle (largest rectangle or rectangle with bound text elements)
@@ -309,10 +316,12 @@ function createLibraryItemFromDatabaseElement(dbElement: any, elementType: strin
       }
     } else {
       // Andere Elemente erhalten nur einen Verweis auf das Hauptelement
+      // Verwende die neue ID des ersten Elements als mainElementId
       newElement.customData = {
         isFromDatabase: true,
         isMainElement: false,
-        mainElementId: idMapping.get(template.elements[0]?.id), // Verweis auf das Hauptelement-ID
+        // Verwende die neue ID des Hauptelements
+        ...(libraryMainElementNewId && { mainElementId: libraryMainElementNewId }),
       }
     }
 
