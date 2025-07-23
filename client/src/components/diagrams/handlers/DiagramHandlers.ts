@@ -176,7 +176,7 @@ export const useDiagramHandlers = (
         console.log('=== Runtime Correction beim Diagramm-Laden ===')
         let correctionMessage = ''
         try {
-          const arrowAnalysis = analyzeArrows(syncedDiagramData.elements || [])
+          const arrowAnalysis = await analyzeArrows(syncedDiagramData.elements || [])
 
           if (arrowAnalysis.correctedElements && arrowAnalysis.correctedElements.length > 0) {
             console.log(

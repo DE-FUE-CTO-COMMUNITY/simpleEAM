@@ -127,7 +127,7 @@ const ImportDialog: React.FC<ImportDialogProps> = ({
               <Grid size={12}>
                 <Box sx={{ mt: 2 }}>
                   <input
-                    accept=".xlsx,.xls,.json"
+                    accept={importSettings.format === 'json' ? '.json' : '.xlsx,.xls'}
                     style={{ display: 'none' }}
                     id="file-upload"
                     type="file"

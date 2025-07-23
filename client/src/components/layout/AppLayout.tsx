@@ -167,7 +167,24 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     )
   }
 
-  const apolloClient = client || createApolloClient()
+  // Warte auf die Apollo Client Initialisierung, bevor Komponenten gerendert werden
+  if (!client) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+          width: '100vw',
+        }}
+      >
+        <div>Initializing...</div>
+      </div>
+    )
+  }
+
+  const apolloClient = client
 
   return (
     <CacheProvider value={cache}>

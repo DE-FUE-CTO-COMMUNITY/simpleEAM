@@ -44,6 +44,7 @@ import {
 // Import der Utilities
 import { exportToExcel, downloadTemplateWithRealFields } from '../../utils/excelUtils'
 import { validateImportData, getTemplateWithExamples } from '../../utils/excelDataService'
+import { validateJsonImportData } from '../../utils/jsonDataService'
 
 interface ImportExportDialogProps {
   isOpen: boolean
@@ -112,7 +113,7 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
           const { importMultiTabFromExcel } = await import('../../utils/excelUtils')
           allData = await importMultiTabFromExcel(file)
         } else if (importSettings.format === 'json') {
-          const { importMultiTabFromJson } = await import('../../utils/excelUtils')
+          const { importMultiTabFromJson } = await import('../../utils/jsonUtils')
           allData = await importMultiTabFromJson(file)
         }
 
@@ -131,14 +132,24 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
             Architectures: 'architectures',
             'Architecture Principles': 'architecturePrinciples',
             Diagrams: 'diagrams',
+            Infrastructure: 'infrastructures',
           }
 
           const entityType = entityTypeMapping[tabName]
           if (entityType && Array.isArray(tabData) && tabData.length > 0) {
-            const validation = validateImportData(tabData, entityType as any)
-            allValidations[tabName] = validation
-            totalValid += validation.summary.validRows
-            totalErrors += validation.errors.length
+            // Verwende JSON-spezifische Validierung für JSON-Format
+            if (importSettings.format === 'json') {
+              const validation = validateJsonImportData(tabData, entityType as any)
+              allValidations[tabName] = validation
+              totalValid += validation.summary.validRows
+              totalErrors += validation.errors.length
+            } else {
+              // Für Excel-Format verwende Excel-spezifische Validierung
+              const validation = validateImportData(tabData, entityType as any)
+              allValidations[tabName] = validation
+              totalValid += validation.summary.validRows
+              totalErrors += validation.errors.length
+            }
           }
         })
 
@@ -166,18 +177,25 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
           { variant: combinedValidation.isValid ? 'success' : 'warning' }
         )
       } else {
-        // Single-Tab Import Validation
+        // Single-Tab Import Validation mit formatspezifischer Validierung
         let data: any[] = []
 
         if (importSettings.format === 'xlsx' && importSettings.entityType !== 'diagrams') {
           const { importFromExcel } = await import('../../utils/excelUtils')
           data = await importFromExcel(file)
         } else if (importSettings.format === 'json' || importSettings.entityType === 'diagrams') {
-          const { importFromJson } = await import('../../utils/excelUtils')
+          const { importFromJson } = await import('../../utils/jsonUtils')
           data = await importFromJson(file)
         }
 
-        const validation = validateImportData(data, importSettings.entityType as any)
+        // Verwende formatspezifische Validierung
+        let validation
+        if (importSettings.format === 'json') {
+          validation = validateJsonImportData(data, importSettings.entityType as any)
+        } else {
+          validation = validateImportData(data, importSettings.entityType as any)
+        }
+
         setValidationResult(validation)
 
         enqueueSnackbar(
@@ -208,14 +226,24 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
       let totalImported = 0
 
       if (importSettings.entityType === 'all') {
-        const result = await handleMultiTabImport(apolloClient, selectedFile, importSettings.format)
+        const result = await handleMultiTabImport(
+          apolloClient,
+          selectedFile,
+          importSettings.format,
+          progress => {
+            setImportProgress(progress)
+          }
+        )
         totalImported = result.totalImported
       } else {
         const result = await handleSingleTabImport(
           apolloClient,
           selectedFile,
           importSettings.entityType,
-          importSettings.format
+          importSettings.format,
+          progress => {
+            setImportProgress(progress)
+          }
         )
         totalImported = result.imported
       }

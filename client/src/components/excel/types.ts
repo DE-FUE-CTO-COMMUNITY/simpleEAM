@@ -54,6 +54,7 @@ export interface EntityMapping {
 export interface ImportWithMappingResult {
   imported: number
   entityMappings: EntityMapping
+  errors?: string[]
 }
 
 export interface TabValidation {

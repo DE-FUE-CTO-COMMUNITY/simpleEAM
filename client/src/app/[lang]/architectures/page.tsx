@@ -27,7 +27,7 @@ import { useArchitectureFilter } from '@/components/architectures/useArchitectur
 import { ArchitectureType, FilterState } from '@/components/architectures/types'
 
 const ArchitecturesPage = () => {
-  const { authenticated } = useAuth()
+  const { authenticated, initialized } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
   const t = useTranslations('architectures')
   const tCommon = useTranslations('common')
@@ -58,7 +58,7 @@ const ArchitecturesPage = () => {
 
   // Architekturen laden - Auth-Check erfolgt bereits in layout.tsx
   const { loading, error, data, refetch } = useQuery(GET_ARCHITECTURES, {
-    skip: !authenticated,
+    skip: !authenticated || !initialized,
     fetchPolicy: 'cache-and-network',
   })
 

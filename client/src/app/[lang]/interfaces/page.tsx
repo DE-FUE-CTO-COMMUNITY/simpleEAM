@@ -30,7 +30,7 @@ import { FilterState } from '@/components/interfaces/types'
 import { DataObject } from '@/gql/generated'
 
 function ApplicationInterfacesPage() {
-  const { authenticated } = useAuth()
+  const { authenticated, initialized } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
   const t = useTranslations('interfaces')
   const [globalFilter, setGlobalFilter] = useState<string>('')
@@ -47,25 +47,25 @@ function ApplicationInterfacesPage() {
 
   // Schnittstellen laden - Auth-Check erfolgt bereits in layout.tsx
   const { loading, error, data, refetch } = useQuery(GET_APPLICATION_INTERFACES, {
-    skip: !authenticated,
+    skip: !authenticated || !initialized,
     fetchPolicy: 'cache-and-network',
   })
 
   // Datenobjekte laden für Formular-Auswahlmöglichkeiten
   const { data: dataObjectsData } = useQuery(GET_DATA_OBJECTS, {
-    skip: !authenticated,
+    skip: !authenticated || !initialized,
     fetchPolicy: 'cache-and-network',
   })
 
   // Anwendungen laden für Formular-Auswahlmöglichkeiten
   const { data: applicationsData } = useQuery(GET_APPLICATIONS, {
-    skip: !authenticated,
+    skip: !authenticated || !initialized,
     fetchPolicy: 'cache-and-network',
   })
 
   // Personen laden für Formular-Auswahlmöglichkeiten
   const { data: personsData } = useQuery(GET_PERSONS, {
-    skip: !authenticated,
+    skip: !authenticated || !initialized,
     fetchPolicy: 'cache-and-network',
   })
 

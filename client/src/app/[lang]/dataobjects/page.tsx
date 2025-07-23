@@ -22,7 +22,7 @@ import { DataObject } from '@/gql/generated'
 import { DataObjectFilterState } from '@/components/dataobjects/DataObjectFilterDialog'
 
 const DataObjectsPage = () => {
-  const { authenticated } = useAuth()
+  const { authenticated, initialized } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
   const t = useTranslations('dataObjects')
   const [globalFilter, setGlobalFilter] = useState('')
@@ -47,7 +47,7 @@ const DataObjectsPage = () => {
 
   // GraphQL-Abfrage für Datenobjekte
   const { data, loading, refetch } = useQuery(GET_DATA_OBJECTS, {
-    skip: !authenticated,
+    skip: !authenticated || !initialized,
     fetchPolicy: 'cache-and-network',
   })
 

@@ -20,7 +20,6 @@ export type EntityType =
   | 'interfaces'
   | 'persons'
   | 'architectures'
-  | 'diagrams' // Nur für JSON-Format verfügbar
   | 'architecturePrinciples'
   | 'infrastructures'
   | 'all'
@@ -621,11 +620,10 @@ export const fetchDataByEntityTypeAndFormat = async (
     | 'interfaces'
     | 'persons'
     | 'architectures'
-    | 'diagrams'
     | 'architecturePrinciples'
     | 'infrastructures'
     | 'all',
-  format: 'xlsx' | 'csv' | 'json'
+  _format: 'xlsx' | 'csv'
 ): Promise<ExcelExportData[] | { [tabName: string]: ExcelExportData[] }> => {
   switch (entityType) {
     case 'businessCapabilities':
@@ -640,20 +638,12 @@ export const fetchDataByEntityTypeAndFormat = async (
       return fetchPersonsForExport(client)
     case 'architectures':
       return fetchArchitecturesForExport(client)
-    case 'diagrams':
-      // Für Excel und CSV ohne diagramJson, für JSON mit diagramJson
-      return format === 'json'
-        ? fetchDiagramsForExport(client)
-        : fetchDiagramsForExcelExport(client)
     case 'architecturePrinciples':
       return fetchArchitecturePrinciplesForExport(client)
     case 'infrastructures':
       return fetchInfrastructuresForExport(client)
     case 'all':
-      // Für Excel mit Diagrammen ohne Inhalte, für JSON mit vollständigen Diagrammen
-      return format === 'json'
-        ? fetchAllEntitiesForExport(client)
-        : fetchAllEntitiesForExcelExport(client)
+      return fetchAllEntitiesForExcelExport(client)
     default:
       throw new Error(`Unbekannter Entity-Typ: ${entityType}`)
   }
@@ -1101,8 +1091,8 @@ export const validateImportData = (
     | 'interfaces'
     | 'persons'
     | 'architectures'
-    | 'diagrams' // Hinzugefügt für JSON-Import
     | 'architecturePrinciples'
+    | 'infrastructures'
 ): ValidationResult => {
   const errors: ValidationError[] = []
   const warnings: ValidationWarning[] = []
@@ -1182,56 +1172,6 @@ export const validateImportData = (
         }
       }
     })
-
-    // Spezielle Validierung für Diagramme (wenn importiert als JSON)
-    if (entityType === 'diagrams') {
-      data.forEach((row, index) => {
-        const rowNumber = index + 2 // Excel row numbers start at 1, plus header row
-
-        // Prüfe erforderliche Felder für Diagramme
-        if (!row.id) {
-          errors.push({
-            row: rowNumber,
-            field: 'id',
-            message: 'ID ist erforderlich',
-            severity: 'error',
-          })
-        }
-
-        if (!row.name) {
-          errors.push({
-            row: rowNumber,
-            field: 'name',
-            message: 'Name ist erforderlich',
-            severity: 'error',
-          })
-        }
-
-        // Prüfe, ob JSON-Daten vorhanden sind
-        if (!row.diagramData) {
-          errors.push({
-            row: rowNumber,
-            field: 'diagramData',
-            message: 'Diagramm-Daten sind erforderlich',
-            severity: 'error',
-          })
-        }
-
-        // Prüfe, ob die Diagramm-Daten gültiges JSON sind
-        if (row.diagramData && typeof row.diagramData === 'string') {
-          try {
-            JSON.parse(row.diagramData)
-          } catch {
-            errors.push({
-              row: rowNumber,
-              field: 'diagramData',
-              message: 'Diagramm-Daten sind kein gültiges JSON',
-              severity: 'error',
-            })
-          }
-        }
-      })
-    }
 
     if (rowIsValid) {
       validRows++

@@ -20,7 +20,7 @@ import { Person, FilterState } from '@/components/persons/types'
 
 function PersonsPage() {
   const t = useTranslations('persons')
-  const { authenticated } = useAuth()
+  const { authenticated, initialized } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
   const [globalFilter, setGlobalFilter] = useState<string>('')
   const [sorting, setSorting] = useState([{ id: 'lastName', desc: false }])
@@ -46,7 +46,7 @@ function PersonsPage() {
 
   // Personen laden - Auth-Check erfolgt bereits in layout.tsx
   const { loading, error, data, refetch } = useQuery(GET_PERSONS, {
-    skip: !authenticated,
+    skip: !authenticated || !initialized,
     fetchPolicy: 'cache-and-network',
   })
 

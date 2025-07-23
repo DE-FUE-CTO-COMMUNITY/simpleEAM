@@ -24,7 +24,7 @@ import { Infrastructure } from '@/gql/generated'
 import { InfrastructureFilterState } from '@/components/infrastructure/InfrastructureFilterDialog'
 
 const InfrastructurePage = () => {
-  const { authenticated } = useAuth()
+  const { authenticated, initialized } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
   const t = useTranslations('infrastructure')
   const [globalFilter, setGlobalFilter] = useState('')
@@ -49,7 +49,7 @@ const InfrastructurePage = () => {
 
   // GraphQL-Abfrage für Infrastrukturen
   const { data, loading, refetch } = useQuery(GET_INFRASTRUCTURES, {
-    skip: !authenticated,
+    skip: !authenticated || !initialized,
     fetchPolicy: 'cache-and-network',
   })
 

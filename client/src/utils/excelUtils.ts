@@ -316,59 +316,12 @@ export const exportMultiTabToJson = async (
 }
 
 /**
- * Liest eine JSON-Datei und gibt die Daten zurück
+ * Erstellt Mock-Daten für Business Capabilities
  */
-export const importFromJson = (file: File): Promise<any> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-
-    reader.onload = e => {
-      try {
-        const jsonString = e.target?.result as string
-        const data = JSON.parse(jsonString)
-        resolve(data)
-      } catch (error) {
-        reject(
-          new Error(
-            `Fehler beim Lesen der JSON-Datei: ${error instanceof Error ? error.message : 'Unbekannter Fehler'}`
-          )
-        )
-      }
-    }
-
-    reader.onerror = () => {
-      reject(new Error('Fehler beim Lesen der Datei'))
-    }
-
-    reader.readAsText(file)
-  })
-}
 
 /**
  * Liest eine Multi-Tab JSON-Datei und gibt die Daten strukturiert zurück (Admin-Funktion)
  */
-export const importMultiTabFromJson = (file: File): Promise<{ [tabName: string]: any[] }> => {
-  return new Promise((resolve, reject) => {
-    importFromJson(file)
-      .then(data => {
-        if (typeof data !== 'object' || data === null) {
-          reject(new Error('Die JSON-Datei enthält keine gültigen Daten'))
-          return
-        }
-
-        // Überprüfe, ob das Format korrekt ist (Objekt mit Arrays für jedes Tab)
-        for (const [, value] of Object.entries(data)) {
-          if (!Array.isArray(value)) {
-            reject(new Error('Die JSON-Datei hat nicht das erwartete Format für Multi-Tab-Daten'))
-            return
-          }
-        }
-
-        resolve(data as { [tabName: string]: any[] })
-      })
-      .catch(error => reject(error))
-  })
-}
 
 /**
  * Erstellt Mock-Daten für Business Capabilities

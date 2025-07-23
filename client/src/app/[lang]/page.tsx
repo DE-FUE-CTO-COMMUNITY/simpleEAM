@@ -60,55 +60,55 @@ const Dashboard = () => {
     data: capabilitiesData,
     loading: capabilitiesLoading,
     error: capabilitiesError,
-  } = useQuery(GET_CAPABILITIES_COUNT, { skip: !authenticated })
+  } = useQuery(GET_CAPABILITIES_COUNT, { skip: !authenticated || !initialized })
 
   const {
     data: applicationsData,
     loading: applicationsLoading,
     error: applicationsError,
-  } = useQuery(GET_APPLICATIONS_COUNT, { skip: !authenticated })
+  } = useQuery(GET_APPLICATIONS_COUNT, { skip: !authenticated || !initialized })
 
   const {
     data: dataObjectsData,
     loading: dataObjectsLoading,
     error: dataObjectsError,
-  } = useQuery(GET_DATA_OBJECTS_COUNT, { skip: !authenticated })
+  } = useQuery(GET_DATA_OBJECTS_COUNT, { skip: !authenticated || !initialized })
 
   const {
     data: architecturesData,
     loading: architecturesLoading,
     error: architecturesError,
-  } = useQuery(GET_ARCHITECTURES_COUNT, { skip: !authenticated })
+  } = useQuery(GET_ARCHITECTURES_COUNT, { skip: !authenticated || !initialized })
 
   const {
     data: diagramsData,
     loading: diagramsLoading,
     error: diagramsError,
-  } = useQuery(GET_DIAGRAMS_COUNT, { skip: !authenticated })
+  } = useQuery(GET_DIAGRAMS_COUNT, { skip: !authenticated || !initialized })
 
   const {
     data: interfacesData,
     loading: interfacesLoading,
     error: interfacesError,
-  } = useQuery(GET_APPLICATION_INTERFACES_COUNT, { skip: !authenticated })
+  } = useQuery(GET_APPLICATION_INTERFACES_COUNT, { skip: !authenticated || !initialized })
 
   const {
     data: personsData,
     loading: personsLoading,
     error: personsError,
-  } = useQuery(GET_PERSONS_COUNT, { skip: !authenticated })
+  } = useQuery(GET_PERSONS_COUNT, { skip: !authenticated || !initialized })
 
   const {
     data: principlesData,
     loading: principlesLoading,
     error: principlesError,
-  } = useQuery(GET_ARCHITECTURE_PRINCIPLES_COUNT, { skip: !authenticated })
+  } = useQuery(GET_ARCHITECTURE_PRINCIPLES_COUNT, { skip: !authenticated || !initialized })
 
   const {
     data: infrastructuresData,
     loading: infrastructuresLoading,
     error: infrastructuresError,
-  } = useQuery(GET_INFRASTRUCTURES_COUNT, { skip: !authenticated })
+  } = useQuery(GET_INFRASTRUCTURES_COUNT, { skip: !authenticated || !initialized })
 
   // Fehlerbehandlung
   useEffect(() => {

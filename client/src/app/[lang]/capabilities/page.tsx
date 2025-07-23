@@ -25,7 +25,7 @@ import { useCapabilityFilter } from '@/components/capabilities/useCapabilityFilt
 import { FilterState } from '@/components/capabilities/types'
 
 const CapabilitiesPage = () => {
-  const { authenticated } = useAuth()
+  const { authenticated, initialized } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
   const t = useTranslations('capabilities')
   const [globalFilter, setGlobalFilter] = useState<string>('')
@@ -55,7 +55,7 @@ const CapabilitiesPage = () => {
 
   // Business Capabilities laden - Auth-Check erfolgt bereits in layout.tsx
   const { loading, error, data, refetch } = useQuery(GET_CAPABILITIES, {
-    skip: !authenticated,
+    skip: !authenticated || !initialized,
     fetchPolicy: 'cache-and-network',
   })
 

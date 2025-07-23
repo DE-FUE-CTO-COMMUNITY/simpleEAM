@@ -2,7 +2,7 @@ import { analyzeArrows } from './utils/arrowAnalysis'
 import { ExcalidrawElement } from './types/relationshipTypes'
 
 // Test-Funktion für die Pfeilanalyse
-export function debugArrowAnalysis(elements: readonly ExcalidrawElement[]) {
+export async function debugArrowAnalysis(elements: readonly ExcalidrawElement[]) {
   console.log('=== Debugging Arrow Analysis ===')
 
   // Alle Elemente anzeigen
@@ -33,7 +33,7 @@ export function debugArrowAnalysis(elements: readonly ExcalidrawElement[]) {
   })
 
   // Analyse ausführen
-  const result = analyzeArrows(elements as ExcalidrawElement[])
+  const result = await analyzeArrows(elements as ExcalidrawElement[])
 
   console.log('Analyseergebnis:')
   console.log('- Gültige Beziehungen:', result.validRelationships.length)

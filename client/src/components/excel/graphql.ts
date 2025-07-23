@@ -113,6 +113,14 @@ export const DELETE_ARCHITECTURE_PRINCIPLES = `
   }
 `
 
+export const DELETE_INFRASTRUCTURES = `
+  mutation DeleteAllInfrastructures {
+    deleteInfrastructures(where: {}) {
+      nodesDeleted
+    }
+  }
+`
+
 // Helper-Funktion: Gibt die passenden CREATE/UPDATE Mutations für einen Entity-Type zurück
 export const getMutationsByEntityType = (entityType: string) => {
   const mutationMap = {
@@ -172,6 +180,7 @@ export const getDeleteMutationByEntityType = (entityType: string) => {
     architectures: DELETE_ARCHITECTURES,
     diagrams: DELETE_DIAGRAMS,
     architecturePrinciples: DELETE_ARCHITECTURE_PRINCIPLES,
+    infrastructures: DELETE_INFRASTRUCTURES,
   }
 
   return deleteMutationMap[entityType as keyof typeof deleteMutationMap]

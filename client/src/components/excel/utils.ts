@@ -10,6 +10,8 @@ import {
   ArchitectureType,
   PrincipleCategory,
   PrinciplePriority,
+  CapabilityStatus,
+  CapabilityType,
 } from '../../gql/generated'
 
 // Helper function to parse comma-separated relationship IDs
@@ -25,7 +27,15 @@ export const parseRelationshipIds = (value: string | undefined | null): string[]
 export const getRelationshipFields = (entityType: string): string[] => {
   switch (entityType) {
     case 'businessCapabilities':
-      return ['owners', 'parents']
+      return [
+        'owners',
+        'parents',
+        'children',
+        'supportedByApplications',
+        'partOfArchitectures',
+        'relatedDataObjects',
+        'depictedInDiagrams',
+      ]
     case 'applications':
       return ['owners', 'supportsCapabilities', 'usesDataObjects', 'partOfArchitectures']
     case 'dataObjects':
@@ -138,18 +148,83 @@ export const checkEntityExists = async (
 
 // Helper function to create entity input based on entity type and row data
 export const createEntityInput = (entityType: string, row: any): any => {
+  // Helper function to generate a fallback name if name is empty
+  const generateFallbackName = (prefix: string, row: any): string => {
+    if (row.name && row.name.trim()) {
+      return row.name.trim()
+    }
+
+    // Generate fallback name based on available data
+    if (row.id && row.id.trim()) {
+      return `${prefix} ${row.id}`
+    }
+
+    // Use description as fallback
+    if (row.description && row.description.trim()) {
+      const desc = row.description.trim()
+      return desc.length > 50 ? `${desc.substring(0, 47)}...` : desc
+    }
+
+    // Last resort: use timestamp
+    const fallbackName = `${prefix} ${new Date().toISOString()}`
+    console.log(
+      `DEBUG: Generated fallback name "${fallbackName}" for row:`,
+      JSON.stringify(row, null, 2)
+    )
+    return fallbackName
+  }
+
   switch (entityType) {
-    case 'businessCapabilities':
+    case 'businessCapabilities': {
+      const validStatus = Object.values(CapabilityStatus).includes(
+        row.status?.toUpperCase() as CapabilityStatus
+      )
+        ? (row.status.toUpperCase() as CapabilityStatus)
+        : CapabilityStatus.ACTIVE
+
+      const validType =
+        row.type &&
+        Object.values(CapabilityType).includes(row.type?.toUpperCase() as CapabilityType)
+          ? (row.type.toUpperCase() as CapabilityType)
+          : undefined
+
       return {
-        id: row.id || '',
-        name: row.name || '',
+        name: generateFallbackName('Business Capability', row),
         description: row.description || '',
-        level: row.level || 1,
-        businessValue: row.businessValue || '',
-        kpiDescription: row.kpiDescription || '',
-        informationConcept: row.informationConcept || '',
-        isActive: row.isActive === 'true' || row.isActive === true || row.isActive === 1,
+        status: validStatus,
+        type: validType,
+        // Numerische Felder
+        businessValue:
+          typeof row.businessValue === 'number'
+            ? row.businessValue
+            : row.businessValue
+              ? parseInt(row.businessValue, 10)
+              : undefined,
+        maturityLevel:
+          typeof row.maturityLevel === 'number'
+            ? row.maturityLevel
+            : row.maturityLevel
+              ? parseInt(row.maturityLevel, 10)
+              : undefined,
+        sequenceNumber:
+          typeof row.sequenceNumber === 'number'
+            ? row.sequenceNumber
+            : row.sequenceNumber
+              ? parseInt(row.sequenceNumber, 10)
+              : undefined,
+        // Datum-Felder
+        introductionDate: row.introductionDate ? new Date(row.introductionDate) : undefined,
+        endDate: row.endDate ? new Date(row.endDate) : undefined,
+        // Tags-Array
+        tags: Array.isArray(row.tags)
+          ? row.tags
+          : typeof row.tags === 'string' && row.tags.trim()
+            ? row.tags.split(',').map((t: string) => t.trim())
+            : undefined,
+        // updatedAt für Excel
+        updatedAt: row.updatedAt ? new Date(row.updatedAt) : new Date(),
       }
+    }
 
     case 'applications': {
       const validStatus = Object.values(ApplicationStatus).includes(
@@ -166,7 +241,7 @@ export const createEntityInput = (entityType: string, row: any): any => {
 
       return {
         id: row.id || '',
-        name: row.name || '',
+        name: generateFallbackName('Application', row),
         description: row.description || '',
         version: row.version || '',
         status: validStatus,
@@ -191,7 +266,7 @@ export const createEntityInput = (entityType: string, row: any): any => {
 
       return {
         id: row.id || '',
-        name: row.name || '',
+        name: generateFallbackName('Data Object', row),
         description: row.description || '',
         classification: validClassification,
         dataFormat: row.dataFormat || '',
@@ -218,7 +293,7 @@ export const createEntityInput = (entityType: string, row: any): any => {
 
       return {
         id: row.id || '',
-        name: row.name || '',
+        name: generateFallbackName('Interface', row),
         description: row.description || '',
         type: validType,
         status: validStatus,
@@ -236,8 +311,11 @@ export const createEntityInput = (entityType: string, row: any): any => {
     case 'persons':
       return {
         id: row.id || '',
-        firstName: row.firstName || '',
-        lastName: row.lastName || '',
+        firstName: row.firstName || generateFallbackName('Person', row).split(' ')[0] || 'Vorname',
+        lastName:
+          row.lastName ||
+          generateFallbackName('Person', row).split(' ').slice(1).join(' ') ||
+          'Nachname',
         email: row.email || '',
         department: row.department || '',
         jobTitle: row.jobTitle || '',
@@ -261,7 +339,7 @@ export const createEntityInput = (entityType: string, row: any): any => {
 
       return {
         id: row.id || '',
-        name: row.name || '',
+        name: generateFallbackName('Architecture', row),
         description: row.description || '',
         domain: validDomain,
         type: validType,
@@ -277,9 +355,12 @@ export const createEntityInput = (entityType: string, row: any): any => {
 
     case 'diagrams':
       return {
-        title: row.title || row.name || '',
+        title: row.title || row.name || generateFallbackName('Diagram', row),
         description: row.description || '',
-        diagramJson: row.diagramJson || row.content || '{}',
+        diagramJson:
+          row.diagramJson ||
+          row.content ||
+          '{"elements":[],"appState":{"currentChartType":"whiteboard"}}',
       }
 
     case 'architecturePrinciples': {
@@ -303,7 +384,7 @@ export const createEntityInput = (entityType: string, row: any): any => {
         : []
 
       return {
-        name: row.name || '',
+        name: generateFallbackName('Architecture Principle', row),
         description: row.description || '',
         category: validCategory,
         priority: validPriority,
@@ -313,6 +394,20 @@ export const createEntityInput = (entityType: string, row: any): any => {
         isActive: row.isActive === 'true' || row.isActive === true || row.isActive === 1,
       }
     }
+
+    case 'infrastructures':
+      return {
+        id: row.id || '',
+        name: generateFallbackName('Infrastructure', row),
+        description: row.description || '',
+        type: row.type || '',
+        location: row.location || '',
+        capacity: row.capacity || '',
+        status: row.status || '',
+        vendor: row.vendor || '',
+        maintenanceSchedule: row.maintenanceSchedule || '',
+        isActive: row.isActive === 'true' || row.isActive === true || row.isActive === 1,
+      }
 
     default:
       throw new Error(`Unsupported entity type: ${entityType}`)
