@@ -20,6 +20,7 @@ export type EntityType =
   | 'interfaces'
   | 'persons'
   | 'architectures'
+  | 'diagrams'
   | 'architecturePrinciples'
   | 'infrastructures'
   | 'all'
@@ -512,7 +513,7 @@ export const fetchAllEntitiesForExport = async (
       Architectures: architectures,
       Diagrams: diagrams, // Für JSON-Export verfügbar
       'Architecture Principles': architecturePrinciples,
-      Infrastructure: infrastructures,
+      Infrastructures: infrastructures,
     }
   } catch {
     throw new Error('Fehler beim Laden der kompletten Datenbank')
@@ -558,7 +559,7 @@ export const fetchAllEntitiesForExcelExport = async (
       Architectures: architectures,
       Diagrams: diagrams, // Mit Metadaten aber ohne diagramJson
       'Architecture Principles': architecturePrinciples,
-      Infrastructure: infrastructures,
+      Infrastructures: infrastructures,
     }
   } catch {
     throw new Error('Fehler beim Laden der kompletten Datenbank')
@@ -1003,7 +1004,7 @@ export const getFieldNamesByEntityType = (
       Architectures: Object.keys(getArchitecturesTemplate()),
       Diagrams: Object.keys(getDiagramsTemplate()), // Vollständig für JSON-Export
       'Architecture Principles': Object.keys(getArchitecturePrinciplesTemplate()),
-      Infrastructure: Object.keys(getInfrastructuresTemplate()),
+      Infrastructures: Object.keys(getInfrastructuresTemplate()),
     }
   }
 
@@ -1042,7 +1043,7 @@ export const getFieldNamesByEntityTypeAndFormat = (
           ? Object.keys(getDiagramsTemplate())
           : Object.keys(getDiagramsForExcelTemplate()),
       'Architecture Principles': Object.keys(getArchitecturePrinciplesTemplate()),
-      Infrastructure: Object.keys(getInfrastructuresTemplate()),
+      Infrastructures: Object.keys(getInfrastructuresTemplate()),
     }
   }
 
@@ -1091,14 +1092,13 @@ export const validateImportData = (
     | 'interfaces'
     | 'persons'
     | 'architectures'
+    | 'diagrams'
     | 'architecturePrinciples'
     | 'infrastructures'
 ): ValidationResult => {
   const errors: ValidationError[] = []
   const warnings: ValidationWarning[] = []
-  const seenIds = new Set<string>()
   let validRows = 0
-  let duplicates = 0
 
   const requiredFields = getRequiredFieldsByEntityType(entityType)
   const optionalFields = getOptionalFieldsByEntityType(entityType)
@@ -1107,20 +1107,6 @@ export const validateImportData = (
   data.forEach((row, index) => {
     const rowNumber = index + 2 // Excel row numbers start at 1, plus header row
     let rowIsValid = true
-
-    // Prüfe ID-Duplikate
-    if (row.id && seenIds.has(row.id)) {
-      duplicates++
-      errors.push({
-        row: rowNumber,
-        field: 'id',
-        message: 'Duplikate ID gefunden',
-        severity: 'error',
-      })
-      rowIsValid = false
-    } else if (row.id) {
-      seenIds.add(row.id)
-    }
 
     // Prüfe erforderliche Felder
     requiredFields.forEach((field: string) => {
@@ -1186,7 +1172,7 @@ export const validateImportData = (
       totalRows: data.length,
       validRows,
       invalidRows: data.length - validRows,
-      duplicates,
+      duplicates: 0, // ID-Duplikate werden nicht mehr geprüft
     },
   }
 }
@@ -1362,23 +1348,25 @@ export const getTemplateWithExamples = (
 export function getRequiredFieldsByEntityType(entityType: EntityType): string[] {
   switch (entityType) {
     case 'businessCapabilities':
-      return ['id', 'name']
+      return ['name']
     case 'applications':
-      return ['id', 'name', 'status']
+      return ['name', 'status']
     case 'interfaces':
-      return ['id', 'name', 'interfaceType', 'status']
+      return ['name', 'interfaceType', 'status']
     case 'dataObjects':
-      return ['id', 'name']
+      return ['name']
     case 'persons':
-      return ['id', 'firstName', 'lastName']
+      return ['firstName', 'lastName']
     case 'architectures':
-      return ['id', 'name', 'domain', 'type', 'timestamp']
-    // case 'diagrams': - Ausgeblendet für Excel-Operationen
-    //   return ['id', 'title', 'diagramJson']
+      return ['name', 'domain', 'type', 'timestamp']
+    case 'diagrams':
+      return ['title'] // Diagramme verwenden 'title' anstatt 'name'
     case 'architecturePrinciples':
-      return ['id', 'name', 'category', 'priority']
+      return ['name', 'category', 'priority']
+    case 'infrastructures':
+      return ['name', 'infrastructureType', 'status']
     default:
-      return ['id', 'name']
+      return ['name']
   }
 }
 
@@ -1472,8 +1460,20 @@ export function getOptionalFieldsByEntityType(entityType: EntityType): string[] 
         'createdAt',
         'updatedAt',
       ]
-    // case 'diagrams': - Ausgeblendet für Excel-Operationen
-    //   return ['description', 'diagramType', 'creator', 'architecture', 'createdAt', 'updatedAt']
+    case 'diagrams':
+      return [
+        'description',
+        'diagramType',
+        'creator',
+        'architecture',
+        'containsCapabilities',
+        'containsApplications',
+        'containsDataObjects',
+        'containsInterfaces',
+        'containsInfrastructure',
+        'createdAt',
+        'updatedAt',
+      ]
     case 'architecturePrinciples':
       return [
         'description',

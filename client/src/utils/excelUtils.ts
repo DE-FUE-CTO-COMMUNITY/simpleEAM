@@ -607,7 +607,7 @@ export const downloadTemplateWithRealFields = async (
       Persons: [getPersonsTemplate()],
       Architectures: [getArchitecturesTemplate()],
       'Architecture Principles': [getArchitecturePrinciplesTemplate()],
-      Infrastructure: [getInfrastructuresTemplate()],
+      Infrastructures: [getInfrastructuresTemplate()],
       // Diagrams: [getDiagramsTemplate()], - Ausgeblendet für Excel (zu große JSON-Daten)
     }
 

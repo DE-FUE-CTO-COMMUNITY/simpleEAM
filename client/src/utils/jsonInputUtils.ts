@@ -4,6 +4,13 @@
  */
 
 /**
+ * Generiert einen Fallback-Namen für Entitäten
+ */
+const generateFallbackName = (prefix: string, row: any): string => {
+  return row.name || row.title || row.firstName || `${prefix} ${Date.now().toString().slice(-4)}`
+}
+
+/**
  * Erstellt Entity-Input aus JSON-Daten
  * Berücksichtigt verschachtelte Beziehungen und vollständige Objektstrukturen
  * WICHTIG: Entfernt id und createdAt, da diese in Create-Input-Typen nicht erlaubt sind
@@ -62,19 +69,30 @@ export const createEntityInputFromJson = (entityType: string, row: any): any => 
         ...baseInput,
         version: row.version || '',
         // status ist Pflichtfeld - verwende gültigen Enum-Wert
-        status: ['ACTIVE', 'IN_DEVELOPMENT', 'RETIRED'].includes(row.status)
-          ? row.status
-          : 'ACTIVE',
+        status: ['ACTIVE', 'PLANNED', 'RETIRED'].includes(row.status) ? row.status : 'ACTIVE',
         // criticality ist Pflichtfeld - verwende gültigen Enum-Wert
         criticality: ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'].includes(row.criticality)
           ? row.criticality
           : 'MEDIUM',
-        // type/technology sind nicht Teil des ApplicationCreateInput, verwende technologyStack
-        technologyStack: row.technology ? [row.technology] : row.technologyStack || [],
         vendor: row.vendor || '',
-        // license ist nicht Teil des ApplicationCreateInput
-        introductionDate: row.introductionDate ? new Date(row.introductionDate) : null,
-        endOfLifeDate: row.endOfLifeDate ? new Date(row.endOfLifeDate) : null,
+        hostingEnvironment: row.hostingEnvironment || '',
+        // Numerische Felder
+        costs:
+          typeof row.costs === 'number' ? row.costs : row.costs ? parseFloat(row.costs) : undefined,
+        // Datum-Felder
+        introductionDate: row.introductionDate ? new Date(row.introductionDate) : undefined,
+        endOfLifeDate: row.endOfLifeDate ? new Date(row.endOfLifeDate) : undefined,
+        endOfUseDate: row.endOfUseDate ? new Date(row.endOfUseDate) : undefined,
+        planningDate: row.planningDate ? new Date(row.planningDate) : undefined,
+        // Array-Felder
+        technologyStack: Array.isArray(row.technologyStack)
+          ? row.technologyStack
+          : typeof row.technologyStack === 'string' && row.technologyStack.trim()
+            ? row.technologyStack.split(',').map((t: string) => t.trim())
+            : undefined,
+        // Enum-Felder
+        sevenRStrategy: row.sevenRStrategy || undefined,
+        timeCategory: row.timeCategory || undefined,
       }
 
     case 'dataObjects':
@@ -87,32 +105,57 @@ export const createEntityInputFromJson = (entityType: string, row: any): any => 
           ? row.classification
           : 'INTERNAL',
         format: row.format || '',
-        // type ist nicht Teil des DataObjectCreateInput
-        // retentionPeriod ist nicht Teil des DataObjectCreateInput
-        introductionDate: row.introductionDate ? new Date(row.introductionDate) : null,
-        endOfLifeDate: row.endOfLifeDate ? new Date(row.endOfLifeDate) : null,
+        // Datum-Felder
+        introductionDate: row.introductionDate ? new Date(row.introductionDate) : undefined,
+        endOfLifeDate: row.endOfLifeDate ? new Date(row.endOfLifeDate) : undefined,
+        endOfUseDate: row.endOfUseDate ? new Date(row.endOfUseDate) : undefined,
+        planningDate: row.planningDate ? new Date(row.planningDate) : undefined,
       }
 
     case 'interfaces':
       return {
-        ...baseInput,
+        name: generateFallbackName('Interface', row),
+        description: row.description || '',
         // interfaceType ist Pflichtfeld - verwende gültigen Enum-Wert
-        interfaceType: ['API', 'DATABASE', 'FILE', 'MESSAGE_QUEUE', 'OTHER'].includes(
-          row.interfaceType
-        )
-          ? row.interfaceType
-          : row.type || 'OTHER',
+        interfaceType: [
+          'API',
+          'FILE_TRANSFER',
+          'DATABASE',
+          'MESSAGE_QUEUE',
+          'WEB_SERVICE',
+          'RPC',
+          'OTHER',
+        ].includes(row.interfaceType?.toUpperCase())
+          ? row.interfaceType?.toUpperCase()
+          : row.type?.toUpperCase() || 'OTHER',
         // status ist Pflichtfeld - verwende gültigen Enum-Wert
         status: ['ACTIVE', 'DEPRECATED', 'IN_DEVELOPMENT', 'OUT_OF_SERVICE', 'PLANNED'].includes(
-          row.status
+          row.status?.toUpperCase()
         )
-          ? row.status
+          ? row.status?.toUpperCase()
           : 'PLANNED',
-        // protocol ist enum-Feld aber optional - verwende protocol falls vorhanden
-        protocol: row.protocol || undefined,
-        // frequency, dataFormat, security sind nicht Teil des ApplicationInterfaceCreateInput
-        introductionDate: row.introductionDate ? new Date(row.introductionDate) : null,
-        endOfLifeDate: row.endOfLifeDate ? new Date(row.endOfLifeDate) : null,
+        // protocol ist enum-Feld aber optional
+        protocol: [
+          'HTTP',
+          'HTTPS',
+          'FTP',
+          'SFTP',
+          'SOAP',
+          'REST',
+          'GRAPHQL',
+          'TCP',
+          'UDP',
+          'OTHER',
+        ].includes(row.protocol?.toUpperCase())
+          ? row.protocol?.toUpperCase()
+          : undefined,
+        version: row.version || undefined,
+        // Datums-Felder
+        introductionDate: row.introductionDate ? new Date(row.introductionDate) : undefined,
+        planningDate: row.planningDate ? new Date(row.planningDate) : undefined,
+        endOfUseDate: row.endOfUseDate ? new Date(row.endOfUseDate) : undefined,
+        endOfLifeDate: row.endOfLifeDate ? new Date(row.endOfLifeDate) : undefined,
+        updatedAt: row.updatedAt ? new Date(row.updatedAt) : undefined,
       }
 
     case 'persons':
@@ -131,7 +174,8 @@ export const createEntityInputFromJson = (entityType: string, row: any): any => 
 
     case 'architectures':
       return {
-        ...baseInput,
+        name: generateFallbackName('Architecture', row),
+        description: row.description || '',
         // domain ist Pflichtfeld - verwende gültigen Enum-Wert
         domain: [
           'APPLICATION',
@@ -141,49 +185,99 @@ export const createEntityInputFromJson = (entityType: string, row: any): any => 
           'INTEGRATION',
           'SECURITY',
           'TECHNOLOGY',
-        ].includes(row.domain)
-          ? row.domain
+        ].includes(row.domain?.toUpperCase())
+          ? row.domain.toUpperCase()
           : 'ENTERPRISE',
         // type ist Pflichtfeld - verwende gültigen Enum-Wert
-        type: ['CONCEPTUAL', 'CURRENT_STATE', 'FUTURE_STATE', 'TRANSITION'].includes(row.type)
-          ? row.type
+        type: ['CONCEPTUAL', 'CURRENT_STATE', 'FUTURE_STATE', 'TRANSITION'].includes(
+          row.type?.toUpperCase()
+        )
+          ? row.type.toUpperCase()
           : 'CURRENT_STATE',
         // timestamp ist Pflichtfeld - verwende aktuelle Zeit oder gegebene Zeit
         timestamp: row.timestamp ? new Date(row.timestamp) : new Date(),
-        // status ist nicht Teil des ArchitectureCreateInput
-        // version ist nicht Teil des ArchitectureCreateInput
+        tags: Array.isArray(row.tags) ? row.tags : [],
+        updatedAt: row.updatedAt ? new Date(row.updatedAt) : undefined,
       }
 
     case 'diagrams':
       return {
-        ...baseInput,
-        type: row.type || '',
-        version: row.version || '',
-        status: row.status || '',
+        title: row.title || row.name || generateFallbackName('Diagram', row),
+        description: row.description || '',
         diagramJson: row.diagramJson || '{}', // Vollständige Excalidraw-Daten
+        diagramPng: row.diagramPng || undefined,
+        diagramType: ['ARCHITECTURE', 'BUSINESS_PROCESS', 'DATA_FLOW', 'NETWORK', 'OTHER'].includes(
+          row.diagramType?.toUpperCase()
+        )
+          ? row.diagramType.toUpperCase()
+          : undefined,
+        updatedAt: row.updatedAt ? new Date(row.updatedAt) : undefined,
       }
 
     case 'architecturePrinciples':
       return {
-        ...baseInput,
+        name: generateFallbackName('Architecture Principle', row),
+        description: row.description || '',
         rationale: row.rationale || '',
         implications: row.implications || '',
-        category: row.category || '',
-        priority: row.priority || '',
-        status: row.status || '',
+        // category ist Pflichtfeld - verwende gültigen Enum-Wert
+        category: [
+          'BUSINESS',
+          'DATA',
+          'APPLICATION',
+          'TECHNOLOGY',
+          'SECURITY',
+          'GOVERNANCE',
+        ].includes(row.category?.toUpperCase())
+          ? row.category.toUpperCase()
+          : 'GOVERNANCE',
+        // priority ist Pflichtfeld - verwende gültigen Enum-Wert
+        priority: ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'].includes(row.priority?.toUpperCase())
+          ? row.priority.toUpperCase()
+          : 'MEDIUM',
+        // isActive ist Pflichtfeld
+        isActive: row.isActive === true || row.isActive === 'true' || row.isActive === 1,
+        tags: Array.isArray(row.tags) ? row.tags : [],
+        updatedAt: row.updatedAt ? new Date(row.updatedAt) : undefined,
       }
 
     case 'infrastructures':
       return {
-        ...baseInput,
-        type: row.type || '',
-        status: row.status || '',
+        name: generateFallbackName('Infrastructure', row),
+        description: row.description || '',
+        // infrastructureType ist Pflichtfeld - verwende gültigen Enum-Wert
+        infrastructureType: [
+          'CLOUD_DATACENTER',
+          'CONTAINER_HOST',
+          'KUBERNETES_CLUSTER',
+          'ON_PREMISE_DATACENTER',
+          'PHYSICAL_SERVER',
+          'VIRTUAL_MACHINE',
+        ].includes(row.infrastructureType?.toUpperCase())
+          ? row.infrastructureType.toUpperCase()
+          : row.type?.toUpperCase() === 'SERVER' || row.type?.toUpperCase() === 'PHYSICAL_SERVER'
+            ? 'PHYSICAL_SERVER'
+            : 'VIRTUAL_MACHINE',
+        // status ist Pflichtfeld - verwende gültigen Enum-Wert
+        status: ['ACTIVE', 'INACTIVE', 'IN_DEVELOPMENT', 'PLANNED', 'RETIRED'].includes(
+          row.status?.toUpperCase()
+        )
+          ? row.status.toUpperCase()
+          : 'PLANNED',
         location: row.location || '',
         capacity: row.capacity || '',
-        technology: row.technology || '',
+        costs: row.costs ? parseFloat(row.costs.toString()) : undefined,
         vendor: row.vendor || '',
-        installationDate: row.installationDate ? new Date(row.installationDate) : null,
-        endOfLifeDate: row.endOfLifeDate ? new Date(row.endOfLifeDate) : null,
+        operatingSystem: row.operatingSystem || '',
+        ipAddress: row.ipAddress || '',
+        specifications: row.specifications || '',
+        maintenanceWindow: row.maintenanceWindow || '',
+        // Datums-Felder
+        introductionDate: row.introductionDate ? new Date(row.introductionDate) : undefined,
+        planningDate: row.planningDate ? new Date(row.planningDate) : undefined,
+        endOfUseDate: row.endOfUseDate ? new Date(row.endOfUseDate) : undefined,
+        endOfLifeDate: row.endOfLifeDate ? new Date(row.endOfLifeDate) : undefined,
+        updatedAt: row.updatedAt ? new Date(row.updatedAt) : undefined,
       }
 
     default:

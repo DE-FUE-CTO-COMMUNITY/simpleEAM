@@ -66,14 +66,24 @@ export const fetchBusinessCapabilitiesForJson = async (
       id: cap.id,
       name: cap.name || '',
       description: cap.description || '',
-      level: cap.level || '',
       status: cap.status || '',
+      type: cap.type || undefined,
+      // Numerische Felder
+      businessValue: cap.businessValue || undefined,
+      maturityLevel: cap.maturityLevel || undefined,
+      sequenceNumber: cap.sequenceNumber || undefined,
+      // Datum-Felder
+      introductionDate: formatDateForJsonExport(cap.introductionDate),
+      endDate: formatDateForJsonExport(cap.endDate),
       createdAt: formatDateForJsonExport(cap.createdAt),
       updatedAt: formatDateForJsonExport(cap.updatedAt),
+      // Array-Felder
+      tags: cap.tags || [],
       // Beziehungen als verschachtelte Objekte (nicht als ID-Strings)
+      owners: cap.owners || [],
       supportedByApplications: cap.supportedByApplications || [],
-      ownedByOrganizations: cap.ownedByOrganizations || [],
       partOfArchitectures: cap.partOfArchitectures || [],
+      relatedDataObjects: cap.relatedDataObjects || [],
       depictedInDiagrams: cap.depictedInDiagrams || [],
       parents: cap.parents || [],
       children: cap.children || [],
@@ -101,15 +111,23 @@ export const fetchApplicationsForJson = async (
       description: app.description || '',
       version: app.version || '',
       status: app.status || '',
-      type: app.type || '',
       criticality: app.criticality || '',
-      technology: app.technology || '',
       vendor: app.vendor || '',
-      license: app.license || '',
+      hostingEnvironment: app.hostingEnvironment || '',
+      // Numerische Felder
+      costs: app.costs || undefined,
+      // Datum-Felder - alle wichtigen Datums-Felder hinzufügen
       introductionDate: formatDateForJsonExport(app.introductionDate),
       endOfLifeDate: formatDateForJsonExport(app.endOfLifeDate),
+      endOfUseDate: formatDateForJsonExport(app.endOfUseDate),
+      planningDate: formatDateForJsonExport(app.planningDate),
       createdAt: formatDateForJsonExport(app.createdAt),
       updatedAt: formatDateForJsonExport(app.updatedAt),
+      // Array-Felder
+      technologyStack: app.technologyStack || [],
+      // Enum-Felder
+      sevenRStrategy: app.sevenRStrategy || undefined,
+      timeCategory: app.timeCategory || undefined,
       // Beziehungen als verschachtelte Objekte
       owners: app.owners || [],
       supportsCapabilities: app.supportsCapabilities || [],
@@ -124,6 +142,7 @@ export const fetchApplicationsForJson = async (
       successors: app.successors || [],
       implementsPrinciples: app.implementsPrinciples || [],
       hostedOn: app.hostedOn || [],
+      isDataSourceFor: app.isDataSourceFor || [],
     }))
   } catch {
     throw new Error('Fehler beim Laden der Applications für JSON-Export')
@@ -146,19 +165,23 @@ export const fetchDataObjectsForJson = async (
       id: obj.id,
       name: obj.name || '',
       description: obj.description || '',
-      type: obj.type || '',
-      format: obj.format || '',
       classification: obj.classification || '',
-      retentionPeriod: obj.retentionPeriod || '',
+      format: obj.format || '',
+      // Datum-Felder
+      introductionDate: formatDateForJsonExport(obj.introductionDate),
+      endOfLifeDate: formatDateForJsonExport(obj.endOfLifeDate),
+      endOfUseDate: formatDateForJsonExport(obj.endOfUseDate),
+      planningDate: formatDateForJsonExport(obj.planningDate),
       createdAt: formatDateForJsonExport(obj.createdAt),
       updatedAt: formatDateForJsonExport(obj.updatedAt),
       // Beziehungen als verschachtelte Objekte
+      owners: obj.owners || [],
+      dataSources: obj.dataSources || [],
       usedByApplications: obj.usedByApplications || [],
-      transferredByInterfaces: obj.transferredByInterfaces || [],
-      ownedByOrganizations: obj.ownedByOrganizations || [],
+      relatedToCapabilities: obj.relatedToCapabilities || [],
+      transferredInInterfaces: obj.transferredInInterfaces || [],
       partOfArchitectures: obj.partOfArchitectures || [],
       depictedInDiagrams: obj.depictedInDiagrams || [],
-      storedOn: obj.storedOn || [],
     }))
   } catch {
     throw new Error('Fehler beim Laden der Data Objects für JSON-Export')
@@ -181,17 +204,24 @@ export const fetchInterfacesForJson = async (
       id: iface.id,
       name: iface.name || '',
       description: iface.description || '',
-      type: iface.type || '',
+      interfaceType: iface.interfaceType || '',
+      status: iface.status || '',
       protocol: iface.protocol || '',
-      frequency: iface.frequency || '',
-      dataFormat: iface.dataFormat || '',
-      security: iface.security || '',
+      version: iface.version || '',
+      // Datums-Felder
+      introductionDate: formatDateForJsonExport(iface.introductionDate),
+      planningDate: formatDateForJsonExport(iface.planningDate),
+      endOfUseDate: formatDateForJsonExport(iface.endOfUseDate),
+      endOfLifeDate: formatDateForJsonExport(iface.endOfLifeDate),
       createdAt: formatDateForJsonExport(iface.createdAt),
       updatedAt: formatDateForJsonExport(iface.updatedAt),
       // Beziehungen als verschachtelte Objekte
-      sourceApplication: iface.sourceApplication || null,
+      sourceApplications: iface.sourceApplications || [],
       targetApplications: iface.targetApplications || [],
-      transfersDataObjects: iface.transfersDataObjects || [],
+      dataObjects: iface.dataObjects || [],
+      responsiblePerson: iface.responsiblePerson || [],
+      predecessors: iface.predecessors || [],
+      successors: iface.successors || [],
       partOfArchitectures: iface.partOfArchitectures || [],
       depictedInDiagrams: iface.depictedInDiagrams || [],
     }))
@@ -212,20 +242,25 @@ export const fetchPersonsForJson = async (client: ApolloClient<any>): Promise<Js
 
     return data.people?.map((person: any) => ({
       id: person.id,
-      name: person.name || '',
+      firstName: person.firstName || '',
+      lastName: person.lastName || '',
+      // Temporäres name-Feld für Export-Kompatibilität (kombiniert firstName + lastName)
+      name: `${person.firstName || ''} ${person.lastName || ''}`.trim() || 'Unbenannt',
       email: person.email || '',
       role: person.role || '',
       department: person.department || '',
       phone: person.phone || '',
-      location: person.location || '',
+      avatarUrl: person.avatarUrl || '',
       createdAt: formatDateForJsonExport(person.createdAt),
       updatedAt: formatDateForJsonExport(person.updatedAt),
       // Beziehungen als verschachtelte Objekte
-      ownsApplications: person.ownsApplications || [],
-      ownsDataObjects: person.ownsDataObjects || [],
-      ownsCapabilities: person.ownsCapabilities || [],
-      partOfArchitectures: person.partOfArchitectures || [],
-      depictedInDiagrams: person.depictedInDiagrams || [],
+      ownedApplications: person.ownedApplications || [],
+      ownedDataObjects: person.ownedDataObjects || [],
+      ownedCapabilities: person.ownedCapabilities || [],
+      ownedArchitectures: person.ownedArchitectures || [],
+      ownedDiagrams: person.ownedDiagrams || [],
+      ownedInfrastructure: person.ownedInfrastructure || [],
+      responsibleForInterfaces: person.responsibleForInterfaces || [],
     }))
   } catch {
     throw new Error('Fehler beim Laden der Persons für JSON-Export')
@@ -248,19 +283,23 @@ export const fetchArchitecturesForJson = async (
       id: arch.id,
       name: arch.name || '',
       description: arch.description || '',
+      domain: arch.domain || '',
       type: arch.type || '',
-      status: arch.status || '',
-      version: arch.version || '',
+      tags: arch.tags || [],
+      timestamp: formatDateForJsonExport(arch.timestamp),
       createdAt: formatDateForJsonExport(arch.createdAt),
       updatedAt: formatDateForJsonExport(arch.updatedAt),
       // Beziehungen als verschachtelte Objekte
-      includesApplications: arch.includesApplications || [],
-      includesCapabilities: arch.includesCapabilities || [],
-      includesDataObjects: arch.includesDataObjects || [],
-      includesInterfaces: arch.includesInterfaces || [],
-      includesPeople: arch.includesPeople || [],
-      depictedInDiagrams: arch.depictedInDiagrams || [],
-      includesInfrastructures: arch.includesInfrastructures || [],
+      containsApplications: arch.containsApplications || [],
+      containsCapabilities: arch.containsCapabilities || [],
+      containsDataObjects: arch.containsDataObjects || [],
+      containsInterfaces: arch.containsInterfaces || [],
+      containsInfrastructure: arch.containsInfrastructure || [],
+      owners: arch.owners || [],
+      diagrams: arch.diagrams || [],
+      appliedPrinciples: arch.appliedPrinciples || [],
+      parentArchitecture: arch.parentArchitecture || null,
+      childArchitectures: arch.childArchitectures || [],
     }))
   } catch {
     throw new Error('Fehler beim Laden der Architectures für JSON-Export')
@@ -281,22 +320,21 @@ export const fetchDiagramsForJson = async (
 
     return data.diagrams?.map((diagram: any) => ({
       id: diagram.id,
-      name: diagram.name || '',
+      title: diagram.title || '',
       description: diagram.description || '',
-      type: diagram.type || '',
-      version: diagram.version || '',
-      status: diagram.status || '',
+      diagramType: diagram.diagramType || '',
+      diagramJson: diagram.diagramJson || '', // Vollständige Excalidraw-Daten für JSON
+      diagramPng: diagram.diagramPng || '',
       createdAt: formatDateForJsonExport(diagram.createdAt),
       updatedAt: formatDateForJsonExport(diagram.updatedAt),
-      diagramJson: diagram.diagramJson || '', // Vollständige Excalidraw-Daten für JSON
       // Beziehungen als verschachtelte Objekte
-      depictsApplications: diagram.depictsApplications || [],
-      depictsCapabilities: diagram.depictsCapabilities || [],
-      depictsDataObjects: diagram.depictsDataObjects || [],
-      depictsInterfaces: diagram.depictsInterfaces || [],
-      depictsPeople: diagram.depictsPeople || [],
-      depictsArchitectures: diagram.depictsArchitectures || [],
-      depictsInfrastructures: diagram.depictsInfrastructures || [],
+      containsApplications: diagram.containsApplications || [],
+      containsCapabilities: diagram.containsCapabilities || [],
+      containsDataObjects: diagram.containsDataObjects || [],
+      containsInterfaces: diagram.containsInterfaces || [],
+      containsInfrastructure: diagram.containsInfrastructure || [],
+      creator: diagram.creator || null,
+      architecture: diagram.architecture || null,
     }))
   } catch {
     throw new Error('Fehler beim Laden der Diagrams für JSON-Export')
@@ -323,11 +361,14 @@ export const fetchArchitecturePrinciplesForJson = async (
       implications: principle.implications || '',
       category: principle.category || '',
       priority: principle.priority || '',
-      status: principle.status || '',
+      isActive: principle.isActive || false,
+      tags: principle.tags || [],
       createdAt: formatDateForJsonExport(principle.createdAt),
       updatedAt: formatDateForJsonExport(principle.updatedAt),
       // Beziehungen als verschachtelte Objekte
+      appliedInArchitectures: principle.appliedInArchitectures || [],
       implementedByApplications: principle.implementedByApplications || [],
+      owners: principle.owners || [],
     }))
   } catch {
     throw new Error('Fehler beim Laden der Architecture Principles für JSON-Export')
@@ -350,21 +391,30 @@ export const fetchInfrastructuresForJson = async (
       id: infra.id,
       name: infra.name || '',
       description: infra.description || '',
-      type: infra.type || '',
+      infrastructureType: infra.infrastructureType || '',
       status: infra.status || '',
       location: infra.location || '',
       capacity: infra.capacity || '',
-      technology: infra.technology || '',
+      costs: infra.costs || 0,
       vendor: infra.vendor || '',
-      installationDate: formatDateForJsonExport(infra.installationDate),
+      operatingSystem: infra.operatingSystem || '',
+      ipAddress: infra.ipAddress || '',
+      specifications: infra.specifications || '',
+      maintenanceWindow: infra.maintenanceWindow || '',
+      // Datums-Felder
+      introductionDate: formatDateForJsonExport(infra.introductionDate),
+      planningDate: formatDateForJsonExport(infra.planningDate),
+      endOfUseDate: formatDateForJsonExport(infra.endOfUseDate),
       endOfLifeDate: formatDateForJsonExport(infra.endOfLifeDate),
       createdAt: formatDateForJsonExport(infra.createdAt),
       updatedAt: formatDateForJsonExport(infra.updatedAt),
       // Beziehungen als verschachtelte Objekte
       hostsApplications: infra.hostsApplications || [],
-      storesDataObjects: infra.storesDataObjects || [],
+      owners: infra.owners || [],
       partOfArchitectures: infra.partOfArchitectures || [],
       depictedInDiagrams: infra.depictedInDiagrams || [],
+      parentInfrastructure: infra.parentInfrastructure || null,
+      childInfrastructures: infra.childInfrastructures || [],
     }))
   } catch {
     throw new Error('Fehler beim Laden der Infrastructures für JSON-Export')
@@ -539,10 +589,23 @@ export const validateJsonImportData = (
         break
       case 'persons':
         nameField = 'firstName oder lastName'
+        // Validierung: firstName ODER lastName ODER name-Feld (für Export-Kompatibilität)
         hasValidName = !!(
           (row.firstName && typeof row.firstName === 'string' && row.firstName.trim() !== '') ||
-          (row.lastName && typeof row.lastName === 'string' && row.lastName.trim() !== '')
+          (row.lastName && typeof row.lastName === 'string' && row.lastName.trim() !== '') ||
+          (row.name && typeof row.name === 'string' && row.name.trim() !== '')
         )
+        
+        // Debug-Ausgabe für Personen
+        console.log(`DEBUG JSON Validation: Person row ${rowNumber}:`, {
+          firstName: row.firstName,
+          lastName: row.lastName,
+          name: row.name,
+          hasValidName,
+          hasFirstName: !!(row.firstName && row.firstName.trim()),
+          hasLastName: !!(row.lastName && row.lastName.trim()),
+          hasName: !!(row.name && row.name.trim()),
+        })
         break
       default:
         hasValidName = !!(row.name && typeof row.name === 'string' && row.name.trim() !== '')
@@ -556,22 +619,52 @@ export const validateJsonImportData = (
         entityType === 'diagrams'
           ? row.title
           : entityType === 'persons'
-            ? `${row.firstName || ''} ${row.lastName || ''}`
+            ? {
+                firstName: row.firstName,
+                lastName: row.lastName,
+                // name-Feld nicht mehr prüfen bei Personen
+                combined: `${row.firstName || ''} ${row.lastName || ''}`.trim(),
+              }
             : row.name,
+      rowKeys: Object.keys(row),
     })
 
     if (!hasValidName) {
       console.log(
         `DEBUG JSON Validation: Row ${rowNumber} - NAME VALIDATION FAILED for ${entityType}`,
-        row
+        {
+          row,
+          nameField,
+          hasValidName,
+          checkFields: entityType === 'persons' ? ['firstName', 'lastName', 'name'] : ['name', 'title'],
+        }
       )
-      errors.push({
-        row: rowNumber,
-        field: nameField,
-        message: `${nameField} ist erforderlich`,
-        severity: 'error',
-      })
-      rowIsValid = false
+      
+      // Für Personen: Versuche zusätzliche Fallback-Strategien
+      if (entityType === 'persons') {
+        // Falls email vorhanden ist, verwende den ersten Teil als Fallback
+        if (row.email && typeof row.email === 'string' && row.email.includes('@')) {
+          const emailUser = row.email.split('@')[0]
+          warnings.push({
+            row: rowNumber,
+            field: 'name',
+            message: `Kein Name gefunden, Email-Benutzername als Fallback: "${emailUser}"`,
+            suggestion: 'Fügen Sie firstName und/oder lastName hinzu',
+          })
+          // Akzeptiere diese Zeile trotzdem
+          hasValidName = true
+        }
+      }
+      
+      if (!hasValidName) {
+        errors.push({
+          row: rowNumber,
+          field: nameField,
+          message: `${nameField} ist erforderlich`,
+          severity: 'error',
+        })
+        rowIsValid = false
+      }
     }
 
     // Validierung für spezifische Entity-Types

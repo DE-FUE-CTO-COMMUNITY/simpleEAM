@@ -132,7 +132,8 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
             Architectures: 'architectures',
             'Architecture Principles': 'architecturePrinciples',
             Diagrams: 'diagrams',
-            Infrastructure: 'infrastructures',
+            Infrastructures: 'infrastructures',
+            Infrastructure: 'infrastructures', // Fallback für Singular-Form
           }
 
           const entityType = entityTypeMapping[tabName]

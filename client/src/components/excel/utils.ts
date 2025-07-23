@@ -6,6 +6,9 @@ import {
   DataClassification,
   InterfaceType,
   InterfaceStatus,
+  InterfaceProtocol,
+  InfrastructureType,
+  InfrastructureStatus,
   ArchitectureDomain,
   ArchitectureType,
   PrincipleCategory,
@@ -70,6 +73,15 @@ export const getRelationshipFields = (entityType: string): string[] => {
       return ['creator', 'architecture']
     case 'architecturePrinciples':
       return ['owners', 'appliedInArchitectures', 'implementedByApplications']
+    case 'infrastructures':
+      return [
+        'owners',
+        'hostsApplications',
+        'partOfArchitectures',
+        'depictedInDiagrams',
+        'parentInfrastructure',
+        'childInfrastructures',
+      ]
     default:
       return []
   }
@@ -137,6 +149,8 @@ export const checkEntityExists = async (
         return result.data?.diagrams?.length > 0
       case 'architecturePrinciples':
         return result.data?.architecturePrinciples?.length > 0
+      case 'infrastructures':
+        return result.data?.infrastructures?.length > 0
       default:
         return false
     }
@@ -150,8 +164,11 @@ export const checkEntityExists = async (
 export const createEntityInput = (entityType: string, row: any): any => {
   // Helper function to generate a fallback name if name is empty
   const generateFallbackName = (prefix: string, row: any): string => {
-    if (row.name && row.name.trim()) {
-      return row.name.trim()
+    // Für Diagramme: Verwende 'title' statt 'name'
+    const nameField = entityType === 'diagrams' ? 'title' : 'name'
+
+    if (row[nameField] && row[nameField].trim()) {
+      return row[nameField].trim()
     }
 
     // Generate fallback name based on available data
@@ -240,20 +257,29 @@ export const createEntityInput = (entityType: string, row: any): any => {
         : CriticalityLevel.MEDIUM
 
       return {
-        id: row.id || '',
         name: generateFallbackName('Application', row),
         description: row.description || '',
         version: row.version || '',
         status: validStatus,
         criticality: validCriticality,
-        documentation: row.documentation || '',
-        technicalSpecification: row.technicalSpecification || '',
         vendor: row.vendor || '',
-        licenseDetails: row.licenseDetails || '',
-        operatingSystem: row.operatingSystem || '',
         hostingEnvironment: row.hostingEnvironment || '',
-        maintenanceWindow: row.maintenanceWindow || '',
-        deploymentModel: row.deploymentModel || '',
+        // Numerische Felder
+        costs:
+          typeof row.costs === 'number' ? row.costs : row.costs ? parseFloat(row.costs) : undefined,
+        // Datum-Felder
+        introductionDate: row.introductionDate ? new Date(row.introductionDate) : undefined,
+        endOfLifeDate: row.endOfLifeDate ? new Date(row.endOfLifeDate) : undefined,
+        endOfUseDate: row.endOfUseDate ? new Date(row.endOfUseDate) : undefined,
+        planningDate: row.planningDate ? new Date(row.planningDate) : undefined,
+        // Array-Felder
+        technologyStack: Array.isArray(row.technologyStack)
+          ? row.technologyStack
+          : typeof row.technologyStack === 'string' && row.technologyStack.trim()
+            ? row.technologyStack.split(',').map((t: string) => t.trim())
+            : undefined,
+        // updatedAt für Excel
+        updatedAt: row.updatedAt ? new Date(row.updatedAt) : new Date(),
       }
     }
 
@@ -265,52 +291,58 @@ export const createEntityInput = (entityType: string, row: any): any => {
         : DataClassification.INTERNAL
 
       return {
-        id: row.id || '',
         name: generateFallbackName('Data Object', row),
         description: row.description || '',
         classification: validClassification,
-        dataFormat: row.dataFormat || '',
-        storageLocation: row.storageLocation || '',
-        retentionPeriod: row.retentionPeriod || '',
-        backupFrequency: row.backupFrequency || '',
-        complianceNotes: row.complianceNotes || '',
-        isActive: row.isActive === 'true' || row.isActive === true || row.isActive === 1,
+        format: row.format || '',
+        // Datum-Felder
+        introductionDate: row.introductionDate ? new Date(row.introductionDate) : undefined,
+        endOfLifeDate: row.endOfLifeDate ? new Date(row.endOfLifeDate) : undefined,
+        endOfUseDate: row.endOfUseDate ? new Date(row.endOfUseDate) : undefined,
+        planningDate: row.planningDate ? new Date(row.planningDate) : undefined,
+        // updatedAt für Excel
+        updatedAt: row.updatedAt ? new Date(row.updatedAt) : new Date(),
       }
     }
 
     case 'interfaces': {
-      const validType = Object.values(InterfaceType).includes(
-        row.type?.toUpperCase() as InterfaceType
+      const validInterfaceType = Object.values(InterfaceType).includes(
+        row.interfaceType?.toUpperCase() as InterfaceType
       )
-        ? (row.type.toUpperCase() as InterfaceType)
-        : InterfaceType.API
+        ? (row.interfaceType.toUpperCase() as InterfaceType)
+        : Object.values(InterfaceType).includes(row.type?.toUpperCase() as InterfaceType)
+          ? (row.type.toUpperCase() as InterfaceType)
+          : InterfaceType.OTHER
 
       const validStatus = Object.values(InterfaceStatus).includes(
         row.status?.toUpperCase() as InterfaceStatus
       )
         ? (row.status.toUpperCase() as InterfaceStatus)
-        : InterfaceStatus.ACTIVE
+        : InterfaceStatus.PLANNED
+
+      const validProtocol = Object.values(InterfaceProtocol).includes(
+        row.protocol?.toUpperCase() as InterfaceProtocol
+      )
+        ? (row.protocol.toUpperCase() as InterfaceProtocol)
+        : undefined
 
       return {
-        id: row.id || '',
         name: generateFallbackName('Interface', row),
         description: row.description || '',
-        type: validType,
+        interfaceType: validInterfaceType,
         status: validStatus,
-        protocol: row.protocol || '',
-        endpoint: row.endpoint || '',
-        authentication: row.authentication || '',
-        dataFormat: row.dataFormat || '',
-        frequency: row.frequency || '',
-        errorHandling: row.errorHandling || '',
-        monitoringDetails: row.monitoringDetails || '',
-        documentation: row.documentation || '',
+        protocol: validProtocol,
+        version: row.version || '',
+        // Datums-Felder
+        introductionDate: row.introductionDate ? new Date(row.introductionDate) : undefined,
+        planningDate: row.planningDate ? new Date(row.planningDate) : undefined,
+        endOfUseDate: row.endOfUseDate ? new Date(row.endOfUseDate) : undefined,
+        endOfLifeDate: row.endOfLifeDate ? new Date(row.endOfLifeDate) : undefined,
       }
     }
 
     case 'persons':
       return {
-        id: row.id || '',
         firstName: row.firstName || generateFallbackName('Person', row).split(' ')[0] || 'Vorname',
         lastName:
           row.lastName ||
@@ -318,10 +350,10 @@ export const createEntityInput = (entityType: string, row: any): any => {
           'Nachname',
         email: row.email || '',
         department: row.department || '',
-        jobTitle: row.jobTitle || '',
+        role: row.role || '',
         phone: row.phone || '',
-        location: row.location || '',
-        isActive: row.isActive === 'true' || row.isActive === true || row.isActive === 1,
+        avatarUrl: row.avatarUrl || '',
+        updatedAt: row.updatedAt ? new Date(row.updatedAt) : new Date(),
       }
 
     case 'architectures': {
@@ -329,27 +361,21 @@ export const createEntityInput = (entityType: string, row: any): any => {
         row.domain?.toUpperCase() as ArchitectureDomain
       )
         ? (row.domain.toUpperCase() as ArchitectureDomain)
-        : ArchitectureDomain.BUSINESS
+        : ArchitectureDomain.ENTERPRISE
 
       const validType = Object.values(ArchitectureType).includes(
         row.type?.toUpperCase() as ArchitectureType
       )
         ? (row.type.toUpperCase() as ArchitectureType)
-        : ArchitectureType.CONCEPTUAL
+        : ArchitectureType.CURRENT_STATE
 
       return {
-        id: row.id || '',
         name: generateFallbackName('Architecture', row),
         description: row.description || '',
         domain: validDomain,
         type: validType,
-        version: row.version || '',
-        status: row.status || '',
-        validFrom: row.validFrom || '',
-        validTo: row.validTo || '',
-        documentation: row.documentation || '',
-        stakeholders: row.stakeholders || '',
-        isActive: row.isActive === 'true' || row.isActive === true || row.isActive === 1,
+        timestamp: row.timestamp ? new Date(row.timestamp) : new Date(),
+        tags: row.tags ? parseRelationshipIds(row.tags) : [],
       }
     }
 
@@ -395,19 +421,41 @@ export const createEntityInput = (entityType: string, row: any): any => {
       }
     }
 
-    case 'infrastructures':
+    case 'infrastructures': {
+      const validInfrastructureType = Object.values(InfrastructureType).includes(
+        row.infrastructureType?.toUpperCase() as InfrastructureType
+      )
+        ? (row.infrastructureType.toUpperCase() as InfrastructureType)
+        : Object.values(InfrastructureType).includes(row.type?.toUpperCase() as InfrastructureType)
+          ? (row.type.toUpperCase() as InfrastructureType)
+          : InfrastructureType.PHYSICAL_SERVER
+
+      const validStatus = Object.values(InfrastructureStatus).includes(
+        row.status?.toUpperCase() as InfrastructureStatus
+      )
+        ? (row.status.toUpperCase() as InfrastructureStatus)
+        : InfrastructureStatus.PLANNED
+
       return {
-        id: row.id || '',
         name: generateFallbackName('Infrastructure', row),
         description: row.description || '',
-        type: row.type || '',
+        infrastructureType: validInfrastructureType,
+        status: validStatus,
         location: row.location || '',
         capacity: row.capacity || '',
-        status: row.status || '',
+        costs: row.costs ? parseFloat(row.costs.toString()) : undefined,
         vendor: row.vendor || '',
-        maintenanceSchedule: row.maintenanceSchedule || '',
-        isActive: row.isActive === 'true' || row.isActive === true || row.isActive === 1,
+        operatingSystem: row.operatingSystem || '',
+        ipAddress: row.ipAddress || '',
+        specifications: row.specifications || '',
+        maintenanceWindow: row.maintenanceWindow || '',
+        // Datums-Felder
+        introductionDate: row.introductionDate ? new Date(row.introductionDate) : undefined,
+        planningDate: row.planningDate ? new Date(row.planningDate) : undefined,
+        endOfUseDate: row.endOfUseDate ? new Date(row.endOfUseDate) : undefined,
+        endOfLifeDate: row.endOfLifeDate ? new Date(row.endOfLifeDate) : undefined,
       }
+    }
 
     default:
       throw new Error(`Unsupported entity type: ${entityType}`)
