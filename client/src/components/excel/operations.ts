@@ -550,7 +550,7 @@ export const updateEntityRelationships = async (
       const mappedRow = mapRelationshipValues(row, entityType, entityMappings)
 
       // Erstelle Update-Input nur mit den Beziehungsfeldern
-      const relationshipInput = createRelationshipUpdateInput(entityType, mappedRow)
+      const relationshipInput = createRelationshipUpdateInput(entityType, mappedRow, entityMappings)
 
       if (Object.keys(relationshipInput).length > 0) {
         await client.mutate({
@@ -580,7 +580,7 @@ export const updateEntityRelationships = async (
 /**
  * Erstellt Update-Input nur mit Beziehungsfeldern basierend auf Excel-Implementierung
  */
-const createRelationshipUpdateInput = (entityType: string, row: any): any => {
+const createRelationshipUpdateInput = (entityType: string, row: any, entityMappings?: Record<string, string>): any => {
   const input: any = {}
 
   // Helper function to process relationship field with connect format (KORREKTE SYNTAX aus Excel-Import)
@@ -800,6 +800,35 @@ const createRelationshipUpdateInput = (entityType: string, row: any): any => {
       break
 
     case 'diagrams':
+      // Update diagramJson with mapped database IDs
+      if (row.diagramJson && entityMappings) {
+        try {
+          const diagram = JSON.parse(row.diagramJson)
+          let updated = false
+          
+          // Update elements with database IDs
+          if (diagram.elements && Array.isArray(diagram.elements)) {
+            diagram.elements.forEach((element: any) => {
+              if (element.customData?.databaseId) {
+                const oldDbId = element.customData.databaseId
+                const mappedId = entityMappings[oldDbId]
+                if (mappedId) {
+                  element.customData.databaseId = mappedId
+                  updated = true
+                }
+              }
+            })
+          }
+          
+          if (updated) {
+            // GraphQL expects StringScalarMutations format for diagramJson
+            input.diagramJson = { set: JSON.stringify(diagram) }
+          }
+        } catch (error) {
+          console.error('Error parsing/updating diagramJson:', error)
+        }
+      }
+      
       if (row.creator) {
         input.creator = processSingleRelationshipField('creator', row.creator)
       }
