@@ -342,19 +342,22 @@ export const createIdMappingsForImport = async (
     const elementName = extractElementName(element, importedData.elements)
 
     if (!elementName) {
-      console.warn(`⚠️ Could not extract name for element ${oldId}, skipping. Element structure:`, {
-        hasOriginalElement: !!element.customData?.originalElement,
-        originalElementName: element.customData?.originalElement?.name,
-        hasText: !!(element.text || element.rawText),
-        directText: element.text || element.rawText,
-      })
       continue
     }
 
     const newId = await findElementByTypeAndName(apolloClient, elementType, elementName)
 
-    if (!newId) {
-      console.warn(`✗ No matching element found for ${elementType} "${elementName}" (ID: ${oldId})`)
+    if (newId) {
+      mappings.push({
+        oldId,
+        newId,
+        elementType,
+        elementName,
+      })
+    } else {
+      console.warn(
+        `Kein passendes Element gefunden für ${elementType} "${elementName}" (ID: ${oldId})`
+      )
     }
   }
 
@@ -429,5 +432,44 @@ export const processImportedDiagramData = async (
     processedData,
     mappings,
     summary,
+  }
+}
+
+/**
+ * Aktualisiert die databaseId-Referenzen in einem Diagramm-JSON basierend auf ID-Mappings
+ * Diese Funktion ist speziell für JSON-Imports gedacht und unterscheidet sich von der
+ * Excel-Version, da sie mit customData.databaseId arbeitet statt customFields.databaseId
+ */
+export const updateDiagramDatabaseIds = (
+  diagramData: ImportedDiagramData,
+  idMappings: { [oldId: string]: string }
+): ImportedDiagramData => {
+  if (!diagramData.elements || !Array.isArray(diagramData.elements)) {
+    return diagramData
+  }
+
+  const updatedElements = diagramData.elements.map(element => {
+    // Prüfe, ob Element customData mit databaseId hat
+    if (element.customData?.databaseId) {
+      const oldId = element.customData.databaseId
+      const newId = idMappings[oldId]
+
+      if (newId && newId !== oldId) {
+        return {
+          ...element,
+          customData: {
+            ...element.customData,
+            databaseId: newId,
+          },
+        }
+      }
+    }
+
+    return element
+  })
+
+  return {
+    ...diagramData,
+    elements: updatedElements,
   }
 }

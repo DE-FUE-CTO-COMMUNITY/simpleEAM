@@ -394,10 +394,6 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
 
       // Prüfe, ob Bindings korrigiert wurden und aktualisiere das Diagramm
       if (arrowAnalysis.correctedElements && arrowAnalysis.correctedElements.length > 0) {
-        console.log(
-          `Correcting ${arrowAnalysis.correctedElements.length} elements with updated bindings`
-        )
-
         // Erstelle eine neue Elementliste mit den korrigierten Elementen
         const correctedElementMap = new Map(arrowAnalysis.correctedElements.map(el => [el.id, el]))
         const updatedElements = elements.map((el: any) => correctedElementMap.get(el.id) || el)

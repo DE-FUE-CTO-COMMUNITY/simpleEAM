@@ -46,6 +46,17 @@ const ManagementDialog: React.FC<ManagementDialogProps> = ({
   const t = useTranslations('importExport.management')
   const tEntityTypes = useTranslations('importExport.entityTypes')
   const tActions = useTranslations('importExport.actions')
+
+  // Sichere Übersetzungsfunktion mit Fallback
+  const safeEntityTypeTranslation = (entityType: string): string => {
+    try {
+      return tEntityTypes(entityType as keyof typeof entityTypeLabels) || entityType
+    } catch (error) {
+      console.warn('Translation error for entityType:', entityType, error)
+      return entityType
+    }
+  }
+
   return (
     <>
       {/* Delete Confirmation Dialog */}
@@ -57,7 +68,7 @@ const ManagementDialog: React.FC<ManagementDialogProps> = ({
               entityType:
                 deleteEntityType === 'all'
                   ? t('confirmAllText')
-                  : tEntityTypes(deleteEntityType as keyof typeof entityTypeLabels),
+                  : safeEntityTypeTranslation(deleteEntityType),
             })}
           </Typography>
           <Typography variant="body2" color="error" sx={{ mt: 1 }}>
@@ -106,7 +117,7 @@ const ManagementDialog: React.FC<ManagementDialogProps> = ({
                     .filter(([key]) => key !== 'all')
                     .map(([key, _label]) => (
                       <MenuItem key={key} value={key}>
-                        {tEntityTypes(key as keyof typeof entityTypeLabels)}
+                        {safeEntityTypeTranslation(key)}
                       </MenuItem>
                     ))}
                 </Select>
@@ -122,7 +133,9 @@ const ManagementDialog: React.FC<ManagementDialogProps> = ({
                 >
                   {isDeleting
                     ? t('deleting')
-                    : t('deleteButton', { entityType: tEntityTypes(deleteSettings.entityType) })}
+                    : t('deleteButton', {
+                        entityType: safeEntityTypeTranslation(deleteSettings.entityType),
+                      })}
                 </Button>
                 <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
                   {t('deleteDescription')}

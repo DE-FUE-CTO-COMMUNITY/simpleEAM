@@ -76,7 +76,7 @@ const ImportDialog: React.FC<ImportDialogProps> = ({
                   >
                     {Object.entries(entityTypeLabels).map(([key, _label]) => (
                       <MenuItem key={key} value={key}>
-                        {tEntityTypes(key as keyof typeof entityTypeLabels)}
+                        {tEntityTypes(key as keyof typeof entityTypeLabels) || key}
                       </MenuItem>
                     ))}
                   </Select>

@@ -50,7 +50,7 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
                   >
                     {Object.entries(entityTypeLabels).map(([key, _label]) => (
                       <MenuItem key={key} value={key}>
-                        {tEntityTypes(key as keyof typeof entityTypeLabels)}
+                        {tEntityTypes(key as keyof typeof entityTypeLabels) || key}
                       </MenuItem>
                     ))}
                   </Select>
@@ -85,7 +85,7 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
             <Alert severity="info" icon={<InfoIcon />}>
               <Typography variant="body2">
                 {t('previewText', {
-                  entityType: tEntityTypes(exportSettings.entityType),
+                  entityType: tEntityTypes(exportSettings.entityType) || exportSettings.entityType,
                   format: exportSettings.format.toUpperCase(),
                 })}
               </Typography>

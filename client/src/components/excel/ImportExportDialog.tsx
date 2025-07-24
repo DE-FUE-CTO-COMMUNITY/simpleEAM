@@ -18,6 +18,7 @@ import {
 import { useSnackbar } from 'notistack'
 import { useApolloClient } from '@apollo/client'
 import { useTranslations } from 'next-intl'
+import { clearDiagramStorage } from '../diagrams/utils/DiagramStorageUtils'
 import { isAdmin } from '@/lib/auth'
 
 // Import der Tab-Komponenten
@@ -255,7 +256,7 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
         importSettings.entityType === 'all'
           ? t('import.messages.multiTabImportSuccess', { count: totalImported })
           : t('import.messages.singleTabImportSuccess', {
-              entityType: tEntityTypes(importSettings.entityType),
+              entityType: tEntityTypes(importSettings.entityType) || importSettings.entityType,
               count: totalImported,
             })
 
@@ -284,7 +285,7 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
       await exportEntityData(apolloClient, exportSettings.entityType, exportSettings.format)
       enqueueSnackbar(
         t('export.messages.exportSuccess', {
-          entityType: tEntityTypes(exportSettings.entityType),
+          entityType: tEntityTypes(exportSettings.entityType) || exportSettings.entityType,
         }),
         { variant: 'success' }
       )
@@ -319,11 +320,17 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
       const deletedCount = await deleteEntityData(apolloClient, deleteEntityType)
       await refreshDashboardCache()
 
+      // Wenn alle Daten oder nur Diagramme gelöscht werden, auch den Diagramm-localStorage leeren
+      if (deleteEntityType === 'all' || deleteEntityType === 'diagrams') {
+        clearDiagramStorage()
+      }
+
       enqueueSnackbar(
         deleteEntityType === 'all'
           ? t('management.messages.deleteAllSuccess', { count: deletedCount })
           : t('management.messages.deleteSuccess', {
-              entityType: tEntityTypes(deleteEntityType as keyof typeof entityTypeLabels),
+              entityType:
+                tEntityTypes(deleteEntityType as keyof typeof entityTypeLabels) || deleteEntityType,
               count: deletedCount,
             }),
         { variant: 'success' }

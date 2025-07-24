@@ -139,31 +139,6 @@ export const ExtendedNewElementsDialog: React.FC<ExtendedNewElementsDialogProps>
     }
   }, [open, invalidRelationships])
 
-  // Debug arrow analysis when dialog opens
-  React.useEffect(() => {
-    if (open) {
-      console.log('=== Dialog opened ===')
-      console.log('Neue Beziehungen:', newRelationships.length)
-      console.log('Unvollständige Beziehungen:', incompleteRelationships.length)
-      console.log('Ungültige Beziehungen:', invalidRelationships.length)
-
-      // Detaillierte Ausgabe der Beziehungen
-      if (incompleteRelationships.length > 0) {
-        console.log('Details der unvollständigen Beziehungen:')
-        incompleteRelationships.forEach((rel, index) => {
-          console.log(`  ${index + 1}.`, {
-            id: rel.id,
-            status: rel.status,
-            sourceElementName: rel.sourceElementName,
-            targetElementName: rel.targetElementName,
-            missingElement: rel.missingElement,
-            invalidReason: rel.invalidReason,
-          })
-        })
-      }
-    }
-  }, [open, newRelationships, incompleteRelationships, invalidRelationships])
-
   const handleElementToggle = (elementId: string) => {
     setSelectedElements(prev =>
       prev.map(el => (el.id === elementId ? { ...el, selected: !el.selected } : el))

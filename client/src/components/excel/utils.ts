@@ -160,41 +160,8 @@ export const checkEntityExists = async (
   }
 }
 
-// Helper function to update databaseId references in diagramJson
-export const updateDiagramJsonDatabaseIds = (
-  diagramJson: string,
-  entityMappings: { [originalId: string]: string }
-): string => {
-  try {
-    const diagramData = JSON.parse(diagramJson)
-
-    // Update databaseId in elements' customFields
-    if (diagramData.elements && Array.isArray(diagramData.elements)) {
-      diagramData.elements.forEach((element: any) => {
-        if (element.customFields && element.customFields.databaseId) {
-          const originalId = element.customFields.databaseId
-          const newId = entityMappings[originalId]
-          if (newId) {
-            console.log(`DEBUG: Updating diagram element databaseId from ${originalId} to ${newId}`)
-            element.customFields.databaseId = newId
-          }
-        }
-      })
-    }
-
-    return JSON.stringify(diagramData)
-  } catch (error) {
-    console.warn('Failed to update databaseId references in diagramJson:', error)
-    return diagramJson // Return original if parsing fails
-  }
-}
-
 // Helper function to create entity input based on entity type and row data
-export const createEntityInput = (
-  entityType: string,
-  row: any,
-  allEntityMappings?: { [originalId: string]: string }
-): any => {
+export const createEntityInput = (entityType: string, row: any): any => {
   // Helper function to generate a fallback name if name is empty
   const generateFallbackName = (prefix: string, row: any): string => {
     // Für Diagramme: Verwende 'title' statt 'name'
@@ -217,10 +184,6 @@ export const createEntityInput = (
 
     // Last resort: use timestamp
     const fallbackName = `${prefix} ${new Date().toISOString()}`
-    console.log(
-      `DEBUG: Generated fallback name "${fallbackName}" for row:`,
-      JSON.stringify(row, null, 2)
-    )
     return fallbackName
   }
 
@@ -418,15 +381,10 @@ export const createEntityInput = (
         row.content ||
         '{"elements":[],"appState":{"currentChartType":"whiteboard"}}'
 
-      // Update databaseId references if mappings are available
-      const updatedJson = allEntityMappings
-        ? updateDiagramJsonDatabaseIds(baseJson, allEntityMappings)
-        : baseJson
-
       return {
         title: row.title || row.name || generateFallbackName('Diagram', row),
         description: row.description || '',
-        diagramJson: updatedJson,
+        diagramJson: baseJson,
       }
     }
 
@@ -512,10 +470,6 @@ export const mapRelationshipValues = (
   const updatedRow = { ...row }
   const relationshipFields = getRelationshipFields(entityType)
 
-  console.log(
-    `DEBUG MAP_RELATIONSHIPS: Processing ${entityType} with ${Object.keys(allEntityMappings).length} total mappings`
-  )
-
   relationshipFields.forEach(field => {
     if (row[field]) {
       let originalIds: string[] = []
@@ -541,20 +495,13 @@ export const mapRelationshipValues = (
         originalIds = [row[field].id]
       }
 
-      console.log(`DEBUG MAP_RELATIONSHIPS: Field "${field}" - originalIds:`, originalIds)
-
       if (originalIds.length > 0) {
         const mappedIds = originalIds
           .map(originalId => {
             const mappedId = allEntityMappings[originalId] || originalId
-            console.log(
-              `DEBUG MAP_RELATIONSHIPS: Mapping ${originalId} -> ${mappedId} (found: ${!!allEntityMappings[originalId]})`
-            )
             return mappedId
           })
           .filter(id => id)
-
-        console.log(`DEBUG MAP_RELATIONSHIPS: Field "${field}" - mappedIds:`, mappedIds)
 
         if (mappedIds.length > 0) {
           updatedRow[field] = mappedIds.join(',')

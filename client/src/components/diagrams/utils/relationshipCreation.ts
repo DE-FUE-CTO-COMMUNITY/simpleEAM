@@ -304,10 +304,6 @@ const createSingleRelationship = async (
     targetElementType,
   } = relationship
 
-  console.log(
-    `Creating relationship: ${relationshipDefinition.type} between ${sourceElementType} (${sourceElementId}) and ${targetElementType} (${targetElementId})`
-  )
-
   // Verwende die korrekten generierten GraphQL Mutations basierend auf dem Beziehungstyp
   switch (relationshipDefinition.type) {
     case 'SUPPORTS':
@@ -442,9 +438,6 @@ const createSingleRelationship = async (
 
     case 'TRANSFERS':
       if (sourceElementType === 'applicationInterface' && targetElementType === 'dataObject') {
-        console.log(
-          'DEBUG: Executing UPDATE_APPLICATION_INTERFACE_TRANSFERS mutation (applicationInterface -> dataObject)'
-        )
         const variables = {
           where: { id: { eq: sourceElementId } },
           update: {
@@ -453,20 +446,15 @@ const createSingleRelationship = async (
             },
           },
         }
-        console.log('DEBUG: Mutation variables:', JSON.stringify(variables, null, 2))
         const result = await client.mutate({
           mutation: UPDATE_APPLICATION_INTERFACE_TRANSFERS,
           variables,
         })
-        console.log('DEBUG: Mutation result:', JSON.stringify(result.data, null, 2))
       } else if (
         sourceElementType === 'dataObject' &&
         targetElementType === 'applicationInterface'
       ) {
         // Korrigiere die Richtung: Erstelle die Beziehung von ApplicationInterface zu DataObject
-        console.log(
-          'DEBUG: Correcting direction - Creating TRANSFERS from applicationInterface to dataObject'
-        )
         const variables = {
           where: { id: { eq: targetElementId } }, // applicationInterface
           update: {
@@ -475,12 +463,10 @@ const createSingleRelationship = async (
             },
           },
         }
-        console.log('DEBUG: Mutation variables (corrected):', JSON.stringify(variables, null, 2))
         const result = await client.mutate({
           mutation: UPDATE_APPLICATION_INTERFACE_TRANSFERS,
           variables,
         })
-        console.log('DEBUG: Mutation result (corrected):', JSON.stringify(result.data, null, 2))
       }
       break
 
@@ -506,10 +492,6 @@ const createSingleRelationship = async (
       )
       return
   }
-
-  console.log(
-    `Successfully created relationship: ${getRelationshipDisplayName(relationshipDefinition.type)}`
-  )
 }
 
 /**
@@ -526,9 +508,6 @@ export const checkRelationshipExists = async (
     targetElementType: string
   }
 ): Promise<boolean> => {
-  console.log('\n=== DEBUG: checkRelationshipExists called ===')
-  console.log('DEBUG: Checking relationship existence:', relationshipDefinition)
-
   const { type, sourceElementId, targetElementId, sourceElementType, targetElementType } =
     relationshipDefinition
 
@@ -540,7 +519,6 @@ export const checkRelationshipExists = async (
     switch (type) {
       case 'SUPPORTS':
         if (sourceElementType === 'application' && targetElementType === 'businessCapability') {
-          console.log('DEBUG: Using CHECK_APPLICATION_SUPPORTS_CAPABILITY query')
           query = CHECK_APPLICATION_SUPPORTS_CAPABILITY
           variables = { applicationId: sourceElementId, capabilityId: targetElementId }
         }
@@ -548,7 +526,6 @@ export const checkRelationshipExists = async (
 
       case 'INTERFACE_SOURCE':
         if (sourceElementType === 'application' && targetElementType === 'applicationInterface') {
-          console.log('DEBUG: Using CHECK_APPLICATION_INTERFACE_SOURCE query')
           query = CHECK_APPLICATION_INTERFACE_SOURCE
           variables = { applicationId: sourceElementId, interfaceId: targetElementId }
         }
@@ -556,7 +533,6 @@ export const checkRelationshipExists = async (
 
       case 'INTERFACE_TARGET':
         if (sourceElementType === 'applicationInterface' && targetElementType === 'application') {
-          console.log('DEBUG: Using CHECK_APPLICATION_INTERFACE_TARGET query')
           query = CHECK_APPLICATION_INTERFACE_TARGET
           variables = { interfaceId: sourceElementId, applicationId: targetElementId }
         }
@@ -564,14 +540,12 @@ export const checkRelationshipExists = async (
 
       case 'TRANSFERS':
         if (sourceElementType === 'applicationInterface' && targetElementType === 'dataObject') {
-          console.log('DEBUG: Using CHECK_APPLICATION_INTERFACE_TRANSFERS query')
           query = CHECK_APPLICATION_INTERFACE_TRANSFERS
           variables = { interfaceId: sourceElementId, dataObjectId: targetElementId }
         } else if (
           sourceElementType === 'dataObject' &&
           targetElementType === 'applicationInterface'
         ) {
-          console.log('DEBUG: Using CHECK_DATA_OBJECT_TRANSFERS query')
           query = CHECK_DATA_OBJECT_TRANSFERS
           variables = { dataObjectId: sourceElementId, interfaceId: targetElementId }
         }
@@ -579,7 +553,6 @@ export const checkRelationshipExists = async (
 
       case 'RELATED_TO':
         if (sourceElementType === 'businessCapability' && targetElementType === 'dataObject') {
-          console.log('DEBUG: Using CHECK_CAPABILITY_RELATED_DATA_OBJECT query')
           query = CHECK_CAPABILITY_RELATED_DATA_OBJECT
           variables = { capabilityId: sourceElementId, dataObjectId: targetElementId }
         }
@@ -587,32 +560,24 @@ export const checkRelationshipExists = async (
 
       case 'DATA_SOURCE':
         if (sourceElementType === 'dataObject' && targetElementType === 'application') {
-          console.log('DEBUG: Using CHECK_DATA_OBJECT_DATA_SOURCE query')
           query = CHECK_DATA_OBJECT_DATA_SOURCE
           variables = { dataObjectId: sourceElementId, applicationId: targetElementId }
         }
         break
 
       default:
-        console.log(`DEBUG: Relationship check not implemented for type: ${type}`)
         return false
     }
 
     if (!query) {
-      console.log(
-        `DEBUG: No query available for relationship ${type} between ${sourceElementType} and ${targetElementType}`
-      )
       return false
     }
 
-    console.log('DEBUG: Executing GraphQL query with variables:', variables)
     const result = await client.query({
       query,
       variables,
       fetchPolicy: 'no-cache', // Immer aktuelle Daten abrufen
     })
-
-    console.log('DEBUG: GraphQL query result:', JSON.stringify(result.data, null, 2))
 
     // Prüfe das Ergebnis je nach Relationship-Typ
     const data = result.data
@@ -621,33 +586,12 @@ export const checkRelationshipExists = async (
     switch (type) {
       case 'SUPPORTS':
         relationshipExists = data.applications?.[0]?.supportsCapabilities?.length > 0
-        console.log('DEBUG: SUPPORTS check - applications found:', data.applications?.length)
-        console.log(
-          'DEBUG: SUPPORTS check - supportsCapabilities found:',
-          data.applications?.[0]?.supportsCapabilities?.length
-        )
         break
       case 'INTERFACE_SOURCE':
         relationshipExists = data.applications?.[0]?.sourceOfInterfaces?.length > 0
-        console.log(
-          'DEBUG: INTERFACE_SOURCE check - applications found:',
-          data.applications?.length
-        )
-        console.log(
-          'DEBUG: INTERFACE_SOURCE check - sourceOfInterfaces found:',
-          data.applications?.[0]?.sourceOfInterfaces?.length
-        )
         break
       case 'INTERFACE_TARGET':
         relationshipExists = data.applicationInterfaces?.[0]?.targetApplications?.length > 0
-        console.log(
-          'DEBUG: INTERFACE_TARGET check - applicationInterfaces found:',
-          data.applicationInterfaces?.length
-        )
-        console.log(
-          'DEBUG: INTERFACE_TARGET check - targetApplications found:',
-          data.applicationInterfaces?.[0]?.targetApplications?.length
-        )
         break
       case 'TRANSFERS': {
         // Prüfe beide möglichen Query-Ergebnisse
@@ -655,47 +599,16 @@ export const checkRelationshipExists = async (
           data.applicationInterfaces?.[0]?.dataObjects?.length > 0
         const dataObjectTransfers = data.dataObjects?.[0]?.transferredInInterfaces?.length > 0
         relationshipExists = applicationInterfaceTransfers || dataObjectTransfers
-
-        console.log(
-          'DEBUG: TRANSFERS check - applicationInterfaces found:',
-          data.applicationInterfaces?.length
-        )
-        console.log(
-          'DEBUG: TRANSFERS check - dataObjects (from interface) found:',
-          data.applicationInterfaces?.[0]?.dataObjects?.length
-        )
-        console.log('DEBUG: TRANSFERS check - dataObjects found:', data.dataObjects?.length)
-        console.log(
-          'DEBUG: TRANSFERS check - transferredInInterfaces found:',
-          data.dataObjects?.[0]?.transferredInInterfaces?.length
-        )
-        console.log('DEBUG: TRANSFERS relationship exists:', relationshipExists)
         break
       }
       case 'RELATED_TO':
         relationshipExists = data.businessCapabilities?.[0]?.relatedDataObjects?.length > 0
-        console.log(
-          'DEBUG: RELATED_TO check - businessCapabilities found:',
-          data.businessCapabilities?.length
-        )
-        console.log(
-          'DEBUG: RELATED_TO check - relatedDataObjects found:',
-          data.businessCapabilities?.[0]?.relatedDataObjects?.length
-        )
         break
       case 'DATA_SOURCE':
         relationshipExists = data.dataObjects?.[0]?.dataSources?.length > 0
-        console.log('DEBUG: DATA_SOURCE check - dataObjects found:', data.dataObjects?.length)
-        console.log(
-          'DEBUG: DATA_SOURCE check - dataSources found:',
-          data.dataObjects?.[0]?.dataSources?.length
-        )
         break
     }
 
-    console.log(
-      `DEBUG: Relationship ${type} between ${sourceElementId} and ${targetElementId} exists: ${relationshipExists}`
-    )
     return relationshipExists
   } catch (error) {
     console.error('DEBUG: Error checking relationship existence:', error)

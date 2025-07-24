@@ -536,10 +536,6 @@ export const validateJsonImportData = (
     }
   }
 
-  console.log(`DEBUG JSON Validation: Starting validation for ${entityType}`)
-  console.log(`DEBUG JSON Validation: Data length: ${data.length}`)
-  console.log(`DEBUG JSON Validation: First 2 items:`, data.slice(0, 2))
-
   data.forEach((row, index) => {
     const rowNumber = index + 1
     let rowIsValid = true
@@ -595,52 +591,13 @@ export const validateJsonImportData = (
           (row.lastName && typeof row.lastName === 'string' && row.lastName.trim() !== '') ||
           (row.name && typeof row.name === 'string' && row.name.trim() !== '')
         )
-
-        // Debug-Ausgabe für Personen
-        console.log(`DEBUG JSON Validation: Person row ${rowNumber}:`, {
-          firstName: row.firstName,
-          lastName: row.lastName,
-          name: row.name,
-          hasValidName,
-          hasFirstName: !!(row.firstName && row.firstName.trim()),
-          hasLastName: !!(row.lastName && row.lastName.trim()),
-          hasName: !!(row.name && row.name.trim()),
-        })
         break
       default:
         hasValidName = !!(row.name && typeof row.name === 'string' && row.name.trim() !== '')
         break
     }
 
-    console.log(`DEBUG JSON Validation: Row ${rowNumber} - name check for ${entityType}:`, {
-      nameField,
-      hasValidName,
-      actualValue:
-        entityType === 'diagrams'
-          ? row.title
-          : entityType === 'persons'
-            ? {
-                firstName: row.firstName,
-                lastName: row.lastName,
-                // name-Feld nicht mehr prüfen bei Personen
-                combined: `${row.firstName || ''} ${row.lastName || ''}`.trim(),
-              }
-            : row.name,
-      rowKeys: Object.keys(row),
-    })
-
     if (!hasValidName) {
-      console.log(
-        `DEBUG JSON Validation: Row ${rowNumber} - NAME VALIDATION FAILED for ${entityType}`,
-        {
-          row,
-          nameField,
-          hasValidName,
-          checkFields:
-            entityType === 'persons' ? ['firstName', 'lastName', 'name'] : ['name', 'title'],
-        }
-      )
-
       // Für Personen: Versuche zusätzliche Fallback-Strategien
       if (entityType === 'persons') {
         // Falls email vorhanden ist, verwende den ersten Teil als Fallback

@@ -5,88 +5,10 @@ import {
   checkEntityExists,
   transformInputForUpdate,
   mapRelationshipValues,
-  updateDiagramJsonDatabaseIds,
 } from './utils'
 import { createEntityInputFromJson, sanitizeJsonImportData } from '../../utils/jsonInputUtils'
 import { ImportWithMappingResult, EntityMapping, ImportResult } from './types'
 import { entityTypeMapping } from './constants'
-
-/**
- * Updates diagram database IDs after all entities have been imported
- */
-const updateDiagramDatabaseIds = async (
-  client: ApolloClient<any>,
-  allEntityMappings: { [originalId: string]: string },
-  onProgress?: (progress: number) => void
-): Promise<void> => {
-  console.log('DEBUG: Starting diagram database ID update phase')
-
-  // Get all diagrams
-  const DIAGRAMS_QUERY = gql`
-    query GetDiagrams {
-      diagrams {
-        id
-        title
-        diagramJson
-      }
-    }
-  `
-
-  const { data } = await client.query({
-    query: DIAGRAMS_QUERY,
-    fetchPolicy: 'network-only',
-  })
-
-  if (!data?.diagrams || data.diagrams.length === 0) {
-    console.log('DEBUG: No diagrams found to update')
-    return
-  }
-
-  console.log(`DEBUG: Found ${data.diagrams.length} diagrams to update`)
-
-  // Update mutation
-  const UPDATE_DIAGRAM = gql`
-    mutation UpdateDiagram($id: ID!, $input: DiagramUpdateInput!) {
-      updateDiagrams(where: { id: $id }, update: $input) {
-        diagrams {
-          id
-          title
-        }
-      }
-    }
-  `
-
-  for (let i = 0; i < data.diagrams.length; i++) {
-    const diagram = data.diagrams[i]
-
-    if (onProgress) {
-      onProgress(Math.round((i / data.diagrams.length) * 100))
-    }
-
-    try {
-      const updatedJson = updateDiagramJsonDatabaseIds(diagram.diagramJson, allEntityMappings)
-
-      // Only update if the JSON actually changed
-      if (updatedJson !== diagram.diagramJson) {
-        console.log(`DEBUG: Updating diagram "${diagram.title}" with new database IDs`)
-
-        await client.mutate({
-          mutation: UPDATE_DIAGRAM,
-          variables: {
-            id: diagram.id,
-            input: {
-              diagramJson: { set: updatedJson },
-            },
-          },
-        })
-      }
-    } catch (error) {
-      console.error(`Error updating diagram ${diagram.id}:`, error)
-    }
-  }
-
-  console.log('DEBUG: Diagram database ID update completed')
-}
 
 /**
  * Formatiert den aktuellen Timestamp für Dateinamen
@@ -125,23 +47,6 @@ export const importEntityDataWithMapping = async (
   // WICHTIG: Nur JSON-Daten sanitizen, Excel-Daten unverändert lassen
   const processedData = format === 'json' ? sanitizeJsonImportData(data) : data
 
-  console.log(`DEBUG IMPORT: Starting import for ${entityType}, format: ${format}`)
-  console.log(`DEBUG IMPORT: Processed data length: ${processedData.length}`)
-
-  // Debug: Log original vs processed data for first item (nur für JSON)
-  if (format === 'json' && data.length > 0) {
-    console.log(`DEBUG IMPORT: Original first item:`, JSON.stringify(data[0], null, 2))
-    console.log(`DEBUG IMPORT: Processed first item:`, JSON.stringify(processedData[0], null, 2))
-    console.log(`DEBUG IMPORT: Available keys in original:`, Object.keys(data[0]))
-    console.log(`DEBUG IMPORT: Available keys in processed:`, Object.keys(processedData[0]))
-  }
-
-  // Debug: Excel-Daten strukturprüfung
-  if (format === 'xlsx' && data.length > 0) {
-    console.log(`DEBUG EXCEL: Original Excel data first item:`, JSON.stringify(data[0], null, 2))
-    console.log(`DEBUG EXCEL: Excel data keys:`, Object.keys(data[0]))
-  }
-
   // Process items one by one to prevent browser freeze
   for (let i = 0; i < processedData.length; i++) {
     const row = processedData[i]
@@ -150,7 +55,6 @@ export const importEntityDataWithMapping = async (
 
     // Progress logging every 5 items
     if (i % 5 === 0) {
-      console.log(`DEBUG: Processing ${entityType} - ${i}/${processedData.length}`)
       // Update progress callback
       if (onProgress) {
         const progress = Math.round((i / processedData.length) * 100)
@@ -158,49 +62,21 @@ export const importEntityDataWithMapping = async (
       }
     }
 
-    // Debug: Log raw data structure for first few items
-    if (i < 2) {
-      console.log(`DEBUG: Raw row data for item ${i + 1}:`, JSON.stringify(row, null, 2))
-      console.log(`DEBUG: Available keys in row:`, Object.keys(row))
-    }
-
     try {
       // WICHTIG: Format-spezifische Input-Erstellung verwenden
       if (format === 'json') {
-        input = createEntityInputFromJson(entityType, row, entityMappings)
+        input = createEntityInputFromJson(entityType, row)
       } else {
         // Für Excel: Verwende die bewährte Excel-Input-Erstellung
-        input = createEntityInput(entityType, row, entityMappings)
+        input = createEntityInput(entityType, row)
       }
 
-      // Only log first few items for debugging
-      if (i < 2) {
-        console.log(
-          `DEBUG: Created input for item ${i + 1} (format: ${format}):`,
-          JSON.stringify(input, null, 2)
-        )
-      }
-
-      // Special debug for infrastructures
-      if (entityType === 'infrastructures') {
-        console.log(`DEBUG: Infrastructure import - Item ${i + 1} (format: ${format}):`, {
-          originalId,
-          input,
-          format,
-          rowKeys: Object.keys(row),
-          mutations: {
-            create: createMutation ? 'exists' : 'missing',
-            update: updateMutation ? 'exists' : 'missing',
-          },
-        })
-      }
       let shouldUpdate = false
       if (row.id && row.id.trim() !== '') {
         shouldUpdate = await checkEntityExists(client, entityType, row.id)
       }
 
       if (shouldUpdate && updateMutation) {
-        if (i < 2) console.log(`DEBUG: Updating existing entity ${row.id}`)
         await client.mutate({
           mutation: updateMutation,
           variables: {
@@ -211,7 +87,6 @@ export const importEntityDataWithMapping = async (
         entityMappings[originalId] = row.id
         imported++
       } else {
-        if (i < 2) console.log(`DEBUG: Creating new entity for item ${i + 1}`)
         const result = await client.mutate({
           mutation: createMutation,
           variables: {
@@ -242,21 +117,10 @@ export const importEntityDataWithMapping = async (
             createdEntities = resultData.createArchitecturePrinciples.architecturePrinciples
           } else if (resultData.createInfrastructures) {
             createdEntities = resultData.createInfrastructures.infrastructures
-            if (entityType === 'infrastructures') {
-              console.log(`DEBUG: Infrastructure creation result:`, {
-                resultData: resultData.createInfrastructures,
-                entitiesCount: createdEntities?.length || 0,
-                firstEntity: createdEntities?.[0] || null,
-              })
-            }
           }
           if (createdEntities && createdEntities.length > 0) {
             entityMappings[originalId] = createdEntities[0].id
             imported++
-            if (i < 2)
-              console.log(`DEBUG: Successfully created entity with ID: ${createdEntities[0].id}`)
-          } else {
-            console.warn(`DEBUG: No entities created for item ${i + 1}`)
           }
         }
       }
@@ -279,7 +143,6 @@ export const importEntityDataWithMapping = async (
     }
   }
 
-  console.log(`Import completed: ${imported}/${processedData.length} items processed`)
   if (errors.length > 0) {
     console.warn(`${errors.length} errors during import`)
   }
@@ -308,12 +171,6 @@ export const handleMultiTabImport = async (
     allData = await importMultiTabFromJson(file)
   }
 
-  console.log(
-    'DEBUG: Multi-Tab Import - Received data:',
-    Object.keys(allData).map(key => `${key}: ${allData[key].length} items`)
-  )
-  console.log('DEBUG: Available tabs:', Object.keys(allData))
-
   let totalImported = 0
   const importResults: ImportResult[] = []
   const allEntityMappings: { [entityType: string]: EntityMapping } = {}
@@ -327,23 +184,7 @@ export const handleMultiTabImport = async (
 
   // Phase 1: Erstelle alle Entitäten ohne Beziehungen
   for (const [tabName, tabData] of Object.entries(allData)) {
-    console.log(
-      `DEBUG: Processing tab "${tabName}" with ${Array.isArray(tabData) ? tabData.length : 'non-array'} items`
-    )
-
     const entityType = entityTypeMapping[tabName]
-    console.log(`DEBUG: Tab "${tabName}" mapped to entity type: ${entityType}`)
-
-    // Special debug for Infrastructure tab
-    if (tabName === 'Infrastructure' || entityType === 'infrastructures') {
-      console.log(`DEBUG: Found Infrastructure tab/entity:`, {
-        tabName,
-        entityType,
-        hasData: Array.isArray(tabData) && tabData.length > 0,
-        dataLength: Array.isArray(tabData) ? tabData.length : 'not array',
-        firstItem: Array.isArray(tabData) && tabData.length > 0 ? tabData[0] : 'no data',
-      })
-    }
 
     if (entityType && Array.isArray(tabData) && tabData.length > 0) {
       try {
@@ -373,10 +214,6 @@ export const handleMultiTabImport = async (
           imported,
           errors,
         })
-        console.log(`DEBUG: Successfully imported ${imported} items for ${tabName}`)
-        if (errors.length > 0) {
-          console.log(`DEBUG: ${errors.length} errors for ${tabName}:`, errors)
-        }
         tabsProcessed++
       } catch (error) {
         console.error(`DEBUG: Error importing ${tabName}:`, error)
@@ -395,18 +232,10 @@ export const handleMultiTabImport = async (
   }
 
   // Phase 2: Update Beziehungen für alle importierten Entitäten
-  console.log('DEBUG: Starting relationship update phase...')
-  console.log('DEBUG: allEntityMappings structure:', Object.keys(allEntityMappings))
-  Object.entries(allEntityMappings).forEach(([key, mapping]) => {
-    console.log(`DEBUG: Entity type "${key}" has ${Object.keys(mapping).length} mappings`)
-  })
 
   const combinedEntityMappings = Object.values(allEntityMappings).reduce(
     (acc, mapping) => ({ ...acc, ...mapping }),
     {}
-  )
-  console.log(
-    `DEBUG: Combined entity mappings has ${Object.keys(combinedEntityMappings).length} total mappings`
   )
 
   const relationshipTabs = Object.keys(allData).filter(tabName => {
@@ -423,21 +252,6 @@ export const handleMultiTabImport = async (
 
   for (const [tabName, tabData] of Object.entries(allData)) {
     const entityType = entityTypeMapping[tabName]
-    console.log(`DEBUG PHASE2: Processing tab "${tabName}" -> entityType "${entityType}"`)
-    console.log(
-      `DEBUG PHASE2: tabData is array: ${Array.isArray(tabData)}, length: ${Array.isArray(tabData) ? tabData.length : 'N/A'}`
-    )
-    console.log(
-      `DEBUG PHASE2: allEntityMappings[${entityType}] exists: ${!!allEntityMappings[entityType]}`
-    )
-
-    if (allEntityMappings[entityType]) {
-      console.log(
-        `DEBUG PHASE2: Entity mappings for ${entityType}:`,
-        Object.keys(allEntityMappings[entityType]).length,
-        'items'
-      )
-    }
 
     if (
       entityType &&
@@ -446,7 +260,6 @@ export const handleMultiTabImport = async (
       allEntityMappings[entityType]
     ) {
       try {
-        console.log(`DEBUG: Updating relationships for ${entityType}...`)
         await updateEntityRelationships(
           client,
           tabData,
@@ -476,24 +289,6 @@ export const handleMultiTabImport = async (
     }
   }
 
-  console.log('DEBUG: Multi-Tab Import completed. Total imported:', totalImported)
-
-  // Phase 3: Update diagram database IDs if there are any diagrams
-  if (combinedEntityMappings && Object.keys(combinedEntityMappings).length > 0) {
-    console.log('DEBUG: Starting diagram database ID update phase...')
-    try {
-      await updateDiagramDatabaseIds(client, combinedEntityMappings, progress => {
-        // Report progress as 95-100% of total
-        if (onProgress) {
-          onProgress(95 + Math.round(progress * 0.05))
-        }
-      })
-      console.log('DEBUG: Diagram database ID update completed')
-    } catch (error) {
-      console.error('DEBUG: Error updating diagram database IDs:', error)
-    }
-  }
-
   // Final progress update
   if (onProgress) {
     onProgress(100)
@@ -519,9 +314,6 @@ export const handleSingleTabImport = async (
     data = await importFromJson(file)
   }
 
-  console.log(`DEBUG SINGLE: Starting single tab import for ${entityType}, format: ${format}`)
-  console.log(`DEBUG SINGLE: Data length: ${data.length}`)
-
   // Phase 1: Erstelle alle Entitäten (70% of progress)
   const { imported, entityMappings } = await importEntityDataWithMapping(
     client,
@@ -537,12 +329,8 @@ export const handleSingleTabImport = async (
     }
   )
 
-  console.log(`DEBUG SINGLE: Phase 1 completed - ${imported} entities imported`)
-  console.log(`DEBUG SINGLE: Entity mappings created:`, Object.keys(entityMappings).length)
-
   // Phase 2: Update Beziehungen (30% of progress)
   if (imported > 0 && Object.keys(entityMappings).length > 0) {
-    console.log(`DEBUG SINGLE: Starting relationship update phase for ${entityType}...`)
     try {
       await updateEntityRelationships(
         client,
@@ -557,29 +345,8 @@ export const handleSingleTabImport = async (
         },
         format
       )
-      console.log(`DEBUG SINGLE: Relationship update completed for ${entityType}`)
     } catch (error) {
       console.error(`DEBUG SINGLE: Error updating relationships for ${entityType}:`, error)
-    }
-  } else {
-    console.log(
-      `DEBUG SINGLE: Skipping relationship update - no entities imported or no mappings available`
-    )
-  }
-
-  // Phase 3: Update diagram database IDs if there are any mappings
-  if (Object.keys(entityMappings).length > 0) {
-    console.log('DEBUG SINGLE: Starting diagram database ID update phase...')
-    try {
-      await updateDiagramDatabaseIds(client, entityMappings, progress => {
-        // Report progress as 95-100% of total
-        if (onProgress) {
-          onProgress(95 + Math.round(progress * 0.05))
-        }
-      })
-      console.log('DEBUG SINGLE: Diagram database ID update completed')
-    } catch (error) {
-      console.error('DEBUG SINGLE: Error updating diagram database IDs:', error)
     }
   }
 
@@ -753,38 +520,15 @@ export const updateEntityRelationships = async (
   onProgress?: (progress: number) => void,
   format: 'xlsx' | 'json' = 'xlsx'
 ): Promise<void> => {
-  console.log(`🔥 FUNCTION_ENTRY: updateEntityRelationships called for ${entityType}`)
-  console.log(
-    `DEBUG RELATIONSHIPS: Starting relationship update for ${entityType}, format: ${format}`
-  )
-  console.log(`DEBUG RELATIONSHIPS: Entity mappings available:`, Object.keys(entityMappings).length)
-  console.log(
-    `DEBUG RELATIONSHIPS: Sample entity mappings:`,
-    Object.entries(entityMappings).slice(0, 3)
-  )
-  console.log(`DEBUG RELATIONSHIPS: Data length:`, data.length)
-
-  // Special debug for Infrastructure
-  if (entityType === 'infrastructures') {
-    console.log(`DEBUG INFRASTRUCTURE: Processing ${data.length} infrastructure rows`)
-    console.log(`DEBUG INFRASTRUCTURE: First row data:`, JSON.stringify(data[0], null, 2))
-  }
-
-  console.log(`🔥 CHECKING_MUTATIONS: Getting mutations for ${entityType}`)
   const mutations = getMutationsByEntityType(entityType)
-  console.log(`🔥 MUTATIONS_RESULT: mutations object:`, mutations ? Object.keys(mutations) : 'null')
   if (!mutations?.update) {
     console.warn(`❌ NO_UPDATE_MUTATION: No update mutation found for entity type: ${entityType}`)
     console.warn(`🔥 AVAILABLE_MUTATIONS:`, mutations)
     return
   }
-  console.log(`✅ UPDATE_MUTATION_FOUND: Update mutation found for ${entityType}`)
-
   const updateMutation = mutations.update
   // Nur für JSON-Format sanitize data, für Excel verwende die ursprünglichen Daten
   const processedData = format === 'json' ? sanitizeJsonImportData(data) : data
-  console.log(`DEBUG RELATIONSHIPS: Processed data length:`, processedData.length)
-
   for (let i = 0; i < processedData.length; i++) {
     const row = processedData[i]
     const originalId = String(row.id || '')
@@ -801,54 +545,14 @@ export const updateEntityRelationships = async (
       onProgress(progress)
     }
 
-    // Debug: Log relationship fields für die ersten Items
-    if (i < 2) {
-      console.log(
-        `DEBUG RELATIONSHIPS: Original row data for ${originalId}:`,
-        JSON.stringify(row, null, 2)
-      )
-    }
-
     try {
       // Verwende einheitliche Beziehungsverarbeitung für beide Formate
       const mappedRow = mapRelationshipValues(row, entityType, entityMappings)
-
-      // Special debug for Infrastructure
-      if (entityType === 'infrastructures') {
-        console.log(`DEBUG INFRASTRUCTURE RELATIONSHIPS: Original row for ${originalId}:`)
-        console.log(`  - hostsApplications:`, row.hostsApplications)
-        console.log(`  - owners:`, row.owners)
-        console.log(`  - partOfArchitectures:`, row.partOfArchitectures)
-        console.log(`DEBUG INFRASTRUCTURE RELATIONSHIPS: Mapped row for ${originalId}:`)
-        console.log(`  - hostsApplications:`, mappedRow.hostsApplications)
-        console.log(`  - owners:`, mappedRow.owners)
-        console.log(`  - partOfArchitectures:`, mappedRow.partOfArchitectures)
-        console.log(
-          `DEBUG INFRASTRUCTURE RELATIONSHIPS: Available entity mappings sample:`,
-          Object.entries(entityMappings).slice(0, 5)
-        )
-      }
-
-      // Debug: Zeige die gemappten Werte
-      if (i < 2) {
-        console.log(
-          `DEBUG RELATIONSHIPS: Mapped row for ${originalId}:`,
-          JSON.stringify(mappedRow, null, 2)
-        )
-      }
 
       // Erstelle Update-Input nur mit den Beziehungsfeldern
       const relationshipInput = createRelationshipUpdateInput(entityType, mappedRow)
 
       if (Object.keys(relationshipInput).length > 0) {
-        console.log(`DEBUG RELATIONSHIPS: Updating relationships for entity ${newId}`)
-        if (i < 2) {
-          console.log(
-            `DEBUG RELATIONSHIPS: Relationship input:`,
-            JSON.stringify(relationshipInput, null, 2)
-          )
-        }
-
         await client.mutate({
           mutation: updateMutation,
           variables: {
@@ -856,10 +560,6 @@ export const updateEntityRelationships = async (
             input: relationshipInput,
           },
         })
-      } else {
-        if (i < 2) {
-          console.log(`DEBUG RELATIONSHIPS: No relationships to update for entity ${originalId}`)
-        }
       }
     } catch (error) {
       console.error(`Error updating relationships for entity ${newId}:`, error)
@@ -870,8 +570,6 @@ export const updateEntityRelationships = async (
       await new Promise(resolve => setTimeout(resolve, 100))
     }
   }
-
-  console.log(`DEBUG RELATIONSHIPS: Completed relationship updates for ${entityType}`)
 
   // Final progress update
   if (onProgress) {
@@ -1127,59 +825,39 @@ const createRelationshipUpdateInput = (entityType: string, row: any): any => {
       break
 
     case 'infrastructures':
-      console.log(
-        `DEBUG INFRASTRUCTURE: Processing relationships for row:`,
-        JSON.stringify(row, null, 2)
-      )
       if (row.owners) {
-        console.log(`DEBUG INFRASTRUCTURE: Processing owners:`, row.owners)
         input.owners = processRelationshipField('owners', row.owners)
       }
       if (row.hostsApplications) {
-        console.log(`DEBUG INFRASTRUCTURE: Processing hostsApplications:`, row.hostsApplications)
         input.hostsApplications = processRelationshipField(
           'hostsApplications',
           row.hostsApplications
         )
       }
       if (row.partOfArchitectures) {
-        console.log(
-          `DEBUG INFRASTRUCTURE: Processing partOfArchitectures:`,
-          row.partOfArchitectures
-        )
         input.partOfArchitectures = processRelationshipField(
           'partOfArchitectures',
           row.partOfArchitectures
         )
       }
       if (row.depictedInDiagrams) {
-        console.log(`DEBUG INFRASTRUCTURE: Processing depictedInDiagrams:`, row.depictedInDiagrams)
         input.depictedInDiagrams = processRelationshipField(
           'depictedInDiagrams',
           row.depictedInDiagrams
         )
       }
       if (row.parentInfrastructure) {
-        console.log(
-          `DEBUG INFRASTRUCTURE: Processing parentInfrastructure:`,
-          row.parentInfrastructure
-        )
         input.parentInfrastructure = processSingleRelationshipField(
           'parentInfrastructure',
           row.parentInfrastructure
         )
       }
       if (row.childInfrastructures) {
-        console.log(
-          `DEBUG INFRASTRUCTURE: Processing childInfrastructures:`,
-          row.childInfrastructures
-        )
         input.childInfrastructures = processRelationshipField(
           'childInfrastructures',
           row.childInfrastructures
         )
       }
-      console.log(`DEBUG INFRASTRUCTURE: Final input object:`, JSON.stringify(input, null, 2))
       break
 
     // persons haben typischerweise keine ausgehenden Beziehungen

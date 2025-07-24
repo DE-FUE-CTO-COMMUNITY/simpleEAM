@@ -173,16 +173,11 @@ export const useDiagramHandlers = (
         }
 
         // Apply runtime correction for mainElementId references
-        console.log('=== Runtime Correction beim Diagramm-Laden ===')
         let correctionMessage = ''
         try {
           const arrowAnalysis = await analyzeArrows(syncedDiagramData.elements || [])
 
           if (arrowAnalysis.correctedElements && arrowAnalysis.correctedElements.length > 0) {
-            console.log(
-              `Runtime Correction: ${arrowAnalysis.correctedElements.length} Pfeile korrigiert`
-            )
-
             // Replace corrected arrows in the elements array
             const correctedElementMap = new Map(
               arrowAnalysis.correctedElements.map((el: any) => [el.id, el])
@@ -190,7 +185,6 @@ export const useDiagramHandlers = (
 
             const correctedElements = (syncedDiagramData.elements || []).map((element: any) => {
               if (correctedElementMap.has(element.id)) {
-                console.log(`Applying correction for arrow ${element.id}`)
                 return correctedElementMap.get(element.id)
               }
               return element
@@ -207,15 +201,10 @@ export const useDiagramHandlers = (
               arrowAnalysis.correctedElements.length === 1
                 ? ' (1 Pfeil-Verbindung automatisch korrigiert)'
                 : ` (${arrowAnalysis.correctedElements.length} Pfeil-Verbindungen automatisch korrigiert)`
-
-            console.log(`Runtime Correction applied: ${correctionMessage}`)
-          } else {
-            console.log('Runtime Correction: Keine Korrekturen erforderlich')
           }
         } catch (correctionError) {
           console.warn('Runtime Correction failed, continuing with original data:', correctionError)
         }
-        console.log('=== Ende Runtime Correction ===')
 
         const sceneData = {
           elements: syncedDiagramData.elements || [],
@@ -610,7 +599,9 @@ export const useDiagramHandlers = (
             })
 
             // Importiere ID-Mapping-Funktionalität
-            const { processImportedDiagramData } = await import('../utils/importIdMappingUtils')
+            const { processImportedDiagramData, updateDiagramDatabaseIds } = await import(
+              '../utils/importIdMappingUtils'
+            )
 
             // Verarbeite importierte Daten und mappe IDs bei Bedarf
             const { processedData, mappings, summary } = await processImportedDiagramData(
@@ -620,8 +611,21 @@ export const useDiagramHandlers = (
                 appState: importedData.appState || { viewBackgroundColor: '#ffffff' },
               }
             )
+            // Zusätzliche ID-Aktualisierung falls Mappings vorhanden sind
+            let finalData = processedData
+            if (mappings.length > 0) {
+              const idMappingMap = mappings.reduce(
+                (acc, mapping) => {
+                  acc[mapping.oldId] = mapping.newId
+                  return acc
+                },
+                {} as { [oldId: string]: string }
+              )
 
-            const restoredScene = restoreSceneData(processedData)
+              finalData = updateDiagramDatabaseIds(processedData, idMappingMap)
+            }
+
+            const restoredScene = restoreSceneData(finalData)
             excalidrawAPI.updateScene(restoredScene)
             setCurrentScene(restoredScene)
 

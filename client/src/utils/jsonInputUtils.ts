@@ -3,7 +3,8 @@
  * Optimiert für verschachtelte Objektstrukturen aus JSON-Exporten
  */
 
-import { updateDiagramJsonDatabaseIds } from '../components/excel/utils'
+// Keine Notwendigkeit für die Excel-spezifische updateDiagramJsonDatabaseIds Funktion
+// JSON-Imports verwenden die spezialisierte ID-Mapping-Logik aus importIdMappingUtils
 
 /**
  * Generiert einen Fallback-Namen für Entitäten
@@ -17,11 +18,7 @@ const generateFallbackName = (prefix: string, row: any): string => {
  * Berücksichtigt verschachtelte Beziehungen und vollständige Objektstrukturen
  * WICHTIG: Entfernt id und createdAt, da diese in Create-Input-Typen nicht erlaubt sind
  */
-export const createEntityInputFromJson = (
-  entityType: string,
-  row: any,
-  allEntityMappings?: { [originalId: string]: string }
-): any => {
+export const createEntityInputFromJson = (entityType: string, row: any): any => {
   const baseInput = {
     name: row.name || '',
     description: row.description || '',
@@ -206,17 +203,12 @@ export const createEntityInputFromJson = (
       }
 
     case 'diagrams': {
-      const baseJson = row.diagramJson || '{}'
-
-      // Update databaseId references if mappings are available
-      const updatedJson = allEntityMappings
-        ? updateDiagramJsonDatabaseIds(baseJson, allEntityMappings)
-        : baseJson
-
+      // Für JSON-Imports wird die ID-Mapping über importIdMappingUtils gemacht
+      // nicht über die Excel-spezifische updateDiagramJsonDatabaseIds Funktion
       return {
         title: row.title || row.name || generateFallbackName('Diagram', row),
         description: row.description || '',
-        diagramJson: updatedJson, // Vollständige Excalidraw-Daten mit aktualisierten IDs
+        diagramJson: row.diagramJson || '{}', // Vollständige Excalidraw-Daten
         diagramPng: row.diagramPng || undefined,
         diagramType: ['ARCHITECTURE', 'BUSINESS_PROCESS', 'DATA_FLOW', 'NETWORK', 'OTHER'].includes(
           row.diagramType?.toUpperCase()
