@@ -707,7 +707,6 @@
       "partOfArchitectures": "Teil von Architekturen",
       "depictedInDiagrams": "In Diagrammen dargestellt",
       "appliedPrinciples": "Angewandte Prinzipien",
-      "relatedInfrastructure": "Verwandte Infrastruktur",
       "predecessorApplications": "Vorgänger-Applikationen",
       "successorApplications": "Nachfolger-Applikationen",
       "parentApplications": "Übergeordnete Applikationen",
@@ -752,7 +751,7 @@
       "depictedInDiagrams": "In Diagrammen dargestellt",
       "appliedPrinciples": "Angewandte Prinzipien",
       "implementedPrinciples": "Implementierte Prinzipien",
-      "relatedInfrastructure": "Verwandte Infrastruktur",
+      "hostedOn": "Gehostet auf",
       "createdAt": "Erstellt am",
       "updatedAt": "Aktualisiert am",
       "actions": "Aktionen"

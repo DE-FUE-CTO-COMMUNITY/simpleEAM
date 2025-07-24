@@ -707,7 +707,6 @@
       "partOfArchitectures": "Part of Architectures",
       "depictedInDiagrams": "Included in Diagrams",
       "appliedPrinciples": "Applied Principles",
-      "relatedInfrastructure": "Related Infrastructure",
       "predecessorApplications": "Predecessor Applications",
       "successorApplications": "Successor Applications",
       "parentApplications": "Parent Applications",
@@ -752,7 +751,7 @@
       "depictedInDiagrams": "Included in Diagrams",
       "appliedPrinciples": "Applied Principles",
       "implementedPrinciples": "Implemented Principles",
-      "relatedInfrastructure": "Related Infrastructure",
+      "hostedOn": "Hosted on",
       "createdAt": "Created At",
       "updatedAt": "Updated At",
       "actions": "Actions"

@@ -301,7 +301,7 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
         enableHiding: true,
       }),
       columnHelper.accessor('hostedOn', {
-        header: t('relatedInfrastructure'),
+        header: t('hostedOn'),
         cell: info => {
           const infrastructure = info.getValue()
           return infrastructure && infrastructure.length > 0
