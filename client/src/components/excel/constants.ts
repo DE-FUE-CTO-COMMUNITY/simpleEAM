@@ -25,6 +25,7 @@ export const entityTypeMapping: Record<string, string> = {
   'Architecture Principles': 'architecturePrinciples',
   Diagrams: 'diagrams',
   Infrastructure: 'infrastructures',
+  Infrastructures: 'infrastructures', // Support both singular and plural
 }
 
 // Umkehrung für Export-Tab-Namen

@@ -179,8 +179,8 @@ export const CREATE_INFRASTRUCTURE = gql`
 `
 
 export const UPDATE_INFRASTRUCTURE = gql`
-  mutation UpdateInfrastructure($where: InfrastructureWhere!, $update: InfrastructureUpdateInput!) {
-    updateInfrastructures(where: $where, update: $update) {
+  mutation UpdateInfrastructure($id: ID!, $input: InfrastructureUpdateInput!) {
+    updateInfrastructures(where: { id: { eq: $id } }, update: $input) {
       infrastructures {
         id
         name

@@ -459,7 +459,7 @@ export const fetchAllDataForJson = async (
       Architectures: architectures,
       Diagrams: diagrams, // Vollständige Diagramme mit JSON-Daten
       'Architecture Principles': architecturePrinciples,
-      Infrastructures: infrastructures,
+      Infrastructure: infrastructures,
     }
   } catch (error) {
     console.error('Fehler beim Laden aller Daten für JSON-Export:', error)
@@ -595,7 +595,7 @@ export const validateJsonImportData = (
           (row.lastName && typeof row.lastName === 'string' && row.lastName.trim() !== '') ||
           (row.name && typeof row.name === 'string' && row.name.trim() !== '')
         )
-        
+
         // Debug-Ausgabe für Personen
         console.log(`DEBUG JSON Validation: Person row ${rowNumber}:`, {
           firstName: row.firstName,
@@ -636,10 +636,11 @@ export const validateJsonImportData = (
           row,
           nameField,
           hasValidName,
-          checkFields: entityType === 'persons' ? ['firstName', 'lastName', 'name'] : ['name', 'title'],
+          checkFields:
+            entityType === 'persons' ? ['firstName', 'lastName', 'name'] : ['name', 'title'],
         }
       )
-      
+
       // Für Personen: Versuche zusätzliche Fallback-Strategien
       if (entityType === 'persons') {
         // Falls email vorhanden ist, verwende den ersten Teil als Fallback
@@ -655,7 +656,7 @@ export const validateJsonImportData = (
           hasValidName = true
         }
       }
-      
+
       if (!hasValidName) {
         errors.push({
           row: rowNumber,

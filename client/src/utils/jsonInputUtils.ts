@@ -3,6 +3,8 @@
  * Optimiert für verschachtelte Objektstrukturen aus JSON-Exporten
  */
 
+import { updateDiagramJsonDatabaseIds } from '../components/excel/utils'
+
 /**
  * Generiert einen Fallback-Namen für Entitäten
  */
@@ -11,11 +13,15 @@ const generateFallbackName = (prefix: string, row: any): string => {
 }
 
 /**
- * Erstellt Entity-Input aus JSON-Daten
+ * Erstellt Entity-Input aus JSON-Zeile für GraphQL-Mutation
  * Berücksichtigt verschachtelte Beziehungen und vollständige Objektstrukturen
  * WICHTIG: Entfernt id und createdAt, da diese in Create-Input-Typen nicht erlaubt sind
  */
-export const createEntityInputFromJson = (entityType: string, row: any): any => {
+export const createEntityInputFromJson = (
+  entityType: string,
+  row: any,
+  allEntityMappings?: { [originalId: string]: string }
+): any => {
   const baseInput = {
     name: row.name || '',
     description: row.description || '',
@@ -163,7 +169,6 @@ export const createEntityInputFromJson = (entityType: string, row: any): any => 
         // Persons verwenden firstName und lastName statt name
         firstName: row.firstName || row.name || 'Unbekannt',
         lastName: row.lastName || '',
-        description: row.description || '',
         updatedAt: row.updatedAt ? new Date(row.updatedAt) : new Date(),
         email: row.email || '',
         role: row.role || '',
@@ -200,11 +205,18 @@ export const createEntityInputFromJson = (entityType: string, row: any): any => 
         updatedAt: row.updatedAt ? new Date(row.updatedAt) : undefined,
       }
 
-    case 'diagrams':
+    case 'diagrams': {
+      const baseJson = row.diagramJson || '{}'
+
+      // Update databaseId references if mappings are available
+      const updatedJson = allEntityMappings
+        ? updateDiagramJsonDatabaseIds(baseJson, allEntityMappings)
+        : baseJson
+
       return {
         title: row.title || row.name || generateFallbackName('Diagram', row),
         description: row.description || '',
-        diagramJson: row.diagramJson || '{}', // Vollständige Excalidraw-Daten
+        diagramJson: updatedJson, // Vollständige Excalidraw-Daten mit aktualisierten IDs
         diagramPng: row.diagramPng || undefined,
         diagramType: ['ARCHITECTURE', 'BUSINESS_PROCESS', 'DATA_FLOW', 'NETWORK', 'OTHER'].includes(
           row.diagramType?.toUpperCase()
@@ -213,6 +225,7 @@ export const createEntityInputFromJson = (entityType: string, row: any): any => 
           : undefined,
         updatedAt: row.updatedAt ? new Date(row.updatedAt) : undefined,
       }
+    }
 
     case 'architecturePrinciples':
       return {

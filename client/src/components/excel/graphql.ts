@@ -47,6 +47,12 @@ import {
   CHECK_ARCHITECTURE_PRINCIPLE_EXISTS,
   GET_ARCHITECTURE_PRINCIPLES_COUNT,
 } from '../../graphql/architecturePrinciple'
+import {
+  CREATE_INFRASTRUCTURE,
+  UPDATE_INFRASTRUCTURE,
+  CHECK_INFRASTRUCTURE_EXISTS,
+  GET_INFRASTRUCTURES_COUNT,
+} from '../../graphql/infrastructure'
 
 // GraphQL Mutations für Datenlöschung
 export const DELETE_BUSINESS_CAPABILITIES = `
@@ -164,6 +170,11 @@ export const getMutationsByEntityType = (entityType: string) => {
       update: UPDATE_ARCHITECTURE_PRINCIPLE,
       check: CHECK_ARCHITECTURE_PRINCIPLE_EXISTS,
     },
+    infrastructures: {
+      create: CREATE_INFRASTRUCTURE,
+      update: UPDATE_INFRASTRUCTURE,
+      check: CHECK_INFRASTRUCTURE_EXISTS,
+    },
   }
 
   return mutationMap[entityType as keyof typeof mutationMap]
@@ -220,4 +231,8 @@ export {
   UPDATE_ARCHITECTURE_PRINCIPLE,
   CHECK_ARCHITECTURE_PRINCIPLE_EXISTS,
   GET_ARCHITECTURE_PRINCIPLES_COUNT,
+  CREATE_INFRASTRUCTURE,
+  UPDATE_INFRASTRUCTURE,
+  CHECK_INFRASTRUCTURE_EXISTS,
+  GET_INFRASTRUCTURES_COUNT,
 }

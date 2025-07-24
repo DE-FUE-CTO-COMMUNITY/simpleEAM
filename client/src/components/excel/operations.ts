@@ -5,11 +5,88 @@ import {
   checkEntityExists,
   transformInputForUpdate,
   mapRelationshipValues,
-  getRelationshipFields,
+  updateDiagramJsonDatabaseIds,
 } from './utils'
 import { createEntityInputFromJson, sanitizeJsonImportData } from '../../utils/jsonInputUtils'
 import { ImportWithMappingResult, EntityMapping, ImportResult } from './types'
 import { entityTypeMapping } from './constants'
+
+/**
+ * Updates diagram database IDs after all entities have been imported
+ */
+const updateDiagramDatabaseIds = async (
+  client: ApolloClient<any>,
+  allEntityMappings: { [originalId: string]: string },
+  onProgress?: (progress: number) => void
+): Promise<void> => {
+  console.log('DEBUG: Starting diagram database ID update phase')
+
+  // Get all diagrams
+  const DIAGRAMS_QUERY = gql`
+    query GetDiagrams {
+      diagrams {
+        id
+        title
+        diagramJson
+      }
+    }
+  `
+
+  const { data } = await client.query({
+    query: DIAGRAMS_QUERY,
+    fetchPolicy: 'network-only',
+  })
+
+  if (!data?.diagrams || data.diagrams.length === 0) {
+    console.log('DEBUG: No diagrams found to update')
+    return
+  }
+
+  console.log(`DEBUG: Found ${data.diagrams.length} diagrams to update`)
+
+  // Update mutation
+  const UPDATE_DIAGRAM = gql`
+    mutation UpdateDiagram($id: ID!, $input: DiagramUpdateInput!) {
+      updateDiagrams(where: { id: $id }, update: $input) {
+        diagrams {
+          id
+          title
+        }
+      }
+    }
+  `
+
+  for (let i = 0; i < data.diagrams.length; i++) {
+    const diagram = data.diagrams[i]
+
+    if (onProgress) {
+      onProgress(Math.round((i / data.diagrams.length) * 100))
+    }
+
+    try {
+      const updatedJson = updateDiagramJsonDatabaseIds(diagram.diagramJson, allEntityMappings)
+
+      // Only update if the JSON actually changed
+      if (updatedJson !== diagram.diagramJson) {
+        console.log(`DEBUG: Updating diagram "${diagram.title}" with new database IDs`)
+
+        await client.mutate({
+          mutation: UPDATE_DIAGRAM,
+          variables: {
+            id: diagram.id,
+            input: {
+              diagramJson: { set: updatedJson },
+            },
+          },
+        })
+      }
+    } catch (error) {
+      console.error(`Error updating diagram ${diagram.id}:`, error)
+    }
+  }
+
+  console.log('DEBUG: Diagram database ID update completed')
+}
 
 /**
  * Formatiert den aktuellen Timestamp für Dateinamen
@@ -90,10 +167,10 @@ export const importEntityDataWithMapping = async (
     try {
       // WICHTIG: Format-spezifische Input-Erstellung verwenden
       if (format === 'json') {
-        input = createEntityInputFromJson(entityType, row)
+        input = createEntityInputFromJson(entityType, row, entityMappings)
       } else {
         // Für Excel: Verwende die bewährte Excel-Input-Erstellung
-        input = createEntityInput(entityType, row)
+        input = createEntityInput(entityType, row, entityMappings)
       }
 
       // Only log first few items for debugging
@@ -104,6 +181,19 @@ export const importEntityDataWithMapping = async (
         )
       }
 
+      // Special debug for infrastructures
+      if (entityType === 'infrastructures') {
+        console.log(`DEBUG: Infrastructure import - Item ${i + 1} (format: ${format}):`, {
+          originalId,
+          input,
+          format,
+          rowKeys: Object.keys(row),
+          mutations: {
+            create: createMutation ? 'exists' : 'missing',
+            update: updateMutation ? 'exists' : 'missing',
+          },
+        })
+      }
       let shouldUpdate = false
       if (row.id && row.id.trim() !== '') {
         shouldUpdate = await checkEntityExists(client, entityType, row.id)
@@ -152,8 +242,14 @@ export const importEntityDataWithMapping = async (
             createdEntities = resultData.createArchitecturePrinciples.architecturePrinciples
           } else if (resultData.createInfrastructures) {
             createdEntities = resultData.createInfrastructures.infrastructures
+            if (entityType === 'infrastructures') {
+              console.log(`DEBUG: Infrastructure creation result:`, {
+                resultData: resultData.createInfrastructures,
+                entitiesCount: createdEntities?.length || 0,
+                firstEntity: createdEntities?.[0] || null,
+              })
+            }
           }
-
           if (createdEntities && createdEntities.length > 0) {
             entityMappings[originalId] = createdEntities[0].id
             imported++
@@ -237,6 +333,17 @@ export const handleMultiTabImport = async (
 
     const entityType = entityTypeMapping[tabName]
     console.log(`DEBUG: Tab "${tabName}" mapped to entity type: ${entityType}`)
+
+    // Special debug for Infrastructure tab
+    if (tabName === 'Infrastructure' || entityType === 'infrastructures') {
+      console.log(`DEBUG: Found Infrastructure tab/entity:`, {
+        tabName,
+        entityType,
+        hasData: Array.isArray(tabData) && tabData.length > 0,
+        dataLength: Array.isArray(tabData) ? tabData.length : 'not array',
+        firstItem: Array.isArray(tabData) && tabData.length > 0 ? tabData[0] : 'no data',
+      })
+    }
 
     if (entityType && Array.isArray(tabData) && tabData.length > 0) {
       try {
@@ -371,6 +478,22 @@ export const handleMultiTabImport = async (
 
   console.log('DEBUG: Multi-Tab Import completed. Total imported:', totalImported)
 
+  // Phase 3: Update diagram database IDs if there are any diagrams
+  if (combinedEntityMappings && Object.keys(combinedEntityMappings).length > 0) {
+    console.log('DEBUG: Starting diagram database ID update phase...')
+    try {
+      await updateDiagramDatabaseIds(client, combinedEntityMappings, progress => {
+        // Report progress as 95-100% of total
+        if (onProgress) {
+          onProgress(95 + Math.round(progress * 0.05))
+        }
+      })
+      console.log('DEBUG: Diagram database ID update completed')
+    } catch (error) {
+      console.error('DEBUG: Error updating diagram database IDs:', error)
+    }
+  }
+
   // Final progress update
   if (onProgress) {
     onProgress(100)
@@ -442,6 +565,22 @@ export const handleSingleTabImport = async (
     console.log(
       `DEBUG SINGLE: Skipping relationship update - no entities imported or no mappings available`
     )
+  }
+
+  // Phase 3: Update diagram database IDs if there are any mappings
+  if (Object.keys(entityMappings).length > 0) {
+    console.log('DEBUG SINGLE: Starting diagram database ID update phase...')
+    try {
+      await updateDiagramDatabaseIds(client, entityMappings, progress => {
+        // Report progress as 95-100% of total
+        if (onProgress) {
+          onProgress(95 + Math.round(progress * 0.05))
+        }
+      })
+      console.log('DEBUG SINGLE: Diagram database ID update completed')
+    } catch (error) {
+      console.error('DEBUG SINGLE: Error updating diagram database IDs:', error)
+    }
   }
 
   // Final progress update
@@ -614,6 +753,7 @@ export const updateEntityRelationships = async (
   onProgress?: (progress: number) => void,
   format: 'xlsx' | 'json' = 'xlsx'
 ): Promise<void> => {
+  console.log(`🔥 FUNCTION_ENTRY: updateEntityRelationships called for ${entityType}`)
   console.log(
     `DEBUG RELATIONSHIPS: Starting relationship update for ${entityType}, format: ${format}`
   )
@@ -622,16 +762,28 @@ export const updateEntityRelationships = async (
     `DEBUG RELATIONSHIPS: Sample entity mappings:`,
     Object.entries(entityMappings).slice(0, 3)
   )
+  console.log(`DEBUG RELATIONSHIPS: Data length:`, data.length)
 
+  // Special debug for Infrastructure
+  if (entityType === 'infrastructures') {
+    console.log(`DEBUG INFRASTRUCTURE: Processing ${data.length} infrastructure rows`)
+    console.log(`DEBUG INFRASTRUCTURE: First row data:`, JSON.stringify(data[0], null, 2))
+  }
+
+  console.log(`🔥 CHECKING_MUTATIONS: Getting mutations for ${entityType}`)
   const mutations = getMutationsByEntityType(entityType)
+  console.log(`🔥 MUTATIONS_RESULT: mutations object:`, mutations ? Object.keys(mutations) : 'null')
   if (!mutations?.update) {
-    console.warn(`No update mutation found for entity type: ${entityType}`)
+    console.warn(`❌ NO_UPDATE_MUTATION: No update mutation found for entity type: ${entityType}`)
+    console.warn(`🔥 AVAILABLE_MUTATIONS:`, mutations)
     return
   }
+  console.log(`✅ UPDATE_MUTATION_FOUND: Update mutation found for ${entityType}`)
 
   const updateMutation = mutations.update
   // Nur für JSON-Format sanitize data, für Excel verwende die ursprünglichen Daten
   const processedData = format === 'json' ? sanitizeJsonImportData(data) : data
+  console.log(`DEBUG RELATIONSHIPS: Processed data length:`, processedData.length)
 
   for (let i = 0; i < processedData.length; i++) {
     const row = processedData[i]
@@ -658,52 +810,23 @@ export const updateEntityRelationships = async (
     }
 
     try {
-      // Verwende format-spezifische Beziehungsverarbeitung
-      let mappedRow: any
-      if (format === 'xlsx') {
-        // Für Excel: Verwende die bewährte Excel-Implementierung
-        mappedRow = mapRelationshipValues(row, entityType, entityMappings)
-      } else {
-        // Für JSON: Spezielle Behandlung für Arrays und Objekte
-        mappedRow = { ...row }
-        const relationshipFields = getRelationshipFields(entityType)
+      // Verwende einheitliche Beziehungsverarbeitung für beide Formate
+      const mappedRow = mapRelationshipValues(row, entityType, entityMappings)
 
-        relationshipFields.forEach((field: string) => {
-          if (mappedRow[field]) {
-            const originalValue = mappedRow[field]
-
-            if (Array.isArray(originalValue)) {
-              // Array von IDs oder Objekten
-              const mappedIds = originalValue
-                .map(item => {
-                  if (typeof item === 'string') {
-                    return entityMappings[item] || item
-                  } else if (typeof item === 'object' && item.id) {
-                    return entityMappings[item.id] || item.id
-                  }
-                  return String(item)
-                })
-                .filter(id => id)
-
-              // Konvertiere zu comma-separated String für processRelationshipField
-              mappedRow[field] = mappedIds.join(',')
-            } else if (typeof originalValue === 'string') {
-              // String-Wert - kann einzelne ID oder comma-separated sein
-              if (originalValue.includes(',')) {
-                // Comma-separated IDs
-                const ids = originalValue.split(',').map((id: string) => id.trim())
-                const mappedIds = ids.map((id: string) => entityMappings[id] || id)
-                mappedRow[field] = mappedIds.join(',')
-              } else {
-                // Einzelne ID
-                mappedRow[field] = entityMappings[originalValue] || originalValue
-              }
-            } else if (typeof originalValue === 'object' && originalValue.id) {
-              // Einzelnes Objekt mit ID
-              mappedRow[field] = entityMappings[originalValue.id] || originalValue.id
-            }
-          }
-        })
+      // Special debug for Infrastructure
+      if (entityType === 'infrastructures') {
+        console.log(`DEBUG INFRASTRUCTURE RELATIONSHIPS: Original row for ${originalId}:`)
+        console.log(`  - hostsApplications:`, row.hostsApplications)
+        console.log(`  - owners:`, row.owners)
+        console.log(`  - partOfArchitectures:`, row.partOfArchitectures)
+        console.log(`DEBUG INFRASTRUCTURE RELATIONSHIPS: Mapped row for ${originalId}:`)
+        console.log(`  - hostsApplications:`, mappedRow.hostsApplications)
+        console.log(`  - owners:`, mappedRow.owners)
+        console.log(`  - partOfArchitectures:`, mappedRow.partOfArchitectures)
+        console.log(
+          `DEBUG INFRASTRUCTURE RELATIONSHIPS: Available entity mappings sample:`,
+          Object.entries(entityMappings).slice(0, 5)
+        )
       }
 
       // Debug: Zeige die gemappten Werte
@@ -1001,6 +1124,62 @@ const createRelationshipUpdateInput = (entityType: string, row: any): any => {
           row.implementedByApplications
         )
       }
+      break
+
+    case 'infrastructures':
+      console.log(
+        `DEBUG INFRASTRUCTURE: Processing relationships for row:`,
+        JSON.stringify(row, null, 2)
+      )
+      if (row.owners) {
+        console.log(`DEBUG INFRASTRUCTURE: Processing owners:`, row.owners)
+        input.owners = processRelationshipField('owners', row.owners)
+      }
+      if (row.hostsApplications) {
+        console.log(`DEBUG INFRASTRUCTURE: Processing hostsApplications:`, row.hostsApplications)
+        input.hostsApplications = processRelationshipField(
+          'hostsApplications',
+          row.hostsApplications
+        )
+      }
+      if (row.partOfArchitectures) {
+        console.log(
+          `DEBUG INFRASTRUCTURE: Processing partOfArchitectures:`,
+          row.partOfArchitectures
+        )
+        input.partOfArchitectures = processRelationshipField(
+          'partOfArchitectures',
+          row.partOfArchitectures
+        )
+      }
+      if (row.depictedInDiagrams) {
+        console.log(`DEBUG INFRASTRUCTURE: Processing depictedInDiagrams:`, row.depictedInDiagrams)
+        input.depictedInDiagrams = processRelationshipField(
+          'depictedInDiagrams',
+          row.depictedInDiagrams
+        )
+      }
+      if (row.parentInfrastructure) {
+        console.log(
+          `DEBUG INFRASTRUCTURE: Processing parentInfrastructure:`,
+          row.parentInfrastructure
+        )
+        input.parentInfrastructure = processSingleRelationshipField(
+          'parentInfrastructure',
+          row.parentInfrastructure
+        )
+      }
+      if (row.childInfrastructures) {
+        console.log(
+          `DEBUG INFRASTRUCTURE: Processing childInfrastructures:`,
+          row.childInfrastructures
+        )
+        input.childInfrastructures = processRelationshipField(
+          'childInfrastructures',
+          row.childInfrastructures
+        )
+      }
+      console.log(`DEBUG INFRASTRUCTURE: Final input object:`, JSON.stringify(input, null, 2))
       break
 
     // persons haben typischerweise keine ausgehenden Beziehungen

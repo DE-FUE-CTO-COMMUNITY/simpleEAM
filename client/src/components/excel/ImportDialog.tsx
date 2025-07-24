@@ -182,6 +182,50 @@ const ImportDialog: React.FC<ImportDialogProps> = ({
                     )}
                   </Alert>
 
+                  {/* Import Progress Indicator */}
+                  {isImporting && (
+                    <Box sx={{ mt: 2, mb: 2 }}>
+                      <CircularProgress size={24} />
+                      <Typography variant="body2" sx={{ mt: 1 }}>
+                        {t('importing', { progress: importProgress })}
+                      </Typography>
+                    </Box>
+                  )}
+
+                  {/* Multi-Tab Validierungsdetails */}
+                  {validationResult.tabValidations &&
+                    Object.keys(validationResult.tabValidations).length > 0 && (
+                      <Box sx={{ mt: 2 }}>
+                        <Typography variant="subtitle2" gutterBottom>
+                          Details pro Tab:
+                        </Typography>
+                        {Object.entries(validationResult.tabValidations).map(
+                          ([tabName, tabValidation]: [string, any]) => (
+                            <Box
+                              key={tabName}
+                              sx={{
+                                mb: 1,
+                                p: 1,
+                                border: 1,
+                                borderColor: 'divider',
+                                borderRadius: 1,
+                              }}
+                            >
+                              <Typography variant="body2" fontWeight="bold">
+                                {tabName}: {tabValidation.summary.validRows} von{' '}
+                                {tabValidation.summary.totalRows} Datensätzen gültig
+                              </Typography>
+                              {tabValidation.errors.length > 0 && (
+                                <Typography variant="body2" color="error">
+                                  {tabValidation.errors.length} Fehler gefunden
+                                </Typography>
+                              )}
+                            </Box>
+                          )
+                        )}
+                      </Box>
+                    )}
+
                   {validationResult.errors.length > 0 && (
                     <Box sx={{ mt: 2 }}>
                       <Typography variant="subtitle2" gutterBottom>
@@ -211,15 +255,6 @@ const ImportDialog: React.FC<ImportDialogProps> = ({
                       </List>
                     </Box>
                   )}
-                </Box>
-              )}
-
-              {isImporting && (
-                <Box sx={{ mt: 2 }}>
-                  <CircularProgress size={24} />
-                  <Typography variant="body2" sx={{ mt: 1 }}>
-                    {t('importing', { progress: importProgress })}
-                  </Typography>
                 </Box>
               )}
             </Paper>
