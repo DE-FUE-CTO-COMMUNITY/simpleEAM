@@ -582,86 +582,123 @@ export function GenericTable<T extends { id: string }, F>({
               justifyContent: 'center',
             }}
           >
-            {Array.from(
-              {
-                length: isMobile
-                  ? Math.min(table.getPageCount(), 3)
-                  : table.getPageCount() > 5
-                    ? 5
-                    : table.getPageCount(),
-              },
-              (_, i) => {
-                // Zeige maximal 3 Seitenzahlen auf mobile, 5 auf Desktop
-                let displayPageIndex
-                const currentPage = pageIndex
-                const totalPages = table.getPageCount()
+            {(() => {
+              const currentPage = pageIndex
+              const totalPages = table.getPageCount()
+              const maxButtons = isMobile ? 3 : 5
+              const buttons: React.ReactNode[] = []
 
-                if (totalPages <= 5) {
-                  // Wenn weniger als 5 Seiten, zeige alle an
-                  displayPageIndex = i
-                } else if (currentPage < 2) {
-                  // Wenn aktuelle Seite weniger als 2 ist
-                  if (i < 4) {
-                    displayPageIndex = i
-                  } else {
-                    return (
-                      <Box key="ellipsis-end" sx={{ mx: 1 }}>
+              if (totalPages <= maxButtons) {
+                // Wenn weniger oder gleich maxButtons Seiten, zeige alle an
+                for (let i = 0; i < totalPages; i++) {
+                  buttons.push(
+                    <Button
+                      key={i}
+                      variant={i === currentPage ? 'contained' : 'outlined'}
+                      size={isMobile ? 'medium' : 'small'}
+                      onClick={() => table.setPageIndex(i)}
+                      sx={{
+                        minWidth: isMobile ? '44px' : '36px',
+                        minHeight: isMobile ? '44px' : '32px',
+                        px: 1,
+                        fontSize: isMobile ? '16px' : '14px',
+                      }}
+                    >
+                      {i + 1}
+                    </Button>
+                  )
+                }
+              } else {
+                // Mehr als maxButtons Seiten: intelligente Pagination
+                if (currentPage < 2) {
+                  // Am Anfang: [1] [2] [3] [4] ... [last]
+                  for (let i = 0; i < Math.min(4, totalPages); i++) {
+                    buttons.push(
+                      <Button
+                        key={i}
+                        variant={i === currentPage ? 'contained' : 'outlined'}
+                        size={isMobile ? 'medium' : 'small'}
+                        onClick={() => table.setPageIndex(i)}
+                        sx={{
+                          minWidth: isMobile ? '44px' : '36px',
+                          minHeight: isMobile ? '44px' : '32px',
+                          px: 1,
+                          fontSize: isMobile ? '16px' : '14px',
+                        }}
+                      >
+                        {i + 1}
+                      </Button>
+                    )
+                  }
+                  if (totalPages > 4) {
+                    buttons.push(
+                      <Box key="ellipsis-end" sx={{ mx: 1, display: 'flex', alignItems: 'center' }}>
                         ...
                       </Box>
                     )
                   }
-                } else if (currentPage > totalPages - 3) {
-                  // Wenn aktuelle Seite nahe am Ende ist
-                  if (i === 0) {
-                    return (
-                      <Box key="ellipsis-start" sx={{ mx: 1 }}>
-                        ...
-                      </Box>
+                } else if (currentPage >= totalPages - 2) {
+                  // Am Ende: [1] ... [n-3] [n-2] [n-1] [n]
+                  buttons.push(
+                    <Box key="ellipsis-start" sx={{ mx: 1, display: 'flex', alignItems: 'center' }}>
+                      ...
+                    </Box>
+                  )
+                  for (let i = Math.max(0, totalPages - 4); i < totalPages; i++) {
+                    buttons.push(
+                      <Button
+                        key={i}
+                        variant={i === currentPage ? 'contained' : 'outlined'}
+                        size={isMobile ? 'medium' : 'small'}
+                        onClick={() => table.setPageIndex(i)}
+                        sx={{
+                          minWidth: isMobile ? '44px' : '36px',
+                          minHeight: isMobile ? '44px' : '32px',
+                          px: 1,
+                          fontSize: isMobile ? '16px' : '14px',
+                        }}
+                      >
+                        {i + 1}
+                      </Button>
                     )
-                  } else {
-                    displayPageIndex = totalPages - 4 + i
                   }
                 } else {
-                  // Wenn aktuelle Seite in der Mitte ist
-                  if (i === 0) {
-                    return (
-                      <Box key="ellipsis-start" sx={{ mx: 1 }}>
-                        ...
-                      </Box>
-                    )
-                  } else if (i === 4) {
-                    return (
-                      <Box key="ellipsis-end" sx={{ mx: 1 }}>
-                        ...
-                      </Box>
-                    )
-                  } else {
-                    displayPageIndex = currentPage + (i - 2)
+                  // In der Mitte: [1] ... [current-1] [current] [current+1] ... [last]
+                  buttons.push(
+                    <Box key="ellipsis-start" sx={{ mx: 1, display: 'flex', alignItems: 'center' }}>
+                      ...
+                    </Box>
+                  )
+                  for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+                    if (i >= 0 && i < totalPages) {
+                      buttons.push(
+                        <Button
+                          key={i}
+                          variant={i === currentPage ? 'contained' : 'outlined'}
+                          size={isMobile ? 'medium' : 'small'}
+                          onClick={() => table.setPageIndex(i)}
+                          sx={{
+                            minWidth: isMobile ? '44px' : '36px',
+                            minHeight: isMobile ? '44px' : '32px',
+                            px: 1,
+                            fontSize: isMobile ? '16px' : '14px',
+                          }}
+                        >
+                          {i + 1}
+                        </Button>
+                      )
+                    }
                   }
+                  buttons.push(
+                    <Box key="ellipsis-end" sx={{ mx: 1, display: 'flex', alignItems: 'center' }}>
+                      ...
+                    </Box>
+                  )
                 }
-
-                // Prüfen und anpassen bei ungültigen displayPageIndex-Werten
-                if (displayPageIndex < 0) displayPageIndex = 0
-                if (displayPageIndex >= totalPages) displayPageIndex = totalPages - 1
-
-                return (
-                  <Button
-                    key={displayPageIndex}
-                    variant={displayPageIndex === currentPage ? 'contained' : 'outlined'}
-                    size={isMobile ? 'medium' : 'small'}
-                    onClick={() => table.setPageIndex(displayPageIndex)}
-                    sx={{
-                      minWidth: isMobile ? '44px' : '36px',
-                      minHeight: isMobile ? '44px' : '32px',
-                      px: 1,
-                      fontSize: isMobile ? '16px' : '14px',
-                    }}
-                  >
-                    {displayPageIndex + 1}
-                  </Button>
-                )
               }
-            )}
+
+              return buttons
+            })()}
           </Box>
 
           {/* Weiter Button */}
