@@ -73,13 +73,17 @@ export function convertExcalidrawToDrawIO(excalidrawData: ExcalidrawData): strin
 
       // Log ALL short lines (< 30px) anywhere in the diagram to find potential icon parts
       if (lineLength < 30) {
-        console.log(`  🔍 SHORT LINE found: ${element.id} - Length: ${lineLength.toFixed(2)}px at (${startX}, ${startY}) to (${endX}, ${endY})`)
+        console.log(
+          `  🔍 SHORT LINE found: ${element.id} - Length: ${lineLength.toFixed(2)}px at (${startX}, ${startY}) to (${endX}, ${endY})`
+        )
       }
 
       // Log potential AWS Cloud Frankfurt icon lines - look for short lines (< 30px) near the known icon area
-      if (lineLength < 30 && 
-          ((endX >= 50 && endX <= 120 && endY >= 375 && endY <= 450) ||
-           (startX >= 50 && startX <= 120 && startY >= 375 && startY <= 450))) {
+      if (
+        lineLength < 30 &&
+        ((endX >= 50 && endX <= 120 && endY >= 375 && endY <= 450) ||
+          (startX >= 50 && startX <= 120 && startY >= 375 && startY <= 450))
+      ) {
         console.log(`  🟢 AWS Cloud Frankfurt icon line (short line near icon): ${element.id}`)
       }
     }
@@ -308,9 +312,11 @@ function createLineCell(
   }
 
   // Check if this is one of the AWS Cloud Frankfurt icon lines - short lines near the icon area
-  if (lineLength < 30 && 
-      ((endX >= 544 && endX <= 614 && endY >= 429 && endY <= 499) ||
-       (startX >= 544 && startX <= 614 && startY >= 429 && startY <= 499))) {
+  if (
+    lineLength < 30 &&
+    ((endX >= 544 && endX <= 614 && endY >= 429 && endY <= 499) ||
+      (startX >= 544 && startX <= 614 && startY >= 429 && startY <= 499))
+  ) {
     console.log(`  🟢 PROCESSING AWS Cloud Frankfurt icon line (short line): ${cellId}`)
   }
 
@@ -345,12 +351,12 @@ function createLineCell(
   let geometryXML = ''
   if (element.points.length > 2) {
     console.log(`📐 Creating bent line with ${element.points.length} points for ${cellId}`)
-    
+
     // For bent lines, we need to include waypoints
     geometryXML = `          <mxGeometry width="160" height="160" relative="1" as="geometry">\n`
     geometryXML += `            <mxPoint x="${startX}" y="${startY}" as="sourcePoint" />\n`
     geometryXML += `            <mxPoint x="${endX}" y="${endY}" as="targetPoint" />\n`
-    
+
     // Add waypoints for intermediate points
     if (element.points.length > 2) {
       geometryXML += `            <Array as="points">\n`
@@ -362,7 +368,7 @@ function createLineCell(
       }
       geometryXML += `            </Array>\n`
     }
-    
+
     geometryXML += `          </mxGeometry>\n`
   } else {
     // Simple straight line

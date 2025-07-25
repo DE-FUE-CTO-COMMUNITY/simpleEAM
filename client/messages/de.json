@@ -186,12 +186,12 @@
         "createButton": "{count} {elementText} erstellen",
         "creatingElements": "Erstelle Elemente...",
         "elementTypes": {
-          "application": "Anwendung",
+          "application": "Applikation",
           "capability": "Capability",
           "businessCapability": "Geschäftsfähigkeit",
           "dataObject": "Datenobjekt",
           "interface": "Schnittstelle",
-          "applicationInterface": "Anwendungsschnittstelle",
+          "applicationInterface": "Applikationsschnittstelle",
           "infrastructure": "Infrastruktur"
         }
       },
@@ -215,8 +215,8 @@
           "SUPPORTS": "unterstützt",
           "USES": "verwendet",
           "DATA_SOURCE": "ist Datenquelle für",
-          "INTERFACE_SOURCE": "ist Quell-Anwendung von",
-          "INTERFACE_TARGET": "ist Ziel-Anwendung von",
+          "INTERFACE_SOURCE": "ist Quell-Applikation von",
+          "INTERFACE_TARGET": "ist Ziel-Applikation von",
           "HOSTED_ON": "gehostet auf",
           "TRANSFERS": "überträgt",
           "RELATED_TO": "bezieht sich auf"
