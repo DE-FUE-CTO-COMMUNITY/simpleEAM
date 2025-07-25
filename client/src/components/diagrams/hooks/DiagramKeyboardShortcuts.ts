@@ -5,6 +5,7 @@ import { isViewer } from '@/lib/auth'
 export const useKeyboardShortcuts = (
   handleNewDiagram: () => void,
   handleExportJSON: () => void,
+  handleExportDrawIO: () => void,
   handleImportJSON: () => void,
   handleExportPNG: () => void,
   handleManualSync: () => void,
@@ -47,10 +48,16 @@ export const useKeyboardShortcuts = (
               setSaveDialogOpen(true)
             }
             break
+          case 'd':
+            event.preventDefault()
+            // Ctrl+D - (reserved for browser bookmark)
+            break
           case 'e':
             event.preventDefault()
-            // Ctrl+E - Export JSON
-            handleExportJSON()
+            if (!event.shiftKey) {
+              // Ctrl+E - Export JSON
+              handleExportJSON()
+            }
             break
           case 'i':
             event.preventDefault()
@@ -74,6 +81,12 @@ export const useKeyboardShortcuts = (
             break
         }
       }
+
+      // Handle Shift+E for draw.io export (without Ctrl)
+      if (event.key.toLowerCase() === 'e' && event.shiftKey && !event.ctrlKey && !event.metaKey) {
+        event.preventDefault()
+        handleExportDrawIO()
+      }
     }
 
     document.addEventListener('keydown', handleKeyboardShortcuts)
@@ -84,6 +97,7 @@ export const useKeyboardShortcuts = (
     handleNewDiagram,
     currentDiagram,
     handleExportJSON,
+    handleExportDrawIO,
     handleImportJSON,
     handleExportPNG,
     handleManualSync,

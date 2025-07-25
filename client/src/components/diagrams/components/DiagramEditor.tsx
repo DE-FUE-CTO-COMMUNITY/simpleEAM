@@ -101,6 +101,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     handleSaveAsDiagram,
     handleChange,
     handleExportJSON,
+    handleExportDrawIO,
     handleImportJSON,
     handleExportPNG,
     handleManualSync,
@@ -168,6 +169,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
   useKeyboardShortcuts(
     handleNewDiagram,
     handleExportJSON,
+    handleExportDrawIO,
     handleImportJSON,
     handleExportPNG,
     handleManualSync,
@@ -429,6 +431,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
           onNewDiagram={handleNewDiagram}
           onDeleteDialog={() => updateDialogState('deleteDialogOpen', true)}
           onExportJSON={handleExportJSON}
+          onExportDrawIO={handleExportDrawIO}
           onImportJSON={handleImportJSON}
           onExportPNG={handleExportPNG}
           onManualSync={handleManualSync}

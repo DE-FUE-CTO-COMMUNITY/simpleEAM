@@ -11,6 +11,7 @@ export interface ExcalidrawComponentProps {
   onNewDiagram: () => void
   onDeleteDialog: () => void
   onExportJSON: () => void
+  onExportDrawIO: () => void
   onImportJSON: () => void
   onExportPNG: () => void
   onManualSync: () => void

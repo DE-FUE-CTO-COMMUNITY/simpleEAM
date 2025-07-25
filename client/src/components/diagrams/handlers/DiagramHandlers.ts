@@ -16,6 +16,7 @@ import {
   saveViewportStateToStorage,
   loadViewportStateFromStorage,
 } from '../utils/DiagramStorageUtils'
+import { convertExcalidrawToDrawIO, downloadDrawIOFile } from '../../../utils/drawioConverter'
 
 // Handlers für alle Diagram-Operationen
 export const useDiagramHandlers = (
@@ -575,6 +576,61 @@ export const useDiagramHandlers = (
     }
   }, [excalidrawAPI, currentDiagram, setNotification])
 
+  // Draw.io XML Export Handler
+  const handleExportDrawIO = useCallback(() => {
+    if (excalidrawAPI) {
+      try {
+        const elements = excalidrawAPI.getSceneElements()
+        const appState = excalidrawAPI.getAppState()
+
+        const exportData = {
+          type: 'excalidraw',
+          version: 2,
+          source: 'simple-eam',
+          elements: elements,
+          appState: {
+            viewBackgroundColor: appState.viewBackgroundColor || '#ffffff',
+            currentItemFontFamily: appState.currentItemFontFamily,
+            currentItemFontSize: appState.currentItemFontSize,
+            currentItemTextAlign: appState.currentItemTextAlign,
+            currentItemStrokeColor: appState.currentItemStrokeColor,
+            currentItemBackgroundColor: appState.currentItemBackgroundColor,
+            currentItemFillStyle: appState.currentItemFillStyle,
+            currentItemStrokeWidth: appState.currentItemStrokeWidth,
+            currentItemStrokeStyle: appState.currentItemStrokeStyle,
+            currentItemRoughness: appState.currentItemRoughness,
+            currentItemOpacity: appState.currentItemOpacity,
+            gridSize: appState.gridSize,
+            showGrid: appState.showGrid,
+            zenModeEnabled: appState.zenModeEnabled,
+            theme: appState.theme,
+          },
+        }
+
+        const xmlContent = convertExcalidrawToDrawIO(exportData)
+
+        const exportFileDefaultName = currentDiagram
+          ? `${currentDiagram.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}`
+          : 'diagram'
+
+        downloadDrawIOFile(xmlContent, exportFileDefaultName)
+
+        setNotification({
+          open: true,
+          message: 'messages.drawioExported',
+          severity: 'success',
+        })
+      } catch (err) {
+        console.error('Error exporting draw.io XML:', err)
+        setNotification({
+          open: true,
+          message: 'errors.exportDrawIOError',
+          severity: 'error',
+        })
+      }
+    }
+  }, [excalidrawAPI, currentDiagram, setNotification])
+
   // JSON Import Handler
   const handleImportJSON = useCallback(async () => {
     const input = document.createElement('input')
@@ -822,6 +878,7 @@ export const useDiagramHandlers = (
     handleSaveAsDiagram,
     handleChange,
     handleExportJSON,
+    handleExportDrawIO,
     handleImportJSON,
     handleExportPNG,
     handleManualSync,

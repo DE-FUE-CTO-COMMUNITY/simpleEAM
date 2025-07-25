@@ -23,6 +23,7 @@ const ExcalidrawWrapper = dynamic(
       onNewDiagram,
       onDeleteDialog,
       onExportJSON,
+      onExportDrawIO,
       onImportJSON,
       onExportPNG: _onExportPNG,
       onManualSync,
@@ -294,6 +295,21 @@ const ExcalidrawWrapper = dynamic(
                   shortcut="Ctrl+E"
                 >
                   {t('actions.exportJSON')}
+                </MainMenuTyped.Item>
+              )}
+
+              {/* Custom Export draw.io XML Menu Item - only for non-viewer users */}
+              {!viewModeEnabled && (
+                <MainMenuTyped.Item
+                  onSelect={onExportDrawIO}
+                  icon={
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12,2A2,2 0 0,1 14,4C14,4.74 13.6,5.39 13,5.73V7.27C13.4,7.61 13.6,8.26 13.6,9A2.4,2.4 0 0,1 11.2,11.4A2.4,2.4 0 0,1 8.8,9A2.4,2.4 0 0,1 11.2,6.6C11.93,6.6 12.58,7 12.92,7.4V5.73C12.31,5.39 12,4.74 12,4A2,2 0 0,1 14,2M21,9V15C21,16.1 20.1,17 19,17H13L16,14H19V10H16L13,7H19C20.1,7 21,7.9 21,9M8,13A2,2 0 0,1 6,15A2,2 0 0,1 4,13A2,2 0 0,1 6,11A2,2 0 0,1 8,13Z" />
+                    </svg>
+                  }
+                  shortcut="Shift+E"
+                >
+                  {t('actions.exportDrawIO')}
                 </MainMenuTyped.Item>
               )}
 
