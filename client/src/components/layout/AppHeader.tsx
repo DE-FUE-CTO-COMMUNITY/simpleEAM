@@ -45,7 +45,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
           <MenuIcon />
         </IconButton>
         <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-          Simple EAM
+          Simple Enterprise Architecture Management
         </Typography>
         <ThemeToggleButton />
         {authenticated && <UserProfileMenu userName={userName} />}

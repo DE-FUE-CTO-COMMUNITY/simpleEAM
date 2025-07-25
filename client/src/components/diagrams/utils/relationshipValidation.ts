@@ -24,13 +24,27 @@ export interface RelationshipDefinition {
 // Alle gültigen Beziehungen basierend auf dem GraphQL Schema
 // Nur OUT-Beziehungen, da IN-Beziehungen die Umkehrung sind
 export const VALID_RELATIONSHIPS: RelationshipDefinition[] = [
-  // BusinessCapability Beziehungen
+  // Business Capability Beziehungen
   {
     type: 'RELATED_TO',
     direction: 'OUT',
     sourceType: 'businessCapability',
     targetType: 'dataObject',
     fieldName: 'relatedDataObjects',
+  },
+  {
+    type: 'SUPPORTS',
+    direction: 'IN', // umgekehrte Richtung: BusinessCapability → Application
+    sourceType: 'businessCapability',
+    targetType: 'application',
+    fieldName: 'supportedByApplications',
+  },
+  {
+    type: 'HAS_PARENT',
+    direction: 'OUT',
+    sourceType: 'businessCapability',
+    targetType: 'businessCapability',
+    fieldName: 'parents',
   },
 
   // Application Beziehungen
@@ -69,6 +83,20 @@ export const VALID_RELATIONSHIPS: RelationshipDefinition[] = [
     targetType: 'infrastructure',
     fieldName: 'hostedOn',
   },
+  {
+    type: 'HAS_PARENT_APPLICATION',
+    direction: 'OUT',
+    sourceType: 'application',
+    targetType: 'application',
+    fieldName: 'parents',
+  },
+  {
+    type: 'SUCCESSOR_OF',
+    direction: 'OUT',
+    sourceType: 'application',
+    targetType: 'application',
+    fieldName: 'predecessors',
+  },
 
   // ApplicationInterface Beziehungen
   {
@@ -77,6 +105,22 @@ export const VALID_RELATIONSHIPS: RelationshipDefinition[] = [
     sourceType: 'applicationInterface',
     targetType: 'dataObject',
     fieldName: 'dataObjects',
+  },
+  {
+    type: 'SUCCESSOR_OF_INTERFACE',
+    direction: 'OUT',
+    sourceType: 'applicationInterface',
+    targetType: 'applicationInterface',
+    fieldName: 'predecessors',
+  },
+
+  // Infrastructure Beziehungen
+  {
+    type: 'HAS_PARENT_INFRASTRUCTURE',
+    direction: 'OUT',
+    sourceType: 'infrastructure',
+    targetType: 'infrastructure',
+    fieldName: 'parentInfrastructure',
   },
 
   // DataObject Beziehungen (umgekehrte TRANSFERS Richtung)
@@ -195,6 +239,11 @@ export const getRelationshipDisplayName = (
       HOSTED_ON: 'gehostet auf',
       TRANSFERS: 'überträgt',
       RELATED_TO: 'bezieht sich auf',
+      HAS_PARENT: 'ist Unterkategorie von',
+      HAS_PARENT_APPLICATION: 'ist Komponente von',
+      SUCCESSOR_OF: 'ist Nachfolger von',
+      HAS_PARENT_INFRASTRUCTURE: 'ist Teil der Infrastruktur',
+      SUCCESSOR_OF_INTERFACE: 'ist Nachfolger der Schnittstelle',
     },
     en: {
       SUPPORTS: 'supports',
@@ -205,6 +254,11 @@ export const getRelationshipDisplayName = (
       HOSTED_ON: 'hosted on',
       TRANSFERS: 'transfers',
       RELATED_TO: 'relates to',
+      HAS_PARENT: 'is subcategory of',
+      HAS_PARENT_APPLICATION: 'is component of',
+      SUCCESSOR_OF: 'is successor of',
+      HAS_PARENT_INFRASTRUCTURE: 'is part of infrastructure',
+      SUCCESSOR_OF_INTERFACE: 'is successor of interface',
     },
   }
 
