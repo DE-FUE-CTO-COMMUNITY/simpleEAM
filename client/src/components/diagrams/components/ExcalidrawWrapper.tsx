@@ -1,9 +1,11 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { useLocale, useTranslations } from 'next-intl'
 import { ExcalidrawComponentProps } from '../types/DiagramTypes'
 import { useThemeMode } from '@/contexts/ThemeContext'
 import ExcalidrawLoading from './ExcalidrawLoading'
+import { useExcalidrawCollaboration } from '../hooks/useExcalidrawCollaboration'
+import { CollaborationDialog } from './CollaborationDialog'
 
 // Dynamischer Import von Excalidraw, um Server-Side-Rendering zu vermeiden
 const ExcalidrawWrapper = dynamic(
@@ -41,12 +43,61 @@ const ExcalidrawWrapper = dynamic(
       // Store the API reference for internal use
       const apiRef = React.useRef<any>(null)
 
+      // Collaboration state
+      const [isCollaborationDialogOpen, setIsCollaborationDialogOpen] = useState(false)
+
       // Hook für Theme-Modus (wird innerhalb der Komponente verwendet)
       const { mode: themeMode } = useThemeMode()
 
       // Hook für aktuelle Sprache
       const locale = useLocale()
       const t = useTranslations('diagrams')
+
+      // Collaboration Hook
+      const {
+        startCollaboration,
+        stopCollaboration,
+        isCollaborating,
+        collaborators,
+        roomId,
+        broadcastSceneUpdate,
+      } = useExcalidrawCollaboration({
+        excalidrawAPI: apiRef.current,
+        username: 'User', // TODO: Get from auth context
+        onCollaboratorJoin: collaborator => {
+          console.log('Collaborator joined:', collaborator)
+        },
+        onCollaboratorLeave: collaborator => {
+          console.log('Collaborator left:', collaborator)
+        },
+      })
+
+      // Check URL for room parameter on component mount
+      useEffect(() => {
+        if (typeof window !== 'undefined') {
+          const urlParams = new URLSearchParams(window.location.search)
+          const roomParam = urlParams.get('room')
+          if (roomParam && !isCollaborating) {
+            startCollaboration(roomParam)
+          }
+        }
+      }, [startCollaboration, isCollaborating])
+
+      // Enhanced onChange handler to broadcast changes during collaboration
+      const handleChange = React.useCallback(
+        (elements: any[], appState: any) => {
+          // Call original onChange handler
+          if (onChange) {
+            onChange(elements, appState)
+          }
+
+          // Broadcast changes if collaborating - use the function directly from the hook
+          if (isCollaborating && broadcastSceneUpdate) {
+            broadcastSceneUpdate(elements, appState)
+          }
+        },
+        [onChange, isCollaborating, broadcastSceneUpdate]
+      )
 
       // Konvertiere locale zu Excalidraw langCode Format
       const excalidrawLangCode = useMemo(() => {
@@ -145,7 +196,7 @@ const ExcalidrawWrapper = dynamic(
                 excalidrawAPI(api)
               }
             }}
-            onChange={onChange}
+            onChange={handleChange}
             viewModeEnabled={viewModeEnabled}
           >
             <MainMenuTyped>
@@ -280,6 +331,19 @@ const ExcalidrawWrapper = dynamic(
                 {t('actions.findOnCanvas')}
               </MainMenuTyped.Item>
 
+              {/* Live Collaboration Menu Item - available for all users */}
+              <MainMenuTyped.Item
+                onSelect={() => setIsCollaborationDialogOpen(true)}
+                icon={
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M16,4C18.21,4 20,5.79 20,8C20,10.21 18.21,12 16,12C13.79,12 12,10.21 12,8C12,5.79 13.79,4 16,4M16,14C18.67,14 24,15.33 24,18V20H8V18C8,15.33 13.33,14 16,14M8,12C10.21,12 12,10.21 12,8C12,5.79 10.21,4 8,4C5.79,4 4,5.79 4,8C4,10.21 5.79,12 8,12M8,14C5.33,14 0,15.33 0,18V20H8V18C8,16.9 8.63,15.72 9.69,14.81C9.08,14.61 8.42,14.5 8,14Z" />
+                  </svg>
+                }
+                shortcut="Ctrl+L"
+              >
+                {isCollaborating ? 'Live Collaboration (Aktiv)' : 'Live Collaboration'}
+              </MainMenuTyped.Item>
+
               {/* Separator */}
               <MainMenuTyped.Separator />
 
@@ -342,6 +406,17 @@ const ExcalidrawWrapper = dynamic(
               </MainMenuTyped.Item>
             </MainMenuTyped>
           </ExcalidrawTyped>
+
+          {/* Collaboration Dialog */}
+          <CollaborationDialog
+            isOpen={isCollaborationDialogOpen}
+            onClose={() => setIsCollaborationDialogOpen(false)}
+            isCollaborating={isCollaborating}
+            roomId={roomId}
+            collaborators={collaborators}
+            onStartCollaboration={startCollaboration}
+            onStopCollaboration={stopCollaboration}
+          />
         </div>
       )
     }
