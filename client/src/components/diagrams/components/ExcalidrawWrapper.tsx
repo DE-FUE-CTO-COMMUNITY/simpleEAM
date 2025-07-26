@@ -37,6 +37,7 @@ const ExcalidrawWrapper = dynamic(
       viewModeEnabled,
       currentDiagram,
       onDiagramUpdate,
+      onCollaborationStatusChange,
     }: ExcalidrawComponentProps) => {
       const ExcalidrawTyped = Excalidraw as any
       const MainMenuTyped = MainMenu as any
@@ -85,6 +86,13 @@ const ExcalidrawWrapper = dynamic(
           }
         }
       }, [startCollaboration, isCollaborating])
+
+      // Notify parent component when collaboration status changes
+      useEffect(() => {
+        if (onCollaborationStatusChange) {
+          onCollaborationStatusChange(isCollaborating)
+        }
+      }, [isCollaborating, onCollaborationStatusChange])
 
       // Enhanced onChange handler to broadcast changes during collaboration
       const handleChange = React.useCallback(

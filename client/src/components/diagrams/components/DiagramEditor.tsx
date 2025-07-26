@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useRef, useCallback, useMemo, useEffect } from 'react'
+import React, { useRef, useCallback, useMemo, useEffect, useState } from 'react'
 import { Box, Alert, Snackbar } from '@mui/material'
 import { useApolloClient } from '@apollo/client'
 import { useTranslations } from 'next-intl'
@@ -23,6 +23,9 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const apolloClient = useApolloClient()
   const t = useTranslations('diagrams')
+
+  // Collaboration status state
+  const [isCollaborating, setIsCollaborating] = useState(false)
 
   // Custom hooks for state management
   const {
@@ -223,13 +226,21 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
   }
 
   // Handle diagram metadata updates from collaboration
-  const handleCollaborationDiagramUpdate = useCallback((diagram: any) => {
-    console.log('Received diagram metadata update from collaboration:', diagram)
-    if (diagram && diagram.id && diagram.title) {
-      setCurrentDiagram(diagram)
-      console.log('Updated current diagram metadata to:', diagram.title)
-    }
-  }, [setCurrentDiagram])
+  const handleCollaborationDiagramUpdate = useCallback(
+    (diagram: any) => {
+      console.log('Received diagram metadata update from collaboration:', diagram)
+      if (diagram && diagram.id && diagram.title) {
+        setCurrentDiagram(diagram)
+        console.log('Updated current diagram metadata to:', diagram.title)
+      }
+    },
+    [setCurrentDiagram]
+  )
+
+  // Handle collaboration status changes
+  const handleCollaborationStatusChange = useCallback((collaborating: boolean) => {
+    setIsCollaborating(collaborating)
+  }, [])
 
   // Create dynamic initialData that includes viewport state
   const initialData = useMemo(() => {
@@ -429,6 +440,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
           currentDiagram={currentDiagram}
           hasUnsavedChanges={hasUnsavedChanges}
           onSaveClick={() => updateDialogState('saveDialogOpen', true)}
+          isCollaborating={isCollaborating}
         />
 
         <ExcalidrawWrapper
@@ -452,6 +464,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
           viewModeEnabled={isViewer()}
           currentDiagram={currentDiagram}
           onDiagramUpdate={handleCollaborationDiagramUpdate}
+          onCollaborationStatusChange={handleCollaborationStatusChange}
         />
 
         {/* Integrated Library Component - only for non-viewer users */}

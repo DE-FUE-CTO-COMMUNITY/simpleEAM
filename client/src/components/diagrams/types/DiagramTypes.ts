@@ -23,6 +23,7 @@ export interface ExcalidrawComponentProps {
   viewModeEnabled?: boolean
   currentDiagram?: any
   onDiagramUpdate?: (diagram: any) => void
+  onCollaborationStatusChange?: (isCollaborating: boolean) => void
 }
 
 export interface NotificationState {

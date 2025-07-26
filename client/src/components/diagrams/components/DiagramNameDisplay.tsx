@@ -1,22 +1,20 @@
 import React from 'react'
 import { Box, Chip } from '@mui/material'
 import { styled } from '@mui/material/styles'
+import { Groups } from '@mui/icons-material'
 
 interface DiagramNameDisplayProps {
   currentDiagram: any
   hasUnsavedChanges?: boolean
   onSaveClick?: () => void
+  isCollaborating?: boolean
 }
 
-// Basis-Styling für den Chip ohne responsive Werte
-const DiagramNameChip = styled(Chip, {
-  shouldForwardProp: prop => prop !== 'hasUnsavedChanges',
-})<{ hasUnsavedChanges?: boolean }>(({ theme, hasUnsavedChanges }) => ({
-  backgroundColor: hasUnsavedChanges ? 'rgba(244, 67, 54, 0.15)' : theme.palette.background.paper,
-  color: hasUnsavedChanges ? '#d32f2f' : theme.palette.text.primary,
-  border: hasUnsavedChanges
-    ? '1px solid rgba(244, 67, 54, 0.15)'
-    : `1px solid ${theme.palette.divider}`,
+// Basis-Styling für den Chip - hasUnsavedChanges Funktionalität deaktiviert
+const DiagramNameChip = styled(Chip)(({ theme }) => ({
+  backgroundColor: theme.palette.background.paper,
+  color: theme.palette.text.primary,
+  border: `1px solid ${theme.palette.divider}`,
   borderRadius: '4px',
   fontWeight: 500,
   boxShadow: '0 1px 4px rgba(0, 0, 0, 0.15)',
@@ -25,35 +23,37 @@ const DiagramNameChip = styled(Chip, {
     overflow: 'hidden',
     whiteSpace: 'nowrap',
     fontFamily: 'Assistant, system-ui, sans-serif',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
   },
   '&:hover': {
-    backgroundColor: hasUnsavedChanges
-      ? 'rgba(244, 67, 54, 0.25)'
-      : theme.palette.mode === 'dark'
-        ? theme.palette.grey[700]
-        : theme.palette.grey[100],
-    border: hasUnsavedChanges
-      ? '1px solid rgba(244, 67, 54, 0.25)'
-      : `1px solid ${theme.palette.divider}`,
-    boxShadow: hasUnsavedChanges ? '0 2px 6px rgba(0, 0, 0, 0.2)' : '0 1px 4px rgba(0, 0, 0, 0.15)',
-    cursor: hasUnsavedChanges ? 'pointer' : 'default',
+    backgroundColor:
+      theme.palette.mode === 'dark' ? theme.palette.grey[700] : theme.palette.grey[100],
+    border: `1px solid ${theme.palette.divider}`,
+    boxShadow: '0 1px 4px rgba(0, 0, 0, 0.15)',
+    cursor: 'default',
   },
   transition: 'all 0.2s ease-in-out',
 }))
 
 const DiagramNameDisplay: React.FC<DiagramNameDisplayProps> = ({
   currentDiagram,
-  hasUnsavedChanges = false,
-  onSaveClick,
+  hasUnsavedChanges: _hasUnsavedChanges = false, // Parameter beibehalten für Kompatibilität, aber nicht verwenden
+  onSaveClick: _onSaveClick, // Parameter beibehalten für Kompatibilität, aber nicht verwenden
+  isCollaborating = false,
 }) => {
   const displayName = currentDiagram?.title || 'Unbenanntes Diagramm'
 
-  const handleClick = () => {
-    // Only handle click if there are unsaved changes and onSaveClick is provided
-    if (hasUnsavedChanges && onSaveClick) {
-      onSaveClick()
-    }
-  }
+  // Icon und Label zusammensetzen
+  const chipLabel = isCollaborating ? (
+    <>
+      <Groups sx={{ fontSize: '1rem' }} />
+      {displayName}
+    </>
+  ) : (
+    displayName
+  )
 
   return (
     <Box
@@ -68,12 +68,9 @@ const DiagramNameDisplay: React.FC<DiagramNameDisplayProps> = ({
       }}
     >
       <DiagramNameChip
-        label={displayName}
-        hasUnsavedChanges={hasUnsavedChanges}
+        label={chipLabel}
         variant="outlined"
-        title={displayName}
-        onClick={handleClick}
-        clickable={hasUnsavedChanges}
+        title={isCollaborating ? `${displayName} (Live Collaboration aktiv)` : displayName}
         sx={{
           // Responsive sizing using MUI System
           height: 40, // Fixed height for the chip

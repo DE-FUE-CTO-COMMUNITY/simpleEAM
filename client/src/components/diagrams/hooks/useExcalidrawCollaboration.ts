@@ -67,8 +67,8 @@ interface UseExcalidrawCollaborationProps {
   userAvatarUrl?: string
   onCollaboratorJoin?: (collaborator: Collaborator) => void
   onCollaboratorLeave?: (collaborator: Collaborator) => void
-  currentDiagram?: any  // Add current diagram data for sharing
-  onDiagramUpdate?: (diagram: any) => void  // Callback when diagram metadata is received
+  currentDiagram?: any // Add current diagram data for sharing
+  onDiagramUpdate?: (diagram: any) => void // Callback when diagram metadata is received
 }
 
 export const useExcalidrawCollaboration = ({
@@ -210,12 +210,14 @@ export const useExcalidrawCollaboration = ({
                     scrollY: currentAppState.scrollY,
                     zoom: currentAppState.zoom,
                   },
-                  diagram: currentDiagram ? {
-                    id: currentDiagram.id,
-                    title: currentDiagram.title,
-                    // Include other relevant diagram metadata
-                    ...currentDiagram
-                  } : null,
+                  diagram: currentDiagram
+                    ? {
+                        id: currentDiagram.id,
+                        title: currentDiagram.title,
+                        // Include other relevant diagram metadata
+                        ...currentDiagram,
+                      }
+                    : null,
                 }
 
                 // Convert to ArrayBuffer for compatibility with excalidraw-room server
@@ -313,7 +315,7 @@ export const useExcalidrawCollaboration = ({
 
               // Restore the broadcast function after a short delay
               setTimeout(() => {
-                (excalidrawAPI as any).broadcastSceneUpdate = originalBroadcast
+                ;(excalidrawAPI as any).broadcastSceneUpdate = originalBroadcast
                 isReceivingUpdateRef.current = false
               }, 50)
             } else {
@@ -387,12 +389,14 @@ export const useExcalidrawCollaboration = ({
             scrollY: appState.scrollY,
             zoom: appState.zoom,
           },
-          diagram: currentDiagram ? {
-            id: currentDiagram.id,
-            title: currentDiagram.title,
-            // Include other relevant diagram metadata
-            ...currentDiagram
-          } : null,
+          diagram: currentDiagram
+            ? {
+                id: currentDiagram.id,
+                title: currentDiagram.title,
+                // Include other relevant diagram metadata
+                ...currentDiagram,
+              }
+            : null,
         }
 
         console.log('Preparing to broadcast scene data:', {
@@ -450,7 +454,7 @@ export const useExcalidrawCollaboration = ({
   useEffect(() => {
     if (excalidrawAPI && state.isCollaborating) {
       // Add the broadcast function to the API so it can be called from ExcalidrawWrapper
-      (excalidrawAPI as any).broadcastSceneUpdate = broadcastSceneUpdate
+      ;(excalidrawAPI as any).broadcastSceneUpdate = broadcastSceneUpdate
     }
   }, [excalidrawAPI, state.isCollaborating, broadcastSceneUpdate])
 
