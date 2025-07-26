@@ -36,6 +36,7 @@ const ExcalidrawWrapper = dynamic(
       initialData: _initialData, // Not used - scene updates happen via excalidrawAPI
       viewModeEnabled,
       currentDiagram,
+      onDiagramUpdate,
     }: ExcalidrawComponentProps) => {
       const ExcalidrawTyped = Excalidraw as any
       const MainMenuTyped = MainMenu as any
@@ -64,6 +65,8 @@ const ExcalidrawWrapper = dynamic(
       } = useExcalidrawCollaboration({
         excalidrawAPI: apiRef.current,
         username: 'User', // TODO: Get from auth context
+        currentDiagram,
+        onDiagramUpdate,
         onCollaboratorJoin: collaborator => {
           console.log('Collaborator joined:', collaborator)
         },

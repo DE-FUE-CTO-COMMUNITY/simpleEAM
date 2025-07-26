@@ -222,6 +222,15 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     })
   }
 
+  // Handle diagram metadata updates from collaboration
+  const handleCollaborationDiagramUpdate = useCallback((diagram: any) => {
+    console.log('Received diagram metadata update from collaboration:', diagram)
+    if (diagram && diagram.id && diagram.title) {
+      setCurrentDiagram(diagram)
+      console.log('Updated current diagram metadata to:', diagram.title)
+    }
+  }, [setCurrentDiagram])
+
   // Create dynamic initialData that includes viewport state
   const initialData = useMemo(() => {
     // Load viewport state from storage
@@ -442,6 +451,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
           initialData={initialData}
           viewModeEnabled={isViewer()}
           currentDiagram={currentDiagram}
+          onDiagramUpdate={handleCollaborationDiagramUpdate}
         />
 
         {/* Integrated Library Component - only for non-viewer users */}

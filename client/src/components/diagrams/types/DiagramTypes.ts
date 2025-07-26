@@ -22,6 +22,7 @@ export interface ExcalidrawComponentProps {
   initialData: any
   viewModeEnabled?: boolean
   currentDiagram?: any
+  onDiagramUpdate?: (diagram: any) => void
 }
 
 export interface NotificationState {
