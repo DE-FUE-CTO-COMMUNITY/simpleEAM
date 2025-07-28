@@ -2,6 +2,7 @@ services:
   # Neo4j-Datenbank
   neo4j:
     image: neo4j:5.26
+    restart: unless-stopped
     ports:
       - '${NEO4J_EXTERNAL_PORT}:${NEO4J_PORT}' # HTTP
       - '${NEO4J_EXTERNAL_BOLT_PORT}:${NEO4J_BOLT_PORT}' # Bolt (externer Port auf 7688 geändert, um Konflikt zu vermeiden)
@@ -33,6 +34,7 @@ services:
     build:
       context: .
       dockerfile: server/Dockerfile
+    restart: unless-stopped
     ports:
       - '${GRAPHQL_EXTERNAL_PORT}:${GRAPHQL_INTERNAL_PORT}'
     depends_on:
@@ -67,6 +69,7 @@ services:
   # Keycloak für Authentifizierung
   keycloak:
     image: quay.io/keycloak/keycloak:23.0
+    restart: unless-stopped
     environment:
       - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN}
       - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
@@ -102,6 +105,7 @@ services:
   # Keycloak-Datenbank
   keycloak-db:
     image: postgres:15
+    restart: unless-stopped
     volumes:
       - ./auth/data:/var/lib/postgresql/data
     environment:
@@ -114,6 +118,7 @@ services:
   # Excalidraw Collaboration Room Server
   excalidraw-room:
     image: excalidraw/excalidraw-room:sha-03ff435
+    restart: unless-stopped
     networks:
       - eam-network
       - ${TRAEFIK_NETWORK}
@@ -132,6 +137,7 @@ services:
     build:
       context: .
       dockerfile: client/Dockerfile
+    restart: unless-stopped
 
     depends_on:
       - server
