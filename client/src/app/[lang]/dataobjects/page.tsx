@@ -14,7 +14,9 @@ import {
   UPDATE_DATA_OBJECT,
   DELETE_DATA_OBJECT,
 } from '@/graphql/dataObject'
-import DataObjectTable from '@/components/dataobjects/DataObjectTable'
+import DataObjectTable, {
+  DATAOBJECT_DEFAULT_COLUMN_VISIBILITY,
+} from '@/components/dataobjects/DataObjectTable'
 import DataObjectToolbar from '@/components/dataobjects/DataObjectToolbar'
 import DataObjectFilterDialog from '@/components/dataobjects/DataObjectFilterDialog'
 import DataObjectForm, { DataObjectFormValues } from '@/components/dataobjects/DataObjectForm'
@@ -487,6 +489,7 @@ const DataObjectsPage = () => {
           onResetFilters={handleResetFilters}
           table={tableInstance}
           enableColumnVisibilityToggle={true}
+          defaultColumnVisibility={DATAOBJECT_DEFAULT_COLUMN_VISIBILITY}
         />
 
         <Paper sx={{ overflow: 'hidden' }}>

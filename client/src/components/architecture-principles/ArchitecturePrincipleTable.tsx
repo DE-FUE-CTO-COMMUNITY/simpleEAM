@@ -14,6 +14,23 @@ import ArchitecturePrincipleForm, {
 } from './ArchitecturePrincipleForm'
 import usePersistentColumnVisibility from '../../hooks/usePersistentColumnVisibility'
 
+// Exportierte Default Column Visibility für ArchitecturePrinciple
+export const ARCHITECTURE_PRINCIPLE_DEFAULT_COLUMN_VISIBILITY = {
+  // Standardmäßig sichtbare Spalten
+  name: true,
+  category: true,
+  priority: true,
+  isActive: true,
+  owners: true,
+  // Standardmäßig versteckte Spalten
+  description: false,
+  appliedInArchitectures: false,
+  implementedByApplications: false,
+  tags: false,
+  createdAt: false,
+  updatedAt: false,
+}
+
 interface ArchitecturePrincipleTableProps {
   id?: string
   principles: ArchitecturePrincipleType[]
@@ -62,21 +79,7 @@ const ArchitecturePrincipleTable: React.FC<ArchitecturePrincipleTableProps> = ({
     // resetColumnVisibility wird für zukünftige Reset-Funktionalität benötigt
   } = usePersistentColumnVisibility({
     tableKey: 'architecture-principles',
-    defaultColumnVisibility: {
-      // Standardmäßig sichtbare Spalten
-      name: true,
-      category: true,
-      priority: true,
-      isActive: true,
-      owners: true,
-      // Standardmäßig versteckte Spalten
-      description: false,
-      appliedInArchitectures: false,
-      implementedByApplications: false,
-      tags: false,
-      createdAt: false,
-      updatedAt: false,
-    },
+    defaultColumnVisibility: ARCHITECTURE_PRINCIPLE_DEFAULT_COLUMN_VISIBILITY,
   })
 
   // Kombiniere externe und persistente onTableReady Callbacks

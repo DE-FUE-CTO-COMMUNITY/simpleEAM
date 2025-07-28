@@ -18,7 +18,9 @@ import { CapabilityStatus, BusinessCapability } from '@/gql/generated'
 import CapabilityForm, { CapabilityFormValues } from '@/components/capabilities/CapabilityForm'
 
 // Importiere die ausgelagerten Komponenten
-import CapabilityTable from '@/components/capabilities/CapabilityTable'
+import CapabilityTable, {
+  CAPABILITY_DEFAULT_COLUMN_VISIBILITY,
+} from '@/components/capabilities/CapabilityTable'
 import CapabilityToolbar from '@/components/capabilities/CapabilityToolbar'
 import CapabilityFilterDialog from '@/components/capabilities/CapabilityFilterDialog'
 import { useCapabilityFilter } from '@/components/capabilities/useCapabilityFilter'
@@ -417,6 +419,7 @@ const CapabilitiesPage = () => {
           onResetFilters={handleResetFilter}
           table={tableInstance}
           enableColumnVisibilityToggle={true}
+          defaultColumnVisibility={CAPABILITY_DEFAULT_COLUMN_VISIBILITY}
         />
 
         <Paper sx={{ overflow: 'hidden' }}>

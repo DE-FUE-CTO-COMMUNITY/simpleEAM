@@ -14,6 +14,7 @@ interface InfrastructureToolbarProps {
   onCreateClick?: () => void
   table?: Table<any>
   enableColumnVisibilityToggle?: boolean
+  defaultColumnVisibility?: Record<string, boolean>
 }
 
 /**
@@ -22,6 +23,7 @@ interface InfrastructureToolbarProps {
 const InfrastructureToolbar: React.FC<InfrastructureToolbarProps> = ({
   table,
   enableColumnVisibilityToggle = true,
+  defaultColumnVisibility,
   ...props
 }) => {
   const t = useTranslations('infrastructure')
@@ -34,6 +36,7 @@ const InfrastructureToolbar: React.FC<InfrastructureToolbarProps> = ({
       table={table}
       enableColumnVisibilityToggle={enableColumnVisibilityToggle}
       tableKey="infrastructure" // Eindeutiger Schlüssel für die Infrastructure-Tabelle
+      defaultColumnVisibility={defaultColumnVisibility}
     />
   )
 }

@@ -15,6 +15,27 @@ import { useDomainLabel, useTypeLabel, useFormatDate } from './utils'
 import ArchitectureForm, { ArchitectureFormValues } from './ArchitectureForm'
 import usePersistentColumnVisibility from '../../hooks/usePersistentColumnVisibility'
 
+// Exportierte Default Column Visibility für Architecture
+export const ARCHITECTURE_DEFAULT_COLUMN_VISIBILITY = {
+  // Standardmäßig sichtbare Spalten
+  name: true,
+  domain: true,
+  type: true,
+  timestamp: true,
+  owners: true,
+  tags: true,
+  // Standardmäßig versteckte Spalten
+  description: false,
+  containsCapabilities: false,
+  containsApplications: false,
+  containsDataObjects: false,
+  containsInterfaces: false,
+  containsInfrastructure: false,
+  appliedPrinciples: false,
+  createdAt: false,
+  updatedAt: false,
+}
+
 interface ArchitectureTableProps {
   id?: string
   architectures: ArchitectureType[]
@@ -61,25 +82,7 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
     onColumnVisibilityChange,
   } = usePersistentColumnVisibility({
     tableKey: 'architectures',
-    defaultColumnVisibility: {
-      // Standardmäßig sichtbare Spalten
-      name: true,
-      domain: true,
-      type: true,
-      timestamp: true,
-      owners: true,
-      tags: true,
-      // Standardmäßig versteckte Spalten
-      description: false,
-      containsCapabilities: false,
-      containsApplications: false,
-      containsDataObjects: false,
-      containsInterfaces: false,
-      containsInfrastructure: false,
-      appliedPrinciples: false,
-      createdAt: false,
-      updatedAt: false,
-    },
+    defaultColumnVisibility: ARCHITECTURE_DEFAULT_COLUMN_VISIBILITY,
   })
 
   // Kombiniere externe und persistente onTableReady Callbacks

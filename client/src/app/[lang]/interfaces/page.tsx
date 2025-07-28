@@ -22,7 +22,9 @@ import ApplicationInterfaceForm, {
 } from '@/components/interfaces/ApplicationInterfaceForm'
 
 // Importiere die ausgelagerten Komponenten
-import ApplicationInterfaceTable from '@/components/interfaces/ApplicationInterfaceTable'
+import ApplicationInterfaceTable, {
+  APPLICATION_INTERFACE_DEFAULT_COLUMN_VISIBILITY,
+} from '@/components/interfaces/ApplicationInterfaceTable'
 import ApplicationInterfaceToolbar from '@/components/interfaces/ApplicationInterfaceToolbar'
 import ApplicationInterfaceFilterDialog from '@/components/interfaces/ApplicationInterfaceFilterDialog'
 import { useApplicationInterfaceFilter } from '@/components/interfaces/useApplicationInterfaceFilter'
@@ -392,6 +394,7 @@ function ApplicationInterfacesPage() {
           onResetFilters={handleResetFilter}
           table={tableInstance}
           enableColumnVisibilityToggle={true}
+          defaultColumnVisibility={APPLICATION_INTERFACE_DEFAULT_COLUMN_VISIBILITY}
         />
 
         <Paper sx={{ overflow: 'hidden' }}>

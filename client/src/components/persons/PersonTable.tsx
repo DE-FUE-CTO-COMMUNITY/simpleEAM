@@ -9,6 +9,27 @@ import { SortingState, VisibilityState } from '@tanstack/react-table'
 import usePersistentColumnVisibility from '../../hooks/usePersistentColumnVisibility'
 import { formatDate } from './utils'
 
+// Exportierte Default Column Visibility für Person
+export const PERSON_DEFAULT_COLUMN_VISIBILITY = {
+  // Standardmäßig sichtbare Spalten
+  firstName: true,
+  lastName: true,
+  email: true,
+  department: true,
+  role: true,
+  phone: true,
+  // Standardmäßig versteckte Spalten
+  ownedCapabilities: false,
+  ownedApplications: false,
+  ownedDataObjects: false,
+  ownedArchitectures: false,
+  ownedDiagrams: false,
+  ownedInfrastructure: false,
+  responsibleForInterfaces: false,
+  createdAt: false,
+  updatedAt: false,
+}
+
 interface PersonTableProps {
   id?: string
   persons: Person[]
@@ -52,25 +73,7 @@ const PersonTableWithGenericTable: React.FC<PersonTableProps> = ({
     onColumnVisibilityChange,
   } = usePersistentColumnVisibility({
     tableKey: 'persons',
-    defaultColumnVisibility: {
-      // Standardmäßig sichtbare Spalten
-      firstName: true,
-      lastName: true,
-      email: true,
-      department: true,
-      role: true,
-      phone: true,
-      // Standardmäßig versteckte Spalten
-      ownedCapabilities: false,
-      ownedApplications: false,
-      ownedDataObjects: false,
-      ownedArchitectures: false,
-      ownedDiagrams: false,
-      ownedInfrastructure: false,
-      responsibleForInterfaces: false,
-      createdAt: false,
-      updatedAt: false,
-    },
+    defaultColumnVisibility: PERSON_DEFAULT_COLUMN_VISIBILITY,
   })
 
   // Kombiniere externe und persistente onTableReady Callbacks

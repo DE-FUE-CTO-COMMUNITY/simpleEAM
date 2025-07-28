@@ -13,6 +13,7 @@ interface CapabilityToolbarWithGenericProps {
   onResetFilters: () => void
   table?: Table<any>
   enableColumnVisibilityToggle?: boolean
+  defaultColumnVisibility?: Record<string, boolean>
 }
 
 /**
@@ -21,6 +22,7 @@ interface CapabilityToolbarWithGenericProps {
 const CapabilityToolbarWithGeneric: React.FC<CapabilityToolbarWithGenericProps> = ({
   table,
   enableColumnVisibilityToggle = true,
+  defaultColumnVisibility,
   ...props
 }) => {
   const t = useTranslations('capabilities')
@@ -33,6 +35,7 @@ const CapabilityToolbarWithGeneric: React.FC<CapabilityToolbarWithGenericProps> 
       table={table}
       enableColumnVisibilityToggle={enableColumnVisibilityToggle}
       tableKey="capabilities" // Eindeutiger Schlüssel für die Capabilities-Tabelle
+      defaultColumnVisibility={defaultColumnVisibility}
     />
   )
 }

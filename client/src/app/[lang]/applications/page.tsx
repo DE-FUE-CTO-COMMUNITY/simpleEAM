@@ -25,7 +25,9 @@ import {
 import ApplicationForm, { ApplicationFormValues } from '@/components/applications/ApplicationForm'
 
 // Importiere die ausgelagerten Komponenten
-import ApplicationTable from '@/components/applications/ApplicationTable'
+import ApplicationTable, {
+  APPLICATION_DEFAULT_COLUMN_VISIBILITY,
+} from '@/components/applications/ApplicationTable'
 import ApplicationToolbar from '@/components/applications/ApplicationToolbar'
 import ApplicationFilterDialog from '@/components/applications/ApplicationFilterDialog'
 import { useApplicationFilter } from '@/components/applications/useApplicationFilter'
@@ -702,7 +704,7 @@ const ApplicationsPage = () => {
           onResetFilters={handleResetFilter}
           table={tableInstance}
           enableColumnVisibilityToggle={true}
-          onResetColumnVisibility={resetColumnVisibility}
+          defaultColumnVisibility={APPLICATION_DEFAULT_COLUMN_VISIBILITY}
         />
 
         <Paper sx={{ overflow: 'hidden' }}>

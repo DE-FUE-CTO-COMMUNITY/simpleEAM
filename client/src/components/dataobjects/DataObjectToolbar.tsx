@@ -14,6 +14,7 @@ interface DataObjectToolbarProps {
   onCreateClick?: () => void
   table?: Table<any>
   enableColumnVisibilityToggle?: boolean
+  defaultColumnVisibility?: Record<string, boolean>
 }
 
 /**
@@ -22,6 +23,7 @@ interface DataObjectToolbarProps {
 const DataObjectToolbar: React.FC<DataObjectToolbarProps> = ({
   table,
   enableColumnVisibilityToggle = true,
+  defaultColumnVisibility,
   ...props
 }) => {
   const t = useTranslations('dataObjects')
@@ -34,6 +36,7 @@ const DataObjectToolbar: React.FC<DataObjectToolbarProps> = ({
       table={table}
       enableColumnVisibilityToggle={enableColumnVisibilityToggle}
       tableKey="dataobjects" // Eindeutiger Schlüssel für die DataObjects-Tabelle
+      defaultColumnVisibility={defaultColumnVisibility}
     />
   )
 }

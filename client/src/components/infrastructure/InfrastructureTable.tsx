@@ -10,6 +10,38 @@ import { createColumnHelper } from '@tanstack/react-table'
 import { SortingState, VisibilityState } from '@tanstack/react-table'
 import usePersistentColumnVisibility from '../../hooks/usePersistentColumnVisibility'
 
+// Exportierte Default Column Visibility für Infrastructure
+export const INFRASTRUCTURE_DEFAULT_COLUMN_VISIBILITY = {
+  // Standardmäßig sichtbare Spalten
+  name: true,
+  infrastructureType: true,
+  status: true,
+  location: true,
+  owners: true,
+  // Standardmäßig versteckte Spalten
+  id: false,
+  description: false,
+  vendor: false,
+  version: false,
+  capacity: false,
+  ipAddress: false,
+  operatingSystem: false,
+  specifications: false,
+  maintenanceWindow: false,
+  costs: false,
+  planningDate: false,
+  introductionDate: false,
+  endOfUseDate: false,
+  endOfLifeDate: false,
+  parentInfrastructure: false,
+  childInfrastructures: false,
+  hostsApplications: false,
+  partOfArchitectures: false,
+  depictedInDiagrams: false,
+  createdAt: false,
+  updatedAt: false,
+}
+
 interface InfrastructureTableProps {
   id?: string
   infrastructures: Infrastructure[]
@@ -88,36 +120,7 @@ const InfrastructureTable: React.FC<InfrastructureTableProps> = ({
     // resetColumnVisibility wird für zukünftige Reset-Funktionalität benötigt
   } = usePersistentColumnVisibility({
     tableKey: 'infrastructure', // Korrigiert: stimmt jetzt mit InfrastructureToolbar überein
-    defaultColumnVisibility: {
-      // Standardmäßig sichtbare Spalten
-      name: true,
-      infrastructureType: true,
-      status: true,
-      location: true,
-      owners: true,
-      // Standardmäßig versteckte Spalten
-      id: false,
-      description: false,
-      vendor: false,
-      version: false,
-      capacity: false,
-      ipAddress: false,
-      operatingSystem: false,
-      specifications: false,
-      maintenanceWindow: false,
-      costs: false,
-      planningDate: false,
-      introductionDate: false,
-      endOfUseDate: false,
-      endOfLifeDate: false,
-      parentInfrastructure: false,
-      childInfrastructures: false,
-      hostsApplications: false,
-      partOfArchitectures: false,
-      depictedInDiagrams: false,
-      createdAt: false,
-      updatedAt: false,
-    },
+    defaultColumnVisibility: INFRASTRUCTURE_DEFAULT_COLUMN_VISIBILITY,
   })
 
   // Kombiniere externe und persistente onTableReady Callbacks

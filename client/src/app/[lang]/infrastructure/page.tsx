@@ -14,7 +14,9 @@ import {
   UPDATE_INFRASTRUCTURE,
   DELETE_INFRASTRUCTURE,
 } from '@/graphql/infrastructure'
-import InfrastructureTable from '@/components/infrastructure/InfrastructureTable'
+import InfrastructureTable, {
+  INFRASTRUCTURE_DEFAULT_COLUMN_VISIBILITY,
+} from '@/components/infrastructure/InfrastructureTable'
 import InfrastructureToolbar from '@/components/infrastructure/InfrastructureToolbar'
 import InfrastructureFilterDialog from '@/components/infrastructure/InfrastructureFilterDialog'
 import InfrastructureForm, {
@@ -610,6 +612,7 @@ const InfrastructurePage = () => {
           onResetFilters={handleResetFilters}
           table={tableInstance}
           enableColumnVisibilityToggle={true}
+          defaultColumnVisibility={INFRASTRUCTURE_DEFAULT_COLUMN_VISIBILITY}
         />
 
         <Paper sx={{ overflow: 'hidden' }}>

@@ -12,7 +12,7 @@ import { GET_PERSONS, CREATE_PERSON, UPDATE_PERSON, DELETE_PERSON } from '@/grap
 import PersonForm, { PersonFormValues } from '@/components/persons/PersonForm'
 
 // Importiere die ausgelagerten Komponenten
-import PersonTable from '@/components/persons/PersonTable'
+import PersonTable, { PERSON_DEFAULT_COLUMN_VISIBILITY } from '@/components/persons/PersonTable'
 import PersonToolbar from '@/components/persons/PersonToolbar'
 import PersonFilterDialog from '@/components/persons/PersonFilterDialog'
 import { usePersonFilter } from '@/components/persons/usePersonFilter'
@@ -216,6 +216,7 @@ function PersonsPage() {
           onResetFilters={handleResetFilter}
           table={tableInstance}
           enableColumnVisibilityToggle={true}
+          defaultColumnVisibility={PERSON_DEFAULT_COLUMN_VISIBILITY}
         />
 
         <Paper sx={{ overflow: 'hidden' }}>

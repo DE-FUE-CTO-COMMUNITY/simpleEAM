@@ -14,6 +14,7 @@ interface ArchitectureToolbarProps {
   onAddClick?: () => void
   table?: Table<any>
   enableColumnVisibilityToggle?: boolean
+  defaultColumnVisibility?: Record<string, boolean>
 }
 
 /**
@@ -28,6 +29,7 @@ const ArchitectureToolbar: React.FC<ArchitectureToolbarProps> = ({
   onAddClick: _onAddClick,
   table,
   enableColumnVisibilityToggle,
+  defaultColumnVisibility,
 }) => {
   const tArch = useTranslations('architectures')
 
@@ -42,6 +44,7 @@ const ArchitectureToolbar: React.FC<ArchitectureToolbarProps> = ({
       table={table}
       enableColumnVisibilityToggle={enableColumnVisibilityToggle}
       tableKey="architectures" // Eindeutiger Schlüssel für die Architectures-Tabelle
+      defaultColumnVisibility={defaultColumnVisibility}
     />
   )
 }

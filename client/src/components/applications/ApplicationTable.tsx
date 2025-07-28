@@ -13,6 +13,41 @@ import { SortingState, VisibilityState } from '@tanstack/react-table'
 import usePersistentColumnVisibility from '../../hooks/usePersistentColumnVisibility'
 import { Application } from '../../gql/generated'
 
+// Exportierte Standard-Spaltenvisibilität für die Application-Tabelle
+export const APPLICATION_DEFAULT_COLUMN_VISIBILITY = {
+  // Standardmäßig sichtbare Spalten
+  name: true,
+  status: true,
+  criticality: true,
+  vendor: true,
+  version: true,
+  owners: true,
+  costs: true,
+  // Standardmäßig versteckte Spalten
+  id: false,
+  description: false,
+  timeCategory: false,
+  sevenRStrategy: false,
+  supportsCapabilities: false,
+  usesDataObjects: false,
+  hostingEnvironment: false,
+  technologyStack: false,
+  planningDate: false,
+  introductionDate: false,
+  endOfUseDate: false,
+  endOfLifeDate: false,
+  sourceOfInterfaces: false,
+  targetOfInterfaces: false,
+  partOfArchitectures: false,
+  implementsPrinciples: false,
+  depictedInDiagrams: false,
+  parents: false,
+  components: false,
+  hostedOn: false,
+  createdAt: false,
+  updatedAt: false,
+} as const
+
 interface ApplicationTableProps {
   id?: string
   applications: ApplicationType[]
@@ -63,39 +98,7 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
     // resetColumnVisibility wird für zukünftige Reset-Funktionalität benötigt
   } = usePersistentColumnVisibility({
     tableKey: 'applications',
-    defaultColumnVisibility: {
-      // Standardmäßig sichtbare Spalten
-      name: true,
-      status: true,
-      criticality: true,
-      vendor: true,
-      version: true,
-      owners: true,
-      costs: true,
-      // Standardmäßig versteckte Spalten
-      id: false,
-      description: false,
-      timeCategory: false,
-      sevenRStrategy: false,
-      supportsCapabilities: false,
-      usesDataObjects: false,
-      hostingEnvironment: false,
-      technologyStack: false,
-      planningDate: false,
-      introductionDate: false,
-      endOfUseDate: false,
-      endOfLifeDate: false,
-      sourceOfInterfaces: false,
-      targetOfInterfaces: false,
-      partOfArchitectures: false,
-      implementsPrinciples: false,
-      depictedInDiagrams: false,
-      parents: false,
-      components: false,
-      hostedOn: false,
-      createdAt: false,
-      updatedAt: false,
-    },
+    defaultColumnVisibility: APPLICATION_DEFAULT_COLUMN_VISIBILITY,
   })
 
   // Kombiniere externe und persistente onTableReady Callbacks

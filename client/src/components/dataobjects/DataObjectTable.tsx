@@ -11,6 +11,30 @@ import { createColumnHelper } from '@tanstack/react-table'
 import { SortingState, VisibilityState } from '@tanstack/react-table'
 import usePersistentColumnVisibility from '../../hooks/usePersistentColumnVisibility'
 
+// Exportierte Default Column Visibility für DataObject
+export const DATAOBJECT_DEFAULT_COLUMN_VISIBILITY = {
+  // Standardmäßig sichtbare Spalten
+  name: true,
+  classification: true,
+  format: true,
+  dataSources: true,
+  owners: true,
+  // Standardmäßig versteckte Spalten
+  id: false,
+  description: false,
+  planningDate: false,
+  introductionDate: false,
+  endOfUseDate: false,
+  endOfLifeDate: false,
+  usedByApplications: false,
+  relatedToCapabilities: false,
+  transferredInInterfaces: false,
+  partOfArchitectures: false,
+  depictedInDiagrams: false,
+  createdAt: false,
+  updatedAt: false,
+}
+
 interface DataObjectTableProps {
   id?: string
   dataObjects: DataObject[]
@@ -55,28 +79,7 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
     // resetColumnVisibility wird für zukünftige Reset-Funktionalität benötigt
   } = usePersistentColumnVisibility({
     tableKey: 'dataobjects', // Korrigiert: stimmt jetzt mit DataObjectToolbar überein
-    defaultColumnVisibility: {
-      // Standardmäßig sichtbare Spalten
-      name: true,
-      classification: true,
-      format: true,
-      dataSources: true,
-      owners: true,
-      // Standardmäßig versteckte Spalten
-      id: false,
-      description: false,
-      planningDate: false,
-      introductionDate: false,
-      endOfUseDate: false,
-      endOfLifeDate: false,
-      usedByApplications: false,
-      relatedToCapabilities: false,
-      transferredInInterfaces: false,
-      partOfArchitectures: false,
-      depictedInDiagrams: false,
-      createdAt: false,
-      updatedAt: false,
-    },
+    defaultColumnVisibility: DATAOBJECT_DEFAULT_COLUMN_VISIBILITY,
   })
 
   // Kombiniere externe und persistente onTableReady Callbacks

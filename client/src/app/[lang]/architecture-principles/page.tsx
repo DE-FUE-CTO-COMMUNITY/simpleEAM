@@ -20,7 +20,9 @@ import ArchitecturePrincipleForm, {
 } from '@/components/architecture-principles/ArchitecturePrincipleForm'
 
 // Importiere die ausgelagerten Komponenten
-import ArchitecturePrincipleTable from '@/components/architecture-principles/ArchitecturePrincipleTable'
+import ArchitecturePrincipleTable, {
+  ARCHITECTURE_PRINCIPLE_DEFAULT_COLUMN_VISIBILITY,
+} from '@/components/architecture-principles/ArchitecturePrincipleTable'
 import ArchitecturePrincipleToolbar from '@/components/architecture-principles/ArchitecturePrincipleToolbar'
 import ArchitecturePrincipleFilterDialog from '@/components/architecture-principles/ArchitecturePrincipleFilterDialog'
 import { useArchitecturePrincipleFilter } from '@/components/architecture-principles/useArchitecturePrincipleFilter'
@@ -199,7 +201,7 @@ const ArchitecturePrinciplesPage = () => {
           : {}),
       }
 
-      const result = await createPrincipleMutation({
+      await createPrincipleMutation({
         variables: { input: [input] },
       })
 
@@ -361,6 +363,7 @@ const ArchitecturePrinciplesPage = () => {
           onResetFilters={handleResetFilter}
           table={tableInstance}
           enableColumnVisibilityToggle={true}
+          defaultColumnVisibility={ARCHITECTURE_PRINCIPLE_DEFAULT_COLUMN_VISIBILITY}
         />
 
         {/* Tabelle der Architektur-Prinzipien */}

@@ -11,6 +11,31 @@ import { createColumnHelper } from '@tanstack/react-table'
 import { SortingState, VisibilityState } from '@tanstack/react-table'
 import usePersistentColumnVisibility from '../../hooks/usePersistentColumnVisibility'
 
+// Exportierte Standard-Spaltenvisibilität für die Capability-Tabelle
+export const CAPABILITY_DEFAULT_COLUMN_VISIBILITY = {
+  // Standardmäßig sichtbare Spalten
+  name: true,
+  description: true,
+  maturityLevel: true,
+  status: true,
+  businessValue: true,
+  owners: true,
+  tags: true,
+  // Standardmäßig versteckte Spalten
+  id: false,
+  type: false,
+  sequenceNumber: false,
+  introductionDate: false,
+  endDate: false,
+  parents: false,
+  children: false,
+  relatedDataObjects: false,
+  supportedByApplications: false,
+  partOfArchitectures: false,
+  createdAt: false,
+  updatedAt: false,
+} as const
+
 interface CapabilityTableProps {
   id?: string
   capabilities: BusinessCapability[]
@@ -62,29 +87,7 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
     // resetColumnVisibility wird für zukünftige Reset-Funktionalität benötigt
   } = usePersistentColumnVisibility({
     tableKey: 'capabilities',
-    defaultColumnVisibility: {
-      // Standardmäßig sichtbare Spalten
-      name: true,
-      description: true,
-      maturityLevel: true,
-      status: true,
-      businessValue: true,
-      owners: true,
-      tags: true,
-      // Standardmäßig versteckte Spalten
-      id: false,
-      type: false,
-      sequenceNumber: false,
-      introductionDate: false,
-      endDate: false,
-      parents: false,
-      children: false,
-      relatedDataObjects: false,
-      supportedByApplications: false,
-      partOfArchitectures: false,
-      createdAt: false,
-      updatedAt: false,
-    },
+    defaultColumnVisibility: CAPABILITY_DEFAULT_COLUMN_VISIBILITY,
   })
 
   // Kombiniere externe und persistente onTableReady Callbacks

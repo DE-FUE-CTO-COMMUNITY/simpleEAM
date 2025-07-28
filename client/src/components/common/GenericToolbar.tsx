@@ -116,6 +116,11 @@ export interface GenericToolbarProps {
    * Eindeutiger Schlüssel für die Tabelle (für persistente Speicherung)
    */
   tableKey?: string
+
+  /**
+   * Standard-Spaltenvisibilität für Reset-Funktionalität
+   */
+  defaultColumnVisibility?: Record<string, boolean>
 }
 
 /**
@@ -138,6 +143,7 @@ const GenericToolbar: React.FC<GenericToolbarProps> = ({
   columnVisibilityTooltip,
   entityName = 'Eintrag',
   tableKey,
+  defaultColumnVisibility,
 }) => {
   const t = useTranslations('common')
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
@@ -183,10 +189,19 @@ const GenericToolbar: React.FC<GenericToolbarProps> = ({
     }
   }
 
-  // Reset-Funktion - verwendet die bewährte clearTableSettings Funktion aus dem Admin-Bereich
+  // Reset-Funktion - verwendet die defaultColumnVisibility für elegantes Reset ohne Page Reload
   const handleResetColumnVisibility = () => {
-    if (tableKey) {
-      // Verwende die bewährte clearTableSettings Funktion aus dem Admin-Bereich
+    if (defaultColumnVisibility && table && tableKey) {
+      // Zuerst localStorage leeren, damit die persistente Speicherung zurückgesetzt wird
+      clearTableSettings(tableKey)
+
+      // Direkt den Table State aktualisieren mit der Default-Visibilität
+      table.setColumnVisibility(defaultColumnVisibility)
+
+      // Lokalen Zustand auch aktualisieren
+      setLocalVisibility(defaultColumnVisibility)
+    } else if (tableKey) {
+      // Fallback: Verwende die bewährte clearTableSettings Funktion aus dem Admin-Bereich
       clearTableSettings(tableKey)
 
       // Nach dem Löschen der localStorage-Einstellungen eine Seite neu laden,
@@ -317,7 +332,7 @@ const GenericToolbar: React.FC<GenericToolbarProps> = ({
                   <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>
                     {t('showColumns')}
                   </Typography>
-                  {tableKey && (
+                  {(defaultColumnVisibility || tableKey) && (
                     <Tooltip title={t('resetColumns')}>
                       <IconButton size="small" onClick={handleResetColumnVisibility} sx={{ ml: 1 }}>
                         <RestartAltIcon fontSize="small" />

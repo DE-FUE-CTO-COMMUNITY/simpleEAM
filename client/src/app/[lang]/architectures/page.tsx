@@ -20,7 +20,9 @@ import ArchitectureForm, {
 } from '@/components/architectures/ArchitectureForm'
 
 // Importiere die ausgelagerten Komponenten
-import ArchitectureTable from '@/components/architectures/ArchitectureTable'
+import ArchitectureTable, {
+  ARCHITECTURE_DEFAULT_COLUMN_VISIBILITY,
+} from '@/components/architectures/ArchitectureTable'
 import ArchitectureToolbar from '@/components/architectures/ArchitectureToolbar'
 import ArchitectureFilterDialog from '@/components/architectures/ArchitectureFilterDialog'
 import { useArchitectureFilter } from '@/components/architectures/useArchitectureFilter'
@@ -30,7 +32,6 @@ const ArchitecturesPage = () => {
   const { authenticated, initialized } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
   const t = useTranslations('architectures')
-  const tCommon = useTranslations('common')
   const [globalFilter, setGlobalFilter] = useState<string>('')
   const [sorting, setSorting] = useState([{ id: 'name', desc: false }])
   const [tableInstance, setTableInstance] = useState<any>(null)
@@ -580,6 +581,7 @@ const ArchitecturesPage = () => {
           onResetFilters={handleResetFilter}
           table={tableInstance}
           enableColumnVisibilityToggle={true}
+          defaultColumnVisibility={ARCHITECTURE_DEFAULT_COLUMN_VISIBILITY}
         />
 
         {/* Tabelle der Architekturen */}

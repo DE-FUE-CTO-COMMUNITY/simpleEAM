@@ -13,6 +13,7 @@ interface ApplicationInterfaceToolbarProps {
   onResetFilters: () => void
   table?: Table<any>
   enableColumnVisibilityToggle?: boolean
+  defaultColumnVisibility?: Record<string, boolean>
 }
 
 /**
@@ -21,6 +22,7 @@ interface ApplicationInterfaceToolbarProps {
 const ApplicationInterfaceToolbar: React.FC<ApplicationInterfaceToolbarProps> = ({
   table,
   enableColumnVisibilityToggle = true,
+  defaultColumnVisibility,
   ...props
 }) => {
   const t = useTranslations('interfaces')
@@ -35,6 +37,7 @@ const ApplicationInterfaceToolbar: React.FC<ApplicationInterfaceToolbarProps> = 
       table={table}
       enableColumnVisibilityToggle={enableColumnVisibilityToggle}
       tableKey="interfaces" // Eindeutiger Schlüssel für die Interfaces-Tabelle
+      defaultColumnVisibility={defaultColumnVisibility}
     />
   )
 }

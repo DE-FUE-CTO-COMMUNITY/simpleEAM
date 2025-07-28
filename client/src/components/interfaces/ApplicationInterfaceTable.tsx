@@ -13,6 +13,33 @@ import { getProtocolLabel } from './utils'
 import { DataObject, Application, Person } from '@/gql/generated'
 import usePersistentColumnVisibility from '../../hooks/usePersistentColumnVisibility'
 
+// Exportierte Default Column Visibility für ApplicationInterface
+export const APPLICATION_INTERFACE_DEFAULT_COLUMN_VISIBILITY = {
+  // Standardmäßig sichtbare Spalten
+  name: true,
+  interfaceType: true,
+  protocol: true,
+  responsiblePerson: true,
+  sourceApplications: true,
+  targetApplications: true,
+  // Standardmäßig versteckte Spalten
+  id: false,
+  description: false,
+  dataObjects: false,
+  version: false,
+  status: false,
+  planningDate: false,
+  introductionDate: false,
+  endOfUseDate: false,
+  endOfLifeDate: false,
+  predecessors: false,
+  successors: false,
+  partOfArchitectures: false,
+  depictedInDiagrams: false,
+  createdAt: false,
+  updatedAt: false,
+}
+
 interface ApplicationInterfaceTableProps {
   id?: string
   applicationInterfaces: ApplicationInterface[]
@@ -119,31 +146,7 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
     // resetColumnVisibility wird für zukünftige Reset-Funktionalität benötigt
   } = usePersistentColumnVisibility({
     tableKey: 'interfaces', // Korrigiert: stimmt jetzt mit ApplicationInterfaceToolbar überein
-    defaultColumnVisibility: {
-      // Standardmäßig sichtbare Spalten
-      name: true,
-      interfaceType: true,
-      protocol: true,
-      responsiblePerson: true,
-      sourceApplications: true,
-      targetApplications: true,
-      // Standardmäßig versteckte Spalten
-      id: false,
-      description: false,
-      dataObjects: false,
-      version: false,
-      status: false,
-      planningDate: false,
-      introductionDate: false,
-      endOfUseDate: false,
-      endOfLifeDate: false,
-      predecessors: false,
-      successors: false,
-      partOfArchitectures: false,
-      depictedInDiagrams: false,
-      createdAt: false,
-      updatedAt: false,
-    },
+    defaultColumnVisibility: APPLICATION_INTERFACE_DEFAULT_COLUMN_VISIBILITY,
   })
 
   // Kombiniere externe und persistente onTableReady Callbacks

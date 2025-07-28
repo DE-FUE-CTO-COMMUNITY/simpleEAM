@@ -13,6 +13,7 @@ interface PersonToolbarProps {
   onResetFilters: () => void
   table?: Table<any>
   enableColumnVisibilityToggle?: boolean
+  defaultColumnVisibility?: Record<string, boolean>
 }
 
 /**
@@ -21,6 +22,7 @@ interface PersonToolbarProps {
 const PersonToolbar: React.FC<PersonToolbarProps> = ({
   table,
   enableColumnVisibilityToggle = true,
+  defaultColumnVisibility,
   ...props
 }) => {
   const t = useTranslations('persons')
@@ -36,6 +38,7 @@ const PersonToolbar: React.FC<PersonToolbarProps> = ({
       table={table}
       enableColumnVisibilityToggle={enableColumnVisibilityToggle}
       tableKey="persons" // Eindeutiger Schlüssel für die Persons-Tabelle
+      defaultColumnVisibility={defaultColumnVisibility}
     />
   )
 }
