@@ -9,6 +9,7 @@ import { GET_PERSONS } from '@/graphql/person'
 import { GET_APPLICATIONS } from '@/graphql/application'
 import { GET_ARCHITECTURES } from '@/graphql/architecture'
 import { GET_DIAGRAMS } from '@/graphql/diagram'
+import { useCurrentPerson } from '@/hooks/useCurrentPerson'
 import {
   BusinessCapability,
   CapabilityStatus,
@@ -100,6 +101,10 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
   const t = useTranslations()
   const tForm = useTranslations('capabilities.form')
   const tTabs = useTranslations('capabilities.tabs')
+
+  // Aktuellen Benutzer als Standard-Owner abrufen
+  const { currentPerson } = useCurrentPerson()
+
   // Personen laden
   const { data: personData, loading: personLoading } = useQuery(GET_PERSONS)
 
@@ -124,7 +129,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
       sequenceNumber: 0,
       introductionDate: undefined,
       endDate: undefined,
-      ownerId: '',
+      ownerId: currentPerson?.id || '', // Standard-Owner auf aktuellen Benutzer setzen
       tags: [],
       parentId: '',
       children: [],
@@ -132,7 +137,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
       partOfArchitectures: [],
       partOfDiagrams: [],
     }),
-    []
+    [currentPerson?.id]
   )
 
   // TanStack Form konfigurieren

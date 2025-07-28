@@ -16,6 +16,7 @@ import { GET_APPLICATIONS } from '@/graphql/application'
 import { GET_ARCHITECTURES } from '@/graphql/architecture'
 import { GET_DIAGRAMS } from '@/graphql/diagram'
 import { GET_APPLICATION_INTERFACES } from '@/graphql/applicationInterface'
+import { useCurrentPerson } from '@/hooks/useCurrentPerson'
 import {
   ApplicationInterface,
   InterfaceType,
@@ -176,6 +177,9 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
   const tTypes = useTranslations('interfaces.interfaceTypes')
   const tStatuses = useTranslations('interfaces.statuses')
 
+  // Aktuellen Benutzer als Standard-ResponsiblePerson abrufen
+  const { currentPerson } = useCurrentPerson()
+
   // Hilfsfunktion für Interface Type Labels
   const getInterfaceTypeLabel = (type: InterfaceType) => {
     switch (type) {
@@ -260,7 +264,8 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       endOfLifeDate: applicationInterface?.endOfLifeDate
         ? new Date(applicationInterface.endOfLifeDate)
         : null,
-      responsiblePerson: applicationInterface?.responsiblePerson?.[0]?.id || null,
+      responsiblePerson:
+        applicationInterface?.responsiblePerson?.[0]?.id || currentPerson?.id || null,
       sourceApplications: applicationInterface?.sourceApplications?.map(app => app.id) || [],
       targetApplications: applicationInterface?.targetApplications?.map(app => app.id) || [],
       dataObjects: applicationInterface?.dataObjects?.map(obj => obj.id) || [],
@@ -269,7 +274,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       predecessorIds: applicationInterface?.predecessors?.map(pred => pred.id) || [],
       successorIds: applicationInterface?.successors?.map(succ => succ.id) || [],
     }),
-    [applicationInterface]
+    [applicationInterface, currentPerson?.id]
   )
 
   // TanStack Form konfigurieren

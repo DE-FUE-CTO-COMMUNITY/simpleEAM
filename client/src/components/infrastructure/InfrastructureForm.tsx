@@ -16,6 +16,7 @@ import { GET_ARCHITECTURES } from '@/graphql/architecture'
 import { GET_DIAGRAMS } from '@/graphql/diagram'
 import { GET_INFRASTRUCTURES } from '@/graphql/infrastructure'
 import { GET_APPLICATIONS } from '@/graphql/application'
+import { useCurrentPerson } from '@/hooks/useCurrentPerson'
 import {
   Infrastructure,
   InfrastructureType,
@@ -124,6 +125,9 @@ const InfrastructureForm: React.FC<InfrastructureFormProps> = ({
   const tTypes = useTranslations('infrastructure.infrastructureTypes')
   const tStatuses = useTranslations('infrastructure.statuses')
 
+  // Aktuellen Benutzer als Standard-Owner abrufen
+  const { currentPerson } = useCurrentPerson()
+
   // Wrapper-Funktion für Typen-Kompatibilität
   // Verwende erstmal das Basis-Schema ohne erweiterte Validierung
   const infrastructureSchema = baseInfrastructureSchema
@@ -213,14 +217,14 @@ const InfrastructureForm: React.FC<InfrastructureFormProps> = ({
       ownerId:
         infrastructure?.owners && infrastructure.owners.length > 0
           ? infrastructure.owners[0].id
-          : undefined,
+          : currentPerson?.id,
       parentInfrastructure: infrastructure?.parentInfrastructure?.map(parent => parent.id) || [],
       childInfrastructures: infrastructure?.childInfrastructures?.map(infra => infra.id) || [],
       hostsApplications: infrastructure?.hostsApplications?.map(app => app.id) || [],
       partOfArchitectures: infrastructure?.partOfArchitectures?.map(arch => arch.id) || [],
       depictedInDiagrams: infrastructure?.depictedInDiagrams?.map(diag => diag.id) || [],
     }),
-    [infrastructure]
+    [infrastructure, currentPerson?.id]
   )
 
   // TanStack Form konfigurieren

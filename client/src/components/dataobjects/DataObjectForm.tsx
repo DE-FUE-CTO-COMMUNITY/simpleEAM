@@ -15,6 +15,7 @@ import { GET_PERSONS } from '@/graphql/person'
 import { GET_APPLICATIONS } from '@/graphql/application'
 import { GET_ARCHITECTURES } from '@/graphql/architecture'
 import { GET_DIAGRAMS } from '@/graphql/diagram'
+import { useCurrentPerson } from '@/hooks/useCurrentPerson'
 import { DataObject, DataClassification, Architecture } from '../../gql/generated'
 import GenericForm, { FieldConfig } from '../common/GenericForm'
 import { isArchitect } from '@/lib/auth'
@@ -97,6 +98,9 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
   const tTabs = useTranslations('dataObjects.tabs')
   const tClassifications = useTranslations('dataObjects.classifications')
 
+  // Aktuellen Benutzer als Standard-Owner abrufen
+  const { currentPerson } = useCurrentPerson()
+
   // Personen laden
   const { data: personData, loading: personLoading } = useQuery(GET_PERSONS)
   // Applikationen laden
@@ -123,11 +127,13 @@ const DataObjectForm: React.FC<DataObjectFormProps> = ({
       planningDate: dataObject?.planningDate ? new Date(dataObject.planningDate) : null,
       endOfUseDate: dataObject?.endOfUseDate ? new Date(dataObject.endOfUseDate) : null,
       ownerId:
-        dataObject?.owners && dataObject.owners.length > 0 ? dataObject.owners[0].id : undefined,
+        dataObject?.owners && dataObject.owners.length > 0
+          ? dataObject.owners[0].id
+          : currentPerson?.id,
       partOfArchitectures: dataObject?.partOfArchitectures?.map(arch => arch.id) || [],
       depictedInDiagrams: dataObject?.depictedInDiagrams?.map(diag => diag.id) || [],
     }),
-    [dataObject]
+    [dataObject, currentPerson?.id]
   )
 
   // TanStack Form konfigurieren

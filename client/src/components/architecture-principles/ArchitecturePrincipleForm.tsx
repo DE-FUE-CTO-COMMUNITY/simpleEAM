@@ -9,6 +9,7 @@ import { ArchitecturePrinciple, PrincipleCategory, PrinciplePriority } from '../
 import { GET_PERSONS } from '@/graphql/person'
 import { GET_ARCHITECTURES } from '@/graphql/architecture'
 import { GET_APPLICATIONS } from '@/graphql/application'
+import { useCurrentPerson } from '@/hooks/useCurrentPerson'
 import GenericForm, { FieldConfig, TabConfig } from '../common/GenericForm'
 import { isArchitect } from '@/lib/auth'
 import { useCategoryLabel, usePriorityLabel } from './utils'
@@ -64,6 +65,9 @@ const ArchitecturePrincipleForm: React.FC<ArchitecturePrincipleFormProps> = ({
   const getCategoryLabel = useCategoryLabel()
   const getPriorityLabel = usePriorityLabel()
 
+  // Aktuellen Benutzer als Standard-Owner abrufen
+  const { currentPerson } = useCurrentPerson()
+
   // Personen laden
   const { data: personData, loading: personLoading } = useQuery(GET_PERSONS)
 
@@ -84,11 +88,11 @@ const ArchitecturePrincipleForm: React.FC<ArchitecturePrincipleFormProps> = ({
       implications: '',
       tags: [],
       isActive: true,
-      ownerId: '',
+      ownerId: currentPerson?.id || '',
       appliedInArchitectureIds: [],
       implementedByApplicationIds: [],
     }),
-    []
+    [currentPerson?.id]
   )
 
   // TanStack Form konfigurieren

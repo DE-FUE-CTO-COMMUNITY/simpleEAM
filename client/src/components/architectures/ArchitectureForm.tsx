@@ -20,6 +20,7 @@ import { GET_DIAGRAMS } from '@/graphql/diagram'
 import { GET_APPLICATION_INTERFACES } from '@/graphql/applicationInterface'
 import { GET_ARCHITECTURE_PRINCIPLES } from '@/graphql/architecturePrinciple'
 import { GET_INFRASTRUCTURES } from '@/graphql/infrastructure'
+import { useCurrentPerson } from '@/hooks/useCurrentPerson'
 import GenericForm, { FieldConfig, TabConfig } from '../common/GenericForm'
 import { isArchitect } from '@/lib/auth'
 import { useDomainLabel, useTypeLabel } from './utils'
@@ -85,6 +86,9 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
   const getDomainLabelTranslated = useDomainLabel()
   const getTypeLabelTranslated = useTypeLabel()
 
+  // Aktuellen Benutzer als Standard-Owner abrufen
+  const { currentPerson } = useCurrentPerson()
+
   // Personen laden
   const { data: personData, loading: personLoading } = useQuery(GET_PERSONS)
 
@@ -118,7 +122,7 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
       type: ArchitectureType.CURRENT_STATE,
       timestamp: new Date(1735689600000), // Fixed timestamp for SSR consistency
       tags: [],
-      ownerId: '',
+      ownerId: currentPerson?.id || '',
       containsApplicationIds: [],
       containsCapabilityIds: [],
       containsDataObjectIds: [],
@@ -129,7 +133,7 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
       appliedPrincipleIds: [],
       elementsNote: t('form.elementsNote'),
     }),
-    [t]
+    [t, currentPerson?.id]
   )
 
   // TanStack Form konfigurieren

@@ -33,6 +33,7 @@ import { GET_ARCHITECTURES } from '@/graphql/architecture'
 import { GET_DIAGRAMS } from '@/graphql/diagram'
 import { GET_ARCHITECTURE_PRINCIPLES } from '@/graphql/architecturePrinciple'
 import { GET_INFRASTRUCTURES } from '@/graphql/infrastructure'
+import { useCurrentPerson } from '@/hooks/useCurrentPerson'
 import GenericForm, { FieldConfig, TabConfig } from '../common/GenericForm'
 import { getValidSevenRStrategies } from './timeCategoryDependencies'
 import { isArchitect } from '@/lib/auth'
@@ -379,6 +380,9 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
   const tSevenR = useTranslations('applications.sevenRStrategies')
   const tTabs = useTranslations('applications.tabs')
 
+  // Aktuellen Benutzer als Standard-Owner abrufen
+  const { currentPerson } = useCurrentPerson()
+
   // Daten laden
   const { data: personsData, loading: personsLoading } = useQuery(GET_PERSONS)
   const { data: capabilitiesData, loading: capabilitiesLoading } = useQuery(GET_CAPABILITIES)
@@ -401,18 +405,37 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     version: mappedVersion ?? application?.version ?? null,
     hostingEnvironment: mappedHostingEnvironment ?? application?.hostingEnvironment ?? null,
     technologyStack: mappedTechnologyStack ?? application?.technologyStack ?? [],
-    introductionDate: mappedIntroductionDate ?? (application?.introductionDate ? new Date(application.introductionDate) : null),
-    endOfLifeDate: mappedEndOfLifeDate ?? (application?.endOfLifeDate ? new Date(application.endOfLifeDate) : null),
-    planningDate: mappedPlanningDate ?? (application?.planningDate ? new Date(application.planningDate) : null),
-    endOfUseDate: mappedEndOfUseDate ?? (application?.endOfUseDate ? new Date(application.endOfUseDate) : null),
-    ownerId: mappedOwnerId ?? (application?.owners && application.owners.length > 0 ? application.owners[0].id : undefined),
-    supportsCapabilityIds: mappedSupportsCapabilityIds ?? application?.supportsCapabilities?.map(cap => cap.id) ?? [],
-    usesDataObjectIds: mappedUsesDataObjectIds ?? application?.usesDataObjects?.map(obj => obj.id) ?? [],
-    sourceOfInterfaceIds: mappedSourceOfInterfaceIds ?? application?.sourceOfInterfaces?.map(iface => iface.id) ?? [],
-    targetOfInterfaceIds: mappedTargetOfInterfaceIds ?? application?.targetOfInterfaces?.map(iface => iface.id) ?? [],
-    partOfArchitectures: mappedPartOfArchitectures ?? application?.partOfArchitectures?.map(arch => arch.id) ?? [],
-    implementsPrincipleIds: mappedImplementsPrincipleIds ?? application?.implementsPrinciples?.map(principle => principle.id) ?? [],
-    depictedInDiagrams: mappedDepictedInDiagrams ?? application?.depictedInDiagrams?.map(diag => diag.id) ?? [],
+    introductionDate:
+      mappedIntroductionDate ??
+      (application?.introductionDate ? new Date(application.introductionDate) : null),
+    endOfLifeDate:
+      mappedEndOfLifeDate ??
+      (application?.endOfLifeDate ? new Date(application.endOfLifeDate) : null),
+    planningDate:
+      mappedPlanningDate ?? (application?.planningDate ? new Date(application.planningDate) : null),
+    endOfUseDate:
+      mappedEndOfUseDate ?? (application?.endOfUseDate ? new Date(application.endOfUseDate) : null),
+    ownerId:
+      mappedOwnerId ??
+      (application?.owners && application.owners.length > 0
+        ? application.owners[0].id
+        : currentPerson?.id),
+    supportsCapabilityIds:
+      mappedSupportsCapabilityIds ?? application?.supportsCapabilities?.map(cap => cap.id) ?? [],
+    usesDataObjectIds:
+      mappedUsesDataObjectIds ?? application?.usesDataObjects?.map(obj => obj.id) ?? [],
+    sourceOfInterfaceIds:
+      mappedSourceOfInterfaceIds ?? application?.sourceOfInterfaces?.map(iface => iface.id) ?? [],
+    targetOfInterfaceIds:
+      mappedTargetOfInterfaceIds ?? application?.targetOfInterfaces?.map(iface => iface.id) ?? [],
+    partOfArchitectures:
+      mappedPartOfArchitectures ?? application?.partOfArchitectures?.map(arch => arch.id) ?? [],
+    implementsPrincipleIds:
+      mappedImplementsPrincipleIds ??
+      application?.implementsPrinciples?.map(principle => principle.id) ??
+      [],
+    depictedInDiagrams:
+      mappedDepictedInDiagrams ?? application?.depictedInDiagrams?.map(diag => diag.id) ?? [],
     parentIds: mappedParentIds ?? application?.parents?.map(app => app.id) ?? [],
     componentIds: mappedComponentIds ?? application?.components?.map(app => app.id) ?? [],
     predecessorIds: mappedPredecessorIds ?? application?.predecessors?.map(app => app.id) ?? [],
@@ -470,18 +493,45 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
         version: mappedVersion ?? application?.version ?? null,
         hostingEnvironment: mappedHostingEnvironment ?? application?.hostingEnvironment ?? null,
         technologyStack: mappedTechnologyStack ?? application?.technologyStack ?? [],
-        introductionDate: mappedIntroductionDate ?? (application?.introductionDate ? new Date(application.introductionDate) : null),
-        endOfLifeDate: mappedEndOfLifeDate ?? (application?.endOfLifeDate ? new Date(application.endOfLifeDate) : null),
-        planningDate: mappedPlanningDate ?? (application?.planningDate ? new Date(application.planningDate) : null),
-        endOfUseDate: mappedEndOfUseDate ?? (application?.endOfUseDate ? new Date(application.endOfUseDate) : null),
-        ownerId: mappedOwnerId ?? (application?.owners && application.owners.length > 0 ? application.owners[0].id : undefined),
-        supportsCapabilityIds: mappedSupportsCapabilityIds ?? application?.supportsCapabilities?.map(cap => cap.id) ?? [],
-        usesDataObjectIds: mappedUsesDataObjectIds ?? application?.usesDataObjects?.map(obj => obj.id) ?? [],
-        sourceOfInterfaceIds: mappedSourceOfInterfaceIds ?? application?.sourceOfInterfaces?.map(iface => iface.id) ?? [],
-        targetOfInterfaceIds: mappedTargetOfInterfaceIds ?? application?.targetOfInterfaces?.map(iface => iface.id) ?? [],
-        partOfArchitectures: mappedPartOfArchitectures ?? application?.partOfArchitectures?.map(arch => arch.id) ?? [],
-        implementsPrincipleIds: mappedImplementsPrincipleIds ?? application?.implementsPrinciples?.map(principle => principle.id) ?? [],
-        depictedInDiagrams: mappedDepictedInDiagrams ?? application?.depictedInDiagrams?.map(diag => diag.id) ?? [],
+        introductionDate:
+          mappedIntroductionDate ??
+          (application?.introductionDate ? new Date(application.introductionDate) : null),
+        endOfLifeDate:
+          mappedEndOfLifeDate ??
+          (application?.endOfLifeDate ? new Date(application.endOfLifeDate) : null),
+        planningDate:
+          mappedPlanningDate ??
+          (application?.planningDate ? new Date(application.planningDate) : null),
+        endOfUseDate:
+          mappedEndOfUseDate ??
+          (application?.endOfUseDate ? new Date(application.endOfUseDate) : null),
+        ownerId:
+          mappedOwnerId ??
+          (application?.owners && application.owners.length > 0
+            ? application.owners[0].id
+            : currentPerson?.id),
+        supportsCapabilityIds:
+          mappedSupportsCapabilityIds ??
+          application?.supportsCapabilities?.map(cap => cap.id) ??
+          [],
+        usesDataObjectIds:
+          mappedUsesDataObjectIds ?? application?.usesDataObjects?.map(obj => obj.id) ?? [],
+        sourceOfInterfaceIds:
+          mappedSourceOfInterfaceIds ??
+          application?.sourceOfInterfaces?.map(iface => iface.id) ??
+          [],
+        targetOfInterfaceIds:
+          mappedTargetOfInterfaceIds ??
+          application?.targetOfInterfaces?.map(iface => iface.id) ??
+          [],
+        partOfArchitectures:
+          mappedPartOfArchitectures ?? application?.partOfArchitectures?.map(arch => arch.id) ?? [],
+        implementsPrincipleIds:
+          mappedImplementsPrincipleIds ??
+          application?.implementsPrinciples?.map(principle => principle.id) ??
+          [],
+        depictedInDiagrams:
+          mappedDepictedInDiagrams ?? application?.depictedInDiagrams?.map(diag => diag.id) ?? [],
         parentIds: mappedParentIds ?? application?.parents?.map(app => app.id) ?? [],
         componentIds: mappedComponentIds ?? application?.components?.map(app => app.id) ?? [],
         predecessorIds: mappedPredecessorIds ?? application?.predecessors?.map(app => app.id) ?? [],
@@ -490,7 +540,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
         timeCategory: mappedTimeCategory ?? application?.timeCategory ?? null,
         sevenRStrategy: mappedSevenRStrategy ?? application?.sevenRStrategy ?? null,
       }
-      
+
       setCurrentTimeCategory(resetValues.timeCategory)
       form.reset(resetValues)
     } else if (!isOpen) {
@@ -498,8 +548,8 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
       form.reset()
     }
   }, [
-    form, 
-    application, 
+    form,
+    application,
     isOpen,
     // Gemappte Abhängigkeiten hinzufügen
     mappedName,
@@ -529,7 +579,8 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     mappedSuccessorIds,
     mappedHostedOnIds,
     mappedTimeCategory,
-    mappedSevenRStrategy
+    mappedSevenRStrategy,
+    currentPerson?.id,
   ])
 
   // Dynamisches Zurücksetzen der 7R-Strategie bei TIME-Kategorie-Änderung
