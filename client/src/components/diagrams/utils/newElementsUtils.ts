@@ -235,7 +235,8 @@ const extractElementText = (element: DiagramElement, allElements: DiagramElement
  */
 export const createNewElementsInDatabase = async (
   apolloClient: any,
-  newElements: NewElement[]
+  newElements: NewElement[],
+  currentPersonId?: string
 ): Promise<ElementCreationResult> => {
   const result: ElementCreationResult = {
     success: true,
@@ -257,7 +258,12 @@ export const createNewElementsInDatabase = async (
   for (const elementType of Array.from(elementsByType.keys())) {
     const elements = elementsByType.get(elementType)!
     try {
-      const createdElements = await createElementsByType(apolloClient, elementType, elements)
+      const createdElements = await createElementsByType(
+        apolloClient,
+        elementType,
+        elements,
+        currentPersonId
+      )
       result.createdElements.push(...createdElements)
     } catch (error) {
       result.success = false
@@ -274,7 +280,8 @@ export const createNewElementsInDatabase = async (
 const createElementsByType = async (
   apolloClient: any,
   elementType: string,
-  elements: NewElement[]
+  elements: NewElement[],
+  currentPersonId?: string
 ): Promise<Array<{ elementId: string; databaseId: string; elementType: string }>> => {
   const input = elements.map(element => {
     const baseInput = {
@@ -282,17 +289,24 @@ const createElementsByType = async (
       description: `Automatisch erstellt aus Diagramm`,
     }
 
+    // Owner-Feld hinzufügen, falls currentPersonId verfügbar ist
+    const ownerInput = currentPersonId
+      ? { owners: { connect: [{ where: { node: { id: { eq: currentPersonId } } } }] } }
+      : {}
+
     // Add type-specific fields
     switch (elementType) {
       case ELEMENT_TYPES.APPLICATION:
         return {
           ...baseInput,
+          ...ownerInput,
           status: 'ACTIVE',
           criticality: 'MEDIUM',
         }
       case ELEMENT_TYPES.CAPABILITY:
         return {
           ...baseInput,
+          ...ownerInput,
           maturityLevel: 1,
           businessValue: 5,
           status: 'ACTIVE',
@@ -300,19 +314,31 @@ const createElementsByType = async (
       case ELEMENT_TYPES.DATA_OBJECT:
         return {
           ...baseInput,
+          ...ownerInput,
           classification: 'INTERNAL',
           format: 'Nicht spezifiziert',
         }
-      case ELEMENT_TYPES.INTERFACE:
+      case ELEMENT_TYPES.INTERFACE: {
+        // ApplicationInterface verwendet responsiblePerson statt owners
+        const responsiblePersonInput = currentPersonId
+          ? {
+              responsiblePerson: {
+                connect: [{ where: { node: { id: { eq: currentPersonId } } } }],
+              },
+            }
+          : {}
         return {
           ...baseInput,
+          ...responsiblePersonInput,
           interfaceType: 'API',
           protocol: 'HTTP',
           status: 'ACTIVE',
         }
+      }
       case ELEMENT_TYPES.INFRASTRUCTURE:
         return {
           ...baseInput,
+          ...ownerInput,
           infrastructureType: element.text.toLowerCase().includes('cloud')
             ? 'CLOUD_DATACENTER'
             : 'ON_PREMISE_DATACENTER',

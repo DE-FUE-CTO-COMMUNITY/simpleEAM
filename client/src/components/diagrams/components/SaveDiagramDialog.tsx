@@ -27,6 +27,7 @@ import {
   LINK_INFRASTRUCTURE_TO_ARCHITECTURE,
 } from '@/graphql/architectureLinking'
 import { useAuth } from '@/lib/auth'
+import { useCurrentPerson } from '@/hooks/useCurrentPerson'
 import {
   createDiagramRelationshipUpdates,
   createDiagramRelationshipUpdatesWithDisconnect,
@@ -166,6 +167,10 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
       return null
     }
   }, [keycloak?.token])
+
+  // Aktuellen Benutzer für Owner-Zuweisung abrufen
+  const { currentPerson } = useCurrentPerson()
+
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [diagramType, setDiagramType] = useState('ARCHITECTURE')
@@ -451,7 +456,11 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
       // Erstelle die ausgewählten Elemente in der Datenbank
       let creationResult: any = { success: true, createdElements: [] }
       if (selectedElements.length > 0) {
-        creationResult = await createNewElementsInDatabase(apolloClient, selectedElements)
+        creationResult = await createNewElementsInDatabase(
+          apolloClient,
+          selectedElements,
+          currentPerson?.id
+        )
       }
 
       // Erstelle die ausgewählten Beziehungen in der Datenbank
