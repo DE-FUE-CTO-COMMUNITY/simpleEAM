@@ -482,7 +482,8 @@ const createSingleRelationship = async (
     case 'SUPPORTS':
       if (
         sourceElementType === 'application' &&
-        (targetElementType === 'businessCapability' || targetElementType === 'capability')
+        ((targetElementType as string) === 'businessCapability' ||
+          (targetElementType as string) === 'capability')
       ) {
         await client.mutate({
           mutation: UPDATE_APPLICATION_SUPPORTS_CAPABILITIES,
@@ -803,7 +804,8 @@ export const checkRelationshipExists = async (
       case 'SUPPORTS':
         if (
           sourceElementType === 'application' &&
-          (targetElementType === 'businessCapability' || targetElementType === 'capability')
+          ((targetElementType as string) === 'businessCapability' ||
+            (targetElementType as string) === 'capability')
         ) {
           query = CHECK_APPLICATION_SUPPORTS_CAPABILITY
           variables = { applicationId: sourceElementId, capabilityId: targetElementId }
