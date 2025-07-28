@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react'
 import { VisibilityState, Table } from '@tanstack/react-table'
+import { loadColumnVisibility, saveColumnVisibility } from '@/utils/columnVisibilityUtils'
 
 interface UsePersistentColumnVisibilityOptions {
   /**
@@ -11,200 +12,66 @@ interface UsePersistentColumnVisibilityOptions {
 
   /**
    * Standard-Spaltenvisibilität, falls keine gespeicherten Einstellungen vorhanden sind
+   * Diese sollte bei jeder Tabelle definiert werden
    */
-  defaultColumnVisibility?: VisibilityState
-
-  /**
-   * Speicher-Präfix für localStorage-Schlüssel
-   * @default 'simple-eam-column-visibility'
-   */
-  storagePrefix?: string
+  defaultColumnVisibility: VisibilityState
 }
 
 /**
  * Hook für persistente Column Visibility Funktionalität in TanStack Table
- *
- * Dieser Hook erweitert die Column Visibility um localStorage-Persistierung,
- * sodass Benutzereinstellungen nach Seitenwechsel oder Browser-Restart erhalten bleiben.
- *
- * @param options Konfiguration für die persistente Column Visibility
- * @returns Ein Objekt mit State und Funktionen für die persistente Column Visibility
  */
-export function usePersistentColumnVisibility({
+export default function usePersistentColumnVisibility({
   tableKey,
-  defaultColumnVisibility = {},
-  storagePrefix = 'simple-eam-column-visibility',
+  defaultColumnVisibility,
 }: UsePersistentColumnVisibilityOptions) {
-  // Verwende immer defaultColumnVisibility als initialen State
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(defaultColumnVisibility)
+  // Lade initiale Column Visibility (mit Default-Fallback)
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(() =>
+    loadColumnVisibility(tableKey, defaultColumnVisibility)
+  )
   const [isInitialized, setIsInitialized] = useState(false)
 
-  // Lade gespeicherte Column Visibility nach dem ersten Render (Client-Side)
+  // Client-Side Initialisierung (für SSR-Kompatibilität)
   useEffect(() => {
     if (typeof window === 'undefined' || isInitialized) return
 
-    try {
-      const storageKey = `${storagePrefix}-${tableKey}`
-      const saved = localStorage.getItem(storageKey)
-
-      if (saved) {
-        const parsed = JSON.parse(saved) as VisibilityState
-        // Merge mit Default-Werten, falls neue Spalten hinzugefügt wurden
-        setColumnVisibility({ ...defaultColumnVisibility, ...parsed })
-      }
-    } catch (error) {
-      console.warn(`Fehler beim Laden der gespeicherten Column Visibility für ${tableKey}:`, error)
-    }
-
+    const loaded = loadColumnVisibility(tableKey, defaultColumnVisibility)
+    setColumnVisibility(loaded)
     setIsInitialized(true)
-  }, [defaultColumnVisibility, tableKey, storagePrefix, isInitialized])
-
-  // State für die Table-Instanz
-  const [tableInstance, setTableInstance] = useState<Table<any> | null>(null)
+  }, [defaultColumnVisibility, tableKey, isInitialized])
 
   // Speichere Column Visibility bei Änderungen (nur nach Initialisierung)
   useEffect(() => {
-    if (typeof window === 'undefined' || !isInitialized) return
+    if (!isInitialized) return
+    saveColumnVisibility(tableKey, columnVisibility)
+  }, [columnVisibility, tableKey, isInitialized])
 
-    try {
-      const storageKey = `${storagePrefix}-${tableKey}`
-      localStorage.setItem(storageKey, JSON.stringify(columnVisibility))
-    } catch (error) {
-      console.warn(`Fehler beim Speichern der Column Visibility für ${tableKey}:`, error)
-    }
-  }, [columnVisibility, tableKey, storagePrefix, isInitialized])
-
-  // Callback zum Speichern der Table-Instanz
-  const handleTableReady = useCallback((table: Table<any>) => {
-    setTableInstance(table)
-  }, [])
-
-  // Column Visibility Update-Funktion
-  const updateColumnVisibility = useCallback(
+  // Callback zum Aktualisieren der Column Visibility
+  const onColumnVisibilityChange = useCallback(
     (updater: VisibilityState | ((old: VisibilityState) => VisibilityState)) => {
       setColumnVisibility(prev => {
-        const newState = typeof updater === 'function' ? updater(prev) : updater
-        return newState
+        if (typeof updater === 'function') {
+          return updater(prev)
+        }
+        return updater
       })
     },
     []
   )
 
-  // Responsive Column Visibility Helfer-Funktion
-  const getResponsiveVisibility = useCallback(
-    (breakpoint: 'xs' | 'sm' | 'md' | 'lg' | 'xl') => {
-      if (!tableInstance) return
+  // Callback zum Speichern der Table-Instanz
+  const onTableReady = useCallback((_table: Table<any>) => {
+    // Hier können wir bei Bedarf zusätzliche Table-Konfiguration vornehmen
+  }, [])
 
-      const columns = tableInstance.getAllLeafColumns()
-      const updatedVisibility: VisibilityState = {}
-
-      // Basierend auf Breakpoint unterschiedlich viele Spalten anzeigen
-      const visibleColumnCount =
-        breakpoint === 'xs'
-          ? 2
-          : breakpoint === 'sm'
-            ? 3
-            : breakpoint === 'md'
-              ? 4
-              : breakpoint === 'lg'
-                ? 5
-                : columns.length // 'xl' = alle Spalten
-
-      columns.forEach((column, index) => {
-        // Actions-Spalte immer anzeigen
-        if (column.id === 'actions') {
-          updatedVisibility[column.id] = true
-          return
-        }
-
-        // Ersten X Spalten sichtbar machen, Rest ausblenden
-        updatedVisibility[column.id] = index < visibleColumnCount
-      })
-
-      setColumnVisibility(updatedVisibility)
-    },
-    [tableInstance]
-  )
-
-  // Spalten-Sichtbarkeit umschalten
-  const toggleColumnVisibility = useCallback(
-    (columnId: string) => {
-      if (!tableInstance) return
-
-      const column = tableInstance.getColumn(columnId)
-      if (!column) return
-
-      setColumnVisibility(prev => ({
-        ...prev,
-        [columnId]: !column.getIsVisible(),
-      }))
-    },
-    [tableInstance]
-  )
-
-  // Alle Spalten ein-/ausschalten
-  const toggleAllColumns = useCallback(
-    (visible: boolean) => {
-      if (!tableInstance) return
-
-      const columns = tableInstance.getAllLeafColumns()
-      const updatedVisibility: VisibilityState = {}
-
-      columns.forEach(column => {
-        // Actions-Spalte immer sichtbar lassen
-        if (column.id === 'actions') {
-          updatedVisibility[column.id] = true
-          return
-        }
-
-        updatedVisibility[column.id] = visible
-      })
-
-      setColumnVisibility(updatedVisibility)
-    },
-    [tableInstance]
-  )
-
-  // Spalten-Einstellungen zurücksetzen
+  // Reset-Funktion
   const resetColumnVisibility = useCallback(() => {
     setColumnVisibility(defaultColumnVisibility)
   }, [defaultColumnVisibility])
 
-  // Gespeicherte Einstellungen löschen
-  const clearStoredSettings = useCallback(() => {
-    if (typeof window === 'undefined') return
-
-    try {
-      const storageKey = `${storagePrefix}-${tableKey}`
-      localStorage.removeItem(storageKey)
-      setColumnVisibility(defaultColumnVisibility)
-    } catch (error) {
-      console.warn(
-        `Fehler beim Löschen der gespeicherten Column Visibility für ${tableKey}:`,
-        error
-      )
-    }
-  }, [tableKey, storagePrefix, defaultColumnVisibility])
-
   return {
-    // State
     columnVisibility,
-    tableInstance,
-
-    // Setter
-    setColumnVisibility: updateColumnVisibility,
-
-    // Callbacks
-    onTableReady: handleTableReady,
-    onColumnVisibilityChange: updateColumnVisibility,
-
-    // Hilfsfunktionen
-    getResponsiveVisibility,
-    toggleColumnVisibility,
-    toggleAllColumns,
+    onColumnVisibilityChange,
+    onTableReady,
     resetColumnVisibility,
-    clearStoredSettings,
   }
 }
-
-export default usePersistentColumnVisibility

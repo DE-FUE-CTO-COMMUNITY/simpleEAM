@@ -59,18 +59,27 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
     columnVisibility,
     onTableReady: persistentOnTableReady,
     onColumnVisibilityChange,
-    resetColumnVisibility,
+    // resetColumnVisibility wird für zukünftige Reset-Funktionalität benötigt
   } = usePersistentColumnVisibility({
     tableKey: 'capabilities',
     defaultColumnVisibility: {
+      // Standardmäßig sichtbare Spalten
+      name: true,
+      description: true,
+      maturityLevel: true,
+      status: true,
+      businessValue: true,
+      owners: true,
+      tags: true,
+      // Standardmäßig versteckte Spalten
       id: false,
-      description: false,
       type: false,
       sequenceNumber: false,
       introductionDate: false,
       endDate: false,
-      relatedDataObjects: false,
       parents: false,
+      children: false,
+      relatedDataObjects: false,
       supportedByApplications: false,
       partOfArchitectures: false,
       createdAt: false,
