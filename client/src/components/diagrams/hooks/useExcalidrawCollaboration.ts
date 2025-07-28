@@ -126,8 +126,6 @@ export const useExcalidrawCollaboration = ({
 
   const startCollaboration = useCallback(
     async (roomId: string) => {
-      console.log('Starting collaboration for room:', roomId)
-
       try {
         // Cleanup any existing connection first
         setState(prev => {
@@ -155,30 +153,19 @@ export const useExcalidrawCollaboration = ({
 
         // Set up event listeners
         socket.on('connect', () => {
-          console.log('Socket.IO connected, joining room:', roomId)
           socket.emit('join-room', roomId)
-        })
-
-        socket.on('disconnect', () => {
-          console.log('Socket.IO disconnected')
         })
 
         socket.on('connect_error', error => {
           console.error('Socket.IO connection error:', error)
         })
 
-        socket.on('init-room', () => {
-          console.log('Room initialized')
-        })
-
         socket.on('first-in-room', () => {
-          console.log('First user in room - will broadcast current scene when ready')
           isFirstUserRef.current = true
           hasReceivedInitialSceneRef.current = true // First user doesn't need to wait for initial scene
         })
 
         socket.on('new-user', (socketId: string) => {
-          console.log('New user joined:', socketId)
           const newCollaborator: Collaborator = {
             id: socketId,
             name: `User ${socketId.substring(0, 8)}`,
@@ -196,11 +183,6 @@ export const useExcalidrawCollaboration = ({
               try {
                 const currentElements = excalidrawAPI.getSceneElements()
                 const currentAppState = excalidrawAPI.getAppState()
-
-                // Always broadcast diagram metadata, even if no elements exist
-                console.log(
-                  `Broadcasting current scene (${currentElements?.length || 0} elements) and diagram metadata to new user ${socketId}`
-                )
 
                 // Create a complete data structure with diagram metadata
                 const sceneData = {
@@ -239,7 +221,6 @@ export const useExcalidrawCollaboration = ({
         })
 
         socket.on('room-user-change', (userIds: string[]) => {
-          console.log('Room users changed:', userIds)
           setState(prev => {
             const newCollaborators = new Map<string, Collaborator>()
             userIds.forEach(userId => {
@@ -256,48 +237,25 @@ export const useExcalidrawCollaboration = ({
         })
 
         socket.on('client-broadcast', (encryptedData: ArrayBuffer, _iv: Uint8Array) => {
-          console.log('Received scene update from collaborator')
-
           // Prevent re-broadcasting immediately
           isReceivingUpdateRef.current = true
 
           try {
             // Debug: Log the received data
-            console.log('Received data type:', typeof encryptedData)
-            console.log('Received data length:', encryptedData?.byteLength || 'undefined')
-
             // For development, we'll implement basic decryption
             // Convert ArrayBuffer back to string
             const decoder = new TextDecoder()
             const dataString = decoder.decode(encryptedData)
-            console.log('Decoded string preview:', dataString.substring(0, 100) + '...')
-
             const sceneData = JSON.parse(dataString)
-            console.log('Parsed scene data:', {
-              hasElements: !!sceneData.elements,
-              elementCount: sceneData.elements?.length || 0,
-              hasAppState: !!sceneData.appState,
-              hasDiagram: !!sceneData.diagram,
-              diagramId: sceneData.diagram?.id,
-              diagramTitle: sceneData.diagram?.title,
-              keys: Object.keys(sceneData),
-            })
-
             if (excalidrawAPI && sceneData && sceneData.elements !== undefined) {
-              const incomingElementCount = sceneData.elements ? sceneData.elements.length : 0
-
-              console.log(`Updating scene with ${incomingElementCount} elements from collaborator`)
-
               // Handle diagram metadata update
               if (sceneData.diagram && onDiagramUpdate) {
-                console.log('Updating diagram metadata:', sceneData.diagram)
                 onDiagramUpdate(sceneData.diagram)
               }
 
               // Mark that we've received initial scene data
               if (!hasReceivedInitialSceneRef.current) {
                 hasReceivedInitialSceneRef.current = true
-                console.log('Received initial scene data from existing users')
               }
 
               // Always update - this ensures proper synchronization
@@ -320,8 +278,6 @@ export const useExcalidrawCollaboration = ({
                 isReceivingUpdateRef.current = false
               }, 50)
             } else {
-              console.log('Received invalid scene data, skipping update. SceneData:', sceneData)
-              console.log('ExcalidrawAPI available:', !!excalidrawAPI)
               isReceivingUpdateRef.current = false
             }
           } catch (error) {
@@ -371,13 +327,6 @@ export const useExcalidrawCollaboration = ({
         isReceivingUpdateRef.current ||
         !hasReceivedInitialSceneRef.current
       ) {
-        console.log('Skipping broadcast - conditions not met:', {
-          hasSocket: !!state.socket,
-          hasRoomId: !!state.roomId,
-          isCollaborating: state.isCollaborating,
-          isReceivingUpdate: isReceivingUpdateRef.current,
-          hasReceivedInitialScene: hasReceivedInitialSceneRef.current,
-        })
         return
       }
 
@@ -400,28 +349,11 @@ export const useExcalidrawCollaboration = ({
             : null,
         }
 
-        console.log('Preparing to broadcast scene data:', {
-          elementCount: elements?.length || 0,
-          hasAppState: !!appState,
-          scrollX: appState?.scrollX,
-          scrollY: appState?.scrollY,
-          zoom: appState?.zoom?.value,
-          hasDiagram: !!sceneData.diagram,
-          diagramId: sceneData.diagram?.id,
-          diagramTitle: sceneData.diagram?.title,
-        })
-
         // Convert to ArrayBuffer for compatibility with excalidraw-room server
         const dataString = JSON.stringify(sceneData)
-        console.log('JSON string length:', dataString.length)
-        console.log('JSON preview:', dataString.substring(0, 200) + '...')
-
         const encoder = new TextEncoder()
         const dataBuffer = encoder.encode(dataString).buffer
         const iv = new Uint8Array(16) // Dummy IV for development
-
-        console.log('Broadcasting scene update to collaborators')
-        console.log('Buffer length:', dataBuffer.byteLength)
         state.socket.emit('server-broadcast', state.roomId, dataBuffer, iv)
       } catch (error) {
         console.error('Failed to broadcast scene update:', error)

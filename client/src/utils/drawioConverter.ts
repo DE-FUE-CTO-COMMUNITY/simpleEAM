@@ -45,51 +45,6 @@ export interface ExcalidrawData {
 export function convertExcalidrawToDrawIO(excalidrawData: ExcalidrawData): string {
   const elements = excalidrawData.elements || []
 
-  console.log(`Converting ${elements.length} elements to draw.io format`)
-  console.log(
-    'Element types:',
-    elements.map(el => el.type)
-  )
-  console.log(
-    'Line elements:',
-    elements.filter(el => el.type === 'line' || el.type === 'arrow').length
-  )
-
-  // Debug: Log all line elements with their coordinates
-  const lineElements = elements.filter(el => el.type === 'line' || el.type === 'arrow')
-  console.log('=== DEBUG: All line elements ===')
-  lineElements.forEach((element, index) => {
-    if (element.points && element.points.length >= 2) {
-      const startPoint = element.points[0]
-      const endPoint = element.points[element.points.length - 1]
-      const startX = Math.round(element.x + startPoint[0])
-      const startY = Math.round(element.y + startPoint[1])
-      const endX = Math.round(element.x + endPoint[0])
-      const endY = Math.round(element.y + endPoint[1])
-      const lineLength = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2))
-      console.log(
-        `Line ${index}: from (${startX}, ${startY}) to (${endX}, ${endY}) - Length: ${lineLength.toFixed(2)}px - ID: ${element.id}`
-      )
-
-      // Log ALL short lines (< 30px) anywhere in the diagram to find potential icon parts
-      if (lineLength < 30) {
-        console.log(
-          `  🔍 SHORT LINE found: ${element.id} - Length: ${lineLength.toFixed(2)}px at (${startX}, ${startY}) to (${endX}, ${endY})`
-        )
-      }
-
-      // Log potential AWS Cloud Frankfurt icon lines - look for short lines (< 30px) near the known icon area
-      if (
-        lineLength < 30 &&
-        ((endX >= 50 && endX <= 120 && endY >= 375 && endY <= 450) ||
-          (startX >= 50 && startX <= 120 && startY >= 375 && startY <= 450))
-      ) {
-        console.log(`  🟢 AWS Cloud Frankfurt icon line (short line near icon): ${element.id}`)
-      }
-    }
-  })
-  console.log('=== END DEBUG ===')
-
   // Find the minimum x and y coordinates to normalize to positive values
   let minX = Infinity
   let minY = Infinity
@@ -114,9 +69,6 @@ export function convertExcalidrawToDrawIO(excalidrawData: ExcalidrawData): strin
   const offsetX = minX < 0 ? Math.abs(minX) + 20 : 0
   const offsetY = minY < 0 ? Math.abs(minY) + 20 : 0
 
-  console.log(`Coordinate bounds: minX=${minX}, minY=${minY}`)
-  console.log(`Applied offset: x=${offsetX}, y=${offsetY}`)
-
   // Start building the XML
   let xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
   xml +=
@@ -135,10 +87,6 @@ export function convertExcalidrawToDrawIO(excalidrawData: ExcalidrawData): strin
     // Ensure unique cell IDs by using both element ID and index
     const cellId = element.id ? `cell-${element.id}` : `cell-${index}-${element.type}`
 
-    console.log(
-      `Converting element ${index}: type=${element.type}, id=${element.id}, cellId=${cellId}`
-    )
-
     switch (element.type) {
       case 'rectangle':
         xml += createRectangleCell(element, cellId, offsetX, offsetY)
@@ -151,9 +99,6 @@ export function convertExcalidrawToDrawIO(excalidrawData: ExcalidrawData): strin
         break
       case 'arrow':
       case 'line':
-        console.log(
-          `Processing line element: points=${element.points?.length}, startArrow=${element.startArrowhead}, endArrow=${element.endArrowhead}`
-        )
         xml += createLineCell(element, cellId, offsetX, offsetY)
         break
       case 'text':
@@ -283,9 +228,6 @@ function createLineCell(
   offsetY: number = 0
 ): string {
   if (!element.points || element.points.length < 2) {
-    console.log(
-      `Skipping line element ${cellId}: invalid points (${element.points?.length || 0} points)`
-    )
     return '' // Skip invalid line elements
   }
 
@@ -298,36 +240,8 @@ function createLineCell(
   const endX = Math.round(element.x + endPoint[0] + offsetX)
   const endY = Math.round(element.y + endPoint[1] + offsetY)
 
-  // Calculate line length to filter out very short decorative lines
-  const lineLength = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2))
-
-  console.log(
-    `Line ${cellId}: from (${startX}, ${startY}) to (${endX}, ${endY}) - Original coords: (${element.x}, ${element.y}) + points: ${element.points.length} points - Length: ${lineLength.toFixed(2)}px`
-  )
-
-  // Special handling for the AWS Cloud Frankfurt icon line with a bend
-  if (cellId === 'cell-LB5FWNY8wbMiU2I4GJkH0') {
-    console.log(`🔧 SPECIAL HANDLING for bent line ${cellId}:`)
-    console.log(`  Points: ${JSON.stringify(element.points)}`)
-  }
-
-  // Check if this is one of the AWS Cloud Frankfurt icon lines - short lines near the icon area
-  if (
-    lineLength < 30 &&
-    ((endX >= 544 && endX <= 614 && endY >= 429 && endY <= 499) ||
-      (startX >= 544 && startX <= 614 && startY >= 429 && startY <= 499))
-  ) {
-    console.log(`  🟢 PROCESSING AWS Cloud Frankfurt icon line (short line): ${cellId}`)
-  }
-
-  console.log(`✅ PROCESSING line ${cellId} (length: ${lineLength.toFixed(2)}px)`)
-
   const hasStartArrow = element.startArrowhead && element.startArrowhead !== null
   const hasEndArrow = element.endArrowhead && element.endArrowhead !== null
-
-  console.log(
-    `Line ${cellId}: hasStartArrow=${hasStartArrow}, hasEndArrow=${hasEndArrow}, startArrowhead='${element.startArrowhead}', endArrowhead='${element.endArrowhead}'`
-  )
 
   let edgeStyle = 'rounded=0;html=1;'
 
@@ -350,8 +264,6 @@ function createLineCell(
   // Handle multi-point lines (bent lines) with waypoints
   let geometryXML = ''
   if (element.points.length > 2) {
-    console.log(`📐 Creating bent line with ${element.points.length} points for ${cellId}`)
-
     // For bent lines, we need to include waypoints
     geometryXML = `          <mxGeometry width="160" height="160" relative="1" as="geometry">\n`
     geometryXML += `            <mxPoint x="${startX}" y="${startY}" as="sourcePoint" />\n`
@@ -364,7 +276,6 @@ function createLineCell(
         const waypointX = Math.round(element.x + element.points[i][0] + offsetX)
         const waypointY = Math.round(element.y + element.points[i][1] + offsetY)
         geometryXML += `              <mxPoint x="${waypointX}" y="${waypointY}" />\n`
-        console.log(`  Waypoint ${i}: (${waypointX}, ${waypointY})`)
       }
       geometryXML += `            </Array>\n`
     }
@@ -383,7 +294,6 @@ function createLineCell(
     geometryXML +
     `        </mxCell>\n`
 
-  console.log(`Generated line XML for ${cellId}:`, lineXML.trim())
   return lineXML
 }
 

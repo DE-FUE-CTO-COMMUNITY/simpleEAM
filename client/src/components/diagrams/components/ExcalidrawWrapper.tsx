@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react'
+import React, { useMemo, useState, useEffect, useCallback } from 'react'
 import dynamic from 'next/dynamic'
 import { useLocale, useTranslations } from 'next-intl'
 import { ExcalidrawComponentProps } from '../types/DiagramTypes'
@@ -44,6 +44,8 @@ const ExcalidrawWrapper = dynamic(
 
       // Store the API reference for internal use
       const apiRef = React.useRef<any>(null)
+      // Track if API is ready
+      const [isAPIReady, setIsAPIReady] = useState(false)
 
       // Collaboration state
       const [isCollaborationDialogOpen, setIsCollaborationDialogOpen] = useState(false)
@@ -68,24 +70,18 @@ const ExcalidrawWrapper = dynamic(
         username: 'User', // TODO: Get from auth context
         currentDiagram,
         onDiagramUpdate,
-        onCollaboratorJoin: collaborator => {
-          console.log('Collaborator joined:', collaborator)
-        },
-        onCollaboratorLeave: collaborator => {
-          console.log('Collaborator left:', collaborator)
-        },
       })
 
-      // Check URL for room parameter on component mount
+      // Check URL for room parameter and start collaboration when API is ready
       useEffect(() => {
-        if (typeof window !== 'undefined') {
+        if (typeof window !== 'undefined' && isAPIReady && apiRef.current) {
           const urlParams = new URLSearchParams(window.location.search)
           const roomParam = urlParams.get('room')
           if (roomParam && !isCollaborating) {
             startCollaboration(roomParam)
           }
         }
-      }, [startCollaboration, isCollaborating])
+      }, [startCollaboration, isCollaborating, isAPIReady])
 
       // Notify parent component when collaboration status changes
       useEffect(() => {
@@ -93,6 +89,18 @@ const ExcalidrawWrapper = dynamic(
           onCollaborationStatusChange(isCollaborating)
         }
       }, [isCollaborating, onCollaborationStatusChange])
+
+      // Safe collaboration start function that ensures API is ready
+      const startCollaborationSafe = useCallback(
+        async (roomId: string) => {
+          if (isAPIReady && apiRef.current) {
+            return await startCollaboration(roomId)
+          } else {
+            console.warn('API not ready yet, cannot start collaboration')
+          }
+        },
+        [isAPIReady, startCollaboration]
+      )
 
       // Enhanced onChange handler to broadcast changes during collaboration
       const handleChange = React.useCallback(
@@ -200,8 +208,10 @@ const ExcalidrawWrapper = dynamic(
             UIOptions={uiOptions}
             initialData={safeInitialData}
             excalidrawAPI={(api: any) => {
-              // Store the API reference for internal use
+              // Store the API reference and mark as ready
               apiRef.current = api
+              setIsAPIReady(true)
+
               // Also call the original excalidrawAPI if provided
               if (excalidrawAPI) {
                 excalidrawAPI(api)
@@ -425,7 +435,7 @@ const ExcalidrawWrapper = dynamic(
             isCollaborating={isCollaborating}
             roomId={roomId}
             collaborators={collaborators}
-            onStartCollaboration={startCollaboration}
+            onStartCollaboration={startCollaborationSafe}
             onStopCollaboration={stopCollaboration}
           />
         </div>

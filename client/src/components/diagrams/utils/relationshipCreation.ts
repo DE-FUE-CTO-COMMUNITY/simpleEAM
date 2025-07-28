@@ -924,9 +924,6 @@ export const checkRelationshipExists = async (
         break
 
       default:
-        console.log(
-          `DEBUG: Unknown relationship type: ${type} between ${sourceElementType} and ${targetElementType}`
-        )
         return false
     }
 
@@ -943,11 +940,6 @@ export const checkRelationshipExists = async (
     // Prüfe das Ergebnis je nach Relationship-Typ
     const data = result.data
     let relationshipExists = false
-
-    console.log(
-      `DEBUG: Checking relationship ${type} from ${sourceElementId} to ${targetElementId}`
-    )
-    console.log(`DEBUG: Query result:`, JSON.stringify(data, null, 2))
 
     switch (type) {
       case 'SUPPORTS':
@@ -1037,7 +1029,6 @@ export const checkRelationshipExists = async (
         break
     }
 
-    console.log(`DEBUG: Relationship exists: ${relationshipExists}`)
     return relationshipExists
   } catch (error) {
     console.error('DEBUG: Error checking relationship existence:', error)

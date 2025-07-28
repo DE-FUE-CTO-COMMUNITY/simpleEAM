@@ -228,10 +228,8 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
   // Handle diagram metadata updates from collaboration
   const handleCollaborationDiagramUpdate = useCallback(
     (diagram: any) => {
-      console.log('Received diagram metadata update from collaboration:', diagram)
       if (diagram && diagram.id && diagram.title) {
         setCurrentDiagram(diagram)
-        console.log('Updated current diagram metadata to:', diagram.title)
       }
     },
     [setCurrentDiagram]
