@@ -9,6 +9,7 @@ import {
   Architecture as ArchitectureIcon,
   AccountTree as DiagramIcon,
   Rule as RuleIcon,
+  Settings as SettingsIcon,
 } from '@mui/icons-material'
 import {
   BusinessCapabilityIcon,
@@ -90,6 +91,13 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
       ? [
           { isDivider: true, text: 'divider', icon: null },
           { text: t('importExport'), icon: <ExcelIcon />, onClick: handleImportExportDialogOpen },
+        ]
+      : []),
+    // Administration nur für Admins - ganz unten
+    ...(initialized && isAdmin()
+      ? [
+          { isDivider: true, text: 'divider', icon: null },
+          { text: t('administration'), icon: <SettingsIcon />, href: '/admin' },
         ]
       : []),
   ]

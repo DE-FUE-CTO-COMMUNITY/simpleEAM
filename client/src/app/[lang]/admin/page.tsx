@@ -2,14 +2,12 @@
 
 import React from 'react'
 import { Container, Typography, Box, Paper, Button } from '@mui/material'
-import { Settings as SettingsIcon, BugReport as BugReportIcon } from '@mui/icons-material'
-import TableSettingsManager from '@/components/common/TableSettingsManager'
+import { BugReport as BugReportIcon } from '@mui/icons-material'
 import SessionDebugger from '@/components/debug/SessionDebugger'
 import { isAdmin } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 
 export default function AdminPage() {
-  const [isSettingsOpen, setIsSettingsOpen] = React.useState(false)
   const [isDebuggerOpen, setIsDebuggerOpen] = React.useState(false)
 
   // Prüfe Admin-Berechtigung
@@ -28,21 +26,11 @@ export default function AdminPage() {
 
         <Paper sx={{ p: 3, mt: 3 }}>
           <Typography variant="h5" component="h2" gutterBottom>
-            Tabellen-Einstellungen verwalten
+            Debug-Tools
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-            Hier können Sie die gespeicherten Spaltensichtbarkeits-Einstellungen für alle Tabellen
-            verwalten. Sie können Einstellungen anzeigen, löschen, exportieren und importieren.
+            Hier können Sie Debug-Tools für die Anwendung verwenden.
           </Typography>
-
-          <Button
-            variant="contained"
-            onClick={() => setIsSettingsOpen(true)}
-            startIcon={<SettingsIcon />}
-            sx={{ mr: 2 }}
-          >
-            Tabellen-Einstellungen öffnen
-          </Button>
 
           <Button
             variant="outlined"
@@ -52,8 +40,6 @@ export default function AdminPage() {
           >
             Session Debugger
           </Button>
-
-          <TableSettingsManager isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
 
           <SessionDebugger isOpen={isDebuggerOpen} onClose={() => setIsDebuggerOpen(false)} />
         </Paper>

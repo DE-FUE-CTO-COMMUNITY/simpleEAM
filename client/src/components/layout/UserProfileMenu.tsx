@@ -14,12 +14,10 @@ import {
 import {
   Person as PersonIcon,
   Logout as LogoutIcon,
-  Settings as SettingsIcon,
   Language as LanguageIcon,
 } from '@mui/icons-material'
-import { useRouter } from '@/i18n/navigation'
 import { useLocale, useTranslations } from 'next-intl'
-import { isAdmin, logout, useAuth } from '@/lib/auth'
+import { logout, useAuth } from '@/lib/auth'
 import { useQuery } from '@apollo/client'
 import { GET_PERSON_BY_EMAIL } from '@/graphql/person'
 import UserProfileDialog from '@/components/profile/UserProfileDialog'
@@ -31,7 +29,6 @@ interface UserProfileMenuProps {
 
 const UserProfileMenu: React.FC<UserProfileMenuProps> = ({ userName }) => {
   const theme = useTheme()
-  const router = useRouter()
   const locale = useLocale()
   const t = useTranslations('user')
   const { authenticated } = useAuth()
@@ -134,14 +131,6 @@ const UserProfileMenu: React.FC<UserProfileMenuProps> = ({ userName }) => {
           <Typography variant="subtitle2">{userName}</Typography>
         </MenuItem>
         <Divider />
-        {isAdmin() && (
-          <MenuItem onClick={() => router.push('/admin')}>
-            <ListItemIcon>
-              <SettingsIcon fontSize="small" />
-            </ListItemIcon>
-            <ListItemText>{t('administration')}</ListItemText>
-          </MenuItem>
-        )}
         <MenuItem onClick={handleProfileClick}>
           <ListItemIcon>
             <PersonIcon fontSize="small" />
