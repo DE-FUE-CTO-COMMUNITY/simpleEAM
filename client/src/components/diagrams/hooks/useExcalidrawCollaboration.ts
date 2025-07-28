@@ -315,7 +315,8 @@ export const useExcalidrawCollaboration = ({
 
               // Restore the broadcast function after a short delay
               setTimeout(() => {
-                ;(excalidrawAPI as any).broadcastSceneUpdate = originalBroadcast
+                const api = excalidrawAPI as any
+                api.broadcastSceneUpdate = originalBroadcast
                 isReceivingUpdateRef.current = false
               }, 50)
             } else {
@@ -454,7 +455,8 @@ export const useExcalidrawCollaboration = ({
   useEffect(() => {
     if (excalidrawAPI && state.isCollaborating) {
       // Add the broadcast function to the API so it can be called from ExcalidrawWrapper
-      ;(excalidrawAPI as any).broadcastSceneUpdate = broadcastSceneUpdate
+      const api = excalidrawAPI as any
+      api.broadcastSceneUpdate = broadcastSceneUpdate
     }
   }, [excalidrawAPI, state.isCollaborating, broadcastSceneUpdate])
 
