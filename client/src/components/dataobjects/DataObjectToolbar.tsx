@@ -3,7 +3,7 @@
 import React from 'react'
 import { useTranslations } from 'next-intl'
 import GenericToolbar from '../common/GenericToolbar'
-import { Table, VisibilityState } from '@tanstack/react-table'
+import { Table } from '@tanstack/react-table'
 
 interface DataObjectToolbarProps {
   globalFilter: string
@@ -14,7 +14,6 @@ interface DataObjectToolbarProps {
   onCreateClick?: () => void
   table?: Table<any>
   enableColumnVisibilityToggle?: boolean
-  columnVisibility?: VisibilityState
 }
 
 /**
@@ -23,7 +22,6 @@ interface DataObjectToolbarProps {
 const DataObjectToolbar: React.FC<DataObjectToolbarProps> = ({
   table,
   enableColumnVisibilityToggle = true,
-  columnVisibility,
   ...props
 }) => {
   const t = useTranslations('dataObjects')
@@ -35,7 +33,6 @@ const DataObjectToolbar: React.FC<DataObjectToolbarProps> = ({
       searchFieldWidth="350px"
       table={table}
       enableColumnVisibilityToggle={enableColumnVisibilityToggle}
-      columnVisibility={columnVisibility}
       tableKey="dataobjects" // Eindeutiger Schlüssel für die DataObjects-Tabelle
     />
   )

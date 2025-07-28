@@ -3,7 +3,7 @@
 import React from 'react'
 import { useTranslations } from 'next-intl'
 import GenericToolbar from '../common/GenericToolbar'
-import { Table, VisibilityState } from '@tanstack/react-table'
+import { Table } from '@tanstack/react-table'
 
 interface InfrastructureToolbarProps {
   globalFilter: string
@@ -14,7 +14,6 @@ interface InfrastructureToolbarProps {
   onCreateClick?: () => void
   table?: Table<any>
   enableColumnVisibilityToggle?: boolean
-  columnVisibility?: VisibilityState
 }
 
 /**
@@ -23,7 +22,6 @@ interface InfrastructureToolbarProps {
 const InfrastructureToolbar: React.FC<InfrastructureToolbarProps> = ({
   table,
   enableColumnVisibilityToggle = true,
-  columnVisibility,
   ...props
 }) => {
   const t = useTranslations('infrastructure')
@@ -35,7 +33,6 @@ const InfrastructureToolbar: React.FC<InfrastructureToolbarProps> = ({
       searchFieldWidth="350px"
       table={table}
       enableColumnVisibilityToggle={enableColumnVisibilityToggle}
-      columnVisibility={columnVisibility}
       tableKey="infrastructure" // Eindeutiger Schlüssel für die Infrastructure-Tabelle
     />
   )

@@ -3,7 +3,7 @@
 import React from 'react'
 import { useTranslations } from 'next-intl'
 import GenericToolbar from '../common/GenericToolbar'
-import { Table, VisibilityState } from '@tanstack/react-table'
+import { Table } from '@tanstack/react-table'
 
 interface CapabilityToolbarWithGenericProps {
   globalFilter: string
@@ -13,7 +13,6 @@ interface CapabilityToolbarWithGenericProps {
   onResetFilters: () => void
   table?: Table<any>
   enableColumnVisibilityToggle?: boolean
-  columnVisibility?: VisibilityState
 }
 
 /**
@@ -22,7 +21,6 @@ interface CapabilityToolbarWithGenericProps {
 const CapabilityToolbarWithGeneric: React.FC<CapabilityToolbarWithGenericProps> = ({
   table,
   enableColumnVisibilityToggle = true,
-  columnVisibility,
   ...props
 }) => {
   const t = useTranslations('capabilities')
@@ -34,7 +32,6 @@ const CapabilityToolbarWithGeneric: React.FC<CapabilityToolbarWithGenericProps> 
       showClearSearchButton={true}
       table={table}
       enableColumnVisibilityToggle={enableColumnVisibilityToggle}
-      columnVisibility={columnVisibility}
       tableKey="capabilities" // Eindeutiger Schlüssel für die Capabilities-Tabelle
     />
   )
