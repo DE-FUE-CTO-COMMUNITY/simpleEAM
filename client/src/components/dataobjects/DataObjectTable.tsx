@@ -52,8 +52,9 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
     columnVisibility,
     onTableReady: persistentOnTableReady,
     onColumnVisibilityChange,
+    resetColumnVisibility,
   } = usePersistentColumnVisibility({
-    tableKey: 'dataObjects',
+    tableKey: 'dataobjects', // Korrigiert: stimmt jetzt mit DataObjectToolbar überein
     defaultColumnVisibility: {
       id: false,
       description: false,

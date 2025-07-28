@@ -41,6 +41,7 @@ const ArchitecturePrincipleToolbar: React.FC<ArchitecturePrincipleToolbarProps> 
       entityName={t('title')}
       table={table}
       enableColumnVisibilityToggle={enableColumnVisibilityToggle}
+      tableKey="architecture-principles" // Eindeutiger Schlüssel für die Architecture-Principles-Tabelle
     />
   )
 }

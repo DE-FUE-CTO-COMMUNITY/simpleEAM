@@ -14,6 +14,7 @@ interface ApplicationToolbarWithGenericProps {
   table?: Table<any>
   enableColumnVisibilityToggle?: boolean
   columnVisibility?: VisibilityState
+  onResetColumnVisibility?: () => void
 }
 
 /**
@@ -23,6 +24,7 @@ const ApplicationToolbarWithGeneric: React.FC<ApplicationToolbarWithGenericProps
   table,
   enableColumnVisibilityToggle = true,
   columnVisibility, // Wird benötigt, um die Prop-Signatur beizubehalten
+  onResetColumnVisibility,
   ...props
 }) => {
   const t = useTranslations('applications')
@@ -35,6 +37,8 @@ const ApplicationToolbarWithGeneric: React.FC<ApplicationToolbarWithGenericProps
       table={table}
       enableColumnVisibilityToggle={enableColumnVisibilityToggle}
       columnVisibility={columnVisibility} // Wird weitergegeben, aber nicht mehr direkt verwendet
+      onResetColumnVisibility={onResetColumnVisibility}
+      tableKey="applications" // Eindeutiger Schlüssel für die Applications-Tabelle
     />
   )
 }

@@ -36,6 +36,7 @@ const DataObjectToolbar: React.FC<DataObjectToolbarProps> = ({
       table={table}
       enableColumnVisibilityToggle={enableColumnVisibilityToggle}
       columnVisibility={columnVisibility}
+      tableKey="dataobjects" // Eindeutiger Schlüssel für die DataObjects-Tabelle
     />
   )
 }

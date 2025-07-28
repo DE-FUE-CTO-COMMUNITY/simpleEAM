@@ -35,6 +35,7 @@
     "first": "First",
     "last": "Last",
     "showColumns": "Show Columns",
+    "resetColumns": "Reset Columns",
     "filter": "Filter",
     "filterFor": "Filter for {entity}",
     "resetFilter": "Reset Filter",

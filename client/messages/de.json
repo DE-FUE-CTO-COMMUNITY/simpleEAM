@@ -35,6 +35,7 @@
     "first": "Anfang",
     "last": "Ende",
     "showColumns": "Spalten anzeigen",
+    "resetColumns": "Spalten zurücksetzen",
     "filter": "Filter",
     "filterFor": "Filter für {entity}",
     "resetFilter": "Filter zurücksetzen",

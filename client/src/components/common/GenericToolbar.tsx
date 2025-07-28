@@ -21,9 +21,11 @@ import {
   ClearAll as ClearAllIcon,
   Clear as ClearIcon,
   ViewColumn as ViewColumnIcon,
+  RestartAlt as RestartAltIcon,
 } from '@mui/icons-material'
 import { Table, VisibilityState } from '@tanstack/react-table'
 import { useTranslations } from 'next-intl'
+import { clearTableSettings } from '@/utils/columnVisibilityUtils'
 
 export interface GenericToolbarProps {
   /**
@@ -114,6 +116,16 @@ export interface GenericToolbarProps {
    * @default "Eintrag"
    */
   entityName?: string
+
+  /**
+   * Eindeutiger Schlüssel für die Tabelle (für persistente Speicherung)
+   */
+  tableKey?: string
+
+  /**
+   * Callback-Funktion zum Zurücksetzen der Spaltenvisibilität auf die Standardwerte
+   */
+  onResetColumnVisibility?: () => void
 }
 
 /**
@@ -138,6 +150,8 @@ const GenericToolbar: React.FC<GenericToolbarProps> = ({
   columnVisibility: _unused, // Umbenannt, um ESLint-Warnung zu vermeiden
   columnVisibilityTooltip,
   entityName = 'Eintrag',
+  tableKey,
+  onResetColumnVisibility,
 }) => {
   const t = useTranslations('common')
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
@@ -180,6 +194,21 @@ const GenericToolbar: React.FC<GenericToolbarProps> = ({
 
       // Spalte in der Tabelle umschalten
       column.toggleVisibility()
+    }
+  }
+
+  // Reset-Funktion - verwendet die bewährte clearTableSettings Funktion aus dem Admin-Bereich
+  const handleResetColumnVisibility = () => {
+    if (tableKey) {
+      // Verwende die bewährte clearTableSettings Funktion aus dem Admin-Bereich
+      clearTableSettings(tableKey)
+
+      // Nach dem Löschen der localStorage-Einstellungen eine Seite neu laden,
+      // damit die Default-Werte wieder geladen werden
+      window.location.reload()
+    } else if (onResetColumnVisibility) {
+      // Fallback: Wenn nur eine spezifische Reset-Funktion übergeben wurde
+      onResetColumnVisibility()
     }
   }
 
@@ -294,9 +323,25 @@ const GenericToolbar: React.FC<GenericToolbarProps> = ({
               }}
             >
               <Box sx={{ p: 2, minWidth: 200 }}>
-                <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold' }}>
-                  {t('showColumns')}
-                </Typography>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    mb: 1,
+                  }}
+                >
+                  <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>
+                    {t('showColumns')}
+                  </Typography>
+                  {(onResetColumnVisibility || tableKey) && (
+                    <Tooltip title={t('resetColumns')}>
+                      <IconButton size="small" onClick={handleResetColumnVisibility} sx={{ ml: 1 }}>
+                        <RestartAltIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                </Box>
                 <FormGroup>
                   {/* Spalten-Checkboxen: Aktiviert = Spalte sichtbar, Deaktiviert = Spalte ausgeblendet */}
                   {table.getAllLeafColumns().map(column => {

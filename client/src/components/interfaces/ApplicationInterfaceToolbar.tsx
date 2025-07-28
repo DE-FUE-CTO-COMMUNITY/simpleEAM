@@ -34,6 +34,7 @@ const ApplicationInterfaceToolbar: React.FC<ApplicationInterfaceToolbarProps> = 
       resetFilterTooltip="Schnittstellenfilter zurücksetzen"
       table={table}
       enableColumnVisibilityToggle={enableColumnVisibilityToggle}
+      tableKey="interfaces" // Eindeutiger Schlüssel für die Interfaces-Tabelle
     />
   )
 }

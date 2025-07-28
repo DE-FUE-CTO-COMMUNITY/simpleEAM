@@ -7,7 +7,7 @@ import { useQuery, useMutation } from '@apollo/client'
 import { useSnackbar } from 'notistack'
 import { useTranslations } from 'next-intl'
 import { isArchitect } from '@/lib/auth'
-import { VisibilityState } from '@tanstack/react-table'
+import usePersistentColumnVisibility from '@/hooks/usePersistentColumnVisibility'
 
 import {
   GET_APPLICATIONS,
@@ -39,31 +39,38 @@ const ApplicationsPage = () => {
 
   // Table instance for column visibility
   const [tableInstance, setTableInstance] = useState<any>(null)
-  // Column visibility state mit Default-Werten für alle Spalten (sichtbar)
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
-    name: true,
-    status: true,
-    criticality: true,
-    timeCategory: true,
-    sevenRStrategy: true,
-    vendor: true,
-    version: true,
-    owners: true,
-    supportsCapabilities: true,
-    usesDataObjects: true,
-    costs: true,
-    hostedOn: false, // Als versteckte Spalte standardmäßig ausgeblendet
-    createdAt: true,
-    updatedAt: true,
-    actions: true,
+
+  // Verwende persistente Spaltensichtbarkeit mit den korrekten Default-Werten
+  const {
+    columnVisibility,
+    onTableReady: persistentOnTableReady,
+    onColumnVisibilityChange: handleColumnVisibilityChange,
+    resetColumnVisibility,
+  } = usePersistentColumnVisibility({
+    tableKey: 'applications',
+    defaultColumnVisibility: {
+      name: true,
+      status: true,
+      criticality: true,
+      timeCategory: true,
+      sevenRStrategy: true,
+      vendor: true,
+      version: true,
+      owners: true,
+      supportsCapabilities: true,
+      usesDataObjects: true,
+      costs: true,
+      hostedOn: false, // Als versteckte Spalte standardmäßig ausgeblendet
+      createdAt: true,
+      updatedAt: true,
+      actions: true,
+    },
   })
 
-  // Hilfsfunktion zum effizienten Aktualisieren der Spaltenvisibilität
-  const handleColumnVisibilityChange = (
-    updater: VisibilityState | ((old: VisibilityState) => VisibilityState)
-  ) => {
-    // Sofort den Zustand aktualisieren, um Verzögerungen zu vermeiden
-    setColumnVisibility(updater)
+  // Kombiniere externe und persistente onTableReady Callbacks
+  const handleTableReady = (table: any) => {
+    persistentOnTableReady(table)
+    setTableInstance(table)
   }
 
   // Filter-Zustand
@@ -695,6 +702,7 @@ const ApplicationsPage = () => {
           onResetFilters={handleResetFilter}
           table={tableInstance}
           enableColumnVisibilityToggle={true}
+          onResetColumnVisibility={resetColumnVisibility}
         />
 
         <Paper sx={{ overflow: 'hidden' }}>
@@ -710,7 +718,7 @@ const ApplicationsPage = () => {
             onDeleteApplication={handleDeleteApplication}
             availableTechStack={availableTechStack}
             availableApplications={applications as unknown as Application[]} // Hinzugefügt
-            onTableReady={setTableInstance}
+            onTableReady={handleTableReady}
             columnVisibility={columnVisibility}
             onColumnVisibilityChange={handleColumnVisibilityChange}
           />

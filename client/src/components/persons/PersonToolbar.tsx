@@ -38,6 +38,7 @@ const PersonToolbar: React.FC<PersonToolbarProps> = ({
       table={table}
       enableColumnVisibilityToggle={enableColumnVisibilityToggle}
       columnVisibility={columnVisibility}
+      tableKey="persons" // Eindeutiger Schlüssel für die Persons-Tabelle
     />
   )
 }

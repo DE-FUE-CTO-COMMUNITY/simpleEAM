@@ -41,6 +41,7 @@ const ArchitectureToolbar: React.FC<ArchitectureToolbarProps> = ({
       entityName={tArch('form.entityName')}
       table={table}
       enableColumnVisibilityToggle={enableColumnVisibilityToggle}
+      tableKey="architectures" // Eindeutiger Schlüssel für die Architectures-Tabelle
     />
   )
 }

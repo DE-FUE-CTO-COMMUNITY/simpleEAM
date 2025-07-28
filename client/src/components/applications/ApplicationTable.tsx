@@ -60,6 +60,7 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
     columnVisibility,
     onTableReady: persistentOnTableReady,
     onColumnVisibilityChange,
+    resetColumnVisibility,
   } = usePersistentColumnVisibility({
     tableKey: 'applications',
     defaultColumnVisibility: {

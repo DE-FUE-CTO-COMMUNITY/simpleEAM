@@ -36,6 +36,7 @@ const InfrastructureToolbar: React.FC<InfrastructureToolbarProps> = ({
       table={table}
       enableColumnVisibilityToggle={enableColumnVisibilityToggle}
       columnVisibility={columnVisibility}
+      tableKey="infrastructure" // Eindeutiger Schlüssel für die Infrastructure-Tabelle
     />
   )
 }

@@ -116,8 +116,9 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
     columnVisibility,
     onTableReady: persistentOnTableReady,
     onColumnVisibilityChange,
+    resetColumnVisibility,
   } = usePersistentColumnVisibility({
-    tableKey: 'applicationInterfaces',
+    tableKey: 'interfaces', // Korrigiert: stimmt jetzt mit ApplicationInterfaceToolbar überein
     defaultColumnVisibility: {
       id: false,
       description: false,

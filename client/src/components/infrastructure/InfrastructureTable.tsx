@@ -85,8 +85,9 @@ const InfrastructureTable: React.FC<InfrastructureTableProps> = ({
     columnVisibility,
     onTableReady: persistentOnTableReady,
     onColumnVisibilityChange,
+    resetColumnVisibility,
   } = usePersistentColumnVisibility({
-    tableKey: 'infrastructures',
+    tableKey: 'infrastructure', // Korrigiert: stimmt jetzt mit InfrastructureToolbar überein
     defaultColumnVisibility: {
       id: false,
       description: false,

@@ -35,6 +35,7 @@ const CapabilityToolbarWithGeneric: React.FC<CapabilityToolbarWithGenericProps> 
       table={table}
       enableColumnVisibilityToggle={enableColumnVisibilityToggle}
       columnVisibility={columnVisibility}
+      tableKey="capabilities" // Eindeutiger Schlüssel für die Capabilities-Tabelle
     />
   )
 }
