@@ -53,6 +53,16 @@ const PersonTableWithGenericTable: React.FC<PersonTableProps> = ({
   } = usePersistentColumnVisibility({
     tableKey: 'persons',
     defaultColumnVisibility: {
+      // Standardmäßig sichtbare Spalten
+      firstName: true,
+      lastName: true,
+      email: true,
+      department: true,
+      role: true,
+      phone: true,
+      // Standardmäßig versteckte Spalten
+      ownedCapabilities: false,
+      ownedApplications: false,
       ownedDataObjects: false,
       ownedArchitectures: false,
       ownedDiagrams: false,

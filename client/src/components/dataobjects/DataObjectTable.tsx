@@ -52,10 +52,17 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
     columnVisibility,
     onTableReady: persistentOnTableReady,
     onColumnVisibilityChange,
-    resetColumnVisibility,
+    // resetColumnVisibility wird für zukünftige Reset-Funktionalität benötigt
   } = usePersistentColumnVisibility({
     tableKey: 'dataobjects', // Korrigiert: stimmt jetzt mit DataObjectToolbar überein
     defaultColumnVisibility: {
+      // Standardmäßig sichtbare Spalten
+      name: true,
+      classification: true,
+      format: true,
+      dataSources: true,
+      owners: true,
+      // Standardmäßig versteckte Spalten
       id: false,
       description: false,
       planningDate: false,

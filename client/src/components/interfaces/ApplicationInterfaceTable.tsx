@@ -116,12 +116,21 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
     columnVisibility,
     onTableReady: persistentOnTableReady,
     onColumnVisibilityChange,
-    resetColumnVisibility,
+    // resetColumnVisibility wird für zukünftige Reset-Funktionalität benötigt
   } = usePersistentColumnVisibility({
     tableKey: 'interfaces', // Korrigiert: stimmt jetzt mit ApplicationInterfaceToolbar überein
     defaultColumnVisibility: {
+      // Standardmäßig sichtbare Spalten
+      name: true,
+      interfaceType: true,
+      protocol: true,
+      responsiblePerson: true,
+      sourceApplications: true,
+      targetApplications: true,
+      // Standardmäßig versteckte Spalten
       id: false,
       description: false,
+      dataObjects: false,
       version: false,
       status: false,
       planningDate: false,

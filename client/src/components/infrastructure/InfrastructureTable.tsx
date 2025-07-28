@@ -85,10 +85,17 @@ const InfrastructureTable: React.FC<InfrastructureTableProps> = ({
     columnVisibility,
     onTableReady: persistentOnTableReady,
     onColumnVisibilityChange,
-    resetColumnVisibility,
+    // resetColumnVisibility wird für zukünftige Reset-Funktionalität benötigt
   } = usePersistentColumnVisibility({
     tableKey: 'infrastructure', // Korrigiert: stimmt jetzt mit InfrastructureToolbar überein
     defaultColumnVisibility: {
+      // Standardmäßig sichtbare Spalten
+      name: true,
+      infrastructureType: true,
+      status: true,
+      location: true,
+      owners: true,
+      // Standardmäßig versteckte Spalten
       id: false,
       description: false,
       vendor: false,

@@ -59,10 +59,23 @@ const ArchitecturePrincipleTable: React.FC<ArchitecturePrincipleTableProps> = ({
     columnVisibility,
     onTableReady: persistentOnTableReady,
     onColumnVisibilityChange,
+    // resetColumnVisibility wird für zukünftige Reset-Funktionalität benötigt
   } = usePersistentColumnVisibility({
     tableKey: 'architecture-principles',
     defaultColumnVisibility: {
-      description: false, // Beschreibung standardmäßig ausblenden
+      // Standardmäßig sichtbare Spalten
+      name: true,
+      category: true,
+      priority: true,
+      isActive: true,
+      owners: true,
+      // Standardmäßig versteckte Spalten
+      description: false,
+      appliedInArchitectures: false,
+      implementedByApplications: false,
+      tags: false,
+      createdAt: false,
+      updatedAt: false,
     },
   })
 

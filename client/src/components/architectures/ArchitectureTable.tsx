@@ -62,13 +62,23 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
   } = usePersistentColumnVisibility({
     tableKey: 'architectures',
     defaultColumnVisibility: {
-      description: false, // Beschreibung standardmäßig ausblenden
-      appliedPrinciples: false, // Angewandte Prinzipien standardmäßig ausblenden
-      containsCapabilities: false, // Capabilities standardmäßig ausblenden
-      containsApplications: false, // Applikationen standardmäßig ausblenden
-      containsDataObjects: false, // Datenobjekte standardmäßig ausblenden
-      containsInterfaces: false, // Schnittstellen standardmäßig ausblenden
-      containsInfrastructure: false, // Infrastruktur standardmäßig ausblenden
+      // Standardmäßig sichtbare Spalten
+      name: true,
+      domain: true,
+      type: true,
+      timestamp: true,
+      owners: true,
+      tags: true,
+      // Standardmäßig versteckte Spalten
+      description: false,
+      containsCapabilities: false,
+      containsApplications: false,
+      containsDataObjects: false,
+      containsInterfaces: false,
+      containsInfrastructure: false,
+      appliedPrinciples: false,
+      createdAt: false,
+      updatedAt: false,
     },
   })
 

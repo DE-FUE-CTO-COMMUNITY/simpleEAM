@@ -60,14 +60,25 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
     columnVisibility,
     onTableReady: persistentOnTableReady,
     onColumnVisibilityChange,
-    resetColumnVisibility,
+    // resetColumnVisibility wird für zukünftige Reset-Funktionalität benötigt
   } = usePersistentColumnVisibility({
     tableKey: 'applications',
     defaultColumnVisibility: {
+      // Standardmäßig sichtbare Spalten
+      name: true,
+      status: true,
+      criticality: true,
+      vendor: true,
+      version: true,
+      owners: true,
+      costs: true,
+      // Standardmäßig versteckte Spalten
       id: false,
       description: false,
       timeCategory: false,
       sevenRStrategy: false,
+      supportsCapabilities: false,
+      usesDataObjects: false,
       hostingEnvironment: false,
       technologyStack: false,
       planningDate: false,
@@ -77,9 +88,11 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
       sourceOfInterfaces: false,
       targetOfInterfaces: false,
       partOfArchitectures: false,
+      implementsPrinciples: false,
       depictedInDiagrams: false,
       parents: false,
       components: false,
+      hostedOn: false,
       createdAt: false,
       updatedAt: false,
     },
