@@ -114,8 +114,6 @@ services:
   # Excalidraw Collaboration Room Server
   excalidraw-room:
     image: excalidraw/excalidraw-room:sha-03ff435
-    ports:
-      - '${EXCALIDRAW_ROOM_EXTERNAL_PORT}:80'
     networks:
       - eam-network
       - ${TRAEFIK_NETWORK}
