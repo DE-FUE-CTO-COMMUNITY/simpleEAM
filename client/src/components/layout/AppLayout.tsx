@@ -10,6 +10,7 @@ import { SnackbarProvider } from 'notistack'
 import { AuthContext, initKeycloak, keycloak } from '@/lib/auth'
 import { setupSessionMonitoring } from '@/utils/sessionUtils'
 import { createApolloClient } from '@/lib/apollo-client'
+import { useAutoUserRegistration } from '@/hooks/useAutoUserRegistration'
 import ThemeProvider from '@/contexts/ThemeContext'
 import { CircularProgress, Box } from '@mui/material'
 import { LocalizationProvider } from '@mui/x-date-pickers'
@@ -18,6 +19,7 @@ import RootLayout from '@/components/layout/RootLayout'
 import { useLocale } from 'next-intl'
 import dayjs from 'dayjs'
 import 'dayjs/locale/de'
+import '@/styles/snackbar-overrides.css'
 import 'dayjs/locale/en'
 
 // Import der globalen Styles
@@ -78,6 +80,12 @@ function useClientStyleRegistry() {
 }
 
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
+
+// Interne Komponente für die automatische Benutzerregistrierung
+function AutoUserRegistration() {
+  useAutoUserRegistration()
+  return null
+}
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const locale = useLocale()
@@ -200,9 +208,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               vertical: 'top',
               horizontal: 'right',
             }}
+            dense
+            preventDuplicate
+            autoHideDuration={5000}
+            className="custom-snackbar-provider"
           >
             <AuthContext.Provider value={{ keycloak, initialized, authenticated }}>
               <ApolloProvider client={apolloClient}>
+                <AutoUserRegistration />
                 <Box
                   sx={{
                     width: '100%',

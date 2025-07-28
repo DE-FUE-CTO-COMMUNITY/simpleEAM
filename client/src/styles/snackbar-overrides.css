@@ -1,0 +1,36 @@
+/* Korrigiere den z-index der Snackbar, damit sie sichtbar ist aber nach 5sec verschwindet */
+.custom-snackbar-provider {
+  z-index: 1400 !important; /* Höher als AppBar (1400) und User Menu (1300) */
+}
+
+.custom-snackbar-provider .SnackbarContainer-root {
+  z-index: 1400 !important;
+}
+
+/* Stelle sicher, dass einzelne Snackbars auch den korrekten z-index haben */
+.custom-snackbar-provider .SnackbarItem-root {
+  z-index: 1400 !important;
+}
+
+/* Notistack-spezifische Klassen */
+.custom-snackbar-provider .notistack-SnackbarContainer {
+  z-index: 1400 !important;
+}
+
+.custom-snackbar-provider .notistack-Snackbar {
+  z-index: 1400 !important;
+}
+
+/* Übersteuere alle Snackbar-Container */
+.SnackbarContainer-root {
+  z-index: 1400 !important;
+}
+
+.notistack-SnackbarContainer {
+  z-index: 1400 !important;
+}
+
+/* Wenn das immer noch nicht funktioniert, benutze eine noch spezifischere Regel */
+div[class*='SnackbarContainer'] {
+  z-index: 1400 !important;
+}
