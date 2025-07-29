@@ -61,6 +61,50 @@ export async function createCapabilityHierarchy(session: Session) {
     CREATE (certification_compliance)-[:HAS_PARENT]->(quality_mgmt)
   `)
 
+  // Finance & Accounting hierarchy
+  await session.run(`
+    MATCH (finance_accounting:BusinessCapability {id: "cap-finance-accounting"})
+    MATCH (financial_planning:BusinessCapability {id: "cap-financial-planning"})
+    MATCH (accounts_payable:BusinessCapability {id: "cap-accounts-payable"})
+    MATCH (financial_reporting:BusinessCapability {id: "cap-financial-reporting"})
+    CREATE (financial_planning)-[:HAS_PARENT]->(finance_accounting)
+    CREATE (accounts_payable)-[:HAS_PARENT]->(finance_accounting)
+    CREATE (financial_reporting)-[:HAS_PARENT]->(finance_accounting)
+  `)
+
+  // HR Management hierarchy
+  await session.run(`
+    MATCH (hr_management:BusinessCapability {id: "cap-hr-management"})
+    MATCH (talent_acquisition:BusinessCapability {id: "cap-talent-acquisition"})
+    MATCH (performance_management:BusinessCapability {id: "cap-performance-management"})
+    MATCH (payroll_benefits:BusinessCapability {id: "cap-payroll-benefits"})
+    CREATE (talent_acquisition)-[:HAS_PARENT]->(hr_management)
+    CREATE (performance_management)-[:HAS_PARENT]->(hr_management)
+    CREATE (payroll_benefits)-[:HAS_PARENT]->(hr_management)
+  `)
+
+  // IT Management hierarchy
+  await session.run(`
+    MATCH (it_management:BusinessCapability {id: "cap-it-management"})
+    MATCH (it_service_management:BusinessCapability {id: "cap-it-service-management"})
+    MATCH (infrastructure_management:BusinessCapability {id: "cap-infrastructure-management"})
+    MATCH (application_management:BusinessCapability {id: "cap-application-management"})
+    CREATE (it_service_management)-[:HAS_PARENT]->(it_management)
+    CREATE (infrastructure_management)-[:HAS_PARENT]->(it_management)
+    CREATE (application_management)-[:HAS_PARENT]->(it_management)
+  `)
+
+  // Customer Service hierarchy
+  await session.run(`
+    MATCH (customer_service:BusinessCapability {id: "cap-customer-service"})
+    MATCH (technical_support:BusinessCapability {id: "cap-technical-support"})
+    MATCH (warranty_management:BusinessCapability {id: "cap-warranty-management"})
+    MATCH (customer_training:BusinessCapability {id: "cap-customer-training"})
+    CREATE (technical_support)-[:HAS_PARENT]->(customer_service)
+    CREATE (warranty_management)-[:HAS_PARENT]->(customer_service)
+    CREATE (customer_training)-[:HAS_PARENT]->(customer_service)
+  `)
+
   console.log('Capability hierarchy relationships created successfully.')
 }
 
@@ -178,6 +222,74 @@ export async function createApplicationCapabilitySupport(session: Session) {
     MATCH (product_innovation:BusinessCapability {id: "cap-product-innovation"})
     CREATE (siemens_plm)-[:SUPPORTS]->(research)
     CREATE (siemens_plm)-[:SUPPORTS]->(product_innovation)
+  `)
+
+  // ServiceNow supports IT Management capabilities
+  await session.run(`
+    MATCH (servicenow:Application {id: "app-servicenow"})
+    MATCH (it_management:BusinessCapability {id: "cap-it-management"})
+    MATCH (it_service_management:BusinessCapability {id: "cap-it-service-management"})
+    MATCH (infrastructure_management:BusinessCapability {id: "cap-infrastructure-management"})
+    MATCH (application_management:BusinessCapability {id: "cap-application-management"})
+    CREATE (servicenow)-[:SUPPORTS]->(it_management)
+    CREATE (servicenow)-[:SUPPORTS]->(it_service_management)
+    CREATE (servicenow)-[:SUPPORTS]->(infrastructure_management)
+    CREATE (servicenow)-[:SUPPORTS]->(application_management)
+  `)
+
+  // SAP Concur supports financial management
+  await session.run(`
+    MATCH (concur:Application {id: "app-concur"})
+    MATCH (finance_accounting:BusinessCapability {id: "cap-finance-accounting"})
+    MATCH (financial_planning:BusinessCapability {id: "cap-financial-planning"})
+    MATCH (accounts_payable:BusinessCapability {id: "cap-accounts-payable"})
+    CREATE (concur)-[:SUPPORTS]->(finance_accounting)
+    CREATE (concur)-[:SUPPORTS]->(financial_planning)
+    CREATE (concur)-[:SUPPORTS]->(accounts_payable)
+  `)
+
+  // Cornerstone supports HR and customer training
+  await session.run(`
+    MATCH (cornerstone:Application {id: "app-cornerstone-lms"})
+    MATCH (hr_management:BusinessCapability {id: "cap-hr-management"})
+    MATCH (performance_management:BusinessCapability {id: "cap-performance-management"})
+    MATCH (customer_service:BusinessCapability {id: "cap-customer-service"})
+    MATCH (customer_training:BusinessCapability {id: "cap-customer-training"})
+    CREATE (cornerstone)-[:SUPPORTS]->(hr_management)
+    CREATE (cornerstone)-[:SUPPORTS]->(performance_management)
+    CREATE (cornerstone)-[:SUPPORTS]->(customer_service)
+    CREATE (cornerstone)-[:SUPPORTS]->(customer_training)
+  `)
+
+  // Oracle Hyperion supports financial planning and reporting
+  await session.run(`
+    MATCH (hyperion:Application {id: "app-oracle-hyperion"})
+    MATCH (finance_accounting:BusinessCapability {id: "cap-finance-accounting"})
+    MATCH (financial_planning:BusinessCapability {id: "cap-financial-planning"})
+    MATCH (financial_reporting:BusinessCapability {id: "cap-financial-reporting"})
+    CREATE (hyperion)-[:SUPPORTS]->(finance_accounting)
+    CREATE (hyperion)-[:SUPPORTS]->(financial_planning)
+    CREATE (hyperion)-[:SUPPORTS]->(financial_reporting)
+  `)
+
+  // Update existing Workday to support new HR capabilities
+  await session.run(`
+    MATCH (workday_hr:Application {id: "app-workday-hr"})
+    MATCH (talent_acquisition:BusinessCapability {id: "cap-talent-acquisition"})
+    MATCH (performance_management:BusinessCapability {id: "cap-performance-management"})
+    MATCH (payroll_benefits:BusinessCapability {id: "cap-payroll-benefits"})
+    CREATE (workday_hr)-[:SUPPORTS]->(talent_acquisition)
+    CREATE (workday_hr)-[:SUPPORTS]->(performance_management)
+    CREATE (workday_hr)-[:SUPPORTS]->(payroll_benefits)
+  `)
+
+  // Update existing Zendesk to support new customer service capabilities
+  await session.run(`
+    MATCH (zendesk_service:Application {id: "app-zendesk-service"})
+    MATCH (technical_support:BusinessCapability {id: "cap-technical-support"})
+    MATCH (warranty_management:BusinessCapability {id: "cap-warranty-management"})
+    CREATE (zendesk_service)-[:SUPPORTS]->(technical_support)
+    CREATE (zendesk_service)-[:SUPPORTS]->(warranty_management)
   `)
 
   console.log('Application-Capability support relationships created successfully.')

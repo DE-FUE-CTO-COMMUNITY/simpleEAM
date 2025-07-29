@@ -165,6 +165,71 @@ export async function createApplicationInterfaces(session: Session) {
       introductionDate: date("2021-10-01"),
       createdAt: datetime(),
       updatedAt: datetime()
+    }),
+    // ===== SERVICENOW INTEGRATIONS =====
+    (servicenow_to_sap:ApplicationInterface {
+      id: "interface-servicenow-to-sap",
+      name: "ServiceNow to SAP Asset Integration",
+      description: "Synchronizes IT asset data and purchase requests between ServiceNow and SAP",
+      interfaceType: "API",
+      protocol: "REST",
+      version: "1.0",
+      status: "ACTIVE",
+      introductionDate: date("2023-03-01"),
+      createdAt: datetime(),
+      updatedAt: datetime()
+    }),
+    (servicenow_to_powerbi:ApplicationInterface {
+      id: "interface-servicenow-to-powerbi",
+      name: "ServiceNow to Power BI Reporting",
+      description: "Transfers IT service metrics and KPIs for dashboard reporting",
+      interfaceType: "API",
+      protocol: "REST",
+      version: "1.0",
+      status: "ACTIVE",
+      introductionDate: date("2023-04-01"),
+      createdAt: datetime(),
+      updatedAt: datetime()
+    }),
+    // ===== EXPENSE MANAGEMENT INTEGRATIONS =====
+    (concur_to_sap:ApplicationInterface {
+      id: "interface-concur-to-sap",
+      name: "SAP Concur to SAP Expense Integration",
+      description: "Transfers approved expense reports to SAP for reimbursement processing",
+      interfaceType: "API",
+      protocol: "REST",
+      version: "2.0",
+      status: "ACTIVE",
+      introductionDate: date("2022-06-01"),
+      createdAt: datetime(),
+      updatedAt: datetime()
+    }),
+    // ===== TRAINING SYSTEM INTEGRATIONS =====
+    (cornerstone_to_workday:ApplicationInterface {
+      id: "interface-cornerstone-to-workday",
+      name: "Cornerstone to Workday Training Sync",
+      description: "Synchronizes employee training records and certifications",
+      interfaceType: "API",
+      protocol: "REST",
+      version: "1.2",
+      status: "ACTIVE",
+      introductionDate: date("2021-10-01"),
+      createdAt: datetime(),
+      updatedAt: datetime()
+    }),
+    // ===== FINANCIAL PLANNING INTEGRATIONS =====
+    (hyperion_to_sap:ApplicationInterface {
+      id: "interface-hyperion-to-sap",
+      name: "Oracle Hyperion to SAP Data Exchange",
+      description: "Transfers budget and planning data between Hyperion and SAP",
+      interfaceType: "FILE",
+      protocol: "SFTP",
+      version: "1.5",
+      status: "ACTIVE",
+      introductionDate: date("2019-04-01"),
+      endOfLifeDate: date("2026-06-30"),
+      createdAt: datetime(),
+      updatedAt: datetime()
     })
   `)
 
@@ -330,6 +395,65 @@ export async function createInterfaceRelationships(session: Session) {
     CREATE (powerbi_data_integration)-[:TRANSFERS]->(quality_test_results)
   `)
 
+  // ServiceNow to SAP interface
+  await session.run(`
+    MATCH (servicenow_to_sap:ApplicationInterface {id: "interface-servicenow-to-sap"})
+    MATCH (servicenow:Application {id: "app-servicenow"})
+    MATCH (sap_s4hana:Application {id: "app-sap-s4hana"})
+    MATCH (asset_inventory:DataObject {id: "data-asset-inventory"})
+    MATCH (purchase_orders:DataObject {id: "data-purchase-orders"})
+    CREATE (servicenow)-[:INTERFACE_SOURCE]->(servicenow_to_sap)
+    CREATE (sap_s4hana)-[:INTERFACE_TARGET]->(servicenow_to_sap)
+    CREATE (servicenow_to_sap)-[:TRANSFERS]->(asset_inventory)
+    CREATE (servicenow_to_sap)-[:TRANSFERS]->(purchase_orders)
+  `)
+
+  // ServiceNow to Power BI interface
+  await session.run(`
+    MATCH (servicenow_to_powerbi:ApplicationInterface {id: "interface-servicenow-to-powerbi"})
+    MATCH (servicenow:Application {id: "app-servicenow"})
+    MATCH (power_bi:Application {id: "app-power-bi"})
+    MATCH (incident_tickets:DataObject {id: "data-incident-tickets"})
+    MATCH (change_requests:DataObject {id: "data-change-requests"})
+    CREATE (servicenow)-[:INTERFACE_SOURCE]->(servicenow_to_powerbi)
+    CREATE (power_bi)-[:INTERFACE_TARGET]->(servicenow_to_powerbi)
+    CREATE (servicenow_to_powerbi)-[:TRANSFERS]->(incident_tickets)
+    CREATE (servicenow_to_powerbi)-[:TRANSFERS]->(change_requests)
+  `)
+
+  // Concur to SAP interface
+  await session.run(`
+    MATCH (concur_to_sap:ApplicationInterface {id: "interface-concur-to-sap"})
+    MATCH (concur:Application {id: "app-concur"})
+    MATCH (sap_s4hana:Application {id: "app-sap-s4hana"})
+    MATCH (expense_reports:DataObject {id: "data-expense-reports"})
+    CREATE (concur)-[:INTERFACE_SOURCE]->(concur_to_sap)
+    CREATE (sap_s4hana)-[:INTERFACE_TARGET]->(concur_to_sap)
+    CREATE (concur_to_sap)-[:TRANSFERS]->(expense_reports)
+  `)
+
+  // Cornerstone to Workday interface
+  await session.run(`
+    MATCH (cornerstone_to_workday:ApplicationInterface {id: "interface-cornerstone-to-workday"})
+    MATCH (cornerstone:Application {id: "app-cornerstone-lms"})
+    MATCH (workday_hr:Application {id: "app-workday-hr"})
+    MATCH (training_records:DataObject {id: "data-training-records"})
+    CREATE (cornerstone)-[:INTERFACE_SOURCE]->(cornerstone_to_workday)
+    CREATE (workday_hr)-[:INTERFACE_TARGET]->(cornerstone_to_workday)
+    CREATE (cornerstone_to_workday)-[:TRANSFERS]->(training_records)
+  `)
+
+  // Hyperion to SAP interface
+  await session.run(`
+    MATCH (hyperion_to_sap:ApplicationInterface {id: "interface-hyperion-to-sap"})
+    MATCH (hyperion:Application {id: "app-oracle-hyperion"})
+    MATCH (sap_s4hana:Application {id: "app-sap-s4hana"})
+    MATCH (budget_forecasts:DataObject {id: "data-budget-forecasts"})
+    CREATE (hyperion)-[:INTERFACE_SOURCE]->(hyperion_to_sap)
+    CREATE (sap_s4hana)-[:INTERFACE_TARGET]->(hyperion_to_sap)
+    CREATE (hyperion_to_sap)-[:TRANSFERS]->(budget_forecasts)
+  `)
+
   console.log('Interface relationships created successfully.')
 }
 
@@ -359,6 +483,11 @@ export async function createInterfaceOwnership(session: Session) {
     MATCH (workday_to_sap:ApplicationInterface {id: "interface-workday-to-sap"})
     MATCH (zendesk_to_salesforce:ApplicationInterface {id: "interface-zendesk-to-salesforce"})
     MATCH (powerbi_data_integration:ApplicationInterface {id: "interface-powerbi-data"})
+    MATCH (servicenow_to_sap:ApplicationInterface {id: "interface-servicenow-to-sap"})
+    MATCH (servicenow_to_powerbi:ApplicationInterface {id: "interface-servicenow-to-powerbi"})
+    MATCH (concur_to_sap:ApplicationInterface {id: "interface-concur-to-sap"})
+    MATCH (cornerstone_to_workday:ApplicationInterface {id: "interface-cornerstone-to-workday"})
+    MATCH (hyperion_to_sap:ApplicationInterface {id: "interface-hyperion-to-sap"})
     MATCH (enterprise_architect:Person {id: "person-enterprise-architect"})
     CREATE (enterprise_architect)-[:RESPONSIBLE_FOR]->(sap_to_oracle_scm)
     CREATE (enterprise_architect)-[:RESPONSIBLE_FOR]->(wms_to_sap)
@@ -367,6 +496,11 @@ export async function createInterfaceOwnership(session: Session) {
     CREATE (enterprise_architect)-[:RESPONSIBLE_FOR]->(workday_to_sap)
     CREATE (enterprise_architect)-[:RESPONSIBLE_FOR]->(zendesk_to_salesforce)
     CREATE (enterprise_architect)-[:RESPONSIBLE_FOR]->(powerbi_data_integration)
+    CREATE (enterprise_architect)-[:RESPONSIBLE_FOR]->(servicenow_to_sap)
+    CREATE (enterprise_architect)-[:RESPONSIBLE_FOR]->(servicenow_to_powerbi)
+    CREATE (enterprise_architect)-[:RESPONSIBLE_FOR]->(concur_to_sap)
+    CREATE (enterprise_architect)-[:RESPONSIBLE_FOR]->(cornerstone_to_workday)
+    CREATE (enterprise_architect)-[:RESPONSIBLE_FOR]->(hyperion_to_sap)
   `)
 
   console.log('Interface ownership relationships created successfully.')

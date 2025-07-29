@@ -239,10 +239,10 @@ export async function createApplications(session: Session) {
       updatedAt: datetime()
     }),
     // ===== LEGACY SYSTEM (TO BE RETIRED) =====
-    (legacy_erp:Application {
+        (legacy_erp:Application {
       id: "app-legacy-erp",
       name: "Legacy ERP System",
-      description: "Old ERP system being replaced by SAP S/4HANA",
+      description: "Legacy enterprise resource planning system being phased out",
       status: "RETIRED",
       criticality: "LOW",
       timeCategory: "ELIMINATE",
@@ -256,6 +256,83 @@ export async function createApplications(session: Session) {
       endOfLifeDate: date("2022-12-31"),
       endOfUseDate: date("2022-12-31"),
       planningDate: date("2004-06-01"),
+      createdAt: datetime(),
+      updatedAt: datetime()
+    }),
+    // ===== IT SERVICE MANAGEMENT =====
+    (servicenow:Application {
+      id: "app-servicenow",
+      name: "ServiceNow ITSM",
+      description: "IT Service Management platform for service desk, incident, and change management",
+      status: "ACTIVE",
+      criticality: "HIGH",
+      timeCategory: "INVEST",
+      sevenRStrategy: "RETAIN",
+      technologyStack: ["ServiceNow Platform", "JavaScript", "REST APIs"],
+      version: "Vancouver",
+      hostingEnvironment: "ServiceNow Cloud",
+      vendor: "ServiceNow",
+      costs: 180000.00,
+      introductionDate: date("2023-02-01"),
+      planningDate: date("2022-08-01"),
+      createdAt: datetime(),
+      updatedAt: datetime()
+    }),
+    // ===== EXPENSE MANAGEMENT =====
+    (concur:Application {
+      id: "app-concur",
+      name: "SAP Concur",
+      description: "Travel and expense management solution",
+      status: "ACTIVE",
+      criticality: "MEDIUM",
+      timeCategory: "INVEST",
+      sevenRStrategy: "RETAIN",
+      technologyStack: ["SAP Concur Platform", "APIs"],
+      version: "Standard",
+      hostingEnvironment: "SAP Cloud",
+      vendor: "SAP",
+      costs: 24000.00,
+      introductionDate: date("2022-05-01"),
+      planningDate: date("2022-01-01"),
+      createdAt: datetime(),
+      updatedAt: datetime()
+    }),
+    // ===== TRAINING MANAGEMENT =====
+    (cornerstone:Application {
+      id: "app-cornerstone-lms",
+      name: "Cornerstone OnDemand",
+      description: "Learning management system for employee and customer training",
+      status: "ACTIVE",
+      criticality: "MEDIUM",
+      timeCategory: "INVEST",
+      sevenRStrategy: "RETAIN",
+      technologyStack: ["Cornerstone Platform", "APIs", "SCORM"],
+      version: "Q3 2024",
+      hostingEnvironment: "Cornerstone Cloud",
+      vendor: "Cornerstone OnDemand",
+      costs: 72000.00,
+      introductionDate: date("2021-09-01"),
+      planningDate: date("2021-04-01"),
+      createdAt: datetime(),
+      updatedAt: datetime()
+    }),
+    // ===== FINANCIAL CONSOLIDATION =====
+    (hyperion:Application {
+      id: "app-oracle-hyperion",
+      name: "Oracle Hyperion",
+      description: "Financial planning, budgeting, and consolidation",
+      status: "ACTIVE",
+      criticality: "HIGH",
+      timeCategory: "TOLERATE",
+      sevenRStrategy: "REPLATFORM",
+      technologyStack: ["Oracle Hyperion", "Essbase", "Oracle Database"],
+      version: "11.2.11",
+      hostingEnvironment: "On-Premise",
+      vendor: "Oracle",
+      costs: 150000.00,
+      introductionDate: date("2019-03-01"),
+      planningDate: date("2018-08-01"),
+      endOfLifeDate: date("2026-06-30"),
       createdAt: datetime(),
       updatedAt: datetime()
     })
@@ -345,6 +422,30 @@ export async function createApplicationOwnership(session: Session) {
     MATCH (legacy_erp:Application {id: "app-legacy-erp"})
     MATCH (cio:Person {id: "person-cio"})
     CREATE (legacy_erp)-[:OWNED_BY]->(cio)
+  `)
+
+  await session.run(`
+    MATCH (servicenow:Application {id: "app-servicenow"})
+    MATCH (cio:Person {id: "person-cio"})
+    CREATE (servicenow)-[:OWNED_BY]->(cio)
+  `)
+
+  await session.run(`
+    MATCH (concur:Application {id: "app-concur"})
+    MATCH (cfo:Person {id: "person-cfo"})
+    CREATE (concur)-[:OWNED_BY]->(cfo)
+  `)
+
+  await session.run(`
+    MATCH (cornerstone:Application {id: "app-cornerstone-lms"})
+    MATCH (dir_hr:Person {id: "person-dir-hr"})
+    CREATE (cornerstone)-[:OWNED_BY]->(dir_hr)
+  `)
+
+  await session.run(`
+    MATCH (hyperion:Application {id: "app-oracle-hyperion"})
+    MATCH (cfo:Person {id: "person-cfo"})
+    CREATE (hyperion)-[:OWNED_BY]->(cfo)
   `)
 
   console.log('Application ownership relationships created successfully.')

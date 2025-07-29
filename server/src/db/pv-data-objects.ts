@@ -225,6 +225,69 @@ export async function createDataObjects(session: Session) {
       introductionDate: date("2020-01-01"),
       createdAt: datetime(),
       updatedAt: datetime()
+    }),
+    // ===== IT SERVICE MANAGEMENT DATA =====
+    (incident_tickets:DataObject {
+      id: "data-incident-tickets",
+      name: "IT Incident Tickets",
+      description: "IT service desk incidents, problems, and resolution data",
+      classification: "INTERNAL",
+      format: "Service Management Database",
+      introductionDate: date("2020-01-01"),
+      createdAt: datetime(),
+      updatedAt: datetime()
+    }),
+    (change_requests:DataObject {
+      id: "data-change-requests",
+      name: "IT Change Requests",
+      description: "IT infrastructure and application change management data",
+      classification: "INTERNAL",
+      format: "Service Management Database",
+      introductionDate: date("2020-01-01"),
+      createdAt: datetime(),
+      updatedAt: datetime()
+    }),
+    (asset_inventory:DataObject {
+      id: "data-asset-inventory",
+      name: "IT Asset Inventory",
+      description: "Hardware and software asset tracking and configuration data",
+      classification: "INTERNAL",
+      format: "Configuration Management Database",
+      introductionDate: date("2020-01-01"),
+      createdAt: datetime(),
+      updatedAt: datetime()
+    }),
+    // ===== LEARNING MATERIALS DATA =====
+    (course_materials:DataObject {
+      id: "data-course-materials",
+      name: "Training Course Materials",
+      description: "Learning content, courses, and educational resources",
+      classification: "INTERNAL",
+      format: "Learning Content Repository",
+      introductionDate: date("2020-01-01"),
+      createdAt: datetime(),
+      updatedAt: datetime()
+    }),
+    // ===== EXPENSE AND BUDGET DATA =====
+    (expense_reports:DataObject {
+      id: "data-expense-reports",
+      name: "Employee Expense Reports",
+      description: "Travel expenses, business expenses, and reimbursement data",
+      classification: "CONFIDENTIAL",
+      format: "Expense Management Database",
+      introductionDate: date("2020-01-01"),
+      createdAt: datetime(),
+      updatedAt: datetime()
+    }),
+    (budget_forecasts:DataObject {
+      id: "data-budget-forecasts",
+      name: "Budget and Financial Forecasts",
+      description: "Financial planning data, budgets, and forecast models",
+      classification: "CONFIDENTIAL",
+      format: "Financial Planning Database",
+      introductionDate: date("2020-01-01"),
+      createdAt: datetime(),
+      updatedAt: datetime()
     })
   `)
 
@@ -306,9 +369,11 @@ export async function createDataObjectOwnership(session: Session) {
   await session.run(`
     MATCH (employee_data:DataObject {id: "data-employee-master"})
     MATCH (training_records:DataObject {id: "data-training-records"})
+    MATCH (course_materials:DataObject {id: "data-course-materials"})
     MATCH (dir_hr:Person {id: "person-dir-hr"})
     CREATE (employee_data)-[:OWNED_BY]->(dir_hr)
     CREATE (training_records)-[:OWNED_BY]->(dir_hr)
+    CREATE (course_materials)-[:OWNED_BY]->(dir_hr)
   `)
 
   // Customer Service Data
@@ -318,6 +383,26 @@ export async function createDataObjectOwnership(session: Session) {
     MATCH (dir_cs:Person {id: "person-dir-cs"})
     CREATE (service_tickets)-[:OWNED_BY]->(dir_cs)
     CREATE (warranty_claims)-[:OWNED_BY]->(dir_cs)
+  `)
+
+  // IT Service Management Data
+  await session.run(`
+    MATCH (incident_tickets:DataObject {id: "data-incident-tickets"})
+    MATCH (change_requests:DataObject {id: "data-change-requests"})
+    MATCH (asset_inventory:DataObject {id: "data-asset-inventory"})
+    MATCH (cio:Person {id: "person-cio"})
+    CREATE (incident_tickets)-[:OWNED_BY]->(cio)
+    CREATE (change_requests)-[:OWNED_BY]->(cio)
+    CREATE (asset_inventory)-[:OWNED_BY]->(cio)
+  `)
+
+  // Financial Planning Data
+  await session.run(`
+    MATCH (expense_reports:DataObject {id: "data-expense-reports"})
+    MATCH (budget_forecasts:DataObject {id: "data-budget-forecasts"})
+    MATCH (cfo:Person {id: "person-cfo"})
+    CREATE (expense_reports)-[:OWNED_BY]->(cfo)
+    CREATE (budget_forecasts)-[:OWNED_BY]->(cfo)
   `)
 
   console.log('Data Object ownership relationships created successfully.')

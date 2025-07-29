@@ -13,17 +13,10 @@ export async function createArchitectures(session: Session) {
       id: "arch-current-state-2024",
       name: "Current State Architecture 2024",
       description: "Current enterprise architecture with mix of legacy and modern systems, partial cloud adoption, and heterogeneous integration landscape",
-      architectureType: "CURRENT_STATE",
-      version: "3.2",
-      status: "APPROVED",
-      validFromDate: date("2024-01-01"),
-      validToDate: date("2025-12-31"),
-      maintenanceCategory: "ACTIVE_SUPPORT",
-      lastAssessmentDate: date("2024-06-01"),
-      architecturalStyle: "SERVICE_ORIENTED",
-      integrationPattern: "POINT_TO_POINT",
-      deploymentModel: "HYBRID_CLOUD",
-      comments: "Legacy systems integrated through various patterns. Manual processes in quality management. File-based interfaces dominate. Limited real-time capabilities.",
+      timestamp: datetime(),
+      domain: "ENTERPRISE",
+      type: "CURRENT_STATE",
+      tags: ["enterprise", "current", "hybrid-cloud", "legacy"],
       createdAt: datetime(),
       updatedAt: datetime()
     }),
@@ -33,16 +26,10 @@ export async function createArchitectures(session: Session) {
       id: "arch-target-state-2027",
       name: "Future State Architecture 2027",
       description: "Target enterprise architecture with cloud-native applications, API-first integration, real-time analytics, and digital manufacturing capabilities",
-      architectureType: "TARGET_STATE",
-      version: "1.0",
-      status: "APPROVED",
-      validFromDate: date("2025-01-01"),
-      validToDate: date("2030-12-31"),
-      maintenanceCategory: "FUTURE_RELEASE",
-      architecturalStyle: "MICROSERVICES",
-      integrationPattern: "API_FIRST",
-      deploymentModel: "CLOUD_NATIVE",
-      comments: "Full cloud-native transformation with AI-driven quality control, automated supply chain optimization, and Industry 4.0 manufacturing capabilities.",
+      timestamp: datetime(),
+      domain: "ENTERPRISE",
+      type: "FUTURE_STATE",
+      tags: ["enterprise", "future", "cloud-native", "api-first"],
       createdAt: datetime(),
       updatedAt: datetime()
     }),
@@ -52,16 +39,10 @@ export async function createArchitectures(session: Session) {
       id: "arch-transition-phase1-2025",
       name: "Transition Architecture Phase 1 - Integration Modernization",
       description: "First phase focusing on API gateway implementation, cloud migration of non-critical systems, and real-time manufacturing integration",
-      architectureType: "TRANSITION_STATE",
-      version: "1.0",
-      status: "APPROVED",
-      validFromDate: date("2025-01-01"),
-      validToDate: date("2025-12-31"),
-      maintenanceCategory: "PLANNED",
-      architecturalStyle: "HYBRID",
-      integrationPattern: "API_GATEWAY",
-      deploymentModel: "HYBRID_CLOUD",
-      comments: "Replace file-based interfaces with API connections. Implement MES real-time integration. Migrate analytics to cloud.",
+      timestamp: datetime(),
+      domain: "INTEGRATION",
+      type: "TRANSITION",
+      tags: ["transition", "integration", "api-gateway", "phase1"],
       createdAt: datetime(),
       updatedAt: datetime()
     }),
@@ -71,16 +52,10 @@ export async function createArchitectures(session: Session) {
       id: "arch-transition-phase2-2026",
       name: "Transition Architecture Phase 2 - Smart Manufacturing",
       description: "Second phase implementing IoT integration, AI-driven quality control, and advanced analytics capabilities",
-      architectureType: "TRANSITION_STATE",
-      version: "1.0", 
-      status: "DRAFT",
-      validFromDate: date("2026-01-01"),
-      validToDate: date("2026-12-31"),
-      maintenanceCategory: "PLANNED",
-      architecturalStyle: "EVENT_DRIVEN",
-      integrationPattern: "EVENT_STREAMING",
-      deploymentModel: "CLOUD_FIRST",
-      comments: "Implement IoT sensors throughout manufacturing. Deploy AI quality prediction. Enable predictive maintenance.",
+      timestamp: datetime(),
+      domain: "TECHNOLOGY",
+      type: "TRANSITION",
+      tags: ["transition", "iot", "ai", "smart-manufacturing", "phase2"],
       createdAt: datetime(),
       updatedAt: datetime()
     }),
@@ -90,15 +65,10 @@ export async function createArchitectures(session: Session) {
       id: "arch-business-2024",
       name: "Solar Manufacturing Business Architecture",
       description: "Business capability model and operating model for solar panel manufacturing with focus on R&D innovation and quality excellence",
-      architectureType: "BUSINESS_ARCHITECTURE",
-      version: "2.1",
-      status: "APPROVED",
-      validFromDate: date("2024-01-01"),
-      validToDate: date("2026-12-31"),
-      maintenanceCategory: "ACTIVE_SUPPORT",
-      lastAssessmentDate: date("2024-03-01"),
-      deploymentModel: "GLOBAL",
-      comments: "Decentralized R&D with centralized quality standards. Customer-centric sales approach. Sustainable supply chain focus.",
+      timestamp: datetime(),
+      domain: "BUSINESS",
+      type: "CURRENT_STATE",
+      tags: ["business", "capabilities", "solar", "manufacturing"],
       createdAt: datetime(),
       updatedAt: datetime()
     }),
@@ -108,17 +78,10 @@ export async function createArchitectures(session: Session) {
       id: "arch-data-2024",
       name: "Enterprise Data Architecture",
       description: "Data architecture supporting analytics, compliance, and operational reporting across manufacturing and business processes",
-      architectureType: "DATA_ARCHITECTURE",
-      version: "1.8",
-      status: "APPROVED",
-      validFromDate: date("2024-01-01"),
-      validToDate: date("2025-12-31"),
-      maintenanceCategory: "ACTIVE_SUPPORT",
-      lastAssessmentDate: date("2024-05-01"),
-      architecturalStyle: "DATA_LAKE",
-      integrationPattern: "ETL",
-      deploymentModel: "HYBRID_CLOUD",
-      comments: "Central data lake for analytics. Master data managed in SAP. Quality data in specialized systems. Real-time streaming planned.",
+      timestamp: datetime(),
+      domain: "DATA",
+      type: "CURRENT_STATE",
+      tags: ["data", "analytics", "compliance", "reporting"],
       createdAt: datetime(),
       updatedAt: datetime()
     }),
@@ -128,17 +91,10 @@ export async function createArchitectures(session: Session) {
       id: "arch-application-2024",
       name: "Application Portfolio Architecture",
       description: "Application landscape with core ERP, specialized manufacturing systems, and cloud-based customer engagement platforms",
-      architectureType: "APPLICATION_ARCHITECTURE",
-      version: "3.0",
-      status: "APPROVED",
-      validFromDate: date("2024-01-01"),
-      validToDate: date("2025-06-30"),
-      maintenanceCategory: "ACTIVE_SUPPORT",
-      lastAssessmentDate: date("2024-07-01"),
-      architecturalStyle: "LAYERED",
-      integrationPattern: "ESB",
-      deploymentModel: "HYBRID_CLOUD",
-      comments: "SAP as core system. Custom MES for manufacturing. SaaS solutions for CRM and HR. Legacy systems being phased out.",
+      timestamp: datetime(),
+      domain: "APPLICATION",
+      type: "CURRENT_STATE",
+      tags: ["application", "portfolio", "erp", "manufacturing"],
       createdAt: datetime(),
       updatedAt: datetime()
     }),
@@ -148,17 +104,10 @@ export async function createArchitectures(session: Session) {
       id: "arch-technology-2024",
       name: "Technology Infrastructure Architecture",
       description: "Infrastructure architecture with AWS cloud services, on-premise manufacturing systems, and hybrid connectivity",
-      architectureType: "TECHNOLOGY_ARCHITECTURE",
-      version: "2.5",
-      status: "APPROVED",
-      validFromDate: date("2024-01-01"),
-      validToDate: date("2025-12-31"),
-      maintenanceCategory: "ACTIVE_SUPPORT",
-      lastAssessmentDate: date("2024-08-01"),
-      architecturalStyle: "CLOUD_NATIVE",
-      integrationPattern: "VPN_GATEWAY",
-      deploymentModel: "HYBRID_CLOUD",
-      comments: "AWS as primary cloud provider. On-premise datacenter for manufacturing. Kubernetes for container orchestration.",
+      timestamp: datetime(),
+      domain: "TECHNOLOGY",
+      type: "CURRENT_STATE",
+      tags: ["technology", "infrastructure", "aws", "hybrid"],
       createdAt: datetime(),
       updatedAt: datetime()
     })
@@ -170,21 +119,20 @@ export async function createArchitectures(session: Session) {
 export async function createArchitectureRelationships(session: Session) {
   console.log('Creating Architecture relationships...')
 
-  // Architecture succession relationships
+  // Architecture hierarchical relationships
   await session.run(`
     MATCH (current:Architecture {id: "arch-current-state-2024"})
     MATCH (transition1:Architecture {id: "arch-transition-phase1-2025"})
     MATCH (transition2:Architecture {id: "arch-transition-phase2-2026"})
     MATCH (target:Architecture {id: "arch-target-state-2027"})
-    CREATE (current)-[:SUCCESSOR_OF {transitionReason: "Digital transformation initiative", migrationComplexity: "HIGH", riskLevel: "MEDIUM"}]->(transition1)
-    CREATE (transition1)-[:SUCCESSOR_OF {transitionReason: "Smart manufacturing implementation", migrationComplexity: "HIGH", riskLevel: "HIGH"}]->(transition2)
-    CREATE (transition2)-[:SUCCESSOR_OF {transitionReason: "Cloud-native completion", migrationComplexity: "MEDIUM", riskLevel: "LOW"}]->(target)
+    CREATE (transition1)-[:PART_OF]->(current)
+    CREATE (transition2)-[:PART_OF]->(transition1)
+    CREATE (target)-[:PART_OF]->(transition2)
   `)
 
   // Architecture to Application relationships
   await session.run(`
     MATCH (current_arch:Architecture {id: "arch-current-state-2024"})
-    MATCH (target_arch:Architecture {id: "arch-target-state-2027"})
     MATCH (app_arch:Architecture {id: "arch-application-2024"})
     
     // Current architecture contains current applications
@@ -245,17 +193,17 @@ export async function createArchitectureRelationships(session: Session) {
     MATCH (quality:BusinessCapability {id: "cap-quality-management"})
     MATCH (supply_chain:BusinessCapability {id: "cap-supply-chain"})
     
-    CREATE (business_arch)-[:ENABLES]->(rd)
-    CREATE (business_arch)-[:ENABLES]->(manufacturing)
-    CREATE (business_arch)-[:ENABLES]->(sales)
-    CREATE (business_arch)-[:ENABLES]->(quality)
-    CREATE (business_arch)-[:ENABLES]->(supply_chain)
+    CREATE (business_arch)-[:CONTAINS]->(rd)
+    CREATE (business_arch)-[:CONTAINS]->(manufacturing)
+    CREATE (business_arch)-[:CONTAINS]->(sales)
+    CREATE (business_arch)-[:CONTAINS]->(quality)
+    CREATE (business_arch)-[:CONTAINS]->(supply_chain)
     
-    CREATE (current_arch)-[:ENABLES]->(rd)
-    CREATE (current_arch)-[:ENABLES]->(manufacturing)
-    CREATE (current_arch)-[:ENABLES]->(sales)
-    CREATE (current_arch)-[:ENABLES]->(quality)
-    CREATE (current_arch)-[:ENABLES]->(supply_chain)
+    CREATE (current_arch)-[:CONTAINS]->(rd)
+    CREATE (current_arch)-[:CONTAINS]->(manufacturing)
+    CREATE (current_arch)-[:CONTAINS]->(sales)
+    CREATE (current_arch)-[:CONTAINS]->(quality)
+    CREATE (current_arch)-[:CONTAINS]->(supply_chain)
   `)
 
   // Architecture follows Architecture Principles
@@ -269,15 +217,15 @@ export async function createArchitectureRelationships(session: Session) {
     MATCH (data_governance:ArchitecturePrinciple {id: "principle-data-governance"})
     MATCH (customer_centric:ArchitecturePrinciple {id: "principle-customer-centric"})
     
-    CREATE (current_arch)-[:FOLLOWS]->(security_design)
-    CREATE (current_arch)-[:FOLLOWS]->(data_governance)
-    CREATE (current_arch)-[:FOLLOWS]->(customer_centric)
+    CREATE (current_arch)-[:APPLIES_PRINCIPLE]->(security_design)
+    CREATE (current_arch)-[:APPLIES_PRINCIPLE]->(data_governance)
+    CREATE (current_arch)-[:APPLIES_PRINCIPLE]->(customer_centric)
     
-    CREATE (target_arch)-[:FOLLOWS]->(cloud_first)
-    CREATE (target_arch)-[:FOLLOWS]->(api_first)
-    CREATE (target_arch)-[:FOLLOWS]->(security_design)
-    CREATE (target_arch)-[:FOLLOWS]->(data_governance)
-    CREATE (target_arch)-[:FOLLOWS]->(customer_centric)
+    CREATE (target_arch)-[:APPLIES_PRINCIPLE]->(cloud_first)
+    CREATE (target_arch)-[:APPLIES_PRINCIPLE]->(api_first)
+    CREATE (target_arch)-[:APPLIES_PRINCIPLE]->(security_design)
+    CREATE (target_arch)-[:APPLIES_PRINCIPLE]->(data_governance)
+    CREATE (target_arch)-[:APPLIES_PRINCIPLE]->(customer_centric)
   `)
 
   console.log('Architecture relationships created successfully.')
@@ -298,32 +246,32 @@ export async function createArchitectureOwnership(session: Session) {
     MATCH (app_arch:Architecture {id: "arch-application-2024"})
     MATCH (tech_arch:Architecture {id: "arch-technology-2024"})
     
-    CREATE (enterprise_architect)-[:RESPONSIBLE_FOR]->(current_arch)
-    CREATE (enterprise_architect)-[:RESPONSIBLE_FOR]->(target_arch)
-    CREATE (enterprise_architect)-[:RESPONSIBLE_FOR]->(transition1)
-    CREATE (enterprise_architect)-[:RESPONSIBLE_FOR]->(transition2)
-    CREATE (enterprise_architect)-[:RESPONSIBLE_FOR]->(business_arch)
-    CREATE (enterprise_architect)-[:RESPONSIBLE_FOR]->(data_arch)
-    CREATE (enterprise_architect)-[:RESPONSIBLE_FOR]->(app_arch)
-    CREATE (enterprise_architect)-[:RESPONSIBLE_FOR]->(tech_arch)
+    CREATE (current_arch)-[:OWNED_BY]->(enterprise_architect)
+    CREATE (target_arch)-[:OWNED_BY]->(enterprise_architect)
+    CREATE (transition1)-[:OWNED_BY]->(enterprise_architect)
+    CREATE (transition2)-[:OWNED_BY]->(enterprise_architect)
+    CREATE (business_arch)-[:OWNED_BY]->(enterprise_architect)
+    CREATE (data_arch)-[:OWNED_BY]->(enterprise_architect)
+    CREATE (app_arch)-[:OWNED_BY]->(enterprise_architect)
+    CREATE (tech_arch)-[:OWNED_BY]->(enterprise_architect)
   `)
 
-  // CTO also responsible for technology architecture
+  // CTO also owns technology architectures
   await session.run(`
     MATCH (cto:Person {id: "person-cto"})
     MATCH (tech_arch:Architecture {id: "arch-technology-2024"})
     MATCH (target_arch:Architecture {id: "arch-target-state-2027"})
-    CREATE (cto)-[:RESPONSIBLE_FOR]->(tech_arch)
-    CREATE (cto)-[:RESPONSIBLE_FOR]->(target_arch)
+    CREATE (tech_arch)-[:OWNED_BY]->(cto)
+    CREATE (target_arch)-[:OWNED_BY]->(cto)
   `)
 
-  // VP Engineering responsible for application architecture
+  // VP Engineering owns application architecture
   await session.run(`
     MATCH (vp_engineering:Person {id: "person-vp-engineering"})
     MATCH (app_arch:Architecture {id: "arch-application-2024"})
     MATCH (transition1:Architecture {id: "arch-transition-phase1-2025"})
-    CREATE (vp_engineering)-[:RESPONSIBLE_FOR]->(app_arch)
-    CREATE (vp_engineering)-[:RESPONSIBLE_FOR]->(transition1)
+    CREATE (app_arch)-[:OWNED_BY]->(vp_engineering)
+    CREATE (transition1)-[:OWNED_BY]->(vp_engineering)
   `)
 
   console.log('Architecture ownership relationships created successfully.')
