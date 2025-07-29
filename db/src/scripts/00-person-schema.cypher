@@ -1,2 +1,0 @@
-// Person-Schema erstellen
-CREATE CONSTRAINT person_id_unique IF NOT EXISTS FOR (p:Person) REQUIRE p.id IS UNIQUE;
