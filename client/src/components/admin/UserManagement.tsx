@@ -30,7 +30,7 @@ import {
 import { KeycloakUser } from '@/lib/keycloak-admin'
 import { KeycloakUserAlt } from '@/lib/keycloak-admin-alt'
 import UserFormDialog from './UserFormDialog'
-// import DeleteConfirmDialog from './DeleteConfirmDialog'
+import DeleteConfirmDialog from './DeleteConfirmDialog'
 
 export default function UserManagement() {
   const [keycloakUsers, setKeycloakUsers] = useState<(KeycloakUser | KeycloakUserAlt)[]>([])
@@ -45,6 +45,11 @@ export default function UserManagement() {
     user: null as (KeycloakUser | KeycloakUserAlt) | null,
   })
 
+  const [deleteDialog, setDeleteDialog] = useState({
+    open: false,
+    user: null as (KeycloakUser | KeycloakUserAlt) | null,
+  })
+
   // Keycloak Benutzer laden
   const loadKeycloakUsers = async () => {
     setKeycloakLoading(true)
@@ -52,12 +57,12 @@ export default function UserManagement() {
 
     try {
       console.log('🔄 Lade Keycloak-Benutzer über API-Route...')
-      
+
       const response = await fetch('/api/admin/keycloak-users')
       if (!response.ok) {
         throw new Error(`API-Fehler: ${response.status} ${response.statusText}`)
       }
-      
+
       const users = await response.json()
       console.log('✅ Keycloak-Benutzer erfolgreich geladen:', users.length)
       setKeycloakUsers(users)
@@ -123,42 +128,17 @@ export default function UserManagement() {
     }
   }
 
-  const deleteKeycloakUser = async (userId: string) => {
-    try {
-      const response = await fetch('/api/admin/keycloak-users', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          action: 'delete',
-          userId,
-        }),
-      })
-
-      if (!response.ok) {
-        throw new Error(`Fehler beim Löschen: ${response.status}`)
-      }
-
-      console.log('✅ Benutzer erfolgreich gelöscht')
-      await loadKeycloakUsers() // Liste neu laden
-      return true
-    } catch (error) {
-      console.error('❌ Fehler beim Löschen des Benutzers:', error)
-      throw error
-    }
-  }
-
   useEffect(() => {
     loadKeycloakUsers()
   }, [])
 
   // Gefilterte Listen
-  const filteredKeycloakUsers = keycloakUsers.filter(user => 
-    user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.lastName?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredKeycloakUsers = keycloakUsers.filter(
+    user =>
+      user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.lastName?.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   // Dialog-Handler mit echten Dialogen
@@ -192,7 +172,7 @@ export default function UserManagement() {
       const userDataWithDefaults = {
         ...userData,
         enabled: true,
-        emailVerified: false,
+        emailVerified: true, // E-Mail automatisch als verifiziert setzen
       }
       await createKeycloakUser(userDataWithDefaults)
     } else if (formDialog.mode === 'edit' && formDialog.user) {
@@ -202,13 +182,22 @@ export default function UserManagement() {
   }
 
   const openDeleteUserDialog = async (user: KeycloakUser | KeycloakUserAlt) => {
-    if (confirm(`Möchten Sie den Benutzer "${user.username}" wirklich löschen?`)) {
-      try {
-        await deleteKeycloakUser(user.id!)
-      } catch (error) {
-        alert('Fehler beim Löschen des Benutzers')
-      }
-    }
+    setDeleteDialog({
+      open: true,
+      user,
+    })
+  }
+
+  const closeDeleteDialog = () => {
+    setDeleteDialog({
+      open: false,
+      user: null,
+    })
+  }
+
+  const handleDeleteSuccess = () => {
+    closeDeleteDialog()
+    loadKeycloakUsers() // Liste neu laden
   }
 
   return (
@@ -226,11 +215,7 @@ export default function UserManagement() {
           >
             Aktualisieren
           </Button>
-          <Button
-            variant="contained"
-            onClick={openCreateUserDialog}
-            startIcon={<AddIcon />}
-          >
+          <Button variant="contained" onClick={openCreateUserDialog} startIcon={<AddIcon />}>
             Neuer Benutzer
           </Button>
         </Box>
@@ -242,7 +227,7 @@ export default function UserManagement() {
         variant="outlined"
         placeholder="Benutzer suchen..."
         value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
+        onChange={e => setSearchTerm(e.target.value)}
         sx={{ mb: 3 }}
         InputProps={{
           startAdornment: (
@@ -293,28 +278,27 @@ export default function UserManagement() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {filteredKeycloakUsers.map((user) => (
+                {filteredKeycloakUsers.map(user => (
                   <TableRow key={user.id}>
                     <TableCell>{user.username}</TableCell>
                     <TableCell>{user.firstName || '-'}</TableCell>
                     <TableCell>{user.lastName || '-'}</TableCell>
                     <TableCell>{user.email || '-'}</TableCell>
                     <TableCell>
-                      {user.realmRoles && user.realmRoles.length > 0 
+                      {user.realmRoles && user.realmRoles.length > 0
                         ? user.realmRoles.join(', ')
-                        : user.attributes?.role?.[0] || '-'
-                      }
+                        : user.attributes?.role?.[0] || '-'}
                     </TableCell>
                     <TableCell>
-                      <Chip 
-                        label={user.enabled ? 'Aktiv' : 'Deaktiviert'} 
+                      <Chip
+                        label={user.enabled ? 'Aktiv' : 'Deaktiviert'}
                         color={user.enabled ? 'success' : 'default'}
                         size="small"
                       />
                     </TableCell>
                     <TableCell>
-                      <Chip 
-                        label={user.emailVerified ? 'Verifiziert' : 'Nicht verifiziert'} 
+                      <Chip
+                        label={user.emailVerified ? 'Verifiziert' : 'Nicht verifiziert'}
                         color={user.emailVerified ? 'success' : 'warning'}
                         size="small"
                       />
@@ -326,8 +310,8 @@ export default function UserManagement() {
                         </IconButton>
                       </Tooltip>
                       <Tooltip title="Löschen">
-                        <IconButton 
-                          onClick={() => openDeleteUserDialog(user)} 
+                        <IconButton
+                          onClick={() => openDeleteUserDialog(user)}
                           size="small"
                           color="error"
                         >
@@ -360,6 +344,15 @@ export default function UserManagement() {
         mode={formDialog.mode}
         user={formDialog.user}
         loading={keycloakLoading}
+      />
+
+      {/* DeleteConfirmDialog */}
+      <DeleteConfirmDialog
+        open={deleteDialog.open}
+        onClose={closeDeleteDialog}
+        onSuccess={handleDeleteSuccess}
+        user={deleteDialog.user}
+        mode="user"
       />
     </Box>
   )

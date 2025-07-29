@@ -13,7 +13,7 @@ import {
   Box,
 } from '@mui/material'
 import { useMutation } from '@apollo/client'
-import { deleteUser, KeycloakUser, KeycloakAdminError } from '@/lib/keycloak-admin'
+import { KeycloakUser } from '@/lib/keycloak-admin'
 import { DELETE_PERSON, GET_PEOPLE } from '@/lib/queries/person-queries'
 import { Person } from '@/gql/generated'
 
@@ -48,9 +48,22 @@ export default function DeleteConfirmDialog({
 
     try {
       if (mode === 'user' || mode === 'both') {
-        // Keycloak-Benutzer löschen
+        // Keycloak-Benutzer über API-Route löschen
         if (user?.id) {
-          await deleteUser(user.id)
+          const response = await fetch('/api/admin/keycloak-users', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              action: 'delete',
+              userId: user.id,
+            }),
+          })
+
+          if (!response.ok) {
+            throw new Error(`Fehler beim Löschen: ${response.status}`)
+          }
         }
       }
 
@@ -66,12 +79,9 @@ export default function DeleteConfirmDialog({
       }
 
       onSuccess()
-
     } catch (err) {
       console.error('Fehler beim Löschen:', err)
-      if (err instanceof KeycloakAdminError) {
-        setError(`Keycloak-Fehler: ${err.message}`)
-      } else if (err instanceof Error) {
+      if (err instanceof Error) {
         setError(err.message)
       } else {
         setError('Unbekannter Fehler beim Löschen')
@@ -163,7 +173,8 @@ export default function DeleteConfirmDialog({
         return (
           <>
             <Typography variant="body1" gutterBottom>
-              Möchten Sie sowohl den Keycloak-Benutzer als auch die Person aus der Datenbank löschen?
+              Möchten Sie sowohl den Keycloak-Benutzer als auch die Person aus der Datenbank
+              löschen?
             </Typography>
             <Box sx={{ mt: 2, p: 2, bgcolor: 'grey.100', borderRadius: 1 }}>
               <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>
@@ -200,10 +211,8 @@ export default function DeleteConfirmDialog({
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-      <DialogTitle sx={{ color: 'error.main' }}>
-        {getDialogTitle()}
-      </DialogTitle>
-      
+      <DialogTitle sx={{ color: 'error.main' }}>{getDialogTitle()}</DialogTitle>
+
       <DialogContent>
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
@@ -229,14 +238,14 @@ export default function DeleteConfirmDialog({
           ) : null}
         </Alert>
       </DialogContent>
-      
+
       <DialogActions>
         <Button onClick={handleClose} disabled={loading}>
           Abbrechen
         </Button>
-        <Button 
+        <Button
           onClick={handleDelete}
-          variant="contained" 
+          variant="contained"
           color="error"
           disabled={loading}
           startIcon={loading ? <CircularProgress size={16} /> : null}

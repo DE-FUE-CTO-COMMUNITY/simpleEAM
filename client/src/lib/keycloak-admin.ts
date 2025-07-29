@@ -48,7 +48,9 @@ export class KeycloakAdminError extends Error {
 // Base API Call Function
 async function apiCall<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   if (!keycloak?.token) {
-    throw new KeycloakAdminError('Kein gültiges Authentifizierungstoken verfügbar. Sind Sie als Administrator angemeldet?')
+    throw new KeycloakAdminError(
+      'Kein gültiges Authentifizierungstoken verfügbar. Sind Sie als Administrator angemeldet?'
+    )
   }
 
   if (!keycloak.authenticated) {
@@ -56,16 +58,16 @@ async function apiCall<T>(endpoint: string, options: RequestInit = {}): Promise<
   }
 
   const url = `${getAdminBaseUrl()}${endpoint}`
-  
+
   console.log('Keycloak Admin API Call:', url)
   console.log('Token vorhanden:', !!keycloak.token)
   console.log('Token (erste 20 Zeichen):', keycloak.token?.substring(0, 20) + '...')
-  
+
   const response = await fetch(url, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${keycloak.token}`,
+      Authorization: `Bearer ${keycloak.token}`,
       ...options.headers,
     },
   })
@@ -73,14 +75,14 @@ async function apiCall<T>(endpoint: string, options: RequestInit = {}): Promise<
   if (!response.ok) {
     const errorText = await response.text()
     let errorMessage = `HTTP ${response.status}: ${response.statusText}`
-    
+
     console.error('Keycloak API Error:', {
       status: response.status,
       statusText: response.statusText,
       url,
       errorText,
     })
-    
+
     // Spezielle Behandlung für häufige Fehler
     if (response.status === 403) {
       errorMessage = 'Keine Berechtigung für Admin-Zugriff. Prüfen Sie Ihre Rollen in Keycloak.'
@@ -103,7 +105,7 @@ async function apiCall<T>(endpoint: string, options: RequestInit = {}): Promise<
         }
       }
     }
-    
+
     throw new KeycloakAdminError(errorMessage, response.status, errorText)
   }
 
@@ -134,14 +136,14 @@ export async function checkAdminAccess(): Promise<{
     if (!keycloak?.token) {
       return {
         hasAccess: false,
-        message: 'Kein gültiges Authentifizierungstoken verfügbar'
+        message: 'Kein gültiges Authentifizierungstoken verfügbar',
       }
     }
 
     if (!keycloak.authenticated) {
       return {
         hasAccess: false,
-        message: 'Benutzer ist nicht authentifiziert'
+        message: 'Benutzer ist nicht authentifiziert',
       }
     }
 
@@ -153,14 +155,14 @@ export async function checkAdminAccess(): Promise<{
     const response = await fetch(`${getAdminBaseUrl()}/`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${keycloak.token}`,
+        Authorization: `Bearer ${keycloak.token}`,
       },
     })
 
     if (response.ok) {
       return {
         hasAccess: true,
-        message: 'Admin-Zugriff verfügbar'
+        message: 'Admin-Zugriff verfügbar',
       }
     } else {
       const errorText = await response.text()
@@ -171,25 +173,25 @@ export async function checkAdminAccess(): Promise<{
           status: response.status,
           error: errorText,
           realmRoles: tokenParsed?.realm_access?.roles,
-          resourceAccess: tokenParsed?.resource_access
-        }
+          resourceAccess: tokenParsed?.resource_access,
+        },
       }
     }
   } catch (error) {
     return {
       hasAccess: false,
       message: `Fehler bei Admin-Zugriffsprüfung: ${error}`,
-      details: error
+      details: error,
     }
   }
 }
 export async function getUsers(): Promise<KeycloakUser[]> {
   try {
     const users = await apiCall<KeycloakUser[]>('/users?briefRepresentation=false')
-    
+
     // Für jeden Benutzer die Rollen laden
     const usersWithRoles = await Promise.all(
-      users.map(async (user) => {
+      users.map(async user => {
         if (user.id) {
           try {
             const realmRoles = await getUserRealmRoles(user.id)
@@ -205,7 +207,7 @@ export async function getUsers(): Promise<KeycloakUser[]> {
         return user
       })
     )
-    
+
     return usersWithRoles
   } catch (error) {
     console.error('Fehler beim Laden der Benutzer:', error)
@@ -229,7 +231,7 @@ export async function createUser(user: Omit<KeycloakUser, 'id'>): Promise<void> 
     enabled: user.enabled ?? true,
     emailVerified: user.emailVerified ?? false,
   }
-  
+
   return apiCall<void>('/users', {
     method: 'POST',
     body: JSON.stringify(userData),
@@ -327,7 +329,7 @@ export async function searchUsers(params: {
   max?: number
 }): Promise<KeycloakUser[]> {
   const searchParams = new URLSearchParams()
-  
+
   Object.entries(params).forEach(([key, value]) => {
     if (value !== undefined) {
       searchParams.append(key, value.toString())
@@ -336,6 +338,6 @@ export async function searchUsers(params: {
 
   const queryString = searchParams.toString()
   const endpoint = queryString ? `/users?${queryString}` : '/users'
-  
+
   return apiCall<KeycloakUser[]>(endpoint)
 }

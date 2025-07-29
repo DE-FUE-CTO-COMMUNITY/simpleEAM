@@ -7,12 +7,16 @@ import GenericForm, { FieldConfig } from '@/components/common/GenericForm'
 import { KeycloakUser } from '@/lib/keycloak-admin'
 import { KeycloakUserAlt } from '@/lib/keycloak-admin-alt'
 
-// Zod Schema für Benutzervalidierung
+// Verfügbare Rollen
+const AVAILABLE_ROLES = ['viewer', 'architect', 'admin'] as const
+
+// Zod Schema für Benutzervalidierung mit Rolle
 const userSchema = z.object({
   username: z.string().min(3, 'Benutzername muss mindestens 3 Zeichen lang sein'),
   email: z.string().email('Gültige E-Mail-Adresse erforderlich'),
   firstName: z.string().min(1, 'Vorname ist erforderlich'),
   lastName: z.string().min(1, 'Nachname ist erforderlich'),
+  role: z.enum(AVAILABLE_ROLES, { required_error: 'Rolle ist erforderlich' }),
 })
 
 type UserFormData = z.infer<typeof userSchema>
@@ -41,6 +45,7 @@ export default function UserFormDialog({
       email: '',
       firstName: '',
       lastName: '',
+      role: 'viewer', // Standardrolle
     }),
     []
   )
@@ -77,6 +82,10 @@ export default function UserFormDialog({
         email: user.email || '',
         firstName: user.firstName || '',
         lastName: user.lastName || '',
+        role:
+          ((user.realmRoles &&
+            user.realmRoles.find(role => AVAILABLE_ROLES.includes(role as any))) as any) ||
+          'viewer',
       }
 
       // Formular mit den Werten aus dem vorhandenen Benutzer zurücksetzen
@@ -117,6 +126,17 @@ export default function UserFormDialog({
       type: 'text',
       required: true,
       placeholder: 'z.B. Mustermann',
+      size: { xs: 12, md: 6 },
+    },
+    {
+      name: 'role',
+      label: 'Rolle',
+      type: 'select',
+      required: true,
+      options: AVAILABLE_ROLES.map(role => ({
+        value: role,
+        label: role.charAt(0).toUpperCase() + role.slice(1), // Erste Buchstabe groß
+      })),
       size: { xs: 12, md: 6 },
     },
   ]

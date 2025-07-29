@@ -1,7 +1,7 @@
 // Alternative Admin API über Keycloak Admin Credentials
 const getAdminToken = async (): Promise<string> => {
   const keycloakUrl = process.env.NEXT_PUBLIC_KEYCLOAK_URL || 'https://auth.dev-server.mf2.eu'
-  
+
   const response = await fetch(`${keycloakUrl}/realms/master/protocol/openid-connect/token`, {
     method: 'POST',
     headers: {
@@ -27,17 +27,17 @@ const getAdminToken = async (): Promise<string> => {
 async function adminApiCall<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const keycloakUrl = process.env.NEXT_PUBLIC_KEYCLOAK_URL || 'https://auth.dev-server.mf2.eu'
   const realm = process.env.NEXT_PUBLIC_KEYCLOAK_REALM || 'simple-eam'
-  
+
   const adminToken = await getAdminToken()
   const url = `${keycloakUrl}/admin/realms/${realm}${endpoint}`
-  
+
   console.log('Admin API Call:', url)
-  
+
   const response = await fetch(url, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${adminToken}`,
+      Authorization: `Bearer ${adminToken}`,
       ...options.headers,
     },
   })
@@ -50,7 +50,7 @@ async function adminApiCall<T>(endpoint: string, options: RequestInit = {}): Pro
       url,
       errorText,
     })
-    
+
     throw new Error(`HTTP ${response.status}: ${response.statusText} - ${errorText}`)
   }
 
@@ -94,10 +94,10 @@ export interface KeycloakRole {
 export async function getUsersViaAdmin(): Promise<KeycloakUserAlt[]> {
   try {
     const users = await adminApiCall<KeycloakUserAlt[]>('/users?briefRepresentation=false')
-    
+
     // Für jeden Benutzer die Rollen laden
     const usersWithRoles = await Promise.all(
-      users.map(async (user) => {
+      users.map(async user => {
         if (user.id) {
           try {
             const realmRoles = await getUserRealmRolesViaAdmin(user.id)
@@ -113,7 +113,7 @@ export async function getUsersViaAdmin(): Promise<KeycloakUserAlt[]> {
         return user
       })
     )
-    
+
     return usersWithRoles
   } catch (error) {
     console.error('Fehler beim Laden der Benutzer via Admin:', error)
@@ -131,14 +131,17 @@ export async function createUserViaAdmin(user: Omit<KeycloakUserAlt, 'id'>): Pro
     enabled: user.enabled ?? true,
     emailVerified: user.emailVerified ?? false,
   }
-  
+
   return adminApiCall<void>('/users', {
     method: 'POST',
     body: JSON.stringify(userData),
   })
 }
 
-export async function updateUserViaAdmin(userId: string, user: Partial<KeycloakUserAlt>): Promise<void> {
+export async function updateUserViaAdmin(
+  userId: string,
+  user: Partial<KeycloakUserAlt>
+): Promise<void> {
   return adminApiCall<void>(`/users/${userId}`, {
     method: 'PUT',
     body: JSON.stringify(user),

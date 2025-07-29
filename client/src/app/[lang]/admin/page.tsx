@@ -53,22 +53,22 @@ export default function AdminPage() {
         </Typography>
 
         <Paper sx={{ mt: 3 }}>
-          <Tabs 
-            value={currentTab} 
-            onChange={handleTabChange} 
+          <Tabs
+            value={currentTab}
+            onChange={handleTabChange}
             aria-label="Administration Tabs"
             sx={{ borderBottom: 1, borderColor: 'divider' }}
           >
-            <Tab 
-              label="Benutzerverwaltung" 
-              icon={<PeopleIcon />} 
+            <Tab
+              label="Benutzerverwaltung"
+              icon={<PeopleIcon />}
               iconPosition="start"
               id="admin-tab-0"
               aria-controls="admin-tabpanel-0"
             />
-            <Tab 
-              label="Debug-Tools" 
-              icon={<BugReportIcon />} 
+            <Tab
+              label="Debug-Tools"
+              icon={<BugReportIcon />}
               iconPosition="start"
               id="admin-tab-1"
               aria-controls="admin-tabpanel-1"
