@@ -21,17 +21,16 @@ import {
   createApplicationDataRelationships,
   createApplicationInfrastructureHosting,
   createApplicationSuccessorRelationships,
+  createArchitecturePrincipleRelationships,
+  createArchitectureRelationships,
+  createArchitectureOwnership,
 } from './pv-relationships'
 import {
   createApplicationInterfaces,
   createInterfaceRelationships,
   createInterfaceOwnership,
 } from './pv-interfaces'
-import {
-  createArchitectures,
-  createArchitectureRelationships,
-  createArchitectureOwnership,
-} from './pv-architectures'
+import { createArchitectures } from './pv-architectures'
 
 export async function initPhotovoltaicScenario(driver: Driver) {
   const session: Session = driver.session()
@@ -106,6 +105,12 @@ export async function initPhotovoltaicScenario(driver: Driver) {
 
     // 16. Architecture Relationships
     await createArchitectureRelationships(session)
+
+    // 17. Architecture Principle Relationships
+    await createArchitecturePrincipleRelationships(session)
+
+    // 18. Architecture Ownership
+    await createArchitectureOwnership(session)
 
     // ===== COMPLETION SUMMARY =====
     console.log('\n✅ Solar Panel Manufacturing Company Scenario Complete!')

@@ -116,35 +116,27 @@ export async function createApplicationCapabilitySupport(session: Session) {
     MATCH (sap_s4hana:Application {id: "app-sap-s4hana"})
     MATCH (finance_accounting:BusinessCapability {id: "cap-finance-accounting"})
     MATCH (procurement:BusinessCapability {id: "cap-procurement"})
-    MATCH (supply_chain:BusinessCapability {id: "cap-supply-chain"})
     MATCH (sales_execution:BusinessCapability {id: "cap-sales-execution"})
     CREATE (sap_s4hana)-[:SUPPORTS]->(finance_accounting)
     CREATE (sap_s4hana)-[:SUPPORTS]->(procurement)
-    CREATE (sap_s4hana)-[:SUPPORTS]->(supply_chain)
     CREATE (sap_s4hana)-[:SUPPORTS]->(sales_execution)
   `)
 
   // Salesforce CRM supports sales and marketing
   await session.run(`
     MATCH (salesforce_crm:Application {id: "app-salesforce-crm"})
-    MATCH (sales_marketing:BusinessCapability {id: "cap-sales-marketing"})
     MATCH (sales_execution:BusinessCapability {id: "cap-sales-execution"})
     MATCH (channel_mgmt:BusinessCapability {id: "cap-channel-management"})
-    MATCH (customer_service:BusinessCapability {id: "cap-customer-service"})
-    CREATE (salesforce_crm)-[:SUPPORTS]->(sales_marketing)
     CREATE (salesforce_crm)-[:SUPPORTS]->(sales_execution)
     CREATE (salesforce_crm)-[:SUPPORTS]->(channel_mgmt)
-    CREATE (salesforce_crm)-[:SUPPORTS]->(customer_service)
   `)
 
   // Manufacturing systems
   await session.run(`
     MATCH (mes_system:Application {id: "app-mes-solar"})
-    MATCH (manufacturing:BusinessCapability {id: "cap-manufacturing"})
     MATCH (cell_production:BusinessCapability {id: "cap-cell-production"})
     MATCH (module_assembly:BusinessCapability {id: "cap-module-assembly"})
     MATCH (packaging_shipping:BusinessCapability {id: "cap-packaging-shipping"})
-    CREATE (mes_system)-[:SUPPORTS]->(manufacturing)
     CREATE (mes_system)-[:SUPPORTS]->(cell_production)
     CREATE (mes_system)-[:SUPPORTS]->(module_assembly)
     CREATE (mes_system)-[:SUPPORTS]->(packaging_shipping)
@@ -153,11 +145,9 @@ export async function createApplicationCapabilitySupport(session: Session) {
   // Quality system
   await session.run(`
     MATCH (quality_system:Application {id: "app-quality-solar"})
-    MATCH (quality_mgmt:BusinessCapability {id: "cap-quality-management"})
     MATCH (incoming_inspection:BusinessCapability {id: "cap-incoming-inspection"})
     MATCH (production_testing:BusinessCapability {id: "cap-production-testing"})
     MATCH (certification_compliance:BusinessCapability {id: "cap-certification-compliance"})
-    CREATE (quality_system)-[:SUPPORTS]->(quality_mgmt)
     CREATE (quality_system)-[:SUPPORTS]->(incoming_inspection)
     CREATE (quality_system)-[:SUPPORTS]->(production_testing)
     CREATE (quality_system)-[:SUPPORTS]->(certification_compliance)
@@ -166,11 +156,9 @@ export async function createApplicationCapabilitySupport(session: Session) {
   // Other application-capability relationships
   await session.run(`
     MATCH (oracle_scm:Application {id: "app-oracle-scm"})
-    MATCH (supply_chain:BusinessCapability {id: "cap-supply-chain"})
     MATCH (supplier_mgmt:BusinessCapability {id: "cap-supplier-management"})
     MATCH (procurement:BusinessCapability {id: "cap-procurement"})
     MATCH (inventory_mgmt:BusinessCapability {id: "cap-inventory-management"})
-    CREATE (oracle_scm)-[:SUPPORTS]->(supply_chain)
     CREATE (oracle_scm)-[:SUPPORTS]->(supplier_mgmt)
     CREATE (oracle_scm)-[:SUPPORTS]->(procurement)
     CREATE (oracle_scm)-[:SUPPORTS]->(inventory_mgmt)
@@ -178,34 +166,26 @@ export async function createApplicationCapabilitySupport(session: Session) {
 
   await session.run(`
     MATCH (rd_platform:Application {id: "app-rd-platform"})
-    MATCH (research:BusinessCapability {id: "cap-research-development"})
     MATCH (product_innovation:BusinessCapability {id: "cap-product-innovation"})
     MATCH (materials_research:BusinessCapability {id: "cap-materials-research"})
     MATCH (prototype_testing:BusinessCapability {id: "cap-prototype-testing"})
-    CREATE (rd_platform)-[:SUPPORTS]->(research)
     CREATE (rd_platform)-[:SUPPORTS]->(product_innovation)
     CREATE (rd_platform)-[:SUPPORTS]->(materials_research)
     CREATE (rd_platform)-[:SUPPORTS]->(prototype_testing)
   `)
 
   await session.run(`
-    MATCH (workday_hr:Application {id: "app-workday-hr"})
-    MATCH (hr_management:BusinessCapability {id: "cap-hr-management"})
-    CREATE (workday_hr)-[:SUPPORTS]->(hr_management)
-  `)
-
-  await session.run(`
     MATCH (hubspot_marketing:Application {id: "app-hubspot-marketing"})
-    MATCH (sales_marketing:BusinessCapability {id: "cap-sales-marketing"})
     MATCH (lead_generation:BusinessCapability {id: "cap-lead-generation"})
-    CREATE (hubspot_marketing)-[:SUPPORTS]->(sales_marketing)
     CREATE (hubspot_marketing)-[:SUPPORTS]->(lead_generation)
   `)
 
   await session.run(`
     MATCH (zendesk_service:Application {id: "app-zendesk-service"})
-    MATCH (customer_service:BusinessCapability {id: "cap-customer-service"})
-    CREATE (zendesk_service)-[:SUPPORTS]->(customer_service)
+    MATCH (technical_support:BusinessCapability {id: "cap-technical-support"})
+    MATCH (warranty_management:BusinessCapability {id: "cap-warranty-management"})
+    CREATE (zendesk_service)-[:SUPPORTS]->(technical_support)
+    CREATE (zendesk_service)-[:SUPPORTS]->(warranty_management)
   `)
 
   await session.run(`
@@ -218,20 +198,16 @@ export async function createApplicationCapabilitySupport(session: Session) {
 
   await session.run(`
     MATCH (siemens_plm:Application {id: "app-siemens-plm"})
-    MATCH (research:BusinessCapability {id: "cap-research-development"})
     MATCH (product_innovation:BusinessCapability {id: "cap-product-innovation"})
-    CREATE (siemens_plm)-[:SUPPORTS]->(research)
     CREATE (siemens_plm)-[:SUPPORTS]->(product_innovation)
   `)
 
   // ServiceNow supports IT Management capabilities
   await session.run(`
     MATCH (servicenow:Application {id: "app-servicenow"})
-    MATCH (it_management:BusinessCapability {id: "cap-it-management"})
     MATCH (it_service_management:BusinessCapability {id: "cap-it-service-management"})
     MATCH (infrastructure_management:BusinessCapability {id: "cap-infrastructure-management"})
     MATCH (application_management:BusinessCapability {id: "cap-application-management"})
-    CREATE (servicenow)-[:SUPPORTS]->(it_management)
     CREATE (servicenow)-[:SUPPORTS]->(it_service_management)
     CREATE (servicenow)-[:SUPPORTS]->(infrastructure_management)
     CREATE (servicenow)-[:SUPPORTS]->(application_management)
@@ -240,10 +216,8 @@ export async function createApplicationCapabilitySupport(session: Session) {
   // SAP Concur supports financial management
   await session.run(`
     MATCH (concur:Application {id: "app-concur"})
-    MATCH (finance_accounting:BusinessCapability {id: "cap-finance-accounting"})
     MATCH (financial_planning:BusinessCapability {id: "cap-financial-planning"})
     MATCH (accounts_payable:BusinessCapability {id: "cap-accounts-payable"})
-    CREATE (concur)-[:SUPPORTS]->(finance_accounting)
     CREATE (concur)-[:SUPPORTS]->(financial_planning)
     CREATE (concur)-[:SUPPORTS]->(accounts_payable)
   `)
@@ -251,23 +225,17 @@ export async function createApplicationCapabilitySupport(session: Session) {
   // Cornerstone supports HR and customer training
   await session.run(`
     MATCH (cornerstone:Application {id: "app-cornerstone-lms"})
-    MATCH (hr_management:BusinessCapability {id: "cap-hr-management"})
     MATCH (performance_management:BusinessCapability {id: "cap-performance-management"})
-    MATCH (customer_service:BusinessCapability {id: "cap-customer-service"})
     MATCH (customer_training:BusinessCapability {id: "cap-customer-training"})
-    CREATE (cornerstone)-[:SUPPORTS]->(hr_management)
     CREATE (cornerstone)-[:SUPPORTS]->(performance_management)
-    CREATE (cornerstone)-[:SUPPORTS]->(customer_service)
     CREATE (cornerstone)-[:SUPPORTS]->(customer_training)
   `)
 
   // Oracle Hyperion supports financial planning and reporting
   await session.run(`
     MATCH (hyperion:Application {id: "app-oracle-hyperion"})
-    MATCH (finance_accounting:BusinessCapability {id: "cap-finance-accounting"})
     MATCH (financial_planning:BusinessCapability {id: "cap-financial-planning"})
     MATCH (financial_reporting:BusinessCapability {id: "cap-financial-reporting"})
-    CREATE (hyperion)-[:SUPPORTS]->(finance_accounting)
     CREATE (hyperion)-[:SUPPORTS]->(financial_planning)
     CREATE (hyperion)-[:SUPPORTS]->(financial_reporting)
   `)
@@ -281,15 +249,6 @@ export async function createApplicationCapabilitySupport(session: Session) {
     CREATE (workday_hr)-[:SUPPORTS]->(talent_acquisition)
     CREATE (workday_hr)-[:SUPPORTS]->(performance_management)
     CREATE (workday_hr)-[:SUPPORTS]->(payroll_benefits)
-  `)
-
-  // Update existing Zendesk to support new customer service capabilities
-  await session.run(`
-    MATCH (zendesk_service:Application {id: "app-zendesk-service"})
-    MATCH (technical_support:BusinessCapability {id: "cap-technical-support"})
-    MATCH (warranty_management:BusinessCapability {id: "cap-warranty-management"})
-    CREATE (zendesk_service)-[:SUPPORTS]->(technical_support)
-    CREATE (zendesk_service)-[:SUPPORTS]->(warranty_management)
   `)
 
   console.log('Application-Capability support relationships created successfully.')
@@ -490,4 +449,351 @@ export async function createApplicationSuccessorRelationships(session: Session) 
   `)
 
   console.log('Application successor relationships created successfully.')
+}
+
+export async function createArchitecturePrincipleRelationships(session: Session) {
+  console.log('Creating Architecture Principle relationships...')
+
+  // Architecture to Architecture Principle relationships
+  await session.run(`
+    MATCH (current_arch:Architecture {id: "arch-current-state-2024"})
+    MATCH (target_arch:Architecture {id: "arch-target-state-2027"})
+    MATCH (business_arch:Architecture {id: "arch-business-2024"})
+    MATCH (data_arch:Architecture {id: "arch-data-2024"})
+    MATCH (app_arch:Architecture {id: "arch-application-2024"})
+    MATCH (tech_arch:Architecture {id: "arch-technology-2024"})
+    
+    MATCH (cloud_first:ArchitecturePrinciple {id: "principle-cloud-first"})
+    MATCH (api_first:ArchitecturePrinciple {id: "principle-api-first"})
+    MATCH (zero_trust:ArchitecturePrinciple {id: "principle-zero-trust"})
+    MATCH (data_protection:ArchitecturePrinciple {id: "principle-data-protection"})
+    MATCH (customer_centricity:ArchitecturePrinciple {id: "principle-customer-centricity"})
+    MATCH (automation:ArchitecturePrinciple {id: "principle-automation-first"})
+    MATCH (business_agility:ArchitecturePrinciple {id: "principle-business-agility"})
+    MATCH (sustainability:ArchitecturePrinciple {id: "principle-sustainability"})
+    MATCH (data_asset:ArchitecturePrinciple {id: "principle-data-asset"})
+    MATCH (microservices:ArchitecturePrinciple {id: "principle-microservices"})
+    MATCH (open_standards:ArchitecturePrinciple {id: "principle-open-standards"})
+    MATCH (edge_computing:ArchitecturePrinciple {id: "principle-edge-computing"})
+    MATCH (event_driven:ArchitecturePrinciple {id: "principle-event-driven"})
+    MATCH (performance_design:ArchitecturePrinciple {id: "principle-performance-design"})
+    MATCH (cost_transparency:ArchitecturePrinciple {id: "principle-cost-transparency"})
+    MATCH (single_source_truth:ArchitecturePrinciple {id: "principle-single-source-truth"})
+    MATCH (real_time_visibility:ArchitecturePrinciple {id: "principle-real-time-visibility"})
+    
+    // Current Architecture applies basic principles
+    CREATE (current_arch)-[:APPLIES_PRINCIPLE]->(zero_trust)
+    CREATE (current_arch)-[:APPLIES_PRINCIPLE]->(data_protection)
+    CREATE (current_arch)-[:APPLIES_PRINCIPLE]->(customer_centricity)
+    CREATE (current_arch)-[:APPLIES_PRINCIPLE]->(open_standards)
+    CREATE (current_arch)-[:APPLIES_PRINCIPLE]->(cost_transparency)
+    
+    // Target Architecture applies all modern principles
+    CREATE (target_arch)-[:APPLIES_PRINCIPLE]->(cloud_first)
+    CREATE (target_arch)-[:APPLIES_PRINCIPLE]->(api_first)
+    CREATE (target_arch)-[:APPLIES_PRINCIPLE]->(zero_trust)
+    CREATE (target_arch)-[:APPLIES_PRINCIPLE]->(data_protection)
+    CREATE (target_arch)-[:APPLIES_PRINCIPLE]->(customer_centricity)
+    CREATE (target_arch)-[:APPLIES_PRINCIPLE]->(automation)
+    CREATE (target_arch)-[:APPLIES_PRINCIPLE]->(business_agility)
+    CREATE (target_arch)-[:APPLIES_PRINCIPLE]->(sustainability)
+    CREATE (target_arch)-[:APPLIES_PRINCIPLE]->(real_time_visibility)
+    CREATE (target_arch)-[:APPLIES_PRINCIPLE]->(event_driven)
+    CREATE (target_arch)-[:APPLIES_PRINCIPLE]->(edge_computing)
+    CREATE (target_arch)-[:APPLIES_PRINCIPLE]->(performance_design)
+    
+    // Business Architecture
+    CREATE (business_arch)-[:APPLIES_PRINCIPLE]->(business_agility)
+    CREATE (business_arch)-[:APPLIES_PRINCIPLE]->(customer_centricity)
+    CREATE (business_arch)-[:APPLIES_PRINCIPLE]->(sustainability)
+    
+    // Data Architecture
+    CREATE (data_arch)-[:APPLIES_PRINCIPLE]->(data_asset)
+    CREATE (data_arch)-[:APPLIES_PRINCIPLE]->(single_source_truth)
+    CREATE (data_arch)-[:APPLIES_PRINCIPLE]->(real_time_visibility)
+    CREATE (data_arch)-[:APPLIES_PRINCIPLE]->(data_protection)
+    
+    // Application Architecture
+    CREATE (app_arch)-[:APPLIES_PRINCIPLE]->(api_first)
+    CREATE (app_arch)-[:APPLIES_PRINCIPLE]->(microservices)
+    CREATE (app_arch)-[:APPLIES_PRINCIPLE]->(open_standards)
+    CREATE (app_arch)-[:APPLIES_PRINCIPLE]->(performance_design)
+    
+    // Technology Architecture
+    CREATE (tech_arch)-[:APPLIES_PRINCIPLE]->(cloud_first)
+    CREATE (tech_arch)-[:APPLIES_PRINCIPLE]->(automation)
+    CREATE (tech_arch)-[:APPLIES_PRINCIPLE]->(edge_computing)
+    CREATE (tech_arch)-[:APPLIES_PRINCIPLE]->(zero_trust)
+  `)
+
+  // Application to Architecture Principle relationships
+  await session.run(`
+    MATCH (sap_s4hana:Application {id: "app-sap-s4hana"})
+    MATCH (salesforce_crm:Application {id: "app-salesforce-crm"})
+    MATCH (mes_system:Application {id: "app-mes-solar"})
+    MATCH (quality_system:Application {id: "app-quality-solar"})
+    MATCH (oracle_scm:Application {id: "app-oracle-scm"})
+    MATCH (rd_platform:Application {id: "app-rd-platform"})
+    MATCH (workday_hr:Application {id: "app-workday-hr"})
+    MATCH (hubspot_marketing:Application {id: "app-hubspot-marketing"})
+    MATCH (zendesk_service:Application {id: "app-zendesk-service"})
+    MATCH (wms_system:Application {id: "app-wms-manhattan"})
+    MATCH (power_bi:Application {id: "app-power-bi"})
+    MATCH (siemens_plm:Application {id: "app-siemens-plm"})
+    MATCH (servicenow:Application {id: "app-servicenow"})
+    MATCH (concur:Application {id: "app-concur"})
+    MATCH (cornerstone:Application {id: "app-cornerstone-lms"})
+    MATCH (hyperion:Application {id: "app-oracle-hyperion"})
+    
+    MATCH (cloud_first:ArchitecturePrinciple {id: "principle-cloud-first"})
+    MATCH (api_first:ArchitecturePrinciple {id: "principle-api-first"})
+    MATCH (zero_trust:ArchitecturePrinciple {id: "principle-zero-trust"})
+    MATCH (data_protection:ArchitecturePrinciple {id: "principle-data-protection"})
+    MATCH (customer_centricity:ArchitecturePrinciple {id: "principle-customer-centricity"})
+    MATCH (automation:ArchitecturePrinciple {id: "principle-automation-first"})
+    MATCH (business_agility:ArchitecturePrinciple {id: "principle-business-agility"})
+    MATCH (sustainability:ArchitecturePrinciple {id: "principle-sustainability"})
+    MATCH (data_asset:ArchitecturePrinciple {id: "principle-data-asset"})
+    MATCH (microservices:ArchitecturePrinciple {id: "principle-microservices"})
+    MATCH (open_standards:ArchitecturePrinciple {id: "principle-open-standards"})
+    MATCH (performance_design:ArchitecturePrinciple {id: "principle-performance-design"})
+    MATCH (cost_transparency:ArchitecturePrinciple {id: "principle-cost-transparency"})
+    MATCH (single_source_truth:ArchitecturePrinciple {id: "principle-single-source-truth"})
+    MATCH (real_time_visibility:ArchitecturePrinciple {id: "principle-real-time-visibility"})
+    
+    // Cloud-native applications implement cloud-first principle
+    CREATE (sap_s4hana)-[:IMPLEMENTS_PRINCIPLE]->(cloud_first)
+    CREATE (salesforce_crm)-[:IMPLEMENTS_PRINCIPLE]->(cloud_first)
+    CREATE (mes_system)-[:IMPLEMENTS_PRINCIPLE]->(cloud_first)
+    CREATE (quality_system)-[:IMPLEMENTS_PRINCIPLE]->(cloud_first)
+    CREATE (rd_platform)-[:IMPLEMENTS_PRINCIPLE]->(cloud_first)
+    CREATE (workday_hr)-[:IMPLEMENTS_PRINCIPLE]->(cloud_first)
+    CREATE (hubspot_marketing)-[:IMPLEMENTS_PRINCIPLE]->(cloud_first)
+    CREATE (zendesk_service)-[:IMPLEMENTS_PRINCIPLE]->(cloud_first)
+    CREATE (power_bi)-[:IMPLEMENTS_PRINCIPLE]->(cloud_first)
+    CREATE (servicenow)-[:IMPLEMENTS_PRINCIPLE]->(cloud_first)
+    CREATE (concur)-[:IMPLEMENTS_PRINCIPLE]->(cloud_first)
+    CREATE (cornerstone)-[:IMPLEMENTS_PRINCIPLE]->(cloud_first)
+    
+    // API-based applications implement API-first principle
+    CREATE (salesforce_crm)-[:IMPLEMENTS_PRINCIPLE]->(api_first)
+    CREATE (mes_system)-[:IMPLEMENTS_PRINCIPLE]->(api_first)
+    CREATE (rd_platform)-[:IMPLEMENTS_PRINCIPLE]->(api_first)
+    CREATE (hubspot_marketing)-[:IMPLEMENTS_PRINCIPLE]->(api_first)
+    CREATE (zendesk_service)-[:IMPLEMENTS_PRINCIPLE]->(api_first)
+    CREATE (servicenow)-[:IMPLEMENTS_PRINCIPLE]->(api_first)
+    CREATE (concur)-[:IMPLEMENTS_PRINCIPLE]->(api_first)
+    CREATE (cornerstone)-[:IMPLEMENTS_PRINCIPLE]->(api_first)
+    
+    // All active applications implement zero trust security
+    CREATE (sap_s4hana)-[:IMPLEMENTS_PRINCIPLE]->(zero_trust)
+    CREATE (salesforce_crm)-[:IMPLEMENTS_PRINCIPLE]->(zero_trust)
+    CREATE (mes_system)-[:IMPLEMENTS_PRINCIPLE]->(zero_trust)
+    CREATE (quality_system)-[:IMPLEMENTS_PRINCIPLE]->(zero_trust)
+    CREATE (oracle_scm)-[:IMPLEMENTS_PRINCIPLE]->(zero_trust)
+    CREATE (rd_platform)-[:IMPLEMENTS_PRINCIPLE]->(zero_trust)
+    CREATE (workday_hr)-[:IMPLEMENTS_PRINCIPLE]->(zero_trust)
+    CREATE (hubspot_marketing)-[:IMPLEMENTS_PRINCIPLE]->(zero_trust)
+    CREATE (zendesk_service)-[:IMPLEMENTS_PRINCIPLE]->(zero_trust)
+    CREATE (wms_system)-[:IMPLEMENTS_PRINCIPLE]->(zero_trust)
+    CREATE (power_bi)-[:IMPLEMENTS_PRINCIPLE]->(zero_trust)
+    CREATE (siemens_plm)-[:IMPLEMENTS_PRINCIPLE]->(zero_trust)
+    CREATE (servicenow)-[:IMPLEMENTS_PRINCIPLE]->(zero_trust)
+    CREATE (concur)-[:IMPLEMENTS_PRINCIPLE]->(zero_trust)
+    CREATE (cornerstone)-[:IMPLEMENTS_PRINCIPLE]->(zero_trust)
+    CREATE (hyperion)-[:IMPLEMENTS_PRINCIPLE]->(zero_trust)
+    
+    // Data-intensive applications implement data protection
+    CREATE (sap_s4hana)-[:IMPLEMENTS_PRINCIPLE]->(data_protection)
+    CREATE (mes_system)-[:IMPLEMENTS_PRINCIPLE]->(data_protection)
+    CREATE (quality_system)-[:IMPLEMENTS_PRINCIPLE]->(data_protection)
+    CREATE (oracle_scm)-[:IMPLEMENTS_PRINCIPLE]->(data_protection)
+    CREATE (rd_platform)-[:IMPLEMENTS_PRINCIPLE]->(data_protection)
+    CREATE (workday_hr)-[:IMPLEMENTS_PRINCIPLE]->(data_protection)
+    CREATE (power_bi)-[:IMPLEMENTS_PRINCIPLE]->(data_protection)
+    CREATE (siemens_plm)-[:IMPLEMENTS_PRINCIPLE]->(data_protection)
+    CREATE (hyperion)-[:IMPLEMENTS_PRINCIPLE]->(data_protection)
+    
+    // Customer-facing applications implement customer centricity
+    CREATE (salesforce_crm)-[:IMPLEMENTS_PRINCIPLE]->(customer_centricity)
+    CREATE (hubspot_marketing)-[:IMPLEMENTS_PRINCIPLE]->(customer_centricity)
+    CREATE (zendesk_service)-[:IMPLEMENTS_PRINCIPLE]->(customer_centricity)
+    CREATE (cornerstone)-[:IMPLEMENTS_PRINCIPLE]->(customer_centricity)
+    
+    // Manufacturing applications implement automation-first
+    CREATE (mes_system)-[:IMPLEMENTS_PRINCIPLE]->(automation)
+    CREATE (quality_system)-[:IMPLEMENTS_PRINCIPLE]->(automation)
+    CREATE (wms_system)-[:IMPLEMENTS_PRINCIPLE]->(automation)
+    CREATE (servicenow)-[:IMPLEMENTS_PRINCIPLE]->(automation)
+    
+    // Engineering applications implement sustainability and performance
+    CREATE (siemens_plm)-[:IMPLEMENTS_PRINCIPLE]->(sustainability)
+    CREATE (siemens_plm)-[:IMPLEMENTS_PRINCIPLE]->(open_standards)
+    CREATE (siemens_plm)-[:IMPLEMENTS_PRINCIPLE]->(performance_design)
+    
+    CREATE (oracle_scm)-[:IMPLEMENTS_PRINCIPLE]->(sustainability)
+    CREATE (oracle_scm)-[:IMPLEMENTS_PRINCIPLE]->(performance_design)
+    
+    CREATE (wms_system)-[:IMPLEMENTS_PRINCIPLE]->(performance_design)
+    CREATE (wms_system)-[:IMPLEMENTS_PRINCIPLE]->(open_standards)
+    
+    // Business applications implement business agility
+    CREATE (salesforce_crm)-[:IMPLEMENTS_PRINCIPLE]->(business_agility)
+    CREATE (servicenow)-[:IMPLEMENTS_PRINCIPLE]->(business_agility)
+    
+    // Financial applications implement cost transparency
+    CREATE (concur)-[:IMPLEMENTS_PRINCIPLE]->(cost_transparency)
+    CREATE (hyperion)-[:IMPLEMENTS_PRINCIPLE]->(cost_transparency)
+    
+    // Analytics applications implement data principles
+    CREATE (power_bi)-[:IMPLEMENTS_PRINCIPLE]->(data_asset)
+    CREATE (power_bi)-[:IMPLEMENTS_PRINCIPLE]->(real_time_visibility)
+    CREATE (power_bi)-[:IMPLEMENTS_PRINCIPLE]->(single_source_truth)
+    
+    // Custom applications implement microservices
+    CREATE (mes_system)-[:IMPLEMENTS_PRINCIPLE]->(microservices)
+    CREATE (quality_system)-[:IMPLEMENTS_PRINCIPLE]->(microservices)
+    CREATE (rd_platform)-[:IMPLEMENTS_PRINCIPLE]->(microservices)
+  `)
+
+  console.log('Architecture Principle relationships created successfully.')
+}
+
+export async function createArchitectureRelationships(session: Session) {
+  console.log('Creating Architecture relationships...')
+
+  // Architecture hierarchical relationships
+  await session.run(`
+    MATCH (current:Architecture {id: "arch-current-state-2024"})
+    MATCH (transition1:Architecture {id: "arch-transition-phase1-2025"})
+    MATCH (transition2:Architecture {id: "arch-transition-phase2-2026"})
+    MATCH (target:Architecture {id: "arch-target-state-2027"})
+    CREATE (transition1)-[:PART_OF]->(current)
+    CREATE (transition2)-[:PART_OF]->(transition1)
+    CREATE (target)-[:PART_OF]->(transition2)
+  `)
+
+  // Architecture to Application relationships
+  await session.run(`
+    MATCH (current_arch:Architecture {id: "arch-current-state-2024"})
+    MATCH (app_arch:Architecture {id: "arch-application-2024"})
+    
+    // Current architecture contains current applications
+    MATCH (sap:Application {id: "app-sap-s4hana"})
+    MATCH (mes:Application {id: "app-mes-solar"})
+    MATCH (quality:Application {id: "app-quality-solar"})
+    MATCH (salesforce:Application {id: "app-salesforce-crm"})
+    MATCH (oracle_scm:Application {id: "app-oracle-scm"})
+    MATCH (wms:Application {id: "app-wms-manhattan"})
+    MATCH (plm:Application {id: "app-siemens-plm"})
+    
+    CREATE (current_arch)-[:CONTAINS]->(sap)
+    CREATE (current_arch)-[:CONTAINS]->(mes)
+    CREATE (current_arch)-[:CONTAINS]->(quality)
+    CREATE (current_arch)-[:CONTAINS]->(salesforce)
+    CREATE (current_arch)-[:CONTAINS]->(oracle_scm)
+    CREATE (current_arch)-[:CONTAINS]->(wms)
+    CREATE (current_arch)-[:CONTAINS]->(plm)
+    
+    CREATE (app_arch)-[:CONTAINS]->(sap)
+    CREATE (app_arch)-[:CONTAINS]->(mes)
+    CREATE (app_arch)-[:CONTAINS]->(quality)
+    CREATE (app_arch)-[:CONTAINS]->(salesforce)
+    CREATE (app_arch)-[:CONTAINS]->(oracle_scm)
+    CREATE (app_arch)-[:CONTAINS]->(wms)
+    CREATE (app_arch)-[:CONTAINS]->(plm)
+  `)
+
+  // Architecture to Infrastructure relationships
+  await session.run(`
+    MATCH (tech_arch:Architecture {id: "arch-technology-2024"})
+    MATCH (current_arch:Architecture {id: "arch-current-state-2024"})
+    
+    MATCH (aws_eu:Infrastructure {id: "infra-aws-eu-west-1"})
+    MATCH (aws_us:Infrastructure {id: "infra-aws-us-east-1"})
+    MATCH (eks_prod:Infrastructure {id: "infra-eks-production"})
+    MATCH (ecs_staging:Infrastructure {id: "infra-ecs-staging"})
+    MATCH (on_premise:Infrastructure {id: "infra-datacenter-munich"})
+    
+    CREATE (tech_arch)-[:CONTAINS]->(aws_eu)
+    CREATE (tech_arch)-[:CONTAINS]->(aws_us)
+    CREATE (tech_arch)-[:CONTAINS]->(eks_prod)
+    CREATE (tech_arch)-[:CONTAINS]->(ecs_staging)
+    CREATE (tech_arch)-[:CONTAINS]->(on_premise)
+    
+    CREATE (current_arch)-[:CONTAINS]->(aws_eu)
+    CREATE (current_arch)-[:CONTAINS]->(on_premise)
+  `)
+
+  // Architecture to Business Capability relationships
+  await session.run(`
+    MATCH (business_arch:Architecture {id: "arch-business-2024"})
+    MATCH (current_arch:Architecture {id: "arch-current-state-2024"})
+    
+    MATCH (rd:BusinessCapability {id: "cap-research-development"})
+    MATCH (manufacturing:BusinessCapability {id: "cap-manufacturing-operations"})
+    MATCH (sales:BusinessCapability {id: "cap-sales-marketing"})
+    MATCH (quality:BusinessCapability {id: "cap-quality-management"})
+    MATCH (supply_chain:BusinessCapability {id: "cap-supply-chain"})
+    
+    CREATE (business_arch)-[:CONTAINS]->(rd)
+    CREATE (business_arch)-[:CONTAINS]->(manufacturing)
+    CREATE (business_arch)-[:CONTAINS]->(sales)
+    CREATE (business_arch)-[:CONTAINS]->(quality)
+    CREATE (business_arch)-[:CONTAINS]->(supply_chain)
+    
+    CREATE (current_arch)-[:CONTAINS]->(rd)
+    CREATE (current_arch)-[:CONTAINS]->(manufacturing)
+    CREATE (current_arch)-[:CONTAINS]->(sales)
+    CREATE (current_arch)-[:CONTAINS]->(quality)
+    CREATE (current_arch)-[:CONTAINS]->(supply_chain)
+  `)
+
+  console.log('Architecture relationships created successfully.')
+}
+
+export async function createArchitectureOwnership(session: Session) {
+  console.log('Creating Architecture Ownership relationships...')
+
+  // Enterprise Architect owns all architectures
+  await session.run(`
+    MATCH (enterprise_architect:Person {id: "person-enterprise-architect"})
+    MATCH (current_arch:Architecture {id: "arch-current-state-2024"})
+    MATCH (target_arch:Architecture {id: "arch-target-state-2027"})
+    MATCH (transition1:Architecture {id: "arch-transition-phase1-2025"})
+    MATCH (transition2:Architecture {id: "arch-transition-phase2-2026"})
+    MATCH (business_arch:Architecture {id: "arch-business-2024"})
+    MATCH (data_arch:Architecture {id: "arch-data-2024"})
+    MATCH (app_arch:Architecture {id: "arch-application-2024"})
+    MATCH (tech_arch:Architecture {id: "arch-technology-2024"})
+    
+    CREATE (current_arch)-[:OWNED_BY]->(enterprise_architect)
+    CREATE (target_arch)-[:OWNED_BY]->(enterprise_architect)
+    CREATE (transition1)-[:OWNED_BY]->(enterprise_architect)
+    CREATE (transition2)-[:OWNED_BY]->(enterprise_architect)
+    CREATE (business_arch)-[:OWNED_BY]->(enterprise_architect)
+    CREATE (data_arch)-[:OWNED_BY]->(enterprise_architect)
+    CREATE (app_arch)-[:OWNED_BY]->(enterprise_architect)
+    CREATE (tech_arch)-[:OWNED_BY]->(enterprise_architect)
+  `)
+
+  // CTO also owns technology architectures
+  await session.run(`
+    MATCH (cto:Person {id: "person-cto"})
+    MATCH (tech_arch:Architecture {id: "arch-technology-2024"})
+    MATCH (target_arch:Architecture {id: "arch-target-state-2027"})
+    CREATE (tech_arch)-[:OWNED_BY]->(cto)
+    CREATE (target_arch)-[:OWNED_BY]->(cto)
+  `)
+
+  // VP Engineering owns application architecture
+  await session.run(`
+    MATCH (vp_engineering:Person {id: "person-vp-engineering"})
+    MATCH (app_arch:Architecture {id: "arch-application-2024"})
+    MATCH (transition1:Architecture {id: "arch-transition-phase1-2025"})
+    CREATE (app_arch)-[:OWNED_BY]->(vp_engineering)
+    CREATE (transition1)-[:OWNED_BY]->(vp_engineering)
+  `)
+
+  console.log('Architecture ownership relationships created successfully.')
 }

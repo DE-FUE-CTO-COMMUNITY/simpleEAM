@@ -1,8 +1,8 @@
 #!/usr/bin/env ts-node
 
 // Executable script for initializing the Solar Panel Manufacturing scenario
-// Run with: yarn init-db-pv
-// Or directly with: ts-node src/db/init-db-pv-runner.ts
+// Run with: yarn init-db-pv --reset
+// Or directly with: ts-node src/db/init-db-pv-runner.ts --reset
 
 import neo4j from 'neo4j-driver'
 import dotenv from 'dotenv'
@@ -30,7 +30,7 @@ async function main() {
     console.log('✅ Neo4j connection established successfully')
 
     // Clear existing data (optional - uncomment if needed)
-    const shouldClearData = process.argv.includes('--clear') || process.argv.includes('-c')
+    const shouldClearData = process.argv.includes('--reset') || process.argv.includes('-r')
     if (shouldClearData) {
       console.log('\n🧹 Clearing existing data...')
       const session = driver.session()
