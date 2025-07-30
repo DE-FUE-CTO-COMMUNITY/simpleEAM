@@ -19,6 +19,7 @@ import {
   CircularProgress,
   Tooltip,
   InputAdornment,
+  Snackbar,
 } from '@mui/material'
 import {
   Add as AddIcon,
@@ -30,9 +31,11 @@ import {
   Key as KeyIcon,
 } from '@mui/icons-material'
 import { useTranslations } from 'next-intl'
+import { useMutation, useLazyQuery } from '@apollo/client'
 import { KeycloakUser } from '@/lib/keycloak-admin'
 import { KeycloakUserAlt } from '@/lib/keycloak-admin-alt'
 import { keycloak } from '@/lib/auth'
+import { CREATE_PERSON, UPDATE_PERSON, GET_PERSON_BY_EMAIL } from '@/graphql/person'
 import UserFormDialog from './UserFormDialog'
 import DeleteConfirmDialog from './DeleteConfirmDialog'
 import PasswordResetDialog from './PasswordResetDialog'
@@ -43,6 +46,77 @@ export default function UserManagement() {
   const [keycloakLoading, setKeycloakLoading] = useState(false)
   const [keycloakError, setKeycloakError] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
+
+  // GraphQL Mutations und Queries für Personen
+  const [createPerson] = useMutation(CREATE_PERSON, {
+    onError: error => {
+      console.error('❌ Fehler beim Erstellen der Person:', error)
+    },
+  })
+
+  const [updatePerson] = useMutation(UPDATE_PERSON, {
+    onError: error => {
+      console.error('❌ Fehler beim Aktualisieren der Person:', error)
+    },
+  })
+
+  const [findPersonByEmail] = useLazyQuery(GET_PERSON_BY_EMAIL, {
+    onError: error => {
+      console.error('❌ Fehler beim Suchen der Person:', error)
+    },
+  })
+
+  // Hilfsfunktion: Person aus Benutzerdaten erstellen/aktualisieren
+  const createOrUpdatePerson = async (userData: any, isUpdate = false) => {
+    try {
+      const personData = {
+        firstName: userData.firstName || '',
+        lastName: userData.lastName || '',
+        email: userData.email || '',
+        department: userData.department || null,
+        role: userData.role || null,
+        phone: userData.phone || null,
+      }
+
+      if (isUpdate && userData.email) {
+        // Erst prüfen, ob Person bereits existiert
+        const { data } = await findPersonByEmail({
+          variables: { email: userData.email },
+        })
+
+        if (data?.people && data.people.length > 0) {
+          // Person aktualisieren
+          const existingPerson = data.people[0]
+          await updatePerson({
+            variables: {
+              id: existingPerson.id,
+              input: personData,
+            },
+          })
+          console.log('✅ Person erfolgreich aktualisiert')
+        } else {
+          // Person existiert nicht, neue erstellen
+          await createPerson({
+            variables: {
+              input: [personData],
+            },
+          })
+          console.log('✅ Person erfolgreich erstellt (während Update)')
+        }
+      } else {
+        // Neue Person erstellen
+        await createPerson({
+          variables: {
+            input: [personData],
+          },
+        })
+        console.log('✅ Person erfolgreich erstellt')
+      }
+    } catch (error) {
+      console.error('❌ Fehler bei Person-Operation:', error)
+      // Fehler nicht weiterwerfen, damit Benutzer-Erstellung nicht blockiert wird
+    }
+  }
 
   const translateRole = (role: string): string => {
     const roleKey = role.toLowerCase()
@@ -78,6 +152,12 @@ export default function UserManagement() {
   const [passwordResetDialog, setPasswordResetDialog] = useState({
     open: false,
     user: null as (KeycloakUser | KeycloakUserAlt) | null,
+  })
+
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success' as 'success' | 'error',
   })
 
   // Keycloak Benutzer laden
@@ -144,6 +224,7 @@ export default function UserManagement() {
         throw new Error('Nicht authentifiziert')
       }
 
+      // Erst Keycloak-Benutzer erstellen
       const response = await fetch('/api/admin/keycloak-users', {
         method: 'POST',
         headers: {
@@ -161,6 +242,12 @@ export default function UserManagement() {
       }
 
       console.log('✅ Benutzer erfolgreich erstellt')
+
+      // Dann entsprechende Person erstellen
+      if (userData.email) {
+        await createOrUpdatePerson(userData, false)
+      }
+
       await loadKeycloakUsers() // Liste neu laden
       return true
     } catch (error) {
@@ -175,6 +262,7 @@ export default function UserManagement() {
         throw new Error('Nicht authentifiziert')
       }
 
+      // Erst Keycloak-Benutzer aktualisieren
       const response = await fetch('/api/admin/keycloak-users', {
         method: 'POST',
         headers: {
@@ -193,6 +281,12 @@ export default function UserManagement() {
       }
 
       console.log('✅ Benutzer erfolgreich aktualisiert')
+
+      // Dann entsprechende Person aktualisieren (falls E-Mail vorhanden)
+      if (userData.email) {
+        await createOrUpdatePerson(userData, true)
+      }
+
       await loadKeycloakUsers() // Liste neu laden
       return true
     } catch (error) {
@@ -254,8 +348,24 @@ export default function UserManagement() {
   }
 
   const handlePasswordResetSuccess = () => {
-    // Erfolgsmeldung könnte hier hinzugefügt werden
+    // Benutzerliste neu laden, um aktualisierte requiredActions zu bekommen
     console.log('Passwort erfolgreich zurückgesetzt')
+    loadKeycloakUsers()
+  }
+
+  const handleClipboardMessage = (message: string, severity: 'success' | 'error') => {
+    setSnackbar({
+      open: true,
+      message,
+      severity,
+    })
+  }
+
+  const handleSnackbarClose = () => {
+    setSnackbar({
+      ...snackbar,
+      open: false,
+    })
   }
 
   const handleFormSubmit = async (userData: any) => {
@@ -403,7 +513,10 @@ export default function UserManagement() {
                       </Tooltip>
                       <Tooltip
                         title={
-                          user.requiredActions?.includes('UPDATE_PASSWORD')
+                          // Prüfe, ob Benutzer noch nie ein Passwort hatte (roter Schlüssel)
+                          // oder nur temporär ein neues Passwort ändern muss (normaler Schlüssel)
+                          user.requiredActions?.includes('UPDATE_PASSWORD') &&
+                          user.attributes?.firstPasswordSet?.[0] !== 'true'
                             ? t('actions.setPassword')
                             : t('actions.resetPassword')
                         }
@@ -412,12 +525,22 @@ export default function UserManagement() {
                           onClick={() => openPasswordResetDialog(user)}
                           size="small"
                           sx={{
-                            color: user.requiredActions?.includes('UPDATE_PASSWORD')
-                              ? 'error.main'
-                              : 'inherit',
+                            color:
+                              // Roter Schlüssel nur für Benutzer, die noch nie ein Passwort hatten
+                              user.requiredActions?.includes('UPDATE_PASSWORD') &&
+                              user.attributes?.firstPasswordSet?.[0] !== 'true'
+                                ? 'error.main'
+                                : 'inherit',
                           }}
                         >
-                          {user.requiredActions?.includes('UPDATE_PASSWORD') ? (
+                          {/* Icon-Logik: 
+                              - Roter KeyIcon: Benutzer hat noch nie ein Passwort gehabt
+                              - Normaler KeyIcon: Benutzer muss Passwort ändern (temporär)
+                              - PasswordIcon: Benutzer hat gültiges Passwort */}
+                          {user.requiredActions?.includes('UPDATE_PASSWORD') &&
+                          user.attributes?.firstPasswordSet?.[0] !== 'true' ? (
+                            <KeyIcon />
+                          ) : user.requiredActions?.includes('UPDATE_PASSWORD') ? (
                             <KeyIcon />
                           ) : (
                             <PasswordIcon />
@@ -467,6 +590,7 @@ export default function UserManagement() {
         onClose={closePasswordResetDialog}
         onSuccess={handlePasswordResetSuccess}
         user={passwordResetDialog.user}
+        onClipboardMessage={handleClipboardMessage}
       />
 
       {/* DeleteConfirmDialog */}
@@ -477,6 +601,18 @@ export default function UserManagement() {
         user={deleteDialog.user}
         mode="user"
       />
+
+      {/* Snackbar für Clipboard-Feedback */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert onClose={handleSnackbarClose} severity={snackbar.severity} sx={{ width: '100%' }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   )
 }

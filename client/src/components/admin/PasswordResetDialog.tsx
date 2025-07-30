@@ -12,12 +12,10 @@ import {
   Alert,
   CircularProgress,
   Box,
-  FormControlLabel,
-  Checkbox,
   IconButton,
   InputAdornment,
 } from '@mui/material'
-import { Visibility, VisibilityOff } from '@mui/icons-material'
+import { Visibility, VisibilityOff, Key } from '@mui/icons-material'
 import { useForm } from '@tanstack/react-form'
 import { z } from 'zod'
 import { useTranslations } from 'next-intl'
@@ -28,15 +26,79 @@ import { keycloak } from '@/lib/auth'
 interface PasswordResetData {
   newPassword: string
   confirmPassword: string
-  forcePasswordChange: boolean
 }
 
 interface PasswordResetDialogProps {
   open: boolean
   onClose: () => void
   onSuccess: () => void
-  user?: KeycloakUser | KeycloakUserAlt | null
+  user: KeycloakUser | KeycloakUserAlt | null
   loading?: boolean
+  onClipboardMessage?: (message: string, severity: 'success' | 'error') => void
+}
+
+// Utility-Funktion für Passwort-Generierung
+function generatePassword(length: number = 22): string {
+  const lowercase = 'abcdefghijklmnopqrstuvwxyz'
+  const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  const numbers = '0123456789'
+  const special = '!@#$%^&*()_+-=[]{}|;:,.<>?'
+
+  const allChars = lowercase + uppercase + numbers + special
+  let password = ''
+
+  // Mindestens ein Zeichen aus jeder Kategorie
+  password += lowercase[Math.floor(Math.random() * lowercase.length)]
+  password += uppercase[Math.floor(Math.random() * uppercase.length)]
+  password += numbers[Math.floor(Math.random() * numbers.length)]
+  password += special[Math.floor(Math.random() * special.length)]
+
+  // Restliche Zeichen zufällig füllen
+  for (let i = 4; i < length; i++) {
+    password += allChars[Math.floor(Math.random() * allChars.length)]
+  }
+
+  // Passwort mischen
+  return password
+    .split('')
+    .sort(() => Math.random() - 0.5)
+    .join('')
+}
+
+// Utility-Funktion für Zwischenablage
+async function copyToClipboard(text: string): Promise<boolean> {
+  let clipboardSuccess = false
+
+  try {
+    // Überprüfung, ob Clipboard API verfügbar ist
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text)
+      clipboardSuccess = true
+    } else if (document.queryCommandSupported && document.queryCommandSupported('copy')) {
+      // Fallback für ältere Browser
+      const textArea = document.createElement('textarea')
+      textArea.value = text
+      textArea.style.position = 'fixed'
+      textArea.style.left = '-999999px'
+      textArea.style.top = '-999999px'
+      document.body.appendChild(textArea)
+      textArea.focus()
+      textArea.select()
+      clipboardSuccess = document.execCommand('copy')
+      textArea.remove()
+    }
+  } catch (error) {
+    console.error('Fehler beim Kopieren:', error)
+    clipboardSuccess = false
+  }
+
+  // Immer Console-Ausgabe machen (für Debug-Zwecke und Fallback)
+  console.log('📋 Zugangsdaten für Benutzer:')
+  console.log('─'.repeat(50))
+  console.log(text)
+  console.log('─'.repeat(50))
+
+  return clipboardSuccess
 }
 
 export default function PasswordResetDialog({
@@ -45,6 +107,7 @@ export default function PasswordResetDialog({
   onSuccess,
   user,
   loading = false,
+  onClipboardMessage,
 }: PasswordResetDialogProps) {
   const t = useTranslations('admin.userManagement.passwordReset')
   const [submitLoading, setSubmitLoading] = useState(false)
@@ -59,7 +122,6 @@ export default function PasswordResetDialog({
         .object({
           newPassword: z.string().min(8, t('validation.passwordMinLength')),
           confirmPassword: z.string().min(1, t('validation.passwordRequired')),
-          forcePasswordChange: z.boolean(),
         })
         .refine(data => data.newPassword === data.confirmPassword, {
           message: t('validation.passwordsNotMatch'),
@@ -73,7 +135,6 @@ export default function PasswordResetDialog({
     defaultValues: {
       newPassword: '',
       confirmPassword: '',
-      forcePasswordChange: true, // Standardmäßig aktiviert
     } as PasswordResetData,
     onSubmit: async ({ value }) => {
       setSubmitLoading(true)
@@ -95,7 +156,7 @@ export default function PasswordResetDialog({
             action: 'resetPassword',
             userId: user?.id,
             password: value.newPassword,
-            temporary: value.forcePasswordChange,
+            temporary: true, // Immer temporär, da das der gewünschte Standardfall ist
           }),
         })
 
@@ -103,6 +164,9 @@ export default function PasswordResetDialog({
           const errorData = await response.json()
           throw new Error(errorData.message || t('error'))
         }
+
+        // Nach erfolgreichem Reset in Zwischenablage kopieren
+        await handleCopyToClipboard(value.newPassword)
 
         onSuccess()
         handleClose()
@@ -147,6 +211,37 @@ export default function PasswordResetDialog({
     }
   }, [open, form])
 
+  // Handler für Passwort-Generierung
+  const handleGeneratePassword = () => {
+    const newPassword = generatePassword(22)
+    form.setFieldValue('newPassword', newPassword)
+    form.setFieldValue('confirmPassword', newPassword)
+  }
+
+  // Handler für Zwischenablage
+  const handleCopyToClipboard = async (password: string) => {
+    if (!user) return false
+
+    const clipboardText = `${t('clipboard.accessDataIntro')}
+
+${t('clipboard.username')}: ${user.username}
+${t('clipboard.email')}: ${user.email || 'N/A'}
+${t('clipboard.password')}: ${password}
+${t('clipboard.url')}: ${window.location.origin}`
+
+    const success = await copyToClipboard(clipboardText)
+    if (onClipboardMessage) {
+      if (success) {
+        // Erfolgreich in Zwischenablage kopiert
+        onClipboardMessage(t('clipboard.copied'), 'success')
+      } else {
+        // Fallback: In Console ausgegeben
+        onClipboardMessage(t('clipboard.consoleOutput'), 'success')
+      }
+    }
+    return success
+  }
+
   const handleClose = () => {
     if (!submitLoading && !loading) {
       setError(null)
@@ -163,14 +258,19 @@ export default function PasswordResetDialog({
     setShowConfirmPassword(!showConfirmPassword)
   }
 
+  // Überprüfen, ob Benutzer noch nie ein Passwort hatte (erstes Mal setzen)
+  const isFirstTimePassword =
+    user?.requiredActions?.includes('UPDATE_PASSWORD') &&
+    user?.attributes?.firstPasswordSet?.[0] !== 'true'
+
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle>
         <Typography variant="h6" component="div">
-          {t('title')}
+          {isFirstTimePassword ? t('titleSet') : t('title')}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          {t('subtitle')}
+          {isFirstTimePassword ? t('subtitleSet') : t('subtitle')}
         </Typography>
       </DialogTitle>
 
@@ -253,40 +353,52 @@ export default function PasswordResetDialog({
             )}
           </form.Field>
 
-          <form.Field name="forcePasswordChange">
-            {field => (
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={field.state.value}
-                    onChange={e => field.handleChange(e.target.checked)}
-                    onBlur={field.handleBlur}
-                  />
-                }
-                label={t('forcePasswordChange')}
-                sx={{ mt: 2 }}
-              />
-            )}
-          </form.Field>
+          {/* Info-Text ohne Checkbox */}
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ mt: 2, mb: 1, fontStyle: 'italic' }}
+          >
+            {t('forcePasswordChange')}
+          </Typography>
         </form>
       </DialogContent>
 
-      <DialogActions>
-        <Button onClick={handleClose} disabled={submitLoading || loading}>
-          {t('buttons.cancel')}
+      <DialogActions sx={{ justifyContent: 'space-between', px: 3, pb: 2 }}>
+        {/* Generate Password Button - links */}
+        <Button
+          onClick={handleGeneratePassword}
+          variant="outlined"
+          startIcon={<Key />}
+          disabled={submitLoading || loading}
+        >
+          {t('buttons.generatePassword')}
         </Button>
-        <form.Subscribe selector={state => [state.canSubmit]}>
-          {([canSubmit]) => (
-            <Button
-              onClick={() => form.handleSubmit()}
-              variant="contained"
-              disabled={!canSubmit || submitLoading || loading}
-              startIcon={submitLoading ? <CircularProgress size={16} /> : null}
-            >
-              {submitLoading ? t('buttons.resetting') : t('buttons.resetPassword')}
-            </Button>
-          )}
-        </form.Subscribe>
+
+        {/* Cancel und Reset Buttons - rechts */}
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <Button onClick={handleClose} disabled={submitLoading || loading}>
+            {t('buttons.cancel')}
+          </Button>
+          <form.Subscribe selector={state => [state.canSubmit]}>
+            {([canSubmit]) => (
+              <Button
+                onClick={() => form.handleSubmit()}
+                variant="contained"
+                disabled={!canSubmit || submitLoading || loading}
+                startIcon={submitLoading ? <CircularProgress size={16} /> : null}
+              >
+                {submitLoading
+                  ? isFirstTimePassword
+                    ? t('buttons.setting')
+                    : t('buttons.resetting')
+                  : isFirstTimePassword
+                    ? t('buttons.setPassword')
+                    : t('buttons.resetPassword')}
+              </Button>
+            )}
+          </form.Subscribe>
+        </Box>
       </DialogActions>
     </Dialog>
   )

@@ -264,6 +264,57 @@ export const POST = withAuth(async (request: NextRequest, _authResult: AuthResul
             }),
           }
         )
+
+        // Wenn das Passwort erfolgreich gesetzt wurde, requiredActions aktualisieren
+        if (apiResponse.ok) {
+          // Benutzer-Daten laden, um aktuelle requiredActions zu bekommen
+          const userResponse = await fetch(`${keycloakUrl}/admin/realms/${realm}/users/${userId}`, {
+            headers: {
+              Authorization: `Bearer ${adminToken}`,
+              'Content-Type': 'application/json',
+            },
+          })
+
+          if (userResponse.ok) {
+            const userData = await userResponse.json()
+            let requiredActions = userData.requiredActions || []
+
+            // Merken, ob der Benutzer vorher bereits UPDATE_PASSWORD hatte (= hatte noch nie ein Passwort)
+            const hadNoPasswordBefore = requiredActions.includes('UPDATE_PASSWORD')
+
+            // UPDATE_PASSWORD aus requiredActions entfernen, da jetzt ein Passwort gesetzt ist
+            requiredActions = requiredActions.filter(
+              (action: string) => action !== 'UPDATE_PASSWORD'
+            )
+
+            // Wenn temporäres Passwort gesetzt wurde:
+            // - Neue Benutzer (hatten UPDATE_PASSWORD): Behalten UPDATE_PASSWORD
+            // - Bestehende Benutzer (hatten kein UPDATE_PASSWORD): Bekommen UPDATE_PASSWORD nur als temporäre Maßnahme
+            if (temporary !== false) {
+              requiredActions.push('UPDATE_PASSWORD')
+            }
+
+            // requiredActions aktualisieren
+            await fetch(`${keycloakUrl}/admin/realms/${realm}/users/${userId}`, {
+              method: 'PUT',
+              headers: {
+                Authorization: `Bearer ${adminToken}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                ...userData,
+                requiredActions,
+                // Zusätzlich: Markiere in User-Attributen, ob dies der erste Passwort-Set war
+                attributes: {
+                  ...userData.attributes,
+                  firstPasswordSet: hadNoPasswordBefore
+                    ? ['true']
+                    : userData.attributes?.firstPasswordSet || ['false'],
+                },
+              }),
+            })
+          }
+        }
         break
       }
 

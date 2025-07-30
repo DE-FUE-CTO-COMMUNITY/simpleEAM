@@ -100,6 +100,23 @@ export const GET_PERSON = gql`
   }
 `
 
+export const GET_PERSON_BY_EMAIL = gql`
+  query GetPersonByEmail($email: String!) {
+    people(where: { email: { eq: $email } }) {
+      id
+      firstName
+      lastName
+      email
+      department
+      role
+      phone
+      avatarUrl
+      createdAt
+      updatedAt
+    }
+  }
+`
+
 export const CREATE_PERSON = gql`
   mutation CreatePerson($input: [PersonCreateInput!]!) {
     createPeople(input: $input) {
@@ -147,35 +164,6 @@ export const CHECK_PERSON_EXISTS = gql`
   query CheckPersonExists($id: ID!) {
     people(where: { id: { eq: $id } }) {
       id
-    }
-  }
-`
-
-export const GET_PERSON_BY_EMAIL = gql`
-  query GetPersonByEmail($email: String!) {
-    people(where: { email: { eq: $email } }) {
-      id
-      firstName
-      lastName
-      email
-      department
-      role
-      phone
-      avatarUrl
-      createdAt
-      updatedAt
-      ownedCapabilities {
-        id
-        name
-      }
-      ownedApplications {
-        id
-        name
-      }
-      ownedDataObjects {
-        id
-        name
-      }
     }
   }
 `

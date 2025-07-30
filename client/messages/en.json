@@ -1484,7 +1484,9 @@
       },
       "passwordReset": {
         "title": "Reset Password",
+        "titleSet": "Set Password",
         "subtitle": "Create new temporary password for user",
+        "subtitleSet": "Set initial password for user",
         "newPassword": "New temporary password",
         "confirmPassword": "Confirm password",
         "forcePasswordChange": "User must change password on next login",
@@ -1499,11 +1501,24 @@
         },
         "buttons": {
           "resetPassword": "Reset Password",
+          "setPassword": "Set Password",
           "cancel": "Cancel",
-          "resetting": "Resetting..."
+          "resetting": "Resetting...",
+          "setting": "Setting...",
+          "generatePassword": "Generate Password"
         },
         "success": "Password successfully reset. User must change it on next login.",
-        "error": "Error resetting password"
+        "error": "Error resetting password",
+        "clipboard": {
+          "accessDataIntro": "Here are the access credentials for Simple EAM:",
+          "username": "Username",
+          "email": "Email",
+          "password": "Password",
+          "url": "URL",
+          "copied": "Access credentials copied to clipboard",
+          "copyError": "Error copying to clipboard",
+          "consoleOutput": "Access credentials have been output to the browser console"
+        }
       }
     },
     "debugTools": {

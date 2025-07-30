@@ -1484,7 +1484,9 @@
       },
       "passwordReset": {
         "title": "Passwort zurücksetzen",
+        "titleSet": "Passwort setzen",
         "subtitle": "Neues temporäres Passwort für Benutzer erstellen",
+        "subtitleSet": "Erstes Passwort für den Benutzer festlegen",
         "newPassword": "Neues temporäres Passwort",
         "confirmPassword": "Passwort bestätigen",
         "forcePasswordChange": "Benutzer muss Passwort beim nächsten Login ändern",
@@ -1499,11 +1501,24 @@
         },
         "buttons": {
           "resetPassword": "Passwort zurücksetzen",
+          "setPassword": "Passwort setzen",
           "cancel": "Abbrechen",
-          "resetting": "Wird zurückgesetzt..."
+          "resetting": "Wird zurückgesetzt...",
+          "setting": "Wird gesetzt...",
+          "generatePassword": "Passwort generieren"
         },
         "success": "Passwort erfolgreich zurückgesetzt. Der Benutzer muss es beim nächsten Login ändern.",
-        "error": "Fehler beim Zurücksetzen des Passworts"
+        "error": "Fehler beim Zurücksetzen des Passworts",
+        "clipboard": {
+          "accessDataIntro": "Hier sind die Zugangsdaten für Simple EAM:",
+          "username": "Benutzername",
+          "email": "E-Mail",
+          "password": "Passwort",
+          "url": "URL",
+          "copied": "Zugangsdaten wurden in die Zwischenablage kopiert",
+          "copyError": "Fehler beim Kopieren in die Zwischenablage",
+          "consoleOutput": "Zugangsdaten wurden in der Browser-Konsole ausgegeben"
+        }
       }
     },
     "debugTools": {
