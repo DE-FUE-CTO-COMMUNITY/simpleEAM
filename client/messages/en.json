@@ -1409,7 +1409,8 @@
       "actions": {
         "edit": "Edit",
         "delete": "Delete",
-        "resetPassword": "Reset Password"
+        "resetPassword": "Reset Password",
+        "setPassword": "Set Password (no password assigned yet)"
       },
       "roles": {
         "admin": "Administrator",

@@ -27,10 +27,12 @@ import {
   Search as SearchIcon,
   Refresh as RefreshIcon,
   VpnKey as PasswordIcon,
+  Key as KeyIcon,
 } from '@mui/icons-material'
 import { useTranslations } from 'next-intl'
 import { KeycloakUser } from '@/lib/keycloak-admin'
 import { KeycloakUserAlt } from '@/lib/keycloak-admin-alt'
+import { keycloak } from '@/lib/auth'
 import UserFormDialog from './UserFormDialog'
 import DeleteConfirmDialog from './DeleteConfirmDialog'
 import PasswordResetDialog from './PasswordResetDialog'
@@ -42,7 +44,6 @@ export default function UserManagement() {
   const [keycloakError, setKeycloakError] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
 
-  // Hilfsfunktion für Rollenübersetzung
   const translateRole = (role: string): string => {
     const roleKey = role.toLowerCase()
     try {
@@ -87,8 +88,29 @@ export default function UserManagement() {
     try {
       console.log('🔄 Lade Keycloak-Benutzer über API-Route...')
 
-      const response = await fetch('/api/admin/keycloak-users')
+      // Überprüfung, ob Keycloak initialisiert ist
+      if (!keycloak) {
+        throw new Error('Keycloak nicht initialisiert')
+      }
+
+      // Token aktualisieren falls nötig
+      await keycloak.updateToken(30)
+
+      // Überprüfung, ob der Benutzer authentifiziert ist
+      if (!keycloak.token) {
+        throw new Error('Nicht authentifiziert - kein Token verfügbar')
+      }
+
+      console.log('🔑 Verwende Token für Authentifizierung...')
+      const response = await fetch('/api/admin/keycloak-users', {
+        headers: {
+          Authorization: `Bearer ${keycloak.token}`,
+        },
+      })
+
       if (!response.ok) {
+        const errorText = await response.text()
+        console.error('❌ API-Fehler Response:', errorText)
         throw new Error(`API-Fehler: ${response.status} ${response.statusText}`)
       }
 
@@ -97,7 +119,19 @@ export default function UserManagement() {
       setKeycloakUsers(users)
     } catch (error) {
       console.error('❌ Fehler beim Laden der Keycloak-Benutzer:', error)
-      setKeycloakError(t('loadingError'))
+
+      // Spezifische Fehlerbehandlung
+      if (error instanceof Error) {
+        if (error.message.includes('401') || error.message.includes('Unauthorized')) {
+          setKeycloakError('Berechtigung verweigert. Bitte melden Sie sich erneut an.')
+        } else if (error.message.includes('403') || error.message.includes('Forbidden')) {
+          setKeycloakError('Keine Admin-Berechtigung vorhanden.')
+        } else {
+          setKeycloakError(error.message)
+        }
+      } else {
+        setKeycloakError(t('loadingError'))
+      }
     } finally {
       setKeycloakLoading(false)
     }
@@ -106,10 +140,15 @@ export default function UserManagement() {
   // CRUD-Operationen für Keycloak-Benutzer
   const createKeycloakUser = async (userData: any) => {
     try {
+      if (!keycloak?.token) {
+        throw new Error('Nicht authentifiziert')
+      }
+
       const response = await fetch('/api/admin/keycloak-users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${keycloak.token}`,
         },
         body: JSON.stringify({
           action: 'create',
@@ -132,10 +171,15 @@ export default function UserManagement() {
 
   const updateKeycloakUser = async (userId: string, userData: any) => {
     try {
+      if (!keycloak?.token) {
+        throw new Error('Nicht authentifiziert')
+      }
+
       const response = await fetch('/api/admin/keycloak-users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${keycloak.token}`,
         },
         body: JSON.stringify({
           action: 'update',
@@ -357,9 +401,27 @@ export default function UserManagement() {
                           <EditIcon />
                         </IconButton>
                       </Tooltip>
-                      <Tooltip title={t('actions.resetPassword')}>
-                        <IconButton onClick={() => openPasswordResetDialog(user)} size="small">
-                          <PasswordIcon />
+                      <Tooltip
+                        title={
+                          user.requiredActions?.includes('UPDATE_PASSWORD')
+                            ? t('actions.setPassword')
+                            : t('actions.resetPassword')
+                        }
+                      >
+                        <IconButton
+                          onClick={() => openPasswordResetDialog(user)}
+                          size="small"
+                          sx={{
+                            color: user.requiredActions?.includes('UPDATE_PASSWORD')
+                              ? 'error.main'
+                              : 'inherit',
+                          }}
+                        >
+                          {user.requiredActions?.includes('UPDATE_PASSWORD') ? (
+                            <KeyIcon />
+                          ) : (
+                            <PasswordIcon />
+                          )}
                         </IconButton>
                       </Tooltip>
                       <Tooltip title={t('actions.delete')}>

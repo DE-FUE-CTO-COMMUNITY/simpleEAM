@@ -23,6 +23,7 @@ import { z } from 'zod'
 import { useTranslations } from 'next-intl'
 import { KeycloakUser } from '@/lib/keycloak-admin'
 import { KeycloakUserAlt } from '@/lib/keycloak-admin-alt'
+import { keycloak } from '@/lib/auth'
 
 interface PasswordResetData {
   newPassword: string
@@ -79,10 +80,16 @@ export default function PasswordResetDialog({
       setError(null)
 
       try {
+        // Überprüfung, ob der Benutzer authentifiziert ist
+        if (!keycloak?.token) {
+          throw new Error('Nicht authentifiziert')
+        }
+
         const response = await fetch('/api/admin/keycloak-users', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${keycloak.token}`,
           },
           body: JSON.stringify({
             action: 'resetPassword',

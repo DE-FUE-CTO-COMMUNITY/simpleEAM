@@ -15,8 +15,9 @@ import {
 import { useMutation } from '@apollo/client'
 import { useTranslations } from 'next-intl'
 import { KeycloakUser } from '@/lib/keycloak-admin'
-import { DELETE_PERSON, GET_PEOPLE } from '@/lib/queries/person-queries'
+import { DELETE_PERSON, GET_PERSONS } from '@/graphql/person'
 import { Person } from '@/gql/generated'
+import { keycloak } from '@/lib/auth'
 
 interface DeleteConfirmDialogProps {
   open: boolean
@@ -41,7 +42,7 @@ export default function DeleteConfirmDialog({
 
   // GraphQL Mutation für Person löschen
   const [deletePerson] = useMutation(DELETE_PERSON, {
-    refetchQueries: [{ query: GET_PEOPLE }],
+    refetchQueries: [{ query: GET_PERSONS }],
   })
 
   const handleDelete = async () => {
@@ -52,10 +53,15 @@ export default function DeleteConfirmDialog({
       if (mode === 'user' || mode === 'both') {
         // Keycloak-Benutzer über API-Route löschen
         if (user?.id) {
+          if (!keycloak?.token) {
+            throw new Error('Nicht authentifiziert')
+          }
+
           const response = await fetch('/api/admin/keycloak-users', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
+              Authorization: `Bearer ${keycloak.token}`,
             },
             body: JSON.stringify({
               action: 'delete',

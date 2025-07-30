@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { withAuth, AuthResult } from '../../../../lib/auth-middleware'
 
 // Verfügbare Rollen im System
 const AVAILABLE_ROLES = ['viewer', 'architect', 'admin']
 
 // API Route für Keycloak Admin Operationen
-export async function GET(request: NextRequest) {
+export const GET = withAuth(async (request: NextRequest, _authResult: AuthResult) => {
   const { searchParams } = new URL(request.url)
   const getRoles = searchParams.get('getRoles') === 'true'
 
@@ -112,9 +113,9 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     )
   }
-}
+}, true) // true = requireAdmin
 
-export async function POST(request: NextRequest) {
+export const POST = withAuth(async (request: NextRequest, _authResult: AuthResult) => {
   try {
     const body = await request.json()
     const { action, userId, userData } = body
@@ -169,14 +170,19 @@ export async function POST(request: NextRequest) {
 
     switch (action) {
       case 'create': {
-        // Benutzer erstellen (ohne role Property)
+        // Benutzer erstellen (ohne role Property) aber mit requiredActions für Passwort-Setup
+        const userDataWithActions = {
+          ...keycloakUserData,
+          requiredActions: ['UPDATE_PASSWORD'], // Benutzer muss beim ersten Login Passwort setzen
+        }
+
         apiResponse = await fetch(`${keycloakUrl}/admin/realms/${realm}/users`, {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${adminToken}`,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(keycloakUserData),
+          body: JSON.stringify(userDataWithActions),
         })
 
         // Nach erfolgreichem Erstellen die Rolle setzen, falls angegeben
@@ -311,7 +317,7 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     )
   }
-}
+}, true) // true = requireAdmin
 
 // Hilfsfunktion: Rolle einem Benutzer zuweisen
 async function assignRoleToUser(

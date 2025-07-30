@@ -1409,7 +1409,8 @@
       "actions": {
         "edit": "Bearbeiten",
         "delete": "Löschen",
-        "resetPassword": "Passwort zurücksetzen"
+        "resetPassword": "Passwort zurücksetzen",
+        "setPassword": "Passwort setzen (noch kein Passwort vergeben)"
       },
       "roles": {
         "admin": "Administrator",
