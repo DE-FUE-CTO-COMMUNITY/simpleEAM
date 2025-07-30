@@ -12,7 +12,6 @@ const LOGIN_STATUS_KEY = 'user_logged_in'
 const setUserLoggedIn = () => {
   if (typeof window !== 'undefined') {
     localStorage.setItem(LOGIN_STATUS_KEY, 'true')
-    console.log('✅ Benutzer als eingeloggt markiert')
   }
 }
 
@@ -24,10 +23,8 @@ const checkForNewLogin = (): boolean => {
     const wasLoggedIn = localStorage.getItem(LOGIN_STATUS_KEY) === 'true'
     if (!wasLoggedIn) {
       // Noch nicht als eingeloggt markiert = neuer Login
-      console.log('🔐 Neuer Login erkannt')
       return true
     }
-    console.log('📄 Bereits eingeloggt (Page-Reload)')
     return false
   }
   return false
@@ -39,7 +36,6 @@ const checkForNewLogin = (): boolean => {
 const clearLoginStatus = () => {
   if (typeof window !== 'undefined') {
     localStorage.removeItem(LOGIN_STATUS_KEY)
-    console.log('🧹 Login-Status bereinigt')
   }
 }
 
@@ -99,9 +95,6 @@ export const initKeycloak = () => {
         const isNewLogin = checkForNewLogin()
 
         if (isNewLogin) {
-          console.log(
-            '🔐 Neuer Login bestätigt - Last-Login wird aktualisiert und Dashboard-Redirect'
-          )
           // JETZT erst als eingeloggt markieren (nach dem ersten Check)
           setUserLoggedIn()
           updateLastLoginDate()
@@ -113,11 +106,8 @@ export const initKeycloak = () => {
           const dashboardUrl = `/${lang}`
 
           if (window.location.pathname !== dashboardUrl) {
-            console.log(`🚀 Weiterleitung zum Dashboard: ${dashboardUrl}`)
             window.location.href = dashboardUrl
           }
-        } else {
-          console.log('📄 Page-Reload erkannt - Kein Last-Login-Update, kein Redirect')
         }
       }
       return authenticated
@@ -221,7 +211,7 @@ const updateLastLoginDate = async () => {
     const currentTimestamp = new Date().toISOString()
 
     // API-Aufruf an unsere Next.js Route für die Aktualisierung des Benutzerattributs
-    const response = await fetch('/api/auth/update-last-login', {
+    await fetch('/api/auth/update-last-login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -231,12 +221,6 @@ const updateLastLoginDate = async () => {
         lastLogin: currentTimestamp,
       }),
     })
-
-    if (response.ok) {
-      console.log('🕐 Letztes Login-Datum erfolgreich aktualisiert:', currentTimestamp)
-    } else {
-      console.warn('⚠️ Fehler beim Aktualisieren des letzten Login-Datums:', response.status)
-    }
   } catch (error) {
     console.error('❌ Fehler beim Aktualisieren des letzten Login-Datums:', error)
   }

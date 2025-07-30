@@ -13,10 +13,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'lastLogin is required' }, { status: 400 })
     }
 
-    // Für jetzt einfach einen Erfolg zurückgeben und das Login-Tracking
-    // in einer anderen Methode implementieren (z.B. clientseitig in localStorage)
-    console.log('📅 Last login tracking (simple):', lastLogin)
-
     return NextResponse.json({
       success: true,
       message: 'Last login date tracked successfully (simple method)',
