@@ -14,48 +14,58 @@ export const useAutoUserRegistration = () => {
   const [userEmail, setUserEmail] = useState<string | null>(null)
   const [isCreatingUser, setIsCreatingUser] = useState(false)
   const registrationAttempted = useRef(false)
+  const processingRef = useRef(false) // Zusätzlicher Schutz gegen Doppelausführung
 
   // E-Mail aus Keycloak-Token extrahieren
   useEffect(() => {
     if (authenticated && keycloak?.tokenParsed?.email) {
       const email = keycloak.tokenParsed.email
       setUserEmail(email)
+      console.log('🔍 Auto-Registration: E-Mail aus Token extrahiert:', email)
 
-      // Prüfe ob für diese E-Mail bereits eine Registrierung versucht wurde
+      // Nur prüfen ob gerade eine Erstellung läuft
       const sessionKey = `autoRegChecked_${email}`
       const alreadyChecked = sessionStorage.getItem(sessionKey)
-      if (alreadyChecked) {
-        setRegistrationChecked(true)
+      if (alreadyChecked === 'creating') {
+        console.log('🔄 Auto-Registration: Erstellung läuft bereits')
+        setIsCreatingUser(true)
         registrationAttempted.current = true
+        setRegistrationChecked(false) // Noch nicht abgeschlossen
+      } else {
+        console.log('🆕 Auto-Registration: Neue Prüfung für:', email)
+        // Immer eine neue Prüfung starten - lass GraphQL-Query entscheiden
+        setRegistrationChecked(false)
+        registrationAttempted.current = false
+        setIsCreatingUser(false)
+        processingRef.current = false
       }
+    } else {
+      console.log('❌ Auto-Registration: Keine E-Mail im Token gefunden oder nicht authentifiziert')
     }
   }, [authenticated, keycloak])
 
   // GraphQL-Abfrage um zu prüfen, ob der Benutzer bereits existiert
   const { data: existingUser, loading: checkingUser } = useQuery(GET_PERSON_BY_EMAIL, {
     variables: { email: userEmail || '' },
-    skip: !userEmail || !authenticated || registrationChecked || isCreatingUser,
+    skip: !userEmail || !authenticated || isCreatingUser || registrationAttempted.current,
     onCompleted: data => {
+      console.log('🔍 Auto-Registration: GraphQL-Abfrage abgeschlossen:', data)
       // Wenn der Benutzer bereits existiert, markiere als geprüft
       if (data?.people && data.people.length > 0) {
+        console.log('✅ Auto-Registration: Benutzer bereits vorhanden')
         setRegistrationChecked(true)
         registrationAttempted.current = true
-
-        // Speichere in sessionStorage für diese Session
-        if (userEmail) {
-          sessionStorage.setItem(`autoRegChecked_${userEmail}`, 'true')
-        }
+        // Kein sessionStorage für existierende Benutzer - das blockiert neue Prüfungen
+      } else {
+        console.log('❌ Auto-Registration: Kein Benutzer gefunden, bereit für Erstellung')
+        setRegistrationChecked(true) // Auch hier auf true setzen, damit der Effect triggert
       }
     },
     onError: error => {
       console.error('❌ Fehler beim Überprüfen des Benutzers:', error)
       setRegistrationChecked(true) // Markiere als geprüft, auch bei Fehler
       registrationAttempted.current = true
-
-      // Speichere in sessionStorage auch bei Fehler
-      if (userEmail) {
-        sessionStorage.setItem(`autoRegChecked_${userEmail}`, 'true')
-      }
+      // Kein sessionStorage bei Fehlern - das blockiert Retry-Versuche
     },
   })
 
@@ -66,6 +76,7 @@ export const useAutoUserRegistration = () => {
       setRegistrationChecked(true)
       setIsCreatingUser(false)
       registrationAttempted.current = true
+      processingRef.current = false
 
       // Speichere in sessionStorage dass Registrierung abgeschlossen ist
       if (userEmail) {
@@ -77,12 +88,14 @@ export const useAutoUserRegistration = () => {
       setRegistrationChecked(true) // Markiere als geprüft, auch bei Fehler
       setIsCreatingUser(false)
       registrationAttempted.current = true
-
-      // Speichere in sessionStorage auch bei Fehler
+      processingRef.current = false
+      // Entferne creating-Flag bei Fehler
       if (userEmail) {
-        sessionStorage.setItem(`autoRegChecked_${userEmail}`, 'true')
+        sessionStorage.removeItem(`autoRegChecked_${userEmail}`)
       }
     },
+    // Verhindere Cache-Updates, die zu erneuten Queries führen könnten
+    fetchPolicy: 'no-cache',
   })
 
   // Stabilisiere die kritischen Werte für die Dependencies
@@ -90,32 +103,30 @@ export const useAutoUserRegistration = () => {
     return existingUser?.people && existingUser.people.length > 0
   }, [existingUser?.people])
 
-  const tokenEmail = useMemo(() => {
-    return keycloak?.tokenParsed?.email
-  }, [keycloak?.tokenParsed?.email])
-
-  // Automatische Registrierung durchführen - verhindert doppelte Ausführung
+  // Vereinfachter Effect - nur noch für den Trigger
   useEffect(() => {
     // Mehrfache Schutzmaßnahmen gegen doppelte Ausführung
-    if (registrationAttempted.current || isCreatingUser || registrationChecked) {
+    if (registrationAttempted.current || isCreatingUser || processingRef.current) {
+      console.log('🛑 Auto-Registration: Gestoppt aufgrund von creation flags')
       return
     }
 
-    const shouldCreateUser =
-      initialized &&
-      authenticated &&
-      userEmail &&
-      !checkingUser &&
-      !registrationChecked &&
-      !isCreatingUser &&
-      existingUser?.people &&
-      existingUser.people.length === 0 // Benutzer existiert noch nicht
+    // Frühe Prüfung - noch nicht bereit
+    if (!initialized || !authenticated || !userEmail || checkingUser || !registrationChecked) {
+      console.log('🕐 Auto-Registration: Noch nicht bereit für Prüfung')
+      return
+    }
+
+    const shouldCreateUser = existingUser?.people && existingUser.people.length === 0
+
+    console.log('🤔 Auto-Registration: Sollte Benutzer erstellt werden?', shouldCreateUser)
 
     if (shouldCreateUser) {
       console.log('🔄 Erstelle neuen Benutzer automatisch...')
 
       // Setze alle Flags um doppelte Ausführung zu verhindern
       registrationAttempted.current = true
+      processingRef.current = true
       setIsCreatingUser(true)
 
       // Markiere sofort in sessionStorage
@@ -148,10 +159,11 @@ export const useAutoUserRegistration = () => {
         console.error('🚨 Unerwarteter Fehler bei der Benutzerregistrierung:', error)
         setIsCreatingUser(false)
         setRegistrationChecked(true)
+        processingRef.current = false
 
-        // Markiere auch bei Catch-Fehler in sessionStorage
+        // Entferne creating-Flag bei Catch-Fehler
         if (userEmail) {
-          sessionStorage.setItem(`autoRegChecked_${userEmail}`, 'true')
+          sessionStorage.removeItem(`autoRegChecked_${userEmail}`)
         }
       })
     }
@@ -162,11 +174,9 @@ export const useAutoUserRegistration = () => {
     checkingUser,
     registrationChecked,
     isCreatingUser,
-    userExists, // Verwende stabilisierten Wert
-    tokenEmail, // Verwende stabilisierten Wert
+    existingUser?.people,
     createPerson,
-    existingUser?.people, // Füge das explizit hinzu
-    keycloak?.tokenParsed, // Füge das explizit hinzu
+    keycloak?.tokenParsed,
   ])
 
   return {
@@ -174,5 +184,16 @@ export const useAutoUserRegistration = () => {
     userExists,
     isChecking: checkingUser,
     isCreating: isCreatingUser,
+    // Debug-Funktionen
+    clearRegistrationCache: () => {
+      if (userEmail) {
+        const sessionKey = `autoRegChecked_${userEmail}`
+        sessionStorage.removeItem(sessionKey)
+        setRegistrationChecked(false)
+        registrationAttempted.current = false
+        setIsCreatingUser(false)
+        console.log('🔄 Auto-Registration Cache geleert für:', userEmail)
+      }
+    },
   }
 }

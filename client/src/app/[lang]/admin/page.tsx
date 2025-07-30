@@ -35,16 +35,24 @@ export default function AdminPage() {
   const t = useTranslations('admin')
   const [isDebuggerOpen, setIsDebuggerOpen] = React.useState(false)
   const [currentTab, setCurrentTab] = React.useState(0)
+  const [isAuthorized, setIsAuthorized] = React.useState(false)
 
   // Prüfe Admin-Berechtigung
   React.useEffect(() => {
     if (!isAdmin()) {
       redirect('/')
+    } else {
+      setIsAuthorized(true)
     }
   }, [])
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setCurrentTab(newValue)
+  }
+
+  // Zeige nichts an, bis die Authorization geprüft wurde
+  if (!isAuthorized) {
+    return null
   }
 
   return (

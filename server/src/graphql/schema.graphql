@@ -52,6 +52,7 @@ type Person
     validate: [
       { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "architect" } } } }
       { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "admin" } } } }
+      { operations: [CREATE, UPDATE], where: { node: { email: { eq: "$jwt.email" } } } }
     ]
   ) {
   id: ID! @id
