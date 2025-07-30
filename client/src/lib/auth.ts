@@ -61,6 +61,8 @@ export const initKeycloak = () => {
       if (authenticated && keycloak) {
         // Automatischen Token-Refresh einrichten
         setupTokenRefresh()
+        // Letztes Login-Datum aktualisieren
+        updateLastLoginDate()
       }
       return authenticated
     })
@@ -149,6 +151,39 @@ const setupTokenRefresh = () => {
   }
 
   window.addEventListener('authError', handleAuthError)
+}
+
+/**
+ * Aktualisiert das letzte Login-Datum in den Keycloak-Benutzerattributen
+ */
+const updateLastLoginDate = async () => {
+  if (!keycloak?.authenticated || !keycloak?.token) {
+    return
+  }
+
+  try {
+    const currentTimestamp = new Date().toISOString()
+
+    // API-Aufruf an unsere Next.js Route für die Aktualisierung des Benutzerattributs
+    const response = await fetch('/api/auth/update-last-login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${keycloak.token}`,
+      },
+      body: JSON.stringify({
+        lastLogin: currentTimestamp,
+      }),
+    })
+
+    if (response.ok) {
+      console.log('🕐 Letztes Login-Datum erfolgreich aktualisiert:', currentTimestamp)
+    } else {
+      console.warn('⚠️ Fehler beim Aktualisieren des letzten Login-Datums:', response.status)
+    }
+  } catch (error) {
+    console.error('❌ Fehler beim Aktualisieren des letzten Login-Datums:', error)
+  }
 }
 
 /**

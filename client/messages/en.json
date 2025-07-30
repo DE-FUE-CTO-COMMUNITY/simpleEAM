@@ -1395,12 +1395,16 @@
         "email": "Email",
         "role": "Role",
         "status": "Status",
-        "emailVerified": "Email Verified",
+        "lastLogin": "Last Login",
         "actions": "Actions"
       },
       "status": {
         "active": "Active",
         "inactive": "Inactive"
+      },
+      "lastLogin": {
+        "never": "Never",
+        "error": "Error"
       },
       "emailVerification": {
         "verified": "Verified",

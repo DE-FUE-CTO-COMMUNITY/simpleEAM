@@ -30,7 +30,7 @@ import {
   VpnKey as PasswordIcon,
   Key as KeyIcon,
 } from '@mui/icons-material'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { useMutation, useLazyQuery } from '@apollo/client'
 import { KeycloakUser } from '@/lib/keycloak-admin'
 import { KeycloakUserAlt } from '@/lib/keycloak-admin-alt'
@@ -42,6 +42,7 @@ import PasswordResetDialog from './PasswordResetDialog'
 
 export default function UserManagement() {
   const t = useTranslations('admin.userManagement')
+  const locale = useLocale()
   const [keycloakUsers, setKeycloakUsers] = useState<(KeycloakUser | KeycloakUserAlt)[]>([])
   const [keycloakLoading, setKeycloakLoading] = useState(false)
   const [keycloakError, setKeycloakError] = useState<string | null>(null)
@@ -129,9 +130,28 @@ export default function UserManagement() {
     return enabled ? t('status.active') : t('status.inactive')
   }
 
-  // Hilfsfunktion für E-Mail-Verifikation-Übersetzung
-  const translateEmailVerification = (verified: boolean | undefined): string => {
-    return verified ? t('emailVerification.verified') : t('emailVerification.notVerified')
+  // Hilfsfunktion für Letztes-Login-Anzeige
+  const formatLastLogin = (user: KeycloakUser | KeycloakUserAlt): string => {
+    const lastLogin = user.attributes?.lastLogin?.[0]
+    if (!lastLogin) {
+      return t('lastLogin.never')
+    }
+
+    try {
+      const date = new Date(lastLogin)
+      // Verwende die aktuelle Locale für korrekte Internationalisierung
+      const localeString = locale === 'de' ? 'de-DE' : 'en-US'
+      return date.toLocaleString(localeString, {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+    } catch (error) {
+      console.error('Fehler beim Formatieren des letzten Login-Datums:', error)
+      return t('lastLogin.error')
+    }
   }
 
   // Dialog States
@@ -463,7 +483,7 @@ export default function UserManagement() {
                   <TableCell>{t('table.email')}</TableCell>
                   <TableCell>{t('table.role')}</TableCell>
                   <TableCell>{t('table.status')}</TableCell>
-                  <TableCell>{t('table.emailVerified')}</TableCell>
+                  <TableCell>{t('table.lastLogin')}</TableCell>
                   <TableCell align="right">{t('table.actions')}</TableCell>
                 </TableRow>
               </TableHead>
@@ -486,13 +506,7 @@ export default function UserManagement() {
                         size="small"
                       />
                     </TableCell>
-                    <TableCell>
-                      <Chip
-                        label={translateEmailVerification(user.emailVerified)}
-                        color={user.emailVerified ? 'success' : 'warning'}
-                        size="small"
-                      />
-                    </TableCell>
+                    <TableCell>{formatLastLogin(user)}</TableCell>
                     <TableCell align="right">
                       <Tooltip title={t('actions.edit')}>
                         <IconButton onClick={() => openEditUserDialog(user)} size="small">

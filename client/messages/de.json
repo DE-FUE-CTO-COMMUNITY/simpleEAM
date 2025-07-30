@@ -1395,16 +1395,16 @@
         "email": "E-Mail",
         "role": "Rolle",
         "status": "Status",
-        "emailVerified": "E-Mail verifiziert",
+        "lastLogin": "Letztes Login",
         "actions": "Aktionen"
       },
       "status": {
         "active": "Aktiv",
         "inactive": "Deaktiviert"
       },
-      "emailVerification": {
-        "verified": "Verifiziert",
-        "notVerified": "Nicht verifiziert"
+      "lastLogin": {
+        "never": "Noch nie angemeldet",
+        "error": "Fehler beim Anzeigen"
       },
       "actions": {
         "edit": "Bearbeiten",
