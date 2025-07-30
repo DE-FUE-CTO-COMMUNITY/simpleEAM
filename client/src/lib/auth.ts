@@ -1,6 +1,48 @@
 import Keycloak from 'keycloak-js'
 import { createContext, useContext } from 'react'
 
+/**
+ * LocalStorage-Schlüssel für Login-Status
+ */
+const LOGIN_STATUS_KEY = 'user_logged_in'
+
+/**
+ * Markiert den Benutzer als eingeloggt
+ */
+const setUserLoggedIn = () => {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(LOGIN_STATUS_KEY, 'true')
+    console.log('✅ Benutzer als eingeloggt markiert')
+  }
+}
+
+/**
+ * Prüft, ob der Benutzer neu eingeloggt ist
+ */
+const checkForNewLogin = (): boolean => {
+  if (typeof window !== 'undefined') {
+    const wasLoggedIn = localStorage.getItem(LOGIN_STATUS_KEY) === 'true'
+    if (!wasLoggedIn) {
+      // Noch nicht als eingeloggt markiert = neuer Login
+      console.log('🔐 Neuer Login erkannt')
+      return true
+    }
+    console.log('📄 Bereits eingeloggt (Page-Reload)')
+    return false
+  }
+  return false
+}
+
+/**
+ * Entfernt den Login-Status (bei Logout)
+ */
+const clearLoginStatus = () => {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem(LOGIN_STATUS_KEY)
+    console.log('🧹 Login-Status bereinigt')
+  }
+}
+
 // Keycloak-Konfiguration
 const keycloakConfig = {
   url: process.env.NEXT_PUBLIC_KEYCLOAK_URL || 'https://auth.dev-server.mf2.eu',
@@ -37,32 +79,46 @@ export const initKeycloak = () => {
   // Initialisiere Keycloak und speichere die Promise
   keycloakInitPromise = keycloak
     .init({
-      onLoad: 'login-required', // Zurück zu 'login-required' für automatische Weiterleitung
+      onLoad: 'login-required',
       silentCheckSsoRedirectUri:
         typeof window !== 'undefined'
           ? window.location.origin + '/silent-check-sso.html'
           : '/silent-check-sso.html',
       pkceMethod: 'S256',
-      // Nach dem Login immer zum Dashboard weiterleiten
-      redirectUri:
-        typeof window !== 'undefined'
-          ? (() => {
-              const currentPath = window.location.pathname
-              const langMatch = currentPath.match(/^\/([a-z]{2})/)
-              const lang = langMatch ? langMatch[1] : 'de'
-              return `${window.location.origin}/${lang}`
-            })()
-          : undefined,
-      checkLoginIframe: true, // Silent token refresh aktivieren
-      checkLoginIframeInterval: 5, // Alle 5 Sekunden prüfen
+      // KEINE automatische redirectUri hier - das verursacht immer Redirects
+      checkLoginIframe: true,
+      checkLoginIframeInterval: 5,
       enableLogging: process.env.NODE_ENV === 'development',
     })
     .then(authenticated => {
       if (authenticated && keycloak) {
         // Automatischen Token-Refresh einrichten
         setupTokenRefresh()
-        // Letztes Login-Datum aktualisieren
-        updateLastLoginDate()
+
+        // Prüfen, ob es ein neuer Login war
+        const isNewLogin = checkForNewLogin()
+
+        if (isNewLogin) {
+          console.log(
+            '🔐 Neuer Login bestätigt - Last-Login wird aktualisiert und Dashboard-Redirect'
+          )
+          // JETZT erst als eingeloggt markieren (nach dem ersten Check)
+          setUserLoggedIn()
+          updateLastLoginDate()
+
+          // Zum Dashboard weiterleiten
+          const currentPath = window.location.pathname
+          const langMatch = currentPath.match(/^\/([a-z]{2})/)
+          const lang = langMatch ? langMatch[1] : 'de'
+          const dashboardUrl = `/${lang}`
+
+          if (window.location.pathname !== dashboardUrl) {
+            console.log(`🚀 Weiterleitung zum Dashboard: ${dashboardUrl}`)
+            window.location.href = dashboardUrl
+          }
+        } else {
+          console.log('📄 Page-Reload erkannt - Kein Last-Login-Update, kein Redirect')
+        }
       }
       return authenticated
     })
@@ -208,6 +264,8 @@ export const useAuth = () => useContext(AuthContext)
  */
 export const logout = () => {
   if (typeof window !== 'undefined' && keycloak) {
+    // Login-Status bereinigen beim Logout
+    clearLoginStatus()
     keycloak.logout()
   }
 }
@@ -217,6 +275,8 @@ export const logout = () => {
  */
 export const login = () => {
   if (typeof window !== 'undefined' && keycloak) {
+    // KEIN Flag setzen hier - das passiert erst nach erfolgreichem Login
+
     // Bestimme die Dashboard-URL basierend auf der aktuellen Sprache
     const currentPath = window.location.pathname
     const langMatch = currentPath.match(/^\/([a-z]{2})/)
