@@ -1374,5 +1374,141 @@
       "csv": "CSV (.csv)",
       "json": "JSON (.json)"
     }
+  },
+  "admin": {
+    "title": "Administration",
+    "tabs": {
+      "userManagement": "User Management",
+      "debugTools": "Debug Tools"
+    },
+    "userManagement": {
+      "title": "User Management",
+      "newUser": "New User",
+      "refresh": "Refresh",
+      "searchPlaceholder": "Search users...",
+      "noUsersFound": "No users found",
+      "loadingError": "Error loading Keycloak users",
+      "table": {
+        "username": "Username",
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "email": "Email",
+        "role": "Role",
+        "status": "Status",
+        "emailVerified": "Email Verified",
+        "actions": "Actions"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "emailVerification": {
+        "verified": "Verified",
+        "notVerified": "Not Verified"
+      },
+      "actions": {
+        "edit": "Edit",
+        "delete": "Delete",
+        "resetPassword": "Reset Password"
+      },
+      "roles": {
+        "admin": "Administrator",
+        "architect": "Architect",
+        "viewer": "Viewer"
+      },
+      "form": {
+        "createTitle": "Create New User",
+        "editTitle": "Edit User",
+        "username": "Username",
+        "email": "Email Address",
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "role": "Role",
+        "placeholders": {
+          "username": "e.g. john.doe",
+          "email": "e.g. john.doe@company.com",
+          "firstName": "e.g. John",
+          "lastName": "e.g. Doe"
+        },
+        "validation": {
+          "usernameMinLength": "Username must be at least 3 characters long",
+          "emailInvalid": "Valid email address required",
+          "firstNameRequired": "First name is required",
+          "lastNameRequired": "Last name is required",
+          "roleRequired": "Role is required"
+        },
+        "buttons": {
+          "create": "Create",
+          "save": "Save",
+          "cancel": "Cancel"
+        },
+        "roleLabels": {
+          "admin": "Administrator",
+          "architect": "Architect",
+          "viewer": "Viewer"
+        }
+      },
+      "deleteDialog": {
+        "title": {
+          "user": "Delete User",
+          "person": "Delete Person",
+          "both": "Delete User and Person"
+        },
+        "confirmation": {
+          "user": "Do you really want to delete this user?",
+          "person": "Do you really want to delete this person?",
+          "both": "Do you really want to delete both the user and the person?",
+          "default": "Do you really want to delete this entry?"
+        },
+        "warning": {
+          "title": "Warning:",
+          "irreversible": "This action cannot be undone!",
+          "userRemoval": "The user will be removed from Keycloak and will no longer be able to log in.",
+          "personRemoval": "All person data will be permanently removed from the database."
+        },
+        "buttons": {
+          "cancel": "Cancel",
+          "delete": "Delete",
+          "deleting": "Deleting..."
+        },
+        "labels": {
+          "username": "Username:",
+          "email": "Email:",
+          "firstName": "First Name:",
+          "lastName": "Last Name:",
+          "department": "Department:",
+          "role": "Role:",
+          "phoneNumber": "Phone:"
+        }
+      },
+      "passwordReset": {
+        "title": "Reset Password",
+        "subtitle": "Create new temporary password for user",
+        "newPassword": "New temporary password",
+        "confirmPassword": "Confirm password",
+        "forcePasswordChange": "User must change password on next login",
+        "validation": {
+          "passwordRequired": "Password is required",
+          "passwordMinLength": "Password must be at least 8 characters long",
+          "passwordsNotMatch": "Passwords do not match"
+        },
+        "placeholders": {
+          "newPassword": "At least 8 characters",
+          "confirmPassword": "Repeat password"
+        },
+        "buttons": {
+          "resetPassword": "Reset Password",
+          "cancel": "Cancel",
+          "resetting": "Resetting..."
+        },
+        "success": "Password successfully reset. User must change it on next login.",
+        "error": "Error resetting password"
+      }
+    },
+    "debugTools": {
+      "title": "Debug Tools",
+      "description": "Here you can use debug tools for the application.",
+      "sessionDebugger": "Session Debugger"
+    }
   }
 }

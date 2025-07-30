@@ -13,6 +13,7 @@ import {
   Box,
 } from '@mui/material'
 import { useMutation } from '@apollo/client'
+import { useTranslations } from 'next-intl'
 import { KeycloakUser } from '@/lib/keycloak-admin'
 import { DELETE_PERSON, GET_PEOPLE } from '@/lib/queries/person-queries'
 import { Person } from '@/gql/generated'
@@ -34,6 +35,7 @@ export default function DeleteConfirmDialog({
   person,
   mode,
 }: DeleteConfirmDialogProps) {
+  const t = useTranslations('admin.userManagement.deleteDialog')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -101,13 +103,13 @@ export default function DeleteConfirmDialog({
   const getDialogTitle = () => {
     switch (mode) {
       case 'user':
-        return 'Benutzer löschen'
+        return t('title.user')
       case 'person':
-        return 'Person löschen'
+        return t('title.person')
       case 'both':
-        return 'Benutzer und Person löschen'
+        return t('title.both')
       default:
-        return 'Löschen bestätigen'
+        return t('title.user')
     }
   }
 
@@ -120,20 +122,23 @@ export default function DeleteConfirmDialog({
         return (
           <>
             <Typography variant="body1" gutterBottom>
-              Möchten Sie den Keycloak-Benutzer wirklich löschen?
+              {t('confirmation.user')}
             </Typography>
             <Box sx={{ mt: 2, p: 2, bgcolor: 'grey.100', borderRadius: 1 }}>
               <Typography variant="body2">
-                <strong>Benutzername:</strong> {userName}
+                <strong>{t('labels.username')}</strong> {userName}
               </Typography>
               {user?.email && (
                 <Typography variant="body2">
-                  <strong>E-Mail:</strong> {user.email}
+                  <strong>{t('labels.email')}</strong> {user.email}
                 </Typography>
               )}
               {user?.firstName && user?.lastName && (
                 <Typography variant="body2">
-                  <strong>Name:</strong> {user.firstName} {user.lastName}
+                  <strong>
+                    {t('labels.firstName')} {t('labels.lastName')}
+                  </strong>{' '}
+                  {user.firstName} {user.lastName}
                 </Typography>
               )}
             </Box>
@@ -144,25 +149,28 @@ export default function DeleteConfirmDialog({
         return (
           <>
             <Typography variant="body1" gutterBottom>
-              Möchten Sie die Person wirklich aus der Datenbank löschen?
+              {t('confirmation.person')}
             </Typography>
             <Box sx={{ mt: 2, p: 2, bgcolor: 'grey.100', borderRadius: 1 }}>
               <Typography variant="body2">
-                <strong>Name:</strong> {personName}
+                <strong>
+                  {t('labels.firstName')} {t('labels.lastName')}
+                </strong>{' '}
+                {personName}
               </Typography>
               {person?.email && (
                 <Typography variant="body2">
-                  <strong>E-Mail:</strong> {person.email}
+                  <strong>{t('labels.email')}</strong> {person.email}
                 </Typography>
               )}
               {person?.department && (
                 <Typography variant="body2">
-                  <strong>Abteilung:</strong> {person.department}
+                  <strong>{t('labels.department')}</strong> {person.department}
                 </Typography>
               )}
               {person?.role && (
                 <Typography variant="body2">
-                  <strong>Rolle:</strong> {person.role}
+                  <strong>{t('labels.role')}</strong> {person.role}
                 </Typography>
               )}
             </Box>
@@ -173,19 +181,18 @@ export default function DeleteConfirmDialog({
         return (
           <>
             <Typography variant="body1" gutterBottom>
-              Möchten Sie sowohl den Keycloak-Benutzer als auch die Person aus der Datenbank
-              löschen?
+              {t('confirmation.both')}
             </Typography>
             <Box sx={{ mt: 2, p: 2, bgcolor: 'grey.100', borderRadius: 1 }}>
               <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>
                 Keycloak-Benutzer:
               </Typography>
               <Typography variant="body2" sx={{ ml: 2 }}>
-                <strong>Benutzername:</strong> {userName}
+                <strong>{t('labels.username')}</strong> {userName}
               </Typography>
               {user?.email && (
                 <Typography variant="body2" sx={{ ml: 2 }}>
-                  <strong>E-Mail:</strong> {user.email}
+                  <strong>{t('labels.email')}</strong> {user.email}
                 </Typography>
               )}
 
@@ -193,11 +200,14 @@ export default function DeleteConfirmDialog({
                 Person:
               </Typography>
               <Typography variant="body2" sx={{ ml: 2 }}>
-                <strong>Name:</strong> {personName}
+                <strong>
+                  {t('labels.firstName')} {t('labels.lastName')}
+                </strong>{' '}
+                {personName}
               </Typography>
               {person?.email && (
                 <Typography variant="body2" sx={{ ml: 2 }}>
-                  <strong>E-Mail:</strong> {person.email}
+                  <strong>{t('labels.email')}</strong> {person.email}
                 </Typography>
               )}
             </Box>
@@ -205,7 +215,7 @@ export default function DeleteConfirmDialog({
         )
 
       default:
-        return <Typography variant="body1">Möchten Sie diesen Eintrag wirklich löschen?</Typography>
+        return <Typography variant="body1">{t('confirmation.default')}</Typography>
     }
   }
 
@@ -224,16 +234,16 @@ export default function DeleteConfirmDialog({
 
         <Alert severity="warning" sx={{ mt: 2 }}>
           <Typography variant="body2">
-            <strong>Achtung:</strong> Diese Aktion kann nicht rückgängig gemacht werden!
+            <strong>{t('warning.title')}</strong> {t('warning.irreversible')}
           </Typography>
           {mode === 'user' || mode === 'both' ? (
             <Typography variant="body2" sx={{ mt: 1 }}>
-              Der Benutzer wird aus Keycloak entfernt und kann sich nicht mehr anmelden.
+              {t('warning.userRemoval')}
             </Typography>
           ) : null}
           {mode === 'person' || mode === 'both' ? (
             <Typography variant="body2" sx={{ mt: 1 }}>
-              Alle Daten der Person werden dauerhaft aus der Datenbank entfernt.
+              {t('warning.personRemoval')}
             </Typography>
           ) : null}
         </Alert>
@@ -241,7 +251,7 @@ export default function DeleteConfirmDialog({
 
       <DialogActions>
         <Button onClick={handleClose} disabled={loading}>
-          Abbrechen
+          {t('buttons.cancel')}
         </Button>
         <Button
           onClick={handleDelete}
@@ -250,7 +260,7 @@ export default function DeleteConfirmDialog({
           disabled={loading}
           startIcon={loading ? <CircularProgress size={16} /> : null}
         >
-          {loading ? 'Lösche...' : 'Löschen'}
+          {loading ? t('buttons.deleting') : t('buttons.delete')}
         </Button>
       </DialogActions>
     </Dialog>

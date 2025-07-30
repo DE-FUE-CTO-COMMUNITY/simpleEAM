@@ -1374,5 +1374,141 @@
       "csv": "CSV (.csv)",
       "json": "JSON (.json)"
     }
+  },
+  "admin": {
+    "title": "Administration",
+    "tabs": {
+      "userManagement": "Benutzerverwaltung",
+      "debugTools": "Debug-Tools"
+    },
+    "userManagement": {
+      "title": "Benutzerverwaltung",
+      "newUser": "Neuer Benutzer",
+      "refresh": "Aktualisieren",
+      "searchPlaceholder": "Benutzer suchen...",
+      "noUsersFound": "Keine Benutzer gefunden",
+      "loadingError": "Fehler beim Laden der Keycloak-Benutzer",
+      "table": {
+        "username": "Benutzername",
+        "firstName": "Vorname",
+        "lastName": "Nachname",
+        "email": "E-Mail",
+        "role": "Rolle",
+        "status": "Status",
+        "emailVerified": "E-Mail verifiziert",
+        "actions": "Aktionen"
+      },
+      "status": {
+        "active": "Aktiv",
+        "inactive": "Deaktiviert"
+      },
+      "emailVerification": {
+        "verified": "Verifiziert",
+        "notVerified": "Nicht verifiziert"
+      },
+      "actions": {
+        "edit": "Bearbeiten",
+        "delete": "Löschen",
+        "resetPassword": "Passwort zurücksetzen"
+      },
+      "roles": {
+        "admin": "Administrator",
+        "architect": "Architekt",
+        "viewer": "Betrachter"
+      },
+      "form": {
+        "createTitle": "Neuen Benutzer erstellen",
+        "editTitle": "Benutzer bearbeiten",
+        "username": "Benutzername",
+        "email": "E-Mail-Adresse",
+        "firstName": "Vorname",
+        "lastName": "Nachname",
+        "role": "Rolle",
+        "placeholders": {
+          "username": "z.B. max.mustermann",
+          "email": "z.B. max.mustermann@firma.de",
+          "firstName": "z.B. Max",
+          "lastName": "z.B. Mustermann"
+        },
+        "validation": {
+          "usernameMinLength": "Benutzername muss mindestens 3 Zeichen lang sein",
+          "emailInvalid": "Gültige E-Mail-Adresse erforderlich",
+          "firstNameRequired": "Vorname ist erforderlich",
+          "lastNameRequired": "Nachname ist erforderlich",
+          "roleRequired": "Rolle ist erforderlich"
+        },
+        "buttons": {
+          "create": "Erstellen",
+          "save": "Speichern",
+          "cancel": "Abbrechen"
+        },
+        "roleLabels": {
+          "admin": "Administrator",
+          "architect": "Architekt",
+          "viewer": "Betrachter"
+        }
+      },
+      "deleteDialog": {
+        "title": {
+          "user": "Benutzer löschen",
+          "person": "Person löschen",
+          "both": "Benutzer und Person löschen"
+        },
+        "confirmation": {
+          "user": "Möchten Sie diesen Benutzer wirklich löschen?",
+          "person": "Möchten Sie diese Person wirklich löschen?",
+          "both": "Möchten Sie sowohl den Benutzer als auch die Person wirklich löschen?",
+          "default": "Möchten Sie diesen Eintrag wirklich löschen?"
+        },
+        "warning": {
+          "title": "Achtung:",
+          "irreversible": "Diese Aktion kann nicht rückgängig gemacht werden!",
+          "userRemoval": "Der Benutzer wird aus Keycloak entfernt und kann sich nicht mehr anmelden.",
+          "personRemoval": "Alle Daten der Person werden dauerhaft aus der Datenbank entfernt."
+        },
+        "buttons": {
+          "cancel": "Abbrechen",
+          "delete": "Löschen",
+          "deleting": "Lösche..."
+        },
+        "labels": {
+          "username": "Benutzername:",
+          "email": "E-Mail:",
+          "firstName": "Vorname:",
+          "lastName": "Nachname:",
+          "department": "Abteilung:",
+          "role": "Rolle:",
+          "phoneNumber": "Telefon:"
+        }
+      },
+      "passwordReset": {
+        "title": "Passwort zurücksetzen",
+        "subtitle": "Neues temporäres Passwort für Benutzer erstellen",
+        "newPassword": "Neues temporäres Passwort",
+        "confirmPassword": "Passwort bestätigen",
+        "forcePasswordChange": "Benutzer muss Passwort beim nächsten Login ändern",
+        "validation": {
+          "passwordRequired": "Passwort ist erforderlich",
+          "passwordMinLength": "Passwort muss mindestens 8 Zeichen lang sein",
+          "passwordsNotMatch": "Passwörter stimmen nicht überein"
+        },
+        "placeholders": {
+          "newPassword": "Mindestens 8 Zeichen",
+          "confirmPassword": "Passwort wiederholen"
+        },
+        "buttons": {
+          "resetPassword": "Passwort zurücksetzen",
+          "cancel": "Abbrechen",
+          "resetting": "Wird zurückgesetzt..."
+        },
+        "success": "Passwort erfolgreich zurückgesetzt. Der Benutzer muss es beim nächsten Login ändern.",
+        "error": "Fehler beim Zurücksetzen des Passworts"
+      }
+    },
+    "debugTools": {
+      "title": "Debug-Tools",
+      "description": "Hier können Sie Debug-Tools für die Anwendung verwenden.",
+      "sessionDebugger": "Session Debugger"
+    }
   }
 }

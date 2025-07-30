@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import {
   Box,
   Typography,
@@ -26,17 +26,41 @@ import {
   Delete as DeleteIcon,
   Search as SearchIcon,
   Refresh as RefreshIcon,
+  VpnKey as PasswordIcon,
 } from '@mui/icons-material'
+import { useTranslations } from 'next-intl'
 import { KeycloakUser } from '@/lib/keycloak-admin'
 import { KeycloakUserAlt } from '@/lib/keycloak-admin-alt'
 import UserFormDialog from './UserFormDialog'
 import DeleteConfirmDialog from './DeleteConfirmDialog'
+import PasswordResetDialog from './PasswordResetDialog'
 
 export default function UserManagement() {
+  const t = useTranslations('admin.userManagement')
   const [keycloakUsers, setKeycloakUsers] = useState<(KeycloakUser | KeycloakUserAlt)[]>([])
   const [keycloakLoading, setKeycloakLoading] = useState(false)
   const [keycloakError, setKeycloakError] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
+
+  // Hilfsfunktion für Rollenübersetzung
+  const translateRole = (role: string): string => {
+    const roleKey = role.toLowerCase()
+    try {
+      return t(`roles.${roleKey}` as any)
+    } catch {
+      return role // Fallback auf ursprünglichen Wert
+    }
+  }
+
+  // Hilfsfunktion für Status-Übersetzung
+  const translateStatus = (enabled: boolean | undefined): string => {
+    return enabled ? t('status.active') : t('status.inactive')
+  }
+
+  // Hilfsfunktion für E-Mail-Verifikation-Übersetzung
+  const translateEmailVerification = (verified: boolean | undefined): string => {
+    return verified ? t('emailVerification.verified') : t('emailVerification.notVerified')
+  }
 
   // Dialog States
   const [formDialog, setFormDialog] = useState({
@@ -50,8 +74,13 @@ export default function UserManagement() {
     user: null as (KeycloakUser | KeycloakUserAlt) | null,
   })
 
+  const [passwordResetDialog, setPasswordResetDialog] = useState({
+    open: false,
+    user: null as (KeycloakUser | KeycloakUserAlt) | null,
+  })
+
   // Keycloak Benutzer laden
-  const loadKeycloakUsers = async () => {
+  const loadKeycloakUsers = useCallback(async () => {
     setKeycloakLoading(true)
     setKeycloakError(null)
 
@@ -68,11 +97,11 @@ export default function UserManagement() {
       setKeycloakUsers(users)
     } catch (error) {
       console.error('❌ Fehler beim Laden der Keycloak-Benutzer:', error)
-      setKeycloakError('Fehler beim Laden der Keycloak-Benutzer')
+      setKeycloakError(t('loadingError'))
     } finally {
       setKeycloakLoading(false)
     }
-  }
+  }, [t])
 
   // CRUD-Operationen für Keycloak-Benutzer
   const createKeycloakUser = async (userData: any) => {
@@ -130,7 +159,7 @@ export default function UserManagement() {
 
   useEffect(() => {
     loadKeycloakUsers()
-  }, [])
+  }, [loadKeycloakUsers])
 
   // Gefilterte Listen
   const filteredKeycloakUsers = keycloakUsers.filter(
@@ -164,6 +193,25 @@ export default function UserManagement() {
       mode: 'create',
       user: null,
     })
+  }
+
+  const openPasswordResetDialog = (user: KeycloakUser | KeycloakUserAlt) => {
+    setPasswordResetDialog({
+      open: true,
+      user,
+    })
+  }
+
+  const closePasswordResetDialog = () => {
+    setPasswordResetDialog({
+      open: false,
+      user: null,
+    })
+  }
+
+  const handlePasswordResetSuccess = () => {
+    // Erfolgsmeldung könnte hier hinzugefügt werden
+    console.log('Passwort erfolgreich zurückgesetzt')
   }
 
   const handleFormSubmit = async (userData: any) => {
@@ -204,7 +252,7 @@ export default function UserManagement() {
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h5" component="h2">
-          Benutzerverwaltung
+          {t('title')}
         </Typography>
         <Box sx={{ display: 'flex', gap: 1 }}>
           <Button
@@ -213,10 +261,10 @@ export default function UserManagement() {
             startIcon={<RefreshIcon />}
             disabled={keycloakLoading}
           >
-            Aktualisieren
+            {t('refresh')}
           </Button>
           <Button variant="contained" onClick={openCreateUserDialog} startIcon={<AddIcon />}>
-            Neuer Benutzer
+            {t('newUser')}
           </Button>
         </Box>
       </Box>
@@ -225,7 +273,7 @@ export default function UserManagement() {
       <TextField
         fullWidth
         variant="outlined"
-        placeholder="Benutzer suchen..."
+        placeholder={t('searchPlaceholder')}
         value={searchTerm}
         onChange={e => setSearchTerm(e.target.value)}
         sx={{ mb: 3 }}
@@ -267,14 +315,14 @@ export default function UserManagement() {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Benutzername</TableCell>
-                  <TableCell>Vorname</TableCell>
-                  <TableCell>Nachname</TableCell>
-                  <TableCell>E-Mail</TableCell>
-                  <TableCell>Rolle</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell>E-Mail verifiziert</TableCell>
-                  <TableCell align="right">Aktionen</TableCell>
+                  <TableCell>{t('table.username')}</TableCell>
+                  <TableCell>{t('table.firstName')}</TableCell>
+                  <TableCell>{t('table.lastName')}</TableCell>
+                  <TableCell>{t('table.email')}</TableCell>
+                  <TableCell>{t('table.role')}</TableCell>
+                  <TableCell>{t('table.status')}</TableCell>
+                  <TableCell>{t('table.emailVerified')}</TableCell>
+                  <TableCell align="right">{t('table.actions')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -286,30 +334,35 @@ export default function UserManagement() {
                     <TableCell>{user.email || '-'}</TableCell>
                     <TableCell>
                       {user.realmRoles && user.realmRoles.length > 0
-                        ? user.realmRoles.join(', ')
-                        : user.attributes?.role?.[0] || '-'}
+                        ? user.realmRoles.map(role => translateRole(role)).join(', ')
+                        : translateRole(user.attributes?.role?.[0] || 'user')}
                     </TableCell>
                     <TableCell>
                       <Chip
-                        label={user.enabled ? 'Aktiv' : 'Deaktiviert'}
+                        label={translateStatus(user.enabled)}
                         color={user.enabled ? 'success' : 'default'}
                         size="small"
                       />
                     </TableCell>
                     <TableCell>
                       <Chip
-                        label={user.emailVerified ? 'Verifiziert' : 'Nicht verifiziert'}
+                        label={translateEmailVerification(user.emailVerified)}
                         color={user.emailVerified ? 'success' : 'warning'}
                         size="small"
                       />
                     </TableCell>
                     <TableCell align="right">
-                      <Tooltip title="Bearbeiten">
+                      <Tooltip title={t('actions.edit')}>
                         <IconButton onClick={() => openEditUserDialog(user)} size="small">
                           <EditIcon />
                         </IconButton>
                       </Tooltip>
-                      <Tooltip title="Löschen">
+                      <Tooltip title={t('actions.resetPassword')}>
+                        <IconButton onClick={() => openPasswordResetDialog(user)} size="small">
+                          <PasswordIcon />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title={t('actions.delete')}>
                         <IconButton
                           onClick={() => openDeleteUserDialog(user)}
                           size="small"
@@ -325,7 +378,7 @@ export default function UserManagement() {
                   <TableRow>
                     <TableCell colSpan={8} align="center">
                       <Typography variant="body2" color="text.secondary">
-                        Keine Benutzer gefunden
+                        {t('noUsersFound')}
                       </Typography>
                     </TableCell>
                   </TableRow>
@@ -344,6 +397,14 @@ export default function UserManagement() {
         mode={formDialog.mode}
         user={formDialog.user}
         loading={keycloakLoading}
+      />
+
+      {/* PasswordResetDialog */}
+      <PasswordResetDialog
+        open={passwordResetDialog.open}
+        onClose={closePasswordResetDialog}
+        onSuccess={handlePasswordResetSuccess}
+        user={passwordResetDialog.user}
       />
 
       {/* DeleteConfirmDialog */}

@@ -168,7 +168,7 @@ export async function POST(request: NextRequest) {
     let apiResponse
 
     switch (action) {
-      case 'create':
+      case 'create': {
         // Benutzer erstellen (ohne role Property)
         apiResponse = await fetch(`${keycloakUrl}/admin/realms/${realm}/users`, {
           method: 'POST',
@@ -198,8 +198,9 @@ export async function POST(request: NextRequest) {
           }
         }
         break
+      }
 
-      case 'update':
+      case 'update': {
         // Benutzer aktualisieren (ohne role Property)
         apiResponse = await fetch(`${keycloakUrl}/admin/realms/${realm}/users/${userId}`, {
           method: 'PUT',
@@ -222,8 +223,9 @@ export async function POST(request: NextRequest) {
           }
         }
         break
+      }
 
-      case 'delete':
+      case 'delete': {
         apiResponse = await fetch(`${keycloakUrl}/admin/realms/${realm}/users/${userId}`, {
           method: 'DELETE',
           headers: {
@@ -231,6 +233,33 @@ export async function POST(request: NextRequest) {
           },
         })
         break
+      }
+
+      case 'resetPassword': {
+        const { password, temporary } = body
+
+        if (!password) {
+          return NextResponse.json({ error: 'Password is required' }, { status: 400 })
+        }
+
+        // Passwort zurücksetzen
+        apiResponse = await fetch(
+          `${keycloakUrl}/admin/realms/${realm}/users/${userId}/reset-password`,
+          {
+            method: 'PUT',
+            headers: {
+              Authorization: `Bearer ${adminToken}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              type: 'password',
+              value: password,
+              temporary: temporary !== false, // Standardmäßig temporär, außer explizit auf false gesetzt
+            }),
+          }
+        )
+        break
+      }
 
       default:
         return NextResponse.json({ error: 'Invalid action' }, { status: 400 })

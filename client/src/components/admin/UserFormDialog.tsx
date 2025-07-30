@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react'
 import { useForm } from '@tanstack/react-form'
 import { z } from 'zod'
+import { useTranslations } from 'next-intl'
 import GenericForm, { FieldConfig } from '@/components/common/GenericForm'
 import { KeycloakUser } from '@/lib/keycloak-admin'
 import { KeycloakUserAlt } from '@/lib/keycloak-admin-alt'
@@ -10,16 +11,13 @@ import { KeycloakUserAlt } from '@/lib/keycloak-admin-alt'
 // Verfügbare Rollen
 const AVAILABLE_ROLES = ['viewer', 'architect', 'admin'] as const
 
-// Zod Schema für Benutzervalidierung mit Rolle
-const userSchema = z.object({
-  username: z.string().min(3, 'Benutzername muss mindestens 3 Zeichen lang sein'),
-  email: z.string().email('Gültige E-Mail-Adresse erforderlich'),
-  firstName: z.string().min(1, 'Vorname ist erforderlich'),
-  lastName: z.string().min(1, 'Nachname ist erforderlich'),
-  role: z.enum(AVAILABLE_ROLES, { required_error: 'Rolle ist erforderlich' }),
-})
-
-type UserFormData = z.infer<typeof userSchema>
+type UserFormData = {
+  username: string
+  email: string
+  firstName: string
+  lastName: string
+  role: (typeof AVAILABLE_ROLES)[number]
+}
 
 interface UserFormDialogProps {
   open: boolean
@@ -38,6 +36,22 @@ export default function UserFormDialog({
   user,
   loading = false,
 }: UserFormDialogProps) {
+  const t = useTranslations('admin.userManagement.form')
+
+  // Zod Schema für Benutzervalidierung mit internationalisierten Fehlermeldungen
+  // useMemo verwenden, damit das Schema nur neu erstellt wird, wenn sich Übersetzungen ändern
+  const userSchema = React.useMemo(
+    () =>
+      z.object({
+        username: z.string().min(3, t('validation.usernameMinLength')),
+        email: z.string().email(t('validation.emailInvalid')),
+        firstName: z.string().min(1, t('validation.firstNameRequired')),
+        lastName: z.string().min(1, t('validation.lastNameRequired')),
+        role: z.enum(AVAILABLE_ROLES, { required_error: t('validation.roleRequired') }),
+      }),
+    [t]
+  )
+
   // Formulardaten initialisieren - leere Standardwerte für neues Formular
   const defaultValues = React.useMemo<UserFormData>(
     () => ({
@@ -63,6 +77,14 @@ export default function UserFormDialog({
       onSubmit: userSchema,
     },
   })
+
+  // Formular-Validatoren aktualisieren, wenn sich das Schema ändert
+  React.useEffect(() => {
+    form.options.validators = {
+      onChange: userSchema,
+      onSubmit: userSchema,
+    }
+  }, [form, userSchema])
 
   // Formular aktualisieren, wenn sich die Daten ändern
   useEffect(() => {
@@ -91,51 +113,51 @@ export default function UserFormDialog({
       // Formular mit den Werten aus dem vorhandenen Benutzer zurücksetzen
       form.reset(formValues)
     }
-  }, [form, user, open, defaultValues, mode])
+  }, [form, user, open, defaultValues, mode, userSchema])
 
   // Feldkonfiguration für das generische Formular
   const fields: FieldConfig[] = [
     {
       name: 'username',
-      label: 'Benutzername',
+      label: t('username'),
       type: 'text',
       required: true,
       disabled: mode === 'edit', // Benutzername kann nicht geändert werden
-      placeholder: 'z.B. max.mustermann',
+      placeholder: t('placeholders.username'),
       size: { xs: 12 },
     },
     {
       name: 'email',
-      label: 'E-Mail-Adresse',
+      label: t('email'),
       type: 'text',
       required: true,
-      placeholder: 'z.B. max.mustermann@firma.de',
+      placeholder: t('placeholders.email'),
       size: { xs: 12, md: 6 },
     },
     {
       name: 'firstName',
-      label: 'Vorname',
+      label: t('firstName'),
       type: 'text',
       required: true,
-      placeholder: 'z.B. Max',
+      placeholder: t('placeholders.firstName'),
       size: { xs: 12, md: 6 },
     },
     {
       name: 'lastName',
-      label: 'Nachname',
+      label: t('lastName'),
       type: 'text',
       required: true,
-      placeholder: 'z.B. Mustermann',
+      placeholder: t('placeholders.lastName'),
       size: { xs: 12, md: 6 },
     },
     {
       name: 'role',
-      label: 'Rolle',
+      label: t('role'),
       type: 'select',
       required: true,
       options: AVAILABLE_ROLES.map(role => ({
         value: role,
-        label: role.charAt(0).toUpperCase() + role.slice(1), // Erste Buchstabe groß
+        label: t(`roleLabels.${role}` as any),
       })),
       size: { xs: 12, md: 6 },
     },
@@ -143,7 +165,7 @@ export default function UserFormDialog({
 
   return (
     <GenericForm
-      title={mode === 'create' ? 'Neuen Benutzer erstellen' : 'Benutzer bearbeiten'}
+      title={mode === 'create' ? t('createTitle') : t('editTitle')}
       isOpen={open}
       onClose={onClose}
       onSubmit={onSubmit}
@@ -151,8 +173,8 @@ export default function UserFormDialog({
       mode={mode}
       fields={fields}
       form={form}
-      submitButtonText={mode === 'create' ? 'Erstellen' : 'Speichern'}
-      cancelButtonText="Abbrechen"
+      submitButtonText={mode === 'create' ? t('buttons.create') : t('buttons.save')}
+      cancelButtonText={t('buttons.cancel')}
     />
   )
 }
