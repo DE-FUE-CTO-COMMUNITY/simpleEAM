@@ -23,11 +23,9 @@ export async function validateAuth(
   requireAdmin: boolean = false
 ): Promise<AuthResult> {
   try {
-    console.log('🔒 Validiere Authentifizierung...', { requireAdmin })
     const authHeader = request.headers.get('authorization')
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      console.log('❌ Authorization header fehlt oder ungültig')
       return {
         isAuthenticated: false,
         isAdmin: false,
@@ -36,16 +34,10 @@ export async function validateAuth(
     }
 
     const token = authHeader.substring(7)
-    console.log('🔑 Token gefunden, validiere über Keycloak...')
 
     // Token validieren über Keycloak User Info Endpoint (einfacher für public clients)
     const keycloakUrl = process.env.NEXT_PUBLIC_KEYCLOAK_URL || 'https://auth.dev-server.mf2.eu'
     const realm = process.env.NEXT_PUBLIC_KEYCLOAK_REALM || 'simple-eam'
-
-    console.log(
-      '🌐 Verwende Keycloak URL:',
-      `${keycloakUrl}/realms/${realm}/protocol/openid-connect/userinfo`
-    )
 
     // User Info Endpoint verwenden (validiert automatisch das Token)
     const userInfoResponse = await fetch(
@@ -59,11 +51,6 @@ export async function validateAuth(
     )
 
     if (!userInfoResponse.ok) {
-      console.log(
-        '❌ Token-Validierung fehlgeschlagen:',
-        userInfoResponse.status,
-        userInfoResponse.statusText
-      )
       return {
         isAuthenticated: false,
         isAdmin: false,
@@ -71,7 +58,6 @@ export async function validateAuth(
       }
     }
 
-    console.log('✅ Token erfolgreich validiert')
     const userInfo = await userInfoResponse.json()
 
     // Token payload dekodieren für Rolleninformationen
@@ -79,7 +65,7 @@ export async function validateAuth(
     try {
       tokenPayload = JSON.parse(atob(token.split('.')[1]))
     } catch (authError) {
-      console.log('❌ Token-Dekodierung fehlgeschlagen:', authError)
+      console.error('❌ Token-Dekodierung fehlgeschlagen:', authError)
       return {
         isAuthenticated: false,
         isAdmin: false,
@@ -95,13 +81,11 @@ export async function validateAuth(
     const resourceAccess = tokenPayload.resource_access?.[clientId]?.roles || []
     const allRoles = [...realmAccess, ...resourceAccess]
 
-    console.log('👤 Benutzer-Rollen:', allRoles)
     const isAdmin = allRoles.includes('admin')
-    console.log('🔐 Ist Admin:', isAdmin)
 
     // Wenn Admin-Berechtigung erforderlich, aber nicht vorhanden
     if (requireAdmin && !isAdmin) {
-      console.log('❌ Admin-Berechtigung erforderlich, aber nicht vorhanden')
+      console.error('❌ Admin-Berechtigung erforderlich, aber nicht vorhanden')
       return {
         isAuthenticated: true,
         isAdmin: false,
@@ -109,7 +93,6 @@ export async function validateAuth(
       }
     }
 
-    console.log('✅ Authentifizierung erfolgreich')
     return {
       isAuthenticated: true,
       isAdmin,
@@ -141,12 +124,10 @@ export function withAuth(
   requireAdmin: boolean = false
 ) {
   return async (request: NextRequest): Promise<NextResponse> => {
-    console.log('🔐 withAuth Middleware gestartet für:', request.url)
-
     const authResult = await validateAuth(request, requireAdmin)
 
     if (!authResult.isAuthenticated) {
-      console.log('❌ Authentifizierung fehlgeschlagen:', authResult.error)
+      console.error('❌ Authentifizierung fehlgeschlagen:', authResult.error)
       return NextResponse.json(
         { error: authResult.error || 'Authentication required' },
         { status: 401 }
@@ -154,11 +135,10 @@ export function withAuth(
     }
 
     if (requireAdmin && !authResult.isAdmin) {
-      console.log('❌ Admin-Berechtigung erforderlich')
+      console.error('❌ Admin-Berechtigung erforderlich')
       return NextResponse.json({ error: 'Admin privileges required' }, { status: 403 })
     }
 
-    console.log('✅ Authentifizierung erfolgreich, führe Handler aus')
     return handler(request, authResult)
   }
 }

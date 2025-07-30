@@ -31,8 +31,6 @@ async function adminApiCall<T>(endpoint: string, options: RequestInit = {}): Pro
   const adminToken = await getAdminToken()
   const url = `${keycloakUrl}/admin/realms/${realm}${endpoint}`
 
-  console.log('Admin API Call:', url)
-
   const response = await fetch(url, {
     ...options,
     headers: {

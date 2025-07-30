@@ -59,10 +59,6 @@ async function apiCall<T>(endpoint: string, options: RequestInit = {}): Promise<
 
   const url = `${getAdminBaseUrl()}${endpoint}`
 
-  console.log('Keycloak Admin API Call:', url)
-  console.log('Token vorhanden:', !!keycloak.token)
-  console.log('Token (erste 20 Zeichen):', keycloak.token?.substring(0, 20) + '...')
-
   const response = await fetch(url, {
     ...options,
     headers: {
@@ -149,7 +145,6 @@ export async function checkAdminAccess(): Promise<{
 
     // Prüfe Token-Details
     const tokenParsed = keycloak.tokenParsed
-    console.log('Token Details:', tokenParsed)
 
     // Teste einen einfachen Admin-API-Aufruf
     const response = await fetch(`${getAdminBaseUrl()}/`, {

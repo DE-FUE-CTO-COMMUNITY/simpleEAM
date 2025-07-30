@@ -43,7 +43,16 @@ export const initKeycloak = () => {
           ? window.location.origin + '/silent-check-sso.html'
           : '/silent-check-sso.html',
       pkceMethod: 'S256',
-      // redirectUri entfernt - Keycloak verwendet dann automatisch die aktuelle URL
+      // Nach dem Login immer zum Dashboard weiterleiten
+      redirectUri:
+        typeof window !== 'undefined'
+          ? (() => {
+              const currentPath = window.location.pathname
+              const langMatch = currentPath.match(/^\/([a-z]{2})/)
+              const lang = langMatch ? langMatch[1] : 'de'
+              return `${window.location.origin}/${lang}`
+            })()
+          : undefined,
       checkLoginIframe: true, // Silent token refresh aktivieren
       checkLoginIframeInterval: 5, // Alle 5 Sekunden prüfen
       enableLogging: process.env.NODE_ENV === 'development',
@@ -173,7 +182,15 @@ export const logout = () => {
  */
 export const login = () => {
   if (typeof window !== 'undefined' && keycloak) {
-    keycloak.login()
+    // Bestimme die Dashboard-URL basierend auf der aktuellen Sprache
+    const currentPath = window.location.pathname
+    const langMatch = currentPath.match(/^\/([a-z]{2})/)
+    const lang = langMatch ? langMatch[1] : 'de'
+    const dashboardUrl = `${window.location.origin}/${lang}`
+
+    keycloak.login({
+      redirectUri: dashboardUrl,
+    })
   }
 }
 

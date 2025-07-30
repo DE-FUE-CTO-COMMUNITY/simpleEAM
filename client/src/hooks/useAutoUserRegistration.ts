@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useMemo } from 'react'
 import { useQuery, useMutation } from '@apollo/client'
-import { GET_PERSON_BY_EMAIL, CREATE_PERSON } from '@/graphql/person'
+import { GET_PERSON_BY_EMAIL, CREATE_PERSON, GET_PERSONS_COUNT } from '@/graphql/person'
 import { useAuth } from '@/lib/auth'
 
 /**
@@ -21,18 +21,14 @@ export const useAutoUserRegistration = () => {
     if (authenticated && keycloak?.tokenParsed?.email) {
       const email = keycloak.tokenParsed.email
       setUserEmail(email)
-      console.log('🔍 Auto-Registration: E-Mail aus Token extrahiert:', email)
-
       // Nur prüfen ob gerade eine Erstellung läuft
       const sessionKey = `autoRegChecked_${email}`
       const alreadyChecked = sessionStorage.getItem(sessionKey)
       if (alreadyChecked === 'creating') {
-        console.log('🔄 Auto-Registration: Erstellung läuft bereits')
         setIsCreatingUser(true)
         registrationAttempted.current = true
         setRegistrationChecked(false) // Noch nicht abgeschlossen
       } else {
-        console.log('🆕 Auto-Registration: Neue Prüfung für:', email)
         // Immer eine neue Prüfung starten - lass GraphQL-Query entscheiden
         setRegistrationChecked(false)
         registrationAttempted.current = false
@@ -40,7 +36,9 @@ export const useAutoUserRegistration = () => {
         processingRef.current = false
       }
     } else {
-      console.log('❌ Auto-Registration: Keine E-Mail im Token gefunden oder nicht authentifiziert')
+      console.error(
+        '❌ Auto-Registration: Keine E-Mail im Token gefunden oder nicht authentifiziert'
+      )
     }
   }, [authenticated, keycloak])
 
@@ -49,15 +47,12 @@ export const useAutoUserRegistration = () => {
     variables: { email: userEmail || '' },
     skip: !userEmail || !authenticated || isCreatingUser || registrationAttempted.current,
     onCompleted: data => {
-      console.log('🔍 Auto-Registration: GraphQL-Abfrage abgeschlossen:', data)
       // Wenn der Benutzer bereits existiert, markiere als geprüft
       if (data?.people && data.people.length > 0) {
-        console.log('✅ Auto-Registration: Benutzer bereits vorhanden')
         setRegistrationChecked(true)
         registrationAttempted.current = true
         // Kein sessionStorage für existierende Benutzer - das blockiert neue Prüfungen
       } else {
-        console.log('❌ Auto-Registration: Kein Benutzer gefunden, bereit für Erstellung')
         setRegistrationChecked(true) // Auch hier auf true setzen, damit der Effect triggert
       }
     },
@@ -72,7 +67,6 @@ export const useAutoUserRegistration = () => {
   // Mutation zum Erstellen eines neuen Benutzers
   const [createPerson] = useMutation(CREATE_PERSON, {
     onCompleted: () => {
-      console.log('🎉 Benutzer automatisch in Personen-Tabelle registriert')
       setRegistrationChecked(true)
       setIsCreatingUser(false)
       registrationAttempted.current = true
@@ -96,6 +90,8 @@ export const useAutoUserRegistration = () => {
     },
     // Verhindere Cache-Updates, die zu erneuten Queries führen könnten
     fetchPolicy: 'no-cache',
+    // Aktualisiere alle relevanten Queries nach der Erstellung
+    refetchQueries: [{ query: GET_PERSONS_COUNT }],
   })
 
   // Stabilisiere die kritischen Werte für die Dependencies
@@ -107,23 +103,17 @@ export const useAutoUserRegistration = () => {
   useEffect(() => {
     // Mehrfache Schutzmaßnahmen gegen doppelte Ausführung
     if (registrationAttempted.current || isCreatingUser || processingRef.current) {
-      console.log('🛑 Auto-Registration: Gestoppt aufgrund von creation flags')
       return
     }
 
     // Frühe Prüfung - noch nicht bereit
     if (!initialized || !authenticated || !userEmail || checkingUser || !registrationChecked) {
-      console.log('🕐 Auto-Registration: Noch nicht bereit für Prüfung')
       return
     }
 
     const shouldCreateUser = existingUser?.people && existingUser.people.length === 0
 
-    console.log('🤔 Auto-Registration: Sollte Benutzer erstellt werden?', shouldCreateUser)
-
     if (shouldCreateUser) {
-      console.log('🔄 Erstelle neuen Benutzer automatisch...')
-
       // Setze alle Flags um doppelte Ausführung zu verhindern
       registrationAttempted.current = true
       processingRef.current = true
@@ -192,7 +182,6 @@ export const useAutoUserRegistration = () => {
         setRegistrationChecked(false)
         registrationAttempted.current = false
         setIsCreatingUser(false)
-        console.log('🔄 Auto-Registration Cache geleert für:', userEmail)
       }
     },
   }

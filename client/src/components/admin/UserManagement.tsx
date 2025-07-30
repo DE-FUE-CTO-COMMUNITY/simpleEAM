@@ -93,7 +93,6 @@ export default function UserManagement() {
               input: personData,
             },
           })
-          console.log('✅ Person erfolgreich aktualisiert')
         } else {
           // Person existiert nicht, neue erstellen
           await createPerson({
@@ -101,7 +100,6 @@ export default function UserManagement() {
               input: [personData],
             },
           })
-          console.log('✅ Person erfolgreich erstellt (während Update)')
         }
       } else {
         // Neue Person erstellen
@@ -110,7 +108,6 @@ export default function UserManagement() {
             input: [personData],
           },
         })
-        console.log('✅ Person erfolgreich erstellt')
       }
     } catch (error) {
       console.error('❌ Fehler bei Person-Operation:', error)
@@ -166,8 +163,6 @@ export default function UserManagement() {
     setKeycloakError(null)
 
     try {
-      console.log('🔄 Lade Keycloak-Benutzer über API-Route...')
-
       // Überprüfung, ob Keycloak initialisiert ist
       if (!keycloak) {
         throw new Error('Keycloak nicht initialisiert')
@@ -181,7 +176,6 @@ export default function UserManagement() {
         throw new Error('Nicht authentifiziert - kein Token verfügbar')
       }
 
-      console.log('🔑 Verwende Token für Authentifizierung...')
       const response = await fetch('/api/admin/keycloak-users', {
         headers: {
           Authorization: `Bearer ${keycloak.token}`,
@@ -195,7 +189,6 @@ export default function UserManagement() {
       }
 
       const users = await response.json()
-      console.log('✅ Keycloak-Benutzer erfolgreich geladen:', users.length)
       setKeycloakUsers(users)
     } catch (error) {
       console.error('❌ Fehler beim Laden der Keycloak-Benutzer:', error)
@@ -241,8 +234,6 @@ export default function UserManagement() {
         throw new Error(`Fehler beim Erstellen: ${response.status}`)
       }
 
-      console.log('✅ Benutzer erfolgreich erstellt')
-
       // Dann entsprechende Person erstellen
       if (userData.email) {
         await createOrUpdatePerson(userData, false)
@@ -279,8 +270,6 @@ export default function UserManagement() {
       if (!response.ok) {
         throw new Error(`Fehler beim Aktualisieren: ${response.status}`)
       }
-
-      console.log('✅ Benutzer erfolgreich aktualisiert')
 
       // Dann entsprechende Person aktualisieren (falls E-Mail vorhanden)
       if (userData.email) {
@@ -349,7 +338,6 @@ export default function UserManagement() {
 
   const handlePasswordResetSuccess = () => {
     // Benutzerliste neu laden, um aktualisierte requiredActions zu bekommen
-    console.log('Passwort erfolgreich zurückgesetzt')
     loadKeycloakUsers()
   }
 
