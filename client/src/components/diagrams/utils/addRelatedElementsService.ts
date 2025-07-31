@@ -8,7 +8,7 @@ import {
   RelatedElementsResponse,
 } from '@/graphql/relatedElements'
 import { ArrowType, RelativePosition, AddRelatedElementsConfig } from '../types/addRelatedElements'
-import { getValidRelationships, normalizeElementType, ElementType } from './relationshipValidation'
+import { getValidRelationships, normalizeElementType } from './relationshipValidation'
 
 // Extended RelatedElement interface mit reverseArrow support
 interface RelatedElement {
@@ -166,34 +166,17 @@ const getArchimateTemplateName = (elementType: string): string => {
 
 /**
  * Aktualisiert die Element-Bindungen für korrekte Pfeil-Verbindungen
+ * (Vereinfachte Version - die eigentliche Logik ist jetzt in der Scene-Update-Funktion)
  */
 const updateElementBindings = (
-  sourceElement: any,
-  targetElement: any,
-  arrowId: string,
-  allNewElements: any[]
+  _sourceElement: any,
+  _targetElement: any,
+  _arrowId: string,
+  _allNewElements: any[]
 ): void => {
-  // Finde das Ziel-Element in den neuen Elementen und aktualisiere seine boundElements
-  const targetInNewElements = allNewElements.find(el => el.id === targetElement.id)
-  if (targetInNewElements) {
-    if (!targetInNewElements.boundElements) {
-      targetInNewElements.boundElements = []
-    }
-
-    // Füge die Pfeil-Bindung hinzu, falls nicht bereits vorhanden
-    const existingBinding = targetInNewElements.boundElements.find(
-      (binding: any) => binding.id === arrowId
-    )
-    if (!existingBinding) {
-      targetInNewElements.boundElements.push({
-        id: arrowId,
-        type: 'arrow',
-      })
-    }
-  }
-
-  // Hinweis: Das Quell-Element wird später vom Excalidraw-System automatisch aktualisiert
-  // wenn die Szene aktualisiert wird, daher müssen wir es hier nicht manuell ändern
+  // Diese Funktion ist jetzt nur noch ein Platzhalter
+  // Die eigentliche Bindungslogik findet in der Scene-Update-Funktion statt
+  // um sicherzustellen, dass alle Änderungen korrekt in der Canvas gespeichert werden
 }
 
 /**
@@ -648,6 +631,8 @@ const createExcalidrawElementsFromRelated = async (
     config.spacing
   )
 
+  console.log('📍 Calculated positions for elements:', positions)
+
   // Erstelle Elemente für jeden verwandten Eintrag
   for (let i = 0; i < finalFilteredElements.length; i++) {
     const relatedElement = finalFilteredElements[i]
@@ -716,6 +701,15 @@ const createExcalidrawElementsFromRelated = async (
     // Erstelle Pfeil vom Quell-Element zum neuen Element
     if (createdElements.length > 0) {
       const targetElement = createdElements[0] // Haupt-Element (normalerweise das erste)
+
+      // Stelle sicher, dass das Target-Element die korrekte Position hat
+      console.log('🎯 Target element before arrow creation:', {
+        id: targetElement.id,
+        position: { x: targetElement.x, y: targetElement.y },
+        calculatedPosition: position,
+        dimensions: { width: targetElement.width, height: targetElement.height },
+      })
+
       const arrow = createArrowBetweenElements(
         selectedElement,
         targetElement,
@@ -737,23 +731,37 @@ const createExcalidrawElementsFromRelated = async (
     const currentElements = excalidrawAPI.getSceneElements()
     const allNewElements = [...newElements, ...newArrows]
 
-    // Erstelle eine aktualisierte Element-Liste mit korrekten Bindungen
+    // Aktualisiere alle Elemente, insbesondere das selectedElement mit korrekten boundElements
     const updatedCurrentElements = currentElements.map((element: any) => {
-      // Prüfe, ob dieses Element das ausgewählte Quell-Element ist
       if (element.id === selectedElement.id) {
-        // Aktualisiere boundElements mit neuen Pfeil-Referenzen
-        const newBoundElements = [...(element.boundElements || [])]
+        // Sammle alle Pfeil-IDs, die mit diesem Element verbunden sind
+        const connectedArrowIds = newArrows
+          .filter(
+            arrow =>
+              arrow.startBinding?.elementId === element.id ||
+              arrow.endBinding?.elementId === element.id
+          )
+          .map(arrow => arrow.id)
 
-        newArrows.forEach(arrow => {
-          if (arrow.startBinding?.elementId === element.id) {
-            const existingBinding = newBoundElements.find((binding: any) => binding.id === arrow.id)
-            if (!existingBinding) {
-              newBoundElements.push({
-                id: arrow.id,
-                type: 'arrow',
-              })
-            }
+        // Kombiniere existierende boundElements mit neuen Pfeil-Referenzen
+        const existingBoundElements = element.boundElements || []
+        const newBoundElements = [...existingBoundElements]
+
+        connectedArrowIds.forEach(arrowId => {
+          const existingBinding = newBoundElements.find((binding: any) => binding.id === arrowId)
+          if (!existingBinding) {
+            newBoundElements.push({
+              id: arrowId,
+              type: 'arrow',
+            })
           }
+        })
+
+        console.log(`🔗 Updated selectedElement boundElements:`, {
+          elementId: element.id,
+          originalBoundElements: existingBoundElements.length,
+          newBoundElements: newBoundElements.length,
+          connectedArrows: connectedArrowIds.length,
         })
 
         return {
@@ -761,12 +769,43 @@ const createExcalidrawElementsFromRelated = async (
           boundElements: newBoundElements,
         }
       }
+      return element
+    })
+
+    // Auch sicherstellen, dass neue Elemente korrekte boundElements haben
+    const finalNewElements = allNewElements.map((element: any) => {
+      if (element.type === 'arrow') {
+        return element // Pfeile bleiben unverändert
+      }
+
+      // Finde alle Pfeile, die mit diesem neuen Element verbunden sind
+      const connectedArrows = newArrows.filter(
+        arrow =>
+          arrow.startBinding?.elementId === element.id || arrow.endBinding?.elementId === element.id
+      )
+
+      if (connectedArrows.length > 0) {
+        const boundElements = connectedArrows.map(arrow => ({
+          id: arrow.id,
+          type: 'arrow' as const,
+        }))
+
+        console.log(`🔗 Updated new element boundElements:`, {
+          elementId: element.id,
+          boundElements: boundElements.length,
+        })
+
+        return {
+          ...element,
+          boundElements: [...(element.boundElements || []), ...boundElements],
+        }
+      }
 
       return element
     })
 
     excalidrawAPI.updateScene({
-      elements: [...updatedCurrentElements, ...allNewElements],
+      elements: [...updatedCurrentElements, ...finalNewElements],
     })
   }
 
@@ -802,44 +841,69 @@ const calculateElementPositions = (
   // Berechne Offset für mittige Positionierung
   const numElements = elements.length
 
-  // Für rechts/links: Y-Koordinaten-Offset (mittige Positionierung in Y-Richtung)
-  // Verwende das konfigurierbare spacing statt fest kodierten elementSpacing
-  const totalHeightWithSpacing = elementHeight * numElements + spacing * (numElements - 1)
-  const yOffset = totalHeightWithSpacing / 2
-
-  // Für oben/unten: X-Koordinaten-Offset (mittige Positionierung in X-Richtung)
-  // Verwende das konfigurierbare spacing statt fest kodierten elementSpacing
-  const totalWidthWithSpacing = elementWidth * numElements + spacing * (numElements - 1)
-  const xOffset = totalWidthWithSpacing / 2
+  console.log('📐 Position calculation details:', {
+    numElements,
+    elementWidth,
+    elementHeight,
+    spacing,
+    sourceElement: {
+      x: sourceElement.x,
+      y: sourceElement.y,
+      width: sourceElement.width,
+      height: sourceElement.height,
+    },
+  })
 
   for (let i = 0; i < elements.length; i++) {
     let x: number, y: number
 
     switch (position) {
-      case 'right':
+      case 'right': {
         // Nach rechts: 2x Breite (bis zur rechten Kante + gewünschter Abstand) + spacing
         x = sourceElement.x + sourceElement.width * 2 + spacing
-        y = sourceElement.y + i * (elementHeight + spacing) - yOffset + sourceElement.height / 2
+        // Berechne Y-Position: Beginne mit sourceElement.y und verteile die Elemente um das Source-Element herum
+        const baseY = sourceElement.y + sourceElement.height / 2 // Mitte des Source-Elements
+        y = baseY + (i - (numElements - 1) / 2) * (elementHeight + spacing)
+        console.log(`📍 RIGHT position calculation for element ${i}:`, {
+          baseX: sourceElement.x + sourceElement.width * 2 + spacing,
+          baseY,
+          elementOffset: (i - (numElements - 1) / 2) * (elementHeight + spacing),
+          finalY: y,
+          i,
+          numElements,
+          elementHeight,
+          spacing,
+        })
         break
-      case 'left':
+      }
+      case 'left': {
         // Nach links: 1x Breite des neuen Elements + 1x Breite des Quell-Elements + spacing
         x = sourceElement.x - elementWidth - sourceElement.width - spacing
-        y = sourceElement.y + i * (elementHeight + spacing) - yOffset + sourceElement.height / 2
+        // Berechne Y-Position: Beginne mit sourceElement.y und verteile die Elemente um das Source-Element herum
+        const baseY = sourceElement.y + sourceElement.height / 2 // Mitte des Source-Elements
+        y = baseY + (i - (numElements - 1) / 2) * (elementHeight + spacing)
         break
-      case 'top':
+      }
+      case 'top': {
         // Nach oben: 1x Höhe des neuen Elements + 1x Breite des Quell-Elements + spacing
-        x = sourceElement.x + i * (elementWidth + spacing) - xOffset + sourceElement.width / 2
+        const baseX = sourceElement.x + sourceElement.width / 2 // Mitte des Source-Elements
+        x = baseX + (i - (numElements - 1) / 2) * (elementWidth + spacing)
         y = sourceElement.y - elementHeight - sourceElement.width - spacing
         break
-      case 'bottom':
+      }
+      case 'bottom': {
         // Nach unten: 1x Höhe des Quell-Elements + 1x Breite des Quell-Elements + spacing
-        x = sourceElement.x + i * (elementWidth + spacing) - xOffset + sourceElement.width / 2
+        const baseX = sourceElement.x + sourceElement.width / 2 // Mitte des Source-Elements
+        x = baseX + (i - (numElements - 1) / 2) * (elementWidth + spacing)
         y = sourceElement.y + sourceElement.height + sourceElement.width + spacing
         break
-      default:
+      }
+      default: {
         // Default: nach rechts
         x = sourceElement.x + sourceElement.width * 2 + spacing
-        y = sourceElement.y + i * (elementHeight + spacing) - yOffset + sourceElement.height / 2
+        const baseY = sourceElement.y + sourceElement.height / 2 // Mitte des Source-Elements
+        y = baseY + (i - (numElements - 1) / 2) * (elementHeight + spacing)
+      }
     }
 
     positions.push({ x, y })
@@ -1018,11 +1082,11 @@ const createArrowBetweenElements = (
 
     // Bei "left" Position: Pfeil geht vom source Element (rechts) zum target Element (links)
     sourceConnectionPoint = {
-      x: actualSourceElement.x - 6, // Linker Rand des Source-Elements mit 6px Abstand (Pfeil-Startpunkt)
+      x: actualSourceElement.x, // Linker Rand des Source-Elements ohne zusätzlichen Offset
       y: distributedSourceY,
     }
     targetConnectionPoint = {
-      x: actualTargetElement.x + actualTargetElement.width + 6, // Rechter Rand des Target-Elements mit 6px Abstand (Pfeil-Endpunkt)
+      x: actualTargetElement.x + actualTargetElement.width, // Rechter Rand des Target-Elements ohne zusätzlichen Offset
       y: actualTargetElement.y + actualTargetElement.height / 2,
     }
     console.log(
@@ -1053,18 +1117,25 @@ const createArrowBetweenElements = (
 
     // Bei "right" Position: Pfeil geht vom source Element (links) zum target Element (rechts)
     sourceConnectionPoint = {
-      x: actualSourceElement.x + actualSourceElement.width + 6, // Rechter Rand des Source-Elements mit 6px Abstand (Pfeil-Startpunkt)
+      x: actualSourceElement.x + actualSourceElement.width, // Rechter Rand des Source-Elements ohne zusätzlichen Offset
       y: distributedSourceY,
     }
     targetConnectionPoint = {
-      x: actualTargetElement.x - 6, // Linker Rand des Target-Elements mit 6px Abstand (Pfeil-Endpunkt)
-      y: actualTargetElement.y + actualTargetElement.height / 2,
+      x: actualTargetElement.x, // Linker Rand des Target-Elements ohne zusätzlichen Offset
+      y: actualTargetElement.y + actualTargetElement.height / 2, // Mitte des Target-Elements
     }
     console.log(
       '🔧 RIGHT correction - Source (Pfeil startet hier):',
       sourceConnectionPoint,
       'Target (Pfeil endet hier):',
       targetConnectionPoint,
+      'Target element details:',
+      {
+        x: actualTargetElement.x,
+        y: actualTargetElement.y,
+        width: actualTargetElement.width,
+        height: actualTargetElement.height,
+      },
       'arrowIndex:',
       arrowIndex,
       'totalArrows:',
@@ -1089,11 +1160,11 @@ const createArrowBetweenElements = (
     // Bei "top" Position: Pfeil geht vom source Element (unten) zum target Element (oben)
     sourceConnectionPoint = {
       x: distributedSourceX, // Verteilte X-Position des Source-Elements
-      y: actualSourceElement.y - 6, // Oberer Rand des Source-Elements mit 6px Abstand (Pfeil-Startpunkt)
+      y: actualSourceElement.y, // Oberer Rand des Source-Elements ohne zusätzlichen Offset
     }
     targetConnectionPoint = {
       x: actualTargetElement.x + actualTargetElement.width / 2, // Horizontale Mitte des Target-Elements
-      y: actualTargetElement.y + actualTargetElement.height + 6, // Unterer Rand des Target-Elements mit 6px Abstand (Pfeil-Endpunkt)
+      y: actualTargetElement.y + actualTargetElement.height, // Unterer Rand des Target-Elements ohne zusätzlichen Offset
     }
     console.log(
       '🔧 TOP correction - Source (Pfeil startet hier):',
@@ -1124,11 +1195,11 @@ const createArrowBetweenElements = (
     // Bei "bottom" Position: Pfeil geht vom source Element (oben) zum target Element (unten)
     sourceConnectionPoint = {
       x: distributedSourceX, // Verteilte X-Position des Source-Elements
-      y: actualSourceElement.y + actualSourceElement.height + 6, // Unterer Rand des Source-Elements mit 6px Abstand (Pfeil-Startpunkt)
+      y: actualSourceElement.y + actualSourceElement.height, // Unterer Rand des Source-Elements ohne zusätzlichen Offset
     }
     targetConnectionPoint = {
       x: actualTargetElement.x + actualTargetElement.width / 2, // Horizontale Mitte des Target-Elements
-      y: actualTargetElement.y - 6, // Oberer Rand des Target-Elements mit 6px Abstand (Pfeil-Endpunkt)
+      y: actualTargetElement.y, // Oberer Rand des Target-Elements ohne zusätzlichen Offset
     }
     console.log(
       '🔧 BOTTOM correction - Source (Pfeil startet hier):',
@@ -1211,6 +1282,7 @@ const createArrowBetweenElements = (
     version: 1,
     versionNonce: Math.floor(Math.random() * 1000000),
     isDeleted: false,
+    boundElements: null, // Wie in manuellen Pfeilen
     updated: Date.now(),
     link: null,
     locked: false,
@@ -1247,28 +1319,24 @@ const createArrowBetweenElements = (
         ? {
             elementId: actualSourceElement.id,
             focus: calculateBindingFocus(actualSourceElement, sourceConnectionPoint),
-            gap: 1,
-            fixedPoint: null,
+            gap: 8, // Realistische gap wie in den manuellen Pfeilen (ca. 8-9)
           }
         : {
             elementId: actualSourceElement.id,
             focus: calculateBindingFocus(actualSourceElement, sourceConnectionPoint),
-            gap: 1,
-            fixedPoint: null,
+            gap: 8, // Realistische gap wie in den manuellen Pfeilen (ca. 8-9)
           },
     endBinding:
       position === 'left'
         ? {
             elementId: actualTargetElement.id,
             focus: calculateBindingFocus(actualTargetElement, targetConnectionPoint),
-            gap: 1,
-            fixedPoint: null,
+            gap: 8, // Realistische gap wie in den manuellen Pfeilen (ca. 8-9)
           }
         : {
             elementId: actualTargetElement.id,
             focus: calculateBindingFocus(actualTargetElement, targetConnectionPoint),
-            gap: 1,
-            fixedPoint: null,
+            gap: 8, // Realistische gap wie in den manuellen Pfeilen (ca. 8-9)
           },
     startArrowhead: reverseArrow ? 'arrow' : null,
     endArrowhead: reverseArrow ? null : 'arrow',
@@ -1324,12 +1392,28 @@ const calculateBindingFocus = (element: any, connectionPoint: { x: number; y: nu
   const centerX = element.x + element.width / 2
   const centerY = element.y + element.height / 2
 
-  // Berechne relative Position (-1 bis 1)
+  // Berechne relative Position zum Element-Zentrum
   const relativeX = (connectionPoint.x - centerX) / (element.width / 2)
   const relativeY = (connectionPoint.y - centerY) / (element.height / 2)
 
-  // Kombiniere X und Y zu einem Focus-Wert
-  return Math.max(-0.9, Math.min(0.9, (relativeX + relativeY) / 2))
+  // Bestimme welche Seite dominiert und berechne entsprechenden Focus
+  const absX = Math.abs(relativeX)
+  const absY = Math.abs(relativeY)
+
+  let focus: number
+  if (absX > absY) {
+    // Horizontale Verbindung - Focus basiert auf Y-Position relativ zur Element-Höhe
+    focus = relativeY * 0.3 // Noch stärkere Reduktion für einfachere Werte wie handgezeichnete Pfeile
+  } else {
+    // Vertikale Verbindung - Focus basiert auf X-Position relativ zur Element-Breite
+    focus = relativeX * 0.3 // Noch stärkere Reduktion für einfachere Werte wie handgezeichnete Pfeile
+  }
+
+  // Runde den Wert auf eine Dezimalstelle wie handgezeichnete Pfeile (-0.3, 0, 0.3)
+  focus = Math.round(focus * 10) / 10
+
+  // Begrenze den Focus-Wert auf einfache Bereiche wie in handgezeichneten Pfeilen
+  return Math.max(-0.3, Math.min(0.3, focus))
 }
 
 /**
@@ -1390,6 +1474,7 @@ const createFallbackArrow = (
     version: 1,
     versionNonce: Math.floor(Math.random() * 1000000),
     isDeleted: false,
+    boundElements: null, // Wie in manuellen Pfeilen
     updated: Date.now(),
     link: null,
     locked: false,
@@ -1401,14 +1486,12 @@ const createFallbackArrow = (
     startBinding: {
       elementId: sourceElement.id,
       focus: 0.5,
-      gap: 1,
-      fixedPoint: null,
+      gap: 8, // Realistische gap wie in manuellen Pfeilen
     },
     endBinding: {
       elementId: targetElement.id,
       focus: -0.5,
-      gap: 1,
-      fixedPoint: null,
+      gap: 8, // Realistische gap wie in manuellen Pfeilen
     },
     startArrowhead: null,
     endArrowhead: 'arrow',
