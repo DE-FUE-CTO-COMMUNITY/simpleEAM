@@ -267,10 +267,12 @@ export default function AddRelatedElementsDialog({
                 Neue Elemente: width={selectedElement.width}, height={selectedElement.height}
               </Typography>
               <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.9rem' }}>
-                Vertikaler Abstand (links/rechts): height + spacing = {selectedElement.height} + 20 = {selectedElement.height + 20}px
+                Vertikaler Abstand (links/rechts): height + spacing = {selectedElement.height} + 20
+                = {selectedElement.height + 20}px
               </Typography>
               <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.9rem' }}>
-                Horizontaler Abstand (oben/unten): width + spacing = {selectedElement.width} + 20 = {selectedElement.width + 20}px
+                Horizontaler Abstand (oben/unten): width + spacing = {selectedElement.width} + 20 ={' '}
+                {selectedElement.width + 20}px
               </Typography>
               <Typography
                 variant="body2"

@@ -5,10 +5,29 @@ import {
   GET_RELATED_ELEMENTS_FOR_DATA_OBJECT,
   GET_RELATED_ELEMENTS_FOR_INTERFACE,
   GET_RELATED_ELEMENTS_FOR_INFRASTRUCTURE,
-  RelatedElement,
   RelatedElementsResponse,
 } from '@/graphql/relatedElements'
 import { ArrowType, RelativePosition, AddRelatedElementsConfig } from '../types/addRelatedElements'
+import { getValidRelationships, normalizeElementType, ElementType } from './relationshipValidation'
+
+// Extended RelatedElement interface mit reverseArrow support
+interface RelatedElement {
+  id: string
+  name: string
+  description?: string
+  elementType: 'capability' | 'application' | 'dataObject' | 'interface' | 'infrastructure'
+  relationshipType?: string
+  reverseArrow?: boolean
+  // Element-spezifische Eigenschaften
+  status?: string
+  criticality?: string
+  type?: string
+  maturityLevel?: number
+  businessValue?: number
+  classification?: string
+  interfaceType?: string
+  infrastructureType?: string
+}
 import {
   createCapabilityElementsFromTemplate,
   createApplicationElementsFromTemplate,
@@ -18,6 +37,29 @@ import {
 } from './elementCreation'
 
 import { findArchimateTemplate, loadArchimateLibrary } from './archimateLibraryUtils'
+
+/**
+ * Bestimmt ob ein Pfeil für eine bestimmte Beziehung umgekehrt werden soll
+ */
+const shouldReverseArrow = (
+  sourceElementType: string,
+  targetElementType: string,
+  relationshipType: string
+): boolean => {
+  // Normalisiere Element-Typen
+  const normalizedSource = normalizeElementType(sourceElementType)
+  const normalizedTarget = normalizeElementType(targetElementType)
+
+  if (!normalizedSource || !normalizedTarget) {
+    return false
+  }
+
+  // Finde gültige Beziehung
+  const validRelationships = getValidRelationships(normalizedSource, normalizedTarget)
+  const relationship = validRelationships.find(rel => rel.type === relationshipType)
+
+  return relationship?.reverseArrow || false
+}
 import { generateElementId } from './elementIdManager'
 
 interface CreateRelatedElementsResult {
@@ -241,6 +283,8 @@ const extractRelatedElementsFromQueryResult = (
             elementType: 'application',
             status: app.status,
             criticality: app.criticality,
+            relationshipType: 'SUPPORTS',
+            reverseArrow: shouldReverseArrow('capability', 'application', 'SUPPORTS'),
           })
         })
       }
@@ -254,6 +298,8 @@ const extractRelatedElementsFromQueryResult = (
             description: dataObj.description,
             elementType: 'dataObject',
             classification: dataObj.classification,
+            relationshipType: 'RELATED_TO',
+            reverseArrow: shouldReverseArrow('capability', 'dataObject', 'RELATED_TO'),
           })
         })
       }
@@ -610,7 +656,13 @@ const createExcalidrawElementsFromRelated = async (
     // Erstelle Pfeil vom Quell-Element zum neuen Element
     if (createdElements.length > 0) {
       const targetElement = createdElements[0] // Haupt-Element (normalerweise das erste)
-      const arrow = createArrowBetweenElements(selectedElement, targetElement, config.arrowType)
+      const arrow = createArrowBetweenElements(
+        selectedElement,
+        targetElement,
+        config.arrowType,
+        config.position,
+        relatedElement.reverseArrow || false
+      )
       newArrows.push(arrow)
 
       // Aktualisiere boundElements der verbundenen Elemente
@@ -740,19 +792,41 @@ const calculateElementPositions = (
 const createArrowBetweenElements = (
   sourceElement: any,
   targetElement: any,
-  arrowType: ArrowType
+  arrowType: ArrowType,
+  position?: RelativePosition,
+  reverseArrow: boolean = false
 ): any => {
+  console.log(
+    '🚀 createArrowBetweenElements called with position:',
+    position,
+    'reverseArrow:',
+    reverseArrow
+  )
   const arrowId = generateElementId()
+
+  // Wenn reverseArrow true ist, vertausche Source und Target
+  // Bei SUPPORTS: reverseArrow=true bedeutet Pfeil von Application (target) zu Capability (source)
+  const actualSourceElement = reverseArrow ? targetElement : sourceElement
+  const actualTargetElement = reverseArrow ? sourceElement : targetElement
+
+  console.log(
+    '🔄 Arrow direction - Original Source→Target, Actual:',
+    reverseArrow ? 'Target→Source (reversed)' : 'Source→Target (normal)',
+    'actualSource:',
+    actualSourceElement.customData?.elementName || 'unknown',
+    'actualTarget:',
+    actualTargetElement.customData?.elementName || 'unknown'
+  )
 
   // Berechne optimale Verbindungspunkte an den Elementrändern
   const sourceCenter = {
-    x: sourceElement.x + sourceElement.width / 2,
-    y: sourceElement.y + sourceElement.height / 2,
+    x: actualSourceElement.x + actualSourceElement.width / 2,
+    y: actualSourceElement.y + actualSourceElement.height / 2,
   }
 
   const targetCenter = {
-    x: targetElement.x + targetElement.width / 2,
-    y: targetElement.y + targetElement.height / 2,
+    x: actualTargetElement.x + actualTargetElement.width / 2,
+    y: actualTargetElement.y + actualTargetElement.height / 2,
   }
 
   // Berechne die Richtung zwischen den Elementen
@@ -762,7 +836,7 @@ const createArrowBetweenElements = (
 
   if (distance === 0) {
     // Fallback für gleiche Position
-    return createFallbackArrow(sourceElement, targetElement, arrowId, arrowType)
+    return createFallbackArrow(actualSourceElement, actualTargetElement, arrowId, arrowType)
   }
 
   // Normalisierte Richtungsvektoren
@@ -770,30 +844,164 @@ const createArrowBetweenElements = (
   const normalizedDy = dy / distance
 
   // Berechne Verbindungspunkte an den Elementrändern
-  const sourceConnectionPoint = calculateConnectionPoint(
-    sourceElement,
+  let sourceConnectionPoint = calculateConnectionPoint(
+    actualSourceElement,
     normalizedDx,
     normalizedDy,
     true // Ausgehend
   )
 
-  const targetConnectionPoint = calculateConnectionPoint(
-    targetElement,
+  let targetConnectionPoint = calculateConnectionPoint(
+    actualTargetElement,
     -normalizedDx, // Umgekehrte Richtung für eingehend
     -normalizedDy,
     false // Eingehend
   )
 
+  // Spezielle Korrektur für "left" Position
+  if (position === 'left') {
+    console.log('🔧 Applying LEFT position arrow correction')
+    console.log('🔧 Target element details:', {
+      x: actualTargetElement.x,
+      width: actualTargetElement.width,
+      rightEdge: actualTargetElement.x + actualTargetElement.width,
+    })
+    // Bei "left" Position: Pfeil geht vom source Element (rechts) zum target Element (links)
+    sourceConnectionPoint = {
+      x: actualSourceElement.x, // Linker Rand des Source-Elements (Pfeil-Startpunkt)
+      y: actualSourceElement.y + actualSourceElement.height / 2,
+    }
+    targetConnectionPoint = {
+      x: actualTargetElement.x + actualTargetElement.width, // Rechter Rand des Target-Elements (Pfeil-Endpunkt)
+      y: actualTargetElement.y + actualTargetElement.height / 2,
+    }
+    console.log(
+      '🔧 LEFT correction - Source (Pfeil startet hier):',
+      sourceConnectionPoint,
+      'Target (Pfeil endet hier):',
+      targetConnectionPoint
+    )
+  } else if (position === 'right') {
+    console.log('🔧 Applying RIGHT position arrow correction')
+    console.log('🔧 Source element details:', {
+      x: actualSourceElement.x,
+      width: actualSourceElement.width,
+      rightEdge: actualSourceElement.x + actualSourceElement.width,
+    })
+    // Bei "right" Position: Pfeil geht vom source Element (links) zum target Element (rechts)
+    sourceConnectionPoint = {
+      x: actualSourceElement.x + actualSourceElement.width, // Rechter Rand des Source-Elements (Pfeil-Startpunkt)
+      y: actualSourceElement.y + actualSourceElement.height / 2,
+    }
+    targetConnectionPoint = {
+      x: actualTargetElement.x, // Linker Rand des Target-Elements (Pfeil-Endpunkt)
+      y: actualTargetElement.y + actualTargetElement.height / 2,
+    }
+    console.log(
+      '🔧 RIGHT correction - Source (Pfeil startet hier):',
+      sourceConnectionPoint,
+      'Target (Pfeil endet hier):',
+      targetConnectionPoint
+    )
+  } else if (position === 'top') {
+    console.log('🔧 Applying TOP position arrow correction')
+    console.log('🔧 Source element details:', {
+      x: actualSourceElement.x,
+      height: actualSourceElement.height,
+      bottomEdge: actualSourceElement.y + actualSourceElement.height,
+    })
+    // Bei "top" Position: Pfeil geht vom source Element (unten) zum target Element (oben)
+    sourceConnectionPoint = {
+      x: actualSourceElement.x + actualSourceElement.width / 2, // Horizontale Mitte des Source-Elements
+      y: actualSourceElement.y, // Oberer Rand des Source-Elements (Pfeil-Startpunkt)
+    }
+    targetConnectionPoint = {
+      x: actualTargetElement.x + actualTargetElement.width / 2, // Horizontale Mitte des Target-Elements
+      y: actualTargetElement.y + actualTargetElement.height, // Unterer Rand des Target-Elements (Pfeil-Endpunkt)
+    }
+    console.log(
+      '🔧 TOP correction - Source (Pfeil startet hier):',
+      sourceConnectionPoint,
+      'Target (Pfeil endet hier):',
+      targetConnectionPoint
+    )
+  } else if (position === 'bottom') {
+    console.log('🔧 Applying BOTTOM position arrow correction')
+    console.log('🔧 Source element details:', {
+      x: actualSourceElement.x,
+      height: actualSourceElement.height,
+      bottomEdge: actualSourceElement.y + actualSourceElement.height,
+    })
+    // Bei "bottom" Position: Pfeil geht vom source Element (oben) zum target Element (unten)
+    sourceConnectionPoint = {
+      x: actualSourceElement.x + actualSourceElement.width / 2, // Horizontale Mitte des Source-Elements
+      y: actualSourceElement.y + actualSourceElement.height, // Unterer Rand des Source-Elements (Pfeil-Startpunkt)
+    }
+    targetConnectionPoint = {
+      x: actualTargetElement.x + actualTargetElement.width / 2, // Horizontale Mitte des Target-Elements
+      y: actualTargetElement.y, // Oberer Rand des Target-Elements (Pfeil-Endpunkt)
+    }
+    console.log(
+      '🔧 BOTTOM correction - Source (Pfeil startet hier):',
+      sourceConnectionPoint,
+      'Target (Pfeil endet hier):',
+      targetConnectionPoint
+    )
+  }
+
   // Konfiguriere Pfeil-Typ
   const arrowConfig = getArrowConfiguration(arrowType)
+
+  // Pfeil-Geometrie: Positionsspezifische Berechnung
+  let arrowGeometry
+  if (position === 'left') {
+    // Bei "left": Pfeil startet vom linken Rand des Source-Elements zum rechten Rand des Target-Elements
+    arrowGeometry = {
+      x: sourceConnectionPoint.x, // Startpunkt: linker Rand des Source-Elements
+      y: sourceConnectionPoint.y, // Startpunkt Y
+      width: targetConnectionPoint.x - sourceConnectionPoint.x, // Breite: Differenz x-Koordinaten
+      height: targetConnectionPoint.y - sourceConnectionPoint.y, // Höhe: Differenz y-Koordinaten
+    }
+  } else if (position === 'right') {
+    // Bei "right": Pfeil startet vom rechten Rand des Source-Elements zum linken Rand des Target-Elements
+    arrowGeometry = {
+      x: sourceConnectionPoint.x, // Startpunkt: rechter Rand des Source-Elements
+      y: sourceConnectionPoint.y, // Startpunkt Y
+      width: targetConnectionPoint.x - sourceConnectionPoint.x, // Breite: Differenz x-Koordinaten
+      height: targetConnectionPoint.y - sourceConnectionPoint.y, // Höhe: Differenz y-Koordinaten
+    }
+  } else if (position === 'top') {
+    // Bei "top": Pfeil startet vom oberen Rand des Source-Elements zum unteren Rand des Target-Elements
+    arrowGeometry = {
+      x: sourceConnectionPoint.x, // Startpunkt X
+      y: sourceConnectionPoint.y, // Startpunkt: oberer Rand des Source-Elements
+      width: targetConnectionPoint.x - sourceConnectionPoint.x, // Breite: Differenz x-Koordinaten
+      height: targetConnectionPoint.y - sourceConnectionPoint.y, // Höhe: Differenz y-Koordinaten
+    }
+  } else if (position === 'bottom') {
+    // Bei "bottom": Pfeil startet vom unteren Rand des Source-Elements zum oberen Rand des Target-Elements
+    arrowGeometry = {
+      x: sourceConnectionPoint.x, // Startpunkt X
+      y: sourceConnectionPoint.y, // Startpunkt: unterer Rand des Source-Elements
+      width: targetConnectionPoint.x - sourceConnectionPoint.x, // Breite: Differenz x-Koordinaten
+      height: targetConnectionPoint.y - sourceConnectionPoint.y, // Höhe: Differenz y-Koordinaten
+    }
+  } else {
+    // Für alle anderen Positionen: Standard-Berechnung
+    arrowGeometry = {
+      x: Math.min(sourceConnectionPoint.x, targetConnectionPoint.x),
+      y: Math.min(sourceConnectionPoint.y, targetConnectionPoint.y),
+      width: Math.abs(targetConnectionPoint.x - sourceConnectionPoint.x),
+      height: Math.abs(targetConnectionPoint.y - sourceConnectionPoint.y),
+    }
+  }
+
+  console.log(`🎯 Arrow geometry for position ${position}:`, arrowGeometry)
 
   return {
     id: arrowId,
     type: 'arrow',
-    x: Math.min(sourceConnectionPoint.x, targetConnectionPoint.x),
-    y: Math.min(sourceConnectionPoint.y, targetConnectionPoint.y),
-    width: Math.abs(targetConnectionPoint.x - sourceConnectionPoint.x),
-    height: Math.abs(targetConnectionPoint.y - sourceConnectionPoint.y),
+    ...arrowGeometry,
     angle: 0,
     strokeColor: '#1e1e1e',
     backgroundColor: 'transparent',
@@ -815,26 +1023,62 @@ const createArrowBetweenElements = (
     locked: false,
     points: [
       [0, 0],
-      [
-        targetConnectionPoint.x - sourceConnectionPoint.x,
-        targetConnectionPoint.y - sourceConnectionPoint.y,
-      ],
+      position === 'left'
+        ? [
+            targetConnectionPoint.x - sourceConnectionPoint.x,
+            targetConnectionPoint.y - sourceConnectionPoint.y,
+          ]
+        : position === 'right'
+          ? [
+              targetConnectionPoint.x - sourceConnectionPoint.x,
+              targetConnectionPoint.y - sourceConnectionPoint.y,
+            ]
+          : position === 'top'
+            ? [
+                targetConnectionPoint.x - sourceConnectionPoint.x,
+                targetConnectionPoint.y - sourceConnectionPoint.y,
+              ]
+            : position === 'bottom'
+              ? [
+                  targetConnectionPoint.x - sourceConnectionPoint.x,
+                  targetConnectionPoint.y - sourceConnectionPoint.y,
+                ]
+              : [
+                  targetConnectionPoint.x - sourceConnectionPoint.x,
+                  targetConnectionPoint.y - sourceConnectionPoint.y,
+                ],
     ],
     lastCommittedPoint: null,
-    startBinding: {
-      elementId: sourceElement.id,
-      focus: calculateBindingFocus(sourceElement, sourceConnectionPoint),
-      gap: 1,
-      fixedPoint: null,
-    },
-    endBinding: {
-      elementId: targetElement.id,
-      focus: calculateBindingFocus(targetElement, targetConnectionPoint),
-      gap: 1,
-      fixedPoint: null,
-    },
-    startArrowhead: null,
-    endArrowhead: 'arrow',
+    startBinding:
+      position === 'left'
+        ? {
+            elementId: actualSourceElement.id,
+            focus: calculateBindingFocus(actualSourceElement, sourceConnectionPoint),
+            gap: 1,
+            fixedPoint: null,
+          }
+        : {
+            elementId: actualSourceElement.id,
+            focus: calculateBindingFocus(actualSourceElement, sourceConnectionPoint),
+            gap: 1,
+            fixedPoint: null,
+          },
+    endBinding:
+      position === 'left'
+        ? {
+            elementId: actualTargetElement.id,
+            focus: calculateBindingFocus(actualTargetElement, targetConnectionPoint),
+            gap: 1,
+            fixedPoint: null,
+          }
+        : {
+            elementId: actualTargetElement.id,
+            focus: calculateBindingFocus(actualTargetElement, targetConnectionPoint),
+            gap: 1,
+            fixedPoint: null,
+          },
+    startArrowhead: reverseArrow ? 'arrow' : null,
+    endArrowhead: reverseArrow ? null : 'arrow',
   }
 }
 
