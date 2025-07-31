@@ -661,7 +661,9 @@ const createExcalidrawElementsFromRelated = async (
         targetElement,
         config.arrowType,
         config.position,
-        relatedElement.reverseArrow || false
+        relatedElement.reverseArrow || false,
+        i, // Arrow index
+        filteredRelatedElements.length // Total arrows count
       )
       newArrows.push(arrow)
 
@@ -787,6 +789,84 @@ const calculateElementPositions = (
 }
 
 /**
+ * Berechnet verteilte Y-Koordinaten für mehrere Pfeile über die Höhe eines Elements
+ * @param elementHeight - Höhe des Elements
+ * @param elementY - Y-Position des Elements
+ * @param arrowCount - Anzahl der Pfeile
+ * @param arrowIndex - Index des aktuellen Pfeils (0-basiert)
+ * @returns Y-Koordinate für den Pfeil
+ */
+const calculateDistributedArrowY = (
+  elementHeight: number,
+  elementY: number,
+  arrowCount: number,
+  arrowIndex: number
+): number => {
+  if (arrowCount === 1) {
+    // Bei nur einem Pfeil: Mittig
+    return elementY + elementHeight / 2
+  }
+
+  // Bei mehreren Pfeilen: Verteilung über die Höhe
+  // Berechne 5 Punkte über die Höhe und verwende nicht den ersten und letzten
+  const totalPoints = 5
+  const usablePoints = totalPoints - 2 // Erste und letzte nicht verwenden
+  const step = elementHeight / (totalPoints - 1) // Schritt zwischen den Punkten
+
+  if (arrowCount <= usablePoints) {
+    // Normal verteilen über die nutzbaren Punkte (Index 1 bis 3 bei 5 Punkten)
+    const startPointIndex = 1 // Überspringe den ersten Punkt
+    const usedPointIndex =
+      startPointIndex + Math.floor((arrowIndex * (usablePoints - 1)) / Math.max(1, arrowCount - 1))
+    return elementY + usedPointIndex * step
+  } else {
+    // Mehr Pfeile als nutzbare Punkte: gleichmäßig über den nutzbaren Bereich verteilen
+    const usableHeight = elementHeight * (usablePoints / (totalPoints - 1))
+    const startY = elementY + elementHeight / totalPoints // Beginne nach dem ersten übersprungenen Punkt
+    return startY + (arrowIndex * usableHeight) / Math.max(1, arrowCount - 1)
+  }
+}
+
+/**
+ * Berechnet verteilte X-Koordinaten für mehrere Pfeile über die Breite eines Elements
+ * @param elementWidth - Breite des Elements
+ * @param elementX - X-Position des Elements
+ * @param arrowCount - Anzahl der Pfeile
+ * @param arrowIndex - Index des aktuellen Pfeils (0-basiert)
+ * @returns X-Koordinate für den Pfeil
+ */
+const calculateDistributedArrowX = (
+  elementWidth: number,
+  elementX: number,
+  arrowCount: number,
+  arrowIndex: number
+): number => {
+  if (arrowCount === 1) {
+    // Bei nur einem Pfeil: Mittig
+    return elementX + elementWidth / 2
+  }
+
+  // Bei mehreren Pfeilen: Verteilung über die Breite
+  // Berechne 5 Punkte über die Breite und verwende nicht den ersten und letzten
+  const totalPoints = 5
+  const usablePoints = totalPoints - 2 // Erste und letzte nicht verwenden
+  const step = elementWidth / (totalPoints - 1) // Schritt zwischen den Punkten
+
+  if (arrowCount <= usablePoints) {
+    // Normal verteilen über die nutzbaren Punkte (Index 1 bis 3 bei 5 Punkten)
+    const startPointIndex = 1 // Überspringe den ersten Punkt
+    const usedPointIndex =
+      startPointIndex + Math.floor((arrowIndex * (usablePoints - 1)) / Math.max(1, arrowCount - 1))
+    return elementX + usedPointIndex * step
+  } else {
+    // Mehr Pfeile als nutzbare Punkte: gleichmäßig über den nutzbaren Bereich verteilen
+    const usableWidth = elementWidth * (usablePoints / (totalPoints - 1))
+    const startX = elementX + elementWidth / totalPoints // Beginne nach dem ersten übersprungenen Punkt
+    return startX + (arrowIndex * usableWidth) / Math.max(1, arrowCount - 1)
+  }
+}
+
+/**
  * Erstellt einen Pfeil zwischen zwei Elementen mit korrekten Randverbindungen
  */
 const createArrowBetweenElements = (
@@ -794,7 +874,9 @@ const createArrowBetweenElements = (
   targetElement: any,
   arrowType: ArrowType,
   position?: RelativePosition,
-  reverseArrow: boolean = false
+  reverseArrow: boolean = false,
+  arrowIndex: number = 0,
+  totalArrows: number = 1
 ): any => {
   console.log(
     '🚀 createArrowBetweenElements called with position:',
@@ -866,20 +948,33 @@ const createArrowBetweenElements = (
       width: actualTargetElement.width,
       rightEdge: actualTargetElement.x + actualTargetElement.width,
     })
+
+    // Berechne verteilte Y-Koordinate für das Source-Element
+    const distributedSourceY = calculateDistributedArrowY(
+      actualSourceElement.height,
+      actualSourceElement.y,
+      totalArrows,
+      arrowIndex
+    )
+
     // Bei "left" Position: Pfeil geht vom source Element (rechts) zum target Element (links)
     sourceConnectionPoint = {
-      x: actualSourceElement.x, // Linker Rand des Source-Elements (Pfeil-Startpunkt)
-      y: actualSourceElement.y + actualSourceElement.height / 2,
+      x: actualSourceElement.x - 6, // Linker Rand des Source-Elements mit 6px Abstand (Pfeil-Startpunkt)
+      y: distributedSourceY,
     }
     targetConnectionPoint = {
-      x: actualTargetElement.x + actualTargetElement.width, // Rechter Rand des Target-Elements (Pfeil-Endpunkt)
+      x: actualTargetElement.x + actualTargetElement.width + 6, // Rechter Rand des Target-Elements mit 6px Abstand (Pfeil-Endpunkt)
       y: actualTargetElement.y + actualTargetElement.height / 2,
     }
     console.log(
       '🔧 LEFT correction - Source (Pfeil startet hier):',
       sourceConnectionPoint,
       'Target (Pfeil endet hier):',
-      targetConnectionPoint
+      targetConnectionPoint,
+      'arrowIndex:',
+      arrowIndex,
+      'totalArrows:',
+      totalArrows
     )
   } else if (position === 'right') {
     console.log('🔧 Applying RIGHT position arrow correction')
@@ -888,20 +983,33 @@ const createArrowBetweenElements = (
       width: actualSourceElement.width,
       rightEdge: actualSourceElement.x + actualSourceElement.width,
     })
+
+    // Berechne verteilte Y-Koordinate für das Source-Element
+    const distributedSourceY = calculateDistributedArrowY(
+      actualSourceElement.height,
+      actualSourceElement.y,
+      totalArrows,
+      arrowIndex
+    )
+
     // Bei "right" Position: Pfeil geht vom source Element (links) zum target Element (rechts)
     sourceConnectionPoint = {
-      x: actualSourceElement.x + actualSourceElement.width, // Rechter Rand des Source-Elements (Pfeil-Startpunkt)
-      y: actualSourceElement.y + actualSourceElement.height / 2,
+      x: actualSourceElement.x + actualSourceElement.width + 6, // Rechter Rand des Source-Elements mit 6px Abstand (Pfeil-Startpunkt)
+      y: distributedSourceY,
     }
     targetConnectionPoint = {
-      x: actualTargetElement.x, // Linker Rand des Target-Elements (Pfeil-Endpunkt)
+      x: actualTargetElement.x - 6, // Linker Rand des Target-Elements mit 6px Abstand (Pfeil-Endpunkt)
       y: actualTargetElement.y + actualTargetElement.height / 2,
     }
     console.log(
       '🔧 RIGHT correction - Source (Pfeil startet hier):',
       sourceConnectionPoint,
       'Target (Pfeil endet hier):',
-      targetConnectionPoint
+      targetConnectionPoint,
+      'arrowIndex:',
+      arrowIndex,
+      'totalArrows:',
+      totalArrows
     )
   } else if (position === 'top') {
     console.log('🔧 Applying TOP position arrow correction')
@@ -910,20 +1018,33 @@ const createArrowBetweenElements = (
       height: actualSourceElement.height,
       bottomEdge: actualSourceElement.y + actualSourceElement.height,
     })
+
+    // Berechne verteilte X-Koordinate für das Source-Element
+    const distributedSourceX = calculateDistributedArrowX(
+      actualSourceElement.width,
+      actualSourceElement.x,
+      totalArrows,
+      arrowIndex
+    )
+
     // Bei "top" Position: Pfeil geht vom source Element (unten) zum target Element (oben)
     sourceConnectionPoint = {
-      x: actualSourceElement.x + actualSourceElement.width / 2, // Horizontale Mitte des Source-Elements
-      y: actualSourceElement.y, // Oberer Rand des Source-Elements (Pfeil-Startpunkt)
+      x: distributedSourceX, // Verteilte X-Position des Source-Elements
+      y: actualSourceElement.y - 6, // Oberer Rand des Source-Elements mit 6px Abstand (Pfeil-Startpunkt)
     }
     targetConnectionPoint = {
       x: actualTargetElement.x + actualTargetElement.width / 2, // Horizontale Mitte des Target-Elements
-      y: actualTargetElement.y + actualTargetElement.height, // Unterer Rand des Target-Elements (Pfeil-Endpunkt)
+      y: actualTargetElement.y + actualTargetElement.height + 6, // Unterer Rand des Target-Elements mit 6px Abstand (Pfeil-Endpunkt)
     }
     console.log(
       '🔧 TOP correction - Source (Pfeil startet hier):',
       sourceConnectionPoint,
       'Target (Pfeil endet hier):',
-      targetConnectionPoint
+      targetConnectionPoint,
+      'arrowIndex:',
+      arrowIndex,
+      'totalArrows:',
+      totalArrows
     )
   } else if (position === 'bottom') {
     console.log('🔧 Applying BOTTOM position arrow correction')
@@ -932,20 +1053,33 @@ const createArrowBetweenElements = (
       height: actualSourceElement.height,
       bottomEdge: actualSourceElement.y + actualSourceElement.height,
     })
+
+    // Berechne verteilte X-Koordinate für das Source-Element
+    const distributedSourceX = calculateDistributedArrowX(
+      actualSourceElement.width,
+      actualSourceElement.x,
+      totalArrows,
+      arrowIndex
+    )
+
     // Bei "bottom" Position: Pfeil geht vom source Element (oben) zum target Element (unten)
     sourceConnectionPoint = {
-      x: actualSourceElement.x + actualSourceElement.width / 2, // Horizontale Mitte des Source-Elements
-      y: actualSourceElement.y + actualSourceElement.height, // Unterer Rand des Source-Elements (Pfeil-Startpunkt)
+      x: distributedSourceX, // Verteilte X-Position des Source-Elements
+      y: actualSourceElement.y + actualSourceElement.height + 6, // Unterer Rand des Source-Elements mit 6px Abstand (Pfeil-Startpunkt)
     }
     targetConnectionPoint = {
       x: actualTargetElement.x + actualTargetElement.width / 2, // Horizontale Mitte des Target-Elements
-      y: actualTargetElement.y, // Oberer Rand des Target-Elements (Pfeil-Endpunkt)
+      y: actualTargetElement.y - 6, // Oberer Rand des Target-Elements mit 6px Abstand (Pfeil-Endpunkt)
     }
     console.log(
       '🔧 BOTTOM correction - Source (Pfeil startet hier):',
       sourceConnectionPoint,
       'Target (Pfeil endet hier):',
-      targetConnectionPoint
+      targetConnectionPoint,
+      'arrowIndex:',
+      arrowIndex,
+      'totalArrows:',
+      totalArrows
     )
   }
 
