@@ -371,6 +371,8 @@ const extractRelatedElementsFromQueryResult = (
             description: iface.description,
             elementType: 'interface',
             interfaceType: iface.interfaceType,
+            relationshipType: 'INTERFACE_SOURCE',
+            reverseArrow: false,
           })
         })
       }
@@ -383,6 +385,8 @@ const extractRelatedElementsFromQueryResult = (
             description: iface.description,
             elementType: 'interface',
             interfaceType: iface.interfaceType,
+            relationshipType: 'INTERFACE_TARGET',
+            reverseArrow: true,
           })
         })
       }
@@ -472,6 +476,8 @@ const extractRelatedElementsFromQueryResult = (
             elementType: 'application',
             status: app.status,
             criticality: app.criticality,
+            relationshipType: 'INTERFACE_SOURCE',
+            reverseArrow: true,
           })
         })
       }
@@ -486,6 +492,8 @@ const extractRelatedElementsFromQueryResult = (
             elementType: 'application',
             status: app.status,
             criticality: app.criticality,
+            relationshipType: 'INTERFACE_TARGET',
+            reverseArrow: false,
           })
         })
       }
@@ -886,17 +894,16 @@ const createArrowBetweenElements = (
   )
   const arrowId = generateElementId()
 
-  // Wenn reverseArrow true ist, vertausche Source und Target
-  // Bei SUPPORTS: reverseArrow=true bedeutet Pfeil von Application (target) zu Capability (source)
-  const actualSourceElement = reverseArrow ? targetElement : sourceElement
-  const actualTargetElement = reverseArrow ? sourceElement : targetElement
+  // KEINE Element-Vertauschung - die Geometrie bleibt unverändert
+  const actualSourceElement = sourceElement
+  const actualTargetElement = targetElement
 
   console.log(
-    '🔄 Arrow direction - Original Source→Target, Actual:',
-    reverseArrow ? 'Target→Source (reversed)' : 'Source→Target (normal)',
-    'actualSource:',
+    '🔄 Arrow direction - reverseArrow:',
+    reverseArrow,
+    'Source:',
     actualSourceElement.customData?.elementName || 'unknown',
-    'actualTarget:',
+    'Target:',
     actualTargetElement.customData?.elementName || 'unknown'
   )
 

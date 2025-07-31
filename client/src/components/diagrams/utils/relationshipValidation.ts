@@ -111,6 +111,22 @@ export const VALID_RELATIONSHIPS: RelationshipDefinition[] = [
 
   // ApplicationInterface Beziehungen
   {
+    type: 'INTERFACE_SOURCE',
+    direction: 'IN', // umgekehrte Richtung: Interface → Application (Source)
+    sourceType: 'applicationInterface',
+    targetType: 'application',
+    fieldName: 'sourceApplications',
+    reverseArrow: false, // Pfeil läuft von Interface zu Application
+  },
+  {
+    type: 'INTERFACE_TARGET',
+    direction: 'IN', // umgekehrte Richtung: Interface → Application (Target)
+    sourceType: 'applicationInterface',
+    targetType: 'application',
+    fieldName: 'targetApplications',
+    reverseArrow: true, // Pfeil läuft von Application zu Interface
+  },
+  {
     type: 'TRANSFERS',
     direction: 'OUT',
     sourceType: 'applicationInterface',
