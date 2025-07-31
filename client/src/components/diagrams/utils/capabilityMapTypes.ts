@@ -37,7 +37,7 @@ export interface MissingCapabilitiesAnalysis extends HierarchyAnalysis {
 
 export interface ExcalidrawElement {
   id: string
-  type: 'rectangle' | 'text'
+  type: 'rectangle' | 'text' | 'arrow'
   x: number
   y: number
   width: number
@@ -65,6 +65,36 @@ export interface ExcalidrawElement {
   updated: number
   link: string | null
   locked: boolean
+  // Text-spezifische Eigenschaften
+  text?: string
+  fontSize?: number
+  fontFamily?: number
+  textAlign?: 'left' | 'center' | 'right'
+  verticalAlign?: 'top' | 'middle' | 'bottom'
+  baseline?: number
+  containerId?: string | null
+  originalText?: string
+  lineHeight?: number
+  // Arrow-spezifische Eigenschaften
+  startBinding?: {
+    elementId: string
+    focus: number
+    gap: number
+  } | null
+  endBinding?: {
+    elementId: string
+    focus: number
+    gap: number
+  } | null
+  lastCommittedPoint?: [number, number] | null
+  startArrowhead?: 'arrow' | 'dot' | 'triangle' | 'triangle_outline' | null
+  endArrowhead?: 'arrow' | 'dot' | 'triangle' | 'triangle_outline' | null
+  points?: [number, number][]
+  // Elbow Arrow spezifische Eigenschaften
+  elbowed?: boolean
+  fixedSegments?: any[] | null
+  startIsSpecial?: boolean | null
+  endIsSpecial?: boolean | null
   customData?: {
     databaseId?: string
     elementType?: string
@@ -72,5 +102,6 @@ export interface ExcalidrawElement {
     originalElement?: any // Für Rückwärtskompatibilität beibehalten
     isFromDatabase?: boolean
     isMainElement?: boolean
+    displayText?: string
   }
 }

@@ -591,6 +591,7 @@ const createNewRelationshipFromResult = (
         sourceType: sourceType as ElementType,
         targetType: targetType as ElementType,
         fieldName: 'unknown',
+        reverseArrow: false,
       },
       selected: true,
       status: 'incomplete' as const,
@@ -648,6 +649,7 @@ const createNewRelationshipFromResult = (
         sourceType: 'application' as const,
         targetType: 'application' as const,
         fieldName: 'unknown',
+        reverseArrow: false,
       },
       selected: true,
       status,
@@ -668,6 +670,7 @@ const createNewRelationshipFromResult = (
       sourceType: sourceType as ElementType,
       targetType: targetType as ElementType,
       fieldName: 'unknown',
+      reverseArrow: false,
     } as RelationshipDefinition)
 
   const finalNewRelationship = {

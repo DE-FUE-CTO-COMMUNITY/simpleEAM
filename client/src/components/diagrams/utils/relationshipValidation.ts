@@ -19,6 +19,7 @@ export interface RelationshipDefinition {
   sourceType: ElementType
   targetType: ElementType
   fieldName: string // Name des Feldes im Schema
+  reverseArrow: boolean // Ob die Pfeilrichtung umgekehrt werden soll
 }
 
 // Alle gültigen Beziehungen basierend auf dem GraphQL Schema
@@ -31,6 +32,7 @@ export const VALID_RELATIONSHIPS: RelationshipDefinition[] = [
     sourceType: 'businessCapability',
     targetType: 'dataObject',
     fieldName: 'relatedDataObjects',
+    reverseArrow: false,
   },
   {
     type: 'SUPPORTS',
@@ -38,6 +40,7 @@ export const VALID_RELATIONSHIPS: RelationshipDefinition[] = [
     sourceType: 'businessCapability',
     targetType: 'application',
     fieldName: 'supportedByApplications',
+    reverseArrow: true, // SUPPORTS soll umgekehrt werden
   },
   {
     type: 'HAS_PARENT',
@@ -45,6 +48,7 @@ export const VALID_RELATIONSHIPS: RelationshipDefinition[] = [
     sourceType: 'businessCapability',
     targetType: 'businessCapability',
     fieldName: 'parents',
+    reverseArrow: false,
   },
 
   // Application Beziehungen
@@ -54,6 +58,7 @@ export const VALID_RELATIONSHIPS: RelationshipDefinition[] = [
     sourceType: 'application',
     targetType: 'businessCapability',
     fieldName: 'supportsCapabilities',
+    reverseArrow: true, // SUPPORTS soll umgekehrt werden
   },
   {
     type: 'USES',
@@ -61,6 +66,7 @@ export const VALID_RELATIONSHIPS: RelationshipDefinition[] = [
     sourceType: 'application',
     targetType: 'dataObject',
     fieldName: 'usesDataObjects',
+    reverseArrow: false,
   },
   {
     type: 'INTERFACE_SOURCE',
@@ -68,6 +74,7 @@ export const VALID_RELATIONSHIPS: RelationshipDefinition[] = [
     sourceType: 'application',
     targetType: 'applicationInterface',
     fieldName: 'sourceOfInterfaces',
+    reverseArrow: false,
   },
   {
     type: 'INTERFACE_TARGET',
@@ -75,6 +82,7 @@ export const VALID_RELATIONSHIPS: RelationshipDefinition[] = [
     sourceType: 'application',
     targetType: 'applicationInterface',
     fieldName: 'targetOfInterfaces',
+    reverseArrow: true, // INTERFACE_TARGET soll umgekehrt werden
   },
   {
     type: 'HOSTED_ON',
@@ -82,6 +90,7 @@ export const VALID_RELATIONSHIPS: RelationshipDefinition[] = [
     sourceType: 'application',
     targetType: 'infrastructure',
     fieldName: 'hostedOn',
+    reverseArrow: false,
   },
   {
     type: 'HAS_PARENT_APPLICATION',
@@ -89,6 +98,7 @@ export const VALID_RELATIONSHIPS: RelationshipDefinition[] = [
     sourceType: 'application',
     targetType: 'application',
     fieldName: 'parents',
+    reverseArrow: false,
   },
   {
     type: 'SUCCESSOR_OF',
@@ -96,6 +106,7 @@ export const VALID_RELATIONSHIPS: RelationshipDefinition[] = [
     sourceType: 'application',
     targetType: 'application',
     fieldName: 'predecessors',
+    reverseArrow: false,
   },
 
   // ApplicationInterface Beziehungen
@@ -105,6 +116,7 @@ export const VALID_RELATIONSHIPS: RelationshipDefinition[] = [
     sourceType: 'applicationInterface',
     targetType: 'dataObject',
     fieldName: 'dataObjects',
+    reverseArrow: true, // TRANSFERS soll umgekehrt werden
   },
   {
     type: 'SUCCESSOR_OF_INTERFACE',
@@ -112,6 +124,7 @@ export const VALID_RELATIONSHIPS: RelationshipDefinition[] = [
     sourceType: 'applicationInterface',
     targetType: 'applicationInterface',
     fieldName: 'predecessors',
+    reverseArrow: false,
   },
 
   // Infrastructure Beziehungen
@@ -121,6 +134,7 @@ export const VALID_RELATIONSHIPS: RelationshipDefinition[] = [
     sourceType: 'infrastructure',
     targetType: 'infrastructure',
     fieldName: 'parentInfrastructure',
+    reverseArrow: false,
   },
 
   // DataObject Beziehungen (umgekehrte TRANSFERS Richtung)
@@ -130,6 +144,7 @@ export const VALID_RELATIONSHIPS: RelationshipDefinition[] = [
     sourceType: 'dataObject',
     targetType: 'applicationInterface',
     fieldName: 'transferredInInterfaces',
+    reverseArrow: true, // TRANSFERS soll umgekehrt werden
   },
   {
     type: 'DATA_SOURCE',
@@ -137,6 +152,7 @@ export const VALID_RELATIONSHIPS: RelationshipDefinition[] = [
     sourceType: 'dataObject',
     targetType: 'application',
     fieldName: 'dataSources',
+    reverseArrow: false,
   },
 ]
 

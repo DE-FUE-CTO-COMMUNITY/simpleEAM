@@ -138,7 +138,40 @@
       "importJSON": "JSON importieren",
       "exportPNG": "PNG exportieren",
       "syncDatabase": "DB Synchronisieren",
-      "findOnCanvas": "Auf Canvas finden"
+      "findOnCanvas": "Auf Canvas finden",
+      "addRelatedElements": "Verwandte Elemente hinzufügen"
+    },
+    "contextMenu": {
+      "cut": "Ausschneiden",
+      "copy": "Kopieren",
+      "paste": "Einfügen",
+      "delete": "Löschen",
+      "duplicate": "Duplizieren",
+      "group": "Gruppieren",
+      "ungroup": "Gruppierung aufheben",
+      "bringToFront": "In den Vordergrund",
+      "sendToBack": "In den Hintergrund",
+      "addRelatedElements": "Verwandte Elemente hinzufügen"
+    },
+    "addRelatedElements": {
+      "title": "Verwandte Elemente hinzufügen",
+      "description": "Fügt automatisch alle Elemente hinzu, die eine Beziehung zu \"{element}\" haben.",
+      "hops": "Anzahl Hops",
+      "position": "Position",
+      "arrowType": "Pfeiltyp",
+      "spacing": "Abstand",
+      "add": "Hinzufügen",
+      "positions": {
+        "left": "Links",
+        "right": "Rechts",
+        "top": "Oben",
+        "bottom": "Unten"
+      },
+      "arrowTypes": {
+        "sharp": "Scharfer Pfeil",
+        "curved": "Gekrümmter Pfeil",
+        "elbow": "Rechtwinkliger Pfeil"
+      }
     },
     "dialogs": {
       "save": {

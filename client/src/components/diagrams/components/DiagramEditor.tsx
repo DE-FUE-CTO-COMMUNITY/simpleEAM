@@ -44,6 +44,8 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     setLastSavedScene,
     setNotification,
     updateDialogState,
+    selectedElementForRelatedElements,
+    setSelectedElementForRelatedElements,
   } = useDiagramState()
 
   // UI Options
@@ -168,7 +170,21 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     [excalidrawAPI, setHasUnsavedChanges, setNotification, t]
   )
 
-  // Keyboard shortcuts
+  // Related Elements handlers
+  const handleOpenAddRelatedElementsDialog = useCallback(
+    (element: any) => {
+      setSelectedElementForRelatedElements(element)
+      updateDialogState('addRelatedElementsDialogOpen', true)
+    },
+    [setSelectedElementForRelatedElements, updateDialogState]
+  )
+
+  const handleCloseAddRelatedElementsDialog = useCallback(() => {
+    updateDialogState('addRelatedElementsDialogOpen', false)
+    setSelectedElementForRelatedElements(null)
+  }, [updateDialogState, setSelectedElementForRelatedElements])
+
+  // Keyboard shortcuts hook
   useKeyboardShortcuts(
     handleNewDiagram,
     handleExportJSON,
@@ -463,6 +479,10 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
           currentDiagram={currentDiagram}
           onDiagramUpdate={handleCollaborationDiagramUpdate}
           onCollaborationStatusChange={handleCollaborationStatusChange}
+          selectedElementForRelatedElements={selectedElementForRelatedElements}
+          onOpenAddRelatedElementsDialog={handleOpenAddRelatedElementsDialog}
+          onCloseAddRelatedElementsDialog={handleCloseAddRelatedElementsDialog}
+          isAddRelatedElementsDialogOpen={dialogStates.addRelatedElementsDialogOpen}
         />
 
         {/* Integrated Library Component - only for non-viewer users */}

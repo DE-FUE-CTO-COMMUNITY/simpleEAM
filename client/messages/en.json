@@ -135,7 +135,40 @@
       "importJSON": "Import JSON",
       "exportPNG": "Export PNG",
       "syncDatabase": "Sync Database",
-      "findOnCanvas": "Find on Canvas"
+      "findOnCanvas": "Find on Canvas",
+      "addRelatedElements": "Add Related Elements"
+    },
+    "contextMenu": {
+      "cut": "Cut",
+      "copy": "Copy",
+      "paste": "Paste",
+      "delete": "Delete",
+      "duplicate": "Duplicate",
+      "group": "Group",
+      "ungroup": "Ungroup",
+      "bringToFront": "Bring to Front",
+      "sendToBack": "Send to Back",
+      "addRelatedElements": "Add Related Elements"
+    },
+    "addRelatedElements": {
+      "title": "Add Related Elements",
+      "description": "Automatically adds all elements that have a relationship to \"{element}\".",
+      "hops": "Number of Hops",
+      "position": "Position",
+      "arrowType": "Arrow Type",
+      "spacing": "Spacing",
+      "add": "Add",
+      "positions": {
+        "left": "Left",
+        "right": "Right",
+        "top": "Top",
+        "bottom": "Bottom"
+      },
+      "arrowTypes": {
+        "sharp": "Sharp Arrow",
+        "curved": "Curved Arrow",
+        "elbow": "Elbow Arrow"
+      }
     },
     "dialogs": {
       "save": {

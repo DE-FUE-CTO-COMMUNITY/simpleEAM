@@ -6,6 +6,8 @@ import { useThemeMode } from '@/contexts/ThemeContext'
 import ExcalidrawLoading from './ExcalidrawLoading'
 import { useExcalidrawCollaboration } from '../hooks/useExcalidrawCollaboration'
 import { CollaborationDialog } from './CollaborationDialog'
+import AddRelatedElementsDialog from '../dialogs/AddRelatedElementsDialog'
+import { FullCustomContextMenu } from './FullCustomContextMenu'
 
 // Dynamischer Import von Excalidraw, um Server-Side-Rendering zu vermeiden
 const ExcalidrawWrapper = dynamic(
@@ -38,6 +40,10 @@ const ExcalidrawWrapper = dynamic(
       currentDiagram,
       onDiagramUpdate,
       onCollaborationStatusChange,
+      selectedElementForRelatedElements,
+      onOpenAddRelatedElementsDialog,
+      onCloseAddRelatedElementsDialog,
+      isAddRelatedElementsDialogOpen,
     }: ExcalidrawComponentProps) => {
       const ExcalidrawTyped = Excalidraw as any
       const MainMenuTyped = MainMenu as any
@@ -199,6 +205,27 @@ const ExcalidrawWrapper = dynamic(
         return defaultData
       }, [_initialData, themeMode]) // Depend on actual initialData prop and theme mode
 
+      // Inject CSS to hide the default Excalidraw context menu
+      React.useEffect(() => {
+        const style = document.createElement('style')
+        style.textContent = `
+          .context-menu {
+            display: none !important;
+          }
+          .ContextMenu {
+            display: none !important;
+          }
+          .excalidraw .context-menu {
+            display: none !important;
+          }
+        `
+        document.head.appendChild(style)
+
+        return () => {
+          document.head.removeChild(style)
+        }
+      }, [])
+
       return (
         <div style={{ height: '100%', width: '100%' }}>
           <ExcalidrawTyped
@@ -211,6 +238,60 @@ const ExcalidrawWrapper = dynamic(
               // Store the API reference and mark as ready
               apiRef.current = api
               setIsAPIReady(true)
+
+              // Erweitere das Kontext-Menü durch Überschreibung der getContextMenuItems-Methode
+              if (api.actionManager && api.actionManager.app) {
+                const originalGetContextMenuItems = api.actionManager.app.getContextMenuItems
+
+                api.actionManager.app.getContextMenuItems = function (type: 'canvas' | 'element') {
+                  // Erhalte die Standard-Menü-Items
+                  const standardItems = originalGetContextMenuItems.call(this, type)
+
+                  // Für Element-Kontext-Menü: Prüfe, ob das ausgewählte Element eine databaseId hat
+                  if (type === 'element' && !this.state.viewModeEnabled) {
+                    const elements = this.state.excalidrawAPI?.getSceneElements() || []
+                    const selectedElements = elements.filter(
+                      (el: any) => this.state.selectedElementIds[el.id]
+                    )
+
+                    if (selectedElements.length === 1) {
+                      const element = selectedElements[0]
+                      const hasDbId = element?.customData?.databaseId
+
+                      if (hasDbId) {
+                        // Füge unseren benutzerdefinierten Menüpunkt hinzu
+                        const customAction = {
+                          name: 'addRelatedElements',
+                          label: 'Verwandte Elemente hinzufügen',
+                          perform: () => {
+                            console.log(
+                              'Add Related Elements triggered from context menu for:',
+                              element
+                            )
+                            onOpenAddRelatedElementsDialog(element)
+                            return false
+                          },
+                          predicate: () => !this.state.viewModeEnabled && hasDbId,
+                          trackEvent: {
+                            category: 'element',
+                            action: 'addRelatedElements',
+                          },
+                        }
+
+                        // Füge Separator und unsere Action hinzu
+                        return [...standardItems, 'separator', customAction]
+                      }
+                    }
+                  }
+
+                  // Für alle anderen Fälle: Standard-Items zurückgeben
+                  return standardItems
+                }
+
+                console.log('Successfully overrode getContextMenuItems method')
+              } else {
+                console.warn('ActionManager or app not available for context menu override')
+              }
 
               // Also call the original excalidrawAPI if provided
               if (excalidrawAPI) {
@@ -235,6 +316,8 @@ const ExcalidrawWrapper = dynamic(
                   {t('actions.new')}
                 </MainMenuTyped.Item>
               )}
+
+              {/* Custom Add Related Elements Menu Item - Entfernt, da ohne Selektion nicht sinnvoll */}
 
               {/* Custom Open Menu Item - available for all users */}
               <MainMenuTyped.Item
@@ -428,6 +511,13 @@ const ExcalidrawWrapper = dynamic(
             </MainMenuTyped>
           </ExcalidrawTyped>
 
+          {/* Custom Context Menu */}
+          <FullCustomContextMenu
+            excalidrawAPI={apiRef.current}
+            onOpenAddRelatedElementsDialog={onOpenAddRelatedElementsDialog}
+            viewModeEnabled={viewModeEnabled}
+          />
+
           {/* Collaboration Dialog */}
           <CollaborationDialog
             isOpen={isCollaborationDialogOpen}
@@ -437,6 +527,14 @@ const ExcalidrawWrapper = dynamic(
             collaborators={collaborators}
             onStartCollaboration={startCollaborationSafe}
             onStopCollaboration={stopCollaboration}
+          />
+
+          {/* Add Related Elements Dialog */}
+          <AddRelatedElementsDialog
+            isOpen={isAddRelatedElementsDialogOpen}
+            onClose={onCloseAddRelatedElementsDialog}
+            selectedElement={selectedElementForRelatedElements}
+            excalidrawAPI={apiRef.current}
           />
         </div>
       )

@@ -24,6 +24,11 @@ export interface ExcalidrawComponentProps {
   currentDiagram?: any
   onDiagramUpdate?: (diagram: any) => void
   onCollaborationStatusChange?: (isCollaborating: boolean) => void
+  // Add Related Elements functionality
+  selectedElementForRelatedElements?: any
+  onOpenAddRelatedElementsDialog: (element: any) => void
+  onCloseAddRelatedElementsDialog: () => void
+  isAddRelatedElementsDialogOpen: boolean
 }
 
 export interface NotificationState {
@@ -47,6 +52,7 @@ export interface DialogStates {
   openDialogOpen: boolean
   deleteDialogOpen: boolean
   capabilityMapGeneratorOpen: boolean
+  addRelatedElementsDialogOpen: boolean
 }
 
 export interface DiagramHandlers {

@@ -19,6 +19,8 @@ export const useDiagramState = () => {
   const [currentScene, setCurrentScene] = useState<any>(null)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [lastSavedScene, setLastSavedScene] = useState<any>(null)
+  const [selectedElementForRelatedElements, setSelectedElementForRelatedElements] =
+    useState<any>(null)
 
   // Track if scene has been restored to prevent multiple restorations
   const sceneRestoredRef = useRef(false)
@@ -35,6 +37,7 @@ export const useDiagramState = () => {
     openDialogOpen: false,
     deleteDialogOpen: false,
     capabilityMapGeneratorOpen: false,
+    addRelatedElementsDialogOpen: false,
   })
 
   // Notification State
@@ -160,6 +163,7 @@ export const useDiagramState = () => {
     lastSavedScene,
     dialogStates,
     notification,
+    selectedElementForRelatedElements,
 
     // State setters
     setExcalidrawAPI,
@@ -169,6 +173,7 @@ export const useDiagramState = () => {
     setLastSavedScene,
     setNotification,
     updateDialogState,
+    setSelectedElementForRelatedElements,
   }
 }
 
