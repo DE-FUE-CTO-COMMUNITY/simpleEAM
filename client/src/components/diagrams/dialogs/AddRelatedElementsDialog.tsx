@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -16,12 +16,15 @@ import {
   Box,
   CircularProgress,
   Alert,
+  Chip,
 } from '@mui/material'
+import FilterListIcon from '@mui/icons-material/FilterList'
 import { useTranslations } from 'next-intl'
 import { useForm } from '@tanstack/react-form'
 import { useApolloClient } from '@apollo/client'
-import { ArrowType, RelativePosition } from '../types/addRelatedElements'
+import { ArrowType, RelativePosition, AddRelatedElementsConfig } from '../types/addRelatedElements'
 import { loadAndCreateRelatedElements } from '../utils/addRelatedElementsService'
+import ElementTypeSelectionDialog, { ElementTypeOption } from './ElementTypeSelectionDialog'
 
 interface AddRelatedElementsDialogProps {
   isOpen: boolean
@@ -41,11 +44,100 @@ export default function AddRelatedElementsDialog({
   const [isLoading, setIsLoading] = useState(false)
   const [elementName, setElementName] = useState<string>('')
   const [resultMessage, setResultMessage] = useState<string>('')
+  const [isTypeSelectionOpen, setIsTypeSelectionOpen] = useState(false)
+  const [selectedElementTypes, setSelectedElementTypes] = useState<string[]>([
+    'capability',
+    'application',
+    'dataObject',
+    'interface',
+    'infrastructure',
+  ])
+  const [expectedElementCount, setExpectedElementCount] = useState<number>(0)
+  const [allRelatedElements, setAllRelatedElements] = useState<any[]>([])
   const apolloClient = useApolloClient()
 
-  // Extract element information when dialog opens
+  // Available element types for selection
+  const availableElementTypes: ElementTypeOption[] = [
+    {
+      id: 'capability',
+      label: 'Capabilities',
+      description: 'Geschäftsfähigkeiten und Funktionen',
+    },
+    {
+      id: 'application',
+      label: 'Applications',
+      description: 'Anwendungen und Software-Komponenten',
+    },
+    {
+      id: 'dataObject',
+      label: 'Data Objects',
+      description: 'Datenobjekte und Informationsstrukturen',
+    },
+    {
+      id: 'interface',
+      label: 'Interfaces',
+      description: 'Schnittstellen zwischen Komponenten',
+    },
+    {
+      id: 'infrastructure',
+      label: 'Infrastructure',
+      description: 'Infrastruktur-Komponenten und Hardware',
+    },
+  ]
+
+  // Function to calculate expected element count based on current filter
+  const calculateExpectedCount = (relatedElements: any[], selectedTypes: string[]): number => {
+    return relatedElements.filter(element => selectedTypes.includes(element.elementType)).length
+  }
+
+  // Function to load related elements for preview
+  const loadRelatedElementsPreview = useCallback(
+    async (element: any) => {
+      if (!element?.customData?.databaseId) return []
+
+      try {
+        const databaseId = element.customData.databaseId
+        const elementType = element.customData.elementType
+
+        // Use the service function to load related elements
+        const { loadRelatedElementsFromDatabase } = await import(
+          '../utils/addRelatedElementsService'
+        )
+        const response = await loadRelatedElementsFromDatabase(
+          apolloClient,
+          databaseId,
+          elementType
+        )
+        return response.elements || []
+      } catch (error) {
+        console.error('Error loading related elements preview:', error)
+        return []
+      }
+    },
+    [apolloClient]
+  )
+
+  // Update expected count when filter changes
+  useEffect(() => {
+    const newCount = calculateExpectedCount(allRelatedElements, selectedElementTypes)
+    setExpectedElementCount(newCount)
+  }, [allRelatedElements, selectedElementTypes])
+
+  // Handler for element type selection changes
+  const handleElementTypeChange = (newSelectedTypes: string[]) => {
+    setSelectedElementTypes(newSelectedTypes)
+    // Clear any previous result message when filter changes
+    setResultMessage('')
+  }
+
+  // Extract element information and load related elements when dialog opens
   useEffect(() => {
     if (isOpen && selectedElement) {
+      // Reset states
+      setResultMessage('')
+      setAllRelatedElements([])
+      setExpectedElementCount(0)
+
       // Extract database ID and element name from customData
       const customData = selectedElement.customData
       if (customData?.databaseId && customData?.elementName) {
@@ -59,8 +151,13 @@ export default function AddRelatedElementsDialog({
           setElementName('Unknown Element')
         }
       }
+
+      // Load related elements for preview
+      loadRelatedElementsPreview(selectedElement).then(elements => {
+        setAllRelatedElements(elements)
+      })
     }
-  }, [isOpen, selectedElement])
+  }, [isOpen, selectedElement, loadRelatedElementsPreview])
 
   // Form configuration
   const form = useForm({
@@ -76,6 +173,8 @@ export default function AddRelatedElementsDialog({
         return
       }
 
+      // Set loading state IMMEDIATELY before any async operations
+      console.log('Setting isLoading to true')
       setIsLoading(true)
       setResultMessage('')
 
@@ -95,25 +194,31 @@ export default function AddRelatedElementsDialog({
           apolloClient,
           selectedElement,
           excalidrawAPI,
-          value
+          {
+            ...value,
+            selectedElementTypes,
+          }
         )
 
         if (result.success) {
           console.log(`Successfully added ${result.elementsAdded} related elements`)
-          setResultMessage(`${result.elementsAdded} verwandte Elemente hinzugefügt`)
+          setResultMessage(
+            `${result.elementsAdded} verwandte Elemente wurden erfolgreich hinzugefügt`
+          )
 
-          // Kurz warten und dann Dialog schließen
-          setTimeout(() => {
-            onClose()
-          }, 1500)
+          // Bei Erfolg sofort schließen
+          onClose()
         } else {
           console.error('Failed to add related elements:', result.errorMessage)
           setResultMessage(result.errorMessage || 'Fehler beim Hinzufügen der Elemente')
+          // Bei Fehler NICHT automatisch schließen
         }
       } catch (error) {
         console.error('Error adding related elements:', error)
         setResultMessage(`Fehler: ${error instanceof Error ? error.message : 'Unbekannter Fehler'}`)
+        // Bei Fehler NICHT automatisch schließen
       } finally {
+        console.log('Setting isLoading to false')
         setIsLoading(false)
       }
     },
@@ -124,17 +229,72 @@ export default function AddRelatedElementsDialog({
   }
 
   return (
-    <Dialog open={isOpen} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog
+      open={isOpen}
+      onClose={isLoading ? undefined : onClose}
+      maxWidth="sm"
+      fullWidth
+      disableEscapeKeyDown={isLoading}
+    >
       <DialogTitle>{t('title')}</DialogTitle>
       <DialogContent>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
           {t('description', { element: elementName })}
         </Typography>
 
+        {/* Processing Indicator */}
+        {isLoading && (
+          <Alert
+            severity="info"
+            icon={<CircularProgress size={20} />}
+            sx={{ mb: 3, fontWeight: 'bold' }}
+          >
+            Verarbeite verwandte Elemente... Bitte warten.
+          </Alert>
+        )}
+
         {/* Ergebnis-Nachricht anzeigen */}
         {resultMessage && (
-          <Alert severity={resultMessage.includes('Fehler') ? 'error' : 'success'} sx={{ mb: 2 }}>
+          <Alert severity={resultMessage.includes('Fehler') ? 'error' : 'success'} sx={{ mb: 3 }}>
             {resultMessage}
+          </Alert>
+        )}
+
+        {/* Element Type Selection */}
+        <Box sx={{ mb: 3 }}>
+          <Box
+            sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}
+          >
+            <Typography variant="h6">Element-Typen</Typography>
+            <Button
+              startIcon={<FilterListIcon />}
+              variant="outlined"
+              size="small"
+              onClick={() => setIsTypeSelectionOpen(true)}
+            >
+              Auswählen ({selectedElementTypes.length})
+            </Button>
+          </Box>
+
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+            {selectedElementTypes.map(typeId => {
+              const type = availableElementTypes.find(t => t.id === typeId)
+              return type ? (
+                <Chip key={typeId} label={type.label} size="small" variant="outlined" />
+              ) : null
+            })}
+            {selectedElementTypes.length === 0 && (
+              <Typography variant="body2" color="text.secondary">
+                Keine Element-Typen ausgewählt
+              </Typography>
+            )}
+          </Box>
+        </Box>
+
+        {/* Expected Element Count */}
+        {expectedElementCount > 0 && !resultMessage && (
+          <Alert severity="info" sx={{ mb: 3 }}>
+            {expectedElementCount} verwandte Elemente dieser Typen werden hinzugefügt
           </Alert>
         )}
 
@@ -144,6 +304,7 @@ export default function AddRelatedElementsDialog({
             e.stopPropagation()
             void form.handleSubmit()
           }}
+          style={{ marginTop: '40px' }}
         >
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             {/* Number of Hops */}
@@ -249,7 +410,9 @@ export default function AddRelatedElementsDialog({
             <Button
               onClick={() => form.handleSubmit()}
               variant="contained"
-              disabled={!canSubmit || isLoading || isSubmitting}
+              disabled={
+                !canSubmit || isLoading || isSubmitting || selectedElementTypes.length === 0
+              }
             >
               {isLoading || isSubmitting ? <CircularProgress size={20} sx={{ mr: 1 }} /> : null}
               {t('add')}
@@ -257,6 +420,17 @@ export default function AddRelatedElementsDialog({
           )}
         </form.Subscribe>
       </DialogActions>
+
+      {/* Element Type Selection Dialog */}
+      <ElementTypeSelectionDialog
+        isOpen={isTypeSelectionOpen}
+        onClose={() => setIsTypeSelectionOpen(false)}
+        onConfirm={handleElementTypeChange}
+        availableTypes={availableElementTypes}
+        initialSelectedTypes={selectedElementTypes}
+        title="Element-Typen auswählen"
+        description="Wählen Sie die Typen von verwandten Elementen aus, die hinzugefügt werden sollen."
+      />
     </Dialog>
   )
 }

@@ -8,7 +8,7 @@ import {
   RelatedElement,
   RelatedElementsResponse,
 } from '@/graphql/relatedElements'
-import { ArrowType, RelativePosition } from '../types/addRelatedElements'
+import { ArrowType, RelativePosition, AddRelatedElementsConfig } from '../types/addRelatedElements'
 import {
   createCapabilityElementsFromTemplate,
   createApplicationElementsFromTemplate,
@@ -19,13 +19,6 @@ import {
 
 import { findArchimateTemplate, loadArchimateLibrary } from './archimateLibraryUtils'
 import { generateElementId } from './elementIdManager'
-
-interface AddRelatedElementsConfig {
-  hops: number
-  position: RelativePosition
-  arrowType: ArrowType
-  spacing: number
-}
 
 interface CreateRelatedElementsResult {
   success: boolean
@@ -164,7 +157,7 @@ const updateElementBindings = (
 /**
  * Universelle Funktion zur Erstellung von Elementen aus Archimate-Templates
  */
-const loadRelatedElementsFromDatabase = async (
+export const loadRelatedElementsFromDatabase = async (
   apolloClient: ApolloClient<any>,
   elementId: string,
   elementType: string
@@ -518,6 +511,20 @@ const createExcalidrawElementsFromRelated = async (
   const newElements: any[] = []
   const newArrows: any[] = []
 
+  // Filter elements by selected types if specified
+  const filteredRelatedElements = config.selectedElementTypes
+    ? relatedElements.filter(element => config.selectedElementTypes!.includes(element.elementType))
+    : relatedElements
+
+  if (filteredRelatedElements.length === 0) {
+    return {
+      success: true,
+      elementsAdded: 0,
+      elements: [],
+      arrows: [],
+    }
+  }
+
   // Position des ausgewählten Elements
   const sourceX = selectedElement.x
   const sourceY = selectedElement.y
@@ -526,15 +533,15 @@ const createExcalidrawElementsFromRelated = async (
 
   // Berechne Positionen basierend auf der gewählten Richtung
   const positions = calculateElementPositions(
-    relatedElements,
+    filteredRelatedElements,
     { x: sourceX, y: sourceY, width: sourceWidth, height: sourceHeight },
     config.position,
     config.spacing
   )
 
   // Erstelle Elemente für jeden verwandten Eintrag
-  for (let i = 0; i < relatedElements.length; i++) {
-    const relatedElement = relatedElements[i]
+  for (let i = 0; i < filteredRelatedElements.length; i++) {
+    const relatedElement = filteredRelatedElements[i]
     const position = positions[i]
 
     // Finde das passende Template basierend auf Element-Typ
@@ -650,7 +657,7 @@ const createExcalidrawElementsFromRelated = async (
 
   return {
     success: true,
-    elementsAdded: relatedElements.length,
+    elementsAdded: filteredRelatedElements.length,
     elements: newElements,
     arrows: newArrows,
   }

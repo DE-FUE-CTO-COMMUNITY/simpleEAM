@@ -24,6 +24,8 @@ export interface AddRelatedElementsConfig {
   position: RelativePosition
   /** Abstand zwischen einzelnen Elementen */
   spacing: number
+  /** Ausgewählte Element-Typen (optional, wenn nicht gesetzt werden alle Typen verwendet) */
+  selectedElementTypes?: string[]
 }
 
 /**
