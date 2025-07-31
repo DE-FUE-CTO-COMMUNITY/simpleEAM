@@ -1216,51 +1216,16 @@ const createArrowBetweenElements = (
   // Konfiguriere Pfeil-Typ
   const arrowConfig = getArrowConfiguration(arrowType)
 
-  // Pfeil-Geometrie: Positionsspezifische Berechnung
-  let arrowGeometry
-  if (position === 'left') {
-    // Bei "left": Pfeil startet vom linken Rand des Source-Elements zum rechten Rand des Target-Elements
-    arrowGeometry = {
-      x: sourceConnectionPoint.x, // Startpunkt: linker Rand des Source-Elements
-      y: sourceConnectionPoint.y, // Startpunkt Y
-      width: targetConnectionPoint.x - sourceConnectionPoint.x, // Breite: Differenz x-Koordinaten
-      height: targetConnectionPoint.y - sourceConnectionPoint.y, // Höhe: Differenz y-Koordinaten
-    }
-  } else if (position === 'right') {
-    // Bei "right": Pfeil startet vom rechten Rand des Source-Elements zum linken Rand des Target-Elements
-    arrowGeometry = {
-      x: sourceConnectionPoint.x, // Startpunkt: rechter Rand des Source-Elements
-      y: sourceConnectionPoint.y, // Startpunkt Y
-      width: targetConnectionPoint.x - sourceConnectionPoint.x, // Breite: Differenz x-Koordinaten
-      height: targetConnectionPoint.y - sourceConnectionPoint.y, // Höhe: Differenz y-Koordinaten
-    }
-  } else if (position === 'top') {
-    // Bei "top": Pfeil startet vom oberen Rand des Source-Elements zum unteren Rand des Target-Elements
-    arrowGeometry = {
-      x: sourceConnectionPoint.x, // Startpunkt X
-      y: sourceConnectionPoint.y, // Startpunkt: oberer Rand des Source-Elements
-      width: targetConnectionPoint.x - sourceConnectionPoint.x, // Breite: Differenz x-Koordinaten
-      height: targetConnectionPoint.y - sourceConnectionPoint.y, // Höhe: Differenz y-Koordinaten
-    }
-  } else if (position === 'bottom') {
-    // Bei "bottom": Pfeil startet vom unteren Rand des Source-Elements zum oberen Rand des Target-Elements
-    arrowGeometry = {
-      x: sourceConnectionPoint.x, // Startpunkt X
-      y: sourceConnectionPoint.y, // Startpunkt: unterer Rand des Source-Elements
-      width: targetConnectionPoint.x - sourceConnectionPoint.x, // Breite: Differenz x-Koordinaten
-      height: targetConnectionPoint.y - sourceConnectionPoint.y, // Höhe: Differenz y-Koordinaten
-    }
-  } else {
-    // Für alle anderen Positionen: Standard-Berechnung
-    arrowGeometry = {
-      x: Math.min(sourceConnectionPoint.x, targetConnectionPoint.x),
-      y: Math.min(sourceConnectionPoint.y, targetConnectionPoint.y),
-      width: Math.abs(targetConnectionPoint.x - sourceConnectionPoint.x),
-      height: Math.abs(targetConnectionPoint.y - sourceConnectionPoint.y),
-    }
-  }
+  // Berechne Wegpunkte basierend auf Pfeil-Typ und Position
+  const { points, arrowGeometry } = calculateArrowPointsAndGeometry(
+    sourceConnectionPoint,
+    targetConnectionPoint,
+    arrowType,
+    position
+  )
 
   console.log(`🎯 Arrow geometry for position ${position}:`, arrowGeometry)
+  console.log(`📍 Arrow points for type ${arrowType}:`, points)
 
   return {
     id: arrowId,
@@ -1286,33 +1251,7 @@ const createArrowBetweenElements = (
     updated: Date.now(),
     link: null,
     locked: false,
-    points: [
-      [0, 0],
-      position === 'left'
-        ? [
-            targetConnectionPoint.x - sourceConnectionPoint.x,
-            targetConnectionPoint.y - sourceConnectionPoint.y,
-          ]
-        : position === 'right'
-          ? [
-              targetConnectionPoint.x - sourceConnectionPoint.x,
-              targetConnectionPoint.y - sourceConnectionPoint.y,
-            ]
-          : position === 'top'
-            ? [
-                targetConnectionPoint.x - sourceConnectionPoint.x,
-                targetConnectionPoint.y - sourceConnectionPoint.y,
-              ]
-            : position === 'bottom'
-              ? [
-                  targetConnectionPoint.x - sourceConnectionPoint.x,
-                  targetConnectionPoint.y - sourceConnectionPoint.y,
-                ]
-              : [
-                  targetConnectionPoint.x - sourceConnectionPoint.x,
-                  targetConnectionPoint.y - sourceConnectionPoint.y,
-                ],
-    ],
+    points: points,
     lastCommittedPoint: null,
     startBinding:
       position === 'left'
@@ -1340,7 +1279,141 @@ const createArrowBetweenElements = (
           },
     startArrowhead: reverseArrow ? 'arrow' : null,
     endArrowhead: reverseArrow ? null : 'arrow',
+    elbowed: arrowConfig.elbowed, // Hinzufügung der elbowed-Eigenschaft für verschiedene Pfeiltypen
   }
+}
+
+/**
+ * Berechnet Wegpunkte und Geometrie für verschiedene Pfeiltypen
+ */
+const calculateArrowPointsAndGeometry = (
+  sourcePoint: { x: number; y: number },
+  targetPoint: { x: number; y: number },
+  arrowType: ArrowType,
+  position?: RelativePosition
+): {
+  points: [number, number][]
+  arrowGeometry: { x: number; y: number; width: number; height: number }
+} => {
+  if (arrowType === 'sharp') {
+    // Sharp (straight) - einfache direkte Verbindung wie bisher
+    const minX = Math.min(sourcePoint.x, targetPoint.x)
+    const minY = Math.min(sourcePoint.y, targetPoint.y)
+    const width = Math.abs(targetPoint.x - sourcePoint.x)
+    const height = Math.abs(targetPoint.y - sourcePoint.y)
+
+    return {
+      points: [
+        [sourcePoint.x - minX, sourcePoint.y - minY],
+        [targetPoint.x - minX, targetPoint.y - minY],
+      ],
+      arrowGeometry: { x: minX, y: minY, width, height },
+    }
+  }
+
+  // Für elbow und curved: erweiterte Berechnung mit positionsspezifischer Geometrie
+  let arrowGeometry: { x: number; y: number; width: number; height: number }
+  let points: [number, number][]
+
+  if (position === 'left') {
+    arrowGeometry = {
+      x: sourcePoint.x,
+      y: sourcePoint.y,
+      width: targetPoint.x - sourcePoint.x,
+      height: targetPoint.y - sourcePoint.y,
+    }
+  } else if (position === 'right') {
+    arrowGeometry = {
+      x: sourcePoint.x,
+      y: sourcePoint.y,
+      width: targetPoint.x - sourcePoint.x,
+      height: targetPoint.y - sourcePoint.y,
+    }
+  } else if (position === 'top') {
+    arrowGeometry = {
+      x: sourcePoint.x,
+      y: sourcePoint.y,
+      width: targetPoint.x - sourcePoint.x,
+      height: targetPoint.y - sourcePoint.y,
+    }
+  } else if (position === 'bottom') {
+    arrowGeometry = {
+      x: sourcePoint.x,
+      y: sourcePoint.y,
+      width: targetPoint.x - sourcePoint.x,
+      height: targetPoint.y - sourcePoint.y,
+    }
+  } else {
+    // Fallback: Basis-Geometrie
+    const minX = Math.min(sourcePoint.x, targetPoint.x)
+    const minY = Math.min(sourcePoint.y, targetPoint.y)
+    arrowGeometry = {
+      x: minX,
+      y: minY,
+      width: Math.abs(targetPoint.x - sourcePoint.x),
+      height: Math.abs(targetPoint.y - sourcePoint.y),
+    }
+  }
+
+  // Berechne relative Punkte basierend auf der Arrow-Geometrie
+  const relativeTargetX = targetPoint.x - arrowGeometry.x
+  const relativeTargetY = targetPoint.y - arrowGeometry.y
+
+  if (arrowType === 'elbow') {
+    // Elbow-Pfeile haben rechtwinklige Verbindungen mit 4 Wegpunkten
+    if (position === 'left' || position === 'right') {
+      // Horizontale Verbindung: erst horizontal, dann vertikal
+      const midX = relativeTargetX / 2
+      points = [
+        [0, 0], // Start (relativ zur Arrow-Geometrie)
+        [midX, 0], // Horizontaler Zwischenpunkt
+        [midX, relativeTargetY], // Vertikaler Zwischenpunkt
+        [relativeTargetX, relativeTargetY], // Ende
+      ]
+    } else {
+      // Vertikale Verbindung: erst vertikal, dann horizontal
+      const midY = relativeTargetY / 2
+      points = [
+        [0, 0], // Start
+        [0, midY], // Vertikaler Zwischenpunkt
+        [relativeTargetX, midY], // Horizontaler Zwischenpunkt
+        [relativeTargetX, relativeTargetY], // Ende
+      ]
+    }
+  } else if (arrowType === 'curved') {
+    // Curved-Pfeile haben mehrere Punkte für sanfte Kurven
+    const deltaX = relativeTargetX
+    const deltaY = relativeTargetY
+
+    // Kontrollpunkte für Bézier-ähnliche Kurve
+    const controlOffset = Math.min(Math.abs(deltaX), Math.abs(deltaY)) * 0.4
+
+    if (position === 'left' || position === 'right') {
+      // Horizontale Kurve
+      points = [
+        [0, 0],
+        [deltaX * 0.3, controlOffset * Math.sign(deltaY)],
+        [deltaX * 0.7, deltaY - controlOffset * Math.sign(deltaY)],
+        [deltaX, deltaY],
+      ]
+    } else {
+      // Vertikale Kurve
+      points = [
+        [0, 0],
+        [controlOffset * Math.sign(deltaX), deltaY * 0.3],
+        [deltaX - controlOffset * Math.sign(deltaX), deltaY * 0.7],
+        [deltaX, deltaY],
+      ]
+    }
+  } else {
+    // Fallback für unbekannte Typen
+    points = [
+      [0, 0],
+      [relativeTargetX, relativeTargetY],
+    ]
+  }
+
+  return { points, arrowGeometry }
 }
 
 /**
@@ -1423,16 +1496,19 @@ const getArrowConfiguration = (arrowType: ArrowType) => {
   switch (arrowType) {
     case 'curved':
       return {
-        roundness: { type: 2, value: 0.5 }, // Gebogene Linie
+        roundness: { type: 2, value: 0.5 }, // Gebogene Linie mit sanfter Kurve
+        elbowed: false, // Explizit false für curved arrows
       }
     case 'elbow':
       return {
         roundness: { type: 1 }, // Rechtwinklige Verbindung
+        elbowed: true, // Explizit true für elbow arrows
       }
     case 'sharp':
     default:
       return {
         roundness: null, // Gerade Linie
+        elbowed: false, // Explizit false für sharp arrows
       }
   }
 }
@@ -1451,13 +1527,18 @@ const createFallbackArrow = (
   const endX = targetElement.x
   const endY = targetElement.y + targetElement.height / 2
 
+  // Berechne Wegpunkte auch für Fallback-Pfeile
+  const { points, arrowGeometry } = calculateArrowPointsAndGeometry(
+    { x: startX, y: startY },
+    { x: endX, y: endY },
+    arrowType,
+    'right' // Default-Position für Fallback
+  )
+
   return {
     id: arrowId,
     type: 'arrow',
-    x: Math.min(startX, endX),
-    y: Math.min(startY, endY),
-    width: Math.abs(endX - startX),
-    height: Math.abs(endY - startY),
+    ...arrowGeometry,
     angle: 0,
     strokeColor: '#1e1e1e',
     backgroundColor: 'transparent',
@@ -1478,10 +1559,7 @@ const createFallbackArrow = (
     updated: Date.now(),
     link: null,
     locked: false,
-    points: [
-      [0, 0],
-      [endX - startX, endY - startY],
-    ],
+    points: points,
     lastCommittedPoint: null,
     startBinding: {
       elementId: sourceElement.id,
@@ -1495,5 +1573,6 @@ const createFallbackArrow = (
     },
     startArrowhead: null,
     endArrowhead: 'arrow',
+    elbowed: getArrowConfiguration(arrowType).elbowed, // Hinzufügung der elbowed-Eigenschaft für Fallback-Pfeile
   }
 }
