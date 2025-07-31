@@ -145,7 +145,7 @@ export const GET_RELATED_ELEMENTS_FOR_INTERFACE = gql`
       description
       interfaceType
       # Direkt verwandte Elemente
-      sourceApplication {
+      sourceApplications {
         id
         name
         description

@@ -12,12 +12,10 @@ import { ArrowType, RelativePosition } from '../types/addRelatedElements'
 import {
   createCapabilityElementsFromTemplate,
   createApplicationElementsFromTemplate,
+  createDataObjectElementsFromTemplate,
+  createInterfaceElementsFromTemplate,
+  createInfrastructureElementsFromTemplate,
 } from './elementCreation'
-import {
-  createDataObjectElementsFromTemplate as createDataObjectElements,
-  createInterfaceElementsFromTemplate as createInterfaceElements,
-  createInfrastructureElementsFromTemplate as createInfrastructureElements,
-} from './elementCreationAdditions'
 
 import { findArchimateTemplate, loadArchimateLibrary } from './archimateLibraryUtils'
 import { generateElementId } from './elementIdManager'
@@ -125,49 +123,10 @@ const getArchimateTemplateName = (elementType: string): string => {
     dataObject: 'Business Object',
     interface: 'Application Interface',
     applicationInterface: 'Application Interface',
-    infrastructure: 'Node',
+    infrastructure: 'Infrastruktur', // Deutsch statt 'Node'
   }
 
   return mapping[elementType] || elementType
-}
-
-/**
- * Erstellt Data Object Elemente aus Template - verwendet die Application-Template-Logik
- */
-const createDataObjectElementsFromTemplate = (
-  element: RelatedElement,
-  template: any,
-  x: number,
-  y: number
-): any[] => {
-  // Verwende die spezialisierte DataObject-Funktion
-  return createDataObjectElements(element, template, x, y)
-}
-
-/**
- * Erstellt Interface Elemente aus Template - verwendet die Application-Template-Logik
- */
-const createInterfaceElementsFromTemplate = (
-  element: RelatedElement,
-  template: any,
-  x: number,
-  y: number
-): any[] => {
-  // Verwende die spezialisierte Interface-Funktion
-  return createInterfaceElements(element, template, x, y)
-}
-
-/**
- * Erstellt Infrastructure Elemente aus Template - verwendet die Infrastructure-Template-Logik
- */
-const createInfrastructureElementsFromTemplate = (
-  element: RelatedElement,
-  template: any,
-  x: number,
-  y: number
-): any[] => {
-  // Verwende die spezialisierte Infrastructure-Funktion
-  return createInfrastructureElements(element, template, x, y)
 }
 
 /**
@@ -205,92 +164,6 @@ const updateElementBindings = (
 /**
  * Universelle Funktion zur Erstellung von Elementen aus Archimate-Templates
  */
-const createElementsFromArchimateTemplate = (
-  element: RelatedElement,
-  template: any,
-  targetX: number,
-  targetY: number
-): any[] => {
-  if (!template || !template.elements) {
-    console.warn('Invalid template provided:', template)
-    return createGenericElementFromTemplate(element, template, targetX, targetY)
-  }
-
-  // Erstelle ID-Mapping für alle Template-Elemente
-  const idMapping = new Map<string, string>()
-  template.elements.forEach((el: any) => {
-    idMapping.set(el.id, generateElementId())
-  })
-
-  // Berechne Template-Grenzen für korrekte Positionierung
-  const templateBounds = {
-    minX: Math.min(...template.elements.map((el: any) => el.x)),
-    minY: Math.min(...template.elements.map((el: any) => el.y)),
-    maxX: Math.max(...template.elements.map((el: any) => el.x + (el.width || 0))),
-    maxY: Math.max(...template.elements.map((el: any) => el.y + (el.height || 0))),
-  }
-
-  // Berechne Offset für Positionierung
-  const offsetX = targetX - templateBounds.minX
-  const offsetY = targetY - templateBounds.minY
-
-  const createdElements: any[] = []
-  let mainElementId: string | null = null
-
-  // Erstelle alle Elemente aus dem Template
-  template.elements.forEach((templateElement: any) => {
-    const newId = idMapping.get(templateElement.id)!
-
-    // Das erste nicht-Text-Element ist das Haupt-Element
-    if (!mainElementId && templateElement.type !== 'text') {
-      mainElementId = newId
-    }
-
-    // Kopiere das Template-Element mit neuen Eigenschaften
-    const newElement = {
-      ...templateElement,
-      id: newId,
-      x: templateElement.x + offsetX,
-      y: templateElement.y + offsetY,
-      seed: Math.floor(Math.random() * 1000000),
-      version: 1,
-      versionNonce: Math.floor(Math.random() * 1000000),
-      updated: Date.now(),
-      isDeleted: false,
-      customData: {
-        databaseId: element.id,
-        elementType: element.elementType,
-        elementName: element.name,
-        isFromDatabase: true,
-        isMainElement: templateElement.type !== 'text' && newId === mainElementId,
-        mainElementId: mainElementId || newId,
-      },
-    }
-
-    // Aktualisiere Referenzen auf andere Elemente
-    if (templateElement.containerId && idMapping.has(templateElement.containerId)) {
-      newElement.containerId = idMapping.get(templateElement.containerId)!
-    }
-
-    if (templateElement.boundElements) {
-      newElement.boundElements = templateElement.boundElements.map((bound: any) => ({
-        ...bound,
-        id: idMapping.get(bound.id) || bound.id,
-      }))
-    }
-
-    // Aktualisiere Text-Inhalt für Text-Elemente
-    if (templateElement.type === 'text') {
-      newElement.text = element.name
-      newElement.originalText = element.name
-    }
-
-    createdElements.push(newElement)
-  })
-
-  return createdElements
-}
-
 const loadRelatedElementsFromDatabase = async (
   apolloClient: ApolloClient<any>,
   elementId: string,
@@ -550,15 +423,17 @@ const extractRelatedElementsFromQueryResult = (
       break
 
     case 'interface':
-      // Source Application
-      if (elementData.sourceApplication) {
-        relatedElements.push({
-          id: elementData.sourceApplication.id,
-          name: elementData.sourceApplication.name,
-          description: elementData.sourceApplication.description,
-          elementType: 'application',
-          status: elementData.sourceApplication.status,
-          criticality: elementData.sourceApplication.criticality,
+      // Source Applications (als Array behandeln)
+      if (elementData.sourceApplications && elementData.sourceApplications.length > 0) {
+        elementData.sourceApplications.forEach((app: any) => {
+          relatedElements.push({
+            id: app.id,
+            name: app.name,
+            description: app.description,
+            elementType: 'application',
+            status: app.status,
+            criticality: app.criticality,
+          })
         })
       }
 
@@ -665,6 +540,7 @@ const createExcalidrawElementsFromRelated = async (
     // Finde das passende Template basierend auf Element-Typ
     const templateName = getArchimateTemplateName(relatedElement.elementType)
     const template = findArchimateTemplate(library, templateName)
+
     if (!template) {
       console.warn(
         `No template found for element type: ${relatedElement.elementType} (template name: ${templateName})`

@@ -41,6 +41,14 @@ export function findArchimateTemplate(
       ],
       'Business Object': ['Data Object', 'Data', 'Object'],
       'Application Interface': ['Interface', 'API'],
+      Infrastruktur: [
+        'Infrastructure',
+        'Server',
+        'Device',
+        'Technology Node',
+        'System Software',
+        'Node',
+      ],
     }
 
     const alts = alternatives[templateName as keyof typeof alternatives] || []
