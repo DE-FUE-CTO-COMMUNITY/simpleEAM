@@ -553,6 +553,51 @@ const getRelationshipTypesForElement = (elementType: string): string[] => {
 }
 
 /**
+ * Filtert Elemente heraus, die bereits mit dem ausgewählten Element verbunden sind
+ */
+const filterAlreadyConnectedElements = (
+  relatedElements: RelatedElement[],
+  selectedElement: any,
+  excalidrawAPI: any
+): RelatedElement[] => {
+  const currentElements = excalidrawAPI.getSceneElements()
+
+  // Finde alle existierenden Elemente mit Datenbankverknüpfungen
+  const existingElementsWithDb = currentElements.filter(
+    (element: any) => element.customData?.databaseId && element.id !== selectedElement.id
+  )
+
+  // Sammle alle Datenbankverknüpfungen der bereits verbundenen Elemente
+  const connectedDatabaseIds = new Set<string>()
+
+  // Prüfe alle Pfeile, die mit dem ausgewählten Element verbunden sind
+  const connectedArrows = currentElements.filter(
+    (element: any) =>
+      element.type === 'arrow' &&
+      (element.startBinding?.elementId === selectedElement.id ||
+        element.endBinding?.elementId === selectedElement.id)
+  )
+
+  // Für jeden verbundenen Pfeil, finde das andere Ende und sammle dessen Datenbank-ID
+  connectedArrows.forEach((arrow: any) => {
+    const otherElementId =
+      arrow.startBinding?.elementId === selectedElement.id
+        ? arrow.endBinding?.elementId
+        : arrow.startBinding?.elementId
+
+    if (otherElementId) {
+      const otherElement = existingElementsWithDb.find((el: any) => el.id === otherElementId)
+      if (otherElement?.customData?.databaseId) {
+        connectedDatabaseIds.add(otherElement.customData.databaseId)
+      }
+    }
+  })
+
+  // Filtere verwandte Elemente, die nicht bereits verbunden sind
+  return relatedElements.filter(relatedElement => !connectedDatabaseIds.has(relatedElement.id))
+}
+
+/**
  * Erstellt Excalidraw-Elemente aus den verwandten Elementen
  */
 const createExcalidrawElementsFromRelated = async (
@@ -570,7 +615,14 @@ const createExcalidrawElementsFromRelated = async (
     ? relatedElements.filter(element => config.selectedElementTypes!.includes(element.elementType))
     : relatedElements
 
-  if (filteredRelatedElements.length === 0) {
+  // Filter out elements that are already connected to the selected element
+  const finalFilteredElements = filterAlreadyConnectedElements(
+    filteredRelatedElements,
+    selectedElement,
+    excalidrawAPI
+  )
+
+  if (finalFilteredElements.length === 0) {
     return {
       success: true,
       elementsAdded: 0,
@@ -590,15 +642,15 @@ const createExcalidrawElementsFromRelated = async (
 
   // Berechne Positionen basierend auf der gewählten Richtung
   const positions = calculateElementPositions(
-    filteredRelatedElements,
+    finalFilteredElements,
     { x: sourceX, y: sourceY, width: sourceWidth, height: sourceHeight },
     config.position,
     config.spacing
   )
 
   // Erstelle Elemente für jeden verwandten Eintrag
-  for (let i = 0; i < filteredRelatedElements.length; i++) {
-    const relatedElement = filteredRelatedElements[i]
+  for (let i = 0; i < finalFilteredElements.length; i++) {
+    const relatedElement = finalFilteredElements[i]
     const position = positions[i]
 
     // Finde das passende Template basierend auf Element-Typ
@@ -671,7 +723,7 @@ const createExcalidrawElementsFromRelated = async (
         config.position,
         relatedElement.reverseArrow || false,
         i, // Arrow index
-        filteredRelatedElements.length // Total arrows count
+        finalFilteredElements.length // Total arrows count
       )
       newArrows.push(arrow)
 
@@ -720,7 +772,7 @@ const createExcalidrawElementsFromRelated = async (
 
   return {
     success: true,
-    elementsAdded: filteredRelatedElements.length,
+    elementsAdded: finalFilteredElements.length,
     elements: newElements,
     arrows: newArrows,
   }
