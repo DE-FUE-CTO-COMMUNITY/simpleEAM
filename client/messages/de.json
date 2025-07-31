@@ -161,6 +161,17 @@
       "arrowType": "Pfeiltyp",
       "spacing": "Abstand",
       "add": "Hinzufügen",
+      "processing": "Verarbeite verwandte Elemente... Bitte warten.",
+      "elementTypes": "Element-Typen",
+      "selectTypes": "Auswählen ({count})",
+      "noTypesSelected": "Keine Element-Typen ausgewählt",
+      "expectedCount": "{count} verwandte Elemente dieser Typen werden hinzugefügt",
+      "successMessage": "{count} verwandte Elemente wurden erfolgreich hinzugefügt",
+      "errorMessage": "Fehler beim Hinzufügen der Elemente",
+      "unexpectedError": "Fehler: {error}",
+      "unknownError": "Unbekannter Fehler",
+      "selectTypesDialogTitle": "Element-Typen auswählen",
+      "selectTypesDialogDescription": "Wählen Sie die Typen von verwandten Elementen aus, die hinzugefügt werden sollen.",
       "positions": {
         "left": "Links",
         "right": "Rechts",
@@ -171,6 +182,26 @@
         "sharp": "Scharfer Pfeil",
         "curved": "Gekrümmter Pfeil",
         "elbow": "Rechtwinkliger Pfeil"
+      },
+      "elementTypeLabels": {
+        "capability": "Capabilities",
+        "application": "Applications",
+        "dataObject": "Data Objects",
+        "interface": "Interfaces",
+        "infrastructure": "Infrastructure"
+      },
+      "elementTypeDescriptions": {
+        "capability": "Geschäftsfähigkeiten und Funktionen",
+        "application": "Anwendungen und Software-Komponenten",
+        "dataObject": "Datenobjekte und Informationsstrukturen",
+        "interface": "Schnittstellen zwischen Komponenten",
+        "infrastructure": "Infrastruktur-Komponenten und Hardware"
+      },
+      "validation": {
+        "minHops": "Mindestens 1 Hop erforderlich",
+        "maxHops": "Maximal 5 Hops erlaubt",
+        "minSpacing": "Mindestabstand 10px",
+        "maxSpacing": "Maximalabstand 1000px"
       }
     },
     "dialogs": {
@@ -1558,6 +1589,15 @@
       "title": "Debug-Tools",
       "description": "Hier können Sie Debug-Tools für die Anwendung verwenden.",
       "sessionDebugger": "Session Debugger"
+    },
+    "debugOverlay": {
+      "title": "Element-Koordinaten",
+      "position": "Position",
+      "size": "Größe",
+      "type": "Typ",
+      "elementType": "Element-Typ",
+      "name": "Name",
+      "noElementSelected": "Kein Element selektiert"
     }
   }
 }

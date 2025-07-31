@@ -158,6 +158,17 @@
       "arrowType": "Arrow Type",
       "spacing": "Spacing",
       "add": "Add",
+      "processing": "Processing related elements... Please wait.",
+      "elementTypes": "Element Types",
+      "selectTypes": "Select ({count})",
+      "noTypesSelected": "No element types selected",
+      "expectedCount": "{count} related elements of this type will be added",
+      "successMessage": "{count} related elements were successfully added",
+      "errorMessage": "Error adding elements",
+      "unexpectedError": "Error: {error}",
+      "unknownError": "Unknown error",
+      "selectTypesDialogTitle": "Select Element Types",
+      "selectTypesDialogDescription": "Choose the types of related elements to be added.",
       "positions": {
         "left": "Left",
         "right": "Right",
@@ -168,6 +179,26 @@
         "sharp": "Sharp Arrow",
         "curved": "Curved Arrow",
         "elbow": "Elbow Arrow"
+      },
+      "elementTypeLabels": {
+        "capability": "Capabilities",
+        "application": "Applications",
+        "dataObject": "Data Objects",
+        "interface": "Interfaces",
+        "infrastructure": "Infrastructure"
+      },
+      "elementTypeDescriptions": {
+        "capability": "Business capabilities and functions",
+        "application": "Applications and software components",
+        "dataObject": "Data objects and information structures",
+        "interface": "Interfaces between components",
+        "infrastructure": "Infrastructure components and hardware"
+      },
+      "validation": {
+        "minHops": "At least 1 hop required",
+        "maxHops": "Maximum 5 hops allowed",
+        "minSpacing": "Minimum spacing 10px",
+        "maxSpacing": "Maximum spacing 1000px"
       }
     },
     "dialogs": {
@@ -1562,6 +1593,15 @@
       "title": "Debug Tools",
       "description": "Here you can use debug tools for the application.",
       "sessionDebugger": "Session Debugger"
+    },
+    "debugOverlay": {
+      "title": "Element Coordinates",
+      "position": "Position",
+      "size": "Size",
+      "type": "Type",
+      "elementType": "Element Type",
+      "name": "Name",
+      "noElementSelected": "No element selected"
     }
   }
 }

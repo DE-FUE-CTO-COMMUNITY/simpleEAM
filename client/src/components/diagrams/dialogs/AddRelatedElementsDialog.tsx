@@ -22,7 +22,7 @@ import FilterListIcon from '@mui/icons-material/FilterList'
 import { useTranslations } from 'next-intl'
 import { useForm } from '@tanstack/react-form'
 import { useApolloClient } from '@apollo/client'
-import { ArrowType, RelativePosition, AddRelatedElementsConfig } from '../types/addRelatedElements'
+import { ArrowType, RelativePosition } from '../types/addRelatedElements'
 import { loadAndCreateRelatedElements } from '../utils/addRelatedElementsService'
 import ElementTypeSelectionDialog, { ElementTypeOption } from './ElementTypeSelectionDialog'
 
@@ -60,28 +60,28 @@ export default function AddRelatedElementsDialog({
   const availableElementTypes: ElementTypeOption[] = [
     {
       id: 'capability',
-      label: 'Capabilities',
-      description: 'Geschäftsfähigkeiten und Funktionen',
+      label: t('elementTypeLabels.capability'),
+      description: t('elementTypeDescriptions.capability'),
     },
     {
       id: 'application',
-      label: 'Applications',
-      description: 'Anwendungen und Software-Komponenten',
+      label: t('elementTypeLabels.application'),
+      description: t('elementTypeDescriptions.application'),
     },
     {
       id: 'dataObject',
-      label: 'Data Objects',
-      description: 'Datenobjekte und Informationsstrukturen',
+      label: t('elementTypeLabels.dataObject'),
+      description: t('elementTypeDescriptions.dataObject'),
     },
     {
       id: 'interface',
-      label: 'Interfaces',
-      description: 'Schnittstellen zwischen Komponenten',
+      label: t('elementTypeLabels.interface'),
+      description: t('elementTypeDescriptions.interface'),
     },
     {
       id: 'infrastructure',
-      label: 'Infrastructure',
-      description: 'Infrastruktur-Komponenten und Hardware',
+      label: t('elementTypeLabels.infrastructure'),
+      description: t('elementTypeDescriptions.infrastructure'),
     },
   ]
 
@@ -202,20 +202,22 @@ export default function AddRelatedElementsDialog({
 
         if (result.success) {
           console.log(`Successfully added ${result.elementsAdded} related elements`)
-          setResultMessage(
-            `${result.elementsAdded} verwandte Elemente wurden erfolgreich hinzugefügt`
-          )
+          setResultMessage(t('successMessage', { count: result.elementsAdded }))
 
           // Bei Erfolg sofort schließen
           onClose()
         } else {
           console.error('Failed to add related elements:', result.errorMessage)
-          setResultMessage(result.errorMessage || 'Fehler beim Hinzufügen der Elemente')
+          setResultMessage(result.errorMessage || t('errorMessage'))
           // Bei Fehler NICHT automatisch schließen
         }
       } catch (error) {
         console.error('Error adding related elements:', error)
-        setResultMessage(`Fehler: ${error instanceof Error ? error.message : 'Unbekannter Fehler'}`)
+        setResultMessage(
+          t('unexpectedError', {
+            error: error instanceof Error ? error.message : t('unknownError'),
+          })
+        )
         // Bei Fehler NICHT automatisch schließen
       } finally {
         console.log('Setting isLoading to false')
@@ -239,56 +241,6 @@ export default function AddRelatedElementsDialog({
     >
       <DialogTitle>{t('title')}</DialogTitle>
       <DialogContent>
-        {/* Debug Information - IMMER SICHTBAR */}
-        <Box sx={{ mb: 3, p: 2, border: '2px solid #ff0000', borderRadius: 1, bgcolor: '#ffebee' }}>
-          <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold', color: '#ff0000' }}>
-            � DEBUG BOX - IMMER SICHTBAR
-          </Typography>
-          {selectedElement ? (
-            <>
-              <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.9rem' }}>
-                Position: x={selectedElement.x}, y={selectedElement.y}
-              </Typography>
-              <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.9rem' }}>
-                Größe: width={selectedElement.width}, height={selectedElement.height}
-              </Typography>
-              <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.9rem' }}>
-                Typ: {selectedElement.type}
-              </Typography>
-              {selectedElement.customData && (
-                <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.9rem' }}>
-                  Element-Typ: {selectedElement.customData.elementType}
-                </Typography>
-              )}
-              <Typography
-                variant="body2"
-                sx={{ fontFamily: 'monospace', fontSize: '0.9rem', mt: 1, fontWeight: 'bold' }}
-              >
-                Neue Elemente: width={selectedElement.width}, height={selectedElement.height}
-              </Typography>
-              <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.9rem' }}>
-                Vertikaler Abstand (links/rechts): height + spacing = {selectedElement.height} + 20
-                = {selectedElement.height + 20}px
-              </Typography>
-              <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.9rem' }}>
-                Horizontaler Abstand (oben/unten): width + spacing = {selectedElement.width} + 20 ={' '}
-                {selectedElement.width + 20}px
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{ fontFamily: 'monospace', fontSize: '0.9rem', mt: 1, color: '#666' }}
-              >
-                ℹ️ Nur bekannte Element-Typen werden erstellt (capability, application, dataObject,
-                interface, infrastructure)
-              </Typography>
-            </>
-          ) : (
-            <Typography variant="body2" sx={{ color: '#ff0000', fontWeight: 'bold' }}>
-              ⚠️ FEHLER: selectedElement ist NULL!
-            </Typography>
-          )}
-        </Box>
-
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
           {t('description', { element: elementName })}
         </Typography>
@@ -300,7 +252,7 @@ export default function AddRelatedElementsDialog({
             icon={<CircularProgress size={20} />}
             sx={{ mb: 3, fontWeight: 'bold' }}
           >
-            Verarbeite verwandte Elemente... Bitte warten.
+            {t('processing')}
           </Alert>
         )}
 
@@ -316,14 +268,14 @@ export default function AddRelatedElementsDialog({
           <Box
             sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}
           >
-            <Typography variant="h6">Element-Typen</Typography>
+            <Typography variant="h6">{t('elementTypes')}</Typography>
             <Button
               startIcon={<FilterListIcon />}
               variant="outlined"
               size="small"
               onClick={() => setIsTypeSelectionOpen(true)}
             >
-              Auswählen ({selectedElementTypes.length})
+              {t('selectTypes', { count: selectedElementTypes.length })}
             </Button>
           </Box>
 
@@ -336,7 +288,7 @@ export default function AddRelatedElementsDialog({
             })}
             {selectedElementTypes.length === 0 && (
               <Typography variant="body2" color="text.secondary">
-                Keine Element-Typen ausgewählt
+                {t('noTypesSelected')}
               </Typography>
             )}
           </Box>
@@ -345,7 +297,7 @@ export default function AddRelatedElementsDialog({
         {/* Expected Element Count */}
         {expectedElementCount > 0 && !resultMessage && (
           <Alert severity="info" sx={{ mb: 3 }}>
-            {expectedElementCount} verwandte Elemente dieser Typen werden hinzugefügt
+            {t('expectedCount', { count: expectedElementCount })}
           </Alert>
         )}
 
@@ -363,8 +315,8 @@ export default function AddRelatedElementsDialog({
               name="hops"
               validators={{
                 onChange: ({ value }) => {
-                  if (value < 1) return 'Mindestens 1 Hop erforderlich'
-                  if (value > 5) return 'Maximal 5 Hops erlaubt'
+                  if (value < 1) return t('validation.minHops')
+                  if (value > 5) return t('validation.maxHops')
                   return undefined
                 },
               }}
@@ -428,8 +380,8 @@ export default function AddRelatedElementsDialog({
               name="spacing"
               validators={{
                 onChange: ({ value }) => {
-                  if (value < 10) return 'Mindestabstand 10px'
-                  if (value > 1000) return 'Maximalabstand 1000px'
+                  if (value < 10) return t('validation.minSpacing')
+                  if (value > 1000) return t('validation.maxSpacing')
                   return undefined
                 },
               }}
@@ -479,8 +431,8 @@ export default function AddRelatedElementsDialog({
         onConfirm={handleElementTypeChange}
         availableTypes={availableElementTypes}
         initialSelectedTypes={selectedElementTypes}
-        title="Element-Typen auswählen"
-        description="Wählen Sie die Typen von verwandten Elementen aus, die hinzugefügt werden sollen."
+        title={t('selectTypesDialogTitle')}
+        description={t('selectTypesDialogDescription')}
       />
     </Dialog>
   )

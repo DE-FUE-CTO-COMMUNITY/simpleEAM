@@ -12,6 +12,7 @@ import { setupSessionMonitoring } from '@/utils/sessionUtils'
 import { createApolloClient } from '@/lib/apollo-client'
 import { useAutoUserRegistration } from '@/hooks/useAutoUserRegistration'
 import ThemeProvider from '@/contexts/ThemeContext'
+import { DebugProvider } from '@/contexts/DebugContext'
 import { CircularProgress, Box } from '@mui/material'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
@@ -197,66 +198,68 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <CacheProvider value={cache}>
       <ThemeProvider>
-        <CssBaseline />
-        <LocalizationProvider
-          dateAdapter={AdapterDayjs}
-          adapterLocale={locale === 'en' ? 'en' : 'de'}
-        >
-          <SnackbarProvider
-            maxSnack={3}
-            anchorOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
-            }}
-            dense
-            preventDuplicate
-            autoHideDuration={5000}
-            className="custom-snackbar-provider"
+        <DebugProvider>
+          <CssBaseline />
+          <LocalizationProvider
+            dateAdapter={AdapterDayjs}
+            adapterLocale={locale === 'en' ? 'en' : 'de'}
           >
-            <AuthContext.Provider value={{ keycloak, initialized, authenticated }}>
-              <ApolloProvider client={apolloClient}>
-                <AutoUserRegistration />
-                <Box
-                  sx={{
-                    width: '100%',
-                    height: '100vh',
-                    position: 'relative',
-                  }}
-                >
-                  {!initialized && (
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        width: '100%',
-                        height: '100%',
-                        zIndex: 9999,
-                        bgcolor: 'background.default',
-                      }}
-                    >
-                      <CircularProgress size={40} />
-                    </Box>
-                  )}
-
+            <SnackbarProvider
+              maxSnack={3}
+              anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+              dense
+              preventDuplicate
+              autoHideDuration={5000}
+              className="custom-snackbar-provider"
+            >
+              <AuthContext.Provider value={{ keycloak, initialized, authenticated }}>
+                <ApolloProvider client={apolloClient}>
+                  <AutoUserRegistration />
                   <Box
                     sx={{
                       width: '100%',
-                      height: '100%',
-                      opacity: initialized ? 1 : 0.3,
-                      transition: 'opacity 0.3s ease-in-out',
+                      height: '100vh',
+                      position: 'relative',
                     }}
                   >
-                    <RootLayout>{children}</RootLayout>
+                    {!initialized && (
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          width: '100%',
+                          height: '100%',
+                          zIndex: 9999,
+                          bgcolor: 'background.default',
+                        }}
+                      >
+                        <CircularProgress size={40} />
+                      </Box>
+                    )}
+
+                    <Box
+                      sx={{
+                        width: '100%',
+                        height: '100%',
+                        opacity: initialized ? 1 : 0.3,
+                        transition: 'opacity 0.3s ease-in-out',
+                      }}
+                    >
+                      <RootLayout>{children}</RootLayout>
+                    </Box>
                   </Box>
-                </Box>
-              </ApolloProvider>
-            </AuthContext.Provider>
-          </SnackbarProvider>
-        </LocalizationProvider>
+                </ApolloProvider>
+              </AuthContext.Provider>
+            </SnackbarProvider>
+          </LocalizationProvider>
+        </DebugProvider>
       </ThemeProvider>
     </CacheProvider>
   )

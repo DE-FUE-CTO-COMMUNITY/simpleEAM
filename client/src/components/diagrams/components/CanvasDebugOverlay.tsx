@@ -1,7 +1,9 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Typography, Paper } from '@mui/material'
+import { Typography, Paper, Box, Chip } from '@mui/material'
+import { useDebug } from '@/contexts/DebugContext'
+import { useTranslations } from 'next-intl'
 
 interface CanvasDebugOverlayProps {
   excalidrawAPI: any
@@ -12,6 +14,8 @@ export default function CanvasDebugOverlay({
   excalidrawAPI,
   selectedElementForRelatedElements,
 }: CanvasDebugOverlayProps) {
+  const { settings: debugSettings } = useDebug()
+  const t = useTranslations('admin.debugOverlay')
   const [currentSelectedElement, setCurrentSelectedElement] = useState<any>(null)
 
   // Aktualisiere die aktuell selektierten Elemente vom Canvas
@@ -52,35 +56,70 @@ export default function CanvasDebugOverlay({
   // Verwende das Element vom Dialog oder das aktuell selektierte Element
   const elementToShow = selectedElementForRelatedElements || currentSelectedElement
 
-  // Zeige immer die Debug-Box, auch wenn kein Element selektiert ist
+  // Zeige Debug-Box nur wenn sie in den Einstellungen aktiviert ist
+  if (!debugSettings.showElementCoordinates) {
+    return null
+  }
+
   return (
     <Paper
       sx={{
         position: 'fixed',
         bottom: 20,
-        left: '50%',
-        transform: 'translateX(-50%)',
+        right: 70, // 50px nach links verschoben (von 20 auf 70)
         zIndex: 9999,
-        bgcolor: 'rgba(255, 255, 255, 0.95)',
-        border: '2px solid #ff0000',
-        borderRadius: 1,
-        px: 3,
-        py: 1,
+        bgcolor: 'background.paper',
+        boxShadow: 3,
+        borderRadius: 2,
+        p: 2,
+        minWidth: 280,
+        maxWidth: 320,
+        border: 1,
+        borderColor: 'divider',
       }}
     >
-      <Typography
-        variant="body2"
-        sx={{ fontFamily: 'monospace', color: '#ff0000', fontWeight: 'bold' }}
-      >
-        {elementToShow ? (
-          <>
-            x={Math.round(elementToShow.x)}, y={Math.round(elementToShow.y)}, width=
-            {Math.round(elementToShow.width || 0)}, height={Math.round(elementToShow.height || 0)}
-          </>
-        ) : (
-          <>Kein Element selektiert</>
-        )}
-      </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+        <Chip
+          label="Debug"
+          size="small"
+          color="primary"
+          variant="outlined"
+          sx={{ mr: 1, fontSize: '0.75rem' }}
+        />
+        <Typography variant="caption" color="text.secondary">
+          {t('title')}
+        </Typography>
+      </Box>
+
+      {elementToShow ? (
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+          <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>
+            <strong>{t('position')}:</strong> x={Math.round(elementToShow.x)}, y=
+            {Math.round(elementToShow.y)}
+          </Typography>
+          <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>
+            <strong>{t('size')}:</strong> {Math.round(elementToShow.width || 0)} ×{' '}
+            {Math.round(elementToShow.height || 0)}
+          </Typography>
+          <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>
+            <strong>{t('type')}:</strong> {elementToShow.type}
+          </Typography>
+          {elementToShow.customData?.elementType && (
+            <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>
+              <strong>{t('elementType')}:</strong> {elementToShow.customData.elementType}
+            </Typography>
+          )}
+          {elementToShow.customData?.elementName && (
+            <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>
+              <strong>{t('name')}:</strong> {elementToShow.customData.elementName}
+            </Typography>
+          )}
+        </Box>
+      ) : (
+        <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+          {t('noElementSelected')}
+        </Typography>
+      )}
     </Paper>
   )
 }

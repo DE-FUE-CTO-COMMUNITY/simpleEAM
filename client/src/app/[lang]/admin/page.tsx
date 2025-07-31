@@ -6,6 +6,7 @@ import { BugReport as BugReportIcon, People as PeopleIcon } from '@mui/icons-mat
 import { useTranslations } from 'next-intl'
 import SessionDebugger from '@/components/debug/SessionDebugger'
 import UserManagement from '@/components/admin/UserManagement'
+import DebugSettingsPanel from '@/components/admin/DebugSettingsPanel'
 import { isAdmin } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 
@@ -96,14 +97,18 @@ export default function AdminPage() {
             {t('debugTools.description')}
           </Typography>
 
-          <Button
-            variant="outlined"
-            onClick={() => setIsDebuggerOpen(true)}
-            startIcon={<BugReportIcon />}
-            color="warning"
-          >
-            {t('debugTools.sessionDebugger')}
-          </Button>
+          <DebugSettingsPanel />
+
+          <Box sx={{ mt: 3, pt: 3, borderTop: 1, borderColor: 'divider' }}>
+            <Button
+              variant="outlined"
+              onClick={() => setIsDebuggerOpen(true)}
+              startIcon={<BugReportIcon />}
+              color="warning"
+            >
+              {t('debugTools.sessionDebugger')}
+            </Button>
+          </Box>
 
           <SessionDebugger isOpen={isDebuggerOpen} onClose={() => setIsDebuggerOpen(false)} />
         </TabPanel>
