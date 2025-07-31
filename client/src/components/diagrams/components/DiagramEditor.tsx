@@ -11,6 +11,7 @@ import DeleteDiagramDialog from './DeleteDiagramDialog'
 import IntegratedLibrary from './IntegratedLibrary'
 import DiagramNameDisplay from './DiagramNameDisplay'
 import ExcalidrawWrapper from './ExcalidrawWrapper'
+import CanvasDebugOverlay from './CanvasDebugOverlay'
 import CapabilityMapGenerator from './CapabilityMapGenerator'
 import { DiagramEditorProps } from '../types/DiagramTypes'
 import { useDiagramState, useUIOptions } from '../state/DiagramState'
@@ -488,6 +489,14 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
         {/* Integrated Library Component - only for non-viewer users */}
         {excalidrawAPI && !isViewer() && (
           <IntegratedLibrary excalidrawAPI={excalidrawAPI} onLibraryUpdate={handleLibraryUpdate} />
+        )}
+
+        {/* Canvas Debug Overlay - nur in Entwicklungsumgebung */}
+        {process.env.NODE_ENV === 'development' && excalidrawAPI && (
+          <CanvasDebugOverlay
+            excalidrawAPI={excalidrawAPI}
+            selectedElementForRelatedElements={selectedElementForRelatedElements}
+          />
         )}
       </Box>
 

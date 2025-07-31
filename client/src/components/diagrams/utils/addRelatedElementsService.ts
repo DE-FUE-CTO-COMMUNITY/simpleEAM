@@ -531,6 +531,9 @@ const createExcalidrawElementsFromRelated = async (
   const sourceWidth = selectedElement.width
   const sourceHeight = selectedElement.height
 
+  console.log('Source element dimensions:', { sourceX, sourceY, sourceWidth, sourceHeight })
+  console.log('Config spacing:', config.spacing)
+
   // Berechne Positionen basierend auf der gewählten Richtung
   const positions = calculateElementPositions(
     filteredRelatedElements,
@@ -595,13 +598,11 @@ const createExcalidrawElementsFromRelated = async (
         position.y
       )
     } else {
-      // Fallback für unbekannte Typen
-      createdElements = createGenericElementFromTemplate(
-        relatedElement,
-        template,
-        position.x,
-        position.y
+      // Unbekannter Elementtyp - überspringen
+      console.warn(
+        `Unbekannter Elementtyp: ${relatedElement.elementType} - Element wird übersprungen`
       )
+      continue
     }
 
     newElements.push(...createdElements)
@@ -673,131 +674,64 @@ const calculateElementPositions = (
   spacing: number
 ): Array<{ x: number; y: number }> => {
   const positions: Array<{ x: number; y: number }> = []
-  const elementWidth = 200 // Standard-Breite für neue Elemente
-  const elementHeight = 100 // Standard-Höhe für neue Elemente
+  // Verwende die Dimensionen des Quell-Elements für konsistente Größen
+  const elementWidth = sourceElement.width // Gleiche Breite wie das Quell-Element
+  const elementHeight = sourceElement.height // Gleiche Höhe wie das Quell-Element
+
+  console.log('calculateElementPositions:', {
+    sourceElementWidth: sourceElement.width,
+    sourceElementHeight: sourceElement.height,
+    spacing,
+    position,
+  })
+
+  // Berechne Offset für mittige Positionierung
+  const numElements = elements.length
+
+  // Für rechts/links: Y-Koordinaten-Offset (mittige Positionierung in Y-Richtung)
+  // Verwende das konfigurierbare spacing statt fest kodierten elementSpacing
+  const totalHeightWithSpacing = elementHeight * numElements + spacing * (numElements - 1)
+  const yOffset = totalHeightWithSpacing / 2
+
+  // Für oben/unten: X-Koordinaten-Offset (mittige Positionierung in X-Richtung)
+  // Verwende das konfigurierbare spacing statt fest kodierten elementSpacing
+  const totalWidthWithSpacing = elementWidth * numElements + spacing * (numElements - 1)
+  const xOffset = totalWidthWithSpacing / 2
 
   for (let i = 0; i < elements.length; i++) {
     let x: number, y: number
 
     switch (position) {
       case 'right':
-        x = sourceElement.x + sourceElement.width + spacing
-        y = sourceElement.y + i * (elementHeight + 20)
+        // Nach rechts: 2x Breite (bis zur rechten Kante + gewünschter Abstand) + spacing
+        x = sourceElement.x + sourceElement.width * 2 + spacing
+        y = sourceElement.y + i * (elementHeight + spacing) - yOffset + sourceElement.height / 2
         break
       case 'left':
-        x = sourceElement.x - elementWidth - spacing
-        y = sourceElement.y + i * (elementHeight + 20)
+        // Nach links: 1x Breite des neuen Elements + 1x Breite des Quell-Elements + spacing
+        x = sourceElement.x - elementWidth - sourceElement.width - spacing
+        y = sourceElement.y + i * (elementHeight + spacing) - yOffset + sourceElement.height / 2
         break
       case 'top':
-        x = sourceElement.x + i * (elementWidth + 20)
-        y = sourceElement.y - elementHeight - spacing
+        // Nach oben: 1x Höhe des neuen Elements + 1x Breite des Quell-Elements + spacing
+        x = sourceElement.x + i * (elementWidth + spacing) - xOffset + sourceElement.width / 2
+        y = sourceElement.y - elementHeight - sourceElement.width - spacing
         break
       case 'bottom':
-        x = sourceElement.x + i * (elementWidth + 20)
-        y = sourceElement.y + sourceElement.height + spacing
+        // Nach unten: 1x Höhe des Quell-Elements + 1x Breite des Quell-Elements + spacing
+        x = sourceElement.x + i * (elementWidth + spacing) - xOffset + sourceElement.width / 2
+        y = sourceElement.y + sourceElement.height + sourceElement.width + spacing
         break
       default:
-        x = sourceElement.x + sourceElement.width + spacing
-        y = sourceElement.y + i * (elementHeight + 20)
+        // Default: nach rechts
+        x = sourceElement.x + sourceElement.width * 2 + spacing
+        y = sourceElement.y + i * (elementHeight + spacing) - yOffset + sourceElement.height / 2
     }
 
     positions.push({ x, y })
   }
 
   return positions
-}
-
-/**
- * Erstellt ein generisches Element aus einem Template
- */
-const createGenericElementFromTemplate = (
-  element: RelatedElement,
-  template: any,
-  x: number,
-  y: number
-): any[] => {
-  // Vereinfachte generische Element-Erstellung
-  const elementId = generateElementId()
-  const textId = generateElementId()
-
-  const rectangle = {
-    id: elementId,
-    type: 'rectangle',
-    x,
-    y,
-    width: 200,
-    height: 100,
-    angle: 0,
-    strokeColor: template.elements[0]?.strokeColor || '#1e1e1e',
-    backgroundColor: template.elements[0]?.backgroundColor || '#ffffff',
-    fillStyle: 'solid',
-    strokeWidth: 2,
-    strokeStyle: 'solid',
-    roughness: 1,
-    opacity: 100,
-    groupIds: [],
-    frameId: null,
-    index: 'a0',
-    roundness: { type: 3 },
-    seed: Math.floor(Math.random() * 1000000),
-    version: 1,
-    versionNonce: Math.floor(Math.random() * 1000000),
-    isDeleted: false,
-    boundElements: [{ id: textId, type: 'text' }],
-    updated: Date.now(),
-    link: null,
-    locked: false,
-    customData: {
-      databaseId: element.id,
-      elementType: element.elementType,
-      elementName: element.name,
-      isFromDatabase: true,
-      isMainElement: true,
-    },
-  }
-
-  const text = {
-    id: textId,
-    type: 'text',
-    x: x + 10,
-    y: y + 40,
-    width: 180,
-    height: 20,
-    angle: 0,
-    strokeColor: '#1e1e1e',
-    backgroundColor: 'transparent',
-    fillStyle: 'solid',
-    strokeWidth: 1,
-    strokeStyle: 'solid',
-    roughness: 1,
-    opacity: 100,
-    groupIds: [],
-    frameId: null,
-    index: 'a1',
-    roundness: null,
-    seed: Math.floor(Math.random() * 1000000),
-    version: 1,
-    versionNonce: Math.floor(Math.random() * 1000000),
-    isDeleted: false,
-    containerId: elementId,
-    originalText: element.name,
-    updated: Date.now(),
-    link: null,
-    locked: false,
-    fontSize: 16,
-    fontFamily: 1,
-    text: element.name,
-    textAlign: 'center',
-    verticalAlign: 'middle',
-    baseline: 14,
-    customData: {
-      isFromDatabase: true,
-      isMainElement: false,
-      mainElementId: elementId,
-    },
-  }
-
-  return [rectangle, text]
 }
 
 /**

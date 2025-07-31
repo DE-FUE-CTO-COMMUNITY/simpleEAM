@@ -224,6 +224,7 @@ export default function AddRelatedElementsDialog({
     },
   })
 
+  // Check if selectedElement exists - return null if not
   if (!selectedElement) {
     return null
   }
@@ -238,6 +239,54 @@ export default function AddRelatedElementsDialog({
     >
       <DialogTitle>{t('title')}</DialogTitle>
       <DialogContent>
+        {/* Debug Information - IMMER SICHTBAR */}
+        <Box sx={{ mb: 3, p: 2, border: '2px solid #ff0000', borderRadius: 1, bgcolor: '#ffebee' }}>
+          <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold', color: '#ff0000' }}>
+            � DEBUG BOX - IMMER SICHTBAR
+          </Typography>
+          {selectedElement ? (
+            <>
+              <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.9rem' }}>
+                Position: x={selectedElement.x}, y={selectedElement.y}
+              </Typography>
+              <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.9rem' }}>
+                Größe: width={selectedElement.width}, height={selectedElement.height}
+              </Typography>
+              <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.9rem' }}>
+                Typ: {selectedElement.type}
+              </Typography>
+              {selectedElement.customData && (
+                <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.9rem' }}>
+                  Element-Typ: {selectedElement.customData.elementType}
+                </Typography>
+              )}
+              <Typography
+                variant="body2"
+                sx={{ fontFamily: 'monospace', fontSize: '0.9rem', mt: 1, fontWeight: 'bold' }}
+              >
+                Neue Elemente: width={selectedElement.width}, height={selectedElement.height}
+              </Typography>
+              <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.9rem' }}>
+                Vertikaler Abstand (links/rechts): height + spacing = {selectedElement.height} + 20 = {selectedElement.height + 20}px
+              </Typography>
+              <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.9rem' }}>
+                Horizontaler Abstand (oben/unten): width + spacing = {selectedElement.width} + 20 = {selectedElement.width + 20}px
+              </Typography>
+              <Typography
+                variant="body2"
+                sx={{ fontFamily: 'monospace', fontSize: '0.9rem', mt: 1, color: '#666' }}
+              >
+                ℹ️ Nur bekannte Element-Typen werden erstellt (capability, application, dataObject,
+                interface, infrastructure)
+              </Typography>
+            </>
+          ) : (
+            <Typography variant="body2" sx={{ color: '#ff0000', fontWeight: 'bold' }}>
+              ⚠️ FEHLER: selectedElement ist NULL!
+            </Typography>
+          )}
+        </Box>
+
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
           {t('description', { element: elementName })}
         </Typography>
