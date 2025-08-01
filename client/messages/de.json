@@ -151,7 +151,9 @@
       "ungroup": "Gruppierung aufheben",
       "bringToFront": "In den Vordergrund",
       "sendToBack": "In den Hintergrund",
-      "addRelatedElements": "Verwandte Elemente hinzufügen"
+      "addRelatedElements": "Verwandte Elemente hinzufügen",
+      "viewElement": "Element anzeigen",
+      "editElement": "Element bearbeiten"
     },
     "addRelatedElements": {
       "title": "Verwandte Elemente hinzufügen",

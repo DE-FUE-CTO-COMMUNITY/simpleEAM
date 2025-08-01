@@ -6,18 +6,21 @@ import {
   ContentPaste as PasteIcon,
   Delete as DeleteIcon,
   Add as AddRelatedIcon,
-  Group as GroupIcon,
-  Layers as UngroupIcon,
   FlipToFront as BringToFrontIcon,
   FlipToBack as SendToBackIcon,
   FileCopy as DuplicateIcon,
+  Visibility as ViewIcon,
+  Edit as EditIcon,
 } from '@mui/icons-material'
 import { useTranslations } from 'next-intl'
 
 interface CustomContextMenuProps {
   excalidrawAPI: any
   onOpenAddRelatedElementsDialog: (element: any) => void
+  onViewElement?: (element: any) => void
+  onEditElement?: (element: any) => void
   viewModeEnabled?: boolean
+  isViewerRole?: boolean
 }
 
 /**
@@ -27,7 +30,10 @@ interface CustomContextMenuProps {
 export const FullCustomContextMenu: React.FC<CustomContextMenuProps> = ({
   excalidrawAPI,
   onOpenAddRelatedElementsDialog,
+  onViewElement,
+  onEditElement,
   viewModeEnabled = false,
+  isViewerRole = false,
 }) => {
   const t = useTranslations()
 
@@ -47,10 +53,8 @@ export const FullCustomContextMenu: React.FC<CustomContextMenuProps> = ({
       // Dynamische Menü-Dimensionen basierend auf Inhalten
       const MENU_WIDTH = 200
       // Geschätzte Höhe basierend auf den Menüeinträgen
-      const MENU_HEIGHT = hasSelection ? 280 : 120 // Mehr Einträge bei Selektion
-      const PADDING = 16 // Mindestabstand zum Rand
-
-      // Viewport-Dimensionen
+      const MENU_HEIGHT = hasSelection ? 350 : 120 // Erhöht für mehr Einträge bei Selektion
+      const PADDING = 16 // Mindestabstand zum Rand      // Viewport-Dimensionen
       const viewportWidth = window.innerWidth
       const viewportHeight = window.innerHeight
 
@@ -294,34 +298,6 @@ export const FullCustomContextMenu: React.FC<CustomContextMenuProps> = ({
     handleClose()
   }, [excalidrawAPI, contextMenu, handleClose])
 
-  const handleGroup = useCallback(() => {
-    if (!excalidrawAPI || !contextMenu?.selectedElements.length) return
-
-    try {
-      const app = excalidrawAPI.getAppState?.()?.actionManager?.app || excalidrawAPI
-      if (app && app.actionManager) {
-        app.actionManager.executeAction('group')
-      }
-    } catch (error) {
-      console.warn('Group action failed:', error)
-    }
-    handleClose()
-  }, [excalidrawAPI, contextMenu, handleClose])
-
-  const handleUngroup = useCallback(() => {
-    if (!excalidrawAPI || !contextMenu?.selectedElements.length) return
-
-    try {
-      const app = excalidrawAPI.getAppState?.()?.actionManager?.app || excalidrawAPI
-      if (app && app.actionManager) {
-        app.actionManager.executeAction('ungroup')
-      }
-    } catch (error) {
-      console.warn('Ungroup action failed:', error)
-    }
-    handleClose()
-  }, [excalidrawAPI, contextMenu, handleClose])
-
   const handleBringToFront = useCallback(() => {
     if (!excalidrawAPI || !contextMenu?.selectedElements.length) return
 
@@ -364,6 +340,30 @@ export const FullCustomContextMenu: React.FC<CustomContextMenuProps> = ({
     }
     handleClose()
   }, [contextMenu, onOpenAddRelatedElementsDialog, handleClose])
+
+  const handleViewElement = useCallback(() => {
+    if (contextMenu && onViewElement) {
+      const elementWithDb = contextMenu.selectedElements.find(
+        (el: any) => el.customData?.databaseId
+      )
+      if (elementWithDb) {
+        onViewElement(elementWithDb)
+      }
+    }
+    handleClose()
+  }, [contextMenu, onViewElement, handleClose])
+
+  const handleEditElement = useCallback(() => {
+    if (contextMenu && onEditElement) {
+      const elementWithDb = contextMenu.selectedElements.find(
+        (el: any) => el.customData?.databaseId
+      )
+      if (elementWithDb) {
+        onEditElement(elementWithDb)
+      }
+    }
+    handleClose()
+  }, [contextMenu, onEditElement, handleClose])
 
   // Event-Listener für Rechtsklick
   useEffect(() => {
@@ -414,8 +414,6 @@ export const FullCustomContextMenu: React.FC<CustomContextMenuProps> = ({
   // Prüfe, ob Elemente ausgewählt sind
   const hasSelection = contextMenu.selectedElements.length > 0
   const hasDbElement = contextMenu.selectedElements.some((el: any) => el.customData?.databaseId)
-  const hasMultipleElements = contextMenu.selectedElements.length > 1
-  const hasGroupedElements = contextMenu.selectedElements.some((el: any) => el.groupIds?.length > 0)
 
   return (
     <Paper
@@ -432,30 +430,30 @@ export const FullCustomContextMenu: React.FC<CustomContextMenuProps> = ({
     >
       <MenuList dense>
         {/* Standard-Aktionen - nur bei Auswahl */}
-        {hasSelection && !viewModeEnabled
-          ? [
-              <MenuItem key="cut" onClick={handleCut}>
-                <ListItemIcon>
-                  <CutIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>{t('diagrams.contextMenu.cut')}</ListItemText>
-              </MenuItem>,
+        {hasSelection && !viewModeEnabled && (
+          <>
+            <MenuItem onClick={handleCut}>
+              <ListItemIcon>
+                <CutIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>{t('diagrams.contextMenu.cut')}</ListItemText>
+            </MenuItem>
 
-              <MenuItem key="copy" onClick={handleCopy}>
-                <ListItemIcon>
-                  <CopyIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>{t('diagrams.contextMenu.copy')}</ListItemText>
-              </MenuItem>,
+            <MenuItem onClick={handleCopy}>
+              <ListItemIcon>
+                <CopyIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>{t('diagrams.contextMenu.copy')}</ListItemText>
+            </MenuItem>
 
-              <MenuItem key="duplicate" onClick={handleDuplicate}>
-                <ListItemIcon>
-                  <DuplicateIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>{t('diagrams.contextMenu.duplicate')}</ListItemText>
-              </MenuItem>,
-            ]
-          : null}
+            <MenuItem onClick={handleDuplicate}>
+              <ListItemIcon>
+                <DuplicateIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>{t('diagrams.contextMenu.duplicate')}</ListItemText>
+            </MenuItem>
+          </>
+        )}
 
         {/* Paste - immer verfügbar (außer im View-Modus) */}
         {!viewModeEnabled && (
@@ -468,73 +466,69 @@ export const FullCustomContextMenu: React.FC<CustomContextMenuProps> = ({
         )}
 
         {/* Trennlinie nach Basis-Aktionen */}
-        {hasSelection && !viewModeEnabled && <Divider />}
+        {((hasSelection && !viewModeEnabled) || !viewModeEnabled) && <Divider />}
 
-        {/* Löschen - nur bei Auswahl */}
-        {hasSelection && !viewModeEnabled && (
-          <MenuItem onClick={handleDelete}>
+        {/* View/Edit-Aktionen - nur für DB-Elemente */}
+        {hasDbElement && (
+          <MenuItem onClick={handleViewElement}>
             <ListItemIcon>
-              <DeleteIcon fontSize="small" />
+              <ViewIcon fontSize="small" />
             </ListItemIcon>
-            <ListItemText>{t('diagrams.contextMenu.delete')}</ListItemText>
+            <ListItemText>{t('diagrams.contextMenu.viewElement')}</ListItemText>
           </MenuItem>
         )}
 
-        {/* Gruppierung - nur bei mehreren Elementen */}
-        {hasMultipleElements && !viewModeEnabled
-          ? [
-              <Divider key="group-divider" />,
-              <MenuItem key="group" onClick={handleGroup}>
-                <ListItemIcon>
-                  <GroupIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>{t('diagrams.contextMenu.group')}</ListItemText>
-              </MenuItem>,
-            ]
-          : null}
-
-        {/* Gruppierung aufheben - nur bei gruppierten Elementen */}
-        {hasGroupedElements && !viewModeEnabled && (
-          <MenuItem onClick={handleUngroup}>
+        {hasDbElement && !viewModeEnabled && !isViewerRole && (
+          <MenuItem onClick={handleEditElement}>
             <ListItemIcon>
-              <UngroupIcon fontSize="small" />
+              <EditIcon fontSize="small" />
             </ListItemIcon>
-            <ListItemText>{t('diagrams.contextMenu.ungroup')}</ListItemText>
+            <ListItemText>{t('diagrams.contextMenu.editElement')}</ListItemText>
+          </MenuItem>
+        )}
+
+        {/* Verwandte Elemente hinzufügen - nur für DB-Elemente */}
+        {hasDbElement && !viewModeEnabled && (
+          <MenuItem onClick={handleAddRelatedElements}>
+            <ListItemIcon>
+              <AddRelatedIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>{t('diagrams.contextMenu.addRelatedElements')}</ListItemText>
           </MenuItem>
         )}
 
         {/* Layer-Aktionen - nur bei Auswahl */}
-        {hasSelection && !viewModeEnabled
-          ? [
-              <Divider key="layer-divider" />,
-              <MenuItem key="bring-to-front" onClick={handleBringToFront}>
-                <ListItemIcon>
-                  <BringToFrontIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>{t('diagrams.contextMenu.bringToFront')}</ListItemText>
-              </MenuItem>,
+        {hasSelection && !viewModeEnabled && (
+          <>
+            <Divider />
+            <MenuItem onClick={handleBringToFront}>
+              <ListItemIcon>
+                <BringToFrontIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>{t('diagrams.contextMenu.bringToFront')}</ListItemText>
+            </MenuItem>
 
-              <MenuItem key="send-to-back" onClick={handleSendToBack}>
-                <ListItemIcon>
-                  <SendToBackIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>{t('diagrams.contextMenu.sendToBack')}</ListItemText>
-              </MenuItem>,
-            ]
-          : null}
+            <MenuItem onClick={handleSendToBack}>
+              <ListItemIcon>
+                <SendToBackIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>{t('diagrams.contextMenu.sendToBack')}</ListItemText>
+            </MenuItem>
+          </>
+        )}
 
-        {/* Benutzerdefinierte Aktionen */}
-        {hasDbElement && !viewModeEnabled
-          ? [
-              <Divider key="custom-divider" />,
-              <MenuItem key="add-related" onClick={handleAddRelatedElements}>
-                <ListItemIcon>
-                  <AddRelatedIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>{t('diagrams.contextMenu.addRelatedElements')}</ListItemText>
-              </MenuItem>,
-            ]
-          : null}
+        {/* Löschen - ganz am Ende */}
+        {hasSelection && !viewModeEnabled && (
+          <>
+            <Divider />
+            <MenuItem onClick={handleDelete}>
+              <ListItemIcon>
+                <DeleteIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>{t('diagrams.contextMenu.delete')}</ListItemText>
+            </MenuItem>
+          </>
+        )}
       </MenuList>
     </Paper>
   )

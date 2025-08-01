@@ -8,6 +8,8 @@ import { useExcalidrawCollaboration } from '../hooks/useExcalidrawCollaboration'
 import { CollaborationDialog } from './CollaborationDialog'
 import AddRelatedElementsDialog from '../dialogs/AddRelatedElementsDialog'
 import { FullCustomContextMenu } from './FullCustomContextMenu'
+import ElementFormDialog from '../../diagram/ElementFormDialog'
+import { ExcalidrawElement } from '../types/relationshipTypes'
 
 // Dynamischer Import von Excalidraw, um Server-Side-Rendering zu vermeiden
 const ExcalidrawWrapper = dynamic(
@@ -55,6 +57,17 @@ const ExcalidrawWrapper = dynamic(
 
       // Collaboration state
       const [isCollaborationDialogOpen, setIsCollaborationDialogOpen] = useState(false)
+
+      // Element Form Dialog state
+      const [elementFormDialog, setElementFormDialog] = useState<{
+        element: ExcalidrawElement | null
+        mode: 'view' | 'edit'
+        isOpen: boolean
+      }>({
+        element: null,
+        mode: 'view',
+        isOpen: false,
+      })
 
       // Hook für Theme-Modus (wird innerhalb der Komponente verwendet)
       const { mode: themeMode } = useThemeMode()
@@ -515,7 +528,22 @@ const ExcalidrawWrapper = dynamic(
           <FullCustomContextMenu
             excalidrawAPI={apiRef.current}
             onOpenAddRelatedElementsDialog={onOpenAddRelatedElementsDialog}
+            onViewElement={element => {
+              setElementFormDialog({
+                element,
+                mode: 'view',
+                isOpen: true,
+              })
+            }}
+            onEditElement={element => {
+              setElementFormDialog({
+                element,
+                mode: 'edit',
+                isOpen: true,
+              })
+            }}
             viewModeEnabled={viewModeEnabled}
+            isViewerRole={false} // TODO: Aus dem Auth-Kontext oder Props holen
           />
 
           {/* Collaboration Dialog */}
@@ -535,6 +563,25 @@ const ExcalidrawWrapper = dynamic(
             onClose={onCloseAddRelatedElementsDialog}
             selectedElement={selectedElementForRelatedElements}
             excalidrawAPI={apiRef.current}
+          />
+
+          {/* Element Form Dialog */}
+          <ElementFormDialog
+            element={elementFormDialog.element}
+            mode={elementFormDialog.mode}
+            isOpen={elementFormDialog.isOpen}
+            onClose={() => {
+              setElementFormDialog({
+                element: null,
+                mode: 'view',
+                isOpen: false,
+              })
+            }}
+            onElementUpdated={() => {
+              // Refresh diagram data after element update
+              // TODO: Add refresh logic if needed
+              console.log('Element updated, consider refreshing diagram data')
+            }}
           />
         </div>
       )

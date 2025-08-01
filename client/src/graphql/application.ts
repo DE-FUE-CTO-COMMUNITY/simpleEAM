@@ -103,7 +103,7 @@ export const GET_APPLICATIONS = gql`
 
 export const GET_APPLICATION = gql`
   query GetApplication($id: ID!) {
-    application(where: { id: $id }) {
+    applications(where: { id: { eq: $id } }) {
       id
       name
       description

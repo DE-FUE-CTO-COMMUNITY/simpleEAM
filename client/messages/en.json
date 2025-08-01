@@ -148,7 +148,9 @@
       "ungroup": "Ungroup",
       "bringToFront": "Bring to Front",
       "sendToBack": "Send to Back",
-      "addRelatedElements": "Add Related Elements"
+      "addRelatedElements": "Add Related Elements",
+      "viewElement": "View Element",
+      "editElement": "Edit Element"
     },
     "addRelatedElements": {
       "title": "Add Related Elements",

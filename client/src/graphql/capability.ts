@@ -63,7 +63,7 @@ export const GET_CAPABILITIES = gql`
 
 export const GET_CAPABILITY = gql`
   query GetCapability($id: ID!) {
-    businessCapability(where: { id: $id }) {
+    businessCapabilities(where: { id: { eq: $id } }) {
       id
       name
       description

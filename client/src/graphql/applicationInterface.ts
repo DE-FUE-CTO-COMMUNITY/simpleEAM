@@ -75,7 +75,7 @@ export const GET_APPLICATION_INTERFACES = gql`
 
 export const GET_APPLICATION_INTERFACE = gql`
   query GetApplicationInterface($id: ID!) {
-    applicationInterface(id: $id) {
+    applicationInterfaces(where: { id: { eq: $id } }) {
       id
       name
       description

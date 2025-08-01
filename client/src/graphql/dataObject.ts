@@ -65,7 +65,7 @@ export const GET_DATA_OBJECTS = gql`
 
 export const GET_DATA_OBJECT = gql`
   query GetDataObject($id: ID!) {
-    dataObject(id: $id) {
+    dataObjects(where: { id: { eq: $id } }) {
       id
       name
       description

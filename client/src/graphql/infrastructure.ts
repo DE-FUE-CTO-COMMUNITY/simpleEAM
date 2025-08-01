@@ -74,7 +74,7 @@ export const GET_INFRASTRUCTURES = gql`
 
 export const GET_INFRASTRUCTURE = gql`
   query GetInfrastructure($id: ID!) {
-    infrastructure(id: $id) {
+    infrastructures(where: { id: { eq: $id } }) {
       id
       name
       description

@@ -2,14 +2,14 @@
 
 import React from 'react'
 import { Dialog } from '@mui/material'
-import { DataObject } from '../../gql/generated'
-import DataObjectForm, { DataObjectFormValues } from '../dataobjects/DataObjectForm'
+import { Infrastructure } from '../../gql/generated'
+import InfrastructureForm, { InfrastructureFormValues } from './InfrastructureForm'
 
-interface DataObjectDialogProps {
-  dataObject?: DataObject | null
+interface InfrastructureDialogProps {
+  infrastructure?: Infrastructure | null
   isOpen: boolean
   onClose: () => void
-  onSubmit: (data: DataObjectFormValues) => Promise<void>
+  onSubmit: (data: InfrastructureFormValues) => Promise<void>
   onDelete?: (id: string) => Promise<void>
   isLoading?: boolean
   mode: 'create' | 'edit' | 'view'
@@ -17,10 +17,10 @@ interface DataObjectDialogProps {
 }
 
 /**
- * Dialog-Komponente zum Anzeigen, Bearbeiten oder Erstellen von Datenobjekten
+ * Dialog-Komponente zum Anzeigen, Bearbeiten oder Erstellen von Infrastructure-Elementen
  */
-const DataObjectDialog: React.FC<DataObjectDialogProps> = ({
-  dataObject,
+const InfrastructureDialog: React.FC<InfrastructureDialogProps> = ({
+  infrastructure,
   isOpen,
   onClose,
   onSubmit,
@@ -31,8 +31,8 @@ const DataObjectDialog: React.FC<DataObjectDialogProps> = ({
 }) => {
   return (
     <Dialog open={isOpen} onClose={onClose} fullWidth maxWidth="md">
-      <DataObjectForm
-        dataObject={dataObject}
+      <InfrastructureForm
+        infrastructure={infrastructure}
         isOpen={isOpen}
         onClose={onClose}
         onSubmit={onSubmit}
@@ -45,4 +45,4 @@ const DataObjectDialog: React.FC<DataObjectDialogProps> = ({
   )
 }
 
-export default DataObjectDialog
+export default InfrastructureDialog
