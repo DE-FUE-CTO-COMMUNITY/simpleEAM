@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { Paper, MenuList, MenuItem, ListItemIcon, ListItemText, Divider } from '@mui/material'
+import { Paper, MenuList, MenuItem, ListItemIcon, ListItemText } from '@mui/material'
 import { Add as AddIcon } from '@mui/icons-material'
 import { useTranslations } from 'next-intl'
 
@@ -25,6 +25,48 @@ export const CustomContextMenu: React.FC<CustomContextMenuProps> = ({
     element: any
   } | null>(null)
 
+  /**
+   * Berechnet die optimale Position für das Kontextmenü,
+   * damit es vollständig sichtbar bleibt
+   */
+  const calculateMenuPosition = useCallback((mouseX: number, mouseY: number) => {
+    // Geschätzte Menü-Dimensionen (diese könnten dynamisch gemessen werden)
+    const MENU_WIDTH = 200
+    const MENU_HEIGHT = 150 // Erhöht für bessere Abschätzung
+    const PADDING = 16 // Erhöhter Mindestabstand zum Rand
+
+    // Viewport-Dimensionen
+    const viewportWidth = window.innerWidth
+    const viewportHeight = window.innerHeight
+
+    let adjustedX = mouseX
+    let adjustedY = mouseY
+
+    // Rechten Rand überprüfen
+    if (mouseX + MENU_WIDTH + PADDING > viewportWidth) {
+      adjustedX = mouseX - MENU_WIDTH
+      // Falls das Menü auch links nicht passt, an den rechten Rand setzen
+      if (adjustedX < PADDING) {
+        adjustedX = viewportWidth - MENU_WIDTH - PADDING
+      }
+    }
+
+    // Unteren Rand überprüfen
+    if (mouseY + MENU_HEIGHT + PADDING > viewportHeight) {
+      adjustedY = mouseY - MENU_HEIGHT
+      // Falls das Menü auch oben nicht passt, an den unteren Rand setzen
+      if (adjustedY < PADDING) {
+        adjustedY = viewportHeight - MENU_HEIGHT - PADDING
+      }
+    }
+
+    // Mindestabstände einhalten
+    adjustedX = Math.max(PADDING, Math.min(adjustedX, viewportWidth - MENU_WIDTH - PADDING))
+    adjustedY = Math.max(PADDING, Math.min(adjustedY, viewportHeight - MENU_HEIGHT - PADDING))
+
+    return { x: adjustedX, y: adjustedY }
+  }, [])
+
   const handleRightClick = useCallback(
     (event: Event) => {
       const mouseEvent = event as MouseEvent
@@ -35,13 +77,19 @@ export const CustomContextMenu: React.FC<CustomContextMenuProps> = ({
         const elements = excalidrawAPI.getSceneElements()
         const appState = excalidrawAPI.getAppState()
 
-        // Finde das Element unter dem Mauszeiger
-        const canvasRect = (mouseEvent.target as HTMLElement).getBoundingClientRect()
-        const x = mouseEvent.clientX - canvasRect.left
-        const y = mouseEvent.clientY - canvasRect.top
-
         // Finde ausgewählte Elemente
         const selectedElements = elements.filter((el: any) => appState.selectedElementIds[el.id])
+
+        console.log('Context Menu Debug:', {
+          selectedElementsCount: selectedElements.length,
+          selectedElements: selectedElements.map((el: any) => ({
+            id: el.id,
+            type: el.type,
+            hasCustomData: !!el.customData,
+            databaseId: el.customData?.databaseId,
+          })),
+          mousePosition: { x: mouseEvent.clientX, y: mouseEvent.clientY },
+        })
 
         if (selectedElements.length === 1) {
           const element = selectedElements[0]
@@ -52,9 +100,21 @@ export const CustomContextMenu: React.FC<CustomContextMenuProps> = ({
             mouseEvent.preventDefault()
             mouseEvent.stopPropagation()
 
+            // Berechne die optimale Position für das Menü
+            const { x: adjustedX, y: adjustedY } = calculateMenuPosition(
+              mouseEvent.clientX,
+              mouseEvent.clientY
+            )
+
+            console.log('Context Menu Position Debug:', {
+              original: { x: mouseEvent.clientX, y: mouseEvent.clientY },
+              adjusted: { x: adjustedX, y: adjustedY },
+              viewport: { width: window.innerWidth, height: window.innerHeight },
+            })
+
             setContextMenu({
-              mouseX: mouseEvent.clientX,
-              mouseY: mouseEvent.clientY,
+              mouseX: adjustedX,
+              mouseY: adjustedY,
               element,
             })
             return
@@ -64,7 +124,7 @@ export const CustomContextMenu: React.FC<CustomContextMenuProps> = ({
         console.warn('Error in custom context menu handler:', error)
       }
     },
-    [excalidrawAPI, viewModeEnabled]
+    [excalidrawAPI, viewModeEnabled, calculateMenuPosition]
   )
 
   const handleClose = useCallback(() => {
@@ -131,18 +191,7 @@ export const CustomContextMenu: React.FC<CustomContextMenuProps> = ({
           <ListItemIcon>
             <AddIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText primary="Verwandte Elemente hinzufügen" />
-        </MenuItem>
-        <Divider />
-        <MenuItem
-          onClick={handleClose}
-          sx={{
-            fontSize: '0.875rem',
-            color: 'text.secondary',
-            fontStyle: 'italic',
-          }}
-        >
-          <ListItemText primary="Standard-Menü anzeigen..." />
+          <ListItemText primary={t('diagrams.contextMenu.addRelatedElements')} />
         </MenuItem>
       </MenuList>
     </Paper>

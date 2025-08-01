@@ -38,6 +38,52 @@ export const FullCustomContextMenu: React.FC<CustomContextMenuProps> = ({
     type: 'canvas' | 'element'
   } | null>(null)
 
+  /**
+   * Berechnet die optimale Position für das Kontextmenü,
+   * damit es vollständig sichtbar bleibt
+   */
+  const calculateMenuPosition = useCallback(
+    (mouseX: number, mouseY: number, hasSelection: boolean) => {
+      // Dynamische Menü-Dimensionen basierend auf Inhalten
+      const MENU_WIDTH = 200
+      // Geschätzte Höhe basierend auf den Menüeinträgen
+      const MENU_HEIGHT = hasSelection ? 280 : 120 // Mehr Einträge bei Selektion
+      const PADDING = 16 // Mindestabstand zum Rand
+
+      // Viewport-Dimensionen
+      const viewportWidth = window.innerWidth
+      const viewportHeight = window.innerHeight
+
+      let adjustedX = mouseX
+      let adjustedY = mouseY
+
+      // Rechten Rand überprüfen
+      if (mouseX + MENU_WIDTH + PADDING > viewportWidth) {
+        adjustedX = mouseX - MENU_WIDTH
+        // Falls das Menü auch links nicht passt, an den rechten Rand setzen
+        if (adjustedX < PADDING) {
+          adjustedX = viewportWidth - MENU_WIDTH - PADDING
+        }
+      }
+
+      // Unteren Rand überprüfen
+      if (mouseY + MENU_HEIGHT + PADDING > viewportHeight) {
+        adjustedY = mouseY - MENU_HEIGHT
+        // Falls das Menü auch oben nicht passt, an den unteren Rand setzen
+        if (adjustedY < PADDING) {
+          adjustedY = viewportHeight - MENU_HEIGHT - PADDING
+        }
+      }
+
+      // Mindestabstände einhalten
+      adjustedX = Math.max(PADDING, Math.min(adjustedX, viewportWidth - MENU_WIDTH - PADDING))
+      adjustedY = Math.max(PADDING, Math.min(adjustedY, viewportHeight - MENU_HEIGHT - PADDING))
+
+      return { x: adjustedX, y: adjustedY }
+    },
+    []
+  )
+
   const handleRightClick = useCallback(
     (event: Event) => {
       const mouseEvent = event as MouseEvent
@@ -56,10 +102,26 @@ export const FullCustomContextMenu: React.FC<CustomContextMenuProps> = ({
         const selectedElements = elements.filter((el: any) => appState.selectedElementIds[el.id])
 
         const menuType = selectedElements.length > 0 ? 'element' : 'canvas'
+        const hasSelection = selectedElements.length > 0
+
+        // Berechne die optimale Position für das Menü
+        const { x: adjustedX, y: adjustedY } = calculateMenuPosition(
+          mouseEvent.clientX,
+          mouseEvent.clientY,
+          hasSelection
+        )
+
+        console.log('FullCustomContextMenu Position Debug:', {
+          original: { x: mouseEvent.clientX, y: mouseEvent.clientY },
+          adjusted: { x: adjustedX, y: adjustedY },
+          viewport: { width: window.innerWidth, height: window.innerHeight },
+          hasSelection,
+          selectedElementsCount: selectedElements.length,
+        })
 
         setContextMenu({
-          mouseX: mouseEvent.clientX,
-          mouseY: mouseEvent.clientY,
+          mouseX: adjustedX,
+          mouseY: adjustedY,
           selectedElements,
           type: menuType,
         })
@@ -67,7 +129,7 @@ export const FullCustomContextMenu: React.FC<CustomContextMenuProps> = ({
         console.warn('Error in custom context menu handler:', error)
       }
     },
-    [excalidrawAPI]
+    [excalidrawAPI, calculateMenuPosition]
   )
 
   const handleClose = useCallback(() => {
