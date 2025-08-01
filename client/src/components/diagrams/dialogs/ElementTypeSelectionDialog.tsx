@@ -41,6 +41,7 @@ export default function ElementTypeSelectionDialog({
   description,
 }: ElementTypeSelectionDialogProps) {
   const tCommon = useTranslations('common')
+  const t = useTranslations('diagrams.addRelatedElements')
   const [selectedTypes, setSelectedTypes] = useState<string[]>(initialSelectedTypes)
 
   // Reset selection when dialog opens
@@ -81,10 +82,10 @@ export default function ElementTypeSelectionDialog({
 
         <Box sx={{ mb: 2 }}>
           <Button size="small" onClick={handleSelectAll} sx={{ mr: 1 }}>
-            Alle auswählen
+            {t('selectAll')}
           </Button>
           <Button size="small" onClick={handleSelectNone}>
-            Alle abwählen
+            {t('selectNone')}
           </Button>
         </Box>
 
@@ -113,7 +114,7 @@ export default function ElementTypeSelectionDialog({
         </FormGroup>
 
         <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-          {selectedTypes.length} von {availableTypes.length} Typen ausgewählt
+          {t('typesSelected', { count: selectedTypes.length, total: availableTypes.length })}
         </Typography>
       </DialogContent>
 

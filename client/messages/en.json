@@ -156,6 +156,7 @@
       "hops": "Number of Hops",
       "position": "Position",
       "arrowType": "Arrow Type",
+      "arrowGap": "Arrow Gap",
       "spacing": "Spacing",
       "add": "Add",
       "processing": "Processing related elements... Please wait.",
@@ -169,6 +170,9 @@
       "unknownError": "Unknown error",
       "selectTypesDialogTitle": "Select Element Types",
       "selectTypesDialogDescription": "Choose the types of related elements to be added.",
+      "selectAll": "Select All",
+      "selectNone": "Select None",
+      "typesSelected": "{count} of {total} types selected",
       "positions": {
         "left": "Left",
         "right": "Right",
@@ -179,6 +183,12 @@
         "sharp": "Sharp Arrow",
         "curved": "Curved Arrow",
         "elbow": "Elbow Arrow"
+      },
+      "arrowGaps": {
+        "none": "None",
+        "small": "Small",
+        "medium": "Medium",
+        "large": "Large"
       },
       "elementTypeLabels": {
         "capability": "Capabilities",

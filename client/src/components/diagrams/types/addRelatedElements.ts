@@ -13,6 +13,11 @@ export type RelativePosition = 'left' | 'right' | 'top' | 'bottom'
 export type ArrowType = 'sharp' | 'curved' | 'elbow'
 
 /**
+ * Gap-Größen für Pfeil-Bindungen
+ */
+export type ArrowGapSize = 'none' | 'small' | 'medium' | 'large'
+
+/**
  * Konfiguration für das Hinzufügen verwandter Elemente
  */
 export interface AddRelatedElementsConfig {
@@ -24,6 +29,8 @@ export interface AddRelatedElementsConfig {
   position: RelativePosition
   /** Abstand zwischen einzelnen Elementen */
   spacing: number
+  /** Gap zwischen Pfeil und Element */
+  arrowGap: ArrowGapSize
   /** Ausgewählte Element-Typen (optional, wenn nicht gesetzt werden alle Typen verwendet) */
   selectedElementTypes?: string[]
 }

@@ -7,7 +7,12 @@ import {
   GET_RELATED_ELEMENTS_FOR_INFRASTRUCTURE,
   RelatedElementsResponse,
 } from '@/graphql/relatedElements'
-import { ArrowType, RelativePosition, AddRelatedElementsConfig } from '../types/addRelatedElements'
+import {
+  ArrowType,
+  RelativePosition,
+  AddRelatedElementsConfig,
+  ArrowGapSize,
+} from '../types/addRelatedElements'
 import { getValidRelationships, normalizeElementType } from './relationshipValidation'
 
 // Extended RelatedElement interface mit reverseArrow support
@@ -59,6 +64,25 @@ const shouldReverseArrow = (
   const relationship = validRelationships.find(rel => rel.type === relationshipType)
 
   return relationship?.reverseArrow || false
+}
+
+/**
+ * Konvertiert ArrowGapSize zu Pixel-Werten
+ * HINWEIS: Wird momentan noch nicht in der Pfeil-Erstellung verwendet
+ */
+const getGapFromSize = (gapSize: ArrowGapSize): number => {
+  switch (gapSize) {
+    case 'none':
+      return 0
+    case 'small':
+      return 4
+    case 'medium':
+      return 8
+    case 'large':
+      return 12
+    default:
+      return 8 // Default fallback
+  }
 }
 import { generateElementId } from './elementIdManager'
 
@@ -717,7 +741,8 @@ const createExcalidrawElementsFromRelated = async (
         config.position,
         relatedElement.reverseArrow || false,
         i, // Arrow index
-        finalFilteredElements.length // Total arrows count
+        finalFilteredElements.length, // Total arrows count
+        config.arrowGap // Gap-Parameter wird bereits weitergegeben (noch nicht implementiert)
       )
       newArrows.push(arrow)
 
@@ -1000,7 +1025,8 @@ const createArrowBetweenElements = (
   position?: RelativePosition,
   reverseArrow: boolean = false,
   arrowIndex: number = 0,
-  totalArrows: number = 1
+  totalArrows: number = 1,
+  _arrowGap: ArrowGapSize = 'medium' // Parameter hinzugefügt, aber noch nicht verwendet
 ): any => {
   console.log(
     '🚀 createArrowBetweenElements called with position:',

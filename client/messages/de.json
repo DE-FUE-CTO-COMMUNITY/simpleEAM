@@ -159,6 +159,7 @@
       "hops": "Anzahl Hops",
       "position": "Position",
       "arrowType": "Pfeiltyp",
+      "arrowGap": "Pfeil-Abstand",
       "spacing": "Abstand",
       "add": "Hinzufügen",
       "processing": "Verarbeite verwandte Elemente... Bitte warten.",
@@ -172,6 +173,9 @@
       "unknownError": "Unbekannter Fehler",
       "selectTypesDialogTitle": "Element-Typen auswählen",
       "selectTypesDialogDescription": "Wählen Sie die Typen von verwandten Elementen aus, die hinzugefügt werden sollen.",
+      "selectAll": "Alle auswählen",
+      "selectNone": "Alle abwählen",
+      "typesSelected": "{count} von {total} Typen ausgewählt",
       "positions": {
         "left": "Links",
         "right": "Rechts",
@@ -182,6 +186,12 @@
         "sharp": "Scharfer Pfeil",
         "curved": "Gekrümmter Pfeil",
         "elbow": "Rechtwinkliger Pfeil"
+      },
+      "arrowGaps": {
+        "none": "Kein",
+        "small": "Klein",
+        "medium": "Mittel",
+        "large": "Groß"
       },
       "elementTypeLabels": {
         "capability": "Capabilities",

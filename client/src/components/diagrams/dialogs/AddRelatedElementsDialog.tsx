@@ -22,7 +22,7 @@ import FilterListIcon from '@mui/icons-material/FilterList'
 import { useTranslations } from 'next-intl'
 import { useForm } from '@tanstack/react-form'
 import { useApolloClient } from '@apollo/client'
-import { ArrowType, RelativePosition } from '../types/addRelatedElements'
+import { ArrowType, RelativePosition, ArrowGapSize } from '../types/addRelatedElements'
 import { loadAndCreateRelatedElements } from '../utils/addRelatedElementsService'
 import ElementTypeSelectionDialog, { ElementTypeOption } from './ElementTypeSelectionDialog'
 
@@ -166,6 +166,7 @@ export default function AddRelatedElementsDialog({
       position: 'right' as RelativePosition,
       arrowType: 'sharp' as ArrowType,
       spacing: 20,
+      arrowGap: 'medium' as ArrowGapSize,
     },
     onSubmit: async ({ value }) => {
       if (!selectedElement || !excalidrawAPI) {
@@ -370,6 +371,26 @@ export default function AddRelatedElementsDialog({
                     <MenuItem value="sharp">{t('arrowTypes.sharp')}</MenuItem>
                     <MenuItem value="curved">{t('arrowTypes.curved')}</MenuItem>
                     <MenuItem value="elbow">{t('arrowTypes.elbow')}</MenuItem>
+                  </Select>
+                </FormControl>
+              )}
+            </form.Field>
+
+            {/* Arrow Gap */}
+            <form.Field name="arrowGap">
+              {field => (
+                <FormControl fullWidth>
+                  <InputLabel>{t('arrowGap')}</InputLabel>
+                  <Select
+                    value={field.state.value}
+                    onChange={e => field.handleChange(e.target.value as ArrowGapSize)}
+                    onBlur={field.handleBlur}
+                    label={t('arrowGap')}
+                  >
+                    <MenuItem value="none">{t('arrowGaps.none')} (0px)</MenuItem>
+                    <MenuItem value="small">{t('arrowGaps.small')} (4px)</MenuItem>
+                    <MenuItem value="medium">{t('arrowGaps.medium')} (8px)</MenuItem>
+                    <MenuItem value="large">{t('arrowGaps.large')} (12px)</MenuItem>
                   </Select>
                 </FormControl>
               )}
