@@ -1253,33 +1253,65 @@ const createArrowBetweenElements = (
     locked: false,
     points: points,
     lastCommittedPoint: null,
-    startBinding:
-      position === 'left'
-        ? {
-            elementId: actualSourceElement.id,
-            focus: calculateBindingFocus(actualSourceElement, sourceConnectionPoint),
-            gap: 8, // Realistische gap wie in den manuellen Pfeilen (ca. 8-9)
-          }
-        : {
-            elementId: actualSourceElement.id,
-            focus: calculateBindingFocus(actualSourceElement, sourceConnectionPoint),
-            gap: 8, // Realistische gap wie in den manuellen Pfeilen (ca. 8-9)
-          },
-    endBinding:
-      position === 'left'
-        ? {
-            elementId: actualTargetElement.id,
-            focus: calculateBindingFocus(actualTargetElement, targetConnectionPoint),
-            gap: 8, // Realistische gap wie in den manuellen Pfeilen (ca. 8-9)
-          }
-        : {
-            elementId: actualTargetElement.id,
-            focus: calculateBindingFocus(actualTargetElement, targetConnectionPoint),
-            gap: 8, // Realistische gap wie in den manuellen Pfeilen (ca. 8-9)
-          },
+    startBinding: calculateBindingForArrowType(
+      actualSourceElement,
+      sourceConnectionPoint,
+      arrowType
+    ),
+    endBinding: calculateBindingForArrowType(actualTargetElement, targetConnectionPoint, arrowType),
     startArrowhead: reverseArrow ? 'arrow' : null,
     endArrowhead: reverseArrow ? null : 'arrow',
     elbowed: arrowConfig.elbowed, // Hinzufügung der elbowed-Eigenschaft für verschiedene Pfeiltypen
+    // Für elbow-Pfeile: fixedSegments hinzufügen
+    ...(arrowType === 'elbow' && {
+      fixedSegments: null, // Wichtig: Elbow-Pfeile benötigen diese Eigenschaft
+      startIsSpecial: null, // Zusätzliche Eigenschaften für elbow-Pfeile
+      endIsSpecial: null,
+    }),
+  }
+}
+
+/**
+ * Berechnet die korrekte Bindung für verschiedene Pfeiltypen
+ */
+const calculateBindingForArrowType = (
+  element: any,
+  connectionPoint: { x: number; y: number },
+  arrowType: ArrowType
+): any => {
+  if (arrowType === 'elbow') {
+    // Elbow-Pfeile benötigen fixedPoint statt focus und gap
+
+    // Berechne fixedPoint-Werte nach Excalidraw-Standard
+    // fixedPoint ist normalisiert: 0 = linker/oberer Rand, 1 = rechter/unterer Rand, 0.5 = Mitte
+    const fixedPointX = (connectionPoint.x - element.x) / element.width
+    const fixedPointY = (connectionPoint.y - element.y) / element.height
+
+    // Normalisiere und begrenze auf [0, 1] Bereich wie in Excalidraw
+    const normalizedFixedPointX = Math.max(0, Math.min(1, fixedPointX))
+    const normalizedFixedPointY = Math.max(0, Math.min(1, fixedPointY))
+
+    console.log(`🔗 fixedPoint calculation for elbow arrow:`, {
+      elementId: element.id,
+      elementBounds: { x: element.x, y: element.y, width: element.width, height: element.height },
+      connectionPoint,
+      rawFixedPoint: [fixedPointX, fixedPointY],
+      normalizedFixedPoint: [normalizedFixedPointX, normalizedFixedPointY],
+    })
+
+    return {
+      elementId: element.id,
+      fixedPoint: [normalizedFixedPointX, normalizedFixedPointY],
+      focus: 0,
+      gap: 0,
+    }
+  } else {
+    // Normale Pfeile (sharp, curved) verwenden focus und gap
+    return {
+      elementId: element.id,
+      focus: calculateBindingFocus(element, connectionPoint),
+      gap: 8,
+    }
   }
 }
 
@@ -1561,18 +1593,16 @@ const createFallbackArrow = (
     locked: false,
     points: points,
     lastCommittedPoint: null,
-    startBinding: {
-      elementId: sourceElement.id,
-      focus: 0.5,
-      gap: 8, // Realistische gap wie in manuellen Pfeilen
-    },
-    endBinding: {
-      elementId: targetElement.id,
-      focus: -0.5,
-      gap: 8, // Realistische gap wie in manuellen Pfeilen
-    },
+    startBinding: calculateBindingForArrowType(sourceElement, { x: startX, y: startY }, arrowType),
+    endBinding: calculateBindingForArrowType(targetElement, { x: endX, y: endY }, arrowType),
     startArrowhead: null,
     endArrowhead: 'arrow',
     elbowed: getArrowConfiguration(arrowType).elbowed, // Hinzufügung der elbowed-Eigenschaft für Fallback-Pfeile
+    // Für elbow-Pfeile: fixedSegments hinzufügen
+    ...(arrowType === 'elbow' && {
+      fixedSegments: null, // Wichtig: Elbow-Pfeile benötigen diese Eigenschaft
+      startIsSpecial: null, // Zusätzliche Eigenschaften für elbow-Pfeile
+      endIsSpecial: null,
+    }),
   }
 }
