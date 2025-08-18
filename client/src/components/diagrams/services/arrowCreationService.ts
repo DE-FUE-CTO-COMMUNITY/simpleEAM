@@ -1,6 +1,6 @@
 // arrowCreationService.ts - Erstellung & Geometrie von Pfeilen zwischen Excalidraw Elementen
 import { ArrowType, RelativePosition } from '../types/addRelatedElements'
-import { calculateDistributedArrowY, calculateDistributedArrowX } from '../utils/mathUtils'
+// (distribution now handled locally in computeAnchorPoints)
 import { generateElementId } from '../utils/elementIdManager'
 
 // Minimal benötigte Typen für Excalidraw Elemente, um any zu vermeiden
@@ -58,98 +58,20 @@ export const createArrowBetweenElements = ({
   const arrowId = generateElementId()
   const actualSourceElement = sourceElement
   const actualTargetElement = targetElement
-
-  const sourceCenter = {
-    x: actualSourceElement.x + actualSourceElement.width / 2,
-    y: actualSourceElement.y + actualSourceElement.height / 2,
-  }
-  const targetCenter = {
-    x: actualTargetElement.x + actualTargetElement.width / 2,
-    y: actualTargetElement.y + actualTargetElement.height / 2,
-  }
-  const dx = targetCenter.x - sourceCenter.x
-  const dy = targetCenter.y - sourceCenter.y
-  const distance = Math.sqrt(dx * dx + dy * dy)
-  if (distance === 0) {
-    return createFallbackArrow(actualSourceElement, actualTargetElement, arrowId, arrowType)
-  }
-  const normalizedDx = dx / distance
-  const normalizedDy = dy / distance
-  let sourceConnectionPoint = calculateConnectionPoint(
+  const resolvedPosition = derivePosition(position, actualSourceElement, actualTargetElement)
+  const { sourcePoint, targetPoint } = computeAnchorPoints(
     actualSourceElement,
-    normalizedDx,
-    normalizedDy,
-    true
-  )
-  let targetConnectionPoint = calculateConnectionPoint(
     actualTargetElement,
-    -normalizedDx,
-    -normalizedDy,
-    false
+    resolvedPosition,
+    arrowIndex,
+    totalArrows
   )
-
-  if (position === 'left') {
-    const distributedSourceY = calculateDistributedArrowY(
-      actualSourceElement.height,
-      actualSourceElement.y,
-      totalArrows,
-      arrowIndex
-    )
-    sourceConnectionPoint = { x: actualSourceElement.x, y: distributedSourceY }
-    targetConnectionPoint = {
-      x: actualTargetElement.x + actualTargetElement.width,
-      y: actualTargetElement.y + actualTargetElement.height / 2,
-    }
-  } else if (position === 'right') {
-    const distributedSourceY = calculateDistributedArrowY(
-      actualSourceElement.height,
-      actualSourceElement.y,
-      totalArrows,
-      arrowIndex
-    )
-    sourceConnectionPoint = {
-      x: actualSourceElement.x + actualSourceElement.width,
-      y: distributedSourceY,
-    }
-    targetConnectionPoint = {
-      x: actualTargetElement.x,
-      y: actualTargetElement.y + actualTargetElement.height / 2,
-    }
-  } else if (position === 'top') {
-    const distributedSourceX = calculateDistributedArrowX(
-      actualSourceElement.width,
-      actualSourceElement.x,
-      totalArrows,
-      arrowIndex
-    )
-    sourceConnectionPoint = { x: distributedSourceX, y: actualSourceElement.y }
-    targetConnectionPoint = {
-      x: actualTargetElement.x + actualTargetElement.width / 2,
-      y: actualTargetElement.y + actualTargetElement.height,
-    }
-  } else if (position === 'bottom') {
-    const distributedSourceX = calculateDistributedArrowX(
-      actualSourceElement.width,
-      actualSourceElement.x,
-      totalArrows,
-      arrowIndex
-    )
-    sourceConnectionPoint = {
-      x: distributedSourceX,
-      y: actualSourceElement.y + actualSourceElement.height,
-    }
-    targetConnectionPoint = {
-      x: actualTargetElement.x + actualTargetElement.width / 2,
-      y: actualTargetElement.y,
-    }
-  }
-
   const arrowConfig = getArrowConfiguration(arrowType)
-  const { points, arrowGeometry } = calculateArrowPointsAndGeometry(
-    sourceConnectionPoint,
-    targetConnectionPoint,
+  const { points, arrowGeometry } = buildArrowGeometry(
+    sourcePoint,
+    targetPoint,
     arrowType,
-    position
+    resolvedPosition
   )
 
   return {
@@ -178,12 +100,8 @@ export const createArrowBetweenElements = ({
     locked: false,
     points,
     lastCommittedPoint: null,
-    startBinding: calculateBindingForArrowType(
-      actualSourceElement,
-      sourceConnectionPoint,
-      arrowType
-    ),
-    endBinding: calculateBindingForArrowType(actualTargetElement, targetConnectionPoint, arrowType),
+    startBinding: calculateBindingForArrowType(actualSourceElement, sourcePoint, arrowType),
+    endBinding: calculateBindingForArrowType(actualTargetElement, targetPoint, arrowType),
     startArrowhead: reverseArrow ? 'arrow' : null,
     endArrowhead: reverseArrow ? null : 'arrow',
     elbowed: arrowConfig.elbowed,
@@ -219,120 +137,125 @@ const calculateBindingForArrowType = (
   }
 }
 
-const calculateArrowPointsAndGeometry = (
+// Simplified geometry builder
+const buildArrowGeometry = (
   sourcePoint: { x: number; y: number },
   targetPoint: { x: number; y: number },
   arrowType: ArrowType,
-  position?: RelativePosition
+  position: RelativePosition
 ): {
   points: [number, number][]
   arrowGeometry: { x: number; y: number; width: number; height: number }
 } => {
+  // Compute bounding box
+  const minX = Math.min(sourcePoint.x, targetPoint.x)
+  const minY = Math.min(sourcePoint.y, targetPoint.y)
+  const width = Math.abs(targetPoint.x - sourcePoint.x) || 1
+  const height = Math.abs(targetPoint.y - sourcePoint.y) || 1
+  const toLocal = (p: { x: number; y: number }): [number, number] => [p.x - minX, p.y - minY]
+
   if (arrowType === 'sharp') {
-    const minX = Math.min(sourcePoint.x, targetPoint.x)
-    const minY = Math.min(sourcePoint.y, targetPoint.y)
-    const width = Math.abs(targetPoint.x - sourcePoint.x)
-    const height = Math.abs(targetPoint.y - sourcePoint.y)
     return {
-      points: [
-        [sourcePoint.x - minX, sourcePoint.y - minY],
-        [targetPoint.x - minX, targetPoint.y - minY],
-      ],
+      points: [toLocal(sourcePoint), toLocal(targetPoint)],
       arrowGeometry: { x: minX, y: minY, width, height },
     }
   }
-  let arrowGeometry: { x: number; y: number; width: number; height: number }
-  if (position === 'left' || position === 'right' || position === 'top' || position === 'bottom') {
-    arrowGeometry = {
-      x: sourcePoint.x,
-      y: sourcePoint.y,
-      width: targetPoint.x - sourcePoint.x,
-      height: targetPoint.y - sourcePoint.y,
+
+  if (arrowType === 'curved') {
+    // Simple cubic-like polyline (Excalidraw poly points)
+    const dx = targetPoint.x - sourcePoint.x
+    const dy = targetPoint.y - sourcePoint.y
+    const offset = (position === 'left' || position === 'right' ? Math.abs(dy) : Math.abs(dx)) * 0.4
+    let c1: { x: number; y: number }
+    let c2: { x: number; y: number }
+    if (position === 'left' || position === 'right') {
+      c1 = { x: sourcePoint.x + dx * 0.3, y: sourcePoint.y + Math.sign(dy || 1) * offset }
+      c2 = { x: sourcePoint.x + dx * 0.7, y: targetPoint.y - Math.sign(dy || 1) * offset }
+    } else {
+      c1 = { x: sourcePoint.x + Math.sign(dx || 1) * offset, y: sourcePoint.y + dy * 0.3 }
+      c2 = { x: targetPoint.x - Math.sign(dx || 1) * offset, y: sourcePoint.y + dy * 0.7 }
     }
-  } else {
-    const minX = Math.min(sourcePoint.x, targetPoint.x)
-    const minY = Math.min(sourcePoint.y, targetPoint.y)
-    arrowGeometry = {
-      x: minX,
-      y: minY,
-      width: Math.abs(targetPoint.x - sourcePoint.x),
-      height: Math.abs(targetPoint.y - sourcePoint.y),
+    return {
+      points: [toLocal(sourcePoint), toLocal(c1), toLocal(c2), toLocal(targetPoint)],
+      arrowGeometry: { x: minX, y: minY, width, height },
     }
   }
-  const relativeTargetX = targetPoint.x - arrowGeometry.x
-  const relativeTargetY = targetPoint.y - arrowGeometry.y
-  let points: [number, number][]
-  if (arrowType === 'elbow') {
-    if (position === 'left' || position === 'right') {
-      const midX = relativeTargetX / 2
-      points = [
-        [0, 0],
-        [midX, 0],
-        [midX, relativeTargetY],
-        [relativeTargetX, relativeTargetY],
-      ]
-    } else {
-      const midY = relativeTargetY / 2
-      points = [
-        [0, 0],
-        [0, midY],
-        [relativeTargetX, midY],
-        [relativeTargetX, relativeTargetY],
-      ]
-    }
-  } else if (arrowType === 'curved') {
-    const deltaX = relativeTargetX
-    const deltaY = relativeTargetY
-    const controlOffset = Math.min(Math.abs(deltaX), Math.abs(deltaY)) * 0.4
-    if (position === 'left' || position === 'right') {
-      points = [
-        [0, 0],
-        [deltaX * 0.3, controlOffset * Math.sign(deltaY)],
-        [deltaX * 0.7, deltaY - controlOffset * Math.sign(deltaY)],
-        [deltaX, deltaY],
-      ]
-    } else {
-      points = [
-        [0, 0],
-        [controlOffset * Math.sign(deltaX), deltaY * 0.3],
-        [deltaX - controlOffset * Math.sign(deltaX), deltaY * 0.7],
-        [deltaX, deltaY],
-      ]
-    }
+
+  // Elbow (orthogonal) path
+  const mid: { x: number; y: number }[] = []
+  if (position === 'left' || position === 'right') {
+    const midX = sourcePoint.x + (targetPoint.x - sourcePoint.x) / 2
+    mid.push({ x: midX, y: sourcePoint.y }, { x: midX, y: targetPoint.y })
   } else {
-    points = [
-      [0, 0],
-      [relativeTargetX, relativeTargetY],
-    ]
+    const midY = sourcePoint.y + (targetPoint.y - sourcePoint.y) / 2
+    mid.push({ x: sourcePoint.x, y: midY }, { x: targetPoint.x, y: midY })
   }
-  return { points, arrowGeometry }
+  return {
+    points: [toLocal(sourcePoint), ...mid.map(toLocal), toLocal(targetPoint)] as [number, number][],
+    arrowGeometry: { x: minX, y: minY, width, height },
+  }
 }
 
-const calculateConnectionPoint = (
-  element: ExcalidrawBaseElement,
-  directionX: number,
-  directionY: number,
-  _isOutgoing: boolean
-): { x: number; y: number } => {
-  const centerX = element.x + element.width / 2
-  const centerY = element.y + element.height / 2
-  const halfWidth = element.width / 2
-  const halfHeight = element.height / 2
-  const absX = Math.abs(directionX)
-  const absY = Math.abs(directionY)
-  let connectionX: number
-  let connectionY: number
-  if (absX > absY) {
-    connectionX = centerX + (directionX > 0 ? halfWidth : -halfWidth)
-    connectionY = centerY + (directionY * halfWidth) / absX
-    connectionY = Math.max(element.y, Math.min(element.y + element.height, connectionY))
-  } else {
-    connectionY = centerY + (directionY > 0 ? halfHeight : -halfHeight)
-    connectionX = centerX + (directionX * halfHeight) / absY
-    connectionX = Math.max(element.x, Math.min(element.x + element.width, connectionX))
+// Compute anchors based on side position
+function computeAnchorPoints(
+  source: ExcalidrawBaseElement,
+  target: ExcalidrawBaseElement,
+  position: RelativePosition,
+  index: number,
+  total: number
+): { sourcePoint: { x: number; y: number }; targetPoint: { x: number; y: number } } {
+  const targetCenterX = target.x + target.width / 2
+  const targetCenterY = target.y + target.height / 2
+
+  // Distribution along side
+  const distribute = (length: number, start: number, i: number, n: number): number => {
+    if (n <= 1) return start + length / 2
+    const step = length / (n + 1)
+    return start + step * (i + 1)
   }
-  return { x: connectionX, y: connectionY }
+
+  let sourcePoint: { x: number; y: number }
+  let targetPoint: { x: number; y: number }
+  switch (position) {
+    case 'left':
+      sourcePoint = { x: source.x, y: distribute(source.height, source.y, index, total) }
+      targetPoint = { x: target.x + target.width, y: targetCenterY }
+      break
+    case 'right':
+      sourcePoint = {
+        x: source.x + source.width,
+        y: distribute(source.height, source.y, index, total),
+      }
+      targetPoint = { x: target.x, y: targetCenterY }
+      break
+    case 'top':
+      sourcePoint = { x: distribute(source.width, source.x, index, total), y: source.y }
+      targetPoint = { x: targetCenterX, y: target.y + target.height }
+      break
+    case 'bottom':
+      sourcePoint = {
+        x: distribute(source.width, source.x, index, total),
+        y: source.y + source.height,
+      }
+      targetPoint = { x: targetCenterX, y: target.y }
+      break
+  }
+  return { sourcePoint: sourcePoint!, targetPoint: targetPoint! }
 }
+
+// Determine position if not provided
+function derivePosition(
+  explicit: RelativePosition | undefined,
+  source: ExcalidrawBaseElement,
+  target: ExcalidrawBaseElement
+): RelativePosition {
+  if (explicit) return explicit
+  const dx = target.x + target.width / 2 - (source.x + source.width / 2)
+  const dy = target.y + target.height / 2 - (source.y + source.height / 2)
+  return Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : dy > 0 ? 'bottom' : 'top'
+}
+
+// (removed) calculateConnectionPoint – replaced by simpler side-based anchor logic
 
 const calculateBindingFocus = (
   element: ExcalidrawBaseElement,
@@ -366,60 +289,7 @@ const getArrowConfiguration = (arrowType: ArrowType) => {
   }
 }
 
-const createFallbackArrow = (
-  sourceElement: ExcalidrawBaseElement,
-  targetElement: ExcalidrawBaseElement,
-  arrowId: string,
-  arrowType: ArrowType
-): ExcalidrawArrowElement => {
-  const startX = sourceElement.x + sourceElement.width
-  const startY = sourceElement.y + sourceElement.height / 2
-  const endX = targetElement.x
-  const endY = targetElement.y + targetElement.height / 2
-  const { points, arrowGeometry } = calculateArrowPointsAndGeometry(
-    { x: startX, y: startY },
-    { x: endX, y: endY },
-    arrowType,
-    'right'
-  )
-  return {
-    id: arrowId,
-    type: 'arrow',
-    ...arrowGeometry,
-    angle: 0,
-    strokeColor: '#1e1e1e',
-    backgroundColor: 'transparent',
-    fillStyle: 'solid',
-    strokeWidth: 2,
-    strokeStyle: 'solid',
-    roughness: 1,
-    opacity: 100,
-    groupIds: [],
-    frameId: null,
-    index: 'a2',
-    roundness: getArrowConfiguration(arrowType).roundness,
-    seed: Math.floor(Math.random() * 1000000),
-    version: 1,
-    versionNonce: Math.floor(Math.random() * 1000000),
-    isDeleted: false,
-    boundElements: null,
-    updated: Date.now(),
-    link: null,
-    locked: false,
-    points,
-    lastCommittedPoint: null,
-    startBinding: calculateBindingForArrowType(sourceElement, { x: startX, y: startY }, arrowType),
-    endBinding: calculateBindingForArrowType(targetElement, { x: endX, y: endY }, arrowType),
-    startArrowhead: null,
-    endArrowhead: 'arrow',
-    elbowed: getArrowConfiguration(arrowType).elbowed,
-    ...(arrowType === 'elbow' && {
-      fixedSegments: null,
-      startIsSpecial: null,
-      endIsSpecial: null,
-    }),
-  }
-}
+// Fallback (unused with simplified logic) could be reintroduced if needed
 
 export type ArrowCreationExports = {
   createArrowBetweenElements: typeof createArrowBetweenElements
