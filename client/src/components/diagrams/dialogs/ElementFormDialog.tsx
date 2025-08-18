@@ -2,19 +2,21 @@
 
 import React, { useState, useEffect } from 'react'
 import { useMutation, useQuery } from '@apollo/client'
-import { ExcalidrawElement } from '../diagrams/types/relationshipTypes'
+import { ExcalidrawElement } from '../types/relationshipTypes'
 
 // Import der Form-Komponenten (alle einheitlich als Forms)
-import ApplicationForm, { ApplicationFormValues } from '../applications/ApplicationForm'
-import CapabilityForm, { CapabilityFormValues } from '../capabilities/CapabilityForm'
-import DataObjectForm, { DataObjectFormValues } from '../dataobjects/DataObjectForm'
-import InfrastructureForm, { InfrastructureFormValues } from '../infrastructure/InfrastructureForm'
+import ApplicationForm, { ApplicationFormValues } from '../../applications/ApplicationForm'
+import CapabilityForm, { CapabilityFormValues } from '../../capabilities/CapabilityForm'
+import DataObjectForm, { DataObjectFormValues } from '../../dataobjects/DataObjectForm'
+import InfrastructureForm, {
+  InfrastructureFormValues,
+} from '../../infrastructure/InfrastructureForm'
 import ApplicationInterfaceForm, {
   ApplicationInterfaceFormValues,
-} from '../interfaces/ApplicationInterfaceForm'
+} from '../../interfaces/ApplicationInterfaceForm'
 
 // Import der GraphQL-Queries
-import { GET_APPLICATION } from '@/graphql/application'
+import { GET_APPLICATION, GET_APPLICATIONS } from '@/graphql/application'
 import { GET_CAPABILITY, GET_CAPABILITIES } from '@/graphql/capability'
 import { GET_APPLICATION_INTERFACE } from '@/graphql/applicationInterface'
 import { GET_INFRASTRUCTURE } from '@/graphql/infrastructure'
@@ -170,6 +172,15 @@ function ApplicationFormWrapper({
     skip: !isOpen,
   })
 
+  // Lade alle Applikationen für die Parent/Child-Auswahl
+  const {
+    data: allApplicationsData,
+    loading: allApplicationsLoading,
+    error: allApplicationsError,
+  } = useQuery(GET_APPLICATIONS, {
+    skip: !isOpen,
+  })
+
   const [updateApplication] = useMutation(UPDATE_APPLICATION, {
     onCompleted: () => {
       onElementUpdated?.()
@@ -191,15 +202,20 @@ function ApplicationFormWrapper({
     }
   }
 
-  if (loading) return null
+  if (loading || allApplicationsLoading) return null
   if (error) {
     console.error('Error loading application:', error)
+    return null
+  }
+  if (allApplicationsError) {
+    console.error('Error loading all applications:', allApplicationsError)
     return null
   }
 
   console.log('ApplicationFormWrapper - Debug data:', {
     data,
     application: data?.applications?.[0],
+    allApplications: allApplicationsData?.applications,
     databaseId,
     loading,
     error,
@@ -208,6 +224,7 @@ function ApplicationFormWrapper({
   return (
     <ApplicationForm
       application={data?.applications?.[0]}
+      availableApplications={allApplicationsData?.applications || []}
       mode={mode}
       isOpen={isOpen}
       onClose={onClose}

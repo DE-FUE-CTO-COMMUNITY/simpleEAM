@@ -1,12 +1,12 @@
 // Export all diagram components
 export { default as DiagramEditor } from './components/DiagramEditor'
-export { default as CapabilityMapGenerator } from './components/CapabilityMapGenerator'
-export { default as DeleteDiagramDialog } from './components/DeleteDiagramDialog'
+export { default as CapabilityMapGenerator } from './dialogs/CapabilityMapGenerator'
+export { default as DeleteDiagramDialog } from './dialogs/DeleteDiagramDialog'
 export { default as DiagramNameDisplay } from './components/DiagramNameDisplay'
 export { default as ExcalidrawWrapper } from './components/ExcalidrawWrapper'
 export { default as IntegratedLibrary } from './components/IntegratedLibrary'
-export { default as OpenDiagramDialog } from './components/OpenDiagramDialog'
-export { default as SaveDiagramDialog } from './components/SaveDiagramDialog'
+export { default as OpenDiagramDialog } from './dialogs/OpenDiagramDialog'
+export { default as SaveDiagramDialog } from './dialogs/SaveDiagramDialog'
 
 // Export utils (avoiding duplicates)
 export { generateCapabilityMapWithLibrary } from './utils/CapabilityMapLibraryUtils'

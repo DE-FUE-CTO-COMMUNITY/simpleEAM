@@ -430,30 +430,29 @@ export const FullCustomContextMenu: React.FC<CustomContextMenuProps> = ({
     >
       <MenuList dense>
         {/* Standard-Aktionen - nur bei Auswahl */}
-        {hasSelection && !viewModeEnabled && (
-          <>
-            <MenuItem onClick={handleCut}>
+        {hasSelection &&
+          !viewModeEnabled && [
+            <MenuItem key="cut" onClick={handleCut}>
               <ListItemIcon>
                 <CutIcon fontSize="small" />
               </ListItemIcon>
               <ListItemText>{t('diagrams.contextMenu.cut')}</ListItemText>
-            </MenuItem>
+            </MenuItem>,
 
-            <MenuItem onClick={handleCopy}>
+            <MenuItem key="copy" onClick={handleCopy}>
               <ListItemIcon>
                 <CopyIcon fontSize="small" />
               </ListItemIcon>
               <ListItemText>{t('diagrams.contextMenu.copy')}</ListItemText>
-            </MenuItem>
+            </MenuItem>,
 
-            <MenuItem onClick={handleDuplicate}>
+            <MenuItem key="duplicate" onClick={handleDuplicate}>
               <ListItemIcon>
                 <DuplicateIcon fontSize="small" />
               </ListItemIcon>
               <ListItemText>{t('diagrams.contextMenu.duplicate')}</ListItemText>
-            </MenuItem>
-          </>
-        )}
+            </MenuItem>,
+          ]}
 
         {/* Paste - immer verfügbar (außer im View-Modus) */}
         {!viewModeEnabled && (
@@ -498,37 +497,35 @@ export const FullCustomContextMenu: React.FC<CustomContextMenuProps> = ({
         )}
 
         {/* Layer-Aktionen - nur bei Auswahl */}
-        {hasSelection && !viewModeEnabled && (
-          <>
-            <Divider />
-            <MenuItem onClick={handleBringToFront}>
+        {hasSelection &&
+          !viewModeEnabled && [
+            <Divider key="divider-layer" />,
+            <MenuItem key="bring-to-front" onClick={handleBringToFront}>
               <ListItemIcon>
                 <BringToFrontIcon fontSize="small" />
               </ListItemIcon>
               <ListItemText>{t('diagrams.contextMenu.bringToFront')}</ListItemText>
-            </MenuItem>
+            </MenuItem>,
 
-            <MenuItem onClick={handleSendToBack}>
+            <MenuItem key="send-to-back" onClick={handleSendToBack}>
               <ListItemIcon>
                 <SendToBackIcon fontSize="small" />
               </ListItemIcon>
               <ListItemText>{t('diagrams.contextMenu.sendToBack')}</ListItemText>
-            </MenuItem>
-          </>
-        )}
+            </MenuItem>,
+          ]}
 
         {/* Löschen - ganz am Ende */}
-        {hasSelection && !viewModeEnabled && (
-          <>
-            <Divider />
-            <MenuItem onClick={handleDelete}>
+        {hasSelection &&
+          !viewModeEnabled && [
+            <Divider key="divider-delete" />,
+            <MenuItem key="delete" onClick={handleDelete}>
               <ListItemIcon>
                 <DeleteIcon fontSize="small" />
               </ListItemIcon>
               <ListItemText>{t('diagrams.contextMenu.delete')}</ListItemText>
-            </MenuItem>
-          </>
-        )}
+            </MenuItem>,
+          ]}
       </MenuList>
     </Paper>
   )

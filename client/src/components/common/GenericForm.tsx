@@ -717,8 +717,10 @@ const GenericForm: React.FC<GenericFormProps> = ({
                       field.renderOption ||
                       ((props, option) => {
                         // Standard-Rendering für Options ohne Farbhinterlegung
+                        // Extrahiere key prop aus props, da React keys direkt übergeben werden müssen
+                        const { key, ...restProps } = props
                         return (
-                          <li {...props}>
+                          <li key={key} {...restProps}>
                             {typeof option === 'object' && 'label' in option
                               ? option.label
                               : option}

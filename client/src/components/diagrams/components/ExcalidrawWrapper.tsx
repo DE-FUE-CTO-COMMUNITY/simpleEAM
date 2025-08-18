@@ -5,10 +5,10 @@ import { ExcalidrawComponentProps } from '../types/DiagramTypes'
 import { useThemeMode } from '@/contexts/ThemeContext'
 import ExcalidrawLoading from './ExcalidrawLoading'
 import { useExcalidrawCollaboration } from '../hooks/useExcalidrawCollaboration'
-import { CollaborationDialog } from './CollaborationDialog'
+import { CollaborationDialog } from '../dialogs/CollaborationDialog'
 import AddRelatedElementsDialog from '../dialogs/AddRelatedElementsDialog'
 import { FullCustomContextMenu } from './FullCustomContextMenu'
-import ElementFormDialog from '../../diagram/ElementFormDialog'
+import ElementFormDialog from '../dialogs/ElementFormDialog'
 import { ExcalidrawElement } from '../types/relationshipTypes'
 
 // Dynamischer Import von Excalidraw, um Server-Side-Rendering zu vermeiden
