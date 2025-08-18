@@ -100,14 +100,15 @@ export default function AddRelatedElementsDialog({
         const elementType = element.customData.elementType
 
         // Use the service function to load related elements
+        // Direkter Import des Datenbank-Services (Funktionssignatur: ({ client, mainElementId, mainElementType }))
         const { loadRelatedElementsFromDatabase } = await import(
-          '../utils/addRelatedElementsService'
+          '../services/databaseRelatedElementsService'
         )
-        const response = await loadRelatedElementsFromDatabase(
-          apolloClient,
-          databaseId,
-          elementType
-        )
+        const response = await loadRelatedElementsFromDatabase({
+          client: apolloClient as any, // Cast für vereinfachte Kompatibilität
+          mainElementId: databaseId,
+          mainElementType: elementType,
+        })
         return response.elements || []
       } catch (error) {
         console.error('Error loading related elements preview:', error)
