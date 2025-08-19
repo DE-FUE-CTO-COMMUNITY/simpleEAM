@@ -65,16 +65,23 @@ export const loadRelatedElementsFromDatabase = async ({
     }
 
     const elementData = elementDataArray[0]
-    const relatedElements = extractRelatedElementsFromQueryResult(
-      elementData,
-      normalizedType === 'businessCapability' ? 'capability' : normalizedType
-    )
+    const extractionType =
+      normalizedType === 'businessCapability'
+        ? 'capability'
+        : normalizedType === 'applicationInterface'
+          ? 'interface'
+          : normalizedType
+    console.info('[DBRelated] Fetch', {
+      mainElementId,
+      mainElementType,
+      normalizedType,
+      extractionType,
+    })
+    const relatedElements = extractRelatedElementsFromQueryResult(elementData, extractionType)
 
     return {
       elements: relatedElements,
-      relationshipTypes: getRelationshipTypesForElement(
-        normalizedType === 'businessCapability' ? 'capability' : normalizedType
-      ),
+      relationshipTypes: getRelationshipTypesForElement(extractionType),
       totalElements: relatedElements.length,
     }
   } catch (error) {

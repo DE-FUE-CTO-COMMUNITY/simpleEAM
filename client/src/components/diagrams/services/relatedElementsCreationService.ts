@@ -3,9 +3,9 @@ import { getArchimateTemplateName } from './elementTemplateMapping'
 import { filterAlreadyConnectedElements } from './elementFilterService'
 import { calculateElementPositions } from './positioningService'
 import {
-  createArrowBetweenElements,
   ExcalidrawBaseElement,
   ExcalidrawArrowElement,
+  createArrowBetweenElements,
 } from './arrowCreationService'
 import {
   createCapabilityElementsFromTemplate,
@@ -148,66 +148,45 @@ export const createExcalidrawElementsFromRelated = async (
     }
 
     newElements.push(...createdElements)
-
-    if (createdElements.length > 0) {
-      const targetElement = createdElements[0]
-      const arrow = createArrowBetweenElements({
-        sourceElement: selectedElement,
-        targetElement,
-        arrowType: config.arrowType,
-        position: config.position,
-        reverseArrow: relatedElement.reverseArrow || false,
-        arrowIndex: i,
-        totalArrows: finalFilteredElements.length,
-        arrowGap: config.arrowGap,
-      })
-      newArrows.push(arrow)
+    // Pfeil zwischen Root und diesem Element
+    if (createdElements.length) {
+      try {
+        const main = createdElements[0]
+        const source = relatedElement.reverseArrow ? main : selectedElement
+        const target = relatedElement.reverseArrow ? selectedElement : main
+        const arrow = createArrowBetweenElements({
+          sourceElement: source,
+          targetElement: target,
+          arrowType: (config.arrowType as any) || 'sharp',
+          position: config.position as any,
+          reverseArrow: false,
+          totalArrows: finalFilteredElements.length,
+          arrowIndex: i,
+          arrowGap: config.arrowGap,
+        })
+        // Boundings hinzufügen
+        const attach = (el: ExcalidrawBaseElement) => {
+          if (!el.boundElements) el.boundElements = []
+          if (!el.boundElements.some(b => b.id === arrow.id)) {
+            el.boundElements.push({ id: arrow.id, type: 'arrow' })
+          }
+        }
+        attach(source)
+        attach(target)
+        newArrows.push(arrow)
+      } catch (e) {
+        console.warn('[SingleHop][Arrow] Fehler beim Erstellen eines Pfeils', e)
+      }
     }
   }
 
-  if (newElements.length > 0 || newArrows.length > 0) {
+  if (newElements.length > 0) {
     const currentElements = excalidrawAPI.getSceneElements()
     const allNewElements: ExcalidrawBaseElement[] = [...newElements, ...newArrows]
 
-    const updatedCurrentElements = currentElements.map(element => {
-      if (element.id === selectedElement.id) {
-        const connectedArrowIds = newArrows
-          .filter(
-            arrow =>
-              arrow.startBinding?.elementId === element.id ||
-              arrow.endBinding?.elementId === element.id
-          )
-          .map(arrow => arrow.id)
+    const updatedCurrentElements = currentElements // Keine Arrow-Bindings
 
-        const existingBoundElements = element.boundElements || []
-        const newBoundElements = [...existingBoundElements]
-
-        connectedArrowIds.forEach(arrowId => {
-          if (!newBoundElements.find((binding: any) => binding.id === arrowId)) {
-            newBoundElements.push({ id: arrowId, type: 'arrow' })
-          }
-        })
-
-        return { ...element, boundElements: newBoundElements }
-      }
-      return element
-    })
-
-    const finalNewElements = allNewElements.map(element => {
-      if (element.type === 'arrow') return element
-      const connectedArrows = newArrows.filter(
-        arrow =>
-          arrow.startBinding?.elementId === element.id || arrow.endBinding?.elementId === element.id
-      )
-      if (connectedArrows.length > 0) {
-        const boundElements = connectedArrows.map(arrow => ({
-          id: arrow.id,
-          type: 'arrow' as const,
-        }))
-        return { ...element, boundElements: [...(element.boundElements || []), ...boundElements] }
-      }
-      return element
-    })
+    const finalNewElements = allNewElements
 
     excalidrawAPI.updateScene({
       elements: [...updatedCurrentElements, ...finalNewElements],

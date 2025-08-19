@@ -1,10 +1,24 @@
-// arrowCreationService.ts - Erstellung & Geometrie von Pfeilen zwischen Excalidraw Elementen
+/**
+ * NEUIMPLEMENTIERUNG Pfeil-Erstellung
+ * -----------------------------------
+ * Diese Datei wurde vollständig neu erstellt entsprechend:
+ * - FR-DE-06 (Product Requirements)
+ * - EXCALIDRAW-ARROW-FUNCTIONALITY.md (Binding & Geometrie Referenz)
+ * - ARROW-CREATION-REQUIREMENTS.md (Architektur & zukünftige Strategien)
+ * - arrow_samples.excalidraw (Strukturelle Beispiele für Points & Bindings)
+ *
+ * WICHTIG: Kein Alt-Code beibehalten; sämtliche Logik frisch implementiert.
+ * Fokus: Korrekte Ankerberechnung, Bindings (focus bzw. fixedPoint), Gap-Anwendung,
+ * robuste Pfad-Geometrie für sharp | curved | elbow, Reverse-Unterstützung.
+ */
+
 import { ArrowType, RelativePosition, ArrowGapSize } from '../types/addRelatedElements'
 import { resolveArrowGapPx, applyPhysicalGap } from '../utils/arrowGapUtils'
-// (distribution now handled locally in computeAnchorPoints)
 import { generateElementId } from '../utils/elementIdManager'
 
-// Minimal benötigte Typen für Excalidraw Elemente, um any zu vermeiden
+// --------------------------------------------------
+// Excalidraw relevante minimale Typen
+// --------------------------------------------------
 export interface ExcalidrawBaseElement {
   id: string
   x: number
@@ -13,7 +27,7 @@ export interface ExcalidrawBaseElement {
   height: number
   type: string
   boundElements?: { id: string; type: 'arrow' | string }[] | null
-  [key: string]: any // Allow extra properties from library-created templates
+  [key: string]: any
 }
 
 export interface ExcalidrawArrowBinding {
@@ -25,18 +39,21 @@ export interface ExcalidrawArrowBinding {
 
 export interface ExcalidrawArrowElement extends ExcalidrawBaseElement {
   type: 'arrow'
-  points: [number, number][]
+  points: readonly [number, number][]
   startBinding: ExcalidrawArrowBinding | null
   endBinding: ExcalidrawArrowBinding | null
   startArrowhead: 'arrow' | null
   endArrowhead: 'arrow' | null
   elbowed?: boolean
-  fixedSegments?: any
-  startIsSpecial?: any
-  endIsSpecial?: any
+  fixedSegments?: null
+  startIsSpecial?: null
+  endIsSpecial?: null
   roundness: { type: number; value?: number } | null
 }
 
+// --------------------------------------------------
+// Options & Eingabeparameter
+// --------------------------------------------------
 export interface CreateArrowParams {
   sourceElement: ExcalidrawBaseElement
   targetElement: ExcalidrawBaseElement
@@ -45,62 +62,92 @@ export interface CreateArrowParams {
   reverseArrow?: boolean
   arrowIndex?: number
   totalArrows?: number
-  arrowGap?: ArrowGapSize // logische Gap-Größe (wird auf px gemappt und physisch angewandt)
+  arrowGap?: ArrowGapSize
 }
 
-export const createArrowBetweenElements = ({
-  sourceElement,
-  targetElement,
-  arrowType,
-  position,
-  reverseArrow = false,
-  arrowIndex = 0,
-  totalArrows = 1,
-  arrowGap,
-}: CreateArrowParams): ExcalidrawArrowElement => {
-  const arrowId = generateElementId()
-  const actualSourceElement = sourceElement
-  const actualTargetElement = targetElement
-  const resolvedPosition = derivePosition(position, actualSourceElement, actualTargetElement)
-  let { sourcePoint, targetPoint } = computeAnchorPoints(
-    actualSourceElement,
-    actualTargetElement,
-    resolvedPosition,
-    arrowIndex,
-    totalArrows
-  )
-  // Reverse: wir drehen lediglich die Richtung (Punkte + Bindings), behalten aber Standard-Pfeilspitze am Ende bei
-  let startElement = actualSourceElement
-  let endElement = actualTargetElement
-  if (reverseArrow) {
-    ;[sourcePoint, targetPoint] = [targetPoint, sourcePoint]
-    startElement = actualTargetElement
-    endElement = actualSourceElement
-  }
-  // Gap Mapping
-  const logicalGap = arrowGap ?? 'medium'
-  const gapPx = resolveArrowGapPx(logicalGap)
+// Interne Struktur für Anchor Points
+interface AnchorComputationResult {
+  sourceAnchor: Point
+  targetAnchor: Point
+  side: RelativePosition
+  sourceFocus: number // für sharp/curved
+  targetFocus: number // Ziel-Fokus kann für spätere Distribution genutzt werden
+}
 
-  // Physische Verkürzung Start/Ende (immer anwenden) - bei Elbow später nur auf erste & letzte Segmentpunkte
-  let shortenedSource = { ...sourcePoint }
-  let shortenedTarget = { ...targetPoint }
-  if (gapPx > 0) {
-    const shortened = applyPhysicalGap(sourcePoint, targetPoint, gapPx, gapPx)
-    shortenedSource = shortened.start
-    shortenedTarget = shortened.end
-  }
-  const arrowConfig = getArrowConfiguration(arrowType)
-  const { points, arrowGeometry } = buildArrowGeometry(
-    shortenedSource,
-    shortenedTarget,
+interface Point {
+  x: number
+  y: number
+}
+
+// --------------------------------------------------
+// Öffentliche Hauptfunktion
+// --------------------------------------------------
+export const createArrowBetweenElements = (params: CreateArrowParams): ExcalidrawArrowElement => {
+  const {
+    sourceElement,
+    targetElement,
     arrowType,
-    resolvedPosition
-  )
+    position,
+    reverseArrow = false,
+    arrowIndex = 0,
+    totalArrows = 1,
+    arrowGap = 'medium',
+  } = params
+
+  const resolvedSide = deriveSide(position, sourceElement, targetElement)
+  const anchors = computeAnchors({
+    source: sourceElement,
+    target: targetElement,
+    side: resolvedSide,
+    index: arrowIndex,
+    total: totalArrows,
+  })
+
+  // Reverse: rein logische Invertierung von Start/Ende (inkl. Bindings & Punkte-Reihenfolge)
+  const startEl = reverseArrow ? targetElement : sourceElement
+  const endEl = reverseArrow ? sourceElement : targetElement
+  const startPoint = reverseArrow ? anchors.targetAnchor : anchors.sourceAnchor
+  const endPoint = reverseArrow ? anchors.sourceAnchor : anchors.targetAnchor
+
+  const gapPx = resolveArrowGapPx(arrowGap)
+  // Strategie: sharp/curved -> physischer Gap durch Geometrie, Binding-Gap=0 (vermeidet doppelte Anwendung & Instabilität)
+  // elbow -> nur segmentweiser physischer Gap (wie zuvor), Binding-Gap bleibt 0.
+  const physicalGapPx = gapPx
+  const bindingGapPx = arrowType === 'elbow' ? 0 : 0 // aktuell immer 0 für Stabilität
+
+  const path = buildPath({
+    arrowType,
+    start: startPoint,
+    end: endPoint,
+    side: resolvedSide,
+    physicalGapPx,
+  })
+
+  const startBinding = buildBinding({
+    element: startEl,
+    point: startPoint,
+    arrowType,
+    gapPx: bindingGapPx,
+    isStart: true,
+  })
+  const endBinding = buildBinding({
+    element: endEl,
+    point: endPoint,
+    arrowType,
+    gapPx: bindingGapPx,
+    isStart: false,
+  })
+
+  // Bounding Box aus Punkten generieren
+  const { minX, minY, width, height, normalizedPoints } = normalizePoints(path.points)
 
   return {
-    id: arrowId,
+    id: generateElementId(),
     type: 'arrow',
-    ...arrowGeometry,
+    x: minX,
+    y: minY,
+    width,
+    height,
     angle: 0,
     strokeColor: '#1e1e1e',
     backgroundColor: 'transparent',
@@ -111,210 +158,288 @@ export const createArrowBetweenElements = ({
     opacity: 100,
     groupIds: [],
     frameId: null,
-    index: 'a2',
-    roundness: arrowConfig.roundness,
-    seed: Math.floor(Math.random() * 1000000),
+    index: 'a1',
+    roundness: path.roundness,
+    seed: Math.floor(Math.random() * 1_000_000),
     version: 1,
-    versionNonce: Math.floor(Math.random() * 1000000),
+    versionNonce: Math.floor(Math.random() * 1_000_000),
     isDeleted: false,
     boundElements: null,
     updated: Date.now(),
     link: null,
     locked: false,
-    points,
+    points: normalizedPoints,
     lastCommittedPoint: null,
-    startBinding: calculateBindingForArrowType(startElement, shortenedSource, arrowType, gapPx),
-    endBinding: calculateBindingForArrowType(endElement, shortenedTarget, arrowType, gapPx),
+    startBinding,
+    endBinding,
     startArrowhead: null,
     endArrowhead: 'arrow',
-    elbowed: arrowConfig.elbowed,
+    elbowed: arrowType === 'elbow',
     ...(arrowType === 'elbow' && {
       fixedSegments: null,
       startIsSpecial: null,
       endIsSpecial: null,
     }),
+    customData: {
+      ...(typeof (sourceElement as any).customData === 'object' ? (sourceElement as any).customData : {}),
+      arrowGapPx: gapPx,
+      arrowGapMode: 'physical-only',
+    },
   }
 }
 
-const calculateBindingForArrowType = (
-  element: ExcalidrawBaseElement,
-  connectionPoint: { x: number; y: number },
-  arrowType: ArrowType,
-  gapPx: number
-): ExcalidrawArrowBinding => {
-  if (arrowType === 'elbow') {
-    const fixedPointX = (connectionPoint.x - element.x) / element.width
-    const fixedPointY = (connectionPoint.y - element.y) / element.height
-    const normalizedFixedPointX = Math.max(0, Math.min(1, fixedPointX))
-    const normalizedFixedPointY = Math.max(0, Math.min(1, fixedPointY))
-    return {
-      elementId: element.id,
-      fixedPoint: [normalizedFixedPointX, normalizedFixedPointY],
-      focus: 0,
-      gap: 0,
-    }
-  }
-  return {
-    elementId: element.id,
-    focus: calculateBindingFocus(element, connectionPoint),
-    gap: gapPx,
-  }
-}
-
-// Simplified geometry builder
-const buildArrowGeometry = (
-  sourcePoint: { x: number; y: number },
-  targetPoint: { x: number; y: number },
-  arrowType: ArrowType,
-  position: RelativePosition
-): {
-  points: [number, number][]
-  arrowGeometry: { x: number; y: number; width: number; height: number }
-} => {
-  // Compute bounding box
-  const minX = Math.min(sourcePoint.x, targetPoint.x)
-  const minY = Math.min(sourcePoint.y, targetPoint.y)
-  const width = Math.abs(targetPoint.x - sourcePoint.x) || 1
-  const height = Math.abs(targetPoint.y - sourcePoint.y) || 1
-  const toLocal = (p: { x: number; y: number }): [number, number] => [p.x - minX, p.y - minY]
-
-  if (arrowType === 'sharp') {
-    return {
-      points: [toLocal(sourcePoint), toLocal(targetPoint)],
-      arrowGeometry: { x: minX, y: minY, width, height },
-    }
-  }
-
-  if (arrowType === 'curved') {
-    // Simple cubic-like polyline (Excalidraw poly points)
-    const dx = targetPoint.x - sourcePoint.x
-    const dy = targetPoint.y - sourcePoint.y
-    const offset = (position === 'left' || position === 'right' ? Math.abs(dy) : Math.abs(dx)) * 0.4
-    let c1: { x: number; y: number }
-    let c2: { x: number; y: number }
-    if (position === 'left' || position === 'right') {
-      c1 = { x: sourcePoint.x + dx * 0.3, y: sourcePoint.y + Math.sign(dy || 1) * offset }
-      c2 = { x: sourcePoint.x + dx * 0.7, y: targetPoint.y - Math.sign(dy || 1) * offset }
-    } else {
-      c1 = { x: sourcePoint.x + Math.sign(dx || 1) * offset, y: sourcePoint.y + dy * 0.3 }
-      c2 = { x: targetPoint.x - Math.sign(dx || 1) * offset, y: sourcePoint.y + dy * 0.7 }
-    }
-    return {
-      points: [toLocal(sourcePoint), toLocal(c1), toLocal(c2), toLocal(targetPoint)],
-      arrowGeometry: { x: minX, y: minY, width, height },
-    }
-  }
-
-  // Elbow (orthogonal) path
-  const mid: { x: number; y: number }[] = []
-  if (position === 'left' || position === 'right') {
-    const midX = sourcePoint.x + (targetPoint.x - sourcePoint.x) / 2
-    mid.push({ x: midX, y: sourcePoint.y }, { x: midX, y: targetPoint.y })
-  } else {
-    const midY = sourcePoint.y + (targetPoint.y - sourcePoint.y) / 2
-    mid.push({ x: sourcePoint.x, y: midY }, { x: targetPoint.x, y: midY })
-  }
-  return {
-    points: [toLocal(sourcePoint), ...mid.map(toLocal), toLocal(targetPoint)] as [number, number][],
-    arrowGeometry: { x: minX, y: minY, width, height },
-  }
-}
-
-// Compute anchors based on side position
-function computeAnchorPoints(
-  source: ExcalidrawBaseElement,
-  target: ExcalidrawBaseElement,
-  position: RelativePosition,
-  index: number,
-  total: number
-): { sourcePoint: { x: number; y: number }; targetPoint: { x: number; y: number } } {
-  const targetCenterX = target.x + target.width / 2
-  const targetCenterY = target.y + target.height / 2
-
-  // Distribution along side
-  const distribute = (length: number, start: number, i: number, n: number): number => {
-    if (n <= 1) return start + length / 2
-    const step = length / (n + 1)
-    return start + step * (i + 1)
-  }
-
-  let sourcePoint: { x: number; y: number }
-  let targetPoint: { x: number; y: number }
-  switch (position) {
-    case 'left':
-      sourcePoint = { x: source.x, y: distribute(source.height, source.y, index, total) }
-      targetPoint = { x: target.x + target.width, y: targetCenterY }
-      break
-    case 'right':
-      sourcePoint = {
-        x: source.x + source.width,
-        y: distribute(source.height, source.y, index, total),
-      }
-      targetPoint = { x: target.x, y: targetCenterY }
-      break
-    case 'top':
-      sourcePoint = { x: distribute(source.width, source.x, index, total), y: source.y }
-      targetPoint = { x: targetCenterX, y: target.y + target.height }
-      break
-    case 'bottom':
-      sourcePoint = {
-        x: distribute(source.width, source.x, index, total),
-        y: source.y + source.height,
-      }
-      targetPoint = { x: targetCenterX, y: target.y }
-      break
-  }
-  return { sourcePoint: sourcePoint!, targetPoint: targetPoint! }
-}
-
-// Determine position if not provided
-function derivePosition(
+// --------------------------------------------------
+// Seiten-/Richtungsableitung
+// --------------------------------------------------
+function deriveSide(
   explicit: RelativePosition | undefined,
   source: ExcalidrawBaseElement,
   target: ExcalidrawBaseElement
 ): RelativePosition {
   if (explicit) return explicit
-  const dx = target.x + target.width / 2 - (source.x + source.width / 2)
-  const dy = target.y + target.height / 2 - (source.y + source.height / 2)
-  return Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : dy > 0 ? 'bottom' : 'top'
+  const sx = source.x + source.width / 2
+  const sy = source.y + source.height / 2
+  const tx = target.x + target.width / 2
+  const ty = target.y + target.height / 2
+  const dx = tx - sx
+  const dy = ty - sy
+  if (Math.abs(dx) > Math.abs(dy)) return dx > 0 ? 'right' : 'left'
+  return dy > 0 ? 'bottom' : 'top'
 }
 
-// (removed) calculateConnectionPoint – replaced by simpler side-based anchor logic
+// --------------------------------------------------
+// Anchor Berechnung (Distribution nur Source-Seite – FR-DE-06: Startpunkt auf definierter Seite)
+// --------------------------------------------------
+function computeAnchors(args: {
+  source: ExcalidrawBaseElement
+  target: ExcalidrawBaseElement
+  side: RelativePosition
+  index: number
+  total: number
+}): AnchorComputationResult {
+  const { source, target, side, index, total } = args
+  // Verteilung: gleichmäßige Slots -> i+1 von (total+1)
+  const slot = total <= 1 ? 0.5 : (index + 1) / (total + 1)
+  const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v))
+  // Fokus-Bereich erweitern (±0.45) für bessere Entzerrung
+  const focus = clamp((slot - 0.5) * 2 * 0.9, -0.9, 0.9) // normalisiert -0.9..0.9
 
-const calculateBindingFocus = (
-  element: ExcalidrawBaseElement,
-  connectionPoint: { x: number; y: number }
-): number => {
-  const centerX = element.x + element.width / 2
-  const centerY = element.y + element.height / 2
-  const relativeX = (connectionPoint.x - centerX) / (element.width / 2)
-  const relativeY = (connectionPoint.y - centerY) / (element.height / 2)
-  const absX = Math.abs(relativeX)
-  const absY = Math.abs(relativeY)
-  let focus: number
-  if (absX > absY) {
-    focus = relativeY * 0.3
-  } else {
-    focus = relativeX * 0.3
+  let sourceAnchor: Point
+  let targetAnchor: Point
+
+  switch (side) {
+    case 'left': {
+      const y = source.y + source.height * slot
+      sourceAnchor = { x: source.x, y }
+      targetAnchor = { x: target.x + target.width, y: target.y + target.height / 2 }
+      break
+    }
+    case 'right': {
+      const y = source.y + source.height * slot
+      sourceAnchor = { x: source.x + source.width, y }
+      targetAnchor = { x: target.x, y: target.y + target.height / 2 }
+      break
+    }
+    case 'top': {
+      const x = source.x + source.width * slot
+      sourceAnchor = { x, y: source.y }
+      targetAnchor = { x: target.x + target.width / 2, y: target.y + target.height }
+      break
+    }
+    case 'bottom': {
+      const x = source.x + source.width * slot
+      sourceAnchor = { x, y: source.y + source.height }
+      targetAnchor = { x: target.x + target.width / 2, y: target.y }
+      break
+    }
   }
-  focus = Math.round(focus * 10) / 10
-  return Math.max(-0.3, Math.min(0.3, focus))
+
+  return {
+    sourceAnchor: sourceAnchor!,
+    targetAnchor: targetAnchor!,
+    side,
+    sourceFocus: focus,
+    targetFocus: 0, // (Ziel bleibt mittig laut FR-DE-06)
+  }
 }
 
-const getArrowConfiguration = (arrowType: ArrowType) => {
+// --------------------------------------------------
+// Pfad-Erzeugung (Strategien)
+// --------------------------------------------------
+interface BuildPathArgs {
+  arrowType: ArrowType
+  start: Point
+  end: Point
+  side: RelativePosition
+  physicalGapPx: number
+}
+
+interface BuiltPath {
+  points: Point[]
+  roundness: { type: number; value?: number } | null
+}
+
+function buildPath(args: BuildPathArgs): BuiltPath {
+  const { arrowType } = args
   switch (arrowType) {
     case 'curved':
-      return { roundness: { type: 2, value: 0.5 }, elbowed: false }
+      return curvedPath(args)
     case 'elbow':
-      return { roundness: { type: 1 }, elbowed: true }
+      return elbowPath(args)
     case 'sharp':
     default:
-      return { roundness: null, elbowed: false }
+      return sharpPath(args)
   }
 }
 
-// Fallback (unused with simplified logic) could be reintroduced if needed
-
-export type ArrowCreationExports = {
-  createArrowBetweenElements: typeof createArrowBetweenElements
+// Sharp: 2-Punkt Linie + physischer Gap an beiden Enden
+function sharpPath({ start, end, physicalGapPx }: BuildPathArgs): BuiltPath {
+  let s = start
+  let e = end
+  if (physicalGapPx > 0) {
+    const shortened = applyPhysicalGap(start, end, physicalGapPx, physicalGapPx)
+    s = shortened.start
+    e = shortened.end
+  }
+  return { points: [s, e], roundness: null }
 }
+
+// Curved: adaptiver Offset auf Basis Distanz + physischer Gap
+function curvedPath({ start, end, side, physicalGapPx }: BuildPathArgs): BuiltPath {
+  let s = start
+  let e = end
+  if (physicalGapPx > 0) {
+    const shortened = applyPhysicalGap(start, end, physicalGapPx, physicalGapPx)
+    s = shortened.start
+    e = shortened.end
+  }
+  const dx = e.x - s.x
+  const dy = e.y - s.y
+  const distance = Math.hypot(dx, dy)
+  // adaptive Krümmung (Clamp 20..160 px)
+  const curvature = Math.min(160, Math.max(20, distance * 0.3))
+  let c1: Point
+  let c2: Point
+  if (side === 'left' || side === 'right') {
+    // horizontale Hauptrichtung
+    const sign = dy === 0 ? 1 : Math.sign(dy)
+    c1 = { x: s.x + dx * 0.3, y: s.y + sign * curvature }
+    c2 = { x: s.x + dx * 0.7, y: e.y - sign * curvature }
+  } else {
+    const sign = dx === 0 ? 1 : Math.sign(dx)
+    c1 = { x: s.x + sign * curvature, y: s.y + dy * 0.3 }
+    c2 = { x: e.x - sign * curvature, y: s.y + dy * 0.7 }
+  }
+  return { points: [s, c1, c2, e], roundness: { type: 3, value: 0.5 } }
+}
+
+// Elbow: Orthogonaler Pfad. Physischer Gap nur äußerste Segmente (Start/End) – Gap = 0 in Bindings.
+function elbowPath({ start, end, side, physicalGapPx }: BuildPathArgs): BuiltPath {
+  // Grundpunkte vor Verkürzung erzeugen
+  const midPoints: Point[] = []
+  if (side === 'left' || side === 'right') {
+    const midX = start.x + (end.x - start.x) * 0.5
+    midPoints.push({ x: midX, y: start.y }, { x: midX, y: end.y })
+  } else {
+    const midY = start.y + (end.y - start.y) * 0.5
+    midPoints.push({ x: start.x, y: midY }, { x: end.x, y: midY })
+  }
+  // Physische Verkürzung nur entlang erster & letzter Segmentrichtung
+  let s = start
+  let e = end
+  if (physicalGapPx > 0) {
+    // Verkürze Start entlang erster Segmentrichtung
+    const firstNext = midPoints[0] || end
+    const shortenedStart = applyPhysicalGap(start, firstNext, physicalGapPx, 0).start
+    s = shortenedStart
+    // Verkürze Ende entlang letzter Segmentrichtung
+    const lastPrev = midPoints[midPoints.length - 1] || start
+    const shortenedEnd = applyPhysicalGap(lastPrev, end, 0, physicalGapPx).end
+    e = shortenedEnd
+  }
+  return { points: [s, ...midPoints, e], roundness: null }
+}
+
+// --------------------------------------------------
+// Normalisierung (globale -> lokale Punkte & Bounding Box)
+// --------------------------------------------------
+function normalizePoints(points: Point[]): {
+  minX: number
+  minY: number
+  width: number
+  height: number
+  normalizedPoints: [number, number][]
+} {
+  let minX = Infinity
+  let minY = Infinity
+  let maxX = -Infinity
+  let maxY = -Infinity
+  for (const p of points) {
+    if (p.x < minX) minX = p.x
+    if (p.y < minY) minY = p.y
+    if (p.x > maxX) maxX = p.x
+    if (p.y > maxY) maxY = p.y
+  }
+  const width = Math.max(1, maxX - minX)
+  const height = Math.max(1, maxY - minY)
+  const normalizedPoints: [number, number][] = points.map(p => [p.x - minX, p.y - minY])
+  // Startpunkt EXCALIDRAW-Konvention: (0,0) – falls erster Punkt nicht (0,0), wird er durch Verschiebung ohnehin 0/0
+  return { minX, minY, width, height, normalizedPoints }
+}
+
+// --------------------------------------------------
+// Binding Erstellung
+// --------------------------------------------------
+function buildBinding(args: {
+  element: ExcalidrawBaseElement
+  point: Point
+  arrowType: ArrowType
+  gapPx: number
+  isStart: boolean
+}): ExcalidrawArrowBinding {
+  const { element, point, arrowType, gapPx } = args
+  if (arrowType === 'elbow') {
+    // fixedPoint stabile Normalisierung
+    const fx = (point.x - element.x) / element.width
+    const fy = (point.y - element.y) / element.height
+    return {
+      elementId: element.id,
+      fixedPoint: [clamp01(fx), clamp01(fy)],
+      focus: 0,
+      gap: 0, // gemäß Samples elbow häufig ohne Binding-Gap
+    }
+  }
+  return {
+    elementId: element.id,
+    focus: computeFocus(element, point),
+    gap: gapPx,
+  }
+}
+
+function computeFocus(element: ExcalidrawBaseElement, p: Point): number {
+  const cx = element.x + element.width / 2
+  const cy = element.y + element.height / 2
+  const rx = (p.x - cx) / (element.width / 2)
+  const ry = (p.y - cy) / (element.height / 2)
+  const absX = Math.abs(rx)
+  const absY = Math.abs(ry)
+  let focus: number
+  if (absX > absY) {
+    // links/rechts Seite → Variation vertikal
+    focus = ry
+  } else {
+    // oben/unten Seite → Variation horizontal
+    focus = rx
+  }
+  // Clamp etwas breiter als alte Implementation
+  return Math.max(-1, Math.min(1, parseFloat(focus.toFixed(3))))
+}
+
+function clamp01(v: number): number {
+  return v < 0 ? 0 : v > 1 ? 1 : v
+}
+
+// --------------------------------------------------
+// Exporte
+// --------------------------------------------------
+export type ArrowCreationExports = { createArrowBetweenElements: typeof createArrowBetweenElements }

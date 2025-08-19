@@ -342,7 +342,7 @@ Simple-EAM besteht aus mehreren Komponenten, die als Docker-Container bereitgest
 - Verbinden des ausgewählten Architekturelements mit den benachbarten Elementen mit Pfeilen des Angegebenen Pfeiltyps und Gaps. Dabei ist die EXCALIDRAW-ARRWO-FUNCTIONALITY.md Datei zu berücksichtigen.
 - Beim Erstellen der Pfeile soll der Startpunkt beim ausgewählten Element auf der Seite liegen, die bei der Positionierung angegeben ist und beim benachbarten Element auf der gegenüberliegenden Seite. Das angegebene Gap soll bei der Ermittlung der Koordinaten berücksichtigt werden.
 - Wenn die Beziehung als Revers angegeben ist soll der Startpunkt beim benachbarten Element liegen und der Endpunkt beim ausgewählten Element. Dazu soll die Datei relationshipValidation.ts herangezogen werden.
-- Die Pfeile sollen ein Binding zu den jeweiligen Hauptelementen der Elemente haben. Die Bindings sollen entsprechend der EXCALIDRAW-ARRWO-FUNCTIONALITY.md Datei und den arrow-samples.excalidraw erstellt werden.
+- Die Pfeile sollen ein Binding zu den jeweiligen Hauptelementen der Elemente haben. Die Bindings sollen entsprechend der EXCALIDRAW-ARROW-FUNCTIONALITY.md Datei und den arrow-samples.excalidraw erstellt werden.
 
 #### FR-DE-04: Datenbank-integrierte ArchiMate-Bibliothek
 
