@@ -327,6 +327,23 @@ Simple-EAM besteht aus mehreren Komponenten, die als Docker-Container bereitgest
 - Konfigurierbare Layout-Algorithmen
 - Anpassung und Speicherung der generierten Diagramme
 
+#### FR-DE-06: Hinzufügen von benachbarten Elementen
+
+**Beschreibung:** Der Diagramm Editor muss eine Funktion haben um alle mit einem Architekturelement verbundenen Elemente im Diagramm zu ergänzen.  
+**Priorität:** Mittel  
+**Akzeptanzkriterien:**
+
+- Dialog zur Auswahl der zu ergänzenden Elemente und zur Positionierung (links, rechts, oben, unten), der Anzahl der Hops und Formatierung (Pfeiltyp, Gap, Distance, Spacing).
+- Folgende Default Werte der Parameter sollen verwendet werden: Positionierung: rechts, Anzahl der Hops: 1, Pfeiltyp: sharp, Gap: Mittel (8px), Distance: Breite des ausgewählten Elements, Spacing: 20px
+- Bei der Auswahl der zu ergänzenden Elemente soll eine Auswahl der verschiedenen Architekturelementtypen (Business Capability, Applikation, Daten Objekt, Schnittstelle ,Infrastruktur) möglich sein. Es soll mit angegeben werden, wieviele Elemente des jeweiligen Typs benachbart sind. Für Schnittstellen soll zwischen eingehenden und ausgehenden Schnittstellen unterschieden werden können.
+- Ermitteln der benachbarten Elemente aus der Datenbank (bei mehreren Hops entsprechend iterieren) und Hinzufügen zum Diagramm entsprechend der Positionierung, Distance und Spacing Vorgaben.
+- Das ausgewählte Element soll dabei immer mittig zu den benachbarten Elementen liegen.
+- Wenn Hops > 1 ist, muss die Positionierung anhand der Elemente des letzten Hops berechnet werden. Die elemente des jeweils vorigen Hops sollem immer in der Mitte der Elemente des aktuellen Hops liegen.
+- Verbinden des ausgewählten Architekturelements mit den benachbarten Elementen mit Pfeilen des Angegebenen Pfeiltyps und Gaps. Dabei ist die EXCALIDRAW-ARRWO-FUNCTIONALITY.md Datei zu berücksichtigen.
+- Beim Erstellen der Pfeile soll der Startpunkt beim ausgewählten Element auf der Seite liegen, die bei der Positionierung angegeben ist und beim benachbarten Element auf der gegenüberliegenden Seite. Das angegebene Gap soll bei der Ermittlung der Koordinaten berücksichtigt werden.
+- Wenn die Beziehung als Revers angegeben ist soll der Startpunkt beim benachbarten Element liegen und der Endpunkt beim ausgewählten Element. Dazu soll die Datei relationshipValidation.ts herangezogen werden.
+- Die Pfeile sollen ein Binding zu den jeweiligen Hauptelementen der Elemente haben. Die Bindings sollen entsprechend der EXCALIDRAW-ARRWO-FUNCTIONALITY.md Datei und den arrow-samples.excalidraw erstellt werden.
+
 #### FR-DE-04: Datenbank-integrierte ArchiMate-Bibliothek
 
 **Beschreibung:** Das System muss eine erweiterte ArchiMate-Bibliothek bereitstellen, die existierende Architektur-Elemente aus der Datenbank anzeigt und das Drag-and-Drop dieser Elemente in Diagramme ermöglicht.  
