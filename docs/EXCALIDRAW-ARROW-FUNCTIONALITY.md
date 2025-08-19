@@ -41,10 +41,11 @@ Der visuelle Pfad entsteht aus den (x,y)-Punkten unter Anwendung eines Smoothing
 - `elementId`: ID der Ziel-Form
 - `focus`: normalisierter Seiten-/Perimeter-Offset (≈ -1 bis +1)
 - `gap`: Pixelabstand zwischen dem Pfeil-Endpunkt und der Formgrenze (logisch – reine Darstellung berücksichtigt dies beim Rendern der Linie bis zum Rand minus gap)
-- `fixedPoint` (optional): Normalisierte 2D-Koordinate `{ x:0..1, y:0..1 }` innerhalb des Ziel-Bounding-Box Systems; Alternative zu `focus` für Fälle, in denen eine *explizit stabile geometrische Referenz* (z.B. für orthogonale / elbow Routen) bevorzugt wird. Während `focus` Seiten-orientiert ist (seitenspezifische Parametrisierung), beschreibt `fixedPoint` direkt eine relative Position, wodurch spätere Größenänderungen der Form deterministisch skalieren ohne Seiten-Hysterese.
+- `fixedPoint` (optional): Normalisierte 2D-Koordinate `{ x:0..1, y:0..1 }` innerhalb des Ziel-Bounding-Box Systems; Alternative zu `focus` für Fälle, in denen eine _explizit stabile geometrische Referenz_ (z.B. für orthogonale / elbow Routen) bevorzugt wird. Während `focus` Seiten-orientiert ist (seitenspezifische Parametrisierung), beschreibt `fixedPoint` direkt eine relative Position, wodurch spätere Größenänderungen der Form deterministisch skalieren ohne Seiten-Hysterese.
 - (teilweise weitere interne Felder wie Version/Provenienz)
 
 Verwendungskonvention (Custom / Elbow):
+
 - Elbow-Pfade nutzen bevorzugt `fixedPoint`, weil ein einzelner seitlicher Fokus nicht ausreichend Information für mehrsegmentige orthogonale Wege liefert.
 - Fallback-Regel: Wenn sowohl `focus` als auch `fixedPoint` vorhanden sind, hat `fixedPoint` Vorrang für die Rekonstruktion; `focus` kann als kompatible Reserve dienen.
 
@@ -157,13 +158,13 @@ Hinweis: Excalidraw unterscheidet im Kern nicht explizit zwischen "sharp" und "c
 
 ##### `fixedPoint` vs. `focus` beim Elbow
 
-| Aspekt            | focus                                   | fixedPoint (empfohlen)                                 |
-|-------------------|------------------------------------------|--------------------------------------------------------|
-| Bezug             | Seitenabhängig (top/right/bottom/left)   | Bounding-Box relativ (x,y in 0..1)                     |
-| Stabilität        | Kann Side-Flips triggern                 | Kein Flipping; skaliert proportional                   |
-| Orthogonale Pfade | Benötigt zusätzliche Side-Kontext        | Direkte Rekonstruktion Start-/End-Anker                |
-| Anpassung Größe   | Re-Interpretation über Seitenlogik       | Lineare Skalierung                                     |
-| Komplexe Formen   | Erfordert Side-Erkennung                 | Nur Bounding-Box-Koordinaten notwendig                 |
+| Aspekt            | focus                                  | fixedPoint (empfohlen)                  |
+| ----------------- | -------------------------------------- | --------------------------------------- |
+| Bezug             | Seitenabhängig (top/right/bottom/left) | Bounding-Box relativ (x,y in 0..1)      |
+| Stabilität        | Kann Side-Flips triggern               | Kein Flipping; skaliert proportional    |
+| Orthogonale Pfade | Benötigt zusätzliche Side-Kontext      | Direkte Rekonstruktion Start-/End-Anker |
+| Anpassung Größe   | Re-Interpretation über Seitenlogik     | Lineare Skalierung                      |
+| Komplexe Formen   | Erfordert Side-Erkennung               | Nur Bounding-Box-Koordinaten notwendig  |
 
 Empfohlene Regel: Für `elbowed` Pfeile immer `fixedPoint` setzen; `focus` optional als Legacy-Kompatibilität beibehalten.
 
@@ -315,9 +316,9 @@ Excalidraws Pfeilmechanik stützt sich auf ein kompaktes Binding-Modell (focus +
 
 ## 15. Änderungslog
 
-| Datum      | Änderung                                        |
+| Datum      | Änderung                                         |
 | ---------- | ------------------------------------------------ |
-| 19.08.2025 | Initiale Erstellung                             |
+| 19.08.2025 | Initiale Erstellung                              |
 | 19.08.2025 | Ergänzung: `fixedPoint` Binding + `elbowed` Flag |
 
 ---

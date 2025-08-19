@@ -1,5 +1,6 @@
 // arrowCreationService.ts - Erstellung & Geometrie von Pfeilen zwischen Excalidraw Elementen
-import { ArrowType, RelativePosition } from '../types/addRelatedElements'
+import { ArrowType, RelativePosition, ArrowGapSize } from '../types/addRelatedElements'
+import { resolveArrowGapPx, applyPhysicalGap } from '../utils/arrowGapUtils'
 // (distribution now handled locally in computeAnchorPoints)
 import { generateElementId } from '../utils/elementIdManager'
 
@@ -44,6 +45,7 @@ export interface CreateArrowParams {
   reverseArrow?: boolean
   arrowIndex?: number
   totalArrows?: number
+  arrowGap?: ArrowGapSize // logische Gap-Größe (wird auf px gemappt und physisch angewandt)
 }
 
 export const createArrowBetweenElements = ({
@@ -54,6 +56,7 @@ export const createArrowBetweenElements = ({
   reverseArrow = false,
   arrowIndex = 0,
   totalArrows = 1,
+  arrowGap,
 }: CreateArrowParams): ExcalidrawArrowElement => {
   const arrowId = generateElementId()
   const actualSourceElement = sourceElement
@@ -66,10 +69,22 @@ export const createArrowBetweenElements = ({
     arrowIndex,
     totalArrows
   )
+  // Gap Mapping
+  const logicalGap = arrowGap ?? 'medium'
+  const gapPx = resolveArrowGapPx(logicalGap)
+
+  // Physische Verkürzung Start/Ende (immer anwenden) - bei Elbow später nur auf erste & letzte Segmentpunkte
+  let shortenedSource = { ...sourcePoint }
+  let shortenedTarget = { ...targetPoint }
+  if (gapPx > 0) {
+    const shortened = applyPhysicalGap(sourcePoint, targetPoint, gapPx, gapPx)
+    shortenedSource = shortened.start
+    shortenedTarget = shortened.end
+  }
   const arrowConfig = getArrowConfiguration(arrowType)
   const { points, arrowGeometry } = buildArrowGeometry(
-    sourcePoint,
-    targetPoint,
+    shortenedSource,
+    shortenedTarget,
     arrowType,
     resolvedPosition
   )
@@ -100,8 +115,18 @@ export const createArrowBetweenElements = ({
     locked: false,
     points,
     lastCommittedPoint: null,
-    startBinding: calculateBindingForArrowType(actualSourceElement, sourcePoint, arrowType),
-    endBinding: calculateBindingForArrowType(actualTargetElement, targetPoint, arrowType),
+    startBinding: calculateBindingForArrowType(
+      actualSourceElement,
+      shortenedSource,
+      arrowType,
+      gapPx
+    ),
+    endBinding: calculateBindingForArrowType(
+      actualTargetElement,
+      shortenedTarget,
+      arrowType,
+      gapPx
+    ),
     startArrowhead: reverseArrow ? 'arrow' : null,
     endArrowhead: reverseArrow ? null : 'arrow',
     elbowed: arrowConfig.elbowed,
@@ -116,7 +141,8 @@ export const createArrowBetweenElements = ({
 const calculateBindingForArrowType = (
   element: ExcalidrawBaseElement,
   connectionPoint: { x: number; y: number },
-  arrowType: ArrowType
+  arrowType: ArrowType,
+  gapPx: number
 ): ExcalidrawArrowBinding => {
   if (arrowType === 'elbow') {
     const fixedPointX = (connectionPoint.x - element.x) / element.width
@@ -133,7 +159,7 @@ const calculateBindingForArrowType = (
   return {
     elementId: element.id,
     focus: calculateBindingFocus(element, connectionPoint),
-    gap: 8,
+    gap: gapPx,
   }
 }
 

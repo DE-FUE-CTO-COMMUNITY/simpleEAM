@@ -163,6 +163,8 @@
       "arrowType": "Pfeiltyp",
       "arrowGap": "Pfeil-Abstand",
       "spacing": "Abstand",
+      "distance": "Distanz",
+      "distanceHint": "(Elementbreite {fallback})",
       "add": "Hinzufügen",
       "processing": "Verarbeite verwandte Elemente... Bitte warten.",
       "elementTypes": "Element-Typen",
@@ -213,7 +215,9 @@
         "minHops": "Mindestens 1 Hop erforderlich",
         "maxHops": "Maximal 5 Hops erlaubt",
         "minSpacing": "Mindestabstand 10px",
-        "maxSpacing": "Maximalabstand 1000px"
+        "maxSpacing": "Maximalabstand 1000px",
+        "minDistance": "Mindestdistanz 10px",
+        "maxDistance": "Maximaldistanz 5000px"
       }
     },
     "dialogs": {

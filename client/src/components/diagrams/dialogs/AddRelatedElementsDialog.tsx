@@ -168,6 +168,7 @@ export default function AddRelatedElementsDialog({
       arrowType: 'sharp' as ArrowType,
       spacing: 20,
       arrowGap: 'medium' as ArrowGapSize,
+      distance: selectedElement ? Math.round(selectedElement.width) : 0,
     },
     onSubmit: async ({ value }) => {
       if (!selectedElement || !excalidrawAPI) {
@@ -418,6 +419,44 @@ export default function AddRelatedElementsDialog({
                   error={!field.state.meta.isValid}
                   helperText={field.state.meta.errors.join(', ')}
                   inputProps={{ min: 10, max: 1000, step: 10 }}
+                  fullWidth
+                />
+              )}
+            </form.Field>
+
+            {/* Distance */}
+            <form.Field
+              name="distance"
+              validators={{
+                onChange: ({ value }) => {
+                  if (value === undefined || value === null) return 'Required'
+                  if (value < 10) return t('validation.minDistance' as any)
+                  if (value > 5000) return t('validation.maxDistance' as any)
+                  return undefined
+                },
+              }}
+            >
+              {field => (
+                <TextField
+                  label={t('distance' as any)}
+                  type="number"
+                  value={field.state.value}
+                  onChange={e => {
+                    const raw = e.target.value
+                    field.handleChange(parseInt(raw) || 0)
+                  }}
+                  onBlur={field.handleBlur}
+                  error={!field.state.meta.isValid}
+                  helperText={
+                    field.state.meta.errors.join(', ') ||
+                    (t as any)('distanceHint', { fallback: Math.round(selectedElement.width) })
+                  }
+                  inputProps={{
+                    min: 10,
+                    max: 5000,
+                    step: 10,
+                    placeholder: `${selectedElement.width}`,
+                  }}
                   fullWidth
                 />
               )}

@@ -160,6 +160,8 @@
       "arrowType": "Arrow Type",
       "arrowGap": "Arrow Gap",
       "spacing": "Spacing",
+      "distance": "Distance",
+      "distanceHint": "(element width {fallback})",
       "add": "Add",
       "processing": "Processing related elements... Please wait.",
       "elementTypes": "Element Types",
@@ -210,7 +212,9 @@
         "minHops": "At least 1 hop required",
         "maxHops": "Maximum 5 hops allowed",
         "minSpacing": "Minimum spacing 10px",
-        "maxSpacing": "Maximum spacing 1000px"
+        "maxSpacing": "Maximum spacing 1000px",
+        "minDistance": "Minimum distance 10px",
+        "maxDistance": "Maximum distance 5000px"
       }
     },
     "dialogs": {

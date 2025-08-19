@@ -82,7 +82,8 @@ export const createExcalidrawElementsFromRelated = async (
     finalFilteredElements,
     { x: sourceX, y: sourceY, width: sourceWidth, height: sourceHeight },
     config.position,
-    config.spacing
+    config.spacing,
+    config.distance
   )
 
   for (let i = 0; i < finalFilteredElements.length; i++) {
@@ -158,6 +159,7 @@ export const createExcalidrawElementsFromRelated = async (
         reverseArrow: relatedElement.reverseArrow || false,
         arrowIndex: i,
         totalArrows: finalFilteredElements.length,
+        arrowGap: config.arrowGap,
       })
       newArrows.push(arrow)
     }

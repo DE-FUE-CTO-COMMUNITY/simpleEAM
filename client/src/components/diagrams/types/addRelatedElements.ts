@@ -29,6 +29,8 @@ export interface AddRelatedElementsConfig {
   position: RelativePosition
   /** Abstand zwischen einzelnen Elementen */
   spacing: number
+  /** Distanz zwischen ausgewähltem Element und erster Reihe neuer Elemente (immer gesetzt, initial = gerundete Breite des ausgewählten Elements) */
+  distance: number
   /** Gap zwischen Pfeil und Element */
   arrowGap: ArrowGapSize
   /** Ausgewählte Element-Typen (optional, wenn nicht gesetzt werden alle Typen verwendet) */
