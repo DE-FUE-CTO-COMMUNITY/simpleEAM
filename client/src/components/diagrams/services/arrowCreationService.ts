@@ -62,13 +62,21 @@ export const createArrowBetweenElements = ({
   const actualSourceElement = sourceElement
   const actualTargetElement = targetElement
   const resolvedPosition = derivePosition(position, actualSourceElement, actualTargetElement)
-  const { sourcePoint, targetPoint } = computeAnchorPoints(
+  let { sourcePoint, targetPoint } = computeAnchorPoints(
     actualSourceElement,
     actualTargetElement,
     resolvedPosition,
     arrowIndex,
     totalArrows
   )
+  // Reverse: wir drehen lediglich die Richtung (Punkte + Bindings), behalten aber Standard-Pfeilspitze am Ende bei
+  let startElement = actualSourceElement
+  let endElement = actualTargetElement
+  if (reverseArrow) {
+    ;[sourcePoint, targetPoint] = [targetPoint, sourcePoint]
+    startElement = actualTargetElement
+    endElement = actualSourceElement
+  }
   // Gap Mapping
   const logicalGap = arrowGap ?? 'medium'
   const gapPx = resolveArrowGapPx(logicalGap)
@@ -115,20 +123,10 @@ export const createArrowBetweenElements = ({
     locked: false,
     points,
     lastCommittedPoint: null,
-    startBinding: calculateBindingForArrowType(
-      actualSourceElement,
-      shortenedSource,
-      arrowType,
-      gapPx
-    ),
-    endBinding: calculateBindingForArrowType(
-      actualTargetElement,
-      shortenedTarget,
-      arrowType,
-      gapPx
-    ),
-    startArrowhead: reverseArrow ? 'arrow' : null,
-    endArrowhead: reverseArrow ? null : 'arrow',
+    startBinding: calculateBindingForArrowType(startElement, shortenedSource, arrowType, gapPx),
+    endBinding: calculateBindingForArrowType(endElement, shortenedTarget, arrowType, gapPx),
+    startArrowhead: null,
+    endArrowhead: 'arrow',
     elbowed: arrowConfig.elbowed,
     ...(arrowType === 'elbow' && {
       fixedSegments: null,
