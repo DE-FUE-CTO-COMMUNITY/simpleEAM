@@ -263,9 +263,8 @@ const ExcalidrawWrapper = dynamic(
                   // Für Element-Kontext-Menü: Prüfe, ob das ausgewählte Element eine databaseId hat
                   if (type === 'element' && !this.state.viewModeEnabled) {
                     const elements = this.state.excalidrawAPI?.getSceneElements() || []
-                    const selectedElements = elements.filter(
-                      (el: any) => this.state.selectedElementIds[el.id]
-                    )
+                    const selectedElementIds = this.state.selectedElementIds || {}
+                    const selectedElements = elements.filter((el: any) => selectedElementIds[el.id])
 
                     if (selectedElements.length === 1) {
                       const element = selectedElements[0]

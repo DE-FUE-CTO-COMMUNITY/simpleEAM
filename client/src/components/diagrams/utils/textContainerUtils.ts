@@ -488,8 +488,10 @@ export const findLinkedTextElement = (
       for (const textEl of nearbyTexts) {
         const textContent = normalizeText(textEl.text || textEl.rawText)
         if (
-          textContent.includes(expectedName.split(' ')[0]) ||
-          expectedName.includes(textContent.split(' ')[0])
+          textContent &&
+          expectedName &&
+          (textContent.includes(expectedName.split(' ')[0]) ||
+            expectedName.includes(textContent.split(' ')[0]))
         ) {
           return textEl
         }

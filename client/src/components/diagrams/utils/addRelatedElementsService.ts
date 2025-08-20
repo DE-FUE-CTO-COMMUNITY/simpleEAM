@@ -387,7 +387,11 @@ export const loadAndCreateRelatedElements = async (
 
     // Filter Hop1 anhand selectedElementTypes (wie zuvor), aber wir müssen deren Spans beibehalten – also nur nicht-gewählte überspringen
     hop1SpanNodes.forEach(sn => {
-      if (config.selectedElementTypes && !config.selectedElementTypes.includes(sn.node.elementType))
+      if (
+        config.selectedElementTypes &&
+        Array.isArray(config.selectedElementTypes) &&
+        !config.selectedElementTypes.includes(sn.node.elementType)
+      )
         return
       placeSpanNode(sn, 0)
     })
@@ -472,7 +476,26 @@ export const loadAndCreateRelatedElements = async (
         }
         return el
       })
-      excalidrawAPI.updateScene({ elements: [...current, ...allNewElements, ...allNewArrows] })
+
+      // Defensive Element-Validierung vor updateScene
+      const validElements = [...current, ...allNewElements, ...allNewArrows].filter(el => {
+        if (!el || typeof el !== 'object') {
+          console.warn('Invalid element (not object):', el)
+          return false
+        }
+        if (!el.id || !el.type) {
+          console.warn('Invalid element (missing id or type):', el)
+          return false
+        }
+        if (typeof el.x !== 'number' || typeof el.y !== 'number') {
+          console.warn('Invalid element (invalid coordinates):', el)
+          return false
+        }
+        return true
+      })
+
+      console.log(`[AddRelatedElements] Updating scene with ${validElements.length} elements`)
+      excalidrawAPI.updateScene({ elements: validElements })
     }
 
     return {

@@ -54,9 +54,12 @@ export const createExcalidrawElementsFromRelated = async (
   const newElements: ExcalidrawBaseElement[] = []
   const newArrows: ExcalidrawArrowElement[] = []
 
-  const filteredRelatedElements = config.selectedElementTypes
-    ? relatedElements.filter(element => config.selectedElementTypes!.includes(element.elementType))
-    : relatedElements
+  const filteredRelatedElements =
+    config.selectedElementTypes && Array.isArray(config.selectedElementTypes)
+      ? relatedElements.filter(element =>
+          config.selectedElementTypes!.includes(element.elementType)
+        )
+      : relatedElements
 
   const finalFilteredElements = filterAlreadyConnectedElements(
     filteredRelatedElements as any,
@@ -188,8 +191,27 @@ export const createExcalidrawElementsFromRelated = async (
 
     const finalNewElements = allNewElements
 
+    // Defensive Element-Validierung vor updateScene
+    const allElements = [...updatedCurrentElements, ...finalNewElements]
+    const validElements = allElements.filter(el => {
+      if (!el || typeof el !== 'object') {
+        console.warn('[RelatedElementsCreation] Invalid element (not object):', el)
+        return false
+      }
+      if (!el.id || !el.type) {
+        console.warn('[RelatedElementsCreation] Invalid element (missing id or type):', el)
+        return false
+      }
+      if (typeof el.x !== 'number' || typeof el.y !== 'number') {
+        console.warn('[RelatedElementsCreation] Invalid element (invalid coordinates):', el)
+        return false
+      }
+      return true
+    })
+
+    console.log(`[RelatedElementsCreation] Updating scene with ${validElements.length} elements`)
     excalidrawAPI.updateScene({
-      elements: [...updatedCurrentElements, ...finalNewElements],
+      elements: validElements,
     })
   }
 

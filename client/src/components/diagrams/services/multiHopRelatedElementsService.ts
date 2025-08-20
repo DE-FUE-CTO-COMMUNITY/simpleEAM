@@ -63,7 +63,8 @@ export const loadMultiHopRelatedElements = async ({
   const filterBySelectedTypes = (
     elements: SingleHopRelatedElement[]
   ): SingleHopRelatedElement[] => {
-    if (!selectedTypes || selectedTypes.length === 0) return elements
+    if (!selectedTypes || !Array.isArray(selectedTypes) || selectedTypes.length === 0)
+      return elements
     return elements.filter(e => selectedTypes.includes(e.elementType))
   }
 
@@ -149,7 +150,9 @@ export const loadMultiHopRelatedElements = async ({
           console.info(`[MultiHop][Hop${hop}] Parent ${parentNode.id} keine Nachbarn roh`)
         }
         const afterTypeFilter = filterBySelectedTypes(neighbors)
-        const removedByType = neighbors.filter(n => !afterTypeFilter.includes(n))
+        const removedByType = Array.isArray(afterTypeFilter)
+          ? neighbors.filter(n => !afterTypeFilter.includes(n))
+          : []
         neighbors = afterTypeFilter
         const afterTypeIds = neighbors.map(n => `${n.id}:${n.elementType}`)
         if (removedByType.length) {
