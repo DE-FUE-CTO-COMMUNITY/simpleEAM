@@ -95,7 +95,7 @@ function getGapValue(gapSize?: ArrowGapSize): number {
   if (typeof gapSize === 'number') {
     return gapSize
   }
-  
+
   switch (gapSize) {
     case 'small':
       return 8
@@ -282,10 +282,7 @@ function createArrowGeometry(
  * Berechnet die Gap-Distanz basierend auf Excalidraw's distanceToBindableElement
  * Vereinfachte Version für rechteckige Elemente
  */
-function calculateGap(
-  point: [number, number],
-  element: ExcalidrawBaseElement
-): number {
+function calculateGap(point: [number, number], element: ExcalidrawBaseElement): number {
   const [px, py] = point
   const { x, y, width, height, angle = 0 } = element
 
@@ -296,7 +293,7 @@ function calculateGap(
   // Rotiere Punkt um das Element-Zentrum (umgekehrt zur Element-Rotation)
   const cos = Math.cos(-angle)
   const sin = Math.sin(-angle)
-  
+
   const rotatedPX = cos * (px - centerX) - sin * (py - centerY) + centerX
   const rotatedPY = sin * (px - centerX) + cos * (py - centerY) + centerY
 
@@ -330,12 +327,12 @@ function calculateGap(
       { x: left, y: top },
       { x: right, y: top },
       { x: right, y: bottom },
-      { x: left, y: bottom }
+      { x: left, y: bottom },
     ]
 
-    minDistance = Math.min(...corners.map(corner => 
-      Math.sqrt((rotatedPX - corner.x) ** 2 + (rotatedPY - corner.y) ** 2)
-    ))
+    minDistance = Math.min(
+      ...corners.map(corner => Math.sqrt((rotatedPX - corner.x) ** 2 + (rotatedPY - corner.y) ** 2))
+    )
   }
 
   return Math.max(1, minDistance)
@@ -366,10 +363,10 @@ function calculateFocus(
   // Rotiere Punkte um das Element-Zentrum (umgekehrt zur Element-Rotation)
   const cos = Math.cos(-angle)
   const sin = Math.sin(-angle)
-  
+
   const rotatedAX = cos * (ax - centerX) - sin * (ay - centerY) + centerX
   const rotatedAY = sin * (ax - centerX) + cos * (ay - centerY) + centerY
-  
+
   const rotatedEX = cos * (ex - centerX) - sin * (ey - centerY) + centerX
   const rotatedEY = sin * (ex - centerX) + cos * (ey - centerY) + centerY
 
@@ -377,7 +374,7 @@ function calculateFocus(
   const dirX = rotatedEX - rotatedAX
   const dirY = rotatedEY - rotatedAY
   const dirLength = Math.sqrt(dirX * dirX + dirY * dirY)
-  
+
   if (dirLength === 0) {
     return 0
   }
@@ -393,17 +390,29 @@ function calculateFocus(
 
   // Berechne Schnittpunkte mit Element-Diagonalen
   const diagonal1 = intersectLineWithLine(
-    rotatedAX, rotatedAY, lineEndX, lineEndY,
-    x - width, y - height, x + width * 2, y + height * 2
+    rotatedAX,
+    rotatedAY,
+    lineEndX,
+    lineEndY,
+    x - width,
+    y - height,
+    x + width * 2,
+    y + height * 2
   )
-  
+
   const diagonal2 = intersectLineWithLine(
-    rotatedAX, rotatedAY, lineEndX, lineEndY,
-    x + width * 2, y - height, x - width, y + height * 2
+    rotatedAX,
+    rotatedAY,
+    lineEndX,
+    lineEndY,
+    x + width * 2,
+    y - height,
+    x - width,
+    y + height * 2
   )
 
   const intersections = [diagonal1, diagonal2].filter(p => p !== null)
-  
+
   if (intersections.length === 0) {
     return 0
   }
@@ -416,7 +425,7 @@ function calculateFocus(
   })
 
   const intersection = intersections[0]
-  
+
   // Vorzeichen bestimmen (Cross-Product)
   const vecToCenter = { x: centerX - rotatedAX, y: centerY - rotatedAY }
   const vecToEdge = { x: rotatedEX - rotatedAX, y: rotatedEY - rotatedAX }
@@ -424,10 +433,10 @@ function calculateFocus(
 
   // Distanz vom Zentrum zum Schnittpunkt
   const distance = Math.sqrt((intersection.x - centerX) ** 2 + (intersection.y - centerY) ** 2)
-  
+
   // Normalisierung basierend auf Element-Diagonale
   const normalizer = Math.sqrt(width ** 2 + height ** 2) / 2
-  
+
   return (sign * distance) / normalizer
 }
 
@@ -435,20 +444,26 @@ function calculateFocus(
  * Hilfsfunktion für Linien-Schnittpunkt-Berechnung
  */
 function intersectLineWithLine(
-  x1: number, y1: number, x2: number, y2: number,
-  x3: number, y3: number, x4: number, y4: number
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+  x3: number,
+  y3: number,
+  x4: number,
+  y4: number
 ): { x: number; y: number } | null {
   const denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
-  
+
   if (Math.abs(denom) < 1e-10) {
     return null // Parallele Linien
   }
 
   const t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / denom
-  
+
   return {
     x: x1 + t * (x2 - x1),
-    y: y1 + t * (y2 - y1)
+    y: y1 + t * (y2 - y1),
   }
 }
 
@@ -490,7 +505,7 @@ export function createArrowBetweenElements(params: CreateArrowParams): any {
   // - Bei reverse Pfeil: Start in der Mitte, End mit Offset
   let startPoint: [number, number]
   let endPoint: [number, number]
-  
+
   if (reverseArrow) {
     // Reverse: Ziel-Element (actualSource) bekommt Offset, Start-Element (actualTarget) in der Mitte
     startPoint = calculateTargetAnchorPoint(actualSource, fromSide, gapValue)
