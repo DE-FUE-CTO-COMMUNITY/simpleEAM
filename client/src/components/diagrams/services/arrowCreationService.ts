@@ -108,39 +108,12 @@ function getGapValue(gapSize?: ArrowGapSize): number {
   }
 }
 
-/**
- * Bestimmt die beste Seite für die Pfeilverbindung
- */
-function determineBestSide(
-  from: ExcalidrawBaseElement,
-  to: ExcalidrawBaseElement
-): { fromSide: string; toSide: string } {
-  const fromCenter = {
-    x: from.x + from.width / 2,
-    y: from.y + from.height / 2,
-  }
-  const toCenter = {
-    x: to.x + to.width / 2,
-    y: to.y + to.height / 2,
-  }
-
-  const dx = toCenter.x - fromCenter.x
-  const dy = toCenter.y - fromCenter.y
-
-  // Bestimme dominante Richtung
-  if (Math.abs(dx) > Math.abs(dy)) {
-    // Horizontal dominant
-    return {
-      fromSide: dx > 0 ? 'right' : 'left',
-      toSide: dx > 0 ? 'left' : 'right',
-    }
-  } else {
-    // Vertikal dominant
-    return {
-      fromSide: dy > 0 ? 'bottom' : 'top',
-      toSide: dy > 0 ? 'top' : 'bottom',
-    }
-  }
+// Opposite Side Mapping
+const oppositeSide: Record<RelativePosition, RelativePosition> = {
+  top: 'bottom',
+  bottom: 'top',
+  left: 'right',
+  right: 'left',
 }
 
 /**
@@ -210,29 +183,12 @@ function createArrowGeometry(
   const [startX, startY] = startPoint
   const [endX, endY] = endPoint
 
-  // Berechne Zielkoordinaten relativ zum Startpunkt
   const deltaX = endX - startX
   const deltaY = endY - startY
 
   let points: [number, number][]
-
   switch (arrowType) {
-    case 'sharp':
-      points = [
-        [0, 0],
-        [deltaX, deltaY],
-      ]
-      break
-
-    case 'curved':
-      points = [
-        [0, 0],
-        [deltaX, deltaY],
-      ]
-      break
-
     case 'elbow': {
-      // Rechtwinkliger Pfeil mit Zwischenpunkt
       const midX = deltaX / 2
       points = [
         [0, 0],
@@ -242,36 +198,33 @@ function createArrowGeometry(
       ]
       break
     }
-
-    default:
+    case 'curved': {
       points = [
         [0, 0],
         [deltaX, deltaY],
       ]
+      break
+    }
+    default: {
+      points = [
+        [0, 0],
+        [deltaX, deltaY],
+      ]
+    }
   }
-
-  // Berechne width und height MIT Vorzeichen (negativ = links/oben, positiv = rechts/unten)
-  const width = deltaX
-  const height = deltaY
 
   const result = {
     points,
     bounds: {
-      x: startX, // Position ist der tatsächliche Startpunkt
+      x: startX,
       y: startY,
-      width,
-      height,
+      width: deltaX,
+      height: deltaY,
     },
   }
 
-  if (arrowType === 'curved') {
-    return { ...result, roundness: { type: 2 } }
-  }
-
-  if (arrowType === 'elbow') {
-    return { ...result, elbowed: true }
-  }
-
+  if (arrowType === 'curved') return { ...result, roundness: { type: 2 } }
+  if (arrowType === 'elbow') return { ...result, elbowed: true }
   return result
 }
 
@@ -294,12 +247,10 @@ export function createArrowBetweenElements(params: CreateArrowParams): any {
     throw new Error('Source and target elements are required')
   }
 
-  // Bei reverseArrow: Vertausche Source und Target
-  const actualSource = reverseArrow ? targetElement : sourceElement
-  const actualTarget = reverseArrow ? sourceElement : targetElement
-
-  // Bestimme beste Verbindungsseiten
-  const { fromSide, toSide } = determineBestSide(actualSource, actualTarget)
+  // Feste Seiten aus Parameter (kein automatisches Umschalten)
+  const desired = params.position || 'right'
+  const sourceSide: RelativePosition = desired
+  const targetSide: RelativePosition = oppositeSide[desired]
 
   // Berechne Gap-Wert
   const gapValue = getGapValue(arrowGap)
@@ -308,20 +259,18 @@ export function createArrowBetweenElements(params: CreateArrowParams): any {
   const offsetStep = totalArrows > 1 ? 20 : 0
   const offset = totalArrows > 1 ? (arrowIndex - (totalArrows - 1) / 2) * offsetStep : 0
 
-  // Berechne Anchor-Punkte:
-  // - Bei normalem Pfeil: Start mit Offset, End in der Mitte
-  // - Bei reverse Pfeil: Start in der Mitte, End mit Offset
+  // Berechne Anchor-Punkte basierend auf vorgegebenen Seiten
   let startPoint: [number, number]
   let endPoint: [number, number]
 
-  if (reverseArrow) {
-    // Reverse: Ziel-Element (actualSource) bekommt Offset, Start-Element (actualTarget) in der Mitte
-    startPoint = calculateTargetAnchorPoint(actualSource, fromSide, gapValue)
-    endPoint = calculateAnchorPoint(actualTarget, toSide, offset, gapValue)
+  if (!reverseArrow) {
+    // Normal Richtung: Source -> Target (Offset an Source-Seite)
+    startPoint = calculateAnchorPoint(sourceElement, sourceSide, offset, gapValue)
+    endPoint = calculateTargetAnchorPoint(targetElement, targetSide, gapValue)
   } else {
-    // Normal: Start-Element bekommt Offset, Ziel-Element in der Mitte
-    startPoint = calculateAnchorPoint(actualSource, fromSide, offset, gapValue)
-    endPoint = calculateTargetAnchorPoint(actualTarget, toSide, gapValue)
+    // Reverse Richtung: Target -> Source; Offset bleibt konzeptionell an ursprünglicher Source-Seite
+    startPoint = calculateTargetAnchorPoint(targetElement, targetSide, gapValue) // ohne Offset
+    endPoint = calculateAnchorPoint(sourceElement, sourceSide, offset, gapValue) // Offset hier
   }
 
   // Erstelle Pfeil-Geometrie für Koordinaten-Berechnung
@@ -364,16 +313,16 @@ export function createArrowBetweenElements(params: CreateArrowParams): any {
     points: geometry.points.map(([x, y]) => [x, y] as [number, number]),
     lastCommittedPoint: null,
     startBinding: {
-      elementId: actualSource.id,
+      elementId: (!reverseArrow ? sourceElement : targetElement).id,
       focus: startFocus,
       gap: startGap,
     },
     endBinding: {
-      elementId: actualTarget.id,
+      elementId: (!reverseArrow ? targetElement : sourceElement).id,
       focus: endFocus,
       gap: endGap,
     },
-    startArrowhead: null,
+    startArrowhead: reverseArrow ? null : null,
     endArrowhead: 'arrow',
     ...(geometry.roundness && { roundness: geometry.roundness }),
     ...(geometry.elbowed && { elbowed: geometry.elbowed }),
