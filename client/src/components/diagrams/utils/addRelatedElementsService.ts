@@ -222,13 +222,15 @@ export const loadAndCreateRelatedElements = async (
     interface SpanNode {
       node: MultiHopNode
       children: SpanNode[]
-      requiredSpan: number // Höhe inklusive Kinder (vertical orient.)
+      requiredSpan: number // Ausdehnung entlang Hauptachse (vertikal bei left/right, horizontal bei top/bottom)
       elementHeight: number
       elementWidth: number
       isUnique: boolean
     }
 
     const hopCount = replicatedLevels.length
+    const direction = config.position
+    const horizontal = direction === 'top' || direction === 'bottom'
     const spanLevels: SpanNode[][] = []
     // Set der unique IDs je Hop aus levels (ohne Replikate)
     const uniqueIdSets: Set<string>[] = levels.map(lvl => new Set(lvl.map(n => n.id)))
@@ -241,7 +243,7 @@ export const loadAndCreateRelatedElements = async (
         return {
           node: n,
           children: [] as SpanNode[],
-          requiredSpan: size.height, // initial – wird unten überschrieben falls Kinder
+          requiredSpan: horizontal ? size.width : size.height, // initial – wird unten überschrieben falls Kinder
           elementHeight: size.height,
           elementWidth: size.width,
           isUnique: uniqueIdSets[h]?.has(n.id) || false,
@@ -272,19 +274,22 @@ export const loadAndCreateRelatedElements = async (
     for (let h = hopCount - 1; h >= 0; h--) {
       spanLevels[h].forEach(sn => {
         if (!sn.children.length) {
-          sn.requiredSpan = sn.elementHeight
+          sn.requiredSpan = horizontal ? sn.elementWidth : sn.elementHeight
         } else {
           const sumChildren = sn.children.reduce((acc, c) => acc + c.requiredSpan, 0)
           const spacingTotal = (sn.children.length - 1) * config.spacing
-          sn.requiredSpan = Math.max(sn.elementHeight, sumChildren + spacingTotal)
+          const ownSize = horizontal ? sn.elementWidth : sn.elementHeight
+          sn.requiredSpan = Math.max(ownSize, sumChildren + spacingTotal)
         }
         console.debug(
           '[MultiHop][Layout][Span]',
           'Hop',
           sn.node.hop,
           sn.node.id,
-          'span=',
+          'span(main)=',
           sn.requiredSpan,
+          'elemW=',
+          sn.elementWidth,
           'elemH=',
           sn.elementHeight,
           'children=',
@@ -298,39 +303,62 @@ export const loadAndCreateRelatedElements = async (
     const rootSpan = hop1SpanNodes.reduce((acc, sn, idx) => {
       return acc + sn.requiredSpan + (idx > 0 ? config.spacing : 0)
     }, 0)
-    console.info('[MultiHop][Layout] RootSpan=', rootSpan)
+    console.info(
+      '[MultiHop][Layout] RootSpan(main)=',
+      rootSpan,
+      'orientation=',
+      horizontal ? 'horizontal' : 'vertical'
+    )
 
     // Platzierung: rekursiv
-    const direction = config.position
     const rootCenterY = rootBounds.y + rootBounds.height / 2
-    let currentY = rootCenterY - rootSpan / 2
+    const rootCenterX = rootBounds.x + rootBounds.width / 2
+    let currentMain = (horizontal ? rootCenterX : rootCenterY) - rootSpan / 2
 
     const placeSpanNode = (
       sn: SpanNode,
       hopIndex: number,
       parentBounds?: { x: number; y: number; width: number; height: number }
     ) => {
-      // Bestimme X
       let x: number
-      if (hopIndex === 0) {
-        // Hop1 relativ zum Root
-        x =
-          direction === 'right'
-            ? rootBounds.x + rootBounds.width + baseDistance
-            : rootBounds.x - sn.elementWidth - baseDistance
-      } else if (parentBounds) {
-        x =
-          direction === 'right'
-            ? parentBounds.x + parentBounds.width + baseDistance
-            : parentBounds.x - sn.elementWidth - baseDistance
+      let y: number
+      if (horizontal) {
+        // Hauptachse = X (top/bottom)
+        const subtreeStart = subtreeStarts.get(sn)!
+        const centerX = subtreeStart + sn.requiredSpan / 2
+        x = centerX - sn.elementWidth / 2
+        if (hopIndex === 0) {
+          y =
+            direction === 'bottom'
+              ? rootBounds.y + rootBounds.height + baseDistance
+              : rootBounds.y - sn.elementHeight - baseDistance
+        } else if (parentBounds) {
+          y =
+            direction === 'bottom'
+              ? parentBounds.y + parentBounds.height + baseDistance
+              : parentBounds.y - sn.elementHeight - baseDistance
+        } else {
+          y = rootBounds.y
+        }
       } else {
-        x = rootBounds.x // fallback
+        // Hauptachse = Y (left/right)
+        if (hopIndex === 0) {
+          x =
+            direction === 'right'
+              ? rootBounds.x + rootBounds.width + baseDistance
+              : rootBounds.x - sn.elementWidth - baseDistance
+        } else if (parentBounds) {
+          x =
+            direction === 'right'
+              ? parentBounds.x + parentBounds.width + baseDistance
+              : parentBounds.x - sn.elementWidth - baseDistance
+        } else {
+          x = rootBounds.x
+        }
+        const subtreeStart = subtreeStarts.get(sn)!
+        const centerY = subtreeStart + sn.requiredSpan / 2
+        y = centerY - sn.elementHeight / 2
       }
-
-      // Y: center dieses Subtrees
-      const subtreeTop = subtreeTops.get(sn)!
-      const centerY = subtreeTop + sn.requiredSpan / 2
-      const y = centerY - sn.elementHeight / 2
       const el: CreationRelatedElement = {
         id: sn.node.id,
         name: sn.node.name,
@@ -367,22 +395,22 @@ export const loadAndCreateRelatedElements = async (
 
       // Children platzieren (nur wenn vorhanden)
       if (sn.children.length) {
-        let childCurrentTop = subtreeTop
+        let childCurrentStart = subtreeStarts.get(sn)!
         const pb = parentBoundsMap.get(el.id)
         sn.children.forEach((child, idx) => {
-          subtreeTops.set(child, childCurrentTop)
+          subtreeStarts.set(child, childCurrentStart)
           placeSpanNode(child, hopIndex + 1, pb)
-          childCurrentTop +=
+          childCurrentStart +=
             child.requiredSpan + (idx < sn.children.length - 1 ? config.spacing : 0)
         })
       }
     }
 
     // subtreeTops Map: Beginn (Top-Y) jedes Subtrees
-    const subtreeTops = new Map<SpanNode, number>()
+    const subtreeStarts = new Map<SpanNode, number>()
     hop1SpanNodes.forEach((sn, idx) => {
-      subtreeTops.set(sn, currentY)
-      currentY += sn.requiredSpan + (idx < hop1SpanNodes.length - 1 ? config.spacing : 0)
+      subtreeStarts.set(sn, currentMain)
+      currentMain += sn.requiredSpan + (idx < hop1SpanNodes.length - 1 ? config.spacing : 0)
     })
 
     // Filter Hop1 anhand selectedElementTypes (wie zuvor), aber wir müssen deren Spans beibehalten – also nur nicht-gewählte überspringen
