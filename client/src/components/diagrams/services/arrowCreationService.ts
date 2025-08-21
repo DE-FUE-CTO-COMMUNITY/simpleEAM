@@ -255,9 +255,31 @@ export function createArrowBetweenElements(params: CreateArrowParams): any {
   // Berechne Gap-Wert
   const gapValue = getGapValue(arrowGap)
 
-  // Berechne Offset für mehrere Pfeile
-  const offsetStep = totalArrows > 1 ? 20 : 0
-  const offset = totalArrows > 1 ? (arrowIndex - (totalArrows - 1) / 2) * offsetStep : 0
+  // Gleichmäßige Offset-Verteilung entlang der Seite (innerhalb der Seitenlänge, kein Überhang)
+  function computeDistributedOffset(
+    el: ExcalidrawBaseElement,
+    side: RelativePosition,
+    count: number,
+    index: number
+  ): number {
+    if (count <= 1) return 0
+    const isVerticalSide = side === 'left' || side === 'right' // Offset entlang Y
+    const span = isVerticalSide ? el.height : el.width
+    if (span <= 0) return 0
+    const margin = Math.min(12, span * 0.05) // 5% oder max 12px
+    const effectiveSpan = Math.max(0, span - 2 * margin)
+    if (effectiveSpan === 0) return 0
+    if (count === 2) {
+      // symmetrisch zwei Punkte
+      return index === 0 ? -effectiveSpan / 2 : effectiveSpan / 2
+    }
+    // Verteilt von -effectiveSpan/2 bis +effectiveSpan/2 über (count-1) Intervalle
+    const step = effectiveSpan / (count - 1)
+    return -effectiveSpan / 2 + step * index
+  }
+
+  // Offset immer relativ zur ursprünglichen Source-Seite berechnen (auch bei reverse)
+  const offset = computeDistributedOffset(sourceElement, sourceSide, totalArrows, arrowIndex)
 
   // Berechne Anchor-Punkte basierend auf vorgegebenen Seiten
   let startPoint: [number, number]
