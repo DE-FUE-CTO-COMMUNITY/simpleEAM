@@ -5,11 +5,23 @@ import { loadRelatedElementsFromDatabase } from './databaseRelatedElementsServic
 export interface MultiHopNode {
   id: string
   name: string
-  elementType: string
+  elementType: 'interface' | 'application' | 'capability' | 'dataObject' | 'infrastructure'
   hop: number
   parentId?: string
   x?: number
   y?: number
+  // Zusätzliche Daten für Rendering
+  relationshipType?: string
+  reverseArrow?: boolean
+  description?: string
+  status?: string
+  criticality?: string
+  type?: string
+  maturityLevel?: string
+  businessValue?: string
+  classification?: string
+  interfaceType?: string
+  infrastructureType?: string
 }
 
 export interface MultiHopEdge {
@@ -23,7 +35,6 @@ export interface MultiHopEdge {
 export interface MultiHopResult {
   nodes: MultiHopNode[]
   edges: MultiHopEdge[]
-  levels: MultiHopNode[][]
   stats: {
     totalHops: number
     totalUniqueElements: number
@@ -55,11 +66,23 @@ export async function loadMultiHopRelatedElements({
 }: FetchParams): Promise<MultiHopResult> {
   console.info('[MultiHopFAILSAFE] Start - 100% Duplikatsichere Version')
 
-  // ABSOLUTE EINDEUTIGKEIT - UNMÖGLICH DUPLIKATE ZU ERZEUGEN
-  const globalElementMap = new Map<string, MultiHopNode>() // ID -> Node (MASTER TRUTH)
-  const usedApplicationEdges = new Set<string>() // Edge-Eindeutigkeit
+  // FAIL-SAFE MASTER MAPS (EINZIGE WAHRHEIT)
+  const globalElementMap = new Map<string, MultiHopNode>() // Key: siehe getMapKey()
   const allEdges: MultiHopEdge[] = []
-  const levels: MultiHopNode[][] = []
+
+  /**
+   * BUSINESS REQUIREMENTS - Map Key Strategie:
+   * - INTERFACE: Global eindeutig → Key = element.id
+   * - APPLICATION: Edge eindeutig → Key = parentId->element.id
+   * - Grund: Applications können über verschiedene Interfaces erreichbar sein
+   */
+  const getMapKey = (element: any, parentId: string): string => {
+    if (element.elementType === 'interface') {
+      return element.id // Global eindeutig
+    } else {
+      return `${parentId}->${element.id}` // Edge eindeutig
+    }
+  }
 
   // Bestimme gewünschte Typen
   const selectedTypes = config.selectedElementTypes || ['interface', 'application']
@@ -120,57 +143,59 @@ export async function loadMultiHopRelatedElements({
             continue
           }
 
-          // *** KORREKTE EINDEUTIGKEIT ***
+          // *** BUSINESS REQUIREMENTS: Korrekte Eindeutigkeit ***
           // Interface: Global eindeutig (nur einmal im gesamten Diagramm)
-          // Application: Edge-eindeutig (mehrfach mit verschiedenen Parents)
-          
-          if (element.elementType === 'interface') {
-            // Interface global eindeutig prüfen
-            if (globalElementMap.has(element.id)) {
-              console.warn(
-                `[MultiHopFAILSAFE][Hop${hop}] ✗ Interface ${element.id} bereits global vorhanden - SKIP`
-              )
-              continue
-            }
-          } else if (element.elementType === 'application') {
-            // Application edge-eindeutig prüfen
-            const edgeKey = `${parent.id}->${element.id}`
-            if (usedApplicationEdges.has(edgeKey)) {
-              console.warn(
-                `[MultiHopFAILSAFE][Hop${hop}] ✗ Application Edge ${edgeKey} bereits vorhanden - SKIP`
-              )
-              continue
-            }
-            usedApplicationEdges.add(edgeKey)
-            console.info(
-              `[MultiHopFAILSAFE][Hop${hop}] ✓ Application ${element.id} mit Parent ${parent.id} (edge-eindeutig)`
+          // Application: Edge eindeutig (mehrfach mit verschiedenen Parents erlaubt)
+
+          const mapKey = getMapKey(element, parent.id)
+
+          if (globalElementMap.has(mapKey)) {
+            const type = element.elementType === 'interface' ? 'global' : 'edge'
+            console.warn(
+              `[MultiHopFAILSAFE][Hop${hop}] ✗ ${element.elementType} ${element.id} bereits ${type} vorhanden - SKIP`
             )
+            continue
           }
 
           // Element ERSTMALIG hinzufügen
           const node: MultiHopNode = {
             id: element.id,
             name: element.name || `Element_${element.id}`,
-            elementType: element.elementType,
+            elementType: element.elementType as MultiHopNode['elementType'],
             parentId: parent.id,
             hop,
             x: 0,
             y: 0,
+            // Alle zusätzlichen Daten für Rendering
+            relationshipType: (element as any).relationshipType,
+            reverseArrow: (element as any).reverseArrow,
+            description: (element as any).description,
+            status: (element as any).status,
+            criticality: (element as any).criticality,
+            type: (element as any).type,
+            maturityLevel: (element as any).maturityLevel,
+            businessValue: (element as any).businessValue,
+            classification: (element as any).classification,
+            interfaceType: (element as any).interfaceType,
+            infrastructureType: (element as any).infrastructureType,
           }
 
-          // KORREKTE MAP-KEYS:
-          // Interface: Nur ID (global eindeutig)
-          // Application: Parent->ID (edge-eindeutig)
-          let mapKey: string
-          if (element.elementType === 'interface') {
-            mapKey = element.id
-            console.info(`[MultiHopFAILSAFE][Hop${hop}] ✓ Interface ${element.id} NEU (global eindeutig)`)
-          } else {
-            mapKey = `${parent.id}->${element.id}`
-            console.info(`[MultiHopFAILSAFE][Hop${hop}] ✓ Application ${element.id} mit Parent ${parent.id} (edge-eindeutig)`)
+          // VEREINFACHT: Alle Elemente global eindeutig (nur ID als Key)
+          const elementMapKey = getMapKey(element, parent.id)
+
+          if (globalElementMap.has(elementMapKey)) {
+            const type = element.elementType === 'interface' ? 'global' : 'edge'
+            console.warn(
+              `[MultiHopFAILSAFE][Hop${hop}] ✗ ${element.elementType} ${element.id} bereits ${type} vorhanden - SKIP`
+            )
+            continue
           }
 
-          globalElementMap.set(mapKey, node)
+          console.info(
+            `[MultiHopFAILSAFE][Hop${hop}] ✓ ${element.elementType} ${element.id} NEU (${element.elementType === 'interface' ? 'global' : 'edge'} eindeutig)`
+          )
+
+          globalElementMap.set(elementMapKey, node)
           currentLevelNodes.push(node)
 
           console.info(
@@ -193,8 +218,7 @@ export async function loadMultiHopRelatedElements({
       }
     }
 
-    // Level abschließen
-    levels.push(currentLevelNodes)
+    // Level abschließen - nicht mehr nötig, alle Daten in globalElementMap
     console.info(
       `[MultiHopFAILSAFE][Hop${hop}] Abgeschlossen: ${currentLevelNodes.length} NEUE Elemente`
     )
@@ -215,20 +239,24 @@ export async function loadMultiHopRelatedElements({
     }
   }
 
-  // Finales Ergebnis aus MASTER MAP
+  // FINALE EINHEITLICHE DATENSTRUKTUR
+  // Alle Informationen in nodes[] mit hop-Information
   const allNodes = Array.from(globalElementMap.values())
   const uniqueInterfaces = allNodes.filter(n => n.elementType === 'interface').length
 
   console.info(
-    `[MultiHopFAILSAFE] FERTIG - Master Map: ${allNodes.length} Elemente, ${uniqueInterfaces} Interfaces, ${allEdges.length} Edges`
+    `[MultiHopFAILSAFE] FERTIG - ${allNodes.length} Elemente, ${uniqueInterfaces} Interfaces, ${allEdges.length} Edges`
+  )
+  console.info(
+    `[MultiHopFAILSAFE] NODES by HOP:`,
+    [0, 1, 2, 3, 4].map(hop => allNodes.filter(n => n.hop === hop).length)
   )
 
   return {
-    nodes: allNodes,
+    nodes: allNodes, // EINZIGE DATENQUELLE - enthält hop, parentId, etc.
     edges: allEdges,
-    levels,
     stats: {
-      totalHops: levels.length,
+      totalHops: Math.max(...allNodes.map(n => n.hop)) + 1,
       totalUniqueElements: allNodes.length,
       uniqueInterfaces,
     },

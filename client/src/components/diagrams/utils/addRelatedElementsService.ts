@@ -89,15 +89,34 @@ export const loadAndCreateRelatedElements = async (
       rootType: elementType,
       config,
     })
-    const levels = multiHop.levels
 
-    if (!levels.length || !levels[0].length) {
+    // VEREINFACHTE STRUKTUR: Nur nodes (mit hop-Information)
+    const allNodes = multiHop.nodes
+
+    // Nodes nach Hops gruppieren (für Layout)
+    const nodesByHop = new Map<number, MultiHopNode[]>()
+    for (const node of allNodes) {
+      const hopNodes = nodesByHop.get(node.hop) || []
+      hopNodes.push(node)
+      nodesByHop.set(node.hop, hopNodes)
+    }
+
+    // Als Array für bestehende Logik
+    const maxHop = Math.max(...allNodes.map(n => n.hop))
+    const levels: MultiHopNode[][] = []
+    for (let hop = 0; hop <= maxHop; hop++) {
+      levels.push(nodesByHop.get(hop) || [])
+    }
+
+    // Prüfe ob es verwandte Elemente gibt (Hop 1+, nicht Hop 0 das ist Root)
+    const hasRelatedElements = allNodes.some(node => node.hop > 0)
+    if (!hasRelatedElements) {
       return {
         success: true,
         elementsAdded: 0,
         elements: [],
         arrows: [],
-        errorMessage: 'Keine verwandten Elemente (Hop1) gefunden',
+        errorMessage: 'Keine verwandten Elemente gefunden',
       }
     }
 
@@ -111,7 +130,7 @@ export const loadAndCreateRelatedElements = async (
     const baseDistance = config.distance || Math.round(selectedElement.width)
     const allNewElements: ExcalidrawBaseElement[] = []
     const allNewArrows: ExcalidrawBaseElement[] = []
-    const createdIds = new Set<string>()
+    const renderedElementIds = new Set<string>() // Für UI: Welche element.id bereits gerendert
     const parentBoundsMap = new Map<
       string,
       { x: number; y: number; width: number; height: number }
@@ -185,8 +204,8 @@ export const loadAndCreateRelatedElements = async (
         }
         allNewElements.push(...created)
         pushInstance(el.id, main)
-        if (storeBounds && !createdIds.has(el.id)) {
-          createdIds.add(el.id)
+        if (storeBounds) {
+          // Vereinfacht: Immer bounds speichern wenn storeBounds=true
           parentBoundsMap.set(el.id, {
             x: main.x,
             y: main.y,
@@ -258,9 +277,12 @@ export const loadAndCreateRelatedElements = async (
       const next = spanLevels[h + 1]
       const childrenByParent = new Map<string, SpanNode[]>()
       next.forEach(sn => {
-        const arr = childrenByParent.get(sn.node.parentId) || []
-        arr.push(sn)
-        childrenByParent.set(sn.node.parentId, arr)
+        if (sn.node.parentId) {
+          // parentId ist optional, also prüfen
+          const arr = childrenByParent.get(sn.node.parentId) || []
+          arr.push(sn)
+          childrenByParent.set(sn.node.parentId, arr)
+        }
       })
       current.forEach(sn => {
         // Nur unique Instanzen tragen Kinder (entspricht BFS-Expansion)
@@ -298,8 +320,19 @@ export const loadAndCreateRelatedElements = async (
       })
     }
 
-    // Root Span – Summe Hop1
-    const hop1SpanNodes = spanLevels[0]
+    // Root Span – Summe der ersten verwandten Elemente (Hop 1)
+    const hop1SpanNodes = spanLevels[1] || [] // Hop 1 sind die ersten verwandten Elemente
+    if (hop1SpanNodes.length === 0) {
+      console.info('[MultiHop][Layout] Keine Hop 1 Elemente gefunden')
+      return {
+        success: true,
+        elementsAdded: 0,
+        elements: [],
+        arrows: [],
+        errorMessage: 'Keine Hop 1 Elemente zum Rendern',
+      }
+    }
+
     const rootSpan = hop1SpanNodes.reduce((acc, sn, idx) => {
       return acc + sn.requiredSpan + (idx > 0 ? config.spacing : 0)
     }, 0)
@@ -327,7 +360,8 @@ export const loadAndCreateRelatedElements = async (
         const subtreeStart = subtreeStarts.get(sn)!
         const centerX = subtreeStart + sn.requiredSpan / 2
         x = centerX - sn.elementWidth / 2
-        if (hopIndex === 0) {
+        if (hopIndex === 1) {
+          // Erste verwandte Elemente (Hop 1)
           y =
             direction === 'bottom'
               ? rootBounds.y + rootBounds.height + baseDistance
@@ -342,7 +376,8 @@ export const loadAndCreateRelatedElements = async (
         }
       } else {
         // Hauptachse = Y (left/right)
-        if (hopIndex === 0) {
+        if (hopIndex === 1) {
+          // Erste verwandte Elemente (Hop 1)
           x =
             direction === 'right'
               ? rootBounds.x + rootBounds.width + baseDistance
@@ -375,22 +410,40 @@ export const loadAndCreateRelatedElements = async (
         interfaceType: (sn.node as any).interfaceType,
         infrastructureType: (sn.node as any).infrastructureType,
       }
-      const isDuplicateInstance = createdIds.has(el.id)
-      // parentDbId = für Hop1 Root, sonst sn.node.parentId
+
+      // BUSINESS RULE: Interfaces nur einmal rendern, Applications mehrfach erlaubt
+      const shouldSkipRendering = el.elementType === 'interface' && renderedElementIds.has(el.id)
+
+      if (shouldSkipRendering) {
+        console.debug(
+          '[MultiHop][Layout][SKIP]',
+          'Hop',
+          hopIndex,
+          el.id,
+          'Interface bereits gerendert - SKIP'
+        )
+        return // Interface bereits gerendert, nicht nochmal
+      }
+
       const parentDbId = sn.node.parentId
-      createElementAt(el, x, y, !isDuplicateInstance, parentDbId)
+      createElementAt(el, x, y, true, parentDbId) // Immer storeBounds=true
+
+      // Element als gerendert markieren
+      if (el.elementType === 'interface') {
+        renderedElementIds.add(el.id)
+      }
+
       console.debug(
         '[MultiHop][Layout][Place]',
         'Hop',
-        hopIndex + 1,
+        hopIndex,
+        el.elementType,
         el.id,
         'at',
         x,
         y,
         'span',
-        sn.requiredSpan,
-        'dup',
-        isDuplicateInstance
+        sn.requiredSpan
       )
 
       // Children platzieren (nur wenn vorhanden)
@@ -399,7 +452,7 @@ export const loadAndCreateRelatedElements = async (
         const pb = parentBoundsMap.get(el.id)
         sn.children.forEach((child, idx) => {
           subtreeStarts.set(child, childCurrentStart)
-          placeSpanNode(child, hopIndex + 1, pb)
+          placeSpanNode(child, hopIndex + 1, pb) // Nächster Hop
           childCurrentStart +=
             child.requiredSpan + (idx < sn.children.length - 1 ? config.spacing : 0)
         })
@@ -414,6 +467,25 @@ export const loadAndCreateRelatedElements = async (
     })
 
     // Filter Hop1 anhand selectedElementTypes (wie zuvor), aber wir müssen deren Spans beibehalten – also nur nicht-gewählte überspringen
+    console.info('[MultiHop][Layout] Start Rendering - Total Nodes:', allNodes.length)
+    console.info(
+      '[MultiHop][Layout] Nodes by Hop:',
+      [0, 1, 2, 3, 4].map(hop => ({
+        hop,
+        count: allNodes.filter(n => n.hop === hop).length,
+        types: allNodes
+          .filter(n => n.hop === hop)
+          .map(n => n.elementType)
+          .reduce(
+            (acc, type) => {
+              acc[type] = (acc[type] || 0) + 1
+              return acc
+            },
+            {} as Record<string, number>
+          ),
+      }))
+    )
+
     hop1SpanNodes.forEach(sn => {
       if (
         config.selectedElementTypes &&
@@ -421,7 +493,7 @@ export const loadAndCreateRelatedElements = async (
         !config.selectedElementTypes.includes(sn.node.elementType)
       )
         return
-      placeSpanNode(sn, 0)
+      placeSpanNode(sn, 1) // Hop 1 (erste verwandte Elemente), nicht 0
     })
     console.info('[MultiHop][Placement] Hop 1 + rekursive Kinder fertig (Span-Layout)')
 
