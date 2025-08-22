@@ -120,25 +120,31 @@ export async function loadMultiHopRelatedElements({
             continue
           }
 
-          // *** ABSOLUTE EINDEUTIGKEIT ***
-          // Prüfe Master Map - EINZIGE WAHRHEIT
-          if (globalElementMap.has(element.id)) {
-            console.warn(
-              `[MultiHopFAILSAFE][Hop${hop}] ✗ Element ${element.id} bereits in Master Map - ABSOLUTER SKIP`
-            )
-            continue // UNMÖGLICH DUPLIKAT ZU ERZEUGEN
-          }
-
-          // Application Edge-Eindeutigkeit (zusätzliche Prüfung)
-          if (element.elementType === 'application') {
+          // *** KORREKTE EINDEUTIGKEIT ***
+          // Interface: Global eindeutig (nur einmal im gesamten Diagramm)
+          // Application: Edge-eindeutig (mehrfach mit verschiedenen Parents)
+          
+          if (element.elementType === 'interface') {
+            // Interface global eindeutig prüfen
+            if (globalElementMap.has(element.id)) {
+              console.warn(
+                `[MultiHopFAILSAFE][Hop${hop}] ✗ Interface ${element.id} bereits global vorhanden - SKIP`
+              )
+              continue
+            }
+          } else if (element.elementType === 'application') {
+            // Application edge-eindeutig prüfen
             const edgeKey = `${parent.id}->${element.id}`
             if (usedApplicationEdges.has(edgeKey)) {
               console.warn(
-                `[MultiHopFAILSAFE][Hop${hop}] ✗ Application Edge ${edgeKey} bereits vorhanden`
+                `[MultiHopFAILSAFE][Hop${hop}] ✗ Application Edge ${edgeKey} bereits vorhanden - SKIP`
               )
               continue
             }
             usedApplicationEdges.add(edgeKey)
+            console.info(
+              `[MultiHopFAILSAFE][Hop${hop}] ✓ Application ${element.id} mit Parent ${parent.id} (edge-eindeutig)`
+            )
           }
 
           // Element ERSTMALIG hinzufügen
@@ -152,12 +158,23 @@ export async function loadMultiHopRelatedElements({
             y: 0,
           }
 
-          // MASTER MAP Update - EINZIGE WAHRHEIT
-          globalElementMap.set(element.id, node)
+          // KORREKTE MAP-KEYS:
+          // Interface: Nur ID (global eindeutig)
+          // Application: Parent->ID (edge-eindeutig)
+          let mapKey: string
+          if (element.elementType === 'interface') {
+            mapKey = element.id
+            console.info(`[MultiHopFAILSAFE][Hop${hop}] ✓ Interface ${element.id} NEU (global eindeutig)`)
+          } else {
+            mapKey = `${parent.id}->${element.id}`
+            console.info(`[MultiHopFAILSAFE][Hop${hop}] ✓ Application ${element.id} mit Parent ${parent.id} (edge-eindeutig)`)
+          }
+
+          globalElementMap.set(mapKey, node)
           currentLevelNodes.push(node)
 
           console.info(
-            `[MultiHopFAILSAFE][Hop${hop}] ✓ NEUES Element: ${element.elementType} ${element.id} → Master Map`
+            `[MultiHopFAILSAFE][Hop${hop}] ✓ NEUES Element: ${element.elementType} ${element.id} → Map Key: ${mapKey}`
           )
 
           // Edge erstellen
@@ -165,8 +182,8 @@ export async function loadMultiHopRelatedElements({
             sourceId: parent.id,
             targetId: element.id,
             hop,
-            relationshipType: 'related',
-            reverseArrow: false,
+            relationshipType: (element as any).relationshipType || 'related',
+            reverseArrow: (element as any).reverseArrow || false,
           }
           allEdges.push(edge)
         }
