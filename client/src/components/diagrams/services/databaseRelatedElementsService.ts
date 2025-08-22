@@ -15,12 +15,14 @@ export interface LoadRelatedElementsParams {
   client: ApolloClient<NormalizedCacheObject>
   mainElementId: string
   mainElementType: string
+  selectedTypes?: string[] // Neue optionale Filterung
 }
 
 export const loadRelatedElementsFromDatabase = async ({
   client,
   mainElementId,
   mainElementType,
+  selectedTypes,
 }: LoadRelatedElementsParams): Promise<RelatedElementsResponse> => {
   try {
     const normalizedType = normalizeElementType(mainElementType)
@@ -79,10 +81,21 @@ export const loadRelatedElementsFromDatabase = async ({
     })
     const relatedElements = extractRelatedElementsFromQueryResult(elementData, extractionType)
 
+    // Optionale Filterung nach selectedTypes
+    const filteredElements = selectedTypes && selectedTypes.length > 0 
+      ? relatedElements.filter((element: any) => selectedTypes.includes(element.elementType))
+      : relatedElements
+
+    console.info('[DBRelated] Filtering', {
+      originalCount: relatedElements.length,
+      filteredCount: filteredElements.length,
+      selectedTypes,
+    })
+
     return {
-      elements: relatedElements,
+      elements: filteredElements,
       relationshipTypes: getRelationshipTypesForElement(extractionType),
-      totalElements: relatedElements.length,
+      totalElements: filteredElements.length, // Angepasst für gefilterte Anzahl
     }
   } catch (error) {
     console.error('Fehler beim Laden der Daten:', error)

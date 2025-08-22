@@ -90,7 +90,7 @@ export const loadAndCreateRelatedElements = async (
       config,
     })
     const levels = multiHop.levels
-    const replicatedLevels = multiHop.replicatedLevels || levels
+
     if (!levels.length || !levels[0].length) {
       return {
         success: true,
@@ -228,7 +228,7 @@ export const loadAndCreateRelatedElements = async (
       isUnique: boolean
     }
 
-    const hopCount = replicatedLevels.length
+    const hopCount = levels.length
     const direction = config.position
     const horizontal = direction === 'top' || direction === 'bottom'
     const spanLevels: SpanNode[][] = []
@@ -237,8 +237,8 @@ export const loadAndCreateRelatedElements = async (
 
     // Zuerst alle SpanNodes ohne Children erstellen
     for (let h = 0; h < hopCount; h++) {
-      const repNodes = replicatedLevels[h]
-      const spanNodes = repNodes.map(n => {
+      const hopNodes = levels[h]
+      const spanNodes = hopNodes.map(n => {
         const size = getSize(n.elementType)
         return {
           node: n,

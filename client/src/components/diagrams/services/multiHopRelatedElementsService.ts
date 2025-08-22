@@ -1,200 +1,217 @@
-import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
-import { AddRelatedElementsConfig } from '../types/addRelatedElements'
+import { ApolloClient } from '@apollo/client'
 import { loadRelatedElementsFromDatabase } from './databaseRelatedElementsService'
-import { RelatedElement as SingleHopRelatedElement } from './relatedElementsCreationService'
 
-export interface MultiHopNode extends SingleHopRelatedElement {
-  parentId: string // ID des Elements aus dem vorherigen Hop (Root für Hop1)
-  hop: number // 1-basiert: 1 = erster Hop (Nachbarn des Root)
+// Types
+export interface MultiHopNode {
+  id: string
+  name: string
+  elementType: string
+  hop: number
+  parentId?: string
+  x?: number
+  y?: number
 }
 
 export interface MultiHopEdge {
   sourceId: string
   targetId: string
-  hop: number // Hop auf dem das Target liegt
+  hop: number
   relationshipType?: string
   reverseArrow?: boolean
 }
 
 export interface MultiHopResult {
-  levels: MultiHopNode[][] // Index 0 = Hop1 (unique per first discovery)
+  nodes: MultiHopNode[]
   edges: MultiHopEdge[]
-  totalUniqueElements: number
-  // Neu: Für Replikationszwecke pro Hop eine Liste inkl. möglicher Duplikate je Parent
-  replicatedLevels: MultiHopNode[][]
+  levels: MultiHopNode[][]
+  stats: {
+    totalHops: number
+    totalUniqueElements: number
+    uniqueInterfaces: number
+  }
+}
+
+export interface MultiHopConfig {
+  maxHops: number
+  selectedElementTypes: string[]
 }
 
 interface FetchParams {
-  client: ApolloClient<NormalizedCacheObject>
+  client: ApolloClient<any>
   rootId: string
   rootType: string
-  config: AddRelatedElementsConfig
+  config: MultiHopConfig
 }
 
 /**
- * Multi-Hop Laden gemäß Anforderung:
- * Hop1: Nachbarn des Root (gefiltert nach ausgewählten Typen)
- * Hop2: Für jeden Hop1-Knoten dessen Nachbarn (gefiltert), excl. Root
- * Hop3: Für jeden Hop2-Knoten dessen Nachbarn (gefiltert), excl. jeweiliger Parent aus Hop2? (Beschreibung: "ohne ... Elemente aus dem ersten Hop" => Ausschluss des direkten Parents)
- * Generalisiert: Beim Expandieren eines Knotens wird dessen Parent ausgeschlossen, um Rücksprünge zu vermeiden.
- * Keine globale Deduplikation außer: Ein Element wird nur einmal als Node pro erstem Entdeckungs-Hop aufgenommen, aber zusätzliche Kanten werden dennoch erfasst.
+ * 100% FAIL-SAFE Multi-Hop Service
+ * UNMÖGLICH DUPLIKATE ZU ERZEUGEN
  */
-export const loadMultiHopRelatedElements = async ({
+export async function loadMultiHopRelatedElements({
   client,
   rootId,
   rootType,
   config,
-}: FetchParams): Promise<MultiHopResult> => {
-  const maxHops = Math.max(1, config.hops)
-  const selectedTypes = config.selectedElementTypes
-  const levels: MultiHopNode[][] = [] // unique nodes per hop (first discovery only)
-  const edges: MultiHopEdge[] = []
-  const nodeFirstHop = new Map<string, number>() // elementId -> first hop discovered
-  const nodeData = new Map<string, MultiHopNode>()
-  const replicatedLevels: MultiHopNode[][] = [] // includes duplicates per parent
+}: FetchParams): Promise<MultiHopResult> {
+  console.info('[MultiHopFAILSAFE] Start - 100% Duplikatsichere Version')
 
-  console.group('[MultiHop] Start')
-  console.info('[MultiHop] Root:', { id: rootId, type: rootType, maxHops, selectedTypes })
-  console.info(
-    '[MultiHop] Hinweis Filter-Logik: Hop2 schließt nur Root aus; Hop>=3 schließt immer den direkten Parent aus (Rückkante).'
-  )
+  // ABSOLUTE EINDEUTIGKEIT - UNMÖGLICH DUPLIKATE ZU ERZEUGEN
+  const globalElementMap = new Map<string, MultiHopNode>() // ID -> Node (MASTER TRUTH)
+  const usedApplicationEdges = new Set<string>() // Edge-Eindeutigkeit
+  const allEdges: MultiHopEdge[] = []
+  const levels: MultiHopNode[][] = []
 
-  // Helper: apply type filter
-  const filterBySelectedTypes = (
-    elements: SingleHopRelatedElement[]
-  ): SingleHopRelatedElement[] => {
-    if (!selectedTypes || !Array.isArray(selectedTypes) || selectedTypes.length === 0)
-      return elements
-    return elements.filter(e => selectedTypes.includes(e.elementType))
-  }
-
-  // Generische Expansion für alle Hops (1..maxHops)
-  interface ParentHolder {
-    id: string
-    elementType: string
-    parentId: string | null
-  }
-  let parents: ParentHolder[] = [{ id: rootId, elementType: rootType, parentId: null }]
-
+  // Bestimme gewünschte Typen
+  const selectedTypes = config.selectedElementTypes || ['interface', 'application']
+  console.info(`[MultiHopFAILSAFE] Gewünschte Typen: ${selectedTypes.join(', ')}`)
+  console.info(`[MultiHopFAILSAFE] Config:`, config)
+  
+  // FIX: Map hops -> maxHops
+  const maxHops = config.maxHops || (config as any).hops || 4
+  console.info(`[MultiHopFAILSAFE] MaxHops: ${maxHops} (original: ${config.maxHops}, fallback: ${(config as any).hops})`)
+  console.info(`[MultiHopFAILSAFE] RootId: ${rootId}, RootType: ${rootType}`)
+  
+  // Parent-Nodes für aktuellen Hop (startet mit Root)
+  let currentParents: { id: string; elementType: string; hop: number }[] = [
+    { id: rootId, elementType: rootType, hop: 0 },
+  ]
+  console.info(`[MultiHopFAILSAFE] Initial Parents:`, currentParents)  // Multi-Hop Processing
+  console.info(`[MultiHopFAILSAFE] Schleife: von 1 bis ${maxHops}, condition: ${1 <= maxHops}`)
   for (let hop = 1; hop <= maxHops; hop++) {
-    if (!parents.length) {
-      console.info(`[MultiHop][Hop${hop}] Abbruch – keine Parents mehr`)
+    console.info(`[MultiHopFAILSAFE][Hop${hop}] Start mit ${currentParents.length} Parents`)
+
+    if (currentParents.length === 0) {
+      console.info(`[MultiHopFAILSAFE][Hop${hop}] Keine Parents → Stop`)
       break
     }
-    const currentLevelNodes: MultiHopNode[] = []
-    const replicatedCurrent: MultiHopNode[] = []
-    console.group(`[MultiHop][Hop${hop}] Expansion`)
-    for (const parentNode of parents) {
-      // Root-Placeholder soll nicht erneut geladen werden nach erstem Hop
-      if (hop > 1 && parentNode.id === rootId && parentNode.parentId === null) continue
-      console.info(
-        `[MultiHop][Hop${hop}] Expand Parent ${parentNode.id} (${parentNode.elementType})`
-      )
-      try {
-        const related = await loadRelatedElementsFromDatabase({
-          client: client as any,
-          mainElementId: parentNode.id,
-          mainElementType: parentNode.elementType,
-        })
-        console.info(
-          `[MultiHop][Hop${hop}] Raw Response Parent ${parentNode.id}:`,
-          related.totalElements
-        )
-        let neighbors = related.elements as SingleHopRelatedElement[]
-        const beforeFilter = neighbors.length
-        if (beforeFilter) {
-          console.info(
-            `[MultiHop][Hop${hop}] Parent ${parentNode.id} Roh IDs: ${neighbors
-              .map(n => `${n.id}:${n.elementType}`)
-              .join(', ')}`
-          )
-        }
-        // Typfilter
-        const afterTypeFilter = filterBySelectedTypes(neighbors)
-        const removedByType = neighbors.filter(n => !afterTypeFilter.includes(n))
-        neighbors = afterTypeFilter
-        if (removedByType.length) {
-          console.info(
-            `[MultiHop][Hop${hop}] Entfernt durch Typfilter: ${removedByType
-              .map(n => `${n.id}:${n.elementType}`)
-              .join(', ')}`
-          )
-        }
-        // Parent Exklusion (ab Hop 2)
-        const beforeParent = neighbors.length
-        if (hop >= 2) {
-          const exclusionId = hop === 2 ? rootId : parentNode.parentId
-          neighbors = neighbors.filter(n => n.id !== exclusionId)
-          const removed = beforeParent - neighbors.length
-          if (removed > 0) {
-            console.info(
-              `[MultiHop][Hop${hop}] Parent-Exklusion (${exclusionId}) entfernte ${removed}`
-            )
-          }
-        }
-        console.info(
-          `[MultiHop][Hop${hop}] Parent ${parentNode.id} -> roh ${beforeFilter}, final ${neighbors.length}`
-        )
-        // Prozess Nachbarn
-        for (const nb of neighbors) {
-          const existingHop = nodeFirstHop.get(nb.id)
 
-          if (!existingHop) {
-            const node: MultiHopNode = { ...nb, parentId: parentNode.id, hop }
-            nodeFirstHop.set(nb.id, hop)
-            nodeData.set(nb.id, node)
-            currentLevelNodes.push(node)
-            replicatedCurrent.push(node)
-            console.info(
-              `[MultiHop][Hop${hop}] + Neu ${nb.id} (${nb.elementType}) Parent ${parentNode.id}`
-            )
-          } else {
-            const replicated: MultiHopNode = { ...nb, parentId: parentNode.id, hop }
-            replicatedCurrent.push(replicated)
-            console.info(
-              `[MultiHop][Hop${hop}] + Replik ${nb.id} Parent ${parentNode.id} (erstmals Hop ${existingHop})`
-            )
+    const currentLevelNodes: MultiHopNode[] = []
+
+    // Für jeden Parent: Related Elements laden
+    for (const parent of currentParents) {
+      try {
+        console.info(`[MultiHopFAILSAFE][Hop${hop}] Lade Related für ${parent.id}`)
+
+        // Lade Related Elements mit existing function (mit Filterung)
+        console.info(`[MultiHopFAILSAFE][Hop${hop}] API Call - Parent:`, parent)
+        const relatedData = await loadRelatedElementsFromDatabase({
+          client,
+          mainElementId: parent.id,
+          mainElementType: parent.elementType,
+          selectedTypes, // EFFICIENT: Filterung direkt bei API
+        })
+        console.info(`[MultiHopFAILSAFE][Hop${hop}] API Response:`, relatedData)
+
+        const elements = relatedData?.elements || []
+        console.info(
+          `[MultiHopFAILSAFE][Hop${hop}] Parent ${parent.id}: ${elements.length} GEFILTERTE Elements (selectedTypes: ${selectedTypes.join(', ')})`
+        )
+        
+        // Entfernt: Manuelle Filterung nicht mehr nötig - bereits von API gefiltert
+        console.info(`[MultiHopFAILSAFE][Hop${hop}] Elements Sample:`, elements.slice(0, 3))
+
+        // FAIL-SAFE: Verarbeite jeden Element mit ABSOLUTER Eindeutigkeit
+        for (const element of elements) {
+          // Skip Root Element
+          if (element.id === rootId) {
+            console.info(`[MultiHopFAILSAFE][Hop${hop}] Skip Root Element ${element.id}`)
+            continue
           }
-          edges.push({
-            sourceId: parentNode.id,
-            targetId: nb.id,
+
+          // *** ABSOLUTE EINDEUTIGKEIT ***
+          // Prüfe Master Map - EINZIGE WAHRHEIT
+          if (globalElementMap.has(element.id)) {
+            console.warn(
+              `[MultiHopFAILSAFE][Hop${hop}] ✗ Element ${element.id} bereits in Master Map - ABSOLUTER SKIP`
+            )
+            continue // UNMÖGLICH DUPLIKAT ZU ERZEUGEN
+          }
+
+          // Application Edge-Eindeutigkeit (zusätzliche Prüfung)
+          if (element.elementType === 'application') {
+            const edgeKey = `${parent.id}->${element.id}`
+            if (usedApplicationEdges.has(edgeKey)) {
+              console.warn(
+                `[MultiHopFAILSAFE][Hop${hop}] ✗ Application Edge ${edgeKey} bereits vorhanden`
+              )
+              continue
+            }
+            usedApplicationEdges.add(edgeKey)
+          }
+
+          // Element ERSTMALIG hinzufügen
+          const node: MultiHopNode = {
+            id: element.id,
+            name: element.name || `Element_${element.id}`,
+            elementType: element.elementType,
+            parentId: parent.id,
             hop,
-            relationshipType: nb.relationshipType,
-            reverseArrow: nb.reverseArrow,
-          })
+            x: 0,
+            y: 0,
+          }
+
+          // MASTER MAP Update - EINZIGE WAHRHEIT
+          globalElementMap.set(element.id, node)
+          currentLevelNodes.push(node)
+
+          console.info(
+            `[MultiHopFAILSAFE][Hop${hop}] ✓ NEUES Element: ${element.elementType} ${element.id} → Master Map`
+          )
+
+          // Edge erstellen
+          const edge: MultiHopEdge = {
+            sourceId: parent.id,
+            targetId: element.id,
+            hop,
+            relationshipType: 'related',
+            reverseArrow: false,
+          }
+          allEdges.push(edge)
         }
-      } catch (e) {
-        console.warn(`[MultiHop][Hop${hop}] Fehler beim Laden für Parent ${parentNode.id}:`, e)
+      } catch (error) {
+        console.warn(`[MultiHopFAILSAFE][Hop${hop}] Fehler bei Parent ${parent.id}:`, error)
+        continue
       }
     }
-    console.info(
-      `[MultiHop][Hop${hop}] Neue eindeutige Nodes: ${currentLevelNodes.length} (gesamt uniq: ${nodeFirstHop.size})`
-    )
+
+    // Level abschließen
     levels.push(currentLevelNodes)
-    replicatedLevels.push(replicatedCurrent)
-    console.groupEnd()
-    // Nächste Parents = unique Level Nodes dieses Hops
-    parents = currentLevelNodes.map(n => ({
-      id: n.id,
-      elementType: n.elementType,
-      parentId: n.parentId,
+    console.info(
+      `[MultiHopFAILSAFE][Hop${hop}] Abgeschlossen: ${currentLevelNodes.length} NEUE Elemente`
+    )
+
+    // Prepare next hop parents (ALLE Elemente können Parents sein)
+    currentParents = currentLevelNodes.map(node => ({
+      id: node.id,
+      elementType: node.elementType,
+      hop: node.hop,
     }))
+
+    console.info(`[MultiHopFAILSAFE][Hop${hop}] Nächster Hop: ${currentParents.length} Parents`)
+
+    // Stopp wenn keine neuen Parents
+    if (currentParents.length === 0) {
+      console.info(`[MultiHopFAILSAFE][Hop${hop}] Keine neuen Parents → Stop`)
+      break
+    }
   }
 
-  console.info(
-    '[MultiHop] Fertig. Hops:',
-    levels.length,
-    'Unique Elements:',
-    nodeFirstHop.size,
-    'Edges:',
-    edges.length
-  )
-  console.info('[MultiHop] Edge Sample (erste 10):', edges.slice(0, 10))
-  levels.forEach((lvl, idx) => {
-    const ids = lvl.map(n => n.id).join(', ')
-    console.info(`[MultiHop] Hop ${idx + 1}: ${lvl.length} Elemente -> ${ids}`)
-  })
-  console.groupEnd()
+  // Finales Ergebnis aus MASTER MAP
+  const allNodes = Array.from(globalElementMap.values())
+  const uniqueInterfaces = allNodes.filter(n => n.elementType === 'interface').length
 
-  return { levels, edges, totalUniqueElements: nodeFirstHop.size, replicatedLevels }
+  console.info(
+    `[MultiHopFAILSAFE] FERTIG - Master Map: ${allNodes.length} Elemente, ${uniqueInterfaces} Interfaces, ${allEdges.length} Edges`
+  )
+
+  return {
+    nodes: allNodes,
+    edges: allEdges,
+    levels,
+    stats: {
+      totalHops: levels.length,
+      totalUniqueElements: allNodes.length,
+      uniqueInterfaces,
+    },
+  }
 }
