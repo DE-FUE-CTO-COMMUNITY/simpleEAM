@@ -1,16 +1,15 @@
 import { ApolloClient } from '@apollo/client'
 import { loadRelatedElementsFromDatabase } from './databaseRelatedElementsService'
 
-// Types
+// Types - NUR LOGISCHE DATENSTRUKTUR (keine Rendering-Informationen!)
 export interface MultiHopNode {
   id: string
   name: string
   elementType: 'interface' | 'application' | 'capability' | 'dataObject' | 'infrastructure'
   hop: number
   parentId?: string
-  x?: number
-  y?: number
-  // Zusätzliche Daten für Rendering
+
+  // Geschäftsdaten (gehören zur logischen Struktur)
   relationshipType?: string
   reverseArrow?: boolean
   description?: string
@@ -25,8 +24,9 @@ export interface MultiHopNode {
 }
 
 export interface MultiHopEdge {
-  sourceId: string
-  targetId: string
+  id: string
+  sourceNodeId: string
+  targetNodeId: string
   hop: number
   relationshipType?: string
   reverseArrow?: boolean
@@ -35,16 +35,17 @@ export interface MultiHopEdge {
 export interface MultiHopResult {
   nodes: MultiHopNode[]
   edges: MultiHopEdge[]
-  stats: {
-    totalHops: number
-    totalUniqueElements: number
-    uniqueInterfaces: number
-  }
 }
 
 export interface MultiHopConfig {
   maxHops: number
   selectedElementTypes: string[]
+  // Layout-Konfiguration für Position-Berechnung
+  position: 'right' | 'left' | 'top' | 'bottom'
+  spacing: number
+  distance: number
+  arrowType: 'sharp' | 'rounded'
+  arrowGap: 'small' | 'medium' | 'large'
 }
 
 interface FetchParams {
@@ -164,9 +165,7 @@ export async function loadMultiHopRelatedElements({
             elementType: element.elementType as MultiHopNode['elementType'],
             parentId: parent.id,
             hop,
-            x: 0,
-            y: 0,
-            // Alle zusätzlichen Daten für Rendering
+            // NUR GESCHÄFTSDATEN - keine Rendering-Informationen!
             relationshipType: (element as any).relationshipType,
             reverseArrow: (element as any).reverseArrow,
             description: (element as any).description,
@@ -202,10 +201,11 @@ export async function loadMultiHopRelatedElements({
             `[MultiHopFAILSAFE][Hop${hop}] ✓ NEUES Element: ${element.elementType} ${element.id} → Map Key: ${mapKey}`
           )
 
-          // Edge erstellen
+          // Edge erstellen (nur logische Verbindung)
           const edge: MultiHopEdge = {
-            sourceId: parent.id,
-            targetId: element.id,
+            id: `edge-${parent.id}-${element.id}`,
+            sourceNodeId: parent.id,
+            targetNodeId: element.id,
             hop,
             relationshipType: (element as any).relationshipType || 'related',
             reverseArrow: (element as any).reverseArrow || false,
@@ -253,12 +253,7 @@ export async function loadMultiHopRelatedElements({
   )
 
   return {
-    nodes: allNodes, // EINZIGE DATENQUELLE - enthält hop, parentId, etc.
-    edges: allEdges,
-    stats: {
-      totalHops: Math.max(...allNodes.map(n => n.hop)) + 1,
-      totalUniqueElements: allNodes.length,
-      uniqueInterfaces,
-    },
+    nodes: allNodes, // NUR LOGISCHE DATENSTRUKTUR
+    edges: allEdges, // NUR LOGISCHE VERBINDUNGEN
   }
 }

@@ -2,7 +2,7 @@ import { ApolloClient } from '@apollo/client'
 import { AddRelatedElementsConfig } from '../types/addRelatedElements'
 import { loadRelatedElementsFromDatabase } from '../services/databaseRelatedElementsService'
 import { loadMultiHopRelatedElements } from '../services/multiHopRelatedElementsService'
-import type { MultiHopNode } from '../services/multiHopRelatedElementsService'
+import type { MultiHopNode, MultiHopEdge } from '../services/multiHopRelatedElementsService'
 import { loadArchimateLibrary } from './archimateLibraryUtils'
 import { getArchimateTemplateName } from '../services/elementTemplateMapping'
 import {
@@ -87,7 +87,15 @@ export const loadAndCreateRelatedElements = async (
       client: apolloClient as any,
       rootId: databaseId,
       rootType: elementType,
-      config,
+      config: {
+        maxHops: config.hops || 4,
+        selectedElementTypes: config.selectedElementTypes || ['interface', 'application'],
+        position: config.position || 'right',
+        spacing: 50,
+        distance: config.distance || 100,
+        arrowType: (config.arrowType === 'curved' || config.arrowType === 'elbow' ? 'rounded' : 'sharp'),
+        arrowGap: (config.arrowGap === 'none' ? 'small' : config.arrowGap) || 'medium',
+      },
     })
 
     // VEREINFACHTE STRUKTUR: Nur nodes (mit hop-Information)
@@ -528,18 +536,18 @@ export const loadAndCreateRelatedElements = async (
       )
       return list[0]
     }
-    // Edge-Gruppierung nach sourceId für seitliche Verteilung
+    // Edge-Gruppierung nach sourceNodeId für seitliche Verteilung
     const edgesBySource = new Map<string, typeof multiHop.edges>()
     multiHop.edges.forEach(e => {
-      if (!edgesBySource.has(e.sourceId)) edgesBySource.set(e.sourceId, [] as any)
-      ;(edgesBySource.get(e.sourceId) as any).push(e)
+      if (!edgesBySource.has(e.sourceNodeId)) edgesBySource.set(e.sourceNodeId, [] as any)
+      ;(edgesBySource.get(e.sourceNodeId) as any).push(e)
     })
 
     edgesBySource.forEach(edgeList => {
       const total = edgeList.length
       edgeList.forEach((edge, idx) => {
-        const sourceEl = pickInstanceForEdge(edge.sourceId, null)
-        const targetEl = pickInstanceForEdge(edge.targetId, edge.sourceId)
+        const sourceEl = pickInstanceForEdge(edge.sourceNodeId, null)
+        const targetEl = pickInstanceForEdge(edge.targetNodeId, edge.sourceNodeId)
         if (!sourceEl || !targetEl) return
         try {
           const arrow = createArrowBetweenElements({
