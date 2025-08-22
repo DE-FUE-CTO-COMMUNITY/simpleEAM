@@ -82,9 +82,10 @@ export const loadRelatedElementsFromDatabase = async ({
     const relatedElements = extractRelatedElementsFromQueryResult(elementData, extractionType)
 
     // Optionale Filterung nach selectedTypes
-    const filteredElements = selectedTypes && selectedTypes.length > 0 
-      ? relatedElements.filter((element: any) => selectedTypes.includes(element.elementType))
-      : relatedElements
+    const filteredElements =
+      selectedTypes && selectedTypes.length > 0
+        ? relatedElements.filter((element: any) => selectedTypes.includes(element.elementType))
+        : relatedElements
 
     console.info('[DBRelated] Filtering', {
       originalCount: relatedElements.length,

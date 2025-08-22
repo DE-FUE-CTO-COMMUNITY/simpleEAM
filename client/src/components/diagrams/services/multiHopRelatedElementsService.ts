@@ -65,17 +65,19 @@ export async function loadMultiHopRelatedElements({
   const selectedTypes = config.selectedElementTypes || ['interface', 'application']
   console.info(`[MultiHopFAILSAFE] Gewünschte Typen: ${selectedTypes.join(', ')}`)
   console.info(`[MultiHopFAILSAFE] Config:`, config)
-  
+
   // FIX: Map hops -> maxHops
   const maxHops = config.maxHops || (config as any).hops || 4
-  console.info(`[MultiHopFAILSAFE] MaxHops: ${maxHops} (original: ${config.maxHops}, fallback: ${(config as any).hops})`)
+  console.info(
+    `[MultiHopFAILSAFE] MaxHops: ${maxHops} (original: ${config.maxHops}, fallback: ${(config as any).hops})`
+  )
   console.info(`[MultiHopFAILSAFE] RootId: ${rootId}, RootType: ${rootType}`)
-  
+
   // Parent-Nodes für aktuellen Hop (startet mit Root)
   let currentParents: { id: string; elementType: string; hop: number }[] = [
     { id: rootId, elementType: rootType, hop: 0 },
   ]
-  console.info(`[MultiHopFAILSAFE] Initial Parents:`, currentParents)  // Multi-Hop Processing
+  console.info(`[MultiHopFAILSAFE] Initial Parents:`, currentParents) // Multi-Hop Processing
   console.info(`[MultiHopFAILSAFE] Schleife: von 1 bis ${maxHops}, condition: ${1 <= maxHops}`)
   for (let hop = 1; hop <= maxHops; hop++) {
     console.info(`[MultiHopFAILSAFE][Hop${hop}] Start mit ${currentParents.length} Parents`)
@@ -106,7 +108,7 @@ export async function loadMultiHopRelatedElements({
         console.info(
           `[MultiHopFAILSAFE][Hop${hop}] Parent ${parent.id}: ${elements.length} GEFILTERTE Elements (selectedTypes: ${selectedTypes.join(', ')})`
         )
-        
+
         // Entfernt: Manuelle Filterung nicht mehr nötig - bereits von API gefiltert
         console.info(`[MultiHopFAILSAFE][Hop${hop}] Elements Sample:`, elements.slice(0, 3))
 
