@@ -486,8 +486,8 @@ export const FullCustomContextMenu: React.FC<CustomContextMenuProps> = ({
           </MenuItem>
         )}
 
-        {/* Verwandte Elemente hinzufügen - nur für DB-Elemente */}
-        {hasDbElement && !viewModeEnabled && (
+        {/* Verwandte Elemente hinzufügen - im main-Branch deaktiviert */}
+        {false && hasDbElement && !viewModeEnabled && (
           <MenuItem onClick={handleAddRelatedElements}>
             <ListItemIcon>
               <AddRelatedIcon fontSize="small" />
