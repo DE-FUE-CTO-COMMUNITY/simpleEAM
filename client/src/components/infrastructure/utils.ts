@@ -21,6 +21,8 @@ export const getInfrastructureTypeLabel = (type: InfrastructureType): string => 
       return 'On-Premise-Rechenzentrum'
     case InfrastructureType.KUBERNETES_CLUSTER:
       return 'Kubernetes-Cluster'
+    case InfrastructureType.VIRTUALIZATION_CLUSTER:
+      return 'Virtualisierungs-Cluster'
     case InfrastructureType.VIRTUAL_MACHINE:
       return 'Virtuelle Maschine'
     case InfrastructureType.CONTAINER_HOST:

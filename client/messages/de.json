@@ -1242,7 +1242,8 @@
       "KUBERNETES_CLUSTER": "Kubernetes-Cluster",
       "ON_PREMISE_DATACENTER": "On-Premise-Rechenzentrum",
       "PHYSICAL_SERVER": "Physischer Server",
-      "VIRTUAL_MACHINE": "Virtuelle Maschine"
+      "VIRTUAL_MACHINE": "Virtuelle Maschine",
+      "VIRTUALIZATION_CLUSTER": "Virtualisierungs-Cluster"
     },
     "statuses": {
       "ACTIVE": "Aktiv",

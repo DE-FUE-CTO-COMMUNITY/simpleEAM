@@ -94,6 +94,7 @@ const InfrastructureTable: React.FC<InfrastructureTableProps> = ({
       [InfrastructureType.ON_PREMISE_DATACENTER]: t('infrastructureTypes.ON_PREMISE_DATACENTER'),
       [InfrastructureType.PHYSICAL_SERVER]: t('infrastructureTypes.PHYSICAL_SERVER'),
       [InfrastructureType.VIRTUAL_MACHINE]: t('infrastructureTypes.VIRTUAL_MACHINE'),
+      [InfrastructureType.VIRTUALIZATION_CLUSTER]: t('infrastructureTypes.VIRTUALIZATION_CLUSTER'),
     }
     return translations[type] || type
   }
@@ -148,6 +149,10 @@ const InfrastructureTable: React.FC<InfrastructureTableProps> = ({
           break
         case InfrastructureType.KUBERNETES_CLUSTER:
           color = 'info'
+          label = getInfrastructureTypeTranslation(type, t)
+          break
+        case InfrastructureType.VIRTUALIZATION_CLUSTER:
+          color = 'primary'
           label = getInfrastructureTypeTranslation(type, t)
           break
         case InfrastructureType.VIRTUAL_MACHINE:

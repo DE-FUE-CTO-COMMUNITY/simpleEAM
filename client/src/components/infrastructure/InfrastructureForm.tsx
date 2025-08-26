@@ -147,6 +147,8 @@ const InfrastructureForm: React.FC<InfrastructureFormProps> = ({
         return tTypes('PHYSICAL_SERVER')
       case InfrastructureType.VIRTUAL_MACHINE:
         return tTypes('VIRTUAL_MACHINE')
+      case InfrastructureType.VIRTUALIZATION_CLUSTER:
+        return tTypes('VIRTUALIZATION_CLUSTER')
       default:
         return type
     }
