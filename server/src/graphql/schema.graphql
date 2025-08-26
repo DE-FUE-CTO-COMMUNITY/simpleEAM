@@ -71,8 +71,7 @@ type Person
   ownedArchitectures: [Architecture!]! @relationship(type: "OWNED_BY", direction: IN)
   ownedDiagrams: [Diagram!]! @relationship(type: "CREATED_BY", direction: IN)
   ownedInfrastructure: [Infrastructure!]! @relationship(type: "OWNED_BY", direction: IN)
-  responsibleForInterfaces: [ApplicationInterface!]!
-    @relationship(type: "RESPONSIBLE_FOR", direction: OUT)
+  ownedInterfaces: [ApplicationInterface!]! @relationship(type: "OWNED_BY", direction: IN)
 }
 
 """
@@ -147,7 +146,7 @@ type ApplicationInterface
   endOfUseDate: Date
   createdAt: DateTime! @timestamp(operations: [CREATE])
   updatedAt: DateTime @timestamp(operations: [UPDATE])
-  responsiblePerson: [Person!]! @relationship(type: "RESPONSIBLE_FOR", direction: IN)
+  owners: [Person!]! @relationship(type: "OWNED_BY", direction: OUT)
   predecessors: [ApplicationInterface!]!
     @relationship(type: "SUCCESSOR_OF_INTERFACE", direction: OUT)
   successors: [ApplicationInterface!]! @relationship(type: "SUCCESSOR_OF_INTERFACE", direction: IN)
