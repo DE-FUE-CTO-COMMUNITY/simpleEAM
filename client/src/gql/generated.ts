@@ -1106,14 +1106,14 @@ export type ApplicationInterface = {
   interfaceType: InterfaceType;
   introductionDate?: Maybe<Scalars['Date']['output']>;
   name: Scalars['String']['output'];
+  owners: Array<Person>;
+  ownersConnection: ApplicationInterfaceOwnersConnection;
   partOfArchitectures: Array<Architecture>;
   partOfArchitecturesConnection: ApplicationInterfacePartOfArchitecturesConnection;
   planningDate?: Maybe<Scalars['Date']['output']>;
   predecessors: Array<ApplicationInterface>;
   predecessorsConnection: ApplicationInterfacePredecessorsConnection;
   protocol?: Maybe<InterfaceProtocol>;
-  responsiblePerson: Array<Person>;
-  responsiblePersonConnection: ApplicationInterfaceResponsiblePersonConnection;
   sourceApplications: Array<Application>;
   sourceApplicationsConnection: ApplicationInterfaceSourceApplicationsConnection;
   status: InterfaceStatus;
@@ -1163,6 +1163,24 @@ export type ApplicationInterfaceDepictedInDiagramsConnectionArgs = {
 
 
 /** ApplicationInterface - repräsentiert eine Schnittstelle zwischen Applikationen */
+export type ApplicationInterfaceOwnersArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<PersonSort>>;
+  where?: InputMaybe<PersonWhere>;
+};
+
+
+/** ApplicationInterface - repräsentiert eine Schnittstelle zwischen Applikationen */
+export type ApplicationInterfaceOwnersConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<ApplicationInterfaceOwnersConnectionSort>>;
+  where?: InputMaybe<ApplicationInterfaceOwnersConnectionWhere>;
+};
+
+
+/** ApplicationInterface - repräsentiert eine Schnittstelle zwischen Applikationen */
 export type ApplicationInterfacePartOfArchitecturesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -1195,24 +1213,6 @@ export type ApplicationInterfacePredecessorsConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<ApplicationInterfacePredecessorsConnectionSort>>;
   where?: InputMaybe<ApplicationInterfacePredecessorsConnectionWhere>;
-};
-
-
-/** ApplicationInterface - repräsentiert eine Schnittstelle zwischen Applikationen */
-export type ApplicationInterfaceResponsiblePersonArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<PersonSort>>;
-  where?: InputMaybe<PersonWhere>;
-};
-
-
-/** ApplicationInterface - repräsentiert eine Schnittstelle zwischen Applikationen */
-export type ApplicationInterfaceResponsiblePersonConnectionArgs = {
-  after?: InputMaybe<Scalars['String']['input']>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ApplicationInterfaceResponsiblePersonConnectionSort>>;
-  where?: InputMaybe<ApplicationInterfaceResponsiblePersonConnectionWhere>;
 };
 
 
@@ -1368,9 +1368,9 @@ export type ApplicationInterfaceArchitecturePartOfArchitecturesNodeAggregateSele
 export type ApplicationInterfaceConnectInput = {
   dataObjects?: InputMaybe<Array<ApplicationInterfaceDataObjectsConnectFieldInput>>;
   depictedInDiagrams?: InputMaybe<Array<ApplicationInterfaceDepictedInDiagramsConnectFieldInput>>;
+  owners?: InputMaybe<Array<ApplicationInterfaceOwnersConnectFieldInput>>;
   partOfArchitectures?: InputMaybe<Array<ApplicationInterfacePartOfArchitecturesConnectFieldInput>>;
   predecessors?: InputMaybe<Array<ApplicationInterfacePredecessorsConnectFieldInput>>;
-  responsiblePerson?: InputMaybe<Array<ApplicationInterfaceResponsiblePersonConnectFieldInput>>;
   sourceApplications?: InputMaybe<Array<ApplicationInterfaceSourceApplicationsConnectFieldInput>>;
   successors?: InputMaybe<Array<ApplicationInterfaceSuccessorsConnectFieldInput>>;
   targetApplications?: InputMaybe<Array<ApplicationInterfaceTargetApplicationsConnectFieldInput>>;
@@ -1389,11 +1389,11 @@ export type ApplicationInterfaceCreateInput = {
   interfaceType: InterfaceType;
   introductionDate?: InputMaybe<Scalars['Date']['input']>;
   name: Scalars['String']['input'];
+  owners?: InputMaybe<ApplicationInterfaceOwnersFieldInput>;
   partOfArchitectures?: InputMaybe<ApplicationInterfacePartOfArchitecturesFieldInput>;
   planningDate?: InputMaybe<Scalars['Date']['input']>;
   predecessors?: InputMaybe<ApplicationInterfacePredecessorsFieldInput>;
   protocol?: InputMaybe<InterfaceProtocol>;
-  responsiblePerson?: InputMaybe<ApplicationInterfaceResponsiblePersonFieldInput>;
   sourceApplications?: InputMaybe<ApplicationInterfaceSourceApplicationsFieldInput>;
   status: InterfaceStatus;
   successors?: InputMaybe<ApplicationInterfaceSuccessorsFieldInput>;
@@ -1527,9 +1527,9 @@ export type ApplicationInterfaceDataObjectsUpdateFieldInput = {
 export type ApplicationInterfaceDeleteInput = {
   dataObjects?: InputMaybe<Array<ApplicationInterfaceDataObjectsDeleteFieldInput>>;
   depictedInDiagrams?: InputMaybe<Array<ApplicationInterfaceDepictedInDiagramsDeleteFieldInput>>;
+  owners?: InputMaybe<Array<ApplicationInterfaceOwnersDeleteFieldInput>>;
   partOfArchitectures?: InputMaybe<Array<ApplicationInterfacePartOfArchitecturesDeleteFieldInput>>;
   predecessors?: InputMaybe<Array<ApplicationInterfacePredecessorsDeleteFieldInput>>;
-  responsiblePerson?: InputMaybe<Array<ApplicationInterfaceResponsiblePersonDeleteFieldInput>>;
   sourceApplications?: InputMaybe<Array<ApplicationInterfaceSourceApplicationsDeleteFieldInput>>;
   successors?: InputMaybe<Array<ApplicationInterfaceSuccessorsDeleteFieldInput>>;
   targetApplications?: InputMaybe<Array<ApplicationInterfaceTargetApplicationsDeleteFieldInput>>;
@@ -1662,9 +1662,9 @@ export type ApplicationInterfaceDiagramDepictedInDiagramsNodeAggregateSelection 
 export type ApplicationInterfaceDisconnectInput = {
   dataObjects?: InputMaybe<Array<ApplicationInterfaceDataObjectsDisconnectFieldInput>>;
   depictedInDiagrams?: InputMaybe<Array<ApplicationInterfaceDepictedInDiagramsDisconnectFieldInput>>;
+  owners?: InputMaybe<Array<ApplicationInterfaceOwnersDisconnectFieldInput>>;
   partOfArchitectures?: InputMaybe<Array<ApplicationInterfacePartOfArchitecturesDisconnectFieldInput>>;
   predecessors?: InputMaybe<Array<ApplicationInterfacePredecessorsDisconnectFieldInput>>;
-  responsiblePerson?: InputMaybe<Array<ApplicationInterfaceResponsiblePersonDisconnectFieldInput>>;
   sourceApplications?: InputMaybe<Array<ApplicationInterfaceSourceApplicationsDisconnectFieldInput>>;
   successors?: InputMaybe<Array<ApplicationInterfaceSuccessorsDisconnectFieldInput>>;
   targetApplications?: InputMaybe<Array<ApplicationInterfaceTargetApplicationsDisconnectFieldInput>>;
@@ -1674,6 +1674,117 @@ export type ApplicationInterfaceEdge = {
   __typename?: 'ApplicationInterfaceEdge';
   cursor: Scalars['String']['output'];
   node: ApplicationInterface;
+};
+
+export type ApplicationInterfaceOwnersAggregateInput = {
+  AND?: InputMaybe<Array<ApplicationInterfaceOwnersAggregateInput>>;
+  NOT?: InputMaybe<ApplicationInterfaceOwnersAggregateInput>;
+  OR?: InputMaybe<Array<ApplicationInterfaceOwnersAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<ApplicationInterfaceOwnersNodeAggregationWhereInput>;
+};
+
+export type ApplicationInterfaceOwnersConnectFieldInput = {
+  connect?: InputMaybe<Array<PersonConnectInput>>;
+  where?: InputMaybe<PersonConnectWhere>;
+};
+
+export type ApplicationInterfaceOwnersConnection = {
+  __typename?: 'ApplicationInterfaceOwnersConnection';
+  aggregate: ApplicationInterfacePersonOwnersAggregateSelection;
+  edges: Array<ApplicationInterfaceOwnersRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type ApplicationInterfaceOwnersConnectionAggregateInput = {
+  AND?: InputMaybe<Array<ApplicationInterfaceOwnersConnectionAggregateInput>>;
+  NOT?: InputMaybe<ApplicationInterfaceOwnersConnectionAggregateInput>;
+  OR?: InputMaybe<Array<ApplicationInterfaceOwnersConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<ApplicationInterfaceOwnersNodeAggregationWhereInput>;
+};
+
+export type ApplicationInterfaceOwnersConnectionFilters = {
+  /** Filter ApplicationInterfaces by aggregating results on related ApplicationInterfaceOwnersConnections */
+  aggregate?: InputMaybe<ApplicationInterfaceOwnersConnectionAggregateInput>;
+  /** Return ApplicationInterfaces where all of the related ApplicationInterfaceOwnersConnections match this filter */
+  all?: InputMaybe<ApplicationInterfaceOwnersConnectionWhere>;
+  /** Return ApplicationInterfaces where none of the related ApplicationInterfaceOwnersConnections match this filter */
+  none?: InputMaybe<ApplicationInterfaceOwnersConnectionWhere>;
+  /** Return ApplicationInterfaces where one of the related ApplicationInterfaceOwnersConnections match this filter */
+  single?: InputMaybe<ApplicationInterfaceOwnersConnectionWhere>;
+  /** Return ApplicationInterfaces where some of the related ApplicationInterfaceOwnersConnections match this filter */
+  some?: InputMaybe<ApplicationInterfaceOwnersConnectionWhere>;
+};
+
+export type ApplicationInterfaceOwnersConnectionSort = {
+  node?: InputMaybe<PersonSort>;
+};
+
+export type ApplicationInterfaceOwnersConnectionWhere = {
+  AND?: InputMaybe<Array<ApplicationInterfaceOwnersConnectionWhere>>;
+  NOT?: InputMaybe<ApplicationInterfaceOwnersConnectionWhere>;
+  OR?: InputMaybe<Array<ApplicationInterfaceOwnersConnectionWhere>>;
+  node?: InputMaybe<PersonWhere>;
+};
+
+export type ApplicationInterfaceOwnersCreateFieldInput = {
+  node: PersonCreateInput;
+};
+
+export type ApplicationInterfaceOwnersDeleteFieldInput = {
+  delete?: InputMaybe<PersonDeleteInput>;
+  where?: InputMaybe<ApplicationInterfaceOwnersConnectionWhere>;
+};
+
+export type ApplicationInterfaceOwnersDisconnectFieldInput = {
+  disconnect?: InputMaybe<PersonDisconnectInput>;
+  where?: InputMaybe<ApplicationInterfaceOwnersConnectionWhere>;
+};
+
+export type ApplicationInterfaceOwnersFieldInput = {
+  connect?: InputMaybe<Array<ApplicationInterfaceOwnersConnectFieldInput>>;
+  create?: InputMaybe<Array<ApplicationInterfaceOwnersCreateFieldInput>>;
+};
+
+export type ApplicationInterfaceOwnersNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<ApplicationInterfaceOwnersNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<ApplicationInterfaceOwnersNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<ApplicationInterfaceOwnersNodeAggregationWhereInput>>;
+  avatarUrl?: InputMaybe<StringScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  department?: InputMaybe<StringScalarAggregationFilters>;
+  email?: InputMaybe<StringScalarAggregationFilters>;
+  firstName?: InputMaybe<StringScalarAggregationFilters>;
+  lastName?: InputMaybe<StringScalarAggregationFilters>;
+  phone?: InputMaybe<StringScalarAggregationFilters>;
+  role?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type ApplicationInterfaceOwnersRelationship = {
+  __typename?: 'ApplicationInterfaceOwnersRelationship';
+  cursor: Scalars['String']['output'];
+  node: Person;
+};
+
+export type ApplicationInterfaceOwnersUpdateConnectionInput = {
+  node?: InputMaybe<PersonUpdateInput>;
+  where?: InputMaybe<ApplicationInterfaceOwnersConnectionWhere>;
+};
+
+export type ApplicationInterfaceOwnersUpdateFieldInput = {
+  connect?: InputMaybe<Array<ApplicationInterfaceOwnersConnectFieldInput>>;
+  create?: InputMaybe<Array<ApplicationInterfaceOwnersCreateFieldInput>>;
+  delete?: InputMaybe<Array<ApplicationInterfaceOwnersDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<ApplicationInterfaceOwnersDisconnectFieldInput>>;
+  update?: InputMaybe<ApplicationInterfaceOwnersUpdateConnectionInput>;
 };
 
 export type ApplicationInterfacePartOfArchitecturesAggregateInput = {
@@ -1783,14 +1894,14 @@ export type ApplicationInterfacePartOfArchitecturesUpdateFieldInput = {
   update?: InputMaybe<ApplicationInterfacePartOfArchitecturesUpdateConnectionInput>;
 };
 
-export type ApplicationInterfacePersonResponsiblePersonAggregateSelection = {
-  __typename?: 'ApplicationInterfacePersonResponsiblePersonAggregateSelection';
+export type ApplicationInterfacePersonOwnersAggregateSelection = {
+  __typename?: 'ApplicationInterfacePersonOwnersAggregateSelection';
   count: CountConnection;
-  node?: Maybe<ApplicationInterfacePersonResponsiblePersonNodeAggregateSelection>;
+  node?: Maybe<ApplicationInterfacePersonOwnersNodeAggregateSelection>;
 };
 
-export type ApplicationInterfacePersonResponsiblePersonNodeAggregateSelection = {
-  __typename?: 'ApplicationInterfacePersonResponsiblePersonNodeAggregateSelection';
+export type ApplicationInterfacePersonOwnersNodeAggregateSelection = {
+  __typename?: 'ApplicationInterfacePersonOwnersNodeAggregateSelection';
   avatarUrl: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   department: StringAggregateSelection;
@@ -1918,117 +2029,6 @@ export type ApplicationInterfaceRelationshipFilters = {
   single?: InputMaybe<ApplicationInterfaceWhere>;
   /** Filter type where some of the related ApplicationInterfaces match this filter */
   some?: InputMaybe<ApplicationInterfaceWhere>;
-};
-
-export type ApplicationInterfaceResponsiblePersonAggregateInput = {
-  AND?: InputMaybe<Array<ApplicationInterfaceResponsiblePersonAggregateInput>>;
-  NOT?: InputMaybe<ApplicationInterfaceResponsiblePersonAggregateInput>;
-  OR?: InputMaybe<Array<ApplicationInterfaceResponsiblePersonAggregateInput>>;
-  count?: InputMaybe<IntScalarFilters>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
-  count_GT?: InputMaybe<Scalars['Int']['input']>;
-  count_GTE?: InputMaybe<Scalars['Int']['input']>;
-  count_LT?: InputMaybe<Scalars['Int']['input']>;
-  count_LTE?: InputMaybe<Scalars['Int']['input']>;
-  node?: InputMaybe<ApplicationInterfaceResponsiblePersonNodeAggregationWhereInput>;
-};
-
-export type ApplicationInterfaceResponsiblePersonConnectFieldInput = {
-  connect?: InputMaybe<Array<PersonConnectInput>>;
-  where?: InputMaybe<PersonConnectWhere>;
-};
-
-export type ApplicationInterfaceResponsiblePersonConnection = {
-  __typename?: 'ApplicationInterfaceResponsiblePersonConnection';
-  aggregate: ApplicationInterfacePersonResponsiblePersonAggregateSelection;
-  edges: Array<ApplicationInterfaceResponsiblePersonRelationship>;
-  pageInfo: PageInfo;
-  totalCount: Scalars['Int']['output'];
-};
-
-export type ApplicationInterfaceResponsiblePersonConnectionAggregateInput = {
-  AND?: InputMaybe<Array<ApplicationInterfaceResponsiblePersonConnectionAggregateInput>>;
-  NOT?: InputMaybe<ApplicationInterfaceResponsiblePersonConnectionAggregateInput>;
-  OR?: InputMaybe<Array<ApplicationInterfaceResponsiblePersonConnectionAggregateInput>>;
-  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
-  node?: InputMaybe<ApplicationInterfaceResponsiblePersonNodeAggregationWhereInput>;
-};
-
-export type ApplicationInterfaceResponsiblePersonConnectionFilters = {
-  /** Filter ApplicationInterfaces by aggregating results on related ApplicationInterfaceResponsiblePersonConnections */
-  aggregate?: InputMaybe<ApplicationInterfaceResponsiblePersonConnectionAggregateInput>;
-  /** Return ApplicationInterfaces where all of the related ApplicationInterfaceResponsiblePersonConnections match this filter */
-  all?: InputMaybe<ApplicationInterfaceResponsiblePersonConnectionWhere>;
-  /** Return ApplicationInterfaces where none of the related ApplicationInterfaceResponsiblePersonConnections match this filter */
-  none?: InputMaybe<ApplicationInterfaceResponsiblePersonConnectionWhere>;
-  /** Return ApplicationInterfaces where one of the related ApplicationInterfaceResponsiblePersonConnections match this filter */
-  single?: InputMaybe<ApplicationInterfaceResponsiblePersonConnectionWhere>;
-  /** Return ApplicationInterfaces where some of the related ApplicationInterfaceResponsiblePersonConnections match this filter */
-  some?: InputMaybe<ApplicationInterfaceResponsiblePersonConnectionWhere>;
-};
-
-export type ApplicationInterfaceResponsiblePersonConnectionSort = {
-  node?: InputMaybe<PersonSort>;
-};
-
-export type ApplicationInterfaceResponsiblePersonConnectionWhere = {
-  AND?: InputMaybe<Array<ApplicationInterfaceResponsiblePersonConnectionWhere>>;
-  NOT?: InputMaybe<ApplicationInterfaceResponsiblePersonConnectionWhere>;
-  OR?: InputMaybe<Array<ApplicationInterfaceResponsiblePersonConnectionWhere>>;
-  node?: InputMaybe<PersonWhere>;
-};
-
-export type ApplicationInterfaceResponsiblePersonCreateFieldInput = {
-  node: PersonCreateInput;
-};
-
-export type ApplicationInterfaceResponsiblePersonDeleteFieldInput = {
-  delete?: InputMaybe<PersonDeleteInput>;
-  where?: InputMaybe<ApplicationInterfaceResponsiblePersonConnectionWhere>;
-};
-
-export type ApplicationInterfaceResponsiblePersonDisconnectFieldInput = {
-  disconnect?: InputMaybe<PersonDisconnectInput>;
-  where?: InputMaybe<ApplicationInterfaceResponsiblePersonConnectionWhere>;
-};
-
-export type ApplicationInterfaceResponsiblePersonFieldInput = {
-  connect?: InputMaybe<Array<ApplicationInterfaceResponsiblePersonConnectFieldInput>>;
-  create?: InputMaybe<Array<ApplicationInterfaceResponsiblePersonCreateFieldInput>>;
-};
-
-export type ApplicationInterfaceResponsiblePersonNodeAggregationWhereInput = {
-  AND?: InputMaybe<Array<ApplicationInterfaceResponsiblePersonNodeAggregationWhereInput>>;
-  NOT?: InputMaybe<ApplicationInterfaceResponsiblePersonNodeAggregationWhereInput>;
-  OR?: InputMaybe<Array<ApplicationInterfaceResponsiblePersonNodeAggregationWhereInput>>;
-  avatarUrl?: InputMaybe<StringScalarAggregationFilters>;
-  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
-  department?: InputMaybe<StringScalarAggregationFilters>;
-  email?: InputMaybe<StringScalarAggregationFilters>;
-  firstName?: InputMaybe<StringScalarAggregationFilters>;
-  lastName?: InputMaybe<StringScalarAggregationFilters>;
-  phone?: InputMaybe<StringScalarAggregationFilters>;
-  role?: InputMaybe<StringScalarAggregationFilters>;
-  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
-};
-
-export type ApplicationInterfaceResponsiblePersonRelationship = {
-  __typename?: 'ApplicationInterfaceResponsiblePersonRelationship';
-  cursor: Scalars['String']['output'];
-  node: Person;
-};
-
-export type ApplicationInterfaceResponsiblePersonUpdateConnectionInput = {
-  node?: InputMaybe<PersonUpdateInput>;
-  where?: InputMaybe<ApplicationInterfaceResponsiblePersonConnectionWhere>;
-};
-
-export type ApplicationInterfaceResponsiblePersonUpdateFieldInput = {
-  connect?: InputMaybe<Array<ApplicationInterfaceResponsiblePersonConnectFieldInput>>;
-  create?: InputMaybe<Array<ApplicationInterfaceResponsiblePersonCreateFieldInput>>;
-  delete?: InputMaybe<Array<ApplicationInterfaceResponsiblePersonDeleteFieldInput>>;
-  disconnect?: InputMaybe<Array<ApplicationInterfaceResponsiblePersonDisconnectFieldInput>>;
-  update?: InputMaybe<ApplicationInterfaceResponsiblePersonUpdateConnectionInput>;
 };
 
 /** Fields to sort ApplicationInterfaces by. The order in which sorts are applied is not guaranteed when specifying many fields in one ApplicationInterfaceSort object. */
@@ -2385,11 +2385,11 @@ export type ApplicationInterfaceUpdateInput = {
   interfaceType?: InputMaybe<InterfaceTypeEnumScalarMutations>;
   introductionDate?: InputMaybe<DateScalarMutations>;
   name?: InputMaybe<StringScalarMutations>;
+  owners?: InputMaybe<Array<ApplicationInterfaceOwnersUpdateFieldInput>>;
   partOfArchitectures?: InputMaybe<Array<ApplicationInterfacePartOfArchitecturesUpdateFieldInput>>;
   planningDate?: InputMaybe<DateScalarMutations>;
   predecessors?: InputMaybe<Array<ApplicationInterfacePredecessorsUpdateFieldInput>>;
   protocol?: InputMaybe<InterfaceProtocolEnumScalarMutations>;
-  responsiblePerson?: InputMaybe<Array<ApplicationInterfaceResponsiblePersonUpdateFieldInput>>;
   sourceApplications?: InputMaybe<Array<ApplicationInterfaceSourceApplicationsUpdateFieldInput>>;
   status?: InputMaybe<InterfaceStatusEnumScalarMutations>;
   successors?: InputMaybe<Array<ApplicationInterfaceSuccessorsUpdateFieldInput>>;
@@ -2413,14 +2413,14 @@ export type ApplicationInterfaceWhere = {
   interfaceType?: InputMaybe<InterfaceTypeEnumScalarFilters>;
   introductionDate?: InputMaybe<DateScalarFilters>;
   name?: InputMaybe<StringScalarFilters>;
+  owners?: InputMaybe<PersonRelationshipFilters>;
+  ownersConnection?: InputMaybe<ApplicationInterfaceOwnersConnectionFilters>;
   partOfArchitectures?: InputMaybe<ArchitectureRelationshipFilters>;
   partOfArchitecturesConnection?: InputMaybe<ApplicationInterfacePartOfArchitecturesConnectionFilters>;
   planningDate?: InputMaybe<DateScalarFilters>;
   predecessors?: InputMaybe<ApplicationInterfaceRelationshipFilters>;
   predecessorsConnection?: InputMaybe<ApplicationInterfacePredecessorsConnectionFilters>;
   protocol?: InputMaybe<InterfaceProtocolEnumScalarFilters>;
-  responsiblePerson?: InputMaybe<PersonRelationshipFilters>;
-  responsiblePersonConnection?: InputMaybe<ApplicationInterfaceResponsiblePersonConnectionFilters>;
   sourceApplications?: InputMaybe<ApplicationRelationshipFilters>;
   sourceApplicationsConnection?: InputMaybe<ApplicationInterfaceSourceApplicationsConnectionFilters>;
   status?: InputMaybe<InterfaceStatusEnumScalarFilters>;
@@ -11315,9 +11315,9 @@ export type Person = {
   ownedDiagramsConnection: PersonOwnedDiagramsConnection;
   ownedInfrastructure: Array<Infrastructure>;
   ownedInfrastructureConnection: PersonOwnedInfrastructureConnection;
+  ownedInterfaces: Array<ApplicationInterface>;
+  ownedInterfacesConnection: PersonOwnedInterfacesConnection;
   phone?: Maybe<Scalars['String']['output']>;
-  responsibleForInterfaces: Array<ApplicationInterface>;
-  responsibleForInterfacesConnection: PersonResponsibleForInterfacesConnection;
   role?: Maybe<Scalars['String']['output']>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
 };
@@ -11432,7 +11432,7 @@ export type PersonOwnedInfrastructureConnectionArgs = {
 
 
 /** Person - repräsentiert eine Person im Unternehmen */
-export type PersonResponsibleForInterfacesArgs = {
+export type PersonOwnedInterfacesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<ApplicationInterfaceSort>>;
@@ -11441,11 +11441,11 @@ export type PersonResponsibleForInterfacesArgs = {
 
 
 /** Person - repräsentiert eine Person im Unternehmen */
-export type PersonResponsibleForInterfacesConnectionArgs = {
+export type PersonOwnedInterfacesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<PersonResponsibleForInterfacesConnectionSort>>;
-  where?: InputMaybe<PersonResponsibleForInterfacesConnectionWhere>;
+  sort?: InputMaybe<Array<PersonOwnedInterfacesConnectionSort>>;
+  where?: InputMaybe<PersonOwnedInterfacesConnectionWhere>;
 };
 
 export type PersonAggregate = {
@@ -11467,14 +11467,14 @@ export type PersonAggregateNode = {
   updatedAt: DateTimeAggregateSelection;
 };
 
-export type PersonApplicationInterfaceResponsibleForInterfacesAggregateSelection = {
-  __typename?: 'PersonApplicationInterfaceResponsibleForInterfacesAggregateSelection';
+export type PersonApplicationInterfaceOwnedInterfacesAggregateSelection = {
+  __typename?: 'PersonApplicationInterfaceOwnedInterfacesAggregateSelection';
   count: CountConnection;
-  node?: Maybe<PersonApplicationInterfaceResponsibleForInterfacesNodeAggregateSelection>;
+  node?: Maybe<PersonApplicationInterfaceOwnedInterfacesNodeAggregateSelection>;
 };
 
-export type PersonApplicationInterfaceResponsibleForInterfacesNodeAggregateSelection = {
-  __typename?: 'PersonApplicationInterfaceResponsibleForInterfacesNodeAggregateSelection';
+export type PersonApplicationInterfaceOwnedInterfacesNodeAggregateSelection = {
+  __typename?: 'PersonApplicationInterfaceOwnedInterfacesNodeAggregateSelection';
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   name: StringAggregateSelection;
@@ -11539,7 +11539,7 @@ export type PersonConnectInput = {
   ownedDataObjects?: InputMaybe<Array<PersonOwnedDataObjectsConnectFieldInput>>;
   ownedDiagrams?: InputMaybe<Array<PersonOwnedDiagramsConnectFieldInput>>;
   ownedInfrastructure?: InputMaybe<Array<PersonOwnedInfrastructureConnectFieldInput>>;
-  responsibleForInterfaces?: InputMaybe<Array<PersonResponsibleForInterfacesConnectFieldInput>>;
+  ownedInterfaces?: InputMaybe<Array<PersonOwnedInterfacesConnectFieldInput>>;
 };
 
 export type PersonConnectWhere = {
@@ -11558,8 +11558,8 @@ export type PersonCreateInput = {
   ownedDataObjects?: InputMaybe<PersonOwnedDataObjectsFieldInput>;
   ownedDiagrams?: InputMaybe<PersonOwnedDiagramsFieldInput>;
   ownedInfrastructure?: InputMaybe<PersonOwnedInfrastructureFieldInput>;
+  ownedInterfaces?: InputMaybe<PersonOwnedInterfacesFieldInput>;
   phone?: InputMaybe<Scalars['String']['input']>;
-  responsibleForInterfaces?: InputMaybe<PersonResponsibleForInterfacesFieldInput>;
   role?: InputMaybe<Scalars['String']['input']>;
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
 };
@@ -11586,7 +11586,7 @@ export type PersonDeleteInput = {
   ownedDataObjects?: InputMaybe<Array<PersonOwnedDataObjectsDeleteFieldInput>>;
   ownedDiagrams?: InputMaybe<Array<PersonOwnedDiagramsDeleteFieldInput>>;
   ownedInfrastructure?: InputMaybe<Array<PersonOwnedInfrastructureDeleteFieldInput>>;
-  responsibleForInterfaces?: InputMaybe<Array<PersonResponsibleForInterfacesDeleteFieldInput>>;
+  ownedInterfaces?: InputMaybe<Array<PersonOwnedInterfacesDeleteFieldInput>>;
 };
 
 export type PersonDiagramOwnedDiagramsAggregateSelection = {
@@ -11612,7 +11612,7 @@ export type PersonDisconnectInput = {
   ownedDataObjects?: InputMaybe<Array<PersonOwnedDataObjectsDisconnectFieldInput>>;
   ownedDiagrams?: InputMaybe<Array<PersonOwnedDiagramsDisconnectFieldInput>>;
   ownedInfrastructure?: InputMaybe<Array<PersonOwnedInfrastructureDisconnectFieldInput>>;
-  responsibleForInterfaces?: InputMaybe<Array<PersonResponsibleForInterfacesDisconnectFieldInput>>;
+  ownedInterfaces?: InputMaybe<Array<PersonOwnedInterfacesDisconnectFieldInput>>;
 };
 
 export type PersonEdge = {
@@ -12300,6 +12300,113 @@ export type PersonOwnedInfrastructureUpdateFieldInput = {
   update?: InputMaybe<PersonOwnedInfrastructureUpdateConnectionInput>;
 };
 
+export type PersonOwnedInterfacesAggregateInput = {
+  AND?: InputMaybe<Array<PersonOwnedInterfacesAggregateInput>>;
+  NOT?: InputMaybe<PersonOwnedInterfacesAggregateInput>;
+  OR?: InputMaybe<Array<PersonOwnedInterfacesAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<PersonOwnedInterfacesNodeAggregationWhereInput>;
+};
+
+export type PersonOwnedInterfacesConnectFieldInput = {
+  connect?: InputMaybe<Array<ApplicationInterfaceConnectInput>>;
+  where?: InputMaybe<ApplicationInterfaceConnectWhere>;
+};
+
+export type PersonOwnedInterfacesConnection = {
+  __typename?: 'PersonOwnedInterfacesConnection';
+  aggregate: PersonApplicationInterfaceOwnedInterfacesAggregateSelection;
+  edges: Array<PersonOwnedInterfacesRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type PersonOwnedInterfacesConnectionAggregateInput = {
+  AND?: InputMaybe<Array<PersonOwnedInterfacesConnectionAggregateInput>>;
+  NOT?: InputMaybe<PersonOwnedInterfacesConnectionAggregateInput>;
+  OR?: InputMaybe<Array<PersonOwnedInterfacesConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<PersonOwnedInterfacesNodeAggregationWhereInput>;
+};
+
+export type PersonOwnedInterfacesConnectionFilters = {
+  /** Filter People by aggregating results on related PersonOwnedInterfacesConnections */
+  aggregate?: InputMaybe<PersonOwnedInterfacesConnectionAggregateInput>;
+  /** Return People where all of the related PersonOwnedInterfacesConnections match this filter */
+  all?: InputMaybe<PersonOwnedInterfacesConnectionWhere>;
+  /** Return People where none of the related PersonOwnedInterfacesConnections match this filter */
+  none?: InputMaybe<PersonOwnedInterfacesConnectionWhere>;
+  /** Return People where one of the related PersonOwnedInterfacesConnections match this filter */
+  single?: InputMaybe<PersonOwnedInterfacesConnectionWhere>;
+  /** Return People where some of the related PersonOwnedInterfacesConnections match this filter */
+  some?: InputMaybe<PersonOwnedInterfacesConnectionWhere>;
+};
+
+export type PersonOwnedInterfacesConnectionSort = {
+  node?: InputMaybe<ApplicationInterfaceSort>;
+};
+
+export type PersonOwnedInterfacesConnectionWhere = {
+  AND?: InputMaybe<Array<PersonOwnedInterfacesConnectionWhere>>;
+  NOT?: InputMaybe<PersonOwnedInterfacesConnectionWhere>;
+  OR?: InputMaybe<Array<PersonOwnedInterfacesConnectionWhere>>;
+  node?: InputMaybe<ApplicationInterfaceWhere>;
+};
+
+export type PersonOwnedInterfacesCreateFieldInput = {
+  node: ApplicationInterfaceCreateInput;
+};
+
+export type PersonOwnedInterfacesDeleteFieldInput = {
+  delete?: InputMaybe<ApplicationInterfaceDeleteInput>;
+  where?: InputMaybe<PersonOwnedInterfacesConnectionWhere>;
+};
+
+export type PersonOwnedInterfacesDisconnectFieldInput = {
+  disconnect?: InputMaybe<ApplicationInterfaceDisconnectInput>;
+  where?: InputMaybe<PersonOwnedInterfacesConnectionWhere>;
+};
+
+export type PersonOwnedInterfacesFieldInput = {
+  connect?: InputMaybe<Array<PersonOwnedInterfacesConnectFieldInput>>;
+  create?: InputMaybe<Array<PersonOwnedInterfacesCreateFieldInput>>;
+};
+
+export type PersonOwnedInterfacesNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<PersonOwnedInterfacesNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<PersonOwnedInterfacesNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<PersonOwnedInterfacesNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  version?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type PersonOwnedInterfacesRelationship = {
+  __typename?: 'PersonOwnedInterfacesRelationship';
+  cursor: Scalars['String']['output'];
+  node: ApplicationInterface;
+};
+
+export type PersonOwnedInterfacesUpdateConnectionInput = {
+  node?: InputMaybe<ApplicationInterfaceUpdateInput>;
+  where?: InputMaybe<PersonOwnedInterfacesConnectionWhere>;
+};
+
+export type PersonOwnedInterfacesUpdateFieldInput = {
+  connect?: InputMaybe<Array<PersonOwnedInterfacesConnectFieldInput>>;
+  create?: InputMaybe<Array<PersonOwnedInterfacesCreateFieldInput>>;
+  delete?: InputMaybe<Array<PersonOwnedInterfacesDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<PersonOwnedInterfacesDisconnectFieldInput>>;
+  update?: InputMaybe<PersonOwnedInterfacesUpdateConnectionInput>;
+};
+
 export type PersonRelationshipFilters = {
   /** Filter type where all of the related People match this filter */
   all?: InputMaybe<PersonWhere>;
@@ -12309,113 +12416,6 @@ export type PersonRelationshipFilters = {
   single?: InputMaybe<PersonWhere>;
   /** Filter type where some of the related People match this filter */
   some?: InputMaybe<PersonWhere>;
-};
-
-export type PersonResponsibleForInterfacesAggregateInput = {
-  AND?: InputMaybe<Array<PersonResponsibleForInterfacesAggregateInput>>;
-  NOT?: InputMaybe<PersonResponsibleForInterfacesAggregateInput>;
-  OR?: InputMaybe<Array<PersonResponsibleForInterfacesAggregateInput>>;
-  count?: InputMaybe<IntScalarFilters>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
-  count_GT?: InputMaybe<Scalars['Int']['input']>;
-  count_GTE?: InputMaybe<Scalars['Int']['input']>;
-  count_LT?: InputMaybe<Scalars['Int']['input']>;
-  count_LTE?: InputMaybe<Scalars['Int']['input']>;
-  node?: InputMaybe<PersonResponsibleForInterfacesNodeAggregationWhereInput>;
-};
-
-export type PersonResponsibleForInterfacesConnectFieldInput = {
-  connect?: InputMaybe<Array<ApplicationInterfaceConnectInput>>;
-  where?: InputMaybe<ApplicationInterfaceConnectWhere>;
-};
-
-export type PersonResponsibleForInterfacesConnection = {
-  __typename?: 'PersonResponsibleForInterfacesConnection';
-  aggregate: PersonApplicationInterfaceResponsibleForInterfacesAggregateSelection;
-  edges: Array<PersonResponsibleForInterfacesRelationship>;
-  pageInfo: PageInfo;
-  totalCount: Scalars['Int']['output'];
-};
-
-export type PersonResponsibleForInterfacesConnectionAggregateInput = {
-  AND?: InputMaybe<Array<PersonResponsibleForInterfacesConnectionAggregateInput>>;
-  NOT?: InputMaybe<PersonResponsibleForInterfacesConnectionAggregateInput>;
-  OR?: InputMaybe<Array<PersonResponsibleForInterfacesConnectionAggregateInput>>;
-  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
-  node?: InputMaybe<PersonResponsibleForInterfacesNodeAggregationWhereInput>;
-};
-
-export type PersonResponsibleForInterfacesConnectionFilters = {
-  /** Filter People by aggregating results on related PersonResponsibleForInterfacesConnections */
-  aggregate?: InputMaybe<PersonResponsibleForInterfacesConnectionAggregateInput>;
-  /** Return People where all of the related PersonResponsibleForInterfacesConnections match this filter */
-  all?: InputMaybe<PersonResponsibleForInterfacesConnectionWhere>;
-  /** Return People where none of the related PersonResponsibleForInterfacesConnections match this filter */
-  none?: InputMaybe<PersonResponsibleForInterfacesConnectionWhere>;
-  /** Return People where one of the related PersonResponsibleForInterfacesConnections match this filter */
-  single?: InputMaybe<PersonResponsibleForInterfacesConnectionWhere>;
-  /** Return People where some of the related PersonResponsibleForInterfacesConnections match this filter */
-  some?: InputMaybe<PersonResponsibleForInterfacesConnectionWhere>;
-};
-
-export type PersonResponsibleForInterfacesConnectionSort = {
-  node?: InputMaybe<ApplicationInterfaceSort>;
-};
-
-export type PersonResponsibleForInterfacesConnectionWhere = {
-  AND?: InputMaybe<Array<PersonResponsibleForInterfacesConnectionWhere>>;
-  NOT?: InputMaybe<PersonResponsibleForInterfacesConnectionWhere>;
-  OR?: InputMaybe<Array<PersonResponsibleForInterfacesConnectionWhere>>;
-  node?: InputMaybe<ApplicationInterfaceWhere>;
-};
-
-export type PersonResponsibleForInterfacesCreateFieldInput = {
-  node: ApplicationInterfaceCreateInput;
-};
-
-export type PersonResponsibleForInterfacesDeleteFieldInput = {
-  delete?: InputMaybe<ApplicationInterfaceDeleteInput>;
-  where?: InputMaybe<PersonResponsibleForInterfacesConnectionWhere>;
-};
-
-export type PersonResponsibleForInterfacesDisconnectFieldInput = {
-  disconnect?: InputMaybe<ApplicationInterfaceDisconnectInput>;
-  where?: InputMaybe<PersonResponsibleForInterfacesConnectionWhere>;
-};
-
-export type PersonResponsibleForInterfacesFieldInput = {
-  connect?: InputMaybe<Array<PersonResponsibleForInterfacesConnectFieldInput>>;
-  create?: InputMaybe<Array<PersonResponsibleForInterfacesCreateFieldInput>>;
-};
-
-export type PersonResponsibleForInterfacesNodeAggregationWhereInput = {
-  AND?: InputMaybe<Array<PersonResponsibleForInterfacesNodeAggregationWhereInput>>;
-  NOT?: InputMaybe<PersonResponsibleForInterfacesNodeAggregationWhereInput>;
-  OR?: InputMaybe<Array<PersonResponsibleForInterfacesNodeAggregationWhereInput>>;
-  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
-  description?: InputMaybe<StringScalarAggregationFilters>;
-  name?: InputMaybe<StringScalarAggregationFilters>;
-  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
-  version?: InputMaybe<StringScalarAggregationFilters>;
-};
-
-export type PersonResponsibleForInterfacesRelationship = {
-  __typename?: 'PersonResponsibleForInterfacesRelationship';
-  cursor: Scalars['String']['output'];
-  node: ApplicationInterface;
-};
-
-export type PersonResponsibleForInterfacesUpdateConnectionInput = {
-  node?: InputMaybe<ApplicationInterfaceUpdateInput>;
-  where?: InputMaybe<PersonResponsibleForInterfacesConnectionWhere>;
-};
-
-export type PersonResponsibleForInterfacesUpdateFieldInput = {
-  connect?: InputMaybe<Array<PersonResponsibleForInterfacesConnectFieldInput>>;
-  create?: InputMaybe<Array<PersonResponsibleForInterfacesCreateFieldInput>>;
-  delete?: InputMaybe<Array<PersonResponsibleForInterfacesDeleteFieldInput>>;
-  disconnect?: InputMaybe<Array<PersonResponsibleForInterfacesDisconnectFieldInput>>;
-  update?: InputMaybe<PersonResponsibleForInterfacesUpdateConnectionInput>;
 };
 
 /** Fields to sort People by. The order in which sorts are applied is not guaranteed when specifying many fields in one PersonSort object. */
@@ -12445,8 +12445,8 @@ export type PersonUpdateInput = {
   ownedDataObjects?: InputMaybe<Array<PersonOwnedDataObjectsUpdateFieldInput>>;
   ownedDiagrams?: InputMaybe<Array<PersonOwnedDiagramsUpdateFieldInput>>;
   ownedInfrastructure?: InputMaybe<Array<PersonOwnedInfrastructureUpdateFieldInput>>;
+  ownedInterfaces?: InputMaybe<Array<PersonOwnedInterfacesUpdateFieldInput>>;
   phone?: InputMaybe<StringScalarMutations>;
-  responsibleForInterfaces?: InputMaybe<Array<PersonResponsibleForInterfacesUpdateFieldInput>>;
   role?: InputMaybe<StringScalarMutations>;
 };
 
@@ -12473,9 +12473,9 @@ export type PersonWhere = {
   ownedDiagramsConnection?: InputMaybe<PersonOwnedDiagramsConnectionFilters>;
   ownedInfrastructure?: InputMaybe<InfrastructureRelationshipFilters>;
   ownedInfrastructureConnection?: InputMaybe<PersonOwnedInfrastructureConnectionFilters>;
+  ownedInterfaces?: InputMaybe<ApplicationInterfaceRelationshipFilters>;
+  ownedInterfacesConnection?: InputMaybe<PersonOwnedInterfacesConnectionFilters>;
   phone?: InputMaybe<StringScalarFilters>;
-  responsibleForInterfaces?: InputMaybe<ApplicationInterfaceRelationshipFilters>;
-  responsibleForInterfacesConnection?: InputMaybe<PersonResponsibleForInterfacesConnectionFilters>;
   role?: InputMaybe<StringScalarFilters>;
   updatedAt?: InputMaybe<DateTimeScalarFilters>;
 };

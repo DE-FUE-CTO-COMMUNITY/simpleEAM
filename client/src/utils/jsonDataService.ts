@@ -219,7 +219,7 @@ export const fetchInterfacesForJson = async (
       sourceApplications: iface.sourceApplications || [],
       targetApplications: iface.targetApplications || [],
       dataObjects: iface.dataObjects || [],
-      responsiblePerson: iface.responsiblePerson || [],
+      owners: iface.owners || [],
       predecessors: iface.predecessors || [],
       successors: iface.successors || [],
       partOfArchitectures: iface.partOfArchitectures || [],

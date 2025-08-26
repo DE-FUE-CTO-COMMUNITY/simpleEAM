@@ -211,7 +211,7 @@ export const fetchInterfacesForExport = async (
       endOfLifeDate: formatDateForExport(iface.endOfLifeDate),
       createdAt: formatDateForExport(iface.createdAt),
       updatedAt: formatDateForExport(iface.updatedAt),
-      responsiblePerson: iface.responsiblePerson?.map((person: any) => person.id).join(',') || '',
+      owners: iface.owners?.map((person: any) => person.id).join(',') || '',
       sourceApplications: iface.sourceApplications?.map((app: any) => app.id).join(',') || '',
       targetApplications: iface.targetApplications?.map((app: any) => app.id).join(',') || '',
       dataObjects: iface.dataObjects?.map((obj: any) => obj.id).join(',') || '',
@@ -753,7 +753,7 @@ export const getInterfacesTemplate = (): ExcelExportData => ({
   endOfLifeDate: '', // ISO-Format: 2024-01-01T12:00:00.000Z
   createdAt: '', // ISO-Format: 2024-01-01T12:00:00.000Z
   updatedAt: '', // ISO-Format: 2024-01-01T12:00:00.000Z
-  responsiblePerson: '', // Person-ID
+  owners: '', // Person-ID
   sourceApplications: '', // Komma-getrennte Application-IDs
   targetApplications: '', // Komma-getrennte Application-IDs
   dataObjects: '', // Komma-getrennte DataObject-IDs
@@ -1271,7 +1271,7 @@ export const getTemplateWithExamples = (
           status: 'active',
           introductionDate: '2023-03-15T00:00:00.000Z',
           endOfLifeDate: '2026-12-31T23:59:59.000Z',
-          responsiblePerson: 'user-123',
+          owners: 'user-123',
           sourceApplications: 'app-001',
           targetApplications: 'app-002,app-003',
           dataObjects: 'data-001,data-002',
@@ -1411,7 +1411,7 @@ export function getOptionalFieldsByEntityType(entityType: EntityType): string[] 
         'version',
         'introductionDate',
         'endOfLifeDate',
-        'responsiblePerson',
+        'owners',
         'sourceApplications',
         'targetApplications',
         'dataObjects',

@@ -92,10 +92,10 @@ export const countActiveFilters = (filterState: GenericFilterState): number => {
     count++
   }
 
-  // Verantwortliche-Filter
+  // Eigentümer-Filter
   if (
-    filterState.responsiblePersonFilter &&
-    (filterState.responsiblePersonFilter as string[]).length > 0
+    filterState.ownersFilter &&
+    (filterState.ownersFilter as string[]).length > 0
   ) {
     count++
   }
