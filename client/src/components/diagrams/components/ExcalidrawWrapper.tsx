@@ -218,7 +218,8 @@ const ExcalidrawWrapper = dynamic(
         return defaultData
       }, [_initialData, themeMode]) // Depend on actual initialData prop and theme mode
 
-      // Inject CSS to hide the default Excalidraw context menu
+      // Inject CSS to disable the default Excalidraw context menu completely
+      // We use our own FullCustomContextMenu instead
       React.useEffect(() => {
         const style = document.createElement('style')
         style.textContent = `
@@ -252,23 +253,11 @@ const ExcalidrawWrapper = dynamic(
               apiRef.current = api
               setIsAPIReady(true)
 
-              // Erweitere das Kontext-Menü durch Überschreibung der getContextMenuItems-Methode
-              if (api.actionManager && api.actionManager.app) {
-                const originalGetContextMenuItems = api.actionManager.app.getContextMenuItems
+              // Note: We do NOT use the built-in Excalidraw context menu
+              // Instead, we use our own FullCustomContextMenu component
+              // The built-in context menu is disabled via CSS
 
-                api.actionManager.app.getContextMenuItems = function (type: 'canvas' | 'element') {
-                  // Erhalte die Standard-Menü-Items
-                  const standardItems = originalGetContextMenuItems.call(this, type)
-                  // Menüeintrag 'Verwandte Elemente hinzufügen' ist im main-Branch deaktiviert
-                  return standardItems
-                }
-
-                console.log('Successfully overrode getContextMenuItems method')
-              } else {
-                console.warn('ActionManager or app not available for context menu override')
-              }
-
-              // Also call the original excalidrawAPI if provided
+              // Call the original excalidrawAPI callback if provided
               if (excalidrawAPI) {
                 excalidrawAPI(api)
               }
@@ -486,7 +475,10 @@ const ExcalidrawWrapper = dynamic(
             </MainMenuTyped>
           </ExcalidrawTyped>
 
-          {/* Custom Context Menu */}
+          {/* 
+            Our custom context menu implementation - replaces Excalidraw's built-in context menu
+            The built-in context menu is disabled via CSS and we use this component instead
+          */}
           <FullCustomContextMenu
             excalidrawAPI={apiRef.current}
             onOpenAddRelatedElementsDialog={onOpenAddRelatedElementsDialog}
