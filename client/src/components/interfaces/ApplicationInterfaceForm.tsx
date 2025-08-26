@@ -53,7 +53,7 @@ const baseApplicationInterfaceSchema = z.object({
   endOfLifeDate: z.date().optional().nullable(),
   planningDate: z.date().optional().nullable(),
   endOfUseDate: z.date().optional().nullable(),
-  responsiblePerson: z.string().optional().nullable(),
+  owners: z.string().optional().nullable(),
   sourceApplications: z.array(z.string()).optional(),
   targetApplications: z.array(z.string()).optional(),
   dataObjects: z.array(z.string()).optional(),
@@ -177,7 +177,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
   const tTypes = useTranslations('interfaces.interfaceTypes')
   const tStatuses = useTranslations('interfaces.statuses')
 
-  // Aktuellen Benutzer als Standard-ResponsiblePerson abrufen
+  // Aktuellen Benutzer als Standard-Eigentümer abrufen
   const { currentPerson } = useCurrentPerson()
 
   // Hilfsfunktion für Interface Type Labels
@@ -264,8 +264,8 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       endOfLifeDate: applicationInterface?.endOfLifeDate
         ? new Date(applicationInterface.endOfLifeDate)
         : null,
-      responsiblePerson:
-        applicationInterface?.responsiblePerson?.[0]?.id || currentPerson?.id || null,
+      owners:
+        applicationInterface?.owners?.[0]?.id || currentPerson?.id || null,
       sourceApplications: applicationInterface?.sourceApplications?.map(app => app.id) || [],
       targetApplications: applicationInterface?.targetApplications?.map(app => app.id) || [],
       dataObjects: applicationInterface?.dataObjects?.map(obj => obj.id) || [],
@@ -336,10 +336,10 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
         endOfLifeDate: applicationInterface.endOfLifeDate
           ? new Date(applicationInterface.endOfLifeDate)
           : null,
-        responsiblePerson:
-          applicationInterface.responsiblePerson &&
-          applicationInterface.responsiblePerson.length > 0
-            ? applicationInterface.responsiblePerson[0].id
+        owners:
+          applicationInterface.owners &&
+          applicationInterface.owners.length > 0
+            ? applicationInterface.owners[0].id
             : null,
         sourceApplications: applicationInterface.sourceApplications?.map(app => app.id) || [],
         targetApplications: applicationInterface.targetApplications?.map(app => app.id) || [],
@@ -470,8 +470,8 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       icon: <DeleteIcon />,
     },
     {
-      name: 'responsiblePerson',
-      label: t('responsiblePerson'),
+      name: 'owners',
+      label: t('owners'),
       type: 'autocomplete',
       size: { xs: 12 },
       tabId: 'general',

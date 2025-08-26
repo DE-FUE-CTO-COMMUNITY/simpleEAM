@@ -19,7 +19,7 @@ export const APPLICATION_INTERFACE_DEFAULT_COLUMN_VISIBILITY = {
   name: true,
   interfaceType: true,
   protocol: true,
-  responsiblePerson: true,
+  owners: true,
   sourceApplications: true,
   targetApplications: true,
   // Standardmäßig versteckte Spalten
@@ -202,12 +202,12 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
           )
         },
       }),
-      columnHelper.accessor('responsiblePerson', {
-        header: t('responsiblePerson'),
+      columnHelper.accessor('owners', {
+        header: t('owners'),
         cell: info => {
-          const responsiblePersons = info.getValue()
-          return responsiblePersons && responsiblePersons.length > 0
-            ? responsiblePersons
+          const owners = info.getValue()
+          return owners && owners.length > 0
+            ? owners
                 .map((person: any) => `${person.firstName} ${person.lastName}`)
                 .join(', ')
             : '-'
@@ -349,9 +349,9 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
       status: applicationInterface.status,
       introductionDate: applicationInterface.introductionDate ?? null,
       endOfLifeDate: applicationInterface.endOfLifeDate ?? null,
-      responsiblePerson:
-        applicationInterface.responsiblePerson && applicationInterface.responsiblePerson.length > 0
-          ? applicationInterface.responsiblePerson[0].id
+      owners:
+        applicationInterface.owners && applicationInterface.owners.length > 0
+          ? applicationInterface.owners[0].id
           : null,
       sourceApplications: applicationInterface.sourceApplications?.map((app: any) => app.id) || [],
       targetApplications: applicationInterface.targetApplications?.map((app: any) => app.id) || [],

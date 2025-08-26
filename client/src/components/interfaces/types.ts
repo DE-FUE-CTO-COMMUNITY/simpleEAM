@@ -21,7 +21,7 @@ export type ApplicationInterface = Pick<
   | 'endOfLifeDate'
   | 'planningDate'
   | 'endOfUseDate'
-  | 'responsiblePerson'
+  | 'owners'
   | 'sourceApplications'
   | 'targetApplications'
   | 'dataObjects'
@@ -37,7 +37,7 @@ export interface FilterState {
   interfaceTypeFilter: InterfaceType[]
   protocolFilter: InterfaceProtocol[]
   statusFilter: InterfaceStatus[]
-  responsiblePersonFilter: string[]
+  ownersFilter: string[]
   sourceApplicationsFilter: string[]
   targetApplicationsFilter: string[]
   dataObjectsFilter: string[]
@@ -51,7 +51,7 @@ export interface FilterProps {
   availableInterfaceTypes: InterfaceType[]
   availableProtocols: InterfaceProtocol[]
   availableStatuses: InterfaceStatus[]
-  availableResponsiblePersons: string[]
+  availableOwners: string[]
   availableSourceApplications: string[]
   availableTargetApplications: string[]
   availableDataObjects: string[]

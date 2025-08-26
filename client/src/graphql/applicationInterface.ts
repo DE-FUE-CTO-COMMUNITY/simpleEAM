@@ -36,7 +36,7 @@ export const GET_APPLICATION_INTERFACES = gql`
       endOfLifeDate
       createdAt
       updatedAt
-      responsiblePerson {
+      owners {
         id
         firstName
         lastName
@@ -89,7 +89,7 @@ export const GET_APPLICATION_INTERFACE = gql`
       endOfLifeDate
       createdAt
       updatedAt
-      responsiblePerson {
+      owners {
         id
         firstName
         lastName
@@ -143,7 +143,7 @@ export const CREATE_APPLICATION_INTERFACE = gql`
         endOfLifeDate
         createdAt
         updatedAt
-        responsiblePerson {
+        owners {
           id
           firstName
           lastName
@@ -194,7 +194,7 @@ export const UPDATE_APPLICATION_INTERFACE = gql`
         endOfLifeDate
         createdAt
         updatedAt
-        responsiblePerson {
+        owners {
           id
           firstName
           lastName

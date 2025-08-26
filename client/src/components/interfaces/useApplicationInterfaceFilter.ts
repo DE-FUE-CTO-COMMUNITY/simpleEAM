@@ -17,7 +17,7 @@ export const useApplicationInterfaceFilter = ({
     interfaceTypeFilter: [],
     protocolFilter: [],
     statusFilter: [],
-    responsiblePersonFilter: [],
+    ownersFilter: [],
     sourceApplicationsFilter: [],
     targetApplicationsFilter: [],
     dataObjectsFilter: [],
@@ -41,12 +41,12 @@ export const useApplicationInterfaceFilter = ({
     return Object.values(InterfaceStatus)
   }, [])
 
-  // Alle verfügbaren verantwortlichen Personen
-  const availableResponsiblePersons = useMemo(() => {
+  // Alle verfügbaren Eigentümer (Owners)
+  const availableOwners = useMemo(() => {
     const persons = new Set<string>()
     applicationInterfaces.forEach(iface => {
-      if (iface.responsiblePerson) {
-        iface.responsiblePerson.forEach(person => {
+      if (iface.owners) {
+        iface.owners.forEach(person => {
           const fullName = `${person.firstName} ${person.lastName}`.trim()
           persons.add(fullName)
         })
@@ -117,7 +117,7 @@ export const useApplicationInterfaceFilter = ({
       interfaceTypeFilter,
       protocolFilter,
       statusFilter,
-      responsiblePersonFilter,
+      ownersFilter,
       sourceApplicationsFilter,
       targetApplicationsFilter,
       dataObjectsFilter,
@@ -151,12 +151,12 @@ export const useApplicationInterfaceFilter = ({
         return false
       }
 
-      // Verantwortliche Person-Filter
+      // Eigentümer-Filter (Owners)
       if (
-        responsiblePersonFilter.length > 0 &&
-        (!applicationInterface.responsiblePerson ||
-          !responsiblePersonFilter.some(personName =>
-            applicationInterface.responsiblePerson?.some(person => {
+        ownersFilter.length > 0 &&
+        (!applicationInterface.owners ||
+          !ownersFilter.some(personName =>
+            applicationInterface.owners?.some(person => {
               const fullName = `${person.firstName} ${person.lastName}`.trim()
               return (
                 fullName === personName ||
@@ -252,7 +252,7 @@ export const useApplicationInterfaceFilter = ({
       interfaceTypeFilter: [],
       protocolFilter: [],
       statusFilter: [],
-      responsiblePersonFilter: [],
+      ownersFilter: [],
       sourceApplicationsFilter: [],
       targetApplicationsFilter: [],
       dataObjectsFilter: [],
@@ -270,7 +270,7 @@ export const useApplicationInterfaceFilter = ({
     availableInterfaceTypes,
     availableProtocols,
     availableStatuses,
-    availableResponsiblePersons,
+    availableOwners,
     availableSourceApplications,
     availableTargetApplications,
     availableDataObjects,

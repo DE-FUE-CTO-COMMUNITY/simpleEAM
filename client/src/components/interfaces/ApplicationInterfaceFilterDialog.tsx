@@ -12,7 +12,7 @@ const ApplicationInterfaceFilterDialog: React.FC<FilterProps> = ({
   availableInterfaceTypes,
   availableProtocols,
   availableStatuses,
-  availableResponsiblePersons,
+  availableOwners,
   availableSourceApplications,
   availableTargetApplications,
   availableDataObjects,
@@ -126,12 +126,12 @@ const ApplicationInterfaceFilterDialog: React.FC<FilterProps> = ({
       })),
       valueFormatter: value => getStatusLabel(value as InterfaceStatus),
     },
-    // Verantwortliche Person-Filter
+    // Eigentümer-Filter
     {
-      id: 'responsiblePersonFilter',
-      label: t('responsiblePerson'),
+      id: 'ownersFilter',
+      label: t('owners'),
       type: 'multiSelect',
-      options: availableResponsiblePersons.map(person => ({
+      options: availableOwners.map(person => ({
         value: person,
         label: person,
       })),
