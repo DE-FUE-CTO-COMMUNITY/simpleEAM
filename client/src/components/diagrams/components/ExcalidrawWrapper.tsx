@@ -259,44 +259,7 @@ const ExcalidrawWrapper = dynamic(
                 api.actionManager.app.getContextMenuItems = function (type: 'canvas' | 'element') {
                   // Erhalte die Standard-Menü-Items
                   const standardItems = originalGetContextMenuItems.call(this, type)
-
-                  // Für Element-Kontext-Menü: Prüfe, ob das ausgewählte Element eine databaseId hat
-                  if (type === 'element' && !this.state.viewModeEnabled) {
-                    const elements = this.state.excalidrawAPI?.getSceneElements() || []
-                    const selectedElementIds = this.state.selectedElementIds || {}
-                    const selectedElements = elements.filter((el: any) => selectedElementIds[el.id])
-
-                    if (selectedElements.length === 1) {
-                      const element = selectedElements[0]
-                      const hasDbId = element?.customData?.databaseId
-
-                      if (hasDbId) {
-                        // Füge unseren benutzerdefinierten Menüpunkt hinzu
-                        const customAction = {
-                          name: 'addRelatedElements',
-                          label: 'Verwandte Elemente hinzufügen',
-                          perform: () => {
-                            console.log(
-                              'Add Related Elements triggered from context menu for:',
-                              element
-                            )
-                            onOpenAddRelatedElementsDialog(element)
-                            return false
-                          },
-                          predicate: () => !this.state.viewModeEnabled && hasDbId,
-                          trackEvent: {
-                            category: 'element',
-                            action: 'addRelatedElements',
-                          },
-                        }
-
-                        // Füge Separator und unsere Action hinzu
-                        return [...standardItems, 'separator', customAction]
-                      }
-                    }
-                  }
-
-                  // Für alle anderen Fälle: Standard-Items zurückgeben
+                  // Menüeintrag 'Verwandte Elemente hinzufügen' ist im main-Branch deaktiviert
                   return standardItems
                 }
 
