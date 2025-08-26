@@ -1496,11 +1496,11 @@ async function createSampleData(session: Session) {
         (p1:Person {id: "person-001"}), (i4:ApplicationInterface {id: "int-004"}),
         (p2), (i5:ApplicationInterface {id: "int-005"})
       CREATE 
-        (p2)-[:RESPONSIBLE_FOR]->(i1),
-        (p2)-[:RESPONSIBLE_FOR]->(i2),
-        (p6)-[:RESPONSIBLE_FOR]->(i3),
-        (p1)-[:RESPONSIBLE_FOR]->(i4),
-        (p2)-[:RESPONSIBLE_FOR]->(i5)
+        (i1)-[:OWNED_BY]->(p2),
+        (i2)-[:OWNED_BY]->(p2),
+        (i3)-[:OWNED_BY]->(p6),
+        (i4)-[:OWNED_BY]->(p1),
+        (i5)-[:OWNED_BY]->(p2)
     `)
 
     // Fehlende Interface-Verantwortlichkeiten ergänzen
@@ -1514,13 +1514,13 @@ async function createSampleData(session: Session) {
         (p2:Person {id: "person-002"}), (i11:ApplicationInterface {id: "int-011"}),
         (p3), (i12:ApplicationInterface {id: "int-012"})
       CREATE 
-        (p3)-[:RESPONSIBLE_FOR]->(i6),
-        (p4)-[:RESPONSIBLE_FOR]->(i7),
-        (p5)-[:RESPONSIBLE_FOR]->(i8),
-        (p6)-[:RESPONSIBLE_FOR]->(i9),
-        (p1)-[:RESPONSIBLE_FOR]->(i10),
-        (p2)-[:RESPONSIBLE_FOR]->(i11),
-        (p3)-[:RESPONSIBLE_FOR]->(i12)
+        (i6)-[:OWNED_BY]->(p3),
+        (i7)-[:OWNED_BY]->(p4),
+        (i8)-[:OWNED_BY]->(p5),
+        (i9)-[:OWNED_BY]->(p6),
+        (i10)-[:OWNED_BY]->(p1),
+        (i11)-[:OWNED_BY]->(p2),
+        (i12)-[:OWNED_BY]->(p3)
     `)
 
     // Application-Capability Beziehungen

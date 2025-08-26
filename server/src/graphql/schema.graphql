@@ -35,9 +35,12 @@ type BusinessCapability
   createdAt: DateTime! @timestamp(operations: [CREATE])
   updatedAt: DateTime @timestamp(operations: [UPDATE])
   owners: [Person!]! @relationship(type: "OWNED_BY", direction: OUT)
+  company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
+  usedByOrganisations: [Organisation!]! @relationship(type: "USED_BY", direction: OUT)
   parents: [BusinessCapability!]! @relationship(type: "HAS_PARENT", direction: OUT)
   children: [BusinessCapability!]! @relationship(type: "HAS_PARENT", direction: IN)
   supportedByApplications: [Application!]! @relationship(type: "SUPPORTS", direction: IN)
+  supportedByAIAssets: [AIAsset!]! @relationship(type: "SUPPORTS", direction: IN)
   relatedDataObjects: [DataObject!]! @relationship(type: "RELATED_TO", direction: OUT)
   partOfArchitectures: [Architecture!]! @relationship(type: "CONTAINS", direction: IN)
   depictedInDiagrams: [Diagram!]! @relationship(type: "DEPICTED_IN", direction: OUT)
@@ -72,6 +75,7 @@ type Person
   ownedDiagrams: [Diagram!]! @relationship(type: "CREATED_BY", direction: IN)
   ownedInfrastructure: [Infrastructure!]! @relationship(type: "OWNED_BY", direction: IN)
   ownedInterfaces: [ApplicationInterface!]! @relationship(type: "OWNED_BY", direction: IN)
+  ownedAIAssets: [AIAsset!]! @relationship(type: "OWNED_BY", direction: IN)
 }
 
 """
@@ -104,6 +108,8 @@ type Application
   createdAt: DateTime! @timestamp(operations: [CREATE])
   updatedAt: DateTime @timestamp(operations: [UPDATE])
   owners: [Person!]! @relationship(type: "OWNED_BY", direction: OUT)
+  company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
+  usedByOrganisations: [Organisation!]! @relationship(type: "USED_BY", direction: OUT)
   parents: [Application!]! @relationship(type: "HAS_PARENT_APPLICATION", direction: OUT)
   components: [Application!]! @relationship(type: "HAS_PARENT_APPLICATION", direction: IN)
   predecessors: [Application!]! @relationship(type: "SUCCESSOR_OF", direction: OUT)
@@ -120,6 +126,7 @@ type Application
   implementsPrinciples: [ArchitecturePrinciple!]!
     @relationship(type: "IMPLEMENTS_PRINCIPLE", direction: OUT)
   hostedOn: [Infrastructure!]! @relationship(type: "HOSTED_ON", direction: OUT)
+  usesAIAssets: [AIAsset!]! @relationship(type: "USED_BY", direction: OUT)
 }
 
 """
@@ -147,6 +154,8 @@ type ApplicationInterface
   createdAt: DateTime! @timestamp(operations: [CREATE])
   updatedAt: DateTime @timestamp(operations: [UPDATE])
   owners: [Person!]! @relationship(type: "OWNED_BY", direction: OUT)
+  company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
+  usedByOrganisations: [Organisation!]! @relationship(type: "USED_BY", direction: OUT)
   predecessors: [ApplicationInterface!]!
     @relationship(type: "SUCCESSOR_OF_INTERFACE", direction: OUT)
   successors: [ApplicationInterface!]! @relationship(type: "SUCCESSOR_OF_INTERFACE", direction: IN)
@@ -180,10 +189,13 @@ type DataObject
   createdAt: DateTime! @timestamp(operations: [CREATE])
   updatedAt: DateTime @timestamp(operations: [UPDATE])
   owners: [Person!]! @relationship(type: "OWNED_BY", direction: OUT)
+  company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
+  usedByOrganisations: [Organisation!]! @relationship(type: "USED_BY", direction: OUT)
   dataSources: [Application!]! @relationship(type: "DATA_SOURCE", direction: OUT)
   usedByApplications: [Application!]! @relationship(type: "USES", direction: IN)
   relatedToCapabilities: [BusinessCapability!]! @relationship(type: "RELATED_TO", direction: IN)
   transferredInInterfaces: [ApplicationInterface!]! @relationship(type: "TRANSFERS", direction: IN)
+  usedForTrainingAI: [AIAsset!]! @relationship(type: "TRAINED_WITH", direction: IN)
   partOfArchitectures: [Architecture!]! @relationship(type: "CONTAINS", direction: IN)
   depictedInDiagrams: [Diagram!]! @relationship(type: "DEPICTED_IN", direction: OUT)
 }
@@ -220,13 +232,115 @@ type Infrastructure
   createdAt: DateTime! @timestamp(operations: [CREATE])
   updatedAt: DateTime @timestamp(operations: [UPDATE])
   owners: [Person!]! @relationship(type: "OWNED_BY", direction: OUT)
+  company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
+  usedByOrganisations: [Organisation!]! @relationship(type: "USED_BY", direction: OUT)
   parentInfrastructure: [Infrastructure!]!
     @relationship(type: "HAS_PARENT_INFRASTRUCTURE", direction: OUT)
   childInfrastructures: [Infrastructure!]!
     @relationship(type: "HAS_PARENT_INFRASTRUCTURE", direction: IN)
   hostsApplications: [Application!]! @relationship(type: "HOSTED_ON", direction: IN)
+  hostsAIAssets: [AIAsset!]! @relationship(type: "HOSTED_ON", direction: IN)
   partOfArchitectures: [Architecture!]! @relationship(type: "CONTAINS", direction: IN)
   depictedInDiagrams: [Diagram!]! @relationship(type: "DEPICTED_IN", direction: OUT)
+}
+
+"""
+AIAsset - repräsentiert ein KI-Asset im Enterprise Architecture Management
+"""
+type AIAsset
+  @node
+  @authorization(
+    validate: [
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "architect" } } } }
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "admin" } } } }
+    ]
+  ) {
+  id: ID! @id
+  name: String!
+  description: String
+  aiType: AIAssetType!
+  model: String
+  version: String
+  status: AIAssetStatus!
+  accuracy: Float
+  trainingDate: Date
+  lastUpdated: Date
+  provider: String
+  license: String
+  costs: Float
+  tags: [String!]
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime @timestamp(operations: [UPDATE])
+  owners: [Person!]! @relationship(type: "OWNED_BY", direction: OUT)
+  company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
+  usedByOrganisations: [Organisation!]! @relationship(type: "USED_BY", direction: OUT)
+  trainedWithDataObjects: [DataObject!]! @relationship(type: "TRAINED_WITH", direction: OUT)
+  usedByApplications: [Application!]! @relationship(type: "USED_BY", direction: IN)
+  supportsCapabilities: [BusinessCapability!]! @relationship(type: "SUPPORTS", direction: OUT)
+  implementsPrinciples: [ArchitecturePrinciple!]!
+    @relationship(type: "IMPLEMENTS_PRINCIPLE", direction: OUT)
+  hostedOn: [Infrastructure!]! @relationship(type: "HOSTED_ON", direction: OUT)
+  partOfArchitectures: [Architecture!]! @relationship(type: "CONTAINS", direction: IN)
+  depictedInDiagrams: [Diagram!]! @relationship(type: "DEPICTED_IN", direction: OUT)
+}
+
+"""
+Company - repräsentiert ein Unternehmen im Enterprise Architecture Management
+"""
+type Company
+  @node
+  @authorization(
+    validate: [
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "architect" } } } }
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "admin" } } } }
+    ]
+  ) {
+  id: ID! @id
+  name: String!
+  description: String
+  address: String
+  website: String
+  industry: String
+  size: CompanySize
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime @timestamp(operations: [UPDATE])
+  organisations: [Organisation!]! @relationship(type: "BELONGS_TO", direction: IN)
+  ownedCapabilities: [BusinessCapability!]! @relationship(type: "OWNED_BY", direction: IN)
+  ownedApplications: [Application!]! @relationship(type: "OWNED_BY", direction: IN)
+  ownedDataObjects: [DataObject!]! @relationship(type: "OWNED_BY", direction: IN)
+  ownedInterfaces: [ApplicationInterface!]! @relationship(type: "OWNED_BY", direction: IN)
+  ownedInfrastructure: [Infrastructure!]! @relationship(type: "OWNED_BY", direction: IN)
+  ownedAIAssets: [AIAsset!]! @relationship(type: "OWNED_BY", direction: IN)
+}
+
+"""
+Organisation - repräsentiert eine organisatorische Einheit im Unternehmen
+"""
+type Organisation
+  @node
+  @authorization(
+    validate: [
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "architect" } } } }
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "admin" } } } }
+    ]
+  ) {
+  id: ID! @id
+  name: String!
+  description: String
+  type: OrganisationType!
+  level: Int
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime @timestamp(operations: [UPDATE])
+  company: [Company!]! @relationship(type: "BELONGS_TO", direction: OUT)
+  parentOrganisation: [Organisation!]!
+    @relationship(type: "HAS_PARENT_ORGANISATION", direction: OUT)
+  childOrganisations: [Organisation!]! @relationship(type: "HAS_PARENT_ORGANISATION", direction: IN)
+  usedCapabilities: [BusinessCapability!]! @relationship(type: "USED_BY", direction: IN)
+  usedApplications: [Application!]! @relationship(type: "USED_BY", direction: IN)
+  usedDataObjects: [DataObject!]! @relationship(type: "USED_BY", direction: IN)
+  usedInterfaces: [ApplicationInterface!]! @relationship(type: "USED_BY", direction: IN)
+  usedInfrastructure: [Infrastructure!]! @relationship(type: "USED_BY", direction: IN)
+  usedAIAssets: [AIAsset!]! @relationship(type: "USED_BY", direction: IN)
 }
 
 """
@@ -368,6 +482,7 @@ type Architecture
   containsDataObjects: [DataObject!]! @relationship(type: "CONTAINS", direction: OUT)
   containsInterfaces: [ApplicationInterface!]! @relationship(type: "CONTAINS", direction: OUT)
   containsInfrastructure: [Infrastructure!]! @relationship(type: "CONTAINS", direction: OUT)
+  containsAIAssets: [AIAsset!]! @relationship(type: "CONTAINS", direction: OUT)
   parentArchitecture: [Architecture!]! @relationship(type: "PART_OF", direction: OUT)
   childArchitectures: [Architecture!]! @relationship(type: "PART_OF", direction: IN)
   diagrams: [Diagram!]! @relationship(type: "BELONGS_TO", direction: IN)
@@ -401,6 +516,7 @@ type Diagram
   containsDataObjects: [DataObject!]! @relationship(type: "DEPICTED_IN", direction: IN)
   containsInterfaces: [ApplicationInterface!]! @relationship(type: "DEPICTED_IN", direction: IN)
   containsInfrastructure: [Infrastructure!]! @relationship(type: "DEPICTED_IN", direction: IN)
+  containsAIAssets: [AIAsset!]! @relationship(type: "DEPICTED_IN", direction: IN)
 }
 
 """
@@ -429,6 +545,7 @@ type ArchitecturePrinciple
   appliedInArchitectures: [Architecture!]! @relationship(type: "APPLIES_PRINCIPLE", direction: IN)
   implementedByApplications: [Application!]!
     @relationship(type: "IMPLEMENTS_PRINCIPLE", direction: IN)
+  implementedByAIAssets: [AIAsset!]! @relationship(type: "IMPLEMENTS_PRINCIPLE", direction: IN)
 }
 
 """
@@ -509,6 +626,7 @@ enum InfrastructureType {
   CLOUD_DATACENTER
   ON_PREMISE_DATACENTER
   KUBERNETES_CLUSTER
+  VIRTUALIZATION_CLUSTER
   VIRTUAL_MACHINE
   CONTAINER_HOST
   PHYSICAL_SERVER
@@ -524,4 +642,61 @@ enum InfrastructureStatus {
   PLANNED
   DECOMMISSIONED
   UNDER_CONSTRUCTION
+}
+
+"""
+Unternehmensgrößen
+"""
+enum CompanySize {
+  STARTUP
+  SMALL
+  MEDIUM
+  LARGE
+  ENTERPRISE
+  MULTINATIONAL
+}
+
+"""
+Organisationstypen
+"""
+enum OrganisationType {
+  DIVISION
+  DEPARTMENT
+  TEAM
+  PROJECT
+  FUNCTION
+  SUBSIDIARY
+  BRANCH
+  UNIT
+}
+
+"""
+KI-Asset Typen
+"""
+enum AIAssetType {
+  MACHINE_LEARNING_MODEL
+  DEEP_LEARNING_MODEL
+  NATURAL_LANGUAGE_PROCESSING
+  COMPUTER_VISION
+  RECOMMENDATION_ENGINE
+  PREDICTIVE_ANALYTICS
+  CHATBOT
+  VOICE_ASSISTANT
+  DECISION_SUPPORT_SYSTEM
+  AUTOMATION_ENGINE
+  GENERATIVE_AI
+  OTHER
+}
+
+"""
+Status-Werte für KI-Assets
+"""
+enum AIAssetStatus {
+  IN_DEVELOPMENT
+  TRAINING
+  TESTING
+  DEPLOYED
+  ACTIVE
+  DEPRECATED
+  RETIRED
 }

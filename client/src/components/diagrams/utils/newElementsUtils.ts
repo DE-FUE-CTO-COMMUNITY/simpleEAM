@@ -319,17 +319,17 @@ const createElementsByType = async (
           format: 'Nicht spezifiziert',
         }
       case ELEMENT_TYPES.INTERFACE: {
-        // ApplicationInterface verwendet responsiblePerson statt owners
-        const responsiblePersonInput = currentPersonId
+        // ApplicationInterface verwendet jetzt owners
+        const ownersInput = currentPersonId
           ? {
-              responsiblePerson: {
+              owners: {
                 connect: [{ where: { node: { id: { eq: currentPersonId } } } }],
               },
             }
           : {}
         return {
           ...baseInput,
-          ...responsiblePersonInput,
+          ...ownersInput,
           interfaceType: 'API',
           protocol: 'HTTP',
           status: 'ACTIVE',

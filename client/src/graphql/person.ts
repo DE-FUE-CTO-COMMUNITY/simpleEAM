@@ -48,7 +48,7 @@ export const GET_PERSONS = gql`
         id
         name
       }
-      responsibleForInterfaces {
+      ownedInterfaces {
         id
         name
       }
@@ -92,7 +92,7 @@ export const GET_PERSON = gql`
         id
         name
       }
-      responsibleForInterfaces {
+      ownedInterfaces {
         id
         name
       }

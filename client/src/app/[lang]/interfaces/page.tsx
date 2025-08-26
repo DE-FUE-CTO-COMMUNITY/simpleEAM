@@ -93,7 +93,7 @@ function ApplicationInterfacesPage() {
     availableInterfaceTypes,
     availableProtocols,
     availableStatuses,
-    availableResponsiblePersons,
+    availableOwners,
     availableSourceApplications,
     availableTargetApplications,
     availableDataObjects,
@@ -157,11 +157,11 @@ function ApplicationInterfacesPage() {
       introductionDate: data.introductionDate,
       endOfUseDate: data.endOfUseDate,
       endOfLifeDate: data.endOfLifeDate,
-      responsiblePerson: data.responsiblePerson
+      owners: data.owners
         ? {
             connect: {
               where: {
-                node: { id: { eq: data.responsiblePerson } },
+                node: { id: { eq: data.owners } },
               },
             },
           }
@@ -256,12 +256,12 @@ function ApplicationInterfacesPage() {
       introductionDate: { set: data.introductionDate },
       endOfUseDate: { set: data.endOfUseDate },
       endOfLifeDate: { set: data.endOfLifeDate },
-      responsiblePerson: data.responsiblePerson
+      owners: data.owners
         ? {
             disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
             connect: {
               where: {
-                node: { id: { eq: data.responsiblePerson } },
+                node: { id: { eq: data.owners } },
               },
             },
           }
@@ -424,7 +424,7 @@ function ApplicationInterfacesPage() {
           availableInterfaceTypes={availableInterfaceTypes}
           availableProtocols={availableProtocols}
           availableStatuses={availableStatuses}
-          availableResponsiblePersons={availableResponsiblePersons}
+          availableOwners={availableOwners}
           availableSourceApplications={availableSourceApplications}
           availableTargetApplications={availableTargetApplications}
           availableDataObjects={availableDataObjects}

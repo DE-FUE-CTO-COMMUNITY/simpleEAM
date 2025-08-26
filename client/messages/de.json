@@ -1322,7 +1322,7 @@
       "ownedArchitectures": "Verantwortlich für Architekturen",
       "ownedDiagrams": "Verantwortlich für Diagramme",
       "ownedInfrastructure": "Verantwortlich für Infrastruktur",
-      "responsibleForInterfaces": "Verantwortlich für Schnittstellen",
+      "ownedInterfaces": "Verantwortlich für Schnittstellen",
       "createdAt": "Erstellt am",
       "updatedAt": "Aktualisiert am",
       "actions": "Aktionen"

@@ -264,8 +264,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       endOfLifeDate: applicationInterface?.endOfLifeDate
         ? new Date(applicationInterface.endOfLifeDate)
         : null,
-      owners:
-        applicationInterface?.owners?.[0]?.id || currentPerson?.id || null,
+      owners: applicationInterface?.owners?.[0]?.id || currentPerson?.id || null,
       sourceApplications: applicationInterface?.sourceApplications?.map(app => app.id) || [],
       targetApplications: applicationInterface?.targetApplications?.map(app => app.id) || [],
       dataObjects: applicationInterface?.dataObjects?.map(obj => obj.id) || [],
@@ -337,8 +336,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
           ? new Date(applicationInterface.endOfLifeDate)
           : null,
         owners:
-          applicationInterface.owners &&
-          applicationInterface.owners.length > 0
+          applicationInterface.owners && applicationInterface.owners.length > 0
             ? applicationInterface.owners[0].id
             : null,
         sourceApplications: applicationInterface.sourceApplications?.map(app => app.id) || [],

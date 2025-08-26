@@ -25,7 +25,7 @@ export const PERSON_DEFAULT_COLUMN_VISIBILITY = {
   ownedArchitectures: false,
   ownedDiagrams: false,
   ownedInfrastructure: false,
-  responsibleForInterfaces: false,
+  ownedInterfaces: false,
   createdAt: false,
   updatedAt: false,
 }
@@ -167,8 +167,8 @@ const PersonTableWithGenericTable: React.FC<PersonTableProps> = ({
         },
         enableHiding: true,
       }),
-      columnHelper.accessor('responsibleForInterfaces', {
-        header: t('responsibleForInterfaces'),
+      columnHelper.accessor('ownedInterfaces', {
+        header: t('ownedInterfaces'),
         cell: info => {
           const interfaces = info.getValue()
           return interfaces && interfaces.length > 0

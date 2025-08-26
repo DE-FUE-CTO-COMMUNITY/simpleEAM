@@ -207,9 +207,7 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
         cell: info => {
           const owners = info.getValue()
           return owners && owners.length > 0
-            ? owners
-                .map((person: any) => `${person.firstName} ${person.lastName}`)
-                .join(', ')
+            ? owners.map((person: any) => `${person.firstName} ${person.lastName}`).join(', ')
             : '-'
         },
       }),

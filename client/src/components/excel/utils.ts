@@ -52,7 +52,7 @@ export const getRelationshipFields = (entityType: string): string[] => {
       ]
     case 'interfaces':
       return [
-        'responsiblePerson',
+        'owners',
         'sourceApplications',
         'targetApplications',
         'dataObjects',

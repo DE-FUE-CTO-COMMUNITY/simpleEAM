@@ -20,7 +20,7 @@ export type Person = Pick<
   | 'ownedArchitectures'
   | 'ownedDiagrams'
   | 'ownedInfrastructure'
-  | 'responsibleForInterfaces'
+  | 'ownedInterfaces'
 >
 
 export interface FilterState {

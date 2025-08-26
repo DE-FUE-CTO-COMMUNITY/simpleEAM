@@ -260,7 +260,7 @@ export const fetchPersonsForJson = async (client: ApolloClient<any>): Promise<Js
       ownedArchitectures: person.ownedArchitectures || [],
       ownedDiagrams: person.ownedDiagrams || [],
       ownedInfrastructure: person.ownedInfrastructure || [],
-      responsibleForInterfaces: person.responsibleForInterfaces || [],
+      ownedInterfaces: person.ownedInterfaces || [],
     }))
   } catch {
     throw new Error('Fehler beim Laden der Persons für JSON-Export')

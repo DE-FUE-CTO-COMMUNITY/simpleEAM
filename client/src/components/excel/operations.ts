@@ -580,7 +580,11 @@ export const updateEntityRelationships = async (
 /**
  * Erstellt Update-Input nur mit Beziehungsfeldern basierend auf Excel-Implementierung
  */
-const createRelationshipUpdateInput = (entityType: string, row: any, entityMappings?: Record<string, string>): any => {
+const createRelationshipUpdateInput = (
+  entityType: string,
+  row: any,
+  entityMappings?: Record<string, string>
+): any => {
   const input: any = {}
 
   // Helper function to process relationship field with connect format (KORREKTE SYNTAX aus Excel-Import)
@@ -741,11 +745,8 @@ const createRelationshipUpdateInput = (entityType: string, row: any, entityMappi
       break
 
     case 'interfaces':
-      if (row.responsiblePerson) {
-        input.responsiblePerson = processSingleRelationshipField(
-          'responsiblePerson',
-          row.responsiblePerson
-        )
+      if (row.owners) {
+        input.owners = processSingleRelationshipField('owners', row.owners)
       }
       if (row.sourceApplications) {
         input.sourceApplications = processRelationshipField(
@@ -805,7 +806,7 @@ const createRelationshipUpdateInput = (entityType: string, row: any, entityMappi
         try {
           const diagram = JSON.parse(row.diagramJson)
           let updated = false
-          
+
           // Update elements with database IDs
           if (diagram.elements && Array.isArray(diagram.elements)) {
             diagram.elements.forEach((element: any) => {
@@ -819,7 +820,7 @@ const createRelationshipUpdateInput = (entityType: string, row: any, entityMappi
               }
             })
           }
-          
+
           if (updated) {
             // GraphQL expects StringScalarMutations format for diagramJson
             input.diagramJson = { set: JSON.stringify(diagram) }
@@ -828,7 +829,7 @@ const createRelationshipUpdateInput = (entityType: string, row: any, entityMappi
           console.error('Error parsing/updating diagramJson:', error)
         }
       }
-      
+
       if (row.creator) {
         input.creator = processSingleRelationshipField('creator', row.creator)
       }

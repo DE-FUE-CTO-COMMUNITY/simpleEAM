@@ -187,7 +187,7 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
                       'endOfLifeDate',
                       'createdAt',
                       'updatedAt',
-                      'responsiblePerson',
+                      'owners',
                       'sourceApplications',
                       'targetApplications',
                       'dataObjects',
