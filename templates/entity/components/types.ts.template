@@ -7,11 +7,18 @@
 'use client'
 
 import { z } from 'zod'
-import { {{ENTITY_SINGULAR_UPPER}} } from '../../gql/generated'
+import { {{ENTITY_SINGULAR_UPPER}}Type as Generated{{ENTITY_SINGULAR_UPPER}}Type } from '../../gql/generated'
 
-// Nutze den generierten Typ als Basis
-export type {{ENTITY_SINGULAR_UPPER}}Type = {{ENTITY_SINGULAR_UPPER}}
+// Nutze den generierten Typ als Basis und passe ihn für unsere Komponenten an
+export type {{ENTITY_SINGULAR_UPPER}}Type = Pick<
+  Generated{{ENTITY_SINGULAR_UPPER}}Type,
+  | 'id'
+  | 'name'
+  | 'description'
+  | 'createdAt'
+  | 'updatedAt'
   // TODO: Weitere relevante Felder hinzufügen
+>
 
 // Formular-Validierungsschema mit Zod
 export const {{ENTITY_SINGULAR}}FormSchema = z.object({

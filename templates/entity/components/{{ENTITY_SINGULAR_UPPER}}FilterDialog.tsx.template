@@ -2,10 +2,10 @@
 
 import React from 'react'
 import { useTranslations } from 'next-intl'
-import { GenericFilterDialog } from '../common/GenericFilterDialog'
+import GenericFilterDialog from '../common/GenericFilterDialog'
 import { {{ENTITY_SINGULAR_UPPER}}FilterState, default{{ENTITY_SINGULAR_UPPER}}Filter } from './types'
 
-interface {{ENTITY_SINGULAR_UPPER}}FilterDialogProps {
+interface {{ENTITY_NAME_UPPER}}FilterDialogProps {
   open: boolean
   onClose: () => void
   filter: {{ENTITY_SINGULAR_UPPER}}FilterState
@@ -13,22 +13,22 @@ interface {{ENTITY_SINGULAR_UPPER}}FilterDialogProps {
   onReset: () => void
 }
 
-export function {{ENTITY_SINGULAR_UPPER}}FilterDialog({
+export function {{ENTITY_NAME_UPPER}}FilterDialog({
   open,
   onClose,
   filter,
   onFilterChange,
   onReset,
-}: {{ENTITY_SINGULAR_UPPER}}FilterDialogProps) {
+}: {{ENTITY_NAME_UPPER}}FilterDialogProps) {
   const t = useTranslations('{{ENTITY_NAME}}')
 
   const filterSections = [
     {
-      title: t('filter.basic'),
+      title: t('table.search'),
       fields: [
         {
           type: 'search' as const,
-          label: t('filter.search'),
+          label: t('table.search'),
           value: filter.search,
           onChange: (value: string) => onFilterChange({ ...filter, search: value }),
           placeholder: t('searchPlaceholder'),
@@ -57,13 +57,13 @@ export function {{ENTITY_SINGULAR_UPPER}}FilterDialog({
     <GenericFilterDialog
       open={open}
       onClose={onClose}
-      title={t('filter.title')}
+      title={t('title')}
       sections={filterSections}
       onReset={() => {
         onFilterChange(default{{ENTITY_SINGULAR_UPPER}}Filter)
         onReset()
       }}
-      resetLabel={t('filter.reset')}
+      resetLabel={t('actions.delete')}
     />
   )
 }
