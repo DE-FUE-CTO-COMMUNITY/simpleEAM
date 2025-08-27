@@ -4,12 +4,12 @@ import React, { useEffect } from 'react'
 import { useForm } from '@tanstack/react-form'
 import { useTranslations } from 'next-intl'
 import { z } from 'zod'
-import { {{ENTITY_SINGULAR_UPPER}}Type } from './types'
+import { CompanyType } from './types'
 import GenericForm, { FieldConfig, TabConfig } from '../common/GenericForm'
 import { GenericFormProps } from '../common/GenericFormProps'
 
 // Schema für die Formularvalidierung
-export const {{ENTITY_SINGULAR}}Schema = z.object({
+export const companySchema = z.object({
   name: z
     .string()
     .min(3, 'Der Name muss mindestens 3 Zeichen lang sein')
@@ -22,12 +22,10 @@ export const {{ENTITY_SINGULAR}}Schema = z.object({
 })
 
 // TypeScript Typen basierend auf dem Schema
-export type {{ENTITY_SINGULAR_UPPER}}FormValues = z.infer<typeof {{ENTITY_SINGULAR}}Schema>
+export type CompanyFormValues = z.infer<typeof companySchema>
 
-const {{ENTITY_NAME_UPPER}}Form: React.FC<
-  GenericFormProps<{{ENTITY_SINGULAR_UPPER}}Type, {{ENTITY_SINGULAR_UPPER}}FormValues>
-> = ({
-  data: {{ENTITY_SINGULAR}},
+const CompaniesForm: React.FC<GenericFormProps<CompanyType, CompanyFormValues>> = ({
+  data: company,
   isOpen,
   onClose,
   onSubmit,
@@ -36,11 +34,11 @@ const {{ENTITY_NAME_UPPER}}Form: React.FC<
   loading = false,
   onEditMode,
 }) => {
-  const t = useTranslations('{{ENTITY_NAME}}')
+  const t = useTranslations('companies')
   const tCommon = useTranslations('common')
 
   // Formulardaten mit useMemo initialisieren
-  const defaultValues = React.useMemo<{{ENTITY_SINGULAR_UPPER}}FormValues>(
+  const defaultValues = React.useMemo<CompanyFormValues>(
     () => ({
       name: '',
       description: '',
@@ -67,15 +65,15 @@ const {{ENTITY_NAME_UPPER}}Form: React.FC<
 
   // Formulardaten aktualisieren, wenn sich die Entity ändert
   useEffect(() => {
-    if ({{ENTITY_SINGULAR}}) {
-      form.setFieldValue('name', {{ENTITY_SINGULAR}}.name || '')
-      form.setFieldValue('description', {{ENTITY_SINGULAR}}.description || '')
+    if (company) {
+      form.setFieldValue('name', company.name || '')
+      form.setFieldValue('description', company.description || '')
       // TODO: Weitere Felder setzen
     }
-  }, [{{ENTITY_SINGULAR}}, form])
+  }, [company, form])
 
   // Feldkonfigurationen definieren
-  const fields: FieldConfig[] = [
+  const fieldConfigs: FieldConfig[] = [
     {
       name: 'name',
       label: t('form.name'),
@@ -114,7 +112,7 @@ const {{ENTITY_NAME_UPPER}}Form: React.FC<
   ]
 
   // Tab-Konfigurationen (falls mehrere Tabs benötigt werden)
-  const tabs: TabConfig[] = [
+  const tabConfigs: TabConfig[] = [
     { id: 'general', label: t('form.tabs.general') },
     // TODO: Weitere Tabs hinzufügen falls benötigt
     // { id: 'relationships', label: t('form.tabs.relationships') },
@@ -125,7 +123,7 @@ const {{ENTITY_NAME_UPPER}}Form: React.FC<
       form={form}
       isOpen={isOpen}
       onClose={onClose}
-      onDelete={ {{ENTITY_SINGULAR}}?.id && onDelete ? () => onDelete({{ENTITY_SINGULAR}}.id) : undefined}
+      onDelete={company?.id && onDelete ? () => onDelete(company.id) : undefined}
       mode={mode}
       isLoading={loading}
       onEditMode={onEditMode}
@@ -133,11 +131,11 @@ const {{ENTITY_NAME_UPPER}}Form: React.FC<
         mode === 'create'
           ? t('form.createTitle')
           : mode === 'edit'
-          ? t('form.editTitle')
-          : t('form.viewTitle')
+            ? t('form.editTitle')
+            : t('form.viewTitle')
       }
-      fields={fields}
-      tabs={tabs.length > 1 ? tabs : undefined}
+      fieldConfigs={fieldConfigs}
+      tabConfigs={tabConfigs.length > 1 ? tabConfigs : undefined}
       saveLabel={tCommon('save')}
       cancelLabel={tCommon('cancel')}
       editLabel={tCommon('edit')}
@@ -147,4 +145,4 @@ const {{ENTITY_NAME_UPPER}}Form: React.FC<
   )
 }
 
-export default {{ENTITY_NAME_UPPER}}Form
+export default CompaniesForm
