@@ -27,14 +27,8 @@ import { useDomainLabel, useTypeLabel } from './utils'
 
 // Schema für die Formularvalidierung
 export const architectureSchema = z.object({
-  name: z
-    .string()
-    .min(3)
-    .max(100),
-  description: z
-    .string()
-    .min(10)
-    .max(1000),
+  name: z.string().min(3).max(100),
+  description: z.string().min(10).max(1000),
   timestamp: z.date({
     required_error: 'Architekturdatum ist erforderlich',
     invalid_type_error: 'Architekturdatum muss ein gültiges Datum sein',
