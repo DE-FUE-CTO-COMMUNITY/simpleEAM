@@ -29,11 +29,7 @@ export type PersonFormValues = z.infer<typeof personSchema>
 
 import { GenericFormProps } from '../common/GenericFormProps'
 
-export interface PersonFormProps extends GenericFormProps<Person, PersonFormValues> {
-  // Zusätzliche entity-spezifische Props können hier hinzugefügt werden
-}
-
-const PersonForm: React.FC<PersonFormProps> = ({
+const PersonForm: React.FC<GenericFormProps<Person, PersonFormValues>> = ({
   data: person,
   isOpen,
   onClose,

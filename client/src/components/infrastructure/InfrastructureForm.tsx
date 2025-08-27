@@ -92,11 +92,6 @@ export type InfrastructureFormValues = z.infer<typeof baseInfrastructureSchema>
 
 import { GenericFormProps } from '../common/GenericFormProps'
 
-export interface InfrastructureFormProps
-  extends GenericFormProps<Infrastructure, InfrastructureFormValues> {
-  // Zusätzliche entity-spezifische Props können hier hinzugefügt werden
-}
-
 // Tab-Konfiguration mit Übersetzungen
 const INFRASTRUCTURE_TABS = (tTabs: any) => [
   { id: 'general', label: tTabs('general') },
@@ -106,7 +101,7 @@ const INFRASTRUCTURE_TABS = (tTabs: any) => [
   { id: 'architectures', label: tTabs('architectures') },
 ]
 
-const InfrastructureForm: React.FC<InfrastructureFormProps> = ({
+const InfrastructureForm: React.FC<GenericFormProps<Infrastructure, InfrastructureFormValues>> = ({
   data: infrastructure,
   isOpen,
   onClose,

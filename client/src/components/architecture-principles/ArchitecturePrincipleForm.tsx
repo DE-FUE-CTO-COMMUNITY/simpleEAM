@@ -40,12 +40,9 @@ export type ArchitecturePrincipleFormValues = z.infer<typeof architecturePrincip
 
 import { GenericFormProps } from '../common/GenericFormProps'
 
-export interface ArchitecturePrincipleFormProps
-  extends GenericFormProps<ArchitecturePrinciple, ArchitecturePrincipleFormValues> {
-  // Zusätzliche entity-spezifische Props können hier hinzugefügt werden
-}
-
-const ArchitecturePrincipleForm: React.FC<ArchitecturePrincipleFormProps> = ({
+const ArchitecturePrincipleForm: React.FC<
+  GenericFormProps<ArchitecturePrinciple, ArchitecturePrincipleFormValues>
+> = ({
   data: principle,
   isOpen,
   onClose,

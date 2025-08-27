@@ -47,7 +47,7 @@ interface GenericTableProps<TData, TFormValues> {
   globalFilter: string
   sorting: SortingState
   onSortingChange: (sorting: SortingState) => void
-  columns: ColumnDef<TData>[]
+  columns: ColumnDef<TData, any>[]
   onCreate?: (data: TFormValues) => Promise<void>
   onUpdate?: (id: string, data: TFormValues) => Promise<void>
   onDelete?: (id: string) => Promise<void>

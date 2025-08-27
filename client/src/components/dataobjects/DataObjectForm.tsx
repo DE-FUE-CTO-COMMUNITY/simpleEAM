@@ -75,11 +75,7 @@ export type DataObjectFormValues = z.infer<typeof dataObjectSchema>
 
 import { GenericFormProps } from '../common/GenericFormProps'
 
-export interface DataObjectFormProps extends GenericFormProps<DataObject, DataObjectFormValues> {
-  // Zusätzliche entity-spezifische Props können hier hinzugefügt werden
-}
-
-const DataObjectForm: React.FC<DataObjectFormProps> = ({
+const DataObjectForm: React.FC<GenericFormProps<DataObject, DataObjectFormValues>> = ({
   data: dataObject,
   isOpen,
   onClose,
