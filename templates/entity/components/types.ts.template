@@ -1,0 +1,43 @@
+// Template für Entity Types
+// {{ENTITY_NAME}} = plural (companies, capabilities, etc.)
+// {{ENTITY_SINGULAR}} = singular (company, capability, etc.)
+// {{ENTITY_UPPER}} = plural capitalized (Companies, Capabilities, etc.)
+// {{ENTITY_SINGULAR_UPPER}} = singular capitalized (Company, Capability, etc.)
+// {{ENTITY_GENERATED_TYPE}} = GraphQL generated type (Company, BusinessCapability, etc.)
+
+'use client'
+
+import { z } from 'zod'
+import { {{ENTITY_GENERATED_TYPE}} } from '../../gql/generated'
+
+// Nutze den generierten Typ als Basis und passe ihn für unsere Komponenten an
+export type {{ENTITY_SINGULAR_UPPER}}Type = Pick<
+  {{ENTITY_GENERATED_TYPE}},
+  | 'id'
+  | 'name'
+  | 'description'
+  | 'createdAt'
+  | 'updatedAt'
+  // TODO: Weitere relevante Felder hinzufügen
+>
+
+// Formular-Validierungsschema mit Zod
+export const {{ENTITY_SINGULAR}}FormSchema = z.object({
+  name: z.string().min(1, 'Name ist erforderlich'),
+  description: z.string().optional(),
+  // TODO: Weitere feldspezifische Validierungen hinzufügen
+})
+
+// Formular-Werte-Typ
+export type {{ENTITY_SINGULAR_UPPER}}FormValues = z.infer<typeof {{ENTITY_SINGULAR}}FormSchema>
+
+// Filter-State für die Suche und Filterung
+export interface {{ENTITY_SINGULAR_UPPER}}FilterState {
+  search: string
+  // TODO: Weitere Filter hinzufügen (z.B. status, category, etc.)
+}
+
+// Standard-Filterwerte
+export const default{{ENTITY_SINGULAR_UPPER}}Filter: {{ENTITY_SINGULAR_UPPER}}FilterState = {
+  search: '',
+}

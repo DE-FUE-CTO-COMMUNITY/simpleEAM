@@ -90,15 +90,11 @@ export const createInfrastructureSchema = (t: (key: string) => string) =>
 // TypeScript Typen basierend auf dem Schema
 export type InfrastructureFormValues = z.infer<typeof baseInfrastructureSchema>
 
-export interface InfrastructureFormProps {
-  infrastructure?: Infrastructure | null
-  isOpen: boolean
-  onClose: () => void
-  onSubmit: (data: InfrastructureFormValues) => Promise<void>
-  onDelete?: (id: string) => Promise<void>
-  mode: 'create' | 'edit' | 'view'
-  loading?: boolean
-  onEditMode?: () => void
+import { GenericFormProps } from '../common/GenericFormProps'
+
+export interface InfrastructureFormProps
+  extends GenericFormProps<Infrastructure, InfrastructureFormValues> {
+  // Zusätzliche entity-spezifische Props können hier hinzugefügt werden
 }
 
 // Tab-Konfiguration mit Übersetzungen
@@ -111,7 +107,7 @@ const INFRASTRUCTURE_TABS = (tTabs: any) => [
 ]
 
 const InfrastructureForm: React.FC<InfrastructureFormProps> = ({
-  infrastructure,
+  data: infrastructure,
   isOpen,
   onClose,
   onSubmit,

@@ -73,19 +73,14 @@ export const dataObjectSchema = baseDataObjectSchema.superRefine((data, ctx) => 
 // TypeScript Typen basierend auf dem Schema
 export type DataObjectFormValues = z.infer<typeof dataObjectSchema>
 
-export interface DataObjectFormProps {
-  dataObject?: DataObject | null
-  isOpen: boolean
-  onClose: () => void
-  onSubmit: (data: DataObjectFormValues) => Promise<void>
-  onDelete?: (id: string) => Promise<void>
-  mode: 'create' | 'edit' | 'view'
-  loading?: boolean
-  onEditMode?: () => void
+import { GenericFormProps } from '../common/GenericFormProps'
+
+export interface DataObjectFormProps extends GenericFormProps<DataObject, DataObjectFormValues> {
+  // Zusätzliche entity-spezifische Props können hier hinzugefügt werden
 }
 
 const DataObjectForm: React.FC<DataObjectFormProps> = ({
-  dataObject,
+  data: dataObject,
   isOpen,
   onClose,
   onSubmit,

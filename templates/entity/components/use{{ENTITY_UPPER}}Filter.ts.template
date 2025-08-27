@@ -1,0 +1,39 @@
+'use client'
+
+import { useState, useMemo } from 'react'
+import { {{ENTITY_SINGULAR_UPPER}}Type, {{ENTITY_SINGULAR_UPPER}}FilterState, default{{ENTITY_SINGULAR_UPPER}}Filter } from './types'
+import { matches{{ENTITY_SINGULAR_UPPER}}Filter } from './utils'
+
+interface Use{{ENTITY_UPPER}}FilterProps {
+  {{ENTITY_NAME}}: {{ENTITY_SINGULAR_UPPER}}Type[]
+}
+
+export function use{{ENTITY_UPPER}}Filter({ {{ENTITY_NAME}} }: Use{{ENTITY_UPPER}}FilterProps) {
+  const [filter, setFilter] = useState<{{ENTITY_SINGULAR_UPPER}}FilterState>(default{{ENTITY_SINGULAR_UPPER}}Filter)
+
+  // Gefilterte {{ENTITY_NAME}}
+  const filtered{{ENTITY_UPPER}} = useMemo(() => {
+    return {{ENTITY_NAME}}.filter({{ENTITY_SINGULAR}} => matches{{ENTITY_SINGULAR_UPPER}}Filter({{ENTITY_SINGULAR}}, filter))
+  }, [{{ENTITY_NAME}}, filter])
+
+  // Filter zurücksetzen
+  const resetFilter = () => {
+    setFilter(default{{ENTITY_SINGULAR_UPPER}}Filter)
+  }
+
+  // Einzelne Filter-Funktionen
+  const setSearchFilter = (search: string) => {
+    setFilter(prev => ({ ...prev, search }))
+  }
+
+  // TODO: Weitere spezifische Filter-Setter hinzufügen
+
+  return {
+    filter,
+    setFilter,
+    filtered{{ENTITY_UPPER}},
+    resetFilter,
+    setSearchFilter,
+    // TODO: Weitere Filter-Setter exportieren
+  }
+}

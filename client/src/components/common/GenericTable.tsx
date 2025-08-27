@@ -41,37 +41,34 @@ import { useTranslations } from 'next-intl'
  * T ist der Typ der Daten (z.B. Capability, Application, DataObject, Person, Interface)
  * F ist der Typ der Formulardaten (z.B. CapabilityFormValues, ApplicationFormValues)
  */
-export interface GenericTableProps<T, F> {
-  id?: string
-  data: T[] // Die Daten für die Tabelle
+interface GenericTableProps<TData, TFormValues> {
+  data: TData[]
   loading: boolean
   globalFilter: string
   sorting: SortingState
   onSortingChange: (sorting: SortingState) => void
-  columns: ColumnDef<T, any>[] // Spalten-Definition
-  onCreate?: (data: F) => Promise<void>
-  onUpdate?: (id: string, data: F) => Promise<void>
+  columns: ColumnDef<TData>[]
+  onCreate?: (data: TFormValues) => Promise<void>
+  onUpdate?: (id: string, data: TFormValues) => Promise<void>
   onDelete?: (id: string) => Promise<void>
-  emptyMessage?: string // Nachricht, wenn keine Daten vorhanden sind
-  createButtonLabel?: string // Label für den Erstellungsbutton
-  entityName?: string // Name der Entität (z.B. "Capability", "Application")
-  FormComponent?: React.ComponentType<any> // Formular-Komponente
-  getIdFromData?: (item: T) => string // Funktion zum Extrahieren der ID aus den Daten
-  mapDataToFormValues?: (item: T) => F // Funktion zum Mapping der Daten zu Formularwerten
-  additionalProps?: Record<string, any> // Zusätzliche Props für das Formular
-  // Column Visibility Props
-  columnVisibility?: VisibilityState // Externe Kontrolle der Spalten-Sichtbarkeit
+  emptyMessage: string
+  createButtonLabel: string
+  entityName: string
+  FormComponent: React.ComponentType<any>
+  getIdFromData: (item: TData) => string
+  mapDataToFormValues?: (item: TData) => Record<string, any>
+  additionalProps?: Record<string, any>
+  columnVisibility?: VisibilityState
   onColumnVisibilityChange?: (
     updater: VisibilityState | ((old: VisibilityState) => VisibilityState)
-  ) => void // Callback für Spalten-Sichtbarkeits-Änderungen
-  // Table Instance Callback
-  onTableReady?: (table: any) => void // Callback um die Table-Instanz bereitzustellen
+  ) => void
+  onTableReady?: (table: any) => void
 }
 
 /**
  * GenericTable ist eine wiederverwendbare Tabellenkomponente für verschiedene Entitätstypen
  */
-export function GenericTable<T extends { id: string }, F>({
+export function GenericTable<T, F>({
   data,
   loading,
   globalFilter,
@@ -81,17 +78,15 @@ export function GenericTable<T extends { id: string }, F>({
   onCreate,
   onUpdate,
   onDelete,
-  emptyMessage: _emptyMessage = 'Keine Daten gefunden.',
-  createButtonLabel: _createButtonLabel = 'Neu erstellen',
-  entityName: _entityName = 'Element',
+  emptyMessage: _emptyMessage,
+  createButtonLabel: _createButtonLabel,
+  entityName: _entityName,
   FormComponent,
-  getIdFromData = (item: T) => item.id,
+  getIdFromData,
   mapDataToFormValues,
   additionalProps = {},
-  // Column Visibility Props
-  columnVisibility: _externalColumnVisibility,
-  onColumnVisibilityChange: _externalOnColumnVisibilityChange,
-  // Table Instance Callback
+  columnVisibility: _columnVisibility,
+  onColumnVisibilityChange: _onColumnVisibilityChange,
   onTableReady,
 }: GenericTableProps<T, F>) {
   const t = useTranslations('common')
@@ -284,7 +279,7 @@ export function GenericTable<T extends { id: string }, F>({
       sorting,
       globalFilter,
       // Externes State-Management für die Spaltenvisibilität
-      columnVisibility: _externalColumnVisibility,
+      columnVisibility: _columnVisibility,
       // Lokale Pagination State
       pagination: {
         pageIndex: pageIndex,
@@ -295,13 +290,12 @@ export function GenericTable<T extends { id: string }, F>({
       onSortingChange(typeof updater === 'function' ? updater(sorting) : updater),
     // Spaltenvisibilitätsänderungen an den externen State übergeben
     onColumnVisibilityChange: updater => {
-      if (_externalOnColumnVisibilityChange) {
+      if (_onColumnVisibilityChange) {
         // Bestimme den neuen Zustand
-        const newState =
-          typeof updater === 'function' ? updater(_externalColumnVisibility || {}) : updater
+        const newState = typeof updater === 'function' ? updater(_columnVisibility || {}) : updater
 
         // Update des externen States
-        _externalOnColumnVisibilityChange(newState)
+        _onColumnVisibilityChange(newState)
       }
     },
     // Pagination State Updates handhaben
@@ -739,15 +733,7 @@ export function GenericTable<T extends { id: string }, F>({
       {/* Formular-Dialog */}
       {FormComponent && (
         <FormComponent
-          application={selectedItem} // Für ApplicationForm
-          capability={selectedItem} // Für CapabilityForm
-          dataObject={selectedItem} // Für DataObjectForm
-          applicationInterface={selectedItem} // Für ApplicationInterfaceForm
-          architecture={selectedItem} // Für ArchitectureForm
-          principle={selectedItem} // Für ArchitecturePrincipleForm
-          person={selectedItem} // Für PersonForm
-          infrastructure={selectedItem} // Für InfrastructureForm
-          data={selectedItem} // Fallback für generische Forms
+          data={selectedItem} // Standardisierte generische Prop
           {...(mapDataToFormValues && selectedItem ? mapDataToFormValues(selectedItem) : {})}
           mode={formMode}
           isOpen={isFormOpen}

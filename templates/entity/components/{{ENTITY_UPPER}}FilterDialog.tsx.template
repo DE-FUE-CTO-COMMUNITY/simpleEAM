@@ -1,0 +1,69 @@
+'use client'
+
+import React from 'react'
+import { useTranslations } from 'next-intl'
+import { GenericFilterDialog } from '../common/GenericFilterDialog'
+import { {{ENTITY_SINGULAR_UPPER}}FilterState, default{{ENTITY_SINGULAR_UPPER}}Filter } from './types'
+
+interface {{ENTITY_UPPER}}FilterDialogProps {
+  open: boolean
+  onClose: () => void
+  filter: {{ENTITY_SINGULAR_UPPER}}FilterState
+  onFilterChange: (filter: {{ENTITY_SINGULAR_UPPER}}FilterState) => void
+  onReset: () => void
+}
+
+export function {{ENTITY_UPPER}}FilterDialog({
+  open,
+  onClose,
+  filter,
+  onFilterChange,
+  onReset,
+}: {{ENTITY_UPPER}}FilterDialogProps) {
+  const t = useTranslations('{{ENTITY_NAME}}')
+
+  const filterSections = [
+    {
+      title: t('filter.basic'),
+      fields: [
+        {
+          type: 'search' as const,
+          label: t('filter.search'),
+          value: filter.search,
+          onChange: (value: string) => onFilterChange({ ...filter, search: value }),
+          placeholder: t('searchPlaceholder'),
+        },
+        // TODO: Weitere Filter-Felder hinzufügen
+        // Beispiele:
+        // {
+        //   type: 'select' as const,
+        //   label: t('filter.status'),
+        //   value: filter.status,
+        //   onChange: (value: string) => onFilterChange({ ...filter, status: value }),
+        //   options: statusOptions,
+        // },
+        // {
+        //   type: 'multiselect' as const,
+        //   label: t('filter.categories'),
+        //   value: filter.categories,
+        //   onChange: (value: string[]) => onFilterChange({ ...filter, categories: value }),
+        //   options: categoryOptions,
+        // },
+      ],
+    },
+  ]
+
+  return (
+    <GenericFilterDialog
+      open={open}
+      onClose={onClose}
+      title={t('filter.title')}
+      sections={filterSections}
+      onReset={() => {
+        onFilterChange(default{{ENTITY_SINGULAR_UPPER}}Filter)
+        onReset()
+      }}
+      resetLabel={t('filter.reset')}
+    />
+  )
+}

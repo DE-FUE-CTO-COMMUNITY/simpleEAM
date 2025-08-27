@@ -1,0 +1,80 @@
+'use client'
+
+import React from 'react'
+import { useTranslations } from 'next-intl'
+import { useForm } from '@tanstack/react-form'
+import { zodValidator } from '@tanstack/zod-form-adapter'
+import { GenericForm } from '../common/GenericForm'
+import { GenericFormProps } from '../common/GenericFormProps'
+import { {{ENTITY_SINGULAR_UPPER}}FormValues, {{ENTITY_SINGULAR}}FormSchema, {{ENTITY_SINGULAR_UPPER}}Type } from './types'
+
+// Standardisiertes Interface für {{ENTITY_UPPER}}Form
+interface {{ENTITY_UPPER}}FormProps extends GenericFormProps<{{ENTITY_SINGULAR_UPPER}}Type, {{ENTITY_SINGULAR_UPPER}}FormValues> {
+  // Zusätzliche entity-spezifische Props können hier hinzugefügt werden
+}
+
+export function {{ENTITY_UPPER}}Form({
+  data: {{ENTITY_SINGULAR}}, // Standardisierte Prop
+  mode,
+  isOpen,
+  onClose,
+  onSubmit,
+  onDelete,
+  loading = false,
+  onEditMode,
+  ...otherProps
+}: {{ENTITY_UPPER}}FormProps) {
+  const t = useTranslations('{{ENTITY_NAME}}')
+  
+  const form = useForm({
+    defaultValues: {
+      name: {{ENTITY_SINGULAR}}?.name ?? '',
+      description: {{ENTITY_SINGULAR}}?.description ?? '',
+      // TODO: Weitere Default-Werte hinzufügen
+    } as {{ENTITY_SINGULAR_UPPER}}FormValues,
+    validatorAdapter: zodValidator(),
+    validators: {
+      onChange: {{ENTITY_SINGULAR}}FormSchema,
+    },
+    onSubmit: async ({ value }) => {
+      await onSubmit(value)
+    },
+  })
+
+  const formSections = [
+    {
+      title: t('form.tabs.basic'),
+      fields: [
+        {
+          name: 'name' as keyof {{ENTITY_SINGULAR_UPPER}}FormValues,
+          label: t('form.name'),
+          placeholder: t('form.namePlaceholder'),
+          type: 'text' as const,
+          required: true,
+        },
+        {
+          name: 'description' as keyof {{ENTITY_SINGULAR_UPPER}}FormValues,
+          label: t('form.description'),
+          placeholder: t('form.descriptionPlaceholder'),
+          type: 'textarea' as const,
+          rows: 3,
+        },
+        // TODO: Weitere Felder hinzufügen
+      ],
+    },
+    // TODO: Weitere Tabs/Sections hinzufügen
+  ]
+
+  return (
+    <GenericForm
+      form={form}
+      sections={formSections}
+      onCancel={onClose}
+      isViewMode={mode === 'view'}
+      submitLabel={t('actions.save')}
+      cancelLabel={t('actions.cancel')}
+      // Weitere Props weiterleiten
+      {...otherProps}
+    />
+  )
+}

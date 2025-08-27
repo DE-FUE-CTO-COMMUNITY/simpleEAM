@@ -1,0 +1,59 @@
+'use client'
+
+import { format } from 'date-fns'
+import { de, enUS } from 'date-fns/locale'
+import { {{ENTITY_SINGULAR_UPPER}}FilterState } from './types'
+
+/**
+ * Formatiert das Datum für die Anzeige
+ */
+export const formatDate = (dateString: string, locale: string = 'de'): string => {
+  try {
+    // Standarddatum (1.1.1970) prüfen, das als leerer Wert gilt
+    const date = new Date(dateString)
+    if (date.getFullYear() === 1970 && date.getMonth() === 0 && date.getDate() === 1) {
+      return '-'
+    }
+    const dateLocale = locale === 'de' ? de : enUS
+    const formatPattern = locale === 'de' ? 'dd.MM.yyyy' : 'MM/dd/yyyy'
+    return format(date, formatPattern, { locale: dateLocale })
+  } catch {
+    return 'Unbekannt'
+  }
+}
+
+/**
+ * Zählt die aktiven Filter
+ */
+export const countActiveFilters = (filter: {{ENTITY_SINGULAR_UPPER}}FilterState): number => {
+  let count = 0
+  if (filter.search.trim()) count++
+  // TODO: Weitere Filter-Counts hinzufügen
+  return count
+}
+
+/**
+ * Prüft, ob ein {{ENTITY_SINGULAR}} den Filterkriterien entspricht
+ */
+export const matches{{ENTITY_SINGULAR_UPPER}}Filter = (
+  {{ENTITY_SINGULAR}}: any,
+  filter: {{ENTITY_SINGULAR_UPPER}}FilterState
+): boolean => {
+  // Suchfilter
+  if (filter.search.trim()) {
+    const searchTerm = filter.search.toLowerCase()
+    const nameMatch = {{ENTITY_SINGULAR}}.name?.toLowerCase().includes(searchTerm)
+    const descriptionMatch = {{ENTITY_SINGULAR}}.description?.toLowerCase().includes(searchTerm)
+    if (!nameMatch && !descriptionMatch) return false
+  }
+
+  // TODO: Weitere Filter-Logik hinzufügen
+
+  return true
+}
+
+// TODO: Entity-spezifische Utility-Funktionen hinzufügen
+// Beispiele:
+// - formatEntitySpecificValue
+// - getEntityStatusLabel
+// - calculateEntityMetrics

@@ -145,22 +145,17 @@ export const applicationInterfaceSchema = baseApplicationInterfaceSchema.superRe
 // TypeScript Typen basierend auf dem Schema
 export type ApplicationInterfaceFormValues = z.infer<typeof applicationInterfaceSchema>
 
-export interface ApplicationInterfaceFormProps {
-  applicationInterface?: ApplicationInterface | null
+import { GenericFormProps } from '../common/GenericFormProps'
+
+export interface ApplicationInterfaceFormProps
+  extends GenericFormProps<ApplicationInterface, ApplicationInterfaceFormValues> {
   dataObjects?: DataObject[]
   applications?: Application[]
   persons?: Person[]
-  isOpen: boolean
-  onClose: () => void
-  onSubmit: (data: ApplicationInterfaceFormValues) => Promise<void>
-  onDelete?: (id: string) => Promise<void>
-  mode: 'create' | 'edit' | 'view'
-  loading?: boolean
-  onEditMode?: () => void
 }
 
 const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
-  applicationInterface,
+  data: applicationInterface,
   dataObjects = [],
   applications: _applications = [],
   persons: _persons = [],

@@ -57,17 +57,12 @@ export const capabilitySchema = z.object({
 // TypeScript Typen basierend auf dem Schema
 export type CapabilityFormValues = z.infer<typeof capabilitySchema>
 
-export interface CapabilityFormProps {
-  capability?: BusinessCapability | null
+import { GenericFormProps } from '../common/GenericFormProps'
+
+export interface CapabilityFormProps
+  extends GenericFormProps<BusinessCapability, CapabilityFormValues> {
   availableCapabilities?: BusinessCapability[]
   availableTags?: string[]
-  isOpen: boolean
-  onClose: () => void
-  onSubmit: (data: CapabilityFormValues) => Promise<void>
-  onDelete?: (id: string) => Promise<void>
-  mode: 'create' | 'edit' | 'view'
-  loading?: boolean
-  onEditMode?: () => void
 }
 
 const getLevelLabel = (level: number | null | undefined, t: any): string => {
@@ -87,7 +82,7 @@ const getTypeLabel = (type: CapabilityType, t: any): string => {
 }
 
 const CapabilityForm: React.FC<CapabilityFormProps> = ({
-  capability,
+  data: capability,
   availableCapabilities = [],
   availableTags = [],
   isOpen,
@@ -169,20 +164,20 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
   const capabilityParentId =
     capability?.parents && capability.parents.length > 0 ? capability.parents[0]?.id : undefined
   const capabilityChildren = React.useMemo(
-    () => capability?.children?.map(child => child.id) ?? [],
+    () => capability?.children?.map((child: any) => child.id) ?? [],
     [capability?.children]
   )
   const capabilitySupportedByApplications = React.useMemo(
-    () => capability?.supportedByApplications?.map(app => app.id) ?? [],
+    () => capability?.supportedByApplications?.map((app: any) => app.id) ?? [],
     [capability?.supportedByApplications]
   )
   const capabilityPartOfArchitectures = React.useMemo(
-    () => capability?.partOfArchitectures?.map(arch => arch.id) ?? [],
+    () => capability?.partOfArchitectures?.map((arch: any) => arch.id) ?? [],
     [capability?.partOfArchitectures]
   )
   // Diagramme, in denen die Capability dargestellt wird
   const capabilityPartOfDiagrams = React.useMemo(
-    () => capability?.depictedInDiagrams?.map(diagram => diagram.id) ?? [],
+    () => capability?.depictedInDiagrams?.map((diagram: any) => diagram.id) ?? [],
     [capability?.depictedInDiagrams]
   )
 

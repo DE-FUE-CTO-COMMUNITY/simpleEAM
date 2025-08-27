@@ -38,19 +38,15 @@ export const architecturePrincipleSchema = z.object({
 // TypeScript Typen basierend auf dem Schema
 export type ArchitecturePrincipleFormValues = z.infer<typeof architecturePrincipleSchema>
 
-export interface ArchitecturePrincipleFormProps {
-  principle?: ArchitecturePrinciple | null
-  mode: 'create' | 'edit' | 'view'
-  isOpen?: boolean
-  onClose?: () => void
-  onSubmit?: (data: ArchitecturePrincipleFormValues) => Promise<void>
-  onDelete?: (id: string) => Promise<void>
-  loading?: boolean
-  onEditMode?: () => void
+import { GenericFormProps } from '../common/GenericFormProps'
+
+export interface ArchitecturePrincipleFormProps
+  extends GenericFormProps<ArchitecturePrinciple, ArchitecturePrincipleFormValues> {
+  // Zusätzliche entity-spezifische Props können hier hinzugefügt werden
 }
 
 const ArchitecturePrincipleForm: React.FC<ArchitecturePrincipleFormProps> = ({
-  principle,
+  data: principle,
   isOpen,
   onClose,
   onSubmit,

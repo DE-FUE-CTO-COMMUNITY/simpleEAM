@@ -58,20 +58,15 @@ export const architectureSchema = z.object({
 // TypeScript Typen basierend auf dem Schema
 export type ArchitectureFormValues = z.infer<typeof architectureSchema>
 
-export interface ArchitectureFormProps {
-  architecture?: Architecture | null
+import { GenericFormProps } from '../common/GenericFormProps'
+
+export interface ArchitectureFormProps
+  extends GenericFormProps<Architecture, ArchitectureFormValues> {
   availableArchitectures?: Architecture[]
-  mode: 'create' | 'edit' | 'view'
-  isOpen?: boolean
-  onClose?: () => void
-  onSubmit?: (data: ArchitectureFormValues) => Promise<void>
-  onDelete?: (id: string) => Promise<void>
-  loading?: boolean
-  onEditMode?: () => void
 }
 
 const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
-  architecture,
+  data: architecture,
   availableArchitectures = [],
   isOpen,
   onClose,

@@ -1,0 +1,153 @@
+'use client'
+
+import React, { useState, useMemo } from 'react'
+import { useQuery, useMutation } from '@apollo/client'
+import { useTranslations } from 'next-intl'
+import { Box, Typography } from '@mui/material'
+import { SortingState } from '@tanstack/react-table'
+import {{ENTITY_UPPER}}Table from '../../../components/{{ENTITY_NAME}}/{{ENTITY_UPPER}}Table'
+import { {{ENTITY_UPPER}}Toolbar } from '../../../components/{{ENTITY_NAME}}/{{ENTITY_UPPER}}Toolbar'
+import { {{ENTITY_UPPER}}FilterDialog } from '../../../components/{{ENTITY_NAME}}/{{ENTITY_UPPER}}FilterDialog'
+import { use{{ENTITY_UPPER}}Filter } from '../../../components/{{ENTITY_NAME}}/use{{ENTITY_UPPER}}Filter'
+import { {{ENTITY_SINGULAR_UPPER}}FormValues } from '../../../components/{{ENTITY_NAME}}/types'
+import { countActiveFilters } from '../../../components/{{ENTITY_NAME}}/utils'
+import {
+  GET_{{ENTITY_NAME_CONST}},
+  CREATE_{{ENTITY_SINGULAR_CONST}},
+  UPDATE_{{ENTITY_SINGULAR_CONST}},
+  DELETE_{{ENTITY_SINGULAR_CONST}},
+} from '../../../graphql/{{ENTITY_SINGULAR}}'
+
+export default function {{ENTITY_UPPER}}Page() {
+  const t = useTranslations('{{ENTITY_NAME}}')
+  const [sorting, setSorting] = useState<SortingState>([])
+  const [globalFilter, setGlobalFilter] = useState('')
+  const [showFilterDialog, setShowFilterDialog] = useState(false)
+
+  // GraphQL Queries & Mutations
+  const { data, loading, error, refetch } = useQuery(GET_{{ENTITY_NAME_CONST}})
+  const [create{{ENTITY_SINGULAR_UPPER}}] = useMutation(CREATE_{{ENTITY_SINGULAR_CONST}})
+  const [update{{ENTITY_SINGULAR_UPPER}}] = useMutation(UPDATE_{{ENTITY_SINGULAR_CONST}})
+  const [delete{{ENTITY_SINGULAR_UPPER}}] = useMutation(DELETE_{{ENTITY_SINGULAR_CONST}})
+
+  // Filter Logic
+  const {{ENTITY_NAME}} = data?.{{ENTITY_NAME}} || []
+  const { filter, setFilter, filtered{{ENTITY_UPPER}}, resetFilter } = use{{ENTITY_UPPER}}Filter({
+    {{ENTITY_NAME}},
+  })
+
+  // Weitere Filterung durch globalen Suchfilter
+  const final{{ENTITY_UPPER}} = useMemo(() => {
+    if (!globalFilter.trim()) return filtered{{ENTITY_UPPER}}
+    const searchTerm = globalFilter.toLowerCase()
+    return filtered{{ENTITY_UPPER}}.filter(
+      {{ENTITY_SINGULAR}} =>
+        {{ENTITY_SINGULAR}}.name?.toLowerCase().includes(searchTerm) ||
+        {{ENTITY_SINGULAR}}.description?.toLowerCase().includes(searchTerm)
+    )
+  }, [filtered{{ENTITY_UPPER}}, globalFilter])
+
+  // CRUD Handlers
+  const handleCreate = async (data: {{ENTITY_SINGULAR_UPPER}}FormValues) => {
+    try {
+      await create{{ENTITY_SINGULAR_UPPER}}({
+        variables: {
+          input: {
+            name: data.name,
+            description: data.description,
+            // TODO: Weitere Felder hinzufügen
+          },
+        },
+        refetchQueries: [{ query: GET_{{ENTITY_NAME_CONST}} }],
+      })
+    } catch (error) {
+      console.error('Error creating {{ENTITY_SINGULAR}}:', error)
+      throw error
+    }
+  }
+
+  const handleUpdate = async (id: string, data: {{ENTITY_SINGULAR_UPPER}}FormValues) => {
+    try {
+      await update{{ENTITY_SINGULAR_UPPER}}({
+        variables: {
+          id,
+          input: {
+            name: data.name,
+            description: data.description,
+            // TODO: Weitere Felder hinzufügen
+          },
+        },
+        refetchQueries: [{ query: GET_{{ENTITY_NAME_CONST}} }],
+      })
+    } catch (error) {
+      console.error('Error updating {{ENTITY_SINGULAR}}:', error)
+      throw error
+    }
+  }
+
+  const handleDelete = async (id: string) => {
+    try {
+      await delete{{ENTITY_SINGULAR_UPPER}}({
+        variables: { id },
+        refetchQueries: [{ query: GET_{{ENTITY_NAME_CONST}} }],
+      })
+    } catch (error) {
+      console.error('Error deleting {{ENTITY_SINGULAR}}:', error)
+      throw error
+    }
+  }
+
+  // UI Event Handlers
+  const handleAddNew = () => {
+    // Die GenericTable zeigt automatisch das Formular an
+  }
+
+  const handleFilterOpen = () => {
+    setShowFilterDialog(true)
+  }
+
+  const handleFilterClose = () => {
+    setShowFilterDialog(false)
+  }
+
+  if (error) {
+    return (
+      <Box p={3}>
+        <Typography color="error">
+          {t('messages.loadError')}: {error.message}
+        </Typography>
+      </Box>
+    )
+  }
+
+  return (
+    <Box>
+      <{{ENTITY_UPPER}}Toolbar
+        onAdd={handleAddNew}
+        onFilter={handleFilterOpen}
+        totalCount={ {{ENTITY_NAME}}.length}
+        filteredCount={final{{ENTITY_UPPER}}.length}
+        activeFiltersCount={countActiveFilters(filter)}
+      />
+
+      <{{ENTITY_UPPER}}Table
+        {{ENTITY_NAME}}={final{{ENTITY_UPPER}}}
+        loading={loading}
+        globalFilter={globalFilter}
+        sorting={sorting}
+        onSortingChange={setSorting}
+        onCreate{{ENTITY_SINGULAR_UPPER}}={handleCreate}
+        onUpdate{{ENTITY_SINGULAR_UPPER}}={handleUpdate}
+        onDelete{{ENTITY_SINGULAR_UPPER}}={handleDelete}
+      />
+
+      <{{ENTITY_UPPER}}FilterDialog
+        open={showFilterDialog}
+        onClose={handleFilterClose}
+        filter={filter}
+        onFilterChange={setFilter}
+        onReset={resetFilter}
+      />
+    </Box>
+  )
+}

@@ -27,19 +27,14 @@ export const personSchema = z.object({
 // TypeScript Typen basierend auf dem Schema
 export type PersonFormValues = z.infer<typeof personSchema>
 
-export interface PersonFormProps {
-  person?: Person | null
-  isOpen: boolean
-  onClose: () => void
-  onSubmit: (data: PersonFormValues) => Promise<void>
-  onDelete?: (id: string) => Promise<void>
-  mode: 'create' | 'edit' | 'view'
-  loading?: boolean
-  onEditMode?: () => void
+import { GenericFormProps } from '../common/GenericFormProps'
+
+export interface PersonFormProps extends GenericFormProps<Person, PersonFormValues> {
+  // Zusätzliche entity-spezifische Props können hier hinzugefügt werden
 }
 
 const PersonForm: React.FC<PersonFormProps> = ({
-  person,
+  data: person,
   isOpen,
   onClose,
   onSubmit,
