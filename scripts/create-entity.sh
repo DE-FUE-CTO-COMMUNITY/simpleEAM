@@ -1,27 +1,75 @@
 #!/bin/bash
 
 # Script zur automatisierten Erstellung einer neuen Entity nach dem Standard-Pattern
-# Verwendung: ./create-entity.sh [entity-name] [Entity-Display-Name]
-# Beispiel: ./create-entity.sh companies "Unternehmen"
+# Verwendung: ./create-entity.sh [entity-name]
+# Beispiel: ./create-entity.sh companies
 
 set -e
 
+# Funktion zur automatischen Ableitung des deutschen Display Names
+get_german_display_name() {
+    local entity_name=$1
+    case $entity_name in
+        "companies") echo "Unternehmen" ;;
+        "organisations") echo "Organisationen" ;;
+        "projects") echo "Projekte" ;;
+        "contracts") echo "Verträge" ;;
+        "suppliers") echo "Lieferanten" ;;
+        "customers") echo "Kunden" ;;
+        "departments") echo "Abteilungen" ;;
+        "teams") echo "Teams" ;;
+        "locations") echo "Standorte" ;;
+        "assets") echo "Assets" ;;
+        "services") echo "Services" ;;
+        "processes") echo "Prozesse" ;;
+        *) 
+            # Fallback: Erste Buchstabe groß, Rest klein
+            echo "$(echo ${entity_name:0:1} | tr '[:lower:]' '[:upper:]')$(echo ${entity_name:1} | tr '[:upper:]' '[:lower:]')"
+            ;;
+    esac
+}
+
+# Funktion zur automatischen Ableitung des englischen Display Names
+get_english_display_name() {
+    local entity_name=$1
+    # Erste Buchstabe groß, Rest klein
+    echo "$(echo ${entity_name:0:1} | tr '[:lower:]' '[:upper:]')$(echo ${entity_name:1} | tr '[:upper:]' '[:lower:]')"
+}
+
 # Parameter prüfen
-if [ $# -lt 2 ]; then
-    echo "Verwendung: $0 [entity-name] [Entity-Display-Name]"
-    echo "Beispiel: $0 companies \"Unternehmen\""
+if [ $# -lt 1 ]; then
+    echo "Verwendung: $0 [entity-name]"
+    echo "Beispiel: $0 companies"
+    echo ""
+    echo "Unterstützte Entity Names mit automatischen Display Names:"
+    echo "  companies     → Unternehmen (DE), Companies (EN)"
+    echo "  organisations → Organisationen (DE), Organisations (EN)"
+    echo "  projects      → Projekte (DE), Projects (EN)"
+    echo "  contracts     → Verträge (DE), Contracts (EN)"
+    echo "  suppliers     → Lieferanten (DE), Suppliers (EN)"
+    echo "  customers     → Kunden (DE), Customers (EN)"
+    echo "  departments   → Abteilungen (DE), Departments (EN)"
+    echo "  teams         → Teams (DE), Teams (EN)"
+    echo "  locations     → Standorte (DE), Locations (EN)"
+    echo "  assets        → Assets (DE), Assets (EN)"
+    echo "  services      → Services (DE), Services (EN)"
+    echo "  processes     → Prozesse (DE), Processes (EN)"
+    echo ""
+    echo "Für andere Namen wird automatisch abgeleitet (erste Buchstabe groß)."
     exit 1
 fi
 
 ENTITY_NAME=$1
-ENTITY_DISPLAY_NAME=$2
+ENTITY_DISPLAY_NAME_DE=$(get_german_display_name $ENTITY_NAME)
+ENTITY_DISPLAY_NAME_EN=$(get_english_display_name $ENTITY_NAME)
 ENTITY_NAME_UPPER=$(echo $ENTITY_NAME | sed 's/^./\U&/')
 ENTITY_NAME_SINGULAR=$(echo $ENTITY_NAME | sed 's/s$//')
 ENTITY_NAME_SINGULAR_UPPER=$(echo $ENTITY_NAME_SINGULAR | sed 's/^./\U&/')
 
-echo "🚀 Erstelle neue Entity: $ENTITY_NAME ($ENTITY_DISPLAY_NAME)"
+echo "🚀 Erstelle neue Entity: $ENTITY_NAME"
 echo "📁 Entity Name: $ENTITY_NAME"
-echo "📄 Display Name: $ENTITY_DISPLAY_NAME"
+echo "🇩🇪 Display Name (DE): $ENTITY_DISPLAY_NAME_DE"
+echo "🇬🇧 Display Name (EN): $ENTITY_DISPLAY_NAME_EN"
 echo "🔤 Singular: $ENTITY_NAME_SINGULAR"
 echo ""
 
@@ -94,24 +142,24 @@ sed -i "s/applications/$ENTITY_NAME/g" "client/src/app/[lang]/$ENTITY_NAME/page.
 # Phase 3: Übersetzungen erstellen
 echo "📖 Erstelle Übersetzungen..."
 
-# Prüfe ob Übersetzungen bereits existieren
+# Deutsche Übersetzungen
 if ! grep -q "\"$ENTITY_NAME\":" "client/messages/de.json"; then
     echo "  🇩🇪 Deutsche Übersetzungen..."
     
-    # JSON-Block für Übersetzungen erstellen
-    translation_block="\
+    # JSON-Block für deutsche Übersetzungen erstellen
+    translation_block_de="\
   \"$ENTITY_NAME\": {\
-    \"title\": \"$ENTITY_DISPLAY_NAME\",\
-    \"description\": \"Verwalten Sie $ENTITY_DISPLAY_NAME und deren Informationen\",\
-    \"loading\": \"Lade $ENTITY_DISPLAY_NAME...\",\
+    \"title\": \"$ENTITY_DISPLAY_NAME_DE\",\
+    \"description\": \"Verwalten Sie $ENTITY_DISPLAY_NAME_DE und deren Informationen\",\
+    \"loading\": \"Lade $ENTITY_DISPLAY_NAME_DE...\",\
     \"addNew\": \"Neue(n) $ENTITY_NAME_SINGULAR erstellen\",\
     \"editTitle\": \"$ENTITY_NAME_SINGULAR bearbeiten\",\
     \"createTitle\": \"Neue(n) $ENTITY_NAME_SINGULAR erstellen\",\
     \"viewTitle\": \"$ENTITY_NAME_SINGULAR Details\",\
     \"deleteConfirmation\": \"Sind Sie sicher, dass Sie diese(n) $ENTITY_NAME_SINGULAR löschen möchten?\",\
-    \"searchPlaceholder\": \"$ENTITY_DISPLAY_NAME durchsuchen...\",\
+    \"searchPlaceholder\": \"$ENTITY_DISPLAY_NAME_DE durchsuchen...\",\
     \"messages\": {\
-      \"loadError\": \"Fehler beim Laden der $ENTITY_DISPLAY_NAME\",\
+      \"loadError\": \"Fehler beim Laden der $ENTITY_DISPLAY_NAME_DE\",\
       \"createSuccess\": \"$ENTITY_NAME_SINGULAR erfolgreich erstellt\",\
       \"createError\": \"Fehler beim Erstellen des $ENTITY_NAME_SINGULAR\",\
       \"updateSuccess\": \"$ENTITY_NAME_SINGULAR erfolgreich aktualisiert\",\
@@ -138,14 +186,68 @@ if ! grep -q "\"$ENTITY_NAME\":" "client/messages/de.json"; then
         \"updatedAt\": \"Aktualisiert am\",\
         \"actions\": \"Aktionen\"\
       },\
-      \"noData\": \"Keine $ENTITY_DISPLAY_NAME gefunden\",\
-      \"loading\": \"Lade $ENTITY_DISPLAY_NAME...\",\
+      \"noData\": \"Keine $ENTITY_DISPLAY_NAME_DE gefunden\",\
+      \"loading\": \"Lade $ENTITY_DISPLAY_NAME_DE...\",\
       \"search\": \"Suchen...\"\
     }\
   },"
     
     # Füge Block vor dem letzten } ein
-    sed -i "$ s/}/  $translation_block\n}/" "client/messages/de.json"
+    sed -i "$ s/}/  $translation_block_de\n}/" "client/messages/de.json"
+fi
+
+# Englische Übersetzungen
+if ! grep -q "\"$ENTITY_NAME\":" "client/messages/en.json"; then
+    echo "  🇬🇧 Englische Übersetzungen..."
+    
+    # JSON-Block für englische Übersetzungen erstellen
+    translation_block_en="\
+  \"$ENTITY_NAME\": {\
+    \"title\": \"$ENTITY_DISPLAY_NAME_EN\",\
+    \"description\": \"Manage $ENTITY_DISPLAY_NAME_EN and their information\",\
+    \"loading\": \"Loading $ENTITY_DISPLAY_NAME_EN...\",\
+    \"addNew\": \"Create new $ENTITY_NAME_SINGULAR\",\
+    \"editTitle\": \"Edit $ENTITY_NAME_SINGULAR\",\
+    \"createTitle\": \"Create new $ENTITY_NAME_SINGULAR\",\
+    \"viewTitle\": \"$ENTITY_NAME_SINGULAR Details\",\
+    \"deleteConfirmation\": \"Are you sure you want to delete this $ENTITY_NAME_SINGULAR?\",\
+    \"searchPlaceholder\": \"Search $ENTITY_DISPLAY_NAME_EN...\",\
+    \"messages\": {\
+      \"loadError\": \"Error loading $ENTITY_DISPLAY_NAME_EN\",\
+      \"createSuccess\": \"$ENTITY_NAME_SINGULAR created successfully\",\
+      \"createError\": \"Error creating $ENTITY_NAME_SINGULAR\",\
+      \"updateSuccess\": \"$ENTITY_NAME_SINGULAR updated successfully\",\
+      \"updateError\": \"Error updating $ENTITY_NAME_SINGULAR\",\
+      \"deleteSuccess\": \"$ENTITY_NAME_SINGULAR deleted successfully\",\
+      \"deleteError\": \"Error deleting $ENTITY_NAME_SINGULAR\"\
+    },\
+    \"actions\": {\
+      \"add\": \"Add\",\
+      \"edit\": \"Edit\",\
+      \"delete\": \"Delete\",\
+      \"view\": \"View\"\
+    },\
+    \"form\": {\
+      \"name\": \"Name\",\
+      \"description\": \"Description\"\
+    },\
+    \"table\": {\
+      \"headers\": {\
+        \"id\": \"ID\",\
+        \"name\": \"Name\",\
+        \"description\": \"Description\",\
+        \"createdAt\": \"Created at\",\
+        \"updatedAt\": \"Updated at\",\
+        \"actions\": \"Actions\"\
+      },\
+      \"noData\": \"No $ENTITY_DISPLAY_NAME_EN found\",\
+      \"loading\": \"Loading $ENTITY_DISPLAY_NAME_EN...\",\
+      \"search\": \"Search...\"\
+    }\
+  },"
+    
+    # Füge Block vor dem letzten } ein
+    sed -i "$ s/}/  $translation_block_en\n}/" "client/messages/en.json"
 fi
 
 echo ""
