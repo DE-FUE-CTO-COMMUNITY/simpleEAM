@@ -9,9 +9,7 @@ import { GenericFormProps } from '../common/GenericFormProps'
 import { {{ENTITY_SINGULAR_UPPER}}FormValues, {{ENTITY_SINGULAR}}FormSchema, {{ENTITY_SINGULAR_UPPER}}Type } from './types'
 
 // Standardisiertes Interface für {{ENTITY_NAME_UPPER}}Form
-interface {{ENTITY_NAME_UPPER}}FormProps extends GenericFormProps<{{ENTITY_SINGULAR_UPPER}}Type, {{ENTITY_SINGULAR_UPPER}}FormValues> {
-  // Zusätzliche entity-spezifische Props können hier hinzugefügt werden
-}
+type {{ENTITY_NAME_UPPER}}FormProps = GenericFormProps<{{ENTITY_SINGULAR_UPPER}}Type, {{ENTITY_SINGULAR_UPPER}}FormValues>
 
 export function {{ENTITY_NAME_UPPER}}Form({
   data: {{ENTITY_SINGULAR}}, // Standardisierte Prop
