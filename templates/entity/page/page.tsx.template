@@ -25,8 +25,8 @@ export default function {{ENTITY_NAME_UPPER}}Page() {
   const [showFilterDialog, setShowFilterDialog] = useState(false)
 
   // GraphQL Queries & Mutations
-  const { data, loading, error, refetch } = useQuery(GET_{{ENTITY_NAME_CONST}})
-  const [create{{ENTITY_SINGULAR_UPPER}}] = useMutation(CREATE_{{ENTITY_SINGULAR_CONST}})
+  const { data, loading, error, refetch } = useQuery(GET_{{ENTITY_NAME_UPPER}})
+  const [create{{ENTITY_SINGULAR_UPPER}}] = useMutation(CREATE_{{ENTITY_SINGULAR_UPPER}})
   const [update{{ENTITY_SINGULAR_UPPER}}] = useMutation(UPDATE_{{ENTITY_SINGULAR_UPPER}})
   const [delete{{ENTITY_SINGULAR_UPPER}}] = useMutation(DELETE_{{ENTITY_SINGULAR_UPPER}})
 
@@ -58,7 +58,7 @@ export default function {{ENTITY_NAME_UPPER}}Page() {
             // TODO: Weitere Felder hinzufügen
           },
         },
-        refetchQueries: [{ query: GET_{{ENTITY_NAME_CONST}} }],
+        refetchQueries: [{ query: GET_{{ENTITY_NAME_UPPER}} }],
       })
     } catch (error) {
       console.error('Error creating {{ENTITY_SINGULAR}}:', error)
@@ -77,7 +77,7 @@ export default function {{ENTITY_NAME_UPPER}}Page() {
             // TODO: Weitere Felder hinzufügen
           },
         },
-        refetchQueries: [{ query: GET_{{ENTITY_NAME_CONST}} }],
+        refetchQueries: [{ query: GET_{{ENTITY_NAME_UPPER}} }],
       })
     } catch (error) {
       console.error('Error updating {{ENTITY_SINGULAR}}:', error)
@@ -89,7 +89,7 @@ export default function {{ENTITY_NAME_UPPER}}Page() {
     try {
       await delete{{ENTITY_SINGULAR_UPPER}}({
         variables: { id },
-        refetchQueries: [{ query: GET_{{ENTITY_NAME_CONST}} }],
+        refetchQueries: [{ query: GET_{{ENTITY_NAME_UPPER}} }],
       })
     } catch (error) {
       console.error('Error deleting {{ENTITY_SINGULAR}}:', error)

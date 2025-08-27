@@ -11,7 +11,7 @@ import { SortingState, VisibilityState } from '@tanstack/react-table'
 import usePersistentColumnVisibility from '../../hooks/usePersistentColumnVisibility'
 
 // Exportierte Standard-Spaltenvisibilität für die {{ENTITY_SINGULAR_UPPER}}-Tabelle
-export const {{ENTITY_NAME_CONST}}_DEFAULT_COLUMN_VISIBILITY = {
+export const {{ENTITY_NAME_UPPER}}_DEFAULT_COLUMN_VISIBILITY = {
   // Standardmäßig sichtbare Spalten
   name: true,
   description: true,
@@ -66,7 +66,7 @@ const {{ENTITY_SINGULAR_UPPER}}TableWithGenericTable: React.FC<{{ENTITY_SINGULAR
     onColumnVisibilityChange,
   } = usePersistentColumnVisibility({
     tableKey: '{{ENTITY_NAME}}',
-    defaultColumnVisibility: {{ENTITY_NAME_CONST}}_DEFAULT_COLUMN_VISIBILITY,
+    defaultColumnVisibility: {{ENTITY_NAME_UPPER}}_DEFAULT_COLUMN_VISIBILITY,
   })
 
   // Kombiniere externe und persistente onTableReady Callbacks

@@ -22,7 +22,7 @@ export const GET_{{ENTITY_NAME_UPPER}} = gql`
 `
 
 // Query: Einzelne {{ENTITY_SINGULAR}} abrufen
-export const GET_{{ENTITY_SINGULAR_CONST}} = gql`
+export const GET_{{ENTITY_SINGULAR_UPPER}} = gql`
   query Get{{ENTITY_SINGULAR_UPPER}}($id: ID!) {
     {{ENTITY_SINGULAR}}(id: $id) {
       id
@@ -36,7 +36,7 @@ export const GET_{{ENTITY_SINGULAR_CONST}} = gql`
 `
 
 // Mutation: Neue {{ENTITY_SINGULAR}} erstellen
-export const CREATE_{{ENTITY_SINGULAR_CONST}} = gql`
+export const CREATE_{{ENTITY_SINGULAR_UPPER}} = gql`
   mutation Create{{ENTITY_SINGULAR_UPPER}}($input: Create{{ENTITY_SINGULAR_UPPER}}Input!) {
     create{{ENTITY_SINGULAR_UPPER}}(input: $input) {
       id
@@ -50,7 +50,7 @@ export const CREATE_{{ENTITY_SINGULAR_CONST}} = gql`
 `
 
 // Mutation: {{ENTITY_SINGULAR}} aktualisieren
-export const UPDATE_{{ENTITY_SINGULAR_CONST}} = gql`
+export const UPDATE_{{ENTITY_SINGULAR_UPPER}} = gql`
   mutation Update{{ENTITY_SINGULAR_UPPER}}($id: ID!, $input: Update{{ENTITY_SINGULAR_UPPER}}Input!) {
     update{{ENTITY_SINGULAR_UPPER}}(id: $id, input: $input) {
       id
@@ -64,7 +64,7 @@ export const UPDATE_{{ENTITY_SINGULAR_CONST}} = gql`
 `
 
 // Mutation: {{ENTITY_SINGULAR}} löschen
-export const DELETE_{{ENTITY_SINGULAR_CONST}} = gql`
+export const DELETE_{{ENTITY_SINGULAR_UPPER}} = gql`
   mutation Delete{{ENTITY_SINGULAR_UPPER}}($id: ID!) {
     delete{{ENTITY_SINGULAR_UPPER}}(id: $id)
   }
