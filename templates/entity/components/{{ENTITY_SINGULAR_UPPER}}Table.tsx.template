@@ -2,10 +2,10 @@
 
 import React, { useMemo } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
-import { GenericTable } from '../common/GenericTable'
+import GenericTable from '../common/GenericTable'
 import { {{ENTITY_SINGULAR_UPPER}}Type, {{ENTITY_SINGULAR_UPPER}}FormValues } from './types'
 import { formatDate } from './utils'
-import { {{ENTITY_SINGULAR_UPPER}}Form } from './{{ENTITY_SINGULAR_UPPER}}Form'
+import {{ENTITY_SINGULAR_UPPER}}Form from './{{ENTITY_SINGULAR_UPPER}}Form'
 import { createColumnHelper } from '@tanstack/react-table'
 import { SortingState, VisibilityState } from '@tanstack/react-table'
 import usePersistentColumnVisibility from '../../hooks/usePersistentColumnVisibility'
