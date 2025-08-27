@@ -67,3 +67,5 @@ export function {{ENTITY_NAME_UPPER}}FilterDialog({
     />
   )
 }
+
+export default {{ENTITY_NAME_UPPER}}FilterDialog

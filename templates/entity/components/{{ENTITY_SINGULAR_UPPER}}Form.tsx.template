@@ -78,3 +78,5 @@ export function {{ENTITY_NAME_UPPER}}Form({
     />
   )
 }
+
+export default {{ENTITY_NAME_UPPER}}Form

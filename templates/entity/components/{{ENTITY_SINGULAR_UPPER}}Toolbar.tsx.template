@@ -37,3 +37,5 @@ export function {{ENTITY_NAME_UPPER}}Toolbar({
     />
   )
 }
+
+export default {{ENTITY_NAME_UPPER}}Toolbar
