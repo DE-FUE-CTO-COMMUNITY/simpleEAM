@@ -12,12 +12,12 @@ import { GenericFormProps } from '../common/GenericFormProps'
 export const {{ENTITY_SINGULAR}}Schema = z.object({
   name: z
     .string()
-    .min(3, 'Der Name muss mindestens 3 Zeichen lang sein')
-    .max(100, 'Der Name darf maximal 100 Zeichen lang sein'),
+    .min(3)
+    .max(100),
   description: z
     .string()
-    .min(10, 'Die Beschreibung muss mindestens 10 Zeichen lang sein')
-    .max(1000, 'Die Beschreibung darf maximal 1000 Zeichen lang sein'),
+    .min(10)
+    .max(1000),
   // TODO: Weitere entity-spezifische Felder hinzufügen
 })
 
@@ -84,10 +84,10 @@ const {{ENTITY_NAME_UPPER}}Form: React.FC<
       validators: {
         onChange: ({ value }: { value: string }) => {
           if (!value || value.length < 3) {
-            return t('form.validation.nameMinLength', { min: 3 })
+            return tCommon('validation.minLength', { count: 3 })
           }
           if (value.length > 100) {
-            return t('form.validation.nameMaxLength', { max: 100 })
+            return tCommon('validation.maxLength', { count: 100 })
           }
           return undefined
         },
@@ -101,10 +101,10 @@ const {{ENTITY_NAME_UPPER}}Form: React.FC<
       validators: {
         onChange: ({ value }: { value: string }) => {
           if (!value || value.length < 10) {
-            return t('form.validation.descriptionMinLength', { min: 10 })
+            return tCommon('validation.minLength', { count: 10 })
           }
           if (value.length > 1000) {
-            return t('form.validation.descriptionMaxLength', { max: 1000 })
+            return tCommon('validation.maxLength', { count: 1000 })
           }
           return undefined
         },
@@ -115,7 +115,7 @@ const {{ENTITY_NAME_UPPER}}Form: React.FC<
 
   // Tab-Konfigurationen (falls mehrere Tabs benötigt werden)
   const tabs: TabConfig[] = [
-    { id: 'general', label: t('form.tabs.general') },
+    { id: 'general', label: tCommon('general') },
     // TODO: Weitere Tabs hinzufügen falls benötigt
     // { id: 'relationships', label: t('form.tabs.relationships') },
   ]
@@ -131,18 +131,17 @@ const {{ENTITY_NAME_UPPER}}Form: React.FC<
       onEditMode={onEditMode}
       title={
         mode === 'create'
-          ? t('form.createTitle')
+          ? t('createTitle')
           : mode === 'edit'
-          ? t('form.editTitle')
-          : t('form.viewTitle')
+          ? t('editTitle')
+          : t('viewTitle')
       }
       fields={fields}
       tabs={tabs.length > 1 ? tabs : undefined}
-      saveLabel={tCommon('save')}
-      cancelLabel={tCommon('cancel')}
-      editLabel={tCommon('edit')}
-      deleteLabel={tCommon('delete')}
-      deleteConfirmMessage={t('form.deleteConfirmation')}
+      submitButtonText={tCommon('save')}
+      cancelButtonText={tCommon('cancel')}
+      deleteButtonText={tCommon('delete')}
+      deleteConfirmationText={t('deleteConfirmation')}
     />
   )
 }
