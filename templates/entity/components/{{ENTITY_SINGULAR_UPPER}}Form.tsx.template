@@ -4,10 +4,7 @@ import React, { useEffect } from 'react'
 import { useForm } from '@tanstack/react-form'
 import { useTranslations } from 'next-intl'
 import { z } from 'zod'
-import { useQuery } from '@apollo/client'
 import { {{ENTITY_SINGULAR_UPPER}}Type } from './types'
-import { GET_PERSONS } from '@/graphql/person'
-import { useCurrentPerson } from '@/hooks/useCurrentPerson'
 import GenericForm, { FieldConfig, TabConfig } from '../common/GenericForm'
 import { GenericFormProps } from '../common/GenericFormProps'
 
@@ -27,8 +24,6 @@ export const {{ENTITY_SINGULAR}}Schema = z.object({
 // TypeScript Typen basierend auf dem Schema
 export type {{ENTITY_SINGULAR_UPPER}}FormValues = z.infer<typeof {{ENTITY_SINGULAR}}Schema>
 
-import { GenericFormProps } from '../common/GenericFormProps'
-
 const {{ENTITY_NAME_UPPER}}Form: React.FC<
   GenericFormProps<{{ENTITY_SINGULAR_UPPER}}Type, {{ENTITY_SINGULAR_UPPER}}FormValues>
 > = ({
@@ -43,13 +38,6 @@ const {{ENTITY_NAME_UPPER}}Form: React.FC<
 }) => {
   const t = useTranslations('{{ENTITY_NAME}}')
   const tCommon = useTranslations('common')
-  const tForms = useTranslations('forms.validation')
-
-  // Aktuellen Benutzer als Standard-Owner abrufen
-  const { currentPerson } = useCurrentPerson()
-
-  // Personen laden (falls benötigt)
-  const { data: personData, loading: personLoading } = useQuery(GET_PERSONS)
 
   // Formulardaten mit useMemo initialisieren
   const defaultValues = React.useMemo<{{ENTITY_SINGULAR_UPPER}}FormValues>(
@@ -58,7 +46,7 @@ const {{ENTITY_NAME_UPPER}}Form: React.FC<
       description: '',
       // TODO: Weitere Standardwerte hinzufügen
     }),
-    [currentPerson?.id]
+    []
   )
 
   // TanStack Form konfigurieren
@@ -96,10 +84,10 @@ const {{ENTITY_NAME_UPPER}}Form: React.FC<
       validators: {
         onChange: ({ value }: { value: string }) => {
           if (!value || value.length < 3) {
-            return 'Der Name muss mindestens 3 Zeichen lang sein'
+            return t('form.validation.nameMinLength', { min: 3 })
           }
           if (value.length > 100) {
-            return 'Der Name darf maximal 100 Zeichen lang sein'
+            return t('form.validation.nameMaxLength', { max: 100 })
           }
           return undefined
         },
@@ -113,10 +101,10 @@ const {{ENTITY_NAME_UPPER}}Form: React.FC<
       validators: {
         onChange: ({ value }: { value: string }) => {
           if (!value || value.length < 10) {
-            return 'Die Beschreibung muss mindestens 10 Zeichen lang sein'
+            return t('form.validation.descriptionMinLength', { min: 10 })
           }
           if (value.length > 1000) {
-            return 'Die Beschreibung darf maximal 1000 Zeichen lang sein'
+            return t('form.validation.descriptionMaxLength', { max: 1000 })
           }
           return undefined
         },
@@ -127,9 +115,9 @@ const {{ENTITY_NAME_UPPER}}Form: React.FC<
 
   // Tab-Konfigurationen (falls mehrere Tabs benötigt werden)
   const tabConfigs: TabConfig[] = [
-    { id: 'general', label: t('tabs.general') },
+    { id: 'general', label: t('form.tabs.general') },
     // TODO: Weitere Tabs hinzufügen falls benötigt
-    // { id: 'relationships', label: t('tabs.relationships') },
+    // { id: 'relationships', label: t('form.tabs.relationships') },
   ]
 
   return (
@@ -139,14 +127,14 @@ const {{ENTITY_NAME_UPPER}}Form: React.FC<
       onClose={onClose}
       onDelete={ {{ENTITY_SINGULAR}}?.id && onDelete ? () => onDelete({{ENTITY_SINGULAR}}.id) : undefined}
       mode={mode}
-      loading={loading || personLoading}
+      isLoading={loading}
       onEditMode={onEditMode}
       title={
         mode === 'create'
-          ? t('createTitle')
+          ? t('form.createTitle')
           : mode === 'edit'
-          ? t('editTitle')
-          : t('viewTitle')
+          ? t('form.editTitle')
+          : t('form.viewTitle')
       }
       fieldConfigs={fieldConfigs}
       tabConfigs={tabConfigs.length > 1 ? tabConfigs : undefined}
@@ -154,7 +142,7 @@ const {{ENTITY_NAME_UPPER}}Form: React.FC<
       cancelLabel={tCommon('cancel')}
       editLabel={tCommon('edit')}
       deleteLabel={tCommon('delete')}
-      deleteConfirmMessage={t('deleteConfirmation')}
+      deleteConfirmMessage={t('form.deleteConfirmation')}
     />
   )
 }
