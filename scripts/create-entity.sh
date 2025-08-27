@@ -106,69 +106,69 @@ echo "📂 Erstelle Verzeichnisstruktur..."
 mkdir -p "client/src/app/[lang]/$ENTITY_NAME"
 mkdir -p "client/src/components/$ENTITY_NAME"
 
-# Phase 1: Applications-Struktur kopieren
-echo "📋 Kopiere Applications-Pattern..."
+# Phase 1: Template-Struktur kopieren und anpassen
+echo "📋 Kopiere Template-Struktur..."
 
-# GraphQL Operations kopieren
+# GraphQL Operations aus Template kopieren
 echo "  📄 GraphQL Operations..."
-cp "client/src/graphql/application.ts" "client/src/graphql/$ENTITY_NAME_SINGULAR.ts"
+cp "templates/entity/graphql/{{ENTITY_SINGULAR}}.ts.template" "client/src/graphql/$ENTITY_NAME_SINGULAR.ts"
 
-# Komponenten kopieren
+# Komponenten aus Templates kopieren
 echo "  🧩 Komponenten..."
-cp "client/src/components/applications/types.ts" "client/src/components/$ENTITY_NAME/types.ts"
-cp "client/src/components/applications/utils.ts" "client/src/components/$ENTITY_NAME/utils.ts"
-cp "client/src/components/applications/useApplicationFilter.ts" "client/src/components/$ENTITY_NAME/use${ENTITY_NAME_SINGULAR_UPPER}Filter.ts"
-cp "client/src/components/applications/ApplicationForm.tsx" "client/src/components/$ENTITY_NAME/${ENTITY_NAME_SINGULAR_UPPER}Form.tsx"
-cp "client/src/components/applications/ApplicationTable.tsx" "client/src/components/$ENTITY_NAME/${ENTITY_NAME_SINGULAR_UPPER}Table.tsx"
-cp "client/src/components/applications/ApplicationToolbar.tsx" "client/src/components/$ENTITY_NAME/${ENTITY_NAME_SINGULAR_UPPER}Toolbar.tsx"
-cp "client/src/components/applications/ApplicationFilterDialog.tsx" "client/src/components/$ENTITY_NAME/${ENTITY_NAME_SINGULAR_UPPER}FilterDialog.tsx"
+cp "templates/entity/components/types.ts.template" "client/src/components/$ENTITY_NAME/types.ts"
+cp "templates/entity/components/utils.ts.template" "client/src/components/$ENTITY_NAME/utils.ts"
+cp "templates/entity/components/use{{ENTITY_UPPER}}Filter.ts.template" "client/src/components/$ENTITY_NAME/use${ENTITY_NAME_SINGULAR_UPPER}Filter.ts"
+cp "templates/entity/components/{{ENTITY_UPPER}}Form.tsx.template" "client/src/components/$ENTITY_NAME/${ENTITY_NAME_SINGULAR_UPPER}Form.tsx"
+cp "templates/entity/components/{{ENTITY_UPPER}}Table.tsx.template" "client/src/components/$ENTITY_NAME/${ENTITY_NAME_SINGULAR_UPPER}Table.tsx"
+cp "templates/entity/components/{{ENTITY_UPPER}}Toolbar.tsx.template" "client/src/components/$ENTITY_NAME/${ENTITY_NAME_SINGULAR_UPPER}Toolbar.tsx"
+cp "templates/entity/components/{{ENTITY_UPPER}}FilterDialog.tsx.template" "client/src/components/$ENTITY_NAME/${ENTITY_NAME_SINGULAR_UPPER}FilterDialog.tsx"
 
-# Hauptseite kopieren
+# Hauptseite aus Template kopieren
 echo "  📃 Hauptseite..."
-cp "client/src/app/[lang]/applications/page.tsx" "client/src/app/[lang]/$ENTITY_NAME/page.tsx"
+cp "templates/entity/page/page.tsx.template" "client/src/app/[lang]/$ENTITY_NAME/page.tsx"
 
-# Phase 2: Systematische String-Ersetzung
-echo "🔄 Passe Dateien an..."
+# Phase 2: Template-Platzhalter ersetzen
+echo "🔄 Passe Template-Platzhalter an..."
 
-# GraphQL Operations anpassen
+# Alle erstellten Dateien durchgehen und Platzhalter ersetzen
 echo "  🔧 GraphQL Operations..."
-sed -i "s/application/$ENTITY_NAME_SINGULAR/g" "client/src/graphql/$ENTITY_NAME_SINGULAR.ts"
-sed -i "s/Application/${ENTITY_NAME_SINGULAR_UPPER}/g" "client/src/graphql/$ENTITY_NAME_SINGULAR.ts"
-sed -i "s/applications/$ENTITY_NAME/g" "client/src/graphql/$ENTITY_NAME_SINGULAR.ts"
+sed -i "s/{{ENTITY_NAME}}/$ENTITY_NAME/g" "client/src/graphql/$ENTITY_NAME_SINGULAR.ts"
+sed -i "s/{{ENTITY_SINGULAR}}/$ENTITY_NAME_SINGULAR/g" "client/src/graphql/$ENTITY_NAME_SINGULAR.ts"
+sed -i "s/{{ENTITY_SINGULAR_UPPER}}/$ENTITY_NAME_SINGULAR_UPPER/g" "client/src/graphql/$ENTITY_NAME_SINGULAR.ts"
+sed -i "s/{{ENTITY_UPPER}}/$ENTITY_NAME_UPPER/g" "client/src/graphql/$ENTITY_NAME_SINGULAR.ts"
 
-# Types anpassen
 echo "  🏷️  Types..."
-sed -i "s/Application/${ENTITY_NAME_SINGULAR_UPPER}/g" "client/src/components/$ENTITY_NAME/types.ts"
-sed -i "s/application/$ENTITY_NAME_SINGULAR/g" "client/src/components/$ENTITY_NAME/types.ts"
+sed -i "s/{{ENTITY_NAME}}/$ENTITY_NAME/g" "client/src/components/$ENTITY_NAME/types.ts"
+sed -i "s/{{ENTITY_SINGULAR}}/$ENTITY_NAME_SINGULAR/g" "client/src/components/$ENTITY_NAME/types.ts"
+sed -i "s/{{ENTITY_SINGULAR_UPPER}}/$ENTITY_NAME_SINGULAR_UPPER/g" "client/src/components/$ENTITY_NAME/types.ts"
+sed -i "s/{{ENTITY_UPPER}}/$ENTITY_NAME_UPPER/g" "client/src/components/$ENTITY_NAME/types.ts"
 
-# Utils anpassen
 echo "  🛠️  Utils..."
-sed -i "s/Application/${ENTITY_NAME_SINGULAR_UPPER}/g" "client/src/components/$ENTITY_NAME/utils.ts"
-sed -i "s/application/$ENTITY_NAME_SINGULAR/g" "client/src/components/$ENTITY_NAME/utils.ts"
+sed -i "s/{{ENTITY_NAME}}/$ENTITY_NAME/g" "client/src/components/$ENTITY_NAME/utils.ts"
+sed -i "s/{{ENTITY_SINGULAR}}/$ENTITY_NAME_SINGULAR/g" "client/src/components/$ENTITY_NAME/utils.ts"
+sed -i "s/{{ENTITY_SINGULAR_UPPER}}/$ENTITY_NAME_SINGULAR_UPPER/g" "client/src/components/$ENTITY_NAME/utils.ts"
+sed -i "s/{{ENTITY_UPPER}}/$ENTITY_NAME_UPPER/g" "client/src/components/$ENTITY_NAME/utils.ts"
 
-# Filter Hook anpassen
 echo "  🔍 Filter Hook..."
-sed -i "s/Application/${ENTITY_NAME_SINGULAR_UPPER}/g" "client/src/components/$ENTITY_NAME/use${ENTITY_NAME_SINGULAR_UPPER}Filter.ts"
-sed -i "s/application/$ENTITY_NAME_SINGULAR/g" "client/src/components/$ENTITY_NAME/use${ENTITY_NAME_SINGULAR_UPPER}Filter.ts"
-sed -i "s/applications/$ENTITY_NAME/g" "client/src/components/$ENTITY_NAME/use${ENTITY_NAME_SINGULAR_UPPER}Filter.ts"
+sed -i "s/{{ENTITY_NAME}}/$ENTITY_NAME/g" "client/src/components/$ENTITY_NAME/use${ENTITY_NAME_SINGULAR_UPPER}Filter.ts"
+sed -i "s/{{ENTITY_SINGULAR}}/$ENTITY_NAME_SINGULAR/g" "client/src/components/$ENTITY_NAME/use${ENTITY_NAME_SINGULAR_UPPER}Filter.ts"
+sed -i "s/{{ENTITY_SINGULAR_UPPER}}/$ENTITY_NAME_SINGULAR_UPPER/g" "client/src/components/$ENTITY_NAME/use${ENTITY_NAME_SINGULAR_UPPER}Filter.ts"
+sed -i "s/{{ENTITY_UPPER}}/$ENTITY_NAME_UPPER/g" "client/src/components/$ENTITY_NAME/use${ENTITY_NAME_SINGULAR_UPPER}Filter.ts"
 
-# Komponenten anpassen
 echo "  🧩 Komponenten..."
 for component in "Form" "Table" "Toolbar" "FilterDialog"; do
     file="client/src/components/$ENTITY_NAME/${ENTITY_NAME_SINGULAR_UPPER}${component}.tsx"
-    sed -i "s/Application/${ENTITY_NAME_SINGULAR_UPPER}/g" "$file"
-    sed -i "s/application/$ENTITY_NAME_SINGULAR/g" "$file"
-    sed -i "s/applications/$ENTITY_NAME/g" "$file"
+    sed -i "s/{{ENTITY_NAME}}/$ENTITY_NAME/g" "$file"
+    sed -i "s/{{ENTITY_SINGULAR}}/$ENTITY_NAME_SINGULAR/g" "$file"
+    sed -i "s/{{ENTITY_SINGULAR_UPPER}}/$ENTITY_NAME_SINGULAR_UPPER/g" "$file"
+    sed -i "s/{{ENTITY_UPPER}}/$ENTITY_NAME_UPPER/g" "$file"
 done
 
-# Hauptseite anpassen
 echo "  📃 Hauptseite..."
-# Erst spezielle Import-Pfade ersetzen, bevor allgemeine Ersetzung
-sed -i "s|@/components/applications/|@/components/$ENTITY_NAME/|g" "client/src/app/[lang]/$ENTITY_NAME/page.tsx"
-# Dann andere Ersetzungen
-sed -i "s/Application/${ENTITY_NAME_SINGULAR_UPPER}/g" "client/src/app/[lang]/$ENTITY_NAME/page.tsx"
-sed -i "s/application/$ENTITY_NAME_SINGULAR/g" "client/src/app/[lang]/$ENTITY_NAME/page.tsx"
-sed -i "s/applications/$ENTITY_NAME/g" "client/src/app/[lang]/$ENTITY_NAME/page.tsx"
+sed -i "s/{{ENTITY_NAME}}/$ENTITY_NAME/g" "client/src/app/[lang]/$ENTITY_NAME/page.tsx"
+sed -i "s/{{ENTITY_SINGULAR}}/$ENTITY_NAME_SINGULAR/g" "client/src/app/[lang]/$ENTITY_NAME/page.tsx"
+sed -i "s/{{ENTITY_SINGULAR_UPPER}}/$ENTITY_NAME_SINGULAR_UPPER/g" "client/src/app/[lang]/$ENTITY_NAME/page.tsx"
+sed -i "s/{{ENTITY_UPPER}}/$ENTITY_NAME_UPPER/g" "client/src/app/[lang]/$ENTITY_NAME/page.tsx"
 
 # Phase 3: Übersetzungen erstellen
 echo "📖 Erstelle Übersetzungen..."
