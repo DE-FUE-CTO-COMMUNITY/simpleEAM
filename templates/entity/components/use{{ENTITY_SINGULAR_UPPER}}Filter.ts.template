@@ -4,11 +4,11 @@ import { useState, useMemo } from 'react'
 import { {{ENTITY_SINGULAR_UPPER}}Type, {{ENTITY_SINGULAR_UPPER}}FilterState, default{{ENTITY_SINGULAR_UPPER}}Filter } from './types'
 import { matches{{ENTITY_SINGULAR_UPPER}}Filter } from './utils'
 
-interface Use{{ENTITY_NAME_UPPER}}FilterProps {
+interface Use{{ENTITY_SINGULAR_UPPER}}FilterProps {
   {{ENTITY_NAME}}: {{ENTITY_SINGULAR_UPPER}}Type[]
 }
 
-export function use{{ENTITY_NAME_UPPER}}Filter({ {{ENTITY_NAME}} }: Use{{ENTITY_NAME_UPPER}}FilterProps) {
+export function use{{ENTITY_SINGULAR_UPPER}}Filter({ {{ENTITY_NAME}} }: Use{{ENTITY_SINGULAR_UPPER}}FilterProps) {
   const [filter, setFilter] = useState<{{ENTITY_SINGULAR_UPPER}}FilterState>(default{{ENTITY_SINGULAR_UPPER}}Filter)
 
   // Gefilterte {{ENTITY_NAME}}

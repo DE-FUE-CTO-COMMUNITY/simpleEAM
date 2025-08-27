@@ -3,21 +3,14 @@
 // {{ENTITY_SINGULAR}} = singular (company, capability, etc.)
 // {{ENTITY_NAME_UPPER}} = plural capitalized (Companies, Capabilities, etc.)
 // {{ENTITY_SINGULAR_UPPER}} = singular capitalized (Company, Capability, etc.)
-// {{ENTITY_GENERATED_TYPE}} = GraphQL generated type (Company, BusinessCapability, etc.)
 
 'use client'
 
 import { z } from 'zod'
-import { {{ENTITY_GENERATED_TYPE}} } from '../../gql/generated'
+import { {{ENTITY_SINGULAR_UPPER}} } from '../../gql/generated'
 
-// Nutze den generierten Typ als Basis und passe ihn für unsere Komponenten an
-export type {{ENTITY_SINGULAR_UPPER}}Type = Pick<
-  {{ENTITY_GENERATED_TYPE}},
-  | 'id'
-  | 'name'
-  | 'description'
-  | 'createdAt'
-  | 'updatedAt'
+// Nutze den generierten Typ als Basis
+export type {{ENTITY_SINGULAR_UPPER}}Type = {{ENTITY_SINGULAR_UPPER}}
   // TODO: Weitere relevante Felder hinzufügen
 >
 

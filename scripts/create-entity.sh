@@ -117,11 +117,11 @@ cp "templates/entity/graphql/{{ENTITY_SINGULAR}}.ts.template" "client/src/graphq
 echo "  🧩 Komponenten..."
 cp "templates/entity/components/types.ts.template" "client/src/components/$ENTITY_NAME/types.ts"
 cp "templates/entity/components/utils.ts.template" "client/src/components/$ENTITY_NAME/utils.ts"
-cp "templates/entity/components/use{{ENTITY_NAME_UPPER}}Filter.ts.template" "client/src/components/$ENTITY_NAME/use${ENTITY_NAME_UPPER}Filter.ts"
-cp "templates/entity/components/{{ENTITY_NAME_UPPER}}Form.tsx.template" "client/src/components/$ENTITY_NAME/${ENTITY_NAME_UPPER}Form.tsx"
-cp "templates/entity/components/{{ENTITY_NAME_UPPER}}Table.tsx.template" "client/src/components/$ENTITY_NAME/${ENTITY_NAME_UPPER}Table.tsx"
-cp "templates/entity/components/{{ENTITY_NAME_UPPER}}Toolbar.tsx.template" "client/src/components/$ENTITY_NAME/${ENTITY_NAME_UPPER}Toolbar.tsx"
-cp "templates/entity/components/{{ENTITY_NAME_UPPER}}FilterDialog.tsx.template" "client/src/components/$ENTITY_NAME/${ENTITY_NAME_UPPER}FilterDialog.tsx"
+cp "templates/entity/components/use{{ENTITY_SINGULAR_UPPER}}Filter.ts.template" "client/src/components/$ENTITY_NAME/use${ENTITY_NAME_SINGULAR_UPPER}Filter.ts"
+cp "templates/entity/components/{{ENTITY_SINGULAR_UPPER}}Form.tsx.template" "client/src/components/$ENTITY_NAME/${ENTITY_NAME_SINGULAR_UPPER}Form.tsx"
+cp "templates/entity/components/{{ENTITY_SINGULAR_UPPER}}Table.tsx.template" "client/src/components/$ENTITY_NAME/${ENTITY_NAME_SINGULAR_UPPER}Table.tsx"
+cp "templates/entity/components/{{ENTITY_SINGULAR_UPPER}}Toolbar.tsx.template" "client/src/components/$ENTITY_NAME/${ENTITY_NAME_SINGULAR_UPPER}Toolbar.tsx"
+cp "templates/entity/components/{{ENTITY_SINGULAR_UPPER}}FilterDialog.tsx.template" "client/src/components/$ENTITY_NAME/${ENTITY_NAME_SINGULAR_UPPER}FilterDialog.tsx"
 
 # Hauptseite aus Template kopieren
 echo "  📃 Hauptseite..."
@@ -150,14 +150,14 @@ sed -i "s/{{ENTITY_SINGULAR_UPPER}}/$ENTITY_NAME_SINGULAR_UPPER/g" "client/src/c
 sed -i "s/{{ENTITY_NAME_UPPER}}/$ENTITY_NAME_UPPER/g" "client/src/components/$ENTITY_NAME/utils.ts"
 
 echo "  🔍 Filter Hook..."
-sed -i "s/{{ENTITY_NAME}}/$ENTITY_NAME/g" "client/src/components/$ENTITY_NAME/use${ENTITY_NAME_UPPER}Filter.ts"
-sed -i "s/{{ENTITY_SINGULAR}}/$ENTITY_NAME_SINGULAR/g" "client/src/components/$ENTITY_NAME/use${ENTITY_NAME_UPPER}Filter.ts"
-sed -i "s/{{ENTITY_SINGULAR_UPPER}}/$ENTITY_NAME_SINGULAR_UPPER/g" "client/src/components/$ENTITY_NAME/use${ENTITY_NAME_UPPER}Filter.ts"
-sed -i "s/{{ENTITY_NAME_UPPER}}/$ENTITY_NAME_UPPER/g" "client/src/components/$ENTITY_NAME/use${ENTITY_NAME_UPPER}Filter.ts"
+sed -i "s/{{ENTITY_NAME}}/$ENTITY_NAME/g" "client/src/components/$ENTITY_NAME/use${ENTITY_NAME_SINGULAR_UPPER}Filter.ts"
+sed -i "s/{{ENTITY_SINGULAR}}/$ENTITY_NAME_SINGULAR/g" "client/src/components/$ENTITY_NAME/use${ENTITY_NAME_SINGULAR_UPPER}Filter.ts"
+sed -i "s/{{ENTITY_SINGULAR_UPPER}}/$ENTITY_NAME_SINGULAR_UPPER/g" "client/src/components/$ENTITY_NAME/use${ENTITY_NAME_SINGULAR_UPPER}Filter.ts"
+sed -i "s/{{ENTITY_NAME_UPPER}}/$ENTITY_NAME_UPPER/g" "client/src/components/$ENTITY_NAME/use${ENTITY_NAME_SINGULAR_UPPER}Filter.ts"
 
 echo "  🧩 Komponenten..."
 for component in "Form" "Table" "Toolbar" "FilterDialog"; do
-    file="client/src/components/$ENTITY_NAME/${ENTITY_NAME_UPPER}${component}.tsx"
+    file="client/src/components/$ENTITY_NAME/${ENTITY_NAME_SINGULAR_UPPER}${component}.tsx"
     sed -i "s/{{ENTITY_NAME}}/$ENTITY_NAME/g" "$file"
     sed -i "s/{{ENTITY_SINGULAR}}/$ENTITY_NAME_SINGULAR/g" "$file"
     sed -i "s/{{ENTITY_SINGULAR_UPPER}}/$ENTITY_NAME_SINGULAR_UPPER/g" "$file"

@@ -3,8 +3,8 @@
 ## 🚀 Schnellstart
 
 ```bash
-# 1. Script verwenden für automatische Erstellung
-./scripts/create-entity.sh companies "Unternehmen"
+# 1. Script verwenden für automatische Erstellung  
+./scripts/create-entity.sh companies
 
 # 2. GraphQL Types generieren
 cd client && yarn codegen
@@ -23,9 +23,20 @@ yarn dev
 
 ### Phase 2: Automatische Generierung
 
-- [ ] **Script ausgeführt**: `./scripts/create-entity.sh [name] "[Display Name]"`
+- [ ] **Script ausgeführt**: `./scripts/create-entity.sh [entity-name]`
 - [ ] **Ordnerstruktur erstellt**: Alle Verzeichnisse vorhanden?
-- [ ] **Dateien kopiert**: Alle Komponenten-Dateien erstellt?
+- [ ] **Dateien kopiert**: Alle Komponenten-Dateien mit SINGULAR-Namen erstellt?
+  - [ ] `CompanyForm.tsx` (nicht `CompaniesForm.tsx`)
+  - [ ] `CompanyTable.tsx` (nicht `CompaniesTable.tsx`)  
+  - [ ] `CompanyToolbar.tsx` (nicht `CompaniesToolbar.tsx`)
+  - [ ] `CompanyFilterDialog.tsx` (nicht `CompaniesFilterDialog.tsx`)
+
+### Phase 2.1: Internationalisierung prüfen
+
+- [ ] **Deutsche Übersetzungen**: `client/messages/de.json` erweitert?
+- [ ] **Englische Übersetzungen**: `client/messages/en.json` erweitert?
+- [ ] **Übersetzungsschlüssel**: Korrekte Hierarchie (`companies.title`, `companies.addNew`, etc.)?
+- [ ] **Display Names**: Deutsche und englische Bezeichnungen korrekt?
 
 ### Phase 3: GraphQL & Types
 

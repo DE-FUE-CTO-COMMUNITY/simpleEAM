@@ -4,6 +4,36 @@
 
 Dieses Dokument beschreibt das standardisierte Pattern für die Implementierung neuer Entities im Simple-EAM System. Das Pattern basiert auf den vorhandenen Generic-Komponenten und stellt sicher, dass alle Entities konsistent implementiert werden.
 
+## Automatisierte Entity-Erstellung
+
+**WICHTIG:** Verwende das automatisierte Script:
+
+```bash
+./scripts/create-entity.sh [entity-name]
+```
+
+Das Script erstellt automatisch alle benötigten Dateien nach dem standardisierten Pattern.
+
+### Unterstützte Entity-Namen
+- companies, organisations, projects, contracts, suppliers, customers
+- departments, teams, locations, assets, services, processes  
+- Für andere Namen wird automatisch abgeleitet
+
+## Template-System
+
+Das System verwendet Template-basierte Generierung mit folgenden Platzhaltern:
+
+- `{{ENTITY_NAME}}` = Plural lowercase (companies, capabilities)
+- `{{ENTITY_SINGULAR}}` = Singular lowercase (company, capability)  
+- `{{ENTITY_NAME_UPPER}}` = Plural capitalized (Companies, Capabilities)
+- `{{ENTITY_SINGULAR_UPPER}}` = Singular capitalized (Company, Capability)
+
+### Dateinamen-Konvention
+**WICHTIG:** Alle Komponenten-Dateien verwenden SINGULAR-Namen:
+- `CompanyForm.tsx` (nicht `CompaniesForm.tsx`)
+- `CompanyTable.tsx` (nicht `CompaniesTable.tsx`)
+- `CompanyToolbar.tsx` (nicht `CompaniesToolbar.tsx`)
+
 ## Referenz-Implementation: Applications
 
 Die `applications`-Implementation dient als **Referenz-Pattern** für alle neuen Entities. Alle neuen Implementierungen sollen diesem Pattern folgen.
@@ -17,37 +47,40 @@ src/
 ├── components/applications/
 │   ├── types.ts                    # TypeScript Definitionen
 │   ├── utils.ts                    # Hilfsfunktionen
-│   ├── useApplicationFilter.ts     # Filter-Hook
-│   ├── ApplicationForm.tsx         # Formular-Komponente
-│   ├── ApplicationTable.tsx        # Tabellen-Komponente
-│   ├── ApplicationToolbar.tsx      # Toolbar-Komponente
-│   └── ApplicationFilterDialog.tsx # Filter-Dialog
+│   ├── useApplicationFilter.ts     # Filter-Hook (Singular!)
+│   ├── ApplicationForm.tsx         # Formular-Komponente (Singular!)
+│   ├── ApplicationTable.tsx        # Tabellen-Komponente (Singular!)
+│   ├── ApplicationToolbar.tsx      # Toolbar-Komponente (Singular!)
+│   └── ApplicationFilterDialog.tsx # Filter-Dialog (Singular!)
 ├── graphql/
 │   └── application.ts              # GraphQL Operations
 └── messages/
-    ├── de.json                     # Deutsche Übersetzungen
+    ├── de.json                     # Deutsche Übersetzungen  
     └── en.json                     # Englische Übersetzungen
 ```
 
 ## Schritt-für-Schritt Anleitung
 
-### Phase 1: Vorbereitung und Analyse
+### Phase 1: Automatisierte Generierung
 
-#### Schritt 1.1: GraphQL Schema analysieren
-
-```bash
-# Prüfen ob Entity bereits im Schema existiert
-grep -r "type.*Entity" server/src/graphql/schema.graphql
-```
-
-#### Schritt 1.2: Bestehende Applications-Struktur kopieren
+#### Schritt 1.1: Script ausführen
 
 ```bash
-# Kopiere die gesamte Applications-Struktur
-cp -r src/components/applications src/components/[new-entity]
-cp -r src/app/[lang]/applications src/app/[lang]/[new-entity]
-cp src/graphql/application.ts src/graphql/[new-entity].ts
+./scripts/create-entity.sh [entity-name]
 ```
+
+#### Schritt 1.2: Internationalisierung prüfen
+
+**WICHTIG:** Das Script fügt automatisch Übersetzungen hinzu:
+
+- **Deutsche Übersetzungen** in `client/messages/de.json`
+- **Englische Übersetzungen** in `client/messages/en.json`
+
+Prüfe die generierten Übersetzungen und passe sie bei Bedarf an.
+
+### Phase 2: Manuelle Anpassungen
+
+#### Schritt 2.1: GraphQL Schema prüfen
 
 ### Phase 2: Systematische Anpassung
 
