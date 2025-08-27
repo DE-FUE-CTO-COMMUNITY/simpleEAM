@@ -163,6 +163,9 @@ done
 
 # Hauptseite anpassen
 echo "  📃 Hauptseite..."
+# Erst spezielle Import-Pfade ersetzen, bevor allgemeine Ersetzung
+sed -i "s|@/components/applications/|@/components/$ENTITY_NAME/|g" "client/src/app/[lang]/$ENTITY_NAME/page.tsx"
+# Dann andere Ersetzungen
 sed -i "s/Application/${ENTITY_NAME_SINGULAR_UPPER}/g" "client/src/app/[lang]/$ENTITY_NAME/page.tsx"
 sed -i "s/application/$ENTITY_NAME_SINGULAR/g" "client/src/app/[lang]/$ENTITY_NAME/page.tsx"
 sed -i "s/applications/$ENTITY_NAME/g" "client/src/app/[lang]/$ENTITY_NAME/page.tsx"
