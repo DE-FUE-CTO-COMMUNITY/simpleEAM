@@ -1,18 +1,5 @@
 'use client'
 
-import React from 'react'
-import { useTranslations } from 'next-intl'
-import { useForm } from '@tanstack/react-form'
-import { zodValidator } from '@tanstack/zod-form-adapter'
-import GenericForm from '../common/GenericForm'
-import { GenericFormProps } from '../common/GenericFormProps'
-import { {{ENTITY_SINGULAR_UPPER}}FormValues, {{ENTITY_SINGULAR}}FormSchema, {{ENTITY_SINGULAR_UPPER}}Type } from './types'
-
-// Standardisiertes Interface für {{ENTITY_NAME_UPPER}}Form
-type {{ENTITY_NAME_UPPER}}FormProps = GenericFormProps<{{ENTITY_SINGULAR_UPPER}}Type, {{ENTITY_SINGULAR_UPPER}}FormValues>
-
-'use client'
-
 import React, { useEffect } from 'react'
 import { useForm } from '@tanstack/react-form'
 import { useTranslations } from 'next-intl'
@@ -22,7 +9,7 @@ import { {{ENTITY_SINGULAR_UPPER}}Type } from './types'
 import { GET_PERSONS } from '@/graphql/person'
 import { useCurrentPerson } from '@/hooks/useCurrentPerson'
 import GenericForm, { FieldConfig, TabConfig } from '../common/GenericForm'
-import { isArchitect } from '@/lib/auth'
+import { GenericFormProps } from '../common/GenericFormProps'
 
 // Schema für die Formularvalidierung
 export const {{ENTITY_SINGULAR}}Schema = z.object({
@@ -106,13 +93,13 @@ const {{ENTITY_NAME_UPPER}}Form: React.FC<
       label: t('form.name'),
       type: 'text',
       required: true,
-      validation: {
-        onChange: ({ value }) => {
+      validators: {
+        onChange: ({ value }: { value: string }) => {
           if (!value || value.length < 3) {
-            return tForms('name.minLength', { min: 3 })
+            return 'Der Name muss mindestens 3 Zeichen lang sein'
           }
           if (value.length > 100) {
-            return tForms('name.maxLength', { max: 100 })
+            return 'Der Name darf maximal 100 Zeichen lang sein'
           }
           return undefined
         },
@@ -123,13 +110,13 @@ const {{ENTITY_NAME_UPPER}}Form: React.FC<
       label: t('form.description'),
       type: 'textarea',
       required: true,
-      validation: {
-        onChange: ({ value }) => {
+      validators: {
+        onChange: ({ value }: { value: string }) => {
           if (!value || value.length < 10) {
-            return tForms('description.minLength', { min: 10 })
+            return 'Die Beschreibung muss mindestens 10 Zeichen lang sein'
           }
           if (value.length > 1000) {
-            return tForms('description.maxLength', { max: 1000 })
+            return 'Die Beschreibung darf maximal 1000 Zeichen lang sein'
           }
           return undefined
         },
@@ -140,11 +127,9 @@ const {{ENTITY_NAME_UPPER}}Form: React.FC<
 
   // Tab-Konfigurationen (falls mehrere Tabs benötigt werden)
   const tabConfigs: TabConfig[] = [
-    {
-      label: t('tabs.general'),
-      fields: ['name', 'description'],
-    },
+    { id: 'general', label: t('tabs.general') },
     // TODO: Weitere Tabs hinzufügen falls benötigt
+    // { id: 'relationships', label: t('tabs.relationships') },
   ]
 
   return (
@@ -152,7 +137,7 @@ const {{ENTITY_NAME_UPPER}}Form: React.FC<
       form={form}
       isOpen={isOpen}
       onClose={onClose}
-      onDelete={onDelete}
+      onDelete={ {{ENTITY_SINGULAR}}?.id && onDelete ? () => onDelete({{ENTITY_SINGULAR}}.id) : undefined}
       mode={mode}
       loading={loading || personLoading}
       onEditMode={onEditMode}
