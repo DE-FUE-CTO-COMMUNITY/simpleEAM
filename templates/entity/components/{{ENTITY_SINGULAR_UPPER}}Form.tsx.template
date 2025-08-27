@@ -11,68 +11,165 @@ import { {{ENTITY_SINGULAR_UPPER}}FormValues, {{ENTITY_SINGULAR}}FormSchema, {{E
 // Standardisiertes Interface für {{ENTITY_NAME_UPPER}}Form
 type {{ENTITY_NAME_UPPER}}FormProps = GenericFormProps<{{ENTITY_SINGULAR_UPPER}}Type, {{ENTITY_SINGULAR_UPPER}}FormValues>
 
-export function {{ENTITY_NAME_UPPER}}Form({
-  data: {{ENTITY_SINGULAR}}, // Standardisierte Prop
-  mode,
+'use client'
+
+import React, { useEffect } from 'react'
+import { useForm } from '@tanstack/react-form'
+import { useTranslations } from 'next-intl'
+import { z } from 'zod'
+import { useQuery } from '@apollo/client'
+import { {{ENTITY_SINGULAR_UPPER}}Type } from './types'
+import { GET_PERSONS } from '@/graphql/person'
+import { useCurrentPerson } from '@/hooks/useCurrentPerson'
+import GenericForm, { FieldConfig, TabConfig } from '../common/GenericForm'
+import { isArchitect } from '@/lib/auth'
+
+// Schema für die Formularvalidierung
+export const {{ENTITY_SINGULAR}}Schema = z.object({
+  name: z
+    .string()
+    .min(3, 'Der Name muss mindestens 3 Zeichen lang sein')
+    .max(100, 'Der Name darf maximal 100 Zeichen lang sein'),
+  description: z
+    .string()
+    .min(10, 'Die Beschreibung muss mindestens 10 Zeichen lang sein')
+    .max(1000, 'Die Beschreibung darf maximal 1000 Zeichen lang sein'),
+  // TODO: Weitere entity-spezifische Felder hinzufügen
+})
+
+// TypeScript Typen basierend auf dem Schema
+export type {{ENTITY_SINGULAR_UPPER}}FormValues = z.infer<typeof {{ENTITY_SINGULAR}}Schema>
+
+import { GenericFormProps } from '../common/GenericFormProps'
+
+const {{ENTITY_NAME_UPPER}}Form: React.FC<
+  GenericFormProps<{{ENTITY_SINGULAR_UPPER}}Type, {{ENTITY_SINGULAR_UPPER}}FormValues>
+> = ({
+  data: {{ENTITY_SINGULAR}},
   isOpen,
   onClose,
   onSubmit,
   onDelete,
+  mode,
   loading = false,
   onEditMode,
-  ...otherProps
-}: {{ENTITY_NAME_UPPER}}FormProps) {
+}) => {
   const t = useTranslations('{{ENTITY_NAME}}')
-  
+  const tCommon = useTranslations('common')
+  const tForms = useTranslations('forms.validation')
+
+  // Aktuellen Benutzer als Standard-Owner abrufen
+  const { currentPerson } = useCurrentPerson()
+
+  // Personen laden (falls benötigt)
+  const { data: personData, loading: personLoading } = useQuery(GET_PERSONS)
+
+  // Formulardaten mit useMemo initialisieren
+  const defaultValues = React.useMemo<{{ENTITY_SINGULAR_UPPER}}FormValues>(
+    () => ({
+      name: '',
+      description: '',
+      // TODO: Weitere Standardwerte hinzufügen
+    }),
+    [currentPerson?.id]
+  )
+
+  // TanStack Form konfigurieren
   const form = useForm({
-    defaultValues: {
-      name: {{ENTITY_SINGULAR}}?.name ?? '',
-      description: {{ENTITY_SINGULAR}}?.description ?? '',
-      // TODO: Weitere Default-Werte hinzufügen
-    } as {{ENTITY_SINGULAR_UPPER}}FormValues,
-    validatorAdapter: zodValidator(),
-    validators: {
-      onChange: {{ENTITY_SINGULAR}}FormSchema,
-    },
+    defaultValues,
     onSubmit: async ({ value }) => {
-      await onSubmit(value)
+      if (onSubmit) {
+        // Bereinige alle Werte vor der Übermittlung
+        const submissionData = {
+          ...value,
+          name: value.name || '',
+          description: value.description || '',
+        }
+        await onSubmit(submissionData)
+      }
     },
   })
 
-  const formSections = [
+  // Formulardaten aktualisieren, wenn sich die Entity ändert
+  useEffect(() => {
+    if ({{ENTITY_SINGULAR}}) {
+      form.setFieldValue('name', {{ENTITY_SINGULAR}}.name || '')
+      form.setFieldValue('description', {{ENTITY_SINGULAR}}.description || '')
+      // TODO: Weitere Felder setzen
+    }
+  }, [{{ENTITY_SINGULAR}}, form])
+
+  // Feldkonfigurationen definieren
+  const fieldConfigs: FieldConfig[] = [
     {
-      title: t('form.tabs.basic'),
-      fields: [
-        {
-          name: 'name' as keyof {{ENTITY_SINGULAR_UPPER}}FormValues,
-          label: t('form.name'),
-          placeholder: t('form.namePlaceholder'),
-          type: 'text' as const,
-          required: true,
+      name: 'name',
+      label: t('form.name'),
+      type: 'text',
+      required: true,
+      validation: {
+        onChange: ({ value }) => {
+          if (!value || value.length < 3) {
+            return tForms('name.minLength', { min: 3 })
+          }
+          if (value.length > 100) {
+            return tForms('name.maxLength', { max: 100 })
+          }
+          return undefined
         },
-        {
-          name: 'description' as keyof {{ENTITY_SINGULAR_UPPER}}FormValues,
-          label: t('form.description'),
-          placeholder: t('form.descriptionPlaceholder'),
-          type: 'textarea' as const,
-          rows: 3,
-        },
-        // TODO: Weitere Felder hinzufügen
-      ],
+      },
     },
-    // TODO: Weitere Tabs/Sections hinzufügen
+    {
+      name: 'description',
+      label: t('form.description'),
+      type: 'textarea',
+      required: true,
+      validation: {
+        onChange: ({ value }) => {
+          if (!value || value.length < 10) {
+            return tForms('description.minLength', { min: 10 })
+          }
+          if (value.length > 1000) {
+            return tForms('description.maxLength', { max: 1000 })
+          }
+          return undefined
+        },
+      },
+    },
+    // TODO: Weitere Feldkonfigurationen hinzufügen
+  ]
+
+  // Tab-Konfigurationen (falls mehrere Tabs benötigt werden)
+  const tabConfigs: TabConfig[] = [
+    {
+      label: t('tabs.general'),
+      fields: ['name', 'description'],
+    },
+    // TODO: Weitere Tabs hinzufügen falls benötigt
   ]
 
   return (
     <GenericForm
       form={form}
-      sections={formSections}
-      onCancel={onClose}
-      isViewMode={mode === 'view'}
-      submitLabel={t('actions.save')}
-      cancelLabel={t('actions.cancel')}
-      // Weitere Props weiterleiten
-      {...otherProps}
+      isOpen={isOpen}
+      onClose={onClose}
+      onDelete={onDelete}
+      mode={mode}
+      loading={loading || personLoading}
+      onEditMode={onEditMode}
+      title={
+        mode === 'create'
+          ? t('createTitle')
+          : mode === 'edit'
+          ? t('editTitle')
+          : t('viewTitle')
+      }
+      fieldConfigs={fieldConfigs}
+      tabConfigs={tabConfigs.length > 1 ? tabConfigs : undefined}
+      saveLabel={tCommon('save')}
+      cancelLabel={tCommon('cancel')}
+      editLabel={tCommon('edit')}
+      deleteLabel={tCommon('delete')}
+      deleteConfirmMessage={t('deleteConfirmation')}
     />
   )
 }

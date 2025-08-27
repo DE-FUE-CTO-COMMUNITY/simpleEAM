@@ -2,8 +2,9 @@
 
 import React, { useMemo } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
-import GenericTable from '../common/GenericTable'
-import { {{ENTITY_SINGULAR_UPPER}}Type, {{ENTITY_SINGULAR_UPPER}}FormValues } from './types'
+import { GenericTable } from '../common/GenericTable'
+import { {{ENTITY_SINGULAR_UPPER}}Type } from './types'
+import { {{ENTITY_SINGULAR_UPPER}}FormValues } from './{{ENTITY_SINGULAR_UPPER}}Form'
 import { formatDate } from './utils'
 import {{ENTITY_SINGULAR_UPPER}}Form from './{{ENTITY_SINGULAR_UPPER}}Form'
 import { createColumnHelper } from '@tanstack/react-table'

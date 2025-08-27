@@ -6,12 +6,14 @@
 
 'use client'
 
-import { z } from 'zod'
-import { {{ENTITY_SINGULAR_UPPER}}Type as Generated{{ENTITY_SINGULAR_UPPER}}Type } from '../../gql/generated'
+import {
+  {{ENTITY_SINGULAR_UPPER}} as Generated{{ENTITY_SINGULAR_UPPER}},
+  // TODO: Weitere Enum-Typen importieren (z.B. Category, Status, Priority, etc.)
+} from '../../gql/generated'
 
 // Nutze den generierten Typ als Basis und passe ihn für unsere Komponenten an
 export type {{ENTITY_SINGULAR_UPPER}}Type = Pick<
-  Generated{{ENTITY_SINGULAR_UPPER}}Type,
+  Generated{{ENTITY_SINGULAR_UPPER}},
   | 'id'
   | 'name'
   | 'description'
@@ -20,23 +22,27 @@ export type {{ENTITY_SINGULAR_UPPER}}Type = Pick<
   // TODO: Weitere relevante Felder hinzufügen
 >
 
-// Formular-Validierungsschema mit Zod
-export const {{ENTITY_SINGULAR}}FormSchema = z.object({
-  name: z.string().min(1, 'Name ist erforderlich'),
-  description: z.string().optional(),
-  // TODO: Weitere feldspezifische Validierungen hinzufügen
-})
-
-// Formular-Werte-Typ
-export type {{ENTITY_SINGULAR_UPPER}}FormValues = z.infer<typeof {{ENTITY_SINGULAR}}FormSchema>
-
-// Filter-State für die Suche und Filterung
-export interface {{ENTITY_SINGULAR_UPPER}}FilterState {
-  search: string
-  // TODO: Weitere Filter hinzufügen (z.B. status, category, etc.)
+export interface FilterState {
+  // TODO: Filter-Felder spezifisch für diese Entity definieren
+  // z.B.:
+  // categoryFilter: SomeCategory[]
+  // statusFilter: SomeStatus[]
+  // tagsFilter: string[]
+  descriptionFilter: string
+  // ownerFilter: string
+  // updatedDateRange: [string, string]
+  // isActiveFilter: string | null // 'all', 'true', 'false'
 }
 
-// Standard-Filterwerte
-export const default{{ENTITY_SINGULAR_UPPER}}Filter: {{ENTITY_SINGULAR_UPPER}}FilterState = {
-  search: '',
+export interface FilterProps {
+  filterState: FilterState
+  // TODO: Verfügbare Filter-Optionen hinzufügen
+  // z.B.:
+  // availableCategories: SomeCategory[]
+  // availableStatuses: SomeStatus[]
+  // availableTags: string[]
+  onFilterChange: (newFilter: Partial<FilterState>) => void
+  onResetFilter: () => void
+  onClose: () => void
+  onApply: (activeCount: number) => void
 }
