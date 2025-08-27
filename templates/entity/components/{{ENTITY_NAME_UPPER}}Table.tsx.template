@@ -5,7 +5,7 @@ import { useTranslations, useLocale } from 'next-intl'
 import { GenericTable } from '../common/GenericTable'
 import { {{ENTITY_SINGULAR_UPPER}}Type, {{ENTITY_SINGULAR_UPPER}}FormValues } from './types'
 import { formatDate } from './utils'
-import { {{ENTITY_UPPER}}Form } from './{{ENTITY_UPPER}}Form'
+import { {{ENTITY_NAME_UPPER}}Form } from './{{ENTITY_NAME_UPPER}}Form'
 import { createColumnHelper } from '@tanstack/react-table'
 import { SortingState, VisibilityState } from '@tanstack/react-table'
 import usePersistentColumnVisibility from '../../hooks/usePersistentColumnVisibility'
@@ -24,7 +24,7 @@ export const {{ENTITY_NAME_CONST}}_DEFAULT_COLUMN_VISIBILITY = {
   // TODO: Weitere versteckte Spalten konfigurieren
 } as const
 
-interface {{ENTITY_UPPER}}TableProps {
+interface {{ENTITY_NAME_UPPER}}TableProps {
   id?: string
   {{ENTITY_NAME}}: {{ENTITY_SINGULAR_UPPER}}Type[]
   loading: boolean
@@ -42,7 +42,7 @@ interface {{ENTITY_UPPER}}TableProps {
   ) => void
 }
 
-const {{ENTITY_UPPER}}TableWithGenericTable: React.FC<{{ENTITY_UPPER}}TableProps> = ({
+const {{ENTITY_NAME_UPPER}}TableWithGenericTable: React.FC<{{ENTITY_NAME_UPPER}}TableProps> = ({
   {{ENTITY_NAME}},
   loading,
   globalFilter,
@@ -133,7 +133,7 @@ const {{ENTITY_UPPER}}TableWithGenericTable: React.FC<{{ENTITY_UPPER}}TableProps
       emptyMessage={t('noData')}
       createButtonLabel={t('addNew')}
       entityName={t('title')}
-      FormComponent={ {{ENTITY_UPPER}}Form}
+      FormComponent={ {{ENTITY_NAME_UPPER}}Form}
       getIdFromData={(item: {{ENTITY_SINGULAR_UPPER}}Type) => item.id}
       mapDataToFormValues={mapToFormValues}
       columnVisibility={columnVisibility}
@@ -143,4 +143,4 @@ const {{ENTITY_UPPER}}TableWithGenericTable: React.FC<{{ENTITY_UPPER}}TableProps
   )
 }
 
-export default {{ENTITY_UPPER}}TableWithGenericTable
+export default {{ENTITY_NAME_UPPER}}TableWithGenericTable

@@ -1,5 +1,5 @@
 // Template für Entity Types
-// Platzhalter: {{ENTITY_NAME}}, {{ENTITY_SINGULAR}}, {{ENTITY_UPPER}}, {{ENTITY_SINGULAR_UPPER}}
+// Platzhalter: {{ENTITY_NAME}}, {{ENTITY_SINGULAR}}, {{ENTITY_NAME_UPPER}}, {{ENTITY_SINGULAR_UPPER}}
 
 import { z } from 'zod'
 import { {{ENTITY_SINGULAR_UPPER}} } from '../../gql/generated'

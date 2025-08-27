@@ -1,7 +1,7 @@
 // Template für Entity Types
 // {{ENTITY_NAME}} = plural (companies, capabilities, etc.)
 // {{ENTITY_SINGULAR}} = singular (company, capability, etc.)
-// {{ENTITY_UPPER}} = plural capitalized (Companies, Capabilities, etc.)
+// {{ENTITY_NAME_UPPER}} = plural capitalized (Companies, Capabilities, etc.)
 // {{ENTITY_SINGULAR_UPPER}} = singular capitalized (Company, Capability, etc.)
 // {{ENTITY_GENERATED_TYPE}} = GraphQL generated type (Company, BusinessCapability, etc.)
 

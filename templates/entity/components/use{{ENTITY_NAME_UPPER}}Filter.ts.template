@@ -4,15 +4,15 @@ import { useState, useMemo } from 'react'
 import { {{ENTITY_SINGULAR_UPPER}}Type, {{ENTITY_SINGULAR_UPPER}}FilterState, default{{ENTITY_SINGULAR_UPPER}}Filter } from './types'
 import { matches{{ENTITY_SINGULAR_UPPER}}Filter } from './utils'
 
-interface Use{{ENTITY_UPPER}}FilterProps {
+interface Use{{ENTITY_NAME_UPPER}}FilterProps {
   {{ENTITY_NAME}}: {{ENTITY_SINGULAR_UPPER}}Type[]
 }
 
-export function use{{ENTITY_UPPER}}Filter({ {{ENTITY_NAME}} }: Use{{ENTITY_UPPER}}FilterProps) {
+export function use{{ENTITY_NAME_UPPER}}Filter({ {{ENTITY_NAME}} }: Use{{ENTITY_NAME_UPPER}}FilterProps) {
   const [filter, setFilter] = useState<{{ENTITY_SINGULAR_UPPER}}FilterState>(default{{ENTITY_SINGULAR_UPPER}}Filter)
 
   // Gefilterte {{ENTITY_NAME}}
-  const filtered{{ENTITY_UPPER}} = useMemo(() => {
+  const filtered{{ENTITY_NAME_UPPER}} = useMemo(() => {
     return {{ENTITY_NAME}}.filter({{ENTITY_SINGULAR}} => matches{{ENTITY_SINGULAR_UPPER}}Filter({{ENTITY_SINGULAR}}, filter))
   }, [{{ENTITY_NAME}}, filter])
 
@@ -31,7 +31,7 @@ export function use{{ENTITY_UPPER}}Filter({ {{ENTITY_NAME}} }: Use{{ENTITY_UPPER
   return {
     filter,
     setFilter,
-    filtered{{ENTITY_UPPER}},
+    filtered{{ENTITY_NAME_UPPER}},
     resetFilter,
     setSearchFilter,
     // TODO: Weitere Filter-Setter exportieren

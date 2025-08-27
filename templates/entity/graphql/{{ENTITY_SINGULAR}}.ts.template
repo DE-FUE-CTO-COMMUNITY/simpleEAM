@@ -1,15 +1,15 @@
-// GraphQL Operations für {{ENTITY_UPPER}}
+// GraphQL Operations für {{ENTITY_NAME_UPPER}}
 // {{ENTITY_NAME}} = plural (companies, capabilities, etc.)
 // {{ENTITY_SINGULAR}} = singular (company, capability, etc.)
-// {{ENTITY_UPPER}} = plural capitalized (Companies, Capabilities, etc.)
+// {{ENTITY_NAME_UPPER}} = plural capitalized (Companies, Capabilities, etc.)
 // {{ENTITY_SINGULAR_UPPER}} = singular capitalized (Company, Capability, etc.)
 // {{ENTITY_GENERATED_TYPE}} = GraphQL generated type (Company, BusinessCapability, etc.)
 
 import { gql } from '@apollo/client'
 
 // Query: Alle {{ENTITY_NAME}} abrufen
-export const GET_{{ENTITY_NAME_CONST}} = gql`
-  query Get{{ENTITY_UPPER}} {
+export const GET_{{ENTITY_NAME_UPPER}} = gql`
+  query Get{{ENTITY_NAME_UPPER}} {
     {{ENTITY_NAME}} {
       id
       name

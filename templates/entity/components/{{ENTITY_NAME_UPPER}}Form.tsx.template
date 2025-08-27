@@ -8,12 +8,12 @@ import { GenericForm } from '../common/GenericForm'
 import { GenericFormProps } from '../common/GenericFormProps'
 import { {{ENTITY_SINGULAR_UPPER}}FormValues, {{ENTITY_SINGULAR}}FormSchema, {{ENTITY_SINGULAR_UPPER}}Type } from './types'
 
-// Standardisiertes Interface für {{ENTITY_UPPER}}Form
-interface {{ENTITY_UPPER}}FormProps extends GenericFormProps<{{ENTITY_SINGULAR_UPPER}}Type, {{ENTITY_SINGULAR_UPPER}}FormValues> {
+// Standardisiertes Interface für {{ENTITY_NAME_UPPER}}Form
+interface {{ENTITY_NAME_UPPER}}FormProps extends GenericFormProps<{{ENTITY_SINGULAR_UPPER}}Type, {{ENTITY_SINGULAR_UPPER}}FormValues> {
   // Zusätzliche entity-spezifische Props können hier hinzugefügt werden
 }
 
-export function {{ENTITY_UPPER}}Form({
+export function {{ENTITY_NAME_UPPER}}Form({
   data: {{ENTITY_SINGULAR}}, // Standardisierte Prop
   mode,
   isOpen,
@@ -23,7 +23,7 @@ export function {{ENTITY_UPPER}}Form({
   loading = false,
   onEditMode,
   ...otherProps
-}: {{ENTITY_UPPER}}FormProps) {
+}: {{ENTITY_NAME_UPPER}}FormProps) {
   const t = useTranslations('{{ENTITY_NAME}}')
   
   const form = useForm({

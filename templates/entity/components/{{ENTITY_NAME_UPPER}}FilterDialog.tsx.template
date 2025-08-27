@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl'
 import { GenericFilterDialog } from '../common/GenericFilterDialog'
 import { {{ENTITY_SINGULAR_UPPER}}FilterState, default{{ENTITY_SINGULAR_UPPER}}Filter } from './types'
 
-interface {{ENTITY_UPPER}}FilterDialogProps {
+interface {{ENTITY_NAME_UPPER}}FilterDialogProps {
   open: boolean
   onClose: () => void
   filter: {{ENTITY_SINGULAR_UPPER}}FilterState
@@ -13,13 +13,13 @@ interface {{ENTITY_UPPER}}FilterDialogProps {
   onReset: () => void
 }
 
-export function {{ENTITY_UPPER}}FilterDialog({
+export function {{ENTITY_NAME_UPPER}}FilterDialog({
   open,
   onClose,
   filter,
   onFilterChange,
   onReset,
-}: {{ENTITY_UPPER}}FilterDialogProps) {
+}: {{ENTITY_NAME_UPPER}}FilterDialogProps) {
   const t = useTranslations('{{ENTITY_NAME}}')
 
   const filterSections = [

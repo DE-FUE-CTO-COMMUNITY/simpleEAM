@@ -4,7 +4,7 @@ import React from 'react'
 import { useTranslations } from 'next-intl'
 import { GenericToolbar } from '../common/GenericToolbar'
 
-interface {{ENTITY_UPPER}}ToolbarProps {
+interface {{ENTITY_NAME_UPPER}}ToolbarProps {
   onAdd: () => void
   onFilter: () => void
   onExport?: () => void
@@ -13,14 +13,14 @@ interface {{ENTITY_UPPER}}ToolbarProps {
   activeFiltersCount: number
 }
 
-export function {{ENTITY_UPPER}}Toolbar({
+export function {{ENTITY_NAME_UPPER}}Toolbar({
   onAdd,
   onFilter,
   onExport,
   totalCount,
   filteredCount,
   activeFiltersCount,
-}: {{ENTITY_UPPER}}ToolbarProps) {
+}: {{ENTITY_NAME_UPPER}}ToolbarProps) {
   const t = useTranslations('{{ENTITY_NAME}}')
 
   return (
