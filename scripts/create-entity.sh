@@ -36,6 +36,34 @@ get_english_display_name() {
     echo "$(echo ${entity_name:0:1} | tr '[:lower:]' '[:upper:]')$(echo ${entity_name:1} | tr '[:upper:]' '[:lower:]')"
 }
 
+# Funktion zur korrekten Ableitung der Singular-Form
+get_singular_form() {
+    local entity_name=$1
+    case $entity_name in
+        "companies") echo "company" ;;
+        "organisations") echo "organisation" ;;
+        "projects") echo "project" ;;
+        "contracts") echo "contract" ;;
+        "suppliers") echo "supplier" ;;
+        "customers") echo "customer" ;;
+        "departments") echo "department" ;;
+        "teams") echo "team" ;;
+        "locations") echo "location" ;;
+        "assets") echo "asset" ;;
+        "services") echo "service" ;;
+        "processes") echo "process" ;;
+        "categories") echo "category" ;;
+        "activities") echo "activity" ;;
+        "entities") echo "entity" ;;
+        "facilities") echo "facility" ;;
+        "cities") echo "city" ;;
+        *) 
+            # Fallback: Einfaches Entfernen des 's' am Ende
+            echo "${entity_name%s}"
+            ;;
+    esac
+}
+
 # Parameter prüfen
 if [ $# -lt 1 ]; then
     echo "Verwendung: $0 [entity-name]"
@@ -63,7 +91,7 @@ ENTITY_NAME=$1
 ENTITY_DISPLAY_NAME_DE=$(get_german_display_name $ENTITY_NAME)
 ENTITY_DISPLAY_NAME_EN=$(get_english_display_name $ENTITY_NAME)
 ENTITY_NAME_UPPER=$(echo $ENTITY_NAME | sed 's/^./\U&/')
-ENTITY_NAME_SINGULAR=$(echo $ENTITY_NAME | sed 's/s$//')
+ENTITY_NAME_SINGULAR=$(get_singular_form $ENTITY_NAME)
 ENTITY_NAME_SINGULAR_UPPER=$(echo $ENTITY_NAME_SINGULAR | sed 's/^./\U&/')
 
 echo "🚀 Erstelle neue Entity: $ENTITY_NAME"
@@ -146,108 +174,134 @@ echo "📖 Erstelle Übersetzungen..."
 if ! grep -q "\"$ENTITY_NAME\":" "client/messages/de.json"; then
     echo "  🇩🇪 Deutsche Übersetzungen..."
     
-    # JSON-Block für deutsche Übersetzungen erstellen
-    translation_block_de="\
-  \"$ENTITY_NAME\": {\
-    \"title\": \"$ENTITY_DISPLAY_NAME_DE\",\
-    \"description\": \"Verwalten Sie $ENTITY_DISPLAY_NAME_DE und deren Informationen\",\
-    \"loading\": \"Lade $ENTITY_DISPLAY_NAME_DE...\",\
-    \"addNew\": \"Neue(n) $ENTITY_NAME_SINGULAR erstellen\",\
-    \"editTitle\": \"$ENTITY_NAME_SINGULAR bearbeiten\",\
-    \"createTitle\": \"Neue(n) $ENTITY_NAME_SINGULAR erstellen\",\
-    \"viewTitle\": \"$ENTITY_NAME_SINGULAR Details\",\
-    \"deleteConfirmation\": \"Sind Sie sicher, dass Sie diese(n) $ENTITY_NAME_SINGULAR löschen möchten?\",\
-    \"searchPlaceholder\": \"$ENTITY_DISPLAY_NAME_DE durchsuchen...\",\
-    \"messages\": {\
-      \"loadError\": \"Fehler beim Laden der $ENTITY_DISPLAY_NAME_DE\",\
-      \"createSuccess\": \"$ENTITY_NAME_SINGULAR erfolgreich erstellt\",\
-      \"createError\": \"Fehler beim Erstellen des $ENTITY_NAME_SINGULAR\",\
-      \"updateSuccess\": \"$ENTITY_NAME_SINGULAR erfolgreich aktualisiert\",\
-      \"updateError\": \"Fehler beim Aktualisieren des $ENTITY_NAME_SINGULAR\",\
-      \"deleteSuccess\": \"$ENTITY_NAME_SINGULAR erfolgreich gelöscht\",\
-      \"deleteError\": \"Fehler beim Löschen des $ENTITY_NAME_SINGULAR\"\
-    },\
-    \"actions\": {\
-      \"add\": \"Hinzufügen\",\
-      \"edit\": \"Bearbeiten\",\
-      \"delete\": \"Löschen\",\
-      \"view\": \"Anzeigen\"\
-    },\
-    \"form\": {\
-      \"name\": \"Name\",\
-      \"description\": \"Beschreibung\"\
-    },\
-    \"table\": {\
-      \"headers\": {\
-        \"id\": \"ID\",\
-        \"name\": \"Name\",\
-        \"description\": \"Beschreibung\",\
-        \"createdAt\": \"Erstellt am\",\
-        \"updatedAt\": \"Aktualisiert am\",\
-        \"actions\": \"Aktionen\"\
-      },\
-      \"noData\": \"Keine $ENTITY_DISPLAY_NAME_DE gefunden\",\
-      \"loading\": \"Lade $ENTITY_DISPLAY_NAME_DE...\",\
-      \"search\": \"Suchen...\"\
-    }\
-  },"
+    # Temporäre Datei für korrekte JSON-Formatierung
+    temp_file=$(mktemp)
     
-    # Füge Block vor dem letzten } ein
-    sed -i "$ s/}/  $translation_block_de\n}/" "client/messages/de.json"
+    # Entferne die letzte schließende Klammer
+    head -n -1 "client/messages/de.json" > "$temp_file"
+    
+    # Füge Komma hinzu, falls noch kein Element vorhanden
+    if ! tail -1 "$temp_file" | grep -q ','; then
+        sed -i '$ s/$/,/' "$temp_file"
+    fi
+    
+    # Füge die neuen Übersetzungen hinzu
+    cat >> "$temp_file" << EOF
+  "$ENTITY_NAME": {
+    "title": "$ENTITY_DISPLAY_NAME_DE",
+    "description": "Verwalten Sie $ENTITY_DISPLAY_NAME_DE und deren Informationen",
+    "loading": "Lade $ENTITY_DISPLAY_NAME_DE...",
+    "addNew": "Neue(n) $ENTITY_NAME_SINGULAR erstellen",
+    "editTitle": "$ENTITY_NAME_SINGULAR bearbeiten",
+    "createTitle": "Neue(n) $ENTITY_NAME_SINGULAR erstellen",
+    "viewTitle": "$ENTITY_NAME_SINGULAR Details",
+    "deleteConfirmation": "Sind Sie sicher, dass Sie diese(n) $ENTITY_NAME_SINGULAR löschen möchten?",
+    "searchPlaceholder": "$ENTITY_DISPLAY_NAME_DE durchsuchen...",
+    "messages": {
+      "loadError": "Fehler beim Laden der $ENTITY_DISPLAY_NAME_DE",
+      "createSuccess": "$ENTITY_NAME_SINGULAR erfolgreich erstellt",
+      "createError": "Fehler beim Erstellen des $ENTITY_NAME_SINGULAR",
+      "updateSuccess": "$ENTITY_NAME_SINGULAR erfolgreich aktualisiert",
+      "updateError": "Fehler beim Aktualisieren des $ENTITY_NAME_SINGULAR",
+      "deleteSuccess": "$ENTITY_NAME_SINGULAR erfolgreich gelöscht",
+      "deleteError": "Fehler beim Löschen des $ENTITY_NAME_SINGULAR"
+    },
+    "actions": {
+      "add": "Hinzufügen",
+      "edit": "Bearbeiten",
+      "delete": "Löschen",
+      "view": "Anzeigen"
+    },
+    "form": {
+      "name": "Name",
+      "description": "Beschreibung"
+    },
+    "table": {
+      "headers": {
+        "id": "ID",
+        "name": "Name",
+        "description": "Beschreibung",
+        "createdAt": "Erstellt am",
+        "updatedAt": "Aktualisiert am",
+        "actions": "Aktionen"
+      },
+      "noData": "Keine $ENTITY_DISPLAY_NAME_DE gefunden",
+      "loading": "Lade $ENTITY_DISPLAY_NAME_DE...",
+      "search": "Suchen..."
+    }
+  }
+}
+EOF
+    
+    # Ersetze die originale Datei
+    mv "$temp_file" "client/messages/de.json"
 fi
 
 # Englische Übersetzungen
 if ! grep -q "\"$ENTITY_NAME\":" "client/messages/en.json"; then
     echo "  🇬🇧 Englische Übersetzungen..."
     
-    # JSON-Block für englische Übersetzungen erstellen
-    translation_block_en="\
-  \"$ENTITY_NAME\": {\
-    \"title\": \"$ENTITY_DISPLAY_NAME_EN\",\
-    \"description\": \"Manage $ENTITY_DISPLAY_NAME_EN and their information\",\
-    \"loading\": \"Loading $ENTITY_DISPLAY_NAME_EN...\",\
-    \"addNew\": \"Create new $ENTITY_NAME_SINGULAR\",\
-    \"editTitle\": \"Edit $ENTITY_NAME_SINGULAR\",\
-    \"createTitle\": \"Create new $ENTITY_NAME_SINGULAR\",\
-    \"viewTitle\": \"$ENTITY_NAME_SINGULAR Details\",\
-    \"deleteConfirmation\": \"Are you sure you want to delete this $ENTITY_NAME_SINGULAR?\",\
-    \"searchPlaceholder\": \"Search $ENTITY_DISPLAY_NAME_EN...\",\
-    \"messages\": {\
-      \"loadError\": \"Error loading $ENTITY_DISPLAY_NAME_EN\",\
-      \"createSuccess\": \"$ENTITY_NAME_SINGULAR created successfully\",\
-      \"createError\": \"Error creating $ENTITY_NAME_SINGULAR\",\
-      \"updateSuccess\": \"$ENTITY_NAME_SINGULAR updated successfully\",\
-      \"updateError\": \"Error updating $ENTITY_NAME_SINGULAR\",\
-      \"deleteSuccess\": \"$ENTITY_NAME_SINGULAR deleted successfully\",\
-      \"deleteError\": \"Error deleting $ENTITY_NAME_SINGULAR\"\
-    },\
-    \"actions\": {\
-      \"add\": \"Add\",\
-      \"edit\": \"Edit\",\
-      \"delete\": \"Delete\",\
-      \"view\": \"View\"\
-    },\
-    \"form\": {\
-      \"name\": \"Name\",\
-      \"description\": \"Description\"\
-    },\
-    \"table\": {\
-      \"headers\": {\
-        \"id\": \"ID\",\
-        \"name\": \"Name\",\
-        \"description\": \"Description\",\
-        \"createdAt\": \"Created at\",\
-        \"updatedAt\": \"Updated at\",\
-        \"actions\": \"Actions\"\
-      },\
-      \"noData\": \"No $ENTITY_DISPLAY_NAME_EN found\",\
-      \"loading\": \"Loading $ENTITY_DISPLAY_NAME_EN...\",\
-      \"search\": \"Search...\"\
-    }\
-  },"
+    # Temporäre Datei für korrekte JSON-Formatierung
+    temp_file=$(mktemp)
     
-    # Füge Block vor dem letzten } ein
-    sed -i "$ s/}/  $translation_block_en\n}/" "client/messages/en.json"
+    # Entferne die letzte schließende Klammer
+    head -n -1 "client/messages/en.json" > "$temp_file"
+    
+    # Füge Komma hinzu, falls noch kein Element vorhanden
+    if ! tail -1 "$temp_file" | grep -q ','; then
+        sed -i '$ s/$/,/' "$temp_file"
+    fi
+    
+    # Füge die neuen Übersetzungen hinzu
+    cat >> "$temp_file" << EOF
+  "$ENTITY_NAME": {
+    "title": "$ENTITY_DISPLAY_NAME_EN",
+    "description": "Manage $ENTITY_DISPLAY_NAME_EN and their information",
+    "loading": "Loading $ENTITY_DISPLAY_NAME_EN...",
+    "addNew": "Create new $ENTITY_NAME_SINGULAR",
+    "editTitle": "Edit $ENTITY_NAME_SINGULAR",
+    "createTitle": "Create new $ENTITY_NAME_SINGULAR",
+    "viewTitle": "$ENTITY_NAME_SINGULAR Details",
+    "deleteConfirmation": "Are you sure you want to delete this $ENTITY_NAME_SINGULAR?",
+    "searchPlaceholder": "Search $ENTITY_DISPLAY_NAME_EN...",
+    "messages": {
+      "loadError": "Error loading $ENTITY_DISPLAY_NAME_EN",
+      "createSuccess": "$ENTITY_NAME_SINGULAR created successfully",
+      "createError": "Error creating $ENTITY_NAME_SINGULAR",
+      "updateSuccess": "$ENTITY_NAME_SINGULAR updated successfully",
+      "updateError": "Error updating $ENTITY_NAME_SINGULAR",
+      "deleteSuccess": "$ENTITY_NAME_SINGULAR deleted successfully",
+      "deleteError": "Error deleting $ENTITY_NAME_SINGULAR"
+    },
+    "actions": {
+      "add": "Add",
+      "edit": "Edit",
+      "delete": "Delete",
+      "view": "View"
+    },
+    "form": {
+      "name": "Name",
+      "description": "Description"
+    },
+    "table": {
+      "headers": {
+        "id": "ID",
+        "name": "Name",
+        "description": "Description",
+        "createdAt": "Created at",
+        "updatedAt": "Updated at",
+        "actions": "Actions"
+      },
+      "noData": "No $ENTITY_DISPLAY_NAME_EN found",
+      "loading": "Loading $ENTITY_DISPLAY_NAME_EN...",
+      "search": "Search..."
+    }
+  }
+}
+EOF
+    
+    # Ersetze die originale Datei
+    mv "$temp_file" "client/messages/en.json"
 fi
 
 echo ""
