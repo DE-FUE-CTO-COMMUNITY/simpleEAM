@@ -117,11 +117,11 @@ cp "client/src/graphql/application.ts" "client/src/graphql/$ENTITY_NAME_SINGULAR
 echo "  🧩 Komponenten..."
 cp "client/src/components/applications/types.ts" "client/src/components/$ENTITY_NAME/types.ts"
 cp "client/src/components/applications/utils.ts" "client/src/components/$ENTITY_NAME/utils.ts"
-cp "client/src/components/applications/useApplicationFilter.ts" "client/src/components/$ENTITY_NAME/use${ENTITY_NAME_UPPER}Filter.ts"
-cp "client/src/components/applications/ApplicationForm.tsx" "client/src/components/$ENTITY_NAME/${ENTITY_NAME_UPPER}Form.tsx"
-cp "client/src/components/applications/ApplicationTable.tsx" "client/src/components/$ENTITY_NAME/${ENTITY_NAME_UPPER}Table.tsx"
-cp "client/src/components/applications/ApplicationToolbar.tsx" "client/src/components/$ENTITY_NAME/${ENTITY_NAME_UPPER}Toolbar.tsx"
-cp "client/src/components/applications/ApplicationFilterDialog.tsx" "client/src/components/$ENTITY_NAME/${ENTITY_NAME_UPPER}FilterDialog.tsx"
+cp "client/src/components/applications/useApplicationFilter.ts" "client/src/components/$ENTITY_NAME/use${ENTITY_NAME_SINGULAR_UPPER}Filter.ts"
+cp "client/src/components/applications/ApplicationForm.tsx" "client/src/components/$ENTITY_NAME/${ENTITY_NAME_SINGULAR_UPPER}Form.tsx"
+cp "client/src/components/applications/ApplicationTable.tsx" "client/src/components/$ENTITY_NAME/${ENTITY_NAME_SINGULAR_UPPER}Table.tsx"
+cp "client/src/components/applications/ApplicationToolbar.tsx" "client/src/components/$ENTITY_NAME/${ENTITY_NAME_SINGULAR_UPPER}Toolbar.tsx"
+cp "client/src/components/applications/ApplicationFilterDialog.tsx" "client/src/components/$ENTITY_NAME/${ENTITY_NAME_SINGULAR_UPPER}FilterDialog.tsx"
 
 # Hauptseite kopieren
 echo "  📃 Hauptseite..."
@@ -148,14 +148,14 @@ sed -i "s/application/$ENTITY_NAME_SINGULAR/g" "client/src/components/$ENTITY_NA
 
 # Filter Hook anpassen
 echo "  🔍 Filter Hook..."
-sed -i "s/Application/${ENTITY_NAME_SINGULAR_UPPER}/g" "client/src/components/$ENTITY_NAME/use${ENTITY_NAME_UPPER}Filter.ts"
-sed -i "s/application/$ENTITY_NAME_SINGULAR/g" "client/src/components/$ENTITY_NAME/use${ENTITY_NAME_UPPER}Filter.ts"
-sed -i "s/applications/$ENTITY_NAME/g" "client/src/components/$ENTITY_NAME/use${ENTITY_NAME_UPPER}Filter.ts"
+sed -i "s/Application/${ENTITY_NAME_SINGULAR_UPPER}/g" "client/src/components/$ENTITY_NAME/use${ENTITY_NAME_SINGULAR_UPPER}Filter.ts"
+sed -i "s/application/$ENTITY_NAME_SINGULAR/g" "client/src/components/$ENTITY_NAME/use${ENTITY_NAME_SINGULAR_UPPER}Filter.ts"
+sed -i "s/applications/$ENTITY_NAME/g" "client/src/components/$ENTITY_NAME/use${ENTITY_NAME_SINGULAR_UPPER}Filter.ts"
 
 # Komponenten anpassen
 echo "  🧩 Komponenten..."
 for component in "Form" "Table" "Toolbar" "FilterDialog"; do
-    file="client/src/components/$ENTITY_NAME/${ENTITY_NAME_UPPER}${component}.tsx"
+    file="client/src/components/$ENTITY_NAME/${ENTITY_NAME_SINGULAR_UPPER}${component}.tsx"
     sed -i "s/Application/${ENTITY_NAME_SINGULAR_UPPER}/g" "$file"
     sed -i "s/application/$ENTITY_NAME_SINGULAR/g" "$file"
     sed -i "s/applications/$ENTITY_NAME/g" "$file"
