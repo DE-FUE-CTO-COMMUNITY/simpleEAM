@@ -37,6 +37,7 @@ const {{ENTITY_NAME_UPPER}}Form: React.FC<
   onEditMode,
 }) => {
   const t = useTranslations('{{ENTITY_NAME}}')
+  const tForms = useTranslations('forms')
   const tCommon = useTranslations('common')
 
   // Formulardaten mit useMemo initialisieren
@@ -84,10 +85,10 @@ const {{ENTITY_NAME_UPPER}}Form: React.FC<
       validators: {
         onChange: ({ value }: { value: string }) => {
           if (!value || value.length < 3) {
-            return tCommon('validation.minLength', { count: 3 })
+            return tForms('validation.minLength', { count: 3 })
           }
           if (value.length > 100) {
-            return tCommon('validation.maxLength', { count: 100 })
+            return tForms('validation.maxLength', { count: 100 })
           }
           return undefined
         },
@@ -101,10 +102,10 @@ const {{ENTITY_NAME_UPPER}}Form: React.FC<
       validators: {
         onChange: ({ value }: { value: string }) => {
           if (!value || value.length < 10) {
-            return tCommon('validation.minLength', { count: 10 })
+            return tForms('validation.minLength', { count: 10 })
           }
           if (value.length > 1000) {
-            return tCommon('validation.maxLength', { count: 1000 })
+            return tForms('validation.maxLength', { count: 1000 })
           }
           return undefined
         },
