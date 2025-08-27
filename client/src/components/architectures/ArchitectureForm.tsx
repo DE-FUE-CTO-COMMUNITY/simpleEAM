@@ -29,12 +29,12 @@ import { useDomainLabel, useTypeLabel } from './utils'
 export const architectureSchema = z.object({
   name: z
     .string()
-    .min(3, 'Der Name muss mindestens 3 Zeichen lang sein')
-    .max(100, 'Der Name darf maximal 100 Zeichen lang sein'),
+    .min(3)
+    .max(100),
   description: z
     .string()
-    .min(10, 'Die Beschreibung muss mindestens 10 Zeichen lang sein')
-    .max(1000, 'Die Beschreibung darf maximal 1000 Zeichen lang sein'),
+    .min(10)
+    .max(1000),
   timestamp: z.date({
     required_error: 'Architekturdatum ist erforderlich',
     invalid_type_error: 'Architekturdatum muss ein gültiges Datum sein',
@@ -359,10 +359,10 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
 
   // Tab-Konfiguration für die vier Tabs
   const tabs: TabConfig[] = [
-    { id: 'general', label: t('form.tabs.general') },
-    { id: 'elements', label: t('form.tabs.elements') },
-    { id: 'principles', label: t('form.tabs.principles') },
-    { id: 'diagrams', label: t('form.tabs.diagrams') },
+    { id: 'general', label: t('tabs.general') },
+    { id: 'elements', label: t('tabs.elements') },
+    { id: 'principles', label: t('tabs.principles') },
+    { id: 'diagrams', label: t('tabs.diagrams') },
   ]
 
   // Feldkonfiguration für das generische Formular

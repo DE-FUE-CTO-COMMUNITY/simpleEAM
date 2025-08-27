@@ -420,18 +420,18 @@
     "deleteSuccess": "Architecture successfully deleted",
     "deleteError": "Error deleting architecture",
     "noData": "No architectures found",
+    "tabs": {
+      "general": "General",
+      "elements": "Contained Architecture Elements",
+      "principles": "Architecture Principles",
+      "diagrams": "Diagrams"
+    },
     "form": {
       "title": "Architecture",
       "createTitle": "Create New Architecture",
       "editTitle": "Edit Architecture",
       "viewTitle": "Architecture Details",
       "entityName": "Architecture",
-      "tabs": {
-        "general": "General",
-        "elements": "Contained Architecture Elements",
-        "principles": "Architecture Principles",
-        "diagrams": "Diagrams"
-      },
       "name": "Name",
       "description": "Description",
       "domain": "Domain",

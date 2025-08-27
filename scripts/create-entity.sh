@@ -219,6 +219,9 @@ if ! grep -q "\"$ENTITY_NAME\":" "client/messages/de.json"; then
       "name": "Name",
       "description": "Beschreibung"
     },
+    "tabs": {
+      "general": "Allgemein"
+    },
     "table": {
       "headers": {
         "id": "ID",
@@ -285,6 +288,9 @@ if ! grep -q "\"$ENTITY_NAME\":" "client/messages/en.json"; then
     "form": {
       "name": "Name",
       "description": "Description"
+    },
+    "tabs": {
+      "general": "General"
     },
     "table": {
       "headers": {

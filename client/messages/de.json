@@ -420,18 +420,18 @@
     "deleteSuccess": "Architektur erfolgreich gelöscht",
     "deleteError": "Fehler beim Löschen der Architektur",
     "noData": "Keine Architekturen gefunden",
+    "tabs": {
+      "general": "Allgemein",
+      "elements": "Enthaltene Architekturelemente",
+      "principles": "Architektur-Prinzipien",
+      "diagrams": "Diagramme"
+    },
     "form": {
       "title": "Architektur",
       "createTitle": "Neue Architektur erstellen",
       "editTitle": "Architektur bearbeiten",
       "viewTitle": "Architekturdetails",
       "entityName": "Architektur",
-      "tabs": {
-        "general": "Allgemein",
-        "elements": "Enthaltene Architekturelemente",
-        "principles": "Architektur-Prinzipien",
-        "diagrams": "Diagramme"
-      },
       "name": "Name",
       "description": "Beschreibung",
       "domain": "Domäne",

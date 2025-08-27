@@ -116,9 +116,9 @@ const {{ENTITY_NAME_UPPER}}Form: React.FC<
 
   // Tab-Konfigurationen (falls mehrere Tabs benötigt werden)
   const tabs: TabConfig[] = [
-    { id: 'general', label: t('form.tabs.general') },
+    { id: 'general', label: t('tabs.general') },
     // TODO: Weitere Tabs hinzufügen falls benötigt
-    // { id: 'relationships', label: t('form.tabs.relationships') },
+    // { id: 'relationships', label: t('tabs.relationships') },
   ]
 
   return (
