@@ -12,7 +12,6 @@ import { {{ENTITY_SINGULAR_UPPER}} } from '../../gql/generated'
 // Nutze den generierten Typ als Basis
 export type {{ENTITY_SINGULAR_UPPER}}Type = {{ENTITY_SINGULAR_UPPER}}
   // TODO: Weitere relevante Felder hinzufügen
->
 
 // Formular-Validierungsschema mit Zod
 export const {{ENTITY_SINGULAR}}FormSchema = z.object({
