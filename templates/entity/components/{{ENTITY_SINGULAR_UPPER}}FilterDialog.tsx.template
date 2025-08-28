@@ -7,7 +7,6 @@ import { FilterState } from './types'
 import { countActiveFilters } from './utils'
 
 interface {{ENTITY_NAME_UPPER}}FilterProps {
-  open: boolean
   filterState: FilterState
   onFilterChange: (newFilter: Partial<FilterState>) => void
   onResetFilter: () => void
@@ -16,7 +15,6 @@ interface {{ENTITY_NAME_UPPER}}FilterProps {
 }
 
 export function {{ENTITY_NAME_UPPER}}FilterDialog({
-  open,
   filterState,
   onFilterChange,
   onResetFilter,
@@ -41,15 +39,14 @@ export function {{ENTITY_NAME_UPPER}}FilterDialog({
 
   return (
     <GenericFilterDialog
-      open={open}
-      title={t('filter.title')}
+      title={t('title')}
       filterState={filterState}
       filterFields={filterFields}
       onFilterChange={onFilterChange}
       onResetFilter={onResetFilter}
       onClose={onClose}
       onApply={onApply}
-      countActiveFilters={countActiveFilters}
+      countActiveFilters={countActiveFilters as (filterState: any) => number}
     />
   )
 }

@@ -120,6 +120,7 @@ const {{ENTITY_NAME_UPPER}}Form: React.FC<
       form={form}
       isOpen={isOpen}
       onClose={onClose}
+      onSubmit={() => form.handleSubmit()}
       onDelete={ {{ENTITY_SINGULAR}}?.id && onDelete ? () => onDelete({{ENTITY_SINGULAR}}.id) : undefined}
       mode={mode}
       isLoading={loading}

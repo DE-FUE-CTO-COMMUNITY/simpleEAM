@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useMemo } from 'react'
-import { useTranslations, useLocale } from 'next-intl'
+import { useTranslations } from 'next-intl'
 import { GenericTable } from '../common/GenericTable'
 import { {{ENTITY_SINGULAR_UPPER}}Type } from './types'
 import { {{ENTITY_SINGULAR_UPPER}}FormValues } from './{{ENTITY_SINGULAR_UPPER}}Form'
@@ -27,7 +27,7 @@ export const {{ENTITY_NAME_UPPER}}_DEFAULT_COLUMN_VISIBILITY = {
 
 interface {{ENTITY_SINGULAR_UPPER}}TableProps {
   id?: string
-  {{ENTITY_NAME}}: {{ENTITY_SINGULAR_UPPER}}Type[]
+  {{ENTITY_NAME_LOWER}}: {{ENTITY_SINGULAR_UPPER}}Type[]
   loading: boolean
   globalFilter: string
   sorting: SortingState
@@ -44,7 +44,7 @@ interface {{ENTITY_SINGULAR_UPPER}}TableProps {
 }
 
 const {{ENTITY_SINGULAR_UPPER}}TableWithGenericTable: React.FC<{{ENTITY_SINGULAR_UPPER}}TableProps> = ({
-  {{ENTITY_NAME}},
+  {{ENTITY_NAME_LOWER}},
   loading,
   globalFilter,
   sorting,
@@ -58,7 +58,6 @@ const {{ENTITY_SINGULAR_UPPER}}TableWithGenericTable: React.FC<{{ENTITY_SINGULAR
 }) => {
   const t = useTranslations('{{ENTITY_NAME}}.table')
   const formatDate = useFormatDate()
-  const locale = useLocale()
   const columnHelper = createColumnHelper<{{ENTITY_SINGULAR_UPPER}}Type>()
 
   // Verwende persistente Spaltensichtbarkeit
@@ -129,7 +128,7 @@ const {{ENTITY_SINGULAR_UPPER}}TableWithGenericTable: React.FC<{{ENTITY_SINGULAR
 
   return (
     <GenericTable<{{ENTITY_SINGULAR_UPPER}}Type, {{ENTITY_SINGULAR_UPPER}}FormValues>
-      data={ {{ENTITY_NAME}} }
+      data={ {{ENTITY_NAME_LOWER}} }
       loading={loading}
       globalFilter={globalFilter}
       sorting={sorting}

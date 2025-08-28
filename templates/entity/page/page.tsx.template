@@ -7,7 +7,6 @@ import { Box, Typography } from '@mui/material'
 import { SortingState } from '@tanstack/react-table'
 import {{ENTITY_SINGULAR_UPPER}}Table from '../../../components/{{ENTITY_NAME}}/{{ENTITY_SINGULAR_UPPER}}Table'
 import {{ENTITY_SINGULAR_UPPER}}Toolbar from '../../../components/{{ENTITY_NAME}}/{{ENTITY_SINGULAR_UPPER}}Toolbar'
-import {{ENTITY_SINGULAR_UPPER}}FilterDialog from '../../../components/{{ENTITY_NAME}}/{{ENTITY_SINGULAR_UPPER}}FilterDialog'
 import { use{{ENTITY_SINGULAR_UPPER}}Filter } from '../../../components/{{ENTITY_NAME}}/use{{ENTITY_SINGULAR_UPPER}}Filter'
 import { {{ENTITY_SINGULAR_UPPER}}FormValues } from '../../../components/{{ENTITY_NAME}}/{{ENTITY_SINGULAR_UPPER}}Form'
 import { countActiveFilters } from '../../../components/{{ENTITY_NAME}}/utils'
@@ -16,13 +15,12 @@ import {
   CREATE_{{ENTITY_SINGULAR_UPPER}},
   UPDATE_{{ENTITY_SINGULAR_UPPER}},
   DELETE_{{ENTITY_SINGULAR_UPPER}},
-} from '../../../graphql/{{ENTITY_SINGULAR}}'
+} from '../../../graphql/{{ENTITY_SINGULAR_LOWER}}'
 
 export default function {{ENTITY_NAME_UPPER}}Page() {
   const t = useTranslations('{{ENTITY_NAME}}')
   const [sorting, setSorting] = useState<SortingState>([])
   const [globalFilter, setGlobalFilter] = useState('')
-  const [showFilterDialog, setShowFilterDialog] = useState(false)
 
   // GraphQL Queries & Mutations
   const { data, loading, error, refetch } = useQuery(GET_{{ENTITY_NAME_UPPER}})
@@ -31,9 +29,9 @@ export default function {{ENTITY_NAME_UPPER}}Page() {
   const [delete{{ENTITY_SINGULAR_UPPER}}] = useMutation(DELETE_{{ENTITY_SINGULAR_UPPER}})
 
   // Filter Logic
-  const {{ENTITY_NAME}} = data?.{{ENTITY_NAME}} || []
+  const {{ENTITY_NAME_LOWER}} = data?.{{ENTITY_NAME_LOWER}} || []
   const { filter, setFilter, filtered{{ENTITY_NAME_UPPER}}, resetFilter } = use{{ENTITY_SINGULAR_UPPER}}Filter({
-    {{ENTITY_NAME}},
+    {{ENTITY_NAME_LOWER}},
   })
 
   // Weitere Filterung durch globalen Suchfilter
@@ -102,14 +100,6 @@ export default function {{ENTITY_NAME_UPPER}}Page() {
     // Die GenericTable zeigt automatisch das Formular an
   }
 
-  const handleFilterOpen = () => {
-    setShowFilterDialog(true)
-  }
-
-  const handleFilterClose = () => {
-    setShowFilterDialog(false)
-  }
-
   if (error) {
     return (
       <Box p={3}>
@@ -123,15 +113,21 @@ export default function {{ENTITY_NAME_UPPER}}Page() {
   return (
     <Box>
       <{{ENTITY_SINGULAR_UPPER}}Toolbar
-        onAdd={handleAddNew}
-        onFilter={handleFilterOpen}
-        totalCount={ {{ENTITY_NAME}}.length}
-        filteredCount={final{{ENTITY_NAME_UPPER}}.length}
+        globalFilter={globalFilter}
+        onGlobalFilterChange={setGlobalFilter}
         activeFiltersCount={countActiveFilters(filter)}
+        onFilterClick={() => {
+          // Filter wird über GenericToolbar verwaltet
+        }}
+        onResetFilters={() => {
+          resetFilter()
+          setGlobalFilter('')
+        }}
+        onAddClick={handleAddNew}
       />
 
       <{{ENTITY_SINGULAR_UPPER}}Table
-        {{ENTITY_NAME}}={final{{ENTITY_NAME_UPPER}}}
+        {{ENTITY_NAME_LOWER}}={final{{ENTITY_NAME_UPPER}}}
         loading={loading}
         globalFilter={globalFilter}
         sorting={sorting}
@@ -139,17 +135,6 @@ export default function {{ENTITY_NAME_UPPER}}Page() {
         onCreate{{ENTITY_SINGULAR_UPPER}}={handleCreate}
         onUpdate{{ENTITY_SINGULAR_UPPER}}={handleUpdate}
         onDelete{{ENTITY_SINGULAR_UPPER}}={handleDelete}
-      />
-
-      <{{ENTITY_SINGULAR_UPPER}}FilterDialog
-        open={showFilterDialog}
-        onClose={handleFilterClose}
-        filterState={filter}
-        onFilterChange={setFilter}
-        onResetFilter={resetFilter}
-        onApply={(activeCount) => {
-          console.log(`Applied filters: ${activeCount} active`)
-        }}
       />
     </Box>
   )

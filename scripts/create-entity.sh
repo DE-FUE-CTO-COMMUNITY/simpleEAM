@@ -91,8 +91,10 @@ ENTITY_NAME=$1
 ENTITY_DISPLAY_NAME_DE=$(get_german_display_name $ENTITY_NAME)
 ENTITY_DISPLAY_NAME_EN=$(get_english_display_name $ENTITY_NAME)
 ENTITY_NAME_UPPER=$(echo $ENTITY_NAME | sed 's/^./\U&/')
+ENTITY_NAME_LOWER=$ENTITY_NAME
 ENTITY_NAME_SINGULAR=$(get_singular_form $ENTITY_NAME)
 ENTITY_NAME_SINGULAR_UPPER=$(echo $ENTITY_NAME_SINGULAR | sed 's/^./\U&/')
+ENTITY_NAME_SINGULAR_LOWER=$ENTITY_NAME_SINGULAR
 
 echo "🚀 Erstelle neue Entity: $ENTITY_NAME"
 echo "📁 Entity Name: $ENTITY_NAME"
@@ -159,14 +161,18 @@ echo "  🧩 Komponenten..."
 for component in "Form" "Table" "Toolbar" "FilterDialog"; do
     file="client/src/components/$ENTITY_NAME/${ENTITY_NAME_SINGULAR_UPPER}${component}.tsx"
     sed -i "s/{{ENTITY_NAME}}/$ENTITY_NAME/g" "$file"
+    sed -i "s/{{ENTITY_NAME_LOWER}}/$ENTITY_NAME_LOWER/g" "$file"
     sed -i "s/{{ENTITY_SINGULAR}}/$ENTITY_NAME_SINGULAR/g" "$file"
+    sed -i "s/{{ENTITY_SINGULAR_LOWER}}/$ENTITY_NAME_SINGULAR_LOWER/g" "$file"
     sed -i "s/{{ENTITY_SINGULAR_UPPER}}/$ENTITY_NAME_SINGULAR_UPPER/g" "$file"
     sed -i "s/{{ENTITY_NAME_UPPER}}/$ENTITY_NAME_UPPER/g" "$file"
 done
 
 echo "  📃 Hauptseite..."
 sed -i "s/{{ENTITY_NAME}}/$ENTITY_NAME/g" "client/src/app/[lang]/$ENTITY_NAME/page.tsx"
+sed -i "s/{{ENTITY_NAME_LOWER}}/$ENTITY_NAME_LOWER/g" "client/src/app/[lang]/$ENTITY_NAME/page.tsx"
 sed -i "s/{{ENTITY_SINGULAR}}/$ENTITY_NAME_SINGULAR/g" "client/src/app/[lang]/$ENTITY_NAME/page.tsx"
+sed -i "s/{{ENTITY_SINGULAR_LOWER}}/$ENTITY_NAME_SINGULAR_LOWER/g" "client/src/app/[lang]/$ENTITY_NAME/page.tsx"
 sed -i "s/{{ENTITY_SINGULAR_UPPER}}/$ENTITY_NAME_SINGULAR_UPPER/g" "client/src/app/[lang]/$ENTITY_NAME/page.tsx"
 sed -i "s/{{ENTITY_NAME_UPPER}}/$ENTITY_NAME_UPPER/g" "client/src/app/[lang]/$ENTITY_NAME/page.tsx"
 
@@ -234,6 +240,10 @@ if ! grep -q "\"$ENTITY_NAME\":" "client/messages/de.json"; then
       "noData": "Keine $ENTITY_DISPLAY_NAME_DE gefunden",
       "loading": "Lade $ENTITY_DISPLAY_NAME_DE...",
       "search": "Suchen..."
+    },
+    "states": {
+      "active": "Aktiv",
+      "inactive": "Inaktiv"
     }
   }
 }
@@ -304,6 +314,10 @@ if ! grep -q "\"$ENTITY_NAME\":" "client/messages/en.json"; then
       "noData": "No $ENTITY_DISPLAY_NAME_EN found",
       "loading": "Loading $ENTITY_DISPLAY_NAME_EN...",
       "search": "Search..."
+    },
+    "states": {
+      "active": "Active",
+      "inactive": "Inactive"
     }
   }
 }
