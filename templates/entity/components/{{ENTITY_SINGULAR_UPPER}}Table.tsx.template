@@ -57,6 +57,7 @@ const {{ENTITY_SINGULAR_UPPER}}TableWithGenericTable: React.FC<{{ENTITY_SINGULAR
   onColumnVisibilityChange: _externalOnColumnVisibilityChange,
 }) => {
   const t = useTranslations('{{ENTITY_NAME}}.table')
+  const tEntity = useTranslations('{{ENTITY_NAME}}')
   const formatDate = useFormatDate()
   const columnHelper = createColumnHelper<{{ENTITY_SINGULAR_UPPER}}Type>()
 
@@ -82,16 +83,16 @@ const {{ENTITY_SINGULAR_UPPER}}TableWithGenericTable: React.FC<{{ENTITY_SINGULAR
   const columns = useMemo(
     () => [
       columnHelper.accessor('id', {
-        header: t('id'),
+        header: t('headers.id'),
         cell: info => info.getValue(),
         enableHiding: true,
       }),
       columnHelper.accessor('name', {
-        header: t('name'),
+        header: t('headers.name'),
         cell: info => info.getValue(),
       }),
       columnHelper.accessor('description', {
-        header: t('description'),
+        header: t('headers.description'),
         cell: info => {
           const value = info.getValue()
           return value && value.length > 50 ? `${value.substring(0, 50)}...` : value || '-'
@@ -99,14 +100,14 @@ const {{ENTITY_SINGULAR_UPPER}}TableWithGenericTable: React.FC<{{ENTITY_SINGULAR
       }),
       // TODO: Weitere entity-spezifische Spalten hinzufügen
       columnHelper.accessor('createdAt', {
-        header: t('createdAt'),
+        header: t('headers.createdAt'),
         cell: info => {
           const value = info.getValue()
           return value ? formatDate(value) : '-'
         },
       }),
       columnHelper.accessor('updatedAt', {
-        header: t('updatedAt'),
+        header: t('headers.updatedAt'),
         cell: info => {
           const value = info.getValue()
           return value ? formatDate(value) : '-'
@@ -138,8 +139,8 @@ const {{ENTITY_SINGULAR_UPPER}}TableWithGenericTable: React.FC<{{ENTITY_SINGULAR
       onUpdate={onUpdate{{ENTITY_SINGULAR_UPPER}}}
       onDelete={onDelete{{ENTITY_SINGULAR_UPPER}}}
       emptyMessage={t('noData')}
-      createButtonLabel={t('addNew')}
-      entityName={t('title')}
+      createButtonLabel={tEntity('addNew')}
+      entityName={tEntity('title')}
       FormComponent={ {{ENTITY_SINGULAR_UPPER}}Form}
       getIdFromData={(item: {{ENTITY_SINGULAR_UPPER}}Type) => item.id}
       mapDataToFormValues={mapToFormValues}

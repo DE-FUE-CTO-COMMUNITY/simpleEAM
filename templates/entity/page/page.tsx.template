@@ -39,9 +39,9 @@ export default function {{ENTITY_NAME_UPPER}}Page() {
     if (!globalFilter.trim()) return filtered{{ENTITY_NAME_UPPER}}
     const searchTerm = globalFilter.toLowerCase()
     return filtered{{ENTITY_NAME_UPPER}}.filter(
-      {{ENTITY_SINGULAR}} =>
-        {{ENTITY_SINGULAR}}.name?.toLowerCase().includes(searchTerm) ||
-        {{ENTITY_SINGULAR}}.description?.toLowerCase().includes(searchTerm)
+      {{ENTITY_SINGULAR_LOWER}} =>
+        {{ENTITY_SINGULAR_LOWER}}.name?.toLowerCase().includes(searchTerm) ||
+        {{ENTITY_SINGULAR_LOWER}}.description?.toLowerCase().includes(searchTerm)
     )
   }, [filtered{{ENTITY_NAME_UPPER}}, globalFilter])
 
