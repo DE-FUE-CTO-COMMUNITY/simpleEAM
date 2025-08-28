@@ -9,7 +9,7 @@ import {{ENTITY_SINGULAR_UPPER}}Table from '../../../components/{{ENTITY_NAME}}/
 import {{ENTITY_SINGULAR_UPPER}}Toolbar from '../../../components/{{ENTITY_NAME}}/{{ENTITY_SINGULAR_UPPER}}Toolbar'
 import {{ENTITY_SINGULAR_UPPER}}FilterDialog from '../../../components/{{ENTITY_NAME}}/{{ENTITY_SINGULAR_UPPER}}FilterDialog'
 import { use{{ENTITY_SINGULAR_UPPER}}Filter } from '../../../components/{{ENTITY_NAME}}/use{{ENTITY_SINGULAR_UPPER}}Filter'
-import { {{ENTITY_SINGULAR_UPPER}}FormValues } from '../../../components/{{ENTITY_NAME}}/types'
+import { {{ENTITY_SINGULAR_UPPER}}FormValues } from '../../../components/{{ENTITY_NAME}}/{{ENTITY_SINGULAR_UPPER}}Form'
 import { countActiveFilters } from '../../../components/{{ENTITY_NAME}}/utils'
 import {
   GET_{{ENTITY_NAME_UPPER}},
@@ -144,9 +144,12 @@ export default function {{ENTITY_NAME_UPPER}}Page() {
       <{{ENTITY_SINGULAR_UPPER}}FilterDialog
         open={showFilterDialog}
         onClose={handleFilterClose}
-        filter={filter}
+        filterState={filter}
         onFilterChange={setFilter}
-        onReset={resetFilter}
+        onResetFilter={resetFilter}
+        onApply={(activeCount) => {
+          console.log(`Applied filters: ${activeCount} active`)
+        }}
       />
     </Box>
   )

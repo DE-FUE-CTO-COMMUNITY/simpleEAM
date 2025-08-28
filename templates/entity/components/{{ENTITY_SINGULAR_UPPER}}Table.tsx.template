@@ -5,7 +5,7 @@ import { useTranslations, useLocale } from 'next-intl'
 import { GenericTable } from '../common/GenericTable'
 import { {{ENTITY_SINGULAR_UPPER}}Type } from './types'
 import { {{ENTITY_SINGULAR_UPPER}}FormValues } from './{{ENTITY_SINGULAR_UPPER}}Form'
-import { formatDate } from './utils'
+import { useFormatDate } from './utils'
 import {{ENTITY_SINGULAR_UPPER}}Form from './{{ENTITY_SINGULAR_UPPER}}Form'
 import { createColumnHelper } from '@tanstack/react-table'
 import { SortingState, VisibilityState } from '@tanstack/react-table'
@@ -57,6 +57,7 @@ const {{ENTITY_SINGULAR_UPPER}}TableWithGenericTable: React.FC<{{ENTITY_SINGULAR
   onColumnVisibilityChange: _externalOnColumnVisibilityChange,
 }) => {
   const t = useTranslations('{{ENTITY_NAME}}.table')
+  const formatDate = useFormatDate()
   const locale = useLocale()
   const columnHelper = createColumnHelper<{{ENTITY_SINGULAR_UPPER}}Type>()
 
@@ -100,15 +101,21 @@ const {{ENTITY_SINGULAR_UPPER}}TableWithGenericTable: React.FC<{{ENTITY_SINGULAR
       // TODO: Weitere entity-spezifische Spalten hinzufügen
       columnHelper.accessor('createdAt', {
         header: t('createdAt'),
-        cell: info => formatDate(info.getValue(), locale),
+        cell: info => {
+          const value = info.getValue()
+          return value ? formatDate(value) : '-'
+        },
       }),
       columnHelper.accessor('updatedAt', {
         header: t('updatedAt'),
-        cell: info => formatDate(info.getValue(), locale),
+        cell: info => {
+          const value = info.getValue()
+          return value ? formatDate(value) : '-'
+        },
         enableHiding: true,
       }),
     ],
-    [columnHelper, t, locale]
+    [columnHelper, t, formatDate]
   )
 
   // Mapping von {{ENTITY_SINGULAR_UPPER}}Type zu den erwarteten FormValues für das Formular

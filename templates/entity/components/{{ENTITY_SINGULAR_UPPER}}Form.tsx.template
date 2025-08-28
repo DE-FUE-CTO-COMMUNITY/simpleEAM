@@ -50,18 +50,12 @@ const {{ENTITY_NAME_UPPER}}Form: React.FC<
     []
   )
 
-  // TanStack Form konfigurieren
+    // TanStack Form konfigurieren
   const form = useForm({
     defaultValues,
     onSubmit: async ({ value }) => {
       if (onSubmit) {
-        // Bereinige alle Werte vor der Übermittlung
-        const submissionData = {
-          ...value,
-          name: value.name || '',
-          description: value.description || '',
-        }
-        await onSubmit(submissionData)
+        await onSubmit(value)
       }
     },
   })

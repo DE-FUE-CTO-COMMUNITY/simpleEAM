@@ -1,39 +1,44 @@
 'use client'
 
-import { useState, useMemo } from 'react'
-import { {{ENTITY_SINGULAR_UPPER}}Type, {{ENTITY_SINGULAR_UPPER}}FilterState, default{{ENTITY_SINGULAR_UPPER}}Filter } from './types'
-import { matches{{ENTITY_SINGULAR_UPPER}}Filter } from './utils'
+import { useMemo } from 'react'
+import { {{ENTITY_SINGULAR_UPPER}}Type, FilterState } from './types'
 
 interface Use{{ENTITY_SINGULAR_UPPER}}FilterProps {
   {{ENTITY_NAME}}: {{ENTITY_SINGULAR_UPPER}}Type[]
+  filterState: FilterState
 }
 
-export function use{{ENTITY_SINGULAR_UPPER}}Filter({ {{ENTITY_NAME}} }: Use{{ENTITY_SINGULAR_UPPER}}FilterProps) {
-  const [filter, setFilter] = useState<{{ENTITY_SINGULAR_UPPER}}FilterState>(default{{ENTITY_SINGULAR_UPPER}}Filter)
+export const use{{ENTITY_SINGULAR_UPPER}}Filter = ({ {{ENTITY_NAME}}, filterState }: Use{{ENTITY_SINGULAR_UPPER}}FilterProps) => {
+  const {
+    descriptionFilter,
+    // TODO: Weitere Filter-Properties hier destructuring
+  } = filterState
 
-  // Gefilterte {{ENTITY_NAME}}
-  const filtered{{ENTITY_NAME_UPPER}} = useMemo(() => {
-    return {{ENTITY_NAME}}.filter({{ENTITY_SINGULAR}} => matches{{ENTITY_SINGULAR_UPPER}}Filter({{ENTITY_SINGULAR}}, filter))
-  }, [{{ENTITY_NAME}}, filter])
+  // Filterfunktion für erweiterte Filter
+  const filteredData = useMemo(() => {
+    return {{ENTITY_NAME}}.filter((item: {{ENTITY_SINGULAR_UPPER}}Type) => {
+      // Beschreibungs-Filter
+      if (
+        descriptionFilter &&
+        (!item.description ||
+          !item.description.toLowerCase().includes(descriptionFilter.toLowerCase()))
+      ) {
+        return false
+      }
 
-  // Filter zurücksetzen
-  const resetFilter = () => {
-    setFilter(default{{ENTITY_SINGULAR_UPPER}}Filter)
-  }
+      // TODO: Entity-spezifische Filter-Logik hinzufügen
+      // Beispiel:
+      // if (statusFilter.length > 0 && !statusFilter.includes(item.status)) {
+      //   return false
+      // }
 
-  // Einzelne Filter-Funktionen
-  const setSearchFilter = (search: string) => {
-    setFilter(prev => ({ ...prev, search }))
-  }
+      return true
+    })
+  }, [
+    {{ENTITY_NAME}},
+    descriptionFilter,
+    // TODO: Weitere Filter-Abhängigkeiten hier hinzufügen
+  ])
 
-  // TODO: Weitere spezifische Filter-Setter hinzufügen
-
-  return {
-    filter,
-    setFilter,
-    filtered{{ENTITY_NAME_UPPER}},
-    resetFilter,
-    setSearchFilter,
-    // TODO: Weitere Filter-Setter exportieren
-  }
+  return filteredData
 }

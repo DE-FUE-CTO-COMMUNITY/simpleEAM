@@ -25,7 +25,6 @@ export function {{ENTITY_NAME_UPPER}}Toolbar({
 
   return (
     <GenericToolbar
-      title={t('title')}
       onAdd={onAdd}
       onFilter={onFilter}
       onExport={onExport}

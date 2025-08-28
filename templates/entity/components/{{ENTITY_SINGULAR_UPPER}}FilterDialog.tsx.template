@@ -3,18 +3,20 @@
 import React from 'react'
 import { useTranslations } from 'next-intl'
 import GenericFilterDialog, { FilterField } from '../common/GenericFilterDialog'
-import { {{ENTITY_SINGULAR_UPPER}}FilterState } from './types'
+import { FilterState } from './types'
 import { countActiveFilters } from './utils'
 
 interface {{ENTITY_NAME_UPPER}}FilterProps {
-  filterState: {{ENTITY_SINGULAR_UPPER}}FilterState
-  onFilterChange: (newFilter: Partial<{{ENTITY_SINGULAR_UPPER}}FilterState>) => void
+  open: boolean
+  filterState: FilterState
+  onFilterChange: (newFilter: Partial<FilterState>) => void
   onResetFilter: () => void
   onClose: () => void
   onApply: (activeCount: number) => void
 }
 
 export function {{ENTITY_NAME_UPPER}}FilterDialog({
+  open,
   filterState,
   onFilterChange,
   onResetFilter,
@@ -39,7 +41,8 @@ export function {{ENTITY_NAME_UPPER}}FilterDialog({
 
   return (
     <GenericFilterDialog
-      title={t('title')}
+      open={open}
+      title={t('filter.title')}
       filterState={filterState}
       filterFields={filterFields}
       onFilterChange={onFilterChange}
