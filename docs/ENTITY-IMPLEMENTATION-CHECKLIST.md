@@ -3,7 +3,7 @@
 ## 🚀 Schnellstart
 
 ```bash
-# 1. Script verwenden für automatische Erstellung  
+# 1. Script verwenden für automatische Erstellung
 ./scripts/create-entity.sh companies
 
 # 2. GraphQL Types generieren
@@ -27,7 +27,7 @@ yarn dev
 - [ ] **Ordnerstruktur erstellt**: Alle Verzeichnisse vorhanden?
 - [ ] **Dateien kopiert**: Alle Komponenten-Dateien mit SINGULAR-Namen erstellt?
   - [ ] `CompanyForm.tsx` (nicht `CompaniesForm.tsx`)
-  - [ ] `CompanyTable.tsx` (nicht `CompaniesTable.tsx`)  
+  - [ ] `CompanyTable.tsx` (nicht `CompaniesTable.tsx`)
   - [ ] `CompanyToolbar.tsx` (nicht `CompaniesToolbar.tsx`)
   - [ ] `CompanyFilterDialog.tsx` (nicht `CompaniesFilterDialog.tsx`)
 
@@ -113,38 +113,41 @@ yarn dev
 - [ ] **Permissions**: `isArchitect()` Check für Schreibzugriffe
 - [ ] **Responsive Design**: Layout funktioniert auf allen Geräten
 
-### Phase 7: Übersetzungen
+### Phase 7: Übersetzungen ✅
 
 #### 🇩🇪 messages/de.json
 
-- [ ] **Vollständige Struktur**: Alle Übersetzungsschlüssel vorhanden
-- [ ] **Messages**: Error/Success Messages definiert
-- [ ] **Form Labels**: Alle Formular-Felder übersetzt
-- [ ] **Table Headers**: Alle Spalten-Überschriften
-- [ ] **Actions**: Button-Texte und Aktionen
+- [x] **Vollständige Struktur**: Alle Übersetzungsschlüssel vorhanden
+- [x] **Messages**: Error/Success Messages definiert
+- [x] **Form Labels**: Alle Formular-Felder übersetzt
+- [x] **Table Headers**: Alle Spalten-Überschriften
+- [x] **Actions**: Button-Texte und Aktionen
+- [x] **Filter Texte**: Alle Filter-Placeholder übersetzt
+- [x] **Validierung**: Lokalisierte Fehlermeldungen
 
 #### 🇬🇧 messages/en.json
 
-- [ ] **Konsistenz**: Gleiche Struktur wie deutsche Übersetzungen
-- [ ] **Qualität**: Professionelle englische Übersetzungen
+- [x] **Konsistenz**: Gleiche Struktur wie deutsche Übersetzungen
+- [x] **Qualität**: Professionelle englische Übersetzungen
+- [x] **Vollständigkeit**: Alle deutschen Schlüssel gespiegelt
 
 ### Phase 8: Integration & Testing
 
-#### 🔗 Navigation (optional)
+#### 🔗 Navigation
 
-- [ ] **Menu Integration**: Eintrag in `RootLayout.tsx` hinzugefügt
-- [ ] **Route funktional**: URL `/[lang]/[entity]` erreichbar
-- [ ] **Permissions**: Menu-Eintrag nur für berechtigte Benutzer
+- [x] **Menu Integration**: Eintrag in `RootLayout.tsx` hinzugefügt
+- [x] **Route funktional**: URL `/[lang]/companies` erreichbar
+- [x] **Permissions**: Menu-Eintrag für alle Benutzer sichtbar
 
 #### 🧪 Funktionale Tests
 
-- [ ] **Page Load**: Seite lädt ohne JavaScript-Fehler
-- [ ] **Data Loading**: Daten werden korrekt geladen und angezeigt
-- [ ] **Create**: Neue Entities können erstellt werden
-- [ ] **Edit**: Bestehende Entities können bearbeitet werden
-- [ ] **Delete**: Entities können gelöscht werden (mit Bestätigung)
-- [ ] **Filter**: Alle Filter funktionieren korrekt
-- [ ] **Search**: Globale Suche funktioniert
+- [x] **Page Load**: Seite lädt ohne JavaScript-Fehler
+- [x] **Data Loading**: Daten werden korrekt geladen und angezeigt
+- [x] **Create**: Neue Entities können erstellt werden (CREATE_NEW Button hinzugefügt)
+- [x] **Edit**: Bestehende Entities können bearbeitet werden (Update-Mutation korrigiert)
+- [x] **Delete**: Entities können gelöscht werden (mit Bestätigung)
+- [x] **Filter**: Alle Filter funktionieren korrekt
+- [x] **Search**: Globale Suche funktioniert
 - [ ] **Sorting**: Spalten-Sortierung funktioniert
 - [ ] **Pagination**: Bei vielen Daten funktioniert Pagination
 

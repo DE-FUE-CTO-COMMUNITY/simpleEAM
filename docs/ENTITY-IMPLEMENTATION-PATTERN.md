@@ -15,8 +15,9 @@ Dieses Dokument beschreibt das standardisierte Pattern für die Implementierung 
 Das Script erstellt automatisch alle benötigten Dateien nach dem standardisierten Pattern.
 
 ### Unterstützte Entity-Namen
+
 - companies, organisations, projects, contracts, suppliers, customers
-- departments, teams, locations, assets, services, processes  
+- departments, teams, locations, assets, services, processes
 - Für andere Namen wird automatisch abgeleitet
 
 ## Template-System
@@ -24,12 +25,14 @@ Das Script erstellt automatisch alle benötigten Dateien nach dem standardisiert
 Das System verwendet Template-basierte Generierung mit folgenden Platzhaltern:
 
 - `{{ENTITY_NAME}}` = Plural lowercase (companies, capabilities)
-- `{{ENTITY_SINGULAR}}` = Singular lowercase (company, capability)  
+- `{{ENTITY_SINGULAR}}` = Singular lowercase (company, capability)
 - `{{ENTITY_NAME_UPPER}}` = Plural capitalized (Companies, Capabilities)
 - `{{ENTITY_SINGULAR_UPPER}}` = Singular capitalized (Company, Capability)
 
 ### Dateinamen-Konvention
+
 **WICHTIG:** Alle Komponenten-Dateien verwenden SINGULAR-Namen:
+
 - `CompanyForm.tsx` (nicht `CompaniesForm.tsx`)
 - `CompanyTable.tsx` (nicht `CompaniesTable.tsx`)
 - `CompanyToolbar.tsx` (nicht `CompaniesToolbar.tsx`)
@@ -55,7 +58,7 @@ src/
 ├── graphql/
 │   └── application.ts              # GraphQL Operations
 └── messages/
-    ├── de.json                     # Deutsche Übersetzungen  
+    ├── de.json                     # Deutsche Übersetzungen
     └── en.json                     # Englische Übersetzungen
 ```
 
@@ -404,12 +407,358 @@ yarn build
 - Snippet für Entity-Form
 - Snippet für Entity-Page
 
+## CRUD-Implementierung: Bewährte Patterns
+
+### GraphQL-Mutations: Korrekte Neo4j Syntax
+
+**WICHTIG:** Basierend auf Applications und Companies Erfolg - verwende IMMER diese Patterns:
+
+#### Create Mutation (Funktioniert bewiesenermaßen)
+
+```typescript
+// ✅ RICHTIG - Bewährt bei Applications & Companies
+export const CREATE_ENTITIES = gql`
+  mutation CreateEntities($input: [EntityCreateInput!]!) {
+    createEntities(input: $input) {
+      entities {
+        id
+        name
+        description
+        # ... weitere Felder
+        createdAt
+        updatedAt
+      }
+    }
+  }
+`
+
+// Verwendung im Code:
+await createEntityMutation({
+  variables: { input: [values] }, // WICHTIG: Array für createEntities
+  refetchQueries: [{ query: GET_ENTITIES }],
+})
+```
+
+#### Update Mutation (Applications Pattern - bewährt)
+
+```typescript
+// ✅ RICHTIG - Applications Pattern (funktioniert)
+export const UPDATE_ENTITY = gql`
+  mutation UpdateEntity($id: ID!, $input: EntityUpdateInput!) {
+    updateEntities(where: { id: { eq: $id } }, update: $input) {
+      entities {
+        id
+        name
+        description
+        # ... weitere Felder
+        createdAt
+        updatedAt
+      }
+    }
+  }
+`
+
+// Verwendung im Code:
+await updateEntityMutation({
+  variables: {
+    id: entity.id, // WICHTIG: separate id Parameter
+    input: {
+      // WICHTIG: { field: { set: value } } Struktur für Neo4j
+      name: { set: values.name },
+      description: { set: values.description },
+      // ... weitere Felder mit { set: value }
+    },
+  },
+  refetchQueries: [{ query: GET_ENTITIES }],
+})
+```
+
+### Page-Implementation: Create und Update Patterns
+
+#### Create-Handling (Header Button + Separates Dialog)
+
+```typescript
+const EntitiesPage = () => {
+  // Dialog-States
+  const [showNewEntityForm, setShowNewEntityForm] = useState(false)
+
+  // Create-Handler für Header Button
+  const handleCreateEntity = () => {
+    if (loading || !data?.entities) {
+      enqueueSnackbar('Bitte warten Sie, bis die Daten geladen sind.', { variant: 'info' })
+      return
+    }
+    setShowNewEntityForm(true)
+  }
+
+  return (
+    <Box sx={{ py: 2, px: 1 }}>
+      {/* Header mit Create Button */}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+        <Typography variant="h4" component="h1">
+          {t('title')}
+        </Typography>
+        {isArchitect() && (
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<AddIcon />}
+            onClick={handleCreateEntity}
+          >
+            {t('addNew')}
+          </Button>
+        )}
+      </Box>
+
+      {/* EntityTable OHNE onCreate Prop */}
+      <EntityTable
+        entities={filteredEntities}
+        loading={loading}
+        globalFilter={globalFilter}
+        sorting={sorting}
+        onSortingChange={setSorting}
+        onUpdateEntity={async (entityId, data) => {
+          await handleUpdateEntity({ id: entityId } as EntityType, data)
+        }}
+        onDeleteEntity={async id => {
+          const entity = filteredEntities.find((e: any) => e.id === id)
+          if (entity) {
+            setCurrentEntity(entity)
+            setShowDeleteConfirm(true)
+          }
+        }}
+      />
+
+      {/* Separates Create Form Dialog */}
+      {showNewEntityForm && (
+        <EntityForm
+          isOpen={showNewEntityForm}
+          onClose={() => setShowNewEntityForm(false)}
+          mode="create"
+          onSubmit={async (values: EntityFormValues) => {
+            try {
+              await createEntityMutation({
+                variables: { input: [values] }, // WICHTIG: Array
+                refetchQueries: [{ query: GET_ENTITIES }],
+              })
+              enqueueSnackbar(t('messages.createSuccess'), { variant: 'success' })
+              setShowNewEntityForm(false)
+            } catch (error) {
+              console.error('Fehler beim Erstellen der Entity:', error)
+              enqueueSnackbar(t('messages.createError'), { variant: 'error' })
+            }
+          }}
+        />
+      )}
+    </Box>
+  )
+}
+```
+
+#### Update-Handling (über GenericTable)
+
+```typescript
+const handleUpdateEntity = async (entity: EntityType, values: EntityFormValues) => {
+  console.log('🔄 handleUpdateEntity called with:', { entity: entity.id, values })
+  try {
+    const result = await updateEntityMutation({
+      variables: {
+        id: entity.id, // WICHTIG: separate id Parameter wie Applications
+        input: {
+          // WICHTIG: { field: { set: value } } für Neo4j GraphQL
+          name: { set: values.name },
+          description: { set: values.description },
+          // ... weitere Felder mit { set: value }
+        },
+      },
+      refetchQueries: [{ query: GET_ENTITIES }],
+    })
+    console.log('✅ Update successful:', result)
+    enqueueSnackbar(t('messages.updateSuccess'), { variant: 'success' })
+  } catch (error) {
+    console.error('❌ Fehler beim Aktualisieren der Entity:', error)
+    enqueueSnackbar(t('messages.updateError'), { variant: 'error' })
+  }
+}
+```
+
+#### Delete-Handling (über GenericTable)
+
+```typescript
+// Delete-Handler in Page Component
+const handleDeleteEntity = async (id: string) => {
+  try {
+    await deleteEntityMutation({
+      variables: { id }, // WICHTIG: Applications Pattern mit id Parameter
+      refetchQueries: [{ query: GET_ENTITIES }],
+    })
+    enqueueSnackbar(t('messages.deleteSuccess'), { variant: 'success' })
+  } catch (error) {
+    console.error('❌ Fehler beim Löschen der Entity:', error)
+    enqueueSnackbar(t('messages.deleteError'), { variant: 'error' })
+  }
+}
+
+// JSX: EntityTable mit Delete-Handler
+<EntityTable
+  entities={filteredEntities}
+  loading={loading}
+  globalFilter={globalFilter}
+  sorting={sorting}
+  onSortingChange={setSorting}
+  onUpdateEntity={async (entityId, data) => {
+    await handleUpdateEntity({ id: entityId } as EntityType, data)
+  }}
+  onDeleteEntity={handleDeleteEntity} // WICHTIG: Direkte Weiterleitung
+/>
+```
+
+### Häufige Fehler und Lösungen
+
+#### ❌ Problem: "Variable '$where' got invalid value"
+
+```typescript
+// ❌ FALSCH - führt zu IDScalarFilters Fehlern
+mutation UpdateEntities($where: EntityWhere!, $update: EntityUpdateInput!) {
+  updateEntities(where: $where, update: $update)
+}
+
+// ❌ FALSCH - Delete mit where-Objekt
+mutation DeleteEntities($where: EntityWhere!) {
+  deleteEntities(where: $where) {
+    nodesDeleted
+  }
+}
+
+// ✅ RICHTIG - Applications Pattern verwenden
+mutation UpdateEntity($id: ID!, $input: EntityUpdateInput!) {
+  updateEntities(where: { id: { eq: $id } }, update: $input)
+}
+
+// ✅ RICHTIG - Delete mit direkter ID
+mutation DeleteEntity($id: ID!) {
+  deleteEntities(where: { id: { eq: $id } }) {
+    nodesDeleted
+  }
+}
+```
+
+#### ❌ Problem: "Expected type 'StringScalarMutations' to be an object"
+
+```typescript
+// ❌ FALSCH - direkte Werte
+input: {
+  name: values.name,
+  description: values.description
+}
+
+// ✅ RICHTIG - { set: value } Struktur für Neo4j GraphQL
+input: {
+  name: { set: values.name },
+  description: { set: values.description }
+}
+```
+
+#### ❌ Problem: "Create Button funktioniert nicht"
+
+```typescript
+// ❌ FALSCH - Create über GenericTable (macht Probleme)
+<GenericTable
+  onCreate={...}  // Führt zu onSubmit-Problemen
+/>
+
+// ✅ RICHTIG - Separates Create Dialog wie Applications
+{/* Header Button */}
+<Button onClick={handleCreateEntity}>Create</Button>
+
+{/* Separates Dialog */}
+{showNewEntityForm && (
+  <EntityForm
+    mode="create"
+    onSubmit={async (values) => {
+      await createEntityMutation({ variables: { input: [values] } })
+    }}
+  />
+)}
+```
+
+#### ❌ Problem: "Delete-Dialoge doppelt oder nicht internationalisiert"
+
+```typescript
+// ❌ FALSCH - Manueller Delete-Dialog in Page + GenericForm Delete
+{showDeleteConfirm && (
+  <Paper>
+    <Typography>Löschen bestätigen</Typography> {/* Nicht internationalisiert */}
+    <Button onClick={handleDelete}>Löschen</Button>
+  </Paper>
+)}
+
+// ✅ RICHTIG - Nur GenericTable Delete verwenden
+<EntityTable
+  onDeleteEntity={handleDeleteEntity} // Einfache Weiterleitung
+  // Kein manueller Delete-Dialog nötig!
+/>
+
+// ✅ Delete-Handler in Page
+const handleDeleteEntity = async (id: string) => {
+  await deleteEntityMutation({
+    variables: { id }, // Applications Pattern
+    refetchQueries: [{ query: GET_ENTITIES }],
+  })
+}
+```
+
+### Checkliste für CRUD-Implementation
+
+#### GraphQL Mutations
+
+- [ ] CREATE_ENTITIES mit PLURAL name (`createEntities`)
+- [ ] UPDATE_ENTITY mit Applications Pattern (`$id: ID!`, `{ id: { eq: $id } }`)
+- [ ] DELETE_ENTITY mit Applications Pattern (`$id: ID!`, `{ id: { eq: $id } }`)
+- [ ] Array-Input für Create: `{ input: [values] }`
+- [ ] `{ set: value }` Struktur für Update-Input
+
+#### Page Component
+
+- [ ] Header mit Create Button (nur für Architects)
+- [ ] `handleCreateEntity` für Dialog-Öffnung
+- [ ] `handleUpdateEntity` mit `{ field: { set: value } }` Struktur
+- [ ] `handleDeleteEntity` mit direkter ID-Weiterleitung
+- [ ] Separates Create Form Dialog
+- [ ] EntityTable OHNE `onCreate` Prop
+- [ ] EntityTable MIT `onDeleteEntity` Prop
+
+#### Funktions-Tests
+
+- [ ] Create: Header Button → Dialog → Submit funktioniert
+- [ ] Update: Table Edit → Dialog → Submit funktioniert
+- [ ] Delete: Table Delete → GenericForm Confirmation → Submit funktioniert
+- [ ] Console-Logs zeigen korrekte GraphQL Variablen
+- [ ] Keine "StringScalarMutations" Fehler
+- [ ] Keine "IDScalarFilters" Fehler
+- [ ] Nur ein Delete-Dialog (GenericForm), nicht zwei
+
+### Referenz-Implementierungen
+
+- **Applications:** Vollständig funktionierendes Create/Update Pattern
+- **Companies:** Nach Applications-Pattern korrigiert, funktioniert jetzt
+- **Beide verwenden:** Separates Create Dialog + Applications GraphQL Syntax
+
 ## Fazit
+
+**Für zukünftige Entity-Implementierungen:**
+
+1. **IMMER Applications Pattern verwenden** - es ist bewiesenermaßen funktional
+2. **Separates Create Dialog** - nicht über GenericTable onCreate
+3. **Neo4j GraphQL Syntax beachten** - `{ set: value }` für Updates
+4. **Applications GraphQL Mutations kopieren** - Parameter-Struktur übernehmen
+5. **Diese Dokumentation befolgen** - verhindert wiederkehrende onSubmit-Probleme
 
 Durch die konsequente Verwendung dieses Patterns wird sichergestellt, dass:
 
-1. **Konsistenz**: Alle Entities folgen demselben Aufbau
+1. **Konsistenz**: Alle Entities folgen demselben funktionalen Aufbau
 2. **Wartbarkeit**: Änderungen an Generic-Komponenten wirken sich auf alle Entities aus
-3. **Entwicklungsgeschwindigkeit**: Neue Entities können schnell implementiert werden
-4. **Qualität**: Bewährte Patterns werden wiederverwendet
+3. **Entwicklungsgeschwindigkeit**: Neue Entities können schnell und fehlerfrei implementiert werden
+4. **Qualität**: Bewährte, getestete Patterns werden wiederverwendet
 5. **Dokumentation**: Jede neue Entity ist selbsterklärend durch das bekannte Pattern
+6. **Weniger Debugging**: CRUD-Probleme gehören der Vergangenheit an

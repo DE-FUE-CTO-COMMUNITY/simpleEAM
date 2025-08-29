@@ -26,14 +26,34 @@ export function {{ENTITY_NAME_UPPER}}FilterDialog({
   // Konfiguration der Filterfelder
   const filterFields: FilterField[] = [
     // TODO: Definiere hier die spezifischen Filter-Felder für {{ENTITY_NAME}}
-    // Beispiel:
+    // Beispiele für verschiedene Filter-Typen:
+    // 
+    // Text-Filter:
     // {
-    //   id: 'search',
-    //   label: t('table.search'),
+    //   id: 'nameFilter',
+    //   label: t('form.name'),
     //   type: 'text',
-    //   value: filterState.search || '',
-    //   onChange: (value) => onFilterChange({ search: value }),
     //   placeholder: t('searchPlaceholder'),
+    // },
+    //
+    // Multi-Select Filter:
+    // {
+    //   id: 'statusFilter',
+    //   label: t('form.status'),
+    //   type: 'multiSelect',
+    //   options: availableStatuses.map(status => ({
+    //     value: status,
+    //     label: t(`statuses.${status}`)
+    //   })),
+    // },
+    //
+    // Datum-Bereich Filter:
+    // {
+    //   id: 'createdDateRange',
+    //   label: 'Erstellungsdatum',
+    //   type: 'dateRange',
+    //   fromLabel: 'Von',
+    //   toLabel: 'Bis',
     // },
   ]
 

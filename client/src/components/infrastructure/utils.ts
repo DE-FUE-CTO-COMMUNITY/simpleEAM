@@ -57,7 +57,7 @@ export const getInfrastructureStatusLabel = (status: InfrastructureStatus): stri
 // Berechnet die Anzahl der aktiven Filter
 export const countActiveFilters = (filterState: any): number => {
   if (!filterState) return 0
-  
+
   const {
     statusFilter = [],
     typeFilter = [],

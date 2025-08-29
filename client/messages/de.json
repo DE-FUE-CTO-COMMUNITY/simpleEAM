@@ -52,15 +52,12 @@
     "architecturePrinciples": "Architektur Prinzipien",
     "businessCapabilities": "Business Capabilities",
     "applications": "Applikationen",
+    "companies": "Unternehmen",
     "dataObjects": "Datenobjekte",
     "interfaces": "Schnittstellen",
     "infrastructure": "Infrastruktur",
     "persons": "Personen",
     "importExport": "Import/Export",
-    "capabilities": "Capabilities",
-    "processes": "Prozesse",
-    "technologies": "Technologien",
-    "data": "Daten",
     "organizations": "Organisationen",
     "diagrams": "Diagramme",
     "administration": "Administration"
@@ -1612,6 +1609,111 @@
       "elementType": "Element-Typ",
       "name": "Name",
       "noElementSelected": "Kein Element selektiert"
+    }
+  },
+  "companies": {
+    "title": "Unternehmen",
+    "description": "Verwalten Sie Unternehmen und deren Informationen",
+    "loading": "Lade Unternehmen...",
+    "addNew": "Neues Unternehmen erstellen",
+    "editTitle": "Unternehmen bearbeiten",
+    "createTitle": "Neues Unternehmen erstellen",
+    "viewTitle": "Unternehmen Details",
+    "deleteConfirmation": "Sind Sie sicher, dass Sie dieses Unternehmen löschen möchten?",
+    "searchPlaceholder": "Unternehmen durchsuchen...",
+    "noData": "Keine Unternehmen gefunden",
+    "messages": {
+      "loadError": "Fehler beim Laden der Unternehmen",
+      "createSuccess": "Unternehmen erfolgreich erstellt",
+      "createError": "Fehler beim Erstellen des Unternehmens",
+      "updateSuccess": "Unternehmen erfolgreich aktualisiert",
+      "updateError": "Fehler beim Aktualisieren des Unternehmens",
+      "deleteSuccess": "Unternehmen erfolgreich gelöscht",
+      "deleteError": "Fehler beim Löschen des Unternehmens"
+    },
+    "actions": {
+      "add": "Hinzufügen",
+      "edit": "Bearbeiten",
+      "delete": "Löschen",
+      "view": "Anzeigen"
+    },
+    "form": {
+      "name": "Name",
+      "description": "Beschreibung",
+      "address": "Adresse",
+      "industry": "Branche",
+      "website": "Website",
+      "size": "Größe",
+      "validation": {
+        "nameMin": "Name muss mindestens 3 Zeichen haben",
+        "nameMax": "Name darf maximal 100 Zeichen haben",
+        "descriptionMin": "Beschreibung muss mindestens 10 Zeichen haben",
+        "descriptionMax": "Beschreibung darf maximal 1000 Zeichen haben",
+        "addressMax": "Adresse darf maximal 500 Zeichen haben",
+        "industryMax": "Branche darf maximal 100 Zeichen haben",
+        "websiteInvalid": "Bitte eine gültige URL eingeben"
+      }
+    },
+    "tabs": {
+      "general": "Allgemein"
+    },
+    "headers": {
+      "id": "ID",
+      "name": "Name",
+      "description": "Beschreibung",
+      "address": "Adresse",
+      "industry": "Branche",
+      "website": "Website",
+      "size": "Größe",
+      "createdAt": "Erstellt am",
+      "updatedAt": "Aktualisiert am",
+      "actions": "Aktionen"
+    },
+    "table": {
+      "headers": {
+        "id": "ID",
+        "name": "Name",
+        "description": "Beschreibung",
+        "address": "Adresse",
+        "industry": "Branche",
+        "website": "Website",
+        "size": "Größe",
+        "createdAt": "Erstellt am",
+        "updatedAt": "Aktualisiert am",
+        "actions": "Aktionen"
+      },
+      "noData": "Keine Unternehmen gefunden",
+      "loading": "Lade Unternehmen...",
+      "search": "Suchen..."
+    },
+    "states": {
+      "active": "Aktiv",
+      "inactive": "Inaktiv"
+    },
+    "sizes": {
+      "startup": "Startup",
+      "small": "Klein",
+      "medium": "Mittel",
+      "large": "Groß",
+      "enterprise": "Unternehmen",
+      "multinational": "Multinational"
+    },
+    "filter": {
+      "title": "Filter für Unternehmen",
+      "reset": "Filter zurücksetzen",
+      "apply": "Anwenden",
+      "industry": "Branche",
+      "size": "Größe",
+      "createdAt": "Erstellt am",
+      "updatedAt": "Aktualisiert am",
+      "descriptionPlaceholder": "Beschreibung filtern...",
+      "industryPlaceholder": "Branche filtern...",
+      "addressPlaceholder": "Adresse filtern...",
+      "websitePlaceholder": "Website filtern...",
+      "createdAtLabel": "Erstellungsdatum",
+      "updatedAtLabel": "Aktualisierungsdatum",
+      "fromLabel": "Von",
+      "toLabel": "Bis"
     }
   }
 }

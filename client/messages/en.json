@@ -52,6 +52,7 @@
     "architecturePrinciples": "Architecture Principles",
     "businessCapabilities": "Business Capabilities",
     "applications": "Applications",
+    "companies": "Companies",
     "dataObjects": "Data Objects",
     "interfaces": "Interfaces",
     "infrastructure": "Infrastructure",
@@ -1616,6 +1617,111 @@
       "elementType": "Element Type",
       "name": "Name",
       "noElementSelected": "No element selected"
+    }
+  },
+  "companies": {
+    "title": "Companies",
+    "description": "Manage companies and their information",
+    "loading": "Loading companies...",
+    "addNew": "Create new company",
+    "editTitle": "Edit company",
+    "createTitle": "Create new company",
+    "viewTitle": "Company details",
+    "deleteConfirmation": "Are you sure you want to delete this company?",
+    "searchPlaceholder": "Search companies...",
+    "noData": "No companies found",
+    "messages": {
+      "loadError": "Error loading companies",
+      "createSuccess": "Company created successfully",
+      "createError": "Error creating company",
+      "updateSuccess": "Company updated successfully",
+      "updateError": "Error updating company",
+      "deleteSuccess": "Company deleted successfully",
+      "deleteError": "Error deleting company"
+    },
+    "actions": {
+      "add": "Add",
+      "edit": "Edit",
+      "delete": "Delete",
+      "view": "View"
+    },
+    "form": {
+      "name": "Name",
+      "description": "Description",
+      "address": "Address",
+      "industry": "Industry",
+      "website": "Website",
+      "size": "Size",
+      "validation": {
+        "nameMin": "Name must be at least 3 characters long",
+        "nameMax": "Name must not exceed 100 characters",
+        "descriptionMin": "Description must be at least 10 characters long",
+        "descriptionMax": "Description must not exceed 1000 characters",
+        "addressMax": "Address must not exceed 500 characters",
+        "industryMax": "Industry must not exceed 100 characters",
+        "websiteInvalid": "Please enter a valid URL"
+      }
+    },
+    "tabs": {
+      "general": "General"
+    },
+    "headers": {
+      "id": "ID",
+      "name": "Name",
+      "description": "Description",
+      "address": "Address",
+      "industry": "Industry",
+      "website": "Website",
+      "size": "Size",
+      "createdAt": "Created at",
+      "updatedAt": "Updated at",
+      "actions": "Actions"
+    },
+    "table": {
+      "headers": {
+        "id": "ID",
+        "name": "Name",
+        "description": "Description",
+        "address": "Address",
+        "industry": "Industry",
+        "website": "Website",
+        "size": "Size",
+        "createdAt": "Created at",
+        "updatedAt": "Updated at",
+        "actions": "Actions"
+      },
+      "noData": "No companies found",
+      "loading": "Loading companies...",
+      "search": "Search..."
+    },
+    "states": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "sizes": {
+      "startup": "Startup",
+      "small": "Small",
+      "medium": "Medium",
+      "large": "Large",
+      "enterprise": "Enterprise",
+      "multinational": "Multinational"
+    },
+    "filter": {
+      "title": "Filter for companies",
+      "reset": "Reset filters",
+      "apply": "Apply",
+      "industry": "Industry",
+      "size": "Size",
+      "createdAt": "Created at",
+      "updatedAt": "Updated at",
+      "descriptionPlaceholder": "Filter by description...",
+      "industryPlaceholder": "Filter by industry...",
+      "addressPlaceholder": "Filter by address...",
+      "websitePlaceholder": "Filter by website...",
+      "createdAtLabel": "Created on",
+      "updatedAtLabel": "Updated on",
+      "fromLabel": "From",
+      "toLabel": "To"
     }
   }
 }

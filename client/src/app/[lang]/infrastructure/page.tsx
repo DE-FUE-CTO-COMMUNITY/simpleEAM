@@ -31,9 +31,10 @@ export default function InfrastructuresPage() {
 
   // Filter Logic
   const infrastructures = data?.infrastructures || []
-  const { filterState, setFilterState, filteredInfrastructures, resetFilters } = useInfrastructureFilter({
-    infrastructures,
-  })
+  const { filterState, setFilterState, filteredInfrastructures, resetFilters } =
+    useInfrastructureFilter({
+      infrastructures,
+    })
 
   // Weitere Filterung durch globalen Suchfilter
   const finalInfrastructures = useMemo(() => {
@@ -71,29 +72,41 @@ export default function InfrastructuresPage() {
             endOfLifeDate: data.endOfLifeDate || null,
             ...(data.parentInfrastructure && {
               parentInfrastructure: {
-                connect: { where: { node: { id: data.parentInfrastructure } } }
-              }
+                connect: { where: { node: { id: data.parentInfrastructure } } },
+              },
             }),
-            ...(data.childInfrastructures && data.childInfrastructures.length > 0 && {
-              childInfrastructures: {
-                connect: data.childInfrastructures.map((id: string) => ({ where: { node: { id } } }))
-              }
-            }),
-            ...(data.hostsApplications && data.hostsApplications.length > 0 && {
-              hostsApplications: {
-                connect: data.hostsApplications.map((id: string) => ({ where: { node: { id } } }))
-              }
-            }),
-            ...(data.partOfArchitectures && data.partOfArchitectures.length > 0 && {
-              partOfArchitectures: {
-                connect: data.partOfArchitectures.map((id: string) => ({ where: { node: { id } } }))
-              }
-            }),
-            ...(data.depictedInDiagrams && data.depictedInDiagrams.length > 0 && {
-              depictedInDiagrams: {
-                connect: data.depictedInDiagrams.map((id: string) => ({ where: { node: { id } } }))
-              }
-            }),
+            ...(data.childInfrastructures &&
+              data.childInfrastructures.length > 0 && {
+                childInfrastructures: {
+                  connect: data.childInfrastructures.map((id: string) => ({
+                    where: { node: { id } },
+                  })),
+                },
+              }),
+            ...(data.hostsApplications &&
+              data.hostsApplications.length > 0 && {
+                hostsApplications: {
+                  connect: data.hostsApplications.map((id: string) => ({
+                    where: { node: { id } },
+                  })),
+                },
+              }),
+            ...(data.partOfArchitectures &&
+              data.partOfArchitectures.length > 0 && {
+                partOfArchitectures: {
+                  connect: data.partOfArchitectures.map((id: string) => ({
+                    where: { node: { id } },
+                  })),
+                },
+              }),
+            ...(data.depictedInDiagrams &&
+              data.depictedInDiagrams.length > 0 && {
+                depictedInDiagrams: {
+                  connect: data.depictedInDiagrams.map((id: string) => ({
+                    where: { node: { id } },
+                  })),
+                },
+              }),
           },
         },
       })

@@ -10,6 +10,7 @@ import {
   AccountTree as DiagramIcon,
   Rule as RuleIcon,
   Settings as SettingsIcon,
+  Business as CompanyIcon,
 } from '@mui/icons-material'
 import {
   BusinessCapabilityIcon,
@@ -85,6 +86,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
     { text: t('interfaces'), icon: <ApplicationInterfaceIcon />, href: '/interfaces' },
     { text: t('infrastructure'), icon: <InfrastructureIcon />, href: '/infrastructure' },
     { isDivider: true, text: 'divider', icon: null },
+    { text: t('companies'), icon: <CompanyIcon />, href: '/companies' },
     { text: t('persons'), icon: <PersonIcon />, href: '/persons' },
     // Import/Export für Admin- und Architect-Benutzer (Hydration-Fix: nur wenn initialisiert)
     ...(initialized && (isAdmin() || isArchitect())
