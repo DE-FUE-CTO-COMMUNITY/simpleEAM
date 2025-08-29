@@ -1,33 +1,56 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { {{ENTITY_SINGULAR_UPPER}}Type, FilterState } from './types'
 
 interface Use{{ENTITY_SINGULAR_UPPER}}FilterProps {
-  {{ENTITY_NAME}}: {{ENTITY_SINGULAR_UPPER}}Type[]
-  filterState: FilterState
+  {{ENTITY_NAME_LOWER}}: {{ENTITY_SINGULAR_UPPER}}Type[]
+  filterState?: FilterState
 }
 
-export const use{{ENTITY_SINGULAR_UPPER}}Filter = ({ {{ENTITY_NAME}}, filterState }: Use{{ENTITY_SINGULAR_UPPER}}FilterProps) => {
-  const {
-    descriptionFilter,
-    // TODO: Weitere Filter-Properties hier destructuring
-  } = filterState
+export const use{{ENTITY_SINGULAR_UPPER}}Filter = ({ {{ENTITY_NAME_LOWER}} = [] }: Use{{ENTITY_SINGULAR_UPPER}}FilterProps) => {
+  // Standardzustand für Filter
+  const [filterState, setFilterState] = useState<FilterState>({
+    descriptionFilter: '',
+    // TODO: Weitere Filter-Properties hier hinzufügen
+  })
 
   // Filterfunktion für erweiterte Filter
-  const filteredData = useMemo(() => {
-    return {{ENTITY_NAME}}.filter((item: {{ENTITY_SINGULAR_UPPER}}Type) => {
+  const filtered{{ENTITY_NAME_UPPER}} = useMemo(() => {
+    return {{ENTITY_NAME_LOWER}}.filter((item: {{ENTITY_SINGULAR_UPPER}}Type) => {
       // Beschreibungs-Filter
       if (
-        descriptionFilter &&
+        filterState.descriptionFilter &&
         (!item.description ||
-          !item.description.toLowerCase().includes(descriptionFilter.toLowerCase()))
+          !item.description.toLowerCase().includes(filterState.descriptionFilter.toLowerCase()))
       ) {
         return false
       }
 
       // TODO: Entity-spezifische Filter-Logik hinzufügen
       // Beispiel:
+      // if (filterState.statusFilter && item.status !== filterState.statusFilter) {
+      //   return false
+      // }
+
+      return true
+    })
+  }, [{{ENTITY_NAME_LOWER}}, filterState])
+
+  const resetFilters = () => {
+    setFilterState({
+      descriptionFilter: '',
+      // TODO: Reset weitere Filter-Properties
+    })
+  }
+
+  return {
+    filterState,
+    setFilterState,
+    filtered{{ENTITY_NAME_UPPER}},
+    resetFilters,
+  }
+}
       // if (statusFilter.length > 0 && !statusFilter.includes(item.status)) {
       //   return false
       // }

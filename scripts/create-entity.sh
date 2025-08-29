@@ -64,6 +64,34 @@ get_singular_form() {
     esac
 }
 
+# Funktion zur korrekten Ableitung der deutschen Singular-Form
+get_german_singular_form() {
+    local entity_name=$1
+    case $entity_name in
+        "companies") echo "Unternehmen" ;;
+        "organisations") echo "Organisation" ;;
+        "projects") echo "Projekt" ;;
+        "contracts") echo "Vertrag" ;;
+        "suppliers") echo "Lieferant" ;;
+        "customers") echo "Kunde" ;;
+        "departments") echo "Abteilung" ;;
+        "teams") echo "Team" ;;
+        "locations") echo "Standort" ;;
+        "assets") echo "Asset" ;;
+        "services") echo "Service" ;;
+        "processes") echo "Prozess" ;;
+        "categories") echo "Kategorie" ;;
+        "activities") echo "Aktivität" ;;
+        "entities") echo "Entität" ;;
+        "facilities") echo "Einrichtung" ;;
+        "cities") echo "Stadt" ;;
+        *) 
+            # Fallback: Deutsche Pluralform verwenden
+            get_german_display_name "$entity_name"
+            ;;
+    esac
+}
+
 # Parameter prüfen
 if [ $# -lt 1 ]; then
     echo "Verwendung: $0 [entity-name]"
@@ -95,6 +123,7 @@ ENTITY_NAME_LOWER=$ENTITY_NAME
 ENTITY_NAME_SINGULAR=$(get_singular_form $ENTITY_NAME)
 ENTITY_NAME_SINGULAR_UPPER=$(echo $ENTITY_NAME_SINGULAR | sed 's/^./\U&/')
 ENTITY_NAME_SINGULAR_LOWER=$ENTITY_NAME_SINGULAR
+ENTITY_SINGULAR_DE=$(get_german_singular_form $ENTITY_NAME)
 
 echo "🚀 Erstelle neue Entity: $ENTITY_NAME"
 echo "📁 Entity Name: $ENTITY_NAME"
@@ -200,20 +229,20 @@ if ! grep -q "\"$ENTITY_NAME\":" "client/messages/de.json"; then
     "title": "$ENTITY_DISPLAY_NAME_DE",
     "description": "Verwalten Sie $ENTITY_DISPLAY_NAME_DE und deren Informationen",
     "loading": "Lade $ENTITY_DISPLAY_NAME_DE...",
-    "addNew": "Neue(n) $ENTITY_NAME_SINGULAR erstellen",
-    "editTitle": "$ENTITY_NAME_SINGULAR bearbeiten",
-    "createTitle": "Neue(n) $ENTITY_NAME_SINGULAR erstellen",
-    "viewTitle": "$ENTITY_NAME_SINGULAR Details",
-    "deleteConfirmation": "Sind Sie sicher, dass Sie diese(n) $ENTITY_NAME_SINGULAR löschen möchten?",
+    "addNew": "Neue(n) $ENTITY_SINGULAR_DE erstellen",
+    "editTitle": "$ENTITY_SINGULAR_DE bearbeiten",
+    "createTitle": "Neue(n) $ENTITY_SINGULAR_DE erstellen",
+    "viewTitle": "$ENTITY_SINGULAR_DE Details",
+    "deleteConfirmation": "Sind Sie sicher, dass Sie diese(n) $ENTITY_SINGULAR_DE löschen möchten?",
     "searchPlaceholder": "$ENTITY_DISPLAY_NAME_DE durchsuchen...",
     "messages": {
       "loadError": "Fehler beim Laden der $ENTITY_DISPLAY_NAME_DE",
-      "createSuccess": "$ENTITY_NAME_SINGULAR erfolgreich erstellt",
-      "createError": "Fehler beim Erstellen des $ENTITY_NAME_SINGULAR",
-      "updateSuccess": "$ENTITY_NAME_SINGULAR erfolgreich aktualisiert",
-      "updateError": "Fehler beim Aktualisieren des $ENTITY_NAME_SINGULAR",
-      "deleteSuccess": "$ENTITY_NAME_SINGULAR erfolgreich gelöscht",
-      "deleteError": "Fehler beim Löschen des $ENTITY_NAME_SINGULAR"
+      "createSuccess": "$ENTITY_SINGULAR_DE erfolgreich erstellt",
+      "createError": "Fehler beim Erstellen des $ENTITY_SINGULAR_DE",
+      "updateSuccess": "$ENTITY_SINGULAR_DE erfolgreich aktualisiert",
+      "updateError": "Fehler beim Aktualisieren des $ENTITY_SINGULAR_DE",
+      "deleteSuccess": "$ENTITY_SINGULAR_DE erfolgreich gelöscht",
+      "deleteError": "Fehler beim Löschen des $ENTITY_SINGULAR_DE"
     },
     "actions": {
       "add": "Hinzufügen",

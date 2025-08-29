@@ -30,7 +30,7 @@ export default function {{ENTITY_NAME_UPPER}}Page() {
 
   // Filter Logic
   const {{ENTITY_NAME_LOWER}} = data?.{{ENTITY_NAME_LOWER}} || []
-  const { filter, setFilter, filtered{{ENTITY_NAME_UPPER}}, resetFilter } = use{{ENTITY_SINGULAR_UPPER}}Filter({
+  const { filterState, setFilterState, filtered{{ENTITY_NAME_UPPER}}, resetFilters } = use{{ENTITY_SINGULAR_UPPER}}Filter({
     {{ENTITY_NAME_LOWER}},
   })
 
@@ -120,7 +120,7 @@ export default function {{ENTITY_NAME_UPPER}}Page() {
           // Filter wird über GenericToolbar verwaltet
         }}
         onResetFilters={() => {
-          resetFilter()
+          resetFilters()
           setGlobalFilter('')
         }}
         onAddClick={handleAddNew}
