@@ -39,14 +39,6 @@ const ArchitecturesPage = () => {
 
   // Filter-Zustand
   const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false)
-  const [filterState, setFilterState] = useState<FilterState>({
-    domainFilter: [] as ArchitectureDomain[],
-    typeFilter: [] as ArchitectureEnumType[],
-    tagsFilter: [],
-    descriptionFilter: '',
-    ownerFilter: '',
-    updatedDateRange: ['', ''],
-  })
   const [activeFiltersCount, setActiveFiltersCount] = useState<number>(0)
 
   // Liste der verfügbaren Domains, Types und Tags aus den Daten extrahieren
@@ -106,8 +98,8 @@ const ArchitecturesPage = () => {
 
   const architectures = data?.architectures || []
 
-  // Filter auf Architekturen anwenden
-  const { filteredArchitectures } = useArchitectureFilter({ architectures, filterState })
+  // Filter-Hook verwenden (Pattern 2)
+  const { filterState, setFilterState, filteredArchitectures, resetFilters } = useArchitectureFilter({ architectures })
 
   // Mutation zum Erstellen einer neuen Architektur
   const [createArchitecture, { loading: isCreating }] = useMutation(CREATE_ARCHITECTURE, {

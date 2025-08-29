@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { ArchitectureType, FilterState } from './types'
 import {
   ArchitectureDomain,
@@ -12,59 +12,57 @@ interface UseArchitectureFilterProps {
   filterState?: FilterState
 }
 
-export const useArchitectureFilter = ({
-  architectures,
-  filterState,
-}: UseArchitectureFilterProps) => {
-  const {
-    domainFilter = [],
-    typeFilter = [],
-    tagsFilter = [],
-    descriptionFilter = '',
-    ownerFilter = '',
-    updatedDateRange = ['', ''],
-  } = filterState || {}
+export const useArchitectureFilter = ({ architectures = [] }: UseArchitectureFilterProps) => {
+  // Standardzustand für Filter
+  const [filterState, setFilterState] = useState<FilterState>({
+    domainFilter: [],
+    typeFilter: [],
+    tagsFilter: [],
+    descriptionFilter: '',
+    ownerFilter: '',
+    updatedDateRange: ['', ''],
+  })
 
   // Filterfunktion für erweiterte Filter
   const filteredData = useMemo(() => {
     return architectures.filter((architecture: ArchitectureType) => {
       // Domain Filter
       if (
-        domainFilter.length > 0 &&
-        !domainFilter.includes(architecture.domain as ArchitectureDomain)
+        filterState.domainFilter.length > 0 &&
+        !filterState.domainFilter.includes(architecture.domain as ArchitectureDomain)
       ) {
         return false
       }
 
       // Typ Filter
       if (
-        typeFilter.length > 0 &&
-        !typeFilter.includes(architecture.type as GeneratedArchitectureType)
+        filterState.typeFilter.length > 0 &&
+        !filterState.typeFilter.includes(architecture.type as GeneratedArchitectureType)
       ) {
         return false
       }
 
       // Tags Filter
-      if (tagsFilter.length > 0) {
+      if (filterState.tagsFilter.length > 0) {
         const architectureTags = architecture.tags || []
-        const hasMatchingTag = tagsFilter.some(tag => architectureTags.includes(tag))
+        const hasMatchingTag = filterState.tagsFilter.some((tag: string) => architectureTags.includes(tag))
         if (!hasMatchingTag) {
           return false
         }
       }
 
       // Beschreibung Filter
-      if (descriptionFilter && architecture.description) {
-        if (!architecture.description.toLowerCase().includes(descriptionFilter.toLowerCase())) {
+      if (filterState.descriptionFilter && architecture.description) {
+        if (!architecture.description.toLowerCase().includes(filterState.descriptionFilter.toLowerCase())) {
           return false
         }
       }
 
       // Verantwortlicher Filter
-      if (ownerFilter && architecture.owners && architecture.owners.length > 0) {
+      if (filterState.ownerFilter && architecture.owners && architecture.owners.length > 0) {
         const ownerMatch = architecture.owners.some(owner => {
           const ownerFullName = `${owner.firstName} ${owner.lastName}`.toLowerCase()
-          return ownerFullName.includes(ownerFilter.toLowerCase())
+          return ownerFullName.includes(filterState.ownerFilter.toLowerCase())
         })
         if (!ownerMatch) {
           return false
@@ -72,16 +70,16 @@ export const useArchitectureFilter = ({
       }
 
       // Aktualisiert Datumsbereich Filter
-      if (updatedDateRange[0] && architecture.updatedAt) {
-        const startDate = new Date(updatedDateRange[0])
+      if (filterState.updatedDateRange[0] && architecture.updatedAt) {
+        const startDate = new Date(filterState.updatedDateRange[0])
         const updatedDate = new Date(architecture.updatedAt)
         if (updatedDate < startDate) {
           return false
         }
       }
 
-      if (updatedDateRange[1] && architecture.updatedAt) {
-        const endDate = new Date(updatedDateRange[1])
+      if (filterState.updatedDateRange[1] && architecture.updatedAt) {
+        const endDate = new Date(filterState.updatedDateRange[1])
         endDate.setHours(23, 59, 59, 999) // Ende des Tages
         const updatedDate = new Date(architecture.updatedAt)
         if (updatedDate > endDate) {
@@ -93,12 +91,12 @@ export const useArchitectureFilter = ({
     })
   }, [
     architectures,
-    domainFilter,
-    typeFilter,
-    tagsFilter,
-    descriptionFilter,
-    ownerFilter,
-    updatedDateRange,
+    filterState.domainFilter,
+    filterState.typeFilter,
+    filterState.tagsFilter,
+    filterState.descriptionFilter,
+    filterState.ownerFilter,
+    filterState.updatedDateRange,
   ])
 
   // Alle verfügbaren Domains extrahieren
@@ -136,8 +134,23 @@ export const useArchitectureFilter = ({
     return Array.from(new Set(allTags)).sort()
   }, [architectures])
 
+  // Reset-Funktion für Filter
+  const resetFilters = () => {
+    setFilterState({
+      domainFilter: [],
+      typeFilter: [],
+      tagsFilter: [],
+      descriptionFilter: '',
+      ownerFilter: '',
+      updatedDateRange: ['', ''],
+    })
+  }
+
   return {
+    filterState,
+    setFilterState,
     filteredArchitectures: filteredData,
+    resetFilters,
     availableDomains,
     availableTypes,
     availableTags,

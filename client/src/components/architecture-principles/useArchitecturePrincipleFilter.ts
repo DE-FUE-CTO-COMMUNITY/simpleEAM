@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { ArchitecturePrincipleType, FilterState } from './types'
 import { PrincipleCategory, PrinciplePriority } from '../../gql/generated'
 
@@ -9,83 +9,80 @@ interface UseArchitecturePrincipleFilterProps {
   filterState?: FilterState
 }
 
-export const useArchitecturePrincipleFilter = ({
-  principles,
-  filterState,
-}: UseArchitecturePrincipleFilterProps) => {
-  const {
-    categoryFilter = [],
-    priorityFilter = [],
-    tagsFilter = [],
-    descriptionFilter = '',
-    ownerFilter = '',
-    updatedDateRange = ['', ''],
-    isActiveFilter = null,
-  } = filterState || {}
+export const useArchitecturePrincipleFilter = ({ principles = [] }: UseArchitecturePrincipleFilterProps) => {
+  // Standardzustand für Filter
+  const [filterState, setFilterState] = useState<FilterState>({
+    categoryFilter: [],
+    priorityFilter: [],
+    tagsFilter: [],
+    descriptionFilter: '',
+    ownerFilter: '',
+    updatedDateRange: ['', ''],
+    isActiveFilter: null,
+  })
 
   // Filterfunktion für erweiterte Filter
   const filteredData = useMemo(() => {
     return principles.filter((principle: ArchitecturePrincipleType) => {
       // Kategorie Filter
       if (
-        categoryFilter.length > 0 &&
-        !categoryFilter.includes(principle.category as PrincipleCategory)
+        filterState.categoryFilter.length > 0 &&
+        !filterState.categoryFilter.includes(principle.category as PrincipleCategory)
       ) {
         return false
       }
 
       // Priorität Filter
       if (
-        priorityFilter.length > 0 &&
-        !priorityFilter.includes(principle.priority as PrinciplePriority)
+        filterState.priorityFilter.length > 0 &&
+        !filterState.priorityFilter.includes(principle.priority as PrinciplePriority)
       ) {
         return false
       }
 
-      // Active Filter
-      if (isActiveFilter !== null && isActiveFilter !== 'all') {
-        const isActiveValue = isActiveFilter === 'true'
+      // Aktiv/Inaktiv Filter
+      if (filterState.isActiveFilter !== null && filterState.isActiveFilter !== 'all') {
+        const isActiveValue = filterState.isActiveFilter === 'true'
         if (principle.isActive !== isActiveValue) {
           return false
         }
       }
 
       // Tags Filter
-      if (tagsFilter.length > 0) {
+      if (filterState.tagsFilter.length > 0) {
         const principleTags = principle.tags || []
-        const hasMatchingTag = tagsFilter.some(tag => principleTags.includes(tag))
+        const hasMatchingTag = filterState.tagsFilter.some((tag: string) => principleTags.includes(tag))
         if (!hasMatchingTag) {
           return false
         }
       }
 
       // Beschreibung Filter
-      if (descriptionFilter && principle.description) {
-        if (!principle.description.toLowerCase().includes(descriptionFilter.toLowerCase())) {
+      if (filterState.descriptionFilter && principle.description) {
+        if (!principle.description.toLowerCase().includes(filterState.descriptionFilter.toLowerCase())) {
           return false
         }
       }
 
       // Verantwortlicher Filter
-      if (ownerFilter && principle.owners && principle.owners.length > 0) {
-        // ownerFilter enthält eine Person-ID vom personSelect
-        const ownerMatch = principle.owners.some(owner => owner.id === ownerFilter)
+      if (filterState.ownerFilter && principle.owners && principle.owners.length > 0) {
+        const ownerMatch = principle.owners.some(owner => owner.id === filterState.ownerFilter)
         if (!ownerMatch) {
           return false
         }
       }
 
       // Aktualisiert Datumsbereich Filter
-      if (updatedDateRange[0] && principle.updatedAt) {
-        const startDate = new Date(updatedDateRange[0])
+      if (filterState.updatedDateRange[0] && principle.updatedAt) {
+        const startDate = new Date(filterState.updatedDateRange[0])
         const updatedDate = new Date(principle.updatedAt)
         if (updatedDate < startDate) {
           return false
         }
       }
 
-      if (updatedDateRange[1] && principle.updatedAt) {
-        const endDate = new Date(updatedDateRange[1])
+      if (filterState.updatedDateRange[1] && principle.updatedAt) {
+        const endDate = new Date(filterState.updatedDateRange[1])
         endDate.setHours(23, 59, 59, 999) // Ende des Tages
         const updatedDate = new Date(principle.updatedAt)
         if (updatedDate > endDate) {
@@ -97,13 +94,13 @@ export const useArchitecturePrincipleFilter = ({
     })
   }, [
     principles,
-    categoryFilter,
-    priorityFilter,
-    tagsFilter,
-    descriptionFilter,
-    ownerFilter,
-    updatedDateRange,
-    isActiveFilter,
+    filterState.categoryFilter,
+    filterState.priorityFilter,
+    filterState.tagsFilter,
+    filterState.descriptionFilter,
+    filterState.ownerFilter,
+    filterState.updatedDateRange,
+    filterState.isActiveFilter,
   ])
 
   // Alle verfügbaren Kategorien extrahieren
@@ -142,8 +139,24 @@ export const useArchitecturePrincipleFilter = ({
     return Array.from(new Set(allTags)).sort()
   }, [principles])
 
+  // Reset-Funktion für Filter
+  const resetFilters = () => {
+    setFilterState({
+      categoryFilter: [],
+      priorityFilter: [],
+      tagsFilter: [],
+      descriptionFilter: '',
+      ownerFilter: '',
+      updatedDateRange: ['', ''],
+      isActiveFilter: null,
+    })
+  }
+
   return {
+    filterState,
+    setFilterState,
     filteredPrinciples: filteredData,
+    resetFilters,
     availableCategories,
     availablePriorities,
     availableTags,

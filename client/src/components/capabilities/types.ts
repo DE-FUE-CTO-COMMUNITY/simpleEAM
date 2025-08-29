@@ -21,7 +21,7 @@ export type Capability = Pick<
 
 export interface FilterState {
   statusFilter: CapabilityStatus[]
-  maturityLevelFilter: number[]
+  maturityLevelFilter: string[]
   businessValueRange: [number, number]
   tagsFilter: string[]
   descriptionFilter: string

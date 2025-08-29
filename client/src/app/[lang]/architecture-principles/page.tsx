@@ -39,15 +39,6 @@ const ArchitecturePrinciplesPage = () => {
 
   // Filter-Zustand
   const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false)
-  const [filterState, setFilterState] = useState<FilterState>({
-    categoryFilter: [] as PrincipleCategory[],
-    priorityFilter: [] as PrinciplePriority[],
-    tagsFilter: [],
-    descriptionFilter: '',
-    ownerFilter: '',
-    updatedDateRange: ['', ''],
-    isActiveFilter: null,
-  })
   const [activeFiltersCount, setActiveFiltersCount] = useState<number>(0)
 
   // Liste der verfügbaren Categories, Priorities und Tags aus den Daten extrahieren
@@ -135,11 +126,10 @@ const ArchitecturePrinciplesPage = () => {
     }
   }, [principleData])
 
-  // Filter anwenden
-  const { filteredPrinciples } = useArchitecturePrincipleFilter({
-    principles: principleData?.architecturePrinciples || [],
-    filterState,
-  })
+  const principles = principleData?.architecturePrinciples || []
+
+  // Filter-Hook verwenden (Pattern 2)
+  const { filterState, setFilterState, filteredPrinciples, resetFilters } = useArchitecturePrincipleFilter({ principles })
 
   // Aktive Filter zählen und State aktualisieren
   useEffect(() => {
@@ -280,15 +270,7 @@ const ArchitecturePrinciplesPage = () => {
   }
 
   const handleResetFilter = () => {
-    setFilterState({
-      categoryFilter: [],
-      priorityFilter: [],
-      tagsFilter: [],
-      descriptionFilter: '',
-      ownerFilter: '',
-      updatedDateRange: ['', ''],
-      isActiveFilter: null,
-    })
+    resetFilters()
   }
 
   if (error) {

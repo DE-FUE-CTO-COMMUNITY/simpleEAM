@@ -24,7 +24,6 @@ import CapabilityTable, {
 import CapabilityToolbar from '@/components/capabilities/CapabilityToolbar'
 import CapabilityFilterDialog from '@/components/capabilities/CapabilityFilterDialog'
 import { useCapabilityFilter } from '@/components/capabilities/useCapabilityFilter'
-import { FilterState } from '@/components/capabilities/types'
 
 const CapabilitiesPage = () => {
   const { authenticated, initialized } = useAuth()
@@ -37,15 +36,7 @@ const CapabilitiesPage = () => {
 
   // Filter-Zustand
   const [filterOpen, setFilterOpen] = useState(false)
-  const [filterState, setFilterState] = useState<FilterState>({
-    statusFilter: [] as CapabilityStatus[],
-    maturityLevelFilter: [],
-    businessValueRange: [0, 10],
-    tagsFilter: [],
-    descriptionFilter: '',
-    ownerFilter: '',
-    updatedDateRange: ['', ''],
-  })
+  // Filter-Hook verwenden (nach capabilities Query)
   const [activeFiltersCount, setActiveFiltersCount] = useState<number>(0)
 
   // Liste der verfügbaren Status und Tags aus den Daten extrahieren
@@ -96,8 +87,10 @@ const CapabilitiesPage = () => {
 
   const capabilities = data?.businessCapabilities || []
 
-  // Filter auf Capabilities anwenden
-  const filteredData = useCapabilityFilter({ capabilities, filterState })
+  // Filter-Hook verwenden
+  const { filterState, setFilterState, filteredCapabilities, resetFilters } = useCapabilityFilter({
+    capabilities,
+  })
 
   // Mutation zum Erstellen einer neuen Capability
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -373,25 +366,6 @@ const CapabilitiesPage = () => {
     // Automatisches Schließen erfolgt durch die CapabilityForm selbst
   }
 
-  // Filter-Handler
-  const handleFilterChange = (newFilterValues: Partial<FilterState>) => {
-    setFilterState(prev => ({ ...prev, ...newFilterValues }))
-  }
-
-  // Filter zurücksetzen
-  const handleResetFilter = () => {
-    setFilterState({
-      statusFilter: [],
-      maturityLevelFilter: [],
-      businessValueRange: [0, 10],
-      tagsFilter: [],
-      descriptionFilter: '',
-      ownerFilter: '',
-      updatedDateRange: ['', ''],
-    })
-    setActiveFiltersCount(0)
-  }
-
   return (
     <Box sx={{ py: 2, px: 1 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
@@ -416,7 +390,7 @@ const CapabilitiesPage = () => {
           onGlobalFilterChange={setGlobalFilter}
           activeFiltersCount={activeFiltersCount}
           onFilterClick={() => setFilterOpen(true)}
-          onResetFilters={handleResetFilter}
+          onResetFilters={resetFilters}
           table={tableInstance}
           enableColumnVisibilityToggle={true}
           defaultColumnVisibility={CAPABILITY_DEFAULT_COLUMN_VISIBILITY}
@@ -425,7 +399,7 @@ const CapabilitiesPage = () => {
         <Paper sx={{ overflow: 'hidden' }}>
           <CapabilityTable
             id="capability-table"
-            capabilities={filteredData as BusinessCapability[]}
+            capabilities={filteredCapabilities}
             loading={loading}
             globalFilter={globalFilter}
             sorting={sorting}
@@ -447,8 +421,10 @@ const CapabilitiesPage = () => {
           filterState={filterState}
           availableStatuses={availableStatuses}
           availableTags={availableTags}
-          onFilterChange={handleFilterChange}
-          onResetFilter={handleResetFilter}
+          onFilterChange={(newFilterValues: any) => {
+            setFilterState(prev => ({ ...prev, ...newFilterValues }))
+          }}
+          onResetFilter={resetFilters}
           onClose={() => setFilterOpen(false)}
           onApply={count => {
             setActiveFiltersCount(count)

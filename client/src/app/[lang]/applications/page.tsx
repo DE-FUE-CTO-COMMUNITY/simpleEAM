@@ -176,7 +176,9 @@ const ApplicationsPage = () => {
   }, [error, enqueueSnackbar, t])
 
   // Filter auf Applikationen anwenden
-  const { filterState, setFilterState, filteredApplications, resetFilters } = useApplicationFilter({ applications })
+  const { filterState, setFilterState, filteredApplications, resetFilters } = useApplicationFilter({
+    applications,
+  })
 
   // Mutation zum Erstellen einer neuen Applikation
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

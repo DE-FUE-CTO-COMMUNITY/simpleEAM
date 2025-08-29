@@ -52,7 +52,11 @@ export const useApplicationFilter = ({ applications = [] }: UseApplicationFilter
       }
 
       // Kostenbereich-Filter
-      if (filterState.costRangeFilter && application.costs !== null && application.costs !== undefined) {
+      if (
+        filterState.costRangeFilter &&
+        application.costs !== null &&
+        application.costs !== undefined
+      ) {
         const cost = application.costs as number
         if (cost < filterState.costRangeFilter[0] || cost > filterState.costRangeFilter[1]) {
           return false
@@ -75,7 +79,9 @@ export const useApplicationFilter = ({ applications = [] }: UseApplicationFilter
       if (
         filterState.descriptionFilter &&
         (!application.description ||
-          !application.description.toLowerCase().includes(filterState.descriptionFilter.toLowerCase()))
+          !application.description
+            .toLowerCase()
+            .includes(filterState.descriptionFilter.toLowerCase()))
       ) {
         return false
       }
@@ -117,9 +123,16 @@ export const useApplicationFilter = ({ applications = [] }: UseApplicationFilter
       }
 
       // Aktualisierungsdatum-Filter
-      if (filterState.updatedDateRange && (filterState.updatedDateRange[0] || filterState.updatedDateRange[1])) {
-        const startDate = filterState.updatedDateRange[0] ? new Date(filterState.updatedDateRange[0]) : null
-        const endDate = filterState.updatedDateRange[1] ? new Date(filterState.updatedDateRange[1]) : null
+      if (
+        filterState.updatedDateRange &&
+        (filterState.updatedDateRange[0] || filterState.updatedDateRange[1])
+      ) {
+        const startDate = filterState.updatedDateRange[0]
+          ? new Date(filterState.updatedDateRange[0])
+          : null
+        const endDate = filterState.updatedDateRange[1]
+          ? new Date(filterState.updatedDateRange[1])
+          : null
 
         if (!application.updatedAt) {
           return false
@@ -143,10 +156,7 @@ export const useApplicationFilter = ({ applications = [] }: UseApplicationFilter
 
       return true
     })
-  }, [
-    applications,
-    filterState,
-  ])
+  }, [applications, filterState])
 
   const resetFilters = () => {
     setFilterState({

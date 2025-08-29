@@ -35,3 +35,15 @@ export interface DataObjectFormValues {
   source?: string
   ownerId?: string
 }
+
+/**
+ * Filter State für DataObjects
+ */
+export interface FilterState {
+  classificationFilter: DataClassification[]
+  formatFilter: string[]
+  sourceFilter: string[]
+  descriptionFilter: string
+  ownerFilter: string
+  updatedDateRange: [string, string]
+}
