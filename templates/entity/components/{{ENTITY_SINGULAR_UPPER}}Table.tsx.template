@@ -27,7 +27,7 @@ export const {{ENTITY_NAME_UPPER}}_DEFAULT_COLUMN_VISIBILITY = {
 
 interface {{ENTITY_SINGULAR_UPPER}}TableProps {
   id?: string
-  {{ENTITY_NAME_LOWER}}: {{ENTITY_SINGULAR_UPPER}}Type[]
+  {{ENTITY_NAME}}: {{ENTITY_SINGULAR_UPPER}}Type[]
   loading: boolean
   globalFilter: string
   sorting: SortingState
@@ -44,7 +44,7 @@ interface {{ENTITY_SINGULAR_UPPER}}TableProps {
 }
 
 const {{ENTITY_SINGULAR_UPPER}}TableWithGenericTable: React.FC<{{ENTITY_SINGULAR_UPPER}}TableProps> = ({
-  {{ENTITY_NAME_LOWER}},
+  {{ENTITY_NAME}},
   loading,
   globalFilter,
   sorting,
@@ -129,7 +129,7 @@ const {{ENTITY_SINGULAR_UPPER}}TableWithGenericTable: React.FC<{{ENTITY_SINGULAR
 
   return (
     <GenericTable<{{ENTITY_SINGULAR_UPPER}}Type, {{ENTITY_SINGULAR_UPPER}}FormValues>
-      data={ {{ENTITY_NAME_LOWER}} }
+      data={ {{ENTITY_NAME}} }
       loading={loading}
       globalFilter={globalFilter}
       sorting={sorting}

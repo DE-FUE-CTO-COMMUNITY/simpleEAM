@@ -29,9 +29,9 @@ export default function {{ENTITY_NAME_UPPER}}Page() {
   const [delete{{ENTITY_SINGULAR_UPPER}}] = useMutation(DELETE_{{ENTITY_SINGULAR_UPPER}})
 
   // Filter Logic
-  const {{ENTITY_NAME_LOWER}} = data?.{{ENTITY_NAME_LOWER}} || []
+  const {{ENTITY_NAME}} = data?.{{ENTITY_NAME}} || []
   const { filterState, setFilterState, filtered{{ENTITY_NAME_UPPER}}, resetFilters } = use{{ENTITY_SINGULAR_UPPER}}Filter({
-    {{ENTITY_NAME_LOWER}},
+    {{ENTITY_NAME}},
   })
 
   // Weitere Filterung durch globalen Suchfilter
@@ -127,7 +127,7 @@ export default function {{ENTITY_NAME_UPPER}}Page() {
       />
 
       <{{ENTITY_SINGULAR_UPPER}}Table
-        {{ENTITY_NAME_LOWER}}={final{{ENTITY_NAME_UPPER}}}
+        {{ENTITY_NAME}}={final{{ENTITY_NAME_UPPER}}}
         loading={loading}
         globalFilter={globalFilter}
         sorting={sorting}

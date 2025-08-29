@@ -85,10 +85,10 @@ const DataObjectsPage = () => {
   }, [data])
 
   // Filter-Hook verwenden (Pattern 2)
-  const { 
-    filterState, 
-    setFilterState, 
-    filteredDataObjects, 
+  const {
+    filterState,
+    setFilterState,
+    filteredDataObjects,
     resetFilters: resetHookFilters,
     availableFormats,
     availableSources,
@@ -99,21 +99,24 @@ const DataObjectsPage = () => {
   } = useDataObjectFilter({ dataobjects: dataObjects })
 
   // Filter-Optionen direkt vom Hook verwenden (Pattern 2)
-  const filterOptions = useMemo(() => ({
-    availableFormats,
-    availableSources,
-    availableOwners,
-    availableUsedByApplications,
-    availableRelatedToCapabilities,
-    availablePartOfArchitectures,
-  }), [
-    availableFormats,
-    availableSources,
-    availableOwners,
-    availableUsedByApplications,
-    availableRelatedToCapabilities,
-    availablePartOfArchitectures,
-  ])
+  const filterOptions = useMemo(
+    () => ({
+      availableFormats,
+      availableSources,
+      availableOwners,
+      availableUsedByApplications,
+      availableRelatedToCapabilities,
+      availablePartOfArchitectures,
+    }),
+    [
+      availableFormats,
+      availableSources,
+      availableOwners,
+      availableUsedByApplications,
+      availableRelatedToCapabilities,
+      availablePartOfArchitectures,
+    ]
+  )
 
   // Zählt die aktiven Filter
   const activeFiltersCount = useMemo(() => {
@@ -394,7 +397,8 @@ const DataObjectsPage = () => {
       const newTransferredInInterfaceIds = data.transferredInInterfaces?.sort() || []
 
       const transferredInInterfacesChanged =
-        JSON.stringify(currentTransferredInInterfaceIds) !== JSON.stringify(newTransferredInInterfaceIds)
+        JSON.stringify(currentTransferredInInterfaceIds) !==
+        JSON.stringify(newTransferredInInterfaceIds)
 
       if (transferredInInterfacesChanged) {
         if (newTransferredInInterfaceIds.length > 0) {

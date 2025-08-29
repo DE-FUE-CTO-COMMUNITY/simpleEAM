@@ -114,9 +114,12 @@ const DataObjectForm: React.FC<GenericFormProps<DataObject, DataObjectFormValues
     fetchPolicy: 'cache-and-network',
   })
   // Application Interfaces laden
-  const { data: interfacesData, loading: interfacesLoading } = useQuery(GET_APPLICATION_INTERFACES, {
-    fetchPolicy: 'cache-and-network',
-  })
+  const { data: interfacesData, loading: interfacesLoading } = useQuery(
+    GET_APPLICATION_INTERFACES,
+    {
+      fetchPolicy: 'cache-and-network',
+    }
+  )
 
   // Formulardaten mit useMemo initialisieren, um unnötige Re-Renders zu vermeiden
   const defaultValues = React.useMemo<DataObjectFormValues>(
