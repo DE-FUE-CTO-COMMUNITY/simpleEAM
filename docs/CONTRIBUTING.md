@@ -1,5 +1,7 @@
 # Beitragsrichtlinien für das Simple-EAM Projekt
 
+> **🤖 AI-Entwicklungshinweis**: Der Code dieses Projekts wurde vollständig mit GitHub Copilot im Agent-Modus erstellt. Dies gewährleistet eine konsistente Codebasis und moderne Best Practices.
+
 ## Material UI v7 Grid-Komponenten
 
 Ab Material UI v7 muss die neue Grid v2 API verwendet werden. Es gibt wichtige Unterschiede zur vorherigen Grid-Implementierung:
