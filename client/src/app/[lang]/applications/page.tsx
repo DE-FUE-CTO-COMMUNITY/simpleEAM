@@ -75,21 +75,8 @@ const ApplicationsPage = () => {
     setTableInstance(table)
   }
 
-  // Filter-Zustand
+  // Filter-Zustand (wird jetzt vom Hook verwaltet)
   const [filterOpen, setFilterOpen] = useState(false)
-  const [filterState, setFilterState] = useState<FilterState>({
-    statusFilter: [] as ApplicationStatus[],
-    criticalityFilter: [] as CriticalityLevel[],
-    costRangeFilter: [0, 1000000],
-    technologyStackFilter: [],
-    descriptionFilter: '',
-    ownerFilter: '',
-    updatedDateRange: ['', ''],
-    vendorFilter: '',
-    timeCategoryFilter: [] as TimeCategory[],
-    sevenRStrategyFilter: [] as SevenRStrategy[],
-    hostedOnFilter: [] as string[],
-  })
   const [activeFiltersCount, setActiveFiltersCount] = useState<number>(0)
 
   // Liste der verfügbaren Status, Kritikalitäten und Technology Stack aus den Daten extrahieren
@@ -189,7 +176,7 @@ const ApplicationsPage = () => {
   }, [error, enqueueSnackbar, t])
 
   // Filter auf Applikationen anwenden
-  const filteredData = useApplicationFilter({ applications, filterState })
+  const { filterState, setFilterState, filteredApplications, resetFilters } = useApplicationFilter({ applications })
 
   // Mutation zum Erstellen einer neuen Applikation
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -661,19 +648,7 @@ const ApplicationsPage = () => {
 
   // Filter zurücksetzen
   const handleResetFilter = () => {
-    setFilterState({
-      statusFilter: [],
-      criticalityFilter: [],
-      costRangeFilter: [0, 1000000],
-      technologyStackFilter: [],
-      descriptionFilter: '',
-      ownerFilter: '',
-      updatedDateRange: ['', ''],
-      vendorFilter: '',
-      timeCategoryFilter: [],
-      sevenRStrategyFilter: [],
-      hostedOnFilter: [],
-    })
+    resetFilters()
     setActiveFiltersCount(0)
   }
 
@@ -710,7 +685,7 @@ const ApplicationsPage = () => {
         <Paper sx={{ overflow: 'hidden' }}>
           <ApplicationTable
             id="application-table"
-            applications={filteredData}
+            applications={filteredApplications}
             loading={loading}
             globalFilter={globalFilter}
             sorting={sorting}
