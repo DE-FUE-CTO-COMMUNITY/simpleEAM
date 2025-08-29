@@ -51,17 +51,3 @@ export const use{{ENTITY_SINGULAR_UPPER}}Filter = ({ {{ENTITY_NAME}} = [] }: Use
     resetFilters,
   }
 }
-      // if (statusFilter.length > 0 && !statusFilter.includes(item.status)) {
-      //   return false
-      // }
-
-      return true
-    })
-  }, [
-    {{ENTITY_NAME}},
-    descriptionFilter,
-    // TODO: Weitere Filter-Abhängigkeiten hier hinzufügen
-  ])
-
-  return filteredData
-}
