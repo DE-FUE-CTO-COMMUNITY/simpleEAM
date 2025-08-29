@@ -23,14 +23,16 @@ export const getLevelLabel = (level: number | null | undefined, t?: any): string
   }
 
   switch (level) {
-    case 0:
-      return t ? t('low') : 'Niedrig'
     case 1:
-      return t ? t('medium') : 'Mittel'
+      return t ? t('1') : 'Sehr niedrig'
     case 2:
-      return t ? t('high') : 'Hoch'
+      return t ? t('2') : 'Niedrig'
     case 3:
-      return t ? t('veryHigh') : 'Sehr Hoch'
+      return t ? t('3') : 'Mittel'
+    case 4:
+      return t ? t('4') : 'Hoch'
+    case 5:
+      return t ? t('5') : 'Sehr hoch'
     default:
       return `Level ${level}`
   }

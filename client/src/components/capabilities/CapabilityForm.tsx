@@ -304,7 +304,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
       type: 'select',
       required: true,
       validators: capabilitySchema.shape.maturityLevel,
-      options: [0, 1, 2, 3].map(
+      options: [1, 2, 3, 4, 5].map(
         (level): SelectOption => ({
           value: level,
           label: getLevelLabel(level, t),

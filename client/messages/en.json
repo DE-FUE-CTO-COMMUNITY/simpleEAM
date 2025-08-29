@@ -699,15 +699,12 @@
       "actions": "Actions"
     },
     "maturityLevels": {
-      "low": "Low",
-      "medium": "Medium",
-      "high": "High",
-      "veryHigh": "Very High",
       "undefined": "Not defined",
-      "0": "Low",
-      "1": "Medium",
-      "2": "High",
-      "3": "Very High"
+      "1": "Very Low",
+      "2": "Low",
+      "3": "Medium",
+      "4": "High",
+      "5": "Very High"
     },
     "statuses": {
       "ACTIVE": "Active",

@@ -36,7 +36,7 @@ const CapabilityFilterDialogWithGeneric: React.FC<FilterProps> = ({
       id: 'maturityLevelFilter',
       label: t('maturityLevel'),
       type: 'multiSelect',
-      options: [0, 1, 2, 3].map(level => ({
+      options: [1, 2, 3, 4, 5].map(level => ({
         value: level.toString(),
         label: getLevelLabel(level, tMaturity),
       })),
