@@ -23,7 +23,7 @@ import InfrastructureForm, {
   InfrastructureFormValues,
 } from '@/components/infrastructure/InfrastructureForm'
 import { Infrastructure } from '@/gql/generated'
-import { InfrastructureFilterState } from '@/components/infrastructure/InfrastructureFilterDialog'
+import { useInfrastructureFilter } from '@/components/infrastructure/useInfrastructureFilter'
 
 const InfrastructurePage = () => {
   const { authenticated, initialized } = useAuth()
@@ -34,19 +34,6 @@ const InfrastructurePage = () => {
   const [tableInstance, setTableInstance] = useState<any>(null)
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false)
-  const [filters, setFilters] = useState<InfrastructureFilterState>({
-    infrastructureTypes: [],
-    statuses: [],
-    vendors: [],
-    locations: [],
-    owners: [],
-    hostsApplications: [],
-    partOfArchitectures: [],
-    descriptionFilter: '',
-    updatedDateRange: ['', ''],
-  })
-
-  // State für das neue Formular
   const [showNewInfrastructureForm, setShowNewInfrastructureForm] = useState(false)
 
   // GraphQL-Abfrage für Infrastrukturen
@@ -54,6 +41,24 @@ const InfrastructurePage = () => {
     skip: !authenticated || !initialized,
     fetchPolicy: 'cache-and-network',
   })
+
+  // Echte Daten aus GraphQL oder Fallback auf leeres Array
+  const infrastructures: Infrastructure[] = useMemo(() => {
+    return data?.infrastructures || []
+  }, [data])
+
+  // Filter Hook mit Pattern 2
+  const {
+    filterState,
+    setFilterState,
+    filteredInfrastructures,
+    resetFilters,
+    availableTypes,
+    availableStatuses,
+    availableVendors,
+    availableLocations,
+    availableOperatingSystems,
+  } = useInfrastructureFilter({ infrastructures })
 
   // GraphQL-Mutationen für Infrastrukturen
   const [createInfrastructure] = useMutation(CREATE_INFRASTRUCTURE, {
@@ -92,565 +97,222 @@ const InfrastructurePage = () => {
     },
   })
 
-  // Echte Daten aus GraphQL oder Fallback auf leeres Array - Auth-Check erfolgt bereits in layout.tsx
-  const infrastructures: Infrastructure[] = useMemo(() => {
-    return data?.infrastructures || []
-  }, [data])
-
-  // Gefilterte Daten basierend auf den ausgewählten Filtern
-  const filteredInfrastructures = useMemo(() => {
-    // Wenn keine Filter aktiv sind, alle Daten zurückgeben
-    if (
-      filters.infrastructureTypes.length === 0 &&
-      filters.statuses.length === 0 &&
-      filters.vendors.length === 0 &&
-      filters.locations.length === 0 &&
-      filters.owners.length === 0 &&
-      filters.hostsApplications.length === 0 &&
-      filters.partOfArchitectures.length === 0 &&
-      !filters.descriptionFilter &&
-      !filters.updatedDateRange[0] &&
-      !filters.updatedDateRange[1] &&
-      !globalFilter
-    ) {
-      return infrastructures
-    }
-
-    // Daten basierend auf den Filtern filtern
-    return infrastructures.filter(infrastructure => {
-      // Infrastruktur-Typ Filter anwenden
-      if (
-        filters.infrastructureTypes.length > 0 &&
-        !filters.infrastructureTypes.includes(infrastructure.infrastructureType)
-      ) {
-        return false
-      }
-
-      // Status Filter anwenden
-      if (filters.statuses.length > 0 && !filters.statuses.includes(infrastructure.status)) {
-        return false
-      }
-
-      // Anbieter Filter anwenden
-      if (
-        filters.vendors.length > 0 &&
-        (!infrastructure.vendor || !filters.vendors.includes(infrastructure.vendor))
-      ) {
-        return false
-      }
-
-      // Standort Filter anwenden
-      if (
-        filters.locations.length > 0 &&
-        (!infrastructure.location || !filters.locations.includes(infrastructure.location))
-      ) {
-        return false
-      }
-
-      // Verantwortliche Filter anwenden
-      if (filters.owners.length > 0) {
-        if (!infrastructure.owners || infrastructure.owners.length === 0) return false
-        const hasMatchingOwner = infrastructure.owners.some(owner =>
-          filters.owners.includes(`${owner.firstName} ${owner.lastName}`)
-        )
-        if (!hasMatchingOwner) return false
-      }
-
-      // Gehostete Applikationen Filter anwenden
-      if (filters.hostsApplications.length > 0) {
-        if (!infrastructure.hostsApplications || infrastructure.hostsApplications.length === 0)
-          return false
-        const hasMatchingApp = infrastructure.hostsApplications.some(app =>
-          filters.hostsApplications.includes(app.name)
-        )
-        if (!hasMatchingApp) return false
-      }
-
-      // Teil von Architekturen Filter anwenden
-      if (filters.partOfArchitectures.length > 0) {
-        if (!infrastructure.partOfArchitectures || infrastructure.partOfArchitectures.length === 0)
-          return false
-        const hasMatchingArchitecture = infrastructure.partOfArchitectures.some(arch =>
-          filters.partOfArchitectures.includes(arch.name)
-        )
-        if (!hasMatchingArchitecture) return false
-      }
-
-      // Beschreibungsfilter anwenden
-      if (filters.descriptionFilter && filters.descriptionFilter.trim() !== '') {
-        const searchTerm = filters.descriptionFilter.toLowerCase().trim()
-        if (
-          !infrastructure.description ||
-          !infrastructure.description.toLowerCase().includes(searchTerm)
-        ) {
-          return false
-        }
-      }
-
-      // Datum Aktualisiert Filter anwenden
-      if (filters.updatedDateRange[0] || filters.updatedDateRange[1]) {
-        const infraDate = infrastructure.updatedAt
-          ? new Date(infrastructure.updatedAt).getTime()
-          : 0
-        if (filters.updatedDateRange[0]) {
-          const fromDate = new Date(filters.updatedDateRange[0]).getTime()
-          if (infraDate < fromDate) return false
-        }
-        if (filters.updatedDateRange[1]) {
-          const toDate = new Date(filters.updatedDateRange[1]).getTime()
-          if (infraDate > toDate) return false
-        }
-      }
-
-      // Globalen Filter anwenden (suche in Name, Beschreibung, Anbieter, Standort)
-      if (globalFilter && globalFilter.trim() !== '') {
-        const searchTerm = globalFilter.toLowerCase().trim()
-        const matchesName = infrastructure.name.toLowerCase().includes(searchTerm)
-        const matchesDescription = infrastructure.description
-          ? infrastructure.description.toLowerCase().includes(searchTerm)
-          : false
-        const matchesVendor = infrastructure.vendor
-          ? infrastructure.vendor.toLowerCase().includes(searchTerm)
-          : false
-        const matchesLocation = infrastructure.location
-          ? infrastructure.location.toLowerCase().includes(searchTerm)
-          : false
-
-        if (!matchesName && !matchesDescription && !matchesVendor && !matchesLocation) {
-          return false
-        }
-      }
-
-      return true
-    })
-  }, [infrastructures, filters, globalFilter])
-
-  // Filter-Optionen ermitteln
-  const filterOptions = useMemo(() => {
-    const infrastructureTypes = new Set<string>()
-    const statuses = new Set<string>()
-    const vendors = new Set<string>()
-    const locations = new Set<string>()
-    const owners = new Set<string>()
-    const hostsApplications = new Set<string>()
-    const partOfArchitectures = new Set<string>()
-
-    infrastructures.forEach(infrastructure => {
-      infrastructureTypes.add(infrastructure.infrastructureType)
-      statuses.add(infrastructure.status)
-      if (infrastructure.vendor) vendors.add(infrastructure.vendor)
-      if (infrastructure.location) locations.add(infrastructure.location)
-      if (infrastructure.owners) {
-        infrastructure.owners.forEach(owner => owners.add(`${owner.firstName} ${owner.lastName}`))
-      }
-      if (infrastructure.hostsApplications) {
-        infrastructure.hostsApplications.forEach(app => hostsApplications.add(app.name))
-      }
-      if (infrastructure.partOfArchitectures) {
-        infrastructure.partOfArchitectures.forEach(arch => partOfArchitectures.add(arch.name))
-      }
-    })
-
-    return {
-      availableInfrastructureTypes: Array.from(infrastructureTypes),
-      availableStatuses: Array.from(statuses),
-      availableVendors: Array.from(vendors),
-      availableLocations: Array.from(locations),
-      availableOwners: Array.from(owners),
-      availableHostsApplications: Array.from(hostsApplications),
-      availablePartOfArchitectures: Array.from(partOfArchitectures),
-    }
-  }, [infrastructures])
-
-  // Zählt die aktiven Filter
-  const activeFiltersCount = useMemo(() => {
-    return (
-      filters.infrastructureTypes.length +
-      filters.statuses.length +
-      filters.vendors.length +
-      filters.locations.length +
-      filters.owners.length +
-      filters.hostsApplications.length +
-      filters.partOfArchitectures.length +
-      (filters.descriptionFilter ? 1 : 0) +
-      (filters.updatedDateRange[0] || filters.updatedDateRange[1] ? 1 : 0)
-    )
-  }, [filters])
-
-  // Handler für das Zurücksetzen der Filter
-  const handleResetFilters = useCallback(() => {
-    setFilters({
-      infrastructureTypes: [],
-      statuses: [],
-      vendors: [],
-      locations: [],
-      owners: [],
-      hostsApplications: [],
-      partOfArchitectures: [],
-      descriptionFilter: '',
-      updatedDateRange: ['', ''],
-    })
-  }, [])
-
-  // Handler für das Öffnen der Form zum Erstellen einer neuen Infrastruktur - ENTFERNT
-  // Handler für das Öffnen des Formulars zur Erstellung einer neuen Infrastruktur
-  const handleCreateInfrastructure = useCallback(() => {
+  // Handler für das Hinzufügen neuer Infrastrukturen
+  const handleAddInfrastructure = useCallback(() => {
     setShowNewInfrastructureForm(true)
   }, [])
 
   // Handler für das Erstellen einer neuen Infrastruktur
-  const handleCreateInfrastructureSubmit = async (data: InfrastructureFormValues) => {
-    try {
-      const input = {
-        name: data.name,
-        description: data.description,
-        infrastructureType: data.infrastructureType,
-        status: data.status,
-        vendor: data.vendor,
-        version: data.version,
-        capacity: data.capacity,
-        location: data.location,
-        ipAddress: data.ipAddress,
-        operatingSystem: data.operatingSystem,
-        specifications: data.specifications,
-        maintenanceWindow: data.maintenanceWindow,
-        costs: data.costs,
-        planningDate: data.planningDate,
-        introductionDate: data.introductionDate,
-        endOfUseDate: data.endOfUseDate,
-        endOfLifeDate: data.endOfLifeDate,
-        parentInfrastructure: data.parentInfrastructure?.length
-          ? {
-              connect: data.parentInfrastructure.map(id => ({
-                where: {
-                  node: { id: { eq: id } },
-                },
-              })),
-            }
-          : undefined,
-        childInfrastructures: data.childInfrastructures?.length
-          ? {
-              connect: data.childInfrastructures.map(id => ({
-                where: {
-                  node: { id: { eq: id } },
-                },
-              })),
-            }
-          : undefined,
-        hostsApplications: data.hostsApplications?.length
-          ? {
-              connect: data.hostsApplications.map(id => ({
-                where: {
-                  node: { id: { eq: id } },
-                },
-              })),
-            }
-          : undefined,
-        partOfArchitectures: data.partOfArchitectures?.length
-          ? {
-              connect: data.partOfArchitectures.map(id => ({
-                where: {
-                  node: { id: { eq: id } },
-                },
-              })),
-            }
-          : undefined,
-        depictedInDiagrams: data.depictedInDiagrams?.length
-          ? {
-              connect: data.depictedInDiagrams.map(id => ({
-                where: {
-                  node: { id: { eq: id } },
-                },
-              })),
-            }
-          : undefined,
-        ...(data.ownerId
-          ? { owners: { connect: [{ where: { node: { id: { eq: data.ownerId } } } }] } }
-          : {}),
+  const handleCreateInfrastructure = useCallback(
+    async (values: InfrastructureFormValues) => {
+      try {
+        await createInfrastructure({
+          variables: {
+            input: {
+              name: values.name,
+              description: values.description || '',
+              infrastructureType: values.infrastructureType,
+              status: values.status,
+              vendor: values.vendor || '',
+              version: values.version || '',
+              location: values.location || '',
+              ipAddress: values.ipAddress || '',
+              operatingSystem: values.operatingSystem || '',
+              maintenanceWindow: values.maintenanceWindow || '',
+              endOfLifeDate: values.endOfLifeDate || null,
+              ownerId: values.ownerId || null,
+              parentInfrastructureId: values.parentInfrastructureId || null,
+              childInfrastructureIds: values.childInfrastructureIds || [],
+              hostsApplicationIds: values.hostsApplicationIds || [],
+              partOfArchitectureIds: values.partOfArchitectureIds || [],
+              depictedInDiagramIds: values.depictedInDiagramIds || [],
+            },
+          },
+        })
+        setShowNewInfrastructureForm(false)
+      } catch (error) {
+        console.error('Fehler beim Erstellen der Infrastruktur:', error)
       }
+    },
+    [createInfrastructure]
+  )
 
-      await createInfrastructure({
-        variables: {
-          input: [input],
-        },
-      })
-
-      // Formular nach dem Erstellen schließen
-      setShowNewInfrastructureForm(false)
-    } catch (error) {
-      console.error('Fehler beim Erstellen der Infrastruktur:', error)
-    }
-  }
-
-  // Handler für das Aktualisieren einer Infrastruktur
-  const handleUpdateInfrastructureSubmit = async (id: string, data: InfrastructureFormValues) => {
-    try {
-      // Find the current infrastructure to compare changes
-      const currentInfrastructure = infrastructures.find(infra => infra.id === id)
-      if (!currentInfrastructure) {
-        console.error('Infrastructure not found for update')
-        return
+  // Handler für das Bearbeiten einer Infrastruktur
+  const handleEditInfrastructure = useCallback(
+    async (id: string, values: InfrastructureFormValues) => {
+      try {
+        await updateInfrastructure({
+          variables: {
+            id: id,
+            input: {
+              name: values.name,
+              description: values.description || '',
+              infrastructureType: values.infrastructureType,
+              status: values.status,
+              vendor: values.vendor || '',
+              version: values.version || '',
+              location: values.location || '',
+              ipAddress: values.ipAddress || '',
+              operatingSystem: values.operatingSystem || '',
+              maintenanceWindow: values.maintenanceWindow || '',
+              endOfLifeDate: values.endOfLifeDate || null,
+              ownerId: values.ownerId || null,
+              parentInfrastructureId: values.parentInfrastructureId || null,
+              childInfrastructureIds: values.childInfrastructureIds || [],
+              hostsApplicationIds: values.hostsApplicationIds || [],
+              partOfArchitectureIds: values.partOfArchitectureIds || [],
+              depictedInDiagramIds: values.depictedInDiagramIds || [],
+            },
+          },
+        })
+      } catch (error) {
+        console.error('Fehler beim Aktualisieren der Infrastruktur:', error)
       }
-
-      const input: any = {
-        name: { set: data.name },
-        description: { set: data.description },
-        infrastructureType: { set: data.infrastructureType },
-        status: { set: data.status },
-        vendor: { set: data.vendor },
-        version: { set: data.version },
-        capacity: { set: data.capacity },
-        location: { set: data.location },
-        ipAddress: { set: data.ipAddress },
-        operatingSystem: { set: data.operatingSystem },
-        specifications: { set: data.specifications },
-        maintenanceWindow: { set: data.maintenanceWindow },
-        costs: { set: data.costs },
-        planningDate: { set: data.planningDate },
-        introductionDate: { set: data.introductionDate },
-        endOfUseDate: { set: data.endOfUseDate },
-        endOfLifeDate: { set: data.endOfLifeDate },
-      }
-
-      // Parent Infrastructure Update - only update if changed
-      const currentParentIds =
-        currentInfrastructure.parentInfrastructure?.map(parent => parent.id).sort() || []
-      const newParentIds = data.parentInfrastructure?.sort() || []
-
-      if (JSON.stringify(currentParentIds) !== JSON.stringify(newParentIds)) {
-        if (newParentIds.length > 0) {
-          input.parentInfrastructure = [
-            {
-              disconnect: [{ where: {} }],
-              connect: newParentIds.map(id => ({
-                where: {
-                  node: { id: { eq: id } },
-                },
-              })),
-            },
-          ]
-        } else {
-          input.parentInfrastructure = [
-            {
-              disconnect: [{ where: {} }],
-            },
-          ]
-        }
-      }
-
-      // Child Infrastructures Update - only update if changed
-      const currentChildIds =
-        currentInfrastructure.childInfrastructures?.map(child => child.id).sort() || []
-      const newChildIds = data.childInfrastructures?.sort() || []
-
-      if (JSON.stringify(currentChildIds) !== JSON.stringify(newChildIds)) {
-        if (newChildIds.length > 0) {
-          input.childInfrastructures = [
-            {
-              disconnect: [{ where: {} }],
-              connect: newChildIds.map(id => ({
-                where: {
-                  node: { id: { eq: id } },
-                },
-              })),
-            },
-          ]
-        } else {
-          input.childInfrastructures = [
-            {
-              disconnect: [{ where: {} }],
-            },
-          ]
-        }
-      }
-
-      // Hosted Applications Update - only update if changed
-      const currentHostedAppIds =
-        currentInfrastructure.hostsApplications?.map(app => app.id).sort() || []
-      const newHostedAppIds = data.hostsApplications?.sort() || []
-
-      if (JSON.stringify(currentHostedAppIds) !== JSON.stringify(newHostedAppIds)) {
-        if (newHostedAppIds.length > 0) {
-          input.hostsApplications = [
-            {
-              disconnect: [{ where: {} }],
-              connect: newHostedAppIds.map(id => ({
-                where: {
-                  node: { id: { eq: id } },
-                },
-              })),
-            },
-          ]
-        } else {
-          input.hostsApplications = [
-            {
-              disconnect: [{ where: {} }],
-            },
-          ]
-        }
-      }
-
-      // Part of Architectures Update - only update if changed
-      const currentArchIds =
-        currentInfrastructure.partOfArchitectures?.map(arch => arch.id).sort() || []
-      const newArchIds = data.partOfArchitectures?.sort() || []
-
-      if (JSON.stringify(currentArchIds) !== JSON.stringify(newArchIds)) {
-        if (newArchIds.length > 0) {
-          input.partOfArchitectures = [
-            {
-              disconnect: [{ where: {} }],
-              connect: newArchIds.map(id => ({
-                where: {
-                  node: { id: { eq: id } },
-                },
-              })),
-            },
-          ]
-        } else {
-          input.partOfArchitectures = [
-            {
-              disconnect: [{ where: {} }],
-            },
-          ]
-        }
-      }
-
-      // DepictedInDiagrams Update - only update if changed
-      const currentDepictedInDiagramIds =
-        currentInfrastructure.depictedInDiagrams?.map(diag => diag.id).sort() || []
-      const newDepictedInDiagramIds = data.depictedInDiagrams?.sort() || []
-
-      if (JSON.stringify(currentDepictedInDiagramIds) !== JSON.stringify(newDepictedInDiagramIds)) {
-        if (newDepictedInDiagramIds.length > 0) {
-          input.depictedInDiagrams = [
-            {
-              disconnect: [{ where: {} }],
-              connect: newDepictedInDiagramIds.map(id => ({
-                where: {
-                  node: { id: { eq: id } },
-                },
-              })),
-            },
-          ]
-        } else {
-          input.depictedInDiagrams = [
-            {
-              disconnect: [{ where: {} }],
-            },
-          ]
-        }
-      }
-
-      // Owners Update - only update if changed
-      const currentOwnerId = currentInfrastructure.owners?.[0]?.id || ''
-      const newOwnerId = data.ownerId || ''
-
-      if (currentOwnerId !== newOwnerId) {
-        if (newOwnerId) {
-          input.owners = [
-            {
-              disconnect: [{ where: {} }],
-              connect: [{ where: { node: { id: { eq: newOwnerId } } } }],
-            },
-          ]
-        } else {
-          input.owners = [
-            {
-              disconnect: [{ where: {} }],
-            },
-          ]
-        }
-      }
-
-      await updateInfrastructure({
-        variables: {
-          where: { id: { eq: id } },
-          update: input,
-        },
-      })
-    } catch (error) {
-      console.error('Fehler beim Aktualisieren der Infrastruktur:', error)
-    }
-  }
+    },
+    [updateInfrastructure]
+  )
 
   // Handler für das Löschen einer Infrastruktur
-  const handleDeleteInfrastructure = async (id: string) => {
-    try {
-      await deleteInfrastructure({
-        variables: { where: { id: { eq: id } } },
-      })
-    } catch (error) {
-      console.error('Fehler beim Löschen der Infrastruktur:', error)
-    }
+  const handleDeleteInfrastructure = useCallback(
+    async (id: string) => {
+      try {
+        await deleteInfrastructure({
+          variables: { id },
+        })
+      } catch (error) {
+        console.error('Fehler beim Löschen der Infrastruktur:', error)
+      }
+    },
+    [deleteInfrastructure]
+  )
+
+  // Handler für den Export
+  const handleExport = useCallback(() => {
+    if (!tableInstance) return
+    // Export-Logik hier implementieren
+    console.log('Export wird implementiert...')
+  }, [tableInstance])
+
+  // Handler für den Excel-Export
+  const handleExcelExport = useCallback(() => {
+    if (!tableInstance) return
+    // Excel-Export-Logik hier implementieren
+    console.log('Excel-Export wird implementiert...')
+  }, [tableInstance])
+
+  // Wenn nicht authentifiziert oder noch nicht initialisiert, nichts anzeigen
+  if (!authenticated || !initialized) {
+    return null
   }
 
   return (
-    <Box sx={{ py: 2, px: 1 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+    <Box>
+      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography variant="h4" component="h1">
           {t('title')}
         </Typography>
         {isArchitect() && (
           <Button
             variant="contained"
-            color="primary"
             startIcon={<AddIcon />}
-            onClick={handleCreateInfrastructure}
+            onClick={handleAddInfrastructure}
+            sx={{ ml: 'auto' }}
           >
-            {t('addNew')}
+            {t('addInfrastructure')}
           </Button>
         )}
       </Box>
 
-      <Card sx={{ mb: 3 }}>
-        <InfrastructureToolbar
-          globalFilter={globalFilter}
-          onGlobalFilterChange={setGlobalFilter}
-          activeFiltersCount={activeFiltersCount}
-          onFilterClick={() => setIsFilterDialogOpen(true)}
-          onResetFilters={handleResetFilters}
-          table={tableInstance}
-          enableColumnVisibilityToggle={true}
-          defaultColumnVisibility={INFRASTRUCTURE_DEFAULT_COLUMN_VISIBILITY}
-        />
-
-        <Paper sx={{ overflow: 'hidden' }}>
-          <InfrastructureTable
-            infrastructures={filteredInfrastructures}
-            loading={loading}
+      <Card>
+        <Box sx={{ p: 2 }}>
+          <InfrastructureToolbar
             globalFilter={globalFilter}
+            onGlobalFilterChange={setGlobalFilter}
+            tableInstance={tableInstance}
+            onExport={handleExport}
+            onExcelExport={handleExcelExport}
+            onOpenFilterDialog={() => setIsFilterDialogOpen(true)}
+            onResetFilters={resetFilters}
+          />
+        </Box>
+
+        <Box sx={{ overflow: 'auto' }}>
+          <InfrastructureTable
+            data={filteredInfrastructures}
+            globalFilter={globalFilter}
+            onGlobalFilterChange={setGlobalFilter}
             sorting={sorting}
             onSortingChange={setSorting}
-            onCreateInfrastructure={handleCreateInfrastructureSubmit}
-            onUpdateInfrastructure={handleUpdateInfrastructureSubmit}
-            onDeleteInfrastructure={handleDeleteInfrastructure}
-            onTableReady={setTableInstance}
             columnVisibility={columnVisibility}
             onColumnVisibilityChange={setColumnVisibility}
+            onTableInstanceChange={setTableInstance}
+            onEdit={handleEditInfrastructure}
+            onDelete={handleDeleteInfrastructure}
+            isLoading={loading}
+            defaultColumnVisibility={INFRASTRUCTURE_DEFAULT_COLUMN_VISIBILITY}
           />
-        </Paper>
+        </Box>
       </Card>
 
-      {isFilterDialogOpen && (
-        <InfrastructureFilterDialog
-          open={isFilterDialogOpen}
-          onClose={() => setIsFilterDialogOpen(false)}
-          filters={filters}
-          onFiltersChange={setFilters}
-          onResetFilters={handleResetFilters}
-          filterOptions={filterOptions}
-        />
+      {/* Filter Dialog */}
+      <InfrastructureFilterDialog
+        open={isFilterDialogOpen}
+        onClose={() => setIsFilterDialogOpen(false)}
+        filters={filterState}
+        onFiltersChange={setFilterState}
+        onResetFilters={resetFilters}
+        filterOptions={{
+          infrastructureTypes: availableTypes,
+          statuses: availableStatuses,
+          vendors: availableVendors,
+          locations: availableLocations,
+          operatingSystems: availableOperatingSystems,
+          owners: [], // Falls benötigt, könnte aus dem Hook hinzugefügt werden
+          hostsApplications: [], // Falls benötigt, könnte aus dem Hook hinzugefügt werden
+          partOfArchitectures: [], // Falls benötigt, könnte aus dem Hook hinzugefügt werden
+        }}
+      />
+
+      {/* Neues Infrastruktur Formular */}
+      {showNewInfrastructureForm && (
+        <Paper
+          elevation={3}
+          sx={{
+            position: 'fixed',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '90%',
+            maxWidth: 600,
+            maxHeight: '90vh',
+            overflow: 'auto',
+            zIndex: 1300,
+            p: 3,
+          }}
+        >
+          <Typography variant="h6" gutterBottom>
+            {t('addInfrastructure')}
+          </Typography>
+          <InfrastructureForm
+            onSubmit={handleCreateInfrastructure}
+            onCancel={() => setShowNewInfrastructureForm(false)}
+          />
+        </Paper>
       )}
 
-      {/* Formular für neue Infrastruktur */}
+      {/* Backdrop für das Formular */}
       {showNewInfrastructureForm && (
-        <InfrastructureForm
-          isOpen={showNewInfrastructureForm}
-          onClose={() => setShowNewInfrastructureForm(false)}
-          onSubmit={handleCreateInfrastructureSubmit}
-          mode="create"
-          loading={false}
+        <Box
+          sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            bgcolor: 'rgba(0, 0, 0, 0.5)',
+            zIndex: 1200,
+          }}
+          onClick={() => setShowNewInfrastructureForm(false)}
         />
       )}
     </Box>

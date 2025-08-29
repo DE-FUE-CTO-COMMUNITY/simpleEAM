@@ -29,12 +29,6 @@ function PersonsPage() {
 
   // Filter-Zustand
   const [filterOpen, setFilterOpen] = useState(false)
-  const [filterState, setFilterState] = useState<FilterState>({
-    departmentFilter: [],
-    roleFilter: [],
-    searchFilter: '',
-    updatedDateRange: ['', ''],
-  })
   const [activeFiltersCount, setActiveFiltersCount] = useState<number>(0)
 
   // Liste der verfügbaren Abteilungen und Rollen aus den Daten extrahieren
@@ -82,8 +76,8 @@ function PersonsPage() {
 
   const persons = data?.people || []
 
-  // Filter auf Personen anwenden
-  const { filteredPersons: filteredData } = usePersonFilter({ persons, filterState })
+  // Filter-Hook verwenden (Pattern 2)
+  const { filterState, setFilterState, filteredPersons: filteredData, resetFilters } = usePersonFilter({ persons })
 
   // Mutation zum Erstellen einer neuen Person
   const [createPerson, { loading: isCreating }] = useMutation(CREATE_PERSON, {
@@ -180,12 +174,7 @@ function PersonsPage() {
 
   // Filter zurücksetzen
   const handleResetFilter = () => {
-    setFilterState({
-      departmentFilter: [],
-      roleFilter: [],
-      searchFilter: '',
-      updatedDateRange: ['', ''],
-    })
+    resetFilters()
     setActiveFiltersCount(0)
   }
 

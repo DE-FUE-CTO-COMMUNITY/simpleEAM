@@ -4,18 +4,9 @@ import React from 'react'
 import { useTranslations } from 'next-intl'
 import GenericFilterDialog, { FilterField, GenericFilterState } from '../common/GenericFilterDialog'
 import { DataClassification } from '../../gql/generated'
+import { DataObjectFilterState } from './useDataObjectFilter'
 
-export interface DataObjectFilterState {
-  classifications: DataClassification[]
-  formats: string[]
-  sources: string[]
-  owners: string[]
-  usedByApplications: string[]
-  relatedToCapabilities: string[]
-  partOfArchitectures: string[]
-  descriptionFilter: string
-  updatedDateRange: [string, string]
-}
+export type { DataObjectFilterState }
 
 export interface DataObjectFilterOptions {
   availableFormats: string[]
