@@ -115,7 +115,7 @@ export default function {{ENTITY_NAME_UPPER}}Page() {
       <{{ENTITY_SINGULAR_UPPER}}Toolbar
         globalFilter={globalFilter}
         onGlobalFilterChange={setGlobalFilter}
-        activeFiltersCount={countActiveFilters(filter)}
+        activeFiltersCount={countActiveFilters(filterState)}
         onFilterClick={() => {
           // Filter wird über GenericToolbar verwaltet
         }}

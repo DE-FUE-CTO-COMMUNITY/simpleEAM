@@ -53,3 +53,32 @@ export const getInfrastructureStatusLabel = (status: InfrastructureStatus): stri
       return status
   }
 }
+
+// Berechnet die Anzahl der aktiven Filter
+export const countActiveFilters = (filterState: any): number => {
+  if (!filterState) return 0
+  
+  const {
+    statusFilter = [],
+    typeFilter = [],
+    costRangeFilter = [0, 1000000],
+    vendorFilter = '',
+    locationFilter = '',
+    ownerFilter = '',
+    descriptionFilter = '',
+    updatedDateRange = ['', ''],
+    operatingSystemFilter = '',
+  } = filterState
+
+  return (
+    (statusFilter.length > 0 ? 1 : 0) +
+    (typeFilter.length > 0 ? 1 : 0) +
+    (costRangeFilter[0] > 0 || costRangeFilter[1] < 1000000 ? 1 : 0) +
+    (vendorFilter ? 1 : 0) +
+    (locationFilter ? 1 : 0) +
+    (ownerFilter ? 1 : 0) +
+    (descriptionFilter ? 1 : 0) +
+    (updatedDateRange[0] || updatedDateRange[1] ? 1 : 0) +
+    (operatingSystemFilter ? 1 : 0)
+  )
+}

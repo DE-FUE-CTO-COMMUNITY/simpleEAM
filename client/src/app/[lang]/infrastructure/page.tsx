@@ -1,322 +1,192 @@
 'use client'
 
-import React, { useState, useCallback, useMemo } from 'react'
-import { Box, Typography, Button, Card, Paper } from '@mui/material'
-import { Add as AddIcon } from '@mui/icons-material'
-import { useTranslations } from 'next-intl'
-import { useAuth, isArchitect } from '@/lib/auth'
-import { SortingState, VisibilityState } from '@tanstack/react-table'
+import React, { useState, useMemo } from 'react'
 import { useQuery, useMutation } from '@apollo/client'
-import { useSnackbar } from 'notistack'
+import { useTranslations } from 'next-intl'
+import { Box, Typography } from '@mui/material'
+import { SortingState } from '@tanstack/react-table'
+import { Infrastructure } from '../../../gql/generated'
+import InfrastructureTable from '../../../components/infrastructure/InfrastructureTable'
+import InfrastructureToolbar from '../../../components/infrastructure/InfrastructureToolbar'
+import { useInfrastructureFilter } from '../../../components/infrastructure/useInfrastructureFilter'
+import { InfrastructureFormValues } from '../../../components/infrastructure/InfrastructureForm'
+import { countActiveFilters } from '../../../components/infrastructure/utils'
 import {
   GET_INFRASTRUCTURES,
   CREATE_INFRASTRUCTURE,
   UPDATE_INFRASTRUCTURE,
   DELETE_INFRASTRUCTURE,
-} from '@/graphql/infrastructure'
-import InfrastructureTable, {
-  INFRASTRUCTURE_DEFAULT_COLUMN_VISIBILITY,
-} from '@/components/infrastructure/InfrastructureTable'
-import InfrastructureToolbar from '@/components/infrastructure/InfrastructureToolbar'
-import InfrastructureFilterDialog from '@/components/infrastructure/InfrastructureFilterDialog'
-import InfrastructureForm, {
-  InfrastructureFormValues,
-} from '@/components/infrastructure/InfrastructureForm'
-import { Infrastructure } from '@/gql/generated'
-import { useInfrastructureFilter } from '@/components/infrastructure/useInfrastructureFilter'
+} from '../../../graphql/infrastructure'
 
-const InfrastructurePage = () => {
-  const { authenticated, initialized } = useAuth()
-  const { enqueueSnackbar } = useSnackbar()
+export default function InfrastructuresPage() {
   const t = useTranslations('infrastructure')
-  const [globalFilter, setGlobalFilter] = useState('')
   const [sorting, setSorting] = useState<SortingState>([])
-  const [tableInstance, setTableInstance] = useState<any>(null)
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
-  const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false)
-  const [showNewInfrastructureForm, setShowNewInfrastructureForm] = useState(false)
+  const [globalFilter, setGlobalFilter] = useState('')
 
-  // GraphQL-Abfrage für Infrastrukturen
-  const { data, loading, refetch } = useQuery(GET_INFRASTRUCTURES, {
-    skip: !authenticated || !initialized,
-    fetchPolicy: 'cache-and-network',
+  // GraphQL Queries & Mutations
+  const { data, loading, error, refetch } = useQuery(GET_INFRASTRUCTURES)
+  const [createInfrastructure] = useMutation(CREATE_INFRASTRUCTURE)
+  const [updateInfrastructure] = useMutation(UPDATE_INFRASTRUCTURE)
+  const [deleteInfrastructure] = useMutation(DELETE_INFRASTRUCTURE)
+
+  // Filter Logic
+  const infrastructures = data?.infrastructures || []
+  const { filterState, setFilterState, filteredInfrastructures, resetFilters } = useInfrastructureFilter({
+    infrastructures,
   })
 
-  // Echte Daten aus GraphQL oder Fallback auf leeres Array
-  const infrastructures: Infrastructure[] = useMemo(() => {
-    return data?.infrastructures || []
-  }, [data])
+  // Weitere Filterung durch globalen Suchfilter
+  const finalInfrastructures = useMemo(() => {
+    if (!globalFilter.trim()) return filteredInfrastructures
+    const searchTerm = globalFilter.toLowerCase()
+    return filteredInfrastructures.filter(
+      infrastructure =>
+        infrastructure.name?.toLowerCase().includes(searchTerm) ||
+        infrastructure.description?.toLowerCase().includes(searchTerm)
+    )
+  }, [filteredInfrastructures, globalFilter])
 
-  // Filter Hook mit Pattern 2
-  const {
-    filterState,
-    setFilterState,
-    filteredInfrastructures,
-    resetFilters,
-    availableTypes,
-    availableStatuses,
-    availableVendors,
-    availableLocations,
-    availableOperatingSystems,
-  } = useInfrastructureFilter({ infrastructures })
-
-  // GraphQL-Mutationen für Infrastrukturen
-  const [createInfrastructure] = useMutation(CREATE_INFRASTRUCTURE, {
-    onCompleted: () => {
-      enqueueSnackbar('Infrastruktur erfolgreich erstellt', { variant: 'success' })
-      refetch()
-    },
-    onError: error => {
-      enqueueSnackbar(`Fehler beim Erstellen der Infrastruktur: ${error.message}`, {
-        variant: 'error',
-      })
-    },
-  })
-
-  const [updateInfrastructure] = useMutation(UPDATE_INFRASTRUCTURE, {
-    onCompleted: () => {
-      enqueueSnackbar('Infrastruktur erfolgreich aktualisiert', { variant: 'success' })
-      refetch()
-    },
-    onError: error => {
-      enqueueSnackbar(`Fehler beim Aktualisieren der Infrastruktur: ${error.message}`, {
-        variant: 'error',
-      })
-    },
-  })
-
-  const [deleteInfrastructure] = useMutation(DELETE_INFRASTRUCTURE, {
-    onCompleted: () => {
-      enqueueSnackbar('Infrastruktur erfolgreich gelöscht', { variant: 'success' })
-      refetch()
-    },
-    onError: error => {
-      enqueueSnackbar(`Fehler beim Löschen der Infrastruktur: ${error.message}`, {
-        variant: 'error',
-      })
-    },
-  })
-
-  // Handler für das Hinzufügen neuer Infrastrukturen
-  const handleAddInfrastructure = useCallback(() => {
-    setShowNewInfrastructureForm(true)
-  }, [])
-
-  // Handler für das Erstellen einer neuen Infrastruktur
-  const handleCreateInfrastructure = useCallback(
-    async (values: InfrastructureFormValues) => {
-      try {
-        await createInfrastructure({
-          variables: {
-            input: {
-              name: values.name,
-              description: values.description || '',
-              infrastructureType: values.infrastructureType,
-              status: values.status,
-              vendor: values.vendor || '',
-              version: values.version || '',
-              location: values.location || '',
-              ipAddress: values.ipAddress || '',
-              operatingSystem: values.operatingSystem || '',
-              maintenanceWindow: values.maintenanceWindow || '',
-              endOfLifeDate: values.endOfLifeDate || null,
-              ownerId: values.ownerId || null,
-              parentInfrastructureId: values.parentInfrastructureId || null,
-              childInfrastructureIds: values.childInfrastructureIds || [],
-              hostsApplicationIds: values.hostsApplicationIds || [],
-              partOfArchitectureIds: values.partOfArchitectureIds || [],
-              depictedInDiagramIds: values.depictedInDiagramIds || [],
-            },
+  // CRUD Handlers
+  const handleCreate = async (data: InfrastructureFormValues) => {
+    try {
+      await createInfrastructure({
+        variables: {
+          input: {
+            name: data.name,
+            description: data.description || '',
+            infrastructureType: data.infrastructureType,
+            status: data.status,
+            vendor: data.vendor || '',
+            version: data.version || '',
+            capacity: data.capacity || '',
+            location: data.location || '',
+            ipAddress: data.ipAddress || '',
+            operatingSystem: data.operatingSystem || '',
+            specifications: data.specifications || '',
+            maintenanceWindow: data.maintenanceWindow || '',
+            costs: data.costs || null,
+            planningDate: data.planningDate || null,
+            introductionDate: data.introductionDate || null,
+            endOfUseDate: data.endOfUseDate || null,
+            endOfLifeDate: data.endOfLifeDate || null,
+            ...(data.parentInfrastructure && {
+              parentInfrastructure: {
+                connect: { where: { node: { id: data.parentInfrastructure } } }
+              }
+            }),
+            ...(data.childInfrastructures && data.childInfrastructures.length > 0 && {
+              childInfrastructures: {
+                connect: data.childInfrastructures.map((id: string) => ({ where: { node: { id } } }))
+              }
+            }),
+            ...(data.hostsApplications && data.hostsApplications.length > 0 && {
+              hostsApplications: {
+                connect: data.hostsApplications.map((id: string) => ({ where: { node: { id } } }))
+              }
+            }),
+            ...(data.partOfArchitectures && data.partOfArchitectures.length > 0 && {
+              partOfArchitectures: {
+                connect: data.partOfArchitectures.map((id: string) => ({ where: { node: { id } } }))
+              }
+            }),
+            ...(data.depictedInDiagrams && data.depictedInDiagrams.length > 0 && {
+              depictedInDiagrams: {
+                connect: data.depictedInDiagrams.map((id: string) => ({ where: { node: { id } } }))
+              }
+            }),
           },
-        })
-        setShowNewInfrastructureForm(false)
-      } catch (error) {
-        console.error('Fehler beim Erstellen der Infrastruktur:', error)
-      }
-    },
-    [createInfrastructure]
-  )
+        },
+      })
+      refetch()
+    } catch (error) {
+      console.error('Error creating infrastructure:', error)
+      throw error
+    }
+  }
 
-  // Handler für das Bearbeiten einer Infrastruktur
-  const handleEditInfrastructure = useCallback(
-    async (id: string, values: InfrastructureFormValues) => {
-      try {
-        await updateInfrastructure({
-          variables: {
-            id: id,
-            input: {
-              name: values.name,
-              description: values.description || '',
-              infrastructureType: values.infrastructureType,
-              status: values.status,
-              vendor: values.vendor || '',
-              version: values.version || '',
-              location: values.location || '',
-              ipAddress: values.ipAddress || '',
-              operatingSystem: values.operatingSystem || '',
-              maintenanceWindow: values.maintenanceWindow || '',
-              endOfLifeDate: values.endOfLifeDate || null,
-              ownerId: values.ownerId || null,
-              parentInfrastructureId: values.parentInfrastructureId || null,
-              childInfrastructureIds: values.childInfrastructureIds || [],
-              hostsApplicationIds: values.hostsApplicationIds || [],
-              partOfArchitectureIds: values.partOfArchitectureIds || [],
-              depictedInDiagramIds: values.depictedInDiagramIds || [],
-            },
+  const handleUpdate = async (id: string, data: InfrastructureFormValues) => {
+    try {
+      await updateInfrastructure({
+        variables: {
+          where: { id },
+          update: {
+            name: data.name,
+            description: data.description || '',
+            infrastructureType: data.infrastructureType,
+            status: data.status,
+            vendor: data.vendor || '',
+            version: data.version || '',
+            capacity: data.capacity || '',
+            location: data.location || '',
+            ipAddress: data.ipAddress || '',
+            operatingSystem: data.operatingSystem || '',
+            specifications: data.specifications || '',
+            maintenanceWindow: data.maintenanceWindow || '',
+            costs: data.costs || null,
+            planningDate: data.planningDate || null,
+            introductionDate: data.introductionDate || null,
+            endOfUseDate: data.endOfUseDate || null,
+            endOfLifeDate: data.endOfLifeDate || null,
+            // Beziehungen werden hier nicht aktualisiert - würde komplexere Logik erfordern
           },
-        })
-      } catch (error) {
-        console.error('Fehler beim Aktualisieren der Infrastruktur:', error)
-      }
-    },
-    [updateInfrastructure]
-  )
+        },
+      })
+      refetch()
+    } catch (error) {
+      console.error('Error updating infrastructure:', error)
+      throw error
+    }
+  }
 
-  // Handler für das Löschen einer Infrastruktur
-  const handleDeleteInfrastructure = useCallback(
-    async (id: string) => {
-      try {
-        await deleteInfrastructure({
-          variables: { id },
-        })
-      } catch (error) {
-        console.error('Fehler beim Löschen der Infrastruktur:', error)
-      }
-    },
-    [deleteInfrastructure]
-  )
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteInfrastructure({
+        variables: { where: { id } },
+      })
+      refetch()
+    } catch (error) {
+      console.error('Error deleting infrastructure:', error)
+      throw error
+    }
+  }
 
-  // Handler für den Export
-  const handleExport = useCallback(() => {
-    if (!tableInstance) return
-    // Export-Logik hier implementieren
-    console.log('Export wird implementiert...')
-  }, [tableInstance])
+  const handleAddNew = () => {
+    // Wird von der Tabelle gehandhabt
+  }
 
-  // Handler für den Excel-Export
-  const handleExcelExport = useCallback(() => {
-    if (!tableInstance) return
-    // Excel-Export-Logik hier implementieren
-    console.log('Excel-Export wird implementiert...')
-  }, [tableInstance])
-
-  // Wenn nicht authentifiziert oder noch nicht initialisiert, nichts anzeigen
-  if (!authenticated || !initialized) {
-    return null
+  if (error) {
+    return (
+      <Box p={3}>
+        <Typography color="error">{t('messages.loadError')}</Typography>
+      </Box>
+    )
   }
 
   return (
     <Box>
-      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h4" component="h1">
-          {t('title')}
-        </Typography>
-        {isArchitect() && (
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleAddInfrastructure}
-            sx={{ ml: 'auto' }}
-          >
-            {t('addInfrastructure')}
-          </Button>
-        )}
-      </Box>
-
-      <Card>
-        <Box sx={{ p: 2 }}>
-          <InfrastructureToolbar
-            globalFilter={globalFilter}
-            onGlobalFilterChange={setGlobalFilter}
-            tableInstance={tableInstance}
-            onExport={handleExport}
-            onExcelExport={handleExcelExport}
-            onOpenFilterDialog={() => setIsFilterDialogOpen(true)}
-            onResetFilters={resetFilters}
-          />
-        </Box>
-
-        <Box sx={{ overflow: 'auto' }}>
-          <InfrastructureTable
-            data={filteredInfrastructures}
-            globalFilter={globalFilter}
-            onGlobalFilterChange={setGlobalFilter}
-            sorting={sorting}
-            onSortingChange={setSorting}
-            columnVisibility={columnVisibility}
-            onColumnVisibilityChange={setColumnVisibility}
-            onTableInstanceChange={setTableInstance}
-            onEdit={handleEditInfrastructure}
-            onDelete={handleDeleteInfrastructure}
-            isLoading={loading}
-            defaultColumnVisibility={INFRASTRUCTURE_DEFAULT_COLUMN_VISIBILITY}
-          />
-        </Box>
-      </Card>
-
-      {/* Filter Dialog */}
-      <InfrastructureFilterDialog
-        open={isFilterDialogOpen}
-        onClose={() => setIsFilterDialogOpen(false)}
-        filters={filterState}
-        onFiltersChange={setFilterState}
-        onResetFilters={resetFilters}
-        filterOptions={{
-          infrastructureTypes: availableTypes,
-          statuses: availableStatuses,
-          vendors: availableVendors,
-          locations: availableLocations,
-          operatingSystems: availableOperatingSystems,
-          owners: [], // Falls benötigt, könnte aus dem Hook hinzugefügt werden
-          hostsApplications: [], // Falls benötigt, könnte aus dem Hook hinzugefügt werden
-          partOfArchitectures: [], // Falls benötigt, könnte aus dem Hook hinzugefügt werden
+      <InfrastructureToolbar
+        globalFilter={globalFilter}
+        onGlobalFilterChange={setGlobalFilter}
+        activeFiltersCount={countActiveFilters(filterState)}
+        onFilterClick={() => {
+          // Filter wird über GenericToolbar verwaltet
+        }}
+        onResetFilters={() => {
+          resetFilters()
+          setGlobalFilter('')
         }}
       />
 
-      {/* Neues Infrastruktur Formular */}
-      {showNewInfrastructureForm && (
-        <Paper
-          elevation={3}
-          sx={{
-            position: 'fixed',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: '90%',
-            maxWidth: 600,
-            maxHeight: '90vh',
-            overflow: 'auto',
-            zIndex: 1300,
-            p: 3,
-          }}
-        >
-          <Typography variant="h6" gutterBottom>
-            {t('addInfrastructure')}
-          </Typography>
-          <InfrastructureForm
-            onSubmit={handleCreateInfrastructure}
-            onCancel={() => setShowNewInfrastructureForm(false)}
-          />
-        </Paper>
-      )}
-
-      {/* Backdrop für das Formular */}
-      {showNewInfrastructureForm && (
-        <Box
-          sx={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            bgcolor: 'rgba(0, 0, 0, 0.5)',
-            zIndex: 1200,
-          }}
-          onClick={() => setShowNewInfrastructureForm(false)}
-        />
-      )}
+      <InfrastructureTable
+        infrastructures={finalInfrastructures as Infrastructure[]}
+        loading={loading}
+        globalFilter={globalFilter}
+        sorting={sorting}
+        onSortingChange={setSorting}
+        onCreateInfrastructure={handleCreate}
+        onUpdateInfrastructure={handleUpdate}
+        onDeleteInfrastructure={handleDelete}
+      />
     </Box>
   )
 }
-
-export default InfrastructurePage
