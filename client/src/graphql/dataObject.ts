@@ -49,6 +49,10 @@ export const GET_DATA_OBJECTS = gql`
         id
         name
       }
+      transferredInInterfaces {
+        id
+        name
+      }
       partOfArchitectures {
         id
         name
@@ -94,6 +98,10 @@ export const GET_DATA_OBJECT = gql`
         id
         name
       }
+      transferredInInterfaces {
+        id
+        name
+      }
       depictedInDiagrams {
         id
         title
@@ -121,6 +129,22 @@ export const CREATE_DATA_OBJECT = gql`
         endOfUseDate
         endOfLifeDate
         dataSources {
+          id
+          name
+        }
+        usedByApplications {
+          id
+          name
+        }
+        relatedToCapabilities {
+          id
+          name
+        }
+        transferredInInterfaces {
+          id
+          name
+        }
+        partOfArchitectures {
           id
           name
         }
@@ -154,6 +178,22 @@ export const UPDATE_DATA_OBJECT = gql`
         endOfUseDate
         endOfLifeDate
         dataSources {
+          id
+          name
+        }
+        usedByApplications {
+          id
+          name
+        }
+        relatedToCapabilities {
+          id
+          name
+        }
+        transferredInInterfaces {
+          id
+          name
+        }
+        partOfArchitectures {
           id
           name
         }

@@ -14,7 +14,9 @@ import {
 import { GET_PERSONS } from '@/graphql/person'
 import { GET_APPLICATIONS } from '@/graphql/application'
 import { GET_ARCHITECTURES } from '@/graphql/architecture'
+import { GET_CAPABILITIES } from '@/graphql/capability'
 import { GET_DIAGRAMS } from '@/graphql/diagram'
+import { GET_APPLICATION_INTERFACES } from '@/graphql/applicationInterface'
 import { useCurrentPerson } from '@/hooks/useCurrentPerson'
 import { DataObject, DataClassification, Architecture } from '../../gql/generated'
 import GenericForm, { FieldConfig } from '../common/GenericForm'
@@ -33,6 +35,9 @@ const baseDataObjectSchema = z.object({
   classification: z.nativeEnum(DataClassification),
   format: z.string().max(50, 'Das Format darf maximal 50 Zeichen lang sein').optional().nullable(),
   dataSources: z.array(z.string()).optional(),
+  usedByApplications: z.array(z.string()).optional(),
+  relatedToCapabilities: z.array(z.string()).optional(),
+  transferredInInterfaces: z.array(z.string()).optional(),
   introductionDate: z.date().optional().nullable(),
   endOfLifeDate: z.date().optional().nullable(),
   planningDate: z.date().optional().nullable(),
@@ -98,10 +103,18 @@ const DataObjectForm: React.FC<GenericFormProps<DataObject, DataObjectFormValues
   const { data: applicationData, loading: applicationLoading } = useQuery(GET_APPLICATIONS, {
     fetchPolicy: 'cache-and-network',
   })
+  // Capabilities laden
+  const { data: capabilitiesData, loading: capabilitiesLoading } = useQuery(GET_CAPABILITIES, {
+    fetchPolicy: 'cache-and-network',
+  })
   // Architekturen laden
   const { data: architecturesData, loading: architecturesLoading } = useQuery(GET_ARCHITECTURES)
   // Diagramme laden
   const { data: diagramsData, loading: diagramsLoading } = useQuery(GET_DIAGRAMS, {
+    fetchPolicy: 'cache-and-network',
+  })
+  // Application Interfaces laden
+  const { data: interfacesData, loading: interfacesLoading } = useQuery(GET_APPLICATION_INTERFACES, {
     fetchPolicy: 'cache-and-network',
   })
 
@@ -113,6 +126,9 @@ const DataObjectForm: React.FC<GenericFormProps<DataObject, DataObjectFormValues
       classification: dataObject?.classification || DataClassification.INTERNAL,
       format: dataObject?.format || null,
       dataSources: dataObject?.dataSources?.map(source => source.id) || [],
+      usedByApplications: dataObject?.usedByApplications?.map(app => app.id) || [],
+      relatedToCapabilities: dataObject?.relatedToCapabilities?.map(cap => cap.id) || [],
+      transferredInInterfaces: dataObject?.transferredInInterfaces?.map(inter => inter.id) || [],
       introductionDate: dataObject?.introductionDate ? new Date(dataObject.introductionDate) : null,
       endOfLifeDate: dataObject?.endOfLifeDate ? new Date(dataObject.endOfLifeDate) : null,
       planningDate: dataObject?.planningDate ? new Date(dataObject.planningDate) : null,
@@ -164,6 +180,9 @@ const DataObjectForm: React.FC<GenericFormProps<DataObject, DataObjectFormValues
         classification: dataObject.classification ?? DataClassification.INTERNAL,
         format: dataObject.format ?? null,
         dataSources: dataObject.dataSources?.map(app => app.id) ?? [],
+        usedByApplications: dataObject.usedByApplications?.map(app => app.id) ?? [],
+        relatedToCapabilities: dataObject.relatedToCapabilities?.map(cap => cap.id) ?? [],
+        transferredInInterfaces: dataObject.transferredInInterfaces?.map(inter => inter.id) ?? [],
         introductionDate: dataObject.introductionDate
           ? new Date(dataObject.introductionDate)
           : null,
@@ -330,6 +349,102 @@ const DataObjectForm: React.FC<GenericFormProps<DataObject, DataObjectFormValues
             (app: { id: string; name: string }) => app.id === option
           )
           return matchingApp?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
+      tabId: 'relationships',
+    },
+    {
+      name: 'usedByApplications',
+      label: t('usedByApplications'),
+      type: 'autocomplete',
+      validators: baseDataObjectSchema.shape.usedByApplications,
+      size: { xs: 12, md: 6 },
+      options:
+        applicationData?.applications?.map(
+          (app: { id: string; name: string }): SelectOption => ({
+            value: app.id,
+            label: app.name,
+          })
+        ) || [],
+      multiple: true,
+      loadingOptions: applicationLoading,
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          const matchingApp = applicationData?.applications?.find(
+            (app: { id: string; name: string }) => app.id === option
+          )
+          return matchingApp?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
+      tabId: 'relationships',
+    },
+    {
+      name: 'relatedToCapabilities',
+      label: t('relatedToCapabilities'),
+      type: 'autocomplete',
+      validators: baseDataObjectSchema.shape.relatedToCapabilities,
+      size: { xs: 12, md: 6 },
+      options:
+        capabilitiesData?.businessCapabilities?.map(
+          (cap: { id: string; name: string }): SelectOption => ({
+            value: cap.id,
+            label: cap.name,
+          })
+        ) || [],
+      multiple: true,
+      loadingOptions: capabilitiesLoading,
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          const matchingCap = capabilitiesData?.businessCapabilities?.find(
+            (cap: { id: string; name: string }) => cap.id === option
+          )
+          return matchingCap?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
+      tabId: 'relationships',
+    },
+    {
+      name: 'transferredInInterfaces',
+      label: t('transferredInInterfaces'),
+      type: 'autocomplete',
+      validators: baseDataObjectSchema.shape.transferredInInterfaces,
+      size: { xs: 12, md: 6 },
+      options:
+        interfacesData?.applicationInterfaces?.map(
+          (inter: { id: string; name: string }): SelectOption => ({
+            value: inter.id,
+            label: inter.name,
+          })
+        ) || [],
+      multiple: true,
+      loadingOptions: interfacesLoading,
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          const matchingInterface = interfacesData?.applicationInterfaces?.find(
+            (inter: { id: string; name: string }) => inter.id === option
+          )
+          return matchingInterface?.name || option
         }
         return option?.label || ''
       },
