@@ -162,6 +162,42 @@ const DataObjectsPage = () => {
               })),
             }
           : undefined,
+        usedByApplications: data.usedByApplications?.length
+          ? {
+              connect: data.usedByApplications.map(id => ({
+                where: {
+                  node: { id: { eq: id } },
+                },
+              })),
+            }
+          : undefined,
+        relatedToCapabilities: data.relatedToCapabilities?.length
+          ? {
+              connect: data.relatedToCapabilities.map(id => ({
+                where: {
+                  node: { id: { eq: id } },
+                },
+              })),
+            }
+          : undefined,
+        transferredInInterfaces: data.transferredInInterfaces?.length
+          ? {
+              connect: data.transferredInInterfaces.map(id => ({
+                where: {
+                  node: { id: { eq: id } },
+                },
+              })),
+            }
+          : undefined,
+        partOfArchitectures: data.partOfArchitectures?.length
+          ? {
+              connect: data.partOfArchitectures.map(id => ({
+                where: {
+                  node: { id: { eq: id } },
+                },
+              })),
+            }
+          : undefined,
         depictedInDiagrams: data.depictedInDiagrams?.length
           ? {
               connect: data.depictedInDiagrams.map(id => ({
@@ -285,6 +321,126 @@ const DataObjectsPage = () => {
         } else {
           // Wenn keine Diagramme ausgewählt sind, alle Verbindungen trennen
           input.depictedInDiagrams = [
+            {
+              disconnect: [{ where: {} }],
+            },
+          ]
+        }
+      }
+
+      // UsedByApplications Update - only update if changed
+      const currentUsedByApplicationIds =
+        currentDataObject.usedByApplications?.map(app => app.id).sort() || []
+      const newUsedByApplicationIds = data.usedByApplications?.sort() || []
+
+      const usedByApplicationsChanged =
+        JSON.stringify(currentUsedByApplicationIds) !== JSON.stringify(newUsedByApplicationIds)
+
+      if (usedByApplicationsChanged) {
+        if (newUsedByApplicationIds.length > 0) {
+          input.usedByApplications = [
+            {
+              disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
+              connect: newUsedByApplicationIds.map(id => ({
+                where: {
+                  node: { id: { eq: id } },
+                },
+              })),
+            },
+          ]
+        } else {
+          // Wenn keine Applikationen ausgewählt sind, alle Verbindungen trennen
+          input.usedByApplications = [
+            {
+              disconnect: [{ where: {} }],
+            },
+          ]
+        }
+      }
+
+      // RelatedToCapabilities Update - only update if changed
+      const currentRelatedToCapabilityIds =
+        currentDataObject.relatedToCapabilities?.map(cap => cap.id).sort() || []
+      const newRelatedToCapabilityIds = data.relatedToCapabilities?.sort() || []
+
+      const relatedToCapabilitiesChanged =
+        JSON.stringify(currentRelatedToCapabilityIds) !== JSON.stringify(newRelatedToCapabilityIds)
+
+      if (relatedToCapabilitiesChanged) {
+        if (newRelatedToCapabilityIds.length > 0) {
+          input.relatedToCapabilities = [
+            {
+              disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
+              connect: newRelatedToCapabilityIds.map(id => ({
+                where: {
+                  node: { id: { eq: id } },
+                },
+              })),
+            },
+          ]
+        } else {
+          // Wenn keine Capabilities ausgewählt sind, alle Verbindungen trennen
+          input.relatedToCapabilities = [
+            {
+              disconnect: [{ where: {} }],
+            },
+          ]
+        }
+      }
+
+      // TransferredInInterfaces Update - only update if changed
+      const currentTransferredInInterfaceIds =
+        currentDataObject.transferredInInterfaces?.map(inter => inter.id).sort() || []
+      const newTransferredInInterfaceIds = data.transferredInInterfaces?.sort() || []
+
+      const transferredInInterfacesChanged =
+        JSON.stringify(currentTransferredInInterfaceIds) !== JSON.stringify(newTransferredInInterfaceIds)
+
+      if (transferredInInterfacesChanged) {
+        if (newTransferredInInterfaceIds.length > 0) {
+          input.transferredInInterfaces = [
+            {
+              disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
+              connect: newTransferredInInterfaceIds.map(id => ({
+                where: {
+                  node: { id: { eq: id } },
+                },
+              })),
+            },
+          ]
+        } else {
+          // Wenn keine Interfaces ausgewählt sind, alle Verbindungen trennen
+          input.transferredInInterfaces = [
+            {
+              disconnect: [{ where: {} }],
+            },
+          ]
+        }
+      }
+
+      // PartOfArchitectures Update - only update if changed
+      const currentPartOfArchitectureIds =
+        currentDataObject.partOfArchitectures?.map(arch => arch.id).sort() || []
+      const newPartOfArchitectureIds = data.partOfArchitectures?.sort() || []
+
+      const partOfArchitecturesChanged =
+        JSON.stringify(currentPartOfArchitectureIds) !== JSON.stringify(newPartOfArchitectureIds)
+
+      if (partOfArchitecturesChanged) {
+        if (newPartOfArchitectureIds.length > 0) {
+          input.partOfArchitectures = [
+            {
+              disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
+              connect: newPartOfArchitectureIds.map(id => ({
+                where: {
+                  node: { id: { eq: id } },
+                },
+              })),
+            },
+          ]
+        } else {
+          // Wenn keine Architekturen ausgewählt sind, alle Verbindungen trennen
+          input.partOfArchitectures = [
             {
               disconnect: [{ where: {} }],
             },
