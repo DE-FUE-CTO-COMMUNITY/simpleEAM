@@ -2,7 +2,7 @@
 
 // Executable script for initializing the Solar Panel Manufacturing scenario
 // Run with: yarn init-db-pv --reset
-// Or directly with: ts-node src/db/init-db-pv-runner.ts --reset
+// Or directly with: ts-node src/db/pv/init-db-pv-runner.ts --reset
 
 import neo4j from 'neo4j-driver'
 import dotenv from 'dotenv'

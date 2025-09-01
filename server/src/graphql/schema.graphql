@@ -68,6 +68,7 @@ type Person
   avatarUrl: String
   createdAt: DateTime! @timestamp(operations: [CREATE])
   updatedAt: DateTime @timestamp(operations: [UPDATE])
+  company: [Company!]! @relationship(type: "EMPLOYED_BY", direction: OUT)
   ownedCapabilities: [BusinessCapability!]! @relationship(type: "OWNED_BY", direction: IN)
   ownedApplications: [Application!]! @relationship(type: "OWNED_BY", direction: IN)
   ownedDataObjects: [DataObject!]! @relationship(type: "OWNED_BY", direction: IN)
@@ -311,6 +312,10 @@ type Company
   ownedInterfaces: [ApplicationInterface!]! @relationship(type: "OWNED_BY", direction: IN)
   ownedInfrastructure: [Infrastructure!]! @relationship(type: "OWNED_BY", direction: IN)
   ownedAIAssets: [AIAsset!]! @relationship(type: "OWNED_BY", direction: IN)
+  employees: [Person!]! @relationship(type: "EMPLOYED_BY", direction: IN)
+  ownedArchitectures: [Architecture!]! @relationship(type: "OWNED_BY", direction: IN)
+  ownedDiagrams: [Diagram!]! @relationship(type: "OWNED_BY", direction: IN)
+  ownedArchitecturePrinciples: [ArchitecturePrinciple!]! @relationship(type: "OWNED_BY", direction: IN)
 }
 
 """
@@ -476,6 +481,7 @@ type Architecture
   tags: [String!]
   createdAt: DateTime! @timestamp(operations: [CREATE])
   updatedAt: DateTime @timestamp(operations: [UPDATE])
+  company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
   owners: [Person!]! @relationship(type: "OWNED_BY", direction: OUT)
   containsCapabilities: [BusinessCapability!]! @relationship(type: "CONTAINS", direction: OUT)
   containsApplications: [Application!]! @relationship(type: "CONTAINS", direction: OUT)
@@ -509,6 +515,7 @@ type Diagram
   diagramPng: String # Enthält das PNG-Bild des Diagramms als base64-codierter String
   createdAt: DateTime! @timestamp(operations: [CREATE])
   updatedAt: DateTime @timestamp(operations: [UPDATE])
+  company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
   architecture: [Architecture!]! @relationship(type: "BELONGS_TO", direction: OUT)
   creator: [Person!]! @relationship(type: "CREATED_BY", direction: OUT)
   containsCapabilities: [BusinessCapability!]! @relationship(type: "DEPICTED_IN", direction: IN)
@@ -541,6 +548,7 @@ type ArchitecturePrinciple
   isActive: Boolean!
   createdAt: DateTime! @timestamp(operations: [CREATE])
   updatedAt: DateTime @timestamp(operations: [UPDATE])
+  company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
   owners: [Person!]! @relationship(type: "OWNED_BY", direction: OUT)
   appliedInArchitectures: [Architecture!]! @relationship(type: "APPLIES_PRINCIPLE", direction: IN)
   implementedByApplications: [Application!]!

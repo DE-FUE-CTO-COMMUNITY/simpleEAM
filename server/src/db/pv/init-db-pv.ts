@@ -2,6 +2,9 @@
 // Orchestrates the creation of a comprehensive enterprise architecture model
 
 import { Driver, Session } from 'neo4j-driver'
+import { createSolarCompany } from './pv-company'
+import { associateEntitiesWithCompany } from './pv-company-relationships'
+import { validateCompanyAssociations } from './pv-company-validation'
 import { createBusinessCapabilities } from './pv-business-capabilities'
 import { createPersons, createCapabilityOwnership } from './pv-persons'
 import { createApplications, createApplicationOwnership } from './pv-applications'
@@ -39,6 +42,12 @@ export async function initPhotovoltaicScenario(driver: Driver) {
   )
 
   try {
+    // ===== PHASE 0: COMPANY FOUNDATION =====
+    console.log('\n🏢 Phase 0: Creating Company Foundation...')
+    
+    // Create the main company entity
+    await createSolarCompany(session)
+
     // ===== PHASE 1: CORE ENTITIES =====
     console.log('\n📋 Phase 1: Creating Core Business Entities...')
 
@@ -112,12 +121,19 @@ export async function initPhotovoltaicScenario(driver: Driver) {
     // 18. Architecture Ownership
     await createArchitectureOwnership(session)
 
+    // ===== PHASE 5: COMPANY ASSOCIATIONS =====
+    console.log('\n🏢 Phase 5: Associating all entities with company...')
+    
+    // Associate all entities with the main company
+    await associateEntitiesWithCompany(session)
+
     // ===== COMPLETION SUMMARY =====
     console.log('\n✅ Solar Panel Manufacturing Company Scenario Complete!')
 
     // Generate summary statistics
     const stats = await generateScenarioStatistics(session)
     console.log('\n📊 Scenario Statistics:')
+    console.log(`   • Companies: ${stats.companies}`)
     console.log(
       `   • Business Capabilities: ${stats.capabilities} (${stats.l1Capabilities} L1, ${stats.l2Capabilities} L2)`
     )
@@ -151,6 +167,7 @@ export async function initPhotovoltaicScenario(driver: Driver) {
 
 async function generateScenarioStatistics(session: Session) {
   // Count all created entities
+  const companyResult = await session.run('MATCH (c:Company) RETURN count(c) as total')
   const capabilityResult = await session.run(
     'MATCH (c:BusinessCapability) RETURN count(c) as total'
   )
@@ -176,6 +193,7 @@ async function generateScenarioStatistics(session: Session) {
   const relationshipResult = await session.run('MATCH ()-[r]->() RETURN count(r) as total')
 
   return {
+    companies: companyResult.records[0].get('total').toNumber(),
     capabilities: capabilityResult.records[0].get('total').toNumber(),
     l1Capabilities: l1CapabilityResult.records[0].get('total').toNumber(),
     l2Capabilities: l2CapabilityResult.records[0].get('total').toNumber(),
@@ -197,6 +215,9 @@ export async function testPhotovoltaicScenario(driver: Driver) {
   const session = driver.session()
 
   try {
+    // First validate company associations
+    await validateCompanyAssociations(session)
+
     // Test query: Find all applications supporting manufacturing capabilities
     const manufacturingAppsResult = await session.run(`
       MATCH (cap:BusinessCapability)<-[:SUPPORTS]-(app:Application)
