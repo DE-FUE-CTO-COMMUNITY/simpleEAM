@@ -11,6 +11,7 @@
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "init-db": "ts-node src/db/init-db.ts",
     "init-db-pv": "ts-node src/db/pv/init-db-pv-runner.ts",
+    "init-db-heatpump": "ts-node src/db/heatpump/init-db-heatpump-runner.ts",
     "test": "jest"
   },
   "packageManager": "yarn@4.9.1",

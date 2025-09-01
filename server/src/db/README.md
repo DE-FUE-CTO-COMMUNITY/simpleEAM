@@ -10,16 +10,22 @@ Dieses Verzeichnis verwaltet alle datenbankbezogenen Skripte und Szenarien für 
 server/src/db/
 ├── init-db.ts              # Basis-Datenbankinitialisierung
 ├── neo4j-client.ts         # Neo4j Client-Konfiguration
-└── pv/                     # Photovoltaik-Hersteller Szenario
-    ├── README.md            # PV-Szenario Dokumentation
-    ├── init-db-pv-runner.ts # CLI-Ausführung für PV-Szenario
-    ├── init-db-pv.ts        # PV-Szenario Orchestrierung
-    └── pv-*.ts              # PV-spezifische Komponenten
+├── pv/                     # Photovoltaik-Hersteller Szenario
+│   ├── README.md            # PV-Szenario Dokumentation
+│   ├── init-db-pv-runner.ts # CLI-Ausführung für PV-Szenario
+│   ├── init-db-pv.ts        # PV-Szenario Orchestrierung
+│   └── pv-*.ts              # PV-spezifische Komponenten
+└── heatpump/               # Wärmepumpen-Hersteller Szenario
+    ├── README.md            # Heat Pump-Szenario Dokumentation
+    ├── init-db-heatpump-runner.ts # CLI-Ausführung für Heat Pump-Szenario
+    ├── init-db-heatpump.ts  # Heat Pump-Szenario Orchestrierung
+    └── heatpump-*.ts        # Heat Pump-spezifische Komponenten
 ```
 
 ## Verfügbare Szenarien
 
 ### 1. Basis-Szenario (`init-db.ts`)
+
 Grundlegende Datenbankinitialisierung ohne spezielle Unternehmensdaten.
 
 ```bash
@@ -27,6 +33,7 @@ yarn init-db
 ```
 
 ### 2. Photovoltaik-Hersteller (`pv/`)
+
 Vollständiges Enterprise Architecture Szenario für einen Solarpanel-Hersteller.
 
 ```bash
@@ -35,15 +42,27 @@ yarn init-db-pv --reset --test
 
 Siehe [PV-Szenario README](./pv/README.md) für detaillierte Informationen.
 
+### 3. Wärmepumpen-Hersteller (`heatpump/`)
+
+Vollständiges Enterprise Architecture Szenario für einen HVAC/Wärmepumpen-Hersteller.
+
+```bash
+yarn init-db-heatpump --reset --test
+```
+
+Siehe [Heat Pump-Szenario README](./heatpump/README.md) für detaillierte Informationen.
+
 ## Szenario-Architektur
 
 ### Design-Prinzipien
+
 - **Modulare Struktur**: Jedes Szenario in eigenem Verzeichnis
 - **Wiederverwendbare Komponenten**: Gemeinsame Utilities im Hauptverzeichnis
 - **CLI-freundlich**: Separate Runner-Skripte für Kommandozeilenausführung
 - **Testbar**: Eingebaute Validierungslogik
 
 ### Datei-Konventionen
+
 - `init-db-{scenario}.ts`: Hauptorchestrator für Szenario-Logik
 - `init-db-{scenario}-runner.ts`: CLI-Wrapper für Kommandozeilenausführung
 - `{scenario}-{component}.ts`: Spezifische Komponenten des Szenarios
@@ -73,6 +92,7 @@ Siehe [PV-Szenario README](./pv/README.md) für detaillierte Informationen.
 ## Datenbank-Konfiguration
 
 ### Neo4j Setup
+
 Die Datenbank läuft über Docker Compose:
 
 ```bash
@@ -84,11 +104,13 @@ http://localhost:7474
 ```
 
 ### Verbindungsparameter
+
 - **URL**: `bolt://localhost:7688`
 - **Username**: `neo4j`
 - **Password**: Konfiguriert in `.env`
 
 ### Umgebungsvariablen
+
 ```env
 NEO4J_URI=bolt://localhost:7688
 NEO4J_USER=neo4j
@@ -98,12 +120,14 @@ NEO4J_PASSWORD=your-password
 ## Entwicklung
 
 ### Neue Komponenten hinzufügen
+
 1. TypeScript-Datei im entsprechenden Szenario-Verzeichnis erstellen
 2. Export-Funktionen für Create, Update, Delete implementieren
 3. Integration in den Hauptorchestrator (`init-db-{scenario}.ts`)
 4. Beziehungen in `{scenario}-relationships.ts` definieren
 
 ### Testing
+
 Jedes Szenario sollte Validierungslogik enthalten:
 
 ```typescript
@@ -113,6 +137,7 @@ export async function test{Scenario}Scenario(driver: Driver): Promise<void> {
 ```
 
 ### Error Handling
+
 - Comprehensive Logging mit Console-Output
 - Rollback-Unterstützung durch `--reset` Flags
 - Transaktionale Operationen wo möglich
@@ -126,6 +151,7 @@ export async function test{Scenario}Scenario(driver: Driver): Promise<void> {
 3. **Importfehler**: TypeScript-Pfade in `tsconfig.json` prüfen
 
 ### Debug-Modus
+
 ```bash
 # Verbose Logging aktivieren
 DEBUG=* yarn init-db-{scenario}

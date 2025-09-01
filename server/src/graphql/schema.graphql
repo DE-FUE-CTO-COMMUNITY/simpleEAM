@@ -315,7 +315,8 @@ type Company
   employees: [Person!]! @relationship(type: "EMPLOYED_BY", direction: IN)
   ownedArchitectures: [Architecture!]! @relationship(type: "OWNED_BY", direction: IN)
   ownedDiagrams: [Diagram!]! @relationship(type: "OWNED_BY", direction: IN)
-  ownedArchitecturePrinciples: [ArchitecturePrinciple!]! @relationship(type: "OWNED_BY", direction: IN)
+  ownedArchitecturePrinciples: [ArchitecturePrinciple!]!
+    @relationship(type: "OWNED_BY", direction: IN)
 }
 
 """
@@ -447,6 +448,7 @@ enum InterfaceProtocol {
   JDBC
   ODBC
   ORACLE
+  MQTT
   OTHER
 }
 
@@ -638,6 +640,8 @@ enum InfrastructureType {
   VIRTUAL_MACHINE
   CONTAINER_HOST
   PHYSICAL_SERVER
+  IOT_GATEWAY
+  IOT_PLATFORM
 }
 
 """

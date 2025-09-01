@@ -44,7 +44,7 @@ export async function initPhotovoltaicScenario(driver: Driver) {
   try {
     // ===== PHASE 0: COMPANY FOUNDATION =====
     console.log('\n🏢 Phase 0: Creating Company Foundation...')
-    
+
     // Create the main company entity
     await createSolarCompany(session)
 
@@ -123,7 +123,7 @@ export async function initPhotovoltaicScenario(driver: Driver) {
 
     // ===== PHASE 5: COMPANY ASSOCIATIONS =====
     console.log('\n🏢 Phase 5: Associating all entities with company...')
-    
+
     // Associate all entities with the main company
     await associateEntitiesWithCompany(session)
 

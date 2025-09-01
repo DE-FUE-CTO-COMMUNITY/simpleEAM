@@ -50,6 +50,7 @@ ts-node src/db/pv/init-db-pv-runner.ts --reset --test
 ## Szenario-Details
 
 ### Unternehmensprofil
+
 - **Name**: Solar Panels GmbH
 - **Branche**: Photovoltaik-Hersteller (Renewable Energy / Solar Manufacturing)
 - **Standort**: Berlin, Deutschland
@@ -60,45 +61,54 @@ ts-node src/db/pv/init-db-pv-runner.ts --reset --test
 ### Kernkomponenten
 
 #### Company-Integration (NEU!)
+
 - **Vollständige Unternehmensstruktur**: Alle Entitäten sind mit "Solar Panels GmbH" verknüpft
 - **Mitarbeiter-Zuordnung**: 15 Personen über EMPLOYED_BY-Beziehung
 - **Asset-Ownership**: Alle technischen und organisatorischen Assets gehören zur Company
 - **Governance**: Klare Eigentumsstrukturen für alle Architektur-Komponenten
 
 #### Geschäftsfähigkeiten (36)
+
 - Vollständiges L1/L2 Business Capability Model
 - Manufacturing-spezifische Solarpanel-Produktionsfähigkeiten
 - Von Forschung & Entwicklung bis Kundenservice
 
 #### Anwendungen (17)
+
 - Mix aus Standard-Software (COTS) und Custom-Entwicklungen
 - Cloud-native Anwendungen auf AWS
 - Integrierte Produktions- und ERP-Systeme
 
 #### Infrastruktur (11)
+
 - AWS-basierte Cloud-Infrastruktur
 - Kubernetes (EKS) für Container-Workloads
 - Hybrid-Ansatz mit physischen Servern für spezielle Anwendungen
 
 #### Daten (27)
+
 - Vollständige Datenarchitektur von Produktdaten bis Analytics
 - Manufacturing-spezifische Datenobjekte
 - End-to-End Datenflüsse
 
 #### Schnittstellen (17)
+
 - Vollständige Integration zwischen allen Anwendungen
 - REST APIs und Message Queues
 - Real-time Datenintegration
 
 #### Architektur-Modelle (8)
+
 - Current State, Transition State und Target State Architekturen
 - Spezifische Modelle für verschiedene Geschäftsbereiche
 
 #### Architekturprinzipien (18)
+
 - Erweiterte Sammlung von Architekturprinzipien
 - Manufacturing- und Cloud-spezifische Prinzipien
 
 ### Beziehungen (597 total)
+
 - **Company-Beziehungen**: 149 neue Beziehungen für vollständige Unternehmensintegration
 - Vollständiges Ownership- und Verantwortlichkeitsmodell
 - Detaillierte Abhängigkeiten zwischen allen Komponenten
@@ -110,6 +120,7 @@ ts-node src/db/pv/init-db-pv-runner.ts --reset --test
 ## Technische Implementierung
 
 ### Architektur-Pattern
+
 - **Company-First Design**: Alle Entitäten sind primär einer Company zugeordnet
 - **Modular**: Jede Komponente in separater Datei
 - **Orchestriert**: Zentrale Steuerung über `init-db-pv.ts`
@@ -118,12 +129,14 @@ ts-node src/db/pv/init-db-pv-runner.ts --reset --test
 - **CLI-freundlich**: Separater Runner für Befehlszeilen-Ausführung
 
 ### Datenbank-Schema
+
 - Neo4j Graph Database
 - Constraint-basierte Eindeutigkeit
 - Hierarchische Beziehungsmodelle
 - Performance-optimierte Queries
 
 ### Error Handling
+
 - Comprehensive Error Logging
 - Rollback-Unterstützung durch `--reset` Flag
 - Validation Tests für Datenintegrität
