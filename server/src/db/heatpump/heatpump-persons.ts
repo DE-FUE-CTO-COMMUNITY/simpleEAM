@@ -172,6 +172,39 @@ export async function createHeatPumpPersons(session: Session): Promise<void> {
       phone: "+49-89-1234-0701",
       createdAt: datetime(),
       updatedAt: datetime()
+    }),
+    (hrDirector:Person {
+      id: "hp-person-hr-director",
+      firstName: "Brigitte",
+      lastName: "Meyer",
+      email: "brigitte.meyer@thermo-dynamics.de",
+      department: "Human Resources",
+      role: "HR Director",
+      phone: "+49-89-1234-0801",
+      createdAt: datetime(),
+      updatedAt: datetime()
+    }),
+    (procurementManager:Person {
+      id: "hp-person-procurement-manager",
+      firstName: "Lars",
+      lastName: "Engel",
+      email: "lars.engel@thermo-dynamics.de",
+      department: "Procurement",
+      role: "Procurement Manager",
+      phone: "+49-89-1234-0901",
+      createdAt: datetime(),
+      updatedAt: datetime()
+    }),
+    (marketingManager:Person {
+      id: "hp-person-marketing-manager",
+      firstName: "Claudia",
+      lastName: "Neumann",
+      email: "claudia.neumann@thermo-dynamics.de",
+      department: "Marketing",
+      role: "Marketing Manager",
+      phone: "+49-89-1234-1001",
+      createdAt: datetime(),
+      updatedAt: datetime()
     })
   `)
 
@@ -199,143 +232,168 @@ export async function createHeatPumpCapabilityOwnership(session: Session): Promi
       (serviceDirector:Person {id: "hp-person-service-director"}),
       (itManager:Person {id: "hp-person-it-manager"}),
       (sustainabilityManager:Person {id: "hp-person-sustainability-manager"}),
+      (hrDirector:Person {id: "hp-person-hr-director"}),
+      (procurementManager:Person {id: "hp-person-procurement-manager"}),
+      (marketingManager:Person {id: "hp-person-marketing-manager"}),
 
+      // L1 Business Capabilities (New Structure)
       (strategy:BusinessCapability {id: "hp-cap-strategy-management"}),
       (rd:BusinessCapability {id: "hp-cap-research-development"}),
-      (manufacturing:BusinessCapability {id: "hp-cap-manufacturing"}),
-      (sales:BusinessCapability {id: "hp-cap-sales-marketing"}),
+      (manufacturing:BusinessCapability {id: "hp-cap-manufacturing-operations"}),
+      (salesMarketing:BusinessCapability {id: "hp-cap-sales-marketing"}),
       (service:BusinessCapability {id: "hp-cap-service-support"}),
-      (hr:BusinessCapability {id: "hp-cap-human-resources"}),
-      (finance:BusinessCapability {id: "hp-cap-finance"}),
-      (it:BusinessCapability {id: "hp-cap-it"}),
+      (businessSupport:BusinessCapability {id: "hp-cap-business-support"}),
+
+      // L2 Strategic Capabilities
+      (strategicPlanning:BusinessCapability {id: "hp-cap-strategic-planning"}),
+      (corporateGovernance:BusinessCapability {id: "hp-cap-corporate-governance"}),
+      (marketAnalysis:BusinessCapability {id: "hp-cap-market-analysis"}),
+      (sustainability:BusinessCapability {id: "hp-cap-sustainability"}),
+
+      // L2 R&D Capabilities
       (thermalDesign:BusinessCapability {id: "hp-cap-thermal-design"}),
-      (refrigerantTech:BusinessCapability {id: "hp-cap-refrigerant-tech"}),
+      (refrigerantTech:BusinessCapability {id: "hp-cap-refrigerant-technology"}),
       (smartControls:BusinessCapability {id: "hp-cap-smart-controls"}),
+      (productDevelopment:BusinessCapability {id: "hp-cap-product-development"}),
+      (testing:BusinessCapability {id: "hp-cap-testing-validation"}),
+      (energyEfficiency:BusinessCapability {id: "hp-cap-energy-efficiency"}),
+
+      // L2 Manufacturing Capabilities
       (compressorMfg:BusinessCapability {id: "hp-cap-compressor-manufacturing"}),
       (heatExchangerMfg:BusinessCapability {id: "hp-cap-heat-exchanger-manufacturing"}),
       (systemAssembly:BusinessCapability {id: "hp-cap-system-assembly"}),
+      (productionPlanning:BusinessCapability {id: "hp-cap-production-planning"}),
+      (qualityMgmt:BusinessCapability {id: "hp-cap-quality-management"}),
+      (supplyChain:BusinessCapability {id: "hp-cap-supply-chain"}),
+      (warehouseMgmt:BusinessCapability {id: "hp-cap-warehouse-management"}),
+
+      // L2 Sales & Marketing Capabilities
       (channelMgmt:BusinessCapability {id: "hp-cap-channel-management"}),
       (digitalMarketing:BusinessCapability {id: "hp-cap-digital-marketing"}),
       (productMgmt:BusinessCapability {id: "hp-cap-product-management"}),
+      (salesOps:BusinessCapability {id: "hp-cap-sales-operations"}),
+      (customerAnalytics:BusinessCapability {id: "hp-cap-customer-analytics"}),
+
+      // L2 Service Capabilities
       (installation:BusinessCapability {id: "hp-cap-installation-services"}),
       (maintenance:BusinessCapability {id: "hp-cap-maintenance-services"}),
       (remoteMonitoring:BusinessCapability {id: "hp-cap-remote-monitoring"}),
       (customerSupport:BusinessCapability {id: "hp-cap-customer-support"}),
-      (supplyChain:BusinessCapability {id: "hp-cap-supply-chain"}),
-      (qualityMgmt:BusinessCapability {id: "hp-cap-quality-management"}),
-      (sustainability:BusinessCapability {id: "hp-cap-sustainability"}),
-      (energyEfficiency:BusinessCapability {id: "hp-cap-energy-efficiency"}),
-      
-      // L2 Business Capabilities
-      (strategicPlanning:BusinessCapability {id: "hp-cap-strategic-planning"}),
-      (corporateGovernance:BusinessCapability {id: "hp-cap-corporate-governance"}),
+      (warranty:BusinessCapability {id: "hp-cap-warranty-management"}),
+
+      // L2 Business Support Capabilities
+      (hr:BusinessCapability {id: "hp-cap-human-resources"}),
       (talentManagement:BusinessCapability {id: "hp-cap-talent-management"}),
-      (payrollBenefits:BusinessCapability {id: "hp-cap-payroll-benefits"}),
+      (finance:BusinessCapability {id: "hp-cap-finance"}),
       (financialPlanning:BusinessCapability {id: "hp-cap-financial-planning"}),
-      (accountingReporting:BusinessCapability {id: "hp-cap-accounting-reporting"}),
+      (accounting:BusinessCapability {id: "hp-cap-accounting-reporting"}),
+      (it:BusinessCapability {id: "hp-cap-information-technology"}),
       (applicationMgmt:BusinessCapability {id: "hp-cap-application-management"}),
-      (infrastructureMgmt:BusinessCapability {id: "hp-cap-infrastructure-management"})
+      (infrastructureMgmt:BusinessCapability {id: "hp-cap-infrastructure-management"}),
+      (legal:BusinessCapability {id: "hp-cap-legal-compliance"})
 
     CREATE
-      // CEO ownership
+      // L1 Capability Ownership
       (strategy)-[:OWNED_BY]->(ceo),
-      
-      // CTO ownership
       (rd)-[:OWNED_BY]->(cto),
-      (smartControls)-[:OWNED_BY]->(cto),
-      
-      // COO ownership
       (manufacturing)-[:OWNED_BY]->(coo),
-      (compressorMfg)-[:OWNED_BY]->(coo),
-      (heatExchangerMfg)-[:OWNED_BY]->(coo),
-      (systemAssembly)-[:OWNED_BY]->(coo),
-      (supplyChain)-[:OWNED_BY]->(coo),
-      
-      // CFO ownership
-      (finance)-[:OWNED_BY]->(cfo),
-      
-      // CIO ownership
-      (it)-[:OWNED_BY]->(cio),
-      
-      // HR ownership (missing before)
-      (hr)-[:OWNED_BY]->(ceo),
-      
-      // R&D Director ownership
-      (thermalDesign)-[:OWNED_BY]->(rdDirector),
-      
-      // Specialist ownership
-      (thermalDesign)-[:OWNED_BY]->(thermalEngineer),
-      (refrigerantTech)-[:OWNED_BY]->(refrigerantSpecialist),
-      
-      // Manufacturing Director ownership
-      (qualityMgmt)-[:OWNED_BY]->(qualityManager),
-      
-      // Sales Director ownership
-      (sales)-[:OWNED_BY]->(salesDirector),
-      (channelMgmt)-[:OWNED_BY]->(salesDirector),
-      (digitalMarketing)-[:OWNED_BY]->(salesDirector),
-      
-      // Product Manager ownership
-      (productMgmt)-[:OWNED_BY]->(productManager),
-      
-      // Service Director ownership
+      (salesMarketing)-[:OWNED_BY]->(salesDirector),
       (service)-[:OWNED_BY]->(serviceDirector),
-      (installation)-[:OWNED_BY]->(serviceDirector),
-      (maintenance)-[:OWNED_BY]->(serviceDirector),
-      (remoteMonitoring)-[:OWNED_BY]->(serviceDirector),
-      (customerSupport)-[:OWNED_BY]->(serviceDirector),
+      (businessSupport)-[:OWNED_BY]->(cio),
       
-      // IT Manager ownership
-      (remoteMonitoring)-[:OWNED_BY]->(itManager),
-      
-      // Sustainability Manager ownership
-      (sustainability)-[:OWNED_BY]->(sustainabilityManager),
-      (energyEfficiency)-[:OWNED_BY]->(sustainabilityManager),
-      
-      // Additional L2 Capability ownership
+      // L2 Strategic Capabilities
       (strategicPlanning)-[:OWNED_BY]->(ceo),
       (corporateGovernance)-[:OWNED_BY]->(ceo),
-      (talentManagement)-[:OWNED_BY]->(ceo),
-      (payrollBenefits)-[:OWNED_BY]->(cfo),
-      (financialPlanning)-[:OWNED_BY]->(cfo),
-      (accountingReporting)-[:OWNED_BY]->(cfo),
-      (applicationMgmt)-[:OWNED_BY]->(cio),
-      (infrastructureMgmt)-[:OWNED_BY]->(cio),
+      (marketAnalysis)-[:OWNED_BY]->(marketingManager),
+      (sustainability)-[:OWNED_BY]->(sustainabilityManager),
       
-      // Company ownership for all capabilities
+      // L2 R&D Capabilities
+      (thermalDesign)-[:OWNED_BY]->(thermalEngineer),
+      (refrigerantTech)-[:OWNED_BY]->(refrigerantSpecialist),
+      (smartControls)-[:OWNED_BY]->(rdDirector),
+      (productDevelopment)-[:OWNED_BY]->(rdDirector),
+      (testing)-[:OWNED_BY]->(qualityManager),
+      (energyEfficiency)-[:OWNED_BY]->(sustainabilityManager),
+      
+      // L2 Manufacturing Capabilities
+      (compressorMfg)-[:OWNED_BY]->(mfgDirector),
+      (heatExchangerMfg)-[:OWNED_BY]->(mfgDirector),
+      (systemAssembly)-[:OWNED_BY]->(mfgDirector),
+      (productionPlanning)-[:OWNED_BY]->(mfgDirector),
+      (qualityMgmt)-[:OWNED_BY]->(qualityManager),
+      (supplyChain)-[:OWNED_BY]->(procurementManager),
+      (warehouseMgmt)-[:OWNED_BY]->(procurementManager),
+      
+      // L2 Sales & Marketing Capabilities
+      (channelMgmt)-[:OWNED_BY]->(salesDirector),
+      (digitalMarketing)-[:OWNED_BY]->(marketingManager),
+      (productMgmt)-[:OWNED_BY]->(productManager),
+      (salesOps)-[:OWNED_BY]->(salesDirector),
+      (customerAnalytics)-[:OWNED_BY]->(marketingManager),
+      
+      // L2 Service Capabilities
+      (installation)-[:OWNED_BY]->(serviceDirector),
+      (maintenance)-[:OWNED_BY]->(serviceDirector),
+      (remoteMonitoring)-[:OWNED_BY]->(itManager),
+      (customerSupport)-[:OWNED_BY]->(serviceDirector),
+      (warranty)-[:OWNED_BY]->(serviceDirector),
+      
+      // L2 Business Support Capabilities
+      (hr)-[:OWNED_BY]->(hrDirector),
+      (talentManagement)-[:OWNED_BY]->(hrDirector),
+      (finance)-[:OWNED_BY]->(cfo),
+      (financialPlanning)-[:OWNED_BY]->(cfo),
+      (accounting)-[:OWNED_BY]->(cfo),
+      (it)-[:OWNED_BY]->(cio),
+      (applicationMgmt)-[:OWNED_BY]->(cio),
+      (infrastructureMgmt)-[:OWNED_BY]->(itManager),
+      (legal)-[:OWNED_BY]->(cio),
+      
+      // Company ownership for all capabilities (L1)
       (strategy)-[:OWNED_BY]->(company),
       (rd)-[:OWNED_BY]->(company),
       (manufacturing)-[:OWNED_BY]->(company),
-      (sales)-[:OWNED_BY]->(company),
+      (salesMarketing)-[:OWNED_BY]->(company),
       (service)-[:OWNED_BY]->(company),
-      (hr)-[:OWNED_BY]->(company),
-      (finance)-[:OWNED_BY]->(company),
-      (it)-[:OWNED_BY]->(company),
+      (businessSupport)-[:OWNED_BY]->(company),
+      
+      // Company ownership for all capabilities (L2)
+      (strategicPlanning)-[:OWNED_BY]->(company),
+      (corporateGovernance)-[:OWNED_BY]->(company),
+      (marketAnalysis)-[:OWNED_BY]->(company),
+      (sustainability)-[:OWNED_BY]->(company),
       (thermalDesign)-[:OWNED_BY]->(company),
       (refrigerantTech)-[:OWNED_BY]->(company),
       (smartControls)-[:OWNED_BY]->(company),
+      (productDevelopment)-[:OWNED_BY]->(company),
+      (testing)-[:OWNED_BY]->(company),
+      (energyEfficiency)-[:OWNED_BY]->(company),
       (compressorMfg)-[:OWNED_BY]->(company),
       (heatExchangerMfg)-[:OWNED_BY]->(company),
       (systemAssembly)-[:OWNED_BY]->(company),
+      (productionPlanning)-[:OWNED_BY]->(company),
+      (qualityMgmt)-[:OWNED_BY]->(company),
+      (supplyChain)-[:OWNED_BY]->(company),
+      (warehouseMgmt)-[:OWNED_BY]->(company),
       (channelMgmt)-[:OWNED_BY]->(company),
       (digitalMarketing)-[:OWNED_BY]->(company),
       (productMgmt)-[:OWNED_BY]->(company),
+      (salesOps)-[:OWNED_BY]->(company),
+      (customerAnalytics)-[:OWNED_BY]->(company),
       (installation)-[:OWNED_BY]->(company),
       (maintenance)-[:OWNED_BY]->(company),
       (remoteMonitoring)-[:OWNED_BY]->(company),
       (customerSupport)-[:OWNED_BY]->(company),
-      (supplyChain)-[:OWNED_BY]->(company),
-      (qualityMgmt)-[:OWNED_BY]->(company),
-      (sustainability)-[:OWNED_BY]->(company),
-      (energyEfficiency)-[:OWNED_BY]->(company),
-      (strategicPlanning)-[:OWNED_BY]->(company),
-      (corporateGovernance)-[:OWNED_BY]->(company),
+      (warranty)-[:OWNED_BY]->(company),
+      (hr)-[:OWNED_BY]->(company),
       (talentManagement)-[:OWNED_BY]->(company),
-      (payrollBenefits)-[:OWNED_BY]->(company),
+      (finance)-[:OWNED_BY]->(company),
       (financialPlanning)-[:OWNED_BY]->(company),
-      (accountingReporting)-[:OWNED_BY]->(company),
+      (accounting)-[:OWNED_BY]->(company),
+      (it)-[:OWNED_BY]->(company),
       (applicationMgmt)-[:OWNED_BY]->(company),
-      (infrastructureMgmt)-[:OWNED_BY]->(company)
+      (infrastructureMgmt)-[:OWNED_BY]->(company),
+      (legal)-[:OWNED_BY]->(company)
   `)
 
   console.log('Capability ownership relationships created successfully.')

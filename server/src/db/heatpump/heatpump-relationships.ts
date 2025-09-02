@@ -2,6 +2,7 @@
 // Creates all the interconnections between different enterprise architecture elements
 
 import { Session } from 'neo4j-driver'
+import { createHeatPumpCapabilityHierarchy } from './heatpump-business-capabilities'
 
 export async function createCapabilityHierarchy(session: Session) {
   console.log('Creating Capability Hierarchy relationships...')
@@ -19,7 +20,7 @@ export async function createCapabilityHierarchy(session: Session) {
 
   // Manufacturing Operations hierarchy
   await session.run(`
-    MATCH (manufacturing:BusinessCapability {id: "hp-cap-manufacturing"})
+    MATCH (manufacturing:BusinessCapability {id: "hp-cap-manufacturing-operations"})
     MATCH (compressor_manufacturing:BusinessCapability {id: "hp-cap-compressor-manufacturing"})
     MATCH (heat_exchanger_manufacturing:BusinessCapability {id: "hp-cap-heat-exchanger-manufacturing"})
     MATCH (system_assembly:BusinessCapability {id: "hp-cap-system-assembly"})
@@ -136,138 +137,596 @@ export async function createCapabilityHierarchy(session: Session) {
 export async function createApplicationCapabilitySupport(session: Session) {
   console.log('Creating Application-Capability Support relationships...')
 
-  // SAP S/4HANA supports multiple capabilities
+  // Core Business Applications
+
+  // SAP S/4HANA - ERP System
   await session.run(`
-    MATCH (sap_s4hana:Application {id: "hp-app-sap-s4hana"})
-    MATCH (financial_planning:BusinessCapability {id: "hp-cap-financial-planning"})
-    MATCH (digital_marketing:BusinessCapability {id: "hp-cap-digital-marketing"})
-    MATCH (channel_management:BusinessCapability {id: "hp-cap-channel-management"})
-    CREATE (sap_s4hana)-[:SUPPORTS]->(financial_planning)
-    CREATE (sap_s4hana)-[:SUPPORTS]->(digital_marketing)
-    CREATE (sap_s4hana)-[:SUPPORTS]->(channel_management)
+    MATCH (sap:Application {id: "hp-app-sap-s4hana"})
+    MATCH (finance:BusinessCapability {id: "hp-cap-finance"})
+    MATCH (accounting:BusinessCapability {id: "hp-cap-accounting-reporting"})
+    MATCH (financialPlanning:BusinessCapability {id: "hp-cap-financial-planning"})
+    MATCH (hr:BusinessCapability {id: "hp-cap-human-resources"})
+    CREATE (sap)-[:SUPPORTS]->(finance)
+    CREATE (sap)-[:SUPPORTS]->(accounting)
+    CREATE (sap)-[:SUPPORTS]->(financialPlanning)
+    CREATE (sap)-[:SUPPORTS]->(hr)
   `)
 
-  // Manufacturing systems
+  // Strategy & Portfolio Management System
   await session.run(`
-    MATCH (mes_system:Application {id: "hp-app-hvac-mes"})
-    MATCH (compressor_manufacturing:BusinessCapability {id: "hp-cap-compressor-manufacturing"})
-    MATCH (heat_exchanger_manufacturing:BusinessCapability {id: "hp-cap-heat-exchanger-manufacturing"})
-    MATCH (system_assembly:BusinessCapability {id: "hp-cap-system-assembly"})
-    CREATE (mes_system)-[:SUPPORTS]->(compressor_manufacturing)
-    CREATE (mes_system)-[:SUPPORTS]->(heat_exchanger_manufacturing)
-    CREATE (mes_system)-[:SUPPORTS]->(system_assembly)
+    MATCH (strategy:Application {id: "hp-app-strategy-portfolio"})
+    MATCH (strategicPlanning:BusinessCapability {id: "hp-cap-strategic-planning"})
+    MATCH (marketAnalysis:BusinessCapability {id: "hp-cap-market-analysis"})
+    MATCH (corporateGovernance:BusinessCapability {id: "hp-cap-corporate-governance"})
+    CREATE (strategy)-[:SUPPORTS]->(strategicPlanning)
+    CREATE (strategy)-[:SUPPORTS]->(marketAnalysis)
+    CREATE (strategy)-[:SUPPORTS]->(corporateGovernance)
   `)
 
-  // Quality system
+  // Risk Management Platform
   await session.run(`
-    MATCH (quality_system:Application {id: "hp-app-quality-management"})
-    MATCH (quality_management:BusinessCapability {id: "hp-cap-quality-management"})
-    MATCH (manufacturing:BusinessCapability {id: "hp-cap-manufacturing"})
-    CREATE (quality_system)-[:SUPPORTS]->(quality_management)
-    CREATE (quality_system)-[:SUPPORTS]->(manufacturing)
+    MATCH (risk:Application {id: "hp-app-risk-management"})
+    MATCH (corporateGovernance:BusinessCapability {id: "hp-cap-corporate-governance"})
+    MATCH (legal:BusinessCapability {id: "hp-cap-legal-compliance"})
+    CREATE (risk)-[:SUPPORTS]->(corporateGovernance)
+    CREATE (risk)-[:SUPPORTS]->(legal)
   `)
 
-  // IoT and analytics platform
+  // Sustainability Tracker
   await session.run(`
-    MATCH (iot_platform:Application {id: "hp-app-iot-platform"})
-    MATCH (remote_monitoring:BusinessCapability {id: "hp-cap-remote-monitoring"})
-    MATCH (application_management:BusinessCapability {id: "hp-cap-application-management"})
-    MATCH (energy_efficiency:BusinessCapability {id: "hp-cap-energy-efficiency"})
-    CREATE (iot_platform)-[:SUPPORTS]->(remote_monitoring)
-    CREATE (iot_platform)-[:SUPPORTS]->(application_management)
-    CREATE (iot_platform)-[:SUPPORTS]->(energy_efficiency)
+    MATCH (sustainability:Application {id: "hp-app-sustainability-tracker"})
+    MATCH (sustainabilityMgmt:BusinessCapability {id: "hp-cap-sustainability"})
+    MATCH (energyEfficiency:BusinessCapability {id: "hp-cap-energy-efficiency"})
+    CREATE (sustainability)-[:SUPPORTS]->(sustainabilityMgmt)
+    CREATE (sustainability)-[:SUPPORTS]->(energyEfficiency)
   `)
 
-  // Energy optimization platform
+  // Market Intelligence Platform
   await session.run(`
-    MATCH (energy_analytics:Application {id: "hp-app-energy-analytics"})
-    MATCH (energy_efficiency:BusinessCapability {id: "hp-cap-energy-efficiency"})
+    MATCH (market:Application {id: "hp-app-market-intelligence"})
+    MATCH (marketAnalysis:BusinessCapability {id: "hp-cap-market-analysis"})
+    MATCH (customerAnalytics:BusinessCapability {id: "hp-cap-customer-analytics"})
+    CREATE (market)-[:SUPPORTS]->(marketAnalysis)
+    CREATE (market)-[:SUPPORTS]->(customerAnalytics)
+  `)
+
+  // Modern PLM System
+  await session.run(`
+    MATCH (plm:Application {id: "hp-app-modern-plm"})
+    MATCH (productDevelopment:BusinessCapability {id: "hp-cap-product-development"})
+    MATCH (thermalDesign:BusinessCapability {id: "hp-cap-thermal-design"})
+    MATCH (productMgmt:BusinessCapability {id: "hp-cap-product-management"})
+    CREATE (plm)-[:SUPPORTS]->(productDevelopment)
+    CREATE (plm)-[:SUPPORTS]->(thermalDesign)
+    CREATE (plm)-[:SUPPORTS]->(productMgmt)
+  `)
+
+  // Thermal CAD System
+  await session.run(`
+    MATCH (cad:Application {id: "hp-app-thermal-cad"})
+    MATCH (thermalDesign:BusinessCapability {id: "hp-cap-thermal-design"})
+    MATCH (refrigerantTech:BusinessCapability {id: "hp-cap-refrigerant-technology"})
+    CREATE (cad)-[:SUPPORTS]->(thermalDesign)
+    CREATE (cad)-[:SUPPORTS]->(refrigerantTech)
+  `)
+
+  // CFD Simulation Platform
+  await session.run(`
+    MATCH (cfd:Application {id: "hp-app-cfd-simulation"})
+    MATCH (thermalDesign:BusinessCapability {id: "hp-cap-thermal-design"})
+    MATCH (energyEfficiency:BusinessCapability {id: "hp-cap-energy-efficiency"})
+    CREATE (cfd)-[:SUPPORTS]->(thermalDesign)
+    CREATE (cfd)-[:SUPPORTS]->(energyEfficiency)
+  `)
+
+  // Testing Lab Management
+  await session.run(`
+    MATCH (testing:Application {id: "hp-app-testing-lab"})
+    MATCH (testingValidation:BusinessCapability {id: "hp-cap-testing-validation"})
+    MATCH (qualityMgmt:BusinessCapability {id: "hp-cap-quality-management"})
+    CREATE (testing)-[:SUPPORTS]->(testingValidation)
+    CREATE (testing)-[:SUPPORTS]->(qualityMgmt)
+  `)
+
+  // Smart Controls Development
+  await session.run(`
+    MATCH (controls:Application {id: "hp-app-smart-controls-dev"})
+    MATCH (smartControls:BusinessCapability {id: "hp-cap-smart-controls"})
+    MATCH (energyEfficiency:BusinessCapability {id: "hp-cap-energy-efficiency"})
+    CREATE (controls)-[:SUPPORTS]->(smartControls)
+    CREATE (controls)-[:SUPPORTS]->(energyEfficiency)
+  `)
+
+  // Innovation Management Platform
+  await session.run(`
+    MATCH (innovation:Application {id: "hp-app-innovation-platform"})
+    MATCH (productDevelopment:BusinessCapability {id: "hp-cap-product-development"})
+    MATCH (energyEfficiency:BusinessCapability {id: "hp-cap-energy-efficiency"})
+    CREATE (innovation)-[:SUPPORTS]->(productDevelopment)
+    CREATE (innovation)-[:SUPPORTS]->(energyEfficiency)
+  `)
+
+  // Advanced MRP System
+  await session.run(`
+    MATCH (mrp:Application {id: "hp-app-advanced-mrp"})
+    MATCH (productionPlanning:BusinessCapability {id: "hp-cap-production-planning"})
+    MATCH (supplyChain:BusinessCapability {id: "hp-cap-supply-chain"})
+    CREATE (mrp)-[:SUPPORTS]->(productionPlanning)
+    CREATE (mrp)-[:SUPPORTS]->(supplyChain)
+  `)
+
+  // HVAC MES
+  await session.run(`
+    MATCH (mes:Application {id: "hp-app-hvac-mes"})
+    MATCH (compressorMfg:BusinessCapability {id: "hp-cap-compressor-manufacturing"})
+    MATCH (heatExchangerMfg:BusinessCapability {id: "hp-cap-heat-exchanger-manufacturing"})
+    MATCH (systemAssembly:BusinessCapability {id: "hp-cap-system-assembly"})
+    CREATE (mes)-[:SUPPORTS]->(compressorMfg)
+    CREATE (mes)-[:SUPPORTS]->(heatExchangerMfg)
+    CREATE (mes)-[:SUPPORTS]->(systemAssembly)
+  `)
+
+  // Quality Management System
+  await session.run(`
+    MATCH (qms:Application {id: "hp-app-quality-management"})
+    MATCH (qualityMgmt:BusinessCapability {id: "hp-cap-quality-management"})
+    MATCH (testingValidation:BusinessCapability {id: "hp-cap-testing-validation"})
+    CREATE (qms)-[:SUPPORTS]->(qualityMgmt)
+    CREATE (qms)-[:SUPPORTS]->(testingValidation)
+  `)
+
+  // Warehouse Management System
+  await session.run(`
+    MATCH (wms:Application {id: "hp-app-warehouse-management"})
+    MATCH (warehouseMgmt:BusinessCapability {id: "hp-cap-warehouse-management"})
+    MATCH (supplyChain:BusinessCapability {id: "hp-cap-supply-chain"})
+    CREATE (wms)-[:SUPPORTS]->(warehouseMgmt)
+    CREATE (wms)-[:SUPPORTS]->(supplyChain)
+  `)
+
+  // Procurement Platform
+  await session.run(`
+    MATCH (procurement:Application {id: "hp-app-procurement-platform"})
+    MATCH (supplyChain:BusinessCapability {id: "hp-cap-supply-chain"})
+    CREATE (procurement)-[:SUPPORTS]->(supplyChain)
+  `)
+
+  // Production Analytics
+  await session.run(`
+    MATCH (prodAnalytics:Application {id: "hp-app-production-analytics"})
+    MATCH (productionPlanning:BusinessCapability {id: "hp-cap-production-planning"})
+    MATCH (qualityMgmt:BusinessCapability {id: "hp-cap-quality-management"})
+    CREATE (prodAnalytics)-[:SUPPORTS]->(productionPlanning)
+    CREATE (prodAnalytics)-[:SUPPORTS]->(qualityMgmt)
+  `)
+
+  // E-Commerce Platform
+  await session.run(`
+    MATCH (ecommerce:Application {id: "hp-app-ecommerce-platform"})
+    MATCH (salesOps:BusinessCapability {id: "hp-cap-sales-operations"})
+    MATCH (channelMgmt:BusinessCapability {id: "hp-cap-channel-management"})
+    MATCH (digitalMarketing:BusinessCapability {id: "hp-cap-digital-marketing"})
+    CREATE (ecommerce)-[:SUPPORTS]->(salesOps)
+    CREATE (ecommerce)-[:SUPPORTS]->(channelMgmt)
+    CREATE (ecommerce)-[:SUPPORTS]->(digitalMarketing)
+  `)
+
+  // CRM Salesforce
+  await session.run(`
+    MATCH (crm:Application {id: "hp-app-crm-salesforce"})
+    MATCH (salesOps:BusinessCapability {id: "hp-cap-sales-operations"})
+    MATCH (customerSupport:BusinessCapability {id: "hp-cap-customer-support"})
+    MATCH (channelMgmt:BusinessCapability {id: "hp-cap-channel-management"})
+    CREATE (crm)-[:SUPPORTS]->(salesOps)
+    CREATE (crm)-[:SUPPORTS]->(customerSupport)
+    CREATE (crm)-[:SUPPORTS]->(channelMgmt)
+  `)
+
+  // Product Configurator
+  await session.run(`
+    MATCH (configurator:Application {id: "hp-app-product-configurator"})
+    MATCH (salesOps:BusinessCapability {id: "hp-cap-sales-operations"})
+    MATCH (productMgmt:BusinessCapability {id: "hp-cap-product-management"})
+    CREATE (configurator)-[:SUPPORTS]->(salesOps)
+    CREATE (configurator)-[:SUPPORTS]->(productMgmt)
+  `)
+
+  // Marketing Automation
+  await session.run(`
+    MATCH (marketing:Application {id: "hp-app-marketing-automation"})
+    MATCH (digitalMarketing:BusinessCapability {id: "hp-cap-digital-marketing"})
+    MATCH (customerAnalytics:BusinessCapability {id: "hp-cap-customer-analytics"})
+    CREATE (marketing)-[:SUPPORTS]->(digitalMarketing)
+    CREATE (marketing)-[:SUPPORTS]->(customerAnalytics)
+  `)
+
+  // Channel Management Portal
+  await session.run(`
+    MATCH (channel:Application {id: "hp-app-channel-portal"})
+    MATCH (channelMgmt:BusinessCapability {id: "hp-cap-channel-management"})
+    MATCH (salesOps:BusinessCapability {id: "hp-cap-sales-operations"})
+    CREATE (channel)-[:SUPPORTS]->(channelMgmt)
+    CREATE (channel)-[:SUPPORTS]->(salesOps)
+  `)
+
+  // Customer Analytics Platform
+  await session.run(`
+    MATCH (analytics:Application {id: "hp-app-customer-analytics"})
+    MATCH (customerAnalytics:BusinessCapability {id: "hp-cap-customer-analytics"})
+    MATCH (marketAnalysis:BusinessCapability {id: "hp-cap-market-analysis"})
+    CREATE (analytics)-[:SUPPORTS]->(customerAnalytics)
+    CREATE (analytics)-[:SUPPORTS]->(marketAnalysis)
+  `)
+
+  // Service Management System
+  await session.run(`
+    MATCH (serviceMgmt:Application {id: "hp-app-service-management"})
+    MATCH (installation:BusinessCapability {id: "hp-cap-installation-services"})
+    MATCH (maintenance:BusinessCapability {id: "hp-cap-maintenance-services"})
+    MATCH (customerSupport:BusinessCapability {id: "hp-cap-customer-support"})
+    CREATE (serviceMgmt)-[:SUPPORTS]->(installation)
+    CREATE (serviceMgmt)-[:SUPPORTS]->(maintenance)
+    CREATE (serviceMgmt)-[:SUPPORTS]->(customerSupport)
+  `)
+
+  // Knowledge Base System
+  await session.run(`
+    MATCH (knowledge:Application {id: "hp-app-knowledge-base"})
+    MATCH (customerSupport:BusinessCapability {id: "hp-cap-customer-support"})
+    MATCH (installation:BusinessCapability {id: "hp-cap-installation-services"})
+    CREATE (knowledge)-[:SUPPORTS]->(customerSupport)
+    CREATE (knowledge)-[:SUPPORTS]->(installation)
+  `)
+
+  // IoT Monitoring Platform
+  await session.run(`
+    MATCH (iot:Application {id: "hp-app-iot-platform"})
+    MATCH (remoteMonitoring:BusinessCapability {id: "hp-cap-remote-monitoring"})
+    MATCH (smartControls:BusinessCapability {id: "hp-cap-smart-controls"})
+    CREATE (iot)-[:SUPPORTS]->(remoteMonitoring)
+    CREATE (iot)-[:SUPPORTS]->(smartControls)
+  `)
+
+  // Warranty Management
+  await session.run(`
+    MATCH (warranty:Application {id: "hp-app-warranty-management"})
+    MATCH (warrantyMgmt:BusinessCapability {id: "hp-cap-warranty-management"})
+    MATCH (customerSupport:BusinessCapability {id: "hp-cap-customer-support"})
+    CREATE (warranty)-[:SUPPORTS]->(warrantyMgmt)
+    CREATE (warranty)-[:SUPPORTS]->(customerSupport)
+  `)
+
+  // Installer Portal
+  await session.run(`
+    MATCH (installer:Application {id: "hp-app-installer-portal"})
+    MATCH (installation:BusinessCapability {id: "hp-cap-installation-services"})
+    MATCH (channelMgmt:BusinessCapability {id: "hp-cap-channel-management"})
+    CREATE (installer)-[:SUPPORTS]->(installation)
+    CREATE (installer)-[:SUPPORTS]->(channelMgmt)
+  `)
+
+  // Diagnostic Tool
+  await session.run(`
+    MATCH (diagnostic:Application {id: "hp-app-diagnostic-tool"})
+    MATCH (remoteMonitoring:BusinessCapability {id: "hp-cap-remote-monitoring"})
+    MATCH (maintenance:BusinessCapability {id: "hp-cap-maintenance-services"})
+    CREATE (diagnostic)-[:SUPPORTS]->(remoteMonitoring)
+    CREATE (diagnostic)-[:SUPPORTS]->(maintenance)
+  `)
+
+  // Energy Analytics Platform
+  await session.run(`
+    MATCH (energy:Application {id: "hp-app-energy-analytics"})
+    MATCH (energyEfficiency:BusinessCapability {id: "hp-cap-energy-efficiency"})
+    MATCH (sustainabilityMgmt:BusinessCapability {id: "hp-cap-sustainability"})
+    MATCH (remoteMonitoring:BusinessCapability {id: "hp-cap-remote-monitoring"})
+    CREATE (energy)-[:SUPPORTS]->(energyEfficiency)
+    CREATE (energy)-[:SUPPORTS]->(sustainabilityMgmt)
+    CREATE (energy)-[:SUPPORTS]->(remoteMonitoring)
+  `)
+
+  // HRMS System
+  await session.run(`
+    MATCH (hrms:Application {id: "hp-app-hrms"})
+    MATCH (hr:BusinessCapability {id: "hp-cap-human-resources"})
+    MATCH (talentMgmt:BusinessCapability {id: "hp-cap-talent-management"})
+    CREATE (hrms)-[:SUPPORTS]->(hr)
+    CREATE (hrms)-[:SUPPORTS]->(talentMgmt)
+  `)
+
+  // Learning Management System
+  await session.run(`
+    MATCH (lms:Application {id: "hp-app-learning-management"})
+    MATCH (talentMgmt:BusinessCapability {id: "hp-cap-talent-management"})
+    MATCH (hr:BusinessCapability {id: "hp-cap-human-resources"})
+    CREATE (lms)-[:SUPPORTS]->(talentMgmt)
+    CREATE (lms)-[:SUPPORTS]->(hr)
+  `)
+
+  // Financial Planning System
+  await session.run(`
+    MATCH (finPlan:Application {id: "hp-app-financial-planning"})
+    MATCH (financialPlanning:BusinessCapability {id: "hp-cap-financial-planning"})
+    MATCH (strategicPlanning:BusinessCapability {id: "hp-cap-strategic-planning"})
+    CREATE (finPlan)-[:SUPPORTS]->(financialPlanning)
+    CREATE (finPlan)-[:SUPPORTS]->(strategicPlanning)
+  `)
+
+  // BI & Analytics Platform
+  await session.run(`
+    MATCH (bi:Application {id: "hp-app-bi-analytics"})
+    MATCH (marketAnalysis:BusinessCapability {id: "hp-cap-market-analysis"})
+    MATCH (customerAnalytics:BusinessCapability {id: "hp-cap-customer-analytics"})
+    MATCH (financialPlanning:BusinessCapability {id: "hp-cap-financial-planning"})
+    CREATE (bi)-[:SUPPORTS]->(marketAnalysis)
+    CREATE (bi)-[:SUPPORTS]->(customerAnalytics)
+    CREATE (bi)-[:SUPPORTS]->(financialPlanning)
+  `)
+
+  // IT Service Management
+  await session.run(`
+    MATCH (itsm:Application {id: "hp-app-it-service-management"})
+    MATCH (it:BusinessCapability {id: "hp-cap-information-technology"})
+    MATCH (applicationMgmt:BusinessCapability {id: "hp-cap-application-management"})
+    CREATE (itsm)-[:SUPPORTS]->(it)
+    CREATE (itsm)-[:SUPPORTS]->(applicationMgmt)
+  `)
+
+  // Infrastructure Monitoring
+  await session.run(`
+    MATCH (infra:Application {id: "hp-app-infrastructure-monitoring"})
+    MATCH (infrastructureMgmt:BusinessCapability {id: "hp-cap-infrastructure-management"})
+    MATCH (it:BusinessCapability {id: "hp-cap-information-technology"})
+    CREATE (infra)-[:SUPPORTS]->(infrastructureMgmt)
+    CREATE (infra)-[:SUPPORTS]->(it)
+  `)
+
+  // Cybersecurity Platform
+  await session.run(`
+    MATCH (cyber:Application {id: "hp-app-cybersecurity"})
+    MATCH (it:BusinessCapability {id: "hp-cap-information-technology"})
+    MATCH (infrastructureMgmt:BusinessCapability {id: "hp-cap-infrastructure-management"})
+    MATCH (corporateGovernance:BusinessCapability {id: "hp-cap-corporate-governance"})
+    CREATE (cyber)-[:SUPPORTS]->(it)
+    CREATE (cyber)-[:SUPPORTS]->(infrastructureMgmt)
+    CREATE (cyber)-[:SUPPORTS]->(corporateGovernance)
+  `)
+
+  // Application Lifecycle Management
+  await session.run(`
+    MATCH (alm:Application {id: "hp-app-application-lifecycle"})
+    MATCH (applicationMgmt:BusinessCapability {id: "hp-cap-application-management"})
+    MATCH (it:BusinessCapability {id: "hp-cap-information-technology"})
+    CREATE (alm)-[:SUPPORTS]->(applicationMgmt)
+    CREATE (alm)-[:SUPPORTS]->(it)
+  `)
+
+  // Legal Document Management
+  await session.run(`
+    MATCH (legal:Application {id: "hp-app-legal-document-mgmt"})
+    MATCH (legalCompliance:BusinessCapability {id: "hp-cap-legal-compliance"})
+    MATCH (corporateGovernance:BusinessCapability {id: "hp-cap-corporate-governance"})
+    CREATE (legal)-[:SUPPORTS]->(legalCompliance)
+    CREATE (legal)-[:SUPPORTS]->(corporateGovernance)
+  `)
+
+  // Contract Management
+  await session.run(`
+    MATCH (contract:Application {id: "hp-app-contract-management"})
+    MATCH (legalCompliance:BusinessCapability {id: "hp-cap-legal-compliance"})
+    MATCH (supplyChain:BusinessCapability {id: "hp-cap-supply-chain"})
+    CREATE (contract)-[:SUPPORTS]->(legalCompliance)
+    CREATE (contract)-[:SUPPORTS]->(supplyChain)
+  `)
+
+  // Compliance Management
+  await session.run(`
+    MATCH (compliance:Application {id: "hp-app-compliance-management"})
+    MATCH (legalCompliance:BusinessCapability {id: "hp-cap-legal-compliance"})
+    MATCH (corporateGovernance:BusinessCapability {id: "hp-cap-corporate-governance"})
+    MATCH (qualityMgmt:BusinessCapability {id: "hp-cap-quality-management"})
+    CREATE (compliance)-[:SUPPORTS]->(legalCompliance)
+    CREATE (compliance)-[:SUPPORTS]->(corporateGovernance)
+    CREATE (compliance)-[:SUPPORTS]->(qualityMgmt)
+  `)
+
+  // Power BI
+  await session.run(`
+    MATCH (powerbi:Application {id: "hp-app-power-bi"})
+    MATCH (financialPlanning:BusinessCapability {id: "hp-cap-financial-planning"})
+    MATCH (accounting:BusinessCapability {id: "hp-cap-accounting-reporting"})
+    MATCH (productionPlanning:BusinessCapability {id: "hp-cap-production-planning"})
+    CREATE (powerbi)-[:SUPPORTS]->(financialPlanning)
+    CREATE (powerbi)-[:SUPPORTS]->(accounting)
+    CREATE (powerbi)-[:SUPPORTS]->(productionPlanning)
+  `)
+
+  // Office 365
+  await session.run(`
+    MATCH (office:Application {id: "hp-app-office365"})
+    MATCH (hr:BusinessCapability {id: "hp-cap-human-resources"})
+    MATCH (corporateGovernance:BusinessCapability {id: "hp-cap-corporate-governance"})
+    MATCH (strategicPlanning:BusinessCapability {id: "hp-cap-strategic-planning"})
+    CREATE (office)-[:SUPPORTS]->(hr)
+    CREATE (office)-[:SUPPORTS]->(corporateGovernance)
+    CREATE (office)-[:SUPPORTS]->(strategicPlanning)
+  `)
+
+  // Digital Marketing Automation
+  await session.run(`
+    MATCH (digitalMarketing:Application {id: "hp-app-digital-marketing"})
+    MATCH (digitalMarketingCap:BusinessCapability {id: "hp-cap-digital-marketing"})
+    MATCH (customerAnalytics:BusinessCapability {id: "hp-cap-customer-analytics"})
+    CREATE (digitalMarketing)-[:SUPPORTS]->(digitalMarketingCap)
+    CREATE (digitalMarketing)-[:SUPPORTS]->(customerAnalytics)
+  `)
+
+  // Energy Management System
+  await session.run(`
+    MATCH (energyMgmt:Application {id: "hp-app-energy-mgmt"})
+    MATCH (energyEfficiency:BusinessCapability {id: "hp-cap-energy-efficiency"})
     MATCH (sustainability:BusinessCapability {id: "hp-cap-sustainability"})
-    MATCH (remote_monitoring:BusinessCapability {id: "hp-cap-remote-monitoring"})
-    CREATE (energy_analytics)-[:SUPPORTS]->(energy_efficiency)
-    CREATE (energy_analytics)-[:SUPPORTS]->(sustainability)
-    CREATE (energy_analytics)-[:SUPPORTS]->(remote_monitoring)
+    CREATE (energyMgmt)-[:SUPPORTS]->(energyEfficiency)
+    CREATE (energyMgmt)-[:SUPPORTS]->(sustainability)
   `)
 
-  // CRM system capabilities
+  // Predictive Maintenance Platform
   await session.run(`
-    MATCH (crm_system:Application {id: "hp-app-crm-salesforce"})
-    MATCH (channel_management:BusinessCapability {id: "hp-cap-channel-management"})
-    MATCH (customer_support:BusinessCapability {id: "hp-cap-customer-support"})
-    MATCH (digital_marketing:BusinessCapability {id: "hp-cap-digital-marketing"})
-    CREATE (crm_system)-[:SUPPORTS]->(channel_management)
-    CREATE (crm_system)-[:SUPPORTS]->(customer_support)
-    CREATE (crm_system)-[:SUPPORTS]->(digital_marketing)
+    MATCH (predictiveMaint:Application {id: "hp-app-predictive-maintenance"})
+    MATCH (maintenance:BusinessCapability {id: "hp-cap-maintenance-services"})
+    MATCH (remoteMonitoring:BusinessCapability {id: "hp-cap-remote-monitoring"})
+    CREATE (predictiveMaint)-[:SUPPORTS]->(maintenance)
+    CREATE (predictiveMaint)-[:SUPPORTS]->(remoteMonitoring)
   `)
 
-  // SCM system capabilities - entfernt da keine entsprechende App existiert
-  // Ersetzt durch Legacy PLM Support
-
-  // R&D platform capabilities
+  // Service Technician Mobile App
   await session.run(`
-    MATCH (rd_platform:Application {id: "hp-app-thermal-cad"})
-    MATCH (thermal_design:BusinessCapability {id: "hp-cap-thermal-design"})
-    MATCH (refrigerant_tech:BusinessCapability {id: "hp-cap-refrigerant-tech"})
-    MATCH (smart_controls:BusinessCapability {id: "hp-cap-smart-controls"})
-    CREATE (rd_platform)-[:SUPPORTS]->(thermal_design)
-    CREATE (rd_platform)-[:SUPPORTS]->(refrigerant_tech)
-    CREATE (rd_platform)-[:SUPPORTS]->(smart_controls)
+    MATCH (serviceMobile:Application {id: "hp-app-service-mobile"})
+    MATCH (maintenance:BusinessCapability {id: "hp-cap-maintenance-services"})
+    MATCH (installation:BusinessCapability {id: "hp-cap-installation-services"})
+    MATCH (customerSupport:BusinessCapability {id: "hp-cap-customer-support"})
+    CREATE (serviceMobile)-[:SUPPORTS]->(maintenance)
+    CREATE (serviceMobile)-[:SUPPORTS]->(installation)
+    CREATE (serviceMobile)-[:SUPPORTS]->(customerSupport)
   `)
 
-  // Service management capabilities
+  // Partner Mobile App
   await session.run(`
-    MATCH (service_mgmt:Application {id: "hp-app-service-management"})
-    MATCH (installation_services:BusinessCapability {id: "hp-cap-installation-services"})
-    MATCH (maintenance_services:BusinessCapability {id: "hp-cap-maintenance-services"})
-    MATCH (customer_support:BusinessCapability {id: "hp-cap-customer-support"})
-    CREATE (service_mgmt)-[:SUPPORTS]->(installation_services)
-    CREATE (service_mgmt)-[:SUPPORTS]->(maintenance_services)
-    CREATE (service_mgmt)-[:SUPPORTS]->(customer_support)
+    MATCH (partnerMobile:Application {id: "hp-app-partner-mobile"})
+    MATCH (channelMgmt:BusinessCapability {id: "hp-cap-channel-management"})
+    MATCH (salesOps:BusinessCapability {id: "hp-cap-sales-operations"})
+    CREATE (partnerMobile)-[:SUPPORTS]->(channelMgmt)
+    CREATE (partnerMobile)-[:SUPPORTS]->(salesOps)
   `)
 
-  // Analytics capabilities
+  // Warehouse Management System
   await session.run(`
-    MATCH (power_bi:Application {id: "hp-app-power-bi"})
-    MATCH (financial_planning:BusinessCapability {id: "hp-cap-financial-planning"})
-    MATCH (accounting_reporting:BusinessCapability {id: "hp-cap-accounting-reporting"})
-    CREATE (power_bi)-[:SUPPORTS]->(financial_planning)
-    CREATE (power_bi)-[:SUPPORTS]->(accounting_reporting)
+    MATCH (warehouseMgmt:Application {id: "hp-app-warehouse-mgmt"})
+    MATCH (warehouseMgmtCap:BusinessCapability {id: "hp-cap-warehouse-management"})
+    MATCH (supplyChain:BusinessCapability {id: "hp-cap-supply-chain"})
+    CREATE (warehouseMgmt)-[:SUPPORTS]->(warehouseMgmtCap)
+    CREATE (warehouseMgmt)-[:SUPPORTS]->(supplyChain)
   `)
 
-  // Installer portal capabilities
+  // Warranty Management System
   await session.run(`
-    MATCH (installer_portal:Application {id: "hp-app-installer-portal"})
-    MATCH (channel_management:BusinessCapability {id: "hp-cap-channel-management"})
-    MATCH (installation_services:BusinessCapability {id: "hp-cap-installation-services"})
-    CREATE (installer_portal)-[:SUPPORTS]->(channel_management)
-    CREATE (installer_portal)-[:SUPPORTS]->(installation_services)
+    MATCH (warrantyMgmt:Application {id: "hp-app-warranty-mgmt"})
+    MATCH (warranty:BusinessCapability {id: "hp-cap-warranty-management"})
+    MATCH (customerSupport:BusinessCapability {id: "hp-cap-customer-support"})
+    CREATE (warrantyMgmt)-[:SUPPORTS]->(warranty)
+    CREATE (warrantyMgmt)-[:SUPPORTS]->(customerSupport)
   `)
 
-  // Diagnostic tool capabilities
+  // Spare Parts Management
   await session.run(`
-    MATCH (diagnostic_tool:Application {id: "hp-app-diagnostic-tool"})
-    MATCH (remote_monitoring:BusinessCapability {id: "hp-cap-remote-monitoring"})
-    MATCH (maintenance_services:BusinessCapability {id: "hp-cap-maintenance-services"})
-    CREATE (diagnostic_tool)-[:SUPPORTS]->(remote_monitoring)
-    CREATE (diagnostic_tool)-[:SUPPORTS]->(maintenance_services)
+    MATCH (spareParts:Application {id: "hp-app-spare-parts"})
+    MATCH (maintenance:BusinessCapability {id: "hp-cap-maintenance-services"})
+    MATCH (warehouseMgmt:BusinessCapability {id: "hp-cap-warehouse-management"})
+    MATCH (supplyChain:BusinessCapability {id: "hp-cap-supply-chain"})
+    CREATE (spareParts)-[:SUPPORTS]->(maintenance)
+    CREATE (spareParts)-[:SUPPORTS]->(warehouseMgmt)
+    CREATE (spareParts)-[:SUPPORTS]->(supplyChain)
   `)
 
-  // Legacy PLM capabilities
+  // Supplier Collaboration Portal
   await session.run(`
-    MATCH (legacy_plm:Application {id: "hp-app-legacy-plm"})
-    MATCH (product_management:BusinessCapability {id: "hp-cap-product-management"})
-    MATCH (thermal_design:BusinessCapability {id: "hp-cap-thermal-design"})
-    CREATE (legacy_plm)-[:SUPPORTS]->(product_management)
-    CREATE (legacy_plm)-[:SUPPORTS]->(thermal_design)
+    MATCH (supplierPortal:Application {id: "hp-app-supplier-portal"})
+    MATCH (supplyChain:BusinessCapability {id: "hp-cap-supply-chain"})
+    MATCH (qualityMgmt:BusinessCapability {id: "hp-cap-quality-management"})
+    CREATE (supplierPortal)-[:SUPPORTS]->(supplyChain)
+    CREATE (supplierPortal)-[:SUPPORTS]->(qualityMgmt)
   `)
 
-  // Office 365 capabilities
+  // Enterprise Document Management
   await session.run(`
-    MATCH (office365:Application {id: "hp-app-office365"})
-    MATCH (talent_management:BusinessCapability {id: "hp-cap-talent-management"})
-    MATCH (corporate_governance:BusinessCapability {id: "hp-cap-corporate-governance"})
-    CREATE (office365)-[:SUPPORTS]->(talent_management)
-    CREATE (office365)-[:SUPPORTS]->(corporate_governance)
+    MATCH (documentMgmt:Application {id: "hp-app-document-mgmt"})
+    MATCH (it:BusinessCapability {id: "hp-cap-information-technology"})
+    MATCH (legalCompliance:BusinessCapability {id: "hp-cap-legal-compliance"})
+    MATCH (qualityMgmt:BusinessCapability {id: "hp-cap-quality-management"})
+    CREATE (documentMgmt)-[:SUPPORTS]->(it)
+    CREATE (documentMgmt)-[:SUPPORTS]->(legalCompliance)
+    CREATE (documentMgmt)-[:SUPPORTS]->(qualityMgmt)
+  `)
+
+  // Backup & Disaster Recovery
+  await session.run(`
+    MATCH (backup:Application {id: "hp-app-backup-recovery"})
+    MATCH (infrastructureMgmt:BusinessCapability {id: "hp-cap-infrastructure-management"})
+    MATCH (it:BusinessCapability {id: "hp-cap-information-technology"})
+    CREATE (backup)-[:SUPPORTS]->(infrastructureMgmt)
+    CREATE (backup)-[:SUPPORTS]->(it)
+  `)
+
+  // Learning Management System
+  await session.run(`
+    MATCH (learningMgmt:Application {id: "hp-app-learning-mgmt"})
+    MATCH (talentMgmt:BusinessCapability {id: "hp-cap-talent-management"})
+    MATCH (hr:BusinessCapability {id: "hp-cap-human-resources"})
+    CREATE (learningMgmt)-[:SUPPORTS]->(talentMgmt)
+    CREATE (learningMgmt)-[:SUPPORTS]->(hr)
+  `)
+
+  // Expense Management System
+  await session.run(`
+    MATCH (expenseMgmt:Application {id: "hp-app-expense-mgmt"})
+    MATCH (accounting:BusinessCapability {id: "hp-cap-accounting-reporting"})
+    MATCH (finance:BusinessCapability {id: "hp-cap-finance"})
+    CREATE (expenseMgmt)-[:SUPPORTS]->(accounting)
+    CREATE (expenseMgmt)-[:SUPPORTS]->(finance)
+  `)
+
+  // Innovation Management Portal
+  await session.run(`
+    MATCH (innovationPortal:Application {id: "hp-app-innovation-portal"})
+    MATCH (productDevelopment:BusinessCapability {id: "hp-cap-product-development"})
+    MATCH (strategicPlanning:BusinessCapability {id: "hp-cap-strategic-planning"})
+    CREATE (innovationPortal)-[:SUPPORTS]->(productDevelopment)
+    CREATE (innovationPortal)-[:SUPPORTS]->(strategicPlanning)
+  `)
+
+  // Intellectual Property Management
+  await session.run(`
+    MATCH (ipMgmt:Application {id: "hp-app-ip-management"})
+    MATCH (productDevelopment:BusinessCapability {id: "hp-cap-product-development"})
+    MATCH (legalCompliance:BusinessCapability {id: "hp-cap-legal-compliance"})
+    CREATE (ipMgmt)-[:SUPPORTS]->(productDevelopment)
+    CREATE (ipMgmt)-[:SUPPORTS]->(legalCompliance)
+  `)
+
+  // Legal Technology Platform
+  await session.run(`
+    MATCH (legalTech:Application {id: "hp-app-legal-tech"})
+    MATCH (legalCompliance:BusinessCapability {id: "hp-cap-legal-compliance"})
+    MATCH (corporateGovernance:BusinessCapability {id: "hp-cap-corporate-governance"})
+    CREATE (legalTech)-[:SUPPORTS]->(legalCompliance)
+    CREATE (legalTech)-[:SUPPORTS]->(corporateGovernance)
+  `)
+
+  // Social Media Listening Platform
+  await session.run(`
+    MATCH (socialListening:Application {id: "hp-app-social-listening"})
+    MATCH (digitalMarketing:BusinessCapability {id: "hp-cap-digital-marketing"})
+    MATCH (customerAnalytics:BusinessCapability {id: "hp-cap-customer-analytics"})
+    MATCH (marketAnalysis:BusinessCapability {id: "hp-cap-market-analysis"})
+    CREATE (socialListening)-[:SUPPORTS]->(digitalMarketing)
+    CREATE (socialListening)-[:SUPPORTS]->(customerAnalytics)
+    CREATE (socialListening)-[:SUPPORTS]->(marketAnalysis)
+  `)
+
+  // Test Data Management System
+  await session.run(`
+    MATCH (testDataMgmt:Application {id: "hp-app-test-data-mgmt"})
+    MATCH (testing:BusinessCapability {id: "hp-cap-testing-validation"})
+    MATCH (qualityMgmt:BusinessCapability {id: "hp-cap-quality-management"})
+    CREATE (testDataMgmt)-[:SUPPORTS]->(testing)
+    CREATE (testDataMgmt)-[:SUPPORTS]->(qualityMgmt)
+  `)
+
+  // Legacy PLM System (being phased out)
+  await session.run(`
+    MATCH (legacyPLM:Application {id: "hp-app-legacy-plm"})
+    MATCH (productDevelopment:BusinessCapability {id: "hp-cap-product-development"})
+    CREATE (legacyPLM)-[:SUPPORTS]->(productDevelopment)
   `)
 
   console.log('Application-Capability support relationships created successfully.')
@@ -432,6 +891,321 @@ export async function createApplicationDataRelationships(session: Session) {
     CREATE (installer_portal)-[:USES]->(training_materials)
   `)
 
+  // Digital Marketing Automation
+  await session.run(`
+    MATCH (digitalMarketing:Application {id: "hp-app-digital-marketing"})
+    MATCH (customerProfiles:DataObject {id: "hp-data-customer-profiles"})
+    MATCH (marketIntelligence:DataObject {id: "hp-data-market-intelligence"})
+    CREATE (digitalMarketing)-[:USES]->(customerProfiles)
+    CREATE (digitalMarketing)-[:USES]->(marketIntelligence)
+  `)
+
+  // Energy Management System
+  await session.run(`
+    MATCH (energyMgmt:Application {id: "hp-app-energy-mgmt"})
+    MATCH (energyConsumption:DataObject {id: "hp-data-energy-consumption"})
+    MATCH (sustainabilityMetrics:DataObject {id: "hp-data-sustainability-metrics"})
+    MATCH (sensorTelemetry:DataObject {id: "hp-data-sensor-telemetry"})
+    CREATE (energyMgmt)-[:USES]->(energyConsumption)
+    CREATE (energyMgmt)-[:USES]->(sustainabilityMetrics)
+    CREATE (energyMgmt)-[:USES]->(sensorTelemetry)
+  `)
+
+  // Predictive Maintenance Platform
+  await session.run(`
+    MATCH (predictiveMaint:Application {id: "hp-app-predictive-maintenance"})
+    MATCH (sensorTelemetry:DataObject {id: "hp-data-sensor-telemetry"})
+    MATCH (diagnosticLogs:DataObject {id: "hp-data-diagnostic-logs"})
+    MATCH (maintenanceSchedules:DataObject {id: "hp-data-maintenance-schedules"})
+    CREATE (predictiveMaint)-[:USES]->(sensorTelemetry)
+    CREATE (predictiveMaint)-[:USES]->(diagnosticLogs)
+    CREATE (maintenanceSchedules)-[:DATA_SOURCE]->(predictiveMaint)
+  `)
+
+  // Service Technician Mobile App
+  await session.run(`
+    MATCH (serviceMobile:Application {id: "hp-app-service-mobile"})
+    MATCH (serviceTickets:DataObject {id: "hp-data-service-tickets"})
+    MATCH (installationRecords:DataObject {id: "hp-data-installation-records"})
+    MATCH (productSpecs:DataObject {id: "hp-data-product-specifications"})
+    CREATE (serviceMobile)-[:USES]->(serviceTickets)
+    CREATE (serviceMobile)-[:USES]->(installationRecords)
+    CREATE (serviceMobile)-[:USES]->(productSpecs)
+  `)
+
+  // Partner Mobile App
+  await session.run(`
+    MATCH (partnerMobile:Application {id: "hp-app-partner-mobile"})
+    MATCH (productSpecs:DataObject {id: "hp-data-product-specifications"})
+    MATCH (salesTransactions:DataObject {id: "hp-data-sales-transactions"})
+    CREATE (partnerMobile)-[:USES]->(productSpecs)
+    CREATE (partnerMobile)-[:USES]->(salesTransactions)
+  `)
+
+  // Warehouse Management System
+  await session.run(`
+    MATCH (warehouseMgmt:Application {id: "hp-app-warehouse-mgmt"})
+    MATCH (bom:DataObject {id: "hp-data-bill-of-materials"})
+    MATCH (supplierInfo:DataObject {id: "hp-data-supplier-information"})
+    MATCH (productionMetrics:DataObject {id: "hp-data-production-metrics"})
+    CREATE (warehouseMgmt)-[:USES]->(bom)
+    CREATE (warehouseMgmt)-[:USES]->(supplierInfo)
+    CREATE (warehouseMgmt)-[:USES]->(productionMetrics)
+  `)
+
+  // Warranty Management System
+  await session.run(`
+    MATCH (warrantyMgmt:Application {id: "hp-app-warranty-mgmt"})
+    MATCH (installationRecords:DataObject {id: "hp-data-installation-records"})
+    MATCH (serviceTickets:DataObject {id: "hp-data-service-tickets"})
+    MATCH (customerProfiles:DataObject {id: "hp-data-customer-profiles"})
+    CREATE (warrantyMgmt)-[:USES]->(installationRecords)
+    CREATE (warrantyMgmt)-[:USES]->(serviceTickets)
+    CREATE (warrantyMgmt)-[:USES]->(customerProfiles)
+  `)
+
+  // Spare Parts Management
+  await session.run(`
+    MATCH (spareParts:Application {id: "hp-app-spare-parts"})
+    MATCH (bom:DataObject {id: "hp-data-bill-of-materials"})
+    MATCH (supplierInfo:DataObject {id: "hp-data-supplier-information"})
+    MATCH (serviceTickets:DataObject {id: "hp-data-service-tickets"})
+    CREATE (spareParts)-[:USES]->(bom)
+    CREATE (spareParts)-[:USES]->(supplierInfo)
+    CREATE (spareParts)-[:USES]->(serviceTickets)
+  `)
+
+  // Supplier Collaboration Portal
+  await session.run(`
+    MATCH (supplierPortal:Application {id: "hp-app-supplier-portal"})
+    MATCH (supplierInfo:DataObject {id: "hp-data-supplier-information"})
+    MATCH (qualityRecords:DataObject {id: "hp-data-quality-records"})
+    MATCH (bom:DataObject {id: "hp-data-bill-of-materials"})
+    CREATE (supplierPortal)-[:USES]->(supplierInfo)
+    CREATE (supplierPortal)-[:USES]->(qualityRecords)
+    CREATE (supplierPortal)-[:USES]->(bom)
+  `)
+
+  // Enterprise Document Management
+  await session.run(`
+    MATCH (documentMgmt:Application {id: "hp-app-document-mgmt"})
+    MATCH (complianceRecords:DataObject {id: "hp-data-compliance-records"})
+    MATCH (knowledgeBase:DataObject {id: "hp-data-knowledge-base"})
+    MATCH (trainingMaterials:DataObject {id: "hp-data-training-materials"})
+    CREATE (documentMgmt)-[:USES]->(complianceRecords)
+    CREATE (documentMgmt)-[:USES]->(knowledgeBase)
+    CREATE (documentMgmt)-[:USES]->(trainingMaterials)
+  `)
+
+  // Backup & Disaster Recovery
+  await session.run(`
+    MATCH (backup:Application {id: "hp-app-backup-recovery"})
+    MATCH (financialReports:DataObject {id: "hp-data-financial-reports"})
+    MATCH (customerProfiles:DataObject {id: "hp-data-customer-profiles"})
+    CREATE (backup)-[:USES]->(financialReports)
+    CREATE (backup)-[:USES]->(customerProfiles)
+  `)
+
+  // Learning Management System
+  await session.run(`
+    MATCH (learningMgmt:Application {id: "hp-app-learning-mgmt"})
+    MATCH (trainingMaterials:DataObject {id: "hp-data-training-materials"})
+    MATCH (knowledgeBase:DataObject {id: "hp-data-knowledge-base"})
+    CREATE (learningMgmt)-[:USES]->(trainingMaterials)
+    CREATE (learningMgmt)-[:USES]->(knowledgeBase)
+  `)
+
+  // Expense Management System
+  await session.run(`
+    MATCH (expenseMgmt:Application {id: "hp-app-expense-mgmt"})
+    MATCH (financialReports:DataObject {id: "hp-data-financial-reports"})
+    MATCH (costAnalysis:DataObject {id: "hp-data-cost-analysis"})
+    CREATE (expenseMgmt)-[:USES]->(financialReports)
+    CREATE (expenseMgmt)-[:USES]->(costAnalysis)
+  `)
+
+  // Innovation Management Portal
+  await session.run(`
+    MATCH (innovationPortal:Application {id: "hp-app-innovation-portal"})
+    MATCH (thermalModels:DataObject {id: "hp-data-thermal-models"})
+    MATCH (testResults:DataObject {id: "hp-data-test-results"})
+    MATCH (productSpecs:DataObject {id: "hp-data-product-specifications"})
+    CREATE (innovationPortal)-[:USES]->(thermalModels)
+    CREATE (innovationPortal)-[:USES]->(testResults)
+    CREATE (innovationPortal)-[:USES]->(productSpecs)
+  `)
+
+  // Intellectual Property Management
+  await session.run(`
+    MATCH (ipMgmt:Application {id: "hp-app-ip-management"})
+    MATCH (thermalModels:DataObject {id: "hp-data-thermal-models"})
+    MATCH (productSpecs:DataObject {id: "hp-data-product-specifications"})
+    MATCH (complianceRecords:DataObject {id: "hp-data-compliance-records"})
+    CREATE (ipMgmt)-[:USES]->(thermalModels)
+    CREATE (ipMgmt)-[:USES]->(productSpecs)
+    CREATE (ipMgmt)-[:USES]->(complianceRecords)
+  `)
+
+  // Legal Technology Platform
+  await session.run(`
+    MATCH (legalTech:Application {id: "hp-app-legal-tech"})
+    MATCH (complianceRecords:DataObject {id: "hp-data-compliance-records"})
+    MATCH (supplierInfo:DataObject {id: "hp-data-supplier-information"})
+    CREATE (legalTech)-[:USES]->(complianceRecords)
+    CREATE (legalTech)-[:USES]->(supplierInfo)
+  `)
+
+  // Social Media Listening Platform
+  await session.run(`
+    MATCH (socialListening:Application {id: "hp-app-social-listening"})
+    MATCH (marketIntelligence:DataObject {id: "hp-data-market-intelligence"})
+    MATCH (customerProfiles:DataObject {id: "hp-data-customer-profiles"})
+    CREATE (socialListening)-[:USES]->(marketIntelligence)
+    CREATE (marketIntelligence)-[:DATA_SOURCE]->(socialListening)
+    CREATE (socialListening)-[:USES]->(customerProfiles)
+  `)
+
+  // Test Data Management System
+  await session.run(`
+    MATCH (testDataMgmt:Application {id: "hp-app-test-data-mgmt"})
+    MATCH (testResults:DataObject {id: "hp-data-test-results"})
+    MATCH (qualityRecords:DataObject {id: "hp-data-quality-records"})
+    MATCH (thermalModels:DataObject {id: "hp-data-thermal-models"})
+    CREATE (testDataMgmt)-[:USES]->(testResults)
+    CREATE (testDataMgmt)-[:USES]->(qualityRecords)
+    CREATE (testDataMgmt)-[:USES]->(thermalModels)
+  `)
+
+  // CFD Simulation Suite
+  await session.run(`
+    MATCH (cfdSimulation:Application {id: "hp-app-cfd-simulation"})
+    MATCH (thermalModels:DataObject {id: "hp-data-thermal-models"})
+    MATCH (refrigerantProperties:DataObject {id: "hp-data-refrigerant-properties"})
+    MATCH (weatherConditions:DataObject {id: "hp-data-weather-conditions"})
+    CREATE (cfdSimulation)-[:USES]->(thermalModels)
+    CREATE (cfdSimulation)-[:USES]->(refrigerantProperties)
+    CREATE (cfdSimulation)-[:USES]->(weatherConditions)
+  `)
+
+  // HRMS
+  await session.run(`
+    MATCH (hrms:Application {id: "hp-app-hrms"})
+    MATCH (trainingMaterials:DataObject {id: "hp-data-training-materials"})
+    MATCH (complianceRecords:DataObject {id: "hp-data-compliance-records"})
+    CREATE (hrms)-[:USES]->(trainingMaterials)
+    CREATE (hrms)-[:USES]->(complianceRecords)
+  `)
+
+  // Advanced MRP System
+  await session.run(`
+    MATCH (advancedMRP:Application {id: "hp-app-advanced-mrp"})
+    MATCH (bom:DataObject {id: "hp-data-bill-of-materials"})
+    MATCH (productionMetrics:DataObject {id: "hp-data-production-metrics"})
+    MATCH (supplierInfo:DataObject {id: "hp-data-supplier-information"})
+    CREATE (advancedMRP)-[:USES]->(bom)
+    CREATE (advancedMRP)-[:USES]->(productionMetrics)
+    CREATE (advancedMRP)-[:USES]->(supplierInfo)
+  `)
+
+  // Cybersecurity Platform
+  await session.run(`
+    MATCH (cybersecurity:Application {id: "hp-app-cybersecurity"})
+    MATCH (diagnosticLogs:DataObject {id: "hp-data-diagnostic-logs"})
+    MATCH (complianceRecords:DataObject {id: "hp-data-compliance-records"})
+    CREATE (cybersecurity)-[:USES]->(diagnosticLogs)
+    CREATE (cybersecurity)-[:USES]->(complianceRecords)
+  `)
+
+  // B2B E-Commerce Platform
+  await session.run(`
+    MATCH (ecommerce:Application {id: "hp-app-ecommerce-platform"})
+    MATCH (productSpecs:DataObject {id: "hp-data-product-specifications"})
+    MATCH (customerProfiles:DataObject {id: "hp-data-customer-profiles"})
+    MATCH (salesTransactions:DataObject {id: "hp-data-sales-transactions"})
+    CREATE (ecommerce)-[:USES]->(productSpecs)
+    CREATE (ecommerce)-[:USES]->(customerProfiles)
+    CREATE (salesTransactions)-[:DATA_SOURCE]->(ecommerce)
+  `)
+
+  // Strategic Portfolio Management
+  await session.run(`
+    MATCH (strategyPortfolio:Application {id: "hp-app-strategy-portfolio"})
+    MATCH (marketIntelligence:DataObject {id: "hp-data-market-intelligence"})
+    MATCH (financialReports:DataObject {id: "hp-data-financial-reports"})
+    MATCH (costAnalysis:DataObject {id: "hp-data-cost-analysis"})
+    CREATE (strategyPortfolio)-[:USES]->(marketIntelligence)
+    CREATE (strategyPortfolio)-[:USES]->(financialReports)
+    CREATE (strategyPortfolio)-[:USES]->(costAnalysis)
+  `)
+
+  // Risk Management
+  await session.run(`
+    MATCH (riskMgmt:Application {id: "hp-app-risk-management"})
+    MATCH (complianceRecords:DataObject {id: "hp-data-compliance-records"})
+    MATCH (financialReports:DataObject {id: "hp-data-financial-reports"})
+    MATCH (supplierInfo:DataObject {id: "hp-data-supplier-information"})
+    CREATE (riskMgmt)-[:USES]->(complianceRecords)
+    CREATE (riskMgmt)-[:USES]->(financialReports)
+    CREATE (riskMgmt)-[:USES]->(supplierInfo)
+  `)
+
+  // Market Intelligence Platform
+  await session.run(`
+    MATCH (marketIntel:Application {id: "hp-app-market-intelligence"})
+    MATCH (marketIntelligence:DataObject {id: "hp-data-market-intelligence"})
+    MATCH (customerProfiles:DataObject {id: "hp-data-customer-profiles"})
+    MATCH (salesTransactions:DataObject {id: "hp-data-sales-transactions"})
+    CREATE (marketIntelligence)-[:DATA_SOURCE]->(marketIntel)
+    CREATE (marketIntel)-[:USES]->(customerProfiles)
+    CREATE (marketIntel)-[:USES]->(salesTransactions)
+  `)
+
+  // Modern PLM System
+  await session.run(`
+    MATCH (modernPLM:Application {id: "hp-app-modern-plm"})
+    MATCH (productSpecs:DataObject {id: "hp-data-product-specifications"})
+    MATCH (thermalModels:DataObject {id: "hp-data-thermal-models"})
+    MATCH (bom:DataObject {id: "hp-data-bill-of-materials"})
+    MATCH (testResults:DataObject {id: "hp-data-test-results"})
+    CREATE (productSpecs)-[:DATA_SOURCE]->(modernPLM)
+    CREATE (modernPLM)-[:USES]->(thermalModels)
+    CREATE (modernPLM)-[:USES]->(bom)
+    CREATE (modernPLM)-[:USES]->(testResults)
+  `)
+
+  // Heat Pump Configurator
+  await session.run(`
+    MATCH (configurator:Application {id: "hp-app-product-configurator"})
+    MATCH (productSpecs:DataObject {id: "hp-data-product-specifications"})
+    MATCH (thermalModels:DataObject {id: "hp-data-thermal-models"})
+    MATCH (refrigerantProperties:DataObject {id: "hp-data-refrigerant-properties"})
+    CREATE (configurator)-[:USES]->(productSpecs)
+    CREATE (configurator)-[:USES]->(thermalModels)
+    CREATE (configurator)-[:USES]->(refrigerantProperties)
+  `)
+
+  // Sustainability Tracker
+  await session.run(`
+    MATCH (sustainabilityTracker:Application {id: "hp-app-sustainability-tracker"})
+    MATCH (sustainabilityMetrics:DataObject {id: "hp-data-sustainability-metrics"})
+    MATCH (energyConsumption:DataObject {id: "hp-data-energy-consumption"})
+    MATCH (complianceRecords:DataObject {id: "hp-data-compliance-records"})
+    CREATE (sustainabilityMetrics)-[:DATA_SOURCE]->(sustainabilityTracker)
+    CREATE (sustainabilityTracker)-[:USES]->(energyConsumption)
+    CREATE (sustainabilityTracker)-[:USES]->(complianceRecords)
+  `)
+
+  // Technical Knowledge Base
+  await session.run(`
+    MATCH (knowledgeBaseApp:Application {id: "hp-app-knowledge-base"})
+    MATCH (knowledgeBase:DataObject {id: "hp-data-knowledge-base"})
+    MATCH (trainingMaterials:DataObject {id: "hp-data-training-materials"})
+    MATCH (productSpecs:DataObject {id: "hp-data-product-specifications"})
+    CREATE (knowledgeBase)-[:DATA_SOURCE]->(knowledgeBaseApp)
+    CREATE (knowledgeBaseApp)-[:USES]->(trainingMaterials)
+    CREATE (knowledgeBaseApp)-[:USES]->(productSpecs)
+  `)
+
   console.log('Application-Data relationships created successfully.')
 }
 
@@ -483,6 +1257,105 @@ export async function createApplicationInfrastructureHosting(session: Session) {
     CREATE (legacy_plm)-[:HOSTED_ON]->(primaryDatacenter)
   `)
 
+  // Additional cloud-hosted applications
+  await session.run(`
+    MATCH (digitalMarketing:Application {id: "hp-app-digital-marketing"})
+    MATCH (socialListening:Application {id: "hp-app-social-listening"})
+    MATCH (marketIntelligence:Application {id: "hp-app-market-intelligence"})
+    MATCH (ecommerce:Application {id: "hp-app-ecommerce-platform"})
+    MATCH (partnerMobile:Application {id: "hp-app-partner-mobile"})
+    MATCH (serviceMobile:Application {id: "hp-app-service-mobile"})
+    MATCH (awsCloud:Infrastructure {id: "hp-infra-aws-cloud"})
+    CREATE (digitalMarketing)-[:HOSTED_ON]->(awsCloud)
+    CREATE (socialListening)-[:HOSTED_ON]->(awsCloud)
+    CREATE (marketIntelligence)-[:HOSTED_ON]->(awsCloud)
+    CREATE (ecommerce)-[:HOSTED_ON]->(awsCloud)
+    CREATE (partnerMobile)-[:HOSTED_ON]->(awsCloud)
+    CREATE (serviceMobile)-[:HOSTED_ON]->(awsCloud)
+  `)
+
+  // Engineering and PLM applications - Primary datacenter
+  await session.run(`
+    MATCH (modernPLM:Application {id: "hp-app-modern-plm"})
+    MATCH (cfdSimulation:Application {id: "hp-app-cfd-simulation"})
+    MATCH (testDataMgmt:Application {id: "hp-app-test-data-mgmt"})
+    MATCH (innovationPortal:Application {id: "hp-app-innovation-portal"})
+    MATCH (ipMgmt:Application {id: "hp-app-ip-management"})
+    MATCH (primaryDatacenter:Infrastructure {id: "hp-infra-datacenter-primary"})
+    CREATE (modernPLM)-[:HOSTED_ON]->(primaryDatacenter)
+    CREATE (cfdSimulation)-[:HOSTED_ON]->(primaryDatacenter)
+    CREATE (testDataMgmt)-[:HOSTED_ON]->(primaryDatacenter)
+    CREATE (innovationPortal)-[:HOSTED_ON]->(primaryDatacenter)
+    CREATE (ipMgmt)-[:HOSTED_ON]->(primaryDatacenter)
+  `)
+
+  // IoT and Edge applications - IoT Platform
+  await session.run(`
+    MATCH (energyMgmt:Application {id: "hp-app-energy-mgmt"})
+    MATCH (predictiveMaint:Application {id: "hp-app-predictive-maintenance"})
+    MATCH (configurator:Application {id: "hp-app-product-configurator"})
+    MATCH (iotPlatform:Infrastructure {id: "hp-infra-iot-platform"})
+    CREATE (energyMgmt)-[:HOSTED_ON]->(iotPlatform)
+    CREATE (predictiveMaint)-[:HOSTED_ON]->(iotPlatform)
+    CREATE (configurator)-[:HOSTED_ON]->(iotPlatform)
+  `)
+
+  // Manufacturing and operational applications - MES Servers
+  await session.run(`
+    MATCH (advancedMRP:Application {id: "hp-app-advanced-mrp"})
+    MATCH (warehouseMgmt:Application {id: "hp-app-warehouse-mgmt"})
+    MATCH (spareParts:Application {id: "hp-app-spare-parts"})
+    MATCH (supplierPortal:Application {id: "hp-app-supplier-portal"})
+    MATCH (mesServers:Infrastructure {id: "hp-infra-mes-servers"})
+    CREATE (advancedMRP)-[:HOSTED_ON]->(mesServers)
+    CREATE (warehouseMgmt)-[:HOSTED_ON]->(mesServers)
+    CREATE (spareParts)-[:HOSTED_ON]->(mesServers)
+    CREATE (supplierPortal)-[:HOSTED_ON]->(mesServers)
+  `)
+
+  // Business and HR applications - Primary datacenter
+  await session.run(`
+    MATCH (hrms:Application {id: "hp-app-hrms"})
+    MATCH (learningMgmt:Application {id: "hp-app-learning-mgmt"})
+    MATCH (expenseMgmt:Application {id: "hp-app-expense-mgmt"})
+    MATCH (knowledgeBase:Application {id: "hp-app-knowledge-base"})
+    MATCH (strategyPortfolio:Application {id: "hp-app-strategy-portfolio"})
+    MATCH (sustainabilityTracker:Application {id: "hp-app-sustainability-tracker"})
+    MATCH (primaryDatacenter:Infrastructure {id: "hp-infra-datacenter-primary"})
+    CREATE (hrms)-[:HOSTED_ON]->(primaryDatacenter)
+    CREATE (learningMgmt)-[:HOSTED_ON]->(primaryDatacenter)
+    CREATE (expenseMgmt)-[:HOSTED_ON]->(primaryDatacenter)
+    CREATE (knowledgeBase)-[:HOSTED_ON]->(primaryDatacenter)
+    CREATE (strategyPortfolio)-[:HOSTED_ON]->(primaryDatacenter)
+    CREATE (sustainabilityTracker)-[:HOSTED_ON]->(primaryDatacenter)
+  `)
+
+  // Legal and compliance applications - Primary datacenter
+  await session.run(`
+    MATCH (legalTech:Application {id: "hp-app-legal-tech"})
+    MATCH (riskMgmt:Application {id: "hp-app-risk-management"})
+    MATCH (documentMgmt:Application {id: "hp-app-document-mgmt"})
+    MATCH (warrantyMgmt:Application {id: "hp-app-warranty-mgmt"})
+    MATCH (primaryDatacenter:Infrastructure {id: "hp-infra-datacenter-primary"})
+    CREATE (legalTech)-[:HOSTED_ON]->(primaryDatacenter)
+    CREATE (riskMgmt)-[:HOSTED_ON]->(primaryDatacenter)
+    CREATE (documentMgmt)-[:HOSTED_ON]->(primaryDatacenter)
+    CREATE (warrantyMgmt)-[:HOSTED_ON]->(primaryDatacenter)
+  `)
+
+  // Security and infrastructure applications - Infrastructure specific
+  await session.run(`
+    MATCH (cybersecurity:Application {id: "hp-app-cybersecurity"})
+    MATCH (firewall:Infrastructure {id: "hp-infra-firewall"})
+    CREATE (cybersecurity)-[:HOSTED_ON]->(firewall)
+  `)
+
+  await session.run(`
+    MATCH (backupRecovery:Application {id: "hp-app-backup-recovery"})
+    MATCH (azureBackup:Infrastructure {id: "hp-infra-azure-backup"})
+    CREATE (backupRecovery)-[:HOSTED_ON]->(azureBackup)
+  `)
+
   console.log('Application-Infrastructure hosting relationships created successfully.')
 }
 
@@ -528,7 +1401,7 @@ export async function createArchitectureContainmentRelationships(session: Sessio
   // Business Architecture contains capabilities
   await session.run(`
     MATCH (business_arch:Architecture {id: "hp-arch-business"})
-    MATCH (manufacturing:BusinessCapability {id: "hp-cap-manufacturing"})
+    MATCH (manufacturing:BusinessCapability {id: "hp-cap-manufacturing-operations"})
     MATCH (sales_marketing:BusinessCapability {id: "hp-cap-sales-marketing"})
     MATCH (service_support:BusinessCapability {id: "hp-cap-service-support"})
     MATCH (quality_mgmt:BusinessCapability {id: "hp-cap-quality-management"})
@@ -616,11 +1489,11 @@ export async function createArchitectureContainmentRelationships(session: Sessio
   await session.run(`
     MATCH (customer_arch:Architecture {id: "hp-arch-customer-experience"})
     MATCH (research:BusinessCapability {id: "hp-cap-research-development"})
-    MATCH (manufacturing:BusinessCapability {id: "hp-cap-manufacturing"})
-    MATCH (technology_innovation:BusinessCapability {id: "hp-cap-technology-innovation"})
+    MATCH (manufacturing:BusinessCapability {id: "hp-cap-manufacturing-operations"})
+    MATCH (service:BusinessCapability {id: "hp-cap-service-support"})
     CREATE (customer_arch)-[:CONTAINS]->(research)
     CREATE (customer_arch)-[:CONTAINS]->(manufacturing)
-    CREATE (customer_arch)-[:CONTAINS]->(technology_innovation)
+    CREATE (customer_arch)-[:CONTAINS]->(service)
   `)
 
   console.log('Architecture containment relationships created successfully.')
@@ -826,223 +1699,493 @@ export async function createArchitecturePrincipleRelationships(session: Session)
 export async function createInterfaceRelationships(session: Session) {
   console.log('Creating Interface relationships...')
 
-  // IoT Device Management API relationships
+  // First, create ownership relationships for all interfaces that don't already have person owners
   await session.run(`
-    MATCH (iot_device_api:ApplicationInterface {id: "hp-interface-iot-device-api"})
-    MATCH (iot_platform:Application {id: "hp-app-iot-platform"})
-    MATCH (mes_system:Application {id: "hp-app-hvac-mes"})
-    MATCH (sensor_data:DataObject {id: "hp-data-sensor-telemetry"})
-    MATCH (diagnostic_logs:DataObject {id: "hp-data-diagnostic-logs"})
-    CREATE (iot_platform)-[:INTERFACE_SOURCE]->(iot_device_api)
-    CREATE (mes_system)-[:INTERFACE_TARGET]->(iot_device_api)
-    CREATE (iot_device_api)-[:TRANSFERS]->(sensor_data)
-    CREATE (iot_device_api)-[:TRANSFERS]->(diagnostic_logs)
+    MATCH (ai:ApplicationInterface)
+    WHERE NOT (ai)-[:OWNED_BY]->(:Person)
+    MATCH (owners:Person) WHERE owners.id IN ['hp-person-cio', 'hp-person-cto', 'hp-person-it-manager', 'hp-person-product-manager', 'hp-person-quality-manager', 'hp-person-rd-director', 'hp-person-manufacturing-director']
+    WITH ai, collect(owners) as ownerList
+    WITH ai, ownerList[toInteger(rand() * size(ownerList))] as selected_owner
+    CREATE (ai)-[:OWNED_BY]->(selected_owner)
   `)
 
-  // IoT Telemetry Ingestion API relationships
+  // Create interface relationships systematically for all 45 interfaces
+  // Using a robust approach that assigns available applications and data objects
+
+  // Group 1: IoT and Energy Management APIs
   await session.run(`
-    MATCH (iot_telemetry_api:ApplicationInterface {id: "hp-interface-iot-telemetry-api"})
+    MATCH (ai:ApplicationInterface) WHERE ai.id IN [
+      'hp-interface-iot-device-api', 'hp-interface-iot-telemetry-api', 
+      'hp-interface-energy-analytics-api', 'hp-interface-energy-mgmt-api',
+      'hp-interface-smart-grid-api', 'hp-interface-predictive-maintenance-api'
+    ]
     MATCH (iot_platform:Application {id: "hp-app-iot-platform"})
     MATCH (energy_analytics:Application {id: "hp-app-energy-analytics"})
     MATCH (sensor_data:DataObject {id: "hp-data-sensor-telemetry"})
-    MATCH (energy_consumption:DataObject {id: "hp-data-energy-consumption"})
-    CREATE (iot_platform)-[:INTERFACE_SOURCE]->(iot_telemetry_api)
-    CREATE (energy_analytics)-[:INTERFACE_TARGET]->(iot_telemetry_api)
-    CREATE (iot_telemetry_api)-[:TRANSFERS]->(sensor_data)
-    CREATE (iot_telemetry_api)-[:TRANSFERS]->(energy_consumption)
+    MATCH (energy_data:DataObject {id: "hp-data-energy-consumption"})
+    WITH ai, iot_platform, energy_analytics, sensor_data, energy_data
+    CREATE (iot_platform)-[:INTERFACE_SOURCE]->(ai)
+    CREATE (ai)<-[:INTERFACE_TARGET]-(energy_analytics)
+    CREATE (ai)-[:TRANSFERS]->(sensor_data)
+    CREATE (ai)-[:TRANSFERS]->(energy_data)
   `)
 
-  // Energy Analytics API relationships
+  // Group 2: ERP and Business APIs
   await session.run(`
-    MATCH (energy_analytics_api:ApplicationInterface {id: "hp-interface-energy-analytics-api"})
-    MATCH (energy_analytics:Application {id: "hp-app-energy-analytics"})
-    MATCH (power_bi:Application {id: "hp-app-power-bi"})
-    MATCH (energy_consumption:DataObject {id: "hp-data-energy-consumption"})
-    MATCH (sustainability_metrics:DataObject {id: "hp-data-sustainability-metrics"})
-    CREATE (energy_analytics)-[:INTERFACE_SOURCE]->(energy_analytics_api)
-    CREATE (power_bi)-[:INTERFACE_TARGET]->(energy_analytics_api)
-    CREATE (energy_analytics_api)-[:TRANSFERS]->(energy_consumption)
-    CREATE (energy_analytics_api)-[:TRANSFERS]->(sustainability_metrics)
-  `)
-
-  // ERP Customer API relationships
-  await session.run(`
-    MATCH (erp_customer_api:ApplicationInterface {id: "hp-interface-erp-customer-api"})
-    MATCH (sap_s4hana:Application {id: "hp-app-sap-s4hana"})
-    MATCH (crm_system:Application {id: "hp-app-crm-salesforce"})
+    MATCH (ai:ApplicationInterface) WHERE ai.id IN [
+      'hp-interface-erp-customer-api', 'hp-interface-erp-order-api', 
+      'hp-interface-erp-product-api', 'hp-interface-data-export-api',
+      'hp-interface-hrms-api', 'hp-interface-expense-api'
+    ]
+    MATCH (sap:Application {id: "hp-app-sap-s4hana"})
+    MATCH (crm:Application {id: "hp-app-crm-salesforce"})
     MATCH (customer_data:DataObject {id: "hp-data-customer-profiles"})
     MATCH (financial_data:DataObject {id: "hp-data-financial-reports"})
-    CREATE (sap_s4hana)-[:INTERFACE_SOURCE]->(erp_customer_api)
-    CREATE (crm_system)-[:INTERFACE_TARGET]->(erp_customer_api)
-    CREATE (erp_customer_api)-[:TRANSFERS]->(customer_data)
-    CREATE (erp_customer_api)-[:TRANSFERS]->(financial_data)
+    WITH ai, sap, crm, customer_data, financial_data
+    CREATE (sap)-[:INTERFACE_SOURCE]->(ai)
+    CREATE (ai)<-[:INTERFACE_TARGET]-(crm)
+    CREATE (ai)-[:TRANSFERS]->(customer_data)
+    CREATE (ai)-[:TRANSFERS]->(financial_data)
   `)
 
-  // ERP Order API relationships
+  // Group 3: CRM and Customer Service APIs
   await session.run(`
-    MATCH (erp_order_api:ApplicationInterface {id: "hp-interface-erp-order-api"})
-    MATCH (sap_s4hana:Application {id: "hp-app-sap-s4hana"})
-    MATCH (legacy_plm:Application {id: "hp-app-legacy-plm"})
-    MATCH (sales_data:DataObject {id: "hp-data-sales-transactions"})
-    MATCH (bom_data:DataObject {id: "hp-data-bill-of-materials"})
-    CREATE (sap_s4hana)-[:INTERFACE_SOURCE]->(erp_order_api)
-    CREATE (legacy_plm)-[:INTERFACE_TARGET]->(erp_order_api)
-    CREATE (erp_order_api)-[:TRANSFERS]->(sales_data)
-    CREATE (erp_order_api)-[:TRANSFERS]->(bom_data)
-  `)
-
-  // ERP Product API relationships
-  await session.run(`
-    MATCH (erp_product_api:ApplicationInterface {id: "hp-interface-erp-product-api"})
-    MATCH (sap_s4hana:Application {id: "hp-app-sap-s4hana"})
-    MATCH (thermal_cad:Application {id: "hp-app-thermal-cad"})
-    MATCH (product_specs:DataObject {id: "hp-data-product-specifications"})
-    MATCH (bom_data:DataObject {id: "hp-data-bill-of-materials"})
-    CREATE (sap_s4hana)-[:INTERFACE_SOURCE]->(erp_product_api)
-    CREATE (thermal_cad)-[:INTERFACE_TARGET]->(erp_product_api)
-    CREATE (erp_product_api)-[:TRANSFERS]->(product_specs)
-    CREATE (erp_product_api)-[:TRANSFERS]->(bom_data)
-  `)
-
-  // CRM Service API relationships
-  await session.run(`
-    MATCH (crm_service_api:ApplicationInterface {id: "hp-interface-crm-service-api"})
-    MATCH (crm_system:Application {id: "hp-app-crm-salesforce"})
+    MATCH (ai:ApplicationInterface) WHERE ai.id IN [
+      'hp-interface-crm-service-api', 'hp-interface-crm-installer-api',
+      'hp-interface-mobile-customer-api', 'hp-interface-technical-support-api',
+      'hp-interface-service-mobile-api', 'hp-interface-warranty-api'
+    ]
+    MATCH (crm:Application {id: "hp-app-crm-salesforce"})
     MATCH (service_mgmt:Application {id: "hp-app-service-management"})
     MATCH (customer_data:DataObject {id: "hp-data-customer-profiles"})
-    MATCH (installation_records:DataObject {id: "hp-data-installation-records"})
-    CREATE (crm_system)-[:INTERFACE_SOURCE]->(crm_service_api)
-    CREATE (service_mgmt)-[:INTERFACE_TARGET]->(crm_service_api)
-    CREATE (crm_service_api)-[:TRANSFERS]->(customer_data)
-    CREATE (crm_service_api)-[:TRANSFERS]->(installation_records)
+    MATCH (service_tickets:DataObject {id: "hp-data-service-tickets"})
+    WITH ai, crm, service_mgmt, customer_data, service_tickets
+    CREATE (crm)-[:INTERFACE_SOURCE]->(ai)
+    CREATE (ai)<-[:INTERFACE_TARGET]-(service_mgmt)
+    CREATE (ai)-[:TRANSFERS]->(customer_data)
+    CREATE (ai)-[:TRANSFERS]->(service_tickets)
   `)
 
-  // MES Production API relationships
+  // Group 4: Manufacturing and Quality APIs
   await session.run(`
-    MATCH (mes_production_api:ApplicationInterface {id: "hp-interface-mes-production-api"})
-    MATCH (mes_system:Application {id: "hp-app-hvac-mes"})
-    MATCH (quality_system:Application {id: "hp-app-quality-management"})
+    MATCH (ai:ApplicationInterface) WHERE ai.id IN [
+      'hp-interface-mes-production-api', 'hp-interface-quality-test-api',
+      'hp-interface-mrp-api', 'hp-interface-plm-api',
+      'hp-interface-supplier-portal-api', 'hp-interface-warehouse-api'
+    ]
+    MATCH (mes:Application {id: "hp-app-hvac-mes"})
+    MATCH (quality:Application {id: "hp-app-quality-management"})
     MATCH (production_data:DataObject {id: "hp-data-production-metrics"})
-    MATCH (quality_records:DataObject {id: "hp-data-quality-records"})
-    CREATE (mes_system)-[:INTERFACE_SOURCE]->(mes_production_api)
-    CREATE (quality_system)-[:INTERFACE_TARGET]->(mes_production_api)
-    CREATE (mes_production_api)-[:TRANSFERS]->(production_data)
-    CREATE (mes_production_api)-[:TRANSFERS]->(quality_records)
+    MATCH (quality_data:DataObject {id: "hp-data-quality-records"})
+    WITH ai, mes, quality, production_data, quality_data
+    CREATE (mes)-[:INTERFACE_SOURCE]->(ai)
+    CREATE (ai)<-[:INTERFACE_TARGET]-(quality)
+    CREATE (ai)-[:TRANSFERS]->(production_data)
+    CREATE (ai)-[:TRANSFERS]->(quality_data)
   `)
 
-  // Quality Test API relationships
+  // Group 5: Analytics and Reporting APIs
   await session.run(`
-    MATCH (quality_test_api:ApplicationInterface {id: "hp-interface-quality-test-api"})
-    MATCH (quality_system:Application {id: "hp-app-quality-management"})
+    MATCH (ai:ApplicationInterface) WHERE ai.id IN [
+      'hp-interface-bi-reporting-api', 'hp-interface-market-intel-api',
+      'hp-interface-strategy-api', 'hp-interface-sustainability-api',
+      'hp-interface-social-listening-api'
+    ]
+    MATCH (power_bi:Application {id: "hp-app-power-bi"})
+    MATCH (market_intel:Application {id: "hp-app-market-intelligence"})
+    MATCH (financial_data:DataObject {id: "hp-data-financial-reports"})
+    MATCH (market_data:DataObject {id: "hp-data-market-intelligence"})
+    WITH ai, power_bi, market_intel, financial_data, market_data
+    CREATE (power_bi)-[:INTERFACE_SOURCE]->(ai)
+    CREATE (ai)<-[:INTERFACE_TARGET]-(market_intel)
+    CREATE (ai)-[:TRANSFERS]->(financial_data)
+    CREATE (ai)-[:TRANSFERS]->(market_data)
+  `)
+
+  // Group 6: Product and Engineering APIs
+  await session.run(`
+    MATCH (ai:ApplicationInterface) WHERE ai.id IN [
+      'hp-interface-cfd-api', 'hp-interface-configurator-api',
+      'hp-interface-innovation-api', 'hp-interface-test-data-api',
+      'hp-interface-spare-parts-api'
+    ]
     MATCH (thermal_cad:Application {id: "hp-app-thermal-cad"})
-    MATCH (quality_records:DataObject {id: "hp-data-quality-records"})
-    MATCH (test_results:DataObject {id: "hp-data-test-results"})
+    MATCH (product_config:Application {id: "hp-app-product-configurator"})
     MATCH (product_specs:DataObject {id: "hp-data-product-specifications"})
-    CREATE (quality_system)-[:INTERFACE_SOURCE]->(quality_test_api)
-    CREATE (thermal_cad)-[:INTERFACE_TARGET]->(quality_test_api)
-    CREATE (quality_test_api)-[:TRANSFERS]->(quality_records)
-    CREATE (quality_test_api)-[:TRANSFERS]->(test_results)
-    CREATE (quality_test_api)-[:TRANSFERS]->(product_specs)
+    MATCH (test_results:DataObject {id: "hp-data-test-results"})
+    WITH ai, thermal_cad, product_config, product_specs, test_results
+    CREATE (thermal_cad)-[:INTERFACE_SOURCE]->(ai)
+    CREATE (ai)<-[:INTERFACE_TARGET]-(product_config)
+    CREATE (ai)-[:TRANSFERS]->(product_specs)
+    CREATE (ai)-[:TRANSFERS]->(test_results)
   `)
 
-  // CRM Installer API relationships
+  // Group 7: Digital and Collaboration APIs
   await session.run(`
-    MATCH (crm_installer_api:ApplicationInterface {id: "hp-interface-crm-installer-api"})
-    MATCH (crm_system:Application {id: "hp-app-crm-salesforce"})
-    MATCH (installer_portal:Application {id: "hp-app-installer-portal"})
-    MATCH (customer_data:DataObject {id: "hp-data-customer-profiles"})
-    MATCH (installation_records:DataObject {id: "hp-data-installation-records"})
-    CREATE (crm_system)-[:INTERFACE_SOURCE]->(crm_installer_api)
-    CREATE (installer_portal)-[:INTERFACE_TARGET]->(crm_installer_api)
-    CREATE (crm_installer_api)-[:TRANSFERS]->(customer_data)
-    CREATE (crm_installer_api)-[:TRANSFERS]->(installation_records)
-  `)
-
-  // BI Reporting API relationships
-  await session.run(`
-    MATCH (bi_reporting_api:ApplicationInterface {id: "hp-interface-bi-reporting-api"})
-    MATCH (power_bi:Application {id: "hp-app-power-bi"})
+    MATCH (ai:ApplicationInterface) WHERE ai.id IN [
+      'hp-interface-document-api', 'hp-interface-knowledge-base-api',
+      'hp-interface-learning-api', 'hp-interface-digital-marketing-api',
+      'hp-interface-ecommerce-api', 'hp-interface-partner-mobile-api'
+    ]
     MATCH (office365:Application {id: "hp-app-office365"})
-    MATCH (financial_data:DataObject {id: "hp-data-financial-reports"})
-    MATCH (cost_data:DataObject {id: "hp-data-cost-analysis"})
-    CREATE (power_bi)-[:INTERFACE_SOURCE]->(bi_reporting_api)
-    CREATE (office365)-[:INTERFACE_TARGET]->(bi_reporting_api)
-    CREATE (bi_reporting_api)-[:TRANSFERS]->(financial_data)
-    CREATE (bi_reporting_api)-[:TRANSFERS]->(cost_data)
+    MATCH (knowledge_base:Application {id: "hp-app-knowledge-base"})
+    MATCH (knowledge_data:DataObject {id: "hp-data-knowledge-base"})
+    MATCH (training_data:DataObject {id: "hp-data-training-materials"})
+    WITH ai, office365, knowledge_base, knowledge_data, training_data
+    CREATE (office365)-[:INTERFACE_SOURCE]->(ai)
+    CREATE (ai)<-[:INTERFACE_TARGET]-(knowledge_base)
+    CREATE (ai)-[:TRANSFERS]->(knowledge_data)
+    CREATE (ai)-[:TRANSFERS]->(training_data)
   `)
 
-  // Technical Support API relationships
+  // Group 8: Security and Compliance APIs
   await session.run(`
-    MATCH (tech_support_api:ApplicationInterface {id: "hp-interface-technical-support-api"})
-    MATCH (diagnostic_tool:Application {id: "hp-app-diagnostic-tool"})
-    MATCH (service_mgmt:Application {id: "hp-app-service-management"})
+    MATCH (ai:ApplicationInterface) WHERE ai.id IN [
+      'hp-interface-cybersecurity-api', 'hp-interface-backup-api',
+      'hp-interface-risk-mgmt-api', 'hp-interface-legal-tech-api',
+      'hp-interface-ip-mgmt-api'
+    ]
+    MATCH (cybersecurity:Application {id: "hp-app-cybersecurity"})
+    MATCH (backup:Application {id: "hp-app-backup-recovery"})
+    MATCH (compliance_data:DataObject {id: "hp-data-compliance-records"})
     MATCH (diagnostic_logs:DataObject {id: "hp-data-diagnostic-logs"})
-    MATCH (service_tickets:DataObject {id: "hp-data-service-tickets"})
-    CREATE (diagnostic_tool)-[:INTERFACE_SOURCE]->(tech_support_api)
-    CREATE (service_mgmt)-[:INTERFACE_TARGET]->(tech_support_api)
-    CREATE (tech_support_api)-[:TRANSFERS]->(diagnostic_logs)
-    CREATE (tech_support_api)-[:TRANSFERS]->(service_tickets)
+    WITH ai, cybersecurity, backup, compliance_data, diagnostic_logs
+    CREATE (cybersecurity)-[:INTERFACE_SOURCE]->(ai)
+    CREATE (ai)<-[:INTERFACE_TARGET]-(backup)
+    CREATE (ai)-[:TRANSFERS]->(compliance_data)
+    CREATE (ai)-[:TRANSFERS]->(diagnostic_logs)
   `)
 
-  // Data Export API relationships
+  console.log(
+    'All 45 Interface relationships created successfully with owners, sources, targets and data transfers.'
+  )
+
+  // Ensure every application has meaningful interface relationships based on semantic matching
+
+  // MRP System connections
   await session.run(`
-    MATCH (data_export_api:ApplicationInterface {id: "hp-interface-data-export-api"})
-    MATCH (sap_s4hana:Application {id: "hp-app-sap-s4hana"})
-    MATCH (power_bi:Application {id: "hp-app-power-bi"})
-    MATCH (financial_data:DataObject {id: "hp-data-financial-reports"})
-    MATCH (sales_data:DataObject {id: "hp-data-sales-transactions"})
-    CREATE (sap_s4hana)-[:INTERFACE_SOURCE]->(data_export_api)
-    CREATE (power_bi)-[:INTERFACE_TARGET]->(data_export_api)
-    CREATE (data_export_api)-[:TRANSFERS]->(financial_data)
-    CREATE (data_export_api)-[:TRANSFERS]->(sales_data)
+    MATCH (mrp:Application {id: "hp-app-advanced-mrp"})
+    MATCH (mrp_api:ApplicationInterface {id: "hp-interface-mrp-api"})
+    MATCH (production_data:DataObject {id: "hp-data-production-metrics"})
+    MERGE (mrp)-[:INTERFACE_SOURCE]->(mrp_api)
+    MERGE (mrp_api)-[:TRANSFERS]->(production_data)
   `)
 
-  // Mobile Customer API relationships
+  // Backup System connections
   await session.run(`
-    MATCH (mobile_customer_api:ApplicationInterface {id: "hp-interface-mobile-customer-api"})
-    MATCH (crm_system:Application {id: "hp-app-crm-salesforce"})
-    MATCH (installer_portal:Application {id: "hp-app-installer-portal"})
+    MATCH (backup:Application {id: "hp-app-backup-recovery"})
+    MATCH (backup_api:ApplicationInterface {id: "hp-interface-backup-api"})
+    MATCH (diagnostic_logs:DataObject {id: "hp-data-diagnostic-logs"})
+    MERGE (backup)-[:INTERFACE_SOURCE]->(backup_api)
+    MERGE (backup_api)-[:TRANSFERS]->(diagnostic_logs)
+  `)
+
+  // CFD Simulation connections
+  await session.run(`
+    MATCH (cfd:Application {id: "hp-app-cfd-simulation"})
+    MATCH (cfd_api:ApplicationInterface {id: "hp-interface-cfd-api"})
+    MATCH (thermal_models:DataObject {id: "hp-data-thermal-models"})
+    MERGE (cfd)-[:INTERFACE_SOURCE]->(cfd_api)
+    MERGE (cfd_api)-[:TRANSFERS]->(thermal_models)
+  `)
+
+  // Digital Marketing connections
+  await session.run(`
+    MATCH (marketing:Application {id: "hp-app-digital-marketing"})
+    MATCH (marketing_api:ApplicationInterface {id: "hp-interface-digital-marketing-api"})
     MATCH (customer_data:DataObject {id: "hp-data-customer-profiles"})
-    MATCH (service_tickets:DataObject {id: "hp-data-service-tickets"})
-    CREATE (crm_system)-[:INTERFACE_SOURCE]->(mobile_customer_api)
-    CREATE (installer_portal)-[:INTERFACE_TARGET]->(mobile_customer_api)
-    CREATE (mobile_customer_api)-[:TRANSFERS]->(customer_data)
-    CREATE (mobile_customer_api)-[:TRANSFERS]->(service_tickets)
+    MERGE (marketing)-[:INTERFACE_SOURCE]->(marketing_api)
+    MERGE (marketing_api)-[:TRANSFERS]->(customer_data)
   `)
 
-  // Smart Grid API relationships
+  // Document Management connections
   await session.run(`
-    MATCH (smart_grid_api:ApplicationInterface {id: "hp-interface-smart-grid-api"})
-    MATCH (iot_platform:Application {id: "hp-app-iot-platform"})
-    MATCH (energy_analytics:Application {id: "hp-app-energy-analytics"})
-    MATCH (energy_consumption:DataObject {id: "hp-data-energy-consumption"})
-    MATCH (weather_data:DataObject {id: "hp-data-weather-conditions"})
-    CREATE (iot_platform)-[:INTERFACE_SOURCE]->(smart_grid_api)
-    CREATE (energy_analytics)-[:INTERFACE_TARGET]->(smart_grid_api)
-    CREATE (smart_grid_api)-[:TRANSFERS]->(energy_consumption)
-    CREATE (smart_grid_api)-[:TRANSFERS]->(weather_data)
+    MATCH (doc_mgmt:Application {id: "hp-app-document-mgmt"})
+    MATCH (doc_api:ApplicationInterface {id: "hp-interface-document-api"})
+    MATCH (training_materials:DataObject {id: "hp-data-training-materials"})
+    MERGE (doc_mgmt)-[:INTERFACE_SOURCE]->(doc_api)
+    MERGE (doc_api)-[:TRANSFERS]->(training_materials)
   `)
 
-  // Supplier Portal API relationships
+  // E-commerce Platform connections
   await session.run(`
-    MATCH (supplier_portal_api:ApplicationInterface {id: "hp-interface-supplier-portal-api"})
+    MATCH (ecommerce:Application {id: "hp-app-ecommerce-platform"})
+    MATCH (ecommerce_api:ApplicationInterface {id: "hp-interface-ecommerce-api"})
+    MATCH (sales_data:DataObject {id: "hp-data-sales-transactions"})
+    MERGE (ecommerce)-[:INTERFACE_SOURCE]->(ecommerce_api)
+    MERGE (ecommerce_api)-[:TRANSFERS]->(sales_data)
+  `)
+
+  // Energy Management connections
+  await session.run(`
+    MATCH (energy_mgmt:Application {id: "hp-app-energy-mgmt"})
+    MATCH (energy_api:ApplicationInterface {id: "hp-interface-energy-mgmt-api"})
+    MATCH (energy_data:DataObject {id: "hp-data-energy-consumption"})
+    MERGE (energy_mgmt)-[:INTERFACE_SOURCE]->(energy_api)
+    MERGE (energy_api)-[:TRANSFERS]->(energy_data)
+  `)
+
+  // Expense Management connections
+  await session.run(`
+    MATCH (expense:Application {id: "hp-app-expense-mgmt"})
+    MATCH (expense_api:ApplicationInterface {id: "hp-interface-expense-api"})
+    MATCH (financial_data:DataObject {id: "hp-data-financial-reports"})
+    MERGE (expense)-[:INTERFACE_SOURCE]->(expense_api)
+    MERGE (expense_api)-[:TRANSFERS]->(financial_data)
+  `)
+
+  // HRMS connections
+  await session.run(`
+    MATCH (hrms:Application {id: "hp-app-hrms"})
+    MATCH (hrms_api:ApplicationInterface {id: "hp-interface-hrms-api"})
+    MATCH (training_materials:DataObject {id: "hp-data-training-materials"})
+    MERGE (hrms)-[:INTERFACE_SOURCE]->(hrms_api)
+    MERGE (hrms_api)-[:TRANSFERS]->(training_materials)
+  `)
+
+  // Innovation Portal connections
+  await session.run(`
+    MATCH (innovation:Application {id: "hp-app-innovation-portal"})
+    MATCH (innovation_api:ApplicationInterface {id: "hp-interface-innovation-api"})
+    MATCH (product_specs:DataObject {id: "hp-data-product-specifications"})
+    MERGE (innovation)-[:INTERFACE_SOURCE]->(innovation_api)
+    MERGE (innovation_api)-[:TRANSFERS]->(product_specs)
+  `)
+
+  // Installer Portal connections
+  await session.run(`
+    MATCH (installer:Application {id: "hp-app-installer-portal"})
+    MATCH (installer_api:ApplicationInterface {id: "hp-interface-crm-installer-api"})
+    MATCH (installation_data:DataObject {id: "hp-data-installation-records"})
+    MERGE (installer)-[:INTERFACE_TARGET]->(installer_api)
+    MERGE (installer_api)-[:TRANSFERS]->(installation_data)
+  `)
+
+  // IP Management connections
+  await session.run(`
+    MATCH (ip_mgmt:Application {id: "hp-app-ip-management"})
+    MATCH (ip_api:ApplicationInterface {id: "hp-interface-ip-mgmt-api"})
+    MATCH (product_specs:DataObject {id: "hp-data-product-specifications"})
+    MERGE (ip_mgmt)-[:INTERFACE_SOURCE]->(ip_api)
+    MERGE (ip_api)-[:TRANSFERS]->(product_specs)
+  `)
+
+  // Knowledge Base connections
+  await session.run(`
+    MATCH (kb:Application {id: "hp-app-knowledge-base"})
+    MATCH (kb_api:ApplicationInterface {id: "hp-interface-knowledge-base-api"})
+    MATCH (knowledge_data:DataObject {id: "hp-data-knowledge-base"})
+    MERGE (kb)-[:INTERFACE_SOURCE]->(kb_api)
+    MERGE (kb_api)-[:TRANSFERS]->(knowledge_data)
+  `)
+
+  // Learning Management connections
+  await session.run(`
+    MATCH (lms:Application {id: "hp-app-learning-mgmt"})
+    MATCH (learning_api:ApplicationInterface {id: "hp-interface-learning-api"})
+    MATCH (training_materials:DataObject {id: "hp-data-training-materials"})
+    MERGE (lms)-[:INTERFACE_SOURCE]->(learning_api)
+    MERGE (learning_api)-[:TRANSFERS]->(training_materials)
+  `)
+
+  // Legacy PLM connections
+  await session.run(`
     MATCH (legacy_plm:Application {id: "hp-app-legacy-plm"})
-    MATCH (sap_s4hana:Application {id: "hp-app-sap-s4hana"})
-    MATCH (supplier_data:DataObject {id: "hp-data-supplier-information"})
+    MATCH (plm_api:ApplicationInterface {id: "hp-interface-plm-api"})
     MATCH (bom_data:DataObject {id: "hp-data-bill-of-materials"})
-    CREATE (legacy_plm)-[:INTERFACE_SOURCE]->(supplier_portal_api)
-    CREATE (sap_s4hana)-[:INTERFACE_TARGET]->(supplier_portal_api)
-    CREATE (supplier_portal_api)-[:TRANSFERS]->(supplier_data)
-    CREATE (supplier_portal_api)-[:TRANSFERS]->(bom_data)
+    MERGE (legacy_plm)-[:INTERFACE_SOURCE]->(plm_api)
+    MERGE (plm_api)-[:TRANSFERS]->(bom_data)
   `)
 
-  console.log('Interface relationships created successfully.')
+  // Legal Tech connections
+  await session.run(`
+    MATCH (legal:Application {id: "hp-app-legal-tech"})
+    MATCH (legal_api:ApplicationInterface {id: "hp-interface-legal-tech-api"})
+    MATCH (compliance_data:DataObject {id: "hp-data-compliance-records"})
+    MERGE (legal)-[:INTERFACE_SOURCE]->(legal_api)
+    MERGE (legal_api)-[:TRANSFERS]->(compliance_data)
+  `)
+
+  // Market Intelligence connections
+  await session.run(`
+    MATCH (market:Application {id: "hp-app-market-intelligence"})
+    MATCH (market_api:ApplicationInterface {id: "hp-interface-market-intel-api"})
+    MATCH (market_data:DataObject {id: "hp-data-market-intelligence"})
+    MERGE (market)-[:INTERFACE_SOURCE]->(market_api)
+    MERGE (market_api)-[:TRANSFERS]->(market_data)
+  `)
+
+  // Modern PLM connections
+  await session.run(`
+    MATCH (modern_plm:Application {id: "hp-app-modern-plm"})
+    MATCH (plm_api:ApplicationInterface {id: "hp-interface-plm-api"})
+    MATCH (product_specs:DataObject {id: "hp-data-product-specifications"})
+    MERGE (modern_plm)-[:INTERFACE_TARGET]->(plm_api)
+    MERGE (plm_api)-[:TRANSFERS]->(product_specs)
+  `)
+
+  // Partner Mobile connections
+  await session.run(`
+    MATCH (partner:Application {id: "hp-app-partner-mobile"})
+    MATCH (partner_api:ApplicationInterface {id: "hp-interface-partner-mobile-api"})
+    MATCH (training_materials:DataObject {id: "hp-data-training-materials"})
+    MERGE (partner)-[:INTERFACE_SOURCE]->(partner_api)
+    MERGE (partner_api)-[:TRANSFERS]->(training_materials)
+  `)
+
+  // Predictive Maintenance connections
+  await session.run(`
+    MATCH (pred_maint:Application {id: "hp-app-predictive-maintenance"})
+    MATCH (pred_api:ApplicationInterface {id: "hp-interface-predictive-maintenance-api"})
+    MATCH (maintenance_data:DataObject {id: "hp-data-maintenance-schedules"})
+    MERGE (pred_maint)-[:INTERFACE_SOURCE]->(pred_api)
+    MERGE (pred_api)-[:TRANSFERS]->(maintenance_data)
+  `)
+
+  // Product Configurator connections
+  await session.run(`
+    MATCH (config:Application {id: "hp-app-product-configurator"})
+    MATCH (config_api:ApplicationInterface {id: "hp-interface-configurator-api"})
+    MATCH (product_specs:DataObject {id: "hp-data-product-specifications"})
+    MERGE (config)-[:INTERFACE_SOURCE]->(config_api)
+    MERGE (config_api)-[:TRANSFERS]->(product_specs)
+  `)
+
+  // Quality Management connections
+  await session.run(`
+    MATCH (quality:Application {id: "hp-app-quality-management"})
+    MATCH (quality_api:ApplicationInterface {id: "hp-interface-quality-test-api"})
+    MATCH (quality_data:DataObject {id: "hp-data-quality-records"})
+    MERGE (quality)-[:INTERFACE_SOURCE]->(quality_api)
+    MERGE (quality_api)-[:TRANSFERS]->(quality_data)
+  `)
+
+  // Risk Management connections
+  await session.run(`
+    MATCH (risk:Application {id: "hp-app-risk-management"})
+    MATCH (risk_api:ApplicationInterface {id: "hp-interface-risk-mgmt-api"})
+    MATCH (compliance_data:DataObject {id: "hp-data-compliance-records"})
+    MERGE (risk)-[:INTERFACE_SOURCE]->(risk_api)
+    MERGE (risk_api)-[:TRANSFERS]->(compliance_data)
+  `)
+
+  // Service Management connections
+  await session.run(`
+    MATCH (service:Application {id: "hp-app-service-management"})
+    MATCH (service_api:ApplicationInterface {id: "hp-interface-service-mobile-api"})
+    MATCH (service_tickets:DataObject {id: "hp-data-service-tickets"})
+    MERGE (service)-[:INTERFACE_SOURCE]->(service_api)
+    MERGE (service_api)-[:TRANSFERS]->(service_tickets)
+  `)
+
+  // Service Mobile connections
+  await session.run(`
+    MATCH (service_mobile:Application {id: "hp-app-service-mobile"})
+    MATCH (service_api:ApplicationInterface {id: "hp-interface-service-mobile-api"})
+    MATCH (maintenance_data:DataObject {id: "hp-data-maintenance-schedules"})
+    MERGE (service_mobile)-[:INTERFACE_TARGET]->(service_api)
+    MERGE (service_api)-[:TRANSFERS]->(maintenance_data)
+  `)
+
+  // Social Listening connections
+  await session.run(`
+    MATCH (social:Application {id: "hp-app-social-listening"})
+    MATCH (social_api:ApplicationInterface {id: "hp-interface-social-listening-api"})
+    MATCH (customer_data:DataObject {id: "hp-data-customer-profiles"})
+    MERGE (social)-[:INTERFACE_SOURCE]->(social_api)
+    MERGE (social_api)-[:TRANSFERS]->(customer_data)
+  `)
+
+  // Spare Parts connections
+  await session.run(`
+    MATCH (spare:Application {id: "hp-app-spare-parts"})
+    MATCH (spare_api:ApplicationInterface {id: "hp-interface-spare-parts-api"})
+    MATCH (maintenance_data:DataObject {id: "hp-data-maintenance-schedules"})
+    MERGE (spare)-[:INTERFACE_SOURCE]->(spare_api)
+    MERGE (spare_api)-[:TRANSFERS]->(maintenance_data)
+  `)
+
+  // Strategic Portfolio connections
+  await session.run(`
+    MATCH (strategy:Application {id: "hp-app-strategy-portfolio"})
+    MATCH (strategy_api:ApplicationInterface {id: "hp-interface-strategy-api"})
+    MATCH (market_data:DataObject {id: "hp-data-market-intelligence"})
+    MERGE (strategy)-[:INTERFACE_SOURCE]->(strategy_api)
+    MERGE (strategy_api)-[:TRANSFERS]->(market_data)
+  `)
+
+  // Supplier Portal connections
+  await session.run(`
+    MATCH (supplier:Application {id: "hp-app-supplier-portal"})
+    MATCH (supplier_api:ApplicationInterface {id: "hp-interface-supplier-portal-api"})
+    MATCH (supplier_data:DataObject {id: "hp-data-supplier-information"})
+    MERGE (supplier)-[:INTERFACE_TARGET]->(supplier_api)
+    MERGE (supplier_api)-[:TRANSFERS]->(supplier_data)
+  `)
+
+  // Sustainability Tracker connections
+  await session.run(`
+    MATCH (sustainability:Application {id: "hp-app-sustainability-tracker"})
+    MATCH (sustainability_api:ApplicationInterface {id: "hp-interface-sustainability-api"})
+    MATCH (sustainability_data:DataObject {id: "hp-data-sustainability-metrics"})
+    MERGE (sustainability)-[:INTERFACE_SOURCE]->(sustainability_api)
+    MERGE (sustainability_api)-[:TRANSFERS]->(sustainability_data)
+  `)
+
+  // Test Data Management connections
+  await session.run(`
+    MATCH (test_data:Application {id: "hp-app-test-data-mgmt"})
+    MATCH (test_api:ApplicationInterface {id: "hp-interface-test-data-api"})
+    MATCH (test_results:DataObject {id: "hp-data-test-results"})
+    MERGE (test_data)-[:INTERFACE_SOURCE]->(test_api)
+    MERGE (test_api)-[:TRANSFERS]->(test_results)
+  `)
+
+  // Warehouse Management connections
+  await session.run(`
+    MATCH (warehouse:Application {id: "hp-app-warehouse-mgmt"})
+    MATCH (warehouse_api:ApplicationInterface {id: "hp-interface-warehouse-api"})
+    MATCH (maintenance_data:DataObject {id: "hp-data-maintenance-schedules"})
+    MERGE (warehouse)-[:INTERFACE_SOURCE]->(warehouse_api)
+    MERGE (warehouse_api)-[:TRANSFERS]->(maintenance_data)
+  `)
+
+  // Warranty Management connections
+  await session.run(`
+    MATCH (warranty:Application {id: "hp-app-warranty-mgmt"})
+    MATCH (warranty_api:ApplicationInterface {id: "hp-interface-warranty-api"})
+    MATCH (service_tickets:DataObject {id: "hp-data-service-tickets"})
+    MERGE (warranty)-[:INTERFACE_SOURCE]->(warranty_api)
+    MERGE (warranty_api)-[:TRANSFERS]->(service_tickets)
+  `)
+
+  // Energy Analytics connections
+  await session.run(`
+    MATCH (energy_analytics:Application {id: "hp-app-energy-analytics"})
+    MATCH (energy_api:ApplicationInterface {id: "hp-interface-energy-analytics-api"})
+    MATCH (energy_data:DataObject {id: "hp-data-energy-consumption"})
+    MERGE (energy_analytics)-[:INTERFACE_SOURCE]->(energy_api)
+    MERGE (energy_api)-[:TRANSFERS]->(energy_data)
+  `)
+
+  // Diagnostic Tool connections
+  await session.run(`
+    MATCH (diagnostic_tool:Application {id: "hp-app-diagnostic-tool"})
+    MATCH (predictive_api:ApplicationInterface {id: "hp-interface-predictive-maintenance-api"})
+    MATCH (diagnostic_logs:DataObject {id: "hp-data-diagnostic-logs"})
+    MERGE (diagnostic_tool)-[:INTERFACE_TARGET]->(predictive_api)
+    MERGE (predictive_api)-[:TRANSFERS]->(diagnostic_logs)
+  `)
+
+  console.log(
+    'Semantic interface relationships created to ensure every application has meaningful interface connections.'
+  )
 }
 
 export async function createAllHeatPumpRelationships(session: Session) {
   console.log('Creating all Heat Pump Manufacturing relationships...')
 
-  await createCapabilityHierarchy(session)
+  await createHeatPumpCapabilityHierarchy(session)
   await createApplicationCapabilitySupport(session)
   await createApplicationDataRelationships(session)
   await createApplicationInfrastructureHosting(session)
