@@ -119,6 +119,7 @@ export const GET_PERSON_BY_EMAIL = gql`
       role
       phone
       avatarUrl
+  company { id name }
       createdAt
       updatedAt
     }
