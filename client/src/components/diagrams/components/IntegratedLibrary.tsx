@@ -5,6 +5,7 @@ import { useQuery } from '@apollo/client'
 import { GET_LIBRARY_ELEMENTS } from '@/graphql/library'
 import { wrapTextToFitWidth, calculateCenteredTextPosition } from '../utils/textContainerUtils'
 import { findArchimateTemplate, loadArchimateLibrary } from '../utils/archimateLibraryUtils'
+import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 
 interface IntegratedLibraryProps {
   excalidrawAPI: any
@@ -17,9 +18,18 @@ const IntegratedLibrary: React.FC<IntegratedLibraryProps> = ({
 }) => {
   const [archimateLibrary, setArchimateLibrary] = useState<any>(null)
 
+  const companyWhere = useCompanyWhere()
+
   const { data } = useQuery(GET_LIBRARY_ELEMENTS, {
     errorPolicy: 'all',
     pollInterval: 30000,
+    variables: {
+      capWhere: companyWhere,
+      appWhere: companyWhere,
+      dataWhere: companyWhere,
+      ifaceWhere: companyWhere,
+      infraWhere: companyWhere,
+    },
   })
 
   // Load original ArchiMate library

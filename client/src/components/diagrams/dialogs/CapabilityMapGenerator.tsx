@@ -34,6 +34,7 @@ import {
   type CapabilityMapSettings,
 } from '../utils/CapabilityMapLibraryUtils'
 import { findTopLevelCapabilities } from '../utils/capabilityHierarchy'
+import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 
 interface CapabilityMapGeneratorProps {
   open: boolean
@@ -70,15 +71,25 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
   )
   const [hasInitializedSelection, setHasInitializedSelection] = useState(false)
 
+  const capWhere = useCompanyWhere('company')
+  const appWhere = useCompanyWhere('company')
+
   const { data, loading, error } = useQuery(GET_CAPABILITY_MAP_DATA, {
     skip: !open,
     errorPolicy: 'all',
+    variables: {
+      where: capWhere,
+      appWhere,
+    },
   })
 
   // Get applications count for debugging
   const { data: appCountData } = useQuery(GET_APPLICATIONS_COUNT, {
     skip: !open,
     errorPolicy: 'all',
+    variables: {
+      where: appWhere,
+    },
   })
 
   // Filter capabilities based on the selected date

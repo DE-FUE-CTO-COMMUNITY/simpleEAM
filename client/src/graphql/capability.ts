@@ -167,8 +167,8 @@ export const CHECK_CAPABILITY_EXISTS = gql`
 `
 
 export const GET_CAPABILITY_MAP_DATA = gql`
-  query GetCapabilityMapData {
-    businessCapabilities {
+  query GetCapabilityMapData($where: BusinessCapabilityWhere, $appWhere: ApplicationWhere) {
+    businessCapabilities(where: $where) {
       id
       name
       description
@@ -213,14 +213,14 @@ export const GET_CAPABILITY_MAP_DATA = gql`
             introductionDate
             endDate
           }
-          supportedByApplications {
+          supportedByApplications(where: $appWhere) {
             id
             name
             status
             criticality
           }
         }
-        supportedByApplications {
+        supportedByApplications(where: $appWhere) {
           id
           name
           status
@@ -231,7 +231,7 @@ export const GET_CAPABILITY_MAP_DATA = gql`
         id
         name
       }
-      supportedByApplications {
+      supportedByApplications(where: $appWhere) {
         id
         name
         status
