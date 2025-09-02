@@ -1,4 +1,3 @@
-// filepath: /home/mf2admin/simple-eam/client/src/components/layout/RootLayout.tsx
 'use client'
 
 import React, { useState } from 'react'
@@ -85,8 +84,12 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
     { text: t('dataObjects'), icon: <BusinessObjectIcon />, href: '/dataobjects' },
     { text: t('interfaces'), icon: <ApplicationInterfaceIcon />, href: '/interfaces' },
     { text: t('infrastructure'), icon: <InfrastructureIcon />, href: '/infrastructure' },
+    // Abschnitt: Organisation & Personen
     { isDivider: true, text: 'divider', icon: null },
-    { text: t('companies'), icon: <CompanyIcon />, href: '/companies' },
+    // Companies-Verwaltung nur für Admins sichtbar
+    ...(initialized && isAdmin()
+      ? [{ text: t('companies'), icon: <CompanyIcon />, href: '/companies' }]
+      : []),
     { text: t('persons'), icon: <PersonIcon />, href: '/persons' },
     // Import/Export für Admin- und Architect-Benutzer (Hydration-Fix: nur wenn initialisiert)
     ...(initialized && (isAdmin() || isArchitect())
