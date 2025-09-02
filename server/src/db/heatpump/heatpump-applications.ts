@@ -332,7 +332,6 @@ export async function createHeatPumpApplications(session: Session): Promise<void
       status: "ACTIVE",
       criticality: "HIGH",
       timeCategory: "INVEST",
-      sevenRStrategy: "NEW",
       technologyStack: ["PTC Windchill", "Creo", "Thingworx"],
       version: "13.0",
       hostingEnvironment: "Private Cloud",
