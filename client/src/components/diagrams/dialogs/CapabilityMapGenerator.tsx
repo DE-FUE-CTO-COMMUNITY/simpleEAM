@@ -35,6 +35,7 @@ import {
 } from '../utils/CapabilityMapLibraryUtils'
 import { findTopLevelCapabilities } from '../utils/capabilityHierarchy'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
+import { useCompanyContext } from '@/contexts/CompanyContext'
 
 interface CapabilityMapGeneratorProps {
   open: boolean
@@ -73,6 +74,7 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
 
   const capWhere = useCompanyWhere('company')
   const appWhere = useCompanyWhere('company')
+  const { selectedCompanyId } = useCompanyContext()
 
   const { data, loading, error } = useQuery(GET_CAPABILITY_MAP_DATA, {
     skip: !open,
@@ -91,6 +93,14 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
       where: appWhere,
     },
   })
+
+  // Reset Top-Level Capability filter when company changes
+  useEffect(() => {
+    // Close filter dialog and reset selection initialization
+    setTopLevelFilterDialogOpen(false)
+    setSelectedTopLevelCapabilities(new Set())
+    setHasInitializedSelection(false)
+  }, [selectedCompanyId])
 
   // Filter capabilities based on the selected date
   const filterCapabilitiesByDate = (capabilities: any[], targetDate: Dayjs | null) => {
