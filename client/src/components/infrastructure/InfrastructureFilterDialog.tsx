@@ -54,8 +54,8 @@ const InfrastructureFilterDialog: React.FC<InfrastructureFilterDialogProps> = ({
       [InfrastructureType.PHYSICAL_SERVER]: t('infrastructureTypes.PHYSICAL_SERVER'),
       [InfrastructureType.VIRTUAL_MACHINE]: t('infrastructureTypes.VIRTUAL_MACHINE'),
       [InfrastructureType.VIRTUALIZATION_CLUSTER]: t('infrastructureTypes.VIRTUALIZATION_CLUSTER'),
-  [InfrastructureType.IOT_GATEWAY]: 'IoT Gateway',
-  [InfrastructureType.IOT_PLATFORM]: 'IoT Platform',
+      [InfrastructureType.IOT_GATEWAY]: 'IoT Gateway',
+      [InfrastructureType.IOT_PLATFORM]: 'IoT Platform',
     }
     return translations[type] || type
   }

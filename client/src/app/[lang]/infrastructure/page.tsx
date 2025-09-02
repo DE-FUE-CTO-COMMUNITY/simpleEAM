@@ -1,37 +1,37 @@
-"use client"
+'use client'
 
-import React, { useMemo, useState } from "react"
-import { useQuery, useMutation } from "@apollo/client"
-import { useTranslations } from "next-intl"
-import { Add as AddIcon } from "@mui/icons-material"
-import { Box, Button, Card, Paper, Typography } from "@mui/material"
-import { SortingState } from "@tanstack/react-table"
-import GenericFilterDialog, { FilterField } from "@/components/common/GenericFilterDialog"
-import { isArchitect } from "@/lib/auth"
-import { useSnackbar } from "notistack"
+import React, { useMemo, useState } from 'react'
+import { useQuery, useMutation } from '@apollo/client'
+import { useTranslations } from 'next-intl'
+import { Add as AddIcon } from '@mui/icons-material'
+import { Box, Button, Card, Paper, Typography } from '@mui/material'
+import { SortingState } from '@tanstack/react-table'
+import GenericFilterDialog, { FilterField } from '@/components/common/GenericFilterDialog'
+import { isArchitect } from '@/lib/auth'
+import { useSnackbar } from 'notistack'
 
 import InfrastructureTable, {
   INFRASTRUCTURE_DEFAULT_COLUMN_VISIBILITY,
-} from "@/components/infrastructure/InfrastructureTable"
-import InfrastructureToolbar from "@/components/infrastructure/InfrastructureToolbar"
-import { useInfrastructureFilter } from "@/components/infrastructure/useInfrastructureFilter"
+} from '@/components/infrastructure/InfrastructureTable'
+import InfrastructureToolbar from '@/components/infrastructure/InfrastructureToolbar'
+import { useInfrastructureFilter } from '@/components/infrastructure/useInfrastructureFilter'
 import InfrastructureForm, {
   InfrastructureFormValues,
-} from "@/components/infrastructure/InfrastructureForm"
-import { countActiveFilters } from "@/components/infrastructure/utils"
-import { Infrastructure } from "@/gql/generated"
+} from '@/components/infrastructure/InfrastructureForm'
+import { countActiveFilters } from '@/components/infrastructure/utils'
+import { Infrastructure } from '@/gql/generated'
 import {
   GET_INFRASTRUCTURES,
   CREATE_INFRASTRUCTURE,
   UPDATE_INFRASTRUCTURE,
   DELETE_INFRASTRUCTURE,
-} from "@/graphql/infrastructure"
+} from '@/graphql/infrastructure'
 
 export default function InfrastructuresPage() {
-  const t = useTranslations("infrastructure")
+  const t = useTranslations('infrastructure')
   const { enqueueSnackbar } = useSnackbar()
   const [sorting, setSorting] = useState<SortingState>([])
-  const [globalFilter, setGlobalFilter] = useState("")
+  const [globalFilter, setGlobalFilter] = useState('')
   const [tableInstance, setTableInstance] = useState<any>(null)
   const [filterDialogOpen, setFilterDialogOpen] = useState(false)
   const [showNewInfrastructureForm, setShowNewInfrastructureForm] = useState(false)
@@ -44,10 +44,16 @@ export default function InfrastructuresPage() {
 
   // Filter Logic
   const infrastructures = data?.infrastructures || []
-  const { filterState, setFilterState, filteredInfrastructures, resetFilters, availableStatuses, availableTypes } =
-    useInfrastructureFilter({
-      infrastructures,
-    })
+  const {
+    filterState,
+    setFilterState,
+    filteredInfrastructures,
+    resetFilters,
+    availableStatuses,
+    availableTypes,
+  } = useInfrastructureFilter({
+    infrastructures,
+  })
 
   // Weitere Filterung durch globalen Suchfilter
   const finalInfrastructures = useMemo(() => {
@@ -69,17 +75,17 @@ export default function InfrastructuresPage() {
 
       const input = {
         name: data.name,
-        description: data.description || "",
+        description: data.description || '',
         infrastructureType: data.infrastructureType,
         status: data.status,
-        vendor: data.vendor || "",
-        version: data.version || "",
-        capacity: data.capacity || "",
-        location: data.location || "",
-        ipAddress: data.ipAddress || "",
-        operatingSystem: data.operatingSystem || "",
-        specifications: data.specifications || "",
-        maintenanceWindow: data.maintenanceWindow || "",
+        vendor: data.vendor || '',
+        version: data.version || '',
+        capacity: data.capacity || '',
+        location: data.location || '',
+        ipAddress: data.ipAddress || '',
+        operatingSystem: data.operatingSystem || '',
+        specifications: data.specifications || '',
+        maintenanceWindow: data.maintenanceWindow || '',
         costs: data.costs ?? null,
         planningDate: data.planningDate || null,
         introductionDate: data.introductionDate || null,
@@ -103,34 +109,38 @@ export default function InfrastructuresPage() {
             ],
           },
         }),
-        ...(data.childInfrastructures && data.childInfrastructures.length > 0 && {
-          childInfrastructures: {
-            connect: data.childInfrastructures.map((id: string) => ({
-              where: { node: { id: { eq: id } } },
-            })),
-          },
-        }),
-        ...(data.hostsApplications && data.hostsApplications.length > 0 && {
-          hostsApplications: {
-            connect: data.hostsApplications.map((id: string) => ({
-              where: { node: { id: { eq: id } } },
-            })),
-          },
-        }),
-        ...(data.partOfArchitectures && data.partOfArchitectures.length > 0 && {
-          partOfArchitectures: {
-            connect: data.partOfArchitectures.map((id: string) => ({
-              where: { node: { id: { eq: id } } },
-            })),
-          },
-        }),
-        ...(data.depictedInDiagrams && data.depictedInDiagrams.length > 0 && {
-          depictedInDiagrams: {
-            connect: data.depictedInDiagrams.map((id: string) => ({
-              where: { node: { id: { eq: id } } },
-            })),
-          },
-        }),
+        ...(data.childInfrastructures &&
+          data.childInfrastructures.length > 0 && {
+            childInfrastructures: {
+              connect: data.childInfrastructures.map((id: string) => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }),
+        ...(data.hostsApplications &&
+          data.hostsApplications.length > 0 && {
+            hostsApplications: {
+              connect: data.hostsApplications.map((id: string) => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }),
+        ...(data.partOfArchitectures &&
+          data.partOfArchitectures.length > 0 && {
+            partOfArchitectures: {
+              connect: data.partOfArchitectures.map((id: string) => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }),
+        ...(data.depictedInDiagrams &&
+          data.depictedInDiagrams.length > 0 && {
+            depictedInDiagrams: {
+              connect: data.depictedInDiagrams.map((id: string) => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }),
       }
 
       await createInfrastructure({
@@ -138,12 +148,12 @@ export default function InfrastructuresPage() {
           input: [input],
         },
       })
-      enqueueSnackbar(t("messages.createSuccess" as any), { variant: "success" })
+      enqueueSnackbar(t('messages.createSuccess' as any), { variant: 'success' })
       setShowNewInfrastructureForm(false)
       refetch()
     } catch (error) {
-      console.error("Error creating infrastructure:", error)
-      enqueueSnackbar(t("messages.createError" as any), { variant: "error" })
+      console.error('Error creating infrastructure:', error)
+      enqueueSnackbar(t('messages.createError' as any), { variant: 'error' })
       throw error
     }
   }
@@ -156,17 +166,17 @@ export default function InfrastructuresPage() {
 
       const updateInput = {
         name: { set: data.name },
-        description: { set: data.description || "" },
+        description: { set: data.description || '' },
         infrastructureType: { set: data.infrastructureType },
         status: { set: data.status },
-        vendor: { set: data.vendor || "" },
-        version: { set: data.version || "" },
-        capacity: { set: data.capacity || "" },
-        location: { set: data.location || "" },
-        ipAddress: { set: data.ipAddress || "" },
-        operatingSystem: { set: data.operatingSystem || "" },
-        specifications: { set: data.specifications || "" },
-        maintenanceWindow: { set: data.maintenanceWindow || "" },
+        vendor: { set: data.vendor || '' },
+        version: { set: data.version || '' },
+        capacity: { set: data.capacity || '' },
+        location: { set: data.location || '' },
+        ipAddress: { set: data.ipAddress || '' },
+        operatingSystem: { set: data.operatingSystem || '' },
+        specifications: { set: data.specifications || '' },
+        maintenanceWindow: { set: data.maintenanceWindow || '' },
         costs: { set: data.costs ?? null },
         planningDate: { set: data.planningDate || null },
         introductionDate: { set: data.introductionDate || null },
@@ -244,11 +254,11 @@ export default function InfrastructuresPage() {
           input: updateInput,
         },
       })
-      enqueueSnackbar(t("messages.updateSuccess" as any), { variant: "success" })
+      enqueueSnackbar(t('messages.updateSuccess' as any), { variant: 'success' })
       refetch()
     } catch (error) {
-      console.error("Error updating infrastructure:", error)
-      enqueueSnackbar(t("messages.updateError" as any), { variant: "error" })
+      console.error('Error updating infrastructure:', error)
+      enqueueSnackbar(t('messages.updateError' as any), { variant: 'error' })
       throw error
     }
   }
@@ -258,11 +268,11 @@ export default function InfrastructuresPage() {
       await deleteInfrastructure({
         variables: { where: { id: { eq: id } } },
       })
-      enqueueSnackbar(t("messages.deleteSuccess" as any), { variant: "success" })
+      enqueueSnackbar(t('messages.deleteSuccess' as any), { variant: 'success' })
       refetch()
     } catch (error) {
-      console.error("Error deleting infrastructure:", error)
-      enqueueSnackbar(t("messages.deleteError" as any), { variant: "error" })
+      console.error('Error deleting infrastructure:', error)
+      enqueueSnackbar(t('messages.deleteError' as any), { variant: 'error' })
       throw error
     }
   }
@@ -270,7 +280,7 @@ export default function InfrastructuresPage() {
   if (error) {
     return (
       <Box p={3}>
-        <Typography color="error">{t("messages.loadError")}</Typography>
+        <Typography color="error">{t('messages.loadError')}</Typography>
       </Box>
     )
   }
@@ -278,45 +288,50 @@ export default function InfrastructuresPage() {
   // Filterfelder für GenericFilterDialog (an Hook-State angepasst)
   const filterFields: FilterField[] = [
     {
-      id: "statusFilter",
-      label: t("filter.status"),
-      type: "multiSelect",
+      id: 'statusFilter',
+      label: t('filter.status'),
+      type: 'multiSelect',
       options: availableStatuses.map(s => ({ value: s, label: s })),
     },
     {
-      id: "typeFilter",
-      label: t("filter.infrastructureType"),
-      type: "multiSelect",
+      id: 'typeFilter',
+      label: t('filter.infrastructureType'),
+      type: 'multiSelect',
       options: availableTypes.map(tp => ({ value: tp, label: tp })),
     },
-  { id: "vendorFilter", label: t("filter.vendor"), type: "text" },
-  { id: "locationFilter", label: t("filter.location"), type: "text" },
-  { id: "operatingSystemFilter", label: t("form.operatingSystem"), type: "text" },
+    { id: 'vendorFilter', label: t('filter.vendor'), type: 'text' },
+    { id: 'locationFilter', label: t('filter.location'), type: 'text' },
+    { id: 'operatingSystemFilter', label: t('form.operatingSystem'), type: 'text' },
     {
-      id: "descriptionFilter",
-      label: t("filter.descriptionContains"),
-      type: "text",
-      placeholder: t("filter.descriptionPlaceholder") as string,
+      id: 'descriptionFilter',
+      label: t('filter.descriptionContains'),
+      type: 'text',
+      placeholder: t('filter.descriptionPlaceholder') as string,
     },
     {
-      id: "updatedDateRange",
-      label: t("filter.updatedInPeriod"),
-      type: "dateRange",
-      fromLabel: t("filter.dateFrom") as string,
-      toLabel: t("filter.dateTo") as string,
+      id: 'updatedDateRange',
+      label: t('filter.updatedInPeriod'),
+      type: 'dateRange',
+      fromLabel: t('filter.dateFrom') as string,
+      toLabel: t('filter.dateTo') as string,
     },
   ]
 
   return (
     <Box sx={{ py: 2, px: 1 }}>
       {/* Header mit Create-Button */}
-      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 4 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
         <Typography variant="h4" component="h1">
-          {t("title")}
+          {t('title')}
         </Typography>
         {isArchitect() && (
-          <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={() => setShowNewInfrastructureForm(true)}>
-            {t("addNew")}
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<AddIcon />}
+            onClick={() => setShowNewInfrastructureForm(true)}
+          >
+            {t('addNew')}
           </Button>
         )}
       </Box>
@@ -329,14 +344,14 @@ export default function InfrastructuresPage() {
           onFilterClick={() => setFilterDialogOpen(true)}
           onResetFilters={() => {
             resetFilters()
-            setGlobalFilter("")
+            setGlobalFilter('')
           }}
           table={tableInstance}
           enableColumnVisibilityToggle
           defaultColumnVisibility={INFRASTRUCTURE_DEFAULT_COLUMN_VISIBILITY}
         />
 
-        <Paper sx={{ overflow: "hidden" }}>
+        <Paper sx={{ overflow: 'hidden' }}>
           <InfrastructureTable
             infrastructures={finalInfrastructures as Infrastructure[]}
             loading={loading}
@@ -354,7 +369,7 @@ export default function InfrastructuresPage() {
       {/* Filter Dialog */}
       {filterDialogOpen && (
         <GenericFilterDialog
-          title={t("filter.title")}
+          title={t('filter.title')}
           filterState={filterState as any}
           filterFields={filterFields}
           onFilterChange={(partial: any) => setFilterState(prev => ({ ...prev, ...partial }))}
