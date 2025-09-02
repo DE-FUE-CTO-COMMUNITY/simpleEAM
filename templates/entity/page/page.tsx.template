@@ -16,7 +16,7 @@ import {
 } from '@/graphql/{{ENTITY_SINGULAR_LOWER}}'
 import { {{ENTITY_SINGULAR_UPPER}}Type, {{ENTITY_SINGULAR_UPPER}}FormValues } from '@/components/{{ENTITY_NAME}}/types'
 import {{ENTITY_SINGULAR_UPPER}}Form from '@/components/{{ENTITY_NAME}}/{{ENTITY_SINGULAR_UPPER}}Form'
-import {{ENTITY_SINGULAR_UPPER}}Table from '@/components/{{ENTITY_NAME}}/{{ENTITY_SINGULAR_UPPER}}Table'
+import {{ENTITY_SINGULAR_UPPER}}Table, { {{ENTITY_SINGULAR_UPPER}}_DEFAULT_COLUMN_VISIBILITY } from '@/components/{{ENTITY_NAME}}/{{ENTITY_SINGULAR_UPPER}}Table'
 import {{ENTITY_SINGULAR_UPPER}}Toolbar from '@/components/{{ENTITY_NAME}}/{{ENTITY_SINGULAR_UPPER}}Toolbar'
 import {{ENTITY_SINGULAR_UPPER}}FilterDialog from '@/components/{{ENTITY_NAME}}/{{ENTITY_SINGULAR_UPPER}}FilterDialog'
 import { use{{ENTITY_SINGULAR_UPPER}}Filter } from '@/components/{{ENTITY_NAME}}/use{{ENTITY_SINGULAR_UPPER}}Filter'
@@ -26,6 +26,7 @@ const {{ENTITY_NAME_UPPER}}Page = () => {
   const { enqueueSnackbar } = useSnackbar()
   const [globalFilter, setGlobalFilter] = useState<string>('')
   const [sorting, setSorting] = useState([{ id: 'name', desc: false }])
+  const [tableInstance, setTableInstance] = useState<any>(null)
 
   // Apollo Client-Operationen
   const { data, loading, error } = useQuery(GET_{{ENTITY_NAME_UPPER}})
@@ -40,10 +41,7 @@ const {{ENTITY_NAME_UPPER}}Page = () => {
 
   // Dialog-States
   const [filterDialogOpen, setFilterDialogOpen] = useState(false)
-  const [formDialogOpen, setFormDialogOpen] = useState(false)
-  const [selected{{ENTITY_SINGULAR_UPPER}}, setSelected{{ENTITY_SINGULAR_UPPER}}] = useState<{{ENTITY_SINGULAR_UPPER}}Type | null>(null)
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
-  const [current{{ENTITY_SINGULAR_UPPER}}, setCurrent{{ENTITY_SINGULAR_UPPER}}] = useState<{{ENTITY_SINGULAR_UPPER}}Type | null>(null)
+  const [showNew{{ENTITY_SINGULAR_UPPER}}Form, setShowNew{{ENTITY_SINGULAR_UPPER}}Form] = useState(false)
 
   // Verfügbare Werte für Filter extrahieren (customize based on entity fields)
   const availableValues = useMemo(() => {
@@ -59,28 +57,10 @@ const {{ENTITY_NAME_UPPER}}Page = () => {
 
   // Event Handler
   const handleCreate = () => {
-    setSelected{{ENTITY_SINGULAR_UPPER}}(null)
-    setFormDialogOpen(true)
+    setShowNew{{ENTITY_SINGULAR_UPPER}}Form(true)
   }
 
-  const handleConfirmDelete = async () => {
-    if (!current{{ENTITY_SINGULAR_UPPER}}) return
-
-    try {
-      await delete{{ENTITY_SINGULAR_UPPER}}Mutation({
-        variables: { id: current{{ENTITY_SINGULAR_UPPER}}.id },
-        refetchQueries: [{ query: GET_{{ENTITY_NAME_UPPER}} }],
-      })
-      
-      enqueueSnackbar(t('messages.deleteSuccess'), { variant: 'success' })
-    } catch (error) {
-      console.error('Fehler beim Löschen des {{ENTITY_SINGULAR}}:', error)
-      enqueueSnackbar(t('messages.deleteError'), { variant: 'error' })
-    } finally {
-      setShowDeleteConfirm(false)
-      setCurrent{{ENTITY_SINGULAR_UPPER}}(null)
-    }
-  }
+  // Delete wird i.d.R. im GenericTable/Dialog gehandhabt
 
   // Aktive Filter zählen
   const activeFiltersCount = useMemo(() => {
@@ -129,6 +109,9 @@ const {{ENTITY_NAME_UPPER}}Page = () => {
           onFilterClick={() => setFilterDialogOpen(true)}
           activeFiltersCount={activeFiltersCount}
           onResetFilters={resetFilters}
+          table={tableInstance}
+          enableColumnVisibilityToggle
+          defaultColumnVisibility={{{ENTITY_SINGULAR_UPPER}}_DEFAULT_COLUMN_VISIBILITY}
         />
 
         <Paper sx={{ overflow: 'hidden' }}>
@@ -138,10 +121,12 @@ const {{ENTITY_NAME_UPPER}}Page = () => {
             globalFilter={globalFilter}
             sorting={sorting}
             onSortingChange={setSorting}
+            onTableReady={setTableInstance}
             onCreate{{ENTITY_SINGULAR_UPPER}}={async (data) => {
               try {
                 await create{{ENTITY_SINGULAR_UPPER}}Mutation({
-                  variables: { input: data },
+                  // Most create mutations expect an array input per generated schema
+                  variables: { input: [data] },
                   refetchQueries: [{ query: GET_{{ENTITY_NAME_UPPER}} }],
                 })
                 enqueueSnackbar(t('messages.createSuccess'), { variant: 'success' })
@@ -153,10 +138,12 @@ const {{ENTITY_NAME_UPPER}}Page = () => {
             }}
             onUpdate{{ENTITY_SINGULAR_UPPER}}={async (id, data) => {
               try {
-                await update{{ENTITY_SINGULAR_UPPER}}Mutation({
+        await update{{ENTITY_SINGULAR_UPPER}}Mutation({
                   variables: {
                     id: id,
-                    input: data,
+          // Many generated UpdateInput types require scalar fields wrapped in { set: value }
+          // Adjust mapping in concrete pages if the shape differs
+          input: data,
                   },
                   refetchQueries: [{ query: GET_{{ENTITY_NAME_UPPER}} }],
                 })
@@ -168,10 +155,13 @@ const {{ENTITY_NAME_UPPER}}Page = () => {
               }
             }}
             onDelete{{ENTITY_SINGULAR_UPPER}}={async (id) => {
-              const {{ENTITY_SINGULAR_LOWER}} = filtered{{ENTITY_NAME_UPPER}}.find((item: any) => item.id === id)
-              if ({{ENTITY_SINGULAR_LOWER}}) {
-                setCurrent{{ENTITY_SINGULAR_UPPER}}({{ENTITY_SINGULAR_LOWER}})
-                setShowDeleteConfirm(true)
+              try {
+        // Some entities use delete(where: { id: { eq } }); adapt here per entity's gql file
+        await delete{{ENTITY_SINGULAR_UPPER}}Mutation({ variables: { id } })
+                enqueueSnackbar(t('messages.deleteSuccess'), { variant: 'success' })
+              } catch (error) {
+                console.error('Fehler beim Löschen des {{ENTITY_SINGULAR}}:', error)
+                enqueueSnackbar(t('messages.deleteError'), { variant: 'error' })
               }
             }}
           />
@@ -193,33 +183,26 @@ const {{ENTITY_NAME_UPPER}}Page = () => {
         />
       )}
 
-      {/* Form Dialog */}
-      <{{ENTITY_SINGULAR_UPPER}}Form
-        isOpen={formDialogOpen}
-        onClose={() => setFormDialogOpen(false)}
-        data={selected{{ENTITY_SINGULAR_UPPER}}}
-        onSubmit={handleFormSubmit}
-        mode={selected{{ENTITY_SINGULAR_UPPER}} ? 'edit' : 'create'}
-      />
-
-      {/* Delete Confirmation */}
-      {showDeleteConfirm && current{{ENTITY_SINGULAR_UPPER}} && (
-        <Paper sx={{ p: 2, position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 1300 }}>
-          <Typography variant="h6" gutterBottom>
-            {t('deleteConfirmation')}
-          </Typography>
-          <Typography variant="body2" sx={{ mb: 2 }}>
-            Sicher, dass Sie &quot;{current{{ENTITY_SINGULAR_UPPER}}.name}&quot; löschen möchten?
-          </Typography>
-          <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
-            <Button onClick={() => setShowDeleteConfirm(false)}>
-              Abbrechen
-            </Button>
-            <Button onClick={handleConfirmDelete} color="error" variant="contained">
-              Löschen
-            </Button>
-          </Box>
-        </Paper>
+      {/* Create Form */}
+      {showNew{{ENTITY_SINGULAR_UPPER}}Form && (
+        <{{ENTITY_SINGULAR_UPPER}}Form
+          isOpen={showNew{{ENTITY_SINGULAR_UPPER}}Form}
+          onClose={() => setShowNew{{ENTITY_SINGULAR_UPPER}}Form(false)}
+          mode="create"
+          onSubmit={async (values: {{ENTITY_SINGULAR_UPPER}}FormValues) => {
+            try {
+              await create{{ENTITY_SINGULAR_UPPER}}Mutation({
+                variables: { input: [values] },
+                refetchQueries: [{ query: GET_{{ENTITY_NAME_UPPER}} }],
+              })
+              enqueueSnackbar(t('messages.createSuccess'), { variant: 'success' })
+              setShowNew{{ENTITY_SINGULAR_UPPER}}Form(false)
+            } catch (error) {
+              console.error('Fehler beim Erstellen der/des {{ENTITY_SINGULAR}}:', error)
+              enqueueSnackbar(t('messages.createError'), { variant: 'error' })
+            }
+          }}
+        />
       )}
     </Box>
   )

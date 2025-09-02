@@ -95,6 +95,8 @@ const InfrastructureTable: React.FC<InfrastructureTableProps> = ({
       [InfrastructureType.PHYSICAL_SERVER]: t('infrastructureTypes.PHYSICAL_SERVER'),
       [InfrastructureType.VIRTUAL_MACHINE]: t('infrastructureTypes.VIRTUAL_MACHINE'),
       [InfrastructureType.VIRTUALIZATION_CLUSTER]: t('infrastructureTypes.VIRTUALIZATION_CLUSTER'),
+  [InfrastructureType.IOT_GATEWAY]: 'IoT Gateway',
+  [InfrastructureType.IOT_PLATFORM]: 'IoT Platform',
     }
     return translations[type] || type
   }
@@ -165,6 +167,14 @@ const InfrastructureTable: React.FC<InfrastructureTableProps> = ({
           break
         case InfrastructureType.PHYSICAL_SERVER:
           color = 'error'
+          label = getInfrastructureTypeTranslation(type, t)
+          break
+        case InfrastructureType.IOT_GATEWAY:
+          color = 'info'
+          label = getInfrastructureTypeTranslation(type, t)
+          break
+        case InfrastructureType.IOT_PLATFORM:
+          color = 'info'
           label = getInfrastructureTypeTranslation(type, t)
           break
         default:
