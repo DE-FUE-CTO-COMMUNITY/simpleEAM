@@ -6,7 +6,9 @@ import { z } from 'zod'
 import { useTranslations } from 'next-intl'
 import { Person } from '../../gql/generated'
 import GenericForm, { FieldConfig } from '../common/GenericForm'
-import { isArchitect } from '@/lib/auth'
+import { isArchitect, isAdmin } from '@/lib/auth'
+import { useQuery } from '@apollo/client'
+import { GET_COMPANIES } from '@/graphql/company'
 
 // Schema für die Formularvalidierung
 export const personSchema = z.object({
@@ -22,6 +24,8 @@ export const personSchema = z.object({
   department: z.string().optional().nullable(),
   role: z.string().optional().nullable(),
   phone: z.string().optional().nullable(),
+  // Admin-only Feld: ausgewählte Company-IDs
+  companyIds: z.array(z.string()).optional().default([]),
 })
 
 // TypeScript Typen basierend auf dem Schema
@@ -40,6 +44,12 @@ const PersonForm: React.FC<GenericFormProps<Person, PersonFormValues>> = ({
   onEditMode,
 }) => {
   const t = useTranslations('persons.form')
+  // Companies laden für Admin-Zuordnung
+  const { data: companiesData } = useQuery(GET_COMPANIES, { skip: !isAdmin() })
+  const companyOptions = (companiesData?.companies || []).map((c: any) => ({
+    value: c.id,
+    label: c.name,
+  }))
 
   // Formulardaten initialisieren - leere Standardwerte für neues Formular
   const defaultValues = React.useMemo<PersonFormValues>(
@@ -50,6 +60,7 @@ const PersonForm: React.FC<GenericFormProps<Person, PersonFormValues>> = ({
       department: null,
       role: null,
       phone: null,
+      companyIds: [],
     }),
     []
   )
@@ -66,15 +77,16 @@ const PersonForm: React.FC<GenericFormProps<Person, PersonFormValues>> = ({
         department: value.department,
         role: value.role,
         phone: value.phone,
+        companyIds: value.companyIds || [],
       }
 
       await onSubmit(formattedValues)
     },
     validators: {
       // Primäre Validierung bei Änderungen
-      onChange: personSchema,
+      onChange: personSchema as any,
       // Validierung beim Absenden
-      onSubmit: personSchema,
+      onSubmit: personSchema as any,
     },
   })
 
@@ -102,6 +114,7 @@ const PersonForm: React.FC<GenericFormProps<Person, PersonFormValues>> = ({
         department: person.department ?? null,
         role: person.role ?? null,
         phone: person.phone ?? null,
+        companyIds: (person.company || []).map(c => c.id),
       }
 
       // Formular mit den Werten aus der vorhandenen Person zurücksetzen
@@ -162,6 +175,20 @@ const PersonForm: React.FC<GenericFormProps<Person, PersonFormValues>> = ({
       validators: personSchema.shape.role,
       size: { xs: 12, md: 6 },
     },
+    // Nur Admins dürfen die Company-Zuordnung bearbeiten
+    ...(isAdmin()
+      ? ([
+          {
+            name: 'companyIds',
+            label: 'Companies',
+            type: 'autocomplete',
+            multiple: true,
+            options: companyOptions,
+            size: { xs: 12 },
+            helperText: 'Unternehmen zuordnen',
+          } as FieldConfig,
+        ] as FieldConfig[])
+      : []),
   ]
 
   return (

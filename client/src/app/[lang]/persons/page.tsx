@@ -6,7 +6,7 @@ import { Add as AddIcon } from '@mui/icons-material'
 import { useQuery, useMutation } from '@apollo/client'
 import { useSnackbar } from 'notistack'
 import { useTranslations } from 'next-intl'
-import { useAuth, isArchitect } from '@/lib/auth'
+import { useAuth, isArchitect, isAdmin } from '@/lib/auth'
 import { VisibilityState } from '@tanstack/react-table'
 import { GET_PERSONS, CREATE_PERSON, UPDATE_PERSON, DELETE_PERSON } from '@/graphql/person'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
@@ -40,11 +40,22 @@ function PersonsPage() {
   const [showNewPersonForm, setShowNewPersonForm] = useState(false)
 
   // Personen laden - Auth-Check erfolgt bereits in layout.tsx
-  const personWhere = useCompanyWhere('company')
+  const companyWhere = useCompanyWhere('company')
+  // Admins sollen zusätzlich Personen ohne Company sehen: OR(companyWhere, company: { none: {} })
+  const where = React.useMemo(() => {
+    if (isAdmin()) {
+      const noCompany = {
+        companyConnection: { aggregate: { count: { nodes: { eq: 0 } } } },
+      } as const
+      return companyWhere ? { OR: [companyWhere as any, noCompany] } : (noCompany as any)
+    }
+    return companyWhere as any
+  }, [companyWhere])
+
   const { loading, error, data, refetch } = useQuery(GET_PERSONS, {
     skip: !authenticated || !initialized,
     fetchPolicy: 'cache-and-network',
-    variables: { where: personWhere },
+    variables: { where },
   })
 
   // Verfügbare Abteilungen und Rollen aus den geladenen Daten extrahieren
@@ -137,6 +148,14 @@ function PersonsPage() {
       phone: data.phone,
     }
 
+    // Admin: Companies zuordnen (optional)
+    if (isAdmin() && (data as any).companyIds && (data as any).companyIds.length > 0) {
+      const companyIds: string[] = (data as any).companyIds
+      ;(input as any).company = {
+        connect: companyIds.map(id => ({ where: { node: { id: { eq: id } } } })),
+      }
+    }
+
     await createPerson({
       variables: { input: [input] },
     })
@@ -155,6 +174,21 @@ function PersonsPage() {
       department: { set: data.department },
       role: { set: data.role },
       phone: { set: data.phone },
+    }
+
+    // Admin: Company-Zuordnung setzen (ersetzen)
+    if (isAdmin()) {
+      const companyIds: string[] = ((data as any).companyIds || []) as string[]
+      ;(input as any).company = [
+        {
+          disconnect: [{ where: {} }],
+        },
+      ]
+      if (companyIds.length > 0) {
+        ;(input as any).company.push({
+          connect: companyIds.map(id => ({ where: { node: { id: { eq: id } } } })),
+        })
+      }
     }
 
     await updatePerson({

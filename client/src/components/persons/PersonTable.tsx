@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
 import { GenericTable } from '../common/GenericTable'
-import { Person } from './types'
+import { Person as BasePerson } from './types'
 import { PersonFormValues } from './PersonForm'
 import PersonForm from './PersonForm'
 import { createColumnHelper } from '@tanstack/react-table'
@@ -19,6 +19,8 @@ export const PERSON_DEFAULT_COLUMN_VISIBILITY = {
   role: true,
   phone: true,
   // Standardmäßig versteckte Spalten
+  id: false,
+  company: false,
   ownedCapabilities: false,
   ownedApplications: false,
   ownedDataObjects: false,
@@ -32,7 +34,7 @@ export const PERSON_DEFAULT_COLUMN_VISIBILITY = {
 
 interface PersonTableProps {
   id?: string
-  persons: Person[]
+  persons: PersonWithCompany[]
   loading: boolean
   globalFilter: string
   sorting: SortingState
@@ -47,6 +49,8 @@ interface PersonTableProps {
     updater: VisibilityState | ((old: VisibilityState) => VisibilityState)
   ) => void
 }
+
+type PersonWithCompany = BasePerson & { company?: Array<{ id: string; name: string }> }
 
 const PersonTableWithGenericTable: React.FC<PersonTableProps> = ({
   persons,
@@ -64,7 +68,7 @@ const PersonTableWithGenericTable: React.FC<PersonTableProps> = ({
   const t = useTranslations('persons.table')
   const tPersons = useTranslations('persons')
   const locale = useLocale()
-  const columnHelper = createColumnHelper<Person>()
+  const columnHelper = createColumnHelper<PersonWithCompany>()
 
   // Verwende persistente Spaltensichtbarkeit
   const {
@@ -87,6 +91,12 @@ const PersonTableWithGenericTable: React.FC<PersonTableProps> = ({
   // Spalten-Definition für die Person-Tabelle
   const columns = useMemo(
     () => [
+      // ID (versteckt per Default)
+      columnHelper.accessor('id', {
+        header: 'ID',
+        cell: info => info.getValue(),
+        enableHiding: true,
+      }),
       columnHelper.accessor('firstName', {
         header: t('firstName'),
         cell: info => info.getValue(),
@@ -110,6 +120,16 @@ const PersonTableWithGenericTable: React.FC<PersonTableProps> = ({
       columnHelper.accessor('phone', {
         header: t('phoneNumber'),
         cell: info => info.getValue() || '-',
+      }),
+      // Companies (versteckt per Default)
+      columnHelper.accessor('company', {
+        header: 'Companies',
+        cell: info => {
+          const companies = info.getValue() as Array<{ id: string; name: string }> | undefined
+          return companies && companies.length > 0 ? companies.map(c => c.name).join(', ') : '-'
+        },
+        enableHiding: true,
+        enableSorting: false,
       }),
       columnHelper.accessor('ownedCapabilities', {
         header: t('ownedCapabilities'),
@@ -190,7 +210,7 @@ const PersonTableWithGenericTable: React.FC<PersonTableProps> = ({
   )
 
   // Mapping von Person zu den erwarteten FormValues für das Formular
-  const mapToFormValues = (person: Person): PersonFormValues => {
+  const mapToFormValues = (person: PersonWithCompany): PersonFormValues => {
     return {
       firstName: person.firstName ?? '',
       lastName: person.lastName ?? '',
@@ -198,11 +218,13 @@ const PersonTableWithGenericTable: React.FC<PersonTableProps> = ({
       department: person.department ?? null,
       role: person.role ?? null,
       phone: person.phone ?? null,
+      // Für Admin-Form: initiale Company IDs
+      companyIds: person.company ? person.company.map(c => c.id) : [],
     }
   }
 
   return (
-    <GenericTable<Person, PersonFormValues>
+    <GenericTable<PersonWithCompany, PersonFormValues>
       data={persons}
       loading={loading}
       globalFilter={globalFilter}
@@ -216,7 +238,7 @@ const PersonTableWithGenericTable: React.FC<PersonTableProps> = ({
       createButtonLabel={tPersons('addNew')}
       entityName={tPersons('title')}
       FormComponent={PersonForm}
-      getIdFromData={(item: Person) => item.id}
+      getIdFromData={(item: PersonWithCompany) => item.id}
       mapDataToFormValues={mapToFormValues}
       columnVisibility={columnVisibility}
       onColumnVisibilityChange={onColumnVisibilityChange}

@@ -6,7 +6,8 @@ import { Add as AddIcon } from '@mui/icons-material'
 import { useQuery, useMutation } from '@apollo/client'
 import { useSnackbar } from 'notistack'
 import { useTranslations } from 'next-intl'
-import { isArchitect } from '@/lib/auth'
+import { isAdmin } from '@/lib/auth'
+import { redirect } from 'next/navigation'
 
 import { GET_COMPANIES, CREATE_COMPANY, UPDATE_COMPANY, DELETE_COMPANY } from '@/graphql/company'
 import { CompanySize } from '@/gql/generated'
@@ -20,13 +21,22 @@ import { useCompanyFilter } from '@/components/companies/useCompanyFilter'
 import { CompanyType, CompanyFormValues } from '@/components/companies/types'
 
 const CompaniesPage = () => {
+  // Admin-Guard analog zur Admin-Seite
+  const [isAuthorized, setIsAuthorized] = React.useState(false)
+  React.useEffect(() => {
+    if (!isAdmin()) {
+      redirect('/')
+    } else {
+      setIsAuthorized(true)
+    }
+  }, [])
   const t = useTranslations('companies')
   const { enqueueSnackbar } = useSnackbar()
   const [globalFilter, setGlobalFilter] = useState<string>('')
   const [sorting, setSorting] = useState([{ id: 'name', desc: false }])
 
   // Apollo Client-Operationen
-  const { data, loading, error } = useQuery(GET_COMPANIES)
+  const { data, loading, error } = useQuery(GET_COMPANIES, { skip: !isAuthorized })
   const [createCompanyMutation] = useMutation(CREATE_COMPANY)
   const [updateCompanyMutation] = useMutation(UPDATE_COMPANY)
   const [deleteCompanyMutation] = useMutation(DELETE_COMPANY)
@@ -122,7 +132,7 @@ const CompaniesPage = () => {
         <Typography variant="h4" component="h1">
           {t('title')}
         </Typography>
-        {isArchitect() && (
+        {isAdmin() && (
           <Button
             variant="contained"
             color="primary"

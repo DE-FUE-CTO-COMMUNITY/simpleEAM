@@ -22,6 +22,10 @@ export const GET_PERSONS = gql`
       department
       role
       phone
+      company {
+        id
+        name
+      }
       createdAt
       updatedAt
       ownedCapabilities {
@@ -66,6 +70,10 @@ export const GET_PERSON = gql`
       department
       role
       phone
+      company {
+        id
+        name
+      }
       createdAt
       updatedAt
       ownedCapabilities {
@@ -127,6 +135,10 @@ export const CREATE_PERSON = gql`
         email
         department
         role
+        company {
+          id
+          name
+        }
         phone
         createdAt
       }
@@ -144,6 +156,10 @@ export const UPDATE_PERSON = gql`
         email
         department
         role
+        company {
+          id
+          name
+        }
         phone
         avatarUrl
         updatedAt
