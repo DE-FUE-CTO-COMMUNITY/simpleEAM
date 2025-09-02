@@ -312,6 +312,126 @@ export async function createHeatPumpBusinessCapabilities(session: Session): Prom
       updatedAt: datetime()
     }),
 
+    // L2 Business Capabilities - Strategy & Corporate Management
+    (strategicPlanning:BusinessCapability {
+      id: "hp-cap-strategic-planning",
+      name: "Strategic Planning",
+      description: "Long-term strategic planning and business development",
+      maturityLevel: 4,
+      status: "ACTIVE",
+      type: "STRATEGIC",
+      businessValue: 5,
+      level: 2,
+      sequenceNumber: 11,
+      tags: ["strategy", "planning", "business-development"],
+      createdAt: datetime(),
+      updatedAt: datetime()
+    }),
+    (corporateGovernance:BusinessCapability {
+      id: "hp-cap-corporate-governance",
+      name: "Corporate Governance",
+      description: "Corporate governance and risk management",
+      maturityLevel: 4,
+      status: "ACTIVE",
+      type: "STRATEGIC",
+      businessValue: 4,
+      level: 2,
+      sequenceNumber: 12,
+      tags: ["governance", "risk", "compliance"],
+      createdAt: datetime(),
+      updatedAt: datetime()
+    }),
+
+    // L2 Business Capabilities - Human Resources
+    (talentMgmt:BusinessCapability {
+      id: "hp-cap-talent-management",
+      name: "Talent Management",
+      description: "Recruitment, development, and retention of talent",
+      maturityLevel: 3,
+      status: "ACTIVE",
+      type: "SUPPORT",
+      businessValue: 4,
+      level: 2,
+      sequenceNumber: 61,
+      tags: ["talent", "recruitment", "development"],
+      createdAt: datetime(),
+      updatedAt: datetime()
+    }),
+    (payrollBenefits:BusinessCapability {
+      id: "hp-cap-payroll-benefits",
+      name: "Payroll & Benefits",
+      description: "Payroll processing and employee benefits management",
+      maturityLevel: 4,
+      status: "ACTIVE",
+      type: "SUPPORT",
+      businessValue: 3,
+      level: 2,
+      sequenceNumber: 62,
+      tags: ["payroll", "benefits", "compensation"],
+      createdAt: datetime(),
+      updatedAt: datetime()
+    }),
+
+    // L2 Business Capabilities - Finance & Controlling
+    (financialPlanning:BusinessCapability {
+      id: "hp-cap-financial-planning",
+      name: "Financial Planning & Analysis",
+      description: "Financial planning, budgeting, and business analysis",
+      maturityLevel: 4,
+      status: "ACTIVE",
+      type: "SUPPORT",
+      businessValue: 5,
+      level: 2,
+      sequenceNumber: 71,
+      tags: ["planning", "budgeting", "analysis"],
+      createdAt: datetime(),
+      updatedAt: datetime()
+    }),
+    (accountingReporting:BusinessCapability {
+      id: "hp-cap-accounting-reporting",
+      name: "Accounting & Reporting",
+      description: "Financial accounting and regulatory reporting",
+      maturityLevel: 4,
+      status: "ACTIVE",
+      type: "SUPPORT",
+      businessValue: 4,
+      level: 2,
+      sequenceNumber: 72,
+      tags: ["accounting", "reporting", "regulatory"],
+      createdAt: datetime(),
+      updatedAt: datetime()
+    }),
+
+    // L2 Business Capabilities - Information Technology
+    (applicationMgmt:BusinessCapability {
+      id: "hp-cap-application-management",
+      name: "Application Management",
+      description: "Enterprise application management and development",
+      maturityLevel: 3,
+      status: "ACTIVE",
+      type: "SUPPORT",
+      businessValue: 4,
+      level: 2,
+      sequenceNumber: 81,
+      tags: ["applications", "development", "management"],
+      createdAt: datetime(),
+      updatedAt: datetime()
+    }),
+    (infrastructureMgmt:BusinessCapability {
+      id: "hp-cap-infrastructure-management",
+      name: "IT Infrastructure Management",
+      description: "IT infrastructure and operations management",
+      maturityLevel: 3,
+      status: "ACTIVE",
+      type: "SUPPORT",
+      businessValue: 4,
+      level: 2,
+      sequenceNumber: 82,
+      tags: ["infrastructure", "operations", "it"],
+      createdAt: datetime(),
+      updatedAt: datetime()
+    }),
+
     // L2 Business Capabilities - Supply Chain & Quality
     (supplyChain:BusinessCapability {
       id: "hp-cap-supply-chain",
@@ -322,7 +442,7 @@ export async function createHeatPumpBusinessCapabilities(session: Session): Prom
       type: "OPERATIONAL",
       businessValue: 4,
       level: 2,
-      sequenceNumber: 61,
+      sequenceNumber: 91,
       tags: ["supply-chain", "procurement", "suppliers"],
       createdAt: datetime(),
       updatedAt: datetime()
@@ -336,7 +456,7 @@ export async function createHeatPumpBusinessCapabilities(session: Session): Prom
       type: "OPERATIONAL",
       businessValue: 5,
       level: 2,
-      sequenceNumber: 62,
+      sequenceNumber: 92,
       tags: ["quality", "compliance", "assurance"],
       createdAt: datetime(),
       updatedAt: datetime()
@@ -352,7 +472,7 @@ export async function createHeatPumpBusinessCapabilities(session: Session): Prom
       type: "STRATEGIC",
       businessValue: 4,
       level: 2,
-      sequenceNumber: 71,
+      sequenceNumber: 101,
       tags: ["sustainability", "environment", "carbon"],
       createdAt: datetime(),
       updatedAt: datetime()
@@ -366,7 +486,7 @@ export async function createHeatPumpBusinessCapabilities(session: Session): Prom
       type: "OPERATIONAL",
       businessValue: 5,
       level: 2,
-      sequenceNumber: 72,
+      sequenceNumber: 102,
       tags: ["energy", "efficiency", "optimization"],
       createdAt: datetime(),
       updatedAt: datetime()

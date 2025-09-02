@@ -39,8 +39,54 @@ async function main() {
       console.log('\n🧹 Clearing existing data...')
       const session = driver.session()
       try {
+        // First delete all relationships and nodes
         await session.run('MATCH (n) DETACH DELETE n')
-        console.log('✅ Database cleared')
+
+        // Drop all constraints to prevent conflicts
+        const constraintsResult = await session.run('SHOW CONSTRAINTS')
+        const constraints = constraintsResult.records
+
+        for (const constraint of constraints) {
+          const constraintName = constraint.get('name')
+          try {
+            await session.run(`DROP CONSTRAINT ${constraintName}`)
+          } catch {
+            // Ignore errors when dropping constraints that don't exist
+          }
+        }
+
+        // Recreate essential constraints
+        try {
+          await session.run(
+            'CREATE CONSTRAINT IF NOT EXISTS FOR (c:Company) REQUIRE c.id IS UNIQUE'
+          )
+          await session.run(
+            'CREATE CONSTRAINT IF NOT EXISTS FOR (bc:BusinessCapability) REQUIRE bc.id IS UNIQUE'
+          )
+          await session.run('CREATE CONSTRAINT IF NOT EXISTS FOR (p:Person) REQUIRE p.id IS UNIQUE')
+          await session.run(
+            'CREATE CONSTRAINT IF NOT EXISTS FOR (a:Application) REQUIRE a.id IS UNIQUE'
+          )
+          await session.run(
+            'CREATE CONSTRAINT IF NOT EXISTS FOR (d:DataObject) REQUIRE d.id IS UNIQUE'
+          )
+          await session.run(
+            'CREATE CONSTRAINT IF NOT EXISTS FOR (arch:Architecture) REQUIRE arch.id IS UNIQUE'
+          )
+          await session.run(
+            'CREATE CONSTRAINT IF NOT EXISTS FOR (ap:ArchitecturePrinciple) REQUIRE ap.id IS UNIQUE'
+          )
+          await session.run(
+            'CREATE CONSTRAINT IF NOT EXISTS FOR (i:Infrastructure) REQUIRE i.id IS UNIQUE'
+          )
+          await session.run(
+            'CREATE CONSTRAINT IF NOT EXISTS FOR (ai:ApplicationInterface) REQUIRE ai.id IS UNIQUE'
+          )
+        } catch {
+          // Constraints might already exist, ignore errors
+        }
+
+        console.log('✅ Database cleared and constraints reset')
       } finally {
         await session.close()
       }

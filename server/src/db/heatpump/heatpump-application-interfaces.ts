@@ -353,15 +353,16 @@ export async function createHeatPumpApplicationInterfaceOwnership(session: Sessi
 
   await session.run(`
     MATCH 
+      (company:Company {id: "company-thermo-dynamics-ag"}),
       (cto:Person {id: "hp-person-cto"}),
       (cio:Person {id: "hp-person-cio"}),
       (itManager:Person {id: "hp-person-it-manager"}),
-      (iotSpecialist:Person {id: "hp-person-iot-specialist"}),
       (mfgDirector:Person {id: "hp-person-manufacturing-director"}),
       (salesDirector:Person {id: "hp-person-sales-director"}),
       (serviceDirector:Person {id: "hp-person-service-director"}),
       (productManager:Person {id: "hp-person-product-manager"}),
       (qualityManager:Person {id: "hp-person-quality-manager"}),
+      (rdDirector:Person {id: "hp-person-rd-director"}),
 
       (iotDeviceApi:ApplicationInterface {id: "hp-interface-iot-device-api"}),
       (iotTelemetryApi:ApplicationInterface {id: "hp-interface-iot-telemetry-api"}),
@@ -381,48 +382,41 @@ export async function createHeatPumpApplicationInterfaceOwnership(session: Sessi
       (technicalSupportApi:ApplicationInterface {id: "hp-interface-technical-support-api"})
 
     CREATE
-      // CTO ownership - Strategic APIs
-      (iotDeviceApi)-[:OWNED_BY]->(cto),
-      (energyAnalyticsApi)-[:OWNED_BY]->(cto),
-      (smartGridApi)-[:OWNED_BY]->(cto),
+      // Company ownership for all interfaces
+      (iotDeviceApi)-[:OWNED_BY]->(company),
+      (iotTelemetryApi)-[:OWNED_BY]->(company),
+      (energyAnalyticsApi)-[:OWNED_BY]->(company),
+      (erpCustomerApi)-[:OWNED_BY]->(company),
+      (erpProductApi)-[:OWNED_BY]->(company),
+      (erpOrderApi)-[:OWNED_BY]->(company),
+      (crmServiceApi)-[:OWNED_BY]->(company),
+      (crmInstallerApi)-[:OWNED_BY]->(company),
+      (mesProductionApi)-[:OWNED_BY]->(company),
+      (qualityTestApi)-[:OWNED_BY]->(company),
+      (supplierPortalApi)-[:OWNED_BY]->(company),
+      (smartGridApi)-[:OWNED_BY]->(company),
+      (biReportingApi)-[:OWNED_BY]->(company),
+      (dataExportApi)-[:OWNED_BY]->(company),
+      (mobileCustomerApi)-[:OWNED_BY]->(company),
+      (technicalSupportApi)-[:OWNED_BY]->(company),
       
-      // CIO ownership - Enterprise Integration APIs
+      // Person ownership - ONLY ONE PERSON PER INTERFACE
+      (iotDeviceApi)-[:OWNED_BY]->(cto),
+      (iotTelemetryApi)-[:OWNED_BY]->(rdDirector),
+      (energyAnalyticsApi)-[:OWNED_BY]->(cto),
       (erpCustomerApi)-[:OWNED_BY]->(cio),
-      (erpProductApi)-[:OWNED_BY]->(cio),
-      (erpOrderApi)-[:OWNED_BY]->(cio),
+      (erpProductApi)-[:OWNED_BY]->(productManager),
+      (erpOrderApi)-[:OWNED_BY]->(salesDirector),
+      (crmServiceApi)-[:OWNED_BY]->(serviceDirector),
+      (crmInstallerApi)-[:OWNED_BY]->(salesDirector),
+      (mesProductionApi)-[:OWNED_BY]->(mfgDirector),
+      (qualityTestApi)-[:OWNED_BY]->(qualityManager),
+      (supplierPortalApi)-[:OWNED_BY]->(mfgDirector),
+      (smartGridApi)-[:OWNED_BY]->(cto),
       (biReportingApi)-[:OWNED_BY]->(cio),
       (dataExportApi)-[:OWNED_BY]->(cio),
-      
-      // IT Manager ownership - Operational APIs
-      (erpCustomerApi)-[:OWNED_BY]->(itManager),
-      (biReportingApi)-[:OWNED_BY]->(itManager),
-      (dataExportApi)-[:OWNED_BY]->(itManager),
-      
-      // IoT Specialist ownership
-      (iotDeviceApi)-[:OWNED_BY]->(iotSpecialist),
-      (iotTelemetryApi)-[:OWNED_BY]->(iotSpecialist),
-      (energyAnalyticsApi)-[:OWNED_BY]->(iotSpecialist),
-      
-      // Manufacturing Director ownership
-      (mesProductionApi)-[:OWNED_BY]->(mfgDirector),
-      (supplierPortalApi)-[:OWNED_BY]->(mfgDirector),
-      
-      // Sales Director ownership
-      (erpOrderApi)-[:OWNED_BY]->(salesDirector),
-      (crmInstallerApi)-[:OWNED_BY]->(salesDirector),
-      (supplierPortalApi)-[:OWNED_BY]->(salesDirector),
-      
-      // Service Director ownership
-      (crmServiceApi)-[:OWNED_BY]->(serviceDirector),
-      (technicalSupportApi)-[:OWNED_BY]->(serviceDirector),
       (mobileCustomerApi)-[:OWNED_BY]->(serviceDirector),
-      
-      // Product Manager ownership
-      (erpProductApi)-[:OWNED_BY]->(productManager),
-      (mobileCustomerApi)-[:OWNED_BY]->(productManager),
-      
-      // Quality Manager ownership
-      (qualityTestApi)-[:OWNED_BY]->(qualityManager)
+      (technicalSupportApi)-[:OWNED_BY]->(serviceDirector)
   `)
 
   console.log('Application Interface ownership relationships created successfully.')

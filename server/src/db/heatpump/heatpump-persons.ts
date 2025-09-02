@@ -183,6 +183,7 @@ export async function createHeatPumpCapabilityOwnership(session: Session): Promi
 
   await session.run(`
     MATCH 
+      (company:Company {id: "company-thermo-dynamics-ag"}),
       (ceo:Person {id: "hp-person-ceo"}),
       (cto:Person {id: "hp-person-cto"}),
       (coo:Person {id: "hp-person-coo"}),
@@ -223,7 +224,17 @@ export async function createHeatPumpCapabilityOwnership(session: Session): Promi
       (supplyChain:BusinessCapability {id: "hp-cap-supply-chain"}),
       (qualityMgmt:BusinessCapability {id: "hp-cap-quality-management"}),
       (sustainability:BusinessCapability {id: "hp-cap-sustainability"}),
-      (energyEfficiency:BusinessCapability {id: "hp-cap-energy-efficiency"})
+      (energyEfficiency:BusinessCapability {id: "hp-cap-energy-efficiency"}),
+      
+      // L2 Business Capabilities
+      (strategicPlanning:BusinessCapability {id: "hp-cap-strategic-planning"}),
+      (corporateGovernance:BusinessCapability {id: "hp-cap-corporate-governance"}),
+      (talentManagement:BusinessCapability {id: "hp-cap-talent-management"}),
+      (payrollBenefits:BusinessCapability {id: "hp-cap-payroll-benefits"}),
+      (financialPlanning:BusinessCapability {id: "hp-cap-financial-planning"}),
+      (accountingReporting:BusinessCapability {id: "hp-cap-accounting-reporting"}),
+      (applicationMgmt:BusinessCapability {id: "hp-cap-application-management"}),
+      (infrastructureMgmt:BusinessCapability {id: "hp-cap-infrastructure-management"})
 
     CREATE
       // CEO ownership
@@ -245,6 +256,9 @@ export async function createHeatPumpCapabilityOwnership(session: Session): Promi
       
       // CIO ownership
       (it)-[:OWNED_BY]->(cio),
+      
+      // HR ownership (missing before)
+      (hr)-[:OWNED_BY]->(ceo),
       
       // R&D Director ownership
       (thermalDesign)-[:OWNED_BY]->(rdDirector),
@@ -276,7 +290,52 @@ export async function createHeatPumpCapabilityOwnership(session: Session): Promi
       
       // Sustainability Manager ownership
       (sustainability)-[:OWNED_BY]->(sustainabilityManager),
-      (energyEfficiency)-[:OWNED_BY]->(sustainabilityManager)
+      (energyEfficiency)-[:OWNED_BY]->(sustainabilityManager),
+      
+      // Additional L2 Capability ownership
+      (strategicPlanning)-[:OWNED_BY]->(ceo),
+      (corporateGovernance)-[:OWNED_BY]->(ceo),
+      (talentManagement)-[:OWNED_BY]->(ceo),
+      (payrollBenefits)-[:OWNED_BY]->(cfo),
+      (financialPlanning)-[:OWNED_BY]->(cfo),
+      (accountingReporting)-[:OWNED_BY]->(cfo),
+      (applicationMgmt)-[:OWNED_BY]->(cio),
+      (infrastructureMgmt)-[:OWNED_BY]->(cio),
+      
+      // Company ownership for all capabilities
+      (strategy)-[:OWNED_BY]->(company),
+      (rd)-[:OWNED_BY]->(company),
+      (manufacturing)-[:OWNED_BY]->(company),
+      (sales)-[:OWNED_BY]->(company),
+      (service)-[:OWNED_BY]->(company),
+      (hr)-[:OWNED_BY]->(company),
+      (finance)-[:OWNED_BY]->(company),
+      (it)-[:OWNED_BY]->(company),
+      (thermalDesign)-[:OWNED_BY]->(company),
+      (refrigerantTech)-[:OWNED_BY]->(company),
+      (smartControls)-[:OWNED_BY]->(company),
+      (compressorMfg)-[:OWNED_BY]->(company),
+      (heatExchangerMfg)-[:OWNED_BY]->(company),
+      (systemAssembly)-[:OWNED_BY]->(company),
+      (channelMgmt)-[:OWNED_BY]->(company),
+      (digitalMarketing)-[:OWNED_BY]->(company),
+      (productMgmt)-[:OWNED_BY]->(company),
+      (installation)-[:OWNED_BY]->(company),
+      (maintenance)-[:OWNED_BY]->(company),
+      (remoteMonitoring)-[:OWNED_BY]->(company),
+      (customerSupport)-[:OWNED_BY]->(company),
+      (supplyChain)-[:OWNED_BY]->(company),
+      (qualityMgmt)-[:OWNED_BY]->(company),
+      (sustainability)-[:OWNED_BY]->(company),
+      (energyEfficiency)-[:OWNED_BY]->(company),
+      (strategicPlanning)-[:OWNED_BY]->(company),
+      (corporateGovernance)-[:OWNED_BY]->(company),
+      (talentManagement)-[:OWNED_BY]->(company),
+      (payrollBenefits)-[:OWNED_BY]->(company),
+      (financialPlanning)-[:OWNED_BY]->(company),
+      (accountingReporting)-[:OWNED_BY]->(company),
+      (applicationMgmt)-[:OWNED_BY]->(company),
+      (infrastructureMgmt)-[:OWNED_BY]->(company)
   `)
 
   console.log('Capability ownership relationships created successfully.')

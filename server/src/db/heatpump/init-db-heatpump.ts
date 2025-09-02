@@ -31,6 +31,7 @@ import {
   createHeatPumpApplicationInterfaceOwnership,
   createHeatPumpApplicationInterfaceConnections,
 } from './heatpump-application-interfaces'
+import { createAllHeatPumpRelationships } from './heatpump-relationships'
 
 export async function initHeatPumpScenario(driver: Driver): Promise<void> {
   console.log(
@@ -102,6 +103,9 @@ export async function initHeatPumpScenario(driver: Driver): Promise<void> {
 
     // 1. Application-Interface Connections
     await createHeatPumpApplicationInterfaceConnections(session)
+
+    // 2. Create all cross-entity relationships (capabilities hierarchy, app-capability support, etc.)
+    await createAllHeatPumpRelationships(session)
 
     // ===== PHASE 4: COMPANY ASSOCIATIONS =====
     console.log('\n🏢 Phase 4: Associating all entities with company...')
@@ -211,32 +215,70 @@ export async function testHeatPumpScenario(driver: Driver) {
   const session = driver.session()
 
   try {
-    // Test query: Find all applications supporting thermal capabilities
-    const thermalAppsResult = await session.run(`
-      MATCH (cap:BusinessCapability)<-[:SUPPORTS]-(app:Application)
-      WHERE cap.id STARTS WITH "hp-cap-" AND (cap.name CONTAINS 'Thermal' OR cap.name CONTAINS 'Heat')
-      RETURN cap.name as capability, app.name as application
-      ORDER BY cap.name, app.name
+    // Test: Count all relationship types
+    const relationshipTypesResult = await session.run(`
+      MATCH ()-[r]->()
+      RETURN type(r) as relationship_type, count(r) as count
+      ORDER BY count DESC
     `)
 
-    console.log('\n🌡️ Applications Supporting Thermal Capabilities:')
-    thermalAppsResult.records.forEach(record => {
-      console.log(`   • ${record.get('application')} → ${record.get('capability')}`)
+    console.log('\n📊 Relationship Types in Database:')
+    relationshipTypesResult.records.forEach(record => {
+      console.log(`   • ${record.get('relationship_type')}: ${record.get('count').toNumber()}`)
     })
 
-    // Test query: Company ownership validation
-    const companyEntitiesResult = await session.run(`
-      MATCH (company:Company {id: "company-thermo-dynamics-ag"})<-[r]-(entity)
-      RETURN type(r) as relationship, labels(entity)[0] as entityType, count(entity) as count
-      ORDER BY entityType
+    // Test: Check which nodes actually exist
+    const nodeCountsResult = await session.run(`
+      MATCH (n)
+      RETURN labels(n)[0] as label, count(n) as count
+      ORDER BY count DESC
     `)
 
-    console.log('\n🏢 Company Entity Ownership:')
-    companyEntitiesResult.records.forEach(record => {
-      console.log(
-        `   • ${record.get('entityType')}: ${record.get('count').toNumber()} entities via ${record.get('relationship')}`
-      )
+    console.log('\n�️ Node Types in Database:')
+    nodeCountsResult.records.forEach(record => {
+      console.log(`   • ${record.get('label')}: ${record.get('count').toNumber()}`)
     })
+
+    // Test: Check for missing capabilities that should exist
+    const missingCapabilitiesResult = await session.run(`
+      WITH [
+        "hp-cap-supplier-management", "hp-cap-procurement", "hp-cap-logistics",
+        "hp-cap-sales-execution", "hp-cap-channel-partnership", 
+        "hp-cap-component-production", "hp-cap-heatpump-assembly", "hp-cap-testing-commissioning",
+        "hp-cap-product-innovation", "hp-cap-thermal-research", "hp-cap-efficiency-testing",
+        "hp-cap-installation-services", "hp-cap-maintenance-repair", "hp-cap-remote-monitoring",
+        "hp-cap-quality-assurance", "hp-cap-compliance-management", "hp-cap-cost-management",
+        "hp-cap-market-analysis", "hp-cap-iot-platform-management", "hp-cap-data-analytics",
+        "hp-cap-energy-optimization"
+      ] as expected_caps
+      UNWIND expected_caps as cap_id
+      OPTIONAL MATCH (cap:BusinessCapability {id: cap_id})
+      RETURN cap_id, cap IS NOT NULL as exists
+      ORDER BY exists, cap_id
+    `)
+
+    console.log('\n🔍 Expected Capabilities Check:')
+    missingCapabilitiesResult.records.forEach(record => {
+      const exists = record.get('exists')
+      const status = exists ? '✅' : '❌'
+      console.log(`   ${status} ${record.get('cap_id')}`)
+    })
+
+    // Test: Check application-capability support relationships
+    const appCapSupportResult = await session.run(`
+      MATCH (app:Application)-[:SUPPORTS]->(cap:BusinessCapability)
+      RETURN app.name as application, cap.name as capability
+      ORDER BY app.name, cap.name
+    `)
+
+    console.log('\n🔗 Application-Capability Support Relationships:')
+    if (appCapSupportResult.records.length === 0) {
+      console.log('   ❌ NO SUPPORTS relationships found!')
+    } else {
+      appCapSupportResult.records.forEach(record => {
+        console.log(`   • ${record.get('application')} → ${record.get('capability')}`)
+      })
+    }
   } catch (error) {
     console.error('Error during testing:', error)
   } finally {

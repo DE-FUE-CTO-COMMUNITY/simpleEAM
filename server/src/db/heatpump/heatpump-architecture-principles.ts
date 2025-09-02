@@ -223,26 +223,27 @@ export async function createHeatPumpArchitecturePrincipleOwnership(
 
   const query = `
     // Connect Architecture Principles to Owners and Company
-    MATCH (company:Company {id: "thermo-dynamics-ag"})
-    MATCH (enterpriseArchitect:Person {id: "hp-person-enterprise-architect"})
+    MATCH (company:Company {id: "company-thermo-dynamics-ag"})
+    MATCH (ceo:Person {id: "hp-person-ceo"})
     MATCH (cto:Person {id: "hp-person-cto"})
-    MATCH (dataArchitect:Person {id: "hp-person-data-architect"})
-    MATCH (securityManager:Person {id: "hp-person-security-manager"})
+    MATCH (cio:Person {id: "hp-person-cio"})
+    MATCH (rdDirector:Person {id: "hp-person-rd-director"})
+    MATCH (sustainabilityManager:Person {id: "hp-person-sustainability-manager"})
 
-    // Business Principles - Enterprise Architect ownership
+    // Business Principles - CEO ownership
     MATCH (digitalFirst:ArchitecturePrinciple {id: "hp-principle-digital-first"})
     MATCH (continuousImprovement:ArchitecturePrinciple {id: "hp-principle-continuous-improvement"})
     MATCH (sustainabilityFirst:ArchitecturePrinciple {id: "hp-principle-sustainability"})
     
-    CREATE (digitalFirst)-[:OWNED_BY]->(enterpriseArchitect),
+    CREATE (digitalFirst)-[:OWNED_BY]->(ceo),
            (digitalFirst)-[:OWNED_BY]->(company),
-           (continuousImprovement)-[:OWNED_BY]->(enterpriseArchitect),
+           (continuousImprovement)-[:OWNED_BY]->(ceo),
            (continuousImprovement)-[:OWNED_BY]->(company),
-           (sustainabilityFirst)-[:OWNED_BY]->(enterpriseArchitect),
+           (sustainabilityFirst)-[:OWNED_BY]->(sustainabilityManager),
            (sustainabilityFirst)-[:OWNED_BY]->(company)
 
     // Technical Principles - CTO ownership
-    WITH company, enterpriseArchitect, cto, dataArchitect, securityManager
+    WITH company, ceo, cto, cio, rdDirector, sustainabilityManager
     MATCH (apiFirst:ArchitecturePrinciple {id: "hp-principle-api-first"})
     MATCH (cloudFirst:ArchitecturePrinciple {id: "hp-principle-cloud-first"})
     MATCH (microservicesArchitecture:ArchitecturePrinciple {id: "hp-principle-microservices"})
@@ -266,24 +267,24 @@ export async function createHeatPumpArchitecturePrincipleOwnership(
            (openStandards)-[:OWNED_BY]->(cto),
            (openStandards)-[:OWNED_BY]->(company)
 
-    // Data Principles - Data Architect ownership
-    WITH company, enterpriseArchitect, cto, dataArchitect, securityManager
+    // Data Principles - R&D Director ownership (as data innovation lead)
+    WITH company, ceo, cto, cio, rdDirector, sustainabilityManager
     MATCH (dataUnification:ArchitecturePrinciple {id: "hp-principle-data-unification"})
     MATCH (realTimeAnalytics:ArchitecturePrinciple {id: "hp-principle-real-time-analytics"})
     
-    CREATE (dataUnification)-[:OWNED_BY]->(dataArchitect),
+    CREATE (dataUnification)-[:OWNED_BY]->(rdDirector),
            (dataUnification)-[:OWNED_BY]->(company),
-           (realTimeAnalytics)-[:OWNED_BY]->(dataArchitect),
+           (realTimeAnalytics)-[:OWNED_BY]->(rdDirector),
            (realTimeAnalytics)-[:OWNED_BY]->(company)
 
-    // Security Principles - Security Manager ownership
-    WITH company, enterpriseArchitect, cto, dataArchitect, securityManager
+    // Security Principles - CIO ownership (as IT security lead)
+    WITH company, ceo, cto, cio, rdDirector, sustainabilityManager
     MATCH (zeroTrustSecurity:ArchitecturePrinciple {id: "hp-principle-zero-trust"})
     MATCH (dataProtection:ArchitecturePrinciple {id: "hp-principle-data-protection"})
     
-    CREATE (zeroTrustSecurity)-[:OWNED_BY]->(securityManager),
+    CREATE (zeroTrustSecurity)-[:OWNED_BY]->(cio),
            (zeroTrustSecurity)-[:OWNED_BY]->(company),
-           (dataProtection)-[:OWNED_BY]->(securityManager),
+           (dataProtection)-[:OWNED_BY]->(cio),
            (dataProtection)-[:OWNED_BY]->(company)
   `
 
