@@ -9,6 +9,7 @@ import { useTranslations } from 'next-intl'
 import { useAuth, isArchitect } from '@/lib/auth'
 import { VisibilityState } from '@tanstack/react-table'
 import { GET_PERSONS, CREATE_PERSON, UPDATE_PERSON, DELETE_PERSON } from '@/graphql/person'
+import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import PersonForm, { PersonFormValues } from '@/components/persons/PersonForm'
 
 // Importiere die ausgelagerten Komponenten
@@ -39,9 +40,11 @@ function PersonsPage() {
   const [showNewPersonForm, setShowNewPersonForm] = useState(false)
 
   // Personen laden - Auth-Check erfolgt bereits in layout.tsx
+  const personWhere = useCompanyWhere('company')
   const { loading, error, data, refetch } = useQuery(GET_PERSONS, {
     skip: !authenticated || !initialized,
     fetchPolicy: 'cache-and-network',
+    variables: { where: personWhere },
   })
 
   // Verfügbare Abteilungen und Rollen aus den geladenen Daten extrahieren
@@ -77,7 +80,12 @@ function PersonsPage() {
   const persons = data?.people || []
 
   // Filter-Hook verwenden (Pattern 2)
-  const { filterState, setFilterState, filteredPersons: filteredData, resetFilters } = usePersonFilter({ persons })
+  const {
+    filterState,
+    setFilterState,
+    filteredPersons: filteredData,
+    resetFilters,
+  } = usePersonFilter({ persons })
 
   // Mutation zum Erstellen einer neuen Person
   const [createPerson, { loading: isCreating }] = useMutation(CREATE_PERSON, {

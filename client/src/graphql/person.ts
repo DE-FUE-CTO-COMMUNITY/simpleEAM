@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client'
 
 export const GET_PERSONS_COUNT = gql`
-  query GetPersonsCount {
-    peopleConnection {
+  query GetPersonsCount($where: PersonWhere) {
+    peopleConnection(where: $where) {
       aggregate {
         count {
           nodes
@@ -13,8 +13,8 @@ export const GET_PERSONS_COUNT = gql`
 `
 
 export const GET_PERSONS = gql`
-  query GetPersons {
-    people {
+  query GetPersons($where: PersonWhere) {
+    people(where: $where) {
       id
       firstName
       lastName

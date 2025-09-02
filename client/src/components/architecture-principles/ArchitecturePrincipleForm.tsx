@@ -7,6 +7,7 @@ import { z } from 'zod'
 import { useQuery } from '@apollo/client'
 import { ArchitecturePrinciple, PrincipleCategory, PrinciplePriority } from '../../gql/generated'
 import { GET_PERSONS } from '@/graphql/person'
+import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import { GET_ARCHITECTURES } from '@/graphql/architecture'
 import { GET_APPLICATIONS } from '@/graphql/application'
 import { useCurrentPerson } from '@/hooks/useCurrentPerson'
@@ -60,9 +61,12 @@ const ArchitecturePrincipleForm: React.FC<
 
   // Aktuellen Benutzer als Standard-Owner abrufen
   const { currentPerson } = useCurrentPerson()
+  const personWhere = useCompanyWhere('company')
 
   // Personen laden
-  const { data: personData, loading: personLoading } = useQuery(GET_PERSONS)
+  const { data: personData, loading: personLoading } = useQuery(GET_PERSONS, {
+    variables: { where: personWhere },
+  })
 
   // Architekturen laden
   const { data: architectureData, loading: architectureLoading } = useQuery(GET_ARCHITECTURES)

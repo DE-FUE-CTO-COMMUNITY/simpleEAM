@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { Box, Typography, Button, Card } from '@mui/material'
 import { Add as AddIcon } from '@mui/icons-material'
 import { useQuery, useMutation } from '@apollo/client'
+import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import { useSnackbar } from 'notistack'
 import { useTranslations } from 'next-intl'
 import { useAuth, isArchitect } from '@/lib/auth'
@@ -50,11 +51,12 @@ const ArchitecturesPage = () => {
   const [showNewArchitectureForm, setShowNewArchitectureForm] = useState(false)
 
   // Architekturen laden - Auth-Check erfolgt bereits in layout.tsx
+  const companyWhere = useCompanyWhere('company')
   const { loading, error, data, refetch } = useQuery(GET_ARCHITECTURES, {
     skip: !authenticated || !initialized,
     fetchPolicy: 'cache-and-network',
+    variables: { where: companyWhere },
   })
-
   // Verfügbare Werte aus den geladenen Daten extrahieren
   useEffect(() => {
     if (data?.architectures?.length) {
@@ -99,7 +101,9 @@ const ArchitecturesPage = () => {
   const architectures = data?.architectures || []
 
   // Filter-Hook verwenden (Pattern 2)
-  const { filterState, setFilterState, filteredArchitectures, resetFilters } = useArchitectureFilter({ architectures })
+  const { filterState, setFilterState, filteredArchitectures } = useArchitectureFilter({
+    architectures,
+  })
 
   // Mutation zum Erstellen einer neuen Architektur
   const [createArchitecture, { loading: isCreating }] = useMutation(CREATE_ARCHITECTURE, {

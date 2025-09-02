@@ -39,6 +39,7 @@ import { GET_INFRASTRUCTURES_COUNT } from '@/graphql/infrastructure'
 import { GET_PERSONS_COUNT } from '@/graphql/person'
 import { GET_ARCHITECTURE_PRINCIPLES_COUNT } from '@/graphql/architecturePrinciple'
 import RecentDiagramsSection from '@/components/dashboard/RecentDiagramsSection'
+import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 
 const Dashboard = () => {
   const { authenticated, initialized } = useAuth()
@@ -46,6 +47,13 @@ const Dashboard = () => {
   const { enqueueSnackbar } = useSnackbar()
   const t = useTranslations('dashboard')
   const tCommon = useTranslations('common')
+
+  // Company-Filter für alle Architektur-Elemente
+  const capWhere = useCompanyWhere('company')
+  const appWhere = capWhere
+  const dataWhere = capWhere
+  const archWhere = capWhere
+  const diagWhere = capWhere
 
   // Weiterleitung zum Login, falls nicht authentifiziert
   useEffect(() => {
@@ -60,55 +68,82 @@ const Dashboard = () => {
     data: capabilitiesData,
     loading: capabilitiesLoading,
     error: capabilitiesError,
-  } = useQuery(GET_CAPABILITIES_COUNT, { skip: !authenticated || !initialized })
+  } = useQuery(GET_CAPABILITIES_COUNT, {
+    skip: !authenticated || !initialized,
+    variables: { where: capWhere },
+  })
 
   const {
     data: applicationsData,
     loading: applicationsLoading,
     error: applicationsError,
-  } = useQuery(GET_APPLICATIONS_COUNT, { skip: !authenticated || !initialized })
+  } = useQuery(GET_APPLICATIONS_COUNT, {
+    skip: !authenticated || !initialized,
+    variables: { where: appWhere },
+  })
 
   const {
     data: dataObjectsData,
     loading: dataObjectsLoading,
     error: dataObjectsError,
-  } = useQuery(GET_DATA_OBJECTS_COUNT, { skip: !authenticated || !initialized })
+  } = useQuery(GET_DATA_OBJECTS_COUNT, {
+    skip: !authenticated || !initialized,
+    variables: { where: dataWhere },
+  })
 
   const {
     data: architecturesData,
     loading: architecturesLoading,
     error: architecturesError,
-  } = useQuery(GET_ARCHITECTURES_COUNT, { skip: !authenticated || !initialized })
+  } = useQuery(GET_ARCHITECTURES_COUNT, {
+    skip: !authenticated || !initialized,
+    variables: { where: archWhere },
+  })
 
   const {
     data: diagramsData,
     loading: diagramsLoading,
     error: diagramsError,
-  } = useQuery(GET_DIAGRAMS_COUNT, { skip: !authenticated || !initialized })
+  } = useQuery(GET_DIAGRAMS_COUNT, {
+    skip: !authenticated || !initialized,
+    variables: { where: diagWhere },
+  })
 
   const {
     data: interfacesData,
     loading: interfacesLoading,
     error: interfacesError,
-  } = useQuery(GET_APPLICATION_INTERFACES_COUNT, { skip: !authenticated || !initialized })
+  } = useQuery(GET_APPLICATION_INTERFACES_COUNT, {
+    skip: !authenticated || !initialized,
+    variables: { where: capWhere },
+  })
 
   const {
     data: personsData,
     loading: personsLoading,
     error: personsError,
-  } = useQuery(GET_PERSONS_COUNT, { skip: !authenticated || !initialized })
+  } = useQuery(GET_PERSONS_COUNT, {
+    skip: !authenticated || !initialized,
+    variables: { where: capWhere },
+  })
 
   const {
     data: principlesData,
     loading: principlesLoading,
     error: principlesError,
-  } = useQuery(GET_ARCHITECTURE_PRINCIPLES_COUNT, { skip: !authenticated || !initialized })
+  } = useQuery(GET_ARCHITECTURE_PRINCIPLES_COUNT, {
+    skip: !authenticated || !initialized,
+    variables: { where: capWhere },
+  })
 
   const {
     data: infrastructuresData,
     loading: infrastructuresLoading,
     error: infrastructuresError,
-  } = useQuery(GET_INFRASTRUCTURES_COUNT, { skip: !authenticated || !initialized })
+  } = useQuery(GET_INFRASTRUCTURES_COUNT, {
+    skip: !authenticated || !initialized,
+    variables: { where: capWhere },
+  })
 
   // Fehlerbehandlung
   useEffect(() => {

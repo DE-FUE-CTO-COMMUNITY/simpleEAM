@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client'
 
 export const GET_ARCHITECTURE_PRINCIPLES_COUNT = gql`
-  query GetArchitecturePrinciplesCount {
-    architecturePrinciplesConnection {
+  query GetArchitecturePrinciplesCount($where: ArchitecturePrincipleWhere) {
+    architecturePrinciplesConnection(where: $where) {
       aggregate {
         count {
           nodes
@@ -13,8 +13,8 @@ export const GET_ARCHITECTURE_PRINCIPLES_COUNT = gql`
 `
 
 export const GET_ARCHITECTURE_PRINCIPLES = gql`
-  query GetArchitecturePrinciples {
-    architecturePrinciples {
+  query GetArchitecturePrinciples($where: ArchitecturePrincipleWhere) {
+    architecturePrinciples(where: $where) {
       id
       name
       description

@@ -27,6 +27,7 @@ import ArchitecturePrincipleToolbar from '@/components/architecture-principles/A
 import ArchitecturePrincipleFilterDialog from '@/components/architecture-principles/ArchitecturePrincipleFilterDialog'
 import { useArchitecturePrincipleFilter } from '@/components/architecture-principles/useArchitecturePrincipleFilter'
 import { FilterState } from '@/components/architecture-principles/types'
+import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 
 const ArchitecturePrinciplesPage = () => {
   const { authenticated } = useAuth()
@@ -50,6 +51,7 @@ const ArchitecturePrinciplesPage = () => {
   const [showNewPrincipleForm, setShowNewPrincipleForm] = useState(false)
 
   // GraphQL-Query für Architektur-Prinzipien
+  const companyWhere = useCompanyWhere('company')
   const {
     data: principleData,
     loading,
@@ -58,6 +60,7 @@ const ArchitecturePrinciplesPage = () => {
   } = useQuery(GET_ARCHITECTURE_PRINCIPLES, {
     notifyOnNetworkStatusChange: true,
     errorPolicy: 'all',
+    variables: { where: companyWhere },
   })
 
   // GraphQL-Mutationen
@@ -129,7 +132,8 @@ const ArchitecturePrinciplesPage = () => {
   const principles = principleData?.architecturePrinciples || []
 
   // Filter-Hook verwenden (Pattern 2)
-  const { filterState, setFilterState, filteredPrinciples, resetFilters } = useArchitecturePrincipleFilter({ principles })
+  const { filterState, setFilterState, filteredPrinciples, resetFilters } =
+    useArchitecturePrincipleFilter({ principles })
 
   // Aktive Filter zählen und State aktualisieren
   useEffect(() => {

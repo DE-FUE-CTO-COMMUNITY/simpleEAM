@@ -7,6 +7,7 @@ import { Add as AddIcon } from '@mui/icons-material'
 import { Box, Button, Card, Paper, Typography } from '@mui/material'
 import { SortingState } from '@tanstack/react-table'
 import GenericFilterDialog, { FilterField } from '@/components/common/GenericFilterDialog'
+import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import { isArchitect } from '@/lib/auth'
 import { useSnackbar } from 'notistack'
 
@@ -37,7 +38,10 @@ export default function InfrastructuresPage() {
   const [showNewInfrastructureForm, setShowNewInfrastructureForm] = useState(false)
 
   // GraphQL Queries & Mutations
-  const { data, loading, error, refetch } = useQuery(GET_INFRASTRUCTURES)
+  const companyWhere = useCompanyWhere('company')
+  const { data, loading, error, refetch } = useQuery(GET_INFRASTRUCTURES, {
+    variables: { where: companyWhere },
+  })
   const [createInfrastructure] = useMutation(CREATE_INFRASTRUCTURE)
   const [updateInfrastructure] = useMutation(UPDATE_INFRASTRUCTURE)
   const [deleteInfrastructure] = useMutation(DELETE_INFRASTRUCTURE)

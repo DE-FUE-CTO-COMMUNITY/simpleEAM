@@ -32,6 +32,7 @@ import ApplicationToolbar from '@/components/applications/ApplicationToolbar'
 import ApplicationFilterDialog from '@/components/applications/ApplicationFilterDialog'
 import { useApplicationFilter } from '@/components/applications/useApplicationFilter'
 import { ApplicationType, FilterState } from '@/components/applications/types'
+import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 
 const ApplicationsPage = () => {
   const t = useTranslations('applications')
@@ -47,7 +48,7 @@ const ApplicationsPage = () => {
     columnVisibility,
     onTableReady: persistentOnTableReady,
     onColumnVisibilityChange: handleColumnVisibilityChange,
-    resetColumnVisibility,
+    // resetColumnVisibility,
   } = usePersistentColumnVisibility({
     tableKey: 'applications',
     defaultColumnVisibility: {
@@ -92,9 +93,11 @@ const ApplicationsPage = () => {
   const [showNewApplicationForm, setShowNewApplicationForm] = useState(false)
 
   // Applikationen laden - Auth-Check erfolgt bereits in layout.tsx
+  const companyWhere = useCompanyWhere('company')
   const { loading, error, data, refetch } = useQuery(GET_APPLICATIONS, {
     fetchPolicy: 'cache-and-network',
     notifyOnNetworkStatusChange: true,
+    variables: { where: companyWhere },
   })
 
   // Verfügbare Werte aus den geladenen Daten extrahieren

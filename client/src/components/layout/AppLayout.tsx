@@ -17,6 +17,7 @@ import { CircularProgress, Box } from '@mui/material'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import RootLayout from '@/components/layout/RootLayout'
+import { CompanyProvider } from '@/contexts/CompanyContext'
 import { useLocale } from 'next-intl'
 import dayjs from 'dayjs'
 import 'dayjs/locale/de'
@@ -217,44 +218,46 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             >
               <AuthContext.Provider value={{ keycloak, initialized, authenticated }}>
                 <ApolloProvider client={apolloClient}>
-                  <AutoUserRegistration />
-                  <Box
-                    sx={{
-                      width: '100%',
-                      height: '100vh',
-                      position: 'relative',
-                    }}
-                  >
-                    {!initialized && (
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          position: 'absolute',
-                          top: 0,
-                          left: 0,
-                          width: '100%',
-                          height: '100%',
-                          zIndex: 9999,
-                          bgcolor: 'background.default',
-                        }}
-                      >
-                        <CircularProgress size={40} />
-                      </Box>
-                    )}
-
+                  <CompanyProvider>
+                    <AutoUserRegistration />
                     <Box
                       sx={{
                         width: '100%',
-                        height: '100%',
-                        opacity: initialized ? 1 : 0.3,
-                        transition: 'opacity 0.3s ease-in-out',
+                        height: '100vh',
+                        position: 'relative',
                       }}
                     >
-                      <RootLayout>{children}</RootLayout>
+                      {!initialized && (
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            height: '100%',
+                            zIndex: 9999,
+                            bgcolor: 'background.default',
+                          }}
+                        >
+                          <CircularProgress size={40} />
+                        </Box>
+                      )}
+
+                      <Box
+                        sx={{
+                          width: '100%',
+                          height: '100%',
+                          opacity: initialized ? 1 : 0.3,
+                          transition: 'opacity 0.3s ease-in-out',
+                        }}
+                      >
+                        <RootLayout>{children}</RootLayout>
+                      </Box>
                     </Box>
-                  </Box>
+                  </CompanyProvider>
                 </ApolloProvider>
               </AuthContext.Provider>
             </SnackbarProvider>

@@ -2,8 +2,14 @@ import { gql } from '@apollo/client'
 
 // Query für alle Architektur-Elemente in der Bibliothek
 export const GET_LIBRARY_ELEMENTS = gql`
-  query GetLibraryElements {
-    businessCapabilities {
+  query GetLibraryElements(
+    $capWhere: BusinessCapabilityWhere
+    $appWhere: ApplicationWhere
+    $dataWhere: DataObjectWhere
+    $ifaceWhere: ApplicationInterfaceWhere
+    $infraWhere: InfrastructureWhere
+  ) {
+    businessCapabilities(where: $capWhere) {
       id
       name
       description
@@ -15,7 +21,7 @@ export const GET_LIBRARY_ELEMENTS = gql`
         name
       }
     }
-    applications {
+    applications(where: $appWhere) {
       id
       name
       description
@@ -24,7 +30,7 @@ export const GET_LIBRARY_ELEMENTS = gql`
       vendor
       version
     }
-    dataObjects {
+    dataObjects(where: $dataWhere) {
       id
       name
       description
@@ -35,13 +41,13 @@ export const GET_LIBRARY_ELEMENTS = gql`
       }
       format
     }
-    applicationInterfaces {
+    applicationInterfaces(where: $ifaceWhere) {
       id
       name
       description
       interfaceType
     }
-    infrastructures {
+    infrastructures(where: $infraWhere) {
       id
       name
       description

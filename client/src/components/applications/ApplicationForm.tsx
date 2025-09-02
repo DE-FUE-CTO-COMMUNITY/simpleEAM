@@ -37,6 +37,7 @@ import { useCurrentPerson } from '@/hooks/useCurrentPerson'
 import GenericForm, { FieldConfig, TabConfig } from '../common/GenericForm'
 import { getValidSevenRStrategies } from './timeCategoryDependencies'
 import { isArchitect } from '@/lib/auth'
+import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 
 // Basis-Schema ohne Validierung
 const baseApplicationSchema = z.object({
@@ -318,17 +319,36 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
 
   // Aktuellen Benutzer als Standard-Owner abrufen
   const { currentPerson } = useCurrentPerson()
+  const companyWhere = useCompanyWhere('company')
 
   // Daten laden
-  const { data: personsData, loading: personsLoading } = useQuery(GET_PERSONS)
-  const { data: capabilitiesData, loading: capabilitiesLoading } = useQuery(GET_CAPABILITIES)
-  const { data: dataObjectsData, loading: dataObjectsLoading } = useQuery(GET_DATA_OBJECTS)
-  const { data: interfacesData, loading: interfacesLoading } = useQuery(GET_APPLICATION_INTERFACES)
-  const { data: architecturesData, loading: architecturesLoading } = useQuery(GET_ARCHITECTURES)
-  const { data: diagramsData, loading: diagramsLoading } = useQuery(GET_DIAGRAMS)
-  const { data: principlesData, loading: principlesLoading } = useQuery(GET_ARCHITECTURE_PRINCIPLES)
-  const { data: infrastructuresData, loading: infrastructuresLoading } =
-    useQuery(GET_INFRASTRUCTURES)
+  const { data: personsData, loading: personsLoading } = useQuery(GET_PERSONS, {
+    variables: { where: companyWhere },
+  })
+  const { data: capabilitiesData, loading: capabilitiesLoading } = useQuery(GET_CAPABILITIES, {
+    variables: { where: companyWhere },
+  })
+  const { data: dataObjectsData, loading: dataObjectsLoading } = useQuery(GET_DATA_OBJECTS, {
+    variables: { where: companyWhere },
+  })
+  const { data: interfacesData, loading: interfacesLoading } = useQuery(
+    GET_APPLICATION_INTERFACES,
+    { variables: { where: companyWhere } }
+  )
+  const { data: architecturesData, loading: architecturesLoading } = useQuery(GET_ARCHITECTURES, {
+    variables: { where: companyWhere },
+  })
+  const { data: diagramsData, loading: diagramsLoading } = useQuery(GET_DIAGRAMS, {
+    variables: { where: companyWhere },
+  })
+  const { data: principlesData, loading: principlesLoading } = useQuery(
+    GET_ARCHITECTURE_PRINCIPLES,
+    { variables: { where: companyWhere } }
+  )
+  const { data: infrastructuresData, loading: infrastructuresLoading } = useQuery(
+    GET_INFRASTRUCTURES,
+    { variables: { where: companyWhere } }
+  )
 
   // Standardwerte für das Formular
   const defaultValues: ApplicationFormValues = {

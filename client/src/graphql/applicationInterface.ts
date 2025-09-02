@@ -9,8 +9,8 @@ export const CHECK_APPLICATION_INTERFACE_EXISTS = gql`
 `
 
 export const GET_APPLICATION_INTERFACES_COUNT = gql`
-  query GetApplicationInterfacesCount {
-    applicationInterfacesConnection {
+  query GetApplicationInterfacesCount($where: ApplicationInterfaceWhere) {
+    applicationInterfacesConnection(where: $where) {
       aggregate {
         count {
           nodes
@@ -21,8 +21,8 @@ export const GET_APPLICATION_INTERFACES_COUNT = gql`
 `
 
 export const GET_APPLICATION_INTERFACES = gql`
-  query GetApplicationInterfaces {
-    applicationInterfaces {
+  query GetApplicationInterfaces($where: ApplicationInterfaceWhere) {
+    applicationInterfaces(where: $where) {
       id
       name
       description

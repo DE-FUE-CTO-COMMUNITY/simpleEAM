@@ -30,6 +30,7 @@ import ApplicationInterfaceFilterDialog from '@/components/interfaces/Applicatio
 import { useApplicationInterfaceFilter } from '@/components/interfaces/useApplicationInterfaceFilter'
 import { FilterState } from '@/components/interfaces/types'
 import { DataObject } from '@/gql/generated'
+import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 
 function ApplicationInterfacesPage() {
   const { authenticated, initialized } = useAuth()
@@ -48,27 +49,32 @@ function ApplicationInterfacesPage() {
   const [showNewApplicationInterfaceForm, setShowNewApplicationInterfaceForm] = useState(false)
 
   // Schnittstellen laden - Auth-Check erfolgt bereits in layout.tsx
+  const companyWhere = useCompanyWhere('company')
   const { loading, error, data, refetch } = useQuery(GET_APPLICATION_INTERFACES, {
     skip: !authenticated || !initialized,
     fetchPolicy: 'cache-and-network',
+    variables: { where: companyWhere },
   })
 
-  // Datenobjekte laden für Formular-Auswahlmöglichkeiten
   const { data: dataObjectsData } = useQuery(GET_DATA_OBJECTS, {
     skip: !authenticated || !initialized,
     fetchPolicy: 'cache-and-network',
+    variables: { where: companyWhere },
   })
 
   // Anwendungen laden für Formular-Auswahlmöglichkeiten
   const { data: applicationsData } = useQuery(GET_APPLICATIONS, {
     skip: !authenticated || !initialized,
     fetchPolicy: 'cache-and-network',
+    variables: { where: companyWhere },
   })
 
   // Personen laden für Formular-Auswahlmöglichkeiten
+  const personWhere = useCompanyWhere('company')
   const { data: personsData } = useQuery(GET_PERSONS, {
     skip: !authenticated || !initialized,
     fetchPolicy: 'cache-and-network',
+    variables: { where: personWhere },
   })
 
   const dataObjects = dataObjectsData?.dataObjects || []

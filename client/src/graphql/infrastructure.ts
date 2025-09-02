@@ -9,8 +9,8 @@ export const CHECK_INFRASTRUCTURE_EXISTS = gql`
 `
 
 export const GET_INFRASTRUCTURES_COUNT = gql`
-  query GetInfrastructuresCount {
-    infrastructuresConnection {
+  query GetInfrastructuresCount($where: InfrastructureWhere) {
+    infrastructuresConnection(where: $where) {
       aggregate {
         count {
           nodes
@@ -21,8 +21,8 @@ export const GET_INFRASTRUCTURES_COUNT = gql`
 `
 
 export const GET_INFRASTRUCTURES = gql`
-  query GetInfrastructures {
-    infrastructures {
+  query GetInfrastructures($where: InfrastructureWhere) {
+    infrastructures(where: $where) {
       id
       name
       description

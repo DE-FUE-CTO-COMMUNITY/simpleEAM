@@ -22,6 +22,7 @@ import DataObjectFilterDialog from '@/components/dataobjects/DataObjectFilterDia
 import DataObjectForm, { DataObjectFormValues } from '@/components/dataobjects/DataObjectForm'
 import { useDataObjectFilter } from '@/components/dataobjects/useDataObjectFilter'
 import { DataObject } from '@/gql/generated'
+import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 
 const DataObjectsPage = () => {
   const { authenticated, initialized } = useAuth()
@@ -37,9 +38,11 @@ const DataObjectsPage = () => {
   const [showNewDataObjectForm, setShowNewDataObjectForm] = useState(false)
 
   // GraphQL-Abfrage für Datenobjekte
+  const companyWhere = useCompanyWhere('company')
   const { data, loading, refetch } = useQuery(GET_DATA_OBJECTS, {
     skip: !authenticated || !initialized,
     fetchPolicy: 'cache-and-network',
+    variables: { where: companyWhere },
   })
 
   // GraphQL-Mutationen für Datenobjekte

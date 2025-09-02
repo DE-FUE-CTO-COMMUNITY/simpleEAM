@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client'
 
 export const GET_CAPABILITIES_COUNT = gql`
-  query GetBusinessCapabilitiesCount {
-    businessCapabilitiesConnection {
+  query GetBusinessCapabilitiesCount($where: BusinessCapabilityWhere) {
+    businessCapabilitiesConnection(where: $where) {
       aggregate {
         count {
           nodes
@@ -13,8 +13,8 @@ export const GET_CAPABILITIES_COUNT = gql`
 `
 
 export const GET_CAPABILITIES = gql`
-  query GetCapabilities {
-    businessCapabilities {
+  query GetCapabilities($where: BusinessCapabilityWhere) {
+    businessCapabilities(where: $where) {
       id
       name
       description

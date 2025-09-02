@@ -24,6 +24,7 @@ import { useCurrentPerson } from '@/hooks/useCurrentPerson'
 import GenericForm, { FieldConfig, TabConfig } from '../common/GenericForm'
 import { isArchitect } from '@/lib/auth'
 import { useDomainLabel, useTypeLabel } from './utils'
+import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 
 // Schema für die Formularvalidierung
 export const architectureSchema = z.object({
@@ -79,28 +80,46 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
   const { currentPerson } = useCurrentPerson()
 
   // Personen laden
-  const { data: personData, loading: personLoading } = useQuery(GET_PERSONS)
+  const companyWhere = useCompanyWhere('company')
+  const { data: personData, loading: personLoading } = useQuery(GET_PERSONS, {
+    variables: { where: companyWhere },
+  })
 
   // Applikationen laden
-  const { data: applicationData, loading: applicationLoading } = useQuery(GET_APPLICATIONS)
+  const { data: applicationData, loading: applicationLoading } = useQuery(GET_APPLICATIONS, {
+    variables: { where: companyWhere },
+  })
 
   // Capabilities laden
-  const { data: capabilityData, loading: capabilityLoading } = useQuery(GET_CAPABILITIES)
+  const { data: capabilityData, loading: capabilityLoading } = useQuery(GET_CAPABILITIES, {
+    variables: { where: companyWhere },
+  })
 
   // DataObjects laden
-  const { data: dataObjectData, loading: dataObjectLoading } = useQuery(GET_DATA_OBJECTS)
+  const { data: dataObjectData, loading: dataObjectLoading } = useQuery(GET_DATA_OBJECTS, {
+    variables: { where: companyWhere },
+  })
 
   // Diagramme laden
-  const { data: diagramData, loading: diagramLoading } = useQuery(GET_DIAGRAMS)
+  const { data: diagramData, loading: diagramLoading } = useQuery(GET_DIAGRAMS, {
+    variables: { where: companyWhere },
+  })
 
   // Schnittstellen laden
-  const { data: interfaceData, loading: interfaceLoading } = useQuery(GET_APPLICATION_INTERFACES)
+  const { data: interfaceData, loading: interfaceLoading } = useQuery(GET_APPLICATION_INTERFACES, {
+    variables: { where: companyWhere },
+  })
 
   // Architektur-Prinzipien laden
-  const { data: principleData, loading: principleLoading } = useQuery(GET_ARCHITECTURE_PRINCIPLES)
+  const { data: principleData, loading: principleLoading } = useQuery(GET_ARCHITECTURE_PRINCIPLES, {
+    variables: { where: companyWhere },
+  })
 
   // Infrastruktur laden
-  const { data: infrastructureData, loading: infrastructureLoading } = useQuery(GET_INFRASTRUCTURES)
+  const { data: infrastructureData, loading: infrastructureLoading } = useQuery(
+    GET_INFRASTRUCTURES,
+    { variables: { where: companyWhere } }
+  )
 
   // Formulardaten mit useMemo initialisieren
   const defaultValues = React.useMemo<ArchitectureFormValues>(

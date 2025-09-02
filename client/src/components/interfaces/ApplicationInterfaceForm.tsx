@@ -12,6 +12,7 @@ import {
   Delete as DeleteIcon,
 } from '@mui/icons-material'
 import { GET_PERSONS } from '@/graphql/person'
+import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import { GET_APPLICATIONS } from '@/graphql/application'
 import { GET_ARCHITECTURES } from '@/graphql/architecture'
 import { GET_DIAGRAMS } from '@/graphql/diagram'
@@ -174,6 +175,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
 
   // Aktuellen Benutzer als Standard-Eigentümer abrufen
   const { currentPerson } = useCurrentPerson()
+  const personWhere = useCompanyWhere('company')
 
   // Hilfsfunktion für Interface Type Labels
   const getInterfaceTypeLabel = (type: InterfaceType) => {
@@ -221,20 +223,27 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
   ]
 
   // Daten laden mit cache-and-network Policy für frische Daten
-  const { data: personData, loading: personLoading } = useQuery(GET_PERSONS)
+  const { data: personData, loading: personLoading } = useQuery(GET_PERSONS, {
+    variables: { where: personWhere },
+  })
+  const companyWhere = useCompanyWhere('company')
   const { data: applicationData, loading: applicationLoading } = useQuery(GET_APPLICATIONS, {
     fetchPolicy: 'cache-and-network',
+    variables: { where: companyWhere },
   })
   const { data: architectureData, loading: architectureLoading } = useQuery(GET_ARCHITECTURES, {
     fetchPolicy: 'cache-and-network',
+    variables: { where: companyWhere },
   })
   const { data: diagramsData, loading: diagramsLoading } = useQuery(GET_DIAGRAMS, {
     fetchPolicy: 'cache-and-network',
+    variables: { where: companyWhere },
   })
   const { data: applicationInterfacesData, loading: applicationInterfacesLoading } = useQuery(
     GET_APPLICATION_INTERFACES,
     {
       fetchPolicy: 'cache-and-network',
+      variables: { where: companyWhere },
     }
   )
 

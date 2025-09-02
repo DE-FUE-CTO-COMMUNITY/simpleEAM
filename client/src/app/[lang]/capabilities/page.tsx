@@ -24,6 +24,7 @@ import CapabilityTable, {
 import CapabilityToolbar from '@/components/capabilities/CapabilityToolbar'
 import CapabilityFilterDialog from '@/components/capabilities/CapabilityFilterDialog'
 import { useCapabilityFilter } from '@/components/capabilities/useCapabilityFilter'
+import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 
 const CapabilitiesPage = () => {
   const { authenticated, initialized } = useAuth()
@@ -47,9 +48,11 @@ const CapabilitiesPage = () => {
   const [showNewCapabilityForm, setShowNewCapabilityForm] = useState(false)
 
   // Business Capabilities laden - Auth-Check erfolgt bereits in layout.tsx
+  const companyWhere = useCompanyWhere('company')
   const { loading, error, data, refetch } = useQuery(GET_CAPABILITIES, {
     skip: !authenticated || !initialized,
     fetchPolicy: 'cache-and-network',
+    variables: { where: companyWhere },
   })
 
   // Verfügbare Status und Tags aus den geladenen Daten extrahieren

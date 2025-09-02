@@ -9,8 +9,8 @@ export const CHECK_APPLICATION_EXISTS = gql`
 `
 
 export const GET_APPLICATIONS_COUNT = gql`
-  query GetApplicationsCount {
-    applicationsConnection {
+  query GetApplicationsCount($where: ApplicationWhere) {
+    applicationsConnection(where: $where) {
       aggregate {
         count {
           nodes
@@ -21,8 +21,8 @@ export const GET_APPLICATIONS_COUNT = gql`
 `
 
 export const GET_APPLICATIONS = gql`
-  query GetApplications {
-    applications {
+  query GetApplications($where: ApplicationWhere) {
+    applications(where: $where) {
       id
       name
       description

@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client'
 
 export const GET_ARCHITECTURES_COUNT = gql`
-  query GetArchitecturesCount {
-    architecturesConnection {
+  query GetArchitecturesCount($where: ArchitectureWhere) {
+    architecturesConnection(where: $where) {
       aggregate {
         count {
           nodes
@@ -13,8 +13,8 @@ export const GET_ARCHITECTURES_COUNT = gql`
 `
 
 export const GET_ARCHITECTURES = gql`
-  query GetArchitectures {
-    architectures {
+  query GetArchitectures($where: ArchitectureWhere) {
+    architectures(where: $where) {
       id
       name
       description

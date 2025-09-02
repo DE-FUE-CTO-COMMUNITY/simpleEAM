@@ -6,6 +6,7 @@ import { z } from 'zod'
 import { useQuery } from '@apollo/client'
 import { useTranslations } from 'next-intl'
 import { GET_PERSONS } from '@/graphql/person'
+import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import { GET_APPLICATIONS } from '@/graphql/application'
 import { GET_ARCHITECTURES } from '@/graphql/architecture'
 import { GET_DIAGRAMS } from '@/graphql/diagram'
@@ -99,9 +100,12 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
 
   // Aktuellen Benutzer als Standard-Owner abrufen
   const { currentPerson } = useCurrentPerson()
+  const personWhere = useCompanyWhere('company')
 
   // Personen laden
-  const { data: personData, loading: personLoading } = useQuery(GET_PERSONS)
+  const { data: personData, loading: personLoading } = useQuery(GET_PERSONS, {
+    variables: { where: personWhere },
+  })
 
   // Applikationen laden
   const { data: applicationData, loading: applicationLoading } = useQuery(GET_APPLICATIONS)

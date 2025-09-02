@@ -1,8 +1,18 @@
 import React from 'react'
-import { AppBar, Toolbar, IconButton, Typography, useTheme } from '@mui/material'
+import {
+  AppBar,
+  Toolbar,
+  IconButton,
+  Typography,
+  useTheme,
+  Box,
+  Select,
+  MenuItem,
+} from '@mui/material'
 import { Menu as MenuIcon } from '@mui/icons-material'
 import UserProfileMenu from './UserProfileMenu'
 import ThemeToggleButton from '../ui/ThemeToggleButton'
+import { useCompanyContext } from '@/contexts/CompanyContext'
 
 interface AppHeaderProps {
   open: boolean
@@ -20,6 +30,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
   handleDrawerToggle,
 }) => {
   const theme = useTheme()
+  const { companies, selectedCompanyId, setSelectedCompanyId } = useCompanyContext()
 
   return (
     <AppBar
@@ -44,9 +55,36 @@ const AppHeader: React.FC<AppHeaderProps> = ({
         >
           <MenuIcon />
         </IconButton>
-        <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-          Simple Enterprise Architecture Management
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexGrow: 1, minWidth: 0 }}>
+          <Typography variant="h6" noWrap component="div" sx={{ whiteSpace: 'nowrap' }}>
+            Simple Enterprise Architecture Management
+          </Typography>
+          {/* Company selector: show dropdown if multiple, otherwise static label */}
+          {companies?.length > 1 ? (
+            <Select
+              size="small"
+              value={selectedCompanyId || ''}
+              onChange={e => setSelectedCompanyId(e.target.value as string)}
+              sx={{
+                color: 'inherit',
+                borderColor: 'rgba(255,255,255,0.7)',
+                '& .MuiSelect-icon': { color: 'inherit' },
+                minWidth: 200,
+                bgcolor: 'rgba(255,255,255,0.08)',
+              }}
+            >
+              {companies.map(c => (
+                <MenuItem key={c.id} value={c.id}>
+                  {c.name}
+                </MenuItem>
+              ))}
+            </Select>
+          ) : (
+            <Typography variant="body1" noWrap component="div" sx={{ opacity: 0.9 }}>
+              {companies?.[0]?.name || ''}
+            </Typography>
+          )}
+        </Box>
         <ThemeToggleButton />
         {authenticated && <UserProfileMenu userName={userName} />}
       </Toolbar>

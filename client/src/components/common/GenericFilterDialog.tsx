@@ -25,6 +25,7 @@ import { ClearAll as ClearAllIcon } from '@mui/icons-material'
 import { useQuery } from '@apollo/client'
 import dayjs from 'dayjs'
 import { GET_PERSONS } from '@/graphql/person'
+import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import { Person } from '../../gql/generated'
 import { useTranslations } from 'next-intl'
 
@@ -166,7 +167,10 @@ const GenericFilterDialog: React.FC<GenericFilterProps> = ({
 }) => {
   const t = useTranslations('common')
   // Lade Personen für den PersonSelect-Filter
-  const { data: personsData, loading: personsLoading } = useQuery(GET_PERSONS)
+  const personWhere = useCompanyWhere('company')
+  const { data: personsData, loading: personsLoading } = useQuery(GET_PERSONS, {
+    variables: { where: personWhere },
+  })
   const persons = personsData?.people || []
 
   const handleFilterReset = () => {

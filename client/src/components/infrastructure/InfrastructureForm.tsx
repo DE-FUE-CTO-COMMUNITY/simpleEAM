@@ -16,6 +16,7 @@ import { GET_ARCHITECTURES } from '@/graphql/architecture'
 import { GET_DIAGRAMS } from '@/graphql/diagram'
 import { GET_INFRASTRUCTURES } from '@/graphql/infrastructure'
 import { GET_APPLICATIONS } from '@/graphql/application'
+import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import { useCurrentPerson } from '@/hooks/useCurrentPerson'
 import {
   Infrastructure,
@@ -165,23 +166,31 @@ const InfrastructureForm: React.FC<GenericFormProps<Infrastructure, Infrastructu
     }
   }
 
+  const companyWhere = useCompanyWhere('company')
   // Personen laden
-  const { data: personData, loading: personLoading } = useQuery(GET_PERSONS)
+  const { data: personData, loading: personLoading } = useQuery(GET_PERSONS, {
+    variables: { where: companyWhere },
+  })
   // Applikationen laden
   const { data: applicationsData, loading: applicationsLoading } = useQuery(GET_APPLICATIONS, {
     fetchPolicy: 'cache-and-network',
+    variables: { where: companyWhere },
   })
   // Architekturen laden
-  const { data: architecturesData, loading: architecturesLoading } = useQuery(GET_ARCHITECTURES)
+  const { data: architecturesData, loading: architecturesLoading } = useQuery(GET_ARCHITECTURES, {
+    variables: { where: companyWhere },
+  })
   // Diagramme laden
   const { data: diagramsData, loading: diagramsLoading } = useQuery(GET_DIAGRAMS, {
     fetchPolicy: 'cache-and-network',
+    variables: { where: companyWhere },
   })
   // Infrastrukturen laden (für Parent-Infrastructure)
   const { data: infrastructuresData, loading: infrastructuresLoading } = useQuery(
     GET_INFRASTRUCTURES,
     {
       fetchPolicy: 'cache-and-network',
+      variables: { where: companyWhere },
     }
   )
 

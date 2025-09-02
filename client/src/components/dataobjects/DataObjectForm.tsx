@@ -17,6 +17,7 @@ import { GET_ARCHITECTURES } from '@/graphql/architecture'
 import { GET_CAPABILITIES } from '@/graphql/capability'
 import { GET_DIAGRAMS } from '@/graphql/diagram'
 import { GET_APPLICATION_INTERFACES } from '@/graphql/applicationInterface'
+import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import { useCurrentPerson } from '@/hooks/useCurrentPerson'
 import { DataObject, DataClassification, Architecture } from '../../gql/generated'
 import GenericForm, { FieldConfig } from '../common/GenericForm'
@@ -97,27 +98,36 @@ const DataObjectForm: React.FC<GenericFormProps<DataObject, DataObjectFormValues
   // Aktuellen Benutzer als Standard-Owner abrufen
   const { currentPerson } = useCurrentPerson()
 
+  const companyWhere = useCompanyWhere('company')
   // Personen laden
-  const { data: personData, loading: personLoading } = useQuery(GET_PERSONS)
+  const { data: personData, loading: personLoading } = useQuery(GET_PERSONS, {
+    variables: { where: companyWhere },
+  })
   // Applikationen laden
   const { data: applicationData, loading: applicationLoading } = useQuery(GET_APPLICATIONS, {
     fetchPolicy: 'cache-and-network',
+    variables: { where: companyWhere },
   })
   // Capabilities laden
   const { data: capabilitiesData, loading: capabilitiesLoading } = useQuery(GET_CAPABILITIES, {
     fetchPolicy: 'cache-and-network',
+    variables: { where: companyWhere },
   })
   // Architekturen laden
-  const { data: architecturesData, loading: architecturesLoading } = useQuery(GET_ARCHITECTURES)
+  const { data: architecturesData, loading: architecturesLoading } = useQuery(GET_ARCHITECTURES, {
+    variables: { where: companyWhere },
+  })
   // Diagramme laden
   const { data: diagramsData, loading: diagramsLoading } = useQuery(GET_DIAGRAMS, {
     fetchPolicy: 'cache-and-network',
+    variables: { where: companyWhere },
   })
   // Application Interfaces laden
   const { data: interfacesData, loading: interfacesLoading } = useQuery(
     GET_APPLICATION_INTERFACES,
     {
       fetchPolicy: 'cache-and-network',
+      variables: { where: companyWhere },
     }
   )
 

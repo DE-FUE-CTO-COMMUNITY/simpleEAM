@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client'
 
 export const GET_DIAGRAMS_COUNT = gql`
-  query GetDiagramsCount {
-    diagramsConnection {
+  query GetDiagramsCount($where: DiagramWhere) {
+    diagramsConnection(where: $where) {
       aggregate {
         count {
           nodes
@@ -13,8 +13,8 @@ export const GET_DIAGRAMS_COUNT = gql`
 `
 
 export const GET_RECENT_DIAGRAMS = gql`
-  query GetRecentDiagrams($limit: Int) {
-    diagrams(sort: { updatedAt: DESC }, limit: $limit) {
+  query GetRecentDiagrams($limit: Int, $where: DiagramWhere) {
+    diagrams(sort: { updatedAt: DESC }, limit: $limit, where: $where) {
       id
       title
       description
@@ -39,8 +39,8 @@ export const GET_RECENT_DIAGRAMS = gql`
 `
 
 export const GET_DIAGRAMS = gql`
-  query GetDiagrams {
-    diagrams {
+  query GetDiagrams($where: DiagramWhere) {
+    diagrams(where: $where) {
       id
       title
       description

@@ -9,8 +9,8 @@ export const CHECK_DATA_OBJECT_EXISTS = gql`
 `
 
 export const GET_DATA_OBJECTS_COUNT = gql`
-  query GetDataObjectsCount {
-    dataObjectsConnection {
+  query GetDataObjectsCount($where: DataObjectWhere) {
+    dataObjectsConnection(where: $where) {
       aggregate {
         count {
           nodes
@@ -21,8 +21,8 @@ export const GET_DATA_OBJECTS_COUNT = gql`
 `
 
 export const GET_DATA_OBJECTS = gql`
-  query GetDataObjects {
-    dataObjects {
+  query GetDataObjects($where: DataObjectWhere) {
+    dataObjects(where: $where) {
       id
       name
       description
