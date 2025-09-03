@@ -23,11 +23,13 @@ import DataObjectForm, { DataObjectFormValues } from '@/components/dataobjects/D
 import { useDataObjectFilter } from '@/components/dataobjects/useDataObjectFilter'
 import { DataObject } from '@/gql/generated'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
+import { useCompanyContext } from '@/contexts/CompanyContext'
 
 const DataObjectsPage = () => {
   const { authenticated, initialized } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
   const t = useTranslations('dataObjects')
+  const { selectedCompanyId } = useCompanyContext()
   const [globalFilter, setGlobalFilter] = useState('')
   const [sorting, setSorting] = useState<SortingState>([])
   const [tableInstance, setTableInstance] = useState<any>(null)
@@ -150,6 +152,10 @@ const DataObjectsPage = () => {
   // Handler für das Erstellen eines neuen Datenobjekts
   const handleCreateDataObjectSubmit = async (data: DataObjectFormValues) => {
     try {
+      if (!selectedCompanyId) {
+        enqueueSnackbar('Bitte zuerst ein Unternehmen auswählen.', { variant: 'warning' })
+        return
+      }
       const input = {
         name: data.name,
         description: data.description,
@@ -216,6 +222,14 @@ const DataObjectsPage = () => {
         ...(data.ownerId
           ? { owners: { connect: [{ where: { node: { id: { eq: data.ownerId } } } }] } }
           : {}),
+        // Company-Zuordnung (Pflicht)
+        company: {
+          connect: [
+            {
+              where: { node: { id: { eq: selectedCompanyId } } },
+            },
+          ],
+        },
       }
 
       await createDataObject({
@@ -489,6 +503,7 @@ const DataObjectsPage = () => {
             color="primary"
             startIcon={<AddIcon />}
             onClick={handleCreateDataObject}
+            disabled={!selectedCompanyId}
           >
             {t('addNew')}
           </Button>

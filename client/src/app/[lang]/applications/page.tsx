@@ -33,10 +33,12 @@ import ApplicationFilterDialog from '@/components/applications/ApplicationFilter
 import { useApplicationFilter } from '@/components/applications/useApplicationFilter'
 import { ApplicationType, FilterState } from '@/components/applications/types'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
+import { useCompanyContext } from '@/contexts/CompanyContext'
 
 const ApplicationsPage = () => {
   const t = useTranslations('applications')
   const { enqueueSnackbar } = useSnackbar()
+  const { selectedCompanyId } = useCompanyContext()
   const [globalFilter, setGlobalFilter] = useState<string>('')
   const [sorting, setSorting] = useState([{ id: 'name', desc: false }])
 
@@ -226,6 +228,10 @@ const ApplicationsPage = () => {
 
   // Handler für das Erstellen einer neuen Applikation
   const handleCreateApplicationSubmit = async (data: ApplicationFormValues) => {
+    if (!selectedCompanyId) {
+      enqueueSnackbar('Bitte zuerst ein Unternehmen auswählen.', { variant: 'warning' })
+      return
+    }
     const {
       ownerId,
       supportsCapabilityIds,
@@ -364,6 +370,14 @@ const ApplicationsPage = () => {
             },
           }
         : {}),
+      // Company-Zuordnung (Pflicht)
+      company: {
+        connect: [
+          {
+            where: { node: { id: { eq: selectedCompanyId } } },
+          },
+        ],
+      },
     }
 
     await createApplication({
@@ -669,6 +683,7 @@ const ApplicationsPage = () => {
             color="primary"
             startIcon={<AddIcon />}
             onClick={handleCreateApplication}
+            disabled={!selectedCompanyId}
           >
             {t('addNew')}
           </Button>

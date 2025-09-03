@@ -401,7 +401,7 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
     }
 
     setTitleError(!isTitleValid)
-  setArchitectureError(!isArchitectureValid)
+    setArchitectureError(!isArchitectureValid)
 
     if (!isTitleValid || !isArchitectureValid) {
       return
@@ -481,7 +481,8 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
         creationResult = await createNewElementsInDatabase(
           apolloClient,
           selectedElements,
-          currentPerson?.id
+          currentPerson?.id,
+          selectedCompanyId || undefined
         )
       }
 

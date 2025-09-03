@@ -56,6 +56,46 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   }, [])
 
+  // Cross-Tab Sync: auf Änderungen aus anderen Tabs reagieren
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === STORAGE_KEY) {
+        const newId = e.newValue
+        // Nur aktualisieren, wenn sich der Wert tatsächlich geändert hat
+        if (newId !== selectedCompanyId) {
+          setSelectedCompanyIdState(newId)
+        }
+      }
+    }
+
+    // Beim Tab-Fokus/Visibility-Change ebenfalls mit LocalStorage abgleichen
+    const reconcileFromLocalStorage = () => {
+      try {
+        const current = localStorage.getItem(STORAGE_KEY)
+        if (current !== selectedCompanyId) {
+          setSelectedCompanyIdState(current)
+        }
+      } catch {
+        // noop
+      }
+    }
+
+    window.addEventListener('storage', onStorage)
+    window.addEventListener('focus', reconcileFromLocalStorage)
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') reconcileFromLocalStorage()
+    }
+    document.addEventListener('visibilitychange', onVisibility)
+
+    return () => {
+      window.removeEventListener('storage', onStorage)
+      window.removeEventListener('focus', reconcileFromLocalStorage)
+      document.removeEventListener('visibilitychange', onVisibility)
+    }
+  }, [selectedCompanyId])
+
   // Wenn Companies geladen sind, sinnvolle Vorauswahl treffen und ungültige Auswahl bereinigen
   useEffect(() => {
     if (!companies) return

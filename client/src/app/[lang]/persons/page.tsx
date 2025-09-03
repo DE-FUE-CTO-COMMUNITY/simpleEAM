@@ -18,11 +18,13 @@ import PersonToolbar from '@/components/persons/PersonToolbar'
 import PersonFilterDialog from '@/components/persons/PersonFilterDialog'
 import { usePersonFilter } from '@/components/persons/usePersonFilter'
 import { Person, FilterState } from '@/components/persons/types'
+import { useCompanyContext } from '@/contexts/CompanyContext'
 
 function PersonsPage() {
   const t = useTranslations('persons')
   const { authenticated, initialized } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
+  const { selectedCompanyId } = useCompanyContext()
   const [globalFilter, setGlobalFilter] = useState<string>('')
   const [sorting, setSorting] = useState([{ id: 'lastName', desc: false }])
   const [tableInstance, setTableInstance] = useState<any>(null)
@@ -154,6 +156,18 @@ function PersonsPage() {
       ;(input as any).company = {
         connect: companyIds.map(id => ({ where: { node: { id: { eq: id } } } })),
       }
+    } else if (selectedCompanyId) {
+      // Nicht-Admin: Immer aktuelle Company verbinden
+      ;(input as any).company = {
+        connect: [
+          {
+            where: { node: { id: { eq: selectedCompanyId } } },
+          },
+        ],
+      }
+    } else {
+      enqueueSnackbar('Bitte zuerst ein Unternehmen auswählen.', { variant: 'warning' })
+      return
     }
 
     await createPerson({
@@ -232,6 +246,7 @@ function PersonsPage() {
             color="primary"
             startIcon={<AddIcon />}
             onClick={handleCreatePerson}
+            disabled={!selectedCompanyId && !isAdmin()}
           >
             {t('addNew')}
           </Button>

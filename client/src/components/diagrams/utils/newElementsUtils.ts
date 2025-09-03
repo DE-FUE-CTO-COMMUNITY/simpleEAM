@@ -236,7 +236,8 @@ const extractElementText = (element: DiagramElement, allElements: DiagramElement
 export const createNewElementsInDatabase = async (
   apolloClient: any,
   newElements: NewElement[],
-  currentPersonId?: string
+  currentPersonId?: string,
+  selectedCompanyId?: string
 ): Promise<ElementCreationResult> => {
   const result: ElementCreationResult = {
     success: true,
@@ -262,7 +263,8 @@ export const createNewElementsInDatabase = async (
         apolloClient,
         elementType,
         elements,
-        currentPersonId
+        currentPersonId,
+        selectedCompanyId
       )
       result.createdElements.push(...createdElements)
     } catch (error) {
@@ -281,7 +283,8 @@ const createElementsByType = async (
   apolloClient: any,
   elementType: string,
   elements: NewElement[],
-  currentPersonId?: string
+  currentPersonId?: string,
+  selectedCompanyId?: string
 ): Promise<Array<{ elementId: string; databaseId: string; elementType: string }>> => {
   const input = elements.map(element => {
     const baseInput = {
@@ -294,12 +297,18 @@ const createElementsByType = async (
       ? { owners: { connect: [{ where: { node: { id: { eq: currentPersonId } } } }] } }
       : {}
 
+    // Company-Feld hinzufügen, falls selectedCompanyId verfügbar ist
+    const companyInput = selectedCompanyId
+      ? { company: { connect: [{ where: { node: { id: { eq: selectedCompanyId } } } }] } }
+      : {}
+
     // Add type-specific fields
     switch (elementType) {
       case ELEMENT_TYPES.APPLICATION:
         return {
           ...baseInput,
           ...ownerInput,
+          ...companyInput,
           status: 'ACTIVE',
           criticality: 'MEDIUM',
         }
@@ -307,6 +316,7 @@ const createElementsByType = async (
         return {
           ...baseInput,
           ...ownerInput,
+          ...companyInput,
           maturityLevel: 1,
           businessValue: 5,
           status: 'ACTIVE',
@@ -315,6 +325,7 @@ const createElementsByType = async (
         return {
           ...baseInput,
           ...ownerInput,
+          ...companyInput,
           classification: 'INTERNAL',
           format: 'Nicht spezifiziert',
         }
@@ -330,6 +341,7 @@ const createElementsByType = async (
         return {
           ...baseInput,
           ...ownersInput,
+          ...companyInput,
           interfaceType: 'API',
           protocol: 'HTTP',
           status: 'ACTIVE',
@@ -339,6 +351,7 @@ const createElementsByType = async (
         return {
           ...baseInput,
           ...ownerInput,
+          ...companyInput,
           infrastructureType: element.text.toLowerCase().includes('cloud')
             ? 'CLOUD_DATACENTER'
             : 'ON_PREMISE_DATACENTER',

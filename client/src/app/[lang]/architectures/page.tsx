@@ -28,11 +28,13 @@ import ArchitectureToolbar from '@/components/architectures/ArchitectureToolbar'
 import ArchitectureFilterDialog from '@/components/architectures/ArchitectureFilterDialog'
 import { useArchitectureFilter } from '@/components/architectures/useArchitectureFilter'
 import { ArchitectureType, FilterState } from '@/components/architectures/types'
+import { useCompanyContext } from '@/contexts/CompanyContext'
 
 const ArchitecturesPage = () => {
   const { authenticated, initialized } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
   const t = useTranslations('architectures')
+  const { selectedCompanyId } = useCompanyContext()
   const [globalFilter, setGlobalFilter] = useState<string>('')
   const [sorting, setSorting] = useState([{ id: 'name', desc: false }])
   const [tableInstance, setTableInstance] = useState<any>(null)
@@ -158,6 +160,10 @@ const ArchitecturesPage = () => {
 
   // Handler für das Erstellen einer neuen Architektur
   const handleCreateArchitectureSubmit = async (data: ArchitectureFormValues) => {
+    if (!selectedCompanyId) {
+      enqueueSnackbar('Bitte zuerst ein Unternehmen auswählen.', { variant: 'warning' })
+      return
+    }
     const {
       ownerId,
       containsApplicationIds,
@@ -265,6 +271,14 @@ const ArchitecturesPage = () => {
             },
           }
         : {}),
+      // Company-Zuordnung (Pflicht)
+      company: {
+        connect: [
+          {
+            where: { node: { id: { eq: selectedCompanyId } } },
+          },
+        ],
+      },
     }
 
     await createArchitecture({
@@ -528,6 +542,7 @@ const ArchitecturesPage = () => {
             color="primary"
             startIcon={<AddIcon />}
             onClick={handleCreateArchitecture}
+            disabled={!selectedCompanyId}
           >
             {t('createNew')}
           </Button>

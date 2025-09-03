@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { useCompanyContext } from '@/contexts/CompanyContext'
 import { useSearchParams } from 'next/navigation'
 import { DialogStates, NotificationState } from '../types/DiagramTypes'
 import { isViewer } from '@/lib/auth'
@@ -21,6 +22,9 @@ export const useDiagramState = () => {
   const [lastSavedScene, setLastSavedScene] = useState<any>(null)
   const [selectedElementForRelatedElements, setSelectedElementForRelatedElements] =
     useState<any>(null)
+
+  // Aktuell ausgewählte Company zur Validierung des gespeicherten Diagramms
+  const { selectedCompanyId } = useCompanyContext()
 
   // Track if scene has been restored to prevent multiple restorations
   const sceneRestoredRef = useRef(false)
@@ -87,6 +91,35 @@ export const useDiagramState = () => {
       return () => clearTimeout(timeoutId)
     }
   }, [openDiagramId]) // Scene restoration effect - only restore once when API becomes available
+
+  // Guard: Falls ein gespeichertes Diagramm nicht zur ausgewählten Company gehört, sofort zurücksetzen
+  useEffect(() => {
+    if (!isClient) return
+    if (!selectedCompanyId) return
+    if (!currentDiagram) return
+
+    // Prüfe Zugehörigkeit: Diagramm muss eine Company-Relation mit der ausgewählten Company haben
+    if (!Array.isArray(currentDiagram.company) || currentDiagram.company.length === 0) {
+      // Kein company-Feld vorhanden -> nicht eingreifen (z. B. frisch gespeicherte Diagramme)
+      return
+    }
+
+    const belongsToSelected = currentDiagram.company.some((c: any) => c?.id === selectedCompanyId)
+
+    if (!belongsToSelected) {
+      try {
+        // Szene und Diagramm verwerfen, lokales Storage bereinigen
+        setCurrentDiagram(null)
+        setCurrentScene(null)
+        // Lokalen Speicher bereinigen (nur betroffene Keys, hier direkt entfernen)
+        localStorage.removeItem('excalidraw-current-diagram')
+        localStorage.removeItem('excalidraw-scene')
+        localStorage.removeItem('excalidraw-last-saved-scene')
+      } catch {
+        // noop
+      }
+    }
+  }, [isClient, selectedCompanyId, currentDiagram])
   useEffect(() => {
     if (excalidrawAPI && isClient && currentScene && !sceneRestoredRef.current) {
       // Überspringe Local Storage-Wiederherstellung, wenn ein Diagramm über URL-Parameter geladen werden soll

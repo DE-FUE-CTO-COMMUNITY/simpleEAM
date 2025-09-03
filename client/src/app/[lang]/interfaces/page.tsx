@@ -31,11 +31,13 @@ import { useApplicationInterfaceFilter } from '@/components/interfaces/useApplic
 import { FilterState } from '@/components/interfaces/types'
 import { DataObject } from '@/gql/generated'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
+import { useCompanyContext } from '@/contexts/CompanyContext'
 
 function ApplicationInterfacesPage() {
   const { authenticated, initialized } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
   const t = useTranslations('interfaces')
+  const { selectedCompanyId } = useCompanyContext()
   const [globalFilter, setGlobalFilter] = useState<string>('')
   const [sorting, setSorting] = useState([{ id: 'name', desc: false }])
   const [tableInstance, setTableInstance] = useState<any>(null)
@@ -152,6 +154,10 @@ function ApplicationInterfacesPage() {
 
   // Handler für das Erstellen einer neuen Schnittstelle
   const handleCreateApplicationInterfaceSubmit = async (data: ApplicationInterfaceFormValues) => {
+    if (!selectedCompanyId) {
+      enqueueSnackbar('Bitte zuerst ein Unternehmen auswählen.', { variant: 'warning' })
+      return
+    }
     const input = {
       name: data.name,
       description: data.description,
@@ -235,6 +241,14 @@ function ApplicationInterfacesPage() {
             })),
           }
         : undefined,
+      // Company-Zuordnung (Pflicht)
+      company: {
+        connect: [
+          {
+            where: { node: { id: { eq: selectedCompanyId } } },
+          },
+        ],
+      },
     }
 
     await createApplicationInterface({
@@ -385,6 +399,7 @@ function ApplicationInterfacesPage() {
             color="primary"
             startIcon={<AddIcon />}
             onClick={handleCreateApplicationInterface}
+            disabled={!selectedCompanyId}
           >
             {t('addNew')}
           </Button>

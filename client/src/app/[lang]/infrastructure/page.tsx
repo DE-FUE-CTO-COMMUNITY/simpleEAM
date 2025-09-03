@@ -27,10 +27,12 @@ import {
   UPDATE_INFRASTRUCTURE,
   DELETE_INFRASTRUCTURE,
 } from '@/graphql/infrastructure'
+import { useCompanyContext } from '@/contexts/CompanyContext'
 
 export default function InfrastructuresPage() {
   const t = useTranslations('infrastructure')
   const { enqueueSnackbar } = useSnackbar()
+  const { selectedCompanyId } = useCompanyContext()
   const [sorting, setSorting] = useState<SortingState>([])
   const [globalFilter, setGlobalFilter] = useState('')
   const [tableInstance, setTableInstance] = useState<any>(null)
@@ -73,6 +75,10 @@ export default function InfrastructuresPage() {
   // CRUD Handlers
   const handleCreate = async (data: InfrastructureFormValues) => {
     try {
+      if (!selectedCompanyId) {
+        enqueueSnackbar('Bitte zuerst ein Unternehmen auswählen.', { variant: 'warning' })
+        return
+      }
       const parentId = Array.isArray(data.parentInfrastructure)
         ? data.parentInfrastructure[0]
         : data.parentInfrastructure
@@ -145,6 +151,14 @@ export default function InfrastructuresPage() {
               })),
             },
           }),
+        // Company-Zuordnung (Pflicht)
+        company: {
+          connect: [
+            {
+              where: { node: { id: { eq: selectedCompanyId } } },
+            },
+          ],
+        },
       }
 
       await createInfrastructure({
@@ -334,6 +348,7 @@ export default function InfrastructuresPage() {
             color="primary"
             startIcon={<AddIcon />}
             onClick={() => setShowNewInfrastructureForm(true)}
+            disabled={!selectedCompanyId}
           >
             {t('addNew')}
           </Button>

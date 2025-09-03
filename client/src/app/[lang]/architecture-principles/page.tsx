@@ -28,11 +28,13 @@ import ArchitecturePrincipleFilterDialog from '@/components/architecture-princip
 import { useArchitecturePrincipleFilter } from '@/components/architecture-principles/useArchitecturePrincipleFilter'
 import { FilterState } from '@/components/architecture-principles/types'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
+import { useCompanyContext } from '@/contexts/CompanyContext'
 
 const ArchitecturePrinciplesPage = () => {
   const { authenticated } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
   const t = useTranslations('architecturePrinciples')
+  const { selectedCompanyId } = useCompanyContext()
   const [globalFilter, setGlobalFilter] = useState<string>('')
   const [sorting, setSorting] = useState([{ id: 'name', desc: false }])
   const [tableInstance, setTableInstance] = useState<any>(null)
@@ -156,6 +158,10 @@ const ArchitecturePrinciplesPage = () => {
   // Handler-Funktionen
   const handleCreatePrinciple = async (data: ArchitecturePrincipleFormValues) => {
     try {
+      if (!selectedCompanyId) {
+        enqueueSnackbar('Bitte zuerst ein Unternehmen auswählen.', { variant: 'warning' })
+        return
+      }
       const input = {
         name: data.name,
         description: data.description,
@@ -193,6 +199,14 @@ const ArchitecturePrinciplesPage = () => {
               },
             }
           : {}),
+        // Company-Zuordnung (Pflicht)
+        company: {
+          connect: [
+            {
+              where: { node: { id: { eq: selectedCompanyId } } },
+            },
+          ],
+        },
       }
 
       await createPrincipleMutation({
@@ -302,6 +316,7 @@ const ArchitecturePrinciplesPage = () => {
             color="primary"
             startIcon={<AddIcon />}
             onClick={handleCreatePrincipleClick}
+            disabled={!selectedCompanyId}
           >
             {t('addNew')}
           </Button>

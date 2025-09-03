@@ -25,11 +25,13 @@ import CapabilityToolbar from '@/components/capabilities/CapabilityToolbar'
 import CapabilityFilterDialog from '@/components/capabilities/CapabilityFilterDialog'
 import { useCapabilityFilter } from '@/components/capabilities/useCapabilityFilter'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
+import { useCompanyContext } from '@/contexts/CompanyContext'
 
 const CapabilitiesPage = () => {
   const { authenticated, initialized } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
   const t = useTranslations('capabilities')
+  const { selectedCompanyId } = useCompanyContext()
   const [globalFilter, setGlobalFilter] = useState<string>('')
   const [sorting, setSorting] = useState([{ id: 'name', desc: false }])
   const [tableInstance, setTableInstance] = useState<any>(null)
@@ -138,6 +140,10 @@ const CapabilitiesPage = () => {
 
   // Handler für das Erstellen einer neuen Business Capability
   const handleCreateCapabilitySubmit = async (data: CapabilityFormValues) => {
+    if (!selectedCompanyId) {
+      enqueueSnackbar('Bitte zuerst ein Unternehmen auswählen.', { variant: 'warning' })
+      return
+    }
     const {
       parentId: parent,
       ownerId,
@@ -208,6 +214,14 @@ const CapabilitiesPage = () => {
             },
           }
         : {}),
+      // Company-Zuordnung (Pflicht)
+      company: {
+        connect: [
+          {
+            where: { node: { id: { eq: selectedCompanyId } } },
+          },
+        ],
+      },
     }
 
     await createCapability({
@@ -381,6 +395,7 @@ const CapabilitiesPage = () => {
             color="primary"
             startIcon={<AddIcon />}
             onClick={handleCreateCapability}
+            disabled={!selectedCompanyId}
           >
             {t('addNew')}
           </Button>
