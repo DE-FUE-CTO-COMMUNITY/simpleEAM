@@ -6,6 +6,7 @@ type JWT @jwt {
   preferred_username: String
   email: String
   roles: [String!]! @jwtClaim(path: "realm_access.roles")
+  company_ids: [String!] @jwtClaim(path: "company_ids")
 }
 
 extend schema @authentication
@@ -17,8 +18,18 @@ type BusinessCapability
   @node
   @authorization(
     validate: [
-      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "architect" } } } }
+      { operations: [CREATE], where: { jwt: { roles: { includes: "architect" } } } }
+      { operations: [UPDATE, DELETE], where: { AND: [
+        { jwt: { roles: { includes: "architect" } } },
+  { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+      ] } }
       { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "admin" } } } }
+    ]
+    filter: [
+      { where: { OR: [
+        { jwt: { roles: { includes: "admin" } } },
+        { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+      ] } }
     ]
   ) {
   id: ID! @id
@@ -53,9 +64,20 @@ type Person
   @node
   @authorization(
     validate: [
-      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "architect" } } } }
+      { operations: [CREATE], where: { jwt: { roles: { includes: "architect" } } } }
+      { operations: [UPDATE, DELETE], where: { AND: [
+        { jwt: { roles: { includes: "architect" } } },
+  { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+      ] } }
       { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "admin" } } } }
       { operations: [CREATE, UPDATE], where: { node: { email: { eq: "$jwt.email" } } } }
+    ]
+    filter: [
+      { where: { OR: [
+        { jwt: { roles: { includes: "admin" } } },
+        { node: { company: { some: { id_IN: "$jwt.company_ids" } } } },
+        { node: { email: { eq: "$jwt.email" } } }
+      ] } }
     ]
   ) {
   id: ID! @id
@@ -86,8 +108,18 @@ type Application
   @node
   @authorization(
     validate: [
-      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "architect" } } } }
+      { operations: [CREATE], where: { jwt: { roles: { includes: "architect" } } } }
+      { operations: [UPDATE, DELETE], where: { AND: [
+        { jwt: { roles: { includes: "architect" } } },
+  { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+      ] } }
       { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "admin" } } } }
+    ]
+    filter: [
+      { where: { OR: [
+        { jwt: { roles: { includes: "admin" } } },
+        { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+      ] } }
     ]
   ) {
   id: ID! @id
@@ -137,8 +169,18 @@ type ApplicationInterface
   @node
   @authorization(
     validate: [
-      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "architect" } } } }
+      { operations: [CREATE], where: { jwt: { roles: { includes: "architect" } } } }
+      { operations: [UPDATE, DELETE], where: { AND: [
+        { jwt: { roles: { includes: "architect" } } },
+  { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+      ] } }
       { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "admin" } } } }
+    ]
+    filter: [
+      { where: { OR: [
+        { jwt: { roles: { includes: "admin" } } },
+        { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+      ] } }
     ]
   ) {
   id: ID! @id
@@ -174,8 +216,18 @@ type DataObject
   @node
   @authorization(
     validate: [
-      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "architect" } } } }
+      { operations: [CREATE], where: { jwt: { roles: { includes: "architect" } } } }
+      { operations: [UPDATE, DELETE], where: { AND: [
+        { jwt: { roles: { includes: "architect" } } },
+  { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+      ] } }
       { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "admin" } } } }
+    ]
+    filter: [
+      { where: { OR: [
+        { jwt: { roles: { includes: "admin" } } },
+        { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+      ] } }
     ]
   ) {
   id: ID! @id
@@ -208,8 +260,18 @@ type Infrastructure
   @node
   @authorization(
     validate: [
-      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "architect" } } } }
+      { operations: [CREATE], where: { jwt: { roles: { includes: "architect" } } } }
+      { operations: [UPDATE, DELETE], where: { AND: [
+        { jwt: { roles: { includes: "architect" } } },
+  { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+      ] } }
       { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "admin" } } } }
+    ]
+    filter: [
+      { where: { OR: [
+        { jwt: { roles: { includes: "admin" } } },
+        { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+      ] } }
     ]
   ) {
   id: ID! @id
@@ -252,8 +314,18 @@ type AIAsset
   @node
   @authorization(
     validate: [
-      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "architect" } } } }
+      { operations: [CREATE], where: { jwt: { roles: { includes: "architect" } } } }
+      { operations: [UPDATE, DELETE], where: { AND: [
+        { jwt: { roles: { includes: "architect" } } },
+  { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+      ] } }
       { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "admin" } } } }
+    ]
+    filter: [
+      { where: { OR: [
+        { jwt: { roles: { includes: "admin" } } },
+        { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+      ] } }
     ]
   ) {
   id: ID! @id
@@ -292,8 +364,18 @@ type Company
   @node
   @authorization(
     validate: [
-      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "architect" } } } }
+      { operations: [CREATE], where: { jwt: { roles: { includes: "architect" } } } }
+      { operations: [UPDATE, DELETE], where: { AND: [
+        { jwt: { roles: { includes: "architect" } } },
+        { node: { id_IN: "$jwt.company_ids" } }
+      ] } }
       { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "admin" } } } }
+    ]
+    filter: [
+      { where: { OR: [
+        { jwt: { roles: { includes: "admin" } } },
+        { node: { id_IN: "$jwt.company_ids" } }
+      ] } }
     ]
   ) {
   id: ID! @id
@@ -326,8 +408,18 @@ type Organisation
   @node
   @authorization(
     validate: [
-      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "architect" } } } }
+      { operations: [CREATE], where: { jwt: { roles: { includes: "architect" } } } }
+      { operations: [UPDATE, DELETE], where: { AND: [
+        { jwt: { roles: { includes: "architect" } } },
+  { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+      ] } }
       { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "admin" } } } }
+    ]
+    filter: [
+      { where: { OR: [
+        { jwt: { roles: { includes: "admin" } } },
+        { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+      ] } }
     ]
   ) {
   id: ID! @id
