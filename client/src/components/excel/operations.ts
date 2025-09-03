@@ -32,7 +32,8 @@ export const importEntityDataWithMapping = async (
   entityType: string,
   _skipRelationships: boolean = false,
   format: 'xlsx' | 'json' = 'xlsx',
-  onProgress?: (progress: number) => void
+  onProgress?: (progress: number) => void,
+  selectedCompanyId?: string
 ): Promise<ImportWithMappingResult> => {
   const mutations = getMutationsByEntityType(entityType)
   if (!mutations) {
@@ -87,6 +88,27 @@ export const importEntityDataWithMapping = async (
         entityMappings[originalId] = row.id
         imported++
       } else {
+        // Inject company relationship on create
+        if (selectedCompanyId) {
+          const companyConnect = {
+            connect: [{ where: { node: { id: { eq: selectedCompanyId } } } }],
+          }
+          switch (entityType) {
+            case 'businessCapabilities':
+            case 'applications':
+            case 'dataObjects':
+            case 'interfaces':
+            case 'persons':
+            case 'architectures':
+            case 'diagrams':
+            case 'architecturePrinciples':
+            case 'infrastructures':
+              input = { ...input, company: companyConnect }
+              break
+            default:
+              break
+          }
+        }
         const result = await client.mutate({
           mutation: createMutation,
           variables: {
@@ -159,7 +181,8 @@ export const handleMultiTabImport = async (
   client: ApolloClient<any>,
   file: File,
   format: 'xlsx' | 'json',
-  onProgress?: (progress: number) => void
+  onProgress?: (progress: number) => void,
+  selectedCompanyId?: string
 ): Promise<{ totalImported: number; importResults: ImportResult[] }> => {
   let allData: { [tabName: string]: any[] } = {}
 
@@ -205,7 +228,8 @@ export const handleMultiTabImport = async (
             if (onProgress) {
               onProgress(Math.round(phaseProgress))
             }
-          }
+          },
+          selectedCompanyId
         )
         allEntityMappings[entityType] = entityMappings
         totalImported += imported
@@ -302,7 +326,8 @@ export const handleSingleTabImport = async (
   file: File,
   entityType: string,
   format: 'xlsx' | 'json',
-  onProgress?: (progress: number) => void
+  onProgress?: (progress: number) => void,
+  selectedCompanyId?: string
 ): Promise<{ imported: number; validationResult: any }> => {
   let data: any[] = []
 
@@ -321,12 +346,13 @@ export const handleSingleTabImport = async (
     entityType,
     true,
     format,
-    itemProgress => {
+  itemProgress => {
       const phaseProgress = (itemProgress / 100) * 70
       if (onProgress) {
         onProgress(Math.round(phaseProgress))
       }
-    }
+  },
+  selectedCompanyId
   )
 
   // Phase 2: Update Beziehungen (30% of progress)
@@ -361,30 +387,55 @@ export const handleSingleTabImport = async (
 export const exportEntityData = async (
   apolloClient: ApolloClient<any>,
   entityType: string,
-  format: 'xlsx' | 'csv' | 'json'
+  format: 'xlsx' | 'csv' | 'json',
+  selectedCompanyId?: string
 ): Promise<void> => {
   try {
+    // Company-Name für Dateiname auflösen (optional)
+    let companySuffix = ''
+    if (selectedCompanyId) {
+      try {
+        const { GET_COMPANIES } = await import('../../graphql/company')
+        const res = await apolloClient.query({
+          query: GET_COMPANIES,
+          variables: { where: { id: { eq: selectedCompanyId } } },
+          fetchPolicy: 'cache-first',
+        })
+        const name = res.data?.companies?.[0]?.name as string | undefined
+        if (name) {
+          const safe = name.replace(/[^a-z0-9-_]+/gi, '_')
+          companySuffix = `_Company-${safe}`
+        }
+      } catch {
+        // Ignoriere Fehler bei der Namensauflösung
+      }
+    }
     if (entityType === 'all') {
       // Multi-Entity Export mit formatspezifischer Datenauswahl
       if (format === 'json') {
-        const { fetchAllDataForJson } = await import('../../utils/jsonDataService')
+  const { fetchAllDataForJson } = await import('../../utils/jsonDataService')
         const { exportToJson } = await import('../../utils/jsonUtils')
-        const allData = await fetchAllDataForJson(apolloClient)
+        const allData = await fetchAllDataForJson(apolloClient, selectedCompanyId)
 
         const timestamp = formatTimestampForFilename()
         exportToJson(allData, {
-          filename: `SimpleEAM_Complete_Export_${timestamp}`,
+          filename: `SimpleEAM_Complete_Export${companySuffix}_${timestamp}`,
           pretty: true,
         })
       } else {
         // Excel/CSV Export
         const { fetchDataByEntityTypeAndFormat } = await import('../../utils/excelDataService')
         const { exportMultiTabToExcel } = await import('../../utils/excelUtils')
-        const allData = await fetchDataByEntityTypeAndFormat(apolloClient, 'all', format)
+        const allData = await fetchDataByEntityTypeAndFormat(
+          apolloClient,
+          'all',
+          format,
+          selectedCompanyId
+        )
 
         if (format === 'xlsx') {
           await exportMultiTabToExcel(allData as { [tabName: string]: any[] }, {
-            filename: 'SimpleEAM_Complete_Export',
+            filename: `SimpleEAM_Complete_Export${companySuffix}`,
             format: 'xlsx',
             includeHeaders: true,
           })
@@ -404,12 +455,16 @@ export const exportEntityData = async (
         infrastructures: 'Infrastructure',
       }
 
-      const filename = `${entityTypeLabels[entityType] || entityType}_Export`
+  const filename = `${entityTypeLabels[entityType] || entityType}_Export${companySuffix}`
 
       if (format === 'json') {
         const { fetchDataByEntityTypeForJson } = await import('../../utils/jsonDataService')
         const { exportToJson } = await import('../../utils/jsonUtils')
-        const data = await fetchDataByEntityTypeForJson(apolloClient, entityType as any)
+        const data = await fetchDataByEntityTypeForJson(
+          apolloClient,
+          entityType as any,
+          selectedCompanyId
+        )
 
         const timestamp = formatTimestampForFilename()
         exportToJson(data, {
@@ -423,7 +478,8 @@ export const exportEntityData = async (
         const data = (await fetchDataByEntityTypeAndFormat(
           apolloClient,
           entityType as any,
-          format
+          format,
+          selectedCompanyId
         )) as any[]
 
         if (format === 'xlsx') {

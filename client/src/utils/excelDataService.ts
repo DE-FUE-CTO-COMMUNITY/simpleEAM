@@ -25,6 +25,20 @@ export type EntityType =
   | 'infrastructures'
   | 'all'
 
+// Hilfsfunktion: Company-Filter (inkl. Diagramm-OR-Sonderfall)
+const companyWhere = (entityType: EntityType, companyId?: string): any | undefined => {
+  if (!companyId) return undefined
+  if (entityType === 'diagrams') {
+    return {
+      OR: [
+        { company: { some: { id: { eq: companyId } } } },
+        { architecture: { some: { company: { some: { id: { eq: companyId } } } } } },
+      ],
+    }
+  }
+  return { company: { some: { id: { eq: companyId } } } }
+}
+
 /**
  * Formatiert ein Datum in ISO-Format für re-import-fähigen Export
  */
@@ -44,11 +58,13 @@ const formatDateForExport = (dateValue: string | Date | null | undefined): strin
  * Verwendet GraphQL-Feldnamen als Spaltenüberschriften und IDs für Relationen
  */
 export const fetchBusinessCapabilitiesForExport = async (
-  client: ApolloClient<any>
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
 ): Promise<ExcelExportData[]> => {
   try {
     const { data } = await client.query({
       query: GET_CAPABILITIES,
+      variables: { where: companyWhere('businessCapabilities', selectedCompanyId) },
       fetchPolicy: 'network-only',
     })
 
@@ -89,11 +105,13 @@ export const fetchBusinessCapabilitiesForExport = async (
  * Verwendet GraphQL-Feldnamen als Spaltenüberschriften und IDs für Relationen
  */
 export const fetchApplicationsForExport = async (
-  client: ApolloClient<any>
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
 ): Promise<ExcelExportData[]> => {
   try {
     const { data } = await client.query({
       query: GET_APPLICATIONS,
+      variables: { where: companyWhere('applications', selectedCompanyId) },
       fetchPolicy: 'network-only',
     })
 
@@ -144,11 +162,13 @@ export const fetchApplicationsForExport = async (
  * Verwendet GraphQL-Feldnamen als Spaltenüberschriften und IDs für Relationen
  */
 export const fetchDataObjectsForExport = async (
-  client: ApolloClient<any>
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
 ): Promise<ExcelExportData[]> => {
   try {
     const { data } = await client.query({
       query: GET_DATA_OBJECTS,
+      variables: { where: companyWhere('dataObjects', selectedCompanyId) },
       fetchPolicy: 'network-only',
     })
 
@@ -185,11 +205,13 @@ export const fetchDataObjectsForExport = async (
  * Verwendet GraphQL-Feldnamen als Spaltenüberschriften und IDs für Relationen
  */
 export const fetchInterfacesForExport = async (
-  client: ApolloClient<any>
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
 ): Promise<ExcelExportData[]> => {
   try {
     const { data } = await client.query({
       query: GET_APPLICATION_INTERFACES,
+      variables: { where: companyWhere('interfaces', selectedCompanyId) },
       fetchPolicy: 'network-only',
     })
 
@@ -230,11 +252,13 @@ export const fetchInterfacesForExport = async (
  * Verwendet GraphQL-Feldnamen als Spaltenüberschriften und IDs für Relationen
  */
 export const fetchPersonsForExport = async (
-  client: ApolloClient<any>
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
 ): Promise<ExcelExportData[]> => {
   try {
     const { data } = await client.query({
       query: GET_PERSONS,
+      variables: { where: companyWhere('persons', selectedCompanyId) },
       fetchPolicy: 'network-only',
     })
 
@@ -266,11 +290,13 @@ export const fetchPersonsForExport = async (
  * Verwendet GraphQL-Feldnamen als Spaltenüberschriften und IDs für Relationen
  */
 export const fetchArchitecturesForExport = async (
-  client: ApolloClient<any>
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
 ): Promise<ExcelExportData[]> => {
   try {
     const { data } = await client.query({
       query: GET_ARCHITECTURES,
+      variables: { where: companyWhere('architectures', selectedCompanyId) },
       fetchPolicy: 'network-only',
     })
 
@@ -310,11 +336,13 @@ export const fetchArchitecturesForExport = async (
  * Verwendet GraphQL-Feldnamen als Spaltenüberschriften und IDs für Relationen
  */
 export const fetchDiagramsForExport = async (
-  client: ApolloClient<any>
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
 ): Promise<ExcelExportData[]> => {
   try {
     const { data } = await client.query({
       query: GET_DIAGRAMS,
+      variables: { where: companyWhere('diagrams', selectedCompanyId) },
       fetchPolicy: 'network-only',
     })
 
@@ -349,11 +377,13 @@ export const fetchDiagramsForExport = async (
  * DiagramJson wird ausgeschlossen, da es zu groß für Excel-Zellen ist
  */
 export const fetchDiagramsForExcelExport = async (
-  client: ApolloClient<any>
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
 ): Promise<ExcelExportData[]> => {
   try {
     const { data } = await client.query({
       query: GET_DIAGRAMS,
+      variables: { where: companyWhere('diagrams', selectedCompanyId) },
       fetchPolicy: 'network-only',
     })
 
@@ -388,11 +418,13 @@ export const fetchDiagramsForExcelExport = async (
  * Verwendet GraphQL-Feldnamen als Spaltenüberschriften und IDs für Relationen
  */
 export const fetchArchitecturePrinciplesForExport = async (
-  client: ApolloClient<any>
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
 ): Promise<ExcelExportData[]> => {
   try {
     const { data } = await client.query({
       query: GET_ARCHITECTURE_PRINCIPLES,
+      variables: { where: companyWhere('architecturePrinciples', selectedCompanyId) },
       fetchPolicy: 'network-only',
     })
 
@@ -428,11 +460,13 @@ export const fetchArchitecturePrinciplesForExport = async (
  * Verwendet GraphQL-Feldnamen als Spaltenüberschriften und IDs für Relationen
  */
 export const fetchInfrastructuresForExport = async (
-  client: ApolloClient<any>
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
 ): Promise<ExcelExportData[]> => {
   try {
     const { data } = await client.query({
       query: GET_INFRASTRUCTURES,
+      variables: { where: companyWhere('infrastructures', selectedCompanyId) },
       fetchPolicy: 'network-only',
     })
 
@@ -479,7 +513,8 @@ export const fetchInfrastructuresForExport = async (
  * Hinweis: Diagramme werden beim Excel-Export ausgeblendet, da die JSON-Daten zu groß sind
  */
 export const fetchAllEntitiesForExport = async (
-  client: ApolloClient<any>
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
 ): Promise<{ [tabName: string]: ExcelExportData[] }> => {
   try {
     const [
@@ -493,15 +528,15 @@ export const fetchAllEntitiesForExport = async (
       architecturePrinciples,
       infrastructures,
     ] = await Promise.all([
-      fetchBusinessCapabilitiesForExport(client),
-      fetchApplicationsForExport(client),
-      fetchDataObjectsForExport(client),
-      fetchInterfacesForExport(client),
-      fetchPersonsForExport(client),
-      fetchArchitecturesForExport(client),
-      fetchDiagramsForExport(client), // Für JSON-Export verfügbar
-      fetchArchitecturePrinciplesForExport(client),
-      fetchInfrastructuresForExport(client),
+      fetchBusinessCapabilitiesForExport(client, selectedCompanyId),
+      fetchApplicationsForExport(client, selectedCompanyId),
+      fetchDataObjectsForExport(client, selectedCompanyId),
+      fetchInterfacesForExport(client, selectedCompanyId),
+      fetchPersonsForExport(client, selectedCompanyId),
+      fetchArchitecturesForExport(client, selectedCompanyId),
+      fetchDiagramsForExport(client, selectedCompanyId), // Für JSON-Export verfügbar
+      fetchArchitecturePrinciplesForExport(client, selectedCompanyId),
+      fetchInfrastructuresForExport(client, selectedCompanyId),
     ])
 
     return {
@@ -525,7 +560,8 @@ export const fetchAllEntitiesForExport = async (
  * Diagrams werden mit allen Metadaten aber ohne diagramJson exportiert
  */
 export const fetchAllEntitiesForExcelExport = async (
-  client: ApolloClient<any>
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
 ): Promise<{ [tabName: string]: ExcelExportData[] }> => {
   try {
     const [
@@ -539,15 +575,15 @@ export const fetchAllEntitiesForExcelExport = async (
       architecturePrinciples,
       infrastructures,
     ] = await Promise.all([
-      fetchBusinessCapabilitiesForExport(client),
-      fetchApplicationsForExport(client),
-      fetchDataObjectsForExport(client),
-      fetchInterfacesForExport(client),
-      fetchPersonsForExport(client),
-      fetchArchitecturesForExport(client),
-      fetchDiagramsForExcelExport(client), // Ohne diagramJson
-      fetchArchitecturePrinciplesForExport(client),
-      fetchInfrastructuresForExport(client),
+      fetchBusinessCapabilitiesForExport(client, selectedCompanyId),
+      fetchApplicationsForExport(client, selectedCompanyId),
+      fetchDataObjectsForExport(client, selectedCompanyId),
+      fetchInterfacesForExport(client, selectedCompanyId),
+      fetchPersonsForExport(client, selectedCompanyId),
+      fetchArchitecturesForExport(client, selectedCompanyId),
+      fetchDiagramsForExcelExport(client, selectedCompanyId), // Ohne diagramJson
+      fetchArchitecturePrinciplesForExport(client, selectedCompanyId),
+      fetchInfrastructuresForExport(client, selectedCompanyId),
     ])
 
     return {
@@ -581,29 +617,30 @@ export const fetchDataByEntityType = async (
     | 'diagrams'
     | 'architecturePrinciples'
     | 'infrastructures'
-    | 'all'
+    | 'all',
+  selectedCompanyId?: string
 ): Promise<ExcelExportData[] | { [tabName: string]: ExcelExportData[] }> => {
   switch (entityType) {
     case 'businessCapabilities':
-      return fetchBusinessCapabilitiesForExport(client)
+      return fetchBusinessCapabilitiesForExport(client, selectedCompanyId)
     case 'applications':
-      return fetchApplicationsForExport(client)
+      return fetchApplicationsForExport(client, selectedCompanyId)
     case 'dataObjects':
-      return fetchDataObjectsForExport(client)
+      return fetchDataObjectsForExport(client, selectedCompanyId)
     case 'interfaces':
-      return fetchInterfacesForExport(client)
+      return fetchInterfacesForExport(client, selectedCompanyId)
     case 'persons':
-      return fetchPersonsForExport(client)
+      return fetchPersonsForExport(client, selectedCompanyId)
     case 'architectures':
-      return fetchArchitecturesForExport(client)
+      return fetchArchitecturesForExport(client, selectedCompanyId)
     case 'diagrams':
-      return fetchDiagramsForExport(client)
+      return fetchDiagramsForExport(client, selectedCompanyId)
     case 'architecturePrinciples':
-      return fetchArchitecturePrinciplesForExport(client)
+      return fetchArchitecturePrinciplesForExport(client, selectedCompanyId)
     case 'infrastructures':
-      return fetchInfrastructuresForExport(client)
+      return fetchInfrastructuresForExport(client, selectedCompanyId)
     case 'all':
-      return fetchAllEntitiesForExport(client)
+      return fetchAllEntitiesForExport(client, selectedCompanyId)
     default:
       throw new Error(`Unbekannter Entity-Typ: ${entityType}`)
   }
@@ -624,27 +661,28 @@ export const fetchDataByEntityTypeAndFormat = async (
     | 'architecturePrinciples'
     | 'infrastructures'
     | 'all',
-  _format: 'xlsx' | 'csv'
+  _format: 'xlsx' | 'csv',
+  selectedCompanyId?: string
 ): Promise<ExcelExportData[] | { [tabName: string]: ExcelExportData[] }> => {
   switch (entityType) {
     case 'businessCapabilities':
-      return fetchBusinessCapabilitiesForExport(client)
+      return fetchBusinessCapabilitiesForExport(client, selectedCompanyId)
     case 'applications':
-      return fetchApplicationsForExport(client)
+      return fetchApplicationsForExport(client, selectedCompanyId)
     case 'dataObjects':
-      return fetchDataObjectsForExport(client)
+      return fetchDataObjectsForExport(client, selectedCompanyId)
     case 'interfaces':
-      return fetchInterfacesForExport(client)
+      return fetchInterfacesForExport(client, selectedCompanyId)
     case 'persons':
-      return fetchPersonsForExport(client)
+      return fetchPersonsForExport(client, selectedCompanyId)
     case 'architectures':
-      return fetchArchitecturesForExport(client)
+      return fetchArchitecturesForExport(client, selectedCompanyId)
     case 'architecturePrinciples':
-      return fetchArchitecturePrinciplesForExport(client)
+      return fetchArchitecturePrinciplesForExport(client, selectedCompanyId)
     case 'infrastructures':
-      return fetchInfrastructuresForExport(client)
+      return fetchInfrastructuresForExport(client, selectedCompanyId)
     case 'all':
-      return fetchAllEntitiesForExcelExport(client)
+      return fetchAllEntitiesForExcelExport(client, selectedCompanyId)
     default:
       throw new Error(`Unbekannter Entity-Typ: ${entityType}`)
   }

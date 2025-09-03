@@ -14,6 +14,7 @@ import { Info as InfoIcon } from '@mui/icons-material'
 import { useTranslations } from 'next-intl'
 
 import { ExportSettings } from './types'
+import { useCompanyContext } from '@/contexts/CompanyContext'
 import { entityTypeLabels } from './constants'
 
 interface ExportDialogProps {
@@ -30,6 +31,8 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
   const t = useTranslations('importExport.export')
   const tEntityTypes = useTranslations('importExport.entityTypes')
   const tFileFormats = useTranslations('importExport.fileFormats')
+  const { selectedCompanyId, companies } = useCompanyContext()
+  const selectedCompanyName = companies.find(c => c.id === selectedCompanyId)?.name
   return (
     <Box sx={{ p: 2 }}>
       <Grid container spacing={3} sx={{ width: '100%' }}>
@@ -38,6 +41,14 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
             <Typography variant="h6" gutterBottom>
               {t('title')}
             </Typography>
+
+            <Alert severity="info" icon={<InfoIcon />} sx={{ mb: 2 }}>
+              <Typography variant="body2">
+                {selectedCompanyName
+                  ? `Export wird auf die ausgewählte Company gefiltert: ${selectedCompanyName}`
+                  : 'Export wird auf die ausgewählte Company gefiltert.'}
+              </Typography>
+            </Alert>
 
             <Grid container spacing={2}>
               <Grid size={6}>

@@ -20,6 +20,7 @@ import { useApolloClient } from '@apollo/client'
 import { useTranslations } from 'next-intl'
 import { clearDiagramStorage } from '../diagrams/utils/DiagramStorageUtils'
 import { isAdmin } from '@/lib/auth'
+import { useCompanyContext } from '@/contexts/CompanyContext'
 
 // Import der Tab-Komponenten
 import ImportDialog from './ImportDialog'
@@ -62,6 +63,7 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
   const apolloClient = useApolloClient()
   const t = useTranslations('importExport')
   const tEntityTypes = useTranslations('importExport.entityTypes')
+  const { selectedCompanyId } = useCompanyContext()
 
   // State Management
   const [currentTab, setCurrentTab] = useState<'import' | 'export' | 'management'>(defaultTab)
@@ -234,7 +236,8 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
           importSettings.format,
           progress => {
             setImportProgress(progress)
-          }
+          },
+          selectedCompanyId ?? undefined
         )
         totalImported = result.totalImported
       } else {
@@ -245,7 +248,8 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
           importSettings.format,
           progress => {
             setImportProgress(progress)
-          }
+          },
+          selectedCompanyId ?? undefined
         )
         totalImported = result.imported
       }
@@ -282,7 +286,12 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
   const handleExport = async () => {
     setIsExporting(true)
     try {
-      await exportEntityData(apolloClient, exportSettings.entityType, exportSettings.format)
+      await exportEntityData(
+        apolloClient,
+        exportSettings.entityType,
+        exportSettings.format,
+        selectedCompanyId ?? undefined
+      )
       enqueueSnackbar(
         t('export.messages.exportSuccess', {
           entityType: tEntityTypes(exportSettings.entityType) || exportSettings.entityType,
@@ -542,7 +551,11 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
                   disabled={
                     isImporting ||
                     validationResult.errors.length > 0 ||
-                    validationResult.summary.validRows === 0
+                    validationResult.summary.validRows === 0 ||
+                    !selectedCompanyId
+                  }
+                  title={
+                    !selectedCompanyId ? 'Bitte zuerst eine Company auswählen' : undefined
                   }
                   startIcon={isImporting ? <CircularProgress size={20} /> : <UploadIcon />}
                 >

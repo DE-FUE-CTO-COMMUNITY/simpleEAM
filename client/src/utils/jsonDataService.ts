@@ -28,6 +28,20 @@ export type JsonEntityType =
   | 'architecturePrinciples'
   | 'infrastructures'
 
+// Hilfsfunktion: Company-Filter (inkl. Diagramm-OR-Sonderfall)
+const companyWhere = (entityType: JsonEntityType | 'all', companyId?: string): any | undefined => {
+  if (!companyId) return undefined
+  if (entityType === 'diagrams') {
+    return {
+      OR: [
+        { company: { some: { id: { eq: companyId } } } },
+        { architecture: { some: { company: { some: { id: { eq: companyId } } } } } },
+      ],
+    }
+  }
+  return { company: { some: { id: { eq: companyId } } } }
+}
+
 export interface ValidationError {
   row: number
   field: string
@@ -54,11 +68,13 @@ const formatDateForJsonExport = (date: string | null | undefined): string => {
  * Holt Business Capabilities für JSON-Export mit vollständigen Daten
  */
 export const fetchBusinessCapabilitiesForJson = async (
-  client: ApolloClient<any>
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
 ): Promise<JsonExportData[]> => {
   try {
     const { data } = await client.query({
       query: GET_CAPABILITIES,
+      variables: { where: companyWhere('businessCapabilities', selectedCompanyId) },
       fetchPolicy: 'cache-first',
     })
 
@@ -97,11 +113,13 @@ export const fetchBusinessCapabilitiesForJson = async (
  * Holt Applications für JSON-Export mit vollständigen Daten
  */
 export const fetchApplicationsForJson = async (
-  client: ApolloClient<any>
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
 ): Promise<JsonExportData[]> => {
   try {
     const { data } = await client.query({
       query: GET_APPLICATIONS,
+      variables: { where: companyWhere('applications', selectedCompanyId) },
       fetchPolicy: 'cache-first',
     })
 
@@ -153,11 +171,13 @@ export const fetchApplicationsForJson = async (
  * Holt Data Objects für JSON-Export mit vollständigen Daten
  */
 export const fetchDataObjectsForJson = async (
-  client: ApolloClient<any>
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
 ): Promise<JsonExportData[]> => {
   try {
     const { data } = await client.query({
       query: GET_DATA_OBJECTS,
+      variables: { where: companyWhere('dataObjects', selectedCompanyId) },
       fetchPolicy: 'cache-first',
     })
 
@@ -192,11 +212,13 @@ export const fetchDataObjectsForJson = async (
  * Holt Interfaces für JSON-Export mit vollständigen Daten
  */
 export const fetchInterfacesForJson = async (
-  client: ApolloClient<any>
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
 ): Promise<JsonExportData[]> => {
   try {
     const { data } = await client.query({
       query: GET_APPLICATION_INTERFACES,
+      variables: { where: companyWhere('interfaces', selectedCompanyId) },
       fetchPolicy: 'cache-first',
     })
 
@@ -233,10 +255,14 @@ export const fetchInterfacesForJson = async (
 /**
  * Holt Persons für JSON-Export mit vollständigen Daten
  */
-export const fetchPersonsForJson = async (client: ApolloClient<any>): Promise<JsonExportData[]> => {
+export const fetchPersonsForJson = async (
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
+): Promise<JsonExportData[]> => {
   try {
     const { data } = await client.query({
       query: GET_PERSONS,
+      variables: { where: companyWhere('persons', selectedCompanyId) },
       fetchPolicy: 'cache-first',
     })
 
@@ -271,11 +297,13 @@ export const fetchPersonsForJson = async (client: ApolloClient<any>): Promise<Js
  * Holt Architectures für JSON-Export mit vollständigen Daten
  */
 export const fetchArchitecturesForJson = async (
-  client: ApolloClient<any>
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
 ): Promise<JsonExportData[]> => {
   try {
     const { data } = await client.query({
       query: GET_ARCHITECTURES,
+      variables: { where: companyWhere('architectures', selectedCompanyId) },
       fetchPolicy: 'cache-first',
     })
 
@@ -310,11 +338,13 @@ export const fetchArchitecturesForJson = async (
  * Holt Diagrams für JSON-Export mit vollständigen Daten (inklusive diagramJson)
  */
 export const fetchDiagramsForJson = async (
-  client: ApolloClient<any>
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
 ): Promise<JsonExportData[]> => {
   try {
     const { data } = await client.query({
       query: GET_DIAGRAMS,
+      variables: { where: companyWhere('diagrams', selectedCompanyId) },
       fetchPolicy: 'cache-first',
     })
 
@@ -345,11 +375,13 @@ export const fetchDiagramsForJson = async (
  * Holt Architecture Principles für JSON-Export mit vollständigen Daten
  */
 export const fetchArchitecturePrinciplesForJson = async (
-  client: ApolloClient<any>
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
 ): Promise<JsonExportData[]> => {
   try {
     const { data } = await client.query({
       query: GET_ARCHITECTURE_PRINCIPLES,
+      variables: { where: companyWhere('architecturePrinciples', selectedCompanyId) },
       fetchPolicy: 'cache-first',
     })
 
@@ -379,11 +411,13 @@ export const fetchArchitecturePrinciplesForJson = async (
  * Holt Infrastructures für JSON-Export mit vollständigen Daten
  */
 export const fetchInfrastructuresForJson = async (
-  client: ApolloClient<any>
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
 ): Promise<JsonExportData[]> => {
   try {
     const { data } = await client.query({
       query: GET_INFRASTRUCTURES,
+      variables: { where: companyWhere('infrastructures', selectedCompanyId) },
       fetchPolicy: 'cache-first',
     })
 
@@ -425,7 +459,8 @@ export const fetchInfrastructuresForJson = async (
  * Holt alle Daten für JSON-Export mit vollständigen Beziehungsinformationen
  */
 export const fetchAllDataForJson = async (
-  client: ApolloClient<any>
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
 ): Promise<{ [tabName: string]: JsonExportData[] }> => {
   try {
     const [
@@ -439,15 +474,15 @@ export const fetchAllDataForJson = async (
       architecturePrinciples,
       infrastructures,
     ] = await Promise.all([
-      fetchBusinessCapabilitiesForJson(client),
-      fetchApplicationsForJson(client),
-      fetchDataObjectsForJson(client),
-      fetchInterfacesForJson(client),
-      fetchPersonsForJson(client),
-      fetchArchitecturesForJson(client),
-      fetchDiagramsForJson(client),
-      fetchArchitecturePrinciplesForJson(client),
-      fetchInfrastructuresForJson(client),
+      fetchBusinessCapabilitiesForJson(client, selectedCompanyId),
+      fetchApplicationsForJson(client, selectedCompanyId),
+      fetchDataObjectsForJson(client, selectedCompanyId),
+      fetchInterfacesForJson(client, selectedCompanyId),
+      fetchPersonsForJson(client, selectedCompanyId),
+      fetchArchitecturesForJson(client, selectedCompanyId),
+      fetchDiagramsForJson(client, selectedCompanyId),
+      fetchArchitecturePrinciplesForJson(client, selectedCompanyId),
+      fetchInfrastructuresForJson(client, selectedCompanyId),
     ])
 
     return {
@@ -472,31 +507,32 @@ export const fetchAllDataForJson = async (
  */
 export const fetchDataByEntityTypeForJson = async (
   client: ApolloClient<any>,
-  entityType: JsonEntityType | 'all'
+  entityType: JsonEntityType | 'all',
+  selectedCompanyId?: string
 ): Promise<JsonExportData[] | { [tabName: string]: JsonExportData[] }> => {
   if (entityType === 'all') {
-    return await fetchAllDataForJson(client)
+    return await fetchAllDataForJson(client, selectedCompanyId)
   }
 
   switch (entityType) {
     case 'businessCapabilities':
-      return await fetchBusinessCapabilitiesForJson(client)
+      return await fetchBusinessCapabilitiesForJson(client, selectedCompanyId)
     case 'applications':
-      return await fetchApplicationsForJson(client)
+      return await fetchApplicationsForJson(client, selectedCompanyId)
     case 'dataObjects':
-      return await fetchDataObjectsForJson(client)
+      return await fetchDataObjectsForJson(client, selectedCompanyId)
     case 'interfaces':
-      return await fetchInterfacesForJson(client)
+      return await fetchInterfacesForJson(client, selectedCompanyId)
     case 'persons':
-      return await fetchPersonsForJson(client)
+      return await fetchPersonsForJson(client, selectedCompanyId)
     case 'architectures':
-      return await fetchArchitecturesForJson(client)
+      return await fetchArchitecturesForJson(client, selectedCompanyId)
     case 'diagrams':
-      return await fetchDiagramsForJson(client)
+      return await fetchDiagramsForJson(client, selectedCompanyId)
     case 'architecturePrinciples':
-      return await fetchArchitecturePrinciplesForJson(client)
+      return await fetchArchitecturePrinciplesForJson(client, selectedCompanyId)
     case 'infrastructures':
-      return await fetchInfrastructuresForJson(client)
+      return await fetchInfrastructuresForJson(client, selectedCompanyId)
     default:
       throw new Error(`Unbekannter Entity-Type: ${entityType}`)
   }
