@@ -190,7 +190,8 @@ const ApplicationsPage = () => {
   const [createApplication, { loading: isCreating }] = useMutation(CREATE_APPLICATION, {
     onCompleted: () => {
       enqueueSnackbar(t('messages.createSuccess'), { variant: 'success' })
-      refetch()
+      // Refetch mit aktivem Company-Filter, damit neu erstellte App sofort sichtbar ist
+      refetch({ where: companyWhere })
     },
     onError: error => {
       enqueueSnackbar(`${t('messages.createError')}: ${error.message}`, {
@@ -382,6 +383,14 @@ const ApplicationsPage = () => {
 
     await createApplication({
       variables: { input: [input] },
+      // Sicherheitshalber: aktualisiere auch die Liste im Cache via Refetch Query mit Filter
+      refetchQueries: [
+        {
+          query: GET_APPLICATIONS,
+          variables: { where: companyWhere },
+        },
+      ],
+      awaitRefetchQueries: true,
     })
 
     // Formular nach dem Erstellen schließen
@@ -776,7 +785,7 @@ const ApplicationsPage = () => {
               __typename: 'Application',
             } as unknown as Application
           }
-          loading={loading || applications.length === 0}
+          loading={isCreating}
         />
       )}
     </Box>

@@ -229,46 +229,52 @@ const ArchitecturePrinciplesPage = () => {
 
   const handleUpdatePrinciple = async (id: string, data: ArchitecturePrincipleFormValues) => {
     try {
-      const input = {
-        name: data.name,
-        description: data.description,
-        category: data.category,
-        priority: data.priority,
-        rationale: data.rationale || '',
-        implications: data.implications || '',
-        tags: data.tags || [],
-        isActive: data.isActive,
+      const input: Record<string, any> = {
+        // Scalar-Felder als Mutations-Wrapper übergeben
+        name: { set: data.name },
+        description: { set: data.description },
+        category: { set: data.category },
+        priority: { set: data.priority },
+        rationale: { set: data.rationale || '' },
+        implications: { set: data.implications || '' },
+        tags: { set: data.tags || [] },
+        isActive: { set: data.isActive },
         // Aktualisierung der Owner-Beziehung
-        owners: data.ownerId
-          ? {
-              disconnect: [{ where: {} }],
-              connect: [{ where: { node: { id: { eq: data.ownerId } } } }],
-            }
-          : { disconnect: [{ where: {} }] },
+        owners:
+          data.ownerId && data.ownerId !== ''
+            ? {
+                disconnect: [{ where: {} }],
+                connect: [{ where: { node: { id: { eq: data.ownerId } } } }],
+              }
+            : { disconnect: [{ where: {} }] },
         // Aktualisierung der Architecture-Beziehungen
-        appliedInArchitectures: {
-          disconnect: [{ where: {} }],
-          connect:
-            data.appliedInArchitectureIds && data.appliedInArchitectureIds.length > 0
-              ? data.appliedInArchitectureIds.map(archId => ({
+        appliedInArchitectures:
+          data.appliedInArchitectureIds && data.appliedInArchitectureIds.length > 0
+            ? {
+                disconnect: [{ where: {} }],
+                connect: data.appliedInArchitectureIds.map(archId => ({
                   where: { node: { id: { eq: archId } } },
-                }))
-              : [],
-        },
+                })),
+              }
+            : { disconnect: [{ where: {} }] },
         // Aktualisierung der Application-Beziehungen
-        implementedByApplications: {
-          disconnect: [{ where: {} }],
-          connect:
-            data.implementedByApplicationIds && data.implementedByApplicationIds.length > 0
-              ? data.implementedByApplicationIds.map(appId => ({
+        implementedByApplications:
+          data.implementedByApplicationIds && data.implementedByApplicationIds.length > 0
+            ? {
+                disconnect: [{ where: {} }],
+                connect: data.implementedByApplicationIds.map(appId => ({
                   where: { node: { id: { eq: appId } } },
-                }))
-              : [],
-        },
+                })),
+              }
+            : { disconnect: [{ where: {} }] },
       }
 
       await updatePrincipleMutation({
         variables: { id, input },
+        awaitRefetchQueries: true,
+        refetchQueries: [
+          { query: GET_ARCHITECTURE_PRINCIPLES, variables: { where: companyWhere } },
+        ],
       })
     } catch (error) {
       console.error('Fehler beim Aktualisieren des Architektur-Prinzips:', error)
