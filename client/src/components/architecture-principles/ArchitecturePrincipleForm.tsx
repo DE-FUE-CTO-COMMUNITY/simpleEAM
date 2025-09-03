@@ -68,11 +68,14 @@ const ArchitecturePrincipleForm: React.FC<
     variables: { where: personWhere },
   })
 
-  // Architekturen laden
-  const { data: architectureData, loading: architectureLoading } = useQuery(GET_ARCHITECTURES)
-
-  // Applikationen laden
-  const { data: applicationData, loading: applicationLoading } = useQuery(GET_APPLICATIONS)
+  // Architekturen und Applikationen nur innerhalb der ausgewählten Company laden
+  const companyWhere = useCompanyWhere('company')
+  const { data: architectureData, loading: architectureLoading } = useQuery(GET_ARCHITECTURES, {
+    variables: { where: companyWhere },
+  })
+  const { data: applicationData, loading: applicationLoading } = useQuery(GET_APPLICATIONS, {
+    variables: { where: companyWhere },
+  })
 
   // Formulardaten mit useMemo initialisieren
   const defaultValues = React.useMemo<ArchitecturePrincipleFormValues>(

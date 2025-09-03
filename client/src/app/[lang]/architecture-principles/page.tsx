@@ -69,9 +69,12 @@ const ArchitecturePrinciplesPage = () => {
   const [createPrincipleMutation, { loading: isCreating }] = useMutation(
     CREATE_ARCHITECTURE_PRINCIPLE,
     {
-      refetchQueries: [{ query: GET_ARCHITECTURE_PRINCIPLES }],
+      // Nach CREATE die Liste mit dem aktuellen Company-Filter zuverlässig neu laden
+      refetchQueries: [{ query: GET_ARCHITECTURE_PRINCIPLES, variables: { where: companyWhere } }],
       onCompleted: () => {
         enqueueSnackbar('Architektur-Prinzip erfolgreich erstellt', { variant: 'success' })
+        // Zusätzlich sicherstellen, dass die aktive Query neu lädt
+        refetch()
       },
       onError: error => {
         console.error('Fehler beim Erstellen des Architektur-Prinzips:', error)
@@ -81,9 +84,11 @@ const ArchitecturePrinciplesPage = () => {
   )
 
   const [updatePrincipleMutation] = useMutation(UPDATE_ARCHITECTURE_PRINCIPLE, {
-    refetchQueries: [{ query: GET_ARCHITECTURE_PRINCIPLES }],
+    // Nach UPDATE die Liste mit dem aktuellen Company-Filter zuverlässig neu laden
+    refetchQueries: [{ query: GET_ARCHITECTURE_PRINCIPLES, variables: { where: companyWhere } }],
     onCompleted: () => {
       enqueueSnackbar('Architektur-Prinzip erfolgreich aktualisiert', { variant: 'success' })
+      refetch()
     },
     onError: error => {
       console.error('Fehler beim Aktualisieren des Architektur-Prinzips:', error)
@@ -92,9 +97,11 @@ const ArchitecturePrinciplesPage = () => {
   })
 
   const [deletePrincipleMutation] = useMutation(DELETE_ARCHITECTURE_PRINCIPLE, {
-    refetchQueries: [{ query: GET_ARCHITECTURE_PRINCIPLES }],
+    // Nach DELETE die Liste mit dem aktuellen Company-Filter zuverlässig neu laden
+    refetchQueries: [{ query: GET_ARCHITECTURE_PRINCIPLES, variables: { where: companyWhere } }],
     onCompleted: () => {
       enqueueSnackbar('Architektur-Prinzip erfolgreich gelöscht', { variant: 'success' })
+      refetch()
     },
     onError: error => {
       console.error('Fehler beim Löschen des Architektur-Prinzips:', error)
