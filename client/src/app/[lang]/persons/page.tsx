@@ -22,7 +22,7 @@ import { useCompanyContext } from '@/contexts/CompanyContext'
 
 function PersonsPage() {
   const t = useTranslations('persons')
-  const { authenticated, initialized } = useAuth()
+  const { authenticated, initialized, keycloak } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
   const { selectedCompanyId } = useCompanyContext()
   const [globalFilter, setGlobalFilter] = useState<string>('')
@@ -102,9 +102,25 @@ function PersonsPage() {
 
   // Mutation zum Erstellen einer neuen Person
   const [createPerson, { loading: isCreating }] = useMutation(CREATE_PERSON, {
-    onCompleted: () => {
+    onCompleted: async res => {
       enqueueSnackbar(t('messages.createSuccess'), { variant: 'success' })
       refetch()
+      // Nach erfolgreichem Erstellen: company_ids in Keycloak anhand der E-Mail synchronisieren
+      try {
+        const email: string | undefined = res?.createPeople?.people?.[0]?.email
+        if (email && isAdmin() && keycloak?.token) {
+          await fetch('/api/admin/sync-company-ids/by-email', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${keycloak.token}`,
+            },
+            body: JSON.stringify({ email }),
+          })
+        }
+      } catch (e) {
+        console.error('Fehler bei company_ids Sync (create):', e)
+      }
     },
     onError: error => {
       enqueueSnackbar(t('messages.createError') + `: ${error.message}`, {
@@ -115,9 +131,25 @@ function PersonsPage() {
 
   // Mutation zum Aktualisieren einer bestehenden Person
   const [updatePerson] = useMutation(UPDATE_PERSON, {
-    onCompleted: () => {
+    onCompleted: async res => {
       enqueueSnackbar(t('messages.updateSuccess'), { variant: 'success' })
       refetch()
+      // Nach erfolgreichem Update: company_ids in Keycloak anhand der (ggf. geänderten) E-Mail synchronisieren
+      try {
+        const email: string | undefined = res?.updatePeople?.people?.[0]?.email
+        if (email && isAdmin() && keycloak?.token) {
+          await fetch('/api/admin/sync-company-ids/by-email', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${keycloak.token}`,
+            },
+            body: JSON.stringify({ email }),
+          })
+        }
+      } catch (e) {
+        console.error('Fehler bei company_ids Sync (update):', e)
+      }
     },
     onError: error => {
       enqueueSnackbar(t('messages.updateError') + `: ${error.message}`, {
@@ -153,12 +185,14 @@ function PersonsPage() {
     // Admin: Companies zuordnen (optional)
     if (isAdmin() && (data as any).companyIds && (data as any).companyIds.length > 0) {
       const companyIds: string[] = (data as any).companyIds
-      ;(input as any).company = {
+      const inputAny = input as any
+      inputAny.company = {
         connect: companyIds.map(id => ({ where: { node: { id: { eq: id } } } })),
       }
     } else if (selectedCompanyId) {
       // Nicht-Admin: Immer aktuelle Company verbinden
-      ;(input as any).company = {
+      const inputAny = input as any
+      inputAny.company = {
         connect: [
           {
             where: { node: { id: { eq: selectedCompanyId } } },
@@ -193,13 +227,14 @@ function PersonsPage() {
     // Admin: Company-Zuordnung setzen (ersetzen)
     if (isAdmin()) {
       const companyIds: string[] = ((data as any).companyIds || []) as string[]
-      ;(input as any).company = [
+      const inputAny = input as any
+      inputAny.company = [
         {
           disconnect: [{ where: {} }],
         },
       ]
       if (companyIds.length > 0) {
-        ;(input as any).company.push({
+        inputAny.company.push({
           connect: companyIds.map(id => ({ where: { node: { id: { eq: id } } } })),
         })
       }

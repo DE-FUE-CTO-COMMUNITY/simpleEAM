@@ -177,6 +177,55 @@ export default function UserManagement() {
     severity: 'success' as 'success' | 'error',
   })
 
+  // Bulk-Sync company_ids für alle Benutzer
+  const syncAllCompanyIds = async () => {
+    try {
+      if (!keycloak?.token) {
+        throw new Error(t('notAuthenticated'))
+      }
+
+      setKeycloakLoading(true)
+
+      const response = await fetch('/api/admin/sync-company-ids', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${keycloak.token}`,
+        },
+      })
+
+      const text = await response.text()
+      if (!response.ok) {
+        throw new Error(
+          text || t('apiError', { status: response.status, statusText: response.statusText })
+        )
+      }
+
+      let payload: any
+      try {
+        payload = JSON.parse(text)
+      } catch {
+        payload = { message: text }
+      }
+
+      const updated = payload?.updated ?? 0
+      const failed = payload?.failed ?? 0
+      const skipped = payload?.skipped ?? 0
+
+      setSnackbar({
+        open: true,
+        message: t('syncSummary', { updated, skipped, failed }),
+        severity: failed > 0 ? 'error' : 'success',
+      })
+
+      // Liste neu laden, um neue Attribute zu sehen
+      await loadKeycloakUsers()
+    } catch (e: any) {
+      setSnackbar({ open: true, message: e?.message || t('syncFailed'), severity: 'error' })
+    } finally {
+      setKeycloakLoading(false)
+    }
+  }
+
   // Keycloak Benutzer laden
   const loadKeycloakUsers = useCallback(async () => {
     setKeycloakLoading(true)
@@ -185,7 +234,7 @@ export default function UserManagement() {
     try {
       // Überprüfung, ob Keycloak initialisiert ist
       if (!keycloak) {
-        throw new Error('Keycloak nicht initialisiert')
+        throw new Error(t('keycloakNotInitialized'))
       }
 
       // Token aktualisieren falls nötig
@@ -193,7 +242,7 @@ export default function UserManagement() {
 
       // Überprüfung, ob der Benutzer authentifiziert ist
       if (!keycloak.token) {
-        throw new Error('Nicht authentifiziert - kein Token verfügbar')
+        throw new Error(t('notAuthenticatedNoToken'))
       }
 
       const response = await fetch('/api/admin/keycloak-users', {
@@ -205,7 +254,7 @@ export default function UserManagement() {
       if (!response.ok) {
         const errorText = await response.text()
         console.error('❌ API-Fehler Response:', errorText)
-        throw new Error(`API-Fehler: ${response.status} ${response.statusText}`)
+        throw new Error(t('apiError', { status: response.status, statusText: response.statusText }))
       }
 
       const users = await response.json()
@@ -216,9 +265,9 @@ export default function UserManagement() {
       // Spezifische Fehlerbehandlung
       if (error instanceof Error) {
         if (error.message.includes('401') || error.message.includes('Unauthorized')) {
-          setKeycloakError('Berechtigung verweigert. Bitte melden Sie sich erneut an.')
+          setKeycloakError(t('permissionDenied'))
         } else if (error.message.includes('403') || error.message.includes('Forbidden')) {
-          setKeycloakError('Keine Admin-Berechtigung vorhanden.')
+          setKeycloakError(t('noAdminPermission'))
         } else {
           setKeycloakError(error.message)
         }
@@ -234,7 +283,7 @@ export default function UserManagement() {
   const createKeycloakUser = async (userData: any) => {
     try {
       if (!keycloak?.token) {
-        throw new Error('Nicht authentifiziert')
+        throw new Error(t('notAuthenticated'))
       }
 
       // Erst Keycloak-Benutzer erstellen
@@ -251,7 +300,7 @@ export default function UserManagement() {
       })
 
       if (!response.ok) {
-        throw new Error(`Fehler beim Erstellen: ${response.status}`)
+        throw new Error(t('createErrorWithStatus', { status: response.status }))
       }
 
       // Dann entsprechende Person erstellen
@@ -270,7 +319,7 @@ export default function UserManagement() {
   const updateKeycloakUser = async (userId: string, userData: any) => {
     try {
       if (!keycloak?.token) {
-        throw new Error('Nicht authentifiziert')
+        throw new Error(t('notAuthenticated'))
       }
 
       // Erst Keycloak-Benutzer aktualisieren
@@ -288,7 +337,7 @@ export default function UserManagement() {
       })
 
       if (!response.ok) {
-        throw new Error(`Fehler beim Aktualisieren: ${response.status}`)
+        throw new Error(t('updateErrorWithStatus', { status: response.status }))
       }
 
       // Dann entsprechende Person aktualisieren (falls E-Mail vorhanden)
@@ -424,6 +473,9 @@ export default function UserManagement() {
             disabled={keycloakLoading}
           >
             {t('refresh')}
+          </Button>
+          <Button variant="outlined" onClick={syncAllCompanyIds} disabled={keycloakLoading}>
+            {t('syncCompanyIds')}
           </Button>
           <Button variant="contained" onClick={openCreateUserDialog} startIcon={<AddIcon />}>
             {t('newUser')}

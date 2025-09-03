@@ -227,6 +227,27 @@ const updateLastLoginDate = async () => {
 }
 
 /**
+ * Setzt die company_ids des eingeloggten Benutzers via Keycloak Admin API über unsere Next.js Route.
+ * Achtung: Wird NICHT automatisch aufgerufen, nur explizit vom Aufrufer verwenden.
+ */
+export const updateCompanyIdsFromClient = async (companyIds: string[]) => {
+  if (!keycloak?.authenticated || !keycloak?.token) {
+    throw new Error('Not authenticated')
+  }
+  if (!Array.isArray(companyIds)) {
+    throw new Error('companyIds must be an array')
+  }
+  await fetch('/api/auth/update-company-ids', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${keycloak.token}`,
+    },
+    body: JSON.stringify({ companyIds }),
+  })
+}
+
+/**
  * AuthContext für die Verwendung mit useAuth-Hook
  */
 export const AuthContext = createContext<{
