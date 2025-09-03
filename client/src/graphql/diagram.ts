@@ -23,6 +23,10 @@ export const GET_RECENT_DIAGRAMS = gql`
       diagramJson
       createdAt
       updatedAt
+      company {
+        id
+        name
+      }
       creator {
         id
         firstName
@@ -48,6 +52,10 @@ export const GET_DIAGRAMS = gql`
       diagramJson
       createdAt
       updatedAt
+      company {
+        id
+        name
+      }
       creator {
         id
         firstName
@@ -93,6 +101,10 @@ export const GET_DIAGRAM = gql`
       diagramJson
       createdAt
       updatedAt
+      company {
+        id
+        name
+      }
       creator {
         id
         firstName
@@ -225,8 +237,8 @@ export const DELETE_DIAGRAM = gql`
 `
 
 export const GET_ARCHITECTURES_FOR_DIAGRAM = gql`
-  query GetArchitecturesForDiagram {
-    architectures {
+  query GetArchitecturesForDiagram($where: ArchitectureWhere) {
+    architectures(where: $where) {
       id
       name
       type

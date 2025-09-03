@@ -1,4 +1,5 @@
 import { useCallback, useRef } from 'react'
+import { useCompanyContext } from '@/contexts/CompanyContext'
 import { useApolloClient } from '@apollo/client'
 import { NotificationState } from '../types/DiagramTypes'
 import {
@@ -32,6 +33,7 @@ export const useDiagramHandlers = (
   _lastSavedScene: any
 ) => {
   const apolloClient = useApolloClient()
+  const { selectedCompanyId } = useCompanyContext()
 
   // Ref to track if we're currently saving to prevent onChange from setting hasUnsavedChanges
   const isSavingRef = useRef(false)
@@ -158,6 +160,20 @@ export const useDiagramHandlers = (
       }
 
       try {
+        // Block opening diagrams from other companies only when an explicit company is set and mismatched
+        if (selectedCompanyId && Array.isArray(diagram?.company) && diagram.company.length > 0) {
+          const belongsToSelected = diagram.company.some((c: any) => c?.id === selectedCompanyId)
+          if (!belongsToSelected) {
+            isLoadingRef.current = false
+            setNotification({
+              open: true,
+              message: 'Dieses Diagramm gehört nicht zur ausgewählten Company.',
+              severity: 'error',
+            })
+            return
+          }
+        }
+
         // Parse the diagram JSON data
         const diagramData = JSON.parse(diagram.diagramJson)
 
@@ -358,6 +374,7 @@ export const useDiagramHandlers = (
       setHasUnsavedChanges,
       setLastSavedScene,
       setNotification,
+      selectedCompanyId,
     ]
   )
 

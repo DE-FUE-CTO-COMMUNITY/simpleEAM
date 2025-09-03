@@ -17,13 +17,16 @@ import { DiagramEditorProps } from '../types/DiagramTypes'
 import { useDiagramState, useUIOptions } from '../state/DiagramState'
 import { useDiagramHandlers } from '../handlers/DiagramHandlers'
 import { useKeyboardShortcuts } from '../hooks/DiagramKeyboardShortcuts'
-import { loadViewportStateFromStorage } from '../utils/DiagramStorageUtils'
+import { loadViewportStateFromStorage, clearDiagramStorage } from '../utils/DiagramStorageUtils'
 import { isViewer } from '@/lib/auth'
+import { useCompanyContext } from '@/contexts/CompanyContext'
 
 const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const apolloClient = useApolloClient()
   const t = useTranslations('diagrams')
+  const { selectedCompanyId } = useCompanyContext()
+  const prevCompanyIdRef = useRef<string | null>(null)
 
   // Collaboration status state
   const [isCollaborating, setIsCollaborating] = useState(false)
@@ -170,6 +173,62 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     },
     [excalidrawAPI, setHasUnsavedChanges, setNotification, t]
   )
+
+  // Reset Diagram Editor when company changes
+  useEffect(() => {
+    // Skip on first mount when prev is undefined
+    const prev = prevCompanyIdRef.current
+    if (prev !== null && selectedCompanyId !== prev) {
+      // Perform a silent reset of the editor state
+      try {
+        if (excalidrawAPI) {
+          const emptyScene = {
+            elements: [],
+            appState: {
+              viewBackgroundColor: '#ffffff',
+              collaborators: new Map(),
+              selectedElementIds: {},
+              hoveredElementIds: {},
+              selectedGroupIds: {},
+              selectedLinearElement: null,
+              editingLinearElement: null,
+              activeTool: { type: 'selection' },
+              isLoading: false,
+              errorMessage: null,
+            },
+          }
+          excalidrawAPI.updateScene(emptyScene)
+        }
+      } catch {
+        // noop
+      }
+
+      // Clear local persisted state and reset React state
+      clearDiagramStorage()
+      setCurrentDiagram(null)
+      setCurrentScene(null)
+      setHasUnsavedChanges(false)
+      setLastSavedScene(null)
+      // Optionally close dialogs to avoid stale state
+      updateDialogState('saveDialogOpen', false)
+      updateDialogState('saveAsDialogOpen', false)
+      updateDialogState('openDialogOpen', false)
+      updateDialogState('deleteDialogOpen', false)
+      updateDialogState('capabilityMapGeneratorOpen', false)
+      updateDialogState('addRelatedElementsDialogOpen', false)
+    }
+
+    // update prev ref after handling
+    prevCompanyIdRef.current = selectedCompanyId ?? null
+  }, [
+    selectedCompanyId,
+    excalidrawAPI,
+    setCurrentDiagram,
+    setCurrentScene,
+    setHasUnsavedChanges,
+    setLastSavedScene,
+    updateDialogState,
+  ])
 
   // Related Elements handlers
   const handleOpenAddRelatedElementsDialog = useCallback(

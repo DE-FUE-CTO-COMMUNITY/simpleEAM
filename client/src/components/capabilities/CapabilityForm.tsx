@@ -114,7 +114,9 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
   const { data: architectureData, loading: architectureLoading } = useQuery(GET_ARCHITECTURES)
 
   // Diagramme laden
-  const { data: diagramData, loading: diagramLoading } = useQuery(GET_DIAGRAMS)
+  const { data: diagramData, loading: diagramLoading } = useQuery(GET_DIAGRAMS, {
+    variables: { where: personWhere },
+  })
 
   // Formulardaten mit useMemo initialisieren, um unnötige Re-Renders zu vermeiden
   const defaultValues = React.useMemo<CapabilityFormValues>(

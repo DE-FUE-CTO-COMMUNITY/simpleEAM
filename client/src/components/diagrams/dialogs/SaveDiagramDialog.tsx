@@ -27,6 +27,7 @@ import {
   LINK_INFRASTRUCTURE_TO_ARCHITECTURE,
 } from '@/graphql/architectureLinking'
 import { useAuth } from '@/lib/auth'
+import { useCompanyContext } from '@/contexts/CompanyContext'
 import { useCurrentPerson } from '@/hooks/useCurrentPerson'
 import {
   createDiagramRelationshipUpdates,
@@ -142,6 +143,7 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
   forceSaveAs = false,
 }) => {
   const { keycloak } = useAuth()
+  const { selectedCompanyId } = useCompanyContext()
   const apolloClient = useApolloClient()
   const t = useTranslations('diagrams')
   const tCommon = useTranslations('common')
@@ -200,6 +202,13 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
     skip: !keycloak?.authenticated || !keycloak?.token,
     errorPolicy: 'all',
     fetchPolicy: 'cache-and-network',
+    variables: selectedCompanyId
+      ? {
+          where: {
+            company: { some: { id: { eq: selectedCompanyId } } },
+          },
+        }
+      : undefined,
   })
 
   const [createDiagram] = useMutation(CREATE_DIAGRAM)
@@ -364,11 +373,14 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
       if (foundArch && foundArch !== selectedArchitecture) {
         // Ersetze mit vollständigen Daten aus der API
         setSelectedArchitecture(foundArch)
+        setArchitectureError(false)
       } else if (!foundArch) {
         console.warn(
           'Gesetzte Architektur nicht in verfügbaren Daten gefunden:',
           selectedArchitecture.id
         )
+        // Markiere als Fehler, da die Architektur nicht zur aktuellen Company gehört
+        setArchitectureError(true)
       }
     }
   }, [architecturesData, selectedArchitecture, open, existingDiagram?.architecture])
@@ -376,10 +388,20 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
   const handleSave = async () => {
     // Validierung
     const isTitleValid = title.trim().length > 0
-    const isArchitectureValid = selectedArchitecture !== null
+    let isArchitectureValid = selectedArchitecture !== null
+
+    // Zusätzliche Validierung: Architektur muss zur ausgewählten Company gehören
+    if (isArchitectureValid && selectedCompanyId && architecturesData?.architectures) {
+      const existsInFiltered = architecturesData.architectures.some(
+        (a: any) => a.id === selectedArchitecture.id
+      )
+      if (!existsInFiltered) {
+        isArchitectureValid = false
+      }
+    }
 
     setTitleError(!isTitleValid)
-    setArchitectureError(!isArchitectureValid)
+  setArchitectureError(!isArchitectureValid)
 
     if (!isTitleValid || !isArchitectureValid) {
       return
@@ -587,6 +609,18 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
         diagramJson: dataToSave,
         diagramType: diagramType,
         ...(diagramPng && { diagramPng }),
+        // Safety: always connect diagram to the selected company on create
+        ...(selectedCompanyId && {
+          company: {
+            connect: [
+              {
+                where: {
+                  node: { id: { eq: selectedCompanyId } },
+                },
+              },
+            ],
+          },
+        }),
         architecture: {
           connect: [
             {
@@ -619,6 +653,19 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
           diagramJson: { set: dataToSave },
           diagramType: { set: diagramType },
           ...(diagramPng && { diagramPng: { set: diagramPng } }),
+          // Ensure company stays connected to the selected company on update
+          ...(selectedCompanyId && {
+            company: {
+              disconnect: [{ where: {} }],
+              connect: [
+                {
+                  where: {
+                    node: { id: { eq: selectedCompanyId } },
+                  },
+                },
+              ],
+            },
+          }),
           architecture: {
             disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
             connect: [

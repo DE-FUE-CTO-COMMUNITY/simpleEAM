@@ -18,12 +18,16 @@ import { useTranslations } from 'next-intl'
 import { GET_RECENT_DIAGRAMS } from '@/graphql/diagram'
 import DiagramCard, { DiagramCardSkeleton } from './DiagramCard'
 import { useAuth } from '@/lib/auth'
+import { useCompanyWhere } from '@/hooks/useCompanyWhere'
+import { useCompanyContext } from '@/contexts/CompanyContext'
 
 const RecentDiagramsSection: React.FC = () => {
   const theme = useTheme()
   const [diagramLimit, setDiagramLimit] = useState(6)
   const { authenticated, initialized } = useAuth()
   const t = useTranslations('dashboard')
+  const diagramWhere = useCompanyWhere('company')
+  const { selectedCompanyId } = useCompanyContext()
 
   // Responsive Breakpoints
   const isXs = useMediaQuery(theme.breakpoints.only('xs'))
@@ -56,7 +60,17 @@ const RecentDiagramsSection: React.FC = () => {
     loading: diagramsLoading,
     error: diagramsError,
   } = useQuery(GET_RECENT_DIAGRAMS, {
-    variables: { limit: diagramLimit },
+    variables: {
+      limit: diagramLimit,
+      where: selectedCompanyId
+        ? {
+            OR: [
+              { company: { some: { id: { eq: selectedCompanyId } } } },
+              { architecture: { some: { company: { some: { id: { eq: selectedCompanyId } } } } } },
+            ],
+          }
+        : undefined,
+    },
     fetchPolicy: 'cache-and-network',
     skip: !initialized || !authenticated, // Skip query wenn nicht authentifiziert
   })
