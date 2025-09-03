@@ -26,7 +26,9 @@ export const GET_ARCHITECTURE_PRINCIPLES = gql`
       isActive
       createdAt
       updatedAt
-  company { id }
+      company {
+        id
+      }
       owners {
         id
         firstName
@@ -58,7 +60,9 @@ export const CREATE_ARCHITECTURE_PRINCIPLE = gql`
         implications
         tags
         isActive
-  company { id }
+        company {
+          id
+        }
         owners {
           id
           firstName
@@ -83,7 +87,9 @@ export const UPDATE_ARCHITECTURE_PRINCIPLE = gql`
         implications
         tags
         isActive
-  company { id }
+        company {
+          id
+        }
         owners {
           id
           firstName
