@@ -6,9 +6,6 @@ WORKDIR /app
 RUN corepack enable
 RUN corepack prepare yarn@4.9.1 --activate
 
-
-
-
 # Kopiere package.json und yarn.lock zuerst für deterministische Dependency-Installation
 COPY package.json yarn.lock ./
 # Installiere exakt die Versionen aus yarn.lock
