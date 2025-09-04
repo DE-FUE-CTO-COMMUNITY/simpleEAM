@@ -25,6 +25,7 @@ export const ARCHITECTURE_DEFAULT_COLUMN_VISIBILITY = {
   owners: true,
   tags: true,
   // Standardmäßig versteckte Spalten
+  id: false,
   description: false,
   containsCapabilities: false,
   containsApplications: false,
@@ -96,6 +97,11 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
   // Spalten-Definition für die Architecture-Tabelle
   const columns = useMemo(
     () => [
+      columnHelper.accessor('id', {
+        header: 'ID',
+        cell: info => info.getValue(),
+        enableHiding: true,
+      }),
       columnHelper.accessor('name', {
         header: t('table.name'),
         cell: info => info.getValue(),

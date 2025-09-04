@@ -23,6 +23,7 @@ export const ARCHITECTURE_PRINCIPLE_DEFAULT_COLUMN_VISIBILITY = {
   isActive: true,
   owners: true,
   // Standardmäßig versteckte Spalten
+  id: false,
   description: false,
   appliedInArchitectures: false,
   implementedByApplications: false,
@@ -93,6 +94,11 @@ const ArchitecturePrincipleTable: React.FC<ArchitecturePrincipleTableProps> = ({
   // Spalten-Definition für die ArchitecturePrinciple-Tabelle
   const columns = useMemo(
     () => [
+      columnHelper.accessor('id', {
+        header: 'ID',
+        cell: info => info.getValue(),
+        enableHiding: true,
+      }),
       columnHelper.accessor('name', {
         header: tTable('name'),
         cell: info => info.getValue(),
