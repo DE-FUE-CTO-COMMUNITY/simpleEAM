@@ -22,9 +22,17 @@ coverage/
 
 # Sperren von package-lock.json (Wir verwenden yarn)
 package-lock.json
+.yarn/*
 *.lock
 
+client/.next/
+client/out/
+client/.vercel
+client/.env*.local
+client/.yarn/*
 !client/yarn.lock
+server/dist/
+server/.yarn/*
 !server/yarn.lock
 
 # Neo4j
