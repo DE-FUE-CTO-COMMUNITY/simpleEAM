@@ -22,21 +22,10 @@ coverage/
 
 # Sperren von package-lock.json (Wir verwenden yarn)
 package-lock.json
+*.lock
 
-# Yarn Berry
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/sdks
-!.yarn/versions
-.pnp.*
-
-# Next.js
-client/.next/
-client/out/
-client/.vercel
-client/.env*.local
+!client/yarn.lock
+!server/yarn.lock
 
 # Neo4j
 db/data/
