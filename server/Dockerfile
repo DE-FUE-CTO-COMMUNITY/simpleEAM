@@ -7,8 +7,8 @@ RUN corepack enable \
  && corepack prepare yarn@4.9.1 --activate
 
 # Nur Server-Manifest(e) kopieren für bessere Layer-Caches
-COPY package.json ./package.json
-COPY yarn.lock ./yarn.lock
+COPY server/package.json ./package.json
+COPY server/yarn.lock ./yarn.lock
 
 # Dependencies installieren
 RUN yarn install --immutable
