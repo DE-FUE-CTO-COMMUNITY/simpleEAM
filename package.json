@@ -3,10 +3,6 @@
   "version": "1.0.0",
   "description": "Enterprise Architecture Management System mit Neo4j, GraphQL, Keycloak und Next.js",
   "private": true,
-  "workspaces": [
-    "client",
-    "server"
-  ],
   "scripts": {
     "start": "docker-compose up -d",
     "stop": "docker-compose down",
