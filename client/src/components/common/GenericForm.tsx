@@ -30,7 +30,7 @@ import {
 import type { SxProps, Theme } from '@mui/material'
 import { useTranslations } from 'next-intl'
 import { useLocale } from 'next-intl'
-import type { FormApi } from '@tanstack/react-form'
+// FormApi-Typ wird nicht mehr direkt verwendet; Import entfernt für Kompatibilität
 import { isViewer } from '@/lib/auth'
 import { Field, useStore } from '@tanstack/react-form'
 import { DatePicker, DateTimePicker } from '@mui/x-date-pickers'
@@ -143,7 +143,9 @@ export interface GenericFormProps {
   deleteConfirmationText?: string
   _disableSubmitOnErrors?: boolean // Nicht mehr verwendet - behalten für abwärtskompatibilität
   sx?: SxProps<Theme>
-  form: FormApi<any, any, any, any, any, any, any, any, any, any>
+  // Lockerer Typ, um Kompatibilität mit unterschiedlichen TanStack Form Versionen sicherzustellen
+  // (FormApi/ReactFormExtendedApi Generics variieren je nach Version stark)
+  form: any
   onEditMode?: () => void
   entityId?: string
   entityName?: string
@@ -251,7 +253,7 @@ const GenericForm: React.FC<GenericFormProps> = ({
   }
 
   // Reactive form state tracking using useStore für bessere Performance
-  const formState = useStore(form.store, state => ({
+  const formState = useStore(form.store as any, (state: any) => ({
     isSubmitting: state.isSubmitting,
     // Wir verwenden die manuelle Validierung statt canSubmit, da canSubmit bei Autocomplete-Feldern problematisch ist
   }))
