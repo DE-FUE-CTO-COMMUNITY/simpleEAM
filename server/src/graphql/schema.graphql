@@ -643,6 +643,16 @@ type Architecture
       { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "architect" } } } }
       { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "admin" } } } }
     ]
+    filter: [
+      {
+        where: {
+          OR: [
+            { jwt: { roles: { includes: "admin" } } }
+            { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+          ]
+        }
+      }
+    ]
   ) {
   id: ID! @id
   name: String!
@@ -707,6 +717,16 @@ type ArchitecturePrinciple
     validate: [
       { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "architect" } } } }
       { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "admin" } } } }
+    ]
+    filter: [
+      {
+        where: {
+          OR: [
+            { jwt: { roles: { includes: "admin" } } }
+            { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+          ]
+        }
+      }
     ]
   ) {
   id: ID! @id
