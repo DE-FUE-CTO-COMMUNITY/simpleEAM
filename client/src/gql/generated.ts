@@ -16,50 +16,50 @@ export type Scalars = {
   DateTime: { input: any; output: any; }
 };
 
-/** AIAsset - repräsentiert ein KI-Asset im Enterprise Architecture Management */
-export type AiAsset = {
-  __typename?: 'AIAsset';
+/** AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management */
+export type AiComponent = {
+  __typename?: 'AIComponent';
   accuracy?: Maybe<Scalars['Float']['output']>;
-  aiType: AiAssetType;
+  aiType: AiComponentType;
   company: Array<Company>;
-  companyConnection: AiAssetCompanyConnection;
+  companyConnection: AiComponentCompanyConnection;
   costs?: Maybe<Scalars['Float']['output']>;
   createdAt: Scalars['DateTime']['output'];
   depictedInDiagrams: Array<Diagram>;
-  depictedInDiagramsConnection: AiAssetDepictedInDiagramsConnection;
+  depictedInDiagramsConnection: AiComponentDepictedInDiagramsConnection;
   description?: Maybe<Scalars['String']['output']>;
   hostedOn: Array<Infrastructure>;
-  hostedOnConnection: AiAssetHostedOnConnection;
+  hostedOnConnection: AiComponentHostedOnConnection;
   id: Scalars['ID']['output'];
   implementsPrinciples: Array<ArchitecturePrinciple>;
-  implementsPrinciplesConnection: AiAssetImplementsPrinciplesConnection;
+  implementsPrinciplesConnection: AiComponentImplementsPrinciplesConnection;
   lastUpdated?: Maybe<Scalars['Date']['output']>;
   license?: Maybe<Scalars['String']['output']>;
   model?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
   owners: Array<Person>;
-  ownersConnection: AiAssetOwnersConnection;
+  ownersConnection: AiComponentOwnersConnection;
   partOfArchitectures: Array<Architecture>;
-  partOfArchitecturesConnection: AiAssetPartOfArchitecturesConnection;
+  partOfArchitecturesConnection: AiComponentPartOfArchitecturesConnection;
   provider?: Maybe<Scalars['String']['output']>;
-  status: AiAssetStatus;
+  status: AiComponentStatus;
   supportsCapabilities: Array<BusinessCapability>;
-  supportsCapabilitiesConnection: AiAssetSupportsCapabilitiesConnection;
+  supportsCapabilitiesConnection: AiComponentSupportsCapabilitiesConnection;
   tags?: Maybe<Array<Scalars['String']['output']>>;
   trainedWithDataObjects: Array<DataObject>;
-  trainedWithDataObjectsConnection: AiAssetTrainedWithDataObjectsConnection;
+  trainedWithDataObjectsConnection: AiComponentTrainedWithDataObjectsConnection;
   trainingDate?: Maybe<Scalars['Date']['output']>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
   usedByApplications: Array<Application>;
-  usedByApplicationsConnection: AiAssetUsedByApplicationsConnection;
+  usedByApplicationsConnection: AiComponentUsedByApplicationsConnection;
   usedByOrganisations: Array<Organisation>;
-  usedByOrganisationsConnection: AiAssetUsedByOrganisationsConnection;
+  usedByOrganisationsConnection: AiComponentUsedByOrganisationsConnection;
   version?: Maybe<Scalars['String']['output']>;
 };
 
 
-/** AIAsset - repräsentiert ein KI-Asset im Enterprise Architecture Management */
-export type AiAssetCompanyArgs = {
+/** AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management */
+export type AiComponentCompanyArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<CompanySort>>;
@@ -67,17 +67,17 @@ export type AiAssetCompanyArgs = {
 };
 
 
-/** AIAsset - repräsentiert ein KI-Asset im Enterprise Architecture Management */
-export type AiAssetCompanyConnectionArgs = {
+/** AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management */
+export type AiComponentCompanyConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<AiAssetCompanyConnectionSort>>;
-  where?: InputMaybe<AiAssetCompanyConnectionWhere>;
+  sort?: InputMaybe<Array<AiComponentCompanyConnectionSort>>;
+  where?: InputMaybe<AiComponentCompanyConnectionWhere>;
 };
 
 
-/** AIAsset - repräsentiert ein KI-Asset im Enterprise Architecture Management */
-export type AiAssetDepictedInDiagramsArgs = {
+/** AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management */
+export type AiComponentDepictedInDiagramsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<DiagramSort>>;
@@ -85,17 +85,17 @@ export type AiAssetDepictedInDiagramsArgs = {
 };
 
 
-/** AIAsset - repräsentiert ein KI-Asset im Enterprise Architecture Management */
-export type AiAssetDepictedInDiagramsConnectionArgs = {
+/** AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management */
+export type AiComponentDepictedInDiagramsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<AiAssetDepictedInDiagramsConnectionSort>>;
-  where?: InputMaybe<AiAssetDepictedInDiagramsConnectionWhere>;
+  sort?: InputMaybe<Array<AiComponentDepictedInDiagramsConnectionSort>>;
+  where?: InputMaybe<AiComponentDepictedInDiagramsConnectionWhere>;
 };
 
 
-/** AIAsset - repräsentiert ein KI-Asset im Enterprise Architecture Management */
-export type AiAssetHostedOnArgs = {
+/** AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management */
+export type AiComponentHostedOnArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<InfrastructureSort>>;
@@ -103,17 +103,17 @@ export type AiAssetHostedOnArgs = {
 };
 
 
-/** AIAsset - repräsentiert ein KI-Asset im Enterprise Architecture Management */
-export type AiAssetHostedOnConnectionArgs = {
+/** AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management */
+export type AiComponentHostedOnConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<AiAssetHostedOnConnectionSort>>;
-  where?: InputMaybe<AiAssetHostedOnConnectionWhere>;
+  sort?: InputMaybe<Array<AiComponentHostedOnConnectionSort>>;
+  where?: InputMaybe<AiComponentHostedOnConnectionWhere>;
 };
 
 
-/** AIAsset - repräsentiert ein KI-Asset im Enterprise Architecture Management */
-export type AiAssetImplementsPrinciplesArgs = {
+/** AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management */
+export type AiComponentImplementsPrinciplesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<ArchitecturePrincipleSort>>;
@@ -121,17 +121,17 @@ export type AiAssetImplementsPrinciplesArgs = {
 };
 
 
-/** AIAsset - repräsentiert ein KI-Asset im Enterprise Architecture Management */
-export type AiAssetImplementsPrinciplesConnectionArgs = {
+/** AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management */
+export type AiComponentImplementsPrinciplesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<AiAssetImplementsPrinciplesConnectionSort>>;
-  where?: InputMaybe<AiAssetImplementsPrinciplesConnectionWhere>;
+  sort?: InputMaybe<Array<AiComponentImplementsPrinciplesConnectionSort>>;
+  where?: InputMaybe<AiComponentImplementsPrinciplesConnectionWhere>;
 };
 
 
-/** AIAsset - repräsentiert ein KI-Asset im Enterprise Architecture Management */
-export type AiAssetOwnersArgs = {
+/** AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management */
+export type AiComponentOwnersArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<PersonSort>>;
@@ -139,17 +139,17 @@ export type AiAssetOwnersArgs = {
 };
 
 
-/** AIAsset - repräsentiert ein KI-Asset im Enterprise Architecture Management */
-export type AiAssetOwnersConnectionArgs = {
+/** AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management */
+export type AiComponentOwnersConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<AiAssetOwnersConnectionSort>>;
-  where?: InputMaybe<AiAssetOwnersConnectionWhere>;
+  sort?: InputMaybe<Array<AiComponentOwnersConnectionSort>>;
+  where?: InputMaybe<AiComponentOwnersConnectionWhere>;
 };
 
 
-/** AIAsset - repräsentiert ein KI-Asset im Enterprise Architecture Management */
-export type AiAssetPartOfArchitecturesArgs = {
+/** AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management */
+export type AiComponentPartOfArchitecturesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<ArchitectureSort>>;
@@ -157,17 +157,17 @@ export type AiAssetPartOfArchitecturesArgs = {
 };
 
 
-/** AIAsset - repräsentiert ein KI-Asset im Enterprise Architecture Management */
-export type AiAssetPartOfArchitecturesConnectionArgs = {
+/** AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management */
+export type AiComponentPartOfArchitecturesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<AiAssetPartOfArchitecturesConnectionSort>>;
-  where?: InputMaybe<AiAssetPartOfArchitecturesConnectionWhere>;
+  sort?: InputMaybe<Array<AiComponentPartOfArchitecturesConnectionSort>>;
+  where?: InputMaybe<AiComponentPartOfArchitecturesConnectionWhere>;
 };
 
 
-/** AIAsset - repräsentiert ein KI-Asset im Enterprise Architecture Management */
-export type AiAssetSupportsCapabilitiesArgs = {
+/** AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management */
+export type AiComponentSupportsCapabilitiesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<BusinessCapabilitySort>>;
@@ -175,17 +175,17 @@ export type AiAssetSupportsCapabilitiesArgs = {
 };
 
 
-/** AIAsset - repräsentiert ein KI-Asset im Enterprise Architecture Management */
-export type AiAssetSupportsCapabilitiesConnectionArgs = {
+/** AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management */
+export type AiComponentSupportsCapabilitiesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<AiAssetSupportsCapabilitiesConnectionSort>>;
-  where?: InputMaybe<AiAssetSupportsCapabilitiesConnectionWhere>;
+  sort?: InputMaybe<Array<AiComponentSupportsCapabilitiesConnectionSort>>;
+  where?: InputMaybe<AiComponentSupportsCapabilitiesConnectionWhere>;
 };
 
 
-/** AIAsset - repräsentiert ein KI-Asset im Enterprise Architecture Management */
-export type AiAssetTrainedWithDataObjectsArgs = {
+/** AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management */
+export type AiComponentTrainedWithDataObjectsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<DataObjectSort>>;
@@ -193,17 +193,17 @@ export type AiAssetTrainedWithDataObjectsArgs = {
 };
 
 
-/** AIAsset - repräsentiert ein KI-Asset im Enterprise Architecture Management */
-export type AiAssetTrainedWithDataObjectsConnectionArgs = {
+/** AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management */
+export type AiComponentTrainedWithDataObjectsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<AiAssetTrainedWithDataObjectsConnectionSort>>;
-  where?: InputMaybe<AiAssetTrainedWithDataObjectsConnectionWhere>;
+  sort?: InputMaybe<Array<AiComponentTrainedWithDataObjectsConnectionSort>>;
+  where?: InputMaybe<AiComponentTrainedWithDataObjectsConnectionWhere>;
 };
 
 
-/** AIAsset - repräsentiert ein KI-Asset im Enterprise Architecture Management */
-export type AiAssetUsedByApplicationsArgs = {
+/** AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management */
+export type AiComponentUsedByApplicationsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<ApplicationSort>>;
@@ -211,17 +211,17 @@ export type AiAssetUsedByApplicationsArgs = {
 };
 
 
-/** AIAsset - repräsentiert ein KI-Asset im Enterprise Architecture Management */
-export type AiAssetUsedByApplicationsConnectionArgs = {
+/** AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management */
+export type AiComponentUsedByApplicationsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<AiAssetUsedByApplicationsConnectionSort>>;
-  where?: InputMaybe<AiAssetUsedByApplicationsConnectionWhere>;
+  sort?: InputMaybe<Array<AiComponentUsedByApplicationsConnectionSort>>;
+  where?: InputMaybe<AiComponentUsedByApplicationsConnectionWhere>;
 };
 
 
-/** AIAsset - repräsentiert ein KI-Asset im Enterprise Architecture Management */
-export type AiAssetUsedByOrganisationsArgs = {
+/** AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management */
+export type AiComponentUsedByOrganisationsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<OrganisationSort>>;
@@ -229,22 +229,22 @@ export type AiAssetUsedByOrganisationsArgs = {
 };
 
 
-/** AIAsset - repräsentiert ein KI-Asset im Enterprise Architecture Management */
-export type AiAssetUsedByOrganisationsConnectionArgs = {
+/** AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management */
+export type AiComponentUsedByOrganisationsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<AiAssetUsedByOrganisationsConnectionSort>>;
-  where?: InputMaybe<AiAssetUsedByOrganisationsConnectionWhere>;
+  sort?: InputMaybe<Array<AiComponentUsedByOrganisationsConnectionSort>>;
+  where?: InputMaybe<AiComponentUsedByOrganisationsConnectionWhere>;
 };
 
-export type AiAssetAggregate = {
-  __typename?: 'AIAssetAggregate';
+export type AiComponentAggregate = {
+  __typename?: 'AIComponentAggregate';
   count: Count;
-  node: AiAssetAggregateNode;
+  node: AiComponentAggregateNode;
 };
 
-export type AiAssetAggregateNode = {
-  __typename?: 'AIAssetAggregateNode';
+export type AiComponentAggregateNode = {
+  __typename?: 'AIComponentAggregateNode';
   accuracy: FloatAggregateSelection;
   costs: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
@@ -257,14 +257,14 @@ export type AiAssetAggregateNode = {
   version: StringAggregateSelection;
 };
 
-export type AiAssetApplicationUsedByApplicationsAggregateSelection = {
-  __typename?: 'AIAssetApplicationUsedByApplicationsAggregateSelection';
+export type AiComponentApplicationUsedByApplicationsAggregateSelection = {
+  __typename?: 'AIComponentApplicationUsedByApplicationsAggregateSelection';
   count: CountConnection;
-  node?: Maybe<AiAssetApplicationUsedByApplicationsNodeAggregateSelection>;
+  node?: Maybe<AiComponentApplicationUsedByApplicationsNodeAggregateSelection>;
 };
 
-export type AiAssetApplicationUsedByApplicationsNodeAggregateSelection = {
-  __typename?: 'AIAssetApplicationUsedByApplicationsNodeAggregateSelection';
+export type AiComponentApplicationUsedByApplicationsNodeAggregateSelection = {
+  __typename?: 'AIComponentApplicationUsedByApplicationsNodeAggregateSelection';
   costs: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
@@ -275,14 +275,14 @@ export type AiAssetApplicationUsedByApplicationsNodeAggregateSelection = {
   version: StringAggregateSelection;
 };
 
-export type AiAssetArchitecturePartOfArchitecturesAggregateSelection = {
-  __typename?: 'AIAssetArchitecturePartOfArchitecturesAggregateSelection';
+export type AiComponentArchitecturePartOfArchitecturesAggregateSelection = {
+  __typename?: 'AIComponentArchitecturePartOfArchitecturesAggregateSelection';
   count: CountConnection;
-  node?: Maybe<AiAssetArchitecturePartOfArchitecturesNodeAggregateSelection>;
+  node?: Maybe<AiComponentArchitecturePartOfArchitecturesNodeAggregateSelection>;
 };
 
-export type AiAssetArchitecturePartOfArchitecturesNodeAggregateSelection = {
-  __typename?: 'AIAssetArchitecturePartOfArchitecturesNodeAggregateSelection';
+export type AiComponentArchitecturePartOfArchitecturesNodeAggregateSelection = {
+  __typename?: 'AIComponentArchitecturePartOfArchitecturesNodeAggregateSelection';
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   name: StringAggregateSelection;
@@ -290,14 +290,14 @@ export type AiAssetArchitecturePartOfArchitecturesNodeAggregateSelection = {
   updatedAt: DateTimeAggregateSelection;
 };
 
-export type AiAssetArchitecturePrincipleImplementsPrinciplesAggregateSelection = {
-  __typename?: 'AIAssetArchitecturePrincipleImplementsPrinciplesAggregateSelection';
+export type AiComponentArchitecturePrincipleImplementsPrinciplesAggregateSelection = {
+  __typename?: 'AIComponentArchitecturePrincipleImplementsPrinciplesAggregateSelection';
   count: CountConnection;
-  node?: Maybe<AiAssetArchitecturePrincipleImplementsPrinciplesNodeAggregateSelection>;
+  node?: Maybe<AiComponentArchitecturePrincipleImplementsPrinciplesNodeAggregateSelection>;
 };
 
-export type AiAssetArchitecturePrincipleImplementsPrinciplesNodeAggregateSelection = {
-  __typename?: 'AIAssetArchitecturePrincipleImplementsPrinciplesNodeAggregateSelection';
+export type AiComponentArchitecturePrincipleImplementsPrinciplesNodeAggregateSelection = {
+  __typename?: 'AIComponentArchitecturePrincipleImplementsPrinciplesNodeAggregateSelection';
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   implications: StringAggregateSelection;
@@ -306,14 +306,14 @@ export type AiAssetArchitecturePrincipleImplementsPrinciplesNodeAggregateSelecti
   updatedAt: DateTimeAggregateSelection;
 };
 
-export type AiAssetBusinessCapabilitySupportsCapabilitiesAggregateSelection = {
-  __typename?: 'AIAssetBusinessCapabilitySupportsCapabilitiesAggregateSelection';
+export type AiComponentBusinessCapabilitySupportsCapabilitiesAggregateSelection = {
+  __typename?: 'AIComponentBusinessCapabilitySupportsCapabilitiesAggregateSelection';
   count: CountConnection;
-  node?: Maybe<AiAssetBusinessCapabilitySupportsCapabilitiesNodeAggregateSelection>;
+  node?: Maybe<AiComponentBusinessCapabilitySupportsCapabilitiesNodeAggregateSelection>;
 };
 
-export type AiAssetBusinessCapabilitySupportsCapabilitiesNodeAggregateSelection = {
-  __typename?: 'AIAssetBusinessCapabilitySupportsCapabilitiesNodeAggregateSelection';
+export type AiComponentBusinessCapabilitySupportsCapabilitiesNodeAggregateSelection = {
+  __typename?: 'AIComponentBusinessCapabilitySupportsCapabilitiesNodeAggregateSelection';
   businessValue: IntAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
@@ -323,27 +323,27 @@ export type AiAssetBusinessCapabilitySupportsCapabilitiesNodeAggregateSelection 
   updatedAt: DateTimeAggregateSelection;
 };
 
-export type AiAssetCompanyAggregateInput = {
-  AND?: InputMaybe<Array<AiAssetCompanyAggregateInput>>;
-  NOT?: InputMaybe<AiAssetCompanyAggregateInput>;
-  OR?: InputMaybe<Array<AiAssetCompanyAggregateInput>>;
+export type AiComponentCompanyAggregateInput = {
+  AND?: InputMaybe<Array<AiComponentCompanyAggregateInput>>;
+  NOT?: InputMaybe<AiComponentCompanyAggregateInput>;
+  OR?: InputMaybe<Array<AiComponentCompanyAggregateInput>>;
   count?: InputMaybe<IntScalarFilters>;
   count_EQ?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
   count_LTE?: InputMaybe<Scalars['Int']['input']>;
-  node?: InputMaybe<AiAssetCompanyNodeAggregationWhereInput>;
+  node?: InputMaybe<AiComponentCompanyNodeAggregationWhereInput>;
 };
 
-export type AiAssetCompanyCompanyAggregateSelection = {
-  __typename?: 'AIAssetCompanyCompanyAggregateSelection';
+export type AiComponentCompanyCompanyAggregateSelection = {
+  __typename?: 'AIComponentCompanyCompanyAggregateSelection';
   count: CountConnection;
-  node?: Maybe<AiAssetCompanyCompanyNodeAggregateSelection>;
+  node?: Maybe<AiComponentCompanyCompanyNodeAggregateSelection>;
 };
 
-export type AiAssetCompanyCompanyNodeAggregateSelection = {
-  __typename?: 'AIAssetCompanyCompanyNodeAggregateSelection';
+export type AiComponentCompanyCompanyNodeAggregateSelection = {
+  __typename?: 'AIComponentCompanyCompanyNodeAggregateSelection';
   address: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
@@ -353,74 +353,74 @@ export type AiAssetCompanyCompanyNodeAggregateSelection = {
   website: StringAggregateSelection;
 };
 
-export type AiAssetCompanyConnectFieldInput = {
+export type AiComponentCompanyConnectFieldInput = {
   connect?: InputMaybe<Array<CompanyConnectInput>>;
   where?: InputMaybe<CompanyConnectWhere>;
 };
 
-export type AiAssetCompanyConnection = {
-  __typename?: 'AIAssetCompanyConnection';
-  aggregate: AiAssetCompanyCompanyAggregateSelection;
-  edges: Array<AiAssetCompanyRelationship>;
+export type AiComponentCompanyConnection = {
+  __typename?: 'AIComponentCompanyConnection';
+  aggregate: AiComponentCompanyCompanyAggregateSelection;
+  edges: Array<AiComponentCompanyRelationship>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
 
-export type AiAssetCompanyConnectionAggregateInput = {
-  AND?: InputMaybe<Array<AiAssetCompanyConnectionAggregateInput>>;
-  NOT?: InputMaybe<AiAssetCompanyConnectionAggregateInput>;
-  OR?: InputMaybe<Array<AiAssetCompanyConnectionAggregateInput>>;
+export type AiComponentCompanyConnectionAggregateInput = {
+  AND?: InputMaybe<Array<AiComponentCompanyConnectionAggregateInput>>;
+  NOT?: InputMaybe<AiComponentCompanyConnectionAggregateInput>;
+  OR?: InputMaybe<Array<AiComponentCompanyConnectionAggregateInput>>;
   count?: InputMaybe<ConnectionAggregationCountFilterInput>;
-  node?: InputMaybe<AiAssetCompanyNodeAggregationWhereInput>;
+  node?: InputMaybe<AiComponentCompanyNodeAggregationWhereInput>;
 };
 
-export type AiAssetCompanyConnectionFilters = {
-  /** Filter AIAssets by aggregating results on related AIAssetCompanyConnections */
-  aggregate?: InputMaybe<AiAssetCompanyConnectionAggregateInput>;
-  /** Return AIAssets where all of the related AIAssetCompanyConnections match this filter */
-  all?: InputMaybe<AiAssetCompanyConnectionWhere>;
-  /** Return AIAssets where none of the related AIAssetCompanyConnections match this filter */
-  none?: InputMaybe<AiAssetCompanyConnectionWhere>;
-  /** Return AIAssets where one of the related AIAssetCompanyConnections match this filter */
-  single?: InputMaybe<AiAssetCompanyConnectionWhere>;
-  /** Return AIAssets where some of the related AIAssetCompanyConnections match this filter */
-  some?: InputMaybe<AiAssetCompanyConnectionWhere>;
+export type AiComponentCompanyConnectionFilters = {
+  /** Filter AIComponents by aggregating results on related AIComponentCompanyConnections */
+  aggregate?: InputMaybe<AiComponentCompanyConnectionAggregateInput>;
+  /** Return AIComponents where all of the related AIComponentCompanyConnections match this filter */
+  all?: InputMaybe<AiComponentCompanyConnectionWhere>;
+  /** Return AIComponents where none of the related AIComponentCompanyConnections match this filter */
+  none?: InputMaybe<AiComponentCompanyConnectionWhere>;
+  /** Return AIComponents where one of the related AIComponentCompanyConnections match this filter */
+  single?: InputMaybe<AiComponentCompanyConnectionWhere>;
+  /** Return AIComponents where some of the related AIComponentCompanyConnections match this filter */
+  some?: InputMaybe<AiComponentCompanyConnectionWhere>;
 };
 
-export type AiAssetCompanyConnectionSort = {
+export type AiComponentCompanyConnectionSort = {
   node?: InputMaybe<CompanySort>;
 };
 
-export type AiAssetCompanyConnectionWhere = {
-  AND?: InputMaybe<Array<AiAssetCompanyConnectionWhere>>;
-  NOT?: InputMaybe<AiAssetCompanyConnectionWhere>;
-  OR?: InputMaybe<Array<AiAssetCompanyConnectionWhere>>;
+export type AiComponentCompanyConnectionWhere = {
+  AND?: InputMaybe<Array<AiComponentCompanyConnectionWhere>>;
+  NOT?: InputMaybe<AiComponentCompanyConnectionWhere>;
+  OR?: InputMaybe<Array<AiComponentCompanyConnectionWhere>>;
   node?: InputMaybe<CompanyWhere>;
 };
 
-export type AiAssetCompanyCreateFieldInput = {
+export type AiComponentCompanyCreateFieldInput = {
   node: CompanyCreateInput;
 };
 
-export type AiAssetCompanyDeleteFieldInput = {
+export type AiComponentCompanyDeleteFieldInput = {
   delete?: InputMaybe<CompanyDeleteInput>;
-  where?: InputMaybe<AiAssetCompanyConnectionWhere>;
+  where?: InputMaybe<AiComponentCompanyConnectionWhere>;
 };
 
-export type AiAssetCompanyDisconnectFieldInput = {
+export type AiComponentCompanyDisconnectFieldInput = {
   disconnect?: InputMaybe<CompanyDisconnectInput>;
-  where?: InputMaybe<AiAssetCompanyConnectionWhere>;
+  where?: InputMaybe<AiComponentCompanyConnectionWhere>;
 };
 
-export type AiAssetCompanyFieldInput = {
-  connect?: InputMaybe<Array<AiAssetCompanyConnectFieldInput>>;
-  create?: InputMaybe<Array<AiAssetCompanyCreateFieldInput>>;
+export type AiComponentCompanyFieldInput = {
+  connect?: InputMaybe<Array<AiComponentCompanyConnectFieldInput>>;
+  create?: InputMaybe<Array<AiComponentCompanyCreateFieldInput>>;
 };
 
-export type AiAssetCompanyNodeAggregationWhereInput = {
-  AND?: InputMaybe<Array<AiAssetCompanyNodeAggregationWhereInput>>;
-  NOT?: InputMaybe<AiAssetCompanyNodeAggregationWhereInput>;
-  OR?: InputMaybe<Array<AiAssetCompanyNodeAggregationWhereInput>>;
+export type AiComponentCompanyNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<AiComponentCompanyNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<AiComponentCompanyNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<AiComponentCompanyNodeAggregationWhereInput>>;
   address?: InputMaybe<StringScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
@@ -430,77 +430,77 @@ export type AiAssetCompanyNodeAggregationWhereInput = {
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
 
-export type AiAssetCompanyRelationship = {
-  __typename?: 'AIAssetCompanyRelationship';
+export type AiComponentCompanyRelationship = {
+  __typename?: 'AIComponentCompanyRelationship';
   cursor: Scalars['String']['output'];
   node: Company;
 };
 
-export type AiAssetCompanyUpdateConnectionInput = {
+export type AiComponentCompanyUpdateConnectionInput = {
   node?: InputMaybe<CompanyUpdateInput>;
-  where?: InputMaybe<AiAssetCompanyConnectionWhere>;
+  where?: InputMaybe<AiComponentCompanyConnectionWhere>;
 };
 
-export type AiAssetCompanyUpdateFieldInput = {
-  connect?: InputMaybe<Array<AiAssetCompanyConnectFieldInput>>;
-  create?: InputMaybe<Array<AiAssetCompanyCreateFieldInput>>;
-  delete?: InputMaybe<Array<AiAssetCompanyDeleteFieldInput>>;
-  disconnect?: InputMaybe<Array<AiAssetCompanyDisconnectFieldInput>>;
-  update?: InputMaybe<AiAssetCompanyUpdateConnectionInput>;
+export type AiComponentCompanyUpdateFieldInput = {
+  connect?: InputMaybe<Array<AiComponentCompanyConnectFieldInput>>;
+  create?: InputMaybe<Array<AiComponentCompanyCreateFieldInput>>;
+  delete?: InputMaybe<Array<AiComponentCompanyDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<AiComponentCompanyDisconnectFieldInput>>;
+  update?: InputMaybe<AiComponentCompanyUpdateConnectionInput>;
 };
 
-export type AiAssetConnectInput = {
-  company?: InputMaybe<Array<AiAssetCompanyConnectFieldInput>>;
-  depictedInDiagrams?: InputMaybe<Array<AiAssetDepictedInDiagramsConnectFieldInput>>;
-  hostedOn?: InputMaybe<Array<AiAssetHostedOnConnectFieldInput>>;
-  implementsPrinciples?: InputMaybe<Array<AiAssetImplementsPrinciplesConnectFieldInput>>;
-  owners?: InputMaybe<Array<AiAssetOwnersConnectFieldInput>>;
-  partOfArchitectures?: InputMaybe<Array<AiAssetPartOfArchitecturesConnectFieldInput>>;
-  supportsCapabilities?: InputMaybe<Array<AiAssetSupportsCapabilitiesConnectFieldInput>>;
-  trainedWithDataObjects?: InputMaybe<Array<AiAssetTrainedWithDataObjectsConnectFieldInput>>;
-  usedByApplications?: InputMaybe<Array<AiAssetUsedByApplicationsConnectFieldInput>>;
-  usedByOrganisations?: InputMaybe<Array<AiAssetUsedByOrganisationsConnectFieldInput>>;
+export type AiComponentConnectInput = {
+  company?: InputMaybe<Array<AiComponentCompanyConnectFieldInput>>;
+  depictedInDiagrams?: InputMaybe<Array<AiComponentDepictedInDiagramsConnectFieldInput>>;
+  hostedOn?: InputMaybe<Array<AiComponentHostedOnConnectFieldInput>>;
+  implementsPrinciples?: InputMaybe<Array<AiComponentImplementsPrinciplesConnectFieldInput>>;
+  owners?: InputMaybe<Array<AiComponentOwnersConnectFieldInput>>;
+  partOfArchitectures?: InputMaybe<Array<AiComponentPartOfArchitecturesConnectFieldInput>>;
+  supportsCapabilities?: InputMaybe<Array<AiComponentSupportsCapabilitiesConnectFieldInput>>;
+  trainedWithDataObjects?: InputMaybe<Array<AiComponentTrainedWithDataObjectsConnectFieldInput>>;
+  usedByApplications?: InputMaybe<Array<AiComponentUsedByApplicationsConnectFieldInput>>;
+  usedByOrganisations?: InputMaybe<Array<AiComponentUsedByOrganisationsConnectFieldInput>>;
 };
 
-export type AiAssetConnectWhere = {
-  node: AiAssetWhere;
+export type AiComponentConnectWhere = {
+  node: AiComponentWhere;
 };
 
-export type AiAssetCreateInput = {
+export type AiComponentCreateInput = {
   accuracy?: InputMaybe<Scalars['Float']['input']>;
-  aiType: AiAssetType;
-  company?: InputMaybe<AiAssetCompanyFieldInput>;
+  aiType: AiComponentType;
+  company?: InputMaybe<AiComponentCompanyFieldInput>;
   costs?: InputMaybe<Scalars['Float']['input']>;
-  depictedInDiagrams?: InputMaybe<AiAssetDepictedInDiagramsFieldInput>;
+  depictedInDiagrams?: InputMaybe<AiComponentDepictedInDiagramsFieldInput>;
   description?: InputMaybe<Scalars['String']['input']>;
-  hostedOn?: InputMaybe<AiAssetHostedOnFieldInput>;
-  implementsPrinciples?: InputMaybe<AiAssetImplementsPrinciplesFieldInput>;
+  hostedOn?: InputMaybe<AiComponentHostedOnFieldInput>;
+  implementsPrinciples?: InputMaybe<AiComponentImplementsPrinciplesFieldInput>;
   lastUpdated?: InputMaybe<Scalars['Date']['input']>;
   license?: InputMaybe<Scalars['String']['input']>;
   model?: InputMaybe<Scalars['String']['input']>;
   name: Scalars['String']['input'];
-  owners?: InputMaybe<AiAssetOwnersFieldInput>;
-  partOfArchitectures?: InputMaybe<AiAssetPartOfArchitecturesFieldInput>;
+  owners?: InputMaybe<AiComponentOwnersFieldInput>;
+  partOfArchitectures?: InputMaybe<AiComponentPartOfArchitecturesFieldInput>;
   provider?: InputMaybe<Scalars['String']['input']>;
-  status: AiAssetStatus;
-  supportsCapabilities?: InputMaybe<AiAssetSupportsCapabilitiesFieldInput>;
+  status: AiComponentStatus;
+  supportsCapabilities?: InputMaybe<AiComponentSupportsCapabilitiesFieldInput>;
   tags?: InputMaybe<Array<Scalars['String']['input']>>;
-  trainedWithDataObjects?: InputMaybe<AiAssetTrainedWithDataObjectsFieldInput>;
+  trainedWithDataObjects?: InputMaybe<AiComponentTrainedWithDataObjectsFieldInput>;
   trainingDate?: InputMaybe<Scalars['Date']['input']>;
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
-  usedByApplications?: InputMaybe<AiAssetUsedByApplicationsFieldInput>;
-  usedByOrganisations?: InputMaybe<AiAssetUsedByOrganisationsFieldInput>;
+  usedByApplications?: InputMaybe<AiComponentUsedByApplicationsFieldInput>;
+  usedByOrganisations?: InputMaybe<AiComponentUsedByOrganisationsFieldInput>;
   version?: InputMaybe<Scalars['String']['input']>;
 };
 
-export type AiAssetDataObjectTrainedWithDataObjectsAggregateSelection = {
-  __typename?: 'AIAssetDataObjectTrainedWithDataObjectsAggregateSelection';
+export type AiComponentDataObjectTrainedWithDataObjectsAggregateSelection = {
+  __typename?: 'AIComponentDataObjectTrainedWithDataObjectsAggregateSelection';
   count: CountConnection;
-  node?: Maybe<AiAssetDataObjectTrainedWithDataObjectsNodeAggregateSelection>;
+  node?: Maybe<AiComponentDataObjectTrainedWithDataObjectsNodeAggregateSelection>;
 };
 
-export type AiAssetDataObjectTrainedWithDataObjectsNodeAggregateSelection = {
-  __typename?: 'AIAssetDataObjectTrainedWithDataObjectsNodeAggregateSelection';
+export type AiComponentDataObjectTrainedWithDataObjectsNodeAggregateSelection = {
+  __typename?: 'AIComponentDataObjectTrainedWithDataObjectsNodeAggregateSelection';
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   format: StringAggregateSelection;
@@ -508,100 +508,100 @@ export type AiAssetDataObjectTrainedWithDataObjectsNodeAggregateSelection = {
   updatedAt: DateTimeAggregateSelection;
 };
 
-export type AiAssetDeleteInput = {
-  company?: InputMaybe<Array<AiAssetCompanyDeleteFieldInput>>;
-  depictedInDiagrams?: InputMaybe<Array<AiAssetDepictedInDiagramsDeleteFieldInput>>;
-  hostedOn?: InputMaybe<Array<AiAssetHostedOnDeleteFieldInput>>;
-  implementsPrinciples?: InputMaybe<Array<AiAssetImplementsPrinciplesDeleteFieldInput>>;
-  owners?: InputMaybe<Array<AiAssetOwnersDeleteFieldInput>>;
-  partOfArchitectures?: InputMaybe<Array<AiAssetPartOfArchitecturesDeleteFieldInput>>;
-  supportsCapabilities?: InputMaybe<Array<AiAssetSupportsCapabilitiesDeleteFieldInput>>;
-  trainedWithDataObjects?: InputMaybe<Array<AiAssetTrainedWithDataObjectsDeleteFieldInput>>;
-  usedByApplications?: InputMaybe<Array<AiAssetUsedByApplicationsDeleteFieldInput>>;
-  usedByOrganisations?: InputMaybe<Array<AiAssetUsedByOrganisationsDeleteFieldInput>>;
+export type AiComponentDeleteInput = {
+  company?: InputMaybe<Array<AiComponentCompanyDeleteFieldInput>>;
+  depictedInDiagrams?: InputMaybe<Array<AiComponentDepictedInDiagramsDeleteFieldInput>>;
+  hostedOn?: InputMaybe<Array<AiComponentHostedOnDeleteFieldInput>>;
+  implementsPrinciples?: InputMaybe<Array<AiComponentImplementsPrinciplesDeleteFieldInput>>;
+  owners?: InputMaybe<Array<AiComponentOwnersDeleteFieldInput>>;
+  partOfArchitectures?: InputMaybe<Array<AiComponentPartOfArchitecturesDeleteFieldInput>>;
+  supportsCapabilities?: InputMaybe<Array<AiComponentSupportsCapabilitiesDeleteFieldInput>>;
+  trainedWithDataObjects?: InputMaybe<Array<AiComponentTrainedWithDataObjectsDeleteFieldInput>>;
+  usedByApplications?: InputMaybe<Array<AiComponentUsedByApplicationsDeleteFieldInput>>;
+  usedByOrganisations?: InputMaybe<Array<AiComponentUsedByOrganisationsDeleteFieldInput>>;
 };
 
-export type AiAssetDepictedInDiagramsAggregateInput = {
-  AND?: InputMaybe<Array<AiAssetDepictedInDiagramsAggregateInput>>;
-  NOT?: InputMaybe<AiAssetDepictedInDiagramsAggregateInput>;
-  OR?: InputMaybe<Array<AiAssetDepictedInDiagramsAggregateInput>>;
+export type AiComponentDepictedInDiagramsAggregateInput = {
+  AND?: InputMaybe<Array<AiComponentDepictedInDiagramsAggregateInput>>;
+  NOT?: InputMaybe<AiComponentDepictedInDiagramsAggregateInput>;
+  OR?: InputMaybe<Array<AiComponentDepictedInDiagramsAggregateInput>>;
   count?: InputMaybe<IntScalarFilters>;
   count_EQ?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
   count_LTE?: InputMaybe<Scalars['Int']['input']>;
-  node?: InputMaybe<AiAssetDepictedInDiagramsNodeAggregationWhereInput>;
+  node?: InputMaybe<AiComponentDepictedInDiagramsNodeAggregationWhereInput>;
 };
 
-export type AiAssetDepictedInDiagramsConnectFieldInput = {
+export type AiComponentDepictedInDiagramsConnectFieldInput = {
   connect?: InputMaybe<Array<DiagramConnectInput>>;
   where?: InputMaybe<DiagramConnectWhere>;
 };
 
-export type AiAssetDepictedInDiagramsConnection = {
-  __typename?: 'AIAssetDepictedInDiagramsConnection';
-  aggregate: AiAssetDiagramDepictedInDiagramsAggregateSelection;
-  edges: Array<AiAssetDepictedInDiagramsRelationship>;
+export type AiComponentDepictedInDiagramsConnection = {
+  __typename?: 'AIComponentDepictedInDiagramsConnection';
+  aggregate: AiComponentDiagramDepictedInDiagramsAggregateSelection;
+  edges: Array<AiComponentDepictedInDiagramsRelationship>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
 
-export type AiAssetDepictedInDiagramsConnectionAggregateInput = {
-  AND?: InputMaybe<Array<AiAssetDepictedInDiagramsConnectionAggregateInput>>;
-  NOT?: InputMaybe<AiAssetDepictedInDiagramsConnectionAggregateInput>;
-  OR?: InputMaybe<Array<AiAssetDepictedInDiagramsConnectionAggregateInput>>;
+export type AiComponentDepictedInDiagramsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<AiComponentDepictedInDiagramsConnectionAggregateInput>>;
+  NOT?: InputMaybe<AiComponentDepictedInDiagramsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<AiComponentDepictedInDiagramsConnectionAggregateInput>>;
   count?: InputMaybe<ConnectionAggregationCountFilterInput>;
-  node?: InputMaybe<AiAssetDepictedInDiagramsNodeAggregationWhereInput>;
+  node?: InputMaybe<AiComponentDepictedInDiagramsNodeAggregationWhereInput>;
 };
 
-export type AiAssetDepictedInDiagramsConnectionFilters = {
-  /** Filter AIAssets by aggregating results on related AIAssetDepictedInDiagramsConnections */
-  aggregate?: InputMaybe<AiAssetDepictedInDiagramsConnectionAggregateInput>;
-  /** Return AIAssets where all of the related AIAssetDepictedInDiagramsConnections match this filter */
-  all?: InputMaybe<AiAssetDepictedInDiagramsConnectionWhere>;
-  /** Return AIAssets where none of the related AIAssetDepictedInDiagramsConnections match this filter */
-  none?: InputMaybe<AiAssetDepictedInDiagramsConnectionWhere>;
-  /** Return AIAssets where one of the related AIAssetDepictedInDiagramsConnections match this filter */
-  single?: InputMaybe<AiAssetDepictedInDiagramsConnectionWhere>;
-  /** Return AIAssets where some of the related AIAssetDepictedInDiagramsConnections match this filter */
-  some?: InputMaybe<AiAssetDepictedInDiagramsConnectionWhere>;
+export type AiComponentDepictedInDiagramsConnectionFilters = {
+  /** Filter AIComponents by aggregating results on related AIComponentDepictedInDiagramsConnections */
+  aggregate?: InputMaybe<AiComponentDepictedInDiagramsConnectionAggregateInput>;
+  /** Return AIComponents where all of the related AIComponentDepictedInDiagramsConnections match this filter */
+  all?: InputMaybe<AiComponentDepictedInDiagramsConnectionWhere>;
+  /** Return AIComponents where none of the related AIComponentDepictedInDiagramsConnections match this filter */
+  none?: InputMaybe<AiComponentDepictedInDiagramsConnectionWhere>;
+  /** Return AIComponents where one of the related AIComponentDepictedInDiagramsConnections match this filter */
+  single?: InputMaybe<AiComponentDepictedInDiagramsConnectionWhere>;
+  /** Return AIComponents where some of the related AIComponentDepictedInDiagramsConnections match this filter */
+  some?: InputMaybe<AiComponentDepictedInDiagramsConnectionWhere>;
 };
 
-export type AiAssetDepictedInDiagramsConnectionSort = {
+export type AiComponentDepictedInDiagramsConnectionSort = {
   node?: InputMaybe<DiagramSort>;
 };
 
-export type AiAssetDepictedInDiagramsConnectionWhere = {
-  AND?: InputMaybe<Array<AiAssetDepictedInDiagramsConnectionWhere>>;
-  NOT?: InputMaybe<AiAssetDepictedInDiagramsConnectionWhere>;
-  OR?: InputMaybe<Array<AiAssetDepictedInDiagramsConnectionWhere>>;
+export type AiComponentDepictedInDiagramsConnectionWhere = {
+  AND?: InputMaybe<Array<AiComponentDepictedInDiagramsConnectionWhere>>;
+  NOT?: InputMaybe<AiComponentDepictedInDiagramsConnectionWhere>;
+  OR?: InputMaybe<Array<AiComponentDepictedInDiagramsConnectionWhere>>;
   node?: InputMaybe<DiagramWhere>;
 };
 
-export type AiAssetDepictedInDiagramsCreateFieldInput = {
+export type AiComponentDepictedInDiagramsCreateFieldInput = {
   node: DiagramCreateInput;
 };
 
-export type AiAssetDepictedInDiagramsDeleteFieldInput = {
+export type AiComponentDepictedInDiagramsDeleteFieldInput = {
   delete?: InputMaybe<DiagramDeleteInput>;
-  where?: InputMaybe<AiAssetDepictedInDiagramsConnectionWhere>;
+  where?: InputMaybe<AiComponentDepictedInDiagramsConnectionWhere>;
 };
 
-export type AiAssetDepictedInDiagramsDisconnectFieldInput = {
+export type AiComponentDepictedInDiagramsDisconnectFieldInput = {
   disconnect?: InputMaybe<DiagramDisconnectInput>;
-  where?: InputMaybe<AiAssetDepictedInDiagramsConnectionWhere>;
+  where?: InputMaybe<AiComponentDepictedInDiagramsConnectionWhere>;
 };
 
-export type AiAssetDepictedInDiagramsFieldInput = {
-  connect?: InputMaybe<Array<AiAssetDepictedInDiagramsConnectFieldInput>>;
-  create?: InputMaybe<Array<AiAssetDepictedInDiagramsCreateFieldInput>>;
+export type AiComponentDepictedInDiagramsFieldInput = {
+  connect?: InputMaybe<Array<AiComponentDepictedInDiagramsConnectFieldInput>>;
+  create?: InputMaybe<Array<AiComponentDepictedInDiagramsCreateFieldInput>>;
 };
 
-export type AiAssetDepictedInDiagramsNodeAggregationWhereInput = {
-  AND?: InputMaybe<Array<AiAssetDepictedInDiagramsNodeAggregationWhereInput>>;
-  NOT?: InputMaybe<AiAssetDepictedInDiagramsNodeAggregationWhereInput>;
-  OR?: InputMaybe<Array<AiAssetDepictedInDiagramsNodeAggregationWhereInput>>;
+export type AiComponentDepictedInDiagramsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<AiComponentDepictedInDiagramsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<AiComponentDepictedInDiagramsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<AiComponentDepictedInDiagramsNodeAggregationWhereInput>>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramJson?: InputMaybe<StringScalarAggregationFilters>;
@@ -610,33 +610,33 @@ export type AiAssetDepictedInDiagramsNodeAggregationWhereInput = {
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
-export type AiAssetDepictedInDiagramsRelationship = {
-  __typename?: 'AIAssetDepictedInDiagramsRelationship';
+export type AiComponentDepictedInDiagramsRelationship = {
+  __typename?: 'AIComponentDepictedInDiagramsRelationship';
   cursor: Scalars['String']['output'];
   node: Diagram;
 };
 
-export type AiAssetDepictedInDiagramsUpdateConnectionInput = {
+export type AiComponentDepictedInDiagramsUpdateConnectionInput = {
   node?: InputMaybe<DiagramUpdateInput>;
-  where?: InputMaybe<AiAssetDepictedInDiagramsConnectionWhere>;
+  where?: InputMaybe<AiComponentDepictedInDiagramsConnectionWhere>;
 };
 
-export type AiAssetDepictedInDiagramsUpdateFieldInput = {
-  connect?: InputMaybe<Array<AiAssetDepictedInDiagramsConnectFieldInput>>;
-  create?: InputMaybe<Array<AiAssetDepictedInDiagramsCreateFieldInput>>;
-  delete?: InputMaybe<Array<AiAssetDepictedInDiagramsDeleteFieldInput>>;
-  disconnect?: InputMaybe<Array<AiAssetDepictedInDiagramsDisconnectFieldInput>>;
-  update?: InputMaybe<AiAssetDepictedInDiagramsUpdateConnectionInput>;
+export type AiComponentDepictedInDiagramsUpdateFieldInput = {
+  connect?: InputMaybe<Array<AiComponentDepictedInDiagramsConnectFieldInput>>;
+  create?: InputMaybe<Array<AiComponentDepictedInDiagramsCreateFieldInput>>;
+  delete?: InputMaybe<Array<AiComponentDepictedInDiagramsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<AiComponentDepictedInDiagramsDisconnectFieldInput>>;
+  update?: InputMaybe<AiComponentDepictedInDiagramsUpdateConnectionInput>;
 };
 
-export type AiAssetDiagramDepictedInDiagramsAggregateSelection = {
-  __typename?: 'AIAssetDiagramDepictedInDiagramsAggregateSelection';
+export type AiComponentDiagramDepictedInDiagramsAggregateSelection = {
+  __typename?: 'AIComponentDiagramDepictedInDiagramsAggregateSelection';
   count: CountConnection;
-  node?: Maybe<AiAssetDiagramDepictedInDiagramsNodeAggregateSelection>;
+  node?: Maybe<AiComponentDiagramDepictedInDiagramsNodeAggregateSelection>;
 };
 
-export type AiAssetDiagramDepictedInDiagramsNodeAggregateSelection = {
-  __typename?: 'AIAssetDiagramDepictedInDiagramsNodeAggregateSelection';
+export type AiComponentDiagramDepictedInDiagramsNodeAggregateSelection = {
+  __typename?: 'AIComponentDiagramDepictedInDiagramsNodeAggregateSelection';
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   diagramJson: StringAggregateSelection;
@@ -645,106 +645,106 @@ export type AiAssetDiagramDepictedInDiagramsNodeAggregateSelection = {
   updatedAt: DateTimeAggregateSelection;
 };
 
-export type AiAssetDisconnectInput = {
-  company?: InputMaybe<Array<AiAssetCompanyDisconnectFieldInput>>;
-  depictedInDiagrams?: InputMaybe<Array<AiAssetDepictedInDiagramsDisconnectFieldInput>>;
-  hostedOn?: InputMaybe<Array<AiAssetHostedOnDisconnectFieldInput>>;
-  implementsPrinciples?: InputMaybe<Array<AiAssetImplementsPrinciplesDisconnectFieldInput>>;
-  owners?: InputMaybe<Array<AiAssetOwnersDisconnectFieldInput>>;
-  partOfArchitectures?: InputMaybe<Array<AiAssetPartOfArchitecturesDisconnectFieldInput>>;
-  supportsCapabilities?: InputMaybe<Array<AiAssetSupportsCapabilitiesDisconnectFieldInput>>;
-  trainedWithDataObjects?: InputMaybe<Array<AiAssetTrainedWithDataObjectsDisconnectFieldInput>>;
-  usedByApplications?: InputMaybe<Array<AiAssetUsedByApplicationsDisconnectFieldInput>>;
-  usedByOrganisations?: InputMaybe<Array<AiAssetUsedByOrganisationsDisconnectFieldInput>>;
+export type AiComponentDisconnectInput = {
+  company?: InputMaybe<Array<AiComponentCompanyDisconnectFieldInput>>;
+  depictedInDiagrams?: InputMaybe<Array<AiComponentDepictedInDiagramsDisconnectFieldInput>>;
+  hostedOn?: InputMaybe<Array<AiComponentHostedOnDisconnectFieldInput>>;
+  implementsPrinciples?: InputMaybe<Array<AiComponentImplementsPrinciplesDisconnectFieldInput>>;
+  owners?: InputMaybe<Array<AiComponentOwnersDisconnectFieldInput>>;
+  partOfArchitectures?: InputMaybe<Array<AiComponentPartOfArchitecturesDisconnectFieldInput>>;
+  supportsCapabilities?: InputMaybe<Array<AiComponentSupportsCapabilitiesDisconnectFieldInput>>;
+  trainedWithDataObjects?: InputMaybe<Array<AiComponentTrainedWithDataObjectsDisconnectFieldInput>>;
+  usedByApplications?: InputMaybe<Array<AiComponentUsedByApplicationsDisconnectFieldInput>>;
+  usedByOrganisations?: InputMaybe<Array<AiComponentUsedByOrganisationsDisconnectFieldInput>>;
 };
 
-export type AiAssetEdge = {
-  __typename?: 'AIAssetEdge';
+export type AiComponentEdge = {
+  __typename?: 'AIComponentEdge';
   cursor: Scalars['String']['output'];
-  node: AiAsset;
+  node: AiComponent;
 };
 
-export type AiAssetHostedOnAggregateInput = {
-  AND?: InputMaybe<Array<AiAssetHostedOnAggregateInput>>;
-  NOT?: InputMaybe<AiAssetHostedOnAggregateInput>;
-  OR?: InputMaybe<Array<AiAssetHostedOnAggregateInput>>;
+export type AiComponentHostedOnAggregateInput = {
+  AND?: InputMaybe<Array<AiComponentHostedOnAggregateInput>>;
+  NOT?: InputMaybe<AiComponentHostedOnAggregateInput>;
+  OR?: InputMaybe<Array<AiComponentHostedOnAggregateInput>>;
   count?: InputMaybe<IntScalarFilters>;
   count_EQ?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
   count_LTE?: InputMaybe<Scalars['Int']['input']>;
-  node?: InputMaybe<AiAssetHostedOnNodeAggregationWhereInput>;
+  node?: InputMaybe<AiComponentHostedOnNodeAggregationWhereInput>;
 };
 
-export type AiAssetHostedOnConnectFieldInput = {
+export type AiComponentHostedOnConnectFieldInput = {
   connect?: InputMaybe<Array<InfrastructureConnectInput>>;
   where?: InputMaybe<InfrastructureConnectWhere>;
 };
 
-export type AiAssetHostedOnConnection = {
-  __typename?: 'AIAssetHostedOnConnection';
-  aggregate: AiAssetInfrastructureHostedOnAggregateSelection;
-  edges: Array<AiAssetHostedOnRelationship>;
+export type AiComponentHostedOnConnection = {
+  __typename?: 'AIComponentHostedOnConnection';
+  aggregate: AiComponentInfrastructureHostedOnAggregateSelection;
+  edges: Array<AiComponentHostedOnRelationship>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
 
-export type AiAssetHostedOnConnectionAggregateInput = {
-  AND?: InputMaybe<Array<AiAssetHostedOnConnectionAggregateInput>>;
-  NOT?: InputMaybe<AiAssetHostedOnConnectionAggregateInput>;
-  OR?: InputMaybe<Array<AiAssetHostedOnConnectionAggregateInput>>;
+export type AiComponentHostedOnConnectionAggregateInput = {
+  AND?: InputMaybe<Array<AiComponentHostedOnConnectionAggregateInput>>;
+  NOT?: InputMaybe<AiComponentHostedOnConnectionAggregateInput>;
+  OR?: InputMaybe<Array<AiComponentHostedOnConnectionAggregateInput>>;
   count?: InputMaybe<ConnectionAggregationCountFilterInput>;
-  node?: InputMaybe<AiAssetHostedOnNodeAggregationWhereInput>;
+  node?: InputMaybe<AiComponentHostedOnNodeAggregationWhereInput>;
 };
 
-export type AiAssetHostedOnConnectionFilters = {
-  /** Filter AIAssets by aggregating results on related AIAssetHostedOnConnections */
-  aggregate?: InputMaybe<AiAssetHostedOnConnectionAggregateInput>;
-  /** Return AIAssets where all of the related AIAssetHostedOnConnections match this filter */
-  all?: InputMaybe<AiAssetHostedOnConnectionWhere>;
-  /** Return AIAssets where none of the related AIAssetHostedOnConnections match this filter */
-  none?: InputMaybe<AiAssetHostedOnConnectionWhere>;
-  /** Return AIAssets where one of the related AIAssetHostedOnConnections match this filter */
-  single?: InputMaybe<AiAssetHostedOnConnectionWhere>;
-  /** Return AIAssets where some of the related AIAssetHostedOnConnections match this filter */
-  some?: InputMaybe<AiAssetHostedOnConnectionWhere>;
+export type AiComponentHostedOnConnectionFilters = {
+  /** Filter AIComponents by aggregating results on related AIComponentHostedOnConnections */
+  aggregate?: InputMaybe<AiComponentHostedOnConnectionAggregateInput>;
+  /** Return AIComponents where all of the related AIComponentHostedOnConnections match this filter */
+  all?: InputMaybe<AiComponentHostedOnConnectionWhere>;
+  /** Return AIComponents where none of the related AIComponentHostedOnConnections match this filter */
+  none?: InputMaybe<AiComponentHostedOnConnectionWhere>;
+  /** Return AIComponents where one of the related AIComponentHostedOnConnections match this filter */
+  single?: InputMaybe<AiComponentHostedOnConnectionWhere>;
+  /** Return AIComponents where some of the related AIComponentHostedOnConnections match this filter */
+  some?: InputMaybe<AiComponentHostedOnConnectionWhere>;
 };
 
-export type AiAssetHostedOnConnectionSort = {
+export type AiComponentHostedOnConnectionSort = {
   node?: InputMaybe<InfrastructureSort>;
 };
 
-export type AiAssetHostedOnConnectionWhere = {
-  AND?: InputMaybe<Array<AiAssetHostedOnConnectionWhere>>;
-  NOT?: InputMaybe<AiAssetHostedOnConnectionWhere>;
-  OR?: InputMaybe<Array<AiAssetHostedOnConnectionWhere>>;
+export type AiComponentHostedOnConnectionWhere = {
+  AND?: InputMaybe<Array<AiComponentHostedOnConnectionWhere>>;
+  NOT?: InputMaybe<AiComponentHostedOnConnectionWhere>;
+  OR?: InputMaybe<Array<AiComponentHostedOnConnectionWhere>>;
   node?: InputMaybe<InfrastructureWhere>;
 };
 
-export type AiAssetHostedOnCreateFieldInput = {
+export type AiComponentHostedOnCreateFieldInput = {
   node: InfrastructureCreateInput;
 };
 
-export type AiAssetHostedOnDeleteFieldInput = {
+export type AiComponentHostedOnDeleteFieldInput = {
   delete?: InputMaybe<InfrastructureDeleteInput>;
-  where?: InputMaybe<AiAssetHostedOnConnectionWhere>;
+  where?: InputMaybe<AiComponentHostedOnConnectionWhere>;
 };
 
-export type AiAssetHostedOnDisconnectFieldInput = {
+export type AiComponentHostedOnDisconnectFieldInput = {
   disconnect?: InputMaybe<InfrastructureDisconnectInput>;
-  where?: InputMaybe<AiAssetHostedOnConnectionWhere>;
+  where?: InputMaybe<AiComponentHostedOnConnectionWhere>;
 };
 
-export type AiAssetHostedOnFieldInput = {
-  connect?: InputMaybe<Array<AiAssetHostedOnConnectFieldInput>>;
-  create?: InputMaybe<Array<AiAssetHostedOnCreateFieldInput>>;
+export type AiComponentHostedOnFieldInput = {
+  connect?: InputMaybe<Array<AiComponentHostedOnConnectFieldInput>>;
+  create?: InputMaybe<Array<AiComponentHostedOnCreateFieldInput>>;
 };
 
-export type AiAssetHostedOnNodeAggregationWhereInput = {
-  AND?: InputMaybe<Array<AiAssetHostedOnNodeAggregationWhereInput>>;
-  NOT?: InputMaybe<AiAssetHostedOnNodeAggregationWhereInput>;
-  OR?: InputMaybe<Array<AiAssetHostedOnNodeAggregationWhereInput>>;
+export type AiComponentHostedOnNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<AiComponentHostedOnNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<AiComponentHostedOnNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<AiComponentHostedOnNodeAggregationWhereInput>>;
   capacity?: InputMaybe<StringScalarAggregationFilters>;
   costs?: InputMaybe<FloatScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
@@ -760,106 +760,106 @@ export type AiAssetHostedOnNodeAggregationWhereInput = {
   version?: InputMaybe<StringScalarAggregationFilters>;
 };
 
-export type AiAssetHostedOnRelationship = {
-  __typename?: 'AIAssetHostedOnRelationship';
+export type AiComponentHostedOnRelationship = {
+  __typename?: 'AIComponentHostedOnRelationship';
   cursor: Scalars['String']['output'];
   node: Infrastructure;
 };
 
-export type AiAssetHostedOnUpdateConnectionInput = {
+export type AiComponentHostedOnUpdateConnectionInput = {
   node?: InputMaybe<InfrastructureUpdateInput>;
-  where?: InputMaybe<AiAssetHostedOnConnectionWhere>;
+  where?: InputMaybe<AiComponentHostedOnConnectionWhere>;
 };
 
-export type AiAssetHostedOnUpdateFieldInput = {
-  connect?: InputMaybe<Array<AiAssetHostedOnConnectFieldInput>>;
-  create?: InputMaybe<Array<AiAssetHostedOnCreateFieldInput>>;
-  delete?: InputMaybe<Array<AiAssetHostedOnDeleteFieldInput>>;
-  disconnect?: InputMaybe<Array<AiAssetHostedOnDisconnectFieldInput>>;
-  update?: InputMaybe<AiAssetHostedOnUpdateConnectionInput>;
+export type AiComponentHostedOnUpdateFieldInput = {
+  connect?: InputMaybe<Array<AiComponentHostedOnConnectFieldInput>>;
+  create?: InputMaybe<Array<AiComponentHostedOnCreateFieldInput>>;
+  delete?: InputMaybe<Array<AiComponentHostedOnDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<AiComponentHostedOnDisconnectFieldInput>>;
+  update?: InputMaybe<AiComponentHostedOnUpdateConnectionInput>;
 };
 
-export type AiAssetImplementsPrinciplesAggregateInput = {
-  AND?: InputMaybe<Array<AiAssetImplementsPrinciplesAggregateInput>>;
-  NOT?: InputMaybe<AiAssetImplementsPrinciplesAggregateInput>;
-  OR?: InputMaybe<Array<AiAssetImplementsPrinciplesAggregateInput>>;
+export type AiComponentImplementsPrinciplesAggregateInput = {
+  AND?: InputMaybe<Array<AiComponentImplementsPrinciplesAggregateInput>>;
+  NOT?: InputMaybe<AiComponentImplementsPrinciplesAggregateInput>;
+  OR?: InputMaybe<Array<AiComponentImplementsPrinciplesAggregateInput>>;
   count?: InputMaybe<IntScalarFilters>;
   count_EQ?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
   count_LTE?: InputMaybe<Scalars['Int']['input']>;
-  node?: InputMaybe<AiAssetImplementsPrinciplesNodeAggregationWhereInput>;
+  node?: InputMaybe<AiComponentImplementsPrinciplesNodeAggregationWhereInput>;
 };
 
-export type AiAssetImplementsPrinciplesConnectFieldInput = {
+export type AiComponentImplementsPrinciplesConnectFieldInput = {
   connect?: InputMaybe<Array<ArchitecturePrincipleConnectInput>>;
   where?: InputMaybe<ArchitecturePrincipleConnectWhere>;
 };
 
-export type AiAssetImplementsPrinciplesConnection = {
-  __typename?: 'AIAssetImplementsPrinciplesConnection';
-  aggregate: AiAssetArchitecturePrincipleImplementsPrinciplesAggregateSelection;
-  edges: Array<AiAssetImplementsPrinciplesRelationship>;
+export type AiComponentImplementsPrinciplesConnection = {
+  __typename?: 'AIComponentImplementsPrinciplesConnection';
+  aggregate: AiComponentArchitecturePrincipleImplementsPrinciplesAggregateSelection;
+  edges: Array<AiComponentImplementsPrinciplesRelationship>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
 
-export type AiAssetImplementsPrinciplesConnectionAggregateInput = {
-  AND?: InputMaybe<Array<AiAssetImplementsPrinciplesConnectionAggregateInput>>;
-  NOT?: InputMaybe<AiAssetImplementsPrinciplesConnectionAggregateInput>;
-  OR?: InputMaybe<Array<AiAssetImplementsPrinciplesConnectionAggregateInput>>;
+export type AiComponentImplementsPrinciplesConnectionAggregateInput = {
+  AND?: InputMaybe<Array<AiComponentImplementsPrinciplesConnectionAggregateInput>>;
+  NOT?: InputMaybe<AiComponentImplementsPrinciplesConnectionAggregateInput>;
+  OR?: InputMaybe<Array<AiComponentImplementsPrinciplesConnectionAggregateInput>>;
   count?: InputMaybe<ConnectionAggregationCountFilterInput>;
-  node?: InputMaybe<AiAssetImplementsPrinciplesNodeAggregationWhereInput>;
+  node?: InputMaybe<AiComponentImplementsPrinciplesNodeAggregationWhereInput>;
 };
 
-export type AiAssetImplementsPrinciplesConnectionFilters = {
-  /** Filter AIAssets by aggregating results on related AIAssetImplementsPrinciplesConnections */
-  aggregate?: InputMaybe<AiAssetImplementsPrinciplesConnectionAggregateInput>;
-  /** Return AIAssets where all of the related AIAssetImplementsPrinciplesConnections match this filter */
-  all?: InputMaybe<AiAssetImplementsPrinciplesConnectionWhere>;
-  /** Return AIAssets where none of the related AIAssetImplementsPrinciplesConnections match this filter */
-  none?: InputMaybe<AiAssetImplementsPrinciplesConnectionWhere>;
-  /** Return AIAssets where one of the related AIAssetImplementsPrinciplesConnections match this filter */
-  single?: InputMaybe<AiAssetImplementsPrinciplesConnectionWhere>;
-  /** Return AIAssets where some of the related AIAssetImplementsPrinciplesConnections match this filter */
-  some?: InputMaybe<AiAssetImplementsPrinciplesConnectionWhere>;
+export type AiComponentImplementsPrinciplesConnectionFilters = {
+  /** Filter AIComponents by aggregating results on related AIComponentImplementsPrinciplesConnections */
+  aggregate?: InputMaybe<AiComponentImplementsPrinciplesConnectionAggregateInput>;
+  /** Return AIComponents where all of the related AIComponentImplementsPrinciplesConnections match this filter */
+  all?: InputMaybe<AiComponentImplementsPrinciplesConnectionWhere>;
+  /** Return AIComponents where none of the related AIComponentImplementsPrinciplesConnections match this filter */
+  none?: InputMaybe<AiComponentImplementsPrinciplesConnectionWhere>;
+  /** Return AIComponents where one of the related AIComponentImplementsPrinciplesConnections match this filter */
+  single?: InputMaybe<AiComponentImplementsPrinciplesConnectionWhere>;
+  /** Return AIComponents where some of the related AIComponentImplementsPrinciplesConnections match this filter */
+  some?: InputMaybe<AiComponentImplementsPrinciplesConnectionWhere>;
 };
 
-export type AiAssetImplementsPrinciplesConnectionSort = {
+export type AiComponentImplementsPrinciplesConnectionSort = {
   node?: InputMaybe<ArchitecturePrincipleSort>;
 };
 
-export type AiAssetImplementsPrinciplesConnectionWhere = {
-  AND?: InputMaybe<Array<AiAssetImplementsPrinciplesConnectionWhere>>;
-  NOT?: InputMaybe<AiAssetImplementsPrinciplesConnectionWhere>;
-  OR?: InputMaybe<Array<AiAssetImplementsPrinciplesConnectionWhere>>;
+export type AiComponentImplementsPrinciplesConnectionWhere = {
+  AND?: InputMaybe<Array<AiComponentImplementsPrinciplesConnectionWhere>>;
+  NOT?: InputMaybe<AiComponentImplementsPrinciplesConnectionWhere>;
+  OR?: InputMaybe<Array<AiComponentImplementsPrinciplesConnectionWhere>>;
   node?: InputMaybe<ArchitecturePrincipleWhere>;
 };
 
-export type AiAssetImplementsPrinciplesCreateFieldInput = {
+export type AiComponentImplementsPrinciplesCreateFieldInput = {
   node: ArchitecturePrincipleCreateInput;
 };
 
-export type AiAssetImplementsPrinciplesDeleteFieldInput = {
+export type AiComponentImplementsPrinciplesDeleteFieldInput = {
   delete?: InputMaybe<ArchitecturePrincipleDeleteInput>;
-  where?: InputMaybe<AiAssetImplementsPrinciplesConnectionWhere>;
+  where?: InputMaybe<AiComponentImplementsPrinciplesConnectionWhere>;
 };
 
-export type AiAssetImplementsPrinciplesDisconnectFieldInput = {
+export type AiComponentImplementsPrinciplesDisconnectFieldInput = {
   disconnect?: InputMaybe<ArchitecturePrincipleDisconnectInput>;
-  where?: InputMaybe<AiAssetImplementsPrinciplesConnectionWhere>;
+  where?: InputMaybe<AiComponentImplementsPrinciplesConnectionWhere>;
 };
 
-export type AiAssetImplementsPrinciplesFieldInput = {
-  connect?: InputMaybe<Array<AiAssetImplementsPrinciplesConnectFieldInput>>;
-  create?: InputMaybe<Array<AiAssetImplementsPrinciplesCreateFieldInput>>;
+export type AiComponentImplementsPrinciplesFieldInput = {
+  connect?: InputMaybe<Array<AiComponentImplementsPrinciplesConnectFieldInput>>;
+  create?: InputMaybe<Array<AiComponentImplementsPrinciplesCreateFieldInput>>;
 };
 
-export type AiAssetImplementsPrinciplesNodeAggregationWhereInput = {
-  AND?: InputMaybe<Array<AiAssetImplementsPrinciplesNodeAggregationWhereInput>>;
-  NOT?: InputMaybe<AiAssetImplementsPrinciplesNodeAggregationWhereInput>;
-  OR?: InputMaybe<Array<AiAssetImplementsPrinciplesNodeAggregationWhereInput>>;
+export type AiComponentImplementsPrinciplesNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<AiComponentImplementsPrinciplesNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<AiComponentImplementsPrinciplesNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<AiComponentImplementsPrinciplesNodeAggregationWhereInput>>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   implications?: InputMaybe<StringScalarAggregationFilters>;
@@ -868,33 +868,33 @@ export type AiAssetImplementsPrinciplesNodeAggregationWhereInput = {
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
-export type AiAssetImplementsPrinciplesRelationship = {
-  __typename?: 'AIAssetImplementsPrinciplesRelationship';
+export type AiComponentImplementsPrinciplesRelationship = {
+  __typename?: 'AIComponentImplementsPrinciplesRelationship';
   cursor: Scalars['String']['output'];
   node: ArchitecturePrinciple;
 };
 
-export type AiAssetImplementsPrinciplesUpdateConnectionInput = {
+export type AiComponentImplementsPrinciplesUpdateConnectionInput = {
   node?: InputMaybe<ArchitecturePrincipleUpdateInput>;
-  where?: InputMaybe<AiAssetImplementsPrinciplesConnectionWhere>;
+  where?: InputMaybe<AiComponentImplementsPrinciplesConnectionWhere>;
 };
 
-export type AiAssetImplementsPrinciplesUpdateFieldInput = {
-  connect?: InputMaybe<Array<AiAssetImplementsPrinciplesConnectFieldInput>>;
-  create?: InputMaybe<Array<AiAssetImplementsPrinciplesCreateFieldInput>>;
-  delete?: InputMaybe<Array<AiAssetImplementsPrinciplesDeleteFieldInput>>;
-  disconnect?: InputMaybe<Array<AiAssetImplementsPrinciplesDisconnectFieldInput>>;
-  update?: InputMaybe<AiAssetImplementsPrinciplesUpdateConnectionInput>;
+export type AiComponentImplementsPrinciplesUpdateFieldInput = {
+  connect?: InputMaybe<Array<AiComponentImplementsPrinciplesConnectFieldInput>>;
+  create?: InputMaybe<Array<AiComponentImplementsPrinciplesCreateFieldInput>>;
+  delete?: InputMaybe<Array<AiComponentImplementsPrinciplesDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<AiComponentImplementsPrinciplesDisconnectFieldInput>>;
+  update?: InputMaybe<AiComponentImplementsPrinciplesUpdateConnectionInput>;
 };
 
-export type AiAssetInfrastructureHostedOnAggregateSelection = {
-  __typename?: 'AIAssetInfrastructureHostedOnAggregateSelection';
+export type AiComponentInfrastructureHostedOnAggregateSelection = {
+  __typename?: 'AIComponentInfrastructureHostedOnAggregateSelection';
   count: CountConnection;
-  node?: Maybe<AiAssetInfrastructureHostedOnNodeAggregateSelection>;
+  node?: Maybe<AiComponentInfrastructureHostedOnNodeAggregateSelection>;
 };
 
-export type AiAssetInfrastructureHostedOnNodeAggregateSelection = {
-  __typename?: 'AIAssetInfrastructureHostedOnNodeAggregateSelection';
+export type AiComponentInfrastructureHostedOnNodeAggregateSelection = {
+  __typename?: 'AIComponentInfrastructureHostedOnNodeAggregateSelection';
   capacity: StringAggregateSelection;
   costs: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
@@ -910,14 +910,14 @@ export type AiAssetInfrastructureHostedOnNodeAggregateSelection = {
   version: StringAggregateSelection;
 };
 
-export type AiAssetOrganisationUsedByOrganisationsAggregateSelection = {
-  __typename?: 'AIAssetOrganisationUsedByOrganisationsAggregateSelection';
+export type AiComponentOrganisationUsedByOrganisationsAggregateSelection = {
+  __typename?: 'AIComponentOrganisationUsedByOrganisationsAggregateSelection';
   count: CountConnection;
-  node?: Maybe<AiAssetOrganisationUsedByOrganisationsNodeAggregateSelection>;
+  node?: Maybe<AiComponentOrganisationUsedByOrganisationsNodeAggregateSelection>;
 };
 
-export type AiAssetOrganisationUsedByOrganisationsNodeAggregateSelection = {
-  __typename?: 'AIAssetOrganisationUsedByOrganisationsNodeAggregateSelection';
+export type AiComponentOrganisationUsedByOrganisationsNodeAggregateSelection = {
+  __typename?: 'AIComponentOrganisationUsedByOrganisationsNodeAggregateSelection';
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   level: IntAggregateSelection;
@@ -925,87 +925,87 @@ export type AiAssetOrganisationUsedByOrganisationsNodeAggregateSelection = {
   updatedAt: DateTimeAggregateSelection;
 };
 
-export type AiAssetOwnersAggregateInput = {
-  AND?: InputMaybe<Array<AiAssetOwnersAggregateInput>>;
-  NOT?: InputMaybe<AiAssetOwnersAggregateInput>;
-  OR?: InputMaybe<Array<AiAssetOwnersAggregateInput>>;
+export type AiComponentOwnersAggregateInput = {
+  AND?: InputMaybe<Array<AiComponentOwnersAggregateInput>>;
+  NOT?: InputMaybe<AiComponentOwnersAggregateInput>;
+  OR?: InputMaybe<Array<AiComponentOwnersAggregateInput>>;
   count?: InputMaybe<IntScalarFilters>;
   count_EQ?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
   count_LTE?: InputMaybe<Scalars['Int']['input']>;
-  node?: InputMaybe<AiAssetOwnersNodeAggregationWhereInput>;
+  node?: InputMaybe<AiComponentOwnersNodeAggregationWhereInput>;
 };
 
-export type AiAssetOwnersConnectFieldInput = {
+export type AiComponentOwnersConnectFieldInput = {
   connect?: InputMaybe<Array<PersonConnectInput>>;
   where?: InputMaybe<PersonConnectWhere>;
 };
 
-export type AiAssetOwnersConnection = {
-  __typename?: 'AIAssetOwnersConnection';
-  aggregate: AiAssetPersonOwnersAggregateSelection;
-  edges: Array<AiAssetOwnersRelationship>;
+export type AiComponentOwnersConnection = {
+  __typename?: 'AIComponentOwnersConnection';
+  aggregate: AiComponentPersonOwnersAggregateSelection;
+  edges: Array<AiComponentOwnersRelationship>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
 
-export type AiAssetOwnersConnectionAggregateInput = {
-  AND?: InputMaybe<Array<AiAssetOwnersConnectionAggregateInput>>;
-  NOT?: InputMaybe<AiAssetOwnersConnectionAggregateInput>;
-  OR?: InputMaybe<Array<AiAssetOwnersConnectionAggregateInput>>;
+export type AiComponentOwnersConnectionAggregateInput = {
+  AND?: InputMaybe<Array<AiComponentOwnersConnectionAggregateInput>>;
+  NOT?: InputMaybe<AiComponentOwnersConnectionAggregateInput>;
+  OR?: InputMaybe<Array<AiComponentOwnersConnectionAggregateInput>>;
   count?: InputMaybe<ConnectionAggregationCountFilterInput>;
-  node?: InputMaybe<AiAssetOwnersNodeAggregationWhereInput>;
+  node?: InputMaybe<AiComponentOwnersNodeAggregationWhereInput>;
 };
 
-export type AiAssetOwnersConnectionFilters = {
-  /** Filter AIAssets by aggregating results on related AIAssetOwnersConnections */
-  aggregate?: InputMaybe<AiAssetOwnersConnectionAggregateInput>;
-  /** Return AIAssets where all of the related AIAssetOwnersConnections match this filter */
-  all?: InputMaybe<AiAssetOwnersConnectionWhere>;
-  /** Return AIAssets where none of the related AIAssetOwnersConnections match this filter */
-  none?: InputMaybe<AiAssetOwnersConnectionWhere>;
-  /** Return AIAssets where one of the related AIAssetOwnersConnections match this filter */
-  single?: InputMaybe<AiAssetOwnersConnectionWhere>;
-  /** Return AIAssets where some of the related AIAssetOwnersConnections match this filter */
-  some?: InputMaybe<AiAssetOwnersConnectionWhere>;
+export type AiComponentOwnersConnectionFilters = {
+  /** Filter AIComponents by aggregating results on related AIComponentOwnersConnections */
+  aggregate?: InputMaybe<AiComponentOwnersConnectionAggregateInput>;
+  /** Return AIComponents where all of the related AIComponentOwnersConnections match this filter */
+  all?: InputMaybe<AiComponentOwnersConnectionWhere>;
+  /** Return AIComponents where none of the related AIComponentOwnersConnections match this filter */
+  none?: InputMaybe<AiComponentOwnersConnectionWhere>;
+  /** Return AIComponents where one of the related AIComponentOwnersConnections match this filter */
+  single?: InputMaybe<AiComponentOwnersConnectionWhere>;
+  /** Return AIComponents where some of the related AIComponentOwnersConnections match this filter */
+  some?: InputMaybe<AiComponentOwnersConnectionWhere>;
 };
 
-export type AiAssetOwnersConnectionSort = {
+export type AiComponentOwnersConnectionSort = {
   node?: InputMaybe<PersonSort>;
 };
 
-export type AiAssetOwnersConnectionWhere = {
-  AND?: InputMaybe<Array<AiAssetOwnersConnectionWhere>>;
-  NOT?: InputMaybe<AiAssetOwnersConnectionWhere>;
-  OR?: InputMaybe<Array<AiAssetOwnersConnectionWhere>>;
+export type AiComponentOwnersConnectionWhere = {
+  AND?: InputMaybe<Array<AiComponentOwnersConnectionWhere>>;
+  NOT?: InputMaybe<AiComponentOwnersConnectionWhere>;
+  OR?: InputMaybe<Array<AiComponentOwnersConnectionWhere>>;
   node?: InputMaybe<PersonWhere>;
 };
 
-export type AiAssetOwnersCreateFieldInput = {
+export type AiComponentOwnersCreateFieldInput = {
   node: PersonCreateInput;
 };
 
-export type AiAssetOwnersDeleteFieldInput = {
+export type AiComponentOwnersDeleteFieldInput = {
   delete?: InputMaybe<PersonDeleteInput>;
-  where?: InputMaybe<AiAssetOwnersConnectionWhere>;
+  where?: InputMaybe<AiComponentOwnersConnectionWhere>;
 };
 
-export type AiAssetOwnersDisconnectFieldInput = {
+export type AiComponentOwnersDisconnectFieldInput = {
   disconnect?: InputMaybe<PersonDisconnectInput>;
-  where?: InputMaybe<AiAssetOwnersConnectionWhere>;
+  where?: InputMaybe<AiComponentOwnersConnectionWhere>;
 };
 
-export type AiAssetOwnersFieldInput = {
-  connect?: InputMaybe<Array<AiAssetOwnersConnectFieldInput>>;
-  create?: InputMaybe<Array<AiAssetOwnersCreateFieldInput>>;
+export type AiComponentOwnersFieldInput = {
+  connect?: InputMaybe<Array<AiComponentOwnersConnectFieldInput>>;
+  create?: InputMaybe<Array<AiComponentOwnersCreateFieldInput>>;
 };
 
-export type AiAssetOwnersNodeAggregationWhereInput = {
-  AND?: InputMaybe<Array<AiAssetOwnersNodeAggregationWhereInput>>;
-  NOT?: InputMaybe<AiAssetOwnersNodeAggregationWhereInput>;
-  OR?: InputMaybe<Array<AiAssetOwnersNodeAggregationWhereInput>>;
+export type AiComponentOwnersNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<AiComponentOwnersNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<AiComponentOwnersNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<AiComponentOwnersNodeAggregationWhereInput>>;
   avatarUrl?: InputMaybe<StringScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   department?: InputMaybe<StringScalarAggregationFilters>;
@@ -1017,106 +1017,106 @@ export type AiAssetOwnersNodeAggregationWhereInput = {
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
-export type AiAssetOwnersRelationship = {
-  __typename?: 'AIAssetOwnersRelationship';
+export type AiComponentOwnersRelationship = {
+  __typename?: 'AIComponentOwnersRelationship';
   cursor: Scalars['String']['output'];
   node: Person;
 };
 
-export type AiAssetOwnersUpdateConnectionInput = {
+export type AiComponentOwnersUpdateConnectionInput = {
   node?: InputMaybe<PersonUpdateInput>;
-  where?: InputMaybe<AiAssetOwnersConnectionWhere>;
+  where?: InputMaybe<AiComponentOwnersConnectionWhere>;
 };
 
-export type AiAssetOwnersUpdateFieldInput = {
-  connect?: InputMaybe<Array<AiAssetOwnersConnectFieldInput>>;
-  create?: InputMaybe<Array<AiAssetOwnersCreateFieldInput>>;
-  delete?: InputMaybe<Array<AiAssetOwnersDeleteFieldInput>>;
-  disconnect?: InputMaybe<Array<AiAssetOwnersDisconnectFieldInput>>;
-  update?: InputMaybe<AiAssetOwnersUpdateConnectionInput>;
+export type AiComponentOwnersUpdateFieldInput = {
+  connect?: InputMaybe<Array<AiComponentOwnersConnectFieldInput>>;
+  create?: InputMaybe<Array<AiComponentOwnersCreateFieldInput>>;
+  delete?: InputMaybe<Array<AiComponentOwnersDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<AiComponentOwnersDisconnectFieldInput>>;
+  update?: InputMaybe<AiComponentOwnersUpdateConnectionInput>;
 };
 
-export type AiAssetPartOfArchitecturesAggregateInput = {
-  AND?: InputMaybe<Array<AiAssetPartOfArchitecturesAggregateInput>>;
-  NOT?: InputMaybe<AiAssetPartOfArchitecturesAggregateInput>;
-  OR?: InputMaybe<Array<AiAssetPartOfArchitecturesAggregateInput>>;
+export type AiComponentPartOfArchitecturesAggregateInput = {
+  AND?: InputMaybe<Array<AiComponentPartOfArchitecturesAggregateInput>>;
+  NOT?: InputMaybe<AiComponentPartOfArchitecturesAggregateInput>;
+  OR?: InputMaybe<Array<AiComponentPartOfArchitecturesAggregateInput>>;
   count?: InputMaybe<IntScalarFilters>;
   count_EQ?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
   count_LTE?: InputMaybe<Scalars['Int']['input']>;
-  node?: InputMaybe<AiAssetPartOfArchitecturesNodeAggregationWhereInput>;
+  node?: InputMaybe<AiComponentPartOfArchitecturesNodeAggregationWhereInput>;
 };
 
-export type AiAssetPartOfArchitecturesConnectFieldInput = {
+export type AiComponentPartOfArchitecturesConnectFieldInput = {
   connect?: InputMaybe<Array<ArchitectureConnectInput>>;
   where?: InputMaybe<ArchitectureConnectWhere>;
 };
 
-export type AiAssetPartOfArchitecturesConnection = {
-  __typename?: 'AIAssetPartOfArchitecturesConnection';
-  aggregate: AiAssetArchitecturePartOfArchitecturesAggregateSelection;
-  edges: Array<AiAssetPartOfArchitecturesRelationship>;
+export type AiComponentPartOfArchitecturesConnection = {
+  __typename?: 'AIComponentPartOfArchitecturesConnection';
+  aggregate: AiComponentArchitecturePartOfArchitecturesAggregateSelection;
+  edges: Array<AiComponentPartOfArchitecturesRelationship>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
 
-export type AiAssetPartOfArchitecturesConnectionAggregateInput = {
-  AND?: InputMaybe<Array<AiAssetPartOfArchitecturesConnectionAggregateInput>>;
-  NOT?: InputMaybe<AiAssetPartOfArchitecturesConnectionAggregateInput>;
-  OR?: InputMaybe<Array<AiAssetPartOfArchitecturesConnectionAggregateInput>>;
+export type AiComponentPartOfArchitecturesConnectionAggregateInput = {
+  AND?: InputMaybe<Array<AiComponentPartOfArchitecturesConnectionAggregateInput>>;
+  NOT?: InputMaybe<AiComponentPartOfArchitecturesConnectionAggregateInput>;
+  OR?: InputMaybe<Array<AiComponentPartOfArchitecturesConnectionAggregateInput>>;
   count?: InputMaybe<ConnectionAggregationCountFilterInput>;
-  node?: InputMaybe<AiAssetPartOfArchitecturesNodeAggregationWhereInput>;
+  node?: InputMaybe<AiComponentPartOfArchitecturesNodeAggregationWhereInput>;
 };
 
-export type AiAssetPartOfArchitecturesConnectionFilters = {
-  /** Filter AIAssets by aggregating results on related AIAssetPartOfArchitecturesConnections */
-  aggregate?: InputMaybe<AiAssetPartOfArchitecturesConnectionAggregateInput>;
-  /** Return AIAssets where all of the related AIAssetPartOfArchitecturesConnections match this filter */
-  all?: InputMaybe<AiAssetPartOfArchitecturesConnectionWhere>;
-  /** Return AIAssets where none of the related AIAssetPartOfArchitecturesConnections match this filter */
-  none?: InputMaybe<AiAssetPartOfArchitecturesConnectionWhere>;
-  /** Return AIAssets where one of the related AIAssetPartOfArchitecturesConnections match this filter */
-  single?: InputMaybe<AiAssetPartOfArchitecturesConnectionWhere>;
-  /** Return AIAssets where some of the related AIAssetPartOfArchitecturesConnections match this filter */
-  some?: InputMaybe<AiAssetPartOfArchitecturesConnectionWhere>;
+export type AiComponentPartOfArchitecturesConnectionFilters = {
+  /** Filter AIComponents by aggregating results on related AIComponentPartOfArchitecturesConnections */
+  aggregate?: InputMaybe<AiComponentPartOfArchitecturesConnectionAggregateInput>;
+  /** Return AIComponents where all of the related AIComponentPartOfArchitecturesConnections match this filter */
+  all?: InputMaybe<AiComponentPartOfArchitecturesConnectionWhere>;
+  /** Return AIComponents where none of the related AIComponentPartOfArchitecturesConnections match this filter */
+  none?: InputMaybe<AiComponentPartOfArchitecturesConnectionWhere>;
+  /** Return AIComponents where one of the related AIComponentPartOfArchitecturesConnections match this filter */
+  single?: InputMaybe<AiComponentPartOfArchitecturesConnectionWhere>;
+  /** Return AIComponents where some of the related AIComponentPartOfArchitecturesConnections match this filter */
+  some?: InputMaybe<AiComponentPartOfArchitecturesConnectionWhere>;
 };
 
-export type AiAssetPartOfArchitecturesConnectionSort = {
+export type AiComponentPartOfArchitecturesConnectionSort = {
   node?: InputMaybe<ArchitectureSort>;
 };
 
-export type AiAssetPartOfArchitecturesConnectionWhere = {
-  AND?: InputMaybe<Array<AiAssetPartOfArchitecturesConnectionWhere>>;
-  NOT?: InputMaybe<AiAssetPartOfArchitecturesConnectionWhere>;
-  OR?: InputMaybe<Array<AiAssetPartOfArchitecturesConnectionWhere>>;
+export type AiComponentPartOfArchitecturesConnectionWhere = {
+  AND?: InputMaybe<Array<AiComponentPartOfArchitecturesConnectionWhere>>;
+  NOT?: InputMaybe<AiComponentPartOfArchitecturesConnectionWhere>;
+  OR?: InputMaybe<Array<AiComponentPartOfArchitecturesConnectionWhere>>;
   node?: InputMaybe<ArchitectureWhere>;
 };
 
-export type AiAssetPartOfArchitecturesCreateFieldInput = {
+export type AiComponentPartOfArchitecturesCreateFieldInput = {
   node: ArchitectureCreateInput;
 };
 
-export type AiAssetPartOfArchitecturesDeleteFieldInput = {
+export type AiComponentPartOfArchitecturesDeleteFieldInput = {
   delete?: InputMaybe<ArchitectureDeleteInput>;
-  where?: InputMaybe<AiAssetPartOfArchitecturesConnectionWhere>;
+  where?: InputMaybe<AiComponentPartOfArchitecturesConnectionWhere>;
 };
 
-export type AiAssetPartOfArchitecturesDisconnectFieldInput = {
+export type AiComponentPartOfArchitecturesDisconnectFieldInput = {
   disconnect?: InputMaybe<ArchitectureDisconnectInput>;
-  where?: InputMaybe<AiAssetPartOfArchitecturesConnectionWhere>;
+  where?: InputMaybe<AiComponentPartOfArchitecturesConnectionWhere>;
 };
 
-export type AiAssetPartOfArchitecturesFieldInput = {
-  connect?: InputMaybe<Array<AiAssetPartOfArchitecturesConnectFieldInput>>;
-  create?: InputMaybe<Array<AiAssetPartOfArchitecturesCreateFieldInput>>;
+export type AiComponentPartOfArchitecturesFieldInput = {
+  connect?: InputMaybe<Array<AiComponentPartOfArchitecturesConnectFieldInput>>;
+  create?: InputMaybe<Array<AiComponentPartOfArchitecturesCreateFieldInput>>;
 };
 
-export type AiAssetPartOfArchitecturesNodeAggregationWhereInput = {
-  AND?: InputMaybe<Array<AiAssetPartOfArchitecturesNodeAggregationWhereInput>>;
-  NOT?: InputMaybe<AiAssetPartOfArchitecturesNodeAggregationWhereInput>;
-  OR?: InputMaybe<Array<AiAssetPartOfArchitecturesNodeAggregationWhereInput>>;
+export type AiComponentPartOfArchitecturesNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<AiComponentPartOfArchitecturesNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<AiComponentPartOfArchitecturesNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<AiComponentPartOfArchitecturesNodeAggregationWhereInput>>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
@@ -1124,33 +1124,33 @@ export type AiAssetPartOfArchitecturesNodeAggregationWhereInput = {
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
-export type AiAssetPartOfArchitecturesRelationship = {
-  __typename?: 'AIAssetPartOfArchitecturesRelationship';
+export type AiComponentPartOfArchitecturesRelationship = {
+  __typename?: 'AIComponentPartOfArchitecturesRelationship';
   cursor: Scalars['String']['output'];
   node: Architecture;
 };
 
-export type AiAssetPartOfArchitecturesUpdateConnectionInput = {
+export type AiComponentPartOfArchitecturesUpdateConnectionInput = {
   node?: InputMaybe<ArchitectureUpdateInput>;
-  where?: InputMaybe<AiAssetPartOfArchitecturesConnectionWhere>;
+  where?: InputMaybe<AiComponentPartOfArchitecturesConnectionWhere>;
 };
 
-export type AiAssetPartOfArchitecturesUpdateFieldInput = {
-  connect?: InputMaybe<Array<AiAssetPartOfArchitecturesConnectFieldInput>>;
-  create?: InputMaybe<Array<AiAssetPartOfArchitecturesCreateFieldInput>>;
-  delete?: InputMaybe<Array<AiAssetPartOfArchitecturesDeleteFieldInput>>;
-  disconnect?: InputMaybe<Array<AiAssetPartOfArchitecturesDisconnectFieldInput>>;
-  update?: InputMaybe<AiAssetPartOfArchitecturesUpdateConnectionInput>;
+export type AiComponentPartOfArchitecturesUpdateFieldInput = {
+  connect?: InputMaybe<Array<AiComponentPartOfArchitecturesConnectFieldInput>>;
+  create?: InputMaybe<Array<AiComponentPartOfArchitecturesCreateFieldInput>>;
+  delete?: InputMaybe<Array<AiComponentPartOfArchitecturesDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<AiComponentPartOfArchitecturesDisconnectFieldInput>>;
+  update?: InputMaybe<AiComponentPartOfArchitecturesUpdateConnectionInput>;
 };
 
-export type AiAssetPersonOwnersAggregateSelection = {
-  __typename?: 'AIAssetPersonOwnersAggregateSelection';
+export type AiComponentPersonOwnersAggregateSelection = {
+  __typename?: 'AIComponentPersonOwnersAggregateSelection';
   count: CountConnection;
-  node?: Maybe<AiAssetPersonOwnersNodeAggregateSelection>;
+  node?: Maybe<AiComponentPersonOwnersNodeAggregateSelection>;
 };
 
-export type AiAssetPersonOwnersNodeAggregateSelection = {
-  __typename?: 'AIAssetPersonOwnersNodeAggregateSelection';
+export type AiComponentPersonOwnersNodeAggregateSelection = {
+  __typename?: 'AIComponentPersonOwnersNodeAggregateSelection';
   avatarUrl: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   department: StringAggregateSelection;
@@ -1162,19 +1162,19 @@ export type AiAssetPersonOwnersNodeAggregateSelection = {
   updatedAt: DateTimeAggregateSelection;
 };
 
-export type AiAssetRelationshipFilters = {
-  /** Filter type where all of the related AIAssets match this filter */
-  all?: InputMaybe<AiAssetWhere>;
-  /** Filter type where none of the related AIAssets match this filter */
-  none?: InputMaybe<AiAssetWhere>;
-  /** Filter type where one of the related AIAssets match this filter */
-  single?: InputMaybe<AiAssetWhere>;
-  /** Filter type where some of the related AIAssets match this filter */
-  some?: InputMaybe<AiAssetWhere>;
+export type AiComponentRelationshipFilters = {
+  /** Filter type where all of the related AIComponents match this filter */
+  all?: InputMaybe<AiComponentWhere>;
+  /** Filter type where none of the related AIComponents match this filter */
+  none?: InputMaybe<AiComponentWhere>;
+  /** Filter type where one of the related AIComponents match this filter */
+  single?: InputMaybe<AiComponentWhere>;
+  /** Filter type where some of the related AIComponents match this filter */
+  some?: InputMaybe<AiComponentWhere>;
 };
 
-/** Fields to sort AiAssets by. The order in which sorts are applied is not guaranteed when specifying many fields in one AIAssetSort object. */
-export type AiAssetSort = {
+/** Fields to sort AiComponents by. The order in which sorts are applied is not guaranteed when specifying many fields in one AIComponentSort object. */
+export type AiComponentSort = {
   accuracy?: InputMaybe<SortDirection>;
   aiType?: InputMaybe<SortDirection>;
   costs?: InputMaybe<SortDirection>;
@@ -1193,7 +1193,7 @@ export type AiAssetSort = {
 };
 
 /** Status-Werte für KI-Assets */
-export enum AiAssetStatus {
+export enum AiComponentStatus {
   ACTIVE = 'ACTIVE',
   DEPLOYED = 'DEPLOYED',
   DEPRECATED = 'DEPRECATED',
@@ -1203,98 +1203,98 @@ export enum AiAssetStatus {
   TRAINING = 'TRAINING'
 }
 
-/** AIAssetStatus filters */
-export type AiAssetStatusEnumScalarFilters = {
-  eq?: InputMaybe<AiAssetStatus>;
-  in?: InputMaybe<Array<AiAssetStatus>>;
+/** AIComponentStatus filters */
+export type AiComponentStatusEnumScalarFilters = {
+  eq?: InputMaybe<AiComponentStatus>;
+  in?: InputMaybe<Array<AiComponentStatus>>;
 };
 
-/** AIAssetStatus mutations */
-export type AiAssetStatusEnumScalarMutations = {
-  set?: InputMaybe<AiAssetStatus>;
+/** AIComponentStatus mutations */
+export type AiComponentStatusEnumScalarMutations = {
+  set?: InputMaybe<AiComponentStatus>;
 };
 
-export type AiAssetSupportsCapabilitiesAggregateInput = {
-  AND?: InputMaybe<Array<AiAssetSupportsCapabilitiesAggregateInput>>;
-  NOT?: InputMaybe<AiAssetSupportsCapabilitiesAggregateInput>;
-  OR?: InputMaybe<Array<AiAssetSupportsCapabilitiesAggregateInput>>;
+export type AiComponentSupportsCapabilitiesAggregateInput = {
+  AND?: InputMaybe<Array<AiComponentSupportsCapabilitiesAggregateInput>>;
+  NOT?: InputMaybe<AiComponentSupportsCapabilitiesAggregateInput>;
+  OR?: InputMaybe<Array<AiComponentSupportsCapabilitiesAggregateInput>>;
   count?: InputMaybe<IntScalarFilters>;
   count_EQ?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
   count_LTE?: InputMaybe<Scalars['Int']['input']>;
-  node?: InputMaybe<AiAssetSupportsCapabilitiesNodeAggregationWhereInput>;
+  node?: InputMaybe<AiComponentSupportsCapabilitiesNodeAggregationWhereInput>;
 };
 
-export type AiAssetSupportsCapabilitiesConnectFieldInput = {
+export type AiComponentSupportsCapabilitiesConnectFieldInput = {
   connect?: InputMaybe<Array<BusinessCapabilityConnectInput>>;
   where?: InputMaybe<BusinessCapabilityConnectWhere>;
 };
 
-export type AiAssetSupportsCapabilitiesConnection = {
-  __typename?: 'AIAssetSupportsCapabilitiesConnection';
-  aggregate: AiAssetBusinessCapabilitySupportsCapabilitiesAggregateSelection;
-  edges: Array<AiAssetSupportsCapabilitiesRelationship>;
+export type AiComponentSupportsCapabilitiesConnection = {
+  __typename?: 'AIComponentSupportsCapabilitiesConnection';
+  aggregate: AiComponentBusinessCapabilitySupportsCapabilitiesAggregateSelection;
+  edges: Array<AiComponentSupportsCapabilitiesRelationship>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
 
-export type AiAssetSupportsCapabilitiesConnectionAggregateInput = {
-  AND?: InputMaybe<Array<AiAssetSupportsCapabilitiesConnectionAggregateInput>>;
-  NOT?: InputMaybe<AiAssetSupportsCapabilitiesConnectionAggregateInput>;
-  OR?: InputMaybe<Array<AiAssetSupportsCapabilitiesConnectionAggregateInput>>;
+export type AiComponentSupportsCapabilitiesConnectionAggregateInput = {
+  AND?: InputMaybe<Array<AiComponentSupportsCapabilitiesConnectionAggregateInput>>;
+  NOT?: InputMaybe<AiComponentSupportsCapabilitiesConnectionAggregateInput>;
+  OR?: InputMaybe<Array<AiComponentSupportsCapabilitiesConnectionAggregateInput>>;
   count?: InputMaybe<ConnectionAggregationCountFilterInput>;
-  node?: InputMaybe<AiAssetSupportsCapabilitiesNodeAggregationWhereInput>;
+  node?: InputMaybe<AiComponentSupportsCapabilitiesNodeAggregationWhereInput>;
 };
 
-export type AiAssetSupportsCapabilitiesConnectionFilters = {
-  /** Filter AIAssets by aggregating results on related AIAssetSupportsCapabilitiesConnections */
-  aggregate?: InputMaybe<AiAssetSupportsCapabilitiesConnectionAggregateInput>;
-  /** Return AIAssets where all of the related AIAssetSupportsCapabilitiesConnections match this filter */
-  all?: InputMaybe<AiAssetSupportsCapabilitiesConnectionWhere>;
-  /** Return AIAssets where none of the related AIAssetSupportsCapabilitiesConnections match this filter */
-  none?: InputMaybe<AiAssetSupportsCapabilitiesConnectionWhere>;
-  /** Return AIAssets where one of the related AIAssetSupportsCapabilitiesConnections match this filter */
-  single?: InputMaybe<AiAssetSupportsCapabilitiesConnectionWhere>;
-  /** Return AIAssets where some of the related AIAssetSupportsCapabilitiesConnections match this filter */
-  some?: InputMaybe<AiAssetSupportsCapabilitiesConnectionWhere>;
+export type AiComponentSupportsCapabilitiesConnectionFilters = {
+  /** Filter AIComponents by aggregating results on related AIComponentSupportsCapabilitiesConnections */
+  aggregate?: InputMaybe<AiComponentSupportsCapabilitiesConnectionAggregateInput>;
+  /** Return AIComponents where all of the related AIComponentSupportsCapabilitiesConnections match this filter */
+  all?: InputMaybe<AiComponentSupportsCapabilitiesConnectionWhere>;
+  /** Return AIComponents where none of the related AIComponentSupportsCapabilitiesConnections match this filter */
+  none?: InputMaybe<AiComponentSupportsCapabilitiesConnectionWhere>;
+  /** Return AIComponents where one of the related AIComponentSupportsCapabilitiesConnections match this filter */
+  single?: InputMaybe<AiComponentSupportsCapabilitiesConnectionWhere>;
+  /** Return AIComponents where some of the related AIComponentSupportsCapabilitiesConnections match this filter */
+  some?: InputMaybe<AiComponentSupportsCapabilitiesConnectionWhere>;
 };
 
-export type AiAssetSupportsCapabilitiesConnectionSort = {
+export type AiComponentSupportsCapabilitiesConnectionSort = {
   node?: InputMaybe<BusinessCapabilitySort>;
 };
 
-export type AiAssetSupportsCapabilitiesConnectionWhere = {
-  AND?: InputMaybe<Array<AiAssetSupportsCapabilitiesConnectionWhere>>;
-  NOT?: InputMaybe<AiAssetSupportsCapabilitiesConnectionWhere>;
-  OR?: InputMaybe<Array<AiAssetSupportsCapabilitiesConnectionWhere>>;
+export type AiComponentSupportsCapabilitiesConnectionWhere = {
+  AND?: InputMaybe<Array<AiComponentSupportsCapabilitiesConnectionWhere>>;
+  NOT?: InputMaybe<AiComponentSupportsCapabilitiesConnectionWhere>;
+  OR?: InputMaybe<Array<AiComponentSupportsCapabilitiesConnectionWhere>>;
   node?: InputMaybe<BusinessCapabilityWhere>;
 };
 
-export type AiAssetSupportsCapabilitiesCreateFieldInput = {
+export type AiComponentSupportsCapabilitiesCreateFieldInput = {
   node: BusinessCapabilityCreateInput;
 };
 
-export type AiAssetSupportsCapabilitiesDeleteFieldInput = {
+export type AiComponentSupportsCapabilitiesDeleteFieldInput = {
   delete?: InputMaybe<BusinessCapabilityDeleteInput>;
-  where?: InputMaybe<AiAssetSupportsCapabilitiesConnectionWhere>;
+  where?: InputMaybe<AiComponentSupportsCapabilitiesConnectionWhere>;
 };
 
-export type AiAssetSupportsCapabilitiesDisconnectFieldInput = {
+export type AiComponentSupportsCapabilitiesDisconnectFieldInput = {
   disconnect?: InputMaybe<BusinessCapabilityDisconnectInput>;
-  where?: InputMaybe<AiAssetSupportsCapabilitiesConnectionWhere>;
+  where?: InputMaybe<AiComponentSupportsCapabilitiesConnectionWhere>;
 };
 
-export type AiAssetSupportsCapabilitiesFieldInput = {
-  connect?: InputMaybe<Array<AiAssetSupportsCapabilitiesConnectFieldInput>>;
-  create?: InputMaybe<Array<AiAssetSupportsCapabilitiesCreateFieldInput>>;
+export type AiComponentSupportsCapabilitiesFieldInput = {
+  connect?: InputMaybe<Array<AiComponentSupportsCapabilitiesConnectFieldInput>>;
+  create?: InputMaybe<Array<AiComponentSupportsCapabilitiesCreateFieldInput>>;
 };
 
-export type AiAssetSupportsCapabilitiesNodeAggregationWhereInput = {
-  AND?: InputMaybe<Array<AiAssetSupportsCapabilitiesNodeAggregationWhereInput>>;
-  NOT?: InputMaybe<AiAssetSupportsCapabilitiesNodeAggregationWhereInput>;
-  OR?: InputMaybe<Array<AiAssetSupportsCapabilitiesNodeAggregationWhereInput>>;
+export type AiComponentSupportsCapabilitiesNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<AiComponentSupportsCapabilitiesNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<AiComponentSupportsCapabilitiesNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<AiComponentSupportsCapabilitiesNodeAggregationWhereInput>>;
   businessValue?: InputMaybe<IntScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
@@ -1304,106 +1304,106 @@ export type AiAssetSupportsCapabilitiesNodeAggregationWhereInput = {
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
-export type AiAssetSupportsCapabilitiesRelationship = {
-  __typename?: 'AIAssetSupportsCapabilitiesRelationship';
+export type AiComponentSupportsCapabilitiesRelationship = {
+  __typename?: 'AIComponentSupportsCapabilitiesRelationship';
   cursor: Scalars['String']['output'];
   node: BusinessCapability;
 };
 
-export type AiAssetSupportsCapabilitiesUpdateConnectionInput = {
+export type AiComponentSupportsCapabilitiesUpdateConnectionInput = {
   node?: InputMaybe<BusinessCapabilityUpdateInput>;
-  where?: InputMaybe<AiAssetSupportsCapabilitiesConnectionWhere>;
+  where?: InputMaybe<AiComponentSupportsCapabilitiesConnectionWhere>;
 };
 
-export type AiAssetSupportsCapabilitiesUpdateFieldInput = {
-  connect?: InputMaybe<Array<AiAssetSupportsCapabilitiesConnectFieldInput>>;
-  create?: InputMaybe<Array<AiAssetSupportsCapabilitiesCreateFieldInput>>;
-  delete?: InputMaybe<Array<AiAssetSupportsCapabilitiesDeleteFieldInput>>;
-  disconnect?: InputMaybe<Array<AiAssetSupportsCapabilitiesDisconnectFieldInput>>;
-  update?: InputMaybe<AiAssetSupportsCapabilitiesUpdateConnectionInput>;
+export type AiComponentSupportsCapabilitiesUpdateFieldInput = {
+  connect?: InputMaybe<Array<AiComponentSupportsCapabilitiesConnectFieldInput>>;
+  create?: InputMaybe<Array<AiComponentSupportsCapabilitiesCreateFieldInput>>;
+  delete?: InputMaybe<Array<AiComponentSupportsCapabilitiesDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<AiComponentSupportsCapabilitiesDisconnectFieldInput>>;
+  update?: InputMaybe<AiComponentSupportsCapabilitiesUpdateConnectionInput>;
 };
 
-export type AiAssetTrainedWithDataObjectsAggregateInput = {
-  AND?: InputMaybe<Array<AiAssetTrainedWithDataObjectsAggregateInput>>;
-  NOT?: InputMaybe<AiAssetTrainedWithDataObjectsAggregateInput>;
-  OR?: InputMaybe<Array<AiAssetTrainedWithDataObjectsAggregateInput>>;
+export type AiComponentTrainedWithDataObjectsAggregateInput = {
+  AND?: InputMaybe<Array<AiComponentTrainedWithDataObjectsAggregateInput>>;
+  NOT?: InputMaybe<AiComponentTrainedWithDataObjectsAggregateInput>;
+  OR?: InputMaybe<Array<AiComponentTrainedWithDataObjectsAggregateInput>>;
   count?: InputMaybe<IntScalarFilters>;
   count_EQ?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
   count_LTE?: InputMaybe<Scalars['Int']['input']>;
-  node?: InputMaybe<AiAssetTrainedWithDataObjectsNodeAggregationWhereInput>;
+  node?: InputMaybe<AiComponentTrainedWithDataObjectsNodeAggregationWhereInput>;
 };
 
-export type AiAssetTrainedWithDataObjectsConnectFieldInput = {
+export type AiComponentTrainedWithDataObjectsConnectFieldInput = {
   connect?: InputMaybe<Array<DataObjectConnectInput>>;
   where?: InputMaybe<DataObjectConnectWhere>;
 };
 
-export type AiAssetTrainedWithDataObjectsConnection = {
-  __typename?: 'AIAssetTrainedWithDataObjectsConnection';
-  aggregate: AiAssetDataObjectTrainedWithDataObjectsAggregateSelection;
-  edges: Array<AiAssetTrainedWithDataObjectsRelationship>;
+export type AiComponentTrainedWithDataObjectsConnection = {
+  __typename?: 'AIComponentTrainedWithDataObjectsConnection';
+  aggregate: AiComponentDataObjectTrainedWithDataObjectsAggregateSelection;
+  edges: Array<AiComponentTrainedWithDataObjectsRelationship>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
 
-export type AiAssetTrainedWithDataObjectsConnectionAggregateInput = {
-  AND?: InputMaybe<Array<AiAssetTrainedWithDataObjectsConnectionAggregateInput>>;
-  NOT?: InputMaybe<AiAssetTrainedWithDataObjectsConnectionAggregateInput>;
-  OR?: InputMaybe<Array<AiAssetTrainedWithDataObjectsConnectionAggregateInput>>;
+export type AiComponentTrainedWithDataObjectsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<AiComponentTrainedWithDataObjectsConnectionAggregateInput>>;
+  NOT?: InputMaybe<AiComponentTrainedWithDataObjectsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<AiComponentTrainedWithDataObjectsConnectionAggregateInput>>;
   count?: InputMaybe<ConnectionAggregationCountFilterInput>;
-  node?: InputMaybe<AiAssetTrainedWithDataObjectsNodeAggregationWhereInput>;
+  node?: InputMaybe<AiComponentTrainedWithDataObjectsNodeAggregationWhereInput>;
 };
 
-export type AiAssetTrainedWithDataObjectsConnectionFilters = {
-  /** Filter AIAssets by aggregating results on related AIAssetTrainedWithDataObjectsConnections */
-  aggregate?: InputMaybe<AiAssetTrainedWithDataObjectsConnectionAggregateInput>;
-  /** Return AIAssets where all of the related AIAssetTrainedWithDataObjectsConnections match this filter */
-  all?: InputMaybe<AiAssetTrainedWithDataObjectsConnectionWhere>;
-  /** Return AIAssets where none of the related AIAssetTrainedWithDataObjectsConnections match this filter */
-  none?: InputMaybe<AiAssetTrainedWithDataObjectsConnectionWhere>;
-  /** Return AIAssets where one of the related AIAssetTrainedWithDataObjectsConnections match this filter */
-  single?: InputMaybe<AiAssetTrainedWithDataObjectsConnectionWhere>;
-  /** Return AIAssets where some of the related AIAssetTrainedWithDataObjectsConnections match this filter */
-  some?: InputMaybe<AiAssetTrainedWithDataObjectsConnectionWhere>;
+export type AiComponentTrainedWithDataObjectsConnectionFilters = {
+  /** Filter AIComponents by aggregating results on related AIComponentTrainedWithDataObjectsConnections */
+  aggregate?: InputMaybe<AiComponentTrainedWithDataObjectsConnectionAggregateInput>;
+  /** Return AIComponents where all of the related AIComponentTrainedWithDataObjectsConnections match this filter */
+  all?: InputMaybe<AiComponentTrainedWithDataObjectsConnectionWhere>;
+  /** Return AIComponents where none of the related AIComponentTrainedWithDataObjectsConnections match this filter */
+  none?: InputMaybe<AiComponentTrainedWithDataObjectsConnectionWhere>;
+  /** Return AIComponents where one of the related AIComponentTrainedWithDataObjectsConnections match this filter */
+  single?: InputMaybe<AiComponentTrainedWithDataObjectsConnectionWhere>;
+  /** Return AIComponents where some of the related AIComponentTrainedWithDataObjectsConnections match this filter */
+  some?: InputMaybe<AiComponentTrainedWithDataObjectsConnectionWhere>;
 };
 
-export type AiAssetTrainedWithDataObjectsConnectionSort = {
+export type AiComponentTrainedWithDataObjectsConnectionSort = {
   node?: InputMaybe<DataObjectSort>;
 };
 
-export type AiAssetTrainedWithDataObjectsConnectionWhere = {
-  AND?: InputMaybe<Array<AiAssetTrainedWithDataObjectsConnectionWhere>>;
-  NOT?: InputMaybe<AiAssetTrainedWithDataObjectsConnectionWhere>;
-  OR?: InputMaybe<Array<AiAssetTrainedWithDataObjectsConnectionWhere>>;
+export type AiComponentTrainedWithDataObjectsConnectionWhere = {
+  AND?: InputMaybe<Array<AiComponentTrainedWithDataObjectsConnectionWhere>>;
+  NOT?: InputMaybe<AiComponentTrainedWithDataObjectsConnectionWhere>;
+  OR?: InputMaybe<Array<AiComponentTrainedWithDataObjectsConnectionWhere>>;
   node?: InputMaybe<DataObjectWhere>;
 };
 
-export type AiAssetTrainedWithDataObjectsCreateFieldInput = {
+export type AiComponentTrainedWithDataObjectsCreateFieldInput = {
   node: DataObjectCreateInput;
 };
 
-export type AiAssetTrainedWithDataObjectsDeleteFieldInput = {
+export type AiComponentTrainedWithDataObjectsDeleteFieldInput = {
   delete?: InputMaybe<DataObjectDeleteInput>;
-  where?: InputMaybe<AiAssetTrainedWithDataObjectsConnectionWhere>;
+  where?: InputMaybe<AiComponentTrainedWithDataObjectsConnectionWhere>;
 };
 
-export type AiAssetTrainedWithDataObjectsDisconnectFieldInput = {
+export type AiComponentTrainedWithDataObjectsDisconnectFieldInput = {
   disconnect?: InputMaybe<DataObjectDisconnectInput>;
-  where?: InputMaybe<AiAssetTrainedWithDataObjectsConnectionWhere>;
+  where?: InputMaybe<AiComponentTrainedWithDataObjectsConnectionWhere>;
 };
 
-export type AiAssetTrainedWithDataObjectsFieldInput = {
-  connect?: InputMaybe<Array<AiAssetTrainedWithDataObjectsConnectFieldInput>>;
-  create?: InputMaybe<Array<AiAssetTrainedWithDataObjectsCreateFieldInput>>;
+export type AiComponentTrainedWithDataObjectsFieldInput = {
+  connect?: InputMaybe<Array<AiComponentTrainedWithDataObjectsConnectFieldInput>>;
+  create?: InputMaybe<Array<AiComponentTrainedWithDataObjectsCreateFieldInput>>;
 };
 
-export type AiAssetTrainedWithDataObjectsNodeAggregationWhereInput = {
-  AND?: InputMaybe<Array<AiAssetTrainedWithDataObjectsNodeAggregationWhereInput>>;
-  NOT?: InputMaybe<AiAssetTrainedWithDataObjectsNodeAggregationWhereInput>;
-  OR?: InputMaybe<Array<AiAssetTrainedWithDataObjectsNodeAggregationWhereInput>>;
+export type AiComponentTrainedWithDataObjectsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<AiComponentTrainedWithDataObjectsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<AiComponentTrainedWithDataObjectsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<AiComponentTrainedWithDataObjectsNodeAggregationWhereInput>>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   format?: InputMaybe<StringScalarAggregationFilters>;
@@ -1411,27 +1411,27 @@ export type AiAssetTrainedWithDataObjectsNodeAggregationWhereInput = {
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
-export type AiAssetTrainedWithDataObjectsRelationship = {
-  __typename?: 'AIAssetTrainedWithDataObjectsRelationship';
+export type AiComponentTrainedWithDataObjectsRelationship = {
+  __typename?: 'AIComponentTrainedWithDataObjectsRelationship';
   cursor: Scalars['String']['output'];
   node: DataObject;
 };
 
-export type AiAssetTrainedWithDataObjectsUpdateConnectionInput = {
+export type AiComponentTrainedWithDataObjectsUpdateConnectionInput = {
   node?: InputMaybe<DataObjectUpdateInput>;
-  where?: InputMaybe<AiAssetTrainedWithDataObjectsConnectionWhere>;
+  where?: InputMaybe<AiComponentTrainedWithDataObjectsConnectionWhere>;
 };
 
-export type AiAssetTrainedWithDataObjectsUpdateFieldInput = {
-  connect?: InputMaybe<Array<AiAssetTrainedWithDataObjectsConnectFieldInput>>;
-  create?: InputMaybe<Array<AiAssetTrainedWithDataObjectsCreateFieldInput>>;
-  delete?: InputMaybe<Array<AiAssetTrainedWithDataObjectsDeleteFieldInput>>;
-  disconnect?: InputMaybe<Array<AiAssetTrainedWithDataObjectsDisconnectFieldInput>>;
-  update?: InputMaybe<AiAssetTrainedWithDataObjectsUpdateConnectionInput>;
+export type AiComponentTrainedWithDataObjectsUpdateFieldInput = {
+  connect?: InputMaybe<Array<AiComponentTrainedWithDataObjectsConnectFieldInput>>;
+  create?: InputMaybe<Array<AiComponentTrainedWithDataObjectsCreateFieldInput>>;
+  delete?: InputMaybe<Array<AiComponentTrainedWithDataObjectsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<AiComponentTrainedWithDataObjectsDisconnectFieldInput>>;
+  update?: InputMaybe<AiComponentTrainedWithDataObjectsUpdateConnectionInput>;
 };
 
 /** KI-Asset Typen */
-export enum AiAssetType {
+export enum AiComponentType {
   AGENTIC_AI = 'AGENTIC_AI',
   AUTOMATION_ENGINE = 'AUTOMATION_ENGINE',
   CHATBOT = 'CHATBOT',
@@ -1448,125 +1448,125 @@ export enum AiAssetType {
   VOICE_ASSISTANT = 'VOICE_ASSISTANT'
 }
 
-/** AIAssetType filters */
-export type AiAssetTypeEnumScalarFilters = {
-  eq?: InputMaybe<AiAssetType>;
-  in?: InputMaybe<Array<AiAssetType>>;
+/** AIComponentType filters */
+export type AiComponentTypeEnumScalarFilters = {
+  eq?: InputMaybe<AiComponentType>;
+  in?: InputMaybe<Array<AiComponentType>>;
 };
 
-/** AIAssetType mutations */
-export type AiAssetTypeEnumScalarMutations = {
-  set?: InputMaybe<AiAssetType>;
+/** AIComponentType mutations */
+export type AiComponentTypeEnumScalarMutations = {
+  set?: InputMaybe<AiComponentType>;
 };
 
-export type AiAssetUpdateInput = {
+export type AiComponentUpdateInput = {
   accuracy?: InputMaybe<FloatScalarMutations>;
-  aiType?: InputMaybe<AiAssetTypeEnumScalarMutations>;
-  company?: InputMaybe<Array<AiAssetCompanyUpdateFieldInput>>;
+  aiType?: InputMaybe<AiComponentTypeEnumScalarMutations>;
+  company?: InputMaybe<Array<AiComponentCompanyUpdateFieldInput>>;
   costs?: InputMaybe<FloatScalarMutations>;
   createdAt?: InputMaybe<DateTimeScalarMutations>;
-  depictedInDiagrams?: InputMaybe<Array<AiAssetDepictedInDiagramsUpdateFieldInput>>;
+  depictedInDiagrams?: InputMaybe<Array<AiComponentDepictedInDiagramsUpdateFieldInput>>;
   description?: InputMaybe<StringScalarMutations>;
-  hostedOn?: InputMaybe<Array<AiAssetHostedOnUpdateFieldInput>>;
-  implementsPrinciples?: InputMaybe<Array<AiAssetImplementsPrinciplesUpdateFieldInput>>;
+  hostedOn?: InputMaybe<Array<AiComponentHostedOnUpdateFieldInput>>;
+  implementsPrinciples?: InputMaybe<Array<AiComponentImplementsPrinciplesUpdateFieldInput>>;
   lastUpdated?: InputMaybe<DateScalarMutations>;
   license?: InputMaybe<StringScalarMutations>;
   model?: InputMaybe<StringScalarMutations>;
   name?: InputMaybe<StringScalarMutations>;
-  owners?: InputMaybe<Array<AiAssetOwnersUpdateFieldInput>>;
-  partOfArchitectures?: InputMaybe<Array<AiAssetPartOfArchitecturesUpdateFieldInput>>;
+  owners?: InputMaybe<Array<AiComponentOwnersUpdateFieldInput>>;
+  partOfArchitectures?: InputMaybe<Array<AiComponentPartOfArchitecturesUpdateFieldInput>>;
   provider?: InputMaybe<StringScalarMutations>;
-  status?: InputMaybe<AiAssetStatusEnumScalarMutations>;
-  supportsCapabilities?: InputMaybe<Array<AiAssetSupportsCapabilitiesUpdateFieldInput>>;
+  status?: InputMaybe<AiComponentStatusEnumScalarMutations>;
+  supportsCapabilities?: InputMaybe<Array<AiComponentSupportsCapabilitiesUpdateFieldInput>>;
   tags?: InputMaybe<ListStringMutations>;
-  trainedWithDataObjects?: InputMaybe<Array<AiAssetTrainedWithDataObjectsUpdateFieldInput>>;
+  trainedWithDataObjects?: InputMaybe<Array<AiComponentTrainedWithDataObjectsUpdateFieldInput>>;
   trainingDate?: InputMaybe<DateScalarMutations>;
-  usedByApplications?: InputMaybe<Array<AiAssetUsedByApplicationsUpdateFieldInput>>;
-  usedByOrganisations?: InputMaybe<Array<AiAssetUsedByOrganisationsUpdateFieldInput>>;
+  usedByApplications?: InputMaybe<Array<AiComponentUsedByApplicationsUpdateFieldInput>>;
+  usedByOrganisations?: InputMaybe<Array<AiComponentUsedByOrganisationsUpdateFieldInput>>;
   version?: InputMaybe<StringScalarMutations>;
 };
 
-export type AiAssetUsedByApplicationsAggregateInput = {
-  AND?: InputMaybe<Array<AiAssetUsedByApplicationsAggregateInput>>;
-  NOT?: InputMaybe<AiAssetUsedByApplicationsAggregateInput>;
-  OR?: InputMaybe<Array<AiAssetUsedByApplicationsAggregateInput>>;
+export type AiComponentUsedByApplicationsAggregateInput = {
+  AND?: InputMaybe<Array<AiComponentUsedByApplicationsAggregateInput>>;
+  NOT?: InputMaybe<AiComponentUsedByApplicationsAggregateInput>;
+  OR?: InputMaybe<Array<AiComponentUsedByApplicationsAggregateInput>>;
   count?: InputMaybe<IntScalarFilters>;
   count_EQ?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
   count_LTE?: InputMaybe<Scalars['Int']['input']>;
-  node?: InputMaybe<AiAssetUsedByApplicationsNodeAggregationWhereInput>;
+  node?: InputMaybe<AiComponentUsedByApplicationsNodeAggregationWhereInput>;
 };
 
-export type AiAssetUsedByApplicationsConnectFieldInput = {
+export type AiComponentUsedByApplicationsConnectFieldInput = {
   connect?: InputMaybe<Array<ApplicationConnectInput>>;
   where?: InputMaybe<ApplicationConnectWhere>;
 };
 
-export type AiAssetUsedByApplicationsConnection = {
-  __typename?: 'AIAssetUsedByApplicationsConnection';
-  aggregate: AiAssetApplicationUsedByApplicationsAggregateSelection;
-  edges: Array<AiAssetUsedByApplicationsRelationship>;
+export type AiComponentUsedByApplicationsConnection = {
+  __typename?: 'AIComponentUsedByApplicationsConnection';
+  aggregate: AiComponentApplicationUsedByApplicationsAggregateSelection;
+  edges: Array<AiComponentUsedByApplicationsRelationship>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
 
-export type AiAssetUsedByApplicationsConnectionAggregateInput = {
-  AND?: InputMaybe<Array<AiAssetUsedByApplicationsConnectionAggregateInput>>;
-  NOT?: InputMaybe<AiAssetUsedByApplicationsConnectionAggregateInput>;
-  OR?: InputMaybe<Array<AiAssetUsedByApplicationsConnectionAggregateInput>>;
+export type AiComponentUsedByApplicationsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<AiComponentUsedByApplicationsConnectionAggregateInput>>;
+  NOT?: InputMaybe<AiComponentUsedByApplicationsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<AiComponentUsedByApplicationsConnectionAggregateInput>>;
   count?: InputMaybe<ConnectionAggregationCountFilterInput>;
-  node?: InputMaybe<AiAssetUsedByApplicationsNodeAggregationWhereInput>;
+  node?: InputMaybe<AiComponentUsedByApplicationsNodeAggregationWhereInput>;
 };
 
-export type AiAssetUsedByApplicationsConnectionFilters = {
-  /** Filter AIAssets by aggregating results on related AIAssetUsedByApplicationsConnections */
-  aggregate?: InputMaybe<AiAssetUsedByApplicationsConnectionAggregateInput>;
-  /** Return AIAssets where all of the related AIAssetUsedByApplicationsConnections match this filter */
-  all?: InputMaybe<AiAssetUsedByApplicationsConnectionWhere>;
-  /** Return AIAssets where none of the related AIAssetUsedByApplicationsConnections match this filter */
-  none?: InputMaybe<AiAssetUsedByApplicationsConnectionWhere>;
-  /** Return AIAssets where one of the related AIAssetUsedByApplicationsConnections match this filter */
-  single?: InputMaybe<AiAssetUsedByApplicationsConnectionWhere>;
-  /** Return AIAssets where some of the related AIAssetUsedByApplicationsConnections match this filter */
-  some?: InputMaybe<AiAssetUsedByApplicationsConnectionWhere>;
+export type AiComponentUsedByApplicationsConnectionFilters = {
+  /** Filter AIComponents by aggregating results on related AIComponentUsedByApplicationsConnections */
+  aggregate?: InputMaybe<AiComponentUsedByApplicationsConnectionAggregateInput>;
+  /** Return AIComponents where all of the related AIComponentUsedByApplicationsConnections match this filter */
+  all?: InputMaybe<AiComponentUsedByApplicationsConnectionWhere>;
+  /** Return AIComponents where none of the related AIComponentUsedByApplicationsConnections match this filter */
+  none?: InputMaybe<AiComponentUsedByApplicationsConnectionWhere>;
+  /** Return AIComponents where one of the related AIComponentUsedByApplicationsConnections match this filter */
+  single?: InputMaybe<AiComponentUsedByApplicationsConnectionWhere>;
+  /** Return AIComponents where some of the related AIComponentUsedByApplicationsConnections match this filter */
+  some?: InputMaybe<AiComponentUsedByApplicationsConnectionWhere>;
 };
 
-export type AiAssetUsedByApplicationsConnectionSort = {
+export type AiComponentUsedByApplicationsConnectionSort = {
   node?: InputMaybe<ApplicationSort>;
 };
 
-export type AiAssetUsedByApplicationsConnectionWhere = {
-  AND?: InputMaybe<Array<AiAssetUsedByApplicationsConnectionWhere>>;
-  NOT?: InputMaybe<AiAssetUsedByApplicationsConnectionWhere>;
-  OR?: InputMaybe<Array<AiAssetUsedByApplicationsConnectionWhere>>;
+export type AiComponentUsedByApplicationsConnectionWhere = {
+  AND?: InputMaybe<Array<AiComponentUsedByApplicationsConnectionWhere>>;
+  NOT?: InputMaybe<AiComponentUsedByApplicationsConnectionWhere>;
+  OR?: InputMaybe<Array<AiComponentUsedByApplicationsConnectionWhere>>;
   node?: InputMaybe<ApplicationWhere>;
 };
 
-export type AiAssetUsedByApplicationsCreateFieldInput = {
+export type AiComponentUsedByApplicationsCreateFieldInput = {
   node: ApplicationCreateInput;
 };
 
-export type AiAssetUsedByApplicationsDeleteFieldInput = {
+export type AiComponentUsedByApplicationsDeleteFieldInput = {
   delete?: InputMaybe<ApplicationDeleteInput>;
-  where?: InputMaybe<AiAssetUsedByApplicationsConnectionWhere>;
+  where?: InputMaybe<AiComponentUsedByApplicationsConnectionWhere>;
 };
 
-export type AiAssetUsedByApplicationsDisconnectFieldInput = {
+export type AiComponentUsedByApplicationsDisconnectFieldInput = {
   disconnect?: InputMaybe<ApplicationDisconnectInput>;
-  where?: InputMaybe<AiAssetUsedByApplicationsConnectionWhere>;
+  where?: InputMaybe<AiComponentUsedByApplicationsConnectionWhere>;
 };
 
-export type AiAssetUsedByApplicationsFieldInput = {
-  connect?: InputMaybe<Array<AiAssetUsedByApplicationsConnectFieldInput>>;
-  create?: InputMaybe<Array<AiAssetUsedByApplicationsCreateFieldInput>>;
+export type AiComponentUsedByApplicationsFieldInput = {
+  connect?: InputMaybe<Array<AiComponentUsedByApplicationsConnectFieldInput>>;
+  create?: InputMaybe<Array<AiComponentUsedByApplicationsCreateFieldInput>>;
 };
 
-export type AiAssetUsedByApplicationsNodeAggregationWhereInput = {
-  AND?: InputMaybe<Array<AiAssetUsedByApplicationsNodeAggregationWhereInput>>;
-  NOT?: InputMaybe<AiAssetUsedByApplicationsNodeAggregationWhereInput>;
-  OR?: InputMaybe<Array<AiAssetUsedByApplicationsNodeAggregationWhereInput>>;
+export type AiComponentUsedByApplicationsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<AiComponentUsedByApplicationsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<AiComponentUsedByApplicationsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<AiComponentUsedByApplicationsNodeAggregationWhereInput>>;
   costs?: InputMaybe<FloatScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
@@ -1577,106 +1577,106 @@ export type AiAssetUsedByApplicationsNodeAggregationWhereInput = {
   version?: InputMaybe<StringScalarAggregationFilters>;
 };
 
-export type AiAssetUsedByApplicationsRelationship = {
-  __typename?: 'AIAssetUsedByApplicationsRelationship';
+export type AiComponentUsedByApplicationsRelationship = {
+  __typename?: 'AIComponentUsedByApplicationsRelationship';
   cursor: Scalars['String']['output'];
   node: Application;
 };
 
-export type AiAssetUsedByApplicationsUpdateConnectionInput = {
+export type AiComponentUsedByApplicationsUpdateConnectionInput = {
   node?: InputMaybe<ApplicationUpdateInput>;
-  where?: InputMaybe<AiAssetUsedByApplicationsConnectionWhere>;
+  where?: InputMaybe<AiComponentUsedByApplicationsConnectionWhere>;
 };
 
-export type AiAssetUsedByApplicationsUpdateFieldInput = {
-  connect?: InputMaybe<Array<AiAssetUsedByApplicationsConnectFieldInput>>;
-  create?: InputMaybe<Array<AiAssetUsedByApplicationsCreateFieldInput>>;
-  delete?: InputMaybe<Array<AiAssetUsedByApplicationsDeleteFieldInput>>;
-  disconnect?: InputMaybe<Array<AiAssetUsedByApplicationsDisconnectFieldInput>>;
-  update?: InputMaybe<AiAssetUsedByApplicationsUpdateConnectionInput>;
+export type AiComponentUsedByApplicationsUpdateFieldInput = {
+  connect?: InputMaybe<Array<AiComponentUsedByApplicationsConnectFieldInput>>;
+  create?: InputMaybe<Array<AiComponentUsedByApplicationsCreateFieldInput>>;
+  delete?: InputMaybe<Array<AiComponentUsedByApplicationsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<AiComponentUsedByApplicationsDisconnectFieldInput>>;
+  update?: InputMaybe<AiComponentUsedByApplicationsUpdateConnectionInput>;
 };
 
-export type AiAssetUsedByOrganisationsAggregateInput = {
-  AND?: InputMaybe<Array<AiAssetUsedByOrganisationsAggregateInput>>;
-  NOT?: InputMaybe<AiAssetUsedByOrganisationsAggregateInput>;
-  OR?: InputMaybe<Array<AiAssetUsedByOrganisationsAggregateInput>>;
+export type AiComponentUsedByOrganisationsAggregateInput = {
+  AND?: InputMaybe<Array<AiComponentUsedByOrganisationsAggregateInput>>;
+  NOT?: InputMaybe<AiComponentUsedByOrganisationsAggregateInput>;
+  OR?: InputMaybe<Array<AiComponentUsedByOrganisationsAggregateInput>>;
   count?: InputMaybe<IntScalarFilters>;
   count_EQ?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
   count_LTE?: InputMaybe<Scalars['Int']['input']>;
-  node?: InputMaybe<AiAssetUsedByOrganisationsNodeAggregationWhereInput>;
+  node?: InputMaybe<AiComponentUsedByOrganisationsNodeAggregationWhereInput>;
 };
 
-export type AiAssetUsedByOrganisationsConnectFieldInput = {
+export type AiComponentUsedByOrganisationsConnectFieldInput = {
   connect?: InputMaybe<Array<OrganisationConnectInput>>;
   where?: InputMaybe<OrganisationConnectWhere>;
 };
 
-export type AiAssetUsedByOrganisationsConnection = {
-  __typename?: 'AIAssetUsedByOrganisationsConnection';
-  aggregate: AiAssetOrganisationUsedByOrganisationsAggregateSelection;
-  edges: Array<AiAssetUsedByOrganisationsRelationship>;
+export type AiComponentUsedByOrganisationsConnection = {
+  __typename?: 'AIComponentUsedByOrganisationsConnection';
+  aggregate: AiComponentOrganisationUsedByOrganisationsAggregateSelection;
+  edges: Array<AiComponentUsedByOrganisationsRelationship>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
 
-export type AiAssetUsedByOrganisationsConnectionAggregateInput = {
-  AND?: InputMaybe<Array<AiAssetUsedByOrganisationsConnectionAggregateInput>>;
-  NOT?: InputMaybe<AiAssetUsedByOrganisationsConnectionAggregateInput>;
-  OR?: InputMaybe<Array<AiAssetUsedByOrganisationsConnectionAggregateInput>>;
+export type AiComponentUsedByOrganisationsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<AiComponentUsedByOrganisationsConnectionAggregateInput>>;
+  NOT?: InputMaybe<AiComponentUsedByOrganisationsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<AiComponentUsedByOrganisationsConnectionAggregateInput>>;
   count?: InputMaybe<ConnectionAggregationCountFilterInput>;
-  node?: InputMaybe<AiAssetUsedByOrganisationsNodeAggregationWhereInput>;
+  node?: InputMaybe<AiComponentUsedByOrganisationsNodeAggregationWhereInput>;
 };
 
-export type AiAssetUsedByOrganisationsConnectionFilters = {
-  /** Filter AIAssets by aggregating results on related AIAssetUsedByOrganisationsConnections */
-  aggregate?: InputMaybe<AiAssetUsedByOrganisationsConnectionAggregateInput>;
-  /** Return AIAssets where all of the related AIAssetUsedByOrganisationsConnections match this filter */
-  all?: InputMaybe<AiAssetUsedByOrganisationsConnectionWhere>;
-  /** Return AIAssets where none of the related AIAssetUsedByOrganisationsConnections match this filter */
-  none?: InputMaybe<AiAssetUsedByOrganisationsConnectionWhere>;
-  /** Return AIAssets where one of the related AIAssetUsedByOrganisationsConnections match this filter */
-  single?: InputMaybe<AiAssetUsedByOrganisationsConnectionWhere>;
-  /** Return AIAssets where some of the related AIAssetUsedByOrganisationsConnections match this filter */
-  some?: InputMaybe<AiAssetUsedByOrganisationsConnectionWhere>;
+export type AiComponentUsedByOrganisationsConnectionFilters = {
+  /** Filter AIComponents by aggregating results on related AIComponentUsedByOrganisationsConnections */
+  aggregate?: InputMaybe<AiComponentUsedByOrganisationsConnectionAggregateInput>;
+  /** Return AIComponents where all of the related AIComponentUsedByOrganisationsConnections match this filter */
+  all?: InputMaybe<AiComponentUsedByOrganisationsConnectionWhere>;
+  /** Return AIComponents where none of the related AIComponentUsedByOrganisationsConnections match this filter */
+  none?: InputMaybe<AiComponentUsedByOrganisationsConnectionWhere>;
+  /** Return AIComponents where one of the related AIComponentUsedByOrganisationsConnections match this filter */
+  single?: InputMaybe<AiComponentUsedByOrganisationsConnectionWhere>;
+  /** Return AIComponents where some of the related AIComponentUsedByOrganisationsConnections match this filter */
+  some?: InputMaybe<AiComponentUsedByOrganisationsConnectionWhere>;
 };
 
-export type AiAssetUsedByOrganisationsConnectionSort = {
+export type AiComponentUsedByOrganisationsConnectionSort = {
   node?: InputMaybe<OrganisationSort>;
 };
 
-export type AiAssetUsedByOrganisationsConnectionWhere = {
-  AND?: InputMaybe<Array<AiAssetUsedByOrganisationsConnectionWhere>>;
-  NOT?: InputMaybe<AiAssetUsedByOrganisationsConnectionWhere>;
-  OR?: InputMaybe<Array<AiAssetUsedByOrganisationsConnectionWhere>>;
+export type AiComponentUsedByOrganisationsConnectionWhere = {
+  AND?: InputMaybe<Array<AiComponentUsedByOrganisationsConnectionWhere>>;
+  NOT?: InputMaybe<AiComponentUsedByOrganisationsConnectionWhere>;
+  OR?: InputMaybe<Array<AiComponentUsedByOrganisationsConnectionWhere>>;
   node?: InputMaybe<OrganisationWhere>;
 };
 
-export type AiAssetUsedByOrganisationsCreateFieldInput = {
+export type AiComponentUsedByOrganisationsCreateFieldInput = {
   node: OrganisationCreateInput;
 };
 
-export type AiAssetUsedByOrganisationsDeleteFieldInput = {
+export type AiComponentUsedByOrganisationsDeleteFieldInput = {
   delete?: InputMaybe<OrganisationDeleteInput>;
-  where?: InputMaybe<AiAssetUsedByOrganisationsConnectionWhere>;
+  where?: InputMaybe<AiComponentUsedByOrganisationsConnectionWhere>;
 };
 
-export type AiAssetUsedByOrganisationsDisconnectFieldInput = {
+export type AiComponentUsedByOrganisationsDisconnectFieldInput = {
   disconnect?: InputMaybe<OrganisationDisconnectInput>;
-  where?: InputMaybe<AiAssetUsedByOrganisationsConnectionWhere>;
+  where?: InputMaybe<AiComponentUsedByOrganisationsConnectionWhere>;
 };
 
-export type AiAssetUsedByOrganisationsFieldInput = {
-  connect?: InputMaybe<Array<AiAssetUsedByOrganisationsConnectFieldInput>>;
-  create?: InputMaybe<Array<AiAssetUsedByOrganisationsCreateFieldInput>>;
+export type AiComponentUsedByOrganisationsFieldInput = {
+  connect?: InputMaybe<Array<AiComponentUsedByOrganisationsConnectFieldInput>>;
+  create?: InputMaybe<Array<AiComponentUsedByOrganisationsCreateFieldInput>>;
 };
 
-export type AiAssetUsedByOrganisationsNodeAggregationWhereInput = {
-  AND?: InputMaybe<Array<AiAssetUsedByOrganisationsNodeAggregationWhereInput>>;
-  NOT?: InputMaybe<AiAssetUsedByOrganisationsNodeAggregationWhereInput>;
-  OR?: InputMaybe<Array<AiAssetUsedByOrganisationsNodeAggregationWhereInput>>;
+export type AiComponentUsedByOrganisationsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<AiComponentUsedByOrganisationsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<AiComponentUsedByOrganisationsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<AiComponentUsedByOrganisationsNodeAggregationWhereInput>>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   level?: InputMaybe<IntScalarAggregationFilters>;
@@ -1684,71 +1684,71 @@ export type AiAssetUsedByOrganisationsNodeAggregationWhereInput = {
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
-export type AiAssetUsedByOrganisationsRelationship = {
-  __typename?: 'AIAssetUsedByOrganisationsRelationship';
+export type AiComponentUsedByOrganisationsRelationship = {
+  __typename?: 'AIComponentUsedByOrganisationsRelationship';
   cursor: Scalars['String']['output'];
   node: Organisation;
 };
 
-export type AiAssetUsedByOrganisationsUpdateConnectionInput = {
+export type AiComponentUsedByOrganisationsUpdateConnectionInput = {
   node?: InputMaybe<OrganisationUpdateInput>;
-  where?: InputMaybe<AiAssetUsedByOrganisationsConnectionWhere>;
+  where?: InputMaybe<AiComponentUsedByOrganisationsConnectionWhere>;
 };
 
-export type AiAssetUsedByOrganisationsUpdateFieldInput = {
-  connect?: InputMaybe<Array<AiAssetUsedByOrganisationsConnectFieldInput>>;
-  create?: InputMaybe<Array<AiAssetUsedByOrganisationsCreateFieldInput>>;
-  delete?: InputMaybe<Array<AiAssetUsedByOrganisationsDeleteFieldInput>>;
-  disconnect?: InputMaybe<Array<AiAssetUsedByOrganisationsDisconnectFieldInput>>;
-  update?: InputMaybe<AiAssetUsedByOrganisationsUpdateConnectionInput>;
+export type AiComponentUsedByOrganisationsUpdateFieldInput = {
+  connect?: InputMaybe<Array<AiComponentUsedByOrganisationsConnectFieldInput>>;
+  create?: InputMaybe<Array<AiComponentUsedByOrganisationsCreateFieldInput>>;
+  delete?: InputMaybe<Array<AiComponentUsedByOrganisationsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<AiComponentUsedByOrganisationsDisconnectFieldInput>>;
+  update?: InputMaybe<AiComponentUsedByOrganisationsUpdateConnectionInput>;
 };
 
-export type AiAssetWhere = {
-  AND?: InputMaybe<Array<AiAssetWhere>>;
-  NOT?: InputMaybe<AiAssetWhere>;
-  OR?: InputMaybe<Array<AiAssetWhere>>;
+export type AiComponentWhere = {
+  AND?: InputMaybe<Array<AiComponentWhere>>;
+  NOT?: InputMaybe<AiComponentWhere>;
+  OR?: InputMaybe<Array<AiComponentWhere>>;
   accuracy?: InputMaybe<FloatScalarFilters>;
-  aiType?: InputMaybe<AiAssetTypeEnumScalarFilters>;
+  aiType?: InputMaybe<AiComponentTypeEnumScalarFilters>;
   company?: InputMaybe<CompanyRelationshipFilters>;
-  companyConnection?: InputMaybe<AiAssetCompanyConnectionFilters>;
+  companyConnection?: InputMaybe<AiComponentCompanyConnectionFilters>;
   costs?: InputMaybe<FloatScalarFilters>;
   createdAt?: InputMaybe<DateTimeScalarFilters>;
   depictedInDiagrams?: InputMaybe<DiagramRelationshipFilters>;
-  depictedInDiagramsConnection?: InputMaybe<AiAssetDepictedInDiagramsConnectionFilters>;
+  depictedInDiagramsConnection?: InputMaybe<AiComponentDepictedInDiagramsConnectionFilters>;
   description?: InputMaybe<StringScalarFilters>;
   hostedOn?: InputMaybe<InfrastructureRelationshipFilters>;
-  hostedOnConnection?: InputMaybe<AiAssetHostedOnConnectionFilters>;
+  hostedOnConnection?: InputMaybe<AiComponentHostedOnConnectionFilters>;
   id?: InputMaybe<IdScalarFilters>;
   implementsPrinciples?: InputMaybe<ArchitecturePrincipleRelationshipFilters>;
-  implementsPrinciplesConnection?: InputMaybe<AiAssetImplementsPrinciplesConnectionFilters>;
+  implementsPrinciplesConnection?: InputMaybe<AiComponentImplementsPrinciplesConnectionFilters>;
   lastUpdated?: InputMaybe<DateScalarFilters>;
   license?: InputMaybe<StringScalarFilters>;
   model?: InputMaybe<StringScalarFilters>;
   name?: InputMaybe<StringScalarFilters>;
   owners?: InputMaybe<PersonRelationshipFilters>;
-  ownersConnection?: InputMaybe<AiAssetOwnersConnectionFilters>;
+  ownersConnection?: InputMaybe<AiComponentOwnersConnectionFilters>;
   partOfArchitectures?: InputMaybe<ArchitectureRelationshipFilters>;
-  partOfArchitecturesConnection?: InputMaybe<AiAssetPartOfArchitecturesConnectionFilters>;
+  partOfArchitecturesConnection?: InputMaybe<AiComponentPartOfArchitecturesConnectionFilters>;
   provider?: InputMaybe<StringScalarFilters>;
-  status?: InputMaybe<AiAssetStatusEnumScalarFilters>;
+  status?: InputMaybe<AiComponentStatusEnumScalarFilters>;
   supportsCapabilities?: InputMaybe<BusinessCapabilityRelationshipFilters>;
-  supportsCapabilitiesConnection?: InputMaybe<AiAssetSupportsCapabilitiesConnectionFilters>;
+  supportsCapabilitiesConnection?: InputMaybe<AiComponentSupportsCapabilitiesConnectionFilters>;
   tags?: InputMaybe<StringListFilters>;
   trainedWithDataObjects?: InputMaybe<DataObjectRelationshipFilters>;
-  trainedWithDataObjectsConnection?: InputMaybe<AiAssetTrainedWithDataObjectsConnectionFilters>;
+  trainedWithDataObjectsConnection?: InputMaybe<AiComponentTrainedWithDataObjectsConnectionFilters>;
   trainingDate?: InputMaybe<DateScalarFilters>;
   updatedAt?: InputMaybe<DateTimeScalarFilters>;
   usedByApplications?: InputMaybe<ApplicationRelationshipFilters>;
-  usedByApplicationsConnection?: InputMaybe<AiAssetUsedByApplicationsConnectionFilters>;
+  usedByApplicationsConnection?: InputMaybe<AiComponentUsedByApplicationsConnectionFilters>;
   usedByOrganisations?: InputMaybe<OrganisationRelationshipFilters>;
-  usedByOrganisationsConnection?: InputMaybe<AiAssetUsedByOrganisationsConnectionFilters>;
+  usedByOrganisationsConnection?: InputMaybe<AiComponentUsedByOrganisationsConnectionFilters>;
   version?: InputMaybe<StringScalarFilters>;
 };
 
-export type AiAssetsConnection = {
-  __typename?: 'AiAssetsConnection';
-  aggregate: AiAssetAggregate;
-  edges: Array<AiAssetEdge>;
+export type AiComponentsConnection = {
+  __typename?: 'AiComponentsConnection';
+  aggregate: AiComponentAggregate;
+  edges: Array<AiComponentEdge>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
@@ -1802,8 +1802,8 @@ export type Application = {
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
   usedByOrganisations: Array<Organisation>;
   usedByOrganisationsConnection: ApplicationUsedByOrganisationsConnection;
-  usesAIAssets: Array<AiAsset>;
-  usesAIAssetsConnection: ApplicationUsesAiAssetsConnection;
+  usesAIComponents: Array<AiComponent>;
+  usesAIComponentsConnection: ApplicationUsesAiComponentsConnection;
   usesDataObjects: Array<DataObject>;
   usesDataObjectsConnection: ApplicationUsesDataObjectsConnection;
   vendor?: Maybe<Scalars['String']['output']>;
@@ -2082,20 +2082,20 @@ export type ApplicationUsedByOrganisationsConnectionArgs = {
 
 
 /** Application - repräsentiert eine Business-Applikation im Enterprise Architecture Management */
-export type ApplicationUsesAiAssetsArgs = {
+export type ApplicationUsesAiComponentsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<AiAssetSort>>;
-  where?: InputMaybe<AiAssetWhere>;
+  sort?: InputMaybe<Array<AiComponentSort>>;
+  where?: InputMaybe<AiComponentWhere>;
 };
 
 
 /** Application - repräsentiert eine Business-Applikation im Enterprise Architecture Management */
-export type ApplicationUsesAiAssetsConnectionArgs = {
+export type ApplicationUsesAiComponentsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ApplicationUsesAiAssetsConnectionSort>>;
-  where?: InputMaybe<ApplicationUsesAiAssetsConnectionWhere>;
+  sort?: InputMaybe<Array<ApplicationUsesAiComponentsConnectionSort>>;
+  where?: InputMaybe<ApplicationUsesAiComponentsConnectionWhere>;
 };
 
 
@@ -2116,14 +2116,14 @@ export type ApplicationUsesDataObjectsConnectionArgs = {
   where?: InputMaybe<ApplicationUsesDataObjectsConnectionWhere>;
 };
 
-export type ApplicationAiAssetUsesAiAssetsAggregateSelection = {
-  __typename?: 'ApplicationAIAssetUsesAIAssetsAggregateSelection';
+export type ApplicationAiComponentUsesAiComponentsAggregateSelection = {
+  __typename?: 'ApplicationAIComponentUsesAIComponentsAggregateSelection';
   count: CountConnection;
-  node?: Maybe<ApplicationAiAssetUsesAiAssetsNodeAggregateSelection>;
+  node?: Maybe<ApplicationAiComponentUsesAiComponentsNodeAggregateSelection>;
 };
 
-export type ApplicationAiAssetUsesAiAssetsNodeAggregateSelection = {
-  __typename?: 'ApplicationAIAssetUsesAIAssetsNodeAggregateSelection';
+export type ApplicationAiComponentUsesAiComponentsNodeAggregateSelection = {
+  __typename?: 'ApplicationAIComponentUsesAIComponentsNodeAggregateSelection';
   accuracy: FloatAggregateSelection;
   costs: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
@@ -2556,7 +2556,7 @@ export type ApplicationConnectInput = {
   supportsCapabilities?: InputMaybe<Array<ApplicationSupportsCapabilitiesConnectFieldInput>>;
   targetOfInterfaces?: InputMaybe<Array<ApplicationTargetOfInterfacesConnectFieldInput>>;
   usedByOrganisations?: InputMaybe<Array<ApplicationUsedByOrganisationsConnectFieldInput>>;
-  usesAIAssets?: InputMaybe<Array<ApplicationUsesAiAssetsConnectFieldInput>>;
+  usesAIComponents?: InputMaybe<Array<ApplicationUsesAiComponentsConnectFieldInput>>;
   usesDataObjects?: InputMaybe<Array<ApplicationUsesDataObjectsConnectFieldInput>>;
 };
 
@@ -2594,7 +2594,7 @@ export type ApplicationCreateInput = {
   timeCategory?: InputMaybe<TimeCategory>;
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
   usedByOrganisations?: InputMaybe<ApplicationUsedByOrganisationsFieldInput>;
-  usesAIAssets?: InputMaybe<ApplicationUsesAiAssetsFieldInput>;
+  usesAIComponents?: InputMaybe<ApplicationUsesAiComponentsFieldInput>;
   usesDataObjects?: InputMaybe<ApplicationUsesDataObjectsFieldInput>;
   vendor?: InputMaybe<Scalars['String']['input']>;
   version?: InputMaybe<Scalars['String']['input']>;
@@ -2646,7 +2646,7 @@ export type ApplicationDeleteInput = {
   supportsCapabilities?: InputMaybe<Array<ApplicationSupportsCapabilitiesDeleteFieldInput>>;
   targetOfInterfaces?: InputMaybe<Array<ApplicationTargetOfInterfacesDeleteFieldInput>>;
   usedByOrganisations?: InputMaybe<Array<ApplicationUsedByOrganisationsDeleteFieldInput>>;
-  usesAIAssets?: InputMaybe<Array<ApplicationUsesAiAssetsDeleteFieldInput>>;
+  usesAIComponents?: InputMaybe<Array<ApplicationUsesAiComponentsDeleteFieldInput>>;
   usesDataObjects?: InputMaybe<Array<ApplicationUsesDataObjectsDeleteFieldInput>>;
 };
 
@@ -2790,7 +2790,7 @@ export type ApplicationDisconnectInput = {
   supportsCapabilities?: InputMaybe<Array<ApplicationSupportsCapabilitiesDisconnectFieldInput>>;
   targetOfInterfaces?: InputMaybe<Array<ApplicationTargetOfInterfacesDisconnectFieldInput>>;
   usedByOrganisations?: InputMaybe<Array<ApplicationUsedByOrganisationsDisconnectFieldInput>>;
-  usesAIAssets?: InputMaybe<Array<ApplicationUsesAiAssetsDisconnectFieldInput>>;
+  usesAIComponents?: InputMaybe<Array<ApplicationUsesAiComponentsDisconnectFieldInput>>;
   usesDataObjects?: InputMaybe<Array<ApplicationUsesDataObjectsDisconnectFieldInput>>;
 };
 
@@ -5789,7 +5789,7 @@ export type ApplicationUpdateInput = {
   technologyStack?: InputMaybe<ListStringMutations>;
   timeCategory?: InputMaybe<TimeCategoryEnumScalarMutations>;
   usedByOrganisations?: InputMaybe<Array<ApplicationUsedByOrganisationsUpdateFieldInput>>;
-  usesAIAssets?: InputMaybe<Array<ApplicationUsesAiAssetsUpdateFieldInput>>;
+  usesAIComponents?: InputMaybe<Array<ApplicationUsesAiComponentsUpdateFieldInput>>;
   usesDataObjects?: InputMaybe<Array<ApplicationUsesDataObjectsUpdateFieldInput>>;
   vendor?: InputMaybe<StringScalarMutations>;
   version?: InputMaybe<StringScalarMutations>;
@@ -5902,87 +5902,87 @@ export type ApplicationUsedByOrganisationsUpdateFieldInput = {
   update?: InputMaybe<ApplicationUsedByOrganisationsUpdateConnectionInput>;
 };
 
-export type ApplicationUsesAiAssetsAggregateInput = {
-  AND?: InputMaybe<Array<ApplicationUsesAiAssetsAggregateInput>>;
-  NOT?: InputMaybe<ApplicationUsesAiAssetsAggregateInput>;
-  OR?: InputMaybe<Array<ApplicationUsesAiAssetsAggregateInput>>;
+export type ApplicationUsesAiComponentsAggregateInput = {
+  AND?: InputMaybe<Array<ApplicationUsesAiComponentsAggregateInput>>;
+  NOT?: InputMaybe<ApplicationUsesAiComponentsAggregateInput>;
+  OR?: InputMaybe<Array<ApplicationUsesAiComponentsAggregateInput>>;
   count?: InputMaybe<IntScalarFilters>;
   count_EQ?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
   count_LTE?: InputMaybe<Scalars['Int']['input']>;
-  node?: InputMaybe<ApplicationUsesAiAssetsNodeAggregationWhereInput>;
+  node?: InputMaybe<ApplicationUsesAiComponentsNodeAggregationWhereInput>;
 };
 
-export type ApplicationUsesAiAssetsConnectFieldInput = {
-  connect?: InputMaybe<Array<AiAssetConnectInput>>;
-  where?: InputMaybe<AiAssetConnectWhere>;
+export type ApplicationUsesAiComponentsConnectFieldInput = {
+  connect?: InputMaybe<Array<AiComponentConnectInput>>;
+  where?: InputMaybe<AiComponentConnectWhere>;
 };
 
-export type ApplicationUsesAiAssetsConnection = {
-  __typename?: 'ApplicationUsesAIAssetsConnection';
-  aggregate: ApplicationAiAssetUsesAiAssetsAggregateSelection;
-  edges: Array<ApplicationUsesAiAssetsRelationship>;
+export type ApplicationUsesAiComponentsConnection = {
+  __typename?: 'ApplicationUsesAIComponentsConnection';
+  aggregate: ApplicationAiComponentUsesAiComponentsAggregateSelection;
+  edges: Array<ApplicationUsesAiComponentsRelationship>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
 
-export type ApplicationUsesAiAssetsConnectionAggregateInput = {
-  AND?: InputMaybe<Array<ApplicationUsesAiAssetsConnectionAggregateInput>>;
-  NOT?: InputMaybe<ApplicationUsesAiAssetsConnectionAggregateInput>;
-  OR?: InputMaybe<Array<ApplicationUsesAiAssetsConnectionAggregateInput>>;
+export type ApplicationUsesAiComponentsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<ApplicationUsesAiComponentsConnectionAggregateInput>>;
+  NOT?: InputMaybe<ApplicationUsesAiComponentsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<ApplicationUsesAiComponentsConnectionAggregateInput>>;
   count?: InputMaybe<ConnectionAggregationCountFilterInput>;
-  node?: InputMaybe<ApplicationUsesAiAssetsNodeAggregationWhereInput>;
+  node?: InputMaybe<ApplicationUsesAiComponentsNodeAggregationWhereInput>;
 };
 
-export type ApplicationUsesAiAssetsConnectionFilters = {
-  /** Filter Applications by aggregating results on related ApplicationUsesAIAssetsConnections */
-  aggregate?: InputMaybe<ApplicationUsesAiAssetsConnectionAggregateInput>;
-  /** Return Applications where all of the related ApplicationUsesAIAssetsConnections match this filter */
-  all?: InputMaybe<ApplicationUsesAiAssetsConnectionWhere>;
-  /** Return Applications where none of the related ApplicationUsesAIAssetsConnections match this filter */
-  none?: InputMaybe<ApplicationUsesAiAssetsConnectionWhere>;
-  /** Return Applications where one of the related ApplicationUsesAIAssetsConnections match this filter */
-  single?: InputMaybe<ApplicationUsesAiAssetsConnectionWhere>;
-  /** Return Applications where some of the related ApplicationUsesAIAssetsConnections match this filter */
-  some?: InputMaybe<ApplicationUsesAiAssetsConnectionWhere>;
+export type ApplicationUsesAiComponentsConnectionFilters = {
+  /** Filter Applications by aggregating results on related ApplicationUsesAIComponentsConnections */
+  aggregate?: InputMaybe<ApplicationUsesAiComponentsConnectionAggregateInput>;
+  /** Return Applications where all of the related ApplicationUsesAIComponentsConnections match this filter */
+  all?: InputMaybe<ApplicationUsesAiComponentsConnectionWhere>;
+  /** Return Applications where none of the related ApplicationUsesAIComponentsConnections match this filter */
+  none?: InputMaybe<ApplicationUsesAiComponentsConnectionWhere>;
+  /** Return Applications where one of the related ApplicationUsesAIComponentsConnections match this filter */
+  single?: InputMaybe<ApplicationUsesAiComponentsConnectionWhere>;
+  /** Return Applications where some of the related ApplicationUsesAIComponentsConnections match this filter */
+  some?: InputMaybe<ApplicationUsesAiComponentsConnectionWhere>;
 };
 
-export type ApplicationUsesAiAssetsConnectionSort = {
-  node?: InputMaybe<AiAssetSort>;
+export type ApplicationUsesAiComponentsConnectionSort = {
+  node?: InputMaybe<AiComponentSort>;
 };
 
-export type ApplicationUsesAiAssetsConnectionWhere = {
-  AND?: InputMaybe<Array<ApplicationUsesAiAssetsConnectionWhere>>;
-  NOT?: InputMaybe<ApplicationUsesAiAssetsConnectionWhere>;
-  OR?: InputMaybe<Array<ApplicationUsesAiAssetsConnectionWhere>>;
-  node?: InputMaybe<AiAssetWhere>;
+export type ApplicationUsesAiComponentsConnectionWhere = {
+  AND?: InputMaybe<Array<ApplicationUsesAiComponentsConnectionWhere>>;
+  NOT?: InputMaybe<ApplicationUsesAiComponentsConnectionWhere>;
+  OR?: InputMaybe<Array<ApplicationUsesAiComponentsConnectionWhere>>;
+  node?: InputMaybe<AiComponentWhere>;
 };
 
-export type ApplicationUsesAiAssetsCreateFieldInput = {
-  node: AiAssetCreateInput;
+export type ApplicationUsesAiComponentsCreateFieldInput = {
+  node: AiComponentCreateInput;
 };
 
-export type ApplicationUsesAiAssetsDeleteFieldInput = {
-  delete?: InputMaybe<AiAssetDeleteInput>;
-  where?: InputMaybe<ApplicationUsesAiAssetsConnectionWhere>;
+export type ApplicationUsesAiComponentsDeleteFieldInput = {
+  delete?: InputMaybe<AiComponentDeleteInput>;
+  where?: InputMaybe<ApplicationUsesAiComponentsConnectionWhere>;
 };
 
-export type ApplicationUsesAiAssetsDisconnectFieldInput = {
-  disconnect?: InputMaybe<AiAssetDisconnectInput>;
-  where?: InputMaybe<ApplicationUsesAiAssetsConnectionWhere>;
+export type ApplicationUsesAiComponentsDisconnectFieldInput = {
+  disconnect?: InputMaybe<AiComponentDisconnectInput>;
+  where?: InputMaybe<ApplicationUsesAiComponentsConnectionWhere>;
 };
 
-export type ApplicationUsesAiAssetsFieldInput = {
-  connect?: InputMaybe<Array<ApplicationUsesAiAssetsConnectFieldInput>>;
-  create?: InputMaybe<Array<ApplicationUsesAiAssetsCreateFieldInput>>;
+export type ApplicationUsesAiComponentsFieldInput = {
+  connect?: InputMaybe<Array<ApplicationUsesAiComponentsConnectFieldInput>>;
+  create?: InputMaybe<Array<ApplicationUsesAiComponentsCreateFieldInput>>;
 };
 
-export type ApplicationUsesAiAssetsNodeAggregationWhereInput = {
-  AND?: InputMaybe<Array<ApplicationUsesAiAssetsNodeAggregationWhereInput>>;
-  NOT?: InputMaybe<ApplicationUsesAiAssetsNodeAggregationWhereInput>;
-  OR?: InputMaybe<Array<ApplicationUsesAiAssetsNodeAggregationWhereInput>>;
+export type ApplicationUsesAiComponentsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<ApplicationUsesAiComponentsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<ApplicationUsesAiComponentsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<ApplicationUsesAiComponentsNodeAggregationWhereInput>>;
   accuracy?: InputMaybe<FloatScalarAggregationFilters>;
   costs?: InputMaybe<FloatScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
@@ -5995,23 +5995,23 @@ export type ApplicationUsesAiAssetsNodeAggregationWhereInput = {
   version?: InputMaybe<StringScalarAggregationFilters>;
 };
 
-export type ApplicationUsesAiAssetsRelationship = {
-  __typename?: 'ApplicationUsesAIAssetsRelationship';
+export type ApplicationUsesAiComponentsRelationship = {
+  __typename?: 'ApplicationUsesAIComponentsRelationship';
   cursor: Scalars['String']['output'];
-  node: AiAsset;
+  node: AiComponent;
 };
 
-export type ApplicationUsesAiAssetsUpdateConnectionInput = {
-  node?: InputMaybe<AiAssetUpdateInput>;
-  where?: InputMaybe<ApplicationUsesAiAssetsConnectionWhere>;
+export type ApplicationUsesAiComponentsUpdateConnectionInput = {
+  node?: InputMaybe<AiComponentUpdateInput>;
+  where?: InputMaybe<ApplicationUsesAiComponentsConnectionWhere>;
 };
 
-export type ApplicationUsesAiAssetsUpdateFieldInput = {
-  connect?: InputMaybe<Array<ApplicationUsesAiAssetsConnectFieldInput>>;
-  create?: InputMaybe<Array<ApplicationUsesAiAssetsCreateFieldInput>>;
-  delete?: InputMaybe<Array<ApplicationUsesAiAssetsDeleteFieldInput>>;
-  disconnect?: InputMaybe<Array<ApplicationUsesAiAssetsDisconnectFieldInput>>;
-  update?: InputMaybe<ApplicationUsesAiAssetsUpdateConnectionInput>;
+export type ApplicationUsesAiComponentsUpdateFieldInput = {
+  connect?: InputMaybe<Array<ApplicationUsesAiComponentsConnectFieldInput>>;
+  create?: InputMaybe<Array<ApplicationUsesAiComponentsCreateFieldInput>>;
+  delete?: InputMaybe<Array<ApplicationUsesAiComponentsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<ApplicationUsesAiComponentsDisconnectFieldInput>>;
+  update?: InputMaybe<ApplicationUsesAiComponentsUpdateConnectionInput>;
 };
 
 export type ApplicationUsesDataObjectsAggregateInput = {
@@ -6171,8 +6171,8 @@ export type ApplicationWhere = {
   updatedAt?: InputMaybe<DateTimeScalarFilters>;
   usedByOrganisations?: InputMaybe<OrganisationRelationshipFilters>;
   usedByOrganisationsConnection?: InputMaybe<ApplicationUsedByOrganisationsConnectionFilters>;
-  usesAIAssets?: InputMaybe<AiAssetRelationshipFilters>;
-  usesAIAssetsConnection?: InputMaybe<ApplicationUsesAiAssetsConnectionFilters>;
+  usesAIComponents?: InputMaybe<AiComponentRelationshipFilters>;
+  usesAIComponentsConnection?: InputMaybe<ApplicationUsesAiComponentsConnectionFilters>;
   usesDataObjects?: InputMaybe<DataObjectRelationshipFilters>;
   usesDataObjectsConnection?: InputMaybe<ApplicationUsesDataObjectsConnectionFilters>;
   vendor?: InputMaybe<StringScalarFilters>;
@@ -6196,8 +6196,8 @@ export type Architecture = {
   childArchitecturesConnection: ArchitectureChildArchitecturesConnection;
   company: Array<Company>;
   companyConnection: ArchitectureCompanyConnection;
-  containsAIAssets: Array<AiAsset>;
-  containsAIAssetsConnection: ArchitectureContainsAiAssetsConnection;
+  containsAIComponents: Array<AiComponent>;
+  containsAIComponentsConnection: ArchitectureContainsAiComponentsConnection;
   containsApplications: Array<Application>;
   containsApplicationsConnection: ArchitectureContainsApplicationsConnection;
   containsCapabilities: Array<BusinessCapability>;
@@ -6281,20 +6281,20 @@ export type ArchitectureCompanyConnectionArgs = {
 
 
 /** Architecture - repräsentiert eine Architektur im Enterprise Architecture Management */
-export type ArchitectureContainsAiAssetsArgs = {
+export type ArchitectureContainsAiComponentsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<AiAssetSort>>;
-  where?: InputMaybe<AiAssetWhere>;
+  sort?: InputMaybe<Array<AiComponentSort>>;
+  where?: InputMaybe<AiComponentWhere>;
 };
 
 
 /** Architecture - repräsentiert eine Architektur im Enterprise Architecture Management */
-export type ArchitectureContainsAiAssetsConnectionArgs = {
+export type ArchitectureContainsAiComponentsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ArchitectureContainsAiAssetsConnectionSort>>;
-  where?: InputMaybe<ArchitectureContainsAiAssetsConnectionWhere>;
+  sort?: InputMaybe<Array<ArchitectureContainsAiComponentsConnectionSort>>;
+  where?: InputMaybe<ArchitectureContainsAiComponentsConnectionWhere>;
 };
 
 
@@ -6441,14 +6441,14 @@ export type ArchitectureParentArchitectureConnectionArgs = {
   where?: InputMaybe<ArchitectureParentArchitectureConnectionWhere>;
 };
 
-export type ArchitectureAiAssetContainsAiAssetsAggregateSelection = {
-  __typename?: 'ArchitectureAIAssetContainsAIAssetsAggregateSelection';
+export type ArchitectureAiComponentContainsAiComponentsAggregateSelection = {
+  __typename?: 'ArchitectureAIComponentContainsAIComponentsAggregateSelection';
   count: CountConnection;
-  node?: Maybe<ArchitectureAiAssetContainsAiAssetsNodeAggregateSelection>;
+  node?: Maybe<ArchitectureAiComponentContainsAiComponentsNodeAggregateSelection>;
 };
 
-export type ArchitectureAiAssetContainsAiAssetsNodeAggregateSelection = {
-  __typename?: 'ArchitectureAIAssetContainsAIAssetsNodeAggregateSelection';
+export type ArchitectureAiComponentContainsAiComponentsNodeAggregateSelection = {
+  __typename?: 'ArchitectureAIComponentContainsAIComponentsNodeAggregateSelection';
   accuracy: FloatAggregateSelection;
   costs: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
@@ -6917,7 +6917,7 @@ export type ArchitectureConnectInput = {
   appliedPrinciples?: InputMaybe<Array<ArchitectureAppliedPrinciplesConnectFieldInput>>;
   childArchitectures?: InputMaybe<Array<ArchitectureChildArchitecturesConnectFieldInput>>;
   company?: InputMaybe<Array<ArchitectureCompanyConnectFieldInput>>;
-  containsAIAssets?: InputMaybe<Array<ArchitectureContainsAiAssetsConnectFieldInput>>;
+  containsAIComponents?: InputMaybe<Array<ArchitectureContainsAiComponentsConnectFieldInput>>;
   containsApplications?: InputMaybe<Array<ArchitectureContainsApplicationsConnectFieldInput>>;
   containsCapabilities?: InputMaybe<Array<ArchitectureContainsCapabilitiesConnectFieldInput>>;
   containsDataObjects?: InputMaybe<Array<ArchitectureContainsDataObjectsConnectFieldInput>>;
@@ -6932,87 +6932,87 @@ export type ArchitectureConnectWhere = {
   node: ArchitectureWhere;
 };
 
-export type ArchitectureContainsAiAssetsAggregateInput = {
-  AND?: InputMaybe<Array<ArchitectureContainsAiAssetsAggregateInput>>;
-  NOT?: InputMaybe<ArchitectureContainsAiAssetsAggregateInput>;
-  OR?: InputMaybe<Array<ArchitectureContainsAiAssetsAggregateInput>>;
+export type ArchitectureContainsAiComponentsAggregateInput = {
+  AND?: InputMaybe<Array<ArchitectureContainsAiComponentsAggregateInput>>;
+  NOT?: InputMaybe<ArchitectureContainsAiComponentsAggregateInput>;
+  OR?: InputMaybe<Array<ArchitectureContainsAiComponentsAggregateInput>>;
   count?: InputMaybe<IntScalarFilters>;
   count_EQ?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
   count_LTE?: InputMaybe<Scalars['Int']['input']>;
-  node?: InputMaybe<ArchitectureContainsAiAssetsNodeAggregationWhereInput>;
+  node?: InputMaybe<ArchitectureContainsAiComponentsNodeAggregationWhereInput>;
 };
 
-export type ArchitectureContainsAiAssetsConnectFieldInput = {
-  connect?: InputMaybe<Array<AiAssetConnectInput>>;
-  where?: InputMaybe<AiAssetConnectWhere>;
+export type ArchitectureContainsAiComponentsConnectFieldInput = {
+  connect?: InputMaybe<Array<AiComponentConnectInput>>;
+  where?: InputMaybe<AiComponentConnectWhere>;
 };
 
-export type ArchitectureContainsAiAssetsConnection = {
-  __typename?: 'ArchitectureContainsAIAssetsConnection';
-  aggregate: ArchitectureAiAssetContainsAiAssetsAggregateSelection;
-  edges: Array<ArchitectureContainsAiAssetsRelationship>;
+export type ArchitectureContainsAiComponentsConnection = {
+  __typename?: 'ArchitectureContainsAIComponentsConnection';
+  aggregate: ArchitectureAiComponentContainsAiComponentsAggregateSelection;
+  edges: Array<ArchitectureContainsAiComponentsRelationship>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
 
-export type ArchitectureContainsAiAssetsConnectionAggregateInput = {
-  AND?: InputMaybe<Array<ArchitectureContainsAiAssetsConnectionAggregateInput>>;
-  NOT?: InputMaybe<ArchitectureContainsAiAssetsConnectionAggregateInput>;
-  OR?: InputMaybe<Array<ArchitectureContainsAiAssetsConnectionAggregateInput>>;
+export type ArchitectureContainsAiComponentsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<ArchitectureContainsAiComponentsConnectionAggregateInput>>;
+  NOT?: InputMaybe<ArchitectureContainsAiComponentsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<ArchitectureContainsAiComponentsConnectionAggregateInput>>;
   count?: InputMaybe<ConnectionAggregationCountFilterInput>;
-  node?: InputMaybe<ArchitectureContainsAiAssetsNodeAggregationWhereInput>;
+  node?: InputMaybe<ArchitectureContainsAiComponentsNodeAggregationWhereInput>;
 };
 
-export type ArchitectureContainsAiAssetsConnectionFilters = {
-  /** Filter Architectures by aggregating results on related ArchitectureContainsAIAssetsConnections */
-  aggregate?: InputMaybe<ArchitectureContainsAiAssetsConnectionAggregateInput>;
-  /** Return Architectures where all of the related ArchitectureContainsAIAssetsConnections match this filter */
-  all?: InputMaybe<ArchitectureContainsAiAssetsConnectionWhere>;
-  /** Return Architectures where none of the related ArchitectureContainsAIAssetsConnections match this filter */
-  none?: InputMaybe<ArchitectureContainsAiAssetsConnectionWhere>;
-  /** Return Architectures where one of the related ArchitectureContainsAIAssetsConnections match this filter */
-  single?: InputMaybe<ArchitectureContainsAiAssetsConnectionWhere>;
-  /** Return Architectures where some of the related ArchitectureContainsAIAssetsConnections match this filter */
-  some?: InputMaybe<ArchitectureContainsAiAssetsConnectionWhere>;
+export type ArchitectureContainsAiComponentsConnectionFilters = {
+  /** Filter Architectures by aggregating results on related ArchitectureContainsAIComponentsConnections */
+  aggregate?: InputMaybe<ArchitectureContainsAiComponentsConnectionAggregateInput>;
+  /** Return Architectures where all of the related ArchitectureContainsAIComponentsConnections match this filter */
+  all?: InputMaybe<ArchitectureContainsAiComponentsConnectionWhere>;
+  /** Return Architectures where none of the related ArchitectureContainsAIComponentsConnections match this filter */
+  none?: InputMaybe<ArchitectureContainsAiComponentsConnectionWhere>;
+  /** Return Architectures where one of the related ArchitectureContainsAIComponentsConnections match this filter */
+  single?: InputMaybe<ArchitectureContainsAiComponentsConnectionWhere>;
+  /** Return Architectures where some of the related ArchitectureContainsAIComponentsConnections match this filter */
+  some?: InputMaybe<ArchitectureContainsAiComponentsConnectionWhere>;
 };
 
-export type ArchitectureContainsAiAssetsConnectionSort = {
-  node?: InputMaybe<AiAssetSort>;
+export type ArchitectureContainsAiComponentsConnectionSort = {
+  node?: InputMaybe<AiComponentSort>;
 };
 
-export type ArchitectureContainsAiAssetsConnectionWhere = {
-  AND?: InputMaybe<Array<ArchitectureContainsAiAssetsConnectionWhere>>;
-  NOT?: InputMaybe<ArchitectureContainsAiAssetsConnectionWhere>;
-  OR?: InputMaybe<Array<ArchitectureContainsAiAssetsConnectionWhere>>;
-  node?: InputMaybe<AiAssetWhere>;
+export type ArchitectureContainsAiComponentsConnectionWhere = {
+  AND?: InputMaybe<Array<ArchitectureContainsAiComponentsConnectionWhere>>;
+  NOT?: InputMaybe<ArchitectureContainsAiComponentsConnectionWhere>;
+  OR?: InputMaybe<Array<ArchitectureContainsAiComponentsConnectionWhere>>;
+  node?: InputMaybe<AiComponentWhere>;
 };
 
-export type ArchitectureContainsAiAssetsCreateFieldInput = {
-  node: AiAssetCreateInput;
+export type ArchitectureContainsAiComponentsCreateFieldInput = {
+  node: AiComponentCreateInput;
 };
 
-export type ArchitectureContainsAiAssetsDeleteFieldInput = {
-  delete?: InputMaybe<AiAssetDeleteInput>;
-  where?: InputMaybe<ArchitectureContainsAiAssetsConnectionWhere>;
+export type ArchitectureContainsAiComponentsDeleteFieldInput = {
+  delete?: InputMaybe<AiComponentDeleteInput>;
+  where?: InputMaybe<ArchitectureContainsAiComponentsConnectionWhere>;
 };
 
-export type ArchitectureContainsAiAssetsDisconnectFieldInput = {
-  disconnect?: InputMaybe<AiAssetDisconnectInput>;
-  where?: InputMaybe<ArchitectureContainsAiAssetsConnectionWhere>;
+export type ArchitectureContainsAiComponentsDisconnectFieldInput = {
+  disconnect?: InputMaybe<AiComponentDisconnectInput>;
+  where?: InputMaybe<ArchitectureContainsAiComponentsConnectionWhere>;
 };
 
-export type ArchitectureContainsAiAssetsFieldInput = {
-  connect?: InputMaybe<Array<ArchitectureContainsAiAssetsConnectFieldInput>>;
-  create?: InputMaybe<Array<ArchitectureContainsAiAssetsCreateFieldInput>>;
+export type ArchitectureContainsAiComponentsFieldInput = {
+  connect?: InputMaybe<Array<ArchitectureContainsAiComponentsConnectFieldInput>>;
+  create?: InputMaybe<Array<ArchitectureContainsAiComponentsCreateFieldInput>>;
 };
 
-export type ArchitectureContainsAiAssetsNodeAggregationWhereInput = {
-  AND?: InputMaybe<Array<ArchitectureContainsAiAssetsNodeAggregationWhereInput>>;
-  NOT?: InputMaybe<ArchitectureContainsAiAssetsNodeAggregationWhereInput>;
-  OR?: InputMaybe<Array<ArchitectureContainsAiAssetsNodeAggregationWhereInput>>;
+export type ArchitectureContainsAiComponentsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<ArchitectureContainsAiComponentsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<ArchitectureContainsAiComponentsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<ArchitectureContainsAiComponentsNodeAggregationWhereInput>>;
   accuracy?: InputMaybe<FloatScalarAggregationFilters>;
   costs?: InputMaybe<FloatScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
@@ -7025,23 +7025,23 @@ export type ArchitectureContainsAiAssetsNodeAggregationWhereInput = {
   version?: InputMaybe<StringScalarAggregationFilters>;
 };
 
-export type ArchitectureContainsAiAssetsRelationship = {
-  __typename?: 'ArchitectureContainsAIAssetsRelationship';
+export type ArchitectureContainsAiComponentsRelationship = {
+  __typename?: 'ArchitectureContainsAIComponentsRelationship';
   cursor: Scalars['String']['output'];
-  node: AiAsset;
+  node: AiComponent;
 };
 
-export type ArchitectureContainsAiAssetsUpdateConnectionInput = {
-  node?: InputMaybe<AiAssetUpdateInput>;
-  where?: InputMaybe<ArchitectureContainsAiAssetsConnectionWhere>;
+export type ArchitectureContainsAiComponentsUpdateConnectionInput = {
+  node?: InputMaybe<AiComponentUpdateInput>;
+  where?: InputMaybe<ArchitectureContainsAiComponentsConnectionWhere>;
 };
 
-export type ArchitectureContainsAiAssetsUpdateFieldInput = {
-  connect?: InputMaybe<Array<ArchitectureContainsAiAssetsConnectFieldInput>>;
-  create?: InputMaybe<Array<ArchitectureContainsAiAssetsCreateFieldInput>>;
-  delete?: InputMaybe<Array<ArchitectureContainsAiAssetsDeleteFieldInput>>;
-  disconnect?: InputMaybe<Array<ArchitectureContainsAiAssetsDisconnectFieldInput>>;
-  update?: InputMaybe<ArchitectureContainsAiAssetsUpdateConnectionInput>;
+export type ArchitectureContainsAiComponentsUpdateFieldInput = {
+  connect?: InputMaybe<Array<ArchitectureContainsAiComponentsConnectFieldInput>>;
+  create?: InputMaybe<Array<ArchitectureContainsAiComponentsCreateFieldInput>>;
+  delete?: InputMaybe<Array<ArchitectureContainsAiComponentsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<ArchitectureContainsAiComponentsDisconnectFieldInput>>;
+  update?: InputMaybe<ArchitectureContainsAiComponentsUpdateConnectionInput>;
 };
 
 export type ArchitectureContainsApplicationsAggregateInput = {
@@ -7596,7 +7596,7 @@ export type ArchitectureCreateInput = {
   appliedPrinciples?: InputMaybe<ArchitectureAppliedPrinciplesFieldInput>;
   childArchitectures?: InputMaybe<ArchitectureChildArchitecturesFieldInput>;
   company?: InputMaybe<ArchitectureCompanyFieldInput>;
-  containsAIAssets?: InputMaybe<ArchitectureContainsAiAssetsFieldInput>;
+  containsAIComponents?: InputMaybe<ArchitectureContainsAiComponentsFieldInput>;
   containsApplications?: InputMaybe<ArchitectureContainsApplicationsFieldInput>;
   containsCapabilities?: InputMaybe<ArchitectureContainsCapabilitiesFieldInput>;
   containsDataObjects?: InputMaybe<ArchitectureContainsDataObjectsFieldInput>;
@@ -7633,7 +7633,7 @@ export type ArchitectureDeleteInput = {
   appliedPrinciples?: InputMaybe<Array<ArchitectureAppliedPrinciplesDeleteFieldInput>>;
   childArchitectures?: InputMaybe<Array<ArchitectureChildArchitecturesDeleteFieldInput>>;
   company?: InputMaybe<Array<ArchitectureCompanyDeleteFieldInput>>;
-  containsAIAssets?: InputMaybe<Array<ArchitectureContainsAiAssetsDeleteFieldInput>>;
+  containsAIComponents?: InputMaybe<Array<ArchitectureContainsAiComponentsDeleteFieldInput>>;
   containsApplications?: InputMaybe<Array<ArchitectureContainsApplicationsDeleteFieldInput>>;
   containsCapabilities?: InputMaybe<Array<ArchitectureContainsCapabilitiesDeleteFieldInput>>;
   containsDataObjects?: InputMaybe<Array<ArchitectureContainsDataObjectsDeleteFieldInput>>;
@@ -7772,7 +7772,7 @@ export type ArchitectureDisconnectInput = {
   appliedPrinciples?: InputMaybe<Array<ArchitectureAppliedPrinciplesDisconnectFieldInput>>;
   childArchitectures?: InputMaybe<Array<ArchitectureChildArchitecturesDisconnectFieldInput>>;
   company?: InputMaybe<Array<ArchitectureCompanyDisconnectFieldInput>>;
-  containsAIAssets?: InputMaybe<Array<ArchitectureContainsAiAssetsDisconnectFieldInput>>;
+  containsAIComponents?: InputMaybe<Array<ArchitectureContainsAiComponentsDisconnectFieldInput>>;
   containsApplications?: InputMaybe<Array<ArchitectureContainsApplicationsDisconnectFieldInput>>;
   containsCapabilities?: InputMaybe<Array<ArchitectureContainsCapabilitiesDisconnectFieldInput>>;
   containsDataObjects?: InputMaybe<Array<ArchitectureContainsDataObjectsDisconnectFieldInput>>;
@@ -8082,8 +8082,8 @@ export type ArchitecturePrinciple = {
   createdAt: Scalars['DateTime']['output'];
   description?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
-  implementedByAIAssets: Array<AiAsset>;
-  implementedByAIAssetsConnection: ArchitecturePrincipleImplementedByAiAssetsConnection;
+  implementedByAIComponents: Array<AiComponent>;
+  implementedByAIComponentsConnection: ArchitecturePrincipleImplementedByAiComponentsConnection;
   implementedByApplications: Array<Application>;
   implementedByApplicationsConnection: ArchitecturePrincipleImplementedByApplicationsConnection;
   implications?: Maybe<Scalars['String']['output']>;
@@ -8135,20 +8135,20 @@ export type ArchitecturePrincipleCompanyConnectionArgs = {
 
 
 /** ArchitecturePrinciple - repräsentiert ein Architektur-Prinzip im Enterprise Architecture Management */
-export type ArchitecturePrincipleImplementedByAiAssetsArgs = {
+export type ArchitecturePrincipleImplementedByAiComponentsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<AiAssetSort>>;
-  where?: InputMaybe<AiAssetWhere>;
+  sort?: InputMaybe<Array<AiComponentSort>>;
+  where?: InputMaybe<AiComponentWhere>;
 };
 
 
 /** ArchitecturePrinciple - repräsentiert ein Architektur-Prinzip im Enterprise Architecture Management */
-export type ArchitecturePrincipleImplementedByAiAssetsConnectionArgs = {
+export type ArchitecturePrincipleImplementedByAiComponentsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ArchitecturePrincipleImplementedByAiAssetsConnectionSort>>;
-  where?: InputMaybe<ArchitecturePrincipleImplementedByAiAssetsConnectionWhere>;
+  sort?: InputMaybe<Array<ArchitecturePrincipleImplementedByAiComponentsConnectionSort>>;
+  where?: InputMaybe<ArchitecturePrincipleImplementedByAiComponentsConnectionWhere>;
 };
 
 
@@ -8187,14 +8187,14 @@ export type ArchitecturePrincipleOwnersConnectionArgs = {
   where?: InputMaybe<ArchitecturePrincipleOwnersConnectionWhere>;
 };
 
-export type ArchitecturePrincipleAiAssetImplementedByAiAssetsAggregateSelection = {
-  __typename?: 'ArchitecturePrincipleAIAssetImplementedByAIAssetsAggregateSelection';
+export type ArchitecturePrincipleAiComponentImplementedByAiComponentsAggregateSelection = {
+  __typename?: 'ArchitecturePrincipleAIComponentImplementedByAIComponentsAggregateSelection';
   count: CountConnection;
-  node?: Maybe<ArchitecturePrincipleAiAssetImplementedByAiAssetsNodeAggregateSelection>;
+  node?: Maybe<ArchitecturePrincipleAiComponentImplementedByAiComponentsNodeAggregateSelection>;
 };
 
-export type ArchitecturePrincipleAiAssetImplementedByAiAssetsNodeAggregateSelection = {
-  __typename?: 'ArchitecturePrincipleAIAssetImplementedByAIAssetsNodeAggregateSelection';
+export type ArchitecturePrincipleAiComponentImplementedByAiComponentsNodeAggregateSelection = {
+  __typename?: 'ArchitecturePrincipleAIComponentImplementedByAIComponentsNodeAggregateSelection';
   accuracy: FloatAggregateSelection;
   costs: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
@@ -8492,7 +8492,7 @@ export type ArchitecturePrincipleCompanyUpdateFieldInput = {
 export type ArchitecturePrincipleConnectInput = {
   appliedInArchitectures?: InputMaybe<Array<ArchitecturePrincipleAppliedInArchitecturesConnectFieldInput>>;
   company?: InputMaybe<Array<ArchitecturePrincipleCompanyConnectFieldInput>>;
-  implementedByAIAssets?: InputMaybe<Array<ArchitecturePrincipleImplementedByAiAssetsConnectFieldInput>>;
+  implementedByAIComponents?: InputMaybe<Array<ArchitecturePrincipleImplementedByAiComponentsConnectFieldInput>>;
   implementedByApplications?: InputMaybe<Array<ArchitecturePrincipleImplementedByApplicationsConnectFieldInput>>;
   owners?: InputMaybe<Array<ArchitecturePrincipleOwnersConnectFieldInput>>;
 };
@@ -8506,7 +8506,7 @@ export type ArchitecturePrincipleCreateInput = {
   category: PrincipleCategory;
   company?: InputMaybe<ArchitecturePrincipleCompanyFieldInput>;
   description?: InputMaybe<Scalars['String']['input']>;
-  implementedByAIAssets?: InputMaybe<ArchitecturePrincipleImplementedByAiAssetsFieldInput>;
+  implementedByAIComponents?: InputMaybe<ArchitecturePrincipleImplementedByAiComponentsFieldInput>;
   implementedByApplications?: InputMaybe<ArchitecturePrincipleImplementedByApplicationsFieldInput>;
   implications?: InputMaybe<Scalars['String']['input']>;
   isActive: Scalars['Boolean']['input'];
@@ -8521,7 +8521,7 @@ export type ArchitecturePrincipleCreateInput = {
 export type ArchitecturePrincipleDeleteInput = {
   appliedInArchitectures?: InputMaybe<Array<ArchitecturePrincipleAppliedInArchitecturesDeleteFieldInput>>;
   company?: InputMaybe<Array<ArchitecturePrincipleCompanyDeleteFieldInput>>;
-  implementedByAIAssets?: InputMaybe<Array<ArchitecturePrincipleImplementedByAiAssetsDeleteFieldInput>>;
+  implementedByAIComponents?: InputMaybe<Array<ArchitecturePrincipleImplementedByAiComponentsDeleteFieldInput>>;
   implementedByApplications?: InputMaybe<Array<ArchitecturePrincipleImplementedByApplicationsDeleteFieldInput>>;
   owners?: InputMaybe<Array<ArchitecturePrincipleOwnersDeleteFieldInput>>;
 };
@@ -8529,7 +8529,7 @@ export type ArchitecturePrincipleDeleteInput = {
 export type ArchitecturePrincipleDisconnectInput = {
   appliedInArchitectures?: InputMaybe<Array<ArchitecturePrincipleAppliedInArchitecturesDisconnectFieldInput>>;
   company?: InputMaybe<Array<ArchitecturePrincipleCompanyDisconnectFieldInput>>;
-  implementedByAIAssets?: InputMaybe<Array<ArchitecturePrincipleImplementedByAiAssetsDisconnectFieldInput>>;
+  implementedByAIComponents?: InputMaybe<Array<ArchitecturePrincipleImplementedByAiComponentsDisconnectFieldInput>>;
   implementedByApplications?: InputMaybe<Array<ArchitecturePrincipleImplementedByApplicationsDisconnectFieldInput>>;
   owners?: InputMaybe<Array<ArchitecturePrincipleOwnersDisconnectFieldInput>>;
 };
@@ -8540,87 +8540,87 @@ export type ArchitecturePrincipleEdge = {
   node: ArchitecturePrinciple;
 };
 
-export type ArchitecturePrincipleImplementedByAiAssetsAggregateInput = {
-  AND?: InputMaybe<Array<ArchitecturePrincipleImplementedByAiAssetsAggregateInput>>;
-  NOT?: InputMaybe<ArchitecturePrincipleImplementedByAiAssetsAggregateInput>;
-  OR?: InputMaybe<Array<ArchitecturePrincipleImplementedByAiAssetsAggregateInput>>;
+export type ArchitecturePrincipleImplementedByAiComponentsAggregateInput = {
+  AND?: InputMaybe<Array<ArchitecturePrincipleImplementedByAiComponentsAggregateInput>>;
+  NOT?: InputMaybe<ArchitecturePrincipleImplementedByAiComponentsAggregateInput>;
+  OR?: InputMaybe<Array<ArchitecturePrincipleImplementedByAiComponentsAggregateInput>>;
   count?: InputMaybe<IntScalarFilters>;
   count_EQ?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
   count_LTE?: InputMaybe<Scalars['Int']['input']>;
-  node?: InputMaybe<ArchitecturePrincipleImplementedByAiAssetsNodeAggregationWhereInput>;
+  node?: InputMaybe<ArchitecturePrincipleImplementedByAiComponentsNodeAggregationWhereInput>;
 };
 
-export type ArchitecturePrincipleImplementedByAiAssetsConnectFieldInput = {
-  connect?: InputMaybe<Array<AiAssetConnectInput>>;
-  where?: InputMaybe<AiAssetConnectWhere>;
+export type ArchitecturePrincipleImplementedByAiComponentsConnectFieldInput = {
+  connect?: InputMaybe<Array<AiComponentConnectInput>>;
+  where?: InputMaybe<AiComponentConnectWhere>;
 };
 
-export type ArchitecturePrincipleImplementedByAiAssetsConnection = {
-  __typename?: 'ArchitecturePrincipleImplementedByAIAssetsConnection';
-  aggregate: ArchitecturePrincipleAiAssetImplementedByAiAssetsAggregateSelection;
-  edges: Array<ArchitecturePrincipleImplementedByAiAssetsRelationship>;
+export type ArchitecturePrincipleImplementedByAiComponentsConnection = {
+  __typename?: 'ArchitecturePrincipleImplementedByAIComponentsConnection';
+  aggregate: ArchitecturePrincipleAiComponentImplementedByAiComponentsAggregateSelection;
+  edges: Array<ArchitecturePrincipleImplementedByAiComponentsRelationship>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
 
-export type ArchitecturePrincipleImplementedByAiAssetsConnectionAggregateInput = {
-  AND?: InputMaybe<Array<ArchitecturePrincipleImplementedByAiAssetsConnectionAggregateInput>>;
-  NOT?: InputMaybe<ArchitecturePrincipleImplementedByAiAssetsConnectionAggregateInput>;
-  OR?: InputMaybe<Array<ArchitecturePrincipleImplementedByAiAssetsConnectionAggregateInput>>;
+export type ArchitecturePrincipleImplementedByAiComponentsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<ArchitecturePrincipleImplementedByAiComponentsConnectionAggregateInput>>;
+  NOT?: InputMaybe<ArchitecturePrincipleImplementedByAiComponentsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<ArchitecturePrincipleImplementedByAiComponentsConnectionAggregateInput>>;
   count?: InputMaybe<ConnectionAggregationCountFilterInput>;
-  node?: InputMaybe<ArchitecturePrincipleImplementedByAiAssetsNodeAggregationWhereInput>;
+  node?: InputMaybe<ArchitecturePrincipleImplementedByAiComponentsNodeAggregationWhereInput>;
 };
 
-export type ArchitecturePrincipleImplementedByAiAssetsConnectionFilters = {
-  /** Filter ArchitecturePrinciples by aggregating results on related ArchitecturePrincipleImplementedByAIAssetsConnections */
-  aggregate?: InputMaybe<ArchitecturePrincipleImplementedByAiAssetsConnectionAggregateInput>;
-  /** Return ArchitecturePrinciples where all of the related ArchitecturePrincipleImplementedByAIAssetsConnections match this filter */
-  all?: InputMaybe<ArchitecturePrincipleImplementedByAiAssetsConnectionWhere>;
-  /** Return ArchitecturePrinciples where none of the related ArchitecturePrincipleImplementedByAIAssetsConnections match this filter */
-  none?: InputMaybe<ArchitecturePrincipleImplementedByAiAssetsConnectionWhere>;
-  /** Return ArchitecturePrinciples where one of the related ArchitecturePrincipleImplementedByAIAssetsConnections match this filter */
-  single?: InputMaybe<ArchitecturePrincipleImplementedByAiAssetsConnectionWhere>;
-  /** Return ArchitecturePrinciples where some of the related ArchitecturePrincipleImplementedByAIAssetsConnections match this filter */
-  some?: InputMaybe<ArchitecturePrincipleImplementedByAiAssetsConnectionWhere>;
+export type ArchitecturePrincipleImplementedByAiComponentsConnectionFilters = {
+  /** Filter ArchitecturePrinciples by aggregating results on related ArchitecturePrincipleImplementedByAIComponentsConnections */
+  aggregate?: InputMaybe<ArchitecturePrincipleImplementedByAiComponentsConnectionAggregateInput>;
+  /** Return ArchitecturePrinciples where all of the related ArchitecturePrincipleImplementedByAIComponentsConnections match this filter */
+  all?: InputMaybe<ArchitecturePrincipleImplementedByAiComponentsConnectionWhere>;
+  /** Return ArchitecturePrinciples where none of the related ArchitecturePrincipleImplementedByAIComponentsConnections match this filter */
+  none?: InputMaybe<ArchitecturePrincipleImplementedByAiComponentsConnectionWhere>;
+  /** Return ArchitecturePrinciples where one of the related ArchitecturePrincipleImplementedByAIComponentsConnections match this filter */
+  single?: InputMaybe<ArchitecturePrincipleImplementedByAiComponentsConnectionWhere>;
+  /** Return ArchitecturePrinciples where some of the related ArchitecturePrincipleImplementedByAIComponentsConnections match this filter */
+  some?: InputMaybe<ArchitecturePrincipleImplementedByAiComponentsConnectionWhere>;
 };
 
-export type ArchitecturePrincipleImplementedByAiAssetsConnectionSort = {
-  node?: InputMaybe<AiAssetSort>;
+export type ArchitecturePrincipleImplementedByAiComponentsConnectionSort = {
+  node?: InputMaybe<AiComponentSort>;
 };
 
-export type ArchitecturePrincipleImplementedByAiAssetsConnectionWhere = {
-  AND?: InputMaybe<Array<ArchitecturePrincipleImplementedByAiAssetsConnectionWhere>>;
-  NOT?: InputMaybe<ArchitecturePrincipleImplementedByAiAssetsConnectionWhere>;
-  OR?: InputMaybe<Array<ArchitecturePrincipleImplementedByAiAssetsConnectionWhere>>;
-  node?: InputMaybe<AiAssetWhere>;
+export type ArchitecturePrincipleImplementedByAiComponentsConnectionWhere = {
+  AND?: InputMaybe<Array<ArchitecturePrincipleImplementedByAiComponentsConnectionWhere>>;
+  NOT?: InputMaybe<ArchitecturePrincipleImplementedByAiComponentsConnectionWhere>;
+  OR?: InputMaybe<Array<ArchitecturePrincipleImplementedByAiComponentsConnectionWhere>>;
+  node?: InputMaybe<AiComponentWhere>;
 };
 
-export type ArchitecturePrincipleImplementedByAiAssetsCreateFieldInput = {
-  node: AiAssetCreateInput;
+export type ArchitecturePrincipleImplementedByAiComponentsCreateFieldInput = {
+  node: AiComponentCreateInput;
 };
 
-export type ArchitecturePrincipleImplementedByAiAssetsDeleteFieldInput = {
-  delete?: InputMaybe<AiAssetDeleteInput>;
-  where?: InputMaybe<ArchitecturePrincipleImplementedByAiAssetsConnectionWhere>;
+export type ArchitecturePrincipleImplementedByAiComponentsDeleteFieldInput = {
+  delete?: InputMaybe<AiComponentDeleteInput>;
+  where?: InputMaybe<ArchitecturePrincipleImplementedByAiComponentsConnectionWhere>;
 };
 
-export type ArchitecturePrincipleImplementedByAiAssetsDisconnectFieldInput = {
-  disconnect?: InputMaybe<AiAssetDisconnectInput>;
-  where?: InputMaybe<ArchitecturePrincipleImplementedByAiAssetsConnectionWhere>;
+export type ArchitecturePrincipleImplementedByAiComponentsDisconnectFieldInput = {
+  disconnect?: InputMaybe<AiComponentDisconnectInput>;
+  where?: InputMaybe<ArchitecturePrincipleImplementedByAiComponentsConnectionWhere>;
 };
 
-export type ArchitecturePrincipleImplementedByAiAssetsFieldInput = {
-  connect?: InputMaybe<Array<ArchitecturePrincipleImplementedByAiAssetsConnectFieldInput>>;
-  create?: InputMaybe<Array<ArchitecturePrincipleImplementedByAiAssetsCreateFieldInput>>;
+export type ArchitecturePrincipleImplementedByAiComponentsFieldInput = {
+  connect?: InputMaybe<Array<ArchitecturePrincipleImplementedByAiComponentsConnectFieldInput>>;
+  create?: InputMaybe<Array<ArchitecturePrincipleImplementedByAiComponentsCreateFieldInput>>;
 };
 
-export type ArchitecturePrincipleImplementedByAiAssetsNodeAggregationWhereInput = {
-  AND?: InputMaybe<Array<ArchitecturePrincipleImplementedByAiAssetsNodeAggregationWhereInput>>;
-  NOT?: InputMaybe<ArchitecturePrincipleImplementedByAiAssetsNodeAggregationWhereInput>;
-  OR?: InputMaybe<Array<ArchitecturePrincipleImplementedByAiAssetsNodeAggregationWhereInput>>;
+export type ArchitecturePrincipleImplementedByAiComponentsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<ArchitecturePrincipleImplementedByAiComponentsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<ArchitecturePrincipleImplementedByAiComponentsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<ArchitecturePrincipleImplementedByAiComponentsNodeAggregationWhereInput>>;
   accuracy?: InputMaybe<FloatScalarAggregationFilters>;
   costs?: InputMaybe<FloatScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
@@ -8633,23 +8633,23 @@ export type ArchitecturePrincipleImplementedByAiAssetsNodeAggregationWhereInput 
   version?: InputMaybe<StringScalarAggregationFilters>;
 };
 
-export type ArchitecturePrincipleImplementedByAiAssetsRelationship = {
-  __typename?: 'ArchitecturePrincipleImplementedByAIAssetsRelationship';
+export type ArchitecturePrincipleImplementedByAiComponentsRelationship = {
+  __typename?: 'ArchitecturePrincipleImplementedByAIComponentsRelationship';
   cursor: Scalars['String']['output'];
-  node: AiAsset;
+  node: AiComponent;
 };
 
-export type ArchitecturePrincipleImplementedByAiAssetsUpdateConnectionInput = {
-  node?: InputMaybe<AiAssetUpdateInput>;
-  where?: InputMaybe<ArchitecturePrincipleImplementedByAiAssetsConnectionWhere>;
+export type ArchitecturePrincipleImplementedByAiComponentsUpdateConnectionInput = {
+  node?: InputMaybe<AiComponentUpdateInput>;
+  where?: InputMaybe<ArchitecturePrincipleImplementedByAiComponentsConnectionWhere>;
 };
 
-export type ArchitecturePrincipleImplementedByAiAssetsUpdateFieldInput = {
-  connect?: InputMaybe<Array<ArchitecturePrincipleImplementedByAiAssetsConnectFieldInput>>;
-  create?: InputMaybe<Array<ArchitecturePrincipleImplementedByAiAssetsCreateFieldInput>>;
-  delete?: InputMaybe<Array<ArchitecturePrincipleImplementedByAiAssetsDeleteFieldInput>>;
-  disconnect?: InputMaybe<Array<ArchitecturePrincipleImplementedByAiAssetsDisconnectFieldInput>>;
-  update?: InputMaybe<ArchitecturePrincipleImplementedByAiAssetsUpdateConnectionInput>;
+export type ArchitecturePrincipleImplementedByAiComponentsUpdateFieldInput = {
+  connect?: InputMaybe<Array<ArchitecturePrincipleImplementedByAiComponentsConnectFieldInput>>;
+  create?: InputMaybe<Array<ArchitecturePrincipleImplementedByAiComponentsCreateFieldInput>>;
+  delete?: InputMaybe<Array<ArchitecturePrincipleImplementedByAiComponentsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<ArchitecturePrincipleImplementedByAiComponentsDisconnectFieldInput>>;
+  update?: InputMaybe<ArchitecturePrincipleImplementedByAiComponentsUpdateConnectionInput>;
 };
 
 export type ArchitecturePrincipleImplementedByApplicationsAggregateInput = {
@@ -8923,7 +8923,7 @@ export type ArchitecturePrincipleUpdateInput = {
   company?: InputMaybe<Array<ArchitecturePrincipleCompanyUpdateFieldInput>>;
   createdAt?: InputMaybe<DateTimeScalarMutations>;
   description?: InputMaybe<StringScalarMutations>;
-  implementedByAIAssets?: InputMaybe<Array<ArchitecturePrincipleImplementedByAiAssetsUpdateFieldInput>>;
+  implementedByAIComponents?: InputMaybe<Array<ArchitecturePrincipleImplementedByAiComponentsUpdateFieldInput>>;
   implementedByApplications?: InputMaybe<Array<ArchitecturePrincipleImplementedByApplicationsUpdateFieldInput>>;
   implications?: InputMaybe<StringScalarMutations>;
   isActive?: InputMaybe<BooleanScalarMutations>;
@@ -8946,8 +8946,8 @@ export type ArchitecturePrincipleWhere = {
   createdAt?: InputMaybe<DateTimeScalarFilters>;
   description?: InputMaybe<StringScalarFilters>;
   id?: InputMaybe<IdScalarFilters>;
-  implementedByAIAssets?: InputMaybe<AiAssetRelationshipFilters>;
-  implementedByAIAssetsConnection?: InputMaybe<ArchitecturePrincipleImplementedByAiAssetsConnectionFilters>;
+  implementedByAIComponents?: InputMaybe<AiComponentRelationshipFilters>;
+  implementedByAIComponentsConnection?: InputMaybe<ArchitecturePrincipleImplementedByAiComponentsConnectionFilters>;
   implementedByApplications?: InputMaybe<ApplicationRelationshipFilters>;
   implementedByApplicationsConnection?: InputMaybe<ArchitecturePrincipleImplementedByApplicationsConnectionFilters>;
   implications?: InputMaybe<StringScalarFilters>;
@@ -9015,7 +9015,7 @@ export type ArchitectureUpdateInput = {
   appliedPrinciples?: InputMaybe<Array<ArchitectureAppliedPrinciplesUpdateFieldInput>>;
   childArchitectures?: InputMaybe<Array<ArchitectureChildArchitecturesUpdateFieldInput>>;
   company?: InputMaybe<Array<ArchitectureCompanyUpdateFieldInput>>;
-  containsAIAssets?: InputMaybe<Array<ArchitectureContainsAiAssetsUpdateFieldInput>>;
+  containsAIComponents?: InputMaybe<Array<ArchitectureContainsAiComponentsUpdateFieldInput>>;
   containsApplications?: InputMaybe<Array<ArchitectureContainsApplicationsUpdateFieldInput>>;
   containsCapabilities?: InputMaybe<Array<ArchitectureContainsCapabilitiesUpdateFieldInput>>;
   containsDataObjects?: InputMaybe<Array<ArchitectureContainsDataObjectsUpdateFieldInput>>;
@@ -9043,8 +9043,8 @@ export type ArchitectureWhere = {
   childArchitecturesConnection?: InputMaybe<ArchitectureChildArchitecturesConnectionFilters>;
   company?: InputMaybe<CompanyRelationshipFilters>;
   companyConnection?: InputMaybe<ArchitectureCompanyConnectionFilters>;
-  containsAIAssets?: InputMaybe<AiAssetRelationshipFilters>;
-  containsAIAssetsConnection?: InputMaybe<ArchitectureContainsAiAssetsConnectionFilters>;
+  containsAIComponents?: InputMaybe<AiComponentRelationshipFilters>;
+  containsAIComponentsConnection?: InputMaybe<ArchitectureContainsAiComponentsConnectionFilters>;
   containsApplications?: InputMaybe<ApplicationRelationshipFilters>;
   containsApplicationsConnection?: InputMaybe<ArchitectureContainsApplicationsConnectionFilters>;
   containsCapabilities?: InputMaybe<BusinessCapabilityRelationshipFilters>;
@@ -9125,8 +9125,8 @@ export type BusinessCapability = {
   relatedDataObjectsConnection: BusinessCapabilityRelatedDataObjectsConnection;
   sequenceNumber?: Maybe<Scalars['Int']['output']>;
   status: CapabilityStatus;
-  supportedByAIAssets: Array<AiAsset>;
-  supportedByAIAssetsConnection: BusinessCapabilitySupportedByAiAssetsConnection;
+  supportedByAIComponents: Array<AiComponent>;
+  supportedByAIComponentsConnection: BusinessCapabilitySupportedByAiComponentsConnection;
   supportedByApplications: Array<Application>;
   supportedByApplicationsConnection: BusinessCapabilitySupportedByApplicationsConnection;
   tags?: Maybe<Array<Scalars['String']['output']>>;
@@ -9264,20 +9264,20 @@ export type BusinessCapabilityRelatedDataObjectsConnectionArgs = {
 
 
 /** Business Capability - repräsentiert eine Geschäftsfähigkeit im Enterprise Architecture Management */
-export type BusinessCapabilitySupportedByAiAssetsArgs = {
+export type BusinessCapabilitySupportedByAiComponentsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<AiAssetSort>>;
-  where?: InputMaybe<AiAssetWhere>;
+  sort?: InputMaybe<Array<AiComponentSort>>;
+  where?: InputMaybe<AiComponentWhere>;
 };
 
 
 /** Business Capability - repräsentiert eine Geschäftsfähigkeit im Enterprise Architecture Management */
-export type BusinessCapabilitySupportedByAiAssetsConnectionArgs = {
+export type BusinessCapabilitySupportedByAiComponentsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<BusinessCapabilitySupportedByAiAssetsConnectionSort>>;
-  where?: InputMaybe<BusinessCapabilitySupportedByAiAssetsConnectionWhere>;
+  sort?: InputMaybe<Array<BusinessCapabilitySupportedByAiComponentsConnectionSort>>;
+  where?: InputMaybe<BusinessCapabilitySupportedByAiComponentsConnectionWhere>;
 };
 
 
@@ -9316,14 +9316,14 @@ export type BusinessCapabilityUsedByOrganisationsConnectionArgs = {
   where?: InputMaybe<BusinessCapabilityUsedByOrganisationsConnectionWhere>;
 };
 
-export type BusinessCapabilityAiAssetSupportedByAiAssetsAggregateSelection = {
-  __typename?: 'BusinessCapabilityAIAssetSupportedByAIAssetsAggregateSelection';
+export type BusinessCapabilityAiComponentSupportedByAiComponentsAggregateSelection = {
+  __typename?: 'BusinessCapabilityAIComponentSupportedByAIComponentsAggregateSelection';
   count: CountConnection;
-  node?: Maybe<BusinessCapabilityAiAssetSupportedByAiAssetsNodeAggregateSelection>;
+  node?: Maybe<BusinessCapabilityAiComponentSupportedByAiComponentsNodeAggregateSelection>;
 };
 
-export type BusinessCapabilityAiAssetSupportedByAiAssetsNodeAggregateSelection = {
-  __typename?: 'BusinessCapabilityAIAssetSupportedByAIAssetsNodeAggregateSelection';
+export type BusinessCapabilityAiComponentSupportedByAiComponentsNodeAggregateSelection = {
+  __typename?: 'BusinessCapabilityAIComponentSupportedByAIComponentsNodeAggregateSelection';
   accuracy: FloatAggregateSelection;
   costs: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
@@ -9663,7 +9663,7 @@ export type BusinessCapabilityConnectInput = {
   parents?: InputMaybe<Array<BusinessCapabilityParentsConnectFieldInput>>;
   partOfArchitectures?: InputMaybe<Array<BusinessCapabilityPartOfArchitecturesConnectFieldInput>>;
   relatedDataObjects?: InputMaybe<Array<BusinessCapabilityRelatedDataObjectsConnectFieldInput>>;
-  supportedByAIAssets?: InputMaybe<Array<BusinessCapabilitySupportedByAiAssetsConnectFieldInput>>;
+  supportedByAIComponents?: InputMaybe<Array<BusinessCapabilitySupportedByAiComponentsConnectFieldInput>>;
   supportedByApplications?: InputMaybe<Array<BusinessCapabilitySupportedByApplicationsConnectFieldInput>>;
   usedByOrganisations?: InputMaybe<Array<BusinessCapabilityUsedByOrganisationsConnectFieldInput>>;
 };
@@ -9688,7 +9688,7 @@ export type BusinessCapabilityCreateInput = {
   relatedDataObjects?: InputMaybe<BusinessCapabilityRelatedDataObjectsFieldInput>;
   sequenceNumber?: InputMaybe<Scalars['Int']['input']>;
   status: CapabilityStatus;
-  supportedByAIAssets?: InputMaybe<BusinessCapabilitySupportedByAiAssetsFieldInput>;
+  supportedByAIComponents?: InputMaybe<BusinessCapabilitySupportedByAiComponentsFieldInput>;
   supportedByApplications?: InputMaybe<BusinessCapabilitySupportedByApplicationsFieldInput>;
   tags?: InputMaybe<Array<Scalars['String']['input']>>;
   type?: InputMaybe<CapabilityType>;
@@ -9719,7 +9719,7 @@ export type BusinessCapabilityDeleteInput = {
   parents?: InputMaybe<Array<BusinessCapabilityParentsDeleteFieldInput>>;
   partOfArchitectures?: InputMaybe<Array<BusinessCapabilityPartOfArchitecturesDeleteFieldInput>>;
   relatedDataObjects?: InputMaybe<Array<BusinessCapabilityRelatedDataObjectsDeleteFieldInput>>;
-  supportedByAIAssets?: InputMaybe<Array<BusinessCapabilitySupportedByAiAssetsDeleteFieldInput>>;
+  supportedByAIComponents?: InputMaybe<Array<BusinessCapabilitySupportedByAiComponentsDeleteFieldInput>>;
   supportedByApplications?: InputMaybe<Array<BusinessCapabilitySupportedByApplicationsDeleteFieldInput>>;
   usedByOrganisations?: InputMaybe<Array<BusinessCapabilityUsedByOrganisationsDeleteFieldInput>>;
 };
@@ -9856,7 +9856,7 @@ export type BusinessCapabilityDisconnectInput = {
   parents?: InputMaybe<Array<BusinessCapabilityParentsDisconnectFieldInput>>;
   partOfArchitectures?: InputMaybe<Array<BusinessCapabilityPartOfArchitecturesDisconnectFieldInput>>;
   relatedDataObjects?: InputMaybe<Array<BusinessCapabilityRelatedDataObjectsDisconnectFieldInput>>;
-  supportedByAIAssets?: InputMaybe<Array<BusinessCapabilitySupportedByAiAssetsDisconnectFieldInput>>;
+  supportedByAIComponents?: InputMaybe<Array<BusinessCapabilitySupportedByAiComponentsDisconnectFieldInput>>;
   supportedByApplications?: InputMaybe<Array<BusinessCapabilitySupportedByApplicationsDisconnectFieldInput>>;
   usedByOrganisations?: InputMaybe<Array<BusinessCapabilityUsedByOrganisationsDisconnectFieldInput>>;
 };
@@ -10362,87 +10362,87 @@ export type BusinessCapabilitySort = {
   updatedAt?: InputMaybe<SortDirection>;
 };
 
-export type BusinessCapabilitySupportedByAiAssetsAggregateInput = {
-  AND?: InputMaybe<Array<BusinessCapabilitySupportedByAiAssetsAggregateInput>>;
-  NOT?: InputMaybe<BusinessCapabilitySupportedByAiAssetsAggregateInput>;
-  OR?: InputMaybe<Array<BusinessCapabilitySupportedByAiAssetsAggregateInput>>;
+export type BusinessCapabilitySupportedByAiComponentsAggregateInput = {
+  AND?: InputMaybe<Array<BusinessCapabilitySupportedByAiComponentsAggregateInput>>;
+  NOT?: InputMaybe<BusinessCapabilitySupportedByAiComponentsAggregateInput>;
+  OR?: InputMaybe<Array<BusinessCapabilitySupportedByAiComponentsAggregateInput>>;
   count?: InputMaybe<IntScalarFilters>;
   count_EQ?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
   count_LTE?: InputMaybe<Scalars['Int']['input']>;
-  node?: InputMaybe<BusinessCapabilitySupportedByAiAssetsNodeAggregationWhereInput>;
+  node?: InputMaybe<BusinessCapabilitySupportedByAiComponentsNodeAggregationWhereInput>;
 };
 
-export type BusinessCapabilitySupportedByAiAssetsConnectFieldInput = {
-  connect?: InputMaybe<Array<AiAssetConnectInput>>;
-  where?: InputMaybe<AiAssetConnectWhere>;
+export type BusinessCapabilitySupportedByAiComponentsConnectFieldInput = {
+  connect?: InputMaybe<Array<AiComponentConnectInput>>;
+  where?: InputMaybe<AiComponentConnectWhere>;
 };
 
-export type BusinessCapabilitySupportedByAiAssetsConnection = {
-  __typename?: 'BusinessCapabilitySupportedByAIAssetsConnection';
-  aggregate: BusinessCapabilityAiAssetSupportedByAiAssetsAggregateSelection;
-  edges: Array<BusinessCapabilitySupportedByAiAssetsRelationship>;
+export type BusinessCapabilitySupportedByAiComponentsConnection = {
+  __typename?: 'BusinessCapabilitySupportedByAIComponentsConnection';
+  aggregate: BusinessCapabilityAiComponentSupportedByAiComponentsAggregateSelection;
+  edges: Array<BusinessCapabilitySupportedByAiComponentsRelationship>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
 
-export type BusinessCapabilitySupportedByAiAssetsConnectionAggregateInput = {
-  AND?: InputMaybe<Array<BusinessCapabilitySupportedByAiAssetsConnectionAggregateInput>>;
-  NOT?: InputMaybe<BusinessCapabilitySupportedByAiAssetsConnectionAggregateInput>;
-  OR?: InputMaybe<Array<BusinessCapabilitySupportedByAiAssetsConnectionAggregateInput>>;
+export type BusinessCapabilitySupportedByAiComponentsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<BusinessCapabilitySupportedByAiComponentsConnectionAggregateInput>>;
+  NOT?: InputMaybe<BusinessCapabilitySupportedByAiComponentsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<BusinessCapabilitySupportedByAiComponentsConnectionAggregateInput>>;
   count?: InputMaybe<ConnectionAggregationCountFilterInput>;
-  node?: InputMaybe<BusinessCapabilitySupportedByAiAssetsNodeAggregationWhereInput>;
+  node?: InputMaybe<BusinessCapabilitySupportedByAiComponentsNodeAggregationWhereInput>;
 };
 
-export type BusinessCapabilitySupportedByAiAssetsConnectionFilters = {
-  /** Filter BusinessCapabilities by aggregating results on related BusinessCapabilitySupportedByAIAssetsConnections */
-  aggregate?: InputMaybe<BusinessCapabilitySupportedByAiAssetsConnectionAggregateInput>;
-  /** Return BusinessCapabilities where all of the related BusinessCapabilitySupportedByAIAssetsConnections match this filter */
-  all?: InputMaybe<BusinessCapabilitySupportedByAiAssetsConnectionWhere>;
-  /** Return BusinessCapabilities where none of the related BusinessCapabilitySupportedByAIAssetsConnections match this filter */
-  none?: InputMaybe<BusinessCapabilitySupportedByAiAssetsConnectionWhere>;
-  /** Return BusinessCapabilities where one of the related BusinessCapabilitySupportedByAIAssetsConnections match this filter */
-  single?: InputMaybe<BusinessCapabilitySupportedByAiAssetsConnectionWhere>;
-  /** Return BusinessCapabilities where some of the related BusinessCapabilitySupportedByAIAssetsConnections match this filter */
-  some?: InputMaybe<BusinessCapabilitySupportedByAiAssetsConnectionWhere>;
+export type BusinessCapabilitySupportedByAiComponentsConnectionFilters = {
+  /** Filter BusinessCapabilities by aggregating results on related BusinessCapabilitySupportedByAIComponentsConnections */
+  aggregate?: InputMaybe<BusinessCapabilitySupportedByAiComponentsConnectionAggregateInput>;
+  /** Return BusinessCapabilities where all of the related BusinessCapabilitySupportedByAIComponentsConnections match this filter */
+  all?: InputMaybe<BusinessCapabilitySupportedByAiComponentsConnectionWhere>;
+  /** Return BusinessCapabilities where none of the related BusinessCapabilitySupportedByAIComponentsConnections match this filter */
+  none?: InputMaybe<BusinessCapabilitySupportedByAiComponentsConnectionWhere>;
+  /** Return BusinessCapabilities where one of the related BusinessCapabilitySupportedByAIComponentsConnections match this filter */
+  single?: InputMaybe<BusinessCapabilitySupportedByAiComponentsConnectionWhere>;
+  /** Return BusinessCapabilities where some of the related BusinessCapabilitySupportedByAIComponentsConnections match this filter */
+  some?: InputMaybe<BusinessCapabilitySupportedByAiComponentsConnectionWhere>;
 };
 
-export type BusinessCapabilitySupportedByAiAssetsConnectionSort = {
-  node?: InputMaybe<AiAssetSort>;
+export type BusinessCapabilitySupportedByAiComponentsConnectionSort = {
+  node?: InputMaybe<AiComponentSort>;
 };
 
-export type BusinessCapabilitySupportedByAiAssetsConnectionWhere = {
-  AND?: InputMaybe<Array<BusinessCapabilitySupportedByAiAssetsConnectionWhere>>;
-  NOT?: InputMaybe<BusinessCapabilitySupportedByAiAssetsConnectionWhere>;
-  OR?: InputMaybe<Array<BusinessCapabilitySupportedByAiAssetsConnectionWhere>>;
-  node?: InputMaybe<AiAssetWhere>;
+export type BusinessCapabilitySupportedByAiComponentsConnectionWhere = {
+  AND?: InputMaybe<Array<BusinessCapabilitySupportedByAiComponentsConnectionWhere>>;
+  NOT?: InputMaybe<BusinessCapabilitySupportedByAiComponentsConnectionWhere>;
+  OR?: InputMaybe<Array<BusinessCapabilitySupportedByAiComponentsConnectionWhere>>;
+  node?: InputMaybe<AiComponentWhere>;
 };
 
-export type BusinessCapabilitySupportedByAiAssetsCreateFieldInput = {
-  node: AiAssetCreateInput;
+export type BusinessCapabilitySupportedByAiComponentsCreateFieldInput = {
+  node: AiComponentCreateInput;
 };
 
-export type BusinessCapabilitySupportedByAiAssetsDeleteFieldInput = {
-  delete?: InputMaybe<AiAssetDeleteInput>;
-  where?: InputMaybe<BusinessCapabilitySupportedByAiAssetsConnectionWhere>;
+export type BusinessCapabilitySupportedByAiComponentsDeleteFieldInput = {
+  delete?: InputMaybe<AiComponentDeleteInput>;
+  where?: InputMaybe<BusinessCapabilitySupportedByAiComponentsConnectionWhere>;
 };
 
-export type BusinessCapabilitySupportedByAiAssetsDisconnectFieldInput = {
-  disconnect?: InputMaybe<AiAssetDisconnectInput>;
-  where?: InputMaybe<BusinessCapabilitySupportedByAiAssetsConnectionWhere>;
+export type BusinessCapabilitySupportedByAiComponentsDisconnectFieldInput = {
+  disconnect?: InputMaybe<AiComponentDisconnectInput>;
+  where?: InputMaybe<BusinessCapabilitySupportedByAiComponentsConnectionWhere>;
 };
 
-export type BusinessCapabilitySupportedByAiAssetsFieldInput = {
-  connect?: InputMaybe<Array<BusinessCapabilitySupportedByAiAssetsConnectFieldInput>>;
-  create?: InputMaybe<Array<BusinessCapabilitySupportedByAiAssetsCreateFieldInput>>;
+export type BusinessCapabilitySupportedByAiComponentsFieldInput = {
+  connect?: InputMaybe<Array<BusinessCapabilitySupportedByAiComponentsConnectFieldInput>>;
+  create?: InputMaybe<Array<BusinessCapabilitySupportedByAiComponentsCreateFieldInput>>;
 };
 
-export type BusinessCapabilitySupportedByAiAssetsNodeAggregationWhereInput = {
-  AND?: InputMaybe<Array<BusinessCapabilitySupportedByAiAssetsNodeAggregationWhereInput>>;
-  NOT?: InputMaybe<BusinessCapabilitySupportedByAiAssetsNodeAggregationWhereInput>;
-  OR?: InputMaybe<Array<BusinessCapabilitySupportedByAiAssetsNodeAggregationWhereInput>>;
+export type BusinessCapabilitySupportedByAiComponentsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<BusinessCapabilitySupportedByAiComponentsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<BusinessCapabilitySupportedByAiComponentsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<BusinessCapabilitySupportedByAiComponentsNodeAggregationWhereInput>>;
   accuracy?: InputMaybe<FloatScalarAggregationFilters>;
   costs?: InputMaybe<FloatScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
@@ -10455,23 +10455,23 @@ export type BusinessCapabilitySupportedByAiAssetsNodeAggregationWhereInput = {
   version?: InputMaybe<StringScalarAggregationFilters>;
 };
 
-export type BusinessCapabilitySupportedByAiAssetsRelationship = {
-  __typename?: 'BusinessCapabilitySupportedByAIAssetsRelationship';
+export type BusinessCapabilitySupportedByAiComponentsRelationship = {
+  __typename?: 'BusinessCapabilitySupportedByAIComponentsRelationship';
   cursor: Scalars['String']['output'];
-  node: AiAsset;
+  node: AiComponent;
 };
 
-export type BusinessCapabilitySupportedByAiAssetsUpdateConnectionInput = {
-  node?: InputMaybe<AiAssetUpdateInput>;
-  where?: InputMaybe<BusinessCapabilitySupportedByAiAssetsConnectionWhere>;
+export type BusinessCapabilitySupportedByAiComponentsUpdateConnectionInput = {
+  node?: InputMaybe<AiComponentUpdateInput>;
+  where?: InputMaybe<BusinessCapabilitySupportedByAiComponentsConnectionWhere>;
 };
 
-export type BusinessCapabilitySupportedByAiAssetsUpdateFieldInput = {
-  connect?: InputMaybe<Array<BusinessCapabilitySupportedByAiAssetsConnectFieldInput>>;
-  create?: InputMaybe<Array<BusinessCapabilitySupportedByAiAssetsCreateFieldInput>>;
-  delete?: InputMaybe<Array<BusinessCapabilitySupportedByAiAssetsDeleteFieldInput>>;
-  disconnect?: InputMaybe<Array<BusinessCapabilitySupportedByAiAssetsDisconnectFieldInput>>;
-  update?: InputMaybe<BusinessCapabilitySupportedByAiAssetsUpdateConnectionInput>;
+export type BusinessCapabilitySupportedByAiComponentsUpdateFieldInput = {
+  connect?: InputMaybe<Array<BusinessCapabilitySupportedByAiComponentsConnectFieldInput>>;
+  create?: InputMaybe<Array<BusinessCapabilitySupportedByAiComponentsCreateFieldInput>>;
+  delete?: InputMaybe<Array<BusinessCapabilitySupportedByAiComponentsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<BusinessCapabilitySupportedByAiComponentsDisconnectFieldInput>>;
+  update?: InputMaybe<BusinessCapabilitySupportedByAiComponentsUpdateConnectionInput>;
 };
 
 export type BusinessCapabilitySupportedByApplicationsAggregateInput = {
@@ -10601,7 +10601,7 @@ export type BusinessCapabilityUpdateInput = {
   relatedDataObjects?: InputMaybe<Array<BusinessCapabilityRelatedDataObjectsUpdateFieldInput>>;
   sequenceNumber?: InputMaybe<IntScalarMutations>;
   status?: InputMaybe<CapabilityStatusEnumScalarMutations>;
-  supportedByAIAssets?: InputMaybe<Array<BusinessCapabilitySupportedByAiAssetsUpdateFieldInput>>;
+  supportedByAIComponents?: InputMaybe<Array<BusinessCapabilitySupportedByAiComponentsUpdateFieldInput>>;
   supportedByApplications?: InputMaybe<Array<BusinessCapabilitySupportedByApplicationsUpdateFieldInput>>;
   tags?: InputMaybe<ListStringMutations>;
   type?: InputMaybe<CapabilityTypeEnumScalarMutations>;
@@ -10743,8 +10743,8 @@ export type BusinessCapabilityWhere = {
   relatedDataObjectsConnection?: InputMaybe<BusinessCapabilityRelatedDataObjectsConnectionFilters>;
   sequenceNumber?: InputMaybe<IntScalarFilters>;
   status?: InputMaybe<CapabilityStatusEnumScalarFilters>;
-  supportedByAIAssets?: InputMaybe<AiAssetRelationshipFilters>;
-  supportedByAIAssetsConnection?: InputMaybe<BusinessCapabilitySupportedByAiAssetsConnectionFilters>;
+  supportedByAIComponents?: InputMaybe<AiComponentRelationshipFilters>;
+  supportedByAIComponentsConnection?: InputMaybe<BusinessCapabilitySupportedByAiComponentsConnectionFilters>;
   supportedByApplications?: InputMaybe<ApplicationRelationshipFilters>;
   supportedByApplicationsConnection?: InputMaybe<BusinessCapabilitySupportedByApplicationsConnectionFilters>;
   tags?: InputMaybe<StringListFilters>;
@@ -10811,8 +10811,8 @@ export type Company = {
   name: Scalars['String']['output'];
   organisations: Array<Organisation>;
   organisationsConnection: CompanyOrganisationsConnection;
-  ownedAIAssets: Array<AiAsset>;
-  ownedAIAssetsConnection: CompanyOwnedAiAssetsConnection;
+  ownedAIComponents: Array<AiComponent>;
+  ownedAIComponentsConnection: CompanyOwnedAiComponentsConnection;
   ownedApplications: Array<Application>;
   ownedApplicationsConnection: CompanyOwnedApplicationsConnection;
   ownedArchitecturePrinciples: Array<ArchitecturePrinciple>;
@@ -10872,20 +10872,20 @@ export type CompanyOrganisationsConnectionArgs = {
 
 
 /** Company - repräsentiert ein Unternehmen im Enterprise Architecture Management */
-export type CompanyOwnedAiAssetsArgs = {
+export type CompanyOwnedAiComponentsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<AiAssetSort>>;
-  where?: InputMaybe<AiAssetWhere>;
+  sort?: InputMaybe<Array<AiComponentSort>>;
+  where?: InputMaybe<AiComponentWhere>;
 };
 
 
 /** Company - repräsentiert ein Unternehmen im Enterprise Architecture Management */
-export type CompanyOwnedAiAssetsConnectionArgs = {
+export type CompanyOwnedAiComponentsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<CompanyOwnedAiAssetsConnectionSort>>;
-  where?: InputMaybe<CompanyOwnedAiAssetsConnectionWhere>;
+  sort?: InputMaybe<Array<CompanyOwnedAiComponentsConnectionSort>>;
+  where?: InputMaybe<CompanyOwnedAiComponentsConnectionWhere>;
 };
 
 
@@ -11032,14 +11032,14 @@ export type CompanyOwnedInterfacesConnectionArgs = {
   where?: InputMaybe<CompanyOwnedInterfacesConnectionWhere>;
 };
 
-export type CompanyAiAssetOwnedAiAssetsAggregateSelection = {
-  __typename?: 'CompanyAIAssetOwnedAIAssetsAggregateSelection';
+export type CompanyAiComponentOwnedAiComponentsAggregateSelection = {
+  __typename?: 'CompanyAIComponentOwnedAIComponentsAggregateSelection';
   count: CountConnection;
-  node?: Maybe<CompanyAiAssetOwnedAiAssetsNodeAggregateSelection>;
+  node?: Maybe<CompanyAiComponentOwnedAiComponentsNodeAggregateSelection>;
 };
 
-export type CompanyAiAssetOwnedAiAssetsNodeAggregateSelection = {
-  __typename?: 'CompanyAIAssetOwnedAIAssetsNodeAggregateSelection';
+export type CompanyAiComponentOwnedAiComponentsNodeAggregateSelection = {
+  __typename?: 'CompanyAIComponentOwnedAIComponentsNodeAggregateSelection';
   accuracy: FloatAggregateSelection;
   costs: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
@@ -11153,7 +11153,7 @@ export type CompanyBusinessCapabilityOwnedCapabilitiesNodeAggregateSelection = {
 export type CompanyConnectInput = {
   employees?: InputMaybe<Array<CompanyEmployeesConnectFieldInput>>;
   organisations?: InputMaybe<Array<CompanyOrganisationsConnectFieldInput>>;
-  ownedAIAssets?: InputMaybe<Array<CompanyOwnedAiAssetsConnectFieldInput>>;
+  ownedAIComponents?: InputMaybe<Array<CompanyOwnedAiComponentsConnectFieldInput>>;
   ownedApplications?: InputMaybe<Array<CompanyOwnedApplicationsConnectFieldInput>>;
   ownedArchitecturePrinciples?: InputMaybe<Array<CompanyOwnedArchitecturePrinciplesConnectFieldInput>>;
   ownedArchitectures?: InputMaybe<Array<CompanyOwnedArchitecturesConnectFieldInput>>;
@@ -11175,7 +11175,7 @@ export type CompanyCreateInput = {
   industry?: InputMaybe<Scalars['String']['input']>;
   name: Scalars['String']['input'];
   organisations?: InputMaybe<CompanyOrganisationsFieldInput>;
-  ownedAIAssets?: InputMaybe<CompanyOwnedAiAssetsFieldInput>;
+  ownedAIComponents?: InputMaybe<CompanyOwnedAiComponentsFieldInput>;
   ownedApplications?: InputMaybe<CompanyOwnedApplicationsFieldInput>;
   ownedArchitecturePrinciples?: InputMaybe<CompanyOwnedArchitecturePrinciplesFieldInput>;
   ownedArchitectures?: InputMaybe<CompanyOwnedArchitecturesFieldInput>;
@@ -11207,7 +11207,7 @@ export type CompanyDataObjectOwnedDataObjectsNodeAggregateSelection = {
 export type CompanyDeleteInput = {
   employees?: InputMaybe<Array<CompanyEmployeesDeleteFieldInput>>;
   organisations?: InputMaybe<Array<CompanyOrganisationsDeleteFieldInput>>;
-  ownedAIAssets?: InputMaybe<Array<CompanyOwnedAiAssetsDeleteFieldInput>>;
+  ownedAIComponents?: InputMaybe<Array<CompanyOwnedAiComponentsDeleteFieldInput>>;
   ownedApplications?: InputMaybe<Array<CompanyOwnedApplicationsDeleteFieldInput>>;
   ownedArchitecturePrinciples?: InputMaybe<Array<CompanyOwnedArchitecturePrinciplesDeleteFieldInput>>;
   ownedArchitectures?: InputMaybe<Array<CompanyOwnedArchitecturesDeleteFieldInput>>;
@@ -11237,7 +11237,7 @@ export type CompanyDiagramOwnedDiagramsNodeAggregateSelection = {
 export type CompanyDisconnectInput = {
   employees?: InputMaybe<Array<CompanyEmployeesDisconnectFieldInput>>;
   organisations?: InputMaybe<Array<CompanyOrganisationsDisconnectFieldInput>>;
-  ownedAIAssets?: InputMaybe<Array<CompanyOwnedAiAssetsDisconnectFieldInput>>;
+  ownedAIComponents?: InputMaybe<Array<CompanyOwnedAiComponentsDisconnectFieldInput>>;
   ownedApplications?: InputMaybe<Array<CompanyOwnedApplicationsDisconnectFieldInput>>;
   ownedArchitecturePrinciples?: InputMaybe<Array<CompanyOwnedArchitecturePrinciplesDisconnectFieldInput>>;
   ownedArchitectures?: InputMaybe<Array<CompanyOwnedArchitecturesDisconnectFieldInput>>;
@@ -11510,87 +11510,87 @@ export type CompanyOrganisationsUpdateFieldInput = {
   update?: InputMaybe<CompanyOrganisationsUpdateConnectionInput>;
 };
 
-export type CompanyOwnedAiAssetsAggregateInput = {
-  AND?: InputMaybe<Array<CompanyOwnedAiAssetsAggregateInput>>;
-  NOT?: InputMaybe<CompanyOwnedAiAssetsAggregateInput>;
-  OR?: InputMaybe<Array<CompanyOwnedAiAssetsAggregateInput>>;
+export type CompanyOwnedAiComponentsAggregateInput = {
+  AND?: InputMaybe<Array<CompanyOwnedAiComponentsAggregateInput>>;
+  NOT?: InputMaybe<CompanyOwnedAiComponentsAggregateInput>;
+  OR?: InputMaybe<Array<CompanyOwnedAiComponentsAggregateInput>>;
   count?: InputMaybe<IntScalarFilters>;
   count_EQ?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
   count_LTE?: InputMaybe<Scalars['Int']['input']>;
-  node?: InputMaybe<CompanyOwnedAiAssetsNodeAggregationWhereInput>;
+  node?: InputMaybe<CompanyOwnedAiComponentsNodeAggregationWhereInput>;
 };
 
-export type CompanyOwnedAiAssetsConnectFieldInput = {
-  connect?: InputMaybe<Array<AiAssetConnectInput>>;
-  where?: InputMaybe<AiAssetConnectWhere>;
+export type CompanyOwnedAiComponentsConnectFieldInput = {
+  connect?: InputMaybe<Array<AiComponentConnectInput>>;
+  where?: InputMaybe<AiComponentConnectWhere>;
 };
 
-export type CompanyOwnedAiAssetsConnection = {
-  __typename?: 'CompanyOwnedAIAssetsConnection';
-  aggregate: CompanyAiAssetOwnedAiAssetsAggregateSelection;
-  edges: Array<CompanyOwnedAiAssetsRelationship>;
+export type CompanyOwnedAiComponentsConnection = {
+  __typename?: 'CompanyOwnedAIComponentsConnection';
+  aggregate: CompanyAiComponentOwnedAiComponentsAggregateSelection;
+  edges: Array<CompanyOwnedAiComponentsRelationship>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
 
-export type CompanyOwnedAiAssetsConnectionAggregateInput = {
-  AND?: InputMaybe<Array<CompanyOwnedAiAssetsConnectionAggregateInput>>;
-  NOT?: InputMaybe<CompanyOwnedAiAssetsConnectionAggregateInput>;
-  OR?: InputMaybe<Array<CompanyOwnedAiAssetsConnectionAggregateInput>>;
+export type CompanyOwnedAiComponentsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<CompanyOwnedAiComponentsConnectionAggregateInput>>;
+  NOT?: InputMaybe<CompanyOwnedAiComponentsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<CompanyOwnedAiComponentsConnectionAggregateInput>>;
   count?: InputMaybe<ConnectionAggregationCountFilterInput>;
-  node?: InputMaybe<CompanyOwnedAiAssetsNodeAggregationWhereInput>;
+  node?: InputMaybe<CompanyOwnedAiComponentsNodeAggregationWhereInput>;
 };
 
-export type CompanyOwnedAiAssetsConnectionFilters = {
-  /** Filter Companies by aggregating results on related CompanyOwnedAIAssetsConnections */
-  aggregate?: InputMaybe<CompanyOwnedAiAssetsConnectionAggregateInput>;
-  /** Return Companies where all of the related CompanyOwnedAIAssetsConnections match this filter */
-  all?: InputMaybe<CompanyOwnedAiAssetsConnectionWhere>;
-  /** Return Companies where none of the related CompanyOwnedAIAssetsConnections match this filter */
-  none?: InputMaybe<CompanyOwnedAiAssetsConnectionWhere>;
-  /** Return Companies where one of the related CompanyOwnedAIAssetsConnections match this filter */
-  single?: InputMaybe<CompanyOwnedAiAssetsConnectionWhere>;
-  /** Return Companies where some of the related CompanyOwnedAIAssetsConnections match this filter */
-  some?: InputMaybe<CompanyOwnedAiAssetsConnectionWhere>;
+export type CompanyOwnedAiComponentsConnectionFilters = {
+  /** Filter Companies by aggregating results on related CompanyOwnedAIComponentsConnections */
+  aggregate?: InputMaybe<CompanyOwnedAiComponentsConnectionAggregateInput>;
+  /** Return Companies where all of the related CompanyOwnedAIComponentsConnections match this filter */
+  all?: InputMaybe<CompanyOwnedAiComponentsConnectionWhere>;
+  /** Return Companies where none of the related CompanyOwnedAIComponentsConnections match this filter */
+  none?: InputMaybe<CompanyOwnedAiComponentsConnectionWhere>;
+  /** Return Companies where one of the related CompanyOwnedAIComponentsConnections match this filter */
+  single?: InputMaybe<CompanyOwnedAiComponentsConnectionWhere>;
+  /** Return Companies where some of the related CompanyOwnedAIComponentsConnections match this filter */
+  some?: InputMaybe<CompanyOwnedAiComponentsConnectionWhere>;
 };
 
-export type CompanyOwnedAiAssetsConnectionSort = {
-  node?: InputMaybe<AiAssetSort>;
+export type CompanyOwnedAiComponentsConnectionSort = {
+  node?: InputMaybe<AiComponentSort>;
 };
 
-export type CompanyOwnedAiAssetsConnectionWhere = {
-  AND?: InputMaybe<Array<CompanyOwnedAiAssetsConnectionWhere>>;
-  NOT?: InputMaybe<CompanyOwnedAiAssetsConnectionWhere>;
-  OR?: InputMaybe<Array<CompanyOwnedAiAssetsConnectionWhere>>;
-  node?: InputMaybe<AiAssetWhere>;
+export type CompanyOwnedAiComponentsConnectionWhere = {
+  AND?: InputMaybe<Array<CompanyOwnedAiComponentsConnectionWhere>>;
+  NOT?: InputMaybe<CompanyOwnedAiComponentsConnectionWhere>;
+  OR?: InputMaybe<Array<CompanyOwnedAiComponentsConnectionWhere>>;
+  node?: InputMaybe<AiComponentWhere>;
 };
 
-export type CompanyOwnedAiAssetsCreateFieldInput = {
-  node: AiAssetCreateInput;
+export type CompanyOwnedAiComponentsCreateFieldInput = {
+  node: AiComponentCreateInput;
 };
 
-export type CompanyOwnedAiAssetsDeleteFieldInput = {
-  delete?: InputMaybe<AiAssetDeleteInput>;
-  where?: InputMaybe<CompanyOwnedAiAssetsConnectionWhere>;
+export type CompanyOwnedAiComponentsDeleteFieldInput = {
+  delete?: InputMaybe<AiComponentDeleteInput>;
+  where?: InputMaybe<CompanyOwnedAiComponentsConnectionWhere>;
 };
 
-export type CompanyOwnedAiAssetsDisconnectFieldInput = {
-  disconnect?: InputMaybe<AiAssetDisconnectInput>;
-  where?: InputMaybe<CompanyOwnedAiAssetsConnectionWhere>;
+export type CompanyOwnedAiComponentsDisconnectFieldInput = {
+  disconnect?: InputMaybe<AiComponentDisconnectInput>;
+  where?: InputMaybe<CompanyOwnedAiComponentsConnectionWhere>;
 };
 
-export type CompanyOwnedAiAssetsFieldInput = {
-  connect?: InputMaybe<Array<CompanyOwnedAiAssetsConnectFieldInput>>;
-  create?: InputMaybe<Array<CompanyOwnedAiAssetsCreateFieldInput>>;
+export type CompanyOwnedAiComponentsFieldInput = {
+  connect?: InputMaybe<Array<CompanyOwnedAiComponentsConnectFieldInput>>;
+  create?: InputMaybe<Array<CompanyOwnedAiComponentsCreateFieldInput>>;
 };
 
-export type CompanyOwnedAiAssetsNodeAggregationWhereInput = {
-  AND?: InputMaybe<Array<CompanyOwnedAiAssetsNodeAggregationWhereInput>>;
-  NOT?: InputMaybe<CompanyOwnedAiAssetsNodeAggregationWhereInput>;
-  OR?: InputMaybe<Array<CompanyOwnedAiAssetsNodeAggregationWhereInput>>;
+export type CompanyOwnedAiComponentsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<CompanyOwnedAiComponentsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<CompanyOwnedAiComponentsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<CompanyOwnedAiComponentsNodeAggregationWhereInput>>;
   accuracy?: InputMaybe<FloatScalarAggregationFilters>;
   costs?: InputMaybe<FloatScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
@@ -11603,23 +11603,23 @@ export type CompanyOwnedAiAssetsNodeAggregationWhereInput = {
   version?: InputMaybe<StringScalarAggregationFilters>;
 };
 
-export type CompanyOwnedAiAssetsRelationship = {
-  __typename?: 'CompanyOwnedAIAssetsRelationship';
+export type CompanyOwnedAiComponentsRelationship = {
+  __typename?: 'CompanyOwnedAIComponentsRelationship';
   cursor: Scalars['String']['output'];
-  node: AiAsset;
+  node: AiComponent;
 };
 
-export type CompanyOwnedAiAssetsUpdateConnectionInput = {
-  node?: InputMaybe<AiAssetUpdateInput>;
-  where?: InputMaybe<CompanyOwnedAiAssetsConnectionWhere>;
+export type CompanyOwnedAiComponentsUpdateConnectionInput = {
+  node?: InputMaybe<AiComponentUpdateInput>;
+  where?: InputMaybe<CompanyOwnedAiComponentsConnectionWhere>;
 };
 
-export type CompanyOwnedAiAssetsUpdateFieldInput = {
-  connect?: InputMaybe<Array<CompanyOwnedAiAssetsConnectFieldInput>>;
-  create?: InputMaybe<Array<CompanyOwnedAiAssetsCreateFieldInput>>;
-  delete?: InputMaybe<Array<CompanyOwnedAiAssetsDeleteFieldInput>>;
-  disconnect?: InputMaybe<Array<CompanyOwnedAiAssetsDisconnectFieldInput>>;
-  update?: InputMaybe<CompanyOwnedAiAssetsUpdateConnectionInput>;
+export type CompanyOwnedAiComponentsUpdateFieldInput = {
+  connect?: InputMaybe<Array<CompanyOwnedAiComponentsConnectFieldInput>>;
+  create?: InputMaybe<Array<CompanyOwnedAiComponentsCreateFieldInput>>;
+  delete?: InputMaybe<Array<CompanyOwnedAiComponentsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<CompanyOwnedAiComponentsDisconnectFieldInput>>;
+  update?: InputMaybe<CompanyOwnedAiComponentsUpdateConnectionInput>;
 };
 
 export type CompanyOwnedApplicationsAggregateInput = {
@@ -12565,7 +12565,7 @@ export type CompanyUpdateInput = {
   industry?: InputMaybe<StringScalarMutations>;
   name?: InputMaybe<StringScalarMutations>;
   organisations?: InputMaybe<Array<CompanyOrganisationsUpdateFieldInput>>;
-  ownedAIAssets?: InputMaybe<Array<CompanyOwnedAiAssetsUpdateFieldInput>>;
+  ownedAIComponents?: InputMaybe<Array<CompanyOwnedAiComponentsUpdateFieldInput>>;
   ownedApplications?: InputMaybe<Array<CompanyOwnedApplicationsUpdateFieldInput>>;
   ownedArchitecturePrinciples?: InputMaybe<Array<CompanyOwnedArchitecturePrinciplesUpdateFieldInput>>;
   ownedArchitectures?: InputMaybe<Array<CompanyOwnedArchitecturesUpdateFieldInput>>;
@@ -12592,8 +12592,8 @@ export type CompanyWhere = {
   name?: InputMaybe<StringScalarFilters>;
   organisations?: InputMaybe<OrganisationRelationshipFilters>;
   organisationsConnection?: InputMaybe<CompanyOrganisationsConnectionFilters>;
-  ownedAIAssets?: InputMaybe<AiAssetRelationshipFilters>;
-  ownedAIAssetsConnection?: InputMaybe<CompanyOwnedAiAssetsConnectionFilters>;
+  ownedAIComponents?: InputMaybe<AiComponentRelationshipFilters>;
+  ownedAIComponentsConnection?: InputMaybe<CompanyOwnedAiComponentsConnectionFilters>;
   ownedApplications?: InputMaybe<ApplicationRelationshipFilters>;
   ownedApplicationsConnection?: InputMaybe<CompanyOwnedApplicationsConnectionFilters>;
   ownedArchitecturePrinciples?: InputMaybe<ArchitecturePrincipleRelationshipFilters>;
@@ -12631,9 +12631,9 @@ export type CountConnection = {
   nodes: Scalars['Int']['output'];
 };
 
-export type CreateAiAssetsMutationResponse = {
-  __typename?: 'CreateAiAssetsMutationResponse';
-  aiAssets: Array<AiAsset>;
+export type CreateAiComponentsMutationResponse = {
+  __typename?: 'CreateAiComponentsMutationResponse';
+  aiComponents: Array<AiComponent>;
   info: CreateInfo;
 };
 
@@ -12780,7 +12780,7 @@ export type DataObject = {
   usedByApplicationsConnection: DataObjectUsedByApplicationsConnection;
   usedByOrganisations: Array<Organisation>;
   usedByOrganisationsConnection: DataObjectUsedByOrganisationsConnection;
-  usedForTrainingAI: Array<AiAsset>;
+  usedForTrainingAI: Array<AiComponent>;
   usedForTrainingAIConnection: DataObjectUsedForTrainingAiConnection;
 };
 
@@ -12951,8 +12951,8 @@ export type DataObjectUsedByOrganisationsConnectionArgs = {
 export type DataObjectUsedForTrainingAiArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<AiAssetSort>>;
-  where?: InputMaybe<AiAssetWhere>;
+  sort?: InputMaybe<Array<AiComponentSort>>;
+  where?: InputMaybe<AiComponentWhere>;
 };
 
 
@@ -12964,14 +12964,14 @@ export type DataObjectUsedForTrainingAiConnectionArgs = {
   where?: InputMaybe<DataObjectUsedForTrainingAiConnectionWhere>;
 };
 
-export type DataObjectAiAssetUsedForTrainingAiAggregateSelection = {
-  __typename?: 'DataObjectAIAssetUsedForTrainingAIAggregateSelection';
+export type DataObjectAiComponentUsedForTrainingAiAggregateSelection = {
+  __typename?: 'DataObjectAIComponentUsedForTrainingAIAggregateSelection';
   count: CountConnection;
-  node?: Maybe<DataObjectAiAssetUsedForTrainingAiNodeAggregateSelection>;
+  node?: Maybe<DataObjectAiComponentUsedForTrainingAiNodeAggregateSelection>;
 };
 
-export type DataObjectAiAssetUsedForTrainingAiNodeAggregateSelection = {
-  __typename?: 'DataObjectAIAssetUsedForTrainingAINodeAggregateSelection';
+export type DataObjectAiComponentUsedForTrainingAiNodeAggregateSelection = {
+  __typename?: 'DataObjectAIComponentUsedForTrainingAINodeAggregateSelection';
   accuracy: FloatAggregateSelection;
   costs: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
@@ -14260,13 +14260,13 @@ export type DataObjectUsedForTrainingAiAggregateInput = {
 };
 
 export type DataObjectUsedForTrainingAiConnectFieldInput = {
-  connect?: InputMaybe<Array<AiAssetConnectInput>>;
-  where?: InputMaybe<AiAssetConnectWhere>;
+  connect?: InputMaybe<Array<AiComponentConnectInput>>;
+  where?: InputMaybe<AiComponentConnectWhere>;
 };
 
 export type DataObjectUsedForTrainingAiConnection = {
   __typename?: 'DataObjectUsedForTrainingAIConnection';
-  aggregate: DataObjectAiAssetUsedForTrainingAiAggregateSelection;
+  aggregate: DataObjectAiComponentUsedForTrainingAiAggregateSelection;
   edges: Array<DataObjectUsedForTrainingAiRelationship>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
@@ -14294,27 +14294,27 @@ export type DataObjectUsedForTrainingAiConnectionFilters = {
 };
 
 export type DataObjectUsedForTrainingAiConnectionSort = {
-  node?: InputMaybe<AiAssetSort>;
+  node?: InputMaybe<AiComponentSort>;
 };
 
 export type DataObjectUsedForTrainingAiConnectionWhere = {
   AND?: InputMaybe<Array<DataObjectUsedForTrainingAiConnectionWhere>>;
   NOT?: InputMaybe<DataObjectUsedForTrainingAiConnectionWhere>;
   OR?: InputMaybe<Array<DataObjectUsedForTrainingAiConnectionWhere>>;
-  node?: InputMaybe<AiAssetWhere>;
+  node?: InputMaybe<AiComponentWhere>;
 };
 
 export type DataObjectUsedForTrainingAiCreateFieldInput = {
-  node: AiAssetCreateInput;
+  node: AiComponentCreateInput;
 };
 
 export type DataObjectUsedForTrainingAiDeleteFieldInput = {
-  delete?: InputMaybe<AiAssetDeleteInput>;
+  delete?: InputMaybe<AiComponentDeleteInput>;
   where?: InputMaybe<DataObjectUsedForTrainingAiConnectionWhere>;
 };
 
 export type DataObjectUsedForTrainingAiDisconnectFieldInput = {
-  disconnect?: InputMaybe<AiAssetDisconnectInput>;
+  disconnect?: InputMaybe<AiComponentDisconnectInput>;
   where?: InputMaybe<DataObjectUsedForTrainingAiConnectionWhere>;
 };
 
@@ -14342,11 +14342,11 @@ export type DataObjectUsedForTrainingAiNodeAggregationWhereInput = {
 export type DataObjectUsedForTrainingAiRelationship = {
   __typename?: 'DataObjectUsedForTrainingAIRelationship';
   cursor: Scalars['String']['output'];
-  node: AiAsset;
+  node: AiComponent;
 };
 
 export type DataObjectUsedForTrainingAiUpdateConnectionInput = {
-  node?: InputMaybe<AiAssetUpdateInput>;
+  node?: InputMaybe<AiComponentUpdateInput>;
   where?: InputMaybe<DataObjectUsedForTrainingAiConnectionWhere>;
 };
 
@@ -14391,7 +14391,7 @@ export type DataObjectWhere = {
   usedByApplicationsConnection?: InputMaybe<DataObjectUsedByApplicationsConnectionFilters>;
   usedByOrganisations?: InputMaybe<OrganisationRelationshipFilters>;
   usedByOrganisationsConnection?: InputMaybe<DataObjectUsedByOrganisationsConnectionFilters>;
-  usedForTrainingAI?: InputMaybe<AiAssetRelationshipFilters>;
+  usedForTrainingAI?: InputMaybe<AiComponentRelationshipFilters>;
   usedForTrainingAIConnection?: InputMaybe<DataObjectUsedForTrainingAiConnectionFilters>;
 };
 
@@ -14459,8 +14459,8 @@ export type Diagram = {
   architectureConnection: DiagramArchitectureConnection;
   company: Array<Company>;
   companyConnection: DiagramCompanyConnection;
-  containsAIAssets: Array<AiAsset>;
-  containsAIAssetsConnection: DiagramContainsAiAssetsConnection;
+  containsAIComponents: Array<AiComponent>;
+  containsAIComponentsConnection: DiagramContainsAiComponentsConnection;
   containsApplications: Array<Application>;
   containsApplicationsConnection: DiagramContainsApplicationsConnection;
   containsCapabilities: Array<BusinessCapability>;
@@ -14521,20 +14521,20 @@ export type DiagramCompanyConnectionArgs = {
 
 
 /** Diagram - repräsentiert ein Excalidraw-Diagramm */
-export type DiagramContainsAiAssetsArgs = {
+export type DiagramContainsAiComponentsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<AiAssetSort>>;
-  where?: InputMaybe<AiAssetWhere>;
+  sort?: InputMaybe<Array<AiComponentSort>>;
+  where?: InputMaybe<AiComponentWhere>;
 };
 
 
 /** Diagram - repräsentiert ein Excalidraw-Diagramm */
-export type DiagramContainsAiAssetsConnectionArgs = {
+export type DiagramContainsAiComponentsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<DiagramContainsAiAssetsConnectionSort>>;
-  where?: InputMaybe<DiagramContainsAiAssetsConnectionWhere>;
+  sort?: InputMaybe<Array<DiagramContainsAiComponentsConnectionSort>>;
+  where?: InputMaybe<DiagramContainsAiComponentsConnectionWhere>;
 };
 
 
@@ -14645,14 +14645,14 @@ export type DiagramCreatorConnectionArgs = {
   where?: InputMaybe<DiagramCreatorConnectionWhere>;
 };
 
-export type DiagramAiAssetContainsAiAssetsAggregateSelection = {
-  __typename?: 'DiagramAIAssetContainsAIAssetsAggregateSelection';
+export type DiagramAiComponentContainsAiComponentsAggregateSelection = {
+  __typename?: 'DiagramAIComponentContainsAIComponentsAggregateSelection';
   count: CountConnection;
-  node?: Maybe<DiagramAiAssetContainsAiAssetsNodeAggregateSelection>;
+  node?: Maybe<DiagramAiComponentContainsAiComponentsNodeAggregateSelection>;
 };
 
-export type DiagramAiAssetContainsAiAssetsNodeAggregateSelection = {
-  __typename?: 'DiagramAIAssetContainsAIAssetsNodeAggregateSelection';
+export type DiagramAiComponentContainsAiComponentsNodeAggregateSelection = {
+  __typename?: 'DiagramAIComponentContainsAIComponentsNodeAggregateSelection';
   accuracy: FloatAggregateSelection;
   costs: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
@@ -14982,7 +14982,7 @@ export type DiagramCompanyUpdateFieldInput = {
 export type DiagramConnectInput = {
   architecture?: InputMaybe<Array<DiagramArchitectureConnectFieldInput>>;
   company?: InputMaybe<Array<DiagramCompanyConnectFieldInput>>;
-  containsAIAssets?: InputMaybe<Array<DiagramContainsAiAssetsConnectFieldInput>>;
+  containsAIComponents?: InputMaybe<Array<DiagramContainsAiComponentsConnectFieldInput>>;
   containsApplications?: InputMaybe<Array<DiagramContainsApplicationsConnectFieldInput>>;
   containsCapabilities?: InputMaybe<Array<DiagramContainsCapabilitiesConnectFieldInput>>;
   containsDataObjects?: InputMaybe<Array<DiagramContainsDataObjectsConnectFieldInput>>;
@@ -14995,87 +14995,87 @@ export type DiagramConnectWhere = {
   node: DiagramWhere;
 };
 
-export type DiagramContainsAiAssetsAggregateInput = {
-  AND?: InputMaybe<Array<DiagramContainsAiAssetsAggregateInput>>;
-  NOT?: InputMaybe<DiagramContainsAiAssetsAggregateInput>;
-  OR?: InputMaybe<Array<DiagramContainsAiAssetsAggregateInput>>;
+export type DiagramContainsAiComponentsAggregateInput = {
+  AND?: InputMaybe<Array<DiagramContainsAiComponentsAggregateInput>>;
+  NOT?: InputMaybe<DiagramContainsAiComponentsAggregateInput>;
+  OR?: InputMaybe<Array<DiagramContainsAiComponentsAggregateInput>>;
   count?: InputMaybe<IntScalarFilters>;
   count_EQ?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
   count_LTE?: InputMaybe<Scalars['Int']['input']>;
-  node?: InputMaybe<DiagramContainsAiAssetsNodeAggregationWhereInput>;
+  node?: InputMaybe<DiagramContainsAiComponentsNodeAggregationWhereInput>;
 };
 
-export type DiagramContainsAiAssetsConnectFieldInput = {
-  connect?: InputMaybe<Array<AiAssetConnectInput>>;
-  where?: InputMaybe<AiAssetConnectWhere>;
+export type DiagramContainsAiComponentsConnectFieldInput = {
+  connect?: InputMaybe<Array<AiComponentConnectInput>>;
+  where?: InputMaybe<AiComponentConnectWhere>;
 };
 
-export type DiagramContainsAiAssetsConnection = {
-  __typename?: 'DiagramContainsAIAssetsConnection';
-  aggregate: DiagramAiAssetContainsAiAssetsAggregateSelection;
-  edges: Array<DiagramContainsAiAssetsRelationship>;
+export type DiagramContainsAiComponentsConnection = {
+  __typename?: 'DiagramContainsAIComponentsConnection';
+  aggregate: DiagramAiComponentContainsAiComponentsAggregateSelection;
+  edges: Array<DiagramContainsAiComponentsRelationship>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
 
-export type DiagramContainsAiAssetsConnectionAggregateInput = {
-  AND?: InputMaybe<Array<DiagramContainsAiAssetsConnectionAggregateInput>>;
-  NOT?: InputMaybe<DiagramContainsAiAssetsConnectionAggregateInput>;
-  OR?: InputMaybe<Array<DiagramContainsAiAssetsConnectionAggregateInput>>;
+export type DiagramContainsAiComponentsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<DiagramContainsAiComponentsConnectionAggregateInput>>;
+  NOT?: InputMaybe<DiagramContainsAiComponentsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<DiagramContainsAiComponentsConnectionAggregateInput>>;
   count?: InputMaybe<ConnectionAggregationCountFilterInput>;
-  node?: InputMaybe<DiagramContainsAiAssetsNodeAggregationWhereInput>;
+  node?: InputMaybe<DiagramContainsAiComponentsNodeAggregationWhereInput>;
 };
 
-export type DiagramContainsAiAssetsConnectionFilters = {
-  /** Filter Diagrams by aggregating results on related DiagramContainsAIAssetsConnections */
-  aggregate?: InputMaybe<DiagramContainsAiAssetsConnectionAggregateInput>;
-  /** Return Diagrams where all of the related DiagramContainsAIAssetsConnections match this filter */
-  all?: InputMaybe<DiagramContainsAiAssetsConnectionWhere>;
-  /** Return Diagrams where none of the related DiagramContainsAIAssetsConnections match this filter */
-  none?: InputMaybe<DiagramContainsAiAssetsConnectionWhere>;
-  /** Return Diagrams where one of the related DiagramContainsAIAssetsConnections match this filter */
-  single?: InputMaybe<DiagramContainsAiAssetsConnectionWhere>;
-  /** Return Diagrams where some of the related DiagramContainsAIAssetsConnections match this filter */
-  some?: InputMaybe<DiagramContainsAiAssetsConnectionWhere>;
+export type DiagramContainsAiComponentsConnectionFilters = {
+  /** Filter Diagrams by aggregating results on related DiagramContainsAIComponentsConnections */
+  aggregate?: InputMaybe<DiagramContainsAiComponentsConnectionAggregateInput>;
+  /** Return Diagrams where all of the related DiagramContainsAIComponentsConnections match this filter */
+  all?: InputMaybe<DiagramContainsAiComponentsConnectionWhere>;
+  /** Return Diagrams where none of the related DiagramContainsAIComponentsConnections match this filter */
+  none?: InputMaybe<DiagramContainsAiComponentsConnectionWhere>;
+  /** Return Diagrams where one of the related DiagramContainsAIComponentsConnections match this filter */
+  single?: InputMaybe<DiagramContainsAiComponentsConnectionWhere>;
+  /** Return Diagrams where some of the related DiagramContainsAIComponentsConnections match this filter */
+  some?: InputMaybe<DiagramContainsAiComponentsConnectionWhere>;
 };
 
-export type DiagramContainsAiAssetsConnectionSort = {
-  node?: InputMaybe<AiAssetSort>;
+export type DiagramContainsAiComponentsConnectionSort = {
+  node?: InputMaybe<AiComponentSort>;
 };
 
-export type DiagramContainsAiAssetsConnectionWhere = {
-  AND?: InputMaybe<Array<DiagramContainsAiAssetsConnectionWhere>>;
-  NOT?: InputMaybe<DiagramContainsAiAssetsConnectionWhere>;
-  OR?: InputMaybe<Array<DiagramContainsAiAssetsConnectionWhere>>;
-  node?: InputMaybe<AiAssetWhere>;
+export type DiagramContainsAiComponentsConnectionWhere = {
+  AND?: InputMaybe<Array<DiagramContainsAiComponentsConnectionWhere>>;
+  NOT?: InputMaybe<DiagramContainsAiComponentsConnectionWhere>;
+  OR?: InputMaybe<Array<DiagramContainsAiComponentsConnectionWhere>>;
+  node?: InputMaybe<AiComponentWhere>;
 };
 
-export type DiagramContainsAiAssetsCreateFieldInput = {
-  node: AiAssetCreateInput;
+export type DiagramContainsAiComponentsCreateFieldInput = {
+  node: AiComponentCreateInput;
 };
 
-export type DiagramContainsAiAssetsDeleteFieldInput = {
-  delete?: InputMaybe<AiAssetDeleteInput>;
-  where?: InputMaybe<DiagramContainsAiAssetsConnectionWhere>;
+export type DiagramContainsAiComponentsDeleteFieldInput = {
+  delete?: InputMaybe<AiComponentDeleteInput>;
+  where?: InputMaybe<DiagramContainsAiComponentsConnectionWhere>;
 };
 
-export type DiagramContainsAiAssetsDisconnectFieldInput = {
-  disconnect?: InputMaybe<AiAssetDisconnectInput>;
-  where?: InputMaybe<DiagramContainsAiAssetsConnectionWhere>;
+export type DiagramContainsAiComponentsDisconnectFieldInput = {
+  disconnect?: InputMaybe<AiComponentDisconnectInput>;
+  where?: InputMaybe<DiagramContainsAiComponentsConnectionWhere>;
 };
 
-export type DiagramContainsAiAssetsFieldInput = {
-  connect?: InputMaybe<Array<DiagramContainsAiAssetsConnectFieldInput>>;
-  create?: InputMaybe<Array<DiagramContainsAiAssetsCreateFieldInput>>;
+export type DiagramContainsAiComponentsFieldInput = {
+  connect?: InputMaybe<Array<DiagramContainsAiComponentsConnectFieldInput>>;
+  create?: InputMaybe<Array<DiagramContainsAiComponentsCreateFieldInput>>;
 };
 
-export type DiagramContainsAiAssetsNodeAggregationWhereInput = {
-  AND?: InputMaybe<Array<DiagramContainsAiAssetsNodeAggregationWhereInput>>;
-  NOT?: InputMaybe<DiagramContainsAiAssetsNodeAggregationWhereInput>;
-  OR?: InputMaybe<Array<DiagramContainsAiAssetsNodeAggregationWhereInput>>;
+export type DiagramContainsAiComponentsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<DiagramContainsAiComponentsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<DiagramContainsAiComponentsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<DiagramContainsAiComponentsNodeAggregationWhereInput>>;
   accuracy?: InputMaybe<FloatScalarAggregationFilters>;
   costs?: InputMaybe<FloatScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
@@ -15088,23 +15088,23 @@ export type DiagramContainsAiAssetsNodeAggregationWhereInput = {
   version?: InputMaybe<StringScalarAggregationFilters>;
 };
 
-export type DiagramContainsAiAssetsRelationship = {
-  __typename?: 'DiagramContainsAIAssetsRelationship';
+export type DiagramContainsAiComponentsRelationship = {
+  __typename?: 'DiagramContainsAIComponentsRelationship';
   cursor: Scalars['String']['output'];
-  node: AiAsset;
+  node: AiComponent;
 };
 
-export type DiagramContainsAiAssetsUpdateConnectionInput = {
-  node?: InputMaybe<AiAssetUpdateInput>;
-  where?: InputMaybe<DiagramContainsAiAssetsConnectionWhere>;
+export type DiagramContainsAiComponentsUpdateConnectionInput = {
+  node?: InputMaybe<AiComponentUpdateInput>;
+  where?: InputMaybe<DiagramContainsAiComponentsConnectionWhere>;
 };
 
-export type DiagramContainsAiAssetsUpdateFieldInput = {
-  connect?: InputMaybe<Array<DiagramContainsAiAssetsConnectFieldInput>>;
-  create?: InputMaybe<Array<DiagramContainsAiAssetsCreateFieldInput>>;
-  delete?: InputMaybe<Array<DiagramContainsAiAssetsDeleteFieldInput>>;
-  disconnect?: InputMaybe<Array<DiagramContainsAiAssetsDisconnectFieldInput>>;
-  update?: InputMaybe<DiagramContainsAiAssetsUpdateConnectionInput>;
+export type DiagramContainsAiComponentsUpdateFieldInput = {
+  connect?: InputMaybe<Array<DiagramContainsAiComponentsConnectFieldInput>>;
+  create?: InputMaybe<Array<DiagramContainsAiComponentsCreateFieldInput>>;
+  delete?: InputMaybe<Array<DiagramContainsAiComponentsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<DiagramContainsAiComponentsDisconnectFieldInput>>;
+  update?: InputMaybe<DiagramContainsAiComponentsUpdateConnectionInput>;
 };
 
 export type DiagramContainsApplicationsAggregateInput = {
@@ -15658,7 +15658,7 @@ export type DiagramContainsInterfacesUpdateFieldInput = {
 export type DiagramCreateInput = {
   architecture?: InputMaybe<DiagramArchitectureFieldInput>;
   company?: InputMaybe<DiagramCompanyFieldInput>;
-  containsAIAssets?: InputMaybe<DiagramContainsAiAssetsFieldInput>;
+  containsAIComponents?: InputMaybe<DiagramContainsAiComponentsFieldInput>;
   containsApplications?: InputMaybe<DiagramContainsApplicationsFieldInput>;
   containsCapabilities?: InputMaybe<DiagramContainsCapabilitiesFieldInput>;
   containsDataObjects?: InputMaybe<DiagramContainsDataObjectsFieldInput>;
@@ -15802,7 +15802,7 @@ export type DiagramDataObjectContainsDataObjectsNodeAggregateSelection = {
 export type DiagramDeleteInput = {
   architecture?: InputMaybe<Array<DiagramArchitectureDeleteFieldInput>>;
   company?: InputMaybe<Array<DiagramCompanyDeleteFieldInput>>;
-  containsAIAssets?: InputMaybe<Array<DiagramContainsAiAssetsDeleteFieldInput>>;
+  containsAIComponents?: InputMaybe<Array<DiagramContainsAiComponentsDeleteFieldInput>>;
   containsApplications?: InputMaybe<Array<DiagramContainsApplicationsDeleteFieldInput>>;
   containsCapabilities?: InputMaybe<Array<DiagramContainsCapabilitiesDeleteFieldInput>>;
   containsDataObjects?: InputMaybe<Array<DiagramContainsDataObjectsDeleteFieldInput>>;
@@ -15814,7 +15814,7 @@ export type DiagramDeleteInput = {
 export type DiagramDisconnectInput = {
   architecture?: InputMaybe<Array<DiagramArchitectureDisconnectFieldInput>>;
   company?: InputMaybe<Array<DiagramCompanyDisconnectFieldInput>>;
-  containsAIAssets?: InputMaybe<Array<DiagramContainsAiAssetsDisconnectFieldInput>>;
+  containsAIComponents?: InputMaybe<Array<DiagramContainsAiComponentsDisconnectFieldInput>>;
   containsApplications?: InputMaybe<Array<DiagramContainsApplicationsDisconnectFieldInput>>;
   containsCapabilities?: InputMaybe<Array<DiagramContainsCapabilitiesDisconnectFieldInput>>;
   containsDataObjects?: InputMaybe<Array<DiagramContainsDataObjectsDisconnectFieldInput>>;
@@ -15922,7 +15922,7 @@ export type DiagramTypeEnumScalarMutations = {
 export type DiagramUpdateInput = {
   architecture?: InputMaybe<Array<DiagramArchitectureUpdateFieldInput>>;
   company?: InputMaybe<Array<DiagramCompanyUpdateFieldInput>>;
-  containsAIAssets?: InputMaybe<Array<DiagramContainsAiAssetsUpdateFieldInput>>;
+  containsAIComponents?: InputMaybe<Array<DiagramContainsAiComponentsUpdateFieldInput>>;
   containsApplications?: InputMaybe<Array<DiagramContainsApplicationsUpdateFieldInput>>;
   containsCapabilities?: InputMaybe<Array<DiagramContainsCapabilitiesUpdateFieldInput>>;
   containsDataObjects?: InputMaybe<Array<DiagramContainsDataObjectsUpdateFieldInput>>;
@@ -15945,8 +15945,8 @@ export type DiagramWhere = {
   architectureConnection?: InputMaybe<DiagramArchitectureConnectionFilters>;
   company?: InputMaybe<CompanyRelationshipFilters>;
   companyConnection?: InputMaybe<DiagramCompanyConnectionFilters>;
-  containsAIAssets?: InputMaybe<AiAssetRelationshipFilters>;
-  containsAIAssetsConnection?: InputMaybe<DiagramContainsAiAssetsConnectionFilters>;
+  containsAIComponents?: InputMaybe<AiComponentRelationshipFilters>;
+  containsAIComponentsConnection?: InputMaybe<DiagramContainsAiComponentsConnectionFilters>;
   containsApplications?: InputMaybe<ApplicationRelationshipFilters>;
   containsApplicationsConnection?: InputMaybe<DiagramContainsApplicationsConnectionFilters>;
   containsCapabilities?: InputMaybe<BusinessCapabilityRelationshipFilters>;
@@ -16036,8 +16036,8 @@ export type Infrastructure = {
   description?: Maybe<Scalars['String']['output']>;
   endOfLifeDate?: Maybe<Scalars['Date']['output']>;
   endOfUseDate?: Maybe<Scalars['Date']['output']>;
-  hostsAIAssets: Array<AiAsset>;
-  hostsAIAssetsConnection: InfrastructureHostsAiAssetsConnection;
+  hostsAIComponents: Array<AiComponent>;
+  hostsAIComponentsConnection: InfrastructureHostsAiComponentsConnection;
   hostsApplications: Array<Application>;
   hostsApplicationsConnection: InfrastructureHostsApplicationsConnection;
   id: Scalars['ID']['output'];
@@ -16120,20 +16120,20 @@ export type InfrastructureDepictedInDiagramsConnectionArgs = {
 
 
 /** Infrastructure - repräsentiert eine Infrastruktur-Komponente im Enterprise Architecture Management */
-export type InfrastructureHostsAiAssetsArgs = {
+export type InfrastructureHostsAiComponentsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<AiAssetSort>>;
-  where?: InputMaybe<AiAssetWhere>;
+  sort?: InputMaybe<Array<AiComponentSort>>;
+  where?: InputMaybe<AiComponentWhere>;
 };
 
 
 /** Infrastructure - repräsentiert eine Infrastruktur-Komponente im Enterprise Architecture Management */
-export type InfrastructureHostsAiAssetsConnectionArgs = {
+export type InfrastructureHostsAiComponentsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<InfrastructureHostsAiAssetsConnectionSort>>;
-  where?: InputMaybe<InfrastructureHostsAiAssetsConnectionWhere>;
+  sort?: InputMaybe<Array<InfrastructureHostsAiComponentsConnectionSort>>;
+  where?: InputMaybe<InfrastructureHostsAiComponentsConnectionWhere>;
 };
 
 
@@ -16226,14 +16226,14 @@ export type InfrastructureUsedByOrganisationsConnectionArgs = {
   where?: InputMaybe<InfrastructureUsedByOrganisationsConnectionWhere>;
 };
 
-export type InfrastructureAiAssetHostsAiAssetsAggregateSelection = {
-  __typename?: 'InfrastructureAIAssetHostsAIAssetsAggregateSelection';
+export type InfrastructureAiComponentHostsAiComponentsAggregateSelection = {
+  __typename?: 'InfrastructureAIComponentHostsAIComponentsAggregateSelection';
   count: CountConnection;
-  node?: Maybe<InfrastructureAiAssetHostsAiAssetsNodeAggregateSelection>;
+  node?: Maybe<InfrastructureAiComponentHostsAiComponentsNodeAggregateSelection>;
 };
 
-export type InfrastructureAiAssetHostsAiAssetsNodeAggregateSelection = {
-  __typename?: 'InfrastructureAIAssetHostsAIAssetsNodeAggregateSelection';
+export type InfrastructureAiComponentHostsAiComponentsNodeAggregateSelection = {
+  __typename?: 'InfrastructureAIComponentHostsAIComponentsNodeAggregateSelection';
   accuracy: FloatAggregateSelection;
   costs: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
@@ -16547,7 +16547,7 @@ export type InfrastructureConnectInput = {
   childInfrastructures?: InputMaybe<Array<InfrastructureChildInfrastructuresConnectFieldInput>>;
   company?: InputMaybe<Array<InfrastructureCompanyConnectFieldInput>>;
   depictedInDiagrams?: InputMaybe<Array<InfrastructureDepictedInDiagramsConnectFieldInput>>;
-  hostsAIAssets?: InputMaybe<Array<InfrastructureHostsAiAssetsConnectFieldInput>>;
+  hostsAIComponents?: InputMaybe<Array<InfrastructureHostsAiComponentsConnectFieldInput>>;
   hostsApplications?: InputMaybe<Array<InfrastructureHostsApplicationsConnectFieldInput>>;
   owners?: InputMaybe<Array<InfrastructureOwnersConnectFieldInput>>;
   parentInfrastructure?: InputMaybe<Array<InfrastructureParentInfrastructureConnectFieldInput>>;
@@ -16568,7 +16568,7 @@ export type InfrastructureCreateInput = {
   description?: InputMaybe<Scalars['String']['input']>;
   endOfLifeDate?: InputMaybe<Scalars['Date']['input']>;
   endOfUseDate?: InputMaybe<Scalars['Date']['input']>;
-  hostsAIAssets?: InputMaybe<InfrastructureHostsAiAssetsFieldInput>;
+  hostsAIComponents?: InputMaybe<InfrastructureHostsAiComponentsFieldInput>;
   hostsApplications?: InputMaybe<InfrastructureHostsApplicationsFieldInput>;
   infrastructureType: InfrastructureType;
   introductionDate?: InputMaybe<Scalars['Date']['input']>;
@@ -16593,7 +16593,7 @@ export type InfrastructureDeleteInput = {
   childInfrastructures?: InputMaybe<Array<InfrastructureChildInfrastructuresDeleteFieldInput>>;
   company?: InputMaybe<Array<InfrastructureCompanyDeleteFieldInput>>;
   depictedInDiagrams?: InputMaybe<Array<InfrastructureDepictedInDiagramsDeleteFieldInput>>;
-  hostsAIAssets?: InputMaybe<Array<InfrastructureHostsAiAssetsDeleteFieldInput>>;
+  hostsAIComponents?: InputMaybe<Array<InfrastructureHostsAiComponentsDeleteFieldInput>>;
   hostsApplications?: InputMaybe<Array<InfrastructureHostsApplicationsDeleteFieldInput>>;
   owners?: InputMaybe<Array<InfrastructureOwnersDeleteFieldInput>>;
   parentInfrastructure?: InputMaybe<Array<InfrastructureParentInfrastructureDeleteFieldInput>>;
@@ -16729,7 +16729,7 @@ export type InfrastructureDisconnectInput = {
   childInfrastructures?: InputMaybe<Array<InfrastructureChildInfrastructuresDisconnectFieldInput>>;
   company?: InputMaybe<Array<InfrastructureCompanyDisconnectFieldInput>>;
   depictedInDiagrams?: InputMaybe<Array<InfrastructureDepictedInDiagramsDisconnectFieldInput>>;
-  hostsAIAssets?: InputMaybe<Array<InfrastructureHostsAiAssetsDisconnectFieldInput>>;
+  hostsAIComponents?: InputMaybe<Array<InfrastructureHostsAiComponentsDisconnectFieldInput>>;
   hostsApplications?: InputMaybe<Array<InfrastructureHostsApplicationsDisconnectFieldInput>>;
   owners?: InputMaybe<Array<InfrastructureOwnersDisconnectFieldInput>>;
   parentInfrastructure?: InputMaybe<Array<InfrastructureParentInfrastructureDisconnectFieldInput>>;
@@ -16743,87 +16743,87 @@ export type InfrastructureEdge = {
   node: Infrastructure;
 };
 
-export type InfrastructureHostsAiAssetsAggregateInput = {
-  AND?: InputMaybe<Array<InfrastructureHostsAiAssetsAggregateInput>>;
-  NOT?: InputMaybe<InfrastructureHostsAiAssetsAggregateInput>;
-  OR?: InputMaybe<Array<InfrastructureHostsAiAssetsAggregateInput>>;
+export type InfrastructureHostsAiComponentsAggregateInput = {
+  AND?: InputMaybe<Array<InfrastructureHostsAiComponentsAggregateInput>>;
+  NOT?: InputMaybe<InfrastructureHostsAiComponentsAggregateInput>;
+  OR?: InputMaybe<Array<InfrastructureHostsAiComponentsAggregateInput>>;
   count?: InputMaybe<IntScalarFilters>;
   count_EQ?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
   count_LTE?: InputMaybe<Scalars['Int']['input']>;
-  node?: InputMaybe<InfrastructureHostsAiAssetsNodeAggregationWhereInput>;
+  node?: InputMaybe<InfrastructureHostsAiComponentsNodeAggregationWhereInput>;
 };
 
-export type InfrastructureHostsAiAssetsConnectFieldInput = {
-  connect?: InputMaybe<Array<AiAssetConnectInput>>;
-  where?: InputMaybe<AiAssetConnectWhere>;
+export type InfrastructureHostsAiComponentsConnectFieldInput = {
+  connect?: InputMaybe<Array<AiComponentConnectInput>>;
+  where?: InputMaybe<AiComponentConnectWhere>;
 };
 
-export type InfrastructureHostsAiAssetsConnection = {
-  __typename?: 'InfrastructureHostsAIAssetsConnection';
-  aggregate: InfrastructureAiAssetHostsAiAssetsAggregateSelection;
-  edges: Array<InfrastructureHostsAiAssetsRelationship>;
+export type InfrastructureHostsAiComponentsConnection = {
+  __typename?: 'InfrastructureHostsAIComponentsConnection';
+  aggregate: InfrastructureAiComponentHostsAiComponentsAggregateSelection;
+  edges: Array<InfrastructureHostsAiComponentsRelationship>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
 
-export type InfrastructureHostsAiAssetsConnectionAggregateInput = {
-  AND?: InputMaybe<Array<InfrastructureHostsAiAssetsConnectionAggregateInput>>;
-  NOT?: InputMaybe<InfrastructureHostsAiAssetsConnectionAggregateInput>;
-  OR?: InputMaybe<Array<InfrastructureHostsAiAssetsConnectionAggregateInput>>;
+export type InfrastructureHostsAiComponentsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<InfrastructureHostsAiComponentsConnectionAggregateInput>>;
+  NOT?: InputMaybe<InfrastructureHostsAiComponentsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<InfrastructureHostsAiComponentsConnectionAggregateInput>>;
   count?: InputMaybe<ConnectionAggregationCountFilterInput>;
-  node?: InputMaybe<InfrastructureHostsAiAssetsNodeAggregationWhereInput>;
+  node?: InputMaybe<InfrastructureHostsAiComponentsNodeAggregationWhereInput>;
 };
 
-export type InfrastructureHostsAiAssetsConnectionFilters = {
-  /** Filter Infrastructures by aggregating results on related InfrastructureHostsAIAssetsConnections */
-  aggregate?: InputMaybe<InfrastructureHostsAiAssetsConnectionAggregateInput>;
-  /** Return Infrastructures where all of the related InfrastructureHostsAIAssetsConnections match this filter */
-  all?: InputMaybe<InfrastructureHostsAiAssetsConnectionWhere>;
-  /** Return Infrastructures where none of the related InfrastructureHostsAIAssetsConnections match this filter */
-  none?: InputMaybe<InfrastructureHostsAiAssetsConnectionWhere>;
-  /** Return Infrastructures where one of the related InfrastructureHostsAIAssetsConnections match this filter */
-  single?: InputMaybe<InfrastructureHostsAiAssetsConnectionWhere>;
-  /** Return Infrastructures where some of the related InfrastructureHostsAIAssetsConnections match this filter */
-  some?: InputMaybe<InfrastructureHostsAiAssetsConnectionWhere>;
+export type InfrastructureHostsAiComponentsConnectionFilters = {
+  /** Filter Infrastructures by aggregating results on related InfrastructureHostsAIComponentsConnections */
+  aggregate?: InputMaybe<InfrastructureHostsAiComponentsConnectionAggregateInput>;
+  /** Return Infrastructures where all of the related InfrastructureHostsAIComponentsConnections match this filter */
+  all?: InputMaybe<InfrastructureHostsAiComponentsConnectionWhere>;
+  /** Return Infrastructures where none of the related InfrastructureHostsAIComponentsConnections match this filter */
+  none?: InputMaybe<InfrastructureHostsAiComponentsConnectionWhere>;
+  /** Return Infrastructures where one of the related InfrastructureHostsAIComponentsConnections match this filter */
+  single?: InputMaybe<InfrastructureHostsAiComponentsConnectionWhere>;
+  /** Return Infrastructures where some of the related InfrastructureHostsAIComponentsConnections match this filter */
+  some?: InputMaybe<InfrastructureHostsAiComponentsConnectionWhere>;
 };
 
-export type InfrastructureHostsAiAssetsConnectionSort = {
-  node?: InputMaybe<AiAssetSort>;
+export type InfrastructureHostsAiComponentsConnectionSort = {
+  node?: InputMaybe<AiComponentSort>;
 };
 
-export type InfrastructureHostsAiAssetsConnectionWhere = {
-  AND?: InputMaybe<Array<InfrastructureHostsAiAssetsConnectionWhere>>;
-  NOT?: InputMaybe<InfrastructureHostsAiAssetsConnectionWhere>;
-  OR?: InputMaybe<Array<InfrastructureHostsAiAssetsConnectionWhere>>;
-  node?: InputMaybe<AiAssetWhere>;
+export type InfrastructureHostsAiComponentsConnectionWhere = {
+  AND?: InputMaybe<Array<InfrastructureHostsAiComponentsConnectionWhere>>;
+  NOT?: InputMaybe<InfrastructureHostsAiComponentsConnectionWhere>;
+  OR?: InputMaybe<Array<InfrastructureHostsAiComponentsConnectionWhere>>;
+  node?: InputMaybe<AiComponentWhere>;
 };
 
-export type InfrastructureHostsAiAssetsCreateFieldInput = {
-  node: AiAssetCreateInput;
+export type InfrastructureHostsAiComponentsCreateFieldInput = {
+  node: AiComponentCreateInput;
 };
 
-export type InfrastructureHostsAiAssetsDeleteFieldInput = {
-  delete?: InputMaybe<AiAssetDeleteInput>;
-  where?: InputMaybe<InfrastructureHostsAiAssetsConnectionWhere>;
+export type InfrastructureHostsAiComponentsDeleteFieldInput = {
+  delete?: InputMaybe<AiComponentDeleteInput>;
+  where?: InputMaybe<InfrastructureHostsAiComponentsConnectionWhere>;
 };
 
-export type InfrastructureHostsAiAssetsDisconnectFieldInput = {
-  disconnect?: InputMaybe<AiAssetDisconnectInput>;
-  where?: InputMaybe<InfrastructureHostsAiAssetsConnectionWhere>;
+export type InfrastructureHostsAiComponentsDisconnectFieldInput = {
+  disconnect?: InputMaybe<AiComponentDisconnectInput>;
+  where?: InputMaybe<InfrastructureHostsAiComponentsConnectionWhere>;
 };
 
-export type InfrastructureHostsAiAssetsFieldInput = {
-  connect?: InputMaybe<Array<InfrastructureHostsAiAssetsConnectFieldInput>>;
-  create?: InputMaybe<Array<InfrastructureHostsAiAssetsCreateFieldInput>>;
+export type InfrastructureHostsAiComponentsFieldInput = {
+  connect?: InputMaybe<Array<InfrastructureHostsAiComponentsConnectFieldInput>>;
+  create?: InputMaybe<Array<InfrastructureHostsAiComponentsCreateFieldInput>>;
 };
 
-export type InfrastructureHostsAiAssetsNodeAggregationWhereInput = {
-  AND?: InputMaybe<Array<InfrastructureHostsAiAssetsNodeAggregationWhereInput>>;
-  NOT?: InputMaybe<InfrastructureHostsAiAssetsNodeAggregationWhereInput>;
-  OR?: InputMaybe<Array<InfrastructureHostsAiAssetsNodeAggregationWhereInput>>;
+export type InfrastructureHostsAiComponentsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<InfrastructureHostsAiComponentsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<InfrastructureHostsAiComponentsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<InfrastructureHostsAiComponentsNodeAggregationWhereInput>>;
   accuracy?: InputMaybe<FloatScalarAggregationFilters>;
   costs?: InputMaybe<FloatScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
@@ -16836,23 +16836,23 @@ export type InfrastructureHostsAiAssetsNodeAggregationWhereInput = {
   version?: InputMaybe<StringScalarAggregationFilters>;
 };
 
-export type InfrastructureHostsAiAssetsRelationship = {
-  __typename?: 'InfrastructureHostsAIAssetsRelationship';
+export type InfrastructureHostsAiComponentsRelationship = {
+  __typename?: 'InfrastructureHostsAIComponentsRelationship';
   cursor: Scalars['String']['output'];
-  node: AiAsset;
+  node: AiComponent;
 };
 
-export type InfrastructureHostsAiAssetsUpdateConnectionInput = {
-  node?: InputMaybe<AiAssetUpdateInput>;
-  where?: InputMaybe<InfrastructureHostsAiAssetsConnectionWhere>;
+export type InfrastructureHostsAiComponentsUpdateConnectionInput = {
+  node?: InputMaybe<AiComponentUpdateInput>;
+  where?: InputMaybe<InfrastructureHostsAiComponentsConnectionWhere>;
 };
 
-export type InfrastructureHostsAiAssetsUpdateFieldInput = {
-  connect?: InputMaybe<Array<InfrastructureHostsAiAssetsConnectFieldInput>>;
-  create?: InputMaybe<Array<InfrastructureHostsAiAssetsCreateFieldInput>>;
-  delete?: InputMaybe<Array<InfrastructureHostsAiAssetsDeleteFieldInput>>;
-  disconnect?: InputMaybe<Array<InfrastructureHostsAiAssetsDisconnectFieldInput>>;
-  update?: InputMaybe<InfrastructureHostsAiAssetsUpdateConnectionInput>;
+export type InfrastructureHostsAiComponentsUpdateFieldInput = {
+  connect?: InputMaybe<Array<InfrastructureHostsAiComponentsConnectFieldInput>>;
+  create?: InputMaybe<Array<InfrastructureHostsAiComponentsCreateFieldInput>>;
+  delete?: InputMaybe<Array<InfrastructureHostsAiComponentsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<InfrastructureHostsAiComponentsDisconnectFieldInput>>;
+  update?: InputMaybe<InfrastructureHostsAiComponentsUpdateConnectionInput>;
 };
 
 export type InfrastructureHostsApplicationsAggregateInput = {
@@ -17468,7 +17468,7 @@ export type InfrastructureUpdateInput = {
   description?: InputMaybe<StringScalarMutations>;
   endOfLifeDate?: InputMaybe<DateScalarMutations>;
   endOfUseDate?: InputMaybe<DateScalarMutations>;
-  hostsAIAssets?: InputMaybe<Array<InfrastructureHostsAiAssetsUpdateFieldInput>>;
+  hostsAIComponents?: InputMaybe<Array<InfrastructureHostsAiComponentsUpdateFieldInput>>;
   hostsApplications?: InputMaybe<Array<InfrastructureHostsApplicationsUpdateFieldInput>>;
   infrastructureType?: InputMaybe<InfrastructureTypeEnumScalarMutations>;
   introductionDate?: InputMaybe<DateScalarMutations>;
@@ -17611,8 +17611,8 @@ export type InfrastructureWhere = {
   description?: InputMaybe<StringScalarFilters>;
   endOfLifeDate?: InputMaybe<DateScalarFilters>;
   endOfUseDate?: InputMaybe<DateScalarFilters>;
-  hostsAIAssets?: InputMaybe<AiAssetRelationshipFilters>;
-  hostsAIAssetsConnection?: InputMaybe<InfrastructureHostsAiAssetsConnectionFilters>;
+  hostsAIComponents?: InputMaybe<AiComponentRelationshipFilters>;
+  hostsAIComponentsConnection?: InputMaybe<InfrastructureHostsAiComponentsConnectionFilters>;
   hostsApplications?: InputMaybe<ApplicationRelationshipFilters>;
   hostsApplicationsConnection?: InputMaybe<InfrastructureHostsApplicationsConnectionFilters>;
   id?: InputMaybe<IdScalarFilters>;
@@ -17760,7 +17760,7 @@ export type ListStringMutations = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  createAiAssets: CreateAiAssetsMutationResponse;
+  createAiComponents: CreateAiComponentsMutationResponse;
   createApplicationInterfaces: CreateApplicationInterfacesMutationResponse;
   createApplications: CreateApplicationsMutationResponse;
   createArchitecturePrinciples: CreateArchitecturePrinciplesMutationResponse;
@@ -17772,7 +17772,7 @@ export type Mutation = {
   createInfrastructures: CreateInfrastructuresMutationResponse;
   createOrganisations: CreateOrganisationsMutationResponse;
   createPeople: CreatePeopleMutationResponse;
-  deleteAiAssets: DeleteInfo;
+  deleteAiComponents: DeleteInfo;
   deleteApplicationInterfaces: DeleteInfo;
   deleteApplications: DeleteInfo;
   deleteArchitecturePrinciples: DeleteInfo;
@@ -17784,7 +17784,7 @@ export type Mutation = {
   deleteInfrastructures: DeleteInfo;
   deleteOrganisations: DeleteInfo;
   deletePeople: DeleteInfo;
-  updateAiAssets: UpdateAiAssetsMutationResponse;
+  updateAiComponents: UpdateAiComponentsMutationResponse;
   updateApplicationInterfaces: UpdateApplicationInterfacesMutationResponse;
   updateApplications: UpdateApplicationsMutationResponse;
   updateArchitecturePrinciples: UpdateArchitecturePrinciplesMutationResponse;
@@ -17799,8 +17799,8 @@ export type Mutation = {
 };
 
 
-export type MutationCreateAiAssetsArgs = {
-  input: Array<AiAssetCreateInput>;
+export type MutationCreateAiComponentsArgs = {
+  input: Array<AiComponentCreateInput>;
 };
 
 
@@ -17859,9 +17859,9 @@ export type MutationCreatePeopleArgs = {
 };
 
 
-export type MutationDeleteAiAssetsArgs = {
-  delete?: InputMaybe<AiAssetDeleteInput>;
-  where?: InputMaybe<AiAssetWhere>;
+export type MutationDeleteAiComponentsArgs = {
+  delete?: InputMaybe<AiComponentDeleteInput>;
+  where?: InputMaybe<AiComponentWhere>;
 };
 
 
@@ -17931,9 +17931,9 @@ export type MutationDeletePeopleArgs = {
 };
 
 
-export type MutationUpdateAiAssetsArgs = {
-  update?: InputMaybe<AiAssetUpdateInput>;
-  where?: InputMaybe<AiAssetWhere>;
+export type MutationUpdateAiComponentsArgs = {
+  update?: InputMaybe<AiComponentUpdateInput>;
+  where?: InputMaybe<AiComponentWhere>;
 };
 
 
@@ -18018,8 +18018,8 @@ export type Organisation = {
   parentOrganisationConnection: OrganisationParentOrganisationConnection;
   type: OrganisationType;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
-  usedAIAssets: Array<AiAsset>;
-  usedAIAssetsConnection: OrganisationUsedAiAssetsConnection;
+  usedAIComponents: Array<AiComponent>;
+  usedAIComponentsConnection: OrganisationUsedAiComponentsConnection;
   usedApplications: Array<Application>;
   usedApplicationsConnection: OrganisationUsedApplicationsConnection;
   usedCapabilities: Array<BusinessCapability>;
@@ -18088,20 +18088,20 @@ export type OrganisationParentOrganisationConnectionArgs = {
 
 
 /** Organisation - repräsentiert eine organisatorische Einheit im Unternehmen */
-export type OrganisationUsedAiAssetsArgs = {
+export type OrganisationUsedAiComponentsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<AiAssetSort>>;
-  where?: InputMaybe<AiAssetWhere>;
+  sort?: InputMaybe<Array<AiComponentSort>>;
+  where?: InputMaybe<AiComponentWhere>;
 };
 
 
 /** Organisation - repräsentiert eine organisatorische Einheit im Unternehmen */
-export type OrganisationUsedAiAssetsConnectionArgs = {
+export type OrganisationUsedAiComponentsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<OrganisationUsedAiAssetsConnectionSort>>;
-  where?: InputMaybe<OrganisationUsedAiAssetsConnectionWhere>;
+  sort?: InputMaybe<Array<OrganisationUsedAiComponentsConnectionSort>>;
+  where?: InputMaybe<OrganisationUsedAiComponentsConnectionWhere>;
 };
 
 
@@ -18194,14 +18194,14 @@ export type OrganisationUsedInterfacesConnectionArgs = {
   where?: InputMaybe<OrganisationUsedInterfacesConnectionWhere>;
 };
 
-export type OrganisationAiAssetUsedAiAssetsAggregateSelection = {
-  __typename?: 'OrganisationAIAssetUsedAIAssetsAggregateSelection';
+export type OrganisationAiComponentUsedAiComponentsAggregateSelection = {
+  __typename?: 'OrganisationAIComponentUsedAIComponentsAggregateSelection';
   count: CountConnection;
-  node?: Maybe<OrganisationAiAssetUsedAiAssetsNodeAggregateSelection>;
+  node?: Maybe<OrganisationAiComponentUsedAiComponentsNodeAggregateSelection>;
 };
 
-export type OrganisationAiAssetUsedAiAssetsNodeAggregateSelection = {
-  __typename?: 'OrganisationAIAssetUsedAIAssetsNodeAggregateSelection';
+export type OrganisationAiComponentUsedAiComponentsNodeAggregateSelection = {
+  __typename?: 'OrganisationAIComponentUsedAIComponentsNodeAggregateSelection';
   accuracy: FloatAggregateSelection;
   costs: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
@@ -18516,7 +18516,7 @@ export type OrganisationConnectInput = {
   childOrganisations?: InputMaybe<Array<OrganisationChildOrganisationsConnectFieldInput>>;
   company?: InputMaybe<Array<OrganisationCompanyConnectFieldInput>>;
   parentOrganisation?: InputMaybe<Array<OrganisationParentOrganisationConnectFieldInput>>;
-  usedAIAssets?: InputMaybe<Array<OrganisationUsedAiAssetsConnectFieldInput>>;
+  usedAIComponents?: InputMaybe<Array<OrganisationUsedAiComponentsConnectFieldInput>>;
   usedApplications?: InputMaybe<Array<OrganisationUsedApplicationsConnectFieldInput>>;
   usedCapabilities?: InputMaybe<Array<OrganisationUsedCapabilitiesConnectFieldInput>>;
   usedDataObjects?: InputMaybe<Array<OrganisationUsedDataObjectsConnectFieldInput>>;
@@ -18537,7 +18537,7 @@ export type OrganisationCreateInput = {
   parentOrganisation?: InputMaybe<OrganisationParentOrganisationFieldInput>;
   type: OrganisationType;
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
-  usedAIAssets?: InputMaybe<OrganisationUsedAiAssetsFieldInput>;
+  usedAIComponents?: InputMaybe<OrganisationUsedAiComponentsFieldInput>;
   usedApplications?: InputMaybe<OrganisationUsedApplicationsFieldInput>;
   usedCapabilities?: InputMaybe<OrganisationUsedCapabilitiesFieldInput>;
   usedDataObjects?: InputMaybe<OrganisationUsedDataObjectsFieldInput>;
@@ -18564,7 +18564,7 @@ export type OrganisationDeleteInput = {
   childOrganisations?: InputMaybe<Array<OrganisationChildOrganisationsDeleteFieldInput>>;
   company?: InputMaybe<Array<OrganisationCompanyDeleteFieldInput>>;
   parentOrganisation?: InputMaybe<Array<OrganisationParentOrganisationDeleteFieldInput>>;
-  usedAIAssets?: InputMaybe<Array<OrganisationUsedAiAssetsDeleteFieldInput>>;
+  usedAIComponents?: InputMaybe<Array<OrganisationUsedAiComponentsDeleteFieldInput>>;
   usedApplications?: InputMaybe<Array<OrganisationUsedApplicationsDeleteFieldInput>>;
   usedCapabilities?: InputMaybe<Array<OrganisationUsedCapabilitiesDeleteFieldInput>>;
   usedDataObjects?: InputMaybe<Array<OrganisationUsedDataObjectsDeleteFieldInput>>;
@@ -18576,7 +18576,7 @@ export type OrganisationDisconnectInput = {
   childOrganisations?: InputMaybe<Array<OrganisationChildOrganisationsDisconnectFieldInput>>;
   company?: InputMaybe<Array<OrganisationCompanyDisconnectFieldInput>>;
   parentOrganisation?: InputMaybe<Array<OrganisationParentOrganisationDisconnectFieldInput>>;
-  usedAIAssets?: InputMaybe<Array<OrganisationUsedAiAssetsDisconnectFieldInput>>;
+  usedAIComponents?: InputMaybe<Array<OrganisationUsedAiComponentsDisconnectFieldInput>>;
   usedApplications?: InputMaybe<Array<OrganisationUsedApplicationsDisconnectFieldInput>>;
   usedCapabilities?: InputMaybe<Array<OrganisationUsedCapabilitiesDisconnectFieldInput>>;
   usedDataObjects?: InputMaybe<Array<OrganisationUsedDataObjectsDisconnectFieldInput>>;
@@ -18804,7 +18804,7 @@ export type OrganisationUpdateInput = {
   name?: InputMaybe<StringScalarMutations>;
   parentOrganisation?: InputMaybe<Array<OrganisationParentOrganisationUpdateFieldInput>>;
   type?: InputMaybe<OrganisationTypeEnumScalarMutations>;
-  usedAIAssets?: InputMaybe<Array<OrganisationUsedAiAssetsUpdateFieldInput>>;
+  usedAIComponents?: InputMaybe<Array<OrganisationUsedAiComponentsUpdateFieldInput>>;
   usedApplications?: InputMaybe<Array<OrganisationUsedApplicationsUpdateFieldInput>>;
   usedCapabilities?: InputMaybe<Array<OrganisationUsedCapabilitiesUpdateFieldInput>>;
   usedDataObjects?: InputMaybe<Array<OrganisationUsedDataObjectsUpdateFieldInput>>;
@@ -18812,87 +18812,87 @@ export type OrganisationUpdateInput = {
   usedInterfaces?: InputMaybe<Array<OrganisationUsedInterfacesUpdateFieldInput>>;
 };
 
-export type OrganisationUsedAiAssetsAggregateInput = {
-  AND?: InputMaybe<Array<OrganisationUsedAiAssetsAggregateInput>>;
-  NOT?: InputMaybe<OrganisationUsedAiAssetsAggregateInput>;
-  OR?: InputMaybe<Array<OrganisationUsedAiAssetsAggregateInput>>;
+export type OrganisationUsedAiComponentsAggregateInput = {
+  AND?: InputMaybe<Array<OrganisationUsedAiComponentsAggregateInput>>;
+  NOT?: InputMaybe<OrganisationUsedAiComponentsAggregateInput>;
+  OR?: InputMaybe<Array<OrganisationUsedAiComponentsAggregateInput>>;
   count?: InputMaybe<IntScalarFilters>;
   count_EQ?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
   count_LTE?: InputMaybe<Scalars['Int']['input']>;
-  node?: InputMaybe<OrganisationUsedAiAssetsNodeAggregationWhereInput>;
+  node?: InputMaybe<OrganisationUsedAiComponentsNodeAggregationWhereInput>;
 };
 
-export type OrganisationUsedAiAssetsConnectFieldInput = {
-  connect?: InputMaybe<Array<AiAssetConnectInput>>;
-  where?: InputMaybe<AiAssetConnectWhere>;
+export type OrganisationUsedAiComponentsConnectFieldInput = {
+  connect?: InputMaybe<Array<AiComponentConnectInput>>;
+  where?: InputMaybe<AiComponentConnectWhere>;
 };
 
-export type OrganisationUsedAiAssetsConnection = {
-  __typename?: 'OrganisationUsedAIAssetsConnection';
-  aggregate: OrganisationAiAssetUsedAiAssetsAggregateSelection;
-  edges: Array<OrganisationUsedAiAssetsRelationship>;
+export type OrganisationUsedAiComponentsConnection = {
+  __typename?: 'OrganisationUsedAIComponentsConnection';
+  aggregate: OrganisationAiComponentUsedAiComponentsAggregateSelection;
+  edges: Array<OrganisationUsedAiComponentsRelationship>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
 
-export type OrganisationUsedAiAssetsConnectionAggregateInput = {
-  AND?: InputMaybe<Array<OrganisationUsedAiAssetsConnectionAggregateInput>>;
-  NOT?: InputMaybe<OrganisationUsedAiAssetsConnectionAggregateInput>;
-  OR?: InputMaybe<Array<OrganisationUsedAiAssetsConnectionAggregateInput>>;
+export type OrganisationUsedAiComponentsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<OrganisationUsedAiComponentsConnectionAggregateInput>>;
+  NOT?: InputMaybe<OrganisationUsedAiComponentsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<OrganisationUsedAiComponentsConnectionAggregateInput>>;
   count?: InputMaybe<ConnectionAggregationCountFilterInput>;
-  node?: InputMaybe<OrganisationUsedAiAssetsNodeAggregationWhereInput>;
+  node?: InputMaybe<OrganisationUsedAiComponentsNodeAggregationWhereInput>;
 };
 
-export type OrganisationUsedAiAssetsConnectionFilters = {
-  /** Filter Organisations by aggregating results on related OrganisationUsedAIAssetsConnections */
-  aggregate?: InputMaybe<OrganisationUsedAiAssetsConnectionAggregateInput>;
-  /** Return Organisations where all of the related OrganisationUsedAIAssetsConnections match this filter */
-  all?: InputMaybe<OrganisationUsedAiAssetsConnectionWhere>;
-  /** Return Organisations where none of the related OrganisationUsedAIAssetsConnections match this filter */
-  none?: InputMaybe<OrganisationUsedAiAssetsConnectionWhere>;
-  /** Return Organisations where one of the related OrganisationUsedAIAssetsConnections match this filter */
-  single?: InputMaybe<OrganisationUsedAiAssetsConnectionWhere>;
-  /** Return Organisations where some of the related OrganisationUsedAIAssetsConnections match this filter */
-  some?: InputMaybe<OrganisationUsedAiAssetsConnectionWhere>;
+export type OrganisationUsedAiComponentsConnectionFilters = {
+  /** Filter Organisations by aggregating results on related OrganisationUsedAIComponentsConnections */
+  aggregate?: InputMaybe<OrganisationUsedAiComponentsConnectionAggregateInput>;
+  /** Return Organisations where all of the related OrganisationUsedAIComponentsConnections match this filter */
+  all?: InputMaybe<OrganisationUsedAiComponentsConnectionWhere>;
+  /** Return Organisations where none of the related OrganisationUsedAIComponentsConnections match this filter */
+  none?: InputMaybe<OrganisationUsedAiComponentsConnectionWhere>;
+  /** Return Organisations where one of the related OrganisationUsedAIComponentsConnections match this filter */
+  single?: InputMaybe<OrganisationUsedAiComponentsConnectionWhere>;
+  /** Return Organisations where some of the related OrganisationUsedAIComponentsConnections match this filter */
+  some?: InputMaybe<OrganisationUsedAiComponentsConnectionWhere>;
 };
 
-export type OrganisationUsedAiAssetsConnectionSort = {
-  node?: InputMaybe<AiAssetSort>;
+export type OrganisationUsedAiComponentsConnectionSort = {
+  node?: InputMaybe<AiComponentSort>;
 };
 
-export type OrganisationUsedAiAssetsConnectionWhere = {
-  AND?: InputMaybe<Array<OrganisationUsedAiAssetsConnectionWhere>>;
-  NOT?: InputMaybe<OrganisationUsedAiAssetsConnectionWhere>;
-  OR?: InputMaybe<Array<OrganisationUsedAiAssetsConnectionWhere>>;
-  node?: InputMaybe<AiAssetWhere>;
+export type OrganisationUsedAiComponentsConnectionWhere = {
+  AND?: InputMaybe<Array<OrganisationUsedAiComponentsConnectionWhere>>;
+  NOT?: InputMaybe<OrganisationUsedAiComponentsConnectionWhere>;
+  OR?: InputMaybe<Array<OrganisationUsedAiComponentsConnectionWhere>>;
+  node?: InputMaybe<AiComponentWhere>;
 };
 
-export type OrganisationUsedAiAssetsCreateFieldInput = {
-  node: AiAssetCreateInput;
+export type OrganisationUsedAiComponentsCreateFieldInput = {
+  node: AiComponentCreateInput;
 };
 
-export type OrganisationUsedAiAssetsDeleteFieldInput = {
-  delete?: InputMaybe<AiAssetDeleteInput>;
-  where?: InputMaybe<OrganisationUsedAiAssetsConnectionWhere>;
+export type OrganisationUsedAiComponentsDeleteFieldInput = {
+  delete?: InputMaybe<AiComponentDeleteInput>;
+  where?: InputMaybe<OrganisationUsedAiComponentsConnectionWhere>;
 };
 
-export type OrganisationUsedAiAssetsDisconnectFieldInput = {
-  disconnect?: InputMaybe<AiAssetDisconnectInput>;
-  where?: InputMaybe<OrganisationUsedAiAssetsConnectionWhere>;
+export type OrganisationUsedAiComponentsDisconnectFieldInput = {
+  disconnect?: InputMaybe<AiComponentDisconnectInput>;
+  where?: InputMaybe<OrganisationUsedAiComponentsConnectionWhere>;
 };
 
-export type OrganisationUsedAiAssetsFieldInput = {
-  connect?: InputMaybe<Array<OrganisationUsedAiAssetsConnectFieldInput>>;
-  create?: InputMaybe<Array<OrganisationUsedAiAssetsCreateFieldInput>>;
+export type OrganisationUsedAiComponentsFieldInput = {
+  connect?: InputMaybe<Array<OrganisationUsedAiComponentsConnectFieldInput>>;
+  create?: InputMaybe<Array<OrganisationUsedAiComponentsCreateFieldInput>>;
 };
 
-export type OrganisationUsedAiAssetsNodeAggregationWhereInput = {
-  AND?: InputMaybe<Array<OrganisationUsedAiAssetsNodeAggregationWhereInput>>;
-  NOT?: InputMaybe<OrganisationUsedAiAssetsNodeAggregationWhereInput>;
-  OR?: InputMaybe<Array<OrganisationUsedAiAssetsNodeAggregationWhereInput>>;
+export type OrganisationUsedAiComponentsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<OrganisationUsedAiComponentsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<OrganisationUsedAiComponentsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<OrganisationUsedAiComponentsNodeAggregationWhereInput>>;
   accuracy?: InputMaybe<FloatScalarAggregationFilters>;
   costs?: InputMaybe<FloatScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
@@ -18905,23 +18905,23 @@ export type OrganisationUsedAiAssetsNodeAggregationWhereInput = {
   version?: InputMaybe<StringScalarAggregationFilters>;
 };
 
-export type OrganisationUsedAiAssetsRelationship = {
-  __typename?: 'OrganisationUsedAIAssetsRelationship';
+export type OrganisationUsedAiComponentsRelationship = {
+  __typename?: 'OrganisationUsedAIComponentsRelationship';
   cursor: Scalars['String']['output'];
-  node: AiAsset;
+  node: AiComponent;
 };
 
-export type OrganisationUsedAiAssetsUpdateConnectionInput = {
-  node?: InputMaybe<AiAssetUpdateInput>;
-  where?: InputMaybe<OrganisationUsedAiAssetsConnectionWhere>;
+export type OrganisationUsedAiComponentsUpdateConnectionInput = {
+  node?: InputMaybe<AiComponentUpdateInput>;
+  where?: InputMaybe<OrganisationUsedAiComponentsConnectionWhere>;
 };
 
-export type OrganisationUsedAiAssetsUpdateFieldInput = {
-  connect?: InputMaybe<Array<OrganisationUsedAiAssetsConnectFieldInput>>;
-  create?: InputMaybe<Array<OrganisationUsedAiAssetsCreateFieldInput>>;
-  delete?: InputMaybe<Array<OrganisationUsedAiAssetsDeleteFieldInput>>;
-  disconnect?: InputMaybe<Array<OrganisationUsedAiAssetsDisconnectFieldInput>>;
-  update?: InputMaybe<OrganisationUsedAiAssetsUpdateConnectionInput>;
+export type OrganisationUsedAiComponentsUpdateFieldInput = {
+  connect?: InputMaybe<Array<OrganisationUsedAiComponentsConnectFieldInput>>;
+  create?: InputMaybe<Array<OrganisationUsedAiComponentsCreateFieldInput>>;
+  delete?: InputMaybe<Array<OrganisationUsedAiComponentsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<OrganisationUsedAiComponentsDisconnectFieldInput>>;
+  update?: InputMaybe<OrganisationUsedAiComponentsUpdateConnectionInput>;
 };
 
 export type OrganisationUsedApplicationsAggregateInput = {
@@ -19489,8 +19489,8 @@ export type OrganisationWhere = {
   parentOrganisationConnection?: InputMaybe<OrganisationParentOrganisationConnectionFilters>;
   type?: InputMaybe<OrganisationTypeEnumScalarFilters>;
   updatedAt?: InputMaybe<DateTimeScalarFilters>;
-  usedAIAssets?: InputMaybe<AiAssetRelationshipFilters>;
-  usedAIAssetsConnection?: InputMaybe<OrganisationUsedAiAssetsConnectionFilters>;
+  usedAIComponents?: InputMaybe<AiComponentRelationshipFilters>;
+  usedAIComponentsConnection?: InputMaybe<OrganisationUsedAiComponentsConnectionFilters>;
   usedApplications?: InputMaybe<ApplicationRelationshipFilters>;
   usedApplicationsConnection?: InputMaybe<OrganisationUsedApplicationsConnectionFilters>;
   usedCapabilities?: InputMaybe<BusinessCapabilityRelationshipFilters>;
@@ -19540,8 +19540,8 @@ export type Person = {
   firstName: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   lastName: Scalars['String']['output'];
-  ownedAIAssets: Array<AiAsset>;
-  ownedAIAssetsConnection: PersonOwnedAiAssetsConnection;
+  ownedAIComponents: Array<AiComponent>;
+  ownedAIComponentsConnection: PersonOwnedAiComponentsConnection;
   ownedApplications: Array<Application>;
   ownedApplicationsConnection: PersonOwnedApplicationsConnection;
   ownedArchitectures: Array<Architecture>;
@@ -19581,20 +19581,20 @@ export type PersonCompanyConnectionArgs = {
 
 
 /** Person - repräsentiert eine Person im Unternehmen */
-export type PersonOwnedAiAssetsArgs = {
+export type PersonOwnedAiComponentsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<AiAssetSort>>;
-  where?: InputMaybe<AiAssetWhere>;
+  sort?: InputMaybe<Array<AiComponentSort>>;
+  where?: InputMaybe<AiComponentWhere>;
 };
 
 
 /** Person - repräsentiert eine Person im Unternehmen */
-export type PersonOwnedAiAssetsConnectionArgs = {
+export type PersonOwnedAiComponentsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<PersonOwnedAiAssetsConnectionSort>>;
-  where?: InputMaybe<PersonOwnedAiAssetsConnectionWhere>;
+  sort?: InputMaybe<Array<PersonOwnedAiComponentsConnectionSort>>;
+  where?: InputMaybe<PersonOwnedAiComponentsConnectionWhere>;
 };
 
 
@@ -19723,14 +19723,14 @@ export type PersonOwnedInterfacesConnectionArgs = {
   where?: InputMaybe<PersonOwnedInterfacesConnectionWhere>;
 };
 
-export type PersonAiAssetOwnedAiAssetsAggregateSelection = {
-  __typename?: 'PersonAIAssetOwnedAIAssetsAggregateSelection';
+export type PersonAiComponentOwnedAiComponentsAggregateSelection = {
+  __typename?: 'PersonAIComponentOwnedAIComponentsAggregateSelection';
   count: CountConnection;
-  node?: Maybe<PersonAiAssetOwnedAiAssetsNodeAggregateSelection>;
+  node?: Maybe<PersonAiComponentOwnedAiComponentsNodeAggregateSelection>;
 };
 
-export type PersonAiAssetOwnedAiAssetsNodeAggregateSelection = {
-  __typename?: 'PersonAIAssetOwnedAIAssetsNodeAggregateSelection';
+export type PersonAiComponentOwnedAiComponentsNodeAggregateSelection = {
+  __typename?: 'PersonAIComponentOwnedAIComponentsNodeAggregateSelection';
   accuracy: FloatAggregateSelection;
   costs: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
@@ -19955,7 +19955,7 @@ export type PersonCompanyUpdateFieldInput = {
 
 export type PersonConnectInput = {
   company?: InputMaybe<Array<PersonCompanyConnectFieldInput>>;
-  ownedAIAssets?: InputMaybe<Array<PersonOwnedAiAssetsConnectFieldInput>>;
+  ownedAIComponents?: InputMaybe<Array<PersonOwnedAiComponentsConnectFieldInput>>;
   ownedApplications?: InputMaybe<Array<PersonOwnedApplicationsConnectFieldInput>>;
   ownedArchitectures?: InputMaybe<Array<PersonOwnedArchitecturesConnectFieldInput>>;
   ownedCapabilities?: InputMaybe<Array<PersonOwnedCapabilitiesConnectFieldInput>>;
@@ -19976,7 +19976,7 @@ export type PersonCreateInput = {
   email?: InputMaybe<Scalars['String']['input']>;
   firstName: Scalars['String']['input'];
   lastName: Scalars['String']['input'];
-  ownedAIAssets?: InputMaybe<PersonOwnedAiAssetsFieldInput>;
+  ownedAIComponents?: InputMaybe<PersonOwnedAiComponentsFieldInput>;
   ownedApplications?: InputMaybe<PersonOwnedApplicationsFieldInput>;
   ownedArchitectures?: InputMaybe<PersonOwnedArchitecturesFieldInput>;
   ownedCapabilities?: InputMaybe<PersonOwnedCapabilitiesFieldInput>;
@@ -20006,7 +20006,7 @@ export type PersonDataObjectOwnedDataObjectsNodeAggregateSelection = {
 
 export type PersonDeleteInput = {
   company?: InputMaybe<Array<PersonCompanyDeleteFieldInput>>;
-  ownedAIAssets?: InputMaybe<Array<PersonOwnedAiAssetsDeleteFieldInput>>;
+  ownedAIComponents?: InputMaybe<Array<PersonOwnedAiComponentsDeleteFieldInput>>;
   ownedApplications?: InputMaybe<Array<PersonOwnedApplicationsDeleteFieldInput>>;
   ownedArchitectures?: InputMaybe<Array<PersonOwnedArchitecturesDeleteFieldInput>>;
   ownedCapabilities?: InputMaybe<Array<PersonOwnedCapabilitiesDeleteFieldInput>>;
@@ -20034,7 +20034,7 @@ export type PersonDiagramOwnedDiagramsNodeAggregateSelection = {
 
 export type PersonDisconnectInput = {
   company?: InputMaybe<Array<PersonCompanyDisconnectFieldInput>>;
-  ownedAIAssets?: InputMaybe<Array<PersonOwnedAiAssetsDisconnectFieldInput>>;
+  ownedAIComponents?: InputMaybe<Array<PersonOwnedAiComponentsDisconnectFieldInput>>;
   ownedApplications?: InputMaybe<Array<PersonOwnedApplicationsDisconnectFieldInput>>;
   ownedArchitectures?: InputMaybe<Array<PersonOwnedArchitecturesDisconnectFieldInput>>;
   ownedCapabilities?: InputMaybe<Array<PersonOwnedCapabilitiesDisconnectFieldInput>>;
@@ -20073,87 +20073,87 @@ export type PersonInfrastructureOwnedInfrastructureNodeAggregateSelection = {
   version: StringAggregateSelection;
 };
 
-export type PersonOwnedAiAssetsAggregateInput = {
-  AND?: InputMaybe<Array<PersonOwnedAiAssetsAggregateInput>>;
-  NOT?: InputMaybe<PersonOwnedAiAssetsAggregateInput>;
-  OR?: InputMaybe<Array<PersonOwnedAiAssetsAggregateInput>>;
+export type PersonOwnedAiComponentsAggregateInput = {
+  AND?: InputMaybe<Array<PersonOwnedAiComponentsAggregateInput>>;
+  NOT?: InputMaybe<PersonOwnedAiComponentsAggregateInput>;
+  OR?: InputMaybe<Array<PersonOwnedAiComponentsAggregateInput>>;
   count?: InputMaybe<IntScalarFilters>;
   count_EQ?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
   count_LTE?: InputMaybe<Scalars['Int']['input']>;
-  node?: InputMaybe<PersonOwnedAiAssetsNodeAggregationWhereInput>;
+  node?: InputMaybe<PersonOwnedAiComponentsNodeAggregationWhereInput>;
 };
 
-export type PersonOwnedAiAssetsConnectFieldInput = {
-  connect?: InputMaybe<Array<AiAssetConnectInput>>;
-  where?: InputMaybe<AiAssetConnectWhere>;
+export type PersonOwnedAiComponentsConnectFieldInput = {
+  connect?: InputMaybe<Array<AiComponentConnectInput>>;
+  where?: InputMaybe<AiComponentConnectWhere>;
 };
 
-export type PersonOwnedAiAssetsConnection = {
-  __typename?: 'PersonOwnedAIAssetsConnection';
-  aggregate: PersonAiAssetOwnedAiAssetsAggregateSelection;
-  edges: Array<PersonOwnedAiAssetsRelationship>;
+export type PersonOwnedAiComponentsConnection = {
+  __typename?: 'PersonOwnedAIComponentsConnection';
+  aggregate: PersonAiComponentOwnedAiComponentsAggregateSelection;
+  edges: Array<PersonOwnedAiComponentsRelationship>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
 
-export type PersonOwnedAiAssetsConnectionAggregateInput = {
-  AND?: InputMaybe<Array<PersonOwnedAiAssetsConnectionAggregateInput>>;
-  NOT?: InputMaybe<PersonOwnedAiAssetsConnectionAggregateInput>;
-  OR?: InputMaybe<Array<PersonOwnedAiAssetsConnectionAggregateInput>>;
+export type PersonOwnedAiComponentsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<PersonOwnedAiComponentsConnectionAggregateInput>>;
+  NOT?: InputMaybe<PersonOwnedAiComponentsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<PersonOwnedAiComponentsConnectionAggregateInput>>;
   count?: InputMaybe<ConnectionAggregationCountFilterInput>;
-  node?: InputMaybe<PersonOwnedAiAssetsNodeAggregationWhereInput>;
+  node?: InputMaybe<PersonOwnedAiComponentsNodeAggregationWhereInput>;
 };
 
-export type PersonOwnedAiAssetsConnectionFilters = {
-  /** Filter People by aggregating results on related PersonOwnedAIAssetsConnections */
-  aggregate?: InputMaybe<PersonOwnedAiAssetsConnectionAggregateInput>;
-  /** Return People where all of the related PersonOwnedAIAssetsConnections match this filter */
-  all?: InputMaybe<PersonOwnedAiAssetsConnectionWhere>;
-  /** Return People where none of the related PersonOwnedAIAssetsConnections match this filter */
-  none?: InputMaybe<PersonOwnedAiAssetsConnectionWhere>;
-  /** Return People where one of the related PersonOwnedAIAssetsConnections match this filter */
-  single?: InputMaybe<PersonOwnedAiAssetsConnectionWhere>;
-  /** Return People where some of the related PersonOwnedAIAssetsConnections match this filter */
-  some?: InputMaybe<PersonOwnedAiAssetsConnectionWhere>;
+export type PersonOwnedAiComponentsConnectionFilters = {
+  /** Filter People by aggregating results on related PersonOwnedAIComponentsConnections */
+  aggregate?: InputMaybe<PersonOwnedAiComponentsConnectionAggregateInput>;
+  /** Return People where all of the related PersonOwnedAIComponentsConnections match this filter */
+  all?: InputMaybe<PersonOwnedAiComponentsConnectionWhere>;
+  /** Return People where none of the related PersonOwnedAIComponentsConnections match this filter */
+  none?: InputMaybe<PersonOwnedAiComponentsConnectionWhere>;
+  /** Return People where one of the related PersonOwnedAIComponentsConnections match this filter */
+  single?: InputMaybe<PersonOwnedAiComponentsConnectionWhere>;
+  /** Return People where some of the related PersonOwnedAIComponentsConnections match this filter */
+  some?: InputMaybe<PersonOwnedAiComponentsConnectionWhere>;
 };
 
-export type PersonOwnedAiAssetsConnectionSort = {
-  node?: InputMaybe<AiAssetSort>;
+export type PersonOwnedAiComponentsConnectionSort = {
+  node?: InputMaybe<AiComponentSort>;
 };
 
-export type PersonOwnedAiAssetsConnectionWhere = {
-  AND?: InputMaybe<Array<PersonOwnedAiAssetsConnectionWhere>>;
-  NOT?: InputMaybe<PersonOwnedAiAssetsConnectionWhere>;
-  OR?: InputMaybe<Array<PersonOwnedAiAssetsConnectionWhere>>;
-  node?: InputMaybe<AiAssetWhere>;
+export type PersonOwnedAiComponentsConnectionWhere = {
+  AND?: InputMaybe<Array<PersonOwnedAiComponentsConnectionWhere>>;
+  NOT?: InputMaybe<PersonOwnedAiComponentsConnectionWhere>;
+  OR?: InputMaybe<Array<PersonOwnedAiComponentsConnectionWhere>>;
+  node?: InputMaybe<AiComponentWhere>;
 };
 
-export type PersonOwnedAiAssetsCreateFieldInput = {
-  node: AiAssetCreateInput;
+export type PersonOwnedAiComponentsCreateFieldInput = {
+  node: AiComponentCreateInput;
 };
 
-export type PersonOwnedAiAssetsDeleteFieldInput = {
-  delete?: InputMaybe<AiAssetDeleteInput>;
-  where?: InputMaybe<PersonOwnedAiAssetsConnectionWhere>;
+export type PersonOwnedAiComponentsDeleteFieldInput = {
+  delete?: InputMaybe<AiComponentDeleteInput>;
+  where?: InputMaybe<PersonOwnedAiComponentsConnectionWhere>;
 };
 
-export type PersonOwnedAiAssetsDisconnectFieldInput = {
-  disconnect?: InputMaybe<AiAssetDisconnectInput>;
-  where?: InputMaybe<PersonOwnedAiAssetsConnectionWhere>;
+export type PersonOwnedAiComponentsDisconnectFieldInput = {
+  disconnect?: InputMaybe<AiComponentDisconnectInput>;
+  where?: InputMaybe<PersonOwnedAiComponentsConnectionWhere>;
 };
 
-export type PersonOwnedAiAssetsFieldInput = {
-  connect?: InputMaybe<Array<PersonOwnedAiAssetsConnectFieldInput>>;
-  create?: InputMaybe<Array<PersonOwnedAiAssetsCreateFieldInput>>;
+export type PersonOwnedAiComponentsFieldInput = {
+  connect?: InputMaybe<Array<PersonOwnedAiComponentsConnectFieldInput>>;
+  create?: InputMaybe<Array<PersonOwnedAiComponentsCreateFieldInput>>;
 };
 
-export type PersonOwnedAiAssetsNodeAggregationWhereInput = {
-  AND?: InputMaybe<Array<PersonOwnedAiAssetsNodeAggregationWhereInput>>;
-  NOT?: InputMaybe<PersonOwnedAiAssetsNodeAggregationWhereInput>;
-  OR?: InputMaybe<Array<PersonOwnedAiAssetsNodeAggregationWhereInput>>;
+export type PersonOwnedAiComponentsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<PersonOwnedAiComponentsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<PersonOwnedAiComponentsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<PersonOwnedAiComponentsNodeAggregationWhereInput>>;
   accuracy?: InputMaybe<FloatScalarAggregationFilters>;
   costs?: InputMaybe<FloatScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
@@ -20166,23 +20166,23 @@ export type PersonOwnedAiAssetsNodeAggregationWhereInput = {
   version?: InputMaybe<StringScalarAggregationFilters>;
 };
 
-export type PersonOwnedAiAssetsRelationship = {
-  __typename?: 'PersonOwnedAIAssetsRelationship';
+export type PersonOwnedAiComponentsRelationship = {
+  __typename?: 'PersonOwnedAIComponentsRelationship';
   cursor: Scalars['String']['output'];
-  node: AiAsset;
+  node: AiComponent;
 };
 
-export type PersonOwnedAiAssetsUpdateConnectionInput = {
-  node?: InputMaybe<AiAssetUpdateInput>;
-  where?: InputMaybe<PersonOwnedAiAssetsConnectionWhere>;
+export type PersonOwnedAiComponentsUpdateConnectionInput = {
+  node?: InputMaybe<AiComponentUpdateInput>;
+  where?: InputMaybe<PersonOwnedAiComponentsConnectionWhere>;
 };
 
-export type PersonOwnedAiAssetsUpdateFieldInput = {
-  connect?: InputMaybe<Array<PersonOwnedAiAssetsConnectFieldInput>>;
-  create?: InputMaybe<Array<PersonOwnedAiAssetsCreateFieldInput>>;
-  delete?: InputMaybe<Array<PersonOwnedAiAssetsDeleteFieldInput>>;
-  disconnect?: InputMaybe<Array<PersonOwnedAiAssetsDisconnectFieldInput>>;
-  update?: InputMaybe<PersonOwnedAiAssetsUpdateConnectionInput>;
+export type PersonOwnedAiComponentsUpdateFieldInput = {
+  connect?: InputMaybe<Array<PersonOwnedAiComponentsConnectFieldInput>>;
+  create?: InputMaybe<Array<PersonOwnedAiComponentsCreateFieldInput>>;
+  delete?: InputMaybe<Array<PersonOwnedAiComponentsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<PersonOwnedAiComponentsDisconnectFieldInput>>;
+  update?: InputMaybe<PersonOwnedAiComponentsUpdateConnectionInput>;
 };
 
 export type PersonOwnedApplicationsAggregateInput = {
@@ -20981,7 +20981,7 @@ export type PersonUpdateInput = {
   email?: InputMaybe<StringScalarMutations>;
   firstName?: InputMaybe<StringScalarMutations>;
   lastName?: InputMaybe<StringScalarMutations>;
-  ownedAIAssets?: InputMaybe<Array<PersonOwnedAiAssetsUpdateFieldInput>>;
+  ownedAIComponents?: InputMaybe<Array<PersonOwnedAiComponentsUpdateFieldInput>>;
   ownedApplications?: InputMaybe<Array<PersonOwnedApplicationsUpdateFieldInput>>;
   ownedArchitectures?: InputMaybe<Array<PersonOwnedArchitecturesUpdateFieldInput>>;
   ownedCapabilities?: InputMaybe<Array<PersonOwnedCapabilitiesUpdateFieldInput>>;
@@ -21006,8 +21006,8 @@ export type PersonWhere = {
   firstName?: InputMaybe<StringScalarFilters>;
   id?: InputMaybe<IdScalarFilters>;
   lastName?: InputMaybe<StringScalarFilters>;
-  ownedAIAssets?: InputMaybe<AiAssetRelationshipFilters>;
-  ownedAIAssetsConnection?: InputMaybe<PersonOwnedAiAssetsConnectionFilters>;
+  ownedAIComponents?: InputMaybe<AiComponentRelationshipFilters>;
+  ownedAIComponentsConnection?: InputMaybe<PersonOwnedAiComponentsConnectionFilters>;
   ownedApplications?: InputMaybe<ApplicationRelationshipFilters>;
   ownedApplicationsConnection?: InputMaybe<PersonOwnedApplicationsConnectionFilters>;
   ownedArchitectures?: InputMaybe<ArchitectureRelationshipFilters>;
@@ -21079,8 +21079,8 @@ export type PrinciplePriorityEnumScalarMutations = {
 
 export type Query = {
   __typename?: 'Query';
-  aiAssets: Array<AiAsset>;
-  aiAssetsConnection: AiAssetsConnection;
+  aiComponents: Array<AiComponent>;
+  aiComponentsConnection: AiComponentsConnection;
   applicationInterfaces: Array<ApplicationInterface>;
   applicationInterfacesConnection: ApplicationInterfacesConnection;
   applications: Array<Application>;
@@ -21106,19 +21106,19 @@ export type Query = {
 };
 
 
-export type QueryAiAssetsArgs = {
+export type QueryAiComponentsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<AiAssetSort>>;
-  where?: InputMaybe<AiAssetWhere>;
+  sort?: InputMaybe<Array<AiComponentSort>>;
+  where?: InputMaybe<AiComponentWhere>;
 };
 
 
-export type QueryAiAssetsConnectionArgs = {
+export type QueryAiComponentsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<AiAssetSort>>;
-  where?: InputMaybe<AiAssetWhere>;
+  sort?: InputMaybe<Array<AiComponentSort>>;
+  where?: InputMaybe<AiComponentWhere>;
 };
 
 
@@ -21379,9 +21379,9 @@ export type TimeCategoryEnumScalarMutations = {
   set?: InputMaybe<TimeCategory>;
 };
 
-export type UpdateAiAssetsMutationResponse = {
-  __typename?: 'UpdateAiAssetsMutationResponse';
-  aiAssets: Array<AiAsset>;
+export type UpdateAiComponentsMutationResponse = {
+  __typename?: 'UpdateAiComponentsMutationResponse';
+  aiComponents: Array<AiComponent>;
   info: UpdateInfo;
 };
 

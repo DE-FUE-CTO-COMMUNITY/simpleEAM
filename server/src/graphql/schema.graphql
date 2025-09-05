@@ -884,7 +884,7 @@ enum OrganisationType {
 }
 
 """
-KI-Asset Typen
+KI-Komponent Typen
 """
 enum AIComponentType {
   MACHINE_LEARNING_MODEL
@@ -904,7 +904,7 @@ enum AIComponentType {
 }
 
 """
-Status-Werte für KI-Assets
+Status-Werte für KI-Komponenten
 """
 enum AIComponentStatus {
   IN_DEVELOPMENT
