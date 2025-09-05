@@ -1,6 +1,8 @@
+
+
 FROM node:20-alpine
 
-WORKDIR /app
+WORKDIR /app/server
 
 # Corepack/Yarn aktivieren
 RUN corepack enable \
@@ -9,13 +11,13 @@ RUN corepack enable \
 # Nur Server-Manifest(e) kopieren für bessere Layer-Caches
 COPY server/package.json ./package.json
 COPY server/yarn.lock ./yarn.lock
+COPY server/.yarnrc.yml .yarnrc.yml
+
+# Restlichen Server-Code kopieren
+COPY server/ ./
 
 # Dependencies installieren
-RUN yarn install --immutable
-
-# Restlichen Server-Code kopieren und bauen
-COPY . ./
-COPY server/src/graphql/schema.graphql src/graphql/schema.graphql
+RUN yarn install
 
 # Build-Umgebung
 ENV NODE_ENV=production
@@ -30,8 +32,7 @@ RUN mkdir -p dist/graphql && cp src/graphql/schema.graphql dist/graphql/
 
 EXPOSE 4000
 
-CMD ["yarn", "start"]
-USER node
+ENTRYPOINT ["yarn", "start"]
 
 # Starte den Server im Produktionsmodus
 CMD ["yarn", "start"]

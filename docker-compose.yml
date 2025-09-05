@@ -49,10 +49,7 @@ services:
       - KEYCLOAK_URL=http://keycloak:${KEYCLOAK_INTERNAL_PORT}
       - KEYCLOAK_REALM=${KEYCLOAK_REALM}
       - KEYCLOAK_CLIENT_ID=${KEYCLOAK_CLIENT_ID_SERVER}
-    volumes:
-      - ./server/src:/app/server/src
-      - ./server/prisma:/app/server/prisma
-      - ./server/tests:/app/server/tests
+    # Keine Bind-Mounts für src, prisma, tests – alles kommt aus dem Image
     networks:
       - eam-network
       - ${TRAEFIK_NETWORK}
