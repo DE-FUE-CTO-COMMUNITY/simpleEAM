@@ -9,7 +9,7 @@ import { AiComponentType, AiComponentStatus } from '../../gql/generated'
  */
 export const useAiTypeLabel = () => {
   const t = useTranslations('aicomponents.types')
-  
+
   return (type: AiComponentType): string => {
     switch (type) {
       case AiComponentType.AGENTIC_AI:
@@ -51,7 +51,7 @@ export const useAiTypeLabel = () => {
  */
 export const useStatusLabel = () => {
   const t = useTranslations('aicomponents.status')
-  
+
   return (status: AiComponentStatus): string => {
     switch (status) {
       case AiComponentStatus.ACTIVE:
@@ -231,35 +231,39 @@ export const countActiveFilters = (filterState: FilterState): number => {
   if (filterState.aiTypeFilter && filterState.aiTypeFilter.length > 0) count++
   if (filterState.statusFilter && filterState.statusFilter.length > 0) count++
   if (filterState.tagsFilter && filterState.tagsFilter.length > 0) count++
-  
+
   // Text-Filter zählen nur wenn gesetzt
   if (filterState.descriptionFilter && filterState.descriptionFilter.trim()) count++
   if (filterState.providerFilter && filterState.providerFilter.trim()) count++
   if (filterState.ownerFilter && filterState.ownerFilter.trim()) count++
-  
+
   // Range-Filter zählen nur wenn vom Standard abweichend
   if (
     filterState.accuracyRange &&
     (filterState.accuracyRange[0] > 0 || filterState.accuracyRange[1] < 100)
-  ) count++
-  
+  )
+    count++
+
   if (
     filterState.costsRange &&
     (filterState.costsRange[0] > 0 || filterState.costsRange[1] < 1000000)
-  ) count++
-  
+  )
+    count++
+
   // Date-Range-Filter zählen nur wenn beide Werte gesetzt
   if (
     filterState.trainingDateRange &&
     filterState.trainingDateRange[0] &&
     filterState.trainingDateRange[1]
-  ) count++
-  
+  )
+    count++
+
   if (
     filterState.lastUpdatedRange &&
     filterState.lastUpdatedRange[0] &&
     filterState.lastUpdatedRange[1]
-  ) count++
+  )
+    count++
 
   return count
 }

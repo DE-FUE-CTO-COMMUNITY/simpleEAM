@@ -20,7 +20,7 @@ export const Aicomponents_DEFAULT_COLUMN_VISIBILITY = {
   provider: true,
   version: true,
   createdAt: true,
-  
+
   // Standardmäßig versteckte Spalten
   id: false,
   model: false,
@@ -153,7 +153,7 @@ const AicomponentTableWithGenericTable: React.FC<AicomponentTableProps> = ({
         header: t('costs'),
         cell: info => {
           const value = info.getValue()
-          return value !== null && value !== undefined 
+          return value !== null && value !== undefined
             ? new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(value)
             : '-'
         },
@@ -192,7 +192,7 @@ const AicomponentTableWithGenericTable: React.FC<AicomponentTableProps> = ({
         header: t('owners'),
         cell: info => {
           const value = info.getValue()
-          return value && value.length > 0 
+          return value && value.length > 0
             ? value.map(owner => `${owner.firstName} ${owner.lastName}`).join(', ')
             : '-'
         },
@@ -202,9 +202,7 @@ const AicomponentTableWithGenericTable: React.FC<AicomponentTableProps> = ({
         header: t('company'),
         cell: info => {
           const value = info.getValue()
-          return value && value.length > 0 
-            ? value.map(comp => comp.name).join(', ')
-            : '-'
+          return value && value.length > 0 ? value.map(comp => comp.name).join(', ') : '-'
         },
         enableHiding: true,
       }),
@@ -254,7 +252,7 @@ const AicomponentTableWithGenericTable: React.FC<AicomponentTableProps> = ({
 
   return (
     <GenericTable<AicomponentType, AicomponentFormValues>
-      data={ aicomponents }
+      data={aicomponents}
       loading={loading}
       globalFilter={globalFilter}
       sorting={sorting}
@@ -266,7 +264,7 @@ const AicomponentTableWithGenericTable: React.FC<AicomponentTableProps> = ({
       emptyMessage={tEntity('noAicomponentsFound')}
       createButtonLabel={tEntity('addNew')}
       entityName={tEntity('title')}
-      FormComponent={ AicomponentForm}
+      FormComponent={AicomponentForm}
       getIdFromData={(item: AicomponentType) => item.id}
       mapDataToFormValues={mapToFormValues}
       columnVisibility={columnVisibility}

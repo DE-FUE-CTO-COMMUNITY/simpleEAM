@@ -69,7 +69,9 @@ export const useAicomponentFilter = ({ aicomponents = [] }: UseAicomponentFilter
       if (filterState.ownerFilter) {
         const owners = item.owners || []
         const hasMatchingOwner = owners.some(owner =>
-          `${owner.firstName} ${owner.lastName}`.toLowerCase().includes(filterState.ownerFilter.toLowerCase())
+          `${owner.firstName} ${owner.lastName}`
+            .toLowerCase()
+            .includes(filterState.ownerFilter.toLowerCase())
         )
         if (!hasMatchingOwner) {
           return false
@@ -78,7 +80,10 @@ export const useAicomponentFilter = ({ aicomponents = [] }: UseAicomponentFilter
 
       // Accuracy Range Filter
       if (item.accuracy !== null && item.accuracy !== undefined) {
-        if (item.accuracy < filterState.accuracyRange[0] || item.accuracy > filterState.accuracyRange[1]) {
+        if (
+          item.accuracy < filterState.accuracyRange[0] ||
+          item.accuracy > filterState.accuracyRange[1]
+        ) {
           return false
         }
       }
@@ -91,7 +96,11 @@ export const useAicomponentFilter = ({ aicomponents = [] }: UseAicomponentFilter
       }
 
       // Training Date Range Filter
-      if (filterState.trainingDateRange[0] && filterState.trainingDateRange[1] && item.trainingDate) {
+      if (
+        filterState.trainingDateRange[0] &&
+        filterState.trainingDateRange[1] &&
+        item.trainingDate
+      ) {
         const itemDate = new Date(item.trainingDate)
         const fromDate = new Date(filterState.trainingDateRange[0])
         const toDate = new Date(filterState.trainingDateRange[1])

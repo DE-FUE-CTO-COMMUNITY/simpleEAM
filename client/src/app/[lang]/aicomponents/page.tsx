@@ -57,7 +57,7 @@ const AicomponentsPage = () => {
   // Dialog-States
   const [filterDialogOpen, setFilterDialogOpen] = useState(false)
   const [showNewAicomponentForm, setShowNewAicomponentForm] = useState(false)
-  
+
   // Table-Instanz State für Column Visibility
   const [tableInstance, setTableInstance] = useState<Table<AicomponentType> | null>(null)
 
@@ -110,8 +110,8 @@ const AicomponentsPage = () => {
         }
       })
       // Eindeutige Owners anhand der ID filtern
-      const uniqueOwners = allOwners.filter((owner, index, self) =>
-        index === self.findIndex(o => o.id === owner.id)
+      const uniqueOwners = allOwners.filter(
+        (owner, index, self) => index === self.findIndex(o => o.id === owner.id)
       )
       setAvailableOwners(uniqueOwners)
     }
@@ -177,7 +177,7 @@ const AicomponentsPage = () => {
             globalFilter={globalFilter}
             sorting={sorting}
             onSortingChange={setSorting}
-            onTableReady={(table) => setTableInstance(table)}
+            onTableReady={table => setTableInstance(table)}
             onCreateAicomponent={async data => {
               try {
                 await createAicomponentMutation({
@@ -218,15 +218,15 @@ const AicomponentsPage = () => {
                 if (baseData.model && baseData.model.trim() !== '') {
                   updateInput.model = { set: baseData.model }
                 }
-                
+
                 if (baseData.version && baseData.version.trim() !== '') {
                   updateInput.version = { set: baseData.version }
                 }
-                
+
                 if (baseData.provider && baseData.provider.trim() !== '') {
                   updateInput.provider = { set: baseData.provider }
                 }
-                
+
                 if (baseData.license && baseData.license.trim() !== '') {
                   updateInput.license = { set: baseData.license }
                 }
@@ -235,7 +235,7 @@ const AicomponentsPage = () => {
                 if (baseData.trainingDate && baseData.trainingDate.trim() !== '') {
                   updateInput.trainingDate = { set: baseData.trainingDate }
                 }
-                
+
                 if (baseData.lastUpdated && baseData.lastUpdated.trim() !== '') {
                   updateInput.lastUpdated = { set: baseData.lastUpdated }
                 }
@@ -257,9 +257,9 @@ const AicomponentsPage = () => {
                       {
                         disconnect: [{ where: {} }],
                         connect: ownerIds.map(ownerId => ({
-                          where: { node: { id: { eq: ownerId } } }
-                        }))
-                      }
+                          where: { node: { id: { eq: ownerId } } },
+                        })),
+                      },
                     ]
                   } else {
                     updateInput.owners = [{ disconnect: [{ where: {} }] }]
@@ -272,8 +272,8 @@ const AicomponentsPage = () => {
                     updateInput.company = [
                       {
                         disconnect: [{ where: {} }],
-                        connect: [{ where: { node: { id: { eq: companyIds[0] } } } }]
-                      }
+                        connect: [{ where: { node: { id: { eq: companyIds[0] } } } }],
+                      },
                     ]
                   } else {
                     updateInput.company = [{ disconnect: [{ where: {} }] }]
@@ -287,9 +287,9 @@ const AicomponentsPage = () => {
                       {
                         disconnect: [{ where: {} }],
                         connect: supportsCapabilityIds.map(capId => ({
-                          where: { node: { id: { eq: capId } } }
-                        }))
-                      }
+                          where: { node: { id: { eq: capId } } },
+                        })),
+                      },
                     ]
                   } else {
                     updateInput.supportsCapabilities = [{ disconnect: [{ where: {} }] }]
@@ -303,9 +303,9 @@ const AicomponentsPage = () => {
                       {
                         disconnect: [{ where: {} }],
                         connect: usedByApplicationIds.map(appId => ({
-                          where: { node: { id: { eq: appId } } }
-                        }))
-                      }
+                          where: { node: { id: { eq: appId } } },
+                        })),
+                      },
                     ]
                   } else {
                     updateInput.usedByApplications = [{ disconnect: [{ where: {} }] }]
@@ -319,9 +319,9 @@ const AicomponentsPage = () => {
                       {
                         disconnect: [{ where: {} }],
                         connect: trainedWithDataObjectIds.map(dataId => ({
-                          where: { node: { id: { eq: dataId } } }
-                        }))
-                      }
+                          where: { node: { id: { eq: dataId } } },
+                        })),
+                      },
                     ]
                   } else {
                     updateInput.trainedWithDataObjects = [{ disconnect: [{ where: {} }] }]
@@ -335,9 +335,9 @@ const AicomponentsPage = () => {
                       {
                         disconnect: [{ where: {} }],
                         connect: hostedOnIds.map(infraId => ({
-                          where: { node: { id: { eq: infraId } } }
-                        }))
-                      }
+                          where: { node: { id: { eq: infraId } } },
+                        })),
+                      },
                     ]
                   } else {
                     updateInput.hostedOn = [{ disconnect: [{ where: {} }] }]
@@ -432,7 +432,7 @@ const AicomponentsPage = () => {
                 license: aiComponentData.license,
                 costs: aiComponentData.costs,
                 tags: aiComponentData.tags,
-                
+
                 // Wenn Besitzer ausgewählt wurden, verwenden wir die owners-Struktur
                 ...(ownerIds && ownerIds.length > 0
                   ? {
@@ -443,7 +443,7 @@ const AicomponentsPage = () => {
                       },
                     }
                   : {}),
-                
+
                 // Wenn Capabilities ausgewählt wurden, verbinden wir sie
                 ...(supportsCapabilityIds && supportsCapabilityIds.length > 0
                   ? {
@@ -454,7 +454,7 @@ const AicomponentsPage = () => {
                       },
                     }
                   : {}),
-                
+
                 // Wenn Applications ausgewählt wurden, verbinden wir sie
                 ...(usedByApplicationIds && usedByApplicationIds.length > 0
                   ? {
@@ -465,7 +465,7 @@ const AicomponentsPage = () => {
                       },
                     }
                   : {}),
-                
+
                 // Wenn Data Objects ausgewählt wurden, verbinden wir sie
                 ...(trainedWithDataObjectIds && trainedWithDataObjectIds.length > 0
                   ? {
@@ -476,7 +476,7 @@ const AicomponentsPage = () => {
                       },
                     }
                   : {}),
-                
+
                 // Wenn Infrastructure ausgewählt wurde, verbinden wir sie
                 ...(hostedOnIds && hostedOnIds.length > 0
                   ? {
@@ -487,7 +487,7 @@ const AicomponentsPage = () => {
                       },
                     }
                   : {}),
-                
+
                 // Company-Zuordnung (Pflicht)
                 company: {
                   connect: [

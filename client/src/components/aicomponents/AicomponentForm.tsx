@@ -103,9 +103,18 @@ const AicomponentsForm: React.FC<GenericFormProps<AicomponentType, AicomponentFo
       form.setFieldValue('tags', aicomponent.tags || [])
       form.setFieldValue('ownerIds', aicomponent.owners?.map(owner => owner.id) || [])
       form.setFieldValue('companyIds', aicomponent.company?.map(comp => comp.id) || [])
-      form.setFieldValue('supportsCapabilityIds', aicomponent.supportsCapabilities?.map(cap => cap.id) || [])
-      form.setFieldValue('usedByApplicationIds', aicomponent.usedByApplications?.map(app => app.id) || [])
-      form.setFieldValue('trainedWithDataObjectIds', aicomponent.trainedWithDataObjects?.map(obj => obj.id) || [])
+      form.setFieldValue(
+        'supportsCapabilityIds',
+        aicomponent.supportsCapabilities?.map(cap => cap.id) || []
+      )
+      form.setFieldValue(
+        'usedByApplicationIds',
+        aicomponent.usedByApplications?.map(app => app.id) || []
+      )
+      form.setFieldValue(
+        'trainedWithDataObjectIds',
+        aicomponent.trainedWithDataObjects?.map(obj => obj.id) || []
+      )
       form.setFieldValue('hostedOnIds', aicomponent.hostedOn?.map(infra => infra.id) || [])
     }
   }, [aicomponent, form])
