@@ -223,44 +223,64 @@ export const createDiagramRelationshipUpdatesWithDisconnect = (diagramJsonString
 
   const relationships: any = {}
 
-  // Capabilities
-  relationships.containsCapabilities = {
-    disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
-    ...(grouped.capabilities.length > 0 && {
+  // Capabilities - nur Disconnect wenn keine neuen Connections
+  if (grouped.capabilities.length > 0) {
+    relationships.containsCapabilities = {
+      disconnect: [{ where: {} }],
       connect: createConnectClause(grouped.capabilities),
-    }),
+    }
+  } else {
+    relationships.containsCapabilities = {
+      disconnect: [{ where: {} }],
+    }
   }
 
   // Applications
-  relationships.containsApplications = {
-    disconnect: [{ where: {} }],
-    ...(grouped.applications.length > 0 && {
+  if (grouped.applications.length > 0) {
+    relationships.containsApplications = {
+      disconnect: [{ where: {} }],
       connect: createConnectClause(grouped.applications),
-    }),
+    }
+  } else {
+    relationships.containsApplications = {
+      disconnect: [{ where: {} }],
+    }
   }
 
   // Data Objects
-  relationships.containsDataObjects = {
-    disconnect: [{ where: {} }],
-    ...(grouped.dataObjects.length > 0 && {
+  if (grouped.dataObjects.length > 0) {
+    relationships.containsDataObjects = {
+      disconnect: [{ where: {} }],
       connect: createConnectClause(grouped.dataObjects),
-    }),
+    }
+  } else {
+    relationships.containsDataObjects = {
+      disconnect: [{ where: {} }],
+    }
   }
 
   // Interfaces
-  relationships.containsInterfaces = {
-    disconnect: [{ where: {} }],
-    ...(grouped.interfaces.length > 0 && {
+  if (grouped.interfaces.length > 0) {
+    relationships.containsInterfaces = {
+      disconnect: [{ where: {} }],
       connect: createConnectClause(grouped.interfaces),
-    }),
+    }
+  } else {
+    relationships.containsInterfaces = {
+      disconnect: [{ where: {} }],
+    }
   }
 
   // Infrastructure
-  relationships.containsInfrastructure = {
-    disconnect: [{ where: {} }],
-    ...(grouped.infrastructures.length > 0 && {
+  if (grouped.infrastructures.length > 0) {
+    relationships.containsInfrastructure = {
+      disconnect: [{ where: {} }],
       connect: createConnectClause(grouped.infrastructures),
-    }),
+    }
+  } else {
+    relationships.containsInfrastructure = {
+      disconnect: [{ where: {} }],
+    }
   }
 
   return relationships

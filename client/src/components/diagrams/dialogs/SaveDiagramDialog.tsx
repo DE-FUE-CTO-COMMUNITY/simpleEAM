@@ -686,6 +686,10 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
           },
         })
 
+        if (!result.data || !result.data.updateDiagrams) {
+          throw new Error('Keine Daten von updateDiagrams erhalten')
+        }
+
         const savedDiagram = result.data.updateDiagrams.diagrams[0]
         // Nach erfolgreichem Update: Alle Diagramm-Elemente mit der Architektur verknüpfen
         try {
@@ -710,6 +714,10 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
             input: [input],
           },
         })
+
+        if (!result.data || !result.data.createDiagrams) {
+          throw new Error('Keine Daten von createDiagrams erhalten')
+        }
 
         const savedDiagram = result.data.createDiagrams.diagrams[0]
 

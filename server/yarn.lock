@@ -240,16 +240,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@as-integrations/express4@npm:^1.1.2":
-  version: 1.1.2
-  resolution: "@as-integrations/express4@npm:1.1.2"
-  peerDependencies:
-    "@apollo/server": ^4.0.0 || ^5.0.0
-    express: ^4.0.0
-  checksum: 10c0/6934b4b878f71894f85dc0003eb404a4b701468693bf6cf686b4adf56709532f75f118b63abccc5daaf5ba3e961e541430664e21b9bfb84d7a28e6e248052e92
-  languageName: node
-  linkType: hard
-
 "@babel/code-frame@npm:^7.0.0, @babel/code-frame@npm:^7.12.13, @babel/code-frame@npm:^7.27.1":
   version: 7.27.1
   resolution: "@babel/code-frame@npm:7.27.1"
@@ -740,9 +730,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@graphql-tools/utils@npm:10.9.1, @graphql-tools/utils@npm:^10.9.1":
-  version: 10.9.1
-  resolution: "@graphql-tools/utils@npm:10.9.1"
+"@graphql-tools/utils@npm:10.8.6":
+  version: 10.8.6
+  resolution: "@graphql-tools/utils@npm:10.8.6"
   dependencies:
     "@graphql-typed-document-node/core": "npm:^3.1.1"
     "@whatwg-node/promise-helpers": "npm:^1.0.0"
@@ -751,7 +741,7 @@ __metadata:
     tslib: "npm:^2.4.0"
   peerDependencies:
     graphql: ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
-  checksum: 10c0/97199f52d0235124d4371f7f54cc0df5ce9df6d8aae716ac05d8ebeda4b5ee3faf1fca94d5d1c521a565e152f8e02a1abfb9c2629ffe805c14468aec0c3d41cf
+  checksum: 10c0/17f727eb85415c15c5920ab9ef4648e0d205e1ca8b7d8539ac84f55da04ed60464313792456ebbde30bb883c0abde8df81919fd22f2ed5096b873920e84bef4b
   languageName: node
   linkType: hard
 
@@ -763,6 +753,21 @@ __metadata:
   peerDependencies:
     graphql: ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
   checksum: 10c0/dd589d970fee9ce093a545c69d6306b61af0f38358361295af1274164a87db2985a51d05ca0e0dd08a4e709f0b5c7c201e69ab0b30480fe2fa0c7a7b8310da0a
+  languageName: node
+  linkType: hard
+
+"@graphql-tools/utils@npm:^10.9.1":
+  version: 10.9.1
+  resolution: "@graphql-tools/utils@npm:10.9.1"
+  dependencies:
+    "@graphql-typed-document-node/core": "npm:^3.1.1"
+    "@whatwg-node/promise-helpers": "npm:^1.0.0"
+    cross-inspect: "npm:1.0.1"
+    dset: "npm:^3.1.4"
+    tslib: "npm:^2.4.0"
+  peerDependencies:
+    graphql: ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
+  checksum: 10c0/97199f52d0235124d4371f7f54cc0df5ce9df6d8aae716ac05d8ebeda4b5ee3faf1fca94d5d1c521a565e152f8e02a1abfb9c2629ffe805c14468aec0c3d41cf
   languageName: node
   linkType: hard
 
@@ -1111,24 +1116,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@neo4j/cypher-builder@npm:2.8.0":
+"@neo4j/cypher-builder@npm:^2.4.0":
   version: 2.8.0
   resolution: "@neo4j/cypher-builder@npm:2.8.0"
   checksum: 10c0/99e02eb23ce6b50fe7df1ba13d12f9e2ed6cd95f1bf05ad6076419f6c9d7571cda0a1a3fd8d158a9f385ba76de0ca7759c1efa105e588b909a7f33daecb9ca54
   languageName: node
   linkType: hard
 
-"@neo4j/graphql@npm:^7.1.1":
-  version: 7.2.11
-  resolution: "@neo4j/graphql@npm:7.2.11"
+"@neo4j/graphql@npm:7.1.1":
+  version: 7.1.1
+  resolution: "@neo4j/graphql@npm:7.1.1"
   dependencies:
     "@apollo/subgraph": "npm:^2.2.3"
-    "@as-integrations/express4": "npm:^1.1.2"
     "@graphql-tools/merge": "npm:^9.0.0"
     "@graphql-tools/resolvers-composition": "npm:^7.0.0"
     "@graphql-tools/schema": "npm:^10.0.0"
-    "@graphql-tools/utils": "npm:10.9.1"
-    "@neo4j/cypher-builder": "npm:2.8.0"
+    "@graphql-tools/utils": "npm:10.8.6"
+    "@neo4j/cypher-builder": "npm:^2.4.0"
     camelcase: "npm:^6.3.0"
     debug: "npm:^4.3.4"
     dot-prop: "npm:^6.0.1"
@@ -1143,7 +1147,7 @@ __metadata:
   peerDependencies:
     graphql: ^16.0.0
     neo4j-driver: ^5.8.0
-  checksum: 10c0/c13a8d562125d0ac3d92105dd62b90f1b23cf00a18dc04ea0794e1ddca60952a4fdde962c9e040d65490bcf1f1c2782ecbf705c33b8e44b60126c7358e8b4682
+  checksum: 10c0/9193909c88ed76b3c59558f69f1d812190a3f49c7f78b3f91fcf97d1b77b8c60edb6f4a6358615efa5bb050ad6c03fddb5cda1068bf96256e7ed5ae202210b18
   languageName: node
   linkType: hard
 
@@ -5488,7 +5492,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "simple-eam-server@workspace:."
   dependencies:
-    "@neo4j/graphql": "npm:^7.1.1"
+    "@neo4j/graphql": "npm:7.1.1"
     "@types/compression": "npm:^1.7.3"
     "@types/cors": "npm:^2.8.14"
     "@types/express": "npm:^4.17.18"
