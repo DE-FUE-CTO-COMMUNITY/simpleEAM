@@ -1655,6 +1655,8 @@
       "industry": "Branche",
       "website": "Website",
       "size": "Größe",
+      "employees": "Mitarbeiter",
+      "employeesHelperText": "Wählen Sie die Mitarbeiter aus, die diesem Unternehmen zugeordnet sind.",
       "validation": {
         "nameMin": "Name muss mindestens 3 Zeichen haben",
         "nameMax": "Name darf maximal 100 Zeichen haben",
@@ -1666,7 +1668,8 @@
       }
     },
     "tabs": {
-      "general": "Allgemein"
+      "general": "Allgemein",
+      "employees": "Mitarbeiter"
     },
     "headers": {
       "id": "ID",

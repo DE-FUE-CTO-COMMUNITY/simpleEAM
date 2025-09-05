@@ -60,7 +60,7 @@ type BusinessCapability
   parents: [BusinessCapability!]! @relationship(type: "HAS_PARENT", direction: OUT)
   children: [BusinessCapability!]! @relationship(type: "HAS_PARENT", direction: IN)
   supportedByApplications: [Application!]! @relationship(type: "SUPPORTS", direction: IN)
-  supportedByAIAssets: [AIAsset!]! @relationship(type: "SUPPORTS", direction: IN)
+  supportedByAIComponents: [AIComponent!]! @relationship(type: "SUPPORTS", direction: IN)
   relatedDataObjects: [DataObject!]! @relationship(type: "RELATED_TO", direction: OUT)
   partOfArchitectures: [Architecture!]! @relationship(type: "CONTAINS", direction: IN)
   depictedInDiagrams: [Diagram!]! @relationship(type: "DEPICTED_IN", direction: OUT)
@@ -116,7 +116,7 @@ type Person
   ownedDiagrams: [Diagram!]! @relationship(type: "CREATED_BY", direction: IN)
   ownedInfrastructure: [Infrastructure!]! @relationship(type: "OWNED_BY", direction: IN)
   ownedInterfaces: [ApplicationInterface!]! @relationship(type: "OWNED_BY", direction: IN)
-  ownedAIAssets: [AIAsset!]! @relationship(type: "OWNED_BY", direction: IN)
+  ownedAIComponents: [AIComponent!]! @relationship(type: "OWNED_BY", direction: IN)
 }
 
 """
@@ -186,7 +186,7 @@ type Application
   implementsPrinciples: [ArchitecturePrinciple!]!
     @relationship(type: "IMPLEMENTS_PRINCIPLE", direction: OUT)
   hostedOn: [Infrastructure!]! @relationship(type: "HOSTED_ON", direction: OUT)
-  usesAIAssets: [AIAsset!]! @relationship(type: "USED_BY", direction: OUT)
+  usesAIComponents: [AIComponent!]! @relationship(type: "USED_BY", direction: OUT)
 }
 
 """
@@ -293,7 +293,7 @@ type DataObject
   usedByApplications: [Application!]! @relationship(type: "USES", direction: IN)
   relatedToCapabilities: [BusinessCapability!]! @relationship(type: "RELATED_TO", direction: IN)
   transferredInInterfaces: [ApplicationInterface!]! @relationship(type: "TRANSFERS", direction: IN)
-  usedForTrainingAI: [AIAsset!]! @relationship(type: "TRAINED_WITH", direction: IN)
+  usedForTrainingAI: [AIComponent!]! @relationship(type: "TRAINED_WITH", direction: IN)
   partOfArchitectures: [Architecture!]! @relationship(type: "CONTAINS", direction: IN)
   depictedInDiagrams: [Diagram!]! @relationship(type: "DEPICTED_IN", direction: OUT)
 }
@@ -356,15 +356,15 @@ type Infrastructure
   childInfrastructures: [Infrastructure!]!
     @relationship(type: "HAS_PARENT_INFRASTRUCTURE", direction: IN)
   hostsApplications: [Application!]! @relationship(type: "HOSTED_ON", direction: IN)
-  hostsAIAssets: [AIAsset!]! @relationship(type: "HOSTED_ON", direction: IN)
+  hostsAIComponents: [AIComponent!]! @relationship(type: "HOSTED_ON", direction: IN)
   partOfArchitectures: [Architecture!]! @relationship(type: "CONTAINS", direction: IN)
   depictedInDiagrams: [Diagram!]! @relationship(type: "DEPICTED_IN", direction: OUT)
 }
 
 """
-AIAsset - repräsentiert ein KI-Asset im Enterprise Architecture Management
+AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management
 """
-type AIAsset
+type AIComponent
   @node
   @authorization(
     validate: [
@@ -394,10 +394,10 @@ type AIAsset
   id: ID! @id
   name: String!
   description: String
-  aiType: AIAssetType!
+  aiType: AIComponentType!
   model: String
   version: String
-  status: AIAssetStatus!
+  status: AIComponentStatus!
   accuracy: Float
   trainingDate: Date
   lastUpdated: Date
@@ -462,7 +462,7 @@ type Company
   ownedDataObjects: [DataObject!]! @relationship(type: "OWNED_BY", direction: IN)
   ownedInterfaces: [ApplicationInterface!]! @relationship(type: "OWNED_BY", direction: IN)
   ownedInfrastructure: [Infrastructure!]! @relationship(type: "OWNED_BY", direction: IN)
-  ownedAIAssets: [AIAsset!]! @relationship(type: "OWNED_BY", direction: IN)
+  ownedAIComponents: [AIComponent!]! @relationship(type: "OWNED_BY", direction: IN)
   employees: [Person!]! @relationship(type: "EMPLOYED_BY", direction: IN)
   ownedArchitectures: [Architecture!]! @relationship(type: "OWNED_BY", direction: IN)
   ownedDiagrams: [Diagram!]! @relationship(type: "OWNED_BY", direction: IN)
@@ -516,7 +516,7 @@ type Organisation
   usedDataObjects: [DataObject!]! @relationship(type: "USED_BY", direction: IN)
   usedInterfaces: [ApplicationInterface!]! @relationship(type: "USED_BY", direction: IN)
   usedInfrastructure: [Infrastructure!]! @relationship(type: "USED_BY", direction: IN)
-  usedAIAssets: [AIAsset!]! @relationship(type: "USED_BY", direction: IN)
+  usedAIComponents: [AIComponent!]! @relationship(type: "USED_BY", direction: IN)
 }
 
 """
@@ -670,7 +670,7 @@ type Architecture
   containsDataObjects: [DataObject!]! @relationship(type: "CONTAINS", direction: OUT)
   containsInterfaces: [ApplicationInterface!]! @relationship(type: "CONTAINS", direction: OUT)
   containsInfrastructure: [Infrastructure!]! @relationship(type: "CONTAINS", direction: OUT)
-  containsAIAssets: [AIAsset!]! @relationship(type: "CONTAINS", direction: OUT)
+  containsAIComponents: [AIComponent!]! @relationship(type: "CONTAINS", direction: OUT)
   parentArchitecture: [Architecture!]! @relationship(type: "PART_OF", direction: OUT)
   childArchitectures: [Architecture!]! @relationship(type: "PART_OF", direction: IN)
   diagrams: [Diagram!]! @relationship(type: "BELONGS_TO", direction: IN)
@@ -715,7 +715,7 @@ type Diagram
   containsDataObjects: [DataObject!]! @relationship(type: "DEPICTED_IN", direction: IN)
   containsInterfaces: [ApplicationInterface!]! @relationship(type: "DEPICTED_IN", direction: IN)
   containsInfrastructure: [Infrastructure!]! @relationship(type: "DEPICTED_IN", direction: IN)
-  containsAIAssets: [AIAsset!]! @relationship(type: "DEPICTED_IN", direction: IN)
+  containsAIComponents: [AIComponent!]! @relationship(type: "DEPICTED_IN", direction: IN)
 }
 
 """
@@ -755,7 +755,8 @@ type ArchitecturePrinciple
   appliedInArchitectures: [Architecture!]! @relationship(type: "APPLIES_PRINCIPLE", direction: IN)
   implementedByApplications: [Application!]!
     @relationship(type: "IMPLEMENTS_PRINCIPLE", direction: IN)
-  implementedByAIAssets: [AIAsset!]! @relationship(type: "IMPLEMENTS_PRINCIPLE", direction: IN)
+  implementedByAIComponents: [AIComponent!]!
+    @relationship(type: "IMPLEMENTS_PRINCIPLE", direction: IN)
 }
 
 """
@@ -885,7 +886,7 @@ enum OrganisationType {
 """
 KI-Asset Typen
 """
-enum AIAssetType {
+enum AIComponentType {
   MACHINE_LEARNING_MODEL
   DEEP_LEARNING_MODEL
   NATURAL_LANGUAGE_PROCESSING
@@ -905,7 +906,7 @@ enum AIAssetType {
 """
 Status-Werte für KI-Assets
 """
-enum AIAssetStatus {
+enum AIComponentStatus {
   IN_DEVELOPMENT
   TRAINING
   TESTING

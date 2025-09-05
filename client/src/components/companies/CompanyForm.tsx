@@ -8,7 +8,6 @@ import { z } from 'zod'
 import { CompanyType, CompanyFormValues } from './types'
 import { CompanySize, Person } from '../../gql/generated'
 import { GET_PERSONS } from '@/graphql/person'
-import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import GenericForm, { FieldConfig, TabConfig } from '../common/GenericForm'
 import { GenericFormProps } from '../common/GenericFormProps'
 import { isArchitect } from '@/lib/auth'
@@ -38,11 +37,10 @@ const CompaniesForm: React.FC<GenericFormProps<CompanyType, CompanyFormValues>> 
   const tForms = useTranslations('forms')
   const tCommon = useTranslations('common')
 
-  const companyWhere = useCompanyWhere('company')
-
-  // Daten laden
+  // Admin sollte alle Personen sehen können, nicht nur die der aktuellen Company
+  // Für die Company-Form laden wir alle verfügbaren Personen
   const { data: personsData, loading: personsLoading } = useQuery(GET_PERSONS, {
-    variables: { where: companyWhere },
+    variables: { where: {} }, // Keine Filterung - alle Personen laden
   })
 
   // Formulardaten mit useMemo initialisieren
@@ -202,7 +200,7 @@ const CompaniesForm: React.FC<GenericFormProps<CompanyType, CompanyFormValues>> 
     // Mitarbeiter-Feld (Tab: employees)
     {
       name: 'employees',
-      label: 'Mitarbeiter',
+      label: t('form.employees'),
       type: 'autocomplete',
       tabId: 'employees',
       multiple: true,
@@ -225,14 +223,14 @@ const CompaniesForm: React.FC<GenericFormProps<CompanyType, CompanyFormValues>> 
         }
         return option.value === value?.value || option.value === value
       },
-      helperText: 'Wählen Sie die Mitarbeiter aus, die diesem Unternehmen zugeordnet sind.',
+      helperText: t('form.employeesHelperText'),
     },
   ]
 
   // Tab-Konfigurationen definieren
   const tabs: TabConfig[] = [
-    { id: 'general', label: 'Allgemein' },
-    { id: 'employees', label: 'Mitarbeiter' },
+    { id: 'general', label: t('tabs.general') },
+    { id: 'employees', label: t('tabs.employees') },
   ]
 
   return (
