@@ -3,9 +3,12 @@
 import React, { useEffect } from 'react'
 import { useForm } from '@tanstack/react-form'
 import { useTranslations } from 'next-intl'
+import { useQuery } from '@apollo/client'
 import { z } from 'zod'
 import { CompanyType, CompanyFormValues } from './types'
-import { CompanySize } from '../../gql/generated'
+import { CompanySize, Person } from '../../gql/generated'
+import { GET_PERSONS } from '@/graphql/person'
+import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import GenericForm, { FieldConfig, TabConfig } from '../common/GenericForm'
 import { GenericFormProps } from '../common/GenericFormProps'
 import { isArchitect } from '@/lib/auth'
@@ -18,6 +21,7 @@ export const companySchema = z.object({
   industry: z.string().max(100).optional(),
   website: z.string().url().optional().or(z.literal('')),
   size: z.nativeEnum(CompanySize).optional(),
+  employees: z.array(z.string()).optional(),
 })
 
 const CompaniesForm: React.FC<GenericFormProps<CompanyType, CompanyFormValues>> = ({
@@ -34,6 +38,13 @@ const CompaniesForm: React.FC<GenericFormProps<CompanyType, CompanyFormValues>> 
   const tForms = useTranslations('forms')
   const tCommon = useTranslations('common')
 
+  const companyWhere = useCompanyWhere('company')
+
+  // Daten laden
+  const { data: personsData, loading: personsLoading } = useQuery(GET_PERSONS, {
+    variables: { where: companyWhere },
+  })
+
   // Formulardaten mit useMemo initialisieren
   const defaultValues = React.useMemo<CompanyFormValues>(
     () => ({
@@ -43,6 +54,7 @@ const CompaniesForm: React.FC<GenericFormProps<CompanyType, CompanyFormValues>> 
       industry: '',
       website: '',
       size: undefined,
+      employees: [],
     }),
     []
   )
@@ -82,6 +94,10 @@ const CompaniesForm: React.FC<GenericFormProps<CompanyType, CompanyFormValues>> 
       form.setFieldValue('industry', company.industry || '')
       form.setFieldValue('website', company.website || '')
       form.setFieldValue('size', company.size || undefined)
+      form.setFieldValue(
+        'employees',
+        (company as any).employees?.map((emp: Person) => emp.id) || []
+      )
     }
   }, [company, form])
 
@@ -92,6 +108,7 @@ const CompaniesForm: React.FC<GenericFormProps<CompanyType, CompanyFormValues>> 
       label: t('form.name'),
       type: 'text',
       required: true,
+      tabId: 'general',
       validators: {
         onChange: ({ value }: { value: string }) => {
           if (!value || value.length < 3) {
@@ -109,6 +126,7 @@ const CompaniesForm: React.FC<GenericFormProps<CompanyType, CompanyFormValues>> 
       label: t('form.description'),
       type: 'textarea',
       required: true,
+      tabId: 'general',
       validators: {
         onChange: ({ value }: { value: string }) => {
           if (!value || value.length < 10) {
@@ -126,6 +144,7 @@ const CompaniesForm: React.FC<GenericFormProps<CompanyType, CompanyFormValues>> 
       label: t('form.address'),
       type: 'textarea',
       required: false,
+      tabId: 'general',
       validators: {
         onChange: ({ value }: { value: string }) => {
           if (value && value.length > 500) {
@@ -140,6 +159,7 @@ const CompaniesForm: React.FC<GenericFormProps<CompanyType, CompanyFormValues>> 
       label: t('form.industry'),
       type: 'text',
       required: false,
+      tabId: 'general',
       validators: {
         onChange: ({ value }: { value: string }) => {
           if (value && value.length > 100) {
@@ -154,6 +174,7 @@ const CompaniesForm: React.FC<GenericFormProps<CompanyType, CompanyFormValues>> 
       label: t('form.website'),
       type: 'text',
       required: false,
+      tabId: 'general',
       validators: {
         onChange: ({ value }: { value: string }) => {
           if (value && value !== '') {
@@ -172,18 +193,46 @@ const CompaniesForm: React.FC<GenericFormProps<CompanyType, CompanyFormValues>> 
       label: t('form.size'),
       type: 'select',
       required: false,
+      tabId: 'general',
       options: Object.values(CompanySize).map(size => ({
         value: size,
         label: size.charAt(0) + size.slice(1).toLowerCase(),
       })),
     },
+    // Mitarbeiter-Feld (Tab: employees)
+    {
+      name: 'employees',
+      label: 'Mitarbeiter',
+      type: 'autocomplete',
+      tabId: 'employees',
+      multiple: true,
+      options: (personsData?.people || []).map((person: Person) => ({
+        value: person.id,
+        label: `${person.firstName} ${person.lastName}`,
+      })),
+      loadingOptions: personsLoading,
+      size: { xs: 12 },
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          const matchingPerson = personsData?.people?.find((person: Person) => person.id === option)
+          return matchingPerson ? `${matchingPerson.firstName} ${matchingPerson.lastName}` : option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
+      helperText: 'Wählen Sie die Mitarbeiter aus, die diesem Unternehmen zugeordnet sind.',
+    },
   ]
 
-  // Tab-Konfigurationen (falls mehrere Tabs benötigt werden)
+  // Tab-Konfigurationen definieren
   const tabs: TabConfig[] = [
-    { id: 'general', label: t('tabs.general') },
-    // TODO: Weitere Tabs hinzufügen falls benötigt
-    // { id: 'relationships', label: t('tabs.relationships') },
+    { id: 'general', label: 'Allgemein' },
+    { id: 'employees', label: 'Mitarbeiter' },
   ]
 
   return (
@@ -207,7 +256,7 @@ const CompaniesForm: React.FC<GenericFormProps<CompanyType, CompanyFormValues>> 
         mode === 'create' ? t('createTitle') : mode === 'edit' ? t('editTitle') : t('viewTitle')
       }
       fields={fields}
-      tabs={tabs.length > 1 ? tabs : undefined}
+      tabs={tabs}
       submitButtonText={tCommon('save')}
       cancelButtonText={tCommon('cancel')}
       deleteButtonText={tCommon('delete')}

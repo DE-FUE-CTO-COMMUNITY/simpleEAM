@@ -15,6 +15,11 @@ export const GET_COMPANIES = gql`
       size
       createdAt
       updatedAt
+      employees {
+        id
+        firstName
+        lastName
+      }
     }
   }
 `
@@ -32,6 +37,11 @@ export const GET_COMPANY = gql`
       size
       createdAt
       updatedAt
+      employees {
+        id
+        firstName
+        lastName
+      }
     }
   }
 `
@@ -50,6 +60,11 @@ export const CREATE_COMPANY = gql`
         size
         createdAt
         updatedAt
+        employees {
+          id
+          firstName
+          lastName
+        }
       }
     }
   }
@@ -69,6 +84,11 @@ export const UPDATE_COMPANY = gql`
         size
         createdAt
         updatedAt
+        employees {
+          id
+          firstName
+          lastName
+        }
       }
     }
   }

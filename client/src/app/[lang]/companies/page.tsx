@@ -73,6 +73,32 @@ const CompaniesPage = () => {
   const handleUpdateCompany = async (company: CompanyType, values: CompanyFormValues) => {
     console.log('🔄 handleUpdateCompany called with:', { company: company.id, values })
     try {
+      const employeesUpdate = values.employees
+        ? [
+            {
+              // Erst alle bestehenden Verbindungen trennen
+              disconnect: [
+                {
+                  where: {}, // Trennt alle aktuellen Employee-Verbindungen
+                },
+              ],
+              // Dann neue Verbindungen hinzufügen
+              connect: values.employees.map(employeeId => ({
+                where: { node: { id: { eq: employeeId } } },
+              })),
+            },
+          ]
+        : [
+            {
+              // Wenn employees leer ist, alle Verbindungen trennen
+              disconnect: [
+                {
+                  where: {},
+                },
+              ],
+            },
+          ]
+
       const result = await updateCompanyMutation({
         variables: {
           id: company.id,
@@ -83,6 +109,7 @@ const CompaniesPage = () => {
             industry: { set: values.industry },
             website: { set: values.website },
             size: { set: values.size },
+            employees: employeesUpdate,
           },
         },
         refetchQueries: [{ query: GET_COMPANIES }],
@@ -198,8 +225,24 @@ const CompaniesPage = () => {
           onSubmit={async (values: CompanyFormValues) => {
             console.log('🔄 createCompany called via Create Form with:', values)
             try {
+              const createInput = {
+                name: values.name,
+                description: values.description,
+                address: values.address,
+                industry: values.industry,
+                website: values.website,
+                size: values.size,
+                employees: values.employees?.length
+                  ? {
+                      connect: values.employees.map(employeeId => ({
+                        where: { node: { id: { eq: employeeId } } },
+                      })),
+                    }
+                  : undefined,
+              }
+
               await createCompanyMutation({
-                variables: { input: [values] }, // Array für createCompanies
+                variables: { input: [createInput] }, // Array für createCompanies
                 refetchQueries: [{ query: GET_COMPANIES }],
               })
               enqueueSnackbar(t('messages.createSuccess'), { variant: 'success' })

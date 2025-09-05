@@ -20,6 +20,7 @@ export type CompanyType = Pick<
   | 'size'
   | 'createdAt'
   | 'updatedAt'
+  | 'employees'
 >
 
 export interface FilterState {
@@ -55,4 +56,5 @@ export interface CompanyFormValues {
   industry?: string
   website?: string
   size?: CompanySize
+  employees?: string[] // IDs der zugeordneten Personen
 }
