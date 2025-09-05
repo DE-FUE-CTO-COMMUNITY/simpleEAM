@@ -17,6 +17,7 @@ import {
   ApplicationInterfaceIcon,
   BusinessObjectIcon,
   InfrastructureIcon,
+  AIComponentIcon,
 } from '@/components/icons'
 import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
@@ -81,6 +82,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
     { isDivider: true, text: 'divider', icon: null },
     { text: t('businessCapabilities'), icon: <BusinessCapabilityIcon />, href: '/capabilities' },
     { text: t('applications'), icon: <ApplicationComponentIcon />, href: '/applications' },
+    { text: t('aiComponents'), icon: <AIComponentIcon />, href: '/aicomponents' },
     { text: t('dataObjects'), icon: <BusinessObjectIcon />, href: '/dataobjects' },
     { text: t('interfaces'), icon: <ApplicationInterfaceIcon />, href: '/interfaces' },
     { text: t('infrastructure'), icon: <InfrastructureIcon />, href: '/infrastructure' },
