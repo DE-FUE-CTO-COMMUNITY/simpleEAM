@@ -35,9 +35,42 @@ const AicomponentsPage = () => {
 
   // Apollo Client-Operationen
   const { data, loading, error } = useQuery(GET_Aicomponents)
-  const [createAicomponentMutation] = useMutation(CREATE_Aicomponent)
-  const [updateAicomponentMutation] = useMutation(UPDATE_Aicomponent)
-  const [deleteAicomponentMutation] = useMutation(DELETE_Aicomponent)
+
+  // Mutation zum Erstellen einer neuen AI Component
+  const [createAicomponent, { loading: isCreating }] = useMutation(CREATE_Aicomponent, {
+    onCompleted: () => {
+      enqueueSnackbar(t('messages.createSuccess'), { variant: 'success' })
+    },
+    onError: error => {
+      enqueueSnackbar(`${t('messages.createError')}: ${error.message}`, {
+        variant: 'error',
+      })
+    },
+  })
+
+  // Mutation zum Aktualisieren einer bestehenden AI Component
+  const [updateAicomponent, { loading: isUpdating }] = useMutation(UPDATE_Aicomponent, {
+    onCompleted: () => {
+      enqueueSnackbar(t('messages.updateSuccess'), { variant: 'success' })
+    },
+    onError: error => {
+      enqueueSnackbar(`${t('messages.updateError')}: ${error.message}`, {
+        variant: 'error',
+      })
+    },
+  })
+
+  // Mutation zum Löschen einer AI Component
+  const [deleteAicomponent] = useMutation(DELETE_Aicomponent, {
+    onCompleted: () => {
+      enqueueSnackbar(t('messages.deleteSuccess'), { variant: 'success' })
+    },
+    onError: error => {
+      enqueueSnackbar(`${t('messages.deleteError')}: ${error.message}`, {
+        variant: 'error',
+      })
+    },
+  })
 
   // Filter Hook
   const { filterState, setFilterState, filteredAicomponents, resetFilters } = useAicomponentFilter({
@@ -117,6 +150,202 @@ const AicomponentsPage = () => {
     }
   }, [aicomponents])
 
+  // Handler für das Aktualisieren einer bestehenden AI Component
+  const handleUpdateAicomponentSubmit = async (id: string, data: AicomponentFormValues) => {
+    try {
+      // Separate relationship IDs from base data
+      const {
+        ownerId,
+        supportsCapabilityIds,
+        usedByApplicationIds,
+        trainedWithDataObjectIds,
+        hostedOnIds,
+        partOfArchitectureIds,
+        implementsPrincipleIds,
+        depictedInDiagramIds,
+        ...baseData
+      } = data
+
+      // Prepare update input with proper scalar mutations
+      const updateInput: Record<string, any> = {
+        name: { set: baseData.name },
+        description: { set: baseData.description },
+        aiType: { set: baseData.aiType },
+        status: { set: baseData.status },
+        tags: { set: baseData.tags || [] },
+      }
+
+      // Handle optional string fields - only set if not empty
+      if (baseData.model && baseData.model.trim() !== '') {
+        updateInput.model = { set: baseData.model }
+      }
+
+      if (baseData.version && baseData.version.trim() !== '') {
+        updateInput.version = { set: baseData.version }
+      }
+
+      if (baseData.provider && baseData.provider.trim() !== '') {
+        updateInput.provider = { set: baseData.provider }
+      }
+
+      if (baseData.license && baseData.license.trim() !== '') {
+        updateInput.license = { set: baseData.license }
+      }
+
+      // Handle date fields - only set if not empty
+      if (baseData.trainingDate && baseData.trainingDate.trim() !== '') {
+        updateInput.trainingDate = { set: baseData.trainingDate }
+      }
+
+      // Handle accuracy separately as it might be a number
+      if (baseData.accuracy !== undefined) {
+        updateInput.accuracy = { set: baseData.accuracy }
+      }
+
+      // Handle costs separately as it might be a number
+      if (baseData.costs !== undefined) {
+        updateInput.costs = { set: baseData.costs }
+      }
+
+      // Handle owners relationship (single owner)
+      if (ownerId !== undefined) {
+        if (ownerId) {
+          updateInput.owners = [
+            {
+              disconnect: [{ where: {} }],
+              connect: [{ where: { node: { id: { eq: ownerId } } } }],
+            },
+          ]
+        } else {
+          updateInput.owners = [{ disconnect: [{ where: {} }] }]
+        }
+      }
+
+      // Handle supportsCapabilities relationship
+      if (supportsCapabilityIds !== undefined) {
+        updateInput.supportsCapabilities = [
+          {
+            disconnect: [{ where: {} }],
+            ...(supportsCapabilityIds.length > 0
+              ? {
+                  connect: supportsCapabilityIds.map(capabilityId => ({
+                    where: { node: { id: { eq: capabilityId } } },
+                  })),
+                }
+              : {}),
+          },
+        ]
+      }
+
+      // Handle usedByApplications relationship
+      if (usedByApplicationIds !== undefined) {
+        updateInput.usedByApplications = [
+          {
+            disconnect: [{ where: {} }],
+            ...(usedByApplicationIds.length > 0
+              ? {
+                  connect: usedByApplicationIds.map(applicationId => ({
+                    where: { node: { id: { eq: applicationId } } },
+                  })),
+                }
+              : {}),
+          },
+        ]
+      }
+
+      // Handle trainedWithDataObjects relationship
+      if (trainedWithDataObjectIds !== undefined) {
+        updateInput.trainedWithDataObjects = [
+          {
+            disconnect: [{ where: {} }],
+            ...(trainedWithDataObjectIds.length > 0
+              ? {
+                  connect: trainedWithDataObjectIds.map(dataObjectId => ({
+                    where: { node: { id: { eq: dataObjectId } } },
+                  })),
+                }
+              : {}),
+          },
+        ]
+      }
+
+      // Handle hostedOn relationship
+      if (hostedOnIds !== undefined) {
+        updateInput.hostedOn = [
+          {
+            disconnect: [{ where: {} }],
+            ...(hostedOnIds.length > 0
+              ? {
+                  connect: hostedOnIds.map(infrastructureId => ({
+                    where: { node: { id: { eq: infrastructureId } } },
+                  })),
+                }
+              : {}),
+          },
+        ]
+      }
+
+      // Handle partOfArchitectures relationship
+      if (partOfArchitectureIds !== undefined) {
+        updateInput.partOfArchitectures = [
+          {
+            disconnect: [{ where: {} }],
+            ...(partOfArchitectureIds.length > 0
+              ? {
+                  connect: partOfArchitectureIds.map(architectureId => ({
+                    where: { node: { id: { eq: architectureId } } },
+                  })),
+                }
+              : {}),
+          },
+        ]
+      }
+
+      // Handle implementsPrinciples relationship
+      if (implementsPrincipleIds !== undefined) {
+        updateInput.implementsPrinciples = [
+          {
+            disconnect: [{ where: {} }],
+            ...(implementsPrincipleIds.length > 0
+              ? {
+                  connect: implementsPrincipleIds.map(principleId => ({
+                    where: { node: { id: { eq: principleId } } },
+                  })),
+                }
+              : {}),
+          },
+        ]
+      }
+
+      // Handle depictedInDiagrams relationship
+      if (depictedInDiagramIds !== undefined) {
+        updateInput.depictedInDiagrams = [
+          {
+            disconnect: [{ where: {} }],
+            ...(depictedInDiagramIds.length > 0
+              ? {
+                  connect: depictedInDiagramIds.map(diagramId => ({
+                    where: { node: { id: { eq: diagramId } } },
+                  })),
+                }
+              : {}),
+          },
+        ]
+      }
+
+      await updateAicomponent({
+        variables: {
+          where: { id: { eq: id } },
+          update: updateInput,
+        },
+        refetchQueries: [{ query: GET_Aicomponents }],
+      })
+    } catch (error) {
+      console.error('Fehler beim Aktualisieren der AI Component:', error)
+      throw error
+    }
+  }
+
   const handleCreate = () => {
     setShowNewAicomponentForm(true)
   }
@@ -180,196 +409,28 @@ const AicomponentsPage = () => {
             onTableReady={table => setTableInstance(table)}
             onCreateAicomponent={async data => {
               try {
-                await createAicomponentMutation({
+                await createAicomponent({
                   // Most create mutations expect an array input per generated schema
                   variables: { input: [data] },
                   refetchQueries: [{ query: GET_Aicomponents }],
                 })
-                enqueueSnackbar(t('messages.createSuccess'), { variant: 'success' })
               } catch (error) {
                 console.error('Fehler beim Erstellen des aicomponent:', error)
-                enqueueSnackbar(t('messages.createError'), { variant: 'error' })
                 throw error // Re-throw damit GenericTable den Fehler handhaben kann
               }
             }}
-            onUpdateAicomponent={async (id, data) => {
-              try {
-                // Separate relationship IDs from base data
-                const {
-                  ownerIds,
-                  companyIds,
-                  supportsCapabilityIds,
-                  usedByApplicationIds,
-                  trainedWithDataObjectIds,
-                  hostedOnIds,
-                  ...baseData
-                } = data
-
-                // Prepare update input with proper scalar mutations
-                const updateInput: Record<string, any> = {
-                  name: { set: baseData.name },
-                  description: { set: baseData.description },
-                  aiType: { set: baseData.aiType },
-                  status: { set: baseData.status },
-                  tags: { set: baseData.tags || [] },
-                }
-
-                // Handle optional string fields - only set if not empty
-                if (baseData.model && baseData.model.trim() !== '') {
-                  updateInput.model = { set: baseData.model }
-                }
-
-                if (baseData.version && baseData.version.trim() !== '') {
-                  updateInput.version = { set: baseData.version }
-                }
-
-                if (baseData.provider && baseData.provider.trim() !== '') {
-                  updateInput.provider = { set: baseData.provider }
-                }
-
-                if (baseData.license && baseData.license.trim() !== '') {
-                  updateInput.license = { set: baseData.license }
-                }
-
-                // Handle date fields - only set if not empty
-                if (baseData.trainingDate && baseData.trainingDate.trim() !== '') {
-                  updateInput.trainingDate = { set: baseData.trainingDate }
-                }
-
-                if (baseData.lastUpdated && baseData.lastUpdated.trim() !== '') {
-                  updateInput.lastUpdated = { set: baseData.lastUpdated }
-                }
-
-                // Handle accuracy separately as it might be a number
-                if (baseData.accuracy !== undefined) {
-                  updateInput.accuracy = { set: baseData.accuracy }
-                }
-
-                // Handle costs separately as it might be a number
-                if (baseData.costs !== undefined) {
-                  updateInput.costs = { set: baseData.costs }
-                }
-
-                // Handle owners relationship
-                if (ownerIds !== undefined) {
-                  if (ownerIds.length > 0) {
-                    updateInput.owners = [
-                      {
-                        disconnect: [{ where: {} }],
-                        connect: ownerIds.map(ownerId => ({
-                          where: { node: { id: { eq: ownerId } } },
-                        })),
-                      },
-                    ]
-                  } else {
-                    updateInput.owners = [{ disconnect: [{ where: {} }] }]
-                  }
-                }
-
-                // Handle company relationship
-                if (companyIds !== undefined) {
-                  if (companyIds.length > 0) {
-                    updateInput.company = [
-                      {
-                        disconnect: [{ where: {} }],
-                        connect: [{ where: { node: { id: { eq: companyIds[0] } } } }],
-                      },
-                    ]
-                  } else {
-                    updateInput.company = [{ disconnect: [{ where: {} }] }]
-                  }
-                }
-
-                // Handle supportsCapabilities relationship
-                if (supportsCapabilityIds !== undefined) {
-                  if (supportsCapabilityIds.length > 0) {
-                    updateInput.supportsCapabilities = [
-                      {
-                        disconnect: [{ where: {} }],
-                        connect: supportsCapabilityIds.map(capId => ({
-                          where: { node: { id: { eq: capId } } },
-                        })),
-                      },
-                    ]
-                  } else {
-                    updateInput.supportsCapabilities = [{ disconnect: [{ where: {} }] }]
-                  }
-                }
-
-                // Handle usedByApplications relationship
-                if (usedByApplicationIds !== undefined) {
-                  if (usedByApplicationIds.length > 0) {
-                    updateInput.usedByApplications = [
-                      {
-                        disconnect: [{ where: {} }],
-                        connect: usedByApplicationIds.map(appId => ({
-                          where: { node: { id: { eq: appId } } },
-                        })),
-                      },
-                    ]
-                  } else {
-                    updateInput.usedByApplications = [{ disconnect: [{ where: {} }] }]
-                  }
-                }
-
-                // Handle trainedWithDataObjects relationship
-                if (trainedWithDataObjectIds !== undefined) {
-                  if (trainedWithDataObjectIds.length > 0) {
-                    updateInput.trainedWithDataObjects = [
-                      {
-                        disconnect: [{ where: {} }],
-                        connect: trainedWithDataObjectIds.map(dataId => ({
-                          where: { node: { id: { eq: dataId } } },
-                        })),
-                      },
-                    ]
-                  } else {
-                    updateInput.trainedWithDataObjects = [{ disconnect: [{ where: {} }] }]
-                  }
-                }
-
-                // Handle hostedOn relationship
-                if (hostedOnIds !== undefined) {
-                  if (hostedOnIds.length > 0) {
-                    updateInput.hostedOn = [
-                      {
-                        disconnect: [{ where: {} }],
-                        connect: hostedOnIds.map(infraId => ({
-                          where: { node: { id: { eq: infraId } } },
-                        })),
-                      },
-                    ]
-                  } else {
-                    updateInput.hostedOn = [{ disconnect: [{ where: {} }] }]
-                  }
-                }
-
-                await updateAicomponentMutation({
-                  variables: {
-                    where: { id: { eq: id } },
-                    update: updateInput,
-                  },
-                  refetchQueries: [{ query: GET_Aicomponents }],
-                })
-                enqueueSnackbar(t('messages.updateSuccess'), { variant: 'success' })
-              } catch (error) {
-                console.error('Fehler beim Aktualisieren der AI-Komponente:', error)
-                enqueueSnackbar(t('messages.updateError'), { variant: 'error' })
-                throw error // Re-throw damit GenericTable den Fehler handhaben kann
-              }
-            }}
+            onUpdateAicomponent={handleUpdateAicomponentSubmit}
             onDeleteAicomponent={async id => {
               try {
-                await deleteAicomponentMutation({
+                await deleteAicomponent({
                   variables: {
                     where: { id: id },
                   },
                   refetchQueries: [{ query: GET_Aicomponents }],
                 })
-                enqueueSnackbar(t('messages.deleteSuccess'), { variant: 'success' })
               } catch (error) {
-                console.error('Fehler beim Löschen der AI-Komponente:', error)
-                enqueueSnackbar(t('messages.deleteError'), { variant: 'error' })
+                console.error('Fehler beim Löschen der AI Component:', error)
+                throw error
               }
             }}
           />
@@ -401,7 +462,7 @@ const AicomponentsPage = () => {
           isOpen={showNewAicomponentForm}
           onClose={() => setShowNewAicomponentForm(false)}
           mode="create"
-          onSubmit={async (values: AicomponentFormValues) => {
+          onSubmit={async values => {
             try {
               if (!selectedCompanyId) {
                 enqueueSnackbar('Bitte zuerst ein Unternehmen auswählen.', { variant: 'warning' })
@@ -409,11 +470,14 @@ const AicomponentsPage = () => {
               }
 
               const {
-                ownerIds,
+                ownerId,
                 supportsCapabilityIds,
                 usedByApplicationIds,
                 trainedWithDataObjectIds,
                 hostedOnIds,
+                partOfArchitectureIds,
+                implementsPrincipleIds,
+                depictedInDiagramIds,
                 ...aiComponentData
               } = values
 
@@ -427,19 +491,16 @@ const AicomponentsPage = () => {
                 status: aiComponentData.status,
                 accuracy: aiComponentData.accuracy,
                 trainingDate: aiComponentData.trainingDate || null,
-                lastUpdated: aiComponentData.lastUpdated || null,
                 provider: aiComponentData.provider,
                 license: aiComponentData.license,
                 costs: aiComponentData.costs,
                 tags: aiComponentData.tags,
 
-                // Wenn Besitzer ausgewählt wurden, verwenden wir die owners-Struktur
-                ...(ownerIds && ownerIds.length > 0
+                // Wenn ein Besitzer ausgewählt wurde, verwenden wir die owners-Struktur
+                ...(ownerId
                   ? {
                       owners: {
-                        connect: ownerIds.map(id => ({
-                          where: { node: { id: { eq: id } } },
-                        })),
+                        connect: [{ where: { node: { id: { eq: ownerId } } } }],
                       },
                     }
                   : {}),
@@ -488,25 +549,48 @@ const AicomponentsPage = () => {
                     }
                   : {}),
 
-                // Company-Zuordnung (Pflicht)
-                company: {
-                  connect: [
-                    {
-                      where: { node: { id: { eq: selectedCompanyId } } },
-                    },
-                  ],
-                },
+                // Wenn Architectures ausgewählt wurden, verbinden wir sie
+                ...(partOfArchitectureIds && partOfArchitectureIds.length > 0
+                  ? {
+                      partOfArchitectures: {
+                        connect: partOfArchitectureIds.map(id => ({
+                          where: { node: { id: { eq: id } } },
+                        })),
+                      },
+                    }
+                  : {}),
+
+                // Wenn Principles ausgewählt wurden, verbinden wir sie
+                ...(implementsPrincipleIds && implementsPrincipleIds.length > 0
+                  ? {
+                      implementsPrinciples: {
+                        connect: implementsPrincipleIds.map(id => ({
+                          where: { node: { id: { eq: id } } },
+                        })),
+                      },
+                    }
+                  : {}),
+
+                // Wenn Diagrams ausgewählt wurden, verbinden wir sie
+                ...(depictedInDiagramIds && depictedInDiagramIds.length > 0
+                  ? {
+                      depictedInDiagrams: {
+                        connect: depictedInDiagramIds.map(id => ({
+                          where: { node: { id: { eq: id } } },
+                        })),
+                      },
+                    }
+                  : {}),
               }
 
-              await createAicomponentMutation({
+              await createAicomponent({
                 variables: { input: [input] },
                 refetchQueries: [{ query: GET_Aicomponents }],
               })
-              enqueueSnackbar(t('messages.createSuccess'), { variant: 'success' })
               setShowNewAicomponentForm(false)
             } catch (error) {
               console.error('Fehler beim Erstellen der/des aicomponent:', error)
-              enqueueSnackbar(t('messages.createError'), { variant: 'error' })
+              throw error // Re-throw damit GenericTable den Fehler handhaben kann
             }
           }}
         />

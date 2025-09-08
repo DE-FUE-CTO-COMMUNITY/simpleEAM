@@ -27,10 +27,6 @@ export const GET_Aicomponents = gql`
         firstName
         lastName
       }
-      company {
-        id
-        name
-      }
       supportsCapabilities {
         id
         name
@@ -46,6 +42,18 @@ export const GET_Aicomponents = gql`
       hostedOn {
         id
         name
+      }
+      partOfArchitectures {
+        id
+        name
+      }
+      implementsPrinciples {
+        id
+        name
+      }
+      depictedInDiagrams {
+        id
+        title
       }
     }
   }
@@ -76,10 +84,6 @@ export const GET_Aicomponent = gql`
         firstName
         lastName
       }
-      company {
-        id
-        name
-      }
       supportsCapabilities {
         id
         name
@@ -95,6 +99,18 @@ export const GET_Aicomponent = gql`
       hostedOn {
         id
         name
+      }
+      partOfArchitectures {
+        id
+        name
+      }
+      implementsPrinciples {
+        id
+        name
+      }
+      depictedInDiagrams {
+        id
+        title
       }
     }
   }
@@ -126,10 +142,6 @@ export const CREATE_Aicomponent = gql`
           firstName
           lastName
         }
-        company {
-          id
-          name
-        }
         supportsCapabilities {
           id
           name
@@ -145,6 +157,18 @@ export const CREATE_Aicomponent = gql`
         hostedOn {
           id
           name
+        }
+        partOfArchitectures {
+          id
+          name
+        }
+        implementsPrinciples {
+          id
+          name
+        }
+        depictedInDiagrams {
+          id
+          title
         }
       }
     }
@@ -177,10 +201,6 @@ export const UPDATE_Aicomponent = gql`
           firstName
           lastName
         }
-        company {
-          id
-          name
-        }
         supportsCapabilities {
           id
           name
@@ -196,6 +216,18 @@ export const UPDATE_Aicomponent = gql`
         hostedOn {
           id
           name
+        }
+        partOfArchitectures {
+          id
+          name
+        }
+        implementsPrinciples {
+          id
+          name
+        }
+        depictedInDiagrams {
+          id
+          title
         }
       }
     }

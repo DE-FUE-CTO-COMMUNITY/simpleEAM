@@ -7,11 +7,13 @@ import {
   AiComponentType,
   AiComponentStatus,
   Person,
-  Company,
   BusinessCapability,
   Application,
   DataObject,
   Infrastructure,
+  Architecture,
+  ArchitecturePrinciple,
+  Diagram,
 } from '../../gql/generated'
 
 // Nutze den generierten Typ als Basis und passe ihn für unsere Komponenten an
@@ -34,12 +36,16 @@ export type AicomponentType = Pick<
   | 'createdAt'
   | 'updatedAt'
 > & {
+  createdAt: Date
+  updatedAt: Date
   owners?: Person[]
-  company?: Company[]
   supportsCapabilities?: BusinessCapability[]
   usedByApplications?: Application[]
   trainedWithDataObjects?: DataObject[]
   hostedOn?: Infrastructure[]
+  partOfArchitectures?: Architecture[]
+  implementsPrinciples?: ArchitecturePrinciple[]
+  depictedInDiagrams?: Diagram[]
 }
 
 // Form Values für AI Component Formulare
@@ -57,13 +63,44 @@ export interface AicomponentFormValues {
   license?: string
   costs?: number
   tags?: string[]
-  ownerIds?: string[]
-  companyIds?: string[]
+  ownerId?: string
   supportsCapabilityIds?: string[]
   usedByApplicationIds?: string[]
   trainedWithDataObjectIds?: string[]
   hostedOnIds?: string[]
+  partOfArchitectureIds?: string[]
+  implementsPrincipleIds?: string[]
+  depictedInDiagramIds?: string[]
 }
+
+// Column Visibility für Tables
+export type AicomponentTableColumnId =
+  | 'id'
+  | 'name'
+  | 'description'
+  | 'aiType'
+  | 'model'
+  | 'version'
+  | 'status'
+  | 'accuracy'
+  | 'trainingDate'
+  | 'lastUpdated'
+  | 'provider'
+  | 'license'
+  | 'costs'
+  | 'tags'
+  | 'owners'
+  | 'company'
+  | 'supportsCapabilities'
+  | 'usedByApplications'
+  | 'trainedWithDataObjects'
+  | 'hostedOn'
+  | 'partOfArchitectures'
+  | 'implementsPrinciples'
+  | 'depictedInDiagrams'
+  | 'createdAt'
+  | 'updatedAt'
+  | 'actions'
 
 export interface FilterState {
   aiTypeFilter: AiComponentType[]

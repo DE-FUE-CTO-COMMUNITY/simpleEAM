@@ -926,12 +926,16 @@
       "license": "Lizenz",
       "costs": "Jährliche Kosten",
       "tags": "Tags",
+      "owner": "Verantwortlicher",
       "owners": "Verantwortliche",
       "company": "Unternehmen",
       "supportsCapabilities": "Unterstützt Capabilities",
       "usedByApplications": "Verwendet von Applikationen",
       "trainedWithDataObjects": "Trainiert mit Datenobjekten",
-      "hostedOn": "Gehostet auf"
+      "hostedOn": "Gehostet auf",
+      "partOfArchitectures": "Teil von Architekturen",
+      "depictedInDiagrams": "Dargestellt in Diagrammen",
+      "implementsPrinciples": "Implementiert Prinzipien"
     },
     "table": {
       "id": "ID",
@@ -1009,7 +1013,9 @@
       "general": "Allgemein",
       "technical": "Technisch",
       "relationships": "Beziehungen",
-      "training": "Training"
+      "training": "Training",
+      "architectures": "Architekturen",
+      "principles": "Prinzipien"
     }
   },
   "dataObjects": {

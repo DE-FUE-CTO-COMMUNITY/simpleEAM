@@ -930,12 +930,16 @@
       "license": "License",
       "costs": "Annual Costs",
       "tags": "Tags",
+      "owner": "Owner",
       "owners": "Owners",
       "company": "Company",
       "supportsCapabilities": "Supports Capabilities",
       "usedByApplications": "Used by Applications",
       "trainedWithDataObjects": "Trained with Data Objects",
-      "hostedOn": "Hosted On"
+      "hostedOn": "Hosted On",
+      "partOfArchitectures": "Part of Architectures",
+      "depictedInDiagrams": "Depicted in Diagrams",
+      "implementsPrinciples": "Implements Principles"
     },
     "table": {
       "id": "ID",
@@ -1013,7 +1017,9 @@
       "general": "General",
       "technical": "Technical",
       "relationships": "Relationships",
-      "training": "Training"
+      "training": "Training",
+      "architectures": "Architectures",
+      "principles": "Principles"
     }
   },
   "dataObjects": {
