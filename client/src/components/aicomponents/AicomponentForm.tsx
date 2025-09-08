@@ -7,6 +7,7 @@ import { useQuery } from '@apollo/client'
 import { z } from 'zod'
 import { isArchitect } from '@/lib/auth'
 import {
+  AiComponent,
   AiComponentType,
   AiComponentStatus,
   Person,
@@ -34,10 +35,10 @@ import { GET_DIAGRAMS } from '@/graphql/diagram'
 export const aicomponentSchema = z.object({
   name: z.string().min(1, 'Name ist erforderlich'),
   description: z.string().optional(),
-  aiType: z.string().optional(),
+  aiType: z.nativeEnum(AiComponentType),
   model: z.string().optional(),
   version: z.string().optional(),
-  status: z.string().optional(),
+  status: z.nativeEnum(AiComponentStatus),
   accuracy: z.number().min(0).max(100).optional(),
   trainingDate: z.string().optional(),
   provider: z.string().optional(),
@@ -56,7 +57,7 @@ export const aicomponentSchema = z.object({
 
 export type AicomponentFormValues = z.infer<typeof aicomponentSchema>
 
-interface AicomponentFormProps extends GenericFormProps<any, AicomponentFormValues> {}
+export type AicomponentFormProps = GenericFormProps<AiComponent, AicomponentFormValues>
 
 export default function AicomponentForm({
   data: aicomponent,
@@ -97,7 +98,7 @@ export default function AicomponentForm({
     provider: aicomponent?.provider ?? '',
     license: aicomponent?.license ?? '',
     costs: aicomponent?.costs ?? undefined,
-    tags: aicomponent?.tags ?? '',
+    tags: Array.isArray(aicomponent?.tags) ? aicomponent.tags.join(', ') : (aicomponent?.tags ?? ''),
     ownerId: aicomponent?.owners?.[0]?.id ?? '',
     supportsCapabilityIds: aicomponent?.supportsCapabilities?.map((cap: any) => cap.id) ?? [],
     usedByApplicationIds: aicomponent?.usedByApplications?.map((app: any) => app.id) ?? [],
@@ -114,14 +115,18 @@ export default function AicomponentForm({
     defaultValues,
     onSubmit: async ({ value }) => {
       try {
+        console.log('🔍 AicomponentForm onSubmit called with value:', value)
+        
         // Validierung vor der Verarbeitung
         const validationResult = aicomponentSchema.safeParse(value)
 
         if (!validationResult.success) {
           console.error('❌ Validation failed:', validationResult.error.errors)
+          console.error('❌ Failed value:', value)
           throw new Error('Validierung fehlgeschlagen')
         }
 
+        console.log('✅ Validation passed, calling onSubmit')
         await onSubmit(value)
       } catch (error) {
         console.error('💥 AicomponentForm onSubmit error:', error)
@@ -129,8 +134,8 @@ export default function AicomponentForm({
       }
     },
     validators: {
+      // Verwende nur onChange-Validierung, nicht onSubmit um doppelte Validierung zu vermeiden
       onChange: aicomponentSchema,
-      onSubmit: aicomponentSchema,
     },
   })
 
@@ -149,7 +154,7 @@ export default function AicomponentForm({
         provider: aicomponent.provider ?? '',
         license: aicomponent.license ?? '',
         costs: aicomponent.costs ?? undefined,
-        tags: aicomponent.tags ?? '',
+        tags: Array.isArray(aicomponent.tags) ? aicomponent.tags.join(', ') : (aicomponent.tags ?? ''),
         ownerId: aicomponent.owners?.[0]?.id ?? '',
         supportsCapabilityIds: aicomponent.supportsCapabilities?.map((cap: any) => cap.id) ?? [],
         usedByApplicationIds: aicomponent.usedByApplications?.map((app: any) => app.id) ?? [],

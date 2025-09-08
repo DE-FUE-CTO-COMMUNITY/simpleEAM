@@ -198,14 +198,6 @@ const AicomponentTableWithGenericTable: React.FC<AicomponentTableProps> = ({
         },
         enableHiding: true,
       }),
-      columnHelper.accessor('company', {
-        header: t('company'),
-        cell: info => {
-          const value = info.getValue()
-          return value && value.length > 0 ? value.map(comp => comp.name).join(', ') : '-'
-        },
-        enableHiding: true,
-      }),
       columnHelper.accessor('createdAt', {
         header: t('createdAt'),
         cell: info => {
@@ -240,9 +232,8 @@ const AicomponentTableWithGenericTable: React.FC<AicomponentTableProps> = ({
       provider: aicomponent.provider ?? '',
       license: aicomponent.license ?? '',
       costs: aicomponent.costs ?? undefined,
-      tags: aicomponent.tags ?? [],
-      ownerIds: aicomponent.owners?.map(owner => owner.id) ?? [],
-      companyIds: aicomponent.company?.map(comp => comp.id) ?? [],
+      tags: Array.isArray(aicomponent.tags) ? aicomponent.tags : (aicomponent.tags ? [aicomponent.tags] : []),
+      ownerId: aicomponent.owners?.[0]?.id ?? '',
       supportsCapabilityIds: aicomponent.supportsCapabilities?.map(cap => cap.id) ?? [],
       usedByApplicationIds: aicomponent.usedByApplications?.map(app => app.id) ?? [],
       trainedWithDataObjectIds: aicomponent.trainedWithDataObjects?.map(obj => obj.id) ?? [],

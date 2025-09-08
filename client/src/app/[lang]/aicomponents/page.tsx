@@ -459,6 +459,34 @@ const AicomponentsPage = () => {
       {/* Create Form */}
       {showNewAicomponentForm && (
         <AicomponentForm
+          data={
+            {
+              id: '',
+              name: '',
+              description: '',
+              aiType: AiComponentType.OTHER,
+              model: '',
+              version: '',
+              status: AiComponentStatus.IN_DEVELOPMENT,
+              accuracy: null,
+              trainingDate: null,
+              provider: '',
+              license: '',
+              costs: null,
+              tags: '',
+              owners: [],
+              createdAt: new Date(0).toISOString(),
+              updatedAt: null,
+              supportsCapabilities: [],
+              usedByApplications: [],
+              trainedWithDataObjects: [],
+              hostedOn: [],
+              partOfArchitectures: [],
+              implementsPrinciples: [],
+              depictedInDiagrams: [],
+              __typename: 'AIComponent',
+            } as any
+          }
           isOpen={showNewAicomponentForm}
           onClose={() => setShowNewAicomponentForm(false)}
           mode="create"
