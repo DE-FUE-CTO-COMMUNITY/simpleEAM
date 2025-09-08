@@ -209,6 +209,15 @@ const createIconElement = (
         height: iconSize * 0.7,
       } as ExcalidrawElement
 
+    case 'aiComponent':
+      return {
+        ...baseIcon,
+        type: 'ellipse',
+        width: iconSize,
+        height: iconSize,
+        backgroundColor: '#e6ccff', // Light purple for AI components
+      } as ExcalidrawElement
+
     default:
       return null
   }
@@ -241,6 +250,13 @@ const getSecondaryText = (element: LibraryElement, elementType: ElementType): st
     case 'interface': {
       const iface = element as any
       if (iface.interfaceType) return iface.interfaceType
+      return ''
+    }
+
+    case 'aiComponent': {
+      const aiComp = element as any
+      if (aiComp.aiType) return aiComp.aiType
+      if (aiComp.vendor) return aiComp.vendor
       return ''
     }
 
@@ -288,6 +304,16 @@ const getTypeSpecificMetadata = (
       const iface = element as any
       return {
         interfaceType: iface.interfaceType,
+      }
+    }
+
+    case 'aiComponent': {
+      const aiComp = element as any
+      return {
+        aiType: aiComp.aiType,
+        vendor: aiComp.vendor,
+        version: aiComp.version,
+        status: aiComp.status,
       }
     }
 

@@ -8,6 +8,7 @@ export const GET_LIBRARY_ELEMENTS = gql`
     $dataWhere: DataObjectWhere
     $ifaceWhere: ApplicationInterfaceWhere
     $infraWhere: InfrastructureWhere
+    $aiWhere: AIComponentWhere
   ) {
     businessCapabilities(where: $capWhere) {
       id
@@ -56,6 +57,20 @@ export const GET_LIBRARY_ELEMENTS = gql`
       vendor
       version
       location
+    }
+    aiComponents(where: $aiWhere) {
+      id
+      name
+      description
+      aiType
+      model
+      version
+      provider
+      status
+      company {
+        id
+        name
+      }
     }
   }
 `
@@ -114,12 +129,28 @@ export interface LibraryInfrastructure {
   location?: string
 }
 
+export interface LibraryAiComponent {
+  id: string
+  name: string
+  description?: string
+  aiType?: string
+  model?: string
+  version?: string
+  provider?: string
+  status?: string
+  company?: {
+    id: string
+    name: string
+  }
+}
+
 export interface LibraryElementsResponse {
   businessCapabilities: LibraryCapability[]
   applications: LibraryApplication[]
   dataObjects: LibraryDataObject[]
   applicationInterfaces: LibraryInterface[]
   infrastructures: LibraryInfrastructure[]
+  aiComponents: LibraryAiComponent[]
 }
 
 export type LibraryElement =
@@ -128,6 +159,7 @@ export type LibraryElement =
   | LibraryDataObject
   | LibraryInterface
   | LibraryInfrastructure
+  | LibraryAiComponent
 
 export const ELEMENT_TYPE_CONFIG = {
   capability: {
@@ -159,6 +191,11 @@ export const ELEMENT_TYPE_CONFIG = {
     label: 'Infrastruktur',
     color: '#2f9e44',
     iconType: 'cube',
+  },
+  aiComponent: {
+    label: 'AI Components',
+    color: '#e6ccff',
+    iconType: 'ai-brain',
   },
 } as const
 

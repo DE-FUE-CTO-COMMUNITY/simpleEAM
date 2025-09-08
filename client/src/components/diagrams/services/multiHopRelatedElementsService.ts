@@ -5,7 +5,13 @@ import { loadRelatedElementsFromDatabase } from './databaseRelatedElementsServic
 export interface MultiHopNode {
   id: string
   name: string
-  elementType: 'interface' | 'application' | 'capability' | 'dataObject' | 'infrastructure'
+  elementType:
+    | 'interface'
+    | 'application'
+    | 'capability'
+    | 'dataObject'
+    | 'infrastructure'
+    | 'aiComponent'
   hop: number
   parentId?: string
 

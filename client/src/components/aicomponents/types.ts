@@ -14,6 +14,7 @@ import {
   Architecture,
   ArchitecturePrinciple,
   Diagram,
+  Company,
 } from '../../gql/generated'
 
 // Nutze den generierten Typ als Basis und passe ihn für unsere Komponenten an
@@ -39,6 +40,7 @@ export type AicomponentType = Pick<
   createdAt: Date
   updatedAt: Date
   owners?: Person[]
+  company?: Company[]
   supportsCapabilities?: BusinessCapability[]
   usedByApplications?: Application[]
   trainedWithDataObjects?: DataObject[]

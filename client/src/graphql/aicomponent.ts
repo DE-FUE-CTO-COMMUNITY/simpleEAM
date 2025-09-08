@@ -27,6 +27,10 @@ export const GET_Aicomponents = gql`
         firstName
         lastName
       }
+      company {
+        id
+        name
+      }
       supportsCapabilities {
         id
         name
@@ -83,6 +87,10 @@ export const GET_Aicomponent = gql`
         id
         firstName
         lastName
+      }
+      company {
+        id
+        name
       }
       supportsCapabilities {
         id
@@ -142,6 +150,10 @@ export const CREATE_Aicomponent = gql`
           firstName
           lastName
         }
+        company {
+          id
+          name
+        }
         supportsCapabilities {
           id
           name
@@ -200,6 +212,10 @@ export const UPDATE_Aicomponent = gql`
           id
           firstName
           lastName
+        }
+        company {
+          id
+          name
         }
         supportsCapabilities {
           id

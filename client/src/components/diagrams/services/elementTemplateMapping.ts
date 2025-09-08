@@ -9,6 +9,7 @@ export const getArchimateTemplateName = (elementType: string): string => {
     interface: 'Application Interface',
     applicationInterface: 'Application Interface',
     infrastructure: 'Infrastruktur', // Deutsch statt 'Node'
+    aiComponent: 'AI Component',
   }
   return mapping[elementType] || elementType
 }

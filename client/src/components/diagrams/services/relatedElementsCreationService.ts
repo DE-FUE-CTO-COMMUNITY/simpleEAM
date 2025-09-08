@@ -13,6 +13,7 @@ import {
   createDataObjectElementsFromTemplate,
   createInterfaceElementsFromTemplate,
   createInfrastructureElementsFromTemplate,
+  createAiComponentElementsFromTemplate,
 } from '../utils/elementCreation'
 
 // Extended RelatedElement interface mit reverseArrow support
@@ -20,7 +21,13 @@ export interface RelatedElement {
   id: string
   name: string
   description?: string
-  elementType: 'capability' | 'application' | 'dataObject' | 'interface' | 'infrastructure'
+  elementType:
+    | 'capability'
+    | 'application'
+    | 'dataObject'
+    | 'interface'
+    | 'infrastructure'
+    | 'aiComponent'
   relationshipType?: string
   reverseArrow?: boolean
   status?: string
@@ -138,6 +145,13 @@ export const createExcalidrawElementsFromRelated = async (
       )
     } else if (relatedElement.elementType === 'infrastructure') {
       createdElements = createInfrastructureElementsFromTemplate(
+        relatedElement,
+        template,
+        position.x,
+        position.y
+      )
+    } else if (relatedElement.elementType === 'aiComponent') {
+      createdElements = createAiComponentElementsFromTemplate(
         relatedElement,
         template,
         position.x,

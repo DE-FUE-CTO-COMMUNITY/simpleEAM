@@ -9,6 +9,7 @@ import { useTranslations } from 'next-intl'
 import { Table } from '@tanstack/react-table'
 import { isArchitect } from '@/lib/auth'
 import { useCompanyContext } from '@/contexts/CompanyContext'
+import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 
 import {
   GET_Aicomponents,
@@ -34,12 +35,18 @@ const AicomponentsPage = () => {
   const [sorting, setSorting] = useState([{ id: 'name', desc: false }])
 
   // Apollo Client-Operationen
-  const { data, loading, error } = useQuery(GET_Aicomponents)
+  const companyWhere = useCompanyWhere('company')
+  const { data, loading, error, refetch } = useQuery(GET_Aicomponents, {
+    fetchPolicy: 'cache-and-network',
+    variables: { where: companyWhere },
+  })
 
   // Mutation zum Erstellen einer neuen AI Component
   const [createAicomponent, { loading: isCreating }] = useMutation(CREATE_Aicomponent, {
     onCompleted: () => {
       enqueueSnackbar(t('messages.createSuccess'), { variant: 'success' })
+      // Refetch mit aktivem Company-Filter, damit neu erstellte AI Component sofort sichtbar ist
+      refetch({ where: companyWhere })
     },
     onError: error => {
       enqueueSnackbar(`${t('messages.createError')}: ${error.message}`, {
@@ -52,6 +59,7 @@ const AicomponentsPage = () => {
   const [updateAicomponent, { loading: isUpdating }] = useMutation(UPDATE_Aicomponent, {
     onCompleted: () => {
       enqueueSnackbar(t('messages.updateSuccess'), { variant: 'success' })
+      refetch()
     },
     onError: error => {
       enqueueSnackbar(`${t('messages.updateError')}: ${error.message}`, {
@@ -64,6 +72,7 @@ const AicomponentsPage = () => {
   const [deleteAicomponent] = useMutation(DELETE_Aicomponent, {
     onCompleted: () => {
       enqueueSnackbar(t('messages.deleteSuccess'), { variant: 'success' })
+      refetch()
     },
     onError: error => {
       enqueueSnackbar(`${t('messages.deleteError')}: ${error.message}`, {
@@ -609,11 +618,27 @@ const AicomponentsPage = () => {
                       },
                     }
                   : {}),
+
+                // Company-Zuordnung (Pflicht)
+                company: {
+                  connect: [
+                    {
+                      where: { node: { id: { eq: selectedCompanyId } } },
+                    },
+                  ],
+                },
               }
 
               await createAicomponent({
                 variables: { input: [input] },
-                refetchQueries: [{ query: GET_Aicomponents }],
+                // Sicherheitshalber: aktualisiere auch die Liste im Cache via Refetch Query mit Filter
+                refetchQueries: [
+                  {
+                    query: GET_Aicomponents,
+                    variables: { where: companyWhere },
+                  },
+                ],
+                awaitRefetchQueries: true,
               })
               setShowNewAicomponentForm(false)
             } catch (error) {

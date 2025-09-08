@@ -11,6 +11,7 @@ import {
   createDataObjectElementsFromTemplate,
   createInterfaceElementsFromTemplate,
   createInfrastructureElementsFromTemplate,
+  createAiComponentElementsFromTemplate,
 } from './elementCreation'
 // import { calculateElementPositions } from '../services/positioningService' // (nicht mehr benötigt im Span-Layout)
 import {
@@ -93,7 +94,8 @@ export const loadAndCreateRelatedElements = async (
         position: config.position || 'right',
         spacing: 50,
         distance: config.distance || 100,
-        arrowType: (config.arrowType === 'curved' || config.arrowType === 'elbow' ? 'rounded' : 'sharp'),
+        arrowType:
+          config.arrowType === 'curved' || config.arrowType === 'elbow' ? 'rounded' : 'sharp',
         arrowGap: (config.arrowGap === 'none' ? 'small' : config.arrowGap) || 'medium',
       },
     })
@@ -200,6 +202,9 @@ export const loadAndCreateRelatedElements = async (
           break
         case 'infrastructure':
           created = createInfrastructureElementsFromTemplate(el, template, x, y)
+          break
+        case 'aiComponent':
+          created = createAiComponentElementsFromTemplate(el, template, x, y)
           break
         default:
           console.warn('[MultiHop][Placement] Unbekannter Typ', el.elementType)

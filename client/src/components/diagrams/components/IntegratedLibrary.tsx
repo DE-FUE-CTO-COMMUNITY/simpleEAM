@@ -29,6 +29,7 @@ const IntegratedLibrary: React.FC<IntegratedLibraryProps> = ({
       dataWhere: companyWhere,
       ifaceWhere: companyWhere,
       infraWhere: companyWhere,
+      aiWhere: companyWhere,
     },
   })
 
@@ -59,6 +60,7 @@ const IntegratedLibrary: React.FC<IntegratedLibraryProps> = ({
       dataObject: findArchimateTemplate(archimateLibrary, 'Business Object'),
       applicationInterface: findArchimateTemplate(archimateLibrary, 'Application Interface'),
       infrastructure: findArchimateTemplate(archimateLibrary, 'Infrastruktur'),
+      aiComponent: findArchimateTemplate(archimateLibrary, 'AI Component'),
     }
 
     const newLibraryItems: any[] = []
@@ -93,6 +95,24 @@ const IntegratedLibrary: React.FC<IntegratedLibraryProps> = ({
           templates.application
         )
         if (libraryItem) newLibraryItems.push(libraryItem)
+      })
+    }
+
+    if (data.aiComponents) {
+      // Sort AI components alphabetically by name
+      const sortedAiComponents = [...data.aiComponents].sort((a: any, b: any) =>
+        a.name.localeCompare(b.name, 'de', { sensitivity: 'base' })
+      )
+
+      sortedAiComponents.forEach((aiComponent: any) => {
+        const libraryItem = createLibraryItemFromDatabaseElement(
+          aiComponent,
+          'aiComponent',
+          templates.aiComponent
+        )
+        if (libraryItem) {
+          newLibraryItems.push(libraryItem)
+        }
       })
     }
 
