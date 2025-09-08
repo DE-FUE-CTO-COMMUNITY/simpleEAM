@@ -910,7 +910,8 @@
       "updateSuccess": "KI-Komponente erfolgreich aktualisiert",
       "updateError": "Fehler beim Aktualisieren der KI-Komponente",
       "deleteSuccess": "KI-Komponente erfolgreich gelöscht",
-      "deleteError": "Fehler beim Löschen der KI-Komponente"
+      "deleteError": "Fehler beim Löschen der KI-Komponente",
+      "selectCompanyFirst": "Bitte zuerst ein Unternehmen auswählen."
     },
     "form": {
       "name": "Name",
@@ -1016,7 +1017,8 @@
       "training": "Training",
       "architectures": "Architekturen",
       "principles": "Prinzipien"
-    }
+    },
+    "entityName": "KI-Komponente"
   },
   "dataObjects": {
     "title": "Datenobjekte",

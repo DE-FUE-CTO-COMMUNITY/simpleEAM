@@ -429,7 +429,7 @@ const AicomponentsPage = () => {
                   refetchQueries: [{ query: GET_Aicomponents }],
                 })
               } catch (error) {
-                console.error('Fehler beim Löschen der AI Component:', error)
+                console.error('Error deleting AI Component:', error)
                 throw error
               }
             }}
@@ -493,7 +493,7 @@ const AicomponentsPage = () => {
           onSubmit={async values => {
             try {
               if (!selectedCompanyId) {
-                enqueueSnackbar('Bitte zuerst ein Unternehmen auswählen.', { variant: 'warning' })
+                enqueueSnackbar(t('messages.selectCompanyFirst'), { variant: 'warning' })
                 return
               }
 

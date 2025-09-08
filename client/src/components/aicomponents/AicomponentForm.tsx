@@ -31,31 +31,28 @@ import { GET_ARCHITECTURES } from '@/graphql/architecture'
 import { GET_ARCHITECTURE_PRINCIPLES } from '@/graphql/architecturePrinciple'
 import { GET_DIAGRAMS } from '@/graphql/diagram'
 
-// Schema für die Formularvalidierung
-export const aicomponentSchema = z.object({
-  name: z.string().min(1, 'Name ist erforderlich'),
-  description: z.string().optional(),
-  aiType: z.nativeEnum(AiComponentType),
-  model: z.string().optional(),
-  version: z.string().optional(),
-  status: z.nativeEnum(AiComponentStatus),
-  accuracy: z.number().min(0).max(100).optional(),
-  trainingDate: z.string().optional(),
-  provider: z.string().optional(),
-  license: z.string().optional(),
-  costs: z.number().min(0).optional(),
-  tags: z.string().optional(),
-  ownerId: z.string().optional(),
-  supportsCapabilityIds: z.array(z.string()).optional(),
-  usedByApplicationIds: z.array(z.string()).optional(),
-  trainedWithDataObjectIds: z.array(z.string()).optional(),
-  hostedOnIds: z.array(z.string()).optional(),
-  partOfArchitectureIds: z.array(z.string()).optional(),
-  implementsPrincipleIds: z.array(z.string()).optional(),
-  depictedInDiagramIds: z.array(z.string()).optional(),
-})
-
-export type AicomponentFormValues = z.infer<typeof aicomponentSchema>
+export type AicomponentFormValues = {
+  name: string
+  description?: string
+  aiType: AiComponentType
+  model?: string
+  version?: string
+  status: AiComponentStatus
+  accuracy?: number
+  trainingDate?: string
+  provider?: string
+  license?: string
+  costs?: number
+  tags?: string
+  ownerId?: string
+  supportsCapabilityIds?: string[]
+  usedByApplicationIds?: string[]
+  trainedWithDataObjectIds?: string[]
+  hostedOnIds?: string[]
+  partOfArchitectureIds?: string[]
+  implementsPrincipleIds?: string[]
+  depictedInDiagramIds?: string[]
+}
 
 export type AicomponentFormProps = GenericFormProps<AiComponent, AicomponentFormValues>
 
@@ -70,9 +67,35 @@ export default function AicomponentForm({
   onEditMode,
 }: AicomponentFormProps) {
   const t = useTranslations('aicomponents.form')
+  const tGeneral = useTranslations('aicomponents')
   const tTabs = useTranslations('aicomponents.tabs')
+  const tValidation = useTranslations('forms.validation')
   const getAiTypeLabel = useAiTypeLabel()
   const getStatusLabel = useStatusLabel()
+
+  // Schema für die Formularvalidierung mit internationalisierten Fehlermeldungen
+  const aicomponentSchema = z.object({
+    name: z.string().min(1, tValidation('required')),
+    description: z.string().optional(),
+    aiType: z.nativeEnum(AiComponentType),
+    model: z.string().optional(),
+    version: z.string().optional(),
+    status: z.nativeEnum(AiComponentStatus),
+    accuracy: z.number().min(0).max(100).optional(),
+    trainingDate: z.string().optional(),
+    provider: z.string().optional(),
+    license: z.string().optional(),
+    costs: z.number().min(0).optional(),
+    tags: z.string().optional(),
+    ownerId: z.string().optional(),
+    supportsCapabilityIds: z.array(z.string()).optional(),
+    usedByApplicationIds: z.array(z.string()).optional(),
+    trainedWithDataObjectIds: z.array(z.string()).optional(),
+    hostedOnIds: z.array(z.string()).optional(),
+    partOfArchitectureIds: z.array(z.string()).optional(),
+    implementsPrincipleIds: z.array(z.string()).optional(),
+    depictedInDiagramIds: z.array(z.string()).optional(),
+  })
 
   // GraphQL Queries für Relationship-Daten
   const { data: personsData, loading: personsLoading } = useQuery(GET_PERSONS)
@@ -98,7 +121,9 @@ export default function AicomponentForm({
     provider: aicomponent?.provider ?? '',
     license: aicomponent?.license ?? '',
     costs: aicomponent?.costs ?? undefined,
-    tags: Array.isArray(aicomponent?.tags) ? aicomponent.tags.join(', ') : (aicomponent?.tags ?? ''),
+    tags: Array.isArray(aicomponent?.tags)
+      ? aicomponent.tags.join(', ')
+      : (aicomponent?.tags ?? ''),
     ownerId: aicomponent?.owners?.[0]?.id ?? '',
     supportsCapabilityIds: aicomponent?.supportsCapabilities?.map((cap: any) => cap.id) ?? [],
     usedByApplicationIds: aicomponent?.usedByApplications?.map((app: any) => app.id) ?? [],
@@ -116,14 +141,14 @@ export default function AicomponentForm({
     onSubmit: async ({ value }) => {
       try {
         console.log('🔍 AicomponentForm onSubmit called with value:', value)
-        
+
         // Validierung vor der Verarbeitung
         const validationResult = aicomponentSchema.safeParse(value)
 
         if (!validationResult.success) {
           console.error('❌ Validation failed:', validationResult.error.errors)
           console.error('❌ Failed value:', value)
-          throw new Error('Validierung fehlgeschlagen')
+          throw new Error('Validation failed')
         }
 
         console.log('✅ Validation passed, calling onSubmit')
@@ -154,7 +179,9 @@ export default function AicomponentForm({
         provider: aicomponent.provider ?? '',
         license: aicomponent.license ?? '',
         costs: aicomponent.costs ?? undefined,
-        tags: Array.isArray(aicomponent.tags) ? aicomponent.tags.join(', ') : (aicomponent.tags ?? ''),
+        tags: Array.isArray(aicomponent.tags)
+          ? aicomponent.tags.join(', ')
+          : (aicomponent.tags ?? ''),
         ownerId: aicomponent.owners?.[0]?.id ?? '',
         supportsCapabilityIds: aicomponent.supportsCapabilities?.map((cap: any) => cap.id) ?? [],
         usedByApplicationIds: aicomponent.usedByApplications?.map((app: any) => app.id) ?? [],
@@ -191,7 +218,6 @@ export default function AicomponentForm({
       type: 'text',
       required: true,
       tabId: 'general',
-      validators: aicomponentSchema.shape.name,
       size: { xs: 12, md: 6 },
     },
     {
@@ -409,10 +435,10 @@ export default function AicomponentForm({
     <GenericForm
       title={
         mode === 'create'
-          ? 'Neue AI Komponente erstellen'
+          ? tGeneral('createTitle')
           : mode === 'edit'
-            ? 'AI Komponente bearbeiten'
-            : 'AI Komponenten-Details'
+            ? tGeneral('editTitle')
+            : tGeneral('viewTitle')
       }
       isOpen={isOpen}
       onClose={onClose}
@@ -426,7 +452,7 @@ export default function AicomponentForm({
       onDelete={aicomponent?.id ? () => onDelete?.(aicomponent.id) : undefined}
       onEditMode={onEditMode}
       entityId={aicomponent?.id}
-      entityName="AI Komponente"
+      entityName={tGeneral('entityName')}
       metadata={
         aicomponent
           ? {

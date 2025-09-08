@@ -914,7 +914,8 @@
       "updateSuccess": "AI component updated successfully",
       "updateError": "Error updating AI component",
       "deleteSuccess": "AI component deleted successfully",
-      "deleteError": "Error deleting AI component"
+      "deleteError": "Error deleting AI component",
+      "selectCompanyFirst": "Please select a company first."
     },
     "form": {
       "name": "Name",
@@ -1020,7 +1021,8 @@
       "training": "Training",
       "architectures": "Architectures",
       "principles": "Principles"
-    }
+    },
+    "entityName": "AI Component"
   },
   "dataObjects": {
     "title": "Data Objects",

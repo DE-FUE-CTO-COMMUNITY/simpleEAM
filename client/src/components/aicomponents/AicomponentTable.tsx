@@ -232,7 +232,11 @@ const AicomponentTableWithGenericTable: React.FC<AicomponentTableProps> = ({
       provider: aicomponent.provider ?? '',
       license: aicomponent.license ?? '',
       costs: aicomponent.costs ?? undefined,
-      tags: Array.isArray(aicomponent.tags) ? aicomponent.tags : (aicomponent.tags ? [aicomponent.tags] : []),
+      tags: Array.isArray(aicomponent.tags)
+        ? aicomponent.tags
+        : aicomponent.tags
+          ? [aicomponent.tags]
+          : [],
       ownerId: aicomponent.owners?.[0]?.id ?? '',
       supportsCapabilityIds: aicomponent.supportsCapabilities?.map(cap => cap.id) ?? [],
       usedByApplicationIds: aicomponent.usedByApplications?.map(app => app.id) ?? [],
