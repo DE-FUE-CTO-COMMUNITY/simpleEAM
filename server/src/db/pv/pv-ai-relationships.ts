@@ -94,39 +94,39 @@ export async function createAIComponentRelationships(session: Session) {
       
     CREATE 
       // Quality Prediction used by MES and Quality Systems
-      (mes_solar)-[:USES]->(quality_prediction),
-      (quality_solar)-[:USES]->(quality_prediction),
+      (mes_solar)-[:USED_BY]->(quality_prediction),
+      (quality_solar)-[:USED_BY]->(quality_prediction),
       
       // Defect Detection used by Quality System
-      (quality_solar)-[:USES]->(defect_detection),
+      (quality_solar)-[:USED_BY]->(defect_detection),
       
       // Maintenance Predictor used by ServiceNow
-      (servicenow)-[:USES]->(maintenance_predictor),
+      (servicenow)-[:USED_BY]->(maintenance_predictor),
       
       // Demand Forecaster used by SAP S/4HANA and Salesforce
-      (sap_s4hana)-[:USES]->(demand_forecaster),
-      (salesforce_crm)-[:USES]->(demand_forecaster),
+      (sap_s4hana)-[:USED_BY]->(demand_forecaster),
+      (salesforce_crm)-[:USED_BY]->(demand_forecaster),
       
       // Customer Chatbot used by Zendesk Support
-      (zendesk_service)-[:USES]->(customer_chatbot),
+      (zendesk_service)-[:USED_BY]->(customer_chatbot),
       
       // Supply Optimizer used by Oracle SCM
-      (oracle_scm)-[:USES]->(supply_optimizer),
+      (oracle_scm)-[:USED_BY]->(supply_optimizer),
       
       // Energy Forecaster used by Power BI and R&D Platform
-      (power_bi)-[:USES]->(energy_forecaster),
-      (rd_platform)-[:USES]->(energy_forecaster),
+      (power_bi)-[:USED_BY]->(energy_forecaster),
+      (rd_platform)-[:USED_BY]->(energy_forecaster),
       
       // Product Recommender used by HubSpot Marketing and Salesforce
-      (hubspot_marketing)-[:USES]->(product_recommender),
-      (salesforce_crm)-[:USES]->(product_recommender),
+      (hubspot_marketing)-[:USED_BY]->(product_recommender),
+      (salesforce_crm)-[:USED_BY]->(product_recommender),
       
       // Pricing Engine used by SAP S/4HANA
-      (sap_s4hana)-[:USES]->(pricing_engine),
+      (sap_s4hana)-[:USED_BY]->(pricing_engine),
       
       // Sustainability Analyzer used by R&D Platform and Power BI
-      (rd_platform)-[:USES]->(sustainability_analyzer),
-      (power_bi)-[:USES]->(sustainability_analyzer)
+      (rd_platform)-[:USED_BY]->(sustainability_analyzer),
+      (power_bi)-[:USED_BY]->(sustainability_analyzer)
   `)
 
   // ===== AI COMPONENTS TRAINED WITH DATA OBJECTS =====

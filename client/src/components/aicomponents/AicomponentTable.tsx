@@ -31,11 +31,13 @@ export const Aicomponents_DEFAULT_COLUMN_VISIBILITY = {
   costs: false,
   tags: false,
   owners: false,
-  company: false,
   supportsCapabilities: false,
   usedByApplications: false,
   trainedWithDataObjects: false,
   hostedOn: false,
+  partOfArchitectures: false,
+  implementsPrinciples: false,
+  depictedInDiagrams: false,
   updatedAt: false,
 } as const
 
@@ -198,6 +200,76 @@ const AicomponentTableWithGenericTable: React.FC<AicomponentTableProps> = ({
         },
         enableHiding: true,
       }),
+      columnHelper.accessor('supportsCapabilities', {
+        header: t('supportsCapabilities'),
+        cell: info => {
+          const value = info.getValue()
+          return value && value.length > 0
+            ? value.map(cap => cap.name).join(', ')
+            : '-'
+        },
+        enableHiding: true,
+      }),
+      columnHelper.accessor('usedByApplications', {
+        header: t('usedByApplications'),
+        cell: info => {
+          const value = info.getValue()
+          return value && value.length > 0
+            ? value.map(app => app.name).join(', ')
+            : '-'
+        },
+        enableHiding: true,
+      }),
+      columnHelper.accessor('trainedWithDataObjects', {
+        header: t('trainedWithDataObjects'),
+        cell: info => {
+          const value = info.getValue()
+          return value && value.length > 0
+            ? value.map(data => data.name).join(', ')
+            : '-'
+        },
+        enableHiding: true,
+      }),
+      columnHelper.accessor('hostedOn', {
+        header: t('hostedOn'),
+        cell: info => {
+          const value = info.getValue()
+          return value && value.length > 0
+            ? value.map(infra => infra.name).join(', ')
+            : '-'
+        },
+        enableHiding: true,
+      }),
+      columnHelper.accessor('partOfArchitectures', {
+        header: t('partOfArchitectures'),
+        cell: info => {
+          const value = info.getValue()
+          return value && value.length > 0
+            ? value.map(arch => arch.name).join(', ')
+            : '-'
+        },
+        enableHiding: true,
+      }),
+      columnHelper.accessor('implementsPrinciples', {
+        header: t('implementsPrinciples'),
+        cell: info => {
+          const value = info.getValue()
+          return value && value.length > 0
+            ? value.map(principle => principle.name).join(', ')
+            : '-'
+        },
+        enableHiding: true,
+      }),
+      columnHelper.accessor('depictedInDiagrams', {
+        header: t('depictedInDiagrams'),
+        cell: info => {
+          const value = info.getValue()
+          return value && value.length > 0
+            ? value.map(diagram => diagram.title).join(', ')
+            : '-'
+        },
+        enableHiding: true,
+      }),
       columnHelper.accessor('createdAt', {
         header: t('createdAt'),
         cell: info => {
@@ -242,6 +314,9 @@ const AicomponentTableWithGenericTable: React.FC<AicomponentTableProps> = ({
       usedByApplicationIds: aicomponent.usedByApplications?.map(app => app.id) ?? [],
       trainedWithDataObjectIds: aicomponent.trainedWithDataObjects?.map(obj => obj.id) ?? [],
       hostedOnIds: aicomponent.hostedOn?.map(infra => infra.id) ?? [],
+      partOfArchitectureIds: aicomponent.partOfArchitectures?.map(arch => arch.id) ?? [],
+      implementsPrincipleIds: aicomponent.implementsPrinciples?.map(principle => principle.id) ?? [],
+      depictedInDiagramIds: aicomponent.depictedInDiagrams?.map(diagram => diagram.id) ?? [],
     }
   }
 
