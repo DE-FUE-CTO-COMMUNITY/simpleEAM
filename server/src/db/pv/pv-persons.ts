@@ -172,6 +172,39 @@ export async function createPersons(session: Session) {
       phone: "+1-555-0903",
       createdAt: datetime(),
       updatedAt: datetime()
+    }),
+    (data_scientist:Person {
+      id: "person-data-scientist",
+      firstName: "Dr. Alex",
+      lastName: "Chen",
+      email: "alex.chen@solarpanel.com",
+      department: "Data Science",
+      role: "Lead Data Scientist",
+      phone: "+1-555-1001",
+      createdAt: datetime(),
+      updatedAt: datetime()
+    }),
+    (ml_engineer:Person {
+      id: "person-ml-engineer",
+      firstName: "Sarah",
+      lastName: "Kumar",
+      email: "sarah.kumar@solarpanel.com",
+      department: "Data Science",
+      role: "ML Engineer",
+      phone: "+1-555-1002",
+      createdAt: datetime(),
+      updatedAt: datetime()
+    }),
+    (ai_product_manager:Person {
+      id: "person-ai-product-manager",
+      firstName: "Michael",
+      lastName: "Taylor",
+      email: "michael.taylor@solarpanel.com",
+      department: "Product Management",
+      role: "AI Product Manager",
+      phone: "+1-555-1003",
+      createdAt: datetime(),
+      updatedAt: datetime()
     })
   `)
 

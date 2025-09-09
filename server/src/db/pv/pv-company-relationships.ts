@@ -92,6 +92,18 @@ export async function associateEntitiesWithCompany(session: Session): Promise<vo
 
   console.log('✓ AI Assets associated with company')
 
+  // Associate all AI Components with Company
+  await session.run(
+    `
+    MATCH (aiComponent:AIComponent), (company:Company {id: $companyId})
+    WHERE aiComponent.id STARTS WITH "ai-"
+    CREATE (aiComponent)-[:OWNED_BY]->(company)
+  `,
+    { companyId }
+  )
+
+  console.log('✓ AI Components associated with company')
+
   // Associate all Architectures with Company
   await session.run(
     `

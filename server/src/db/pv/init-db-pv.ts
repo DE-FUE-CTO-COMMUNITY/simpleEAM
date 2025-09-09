@@ -34,6 +34,8 @@ import {
   createInterfaceOwnership,
 } from './pv-interfaces'
 import { createArchitectures } from './pv-architectures'
+import { createAIComponents, createAIComponentOwnership } from './pv-ai-components'
+import { createAIComponentRelationships } from './pv-ai-relationships'
 
 export async function initPhotovoltaicScenario(driver: Driver) {
   const session: Session = driver.session()
@@ -121,6 +123,18 @@ export async function initPhotovoltaicScenario(driver: Driver) {
     // 18. Architecture Ownership
     await createArchitectureOwnership(session)
 
+    // ===== PHASE 4.5: AI COMPONENTS =====
+    console.log('\n🤖 Phase 4.5: Creating AI Components and relationships...')
+
+    // Create AI Components
+    await createAIComponents(session)
+
+    // Create AI Component ownership
+    await createAIComponentOwnership(session)
+
+    // Create AI Component relationships
+    await createAIComponentRelationships(session)
+
     // ===== PHASE 5: COMPANY ASSOCIATIONS =====
     console.log('\n🏢 Phase 5: Associating all entities with company...')
 
@@ -144,6 +158,7 @@ export async function initPhotovoltaicScenario(driver: Driver) {
     console.log(`   • Application Interfaces: ${stats.interfaces}`)
     console.log(`   • Architecture Principles: ${stats.principles}`)
     console.log(`   • Enterprise Architectures: ${stats.architectures}`)
+    console.log(`   • AI Components: ${stats.aiComponents}`)
     console.log(`   • Total Relationships: ${stats.relationships}`)
 
     console.log('\n🎯 Key Features Implemented:')
@@ -154,6 +169,7 @@ export async function initPhotovoltaicScenario(driver: Driver) {
     console.log('   ✓ Current state + transition + target state architectures')
     console.log('   ✓ Extended architecture principles (18 principles)')
     console.log('   ✓ Complete ownership and accountability model')
+    console.log('   ✓ AI-powered manufacturing optimization (10 AI components)')
     console.log('   ✓ Manufacturing-specific solar panel production capabilities')
 
     console.log('\n🚀 Scenario ready for Enterprise Architecture Management!')
@@ -190,6 +206,7 @@ async function generateScenarioStatistics(session: Session) {
     'MATCH (pr:ArchitecturePrinciple) RETURN count(pr) as total'
   )
   const architectureResult = await session.run('MATCH (ar:Architecture) RETURN count(ar) as total')
+  const aiComponentResult = await session.run('MATCH (ai:AIComponent) RETURN count(ai) as total')
   const relationshipResult = await session.run('MATCH ()-[r]->() RETURN count(r) as total')
 
   return {
@@ -204,6 +221,7 @@ async function generateScenarioStatistics(session: Session) {
     interfaces: interfaceResult.records[0].get('total').toNumber(),
     principles: principleResult.records[0].get('total').toNumber(),
     architectures: architectureResult.records[0].get('total').toNumber(),
+    aiComponents: aiComponentResult.records[0].get('total').toNumber(),
     relationships: relationshipResult.records[0].get('total').toNumber(),
   }
 }
