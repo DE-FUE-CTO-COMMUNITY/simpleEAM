@@ -204,9 +204,7 @@ const AicomponentTableWithGenericTable: React.FC<AicomponentTableProps> = ({
         header: t('supportsCapabilities'),
         cell: info => {
           const value = info.getValue()
-          return value && value.length > 0
-            ? value.map(cap => cap.name).join(', ')
-            : '-'
+          return value && value.length > 0 ? value.map(cap => cap.name).join(', ') : '-'
         },
         enableHiding: true,
       }),
@@ -214,9 +212,7 @@ const AicomponentTableWithGenericTable: React.FC<AicomponentTableProps> = ({
         header: t('usedByApplications'),
         cell: info => {
           const value = info.getValue()
-          return value && value.length > 0
-            ? value.map(app => app.name).join(', ')
-            : '-'
+          return value && value.length > 0 ? value.map(app => app.name).join(', ') : '-'
         },
         enableHiding: true,
       }),
@@ -224,9 +220,7 @@ const AicomponentTableWithGenericTable: React.FC<AicomponentTableProps> = ({
         header: t('trainedWithDataObjects'),
         cell: info => {
           const value = info.getValue()
-          return value && value.length > 0
-            ? value.map(data => data.name).join(', ')
-            : '-'
+          return value && value.length > 0 ? value.map(data => data.name).join(', ') : '-'
         },
         enableHiding: true,
       }),
@@ -234,9 +228,7 @@ const AicomponentTableWithGenericTable: React.FC<AicomponentTableProps> = ({
         header: t('hostedOn'),
         cell: info => {
           const value = info.getValue()
-          return value && value.length > 0
-            ? value.map(infra => infra.name).join(', ')
-            : '-'
+          return value && value.length > 0 ? value.map(infra => infra.name).join(', ') : '-'
         },
         enableHiding: true,
       }),
@@ -244,9 +236,7 @@ const AicomponentTableWithGenericTable: React.FC<AicomponentTableProps> = ({
         header: t('partOfArchitectures'),
         cell: info => {
           const value = info.getValue()
-          return value && value.length > 0
-            ? value.map(arch => arch.name).join(', ')
-            : '-'
+          return value && value.length > 0 ? value.map(arch => arch.name).join(', ') : '-'
         },
         enableHiding: true,
       }),
@@ -254,9 +244,7 @@ const AicomponentTableWithGenericTable: React.FC<AicomponentTableProps> = ({
         header: t('implementsPrinciples'),
         cell: info => {
           const value = info.getValue()
-          return value && value.length > 0
-            ? value.map(principle => principle.name).join(', ')
-            : '-'
+          return value && value.length > 0 ? value.map(principle => principle.name).join(', ') : '-'
         },
         enableHiding: true,
       }),
@@ -264,9 +252,7 @@ const AicomponentTableWithGenericTable: React.FC<AicomponentTableProps> = ({
         header: t('depictedInDiagrams'),
         cell: info => {
           const value = info.getValue()
-          return value && value.length > 0
-            ? value.map(diagram => diagram.title).join(', ')
-            : '-'
+          return value && value.length > 0 ? value.map(diagram => diagram.title).join(', ') : '-'
         },
         enableHiding: true,
       }),
@@ -315,7 +301,8 @@ const AicomponentTableWithGenericTable: React.FC<AicomponentTableProps> = ({
       trainedWithDataObjectIds: aicomponent.trainedWithDataObjects?.map(obj => obj.id) ?? [],
       hostedOnIds: aicomponent.hostedOn?.map(infra => infra.id) ?? [],
       partOfArchitectureIds: aicomponent.partOfArchitectures?.map(arch => arch.id) ?? [],
-      implementsPrincipleIds: aicomponent.implementsPrinciples?.map(principle => principle.id) ?? [],
+      implementsPrincipleIds:
+        aicomponent.implementsPrinciples?.map(principle => principle.id) ?? [],
       depictedInDiagramIds: aicomponent.depictedInDiagrams?.map(diagram => diagram.id) ?? [],
     }
   }

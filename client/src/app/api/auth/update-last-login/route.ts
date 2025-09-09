@@ -51,8 +51,30 @@ export async function POST(request: NextRequest) {
 
     if (!adminTokenResponse.ok) {
       const errorText = await adminTokenResponse.text()
-      console.error('Fehler beim Abrufen des Admin-Tokens:', adminTokenResponse.status, errorText)
-      return NextResponse.json({ error: 'Failed to get admin token' }, { status: 500 })
+      console.error('❌ DEBUG: Admin Token Request Failed')
+      console.error('Status:', adminTokenResponse.status)
+      console.error('Status Text:', adminTokenResponse.statusText)
+      console.error('Error Response:', errorText)
+      console.error('Environment Check:')
+      console.error('- KEYCLOAK_URL:', KEYCLOAK_URL)
+      console.error('- KEYCLOAK_ADMIN:', process.env.KEYCLOAK_ADMIN || 'NOT_SET')
+      console.error(
+        '- KEYCLOAK_ADMIN_PASSWORD:',
+        process.env.KEYCLOAK_ADMIN_PASSWORD ? 'SET' : 'NOT_SET'
+      )
+      return NextResponse.json(
+        {
+          error: 'Failed to get admin token',
+          debug: {
+            status: adminTokenResponse.status,
+            statusText: adminTokenResponse.statusText,
+            keycloakUrl: KEYCLOAK_URL,
+            adminUser: process.env.KEYCLOAK_ADMIN || 'NOT_SET',
+            passwordSet: !!process.env.KEYCLOAK_ADMIN_PASSWORD,
+          },
+        },
+        { status: 500 }
+      )
     }
 
     const adminTokenData = await adminTokenResponse.json()
@@ -70,12 +92,23 @@ export async function POST(request: NextRequest) {
     )
 
     if (!userResponse.ok) {
-      console.error(
-        'Fehler beim Abrufen der Benutzerdaten:',
-        userResponse.status,
-        await userResponse.text()
+      console.error('❌ DEBUG: User Data Request Failed')
+      console.error('Status:', userResponse.status)
+      console.error('User ID:', userId)
+      console.error('URL:', `${KEYCLOAK_URL}/admin/realms/${KEYCLOAK_REALM}/users/${userId}`)
+      const errorText = await userResponse.text()
+      console.error('Error Response:', errorText)
+      return NextResponse.json(
+        {
+          error: 'Failed to get user data',
+          debug: {
+            status: userResponse.status,
+            userId,
+            url: `${KEYCLOAK_URL}/admin/realms/${KEYCLOAK_REALM}/users/${userId}`,
+          },
+        },
+        { status: 500 }
       )
-      return NextResponse.json({ error: 'Failed to get user data' }, { status: 500 })
     }
 
     const userData = await userResponse.json()
@@ -101,8 +134,35 @@ export async function POST(request: NextRequest) {
     )
 
     if (!updateResponse.ok) {
-      console.error('Fehler beim Aktualisieren des Benutzerattributs:', updateResponse.status)
-      return NextResponse.json({ error: 'Failed to update user attribute' }, { status: 500 })
+      console.error('❌ DEBUG: User Update Failed')
+      console.error('Status:', updateResponse.status)
+      console.error('User ID:', userId)
+      console.error('Update URL:', `${KEYCLOAK_URL}/admin/realms/${KEYCLOAK_REALM}/users/${userId}`)
+      console.error('Existing Attributes:', JSON.stringify(existingAttributes, null, 2))
+      console.error('New lastLogin value:', lastLogin)
+      const errorText = await updateResponse.text()
+      console.error('Error Response:', errorText)
+
+      // Spezifische Berechtigungsfehler identifizieren
+      if (updateResponse.status === 403) {
+        console.error(
+          '❌ PERMISSION DENIED: Admin user lacks "manage-users" role in realm-management client'
+        )
+      }
+
+      return NextResponse.json(
+        {
+          error: 'Failed to update user attribute',
+          debug: {
+            status: updateResponse.status,
+            userId,
+            lastLogin,
+            existingAttributes,
+            errorText,
+          },
+        },
+        { status: 500 }
+      )
     }
 
     return NextResponse.json({
