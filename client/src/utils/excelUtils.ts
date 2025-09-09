@@ -580,6 +580,7 @@ export const downloadTemplateWithRealFields = async (
     | 'diagrams' // Für JSON-Export verfügbar
     | 'architecturePrinciples'
     | 'infrastructures'
+    | 'aicomponents'
     | 'all'
 ): Promise<void> => {
   // Dynamischen Import für ES-Module-Kompatibilität verwenden
@@ -620,7 +621,34 @@ export const downloadTemplateWithRealFields = async (
   }
 
   // TypeScript weiß, dass entityType hier nicht 'all' ist
-  const template = getTemplateByEntityType(entityType as Exclude<typeof entityType, 'all'>)
+  if (entityType === 'aicomponents') {
+    // Temporäre Lösung für AI Components Template
+    const aicomponentsTemplate = {
+      id: '',
+      name: '',
+      description: '',
+      version: '',
+      modelType: '',
+      trainingData: '',
+      accuracy: '',
+      vendor: '',
+      license: '',
+      apiEndpoint: '',
+      isActive: '',
+      createdAt: '',
+      updatedAt: '',
+    }
+    
+    await exportToExcel([aicomponentsTemplate], {
+      filename: 'AI_Components_Import_Template',
+      sheetName: 'Import Template',
+      format: 'xlsx',
+      includeHeaders: true,
+    })
+    return
+  }
+  
+  const template = getTemplateByEntityType(entityType as Exclude<typeof entityType, 'all' | 'aicomponents'>)
 
   const entityTypeLabels = {
     businessCapabilities: 'Business Capabilities',
@@ -631,6 +659,8 @@ export const downloadTemplateWithRealFields = async (
     architectures: 'Architectures',
     diagrams: 'Diagrams', // Für JSON-Export verfügbar
     architecturePrinciples: 'Architecture Principles',
+    infrastructures: 'Infrastructures',
+    aicomponents: 'AI Components',
   }
 
   await exportToExcel([template], {
