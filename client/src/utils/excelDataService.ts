@@ -8,6 +8,7 @@ import { GET_ARCHITECTURES } from '../graphql/architecture'
 import { GET_DIAGRAMS } from '../graphql/diagram'
 import { GET_ARCHITECTURE_PRINCIPLES } from '../graphql/architecturePrinciple'
 import { GET_INFRASTRUCTURES } from '../graphql/infrastructure'
+import { GET_Aicomponents } from '../graphql/aicomponent'
 
 export interface ExcelExportData {
   [key: string]: string | number | boolean | Date
@@ -23,6 +24,7 @@ export type EntityType =
   | 'diagrams'
   | 'architecturePrinciples'
   | 'infrastructures'
+  | 'aicomponents'
   | 'all'
 
 // Hilfsfunktion: Company-Filter (inkl. Diagramm-OR-Sonderfall)
@@ -509,6 +511,56 @@ export const fetchInfrastructuresForExport = async (
 }
 
 /**
+ * Holt echte AI Components Daten für Excel Export
+ * Verwendet GraphQL-Feldnamen als Spaltenüberschriften und IDs für Relationen
+ */
+export const fetchAicomponentsForExport = async (
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
+): Promise<ExcelExportData[]> => {
+  try {
+    const { data } = await client.query({
+      query: GET_Aicomponents,
+      variables: { where: companyWhere('aicomponents', selectedCompanyId) },
+      fetchPolicy: 'network-only',
+    })
+
+    if (!data?.aiComponents) {
+      return []
+    }
+
+    return data.aiComponents.map((ai: any) => ({
+      id: ai.id,
+      name: ai.name,
+      description: ai.description || '',
+      aiType: ai.aiType || '',
+      model: ai.model || '',
+      version: ai.version || '',
+      status: ai.status || '',
+      accuracy: ai.accuracy || '',
+      trainingDate: formatDateForExport(ai.trainingDate),
+      lastUpdated: formatDateForExport(ai.lastUpdated),
+      provider: ai.provider || '',
+      license: ai.license || '',
+      costs: ai.costs || '',
+      tags: ai.tags?.join(',') || '',
+      owners: ai.owners?.map((owner: any) => owner.id).join(',') || '',
+      supportsCapabilities: ai.supportsCapabilities?.map((cap: any) => cap.id).join(',') || '',
+      usedByApplications: ai.usedByApplications?.map((app: any) => app.id).join(',') || '',
+      trainedWithDataObjects: ai.trainedWithDataObjects?.map((obj: any) => obj.id).join(',') || '',
+      hostedOn: ai.hostedOn?.map((infra: any) => infra.id).join(',') || '',
+      partOfArchitectures: ai.partOfArchitectures?.map((arch: any) => arch.id).join(',') || '',
+      implementsPrinciples: ai.implementsPrinciples?.map((prin: any) => prin.id).join(',') || '',
+      depictedInDiagrams: ai.depictedInDiagrams?.map((diag: any) => diag.id).join(',') || '',
+      createdAt: formatDateForExport(ai.createdAt),
+      updatedAt: formatDateForExport(ai.updatedAt),
+    }))
+  } catch {
+    throw new Error('AI Components konnten nicht geladen werden')
+  }
+}
+
+/**
  * Holt alle Entitäten für Admin-Export (Multi-Tab Excel)
  * Hinweis: Diagramme werden beim Excel-Export ausgeblendet, da die JSON-Daten zu groß sind
  */
@@ -527,6 +579,7 @@ export const fetchAllEntitiesForExport = async (
       diagrams, // Für JSON-Export verfügbar
       architecturePrinciples,
       infrastructures,
+      aicomponents,
     ] = await Promise.all([
       fetchBusinessCapabilitiesForExport(client, selectedCompanyId),
       fetchApplicationsForExport(client, selectedCompanyId),
@@ -537,6 +590,7 @@ export const fetchAllEntitiesForExport = async (
       fetchDiagramsForExport(client, selectedCompanyId), // Für JSON-Export verfügbar
       fetchArchitecturePrinciplesForExport(client, selectedCompanyId),
       fetchInfrastructuresForExport(client, selectedCompanyId),
+      fetchAicomponentsForExport(client, selectedCompanyId),
     ])
 
     return {
@@ -549,6 +603,7 @@ export const fetchAllEntitiesForExport = async (
       Diagrams: diagrams, // Für JSON-Export verfügbar
       'Architecture Principles': architecturePrinciples,
       Infrastructures: infrastructures,
+      'AI Components': aicomponents,
     }
   } catch {
     throw new Error('Fehler beim Laden der kompletten Datenbank')
@@ -574,6 +629,7 @@ export const fetchAllEntitiesForExcelExport = async (
       diagrams, // Für Excel-Export ohne Inhalte
       architecturePrinciples,
       infrastructures,
+      aicomponents,
     ] = await Promise.all([
       fetchBusinessCapabilitiesForExport(client, selectedCompanyId),
       fetchApplicationsForExport(client, selectedCompanyId),
@@ -584,6 +640,7 @@ export const fetchAllEntitiesForExcelExport = async (
       fetchDiagramsForExcelExport(client, selectedCompanyId), // Ohne diagramJson
       fetchArchitecturePrinciplesForExport(client, selectedCompanyId),
       fetchInfrastructuresForExport(client, selectedCompanyId),
+      fetchAicomponentsForExport(client, selectedCompanyId),
     ])
 
     return {
@@ -596,6 +653,7 @@ export const fetchAllEntitiesForExcelExport = async (
       Diagrams: diagrams, // Mit Metadaten aber ohne diagramJson
       'Architecture Principles': architecturePrinciples,
       Infrastructures: infrastructures,
+      'AI Components': aicomponents,
     }
   } catch {
     throw new Error('Fehler beim Laden der kompletten Datenbank')
@@ -658,8 +716,10 @@ export const fetchDataByEntityTypeAndFormat = async (
     | 'interfaces'
     | 'persons'
     | 'architectures'
+    | 'diagrams'
     | 'architecturePrinciples'
     | 'infrastructures'
+    | 'aicomponents'
     | 'all',
   _format: 'xlsx' | 'csv',
   selectedCompanyId?: string
@@ -677,10 +737,14 @@ export const fetchDataByEntityTypeAndFormat = async (
       return fetchPersonsForExport(client, selectedCompanyId)
     case 'architectures':
       return fetchArchitecturesForExport(client, selectedCompanyId)
+    case 'diagrams':
+      return fetchDiagramsForExcelExport(client, selectedCompanyId)
     case 'architecturePrinciples':
       return fetchArchitecturePrinciplesForExport(client, selectedCompanyId)
     case 'infrastructures':
       return fetchInfrastructuresForExport(client, selectedCompanyId)
+    case 'aicomponents':
+      return fetchAicomponentsForExport(client, selectedCompanyId)
     case 'all':
       return fetchAllEntitiesForExcelExport(client, selectedCompanyId)
     default:
@@ -937,6 +1001,36 @@ export const getInfrastructuresTemplate = (): ExcelExportData => ({
 })
 
 /**
+ * Erstellt Template-Daten mit echten GraphQL-Feldnamen für AI Components
+ */
+export const getAicomponentsTemplate = (): ExcelExportData => ({
+  id: '',
+  name: '',
+  description: '',
+  aiType: '',
+  model: '',
+  version: '',
+  status: '',
+  accuracy: '',
+  trainingDate: '', // ISO-Format: 2024-01-01T12:00:00.000Z
+  lastUpdated: '', // ISO-Format: 2024-01-01T12:00:00.000Z
+  provider: '',
+  license: '',
+  costs: '',
+  tags: '', // Komma-getrennte Tags
+  owners: '', // Komma-getrennte Owner-IDs (Person)
+  supportsCapabilities: '', // Komma-getrennte Capability-IDs
+  usedByApplications: '', // Komma-getrennte Application-IDs
+  trainedWithDataObjects: '', // Komma-getrennte DataObject-IDs
+  hostedOn: '', // Komma-getrennte Infrastructure-IDs
+  partOfArchitectures: '', // Komma-getrennte Architecture-IDs
+  implementsPrinciples: '', // Komma-getrennte Principle-IDs
+  depictedInDiagrams: '', // Komma-getrennte Diagram-IDs
+  createdAt: '', // ISO-Format: 2024-01-01T12:00:00.000Z
+  updatedAt: '', // ISO-Format: 2024-01-01T12:00:00.000Z
+})
+
+/**
  * Holt Template-Daten basierend auf dem Entity-Typ mit echten GraphQL-Feldnamen
  */
 export const getTemplateByEntityType = (
@@ -950,6 +1044,7 @@ export const getTemplateByEntityType = (
     | 'diagrams' // Für JSON-Import verfügbar
     | 'architecturePrinciples'
     | 'infrastructures'
+    | 'aicomponents'
 ): ExcelExportData => {
   switch (entityType) {
     case 'businessCapabilities':
@@ -970,6 +1065,8 @@ export const getTemplateByEntityType = (
       return getArchitecturePrinciplesTemplate()
     case 'infrastructures':
       return getInfrastructuresTemplate()
+    case 'aicomponents':
+      return getAicomponentsTemplate()
     default:
       throw new Error(`Unbekannter Entity-Typ: ${entityType}`)
   }
@@ -988,7 +1085,8 @@ export const getTemplateByEntityTypeAndFormat = (
     | 'architectures'
     | 'diagrams'
     | 'architecturePrinciples'
-    | 'infrastructures',
+    | 'infrastructures'
+    | 'aicomponents',
   format: 'xlsx' | 'csv' | 'json'
 ): ExcelExportData => {
   switch (entityType) {
@@ -1011,6 +1109,8 @@ export const getTemplateByEntityTypeAndFormat = (
       return getArchitecturePrinciplesTemplate()
     case 'infrastructures':
       return getInfrastructuresTemplate()
+    case 'aicomponents':
+      return getAicomponentsTemplate()
     default:
       throw new Error(`Unbekannter Entity-Typ: ${entityType}`)
   }

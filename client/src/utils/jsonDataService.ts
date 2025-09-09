@@ -8,6 +8,7 @@ import { GET_ARCHITECTURES } from '../graphql/architecture'
 import { GET_DIAGRAMS } from '../graphql/diagram'
 import { GET_ARCHITECTURE_PRINCIPLES } from '../graphql/architecturePrinciple'
 import { GET_INFRASTRUCTURES } from '../graphql/infrastructure'
+import { GET_Aicomponents } from '../graphql/aicomponent'
 import { ValidationResult } from '../components/excel/types'
 
 /**
@@ -27,6 +28,7 @@ export type JsonEntityType =
   | 'diagrams'
   | 'architecturePrinciples'
   | 'infrastructures'
+  | 'aicomponents'
 
 // Hilfsfunktion: Company-Filter (inkl. Diagramm-OR-Sonderfall)
 const companyWhere = (entityType: JsonEntityType | 'all', companyId?: string): any | undefined => {
@@ -456,6 +458,54 @@ export const fetchInfrastructuresForJson = async (
 }
 
 /**
+ * Holt AI Components für JSON-Export mit vollständigen Daten
+ */
+export const fetchAicomponentsForJson = async (
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
+): Promise<JsonExportData[]> => {
+  try {
+    const { data } = await client.query({
+      query: GET_Aicomponents,
+      variables: { where: companyWhere('aicomponents', selectedCompanyId) },
+      fetchPolicy: 'cache-first',
+    })
+
+    return data.aiComponents?.map((ai: any) => ({
+      id: ai.id,
+      name: ai.name || '',
+      description: ai.description || '',
+      aiType: ai.aiType || '',
+      model: ai.model || '',
+      version: ai.version || '',
+      status: ai.status || '',
+      accuracy: ai.accuracy || '',
+      provider: ai.provider || '',
+      license: ai.license || '',
+      costs: ai.costs || '',
+      // Datums-Felder
+      trainingDate: formatDateForJsonExport(ai.trainingDate),
+      lastUpdated: formatDateForJsonExport(ai.lastUpdated),
+      createdAt: formatDateForJsonExport(ai.createdAt),
+      updatedAt: formatDateForJsonExport(ai.updatedAt),
+      // Array-Felder
+      tags: ai.tags || [],
+      // Beziehungen als verschachtelte Objekte
+      owners: ai.owners || [],
+      supportsCapabilities: ai.supportsCapabilities || [],
+      usedByApplications: ai.usedByApplications || [],
+      trainedWithDataObjects: ai.trainedWithDataObjects || [],
+      hostedOn: ai.hostedOn || [],
+      partOfArchitectures: ai.partOfArchitectures || [],
+      implementsPrinciples: ai.implementsPrinciples || [],
+      depictedInDiagrams: ai.depictedInDiagrams || [],
+    }))
+  } catch {
+    throw new Error('Fehler beim Laden der AI Components für JSON-Export')
+  }
+}
+
+/**
  * Holt alle Daten für JSON-Export mit vollständigen Beziehungsinformationen
  */
 export const fetchAllDataForJson = async (
@@ -473,6 +523,7 @@ export const fetchAllDataForJson = async (
       diagrams,
       architecturePrinciples,
       infrastructures,
+      aicomponents,
     ] = await Promise.all([
       fetchBusinessCapabilitiesForJson(client, selectedCompanyId),
       fetchApplicationsForJson(client, selectedCompanyId),
@@ -483,6 +534,7 @@ export const fetchAllDataForJson = async (
       fetchDiagramsForJson(client, selectedCompanyId),
       fetchArchitecturePrinciplesForJson(client, selectedCompanyId),
       fetchInfrastructuresForJson(client, selectedCompanyId),
+      fetchAicomponentsForJson(client, selectedCompanyId),
     ])
 
     return {
@@ -495,6 +547,7 @@ export const fetchAllDataForJson = async (
       Diagrams: diagrams, // Vollständige Diagramme mit JSON-Daten
       'Architecture Principles': architecturePrinciples,
       Infrastructure: infrastructures,
+      'AI Components': aicomponents,
     }
   } catch (error) {
     console.error('Fehler beim Laden aller Daten für JSON-Export:', error)
@@ -533,6 +586,8 @@ export const fetchDataByEntityTypeForJson = async (
       return await fetchArchitecturePrinciplesForJson(client, selectedCompanyId)
     case 'infrastructures':
       return await fetchInfrastructuresForJson(client, selectedCompanyId)
+    case 'aicomponents':
+      return await fetchAicomponentsForJson(client, selectedCompanyId)
     default:
       throw new Error(`Unbekannter Entity-Type: ${entityType}`)
   }

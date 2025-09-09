@@ -53,6 +53,12 @@ import {
   CHECK_INFRASTRUCTURE_EXISTS,
   GET_INFRASTRUCTURES_COUNT,
 } from '../../graphql/infrastructure'
+import {
+  CREATE_Aicomponent,
+  UPDATE_Aicomponent,
+  CHECK_AICOMPONENT_EXISTS,
+  GET_AICOMPONENTS_COUNT,
+} from '../../graphql/aicomponent'
 
 // GraphQL Mutations für Datenlöschung
 export const DELETE_BUSINESS_CAPABILITIES = () => `
@@ -127,6 +133,14 @@ export const DELETE_INFRASTRUCTURES = () => `
   }
 `
 
+export const DELETE_AICOMPONENTS = () => `
+  mutation DeleteAIComponents($where: AIComponentWhere) {
+    deleteAiComponents(where: $where) {
+      nodesDeleted
+    }
+  }
+`
+
 // Helper-Funktion: Gibt die passenden CREATE/UPDATE Mutations für einen Entity-Type zurück
 export const getMutationsByEntityType = (entityType: string) => {
   const mutationMap = {
@@ -175,6 +189,11 @@ export const getMutationsByEntityType = (entityType: string) => {
       update: UPDATE_INFRASTRUCTURE,
       check: CHECK_INFRASTRUCTURE_EXISTS,
     },
+    aicomponents: {
+      create: CREATE_Aicomponent,
+      update: UPDATE_Aicomponent,
+      check: CHECK_AICOMPONENT_EXISTS,
+    },
   }
 
   return mutationMap[entityType as keyof typeof mutationMap]
@@ -192,6 +211,7 @@ export const getDeleteMutationByEntityType = (entityType: string) => {
     diagrams: DELETE_DIAGRAMS(),
     architecturePrinciples: DELETE_ARCHITECTURE_PRINCIPLES(),
     infrastructures: DELETE_INFRASTRUCTURES(),
+    aicomponents: DELETE_AICOMPONENTS(),
   }
 
   return deleteMutationMap[entityType as keyof typeof deleteMutationMap]
@@ -235,4 +255,8 @@ export {
   UPDATE_INFRASTRUCTURE,
   CHECK_INFRASTRUCTURE_EXISTS,
   GET_INFRASTRUCTURES_COUNT,
+  CREATE_Aicomponent,
+  UPDATE_Aicomponent,
+  CHECK_AICOMPONENT_EXISTS,
+  GET_AICOMPONENTS_COUNT,
 }

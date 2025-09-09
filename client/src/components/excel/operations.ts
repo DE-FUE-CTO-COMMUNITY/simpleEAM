@@ -479,6 +479,7 @@ export const exportEntityData = async (
         diagrams: 'Diagrams',
         architecturePrinciples: 'Architecture_Principles',
         infrastructures: 'Infrastructure',
+        aicomponents: 'AI_Components',
       }
 
       const filename = `${entityTypeLabels[entityType] || entityType}_Export${companySuffix}`

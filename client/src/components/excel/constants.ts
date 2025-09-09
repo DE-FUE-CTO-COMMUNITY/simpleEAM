@@ -11,6 +11,7 @@ export const entityTypeLabels: Record<EntityType, string> = {
   diagrams: 'Diagramme',
   architecturePrinciples: 'Architekturprinzipien',
   infrastructures: 'Infrastruktur',
+  aicomponents: 'AI Components',
   all: 'Alle Daten',
 }
 
@@ -26,6 +27,7 @@ export const entityTypeMapping: Record<string, string> = {
   Diagrams: 'diagrams',
   Infrastructure: 'infrastructures',
   Infrastructures: 'infrastructures', // Support both singular and plural
+  'AI Components': 'aicomponents',
 }
 
 // Umkehrung für Export-Tab-Namen
@@ -39,6 +41,7 @@ export const reverseEntityTypeMapping: Record<string, string> = {
   architecturePrinciples: 'Architecture Principles',
   diagrams: 'Diagrams',
   infrastructures: 'Infrastructure',
+  aicomponents: 'AI Components',
 }
 
 // Format-Optionen

@@ -10,6 +10,7 @@ export interface ImportSettings {
     | 'diagrams' // Nur für JSON-Import verfügbar
     | 'architecturePrinciples'
     | 'infrastructures'
+    | 'aicomponents'
     | 'all'
   format: 'xlsx' | 'json'
   updateMode: 'overwrite' | 'merge' | 'skipExisting'
@@ -27,6 +28,7 @@ export interface ExportSettings {
     | 'diagrams' // Nur für JSON-Export verfügbar
     | 'architecturePrinciples'
     | 'infrastructures'
+    | 'aicomponents'
     | 'all'
   format: 'xlsx' | 'csv' | 'json'
 }

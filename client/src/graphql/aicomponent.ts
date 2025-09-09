@@ -258,3 +258,21 @@ export const DELETE_Aicomponent = gql`
     }
   }
 `
+
+// Query: AI Component Existenz prüfen
+export const CHECK_AICOMPONENT_EXISTS = gql`
+  query CheckAIComponentExists($where: AIComponentWhere!) {
+    aiComponentsAggregate(where: $where) {
+      count
+    }
+  }
+`
+
+// Query: Anzahl der AI Components
+export const GET_AICOMPONENTS_COUNT = gql`
+  query GetAIComponentsCount($where: AIComponentWhere) {
+    aiComponentsAggregate(where: $where) {
+      count
+    }
+  }
+`
