@@ -261,9 +261,9 @@ export const DELETE_Aicomponent = gql`
 
 // Query: AI Component Existenz prüfen
 export const CHECK_AICOMPONENT_EXISTS = gql`
-  query CheckAIComponentExists($where: AIComponentWhere!) {
-    aiComponentsAggregate(where: $where) {
-      count
+  query CheckAIComponentExists($id: ID!) {
+    aiComponents(where: { id: { eq: $id } }) {
+      id
     }
   }
 `
@@ -271,8 +271,8 @@ export const CHECK_AICOMPONENT_EXISTS = gql`
 // Query: Anzahl der AI Components
 export const GET_AICOMPONENTS_COUNT = gql`
   query GetAIComponentsCount($where: AIComponentWhere) {
-    aiComponentsAggregate(where: $where) {
-      count
+    aiComponents(where: $where) {
+      id
     }
   }
 `

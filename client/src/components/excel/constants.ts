@@ -44,6 +44,20 @@ export const reverseEntityTypeMapping: Record<string, string> = {
   aicomponents: 'AI Components',
 }
 
+// Reihenfolge der Entity Types wie im Hauptmenü
+export const entityTypeOrder: EntityType[] = [
+  'businessCapabilities',
+  'applications',
+  'aicomponents',
+  'dataObjects',
+  'interfaces',
+  'infrastructures',
+  'persons',
+  'diagrams',
+  'architectures',
+  'architecturePrinciples',
+]
+
 // Format-Optionen
 export const formatOptions = {
   import: ['xlsx', 'json'] as const,

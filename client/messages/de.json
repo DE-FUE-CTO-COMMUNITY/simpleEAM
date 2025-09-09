@@ -1540,6 +1540,10 @@
       "confirmText": "Sind Sie sicher, dass Sie {entityType} löschen möchten?",
       "confirmAllText": "alle Daten",
       "confirmWarning": "Diese Aktion kann nicht rückgängig gemacht werden!",
+      "companyFilterInfo": "Löschung wird auf die ausgewählte Company gefiltert: {companyName}",
+      "companyFilterDefault": "Löschung wird auf die ausgewählte Company gefiltert.",
+      "companyDeleteWarning": "Alle Daten der Company \"{companyName}\" werden unwiderruflich gelöscht!",
+      "companyDeleteButton": "Alle Daten von {companyName} löschen",
       "messages": {
         "deleteSuccess": "{entityType} erfolgreich gelöscht. {count} Datensätze entfernt.",
         "deleteAllSuccess": "Alle Daten erfolgreich gelöscht. {count} Datensätze entfernt.",

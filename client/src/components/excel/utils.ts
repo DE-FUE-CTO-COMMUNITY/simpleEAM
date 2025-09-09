@@ -15,6 +15,8 @@ import {
   PrinciplePriority,
   CapabilityStatus,
   CapabilityType,
+  AiComponentType,
+  AiComponentStatus,
 } from '../../gql/generated'
 
 // Helper function to parse comma-separated relationship IDs
@@ -151,6 +153,8 @@ export const checkEntityExists = async (
         return result.data?.architecturePrinciples?.length > 0
       case 'infrastructures':
         return result.data?.infrastructures?.length > 0
+      case 'aicomponents':
+        return result.data?.aiComponents?.length > 0
       default:
         return false
     }
@@ -453,6 +457,37 @@ export const createEntityInput = (entityType: string, row: any): any => {
         planningDate: row.planningDate ? new Date(row.planningDate) : undefined,
         endOfUseDate: row.endOfUseDate ? new Date(row.endOfUseDate) : undefined,
         endOfLifeDate: row.endOfLifeDate ? new Date(row.endOfLifeDate) : undefined,
+      }
+    }
+
+    case 'aicomponents': {
+      const validAiType = Object.values(AiComponentType).includes(
+        row.aiType?.toUpperCase() as AiComponentType
+      )
+        ? (row.aiType.toUpperCase() as AiComponentType)
+        : AiComponentType.MACHINE_LEARNING_MODEL
+
+      const validStatus = Object.values(AiComponentStatus).includes(
+        row.status?.toUpperCase() as AiComponentStatus
+      )
+        ? (row.status.toUpperCase() as AiComponentStatus)
+        : AiComponentStatus.IN_DEVELOPMENT
+
+      return {
+        name: generateFallbackName('AI Component', row),
+        description: row.description || '',
+        aiType: validAiType,
+        model: row.model || '',
+        version: row.version || '',
+        status: validStatus,
+        accuracy: row.accuracy && row.accuracy !== '' ? parseFloat(row.accuracy) : undefined,
+        provider: row.provider || '',
+        license: row.license || '',
+        costs: row.costs && row.costs !== '' ? parseFloat(row.costs) : undefined,
+        tags: row.tags ? parseRelationshipIds(row.tags) : [],
+        // Datums-Felder
+        trainingDate: row.trainingDate ? new Date(row.trainingDate) : undefined,
+        lastUpdated: row.lastUpdated ? new Date(row.lastUpdated) : undefined,
       }
     }
 

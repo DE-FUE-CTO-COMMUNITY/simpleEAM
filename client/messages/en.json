@@ -1544,6 +1544,10 @@
       "confirmText": "Are you sure you want to delete {entityType}?",
       "confirmAllText": "all data",
       "confirmWarning": "This action cannot be undone!",
+      "companyFilterInfo": "Deletion will be filtered to the selected company: {companyName}",
+      "companyFilterDefault": "Deletion will be filtered to the selected company.",
+      "companyDeleteWarning": "All data of company \"{companyName}\" will be permanently deleted!",
+      "companyDeleteButton": "Delete All Data from {companyName}",
       "messages": {
         "deleteSuccess": "{entityType} successfully deleted. {count} records removed.",
         "deleteAllSuccess": "All data successfully deleted. {count} records removed.",

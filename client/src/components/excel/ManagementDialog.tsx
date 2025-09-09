@@ -16,11 +16,11 @@ import {
   DialogActions,
 } from '@mui/material'
 import Grid from '@mui/material/Grid'
-import { Error as ErrorIcon, Warning as WarningIcon, Info as InfoIcon } from '@mui/icons-material'
+import { Error as ErrorIcon, Info as InfoIcon } from '@mui/icons-material'
 import { useTranslations } from 'next-intl'
 
-import { DeleteSettings } from './types'
-import { entityTypeLabels } from './constants'
+import { DeleteSettings, EntityType } from './types'
+import { entityTypeLabels, entityTypeOrder } from './constants'
 import { useCompanyContext } from '@/contexts/CompanyContext'
 
 interface ManagementDialogProps {
@@ -50,13 +50,33 @@ const ManagementDialog: React.FC<ManagementDialogProps> = ({
   const { selectedCompanyId, companies } = useCompanyContext()
   const selectedCompanyName = companies.find(c => c.id === selectedCompanyId)?.name
 
-  // Sichere Übersetzungsfunktion mit Fallback
-  const safeEntityTypeTranslation = (entityType: string): string => {
-    try {
-      return tEntityTypes(entityType as keyof typeof entityTypeLabels) || entityType
-    } catch (error) {
-      console.warn('Translation error for entityType:', entityType, error)
-      return entityType
+  // Übersetzungsfunktion für Entity Types
+  const getEntityTypeTranslation = (entityType: string): string => {
+    switch (entityType) {
+      case 'businessCapabilities':
+        return tEntityTypes('businessCapabilities')
+      case 'applications':
+        return tEntityTypes('applications')
+      case 'dataObjects':
+        return tEntityTypes('dataObjects')
+      case 'interfaces':
+        return tEntityTypes('interfaces')
+      case 'persons':
+        return tEntityTypes('persons')
+      case 'architectures':
+        return tEntityTypes('architectures')
+      case 'diagrams':
+        return tEntityTypes('diagrams')
+      case 'architecturePrinciples':
+        return tEntityTypes('architecturePrinciples')
+      case 'infrastructures':
+        return tEntityTypes('infrastructures')
+      case 'aicomponents':
+        return tEntityTypes('aicomponents')
+      case 'all':
+        return tEntityTypes('all')
+      default:
+        return entityTypeLabels[entityType as EntityType] || entityType
     }
   }
 
@@ -71,7 +91,7 @@ const ManagementDialog: React.FC<ManagementDialogProps> = ({
               entityType:
                 deleteEntityType === 'all'
                   ? t('confirmAllText')
-                  : safeEntityTypeTranslation(deleteEntityType),
+                  : getEntityTypeTranslation(deleteEntityType),
             })}
           </Typography>
           <Typography variant="body2" color="error" sx={{ mt: 1 }}>
@@ -90,7 +110,7 @@ const ManagementDialog: React.FC<ManagementDialogProps> = ({
       <Box sx={{ p: 2 }}>
         <Grid container spacing={3} sx={{ width: '100%' }}>
           <Grid size={12}>
-            <Alert severity="warning" icon={<WarningIcon />}>
+            <Alert severity="warning" icon={false}>
               <Typography variant="h6" gutterBottom>
                 {t('title')}
               </Typography>
@@ -102,8 +122,8 @@ const ManagementDialog: React.FC<ManagementDialogProps> = ({
             <Alert severity="info" icon={<InfoIcon />}>
               <Typography variant="body2">
                 {selectedCompanyName
-                  ? `Löschung wird auf die ausgewählte Company gefiltert: ${selectedCompanyName}`
-                  : 'Löschung wird auf die ausgewählte Company gefiltert.'}
+                  ? t('companyFilterInfo', { companyName: selectedCompanyName })
+                  : t('companyFilterDefault')}
               </Typography>
             </Alert>
           </Grid>
@@ -126,11 +146,11 @@ const ManagementDialog: React.FC<ManagementDialogProps> = ({
                     })
                   }
                 >
-                  {Object.entries(entityTypeLabels)
-                    .filter(([key]) => key !== 'all')
-                    .map(([key, _label]) => (
-                      <MenuItem key={key} value={key}>
-                        {safeEntityTypeTranslation(key)}
+                  {entityTypeOrder
+                    .filter(entityType => entityType !== 'all')
+                    .map(entityType => (
+                      <MenuItem key={entityType} value={entityType}>
+                        {getEntityTypeTranslation(entityType)}
                       </MenuItem>
                     ))}
                 </Select>
@@ -147,7 +167,7 @@ const ManagementDialog: React.FC<ManagementDialogProps> = ({
                   {isDeleting
                     ? t('deleting')
                     : t('deleteButton', {
-                        entityType: safeEntityTypeTranslation(deleteSettings.entityType),
+                        entityType: getEntityTypeTranslation(deleteSettings.entityType),
                       })}
                 </Button>
                 <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
@@ -167,7 +187,7 @@ const ManagementDialog: React.FC<ManagementDialogProps> = ({
                 <Typography variant="body2">
                   <strong>
                     {selectedCompanyName
-                      ? `Alle Daten der Company "${selectedCompanyName}" werden unwiderruflich gelöscht!`
+                      ? t('companyDeleteWarning', { companyName: selectedCompanyName })
                       : t('completeDeleteWarning')}
                   </strong>
                 </Typography>
@@ -184,7 +204,7 @@ const ManagementDialog: React.FC<ManagementDialogProps> = ({
                 {isDeleting
                   ? t('deleting')
                   : selectedCompanyName
-                    ? `Alle Daten von ${selectedCompanyName} löschen`
+                    ? t('companyDeleteButton', { companyName: selectedCompanyName })
                     : t('deleteAllButton')}
               </Button>
               <Typography variant="body2" color="error" sx={{ mt: 1 }}>

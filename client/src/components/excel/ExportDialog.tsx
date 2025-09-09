@@ -15,7 +15,7 @@ import { useTranslations } from 'next-intl'
 
 import { ExportSettings } from './types'
 import { useCompanyContext } from '@/contexts/CompanyContext'
-import { entityTypeLabels } from './constants'
+import { entityTypeLabels, entityTypeOrder } from './constants'
 
 interface ExportDialogProps {
   exportSettings: ExportSettings
@@ -59,11 +59,14 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
                     label={t('dataType')}
                     onChange={e => onEntityTypeChange(e.target.value)}
                   >
-                    {Object.entries(entityTypeLabels).map(([key, _label]) => (
-                      <MenuItem key={key} value={key}>
-                        {tEntityTypes(key as keyof typeof entityTypeLabels) || key}
+                    {entityTypeOrder.map(entityType => (
+                      <MenuItem key={entityType} value={entityType}>
+                        {tEntityTypes(entityType as keyof typeof entityTypeLabels) || entityType}
                       </MenuItem>
                     ))}
+                    <MenuItem key="all" value="all">
+                      {tEntityTypes('all')}
+                    </MenuItem>
                   </Select>
                 </FormControl>
               </Grid>

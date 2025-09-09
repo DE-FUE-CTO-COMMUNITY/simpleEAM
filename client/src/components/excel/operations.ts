@@ -95,6 +95,7 @@ export const importEntityDataWithMapping = async (
             case 'diagrams':
             case 'architecturePrinciples':
             case 'infrastructures':
+            case 'aicomponents':
               updateInput = { ...updateInput, company: companyUpdate }
               break
             default:
@@ -127,6 +128,7 @@ export const importEntityDataWithMapping = async (
             case 'diagrams':
             case 'architecturePrinciples':
             case 'infrastructures':
+            case 'aicomponents':
               input = { ...input, company: companyConnect }
               break
             default:
@@ -163,6 +165,8 @@ export const importEntityDataWithMapping = async (
             createdEntities = resultData.createArchitecturePrinciples.architecturePrinciples
           } else if (resultData.createInfrastructures) {
             createdEntities = resultData.createInfrastructures.infrastructures
+          } else if (resultData.createAiComponents) {
+            createdEntities = resultData.createAiComponents.aiComponents
           }
           if (createdEntities && createdEntities.length > 0) {
             entityMappings[originalId] = createdEntities[0].id
@@ -571,6 +575,7 @@ export const deleteEntityData = async (
       'diagrams',
       'architecturePrinciples',
       'infrastructures',
+      'aicomponents',
     ]
 
     let totalDeleted = 0
