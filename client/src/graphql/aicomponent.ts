@@ -252,8 +252,8 @@ export const UPDATE_Aicomponent = gql`
 
 // Mutation: AI Component löschen
 export const DELETE_Aicomponent = gql`
-  mutation DeleteAIComponents($where: AIComponentWhere!) {
-    deleteAiComponents(where: $where) {
+  mutation DeleteAIComponent($id: ID!) {
+    deleteAiComponents(where: { id: { eq: $id } }) {
       nodesDeleted
     }
   }

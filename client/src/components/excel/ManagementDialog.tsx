@@ -16,11 +16,12 @@ import {
   DialogActions,
 } from '@mui/material'
 import Grid from '@mui/material/Grid'
-import { Error as ErrorIcon, Warning as WarningIcon } from '@mui/icons-material'
+import { Error as ErrorIcon, Warning as WarningIcon, Info as InfoIcon } from '@mui/icons-material'
 import { useTranslations } from 'next-intl'
 
 import { DeleteSettings } from './types'
 import { entityTypeLabels } from './constants'
+import { useCompanyContext } from '@/contexts/CompanyContext'
 
 interface ManagementDialogProps {
   deleteSettings: DeleteSettings
@@ -46,6 +47,8 @@ const ManagementDialog: React.FC<ManagementDialogProps> = ({
   const t = useTranslations('importExport.management')
   const tEntityTypes = useTranslations('importExport.entityTypes')
   const tActions = useTranslations('importExport.actions')
+  const { selectedCompanyId, companies } = useCompanyContext()
+  const selectedCompanyName = companies.find(c => c.id === selectedCompanyId)?.name
 
   // Sichere Übersetzungsfunktion mit Fallback
   const safeEntityTypeTranslation = (entityType: string): string => {
@@ -92,6 +95,16 @@ const ManagementDialog: React.FC<ManagementDialogProps> = ({
                 {t('title')}
               </Typography>
               <Typography variant="body2">{t('warning')}</Typography>
+            </Alert>
+          </Grid>
+
+          <Grid size={12}>
+            <Alert severity="info" icon={<InfoIcon />}>
+              <Typography variant="body2">
+                {selectedCompanyName
+                  ? `Löschung wird auf die ausgewählte Company gefiltert: ${selectedCompanyName}`
+                  : 'Löschung wird auf die ausgewählte Company gefiltert.'}
+              </Typography>
             </Alert>
           </Grid>
 
@@ -152,7 +165,11 @@ const ManagementDialog: React.FC<ManagementDialogProps> = ({
 
               <Alert severity="error" sx={{ mb: 2, mt: 2 }}>
                 <Typography variant="body2">
-                  <strong>{t('completeDeleteWarning')}</strong>
+                  <strong>
+                    {selectedCompanyName
+                      ? `Alle Daten der Company "${selectedCompanyName}" werden unwiderruflich gelöscht!`
+                      : t('completeDeleteWarning')}
+                  </strong>
                 </Typography>
               </Alert>
 
@@ -164,7 +181,11 @@ const ManagementDialog: React.FC<ManagementDialogProps> = ({
                 onClick={() => onOpenDeleteConfirmDialog('all')}
                 sx={{ mt: 2 }}
               >
-                {isDeleting ? t('deleting') : t('deleteAllButton')}
+                {isDeleting
+                  ? t('deleting')
+                  : selectedCompanyName
+                    ? `Alle Daten von ${selectedCompanyName} löschen`
+                    : t('deleteAllButton')}
               </Button>
               <Typography variant="body2" color="error" sx={{ mt: 1 }}>
                 {t('deleteAllDescription')}

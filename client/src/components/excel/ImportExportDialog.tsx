@@ -326,7 +326,11 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
 
     setIsDeleting(true)
     try {
-      const deletedCount = await deleteEntityData(apolloClient, deleteEntityType)
+      const deletedCount = await deleteEntityData(
+        apolloClient,
+        deleteEntityType,
+        selectedCompanyId ?? undefined
+      )
       await refreshDashboardCache()
 
       // Wenn alle Daten oder nur Diagramme gelöscht werden, auch den Diagramm-localStorage leeren
@@ -554,9 +558,7 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
                     validationResult.summary.validRows === 0 ||
                     !selectedCompanyId
                   }
-                  title={
-                    !selectedCompanyId ? 'Bitte zuerst eine Company auswählen' : undefined
-                  }
+                  title={!selectedCompanyId ? 'Bitte zuerst eine Company auswählen' : undefined}
                   startIcon={isImporting ? <CircularProgress size={20} /> : <UploadIcon />}
                 >
                   {isImporting ? t('import.importing_') : t('import.startImport')}

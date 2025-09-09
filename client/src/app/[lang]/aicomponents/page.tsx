@@ -433,7 +433,7 @@ const AicomponentsPage = () => {
               try {
                 await deleteAicomponent({
                   variables: {
-                    where: { id: id },
+                    id: id,
                   },
                   refetchQueries: [{ query: GET_Aicomponents }],
                 })

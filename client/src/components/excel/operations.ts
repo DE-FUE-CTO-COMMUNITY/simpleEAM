@@ -78,11 +78,35 @@ export const importEntityDataWithMapping = async (
       }
 
       if (shouldUpdate && updateMutation) {
+        // Inject company relationship on update as well
+        let updateInput = transformInputForUpdate(input)
+        if (selectedCompanyId) {
+          const companyUpdate = {
+            disconnect: [{ where: {} }], // Trenne alle bestehenden Company-Verbindungen
+            connect: [{ where: { node: { id: { eq: selectedCompanyId } } } }], // Verbinde mit ausgewählter Company
+          }
+          switch (entityType) {
+            case 'businessCapabilities':
+            case 'applications':
+            case 'dataObjects':
+            case 'interfaces':
+            case 'persons':
+            case 'architectures':
+            case 'diagrams':
+            case 'architecturePrinciples':
+            case 'infrastructures':
+              updateInput = { ...updateInput, company: companyUpdate }
+              break
+            default:
+              break
+          }
+        }
+
         await client.mutate({
           mutation: updateMutation,
           variables: {
             id: row.id,
-            input: transformInputForUpdate(input),
+            input: updateInput,
           },
         })
         entityMappings[originalId] = row.id
@@ -346,13 +370,13 @@ export const handleSingleTabImport = async (
     entityType,
     true,
     format,
-  itemProgress => {
+    itemProgress => {
       const phaseProgress = (itemProgress / 100) * 70
       if (onProgress) {
         onProgress(Math.round(phaseProgress))
       }
-  },
-  selectedCompanyId
+    },
+    selectedCompanyId
   )
 
   // Phase 2: Update Beziehungen (30% of progress)
@@ -401,7 +425,9 @@ export const exportEntityData = async (
           variables: { where: { id: { eq: selectedCompanyId } } },
           fetchPolicy: 'cache-first',
         })
-        const name = res.data?.companies?.[0]?.name as string | undefined
+        // Da wir nach ID filtern, sollte genau ein Unternehmen zurückkommen
+        const company = res.data?.companies?.find((c: any) => c.id === selectedCompanyId)
+        const name = company?.name as string | undefined
         if (name) {
           const safe = name.replace(/[^a-z0-9-_]+/gi, '_')
           companySuffix = `_Company-${safe}`
@@ -413,7 +439,7 @@ export const exportEntityData = async (
     if (entityType === 'all') {
       // Multi-Entity Export mit formatspezifischer Datenauswahl
       if (format === 'json') {
-  const { fetchAllDataForJson } = await import('../../utils/jsonDataService')
+        const { fetchAllDataForJson } = await import('../../utils/jsonDataService')
         const { exportToJson } = await import('../../utils/jsonUtils')
         const allData = await fetchAllDataForJson(apolloClient, selectedCompanyId)
 
@@ -455,7 +481,7 @@ export const exportEntityData = async (
         infrastructures: 'Infrastructure',
       }
 
-  const filename = `${entityTypeLabels[entityType] || entityType}_Export${companySuffix}`
+      const filename = `${entityTypeLabels[entityType] || entityType}_Export${companySuffix}`
 
       if (format === 'json') {
         const { fetchDataByEntityTypeForJson } = await import('../../utils/jsonDataService')
@@ -508,10 +534,32 @@ export const exportEntityData = async (
 
 export const deleteEntityData = async (
   client: ApolloClient<any>,
-  entityType: string
+  entityType: string,
+  selectedCompanyId?: string
 ): Promise<number> => {
+  // Company-spezifische Where-Klausel erstellen
+  const createCompanyWhere = (entityType: string): any => {
+    if (!selectedCompanyId) {
+      // Wenn keine Company ausgewählt ist, lösche alles (für Admins)
+      return {}
+    }
+
+    // Spezielle Behandlung für Diagrams
+    if (entityType === 'diagrams') {
+      return {
+        OR: [
+          { company: { some: { id: { eq: selectedCompanyId } } } },
+          { architecture: { some: { company: { some: { id: { eq: selectedCompanyId } } } } } },
+        ],
+      }
+    }
+
+    // Standard-Behandlung für alle anderen Entitäten
+    return { company: { some: { id: { eq: selectedCompanyId } } } }
+  }
+
   if (entityType === 'all') {
-    // Lösche alle Entitätstypen
+    // Lösche alle Entitätstypen (company-gefiltert)
     const entityTypes = [
       'businessCapabilities',
       'applications',
@@ -530,8 +578,10 @@ export const deleteEntityData = async (
       try {
         const deleteMutation = getDeleteMutationByEntityType(type)
         if (deleteMutation) {
+          const whereClause = createCompanyWhere(type)
           const result = await client.mutate({
             mutation: gql(deleteMutation),
+            variables: { where: whereClause },
           })
           const deleted = result.data
             ? (Object.values(result.data)[0] as any)?.nodesDeleted || 0
@@ -546,14 +596,16 @@ export const deleteEntityData = async (
 
     return totalDeleted
   } else {
-    // Lösche nur den spezifizierten Entitätstyp
+    // Lösche nur den spezifizierten Entitätstyp (company-gefiltert)
     const deleteMutation = getDeleteMutationByEntityType(entityType)
     if (!deleteMutation) {
       throw new Error(`No delete mutation found for entity type: ${entityType}`)
     }
 
+    const whereClause = createCompanyWhere(entityType)
     const result = await client.mutate({
       mutation: gql(deleteMutation),
+      variables: { where: whereClause },
     })
 
     return result.data ? (Object.values(result.data)[0] as any)?.nodesDeleted || 0 : 0
@@ -561,8 +613,8 @@ export const deleteEntityData = async (
 }
 
 export const refreshDashboardCache = async (): Promise<void> => {
-  // Erzwinge einen vollständigen Seiten-Refresh nach dem Löschen von Daten
-  // Dies stellt sicher, dass keine veralteten Daten mehr angezeigt werden
+  // Nach dem Löschen von Daten muss ein vollständiger Refresh gemacht werden
+  // um sicherzustellen, dass alle UI-Komponenten die Änderungen reflektieren
   if (typeof window !== 'undefined') {
     window.location.reload()
   }

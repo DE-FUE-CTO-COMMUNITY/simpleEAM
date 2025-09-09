@@ -47,13 +47,16 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const loading = admin ? loadingAll : loadingMe
 
   const [selectedCompanyId, setSelectedCompanyIdState] = useState<string | null>(null)
+  const [isInitialized, setIsInitialized] = useState(false)
 
   // Initial aus LocalStorage setzen
   useEffect(() => {
     const fromStorage = typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : null
+    console.log('CompanyContext: Initializing from localStorage', { fromStorage })
     if (fromStorage) {
       setSelectedCompanyIdState(fromStorage)
     }
+    setIsInitialized(true)
   }, [])
 
   // Cross-Tab Sync: auf Änderungen aus anderen Tabs reagieren
@@ -98,10 +101,28 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   // Wenn Companies geladen sind, sinnvolle Vorauswahl treffen und ungültige Auswahl bereinigen
   useEffect(() => {
-    if (!companies) return
-    const hasSelection = selectedCompanyId && companies.some(c => c.id === selectedCompanyId)
+    // Warten bis localStorage initialisiert ist und Companies geladen sind
+    if (!isInitialized) return
 
-    if (companies.length === 0) {
+    console.log('CompanyContext: Validating selection', {
+      companiesCount: companies?.length || 0,
+      selectedCompanyId,
+      isInitialized,
+      loading,
+      companies: companies?.map(c => ({ id: c.id, name: c.name })) || [],
+    })
+
+    // Wenn Companies noch laden, warten (wichtig für Race Condition)
+    if (loading) {
+      console.log('CompanyContext: Still loading companies, waiting...')
+      return
+    }
+
+    // Wenn keine Companies verfügbar sind und das Laden abgeschlossen ist
+    if (!companies || companies.length === 0) {
+      console.log(
+        'CompanyContext: No companies available after loading completed, clearing selection'
+      )
       if (selectedCompanyId) {
         setSelectedCompanyIdState(null)
         if (typeof window !== 'undefined') localStorage.removeItem(STORAGE_KEY)
@@ -109,7 +130,10 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       return
     }
 
+    const hasSelection = selectedCompanyId && companies.some(c => c.id === selectedCompanyId)
+
     if (companies.length === 1) {
+      console.log('CompanyContext: Only one company available, selecting it')
       if (selectedCompanyId !== companies[0].id) {
         setSelectedCompanyIdState(companies[0].id)
         if (typeof window !== 'undefined') localStorage.setItem(STORAGE_KEY, companies[0].id)
@@ -117,15 +141,36 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       return
     }
 
-    // Mehrere Companies: sicherstellen, dass Auswahl gültig ist, sonst erste wählen
-    if (!hasSelection) {
+    // Mehrere Companies: Prüfe, ob aktuelle Auswahl gültig ist
+    if (selectedCompanyId && hasSelection) {
+      console.log('CompanyContext: Current selection is valid, keeping it:', selectedCompanyId)
+      return
+    }
+
+    // Wenn keine Auswahl vorhanden ist, wähle die erste
+    if (!selectedCompanyId) {
+      console.log('CompanyContext: No selection, choosing first company')
+      const first = companies[0]?.id
+      if (first) {
+        setSelectedCompanyIdState(first)
+        if (typeof window !== 'undefined') localStorage.setItem(STORAGE_KEY, first)
+      }
+      return
+    }
+
+    // Wenn eine ungültige Company-ID aus localStorage kommt (z.B. Company wurde gelöscht),
+    // dann auf erste umschalten
+    if (selectedCompanyId && !hasSelection) {
+      console.warn(
+        `CompanyContext: Selected company ID ${selectedCompanyId} not found in available companies, switching to first available`
+      )
       const first = companies[0]?.id
       if (first) {
         setSelectedCompanyIdState(first)
         if (typeof window !== 'undefined') localStorage.setItem(STORAGE_KEY, first)
       }
     }
-  }, [companies, selectedCompanyId])
+  }, [companies, selectedCompanyId, isInitialized, loading])
 
   const setSelectedCompanyId = (id: string) => {
     setSelectedCompanyIdState(id)

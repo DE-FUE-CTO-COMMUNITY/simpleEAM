@@ -55,73 +55,73 @@ import {
 } from '../../graphql/infrastructure'
 
 // GraphQL Mutations für Datenlöschung
-export const DELETE_BUSINESS_CAPABILITIES = `
-  mutation DeleteAllBusinessCapabilities {
-    deleteBusinessCapabilities(where: {}) {
+export const DELETE_BUSINESS_CAPABILITIES = () => `
+  mutation DeleteBusinessCapabilities($where: BusinessCapabilityWhere) {
+    deleteBusinessCapabilities(where: $where) {
       nodesDeleted
     }
   }
 `
 
-export const DELETE_APPLICATIONS = `
-  mutation DeleteAllApplications {
-    deleteApplications(where: {}) {
+export const DELETE_APPLICATIONS = () => `
+  mutation DeleteApplications($where: ApplicationWhere) {
+    deleteApplications(where: $where) {
       nodesDeleted
     }
   }
 `
 
-export const DELETE_DATA_OBJECTS = `
-  mutation DeleteAllDataObjects {
-    deleteDataObjects(where: {}) {
+export const DELETE_DATA_OBJECTS = () => `
+  mutation DeleteDataObjects($where: DataObjectWhere) {
+    deleteDataObjects(where: $where) {
       nodesDeleted
     }
   }
 `
 
-export const DELETE_INTERFACES = `
-  mutation DeleteAllInterfaces {
-    deleteApplicationInterfaces(where: {}) {
+export const DELETE_INTERFACES = () => `
+  mutation DeleteInterfaces($where: ApplicationInterfaceWhere) {
+    deleteApplicationInterfaces(where: $where) {
       nodesDeleted
     }
   }
 `
 
-export const DELETE_PERSONS = `
-  mutation DeleteAllPersons {
-    deletePeople(where: {}) {
+export const DELETE_PERSONS = () => `
+  mutation DeletePersons($where: PersonWhere) {
+    deletePeople(where: $where) {
       nodesDeleted
     }
   }
 `
 
-export const DELETE_ARCHITECTURES = `
-  mutation DeleteAllArchitectures {
-    deleteArchitectures(where: {}) {
+export const DELETE_ARCHITECTURES = () => `
+  mutation DeleteArchitectures($where: ArchitectureWhere) {
+    deleteArchitectures(where: $where) {
       nodesDeleted
     }
   }
 `
 
-export const DELETE_DIAGRAMS = `
-  mutation DeleteAllDiagrams {
-    deleteDiagrams(where: {}) {
+export const DELETE_DIAGRAMS = () => `
+  mutation DeleteDiagrams($where: DiagramWhere) {
+    deleteDiagrams(where: $where) {
       nodesDeleted
     }
   }
 `
 
-export const DELETE_ARCHITECTURE_PRINCIPLES = `
-  mutation DeleteAllArchitecturePrinciples {
-    deleteArchitecturePrinciples(where: {}) {
+export const DELETE_ARCHITECTURE_PRINCIPLES = () => `
+  mutation DeleteArchitecturePrinciples($where: ArchitecturePrincipleWhere) {
+    deleteArchitecturePrinciples(where: $where) {
       nodesDeleted
     }
   }
 `
 
-export const DELETE_INFRASTRUCTURES = `
-  mutation DeleteAllInfrastructures {
-    deleteInfrastructures(where: {}) {
+export const DELETE_INFRASTRUCTURES = () => `
+  mutation DeleteInfrastructures($where: InfrastructureWhere) {
+    deleteInfrastructures(where: $where) {
       nodesDeleted
     }
   }
@@ -183,15 +183,15 @@ export const getMutationsByEntityType = (entityType: string) => {
 // Helper-Funktion: Gibt die passende DELETE Mutation für einen Entity-Type zurück
 export const getDeleteMutationByEntityType = (entityType: string) => {
   const deleteMutationMap = {
-    businessCapabilities: DELETE_BUSINESS_CAPABILITIES,
-    applications: DELETE_APPLICATIONS,
-    dataObjects: DELETE_DATA_OBJECTS,
-    interfaces: DELETE_INTERFACES,
-    persons: DELETE_PERSONS,
-    architectures: DELETE_ARCHITECTURES,
-    diagrams: DELETE_DIAGRAMS,
-    architecturePrinciples: DELETE_ARCHITECTURE_PRINCIPLES,
-    infrastructures: DELETE_INFRASTRUCTURES,
+    businessCapabilities: DELETE_BUSINESS_CAPABILITIES(),
+    applications: DELETE_APPLICATIONS(),
+    dataObjects: DELETE_DATA_OBJECTS(),
+    interfaces: DELETE_INTERFACES(),
+    persons: DELETE_PERSONS(),
+    architectures: DELETE_ARCHITECTURES(),
+    diagrams: DELETE_DIAGRAMS(),
+    architecturePrinciples: DELETE_ARCHITECTURE_PRINCIPLES(),
+    infrastructures: DELETE_INFRASTRUCTURES(),
   }
 
   return deleteMutationMap[entityType as keyof typeof deleteMutationMap]
