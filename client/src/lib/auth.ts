@@ -19,31 +19,24 @@ const setUserLoggedIn = () => {
 }
 
 /**
- * Prüft, ob der Benutzer neu eingeloggt ist (Race-Condition sicher)
+ * Prüft, ob die vorherige Session zu alt ist (für echte neue Logins)
  */
-const checkForNewLogin = (): boolean => {
+const checkForOldSession = (): boolean => {
   if (typeof window !== 'undefined') {
-    const wasLoggedIn = localStorage.getItem(LOGIN_STATUS_KEY) === 'true'
     const lastSessionTimestamp = localStorage.getItem(LAST_LOGIN_SESSION_KEY)
     
-    // Wenn nicht eingeloggt ODER Session älter als X Sekunden, dann neuer Login
-    if (!wasLoggedIn || !lastSessionTimestamp) {
+    // Wenn kein Timestamp existiert, dann neuer Login
+    if (!lastSessionTimestamp) {
       return true
     }
     
-    // Zusätzliche Sicherheit: Wenn Session sehr alt ist, als neuen Login behandeln
+    // Prüfe, ob die letzte Session SEHR alt ist (mehr als 24 Stunden)
     const sessionAge = Date.now() - parseInt(lastSessionTimestamp, 10)
+    const twentyFourHours = 24 * 60 * 60 * 1000 // 24 Stunden in Millisekunden
     
-    // In Development: 5 Sekunden, in Production: 30 Sekunden
-    const timeoutMs = process.env.NODE_ENV === 'development' ? 5000 : 30000
-    
-    if (sessionAge > timeoutMs) {
-      return true
-    }
-    
-    return false
+    return sessionAge > twentyFourHours
   }
-  return false
+  return true
 }
 
 /**
@@ -108,16 +101,18 @@ export const initKeycloak = () => {
         // Automatischen Token-Refresh einrichten
         setupTokenRefresh()
 
-        // Prüfen, ob es ein neuer Login war
-        const isNewLogin = checkForNewLogin()
+        // WICHTIG: Session-Status ZUERST setzen, BEVOR wir prüfen ob es ein neuer Login ist
+        const wasAlreadyLoggedIn = localStorage.getItem(LOGIN_STATUS_KEY) === 'true'
+        
+        // Session-Status immer setzen (für Page Refreshes)
+        setUserLoggedIn()
+        
+        // Prüfen, ob es ein ECHTER neuer Login war (basierend auf dem vorherigen Status)
+        const isNewLogin = !wasAlreadyLoggedIn || checkForOldSession()
 
         if (isNewLogin) {
-          // WICHTIG: updateLastLoginDate VOR setUserLoggedIn aufrufen
-          // um Race-Condition zu vermeiden
+          // Nur bei echtem neuen Login das LastLogin-Datum aktualisieren
           updateLastLoginDate()
-          
-          // NACH dem LastLogin-Update als eingeloggt markieren
-          setUserLoggedIn()
 
           // Zum Dashboard weiterleiten
           const currentPath = window.location.pathname
