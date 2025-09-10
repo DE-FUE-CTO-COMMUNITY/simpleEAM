@@ -19,15 +19,56 @@ const setUserLoggedIn = () => {
  * Prüft, ob der Benutzer neu eingeloggt ist
  */
 const checkForNewLogin = (): boolean => {
+  console.log('🔍 DEBUG: checkForNewLogin() aufgerufen')
+  
   if (typeof window !== 'undefined') {
     const wasLoggedIn = localStorage.getItem(LOGIN_STATUS_KEY) === 'true'
+    console.log('📱 DEBUG: localStorage Check:')
+    console.log('  - LOGIN_STATUS_KEY:', LOGIN_STATUS_KEY)
+    console.log('  - localStorage Wert:', localStorage.getItem(LOGIN_STATUS_KEY))
+    console.log('  - wasLoggedIn:', wasLoggedIn)
+    
     if (!wasLoggedIn) {
       // Noch nicht als eingeloggt markiert = neuer Login
+      console.log('✅ DEBUG: Neuer Login erkannt!')
       return true
     }
+    console.log('ℹ️ DEBUG: Bereits eingeloggt (kein neuer Login)')
     return false
   }
+  console.log('❌ DEBUG: window nicht verfügbar (SSR)')
   return false
+}
+
+/**
+ * Debug-Funktion: Cleart den Login-Status und simuliert einen neuen Login
+ * Zur Verwendung in der Browser-Konsole: window.debugLastLogin()
+ */
+const debugLastLogin = () => {
+  console.log('🔧 DEBUG: Login-Status wird zurückgesetzt...')
+  clearLoginStatus()
+  console.log('🔧 DEBUG: localStorage nach Clear:', localStorage.getItem(LOGIN_STATUS_KEY))
+  
+  if (keycloak?.authenticated) {
+    console.log('🔧 DEBUG: Simuliere neuen Login...')
+    setUserLoggedIn()
+    updateLastLoginDate()
+  } else {
+    console.log('❌ DEBUG: Keycloak nicht authentifiziert')
+  }
+}
+
+// Debug-Funktion global verfügbar machen (nur in Development)
+if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+  (window as any).debugLastLogin = debugLastLogin
+  ;(window as any).checkLoginStatus = () => {
+    console.log('🔍 DEBUG: Aktueller Login-Status')
+    console.log('  - localStorage:', localStorage.getItem(LOGIN_STATUS_KEY))
+    console.log('  - Keycloak authenticated:', keycloak?.authenticated)
+    console.log('  - Token vorhanden:', !!keycloak?.token)
+    console.log('  - User Email:', keycloak?.tokenParsed?.email)
+    console.log('  - User ID:', keycloak?.tokenParsed?.sub)
+  }
 }
 
 /**
@@ -87,17 +128,29 @@ export const initKeycloak = () => {
       enableLogging: process.env.NODE_ENV === 'development',
     })
     .then(authenticated => {
+      console.log('🔍 DEBUG: Keycloak initialisiert - authenticated:', authenticated)
+      
       if (authenticated && keycloak) {
+        console.log('🔑 DEBUG: Benutzer ist authentifiziert')
+        console.log('  - Token vorhanden:', !!keycloak.token)
+        console.log('  - User ID (sub):', keycloak.tokenParsed?.sub)
+        console.log('  - Email:', keycloak.tokenParsed?.email)
+        
         // Automatischen Token-Refresh einrichten
         setupTokenRefresh()
 
         // Prüfen, ob es ein neuer Login war
         const isNewLogin = checkForNewLogin()
+        console.log('🔍 DEBUG: isNewLogin Ergebnis:', isNewLogin)
 
         if (isNewLogin) {
+          console.log('🚀 DEBUG: Neuer Login verarbeitung startet...')
           // JETZT erst als eingeloggt markieren (nach dem ersten Check)
           setUserLoggedIn()
+          console.log('📱 DEBUG: Login-Status gesetzt')
+          
           updateLastLoginDate()
+          console.log('⏰ DEBUG: updateLastLoginDate() aufgerufen')
 
           // Zum Dashboard weiterleiten
           const currentPath = window.location.pathname
@@ -106,9 +159,14 @@ export const initKeycloak = () => {
           const dashboardUrl = `/${lang}`
 
           if (window.location.pathname !== dashboardUrl) {
+            console.log('🔄 DEBUG: Weiterleitung zum Dashboard:', dashboardUrl)
             window.location.href = dashboardUrl
           }
+        } else {
+          console.log('ℹ️ DEBUG: Kein neuer Login - updateLastLoginDate wird NICHT aufgerufen')
         }
+      } else {
+        console.log('❌ DEBUG: Benutzer ist NICHT authentifiziert')
       }
       return authenticated
     })
@@ -203,15 +261,21 @@ const setupTokenRefresh = () => {
  * Aktualisiert das letzte Login-Datum in den Keycloak-Benutzerattributen
  */
 const updateLastLoginDate = async () => {
+  console.log('🔍 DEBUG: updateLastLoginDate() aufgerufen')
+  
   if (!keycloak?.authenticated || !keycloak?.token) {
+    console.log('❌ DEBUG: Keycloak nicht authentifiziert oder kein Token')
+    console.log('  - authenticated:', keycloak?.authenticated)
+    console.log('  - token vorhanden:', !!keycloak?.token)
     return
   }
 
   try {
     const currentTimestamp = new Date().toISOString()
+    console.log('📅 DEBUG: Sende lastLogin Update:', currentTimestamp)
 
     // API-Aufruf an unsere Next.js Route für die Aktualisierung des Benutzerattributs
-    await fetch('/api/auth/update-last-login', {
+    const response = await fetch('/api/auth/update-last-login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -221,6 +285,16 @@ const updateLastLoginDate = async () => {
         lastLogin: currentTimestamp,
       }),
     })
+
+    console.log('📡 DEBUG: API Response Status:', response.status)
+    
+    if (!response.ok) {
+      const errorData = await response.text()
+      console.error('❌ DEBUG: API Response Error:', errorData)
+    } else {
+      const responseData = await response.json()
+      console.log('✅ DEBUG: API Response Success:', responseData)
+    }
   } catch (error) {
     console.error('❌ Fehler beim Aktualisieren des letzten Login-Datums:', error)
   }
