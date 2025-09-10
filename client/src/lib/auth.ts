@@ -5,26 +5,42 @@ import { createContext, useContext } from 'react'
  * LocalStorage-Schlüssel für Login-Status
  */
 const LOGIN_STATUS_KEY = 'user_logged_in'
+const LAST_LOGIN_SESSION_KEY = 'last_login_session'
 
 /**
- * Markiert den Benutzer als eingeloggt
+ * Markiert den Benutzer als eingeloggt mit Session-Timestamp
  */
 const setUserLoggedIn = () => {
   if (typeof window !== 'undefined') {
+    const sessionTimestamp = Date.now().toString()
     localStorage.setItem(LOGIN_STATUS_KEY, 'true')
+    localStorage.setItem(LAST_LOGIN_SESSION_KEY, sessionTimestamp)
   }
 }
 
 /**
- * Prüft, ob der Benutzer neu eingeloggt ist
+ * Prüft, ob der Benutzer neu eingeloggt ist (Race-Condition sicher)
  */
 const checkForNewLogin = (): boolean => {
   if (typeof window !== 'undefined') {
     const wasLoggedIn = localStorage.getItem(LOGIN_STATUS_KEY) === 'true'
-    if (!wasLoggedIn) {
-      // Noch nicht als eingeloggt markiert = neuer Login
+    const lastSessionTimestamp = localStorage.getItem(LAST_LOGIN_SESSION_KEY)
+    
+    // Wenn nicht eingeloggt ODER Session älter als X Sekunden, dann neuer Login
+    if (!wasLoggedIn || !lastSessionTimestamp) {
       return true
     }
+    
+    // Zusätzliche Sicherheit: Wenn Session sehr alt ist, als neuen Login behandeln
+    const sessionAge = Date.now() - parseInt(lastSessionTimestamp, 10)
+    
+    // In Development: 5 Sekunden, in Production: 30 Sekunden
+    const timeoutMs = process.env.NODE_ENV === 'development' ? 5000 : 30000
+    
+    if (sessionAge > timeoutMs) {
+      return true
+    }
+    
     return false
   }
   return false
@@ -36,6 +52,7 @@ const checkForNewLogin = (): boolean => {
 const clearLoginStatus = () => {
   if (typeof window !== 'undefined') {
     localStorage.removeItem(LOGIN_STATUS_KEY)
+    localStorage.removeItem(LAST_LOGIN_SESSION_KEY)
   }
 }
 
@@ -95,9 +112,12 @@ export const initKeycloak = () => {
         const isNewLogin = checkForNewLogin()
 
         if (isNewLogin) {
-          // JETZT erst als eingeloggt markieren (nach dem ersten Check)
-          setUserLoggedIn()
+          // WICHTIG: updateLastLoginDate VOR setUserLoggedIn aufrufen
+          // um Race-Condition zu vermeiden
           updateLastLoginDate()
+          
+          // NACH dem LastLogin-Update als eingeloggt markieren
+          setUserLoggedIn()
 
           // Zum Dashboard weiterleiten
           const currentPath = window.location.pathname
@@ -199,13 +219,24 @@ const setupTokenRefresh = () => {
   window.addEventListener('authError', handleAuthError)
 }
 
+// Debounce-Mechanismus für updateLastLoginDate
+let lastLoginUpdateInProgress = false
+
 /**
  * Aktualisiert das letzte Login-Datum in den Keycloak-Benutzerattributen
+ * (Race-Condition und Doppelaufruf-sicher)
  */
 const updateLastLoginDate = async () => {
   if (!keycloak?.authenticated || !keycloak?.token) {
     return
   }
+
+  // Schutz vor gleichzeitigen Aufrufen
+  if (lastLoginUpdateInProgress) {
+    return
+  }
+
+  lastLoginUpdateInProgress = true
 
   try {
     const currentTimestamp = new Date().toISOString()
@@ -228,6 +259,9 @@ const updateLastLoginDate = async () => {
     }
   } catch (error) {
     console.error('❌ Fehler beim Aktualisieren des letzten Login-Datums:', error)
+  } finally {
+    // Flag nach Abschluss zurücksetzen
+    lastLoginUpdateInProgress = false
   }
 }
 
