@@ -26,7 +26,7 @@ const ArchitectureToolbar: React.FC<ArchitectureToolbarProps> = ({
   activeFiltersCount,
   onFilterClick,
   onResetFilters,
-  onAddClick: _onAddClick,
+  // onAddClick: _onAddClick,
   table,
   enableColumnVisibilityToggle,
   defaultColumnVisibility,

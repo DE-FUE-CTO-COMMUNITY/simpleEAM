@@ -69,8 +69,8 @@ const AicomponentTableWithGenericTable: React.FC<AicomponentTableProps> = ({
   onUpdateAicomponent,
   onDeleteAicomponent,
   onTableReady,
-  columnVisibility: _externalColumnVisibility,
-  onColumnVisibilityChange: _externalOnColumnVisibilityChange,
+  // columnVisibility: _externalColumnVisibility,
+  // onColumnVisibilityChange: _externalOnColumnVisibilityChange,
 }) => {
   const t = useTranslations('aicomponents.table')
   const tEntity = useTranslations('aicomponents')

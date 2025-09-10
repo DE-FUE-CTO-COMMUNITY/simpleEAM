@@ -51,7 +51,7 @@ interface ArchitecturePrincipleTableProps {
 }
 
 const ArchitecturePrincipleTable: React.FC<ArchitecturePrincipleTableProps> = ({
-  id: _id,
+  // id: _id,
   principles,
   loading,
   globalFilter,

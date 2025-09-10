@@ -80,8 +80,8 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
   availableTechStack = [],
   availableApplications = [], // Hinzugefügt
   onTableReady,
-  columnVisibility: _externalColumnVisibility,
-  onColumnVisibilityChange: _externalOnColumnVisibilityChange,
+  // columnVisibility: _externalColumnVisibility,
+  // onColumnVisibilityChange: _externalOnColumnVisibilityChange,
 }) => {
   const t = useTranslations('applications.table')
   const tStatus = useTranslations('applications.statuses')

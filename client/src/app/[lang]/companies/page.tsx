@@ -205,7 +205,7 @@ const CompaniesPage = () => {
           availableSizes={availableValues.size}
           onResetFilter={resetFilters}
           onClose={() => setFilterDialogOpen(false)}
-          onApply={_activeCount => {
+          onApply={() => {
             setFilterDialogOpen(false)
           }}
         />

@@ -24,16 +24,16 @@ const setUserLoggedIn = () => {
 const checkForOldSession = (): boolean => {
   if (typeof window !== 'undefined') {
     const lastSessionTimestamp = localStorage.getItem(LAST_LOGIN_SESSION_KEY)
-    
+
     // Wenn kein Timestamp existiert, dann neuer Login
     if (!lastSessionTimestamp) {
       return true
     }
-    
+
     // Prüfe, ob die letzte Session SEHR alt ist (mehr als 24 Stunden)
     const sessionAge = Date.now() - parseInt(lastSessionTimestamp, 10)
     const twentyFourHours = 24 * 60 * 60 * 1000 // 24 Stunden in Millisekunden
-    
+
     return sessionAge > twentyFourHours
   }
   return true
@@ -103,10 +103,10 @@ export const initKeycloak = () => {
 
         // WICHTIG: Session-Status ZUERST setzen, BEVOR wir prüfen ob es ein neuer Login ist
         const wasAlreadyLoggedIn = localStorage.getItem(LOGIN_STATUS_KEY) === 'true'
-        
+
         // Session-Status immer setzen (für Page Refreshes)
         setUserLoggedIn()
-        
+
         // Prüfen, ob es ein ECHTER neuer Login war (basierend auf dem vorherigen Status)
         const isNewLogin = !wasAlreadyLoggedIn || checkForOldSession()
 

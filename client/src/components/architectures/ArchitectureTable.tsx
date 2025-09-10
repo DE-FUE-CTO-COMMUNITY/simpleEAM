@@ -67,8 +67,8 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
   onDeleteArchitecture,
   availableArchitectures = [],
   onTableReady,
-  columnVisibility: _externalColumnVisibility,
-  onColumnVisibilityChange: _externalOnColumnVisibilityChange,
+  // columnVisibility: _externalColumnVisibility,
+  // onColumnVisibilityChange: _externalOnColumnVisibilityChange,
 }) => {
   const t = useTranslations('architectures')
   const getDomainLabelTranslated = useDomainLabel()

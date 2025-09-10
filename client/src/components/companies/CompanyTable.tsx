@@ -55,8 +55,8 @@ const CompanyTableWithGenericTable: React.FC<CompanyTableProps> = ({
   onUpdateCompany,
   onDeleteCompany,
   onTableReady,
-  columnVisibility: _externalColumnVisibility,
-  onColumnVisibilityChange: _externalOnColumnVisibilityChange,
+  // columnVisibility: _externalColumnVisibility,
+  // onColumnVisibilityChange: _externalOnColumnVisibilityChange,
 }) => {
   const t = useTranslations('companies.table')
   const tEntity = useTranslations('companies')

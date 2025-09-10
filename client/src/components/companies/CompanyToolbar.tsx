@@ -19,7 +19,7 @@ export function CompaniesToolbar({
   activeFiltersCount,
   onFilterClick,
   onResetFilters,
-  onAddClick: _onAddClick,
+  // onAddClick: _onAddClick,
 }: CompaniesToolbarProps) {
   const t = useTranslations('companies')
 

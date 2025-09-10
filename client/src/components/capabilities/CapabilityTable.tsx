@@ -68,8 +68,8 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
   availableTags = [],
   availableCapabilities = [],
   onTableReady,
-  columnVisibility: _externalColumnVisibility,
-  onColumnVisibilityChange: _externalOnColumnVisibilityChange,
+  // columnVisibility: _externalColumnVisibility,
+  // onColumnVisibilityChange: _externalOnColumnVisibilityChange,
 }) => {
   const theme = useTheme()
   const t = useTranslations('capabilities.table')

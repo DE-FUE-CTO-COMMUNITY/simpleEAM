@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { withAuth, AuthResult } from '../../../../lib/auth-middleware'
+import { withAuth } from '../../../../lib/auth-middleware'
 
 // Verfügbare Rollen im System
 const AVAILABLE_ROLES = ['viewer', 'architect', 'admin']
 
 // API Route für Keycloak Admin Operationen
-export const GET = withAuth(async (request: NextRequest, _authResult: AuthResult) => {
+export const GET = withAuth(async (request: NextRequest) => {
   const { searchParams } = new URL(request.url)
   const getRoles = searchParams.get('getRoles') === 'true'
 
@@ -115,7 +115,7 @@ export const GET = withAuth(async (request: NextRequest, _authResult: AuthResult
   }
 }, true) // true = requireAdmin
 
-export const POST = withAuth(async (request: NextRequest, _authResult: AuthResult) => {
+export const POST = withAuth(async (request: NextRequest) => {
   try {
     const body = await request.json()
     const { action, userId, userData } = body

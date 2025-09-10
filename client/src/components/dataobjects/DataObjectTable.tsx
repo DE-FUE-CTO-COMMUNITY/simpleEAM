@@ -63,8 +63,8 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
   onUpdateDataObject,
   onDeleteDataObject,
   onTableReady,
-  columnVisibility: _externalColumnVisibility,
-  onColumnVisibilityChange: _externalOnColumnVisibilityChange,
+  // columnVisibility: _externalColumnVisibility,
+  // onColumnVisibilityChange: _externalOnColumnVisibilityChange,
 }) => {
   const t = useTranslations('dataObjects.table')
   const tClassifications = useTranslations('dataObjects.classifications')

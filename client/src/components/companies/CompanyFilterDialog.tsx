@@ -20,7 +20,7 @@ interface CompanyFilterProps {
 export function CompanyFilterDialog({
   filterState,
   availableSizes = Object.values(CompanySize),
-  availableIndustries: _availableIndustries = [],
+  // availableIndustries: _availableIndustries = [],
   onFilterChange,
   onResetFilter,
   onClose,

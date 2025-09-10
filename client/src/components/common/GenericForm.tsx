@@ -194,12 +194,12 @@ const GenericForm: React.FC<GenericFormProps> = ({
   title,
   isOpen,
   onClose,
-  onSubmit: _submitFn,
+  // onSubmit: _submitFn,
   isLoading = false,
   mode,
   fields,
   tabs,
-  initialValues: _initialValues,
+  // initialValues: _initialValues,
   submitButtonText,
   cancelButtonText,
   formWidth = 'md',
@@ -207,7 +207,7 @@ const GenericForm: React.FC<GenericFormProps> = ({
   onDelete,
   deleteButtonText,
   deleteConfirmationText,
-  _disableSubmitOnErrors = true, // Nicht mehr verwendet - behalten für abwärtskompatibilität
+  // _disableSubmitOnErrors = true, // Nicht mehr verwendet - behalten für abwärtskompatibilität
   sx,
   form,
   onEditMode,

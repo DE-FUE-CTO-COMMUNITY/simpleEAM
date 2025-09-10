@@ -13,7 +13,7 @@ const AicomponentFilterDialogWithGeneric: React.FC<FilterProps> = ({
   availableStatuses,
   availableProviders,
   availableTags,
-  availableOwners: _availableOwners, // TODO: Implement when personSelect supports options
+  // availableOwners, // TODO: Implement when personSelect supports options
   onFilterChange,
   onResetFilter,
   onClose,

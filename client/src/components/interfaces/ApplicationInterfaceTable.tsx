@@ -74,8 +74,8 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
   applications = [],
   persons = [],
   onTableReady,
-  columnVisibility: _externalColumnVisibility,
-  onColumnVisibilityChange: _externalOnColumnVisibilityChange,
+  // columnVisibility: _externalColumnVisibility,
+  // onColumnVisibilityChange: _externalOnColumnVisibilityChange,
 }) => {
   const t = useTranslations('interfaces.table')
   const tTypes = useTranslations('interfaces.interfaceTypes')

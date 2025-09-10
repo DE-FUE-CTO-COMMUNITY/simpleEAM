@@ -70,8 +70,8 @@ const InfrastructureTable: React.FC<InfrastructureTableProps> = ({
   onUpdateInfrastructure,
   onDeleteInfrastructure,
   onTableReady,
-  columnVisibility: _externalColumnVisibility,
-  onColumnVisibilityChange: _externalOnColumnVisibilityChange,
+  // columnVisibility: _externalColumnVisibility,
+  // onColumnVisibilityChange: _externalOnColumnVisibilityChange,
 }) => {
   const t = useTranslations('infrastructure')
   const locale = useLocale()

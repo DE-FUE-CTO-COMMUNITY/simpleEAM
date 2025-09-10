@@ -62,8 +62,8 @@ const PersonTableWithGenericTable: React.FC<PersonTableProps> = ({
   onUpdatePerson,
   onDeletePerson,
   onTableReady,
-  columnVisibility: _externalColumnVisibility,
-  onColumnVisibilityChange: _externalOnColumnVisibilityChange,
+  // columnVisibility: _externalColumnVisibility,
+  // onColumnVisibilityChange: _externalOnColumnVisibilityChange,
 }) => {
   const t = useTranslations('persons.table')
   const tPersons = useTranslations('persons')
