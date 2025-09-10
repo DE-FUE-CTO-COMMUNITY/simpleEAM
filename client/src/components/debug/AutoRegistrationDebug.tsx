@@ -4,8 +4,10 @@ import React from 'react'
 import { Box, Typography, Button, Paper, Chip, Alert } from '@mui/material'
 import { useAutoUserRegistration } from '@/hooks/useAutoUserRegistration'
 import { useAuth } from '@/lib/auth'
+import { useTranslations } from 'next-intl'
 
 export default function AutoRegistrationDebug() {
+  const t = useTranslations('debug.autoRegistration')
   const { keycloak, authenticated, initialized } = useAuth()
   const { registrationChecked, userExists, isChecking, isCreating, clearRegistrationCache } =
     useAutoUserRegistration()
@@ -21,33 +23,33 @@ export default function AutoRegistrationDebug() {
   }
 
   const getStatusText = () => {
-    if (isCreating) return 'Erstelle Person...'
-    if (isChecking) return 'Prüfe Person...'
-    if (userExists) return 'Person existiert'
-    if (registrationChecked && !userExists) return 'Person fehlt'
-    return 'Nicht geprüft'
+    if (isCreating) return t('creatingPerson')
+    if (isChecking) return t('checkingPerson')
+    if (userExists) return t('personExists')
+    if (registrationChecked && !userExists) return t('personMissing')
+    return t('notChecked')
   }
 
   return (
     <Paper sx={{ p: 3, mt: 2 }}>
       <Typography variant="h6" gutterBottom>
-        Auto-Registrierung Debug
+        {t('title')}
       </Typography>
 
       <Box sx={{ mb: 2 }}>
         <Typography variant="body2" color="text.secondary">
-          Benutzer E-Mail: <strong>{userEmail || 'Nicht verfügbar'}</strong>
+          {t('userEmail')}: <strong>{userEmail || t('notAvailable')}</strong>
         </Typography>
       </Box>
 
       <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
         <Chip
-          label={`Initialisiert: ${initialized}`}
+          label={`${t('initialized')}: ${initialized}`}
           color={initialized ? 'success' : 'default'}
           size="small"
         />
         <Chip
-          label={`Authentifiziert: ${authenticated}`}
+          label={`${t('authenticated')}: ${authenticated}`}
           color={authenticated ? 'success' : 'default'}
           size="small"
         />
@@ -61,25 +63,25 @@ export default function AutoRegistrationDebug() {
 
       {!userEmail && (
         <Alert severity="warning" sx={{ mb: 2 }}>
-          Keine E-Mail-Adresse im Keycloak-Token gefunden
+          {t('noEmailFound')}
         </Alert>
       )}
 
       {userEmail && !userExists && registrationChecked && (
         <Alert severity="error" sx={{ mb: 2 }}>
-          Person wurde nicht automatisch erstellt! Möglicherweise liegt ein Problem vor.
+          {t('personNotCreated')}
         </Alert>
       )}
 
       {userEmail && userExists && (
         <Alert severity="success" sx={{ mb: 2 }}>
-          Person existiert und ist korrekt verknüpft
+          {t('personExistsCorrectly')}
         </Alert>
       )}
 
       <Box sx={{ display: 'flex', gap: 1 }}>
         <Button variant="outlined" onClick={clearRegistrationCache} disabled={!userEmail}>
-          Cache leeren & neu prüfen
+          {t('clearCacheAndRecheck')}
         </Button>
 
         <Button
@@ -92,13 +94,13 @@ export default function AutoRegistrationDebug() {
           }}
           disabled={!userEmail}
         >
-          Session zurücksetzen
+          {t('resetSession')}
         </Button>
       </Box>
 
       <Box sx={{ mt: 2 }}>
         <Typography variant="caption" color="text.secondary">
-          Konsole öffnen für detaillierte Logs der Auto-Registrierung
+          {t('consoleHint')}
         </Typography>
       </Box>
     </Paper>

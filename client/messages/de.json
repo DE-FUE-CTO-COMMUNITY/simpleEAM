@@ -43,7 +43,8 @@
     "from": "Von",
     "to": "Bis",
     "contains": "enthält",
-    "none": "Keine"
+    "none": "Keine",
+    "unknownError": "Unbekannter Fehler"
   },
   "navigation": {
     "dashboard": "Dashboard",
@@ -403,7 +404,8 @@
       "excalidrawNotAvailable": "Excalidraw API nicht verfügbar",
       "noElementsToExport": "Keine Elemente zum Exportieren vorhanden",
       "syncError": "Fehler bei der Datenbank-Synchronisation"
-    }
+    },
+    "untitledDiagram": "Unbenanntes Diagramm"
   },
   "architectures": {
     "title": "Architekturen",
@@ -1862,6 +1864,31 @@
       "updatedAtLabel": "Aktualisierungsdatum",
       "fromLabel": "Von",
       "toLabel": "Bis"
+    }
+  },
+  "debug": {
+    "autoRegistration": {
+      "title": "Auto-Registrierung Debug",
+      "userEmail": "Benutzer E-Mail",
+      "notAvailable": "Nicht verfügbar",
+      "initialized": "Initialisiert",
+      "authenticated": "Authentifiziert",
+      "creatingPerson": "Erstelle Person...",
+      "checkingPerson": "Prüfe Person...",
+      "personExists": "Person existiert",
+      "personMissing": "Person fehlt",
+      "notChecked": "Nicht geprüft",
+      "noEmailFound": "Keine E-Mail-Adresse im Keycloak-Token gefunden",
+      "personNotCreated": "Person wurde nicht automatisch erstellt! Möglicherweise liegt ein Problem vor.",
+      "personExistsCorrectly": "Person existiert und ist korrekt verknüpft",
+      "clearCacheAndRecheck": "Cache leeren & neu prüfen",
+      "resetSession": "Session zurücksetzen",
+      "consoleHint": "Konsole öffnen für detaillierte Logs der Auto-Registrierung"
+    },
+    "session": {
+      "keycloakNotInitialized": "Keycloak nicht initialisiert",
+      "authenticated": "Authentifiziert",
+      "notAuthenticated": "Nicht authentifiziert"
     }
   }
 }

@@ -33,6 +33,7 @@ import {
 } from '@mui/icons-material'
 import { keycloak } from '@/lib/auth'
 import { getTokenInfo } from '@/utils/sessionUtils'
+import { useTranslations } from 'next-intl'
 
 interface SessionDebuggerProps {
   isOpen: boolean
@@ -40,6 +41,7 @@ interface SessionDebuggerProps {
 }
 
 const SessionDebugger: React.FC<SessionDebuggerProps> = ({ isOpen, onClose }) => {
+  const t = useTranslations('debug.session')
   const [tokenInfo, setTokenInfo] = useState<any>(null)
   const [refreshKey, setRefreshKey] = useState(0)
 
@@ -86,14 +88,14 @@ const SessionDebugger: React.FC<SessionDebuggerProps> = ({ isOpen, onClose }) =>
 
   const renderKeycloakStatus = () => {
     if (!keycloak) {
-      return <Alert severity="error">Keycloak nicht initialisiert</Alert>
+      return <Alert severity="error">{t('keycloakNotInitialized')}</Alert>
     }
 
     return (
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
           <Chip
-            label={keycloak.authenticated ? 'Authentifiziert' : 'Nicht authentifiziert'}
+            label={keycloak.authenticated ? t('authenticated') : t('notAuthenticated')}
             color={keycloak.authenticated ? 'success' : 'error'}
           />
           <Chip label={`Flow: ${keycloak.flow || 'Unbekannt'}`} variant="outlined" />

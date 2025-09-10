@@ -43,7 +43,8 @@
     "from": "From",
     "to": "To",
     "contains": "contains",
-    "none": "None"
+    "none": "None",
+    "unknownError": "Unknown Error"
   },
   "navigation": {
     "dashboard": "Dashboard",
@@ -407,7 +408,8 @@
       "excalidrawNotAvailable": "Excalidraw API not available",
       "noElementsToExport": "No elements available for export",
       "syncError": "Error during database synchronization"
-    }
+    },
+    "untitledDiagram": "Untitled Diagram"
   },
   "architectures": {
     "title": "Architectures",
@@ -1870,6 +1872,31 @@
       "updatedAtLabel": "Updated on",
       "fromLabel": "From",
       "toLabel": "To"
+    }
+  },
+  "debug": {
+    "autoRegistration": {
+      "title": "Auto-Registration Debug",
+      "userEmail": "User Email",
+      "notAvailable": "Not Available",
+      "initialized": "Initialized",
+      "authenticated": "Authenticated",
+      "creatingPerson": "Creating Person...",
+      "checkingPerson": "Checking Person...",
+      "personExists": "Person Exists",
+      "personMissing": "Person Missing",
+      "notChecked": "Not Checked",
+      "noEmailFound": "No email address found in Keycloak token",
+      "personNotCreated": "Person was not automatically created! There may be a problem.",
+      "personExistsCorrectly": "Person exists and is correctly linked",
+      "clearCacheAndRecheck": "Clear cache & recheck",
+      "resetSession": "Reset Session",
+      "consoleHint": "Open console for detailed auto-registration logs"
+    },
+    "session": {
+      "keycloakNotInitialized": "Keycloak not initialized",
+      "authenticated": "Authenticated",
+      "notAuthenticated": "Not Authenticated"
     }
   }
 }

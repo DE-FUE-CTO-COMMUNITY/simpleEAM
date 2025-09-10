@@ -638,7 +638,7 @@ export const downloadTemplateWithRealFields = async (
       createdAt: '',
       updatedAt: '',
     }
-    
+
     await exportToExcel([aicomponentsTemplate], {
       filename: 'AI_Components_Import_Template',
       sheetName: 'Import Template',
@@ -647,8 +647,10 @@ export const downloadTemplateWithRealFields = async (
     })
     return
   }
-  
-  const template = getTemplateByEntityType(entityType as Exclude<typeof entityType, 'all' | 'aicomponents'>)
+
+  const template = getTemplateByEntityType(
+    entityType as Exclude<typeof entityType, 'all' | 'aicomponents'>
+  )
 
   const entityTypeLabels = {
     businessCapabilities: 'Business Capabilities',

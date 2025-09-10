@@ -2,6 +2,7 @@ import React from 'react'
 import { Box, Chip } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import { Groups } from '@mui/icons-material'
+import { useTranslations } from 'next-intl'
 
 interface DiagramNameDisplayProps {
   currentDiagram: any
@@ -43,7 +44,8 @@ const DiagramNameDisplay: React.FC<DiagramNameDisplayProps> = ({
   onSaveClick: _onSaveClick, // Parameter beibehalten für Kompatibilität, aber nicht verwenden
   isCollaborating = false,
 }) => {
-  const displayName = currentDiagram?.title || 'Unbenanntes Diagramm'
+  const t = useTranslations('diagrams')
+  const displayName = currentDiagram?.title || t('untitledDiagram')
 
   // Icon und Label zusammensetzen
   const chipLabel = isCollaborating ? (

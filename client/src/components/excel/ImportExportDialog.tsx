@@ -62,6 +62,7 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
   const { enqueueSnackbar } = useSnackbar()
   const apolloClient = useApolloClient()
   const t = useTranslations('importExport')
+  const tCommon = useTranslations('common')
   const tEntityTypes = useTranslations('importExport.entityTypes')
   const { selectedCompanyId } = useCompanyContext()
 
@@ -212,7 +213,7 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
     } catch (err) {
       enqueueSnackbar(
         t('import.messages.fileLoadError', {
-          error: err instanceof Error ? err.message : 'Unbekannter Fehler',
+          error: err instanceof Error ? err.message : tCommon('unknownError'),
         }),
         { variant: 'error' }
       )
@@ -272,7 +273,7 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
     } catch (error) {
       enqueueSnackbar(
         t('import.messages.importError', {
-          error: error instanceof Error ? error.message : 'Unbekannter Fehler',
+          error: error instanceof Error ? error.message : tCommon('unknownError'),
         }),
         { variant: 'error' }
       )
@@ -301,7 +302,7 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
     } catch (error) {
       enqueueSnackbar(
         t('export.messages.exportError', {
-          error: error instanceof Error ? error.message : 'Unbekannter Fehler',
+          error: error instanceof Error ? error.message : tCommon('unknownError'),
         }),
         { variant: 'error' }
       )
@@ -353,7 +354,7 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
     } catch (error) {
       enqueueSnackbar(
         t('management.messages.deleteError', {
-          error: error instanceof Error ? error.message : 'Unbekannter Fehler',
+          error: error instanceof Error ? error.message : tCommon('unknownError'),
         }),
         { variant: 'error' }
       )
@@ -398,7 +399,7 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
     } catch (error) {
       enqueueSnackbar(
         t('import.messages.templateDownloadError', {
-          error: error instanceof Error ? error.message : 'Unbekannter Fehler',
+          error: error instanceof Error ? error.message : tCommon('unknownError'),
         }),
         { variant: 'error' }
       )
