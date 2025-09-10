@@ -17,6 +17,7 @@ interface DiagramElement {
     elementType?:
       | 'capability'
       | 'application'
+      | 'aiComponent'
       | 'dataObject'
       | 'interface'
       | 'infrastructure'
@@ -125,6 +126,22 @@ export const fetchElementData = async (
           }
         `
         break
+      case 'aiComponent':
+        query = gql`
+          query GetAIComponent($id: ID!) {
+            aiComponents(where: { id: { eq: $id } }) {
+              id
+              name
+              description
+              aiType
+              model
+              status
+              provider
+              version
+            }
+          }
+        `
+        break
       case 'dataObject':
         query = gql`
           query GetDataObject($id: ID!) {
@@ -183,6 +200,8 @@ export const fetchElementData = async (
         return result.data.businessCapabilities?.[0] || null
       case 'application':
         return result.data.applications?.[0] || null
+      case 'aiComponent':
+        return result.data.aiComponents?.[0] || null
       case 'dataObject':
         return result.data.dataObjects?.[0] || null
       case 'interface':
@@ -256,6 +275,18 @@ export const updateElementName = async (
           mutation UpdateApplicationName($id: ID!, $name: String!) {
             updateApplications(where: { id: { eq: $id } }, update: { name: { set: $name } }) {
               applications {
+                id
+                name
+              }
+            }
+          }
+        `
+        break
+      case 'aiComponent':
+        mutation = gql`
+          mutation UpdateAIComponentName($id: ID!, $name: String!) {
+            updateAiComponents(where: { id: { eq: $id } }, update: { name: { set: $name } }) {
+              aiComponents {
                 id
                 name
               }

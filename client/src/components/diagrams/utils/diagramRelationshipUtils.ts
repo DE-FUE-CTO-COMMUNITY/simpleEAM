@@ -115,6 +115,7 @@ export const groupElementsByType = (elements: DatabaseElementReference[]) => {
   const grouped = {
     capabilities: [] as string[],
     applications: [] as string[],
+    aiComponents: [] as string[],
     dataObjects: [] as string[],
     interfaces: [] as string[],
     infrastructures: [] as string[],
@@ -131,6 +132,9 @@ export const groupElementsByType = (elements: DatabaseElementReference[]) => {
         break
       case 'application':
         grouped.applications.push(element.id)
+        break
+      case 'aiComponent':
+        grouped.aiComponents.push(element.id)
         break
       case 'dataObject':
         grouped.dataObjects.push(element.id)
@@ -303,6 +307,7 @@ export const createArchitectureLinkingUpdates = (
     architectureId,
     capabilities: grouped.capabilities,
     applications: grouped.applications,
+    aiComponents: grouped.aiComponents,
     dataObjects: grouped.dataObjects,
     interfaces: grouped.interfaces,
     infrastructures: grouped.infrastructures,

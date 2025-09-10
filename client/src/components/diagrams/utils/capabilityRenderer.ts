@@ -99,7 +99,10 @@ export const renderCapabilityHierarchy = (
   elements.push(...capabilityElements)
 
   // If this is not a leaf, render visible children and applications/AI components inside the box
-  if (!isLeaf && (visibleChildren.length > 0 || applications.length > 0 || aiComponents.length > 0)) {
+  if (
+    !isLeaf &&
+    (visibleChildren.length > 0 || applications.length > 0 || aiComponents.length > 0)
+  ) {
     const textAreaHeight = 50 // Increased space for text at the top - matches the calculation function
     const childPadding = 10
     const childSpacing = 10
@@ -187,7 +190,6 @@ export const renderCapabilityHierarchy = (
           aiHeight = Math.max(aiTemplateRect.height, baseHeight * 0.8)
         }
 
-        
         const aiElements = createAiComponentElementsFromTemplate(
           aiComponent,
           aiComponentTemplate,

@@ -59,6 +59,7 @@ interface ElementCreationResult {
 // Unterstützte Element-Typen - kompatibel mit databaseSyncUtils
 export const ELEMENT_TYPES = {
   APPLICATION: 'application',
+  AI_COMPONENT: 'aiComponent',
   CAPABILITY: 'capability',
   DATA_OBJECT: 'dataObject',
   INTERFACE: 'interface',
@@ -70,6 +71,18 @@ const CREATE_APPLICATION_MUTATION = gql`
   mutation CreateApplication($input: [ApplicationCreateInput!]!) {
     createApplications(input: $input) {
       applications {
+        id
+        name
+        description
+      }
+    }
+  }
+`
+
+const CREATE_AI_COMPONENT_MUTATION = gql`
+  mutation CreateAIComponent($input: [AIComponentCreateInput!]!) {
+    createAiComponents(input: $input) {
+      aiComponents {
         id
         name
         description
@@ -312,6 +325,15 @@ const createElementsByType = async (
           status: 'ACTIVE',
           criticality: 'MEDIUM',
         }
+      case ELEMENT_TYPES.AI_COMPONENT:
+        return {
+          ...baseInput,
+          ...ownerInput,
+          ...companyInput,
+          modelType: 'Machine Learning',
+          capabilities: ['Data Processing'],
+          status: 'ACTIVE',
+        }
       case ELEMENT_TYPES.CAPABILITY:
         return {
           ...baseInput,
@@ -370,6 +392,10 @@ const createElementsByType = async (
     case ELEMENT_TYPES.APPLICATION:
       mutation = CREATE_APPLICATION_MUTATION
       resultPath = 'createApplications.applications'
+      break
+    case ELEMENT_TYPES.AI_COMPONENT:
+      mutation = CREATE_AI_COMPONENT_MUTATION
+      resultPath = 'createAiComponents.aiComponents'
       break
     case ELEMENT_TYPES.CAPABILITY:
       mutation = CREATE_CAPABILITY_MUTATION

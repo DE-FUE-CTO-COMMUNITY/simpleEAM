@@ -674,7 +674,7 @@ export function createAiComponentElementsFromTemplate(
           const mainContainerNewX = mainContainer.x + offsetX
           const iconOffset = 10 // Fixed offset from right edge
           const iconWidth = element.width || 20
-          
+
           // Position icon near the right edge of the new container
           newElement.x = mainContainerNewX + customizations.width - iconOffset - iconWidth
         }
