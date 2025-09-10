@@ -21,6 +21,7 @@ import {
 import {
   BusinessCapabilityIcon,
   ApplicationComponentIcon,
+  AIComponentIcon,
   ApplicationInterfaceIcon,
   BusinessObjectIcon,
   InfrastructureIcon,
@@ -31,6 +32,7 @@ import { useTranslations } from 'next-intl'
 import { useAuth, login } from '@/lib/auth'
 import { GET_CAPABILITIES_COUNT } from '@/graphql/capability'
 import { GET_APPLICATIONS_COUNT } from '@/graphql/application'
+import { GET_AICOMPONENTS_COUNT } from '@/graphql/aicomponent'
 import { GET_DATA_OBJECTS_COUNT } from '@/graphql/dataObject'
 import { GET_ARCHITECTURES_COUNT } from '@/graphql/architecture'
 import { GET_DIAGRAMS_COUNT } from '@/graphql/diagram'
@@ -78,6 +80,15 @@ const Dashboard = () => {
     loading: applicationsLoading,
     error: applicationsError,
   } = useQuery(GET_APPLICATIONS_COUNT, {
+    skip: !authenticated || !initialized,
+    variables: { where: appWhere },
+  })
+
+  const {
+    data: aiComponentsData,
+    loading: aiComponentsLoading,
+    error: aiComponentsError,
+  } = useQuery(GET_AICOMPONENTS_COUNT, {
     skip: !authenticated || !initialized,
     variables: { where: appWhere },
   })
@@ -153,6 +164,9 @@ const Dashboard = () => {
     if (applicationsError) {
       enqueueSnackbar(tCommon('error'), { variant: 'error' })
     }
+    if (aiComponentsError) {
+      enqueueSnackbar(tCommon('error'), { variant: 'error' })
+    }
     if (dataObjectsError) {
       enqueueSnackbar(tCommon('error'), { variant: 'error' })
     }
@@ -177,6 +191,7 @@ const Dashboard = () => {
   }, [
     capabilitiesError,
     applicationsError,
+    aiComponentsError,
     dataObjectsError,
     architecturesError,
     diagramsError,
@@ -192,6 +207,7 @@ const Dashboard = () => {
   const capabilitiesCount =
     capabilitiesData?.businessCapabilitiesConnection?.aggregate?.count?.nodes || 0
   const applicationsCount = applicationsData?.applicationsConnection?.aggregate?.count?.nodes || 0
+  const aiComponentsCount = aiComponentsData?.aiComponents?.length || 0
   const dataObjectsCount = dataObjectsData?.dataObjectsConnection?.aggregate?.count?.nodes || 0
   const architecturesCount =
     architecturesData?.architecturesConnection?.aggregate?.count?.nodes || 0
@@ -207,6 +223,7 @@ const Dashboard = () => {
   const totalCount =
     capabilitiesCount +
     applicationsCount +
+    aiComponentsCount +
     dataObjectsCount +
     interfacesCount +
     infrastructuresCount
@@ -214,6 +231,7 @@ const Dashboard = () => {
   const isLoading =
     capabilitiesLoading ||
     applicationsLoading ||
+    aiComponentsLoading ||
     dataObjectsLoading ||
     architecturesLoading ||
     diagramsLoading ||
@@ -230,6 +248,8 @@ const Dashboard = () => {
         return (
           <ApplicationComponentIcon sx={{ fontSize: 40, color: theme.palette.secondary.main }} />
         )
+      case 'aiComponent':
+        return <AIComponentIcon sx={{ fontSize: 40, color: theme.palette.secondary.dark }} />
       case 'dataObject':
         return <BusinessObjectIcon sx={{ fontSize: 40, color: theme.palette.info.main }} />
       case 'interface':
@@ -285,6 +305,22 @@ const Dashboard = () => {
                 <Typography variant="h4">{isLoading ? '...' : applicationsCount}</Typography>
               </Box>
               {getCardIcon('application')}
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3, xl: 2 }}>
+          <Card>
+            <CardContent
+              sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+            >
+              <Box>
+                <Typography variant="subtitle2" color="text.secondary">
+                  {t('aiComponents')}
+                </Typography>
+                <Typography variant="h4">{isLoading ? '...' : aiComponentsCount}</Typography>
+              </Box>
+              {getCardIcon('aiComponent')}
             </CardContent>
           </Card>
         </Grid>
@@ -416,6 +452,12 @@ const Dashboard = () => {
           <Typography variant="body1" paragraph>
             {t('totalElements', {
               count: totalCount,
+              capabilitiesCount,
+              applicationsCount,
+              aiComponentsCount,
+              dataObjectsCount,
+              interfacesCount,
+              infrastructuresCount,
               architecturesCount,
               principlesCount,
               diagramsCount,

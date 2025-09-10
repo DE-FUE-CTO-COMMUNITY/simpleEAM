@@ -68,6 +68,7 @@
     "title": "Dashboard",
     "businessCapabilities": "Business Capabilities",
     "applications": "Applikationen",
+    "aiComponents": "AI Components",
     "dataObjects": "Datenobjekte",
     "interfaces": "Schnittstellen",
     "infrastructure": "Infrastruktur",
@@ -83,7 +84,7 @@
     "loadingDiagramsError": "Fehler beim Laden der Diagramme: {message}",
     "architectureLandscape": "Architekturlandschaft",
     "overview": "Die Enterprise-Architektur-Management-Plattform zeigt Ihnen einen Überblick über die vollständige IT-Landschaft.",
-    "totalElements": "Es wurden insgesamt {count} Architekturelemente (Business Capabilities, Applikationen, Datenobjekte, Schnittstellen und Infrastruktur) erfasst. Darüber hinaus gibt es {architecturesCount} Architekturen, {principlesCount} Architektur Prinzipien, {diagramsCount} Diagramme und {personsCount} Personen.",
+    "totalElements": "Es wurden insgesamt {count} Architekturelemente erfasst: {capabilitiesCount} Business Capabilities, {applicationsCount} Applikationen, {aiComponentsCount} AI Components, {dataObjectsCount} Datenobjekte, {interfacesCount} Schnittstellen und {infrastructuresCount} Infrastrukturelemente. Darüber hinaus gibt es {architecturesCount} Architekturen, {principlesCount} Architektur Prinzipien, {diagramsCount} Diagramme und {personsCount} Personen.",
     "navigationHint": "Verwenden Sie die Navigation auf der linken Seite, um detaillierte Informationen zu den einzelnen Architekturkomponenten zu erhalten.",
     "loadingError": {
       "businessCapabilities": "Fehler beim Laden der Business Capabilities",

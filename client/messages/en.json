@@ -81,6 +81,7 @@
     "description_placeholder": "No description available",
     "businessCapabilities": "Business Capabilities",
     "applications": "Applications",
+    "aiComponents": "AI Components",
     "dataObjects": "Data Objects",
     "interfaces": "Interfaces",
     "infrastructure": "Infrastructure",
@@ -95,7 +96,7 @@
     "loadingDiagramsError": "Error loading diagrams: {message}",
     "architectureLandscape": "Architecture Landscape",
     "overview": "The Enterprise Architecture Management platform provides you with an overview of the complete IT landscape.",
-    "totalElements": "A total of {count} architecture elements (Business Capabilities, Applications, Data Objects, Interfaces and Infrastructure) have been recorded. In addition, there are {architecturesCount} Architectures, {principlesCount} Architecture Principles, {diagramsCount} Diagrams and {personsCount} Persons.",
+    "totalElements": "A total of {count} architecture elements have been recorded: {capabilitiesCount} Business Capabilities, {applicationsCount} Applications, {aiComponentsCount} AI Components, {dataObjectsCount} Data Objects, {interfacesCount} Interfaces and {infrastructuresCount} Infrastructure elements. In addition, there are {architecturesCount} Architectures, {principlesCount} Architecture Principles, {diagramsCount} Diagrams and {personsCount} Persons.",
     "navigationHint": "Use the navigation on the left side to get detailed information about the individual architecture components."
   },
   "diagrams": {
