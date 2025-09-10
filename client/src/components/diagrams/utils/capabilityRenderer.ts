@@ -6,10 +6,12 @@ import {
   findChildCapabilities,
   calculateSubtreeHeight,
   collectApplicationsForDisplay,
+  collectAiComponentsForDisplay,
 } from './capabilityHierarchy'
 import {
   createCapabilityElementsFromTemplate,
   createApplicationElementsFromTemplate,
+  createAiComponentElementsFromTemplate,
 } from './elementCreation'
 
 // Recursive function to render capability hierarchy with proper layout
@@ -18,6 +20,7 @@ export const renderCapabilityHierarchy = (
   allCapabilities: BusinessCapability[],
   capabilityTemplate: LibraryTemplate,
   applicationTemplate: LibraryTemplate | null,
+  aiComponentTemplate: LibraryTemplate | null,
   x: number,
   y: number,
   width: number,
@@ -43,6 +46,11 @@ export const renderCapabilityHierarchy = (
     ? collectApplicationsForDisplay(capability, allCapabilities, currentLevel, settings.maxLevels)
     : []
 
+  // Find AI components that should be displayed for this capability (smart rollup logic)
+  const aiComponents = settings.includeAiComponents
+    ? collectAiComponentsForDisplay(capability, allCapabilities, currentLevel, settings.maxLevels)
+    : []
+
   // Calculate the total height needed for this subtree
   const subtreeHeight = calculateSubtreeHeight(
     capability,
@@ -54,9 +62,10 @@ export const renderCapabilityHierarchy = (
     applicationTemplate // Pass the applicationTemplate for consistent height calculations
   )
 
-  // Determine if this is a leaf node (no visible children and no applications to render)
-  // A capability is a leaf ONLY if it has neither visible children NOR applications to display
-  const isLeaf = visibleChildren.length === 0 && applications.length === 0
+  // Determine if this is a leaf node (no visible children, no applications, and no AI components to render)
+  // A capability is a leaf ONLY if it has neither visible children NOR applications NOR AI components to display
+  const isLeaf =
+    visibleChildren.length === 0 && applications.length === 0 && aiComponents.length === 0
 
   // Create the capability box itself
   // For level-0 capabilities, use uniform height if provided; otherwise use calculated height
@@ -89,8 +98,8 @@ export const renderCapabilityHierarchy = (
 
   elements.push(...capabilityElements)
 
-  // If this is not a leaf, render visible children and applications inside the box
-  if (!isLeaf && (visibleChildren.length > 0 || applications.length > 0)) {
+  // If this is not a leaf, render visible children and applications/AI components inside the box
+  if (!isLeaf && (visibleChildren.length > 0 || applications.length > 0 || aiComponents.length > 0)) {
     const textAreaHeight = 50 // Increased space for text at the top - matches the calculation function
     const childPadding = 10
     const childSpacing = 10
@@ -110,6 +119,7 @@ export const renderCapabilityHierarchy = (
         allCapabilities,
         capabilityTemplate,
         applicationTemplate,
+        aiComponentTemplate,
         childX,
         currentChildY,
         childWidth,
@@ -158,6 +168,44 @@ export const renderCapabilityHierarchy = (
 
         // Move to next position
         currentChildY += appHeight + childSpacing
+      })
+    }
+
+    // Then, render AI components (if any and template available)
+    if (aiComponents.length > 0 && aiComponentTemplate) {
+      aiComponents.forEach((aiComponent, _aiIndex) => {
+        // Use the same positioning and sizing logic as applications
+        const aiWidth = width - childIndent - 10
+        const aiX = x + childIndent
+
+        // Calculate AI component height exactly like applications
+        let aiHeight = baseHeight * 0.8 // Default fallback
+        const aiTemplateRect = aiComponentTemplate.elements.find(
+          (el: any) => el.type === 'rectangle'
+        )
+        if (aiTemplateRect) {
+          aiHeight = Math.max(aiTemplateRect.height, baseHeight * 0.8)
+        }
+
+        
+        const aiElements = createAiComponentElementsFromTemplate(
+          aiComponent,
+          aiComponentTemplate,
+          aiX,
+          currentChildY,
+          parentGroupId,
+          {
+            width: aiWidth,
+            height: aiHeight,
+            fontSize: Math.max(10, 14 - currentLevel - 1),
+            // backgroundColor: removed to use template's original color
+          }
+        )
+
+        elements.push(...aiElements)
+
+        // Move to next position
+        currentChildY += aiHeight + childSpacing
       })
     }
 

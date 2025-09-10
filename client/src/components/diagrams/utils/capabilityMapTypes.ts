@@ -3,6 +3,7 @@ import type { BusinessCapability } from '@/gql/generated'
 export interface CapabilityMapSettings {
   maxLevels: number
   includeApplications: boolean
+  includeAiComponents: boolean
   horizontalSpacing: number
   verticalSpacing: number
 }

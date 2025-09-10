@@ -1,11 +1,11 @@
 import type { BusinessCapability } from '@/gql/generated'
 import { generateNKeysBetween } from 'fractional-indexing'
-import { collectApplicationsForDisplay } from './capabilityHierarchy'
 import { generateElementId, generateSeed as generateRandomSeed } from './elementIdManager'
 
 export interface CapabilityMapSettings {
   maxLevels: number
   includeApplications: boolean
+  includeAiComponents: boolean
   horizontalSpacing: number
   verticalSpacing: number
 }
@@ -361,76 +361,7 @@ export const generateCapabilityMapElements = (
       })
     }
 
-    // Add applications if enabled - smart rollup logic
-    if (settings.includeApplications) {
-      // FIXME: This is wrong! We're always passing currentLevel: 0, but this function
-      // is used for top-level capabilities, so it should be 0. The real rendering
-      // happens in capabilityRenderer.ts with the correct levels.
-      const allApplications = collectApplicationsForDisplay(
-        capability,
-        capabilities,
-        0,
-        settings.maxLevels
-      )
-
-      if (allApplications.length > 0) {
-        // Position applications below the capability container
-        const appStartY = y + containerHeight + 10
-
-        allApplications.forEach((app, appIndex) => {
-          const appX = x + 10
-          const appY = appStartY + appIndex * 20
-          const appTextId = generateElementId()
-
-          const appText: ExcalidrawElement = {
-            id: appTextId,
-            type: 'text',
-            x: appX,
-            y: appY,
-            width: calculateTextWidth(app.name, 12),
-            height: 15,
-            angle: 0,
-            strokeColor: '#666666',
-            backgroundColor: 'transparent',
-            fillStyle: 'solid',
-            strokeWidth: 1,
-            strokeStyle: 'solid',
-            roughness: 1,
-            opacity: 100,
-            groupIds: [capabilityGroupId],
-            frameId: null,
-            index: generateIndex(),
-            roundness: null,
-            seed: generateRandomSeed(),
-            version: 1,
-            versionNonce: generateRandomSeed(),
-            isDeleted: false,
-            boundElements: [],
-            updated: Date.now(),
-            link: null,
-            locked: false,
-            text: `• ${app.name}`,
-            fontSize: 12,
-            fontFamily: 1,
-            textAlign: 'left',
-            verticalAlign: 'top',
-            originalText: `• ${app.name}`,
-            autoResize: true,
-            lineHeight: 1.25,
-            rawText: `• ${app.name}`,
-            customData: {
-              databaseId: app.id,
-              elementType: 'application',
-              elementName: app.name, // Optimierung: Nur der Name statt kompletter originalElement
-              isFromDatabase: true,
-              isMainElement: false,
-            },
-          }
-
-          elements.push(appText)
-        })
-      }
-    }
+    // Note: Applications and AI Components are handled in capabilityRenderer.ts for proper hierarchical rendering
   })
 
   // Generated capability map elements

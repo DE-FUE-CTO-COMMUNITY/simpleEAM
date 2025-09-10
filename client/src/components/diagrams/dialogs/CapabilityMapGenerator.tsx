@@ -23,17 +23,25 @@ import dayjs, { Dayjs } from 'dayjs'
 import 'dayjs/locale/de'
 import 'dayjs/locale/en'
 import { useTranslations, useLocale } from 'next-intl'
-import { BusinessCapabilityIcon, ApplicationComponentIcon } from '@/components/icons'
+import {
+  BusinessCapabilityIcon,
+  ApplicationComponentIcon,
+  AIComponentIcon,
+} from '@/components/icons'
 import { useQuery } from '@apollo/client'
 import { GET_CAPABILITY_MAP_DATA } from '@/graphql/capability'
 import { GET_APPLICATIONS_COUNT } from '@/graphql/application'
+import { GET_AICOMPONENTS_COUNT } from '@/graphql/aicomponent'
 import {
   generateCapabilityMapWithLibrary,
   calculateRenderedCapabilitiesCount,
   calculateDisplayedApplicationsCount,
   type CapabilityMapSettings,
 } from '../utils/CapabilityMapLibraryUtils'
-import { findTopLevelCapabilities } from '../utils/capabilityHierarchy'
+import {
+  findTopLevelCapabilities,
+  calculateDisplayedAiComponentsCount,
+} from '../utils/capabilityHierarchy'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import { useCompanyContext } from '@/contexts/CompanyContext'
 
@@ -59,6 +67,7 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
   const [settings, setSettings] = useState<CapabilityMapSettings>({
     maxLevels: 3,
     includeApplications: true,
+    includeAiComponents: false,
     horizontalSpacing: 10,
     verticalSpacing: 10,
   })
@@ -91,6 +100,15 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
     errorPolicy: 'all',
     variables: {
       where: appWhere,
+    },
+  })
+
+  // Get AI components count for debugging
+  const { data: aiCountData } = useQuery(GET_AICOMPONENTS_COUNT, {
+    skip: !open,
+    errorPolicy: 'all',
+    variables: {
+      where: appWhere, // Use the same filter as applications for now
     },
   })
 
@@ -250,6 +268,24 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
       })()
     : 0
 
+  // Calculate displayed AI components count (using the corrected rollup logic)
+  const totalAiComponentsCount = finalFilteredCapabilities
+    ? calculateDisplayedAiComponentsCount(finalFilteredCapabilities, settings)
+    : 0
+
+  // Calculate AI components with capability assignment
+  const aiComponentsWithCapabilityCount = finalFilteredCapabilities
+    ? (() => {
+        const uniqueAiComponents = new Set()
+        finalFilteredCapabilities.forEach((cap: any) => {
+          if (cap.supportedByAIComponents) {
+            cap.supportedByAIComponents.forEach((ai: any) => uniqueAiComponents.add(ai.id))
+          }
+        })
+        return uniqueAiComponents.size
+      })()
+    : 0
+
   // Handler functions for the top-level filter dialog
   const handleOpenTopLevelFilter = () => {
     setTopLevelFilterDialogOpen(true)
@@ -352,7 +388,7 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
                         component="div"
                         sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
                       >
-                        <FilterListIcon sx={{ color: '#9c27b0', fontSize: 16 }} />
+                        <BusinessCapabilityIcon sx={{ color: '#9c27b0', fontSize: 16 }} />
                         {selectedTopLevelCapabilities.size}{' '}
                         {t('dialogs.capabilityMap.topLevelSelected', {
                           total: allTopLevelCapabilities.length,
@@ -413,6 +449,44 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
                         )}
                       </>
                     )}
+
+                    {settings.includeAiComponents && (
+                      <>
+                        {aiCountData && (
+                          <Typography
+                            variant="body2"
+                            component="div"
+                            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                          >
+                            <AIComponentIcon sx={{ color: '#9c27b0', fontSize: 16 }} />
+                            {aiCountData.aiComponents?.length || 0}{' '}
+                            {t('dialogs.capabilityMap.aiComponentsTotal')}
+                          </Typography>
+                        )}
+                        {aiComponentsWithCapabilityCount > 0 && (
+                          <Typography
+                            variant="body2"
+                            component="div"
+                            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                          >
+                            <AIComponentIcon sx={{ color: '#ff9800', fontSize: 16 }} />
+                            {aiComponentsWithCapabilityCount}{' '}
+                            {t('dialogs.capabilityMap.aiComponentsWithCapability')}
+                          </Typography>
+                        )}
+                        {totalAiComponentsCount > 0 && (
+                          <Typography
+                            variant="body2"
+                            component="div"
+                            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                          >
+                            <AIComponentIcon sx={{ color: '#388e3c', fontSize: 16 }} />
+                            {totalAiComponentsCount}{' '}
+                            {t('dialogs.capabilityMap.aiComponentsDisplayed')}
+                          </Typography>
+                        )}
+                      </>
+                    )}
                   </Box>
                 </Alert>
 
@@ -450,6 +524,16 @@ const CapabilityMapGenerator: React.FC<CapabilityMapGeneratorProps> = ({
                       />
                     }
                     label={t('dialogs.capabilityMap.includeApplicationsLabel')}
+                  />
+
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={settings.includeAiComponents}
+                        onChange={e => handleSettingChange('includeAiComponents', e.target.checked)}
+                      />
+                    }
+                    label={t('dialogs.capabilityMap.includeAiComponentsLabel')}
                   />
 
                   <TextField

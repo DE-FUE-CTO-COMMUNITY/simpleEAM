@@ -12,8 +12,10 @@ export {
   calculateRenderedCapabilitiesCount,
   calculateTotalApplicationsCount,
   calculateDisplayedApplicationsCount,
+  calculateTotalAiComponentsCount,
+  calculateDisplayedAiComponentsCount,
   calculateSubtreeHeight,
-  collectApplicationsForDisplay,
+  collectAiComponentsForDisplay,
   sortCapabilitiesByTypeAndSequence,
 } from './capabilityHierarchy'
 export {
@@ -68,6 +70,22 @@ export const generateCapabilityMapWithLibrary = async (
     )
   }
 
+  // Try comprehensive search for AI component template
+  let aiComponentTemplate = findArchimateTemplate(archimateLibrary, 'AI Component')
+  if (!aiComponentTemplate) {
+    aiComponentTemplate = findArchimateTemplate(archimateLibrary, 'AIComponent')
+  }
+  if (!aiComponentTemplate) {
+    aiComponentTemplate = findArchimateTemplate(
+      archimateLibrary,
+      'Artificial Intelligence Component'
+    )
+  }
+  if (!aiComponentTemplate) {
+    // Fallback: use application template for AI components if no specific template found
+    aiComponentTemplate = applicationTemplate
+  }
+
   if (!capabilityTemplate) {
     console.warn('Capability-Template nicht gefunden in ArchiMate-Bibliothek')
     return []
@@ -77,6 +95,10 @@ export const generateCapabilityMapWithLibrary = async (
     console.warn(
       'Applications sind aktiviert, aber Application Component Template wurde nicht gefunden'
     )
+  }
+
+  if (settings.includeAiComponents && !aiComponentTemplate) {
+    console.warn('AI Components sind aktiviert, aber AI Component Template wurde nicht gefunden')
   }
 
   // Find top-level capabilities
@@ -90,7 +112,7 @@ export const generateCapabilityMapWithLibrary = async (
   // Calculate total number of elements needed for index generation (recursive count)
   let totalElements = 0
 
-  // Helper function to recursively count applications in capability tree
+  // Helper function to recursively count applications and AI components in capability tree
   const countApplicationsInCapability = (cap: BusinessCapability, level: number): number => {
     let appCount = 0
 
@@ -98,6 +120,12 @@ export const generateCapabilityMapWithLibrary = async (
     if (level < settings.maxLevels && settings.includeApplications && applicationTemplate) {
       const apps = cap.supportedByApplications || []
       appCount += apps.length * applicationTemplate.elements.length
+    }
+
+    // Count AI components for this capability if we haven't exceeded maxLevels
+    if (level < settings.maxLevels && settings.includeAiComponents && aiComponentTemplate) {
+      const aiComponents = cap.supportedByAIComponents || []
+      appCount += aiComponents.length * aiComponentTemplate.elements.length
     }
 
     // Recursively count applications in child capabilities
@@ -166,6 +194,7 @@ export const generateCapabilityMapWithLibrary = async (
       capabilities,
       capabilityTemplate,
       applicationTemplate,
+      aiComponentTemplate,
       x,
       y,
       baseWidth,

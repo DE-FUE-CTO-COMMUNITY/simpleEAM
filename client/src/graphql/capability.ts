@@ -45,6 +45,10 @@ export const GET_CAPABILITIES = gql`
         id
         name
       }
+      supportedByAIComponents {
+        id
+        name
+      }
       partOfArchitectures {
         id
         name
@@ -91,6 +95,10 @@ export const GET_CAPABILITY = gql`
         name
       }
       supportedByApplications {
+        id
+        name
+      }
+      supportedByAIComponents {
         id
         name
       }
@@ -219,12 +227,20 @@ export const GET_CAPABILITY_MAP_DATA = gql`
             status
             criticality
           }
+          supportedByAIComponents {
+            id
+            name
+          }
         }
         supportedByApplications(where: $appWhere) {
           id
           name
           status
           criticality
+        }
+        supportedByAIComponents {
+          id
+          name
         }
       }
       parents {
@@ -236,6 +252,10 @@ export const GET_CAPABILITY_MAP_DATA = gql`
         name
         status
         criticality
+      }
+      supportedByAIComponents {
+        id
+        name
       }
     }
   }

@@ -114,7 +114,9 @@ export function createCapabilityElementsFromTemplate(
           const originalDistanceFromRight = originalRightEdge - (element.x + (element.width || 0))
 
           // Calculate the new right edge position with custom width
-          const newRightEdge = targetX + customizations.width
+          // IMPORTANT: Use the positioned main container's x-coordinate, not targetX
+          const mainContainerNewX = mainContainer.x + offsetX
+          const newRightEdge = mainContainerNewX + customizations.width
 
           // Position the element to maintain the same distance from the right edge
           newElement.x = newRightEdge - originalDistanceFromRight - (element.width || 0)
@@ -412,7 +414,9 @@ export function createApplicationElementsFromTemplate(
           const originalDistanceFromRight = originalRightEdge - (element.x + (element.width || 0))
 
           // Calculate the new right edge position with custom width
-          const newRightEdge = targetX + customizations.width
+          // IMPORTANT: Use the positioned main container's x-coordinate, not targetX
+          const mainContainerNewX = mainContainer.x + offsetX
+          const newRightEdge = mainContainerNewX + customizations.width
 
           // Position the element to maintain the same distance from the right edge
           newElement.x = newRightEdge - originalDistanceFromRight - (element.width || 0)
@@ -567,6 +571,243 @@ export function createApplicationElementsFromTemplate(
         }
       }
     }
+  })
+
+  return elements
+}
+
+// Specialized function to create AI component elements from template
+export function createAiComponentElementsFromTemplate(
+  aiComponent: any, // AI Component object
+  template: LibraryTemplate,
+  targetX: number,
+  targetY: number,
+  groupId?: string,
+  customizations?: ElementCustomizations
+): ExcalidrawElement[] {
+  if (!template) {
+    console.warn(`Kein Template gefunden für AI Component: ${aiComponent.name}`)
+    return []
+  }
+
+  // Create a mapping from old IDs to new IDs to maintain relationships
+  const idMapping = new Map<string, string>()
+  template.elements.forEach((element: any) => {
+    idMapping.set(element.id, generateElementId())
+  })
+
+  // Generate new group IDs while preserving grouping relationships
+  const groupIdMapping = new Map<string, string>()
+  template.elements.forEach((element: any) => {
+    if (element.groupIds && element.groupIds.length > 0) {
+      element.groupIds.forEach((gId: string) => {
+        if (!groupIdMapping.has(gId)) {
+          groupIdMapping.set(gId, generateElementId())
+        }
+      })
+    }
+  })
+
+  // Calculate template bounding box for proper positioning
+  const templateBounds = {
+    minX: Math.min(...template.elements.map((el: any) => el.x)),
+    minY: Math.min(...template.elements.map((el: any) => el.y)),
+    maxX: Math.max(...template.elements.map((el: any) => el.x + (el.width || 0))),
+    maxY: Math.max(...template.elements.map((el: any) => el.y + (el.height || 0))),
+  }
+
+  // Calculate offset to position template at target coordinates
+  const offsetX = targetX - templateBounds.minX
+  const offsetY = targetY - templateBounds.minY
+
+  // Clone template elements with new IDs and updated content
+  const elements = template.elements.map((element: any, index: number) => {
+    const newElement = { ...element }
+
+    // Use the mapped ID for this element
+    newElement.id = idMapping.get(element.id) || generateElementId()
+
+    // Apply position offset
+    newElement.x = element.x + offsetX
+    newElement.y = element.y + offsetY
+
+    // Handle rectangles - apply customizations but preserve template styling
+    if (element.type === 'rectangle') {
+      const isMainContainer =
+        (element.boundElements && element.boundElements.length > 0) || // Has bound text elements
+        (element.width > 100 && element.height > 50) || // Large enough to be main container
+        index === 0 // Fallback: first rectangle
+
+      if (isMainContainer) {
+        // Always use black stroke color for AI Components (same as Applications)
+        newElement.strokeColor = '#1e1e1e'
+
+        // Apply custom dimensions if provided
+        if (customizations?.width) {
+          newElement.width = customizations.width
+        }
+        if (customizations?.height) {
+          newElement.height = customizations.height
+        }
+
+        // CRITICAL: Only override background color if explicitly provided, otherwise keep template color
+        if (customizations?.backgroundColor) {
+          newElement.backgroundColor = customizations.backgroundColor
+        } else {
+          // Keep the original template background color
+          newElement.backgroundColor = element.backgroundColor || 'transparent'
+        }
+      } else {
+        // Handle icon repositioning for AI Components - SIMPLIFIED APPROACH
+        // For AI Components, we'll use a fixed positioning strategy instead of the complex scaling
+        const mainContainer = template.elements.find(
+          (el: any, idx: number) =>
+            el.type === 'rectangle' &&
+            ((el.boundElements && el.boundElements.length > 0) ||
+              (el.width > 100 && el.height > 50) ||
+              idx === 0)
+        )
+
+        if (mainContainer && customizations?.width) {
+          // SIMPLIFIED: Position icons at a fixed distance from the right edge
+          // This avoids the complex calculations that work for Applications but not AI Components
+          const mainContainerNewX = mainContainer.x + offsetX
+          const iconOffset = 10 // Fixed offset from right edge
+          const iconWidth = element.width || 20
+          
+          // Position icon near the right edge of the new container
+          newElement.x = mainContainerNewX + customizations.width - iconOffset - iconWidth
+        }
+      }
+    }
+
+    // Handle text elements - replace with AI component name and apply proper formatting
+    if (element.type === 'text') {
+      // Get the containing rectangle to determine available width
+      const containerRect = template.elements.find(
+        (el: any) =>
+          el.type === 'rectangle' && el.boundElements?.some((bound: any) => bound.id === element.id)
+      )
+
+      // Calculate available width for text (with padding)
+      let availableWidth = containerRect ? containerRect.width - 20 : 180
+      if (customizations?.width && containerRect) {
+        availableWidth = customizations.width - 20
+      }
+
+      // Get font size
+      const fontSize = customizations?.fontSize || element.fontSize || 20
+
+      // Auto-wrap text to fit within available width
+      const wrappedText = wrapTextToFitWidth(aiComponent.name, availableWidth, fontSize)
+
+      newElement.text = wrappedText
+      newElement.originalText = wrappedText
+      newElement.rawText = wrappedText
+
+      // Set text alignment - AI components use center alignment like applications
+      newElement.textAlign = 'center'
+      newElement.verticalAlign = 'middle'
+      newElement.fontSize = fontSize
+
+      // Maintain container binding for proper text rendering (SAME AS APPLICATIONS)
+      if (containerRect) {
+        const containerElement = template.elements.find(
+          (el: any) =>
+            el.type === 'rectangle' &&
+            el.boundElements?.some((bound: any) => bound.id === element.id)
+        )
+
+        if (containerElement) {
+          const newContainerId = idMapping.get(containerElement.id)
+          if (newContainerId) {
+            newElement.containerId = newContainerId
+
+            // Use center positioning for AI components (SAME AS APPLICATIONS)
+            const containerWithCustomizations = {
+              ...containerElement,
+              x: containerElement.x + offsetX,
+              y: containerElement.y + offsetY,
+              width: customizations?.width || containerElement.width,
+              height: customizations?.height || containerElement.height,
+            }
+
+            const textPosition = calculateCenteredTextPosition(
+              wrappedText,
+              containerWithCustomizations,
+              fontSize
+            )
+
+            newElement.x = textPosition.x
+            newElement.y = textPosition.y
+            newElement.width = textPosition.width
+            newElement.height = textPosition.height
+          }
+        }
+      }
+    }
+
+    // Handle freedraw elements (Icons) - reposition them for AI Components
+    if (element.type === 'freedraw') {
+      // Find the main container to calculate repositioning
+      const mainContainer = template.elements.find(
+        (el: any, idx: number) =>
+          el.type === 'rectangle' &&
+          ((el.boundElements && el.boundElements.length > 0) ||
+            (el.width > 100 && el.height > 50) ||
+            idx === 0)
+      )
+
+      if (mainContainer && customizations?.width) {
+        // Calculate the original distance from the right edge of the main container
+        const originalRightEdge = mainContainer.x + mainContainer.width
+        const originalDistanceFromRight = originalRightEdge - (element.x + (element.width || 0))
+
+        // Calculate the new right edge position with custom width
+        const mainContainerNewX = mainContainer.x + offsetX
+        const newRightEdge = mainContainerNewX + customizations.width
+
+        // Position the icon to maintain the same distance from the right edge
+        newElement.x = newRightEdge - originalDistanceFromRight - (element.width || 0)
+      }
+    }
+
+    // Update group assignments
+    if (newElement.groupIds && newElement.groupIds.length > 0) {
+      newElement.groupIds = newElement.groupIds.map((gId: string) => {
+        return groupIdMapping.get(gId) || gId
+      })
+    }
+
+    // Add to parent group if specified
+    if (groupId) {
+      newElement.groupIds = [...(newElement.groupIds || []), groupId]
+    }
+
+    // Update bound elements to use new IDs
+    if (newElement.boundElements) {
+      newElement.boundElements = newElement.boundElements.map((bound: any) => ({
+        ...bound,
+        id: idMapping.get(bound.id) || bound.id,
+      }))
+    }
+
+    // Set database metadata for AI Components
+    newElement.customData = {
+      databaseId: aiComponent.id,
+      elementType: 'aiComponent', // Different from 'application'
+      elementName: aiComponent.name,
+      isFromDatabase: true,
+      isMainElement: index === 0,
+    }
+
+    // Update indices and other properties
+    newElement.index = getNextIndex()
+    newElement.seed = generateSeed()
+    newElement.versionNonce = generateSeed()
+    newElement.updated = Date.now()
+
+    return newElement
   })
 
   return elements
@@ -1163,211 +1404,6 @@ export function createInfrastructureElementsFromTemplate(
       isFromDatabase: true,
       isMainElement: newElement.id === infrastructureMainElementNewId,
       mainElementId: infrastructureMainElementNewId,
-    }
-
-    // Update other standard properties
-    newElement.seed = generateSeed()
-    newElement.version = 1
-    newElement.versionNonce = generateSeed()
-    newElement.updated = Date.now()
-    newElement.isDeleted = false
-
-    return newElement
-  })
-
-  return elements
-}
-// AI Component function will be added
-
-// Specialized function to create AI component elements from template
-export function createAiComponentElementsFromTemplate(
-  aiComponent: any, // AI Component Object
-  template: LibraryTemplate,
-  targetX: number,
-  targetY: number,
-  groupId?: string,
-  customizations?: ElementCustomizations
-): ExcalidrawElement[] {
-  if (!template) {
-    console.warn(`Kein Template gefunden für Element-Typ: aiComponent`)
-    return []
-  }
-
-  // Create a mapping from old IDs to new IDs to maintain relationships
-  const idMapping = new Map<string, string>()
-  template.elements.forEach((element: any) => {
-    idMapping.set(element.id, generateElementId())
-  })
-
-  // Generate new group IDs while preserving grouping relationships
-  const groupIdMapping = new Map<string, string>()
-  template.elements.forEach((element: any) => {
-    if (element.groupIds && element.groupIds.length > 0) {
-      element.groupIds.forEach((gId: string) => {
-        if (!groupIdMapping.has(gId)) {
-          groupIdMapping.set(gId, generateElementId())
-        }
-      })
-    }
-  })
-
-  // Calculate template bounding box for proper positioning
-  const templateBounds = {
-    minX: Math.min(...template.elements.map((el: any) => el.x)),
-    minY: Math.min(...template.elements.map((el: any) => el.y)),
-    maxX: Math.max(...template.elements.map((el: any) => el.x + (el.width || 0))),
-    maxY: Math.max(...template.elements.map((el: any) => el.y + (el.height || 0))),
-  }
-
-  const offsetX = targetX - templateBounds.minX
-  const offsetY = targetY - templateBounds.minY
-
-  // Store the main element ID for reference
-  let aiComponentMainElementNewId: string | undefined = undefined
-
-  // Clone template elements with new IDs and updated content
-  const elements = template.elements.map((element: any, index: number) => {
-    const newElement = { ...element }
-
-    // Use the mapped ID for this element
-    newElement.id = idMapping.get(element.id) || generateElementId()
-
-    // Store the main elements new ID (first element)
-    if (index === 0) {
-      aiComponentMainElementNewId = newElement.id
-    }
-
-    // Adjust position based on target coordinates
-    newElement.x = element.x + offsetX
-    newElement.y = element.y + offsetY
-
-    // Handle rectangles - apply customizations but preserve template styling
-    if (element.type === 'rectangle') {
-      const isMainContainer =
-        (element.boundElements && element.boundElements.length > 0) || // Has bound text elements
-        (element.width > 100 && element.height > 50) || // Large enough to be main container
-        index === 0 // Fallback: first rectangle
-
-      if (isMainContainer) {
-        // Always use black stroke color for AI Components
-        newElement.strokeColor = '#1e1e1e'
-
-        // Apply custom dimensions if provided
-        if (customizations?.width) {
-          newElement.width = customizations.width
-        }
-        if (customizations?.height) {
-          newElement.height = customizations.height
-        }
-
-        // Apply custom background color for AI Components with light purple background
-        if (customizations?.backgroundColor) {
-          newElement.backgroundColor = customizations.backgroundColor
-        } else {
-          newElement.backgroundColor = '#e6ccff' // Light purple background for AI Components
-        }
-      }
-    }
-
-    // For text elements, replace with AI component name
-    if (element.type === 'text') {
-      // Get the containing rectangle to determine available width
-      const containerRect = template.elements.find(
-        (el: any) =>
-          el.type === 'rectangle' && el.boundElements?.some((bound: any) => bound.id === element.id)
-      )
-
-      // Calculate available width for text (with some padding)
-      const availableWidth = containerRect ? containerRect.width - 20 : 180 // Default 180px if no container found
-
-      // Get font size
-      const fontSize = element.fontSize || 20
-
-      // Auto-wrap text to fit within available width
-      const wrappedText = wrapTextToFitWidth(aiComponent.name, availableWidth, fontSize)
-
-      newElement.text = wrappedText
-      newElement.originalText = wrappedText
-      newElement.rawText = wrappedText
-
-      // Preserve the original templates text alignment if it exists, otherwise set defaults
-      newElement.textAlign = element.textAlign || 'center'
-      newElement.verticalAlign = element.verticalAlign || 'middle'
-
-      // Set font size and ensure its properly applied
-      newElement.fontSize = fontSize
-
-      // CRITICAL: Maintain container binding for proper text rendering
-      if (containerRect) {
-        // Find the new container ID from the mapping
-        const containerElement = template.elements.find(
-          (el: any) =>
-            el.type === 'rectangle' &&
-            el.boundElements?.some((bound: any) => bound.id === element.id)
-        )
-
-        if (containerElement) {
-          const newContainerId = idMapping.get(containerElement.id)
-          if (newContainerId) {
-            // Set the containerId to establish the bound text relationship
-            newElement.containerId = newContainerId
-
-            // Use shared text positioning function for consistent centering
-            const centeredPosition = calculateCenteredTextPosition(
-              wrappedText,
-              containerRect,
-              fontSize
-            )
-
-            // Set position and dimensions from shared function
-            newElement.x = centeredPosition.x + offsetX
-            newElement.y = centeredPosition.y + offsetY
-            newElement.width = centeredPosition.width
-            newElement.height = centeredPosition.height
-          }
-        }
-      } else {
-        // Fallback for texts without container: Use estimated dimensions
-        const lineCount = (wrappedText.match(/\n/g) || []).length + 1
-        const avgLineWidth = Math.max(...wrappedText.split('\n').map(line => line.length))
-
-        const estimatedWidth = Math.min(avgLineWidth * fontSize * 0.6, availableWidth)
-        const estimatedHeight = lineCount * fontSize * 1.2
-
-        newElement.width = element.width && element.width > 0 ? element.width : estimatedWidth
-        newElement.height = element.height && element.height > 0 ? element.height : estimatedHeight
-      }
-    }
-
-    // Apply group IDs if provided or mapped
-    if (groupId) {
-      newElement.groupIds = [groupId]
-    } else if (element.groupIds && element.groupIds.length > 0) {
-      newElement.groupIds = element.groupIds.map((gId: string) => groupIdMapping.get(gId) || gId)
-    }
-
-    // Update container ID references
-    if (element.containerId && idMapping.has(element.containerId)) {
-      newElement.containerId = idMapping.get(element.containerId)
-    }
-
-    // Update bound element references
-    if (element.boundElements) {
-      newElement.boundElements = element.boundElements.map((boundEl: any) => ({
-        ...boundEl,
-        id: idMapping.get(boundEl.id) || boundEl.id,
-      }))
-    }
-
-    // Add database metadata
-    newElement.customData = {
-      ...newElement.customData,
-      databaseId: aiComponent.id,
-      elementType: 'aiComponent',
-      elementName: aiComponent.name,
-      isFromDatabase: true,
-      isMainElement: newElement.id === aiComponentMainElementNewId,
-      mainElementId: aiComponentMainElementNewId,
     }
 
     // Update other standard properties

@@ -102,7 +102,54 @@ export function collectApplicationsForDisplay(
   )
 
   // Sort applications alphabetically by name
-  return uniqueApplications.sort((a, b) => {
+  return uniqueApplications
+}
+
+// Function to collect AI Components that should be displayed with a capability
+// This function implements the correct rollup logic:
+// 1. Always show AI components directly assigned to this capability
+// 2. Additionally, roll up AI components from child capabilities that WON'T be displayed due to maxLevels
+export function collectAiComponentsForDisplay(
+  capability: BusinessCapability,
+  allCapabilities: BusinessCapability[],
+  currentLevel: number,
+  maxLevels: number
+): any[] {
+  const aiComponents: any[] = []
+
+  // ALWAYS add AI components directly assigned to this capability
+  if (capability.supportedByAIComponents && capability.supportedByAIComponents.length > 0) {
+    aiComponents.push(...capability.supportedByAIComponents)
+  }
+
+  // Check if we are at the last visible level AND have children that won't be displayed
+  if (currentLevel === maxLevels - 1) {
+    // We are at the last visible level (e.g., Level 2 when maxLevels = 3)
+    // Any children of this capability will be hidden, so roll up their AI components
+    const hiddenChildren = findChildCapabilities(capability.id, allCapabilities)
+
+    hiddenChildren.forEach(hiddenChild => {
+      // Add AI components from this hidden child
+      if (hiddenChild.supportedByAIComponents && hiddenChild.supportedByAIComponents.length > 0) {
+        aiComponents.push(...hiddenChild.supportedByAIComponents)
+      }
+
+      // Recursively add AI components from all descendants of this hidden child
+      const hiddenDescendants = findAllDescendantsUnlimited(hiddenChild.id, allCapabilities)
+      hiddenDescendants.forEach(descendant => {
+        if (descendant.supportedByAIComponents && descendant.supportedByAIComponents.length > 0) {
+          aiComponents.push(...descendant.supportedByAIComponents)
+        }
+      })
+    })
+  }
+
+  // Remove duplicates - no limit on number of AI components
+  const uniqueAiComponents = aiComponents.filter(
+    (component, index, self) => index === self.findIndex(a => a.id === component.id)
+  )
+
+  return uniqueAiComponents.sort((a, b) => {
     const nameA = a.name?.toLowerCase() || ''
     const nameB = b.name?.toLowerCase() || ''
     return nameA.localeCompare(nameB)
@@ -151,8 +198,14 @@ export const calculateSubtreeHeight = (
     ? collectApplicationsForDisplay(capability, allCapabilities, currentLevel, maxLevels)
     : []
 
-  // Determine if this is a leaf node (no visible children and no applications to render)
-  const isLeaf = visibleChildren.length === 0 && applications.length === 0
+  // Find AI components that should be displayed for this capability
+  const aiComponents = settings.includeAiComponents
+    ? collectAiComponentsForDisplay(capability, allCapabilities, currentLevel, maxLevels)
+    : []
+
+  // Determine if this is a leaf node (no visible children and no applications/AI components to render)
+  const isLeaf =
+    visibleChildren.length === 0 && applications.length === 0 && aiComponents.length === 0
 
   // If this is a leaf node, return the base height
   if (isLeaf) {
@@ -207,6 +260,28 @@ export const calculateSubtreeHeight = (
     })
   }
 
+  // Calculate space for AI components (similar to applications)
+  if (aiComponents.length > 0) {
+    // Calculate AI component height exactly like the renderer does
+    let aiComponentHeight = baseHeight * 0.8 // Default fallback
+    if (applicationTemplate) {
+      // Reuse application template for now
+      const appTemplateRect = applicationTemplate.elements.find(
+        (el: any) => el.type === 'rectangle'
+      )
+      if (appTemplateRect) {
+        aiComponentHeight = Math.max(appTemplateRect.height, baseHeight * 0.8)
+      }
+    }
+
+    aiComponents.forEach((_aiComponent, _aiIndex) => {
+      totalContentHeight += aiComponentHeight
+
+      // Add spacing after EVERY AI component (matches renderer: currentChildY += aiHeight + childSpacing)
+      totalContentHeight += childSpacing
+    })
+  }
+
   // Add bottom padding
   totalContentHeight += bottomPadding
 
@@ -233,6 +308,20 @@ export function calculateTotalApplicationsCount(
   })
 
   return totalApplications
+}
+
+// Function to calculate total AI components count across all capabilities (ignoring maxLevels)
+export function calculateTotalAiComponentsCount(capabilities: BusinessCapability[]): number {
+  if (!capabilities || capabilities.length === 0) return 0
+
+  let totalAiComponents = 0
+  capabilities.forEach(capability => {
+    if (capability.supportedByAIComponents) {
+      totalAiComponents += capability.supportedByAIComponents.length // No limit on AI components per capability
+    }
+  })
+
+  return totalAiComponents
 }
 
 // NEW: Function to calculate how many applications will actually be displayed on the map
@@ -283,6 +372,55 @@ export function calculateDisplayedApplicationsCount(
   })
 
   return uniqueDisplayedApps.size
+}
+
+// NEW: Function to calculate how many AI components will actually be displayed on the map
+// This accounts for the smart rollup logic and only counts rendered capabilities
+export function calculateDisplayedAiComponentsCount(
+  capabilities: BusinessCapability[],
+  settings: CapabilityMapSettings
+): number {
+  if (!settings.includeAiComponents) {
+    return 0
+  }
+
+  const uniqueDisplayedAiComponents = new Set<string>()
+
+  function processCapability(capability: BusinessCapability, currentLevel: number) {
+    // Stop if we've exceeded the max levels
+    if (currentLevel >= settings.maxLevels) {
+      return
+    }
+
+    // Get AI components that will be displayed for this capability using the same logic as rendering
+    const displayedAiComponents = collectAiComponentsForDisplay(
+      capability,
+      capabilities,
+      currentLevel,
+      settings.maxLevels
+    )
+
+    // Add each AI component to our set (ensures uniqueness)
+    displayedAiComponents.forEach(aiComponent => {
+      uniqueDisplayedAiComponents.add(aiComponent.id)
+    })
+
+    // Process visible child capabilities
+    if (currentLevel + 1 < settings.maxLevels) {
+      const children = findChildCapabilities(capability.id, capabilities)
+      children.forEach(child => {
+        processCapability(child, currentLevel + 1)
+      })
+    }
+  }
+
+  // Start with top-level capabilities
+  const topLevelCapabilities = findTopLevelCapabilities(capabilities)
+  topLevelCapabilities.forEach(capability => {
+    processCapability(capability, 0)
+  })
+
+  return uniqueDisplayedAiComponents.size
 }
 
 // Sortierungsfunktion für Capabilities nach Typ und Sequenz
