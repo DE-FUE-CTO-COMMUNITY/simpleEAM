@@ -42,7 +42,7 @@ const AicomponentsPage = () => {
   })
 
   // Mutation zum Erstellen einer neuen AI Component
-  const [createAicomponent, { loading: isCreating }] = useMutation(CREATE_Aicomponent, {
+  const [createAicomponent] = useMutation(CREATE_Aicomponent, {
     onCompleted: () => {
       enqueueSnackbar(t('messages.createSuccess'), { variant: 'success' })
       // Refetch mit aktivem Company-Filter, damit neu erstellte AI Component sofort sichtbar ist
@@ -56,7 +56,7 @@ const AicomponentsPage = () => {
   })
 
   // Mutation zum Aktualisieren einer bestehenden AI Component
-  const [updateAicomponent, { loading: isUpdating }] = useMutation(UPDATE_Aicomponent, {
+  const [updateAicomponent] = useMutation(UPDATE_Aicomponent, {
     onCompleted: () => {
       enqueueSnackbar(t('messages.updateSuccess'), { variant: 'success' })
       refetch()

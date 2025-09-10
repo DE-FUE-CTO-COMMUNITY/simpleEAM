@@ -99,14 +99,13 @@ export default function AicomponentForm({
 
   // GraphQL Queries für Relationship-Daten
   const { data: personsData, loading: personsLoading } = useQuery(GET_PERSONS)
-  const { data: capabilitiesData, loading: capabilitiesLoading } = useQuery(GET_CAPABILITIES)
-  const { data: applicationsData, loading: applicationsLoading } = useQuery(GET_APPLICATIONS)
-  const { data: dataObjectsData, loading: dataObjectsLoading } = useQuery(GET_DATA_OBJECTS)
-  const { data: infrastructuresData, loading: infrastructuresLoading } =
-    useQuery(GET_INFRASTRUCTURES)
-  const { data: architecturesData, loading: architecturesLoading } = useQuery(GET_ARCHITECTURES)
-  const { data: principlesData, loading: principlesLoading } = useQuery(GET_ARCHITECTURE_PRINCIPLES)
-  const { data: diagramsData, loading: diagramsLoading } = useQuery(GET_DIAGRAMS)
+  const { data: capabilitiesData } = useQuery(GET_CAPABILITIES)
+  const { data: applicationsData } = useQuery(GET_APPLICATIONS)
+  const { data: dataObjectsData } = useQuery(GET_DATA_OBJECTS)
+  const { data: infrastructuresData } = useQuery(GET_INFRASTRUCTURES)
+  const { data: architecturesData } = useQuery(GET_ARCHITECTURES)
+  const { data: principlesData } = useQuery(GET_ARCHITECTURE_PRINCIPLES)
+  const { data: diagramsData } = useQuery(GET_DIAGRAMS)
 
   // Standardwerte für das Formular
   const defaultValues: AicomponentFormValues = {

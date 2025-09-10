@@ -98,7 +98,7 @@ const CompaniesPage = () => {
             },
           ]
 
-      const result = await updateCompanyMutation({
+      await updateCompanyMutation({
         variables: {
           id: company.id,
           input: {
@@ -205,7 +205,7 @@ const CompaniesPage = () => {
           availableSizes={availableValues.size}
           onResetFilter={resetFilters}
           onClose={() => setFilterDialogOpen(false)}
-          onApply={activeCount => {
+          onApply={_activeCount => {
             setFilterDialogOpen(false)
           }}
         />

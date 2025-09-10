@@ -51,7 +51,7 @@ const CompanyTableWithGenericTable: React.FC<CompanyTableProps> = ({
   globalFilter,
   sorting,
   onSortingChange,
-  onCreateCompany,
+  onCreateCompany: _onCreateCompany,
   onUpdateCompany,
   onDeleteCompany,
   onTableReady,

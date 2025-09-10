@@ -2,7 +2,7 @@ import { ApolloClient } from '@apollo/client'
 import { AddRelatedElementsConfig } from '../types/addRelatedElements'
 import { loadRelatedElementsFromDatabase } from '../services/databaseRelatedElementsService'
 import { loadMultiHopRelatedElements } from '../services/multiHopRelatedElementsService'
-import type { MultiHopNode, MultiHopEdge } from '../services/multiHopRelatedElementsService'
+import type { MultiHopNode } from '../services/multiHopRelatedElementsService'
 import { loadArchimateLibrary } from './archimateLibraryUtils'
 import { getArchimateTemplateName } from '../services/elementTemplateMapping'
 import {

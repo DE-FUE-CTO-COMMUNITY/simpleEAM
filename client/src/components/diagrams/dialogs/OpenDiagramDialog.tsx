@@ -26,7 +26,6 @@ import { Search, Architecture, Person, CalendarToday } from '@mui/icons-material
 import { useQuery } from '@apollo/client'
 import { useTranslations } from 'next-intl'
 import { GET_DIAGRAMS } from '@/graphql/diagram'
-import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import { useCompanyContext } from '@/contexts/CompanyContext'
 
 // Verfügbare Diagrammtypen direkt als Enum-Werte
@@ -56,7 +55,6 @@ const OpenDiagramDialog: React.FC<OpenDiagramDialogProps> = ({ open, onClose, on
   const t = useTranslations('diagrams')
   const tCommon = useTranslations('common')
   const tErrors = useTranslations('errors')
-  const companyWhere = useCompanyWhere('company')
   const { selectedCompanyId } = useCompanyContext()
 
   const { data, loading, error } = useQuery(GET_DIAGRAMS, {
