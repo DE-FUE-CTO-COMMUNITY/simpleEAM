@@ -115,14 +115,6 @@ export const FullCustomContextMenu: React.FC<CustomContextMenuProps> = ({
           hasSelection
         )
 
-        console.log('FullCustomContextMenu Position Debug:', {
-          original: { x: mouseEvent.clientX, y: mouseEvent.clientY },
-          adjusted: { x: adjustedX, y: adjustedY },
-          viewport: { width: window.innerWidth, height: window.innerHeight },
-          hasSelection,
-          selectedElementsCount: selectedElements.length,
-        })
-
         setContextMenu({
           mouseX: adjustedX,
           mouseY: adjustedY,

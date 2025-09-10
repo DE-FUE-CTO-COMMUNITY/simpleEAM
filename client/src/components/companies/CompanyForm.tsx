@@ -61,24 +61,14 @@ const CompaniesForm: React.FC<GenericFormProps<CompanyType, CompanyFormValues>> 
   const form = useForm({
     defaultValues,
     onSubmit: async ({ value }) => {
-      console.log('📝 CompanyForm TanStack onSubmit called with:', {
-        value,
-        mode,
-        hasCompany: !!company,
-      })
-      console.log('📝 onSubmit prop available:', typeof onSubmit, !!onSubmit)
       if (onSubmit) {
-        console.log('🔄 Calling onSubmit prop from TanStack Form...')
         try {
           const result = await onSubmit(value)
-          console.log('✅ onSubmit prop completed successfully:', result)
           return result
         } catch (error) {
           console.error('💥 onSubmit prop threw error:', error)
           throw error
         }
-      } else {
-        console.log('❌ No onSubmit prop provided!')
       }
     },
   })
@@ -239,7 +229,7 @@ const CompaniesForm: React.FC<GenericFormProps<CompanyType, CompanyFormValues>> 
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={() => {
-        console.log(
+        console.error(
           '⚠️ GenericForm onSubmit called - this should not happen because TanStack Form handles it'
         )
       }}

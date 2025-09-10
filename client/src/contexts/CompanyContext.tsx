@@ -52,7 +52,6 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   // Initial aus LocalStorage setzen
   useEffect(() => {
     const fromStorage = typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : null
-    console.log('CompanyContext: Initializing from localStorage', { fromStorage })
     if (fromStorage) {
       setSelectedCompanyIdState(fromStorage)
     }
@@ -104,23 +103,14 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     // Warten bis localStorage initialisiert ist und Companies geladen sind
     if (!isInitialized) return
 
-    console.log('CompanyContext: Validating selection', {
-      companiesCount: companies?.length || 0,
-      selectedCompanyId,
-      isInitialized,
-      loading,
-      companies: companies?.map(c => ({ id: c.id, name: c.name })) || [],
-    })
-
     // Wenn Companies noch laden, warten (wichtig für Race Condition)
     if (loading) {
-      console.log('CompanyContext: Still loading companies, waiting...')
       return
     }
 
     // Wenn keine Companies verfügbar sind und das Laden abgeschlossen ist
     if (!companies || companies.length === 0) {
-      console.log(
+      console.error(
         'CompanyContext: No companies available after loading completed, clearing selection'
       )
       if (selectedCompanyId) {
@@ -133,7 +123,6 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const hasSelection = selectedCompanyId && companies.some(c => c.id === selectedCompanyId)
 
     if (companies.length === 1) {
-      console.log('CompanyContext: Only one company available, selecting it')
       if (selectedCompanyId !== companies[0].id) {
         setSelectedCompanyIdState(companies[0].id)
         if (typeof window !== 'undefined') localStorage.setItem(STORAGE_KEY, companies[0].id)
@@ -143,13 +132,11 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     // Mehrere Companies: Prüfe, ob aktuelle Auswahl gültig ist
     if (selectedCompanyId && hasSelection) {
-      console.log('CompanyContext: Current selection is valid, keeping it:', selectedCompanyId)
       return
     }
 
     // Wenn keine Auswahl vorhanden ist, wähle die erste
     if (!selectedCompanyId) {
-      console.log('CompanyContext: No selection, choosing first company')
       const first = companies[0]?.id
       if (first) {
         setSelectedCompanyIdState(first)

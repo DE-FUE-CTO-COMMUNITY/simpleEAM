@@ -212,15 +212,6 @@ function ApplicationFormWrapper({
     return null
   }
 
-  console.log('ApplicationFormWrapper - Debug data:', {
-    data,
-    application: data?.applications?.[0],
-    allApplications: allApplicationsData?.applications,
-    databaseId,
-    loading,
-    error,
-  })
-
   return (
     <ApplicationForm
       application={data?.applications?.[0]}
@@ -296,15 +287,6 @@ function CapabilityFormWrapper({
     return null
   }
 
-  console.log('CapabilityFormWrapper - Debug data:', {
-    data,
-    capability: data?.businessCapabilities?.[0],
-    allCapabilities: allCapabilitiesData?.businessCapabilities,
-    databaseId,
-    loading,
-    error,
-  })
-
   return (
     <CapabilityForm
       capability={data?.businessCapabilities?.[0]}
@@ -366,14 +348,6 @@ function InterfaceFormWrapper({
     console.error('Error loading application interface:', error)
     return null
   }
-
-  console.log('InterfaceFormWrapper - Debug data:', {
-    data,
-    applicationInterface: data?.applicationInterfaces?.[0],
-    databaseId,
-    loading,
-    error,
-  })
 
   return (
     <ApplicationInterfaceForm

@@ -1,11 +1,13 @@
 # Debug-Anleitung: LastLogin Problem
 
 ## Problem
+
 Der `api/auth/update-last-login` API-Call wird nicht ausgeführt und erscheint nicht im Network-Log.
 
 ## Debug-Schritte
 
 ### 1. Browser-Konsole öffnen
+
 - Öffnen Sie die Entwicklertools (F12)
 - Gehen Sie zur Konsole
 - **Wichtig**: Öffnen Sie die Konsole BEVOR Sie sich einloggen
@@ -13,11 +15,13 @@ Der `api/auth/update-last-login` API-Call wird nicht ausgeführt und erscheint n
 ### 2. Debug-Funktionen nutzen
 
 #### Aktuellen Status prüfen:
+
 ```javascript
 checkLoginStatus()
 ```
 
 #### Manuell LastLogin-Update auslösen:
+
 ```javascript
 debugLastLogin()
 ```
@@ -32,6 +36,7 @@ debugLastLogin()
 ### 4. Erwartete Debug-Ausgaben
 
 #### Bei erfolgreichem neuen Login:
+
 ```
 🔍 DEBUG: Keycloak initialisiert - authenticated: true
 🔑 DEBUG: Benutzer ist authentifiziert
@@ -52,6 +57,7 @@ debugLastLogin()
 ```
 
 #### Bei bereits eingeloggtem Benutzer:
+
 ```
 🔍 DEBUG: Keycloak initialisiert - authenticated: true
 🔑 DEBUG: Benutzer ist authentifiziert
@@ -68,8 +74,10 @@ debugLastLogin()
 ### 5. Häufige Probleme und Lösungen
 
 #### Problem: "Bereits eingeloggt" obwohl frisch eingeloggt
+
 **Ursache**: localStorage enthält noch `user_logged_in: true`
-**Lösung**: 
+**Lösung**:
+
 ```javascript
 // In Browser-Konsole ausführen:
 localStorage.removeItem('user_logged_in')
@@ -77,19 +85,24 @@ localStorage.removeItem('user_logged_in')
 ```
 
 #### Problem: API-Call wird nicht gesendet
+
 **Mögliche Ursachen**:
+
 1. `isNewLogin` gibt `false` zurück
 2. Keycloak nicht authentifiziert
 3. Kein Token verfügbar
 
 #### Problem: API-Call fehlschlägt
+
 **Debug-Schritte**:
+
 1. Network-Tab prüfen für 401/500 Fehler
 2. Server-Logs prüfen (siehe unten)
 
 ### 6. Server-Side Debugging
 
 #### Docker-Logs prüfen:
+
 ```bash
 # Client-Logs (Next.js)
 docker-compose logs -f client
@@ -99,6 +112,7 @@ docker-compose logs -f server
 ```
 
 #### Keycloak-Logs prüfen:
+
 ```bash
 docker-compose logs -f auth
 ```

@@ -140,8 +140,6 @@ export default function AicomponentForm({
     defaultValues,
     onSubmit: async ({ value }) => {
       try {
-        console.log('🔍 AicomponentForm onSubmit called with value:', value)
-
         // Validierung vor der Verarbeitung
         const validationResult = aicomponentSchema.safeParse(value)
 
@@ -150,8 +148,6 @@ export default function AicomponentForm({
           console.error('❌ Failed value:', value)
           throw new Error('Validation failed')
         }
-
-        console.log('✅ Validation passed, calling onSubmit')
         await onSubmit(value)
       } catch (error) {
         console.error('💥 AicomponentForm onSubmit error:', error)

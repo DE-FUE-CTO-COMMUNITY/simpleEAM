@@ -71,7 +71,6 @@ const CompaniesPage = () => {
   }
 
   const handleUpdateCompany = async (company: CompanyType, values: CompanyFormValues) => {
-    console.log('🔄 handleUpdateCompany called with:', { company: company.id, values })
     try {
       const employeesUpdate = values.employees
         ? [
@@ -114,7 +113,6 @@ const CompaniesPage = () => {
         },
         refetchQueries: [{ query: GET_COMPANIES }],
       })
-      console.log('✅ Update successful:', result)
       enqueueSnackbar(t('messages.updateSuccess'), { variant: 'success' })
     } catch (error) {
       console.error('❌ Fehler beim Aktualisieren der Company:', error)
@@ -177,7 +175,6 @@ const CompaniesPage = () => {
           onGlobalFilterChange={setGlobalFilter}
           onAddClick={() => {
             // Create wird über GenericTable gehandhabt
-            console.log('Toolbar Add clicked - GenericTable handles creation')
           }}
           onFilterClick={() => setFilterDialogOpen(true)}
           activeFiltersCount={activeFiltersCount}
@@ -192,7 +189,6 @@ const CompaniesPage = () => {
             sorting={sorting}
             onSortingChange={setSorting}
             onUpdateCompany={async (companyId, data) => {
-              console.log('🔄 updateCompany called via GenericTable with:', { companyId, data })
               await handleUpdateCompany({ id: companyId } as CompanyType, data)
             }}
             onDeleteCompany={handleDeleteCompany}
@@ -210,7 +206,6 @@ const CompaniesPage = () => {
           onResetFilter={resetFilters}
           onClose={() => setFilterDialogOpen(false)}
           onApply={activeCount => {
-            console.log('Applied filters:', activeCount)
             setFilterDialogOpen(false)
           }}
         />
@@ -223,7 +218,6 @@ const CompaniesPage = () => {
           onClose={() => setShowNewCompanyForm(false)}
           mode="create"
           onSubmit={async (values: CompanyFormValues) => {
-            console.log('🔄 createCompany called via Create Form with:', values)
             try {
               const createInput = {
                 name: values.name,

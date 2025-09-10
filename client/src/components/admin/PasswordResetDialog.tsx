@@ -92,12 +92,6 @@ async function copyToClipboard(text: string): Promise<boolean> {
     clipboardSuccess = false
   }
 
-  // Immer Console-Ausgabe machen (für Debug-Zwecke und Fallback)
-  console.log('📋 Zugangsdaten für Benutzer:')
-  console.log('─'.repeat(50))
-  console.log(text)
-  console.log('─'.repeat(50))
-
   return clipboardSuccess
 }
 

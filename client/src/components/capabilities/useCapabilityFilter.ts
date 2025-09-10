@@ -23,21 +23,12 @@ export const useCapabilityFilter = ({ capabilities = [] }: UseCapabilityFilterPr
 
   // Filterfunktion für erweiterte Filter
   const filteredData = useMemo(() => {
-    console.log('Filter applied with state:', filterState)
-    console.log('Input capabilities:', capabilities.length)
-
     const result = capabilities.filter((capability: BusinessCapability) => {
       // Status Filter
       if (
         filterState.statusFilter.length > 0 &&
         !filterState.statusFilter.includes(capability.status as CapabilityStatus)
       ) {
-        console.log(
-          'Filtered out by status:',
-          capability.status,
-          'expected:',
-          filterState.statusFilter
-        )
         return false
       }
 
@@ -49,12 +40,6 @@ export const useCapabilityFilter = ({ capabilities = [] }: UseCapabilityFilterPr
             .map(level => Number(level))
             .includes(capability.maturityLevel))
       ) {
-        console.log(
-          'Filtered out by maturityLevel:',
-          capability.maturityLevel,
-          'expected:',
-          filterState.maturityLevelFilter.map(level => Number(level))
-        )
         return false
       }
 
@@ -65,12 +50,6 @@ export const useCapabilityFilter = ({ capabilities = [] }: UseCapabilityFilterPr
         (businessValue < filterState.businessValueRange[0] ||
           businessValue > filterState.businessValueRange[1])
       ) {
-        console.log(
-          'Filtered out by businessValue:',
-          businessValue,
-          'range:',
-          filterState.businessValueRange
-        )
         return false
       }
 
@@ -139,7 +118,6 @@ export const useCapabilityFilter = ({ capabilities = [] }: UseCapabilityFilterPr
       return true
     })
 
-    console.log('Filtered capabilities:', result.length)
     return result
   }, [capabilities, filterState])
 
