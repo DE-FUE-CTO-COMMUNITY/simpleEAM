@@ -10,6 +10,7 @@ import {
   Chip,
   CardActionArea,
   Skeleton,
+  useTheme,
 } from '@mui/material'
 import { useRouter } from 'next/navigation'
 import { format } from 'date-fns'
@@ -49,6 +50,7 @@ const DiagramCard: React.FC<DiagramCardProps> = ({
   diagramJson,
 }) => {
   const router = useRouter()
+  const theme = useTheme()
 
   const handleClick = async () => {
     try {
@@ -137,14 +139,14 @@ const DiagramCard: React.FC<DiagramCardProps> = ({
               alt={title}
               sx={{
                 objectFit: 'contain',
-                backgroundColor: '#f5f5f5',
+                backgroundColor: theme.palette.grey[100],
               }}
             />
           ) : (
             <Box
               sx={{
                 height: 200,
-                backgroundColor: '#f5f5f5',
+                backgroundColor: theme.palette.grey[100],
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
