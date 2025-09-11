@@ -36,8 +36,6 @@ export const actionAddRelatedElements = {
     // Hier wird die Action ausgeführt
     const selectedElement = elements[0]
 
-    console.log('Add Related Elements action triggered for:', selectedElement)
-
     // Wir müssen Zugriff auf die onOpenAddRelatedElementsDialog-Funktion haben
     // Das können wir über eine globale Variable oder über das app-Objekt machen
 

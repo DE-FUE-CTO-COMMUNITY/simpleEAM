@@ -69,7 +69,6 @@ export const AddRelatedElementsOverlay: React.FC<AddRelatedElementsOverlayProps>
 
   const handleClick = () => {
     if (selectedElementWithDb) {
-      console.log('Opening Add Related Elements dialog for:', selectedElementWithDb)
       onOpenDialog(selectedElementWithDb)
     }
   }

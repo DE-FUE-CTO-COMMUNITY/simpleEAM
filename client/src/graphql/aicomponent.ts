@@ -66,7 +66,7 @@ export const GET_Aicomponents = gql`
 // Query: Einzelne AI Component abrufen
 export const GET_Aicomponent = gql`
   query GetAIComponent($id: ID!) {
-    aiComponents(where: { id: $id }) {
+    aiComponents(where: { id: { eq: $id } }) {
       id
       name
       description

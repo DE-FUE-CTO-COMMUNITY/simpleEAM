@@ -14,6 +14,7 @@ import InfrastructureForm, {
 import ApplicationInterfaceForm, {
   ApplicationInterfaceFormValues,
 } from '../../interfaces/ApplicationInterfaceForm'
+import AicomponentForm, { AicomponentFormValues } from '../../aicomponents/AicomponentForm'
 
 // Import der GraphQL-Queries
 import { GET_APPLICATION, GET_APPLICATIONS } from '@/graphql/application'
@@ -21,6 +22,7 @@ import { GET_CAPABILITY, GET_CAPABILITIES } from '@/graphql/capability'
 import { GET_APPLICATION_INTERFACE } from '@/graphql/applicationInterface'
 import { GET_INFRASTRUCTURE } from '@/graphql/infrastructure'
 import { GET_DATA_OBJECT } from '@/graphql/dataObject'
+import { GET_Aicomponent } from '@/graphql/aicomponent'
 
 // Import der Mutations
 import { UPDATE_APPLICATION } from '@/graphql/application'
@@ -28,6 +30,7 @@ import { UPDATE_CAPABILITY } from '@/graphql/capability'
 import { UPDATE_INFRASTRUCTURE } from '@/graphql/infrastructure'
 import { UPDATE_DATA_OBJECT } from '@/graphql/dataObject'
 import { UPDATE_APPLICATION_INTERFACE } from '@/graphql/applicationInterface'
+import { UPDATE_Aicomponent } from '@/graphql/aicomponent'
 
 interface ElementFormDialogProps {
   element: ExcalidrawElement | null
@@ -63,6 +66,13 @@ export default function ElementFormDialog({
   const customData = element.customData as CustomData
   const databaseId = customData?.databaseId
   const elementType = customData?.elementType // Changed from 'type' to 'elementType'
+
+  console.log('ElementFormDialog Debug:', {
+    element: element.id,
+    customData,
+    databaseId,
+    elementType,
+  })
 
   if (!databaseId || !elementType) {
     console.warn('Element has no database ID or elementType:', element)
@@ -145,6 +155,19 @@ export default function ElementFormDialog({
         />
       )
 
+    case 'aicomponent':
+    case 'ai component':
+      return (
+        <AiComponentFormWrapper
+          databaseId={databaseId}
+          mode={currentMode}
+          isOpen={isOpen}
+          onClose={handleClose}
+          onEditMode={handleEditMode}
+          onElementUpdated={onElementUpdated}
+        />
+      )
+
     default:
       console.warn('Unknown element type:', elementType)
       return null
@@ -212,9 +235,11 @@ function ApplicationFormWrapper({
     return null
   }
 
+  const applicationData = data?.applications?.[0]
+
   return (
     <ApplicationForm
-      application={data?.applications?.[0]}
+      data={applicationData}
       availableApplications={allApplicationsData?.applications || []}
       mode={mode}
       isOpen={isOpen}
@@ -289,7 +314,7 @@ function CapabilityFormWrapper({
 
   return (
     <CapabilityForm
-      capability={data?.businessCapabilities?.[0]}
+      data={data?.businessCapabilities?.[0]}
       availableCapabilities={allCapabilitiesData?.businessCapabilities || []}
       mode={mode}
       isOpen={isOpen}
@@ -351,7 +376,7 @@ function InterfaceFormWrapper({
 
   return (
     <ApplicationInterfaceForm
-      applicationInterface={data?.applicationInterfaces?.[0]}
+      data={data?.applicationInterfaces?.[0]}
       mode={mode}
       isOpen={isOpen}
       onClose={onClose}
@@ -412,7 +437,7 @@ function InfrastructureFormWrapper({
 
   return (
     <InfrastructureForm
-      infrastructure={data?.infrastructures?.[0]}
+      data={data?.infrastructures?.[0]}
       mode={mode}
       isOpen={isOpen}
       onClose={onClose}
@@ -473,7 +498,73 @@ function DataObjectFormWrapper({
 
   return (
     <DataObjectForm
-      dataObject={data?.dataObjects?.[0]}
+      data={data?.dataObjects?.[0]}
+      mode={mode}
+      isOpen={isOpen}
+      onClose={onClose}
+      onSubmit={handleSubmit}
+      onEditMode={onEditMode}
+      loading={false}
+    />
+  )
+}
+
+// Wrapper für AI Component Form
+function AiComponentFormWrapper({
+  databaseId,
+  mode,
+  isOpen,
+  onClose,
+  onEditMode,
+  onElementUpdated,
+}: {
+  databaseId: string
+  mode: 'view' | 'edit'
+  isOpen: boolean
+  onClose: () => void
+  onEditMode?: () => void
+  onElementUpdated?: () => void
+}) {
+  const { data, loading, error } = useQuery(GET_Aicomponent, {
+    variables: { id: databaseId },
+    skip: !isOpen,
+  })
+
+  const [updateAiComponent] = useMutation(UPDATE_Aicomponent, {
+    onCompleted: () => {
+      onElementUpdated?.()
+    },
+    onError: error => {
+      console.error('Error updating AI component:', error)
+    },
+  })
+
+  const handleSubmit = async (values: AicomponentFormValues) => {
+    try {
+      await updateAiComponent({
+        variables: {
+          where: { id: databaseId },
+          update: values,
+        },
+      })
+      onClose()
+    } catch (error) {
+      console.error('Error in AI component update:', error)
+      throw error
+    }
+  }
+
+  if (loading) return null
+  if (error) {
+    console.error('Error loading AI component:', error)
+    return null
+  }
+
+  const aiComponentData = data?.aiComponents?.[0]
+
+  return (
+    <AicomponentForm
+      data={aiComponentData}
       mode={mode}
       isOpen={isOpen}
       onClose={onClose}

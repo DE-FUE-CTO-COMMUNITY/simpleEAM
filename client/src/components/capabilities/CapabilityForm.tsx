@@ -34,8 +34,8 @@ export const capabilitySchema = z.object({
   maturityLevel: z
     .number()
     .int()
-    .min(0, 'Level muss 0 oder höher sein')
-    .max(3, 'Level darf maximal 3 sein'),
+    .min(1, 'Level muss zwischen 1 und 5 sein')
+    .max(5, 'Level muss zwischen 1 und 5 sein'),
   status: z.nativeEnum(CapabilityStatus),
   type: z.nativeEnum(CapabilityType).optional(),
   businessValue: z
@@ -123,14 +123,14 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
     () => ({
       name: '',
       description: '',
-      maturityLevel: 0,
+      maturityLevel: 1, // Korrigiert: 1-5 statt 0
       businessValue: 0,
       status: CapabilityStatus.ACTIVE,
       type: CapabilityType.OPERATIONAL,
       sequenceNumber: 0,
       introductionDate: undefined,
       endDate: undefined,
-      ownerId: currentPerson?.id || '', // Standard-Owner auf aktuellen Benutzer setzen
+      ownerId: '', // Leer lassen, wird von currentPerson bei Bedarf gesetzt
       tags: [],
       parentId: '',
       children: [],
@@ -138,7 +138,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
       partOfArchitectures: [],
       partOfDiagrams: [],
     }),
-    [currentPerson?.id]
+    []
   )
 
   // TanStack Form konfigurieren
@@ -155,83 +155,41 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
     },
   })
 
-  // Zurücksetzen des Formulars bei Schließen des Dialogs und Aktualisieren bei neuem Capability
-  // Extrahiere stabile Werte aus capability, um die Abhängigkeiten zu stabilisieren
-  const capabilityName = capability?.name
-  const capabilityDescription = capability?.description
-  const capabilityMaturityLevel = capability?.maturityLevel
-  const capabilityBusinessValue = capability?.businessValue
-  const capabilityStatus = capability?.status
-  const capabilityType = capability?.type
-  const capabilitySequenceNumber = capability?.sequenceNumber
-  const capabilityOwnerId =
-    capability?.owners && capability.owners.length > 0 ? capability.owners[0]?.id : undefined
-  const capabilityTags = capability?.tags
-  const capabilityParentId =
-    capability?.parents && capability.parents.length > 0 ? capability.parents[0]?.id : undefined
-  const capabilityChildren = React.useMemo(
-    () => capability?.children?.map((child: any) => child.id) ?? [],
-    [capability?.children]
-  )
-  const capabilitySupportedByApplications = React.useMemo(
-    () => capability?.supportedByApplications?.map((app: any) => app.id) ?? [],
-    [capability?.supportedByApplications]
-  )
-  const capabilityPartOfArchitectures = React.useMemo(
-    () => capability?.partOfArchitectures?.map((arch: any) => arch.id) ?? [],
-    [capability?.partOfArchitectures]
-  )
-  // Diagramme, in denen die Capability dargestellt wird
-  const capabilityPartOfDiagrams = React.useMemo(
-    () => capability?.depictedInDiagrams?.map((diagram: any) => diagram.id) ?? [],
-    [capability?.depictedInDiagrams]
-  )
-
   useEffect(() => {
-    if (!isOpen) {
+    if (isOpen && capability) {
+      // Verwende setFieldValue für jedes Feld einzeln - nach dem bewährten Muster der CompanyForm
+      form.setFieldValue('name', capability?.name ?? '')
+      form.setFieldValue('description', capability?.description ?? '')
+      form.setFieldValue('maturityLevel', capability?.maturityLevel ?? 1)
+      form.setFieldValue('businessValue', capability?.businessValue ?? 0)
+      form.setFieldValue('status', capability?.status ?? CapabilityStatus.ACTIVE)
+      form.setFieldValue('type', capability?.type ?? CapabilityType.OPERATIONAL)
+      form.setFieldValue('sequenceNumber', capability?.sequenceNumber ?? 0)
+      form.setFieldValue(
+        'introductionDate',
+        capability?.introductionDate ? new Date(capability.introductionDate) : undefined
+      )
+      form.setFieldValue('endDate', capability?.endDate ? new Date(capability.endDate) : undefined)
+      form.setFieldValue('ownerId', capability?.owners?.[0]?.id ?? '')
+      form.setFieldValue('tags', capability?.tags ?? [])
+      form.setFieldValue('parentId', capability?.parents?.[0]?.id ?? '')
+      form.setFieldValue('children', capability?.children?.map((child: any) => child.id) ?? [])
+      form.setFieldValue(
+        'supportedByApplications',
+        capability?.supportedByApplications?.map((app: any) => app.id) ?? []
+      )
+      form.setFieldValue(
+        'partOfArchitectures',
+        capability?.partOfArchitectures?.map((arch: any) => arch.id) ?? []
+      )
+      form.setFieldValue(
+        'partOfDiagrams',
+        capability?.depictedInDiagrams?.map((diagram: any) => diagram.id) ?? []
+      )
+    } else if (!isOpen) {
       form.reset()
-    } else if (capability) {
-      // Aktualisiere das Formular bei Änderungen am Capability-Objekt
-      form.reset({
-        name: capabilityName ?? '',
-        description: capabilityDescription ?? '',
-        maturityLevel: capabilityMaturityLevel ?? 0,
-        businessValue: capabilityBusinessValue ?? 0,
-        status: capabilityStatus ?? CapabilityStatus.ACTIVE,
-        type: capabilityType ?? CapabilityType.OPERATIONAL,
-        sequenceNumber: capabilitySequenceNumber ?? 0,
-        introductionDate: capability?.introductionDate
-          ? new Date(capability.introductionDate)
-          : undefined,
-        endDate: capability?.endDate ? new Date(capability.endDate) : undefined,
-        ownerId: capabilityOwnerId ?? '',
-        tags: capabilityTags ?? [],
-        parentId: capabilityParentId ?? '',
-        children: capabilityChildren,
-        supportedByApplications: capabilitySupportedByApplications,
-        partOfArchitectures: capabilityPartOfArchitectures,
-        partOfDiagrams: capabilityPartOfDiagrams,
-      })
     }
-  }, [
-    isOpen,
-    form,
-    capability,
-    capabilityName,
-    capabilityDescription,
-    capabilityMaturityLevel,
-    capabilityBusinessValue,
-    capabilityStatus,
-    capabilityType,
-    capabilitySequenceNumber,
-    capabilityOwnerId,
-    capabilityTags,
-    capabilityParentId,
-    capabilityChildren,
-    capabilitySupportedByApplications,
-    capabilityPartOfArchitectures,
-    capabilityPartOfDiagrams,
-  ])
+  }, [form, capability, isOpen])
 
   // Feldkonfiguration für das generische Formular
   interface SelectOption {
