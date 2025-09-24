@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "license": "AGPL-3.0-or-later",
+  "license": "MIT",
   "scripts": {
     "preinstall": "node -e \"if(process.env.npm_execpath && process.env.npm_execpath.indexOf('yarn') === -1) throw new Error('⚠️ Bitte verwenden Sie yarn für dieses Projekt!')\"",
     "dev": "next dev -p 3000",

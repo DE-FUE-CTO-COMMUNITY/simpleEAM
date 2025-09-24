@@ -160,7 +160,7 @@ Detaillierte Dokumentation finden Sie im [`docs/`](./docs/) Verzeichnis:
 
 ## 📄 Lizenz
 
-Dieses Projekt steht unter der GNU AFFERO GENERAL PUBLIC LICENSE v3. Siehe [LICENSE](LICENSE) Datei für Details.
+Dieses Projekt steht unter der MIT-Lizenz. Copyright (c) 2025 Atos. Siehe [LICENSE](LICENSE) Datei für Details.
 
 ## 🙏 Acknowledgments
 

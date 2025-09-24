@@ -20,7 +20,7 @@
     "test:server": "cd server && yarn test"
   },
   "author": "",
-  "license": "AGPL-3.0-or-later",
+  "license": "MIT",
   "engines": {
     "node": ">=20.x",
     "npm": "please-use-yarn",
