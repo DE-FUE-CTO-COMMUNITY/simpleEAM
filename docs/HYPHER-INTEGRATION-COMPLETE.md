@@ -1,102 +1,102 @@
-# Hypher-basierte Textumbruch-Implementierung
+# Hypher-based Text Wrapping Implementation
 
-## Übersicht
+## Overview
 
-Diese Implementierung erweitert das Simple-EAM-System um eine fortgeschrittene Textumbruch-Funktionalität mit intelligenter Silbentrennung unter Verwendung der Hypher-Bibliothek.
+This implementation extends the Simple-EAM system with advanced text wrapping functionality featuring intelligent hyphenation using the Hypher library.
 
-## Wichtige Funktionen
+## Key Functions
 
-### 1. `wrapTextToFitWidth` - Intelligenter Textumbruch
+### 1. `wrapTextToFitWidth` - Intelligent Text Wrapping
 
-- **Zweck**: Umbricht Text mit optimaler Silbentrennung für deutsche und englische Texte
-- **Funktionen**:
-  - Automatische Spracherkennung (deutsch/englisch)
-  - Pixel-genaue Breitenmessung mit Canvas API
-  - Intelligente Silbentrennung mit Hypher-Bibliothek
-  - Notfall-Trennung bei überlangen Wörtern
-  - Maximale Zeilenbegrenzung für bessere Formatierung
+- **Purpose**: Wraps text with optimal hyphenation for German and English texts
+- **Features**:
+  - Automatic language detection (German/English)
+  - Pixel-accurate width measurement using Canvas API
+  - Intelligent hyphenation with Hypher library
+  - Emergency splitting for overlong words
+  - Maximum line limit for better formatting
 
-### 2. `calculateOptimalTextDimensions` - Präzise Dimensionsberechnung
+### 2. `calculateOptimalTextDimensions` - Precise Dimension Calculation
 
-- **Zweck**: Berechnet optimale Textdimensionen basierend auf Container-Größe
-- **Funktionen**:
-  - Canvas-basierte Textmessung
-  - Hypher-basierter Textumbruch
-  - Automatische Anpassung an Container-Grenzen
-  - Rückgabe von Breite, Höhe und umgebrochenem Text
+- **Purpose**: Calculates optimal text dimensions based on container size
+- **Features**:
+  - Canvas-based text measurement
+  - Hypher-based text wrapping
+  - Automatic adjustment to container boundaries
+  - Returns width, height, and wrapped text
 
-### 3. `measureTextWidth` - Pixel-genaue Textmessung
+### 3. `measureTextWidth` - Pixel-accurate Text Measurement
 
-- **Zweck**: Misst exakte Textbreite mit Canvas API
-- **Funktionen**:
-  - Font-Family- und Font-Size-Unterstützung
-  - Pixel-genaue Messung
-  - Cached Canvas-Kontext für Performance
+- **Purpose**: Measures exact text width using Canvas API
+- **Features**:
+  - Font-family and font-size support
+  - Pixel-accurate measurement
+  - Cached canvas context for performance
 
-## Sprachunterstützung
+## Language Support
 
-### Deutsche Silbentrennung
+### German Hyphenation
 
-- Verwendet `hyphenation.de` Patterns
-- Korrekte Behandlung von Umlauten
-- Zusammengesetzte Wörter werden korrekt getrennt
+- Uses `hyphenation.de` patterns
+- Correct handling of umlauts
+- Compound words are properly hyphenated
 
-### Englische Silbentrennung
+### English Hyphenation
 
-- Verwendet `hyphenation.en-us` Patterns
-- Standard-englische Trennungsregeln
-- Optimiert für technische Begriffe
+- Uses `hyphenation.en-us` patterns
+- Standard English hyphenation rules
+- Optimized for technical terms
 
-## Verwendung
+## Usage
 
-### Grundlegende Integration
+### Basic Integration
 
 ```typescript
 import { wrapTextToFitWidth, calculateOptimalTextDimensions } from './textContainerUtils'
 
-// Einfacher Textumbruch
-const wrappedText = wrapTextToFitWidth('Geschäftsprozessmanagement', 150, 16, 'Arial')
+// Simple text wrapping
+const wrappedText = wrapTextToFitWidth('Businessprocessmanagement', 150, 16, 'Arial')
 
-// Vollständige Dimensionsberechnung
+// Complete dimension calculation
 const dimensions = calculateOptimalTextDimensions(
-  'Längerer Text mit mehreren Wörtern',
+  'Longer text with multiple words',
   containerElement,
   16,
   'Arial'
 )
 ```
 
-### Integration in bestehende Funktionen
+### Integration with Existing Functions
 
-Die folgenden Funktionen wurden bereits aktualisiert:
+The following functions have already been updated:
 
 - `calculateTopCenteredTextPosition`
 - `calculateCenteredTextPosition`
 - `updateTextWithContainerBinding`
 
-## Technische Details
+## Technical Details
 
-### Abhängigkeiten
+### Dependencies
 
-- `hypher`: Basis-Bibliothek für Silbentrennung
-- `hyphenation.de`: Deutsche Trennungsmuster
-- `hyphenation.en-us`: Englische Trennungsmuster
+- `hypher`: Base library for hyphenation
+- `hyphenation.de`: German hyphenation patterns
+- `hyphenation.en-us`: English hyphenation patterns
 
-### Performance-Optimierungen
+### Performance Optimizations
 
-- Cached Canvas-Kontext für Textmessung
-- Lazy Loading der Hypher-Instanzen
-- Effiziente Spracherkennung
+- Cached canvas context for text measurement
+- Lazy loading of Hypher instances
+- Efficient language detection
 
-### Fallback-Mechanismen
+### Fallback Mechanisms
 
-- Bei Hypher-Fehlern: Basis-Wort-Trennung
-- Bei Canvas-Fehlern: Approximation mit Zeichenanzahl
-- Bei Sprach-Erkennungsfehlern: Englisch als Standard
+- On Hypher errors: Basic word splitting
+- On Canvas errors: Approximation using character count
+- On language detection errors: English as default
 
-## Spracherkennung
+## Language Detection
 
-### Automatische Erkennung
+### Automatic Detection
 
 ```typescript
 function detectLanguage(text: string): 'de' | 'en' {
@@ -108,88 +108,88 @@ function detectLanguage(text: string): 'de' | 'en' {
 }
 ```
 
-### Unterstützte Indikatoren
+### Supported Indicators
 
-- **Deutsch**: Umlaute (ä, ö, ü), Eszett (ß), Endungen (-ung, -keit, -schaft, -lich)
-- **Englisch**: Standard-Fallback für alle anderen Texte
+- **German**: Umlauts (ä, ö, ü), Eszett (ß), Endings (-ung, -keit, -schaft, -lich)
+- **English**: Standard fallback for all other texts
 
-## Konfiguration
+## Configuration
 
-### Anpassbare Parameter
+### Customizable Parameters
 
-- `maxWidth`: Maximale Textbreite in Pixeln
-- `fontSize`: Schriftgröße für Berechnungen
-- `fontFamily`: Schriftart für Messungen
-- `maxLines`: Maximale Anzahl der Zeilen (Standard: 2)
+- `maxWidth`: Maximum text width in pixels
+- `fontSize`: Font size for calculations
+- `fontFamily`: Font family for measurements
+- `maxLines`: Maximum number of lines (default: 2)
 
-### Container-Integration
+### Container Integration
 
-Die Funktionen arbeiten nahtlos mit ExcalidrawElement-Containern und berücksichtigen:
+The functions work seamlessly with ExcalidrawElement containers and consider:
 
-- Container-Dimensionen
-- Padding und Abstände
-- Zentrierung und Ausrichtung
+- Container dimensions
+- Padding and spacing
+- Centering and alignment
 
 ## Testing
 
-### Automatisierte Tests
+### Automated Tests
 
-Die Datei `textWrapperTest.ts` enthält umfassende Tests für:
+The file `textWrapperTest.ts` contains comprehensive tests for:
 
-- Deutsche Silbentrennung
-- Englische Silbentrennung
-- Dimensionsberechnung
-- Verschiedene Container-Größen
+- German hyphenation
+- English hyphenation
+- Dimension calculation
+- Various container sizes
 
-### Manuelle Tests
+### Manual Tests
 
 ```bash
-# Hypher-Bibliothek testen
+# Test Hypher library
 node test-hypher.js
 
-# TypeScript-Kompilierung prüfen
+# Check TypeScript compilation
 yarn tsc --noEmit
 ```
 
-## Kompatibilität
+## Compatibility
 
-### Bestehende Funktionen
+### Existing Functions
 
-Alle bestehenden Textpositionierungs- und Bindungsfunktionen wurden aktualisiert, um die neue Hypher-basierte Logik zu verwenden, ohne Breaking Changes zu verursachen.
+All existing text positioning and binding functions have been updated to use the new Hypher-based logic without causing breaking changes.
 
-### Rückwärtskompatibilität
+### Backward Compatibility
 
-- Alle bestehenden API-Signaturen bleiben unverändert
-- Bestehende Aufrufe funktionieren ohne Änderungen
-- Verbesserte Ausgabe bei gleicher Eingabe
+- All existing API signatures remain unchanged
+- Existing calls work without modifications
+- Improved output with same input
 
-## Fehlerbehandlung
+## Error Handling
 
-### Robuste Implementierung
+### Robust Implementation
 
-- Graceful Degradation bei Hypher-Fehlern
-- Fallback auf manuelle Trennung
-- Kontinuierliche Funktionalität auch bei Bibliotheksfehlern
+- Graceful degradation on Hypher errors
+- Fallback to manual splitting
+- Continuous functionality even with library errors
 
-### Logging und Debugging
+### Logging and Debugging
 
-- Detaillierte Fehlerbehandlung
-- Debugging-Funktionen für Entwicklung
-- Performance-Monitoring-Integration
+- Detailed error handling
+- Debugging functions for development
+- Performance monitoring integration
 
-## Zukünftige Erweiterungen
+## Future Enhancements
 
-### Geplante Verbesserungen
+### Planned Improvements
 
-- Zusätzliche Sprachunterstützung (französisch, spanisch)
-- Erweiterte Textformatierung (fett, kursiv)
-- Optimierte Performance für große Texte
-- Intelligente Zeilenhöhen-Anpassung
+- Additional language support (French, Spanish)
+- Extended text formatting (bold, italic)
+- Optimized performance for large texts
+- Intelligent line height adjustment
 
-### Erweiterbarkeit
+### Extensibility
 
-Die Architektur ist darauf ausgelegt, einfach erweitert zu werden:
+The architecture is designed to be easily extended:
 
-- Neue Sprachen können durch zusätzliche Hypher-Pattern hinzugefügt werden
-- Erweiterte Textformatierung kann in die Canvas-Messung integriert werden
-- Zusätzliche Umbruch-Strategien können als Plugins implementiert werden
+- New languages can be added through additional Hypher patterns
+- Extended text formatting can be integrated into Canvas measurement
+- Additional wrapping strategies can be implemented as plugins

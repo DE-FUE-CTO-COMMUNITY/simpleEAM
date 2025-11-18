@@ -1,30 +1,30 @@
-# Silbentrennung-Normalisierung für Datenbank-Speicherung (Korrigiert)
+# Hyphenation Normalization for Database Storage (Corrected)
 
 ## Problem
 
-Wenn im Diagramm Text mit Silbentrennung (Hypher) angezeigt wird, wurden die Trennstriche auch in der Datenbank gespeichert. Dies führte dazu, dass Begriffe wie "Geschäftsprozess" als "Geschäfts-\nprozess" in der Datenbank standen.
+When text with hyphenation (Hypher) was displayed in the diagram, the hyphens were also stored in the database. This led to terms like "Geschäftsprozess" being stored as "Geschäfts-\nprozess" in the database.
 
-**ABER:** Legitime Bindestriche in Namen wie "Backup-Rechenzentrum" oder "End-to-End-System" müssen erhalten bleiben!
+**BUT:** Legitimate hyphens in names like "Backup-Datacenter" or "End-to-End-System" must be preserved!
 
-## Lösung
+## Solution
 
-Die `normalizeText` und `prepareTextForDatabase` Funktionen wurden präzise angepasst, um nur **Silbentrennstriche** zu entfernen, die durch die Hypher-Integration entstehen:
+The `normalizeText` and `prepareTextForDatabase` functions were precisely adjusted to remove only **syllable hyphens** that are created through Hypher integration:
 
-### Korrigierte `normalizeText` Funktion
+### Corrected `normalizeText` Function
 
 ```typescript
 export const normalizeText = (text: string | undefined | null): string => {
   if (!text) return ''
 
   return text
-    .replace(/\r?\n/g, ' ') // Zeilenumbrüche durch Leerzeichen ersetzen
-    .replace(/-\s*\n\s*/g, '') // Nur Trennstriche entfernen, die direkt vor Zeilenumbrüchen stehen
-    .replace(/\s+/g, ' ') // Mehrfache Leerzeichen durch einzelne ersetzen
+    .replace(/\r?\n/g, ' ') // Replace line breaks with spaces
+    .replace(/-\s*\n\s*/g, '') // Only remove hyphens that appear directly before line breaks
+    .replace(/\s+/g, ' ') // Replace multiple spaces with single spaces
     .trim()
 }
 ```
 
-### Korrigierte `prepareTextForDatabase` Funktion
+### Corrected `prepareTextForDatabase` Function
 
 ```typescript
 export const prepareTextForDatabase = (text: string | undefined | null): string => {
@@ -32,132 +32,132 @@ export const prepareTextForDatabase = (text: string | undefined | null): string 
 
   const normalized = normalizeText(text)
 
-  // Entferne nur Unicode-Trennzeichen, die bei der Silbentrennung entstehen können
+  // Only remove Unicode hyphens that can occur during syllable separation
   return normalized
-    .replace(/\u00AD/g, '') // Entferne weiche Trennstriche (soft hyphens)
-    .replace(/\.{3,}/g, '...') // Normalisiere Ellipsen
+    .replace(/\u00AD/g, '') // Remove soft hyphens
+    .replace(/\.{3,}/g, '...') // Normalize ellipses
     .trim()
 }
 ```
 
-## Was wird entfernt vs. was bleibt erhalten
+## What Gets Removed vs. What Remains
 
-### ✅ Entfernt werden (Silbentrennstriche):
+### ✅ Removed (syllable hyphens):
 
 - `"Geschäfts-\nprozess"` → `"Geschäftsprozess"`
 - `"Informa-\ntionsverarbeitung"` → `"Informationsverarbeitung"`
 - `"Software-\nentwicklung"` → `"Softwareentwicklung"`
 - `"Quality-\nAssurance"` → `"QualityAssurance"`
-- Weiche Trennstriche (Unicode \u00AD)
+- Soft hyphens (Unicode \u00AD)
 
-### ✅ Erhalten bleiben (Legitime Bindestriche):
+### ✅ Preserved (legitimate hyphens):
 
-- `"Backup-Rechenzentrum"` → `"Backup-Rechenzentrum"`
+- `"Backup-Datacenter"` → `"Backup-Datacenter"`
 - `"End-to-End-System"` → `"End-to-End-System"`
-- `"Client-Server-Architektur"` → `"Client-Server-Architektur"`
+- `"Client-Server-Architecture"` → `"Client-Server-Architecture"`
 - `"E-Mail-System"` → `"E-Mail-System"`
-- `"Multi-Tier-Architektur"` → `"Multi-Tier-Architektur"`
+- `"Multi-Tier-Architecture"` → `"Multi-Tier-Architecture"`
 
-## Präzise Erkennungslogik
+## Precise Detection Logic
 
-### Silbentrennstriche (werden entfernt):
+### Syllable Hyphens (removed):
 
-- **Muster:** `-\s*\n\s*` (Bindestrich gefolgt von optionalen Leerzeichen, dann Zeilenumbruch)
-- **Beispiel:** `"Geschäfts-\nprozess"` oder `"Geschäfts- \n prozess"`
+- **Pattern:** `-\s*\n\s*` (Hyphen followed by optional whitespace, then line break)
+- **Example:** `"Geschäfts-\nprozess"` or `"Geschäfts- \n prozess"`
 
-### Legitime Bindestriche (bleiben erhalten):
+### Legitimate Hyphens (preserved):
 
-- **Muster:** Bindestriche, die NICHT vor Zeilenumbrüchen stehen
-- **Beispiel:** `"Backup-Rechenzentrum"` oder `"End-to-End"`
+- **Pattern:** Hyphens that do NOT appear before line breaks
+- **Example:** `"Backup-Datacenter"` or `"End-to-End"`
 
-## Beispiele
+## Examples
 
-### Kombinierte Szenarien
+### Combined Scenarios
 
 ```typescript
-// Eingabe: "Client-Server-\nArchitektur"
-// Ergebnis: "Client-Server-Architektur"
-// Erklärung: Legitime Bindestriche bleiben, Silbentrennstrich wird entfernt
+// Input: "Client-Server-\nArchitecture"
+// Result: "Client-Server-Architecture"
+// Explanation: Legitimate hyphens remain, syllable hyphen is removed
 
-// Eingabe: "Multi-Tier-\nApplication-\nServer"
-// Ergebnis: "Multi-Tier-ApplicationServer"
-// Erklärung: Erste beiden Bindestriche bleiben, Silbentrennstriche werden entfernt
+// Input: "Multi-Tier-\nApplication-\nServer"
+// Result: "Multi-Tier-ApplicationServer"
+// Explanation: First two hyphens remain, syllable hyphens are removed
 ```
 
-### Vor der Korrektur (zu aggressiv)
+### Before the Correction (too aggressive)
 
 ```
-Input: "Backup-Rechenzentrum"
-Output: "BackupRechenzentrum"  ❌ (Legitimer Bindestrich entfernt)
+Input: "Backup-Datacenter"
+Output: "BackupDatacenter"  ❌ (Legitimate hyphen removed)
 ```
 
-### Nach der Korrektur (präzise)
+### After the Correction (precise)
 
 ```
-Input: "Backup-Rechenzentrum"
-Output: "Backup-Rechenzentrum"  ✅ (Legitimer Bindestrich erhalten)
+Input: "Backup-Datacenter"
+Output: "Backup-Datacenter"  ✅ (Legitimate hyphen preserved)
 
 Input: "Geschäfts-\nprozess"
-Output: "Geschäftsprozess"     ✅ (Silbentrennstrich entfernt)
+Output: "Geschäftsprozess"     ✅ (Syllable hyphen removed)
 ```
 
-## Angepasste Funktionen
+## Adapted Functions
 
 ### `updateTextWithContainerBinding`
 
-- Verwendet jetzt `prepareTextForDatabase` für die Datenbank-Speicherung
-- Verwendet originalen Text für die Positionsberechnung (bessere Darstellung)
+- Now uses `prepareTextForDatabase` for database storage
+- Uses original text for position calculation (better display)
 
 ### `updateTextContentOnly`
 
-- Verwendet jetzt `prepareTextForDatabase` für die Datenbank-Speicherung
+- Now uses `prepareTextForDatabase` for database storage
 
 ### `databaseSyncUtils.ts`
 
-- GraphQL-Mutation verwendet jetzt `prepareTextForDatabase(newName)` statt `newName.trim()`
+- GraphQL mutation now uses `prepareTextForDatabase(newName)` instead of `newName.trim()`
 
-## Aktualisierte Test-Suite
+## Updated Test Suite
 
-### Neue Test-Fälle
+### New Test Cases
 
 ```typescript
 const testCases = [
   {
-    input: 'Backup-Rechenzentrum',
-    expected: 'Backup-Rechenzentrum',
-    description: 'Legitimer Bindestrich in Namen (sollte erhalten bleiben)',
+    input: 'Backup-Datacenter',
+    expected: 'Backup-Datacenter',
+    description: 'Legitimate hyphen in names (should be preserved)',
   },
   {
     input: 'End-to-End-System',
     expected: 'End-to-End-System',
-    description: 'Mehrere legitime Bindestriche (sollten erhalten bleiben)',
+    description: 'Multiple legitimate hyphens (should be preserved)',
   },
   {
-    input: 'Client-Server-\nArchitektur',
-    expected: 'Client-Server-Architektur',
-    description: 'Kombination aus legitimen und Silbentrennstrichen',
+    input: 'Client-Server-\nArchitecture',
+    expected: 'Client-Server-Architecture',
+    description: 'Combination of legitimate and syllable hyphens',
   },
 ]
 ```
 
-## Auswirkungen der Korrektur
+## Impact of the Correction
 
-- ✅ Silbentrennung wird nur für die Anzeige verwendet
-- ✅ Legitime Bindestriche in Namen bleiben erhalten
-- ✅ Konsistente Datenbank-Einträge ohne Silbentrennungs-Artefakte
-- ✅ Korrekte Darstellung von zusammengesetzten Namen
-- ✅ Keine Breaking Changes für bestehende Funktionalität
-- ✅ Verbesserte Suchfunktionalität bei Erhaltung der Namensintegrität
+- ✅ Hyphenation is only used for display
+- ✅ Legitimate hyphens in names are preserved
+- ✅ Consistent database entries without hyphenation artifacts
+- ✅ Correct representation of compound names
+- ✅ No breaking changes for existing functionality
+- ✅ Improved search functionality while maintaining name integrity
 
-## Technische Details
+## Technical Details
 
-### Regex-Erklärung
+### Regex Explanation
 
-- `/-\s*\n\s*/g`: Sucht nach Bindestrich, gefolgt von optionalen Leerzeichen, dann Zeilenumbruch, dann optionale Leerzeichen
-- Diese Regel erfasst alle Varianten von Silbentrennstrichen vor Zeilenumbrüchen
-- Bindestriche innerhalb einer Zeile werden nicht berührt
+- `/-\s*\n\s*/g`: Searches for hyphen followed by optional whitespace, then line break, then optional whitespace
+- This rule captures all variants of syllable hyphens before line breaks
+- Hyphens within a line are not touched
 
-### Unicode-Behandlung
+### Unicode Handling
 
-- Nur `\u00AD` (Soft Hyphen) wird entfernt, da dieser für Silbentrennung verwendet wird
-- Andere Unicode-Bindestriche bleiben erhalten, da sie legitime Zeichen sein können
+- Only `\u00AD` (Soft Hyphen) is removed, as it's used for syllable separation
+- Other Unicode hyphens are preserved, as they can be legitimate characters

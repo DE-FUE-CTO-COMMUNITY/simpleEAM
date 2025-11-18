@@ -58,7 +58,7 @@ export interface ArrowIssue {
   element?: ExcalidrawElement
 }
 
-// Neue Beziehung die erstellt werden soll
+// New relationship to be created
 export interface NewRelationship {
   id: string // Eindeutige ID für die UI
   arrowId: string

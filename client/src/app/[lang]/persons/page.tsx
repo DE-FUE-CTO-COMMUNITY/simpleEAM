@@ -30,7 +30,7 @@ function PersonsPage() {
   const [tableInstance, setTableInstance] = useState<any>(null)
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
 
-  // Filter-Zustand
+  // Filter state
   const [filterOpen, setFilterOpen] = useState(false)
   const [activeFiltersCount, setActiveFiltersCount] = useState<number>(0)
 
@@ -41,7 +41,7 @@ function PersonsPage() {
   // State for the new Person form
   const [showNewPersonForm, setShowNewPersonForm] = useState(false)
 
-  // Personen laden - Auth-Check erfolgt bereits in layout.tsx
+  // Load persons - auth check already done in layout.tsx
   const companyWhere = useCompanyWhere('company')
   // Admins sollen zusätzlich Personen ohne Company sehen: OR(companyWhere, company: { none: {} })
   const where = React.useMemo(() => {
@@ -86,13 +86,13 @@ function PersonsPage() {
   // Error handling
   useEffect(() => {
     if (error) {
-      enqueueSnackbar('Fehler beim Laden der Personen', { variant: 'error' })
+      enqueueSnackbar('Error loading persons', { variant: 'error' })
     }
   }, [error, enqueueSnackbar])
 
   const persons = data?.people || []
 
-  // Filter-Hook verwenden (Pattern 2)
+  // Use filter hook (Pattern 2)
   const {
     filterState,
     setFilterState,
@@ -103,9 +103,9 @@ function PersonsPage() {
   // Mutation for creating a new Person
   const [createPerson, { loading: isCreating }] = useMutation(CREATE_PERSON, {
     onCompleted: async res => {
-      enqueueSnackbar(t('messages.createSuccess'), { variant: 'success' })
+      enqueueSnackbar(t('messages.updateSuccess'), { variant: 'success' })
       refetch()
-      // Nach erfolgreichem Erstellen: company_ids in Keycloak anhand der E-Mail synchronisieren
+      // After successful update: synchronize company_ids in Keycloak based on email
       try {
         const email: string | undefined = res?.createPeople?.people?.[0]?.email
         if (email && isAdmin() && keycloak?.token) {
@@ -119,7 +119,7 @@ function PersonsPage() {
           })
         }
       } catch (e) {
-        console.error('Fehler bei company_ids Sync (create):', e)
+        console.error('Error with company_ids sync (create):', e)
       }
     },
     onError: error => {
@@ -134,7 +134,7 @@ function PersonsPage() {
     onCompleted: async res => {
       enqueueSnackbar(t('messages.updateSuccess'), { variant: 'success' })
       refetch()
-      // Nach erfolgreichem Update: company_ids in Keycloak anhand der (ggf. geänderten) E-Mail synchronisieren
+      // After successful update: synchronize company_ids in Keycloak based on (possibly changed) email
       try {
         const email: string | undefined = res?.updatePeople?.people?.[0]?.email
         if (email && isAdmin() && keycloak?.token) {
@@ -148,7 +148,7 @@ function PersonsPage() {
           })
         }
       } catch (e) {
-        console.error('Fehler bei company_ids Sync (update):', e)
+        console.error('Error with company_ids sync (update):', e)
       }
     },
     onError: error => {

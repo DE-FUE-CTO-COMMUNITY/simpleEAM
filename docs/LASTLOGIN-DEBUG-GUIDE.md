@@ -1,153 +1,153 @@
-# Debug-Anleitung: LastLogin Problem
+# Debug Guide: LastLogin Problem
 
 ## Problem
 
-Der `api/auth/update-last-login` API-Call wird nicht ausgeführt und erscheint nicht im Network-Log.
+The `api/auth/update-last-login` API call is not being executed and doesn't appear in the network log.
 
-## Debug-Schritte
+## Debug Steps
 
-### 1. Browser-Konsole öffnen
+### 1. Open Browser Console
 
-- Öffnen Sie die Entwicklertools (F12)
-- Gehen Sie zur Konsole
-- **Wichtig**: Öffnen Sie die Konsole BEVOR Sie sich einloggen
+- Open developer tools (F12)
+- Go to console
+- **Important**: Open console BEFORE you log in
 
-### 2. Debug-Funktionen nutzen
+### 2. Use Debug Functions
 
-#### Aktuellen Status prüfen:
+#### Check current status:
 
 ```javascript
 checkLoginStatus()
 ```
 
-#### Manuell LastLogin-Update auslösen:
+#### Manually trigger LastLogin update:
 
 ```javascript
 debugLastLogin()
 ```
 
-### 3. Login-Prozess beobachten
+### 3. Observe Login Process
 
-1. **Logout** (falls eingeloggt)
-2. **Browser-Konsole leeren**
-3. **Login durchführen**
-4. **Debug-Meldungen in der Konsole beobachten**
+1. **Logout** (if logged in)
+2. **Clear browser console**
+3. **Perform login**
+4. **Watch debug messages in console**
 
-### 4. Erwartete Debug-Ausgaben
+### 4. Expected Debug Output
 
-#### Bei erfolgreichem neuen Login:
+#### On successful new login:
 
 ```
-🔍 DEBUG: Keycloak initialisiert - authenticated: true
-🔑 DEBUG: Benutzer ist authentifiziert
-🔍 DEBUG: checkForNewLogin() aufgerufen
+🔍 DEBUG: Keycloak initialized - authenticated: true
+🔑 DEBUG: User is authenticated
+🔍 DEBUG: checkForNewLogin() called
 📱 DEBUG: localStorage Check:
   - LOGIN_STATUS_KEY: user_logged_in
-  - localStorage Wert: null
+  - localStorage Value: null
   - wasLoggedIn: false
-✅ DEBUG: Neuer Login erkannt!
-🔍 DEBUG: isNewLogin Ergebnis: true
-🚀 DEBUG: Neuer Login verarbeitung startet...
-📱 DEBUG: Login-Status gesetzt
-⏰ DEBUG: updateLastLoginDate() aufgerufen
-🔍 DEBUG: updateLastLoginDate() aufgerufen
-📅 DEBUG: Sende lastLogin Update: 2025-01-XX...
+✅ DEBUG: New login detected!
+🔍 DEBUG: isNewLogin result: true
+🚀 DEBUG: New login processing starts...
+📱 DEBUG: Login status set
+⏰ DEBUG: updateLastLoginDate() called
+🔍 DEBUG: updateLastLoginDate() called
+📅 DEBUG: Sending lastLogin update: 2025-01-XX...
 📡 DEBUG: API Response Status: 200
 ✅ DEBUG: API Response Success: {...}
 ```
 
-#### Bei bereits eingeloggtem Benutzer:
+#### On already logged in user:
 
 ```
-🔍 DEBUG: Keycloak initialisiert - authenticated: true
-🔑 DEBUG: Benutzer ist authentifiziert
-🔍 DEBUG: checkForNewLogin() aufgerufen
+🔍 DEBUG: Keycloak initialized - authenticated: true
+🔑 DEBUG: User is authenticated
+🔍 DEBUG: checkForNewLogin() called
 📱 DEBUG: localStorage Check:
   - LOGIN_STATUS_KEY: user_logged_in
-  - localStorage Wert: true
+  - localStorage Value: true
   - wasLoggedIn: true
-ℹ️ DEBUG: Bereits eingeloggt (kein neuer Login)
-🔍 DEBUG: isNewLogin Ergebnis: false
-ℹ️ DEBUG: Kein neuer Login - updateLastLoginDate wird NICHT aufgerufen
+ℹ️ DEBUG: Already logged in (no new login)
+🔍 DEBUG: isNewLogin result: false
+ℹ️ DEBUG: No new login - updateLastLoginDate will NOT be called
 ```
 
-### 5. Häufige Probleme und Lösungen
+### 5. Common Problems and Solutions
 
-#### Problem: "Bereits eingeloggt" obwohl frisch eingeloggt
+#### Problem: "Already logged in" even though freshly logged in
 
-**Ursache**: localStorage enthält noch `user_logged_in: true`
-**Lösung**:
+**Cause**: localStorage still contains `user_logged_in: true`
+**Solution**:
 
 ```javascript
-// In Browser-Konsole ausführen:
+// Execute in browser console:
 localStorage.removeItem('user_logged_in')
-// Dann neu einloggen
+// Then log in again
 ```
 
-#### Problem: API-Call wird nicht gesendet
+#### Problem: API call is not sent
 
-**Mögliche Ursachen**:
+**Possible causes**:
 
-1. `isNewLogin` gibt `false` zurück
-2. Keycloak nicht authentifiziert
-3. Kein Token verfügbar
+1. `isNewLogin` returns `false`
+2. Keycloak not authenticated
+3. No token available
 
-#### Problem: API-Call fehlschlägt
+#### Problem: API call fails
 
-**Debug-Schritte**:
+**Debug steps**:
 
-1. Network-Tab prüfen für 401/500 Fehler
-2. Server-Logs prüfen (siehe unten)
+1. Check network tab for 401/500 errors
+2. Check server logs (see below)
 
 ### 6. Server-Side Debugging
 
-#### Docker-Logs prüfen:
+#### Check Docker logs:
 
 ```bash
-# Client-Logs (Next.js)
+# Client logs (Next.js)
 docker-compose logs -f client
 
-# Server-Logs (falls API über Server läuft)
+# Server logs (if API runs through server)
 docker-compose logs -f server
 ```
 
-#### Keycloak-Logs prüfen:
+#### Check Keycloak logs:
 
 ```bash
 docker-compose logs -f auth
 ```
 
-### 7. Manueller Test
+### 7. Manual Test
 
-Falls automatischer Login nicht funktioniert, können Sie manuell testen:
+If automatic login doesn't work, you can test manually:
 
 ```javascript
-// In Browser-Konsole:
+// In browser console:
 debugLastLogin()
 ```
 
-Dies simuliert einen neuen Login und sollte den API-Call auslösen.
+This simulates a new login and should trigger the API call.
 
-### 8. Environment-Variablen prüfen
+### 8. Verify Environment Variables
 
-Stellen Sie sicher, dass folgende Umgebungsvariablen gesetzt sind:
+Ensure the following environment variables are set:
 
 ```bash
-# In .env.local oder docker-compose.yml:
+# In .env.local or docker-compose.yml:
 KEYCLOAK_ADMIN=admin
-KEYCLOAK_ADMIN_PASSWORD=ihr_password
+KEYCLOAK_ADMIN_PASSWORD=your_password
 NEXT_PUBLIC_KEYCLOAK_URL=https://auth.dev-server.mf2.eu
 NEXT_PUBLIC_KEYCLOAK_REALM=simple-eam
 NEXT_PUBLIC_KEYCLOAK_CLIENT_ID=eam-client
 ```
 
-### 9. Netzwerk-Debugging
+### 9. Network Debugging
 
-Wenn der API-Call gesendet wird aber fehlschlägt:
+When the API call is sent but fails:
 
-1. **Network-Tab** öffnen
-2. **Filter auf "update-last-login"** setzen
-3. **Request Details** prüfen:
+1. **Open Network tab**
+2. **Filter on "update-last-login"**
+3. **Check Request Details**:
    - Headers (Authorization)
    - Request Body
    - Response Status/Body

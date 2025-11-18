@@ -2,85 +2,85 @@
 
 ## Problem
 
-Der helperText wurde doppelt angezeigt beim `onBlur` Event, und es wurden mehrere Validierungen unnötig ausgelöst. Das Problem hatte zwei Hauptursachen:
+The helperText was displayed twice on the `onBlur` event, and multiple unnecessary validations were triggered. The problem had two main causes:
 
-1. **Inkonsistente onBlur Handler**: In der GenericForm (Zeile 597) wurde `onBlur={() => formField.handleBlur()}` statt `onBlur={formField.handleBlur}` verwendet
-2. **Übervalidierung**: Alle Formulare verwendeten dieselbe Schema-Validierung für `onChange`, `onBlur`, `onMount` und `onSubmit`
+1. **Inconsistent onBlur handler**: In GenericForm (line 597), `onBlur={() => formField.handleBlur()}` was used instead of `onBlur={formField.handleBlur}`
+2. **Over-validation**: All forms used the same schema validation for `onChange`, `onBlur`, `onMount` and `onSubmit`
 
-## Lösung
+## Solution
 
-### 1. Konsistente onBlur Handler
+### 1. Consistent onBlur Handler
 
-**Vorher (problematisch):**
+**Before (problematic):**
 
 ```tsx
 onBlur={() => formField.handleBlur()}
 ```
 
-**Nachher (korrekt):**
+**After (correct):**
 
 ```tsx
 onBlur={formField.handleBlur}
 ```
 
-### 2. Optimierte Validierungskonfiguration
+### 2. Optimized Validation Configuration
 
-**Vorher (übervalidiert):**
+**Before (over-validated):**
 
 ```tsx
 validators: {
   onChange: schema,
-  onBlur: schema,      // ❌ Doppelte Validierung
+  onBlur: schema,      // ❌ Duplicate validation
   onSubmit: schema,
-  onMount: schema,     // ❌ Unnötige initiale Validierung
+  onMount: schema,     // ❌ Unnecessary initial validation
 }
 ```
 
-**Nachher (optimal nach TanStack Form Best Practices):**
+**After (optimal according to TanStack Form best practices):**
 
 ```tsx
 validators: {
-  onChange: schema,    // ✅ Primäre Validierung bei Eingabe
-  onSubmit: schema,    // ✅ Finale Validierung beim Absenden
+  onChange: schema,    // ✅ Primary validation on input
+  onSubmit: schema,    // ✅ Final validation on submit
 }
 ```
 
-## Geänderte Dateien
+## Modified Files
 
-1. **GenericForm.tsx**: Korrektur des inkonsistenten onBlur Handlers
-2. **ApplicationForm.tsx**: Entfernung von `onBlur` und `onMount` Validierung
-3. **CapabilityForm.tsx**: Entfernung von `onBlur` und `onMount` Validierung
-4. **DataObjectForm.tsx**: Entfernung von `onBlur` und `onMount` Validierung
-5. **PersonForm.tsx**: Entfernung von `onBlur` und `onMount` Validierung
-6. **ApplicationInterfaceForm.tsx**: Entfernung von `onBlur` und `onMount` Validierung
-7. **ArchitectureForm.tsx**: Entfernung von `onBlur` und `onMount` Validierung
+1. **GenericForm.tsx**: Correction of inconsistent onBlur handler
+2. **ApplicationForm.tsx**: Removal of `onBlur` and `onMount` validation
+3. **CapabilityForm.tsx**: Removal of `onBlur` and `onMount` validation
+4. **DataObjectForm.tsx**: Removal of `onBlur` and `onMount` validation
+5. **PersonForm.tsx**: Removal of `onBlur` and `onMount` validation
+6. **ApplicationInterfaceForm.tsx**: Removal of `onBlur` and `onMount` validation
+7. **ArchitectureForm.tsx**: Removal of `onBlur` and `onMount` validation
 
-## Warum diese Lösung
+## Why This Solution
 
-Nach der [TanStack Form Dokumentation](https://tanstack.com/form/latest/docs/framework/react/guides/validation) ist es **nicht erforderlich**, bei jedem Event dieselbe Validierung auszuführen:
+According to the [TanStack Form documentation](https://tanstack.com/form/latest/docs/framework/react/guides/validation), it is **not required** to run the same validation on every event:
 
-- **onChange**: Sofortige Feedback für Benutzer während der Eingabe
-- **onSubmit**: Finale Validierung vor der Datenübermittlung
-- **onBlur**: Nur bei spezifischen Anforderungen (z.B. externe API-Checks)
-- **onMount**: Nur bei vorausgefüllten Formularen mit Validierungsanforderungen
+- **onChange**: Immediate feedback for users during input
+- **onSubmit**: Final validation before data submission
+- **onBlur**: Only for specific requirements (e.g., external API checks)
+- **onMount**: Only for pre-filled forms with validation requirements
 
-## Ergebnis
+## Result
 
-✅ **Kein doppelter helperText mehr**  
-✅ **Bessere Performance** durch reduzierte Validierungsaufrufe  
-✅ **Konsistente onBlur Handler** in der gesamten GenericForm  
-✅ **TanStack Form Best Practices** befolgt  
-✅ **TypeScript Build erfolgreich**
+✅ **No more double helperText**  
+✅ **Better performance** through reduced validation calls  
+✅ **Consistent onBlur handlers** throughout GenericForm  
+✅ **TanStack Form best practices** followed  
+✅ **TypeScript build successful**
 
 ## Test Status
 
-- ✅ TypeScript-Kompilierung erfolgreich
-- ✅ Nur harmlose ESLint-Warnungen (keine neuen Fehler)
-- ✅ Produktions-Build erfolgreich
+- ✅ TypeScript compilation successful
+- ✅ Only harmless ESLint warnings (no new errors)
+- ✅ Production build successful
 
-## Best Practice für neue Formulare
+## Best Practice for New Forms
 
-Verwenden Sie diese Validierungskonfiguration für neue Formulare:
+Use this validation configuration for new forms:
 
 ```tsx
 const form = useForm({
@@ -89,11 +89,11 @@ const form = useForm({
     await onSubmit(value)
   },
   validators: {
-    // Primäre Validierung bei Änderungen
+    // Primary validation on changes
     onChange: yourSchema,
-    // Finale Validierung beim Absenden
+    // Final validation on submit
     onSubmit: yourSchema,
-    // Nur bei Bedarf:
+    // Only when needed:
     // onBlur: specificFieldValidation,
     // onMount: prefilledFormValidation,
   },

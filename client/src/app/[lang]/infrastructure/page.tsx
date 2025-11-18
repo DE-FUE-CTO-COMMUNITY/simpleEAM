@@ -61,7 +61,7 @@ export default function InfrastructuresPage() {
     infrastructures,
   })
 
-  // Weitere Filterung durch globalen Suchfilter
+  // Further filtering by global search filter
   const finalInfrastructures = useMemo(() => {
     if (!globalFilter.trim()) return filteredInfrastructures
     const searchTerm = globalFilter.toLowerCase()

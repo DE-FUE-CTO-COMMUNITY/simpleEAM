@@ -84,12 +84,12 @@ const DataObjectsPage = () => {
     },
   })
 
-  // Echte Daten aus GraphQL oder Fallback auf leeres Array - Auth-Check erfolgt bereits in layout.tsx
+  // Real data from GraphQL or fallback to empty array - auth check already done in layout.tsx
   const dataObjects: DataObject[] = useMemo(() => {
     return data?.dataObjects || []
   }, [data])
 
-  // Filter-Hook verwenden (Pattern 2)
+  // Use filter hook (Pattern 2)
   const {
     filterState,
     setFilterState,
@@ -241,7 +241,7 @@ const DataObjectsPage = () => {
       // Close form after creating
       setShowNewDataObjectForm(false)
     } catch (error) {
-      console.error('Fehler beim Erstellen des Datenobjekts:', error)
+      console.error('Error creating data object:', error)
     }
   }
 

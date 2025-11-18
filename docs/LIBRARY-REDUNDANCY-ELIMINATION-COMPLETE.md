@@ -1,22 +1,22 @@
-# Library-Element Redundanz-Eliminierung - Implementierung Complete
+# Library Element Redundancy Elimination - Implementation Complete
 
 ## 🎯 Problem
 
-Im DiagramEditor wurde die Beziehung eines DiagramElements zu dem Datensatz redundant in **jedem Element** des libraryItems gespeichert. Dies führte zu:
+In the DiagramEditor, the relationship of a DiagramElement to the database record was redundantly stored in **every element** of the libraryItems. This led to:
 
-- 📦 Unnötig große Diagrammdateien
-- 🔄 Komplexer Synchronisation bei Datenbank-Updates
-- 🐛 Möglichen Konsistenzproblemen
-- 🚀 Reduzierter Performance
+- 📦 Unnecessarily large diagram files
+- 🔄 Complex synchronization with database updates
+- 🐛 Possible consistency issues
+- 🚀 Reduced performance
 
-## ✅ Lösung
+## ✅ Solution
 
-**Neue Struktur**: Beziehungsdaten werden nur **einmal im Hauptelement** gespeichert.
+**New Structure**: Relationship data is stored only **once in the main element**.
 
-### Vorher (Redundant):
+### Before (Redundant):
 
 ```javascript
-// Jedes Element hatte vollständige customData
+// Every element had complete customData
 elements: [
   {
     id: "main-rect",
@@ -45,10 +45,10 @@ elements: [
 ]
 ```
 
-### Nachher (Optimiert):
+### After (Optimized):
 
 ```javascript
-// Nur Hauptelement hat vollständige Daten
+// Only main element has complete data
 elements: [
   {
     id: "main-rect",
@@ -57,7 +57,7 @@ elements: [
       elementType: "application",
       originalElement: {...},
       isFromDatabase: true,
-      isMainElement: true           // ✅ Markiert als Hauptelement
+      isMainElement: true           // ✅ Marked as main element
     }
   },
   {
@@ -65,7 +65,7 @@ elements: [
     customData: {
       isFromDatabase: true,
       isMainElement: false,
-      mainElementId: "main-rect"    // ✅ Nur Verweis
+      mainElementId: "main-rect"    // ✅ Only reference
     }
   },
   {
@@ -73,25 +73,25 @@ elements: [
     customData: {
       isFromDatabase: true,
       isMainElement: false,
-      mainElementId: "main-rect"    // ✅ Nur Verweis
+      mainElementId: "main-rect"    // ✅ Only reference
     }
   }
 ]
 ```
 
-## 🔧 Implementierte Änderungen
+## 🔧 Implemented Changes
 
 ### 1. IntegratedLibrary.tsx
 
-**Datei**: `/client/src/components/diagrams/IntegratedLibrary.tsx`
+**File**: `/client/src/components/diagrams/IntegratedLibrary.tsx`
 
 ```typescript
-// Funktion: createLibraryItemFromDatabaseElement()
+// Function: createLibraryItemFromDatabaseElement()
 const elements = template.elements.map((element: any, index: number) => {
   // ...existing code...
 
   if (index === 0) {
-    // ✅ Erstes Element = Hauptelement mit vollständigen Daten
+    // ✅ First element = main element with complete data
     newElement.customData = {
       databaseId: dbElement.id,
       elementType,
@@ -100,7 +100,7 @@ const elements = template.elements.map((element: any, index: number) => {
       isMainElement: true,
     }
   } else {
-    // ✅ Andere Elemente = nur Verweis auf Hauptelement
+    // ✅ Other elements = only reference to main element
     newElement.customData = {
       isFromDatabase: true,
       isMainElement: false,
@@ -114,17 +114,17 @@ const elements = template.elements.map((element: any, index: number) => {
 
 ### 2. excalidrawLibraryUtils.ts
 
-**Datei**: `/client/src/components/diagrams/excalidrawLibraryUtils.ts`
+**File**: `/client/src/components/diagrams/excalidrawLibraryUtils.ts`
 
-**Neue Hilfsfunktionen**:
+**New Utility Functions**:
 
 ```typescript
-// Prüft ob Element das Hauptelement ist
+// Checks if element is the main element
 export const isMainLibraryElement = (element: ExcalidrawElement): boolean => {
   return !!(element.customData?.isFromDatabase && element.customData?.isMainElement)
 }
 
-// Extrahiert Datenbank-ID nur vom Hauptelement
+// Extracts database ID only from main element
 export const getLibraryElementId = (element: ExcalidrawElement): string | null => {
   if (element.customData?.isMainElement) {
     return element.customData?.databaseId || null
@@ -132,12 +132,12 @@ export const getLibraryElementId = (element: ExcalidrawElement): string | null =
   return null
 }
 
-// Findet Hauptelement in einer Gruppe
+// Finds main element in a group
 export const findMainLibraryElement = (elements: ExcalidrawElement[]): ExcalidrawElement | null => {
   return elements.find(element => isMainLibraryElement(element)) || null
 }
 
-// Findet alle verwandten Elemente einer Library-Gruppe
+// Finds all related elements of a library group
 export const findRelatedLibraryElements = (
   elements: ExcalidrawElement[],
   targetElement: ExcalidrawElement
@@ -148,77 +148,77 @@ export const findRelatedLibraryElements = (
 
 ## 🧪 Testing
 
-### Automatische Validierung
+### Automatic Validation
 
 ```bash
-# Führe Validierungsscript aus
+# Run validation script
 ./validate-library-implementation.sh
 ```
 
-### Manuelle Tests
+### Manual Tests
 
-1. **Öffne**: http://localhost:3000/diagrams
-2. **Warte** bis Library geladen ist (Benachrichtigung)
-3. **Ziehe** Datenbank-Elemente ins Diagramm
-4. **Öffne** Browser-Entwicklertools
-5. **Prüfe** Element-Struktur:
+1. **Open**: http://localhost:3000/diagrams
+2. **Wait** until library is loaded (notification)
+3. **Drag** database elements into diagram
+4. **Open** browser developer tools
+5. **Check** element structure:
 
    ```javascript
-   // In Browser-Konsole
+   // In browser console
    const elements = excalidrawAPI.getSceneElements()
    const mainElement = elements.find(el => el.customData?.isMainElement)
-   console.log('Hauptelement:', mainElement.customData)
+   console.log('Main element:', mainElement.customData)
 
    const relatedElements = elements.filter(el => el.customData?.mainElementId === mainElement.id)
-   console.log('Verwandte Elemente:', relatedElements.length)
+   console.log('Related elements:', relatedElements.length)
    ```
 
-## 📊 Resultate
+## 📊 Results
 
-### Datengröße-Reduzierung
+### Data Size Reduction
 
-- **Vorher**: 3x redundante Speicherung pro Library-Item
-- **Nachher**: 1x Hauptdaten + 2x kleine Verweise
-- **Einsparung**: ~60-70% der Metadaten-Größe
+- **Before**: 3x redundant storage per library item
+- **After**: 1x main data + 2x small references
+- **Savings**: ~60-70% of metadata size
 
-### Performance-Verbesserung
+### Performance Improvement
 
-- Schnellere Diagramm-Serialisierung
-- Reduzierte Memory-Usage
-- Einfachere Synchronisation mit Datenbank
+- Faster diagram serialization
+- Reduced memory usage
+- Simpler synchronization with database
 
-### Code-Qualität
+### Code Quality
 
-- ✅ Alle TypeScript-Checks bestanden
-- ✅ Keine Kompilierungsfehler
-- ✅ Konsistente API-Struktur
+- ✅ All TypeScript checks passed
+- ✅ No compilation errors
+- ✅ Consistent API structure
 
-## 🚀 Nächste Schritte
+## 🚀 Next Steps
 
-1. **Produktionstests**: Testen mit realen Datenbank-Daten
-2. **Performance-Monitoring**: Messen der Verbesserungen
-3. **Migration**: Falls nötig, bestehende Diagramme migrieren
-4. **Dokumentation**: Team über neue Struktur informieren
+1. **Production tests**: Test with real database data
+2. **Performance monitoring**: Measure improvements
+3. **Migration**: If necessary, migrate existing diagrams
+4. **Documentation**: Inform team about new structure
 
-## 📝 Technische Details
+## 📝 Technical Details
 
-### Betroffene Dateien
+### Affected Files
 
-- ✅ `IntegratedLibrary.tsx` - Library-Item-Erstellung
-- ✅ `excalidrawLibraryUtils.ts` - Hilfsfunktionen
-- ✅ `libraryElementTest.ts` - Test-Utilities
-- ✅ `validate-library-implementation.sh` - Validierung
+- ✅ `IntegratedLibrary.tsx` - Library item creation
+- ✅ `excalidrawLibraryUtils.ts` - Utility functions
+- ✅ `libraryElementTest.ts` - Test utilities
+- ✅ `validate-library-implementation.sh` - Validation
 
-### API-Änderungen
+### API Changes
 
-- **Breaking Changes**: Keine (abwärtskompatibel)
-- **Neue Funktionen**: 6 neue Hilfsfunktionen
-- **Entfernte Funktionen**: Keine
+- **Breaking Changes**: None (backward compatible)
+- **New Functions**: 6 new utility functions
+- **Removed Functions**: None
 
-### Datenstruktur
+### Data Structure
 
 ```typescript
-// Neue customData-Struktur
+// New customData structure
 interface MainElementCustomData {
   databaseId: string
   elementType: string
@@ -236,8 +236,8 @@ interface RelatedElementCustomData {
 
 ---
 
-**Status**: ✅ **COMPLETE** - Implementierung erfolgreich abgeschlossen und validiert
+**Status**: ✅ **COMPLETE** - Implementation successfully completed and validated
 
-**Autor**: GitHub Copilot  
-**Datum**: 8. Juni 2025  
-**Ticket**: Library-Element Redundanz-Eliminierung
+**Author**: GitHub Copilot  
+**Date**: June 8, 2025  
+**Ticket**: Library Element Redundancy Elimination

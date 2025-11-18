@@ -1,30 +1,30 @@
-# Silbentrennung-Normalisierung für Datenbank-Speicherung
+# Hyphenation Normalization for Database Storage
 
 ## Problem
 
-Wenn im Diagramm Text mit Silbentrennung (Hypher) angezeigt wird, wurden die Trennstriche auch in der Datenbank gespeichert. Dies führte dazu, dass Begriffe wie "Geschäftsprozess" als "Geschäfts-\nprozess" in der Datenbank standen.
+When text with hyphenation (Hypher) was displayed in the diagram, the hyphens were also stored in the database. This led to terms like "Geschäftsprozess" being stored as "Geschäfts-\nprozess" in the database.
 
-## Lösung
+## Solution
 
-Die `normalizeText` und `prepareTextForDatabase` Funktionen wurden erweitert, um verschiedene Arten von Trennstrichen zu erkennen und zu entfernen:
+The `normalizeText` and `prepareTextForDatabase` functions were extended to detect and remove various types of hyphens:
 
-### Erweiterte `normalizeText` Funktion
+### Extended `normalizeText` Function
 
 ```typescript
 export const normalizeText = (text: string | undefined | null): string => {
   if (!text) return ''
 
   return text
-    .replace(/\r?\n/g, ' ') // Zeilenumbrüche durch Leerzeichen ersetzen
-    .replace(/-\s+/g, '') // Trennstriche am Zeilenende entfernen
-    .replace(/\s+-/g, ' ') // Trennstriche am Zeilenanfang entfernen
-    .replace(/([a-zA-ZäöüÄÖÜß])-([a-zA-ZäöüÄÖÜß])/g, '$1$2') // Trennstriche zwischen Buchstaben entfernen
-    .replace(/\s+/g, ' ') // Mehrfache Leerzeichen durch einzelne ersetzen
+    .replace(/\r?\n/g, ' ') // Replace line breaks with spaces
+    .replace(/-\s+/g, '') // Remove hyphens at line end
+    .replace(/\s+-/g, ' ') // Remove hyphens at line start
+    .replace(/([a-zA-ZäöüÄÖÜß])-([a-zA-ZäöüÄÖÜß])/g, '$1$2') // Remove hyphens between letters
+    .replace(/\s+/g, ' ') // Replace multiple spaces with single spaces
     .trim()
 }
 ```
 
-### Neue `prepareTextForDatabase` Funktion
+### New `prepareTextForDatabase` Function
 
 ```typescript
 export const prepareTextForDatabase = (text: string | undefined | null): string => {
@@ -33,71 +33,71 @@ export const prepareTextForDatabase = (text: string | undefined | null): string 
   const normalized = normalizeText(text)
 
   return normalized
-    .replace(/\u00AD/g, '') // Entferne weiche Trennstriche (soft hyphens)
-    .replace(/\u2010/g, '') // Entferne Bindestrich-Zeichen
-    .replace(/\u2011/g, '') // Entferne geschützte Bindestriche
-    .replace(/\u2012/g, '') // Entferne Gedankenstriche
-    .replace(/\u2013/g, '') // Entferne En-Dash
-    .replace(/\u2014/g, '') // Entferne Em-Dash
-    .replace(/\.{3,}/g, '...') // Normalisiere Ellipsen
+    .replace(/\u00AD/g, '') // Remove soft hyphens
+    .replace(/\u2010/g, '') // Remove hyphen characters
+    .replace(/\u2011/g, '') // Remove non-breaking hyphens
+    .replace(/\u2012/g, '') // Remove figure dashes
+    .replace(/\u2013/g, '') // Remove en-dashes
+    .replace(/\u2014/g, '') // Remove em-dashes
+    .replace(/\.{3,}/g, '...') // Normalize ellipses
     .trim()
 }
 ```
 
-## Angepasste Funktionen
+## Adapted Functions
 
 ### `updateTextWithContainerBinding`
 
-- Verwendet jetzt `prepareTextForDatabase` für die Datenbank-Speicherung
-- Verwendet originalen Text für die Positionsberechnung (bessere Darstellung)
+- Now uses `prepareTextForDatabase` for database storage
+- Uses original text for position calculation (better display)
 
 ### `updateTextContentOnly`
 
-- Verwendet jetzt `prepareTextForDatabase` für die Datenbank-Speicherung
+- Now uses `prepareTextForDatabase` for database storage
 
 ### `databaseSyncUtils.ts`
 
-- GraphQL-Mutation verwendet jetzt `prepareTextForDatabase(newName)` statt `newName.trim()`
+- GraphQL mutation now uses `prepareTextForDatabase(newName)` instead of `newName.trim()`
 
-## Behandelte Trennzeichen-Typen
+## Handled Hyphen Types
 
-### Standard-Trennstriche
+### Standard Hyphens
 
-- `-` (Bindestrich) gefolgt von Leerzeichen oder Zeilenumbruch
-- `-` zwischen Buchstaben (Silbentrennung)
+- `-` (hyphen) followed by space or line break
+- `-` between letters (syllable hyphenation)
 
-### Unicode-Trennzeichen
+### Unicode Hyphens
 
-- `\u00AD` (Soft Hyphen/Weicher Trennstrich)
+- `\u00AD` (Soft Hyphen)
 - `\u2010` (Hyphen)
 - `\u2011` (Non-Breaking Hyphen)
 - `\u2012` (Figure Dash)
 - `\u2013` (En Dash)
 - `\u2014` (Em Dash)
 
-### Zusätzliche Normalisierungen
+### Additional Normalizations
 
-- Mehrfache Leerzeichen werden zu einzelnen Leerzeichen
-- Zeilenumbrüche werden durch Leerzeichen ersetzt
-- Ellipsen werden normalisiert (`...`)
+- Multiple spaces become single spaces
+- Line breaks are replaced with spaces
+- Ellipses are normalized (`...`)
 
-## Beispiele
+## Examples
 
-### Vor der Änderung
-
-```
-Diagramm: "Geschäfts-\nprozess"
-Datenbank: "Geschäfts-\nprozess"  ❌
-```
-
-### Nach der Änderung
+### Before the Change
 
 ```
-Diagramm: "Geschäfts-\nprozess"
-Datenbank: "Geschäftsprozess"     ✅
+Diagram: "Geschäfts-\nprozess"
+Database: "Geschäfts-\nprozess"  ❌
 ```
 
-### Weitere Beispiele
+### After the Change
+
+```
+Diagram: "Geschäfts-\nprozess"
+Database: "Geschäftsprozess"     ✅
+```
+
+### More Examples
 
 ```
 Input: "Informa-\ntionsverarbeitung"
@@ -110,14 +110,14 @@ Input: "Business-\nProcess Management"
 Output: "BusinessProcess Management"
 ```
 
-## Test-Suite
+## Test Suite
 
-Die Datei `textWrapperTest.ts` enthält eine neue `testTextNormalization` Funktion, die verschiedene Trennungs-Szenarien testet.
+The file `textWrapperTest.ts` contains a new `testTextNormalization` function that tests various hyphenation scenarios.
 
-## Auswirkungen
+## Impact
 
-- ✅ Silbentrennung wird nur für die Anzeige verwendet, nicht für die Datenbank
-- ✅ Konsistente Datenbank-Einträge ohne Formatierungs-Artefakte
-- ✅ Bessere Suchfunktionalität in der Datenbank
-- ✅ Keine Breaking Changes für bestehende Funktionalität
-- ✅ Rückwärtskompatibilität gewährleistet
+- ✅ Hyphenation is only used for display, not for the database
+- ✅ Consistent database entries without formatting artifacts
+- ✅ Better search functionality in the database
+- ✅ No breaking changes for existing functionality
+- ✅ Backward compatibility ensured

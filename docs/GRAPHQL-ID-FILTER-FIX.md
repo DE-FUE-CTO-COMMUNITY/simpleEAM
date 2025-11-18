@@ -1,8 +1,8 @@
-# Fix: GraphQL ID-Filterung für Relationship-Erstellung
+# Fix: GraphQL ID Filtering for Relationship Creation
 
 ## Problem
 
-Beim Erstellen von Relationships zwischen Diagramm-Elementen trat ein GraphQL-Validierungsfehler auf:
+When creating relationships between diagram elements, a GraphQL validation error occurred:
 
 ```
 Expected type "IDScalarFilters" to be an object.
@@ -10,11 +10,11 @@ Variable "$where" got invalid value "1OQNcS1qQm9z4ZAd_K-1u" at "where.id"
 Variable "$update" got invalid value "tbEZ5Mw6jLLbuHg5V7BGi" at "update.sourceOfInterfaces.connect[0].where.node.id"
 ```
 
-## Ursache
+## Cause
 
-Die GraphQL-Mutations in `relationshipCreation.ts` verwendeten das falsche Format für ID-Filter:
+The GraphQL mutations in `relationshipCreation.ts` used the wrong format for ID filters:
 
-**❌ Falsch:**
+**❌ Wrong:**
 
 ```typescript
 where: {
@@ -23,7 +23,7 @@ where: {
 connect: [{ where: { node: { id: targetElementId } } }]
 ```
 
-**✅ Korrekt:**
+**✅ Correct:**
 
 ```typescript
 where: {
@@ -34,11 +34,11 @@ where: {
 connect: [{ where: { node: { id: { eq: targetElementId } } } }]
 ```
 
-## Lösung
+## Solution
 
-Alle GraphQL-Mutations in `/client/src/components/diagrams/utils/relationshipCreation.ts` wurden korrigiert:
+All GraphQL mutations in `/client/src/components/diagrams/utils/relationshipCreation.ts` have been corrected:
 
-### Korrigierte Relationship-Typen:
+### Corrected Relationship Types:
 
 - ✅ `SUPPORTS` (Application → BusinessCapability)
 - ✅ `USES` (Application → DataObject)
@@ -49,28 +49,28 @@ Alle GraphQL-Mutations in `/client/src/components/diagrams/utils/relationshipCre
 - ✅ `TRANSFERS` (ApplicationInterface → DataObject)
 - ✅ `DATA_SOURCE` (DataObject → Application)
 
-### Zusätzliche Korrekturen:
+### Additional Corrections:
 
-- ✅ Korrekte Verwendung der `getRelationshipDisplayName(relationshipDefinition.type)` Funktion
-- ✅ Proper Import der `getRelationshipDisplayName` Funktion
+- ✅ Correct usage of `getRelationshipDisplayName(relationshipDefinition.type)` function
+- ✅ Proper import of `getRelationshipDisplayName` function
 
-## Verifikation
+## Verification
 
-Nach der Korrektur:
+After the correction:
 
-- ✅ Alle TypeScript-Kompilierungsfehler behoben
-- ✅ GraphQL-Mutations verwenden korrekte `IdScalarFilters` Struktur
-- ✅ Relationship-Erstellung sollte ohne Fehler funktionieren
+- ✅ All TypeScript compilation errors resolved
+- ✅ GraphQL mutations use correct `IdScalarFilters` structure
+- ✅ Relationship creation should work without errors
 
-## GraphQL ID-Filter Schema
+## GraphQL ID Filter Schema
 
-Das korrekte Format für ID-Filter in Neo4j GraphQL:
+The correct format for ID filters in Neo4j GraphQL:
 
 ```typescript
-// Für WHERE-Klauseln:
+// For WHERE clauses:
 where: { id: { eq: "element-id" } }
 
-// Für CONNECT-Operationen:
+// For CONNECT operations:
 connect: [{ where: { node: { id: { eq: "target-id" } } } }]
 
 // Available IdScalarFilters operators:
@@ -85,8 +85,8 @@ connect: [{ where: { node: { id: { eq: "target-id" } } } }]
 
 ## Testing
 
-Die korrigierten Mutations können jetzt getestet werden durch:
+The corrected mutations can now be tested by:
 
-1. Erstellen eines Diagramms mit neuen Elementen
-2. Definieren von Relationships zwischen den Elementen
-3. Speichern des Diagramms - sollte ohne GraphQL-Fehler funktionieren
+1. Creating a diagram with new elements
+2. Defining relationships between elements
+3. Saving the diagram - should work without GraphQL errors

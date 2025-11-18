@@ -1,79 +1,79 @@
-# Anleitung: Automatische Beziehungserstellung bei Diagramm-Speicherung
+# Guide: Automatic Relationship Creation on Diagram Save
 
-## Wie es funktioniert
+## How It Works
 
-Die automatische Beziehungserstellung wurde erfolgreich implementiert und ist ab sofort aktiv. Beim Speichern eines Diagramms werden automatisch Beziehungen zu allen verwendeten Datenbankelementen erstellt.
+Automatic relationship creation has been successfully implemented and is now active. When saving a diagram, relationships to all used database elements are automatically created.
 
-## Für Entwickler
+## For Developers
 
-### Tests ausführen
+### Running Tests
 
-Um die Utils-Funktionen zu testen:
+To test the utility functions:
 
-1. Öffne die Browser-Konsole in der Diagramm-Editor-Seite
-2. Führe aus: `testDiagramRelationshipUtils()`
-3. Sieh dir die Ausgabe in der Konsole an
+1. Open the browser console in the diagram editor page
+2. Execute: `testDiagramRelationshipUtils()`
+3. View the output in the console
 
 ### Debugging
 
-Die SaveDiagramDialog-Komponente loggt jetzt Fehler beim Speichern mit:
+The SaveDiagramDialog component now logs errors during save with:
 
 ```javascript
-console.error('Fehler beim Speichern des Diagramms:', error)
+console.error('Error saving diagram:', error)
 ```
 
-### Beziehungsarten
+### Relationship Types
 
-Das System erstellt automatisch Beziehungen für:
+The system automatically creates relationships for:
 
 - **Capabilities** → `diagram.capabilities`
 - **Applications** → `diagram.applications`
 - **Data Objects** → `diagram.dataObjects`
 - **Interfaces** → `diagram.interfaces`
 
-## Für Benutzer
+## For Users
 
-### Normale Nutzung
+### Normal Usage
 
-1. **Diagramm erstellen**: Öffne den Diagramm-Editor
-2. **Elemente hinzufügen**: Ziehe Datenbank-Elemente aus der Library
-3. **Speichern**: Klicke auf "Speichern" - Beziehungen werden automatisch erstellt
-4. **Aktualisieren**: Bei Änderungen und erneutem Speichern werden Beziehungen automatisch aktualisiert
+1. **Create diagram**: Open the diagram editor
+2. **Add elements**: Drag database elements from the library
+3. **Save**: Click "Save" - Relationships are automatically created
+4. **Update**: On changes and re-saving, relationships are automatically updated
 
-### Was passiert automatisch
+### What Happens Automatically
 
-- ✅ Neue Beziehungen werden erstellt für alle DB-Elemente im Diagramm
-- ✅ Alte Beziehungen werden entfernt wenn Elemente aus dem Diagramm entfernt werden
-- ✅ Duplikate werden verhindert
-- ✅ Sowohl Haupt- als auch Unterelemente werden korrekt behandelt
+- ✅ New relationships are created for all DB elements in the diagram
+- ✅ Old relationships are removed when elements are removed from the diagram
+- ✅ Duplicates are prevented
+- ✅ Both main and sub-elements are correctly handled
 
-### Erkennbare Elemente
+### Recognizable Elements
 
-Das System erkennt automatisch:
+The system automatically recognizes:
 
-- ArchiMate-Symbole aus der Datenbank-Library
+- ArchiMate symbols from the database library
 - Capabilities, Applications, Data Objects, Interfaces
-- Sowohl Haupt-Shapes als auch Text-Labels
+- Both main shapes and text labels
 
-### Fehlerbehebung
+### Troubleshooting
 
-Falls Beziehungen nicht korrekt erstellt werden:
+If relationships are not created correctly:
 
-1. **Überprüfe die Konsole** auf Fehlermeldungen
-2. **Stelle sicher**, dass Elemente aus der Datenbank-Library stammen
-3. **Überprüfe**, dass Elemente `customData.isFromDatabase = true` haben
-4. **Teste mit einfachen Diagrammen** zuerst
+1. **Check the console** for error messages
+2. **Ensure** that elements come from the database library
+3. **Verify** that elements have `customData.isFromDatabase = true`
+4. **Test with simple diagrams** first
 
-## GraphQL-Queries erweitert
+## Extended GraphQL Queries
 
-Die folgenden Queries geben jetzt auch Beziehungen zurück:
+The following queries now also return relationships:
 
 ```graphql
 query GetDiagram($id: ID!) {
   diagrams(where: { id: { eq: $id } }) {
     id
     title
-    # ... andere Felder
+    # ... other fields
     capabilities {
       id
       name
@@ -94,12 +94,12 @@ query GetDiagram($id: ID!) {
 }
 ```
 
-## Vorteile der automatischen Beziehungserstellung
+## Benefits of Automatic Relationship Creation
 
-1. **Keine manuelle Arbeit** - Beziehungen werden automatisch verwaltet
-2. **Immer aktuell** - Beziehungen bleiben synchron mit Diagramm-Inhalten
-3. **Konsistent** - Keine vergessenen oder falschen Beziehungen
-4. **Performant** - Effiziente Batch-Updates
-5. **Robust** - Behandelt alle Edge Cases und Fehlerszenarien
+1. **No manual work** - Relationships are automatically managed
+2. **Always up-to-date** - Relationships stay in sync with diagram contents
+3. **Consistent** - No forgotten or incorrect relationships
+4. **Performant** - Efficient batch updates
+5. **Robust** - Handles all edge cases and error scenarios
 
-Die Implementierung ist vollständig und betriebsbereit! 🎉
+The implementation is complete and operational! 🎉

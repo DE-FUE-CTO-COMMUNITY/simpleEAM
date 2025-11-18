@@ -40,7 +40,7 @@ const ArchitecturePrinciplesPage = () => {
   const [tableInstance, setTableInstance] = useState<any>(null)
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
 
-  // Filter-Zustand
+  // Filter state
   const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false)
   const [activeFiltersCount, setActiveFiltersCount] = useState<number>(0)
 
@@ -52,7 +52,7 @@ const ArchitecturePrinciplesPage = () => {
   // State for the new Architecture Principle form
   const [showNewPrincipleForm, setShowNewPrincipleForm] = useState(false)
 
-  // GraphQL-Query für Architektur-Prinzipien
+  // GraphQL query for architecture principles
   const companyWhere = useCompanyWhere('company')
   const {
     data: principleData,
@@ -65,7 +65,7 @@ const ArchitecturePrinciplesPage = () => {
     variables: { where: companyWhere },
   })
 
-  // GraphQL-Mutationen
+  // GraphQL mutations
   const [createPrincipleMutation, { loading: isCreating }] = useMutation(
     CREATE_ARCHITECTURE_PRINCIPLE,
     {
@@ -73,11 +73,11 @@ const ArchitecturePrinciplesPage = () => {
       refetchQueries: [{ query: GET_ARCHITECTURE_PRINCIPLES, variables: { where: companyWhere } }],
       onCompleted: () => {
         enqueueSnackbar('Architektur-Prinzip erfolgreich erstellt', { variant: 'success' })
-        // Zusätzlich sicherstellen, dass die aktive Query neu lädt
+        // Additionally ensure that the active query reloads
         refetch()
       },
       onError: error => {
-        console.error('Fehler beim Erstellen des Architektur-Prinzips:', error)
+        console.error('Error creating architecture principle:', error)
         enqueueSnackbar(`Fehler beim Erstellen: ${error.message}`, { variant: 'error' })
       },
     }
@@ -91,7 +91,7 @@ const ArchitecturePrinciplesPage = () => {
       refetch()
     },
     onError: error => {
-      console.error('Fehler beim Aktualisieren des Architektur-Prinzips:', error)
+      console.error('Error updating architecture principle:', error)
       enqueueSnackbar(`Fehler beim Aktualisieren: ${error.message}`, { variant: 'error' })
     },
   })
@@ -104,7 +104,7 @@ const ArchitecturePrinciplesPage = () => {
       refetch()
     },
     onError: error => {
-      console.error('Fehler beim Löschen des Architektur-Prinzips:', error)
+      console.error('Error deleting architecture principle:', error)
       enqueueSnackbar(`Fehler beim Löschen: ${error.message}`, { variant: 'error' })
     },
   })
@@ -140,11 +140,11 @@ const ArchitecturePrinciplesPage = () => {
 
   const principles = principleData?.architecturePrinciples || []
 
-  // Filter-Hook verwenden (Pattern 2)
+  // Use filter hook (Pattern 2)
   const { filterState, setFilterState, filteredPrinciples, resetFilters } =
     useArchitecturePrincipleFilter({ principles })
 
-  // Count active filters und State aktualisieren
+  // Count active filters and update state
   useEffect(() => {
     let count = 0
     if (filterState.categoryFilter && filterState.categoryFilter.length > 0) count++
@@ -162,7 +162,7 @@ const ArchitecturePrinciplesPage = () => {
     setActiveFiltersCount(count)
   }, [filterState])
 
-  // Handler-Funktionen
+  // Handler functions
   const handleCreatePrinciple = async (data: ArchitecturePrincipleFormValues) => {
     try {
       if (!selectedCompanyId) {
@@ -223,14 +223,14 @@ const ArchitecturePrinciplesPage = () => {
       // Close form after creating
       setShowNewPrincipleForm(false)
     } catch (error) {
-      console.error('🚨 Fehler beim Erstellen des Architektur-Prinzips:', error)
+      console.error('🚨 Error creating architecture principle:', error)
     }
   }
 
   const handleUpdatePrinciple = async (id: string, data: ArchitecturePrincipleFormValues) => {
     try {
       const input: Record<string, any> = {
-        // Scalar-Felder als Mutations-Wrapper übergeben
+        // Pass scalar fields as mutation wrappers
         name: { set: data.name },
         description: { set: data.description },
         category: { set: data.category },
@@ -239,7 +239,7 @@ const ArchitecturePrinciplesPage = () => {
         implications: { set: data.implications || '' },
         tags: { set: data.tags || [] },
         isActive: { set: data.isActive },
-        // Aktualisierung der Owner-Beziehung
+        // Update owner relationship
         owners:
           data.ownerId && data.ownerId !== ''
             ? {
@@ -247,7 +247,7 @@ const ArchitecturePrinciplesPage = () => {
                 connect: [{ where: { node: { id: { eq: data.ownerId } } } }],
               }
             : { disconnect: [{ where: {} }] },
-        // Aktualisierung der Architecture-Beziehungen
+        // Update architecture relationships
         appliedInArchitectures:
           data.appliedInArchitectureIds && data.appliedInArchitectureIds.length > 0
             ? {
@@ -257,7 +257,7 @@ const ArchitecturePrinciplesPage = () => {
                 })),
               }
             : { disconnect: [{ where: {} }] },
-        // Aktualisierung der Application-Beziehungen
+        // Update application relationships
         implementedByApplications:
           data.implementedByApplicationIds && data.implementedByApplicationIds.length > 0
             ? {
@@ -277,7 +277,7 @@ const ArchitecturePrinciplesPage = () => {
         ],
       })
     } catch (error) {
-      console.error('Fehler beim Aktualisieren des Architektur-Prinzips:', error)
+      console.error('Error updating architecture principle:', error)
     }
   }
 
@@ -287,11 +287,11 @@ const ArchitecturePrinciplesPage = () => {
         variables: { id },
       })
     } catch (error) {
-      console.error('Fehler beim Löschen des Architektur-Prinzips:', error)
+      console.error('Error deleting architecture principle:', error)
     }
   }
 
-  // Neues Architektur-Prinzip erstellen
+  // Create new architecture principle
   const handleCreatePrincipleClick = () => {
     setShowNewPrincipleForm(true)
   }
@@ -308,10 +308,10 @@ const ArchitecturePrinciplesPage = () => {
     return (
       <Box p={3}>
         <Typography color="error">
-          Fehler beim Laden der Architektur-Prinzipien: {error.message}
+          Error loading architecture principles: {error.message}
         </Typography>
         <Button onClick={() => refetch()} variant="contained" sx={{ mt: 2 }}>
-          Erneut versuchen
+          Try again
         </Button>
       </Box>
     )
@@ -336,7 +336,7 @@ const ArchitecturePrinciplesPage = () => {
         )}
       </Box>
 
-      {/* Architektur-Prinzip-Erstellungsformular */}
+      {/* Architecture Principle Creation Form */}
       {showNewPrincipleForm && (
         <Card sx={{ mb: 3 }}>
           <ArchitecturePrincipleForm
@@ -349,7 +349,7 @@ const ArchitecturePrinciplesPage = () => {
         </Card>
       )}
 
-      {/* Filter-Dialog */}
+      {/* Filter Dialog */}
       {isFilterDialogOpen && (
         <ArchitecturePrincipleFilterDialog
           filterState={filterState}
@@ -367,7 +367,7 @@ const ArchitecturePrinciplesPage = () => {
       )}
 
       <Card>
-        {/* Toolbar für Suche und Filter */}
+        {/* Toolbar for search and filter */}
         <ArchitecturePrincipleToolbar
           globalFilter={globalFilter}
           onGlobalFilterChange={setGlobalFilter}
@@ -380,7 +380,7 @@ const ArchitecturePrinciplesPage = () => {
           defaultColumnVisibility={ARCHITECTURE_PRINCIPLE_DEFAULT_COLUMN_VISIBILITY}
         />
 
-        {/* Tabelle der Architektur-Prinzipien */}
+        {/* Architecture Principles Table */}
         <ArchitecturePrincipleTable
           principles={filteredPrinciples}
           loading={loading}

@@ -2,29 +2,29 @@
 
 ## Problem
 
-Bei der GenericForm-Komponente wurde im Create-Modus beim initialen Laden keine Validierung durchgeführt. Alle Felder wurden als gültig angezeigt, obwohl ungültige Felder (z.B. leere Pflichtfelder) vorhanden waren.
+In the GenericForm component, no validation was performed during initial load in Create mode. All fields were shown as valid, even though invalid fields (e.g., empty required fields) were present.
 
-## Ursache
+## Cause
 
-Das Standardverhalten von TanStack Form zeigt Validierungsfehler nur für Felder an, die bereits berührt (`isTouched`) oder geändert (`isDirty`) wurden. Im Create-Modus sind alle Felder initial unberührt, wodurch Validierungsfehler nicht angezeigt werden.
+The default behavior of TanStack Form only shows validation errors for fields that have been touched (`isTouched`) or changed (`isDirty`). In Create mode, all fields are initially untouched, preventing validation errors from being displayed.
 
-## Lösung
+## Solution
 
-### 1. Initiale Validierung im Create-Modus
+### 1. Initial Validation in Create Mode
 
-**Neue useEffect-Hook** zur Durchführung einer initialen Validierung:
+**New useEffect hook** to perform initial validation:
 
 ```tsx
 React.useEffect(() => {
   if (isOpen && form && isCreateMode) {
-    // Im Create-Modus führen wir eine initiale Validierung durch
-    // Wir verwenden einen kleinen Timeout, um sicherzustellen, dass die Form vollständig initialisiert ist
+    // In Create mode we perform an initial validation
+    // We use a small timeout to ensure the form is fully initialized
     const timer = setTimeout(() => {
       try {
-        // Validiere alle Felder mit dem 'change' Event-Typ
+        // Validate all fields with the 'change' event type
         form.validateAllFields('change')
       } catch (error) {
-        console.warn('Initiale Validierung fehlgeschlagen:', error)
+        console.warn('Initial validation failed:', error)
       }
     }, 100)
 
@@ -33,21 +33,21 @@ React.useEffect(() => {
 }, [form, isOpen, isCreateMode])
 ```
 
-### 2. Erweiterte Validierungslogik
+### 2. Extended Validation Logic
 
-**Neue Logik für shouldShowError**:
+**New logic for shouldShowError**:
 
 ```tsx
-// Erweiterte Validierungslogik für bessere UX im Create-Modus
-// Im Create-Modus zeigen wir Validierungsfehler für ungültige Felder sofort an,
-// auch wenn sie noch nicht berührt wurden. Im Edit-Modus verwenden wir das Standard-Verhalten.
+// Extended validation logic for better UX in Create mode
+// In Create mode we show validation errors for invalid fields immediately,
+// even if they haven't been touched yet. In Edit mode we use the standard behavior.
 const shouldShowError = isCreateMode
   ? !formField.state.meta.isValid
   : !formField.state.meta.isValid &&
     (formField.state.meta.isTouched || formField.state.meta.isDirty)
 
-// Im Create-Modus forcieren wir die Anzeige von Validierungsfehlern für Pflichtfelder
-// die noch keinen Wert haben, unabhängig vom Touch-Status
+// In Create mode we force showing validation errors for required fields
+// that don't have a value yet, regardless of touch status
 const forceShowErrorInCreateMode =
   isCreateMode &&
   field.required &&
@@ -58,60 +58,60 @@ const forceShowErrorInCreateMode =
 const finalShouldShowError = shouldShowError || forceShowErrorInCreateMode
 ```
 
-### 3. Verbesserte Helper-Text-Logik
+### 3. Improved Helper Text Logic
 
-**Standardfehlermeldung für leere Pflichtfelder**:
+**Default error message for empty required fields**:
 
 ```tsx
 const getHelperText = () => {
   if (finalShouldShowError && formField.state.meta.errors.length > 0) {
-    // Bestehende Fehlerbehandlung...
+    // Existing error handling...
     return formField.state.meta.errors.map(/* ... */).join(', ')
   }
 
-  // Im Create-Modus zeigen wir für Pflichtfelder ohne Wert eine Standardmeldung
+  // In Create mode we show a default message for required fields without value
   if (forceShowErrorInCreateMode) {
-    return `${field.label} ist ein Pflichtfeld`
+    return `${field.label} is a required field`
   }
 
   return field.helperText || ''
 }
 ```
 
-## Geänderte Dateien
+## Modified Files
 
 1. **GenericForm.tsx**:
-   - Neue initiale Validierungslogik im Create-Modus
-   - Erweiterte `shouldShowError`-Logik
-   - Verbesserte `getHelperText`-Funktion
-   - Alle UI-Komponenten verwenden jetzt `finalShouldShowError`
+   - New initial validation logic in Create mode
+   - Extended `shouldShowError` logic
+   - Improved `getHelperText` function
+   - All UI components now use `finalShouldShowError`
 
-## Verhalten
+## Behavior
 
-### Vorher
+### Before
 
-- **Create-Modus**: Alle Felder werden als gültig angezeigt, auch wenn sie leer sind
-- **Edit-Modus**: Validierungsfehler nur nach Benutzerinteraktion
+- **Create mode**: All fields are shown as valid, even if empty
+- **Edit mode**: Validation errors only after user interaction
 
-### Nachher
+### After
 
-- **Create-Modus**: Pflichtfelder werden sofort als ungültig angezeigt mit der Meldung "{Feldname} ist ein Pflichtfeld"
-- **Edit-Modus**: Unverändert - Validierungsfehler nur nach Benutzerinteraktion
+- **Create mode**: Required fields are immediately shown as invalid with message "{Fieldname} is a required field"
+- **Edit mode**: Unchanged - validation errors only after user interaction
 
 ## Test Status
 
-✅ **TypeScript-Kompilierung erfolgreich**  
-✅ **Keine ESLint-Fehler**  
-✅ **Alle `shouldShowError` korrekt durch `finalShouldShowError` ersetzt**
+✅ **TypeScript compilation successful**  
+✅ **No ESLint errors**  
+✅ **All `shouldShowError` correctly replaced by `finalShouldShowError`**
 
-## Vorteile
+## Benefits
 
-1. **Bessere UX im Create-Modus**: Benutzer sehen sofort, welche Felder ausgefüllt werden müssen
-2. **Konsistentes Verhalten**: Edit-Modus behält das bewährte Verhalten bei
-3. **Klare Fehlermeldungen**: Standardmeldungen für leere Pflichtfelder
-4. **TanStack Form Best Practices**: Nutzung der offiziellen API-Methoden
+1. **Better UX in Create mode**: Users immediately see which fields need to be filled
+2. **Consistent behavior**: Edit mode retains proven behavior
+3. **Clear error messages**: Default messages for empty required fields
+4. **TanStack Form best practices**: Using official API methods
 
-## Referenzen
+## References
 
 - [TanStack Form Validation Guide](https://tanstack.com/form/latest/docs/react/guides/validation)
 - [TanStack Form Field API](https://tanstack.com/form/latest/docs/framework/react/reference/useField)

@@ -4,20 +4,20 @@
 
 **Root Cause**: Race-Condition zwischen `setUserLoggedIn()` und `updateLastLoginDate()` in kompilierter Produktionsumgebung.
 
-### Race-Condition Scenario (vor Fix):
+### Race-Condition Scenario (before fix):
 
 ```
 1. Keycloak Login → isNewLogin = true
-2. setUserLoggedIn() → localStorage['user_logged_in'] = 'true' (synchron)
-3. updateLastLoginDate() → API-Call (asynchron)
-4. Page Refresh/Navigation (schnell)
-5. checkForNewLogin() → findet 'true' → isNewLogin = false
-6. updateLastLoginDate() wird nie aufgerufen ❌
+2. setUserLoggedIn() → localStorage['user_logged_in'] = 'true' (synchronous)
+3. updateLastLoginDate() → API call (asynchronous)
+4. Page Refresh/Navigation (fast)
+5. checkForNewLogin() → finds 'true' → isNewLogin = false
+6. updateLastLoginDate() is never called ❌
 ```
 
-## Implementierte Lösung 🛠️
+## Implemented Solution 🛠️
 
-### 1. Session-Timestamp-System
+### 1. Session-Timestamp System
 
 ```typescript
 const LOGIN_STATUS_KEY = 'user_logged_in'
@@ -26,39 +26,39 @@ const LAST_LOGIN_SESSION_KEY = 'last_login_session'
 const setUserLoggedIn = () => {
   const sessionTimestamp = Date.now().toString()
   localStorage.setItem(LOGIN_STATUS_KEY, 'true')
-  localStorage.setItem(LAST_LOGIN_SESSION_KEY, sessionTimestamp) // NEU
+  localStorage.setItem(LAST_LOGIN_SESSION_KEY, sessionTimestamp) // NEW
 }
 ```
 
-### 2. Robuste Login-Erkennung
+### 2. Robust Login Detection
 
 ```typescript
 const checkForNewLogin = (): boolean => {
   const wasLoggedIn = localStorage.getItem(LOGIN_STATUS_KEY) === 'true'
   const lastSessionTimestamp = localStorage.getItem(LAST_LOGIN_SESSION_KEY)
 
-  // Wenn nicht eingeloggt ODER Session älter als 5 Sekunden
+  // If not logged in OR session older than 5 seconds
   if (!wasLoggedIn || !lastSessionTimestamp) {
     return true
   }
 
-  // Session-Alter prüfen (30 Sekunden Timeout)
+  // Check session age (30 seconds timeout)
   const sessionAge = Date.now() - parseInt(lastSessionTimestamp, 10)
   if (sessionAge > 30000) {
-    return true // Behandle als neuen Login
+    return true // Treat as new login
   }
 
   return false
 }
 ```
 
-### 3. Doppelaufruf-Schutz
+### 3. Duplicate Call Protection
 
 ```typescript
 let lastLoginUpdateInProgress = false
 
 const updateLastLoginDate = async () => {
-  // Schutz vor gleichzeitigen Aufrufen
+  // Protection against concurrent calls
   if (lastLoginUpdateInProgress) {
     return
   }
@@ -66,58 +66,58 @@ const updateLastLoginDate = async () => {
   lastLoginUpdateInProgress = true
 
   try {
-    // API-Call...
+    // API call...
   } finally {
     lastLoginUpdateInProgress = false
   }
 }
 ```
 
-### 4. Optimierte Ausführungsreihenfolge
+### 4. Optimized Execution Order
 
 ```typescript
 if (isNewLogin) {
-  // WICHTIG: updateLastLoginDate VOR setUserLoggedIn
-  updateLastLoginDate() // Sofortiger API-Call
-  setUserLoggedIn() // Dann Session markieren
+  // IMPORTANT: updateLastLoginDate BEFORE setUserLoggedIn
+  updateLastLoginDate() // Immediate API call
+  setUserLoggedIn() // Then mark session
 
   // Navigation...
 }
 ```
 
-## Vorher vs. Nachher
+## Before vs. After
 
-### ❌ Vor dem Fix (Race-Condition):
+### ❌ Before the Fix (Race-Condition):
 
-- Development: ✅ Funktioniert (Debug-Logs verlangsamen Timing)
-- Production: ❌ Funktioniert nicht (Race-Condition)
-- Problem: localStorage wird zu früh gesetzt
+- Development: ✅ Works (debug logs slow down timing)
+- Production: ❌ Doesn't work (race-condition)
+- Problem: localStorage is set too early
 
-### ✅ Nach dem Fix (Race-Condition sicher):
+### ✅ After the Fix (Race-Condition safe):
 
-- Development: ✅ Funktioniert weiterhin
-- Production: ✅ Funktioniert jetzt robust
-- Lösung: Session-Timestamp + Doppelaufruf-Schutz
+- Development: ✅ Still works
+- Production: ✅ Now works robustly
+- Solution: Session-timestamp + duplicate call protection
 
 ## Testing & Verification
 
-### Automatische Tests:
+### Automated Tests:
 
-1. ✅ Build erfolgreich ohne Warnings
-2. ✅ TypeScript-Kompilierung fehlerfrei
-3. ✅ Keine Breaking Changes
+1. ✅ Build successful without warnings
+2. ✅ TypeScript compilation error-free
+3. ✅ No breaking changes
 
-### Manuelle Tests (Production):
+### Manual Tests (Production):
 
-- [ ] Logout → Login → Network-Tab prüfen
-- [ ] Schnelle Navigation/Refresh testen
-- [ ] Mehrere Browser-Tabs gleichzeitig
-- [ ] Verschiedene Browser/Devices
+- [ ] Logout → Login → Check network tab
+- [ ] Test fast navigation/refresh
+- [ ] Multiple browser tabs simultaneously
+- [ ] Various browsers/devices
 
 ### Debug in Production:
 
 ```javascript
-// Session-Status prüfen (Browser-Konsole):
+// Check session status (browser console):
 console.log('Session Status:', {
   loggedIn: localStorage.getItem('user_logged_in'),
   sessionTimestamp: localStorage.getItem('last_login_session'),
@@ -129,38 +129,38 @@ console.log('Session Status:', {
 
 ### 🚀 **Performance**:
 
-- Weniger localStorage-Zugriffe
-- Verhindert doppelte API-Calls
-- Optimierte Timing-Logik
+- Fewer localStorage accesses
+- Prevents duplicate API calls
+- Optimized timing logic
 
 ### 🔒 **Reliability**:
 
-- Race-Condition-sicher
-- Session-Timeout-Schutz
-- Robust gegen schnelle Navigation
+- Race-condition safe
+- Session timeout protection
+- Robust against fast navigation
 
 ### 🧹 **Maintainability**:
 
-- Klare Verantwortlichkeiten
-- Einfache Debug-Möglichkeiten
-- Dokumentierte Timing-Constraints
+- Clear responsibilities
+- Simple debugging options
+- Documented timing constraints
 
 ## Edge Cases Handled
 
-1. **Schnelle Page Refreshes**: Session-Timestamp verhindert false negatives
-2. **Mehrere Tabs**: Doppelaufruf-Schutz verhindert Race-Conditions
-3. **Alte Sessions**: 30-Sekunden-Timeout erkennt abgelaufene Sessions
-4. **Development vs. Production**: Funktioniert in beiden Umgebungen
+1. **Fast Page Refreshes**: Session timestamp prevents false negatives
+2. **Multiple Tabs**: Duplicate call protection prevents race conditions
+3. **Old Sessions**: 30-second timeout detects expired sessions
+4. **Development vs. Production**: Works in both environments
 
 ## Future Improvements
 
-1. **Session-Sync zwischen Tabs**: BroadcastChannel für Multi-Tab-Synchronisation
-2. **Retry-Mechanismus**: Automatische Wiederholung bei API-Fehlern
-3. **Metrics**: LastLogin-Success-Rate Tracking
-4. **Caching**: Lokales Caching für redundante Calls
+1. **Session sync between tabs**: BroadcastChannel for multi-tab synchronization
+2. **Retry mechanism**: Automatic retry on API failures
+3. **Metrics**: LastLogin success rate tracking
+4. **Caching**: Local caching for redundant calls
 
 ---
 
 **Status**: ✅ IMPLEMENTED & READY FOR PRODUCTION
 
-Diese Lösung behebt das Race-Condition-Problem grundlegend und macht LastLogin robust für Produktionsumgebungen.
+This solution fundamentally fixes the race-condition problem and makes LastLogin robust for production environments.

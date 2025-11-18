@@ -2,31 +2,31 @@
 
 ## Problem
 
-Das GenericForm-Komponente zeigte "[object Object]" anstatt korrekter Fehlermeldungen an, wenn Validierungsfehler auftraten.
+The GenericForm component displayed "[object Object]" instead of correct error messages when validation errors occurred.
 
-## Ursache
+## Cause
 
-TanStack Form speichert Validierungsfehler als Objekte (meist Zod-Validierungsfehler), nicht als einfache Strings. Die bisherige Implementierung verwendete `formField.state.meta.errors.join(', ')`, was bei Objekten zu "[object Object]" führt.
+TanStack Form stores validation errors as objects (mostly Zod validation errors), not as simple strings. The previous implementation used `formField.state.meta.errors.join(', ')`, which results in "[object Object]" for objects.
 
-## Lösung
+## Solution
 
-Implementierung einer korrekten Error-Handling-Logik in der `getHelperText()` Funktion:
+Implementation of correct error handling logic in the `getHelperText()` function:
 
 ```tsx
 const getHelperText = () => {
   if (shouldShowError && formField.state.meta.errors.length > 0) {
-    // Fehler korrekt als Strings extrahieren
+    // Extract errors correctly as strings
     return formField.state.meta.errors
       .map((error: any) => {
-        // Wenn der Fehler ein String ist, verwende ihn direkt
+        // If error is a string, use it directly
         if (typeof error === 'string') {
           return error
         }
-        // Wenn der Fehler ein Objekt ist, versuche message oder toString()
+        // If error is an object, try message or toString()
         if (error && typeof error === 'object') {
-          return error.message || error.toString() || 'Validierungsfehler'
+          return error.message || error.toString() || 'Validation error'
         }
-        return 'Validierungsfehler'
+        return 'Validation error'
       })
       .join(', ')
   }
@@ -34,27 +34,27 @@ const getHelperText = () => {
 }
 ```
 
-## Vorteile
+## Benefits
 
-1. **Korrekte Fehlermeldungen**: Echte Validierungsmeldungen werden angezeigt
-2. **Robustheit**: Funktioniert mit verschiedenen Error-Typen (String, Objekt, Zod-Errors)
-3. **Fallback**: Stellt sicher, dass immer eine sinnvolle Meldung angezeigt wird
-4. **Kompatibilität**: Funktioniert mit allen bestehenden Validierungsschemas
+1. **Correct error messages**: Real validation messages are displayed
+2. **Robustness**: Works with different error types (String, Object, Zod errors)
+3. **Fallback**: Ensures a meaningful message is always displayed
+4. **Compatibility**: Works with all existing validation schemas
 
 ## Status
 
-✅ **Behoben** - Kein "[object Object]" mehr, korrekte Fehlermeldungen werden angezeigt
+✅ **Fixed** - No more "[object Object]", correct error messages are displayed
 
-## Verbleibende Issues
+## Remaining Issues
 
-Die ursprünglich gemeldeten Probleme sollten nun auch behoben sein:
+The originally reported problems should now also be fixed:
 
-- ❓ **Double helperText**: Benötigt Funktionstest im laufenden System
-- ❓ **Field doesn't become valid**: Benötigt Funktionstest im laufenden System
-- ❓ **Double validation on onBlur**: Benötigt Funktionstest im laufenden System
+- ❓ **Double helperText**: Requires functional test in running system
+- ❓ **Field doesn't become valid**: Requires functional test in running system
+- ❓ **Double validation on onBlur**: Requires functional test in running system
 
-## Nächste Schritte
+## Next Steps
 
-1. Funktionstest der GenericForm im laufenden System
-2. Verifikation der Validierungslogik und onBlur-Behavior
-3. Test der Submit-Button-Logik und Form-Reset-Funktionalität
+1. Functional test of GenericForm in running system
+2. Verification of validation logic and onBlur behavior
+3. Test submit button logic and form reset functionality

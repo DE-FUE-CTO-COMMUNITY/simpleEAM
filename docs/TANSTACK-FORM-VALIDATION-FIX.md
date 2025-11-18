@@ -2,29 +2,29 @@
 
 ## Problem
 
-Die GenericForm-Komponente hatte Probleme mit doppelter helperText-Anzeige bei onBlur-Events und doppelten Validierungen.
+The GenericForm component had issues with double helperText display on onBlur events and duplicate validations.
 
-## Lösung
+## Solution
 
-Die Implementierung wurde gemäß der offiziellen TanStack Form Dokumentation korrigiert:
+The implementation has been corrected according to the official TanStack Form documentation:
 
-### 1. Vereinfachte Validierungslogik
+### 1. Simplified Validation Logic
 
-**Vorher:**
+**Before:**
 
 ```tsx
 const shouldShowError = hasErrors && (isTouched || isSubmitted)
 ```
 
-**Nachher (gemäß TanStack Form Best Practices):**
+**After (according to TanStack Form best practices):**
 
 ```tsx
 const shouldShowError = !formField.state.meta.isValid
 ```
 
-### 2. Korrekte Fehleranzeige
+### 2. Correct Error Display
 
-**Vorher:**
+**Before:**
 
 ```tsx
 const getHelperText = () => {
@@ -35,7 +35,7 @@ const getHelperText = () => {
 }
 ```
 
-**Nachher (gemäß offizieller Dokumentation):**
+**After (according to official documentation):**
 
 ```tsx
 const getHelperText = () => {
@@ -46,39 +46,39 @@ const getHelperText = () => {
 }
 ```
 
-### 3. Korrekte onBlur-Handler
+### 3. Correct onBlur Handler
 
-**Vorher:**
+**Before:**
 
 ```tsx
 onBlur={() => formField.handleBlur()}
 ```
 
-**Nachher (direkte Referenz):**
+**After (direct reference):**
 
 ```tsx
 onBlur={formField.handleBlur}
 ```
 
-## Entfernte Komponenten
+## Removed Components
 
-- `formatValidationError` Funktion wurde entfernt (nicht mehr benötigt)
+- `formatValidationError` function removed (no longer needed)
 
-## Vorteile
+## Benefits
 
-1. **Keine doppelten Validierungen mehr** - Die Vereinfachung der Logik verhindert mehrfache Validierung bei onBlur-Events
-2. **Bessere Performance** - Weniger komplexe Logik und direkte Verwendung von TanStack Form State
-3. **Konformität mit offizieller Dokumentation** - Exakte Implementierung der in der TanStack Form Dokumentation gezeigten Patterns
-4. **Verbesserte UX** - Kein doppelter helperText mehr
+1. **No more double validations** - Simplifying the logic prevents multiple validation on onBlur events
+2. **Better performance** - Less complex logic and direct use of TanStack Form state
+3. **Conformity with official documentation** - Exact implementation of patterns shown in TanStack Form documentation
+4. **Improved UX** - No more double helperText
 
-## Referenzen
+## References
 
 - [TanStack Form Validation Guide](https://tanstack.com/form/latest/docs/react/guides/validation)
-- Siehe Beispiele in der offiziellen Dokumentation für `!field.state.meta.isValid` Pattern
-- Dokumentation zeigt `field.state.meta.errors.join(', ')` als Standard-Pattern
+- See examples in official documentation for `!field.state.meta.isValid` pattern
+- Documentation shows `field.state.meta.errors.join(', ')` as standard pattern
 
 ## Build Status
 
-✅ TypeScript-Kompilierung erfolgreich
-✅ Keine neuen ESLint-Errors
-✅ Produktions-Build erfolgreich
+✅ TypeScript compilation successful
+✅ No new ESLint errors
+✅ Production build successful

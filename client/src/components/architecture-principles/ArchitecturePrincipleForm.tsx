@@ -135,7 +135,7 @@ const ArchitecturePrincipleForm: React.FC<
             return undefined
           }
 
-          // Daten aus dem Formular mit Standardwerten anreichern
+          // Enrich form data with default values
           const validationData = {
             ...values,
             name: values.name || '',
@@ -147,15 +147,15 @@ const ArchitecturePrincipleForm: React.FC<
 
           // Perform schema validation
           architecturePrincipleSchema.parse(validationData)
-          return undefined // Kein Fehler
+          return undefined // No error
         } catch (e) {
           if (e instanceof z.ZodError) {
             return e.format()
           }
-          return { error: 'Validierungsfehler' }
+          return { error: tForms('validationError') }
         }
       },
-      // Finale Validierung beim Absenden
+      // Final validation on submit
       onSubmit: formState => {
         try {
           // formState contains values in value property
@@ -165,7 +165,7 @@ const ArchitecturePrincipleForm: React.FC<
             return { error: tForms('noFormData') }
           }
 
-          // Daten aus dem Formular mit Standardwerten anreichern
+          // Enrich form data with default values
           const validationData = {
             ...values,
             name: values.name || '',
@@ -215,7 +215,7 @@ const ArchitecturePrincipleForm: React.FC<
       return
     }
 
-    // Aktualisiere das Formular mit Principle-Daten
+    // Update the form with principle data
     try {
       const resetValues = {
         name: principle.name || '',

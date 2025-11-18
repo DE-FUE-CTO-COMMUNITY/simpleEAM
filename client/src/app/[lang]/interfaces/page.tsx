@@ -43,14 +43,14 @@ function ApplicationInterfacesPage() {
   const [tableInstance, setTableInstance] = useState<any>(null)
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
 
-  // Filter-Zustand
+  // Filter state
   const [filterOpen, setFilterOpen] = useState(false)
   const [activeFiltersCount, setActiveFiltersCount] = useState<number>(0)
 
   // State for the new form
   const [showNewApplicationInterfaceForm, setShowNewApplicationInterfaceForm] = useState(false)
 
-  // Schnittstellen laden - Auth-Check erfolgt bereits in layout.tsx
+  // Load interfaces - auth check already done in layout.tsx
   const companyWhere = useCompanyWhere('company')
   const { loading, error, data, refetch } = useQuery(GET_APPLICATION_INTERFACES, {
     skip: !authenticated || !initialized,
@@ -64,14 +64,14 @@ function ApplicationInterfacesPage() {
     variables: { where: companyWhere },
   })
 
-  // Anwendungen laden für Formular-Auswahlmöglichkeiten
+  // Load applications for form selection options
   const { data: applicationsData } = useQuery(GET_APPLICATIONS, {
     skip: !authenticated || !initialized,
     fetchPolicy: 'cache-and-network',
     variables: { where: companyWhere },
   })
 
-  // Personen laden für Formular-Auswahlmöglichkeiten
+  // Load persons for form selection options
   const personWhere = useCompanyWhere('company')
   const { data: personsData } = useQuery(GET_PERSONS, {
     skip: !authenticated || !initialized,
@@ -92,7 +92,7 @@ function ApplicationInterfacesPage() {
 
   const applicationInterfaces = data?.applicationInterfaces || []
 
-  // Filter auf Schnittstellen anwenden
+  // Apply filter to interfaces
   const {
     filterState,
     setFilterState,
@@ -152,7 +152,7 @@ function ApplicationInterfacesPage() {
     },
   })
 
-  // Handler for creating a new Schnittstelle
+  // Handler for creating a new interface
   const handleCreateApplicationInterfaceSubmit = async (data: ApplicationInterfaceFormValues) => {
     if (!selectedCompanyId) {
       enqueueSnackbar('Please select a company first.', { variant: 'warning' })
@@ -278,7 +278,7 @@ function ApplicationInterfacesPage() {
       endOfLifeDate: { set: data.endOfLifeDate },
       owners: data.owners
         ? {
-            disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
+            disconnect: [{ where: {} }], // Disconnect all existing connections
             connect: {
               where: {
                 node: { id: { eq: data.owners } },

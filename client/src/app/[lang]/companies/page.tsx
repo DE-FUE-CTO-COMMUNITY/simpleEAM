@@ -21,7 +21,7 @@ import { useCompanyFilter } from '@/components/companies/useCompanyFilter'
 import { CompanyType, CompanyFormValues } from '@/components/companies/types'
 
 const CompaniesPage = () => {
-  // Admin-Guard analog zur Admin-Seite
+  // Admin guard similar to admin page
   const [isAuthorized, setIsAuthorized] = React.useState(false)
   React.useEffect(() => {
     if (!isAdmin()) {
@@ -35,7 +35,7 @@ const CompaniesPage = () => {
   const [globalFilter, setGlobalFilter] = useState<string>('')
   const [sorting, setSorting] = useState([{ id: 'name', desc: false }])
 
-  // Apollo Client-Operationen
+  // Apollo Client operations
   const { data, loading, error } = useQuery(GET_COMPANIES, { skip: !isAuthorized })
   const [createCompanyMutation] = useMutation(CREATE_COMPANY)
   const [updateCompanyMutation] = useMutation(UPDATE_COMPANY)
@@ -46,7 +46,7 @@ const CompaniesPage = () => {
     companies: data?.companies || [],
   })
 
-  // Dialog-States
+  // Dialog states
   const [filterDialogOpen, setFilterDialogOpen] = useState(false)
   const [showNewCompanyForm, setShowNewCompanyForm] = useState(false)
 
@@ -115,12 +115,12 @@ const CompaniesPage = () => {
       })
       enqueueSnackbar(t('messages.updateSuccess'), { variant: 'success' })
     } catch (error) {
-      console.error('❌ Fehler beim Aktualisieren der Company:', error)
+      console.error('❌ Error updating company:', error)
       enqueueSnackbar(t('messages.updateError'), { variant: 'error' })
     }
   }
 
-  // Neue Company erstellen
+  // Create new company
   const handleCreateCompany = () => {
     // Wait until data is loaded before opening the form
     if (loading || !data?.companies) {
@@ -242,7 +242,7 @@ const CompaniesPage = () => {
               enqueueSnackbar(t('messages.createSuccess'), { variant: 'success' })
               setShowNewCompanyForm(false)
             } catch (error) {
-              console.error('Fehler beim Erstellen der Company:', error)
+              console.error('Error creating company:', error)
               enqueueSnackbar(t('messages.createError'), { variant: 'error' })
             }
           }}

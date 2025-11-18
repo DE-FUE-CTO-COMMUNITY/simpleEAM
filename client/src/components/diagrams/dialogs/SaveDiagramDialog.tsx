@@ -148,10 +148,10 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
   const t = useTranslations('diagrams')
   const tCommon = useTranslations('common')
 
-  // Übersetzte Diagrammtypen
+  // Translated diagram types
   const diagramTypes = React.useMemo(() => createDiagramTypes(t), [t])
 
-  // Extrahiere Benutzerinformationen aus dem Keycloak-Token
+  // Extract user information from Keycloak token
   const user = React.useMemo(() => {
     if (!keycloak?.token) return null
 
@@ -407,25 +407,25 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
       return
     }
 
-    // Prüfe auf neue Elemente und Beziehungen im Diagramm
+    // Check for new elements and relationships in diagram
     try {
       const parsedDiagramData = JSON.parse(diagramData)
       const elements = parsedDiagramData.elements || []
 
-      // Neue Elemente erkennen
+      // Detect new elements
       const newElements = detectNewElements(elements)
 
-      // Pfeilanalyse durchführen - mit Apollo Client für Beziehungsfilterung
+      // Perform arrow analysis - with Apollo Client for relationship filtering
       const arrowAnalysis = await analyzeArrows(elements, apolloClient)
-      const validRelationships = arrowAnalysis.validRelationships // Bereits gefiltert durch analyzeArrows
+      const validRelationships = arrowAnalysis.validRelationships // Already filtered by analyzeArrows
 
-      // Prüfe, ob Bindings korrigiert wurden und aktualisiere das Diagramm
+      // Check if bindings were corrected and update diagram
       if (arrowAnalysis.correctedElements && arrowAnalysis.correctedElements.length > 0) {
-        // Erstelle eine neue Elementliste mit den korrigierten Elementen
+        // Create new element list with corrected elements
         const correctedElementMap = new Map(arrowAnalysis.correctedElements.map(el => [el.id, el]))
         const updatedElements = elements.map((el: any) => correctedElementMap.get(el.id) || el)
 
-        // Erstelle aktualisierte Diagrammdaten
+        // Create updated diagram data
         const updatedDiagramData = JSON.stringify({
           ...parsedDiagramData,
           elements: updatedElements,
@@ -436,7 +436,7 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
           onDiagramUpdate(updatedDiagramData)
         }
 
-        // Aktualisiere die lokalen diagramData für weitere Verarbeitung
+        // Update local diagramData for further processing
         parsedDiagramData.elements = updatedElements
       }
 
@@ -447,7 +447,7 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
         arrowAnalysis.invalidRelationships.length > 0
 
       if (hasNewElements || hasNewRelationships) {
-        // Neue Elemente oder Beziehungen gefunden - Dialog öffnen
+        // New elements or relationships found - open dialog
         setDetectedNewElements(newElements)
         setDetectedNewRelationships(validRelationships)
         setDetectedIncompleteRelationships(arrowAnalysis.incompleteRelationships)
@@ -456,14 +456,14 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
         return
       }
     } catch (error) {
-      console.warn('Fehler beim Parsen der Diagrammdaten oder bei der Pfeilanalyse:', error)
+      console.warn('Error parsing diagram data or during arrow analysis:', error)
     }
 
-    // Keine neuen Elemente oder Parsing-Fehler - normales Speichern
+    // No new elements or parsing error - normal save
     const savedDiagram = await performSave()
     if (savedDiagram) {
-      onClose() // Dialog schließen
-      onSave(savedDiagram) // Parent über Speichern informieren
+      onClose() // Close dialog
+      onSave(savedDiagram) // Inform parent about save
     }
   }
 
@@ -475,7 +475,7 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
     setCreatingElements(true)
 
     try {
-      // Erstelle die ausgewählten Elemente in der Datenbank
+      // Create selected elements in database
       let creationResult: any = { success: true, createdElements: [] }
       if (selectedElements.length > 0) {
         creationResult = await createNewElementsInDatabase(
@@ -486,10 +486,10 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
         )
       }
 
-      // Erstelle die ausgewählten Beziehungen in der Datenbank
+      // Create selected relationships in database
       let relationshipResult: any = { success: true, createdCount: 0, errors: [] }
       if (selectedRelationships.length > 0) {
-        // Aktualisiere die Beziehungen mit den neuen Datenbank-IDs der erstellten Elemente
+        // Update relationships with new database IDs of created elements
         const updatedRelationships = updateRelationshipsWithDatabaseReferences(
           selectedRelationships,
           creationResult.createdElements
@@ -499,18 +499,18 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
       }
 
       if (creationResult.success && relationshipResult.success) {
-        // Aktualisiere die Diagrammdaten mit den neuen Datenbankreferenzen
+        // Update diagram data with new database references
         const parsedDiagramData = JSON.parse(diagramData)
         const updatedElements = updateElementsWithDatabaseReferences(
           parsedDiagramData.elements,
           creationResult.createdElements
         )
-        // Aktualisiere diagramData für das Speichern
+        // Update diagramData for saving
         const updatedDiagramData = JSON.stringify({
           ...parsedDiagramData,
           elements: updatedElements,
         })
-        // Führe das Speichern mit den aktualisierten Daten durch
+        // Perform save with updated data
         const savedDiagram = await performSave(updatedDiagramData)
 
         // Nach erfolgreichem Speichern: Dialog schließen und Canvas-Update

@@ -37,9 +37,9 @@ const CapabilitiesPage = () => {
   const [tableInstance, setTableInstance] = useState<any>(null)
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
 
-  // Filter-Zustand
+  // Filter state
   const [filterOpen, setFilterOpen] = useState(false)
-  // Filter-Hook verwenden (nach capabilities Query)
+  // Use filter hook (after capabilities query)
   const [activeFiltersCount, setActiveFiltersCount] = useState<number>(0)
 
   // Extract list of available statuses and tags from the data
@@ -49,7 +49,7 @@ const CapabilitiesPage = () => {
   // State for the new capability form
   const [showNewCapabilityForm, setShowNewCapabilityForm] = useState(false)
 
-  // Business Capabilities laden - Auth-Check erfolgt bereits in layout.tsx
+  // Load business capabilities - auth check already done in layout.tsx
   const companyWhere = useCompanyWhere('company')
   const { loading, error, data, refetch } = useQuery(GET_CAPABILITIES, {
     skip: !authenticated || !initialized,
@@ -92,7 +92,7 @@ const CapabilitiesPage = () => {
 
   const capabilities = data?.businessCapabilities || []
 
-  // Filter-Hook verwenden
+  // Use filter hook
   const { filterState, setFilterState, filteredCapabilities, resetFilters } = useCapabilityFilter({
     capabilities,
   })
@@ -255,7 +255,7 @@ const CapabilitiesPage = () => {
       tags: { set: capabilityData.tags },
     }
 
-    // Lifecycle-Felder setzen
+    // Set lifecycle fields
     if (capabilityData.introductionDate) {
       input.introductionDate = { set: capabilityData.introductionDate.toISOString().split('T')[0] }
     }
@@ -288,7 +288,7 @@ const CapabilitiesPage = () => {
       }
     }
 
-    // Aktualisierung der übergeordneten Capability
+    // Update parent capability
     if (parentId) {
       input.parents = {
         disconnect: [{ where: {} }],

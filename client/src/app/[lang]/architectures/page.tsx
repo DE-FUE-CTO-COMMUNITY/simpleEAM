@@ -40,7 +40,7 @@ const ArchitecturesPage = () => {
   const [tableInstance, setTableInstance] = useState<any>(null)
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
 
-  // Filter-Zustand
+  // Filter state
   const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false)
   const [activeFiltersCount, setActiveFiltersCount] = useState<number>(0)
 
@@ -102,7 +102,7 @@ const ArchitecturesPage = () => {
 
   const architectures = data?.architectures || []
 
-  // Filter-Hook verwenden (Pattern 2)
+  // Use filter hook (Pattern 2)
   const { filterState, setFilterState, filteredArchitectures } = useArchitectureFilter({
     architectures,
   })
