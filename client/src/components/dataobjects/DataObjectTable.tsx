@@ -11,9 +11,9 @@ import { createColumnHelper } from '@tanstack/react-table'
 import { SortingState, VisibilityState } from '@tanstack/react-table'
 import usePersistentColumnVisibility from '../../hooks/usePersistentColumnVisibility'
 
-// Exportierte Default Column Visibility für DataObject
+// Exported default column visibility for DataObject
 export const DATAOBJECT_DEFAULT_COLUMN_VISIBILITY = {
-  // Standardmäßig sichtbare Spalten
+  // Columns visible by default
   name: true,
   classification: true,
   format: true,
@@ -22,7 +22,7 @@ export const DATAOBJECT_DEFAULT_COLUMN_VISIBILITY = {
   usedByApplications: true,
   relatedToCapabilities: true,
   transferredInInterfaces: true,
-  // Standardmäßig versteckte Spalten
+  // Columns hidden by default
   id: false,
   description: false,
   planningDate: false,
@@ -46,7 +46,7 @@ interface DataObjectTableProps {
   onUpdateDataObject?: (id: string, data: DataObjectFormValues) => Promise<void>
   onDeleteDataObject?: (id: string) => Promise<void>
   onTableReady?: (table: any) => void
-  // Diese Props sind jetzt optional, da die Persistierung intern verwaltet wird
+  // These props are now optional as persistence is handled internally
   columnVisibility?: VisibilityState
   onColumnVisibilityChange?: (
     updater: VisibilityState | ((old: VisibilityState) => VisibilityState)
@@ -76,13 +76,13 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
     columnVisibility,
     onTableReady: persistentOnTableReady,
     onColumnVisibilityChange,
-    // resetColumnVisibility wird für zukünftige Reset-Funktionalität benötigt
+    // resetColumnVisibility is needed for future reset functionality
   } = usePersistentColumnVisibility({
-    tableKey: 'dataobjects', // Korrigiert: stimmt jetzt mit DataObjectToolbar überein
+    tableKey: 'dataobjects', // Corrected: now matches DataObjectToolbar
     defaultColumnVisibility: DATAOBJECT_DEFAULT_COLUMN_VISIBILITY,
   })
 
-  // Kombiniere externe und persistente onTableReady Callbacks
+  // Combine external and persistent onTableReady callbacks
   const handleTableReady = (table: any) => {
     persistentOnTableReady(table)
     if (onTableReady) {
@@ -90,7 +90,7 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
     }
   }
 
-  // Hilfsfunktion für die Anzeige der Datenschutzklasse mit farblichem Chip
+  // Helper function for die Anzeige der Datenschutzklasse mit farblichem Chip
   const getClassificationChip = useCallback(
     (classification: DataClassification) => {
       let color
@@ -123,7 +123,7 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
     [tClassifications]
   )
 
-  // Spalten-Definition für die DataObject-Tabelle
+  // Column definition for DataObject table
   const columns = useMemo(
     () => [
       columnHelper.accessor('id', {
@@ -266,7 +266,7 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
     [columnHelper, getClassificationChip, t, locale]
   )
 
-  // Mapping-Funktion für die Umwandlung von DataObject zu DataObjectFormValues
+  // Mapping function for converting DataObject to DataObjectFormValues
   const mapDataObjectToFormValues = (dataObject: DataObject): DataObjectFormValues => {
     return {
       name: dataObject.name,

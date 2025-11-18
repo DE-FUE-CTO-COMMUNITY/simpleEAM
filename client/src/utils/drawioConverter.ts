@@ -245,7 +245,7 @@ function createLineCell(
 
   let edgeStyle = 'rounded=0;html=1;'
 
-  // Nur Pfeile hinzufügen, wenn sie explizit gesetzt sind
+  // Only add arrows if they are explicitly set
   if (hasStartArrow) {
     edgeStyle += 'startArrow=classic;'
   } else {

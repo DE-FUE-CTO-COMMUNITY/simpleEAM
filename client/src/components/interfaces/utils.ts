@@ -4,7 +4,7 @@ import { GenericFilterState } from '../common/GenericFilterDialog'
 import { InterfaceType, InterfaceProtocol, InterfaceStatus } from '../../gql/generated'
 
 /**
- * Hilfsfunktion zur Formatierung von Datum
+ * Helper function for date formatting
  */
 export const formatDate = (date: string) => {
   if (!date) return '-'
@@ -47,7 +47,7 @@ export const getStatusLabel = (status: InterfaceStatus): string => {
     case InterfaceStatus.IN_DEVELOPMENT:
       return 'In Entwicklung'
     case InterfaceStatus.OUT_OF_SERVICE:
-      return 'Außer Betrieb'
+      return 'Out of Service'
     case InterfaceStatus.PLANNED:
       return 'Geplant'
     default:
@@ -61,12 +61,12 @@ export const getStatusLabel = (status: InterfaceStatus): string => {
 export const getProtocolLabel = (protocol: any): string => {
   if (!protocol) return '-'
 
-  // Direkt den Protokoll-String zurückgeben, da die Enum-Werte bereits aussagekräftig sind
+  // Return protocol string directly as enum values are already meaningful
   return protocol
 }
 
 /**
- * Zählt die Anzahl der aktiven Filter im FilterState
+ * Counts the number of active filters in FilterState
  */
 export const countActiveFilters = (filterState: GenericFilterState): number => {
   let count = 0
@@ -92,7 +92,7 @@ export const countActiveFilters = (filterState: GenericFilterState): number => {
     count++
   }
 
-  // Eigentümer-Filter
+  // Owner filter
   if (filterState.ownersFilter && (filterState.ownersFilter as string[]).length > 0) {
     count++
   }

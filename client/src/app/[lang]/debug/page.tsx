@@ -20,7 +20,7 @@ export default function DebugPage() {
 
         <Alert severity="warning" sx={{ mb: 3 }}>
           Diese Debug-Tools sind nur für die Entwicklungsumgebung bestimmt und sollten nicht in der
-          Produktion verwendet werden.
+          production.
         </Alert>
 
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>

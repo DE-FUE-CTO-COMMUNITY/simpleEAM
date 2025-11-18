@@ -358,7 +358,7 @@ export const updateElementName = async (
 /**
  * Validiert und synchronisiert Elemente beim Import von anderen Instanzen (mit Namensvergleich für ID-Mapping)
  * WICHTIG: Aktualisiert ALLE Instanzen von Elementen mit derselben databaseId
- * Sollte NUR beim Import verwendet werden, wo IDs nicht übereinstimmen und Namen verglichen werden müssen
+ * Should ONLY be used during import where IDs do not match and names need to be compared
  */
 export const validateAndSyncElementsForImport = async (
   apolloClient: any,

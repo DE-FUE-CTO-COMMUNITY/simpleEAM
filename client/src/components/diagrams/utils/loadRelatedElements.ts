@@ -173,7 +173,7 @@ export interface RelatedElement {
   reverseArrow: boolean
 }
 
-// Mapping von ElementType zu GraphQL-Query
+// Mapping from ElementType zu GraphQL-Query
 export const RELATIONSHIP_QUERIES = {
   businessCapability: GET_BUSINESS_CAPABILITY_RELATIONSHIPS,
   application: GET_APPLICATION_RELATIONSHIPS,

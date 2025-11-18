@@ -210,7 +210,7 @@ export const createEntityInput = (entityType: string, row: any): any => {
         description: row.description || '',
         status: validStatus,
         type: validType,
-        // Numerische Felder
+        // Numeric fields
         businessValue:
           typeof row.businessValue === 'number'
             ? row.businessValue
@@ -229,7 +229,7 @@ export const createEntityInput = (entityType: string, row: any): any => {
             : row.sequenceNumber
               ? parseInt(row.sequenceNumber, 10)
               : undefined,
-        // Datum-Felder
+        // Date fields
         introductionDate: row.introductionDate ? new Date(row.introductionDate) : undefined,
         endDate: row.endDate ? new Date(row.endDate) : undefined,
         // Tags-Array
@@ -264,15 +264,15 @@ export const createEntityInput = (entityType: string, row: any): any => {
         criticality: validCriticality,
         vendor: row.vendor || '',
         hostingEnvironment: row.hostingEnvironment || '',
-        // Numerische Felder
+        // Numeric fields
         costs:
           typeof row.costs === 'number' ? row.costs : row.costs ? parseFloat(row.costs) : undefined,
-        // Datum-Felder
+        // Date fields
         introductionDate: row.introductionDate ? new Date(row.introductionDate) : undefined,
         endOfLifeDate: row.endOfLifeDate ? new Date(row.endOfLifeDate) : undefined,
         endOfUseDate: row.endOfUseDate ? new Date(row.endOfUseDate) : undefined,
         planningDate: row.planningDate ? new Date(row.planningDate) : undefined,
-        // Array-Felder
+        // Array fields
         technologyStack: Array.isArray(row.technologyStack)
           ? row.technologyStack
           : typeof row.technologyStack === 'string' && row.technologyStack.trim()
@@ -295,7 +295,7 @@ export const createEntityInput = (entityType: string, row: any): any => {
         description: row.description || '',
         classification: validClassification,
         format: row.format || '',
-        // Datum-Felder
+        // Date fields
         introductionDate: row.introductionDate ? new Date(row.introductionDate) : undefined,
         endOfLifeDate: row.endOfLifeDate ? new Date(row.endOfLifeDate) : undefined,
         endOfUseDate: row.endOfUseDate ? new Date(row.endOfUseDate) : undefined,
@@ -333,7 +333,7 @@ export const createEntityInput = (entityType: string, row: any): any => {
         status: validStatus,
         protocol: validProtocol,
         version: row.version || '',
-        // Datums-Felder
+        // Date fields
         introductionDate: row.introductionDate ? new Date(row.introductionDate) : undefined,
         planningDate: row.planningDate ? new Date(row.planningDate) : undefined,
         endOfUseDate: row.endOfUseDate ? new Date(row.endOfUseDate) : undefined,
@@ -452,7 +452,7 @@ export const createEntityInput = (entityType: string, row: any): any => {
         ipAddress: row.ipAddress || '',
         specifications: row.specifications || '',
         maintenanceWindow: row.maintenanceWindow || '',
-        // Datums-Felder
+        // Date fields
         introductionDate: row.introductionDate ? new Date(row.introductionDate) : undefined,
         planningDate: row.planningDate ? new Date(row.planningDate) : undefined,
         endOfUseDate: row.endOfUseDate ? new Date(row.endOfUseDate) : undefined,
@@ -485,7 +485,7 @@ export const createEntityInput = (entityType: string, row: any): any => {
         license: row.license || '',
         costs: row.costs && row.costs !== '' ? parseFloat(row.costs) : undefined,
         tags: row.tags ? parseRelationshipIds(row.tags) : [],
-        // Datums-Felder
+        // Date fields
         trainingDate: row.trainingDate ? new Date(row.trainingDate) : undefined,
         lastUpdated: row.lastUpdated ? new Date(row.lastUpdated) : undefined,
       }

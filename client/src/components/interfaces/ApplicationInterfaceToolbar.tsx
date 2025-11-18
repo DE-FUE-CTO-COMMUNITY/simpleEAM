@@ -17,7 +17,7 @@ interface ApplicationInterfaceToolbarProps {
 }
 
 /**
- * Eine Toolbar speziell für Anwendungsschnittstellen, die die GenericToolbar-Komponente verwendet.
+ * A toolbar specifically for application interfaces that uses the GenericToolbar component.
  */
 const ApplicationInterfaceToolbar: React.FC<ApplicationInterfaceToolbarProps> = ({
   table,
@@ -31,12 +31,12 @@ const ApplicationInterfaceToolbar: React.FC<ApplicationInterfaceToolbarProps> = 
     <GenericToolbar
       {...props}
       searchPlaceholder={t('searchPlaceholder')}
-      filterTooltip="Schnittstellenfilter hinzufügen"
+      filterTooltip="Add interface filter"
       editFilterTooltip="Schnittstellenfilter bearbeiten"
-      resetFilterTooltip="Schnittstellenfilter zurücksetzen"
+      resetFilterTooltip="Reset interface filter"
       table={table}
       enableColumnVisibilityToggle={enableColumnVisibilityToggle}
-      tableKey="interfaces" // Eindeutiger Schlüssel für die Interfaces-Tabelle
+      tableKey="interfaces" // Unique key for the interfaces table
       defaultColumnVisibility={defaultColumnVisibility}
     />
   )

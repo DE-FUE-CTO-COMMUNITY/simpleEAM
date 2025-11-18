@@ -15,7 +15,7 @@ import { useDomainLabel, useTypeLabel, useFormatDate } from './utils'
 import ArchitectureForm, { ArchitectureFormValues } from './ArchitectureForm'
 import usePersistentColumnVisibility from '../../hooks/usePersistentColumnVisibility'
 
-// Exportierte Default Column Visibility für Architecture
+// Exported default column visibility for Architecture
 export const ARCHITECTURE_DEFAULT_COLUMN_VISIBILITY = {
   // Standardmäßig sichtbare Spalten
   name: true,
@@ -49,7 +49,7 @@ interface ArchitectureTableProps {
   onDeleteArchitecture?: (id: string) => Promise<void>
   availableArchitectures?: ArchitectureType[]
   onTableReady?: (table: any) => void
-  // Diese Props sind jetzt optional, da die Persistierung intern verwaltet wird
+  // These props are now optional as persistence is handled internally
   columnVisibility?: VisibilityState
   onColumnVisibilityChange?: (
     updater: VisibilityState | ((old: VisibilityState) => VisibilityState)
@@ -86,7 +86,7 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
     defaultColumnVisibility: ARCHITECTURE_DEFAULT_COLUMN_VISIBILITY,
   })
 
-  // Kombiniere externe und persistente onTableReady Callbacks
+  // Combine external and persistent onTableReady callbacks
   const handleTableReady = (table: any) => {
     persistentOnTableReady(table)
     if (onTableReady) {
@@ -94,7 +94,7 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
     }
   }
 
-  // Spalten-Definition für die Architecture-Tabelle
+  // Column definition for the architecture table
   const columns = useMemo(
     () => [
       columnHelper.accessor('id', {
@@ -236,7 +236,7 @@ const ArchitectureTable: React.FC<ArchitectureTableProps> = ({
     [columnHelper, t, getDomainLabelTranslated, getTypeLabelTranslated, formatDateTranslated]
   )
 
-  // Mapping von ArchitectureType zu den erwarteten FormValues für das Formular
+  // Mapping from ArchitectureType to expected FormValues for the form
   const mapToFormValues = (arch: ArchitectureType) => {
     return {
       name: arch.name,

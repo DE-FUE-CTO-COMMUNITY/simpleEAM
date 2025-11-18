@@ -58,9 +58,9 @@ export default function usePersistentColumnVisibility({
     []
   )
 
-  // Callback zum Speichern der Table-Instanz
+  // Callback to save the table instance
   const onTableReady = useCallback((_table: Table<any>) => {
-    // Hier können wir bei Bedarf zusätzliche Table-Konfiguration vornehmen
+    // Here we can add additional table configuration if needed
   }, [])
 
   // Reset-Funktion

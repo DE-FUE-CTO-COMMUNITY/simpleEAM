@@ -24,7 +24,7 @@ const ArchitectureFilterDialog: React.FC<FilterProps> = ({
 
   // Konfiguration der Filterfelder
   const filterFields: FilterField[] = [
-    // Domain Filter
+    // Domain filter
     {
       id: 'domainFilter',
       label: t('domain'),
@@ -63,7 +63,7 @@ const ArchitectureFilterDialog: React.FC<FilterProps> = ({
       type: 'text',
       placeholder: tCommon('contains'),
     },
-    // Verantwortlicher-Filter
+    // Owner filter
     {
       id: 'ownerFilter',
       label: t('owner'),

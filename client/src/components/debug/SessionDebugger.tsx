@@ -120,19 +120,19 @@ const SessionDebugger: React.FC<SessionDebuggerProps> = ({ isOpen, onClose }) =>
             <TableBody>
               <TableRow>
                 <TableCell>Server URL</TableCell>
-                <TableCell>{keycloak.authServerUrl || 'Nicht gesetzt'}</TableCell>
+                <TableCell>{keycloak.authServerUrl || 'Not set'}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell>Realm</TableCell>
-                <TableCell>{keycloak.realm || 'Nicht gesetzt'}</TableCell>
+                <TableCell>{keycloak.realm || 'Not set'}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell>Client ID</TableCell>
-                <TableCell>{keycloak.clientId || 'Nicht gesetzt'}</TableCell>
+                <TableCell>{keycloak.clientId || 'Not set'}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell>Subject (User ID)</TableCell>
-                <TableCell>{keycloak.subject || 'Nicht verfügbar'}</TableCell>
+                <TableCell>{keycloak.subject || 'Not available'}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell>Login erforderlich bei Load</TableCell>
@@ -147,19 +147,19 @@ const SessionDebugger: React.FC<SessionDebuggerProps> = ({ isOpen, onClose }) =>
 
   const renderTokenInfo = () => {
     if (!tokenInfo) {
-      return <Alert severity="warning">Keine Token-Informationen verfügbar</Alert>
+      return <Alert severity="warning">No token information available</Alert>
     }
 
     return (
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
           <Chip
-            label={tokenInfo.isValid ? 'Token gültig' : 'Token abgelaufen'}
+            label={tokenInfo.isValid ? 'Token valid' : 'Token expired'}
             color={tokenInfo.isValid ? 'success' : 'error'}
             icon={<SecurityIcon />}
           />
           <Chip
-            label={`Läuft ab in: ${formatDuration(tokenInfo.timeToExpiry)}`}
+            label={`Expires in: ${formatDuration(tokenInfo.timeToExpiry)}`}
             color={
               tokenInfo.timeToExpiry > 300
                 ? 'success'
@@ -230,23 +230,23 @@ const SessionDebugger: React.FC<SessionDebuggerProps> = ({ isOpen, onClose }) =>
           <TableBody>
             <TableRow>
               <TableCell>NEXT_PUBLIC_KEYCLOAK_URL</TableCell>
-              <TableCell>{process.env.NEXT_PUBLIC_KEYCLOAK_URL || 'Nicht gesetzt'}</TableCell>
+              <TableCell>{process.env.NEXT_PUBLIC_KEYCLOAK_URL || 'Not set'}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>NEXT_PUBLIC_KEYCLOAK_REALM</TableCell>
-              <TableCell>{process.env.NEXT_PUBLIC_KEYCLOAK_REALM || 'Nicht gesetzt'}</TableCell>
+              <TableCell>{process.env.NEXT_PUBLIC_KEYCLOAK_REALM || 'Not set'}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>NEXT_PUBLIC_KEYCLOAK_CLIENT_ID</TableCell>
-              <TableCell>{process.env.NEXT_PUBLIC_KEYCLOAK_CLIENT_ID || 'Nicht gesetzt'}</TableCell>
+              <TableCell>{process.env.NEXT_PUBLIC_KEYCLOAK_CLIENT_ID || 'Not set'}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>NEXT_PUBLIC_GRAPHQL_URL</TableCell>
-              <TableCell>{process.env.NEXT_PUBLIC_GRAPHQL_URL || 'Nicht gesetzt'}</TableCell>
+              <TableCell>{process.env.NEXT_PUBLIC_GRAPHQL_URL || 'Not set'}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>NODE_ENV</TableCell>
-              <TableCell>{process.env.NODE_ENV || 'Nicht gesetzt'}</TableCell>
+              <TableCell>{process.env.NODE_ENV || 'Not set'}</TableCell>
             </TableRow>
           </TableBody>
         </Table>
@@ -256,17 +256,17 @@ const SessionDebugger: React.FC<SessionDebuggerProps> = ({ isOpen, onClose }) =>
 
   const testTokenRefresh = async () => {
     if (!keycloak) {
-      alert('Keycloak nicht verfügbar')
+      alert('Keycloak not available')
       return
     }
 
     try {
-      const refreshed = await keycloak.updateToken(0) // Erzwinge Refresh
+      const refreshed = await keycloak.updateToken(0) // Force refresh
       if (refreshed) {
         alert('Token erfolgreich aktualisiert')
         handleRefresh()
       } else {
-        alert('Token war noch gültig, kein Refresh nötig')
+        alert('Token was still valid, no refresh needed')
       }
     } catch (error) {
       alert(`Token-Refresh fehlgeschlagen: ${error}`)
@@ -331,7 +331,7 @@ const SessionDebugger: React.FC<SessionDebuggerProps> = ({ isOpen, onClose }) =>
 
       <DialogActions>
         <Button onClick={onClose} variant="contained">
-          Schließen
+          Close
         </Button>
       </DialogActions>
     </Dialog>

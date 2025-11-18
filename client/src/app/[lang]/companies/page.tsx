@@ -13,7 +13,7 @@ import { GET_COMPANIES, CREATE_COMPANY, UPDATE_COMPANY, DELETE_COMPANY } from '@
 import { CompanySize } from '@/gql/generated'
 import CompanyForm from '@/components/companies/CompanyForm'
 
-// Importiere die ausgelagerten Komponenten
+// Import the extracted components
 import CompanyTable from '@/components/companies/CompanyTable'
 import CompanyToolbar from '@/components/companies/CompanyToolbar'
 import CompanyFilterDialog from '@/components/companies/CompanyFilterDialog'
@@ -50,7 +50,7 @@ const CompaniesPage = () => {
   const [filterDialogOpen, setFilterDialogOpen] = useState(false)
   const [showNewCompanyForm, setShowNewCompanyForm] = useState(false)
 
-  // Verfügbare Werte für Filter extrahieren
+  // Extract available values for filters
   const availableValues = useMemo(() => {
     const companies = data?.companies || []
 
@@ -62,7 +62,7 @@ const CompaniesPage = () => {
     }
   }, [data?.companies])
 
-  // Company löschen - Handler für CompanyForm
+  // Delete company - Handler for CompanyForm
   const handleDeleteCompany = async (id: string) => {
     await deleteCompanyMutation({
       variables: { id },
@@ -81,7 +81,7 @@ const CompaniesPage = () => {
                   where: {}, // Trennt alle aktuellen Employee-Verbindungen
                 },
               ],
-              // Dann neue Verbindungen hinzufügen
+              // Then add new connections
               connect: values.employees.map(employeeId => ({
                 where: { node: { id: { eq: employeeId } } },
               })),
@@ -89,7 +89,7 @@ const CompaniesPage = () => {
           ]
         : [
             {
-              // Wenn employees leer ist, alle Verbindungen trennen
+              // If employees is empty, disconnect all connections
               disconnect: [
                 {
                   where: {},
@@ -122,15 +122,15 @@ const CompaniesPage = () => {
 
   // Neue Company erstellen
   const handleCreateCompany = () => {
-    // Warten, bis die Daten geladen sind, bevor das Formular geöffnet wird
+    // Wait until data is loaded before opening the form
     if (loading || !data?.companies) {
-      enqueueSnackbar('Bitte warten Sie, bis die Daten geladen sind.', { variant: 'info' })
+      enqueueSnackbar('Please wait until data is loaded.', { variant: 'info' })
       return
     }
     setShowNewCompanyForm(true)
   }
 
-  // Aktive Filter zählen
+  // Count active filters
   const activeFiltersCount = useMemo(() => {
     return Object.values(filterState).filter(value => {
       if (Array.isArray(value)) return value.length > 0
@@ -174,7 +174,7 @@ const CompaniesPage = () => {
           globalFilter={globalFilter}
           onGlobalFilterChange={setGlobalFilter}
           onAddClick={() => {
-            // Create wird über GenericTable gehandhabt
+            // Create is handled via GenericTable
           }}
           onFilterClick={() => setFilterDialogOpen(true)}
           activeFiltersCount={activeFiltersCount}
@@ -236,7 +236,7 @@ const CompaniesPage = () => {
               }
 
               await createCompanyMutation({
-                variables: { input: [createInput] }, // Array für createCompanies
+                variables: { input: [createInput] }, // Array for createCompanies
                 refetchQueries: [{ query: GET_COMPANIES }],
               })
               enqueueSnackbar(t('messages.createSuccess'), { variant: 'success' })

@@ -13,7 +13,7 @@ import { getProtocolLabel } from './utils'
 import { DataObject, Application, Person } from '@/gql/generated'
 import usePersistentColumnVisibility from '../../hooks/usePersistentColumnVisibility'
 
-// Exportierte Default Column Visibility für ApplicationInterface
+// Exported default column visibility for ApplicationInterface
 export const APPLICATION_INTERFACE_DEFAULT_COLUMN_VISIBILITY = {
   // Standardmäßig sichtbare Spalten
   name: true,
@@ -54,7 +54,7 @@ interface ApplicationInterfaceTableProps {
   applications?: Application[]
   persons?: Person[]
   onTableReady?: (table: any) => void
-  // Diese Props sind jetzt optional, da die Persistierung intern verwaltet wird
+  // These props are now optional as persistence is handled internally
   columnVisibility?: VisibilityState
   onColumnVisibilityChange?: (
     updater: VisibilityState | ((old: VisibilityState) => VisibilityState)
@@ -96,7 +96,7 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
     [locale]
   )
 
-  // Hilfsfunktion für Interface Type Labels
+  // Helper function for interface type labels
   const getInterfaceTypeLabel = useCallback(
     (type: any) => {
       switch (type) {
@@ -117,7 +117,7 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
     [tTypes]
   )
 
-  // Hilfsfunktion für Status Labels
+  // Helper function for status labels
   const getInterfaceStatusLabel = useCallback(
     (status: any) => {
       switch (status) {
@@ -143,13 +143,13 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
     columnVisibility,
     onTableReady: persistentOnTableReady,
     onColumnVisibilityChange,
-    // resetColumnVisibility wird für zukünftige Reset-Funktionalität benötigt
+    // resetColumnVisibility is needed for future reset functionality
   } = usePersistentColumnVisibility({
-    tableKey: 'interfaces', // Korrigiert: stimmt jetzt mit ApplicationInterfaceToolbar überein
+    tableKey: 'interfaces', // Fixed: now matches ApplicationInterfaceToolbar
     defaultColumnVisibility: APPLICATION_INTERFACE_DEFAULT_COLUMN_VISIBILITY,
   })
 
-  // Kombiniere externe und persistente onTableReady Callbacks
+  // Combine external and persistent onTableReady callbacks
   const handleTableReady = (table: any) => {
     persistentOnTableReady(table)
     if (onTableReady) {
@@ -157,7 +157,7 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
     }
   }
 
-  // Spalten-Definition für die Schnittstellen-Tabelle
+  // Column definition for the interfaces table
   const columns = useMemo(
     () => [
       columnHelper.accessor('id', {
@@ -334,7 +334,7 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
     [columnHelper, t, getInterfaceTypeLabel, getInterfaceStatusLabel, formatDate]
   )
 
-  // Mapping von ApplicationInterface zu den erwarteten FormValues für das Formular
+  // Mapping from ApplicationInterface to expected FormValues for the form
   const mapToFormValues = (
     applicationInterface: ApplicationInterface
   ): ApplicationInterfaceFormValues => {
@@ -369,7 +369,7 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
       onUpdate={onUpdateApplicationInterface}
       onDelete={onDeleteApplicationInterface}
       emptyMessage="Keine Schnittstellen gefunden."
-      createButtonLabel="Neue Schnittstelle erstellen"
+      createButtonLabel="Create new interface"
       entityName="Schnittstelle"
       FormComponent={ApplicationInterfaceForm}
       getIdFromData={(item: ApplicationInterface) => item.id}

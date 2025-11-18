@@ -5,49 +5,49 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 
-// JWKS-Client für Keycloak
+// JWKS client for Keycloak
 const client = jwksClient({
   jwksUri: `${process.env.KEYCLOAK_URL}/realms/${process.env.KEYCLOAK_REALM}/protocol/openid-connect/certs`,
-  requestHeaders: {}, // Optionale zusätzliche Headers
-  timeout: 30000, // Zeitüberschreitung in Millisekunden (30 Sekunden)
-  cache: true, // Cache die öffentlichen Schlüssel
-  cacheMaxEntries: 5, // Maximale Anzahl der zwischengespeicherten Schlüssel
-  // cacheMaxAge entfernt - verursacht Probleme mit neueren lru-cache Versionen
+  requestHeaders: {}, // Optional additional headers
+  timeout: 30000, // Timeout in milliseconds (30 Sekunden)
+  cache: true, // Cache the public keys
+  cacheMaxEntries: 5, // Maximum number of cached keys
+  // cacheMaxAge removed - causes problems with newer lru-cache versions
 })
 
 /**
- * Extrahiert das Bearer-Token aus dem Authorization-Header
+ * Extracts the Bearer token from the Authorization header
  */
 export const extractTokenFromHeader = (req: Request): string | null => {
   const authHeader = req.headers.authorization
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return null
   }
-  return authHeader.substring(7) // "Bearer " entfernen
+  return authHeader.substring(7) // "Bearer " remove
 }
 
 /**
- * Holt den öffentlichen Schlüssel für die JWT-Verifikation von Keycloak
+ * Retrieves the public key for JWT verification from Keycloak
  */
 const getKey = (header: jwt.JwtHeader, callback: (err: Error | null, key?: string) => void) => {
   if (!header.kid) {
-    return callback(new Error('JWT Header enthält keine Key ID (kid)'))
+    return callback(new Error('JWT Header does not contain Key ID (kid)'))
   }
 
   client.getSigningKey(header.kid, (err: Error | null, key?: unknown) => {
     if (err) {
-      console.error('Fehler beim Abrufen des Signing-Keys:', err)
+      console.error('Error retrieving signing key:', err)
       return callback(err)
     }
 
     if (!key) {
-      return callback(new Error('Kein Schlüssel erhalten'))
+      return callback(new Error('No key received'))
     }
 
-    // Die API kann unterschiedlich sein - versuche verschiedene Zugriffsarten
+    // The API may be different - try different access methods
     let signingKey: string | undefined
 
-    // Versuche die verschiedenen möglichen API-Strukturen
+    // Try the various possible API structures
     if (typeof key === 'object' && key !== null) {
       const keyObj = key as Record<string, unknown>
 
@@ -58,15 +58,15 @@ const getKey = (header: jwt.JwtHeader, callback: (err: Error | null, key?: strin
       } else if (typeof keyObj.rsaPublicKey === 'string') {
         signingKey = keyObj.rsaPublicKey
       } else {
-        console.error('Unbekannte Schlüssel-Struktur:', Object.keys(keyObj))
-        return callback(new Error('Unbekannte Schlüssel-Struktur'))
+        console.error('Unknown key structure:', Object.keys(keyObj))
+        return callback(new Error('Unknown key structure'))
       }
     } else {
-      return callback(new Error('Schlüssel ist kein Objekt'))
+      return callback(new Error('Key is not an object'))
     }
 
     if (!signingKey) {
-      return callback(new Error('Konnte öffentlichen Schlüssel nicht extrahieren'))
+      return callback(new Error('Could not extract public key'))
     }
 
     callback(null, signingKey)
@@ -74,7 +74,7 @@ const getKey = (header: jwt.JwtHeader, callback: (err: Error | null, key?: strin
 }
 
 /**
- * Überprüft die Gültigkeit eines JWT-Tokens mit Keycloak JWKS
+ * Verifies the validity of a JWT token with Keycloak JWKS
  */
 export const verifyToken = async (token: string): Promise<jwt.JwtPayload | null> => {
   return new Promise((resolve, _reject) => {
@@ -88,7 +88,7 @@ export const verifyToken = async (token: string): Promise<jwt.JwtPayload | null>
       },
       (err, decoded) => {
         if (err) {
-          console.error('Token-Verifizierungsfehler:', err)
+          console.error('Token verification error:', err)
           return resolve(null)
         }
         resolve(decoded as jwt.JwtPayload)
@@ -98,16 +98,16 @@ export const verifyToken = async (token: string): Promise<jwt.JwtPayload | null>
 }
 
 /**
- * Erstellt den Kontext für den GraphQL-Server basierend auf der Anfrage
- * Wichtig: Für Neo4j GraphQL Library muss das Token direkt im Request Header bereitgestellt werden
+ * Creates the context for the GraphQL server based on the request
+ * Important: For Neo4j GraphQL Library the token must be provided directly in the request header
  */
 export const createContext = async ({ req }: { req: Request }) => {
-  // Token aus Header extrahieren
+  // Extract token from header
   const token = extractTokenFromHeader(req)
 
   if (!token) {
     return {
-      req, // Request für Neo4j GraphQL Library weiterleiten
+      req, // Forward request for Neo4j GraphQL Library
       token: null,
       jwt: null,
       isAuthenticated: false,
@@ -115,12 +115,12 @@ export const createContext = async ({ req }: { req: Request }) => {
     }
   }
 
-  // Token überprüfen (optional für Debug, aber Neo4j GraphQL Library macht eigene Verifikation)
+  // Verify token (optional for debug, but Neo4j GraphQL Library does its own verification)
   const user = await verifyToken(token)
 
   if (!user) {
     return {
-      req, // Request für Neo4j GraphQL Library weiterleiten
+      req, // Forward request for Neo4j GraphQL Library
       token: null,
       jwt: null,
       isAuthenticated: false,
@@ -128,8 +128,8 @@ export const createContext = async ({ req }: { req: Request }) => {
     }
   }
 
-  // Benutzer ist authentifiziert - Request mit Token für Neo4j GraphQL Library bereitstellen
-  // Rollen aus realm_access extrahieren und direkt im JWT verfügbar machen
+  // User is authenticated - provide request with token for Neo4j GraphQL Library
+  // Extract roles from realm_access and make directly available in JWT
   const jwtForNeo4j = {
     sub: user.sub,
     preferred_username: user.preferred_username,
@@ -138,9 +138,9 @@ export const createContext = async ({ req }: { req: Request }) => {
   }
 
   return {
-    req, // Request mit Authorization Header für Neo4j GraphQL Library
-    token: token, // Rohes Token für Neo4j GraphQL Library
-    jwt: jwtForNeo4j, // Angepasstes JWT für Neo4j GraphQL Library mit direkten Rollen
+    req, // Request with Authorization Header for Neo4j GraphQL Library
+    token: token, // Raw token for Neo4j GraphQL Library
+    jwt: jwtForNeo4j, // Adapted JWT for Neo4j GraphQL Library with direct roles
     isAuthenticated: true,
     user,
     roles: user.realm_access?.roles || [],

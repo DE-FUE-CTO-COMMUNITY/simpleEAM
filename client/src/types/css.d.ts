@@ -1,16 +1,16 @@
-/* Typdeklaration für CSS-Module */
+/* Type declaration for CSS modules */
 declare module '*.css' {
   const content: { [className: string]: string }
   export default content
 }
 
-/* Spezifische Typdeklaration für Excalidraw CSS */
+/* Specific type declaration for Excalidraw CSS */
 declare module '@excalidraw/excalidraw/index.css' {
   const content: any
   export default content
 }
 
-/* Typdeklaration für unsere Excalidraw Override-Styles */
+/* Type declaration for our Excalidraw override styles */
 declare module '@/styles/excalidraw-override.css' {
   const content: any
   export default content

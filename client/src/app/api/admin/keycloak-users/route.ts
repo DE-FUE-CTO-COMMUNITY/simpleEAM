@@ -1,20 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { withAuth } from '../../../../lib/auth-middleware'
 
-// Verfügbare Rollen im System
+// Available roles in the system
 const AVAILABLE_ROLES = ['viewer', 'architect', 'admin']
 
-// API Route für Keycloak Admin Operationen
+// API Route for Keycloak Admin operations
 export const GET = withAuth(async (request: NextRequest) => {
   const { searchParams } = new URL(request.url)
   const getRoles = searchParams.get('getRoles') === 'true'
 
-  // Wenn nur Rollen angefragt werden
+  // If only roles are requested
   if (getRoles) {
     return NextResponse.json({ roles: AVAILABLE_ROLES })
   }
   try {
-    // Admin Token holen
+    // Get admin token
     const keycloakUrl = process.env.NEXT_PUBLIC_KEYCLOAK_URL || 'https://auth.dev-server.mf2.eu'
     const realm = process.env.NEXT_PUBLIC_KEYCLOAK_REALM || 'simple-eam'
 
@@ -48,7 +48,7 @@ export const GET = withAuth(async (request: NextRequest) => {
     const tokenData = await tokenResponse.json()
     const adminToken = tokenData.access_token
 
-    // Benutzer laden
+    // Load users
     const usersResponse = await fetch(
       `${keycloakUrl}/admin/realms/${realm}/users?briefRepresentation=false`,
       {
@@ -72,7 +72,7 @@ export const GET = withAuth(async (request: NextRequest) => {
 
     const users = await usersResponse.json()
 
-    // Für jeden Benutzer die Rollen laden
+    // Load roles for each user
     const usersWithRoles = await Promise.all(
       users.map(async (user: any) => {
         if (user.id) {
@@ -120,7 +120,7 @@ export const POST = withAuth(async (request: NextRequest) => {
     const body = await request.json()
     const { action, userId, userData } = body
 
-    // Rolle aus userData extrahieren und entfernen (nur bei create/update)
+    // Extract role from userData and remove (only for create/update)
     let role = null
     let keycloakUserData = userData
 
@@ -132,7 +132,7 @@ export const POST = withAuth(async (request: NextRequest) => {
       keycloakUserData = restData
     }
 
-    // Admin Token holen
+    // Get admin token
     const keycloakUrl = process.env.NEXT_PUBLIC_KEYCLOAK_URL || 'https://auth.dev-server.mf2.eu'
     const realm = process.env.NEXT_PUBLIC_KEYCLOAK_REALM || 'simple-eam'
 
@@ -170,10 +170,10 @@ export const POST = withAuth(async (request: NextRequest) => {
 
     switch (action) {
       case 'create': {
-        // Benutzer erstellen (ohne role Property) aber mit requiredActions für Passwort-Setup
+        // Create user (without role property) but with requiredActions for password setup
         const userDataWithActions = {
           ...keycloakUserData,
-          requiredActions: ['UPDATE_PASSWORD'], // Benutzer muss beim ersten Login Passwort setzen
+          requiredActions: ["UPDATE_PASSWORD"], // User must set password on first login
         }
 
         apiResponse = await fetch(`${keycloakUrl}/admin/realms/${realm}/users`, {
@@ -185,15 +185,15 @@ export const POST = withAuth(async (request: NextRequest) => {
           body: JSON.stringify(userDataWithActions),
         })
 
-        // Nach erfolgreichem Erstellen die Rolle setzen, falls angegeben
+        // After successful creation, set role if specified
         if (apiResponse.ok && role) {
           try {
-            // Benutzer-ID aus dem Location-Header extrahieren
+            // Extract user ID from Location header
             const location = apiResponse.headers.get('location')
             const extractedUserId = location?.split('/').pop()
 
             if (extractedUserId) {
-              // Rolle dem Benutzer zuweisen
+              // Assign role to user
               await assignRoleToUser(keycloakUrl, realm, adminToken, extractedUserId, role)
             }
           } catch (roleError) {
@@ -207,7 +207,7 @@ export const POST = withAuth(async (request: NextRequest) => {
       }
 
       case 'update': {
-        // Benutzer aktualisieren (ohne role Property)
+        // Update user (without role property)
         apiResponse = await fetch(`${keycloakUrl}/admin/realms/${realm}/users/${userId}`, {
           method: 'PUT',
           headers: {
@@ -217,7 +217,7 @@ export const POST = withAuth(async (request: NextRequest) => {
           body: JSON.stringify(keycloakUserData),
         })
 
-        // Nach erfolgreichem Update die Rolle setzen, falls angegeben
+        // After successful update, set role if specified
         if (apiResponse.ok && role) {
           try {
             await assignRoleToUser(keycloakUrl, realm, adminToken, userId, role)
@@ -248,7 +248,7 @@ export const POST = withAuth(async (request: NextRequest) => {
           return NextResponse.json({ error: 'Password is required' }, { status: 400 })
         }
 
-        // Passwort zurücksetzen
+        // Reset password
         apiResponse = await fetch(
           `${keycloakUrl}/admin/realms/${realm}/users/${userId}/reset-password`,
           {
@@ -265,9 +265,9 @@ export const POST = withAuth(async (request: NextRequest) => {
           }
         )
 
-        // Wenn das Passwort erfolgreich gesetzt wurde, requiredActions aktualisieren
+        // If password was successfully set, update requiredActions
         if (apiResponse.ok) {
-          // Benutzer-Daten laden, um aktuelle requiredActions zu bekommen
+          // Load user data to get current requiredActions
           const userResponse = await fetch(`${keycloakUrl}/admin/realms/${realm}/users/${userId}`, {
             headers: {
               Authorization: `Bearer ${adminToken}`,
@@ -279,17 +279,17 @@ export const POST = withAuth(async (request: NextRequest) => {
             const userData = await userResponse.json()
             let requiredActions = userData.requiredActions || []
 
-            // Merken, ob der Benutzer vorher bereits UPDATE_PASSWORD hatte (= hatte noch nie ein Passwort)
+            // Remember if user previously had UPDATE_PASSWORD (= never had a password)
             const hadNoPasswordBefore = requiredActions.includes('UPDATE_PASSWORD')
 
-            // UPDATE_PASSWORD aus requiredActions entfernen, da jetzt ein Passwort gesetzt ist
+            // Remove UPDATE_PASSWORD from requiredActions since a password is now set
             requiredActions = requiredActions.filter(
               (action: string) => action !== 'UPDATE_PASSWORD'
             )
 
-            // Wenn temporäres Passwort gesetzt wurde:
-            // - Neue Benutzer (hatten UPDATE_PASSWORD): Behalten UPDATE_PASSWORD
-            // - Bestehende Benutzer (hatten kein UPDATE_PASSWORD): Bekommen UPDATE_PASSWORD nur als temporäre Maßnahme
+            // If temporary password was set:
+            // - New users (had UPDATE_PASSWORD): Keep UPDATE_PASSWORD
+            // - Existing users (had no UPDATE_PASSWORD): Get UPDATE_PASSWORD only as temporary measure
             if (temporary !== false) {
               requiredActions.push('UPDATE_PASSWORD')
             }
@@ -304,7 +304,7 @@ export const POST = withAuth(async (request: NextRequest) => {
               body: JSON.stringify({
                 ...userData,
                 requiredActions,
-                // Zusätzlich: Markiere in User-Attributen, ob dies der erste Passwort-Set war
+                // Additionally: Mark in user attributes whether this was the first password set
                 attributes: {
                   ...userData.attributes,
                   firstPasswordSet: hadNoPasswordBefore
@@ -333,17 +333,17 @@ export const POST = withAuth(async (request: NextRequest) => {
       )
     }
 
-    // 204 No Content für erfolgreiche Updates/Deletes
+    // 204 No Content for successful updates/deletes
     if (apiResponse.status === 204) {
       return NextResponse.json({ success: true })
     }
 
-    // 201 Created für erfolgreiche Creates (oft ohne JSON Body)
+    // 201 Created for successful creates (often without JSON body)
     if (apiResponse.status === 201) {
       return NextResponse.json({ success: true, message: 'User created successfully' })
     }
 
-    // Nur JSON parsen, wenn Content vorhanden ist
+    // Only parse JSON if content is present
     const contentLength = apiResponse.headers.get('content-length')
     const contentType = apiResponse.headers.get('content-type')
 
@@ -370,7 +370,7 @@ export const POST = withAuth(async (request: NextRequest) => {
   }
 }, true) // true = requireAdmin
 
-// Hilfsfunktion: Rolle einem Benutzer zuweisen
+// Helper function: Assign role to user
 async function assignRoleToUser(
   keycloakUrl: string,
   realm: string,
@@ -378,7 +378,7 @@ async function assignRoleToUser(
   userId: string,
   roleName: string
 ) {
-  // Zuerst alle aktuellen Rollen des Benutzers abrufen
+  // First fetch all current roles of the user
   const currentRolesResponse = await fetch(
     `${keycloakUrl}/admin/realms/${realm}/users/${userId}/role-mappings/realm`,
     {
@@ -392,7 +392,7 @@ async function assignRoleToUser(
   if (currentRolesResponse.ok) {
     const currentRoles = await currentRolesResponse.json()
 
-    // Alle aktuellen Rollen entfernen (sowohl unsere AVAILABLE_ROLES als auch Default-Rollen)
+    // Remove all current roles (both our AVAILABLE_ROLES and default roles)
     const rolesToRemove = currentRoles.filter(
       (role: any) => AVAILABLE_ROLES.includes(role.name) || role.name.startsWith('default-roles-')
     )
@@ -409,7 +409,7 @@ async function assignRoleToUser(
     }
   }
 
-  // Rolle-Details abrufen
+  // Fetch role details
   const roleResponse = await fetch(`${keycloakUrl}/admin/realms/${realm}/roles/${roleName}`, {
     headers: {
       Authorization: `Bearer ${adminToken}`,
@@ -423,7 +423,7 @@ async function assignRoleToUser(
 
   const role = await roleResponse.json()
 
-  // Neue Rolle zuweisen
+  // Assign new role
   const assignResponse = await fetch(
     `${keycloakUrl}/admin/realms/${realm}/users/${userId}/role-mappings/realm`,
     {

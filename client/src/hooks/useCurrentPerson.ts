@@ -4,7 +4,7 @@ import { GET_PERSON_BY_EMAIL } from '@/graphql/person'
 
 /**
  * Hook zum Abrufen der aktuellen Person basierend auf der Keycloak-E-Mail
- * Kann als Standard-Owner für neue Entities verwendet werden
+ * Can be used as default owner for new entities
  */
 export const useCurrentPerson = () => {
   const { keycloak, authenticated } = useAuth()

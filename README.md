@@ -1,147 +1,159 @@
 # Simple-EAM (Enterprise Architecture Management)
 
-> **🤖 AI-Generated Project**: Dieser Code wurde vollständig mit GitHub Copilot im Agent-Modus erstellt. Das gesamte Projekt, einschließlich Architektur, Implementation und Dokumentation, wurde durch AI-gestützte Entwicklung realisiert.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](./VERSION)
 
-Ein modernes Enterprise Architecture Management System, das Unternehmen dabei unterstützt, ihre IT-Landschaft zu verwalten, zu visualisieren und zu optimieren.
+> **🤖 AI-Generated Project**: This code was fully created with GitHub Copilot in Agent mode. The entire project, including architecture, implementation and documentation, was realized through AI-assisted development.
+
+A modern Enterprise Architecture Management system that helps organizations manage, visualize and optimize their IT landscape.
 
 ## 🚀 Features
 
-- **Grafische Darstellung**: Visualisierung von IT-Architekturen mit Excalidraw
-- **Komponenten-Management**: Verwaltung von Anwendungen, Services, Datenbanken und Infrastruktur
-- **Relationship-Mapping**: Darstellung von Abhängigkeiten zwischen Komponenten
-- **Multi-Language Support**: Deutsch und Englisch
-- **Moderne Tech-Stack**: Next.js 15, Material-UI 7, Neo4j, GraphQL
+- **Visual Representation**: IT architecture visualization with Excalidraw
+- **Component Management**: Manage applications, services, databases and infrastructure
+- **Relationship Mapping**: Display dependencies between components
+- **Multi-Language Support**: German and English
+- **Modern Tech Stack**: Next.js 15, Material-UI 7, Neo4j, GraphQL
+- **Runtime Configuration**: Change settings without rebuilding
+- **Secure Authentication**: Keycloak integration with role-based access control
 
-## 🛠️ Technologie-Stack
+## 🛠️ Technology Stack
 
 ### Frontend
 
-- **Next.js 15**: React-Framework mit App Router
-- **Material-UI 7**: UI-Komponentenbibliothek
-- **TypeScript**: Typsichere Entwicklung
-- **Tanstack Table V8**: Erweiterte Tabellenfunktionen
-- **Tanstack Form**: Leistungsstarke Formularerstellung
-- **Apollo Client**: GraphQL-Client
-- **Excalidraw**: Diagramm-Editor
+- **Next.js 15**: React framework with App Router
+- **Material-UI 7**: UI component library
+- **TypeScript**: Type-safe development
+- **Tanstack Table V8**: Advanced table functionality
+- **Tanstack Form**: Powerful form creation
+- **Apollo Client**: GraphQL client
+- **Excalidraw**: Diagram editor
 
 ### Backend
 
-- **GraphQL**: API-Schicht
-- **Neo4j**: Graphdatenbank für Architekturmodelle
-- **Node.js**: Server-Runtime
+- **GraphQL**: API layer
+- **Neo4j**: Graph database for architecture models
+- **Node.js**: Server runtime
 
 ### Infrastructure
 
-- **Docker**: Containerisierung
-- **Keycloak**: Authentifizierung und Autorisierung
-- **Yarn Berry**: Paketmanager
+- **Docker**: Containerization
+- **Keycloak**: Authentication and authorization
+- **Yarn Berry**: Package manager
 
-## 📋 Voraussetzungen
+## 📋 Prerequisites
 
 - Node.js 18+
 - Docker & Docker Compose
-- Yarn Berry (wird automatisch konfiguriert)
+- Yarn Berry (automatically configured)
 
 ## 🚀 Installation
 
-1. **Repository klonen**
+1. **Clone repository**
 
 ```bash
 git clone https://github.com/marcus-friedrich/simple-eam.git
 cd simple-eam
 ```
 
-2. **Dependencies installieren**
+2. **Install dependencies**
 
 ```bash
 yarn install
 ```
 
-3. **Umgebungsvariablen konfigurieren**
+3. **Configure environment variables**
 
 ```bash
 cp env.sample .env
-# Anpassen der Variablen nach Bedarf
+# Adjust variables as needed
 ```
 
-4. **Docker Services starten**
+4. **Start Docker services**
 
 ```bash
 docker-compose up -d
 ```
 
-5. **Development Server starten**
+5. **Start development server**
 
 ```bash
 cd client
 yarn dev
 ```
 
-Die Anwendung ist dann verfügbar unter: http://localhost:3000
+The application is then available at: http://localhost:3000
 
-## 📁 Projektstruktur
+## 📁 Project Structure
 
 ```
 simple-eam/
-├── auth/                   # Keycloak-Konfiguration
-├── client/                 # Next.js-Frontend
+├── auth/                   # Keycloak configuration
+├── client/                 # Next.js frontend
 │   ├── src/
 │   │   ├── app/           # Next.js App Router
-│   │   ├── components/    # React-Komponenten
-│   │   └── graphql/       # GraphQL-Queries
-├── db/                     # Neo4j-Datenbank
-├── server/                 # GraphQL-Server
-├── templates/              # Entity-Templates
-├── scripts/               # Automatisierungsscripts
-└── docs/                  # Dokumentation
+│   │   ├── components/    # React components
+│   │   └── graphql/       # GraphQL queries
+├── db/                     # Neo4j database
+├── server/                 # GraphQL server
+├── templates/              # Entity templates
+├── scripts/               # Automation scripts
+└── docs/                  # Documentation
 ```
 
-## 🎯 Entity-Generierung
+## 🎯 Entity Generation
 
-Das Projekt verwendet ein Template-System zur automatischen Generierung neuer Entities:
+The project uses a template system for automatic generation of new entities:
 
 ```bash
 ./scripts/create-entity.sh [entity-name]
 ```
 
-Beispiel:
+Example:
 
 ```bash
 ./scripts/create-entity.sh companies
 ```
 
-## 🔧 Entwicklung
+## 🔧 Development
 
-### Verfügbare Scripts
+### Available Scripts
 
 ```bash
 # Frontend Development
-yarn dev              # Startet den Development Server
-yarn build            # Erstellt eine Production Build
-yarn lint             # Führt ESLint aus
+yarn dev              # Start development server
+yarn build            # Create production build
+yarn lint             # Run ESLint
+
+# Version Management
+yarn version          # Show current version
+yarn version:patch    # Increment patch version (1.0.0 -> 1.0.1)
+yarn version:minor    # Increment minor version (1.0.0 -> 1.1.0)
+yarn version:major    # Increment major version (1.0.0 -> 2.0.0)
 
 # Entity Management
-./scripts/create-entity.sh [name]  # Erstellt neue Entity
+./scripts/create-entity.sh [name]  # Create new entity
 
 # Docker
-docker-compose up -d   # Startet alle Services
-docker-compose down    # Stoppt alle Services
+docker-compose up -d   # Start all services
+docker-compose down    # Stop all services
 ```
 
-### Code-Standards
+### Code Standards
 
-- **TypeScript**: Strenge Typisierung
-- **ESLint**: Code-Qualität
-- **Prettier**: Code-Formatierung
-- **Conventional Commits**: Standardisierte Commit-Messages
+- **TypeScript**: Strict typing
+- **ESLint**: Code quality
+- **Prettier**: Code formatting
+- **Conventional Commits**: Standardized commit messages
 
-## 📚 Dokumentation
+## 📚 Documentation
 
-Detaillierte Dokumentation finden Sie im [`docs/`](./docs/) Verzeichnis:
+Detailed documentation can be found in the [`docs/`](./docs/) directory:
 
-- [Architektur-Übersicht](./docs/README.md)
-- [Entity-Pattern](./docs/ENTITY-IMPLEMENTATION-PATTERN.md)
-- [Entwicklungs-Guidelines](./docs/CONTRIBUTING.md)
+- [Architecture Overview](./docs/README.md)
+- [Entity Pattern](./docs/ENTITY-IMPLEMENTATION-PATTERN.md)
+- [Development Guidelines](./docs/CONTRIBUTING.md)
+- [Runtime Configuration](./RUNTIME_CONFIG.md)
 
 ## 🌐 Services
 
@@ -152,19 +164,19 @@ Detaillierte Dokumentation finden Sie im [`docs/`](./docs/) Verzeichnis:
 
 ## 🤝 Contributing
 
-1. Fork das Repository
-2. Erstelle einen Feature-Branch (`git checkout -b feature/AmazingFeature`)
-3. Committe deine Änderungen (`git commit -m 'Add some AmazingFeature'`)
-4. Push zum Branch (`git push origin feature/AmazingFeature`)
-5. Öffne eine Pull Request
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-## 📄 Lizenz
+## 📄 License
 
-Dieses Projekt steht unter der MIT-Lizenz. Copyright (c) 2025 Atos. Siehe [LICENSE](LICENSE) Datei für Details.
+This project is licensed under the MIT License. See [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
-- Erstellt mit GitHub Copilot Agent-Modus
-- Material-UI für die UI-Komponenten
-- Neo4j für die Graphdatenbank
-- Excalidraw für die Diagramm-Funktionalität
+- Created with GitHub Copilot Agent mode
+- Material-UI for UI components
+- Neo4j for graph database
+- Excalidraw for diagram functionality

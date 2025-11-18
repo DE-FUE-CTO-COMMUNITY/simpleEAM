@@ -17,7 +17,7 @@ interface ApplicationToolbarWithGenericProps {
 }
 
 /**
- * Eine Toolbar speziell für Applikationen, die die GenericToolbar-Komponente verwendet.
+ * A toolbar specifically for applications that uses the GenericToolbar component.
  */
 const ApplicationToolbarWithGeneric: React.FC<ApplicationToolbarWithGenericProps> = ({
   table,
@@ -34,7 +34,7 @@ const ApplicationToolbarWithGeneric: React.FC<ApplicationToolbarWithGenericProps
       showClearSearchButton={true}
       table={table}
       enableColumnVisibilityToggle={enableColumnVisibilityToggle}
-      tableKey="applications" // Eindeutiger Schlüssel für die Applications-Tabelle
+      tableKey="applications" // Unique key for applications table
       defaultColumnVisibility={defaultColumnVisibility}
     />
   )

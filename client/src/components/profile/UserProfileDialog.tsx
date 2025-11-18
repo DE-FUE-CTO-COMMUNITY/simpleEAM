@@ -93,7 +93,7 @@ const UserProfileDialog: React.FC<UserProfileDialogProps> = ({
     }
   }, [])
 
-  // GraphQL-Abfrage für Person-Daten basierend auf E-Mail
+  // GraphQL query for Person data based on email
   const { loading, error, data, refetch } = useQuery(GET_PERSON_BY_EMAIL, {
     variables: { email: userEmail || '' },
     skip: !userEmail || !authenticated,
@@ -172,9 +172,9 @@ const UserProfileDialog: React.FC<UserProfileDialogProps> = ({
       }
     },
     validators: {
-      // Primäre Validierung bei Änderungen
+      // Primary validation on changes
       onChange: undefined,
-      // Validierung beim Absenden
+      // Validation on submit
       onSubmit: undefined,
     },
   })

@@ -18,7 +18,7 @@ interface ArchitectureToolbarProps {
 }
 
 /**
- * Eine Toolbar speziell für Architekturen, die die GenericToolbar-Komponente verwendet.
+ * A toolbar specifically for architectures that uses the GenericToolbar component.
  */
 const ArchitectureToolbar: React.FC<ArchitectureToolbarProps> = ({
   globalFilter,
@@ -43,7 +43,7 @@ const ArchitectureToolbar: React.FC<ArchitectureToolbarProps> = ({
       entityName={tArch('form.entityName')}
       table={table}
       enableColumnVisibilityToggle={enableColumnVisibilityToggle}
-      tableKey="architectures" // Eindeutiger Schlüssel für die Architectures-Tabelle
+      tableKey="architectures" // Unique key for the architectures table
       defaultColumnVisibility={defaultColumnVisibility}
     />
   )

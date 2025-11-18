@@ -17,7 +17,7 @@ import {
   Company,
 } from '../../gql/generated'
 
-// Nutze den generierten Typ als Basis und passe ihn für unsere Komponenten an
+// Use the generated type as basis and adapt it for our components
 export type AicomponentType = Pick<
   GeneratedAiComponent,
   | 'id'

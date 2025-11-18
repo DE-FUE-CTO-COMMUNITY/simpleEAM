@@ -15,12 +15,12 @@ const GRAPHQL_URL = process.env.NEXT_PUBLIC_GRAPHQL_URL || 'https://api.dev-serv
 
 export const POST = withAuth(async (request: NextRequest, auth: AuthResult) => {
   try {
-    // Nur Admins dürfen diese Aktion ausführen (zusätzliche Absicherung)
+    // Only admins are allowed to execute this action (zusätzliche Absicherung)
     if (!auth.isAdmin) {
       return NextResponse.json({ error: 'Admin privileges required' }, { status: 403 })
     }
 
-    // Admin-Token für Keycloak Admin API holen
+    // Retrieve admin token for Keycloak Admin API
     const adminTokenResp = await fetch(
       `${KEYCLOAK_URL}/realms/master/protocol/openid-connect/token`,
       {
@@ -43,7 +43,7 @@ export const POST = withAuth(async (request: NextRequest, auth: AuthResult) => {
     }
     const { access_token: adminToken } = await adminTokenResp.json()
 
-    // Alle Benutzer laden
+    // Load all users
     const usersResp = await fetch(
       `${KEYCLOAK_URL}/admin/realms/${REALM}/users?briefRepresentation=false`,
       { headers: { Authorization: `Bearer ${adminToken}`, 'Content-Type': 'application/json' } }
@@ -57,12 +57,12 @@ export const POST = withAuth(async (request: NextRequest, auth: AuthResult) => {
     }
     const users: any[] = await usersResp.json()
 
-    // Adminsenden Token des aufrufenden Admins fürs GraphQL verwenden
+    // Use calling admin token for GraphQL
     const bearer = request.headers.get('authorization') || ''
 
     const results: SyncResultItem[] = []
 
-    // Seriell iterieren, um Keycloak/Graph nicht zu überlasten
+    // Iterate serially to avoid overloading
     for (const user of users) {
       const userId: string | undefined = user?.id
       const email: string | undefined = user?.email
@@ -109,17 +109,17 @@ export const POST = withAuth(async (request: NextRequest, auth: AuthResult) => {
         const gqlData = await gqlResp.json()
         const people = gqlData?.data?.people || []
 
-        // Person.company ist ein Array -> IDs extrahieren
+        // Person.company is an array -> extract IDs
         const companies = (people[0]?.company ?? []) as Array<{ id?: string }>
         const companyIdsRaw: string[] = Array.isArray(companies)
           ? companies.map(c => c.id).filter((id): id is string => Boolean(id))
           : []
 
-        // Normalisieren: eindeutige, sortierte Liste für stabilen Vergleich
+        // Normalize: unique, sorted list for stable comparison
         const normalize = (arr: string[]) => Array.from(new Set(arr)).sort()
         const companyIds = normalize(companyIdsRaw)
 
-        // Aktuellen Benutzer aus Keycloak laden, um Attribute zu mergen
+        // Load current user from Keycloak to merge attributes
         const kcUserResp = await fetch(`${KEYCLOAK_URL}/admin/realms/${REALM}/users/${userId}`, {
           headers: { Authorization: `Bearer ${adminToken}`, 'Content-Type': 'application/json' },
         })
@@ -137,7 +137,7 @@ export const POST = withAuth(async (request: NextRequest, auth: AuthResult) => {
         const kcUser = await kcUserResp.json()
         const existingAttributes = (kcUser.attributes || {}) as Record<string, any>
 
-        // Nur updaten, wenn sich etwas ändert
+        // Only update if something changes
         const prevRaw = (existingAttributes.company_ids as string[]) || []
         const prev = Array.isArray(prevRaw) ? prevRaw : []
         const same = normalize(prev).join(',') === companyIds.join(',')

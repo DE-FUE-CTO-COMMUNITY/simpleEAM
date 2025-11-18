@@ -10,10 +10,10 @@ import { generateExcalidrawThemeCSS } from './excalidraw-theme-adapter'
 // Generiere CSS basierend auf aktuellen Umgebungsvariablen
 const dynamicCSS = generateExcalidrawThemeCSS()
 
-// CSS als String exportieren für dynamische Injection
+// Export CSS as string for dynamic injection
 export default dynamicCSS
 
-// Funktion zum Injizieren des CSS in den DOM
+// Function to inject CSS into DOM
 export function injectExcalidrawThemeCSS(_mode: 'light' | 'dark' = 'light') {
   if (typeof document === 'undefined') {
     return // Server-side rendering guard
@@ -28,12 +28,12 @@ export function injectExcalidrawThemeCSS(_mode: 'light' | 'dark' = 'light') {
   // Generiere CSS basierend auf dem aktuellen Mode
   const dynamicCSS = generateExcalidrawThemeCSS()
 
-  // Neues Style-Element erstellen
+  // Create new style element
   const styleElement = document.createElement('style')
   styleElement.id = 'excalidraw-dynamic-theme'
   styleElement.type = 'text/css'
   styleElement.textContent = dynamicCSS
 
-  // CSS mit höchster Priorität einfügen
+  // Insert CSS with highest priority
   document.head.appendChild(styleElement)
 }

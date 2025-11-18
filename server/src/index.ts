@@ -6,57 +6,57 @@ import dotenv from 'dotenv'
 import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core'
 import http from 'http'
 
-// Eigene Module importieren
+// Import custom modules
 import { testConnection, closeDriver } from './db/neo4j-client'
 import { neoSchema } from './graphql/schema'
 
-// Umgebungsvariablen laden
+// Load environment variables
 dotenv.config()
 
-// Server-Portnummer (standardmäßig 4000)
+// Server port number (by default 4000)
 const PORT = parseInt(process.env.PORT || '4000')
 
 async function startServer() {
-  // Neo4j-Verbindung testen
+  // Test Neo4j connection
   const connectionSuccessful = await testConnection()
   if (!connectionSuccessful) {
-    console.error('Kritischer Fehler: Neo4j-Verbindung konnte nicht hergestellt werden.')
+    console.error('Critical error: Could not establish Neo4j connection.')
     process.exit(1)
   }
 
-  // Express-App initialisieren
+  // Initialize Express app
   const app = express()
 
-  // HTTP-Server erstellen
+  // Create HTTP server
   const httpServer = http.createServer(app)
 
-  // Middleware konfigurieren
+  // Configure middleware
   app.use(cors())
   app.use(
     helmet({ contentSecurityPolicy: process.env.NODE_ENV === 'production' ? undefined : false })
   )
 
-  // Erhöhe die Body-Parser-Limits für große Diagramm-Payloads
+  // Increase body parser limits for large diagram payloads
   app.use(express.json({ limit: '50mb' }))
   app.use(express.urlencoded({ limit: '50mb', extended: true }))
 
-  // GraphQL-Schema erstellen
+  // Create GraphQL schema
   const schema = await neoSchema.getSchema()
 
-  // Apollo-Server initialisieren
+  // Initialize Apollo server
   const server = new ApolloServer({
     schema,
     context: ({ req }) => ({
-      token: req.headers.authorization, // Token direkt aus Authorization Header an Neo4j GraphQL Library weitergeben
+      token: req.headers.authorization, // Token directly from Authorization header forward to Neo4j GraphQL Library
     }),
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
-    introspection: true, // Für Entwicklung aktivieren
+    introspection: true, // Enable for development
   })
 
-  // Apollo-Server starten
+  // Start Apollo server
   await server.start()
 
-  // Apollo-Middleware an Express anbinden mit erweiterten Body-Parser-Optionen
+  // Connect Apollo middleware to Express with extended body parser options
   server.applyMiddleware({
     app,
     path: '/graphql',
@@ -65,7 +65,7 @@ async function startServer() {
     },
   })
 
-  // Gesundheitsprüfung-Endpunkt
+  // Health check endpoint
   app.get('/health', (_, res) => {
     res.status(200).json({
       status: 'ok',
@@ -73,15 +73,15 @@ async function startServer() {
     })
   })
 
-  // Server starten
+  // Start server
   httpServer.listen(PORT, () => {
-    console.log(`🚀 Server gestartet auf http://localhost:${PORT}${server.graphqlPath}`)
-    console.log(`📊 Gesundheitsprüfung verfügbar auf http://localhost:${PORT}/health`)
+    console.log(`🚀 Server started at http://localhost:${PORT}${server.graphqlPath}`)
+    console.log(`📊 Health check available at http://localhost:${PORT}/health`)
   })
 
-  // Aufräumen bei Server-Beendigung
+  // Cleanup on server termination
   const cleanup = async () => {
-    console.log('Server wird heruntergefahren...')
+    console.log('Server is shutting down...')
     await closeDriver()
     process.exit(0)
   }
@@ -90,8 +90,8 @@ async function startServer() {
   process.on('SIGTERM', cleanup)
 }
 
-// Server starten und Fehler abfangen
+// Start server and catch errors
 startServer().catch(error => {
-  console.error('Serverfehler:', error)
+  console.error('Server error:', error)
   process.exit(1)
 })

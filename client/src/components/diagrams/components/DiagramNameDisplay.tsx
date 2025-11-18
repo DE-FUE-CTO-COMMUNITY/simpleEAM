@@ -11,7 +11,7 @@ interface DiagramNameDisplayProps {
   isCollaborating?: boolean
 }
 
-// Basis-Styling für den Chip - hasUnsavedChanges Funktionalität deaktiviert
+// Base styling for chip - hasUnsavedChanges functionality disabled
 const DiagramNameChip = styled(Chip)(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
   color: theme.palette.text.primary,
@@ -40,8 +40,8 @@ const DiagramNameChip = styled(Chip)(({ theme }) => ({
 
 const DiagramNameDisplay: React.FC<DiagramNameDisplayProps> = ({
   currentDiagram,
-  hasUnsavedChanges: _hasUnsavedChanges = false, // Parameter beibehalten für Kompatibilität, aber nicht verwenden
-  onSaveClick: _onSaveClick, // Parameter beibehalten für Kompatibilität, aber nicht verwenden
+  hasUnsavedChanges: _hasUnsavedChanges = false, // Keep parameter for compatibility but do not use
+  onSaveClick: _onSaveClick, // Keep parameter for compatibility but do not use
   isCollaborating = false,
 }) => {
   const t = useTranslations('diagrams')

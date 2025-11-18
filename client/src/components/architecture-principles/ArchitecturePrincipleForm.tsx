@@ -15,7 +15,7 @@ import GenericForm, { FieldConfig, TabConfig } from '../common/GenericForm'
 import { isArchitect } from '@/lib/auth'
 import { useCategoryLabel, usePriorityLabel } from './utils'
 
-// Schema für die Formularvalidierung
+// Schema for form validation
 export const architecturePrincipleSchema = z.object({
   name: z
     .string()
@@ -68,7 +68,7 @@ const ArchitecturePrincipleForm: React.FC<
     variables: { where: personWhere },
   })
 
-  // Architekturen und Applikationen nur innerhalb der ausgewählten Company laden
+  // Load architectures and applications only within selected company
   const companyWhere = useCompanyWhere('company')
   const { data: architectureData, loading: architectureLoading } = useQuery(GET_ARCHITECTURES, {
     variables: { where: companyWhere },
@@ -77,7 +77,7 @@ const ArchitecturePrincipleForm: React.FC<
     variables: { where: companyWhere },
   })
 
-  // Formulardaten mit useMemo initialisieren
+  // Initialize form data with useMemo
   const defaultValues = React.useMemo<ArchitecturePrincipleFormValues>(
     () => ({
       name: '',
@@ -100,7 +100,7 @@ const ArchitecturePrincipleForm: React.FC<
     defaultValues,
     onSubmit: async ({ value }) => {
       if (onSubmit) {
-        // Bereinige alle Werte vor der Übermittlung
+        // Clean all values before submission
         const submissionData = {
           ...value,
           name: value.name || '',
@@ -123,12 +123,12 @@ const ArchitecturePrincipleForm: React.FC<
         await onSubmit(submissionData)
       }
     },
-    // Benutzerdefinierte Validierungsfunktionen für TanStack Form
+    // Custom validation functions for TanStack Form
     validators: {
-      // Primäre Validierungsfunktion für Änderungen
+      // Primary validation function for changes
       onChange: formState => {
         try {
-          // formState enthält die Werte im value-Property
+          // formState contains values in value property
           const values = formState.value
 
           if (!values) {
@@ -145,7 +145,7 @@ const ArchitecturePrincipleForm: React.FC<
             isActive: values.isActive !== undefined ? values.isActive : true,
           }
 
-          // Schema-Validierung durchführen
+          // Perform schema validation
           architecturePrincipleSchema.parse(validationData)
           return undefined // Kein Fehler
         } catch (e) {
@@ -158,7 +158,7 @@ const ArchitecturePrincipleForm: React.FC<
       // Finale Validierung beim Absenden
       onSubmit: formState => {
         try {
-          // formState enthält die Werte im value-Property
+          // formState contains values in value property
           const values = formState.value
 
           if (!values) {
@@ -175,7 +175,7 @@ const ArchitecturePrincipleForm: React.FC<
             isActive: values.isActive !== undefined ? values.isActive : true,
           }
 
-          // Schema-Validierung durchführen
+          // Perform schema validation
           architecturePrincipleSchema.parse(validationData)
           return undefined // Kein Fehler
         } catch (e) {
@@ -188,29 +188,29 @@ const ArchitecturePrincipleForm: React.FC<
     },
   })
 
-  // 1. useEffect für das Initialisieren und Zurücksetzen des Formulars beim Öffnen/Schließen
+  // 1. useEffect for initializing and resetting form when opening/closing
   useEffect(() => {
     if (!isOpen) {
-      // Dialog wird geschlossen - setze Form zurück
+      // Dialog is being closed - reset form
       form.reset()
       return
     }
 
-    // Dialog wurde gerade geöffnet - form initialisieren
+    // Dialog just opened - initialize form
     if (mode === 'create') {
       // Im Create-Modus mit defaultValues initialisieren
       form.reset(defaultValues)
     }
     // Bei 'edit' und 'view' wird das Form separat mit principle-Daten initialisiert
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen]) // Nur abhängig vom Dialog-Status
+  }, [isOpen]) // Only dependent on dialog status
 
-  // 2. Separater useEffect für die Aktualisierung mit ArchitecturePrinciple-Daten
-  // Dieser wird nur ausgeführt, wenn principle sich ändert oder der Mode wechselt
+  // 2. Separate useEffect for updating with ArchitecturePrinciple data
+  // This only executes when principle changes or mode switches
   const principleId = principle?.id // Stabile ID-Referenz
 
   useEffect(() => {
-    // Wenn kein Principle-Objekt oder Dialog nicht geöffnet, nichts tun
+    // If no principle object or dialog not open, do nothing
     if (!principle || !isOpen || mode === 'create') {
       return
     }
@@ -231,9 +231,9 @@ const ArchitecturePrincipleForm: React.FC<
         implementedByApplicationIds: principle.implementedByApplications?.map(app => app.id) || [],
       }
 
-      // Verwende setValues statt reset, um keine neuen Re-Renders auszulösen
+      // Use setValues instead of reset to avoid triggering new re-renders
       Object.entries(resetValues).forEach(([key, value]) => {
-        // TypeScript-Casting für value, um den Compiler-Fehler zu beheben
+        // TypeScript casting for value to fix compiler error
         form.setFieldValue(key as any, value as any)
       })
     } catch (error) {
@@ -242,13 +242,13 @@ const ArchitecturePrincipleForm: React.FC<
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [principleId, isOpen, mode])
 
-  // Tab-Konfiguration für die zwei Tabs
+  // Tab configuration for the two tabs
   const tabs: TabConfig[] = [
     { id: 'general', label: t('tabs.general') },
     { id: 'relationships', label: t('tabs.relationships') },
   ]
 
-  // Feldkonfiguration für das generische Formular
+  // Field configuration for the generic form
   interface SelectOption {
     value: string | number | boolean
     label: string
@@ -261,7 +261,7 @@ const ArchitecturePrincipleForm: React.FC<
     size?: { xs: number; md: number } | number
   }
 
-  // Allgemeine Felder für den ersten Tab
+  // General fields for first tab
   const generalFields: FieldConfigWithSelect[] = [
     {
       name: 'name',
@@ -363,7 +363,7 @@ const ArchitecturePrincipleForm: React.FC<
     },
   ]
 
-  // Beziehungsfelder für den zweiten Tab
+  // Relationship fields for second tab
   const relationshipFields: FieldConfigWithSelect[] = [
     {
       name: 'appliedInArchitectureIds',
@@ -397,10 +397,10 @@ const ArchitecturePrincipleForm: React.FC<
     },
   ]
 
-  // Alle Felder zusammenfügen
+  // Combine all fields
   const fields: FieldConfigWithSelect[] = [...generalFields, ...relationshipFields]
 
-  // Standardwerte für optionale Props bereitstellen
+  // Provide default values for optional props
   const formMode = mode || 'view'
   const formIsOpen = isOpen !== undefined ? isOpen : true
   const formLoading = loading || false

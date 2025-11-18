@@ -51,7 +51,7 @@ const baseApplicationSchema = z.object({
     .max(1000, 'Die Beschreibung darf maximal 1000 Zeichen lang sein'),
   status: z.nativeEnum(ApplicationStatus),
   criticality: z.nativeEnum(CriticalityLevel),
-  costs: z.number().min(0, 'Kosten müssen 0 oder höher sein').optional().nullable(),
+  costs: z.number().min(0, 'Costs must be 0 or higher').optional().nullable(),
   vendor: z
     .string()
     .max(100, 'Der Anbieter darf maximal 100 Zeichen lang sein')
@@ -89,25 +89,25 @@ const baseApplicationSchema = z.object({
   sevenRStrategy: z.nativeEnum(SevenRStrategy).optional().nullable().or(z.literal('')),
 })
 
-// Schema für die Formularvalidierung mit erweiterten Validierungen
+// Schema for form validation with extended validations
 export const applicationSchema = baseApplicationSchema.superRefine((data, ctx) => {
-  // Lifecycle-Datums-Validierung - Prüfe spezifische Paarungen, nicht sequenziell
-  // Planungsdatum < Einführungsdatum
+  // Lifecycle date validation - Check specific pairings, not sequentially
+  // Planning date < Introduction date
   if (data.planningDate && data.introductionDate && data.planningDate >= data.introductionDate) {
     console.warn('⚠️ Date validation failed: planningDate >= introductionDate')
     ctx.addIssue({
       code: 'custom',
-      message: 'Das Einführungsdatum muss nach dem Planungsdatum liegen.',
+      message: 'Introduction date must be after planning date.',
       path: ['introductionDate'],
     })
   }
 
-  // Einführungsdatum < Ende der Nutzung
+  // Introduction date < End of use
   if (data.introductionDate && data.endOfUseDate && data.introductionDate >= data.endOfUseDate) {
     console.warn('⚠️ Date validation failed: introductionDate >= endOfUseDate')
     ctx.addIssue({
       code: 'custom',
-      message: 'Das Ende der Nutzung muss nach dem Einführungsdatum liegen.',
+      message: 'End of use must be after introduction date.',
       path: ['endOfUseDate'],
     })
   }
@@ -122,7 +122,7 @@ export const applicationSchema = baseApplicationSchema.superRefine((data, ctx) =
     })
   }
 
-  // Direkte Prüfung: Einführungsdatum < End-of-Life (falls Ende der Nutzung nicht gesetzt)
+  // Direct check: Introduction date < End-of-Life (if end of use not set)
   if (
     data.introductionDate &&
     data.endOfLifeDate &&
@@ -175,7 +175,7 @@ export const applicationSchema = baseApplicationSchema.superRefine((data, ctx) =
           path: ['status'],
         })
       }
-      // UND End-of-Use muss in der Zukunft liegen (oder nicht gesetzt sein)
+      // AND end-of-use must be in the future (or not set)
       // Nur validieren wenn ein End-of-Use-Datum gesetzt ist
       if (data.endOfUseDate && data.endOfUseDate <= now) {
         console.warn('⚠️ Status validation failed: ACTIVE with past endOfUseDate')
@@ -413,14 +413,14 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
       }
     },
     validators: {
-      // Primäre Validierung bei Änderungen - verwende das vollständige Schema
+      // Primary validation on changes - verwende das vollständige Schema
       onChange: applicationSchema,
-      // Validierung beim Absenden
+      // Validation on submit
       onSubmit: applicationSchema,
     },
   })
 
-  // Formular aktualisieren, wenn sich die Daten ändern
+  // Update form when data changes
   useEffect(() => {
     if (isOpen && application) {
       // Verwende nur die Anwendungsdaten

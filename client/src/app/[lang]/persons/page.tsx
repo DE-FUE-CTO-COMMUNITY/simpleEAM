@@ -12,7 +12,7 @@ import { GET_PERSONS, CREATE_PERSON, UPDATE_PERSON, DELETE_PERSON } from '@/grap
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import PersonForm, { PersonFormValues } from '@/components/persons/PersonForm'
 
-// Importiere die ausgelagerten Komponenten
+// Import the extracted components
 import PersonTable, { PERSON_DEFAULT_COLUMN_VISIBILITY } from '@/components/persons/PersonTable'
 import PersonToolbar from '@/components/persons/PersonToolbar'
 import PersonFilterDialog from '@/components/persons/PersonFilterDialog'
@@ -34,11 +34,11 @@ function PersonsPage() {
   const [filterOpen, setFilterOpen] = useState(false)
   const [activeFiltersCount, setActiveFiltersCount] = useState<number>(0)
 
-  // Liste der verfügbaren Abteilungen und Rollen aus den Daten extrahieren
+  // Extract list of available values from the data
   const [availableDepartments, setAvailableDepartments] = useState<string[]>([])
   const [availableRoles, setAvailableRoles] = useState<string[]>([])
 
-  // State für das neue Person-Formular
+  // State for the new Person form
   const [showNewPersonForm, setShowNewPersonForm] = useState(false)
 
   // Personen laden - Auth-Check erfolgt bereits in layout.tsx
@@ -60,12 +60,12 @@ function PersonsPage() {
     variables: { where },
   })
 
-  // Verfügbare Abteilungen und Rollen aus den geladenen Daten extrahieren
+  // Extract available values from loaded data
   useEffect(() => {
     if (data?.people?.length) {
       const persons = data.people as Person[]
 
-      // Alle Abteilungen extrahieren und Duplikate entfernen
+      // Extract all values and remove duplicates
       const allDepartments: string[] = persons
         .map((person: Person) => person.department)
         .filter(Boolean) as string[]
@@ -73,7 +73,7 @@ function PersonsPage() {
       const uniqueDepartments = Array.from(new Set(allDepartments)).sort()
       setAvailableDepartments(uniqueDepartments)
 
-      // Alle Rollen extrahieren und Duplikate entfernen
+      // Extract all values and remove duplicates
       const allRoles: string[] = persons
         .map((person: Person) => person.role)
         .filter(Boolean) as string[]
@@ -83,7 +83,7 @@ function PersonsPage() {
     }
   }, [data])
 
-  // Fehlerbehandlung
+  // Error handling
   useEffect(() => {
     if (error) {
       enqueueSnackbar('Fehler beim Laden der Personen', { variant: 'error' })
@@ -100,7 +100,7 @@ function PersonsPage() {
     resetFilters,
   } = usePersonFilter({ persons })
 
-  // Mutation zum Erstellen einer neuen Person
+  // Mutation for creating a new Person
   const [createPerson, { loading: isCreating }] = useMutation(CREATE_PERSON, {
     onCompleted: async res => {
       enqueueSnackbar(t('messages.createSuccess'), { variant: 'success' })
@@ -129,7 +129,7 @@ function PersonsPage() {
     },
   })
 
-  // Mutation zum Aktualisieren einer bestehenden Person
+  // Mutation for updating an existing Person
   const [updatePerson] = useMutation(UPDATE_PERSON, {
     onCompleted: async res => {
       enqueueSnackbar(t('messages.updateSuccess'), { variant: 'success' })
@@ -158,7 +158,7 @@ function PersonsPage() {
     },
   })
 
-  // Mutation zum Löschen einer Person
+  // Mutation for deleting a Person
   const [deletePerson] = useMutation(DELETE_PERSON, {
     onCompleted: () => {
       enqueueSnackbar(t('messages.deleteSuccess'), { variant: 'success' })
@@ -171,7 +171,7 @@ function PersonsPage() {
     },
   })
 
-  // Handler für das Erstellen einer neuen Person
+  // Handler for creating a new Person
   const handleCreatePersonSubmit = async (data: PersonFormValues) => {
     const input = {
       firstName: data.firstName,
@@ -200,7 +200,7 @@ function PersonsPage() {
         ],
       }
     } else {
-      enqueueSnackbar('Bitte zuerst ein Unternehmen auswählen.', { variant: 'warning' })
+      enqueueSnackbar('Please select a company first.', { variant: 'warning' })
       return
     }
 
@@ -208,13 +208,13 @@ function PersonsPage() {
       variables: { input: [input] },
     })
 
-    // Formular nach dem Erstellen schließen
+    // Close form after creating
     setShowNewPersonForm(false)
   }
 
-  // Handler für das Aktualisieren einer bestehenden Person
+  // Handler for updating an existing Person
   const handleUpdatePersonSubmit = async (id: string, data: PersonFormValues) => {
-    // Basis-Input-Daten vorbereiten
+    // Prepare base input data
     const input = {
       firstName: { set: data.firstName },
       lastName: { set: data.lastName },
@@ -258,12 +258,12 @@ function PersonsPage() {
     // Automatisches Schließen erfolgt durch die PersonForm selbst
   }
 
-  // Filter-Handler
+  // Filter handler
   const handleFilterChange = (newFilterValues: Partial<FilterState>) => {
     setFilterState(prev => ({ ...prev, ...newFilterValues }))
   }
 
-  // Filter zurücksetzen
+  // Reset filter
   const handleResetFilter = () => {
     resetFilters()
     setActiveFiltersCount(0)

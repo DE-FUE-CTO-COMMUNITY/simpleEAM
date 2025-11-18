@@ -137,7 +137,7 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
             'Architecture Principles': 'architecturePrinciples',
             Diagrams: 'diagrams',
             Infrastructures: 'infrastructures',
-            Infrastructure: 'infrastructures', // Fallback für Singular-Form
+            Infrastructure: 'infrastructures', // Fallback for singular form
           }
 
           const entityType = entityTypeMapping[tabName]
@@ -334,7 +334,7 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
       )
       await refreshDashboardCache()
 
-      // Wenn alle Daten oder nur Diagramme gelöscht werden, auch den Diagramm-localStorage leeren
+      // If all data or only diagrams are deleted, also clear the diagram localStorage
       if (deleteEntityType === 'all' || deleteEntityType === 'diagrams') {
         clearDiagramStorage()
       }

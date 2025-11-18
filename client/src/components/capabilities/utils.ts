@@ -4,7 +4,7 @@ import { format } from 'date-fns'
 import { de, enUS } from 'date-fns/locale'
 import { FilterState } from './types'
 
-// Formatiert das Datum für die Anzeige
+// Formats the date for display
 export const formatDate = (dateString: string, locale: string = 'de'): string => {
   try {
     const date = new Date(dateString)
@@ -16,7 +16,7 @@ export const formatDate = (dateString: string, locale: string = 'de'): string =>
   }
 }
 
-// Liefert den Label für den Reifegrad
+// Returns label for maturity level
 export const getLevelLabel = (level: number | null | undefined, t?: any): string => {
   if (level === null || level === undefined) {
     return t ? t('undefined') : 'Nicht definiert'

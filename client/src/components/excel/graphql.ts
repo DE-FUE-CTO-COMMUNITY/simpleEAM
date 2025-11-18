@@ -1,4 +1,4 @@
-// GraphQL Mutations für Import/Export
+// GraphQL mutations for import/export
 import {
   CREATE_CAPABILITY,
   UPDATE_CAPABILITY,
@@ -60,7 +60,7 @@ import {
   GET_AICOMPONENTS_COUNT,
 } from '../../graphql/aicomponent'
 
-// GraphQL Mutations für Datenlöschung
+// GraphQL mutations for data deletion
 export const DELETE_BUSINESS_CAPABILITIES = () => `
   mutation DeleteBusinessCapabilities($where: BusinessCapabilityWhere) {
     deleteBusinessCapabilities(where: $where) {
@@ -199,7 +199,7 @@ export const getMutationsByEntityType = (entityType: string) => {
   return mutationMap[entityType as keyof typeof mutationMap]
 }
 
-// Helper-Funktion: Gibt die passende DELETE Mutation für einen Entity-Type zurück
+// Helper function: Returns the appropriate DELETE mutation for an entity type
 export const getDeleteMutationByEntityType = (entityType: string) => {
   const deleteMutationMap = {
     businessCapabilities: DELETE_BUSINESS_CAPABILITIES(),

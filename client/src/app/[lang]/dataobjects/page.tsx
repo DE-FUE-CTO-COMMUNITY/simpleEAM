@@ -36,10 +36,10 @@ const DataObjectsPage = () => {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false)
 
-  // State für die DataObjectForm
+  // State for the DataObject form
   const [showNewDataObjectForm, setShowNewDataObjectForm] = useState(false)
 
-  // GraphQL-Abfrage für Datenobjekte
+  // GraphQL query for data objects
   const companyWhere = useCompanyWhere('company')
   const { data, loading, refetch } = useQuery(GET_DATA_OBJECTS, {
     skip: !authenticated || !initialized,
@@ -47,7 +47,7 @@ const DataObjectsPage = () => {
     variables: { where: companyWhere },
   })
 
-  // GraphQL-Mutationen für Datenobjekte
+  // GraphQL mutations for data objects
   const [createDataObject, { loading: isCreating }] = useMutation(CREATE_DATA_OBJECT, {
     onCompleted: () => {
       enqueueSnackbar('Datenobjekt erfolgreich erstellt', { variant: 'success' })
@@ -74,11 +74,11 @@ const DataObjectsPage = () => {
 
   const [deleteDataObject] = useMutation(DELETE_DATA_OBJECT, {
     onCompleted: () => {
-      enqueueSnackbar('Datenobjekt erfolgreich gelöscht', { variant: 'success' })
+      enqueueSnackbar('Data object successfully deleted', { variant: 'success' })
       refetch()
     },
     onError: error => {
-      enqueueSnackbar(`Fehler beim Löschen des Datenobjekts: ${error.message}`, {
+      enqueueSnackbar(`Error deleting data object: ${error.message}`, {
         variant: 'error',
       })
     },
@@ -123,7 +123,7 @@ const DataObjectsPage = () => {
     ]
   )
 
-  // Zählt die aktiven Filter
+  // Counts active filters
   const activeFiltersCount = useMemo(() => {
     return (
       filterState.classifications.length +
@@ -138,22 +138,22 @@ const DataObjectsPage = () => {
     )
   }, [filterState])
 
-  // Handler für das Zurücksetzen der Filter
+  // Handler for resetting filters
   const resetFilters = useCallback(() => {
     resetHookFilters()
     setGlobalFilter('')
   }, [resetHookFilters])
 
-  // Handler für das Öffnen der Form zum Erstellen eines neuen Datenobjekts
+  // Handler for opening form to create new data object
   const handleCreateDataObject = useCallback(() => {
     setShowNewDataObjectForm(true)
   }, [])
 
-  // Handler für das Erstellen eines neuen Datenobjekts
+  // Handler for creating new data object
   const handleCreateDataObjectSubmit = async (data: DataObjectFormValues) => {
     try {
       if (!selectedCompanyId) {
-        enqueueSnackbar('Bitte zuerst ein Unternehmen auswählen.', { variant: 'warning' })
+        enqueueSnackbar('Please select a company first.', { variant: 'warning' })
         return
       }
       const input = {
@@ -222,7 +222,7 @@ const DataObjectsPage = () => {
         ...(data.ownerId
           ? { owners: { connect: [{ where: { node: { id: { eq: data.ownerId } } } }] } }
           : {}),
-        // Company-Zuordnung (Pflicht)
+        // Company assignment (required)
         company: {
           connect: [
             {
@@ -238,14 +238,14 @@ const DataObjectsPage = () => {
         },
       })
 
-      // Formular nach dem Erstellen schließen
+      // Close form after creating
       setShowNewDataObjectForm(false)
     } catch (error) {
       console.error('Fehler beim Erstellen des Datenobjekts:', error)
     }
   }
 
-  // Handler für das Aktualisieren eines Datenobjekts
+  // Handler for updating data object
   const handleUpdateDataObjectSubmit = async (id: string, data: DataObjectFormValues) => {
     try {
       // Find the current data object to compare changes
@@ -286,7 +286,7 @@ const DataObjectsPage = () => {
             },
           ]
         } else {
-          // Wenn keine DataSources ausgewählt sind, alle Verbindungen trennen
+          // If no DataSources are selected, disconnect all connections
           input.dataSources = [
             {
               disconnect: [{ where: {} }],
@@ -339,7 +339,7 @@ const DataObjectsPage = () => {
             },
           ]
         } else {
-          // Wenn keine Diagramme ausgewählt sind, alle Verbindungen trennen
+          // If no Diagrams are selected, disconnect all connections
           input.depictedInDiagrams = [
             {
               disconnect: [{ where: {} }],
@@ -369,7 +369,7 @@ const DataObjectsPage = () => {
             },
           ]
         } else {
-          // Wenn keine Applikationen ausgewählt sind, alle Verbindungen trennen
+          // If no Applications are selected, disconnect all connections
           input.usedByApplications = [
             {
               disconnect: [{ where: {} }],
@@ -399,7 +399,7 @@ const DataObjectsPage = () => {
             },
           ]
         } else {
-          // Wenn keine Capabilities ausgewählt sind, alle Verbindungen trennen
+          // If no Capabilities are selected, disconnect all connections
           input.relatedToCapabilities = [
             {
               disconnect: [{ where: {} }],
@@ -430,7 +430,7 @@ const DataObjectsPage = () => {
             },
           ]
         } else {
-          // Wenn keine Interfaces ausgewählt sind, alle Verbindungen trennen
+          // If no Interfaces are selected, disconnect all connections
           input.transferredInInterfaces = [
             {
               disconnect: [{ where: {} }],
@@ -460,7 +460,7 @@ const DataObjectsPage = () => {
             },
           ]
         } else {
-          // Wenn keine Architekturen ausgewählt sind, alle Verbindungen trennen
+          // If no Architectures are selected, disconnect all connections
           input.partOfArchitectures = [
             {
               disconnect: [{ where: {} }],
@@ -480,14 +480,14 @@ const DataObjectsPage = () => {
     }
   }
 
-  // Handler für das Löschen eines Datenobjekts
+  // Handler for deleting data object
   const handleDeleteDataObject = async (id: string) => {
     try {
       await deleteDataObject({
         variables: { id },
       })
     } catch (error) {
-      console.error('Fehler beim Löschen des Datenobjekts:', error)
+      console.error('Error deleting data object:', error)
     }
   }
 

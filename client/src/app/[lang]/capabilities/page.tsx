@@ -17,7 +17,7 @@ import {
 import { CapabilityStatus, BusinessCapability } from '@/gql/generated'
 import CapabilityForm, { CapabilityFormValues } from '@/components/capabilities/CapabilityForm'
 
-// Importiere die ausgelagerten Komponenten
+// Import the extracted components
 import CapabilityTable, {
   CAPABILITY_DEFAULT_COLUMN_VISIBILITY,
 } from '@/components/capabilities/CapabilityTable'
@@ -42,11 +42,11 @@ const CapabilitiesPage = () => {
   // Filter-Hook verwenden (nach capabilities Query)
   const [activeFiltersCount, setActiveFiltersCount] = useState<number>(0)
 
-  // Liste der verfügbaren Status und Tags aus den Daten extrahieren
+  // Extract list of available statuses and tags from the data
   const [availableStatuses, setAvailableStatuses] = useState<CapabilityStatus[]>([])
   const [availableTags, setAvailableTags] = useState<string[]>([])
 
-  // State für das neue Capability-Formular
+  // State for the new capability form
   const [showNewCapabilityForm, setShowNewCapabilityForm] = useState(false)
 
   // Business Capabilities laden - Auth-Check erfolgt bereits in layout.tsx
@@ -57,12 +57,12 @@ const CapabilitiesPage = () => {
     variables: { where: companyWhere },
   })
 
-  // Verfügbare Status und Tags aus den geladenen Daten extrahieren
+  // Extract available statuses and tags from loaded data
   useEffect(() => {
     if (data?.businessCapabilities?.length) {
       const capabilities = data.businessCapabilities as BusinessCapability[]
 
-      // Alle Status extrahieren und Duplikate entfernen
+      // Extract all statuses and remove duplicates
       const allStatuses: CapabilityStatus[] = capabilities
         .map((cap: BusinessCapability) => cap.status)
         .filter(Boolean) as CapabilityStatus[]
@@ -70,7 +70,7 @@ const CapabilitiesPage = () => {
       const uniqueStatuses = Array.from(new Set(allStatuses)).sort()
       setAvailableStatuses(uniqueStatuses)
 
-      // Alle Tags sammeln und Duplikate entfernen
+      // Collect all tags and remove duplicates
       const allTags: string[] = []
       capabilities.forEach((cap: BusinessCapability) => {
         if (cap.tags && Array.isArray(cap.tags)) {
@@ -83,10 +83,10 @@ const CapabilitiesPage = () => {
     }
   }, [data])
 
-  // Fehlerbehandlung
+  // Error handling
   useEffect(() => {
     if (error) {
-      enqueueSnackbar('Fehler beim Laden der Business Capabilities', { variant: 'error' })
+      enqueueSnackbar('Error loading business capabilities', { variant: 'error' })
     }
   }, [error, enqueueSnackbar])
 
@@ -97,51 +97,51 @@ const CapabilitiesPage = () => {
     capabilities,
   })
 
-  // Mutation zum Erstellen einer neuen Capability
+  // Mutation for creating a new capability
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [createCapability, { loading: isCreating }] = useMutation(CREATE_CAPABILITY, {
     onCompleted: () => {
-      enqueueSnackbar('Business Capability erfolgreich erstellt', { variant: 'success' })
+      enqueueSnackbar('Business capability created successfully', { variant: 'success' })
       refetch()
     },
     onError: error => {
-      enqueueSnackbar(`Fehler beim Erstellen der Business Capability: ${error.message}`, {
+      enqueueSnackbar(`Error creating business capability: ${error.message}`, {
         variant: 'error',
       })
     },
   })
 
-  // Mutation zum Aktualisieren einer bestehenden Capability
+  // Mutation for updating an existing capability
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [updateCapability, { loading: isUpdating }] = useMutation(UPDATE_CAPABILITY, {
     onCompleted: () => {
-      enqueueSnackbar('Business Capability erfolgreich aktualisiert', { variant: 'success' })
+      enqueueSnackbar('Business capability updated successfully', { variant: 'success' })
       refetch()
     },
     onError: error => {
-      enqueueSnackbar(`Fehler beim Aktualisieren der Business Capability: ${error.message}`, {
+      enqueueSnackbar(`Error updating business capability: ${error.message}`, {
         variant: 'error',
       })
     },
   })
 
-  // Mutation zum Löschen einer Capability
+  // Mutation for deleting a capability
   const [deleteCapability] = useMutation(DELETE_CAPABILITY, {
     onCompleted: () => {
-      enqueueSnackbar('Business Capability erfolgreich gelöscht', { variant: 'success' })
+      enqueueSnackbar('Business capability deleted successfully', { variant: 'success' })
       refetch()
     },
     onError: error => {
-      enqueueSnackbar(`Fehler beim Löschen der Business Capability: ${error.message}`, {
+      enqueueSnackbar(`Error deleting business capability: ${error.message}`, {
         variant: 'error',
       })
     },
   })
 
-  // Handler für das Erstellen einer neuen Business Capability
+  // Handler for creating a new business capability
   const handleCreateCapabilitySubmit = async (data: CapabilityFormValues) => {
     if (!selectedCompanyId) {
-      enqueueSnackbar('Bitte zuerst ein Unternehmen auswählen.', { variant: 'warning' })
+      enqueueSnackbar('Please select a company first.', { variant: 'warning' })
       return
     }
     const {
@@ -153,7 +153,7 @@ const CapabilitiesPage = () => {
       ...capabilityData
     } = data
 
-    // Bei CREATE wird kein spezielles Mutation-Objekt benötigt, da direkte Werte erlaubt sind
+    // For CREATE, no special mutation object is needed as direct values are allowed
     const input = {
       name: capabilityData.name,
       description: capabilityData.description,
@@ -169,7 +169,7 @@ const CapabilitiesPage = () => {
         ? { endDate: capabilityData.endDate.toISOString().split('T')[0] }
         : {}),
       tags: capabilityData.tags,
-      // Wenn ein Besitzer ausgewählt wurde, verwenden wir die neue owners-Struktur (nur ein Owner)
+      // If an owner was selected, use the owners structure (nur ein Owner)
       ...(ownerId
         ? {
             owners: {
@@ -214,7 +214,7 @@ const CapabilitiesPage = () => {
             },
           }
         : {}),
-      // Company-Zuordnung (Pflicht)
+      // Company assignment (required)
       company: {
         connect: [
           {
@@ -228,11 +228,11 @@ const CapabilitiesPage = () => {
       variables: { input: [input] },
     })
 
-    // Formular nach dem Erstellen schließen
+    // Close form after creating
     setShowNewCapabilityForm(false)
   }
 
-  // Handler für das Aktualisieren einer bestehenden Business Capability
+  // Handler for updating an existing business capability
   const handleUpdateCapabilitySubmit = async (id: string, data: CapabilityFormValues) => {
     const {
       parentId,
@@ -243,7 +243,7 @@ const CapabilitiesPage = () => {
       ...capabilityData
     } = data
 
-    // Basis-Input-Daten vorbereiten
+    // Prepare base input data
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const input: Record<string, any> = {
       name: { set: capabilityData.name },
@@ -263,15 +263,15 @@ const CapabilitiesPage = () => {
       input.endDate = { set: capabilityData.endDate.toISOString().split('T')[0] }
     }
 
-    // Nur type setzen, wenn es einen Wert hat
+    // Only set type if it has a value
     if (capabilityData.type) {
       input.type = { set: capabilityData.type }
     }
 
-    // Aktualisierung der Owner-Beziehung, wenn ein Besitzer ausgewählt wurde
+    // Update owner relationship if an owner was selected
     if (ownerId) {
       input.owners = {
-        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+        disconnect: [{ where: {} }], // Disconnect all existing connections
         connect: [
           {
             where: {
@@ -369,18 +369,18 @@ const CapabilitiesPage = () => {
 
   // Neue Business Capability erstellen
   const handleCreateCapability = () => {
-    // Hier fügen wir direkt die Logik für das Erstellen einer neuen Capability ein,
-    // anstatt einen versteckten Button zu verwenden
+    // Here we directly add the logic for creating a new capability,
+    // instead of using a hidden button
     setShowNewCapabilityForm(true)
   }
 
-  // Business Capability löschen
+  // Delete business capability
   const handleDeleteCapability = async (id: string) => {
     await deleteCapability({
       variables: { id },
     })
-    // Formular nach dem Löschen schließen
-    // Automatisches Schließen erfolgt durch die CapabilityForm selbst
+    // Close form after deleting
+    // Automatic closing is handled by the CapabilityForm itself
   }
 
   return (

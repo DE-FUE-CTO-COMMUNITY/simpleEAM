@@ -146,7 +146,7 @@ export async function checkAdminAccess(): Promise<{
     // Prüfe Token-Details
     const tokenParsed = keycloak.tokenParsed
 
-    // Teste einen einfachen Admin-API-Aufruf
+    // Test a simple Admin API call
     const response = await fetch(`${getAdminBaseUrl()}/`, {
       method: 'GET',
       headers: {
@@ -184,7 +184,7 @@ export async function getUsers(): Promise<KeycloakUser[]> {
   try {
     const users = await apiCall<KeycloakUser[]>('/users?briefRepresentation=false')
 
-    // Für jeden Benutzer die Rollen laden
+    // Load roles for each user
     const usersWithRoles = await Promise.all(
       users.map(async user => {
         if (user.id) {

@@ -3,8 +3,8 @@
  * Optimiert für verschachtelte Objektstrukturen aus JSON-Exporten
  */
 
-// Keine Notwendigkeit für die Excel-spezifische updateDiagramJsonDatabaseIds Funktion
-// JSON-Imports verwenden die spezialisierte ID-Mapping-Logik aus importIdMappingUtils
+// No need for Excel-specific updateDiagramJsonDatabaseIds function
+// JSON imports use specialized ID mapping logic from importIdMappingUtils
 
 /**
  * Generiert einen Fallback-Namen für Entitäten
@@ -22,8 +22,8 @@ export const createEntityInputFromJson = (entityType: string, row: any): any => 
   const baseInput = {
     name: row.name || '',
     description: row.description || '',
-    // HINWEIS: id und createdAt werden bei der Erstellung nicht übertragen
-    // id wird automatisch generiert, createdAt wird automatisch gesetzt
+    // NOTE: id and createdAt are not transferred during creation
+    // id is auto-generated, createdAt is auto-set
     updatedAt: row.updatedAt ? new Date(row.updatedAt) : new Date(),
   }
 
@@ -31,11 +31,11 @@ export const createEntityInputFromJson = (entityType: string, row: any): any => 
     case 'businessCapabilities':
       return {
         ...baseInput,
-        // status ist Pflichtfeld - verwende gültigen Enum-Wert
+        // status is required field - use valid enum value
         status: ['ACTIVE', 'PLANNED', 'RETIRED'].includes(row.status) ? row.status : 'ACTIVE',
-        // type ist optional - verwende gültigen Enum-Wert falls vorhanden
+        // type is optional - use valid enum value if present
         type: ['OPERATIONAL', 'STRATEGIC', 'SUPPORT'].includes(row.type) ? row.type : undefined,
-        // Numerische Felder
+        // Numeric fields
         businessValue:
           typeof row.businessValue === 'number'
             ? row.businessValue
@@ -54,7 +54,7 @@ export const createEntityInputFromJson = (entityType: string, row: any): any => 
             : row.sequenceNumber
               ? parseInt(row.sequenceNumber, 10)
               : undefined,
-        // Datum-Felder
+        // Date fields
         introductionDate: row.introductionDate ? new Date(row.introductionDate) : undefined,
         endDate: row.endDate ? new Date(row.endDate) : undefined,
         // Tags-Array
@@ -63,7 +63,7 @@ export const createEntityInputFromJson = (entityType: string, row: any): any => 
           : typeof row.tags === 'string' && row.tags.trim()
             ? row.tags.split(',').map((t: string) => t.trim())
             : undefined,
-        // Beziehungen werden in einem separaten Schritt verarbeitet
+        // Relationships are processed in a separate step
         // owners, parents, children, supportedByApplications, etc.
       }
 
@@ -71,29 +71,29 @@ export const createEntityInputFromJson = (entityType: string, row: any): any => 
       return {
         ...baseInput,
         version: row.version || '',
-        // status ist Pflichtfeld - verwende gültigen Enum-Wert
+        // status is required field - use valid enum value
         status: ['ACTIVE', 'PLANNED', 'RETIRED'].includes(row.status) ? row.status : 'ACTIVE',
-        // criticality ist Pflichtfeld - verwende gültigen Enum-Wert
+        // criticality is required field - use valid enum value
         criticality: ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'].includes(row.criticality)
           ? row.criticality
           : 'MEDIUM',
         vendor: row.vendor || '',
         hostingEnvironment: row.hostingEnvironment || '',
-        // Numerische Felder
+        // Numeric fields
         costs:
           typeof row.costs === 'number' ? row.costs : row.costs ? parseFloat(row.costs) : undefined,
-        // Datum-Felder
+        // Date fields
         introductionDate: row.introductionDate ? new Date(row.introductionDate) : undefined,
         endOfLifeDate: row.endOfLifeDate ? new Date(row.endOfLifeDate) : undefined,
         endOfUseDate: row.endOfUseDate ? new Date(row.endOfUseDate) : undefined,
         planningDate: row.planningDate ? new Date(row.planningDate) : undefined,
-        // Array-Felder
+        // Array fields
         technologyStack: Array.isArray(row.technologyStack)
           ? row.technologyStack
           : typeof row.technologyStack === 'string' && row.technologyStack.trim()
             ? row.technologyStack.split(',').map((t: string) => t.trim())
             : undefined,
-        // Enum-Felder
+        // Enum fields
         sevenRStrategy: row.sevenRStrategy || undefined,
         timeCategory: row.timeCategory || undefined,
       }
@@ -101,14 +101,14 @@ export const createEntityInputFromJson = (entityType: string, row: any): any => 
     case 'dataObjects':
       return {
         ...baseInput,
-        // classification ist Pflichtfeld - verwende gültigen Enum-Wert
+        // classification is required field - use valid enum value
         classification: ['PUBLIC', 'INTERNAL', 'CONFIDENTIAL', 'STRICTLY_CONFIDENTIAL'].includes(
           row.classification
         )
           ? row.classification
           : 'INTERNAL',
         format: row.format || '',
-        // Datum-Felder
+        // Date fields
         introductionDate: row.introductionDate ? new Date(row.introductionDate) : undefined,
         endOfLifeDate: row.endOfLifeDate ? new Date(row.endOfLifeDate) : undefined,
         endOfUseDate: row.endOfUseDate ? new Date(row.endOfUseDate) : undefined,
@@ -119,7 +119,7 @@ export const createEntityInputFromJson = (entityType: string, row: any): any => 
       return {
         name: generateFallbackName('Interface', row),
         description: row.description || '',
-        // interfaceType ist Pflichtfeld - verwende gültigen Enum-Wert
+        // interfaceType is required field - use valid enum value
         interfaceType: [
           'API',
           'FILE_TRANSFER',
@@ -131,13 +131,13 @@ export const createEntityInputFromJson = (entityType: string, row: any): any => 
         ].includes(row.interfaceType?.toUpperCase())
           ? row.interfaceType?.toUpperCase()
           : row.type?.toUpperCase() || 'OTHER',
-        // status ist Pflichtfeld - verwende gültigen Enum-Wert
+        // status is required field - use valid enum value
         status: ['ACTIVE', 'DEPRECATED', 'IN_DEVELOPMENT', 'OUT_OF_SERVICE', 'PLANNED'].includes(
           row.status?.toUpperCase()
         )
           ? row.status?.toUpperCase()
           : 'PLANNED',
-        // protocol ist enum-Feld aber optional
+        // protocol is enum field but optional
         protocol: [
           'HTTP',
           'HTTPS',
@@ -153,7 +153,7 @@ export const createEntityInputFromJson = (entityType: string, row: any): any => 
           ? row.protocol?.toUpperCase()
           : undefined,
         version: row.version || undefined,
-        // Datums-Felder
+        // Date fields
         introductionDate: row.introductionDate ? new Date(row.introductionDate) : undefined,
         planningDate: row.planningDate ? new Date(row.planningDate) : undefined,
         endOfUseDate: row.endOfUseDate ? new Date(row.endOfUseDate) : undefined,
@@ -163,7 +163,7 @@ export const createEntityInputFromJson = (entityType: string, row: any): any => 
 
     case 'persons':
       return {
-        // Persons verwenden firstName und lastName statt name
+        // Persons use firstName and lastName instead of name
         firstName: row.firstName || row.name || 'Unbekannt',
         lastName: row.lastName || '',
         updatedAt: row.updatedAt ? new Date(row.updatedAt) : new Date(),
@@ -171,14 +171,14 @@ export const createEntityInputFromJson = (entityType: string, row: any): any => 
         role: row.role || '',
         department: row.department || '',
         phone: row.phone || '',
-        // location ist nicht Teil des PersonCreateInput
+        // location is not part of PersonCreateInput
       }
 
     case 'architectures':
       return {
         name: generateFallbackName('Architecture', row),
         description: row.description || '',
-        // domain ist Pflichtfeld - verwende gültigen Enum-Wert
+        // domain is required field - use valid enum value
         domain: [
           'APPLICATION',
           'BUSINESS',
@@ -190,20 +190,20 @@ export const createEntityInputFromJson = (entityType: string, row: any): any => 
         ].includes(row.domain?.toUpperCase())
           ? row.domain.toUpperCase()
           : 'ENTERPRISE',
-        // type ist Pflichtfeld - verwende gültigen Enum-Wert
+        // type is required field - use valid enum value
         type: ['CONCEPTUAL', 'CURRENT_STATE', 'FUTURE_STATE', 'TRANSITION'].includes(
           row.type?.toUpperCase()
         )
           ? row.type.toUpperCase()
           : 'CURRENT_STATE',
-        // timestamp ist Pflichtfeld - verwende aktuelle Zeit oder gegebene Zeit
+        // timestamp is required field - use current time or given time
         timestamp: row.timestamp ? new Date(row.timestamp) : new Date(),
         tags: Array.isArray(row.tags) ? row.tags : [],
         updatedAt: row.updatedAt ? new Date(row.updatedAt) : undefined,
       }
 
     case 'diagrams': {
-      // Für JSON-Imports wird die ID-Mapping über importIdMappingUtils gemacht
+      // For JSON imports, ID mapping is done via importIdMappingUtils
       // nicht über die Excel-spezifische updateDiagramJsonDatabaseIds Funktion
       return {
         title: row.title || row.name || generateFallbackName('Diagram', row),
@@ -225,7 +225,7 @@ export const createEntityInputFromJson = (entityType: string, row: any): any => 
         description: row.description || '',
         rationale: row.rationale || '',
         implications: row.implications || '',
-        // category ist Pflichtfeld - verwende gültigen Enum-Wert
+        // category is required field - use valid enum value
         category: [
           'BUSINESS',
           'DATA',
@@ -236,11 +236,11 @@ export const createEntityInputFromJson = (entityType: string, row: any): any => 
         ].includes(row.category?.toUpperCase())
           ? row.category.toUpperCase()
           : 'GOVERNANCE',
-        // priority ist Pflichtfeld - verwende gültigen Enum-Wert
+        // priority is required field - use valid enum value
         priority: ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'].includes(row.priority?.toUpperCase())
           ? row.priority.toUpperCase()
           : 'MEDIUM',
-        // isActive ist Pflichtfeld
+        // isActive is required field
         isActive: row.isActive === true || row.isActive === 'true' || row.isActive === 1,
         tags: Array.isArray(row.tags) ? row.tags : [],
         updatedAt: row.updatedAt ? new Date(row.updatedAt) : undefined,
@@ -250,7 +250,7 @@ export const createEntityInputFromJson = (entityType: string, row: any): any => 
       return {
         name: generateFallbackName('Infrastructure', row),
         description: row.description || '',
-        // infrastructureType ist Pflichtfeld - verwende gültigen Enum-Wert
+        // infrastructureType is required field - use valid enum value
         infrastructureType: [
           'CLOUD_DATACENTER',
           'CONTAINER_HOST',
@@ -263,7 +263,7 @@ export const createEntityInputFromJson = (entityType: string, row: any): any => 
           : row.type?.toUpperCase() === 'SERVER' || row.type?.toUpperCase() === 'PHYSICAL_SERVER'
             ? 'PHYSICAL_SERVER'
             : 'VIRTUAL_MACHINE',
-        // status ist Pflichtfeld - verwende gültigen Enum-Wert
+        // status is required field - use valid enum value
         status: ['ACTIVE', 'INACTIVE', 'IN_DEVELOPMENT', 'PLANNED', 'RETIRED'].includes(
           row.status?.toUpperCase()
         )
@@ -277,7 +277,7 @@ export const createEntityInputFromJson = (entityType: string, row: any): any => 
         ipAddress: row.ipAddress || '',
         specifications: row.specifications || '',
         maintenanceWindow: row.maintenanceWindow || '',
-        // Datums-Felder
+        // Date fields
         introductionDate: row.introductionDate ? new Date(row.introductionDate) : undefined,
         planningDate: row.planningDate ? new Date(row.planningDate) : undefined,
         endOfUseDate: row.endOfUseDate ? new Date(row.endOfUseDate) : undefined,
@@ -331,12 +331,12 @@ export const generateFallbackNameForJson = (
   row: any,
   index: number
 ): string => {
-  // Versuche zuerst den vorhandenen Namen
+  // Try existing name first
   if (row.name && typeof row.name === 'string' && row.name.trim() !== '') {
     return row.name.trim()
   }
 
-  // Fallback basierend auf anderen Eigenschaften
+  // Fallback based on other properties
   const fallbacks: { [key: string]: string[] } = {
     businessCapabilities: ['level', 'description'],
     applications: ['type', 'technology', 'version'],
@@ -369,19 +369,19 @@ export const sanitizeJsonImportData = (data: any[]): any[] => {
   return data.map((row, index) => {
     const sanitized = { ...row }
 
-    // Stelle sicher, dass ID vorhanden ist
+    // Ensure that value is present
     if (!sanitized.id || sanitized.id.trim() === '') {
       sanitized.id = `generated-${Date.now()}-${index}`
     }
 
-    // Bereinige Leerstrings zu null
+    // Clean empty strings to null
     Object.keys(sanitized).forEach(key => {
       if (sanitized[key] === '' || sanitized[key] === undefined) {
         sanitized[key] = null
       }
     })
 
-    // Stelle sicher, dass Datum-Felder korrekt formatiert sind
+    // Ensure that date fields are correctly formatted
     const dateFields = [
       'createdAt',
       'updatedAt',
@@ -481,7 +481,7 @@ export const createRelationshipInputFromJson = (
       return relationshipInput
     }
 
-    // Weitere Entity-Typen können hier hinzugefügt werden
+    // Additional entity types can be added here
     case 'applications':
       // TODO: Application relationships
       return {}

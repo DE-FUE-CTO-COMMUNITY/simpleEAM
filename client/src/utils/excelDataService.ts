@@ -98,7 +98,7 @@ export const fetchBusinessCapabilitiesForExport = async (
       depictedInDiagrams: cap.depictedInDiagrams?.map((diag: any) => diag.id).join(',') || '',
     }))
   } catch {
-    throw new Error('Fehler beim Laden der Business Capabilities für Export')
+    throw new Error('Error loading business capabilities für Export')
   }
 }
 
@@ -398,7 +398,7 @@ export const fetchDiagramsForExcelExport = async (
       title: diagram.title,
       description: diagram.description || '',
       diagramType: diagram.diagramType || '',
-      // diagramJson wird bei Excel-Export ausgeschlossen
+      // diagramJson is excluded from Excel export
       createdAt: formatDateForExport(diagram.createdAt),
       updatedAt: formatDateForExport(diagram.updatedAt),
       creator: diagram.creator?.map((creator: any) => creator.id).join(',') || '',
@@ -936,7 +936,7 @@ export const getDiagramsForExcelTemplate = (): ExcelExportData => ({
   title: '',
   description: '',
   diagramType: '', // APPLICATION_LANDSCAPE, ARCHITECTURE, CAPABILITY_MAP, CONCEPTUAL, DATA_FLOW, INTEGRATION_ARCHITECTURE, NETWORK, OTHER, PROCESS, SECURITY_ARCHITECTURE
-  // diagramJson wird bei Excel-Export ausgeschlossen
+  // diagramJson is excluded from Excel export
   createdAt: '', // ISO-Format: 2024-01-01T12:00:00.000Z
   updatedAt: '', // ISO-Format: 2024-01-01T12:00:00.000Z
   creator: '', // Komma-getrennte Creator-IDs (Person)
@@ -1259,7 +1259,7 @@ export const validateImportData = (
       }
     })
 
-    // Prüfe unbekannte Felder
+    // Check unknown fields
     Object.keys(row).forEach(field => {
       if (!allValidFields.includes(field)) {
         warnings.push({
@@ -1310,7 +1310,7 @@ export const validateImportData = (
       totalRows: data.length,
       validRows,
       invalidRows: data.length - validRows,
-      duplicates: 0, // ID-Duplikate werden nicht mehr geprüft
+      duplicates: 0, // ID duplicates are no longer checked
     },
   }
 }

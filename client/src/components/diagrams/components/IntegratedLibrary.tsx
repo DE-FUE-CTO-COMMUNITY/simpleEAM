@@ -206,7 +206,7 @@ const IntegratedLibrary: React.FC<IntegratedLibraryProps> = ({
 // Helper function to create library item from database element
 function createLibraryItemFromDatabaseElement(dbElement: any, elementType: string, template: any) {
   if (!template) {
-    console.warn(`⚠️ Kein Template gefunden für Element-Typ: ${elementType}`)
+    console.warn(`⚠️ No template found for element type: ${elementType}`)
     return null
   }
 
@@ -306,7 +306,7 @@ function createLibraryItemFromDatabaseElement(dbElement: any, elementType: strin
             // Set the containerId to establish the bound text relationship
             newElement.containerId = newContainerId
 
-            // Verwende die gemeinsame calculateCenteredTextPosition Funktion für konsistente Zentrierung
+            // Use the shared calculateCenteredTextPosition function for consistent centering
             const centeredPosition = calculateCenteredTextPosition(
               wrappedText,
               containerRect,
@@ -321,7 +321,7 @@ function createLibraryItemFromDatabaseElement(dbElement: any, elementType: strin
           }
         }
       } else {
-        // Fallback für Texte ohne Container: Verwende geschätzte Dimensionen
+        // Fallback for texts without container: Use estimated dimensions
         const lineCount = (wrappedText.match(/\n/g) || []).length + 1
         const avgLineWidth = Math.max(...wrappedText.split('\n').map(line => line.length))
 
@@ -335,7 +335,7 @@ function createLibraryItemFromDatabaseElement(dbElement: any, elementType: strin
 
     // Store database metadata in customData - ONLY in the first element to avoid redundancy
     if (index === 0) {
-      // Das erste Element (Hauptelement) erhält alle Datenbank-Metadaten
+      // The first element (main element) receives all database metadata
       // Optimierung: Speichere nur elementName statt des kompletten originalElement
       newElement.customData = {
         databaseId: dbElement.id,

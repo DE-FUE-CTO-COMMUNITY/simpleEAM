@@ -1,9 +1,13 @@
 {
   "name": "simple-eam",
   "version": "1.0.0",
-  "description": "Enterprise Architecture Management System mit Neo4j, GraphQL, Keycloak und Next.js",
+  "description": "Enterprise Architecture Management System with Neo4j, GraphQL, Keycloak and Next.js",
   "private": true,
   "scripts": {
+    "version": "./scripts/version.sh",
+    "version:patch": "./scripts/version.sh patch",
+    "version:minor": "./scripts/version.sh minor",
+    "version:major": "./scripts/version.sh major",
     "start": "docker-compose up -d",
     "stop": "docker-compose down",
     "dev": "docker-compose up",

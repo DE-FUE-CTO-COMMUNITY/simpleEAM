@@ -69,10 +69,10 @@ const ExcalidrawWrapper = dynamic(
         isOpen: false,
       })
 
-      // Hook für Theme-Modus (wird innerhalb der Komponente verwendet)
+      // Hook for theme mode (used within component)
       const { mode: themeMode } = useThemeMode()
 
-      // Hook für aktuelle Sprache
+      // Hook for current language
       const locale = useLocale()
       const t = useTranslations('diagrams')
 

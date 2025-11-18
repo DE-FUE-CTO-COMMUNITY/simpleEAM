@@ -79,13 +79,13 @@ export const getCategoryLabel = (category: PrincipleCategory): string => {
     [PrincipleCategory.COMPLIANCE]: 'Compliance',
     [PrincipleCategory.COST_OPTIMIZATION]: 'Kostenoptimierung',
     [PrincipleCategory.DATA]: 'Daten',
-    [PrincipleCategory.FLEXIBILITY]: 'Flexibilität',
+    [PrincipleCategory.FLEXIBILITY]: 'Flexibility',
     [PrincipleCategory.GOVERNANCE]: 'Governance',
     [PrincipleCategory.INTEGRATION]: 'Integration',
-    [PrincipleCategory.INTEROPERABILITY]: 'Interoperabilität',
+    [PrincipleCategory.INTEROPERABILITY]: 'Interoperability',
     [PrincipleCategory.MAINTAINABILITY]: 'Wartbarkeit',
     [PrincipleCategory.PERFORMANCE]: 'Performance',
-    [PrincipleCategory.RELIABILITY]: 'Zuverlässigkeit',
+    [PrincipleCategory.RELIABILITY]: 'Reliability',
     [PrincipleCategory.REUSABILITY]: 'Wiederverwendbarkeit',
     [PrincipleCategory.SCALABILITY]: 'Skalierbarkeit',
     [PrincipleCategory.SECURITY]: 'Sicherheit',
@@ -115,7 +115,7 @@ export const formatBoolean = (value: boolean | null | undefined): string => {
 }
 
 /**
- * Zählt aktive Filter
+ * Counts active filters
  */
 export const countActiveFilters = (filterState: FilterState): number => {
   let count = 0

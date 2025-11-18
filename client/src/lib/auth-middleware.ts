@@ -35,11 +35,11 @@ export async function validateAuth(
 
     const token = authHeader.substring(7)
 
-    // Token validieren über Keycloak User Info Endpoint (einfacher für public clients)
+    // Validate token via Keycloak User Info Endpoint (easier for public clients)
     const keycloakUrl = process.env.NEXT_PUBLIC_KEYCLOAK_URL || 'https://auth.dev-server.mf2.eu'
     const realm = process.env.NEXT_PUBLIC_KEYCLOAK_REALM || 'simple-eam'
 
-    // User Info Endpoint verwenden (validiert automatisch das Token)
+    // Use User Info Endpoint (automatically validates token)
     const userInfoResponse = await fetch(
       `${keycloakUrl}/realms/${realm}/protocol/openid-connect/userinfo`,
       {
@@ -76,14 +76,14 @@ export async function validateAuth(
     // Client ID für Rollen-Extraktion
     const clientId = process.env.NEXT_PUBLIC_KEYCLOAK_CLIENT_ID || 'eam-client'
 
-    // Rollen aus Token extrahieren
+    // Extract roles from token
     const realmAccess = tokenPayload.realm_access?.roles || []
     const resourceAccess = tokenPayload.resource_access?.[clientId]?.roles || []
     const allRoles = [...realmAccess, ...resourceAccess]
 
     const isAdmin = allRoles.includes('admin')
 
-    // Wenn Admin-Berechtigung erforderlich, aber nicht vorhanden
+    // If admin permission required but not present
     if (requireAdmin && !isAdmin) {
       console.error('❌ Admin-Berechtigung erforderlich, aber nicht vorhanden')
       return {

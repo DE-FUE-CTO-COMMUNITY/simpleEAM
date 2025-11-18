@@ -20,7 +20,7 @@ import Logo from '../common/Logo'
 // Konstanten und Styles
 const drawerWidth = 240
 
-// Styled-Komponenten für das Layout
+// Styled components for layout
 const openedMixin = (theme: Theme) => ({
   width: drawerWidth,
   transition: theme.transitions.create('width', {

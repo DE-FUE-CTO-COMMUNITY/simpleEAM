@@ -2,7 +2,7 @@ import Keycloak from 'keycloak-js'
 import { createContext, useContext } from 'react'
 
 /**
- * LocalStorage-Schlüssel für Login-Status
+ * LocalStorage key for login status
  */
 const LOGIN_STATUS_KEY = 'user_logged_in'
 const LAST_LOGIN_SESSION_KEY = 'last_login_session'
@@ -19,20 +19,20 @@ const setUserLoggedIn = () => {
 }
 
 /**
- * Prüft, ob die vorherige Session zu alt ist (für echte neue Logins)
+ * Checks if previous session is too old (for real new logins)
  */
 const checkForOldSession = (): boolean => {
   if (typeof window !== 'undefined') {
     const lastSessionTimestamp = localStorage.getItem(LAST_LOGIN_SESSION_KEY)
 
-    // Wenn kein Timestamp existiert, dann neuer Login
+    // If no timestamp exists, then new login
     if (!lastSessionTimestamp) {
       return true
     }
 
-    // Prüfe, ob die letzte Session SEHR alt ist (mehr als 24 Stunden)
+    // Check if last session is VERY old (more than 24 hours)
     const sessionAge = Date.now() - parseInt(lastSessionTimestamp, 10)
-    const twentyFourHours = 24 * 60 * 60 * 1000 // 24 Stunden in Millisekunden
+    const twentyFourHours = 24 * 60 * 60 * 1000 // 24 hours in milliseconds
 
     return sessionAge > twentyFourHours
   }
@@ -49,7 +49,7 @@ const clearLoginStatus = () => {
   }
 }
 
-// Keycloak-Konfiguration
+// Keycloak configuration
 const keycloakConfig = {
   url: process.env.NEXT_PUBLIC_KEYCLOAK_URL || 'https://auth.dev-server.mf2.eu',
   realm: process.env.NEXT_PUBLIC_KEYCLOAK_REALM || 'simple-eam',
@@ -57,22 +57,22 @@ const keycloakConfig = {
 }
 
 /**
- * Keycloak-Instanz für die Authentifizierung (nur clientseitig)
+ * Keycloak instance for authentication (client-side only)
  */
 export let keycloak: Keycloak | undefined
 let keycloakInitPromise: Promise<boolean> | null = null
 
 /**
- * Initialisiert die Keycloak-Instanz und gibt ein Promise zurück
+ * Initializes Keycloak instance and returns a Promise
  * Diese Funktion stellt sicher, dass Keycloak nur einmal initialisiert wird
  */
 export const initKeycloak = () => {
   if (typeof window === 'undefined') {
-    // Wenn Server-Umgebung, leeres Promise zurückgeben
+    // If server environment, return empty promise
     return Promise.resolve(false)
   }
 
-  // Wenn die Promise bereits existiert, gib sie zurück
+  // If promise already exists, return it
   if (keycloakInitPromise) {
     return keycloakInitPromise
   }
@@ -91,30 +91,30 @@ export const initKeycloak = () => {
           ? window.location.origin + '/silent-check-sso.html'
           : '/silent-check-sso.html',
       pkceMethod: 'S256',
-      // KEINE automatische redirectUri hier - das verursacht immer Redirects
+      // NO automatic redirectUri here - this always causes redirects
       checkLoginIframe: true,
       checkLoginIframeInterval: 5,
       enableLogging: process.env.NODE_ENV === 'development',
     })
     .then(authenticated => {
       if (authenticated && keycloak) {
-        // Automatischen Token-Refresh einrichten
+        // Set up automatic token refresh
         setupTokenRefresh()
 
-        // WICHTIG: Session-Status ZUERST setzen, BEVOR wir prüfen ob es ein neuer Login ist
+        // IMPORTANT: Set session status FIRST, BEFORE checking if it is a new login
         const wasAlreadyLoggedIn = localStorage.getItem(LOGIN_STATUS_KEY) === 'true'
 
-        // Session-Status immer setzen (für Page Refreshes)
+        // Always set session status (for page refreshes)
         setUserLoggedIn()
 
-        // Prüfen, ob es ein ECHTER neuer Login war (basierend auf dem vorherigen Status)
+        // Check if it was a REAL new login (based on previous status)
         const isNewLogin = !wasAlreadyLoggedIn || checkForOldSession()
 
         if (isNewLogin) {
-          // Nur bei echtem neuen Login das LastLogin-Datum aktualisieren
+          // Only update LastLogin date on real new login
           updateLastLoginDate()
 
-          // Zum Dashboard weiterleiten
+          // Redirect to dashboard
           const currentPath = window.location.pathname
           const langMatch = currentPath.match(/^\/([a-z]{2})/)
           const lang = langMatch ? langMatch[1] : 'de'
@@ -145,7 +145,7 @@ const setupTokenRefresh = () => {
       .updateToken(30)
       .then(refreshed => {
         if (refreshed && keycloak) {
-          // Event für Token-Update auslösen
+          // Trigger event for token update
           window.dispatchEvent(
             new CustomEvent('tokenRefreshed', {
               detail: { token: keycloak.token },
@@ -161,12 +161,12 @@ const setupTokenRefresh = () => {
       })
   }
 
-  // Präventiver Token-Refresh alle 5 Minuten
+  // Preventive token refresh every 5 minutes
   setInterval(
     () => {
       if (keycloak?.authenticated) {
         keycloak
-          .updateToken(70) // Refresh wenn weniger als 70 Sekunden verbleiben
+          .updateToken(70) // Refresh if less than 70 seconds remaining
           .then(refreshed => {
             if (refreshed && keycloak) {
               window.dispatchEvent(
@@ -177,14 +177,14 @@ const setupTokenRefresh = () => {
             }
           })
           .catch(error => {
-            console.error('Präventiver Token-Refresh fehlgeschlagen:', error)
+            console.error('Preventive token refresh failed:', error)
           })
       }
     },
     5 * 60 * 1000
   ) // 5 Minuten
 
-  // Event-Listener für Auth-Fehler
+  // Event listener for auth errors
   const handleAuthError = () => {
     if (keycloak?.authenticated) {
       keycloak
@@ -214,7 +214,7 @@ const setupTokenRefresh = () => {
   window.addEventListener('authError', handleAuthError)
 }
 
-// Debounce-Mechanismus für updateLastLoginDate
+// Debounce mechanism for updateLastLoginDate
 let lastLoginUpdateInProgress = false
 
 /**
@@ -236,7 +236,7 @@ const updateLastLoginDate = async () => {
   try {
     const currentTimestamp = new Date().toISOString()
 
-    // API-Aufruf an unsere Next.js Route für die Aktualisierung des Benutzerattributs
+    // API call to our Next.js route for updating user attribute
     const response = await fetch('/api/auth/update-last-login', {
       method: 'POST',
       headers: {
@@ -255,13 +255,13 @@ const updateLastLoginDate = async () => {
   } catch (error) {
     console.error('❌ Fehler beim Aktualisieren des letzten Login-Datums:', error)
   } finally {
-    // Flag nach Abschluss zurücksetzen
+    // Reset flag after completion
     lastLoginUpdateInProgress = false
   }
 }
 
 /**
- * Setzt die company_ids des eingeloggten Benutzers via Keycloak Admin API über unsere Next.js Route.
+ * Sets company_ids of logged-in user via Keycloak Admin API through our Next.js route.
  * Achtung: Wird NICHT automatisch aufgerufen, nur explizit vom Aufrufer verwenden.
  */
 export const updateCompanyIdsFromClient = async (companyIds: string[]) => {
@@ -282,7 +282,7 @@ export const updateCompanyIdsFromClient = async (companyIds: string[]) => {
 }
 
 /**
- * AuthContext für die Verwendung mit useAuth-Hook
+ * AuthContext for use with useAuth hook
  */
 export const AuthContext = createContext<{
   keycloak: Keycloak | undefined
@@ -294,7 +294,7 @@ export const AuthContext = createContext<{
 })
 
 /**
- * Hook für den einfachen Zugriff auf Auth-Daten und -Funktionen
+ * Hook for easy access to auth data and functions
  */
 export const useAuth = () => useContext(AuthContext)
 
@@ -303,7 +303,7 @@ export const useAuth = () => useContext(AuthContext)
  */
 export const logout = () => {
   if (typeof window !== 'undefined' && keycloak) {
-    // Login-Status bereinigen beim Logout
+    // Clean up login status on logout
     clearLoginStatus()
     keycloak.logout()
   }
@@ -314,9 +314,9 @@ export const logout = () => {
  */
 export const login = () => {
   if (typeof window !== 'undefined' && keycloak) {
-    // KEIN Flag setzen hier - das passiert erst nach erfolgreichem Login
+    // DO NOT set flag here - that happens only after successful login
 
-    // Bestimme die Dashboard-URL basierend auf der aktuellen Sprache
+    // Determine dashboard URL based on current language
     const currentPath = window.location.pathname
     const langMatch = currentPath.match(/^\/([a-z]{2})/)
     const lang = langMatch ? langMatch[1] : 'de'
@@ -329,7 +329,7 @@ export const login = () => {
 }
 
 /**
- * Prüft, ob der Benutzer die angegebene Rolle hat
+ * Checks if user has the specified role
  */
 export const hasRole = (role: string): boolean => {
   if (typeof window !== 'undefined' && keycloak) {
@@ -339,7 +339,7 @@ export const hasRole = (role: string): boolean => {
 }
 
 /**
- * Gibt die Benutzerrollen zurück
+ * Returns user roles
  */
 export const getRoles = (): string[] => {
   if (typeof window !== 'undefined' && keycloak) {
@@ -349,28 +349,28 @@ export const getRoles = (): string[] => {
 }
 
 /**
- * Prüft, ob der Benutzer Admin-Rechte hat
+ * Checks if user has admin rights
  */
 export const isAdmin = (): boolean => {
   return hasRole('admin')
 }
 
 /**
- * Prüft, ob der Benutzer Architect-Rechte hat
+ * Checks if user has architect rights
  */
 export const isArchitect = (): boolean => {
   return hasRole('architect') || isAdmin()
 }
 
 /**
- * Prüft, ob der Benutzer nur Viewer-Rechte hat
+ * Checks if user has only viewer rights
  */
 export const isViewer = (): boolean => {
   return hasRole('viewer') && !isArchitect() && !isAdmin()
 }
 
 /**
- * Gibt die Keycloak-Instanz zurück
+ * Returns Keycloak instance
  */
 export const getKeycloak = () => {
   return keycloak

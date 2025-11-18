@@ -19,7 +19,7 @@ import ArchitecturePrincipleForm, {
   ArchitecturePrincipleFormValues,
 } from '@/components/architecture-principles/ArchitecturePrincipleForm'
 
-// Importiere die ausgelagerten Komponenten
+// Import the extracted components
 import ArchitecturePrincipleTable, {
   ARCHITECTURE_PRINCIPLE_DEFAULT_COLUMN_VISIBILITY,
 } from '@/components/architecture-principles/ArchitecturePrincipleTable'
@@ -44,12 +44,12 @@ const ArchitecturePrinciplesPage = () => {
   const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false)
   const [activeFiltersCount, setActiveFiltersCount] = useState<number>(0)
 
-  // Liste der verfügbaren Categories, Priorities und Tags aus den Daten extrahieren
+  // Extract list of available values from the data
   const [availableCategories, setAvailableCategories] = useState<PrincipleCategory[]>([])
   const [availablePriorities, setAvailablePriorities] = useState<PrinciplePriority[]>([])
   const [availableTags, setAvailableTags] = useState<string[]>([])
 
-  // State für das neue Architektur-Prinzip-Formular
+  // State for the new Architecture Principle form
   const [showNewPrincipleForm, setShowNewPrincipleForm] = useState(false)
 
   // GraphQL-Query für Architektur-Prinzipien
@@ -69,7 +69,7 @@ const ArchitecturePrinciplesPage = () => {
   const [createPrincipleMutation, { loading: isCreating }] = useMutation(
     CREATE_ARCHITECTURE_PRINCIPLE,
     {
-      // Nach CREATE die Liste mit dem aktuellen Company-Filter zuverlässig neu laden
+      // After CREATE reliably reload list with current company filter
       refetchQueries: [{ query: GET_ARCHITECTURE_PRINCIPLES, variables: { where: companyWhere } }],
       onCompleted: () => {
         enqueueSnackbar('Architektur-Prinzip erfolgreich erstellt', { variant: 'success' })
@@ -84,7 +84,7 @@ const ArchitecturePrinciplesPage = () => {
   )
 
   const [updatePrincipleMutation] = useMutation(UPDATE_ARCHITECTURE_PRINCIPLE, {
-    // Nach UPDATE die Liste mit dem aktuellen Company-Filter zuverlässig neu laden
+    // After UPDATE reliably reload list with current company filter
     refetchQueries: [{ query: GET_ARCHITECTURE_PRINCIPLES, variables: { where: companyWhere } }],
     onCompleted: () => {
       enqueueSnackbar('Architektur-Prinzip erfolgreich aktualisiert', { variant: 'success' })
@@ -97,7 +97,7 @@ const ArchitecturePrinciplesPage = () => {
   })
 
   const [deletePrincipleMutation] = useMutation(DELETE_ARCHITECTURE_PRINCIPLE, {
-    // Nach DELETE die Liste mit dem aktuellen Company-Filter zuverlässig neu laden
+    // After DELETE reliably reload list with current company filter
     refetchQueries: [{ query: GET_ARCHITECTURE_PRINCIPLES, variables: { where: companyWhere } }],
     onCompleted: () => {
       enqueueSnackbar('Architektur-Prinzip erfolgreich gelöscht', { variant: 'success' })
@@ -144,7 +144,7 @@ const ArchitecturePrinciplesPage = () => {
   const { filterState, setFilterState, filteredPrinciples, resetFilters } =
     useArchitecturePrincipleFilter({ principles })
 
-  // Aktive Filter zählen und State aktualisieren
+  // Count active filters und State aktualisieren
   useEffect(() => {
     let count = 0
     if (filterState.categoryFilter && filterState.categoryFilter.length > 0) count++
@@ -166,7 +166,7 @@ const ArchitecturePrinciplesPage = () => {
   const handleCreatePrinciple = async (data: ArchitecturePrincipleFormValues) => {
     try {
       if (!selectedCompanyId) {
-        enqueueSnackbar('Bitte zuerst ein Unternehmen auswählen.', { variant: 'warning' })
+        enqueueSnackbar('Please select a company first.', { variant: 'warning' })
         return
       }
       const input = {
@@ -178,7 +178,7 @@ const ArchitecturePrinciplesPage = () => {
         implications: data.implications || '',
         tags: data.tags || [],
         isActive: data.isActive,
-        // Wenn ein Besitzer ausgewählt wurde, verwenden wir die owners-Struktur
+        // If an owner was selected, use the owners structure
         ...(data.ownerId
           ? {
               owners: {
@@ -186,7 +186,7 @@ const ArchitecturePrinciplesPage = () => {
               },
             }
           : {}),
-        // Wenn Architekturen ausgewählt wurden, verbinden wir sie
+        // If values were selected, connect them
         ...(data.appliedInArchitectureIds && data.appliedInArchitectureIds.length > 0
           ? {
               appliedInArchitectures: {
@@ -196,7 +196,7 @@ const ArchitecturePrinciplesPage = () => {
               },
             }
           : {}),
-        // Wenn Applikationen ausgewählt wurden, verbinden wir sie
+        // If values were selected, connect them
         ...(data.implementedByApplicationIds && data.implementedByApplicationIds.length > 0
           ? {
               implementedByApplications: {
@@ -206,7 +206,7 @@ const ArchitecturePrinciplesPage = () => {
               },
             }
           : {}),
-        // Company-Zuordnung (Pflicht)
+        // Company assignment (required)
         company: {
           connect: [
             {
@@ -220,7 +220,7 @@ const ArchitecturePrinciplesPage = () => {
         variables: { input: [input] },
       })
 
-      // Formular nach dem Erstellen schließen
+      // Close form after creating
       setShowNewPrincipleForm(false)
     } catch (error) {
       console.error('🚨 Fehler beim Erstellen des Architektur-Prinzips:', error)

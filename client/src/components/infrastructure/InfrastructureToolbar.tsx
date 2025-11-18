@@ -18,7 +18,7 @@ interface InfrastructureToolbarProps {
 }
 
 /**
- * Eine Toolbar speziell für Infrastrukturen, die die GenericToolbar-Komponente verwendet.
+ * A toolbar specifically for infrastructures that uses the GenericToolbar component.
  */
 const InfrastructureToolbar: React.FC<InfrastructureToolbarProps> = ({
   table,
@@ -35,7 +35,7 @@ const InfrastructureToolbar: React.FC<InfrastructureToolbarProps> = ({
       searchFieldWidth="350px"
       table={table}
       enableColumnVisibilityToggle={enableColumnVisibilityToggle}
-      tableKey="infrastructure" // Eindeutiger Schlüssel für die Infrastructure-Tabelle
+      tableKey="infrastructure" // Unique key for the infrastructure table
       defaultColumnVisibility={defaultColumnVisibility}
     />
   )

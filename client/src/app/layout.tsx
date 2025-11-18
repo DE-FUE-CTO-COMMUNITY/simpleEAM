@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   description: 'Enterprise Architecture Management System',
 }
 
-// Root layout - minimale HTML-Struktur
+// Root layout - minimal HTML structure
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html suppressHydrationWarning>

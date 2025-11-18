@@ -111,7 +111,7 @@ export const useDiagramState = () => {
         // Szene und Diagramm verwerfen, lokales Storage bereinigen
         setCurrentDiagram(null)
         setCurrentScene(null)
-        // Lokalen Speicher bereinigen (nur betroffene Keys, hier direkt entfernen)
+        // Lokalen Speicher bereinigen (nur betroffene Keys, hier direkt remove)
         localStorage.removeItem('excalidraw-current-diagram')
         localStorage.removeItem('excalidraw-scene')
         localStorage.removeItem('excalidraw-last-saved-scene')

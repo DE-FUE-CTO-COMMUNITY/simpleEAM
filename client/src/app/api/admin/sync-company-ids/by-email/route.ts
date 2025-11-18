@@ -61,7 +61,7 @@ export const POST = withAuth(async (request: NextRequest, auth: AuthResult) => {
 
     const userId: string = user.id
 
-    // GraphQL: Person nach E-Mail, Companies holen
+    // GraphQL: fetch data
     const bearer = request.headers.get('authorization') || ''
     const gqlResp = await fetch(GRAPHQL_URL, {
       method: 'POST',
@@ -91,7 +91,7 @@ export const POST = withAuth(async (request: NextRequest, auth: AuthResult) => {
       )
     ).sort()
 
-    // Aktuellen User holen zum Mergen
+    // Fetch current user for merging
     const kcUserResp = await fetch(`${KEYCLOAK_URL}/admin/realms/${REALM}/users/${userId}`, {
       headers: { Authorization: `Bearer ${adminToken}`, 'Content-Type': 'application/json' },
     })

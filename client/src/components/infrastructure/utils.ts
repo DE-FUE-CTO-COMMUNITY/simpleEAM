@@ -3,7 +3,7 @@
 import { format } from 'date-fns'
 import { InfrastructureType, InfrastructureStatus } from '../../gql/generated'
 
-// Formatiert das Datum für die Anzeige
+// Formats the date for display
 export const formatDate = (dateString: string): string => {
   try {
     return format(new Date(dateString), 'dd.MM.yyyy HH:mm')
@@ -12,7 +12,7 @@ export const formatDate = (dateString: string): string => {
   }
 }
 
-// Gibt einen lesbaren deutschen Namen für den Infrastructure-Typ zurück
+// Returns a human-readable name for the Infrastructure type
 export const getInfrastructureTypeLabel = (type: InfrastructureType): string => {
   switch (type) {
     case InfrastructureType.CLOUD_DATACENTER:
@@ -34,7 +34,7 @@ export const getInfrastructureTypeLabel = (type: InfrastructureType): string => 
   }
 }
 
-// Gibt einen lesbaren deutschen Namen für den Infrastructure-Status zurück
+// Returns a human-readable name for the Infrastructure status
 export const getInfrastructureStatusLabel = (status: InfrastructureStatus): string => {
   switch (status) {
     case InfrastructureStatus.ACTIVE:
@@ -46,7 +46,7 @@ export const getInfrastructureStatusLabel = (status: InfrastructureStatus): stri
     case InfrastructureStatus.PLANNED:
       return 'Geplant'
     case InfrastructureStatus.DECOMMISSIONED:
-      return 'Außer Betrieb'
+      return 'Out of Service'
     case InfrastructureStatus.UNDER_CONSTRUCTION:
       return 'Im Aufbau'
     default:

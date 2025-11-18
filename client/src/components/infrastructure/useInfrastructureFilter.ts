@@ -10,7 +10,7 @@ interface UseInfrastructureFilterProps {
 }
 
 export const useInfrastructureFilter = ({ infrastructures = [] }: UseInfrastructureFilterProps) => {
-  // Standardzustand für Filter
+  // Default state for filters
   const [filterState, setFilterState] = useState<FilterState>({
     statusFilter: [],
     typeFilter: [],
@@ -23,7 +23,7 @@ export const useInfrastructureFilter = ({ infrastructures = [] }: UseInfrastruct
     operatingSystemFilter: '',
   })
 
-  // Filterfunktion für erweiterte Filter
+  // Filter function for advanced filters
   const filteredInfrastructures = useMemo(() => {
     return infrastructures.filter((infrastructure: Infrastructure) => {
       // Status Filter
@@ -128,7 +128,7 @@ export const useInfrastructureFilter = ({ infrastructures = [] }: UseInfrastruct
     filterState.operatingSystemFilter,
   ])
 
-  // Alle verfügbaren Status extrahieren
+  // Extract all available statuses
   const availableStatuses = useMemo(() => {
     const statuses = infrastructures
       .map(infra => infra.status)
@@ -140,7 +140,7 @@ export const useInfrastructureFilter = ({ infrastructures = [] }: UseInfrastruct
     return statuses.sort()
   }, [infrastructures])
 
-  // Alle verfügbaren Typen extrahieren
+  // Extract all available types
   const availableTypes = useMemo(() => {
     const types = infrastructures
       .map(infra => infra.infrastructureType)
@@ -152,7 +152,7 @@ export const useInfrastructureFilter = ({ infrastructures = [] }: UseInfrastruct
     return types.sort()
   }, [infrastructures])
 
-  // Alle verfügbaren Vendors extrahieren
+  // Extract all available vendors
   const availableVendors = useMemo(() => {
     const vendors = infrastructures
       .map(infra => infra.vendor)
@@ -164,7 +164,7 @@ export const useInfrastructureFilter = ({ infrastructures = [] }: UseInfrastruct
     return vendors.sort()
   }, [infrastructures])
 
-  // Alle verfügbaren Locations extrahieren
+  // Extract all available locations
   const availableLocations = useMemo(() => {
     const locations = infrastructures
       .map(infra => infra.location)
@@ -176,7 +176,7 @@ export const useInfrastructureFilter = ({ infrastructures = [] }: UseInfrastruct
     return locations.sort()
   }, [infrastructures])
 
-  // Alle verfügbaren Operating Systems extrahieren
+  // Extract all available operating systems
   const availableOperatingSystems = useMemo(() => {
     const operatingSystems = infrastructures
       .map(infra => infra.operatingSystem)
@@ -188,7 +188,7 @@ export const useInfrastructureFilter = ({ infrastructures = [] }: UseInfrastruct
     return operatingSystems.sort()
   }, [infrastructures])
 
-  // Reset-Funktion für Filter
+  // Reset function for filters
   const resetFilters = () => {
     setFilterState({
       statusFilter: [],

@@ -163,7 +163,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
           severity: 'success',
         })
       } catch {
-        // Fehlerbehandlung
+        // Error handling
         setNotification({
           open: true,
           message: t('errors.capabilityMapError'),

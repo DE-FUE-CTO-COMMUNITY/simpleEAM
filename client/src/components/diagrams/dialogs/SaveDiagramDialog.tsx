@@ -181,7 +181,7 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
   const [titleError, setTitleError] = useState(false)
   const [architectureError, setArchitectureError] = useState(false)
 
-  // State für neue Elemente und Beziehungen
+  // State for neue Elemente und Beziehungen
   const [newElementsDialogOpen, setNewElementsDialogOpen] = useState(false)
   const [detectedNewElements, setDetectedNewElements] = useState<any[]>([])
   const [detectedNewRelationships, setDetectedNewRelationships] = useState<NewRelationship[]>([])

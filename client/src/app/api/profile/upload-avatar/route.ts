@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
 
     const token = authHeader.substring(7)
 
-    // Entschlüssele das Token, um Benutzerinformationen zu erhalten
+    // Decrypt token to get user information
     const tokenPayload = JSON.parse(atob(token.split('.')[1]))
     const userEmail = tokenPayload.email
 
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Keine Datei hochgeladen' }, { status: 400 })
     }
 
-    // Überprüfe Dateigröße (max 2MB für komprimierte Bilder)
+    // Check file size (max 2MB für komprimierte Bilder)
     const maxSize = 2 * 1024 * 1024 // 2MB
     if (file.size > maxSize) {
       return NextResponse.json(
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Überprüfe Dateityp
+    // Check file type
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
     if (!allowedTypes.includes(file.type)) {
       return NextResponse.json(
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(bytes)
     const base64String = buffer.toString('base64')
 
-    // Zusätzliche Größenprüfung für Base64-String
+    // Additional size check for Base64-String
     if (base64String.length > 1500000) {
       // ~1.5MB Base64
       return NextResponse.json(
@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
     const mimeType = file.type
     const dataUrl = `data:${mimeType};base64,${base64String}`
 
-    // GraphQL-Mutation über internen API-Aufruf
+    // GraphQL mutation via internal API call
     const graphqlEndpoint =
       process.env.NEXT_PUBLIC_GRAPHQL_URL || 'https://api.dev-server.mf2.eu/graphql'
 
@@ -144,7 +144,7 @@ export async function DELETE(request: NextRequest) {
 
     const token = authHeader.substring(7)
 
-    // Entschlüssele das Token, um Benutzerinformationen zu erhalten
+    // Decrypt token to get user information
     const tokenPayload = JSON.parse(atob(token.split('.')[1]))
     const userEmail = tokenPayload.email
 
@@ -152,7 +152,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ message: 'E-Mail nicht im Token gefunden' }, { status: 400 })
     }
 
-    // GraphQL-Mutation zum Löschen des Avatars
+    // GraphQL mutation to delete the Avatars
     const graphqlEndpoint =
       process.env.NEXT_PUBLIC_GRAPHQL_URL || 'https://api.dev-server.mf2.eu/graphql'
 

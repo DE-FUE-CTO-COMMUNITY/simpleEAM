@@ -1,7 +1,7 @@
 import { defineRouting } from 'next-intl/routing'
 
 export const routing = defineRouting({
-  // Unterstützte Sprachen
+  // Supported languages
   locales: ['de', 'en'],
 
   // Standardsprache
@@ -12,8 +12,8 @@ export const routing = defineRouting({
 
   // Cookie-Konfiguration für GDPR-Konformität
   localeCookie: {
-    // Session-Cookie (läuft ab wenn Browser geschlossen wird)
-    // maxAge kann gesetzt werden für längere Gültigkeit
+    // Session cookie (expires when browser is closed)
+    // maxAge can be set for longer validity
     name: 'NEXT_LOCALE',
   },
 })

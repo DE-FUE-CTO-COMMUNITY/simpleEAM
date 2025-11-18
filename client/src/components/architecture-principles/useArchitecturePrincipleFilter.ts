@@ -10,7 +10,7 @@ interface UseArchitecturePrincipleFilterProps {
 }
 
 export const useArchitecturePrincipleFilter = ({ principles = [] }: UseArchitecturePrincipleFilterProps) => {
-  // Standardzustand für Filter
+  // Default state for filters
   const [filterState, setFilterState] = useState<FilterState>({
     categoryFilter: [],
     priorityFilter: [],
@@ -21,7 +21,7 @@ export const useArchitecturePrincipleFilter = ({ principles = [] }: UseArchitect
     isActiveFilter: null,
   })
 
-  // Filterfunktion für erweiterte Filter
+  // Filter function for advanced filters
   const filteredData = useMemo(() => {
     return principles.filter((principle: ArchitecturePrincipleType) => {
       // Kategorie Filter
@@ -32,7 +32,7 @@ export const useArchitecturePrincipleFilter = ({ principles = [] }: UseArchitect
         return false
       }
 
-      // Priorität Filter
+      // Priority filter
       if (
         filterState.priorityFilter.length > 0 &&
         !filterState.priorityFilter.includes(principle.priority as PrinciplePriority)
@@ -103,7 +103,7 @@ export const useArchitecturePrincipleFilter = ({ principles = [] }: UseArchitect
     filterState.isActiveFilter,
   ])
 
-  // Alle verfügbaren Kategorien extrahieren
+  // Extract all available categories
   const availableCategories = useMemo(() => {
     const categories = principles
       .map(principle => principle.category)
@@ -115,7 +115,7 @@ export const useArchitecturePrincipleFilter = ({ principles = [] }: UseArchitect
     return categories.sort()
   }, [principles])
 
-  // Alle verfügbaren Prioritäten extrahieren
+  // Extract all available priorities
   const availablePriorities = useMemo(() => {
     const priorities = principles
       .map(principle => principle.priority)
@@ -127,7 +127,7 @@ export const useArchitecturePrincipleFilter = ({ principles = [] }: UseArchitect
     return priorities.sort()
   }, [principles])
 
-  // Alle verfügbaren Tags extrahieren
+  // Extract all available tags
   const availableTags = useMemo(() => {
     const allTags: string[] = []
     principles.forEach(principle => {
@@ -139,7 +139,7 @@ export const useArchitecturePrincipleFilter = ({ principles = [] }: UseArchitect
     return Array.from(new Set(allTags)).sort()
   }, [principles])
 
-  // Reset-Funktion für Filter
+  // Reset function for filters
   const resetFilters = () => {
     setFilterState({
       categoryFilter: [],

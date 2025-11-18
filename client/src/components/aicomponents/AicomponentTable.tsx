@@ -52,7 +52,7 @@ interface AicomponentTableProps {
   onUpdateAicomponent?: (id: string, data: AicomponentFormValues) => Promise<void>
   onDeleteAicomponent?: (id: string) => Promise<void>
   onTableReady?: (table: any) => void
-  // Diese Props sind jetzt optional, da die Persistierung intern verwaltet wird
+  // These props are now optional as persistence is handled internally
   columnVisibility?: VisibilityState
   onColumnVisibilityChange?: (
     updater: VisibilityState | ((old: VisibilityState) => VisibilityState)
@@ -89,7 +89,7 @@ const AicomponentTableWithGenericTable: React.FC<AicomponentTableProps> = ({
     defaultColumnVisibility: Aicomponents_DEFAULT_COLUMN_VISIBILITY,
   })
 
-  // Kombiniere externe und persistente onTableReady Callbacks
+  // Combine external and persistent onTableReady callbacks
   const handleTableReady = (table: any) => {
     persistentOnTableReady(table)
     if (onTableReady) {
@@ -97,7 +97,7 @@ const AicomponentTableWithGenericTable: React.FC<AicomponentTableProps> = ({
     }
   }
 
-  // Spalten-Definition für die Aicomponent-Tabelle
+  // Column definition for Aicomponent-Tabelle
   const columns = useMemo(
     () => [
       columnHelper.accessor('id', {
@@ -275,7 +275,7 @@ const AicomponentTableWithGenericTable: React.FC<AicomponentTableProps> = ({
     [columnHelper, t, formatDate, getAiTypeLabel, getStatusLabel]
   )
 
-  // Mapping von AicomponentType zu den erwarteten FormValues für das Formular
+  // Mapping from AicomponentType to expected FormValues for form
   const mapToFormValues = (aicomponent: AicomponentType): AicomponentFormValues => {
     return {
       name: aicomponent.name,

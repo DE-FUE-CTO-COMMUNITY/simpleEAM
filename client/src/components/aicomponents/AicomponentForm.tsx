@@ -73,7 +73,7 @@ export default function AicomponentForm({
   const getAiTypeLabel = useAiTypeLabel()
   const getStatusLabel = useStatusLabel()
 
-  // Schema für die Formularvalidierung mit internationalisierten Fehlermeldungen
+  // Schema for form validation mit internationalisierten Fehlermeldungen
   const aicomponentSchema = z.object({
     name: z.string().min(1, tValidation('required')),
     description: z.string().optional(),

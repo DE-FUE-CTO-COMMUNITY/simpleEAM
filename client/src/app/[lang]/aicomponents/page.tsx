@@ -41,11 +41,11 @@ const AicomponentsPage = () => {
     variables: { where: companyWhere },
   })
 
-  // Mutation zum Erstellen einer neuen AI Component
+  // Mutation for creating a new AI Component
   const [createAicomponent] = useMutation(CREATE_Aicomponent, {
     onCompleted: () => {
       enqueueSnackbar(t('messages.createSuccess'), { variant: 'success' })
-      // Refetch mit aktivem Company-Filter, damit neu erstellte AI Component sofort sichtbar ist
+      // Refetch with active company filter so newly created items are immediately visible
       refetch({ where: companyWhere })
     },
     onError: error => {
@@ -55,7 +55,7 @@ const AicomponentsPage = () => {
     },
   })
 
-  // Mutation zum Aktualisieren einer bestehenden AI Component
+  // Mutation for updating an existing AI Component
   const [updateAicomponent] = useMutation(UPDATE_Aicomponent, {
     onCompleted: () => {
       enqueueSnackbar(t('messages.updateSuccess'), { variant: 'success' })
@@ -68,7 +68,7 @@ const AicomponentsPage = () => {
     },
   })
 
-  // Mutation zum Löschen einer AI Component
+  // Mutation for deleting a AI Component
   const [deleteAicomponent] = useMutation(DELETE_Aicomponent, {
     onCompleted: () => {
       enqueueSnackbar(t('messages.deleteSuccess'), { variant: 'success' })
@@ -86,7 +86,7 @@ const AicomponentsPage = () => {
     aicomponents: data?.aiComponents || [],
   })
 
-  // Liste der verfügbaren Werte aus den Daten extrahieren
+  // Extract list of available values from the data
   const [availableAiTypes, setAvailableAiTypes] = useState<AiComponentType[]>([])
   const [availableStatuses, setAvailableStatuses] = useState<AiComponentStatus[]>([])
   const [availableProviders, setAvailableProviders] = useState<string[]>([])
@@ -100,17 +100,17 @@ const AicomponentsPage = () => {
   const [filterDialogOpen, setFilterDialogOpen] = useState(false)
   const [showNewAicomponentForm, setShowNewAicomponentForm] = useState(false)
 
-  // Table-Instanz State für Column Visibility
+  // Table instance state for column visibility
   const [tableInstance, setTableInstance] = useState<Table<AicomponentType> | null>(null)
 
-  // Verfügbare Werte aus den geladenen Daten extrahieren
+  // Extract available values from loaded data
   const aicomponents = useMemo(() => data?.aiComponents || [], [data?.aiComponents])
 
   useEffect(() => {
     if (aicomponents.length) {
       const aicomponentsData = aicomponents as AicomponentType[]
 
-      // Alle AI Types extrahieren und Duplikate entfernen
+      // Extract all values and remove duplicates
       const allAiTypes: AiComponentType[] = aicomponentsData
         .map((ai: AicomponentType) => ai.aiType)
         .filter(Boolean) as AiComponentType[]
@@ -118,7 +118,7 @@ const AicomponentsPage = () => {
       const uniqueAiTypes = Array.from(new Set(allAiTypes)).sort()
       setAvailableAiTypes(uniqueAiTypes)
 
-      // Alle Status extrahieren und Duplikate entfernen
+      // Extract all statuses and remove duplicates
       const allStatuses: AiComponentStatus[] = aicomponentsData
         .map((ai: AicomponentType) => ai.status)
         .filter(Boolean) as AiComponentStatus[]
@@ -126,7 +126,7 @@ const AicomponentsPage = () => {
       const uniqueStatuses = Array.from(new Set(allStatuses)).sort()
       setAvailableStatuses(uniqueStatuses)
 
-      // Alle Provider sammeln und Duplikate entfernen
+      // Collect all values and remove duplicates
       const allProviders: string[] = aicomponentsData
         .map((ai: AicomponentType) => ai.provider)
         .filter(Boolean) as string[]
@@ -134,7 +134,7 @@ const AicomponentsPage = () => {
       const uniqueProviders = Array.from(new Set(allProviders)).sort()
       setAvailableProviders(uniqueProviders)
 
-      // Alle Tags sammeln und Duplikate entfernen
+      // Collect all tags and remove duplicates
       const allTags: string[] = []
       aicomponentsData.forEach((ai: AicomponentType) => {
         if (ai.tags) {
@@ -144,7 +144,7 @@ const AicomponentsPage = () => {
       const uniqueTags = Array.from(new Set(allTags)).sort()
       setAvailableTags(uniqueTags)
 
-      // Alle Owners sammeln und Duplikate entfernen
+      // Collect all values and remove duplicates
       const allOwners: Person[] = []
       aicomponentsData.forEach((ai: AicomponentType) => {
         if (ai.owners) {
@@ -159,7 +159,7 @@ const AicomponentsPage = () => {
     }
   }, [aicomponents])
 
-  // Handler für das Aktualisieren einer bestehenden AI Component
+  // Handler for updating an existing AI Component
   const handleUpdateAicomponentSubmit = async (id: string, data: AicomponentFormValues) => {
     try {
       // Separate relationship IDs from base data
@@ -359,7 +359,7 @@ const AicomponentsPage = () => {
     setShowNewAicomponentForm(true)
   }
 
-  // Delete wird i.d.R. im GenericTable/Dialog gehandhabt
+  // Delete is usually handled in GenericTable/Dialog
 
   // Reset Filter Handler
   const handleResetFilter = () => {
@@ -425,7 +425,7 @@ const AicomponentsPage = () => {
                 })
               } catch (error) {
                 console.error('Fehler beim Erstellen des aicomponent:', error)
-                throw error // Re-throw damit GenericTable den Fehler handhaben kann
+                throw error // Re-throw so GenericTable can handle the error
               }
             }}
             onUpdateAicomponent={handleUpdateAicomponentSubmit}
@@ -518,7 +518,7 @@ const AicomponentsPage = () => {
                 ...aiComponentData
               } = values
 
-              // Bei CREATE wird kein spezielles Mutation-Objekt benötigt, da direkte Werte erlaubt sind
+              // For CREATE, no special mutation object is needed as direct values are allowed
               const input = {
                 name: aiComponentData.name,
                 description: aiComponentData.description,
@@ -533,7 +533,7 @@ const AicomponentsPage = () => {
                 costs: aiComponentData.costs,
                 tags: aiComponentData.tags,
 
-                // Wenn ein Besitzer ausgewählt wurde, verwenden wir die owners-Struktur
+                // If an owner was selected, use the owners structure
                 ...(ownerId
                   ? {
                       owners: {
@@ -542,7 +542,7 @@ const AicomponentsPage = () => {
                     }
                   : {}),
 
-                // Wenn Capabilities ausgewählt wurden, verbinden wir sie
+                // If values were selected, connect them
                 ...(supportsCapabilityIds && supportsCapabilityIds.length > 0
                   ? {
                       supportsCapabilities: {
@@ -553,7 +553,7 @@ const AicomponentsPage = () => {
                     }
                   : {}),
 
-                // Wenn Applications ausgewählt wurden, verbinden wir sie
+                // If values were selected, connect them
                 ...(usedByApplicationIds && usedByApplicationIds.length > 0
                   ? {
                       usedByApplications: {
@@ -564,7 +564,7 @@ const AicomponentsPage = () => {
                     }
                   : {}),
 
-                // Wenn Data Objects ausgewählt wurden, verbinden wir sie
+                // If values were selected, connect them
                 ...(trainedWithDataObjectIds && trainedWithDataObjectIds.length > 0
                   ? {
                       trainedWithDataObjects: {
@@ -575,7 +575,7 @@ const AicomponentsPage = () => {
                     }
                   : {}),
 
-                // Wenn Infrastructure ausgewählt wurde, verbinden wir sie
+                // If Infrastructure was selected, connect it
                 ...(hostedOnIds && hostedOnIds.length > 0
                   ? {
                       hostedOn: {
@@ -586,7 +586,7 @@ const AicomponentsPage = () => {
                     }
                   : {}),
 
-                // Wenn Architectures ausgewählt wurden, verbinden wir sie
+                // If values were selected, connect them
                 ...(partOfArchitectureIds && partOfArchitectureIds.length > 0
                   ? {
                       partOfArchitectures: {
@@ -597,7 +597,7 @@ const AicomponentsPage = () => {
                     }
                   : {}),
 
-                // Wenn Principles ausgewählt wurden, verbinden wir sie
+                // If values were selected, connect them
                 ...(implementsPrincipleIds && implementsPrincipleIds.length > 0
                   ? {
                       implementsPrinciples: {
@@ -608,7 +608,7 @@ const AicomponentsPage = () => {
                     }
                   : {}),
 
-                // Wenn Diagrams ausgewählt wurden, verbinden wir sie
+                // If values were selected, connect them
                 ...(depictedInDiagramIds && depictedInDiagramIds.length > 0
                   ? {
                       depictedInDiagrams: {
@@ -619,7 +619,7 @@ const AicomponentsPage = () => {
                     }
                   : {}),
 
-                // Company-Zuordnung (Pflicht)
+                // Company assignment (required)
                 company: {
                   connect: [
                     {
@@ -631,7 +631,7 @@ const AicomponentsPage = () => {
 
               await createAicomponent({
                 variables: { input: [input] },
-                // Sicherheitshalber: aktualisiere auch die Liste im Cache via Refetch Query mit Filter
+                // For safety: also update the list in cache via refetch query with filter
                 refetchQueries: [
                   {
                     query: GET_Aicomponents,
@@ -643,7 +643,7 @@ const AicomponentsPage = () => {
               setShowNewAicomponentForm(false)
             } catch (error) {
               console.error('Fehler beim Erstellen der/des aicomponent:', error)
-              throw error // Re-throw damit GenericTable den Fehler handhaben kann
+              throw error // Re-throw so GenericTable can handle the error
             }
           }}
         />

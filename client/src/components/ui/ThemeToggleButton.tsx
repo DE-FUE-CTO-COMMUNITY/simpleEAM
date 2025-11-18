@@ -17,7 +17,7 @@ const ThemeToggleButton: React.FC<ThemeToggleButtonProps> = ({ sx }) => {
 
   return (
     <Tooltip
-      title={mode === 'light' ? 'Zu Dark Mode wechseln' : 'Zu Light Mode wechseln'}
+      title={mode === 'light' ? 'Zu dark mode wechseln' : 'Zu Light Mode wechseln'}
       placement="bottom"
     >
       <IconButton

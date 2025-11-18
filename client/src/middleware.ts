@@ -3,7 +3,7 @@ import { routing } from '@/i18n/routing'
 
 export default createMiddleware(routing)
 
-// Konfiguration für Next.js 15 - Internationalisierung mit next-intl
+// Configuration for Next.js 15 - Internationalization with next-intl
 export const config = {
   matcher: [
     /*
@@ -11,7 +11,6 @@ export const config = {
      * - api (API routes)
      * - _next (Next.js internals)
      * - _vercel (Vercel internals)
-     * - Dateien mit Punkten (z.B. favicon.ico)
      */
     '/((?!api|_next|_vercel|.*\\..*).*)',
   ],

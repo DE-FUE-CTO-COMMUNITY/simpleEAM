@@ -54,7 +54,7 @@ const DiagramCard: React.FC<DiagramCardProps> = ({
 
   const handleClick = async () => {
     try {
-      // Diagramm-Daten mit allen verfügbaren Metadaten vorbereiten
+      // Prepare diagram data with all available metadata
       const diagramToOpen = {
         id,
         title,
@@ -66,7 +66,7 @@ const DiagramCard: React.FC<DiagramCardProps> = ({
         architecture,
       }
 
-      // Wenn diagramJson verfügbar ist, direkt verwenden
+      // If diagramJson is available, use it directly
       if (diagramJson) {
         localStorage.setItem(
           'pendingDiagramToOpen',
@@ -76,14 +76,14 @@ const DiagramCard: React.FC<DiagramCardProps> = ({
           })
         )
       } else {
-        // Nur die ID speichern, der DiagramEditor lädt das JSON dynamisch
+        // Only save ID, DiagramEditor loads JSON dynamically
         localStorage.setItem('pendingDiagramToOpen', JSON.stringify(diagramToOpen))
       }
 
-      // Navigiere ohne URL-Parameter zum Diagram Editor
+      // Navigate to diagram editor without URL parameters
       router.push('/diagrams')
     } catch (error) {
-      console.error('Fehler beim Vorbereiten des Diagramm-Öffnens:', error)
+      console.error('Error preparing diagram opening:', error)
     }
   }
 
@@ -153,7 +153,7 @@ const DiagramCard: React.FC<DiagramCardProps> = ({
                 color: 'text.secondary',
               }}
             >
-              <Typography variant="body2">Keine Vorschau verfügbar</Typography>
+              <Typography variant="body2">No preview available</Typography>
             </Box>
           )}
         </Box>
@@ -221,7 +221,7 @@ const DiagramCard: React.FC<DiagramCardProps> = ({
             </Box>
           )}
 
-          {/* Chips für Typ und Datum */}
+          {/* Chips for type and date */}
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 1 }}>
             <Chip
               label={getDiagramTypeLabel(diagramType)}
@@ -243,7 +243,7 @@ const DiagramCard: React.FC<DiagramCardProps> = ({
   )
 }
 
-// Skeleton-Version für Ladezeiten
+// Skeleton version for loading times
 export const DiagramCardSkeleton: React.FC = () => (
   <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
     <Skeleton variant="rectangular" height={200} />

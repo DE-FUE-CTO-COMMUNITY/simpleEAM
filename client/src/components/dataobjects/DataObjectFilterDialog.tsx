@@ -37,7 +37,7 @@ const DataObjectFilterDialog: React.FC<DataObjectFilterDialogProps> = ({
   const t = useTranslations('dataObjects.filter')
   const tClassifications = useTranslations('dataObjects.classifications')
 
-  // Zähle die aktiven Filter
+  // Count active filters
   const countActiveFilters = (fs: GenericFilterState) => {
     return (
       (fs.classifications?.length || 0) +
@@ -52,7 +52,7 @@ const DataObjectFilterDialog: React.FC<DataObjectFilterDialogProps> = ({
     )
   }
 
-  // Definiere Filterfelder für den generischen Dialog
+  // Define filter fields for the generic dialog
   const filterFields: FilterField[] = [
     // Klassifikationsfilter
     {
@@ -115,7 +115,7 @@ const DataObjectFilterDialog: React.FC<DataObjectFilterDialogProps> = ({
         label: cap,
       })),
     },
-    // Teil von Architekturen Filter
+    // Part of architectures filter
     {
       id: 'partOfArchitectures',
       label: t('partOfArchitectures'),
@@ -142,12 +142,12 @@ const DataObjectFilterDialog: React.FC<DataObjectFilterDialogProps> = ({
     },
   ]
 
-  // Handler für Änderungen der Filter
+  // Handler for filter changes
   const handleFilterChange = (partialState: Partial<GenericFilterState>) => {
     onFiltersChange({ ...filters, ...partialState })
   }
 
-  // Wenn der Dialog nicht offen ist, nichts rendern
+  // If dialog is not open, render nothing
   if (!open) return null
 
   return (

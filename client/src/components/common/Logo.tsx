@@ -9,10 +9,10 @@ interface LogoProps extends BoxProps {
 
 /**
  * Logo Komponente für die Verwendung im Header und Footer
- * Das Logo wird dynamisch aus Umgebungsvariablen geladen
+ * Das Logo wird dynamically from environment variables geladen
  */
 const Logo: React.FC<LogoProps> = ({ height = 40, ...boxProps }) => {
-  // Logo-Pfad aus Umgebungsvariablen laden, mit Fallback auf Simple-EAM Logo
+  // Logo-Pfad from environment variables, mit Fallback auf Simple-EAM Logo
   // Unterstütze sowohl die alten (_URL/_ALT) als auch die neuen (_PATH/_NAME) Variablennamen
   const logoPath =
     process.env.NEXT_PUBLIC_LOGO_PATH ||

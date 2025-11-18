@@ -7,7 +7,7 @@ export interface ImportSettings {
     | 'interfaces'
     | 'persons'
     | 'architectures'
-    | 'diagrams' // Nur für JSON-Import verfügbar
+    | 'diagrams' // Only available for JSON import
     | 'architecturePrinciples'
     | 'infrastructures'
     | 'aicomponents'
@@ -25,7 +25,7 @@ export interface ExportSettings {
     | 'interfaces'
     | 'persons'
     | 'architectures'
-    | 'diagrams' // Nur für JSON-Export verfügbar
+    | 'diagrams' // Only available for JSON export
     | 'architecturePrinciples'
     | 'infrastructures'
     | 'aicomponents'

@@ -1,7 +1,7 @@
 import { DataClassification } from '../../gql/generated'
 
 /**
- * Vereinfachte Version des Owner-Typs für Beispieldaten
+ * Simplified version of Owner type for example data
  */
 export interface SimplePerson {
   id: string
@@ -10,7 +10,7 @@ export interface SimplePerson {
 }
 
 /**
- * Erweiterter Typ für DataObjects mit zusätzlichen Feldern oder angepassten Typen
+ * Extended type for DataObjects with additional fields or adjusted types
  */
 export interface DataObject {
   id: string
@@ -25,7 +25,7 @@ export interface DataObject {
 }
 
 /**
- * Typ für Formulareingaben für DataObjects
+ * Type for form inputs for DataObjects
  */
 export interface DataObjectFormValues {
   name: string
@@ -37,7 +37,7 @@ export interface DataObjectFormValues {
 }
 
 /**
- * Filter State für DataObjects
+ * Filter state for DataObjects
  */
 export interface FilterState {
   classificationFilter: DataClassification[]

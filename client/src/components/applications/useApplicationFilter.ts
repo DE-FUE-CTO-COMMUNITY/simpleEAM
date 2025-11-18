@@ -15,7 +15,7 @@ interface UseApplicationFilterProps {
 }
 
 export const useApplicationFilter = ({ applications = [] }: UseApplicationFilterProps) => {
-  // Standardzustand für Filter
+  // Default state for filters
   const [filterState, setFilterState] = useState<FilterState>({
     statusFilter: [] as ApplicationStatus[],
     criticalityFilter: [] as CriticalityLevel[],
@@ -30,7 +30,7 @@ export const useApplicationFilter = ({ applications = [] }: UseApplicationFilter
     hostedOnFilter: [] as string[],
   })
 
-  // Filterfunktion für erweiterte Filter
+  // Filter function for advanced filters
   const filteredData = useMemo(() => {
     return applications.filter((application: ApplicationType) => {
       // Status-Filter
@@ -42,7 +42,7 @@ export const useApplicationFilter = ({ applications = [] }: UseApplicationFilter
         return false
       }
 
-      // Kritikalitäts-Filter
+      // Criticality filter
       if (
         filterState.criticalityFilter &&
         filterState.criticalityFilter.length > 0 &&
@@ -86,7 +86,7 @@ export const useApplicationFilter = ({ applications = [] }: UseApplicationFilter
         return false
       }
 
-      // Verantwortlicher-Filter
+      // Owner filter
       if (
         filterState.ownerFilter &&
         (!application.owners ||

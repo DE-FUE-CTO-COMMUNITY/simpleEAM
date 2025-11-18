@@ -1,4 +1,4 @@
-// Template für Entity Types
+// Template for entity types
 // companies = plural (companies, capabilities, etc.)
 // company = singular (company, capability, etc.)
 // Companies = plural capitalized (Companies, Capabilities, etc.)
@@ -8,7 +8,7 @@
 
 import { Company as GeneratedCompany, CompanySize } from '../../gql/generated'
 
-// Nutze den generierten Typ als Basis und passe ihn für unsere Komponenten an
+// Use the generated type as basis and adapt it for our components
 export type CompanyType = Pick<
   GeneratedCompany,
   | 'id'

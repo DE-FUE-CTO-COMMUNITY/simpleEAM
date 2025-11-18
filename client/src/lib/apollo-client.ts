@@ -7,15 +7,15 @@ import { keycloak } from './auth'
  * Erstellt einen Apollo-Client für GraphQL-Anfragen mit dynamischer Token-Authentifizierung
  */
 export function createApolloClient(initialToken?: string) {
-  // HTTP-Link für den GraphQL-Endpunkt
+  // HTTP link for GraphQL endpoint
   const httpLink = new HttpLink({
     uri: process.env.NEXT_PUBLIC_GRAPHQL_URL || 'https://api.dev-server.mf2.eu/graphql',
   })
 
   // Authentifizierungs-Link für dynamisches Token-Handling
   const authLink = setContext((_, { headers }) => {
-    // Hole das aktuelle Token aus der Keycloak-Instanz (falls verfügbar)
-    // oder verwende das übergebene initialToken als Fallback
+    // Get current token from Keycloak instance (if available)
+    // or use passed initialToken as fallback
     const currentToken = keycloak?.token || initialToken
 
     return {
@@ -55,7 +55,7 @@ export function createApolloClient(initialToken?: string) {
           window.dispatchEvent(new CustomEvent('authError'))
         }
       }
-      // Bei Netzwerkfehlern können wir es erneut versuchen
+      // On network errors we can retry
       return forward(operation)
     }
   })

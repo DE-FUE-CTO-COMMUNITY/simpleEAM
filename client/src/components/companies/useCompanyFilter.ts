@@ -9,7 +9,7 @@ interface UseCompanyFilterProps {
 }
 
 export const useCompanyFilter = ({ companies = [] }: UseCompanyFilterProps) => {
-  // Standardzustand für Filter
+  // Default state for filters
   const [filterState, setFilterState] = useState<FilterState>({
     nameFilter: '',
     descriptionFilter: '',
@@ -21,7 +21,7 @@ export const useCompanyFilter = ({ companies = [] }: UseCompanyFilterProps) => {
     updatedDateRange: null,
   })
 
-  // Filterfunktion für erweiterte Filter
+  // Filter function for advanced filters
   const filteredCompanies = useMemo(() => {
     return companies.filter((company: CompanyType) => {
       // Name-Filter

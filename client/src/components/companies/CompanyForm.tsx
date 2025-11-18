@@ -12,7 +12,7 @@ import GenericForm, { FieldConfig, TabConfig } from '../common/GenericForm'
 import { GenericFormProps } from '../common/GenericFormProps'
 import { isArchitect } from '@/lib/auth'
 
-// Schema für die Formularvalidierung (Export für externe Verwendung)
+// Schema for form validation (export for external use)
 export const companySchema = z.object({
   name: z.string().min(3).max(100),
   description: z.string().min(10).max(1000).optional(),
@@ -38,12 +38,12 @@ const CompaniesForm: React.FC<GenericFormProps<CompanyType, CompanyFormValues>> 
   const tCommon = useTranslations('common')
 
   // Admin sollte alle Personen sehen können, nicht nur die der aktuellen Company
-  // Für die Company-Form laden wir alle verfügbaren Personen
+  // For the company form we load all available persons
   const { data: personsData, loading: personsLoading } = useQuery(GET_PERSONS, {
     variables: { where: {} }, // Keine Filterung - alle Personen laden
   })
 
-  // Formulardaten mit useMemo initialisieren
+  // Initialize form data with useMemo
   const defaultValues = React.useMemo<CompanyFormValues>(
     () => ({
       name: '',
@@ -73,7 +73,7 @@ const CompaniesForm: React.FC<GenericFormProps<CompanyType, CompanyFormValues>> 
     },
   })
 
-  // Formulardaten aktualisieren, wenn sich die Entity ändert
+  // Update form data when entity changes
   useEffect(() => {
     if (company) {
       form.setFieldValue('name', company.name || '')

@@ -54,7 +54,7 @@ export default function AutoRegistrationDebug() {
           size="small"
         />
         <Chip
-          label={`Registrierung geprüft: ${registrationChecked}`}
+          label={`Registration checked: ${registrationChecked}`}
           color={registrationChecked ? 'success' : 'default'}
           size="small"
         />

@@ -1,4 +1,4 @@
-// TypeScript-Deklarationen für Hypher-Bibliothek
+// TypeScript declarations for Hypher library
 declare module 'hypher' {
   interface HypherOptions {
     minLength?: number

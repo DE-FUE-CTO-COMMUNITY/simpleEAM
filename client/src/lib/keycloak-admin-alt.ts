@@ -1,4 +1,4 @@
-// Alternative Admin API über Keycloak Admin Credentials
+// Alternative Admin API via Keycloak Admin Credentials
 const getAdminToken = async (): Promise<string> => {
   const keycloakUrl = process.env.NEXT_PUBLIC_KEYCLOAK_URL || 'https://auth.dev-server.mf2.eu'
 
@@ -64,7 +64,7 @@ async function adminApiCall<T>(endpoint: string, options: RequestInit = {}): Pro
   return response.text() as unknown as T
 }
 
-// Keycloak User Interface (vereinfacht)
+// Keycloak User Interface (simplified)
 export interface KeycloakUserAlt {
   id?: string
   username: string
@@ -93,7 +93,7 @@ export async function getUsersViaAdmin(): Promise<KeycloakUserAlt[]> {
   try {
     const users = await adminApiCall<KeycloakUserAlt[]>('/users?briefRepresentation=false')
 
-    // Für jeden Benutzer die Rollen laden
+    // Load roles for each user
     const usersWithRoles = await Promise.all(
       users.map(async user => {
         if (user.id) {

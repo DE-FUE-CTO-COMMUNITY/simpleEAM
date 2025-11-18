@@ -38,7 +38,7 @@ const UserProfileMenu: React.FC<UserProfileMenuProps> = ({ userName }) => {
   const [userEmail, setUserEmail] = useState<string | null>(null)
   const [keycloak, setKeycloak] = useState<any>(null)
 
-  // Keycloak initialisieren und E-Mail extrahieren
+  // Initialize Keycloak and extract email
   useEffect(() => {
     if (typeof window !== 'undefined' && authenticated) {
       import('@/lib/auth').then(({ getKeycloak }) => {
@@ -51,7 +51,7 @@ const UserProfileMenu: React.FC<UserProfileMenuProps> = ({ userName }) => {
     }
   }, [authenticated])
 
-  // GraphQL-Abfrage für Person-Daten basierend auf E-Mail
+  // GraphQL query for Person data based on email
   const { data } = useQuery(GET_PERSON_BY_EMAIL, {
     variables: { email: userEmail || '' },
     skip: !userEmail || !authenticated,

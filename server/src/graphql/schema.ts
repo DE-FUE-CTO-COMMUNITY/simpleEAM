@@ -4,18 +4,18 @@ import { resolve } from 'path'
 import neo4jDriver from '../db/neo4j-client'
 import dotenv from 'dotenv'
 
-// Umgebungsvariablen laden
+// Load environment variables
 dotenv.config()
 
-// GraphQL-Typendefinitionen aus der Schema-Datei lesen
+// Read GraphQL type definitions from schema file
 const typeDefs = readFileSync(resolve(__dirname, 'schema.graphql')).toString('utf-8')
 
-// JWKS URL konstruieren
+// Construct JWKS URL
 const KEYCLOAK_URL = process.env.KEYCLOAK_URL || 'https://auth.dev-server.mf2.eu'
 const KEYCLOAK_REALM = process.env.KEYCLOAK_REALM || 'simple-eam'
 const jwksUrl = `${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/certs`
 
-// Neo4j GraphQL-Instanz erstellen mit JWT-Konfiguration
+// Create Neo4j GraphQL instance with JWT configuration
 export const neoSchema = new Neo4jGraphQL({
   typeDefs,
   driver: neo4jDriver,
@@ -28,7 +28,7 @@ export const neoSchema = new Neo4jGraphQL({
   },
 })
 
-// Schema generieren
+// Generate schema
 export const getSchema = async () => {
   return await neoSchema.getSchema()
 }

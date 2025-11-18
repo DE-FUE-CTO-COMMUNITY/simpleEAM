@@ -28,23 +28,23 @@ interface ThemeProviderProps {
 }
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
-  // Initialisiere mit light mode als Standard
+  // Initialize with light mode as default
   const [mode, setMode] = useState<ThemeMode>('light')
   const [mounted, setMounted] = useState(false)
 
-  // Theme basierend auf dem aktuellen Mode erstellen
+  // Create theme based on current mode
   const theme = createDynamicTheme(mode)
 
-  // LocalStorage Integration mit Hydration-Schutz
+  // LocalStorage integration with hydration protection
   useEffect(() => {
     setMounted(true)
 
-    // Lade gespeicherte Theme-Präferenz aus localStorage
+    // Load saved theme preference from localStorage
     const savedMode = localStorage.getItem('theme-mode') as ThemeMode
     if (savedMode && (savedMode === 'light' || savedMode === 'dark')) {
       setMode(savedMode)
     } else {
-      // Falls keine Präferenz gespeichert ist, prüfe System-Präferenz
+      // If no preference is saved, check system preference
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
       const initialMode = prefersDark ? 'dark' : 'light'
       setMode(initialMode)
@@ -52,7 +52,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     }
   }, [])
 
-  // Speichere Mode-Änderungen in localStorage
+  // Save mode changes to localStorage
   useEffect(() => {
     if (mounted) {
       localStorage.setItem('theme-mode', mode)
@@ -67,10 +67,10 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     setMode(newMode)
   }
 
-  // Vermeide Hydration-Fehler durch verzögertes Rendern
+  // Avoid hydration errors through delayed rendering
   if (!mounted) {
-    // Während Server-Side Rendering oder vor Client-Hydration
-    // verwende ein Standard-Theme
+    // During server-side rendering or before client hydration
+    // use a default theme
     return (
       <ThemeContext.Provider
         value={{

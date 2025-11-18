@@ -18,7 +18,7 @@ interface ArchitecturePrincipleToolbarProps {
 }
 
 /**
- * Eine Toolbar speziell für Architektur-Prinzipien, die die GenericToolbar-Komponente verwendet.
+ * A toolbar specifically for architecture principles that uses the GenericToolbar component.
  */
 const ArchitecturePrincipleToolbar: React.FC<ArchitecturePrincipleToolbarProps> = ({
   globalFilter,
@@ -43,7 +43,7 @@ const ArchitecturePrincipleToolbar: React.FC<ArchitecturePrincipleToolbarProps> 
       entityName={t('title')}
       table={table}
       enableColumnVisibilityToggle={enableColumnVisibilityToggle}
-      tableKey="architecture-principles" // Eindeutiger Schlüssel für die Architecture-Principles-Tabelle
+      tableKey="architecture-principles" // Unique key for architecture principles table
       defaultColumnVisibility={defaultColumnVisibility}
     />
   )

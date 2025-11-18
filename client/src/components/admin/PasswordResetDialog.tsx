@@ -37,7 +37,7 @@ interface PasswordResetDialogProps {
   onClipboardMessage?: (message: string, severity: 'success' | 'error') => void
 }
 
-// Utility-Funktion für Passwort-Generierung
+// Utility function for password generation
 function generatePassword(length: number = 22): string {
   const lowercase = 'abcdefghijklmnopqrstuvwxyz'
   const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -53,7 +53,7 @@ function generatePassword(length: number = 22): string {
   password += numbers[Math.floor(Math.random() * numbers.length)]
   password += special[Math.floor(Math.random() * special.length)]
 
-  // Restliche Zeichen zufällig füllen
+  // Fill remaining characters randomly
   for (let i = 4; i < length; i++) {
     password += allChars[Math.floor(Math.random() * allChars.length)]
   }
@@ -65,17 +65,17 @@ function generatePassword(length: number = 22): string {
     .join('')
 }
 
-// Utility-Funktion für Zwischenablage
+// Utility function for clipboard
 async function copyToClipboard(text: string): Promise<boolean> {
   let clipboardSuccess = false
 
   try {
-    // Überprüfung, ob Clipboard API verfügbar ist
+    // Check if Clipboard API is available
     if (navigator.clipboard && window.isSecureContext) {
       await navigator.clipboard.writeText(text)
       clipboardSuccess = true
     } else if (document.queryCommandSupported && document.queryCommandSupported('copy')) {
-      // Fallback für ältere Browser
+      // Fallback for older browsers
       const textArea = document.createElement('textarea')
       textArea.value = text
       textArea.style.position = 'fixed'
@@ -109,7 +109,7 @@ export default function PasswordResetDialog({
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
-  // Zod Schema für Passwort-Validierung
+  // Zod schema for password validation
   const passwordSchema = React.useMemo(
     () =>
       z
@@ -135,7 +135,7 @@ export default function PasswordResetDialog({
       setError(null)
 
       try {
-        // Überprüfung, ob der Benutzer authentifiziert ist
+        // Check if user is authenticated
         if (!keycloak?.token) {
           throw new Error('Nicht authentifiziert')
         }
@@ -150,7 +150,7 @@ export default function PasswordResetDialog({
             action: 'resetPassword',
             userId: user?.id,
             password: value.newPassword,
-            temporary: true, // Immer temporär, da das der gewünschte Standardfall ist
+            temporary: true, // Always temporary as this is the desired default
           }),
         })
 
@@ -165,7 +165,7 @@ export default function PasswordResetDialog({
         onSuccess()
         handleClose()
       } catch (err) {
-        console.error('Fehler beim Zurücksetzen des Passworts:', err)
+        console.error('Error resetting password:', err)
         setError(err instanceof Error ? err.message : t('error'))
       } finally {
         setSubmitLoading(false)
@@ -183,7 +183,7 @@ export default function PasswordResetDialog({
     },
   })
 
-  // Formular-Validatoren aktualisieren, wenn sich das Schema ändert
+  // Update form validators when schema changes
   React.useEffect(() => {
     form.options.validators = {
       onChange: ({ value }) => {
@@ -197,7 +197,7 @@ export default function PasswordResetDialog({
     }
   }, [form, passwordSchema])
 
-  // Formular zurücksetzen, wenn Dialog geöffnet/geschlossen wird
+  // Reset form when dialog is opened/closed
   React.useEffect(() => {
     if (open) {
       form.reset()
@@ -205,14 +205,14 @@ export default function PasswordResetDialog({
     }
   }, [open, form])
 
-  // Handler für Passwort-Generierung
+  // Handler for password generation
   const handleGeneratePassword = () => {
     const newPassword = generatePassword(22)
     form.setFieldValue('newPassword', newPassword)
     form.setFieldValue('confirmPassword', newPassword)
   }
 
-  // Handler für Zwischenablage
+  // Handler for clipboard
   const handleCopyToClipboard = async (password: string) => {
     if (!user) return false
 
@@ -252,7 +252,7 @@ ${t('clipboard.url')}: ${window.location.origin}`
     setShowConfirmPassword(!showConfirmPassword)
   }
 
-  // Überprüfen, ob Benutzer noch nie ein Passwort hatte (erstes Mal setzen)
+  // Check if user never had a password (first time setting)
   const isFirstTimePassword =
     user?.requiredActions?.includes('UPDATE_PASSWORD') &&
     user?.attributes?.firstPasswordSet?.[0] !== 'true'

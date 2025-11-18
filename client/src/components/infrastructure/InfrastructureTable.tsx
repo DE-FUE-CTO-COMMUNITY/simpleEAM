@@ -10,7 +10,7 @@ import { createColumnHelper } from '@tanstack/react-table'
 import { SortingState, VisibilityState } from '@tanstack/react-table'
 import usePersistentColumnVisibility from '../../hooks/usePersistentColumnVisibility'
 
-// Exportierte Default Column Visibility für Infrastructure
+// Exported default column visibility for Infrastructure
 export const INFRASTRUCTURE_DEFAULT_COLUMN_VISIBILITY = {
   // Standardmäßig sichtbare Spalten
   name: true,
@@ -53,7 +53,7 @@ interface InfrastructureTableProps {
   onUpdateInfrastructure?: (id: string, data: InfrastructureFormValues) => Promise<void>
   onDeleteInfrastructure?: (id: string) => Promise<void>
   onTableReady?: (table: any) => void
-  // Diese Props sind jetzt optional, da die Persistierung intern verwaltet wird
+  // These props are now optional as persistence is handled internally
   columnVisibility?: VisibilityState
   onColumnVisibilityChange?: (
     updater: VisibilityState | ((old: VisibilityState) => VisibilityState)
@@ -120,13 +120,13 @@ const InfrastructureTable: React.FC<InfrastructureTableProps> = ({
     columnVisibility,
     onTableReady: persistentOnTableReady,
     onColumnVisibilityChange,
-    // resetColumnVisibility wird für zukünftige Reset-Funktionalität benötigt
+    // resetColumnVisibility is needed for future reset functionality
   } = usePersistentColumnVisibility({
-    tableKey: 'infrastructure', // Korrigiert: stimmt jetzt mit InfrastructureToolbar überein
+    tableKey: 'infrastructure', // Fixed: now matches InfrastructureToolbar
     defaultColumnVisibility: INFRASTRUCTURE_DEFAULT_COLUMN_VISIBILITY,
   })
 
-  // Kombiniere externe und persistente onTableReady Callbacks
+  // Combine external and persistent onTableReady callbacks
   const handleTableReady = (table: any) => {
     persistentOnTableReady(table)
     if (onTableReady) {
@@ -134,7 +134,7 @@ const InfrastructureTable: React.FC<InfrastructureTableProps> = ({
     }
   }
 
-  // Hilfsfunktion für die Anzeige des Infrastruktur-Typs mit farblichem Chip
+  // Helper function for displaying infrastructure type with colored chip
   const getTypeChip = useCallback(
     (type: InfrastructureType) => {
       let color
@@ -187,7 +187,7 @@ const InfrastructureTable: React.FC<InfrastructureTableProps> = ({
     [t]
   )
 
-  // Hilfsfunktion für die Anzeige des Status mit farblichem Chip
+  // Helper function for displaying status with colored chip
   const getStatusChip = useCallback(
     (status: InfrastructureStatus) => {
       let color
@@ -228,7 +228,7 @@ const InfrastructureTable: React.FC<InfrastructureTableProps> = ({
     [t]
   )
 
-  // Spalten-Definition für die Infrastructure-Tabelle
+  // Column definition for the infrastructure table
   const columns = useMemo(
     () => [
       columnHelper.accessor('id', {
@@ -427,7 +427,7 @@ const InfrastructureTable: React.FC<InfrastructureTableProps> = ({
       entityName={t('title')}
       FormComponent={InfrastructureForm}
       getIdFromData={(item: Infrastructure) => item.id}
-      // mapDataToFormValues entfernt - die InfrastructureForm arbeitet direkt mit der infrastructure Prop
+      // mapDataToFormValues removed - InfrastructureForm works directly with infrastructure prop
       onTableReady={handleTableReady}
       columnVisibility={columnVisibility}
       onColumnVisibilityChange={onColumnVisibilityChange}

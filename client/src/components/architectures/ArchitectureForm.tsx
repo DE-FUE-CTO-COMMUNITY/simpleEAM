@@ -26,7 +26,7 @@ import { isArchitect } from '@/lib/auth'
 import { useDomainLabel, useTypeLabel } from './utils'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 
-// Schema für die Formularvalidierung
+// Schema for form validation
 export const architectureSchema = z.object({
   name: z.string().min(3).max(100),
   description: z.string().min(10).max(1000),
@@ -85,7 +85,7 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
     variables: { where: companyWhere },
   })
 
-  // Applikationen laden
+  // Load applications
   const { data: applicationData, loading: applicationLoading } = useQuery(GET_APPLICATIONS, {
     variables: { where: companyWhere },
   })
@@ -121,7 +121,7 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
     { variables: { where: companyWhere } }
   )
 
-  // Formulardaten mit useMemo initialisieren
+  // Initialize form data with useMemo
   const defaultValues = React.useMemo<ArchitectureFormValues>(
     () => ({
       name: '',
@@ -378,7 +378,7 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
     { id: 'diagrams', label: t('tabs.diagrams') },
   ]
 
-  // Feldkonfiguration für das generische Formular
+  // Field configuration for the generic form
   interface SelectOption {
     value: string | number
     label: string

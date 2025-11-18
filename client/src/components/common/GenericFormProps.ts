@@ -16,7 +16,7 @@ export interface GenericFormProps<T = any, F = any> {
   [key: string]: any
 }
 
-// Hilfsfunktion für Migration: Erstellt Props-Mapping für bestehende Komponenten
+// Helper function for Migration: Erstellt Props-Mapping für bestehende Komponenten
 export function createLegacyFormProps<T>(
   entityName: string,
   data: T | null,

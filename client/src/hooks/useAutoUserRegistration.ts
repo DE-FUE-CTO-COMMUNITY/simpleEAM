@@ -14,14 +14,14 @@ export const useAutoUserRegistration = () => {
   const [userEmail, setUserEmail] = useState<string | null>(null)
   const [isCreatingUser, setIsCreatingUser] = useState(false)
   const registrationAttempted = useRef(false)
-  const processingRef = useRef(false) // Zusätzlicher Schutz gegen Doppelausführung
+  const processingRef = useRef(false) // Additional protection against double execution
 
-  // E-Mail aus Keycloak-Token extrahieren
+  // Extract email from Keycloak token
   useEffect(() => {
     if (authenticated && keycloak?.tokenParsed?.email) {
       const email = keycloak.tokenParsed.email
       setUserEmail(email)
-      // Nur prüfen ob gerade eine Erstellung läuft
+      // Only check if creation is currently running
       const sessionKey = `autoRegChecked_${email}`
       const alreadyChecked = sessionStorage.getItem(sessionKey)
       if (alreadyChecked === 'creating') {
@@ -29,7 +29,7 @@ export const useAutoUserRegistration = () => {
         registrationAttempted.current = true
         setRegistrationChecked(false) // Noch nicht abgeschlossen
       } else {
-        // Immer eine neue Prüfung starten - lass GraphQL-Query entscheiden
+        // Always start a new check - let GraphQL query decide
         setRegistrationChecked(false)
         registrationAttempted.current = false
         setIsCreatingUser(false)
@@ -42,29 +42,29 @@ export const useAutoUserRegistration = () => {
     }
   }, [authenticated, keycloak])
 
-  // GraphQL-Abfrage um zu prüfen, ob der Benutzer bereits existiert
+  // GraphQL query to check, ob der Benutzer bereits existiert
   const { data: existingUser, loading: checkingUser } = useQuery(GET_PERSON_BY_EMAIL, {
     variables: { email: userEmail || '' },
     skip: !userEmail || !authenticated || isCreatingUser || registrationAttempted.current,
     onCompleted: data => {
-      // Wenn der Benutzer bereits existiert, markiere als geprüft
+      // If user already exists, mark as checked
       if (data?.people && data.people.length > 0) {
         setRegistrationChecked(true)
         registrationAttempted.current = true
-        // Kein sessionStorage für existierende Benutzer - das blockiert neue Prüfungen
+        // No sessionStorage for existing users - this blocks new checks
       } else {
-        setRegistrationChecked(true) // Auch hier auf true setzen, damit der Effect triggert
+        setRegistrationChecked(true) // Also set to true here so the effect triggers
       }
     },
     onError: error => {
       console.error('❌ Fehler beim Überprüfen des Benutzers:', error)
-      setRegistrationChecked(true) // Markiere als geprüft, auch bei Fehler
+      setRegistrationChecked(true) // Mark as checked, even on error
       registrationAttempted.current = true
-      // Kein sessionStorage bei Fehlern - das blockiert Retry-Versuche
+      // No sessionStorage on errors - this blocks retry attempts
     },
   })
 
-  // Mutation zum Erstellen eines neuen Benutzers
+  // Mutation to create a new user
   const [createPerson] = useMutation(CREATE_PERSON, {
     onCompleted: () => {
       setRegistrationChecked(true)
@@ -72,14 +72,14 @@ export const useAutoUserRegistration = () => {
       registrationAttempted.current = true
       processingRef.current = false
 
-      // Speichere in sessionStorage dass Registrierung abgeschlossen ist
+      // Save in sessionStorage that registration is complete
       if (userEmail) {
         sessionStorage.setItem(`autoRegChecked_${userEmail}`, 'true')
       }
     },
     onError: error => {
       console.error('❌ Fehler bei der automatischen Benutzerregistrierung:', error)
-      setRegistrationChecked(true) // Markiere als geprüft, auch bei Fehler
+      setRegistrationChecked(true) // Mark as checked, even on error
       setIsCreatingUser(false)
       registrationAttempted.current = true
       processingRef.current = false
@@ -138,7 +138,7 @@ export const useAutoUserRegistration = () => {
               firstName,
               lastName,
               email,
-              // Optional: Weitere Felder können hier gesetzt werden
+              // Optional: Additional fields can be set here
               department: null,
               role: null,
               phone: null,

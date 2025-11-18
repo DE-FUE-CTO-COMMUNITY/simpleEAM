@@ -48,7 +48,7 @@ export default function UserManagement() {
   const [keycloakError, setKeycloakError] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
 
-  // GraphQL Mutations und Queries für Personen
+  // GraphQL mutations and queries for persons
   const [createPerson] = useMutation(CREATE_PERSON, {
     onError: error => {
       console.error('❌ Fehler beim Erstellen der Person:', error)
@@ -80,7 +80,7 @@ export default function UserManagement() {
       }
 
       if (isUpdate && userData.email) {
-        // Erst prüfen, ob Person bereits existiert
+        // First check if person already exists
         const { data } = await findPersonByEmail({
           variables: { email: userData.email },
         })
@@ -121,16 +121,16 @@ export default function UserManagement() {
     try {
       return t(`roles.${roleKey}` as any)
     } catch {
-      return role // Fallback auf ursprünglichen Wert
+      return role // Fallback to original value
     }
   }
 
-  // Hilfsfunktion für Status-Übersetzung
+  // Helper function for status translation
   const translateStatus = (enabled: boolean | undefined): string => {
     return enabled ? t('status.active') : t('status.inactive')
   }
 
-  // Hilfsfunktion für Letztes-Login-Anzeige
+  // Helper function for Letztes-Login-Anzeige
   const formatLastLogin = (user: KeycloakUser | KeycloakUserAlt): string => {
     const lastLogin = user.attributes?.lastLogin?.[0]
     if (!lastLogin) {
@@ -139,7 +139,7 @@ export default function UserManagement() {
 
     try {
       const date = new Date(lastLogin)
-      // Verwende die aktuelle Locale für korrekte Internationalisierung
+      // Use current locale for correct internationalization
       const localeString = locale === 'de' ? 'de-DE' : 'en-US'
       return date.toLocaleString(localeString, {
         day: '2-digit',
@@ -177,7 +177,7 @@ export default function UserManagement() {
     severity: 'success' as 'success' | 'error',
   })
 
-  // Bulk-Sync company_ids für alle Benutzer
+  // Bulk sync company_ids for all users
   const syncAllCompanyIds = async () => {
     try {
       if (!keycloak?.token) {
@@ -232,15 +232,15 @@ export default function UserManagement() {
     setKeycloakError(null)
 
     try {
-      // Überprüfung, ob Keycloak initialisiert ist
+      // Check if Keycloak is initialized
       if (!keycloak) {
         throw new Error(t('keycloakNotInitialized'))
       }
 
-      // Token aktualisieren falls nötig
+      // Update token if necessary
       await keycloak.updateToken(30)
 
-      // Überprüfung, ob der Benutzer authentifiziert ist
+      // Check if user is authenticated
       if (!keycloak.token) {
         throw new Error(t('notAuthenticatedNoToken'))
       }
@@ -279,7 +279,7 @@ export default function UserManagement() {
     }
   }, [t])
 
-  // CRUD-Operationen für Keycloak-Benutzer
+  // CRUD operations for Keycloak users
   const createKeycloakUser = async (userData: any) => {
     try {
       if (!keycloak?.token) {
@@ -427,7 +427,7 @@ export default function UserManagement() {
 
   const handleFormSubmit = async (userData: any) => {
     if (formDialog.mode === 'create') {
-      // Für neue Benutzer setzen wir Standardwerte für enabled und emailVerified
+      // For new users we set default values for enabled and emailVerified
       const userDataWithDefaults = {
         ...userData,
         enabled: true,
@@ -567,8 +567,8 @@ export default function UserManagement() {
                       </Tooltip>
                       <Tooltip
                         title={
-                          // Prüfe, ob Benutzer noch nie ein Passwort hatte (roter Schlüssel)
-                          // oder nur temporär ein neues Passwort ändern muss (normaler Schlüssel)
+                          // Check if user never had a password (red key)
+                          // or only needs to temporarily change new password (normal key)
                           user.requiredActions?.includes('UPDATE_PASSWORD') &&
                           user.attributes?.firstPasswordSet?.[0] !== 'true'
                             ? t('actions.setPassword')
@@ -580,7 +580,7 @@ export default function UserManagement() {
                           size="small"
                           sx={{
                             color:
-                              // Roter Schlüssel nur für Benutzer, die noch nie ein Passwort hatten
+                              // Red key only for users who never had a password
                               user.requiredActions?.includes('UPDATE_PASSWORD') &&
                               user.attributes?.firstPasswordSet?.[0] !== 'true'
                                 ? 'error.main'
@@ -589,8 +589,8 @@ export default function UserManagement() {
                         >
                           {/* Icon-Logik: 
                               - Roter KeyIcon: Benutzer hat noch nie ein Passwort gehabt
-                              - Normaler KeyIcon: Benutzer muss Passwort ändern (temporär)
-                              - PasswordIcon: Benutzer hat gültiges Passwort */}
+                              - Normal KeyIcon: User must change password (temporary)
+                              - PasswordIcon: User has valid password */}
                           {user.requiredActions?.includes('UPDATE_PASSWORD') &&
                           user.attributes?.firstPasswordSet?.[0] !== 'true' ? (
                             <KeyIcon />
@@ -656,7 +656,7 @@ export default function UserManagement() {
         mode="user"
       />
 
-      {/* Snackbar für Clipboard-Feedback */}
+      {/* Snackbar for clipboard feedback */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={6000}

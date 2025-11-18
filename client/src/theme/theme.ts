@@ -1,6 +1,6 @@
 import { createTheme, ThemeOptions } from '@mui/material/styles'
 
-// Farbpalette für das Atos Corporate Design
+// Color palette for the Atos Corporate Design
 declare module '@mui/material/styles' {
   interface PaletteColor {
     lighter?: string
@@ -173,9 +173,9 @@ export const themeOptions: ThemeOptions = {
         root: {
           borderRadius: '8px',
           boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.1)',
-          // Entferne das Standard-24px Margin von Material UI 7
+          // Remove the default 24px margin from Material UI 7
           margin: '0 !important',
-          // Entferne auch mögliche margin-bottom Einstellungen
+          // Also remove possible margin-bottom settings
           marginBottom: '0 !important',
         },
       },
@@ -183,11 +183,11 @@ export const themeOptions: ThemeOptions = {
     MuiCardContent: {
       styleOverrides: {
         root: {
-          // Entferne das Standard-Margin von CardContent
+          // Remove the default margin from CardContent
           margin: '0 !important',
           marginBottom: '0 !important',
           '&:last-child': {
-            paddingBottom: '16px', // Standard-Padding beibehalten
+            paddingBottom: '16px', // Keep standard padding
           },
         },
       },
@@ -195,7 +195,7 @@ export const themeOptions: ThemeOptions = {
     MuiCardHeader: {
       styleOverrides: {
         root: {
-          // Entferne das Standard-Margin von CardHeader
+          // Remove the default margin from CardHeader
           margin: '0 !important',
           marginBottom: '0 !important',
         },
@@ -204,7 +204,7 @@ export const themeOptions: ThemeOptions = {
     MuiCardActions: {
       styleOverrides: {
         root: {
-          // Entferne das Standard-Margin von CardActions
+          // Remove the default margin from CardActions
           margin: '0 !important',
           marginBottom: '0 !important',
         },
@@ -213,9 +213,9 @@ export const themeOptions: ThemeOptions = {
     MuiPaper: {
       styleOverrides: {
         root: {
-          // Entferne das Standard-24px Margin von Material UI 7
+          // Remove the default 24px margin from Material UI 7
           margin: '0 !important',
-          // Entferne auch mögliche margin-bottom Einstellungen
+          // Also remove possible margin-bottom settings
           marginBottom: '0 !important',
         },
       },

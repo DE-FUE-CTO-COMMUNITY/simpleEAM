@@ -13,7 +13,7 @@ import { SortingState, VisibilityState } from '@tanstack/react-table'
 import usePersistentColumnVisibility from '../../hooks/usePersistentColumnVisibility'
 import { Application } from '../../gql/generated'
 
-// Exportierte Standard-Spaltenvisibilität für die Application-Tabelle
+// Exported default column visibility for application table
 export const APPLICATION_DEFAULT_COLUMN_VISIBILITY = {
   // Standardmäßig sichtbare Spalten
   name: true,
@@ -59,9 +59,9 @@ interface ApplicationTableProps {
   onUpdateApplication?: (id: string, data: ApplicationFormValues) => Promise<void>
   onDeleteApplication?: (id: string) => Promise<void>
   availableTechStack?: string[]
-  availableApplications?: Application[] // Hinzugefügt für die Dropdowns
+  availableApplications?: Application[] // Added for dropdowns
   onTableReady?: (table: any) => void
-  // Diese Props sind jetzt optional, da die Persistierung intern verwaltet wird
+  // These props are now optional as persistence is handled internally
   columnVisibility?: VisibilityState
   onColumnVisibilityChange?: (
     updater: VisibilityState | ((old: VisibilityState) => VisibilityState)
@@ -78,7 +78,7 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
   onUpdateApplication,
   onDeleteApplication,
   availableTechStack = [],
-  availableApplications = [], // Hinzugefügt
+  availableApplications = [], // Added
   onTableReady,
   // columnVisibility: _externalColumnVisibility,
   // onColumnVisibilityChange: _externalOnColumnVisibilityChange,
@@ -95,13 +95,13 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
     columnVisibility,
     onTableReady: persistentOnTableReady,
     onColumnVisibilityChange,
-    // resetColumnVisibility wird für zukünftige Reset-Funktionalität benötigt
+    // resetColumnVisibility is needed for future reset functionality
   } = usePersistentColumnVisibility({
     tableKey: 'applications',
     defaultColumnVisibility: APPLICATION_DEFAULT_COLUMN_VISIBILITY,
   })
 
-  // Kombiniere externe und persistente onTableReady Callbacks
+  // Combine external and persistent onTableReady callbacks
   const handleTableReady = (table: any) => {
     persistentOnTableReady(table)
     if (onTableReady) {
@@ -109,7 +109,7 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
     }
   }
 
-  // Spalten-Definition für die Application-Tabelle
+  // Column definition for application table
   const columns = useMemo(
     () => [
       columnHelper.accessor('id', {
@@ -342,7 +342,7 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
     [columnHelper, t, tStatus, tTimeCategory, tSevenR, locale]
   )
 
-  // Mapping von ApplicationType zu den erwarteten FormValues für das Formular
+  // Mapping from ApplicationType to expected FormValues for form
   const mapToFormValues = (app: ApplicationType) => {
     return {
       name: app.name,
@@ -396,7 +396,7 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
       onColumnVisibilityChange={onColumnVisibilityChange}
       additionalProps={{
         availableTechStack,
-        availableApplications, // Hinzugefügt
+        availableApplications, // Added
       }}
       onTableReady={handleTableReady}
     />

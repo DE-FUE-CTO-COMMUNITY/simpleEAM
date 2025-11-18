@@ -9,7 +9,7 @@ interface UsePersonFilterProps {
 }
 
 export const usePersonFilter = ({ persons = [] }: UsePersonFilterProps) => {
-  // Standardzustand für Filter
+  // Default state for filters
   const [filterState, setFilterState] = useState<FilterState>({
     departmentFilter: [],
     roleFilter: [],
@@ -42,7 +42,7 @@ export const usePersonFilter = ({ persons = [] }: UsePersonFilterProps) => {
     return Array.from(roles)
   }, [persons])
 
-  // Filterfunktion für erweiterte Filter
+  // Filter function for advanced filters
   const filteredPersons = useMemo(() => {
     const { departmentFilter, roleFilter, searchFilter, updatedDateRange } = filterState
 
@@ -86,7 +86,7 @@ export const usePersonFilter = ({ persons = [] }: UsePersonFilterProps) => {
 
       if (endDateStr && person.updatedAt) {
         const endDate = new Date(endDateStr)
-        // Setze das Ende des Tages für den Endzeitpunkt
+        // Set end of day for end time
         endDate.setHours(23, 59, 59, 999)
         const updatedDate = new Date(person.updatedAt)
 

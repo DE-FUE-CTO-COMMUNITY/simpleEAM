@@ -27,7 +27,7 @@ import 'dayjs/locale/en'
 // Import der globalen Styles
 import '@/styles/global.css'
 
-// Emotion Cache für Server-Side Rendering mit besserer Hydration-Kompatibilität
+// Emotion cache for server-side rendering with better hydration compatibility
 let clientSideCache: ReturnType<typeof createCache> | null = null
 
 function useClientStyleRegistry() {
@@ -40,7 +40,7 @@ function useClientStyleRegistry() {
     const newCache = createCache({
       key: 'mui',
       prepend: true,
-      // Stabile Konfiguration für Server und Client
+      // Stable configuration for server and client
       speedy: process.env.NODE_ENV === 'production',
     })
 
@@ -83,7 +83,7 @@ function useClientStyleRegistry() {
 
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
 
-// Interne Komponente für die automatische Benutzerregistrierung
+// Internal component for automatic user registration
 function AutoUserRegistration() {
   useAutoUserRegistration()
   return null
@@ -98,7 +98,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     dayjs.locale(locale === 'en' ? 'en' : 'de')
   }, [locale])
 
-  // Vereinfachte State-Verwaltung für bessere Hydration
+  // Simplified state management for better hydration
   const [mounted, setMounted] = useState(false)
   const [initialized, setInitialized] = useState(false)
   const [authenticated, setAuthenticated] = useState(false)
@@ -122,17 +122,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         // Session Monitoring
         setupSessionMonitoring()
 
-        // Apollo Client mit dynamischem Token erstellen (einmalig)
+        // Create Apollo client with dynamic token (once)
         const apolloClient = createApolloClient(keycloak?.token)
         setClient(apolloClient)
 
-        // Token Refresh Listener - aktualisiere nur den Token, nicht den ganzen Client
+        // Token refresh listener - update only the token, not the entire client
         const handleTokenRefresh = (_event: CustomEvent) => {
-          // Der Apollo Client wird so konfiguriert, dass er das aktuelle Token
-          // aus der Keycloak-Instanz holt, daher keine weitere Aktion nötig
+          // The Apollo client is configured to use the current token
+          // from Keycloak instance, so no further action needed
         }
 
-        // Auth Error Listener - erstelle Client ohne Token
+        // Auth error listener - create client without token
         const handleAuthError = () => {
           const unauthenticatedClient = createApolloClient()
           setClient(unauthenticatedClient)
@@ -177,7 +177,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     )
   }
 
-  // Warte auf die Apollo Client Initialisierung, bevor Komponenten gerendert werden
+  // Wait for Apollo Client initialization before rendering components
   if (!client) {
     return (
       <div

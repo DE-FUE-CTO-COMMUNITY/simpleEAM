@@ -11,13 +11,13 @@ import { VisibilityState, Table } from '@tanstack/react-table'
  * @returns Ein Objekt mit State und Funktionen für die Column Visibility
  */
 export function useColumnVisibility() {
-  // State für Column Visibility
+  // State for Column Visibility
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
 
-  // State für die Table-Instanz
+  // State for die Table-Instanz
   const [tableInstance, setTableInstance] = useState<Table<any> | null>(null)
 
-  // Callback zum Speichern der Table-Instanz
+  // Callback to save the table instance
   const handleTableReady = useCallback((table: Table<any>) => {
     setTableInstance(table)
   }, [])
@@ -40,7 +40,7 @@ export function useColumnVisibility() {
               ? 4
               : breakpoint === 'lg'
                 ? 5
-                : columns.length // 'xl' = alle Spalten
+                : columns.length // 'xl' = all columns
 
       columns.forEach((column, index) => {
         // Actions-Spalte immer anzeigen
@@ -49,7 +49,7 @@ export function useColumnVisibility() {
           return
         }
 
-        // Ersten X Spalten sichtbar machen, Rest ausblenden
+        // Make first X columns visible, hide the rest
         updatedVisibility[column.id] = index < visibleColumnCount
       })
 
@@ -74,7 +74,7 @@ export function useColumnVisibility() {
     [tableInstance]
   )
 
-  // Alle Spalten ein-/ausschalten
+  // Toggle all columns on/off
   const toggleAllColumns = useCallback(
     (visible: boolean) => {
       if (!tableInstance) return

@@ -18,7 +18,7 @@ interface DataObjectToolbarProps {
 }
 
 /**
- * Eine Toolbar speziell für Datenobjekte, die die GenericToolbar-Komponente verwendet.
+ * A toolbar specifically for data objects that uses the GenericToolbar component.
  */
 const DataObjectToolbar: React.FC<DataObjectToolbarProps> = ({
   table,
@@ -35,7 +35,7 @@ const DataObjectToolbar: React.FC<DataObjectToolbarProps> = ({
       searchFieldWidth="350px"
       table={table}
       enableColumnVisibilityToggle={enableColumnVisibilityToggle}
-      tableKey="dataobjects" // Eindeutiger Schlüssel für die DataObjects-Tabelle
+      tableKey="dataobjects" // Unique key for the dataobjects table
       defaultColumnVisibility={defaultColumnVisibility}
     />
   )

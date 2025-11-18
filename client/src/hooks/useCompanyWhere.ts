@@ -12,7 +12,7 @@ export function useCompanyWhere<T extends Record<string, any>>(key: string = 'co
   const { selectedCompanyId } = useCompanyContext()
   return useMemo(() => {
     if (!selectedCompanyId) return undefined
-    // Für Typen mit Beziehung "company" kann mit RelationshipFilter auf id gefiltert werden
+    // For types with relationship, can be filtered on id with RelationshipFilter
     return {
       [key]: {
         some: {

@@ -24,7 +24,7 @@ interface CustomContextMenuProps {
 }
 
 /**
- * Vollständiger Ersatz für das Excalidraw-Kontext-Menü
+ * Complete replacement for Excalidraw context menu
  * Bietet alle Standard-Funktionen plus unsere benutzerdefinierten Funktionen
  */
 export const FullCustomContextMenu: React.FC<CustomContextMenuProps> = ({
@@ -45,15 +45,15 @@ export const FullCustomContextMenu: React.FC<CustomContextMenuProps> = ({
   } | null>(null)
 
   /**
-   * Berechnet die optimale Position für das Kontextmenü,
-   * damit es vollständig sichtbar bleibt
+   * Calculates optimal position for context menu,
+   * to keep it fully visible
    */
   const calculateMenuPosition = useCallback(
     (mouseX: number, mouseY: number, hasSelection: boolean) => {
-      // Dynamische Menü-Dimensionen basierend auf Inhalten
+      // Dynamic menu dimensions based on contents
       const MENU_WIDTH = 200
-      // Geschätzte Höhe basierend auf den Menüeinträgen
-      const MENU_HEIGHT = hasSelection ? 350 : 120 // Erhöht für mehr Einträge bei Selektion
+      // Estimated height based on menu items
+      const MENU_HEIGHT = hasSelection ? 350 : 120 // Increased for more items when selection
       const PADDING = 16 // Mindestabstand zum Rand      // Viewport-Dimensionen
       const viewportWidth = window.innerWidth
       const viewportHeight = window.innerHeight
@@ -61,25 +61,25 @@ export const FullCustomContextMenu: React.FC<CustomContextMenuProps> = ({
       let adjustedX = mouseX
       let adjustedY = mouseY
 
-      // Rechten Rand überprüfen
+      // Check right edge
       if (mouseX + MENU_WIDTH + PADDING > viewportWidth) {
         adjustedX = mouseX - MENU_WIDTH
-        // Falls das Menü auch links nicht passt, an den rechten Rand setzen
+        // If menu does not fit on left either, place at right edge
         if (adjustedX < PADDING) {
           adjustedX = viewportWidth - MENU_WIDTH - PADDING
         }
       }
 
-      // Unteren Rand überprüfen
+      // Check bottom edge
       if (mouseY + MENU_HEIGHT + PADDING > viewportHeight) {
         adjustedY = mouseY - MENU_HEIGHT
-        // Falls das Menü auch oben nicht passt, an den unteren Rand setzen
+        // If menu does not fit on top either, place at bottom edge
         if (adjustedY < PADDING) {
           adjustedY = viewportHeight - MENU_HEIGHT - PADDING
         }
       }
 
-      // Mindestabstände einhalten
+      // Maintain minimum distances
       adjustedX = Math.max(PADDING, Math.min(adjustedX, viewportWidth - MENU_WIDTH - PADDING))
       adjustedY = Math.max(PADDING, Math.min(adjustedY, viewportHeight - MENU_HEIGHT - PADDING))
 
@@ -94,7 +94,7 @@ export const FullCustomContextMenu: React.FC<CustomContextMenuProps> = ({
 
       if (!excalidrawAPI) return
 
-      // Verhindere das Standard-Kontext-Menü
+      // Prevent default context menu
       event.preventDefault()
       event.stopPropagation()
 
@@ -102,7 +102,7 @@ export const FullCustomContextMenu: React.FC<CustomContextMenuProps> = ({
         const elements = excalidrawAPI.getSceneElements()
         const appState = excalidrawAPI.getAppState()
 
-        // Finde ausgewählte Elemente
+        // Find selected elements
         const selectedElements = elements.filter((el: any) => appState.selectedElementIds[el.id])
 
         const menuType = selectedElements.length > 0 ? 'element' : 'canvas'

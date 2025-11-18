@@ -34,9 +34,9 @@ const RecentDiagramsSection: React.FC = () => {
   const isLg = useMediaQuery(theme.breakpoints.only('lg'))
   const isXl = useMediaQuery(theme.breakpoints.up('xl'))
 
-  // Berechne die Anzahl der anzuzeigenden Diagramme basierend auf der Bildschirmgröße
+  // Calculate number of diagrams to display based on screen size
   useEffect(() => {
-    let limit = 6 // Standard für xl und größer
+    let limit = 6 // Default for xl and larger
 
     if (isXs) {
       limit = 1 // 1 Karte pro Zeile auf sehr kleinen Bildschirmen
@@ -45,9 +45,9 @@ const RecentDiagramsSection: React.FC = () => {
     } else if (isMd) {
       limit = 3 // 3 Karten pro Zeile auf mittleren Bildschirmen
     } else if (isLg) {
-      limit = 4 // 4 Karten pro Zeile auf großen Bildschirmen
+      limit = 4 // 4 cards per row on large screens
     } else if (isXl) {
-      limit = 6 // 6 Karten pro Zeile auf sehr großen Bildschirmen
+      limit = 6 // 6 cards per row on very large screens
     }
 
     setDiagramLimit(limit)
@@ -70,12 +70,12 @@ const RecentDiagramsSection: React.FC = () => {
         : undefined,
     },
     fetchPolicy: 'cache-and-network',
-    skip: !initialized || !authenticated, // Skip query wenn nicht authentifiziert
+    skip: !initialized || !authenticated, // Skip query if not authenticated
   })
 
   const diagrams = diagramsData?.diagrams || []
 
-  // Zeige Loading während Authentifizierung oder Query lädt
+  // Show loading while authenticating or query is loading
   if (!initialized || (!authenticated && initialized)) {
     return (
       <Card sx={{ mb: 4 }}>

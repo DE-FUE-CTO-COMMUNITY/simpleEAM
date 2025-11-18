@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from 'next-intl'
 import { useRouter, usePathname } from '@/i18n/navigation'
 import { MenuItem, ListItemIcon, ListItemText, Menu } from '@mui/material'
 
-// Unterstützte Sprachen
+// Supported languages
 const languages = [
   { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
   { code: 'en', name: 'English', flag: '🇺🇸' },

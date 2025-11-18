@@ -24,7 +24,7 @@ import {
 } from '@/gql/generated'
 import ApplicationForm, { ApplicationFormValues } from '@/components/applications/ApplicationForm'
 
-// Importiere die ausgelagerten Komponenten
+// Import the extracted components
 import ApplicationTable, {
   APPLICATION_DEFAULT_COLUMN_VISIBILITY,
 } from '@/components/applications/ApplicationTable'
@@ -45,7 +45,7 @@ const ApplicationsPage = () => {
   // Table instance for column visibility
   const [tableInstance, setTableInstance] = useState<any>(null)
 
-  // Verwende persistente Spaltensichtbarkeit mit den korrekten Default-Werten
+  // Use persistent column visibility with correct default values
   const {
     columnVisibility,
     onTableReady: persistentOnTableReady,
@@ -65,24 +65,24 @@ const ApplicationsPage = () => {
       supportsCapabilities: true,
       usesDataObjects: true,
       costs: true,
-      hostedOn: false, // Als versteckte Spalte standardmäßig ausgeblendet
+      hostedOn: false, // Hidden column by default
       createdAt: true,
       updatedAt: true,
       actions: true,
     },
   })
 
-  // Kombiniere externe und persistente onTableReady Callbacks
+  // Combine external and persistent onTableReady callbacks
   const handleTableReady = (table: any) => {
     persistentOnTableReady(table)
     setTableInstance(table)
   }
 
-  // Filter-Zustand (wird jetzt vom Hook verwaltet)
+  // Filter state (now managed by hook)
   const [filterOpen, setFilterOpen] = useState(false)
   const [activeFiltersCount, setActiveFiltersCount] = useState<number>(0)
 
-  // Liste der verfügbaren Status, Kritikalitäten und Technology Stack aus den Daten extrahieren
+  // Extract list of available values from the data
   const [availableStatuses, setAvailableStatuses] = useState<ApplicationStatus[]>([])
   const [availableCriticalities, setAvailableCriticalities] = useState<CriticalityLevel[]>([])
   const [availableTechStack, setAvailableTechStack] = useState<string[]>([])
@@ -91,10 +91,10 @@ const ApplicationsPage = () => {
   const [availableSevenRStrategies, setAvailableSevenRStrategies] = useState<SevenRStrategy[]>([])
   const [availableInfrastructures, setAvailableInfrastructures] = useState<string[]>([])
 
-  // State für das neue Application-Formular
+  // State for the new Application form
   const [showNewApplicationForm, setShowNewApplicationForm] = useState(false)
 
-  // Applikationen laden - Auth-Check erfolgt bereits in layout.tsx
+  // Load applications - auth check already done in layout.tsx
   const companyWhere = useCompanyWhere('company')
   const { loading, error, data, refetch } = useQuery(GET_APPLICATIONS, {
     fetchPolicy: 'cache-and-network',
@@ -102,14 +102,14 @@ const ApplicationsPage = () => {
     variables: { where: companyWhere },
   })
 
-  // Verfügbare Werte aus den geladenen Daten extrahieren
+  // Extract available values from loaded data
   const applications = useMemo(() => data?.applications || [], [data?.applications])
 
   useEffect(() => {
     if (applications.length) {
       const applicationsData = applications as ApplicationType[]
 
-      // Alle Status extrahieren und Duplikate entfernen
+      // Extract all statuses and remove duplicates
       const allStatuses: ApplicationStatus[] = applicationsData
         .map((app: ApplicationType) => app.status)
         .filter(Boolean) as ApplicationStatus[]
@@ -117,7 +117,7 @@ const ApplicationsPage = () => {
       const uniqueStatuses = Array.from(new Set(allStatuses)).sort()
       setAvailableStatuses(uniqueStatuses)
 
-      // Alle Kritikalitäten extrahieren und Duplikate entfernen
+      // Extract all values and remove duplicates
       const allCriticalities: CriticalityLevel[] = applicationsData
         .map((app: ApplicationType) => app.criticality)
         .filter(Boolean) as CriticalityLevel[]
@@ -125,7 +125,7 @@ const ApplicationsPage = () => {
       const uniqueCriticalities = Array.from(new Set(allCriticalities)).sort()
       setAvailableCriticalities(uniqueCriticalities)
 
-      // Alle Technology Stack Tags sammeln und Duplikate entfernen
+      // Collect all values and remove duplicates
       const allTechTags: string[] = []
       applicationsData.forEach((app: ApplicationType) => {
         if (app.technologyStack && Array.isArray(app.technologyStack)) {
@@ -136,7 +136,7 @@ const ApplicationsPage = () => {
       const uniqueTechTags = Array.from(new Set(allTechTags)).sort()
       setAvailableTechStack(uniqueTechTags)
 
-      // Alle Vendors sammeln und Duplikate entfernen
+      // Collect all values and remove duplicates
       const allVendors: string[] = applicationsData
         .map((app: ApplicationType) => app.vendor)
         .filter(Boolean) as string[]
@@ -144,7 +144,7 @@ const ApplicationsPage = () => {
       const uniqueVendors = Array.from(new Set(allVendors)).sort()
       setAvailableVendors(uniqueVendors)
 
-      // Alle TIME-Kategorien extrahieren und Duplikate entfernen
+      // Extract all values and remove duplicates
       const allTimeCategories: TimeCategory[] = applicationsData
         .map((app: ApplicationType) => app.timeCategory)
         .filter(Boolean) as TimeCategory[]
@@ -152,7 +152,7 @@ const ApplicationsPage = () => {
       const uniqueTimeCategories = Array.from(new Set(allTimeCategories)).sort()
       setAvailableTimeCategories(uniqueTimeCategories)
 
-      // Alle 7R-Strategien extrahieren und Duplikate entfernen
+      // Extract all values and remove duplicates
       const allSevenRStrategies: SevenRStrategy[] = applicationsData
         .map((app: ApplicationType) => app.sevenRStrategy)
         .filter(Boolean) as SevenRStrategy[]
@@ -160,7 +160,7 @@ const ApplicationsPage = () => {
       const uniqueSevenRStrategies = Array.from(new Set(allSevenRStrategies)).sort()
       setAvailableSevenRStrategies(uniqueSevenRStrategies)
 
-      // Alle Infrastrukturen extrahieren und Duplikate entfernen
+      // Extract all values and remove duplicates
       const allInfrastructures: string[] = []
       applicationsData.forEach((app: ApplicationType) => {
         if (app.hostedOn && Array.isArray(app.hostedOn)) {
@@ -173,24 +173,24 @@ const ApplicationsPage = () => {
     }
   }, [applications])
 
-  // Fehlerbehandlung
+  // Error handling
   useEffect(() => {
     if (error) {
       enqueueSnackbar(t('messages.loadError'), { variant: 'error' })
     }
   }, [error, enqueueSnackbar, t])
 
-  // Filter auf Applikationen anwenden
+  // Apply filter to applications
   const { filterState, setFilterState, filteredApplications, resetFilters } = useApplicationFilter({
     applications,
   })
 
-  // Mutation zum Erstellen einer neuen Applikation
+  // Mutation for creating a new Application
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [createApplication, { loading: isCreating }] = useMutation(CREATE_APPLICATION, {
     onCompleted: () => {
       enqueueSnackbar(t('messages.createSuccess'), { variant: 'success' })
-      // Refetch mit aktivem Company-Filter, damit neu erstellte App sofort sichtbar ist
+      // Refetch with active company filter so newly created items are immediately visible
       refetch({ where: companyWhere })
     },
     onError: error => {
@@ -200,7 +200,7 @@ const ApplicationsPage = () => {
     },
   })
 
-  // Mutation zum Aktualisieren einer bestehenden Applikation
+  // Mutation for updating an existing Application
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [updateApplication, { loading: isUpdating }] = useMutation(UPDATE_APPLICATION, {
     onCompleted: () => {
@@ -214,7 +214,7 @@ const ApplicationsPage = () => {
     },
   })
 
-  // Mutation zum Löschen einer Applikation
+  // Mutation for deleting an Application
   const [deleteApplication] = useMutation(DELETE_APPLICATION, {
     onCompleted: () => {
       enqueueSnackbar(t('messages.deleteSuccess'), { variant: 'success' })
@@ -227,10 +227,10 @@ const ApplicationsPage = () => {
     },
   })
 
-  // Handler für das Erstellen einer neuen Applikation
+  // Handler for creating a new Application
   const handleCreateApplicationSubmit = async (data: ApplicationFormValues) => {
     if (!selectedCompanyId) {
-      enqueueSnackbar('Bitte zuerst ein Unternehmen auswählen.', { variant: 'warning' })
+      enqueueSnackbar('Please select a company first.', { variant: 'warning' })
       return
     }
     const {
@@ -247,7 +247,7 @@ const ApplicationsPage = () => {
       hostedOnIds,
       ...applicationData
     } = data
-    // Bei CREATE wird kein spezielles Mutation-Objekt benötigt, da direkte Werte erlaubt sind
+    // For CREATE, no special mutation object is needed as direct values are allowed
     const input = {
       name: applicationData.name,
       description: applicationData.description,
@@ -264,7 +264,7 @@ const ApplicationsPage = () => {
       introductionDate: applicationData.introductionDate,
       endOfUseDate: applicationData.endOfUseDate,
       endOfLifeDate: applicationData.endOfLifeDate,
-      // Wenn ein Besitzer ausgewählt wurde, verwenden wir die neue owners-Struktur
+      // If an owner was selected, use the owners structure
       ...(ownerId
         ? {
             owners: {
@@ -272,7 +272,7 @@ const ApplicationsPage = () => {
             },
           }
         : {}),
-      // Wenn Capabilities ausgewählt wurden, verbinden wir sie mit der Applikation
+      // If values were selected, connect them to the Application
       ...(supportsCapabilityIds && supportsCapabilityIds.length > 0
         ? {
             supportsCapabilities: {
@@ -282,7 +282,7 @@ const ApplicationsPage = () => {
             },
           }
         : {}),
-      // Wenn Datenobjekte ausgewählt wurden, verbinden wir sie mit der Applikation
+      // If values were selected, connect them to the Application
       ...(usesDataObjectIds && usesDataObjectIds.length > 0
         ? {
             usesDataObjects: {
@@ -292,7 +292,7 @@ const ApplicationsPage = () => {
             },
           }
         : {}),
-      // Wenn Schnittstellen ausgewählt wurden, verbinden wir sie mit der Applikation
+      // If values were selected, connect them to the Application
       ...(sourceOfInterfaceIds && sourceOfInterfaceIds.length > 0
         ? {
             sourceOfInterfaces: {
@@ -311,7 +311,7 @@ const ApplicationsPage = () => {
             },
           }
         : {}),
-      // Wenn Parent-Applikationen ausgewählt wurden, verbinden wir sie
+      // If values were selected, connect them
       ...(parentIds && parentIds.length > 0
         ? {
             parents: {
@@ -321,7 +321,7 @@ const ApplicationsPage = () => {
             },
           }
         : {}),
-      // Wenn Komponenten ausgewählt wurden, verbinden wir sie
+      // If values were selected, connect them
       ...(componentIds && componentIds.length > 0
         ? {
             components: {
@@ -331,7 +331,7 @@ const ApplicationsPage = () => {
             },
           }
         : {}),
-      // Wenn Vorgänger-Applikationen ausgewählt wurden, verbinden wir sie
+      // If values were selected, connect them
       ...(predecessorIds && predecessorIds.length > 0
         ? {
             predecessors: {
@@ -341,7 +341,7 @@ const ApplicationsPage = () => {
             },
           }
         : {}),
-      // Wenn Nachfolger-Applikationen ausgewählt wurden, verbinden wir sie
+      // If values were selected, connect them
       ...(successorIds && successorIds.length > 0
         ? {
             successors: {
@@ -351,7 +351,7 @@ const ApplicationsPage = () => {
             },
           }
         : {}),
-      // Wenn Prinzipien ausgewählt wurden, verbinden wir sie mit der Applikation
+      // If values were selected, connect them to the Application
       ...(implementsPrincipleIds && implementsPrincipleIds.length > 0
         ? {
             implementsPrinciples: {
@@ -361,7 +361,7 @@ const ApplicationsPage = () => {
             },
           }
         : {}),
-      // Wenn Infrastructure ausgewählt wurde, verbinden wir sie mit der Applikation
+      // If Infrastructure was selected, connect it to the Application
       ...(hostedOnIds && hostedOnIds.length > 0
         ? {
             hostedOn: {
@@ -371,7 +371,7 @@ const ApplicationsPage = () => {
             },
           }
         : {}),
-      // Company-Zuordnung (Pflicht)
+      // Company assignment (required)
       company: {
         connect: [
           {
@@ -383,7 +383,7 @@ const ApplicationsPage = () => {
 
     await createApplication({
       variables: { input: [input] },
-      // Sicherheitshalber: aktualisiere auch die Liste im Cache via Refetch Query mit Filter
+      // For safety: also update the list in cache via refetch query with filter
       refetchQueries: [
         {
           query: GET_APPLICATIONS,
@@ -393,11 +393,11 @@ const ApplicationsPage = () => {
       awaitRefetchQueries: true,
     })
 
-    // Formular nach dem Erstellen schließen
+    // Close form after creating
     setShowNewApplicationForm(false)
   }
 
-  // Handler für das Aktualisieren einer bestehenden Applikation
+  // Handler for updating an existing Application
   const handleUpdateApplicationSubmit = async (id: string, data: ApplicationFormValues) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const {
@@ -415,7 +415,7 @@ const ApplicationsPage = () => {
       ...applicationData
     } = data
 
-    // Basis-Input-Daten vorbereiten
+    // Prepare base input data
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const input: Record<string, any> = {
       name: { set: applicationData.name },
@@ -435,112 +435,112 @@ const ApplicationsPage = () => {
       sevenRStrategy: { set: applicationData.sevenRStrategy },
     }
 
-    // Aktualisierung der Owner-Beziehung, wenn ein Besitzer ausgewählt wurde
+    // Update owner relationship if an owner was selected
     if (ownerId) {
-      // Wir setzen die owners-Beziehung
+      // Set the owners relationship
       input.owners = {
-        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+        disconnect: [{ where: {} }], // Disconnect all existing connections
         connect: [
           {
             where: {
               node: {
-                id: { eq: ownerId }, // ID muss als IdScalarFilters-Objekt übergeben werden
+                id: { eq: ownerId }, // ID must be passed as IdScalarFilters object
               },
             },
           },
-        ], // Verbinde mit dem neuen Besitzer
+        ], // Connect to new owner
       }
     } else {
-      // Wenn kein Besitzer ausgewählt wurde, entfernen wir alle Besitzer
+      // If no owner was selected, remove all owners
       input.owners = {
-        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+        disconnect: [{ where: {} }], // Disconnect all existing connections
       }
     }
 
-    // Aktualisierung der Capability-Beziehungen
+    // Update capability relationships
     if (supportsCapabilityIds && supportsCapabilityIds.length > 0) {
-      // Wir setzen die supportsCapabilities-Beziehung
+      // Set the supportsCapabilities relationship
       input.supportsCapabilities = {
-        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+        disconnect: [{ where: {} }], // Disconnect all existing connections
         connect: supportsCapabilityIds.map(capId => ({
           where: {
             node: {
-              id: { eq: capId }, // ID muss als IdScalarFilters-Objekt übergeben werden
+              id: { eq: capId }, // ID must be passed as IdScalarFilters object
             },
           },
-        })), // Verbinde mit den neuen Capabilities
+        })), // Connect to new capabilities
       }
     } else {
-      // Wenn keine Capabilities ausgewählt wurden, entfernen wir alle Verbindungen
+      // If no Capabilities were selected, remove all connections
       input.supportsCapabilities = {
-        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+        disconnect: [{ where: {} }], // Disconnect all existing connections
       }
     }
 
-    // Aktualisierung der DataObject-Beziehungen
+    // Update DataObject relationships
     if (usesDataObjectIds && usesDataObjectIds.length > 0) {
-      // Wir setzen die usesDataObjects-Beziehung
+      // Set the usesDataObjects relationship
       input.usesDataObjects = {
-        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+        disconnect: [{ where: {} }], // Disconnect all existing connections
         connect: usesDataObjectIds.map(doId => ({
           where: {
             node: {
-              id: { eq: doId }, // ID muss als IdScalarFilters-Objekt übergeben werden
+              id: { eq: doId }, // ID must be passed as IdScalarFilters object
             },
           },
-        })), // Verbinde mit den neuen DataObjects
+        })), // Connect to new DataObjects
       }
     } else {
-      // Wenn keine DataObjects ausgewählt wurden, entfernen wir alle Verbindungen
+      // If no DataObjects were selected, remove all connections
       input.usesDataObjects = {
-        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+        disconnect: [{ where: {} }], // Disconnect all existing connections
       }
     }
 
-    // Aktualisierung der Source Interface-Beziehungen
+    // Update Source Interface relationships
     if (sourceOfInterfaceIds && sourceOfInterfaceIds.length > 0) {
-      // Wir setzen die sourceOfInterfaces-Beziehung
+      // Set the sourceOfInterfaces relationship
       input.sourceOfInterfaces = {
-        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+        disconnect: [{ where: {} }], // Disconnect all existing connections
         connect: sourceOfInterfaceIds.map(intfId => ({
           where: {
             node: {
-              id: { eq: intfId }, // ID muss als IdScalarFilters-Objekt übergeben werden
+              id: { eq: intfId }, // ID must be passed as IdScalarFilters object
             },
           },
-        })), // Verbinde mit den neuen Interfaces
+        })), // Connect to new Interfaces
       }
     } else {
-      // Wenn keine Source Interfaces ausgewählt wurden, entfernen wir alle Verbindungen
+      // If no Source Interfaces were selected, remove all connections
       input.sourceOfInterfaces = {
-        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+        disconnect: [{ where: {} }], // Disconnect all existing connections
       }
     }
 
-    // Aktualisierung der Target Interface-Beziehungen
+    // Update Target Interface relationships
     if (targetOfInterfaceIds && targetOfInterfaceIds.length > 0) {
-      // Wir setzen die targetOfInterfaces-Beziehung
+      // Set the targetOfInterfaces relationship
       input.targetOfInterfaces = {
-        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+        disconnect: [{ where: {} }], // Disconnect all existing connections
         connect: targetOfInterfaceIds.map(intfId => ({
           where: {
             node: {
-              id: { eq: intfId }, // ID muss als IdScalarFilters-Objekt übergeben werden
+              id: { eq: intfId }, // ID must be passed as IdScalarFilters object
             },
           },
-        })), // Verbinde mit den neuen Interfaces
+        })), // Connect to new Interfaces
       }
     } else {
-      // Wenn keine Target Interfaces ausgewählt wurden, entfernen wir alle Verbindungen
+      // If no Target Interfaces were selected, remove all connections
       input.targetOfInterfaces = {
-        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+        disconnect: [{ where: {} }], // Disconnect all existing connections
       }
     }
 
-    // Aktualisierung der Parent-Application-Beziehungen
+    // Update Parent-Application relationships
     if (parentIds && parentIds.length > 0) {
       input.parents = {
-        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+        disconnect: [{ where: {} }], // Disconnect all existing connections
         connect: parentIds.map(parentId => ({
           where: {
             node: {
@@ -551,14 +551,14 @@ const ApplicationsPage = () => {
       }
     } else {
       input.parents = {
-        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+        disconnect: [{ where: {} }], // Disconnect all existing connections
       }
     }
 
-    // Aktualisierung der Component-Application-Beziehungen
+    // Update Component-Application relationships
     if (componentIds && componentIds.length > 0) {
       input.components = {
-        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+        disconnect: [{ where: {} }], // Disconnect all existing connections
         connect: componentIds.map(componentId => ({
           where: {
             node: {
@@ -569,14 +569,14 @@ const ApplicationsPage = () => {
       }
     } else {
       input.components = {
-        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+        disconnect: [{ where: {} }], // Disconnect all existing connections
       }
     }
 
-    // Aktualisierung der Predecessor-Application-Beziehungen
+    // Update Predecessor-Application relationships
     if (predecessorIds && predecessorIds.length > 0) {
       input.predecessors = {
-        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+        disconnect: [{ where: {} }], // Disconnect all existing connections
         connect: predecessorIds.map(predecessorId => ({
           where: {
             node: {
@@ -587,14 +587,14 @@ const ApplicationsPage = () => {
       }
     } else {
       input.predecessors = {
-        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+        disconnect: [{ where: {} }], // Disconnect all existing connections
       }
     }
 
-    // Aktualisierung der Successor-Application-Beziehungen
+    // Update Successor-Application relationships
     if (successorIds && successorIds.length > 0) {
       input.successors = {
-        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+        disconnect: [{ where: {} }], // Disconnect all existing connections
         connect: successorIds.map(successorId => ({
           where: {
             node: {
@@ -605,14 +605,14 @@ const ApplicationsPage = () => {
       }
     } else {
       input.successors = {
-        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+        disconnect: [{ where: {} }], // Disconnect all existing connections
       }
     }
 
-    // Aktualisierung der Implements-Principles-Beziehungen
+    // Update Implements-Principles relationships
     if (implementsPrincipleIds && implementsPrincipleIds.length > 0) {
       input.implementsPrinciples = {
-        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+        disconnect: [{ where: {} }], // Disconnect all existing connections
         connect: implementsPrincipleIds.map(principleId => ({
           where: {
             node: {
@@ -623,14 +623,14 @@ const ApplicationsPage = () => {
       }
     } else {
       input.implementsPrinciples = {
-        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+        disconnect: [{ where: {} }], // Disconnect all existing connections
       }
     }
 
-    // Aktualisierung der Infrastructure-Beziehungen (hostedOn)
+    // Update Infrastructure relationships (hostedOn)
     if (hostedOnIds && hostedOnIds.length > 0) {
       input.hostedOn = {
-        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+        disconnect: [{ where: {} }], // Disconnect all existing connections
         connect: hostedOnIds.map(infraId => ({
           where: {
             node: {
@@ -641,7 +641,7 @@ const ApplicationsPage = () => {
       }
     } else {
       input.hostedOn = {
-        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+        disconnect: [{ where: {} }], // Disconnect all existing connections
       }
     }
 
@@ -650,31 +650,31 @@ const ApplicationsPage = () => {
     })
   }
 
-  // Neue Applikation erstellen
+  // Create new application
   const handleCreateApplication = () => {
-    // Warten, bis die Daten geladen sind, bevor das Formular geöffnet wird
+    // Wait until data is loaded before opening the form
     if (loading || !data?.applications) {
-      enqueueSnackbar('Bitte warten Sie, bis die Daten geladen sind.', { variant: 'info' })
+      enqueueSnackbar('Please wait until data is loaded.', { variant: 'info' })
       return
     }
     setShowNewApplicationForm(true)
   }
 
-  // Applikation löschen
+  // Delete application
   const handleDeleteApplication = async (id: string) => {
     await deleteApplication({
       variables: { id },
     })
-    // Formular nach dem Löschen schließen
-    // Automatisches Schließen erfolgt durch die ApplicationForm selbst
+    // Close form after deleting
+    // Automatic closing is handled by ApplicationForm itself
   }
 
-  // Filter-Handler
+  // Filter handler
   const handleFilterChange = (newFilterValues: Partial<FilterState>) => {
     setFilterState(prev => ({ ...prev, ...newFilterValues }))
   }
 
-  // Filter zurücksetzen
+  // Reset filter
   const handleResetFilter = () => {
     resetFilters()
     setActiveFiltersCount(0)
@@ -723,7 +723,7 @@ const ApplicationsPage = () => {
             onUpdateApplication={handleUpdateApplicationSubmit}
             onDeleteApplication={handleDeleteApplication}
             availableTechStack={availableTechStack}
-            availableApplications={applications as unknown as Application[]} // Hinzugefügt
+            availableApplications={applications as unknown as Application[]} // Added
             onTableReady={handleTableReady}
             columnVisibility={columnVisibility}
             onColumnVisibilityChange={handleColumnVisibilityChange}
@@ -751,7 +751,7 @@ const ApplicationsPage = () => {
         />
       )}
 
-      {/* Formular für neue Applikation */}
+      {/* Form for new application */}
       {showNewApplicationForm && (
         <ApplicationForm
           isOpen={showNewApplicationForm}

@@ -2,7 +2,7 @@ import { ArchitectureDomain, ArchitectureType } from '../../gql/generated'
 import { FilterState } from './types'
 import { useTranslations, useLocale } from 'next-intl'
 
-// Hook für Domain-Labels mit Übersetzungen
+// Hook for domain labels with translations
 export const useDomainLabel = () => {
   const t = useTranslations('architectures.domains')
 
@@ -30,7 +30,7 @@ export const useDomainLabel = () => {
   }
 }
 
-// Hook für Type-Labels mit Übersetzungen
+// Hook for type labels with translations
 export const useTypeLabel = () => {
   const t = useTranslations('architectures.types')
 
@@ -52,7 +52,7 @@ export const useTypeLabel = () => {
   }
 }
 
-// Fallback-Funktionen für Kompatibilität (deprecated - verwenden Sie die Hooks)
+// Fallback functions for compatibility (deprecated - use the hooks)
 export const getDomainLabel = (domain: ArchitectureDomain | null): string => {
   if (!domain) return 'Unbekannt'
 
@@ -76,7 +76,7 @@ export const getDomainLabel = (domain: ArchitectureDomain | null): string => {
   }
 }
 
-// Gibt ein menschenlesbares Label für einen Type-Wert zurück
+// Returns a human-readable label for a type value
 export const getTypeLabel = (type: ArchitectureType | null): string => {
   if (!type) return 'Unbekannt'
 
@@ -86,7 +86,7 @@ export const getTypeLabel = (type: ArchitectureType | null): string => {
     case ArchitectureType.FUTURE_STATE:
       return 'Soll-Zustand'
     case ArchitectureType.TRANSITION:
-      return 'Übergang'
+      return 'Transition'
     case ArchitectureType.CONCEPTUAL:
       return 'Konzeptionell'
     default:
@@ -94,7 +94,7 @@ export const getTypeLabel = (type: ArchitectureType | null): string => {
   }
 }
 
-// Hook für internationalisierte Datumsformatierung
+// Hook for internationalized date formatting
 export const useFormatDate = () => {
   const locale = useLocale()
 
@@ -120,7 +120,7 @@ export const formatDate = (dateString?: string | Date | null): string => {
   })
 }
 
-// Zählt aktive Filter
+// Count active filters
 export const countActiveFilters = (filterState: FilterState): number => {
   let count = 0
 

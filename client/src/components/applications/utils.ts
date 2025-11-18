@@ -5,10 +5,10 @@ import { de, enUS } from 'date-fns/locale'
 import { FilterState } from './types'
 import { CriticalityLevel, TimeCategory, SevenRStrategy } from '../../gql/generated'
 
-// Formatiert das Datum für die Anzeige
+// Formats the date for display
 export const formatDate = (dateString: string, locale: string = 'de'): string => {
   try {
-    // Standarddatum (1.1.1970) prüfen, das als leerer Wert gilt
+    // Check default date (1.1.1970) that counts as empty value
     const date = new Date(dateString)
     if (date.getFullYear() === 1970 && date.getMonth() === 0 && date.getDate() === 1) {
       return '-'
@@ -21,7 +21,7 @@ export const formatDate = (dateString: string, locale: string = 'de'): string =>
   }
 }
 
-// Liefert den Label für das Kritikalitäts-Level
+// Returns label for das Kritikalitäts-Level
 export const getCriticalityLabel = (level: CriticalityLevel | null | undefined): string => {
   if (level === null || level === undefined) {
     return 'Nicht definiert'
@@ -41,7 +41,7 @@ export const getCriticalityLabel = (level: CriticalityLevel | null | undefined):
   }
 }
 
-// Formatiert Kosten für die Anzeige
+// Formats costs for display
 export const formatCosts = (costs: number | null | undefined): string => {
   if (costs === null || costs === undefined) {
     return '-'
@@ -78,7 +78,7 @@ export const countActiveFilters = (filterState: FilterState): number => {
   )
 }
 
-// Label-Funktionen für TIME-Kategorie
+// Label functions for TIME-Kategorie
 export const getTimeCategoryLabel = (category: TimeCategory): string => {
   switch (category) {
     case TimeCategory.TOLERATE:
@@ -94,7 +94,7 @@ export const getTimeCategoryLabel = (category: TimeCategory): string => {
   }
 }
 
-// Label-Funktionen für 7R-Strategie
+// Label functions for 7R-Strategie
 export const getSevenRStrategyLabel = (strategy: SevenRStrategy): string => {
   switch (strategy) {
     case SevenRStrategy.RETIRE:

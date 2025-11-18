@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
 
     const token = authHeader.substring(7)
 
-    // Entschlüssele das Token, um Benutzerinformationen zu erhalten
+    // Decrypt token to get user information
     const tokenPayload = JSON.parse(atob(token.split('.')[1]))
     const userId = tokenPayload.sub
     const username = tokenPayload.preferred_username
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Admin-Token von Keycloak abrufen
+    // Retrieve admin token from Keycloak
     const adminTokenResponse = await fetch(
       `${keycloakUrl}/realms/master/protocol/openid-connect/token`,
       {
@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
     const adminTokenData = await adminTokenResponse.json()
     const adminToken = adminTokenData.access_token
 
-    // Passwort über Keycloak Admin API ändern
+    // Change password via Keycloak Admin API
     const changePasswordResponse = await fetch(
       `${keycloakUrl}/admin/realms/${realm}/users/${userId}/reset-password`,
       {

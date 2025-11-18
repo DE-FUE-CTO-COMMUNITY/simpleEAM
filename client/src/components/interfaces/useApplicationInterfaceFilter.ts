@@ -12,7 +12,7 @@ interface UseApplicationInterfaceFilterProps {
 export const useApplicationInterfaceFilter = ({
   applicationInterfaces = [],
 }: UseApplicationInterfaceFilterProps) => {
-  // Standardzustand für Filter
+  // Default state for filters
   const [filterState, setFilterState] = useState<FilterState>({
     interfaceTypeFilter: [],
     protocolFilter: [],
@@ -26,22 +26,22 @@ export const useApplicationInterfaceFilter = ({
     updatedDateRange: ['', ''],
   })
 
-  // Alle verfügbaren Schnittstellentypen
+  // All available interface types
   const availableInterfaceTypes = useMemo(() => {
     return Object.values(InterfaceType)
   }, [])
 
-  // Alle verfügbaren Protokolle
+  // All available protocols
   const availableProtocols = useMemo(() => {
     return Object.values(InterfaceProtocol)
   }, [])
 
-  // Alle verfügbaren Status
+  // All available statuses
   const availableStatuses = useMemo(() => {
     return Object.values(InterfaceStatus)
   }, [])
 
-  // Alle verfügbaren Eigentümer (Owners)
+  // All available owners
   const availableOwners = useMemo(() => {
     const persons = new Set<string>()
     applicationInterfaces.forEach(iface => {
@@ -55,7 +55,7 @@ export const useApplicationInterfaceFilter = ({
     return Array.from(persons).sort()
   }, [applicationInterfaces])
 
-  // Alle verfügbaren Quell-Anwendungen
+  // All available source applications
   const availableSourceApplications = useMemo(() => {
     const apps = new Set<string>()
     applicationInterfaces.forEach(iface => {
@@ -70,7 +70,7 @@ export const useApplicationInterfaceFilter = ({
     return Array.from(apps).sort()
   }, [applicationInterfaces])
 
-  // Alle verfügbaren Ziel-Anwendungen
+  // All available target applications
   const availableTargetApplications = useMemo(() => {
     const apps = new Set<string>()
     applicationInterfaces.forEach(iface => {
@@ -85,7 +85,7 @@ export const useApplicationInterfaceFilter = ({
     return Array.from(apps).sort()
   }, [applicationInterfaces])
 
-  // Alle verfügbaren Datenobjekte
+  // All available data objects
   const availableDataObjects = useMemo(() => {
     const objects = new Set<string>()
     applicationInterfaces.forEach(iface => {
@@ -100,7 +100,7 @@ export const useApplicationInterfaceFilter = ({
     return Array.from(objects).sort()
   }, [applicationInterfaces])
 
-  // Alle verfügbaren Versionen
+  // All available versions
   const availableVersions = useMemo(() => {
     const versions = new Set<string>()
     applicationInterfaces.forEach(iface => {
@@ -111,7 +111,7 @@ export const useApplicationInterfaceFilter = ({
     return Array.from(versions).sort()
   }, [applicationInterfaces])
 
-  // Filterfunktion für erweiterte Filter
+  // Filter function for advanced filters
   const filteredApplicationInterfaces = useMemo(() => {
     const {
       interfaceTypeFilter,
@@ -127,7 +127,7 @@ export const useApplicationInterfaceFilter = ({
     } = filterState
 
     return applicationInterfaces.filter((applicationInterface: ApplicationInterface) => {
-      // Schnittstellentyp-Filter
+      // Interface type filter
       if (
         interfaceTypeFilter.length > 0 &&
         !interfaceTypeFilter.includes(applicationInterface.interfaceType)
@@ -151,7 +151,7 @@ export const useApplicationInterfaceFilter = ({
         return false
       }
 
-      // Eigentümer-Filter (Owners)
+      // Owner filter
       if (
         ownersFilter.length > 0 &&
         (!applicationInterface.owners ||
@@ -191,7 +191,7 @@ export const useApplicationInterfaceFilter = ({
         }
       }
 
-      // Datenobjekte-Filter
+      // Data objects filter
       if (dataObjectsFilter.length > 0) {
         const dataObjects = applicationInterface.dataObjects || []
         const hasMatchingDataObject = dataObjects.some(obj =>
@@ -234,7 +234,7 @@ export const useApplicationInterfaceFilter = ({
 
       if (endDateStr && applicationInterface.updatedAt) {
         const endDate = new Date(endDateStr)
-        // Setze das Ende des Tages für den Endzeitpunkt
+        // Set end of day for end time
         endDate.setHours(23, 59, 59, 999)
         const updatedDate = new Date(applicationInterface.updatedAt)
 

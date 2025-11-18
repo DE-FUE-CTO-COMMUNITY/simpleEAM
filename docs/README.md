@@ -1,118 +1,118 @@
 # Simple-EAM: Enterprise Architecture Management
 
-Ein skalierbares Enterprise Architecture Management System, das aus mehreren Docker-Containern besteht und moderne Webtechnologien nutzt.
+A scalable Enterprise Architecture Management System consisting of multiple Docker containers using modern web technologies.
 
-## ⚠️ WICHTIGER HINWEIS: PAKETMANAGER
+## ⚠️ IMPORTANT NOTE: PACKAGE MANAGER
 
-**🚫 NPM IST STRIKT VERBOTEN IN DIESEM PROJEKT! 🚫**
+**🚫 NPM IS STRICTLY PROHIBITED IN THIS PROJECT! 🚫**
 
-Dieses Projekt verwendet **ausschließlich yarn** als Paketmanager:
+This project uses **exclusively yarn** as package manager:
 
-- ✅ `yarn install` - KORREKT
-- ✅ `yarn add package` - KORREKT
-- ✅ `yarn run script` - KORREKT
-- ❌ `npm install` - VERBOTEN
-- ❌ `npm run` - VERBOTEN
-- ❌ `npm add` - VERBOTEN
+- ✅ `yarn install` - CORRECT
+- ✅ `yarn add package` - CORRECT
+- ✅ `yarn run script` - CORRECT
+- ❌ `npm install` - PROHIBITED
+- ❌ `npm run` - PROHIBITED
+- ❌ `npm add` - PROHIBITED
 
-Das Projekt ist technisch so konfiguriert, dass npm-Aufrufe blockiert werden.
+The project is technically configured to block npm calls.
 
-> **Hinweis für GitHub Copilot**: In diesem Projekt wird ausschließlich Yarn als Paketmanager verwendet. Bei allen Installationsbefehlen bitte immer Yarn-Syntax verwenden, nicht npm.
+> **Note for GitHub Copilot**: This project exclusively uses Yarn as package manager. For all installation commands, please always use Yarn syntax, not npm.
 
-## Projektübersicht
+## Project Overview
 
-Dieses Mono-Repository enthält alle Komponenten des Simple-EAM Systems:
+This mono-repository contains all components of the Simple-EAM System:
 
-- **Neo4j-Datenbank**: Graphdatenbank für die Speicherung des Enterprise Architecture Models
-- **GraphQL-Server**: API-Schicht für effiziente Datenkommunikation
-- **Keycloak**: Identitäts- und Zugriffsverwaltung
-- **Next.js-Frontend**: Moderne, responsive Benutzeroberfläche
+- **Neo4j Database**: Graph database for storing the Enterprise Architecture Model
+- **GraphQL Server**: API layer for efficient data communication
+- **Keycloak**: Identity and access management
+- **Next.js Frontend**: Modern, responsive user interface
 
-## Projektstruktur
+## Project Structure
 
 ```
 simple-eam/
-├── auth/                   # Keycloak-Konfiguration
-│   └── src/                # Keycloak-Anpassungen
-├── client/                 # Next.js-Frontend
+├── auth/                   # Keycloak configuration
+│   └── src/                # Keycloak customizations
+├── client/                 # Next.js frontend
 │   └── src/
 │       ├── app/            # Next.js App Router
-│       └── components/     # React-Komponenten
-├── db/                     # Neo4j-Datenbank
-│   └── src/                # Datenbankskripte, Seed-Dateien
-├── server/                 # GraphQL-Server
-│   └── src/                # Server-Quellcode
-└── docker-compose.yml      # Docker-Konfiguration für alle Services
+│       └── components/     # React components
+├── db/                     # Neo4j database
+│   └── src/                # Database scripts, seed files
+├── server/                 # GraphQL server
+│   └── src/                # Server source code
+└── docker-compose.yml      # Docker configuration for all services
 ```
 
-## Technologie-Stack
+## Technology Stack
 
-- **Frontend**: Next.js 15, Material UI 7, Excalidraw, TanStack Table/Form, Internationalisierung
+- **Frontend**: Next.js 15, Material UI 7, Excalidraw, TanStack Table/Form, Internationalization
 - **Backend**: GraphQL, Neo4j, Keycloak
-- **Infrastruktur**: Docker, Docker Compose
+- **Infrastructure**: Docker, Docker Compose
 
-> **Wichtig für Material UI 7**: Wir verwenden die neue Grid v2 API, die sich deutlich von der Legacy Grid-Komponente unterscheidet. Bitte verwenden Sie `size` statt `xs/sm/md`, `<Grid container sx={{ width: '100%' }}>` für Container, und Stack für vertikale Layouts. Siehe [Beispielkomponente](./client/src/components/common/GridV2Example.tsx) und [Dokumentation](https://mui.com/material-ui/migration/upgrade-to-grid-v2/).
+> **Important for Material UI 7**: We use the new Grid v2 API, which differs significantly from the legacy Grid component. Please use `size` instead of `xs/sm/md`, `<Grid container sx={{ width: '100%' }}>` for containers, and Stack for vertical layouts. See [example component](./client/src/components/common/GridV2Example.tsx) and [documentation](https://mui.com/material-ui/migration/upgrade-to-grid-v2/).
 
-> **Wichtig für Tanstack Table**: Wir verwenden Tanstack Table V8, das sich deutlich von React Table v7 unterscheidet. Bitte verwenden Sie `useReactTable` statt `useTable`, `flexRender` für Zellen-Rendering, und explizites State-Management. Siehe [Beispielkomponente](./client/src/components/common/TanstackTableExample.tsx) und [Dokumentation](https://tanstack.com/table/latest/docs/guide/migrating).
+> **Important for Tanstack Table**: We use Tanstack Table V8, which differs significantly from React Table v7. Please use `useReactTable` instead of `useTable`, `flexRender` for cell rendering, and explicit state management. See [example component](./client/src/components/common/TanstackTableExample.tsx) and [documentation](https://tanstack.com/table/latest/docs/guide/migrating).
 
-> **Wichtig für TanStack Form**: Wir verwenden TanStack Form für alle Formulare. Bitte verwenden Sie strikte Typisierung, Schema-Validierung mit Zod, `useForm` für die Form-Instanz, Render-Props Pattern für Felder und optimierte Reaktivität mit `useStore`. Siehe unsere [Formular-Richtlinien](./.github/copilot/TANSTACK_FORM_GUIDELINES.md) und [Dokumentation](https://tanstack.com/form/latest/docs/framework/react/guides/basic-concepts).
+> **Important for TanStack Form**: We use TanStack Form for all forms. Please use strict typing, schema validation with Zod, `useForm` for the form instance, Render Props Pattern for fields and optimized reactivity with `useStore`. See our [form guidelines](./.github/copilot/TANSTACK_FORM_GUIDELINES.md) and [documentation](https://tanstack.com/form/latest/docs/framework/react/guides/basic-concepts).
 
-## Erste Schritte
+## Getting Started
 
-### Voraussetzungen
+### Prerequisites
 
-- Docker und Docker Compose installiert
-- Node.js (empfohlene Version: 20.x oder höher)
+- Docker and Docker Compose installed
+- Node.js (recommended version: 20.x or higher)
 - Git
 
 ### Installation
 
-1. Repository klonen:
+1. Clone repository:
 
    ```bash
    git clone https://your-repository-url/simple-eam.git
    cd simple-eam
    ```
 
-2. Abhängigkeiten installieren:
+2. Install dependencies:
 
    ```bash
    yarn
    ```
 
-3. System starten:
+3. Start system:
 
    ```bash
    docker-compose up -d
    ```
 
-4. Auf die verschiedenen Komponenten zugreifen:
+4. Access the different components:
    - Frontend: http://localhost:3000
-   - GraphQL-Server: http://localhost:4000/graphql
-   - Neo4j-Browser: http://localhost:7474
-   - Keycloak-Admin: http://localhost:8080
+   - GraphQL Server: http://localhost:4000/graphql
+   - Neo4j Browser: http://localhost:7474
+   - Keycloak Admin: http://localhost:8080
 
-## Entwicklung
+## Development
 
-Jede Komponente kann unabhängig entwickelt werden:
+Each component can be developed independently:
 
-- **Client**: Im `client`-Verzeichnis arbeiten
-- **Server**: Im `server`-Verzeichnis arbeiten
-- **Datenbank**: Skripte im `db/src`-Verzeichnis pflegen
-- **Auth**: Keycloak-Konfigurationen im `auth/src`-Verzeichnis anpassen
+- **Client**: Work in the `client` directory
+- **Server**: Work in the `server` directory
+- **Database**: Maintain scripts in the `db/src` directory
+- **Auth**: Customize Keycloak configurations in the `auth/src` directory
 
-**Wichtig:** In diesem Projekt verwenden wir **yarn** als Paketmanager. Bitte verwenden Sie keine npm-Befehle. Weitere Details finden Sie in der [YARN.md](./YARN.md) Dokumentation.
+**Important:** In this project we use **yarn** as package manager. Please do not use npm commands. For more details, see the [YARN.md](./YARN.md) documentation.
 
-## Branching-Strategie
+## Branching Strategy
 
-Wir empfehlen die folgende Branching-Strategie für dieses Mono-Repository:
+We recommend the following branching strategy for this mono-repository:
 
-- `main` - Produktionscode
-- `develop` - Entwicklungszweig
-- `feature/*` - Neue Features
-- `bugfix/*` - Fehlerbehebungen
-- `release/*` - Release-Kandidaten
+- `main` - Production code
+- `develop` - Development branch
+- `feature/*` - New features
+- `bugfix/*` - Bug fixes
+- `release/*` - Release candidates
 
-## Lizenz
+## License
 
-[MIT Lizenz](LICENSE)
+[MIT License](LICENSE)

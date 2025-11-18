@@ -59,7 +59,7 @@ export const useCompanySizeLabel = () => {
 }
 
 /**
- * Zählt aktive Filter
+ * Counts active filters
  */
 export const countActiveFilters = (filterState: FilterState): number => {
   let count = 0

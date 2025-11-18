@@ -13,7 +13,7 @@ interface UseArchitectureFilterProps {
 }
 
 export const useArchitectureFilter = ({ architectures = [] }: UseArchitectureFilterProps) => {
-  // Standardzustand für Filter
+  // Default state for filters
   const [filterState, setFilterState] = useState<FilterState>({
     domainFilter: [],
     typeFilter: [],
@@ -23,10 +23,10 @@ export const useArchitectureFilter = ({ architectures = [] }: UseArchitectureFil
     updatedDateRange: ['', ''],
   })
 
-  // Filterfunktion für erweiterte Filter
+  // Filter function for advanced filters
   const filteredData = useMemo(() => {
     return architectures.filter((architecture: ArchitectureType) => {
-      // Domain Filter
+      // Domain filter
       if (
         filterState.domainFilter.length > 0 &&
         !filterState.domainFilter.includes(architecture.domain as ArchitectureDomain)
@@ -99,7 +99,7 @@ export const useArchitectureFilter = ({ architectures = [] }: UseArchitectureFil
     filterState.updatedDateRange,
   ])
 
-  // Alle verfügbaren Domains extrahieren
+  // Extract all available domains
   const availableDomains = useMemo(() => {
     const domains = architectures
       .map(arch => arch.domain)
@@ -111,7 +111,7 @@ export const useArchitectureFilter = ({ architectures = [] }: UseArchitectureFil
     return domains.sort()
   }, [architectures])
 
-  // Alle verfügbaren Typen extrahieren
+  // Extract all available types
   const availableTypes = useMemo(() => {
     const types = architectures
       .map(arch => arch.type)
@@ -122,7 +122,7 @@ export const useArchitectureFilter = ({ architectures = [] }: UseArchitectureFil
     return types.sort()
   }, [architectures])
 
-  // Alle verfügbaren Tags extrahieren
+  // Extract all available tags
   const availableTags = useMemo(() => {
     const allTags: string[] = []
     architectures.forEach(arch => {
@@ -134,7 +134,7 @@ export const useArchitectureFilter = ({ architectures = [] }: UseArchitectureFil
     return Array.from(new Set(allTags)).sort()
   }, [architectures])
 
-  // Reset-Funktion für Filter
+  // Reset function for filters
   const resetFilters = () => {
     setFilterState({
       domainFilter: [],

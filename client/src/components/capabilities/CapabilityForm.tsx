@@ -21,7 +21,7 @@ import {
 import GenericForm, { FieldConfig } from '../common/GenericForm'
 import { isArchitect } from '@/lib/auth'
 
-// Schema für die Formularvalidierung
+// Schema for form validation
 export const capabilitySchema = z.object({
   name: z
     .string()
@@ -41,9 +41,9 @@ export const capabilitySchema = z.object({
   businessValue: z
     .number()
     .int()
-    .min(0, 'Geschäftswert muss 0 oder höher sein')
-    .max(10, 'Geschäftswert darf maximal 10 sein'),
-  sequenceNumber: z.number().int().min(0, 'Sequenznummer muss 0 oder höher sein').optional(),
+    .min(0, 'Business value must be 0 or higher')
+    .max(10, 'Business value may be at most 10'),
+  sequenceNumber: z.number().int().min(0, 'Sequence number must be 0 or higher').optional(),
   introductionDate: z.date().optional(),
   endDate: z.date().optional(),
   ownerId: z.string().optional(),
@@ -107,7 +107,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
     variables: { where: personWhere },
   })
 
-  // Applikationen laden
+  // Load applications
   const { data: applicationData, loading: applicationLoading } = useQuery(GET_APPLICATIONS)
 
   // Architekturen laden
@@ -118,7 +118,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
     variables: { where: personWhere },
   })
 
-  // Formulardaten mit useMemo initialisieren, um unnötige Re-Renders zu vermeiden
+  // Initialize form data with useMemo to avoid unnecessary re-renders
   const defaultValues = React.useMemo<CapabilityFormValues>(
     () => ({
       name: '',
@@ -148,16 +148,16 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
       await onSubmit(value)
     },
     validators: {
-      // Primäre Validierung bei Änderungen
+      // Primary validation on changes
       onChange: capabilitySchema,
-      // Validierung beim Absenden
+      // Validation on submit
       onSubmit: capabilitySchema,
     },
   })
 
   useEffect(() => {
     if (isOpen && capability) {
-      // Verwende setFieldValue für jedes Feld einzeln - nach dem bewährten Muster der CompanyForm
+      // Use setFieldValue for each field individually - following proven pattern of CompanyForm
       form.setFieldValue('name', capability?.name ?? '')
       form.setFieldValue('description', capability?.description ?? '')
       form.setFieldValue('maturityLevel', capability?.maturityLevel ?? 1)
@@ -191,7 +191,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
     }
   }, [form, capability, isOpen])
 
-  // Feldkonfiguration für das generische Formular
+  // Field configuration for the generic form
   interface SelectOption {
     value: string | number
     label: string

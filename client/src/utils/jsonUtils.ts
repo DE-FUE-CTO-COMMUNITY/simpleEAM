@@ -14,16 +14,16 @@ export const importFromJson = async (file: File): Promise<any[]> => {
         const jsonContent = e.target?.result as string
         const data = JSON.parse(jsonContent)
 
-        // JSON kann sowohl Array als auch Objekt sein
+        // JSON can be either array or object
         if (Array.isArray(data)) {
           resolve(data)
         } else if (typeof data === 'object' && data !== null) {
-          // Wenn es ein Objekt ist, nehmen wir die erste Array-Property
+          // If it is an object, take the first array property
           const firstArrayKey = Object.keys(data).find(key => Array.isArray(data[key]))
           if (firstArrayKey) {
             resolve(data[firstArrayKey])
           } else {
-            resolve([data]) // Einzelnes Objekt als Array
+            resolve([data]) // Single object as array
           }
         } else {
           reject(new Error('JSON enthält keine gültigen Daten'))
@@ -54,7 +54,7 @@ export const importMultiTabFromJson = async (file: File): Promise<{ [tabName: st
         const data = JSON.parse(jsonContent)
 
         if (typeof data === 'object' && data !== null && !Array.isArray(data)) {
-          // Validiere, dass alle Werte Arrays sind
+          // Validate that all values are arrays
           const result: { [tabName: string]: any[] } = {}
 
           for (const [tabName, tabData] of Object.entries(data)) {
@@ -146,7 +146,7 @@ export const convertJsonToExcelData = (jsonData: any[]): any[] => {
           .map(v => (typeof v === 'object' && v !== null && 'id' in v ? v.id : String(v)))
           .join(',')
       } else if (typeof value === 'object' && value !== null) {
-        // Objekte zu ID oder String-Repräsentation
+        // Objects to ID or string representation
         if ('id' in value) {
           converted[key] = value.id
         } else {
@@ -177,7 +177,7 @@ export const convertExcelToJsonData = (excelData: any[]): any[] => {
       if (value === '' || value === null || value === undefined) {
         converted[key] = null
       } else if (typeof value === 'string' && value.includes(',')) {
-        // Kommagetrennte Strings zu Arrays (wenn sie IDs enthalten)
+        // Comma-separated strings to arrays (if they contain IDs)
         const parts = value
           .split(',')
           .map(part => part.trim())
@@ -202,11 +202,11 @@ export const validateJsonStructure = (data: any): { isValid: boolean; error?: st
     }
 
     if (Array.isArray(data)) {
-      // Array-Format ist gültig
+      // Array format is valid
       return { isValid: true }
     }
 
-    // Objekt-Format: Überprüfe, ob es Tab-Struktur hat
+    // Object format: Check if it has tab structure
     const hasArrayValues = Object.values(data).some(value => Array.isArray(value))
     if (hasArrayValues) {
       return { isValid: true }
@@ -268,7 +268,7 @@ export const createJsonTemplate = (entityType: string): any[] => {
         updatedAt: new Date().toISOString(),
       },
     ],
-    // Weitere Templates können hier hinzugefügt werden
+    // Additional templates can be added here
   }
 
   return (

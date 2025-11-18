@@ -1,6 +1,6 @@
-// Deklaration zur Lösung von Typ-Inkompatibilitäten in Middleware-Paketen
+// Declaration to resolve type incompatibilities in middleware packages
 declare namespace Express {
-  // Hinzufügen von leeren Deklarationen, um Typkonflikte zu beheben
+  // Add empty declarations, to resolve type conflicts
   interface Request {}
   interface Response {}
   interface Application {}

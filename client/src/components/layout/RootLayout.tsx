@@ -28,7 +28,7 @@ import Sidebar, { drawerWidth } from './Sidebar'
 import ExcelIcon from '../icons/ExcelIcon'
 import { ImportExportDialog } from '../excel'
 
-// Styled-Komponenten für das Layout
+// Styled components for layout
 const Main = styled('main')(({ theme }) => ({
   flexGrow: 1,
   padding: 0,
@@ -62,7 +62,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
     setImportExportDialogOpen(false)
   }
 
-  // Wenn Keycloak initialisiert ist, aber der Benutzer nicht authentifiziert ist,
+  // If Keycloak is initialized but user is not authenticated,
   // wird eine leere Seite angezeigt, um Flash of Content zu vermeiden
   if (initialized && !authenticated) {
     return <Box sx={{ display: 'flex', minHeight: '100vh' }} />
@@ -88,19 +88,19 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
     { text: t('infrastructure'), icon: <InfrastructureIcon />, href: '/infrastructure' },
     // Abschnitt: Organisation & Personen
     { isDivider: true, text: 'divider', icon: null },
-    // Companies-Verwaltung nur für Admins sichtbar
+    // Companies management only visible for admins
     ...(initialized && isAdmin()
       ? [{ text: t('companies'), icon: <CompanyIcon />, href: '/companies' }]
       : []),
     { text: t('persons'), icon: <PersonIcon />, href: '/persons' },
-    // Import/Export für Admin- und Architect-Benutzer (Hydration-Fix: nur wenn initialisiert)
+    // Import/Export for Admin and Architect users (Hydration fix: only when initialized)
     ...(initialized && (isAdmin() || isArchitect())
       ? [
           { isDivider: true, text: 'divider', icon: null },
           { text: t('importExport'), icon: <ExcelIcon />, onClick: handleImportExportDialogOpen },
         ]
       : []),
-    // Administration nur für Admins - ganz unten
+    // Administration only for admins - at the bottom
     ...(initialized && isAdmin()
       ? [
           { isDivider: true, text: 'divider', icon: null },
@@ -115,7 +115,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-      {/* CssBaseline wird bereits im layout.tsx verwendet */}
+      {/* CssBaseline is already used in layout.tsx */}
 
       <AppHeader
         open={open}
@@ -133,12 +133,12 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
       />
 
       <Main>
-        <Toolbar /> {/* Spacer für die AppBar */}
+        <Toolbar /> {/* Spacer for the AppBar */}
         {children}
       </Main>
 
       {/* Excel Import/Export Dialog - für Admin- und Architect-Benutzer */}
-      {/* Hydration-Fix: Nur rendern wenn Auth initialisiert ist */}
+      {/* Hydration fix: Only render when auth is initialized */}
       {initialized && (isAdmin() || isArchitect()) && (
         <ImportExportDialog
           isOpen={importExportDialogOpen}

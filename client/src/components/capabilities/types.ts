@@ -1,6 +1,6 @@
 import { BusinessCapability, CapabilityStatus } from '../../gql/generated'
 
-// Nutze den generierten Typ als Basis und passe ihn für unsere Komponenten an
+// Use the generated type as basis and adapt it for our components
 export type Capability = Pick<
   BusinessCapability,
   | 'id'

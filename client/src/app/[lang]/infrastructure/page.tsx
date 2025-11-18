@@ -76,7 +76,7 @@ export default function InfrastructuresPage() {
   const handleCreate = async (data: InfrastructureFormValues) => {
     try {
       if (!selectedCompanyId) {
-        enqueueSnackbar('Bitte zuerst ein Unternehmen auswählen.', { variant: 'warning' })
+        enqueueSnackbar('Please select a company first.', { variant: 'warning' })
         return
       }
       const parentId = Array.isArray(data.parentInfrastructure)
@@ -151,7 +151,7 @@ export default function InfrastructuresPage() {
               })),
             },
           }),
-        // Company-Zuordnung (Pflicht)
+        // Company assignment (required)
         company: {
           connect: [
             {

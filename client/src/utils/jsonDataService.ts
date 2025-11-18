@@ -86,16 +86,16 @@ export const fetchBusinessCapabilitiesForJson = async (
       description: cap.description || '',
       status: cap.status || '',
       type: cap.type || undefined,
-      // Numerische Felder
+      // Numeric fields
       businessValue: cap.businessValue || undefined,
       maturityLevel: cap.maturityLevel || undefined,
       sequenceNumber: cap.sequenceNumber || undefined,
-      // Datum-Felder
+      // Date fields
       introductionDate: formatDateForJsonExport(cap.introductionDate),
       endDate: formatDateForJsonExport(cap.endDate),
       createdAt: formatDateForJsonExport(cap.createdAt),
       updatedAt: formatDateForJsonExport(cap.updatedAt),
-      // Array-Felder
+      // Array fields
       tags: cap.tags || [],
       // Beziehungen als verschachtelte Objekte (nicht als ID-Strings)
       owners: cap.owners || [],
@@ -107,7 +107,7 @@ export const fetchBusinessCapabilitiesForJson = async (
       children: cap.children || [],
     }))
   } catch {
-    throw new Error('Fehler beim Laden der Business Capabilities für JSON-Export')
+    throw new Error('Error loading business capabilities für JSON-Export')
   }
 }
 
@@ -134,18 +134,18 @@ export const fetchApplicationsForJson = async (
       criticality: app.criticality || '',
       vendor: app.vendor || '',
       hostingEnvironment: app.hostingEnvironment || '',
-      // Numerische Felder
+      // Numeric fields
       costs: app.costs || undefined,
-      // Datum-Felder - alle wichtigen Datums-Felder hinzufügen
+      // Date fields - alle wichtigen Datums-Felder hinzufügen
       introductionDate: formatDateForJsonExport(app.introductionDate),
       endOfLifeDate: formatDateForJsonExport(app.endOfLifeDate),
       endOfUseDate: formatDateForJsonExport(app.endOfUseDate),
       planningDate: formatDateForJsonExport(app.planningDate),
       createdAt: formatDateForJsonExport(app.createdAt),
       updatedAt: formatDateForJsonExport(app.updatedAt),
-      // Array-Felder
+      // Array fields
       technologyStack: app.technologyStack || [],
-      // Enum-Felder
+      // Enum fields
       sevenRStrategy: app.sevenRStrategy || undefined,
       timeCategory: app.timeCategory || undefined,
       // Beziehungen als verschachtelte Objekte
@@ -189,7 +189,7 @@ export const fetchDataObjectsForJson = async (
       description: obj.description || '',
       classification: obj.classification || '',
       format: obj.format || '',
-      // Datum-Felder
+      // Date fields
       introductionDate: formatDateForJsonExport(obj.introductionDate),
       endOfLifeDate: formatDateForJsonExport(obj.endOfLifeDate),
       endOfUseDate: formatDateForJsonExport(obj.endOfUseDate),
@@ -232,7 +232,7 @@ export const fetchInterfacesForJson = async (
       status: iface.status || '',
       protocol: iface.protocol || '',
       version: iface.version || '',
-      // Datums-Felder
+      // Date fields
       introductionDate: formatDateForJsonExport(iface.introductionDate),
       planningDate: formatDateForJsonExport(iface.planningDate),
       endOfUseDate: formatDateForJsonExport(iface.endOfUseDate),
@@ -437,7 +437,7 @@ export const fetchInfrastructuresForJson = async (
       ipAddress: infra.ipAddress || '',
       specifications: infra.specifications || '',
       maintenanceWindow: infra.maintenanceWindow || '',
-      // Datums-Felder
+      // Date fields
       introductionDate: formatDateForJsonExport(infra.introductionDate),
       planningDate: formatDateForJsonExport(infra.planningDate),
       endOfUseDate: formatDateForJsonExport(infra.endOfUseDate),
@@ -483,12 +483,12 @@ export const fetchAicomponentsForJson = async (
       provider: ai.provider || '',
       license: ai.license || '',
       costs: ai.costs || '',
-      // Datums-Felder
+      // Date fields
       trainingDate: formatDateForJsonExport(ai.trainingDate),
       lastUpdated: formatDateForJsonExport(ai.lastUpdated),
       createdAt: formatDateForJsonExport(ai.createdAt),
       updatedAt: formatDateForJsonExport(ai.updatedAt),
-      // Array-Felder
+      // Array fields
       tags: ai.tags || [],
       // Beziehungen als verschachtelte Objekte
       owners: ai.owners || [],
@@ -744,7 +744,7 @@ export const validateJsonImportData = (
           })
         }
         break
-      // Weitere spezifische Validierungen können hier hinzugefügt werden
+      // Additional specific validations can be added here
     }
 
     if (rowIsValid) {

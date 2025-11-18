@@ -8,7 +8,7 @@ import GenericForm, { FieldConfig } from '@/components/common/GenericForm'
 import { KeycloakUser } from '@/lib/keycloak-admin'
 import { KeycloakUserAlt } from '@/lib/keycloak-admin-alt'
 
-// Verfügbare Rollen
+// Available roles
 const AVAILABLE_ROLES = ['viewer', 'architect', 'admin'] as const
 
 type UserFormData = {
@@ -71,14 +71,14 @@ export default function UserFormDialog({
       await onSubmit(value)
     },
     validators: {
-      // Primäre Validierung bei Änderungen
+      // Primary validation on changes
       onChange: userSchema,
-      // Validierung beim Absenden
+      // Validation on submit
       onSubmit: userSchema,
     },
   })
 
-  // Formular-Validatoren aktualisieren, wenn sich das Schema ändert
+  // Update form validators when schema changes
   React.useEffect(() => {
     form.options.validators = {
       onChange: userSchema,
@@ -86,16 +86,16 @@ export default function UserFormDialog({
     }
   }, [form, userSchema])
 
-  // Formular aktualisieren, wenn sich die Daten ändern
+  // Update form when data changes
   useEffect(() => {
     if (!open) {
-      // Dialog geschlossen - Formular zurücksetzen
+      // Dialog closed - reset form
       form.reset()
       return
     }
 
     if (mode === 'create') {
-      // Im CREATE-Modus mit leeren Standardwerten initialisieren
+      // Initialize with empty default values in CREATE mode
       form.reset(defaultValues)
     } else if (mode === 'edit' && user) {
       // Im edit Mode mit Werten aus user initialisieren
@@ -115,7 +115,7 @@ export default function UserFormDialog({
     }
   }, [form, user, open, defaultValues, mode, userSchema])
 
-  // Feldkonfiguration für das generische Formular
+  // Field configuration for the generic form
   const fields: FieldConfig[] = [
     {
       name: 'username',

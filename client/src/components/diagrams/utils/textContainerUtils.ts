@@ -108,8 +108,8 @@ export const normalizeText = (text: string | undefined | null): string => {
 
   return text
     .replace(/\r?\n/g, ' ') // Zeilenumbrüche durch Leerzeichen ersetzen
-    .replace(/-\s*\n\s*/g, '') // Trennstriche vor Zeilenumbrüchen entfernen
-    .replace(/\n\s*-\s*/g, '') // Trennstriche nach Zeilenumbrüchen entfernen
+    .replace(/-\s*\n\s*/g, '') // Trennstriche vor Zeilenumbrüchen remove
+    .replace(/\n\s*-\s*/g, '') // Trennstriche nach Zeilenumbrüchen remove
     .replace(/\u00AD/g, '') // Entferne weiche Trennstriche (soft hyphens) für Synchronisation
     .replace(/([a-zA-ZäöüÄÖÜß])-\s+([a-zA-ZäöüÄÖÜß])/g, '$1$2') // WICHTIG: Entferne Hypher-Trennungen wie "Hauptrechenzentr- um"
     .replace(/\s+/g, ' ') // Mehrfache Leerzeichen durch einzelne ersetzen

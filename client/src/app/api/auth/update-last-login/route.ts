@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
 
     const userId = decoded.sub
 
-    // Admin-Token für Keycloak-API abrufen (mit Benutzername/Passwort wie andere APIs)
+    // Retrieve admin token for Keycloak API (mit Benutzername/Passwort wie andere APIs)
     const adminTokenResponse = await fetch(
       `${KEYCLOAK_URL}/realms/master/protocol/openid-connect/token`,
       {
@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
     const userData = await userResponse.json()
     const existingAttributes = userData.attributes || {}
 
-    // Benutzerattribut in Keycloak aktualisieren
+    // Update user attribute
     const updateResponse = await fetch(
       `${KEYCLOAK_URL}/admin/realms/${KEYCLOAK_REALM}/users/${userId}`,
       {

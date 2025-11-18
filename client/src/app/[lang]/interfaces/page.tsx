@@ -21,7 +21,7 @@ import ApplicationInterfaceForm, {
   ApplicationInterfaceFormValues,
 } from '@/components/interfaces/ApplicationInterfaceForm'
 
-// Importiere die ausgelagerten Komponenten
+// Import the extracted components
 import ApplicationInterfaceTable, {
   APPLICATION_INTERFACE_DEFAULT_COLUMN_VISIBILITY,
 } from '@/components/interfaces/ApplicationInterfaceTable'
@@ -47,7 +47,7 @@ function ApplicationInterfacesPage() {
   const [filterOpen, setFilterOpen] = useState(false)
   const [activeFiltersCount, setActiveFiltersCount] = useState<number>(0)
 
-  // State für das neue Formular
+  // State for the new form
   const [showNewApplicationInterfaceForm, setShowNewApplicationInterfaceForm] = useState(false)
 
   // Schnittstellen laden - Auth-Check erfolgt bereits in layout.tsx
@@ -83,7 +83,7 @@ function ApplicationInterfacesPage() {
   const applications = applicationsData?.applications || []
   const persons = personsData?.people || []
 
-  // Fehlerbehandlung
+  // Error handling
   useEffect(() => {
     if (error) {
       enqueueSnackbar(t('messages.loadError'), { variant: 'error' })
@@ -110,7 +110,7 @@ function ApplicationInterfacesPage() {
     applicationInterfaces,
   })
 
-  // Mutation zum Erstellen einer neuen Schnittstelle
+  // Mutation for creating a new Interface
   const [createApplicationInterface, { loading: isCreating }] = useMutation(
     CREATE_APPLICATION_INTERFACE,
     {
@@ -126,7 +126,7 @@ function ApplicationInterfacesPage() {
     }
   )
 
-  // Mutation zum Aktualisieren einer bestehenden Schnittstelle
+  // Mutation for updating an existing Interface
   const [updateApplicationInterface] = useMutation(UPDATE_APPLICATION_INTERFACE, {
     onCompleted: () => {
       enqueueSnackbar(t('messages.updateSuccess'), { variant: 'success' })
@@ -139,7 +139,7 @@ function ApplicationInterfacesPage() {
     },
   })
 
-  // Mutation zum Löschen einer Schnittstelle
+  // Mutation for deleting an Interface
   const [deleteApplicationInterface] = useMutation(DELETE_APPLICATION_INTERFACE, {
     onCompleted: () => {
       enqueueSnackbar(t('messages.deleteSuccess'), { variant: 'success' })
@@ -152,10 +152,10 @@ function ApplicationInterfacesPage() {
     },
   })
 
-  // Handler für das Erstellen einer neuen Schnittstelle
+  // Handler for creating a new Schnittstelle
   const handleCreateApplicationInterfaceSubmit = async (data: ApplicationInterfaceFormValues) => {
     if (!selectedCompanyId) {
-      enqueueSnackbar('Bitte zuerst ein Unternehmen auswählen.', { variant: 'warning' })
+      enqueueSnackbar('Please select a company first.', { variant: 'warning' })
       return
     }
     const input = {
@@ -241,7 +241,7 @@ function ApplicationInterfacesPage() {
             })),
           }
         : undefined,
-      // Company-Zuordnung (Pflicht)
+      // Company assignment (required)
       company: {
         connect: [
           {
@@ -255,16 +255,16 @@ function ApplicationInterfacesPage() {
       variables: { input: [input] },
     })
 
-    // Formular nach dem Erstellen schließen
+    // Close form after creating
     setShowNewApplicationInterfaceForm(false)
   }
 
-  // Handler für das Aktualisieren einer bestehenden Schnittstelle
+  // Handler for updating an existing Interface
   const handleUpdateApplicationInterfaceSubmit = async (
     id: string,
     data: ApplicationInterfaceFormValues
   ) => {
-    // Basis-Input-Daten vorbereiten
+    // Prepare base input data
     const input = {
       name: { set: data.name },
       description: { set: data.description },
@@ -363,12 +363,12 @@ function ApplicationInterfacesPage() {
     })
   }
 
-  // Neue Schnittstelle erstellen
+  // Create new interface
   const handleCreateApplicationInterface = () => {
     setShowNewApplicationInterfaceForm(true)
   }
 
-  // Schnittstelle löschen
+  // Delete interface
   const handleDeleteApplicationInterface = async (id: string) => {
     await deleteApplicationInterface({
       variables: { id },
@@ -376,12 +376,12 @@ function ApplicationInterfacesPage() {
     // Automatisches Schließen erfolgt durch die Form selbst
   }
 
-  // Filter-Handler
+  // Filter handler
   const handleFilterChange = (newFilterValues: Partial<FilterState>) => {
     setFilterState(prev => ({ ...prev, ...newFilterValues }))
   }
 
-  // Filter zurücksetzen
+  // Reset filter
   const handleResetFilter = () => {
     resetFilters()
     setActiveFiltersCount(0)

@@ -27,7 +27,7 @@ const ApplicationInterfaceFilterDialog: React.FC<FilterProps> = ({
   const tStatuses = useTranslations('interfaces.statuses')
   const tProtocols = useTranslations('interfaces.protocols')
 
-  // Hilfsfunktion für Interface Type Labels
+  // Helper function for interface type labels
   const getInterfaceTypeLabel = (type: InterfaceType) => {
     switch (type) {
       case InterfaceType.API:
@@ -45,7 +45,7 @@ const ApplicationInterfaceFilterDialog: React.FC<FilterProps> = ({
     }
   }
 
-  // Hilfsfunktion für Status Labels
+  // Helper function for status labels
   const getStatusLabel = (status: InterfaceStatus) => {
     switch (status) {
       case InterfaceStatus.ACTIVE:
@@ -63,7 +63,7 @@ const ApplicationInterfaceFilterDialog: React.FC<FilterProps> = ({
     }
   }
 
-  // Hilfsfunktion für Protokoll Labels
+  // Helper function for protocol labels
   const getProtocolDisplayLabel = (protocol: InterfaceProtocol) => {
     switch (protocol) {
       case InterfaceProtocol.HTTP:
@@ -93,7 +93,7 @@ const ApplicationInterfaceFilterDialog: React.FC<FilterProps> = ({
 
   // Konfiguration der Filterfelder
   const filterFields: FilterField[] = [
-    // Schnittstellentyp-Filter
+    // Interface type filter
     {
       id: 'interfaceTypeFilter',
       label: t('interfaceType'),
@@ -126,7 +126,7 @@ const ApplicationInterfaceFilterDialog: React.FC<FilterProps> = ({
       })),
       valueFormatter: value => getStatusLabel(value as InterfaceStatus),
     },
-    // Eigentümer-Filter
+    // Owner filter
     {
       id: 'ownersFilter',
       label: t('owners'),
@@ -136,7 +136,7 @@ const ApplicationInterfaceFilterDialog: React.FC<FilterProps> = ({
         label: person,
       })),
     },
-    // Quell-Applikationen-Filter
+    // Source applications filter
     {
       id: 'sourceApplicationsFilter',
       label: t('sourceApplications'),
@@ -146,7 +146,7 @@ const ApplicationInterfaceFilterDialog: React.FC<FilterProps> = ({
         label: app,
       })),
     },
-    // Ziel-Applikationen-Filter
+    // Target applications filter
     {
       id: 'targetApplicationsFilter',
       label: t('targetApplications'),
@@ -156,7 +156,7 @@ const ApplicationInterfaceFilterDialog: React.FC<FilterProps> = ({
         label: app,
       })),
     },
-    // Datenobjekte-Filter
+    // Data objects filter
     {
       id: 'dataObjectsFilter',
       label: t('dataObjects'),

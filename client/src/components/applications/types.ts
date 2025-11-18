@@ -14,7 +14,7 @@ export const baseApplicationSchema = z.object({
   description: z.string().min(1, 'Beschreibung ist erforderlich'),
   status: z.nativeEnum(ApplicationStatus),
   criticality: z.nativeEnum(CriticalityLevel),
-  costs: z.number().min(0, 'Kosten müssen positiv sein'),
+  costs: z.number().min(0, 'Costs must be positive'),
   vendor: z.string().optional(),
   version: z.string().optional(),
   hostingEnvironment: z.string().optional(),
@@ -36,12 +36,12 @@ export const applicationSchema = baseApplicationSchema.refine(
     return true
   },
   {
-    message: 'Ungültige Kombination von TIME-Kategorie und 7R-Strategie',
+    message: 'Invalid combination of TIME category and 7R strategy',
     path: ['sevenRStrategy'], // Error wird bei sevenRStrategy angezeigt
   }
 )
 
-// Nutze den generierten Typ als Basis und passe ihn für unsere Komponenten an
+// Use the generated type as basis and adapt it for our components
 export type ApplicationType = Pick<
   Application,
   | 'id'

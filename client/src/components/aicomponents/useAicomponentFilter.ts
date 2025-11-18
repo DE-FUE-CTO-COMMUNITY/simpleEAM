@@ -9,7 +9,7 @@ interface UseAicomponentFilterProps {
 }
 
 export const useAicomponentFilter = ({ aicomponents = [] }: UseAicomponentFilterProps) => {
-  // Standardzustand für Filter
+  // Default state for filters
   const [filterState, setFilterState] = useState<FilterState>({
     aiTypeFilter: [],
     statusFilter: [],
@@ -23,7 +23,7 @@ export const useAicomponentFilter = ({ aicomponents = [] }: UseAicomponentFilter
     lastUpdatedRange: ['', ''],
   })
 
-  // Filterfunktion für erweiterte Filter
+  // Filter function for advanced filters
   const filteredAicomponents = useMemo(() => {
     return aicomponents.filter((item: AicomponentType) => {
       // AI-Typ Filter

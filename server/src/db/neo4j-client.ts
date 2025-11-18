@@ -3,25 +3,25 @@ import * as dotenv from 'dotenv'
 
 dotenv.config()
 
-// Neo4j-Verbindungsparameter aus Umgebungsvariablen oder Standardwerte
-// Verwende den Container-Namen als Hostname für zuverlässigere Verbindung
+// Neo4j connection parameters from environment variables or default values
+// Use the container name als Hostname for more reliable connection
 const URI = process.env.NEO4J_URI || 'bolt://neo4j:7687'
 const USER = process.env.NEO4J_USER || 'neo4j'
 const PASSWORD = process.env.NEO4J_PASSWORD || 'eam_password'
 
-// Erstellen der Neo4j-Driver-Instanz mit erweiterten Verbindungsoptionen
+// Creating the Neo4j driver instance with advanced connection options
 export const neo4jDriver: Driver = driver(URI, auth.basic(USER, PASSWORD), {
-  // Erhöhte Timeouts für langsamere Netzwerke/Container-Starts
+  // Increased timeouts for slower networks/container starts
   connectionTimeout: 30000, // 30 Sekunden Verbindungs-Timeout
   maxTransactionRetryTime: 30000,
   maxConnectionLifetime: 3 * 60 * 60 * 1000, // 3 Stunden
   maxConnectionPoolSize: 50,
   connectionAcquisitionTimeout: 2 * 60 * 1000, // 2 Minuten
-  // Encryption explizit deaktivieren für Entwicklungsumgebung
+  // Explicitly disable encryption for development environment
   encrypted: false,
 })
 
-// Funktion zum Testen der Datenbankverbindung mit Retry-Mechanismus
+// Function to test database connection with retry mechanism
 export const testConnection = async (): Promise<boolean> => {
   const maxRetries = 5
   let retries = 0
@@ -41,7 +41,7 @@ export const testConnection = async (): Promise<boolean> => {
       retries++
 
       if (retries < maxRetries) {
-        await new Promise(resolve => setTimeout(resolve, 5000)) // 5 Sekunden warten
+        await new Promise(resolve => setTimeout(resolve, 5000)) // Wait 5 seconds
       }
     } finally {
       await session.close()
@@ -55,7 +55,7 @@ export const testConnection = async (): Promise<boolean> => {
   return success
 }
 
-// Funktion zum Beenden der Datenbankverbindung
+// Function to close database connection
 export const closeDriver = async (): Promise<void> => {
   await neo4jDriver.close()
 }

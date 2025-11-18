@@ -1,7 +1,7 @@
 import { InfrastructureType, InfrastructureStatus } from '../../gql/generated'
 
 /**
- * Vereinfachte Version des Owner-Typs für Beispieldaten
+ * Simplified version of Owner type for example data
  */
 export interface SimplePerson {
   id: string
@@ -10,7 +10,7 @@ export interface SimplePerson {
 }
 
 /**
- * Erweiterter Typ für Infrastructure mit zusätzlichen Feldern oder angepassten Typen
+ * Extended type for Infrastructure with additional fields or adjusted types
  */
 export interface Infrastructure {
   id: string
@@ -37,7 +37,7 @@ export interface Infrastructure {
 }
 
 /**
- * Typ für Formulareingaben für Infrastructure
+ * Type for form inputs for Infrastructure
  */
 export interface InfrastructureFormValues {
   name: string
@@ -66,7 +66,7 @@ export interface InfrastructureFormValues {
 }
 
 /**
- * Filter-Zustand für Infrastructure
+ * Filter state for Infrastructure
  */
 export interface FilterState {
   statusFilter: InfrastructureStatus[]

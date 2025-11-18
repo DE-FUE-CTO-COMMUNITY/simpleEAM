@@ -48,25 +48,25 @@ const baseDataObjectSchema = z.object({
   depictedInDiagrams: z.array(z.string()).optional(),
 })
 
-// Schema für die Formularvalidierung mit erweiterten Validierungen
+// Schema for form validation with extended validations
 export const dataObjectSchema = baseDataObjectSchema.superRefine((data, ctx) => {
-  // Lifecycle-Datums-Validierung mit individuellen Fehlermeldungen
+  // Lifecycle date validation with individual error messages
   const dates = [
     { field: 'planningDate', date: data.planningDate, label: 'Planungsdatum' },
-    { field: 'introductionDate', date: data.introductionDate, label: 'Einführungsdatum' },
+    { field: 'introductionDate', date: data.introductionDate, label: 'Introduction Date' },
     { field: 'endOfUseDate', date: data.endOfUseDate, label: 'Ende der Nutzung' },
     { field: 'endOfLifeDate', date: data.endOfLifeDate, label: 'End-of-Life-Datum' },
   ] as const
 
   const setDates = dates.filter(d => d.date && d.date instanceof Date && !isNaN(d.date.getTime()))
 
-  // Prüfe chronologische Reihenfolge zwischen allen aufeinanderfolgenden Daten
+  // Check chronological order between all consecutive dates
   for (let i = 0; i < setDates.length - 1; i++) {
     const currentDate = setDates[i]
     const nextDate = setDates[i + 1]
 
     if (currentDate.date! >= nextDate.date!) {
-      // Füge Fehlermeldung zum späteren Datum hinzu
+      // Add error message to the later date
       ctx.addIssue({
         code: 'custom',
         message: `${nextDate.label} muss nach ${currentDate.label} liegen.`,
@@ -103,7 +103,7 @@ const DataObjectForm: React.FC<GenericFormProps<DataObject, DataObjectFormValues
   const { data: personData, loading: personLoading } = useQuery(GET_PERSONS, {
     variables: { where: companyWhere },
   })
-  // Applikationen laden
+  // Load applications
   const { data: applicationData, loading: applicationLoading } = useQuery(GET_APPLICATIONS, {
     fetchPolicy: 'cache-and-network',
     variables: { where: companyWhere },
@@ -131,7 +131,7 @@ const DataObjectForm: React.FC<GenericFormProps<DataObject, DataObjectFormValues
     }
   )
 
-  // Formulardaten mit useMemo initialisieren, um unnötige Re-Renders zu vermeiden
+  // Initialize form data with useMemo to avoid unnecessary re-renders
   const defaultValues = React.useMemo<DataObjectFormValues>(
     () => ({
       name: dataObject?.name || '',
@@ -163,26 +163,26 @@ const DataObjectForm: React.FC<GenericFormProps<DataObject, DataObjectFormValues
       await onSubmit(value)
     },
     validators: {
-      // Primäre Validierung bei Änderungen
+      // Primary validation on changes
       onChange: dataObjectSchema,
-      // Validierung beim Absenden
+      // Validation on submit
       onSubmit: dataObjectSchema,
     },
   })
 
-  // Formular aktualisieren, wenn sich die Daten ändern
+  // Update form when data changes
   useEffect(() => {
-    // Nicht-reaktives Flag für unerwartete Zustandsbehandlung
+    // Non-reactive flag for unexpected state handling
     let hasHandledForm = false
 
     if (!isOpen) {
-      // Dialog geschlossen - Formular zurücksetzen
+      // Dialog closed - reset form
       form.reset()
       return
     }
 
     if (mode === 'create') {
-      // Im CREATE-Modus mit leeren Standardwerten initialisieren
+      // Initialize with empty default values in CREATE mode
       form.reset(defaultValues)
       hasHandledForm = true
     } else if ((mode === 'view' || mode === 'edit') && dataObject && dataObject.id) {
@@ -208,19 +208,19 @@ const DataObjectForm: React.FC<GenericFormProps<DataObject, DataObjectFormValues
         depictedInDiagrams: dataObject.depictedInDiagrams?.map(diagram => diagram.id) ?? [],
       }
 
-      // Formular mit den Werten aus dem vorhandenen DataObject zurücksetzen
+      // Reset form with values from existing DataObject
       form.reset(formValues)
       hasHandledForm = true
     }
 
-    // Final Fallback - nur ausführen, wenn keine der vorherigen Bedingungen zutraf
+    // Final fallback - only execute if none of the previous conditions matched
     if (!hasHandledForm) {
-      // Immer mit Standardwerten zurücksetzen, aber Dialog nicht automatisch schließen
+      // Always reset with default values, but do not close dialog automatically
       form.reset(defaultValues)
     }
   }, [form, dataObject, isOpen, defaultValues, mode])
 
-  // Feldkonfiguration für das generische Formular
+  // Field configuration for the generic form
   interface SelectOption {
     value: string | number
     label: string
@@ -233,7 +233,7 @@ const DataObjectForm: React.FC<GenericFormProps<DataObject, DataObjectFormValues
     size?: { xs: number; md: number } | number
   }
 
-  // Dynamische Tab-Konfiguration mit Übersetzungen
+  // Dynamic tab configuration with translations
   const tabs = React.useMemo(
     () => [
       { id: 'general', label: tTabs('general') },

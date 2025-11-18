@@ -599,7 +599,7 @@ export const downloadTemplateWithRealFields = async (
   } = moduleImport
 
   if (entityType === 'all') {
-    // Multi-Tab Template für Admin (Diagramme werden bei Excel ausgeblendet)
+    // Multi-tab template for admin (Diagrams are hidden in Excel)
     const allTemplates = {
       'Business Capabilities': [getBusinessCapabilitiesTemplate()],
       Applications: [getApplicationsTemplate()],
@@ -620,7 +620,7 @@ export const downloadTemplateWithRealFields = async (
     return
   }
 
-  // TypeScript weiß, dass entityType hier nicht 'all' ist
+  // TypeScript knows that entityType here is not "all"
   if (entityType === 'aicomponents') {
     // Temporäre Lösung für AI Components Template
     const aicomponentsTemplate = {

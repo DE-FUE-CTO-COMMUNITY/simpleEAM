@@ -245,7 +245,7 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
                       'parentArchitecture',
                       'appliedPrinciples',
                     ],
-                    // Diagramme werden je nach Format unterschiedlich angezeigt
+                    // Diagrams are displayed differently depending on format
                     diagrams:
                       exportSettings.format === 'json'
                         ? [
@@ -410,7 +410,7 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
                     )
                   }
 
-                  // Hinweis für einzelne Diagramm-Exports
+                  // Note for individual diagram exports
                   if (
                     exportSettings.entityType === 'diagrams' &&
                     exportSettings.format !== 'json'

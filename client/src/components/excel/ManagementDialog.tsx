@@ -50,7 +50,7 @@ const ManagementDialog: React.FC<ManagementDialogProps> = ({
   const { selectedCompanyId, companies } = useCompanyContext()
   const selectedCompanyName = companies.find(c => c.id === selectedCompanyId)?.name
 
-  // Übersetzungsfunktion für Entity Types
+  // Translation function for entity types
   const getEntityTypeTranslation = (entityType: string): string => {
     switch (entityType) {
       case 'businessCapabilities':

@@ -16,7 +16,7 @@ interface AuthContextType {
   initialized: boolean
 }
 
-// Erstelle einen Mock AuthContext für die Diagramm-Komponenten
+// Create a mock AuthContext for diagram components
 const AuthContext = createContext<AuthContextType>({
   user: null,
   authenticated: false,
@@ -25,9 +25,9 @@ const AuthContext = createContext<AuthContextType>({
 
 export const useAuth = () => useContext(AuthContext)
 
-// Einfacher Mock Provider für Entwicklungszwecke
+// Simple mock provider for development purposes
 export const MockAuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Mock-Benutzer für Entwicklung
+  // Mock user for development
   const mockUser: User = {
     id: 'mock-user-id',
     preferred_username: 'developer',

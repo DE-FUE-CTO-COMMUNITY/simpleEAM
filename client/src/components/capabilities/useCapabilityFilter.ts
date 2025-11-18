@@ -10,7 +10,7 @@ interface UseCapabilityFilterProps {
 }
 
 export const useCapabilityFilter = ({ capabilities = [] }: UseCapabilityFilterProps) => {
-  // Standardzustand für Filter
+  // Default state for filters
   const [filterState, setFilterState] = useState<FilterState>({
     statusFilter: [] as CapabilityStatus[],
     maturityLevelFilter: [],
@@ -21,7 +21,7 @@ export const useCapabilityFilter = ({ capabilities = [] }: UseCapabilityFilterPr
     updatedDateRange: ['', ''],
   })
 
-  // Filterfunktion für erweiterte Filter
+  // Filter function for advanced filters
   const filteredData = useMemo(() => {
     const result = capabilities.filter((capability: BusinessCapability) => {
       // Status Filter
@@ -43,7 +43,7 @@ export const useCapabilityFilter = ({ capabilities = [] }: UseCapabilityFilterPr
         return false
       }
 
-      // Geschäftswert Range Filter
+      // Business value range filter
       const businessValue = capability.businessValue ?? 0
       if (
         filterState.businessValueRange &&
@@ -73,7 +73,7 @@ export const useCapabilityFilter = ({ capabilities = [] }: UseCapabilityFilterPr
         return false
       }
 
-      // Verantwortlicher-Filter
+      // Owner filter
       if (
         filterState.ownerFilter &&
         (!capability.owners ||
@@ -105,7 +105,7 @@ export const useCapabilityFilter = ({ capabilities = [] }: UseCapabilityFilterPr
         }
 
         if (endDate) {
-          // Setze das Ende des Tages für einen inklusiven Vergleich
+          // Set end of day for inclusive comparison
           const endOfDay = new Date(endDate)
           endOfDay.setHours(23, 59, 59, 999)
 

@@ -1,6 +1,6 @@
 import { TimeCategory, SevenRStrategy } from '@/gql/generated'
 
-// Definiert die gültigen Kombinationen zwischen TIME-Kategorie und 7R-Strategie
+// Defines valid combinations between TIME category and 7R strategy
 export const TIME_CATEGORY_SEVEN_R_DEPENDENCIES: Record<TimeCategory, SevenRStrategy[]> = {
   [TimeCategory.TOLERATE]: [SevenRStrategy.RETAIN],
   [TimeCategory.INVEST]: [
@@ -16,7 +16,7 @@ export const TIME_CATEGORY_SEVEN_R_DEPENDENCIES: Record<TimeCategory, SevenRStra
   [TimeCategory.ELIMINATE]: [SevenRStrategy.RETIRE],
 }
 
-// Funktion um gültige 7R-Strategien für eine gegebene TIME-Kategorie zu erhalten
+// Function to get valid 7R strategies for a given TIME category
 export const getValidSevenRStrategies = (timeCategory: TimeCategory | null): SevenRStrategy[] => {
   if (!timeCategory) {
     return Object.values(SevenRStrategy)
@@ -24,7 +24,7 @@ export const getValidSevenRStrategies = (timeCategory: TimeCategory | null): Sev
   return TIME_CATEGORY_SEVEN_R_DEPENDENCIES[timeCategory] || []
 }
 
-// Funktion um zu prüfen ob eine Kombination gültig ist
+// Function to check if a combination is valid
 export const isValidCombination = (
   timeCategory: TimeCategory | null,
   sevenRStrategy: SevenRStrategy | null
@@ -37,7 +37,7 @@ export const isValidCombination = (
   return validStrategies.includes(sevenRStrategy)
 }
 
-// Funktion um eine gültige 7R-Strategie basierend auf der TIME-Kategorie zu empfehlen
+// Function to recommend a valid 7R strategy based on TIME category
 export const getRecommendedSevenRStrategy = (
   timeCategory: TimeCategory | null
 ): SevenRStrategy | null => {

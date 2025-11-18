@@ -7,16 +7,16 @@
  */
 
 /**
- * Generiert Farbvarianten aus einer Hauptfarbe
+ * Generates color variants from a main color
  * Verwendet einfache Hex-Manipulation für bessere Kompatibilität
- * Angepasst für Button-Hintergründe analog zum Original (#e6f2ff für #4d94e0)
+ * Adapted for button backgrounds similar to original (#e6f2ff für #4d94e0)
  */
 function generateExcalidrawColorVariants(mainColor: string) {
-  // Generiert automatisch Farbvarianten aus der Hauptfarbe
+  // Automatically generates color variants from the main color
   return {
     main: mainColor,
-    lighter: lightenColor(mainColor, 0.95), // Sehr hell für Button-Hintergründe wie #e6f2ff
-    light: lightenColor(mainColor, 0.85), // Hell für UI-Elemente
+    lighter: lightenColor(mainColor, 0.95), // Very light for button backgrounds like #e6f2ff
+    light: lightenColor(mainColor, 0.85), // Light for UI elements
     dark: darkenColor(mainColor, 0.2),
     darker: darkenColor(mainColor, 0.4),
     darkest: darkenColor(mainColor, 0.6),
@@ -58,10 +58,10 @@ function darkenColor(color: string, factor: number): string {
 
 /**
  * Erstellt CSS-Variablen für Excalidraw basierend auf Umgebungsvariablen
- * Kann sowohl client- als auch serverseitig verwendet werden
+ * Can be used both client-side and server-side
  */
 export function generateExcalidrawThemeVariables() {
-  // Theme-Farben aus Umgebungsvariablen lesen
+  // Read theme colors from environment variables
   const primaryColor = process.env.NEXT_PUBLIC_THEME_PRIMARY_COLOR || '#0066CC'
   const secondaryColor = process.env.NEXT_PUBLIC_THEME_SECONDARY_COLOR || '#00AEEF'
 
@@ -69,7 +69,7 @@ export function generateExcalidrawThemeVariables() {
   const primaryVariants = generateExcalidrawColorVariants(primaryColor)
   const secondaryVariants = generateExcalidrawColorVariants(secondaryColor)
 
-  // CSS-Variablen für Excalidraw Light Theme generieren
+  // Generate CSS variables for Excalidraw light theme
   const lightThemeVariables = {
     // Primary Color Familie
     '--color-primary': primaryVariants.main,
@@ -79,7 +79,7 @@ export function generateExcalidrawThemeVariables() {
     '--color-primary-light-darker': primaryVariants.light,
     '--color-primary-hover': primaryVariants.hover,
 
-    // Brand Color Familie (für spezielle UI-Elemente)
+    // Brand color family (for special UI elements)
     '--color-brand': primaryVariants.main,
     '--color-brand-hover': primaryVariants.hover,
     '--color-brand-active': primaryVariants.dark,
@@ -96,22 +96,22 @@ export function generateExcalidrawThemeVariables() {
     '--select-highlight-color': primaryVariants.main,
     '--link-color': primaryVariants.main,
 
-    // Button States (Original-kompatibel: hover/active/selected = sehr hell, borders = primär/dunkler)
-    '--button-hover-bg': primaryVariants.lighter, // = #e6f2ff äquivalent (sehr hell für Hover)
-    '--button-active-bg': primaryVariants.lighter, // = #e6f2ff äquivalent (sehr hell für Active)
-    '--button-active-border': primaryVariants.darker, // = #2761a8 äquivalent (dunkler für Active Border)
-    '--button-selected-bg': primaryVariants.lighter, // = #e6f2ff äquivalent (sehr hell für Selected)
-    '--button-selected-border': primaryVariants.main, // = #4d94e0 äquivalent (primär für Selected Border)
+    // Button states (original-compatible: hover/active/selected = very light, borders = primary/darker)
+    '--button-hover-bg': primaryVariants.lighter, // = #e6f2ff equivalent (very light for hover)
+    '--button-active-bg': primaryVariants.lighter, // = #e6f2ff equivalent (very light for active)
+    '--button-active-border': primaryVariants.darker, // = #2761a8 equivalent (darker for active border)
+    '--button-selected-bg': primaryVariants.lighter, // = #e6f2ff equivalent (very light for selected)
+    '--button-selected-border': primaryVariants.main, // = #4d94e0 equivalent (primary for selected border)
 
-    // Border-Radius (falls aus ENV definiert)
+    // Border radius (if defined in ENV)
     '--border-radius-md': '0.25rem',
     '--border-radius-lg': '0.25rem',
     '--border-radius-sm': '0.25rem',
   }
 
-  // CSS-Variablen für Excalidraw Dark Theme generieren
+  // Generate CSS variables for Excalidraw dark theme
   const darkThemeVariables = {
-    // Primary Color Familie (angepasst für Dark Mode)
+    // Primary color family (adapted for dark mode)
     '--color-primary': primaryVariants.light,
     '--color-primary-darker': primaryVariants.main,
     '--color-primary-darkest': primaryVariants.dark,
@@ -119,24 +119,24 @@ export function generateExcalidrawThemeVariables() {
     '--color-primary-light-darker': primaryVariants.darkest,
     '--color-primary-hover': primaryVariants.hover,
 
-    // Brand Color Familie für Dark Mode
+    // Brand color family for dark mode
     '--color-brand': primaryVariants.light,
     '--color-brand-hover': primaryVariants.hover,
     '--color-brand-active': primaryVariants.main,
 
-    // Container Farben für Dark Mode
+    // Container colors for dark mode
     '--color-on-primary-container': primaryVariants.lighter,
     '--color-surface-primary-container': primaryVariants.darkest,
     '--color-logo-icon': primaryVariants.light,
     '--color-logo-text': primaryVariants.lighter,
     '--color-promo': primaryVariants.light,
 
-    // UI-Element Farben für Dark Mode
+    // UI element colors for dark mode
     '--focus-highlight-color': primaryVariants.darkest,
     '--select-highlight-color': primaryVariants.light,
     '--link-color': primaryVariants.light,
 
-    // Button States für Dark Mode
+    // Button states for dark mode
     '--button-hover-bg': primaryVariants.darkest,
     '--button-active-bg': primaryVariants.light,
     '--button-active-border': primaryVariants.lighter,
@@ -172,7 +172,7 @@ export function generateExcalidrawThemeCSS(): string {
 
   return `
 /* Dynamische Excalidraw Theme-Anpassung aus Umgebungsvariablen */
-/* Generiert für Primary: ${themeVars.debug.primaryColor}, Secondary: ${themeVars.debug.secondaryColor} */
+/* Generated for Primary: ${themeVars.debug.primaryColor}, Secondary: ${themeVars.debug.secondaryColor} */
 
 .excalidraw {
 ${lightCSS}
@@ -342,7 +342,7 @@ export function applyExcalidrawThemeVariables(
   })
 }
 
-// Debug-Export für Entwicklung
+// Debug export for development
 export function debugThemeVariables() {
   // Debug function disabled in production
 }

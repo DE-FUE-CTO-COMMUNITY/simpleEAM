@@ -40,7 +40,7 @@ export default function DeleteConfirmDialog({
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // GraphQL Mutation für Person löschen
+  // GraphQL mutation for deleting person
   const [deletePerson] = useMutation(DELETE_PERSON, {
     refetchQueries: [{ query: GET_PERSONS }],
   })
@@ -51,7 +51,7 @@ export default function DeleteConfirmDialog({
 
     try {
       if (mode === 'user' || mode === 'both') {
-        // Keycloak-Benutzer über API-Route löschen
+        // Delete Keycloak user via API route
         if (user?.id) {
           if (!keycloak?.token) {
             throw new Error('Nicht authentifiziert')
@@ -70,13 +70,13 @@ export default function DeleteConfirmDialog({
           })
 
           if (!response.ok) {
-            throw new Error(`Fehler beim Löschen: ${response.status}`)
+            throw new Error(`Error deleting: ${response.status}`)
           }
         }
       }
 
       if (mode === 'person' || mode === 'both') {
-        // Person aus Datenbank löschen
+        // Delete person from database
         if (person?.id) {
           await deletePerson({
             variables: {
@@ -88,11 +88,11 @@ export default function DeleteConfirmDialog({
 
       onSuccess()
     } catch (err) {
-      console.error('Fehler beim Löschen:', err)
+      console.error('Error deleting:', err)
       if (err instanceof Error) {
         setError(err.message)
       } else {
-        setError('Unbekannter Fehler beim Löschen')
+        setError('Unknown error during deletion')
       }
     } finally {
       setLoading(false)

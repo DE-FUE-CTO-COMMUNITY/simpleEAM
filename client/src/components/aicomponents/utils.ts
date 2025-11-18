@@ -163,7 +163,7 @@ export const useAiComponentTypeLabel = () => {
 }
 
 /**
- * Hook für AI Component Status Labels
+ * Hook für AI Component status labels
  */
 export const useAiComponentStatusLabel = () => {
   const t = useTranslations('aicomponents.status')
@@ -222,7 +222,7 @@ export const useFormatPercentage = () => {
 }
 
 /**
- * Zählt aktive Filter basierend auf geänderten Werten vom Standard
+ * Counts active filters basierend auf geänderten Werten vom Standard
  */
 export const countActiveFilters = (filterState: FilterState): number => {
   let count = 0

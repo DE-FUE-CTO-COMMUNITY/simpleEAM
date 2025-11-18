@@ -32,7 +32,7 @@ export const AddRelatedElementsOverlay: React.FC<AddRelatedElementsOverlayProps>
         const elements = excalidrawAPI.getSceneElements()
         const appState = excalidrawAPI.getAppState()
 
-        // Finde ausgewählte Elemente
+        // Find selected elements
         const selectedElements = elements.filter((el: any) => appState.selectedElementIds[el.id])
 
         if (selectedElements.length === 1) {

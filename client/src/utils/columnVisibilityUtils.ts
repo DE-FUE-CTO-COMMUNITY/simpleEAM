@@ -25,7 +25,7 @@ export function loadColumnVisibility(
     if (saved) {
       const parsed = JSON.parse(saved) as VisibilityState
 
-      // Merge mit Default-Werten, falls neue Spalten hinzugefügt wurden
+      // Merge with default values if new columns were added
       return { ...defaultVisibility, ...parsed }
     }
   } catch (error) {

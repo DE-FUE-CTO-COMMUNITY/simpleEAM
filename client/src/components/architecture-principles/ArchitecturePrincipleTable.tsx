@@ -14,7 +14,7 @@ import ArchitecturePrincipleForm, {
 } from './ArchitecturePrincipleForm'
 import usePersistentColumnVisibility from '../../hooks/usePersistentColumnVisibility'
 
-// Exportierte Default Column Visibility für ArchitecturePrinciple
+// Exported default column visibility for ArchitecturePrinciple
 export const ARCHITECTURE_PRINCIPLE_DEFAULT_COLUMN_VISIBILITY = {
   // Standardmäßig sichtbare Spalten
   name: true,
@@ -43,7 +43,7 @@ interface ArchitecturePrincipleTableProps {
   onUpdatePrinciple?: (id: string, data: ArchitecturePrincipleFormValues) => Promise<void>
   onDeletePrinciple?: (id: string) => Promise<void>
   onTableReady?: (table: any) => void
-  // Diese Props sind jetzt optional, da die Persistierung intern verwaltet wird
+  // These props are now optional as persistence is handled internally
   columnVisibility?: VisibilityState
   onColumnVisibilityChange?: (
     updater: VisibilityState | ((old: VisibilityState) => VisibilityState)
@@ -69,7 +69,7 @@ const ArchitecturePrincipleTable: React.FC<ArchitecturePrincipleTableProps> = ({
   const formatBooleanLabel = useFormatBoolean()
   const formatDate = useFormatDate()
 
-  // Column helper für Typsicherheit
+  // Column helper for type safety
   const columnHelper = createColumnHelper<ArchitecturePrincipleType>()
 
   // Verwende persistente Spaltensichtbarkeit
@@ -77,13 +77,13 @@ const ArchitecturePrincipleTable: React.FC<ArchitecturePrincipleTableProps> = ({
     columnVisibility,
     onTableReady: persistentOnTableReady,
     onColumnVisibilityChange,
-    // resetColumnVisibility wird für zukünftige Reset-Funktionalität benötigt
+    // resetColumnVisibility is needed for future reset functionality
   } = usePersistentColumnVisibility({
     tableKey: 'architecture-principles',
     defaultColumnVisibility: ARCHITECTURE_PRINCIPLE_DEFAULT_COLUMN_VISIBILITY,
   })
 
-  // Kombiniere externe und persistente onTableReady Callbacks
+  // Combine external and persistent onTableReady callbacks
   const handleTableReady = (table: any) => {
     persistentOnTableReady(table)
     if (onTableReady) {
@@ -91,7 +91,7 @@ const ArchitecturePrincipleTable: React.FC<ArchitecturePrincipleTableProps> = ({
     }
   }
 
-  // Spalten-Definition für die ArchitecturePrinciple-Tabelle
+  // Column definition for ArchitecturePrinciple-Tabelle
   const columns = useMemo(
     () => [
       columnHelper.accessor('id', {
@@ -208,7 +208,7 @@ const ArchitecturePrincipleTable: React.FC<ArchitecturePrincipleTableProps> = ({
     [columnHelper, tTable, getCategoryLabel, getPriorityLabel, formatDate, formatBooleanLabel]
   )
 
-  // Mapping von ArchitecturePrincipleType zu den erwarteten FormValues für das Formular
+  // Mapping from ArchitecturePrincipleType to expected FormValues for form
   const mapToFormValues = (principle: ArchitecturePrincipleType) => {
     return {
       name: principle.name,

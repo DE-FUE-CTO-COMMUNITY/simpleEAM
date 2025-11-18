@@ -1,6 +1,6 @@
 import { createTheme, ThemeOptions } from '@mui/material/styles'
 
-// Farbpalette für das Corporate Design - dynamisch aus Umgebungsvariablen
+// Color palette for the Corporate Design - dynamically from environment variables
 declare module '@mui/material/styles' {
   interface PaletteColor {
     lighter?: string
@@ -15,13 +15,13 @@ declare module '@mui/material/styles' {
 
 /**
  * Generiert automatisch light und dark Varianten einer Hauptfarbe
- * Verwendet einen einfachen HSL-Ansatz für konsistente Farbvariationen
+ * Uses a simple HSL approach for consistent color variations
  */
 function generateColorVariants(mainColor: string) {
-  // Einfache Farb-Manipulation für bessere Browser-Kompatibilität
-  // In einer Production-Umgebung könnte hier eine robustere Farb-Bibliothek verwendet werden
+  // Simple color manipulation for better browser compatibility
+  // In a production environment, a more robust color library could be used here
 
-  // Für häufige Hex-Farben manuelle Varianten definieren
+  // Define manual variants for common hex colors
   const colorVariants: Record<
     string,
     { light: string; dark: string; lighter?: string; darker?: string }
@@ -38,7 +38,7 @@ function generateColorVariants(mainColor: string) {
     '#c9ece1': { light: '#E0F6F0', dark: '#A8D4C6', lighter: '#F0FAF7', darker: '#8BC2B3' },
     '#2765c3': { light: '#5A8BD9', dark: '#1B4A94', lighter: '#E7F0FB', darker: '#123468' },
 
-    // Fallback für unbekannte Farben
+    // Fallback for unknown colors
     '#D32F2F': { light: '#EF5350', dark: '#C62828' },
     '#ED6C02': { light: '#FF9800', dark: '#E65100' },
     '#0288D1': { light: '#03A9F4', dark: '#01579B' },
@@ -50,9 +50,9 @@ function generateColorVariants(mainColor: string) {
     return variants
   }
 
-  // Fallback: Verwende die ursprüngliche Farbe für alle Varianten
+  // Fallback: Use the original color for all variants
   console.warn(
-    `Keine Farbvarianten für ${mainColor} definiert. Verwende Originalfarbe als Fallback.`
+    `No color variants defined for ${mainColor}. Using original color as fallback.`
   )
   return {
     light: mainColor,
@@ -64,24 +64,24 @@ function generateColorVariants(mainColor: string) {
 
 /**
  * Erstellt ein dynamisches Theme basierend auf Umgebungsvariablen
- * Unterstützt sowohl Legacy- als auch neue Variablennamen
+ * Supports both legacy and new variable names
  */
 export function createDynamicTheme(
   mode: 'light' | 'dark' = 'light'
 ): ReturnType<typeof createTheme> {
-  // Primary Color aus Umgebungsvariablen laden
+  // Primary Color from environment variables
   const primaryColor =
     process.env.NEXT_PUBLIC_THEME_PRIMARY_COLOR ||
     process.env.NEXT_PUBLIC_PRIMARY_COLOR ||
     '#0066CC' // Atos Blue als Fallback
 
-  // Secondary Color aus Umgebungsvariablen laden
+  // Secondary Color from environment variables
   const secondaryColor =
     process.env.NEXT_PUBLIC_THEME_SECONDARY_COLOR ||
     process.env.NEXT_PUBLIC_SECONDARY_COLOR ||
     '#00AEEF' // Atos Light Blue als Fallback
 
-  // Font Family aus Umgebungsvariablen laden
+  // Font Family from environment variables
   const fontFamily =
     process.env.NEXT_PUBLIC_THEME_FONT_FAMILY ||
     process.env.NEXT_PUBLIC_FONT_FAMILY ||
@@ -91,7 +91,7 @@ export function createDynamicTheme(
   const primaryVariants = generateColorVariants(primaryColor)
   const secondaryVariants = generateColorVariants(secondaryColor)
 
-  // Basis Palette-Konfiguration abhängig vom Mode
+  // Base palette configuration depending on mode
   const basePalette =
     mode === 'dark'
       ? {
@@ -269,9 +269,9 @@ export function createDynamicTheme(
           root: {
             borderRadius: '8px',
             boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.1)',
-            // Entferne das Standard-24px Margin von Material UI 7
+            // Remove the default 24px margin from Material UI 7
             margin: '0 !important',
-            // Entferne auch mögliche margin-bottom Einstellungen
+            // Also remove possible margin-bottom settings
             marginBottom: '0 !important',
           },
         },
@@ -279,11 +279,11 @@ export function createDynamicTheme(
       MuiCardContent: {
         styleOverrides: {
           root: {
-            // Entferne das Standard-Margin von CardContent
+            // Remove the default margin from CardContent
             margin: '0 !important',
             marginBottom: '0 !important',
             '&:last-child': {
-              paddingBottom: '16px', // Standard-Padding beibehalten
+              paddingBottom: '16px', // Keep standard padding
             },
           },
         },
@@ -291,7 +291,7 @@ export function createDynamicTheme(
       MuiCardHeader: {
         styleOverrides: {
           root: {
-            // Entferne das Standard-Margin von CardHeader
+            // Remove the default margin from CardHeader
             margin: '0 !important',
             marginBottom: '0 !important',
           },
@@ -300,7 +300,7 @@ export function createDynamicTheme(
       MuiCardActions: {
         styleOverrides: {
           root: {
-            // Entferne das Standard-Margin von CardActions
+            // Remove the default margin from CardActions
             margin: '0 !important',
             marginBottom: '0 !important',
           },
@@ -309,9 +309,9 @@ export function createDynamicTheme(
       MuiPaper: {
         styleOverrides: {
           root: {
-            // Entferne das Standard-24px Margin von Material UI 7
+            // Remove the default 24px margin from Material UI 7
             margin: '0 !important',
-            // Entferne auch mögliche margin-bottom Einstellungen
+            // Also remove possible margin-bottom settings
             marginBottom: '0 !important',
           },
         },

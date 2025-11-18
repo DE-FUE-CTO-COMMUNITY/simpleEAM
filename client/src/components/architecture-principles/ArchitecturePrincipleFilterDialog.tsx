@@ -34,7 +34,7 @@ const ArchitecturePrincipleFilterDialog: React.FC<FilterProps> = ({
       })),
       valueFormatter: value => getCategoryLabel(value as PrincipleCategory),
     },
-    // Priorität Filter
+    // Priority filter
     {
       id: 'priorityFilter',
       label: t('priority'),
@@ -73,7 +73,7 @@ const ArchitecturePrincipleFilterDialog: React.FC<FilterProps> = ({
       type: 'text',
       placeholder: 'Geben Sie einen Text ein...',
     },
-    // Verantwortlicher-Filter
+    // Owner filter
     {
       id: 'ownerFilter',
       label: t('owner'),

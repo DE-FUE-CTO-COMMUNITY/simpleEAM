@@ -51,7 +51,7 @@ export default function AdminPage() {
     setCurrentTab(newValue)
   }
 
-  // Zeige nichts an, bis die Authorization geprüft wurde
+  // Show nothing until authorization is checked
   if (!isAuthorized) {
     return null
   }

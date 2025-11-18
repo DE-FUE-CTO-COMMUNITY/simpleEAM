@@ -17,7 +17,7 @@ interface CapabilityToolbarWithGenericProps {
 }
 
 /**
- * Eine Toolbar speziell für Capabilities, die die GenericToolbar-Komponente verwendet.
+ * A toolbar specifically for capabilities that uses the GenericToolbar component.
  */
 const CapabilityToolbarWithGeneric: React.FC<CapabilityToolbarWithGenericProps> = ({
   table,
@@ -34,7 +34,7 @@ const CapabilityToolbarWithGeneric: React.FC<CapabilityToolbarWithGenericProps> 
       showClearSearchButton={true}
       table={table}
       enableColumnVisibilityToggle={enableColumnVisibilityToggle}
-      tableKey="capabilities" // Eindeutiger Schlüssel für die Capabilities-Tabelle
+      tableKey="capabilities" // Unique key for capabilities table
       defaultColumnVisibility={defaultColumnVisibility}
     />
   )

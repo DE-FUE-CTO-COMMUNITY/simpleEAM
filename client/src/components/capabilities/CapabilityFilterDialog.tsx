@@ -42,7 +42,7 @@ const CapabilityFilterDialogWithGeneric: React.FC<FilterProps> = ({
       })),
       valueFormatter: value => getLevelLabel(Number(value), tMaturity),
     },
-    // Geschäftswert Range Filter
+    // Business value range filter
     {
       id: 'businessValueRange',
       label: t('businessValue'),

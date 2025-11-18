@@ -11,7 +11,7 @@ import { createColumnHelper } from '@tanstack/react-table'
 import { SortingState, VisibilityState } from '@tanstack/react-table'
 import usePersistentColumnVisibility from '../../hooks/usePersistentColumnVisibility'
 
-// Exportierte Standard-Spaltenvisibilität für die Company-Tabelle
+// Exported default column visibility for the company table
 export const COMPANY_DEFAULT_COLUMN_VISIBILITY = {
   // Standardmäßig sichtbare Spalten
   name: true,
@@ -38,7 +38,7 @@ interface CompanyTableProps {
   onUpdateCompany?: (id: string, data: CompanyFormValues) => Promise<void>
   onDeleteCompany?: (id: string) => Promise<void>
   onTableReady?: (table: any) => void
-  // Diese Props sind jetzt optional, da die Persistierung intern verwaltet wird
+  // These props are now optional as persistence is handled internally
   columnVisibility?: VisibilityState
   onColumnVisibilityChange?: (
     updater: VisibilityState | ((old: VisibilityState) => VisibilityState)
@@ -74,7 +74,7 @@ const CompanyTableWithGenericTable: React.FC<CompanyTableProps> = ({
     defaultColumnVisibility: COMPANY_DEFAULT_COLUMN_VISIBILITY,
   })
 
-  // Kombiniere externe und persistente onTableReady Callbacks
+  // Combine external and persistent onTableReady callbacks
   const handleTableReady = (table: any) => {
     persistentOnTableReady(table)
     if (onTableReady) {
@@ -82,7 +82,7 @@ const CompanyTableWithGenericTable: React.FC<CompanyTableProps> = ({
     }
   }
 
-  // Spalten-Definition für die Company-Tabelle
+  // Column definition for the company table
   const columns = useMemo(
     () => [
       columnHelper.accessor('id', {
@@ -153,7 +153,7 @@ const CompanyTableWithGenericTable: React.FC<CompanyTableProps> = ({
     [columnHelper, t, formatDate, formatSize]
   )
 
-  // Mapping von CompanyType zu den erwarteten FormValues für das Formular
+  // Mapping from CompanyType to expected FormValues for the form
   const mapToFormValues = (company: CompanyType): CompanyFormValues => {
     return {
       name: company.name,

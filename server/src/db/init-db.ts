@@ -2,17 +2,17 @@ import { neo4jDriver, closeDriver } from './neo4j-client'
 import { Session } from 'neo4j-driver'
 
 /**
- * Löscht alle Daten aus der Datenbank
+ * Deletes all data from the database
  */
 async function clearDatabase(session: Session) {
   try {
-    // Alle Knoten und Beziehungen löschen
+    // Delete all nodes and relationships
     await session.run(`
       MATCH (n)
       DETACH DELETE n
     `)
   } catch (error) {
-    console.error('Fehler beim Löschen der Daten:', error)
+    console.error('Error deleting data:', error)
     throw error
   }
 }
@@ -23,48 +23,48 @@ async function clearDatabase(session: Session) {
 async function initDatabase(reset: boolean = false) {
   const session = neo4jDriver.session()
   try {
-    // Wenn reset=true, dann zuerst alle Daten löschen
+    // If reset=true, delete all data first
     if (reset) {
       await clearDatabase(session)
     }
 
-    // Constraints für Business Capabilities
+    // Constraints for Business Capabilities
     await session.run(`
       CREATE CONSTRAINT business_capability_id_unique IF NOT EXISTS
       FOR (c:BusinessCapability) REQUIRE c.id IS UNIQUE
     `)
 
-    // Constraints für Applications
+    // Constraints for Applications
     await session.run(`
       CREATE CONSTRAINT application_id_unique IF NOT EXISTS
       FOR (a:Application) REQUIRE a.id IS UNIQUE
     `)
 
-    // Constraints für Data Objects
+    // Constraints for Data Objects
     await session.run(`
       CREATE CONSTRAINT data_object_id_unique IF NOT EXISTS
       FOR (d:DataObject) REQUIRE d.id IS UNIQUE
     `)
 
-    // Constraints für Application Interfaces
+    // Constraints for Application Interfaces
     await session.run(`
       CREATE CONSTRAINT application_interface_id_unique IF NOT EXISTS
       FOR (i:ApplicationInterface) REQUIRE i.id IS UNIQUE
     `)
 
-    // Constraints für Personen
+    // Constraints for Persons
     await session.run(`
       CREATE CONSTRAINT person_id_unique IF NOT EXISTS
       FOR (p:Person) REQUIRE p.id IS UNIQUE
     `)
 
-    // Constraints für Infrastructure
+    // Constraints for Infrastructure
     await session.run(`
       CREATE CONSTRAINT infrastructure_id_unique IF NOT EXISTS
       FOR (inf:Infrastructure) REQUIRE inf.id IS UNIQUE
     `)
 
-    // Indizes für die Suche
+    // Indexes for search
     await session.run(`
       CREATE INDEX business_capability_name_index IF NOT EXISTS
       FOR (c:BusinessCapability) ON (c.name)
@@ -85,17 +85,17 @@ async function initDatabase(reset: boolean = false) {
       FOR (inf:Infrastructure) ON (inf.name)
     `)
 
-    // Optional: Testdaten einfügen, falls die Datenbank leer ist
+    // Optional: Insert test data if database is empty
     const result = await session.run('MATCH (n) RETURN count(n) AS nodeCount')
     const nodeCount = result.records[0].get('nodeCount').toNumber()
 
     if (nodeCount === 0 && process.env.NODE_ENV !== 'production') {
       await createSampleData(session)
     } else {
-      console.log(`Datenbank enthält bereits ${nodeCount} Knoten. Überspringe Testdatenerstellung.`)
+      console.log(`Database already contains ${nodeCount} nodes. Skipping test data creation.`)
     }
   } catch (error) {
-    console.error('Fehler bei der Datenbank-Initialisierung:', error)
+    console.error('Error during database initialization:', error)
     throw error
   } finally {
     await session.close()
@@ -425,7 +425,7 @@ async function createSampleData(session: Session) {
     `)
 
     console.log('Erstelle Applikationen...')
-    // Applikationen erstellen (12+ Applications)
+    // Create applications (12+ Applications)
     await session.run(`
       CREATE 
       (a1:Application {
@@ -752,7 +752,7 @@ async function createSampleData(session: Session) {
     `)
 
     console.log('Erstelle Infrastructure-Application Beziehungen...')
-    // Applikationen mit Infrastructure-Elementen verbinden
+    // Connect applications with infrastructure elements
     await session.run(`
       MATCH 
         (a1:Application {id: "app-001"}),
@@ -773,35 +773,35 @@ async function createSampleData(session: Session) {
         (inf4:Infrastructure {id: "inf-004"}),
         (inf5:Infrastructure {id: "inf-005"})
       CREATE 
-        // Cloud-basierte Applikationen auf AWS
-        (a1)-[:HOSTED_ON]->(inf1),  // Salesforce CRM auf AWS
-        (a4)-[:HOSTED_ON]->(inf1),  // ServiceNow ITSM auf AWS
-        (a5)-[:HOSTED_ON]->(inf1),  // Tableau Analytics auf AWS
+        // Cloud-based applications on AWS
+        (a1)-[:HOSTED_ON]->(inf1),  // Salesforce CRM on AWS
+        (a4)-[:HOSTED_ON]->(inf1),  // ServiceNow ITSM on AWS
+        (a5)-[:HOSTED_ON]->(inf1),  // Tableau Analytics on AWS
         
-        // Cloud-basierte Applikationen auf Azure
-        (a3)-[:HOSTED_ON]->(inf2),  // Microsoft 365 auf Azure
-        (a6)-[:HOSTED_ON]->(inf2),  // Workday HCM auf Azure
-        (a9)-[:HOSTED_ON]->(inf2),  // Slack Communication auf Azure
-        (a10)-[:HOSTED_ON]->(inf2), // DocuSign Digital auf Azure
+        // Cloud-based applications on Azure
+        (a3)-[:HOSTED_ON]->(inf2),  // Microsoft 365 on Azure
+        (a6)-[:HOSTED_ON]->(inf2),  // Workday HCM on Azure
+        (a9)-[:HOSTED_ON]->(inf2),  // Slack Communication on Azure
+        (a10)-[:HOSTED_ON]->(inf2), // DocuSign Digital on Azure
         
-        // On-Premise Applikationen im Hauptrechenzentrum München
-        (a2)-[:HOSTED_ON]->(inf3),  // SAP ERP in München
-        (a7)-[:HOSTED_ON]->(inf3),  // Confluence Wiki in München
-        (a11)-[:HOSTED_ON]->(inf3), // Splunk Security in München
-        (a12)-[:HOSTED_ON]->(inf3), // Oracle Database in München
+        // On-premise applications in main data center Munich
+        (a2)-[:HOSTED_ON]->(inf3),  // SAP ERP in Munich
+        (a7)-[:HOSTED_ON]->(inf3),  // Confluence Wiki in Munich
+        (a11)-[:HOSTED_ON]->(inf3), // Splunk Security in Munich
+        (a12)-[:HOSTED_ON]->(inf3), // Oracle Database in Munich
         
-        // Kubernetes-basierte Applikationen
-        (a8)-[:HOSTED_ON]->(inf5),  // Jira Project Management auf Kubernetes
+        // Kubernetes-based applications
+        (a8)-[:HOSTED_ON]->(inf5),  // Jira Project Management on Kubernetes
         
-        // Backup-Infrastruktur ist ein Child der Main-Infrastruktur
+        // Backup infrastructure is a child of main infrastructure
         (inf4)-[:HAS_PARENT_INFRASTRUCTURE]->(inf3),
         
-        // Kubernetes läuft teilweise auf der Main-Infrastruktur
+        // Kubernetes runs partially on main infrastructure
         (inf5)-[:HAS_PARENT_INFRASTRUCTURE]->(inf3)
     `)
 
     console.log('Erstelle Infrastructure-Verantwortliche...')
-    // Infrastructure-Verantwortliche zuweisen
+    // Assign infrastructure responsibles
     await session.run(`
       MATCH 
         (p1:Person {id: "person-001"}),
@@ -813,11 +813,11 @@ async function createSampleData(session: Session) {
         (inf4:Infrastructure {id: "inf-004"}),
         (inf5:Infrastructure {id: "inf-005"})
       CREATE 
-        (inf1)-[:HAS_RESPONSIBLE]->(p1),  // Max Mustermann für AWS
-        (inf2)-[:HAS_RESPONSIBLE]->(p1),  // Max Mustermann für Azure
-        (inf3)-[:HAS_RESPONSIBLE]->(p2),  // Anna Schmidt für Hauptrechenzentrum
-        (inf4)-[:HAS_RESPONSIBLE]->(p2),  // Anna Schmidt für Backup-Rechenzentrum
-        (inf5)-[:HAS_RESPONSIBLE]->(p6)   // Julia Wagner für Kubernetes
+        (inf1)-[:HAS_RESPONSIBLE]->(p1),  // Max Mustermann for AWS
+        (inf2)-[:HAS_RESPONSIBLE]->(p1),  // Max Mustermann for Azure
+        (inf3)-[:HAS_RESPONSIBLE]->(p2),  // Anna Schmidt for main data center
+        (inf4)-[:HAS_RESPONSIBLE]->(p2),  // Anna Schmidt for backup data center
+        (inf5)-[:HAS_RESPONSIBLE]->(p6)   // Julia Wagner for Kubernetes
     `)
 
     console.log('Erstelle DataObjects...')
@@ -1577,7 +1577,7 @@ async function createSampleData(session: Session) {
         (d5)-[:DATA_SOURCE]->(a12)
     `)
 
-    // Fehlende Datenquellen für alle DataObjects ergänzen
+    // Add missing data sources for all DataObjects
     await session.run(`
       MATCH 
         (a3:Application {id: "app-003"}), (d3:DataObject {id: "do-003"}),
@@ -1657,7 +1657,7 @@ async function createSampleData(session: Session) {
         (a12)-[:INTERFACE_TARGET]->(i12)
     `)
 
-    // Interface-DataObject Transferbeziehungen (alle Interfaces)
+    // Interface-DataObject transfer relationships (all interfaces)
     await session.run(`
       MATCH 
         (i1:ApplicationInterface {id: "int-001"}), (d1:DataObject {id: "do-001"}),
@@ -1677,7 +1677,7 @@ async function createSampleData(session: Session) {
         (i6)-[:TRANSFERS]->(d7)
     `)
 
-    // Fehlende Interface-DataObject Transferbeziehungen für int-007 bis int-012
+    // Add missing Interface-DataObject transfer relationships for int-007 to int-012
     await session.run(`
       MATCH 
         (i7:ApplicationInterface {id: "int-007"}), (d10:DataObject {id: "do-010"}),
@@ -1918,7 +1918,7 @@ async function createSampleData(session: Session) {
     console.log('- 20 Business Capabilities (alle mit Verantwortlichen)')
     console.log('- 12 Applications (alle mit Verantwortlichen)')
     console.log('- 10 DataObjects (alle mit Verantwortlichen)')
-    console.log('- 12 ApplicationInterfaces (alle mit Quell- und Zielanwendungen)')
+    console.log('- 12 ApplicationInterfaces (all with source and target applications)')
     console.log('- 5 Infrastructure-Elemente (2 Cloud-DC, 2 On-Premise-DC, 1 Kubernetes-Cluster)')
     console.log('- 5 Architectures (alle mit Verantwortlichen)')
     console.log('- 20 ArchitecturePrinciples (alle mit Verantwortlichen)')
@@ -1926,21 +1926,21 @@ async function createSampleData(session: Session) {
     console.log('- Alle Entitäten haben genau einen Verantwortlichen')
     console.log('- Infrastructure-Applikations-Beziehungen (HOSTS)')
   } catch (error) {
-    console.error('Fehler beim Erstellen der Testdaten:', error)
+    console.error('Error creating test data:', error)
     throw error
   }
 }
 
-// Überprüfen, ob ein Reset-Parameter übergeben wurde
+// Check if a reset parameter was passed
 const resetArg = process.argv.includes('--reset')
 
-// Skript ausführen
+// Execute script
 initDatabase(resetArg)
   .then(() => {
     console.log('Datenbank-Initialisierung erfolgreich.')
     return closeDriver()
   })
   .catch(error => {
-    console.error('Fehler bei der Datenbank-Initialisierung:', error)
+    console.error('Error during database initialization:', error)
     process.exit(1)
   })

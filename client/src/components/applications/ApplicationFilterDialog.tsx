@@ -37,7 +37,7 @@ const ApplicationFilterDialogWithGeneric: React.FC<FilterProps> = ({
         label: tStatus(status),
       })),
     },
-    // Kritikalitäts-Filter
+    // Criticality filter
     {
       id: 'criticalityFilter',
       label: t('criticality'),
@@ -85,7 +85,7 @@ const ApplicationFilterDialogWithGeneric: React.FC<FilterProps> = ({
       type: 'text',
       placeholder: t('descriptionPlaceholder'),
     },
-    // Verantwortlicher-Filter
+    // Owner filter
     {
       id: 'ownerFilter',
       label: t('owner'),

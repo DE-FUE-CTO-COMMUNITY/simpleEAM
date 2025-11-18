@@ -304,7 +304,7 @@ const AvatarUploadDialog: React.FC<AvatarUploadDialogProps> = ({
                 onClick={handleDelete}
                 disabled={uploading}
               >
-                Avatar entfernen
+                Avatar remove
               </Button>
             )}
           </Box>

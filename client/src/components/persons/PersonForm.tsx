@@ -10,7 +10,7 @@ import { isArchitect, isAdmin } from '@/lib/auth'
 import { useQuery } from '@apollo/client'
 import { GET_COMPANIES } from '@/graphql/company'
 
-// Schema für die Formularvalidierung
+// Schema for form validation
 export const personSchema = z.object({
   firstName: z
     .string()
@@ -83,26 +83,26 @@ const PersonForm: React.FC<GenericFormProps<Person, PersonFormValues>> = ({
       await onSubmit(formattedValues)
     },
     validators: {
-      // Primäre Validierung bei Änderungen
+      // Primary validation on changes
       onChange: personSchema as any,
-      // Validierung beim Absenden
+      // Validation on submit
       onSubmit: personSchema as any,
     },
   })
 
-  // Formular aktualisieren, wenn sich die Daten ändern
+  // Update form when data changes
   useEffect(() => {
-    // Nicht-reaktives Flag für unerwartete Zustandsbehandlung
+    // Non-reactive flag for unexpected state handling
     let hasHandledForm = false
 
     if (!isOpen) {
-      // Dialog geschlossen - Formular zurücksetzen
+      // Dialog closed - reset form
       form.reset()
       return
     }
 
     if (mode === 'create') {
-      // Im CREATE-Modus mit leeren Standardwerten initialisieren
+      // Initialize with empty default values in CREATE mode
       form.reset(defaultValues)
       hasHandledForm = true
     } else if ((mode === 'view' || mode === 'edit') && person && person.id) {
@@ -122,14 +122,14 @@ const PersonForm: React.FC<GenericFormProps<Person, PersonFormValues>> = ({
       hasHandledForm = true
     }
 
-    // Final Fallback - nur ausführen, wenn keine der vorherigen Bedingungen zutraf
+    // Final fallback - only execute if none of the previous conditions matched
     if (!hasHandledForm) {
-      // Immer mit Standardwerten zurücksetzen, aber Dialog nicht automatisch schließen
+      // Always reset with default values, aber Dialog nicht automatisch schließen
       form.reset(defaultValues)
     }
   }, [form, person, isOpen, defaultValues, mode, onClose])
 
-  // Feldkonfiguration für das generische Formular
+  // Field configuration for the generic form
   const fields: FieldConfig[] = [
     {
       name: 'firstName',

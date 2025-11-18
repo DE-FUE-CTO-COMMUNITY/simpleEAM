@@ -30,7 +30,7 @@ import GenericForm, { FieldConfig } from '../common/GenericForm'
 import { isArchitect } from '@/lib/auth'
 import { DataObject } from '@/gql/generated'
 
-// Basis-Schema für die Formularvalidierung
+// Base schema for form validation
 const baseApplicationInterfaceSchema = z.object({
   name: z
     .string()
@@ -41,7 +41,7 @@ const baseApplicationInterfaceSchema = z.object({
     .min(10, 'Die Beschreibung muss mindestens 10 Zeichen lang sein')
     .max(1000, 'Die Beschreibung darf maximal 1000 Zeichen lang sein'),
   interfaceType: z.nativeEnum(InterfaceType, {
-    errorMap: () => ({ message: 'Bitte wählen Sie einen Schnittstellentyp' }),
+    errorMap: () => ({ message: 'Please select an interface type' }),
   }),
   protocol: z.nativeEnum(InterfaceProtocol).optional().nullable(),
   version: z
@@ -64,26 +64,26 @@ const baseApplicationInterfaceSchema = z.object({
   successorIds: z.array(z.string()).optional(),
 })
 
-// Erweiterte Schema-Validierung mit Lifecycle-Logik
+// Extended schema validation with lifecycle logic
 export const applicationInterfaceSchema = baseApplicationInterfaceSchema.superRefine(
   (data, ctx) => {
-    // Lifecycle-Datums-Validierung mit individuellen Fehlermeldungen
+    // Lifecycle date validation with individual error messages
     const dates = [
       { field: 'planningDate', date: data.planningDate, label: 'Planungsdatum' },
-      { field: 'introductionDate', date: data.introductionDate, label: 'Einführungsdatum' },
+      { field: 'introductionDate', date: data.introductionDate, label: 'Introduction Date' },
       { field: 'endOfUseDate', date: data.endOfUseDate, label: 'Ende der Nutzung' },
       { field: 'endOfLifeDate', date: data.endOfLifeDate, label: 'End-of-Life-Datum' },
     ] as const
 
     const setDates = dates.filter(d => d.date && d.date instanceof Date && !isNaN(d.date.getTime()))
 
-    // Prüfe chronologische Reihenfolge zwischen allen aufeinanderfolgenden Daten
+    // Check chronological order between all consecutive dates
     for (let i = 0; i < setDates.length - 1; i++) {
       const currentDate = setDates[i]
       const nextDate = setDates[i + 1]
 
       if (currentDate.date! > nextDate.date!) {
-        // Füge Fehlermeldung zum späteren Datum hinzu
+        // Add error message to the later date
         ctx.addIssue({
           code: 'custom',
           message: `${nextDate.label} muss nach ${currentDate.label} liegen.`,
@@ -101,25 +101,25 @@ export const applicationInterfaceSchema = baseApplicationInterfaceSchema.superRe
     switch (status) {
       case InterfaceStatus.IN_DEVELOPMENT:
       case InterfaceStatus.PLANNED:
-        // IN_DEVELOPMENT/PLANNED: Einführungsdatum muss in der Zukunft liegen (oder nicht gesetzt sein)
+        // IN_DEVELOPMENT/PLANNED: Introduction date must be in the future (or not set)
         if (introductionDate && introductionDate <= now) {
           ctx.addIssue({
             code: 'custom',
-            message: `Bei Status "${status === InterfaceStatus.PLANNED ? 'Geplant' : 'In Entwicklung'}" muss das Einführungsdatum in der Zukunft liegen.`,
+            message: `For status "${status === InterfaceStatus.PLANNED ? 'Planned' : 'In Development'}" introduction date must be in the future.`,
             path: ['introductionDate'],
           })
         }
         break
       case InterfaceStatus.ACTIVE:
-        // ACTIVE: Wenn Einführungsdatum gesetzt ist, muss es in der Vergangenheit liegen
+        // ACTIVE: If introduction date is set, it must be in the past
         if (introductionDate && introductionDate > now) {
           ctx.addIssue({
             code: 'custom',
-            message: 'Bei Status "Aktiv" muss das Einführungsdatum in der Vergangenheit liegen.',
+            message: 'For status "Active" introduction date must be in the past.',
             path: ['introductionDate'],
           })
         }
-        // UND End-of-Use muss in der Zukunft liegen (oder nicht gesetzt sein)
+        // AND end-of-use must be in the future (or not set)
         if (endOfUseDate && endOfUseDate <= now) {
           ctx.addIssue({
             code: 'custom',
@@ -134,7 +134,7 @@ export const applicationInterfaceSchema = baseApplicationInterfaceSchema.superRe
         if (!endOfUseDate || endOfUseDate > now) {
           ctx.addIssue({
             code: 'custom',
-            message: `Bei Status "${status === InterfaceStatus.DEPRECATED ? 'Veraltet' : 'Außer Betrieb'}" muss das Ende der Nutzung in der Vergangenheit liegen.`,
+            message: `For status "${status === InterfaceStatus.DEPRECATED ? 'Deprecated' : 'Out of Service'}" end of use must be in the past.`,
             path: ['endOfUseDate'],
           })
         }
@@ -173,11 +173,11 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
   const tTypes = useTranslations('interfaces.interfaceTypes')
   const tStatuses = useTranslations('interfaces.statuses')
 
-  // Aktuellen Benutzer als Standard-Eigentümer abrufen
+  // Get current user as default owner
   const { currentPerson } = useCurrentPerson()
   const personWhere = useCompanyWhere('company')
 
-  // Hilfsfunktion für Interface Type Labels
+  // Helper function for interface type labels
   const getInterfaceTypeLabel = (type: InterfaceType) => {
     switch (type) {
       case InterfaceType.API:
@@ -195,7 +195,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
     }
   }
 
-  // Hilfsfunktion für Status Labels
+  // Helper function for status labels
   const getStatusLabel = (status: InterfaceStatus) => {
     switch (status) {
       case InterfaceStatus.ACTIVE:
@@ -213,7 +213,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
     }
   }
 
-  // Tab-Konfiguration mit Übersetzungen
+  // Tab configuration with translations
   const APPLICATION_INTERFACE_TABS = [
     { id: 'general', label: tTabs('general') },
     { id: 'technical', label: tTabs('technical') },
@@ -222,7 +222,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
     { id: 'architectures', label: tTabs('architectures') },
   ]
 
-  // Daten laden mit cache-and-network Policy für frische Daten
+  // Load data with cache-and-network policy for fresh data
   const { data: personData, loading: personLoading } = useQuery(GET_PERSONS, {
     variables: { where: personWhere },
   })
@@ -247,7 +247,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
     }
   )
 
-  // Formulardaten mit useMemo initialisieren, um unnötige Re-Renders zu vermeiden
+  // Initialize form data with useMemo to avoid unnecessary re-renders
   const defaultValues = React.useMemo<ApplicationInterfaceFormValues>(
     () => ({
       name: applicationInterface?.name || '',
@@ -292,26 +292,26 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       }
     },
     validators: {
-      // Primäre Validierung bei Änderungen
+      // Primary validation on changes
       onChange: applicationInterfaceSchema,
-      // Validierung beim Absenden
+      // Validation on submit
       onSubmit: applicationInterfaceSchema,
     },
   })
 
-  // Formular aktualisieren, wenn sich die Daten ändern
+  // Update form when data changes
   useEffect(() => {
-    // Nicht-reaktives Flag für unerwartete Zustandsbehandlung
+    // Non-reactive flag for unexpected state handling
     let hasHandledForm = false
 
     if (!isOpen) {
-      // Dialog geschlossen - Formular zurücksetzen
+      // Dialog closed - reset form
       form.reset()
       return
     }
 
     if (mode === 'create') {
-      // Im CREATE-Modus mit leeren Standardwerten initialisieren
+      // Initialize with empty default values in CREATE mode
       form.reset(defaultValues)
       hasHandledForm = true
     } else if (
@@ -319,7 +319,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       applicationInterface &&
       applicationInterface.id
     ) {
-      // Im edit/view Mode mit Werten aus applicationInterface initialisieren
+      // Initialize with values from applicationInterface in edit/view mode
       const formValues = {
         name: applicationInterface.name ?? '',
         description: applicationInterface.description ?? '',
@@ -352,19 +352,19 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
         successorIds: applicationInterface.successors?.map(iface => iface.id) || [],
       }
 
-      // Formular mit den Werten aus der vorhandenen Schnittstelle zurücksetzen
+      // Reset form with values from existing interface
       form.reset(formValues)
       hasHandledForm = true
     }
 
-    // Final Fallback - nur ausführen, wenn keine der vorherigen Bedingungen zutraf
+    // Final fallback - only execute if none of the previous conditions matched
     if (!hasHandledForm) {
-      // Immer mit Standardwerten zurücksetzen
+      // Always reset with default values
       form.reset(defaultValues)
     }
   }, [form, applicationInterface, isOpen, defaultValues, mode])
 
-  // Feldkonfiguration für das generische Formular
+  // Field configuration for the generic form
   const fields: FieldConfig[] = [
     {
       name: 'name',
@@ -716,7 +716,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
     <GenericForm
       title={
         mode === 'create'
-          ? 'Neue Schnittstelle erstellen'
+          ? 'Create new interface'
           : mode === 'edit'
             ? 'Schnittstelle bearbeiten'
             : 'Schnittstellendetails'

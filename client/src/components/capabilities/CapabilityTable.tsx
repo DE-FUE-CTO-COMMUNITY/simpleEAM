@@ -11,7 +11,7 @@ import { createColumnHelper } from '@tanstack/react-table'
 import { SortingState, VisibilityState } from '@tanstack/react-table'
 import usePersistentColumnVisibility from '../../hooks/usePersistentColumnVisibility'
 
-// Exportierte Standard-Spaltenvisibilität für die Capability-Tabelle
+// Exported default column visibility for capability table
 export const CAPABILITY_DEFAULT_COLUMN_VISIBILITY = {
   // Standardmäßig sichtbare Spalten
   name: true,
@@ -49,7 +49,7 @@ interface CapabilityTableProps {
   availableTags?: string[]
   availableCapabilities?: BusinessCapability[]
   onTableReady?: (table: any) => void
-  // Diese Props sind jetzt optional, da die Persistierung intern verwaltet wird
+  // These props are now optional as persistence is handled internally
   columnVisibility?: VisibilityState
   onColumnVisibilityChange?: (
     updater: VisibilityState | ((old: VisibilityState) => VisibilityState)
@@ -84,13 +84,13 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
     columnVisibility,
     onTableReady: persistentOnTableReady,
     onColumnVisibilityChange,
-    // resetColumnVisibility wird für zukünftige Reset-Funktionalität benötigt
+    // resetColumnVisibility is needed for future reset functionality
   } = usePersistentColumnVisibility({
     tableKey: 'capabilities',
     defaultColumnVisibility: CAPABILITY_DEFAULT_COLUMN_VISIBILITY,
   })
 
-  // Kombiniere externe und persistente onTableReady Callbacks
+  // Combine external and persistent onTableReady callbacks
   const handleTableReady = (table: any) => {
     persistentOnTableReady(table)
     if (onTableReady) {
@@ -98,7 +98,7 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
     }
   }
 
-  // Spalten-Definition für die Capability-Tabelle
+  // Column definition for capability table
   const columns = useMemo(
     () => [
       columnHelper.accessor('id', {
@@ -177,7 +177,7 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
         },
         enableHiding: true,
       }),
-      // Versteckte Spalten für type und sequenceNumber
+      // Hidden columns for type and sequenceNumber
       columnHelper.accessor('type', {
         header: t('type'),
         cell: info => {
@@ -210,7 +210,7 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
         },
         enableHiding: true,
       }),
-      // Weitere versteckte Spalten für Beziehungen
+      // Additional hidden columns for relationships
       columnHelper.accessor('relatedDataObjects', {
         header: t('relatedDataObjects'),
         cell: info => {
@@ -239,7 +239,7 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
         },
         enableHiding: true,
       }),
-      // Versteckte Spalten für Zeitstempel am Ende
+      // Hidden columns for timestamps at end
       columnHelper.accessor('createdAt', {
         header: t('createdAt'),
         cell: info => formatDate(info.getValue(), locale),
@@ -266,7 +266,7 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
     ]
   )
 
-  // Mapping von Capability zu den erwarteten FormValues für das Formular
+  // Mapping from Capability to expected FormValues for the form
   const mapToFormValues = (capability: BusinessCapability): CapabilityFormValues => {
     return {
       name: capability.name ?? '',
@@ -281,7 +281,7 @@ const CapabilityTable: React.FC<CapabilityTableProps> = ({
       children: capability.children?.map((child: BusinessCapability) => child.id) ?? [],
       supportedByApplications: capability.supportedByApplications?.map((app: any) => app.id) ?? [],
       partOfArchitectures: capability.partOfArchitectures?.map((arch: any) => arch.id) ?? [],
-      partOfDiagrams: [], // Vorläufig leerer Array
+      partOfDiagrams: [], // Temporarily empty array
       sequenceNumber: capability.sequenceNumber ?? 0,
       introductionDate: capability.introductionDate
         ? new Date(capability.introductionDate)

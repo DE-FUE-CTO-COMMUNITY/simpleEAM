@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
 
     const token = authHeader.substring(7)
 
-    // Keycloak Token Introspection Endpoint für Passwort-Validierung verwenden
+    // Use Keycloak token introspection endpoint for password validation
     const keycloakUrl =
       process.env.NEXT_PUBLIC_KEYCLOAK_URL ||
       process.env.KEYCLOAK_URL ||
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     const realm =
       process.env.NEXT_PUBLIC_KEYCLOAK_REALM || process.env.KEYCLOAK_REALM || 'simple-eam'
 
-    // Entschlüssele das Token, um den Benutzernamen zu erhalten
+    // Decrypt token to get user information
     const tokenPayload = JSON.parse(atob(token.split('.')[1]))
     const username = tokenPayload.preferred_username
 
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Benutzername nicht im Token gefunden' }, { status: 400 })
     }
 
-    // Versuche Anmeldung mit dem aktuellen Passwort über Keycloak Token Endpoint
+    // Try login with current password über Keycloak Token Endpoint
     const tokenResponse = await fetch(
       `${keycloakUrl}/realms/${realm}/protocol/openid-connect/token`,
       {

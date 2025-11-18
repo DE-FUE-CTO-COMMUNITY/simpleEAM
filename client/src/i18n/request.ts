@@ -6,7 +6,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
   // Typischerweise entspricht dies dem [locale] Segment
   const requested = await requestLocale
 
-  // Überprüfe ob die angeforderte Sprache unterstützt wird
+  // Check if requested language is supported
   const locale = hasLocale(routing.locales, requested) ? requested : routing.defaultLocale
 
   return {

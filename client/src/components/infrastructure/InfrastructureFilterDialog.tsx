@@ -72,7 +72,7 @@ const InfrastructureFilterDialog: React.FC<InfrastructureFilterDialogProps> = ({
     return translations[status] || status
   }
 
-  // Zähle die aktiven Filter
+  // Count active filters
   const countActiveFilters = (fs: GenericFilterState) => {
     return (
       (fs.infrastructureTypes?.length || 0) +
@@ -87,7 +87,7 @@ const InfrastructureFilterDialog: React.FC<InfrastructureFilterDialogProps> = ({
     )
   }
 
-  // Definiere Filterfelder für den generischen Dialog
+  // Define filter fields for the generic dialog
   const filterFields: FilterField[] = [
     // Infrastrukturtyp-Filter
     {
@@ -141,7 +141,7 @@ const InfrastructureFilterDialog: React.FC<InfrastructureFilterDialogProps> = ({
         label: owner,
       })),
     },
-    // Gehostete Applikationen Filter
+    // Hosted applications filter
     {
       id: 'hostsApplications',
       label: t('filter.hostedApplications'),
@@ -151,7 +151,7 @@ const InfrastructureFilterDialog: React.FC<InfrastructureFilterDialogProps> = ({
         label: app,
       })),
     },
-    // Teil von Architekturen Filter
+    // Part of architectures filter
     {
       id: 'partOfArchitectures',
       label: t('filter.partOfArchitectures'),
@@ -178,12 +178,12 @@ const InfrastructureFilterDialog: React.FC<InfrastructureFilterDialogProps> = ({
     },
   ]
 
-  // Handler für Änderungen der Filter
+  // Handler for filter changes
   const handleFilterChange = (partialState: Partial<GenericFilterState>) => {
     onFiltersChange({ ...filters, ...partialState })
   }
 
-  // Wenn der Dialog nicht offen ist, nichts rendern
+  // If dialog is not open, render nothing
   if (!open) return null
 
   return (

@@ -90,7 +90,7 @@ export function GenericTable<T, F>({
   onTableReady,
 }: GenericTableProps<T, F>) {
   const t = useTranslations('common')
-  // State für das Formular-Dialog
+  // State for das Formular-Dialog
   const [formMode, setFormMode] = useState<'create' | 'edit' | 'view'>('view')
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState<T | null>(null)
@@ -111,7 +111,7 @@ export function GenericTable<T, F>({
     200 // Offset height
   )
 
-  // State für die Seitengröße und Seitenindex
+  // State for die Seitengröße und Seitenindex
   const [pageSize, setPageSize] = useState(automaticPageSize)
   const [pageIndex, setPageIndex] = useState(0)
 

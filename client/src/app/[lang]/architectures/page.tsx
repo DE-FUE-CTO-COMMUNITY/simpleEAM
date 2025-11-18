@@ -20,7 +20,7 @@ import ArchitectureForm, {
   ArchitectureFormValues,
 } from '@/components/architectures/ArchitectureForm'
 
-// Importiere die ausgelagerten Komponenten
+// Import the extracted components
 import ArchitectureTable, {
   ARCHITECTURE_DEFAULT_COLUMN_VISIBILITY,
 } from '@/components/architectures/ArchitectureTable'
@@ -44,27 +44,27 @@ const ArchitecturesPage = () => {
   const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false)
   const [activeFiltersCount, setActiveFiltersCount] = useState<number>(0)
 
-  // Liste der verfügbaren Domains, Types und Tags aus den Daten extrahieren
+  // Extract list of available values from the data
   const [availableDomains, setAvailableDomains] = useState<ArchitectureDomain[]>([])
   const [availableTypes, setAvailableTypes] = useState<ArchitectureEnumType[]>([])
   const [availableTags, setAvailableTags] = useState<string[]>([])
 
-  // State für das neue Architecture-Formular
+  // State for the new Architecture form
   const [showNewArchitectureForm, setShowNewArchitectureForm] = useState(false)
 
-  // Architekturen laden - Auth-Check erfolgt bereits in layout.tsx
+  // Load architectures - auth check already done in layout.tsx
   const companyWhere = useCompanyWhere('company')
   const { loading, error, data, refetch } = useQuery(GET_ARCHITECTURES, {
     skip: !authenticated || !initialized,
     fetchPolicy: 'cache-and-network',
     variables: { where: companyWhere },
   })
-  // Verfügbare Werte aus den geladenen Daten extrahieren
+  // Extract available values from loaded data
   useEffect(() => {
     if (data?.architectures?.length) {
       const architectures = data.architectures as ArchitectureType[]
 
-      // Alle Domains extrahieren und Duplikate entfernen
+      // Extract all values and remove duplicates
       const allDomains: ArchitectureDomain[] = architectures
         .map((arch: ArchitectureType) => arch.domain)
         .filter(Boolean) as ArchitectureDomain[]
@@ -72,7 +72,7 @@ const ArchitecturesPage = () => {
       const uniqueDomains = Array.from(new Set(allDomains)).sort()
       setAvailableDomains(uniqueDomains)
 
-      // Alle Typen extrahieren und Duplikate entfernen
+      // Extract all values and remove duplicates
       const allTypes: ArchitectureEnumType[] = architectures
         .map((arch: ArchitectureType) => arch.type)
         .filter(Boolean) as ArchitectureEnumType[]
@@ -80,7 +80,7 @@ const ArchitecturesPage = () => {
       const uniqueTypes = Array.from(new Set(allTypes)).sort()
       setAvailableTypes(uniqueTypes)
 
-      // Alle Tags sammeln und Duplikate entfernen
+      // Collect all tags and remove duplicates
       const allTags: string[] = []
       architectures.forEach((arch: ArchitectureType) => {
         if (arch.tags && Array.isArray(arch.tags)) {
@@ -93,7 +93,7 @@ const ArchitecturesPage = () => {
     }
   }, [data])
 
-  // Fehlerbehandlung
+  // Error handling
   useEffect(() => {
     if (error) {
       enqueueSnackbar(t('loadingError'), { variant: 'error' })
@@ -107,7 +107,7 @@ const ArchitecturesPage = () => {
     architectures,
   })
 
-  // Mutation zum Erstellen einer neuen Architektur
+  // Mutation for creating a new Architecture
   const [createArchitecture, { loading: isCreating }] = useMutation(CREATE_ARCHITECTURE, {
     onCompleted: () => {
       enqueueSnackbar(t('createSuccess'), { variant: 'success' })
@@ -120,10 +120,10 @@ const ArchitecturesPage = () => {
     },
   })
 
-  // Mutation zum Aktualisieren einer bestehenden Architektur
+  // Mutation for updating an existing Architecture
   const [updateArchitecture] = useMutation(UPDATE_ARCHITECTURE, {
     onCompleted: data => {
-      // Überprüfe das Ergebnis der Mutation
+      // Check the result of the mutation
       if (data?.updateArchitectures?.architectures?.length > 0) {
         enqueueSnackbar(t('updateSuccess'), { variant: 'success' })
       } else {
@@ -132,7 +132,7 @@ const ArchitecturesPage = () => {
         })
       }
 
-      // Wir laden explizit neu, um die Änderungen zu sehen
+      // Explicitly reload to see the changes
       refetch()
     },
     onError: error => {
@@ -140,12 +140,12 @@ const ArchitecturesPage = () => {
         variant: 'error',
       })
     },
-    // Vollständige Aktualisierung der Apollo-Cache nach Mutation
+    // Complete update of Apollo cache after mutation
     refetchQueries: [{ query: GET_ARCHITECTURES }],
     awaitRefetchQueries: true,
   })
 
-  // Mutation zum Löschen einer Architektur
+  // Mutation for deleting an Architecture
   const [deleteArchitecture] = useMutation(DELETE_ARCHITECTURE, {
     onCompleted: () => {
       enqueueSnackbar(t('deleteSuccess'), { variant: 'success' })
@@ -158,10 +158,10 @@ const ArchitecturesPage = () => {
     },
   })
 
-  // Handler für das Erstellen einer neuen Architektur
+  // Handler for creating a new Architecture
   const handleCreateArchitectureSubmit = async (data: ArchitectureFormValues) => {
     if (!selectedCompanyId) {
-      enqueueSnackbar('Bitte zuerst ein Unternehmen auswählen.', { variant: 'warning' })
+      enqueueSnackbar('Please select a company first.', { variant: 'warning' })
       return
     }
     const {
@@ -177,15 +177,15 @@ const ArchitecturesPage = () => {
       ...architectureData
     } = data
 
-    // Bei CREATE wird kein spezielles Mutation-Objekt benötigt, da direkte Werte erlaubt sind
+    // For CREATE, no special mutation object is needed as direct values are allowed
     const input = {
       name: architectureData.name,
       description: architectureData.description,
       domain: architectureData.domain,
       type: architectureData.type,
       tags: architectureData.tags,
-      timestamp: architectureData.timestamp.toISOString(), // Verwende das vom Benutzer ausgewählte Gültigkeitsdatum
-      // Wenn ein Besitzer ausgewählt wurde, verwenden wir die owners-Struktur
+      timestamp: architectureData.timestamp.toISOString(), // Use the validity date selected by the user
+      // If an owner was selected, use the owners structure
       ...(ownerId
         ? {
             owners: {
@@ -193,7 +193,7 @@ const ArchitecturesPage = () => {
             },
           }
         : {}),
-      // Wenn Applikationen ausgewählt wurden, verbinden wir sie mit der Architektur
+      // If values were selected, connect them to the Architecture
       ...(containsApplicationIds && containsApplicationIds.length > 0
         ? {
             containsApplications: {
@@ -203,7 +203,7 @@ const ArchitecturesPage = () => {
             },
           }
         : {}),
-      // Wenn Capabilities ausgewählt wurden, verbinden wir sie mit der Architektur
+      // If values were selected, connect them to the Architecture
       ...(containsCapabilityIds && containsCapabilityIds.length > 0
         ? {
             containsCapabilities: {
@@ -213,7 +213,7 @@ const ArchitecturesPage = () => {
             },
           }
         : {}),
-      // Wenn Datenobjekte ausgewählt wurden, verbinden wir sie mit der Architektur
+      // If values were selected, connect them to the Architecture
       ...(containsDataObjectIds && containsDataObjectIds.length > 0
         ? {
             containsDataObjects: {
@@ -223,7 +223,7 @@ const ArchitecturesPage = () => {
             },
           }
         : {}),
-      // Wenn Schnittstellen ausgewählt wurden, verbinden wir sie mit der Architektur
+      // If values were selected, connect them to the Architecture
       ...(containsInterfaceIds && containsInterfaceIds.length > 0
         ? {
             containsInterfaces: {
@@ -233,7 +233,7 @@ const ArchitecturesPage = () => {
             },
           }
         : {}),
-      // Wenn Infrastruktur ausgewählt wurde, verbinden wir sie mit der Architektur
+      // If Infrastructure was selected, connect it to the Architecture
       ...(containsInfrastructureIds && containsInfrastructureIds.length > 0
         ? {
             containsInfrastructure: {
@@ -243,7 +243,7 @@ const ArchitecturesPage = () => {
             },
           }
         : {}),
-      // Wenn Diagramme ausgewählt wurden, verbinden wir sie mit der Architektur
+      // If values were selected, connect them to the Architecture
       ...(diagramIds && diagramIds.length > 0
         ? {
             diagrams: {
@@ -253,7 +253,7 @@ const ArchitecturesPage = () => {
             },
           }
         : {}),
-      // Wenn eine Elternarchitektur ausgewählt wurde, verbinden wir sie mit der Architektur
+      // If a parent architecture was selected, connect it to the Architecture
       ...(parentArchitectureId
         ? {
             parentArchitecture: {
@@ -261,7 +261,7 @@ const ArchitecturesPage = () => {
             },
           }
         : {}),
-      // Wenn Prinzipien ausgewählt wurden, verbinden wir sie mit der Architektur
+      // If values were selected, connect them to the Architecture
       ...(appliedPrincipleIds && appliedPrincipleIds.length > 0
         ? {
             appliedPrinciples: {
@@ -271,7 +271,7 @@ const ArchitecturesPage = () => {
             },
           }
         : {}),
-      // Company-Zuordnung (Pflicht)
+      // Company assignment (required)
       company: {
         connect: [
           {
@@ -285,11 +285,11 @@ const ArchitecturesPage = () => {
       variables: { input: [input] },
     })
 
-    // Formular nach dem Erstellen schließen
+    // Close form after creating
     setShowNewArchitectureForm(false)
   }
 
-  // Handler für das Aktualisieren einer bestehenden Architektur
+  // Handler for updating an existing Architecture
   const handleUpdateArchitectureSubmit = async (id: string, data: ArchitectureFormValues) => {
     const {
       ownerId,
@@ -304,7 +304,7 @@ const ArchitecturesPage = () => {
       ...architectureData
     } = data
 
-    // Sicherstellen, dass ein gültiges Datum verwendet wird
+    // Ensure a valid date is used
     let timestamp: Date
 
     if (architectureData.timestamp instanceof Date) {
@@ -319,21 +319,21 @@ const ArchitecturesPage = () => {
       timestamp = new Date(1735689600000) // Fixed timestamp for SSR consistency
     }
 
-    // Basis-Input-Daten vorbereiten
+    // Prepare base input data
     const input: Record<string, any> = {
       name: { set: architectureData.name },
       description: { set: architectureData.description },
       domain: { set: architectureData.domain },
       type: { set: architectureData.type },
       tags: { set: Array.isArray(architectureData.tags) ? architectureData.tags : [] },
-      timestamp: { set: timestamp.toISOString() }, // Verwende das vom Benutzer ausgewählte Datum
+      timestamp: { set: timestamp.toISOString() }, // Use the date selected by the user
     }
 
-    // Aktualisierung der Owner-Beziehung, wenn ein Besitzer ausgewählt wurde
+    // Update owner relationship if an owner was selected
     if (ownerId) {
-      // Wir setzen die owners-Beziehung
+      // Set the owners relationship
       input.owners = {
-        disconnect: [{ where: {} }], // Trennt alle bestehenden Verbindungen
+        disconnect: [{ where: {} }], // Disconnect all existing connections
         connect: [
           {
             where: {
@@ -345,7 +345,7 @@ const ArchitecturesPage = () => {
         ],
       }
     } else {
-      // Wenn kein Besitzer ausgewählt wurde, entfernen wir alle Besitzer
+      // If no owner was selected, remove all owners
       input.owners = {
         disconnect: [{ where: {} }],
       }
@@ -369,7 +369,7 @@ const ArchitecturesPage = () => {
       }
     }
 
-    // Aktualisierung der Capability-Beziehungen
+    // Update capability relationships
     if (containsCapabilityIds && containsCapabilityIds.length > 0) {
       input.containsCapabilities = {
         disconnect: [{ where: {} }],
@@ -387,7 +387,7 @@ const ArchitecturesPage = () => {
       }
     }
 
-    // Aktualisierung der DataObject-Beziehungen
+    // Update DataObject relationships
     if (containsDataObjectIds && containsDataObjectIds.length > 0) {
       input.containsDataObjects = {
         disconnect: [{ where: {} }],
@@ -500,24 +500,24 @@ const ArchitecturesPage = () => {
     })
   }
 
-  // Neue Architektur erstellen
+  // Create new architecture
   const handleCreateArchitecture = () => {
     setShowNewArchitectureForm(true)
   }
 
-  // Architektur löschen
+  // Delete architecture
   const handleDeleteArchitecture = async (id: string) => {
     await deleteArchitecture({
       variables: { id },
     })
   }
 
-  // Filter-Handler
+  // Filter handler
   const handleFilterChange = (newFilterValues: Partial<FilterState>) => {
     setFilterState(prev => ({ ...prev, ...newFilterValues }))
   }
 
-  // Filter zurücksetzen
+  // Reset filter
   const handleResetFilter = () => {
     setFilterState({
       domainFilter: [],

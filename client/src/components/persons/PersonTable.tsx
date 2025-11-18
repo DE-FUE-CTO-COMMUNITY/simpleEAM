@@ -9,7 +9,7 @@ import { SortingState, VisibilityState } from '@tanstack/react-table'
 import usePersistentColumnVisibility from '../../hooks/usePersistentColumnVisibility'
 import { formatDate } from './utils'
 
-// Exportierte Default Column Visibility für Person
+// Exported default column visibility for Person
 export const PERSON_DEFAULT_COLUMN_VISIBILITY = {
   // Standardmäßig sichtbare Spalten
   firstName: true,
@@ -43,7 +43,7 @@ interface PersonTableProps {
   onUpdatePerson?: (id: string, data: PersonFormValues) => Promise<void>
   onDeletePerson?: (id: string) => Promise<void>
   onTableReady?: (table: any) => void
-  // Diese Props sind jetzt optional, da die Persistierung intern verwaltet wird
+  // These props are now optional as persistence is handled internally
   columnVisibility?: VisibilityState
   onColumnVisibilityChange?: (
     updater: VisibilityState | ((old: VisibilityState) => VisibilityState)
@@ -80,7 +80,7 @@ const PersonTableWithGenericTable: React.FC<PersonTableProps> = ({
     defaultColumnVisibility: PERSON_DEFAULT_COLUMN_VISIBILITY,
   })
 
-  // Kombiniere externe und persistente onTableReady Callbacks
+  // Combine external and persistent onTableReady callbacks
   const handleTableReady = (table: any) => {
     persistentOnTableReady(table)
     if (onTableReady) {
@@ -88,7 +88,7 @@ const PersonTableWithGenericTable: React.FC<PersonTableProps> = ({
     }
   }
 
-  // Spalten-Definition für die Person-Tabelle
+  // Column definition for Person-Tabelle
   const columns = useMemo(
     () => [
       // ID (versteckt per Default)
@@ -209,7 +209,7 @@ const PersonTableWithGenericTable: React.FC<PersonTableProps> = ({
     [columnHelper, t, locale]
   )
 
-  // Mapping von Person zu den erwarteten FormValues für das Formular
+  // Mapping from Person to expected FormValues for form
   const mapToFormValues = (person: PersonWithCompany): PersonFormValues => {
     return {
       firstName: person.firstName ?? '',

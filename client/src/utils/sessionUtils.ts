@@ -16,7 +16,7 @@ export const isTokenValid = (): boolean => {
     const tokenPayload = JSON.parse(atob(keycloak.token.split('.')[1]))
     const currentTime = Math.floor(Date.now() / 1000)
 
-    // Prüfe Ablaufzeit mit 30 Sekunden Puffer
+    // Check expiration time with 30 second buffer
     return tokenPayload.exp > currentTime + 30
   } catch (error) {
     console.error('Fehler beim Parsen des Tokens:', error)
@@ -64,7 +64,7 @@ export const secureApiCall = async <T>(apiCall: (token: string) => Promise<T>): 
   try {
     return await apiCall(keycloak.token!)
   } catch (error: any) {
-    // Bei Auth-Fehlern versuche Token-Refresh und wiederhole die Anfrage
+    // On auth errors try token refresh and retry request
     if (
       error.message?.includes('unauthenticated') ||
       error.status === 401 ||
@@ -75,7 +75,7 @@ export const secureApiCall = async <T>(apiCall: (token: string) => Promise<T>): 
         throw new Error('Token-Refresh nach Auth-Fehler fehlgeschlagen')
       }
 
-      // Wiederhole die Anfrage mit neuem Token
+      // Retry request with new token
       return await apiCall(newToken)
     }
 
@@ -93,7 +93,7 @@ export const setupSessionMonitoring = () => {
   // Überwache Page Visibility für Token-Refresh bei Tab-Wechsel
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden && keycloak?.authenticated) {
-      // Wenn Tab wieder aktiv wird, prüfe Token-Gültigkeit
+      // When tab becomes active again, check token validity
       if (!isTokenValid()) {
         refreshToken().then(newToken => {
           if (newToken) {
@@ -134,7 +134,7 @@ export const setupSessionMonitoring = () => {
 }
 
 /**
- * Hilfsfunktion für Token-Info
+ * Helper function for Token-Info
  */
 export const getTokenInfo = () => {
   if (!keycloak?.token) {

@@ -27,7 +27,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const admin = isAdmin()
   const email = (keycloak?.tokenParsed as any)?.email as string | undefined
 
-  // Admin: lade alle Companies; Nicht-Admin: lade Companies der eigenen Person (über E-Mail)
+  // Admin: load all companies; Non-admin: load companies of own person (via email)
   const { data: allCompaniesData, loading: loadingAll } = useQuery(GET_COMPANIES, {
     skip: !admin,
   })
@@ -49,7 +49,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [selectedCompanyId, setSelectedCompanyIdState] = useState<string | null>(null)
   const [isInitialized, setIsInitialized] = useState(false)
 
-  // Initial aus LocalStorage setzen
+  // Set initial value from localStorage
   useEffect(() => {
     const fromStorage = typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : null
     if (fromStorage) {
@@ -58,7 +58,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setIsInitialized(true)
   }, [])
 
-  // Cross-Tab Sync: auf Änderungen aus anderen Tabs reagieren
+  // Cross-tab sync: react to changes from other tabs
   useEffect(() => {
     if (typeof window === 'undefined') return
 
@@ -72,7 +72,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       }
     }
 
-    // Beim Tab-Fokus/Visibility-Change ebenfalls mit LocalStorage abgleichen
+    // Also sync with localStorage on tab focus/visibility change
     const reconcileFromLocalStorage = () => {
       try {
         const current = localStorage.getItem(STORAGE_KEY)
@@ -98,17 +98,17 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   }, [selectedCompanyId])
 
-  // Wenn Companies geladen sind, sinnvolle Vorauswahl treffen und ungültige Auswahl bereinigen
+  // When companies are loaded, make sensible preselection and clean up invalid selection
   useEffect(() => {
-    // Warten bis localStorage initialisiert ist und Companies geladen sind
+    // Wait until localStorage is initialized and companies are loaded
     if (!isInitialized) return
 
-    // Wenn Companies noch laden, warten (wichtig für Race Condition)
+    // If companies are still loading, wait (important for race condition)
     if (loading) {
       return
     }
 
-    // Wenn keine Companies verfügbar sind und das Laden abgeschlossen ist
+    // If no companies are available and loading is complete
     if (!companies || companies.length === 0) {
       console.error(
         'CompanyContext: No companies available after loading completed, clearing selection'
@@ -145,7 +145,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       return
     }
 
-    // Wenn eine ungültige Company-ID aus localStorage kommt (z.B. Company wurde gelöscht),
+    // If an invalid company ID comes from localStorage (e.g. company was deleted),
     // dann auf erste umschalten
     if (selectedCompanyId && !hasSelection) {
       console.warn(

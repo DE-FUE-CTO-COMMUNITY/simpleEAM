@@ -59,7 +59,7 @@ const Dashboard = () => {
 
   // Weiterleitung zum Login, falls nicht authentifiziert
   useEffect(() => {
-    // Nur ausführen, wenn Keycloak fertig initialisiert ist
+    // Only execute when Keycloak is fully initialized
     if (initialized && authenticated === false) {
       login()
     }
@@ -156,7 +156,7 @@ const Dashboard = () => {
     variables: { where: capWhere },
   })
 
-  // Fehlerbehandlung
+  // Error handling
   useEffect(() => {
     if (capabilitiesError) {
       enqueueSnackbar(tCommon('error'), { variant: 'error' })
