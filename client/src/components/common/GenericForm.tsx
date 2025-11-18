@@ -67,6 +67,8 @@ export type FieldType =
 export interface SelectOption {
   value: string | number | boolean | null
   label: string
+  style?: React.CSSProperties
+  sx?: SxProps<Theme>
   [key: string]: any // Erlaubt zusätzliche Eigenschaften für komplexere Optionen
 }
 
@@ -101,6 +103,10 @@ export interface FieldConfig {
   loadingOptions?: boolean // Für Autocomplete während des Ladens
   loadingText?: string // Text während des Ladens
   onChange?: (value: any) => void // Callback für Feldwert-Änderungen
+  selectRenderValue?: (
+    value: string | number | boolean | null,
+    option?: SelectOption
+  ) => React.ReactNode
   // Eigenschaften für displayText
   variant?:
     | 'body1'
@@ -520,6 +526,16 @@ const GenericForm: React.FC<GenericFormProps> = ({
                     select
                     error={finalShouldShowError}
                     fullWidth={field.fullWidth !== false}
+                    SelectProps={
+                      field.selectRenderValue
+                        ? {
+                            renderValue: (selected: any) => {
+                              const option = field.options?.find(opt => opt.value === selected)
+                              return field.selectRenderValue?.(selected, option)
+                            },
+                          }
+                        : undefined
+                    }
                     InputProps={{
                       readOnly: !!field.readOnly,
                       ...(field.icon && {
@@ -533,7 +549,12 @@ const GenericForm: React.FC<GenericFormProps> = ({
                     helperText={getHelperText()}
                   >
                     {field.options?.map(option => (
-                      <MenuItem key={String(option.value)} value={option.value as any}>
+                      <MenuItem
+                        key={String(option.value)}
+                        value={option.value as any}
+                        style={option.style}
+                        sx={option.sx}
+                      >
                         {option.label}
                       </MenuItem>
                     ))}

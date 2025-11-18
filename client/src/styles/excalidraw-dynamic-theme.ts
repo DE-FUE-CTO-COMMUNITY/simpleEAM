@@ -5,7 +5,7 @@
  * die Farben aus den Umgebungsvariablen auf Excalidraw an.
  */
 
-import { generateExcalidrawThemeCSS } from './excalidraw-theme-adapter'
+import { generateExcalidrawThemeCSS, ExcalidrawThemeOverrides } from './excalidraw-theme-adapter'
 
 // Generiere CSS basierend auf aktuellen Umgebungsvariablen
 const dynamicCSS = generateExcalidrawThemeCSS()
@@ -14,7 +14,10 @@ const dynamicCSS = generateExcalidrawThemeCSS()
 export default dynamicCSS
 
 // Function to inject CSS into DOM
-export function injectExcalidrawThemeCSS(_mode: 'light' | 'dark' = 'light') {
+export function injectExcalidrawThemeCSS(
+  _mode: 'light' | 'dark' = 'light',
+  overrides?: ExcalidrawThemeOverrides
+) {
   if (typeof document === 'undefined') {
     return // Server-side rendering guard
   }
@@ -26,7 +29,7 @@ export function injectExcalidrawThemeCSS(_mode: 'light' | 'dark' = 'light') {
   }
 
   // Generiere CSS basierend auf dem aktuellen Mode
-  const dynamicCSS = generateExcalidrawThemeCSS()
+  const dynamicCSS = generateExcalidrawThemeCSS(overrides)
 
   // Create new style element
   const styleElement = document.createElement('style')

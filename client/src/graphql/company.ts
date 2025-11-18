@@ -12,6 +12,11 @@ export const GET_COMPANIES = gql`
       address
       industry
       website
+      primaryColor
+      secondaryColor
+      font
+      diagramFont
+      logo
       size
       createdAt
       updatedAt
@@ -34,6 +39,11 @@ export const GET_COMPANY = gql`
       address
       industry
       website
+      primaryColor
+      secondaryColor
+      font
+      diagramFont
+      logo
       size
       createdAt
       updatedAt
@@ -57,6 +67,11 @@ export const CREATE_COMPANY = gql`
         address
         industry
         website
+        primaryColor
+        secondaryColor
+        font
+        diagramFont
+        logo
         size
         createdAt
         updatedAt
@@ -81,6 +96,11 @@ export const UPDATE_COMPANY = gql`
         address
         industry
         website
+        primaryColor
+        secondaryColor
+        font
+        diagramFont
+        logo
         size
         createdAt
         updatedAt

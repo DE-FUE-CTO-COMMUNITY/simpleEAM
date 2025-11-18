@@ -26,6 +26,7 @@ import 'dayjs/locale/en'
 
 // Import der globalen Styles
 import '@/styles/global.css'
+import '@/styles/excalidraw-fonts.css'
 
 // Emotion cache for server-side rendering with better hydration compatibility
 let clientSideCache: ReturnType<typeof createCache> | null = null
@@ -198,27 +199,27 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <CacheProvider value={cache}>
-      <ThemeProvider>
-        <DebugProvider>
-          <CssBaseline />
-          <LocalizationProvider
-            dateAdapter={AdapterDayjs}
-            adapterLocale={locale === 'en' ? 'en' : 'de'}
-          >
-            <SnackbarProvider
-              maxSnack={3}
-              anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              dense
-              preventDuplicate
-              autoHideDuration={5000}
-              className="custom-snackbar-provider"
-            >
-              <AuthContext.Provider value={{ keycloak, initialized, authenticated }}>
-                <ApolloProvider client={apolloClient}>
-                  <CompanyProvider>
+      <AuthContext.Provider value={{ keycloak, initialized, authenticated }}>
+        <ApolloProvider client={apolloClient}>
+          <CompanyProvider>
+            <ThemeProvider>
+              <DebugProvider>
+                <CssBaseline />
+                <LocalizationProvider
+                  dateAdapter={AdapterDayjs}
+                  adapterLocale={locale === 'en' ? 'en' : 'de'}
+                >
+                  <SnackbarProvider
+                    maxSnack={3}
+                    anchorOrigin={{
+                      vertical: 'top',
+                      horizontal: 'right',
+                    }}
+                    dense
+                    preventDuplicate
+                    autoHideDuration={5000}
+                    className="custom-snackbar-provider"
+                  >
                     <AutoUserRegistration />
                     <Box
                       sx={{
@@ -257,13 +258,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                         <RootLayout>{children}</RootLayout>
                       </Box>
                     </Box>
-                  </CompanyProvider>
-                </ApolloProvider>
-              </AuthContext.Provider>
-            </SnackbarProvider>
-          </LocalizationProvider>
-        </DebugProvider>
-      </ThemeProvider>
+                  </SnackbarProvider>
+                </LocalizationProvider>
+              </DebugProvider>
+            </ThemeProvider>
+          </CompanyProvider>
+        </ApolloProvider>
+      </AuthContext.Provider>
     </CacheProvider>
   )
 }

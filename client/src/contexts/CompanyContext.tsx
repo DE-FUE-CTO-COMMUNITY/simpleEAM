@@ -9,10 +9,15 @@ import { useAuth, isAdmin } from '@/lib/auth'
 type Company = {
   id: string
   name: string
+  primaryColor?: string | null
+  secondaryColor?: string | null
+  font?: string | null
+  diagramFont?: string | null
 }
 
 type CompanyContextValue = {
   companies: Company[]
+  selectedCompany: Company | null
   selectedCompanyId: string | null
   setSelectedCompanyId: (id: string) => void
   loading: boolean
@@ -164,9 +169,20 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     if (typeof window !== 'undefined') localStorage.setItem(STORAGE_KEY, id)
   }
 
+  const selectedCompany = useMemo(() => {
+    if (!selectedCompanyId) return null
+    return companies.find(c => c.id === selectedCompanyId) ?? null
+  }, [companies, selectedCompanyId])
+
   const value = useMemo(
-    () => ({ companies, selectedCompanyId, setSelectedCompanyId, loading }),
-    [companies, selectedCompanyId, loading]
+    () => ({
+      companies,
+      selectedCompanyId,
+      selectedCompany,
+      setSelectedCompanyId,
+      loading,
+    }),
+    [companies, selectedCompanyId, selectedCompany, loading]
   )
 
   return <CompanyContext.Provider value={value}>{children}</CompanyContext.Provider>

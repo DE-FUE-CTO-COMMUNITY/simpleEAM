@@ -6,15 +6,18 @@ import { GET_LIBRARY_ELEMENTS } from '@/graphql/library'
 import { wrapTextToFitWidth, calculateCenteredTextPosition } from '../utils/textContainerUtils'
 import { findArchimateTemplate, loadArchimateLibrary } from '../utils/archimateLibraryUtils'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
+import { FONT_FAMILY } from '@excalidraw/excalidraw'
 
 interface IntegratedLibraryProps {
   excalidrawAPI: any
   onLibraryUpdate: (library: any) => void
+  defaultFontFamily: number
 }
 
 const IntegratedLibrary: React.FC<IntegratedLibraryProps> = ({
   excalidrawAPI,
   onLibraryUpdate,
+  defaultFontFamily,
 }) => {
   const [archimateLibrary, setArchimateLibrary] = useState<any>(null)
 
@@ -48,19 +51,65 @@ const IntegratedLibrary: React.FC<IntegratedLibraryProps> = ({
   }, [])
 
   // Create integrated library combining ArchiMate symbols with database elements
+  const fontFamilyName = useMemo(() => {
+    const entry = Object.entries(FONT_FAMILY).find(([, value]) => value === defaultFontFamily)
+    return entry?.[0] ?? 'Virgil'
+  }, [defaultFontFamily])
+
+  const normalizedArchimateLibrary = useMemo(() => {
+    if (!archimateLibrary) {
+      return null
+    }
+
+    const patchedItems = archimateLibrary.libraryItems.map(item => {
+      if (!Array.isArray(item.elements)) {
+        return item
+      }
+
+      let updated = false
+      const patchedElements = item.elements.map((element: any) => {
+        if (element?.type === 'text' && element.fontFamily !== defaultFontFamily) {
+          updated = true
+          return {
+            ...element,
+            fontFamily: defaultFontFamily,
+          }
+        }
+        return element
+      })
+
+      if (!updated) {
+        return item
+      }
+
+      return {
+        ...item,
+        elements: patchedElements,
+      }
+    })
+
+    return {
+      ...archimateLibrary,
+      libraryItems: patchedItems,
+    }
+  }, [archimateLibrary, defaultFontFamily])
+
   const integratedLibrary = useMemo(() => {
-    if (!archimateLibrary || !data) {
+    if (!normalizedArchimateLibrary || !data) {
       return null
     }
 
     // Create template elements from ArchiMate library for each type
     const templates = {
-      businessCapability: findArchimateTemplate(archimateLibrary, 'Capability'),
-      application: findArchimateTemplate(archimateLibrary, 'Application Component'),
-      dataObject: findArchimateTemplate(archimateLibrary, 'Business Object'),
-      applicationInterface: findArchimateTemplate(archimateLibrary, 'Application Interface'),
-      infrastructure: findArchimateTemplate(archimateLibrary, 'Infrastruktur'),
-      aiComponent: findArchimateTemplate(archimateLibrary, 'AI Component'),
+      businessCapability: findArchimateTemplate(normalizedArchimateLibrary, 'Capability'),
+      application: findArchimateTemplate(normalizedArchimateLibrary, 'Application Component'),
+      dataObject: findArchimateTemplate(normalizedArchimateLibrary, 'Business Object'),
+      applicationInterface: findArchimateTemplate(
+        normalizedArchimateLibrary,
+        'Application Interface'
+      ),
+      infrastructure: findArchimateTemplate(normalizedArchimateLibrary, 'Infrastruktur'),
+      aiComponent: findArchimateTemplate(normalizedArchimateLibrary, 'AI Component'),
     }
 
     const newLibraryItems: any[] = []
@@ -76,7 +125,9 @@ const IntegratedLibrary: React.FC<IntegratedLibraryProps> = ({
         const libraryItem = createLibraryItemFromDatabaseElement(
           capability,
           'capability', // Fix: elementType muss 'capability' sein!
-          templates.businessCapability
+          templates.businessCapability,
+          defaultFontFamily,
+          fontFamilyName
         )
         if (libraryItem) newLibraryItems.push(libraryItem)
       })
@@ -92,7 +143,9 @@ const IntegratedLibrary: React.FC<IntegratedLibraryProps> = ({
         const libraryItem = createLibraryItemFromDatabaseElement(
           application,
           'application',
-          templates.application
+          templates.application,
+          defaultFontFamily,
+          fontFamilyName
         )
         if (libraryItem) newLibraryItems.push(libraryItem)
       })
@@ -108,7 +161,9 @@ const IntegratedLibrary: React.FC<IntegratedLibraryProps> = ({
         const libraryItem = createLibraryItemFromDatabaseElement(
           aiComponent,
           'aiComponent',
-          templates.aiComponent
+          templates.aiComponent,
+          defaultFontFamily,
+          fontFamilyName
         )
         if (libraryItem) {
           newLibraryItems.push(libraryItem)
@@ -126,7 +181,9 @@ const IntegratedLibrary: React.FC<IntegratedLibraryProps> = ({
         const libraryItem = createLibraryItemFromDatabaseElement(
           dataObject,
           'dataObject',
-          templates.dataObject
+          templates.dataObject,
+          defaultFontFamily,
+          fontFamilyName
         )
         if (libraryItem) newLibraryItems.push(libraryItem)
       })
@@ -142,7 +199,9 @@ const IntegratedLibrary: React.FC<IntegratedLibraryProps> = ({
         const libraryItem = createLibraryItemFromDatabaseElement(
           interface_,
           'applicationInterface',
-          templates.applicationInterface
+          templates.applicationInterface,
+          defaultFontFamily,
+          fontFamilyName
         )
         if (libraryItem) newLibraryItems.push(libraryItem)
       })
@@ -158,7 +217,9 @@ const IntegratedLibrary: React.FC<IntegratedLibraryProps> = ({
         const libraryItem = createLibraryItemFromDatabaseElement(
           infrastructure,
           'infrastructure',
-          templates.infrastructure
+          templates.infrastructure,
+          defaultFontFamily,
+          fontFamilyName
         )
         if (libraryItem) {
           newLibraryItems.push(libraryItem)
@@ -168,10 +229,15 @@ const IntegratedLibrary: React.FC<IntegratedLibraryProps> = ({
 
     // Combine original ArchiMate library items with new database items
     // For Excalidraw 0.18, we need to pass just the libraryItems array
-    const combinedLibraryItems = [...archimateLibrary.libraryItems, ...newLibraryItems]
+    const combinedLibraryItems = [...normalizedArchimateLibrary.libraryItems, ...newLibraryItems]
 
     return combinedLibraryItems
-  }, [archimateLibrary, data])
+  }, [
+    data,
+    defaultFontFamily,
+    fontFamilyName,
+    normalizedArchimateLibrary,
+  ])
 
   // Update library when ready
   useEffect(() => {
@@ -198,13 +264,19 @@ const IntegratedLibrary: React.FC<IntegratedLibraryProps> = ({
           // Fehler beim Aktualisieren der Library
         })
     }
-  }, [integratedLibrary, excalidrawAPI, onLibraryUpdate, archimateLibrary])
+  }, [excalidrawAPI, integratedLibrary, onLibraryUpdate])
 
   return null // This component doesn't render anything
 }
 
 // Helper function to create library item from database element
-function createLibraryItemFromDatabaseElement(dbElement: any, elementType: string, template: any) {
+function createLibraryItemFromDatabaseElement(
+  dbElement: any,
+  elementType: string,
+  template: any,
+  defaultFontFamily: number,
+  fontFamilyName: string
+) {
   if (!template) {
     console.warn(`⚠️ No template found for element type: ${elementType}`)
     return null
@@ -278,11 +350,12 @@ function createLibraryItemFromDatabaseElement(dbElement: any, elementType: strin
       const fontSize = elementType === 'applicationInterface' ? 16 : element.fontSize || 20
 
       // Auto-wrap text to fit within available width
-      const wrappedText = wrapTextToFitWidth(dbElement.name, availableWidth, fontSize)
+      const wrappedText = wrapTextToFitWidth(dbElement.name, availableWidth, fontSize, fontFamilyName)
 
       newElement.text = wrappedText
       newElement.originalText = wrappedText
       newElement.rawText = wrappedText
+      newElement.fontFamily = defaultFontFamily
 
       // Preserve the original template's text alignment if it exists, otherwise set defaults
       newElement.textAlign = element.textAlign || 'center'

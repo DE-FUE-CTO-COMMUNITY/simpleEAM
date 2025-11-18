@@ -3,8 +3,7 @@
 import React, { useMemo } from 'react'
 import { useTranslations } from 'next-intl'
 import { GenericTable } from '../common/GenericTable'
-import { CompanyType } from './types'
-import { CompanyFormValues } from './types'
+import { CompanyType, CompanyFormValues, EXCALIDRAW_FONTS } from './types'
 import { useFormatDate, useCompanySizeLabel, formatWebsiteUrl } from './utils'
 import CompanyForm from './CompanyForm'
 import { createColumnHelper } from '@tanstack/react-table'
@@ -162,6 +161,14 @@ const CompanyTableWithGenericTable: React.FC<CompanyTableProps> = ({
       industry: company.industry ?? '',
       website: company.website ?? '',
       size: company.size ?? undefined,
+      employees: (company.employees || [])
+        .map(employee => employee?.id)
+        .filter(Boolean) as string[],
+      primaryColor: company.primaryColor ?? '',
+      secondaryColor: company.secondaryColor ?? '',
+      font: company.font ?? '',
+      diagramFont: (company.diagramFont as CompanyFormValues['diagramFont']) ?? EXCALIDRAW_FONTS[0],
+      logo: company.logo ?? '',
     }
   }
 

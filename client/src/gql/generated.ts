@@ -347,8 +347,13 @@ export type AiComponentCompanyCompanyNodeAggregateSelection = {
   address: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  diagramFont: StringAggregateSelection;
+  font: StringAggregateSelection;
   industry: StringAggregateSelection;
+  logo: StringAggregateSelection;
   name: StringAggregateSelection;
+  primaryColor: StringAggregateSelection;
+  secondaryColor: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -424,8 +429,13 @@ export type AiComponentCompanyNodeAggregationWhereInput = {
   address?: InputMaybe<StringScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  diagramFont?: InputMaybe<StringScalarAggregationFilters>;
+  font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
+  logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  primaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -1192,7 +1202,7 @@ export type AiComponentSort = {
   version?: InputMaybe<SortDirection>;
 };
 
-/** Status-Werte für KI-Assets */
+/** Status-Werte für KI-Komponenten */
 export enum AiComponentStatus {
   ACTIVE = 'ACTIVE',
   DEPLOYED = 'DEPLOYED',
@@ -1430,7 +1440,7 @@ export type AiComponentTrainedWithDataObjectsUpdateFieldInput = {
   update?: InputMaybe<AiComponentTrainedWithDataObjectsUpdateConnectionInput>;
 };
 
-/** KI-Asset Typen */
+/** KI-Komponent Typen */
 export enum AiComponentType {
   AGENTIC_AI = 'AGENTIC_AI',
   AUTOMATION_ENGINE = 'AUTOMATION_ENGINE',
@@ -2328,8 +2338,13 @@ export type ApplicationCompanyCompanyNodeAggregateSelection = {
   address: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  diagramFont: StringAggregateSelection;
+  font: StringAggregateSelection;
   industry: StringAggregateSelection;
+  logo: StringAggregateSelection;
   name: StringAggregateSelection;
+  primaryColor: StringAggregateSelection;
+  secondaryColor: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -2405,8 +2420,13 @@ export type ApplicationCompanyNodeAggregationWhereInput = {
   address?: InputMaybe<StringScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  diagramFont?: InputMaybe<StringScalarAggregationFilters>;
+  font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
+  logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  primaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -3384,8 +3404,13 @@ export type ApplicationInterfaceCompanyCompanyNodeAggregateSelection = {
   address: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  diagramFont: StringAggregateSelection;
+  font: StringAggregateSelection;
   industry: StringAggregateSelection;
+  logo: StringAggregateSelection;
   name: StringAggregateSelection;
+  primaryColor: StringAggregateSelection;
+  secondaryColor: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -3461,8 +3486,13 @@ export type ApplicationInterfaceCompanyNodeAggregationWhereInput = {
   address?: InputMaybe<StringScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  diagramFont?: InputMaybe<StringScalarAggregationFilters>;
+  font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
+  logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  primaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -6811,8 +6841,13 @@ export type ArchitectureCompanyCompanyNodeAggregateSelection = {
   address: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  diagramFont: StringAggregateSelection;
+  font: StringAggregateSelection;
   industry: StringAggregateSelection;
+  logo: StringAggregateSelection;
   name: StringAggregateSelection;
+  primaryColor: StringAggregateSelection;
+  secondaryColor: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -6888,8 +6923,13 @@ export type ArchitectureCompanyNodeAggregationWhereInput = {
   address?: InputMaybe<StringScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  diagramFont?: InputMaybe<StringScalarAggregationFilters>;
+  font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
+  logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  primaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -8387,8 +8427,13 @@ export type ArchitecturePrincipleCompanyCompanyNodeAggregateSelection = {
   address: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  diagramFont: StringAggregateSelection;
+  font: StringAggregateSelection;
   industry: StringAggregateSelection;
+  logo: StringAggregateSelection;
   name: StringAggregateSelection;
+  primaryColor: StringAggregateSelection;
+  secondaryColor: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -8464,8 +8509,13 @@ export type ArchitecturePrincipleCompanyNodeAggregationWhereInput = {
   address?: InputMaybe<StringScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  diagramFont?: InputMaybe<StringScalarAggregationFilters>;
+  font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
+  logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  primaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -9553,8 +9603,13 @@ export type BusinessCapabilityCompanyCompanyNodeAggregateSelection = {
   address: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  diagramFont: StringAggregateSelection;
+  font: StringAggregateSelection;
   industry: StringAggregateSelection;
+  logo: StringAggregateSelection;
   name: StringAggregateSelection;
+  primaryColor: StringAggregateSelection;
+  secondaryColor: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -9630,8 +9685,13 @@ export type BusinessCapabilityCompanyNodeAggregationWhereInput = {
   address?: InputMaybe<StringScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  diagramFont?: InputMaybe<StringScalarAggregationFilters>;
+  font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
+  logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  primaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -10804,10 +10864,13 @@ export type Company = {
   address?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
   description?: Maybe<Scalars['String']['output']>;
+  diagramFont?: Maybe<Scalars['String']['output']>;
   employees: Array<Person>;
   employeesConnection: CompanyEmployeesConnection;
+  font?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   industry?: Maybe<Scalars['String']['output']>;
+  logo?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
   organisations: Array<Organisation>;
   organisationsConnection: CompanyOrganisationsConnection;
@@ -10829,6 +10892,8 @@ export type Company = {
   ownedInfrastructureConnection: CompanyOwnedInfrastructureConnection;
   ownedInterfaces: Array<ApplicationInterface>;
   ownedInterfacesConnection: CompanyOwnedInterfacesConnection;
+  primaryColor?: Maybe<Scalars['String']['output']>;
+  secondaryColor?: Maybe<Scalars['String']['output']>;
   size?: Maybe<CompanySize>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
   website?: Maybe<Scalars['String']['output']>;
@@ -11063,8 +11128,13 @@ export type CompanyAggregateNode = {
   address: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  diagramFont: StringAggregateSelection;
+  font: StringAggregateSelection;
   industry: StringAggregateSelection;
+  logo: StringAggregateSelection;
   name: StringAggregateSelection;
+  primaryColor: StringAggregateSelection;
+  secondaryColor: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -11171,8 +11241,11 @@ export type CompanyConnectWhere = {
 export type CompanyCreateInput = {
   address?: InputMaybe<Scalars['String']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
+  diagramFont?: InputMaybe<Scalars['String']['input']>;
   employees?: InputMaybe<CompanyEmployeesFieldInput>;
+  font?: InputMaybe<Scalars['String']['input']>;
   industry?: InputMaybe<Scalars['String']['input']>;
+  logo?: InputMaybe<Scalars['String']['input']>;
   name: Scalars['String']['input'];
   organisations?: InputMaybe<CompanyOrganisationsFieldInput>;
   ownedAIComponents?: InputMaybe<CompanyOwnedAiComponentsFieldInput>;
@@ -11184,6 +11257,8 @@ export type CompanyCreateInput = {
   ownedDiagrams?: InputMaybe<CompanyOwnedDiagramsFieldInput>;
   ownedInfrastructure?: InputMaybe<CompanyOwnedInfrastructureFieldInput>;
   ownedInterfaces?: InputMaybe<CompanyOwnedInterfacesFieldInput>;
+  primaryColor?: InputMaybe<Scalars['String']['input']>;
+  secondaryColor?: InputMaybe<Scalars['String']['input']>;
   size?: InputMaybe<CompanySize>;
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
   website?: InputMaybe<Scalars['String']['input']>;
@@ -12549,9 +12624,14 @@ export type CompanySort = {
   address?: InputMaybe<SortDirection>;
   createdAt?: InputMaybe<SortDirection>;
   description?: InputMaybe<SortDirection>;
+  diagramFont?: InputMaybe<SortDirection>;
+  font?: InputMaybe<SortDirection>;
   id?: InputMaybe<SortDirection>;
   industry?: InputMaybe<SortDirection>;
+  logo?: InputMaybe<SortDirection>;
   name?: InputMaybe<SortDirection>;
+  primaryColor?: InputMaybe<SortDirection>;
+  secondaryColor?: InputMaybe<SortDirection>;
   size?: InputMaybe<SortDirection>;
   updatedAt?: InputMaybe<SortDirection>;
   website?: InputMaybe<SortDirection>;
@@ -12561,8 +12641,11 @@ export type CompanyUpdateInput = {
   address?: InputMaybe<StringScalarMutations>;
   createdAt?: InputMaybe<DateTimeScalarMutations>;
   description?: InputMaybe<StringScalarMutations>;
+  diagramFont?: InputMaybe<StringScalarMutations>;
   employees?: InputMaybe<Array<CompanyEmployeesUpdateFieldInput>>;
+  font?: InputMaybe<StringScalarMutations>;
   industry?: InputMaybe<StringScalarMutations>;
+  logo?: InputMaybe<StringScalarMutations>;
   name?: InputMaybe<StringScalarMutations>;
   organisations?: InputMaybe<Array<CompanyOrganisationsUpdateFieldInput>>;
   ownedAIComponents?: InputMaybe<Array<CompanyOwnedAiComponentsUpdateFieldInput>>;
@@ -12574,6 +12657,8 @@ export type CompanyUpdateInput = {
   ownedDiagrams?: InputMaybe<Array<CompanyOwnedDiagramsUpdateFieldInput>>;
   ownedInfrastructure?: InputMaybe<Array<CompanyOwnedInfrastructureUpdateFieldInput>>;
   ownedInterfaces?: InputMaybe<Array<CompanyOwnedInterfacesUpdateFieldInput>>;
+  primaryColor?: InputMaybe<StringScalarMutations>;
+  secondaryColor?: InputMaybe<StringScalarMutations>;
   size?: InputMaybe<CompanySizeEnumScalarMutations>;
   website?: InputMaybe<StringScalarMutations>;
 };
@@ -12585,10 +12670,13 @@ export type CompanyWhere = {
   address?: InputMaybe<StringScalarFilters>;
   createdAt?: InputMaybe<DateTimeScalarFilters>;
   description?: InputMaybe<StringScalarFilters>;
+  diagramFont?: InputMaybe<StringScalarFilters>;
   employees?: InputMaybe<PersonRelationshipFilters>;
   employeesConnection?: InputMaybe<CompanyEmployeesConnectionFilters>;
+  font?: InputMaybe<StringScalarFilters>;
   id?: InputMaybe<IdScalarFilters>;
   industry?: InputMaybe<StringScalarFilters>;
+  logo?: InputMaybe<StringScalarFilters>;
   name?: InputMaybe<StringScalarFilters>;
   organisations?: InputMaybe<OrganisationRelationshipFilters>;
   organisationsConnection?: InputMaybe<CompanyOrganisationsConnectionFilters>;
@@ -12610,6 +12698,8 @@ export type CompanyWhere = {
   ownedInfrastructureConnection?: InputMaybe<CompanyOwnedInfrastructureConnectionFilters>;
   ownedInterfaces?: InputMaybe<ApplicationInterfaceRelationshipFilters>;
   ownedInterfacesConnection?: InputMaybe<CompanyOwnedInterfacesConnectionFilters>;
+  primaryColor?: InputMaybe<StringScalarFilters>;
+  secondaryColor?: InputMaybe<StringScalarFilters>;
   size?: InputMaybe<CompanySizeEnumScalarFilters>;
   updatedAt?: InputMaybe<DateTimeScalarFilters>;
   website?: InputMaybe<StringScalarFilters>;
@@ -13106,8 +13196,13 @@ export type DataObjectCompanyCompanyNodeAggregateSelection = {
   address: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  diagramFont: StringAggregateSelection;
+  font: StringAggregateSelection;
   industry: StringAggregateSelection;
+  logo: StringAggregateSelection;
   name: StringAggregateSelection;
+  primaryColor: StringAggregateSelection;
+  secondaryColor: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -13183,8 +13278,13 @@ export type DataObjectCompanyNodeAggregationWhereInput = {
   address?: InputMaybe<StringScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  diagramFont?: InputMaybe<StringScalarAggregationFilters>;
+  font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
+  logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  primaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -14877,8 +14977,13 @@ export type DiagramCompanyCompanyNodeAggregateSelection = {
   address: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  diagramFont: StringAggregateSelection;
+  font: StringAggregateSelection;
   industry: StringAggregateSelection;
+  logo: StringAggregateSelection;
   name: StringAggregateSelection;
+  primaryColor: StringAggregateSelection;
+  secondaryColor: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -14954,8 +15059,13 @@ export type DiagramCompanyNodeAggregationWhereInput = {
   address?: InputMaybe<StringScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  diagramFont?: InputMaybe<StringScalarAggregationFilters>;
+  font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
+  logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  primaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -16441,8 +16551,13 @@ export type InfrastructureCompanyCompanyNodeAggregateSelection = {
   address: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  diagramFont: StringAggregateSelection;
+  font: StringAggregateSelection;
   industry: StringAggregateSelection;
+  logo: StringAggregateSelection;
   name: StringAggregateSelection;
+  primaryColor: StringAggregateSelection;
+  secondaryColor: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -16518,8 +16633,13 @@ export type InfrastructureCompanyNodeAggregationWhereInput = {
   address?: InputMaybe<StringScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  diagramFont?: InputMaybe<StringScalarAggregationFilters>;
+  font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
+  logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  primaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -18410,8 +18530,13 @@ export type OrganisationCompanyCompanyNodeAggregateSelection = {
   address: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  diagramFont: StringAggregateSelection;
+  font: StringAggregateSelection;
   industry: StringAggregateSelection;
+  logo: StringAggregateSelection;
   name: StringAggregateSelection;
+  primaryColor: StringAggregateSelection;
+  secondaryColor: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -18487,8 +18612,13 @@ export type OrganisationCompanyNodeAggregationWhereInput = {
   address?: InputMaybe<StringScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  diagramFont?: InputMaybe<StringScalarAggregationFilters>;
+  font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
+  logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  primaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -19851,8 +19981,13 @@ export type PersonCompanyCompanyNodeAggregateSelection = {
   address: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  diagramFont: StringAggregateSelection;
+  font: StringAggregateSelection;
   industry: StringAggregateSelection;
+  logo: StringAggregateSelection;
   name: StringAggregateSelection;
+  primaryColor: StringAggregateSelection;
+  secondaryColor: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -19928,8 +20063,13 @@ export type PersonCompanyNodeAggregationWhereInput = {
   address?: InputMaybe<StringScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  diagramFont?: InputMaybe<StringScalarAggregationFilters>;
+  font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
+  logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  primaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };

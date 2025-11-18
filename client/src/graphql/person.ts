@@ -25,6 +25,10 @@ export const GET_PERSONS = gql`
       company {
         id
         name
+        primaryColor
+        secondaryColor
+        font
+        diagramFont
       }
       createdAt
       updatedAt
@@ -73,6 +77,10 @@ export const GET_PERSON = gql`
       company {
         id
         name
+        primaryColor
+        secondaryColor
+        font
+        diagramFont
       }
       createdAt
       updatedAt
@@ -122,6 +130,10 @@ export const GET_PERSON_BY_EMAIL = gql`
       company {
         id
         name
+        primaryColor
+        secondaryColor
+        font
+        diagramFont
       }
       createdAt
       updatedAt
@@ -142,6 +154,10 @@ export const CREATE_PERSON = gql`
         company {
           id
           name
+          primaryColor
+          secondaryColor
+          font
+          diagramFont
         }
         phone
         createdAt
@@ -163,6 +179,10 @@ export const UPDATE_PERSON = gql`
         company {
           id
           name
+          primaryColor
+          secondaryColor
+          font
+          diagramFont
         }
         phone
         avatarUrl

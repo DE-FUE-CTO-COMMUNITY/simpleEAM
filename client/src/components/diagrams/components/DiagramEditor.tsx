@@ -3,6 +3,7 @@
 import React, { useRef, useCallback, useMemo, useEffect, useState } from 'react'
 import { Box, Alert, Snackbar } from '@mui/material'
 import { useApolloClient } from '@apollo/client'
+import { FONT_FAMILY } from '@excalidraw/excalidraw'
 import { useTranslations } from 'next-intl'
 import { GET_DIAGRAM } from '@/graphql/diagram'
 import SaveDiagramDialog from '../dialogs/SaveDiagramDialog'
@@ -20,13 +21,32 @@ import { useKeyboardShortcuts } from '../hooks/DiagramKeyboardShortcuts'
 import { loadViewportStateFromStorage, clearDiagramStorage } from '../utils/DiagramStorageUtils'
 import { isViewer } from '@/lib/auth'
 import { useCompanyContext } from '@/contexts/CompanyContext'
+import type { ExcalidrawFont } from '@/components/companies/types'
+
+const COMPANY_FONT_TO_EXCALIDRAW: Record<ExcalidrawFont, number> = {
+  Virgil: FONT_FAMILY.Virgil,
+  'Comic Shanns': FONT_FAMILY['Comic Shanns'],
+  Excalifont: FONT_FAMILY.Excalifont,
+  'Lilita One': FONT_FAMILY['Lilita One'],
+  Nunito: FONT_FAMILY.Nunito,
+}
+
+const FALLBACK_EXCALIDRAW_FONT = FONT_FAMILY.Virgil
 
 const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const apolloClient = useApolloClient()
   const t = useTranslations('diagrams')
-  const { selectedCompanyId } = useCompanyContext()
+  const { selectedCompanyId, selectedCompany } = useCompanyContext()
   const prevCompanyIdRef = useRef<string | null>(null)
+
+  const companyFontFamily = useMemo(() => {
+    const diagramFont = selectedCompany?.diagramFont as ExcalidrawFont | undefined
+    if (diagramFont && COMPANY_FONT_TO_EXCALIDRAW[diagramFont]) {
+      return COMPANY_FONT_TO_EXCALIDRAW[diagramFont]
+    }
+    return FALLBACK_EXCALIDRAW_FONT
+  }, [selectedCompany?.diagramFont])
 
   // Collaboration status state
   const [isCollaborating, setIsCollaborating] = useState(false)
@@ -36,7 +56,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     isClient,
     excalidrawAPI,
     currentDiagram,
-    // currentScene, // Not used in initialData anymore
+    currentScene,
     hasUnsavedChanges,
     lastSavedScene,
     dialogStates,
@@ -124,13 +144,61 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     setTranslatedNotification,
     open => updateDialogState('saveDialogOpen', open),
     open => updateDialogState('saveAsDialogOpen', open),
-    lastSavedScene
+    lastSavedScene,
+    companyFontFamily
   )
 
   // Capability Map Generator Handler
   const handleCapabilityMapGenerator = useCallback(() => {
     updateDialogState('capabilityMapGeneratorOpen', true)
   }, [updateDialogState])
+
+  const enforceCompanyFontFamily = useCallback(() => {
+    if (!excalidrawAPI) {
+      return
+    }
+
+    try {
+      const appState = excalidrawAPI.getAppState?.()
+      if (!appState) {
+        return
+      }
+
+      if (appState.currentItemFontFamily !== companyFontFamily) {
+        excalidrawAPI.updateScene({
+          appState: {
+            ...appState,
+            currentItemFontFamily: companyFontFamily,
+          },
+        })
+      }
+    } catch (error) {
+      console.warn('DiagramEditor: Failed to synchronize company font family', error)
+    }
+  }, [companyFontFamily, excalidrawAPI])
+
+  const normalizeElementsFont = useCallback(
+    (elements: any[] = []) => {
+      if (!elements.length) {
+        return elements
+      }
+
+      let didUpdate = false
+      const patchedElements = elements.map(element => {
+        if (element?.type === 'text' && element.fontFamily !== companyFontFamily) {
+          didUpdate = true
+          return {
+            ...element,
+            fontFamily: companyFontFamily,
+          }
+        }
+        return element
+      })
+
+      return didUpdate ? patchedElements : elements
+    },
+    [companyFontFamily]
+  )
 
   // Handle generated capability map elements
   const handleCapabilityMapGenerated = useCallback(
@@ -142,9 +210,10 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
       try {
         // Update the scene with generated elements
         excalidrawAPI.updateScene({
-          elements: elements,
+          elements: normalizeElementsFont(elements),
           appState: {
             viewBackgroundColor: '#ffffff',
+            currentItemFontFamily: companyFontFamily,
           },
         })
 
@@ -171,7 +240,14 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
         })
       }
     },
-    [excalidrawAPI, setHasUnsavedChanges, setNotification, t]
+    [
+      companyFontFamily,
+      excalidrawAPI,
+      normalizeElementsFont,
+      setHasUnsavedChanges,
+      setNotification,
+      t,
+    ]
   )
 
   // Reset Diagram Editor when company changes
@@ -195,6 +271,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
               activeTool: { type: 'selection' },
               isLoading: false,
               errorMessage: null,
+              currentItemFontFamily: companyFontFamily,
             },
           }
           excalidrawAPI.updateScene(emptyScene)
@@ -228,6 +305,15 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     setHasUnsavedChanges,
     setLastSavedScene,
     updateDialogState,
+    companyFontFamily,
+  ])
+
+  useEffect(() => {
+    enforceCompanyFontFamily()
+  }, [
+    enforceCompanyFontFamily,
+    currentDiagram?.id,
+    currentScene?.appState?.currentItemFontFamily,
   ])
 
   // Related Elements handlers
@@ -317,8 +403,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
   }, [])
 
   // Create dynamic initialData that includes viewport state
-  const initialData = useMemo(() => {
-    // Load viewport state from storage
+  const baseInitialAppState = useMemo(() => {
     let viewportState = null
     try {
       const savedViewportState = loadViewportStateFromStorage()
@@ -329,8 +414,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
       console.warn('DiagramEditor: Failed to load viewport state:', error)
     }
 
-    // Create base app state with viewport position
-    const baseAppState = {
+    return {
       viewBackgroundColor: '#ffffff',
       collaborators: new Map(),
       selectedElementIds: {},
@@ -341,7 +425,6 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
       activeTool: { type: 'selection' },
       isLoading: false,
       errorMessage: null,
-      currentItemFontFamily: 1,
       currentItemFontSize: 20,
       currentItemTextAlign: 'left',
       currentItemStrokeColor: '#1e1e1e',
@@ -351,22 +434,24 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
       currentItemStrokeStyle: 'solid',
       currentItemRoughness: 1,
       currentItemOpacity: 100,
-      // Include viewport state if available
       ...(viewportState && {
         scrollX: viewportState.scrollX,
         scrollY: viewportState.scrollY,
         zoom: { value: viewportState.zoom },
       }),
     }
+  }, [])
 
-    const data = {
-      elements: [], // Always start with empty elements - they get loaded separately
-      appState: baseAppState,
-      scrollToContent: false, // Critical: preserve viewport position
+  const initialData = useMemo(() => {
+    return {
+      elements: [],
+      appState: {
+        ...baseInitialAppState,
+        currentItemFontFamily: companyFontFamily,
+      },
+      scrollToContent: false,
     }
-
-    return data
-  }, []) // Deliberately static - viewport is applied once on init
+  }, [baseInitialAppState, companyFontFamily])
 
   // Debug log for initialData
 
@@ -402,7 +487,13 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
         }
 
         // Update the canvas with the new elements
-        const restoredData = restoreSceneData({ elements: elements || [], appState })
+        const restoredData = restoreSceneData({
+          elements: normalizeElementsFont(elements || []),
+          appState: {
+            ...appState,
+            currentItemFontFamily: companyFontFamily,
+          },
+        })
         excalidrawAPI.updateScene(restoredData)
 
         // Update current scene state
@@ -425,7 +516,15 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
         })
       }
     },
-    [excalidrawAPI, setCurrentScene, setHasUnsavedChanges, setNotification, t]
+    [
+      companyFontFamily,
+      excalidrawAPI,
+      normalizeElementsFont,
+      setCurrentScene,
+      setHasUnsavedChanges,
+      setNotification,
+      t,
+    ]
   ) // LocalStorage-basiertes Diagramm laden beim Start
   useEffect(() => {
     const loadDiagramFromStorage = async () => {
@@ -547,7 +646,11 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
 
         {/* Integrated Library Component - only for non-viewer users */}
         {excalidrawAPI && !isViewer() && (
-          <IntegratedLibrary excalidrawAPI={excalidrawAPI} onLibraryUpdate={handleLibraryUpdate} />
+          <IntegratedLibrary
+            excalidrawAPI={excalidrawAPI}
+            onLibraryUpdate={handleLibraryUpdate}
+            defaultFontFamily={companyFontFamily}
+          />
         )}
 
         {/* Canvas Debug Overlay - nur in Entwicklungsumgebung */}

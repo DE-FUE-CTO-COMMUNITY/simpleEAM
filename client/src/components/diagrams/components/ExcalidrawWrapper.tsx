@@ -3,6 +3,7 @@ import dynamic from 'next/dynamic'
 import { useLocale, useTranslations } from 'next-intl'
 import { ExcalidrawComponentProps } from '../types/DiagramTypes'
 import { useThemeMode } from '@/contexts/ThemeContext'
+import { useCompanyContext } from '@/contexts/CompanyContext'
 import ExcalidrawLoading from './ExcalidrawLoading'
 import { useExcalidrawCollaboration } from '../hooks/useExcalidrawCollaboration'
 import { CollaborationDialog } from '../dialogs/CollaborationDialog'
@@ -71,6 +72,15 @@ const ExcalidrawWrapper = dynamic(
 
       // Hook for theme mode (used within component)
       const { mode: themeMode } = useThemeMode()
+      const { selectedCompany } = useCompanyContext()
+
+      const excalidrawBranding = useMemo(
+        () => ({
+          primaryColor: selectedCompany?.primaryColor || undefined,
+          secondaryColor: selectedCompany?.secondaryColor || undefined,
+        }),
+        [selectedCompany?.primaryColor, selectedCompany?.secondaryColor]
+      )
 
       // Hook for current language
       const locale = useLocale()
@@ -156,10 +166,10 @@ const ExcalidrawWrapper = dynamic(
         }
       }, [excalidrawAPI])
 
-      // Inject dynamic theme CSS based on environment variables and current theme mode
+      // Inject dynamic theme CSS based on selected company branding and current mode
       React.useEffect(() => {
-        injectExcalidrawThemeCSS(themeMode)
-      }, [themeMode])
+        injectExcalidrawThemeCSS(themeMode, excalidrawBranding)
+      }, [themeMode, excalidrawBranding])
 
       // Process initialData - use provided data or fallback to safe defaults
       const safeInitialData = useMemo(() => {

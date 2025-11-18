@@ -6,6 +6,30 @@
  * automatisch zu Excalidraw CSS-Variablen.
  */
 
+export type ExcalidrawThemeOverrides = {
+  primaryColor?: string | null
+  secondaryColor?: string | null
+}
+
+const HEX_COLOR_REGEX = /^#(?:[0-9a-fA-F]{3}){1,2}$/
+
+const normalizeHexColor = (color?: string | null): string | null => {
+  if (!color) return null
+  const trimmed = color.trim()
+  if (!trimmed) return null
+  const prefixed = trimmed.startsWith('#') ? trimmed : `#${trimmed}`
+  if (!HEX_COLOR_REGEX.test(prefixed)) {
+    return null
+  }
+
+  if (prefixed.length === 4) {
+    const [, r, g, b] = prefixed
+    return `#${r}${r}${g}${g}${b}${b}`.toUpperCase()
+  }
+
+  return prefixed.toUpperCase()
+}
+
 /**
  * Generates color variants from a main color
  * Verwendet einfache Hex-Manipulation für bessere Kompatibilität
@@ -60,10 +84,16 @@ function darkenColor(color: string, factor: number): string {
  * Erstellt CSS-Variablen für Excalidraw basierend auf Umgebungsvariablen
  * Can be used both client-side and server-side
  */
-export function generateExcalidrawThemeVariables() {
-  // Read theme colors from environment variables
-  const primaryColor = process.env.NEXT_PUBLIC_THEME_PRIMARY_COLOR || '#0066CC'
-  const secondaryColor = process.env.NEXT_PUBLIC_THEME_SECONDARY_COLOR || '#00AEEF'
+export function generateExcalidrawThemeVariables(overrides?: ExcalidrawThemeOverrides) {
+  // Read theme colors from overrides first, then environment variables
+  const primaryColor =
+    normalizeHexColor(overrides?.primaryColor) ||
+    normalizeHexColor(process.env.NEXT_PUBLIC_THEME_PRIMARY_COLOR) ||
+    '#0066CC'
+  const secondaryColor =
+    normalizeHexColor(overrides?.secondaryColor) ||
+    normalizeHexColor(process.env.NEXT_PUBLIC_THEME_SECONDARY_COLOR) ||
+    '#00AEEF'
 
   // Farbvarianten generieren
   const primaryVariants = generateExcalidrawColorVariants(primaryColor)
@@ -159,8 +189,8 @@ export function generateExcalidrawThemeVariables() {
 /**
  * Generiert CSS-Text für Excalidraw Theme-Variablen
  */
-export function generateExcalidrawThemeCSS(): string {
-  const themeVars = generateExcalidrawThemeVariables()
+export function generateExcalidrawThemeCSS(overrides?: ExcalidrawThemeOverrides): string {
+  const themeVars = generateExcalidrawThemeVariables(overrides)
 
   const lightCSS = Object.entries(themeVars.light)
     .map(([key, value]) => `  ${key}: ${value} !important;`)

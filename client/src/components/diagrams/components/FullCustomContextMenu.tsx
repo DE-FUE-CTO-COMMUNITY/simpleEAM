@@ -147,7 +147,7 @@ export const FullCustomContextMenu: React.FC<CustomContextMenuProps> = ({
       // Simuliere Cut: Kopiere und lösche
       if (selectedElements.length > 0) {
         // Create copy for clipboard
-        const elementsForClipboard = selectedElements.map(element => {
+        const elementsForClipboard = selectedElements.map((el: any) => ({
           ...el,
           id: `copy_${el.id}_${Date.now()}`,
         }))

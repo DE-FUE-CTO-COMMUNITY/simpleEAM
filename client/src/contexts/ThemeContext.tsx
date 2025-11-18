@@ -1,8 +1,9 @@
 'use client'
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react'
 import { Theme, ThemeProvider as MuiThemeProvider } from '@mui/material/styles'
 import { createDynamicTheme } from '@/theme/dynamic-theme'
+import { useCompanyContext } from '@/contexts/CompanyContext'
 
 type ThemeMode = 'light' | 'dark'
 
@@ -31,9 +32,22 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   // Initialize with light mode as default
   const [mode, setMode] = useState<ThemeMode>('light')
   const [mounted, setMounted] = useState(false)
+  const { selectedCompany } = useCompanyContext()
+
+  const brandingOverrides = useMemo(() => {
+    if (!selectedCompany) return undefined
+    return {
+      primaryColor: selectedCompany.primaryColor || undefined,
+      secondaryColor: selectedCompany.secondaryColor || undefined,
+      fontFamily: selectedCompany.font || undefined,
+    }
+  }, [selectedCompany])
 
   // Create theme based on current mode
-  const theme = createDynamicTheme(mode)
+  const theme = useMemo(
+    () => createDynamicTheme(mode, brandingOverrides),
+    [mode, brandingOverrides]
+  )
 
   // LocalStorage integration with hydration protection
   useEffect(() => {
@@ -75,12 +89,14 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
       <ThemeContext.Provider
         value={{
           mode: 'light',
-          theme: createDynamicTheme('light'),
+          theme: createDynamicTheme('light', brandingOverrides),
           toggleTheme: () => {},
           setThemeMode: () => {},
         }}
       >
-        <MuiThemeProvider theme={createDynamicTheme('light')}>{children}</MuiThemeProvider>
+        <MuiThemeProvider theme={createDynamicTheme('light', brandingOverrides)}>
+          {children}
+        </MuiThemeProvider>
       </ThemeContext.Provider>
     )
   }

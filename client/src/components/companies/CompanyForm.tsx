@@ -5,12 +5,17 @@ import { useForm } from '@tanstack/react-form'
 import { useTranslations } from 'next-intl'
 import { useQuery } from '@apollo/client'
 import { z } from 'zod'
-import { CompanyType, CompanyFormValues } from './types'
+import { CompanyType, CompanyFormValues, EXCALIDRAW_FONTS } from './types'
 import { CompanySize, Person } from '../../gql/generated'
 import { GET_PERSONS } from '@/graphql/person'
 import GenericForm, { FieldConfig, TabConfig } from '../common/GenericForm'
 import { GenericFormProps } from '../common/GenericFormProps'
 import { isArchitect } from '@/lib/auth'
+
+const HEX_COLOR_REGEX = /^#(?:[0-9a-fA-F]{3}){1,2}$/
+const DEFAULT_DIAGRAM_FONT = EXCALIDRAW_FONTS[0]
+const getFontPreviewFamily = (font: string) =>
+  `"${font}", "Segoe UI", "Nunito", "Helvetica Neue", sans-serif`
 
 // Schema for form validation (export for external use)
 export const companySchema = z.object({
@@ -21,6 +26,11 @@ export const companySchema = z.object({
   website: z.string().url().optional().or(z.literal('')),
   size: z.nativeEnum(CompanySize).optional(),
   employees: z.array(z.string()).optional(),
+  primaryColor: z.string().regex(HEX_COLOR_REGEX).optional().or(z.literal('')),
+  secondaryColor: z.string().regex(HEX_COLOR_REGEX).optional().or(z.literal('')),
+  font: z.string().max(200).optional().or(z.literal('')),
+  diagramFont: z.enum(EXCALIDRAW_FONTS).optional(),
+  logo: z.string().url().optional().or(z.literal('')),
 })
 
 const CompaniesForm: React.FC<GenericFormProps<CompanyType, CompanyFormValues>> = ({
@@ -53,7 +63,22 @@ const CompaniesForm: React.FC<GenericFormProps<CompanyType, CompanyFormValues>> 
       website: '',
       size: undefined,
       employees: [],
+      primaryColor: '',
+      secondaryColor: '',
+      font: '',
+      diagramFont: DEFAULT_DIAGRAM_FONT,
+      logo: '',
     }),
+    []
+  )
+
+  const diagramFontOptions = React.useMemo(
+    () =>
+      EXCALIDRAW_FONTS.map(font => ({
+        value: font,
+        label: font,
+        style: { fontFamily: getFontPreviewFamily(font) },
+      })),
     []
   )
 
@@ -82,6 +107,11 @@ const CompaniesForm: React.FC<GenericFormProps<CompanyType, CompanyFormValues>> 
       form.setFieldValue('industry', company.industry || '')
       form.setFieldValue('website', company.website || '')
       form.setFieldValue('size', company.size || undefined)
+      form.setFieldValue('primaryColor', company.primaryColor || '')
+      form.setFieldValue('secondaryColor', company.secondaryColor || '')
+      form.setFieldValue('font', company.font || '')
+      form.setFieldValue('diagramFont', company.diagramFont || DEFAULT_DIAGRAM_FONT)
+      form.setFieldValue('logo', company.logo || '')
       form.setFieldValue(
         'employees',
         (company as any).employees?.map((emp: Person) => emp.id) || []
@@ -187,6 +217,90 @@ const CompaniesForm: React.FC<GenericFormProps<CompanyType, CompanyFormValues>> 
         label: size.charAt(0) + size.slice(1).toLowerCase(),
       })),
     },
+    {
+      name: 'primaryColor',
+      label: t('form.primaryColor'),
+      type: 'text',
+      required: false,
+      tabId: 'branding',
+      placeholder: '#0A66FF',
+      helperText: t('form.primaryColorHelperText'),
+      validators: {
+        onChange: ({ value }: { value: string }) => {
+          if (value && !HEX_COLOR_REGEX.test(value)) {
+            return tForms('validation.hexColor')
+          }
+          return undefined
+        },
+      },
+    },
+    {
+      name: 'secondaryColor',
+      label: t('form.secondaryColor'),
+      type: 'text',
+      required: false,
+      tabId: 'branding',
+      placeholder: '#172B4D',
+      helperText: t('form.secondaryColorHelperText'),
+      validators: {
+        onChange: ({ value }: { value: string }) => {
+          if (value && !HEX_COLOR_REGEX.test(value)) {
+            return tForms('validation.hexColor')
+          }
+          return undefined
+        },
+      },
+    },
+    {
+      name: 'font',
+      label: t('form.font'),
+      type: 'text',
+      required: false,
+      tabId: 'branding',
+      helperText: t('form.fontHelperText'),
+      validators: {
+        onChange: ({ value }: { value: string }) => {
+          if (value && value.length > 200) {
+            return tForms('validation.maxLength', { count: 200 })
+          }
+          return undefined
+        },
+      },
+    },
+    {
+      name: 'diagramFont',
+      label: t('form.diagramFont'),
+      type: 'select',
+      required: false,
+      tabId: 'branding',
+      helperText: t('form.diagramFontHelperText'),
+      options: diagramFontOptions,
+      selectRenderValue: (value, option) => {
+        const fontName = (option?.value as string) || (value as string) || DEFAULT_DIAGRAM_FONT
+        const label = option?.label || value || t('form.diagramFont')
+        return <span style={{ fontFamily: getFontPreviewFamily(fontName) }}>{label}</span>
+      },
+    },
+    {
+      name: 'logo',
+      label: t('form.logo'),
+      type: 'text',
+      required: false,
+      tabId: 'branding',
+      helperText: t('form.logoHelperText'),
+      validators: {
+        onChange: ({ value }: { value: string }) => {
+          if (value && value !== '') {
+            try {
+              new URL(value.startsWith('http') ? value : `https://${value}`)
+            } catch {
+              return tForms('validation.url')
+            }
+          }
+          return undefined
+        },
+      },
+    },
     // Mitarbeiter-Feld (Tab: employees)
     {
       name: 'employees',
@@ -220,6 +334,7 @@ const CompaniesForm: React.FC<GenericFormProps<CompanyType, CompanyFormValues>> 
   // Tab-Konfigurationen definieren
   const tabs: TabConfig[] = [
     { id: 'general', label: t('tabs.general') },
+    { id: 'branding', label: t('tabs.branding') },
     { id: 'employees', label: t('tabs.employees') },
   ]
 

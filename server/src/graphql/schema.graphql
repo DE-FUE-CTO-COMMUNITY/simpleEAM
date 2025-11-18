@@ -454,6 +454,11 @@ type Company
   website: String
   industry: String
   size: CompanySize
+  primaryColor: String
+  secondaryColor: String
+  font: String
+  diagramFont: String
+  logo: String
   createdAt: DateTime! @timestamp(operations: [CREATE])
   updatedAt: DateTime @timestamp(operations: [UPDATE])
   organisations: [Organisation!]! @relationship(type: "BELONGS_TO", direction: IN)

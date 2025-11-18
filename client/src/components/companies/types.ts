@@ -8,6 +8,15 @@
 
 import { Company as GeneratedCompany, CompanySize } from '../../gql/generated'
 
+export const EXCALIDRAW_FONTS = [
+  'Virgil',
+  'Comic Shanns',
+  'Excalifont',
+  'Lilita One',
+  'Nunito',
+] as const satisfies readonly [string, ...string[]]
+export type ExcalidrawFont = (typeof EXCALIDRAW_FONTS)[number]
+
 // Use the generated type as basis and adapt it for our components
 export type CompanyType = Pick<
   GeneratedCompany,
@@ -17,6 +26,11 @@ export type CompanyType = Pick<
   | 'address'
   | 'industry'
   | 'website'
+  | 'primaryColor'
+  | 'secondaryColor'
+  | 'font'
+  | 'diagramFont'
+  | 'logo'
   | 'size'
   | 'createdAt'
   | 'updatedAt'
@@ -57,4 +71,9 @@ export interface CompanyFormValues {
   website?: string
   size?: CompanySize
   employees?: string[] // IDs der zugeordneten Personen
+  primaryColor?: string
+  secondaryColor?: string
+  font?: string
+  diagramFont?: ExcalidrawFont
+  logo?: string
 }

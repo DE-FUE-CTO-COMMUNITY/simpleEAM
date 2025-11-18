@@ -20,6 +20,16 @@ import CompanyFilterDialog from '@/components/companies/CompanyFilterDialog'
 import { useCompanyFilter } from '@/components/companies/useCompanyFilter'
 import { CompanyType, CompanyFormValues } from '@/components/companies/types'
 
+const sanitizeCreateString = (value?: string | null) => {
+  const trimmed = value?.trim()
+  return trimmed && trimmed.length > 0 ? trimmed : undefined
+}
+
+const sanitizeUpdateString = (value?: string | null) => {
+  const trimmed = value?.trim()
+  return trimmed && trimmed.length > 0 ? trimmed : null
+}
+
 const CompaniesPage = () => {
   // Admin guard similar to admin page
   const [isAuthorized, setIsAuthorized] = React.useState(false)
@@ -107,6 +117,11 @@ const CompaniesPage = () => {
             address: { set: values.address },
             industry: { set: values.industry },
             website: { set: values.website },
+            primaryColor: { set: sanitizeUpdateString(values.primaryColor) },
+            secondaryColor: { set: sanitizeUpdateString(values.secondaryColor) },
+            font: { set: sanitizeUpdateString(values.font) },
+            diagramFont: { set: sanitizeUpdateString(values.diagramFont) },
+            logo: { set: sanitizeUpdateString(values.logo) },
             size: { set: values.size },
             employees: employeesUpdate,
           },
@@ -225,6 +240,11 @@ const CompaniesPage = () => {
                 address: values.address,
                 industry: values.industry,
                 website: values.website,
+                primaryColor: sanitizeCreateString(values.primaryColor),
+                secondaryColor: sanitizeCreateString(values.secondaryColor),
+                font: sanitizeCreateString(values.font),
+                diagramFont: sanitizeCreateString(values.diagramFont),
+                logo: sanitizeCreateString(values.logo),
                 size: values.size,
                 employees: values.employees?.length
                   ? {

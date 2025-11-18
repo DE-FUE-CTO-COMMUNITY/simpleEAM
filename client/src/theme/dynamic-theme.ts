@@ -1,5 +1,30 @@
 import { createTheme, ThemeOptions } from '@mui/material/styles'
 
+export type ThemeBrandingOverrides = {
+  primaryColor?: string | null
+  secondaryColor?: string | null
+  fontFamily?: string | null
+}
+
+const HEX_COLOR_REGEX = /^#(?:[0-9a-fA-F]{3}){1,2}$/
+
+const normalizeHexColor = (color?: string | null): string | null => {
+  if (!color) return null
+  const trimmed = color.trim()
+  if (!trimmed) return null
+  const prefixed = trimmed.startsWith('#') ? trimmed : `#${trimmed}`
+  if (!HEX_COLOR_REGEX.test(prefixed)) {
+    return null
+  }
+
+  if (prefixed.length === 4) {
+    const [, r, g, b] = prefixed
+    return `#${r}${r}${g}${g}${b}${b}`.toUpperCase()
+  }
+
+  return prefixed.toUpperCase()
+}
+
 // Color palette for the Corporate Design - dynamically from environment variables
 declare module '@mui/material/styles' {
   interface PaletteColor {
@@ -51,9 +76,7 @@ function generateColorVariants(mainColor: string) {
   }
 
   // Fallback: Use the original color for all variants
-  console.warn(
-    `No color variants defined for ${mainColor}. Using original color as fallback.`
-  )
+  console.warn(`No color variants defined for ${mainColor}. Using original color as fallback.`)
   return {
     light: mainColor,
     dark: mainColor,
@@ -67,29 +90,30 @@ function generateColorVariants(mainColor: string) {
  * Supports both legacy and new variable names
  */
 export function createDynamicTheme(
-  mode: 'light' | 'dark' = 'light'
+  mode: 'light' | 'dark' = 'light',
+  branding?: ThemeBrandingOverrides
 ): ReturnType<typeof createTheme> {
-  // Primary Color from environment variables
-  const primaryColor =
-    process.env.NEXT_PUBLIC_THEME_PRIMARY_COLOR ||
-    process.env.NEXT_PUBLIC_PRIMARY_COLOR ||
-    '#0066CC' // Atos Blue als Fallback
+  const resolvedPrimary =
+    normalizeHexColor(branding?.primaryColor) ||
+    normalizeHexColor(process.env.NEXT_PUBLIC_THEME_PRIMARY_COLOR) ||
+    normalizeHexColor(process.env.NEXT_PUBLIC_PRIMARY_COLOR) ||
+    '#0066CC'
 
-  // Secondary Color from environment variables
-  const secondaryColor =
-    process.env.NEXT_PUBLIC_THEME_SECONDARY_COLOR ||
-    process.env.NEXT_PUBLIC_SECONDARY_COLOR ||
-    '#00AEEF' // Atos Light Blue als Fallback
+  const resolvedSecondary =
+    normalizeHexColor(branding?.secondaryColor) ||
+    normalizeHexColor(process.env.NEXT_PUBLIC_THEME_SECONDARY_COLOR) ||
+    normalizeHexColor(process.env.NEXT_PUBLIC_SECONDARY_COLOR) ||
+    '#00AEEF'
 
-  // Font Family from environment variables
   const fontFamily =
+    (branding?.fontFamily && branding.fontFamily.trim()) ||
     process.env.NEXT_PUBLIC_THEME_FONT_FAMILY ||
     process.env.NEXT_PUBLIC_FONT_FAMILY ||
     '"Roboto", "Helvetica", "Arial", sans-serif'
 
   // Farbvarianten generieren
-  const primaryVariants = generateColorVariants(primaryColor)
-  const secondaryVariants = generateColorVariants(secondaryColor)
+  const primaryVariants = generateColorVariants(resolvedPrimary)
+  const secondaryVariants = generateColorVariants(resolvedSecondary)
 
   // Base palette configuration depending on mode
   const basePalette =
@@ -121,14 +145,14 @@ export function createDynamicTheme(
     palette: {
       mode,
       primary: {
-        main: primaryColor,
+        main: resolvedPrimary,
         light: primaryVariants.light,
         dark: primaryVariants.dark,
         lighter: primaryVariants.lighter,
         darker: primaryVariants.darker,
       },
       secondary: {
-        main: secondaryColor,
+        main: resolvedSecondary,
         light: secondaryVariants.light,
         dark: secondaryVariants.dark,
       },

@@ -30,7 +30,8 @@ export const useDiagramHandlers = (
   setNotification: (notification: NotificationState) => void,
   _setSaveDialogOpen: (open: boolean) => void,
   _setSaveAsDialogOpen: (open: boolean) => void,
-  _lastSavedScene: any
+  _lastSavedScene: any,
+  defaultFontFamily: number
 ) => {
   const apolloClient = useApolloClient()
   const { selectedCompanyId } = useCompanyContext()
@@ -43,6 +44,45 @@ export const useDiagramHandlers = (
 
   // Ref to track the timestamp when we last completed a load operation
   const lastLoadCompletedRef = useRef<number>(0)
+
+  const applyDefaultFontToScene = useCallback(
+    (sceneData: any) => {
+      if (!sceneData) {
+        return sceneData
+      }
+
+      const patchedAppState = {
+        ...(sceneData.appState || {}),
+        currentItemFontFamily: defaultFontFamily,
+      }
+
+      if (!Array.isArray(sceneData.elements)) {
+        return {
+          ...sceneData,
+          appState: patchedAppState,
+        }
+      }
+
+      let requiresUpdate = false
+      const elementsWithFont = sceneData.elements.map((element: any) => {
+        if (element?.type === 'text' && element.fontFamily !== defaultFontFamily) {
+          requiresUpdate = true
+          return {
+            ...element,
+            fontFamily: defaultFontFamily,
+          }
+        }
+        return element
+      })
+
+      return {
+        ...sceneData,
+        elements: requiresUpdate ? elementsWithFont : sceneData.elements,
+        appState: patchedAppState,
+      }
+    },
+    [defaultFontFamily]
+  )
 
   // New Diagram Handler
   const handleNewDiagram = useCallback(() => {
@@ -61,9 +101,10 @@ export const useDiagramHandlers = (
         activeTool: { type: 'selection' },
         isLoading: false,
         errorMessage: null,
+        currentItemFontFamily: defaultFontFamily,
       },
     }
-    const restoredScene = restoreSceneData(emptyScene)
+    const restoredScene = applyDefaultFontToScene(restoreSceneData(emptyScene))
 
     // Set loading flag to prevent onChange from setting hasUnsavedChanges during scene update
     isLoadingRef.current = true
@@ -96,6 +137,8 @@ export const useDiagramHandlers = (
       severity: 'info',
     })
   }, [
+    applyDefaultFontToScene,
+    defaultFontFamily,
     excalidrawAPI,
     setCurrentDiagram,
     setCurrentScene,
@@ -117,9 +160,10 @@ export const useDiagramHandlers = (
         hoveredElementIds: {},
         selectedGroupIds: {},
         activeTool: { type: 'selection' },
+        currentItemFontFamily: defaultFontFamily,
       },
     }
-    const restoredScene = restoreSceneData(emptyScene)
+    const restoredScene = applyDefaultFontToScene(restoreSceneData(emptyScene))
     if (excalidrawAPI) {
       excalidrawAPI.updateScene(restoredScene)
     }
@@ -133,7 +177,7 @@ export const useDiagramHandlers = (
       message: 'messages.diagramDeleted',
       severity: 'success',
     })
-  }, [excalidrawAPI, setCurrentDiagram, setCurrentScene, setNotification])
+  }, [applyDefaultFontToScene, defaultFontFamily, excalidrawAPI, setCurrentDiagram, setCurrentScene, setNotification])
 
   // Open Diagram Handler
   const handleOpenDiagram = useCallback(
@@ -250,7 +294,7 @@ export const useDiagramHandlers = (
           sceneData.appState.zoom = { value: savedViewportState.zoom }
         }
 
-        const restoredScene = restoreSceneData(sceneData)
+        const restoredScene = applyDefaultFontToScene(restoreSceneData(sceneData))
 
         // Sicherstellen, dass die Excalidraw-API-Methoden verfügbar sind
         if (typeof api.updateScene !== 'function') {
@@ -368,6 +412,7 @@ export const useDiagramHandlers = (
     },
     [
       apolloClient,
+      applyDefaultFontToScene,
       excalidrawAPI,
       setCurrentDiagram,
       setCurrentScene,
@@ -698,7 +743,7 @@ export const useDiagramHandlers = (
               finalData = updateDiagramDatabaseIds(processedData, idMappingMap)
             }
 
-            const restoredScene = restoreSceneData(finalData)
+            const restoredScene = applyDefaultFontToScene(restoreSceneData(finalData))
             excalidrawAPI.updateScene(restoredScene)
             setCurrentScene(restoredScene)
 
@@ -741,7 +786,14 @@ export const useDiagramHandlers = (
       }
     }
     input.click()
-  }, [apolloClient, excalidrawAPI, setCurrentScene, setCurrentDiagram, setNotification])
+  }, [
+    apolloClient,
+    applyDefaultFontToScene,
+    excalidrawAPI,
+    setCurrentScene,
+    setCurrentDiagram,
+    setNotification,
+  ])
 
   // PNG Export Handler
   const handleExportPNG = useCallback(async () => {
