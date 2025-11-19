@@ -66,6 +66,13 @@ lib-cov/
 # Keycloak
 auth/src/*.jar
 auth/data/
+auth/themes/*
+!auth/themes/simple-eam/
+!auth/themes/simple-eam/**
+
+# Branding assets (kept local per customer)
+client/public/brand-images/*
+!client/public/brand-images/.gitkeep
 
 # Temporäre Dateien
 tmp/

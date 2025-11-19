@@ -88,7 +88,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, menuItems, handleDrawerToggle, 
           px: [1],
         }}
       >
-        {open && <Logo height={30} />}
+        {open && <Logo height={30} sx={{ ml: '58px' }} />}
         <IconButton onClick={handleDrawerToggle}>
           <ChevronLeftIcon />
         </IconButton>
