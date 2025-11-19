@@ -3,10 +3,6 @@
     {
       "name": "Simple-EAM (Main)",
       "path": "."
-    },
-    {
-      "name": "Excalidraw Fork",
-      "path": "./packages/simple-eam-excalidraw"
     }
   ],
   "settings": {
