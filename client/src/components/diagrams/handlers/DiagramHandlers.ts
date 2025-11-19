@@ -177,7 +177,14 @@ export const useDiagramHandlers = (
       message: 'messages.diagramDeleted',
       severity: 'success',
     })
-  }, [applyDefaultFontToScene, defaultFontFamily, excalidrawAPI, setCurrentDiagram, setCurrentScene, setNotification])
+  }, [
+    applyDefaultFontToScene,
+    defaultFontFamily,
+    excalidrawAPI,
+    setCurrentDiagram,
+    setCurrentScene,
+    setNotification,
+  ])
 
   // Open Diagram Handler
   const handleOpenDiagram = useCallback(

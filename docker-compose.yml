@@ -78,6 +78,8 @@ services:
       - KC_HTTP_ENABLED=true
       - KC_PROXY=edge
       - KC_HEALTH_ENABLED=true
+    ports:
+      - "${KEYCLOAK_EXTERNAL_PORT}:${KEYCLOAK_INTERNAL_PORT}"
     command:
       - start
       - --import-realm

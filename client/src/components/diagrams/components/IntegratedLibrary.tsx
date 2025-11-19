@@ -232,12 +232,7 @@ const IntegratedLibrary: React.FC<IntegratedLibraryProps> = ({
     const combinedLibraryItems = [...normalizedArchimateLibrary.libraryItems, ...newLibraryItems]
 
     return combinedLibraryItems
-  }, [
-    data,
-    defaultFontFamily,
-    fontFamilyName,
-    normalizedArchimateLibrary,
-  ])
+  }, [data, defaultFontFamily, fontFamilyName, normalizedArchimateLibrary])
 
   // Update library when ready
   useEffect(() => {
@@ -350,7 +345,12 @@ function createLibraryItemFromDatabaseElement(
       const fontSize = elementType === 'applicationInterface' ? 16 : element.fontSize || 20
 
       // Auto-wrap text to fit within available width
-      const wrappedText = wrapTextToFitWidth(dbElement.name, availableWidth, fontSize, fontFamilyName)
+      const wrappedText = wrapTextToFitWidth(
+        dbElement.name,
+        availableWidth,
+        fontSize,
+        fontFamilyName
+      )
 
       newElement.text = wrappedText
       newElement.originalText = wrappedText

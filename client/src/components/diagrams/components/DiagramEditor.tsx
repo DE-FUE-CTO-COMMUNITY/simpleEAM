@@ -310,11 +310,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
 
   useEffect(() => {
     enforceCompanyFontFamily()
-  }, [
-    enforceCompanyFontFamily,
-    currentDiagram?.id,
-    currentScene?.appState?.currentItemFontFamily,
-  ])
+  }, [enforceCompanyFontFamily, currentDiagram?.id, currentScene?.appState?.currentItemFontFamily])
 
   // Related Elements handlers
   const handleOpenAddRelatedElementsDialog = useCallback(

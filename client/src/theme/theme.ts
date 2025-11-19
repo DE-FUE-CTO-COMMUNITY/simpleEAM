@@ -1,6 +1,5 @@
 import { createTheme, ThemeOptions } from '@mui/material/styles'
 
-// Color palette for the Atos Corporate Design
 declare module '@mui/material/styles' {
   interface PaletteColor {
     lighter?: string
@@ -17,14 +16,14 @@ export const themeOptions: ThemeOptions = {
   palette: {
     mode: 'light',
     primary: {
-      main: '#0066CC', // Atos Blue
-      light: '#4D94E0',
-      dark: '#004C99',
-      lighter: '#E6F0FF',
-      darker: '#003366',
+      main: '#00bbd4',
+      light: '#26c5da',
+      dark: '#00abc1',
+      lighter: '#80deea',
+      darker: '#00828f',
     },
     secondary: {
-      main: '#00AEEF', // Atos Light Blue
+      main: '#00AEEF',
       light: '#4DC8F4',
       dark: '#007DBC',
     },

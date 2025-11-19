@@ -1,11 +1,11 @@
 :root {
-  --pf-global--primary-color--100: #0073e6;
-  --pf-global--primary-color--200: #0961d4;
-  --pf-global--primary-color--dark-100: #1041b5;
+  --pf-global--primary-color--100: #00bbd4;
+  --pf-global--primary-color--200: #00abc1;
+  --pf-global--primary-color--dark-100: #005f64;
 }
 
 a {
-  color: #002d3c;
+  color: #4e342e;
 }
 
 /* Patternfly CSS places a "bg-login.jpg" as the background on this ".login-pf" class.
@@ -16,7 +16,7 @@ a {
 }
 
 .login-pf body {
-  background: url('../img/atos-bg.png') no-repeat center center fixed;
+  background: #00bbd4;
   background-size: cover;
   height: 100%;
 }
@@ -88,7 +88,7 @@ a#kc-current-locale-link::after {
 }
 
 div.kc-logo-text {
-  background-image: url(../img/New_Atos_logo_blue_RGB.png);
+  background-image: url(../img/Simple-EAM-Logo.svg);
   background-size: 300px 97px;
   background-repeat: no-repeat;
   height: 97px;

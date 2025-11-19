@@ -50,25 +50,7 @@ function generateColorVariants(mainColor: string) {
   const colorVariants: Record<
     string,
     { light: string; dark: string; lighter?: string; darker?: string }
-  > = {
-    // Atos Colors
-    '#0066CC': { light: '#4D94E0', dark: '#004C99', lighter: '#E6F0FF', darker: '#003366' },
-    '#00AEEF': { light: '#4DC8F4', dark: '#007DBC' },
-
-    // DIN Colors
-    '#004164': { light: '#336B8A', dark: '#002A42', lighter: '#E8F1F5', darker: '#001A28' },
-    '#821E3C': { light: '#A94866', dark: '#5A1529', lighter: '#F4E8EC', darker: '#3D0F1C' },
-
-    // MF2 Colors
-    '#c9ece1': { light: '#E0F6F0', dark: '#A8D4C6', lighter: '#F0FAF7', darker: '#8BC2B3' },
-    '#2765c3': { light: '#5A8BD9', dark: '#1B4A94', lighter: '#E7F0FB', darker: '#123468' },
-
-    // Fallback for unknown colors
-    '#D32F2F': { light: '#EF5350', dark: '#C62828' },
-    '#ED6C02': { light: '#FF9800', dark: '#E65100' },
-    '#0288D1': { light: '#03A9F4', dark: '#01579B' },
-    '#2E7D32': { light: '#4CAF50', dark: '#1B5E20' },
-  }
+  > = {}
 
   const variants = colorVariants[mainColor.toUpperCase()]
   if (variants) {
