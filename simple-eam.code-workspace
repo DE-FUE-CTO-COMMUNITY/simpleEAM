@@ -2,20 +2,20 @@
   "folders": [
     {
       "name": "Simple-EAM (Main)",
-      "path": "."
-    }
+      "path": ".",
+    },
   ],
   "settings": {
     "git.detectSubmodules": true,
     "git.detectSubmodulesLimit": 10,
     "git.fetchOnPull": true,
-    "git.submoduleSupport": "enabled"
+    "git.submoduleSupport": "enabled",
   },
   "extensions": {
     "recommendations": [
       "ms-vscode.vscode-typescript-next",
       "bradlc.vscode-tailwindcss",
-      "esbenp.prettier-vscode"
-    ]
-  }
+      "esbenp.prettier-vscode",
+    ],
+  },
 }

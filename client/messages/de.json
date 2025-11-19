@@ -736,6 +736,7 @@
       "number": "Bitte geben Sie eine gültige Zahl ein",
       "positive": "Bitte geben Sie eine positive Zahl ein",
       "integer": "Bitte geben Sie eine ganze Zahl ein",
+      "validationError": "Validierungsfehler",
       "noFormData": "Keine Formulardaten vorhanden"
     },
     "placeholders": {

@@ -5,7 +5,7 @@ import { useForm } from '@tanstack/react-form'
 import { useTranslations } from 'next-intl'
 import { useQuery } from '@apollo/client'
 import { z } from 'zod'
-import { CompanyType, CompanyFormValues, EXCALIDRAW_FONTS } from './types'
+import { CompanyType, CompanyFormValues, EXCALIDRAW_FONTS, ExcalidrawFont } from './types'
 import { CompanySize, Person } from '../../gql/generated'
 import { GET_PERSONS } from '@/graphql/person'
 import GenericForm, { FieldConfig, TabConfig } from '../common/GenericForm'
@@ -13,9 +13,17 @@ import { GenericFormProps } from '../common/GenericFormProps'
 import { isArchitect } from '@/lib/auth'
 
 const HEX_COLOR_REGEX = /^#(?:[0-9a-fA-F]{3}){1,2}$/
-const DEFAULT_DIAGRAM_FONT = EXCALIDRAW_FONTS[0]
+const DEFAULT_DIAGRAM_FONT: ExcalidrawFont = EXCALIDRAW_FONTS[0]
 const getFontPreviewFamily = (font: string) =>
   `"${font}", "Segoe UI", "Nunito", "Helvetica Neue", sans-serif`
+
+const normalizeDiagramFont = (font?: string | null): ExcalidrawFont => {
+  if (font && (EXCALIDRAW_FONTS as readonly string[]).includes(font)) {
+    return font as ExcalidrawFont
+  }
+
+  return DEFAULT_DIAGRAM_FONT
+}
 
 // Schema for form validation (export for external use)
 export const companySchema = z.object({
@@ -110,7 +118,7 @@ const CompaniesForm: React.FC<GenericFormProps<CompanyType, CompanyFormValues>> 
       form.setFieldValue('primaryColor', company.primaryColor || '')
       form.setFieldValue('secondaryColor', company.secondaryColor || '')
       form.setFieldValue('font', company.font || '')
-      form.setFieldValue('diagramFont', company.diagramFont || DEFAULT_DIAGRAM_FONT)
+      form.setFieldValue('diagramFont', normalizeDiagramFont(company.diagramFont))
       form.setFieldValue('logo', company.logo || '')
       form.setFieldValue(
         'employees',

@@ -27,14 +27,15 @@ let cachedConfig: RuntimeConfig | null = null
  * This allows configuration changes without rebuilding the client
  */
 export async function loadRuntimeConfig(): Promise<RuntimeConfig> {
-  if (cachedConfig) {
-    return cachedConfig
+  const existingConfig = cachedConfig
+  if (existingConfig) {
+    return existingConfig
   }
 
   try {
     const response = await fetch('/api/config')
     if (response.ok) {
-      cachedConfig = await response.json()
+      cachedConfig = (await response.json()) as RuntimeConfig
       return cachedConfig
     }
   } catch (error) {

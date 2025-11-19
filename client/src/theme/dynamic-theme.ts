@@ -18,7 +18,12 @@ const normalizeHexColor = (color?: string | null): string | null => {
   }
 
   if (prefixed.length === 4) {
-    const [, r, g, b] = prefixed
+    const r = prefixed[1]
+    const g = prefixed[2]
+    const b = prefixed[3]
+    if (!r || !g || !b) {
+      return null
+    }
     return `#${r}${r}${g}${g}${b}${b}`.toUpperCase()
   }
 
@@ -337,6 +342,3 @@ export function createDynamicTheme(
 
   return createTheme(themeOptions)
 }
-
-// Statisches Theme als Fallback exportieren
-export { default as staticTheme } from './theme'

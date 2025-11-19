@@ -61,7 +61,7 @@ const IntegratedLibrary: React.FC<IntegratedLibraryProps> = ({
       return null
     }
 
-    const patchedItems = archimateLibrary.libraryItems.map(item => {
+    const patchedItems = archimateLibrary.libraryItems.map((item: { elements?: any[] }) => {
       if (!Array.isArray(item.elements)) {
         return item
       }
