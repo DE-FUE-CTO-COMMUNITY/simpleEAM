@@ -11,7 +11,7 @@ dotenv.config()
 const typeDefs = readFileSync(resolve(__dirname, 'schema.graphql')).toString('utf-8')
 
 // Construct JWKS URL
-const KEYCLOAK_URL = process.env.KEYCLOAK_URL || 'https://auth.dev-server.mf2.eu'
+const KEYCLOAK_URL = process.env.KEYCLOAK_URL || 'http://localhost:8080'
 const KEYCLOAK_REALM = process.env.KEYCLOAK_REALM || 'simple-eam'
 const jwksUrl = `${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/certs`
 

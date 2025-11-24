@@ -10,14 +10,27 @@ import { keycloak } from './auth'
 export function createApolloClient(initialToken?: string) {
   // HTTP link for GraphQL endpoint
   const httpLink = new HttpLink({
-    uri: process.env.GRAPHQL_URL || 'https://api.dev-server.mf2.eu/graphql',
+    uri: process.env.GRAPHQL_URL || 'http://localhost:4000/graphql',
   })
 
   // Authentifizierungs-Link für dynamisches Token-Handling
-  const authLink = setContext((_, { headers }) => {
+  const authLink = setContext(async (_, { headers }) => {
+    // Try to refresh token if it's about to expire
+    if (keycloak && keycloak.isTokenExpired(30)) {
+      try {
+        await keycloak.updateToken(30)
+      } catch (error) {
+        console.error('Failed to refresh token:', error)
+      }
+    }
+
     // Get current token from Keycloak instance (if available)
     // or use passed initialToken as fallback
     const currentToken = keycloak?.token || initialToken
+
+    if (!currentToken) {
+      console.warn('No authentication token available for GraphQL request')
+    }
 
     return {
       headers: {

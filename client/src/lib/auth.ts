@@ -77,7 +77,7 @@ async function fetchKeycloakConfig() {
 
   // Fallback to defaults
   keycloakConfig = {
-    url: 'https://auth.dev-server.mf2.eu',
+    url: 'http://localhost:8080',
     realm: 'simple-eam',
     clientId: 'eam-client',
   }

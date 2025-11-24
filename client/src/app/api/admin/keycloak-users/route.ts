@@ -15,7 +15,7 @@ export const GET = withAuth(async (request: NextRequest) => {
   }
   try {
     // Get admin token
-    const keycloakUrl = process.env.KEYCLOAK_URL || 'https://auth.dev-server.mf2.eu'
+    const keycloakUrl = process.env.KEYCLOAK_URL || 'http://localhost:8080'
     const realm = process.env.KEYCLOAK_REALM || 'simple-eam'
 
     const tokenResponse = await fetch(
@@ -133,7 +133,7 @@ export const POST = withAuth(async (request: NextRequest) => {
     }
 
     // Get admin token
-    const keycloakUrl = process.env.KEYCLOAK_URL || 'https://auth.dev-server.mf2.eu'
+    const keycloakUrl = process.env.KEYCLOAK_URL || 'http://localhost:8080'
     const realm = process.env.KEYCLOAK_REALM || 'simple-eam'
 
     const tokenResponse = await fetch(

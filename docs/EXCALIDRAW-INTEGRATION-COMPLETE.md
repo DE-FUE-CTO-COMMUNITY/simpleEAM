@@ -186,7 +186,7 @@ git push origin eam-main
 
 ### Aktueller Status
 
-- ✅ Client läuft auf http://dev-server.mf2.eu:3000
+- ✅ Client läuft auf http://example.com:3000
 - ✅ Excalidraw-Fork vollständig integriert
 - ✅ Alle DiagramEditor-Komponenten funktionsfähig
 - ✅ TypeScript-Unterstützung vollständig

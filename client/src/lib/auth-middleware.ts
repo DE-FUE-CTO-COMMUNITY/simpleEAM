@@ -36,7 +36,7 @@ export async function validateAuth(
     const token = authHeader.substring(7)
 
     // Validate token via Keycloak User Info Endpoint (easier for public clients)
-    const keycloakUrl = process.env.KEYCLOAK_URL || 'https://auth.dev-server.mf2.eu'
+    const keycloakUrl = process.env.KEYCLOAK_URL || 'http://localhost:8080'
     const realm = process.env.KEYCLOAK_REALM || 'simple-eam'
 
     // Use User Info Endpoint (automatically validates token)

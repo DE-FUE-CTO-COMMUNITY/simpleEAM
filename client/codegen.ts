@@ -6,7 +6,7 @@ const config: CodegenConfig = {
   // automatisch Queries und Mutations aus der lokalen Schema-Datei generiert.
   // Diese generierten Operationen sind nur über das laufende GraphQL-Server verfügbar
   // und nicht in der statischen Schema-Datei enthalten.
-  schema: 'https://api.dev-server.mf2.eu/graphql',
+  schema: process.env.GRAPHQL_URL || 'http://localhost:4000/graphql',
   config: {
     // This tells codegen that the `Money` scalar is a number
     scalars: { Money: 'number' },

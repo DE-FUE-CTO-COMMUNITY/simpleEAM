@@ -23,15 +23,15 @@ export interface RuntimeConfig {
 
 export const defaultConfig: RuntimeConfig = {
   keycloak: {
-    url: 'https://auth.dev-server.mf2.eu',
+    url: 'http://localhost:8080',
     realm: 'simple-eam',
     clientId: 'eam-client',
   },
   graphql: {
-    url: 'https://api.dev-server.mf2.eu/graphql',
+    url: 'http://localhost:4000/graphql',
   },
   excalidraw: {
-    wsServerUrl: 'https://room.dev-server.mf2.eu',
+    wsServerUrl: 'http://localhost:3002',
   },
   theme: {
     primaryColor: '#00BCD4',

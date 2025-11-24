@@ -9,19 +9,19 @@ export async function GET() {
   const config = {
     // Keycloak Configuration
     keycloak: {
-      url: process.env.KEYCLOAK_URL || 'https://auth.dev-server.mf2.eu',
+      url: process.env.KEYCLOAK_URL || 'http://localhost:8080',
       realm: process.env.KEYCLOAK_REALM || 'simple-eam',
       clientId: process.env.KEYCLOAK_CLIENT_ID_CLIENT || 'eam-client',
     },
 
     // GraphQL API
     graphql: {
-      url: process.env.GRAPHQL_URL || 'https://api.dev-server.mf2.eu/graphql',
+      url: process.env.GRAPHQL_URL || 'http://localhost:4000/graphql',
     },
 
     // Excalidraw Collaboration
     excalidraw: {
-      wsServerUrl: process.env.EXCALIDRAW_WS_SERVER_URL || 'https://room.dev-server.mf2.eu',
+      wsServerUrl: process.env.EXCALIDRAW_WS_SERVER_URL || 'http://localhost:3002',
     },
 
     // Theme Configuration

@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { withAuth, AuthResult } from '@/lib/auth-middleware'
 
-const KEYCLOAK_URL = process.env.KEYCLOAK_URL || 'https://auth.dev-server.mf2.eu'
-const REALM = process.env.KEYCLOAK_REALM || 'simple-eam'
-const GRAPHQL_URL = process.env.GRAPHQL_URL || 'https://api.dev-server.mf2.eu/graphql'
+const KEYCLOAK_URL = process.env.KEYCLOAK_URL || 'http://localhost:8080'
+const KEYCLOAK_REALM = process.env.KEYCLOAK_REALM || 'simple-eam'
+const REALM = KEYCLOAK_REALM
+const GRAPHQL_URL = process.env.GRAPHQL_URL || 'http://localhost:4000/graphql'
 
 export const POST = withAuth(async (request: NextRequest, auth: AuthResult) => {
   try {

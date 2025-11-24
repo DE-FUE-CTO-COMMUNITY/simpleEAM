@@ -46,7 +46,7 @@
 -
 - VERWENDUNG:
 -
-- 1.  Öffne http://dev-server.mf2.eu:3000/diagrams
+- 1.  Öffne http://example.com:3000/diagrams
 - 2.  Warte bis die Library geladen ist (Benachrichtigung erscheint)
 - 3.  Klicke auf das Library-Symbol in Excalidraw (Bücher-Icon)
 - 4.  Sieh alle ArchiMate-Symbole UND Datenbank-Elemente in einer Library

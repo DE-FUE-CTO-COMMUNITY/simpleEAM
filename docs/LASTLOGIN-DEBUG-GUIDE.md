@@ -136,7 +136,7 @@ Ensure the following environment variables are set:
 # In .env.local or docker-compose.yml:
 KEYCLOAK_ADMIN=admin
 KEYCLOAK_ADMIN_PASSWORD=your_password
-NEXT_PUBLIC_KEYCLOAK_URL=https://auth.dev-server.mf2.eu
+NEXT_PUBLIC_KEYCLOAK_URL=https://auth.example.com
 NEXT_PUBLIC_KEYCLOAK_REALM=simple-eam
 NEXT_PUBLIC_KEYCLOAK_CLIENT_ID=eam-client
 ```
