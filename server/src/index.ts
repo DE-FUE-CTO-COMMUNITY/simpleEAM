@@ -14,7 +14,7 @@ import { neoSchema } from './graphql/schema'
 dotenv.config()
 
 // Server port number (by default 4000)
-const PORT = parseInt(process.env.PORT || '4000')
+const PORT = parseInt(process.env.GRAPHQL_INTERNAL_PORT || '4000')
 
 async function startServer() {
   // Test Neo4j connection
