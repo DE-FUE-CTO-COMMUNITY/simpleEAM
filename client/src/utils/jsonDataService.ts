@@ -10,6 +10,7 @@ import { GET_ARCHITECTURE_PRINCIPLES } from '../graphql/architecturePrinciple'
 import { GET_INFRASTRUCTURES } from '../graphql/infrastructure'
 import { GET_Aicomponents } from '../graphql/aicomponent'
 import { ValidationResult } from '../components/excel/types'
+import { getRequiredFieldsByEntityType, getOptionalFieldsByEntityType } from './excelDataService'
 
 /**
  * Typen für JSON-Export
@@ -635,17 +636,24 @@ export const validateJsonImportData = (
   }
 
   // Get required and optional fields for this entity type
-  const { getRequiredFieldsByEntityType, getOptionalFieldsByEntityType } = require('./excelDataService')
   const requiredFields = getRequiredFieldsByEntityType(entityType)
   const optionalFields = getOptionalFieldsByEntityType(entityType)
   const allValidFields = ['id', ...requiredFields, ...optionalFields]
 
   // Analyze field coverage from the first row
   const fileColumns = data.length > 0 ? Object.keys(data[0]) : []
-  const mandatoryFieldsPresent = requiredFields.filter((field: string) => fileColumns.includes(field))
-  const mandatoryFieldsMissing = requiredFields.filter((field: string) => !fileColumns.includes(field))
-  const optionalFieldsPresent = optionalFields.filter((field: string) => fileColumns.includes(field))
-  const optionalFieldsMissing = optionalFields.filter((field: string) => !fileColumns.includes(field))
+  const mandatoryFieldsPresent = requiredFields.filter((field: string) =>
+    fileColumns.includes(field)
+  )
+  const mandatoryFieldsMissing = requiredFields.filter(
+    (field: string) => !fileColumns.includes(field)
+  )
+  const optionalFieldsPresent = optionalFields.filter((field: string) =>
+    fileColumns.includes(field)
+  )
+  const optionalFieldsMissing = optionalFields.filter(
+    (field: string) => !fileColumns.includes(field)
+  )
   const unmappedColumns = fileColumns.filter((col: string) => !allValidFields.includes(col))
 
   data.forEach((row, index) => {

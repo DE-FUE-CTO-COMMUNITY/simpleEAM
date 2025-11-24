@@ -224,7 +224,8 @@ const ImportDialog: React.FC<ImportDialogProps> = ({
                         {validationResult.fieldCoverage.optionalFieldsPresent.length > 0 && (
                           <Box sx={{ mb: 1 }}>
                             <Typography variant="body2" color="info.main" fontWeight="bold">
-                              ℹ {t('optionalFieldsPresent')} ({validationResult.fieldCoverage.optionalFieldsPresent.length}):
+                              ℹ {t('optionalFieldsPresent')} (
+                              {validationResult.fieldCoverage.optionalFieldsPresent.length}):
                             </Typography>
                             <Typography variant="caption" sx={{ pl: 2 }}>
                               {validationResult.fieldCoverage.optionalFieldsPresent.join(', ')}
@@ -236,7 +237,8 @@ const ImportDialog: React.FC<ImportDialogProps> = ({
                         {validationResult.fieldCoverage.optionalFieldsMissing.length > 0 && (
                           <Box sx={{ mb: 1 }}>
                             <Typography variant="body2" color="text.secondary" fontWeight="bold">
-                              ○ {t('optionalFieldsMissing')} ({validationResult.fieldCoverage.optionalFieldsMissing.length}):
+                              ○ {t('optionalFieldsMissing')} (
+                              {validationResult.fieldCoverage.optionalFieldsMissing.length}):
                             </Typography>
                             <Typography variant="caption" sx={{ pl: 2 }} color="text.secondary">
                               {validationResult.fieldCoverage.optionalFieldsMissing.join(', ')}
