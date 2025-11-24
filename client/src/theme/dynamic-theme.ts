@@ -6,6 +6,12 @@ export type ThemeBrandingOverrides = {
   fontFamily?: string | null
 }
 
+export type RuntimeThemeConfig = {
+  primaryColor: string
+  secondaryColor: string
+  fontFamily: string
+}
+
 const HEX_COLOR_REGEX = /^#(?:[0-9a-fA-F]{3}){1,2}$/
 
 const normalizeHexColor = (color?: string | null): string | null => {
@@ -74,28 +80,26 @@ function generateColorVariants(mainColor: string) {
 
 /**
  * Erstellt ein dynamisches Theme basierend auf Umgebungsvariablen
- * Supports both legacy and new variable names
+ * Uses runtime configuration instead of build-time NEXT_PUBLIC_ variables
  */
 export function createDynamicTheme(
   mode: 'light' | 'dark' = 'light',
-  branding?: ThemeBrandingOverrides
+  branding?: ThemeBrandingOverrides,
+  runtimeConfig?: RuntimeThemeConfig
 ): ReturnType<typeof createTheme> {
   const resolvedPrimary =
     normalizeHexColor(branding?.primaryColor) ||
-    normalizeHexColor(process.env.NEXT_PUBLIC_THEME_PRIMARY_COLOR) ||
-    normalizeHexColor(process.env.NEXT_PUBLIC_PRIMARY_COLOR) ||
+    (runtimeConfig && normalizeHexColor(runtimeConfig.primaryColor)) ||
     '#0066CC'
 
   const resolvedSecondary =
     normalizeHexColor(branding?.secondaryColor) ||
-    normalizeHexColor(process.env.NEXT_PUBLIC_THEME_SECONDARY_COLOR) ||
-    normalizeHexColor(process.env.NEXT_PUBLIC_SECONDARY_COLOR) ||
+    (runtimeConfig && normalizeHexColor(runtimeConfig.secondaryColor)) ||
     '#00AEEF'
 
   const fontFamily =
     (branding?.fontFamily && branding.fontFamily.trim()) ||
-    process.env.NEXT_PUBLIC_THEME_FONT_FAMILY ||
-    process.env.NEXT_PUBLIC_FONT_FAMILY ||
+    (runtimeConfig?.fontFamily && runtimeConfig.fontFamily.trim()) ||
     '"Roboto", "Helvetica", "Arial", sans-serif'
 
   // Farbvarianten generieren

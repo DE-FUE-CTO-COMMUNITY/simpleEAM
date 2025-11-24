@@ -36,8 +36,8 @@ export async function validateAuth(
     const token = authHeader.substring(7)
 
     // Validate token via Keycloak User Info Endpoint (easier for public clients)
-    const keycloakUrl = process.env.NEXT_PUBLIC_KEYCLOAK_URL || 'https://auth.dev-server.mf2.eu'
-    const realm = process.env.NEXT_PUBLIC_KEYCLOAK_REALM || 'simple-eam'
+    const keycloakUrl = process.env.KEYCLOAK_URL || 'https://auth.dev-server.mf2.eu'
+    const realm = process.env.KEYCLOAK_REALM || 'simple-eam'
 
     // Use User Info Endpoint (automatically validates token)
     const userInfoResponse = await fetch(
@@ -74,7 +74,7 @@ export async function validateAuth(
     }
 
     // Client ID für Rollen-Extraktion
-    const clientId = process.env.NEXT_PUBLIC_KEYCLOAK_CLIENT_ID || 'eam-client'
+    const clientId = process.env.KEYCLOAK_CLIENT_ID_CLIENT || 'eam-client'
 
     // Extract roles from token
     const realmAccess = tokenPayload.realm_access?.roles || []

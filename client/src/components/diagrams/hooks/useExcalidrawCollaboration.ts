@@ -5,6 +5,7 @@
 
 import { useCallback, useEffect, useState, useRef } from 'react'
 import { io, Socket } from 'socket.io-client'
+import { useExcalidrawConfig } from '@/lib/runtime-config'
 
 // Import types from our Excalidraw fork
 interface ExcalidrawElement {
@@ -94,9 +95,9 @@ export const useExcalidrawCollaboration = ({
   // Track if we're the first user in the room
   const isFirstUserRef = useRef(false)
 
-  // Socket.IO Server URL aus der Umgebungsvariable
-  const socketServerUrl =
-    process.env.NEXT_PUBLIC_EXCALIDRAW_WS_SERVER_URL || 'http://localhost:8890'
+  // Get Excalidraw WebSocket server URL from runtime config
+  const excalidrawConfig = useExcalidrawConfig()
+  const socketServerUrl = excalidrawConfig.wsServerUrl || 'http://localhost:8890'
 
   const stopCollaboration = useCallback(() => {
     setState(prev => {

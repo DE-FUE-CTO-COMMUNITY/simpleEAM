@@ -1,6 +1,7 @@
 import React from 'react'
 import Image from 'next/image'
 import { Box, BoxProps } from '@mui/material'
+import { useLogoConfig } from '@/lib/runtime-config'
 
 interface LogoProps extends BoxProps {
   variant?: 'blue' | 'white'
@@ -9,17 +10,14 @@ interface LogoProps extends BoxProps {
 
 /**
  * Logo Komponente für die Verwendung im Header und Footer
- * Das Logo wird dynamically from environment variables geladen
+ * Das Logo wird dynamically from runtime configuration geladen
  */
 const Logo: React.FC<LogoProps> = ({ height = 40, ...boxProps }) => {
-  // Logo-Pfad from environment variables, mit Fallback auf Simple-EAM Logo
-  // Unterstütze sowohl die alten (_URL/_ALT) als auch die neuen (_PATH/_NAME) Variablennamen
-  const logoPath =
-    process.env.NEXT_PUBLIC_LOGO_PATH ||
-    process.env.NEXT_PUBLIC_LOGO_URL ||
-    '/images/Simple-EAM-Logo.png'
-  const logoName =
-    process.env.NEXT_PUBLIC_LOGO_NAME || process.env.NEXT_PUBLIC_LOGO_ALT || 'Simple-EAM'
+  // Logo configuration from runtime config
+  const logoConfig = useLogoConfig()
+
+  const logoPath = logoConfig.url || '/images/Simple-EAM-Logo.png'
+  const logoName = logoConfig.alt || 'Simple-EAM'
 
   return (
     <Box {...boxProps} sx={{ display: 'inline-flex', alignItems: 'center', ...boxProps.sx }}>

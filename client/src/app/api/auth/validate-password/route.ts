@@ -12,12 +12,8 @@ export async function POST(request: NextRequest) {
     const token = authHeader.substring(7)
 
     // Use Keycloak token introspection endpoint for password validation
-    const keycloakUrl =
-      process.env.NEXT_PUBLIC_KEYCLOAK_URL ||
-      process.env.KEYCLOAK_URL ||
-      'https://auth.dev-server.mf2.eu'
-    const realm =
-      process.env.NEXT_PUBLIC_KEYCLOAK_REALM || process.env.KEYCLOAK_REALM || 'simple-eam'
+    const keycloakUrl = process.env.KEYCLOAK_URL || 'https://auth.dev-server.mf2.eu'
+    const realm = process.env.KEYCLOAK_REALM || 'simple-eam'
 
     // Decrypt token to get user information
     const tokenPayload = JSON.parse(atob(token.split('.')[1]))
@@ -37,7 +33,7 @@ export async function POST(request: NextRequest) {
         },
         body: new URLSearchParams({
           grant_type: 'password',
-          client_id: process.env.NEXT_PUBLIC_KEYCLOAK_CLIENT_ID || 'eam-client',
+          client_id: process.env.KEYCLOAK_CLIENT_ID_CLIENT || 'eam-client',
           username: username,
           password: password,
         }),

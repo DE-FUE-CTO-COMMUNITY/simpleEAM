@@ -5,11 +5,12 @@ import { keycloak } from './auth'
 
 /**
  * Erstellt einen Apollo-Client für GraphQL-Anfragen mit dynamischer Token-Authentifizierung
+ * Uses server-side environment variable (not NEXT_PUBLIC_)
  */
 export function createApolloClient(initialToken?: string) {
   // HTTP link for GraphQL endpoint
   const httpLink = new HttpLink({
-    uri: process.env.NEXT_PUBLIC_GRAPHQL_URL || 'https://api.dev-server.mf2.eu/graphql',
+    uri: process.env.GRAPHQL_URL || 'https://api.dev-server.mf2.eu/graphql',
   })
 
   // Authentifizierungs-Link für dynamisches Token-Handling

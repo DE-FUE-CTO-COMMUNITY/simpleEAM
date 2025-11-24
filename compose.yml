@@ -59,7 +59,7 @@ services:
       - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-graphql.entrypoints=websecure"
       - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-graphql.tls=true"
       - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-graphql.tls.certresolver=${TRAEFIK_CERTRESOLVER}"
-      - traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-graphql.tls.domains[0].main=${API_SUBDOMAIN}.${BASE_DOMAIN}
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-graphql.tls.domains[0].main=${API_SUBDOMAIN}.${BASE_DOMAIN}"
       - "traefik.http.services.${COMPOSE_PROJECT_NAME:-simple-eam}-graphql.loadbalancer.server.port=${GRAPHQL_INTERNAL_PORT}"
       - "traefik.docker.network=${TRAEFIK_NETWORK}"
 
@@ -143,11 +143,17 @@ services:
       - excalidraw-room
     environment:
       - NODE_ENV=production
-      - NEXT_PUBLIC_GRAPHQL_URL=https://${API_SUBDOMAIN}.${BASE_DOMAIN}/graphql
-      - NEXT_PUBLIC_KEYCLOAK_URL=https://${AUTH_SUBDOMAIN}.${BASE_DOMAIN}
-      - NEXT_PUBLIC_KEYCLOAK_REALM=${KEYCLOAK_REALM}
-      - NEXT_PUBLIC_KEYCLOAK_CLIENT_ID=${KEYCLOAK_CLIENT_ID_CLIENT}
-      - NEXT_PUBLIC_EXCALIDRAW_WS_SERVER_URL=https://${EXCALIDRAW_ROOM_SUBDOMAIN}.${BASE_DOMAIN}
+      # Runtime configuration - passed to container for /api/runtime-config endpoint
+      - GRAPHQL_URL=https://${API_SUBDOMAIN}.${BASE_DOMAIN}/graphql
+      - KEYCLOAK_URL=https://${AUTH_SUBDOMAIN}.${BASE_DOMAIN}
+      - KEYCLOAK_REALM=${KEYCLOAK_REALM}
+      - KEYCLOAK_CLIENT_ID_CLIENT=${KEYCLOAK_CLIENT_ID_CLIENT}
+      - EXCALIDRAW_WS_SERVER_URL=https://${EXCALIDRAW_ROOM_SUBDOMAIN}.${BASE_DOMAIN}
+      - THEME_PRIMARY_COLOR=${THEME_PRIMARY_COLOR}
+      - THEME_SECONDARY_COLOR=${THEME_SECONDARY_COLOR}
+      - THEME_FONT_FAMILY=${THEME_FONT_FAMILY}
+      - LOGO_URL=${LOGO_URL}
+      - LOGO_ALT=${LOGO_ALT}
     networks:
       - eam-network
       - ${TRAEFIK_NETWORK}

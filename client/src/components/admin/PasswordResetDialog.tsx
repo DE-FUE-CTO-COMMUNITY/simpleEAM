@@ -19,8 +19,7 @@ import { Visibility, VisibilityOff, Key } from '@mui/icons-material'
 import { useForm } from '@tanstack/react-form'
 import { z } from 'zod'
 import { useTranslations } from 'next-intl'
-import { KeycloakUser } from '@/lib/keycloak-admin'
-import { KeycloakUserAlt } from '@/lib/keycloak-admin-alt'
+import { KeycloakUser } from '@/lib/keycloak-types'
 import { keycloak } from '@/lib/auth'
 
 interface PasswordResetData {
@@ -32,7 +31,7 @@ interface PasswordResetDialogProps {
   open: boolean
   onClose: () => void
   onSuccess: () => void
-  user: KeycloakUser | KeycloakUserAlt | null
+  user: KeycloakUser | null
   loading?: boolean
   onClipboardMessage?: (message: string, severity: 'success' | 'error') => void
 }

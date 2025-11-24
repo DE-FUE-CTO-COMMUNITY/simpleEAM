@@ -24,12 +24,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Keycloak Admin API Konfiguration
-    const keycloakUrl =
-      process.env.NEXT_PUBLIC_KEYCLOAK_URL ||
-      process.env.KEYCLOAK_URL ||
-      'https://auth.dev-server.mf2.eu'
-    const realm =
-      process.env.NEXT_PUBLIC_KEYCLOAK_REALM || process.env.KEYCLOAK_REALM || 'simple-eam'
+    const keycloakUrl = process.env.KEYCLOAK_URL || 'https://auth.dev-server.mf2.eu'
+    const realm = process.env.KEYCLOAK_REALM || 'simple-eam'
     const adminUsername = process.env.KEYCLOAK_ADMIN || 'admin'
     const adminPassword = process.env.KEYCLOAK_ADMIN_PASSWORD
 

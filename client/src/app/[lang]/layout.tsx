@@ -3,6 +3,7 @@ import { getMessages } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { routing } from '@/i18n/routing'
 import AppLayout from '@/components/layout/AppLayout'
+import { RuntimeConfigProvider } from '@/lib/runtime-config'
 
 export function generateStaticParams() {
   return routing.locales.map(lang => ({ lang }))
@@ -26,8 +27,10 @@ export default async function LocaleLayout({
   const messages = await getMessages()
 
   return (
-    <NextIntlClientProvider messages={messages}>
-      <AppLayout>{children}</AppLayout>
-    </NextIntlClientProvider>
+    <RuntimeConfigProvider>
+      <NextIntlClientProvider messages={messages}>
+        <AppLayout>{children}</AppLayout>
+      </NextIntlClientProvider>
+    </RuntimeConfigProvider>
   )
 }

@@ -5,8 +5,7 @@ import { useForm } from '@tanstack/react-form'
 import { z } from 'zod'
 import { useTranslations } from 'next-intl'
 import GenericForm, { FieldConfig } from '@/components/common/GenericForm'
-import { KeycloakUser } from '@/lib/keycloak-admin'
-import { KeycloakUserAlt } from '@/lib/keycloak-admin-alt'
+import { KeycloakUser } from '@/lib/keycloak-types'
 
 // Available roles
 const AVAILABLE_ROLES = ['viewer', 'architect', 'admin'] as const
@@ -24,7 +23,7 @@ interface UserFormDialogProps {
   onClose: () => void
   onSubmit: (userData: UserFormData) => Promise<void>
   mode: 'create' | 'edit'
-  user?: (KeycloakUser | KeycloakUserAlt) | null
+  user?: KeycloakUser | null
   loading?: boolean
 }
 

@@ -89,15 +89,18 @@ function darkenColor(color: string, factor: number): string {
  * Erstellt CSS-Variablen für Excalidraw basierend auf Umgebungsvariablen
  * Can be used both client-side and server-side
  */
-export function generateExcalidrawThemeVariables(overrides?: ExcalidrawThemeOverrides) {
-  // Read theme colors from overrides first, then environment variables
+export function generateExcalidrawThemeVariables(
+  overrides?: ExcalidrawThemeOverrides,
+  runtimeConfig?: { primaryColor: string; secondaryColor: string }
+) {
+  // Read theme colors from overrides first, then runtime config
   const primaryColor =
     normalizeHexColor(overrides?.primaryColor) ||
-    normalizeHexColor(process.env.NEXT_PUBLIC_THEME_PRIMARY_COLOR) ||
+    (runtimeConfig && normalizeHexColor(runtimeConfig.primaryColor)) ||
     '#0066CC'
   const secondaryColor =
     normalizeHexColor(overrides?.secondaryColor) ||
-    normalizeHexColor(process.env.NEXT_PUBLIC_THEME_SECONDARY_COLOR) ||
+    (runtimeConfig && normalizeHexColor(runtimeConfig.secondaryColor)) ||
     '#00AEEF'
 
   // Farbvarianten generieren
@@ -194,8 +197,11 @@ export function generateExcalidrawThemeVariables(overrides?: ExcalidrawThemeOver
 /**
  * Generiert CSS-Text für Excalidraw Theme-Variablen
  */
-export function generateExcalidrawThemeCSS(overrides?: ExcalidrawThemeOverrides): string {
-  const themeVars = generateExcalidrawThemeVariables(overrides)
+export function generateExcalidrawThemeCSS(
+  overrides?: ExcalidrawThemeOverrides,
+  runtimeConfig?: { primaryColor: string; secondaryColor: string }
+): string {
+  const themeVars = generateExcalidrawThemeVariables(overrides, runtimeConfig)
 
   const lightCSS = Object.entries(themeVars.light)
     .map(([key, value]) => `  ${key}: ${value} !important;`)
@@ -367,9 +373,10 @@ ${darkCSS}
  */
 export function applyExcalidrawThemeVariables(
   element: HTMLElement,
-  theme: 'light' | 'dark' = 'light'
+  theme: 'light' | 'dark' = 'light',
+  runtimeConfig?: { primaryColor: string; secondaryColor: string }
 ) {
-  const themeVars = generateExcalidrawThemeVariables()
+  const themeVars = generateExcalidrawThemeVariables(undefined, runtimeConfig)
   const variables = themeVars[theme]
 
   Object.entries(variables).forEach(([key, value]) => {

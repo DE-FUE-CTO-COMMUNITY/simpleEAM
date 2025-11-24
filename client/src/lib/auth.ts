@@ -51,9 +51,9 @@ const clearLoginStatus = () => {
 
 // Keycloak configuration
 const keycloakConfig = {
-  url: process.env.NEXT_PUBLIC_KEYCLOAK_URL || 'https://auth.dev-server.mf2.eu',
-  realm: process.env.NEXT_PUBLIC_KEYCLOAK_REALM || 'simple-eam',
-  clientId: process.env.NEXT_PUBLIC_KEYCLOAK_CLIENT_ID || 'eam-client',
+  url: process.env.KEYCLOAK_URL || 'https://auth.dev-server.mf2.eu',
+  realm: process.env.KEYCLOAK_REALM || 'simple-eam',
+  clientId: process.env.KEYCLOAK_CLIENT_ID_CLIENT || 'eam-client',
 }
 
 /**

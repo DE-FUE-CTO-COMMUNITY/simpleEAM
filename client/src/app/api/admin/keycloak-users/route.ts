@@ -15,8 +15,8 @@ export const GET = withAuth(async (request: NextRequest) => {
   }
   try {
     // Get admin token
-    const keycloakUrl = process.env.NEXT_PUBLIC_KEYCLOAK_URL || 'https://auth.dev-server.mf2.eu'
-    const realm = process.env.NEXT_PUBLIC_KEYCLOAK_REALM || 'simple-eam'
+    const keycloakUrl = process.env.KEYCLOAK_URL || 'https://auth.dev-server.mf2.eu'
+    const realm = process.env.KEYCLOAK_REALM || 'simple-eam'
 
     const tokenResponse = await fetch(
       `${keycloakUrl}/realms/master/protocol/openid-connect/token`,
@@ -133,8 +133,8 @@ export const POST = withAuth(async (request: NextRequest) => {
     }
 
     // Get admin token
-    const keycloakUrl = process.env.NEXT_PUBLIC_KEYCLOAK_URL || 'https://auth.dev-server.mf2.eu'
-    const realm = process.env.NEXT_PUBLIC_KEYCLOAK_REALM || 'simple-eam'
+    const keycloakUrl = process.env.KEYCLOAK_URL || 'https://auth.dev-server.mf2.eu'
+    const realm = process.env.KEYCLOAK_REALM || 'simple-eam'
 
     const tokenResponse = await fetch(
       `${keycloakUrl}/realms/master/protocol/openid-connect/token`,
@@ -173,7 +173,7 @@ export const POST = withAuth(async (request: NextRequest) => {
         // Create user (without role property) but with requiredActions for password setup
         const userDataWithActions = {
           ...keycloakUserData,
-          requiredActions: ["UPDATE_PASSWORD"], // User must set password on first login
+          requiredActions: ['UPDATE_PASSWORD'], // User must set password on first login
         }
 
         apiResponse = await fetch(`${keycloakUrl}/admin/realms/${realm}/users`, {

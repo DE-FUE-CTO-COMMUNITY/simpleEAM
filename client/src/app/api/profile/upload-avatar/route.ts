@@ -64,8 +64,7 @@ export async function POST(request: NextRequest) {
     const dataUrl = `data:${mimeType};base64,${base64String}`
 
     // GraphQL mutation via internal API call
-    const graphqlEndpoint =
-      process.env.NEXT_PUBLIC_GRAPHQL_URL || 'https://api.dev-server.mf2.eu/graphql'
+    const graphqlEndpoint = process.env.GRAPHQL_URL || 'https://api.dev-server.mf2.eu/graphql'
 
     const updateMutation = `
       mutation UpdatePersonAvatar($email: String!, $avatarUrl: String!) {
@@ -153,8 +152,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // GraphQL mutation to delete the Avatars
-    const graphqlEndpoint =
-      process.env.NEXT_PUBLIC_GRAPHQL_URL || 'https://api.dev-server.mf2.eu/graphql'
+    const graphqlEndpoint = process.env.GRAPHQL_URL || 'https://api.dev-server.mf2.eu/graphql'
 
     const deleteMutation = `
       mutation DeletePersonAvatar($email: String!) {

@@ -32,8 +32,7 @@ import {
 } from '@mui/icons-material'
 import { useTranslations, useLocale } from 'next-intl'
 import { useMutation, useLazyQuery } from '@apollo/client'
-import { KeycloakUser } from '@/lib/keycloak-admin'
-import { KeycloakUserAlt } from '@/lib/keycloak-admin-alt'
+import { KeycloakUser } from '@/lib/keycloak-types'
 import { keycloak } from '@/lib/auth'
 import { CREATE_PERSON, UPDATE_PERSON, GET_PERSON_BY_EMAIL } from '@/graphql/person'
 import UserFormDialog from './UserFormDialog'
@@ -43,7 +42,7 @@ import PasswordResetDialog from './PasswordResetDialog'
 export default function UserManagement() {
   const t = useTranslations('admin.userManagement')
   const locale = useLocale()
-  const [keycloakUsers, setKeycloakUsers] = useState<(KeycloakUser | KeycloakUserAlt)[]>([])
+  const [keycloakUsers, setKeycloakUsers] = useState<KeycloakUser[]>([])
   const [keycloakLoading, setKeycloakLoading] = useState(false)
   const [keycloakError, setKeycloakError] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
@@ -131,7 +130,7 @@ export default function UserManagement() {
   }
 
   // Helper function for Letztes-Login-Anzeige
-  const formatLastLogin = (user: KeycloakUser | KeycloakUserAlt): string => {
+  const formatLastLogin = (user: KeycloakUser): string => {
     const lastLogin = user.attributes?.lastLogin?.[0]
     if (!lastLogin) {
       return t('lastLogin.never')
@@ -158,17 +157,17 @@ export default function UserManagement() {
   const [formDialog, setFormDialog] = useState({
     open: false,
     mode: 'create' as 'create' | 'edit',
-    user: null as (KeycloakUser | KeycloakUserAlt) | null,
+    user: null as KeycloakUser | null,
   })
 
   const [deleteDialog, setDeleteDialog] = useState({
     open: false,
-    user: null as (KeycloakUser | KeycloakUserAlt) | null,
+    user: null as KeycloakUser | null,
   })
 
   const [passwordResetDialog, setPasswordResetDialog] = useState({
     open: false,
-    user: null as (KeycloakUser | KeycloakUserAlt) | null,
+    user: null as KeycloakUser | null,
   })
 
   const [snackbar, setSnackbar] = useState({
@@ -375,7 +374,7 @@ export default function UserManagement() {
     })
   }
 
-  const openEditUserDialog = (user: KeycloakUser | KeycloakUserAlt) => {
+  const openEditUserDialog = (user: KeycloakUser) => {
     setFormDialog({
       open: true,
       mode: 'edit',
@@ -391,7 +390,7 @@ export default function UserManagement() {
     })
   }
 
-  const openPasswordResetDialog = (user: KeycloakUser | KeycloakUserAlt) => {
+  const openPasswordResetDialog = (user: KeycloakUser) => {
     setPasswordResetDialog({
       open: true,
       user,
@@ -440,7 +439,7 @@ export default function UserManagement() {
     closeFormDialog()
   }
 
-  const openDeleteUserDialog = async (user: KeycloakUser | KeycloakUserAlt) => {
+  const openDeleteUserDialog = async (user: KeycloakUser) => {
     setDeleteDialog({
       open: true,
       user,

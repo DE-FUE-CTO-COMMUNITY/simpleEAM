@@ -34,6 +34,7 @@ import {
 import { keycloak } from '@/lib/auth'
 import { getTokenInfo } from '@/utils/sessionUtils'
 import { useTranslations } from 'next-intl'
+import { useRuntimeConfig } from '@/lib/runtime-config'
 
 interface SessionDebuggerProps {
   isOpen: boolean
@@ -42,6 +43,7 @@ interface SessionDebuggerProps {
 
 const SessionDebugger: React.FC<SessionDebuggerProps> = ({ isOpen, onClose }) => {
   const t = useTranslations('debug.session')
+  const runtimeConfig = useRuntimeConfig()
   const [tokenInfo, setTokenInfo] = useState<any>(null)
   const [refreshKey, setRefreshKey] = useState(0)
 
@@ -220,7 +222,7 @@ const SessionDebugger: React.FC<SessionDebuggerProps> = ({ isOpen, onClose }) =>
           <TableHead>
             <TableRow>
               <TableCell>
-                <strong>Umgebungsvariable</strong>
+                <strong>Runtime Configuration</strong>
               </TableCell>
               <TableCell>
                 <strong>Wert</strong>
@@ -229,20 +231,24 @@ const SessionDebugger: React.FC<SessionDebuggerProps> = ({ isOpen, onClose }) =>
           </TableHead>
           <TableBody>
             <TableRow>
-              <TableCell>NEXT_PUBLIC_KEYCLOAK_URL</TableCell>
-              <TableCell>{process.env.NEXT_PUBLIC_KEYCLOAK_URL || 'Not set'}</TableCell>
+              <TableCell>KEYCLOAK_URL</TableCell>
+              <TableCell>{runtimeConfig.keycloak.url || 'Not set'}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>NEXT_PUBLIC_KEYCLOAK_REALM</TableCell>
-              <TableCell>{process.env.NEXT_PUBLIC_KEYCLOAK_REALM || 'Not set'}</TableCell>
+              <TableCell>KEYCLOAK_REALM</TableCell>
+              <TableCell>{runtimeConfig.keycloak.realm || 'Not set'}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>NEXT_PUBLIC_KEYCLOAK_CLIENT_ID</TableCell>
-              <TableCell>{process.env.NEXT_PUBLIC_KEYCLOAK_CLIENT_ID || 'Not set'}</TableCell>
+              <TableCell>KEYCLOAK_CLIENT_ID</TableCell>
+              <TableCell>{runtimeConfig.keycloak.clientId || 'Not set'}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>NEXT_PUBLIC_GRAPHQL_URL</TableCell>
-              <TableCell>{process.env.NEXT_PUBLIC_GRAPHQL_URL || 'Not set'}</TableCell>
+              <TableCell>GRAPHQL_URL</TableCell>
+              <TableCell>{runtimeConfig.graphql.url || 'Not set'}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>EXCALIDRAW_WS_SERVER_URL</TableCell>
+              <TableCell>{runtimeConfig.excalidraw.wsServerUrl || 'Not set'}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>NODE_ENV</TableCell>

@@ -14,7 +14,7 @@ import {
 } from '@mui/material'
 import { useMutation } from '@apollo/client'
 import { useTranslations } from 'next-intl'
-import { KeycloakUser } from '@/lib/keycloak-admin'
+import { KeycloakUser } from '@/lib/keycloak-types'
 import { DELETE_PERSON, GET_PERSONS } from '@/graphql/person'
 import { Person } from '@/gql/generated'
 import { keycloak } from '@/lib/auth'
