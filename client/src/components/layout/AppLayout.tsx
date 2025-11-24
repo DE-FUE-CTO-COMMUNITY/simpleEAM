@@ -105,7 +105,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [initialized, setInitialized] = useState(false)
   const [authenticated, setAuthenticated] = useState(false)
   const [client, setClient] = useState<ApolloClient<NormalizedCacheObject> | null>(null)
-  
+
   // Get GraphQL URL from runtime config
   const graphqlConfig = useGraphQLConfig()
 
@@ -126,6 +126,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
         // Session Monitoring
         setupSessionMonitoring()
+
+        // Log the GraphQL URL being used
+        console.log('Creating Apollo Client with GraphQL URL:', graphqlConfig.url)
 
         // Create Apollo client with dynamic token and GraphQL URL from runtime config
         const apolloClient = createApolloClient(keycloak?.token, graphqlConfig.url)
@@ -163,7 +166,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         cleanup.then(cleanupFn => cleanupFn?.())
       }
     }
-  }, [mounted])
+  }, [mounted, graphqlConfig.url])
 
   // Verhindere Hydration-Fehler durch einheitliche Server/Client Struktur
   if (!mounted) {
