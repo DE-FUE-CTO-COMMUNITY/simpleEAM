@@ -1192,6 +1192,14 @@ export const getFieldNamesByEntityTypeAndFormat = (
   return Object.keys(template)
 }
 
+export interface FieldCoverage {
+  mandatoryFieldsPresent: string[]
+  mandatoryFieldsMissing: string[]
+  optionalFieldsPresent: string[]
+  optionalFieldsMissing: string[]
+  unmappedColumns: string[]
+}
+
 export interface ValidationResult {
   isValid: boolean
   errors: ValidationError[]
@@ -1202,6 +1210,7 @@ export interface ValidationResult {
     invalidRows: number
     duplicates: number
   }
+  fieldCoverage?: FieldCoverage
 }
 
 export interface ValidationError {
@@ -1240,7 +1249,15 @@ export const validateImportData = (
 
   const requiredFields = getRequiredFieldsByEntityType(entityType)
   const optionalFields = getOptionalFieldsByEntityType(entityType)
-  const allValidFields = [...requiredFields, ...optionalFields]
+  const allValidFields = ['id', ...requiredFields, ...optionalFields]
+
+  // Analyze field coverage from the first row (assuming all rows have same structure)
+  const fileColumns = data.length > 0 ? Object.keys(data[0]) : []
+  const mandatoryFieldsPresent = requiredFields.filter(field => fileColumns.includes(field))
+  const mandatoryFieldsMissing = requiredFields.filter(field => !fileColumns.includes(field))
+  const optionalFieldsPresent = optionalFields.filter(field => fileColumns.includes(field))
+  const optionalFieldsMissing = optionalFields.filter(field => !fileColumns.includes(field))
+  const unmappedColumns = fileColumns.filter(col => !allValidFields.includes(col))
 
   data.forEach((row, index) => {
     const rowNumber = index + 2 // Excel row numbers start at 1, plus header row
@@ -1252,7 +1269,7 @@ export const validateImportData = (
         errors.push({
           row: rowNumber,
           field,
-          message: `Erforderliches Feld '${field}' ist leer`,
+          message: `Required field '${field}' is empty`,
           severity: 'error',
         })
         rowIsValid = false
@@ -1265,8 +1282,8 @@ export const validateImportData = (
         warnings.push({
           row: rowNumber,
           field,
-          message: `Unbekanntes Feld '${field}' wird ignoriert`,
-          suggestion: `Gültige Felder: ${allValidFields.join(', ')}`,
+          message: `Unknown field '${field}' will be ignored`,
+          suggestion: `Valid fields: ${allValidFields.join(', ')}`,
         })
       }
     })
@@ -1276,8 +1293,8 @@ export const validateImportData = (
       warnings.push({
         row: rowNumber,
         field: 'id',
-        message: 'ID enthält ungültige Zeichen',
-        suggestion: 'Verwenden Sie nur Buchstaben, Zahlen, Bindestriche und Unterstriche',
+        message: 'ID contains invalid characters',
+        suggestion: 'Use only letters, numbers, hyphens and underscores',
       })
     }
 
@@ -1290,8 +1307,8 @@ export const validateImportData = (
           warnings.push({
             row: rowNumber,
             field,
-            message: 'Ungültiges Datumsformat',
-            suggestion: 'Verwenden Sie ISO-Format: 2024-01-01T12:00:00.000Z',
+            message: 'Invalid date format',
+            suggestion: 'Use ISO format: 2024-01-01T12:00:00.000Z',
           })
         }
       }
@@ -1311,6 +1328,13 @@ export const validateImportData = (
       validRows,
       invalidRows: data.length - validRows,
       duplicates: 0, // ID duplicates are no longer checked
+    },
+    fieldCoverage: {
+      mandatoryFieldsPresent,
+      mandatoryFieldsMissing,
+      optionalFieldsPresent,
+      optionalFieldsMissing,
+      unmappedColumns,
     },
   }
 }
@@ -1503,6 +1527,8 @@ export function getRequiredFieldsByEntityType(entityType: EntityType): string[] 
       return ['name', 'category', 'priority']
     case 'infrastructures':
       return ['name', 'infrastructureType', 'status']
+    case 'aicomponents':
+      return ['name']
     default:
       return ['name']
   }
@@ -1515,10 +1541,19 @@ export function getOptionalFieldsByEntityType(entityType: EntityType): string[] 
         'description',
         'maturityLevel',
         'status',
+        'type',
         'businessValue',
+        'sequenceNumber',
+        'introductionDate',
+        'endDate',
         'owners',
         'tags',
+        'children',
         'parents',
+        'supportedByApplications',
+        'partOfArchitectures',
+        'relatedDataObjects',
+        'depictedInDiagrams',
         'createdAt',
         'updatedAt',
       ]
@@ -1526,12 +1561,16 @@ export function getOptionalFieldsByEntityType(entityType: EntityType): string[] 
       return [
         'description',
         'criticality',
+        'timeCategory',
+        'sevenRStrategy',
         'costs',
         'vendor',
         'version',
         'hostingEnvironment',
         'technologyStack',
+        'planningDate',
         'introductionDate',
+        'endOfUseDate',
         'endOfLifeDate',
         'owners',
         'supportsCapabilities',
@@ -1539,6 +1578,13 @@ export function getOptionalFieldsByEntityType(entityType: EntityType): string[] 
         'sourceOfInterfaces',
         'targetOfInterfaces',
         'partOfArchitectures',
+        'depictedInDiagrams',
+        'parents',
+        'components',
+        'predecessors',
+        'successors',
+        'implementsPrinciples',
+        'hostedOn',
         'createdAt',
         'updatedAt',
       ]
@@ -1547,12 +1593,18 @@ export function getOptionalFieldsByEntityType(entityType: EntityType): string[] 
         'description',
         'protocol',
         'version',
+        'planningDate',
         'introductionDate',
+        'endOfUseDate',
         'endOfLifeDate',
         'owners',
         'sourceApplications',
         'targetApplications',
         'dataObjects',
+        'predecessors',
+        'successors',
+        'partOfArchitectures',
+        'depictedInDiagrams',
         'createdAt',
         'updatedAt',
       ]
@@ -1561,7 +1613,9 @@ export function getOptionalFieldsByEntityType(entityType: EntityType): string[] 
         'description',
         'classification',
         'format',
+        'planningDate',
         'introductionDate',
+        'endOfUseDate',
         'endOfLifeDate',
         'owners',
         'dataSources',
@@ -1569,6 +1623,7 @@ export function getOptionalFieldsByEntityType(entityType: EntityType): string[] 
         'relatedToCapabilities',
         'transferredInInterfaces',
         'partOfArchitectures',
+        'depictedInDiagrams',
         'createdAt',
         'updatedAt',
       ]
@@ -1592,9 +1647,12 @@ export function getOptionalFieldsByEntityType(entityType: EntityType): string[] 
         'containsApplications',
         'containsCapabilities',
         'containsDataObjects',
+        'containsInterfaces',
+        'containsInfrastructure',
         'diagrams',
         'childArchitectures',
         'parentArchitecture',
+        'appliedPrinciples',
         'createdAt',
         'updatedAt',
       ]
@@ -1622,6 +1680,56 @@ export function getOptionalFieldsByEntityType(entityType: EntityType): string[] 
         'owners',
         'appliedInArchitectures',
         'implementedByApplications',
+        'createdAt',
+        'updatedAt',
+      ]
+    case 'infrastructures':
+      return [
+        'description',
+        'vendor',
+        'version',
+        'capacity',
+        'location',
+        'ipAddress',
+        'operatingSystem',
+        'specifications',
+        'maintenanceWindow',
+        'costs',
+        'planningDate',
+        'introductionDate',
+        'endOfUseDate',
+        'endOfLifeDate',
+        'owners',
+        'parentInfrastructure',
+        'childInfrastructures',
+        'hostsApplications',
+        'partOfArchitectures',
+        'depictedInDiagrams',
+        'createdAt',
+        'updatedAt',
+      ]
+    case 'aicomponents':
+      return [
+        'description',
+        'aiType',
+        'model',
+        'version',
+        'status',
+        'accuracy',
+        'trainingDate',
+        'lastUpdated',
+        'provider',
+        'license',
+        'costs',
+        'tags',
+        'owners',
+        'supportsCapabilities',
+        'usedByApplications',
+        'trainedWithDataObjects',
+        'hostedOn',
+        'partOfArchitectures',
+        'implementsPrinciples',
+        'depictedInDiagrams',
         'createdAt',
         'updatedAt',
       ]

@@ -11,6 +11,45 @@ import { ImportWithMappingResult, EntityMapping, ImportResult } from './types'
 import { entityTypeMapping } from './constants'
 
 /**
+ * Extracts a readable error message from various error types
+ * Prioritizes GraphQL error messages over generic error messages
+ */
+const extractErrorMessage = (error: any): string => {
+  // Check for GraphQL errors
+  if (error.graphQLErrors && error.graphQLErrors.length > 0) {
+    return error.graphQLErrors.map((e: any) => e.message).join('; ')
+  }
+
+  // Check for network errors with GraphQL response body
+  if (error.networkError) {
+    // Apollo Client often wraps GraphQL errors in networkError.result.errors
+    if (error.networkError.result?.errors && error.networkError.result.errors.length > 0) {
+      return error.networkError.result.errors.map((e: any) => e.message).join('; ')
+    }
+    // Check for bodyText that might contain error details
+    if (error.networkError.bodyText) {
+      try {
+        const body = JSON.parse(error.networkError.bodyText)
+        if (body.errors && body.errors.length > 0) {
+          return body.errors.map((e: any) => e.message).join('; ')
+        }
+      } catch {
+        // Parsing failed, continue to fallback
+      }
+    }
+    return `Network error: ${error.networkError.message}`
+  }
+
+  // Check for standard Error object
+  if (error instanceof Error) {
+    return error.message
+  }
+
+  // Fallback for unknown error types
+  return 'Unknown error'
+}
+
+/**
  * Formatiert den aktuellen Timestamp für Dateinamen
  */
 const formatTimestampForFilename = (): string => {
@@ -43,6 +82,7 @@ export const importEntityDataWithMapping = async (
   const { create: createMutation, update: updateMutation } = mutations
   const entityMappings: EntityMapping = {}
   let imported = 0
+  let failed = 0
   const errors: string[] = []
 
   // WICHTIG: Nur JSON-Daten sanitizen, Excel-Daten unverändert lassen
@@ -175,7 +215,7 @@ export const importEntityDataWithMapping = async (
         }
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unbekannter Fehler'
+      const errorMessage = extractErrorMessage(error)
 
       // Only log detailed errors for first few items
       if (i < 3) {
@@ -184,7 +224,8 @@ export const importEntityDataWithMapping = async (
         console.error(`DEBUG: Full error:`, error)
       }
 
-      errors.push(`Zeile ${i + 1}: ${errorMessage}`)
+      errors.push(`Row ${i + 1}: ${errorMessage}`)
+      failed++
     }
 
     // Small delay to prevent browser freeze - pause every 10 items for larger imports
@@ -202,7 +243,7 @@ export const importEntityDataWithMapping = async (
     onProgress(100)
   }
 
-  return { imported, entityMappings, errors }
+  return { imported, failed, entityMappings, errors }
 }
 
 export const handleMultiTabImport = async (
@@ -211,7 +252,7 @@ export const handleMultiTabImport = async (
   format: 'xlsx' | 'json',
   onProgress?: (progress: number) => void,
   selectedCompanyId?: string
-): Promise<{ totalImported: number; importResults: ImportResult[] }> => {
+): Promise<{ totalImported: number; totalFailed: number; importResults: ImportResult[] }> => {
   let allData: { [tabName: string]: any[] } = {}
 
   if (format === 'xlsx') {
@@ -223,6 +264,7 @@ export const handleMultiTabImport = async (
   }
 
   let totalImported = 0
+  let totalFailed = 0
   const importResults: ImportResult[] = []
   const allEntityMappings: { [entityType: string]: EntityMapping } = {}
 
@@ -241,6 +283,7 @@ export const handleMultiTabImport = async (
       try {
         const {
           imported,
+          failed = 0,
           entityMappings,
           errors = [],
         } = await importEntityDataWithMapping(
@@ -261,19 +304,24 @@ export const handleMultiTabImport = async (
         )
         allEntityMappings[entityType] = entityMappings
         totalImported += imported
+        totalFailed += failed
         importResults.push({
           entityType: tabName,
           imported,
+          failed,
           errors,
         })
         tabsProcessed++
       } catch (error) {
         console.error(`DEBUG: Error importing ${tabName}:`, error)
+        const tabLength = Array.isArray(tabData) ? tabData.length : 0
         importResults.push({
           entityType: tabName,
           imported: 0,
-          errors: [error instanceof Error ? error.message : 'Unbekannter Fehler'],
+          failed: tabLength,
+          errors: [extractErrorMessage(error)],
         })
+        totalFailed += tabLength
         tabsProcessed++
       }
     } else {
@@ -346,7 +394,7 @@ export const handleMultiTabImport = async (
     onProgress(100)
   }
 
-  return { totalImported, importResults }
+  return { totalImported, totalFailed, importResults }
 }
 
 export const handleSingleTabImport = async (
@@ -356,7 +404,7 @@ export const handleSingleTabImport = async (
   format: 'xlsx' | 'json',
   onProgress?: (progress: number) => void,
   selectedCompanyId?: string
-): Promise<{ imported: number; validationResult: any }> => {
+): Promise<{ imported: number; failed: number; errors: string[]; validationResult: any }> => {
   let data: any[] = []
 
   if (format === 'xlsx' && entityType !== 'diagrams') {
@@ -368,7 +416,12 @@ export const handleSingleTabImport = async (
   }
 
   // Phase 1: Erstelle alle Entitäten (70% of progress)
-  const { imported, entityMappings } = await importEntityDataWithMapping(
+  const {
+    imported,
+    failed = 0,
+    entityMappings,
+    errors = [],
+  } = await importEntityDataWithMapping(
     client,
     data,
     entityType,
@@ -409,7 +462,7 @@ export const handleSingleTabImport = async (
     onProgress(100)
   }
 
-  return { imported, validationResult: { isValid: true } }
+  return { imported, failed, errors, validationResult: { isValid: true } }
 }
 
 export const exportEntityData = async (
@@ -618,12 +671,12 @@ export const deleteEntityData = async (
   }
 }
 
-export const refreshDashboardCache = async (): Promise<void> => {
-  // Nach dem Löschen von Daten muss ein vollständiger Refresh gemacht werden
-  // um sicherzustellen, dass alle UI-Komponenten die Änderungen reflektieren
-  if (typeof window !== 'undefined') {
-    window.location.reload()
-  }
+export const refreshDashboardCache = async (client: ApolloClient<any>): Promise<void> => {
+  // Refetch all active queries to update tables without full page reload
+  // This allows users to review import results and errors while seeing updated data
+  await client.refetchQueries({
+    include: 'active',
+  })
 }
 
 export const updateEntityRelationships = async (

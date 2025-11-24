@@ -77,6 +77,11 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
   const [validationResult, setValidationResult] = useState<ValidationResult | null>(null)
   const [isImporting, setIsImporting] = useState(false)
   const [importProgress, setImportProgress] = useState(0)
+  const [importSummary, setImportSummary] = useState<{
+    imported: number
+    failed: number
+    results?: any[]
+  } | null>(null)
 
   // Export State
   const [isExporting, setIsExporting] = useState(false)
@@ -93,6 +98,7 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
       setSelectedFile(null)
       setValidationResult(null)
       setImportProgress(0)
+      setImportSummary(null)
       setIsImporting(false)
       setIsExporting(false)
       setIsDeleting(false)
@@ -226,9 +232,12 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
 
     setIsImporting(true)
     setImportProgress(0)
+    setImportSummary(null)
 
     try {
       let totalImported = 0
+      let totalFailed = 0
+      let importResults: any[] = []
 
       if (importSettings.entityType === 'all') {
         const result = await handleMultiTabImport(
@@ -241,6 +250,8 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
           selectedCompanyId ?? undefined
         )
         totalImported = result.totalImported
+        totalFailed = result.totalFailed
+        importResults = result.importResults
       } else {
         const result = await handleSingleTabImport(
           apolloClient,
@@ -253,23 +264,58 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
           selectedCompanyId ?? undefined
         )
         totalImported = result.imported
+        totalFailed = result.failed
+        importResults = [
+          {
+            entityType: importSettings.entityType,
+            imported: result.imported,
+            failed: result.failed,
+            errors: result.errors || [],
+          },
+        ]
       }
 
-      await refreshDashboardCache()
+      await refreshDashboardCache(apolloClient)
 
+      // Store import summary
+      setImportSummary({
+        imported: totalImported,
+        failed: totalFailed,
+        results: importResults,
+      })
+
+      // Show success message
       const successMessage =
         importSettings.entityType === 'all'
-          ? t('import.messages.multiTabImportSuccess', { count: totalImported })
-          : t('import.messages.singleTabImportSuccess', {
-              entityType: tEntityTypes(importSettings.entityType) || importSettings.entityType,
-              count: totalImported,
-            })
+          ? totalFailed > 0
+            ? t('import.messages.multiTabImportPartial', {
+                imported: totalImported,
+                failed: totalFailed,
+              })
+            : t('import.messages.multiTabImportSuccess', { count: totalImported })
+          : totalFailed > 0
+            ? t('import.messages.singleTabImportPartial', {
+                entityType: tEntityTypes(importSettings.entityType) || importSettings.entityType,
+                imported: totalImported,
+                failed: totalFailed,
+              })
+            : t('import.messages.singleTabImportSuccess', {
+                entityType: tEntityTypes(importSettings.entityType) || importSettings.entityType,
+                count: totalImported,
+              })
 
-      enqueueSnackbar(successMessage, { variant: 'success' })
+      enqueueSnackbar(successMessage, {
+        variant: totalFailed > 0 ? 'warning' : 'success',
+      })
 
-      // Reset state
-      setSelectedFile(null)
-      setValidationResult(null)
+      // Only reset file/validation if fully successful
+      if (totalFailed === 0) {
+        setSelectedFile(null)
+        setValidationResult(null)
+        setImportSummary(null)
+        // Close dialog after successful import with no errors
+        onClose()
+      }
     } catch (error) {
       enqueueSnackbar(
         t('import.messages.importError', {
@@ -332,7 +378,7 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
         deleteEntityType,
         selectedCompanyId ?? undefined
       )
-      await refreshDashboardCache()
+      await refreshDashboardCache(apolloClient)
 
       // If all data or only diagrams are deleted, also clear the diagram localStorage
       if (deleteEntityType === 'all' || deleteEntityType === 'diagrams') {
@@ -498,6 +544,7 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
             validationResult={validationResult}
             isImporting={isImporting}
             importProgress={importProgress}
+            importSummary={importSummary}
             onFileUpload={handleFileUpload}
             onEntityTypeChange={handleEntityTypeChange}
             onFormatChange={handleFormatChange}

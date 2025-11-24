@@ -259,7 +259,7 @@ export const createEntityInput = (entityType: string, row: any): any => {
       return {
         name: generateFallbackName('Application', row),
         description: row.description || '',
-        version: row.version || '',
+        version: row.version ? String(row.version) : '',
         status: validStatus,
         criticality: validCriticality,
         vendor: row.vendor || '',
@@ -332,7 +332,7 @@ export const createEntityInput = (entityType: string, row: any): any => {
         interfaceType: validInterfaceType,
         status: validStatus,
         protocol: validProtocol,
-        version: row.version || '',
+        version: row.version ? String(row.version) : '',
         // Date fields
         introductionDate: row.introductionDate ? new Date(row.introductionDate) : undefined,
         planningDate: row.planningDate ? new Date(row.planningDate) : undefined,
@@ -478,7 +478,7 @@ export const createEntityInput = (entityType: string, row: any): any => {
         description: row.description || '',
         aiType: validAiType,
         model: row.model || '',
-        version: row.version || '',
+        version: row.version ? String(row.version) : '',
         status: validStatus,
         accuracy: row.accuracy && row.accuracy !== '' ? parseFloat(row.accuracy) : undefined,
         provider: row.provider || '',

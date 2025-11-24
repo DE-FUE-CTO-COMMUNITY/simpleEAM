@@ -611,7 +611,7 @@ export const validateJsonImportData = (
     errors.push({
       row: 1,
       field: 'structure',
-      message: 'JSON-Daten müssen ein Array sein',
+      message: 'JSON data must be an array',
       severity: 'error',
     })
     return {
@@ -624,8 +624,29 @@ export const validateJsonImportData = (
         invalidRows: 0,
         duplicates: 0,
       },
+      fieldCoverage: {
+        mandatoryFieldsPresent: [],
+        mandatoryFieldsMissing: [],
+        optionalFieldsPresent: [],
+        optionalFieldsMissing: [],
+        unmappedColumns: [],
+      },
     }
   }
+
+  // Get required and optional fields for this entity type
+  const { getRequiredFieldsByEntityType, getOptionalFieldsByEntityType } = require('./excelDataService')
+  const requiredFields = getRequiredFieldsByEntityType(entityType)
+  const optionalFields = getOptionalFieldsByEntityType(entityType)
+  const allValidFields = ['id', ...requiredFields, ...optionalFields]
+
+  // Analyze field coverage from the first row
+  const fileColumns = data.length > 0 ? Object.keys(data[0]) : []
+  const mandatoryFieldsPresent = requiredFields.filter((field: string) => fileColumns.includes(field))
+  const mandatoryFieldsMissing = requiredFields.filter((field: string) => !fileColumns.includes(field))
+  const optionalFieldsPresent = optionalFields.filter((field: string) => fileColumns.includes(field))
+  const optionalFieldsMissing = optionalFields.filter((field: string) => !fileColumns.includes(field))
+  const unmappedColumns = fileColumns.filter((col: string) => !allValidFields.includes(col))
 
   data.forEach((row, index) => {
     const rowNumber = index + 1
@@ -636,7 +657,7 @@ export const validateJsonImportData = (
       errors.push({
         row: rowNumber,
         field: 'structure',
-        message: 'Jede Zeile muss ein Objekt sein',
+        message: 'Each row must be an object',
         severity: 'error',
       })
       rowIsValid = false
@@ -648,7 +669,7 @@ export const validateJsonImportData = (
       errors.push({
         row: rowNumber,
         field: 'id',
-        message: 'ID ist erforderlich',
+        message: 'ID is required',
         severity: 'error',
       })
       rowIsValid = false
@@ -657,7 +678,7 @@ export const validateJsonImportData = (
       errors.push({
         row: rowNumber,
         field: 'id',
-        message: 'Duplikate ID gefunden',
+        message: 'Duplicate ID found',
         severity: 'error',
       })
       rowIsValid = false
@@ -697,8 +718,8 @@ export const validateJsonImportData = (
           warnings.push({
             row: rowNumber,
             field: 'name',
-            message: `Kein Name gefunden, Email-Benutzername als Fallback: "${emailUser}"`,
-            suggestion: 'Fügen Sie firstName und/oder lastName hinzu',
+            message: `No name found, using email username as fallback: "${emailUser}"`,
+            suggestion: 'Add firstName and/or lastName',
           })
           // Akzeptiere diese Zeile trotzdem
           hasValidName = true
@@ -709,7 +730,7 @@ export const validateJsonImportData = (
         errors.push({
           row: rowNumber,
           field: nameField,
-          message: `${nameField} ist erforderlich`,
+          message: `${nameField} is required`,
           severity: 'error',
         })
         rowIsValid = false
@@ -727,8 +748,8 @@ export const validateJsonImportData = (
             warnings.push({
               row: rowNumber,
               field: 'diagramJson',
-              message: 'DiagramJson enthält ungültiges JSON',
-              suggestion: 'Überprüfen Sie die JSON-Syntax des Diagramms',
+              message: 'DiagramJson contains invalid JSON',
+              suggestion: 'Check the JSON syntax of the diagram',
             })
           }
         }
@@ -739,8 +760,8 @@ export const validateJsonImportData = (
           warnings.push({
             row: rowNumber,
             field: 'criticality',
-            message: 'Ungültiger Criticality-Wert',
-            suggestion: 'Verwenden Sie: Low, Medium, High, Critical',
+            message: 'Invalid criticality value',
+            suggestion: 'Use: Low, Medium, High, Critical',
           })
         }
         break
@@ -761,6 +782,13 @@ export const validateJsonImportData = (
       validRows,
       invalidRows: data.length - validRows,
       duplicates,
+    },
+    fieldCoverage: {
+      mandatoryFieldsPresent,
+      mandatoryFieldsMissing,
+      optionalFieldsPresent,
+      optionalFieldsMissing,
+      unmappedColumns,
     },
   }
 }

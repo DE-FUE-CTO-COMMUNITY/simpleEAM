@@ -46,7 +46,14 @@ export interface ImportExportDialogProps {
 export interface ImportResult {
   entityType: string
   imported: number
+  failed: number
   errors: string[]
+}
+
+export interface ImportSummary {
+  totalImported: number
+  totalFailed: number
+  importResults: ImportResult[]
 }
 
 export interface EntityMapping {
@@ -55,8 +62,17 @@ export interface EntityMapping {
 
 export interface ImportWithMappingResult {
   imported: number
+  failed: number
   entityMappings: EntityMapping
   errors?: string[]
+}
+
+export interface FieldCoverage {
+  mandatoryFieldsPresent: string[]
+  mandatoryFieldsMissing: string[]
+  optionalFieldsPresent: string[]
+  optionalFieldsMissing: string[]
+  unmappedColumns: string[]
 }
 
 export interface TabValidation {
@@ -69,6 +85,7 @@ export interface TabValidation {
     totalRows: number
     duplicates: number
   }
+  fieldCoverage?: FieldCoverage
 }
 
 export interface ValidationResult {
@@ -81,6 +98,7 @@ export interface ValidationResult {
     totalRows: number
     duplicates: number
   }
+  fieldCoverage?: FieldCoverage
   tabValidations?: { [tabName: string]: TabValidation }
 }
 

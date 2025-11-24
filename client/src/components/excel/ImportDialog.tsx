@@ -9,10 +9,6 @@ import {
   Paper,
   Alert,
   CircularProgress,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
   Button,
 } from '@mui/material'
 import Grid from '@mui/material/Grid'
@@ -34,6 +30,7 @@ interface ImportDialogProps {
   validationResult: ValidationResult | null
   isImporting: boolean
   importProgress: number
+  importSummary: { imported: number; failed: number; results?: any[] } | null
   onFileUpload: (event: React.ChangeEvent<HTMLInputElement>) => void
   onEntityTypeChange: (entityType: string) => void
   onFormatChange: (format: string) => void
@@ -46,6 +43,7 @@ const ImportDialog: React.FC<ImportDialogProps> = ({
   validationResult,
   isImporting,
   importProgress,
+  importSummary,
   onFileUpload,
   onEntityTypeChange,
   onFormatChange,
@@ -185,6 +183,88 @@ const ImportDialog: React.FC<ImportDialogProps> = ({
                     )}
                   </Alert>
 
+                  {/* Field Coverage Information */}
+                  {validationResult.fieldCoverage && (
+                    <Box sx={{ mt: 2 }}>
+                      <Typography variant="subtitle2" gutterBottom>
+                        {t('fieldCoverage')}:
+                      </Typography>
+                      <Box sx={{ pl: 2 }}>
+                        {/* Mandatory Fields Present */}
+                        {validationResult.fieldCoverage.mandatoryFieldsPresent.length > 0 && (
+                          <Box sx={{ mb: 1 }}>
+                            <Typography variant="body2" color="success.main" fontWeight="bold">
+                              ✓ {t('mandatoryFieldsPresent')}:
+                            </Typography>
+                            <Typography variant="caption" sx={{ pl: 2 }}>
+                              {validationResult.fieldCoverage.mandatoryFieldsPresent.join(', ')}
+                            </Typography>
+                          </Box>
+                        )}
+
+                        {/* Mandatory Fields Missing */}
+                        {validationResult.fieldCoverage.mandatoryFieldsMissing.length > 0 ? (
+                          <Box sx={{ mb: 1 }}>
+                            <Typography variant="body2" color="error.main" fontWeight="bold">
+                              ✗ {t('mandatoryFieldsMissing')}:
+                            </Typography>
+                            <Typography variant="caption" sx={{ pl: 2 }} color="error">
+                              {validationResult.fieldCoverage.mandatoryFieldsMissing.join(', ')}
+                            </Typography>
+                          </Box>
+                        ) : (
+                          <Box sx={{ mb: 1 }}>
+                            <Typography variant="body2" color="success.main">
+                              ✓ {t('allMandatoryFieldsPresent')}
+                            </Typography>
+                          </Box>
+                        )}
+
+                        {/* Optional Fields Present */}
+                        {validationResult.fieldCoverage.optionalFieldsPresent.length > 0 && (
+                          <Box sx={{ mb: 1 }}>
+                            <Typography variant="body2" color="info.main" fontWeight="bold">
+                              ℹ {t('optionalFieldsPresent')} ({validationResult.fieldCoverage.optionalFieldsPresent.length}):
+                            </Typography>
+                            <Typography variant="caption" sx={{ pl: 2 }}>
+                              {validationResult.fieldCoverage.optionalFieldsPresent.join(', ')}
+                            </Typography>
+                          </Box>
+                        )}
+
+                        {/* Optional Fields Missing */}
+                        {validationResult.fieldCoverage.optionalFieldsMissing.length > 0 && (
+                          <Box sx={{ mb: 1 }}>
+                            <Typography variant="body2" color="text.secondary" fontWeight="bold">
+                              ○ {t('optionalFieldsMissing')} ({validationResult.fieldCoverage.optionalFieldsMissing.length}):
+                            </Typography>
+                            <Typography variant="caption" sx={{ pl: 2 }} color="text.secondary">
+                              {validationResult.fieldCoverage.optionalFieldsMissing.join(', ')}
+                            </Typography>
+                          </Box>
+                        )}
+
+                        {/* Unmapped Columns */}
+                        {validationResult.fieldCoverage.unmappedColumns.length > 0 ? (
+                          <Box sx={{ mb: 1 }}>
+                            <Typography variant="body2" color="warning.main" fontWeight="bold">
+                              ⚠ {t('unmappedColumns')}:
+                            </Typography>
+                            <Typography variant="caption" sx={{ pl: 2 }} color="warning.main">
+                              {validationResult.fieldCoverage.unmappedColumns.join(', ')}
+                            </Typography>
+                          </Box>
+                        ) : (
+                          <Box sx={{ mb: 1 }}>
+                            <Typography variant="body2" color="success.main">
+                              ✓ {t('noUnmappedColumns')}
+                            </Typography>
+                          </Box>
+                        )}
+                      </Box>
+                    </Box>
+                  )}
+
                   {/* Import Progress Indicator */}
                   {isImporting && (
                     <Box sx={{ mt: 2, mb: 2 }}>
@@ -234,28 +314,84 @@ const ImportDialog: React.FC<ImportDialogProps> = ({
                       <Typography variant="subtitle2" gutterBottom>
                         {t('errors')}:
                       </Typography>
-                      <List dense>
-                        {validationResult.errors.slice(0, 5).map((error, index) => (
-                          <ListItem key={index}>
-                            <ListItemIcon>
-                              <ErrorIcon color="error" />
-                            </ListItemIcon>
-                            <ListItemText
-                              primary={error.message || error}
-                              secondary={error.row && `${t('rowLabel')} ${error.row}`}
-                            />
-                          </ListItem>
+                      <Box sx={{ pl: 2 }}>
+                        {validationResult.errors.map((error, index) => (
+                          <Typography
+                            key={index}
+                            variant="caption"
+                            component="div"
+                            color="error"
+                            sx={{ mb: 0.5 }}
+                          >
+                            {error.row ? `Row ${error.row}: ` : ''}
+                            {error.message || error}
+                          </Typography>
                         ))}
-                        {validationResult.errors.length > 5 && (
-                          <ListItem>
-                            <ListItemText
-                              primary={t('moreErrors', {
-                                count: validationResult.errors.length - 5,
-                              })}
-                            />
-                          </ListItem>
-                        )}
-                      </List>
+                      </Box>
+                    </Box>
+                  )}
+                </Box>
+              )}
+
+              {/* Import Summary - shown after import completes */}
+              {importSummary && (
+                <Box sx={{ mt: 2 }}>
+                  <Alert
+                    severity={importSummary.failed > 0 ? 'warning' : 'success'}
+                    icon={importSummary.failed > 0 ? <WarningIcon /> : <InfoIcon />}
+                  >
+                    <Typography variant="body2" fontWeight="bold">
+                      {t('importComplete')}
+                    </Typography>
+                    <Typography variant="body2">
+                      {t('importedCount', { count: importSummary.imported })}
+                    </Typography>
+                    {importSummary.failed > 0 && (
+                      <Typography variant="body2" color="error">
+                        {t('failedCount', { count: importSummary.failed })}
+                      </Typography>
+                    )}
+                  </Alert>
+
+                  {/* Detailed results per entity type */}
+                  {importSummary.results && importSummary.results.length > 0 && (
+                    <Box sx={{ mt: 2 }}>
+                      <Typography variant="subtitle2" gutterBottom>
+                        {t('detailedResults')}:
+                      </Typography>
+                      {importSummary.results.map((result: any, index: number) => (
+                        <Box
+                          key={index}
+                          sx={{
+                            mb: 1,
+                            p: 1,
+                            border: 1,
+                            borderColor: result.failed > 0 ? 'warning.main' : 'divider',
+                            borderRadius: 1,
+                            bgcolor: result.failed > 0 ? 'warning.light' : 'transparent',
+                          }}
+                        >
+                          <Typography variant="body2" fontWeight="bold">
+                            {result.entityType}: {result.imported} {t('imported')}
+                            {result.failed > 0 && `, ${result.failed} ${t('failed')}`}
+                          </Typography>
+                          {result.errors && result.errors.length > 0 && (
+                            <Box sx={{ mt: 1, pl: 1 }}>
+                              {result.errors.map((error: string, errIdx: number) => (
+                                <Typography
+                                  key={errIdx}
+                                  variant="caption"
+                                  component="div"
+                                  color="error"
+                                  sx={{ mb: 0.5 }}
+                                >
+                                  {error}
+                                </Typography>
+                              ))}
+                            </Box>
+                          )}
+                        </Box>
+                      ))}
                     </Box>
                   )}
                 </Box>
