@@ -25,6 +25,10 @@ async function fetchConfig(): Promise<RuntimeConfig> {
       return res.json()
     })
     .then((config: RuntimeConfig) => {
+      console.log('=== Runtime Config Loaded ===')
+      console.log('GraphQL URL:', config.graphql.url)
+      console.log('Keycloak URL:', config.keycloak.url)
+      console.log('============================')
       configCache = config
       configPromise = null
       return config

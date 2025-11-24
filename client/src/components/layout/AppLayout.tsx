@@ -105,6 +105,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [initialized, setInitialized] = useState(false)
   const [authenticated, setAuthenticated] = useState(false)
   const [client, setClient] = useState<ApolloClient<NormalizedCacheObject> | null>(null)
+  const [configLoaded, setConfigLoaded] = useState(false)
 
   // Get GraphQL URL from runtime config
   const graphqlConfig = useGraphQLConfig()
@@ -114,9 +115,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     setMounted(true)
   }, [])
 
+  // Wait for config to load
+  useEffect(() => {
+    // Check if config has been loaded (not using default localhost URL)
+    if (graphqlConfig.url !== 'http://localhost:4000/graphql') {
+      setConfigLoaded(true)
+    }
+  }, [graphqlConfig.url])
+
   // Authentication und Apollo Client Initialisierung
   useEffect(() => {
-    if (!mounted) return
+    if (!mounted || !configLoaded) return
 
     const initializeApp = async () => {
       try {
@@ -166,7 +175,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         cleanup.then(cleanupFn => cleanupFn?.())
       }
     }
-  }, [mounted, graphqlConfig.url])
+  }, [mounted, configLoaded, graphqlConfig.url])
 
   // Verhindere Hydration-Fehler durch einheitliche Server/Client Struktur
   if (!mounted) {
@@ -181,6 +190,23 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         }}
       >
         <div>Loading...</div>
+      </div>
+    )
+  }
+
+  // Wait for runtime config to load
+  if (!configLoaded) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+          width: '100vw',
+        }}
+      >
+        <div>Loading configuration...</div>
       </div>
     )
   }
