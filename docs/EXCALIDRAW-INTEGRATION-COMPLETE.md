@@ -57,12 +57,10 @@ Die komplette Excalidraw-Fork-Integration für das Simple EAM-Projekt ist erfolg
 ### 4. Benachrichtigungssystem
 
 - **Success-Notifications:**
-
   - "Diagramm erfolgreich gespeichert"
   - "Diagramm erfolgreich geladen"
 
 - **Error-Notifications:**
-
   - "Fehler beim Laden des Diagramms"
   - Weitere GraphQL-Fehler
 

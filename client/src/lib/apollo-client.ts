@@ -3,27 +3,46 @@ import { setContext } from '@apollo/client/link/context'
 import { onError } from '@apollo/client/link/error'
 import { keycloak } from './auth'
 
+// Cache for GraphQL URL from runtime config
+let graphqlUrlCache: string | null = null
+
+/**
+ * Fetch GraphQL URL from runtime config
+ */
+async function fetchGraphQLUrl(): Promise<string> {
+  if (graphqlUrlCache) {
+    return graphqlUrlCache as string
+  }
+
+  try {
+    const response = await fetch('/api/runtime-config')
+    if (response.ok) {
+      const config = await response.json()
+      graphqlUrlCache = config.graphql.url || 'http://localhost:4000/graphql'
+      return graphqlUrlCache as string
+    }
+  } catch (error) {
+    console.error('Failed to fetch runtime config for GraphQL:', error)
+  }
+
+  // Fallback to localhost
+  const fallback = 'http://localhost:4000/graphql'
+  graphqlUrlCache = fallback
+  return fallback
+}
+
 /**
  * Erstellt einen Apollo-Client für GraphQL-Anfragen mit dynamischer Token-Authentifizierung
- * Uses server-side environment variable (not NEXT_PUBLIC_)
+ * Uses runtime configuration from API
  */
-export function createApolloClient(initialToken?: string) {
+export function createApolloClient(initialToken?: string, graphqlUrl?: string) {
   // HTTP link for GraphQL endpoint
   const httpLink = new HttpLink({
-    uri: process.env.GRAPHQL_URL || 'http://localhost:4000/graphql',
+    uri: graphqlUrl || 'http://localhost:4000/graphql',
   })
 
   // Authentifizierungs-Link für dynamisches Token-Handling
-  const authLink = setContext(async (_, { headers }) => {
-    // Try to refresh token if it's about to expire
-    if (keycloak && keycloak.isTokenExpired(30)) {
-      try {
-        await keycloak.updateToken(30)
-      } catch (error) {
-        console.error('Failed to refresh token:', error)
-      }
-    }
-
+  const authLink = setContext((_, { headers }) => {
     // Get current token from Keycloak instance (if available)
     // or use passed initialToken as fallback
     const currentToken = keycloak?.token || initialToken

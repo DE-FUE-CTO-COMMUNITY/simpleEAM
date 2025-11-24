@@ -11,6 +11,7 @@ import { AuthContext, initKeycloak, keycloak } from '@/lib/auth'
 import { setupSessionMonitoring } from '@/utils/sessionUtils'
 import { createApolloClient } from '@/lib/apollo-client'
 import { useAutoUserRegistration } from '@/hooks/useAutoUserRegistration'
+import { useGraphQLConfig } from '@/lib/runtime-config'
 import ThemeProvider from '@/contexts/ThemeContext'
 import { DebugProvider } from '@/contexts/DebugContext'
 import { CircularProgress, Box } from '@mui/material'
@@ -104,6 +105,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [initialized, setInitialized] = useState(false)
   const [authenticated, setAuthenticated] = useState(false)
   const [client, setClient] = useState<ApolloClient<NormalizedCacheObject> | null>(null)
+  
+  // Get GraphQL URL from runtime config
+  const graphqlConfig = useGraphQLConfig()
 
   // Client-side mounting
   useEffect(() => {
@@ -123,8 +127,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         // Session Monitoring
         setupSessionMonitoring()
 
-        // Create Apollo client with dynamic token (once)
-        const apolloClient = createApolloClient(keycloak?.token)
+        // Create Apollo client with dynamic token and GraphQL URL from runtime config
+        const apolloClient = createApolloClient(keycloak?.token, graphqlConfig.url)
         setClient(apolloClient)
 
         // Token refresh listener - update only the token, not the entire client
@@ -135,7 +139,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
         // Auth error listener - create client without token
         const handleAuthError = () => {
-          const unauthenticatedClient = createApolloClient()
+          const unauthenticatedClient = createApolloClient(undefined, graphqlConfig.url)
           setClient(unauthenticatedClient)
         }
 

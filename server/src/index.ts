@@ -46,15 +46,9 @@ async function startServer() {
   // Initialize Apollo server
   const server = new ApolloServer({
     schema,
-    context: ({ req }) => {
-      // Extract JWT token from Authorization header (remove "Bearer " prefix)
-      const authHeader = req.headers.authorization || ''
-      const token = authHeader.startsWith('Bearer ') ? authHeader.substring(7) : authHeader
-      
-      return {
-        token, // Pass just the JWT token to Neo4j GraphQL Library
-      }
-    },
+    context: ({ req }) => ({
+      token: req.headers.authorization, // Token directly from Authorization header forward to Neo4j GraphQL Library
+    }),
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
     introspection: true, // Enable for development
   })
