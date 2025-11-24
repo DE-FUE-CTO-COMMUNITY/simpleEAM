@@ -6,15 +6,6 @@ import { NextResponse } from 'next/server'
  * This replaces NEXT_PUBLIC_* build-time variables
  */
 export async function GET() {
-  // Debug logging
-  console.log('=== Runtime Config Debug ===')
-  console.log('THEME_PRIMARY_COLOR:', process.env.THEME_PRIMARY_COLOR)
-  console.log('THEME_SECONDARY_COLOR:', process.env.THEME_SECONDARY_COLOR)
-  console.log('THEME_FONT_FAMILY:', process.env.THEME_FONT_FAMILY)
-  console.log('LOGO_URL:', process.env.LOGO_URL)
-  console.log('LOGO_ALT:', process.env.LOGO_ALT)
-  console.log('===========================')
-
   const config = {
     // Keycloak Configuration
     keycloak: {

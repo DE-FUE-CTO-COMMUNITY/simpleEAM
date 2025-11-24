@@ -49,11 +49,39 @@ const clearLoginStatus = () => {
   }
 }
 
-// Keycloak configuration
-const keycloakConfig = {
-  url: process.env.KEYCLOAK_URL || 'https://auth.dev-server.mf2.eu',
-  realm: process.env.KEYCLOAK_REALM || 'simple-eam',
-  clientId: process.env.KEYCLOAK_CLIENT_ID_CLIENT || 'eam-client',
+// Keycloak configuration - will be populated from runtime config
+let keycloakConfig: {
+  url: string
+  realm: string
+  clientId: string
+} | null = null
+
+/**
+ * Fetch Keycloak configuration from runtime config
+ */
+async function fetchKeycloakConfig() {
+  if (keycloakConfig) {
+    return keycloakConfig
+  }
+
+  try {
+    const response = await fetch('/api/runtime-config')
+    if (response.ok) {
+      const config = await response.json()
+      keycloakConfig = config.keycloak
+      return keycloakConfig
+    }
+  } catch (error) {
+    console.error('Failed to fetch runtime config for Keycloak:', error)
+  }
+
+  // Fallback to defaults
+  keycloakConfig = {
+    url: 'https://auth.dev-server.mf2.eu',
+    realm: 'simple-eam',
+    clientId: 'eam-client',
+  }
+  return keycloakConfig
 }
 
 /**
@@ -66,7 +94,7 @@ let keycloakInitPromise: Promise<boolean> | null = null
  * Initializes Keycloak instance and returns a Promise
  * Diese Funktion stellt sicher, dass Keycloak nur einmal initialisiert wird
  */
-export const initKeycloak = () => {
+export const initKeycloak = async () => {
   if (typeof window === 'undefined') {
     // If server environment, return empty promise
     return Promise.resolve(false)
@@ -77,9 +105,18 @@ export const initKeycloak = () => {
     return keycloakInitPromise
   }
 
+  // Fetch Keycloak configuration from runtime config
+  const config = await fetchKeycloakConfig()
+
   // Erstelle Keycloak-Instanz, falls noch nicht geschehen
+  if (!keycloak && config) {
+    keycloak = new Keycloak(config)
+  }
+
+  // Guard: If keycloak could not be initialized, return false
   if (!keycloak) {
-    keycloak = new Keycloak(keycloakConfig)
+    console.error('Failed to initialize Keycloak instance')
+    return Promise.resolve(false)
   }
 
   // Initialisiere Keycloak und speichere die Promise
