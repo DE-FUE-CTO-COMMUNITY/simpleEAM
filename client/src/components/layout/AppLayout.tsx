@@ -136,9 +136,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         // Session Monitoring
         setupSessionMonitoring()
 
-        // Log the GraphQL URL being used
-        console.log('Creating Apollo Client with GraphQL URL:', graphqlConfig.url)
-
         // Create Apollo client with dynamic token and GraphQL URL from runtime config
         const apolloClient = createApolloClient(keycloak?.token, graphqlConfig.url)
         setClient(apolloClient)

@@ -9,12 +9,6 @@ const appVersion = packageJson.version ?? '0.0.0'
  * This replaces NEXT_PUBLIC_* build-time variables
  */
 export async function GET() {
-  // Debug logging
-  console.log('=== Runtime Config API Debug ===')
-  console.log('GRAPHQL_URL:', process.env.GRAPHQL_URL)
-  console.log('KEYCLOAK_URL:', process.env.KEYCLOAK_URL)
-  console.log('================================')
-
   const config = {
     // Keycloak Configuration
     keycloak: {
