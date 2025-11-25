@@ -1,12 +1,13 @@
 'use client'
 
-import { useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import dynamic from 'next/dynamic'
 import { FONT_FAMILY } from '@excalidraw/excalidraw'
 import type { ExcalidrawFont } from '@/components/companies/types'
 import { useThemeMode } from '@/contexts/ThemeContext'
 import { useCompanyContext } from '@/contexts/CompanyContext'
 import { useThemeConfig } from '@/lib/runtime-config'
+import DiagramLibrarySidebar from './DiagramLibrarySidebar'
 
 const ExcalidrawCanvas = dynamic(
   async () => {
@@ -33,6 +34,7 @@ export default function DiagramEditor() {
   const { mode } = useThemeMode()
   const { selectedCompany } = useCompanyContext()
   const themeConfig = useThemeConfig()
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
 
   const branding = useMemo(
     () => ({
@@ -78,9 +80,28 @@ export default function DiagramEditor() {
     [mode, companyFontFamily]
   )
 
+  const handleToggleSidebar = useCallback(() => {
+    setIsSidebarOpen(prev => !prev)
+  }, [])
+
   return (
-    <div style={{ width: '100%', height: '100%' }}>
-      <ExcalidrawCanvas theme={excalidrawTheme} initialData={initialData} />
+    <div
+      style={{
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        overflow: 'hidden',
+        backgroundColor: 'var(--excalidraw-bg, transparent)',
+      }}
+    >
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <ExcalidrawCanvas theme={excalidrawTheme} initialData={initialData} />
+      </div>
+      <DiagramLibrarySidebar
+        defaultFontFamily={companyFontFamily}
+        isOpen={isSidebarOpen}
+        onToggle={handleToggleSidebar}
+      />
     </div>
   )
 }
