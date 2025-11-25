@@ -9,9 +9,8 @@
 import { Company as GeneratedCompany, CompanySize } from '../../gql/generated'
 
 export const EXCALIDRAW_FONTS = [
-  'Virgil',
-  'Comic Shanns',
   'Excalifont',
+  'Comic Shanns',
   'Lilita One',
   'Nunito',
 ] as const satisfies readonly [string, ...string[]]

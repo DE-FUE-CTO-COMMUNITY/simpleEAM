@@ -13,7 +13,7 @@ import { GenericFormProps } from '../common/GenericFormProps'
 import { isArchitect } from '@/lib/auth'
 
 const HEX_COLOR_REGEX = /^#(?:[0-9a-fA-F]{3}){1,2}$/
-const DEFAULT_DIAGRAM_FONT: ExcalidrawFont = EXCALIDRAW_FONTS[0]
+const DEFAULT_DIAGRAM_FONT: ExcalidrawFont = 'Excalifont'
 const getFontPreviewFamily = (font: string) =>
   `"${font}", "Segoe UI", "Nunito", "Helvetica Neue", sans-serif`
 
