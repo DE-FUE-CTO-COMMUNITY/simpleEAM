@@ -78,7 +78,14 @@ export function findArchimateTemplate(
       ],
       'Business Object': ['Data Object', 'Data', 'Object'],
       'Application Interface': ['Interface', 'API'],
-      Infrastruktur: ['Infrastructure', 'Server', 'Device', 'Technology Node', 'System Software', 'Node'],
+      Infrastruktur: [
+        'Infrastructure',
+        'Server',
+        'Device',
+        'Technology Node',
+        'System Software',
+        'Node',
+      ],
     }
 
     const altNames = alternatives[templateName]
@@ -173,7 +180,9 @@ export function createLibraryItemFromDatabaseElement<T extends { id: string; nam
     clone.id = idMapping.get(templateElement.id) ?? generateId()
 
     if (Array.isArray(clone.groupIds)) {
-      clone.groupIds = clone.groupIds.map((groupId: string) => groupIdMapping.get(groupId) ?? groupId)
+      clone.groupIds = clone.groupIds.map(
+        (groupId: string) => groupIdMapping.get(groupId) ?? groupId
+      )
     }
 
     if (Array.isArray(clone.boundElements)) {
@@ -202,10 +211,12 @@ export function createLibraryItemFromDatabaseElement<T extends { id: string; nam
       const containerRect = template.elements.find(
         originalElement =>
           originalElement.type === 'rectangle' &&
-          originalElement.boundElements?.some((bound: { id: string }) => bound.id === templateElement.id)
+          originalElement.boundElements?.some(
+            (bound: { id: string }) => bound.id === templateElement.id
+          )
       )
 
-      const availableWidth = containerRect ? containerRect.width - 20 : clone.width ?? 180
+      const availableWidth = containerRect ? containerRect.width - 20 : (clone.width ?? 180)
       const fontSize = clone.fontSize ?? 20
       const wrappedText = wrapTextToFitWidth(element.name ?? '', availableWidth, fontSize)
 

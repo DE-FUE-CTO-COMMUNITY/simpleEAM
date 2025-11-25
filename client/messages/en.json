@@ -1918,6 +1918,51 @@
       "toLabel": "To"
     }
   },
+  "diagramEditor": {
+    "librarySidebar": {
+      "title": "Diagram Library",
+      "description": "Drag an entry into the canvas.",
+      "newHeading": "New elements",
+      "existingHeading": "Existing elements",
+      "noTemplates": "Templates are not available yet.",
+      "noRecords": "No {type} available yet.",
+      "templateRequired": "Add a {type} template to unlock database elements.",
+      "toggle": {
+        "show": "Show library",
+        "hide": "Hide library"
+      }
+    },
+    "elementTypes": {
+      "capability": {
+        "singular": "Business Capability",
+        "plural": "Business Capabilities"
+      },
+      "application": {
+        "singular": "Application",
+        "plural": "Applications"
+      },
+      "dataObject": {
+        "singular": "Data Object",
+        "plural": "Data Objects"
+      },
+      "applicationInterface": {
+        "singular": "Application Interface",
+        "plural": "Application Interfaces"
+      },
+      "interface": {
+        "singular": "Interface",
+        "plural": "Interfaces"
+      },
+      "infrastructure": {
+        "singular": "Infrastructure",
+        "plural": "Infrastructure"
+      },
+      "aiComponent": {
+        "singular": "AI Component",
+        "plural": "AI Components"
+      }
+    }
+  },
   "debug": {
     "autoRegistration": {
       "title": "Auto-Registration Debug",

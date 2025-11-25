@@ -869,7 +869,7 @@
           "height": 74.62109375000003,
           "angle": 0,
           "strokeColor": "#2f9e44",
-          "backgroundColor": "#ffec99",
+          "backgroundColor": "#a5d8ff",
           "fillStyle": "solid",
           "strokeWidth": 2,
           "strokeStyle": "solid",
@@ -907,7 +907,7 @@
           "height": 50,
           "angle": 0,
           "strokeColor": "#1e1e1e",
-          "backgroundColor": "#ffec99",
+          "backgroundColor": "#a5d8ff",
           "fillStyle": "solid",
           "strokeWidth": 2,
           "strokeStyle": "solid",
@@ -927,13 +927,13 @@
           "updated": 1738336012611,
           "link": null,
           "locked": false,
-          "text": "Business\nObject",
+          "text": "Data\nObject",
           "fontSize": 20,
           "fontFamily": 1,
           "textAlign": "center",
           "verticalAlign": "middle",
           "containerId": "AEfXPontS_UaU3iI5WDqT",
-          "originalText": "Business\nObject",
+          "originalText": "Data\nObject",
           "autoResize": true,
           "lineHeight": 1.25
         },
@@ -1015,7 +1015,7 @@
       ],
       "id": "y-gQuQWlt5cOzs0DHiWFn",
       "created": 1738336796307,
-      "name": "Business Object"
+      "name": "Data Object"
     },
 
     {

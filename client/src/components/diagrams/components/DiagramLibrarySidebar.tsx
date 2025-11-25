@@ -19,6 +19,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import { useQuery } from '@apollo/client'
+import { useTranslations } from 'next-intl'
 import {
   GET_LIBRARY_ELEMENTS,
   ELEMENT_TYPE_CONFIG,
@@ -87,6 +88,9 @@ export default function DiagramLibrarySidebar({
   onToggle,
 }: DiagramLibrarySidebarProps) {
   const companyWhere = useCompanyWhere()
+  const tSidebar = useTranslations('diagramEditor.librarySidebar')
+  const tTypes = useTranslations('diagramEditor.elementTypes')
+  const tToggle = useTranslations('diagramEditor.librarySidebar.toggle')
   const variables = useMemo(
     () => ({
       capWhere: companyWhere,
@@ -147,6 +151,32 @@ export default function DiagramLibrarySidebar({
     return lookup
   }, [templateLibrary])
 
+  const typeColors = useMemo(() => {
+    const colors: Partial<Record<ElementType, string>> = {}
+    SECTION_ORDER.forEach(type => {
+      const template = templateLookup[type]
+      if (!template?.elements?.length) return
+      const rectangle = template.elements.find(
+        element => element?.type === 'rectangle' && typeof element.backgroundColor === 'string'
+      ) as { backgroundColor?: string } | undefined
+      if (rectangle?.backgroundColor) {
+        colors[type] = rectangle.backgroundColor
+      }
+    })
+    return colors
+  }, [templateLookup])
+
+  const getTypeLabel = useCallback(
+    (type: ElementType, variant: 'singular' | 'plural') => {
+      try {
+        return tTypes(`${type}.${variant}`)
+      } catch {
+        return ELEMENT_TYPE_CONFIG[type]?.label ?? type
+      }
+    },
+    [tTypes]
+  )
+
   const templateItems = useMemo(() => {
     const items: SidebarItem[] = []
     SECTION_ORDER.forEach(type => {
@@ -154,20 +184,22 @@ export default function DiagramLibrarySidebar({
       if (!template) return
       items.push({
         id: `template-${type}`,
-        title: ELEMENT_TYPE_CONFIG[type]?.label ?? type,
+        title: getTypeLabel(type, 'singular'),
         elementType: type,
         libraryItem: template,
       })
     })
     return items
-  }, [templateLookup])
+  }, [getTypeLabel, templateLookup])
 
   const existingSections: SidebarSection[] = useMemo(() => {
     return SECTION_ORDER.map((type, index) => {
       const accessor = DATA_ACCESSORS[type]
       const template = templateLookup[type] ?? null
       const list = accessor && data ? accessor(data) : []
-      const sorted = [...list].sort((a, b) => a.name.localeCompare(b.name, 'de', { sensitivity: 'base' }))
+      const sorted = [...list].sort((a, b) =>
+        a.name.localeCompare(b.name, 'de', { sensitivity: 'base' })
+      )
 
       const items: SidebarItem[] = template
         ? sorted.reduce<SidebarItem[]>((acc, record) => {
@@ -193,15 +225,15 @@ export default function DiagramLibrarySidebar({
 
       return {
         key: `existing-${type}`,
-        title: ELEMENT_TYPE_CONFIG[type]?.label ?? type,
+        title: getTypeLabel(type, 'plural'),
         items,
         emptyLabel: template
-          ? 'No records available for this type yet'
-          : 'Add a template to unlock database elements',
+          ? tSidebar('noRecords', { type: getTypeLabel(type, 'plural') })
+          : tSidebar('templateRequired', { type: getTypeLabel(type, 'singular') }),
         defaultExpanded: index === 0,
       }
     })
-  }, [data, defaultFontFamily, templateLookup])
+  }, [data, defaultFontFamily, getTypeLabel, tSidebar, templateLookup])
 
   const handleDragStart = useCallback((event: DragEvent<HTMLDivElement>, item: SidebarItem) => {
     if (!item?.libraryItem) return
@@ -212,7 +244,10 @@ export default function DiagramLibrarySidebar({
 
   const renderListItem = useCallback(
     (item: SidebarItem) => {
-      const color = ELEMENT_TYPE_CONFIG[item.elementType]?.color ?? 'transparent'
+      const color =
+        typeColors[item.elementType] ??
+        ELEMENT_TYPE_CONFIG[item.elementType]?.color ??
+        'transparent'
       return (
         <ListItemButton
           key={item.id}
@@ -239,11 +274,15 @@ export default function DiagramLibrarySidebar({
               alignSelf: 'stretch',
             }}
           />
-          <ListItemText primary={item.title} primaryTypographyProps={{ noWrap: true }} sx={{ mr: 1 }} />
+          <ListItemText
+            primary={item.title}
+            primaryTypographyProps={{ noWrap: true }}
+            sx={{ mr: 1 }}
+          />
         </ListItemButton>
       )
     },
-    [handleDragStart]
+    [handleDragStart, typeColors]
   )
 
   const renderSection = (section: SidebarSection, loading: boolean) => (
@@ -259,7 +298,14 @@ export default function DiagramLibrarySidebar({
       }}
     >
       <AccordionSummary expandIcon={<ExpandMoreIcon fontSize="small" />} sx={{ px: 1 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'space-between' }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            width: '100%',
+            justifyContent: 'space-between',
+          }}
+        >
           <Typography variant="subtitle2" fontWeight={600}>
             {section.title}
           </Typography>
@@ -304,8 +350,12 @@ export default function DiagramLibrarySidebar({
           justifyContent: 'center',
         }}
       >
-        <Tooltip title={isOpen ? 'Hide library' : 'Show library'}>
-          <IconButton size="small" onClick={onToggle} aria-label={isOpen ? 'Hide library' : 'Show library'}>
+        <Tooltip title={isOpen ? tToggle('hide') : tToggle('show')}>
+          <IconButton
+            size="small"
+            onClick={onToggle}
+            aria-label={isOpen ? tToggle('hide') : tToggle('show')}
+          >
             {isOpen ? <ChevronRightIcon fontSize="small" /> : <ChevronLeftIcon fontSize="small" />}
           </IconButton>
         </Tooltip>
@@ -324,10 +374,10 @@ export default function DiagramLibrarySidebar({
           <>
             <Box sx={{ px: 2, py: 2 }}>
               <Typography variant="subtitle1" fontWeight={700}>
-                Diagram Library
+                {tSidebar('title')}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Drag an entry into the canvas to drop it via Excalidraw&rsquo;s native API.
+                {tSidebar('description')}
               </Typography>
             </Box>
 
@@ -335,7 +385,7 @@ export default function DiagramLibrarySidebar({
 
             <Box sx={{ flex: 1, overflowY: 'auto' }}>
               <Typography variant="overline" sx={{ px: 2, pt: 2, pb: 1 }} color="text.secondary">
-                New elements
+                {tSidebar('newHeading')}
               </Typography>
               {templatesLoading ? (
                 <Box sx={{ display: 'flex', justifyContent: 'center', py: 1 }}>
@@ -347,14 +397,14 @@ export default function DiagramLibrarySidebar({
                 </List>
               ) : (
                 <Typography variant="body2" color="text.secondary" sx={{ px: 2 }}>
-                  Templates are not available yet.
+                  {tSidebar('noTemplates')}
                 </Typography>
               )}
 
               <Divider sx={{ my: 1.5 }} />
 
               <Typography variant="overline" sx={{ px: 2, pb: 1 }} color="text.secondary">
-                Existing elements
+                {tSidebar('existingHeading')}
               </Typography>
               {existingSections.map(section => renderSection(section, elementsLoading))}
             </Box>

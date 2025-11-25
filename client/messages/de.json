@@ -1910,6 +1910,51 @@
       "toLabel": "Bis"
     }
   },
+  "diagramEditor": {
+    "librarySidebar": {
+      "title": "Diagrammbibliothek",
+      "description": "Ziehe einen Eintrag auf die Zeichenfläche.",
+      "newHeading": "Neue Elemente",
+      "existingHeading": "Bestehende Elemente",
+      "noTemplates": "Vorlagen sind noch nicht verfügbar.",
+      "noRecords": "Noch keine {type} vorhanden.",
+      "templateRequired": "Füge eine {type}-Vorlage hinzu, um Datenbankelemente freizuschalten.",
+      "toggle": {
+        "show": "Bibliothek anzeigen",
+        "hide": "Bibliothek ausblenden"
+      }
+    },
+    "elementTypes": {
+      "capability": {
+        "singular": "Business Capability",
+        "plural": "Business Capabilities"
+      },
+      "application": {
+        "singular": "Applikation",
+        "plural": "Applikationen"
+      },
+      "dataObject": {
+        "singular": "Datenobjekt",
+        "plural": "Datenobjekte"
+      },
+      "applicationInterface": {
+        "singular": "Applikationsschnittstelle",
+        "plural": "Applikationsschnittstellen"
+      },
+      "interface": {
+        "singular": "Schnittstelle",
+        "plural": "Schnittstellen"
+      },
+      "infrastructure": {
+        "singular": "Infrastruktur",
+        "plural": "Infrastruktur"
+      },
+      "aiComponent": {
+        "singular": "KI-Komponente",
+        "plural": "KI-Komponenten"
+      }
+    }
+  },
   "debug": {
     "autoRegistration": {
       "title": "Auto-Registrierung Debug",
