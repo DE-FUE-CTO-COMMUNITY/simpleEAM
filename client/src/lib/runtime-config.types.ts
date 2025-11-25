@@ -19,6 +19,9 @@ export interface RuntimeConfig {
     url: string
     alt: string
   }
+  tool: {
+    version: string
+  }
 }
 
 export const defaultConfig: RuntimeConfig = {
@@ -41,5 +44,8 @@ export const defaultConfig: RuntimeConfig = {
   logo: {
     url: '/images/Simple-EAM-Logo.svg',
     alt: 'Simple-EAM Logo',
+  },
+  tool: {
+    version: '0.0.0',
   },
 }

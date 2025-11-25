@@ -1,4 +1,7 @@
 import { NextResponse } from 'next/server'
+import packageJson from '../../../../package.json'
+
+const appVersion = packageJson.version ?? '0.0.0'
 
 /**
  * Runtime configuration endpoint
@@ -41,6 +44,11 @@ export async function GET() {
     logo: {
       url: process.env.LOGO_URL || '/images/Simple-EAM-Logo.svg',
       alt: process.env.LOGO_ALT || 'Simple-EAM Logo',
+    },
+
+    // Tool metadata
+    tool: {
+      version: appVersion,
     },
   }
 

@@ -18,6 +18,7 @@ import {
 } from '@mui/icons-material'
 import { useLocale, useTranslations } from 'next-intl'
 import { logout, useAuth } from '@/lib/auth'
+import { useToolConfig } from '@/lib/runtime-config'
 import { useQuery } from '@apollo/client'
 import { GET_PERSON_BY_EMAIL } from '@/graphql/person'
 import UserProfileDialog from '@/components/profile/UserProfileDialog'
@@ -32,6 +33,7 @@ const UserProfileMenu: React.FC<UserProfileMenuProps> = ({ userName }) => {
   const locale = useLocale()
   const t = useTranslations('user')
   const { authenticated } = useAuth()
+  const { version: toolVersion } = useToolConfig()
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
   const [profileDialogOpen, setProfileDialogOpen] = useState(false)
   const [languageSwitcherAnchorEl, setLanguageSwitcherAnchorEl] = useState<null | HTMLElement>(null)
@@ -150,6 +152,12 @@ const UserProfileMenu: React.FC<UserProfileMenuProps> = ({ userName }) => {
             <LogoutIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>{t('logout')}</ListItemText>
+        </MenuItem>
+        <Divider sx={{ my: 1 }} />
+        <MenuItem disabled sx={{ opacity: 1, cursor: 'default' }}>
+          <ListItemText primaryTypographyProps={{ variant: 'caption', color: 'text.secondary' }}>
+            {`Version ${toolVersion || 'N/A'}`}
+          </ListItemText>
         </MenuItem>
       </Menu>
 

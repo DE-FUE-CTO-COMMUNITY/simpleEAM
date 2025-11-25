@@ -28,6 +28,7 @@ async function fetchConfig(): Promise<RuntimeConfig> {
       console.log('=== Runtime Config Loaded ===')
       console.log('GraphQL URL:', config.graphql.url)
       console.log('Keycloak URL:', config.keycloak.url)
+      console.log('Tool Version:', config.tool.version)
       console.log('============================')
       configCache = config
       configPromise = null
@@ -80,4 +81,9 @@ export function useThemeConfig() {
 export function useLogoConfig() {
   const config = useRuntimeConfig()
   return config.logo
+}
+
+export function useToolConfig() {
+  const config = useRuntimeConfig()
+  return config.tool
 }
