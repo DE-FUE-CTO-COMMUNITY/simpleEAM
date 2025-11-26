@@ -303,6 +303,12 @@
     height: var(--default-button-size) !important;
   }
 
+  /* Hide legacy default sidebar trigger (old library button) */
+  label.sidebar-trigger__label-element[title='Library'],
+  label.sidebar-trigger__label-element[title='Bibliothek'] {
+    display: none !important;
+  }
+
   /* Additional UI component styling with higher specificity */
   .layer-ui__library {
     display: flex !important;

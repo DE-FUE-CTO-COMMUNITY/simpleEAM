@@ -1088,13 +1088,13 @@
           "updated": 1738336012611,
           "link": null,
           "locked": false,
-          "text": "Infrastruktur",
+          "text": "Infrastructure",
           "fontSize": 20,
           "fontFamily": 1,
           "textAlign": "center",
           "verticalAlign": "middle",
           "containerId": "InfraNodeMainRect",
-          "originalText": "Infrastruktur",
+          "originalText": "Infrastructure",
           "autoResize": true,
           "lineHeight": 1.25
         },
@@ -1289,7 +1289,7 @@
       ],
       "id": "infrastructure-node-symbol",
       "created": 1738336796308,
-      "name": "Infrastruktur"
+      "name": "Infrastructure"
     }
 
   ]

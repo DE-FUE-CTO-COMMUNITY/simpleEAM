@@ -16,9 +16,9 @@ export interface ArchiMateLibrary {
 export const TEMPLATE_NAME_BY_TYPE: Partial<Record<ElementType, string>> = {
   capability: 'Capability',
   application: 'Application Component',
-  dataObject: 'Business Object',
+  dataObject: 'Data Object',
   applicationInterface: 'Application Interface',
-  infrastructure: 'Infrastruktur',
+  infrastructure: 'Infrastructure',
   aiComponent: 'AI Component',
 }
 
@@ -63,44 +63,6 @@ export function findArchimateTemplate(
         (element: any) => element.type === 'text' && element.text?.includes(templateName)
       )
     )
-  }
-
-  if (!item) {
-    const alternatives: Record<string, string[]> = {
-      Capability: ['Business Function', 'Business Capability', 'Business'],
-      'Application Component': [
-        'Application',
-        'App Component',
-        'ApplicationComponent',
-        'App',
-        'Software Component',
-        'System Component',
-      ],
-      'Business Object': ['Data Object', 'Data', 'Object'],
-      'Application Interface': ['Interface', 'API'],
-      Infrastruktur: [
-        'Infrastructure',
-        'Server',
-        'Device',
-        'Technology Node',
-        'System Software',
-        'Node',
-      ],
-    }
-
-    const altNames = alternatives[templateName]
-    if (altNames) {
-      for (const alt of altNames) {
-        item = library.libraryItems.find(libItem => libItem.name === alt)
-        if (item) break
-        item = library.libraryItems.find(libItem =>
-          libItem.elements?.some(
-            (element: any) => element.type === 'text' && element.text?.includes(alt)
-          )
-        )
-        if (item) break
-      }
-    }
   }
 
   if (!item) {
