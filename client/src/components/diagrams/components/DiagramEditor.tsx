@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
-import { useMutation } from '@apollo/client'
+import { useLazyQuery, useMutation } from '@apollo/client'
 import { FONT_FAMILY } from '@excalidraw/excalidraw'
 import { useTranslations, useLocale } from 'next-intl'
 import type { ExcalidrawFont } from '@/components/companies/types'
@@ -10,11 +10,21 @@ import { useThemeMode } from '@/contexts/ThemeContext'
 import { useCompanyContext } from '@/contexts/CompanyContext'
 import { useCurrentPerson } from '@/hooks/useCurrentPerson'
 import { useThemeConfig } from '@/lib/runtime-config'
-import { CREATE_DIAGRAM, UPDATE_DIAGRAM } from '@/graphql/diagram'
+import { CREATE_DIAGRAM, GET_DIAGRAM, UPDATE_DIAGRAM } from '@/graphql/diagram'
 import DiagramLibrarySidebar from './DiagramLibrarySidebar'
 import LocalOpenDiagramDialog, { LocalOpenDialogDiagram } from './dialogs/LocalOpenDiagramDialog'
 import LocalSaveDiagramDialog from './dialogs/LocalSaveDiagramDialog'
 import type { LocalStoredDiagramMetadata } from './dialogs/types'
+
+const LOCAL_DRAFT_STORAGE_KEY = 'diagram-editor-local-draft'
+
+interface LocalDiagramDraftPayload {
+  diagramJson: string
+  metadata?: LocalStoredDiagramMetadata
+  diagramId?: string | null
+  diagramName?: string | null
+  updatedAt: string
+}
 
 interface MinimalExcalidrawProps {
   theme: 'light' | 'dark'
@@ -237,8 +247,24 @@ export default function DiagramEditor() {
   const [saveDialogForceSaveAs, setSaveDialogForceSaveAs] = useState(false)
   const [createDiagramMutation] = useMutation(CREATE_DIAGRAM)
   const [updateDiagramMutation] = useMutation(UPDATE_DIAGRAM)
+  const [fetchDiagramById] = useLazyQuery(GET_DIAGRAM)
   const excalidrawAPIRef = useRef<any>(null)
+  const sceneInitializedRef = useRef(false)
+  const pendingDiagramProcessingRef = useRef(false)
   const suppressSceneChangeRef = useRef(false)
+  const [isEditorReady, setIsEditorReady] = useState(false)
+
+  const waitForCanvasHydration = useCallback(async () => {
+    if (typeof window === 'undefined') {
+      return
+    }
+
+    await new Promise<void>(resolve => {
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => resolve())
+      })
+    })
+  }, [])
 
   const branding = useMemo(
     () => ({
@@ -288,6 +314,7 @@ export default function DiagramEditor() {
 
   const handleExcalidrawReady = useCallback((api: any) => {
     excalidrawAPIRef.current = api
+    setIsEditorReady(true)
   }, [])
 
   const serializeCurrentScene = useCallback(() => {
@@ -356,6 +383,83 @@ export default function DiagramEditor() {
     [companyFontFamily]
   )
 
+  const persistLocalDraft = useCallback(
+    (
+      diagramJson: string,
+      override?: {
+        metadata?: LocalStoredDiagramMetadata
+        diagramId?: string | null
+        diagramName?: string | null
+      }
+    ) => {
+      if (typeof window === 'undefined') {
+        return
+      }
+
+      try {
+        const payload: LocalDiagramDraftPayload = {
+          diagramJson,
+          metadata: override?.metadata ?? currentDiagramMetadata,
+          diagramId: override?.diagramId ?? currentDiagramId,
+          diagramName: override?.diagramName ?? currentDiagramName,
+          updatedAt: new Date().toISOString(),
+        }
+        window.localStorage.setItem(LOCAL_DRAFT_STORAGE_KEY, JSON.stringify(payload))
+      } catch (error) {
+        console.warn('DiagramEditor: Unable to persist local draft', error)
+      }
+    },
+    [currentDiagramId, currentDiagramMetadata, currentDiagramName]
+  )
+
+  const clearLocalDraft = useCallback(() => {
+    if (typeof window === 'undefined') {
+      return
+    }
+    try {
+      window.localStorage.removeItem(LOCAL_DRAFT_STORAGE_KEY)
+    } catch (error) {
+      console.warn('DiagramEditor: Unable to clear local draft', error)
+    }
+  }, [])
+
+  const restoreLocalDraft = useCallback(async () => {
+    if (typeof window === 'undefined') {
+      return false
+    }
+
+    const rawDraft = window.localStorage.getItem(LOCAL_DRAFT_STORAGE_KEY)
+    if (!rawDraft) {
+      return false
+    }
+
+    try {
+      const parsed = JSON.parse(rawDraft) as LocalDiagramDraftPayload
+      if (!parsed?.diagramJson) {
+        return false
+      }
+
+      await waitForCanvasHydration()
+
+      const loaded = loadDiagramFromJson(parsed.diagramJson)
+      if (!loaded) {
+        return false
+      }
+
+      setCurrentDiagramId(parsed.diagramId ?? null)
+      setCurrentDiagramName(parsed.diagramName ?? null)
+      setCurrentDiagramMetadata(parsed.metadata)
+      setSaveDialogInitialMetadata(parsed.metadata)
+      setSaveDialogInitialName(parsed.diagramName ?? null)
+      sceneInitializedRef.current = true
+      return true
+    } catch (error) {
+      console.error('DiagramEditor: Unable to restore local draft', error)
+      window.localStorage.removeItem(LOCAL_DRAFT_STORAGE_KEY)
+      return false
+    }
+  }, [loadDiagramFromJson, waitForCanvasHydration])
+
   const openSaveDialog = useCallback(
     (proposedName?: string | null, metadata?: LocalStoredDiagramMetadata, forceSaveAs = false) => {
       setSaveDialogInitialName(proposedName ?? '')
@@ -391,18 +495,42 @@ export default function DiagramEditor() {
     setCurrentDiagramName(null)
     setCurrentDiagramId(null)
     setCurrentDiagramMetadata(undefined)
+    sceneInitializedRef.current = true
+    clearLocalDraft()
     setHasUnsavedChanges(false)
-  }, [companyFontFamily, defaultCanvasBackground])
+  }, [clearLocalDraft, companyFontFamily, defaultCanvasBackground])
 
   const handleSceneChange = useCallback(
-    (_: readonly unknown[] = [], __: unknown = null, ___: unknown = null) => {
+    (elements: readonly unknown[] = [], appState: any = {}, filesParam: any = undefined) => {
       if (suppressSceneChangeRef.current) {
         suppressSceneChangeRef.current = false
         return
       }
+
       setHasUnsavedChanges(true)
+
+      const files = (() => {
+        if (!filesParam) {
+          return undefined
+        }
+        if (filesParam instanceof Map) {
+          return Object.fromEntries(filesParam.entries())
+        }
+        return filesParam
+      })()
+
+      const serialized = JSON.stringify({
+        elements,
+        appState: {
+          ...(appState || {}),
+          collaborators: undefined,
+        },
+        files,
+      })
+
+      persistLocalDraft(serialized)
     },
-    []
+    [persistLocalDraft]
   )
 
   const handleSaveAsDiagram = useCallback(() => {
@@ -443,6 +571,8 @@ export default function DiagramEditor() {
       }
 
       try {
+        let resultingDiagramId = currentDiagramId
+
         if (currentDiagramId && !saveDialogForceSaveAs) {
           const updateInput: Record<string, unknown> = {
             title: { set: name },
@@ -480,6 +610,7 @@ export default function DiagramEditor() {
             throw new Error('No diagram returned from update mutation')
           }
           setCurrentDiagramId(updated.id)
+          resultingDiagramId = updated.id
         } else {
           const createInput: Record<string, unknown> = {
             title: name,
@@ -524,6 +655,7 @@ export default function DiagramEditor() {
             throw new Error('No diagram returned from create mutation')
           }
           setCurrentDiagramId(created.id)
+          resultingDiagramId = created.id
         }
 
         setCurrentDiagramName(name)
@@ -533,6 +665,11 @@ export default function DiagramEditor() {
         setIsSaveDialogOpen(false)
         setSaveDialogForceSaveAs(false)
         setHasUnsavedChanges(false)
+        persistLocalDraft(serialized, {
+          metadata,
+          diagramId: resultingDiagramId,
+          diagramName: name,
+        })
         return true
       } catch (error) {
         console.error('DiagramEditor: Failed to save diagram', error)
@@ -544,6 +681,7 @@ export default function DiagramEditor() {
       createDiagramMutation,
       currentDiagramId,
       currentPerson?.id,
+      persistLocalDraft,
       saveDialogForceSaveAs,
       selectedCompanyId,
       serializeCurrentScene,
@@ -562,15 +700,15 @@ export default function DiagramEditor() {
   }, [])
 
   const handleSelectDiagram = useCallback(
-    (diagram: LocalOpenDialogDiagram) => {
+    (diagram: LocalOpenDialogDiagram): boolean => {
       if (!diagram.diagramJson) {
         window.alert('Selected diagram has no stored content.')
-        return
+        return false
       }
 
       const loaded = loadDiagramFromJson(diagram.diagramJson)
       if (!loaded) {
-        return
+        return false
       }
 
       const firstArchitecture = diagram.architecture?.[0]
@@ -593,14 +731,128 @@ export default function DiagramEditor() {
       setCurrentDiagramMetadata(metadata)
       setSaveDialogInitialMetadata(metadata)
       setSaveDialogInitialName(diagram.title)
+      sceneInitializedRef.current = true
+      persistLocalDraft(diagram.diagramJson, {
+        metadata,
+        diagramId: diagram.id,
+        diagramName: diagram.title,
+      })
       setIsOpenDialogOpen(false)
+      return true
     },
-    [loadDiagramFromJson]
+    [loadDiagramFromJson, persistLocalDraft]
   )
 
   const handleToggleSidebar = useCallback(() => {
     setIsSidebarOpen(prev => !prev)
   }, [])
+
+  useEffect(() => {
+    if (!isEditorReady || sceneInitializedRef.current) {
+      return
+    }
+
+    if (typeof window !== 'undefined') {
+      const pendingPayloadExists = Boolean(window.localStorage.getItem('pendingDiagramToOpen'))
+      if (pendingPayloadExists) {
+        return
+      }
+    }
+
+    if (pendingDiagramProcessingRef.current) {
+      return
+    }
+
+    void (async () => {
+      await restoreLocalDraft()
+    })()
+  }, [isEditorReady, restoreLocalDraft])
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !isEditorReady) {
+      return
+    }
+
+    const rawPending = window.localStorage.getItem('pendingDiagramToOpen')
+    if (!rawPending) {
+      return
+    }
+
+    let isCancelled = false
+    let shouldClearPending = false
+    pendingDiagramProcessingRef.current = true
+
+    const loadPendingDiagram = async () => {
+      try {
+        const parsed = JSON.parse(rawPending)
+        let diagramToOpen: LocalOpenDialogDiagram | null = null
+
+        if (typeof parsed.diagramJson === 'string') {
+          diagramToOpen = parsed as LocalOpenDialogDiagram
+        } else if (parsed.id) {
+          const { data } = await fetchDiagramById({ variables: { id: parsed.id as string } })
+          const fetched = data?.diagrams?.[0]
+          if (fetched?.diagramJson) {
+            diagramToOpen = {
+              id: fetched.id,
+              title: fetched.title ?? 'Untitled diagram',
+              description: fetched.description,
+              diagramType: fetched.diagramType,
+              diagramJson: fetched.diagramJson,
+              updatedAt: fetched.updatedAt,
+              architecture: fetched.architecture,
+            }
+          }
+        }
+
+        if (!diagramToOpen) {
+          window.alert('Failed to load the selected diagram. Please try again.')
+          shouldClearPending = true
+          return
+        }
+
+        if (!isCancelled) {
+          await waitForCanvasHydration()
+
+          if (isCancelled) {
+            return
+          }
+
+          const loaded = handleSelectDiagram(diagramToOpen)
+          shouldClearPending = true
+
+          if (!loaded && !sceneInitializedRef.current) {
+            await restoreLocalDraft()
+          }
+        }
+      } catch (error) {
+        console.error('DiagramEditor: Unable to process pending diagram', error)
+        window.alert('Failed to open the selected diagram. Please try again.')
+        shouldClearPending = true
+
+        if (!sceneInitializedRef.current) {
+          await restoreLocalDraft()
+        }
+      } finally {
+        pendingDiagramProcessingRef.current = false
+        if (shouldClearPending) {
+          window.localStorage.removeItem('pendingDiagramToOpen')
+        }
+      }
+    }
+
+    void loadPendingDiagram()
+
+    return () => {
+      isCancelled = true
+    }
+  }, [
+    fetchDiagramById,
+    handleSelectDiagram,
+    isEditorReady,
+    restoreLocalDraft,
+    waitForCanvasHydration,
+  ])
 
   return (
     <>
