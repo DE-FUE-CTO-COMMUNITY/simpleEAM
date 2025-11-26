@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
 import { useLazyQuery, useMutation } from '@apollo/client'
 import { FONT_FAMILY } from '@excalidraw/excalidraw'
+import { useSnackbar } from 'notistack'
 import { useTranslations, useLocale } from 'next-intl'
 import type { ExcalidrawFont } from '@/components/companies/types'
 import { useThemeMode } from '@/contexts/ThemeContext'
@@ -11,7 +12,9 @@ import { useCompanyContext } from '@/contexts/CompanyContext'
 import { useCurrentPerson } from '@/hooks/useCurrentPerson'
 import { useThemeConfig } from '@/lib/runtime-config'
 import { CREATE_DIAGRAM, GET_DIAGRAM, UPDATE_DIAGRAM } from '@/graphql/diagram'
+import { convertExcalidrawToDrawIO, downloadDrawIOFile } from '@/utils/drawioConverter'
 import DiagramLibrarySidebar from './DiagramLibrarySidebar'
+import DeleteDiagramDialog from './dialogs/DeleteDiagramDialog'
 import LocalOpenDiagramDialog, { LocalOpenDialogDiagram } from './dialogs/LocalOpenDiagramDialog'
 import LocalSaveDiagramDialog from './dialogs/LocalSaveDiagramDialog'
 import type { LocalStoredDiagramMetadata } from './dialogs/types'
@@ -33,6 +36,12 @@ interface MinimalExcalidrawProps {
   onOpenDiagram: () => void
   onSaveDiagram: () => void
   onSaveAsDiagram: () => void
+  onDeleteDiagram: () => void
+  canDeleteDiagram: boolean
+  onImportJSON: () => void
+  onExportJSON: () => void
+  onExportDrawIO: () => void
+  onExportPNG: () => void
   onSceneChange: (elements: readonly any[], appState: any, files: any) => void
   onReady: (api: any) => void
 }
@@ -55,6 +64,12 @@ const ExcalidrawCanvas = dynamic<MinimalExcalidrawProps>(
       onOpenDiagram,
       onSaveDiagram,
       onSaveAsDiagram,
+      onDeleteDiagram,
+      canDeleteDiagram,
+      onImportJSON,
+      onExportJSON,
+      onExportDrawIO,
+      onExportPNG,
       onSceneChange,
       onReady,
     }: MinimalExcalidrawProps) => {
@@ -122,7 +137,8 @@ const ExcalidrawCanvas = dynamic<MinimalExcalidrawProps>(
                 {t('actions.saveAs')}
               </MainMenu.Item>
               <MainMenu.Item
-                onSelect={placeholder('delete')}
+                onSelect={canDeleteDiagram ? onDeleteDiagram : undefined}
+                disabled={!canDeleteDiagram}
                 icon={
                   <MenuIcon path="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" />
                 }
@@ -168,25 +184,7 @@ const ExcalidrawCanvas = dynamic<MinimalExcalidrawProps>(
               </MainMenu.Item>
               <MainMenu.Separator />
               <MainMenu.Item
-                onSelect={placeholder('exportJSON')}
-                icon={
-                  <MenuIcon path="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z M8,12V14H16V12H8Z M10,10V16H14V10H10Z" />
-                }
-                shortcut="Ctrl+E"
-              >
-                {t('actions.exportJSON')}
-              </MainMenu.Item>
-              <MainMenu.Item
-                onSelect={placeholder('exportDrawIO')}
-                icon={
-                  <MenuIcon path="M12,2A2,2 0 0,1 14,4C14,4.74 13.6,5.39 13,5.73V7.27C13.4,7.61 13.6,8.26 13.6,9A2.4,2.4 0 0,1 11.2,11.4A2.4,2.4 0 0,1 8.8,9A2.4,2.4 0 0,1 11.2,6.6C11.93,6.6 12.58,7 12.92,7.4V5.73C12.31,5.39 12,4.74 12,4A2,2 0 0,1 14,2M21,9V15C21,16.1 20.1,17 19,17H13L16,14H19V10H16L13,7H19C20.1,7 21,7.9 21,9M8,13A2,2 0 0,1 6,15A2,2 0 0,1 4,13A2,2 0 0,1 6,11A2,2 0 0,1 8,13Z" />
-                }
-                shortcut="Ctrl+D"
-              >
-                {t('actions.exportDrawIO')}
-              </MainMenu.Item>
-              <MainMenu.Item
-                onSelect={placeholder('importJSON')}
+                onSelect={onImportJSON}
                 icon={
                   <MenuIcon path="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z M8,12V14H16V12H8Z M10,10V16H14V10H10Z" />
                 }
@@ -195,7 +193,25 @@ const ExcalidrawCanvas = dynamic<MinimalExcalidrawProps>(
                 {t('actions.importJSON')}
               </MainMenu.Item>
               <MainMenu.Item
-                onSelect={placeholder('exportPNG')}
+                onSelect={onExportJSON}
+                icon={
+                  <MenuIcon path="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z M8,12V14H16V12H8Z M10,10V16H14V10H10Z" />
+                }
+                shortcut="Ctrl+E"
+              >
+                {t('actions.exportJSON')}
+              </MainMenu.Item>
+              <MainMenu.Item
+                onSelect={onExportDrawIO}
+                icon={
+                  <MenuIcon path="M12,2A2,2 0 0,1 14,4C14,4.74 13.6,5.39 13,5.73V7.27C13.4,7.61 13.6,8.26 13.6,9A2.4,2.4 0 0,1 11.2,11.4A2.4,2.4 0 0,1 8.8,9A2.4,2.4 0 0,1 11.2,6.6C11.93,6.6 12.58,7 12.92,7.4V5.73C12.31,5.39 12,4.74 12,4A2,2 0 0,1 14,2M21,9V15C21,16.1 20.1,17 19,17H13L16,14H19V10H16L13,7H19C20.1,7 21,7.9 21,9M8,13A2,2 0 0,1 6,15A2,2 0 0,1 4,13A2,2 0 0,1 6,11A2,2 0 0,1 8,13Z" />
+                }
+                shortcut="Ctrl+D"
+              >
+                {t('actions.exportDrawIO')}
+              </MainMenu.Item>
+              <MainMenu.Item
+                onSelect={onExportPNG}
                 icon={
                   <MenuIcon path="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z M12,17L16,12H13V8H11V12H8L12,17Z" />
                 }
@@ -240,6 +256,7 @@ export default function DiagramEditor() {
   const [, setHasUnsavedChanges] = useState(false)
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false)
   const [isOpenDialogOpen, setIsOpenDialogOpen] = useState(false)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [saveDialogInitialName, setSaveDialogInitialName] = useState<string | null>(null)
   const [saveDialogInitialMetadata, setSaveDialogInitialMetadata] = useState<
     LocalStoredDiagramMetadata | undefined
@@ -248,11 +265,18 @@ export default function DiagramEditor() {
   const [createDiagramMutation] = useMutation(CREATE_DIAGRAM)
   const [updateDiagramMutation] = useMutation(UPDATE_DIAGRAM)
   const [fetchDiagramById] = useLazyQuery(GET_DIAGRAM)
+  const { enqueueSnackbar } = useSnackbar()
   const excalidrawAPIRef = useRef<any>(null)
   const sceneInitializedRef = useRef(false)
   const pendingDiagramProcessingRef = useRef(false)
   const suppressSceneChangeRef = useRef(false)
   const [isEditorReady, setIsEditorReady] = useState(false)
+  const [isSceneEmpty, setIsSceneEmpty] = useState(true)
+
+  const canDeleteDiagram = useMemo(
+    () => Boolean(currentDiagramId && !isSceneEmpty),
+    [currentDiagramId, isSceneEmpty]
+  )
 
   const waitForCanvasHydration = useCallback(async () => {
     if (typeof window === 'undefined') {
@@ -317,10 +341,32 @@ export default function DiagramEditor() {
     setIsEditorReady(true)
   }, [])
 
+  const notifyEditorNotReady = useCallback(() => {
+    enqueueSnackbar('Diagram editor is not ready yet.', { variant: 'warning' })
+  }, [enqueueSnackbar])
+
+  const closeMainMenu = useCallback(() => {
+    const api = excalidrawAPIRef.current
+    if (api?.setAppState) {
+      api.setAppState({ openMenu: null })
+      return
+    }
+
+    if (api?.updateScene) {
+      const currentAppState = api.getAppState?.() ?? {}
+      api.updateScene({
+        appState: {
+          ...currentAppState,
+          openMenu: null,
+        },
+      })
+    }
+  }, [])
+
   const serializeCurrentScene = useCallback(() => {
     const api = excalidrawAPIRef.current
     if (!api?.getSceneElements || !api?.getAppState) {
-      window.alert('Diagram editor is not ready yet.')
+      notifyEditorNotReady()
       return null
     }
 
@@ -344,13 +390,55 @@ export default function DiagramEditor() {
       },
       files,
     })
+  }, [notifyEditorNotReady])
+
+  const getSceneForExport = useCallback(() => {
+    const api = excalidrawAPIRef.current
+    if (!api?.getSceneElements || !api?.getAppState) {
+      notifyEditorNotReady()
+      return null
+    }
+
+    const elements = api.getSceneElements() ?? []
+    const appState = api.getAppState() ?? {}
+    const filesFromApi = api.getFiles ? api.getFiles() : undefined
+    const files =
+      filesFromApi instanceof Map ? Object.fromEntries(filesFromApi.entries()) : filesFromApi
+
+    return { elements, appState, files }
+  }, [notifyEditorNotReady])
+
+  const sanitizeFilenameBase = useCallback(() => {
+    if (currentDiagramName?.trim()) {
+      return currentDiagramName
+        .trim()
+        .replace(/[^a-z0-9]+/gi, '_')
+        .replace(/^_+|_+$/g, '')
+        .toLowerCase()
+    }
+    return 'diagram'
+  }, [currentDiagramName])
+
+  const downloadBlob = useCallback((blob: Blob, filename: string) => {
+    if (typeof window === 'undefined') {
+      return
+    }
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = filename
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
   }, [])
+
 
   const loadDiagramFromJson = useCallback(
     (diagramJson: string) => {
       const api = excalidrawAPIRef.current
       if (!api?.updateScene) {
-        window.alert('Diagram editor is not ready yet.')
+        notifyEditorNotReady()
         return false
       }
 
@@ -363,9 +451,17 @@ export default function DiagramEditor() {
         parsed = JSON.parse(diagramJson)
       } catch (error) {
         console.error('DiagramEditor: Unable to parse diagram JSON', error)
-        window.alert('Unable to open diagram because its data is corrupted.')
+        enqueueSnackbar('Unable to open diagram because its data is corrupted.', {
+          variant: 'error',
+        })
         return false
       }
+
+      const hasRenderableElements = Array.isArray(parsed.elements)
+        ? parsed.elements.some(
+            element => element && !(element as { isDeleted?: boolean }).isDeleted
+          )
+        : false
 
       suppressSceneChangeRef.current = true
       api.updateScene({
@@ -378,9 +474,10 @@ export default function DiagramEditor() {
         files: parsed.files ?? {},
       })
       setHasUnsavedChanges(false)
+      setIsSceneEmpty(!hasRenderableElements)
       return true
     },
-    [companyFontFamily]
+    [companyFontFamily, enqueueSnackbar, notifyEditorNotReady]
   )
 
   const persistLocalDraft = useCallback(
@@ -471,6 +568,7 @@ export default function DiagramEditor() {
   )
 
   const handleNewDiagram = useCallback(() => {
+    closeMainMenu()
     const api = excalidrawAPIRef.current
     if (!api?.resetScene) {
       console.warn('DiagramEditor: Excalidraw API not ready for new diagram action')
@@ -498,7 +596,8 @@ export default function DiagramEditor() {
     sceneInitializedRef.current = true
     clearLocalDraft()
     setHasUnsavedChanges(false)
-  }, [clearLocalDraft, companyFontFamily, defaultCanvasBackground])
+    setIsSceneEmpty(true)
+  }, [clearLocalDraft, closeMainMenu, companyFontFamily, defaultCanvasBackground])
 
   const handleSceneChange = useCallback(
     (elements: readonly unknown[] = [], appState: any = {}, filesParam: any = undefined) => {
@@ -508,6 +607,13 @@ export default function DiagramEditor() {
       }
 
       setHasUnsavedChanges(true)
+
+      const hasRenderableElements = Array.isArray(elements)
+        ? (elements as Array<{ isDeleted?: boolean }>).some(
+            element => element && !element.isDeleted
+          )
+        : false
+      setIsSceneEmpty(!hasRenderableElements)
 
       const files = (() => {
         if (!filesParam) {
@@ -534,18 +640,221 @@ export default function DiagramEditor() {
   )
 
   const handleSaveAsDiagram = useCallback(() => {
+    closeMainMenu()
     const proposedName = currentDiagramName ? `${currentDiagramName} - Copy` : ''
     openSaveDialog(proposedName, currentDiagramMetadata, true)
-  }, [currentDiagramMetadata, currentDiagramName, openSaveDialog])
+  }, [closeMainMenu, currentDiagramMetadata, currentDiagramName, openSaveDialog])
 
   const handleSaveDiagram = useCallback(() => {
+    closeMainMenu()
     const proposedName = currentDiagramName ?? ''
     openSaveDialog(proposedName, currentDiagramMetadata, false)
-  }, [currentDiagramMetadata, currentDiagramName, openSaveDialog])
+  }, [closeMainMenu, currentDiagramMetadata, currentDiagramName, openSaveDialog])
 
   const handleOpenDiagram = useCallback(() => {
+    closeMainMenu()
     setIsOpenDialogOpen(true)
+  }, [closeMainMenu])
+
+  const handleExportJSON = useCallback(() => {
+    closeMainMenu()
+    const scene = getSceneForExport()
+    if (!scene) {
+      return
+    }
+
+    if (!scene.elements || scene.elements.length === 0) {
+      enqueueSnackbar('There are no elements to export.', { variant: 'warning' })
+      return
+    }
+
+    const payload = {
+      type: 'excalidraw',
+      version: 2,
+      source: 'simple-eam',
+      elements: scene.elements,
+      appState: {
+        ...(scene.appState || {}),
+        collaborators: undefined,
+      },
+      files: scene.files ?? {},
+    }
+
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' })
+    const filename = `${sanitizeFilenameBase()}.excalidraw`
+    downloadBlob(blob, filename)
+  }, [closeMainMenu, downloadBlob, enqueueSnackbar, getSceneForExport, sanitizeFilenameBase])
+
+  const handleExportDrawIO = useCallback(() => {
+    closeMainMenu()
+    const scene = getSceneForExport()
+    if (!scene) {
+      return
+    }
+
+    if (!scene.elements || scene.elements.length === 0) {
+      enqueueSnackbar('There are no elements to export.', { variant: 'warning' })
+      return
+    }
+
+    const exportPayload = {
+      type: 'excalidraw',
+      version: 2,
+      source: 'simple-eam',
+      elements: scene.elements,
+      appState: {
+        ...(scene.appState || {}),
+        collaborators: undefined,
+      },
+    }
+
+    try {
+      const xmlContent = convertExcalidrawToDrawIO(exportPayload)
+      downloadDrawIOFile(xmlContent, sanitizeFilenameBase())
+    } catch (error) {
+      console.error('DiagramEditor: Failed to export draw.io XML', error)
+      enqueueSnackbar('Failed to export draw.io XML. Please try again.', { variant: 'error' })
+    }
+  }, [closeMainMenu, enqueueSnackbar, getSceneForExport, sanitizeFilenameBase])
+
+  const handleExportPNG = useCallback(async () => {
+    closeMainMenu()
+    const scene = getSceneForExport()
+    if (!scene) {
+      return
+    }
+
+    if (!scene.elements || scene.elements.length === 0) {
+      enqueueSnackbar('There are no elements to export.', { variant: 'warning' })
+      return
+    }
+
+    try {
+      const { exportToBlob } = await import('@excalidraw/excalidraw')
+      const blob = await exportToBlob({
+        elements: scene.elements,
+        appState: {
+          ...scene.appState,
+          collaborators: undefined,
+          viewBackgroundColor: scene.appState?.viewBackgroundColor ?? defaultCanvasBackground,
+          exportBackground: true,
+          exportEmbedScene: false,
+          exportWithDarkMode: false,
+        },
+        files: scene.files ?? {},
+        mimeType: 'image/png',
+        quality: 0.95,
+        exportPadding: 20,
+      })
+
+      if (!blob) {
+        throw new Error('No PNG blob generated')
+      }
+
+      const timestamp = new Date().toISOString().slice(0, 19).replace(/[:.]/g, '-')
+      const filename = `${sanitizeFilenameBase()}_${timestamp}.png`
+      downloadBlob(blob, filename)
+    } catch (error) {
+      console.error('DiagramEditor: Failed to export PNG', error)
+      enqueueSnackbar('Failed to export PNG. Please try again.', { variant: 'error' })
+    }
+  }, [
+    closeMainMenu,
+    defaultCanvasBackground,
+    downloadBlob,
+    enqueueSnackbar,
+    getSceneForExport,
+    sanitizeFilenameBase,
+  ])
+
+  const handleImportJSON = useCallback(() => {
+    closeMainMenu()
+    if (typeof window === 'undefined') {
+      return
+    }
+
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = '.json,.excalidraw'
+    input.onchange = event => {
+      const file = (event.target as HTMLInputElement).files?.[0]
+      if (!file) {
+        return
+      }
+
+      const reader = new FileReader()
+      reader.onload = readerEvent => {
+        try {
+          const rawContent = readerEvent.target?.result
+          if (typeof rawContent !== 'string') {
+            throw new Error('Unable to read file contents')
+          }
+
+          const parsed = JSON.parse(rawContent)
+          const normalized = {
+            elements: parsed.elements ?? parsed.scene?.elements ?? [],
+            appState: {
+              ...(parsed.appState ?? parsed.scene?.appState ?? {}),
+              collaborators: undefined,
+            },
+            files: parsed.files ?? parsed.binaryFiles ?? {},
+          }
+
+          if (!Array.isArray(normalized.elements)) {
+            throw new Error('Invalid diagram structure')
+          }
+
+          const serialized = JSON.stringify(normalized)
+          const loaded = loadDiagramFromJson(serialized)
+          if (!loaded) {
+            throw new Error('Failed to load imported diagram')
+          }
+
+          const baseName = file.name.replace(/\.[^.]+$/, '')
+          setCurrentDiagramId(null)
+          setCurrentDiagramName(baseName || 'Imported diagram')
+          setCurrentDiagramMetadata(undefined)
+          setSaveDialogInitialMetadata(undefined)
+          setSaveDialogInitialName(baseName || 'Imported diagram')
+          persistLocalDraft(serialized, {
+            metadata: undefined,
+            diagramId: null,
+            diagramName: baseName || 'Imported diagram',
+          })
+          enqueueSnackbar('Diagram imported. Remember to save it to persist in the database.', {
+            variant: 'success',
+          })
+        } catch (error) {
+          console.error('DiagramEditor: Failed to import JSON', error)
+          enqueueSnackbar(
+            'Failed to import the selected file. Please ensure it is a valid Excalidraw export.',
+            { variant: 'error' }
+          )
+        } finally {
+          closeMainMenu()
+        }
+      }
+      reader.readAsText(file)
+    }
+
+    input.click()
+  }, [closeMainMenu, enqueueSnackbar, loadDiagramFromJson, persistLocalDraft])
+
+  const handleRequestDelete = useCallback(() => {
+    if (!canDeleteDiagram) {
+      return
+    }
+    closeMainMenu()
+    setIsDeleteDialogOpen(true)
+  }, [canDeleteDiagram, closeMainMenu])
+
+  const handleCloseDeleteDialog = useCallback(() => {
+    setIsDeleteDialogOpen(false)
   }, [])
+
+  const handleDiagramDeleted = useCallback(() => {
+    handleNewDiagram()
+  }, [handleNewDiagram])
 
   const handleConfirmSave = useCallback(
     async ({ name, metadata }: { name: string; metadata: LocalStoredDiagramMetadata }) => {
@@ -555,7 +864,9 @@ export default function DiagramEditor() {
       }
 
       if (!metadata.architecture?.id) {
-        window.alert('Please select an architecture before saving the diagram.')
+        enqueueSnackbar('Please select an architecture before saving the diagram.', {
+          variant: 'warning',
+        })
         return false
       }
 
@@ -673,7 +984,7 @@ export default function DiagramEditor() {
         return true
       } catch (error) {
         console.error('DiagramEditor: Failed to save diagram', error)
-        window.alert('Failed to save the diagram. Please try again.')
+        enqueueSnackbar('Failed to save the diagram. Please try again.', { variant: 'error' })
         return false
       }
     },
@@ -681,6 +992,7 @@ export default function DiagramEditor() {
       createDiagramMutation,
       currentDiagramId,
       currentPerson?.id,
+      enqueueSnackbar,
       persistLocalDraft,
       saveDialogForceSaveAs,
       selectedCompanyId,
@@ -702,7 +1014,7 @@ export default function DiagramEditor() {
   const handleSelectDiagram = useCallback(
     (diagram: LocalOpenDialogDiagram): boolean => {
       if (!diagram.diagramJson) {
-        window.alert('Selected diagram has no stored content.')
+        enqueueSnackbar('Selected diagram has no stored content.', { variant: 'error' })
         return false
       }
 
@@ -740,7 +1052,7 @@ export default function DiagramEditor() {
       setIsOpenDialogOpen(false)
       return true
     },
-    [loadDiagramFromJson, persistLocalDraft]
+    [enqueueSnackbar, loadDiagramFromJson, persistLocalDraft]
   )
 
   const handleToggleSidebar = useCallback(() => {
@@ -806,7 +1118,9 @@ export default function DiagramEditor() {
         }
 
         if (!diagramToOpen) {
-          window.alert('Failed to load the selected diagram. Please try again.')
+          enqueueSnackbar('Failed to load the selected diagram. Please try again.', {
+            variant: 'error',
+          })
           shouldClearPending = true
           return
         }
@@ -827,7 +1141,9 @@ export default function DiagramEditor() {
         }
       } catch (error) {
         console.error('DiagramEditor: Unable to process pending diagram', error)
-        window.alert('Failed to open the selected diagram. Please try again.')
+        enqueueSnackbar('Failed to open the selected diagram. Please try again.', {
+          variant: 'error',
+        })
         shouldClearPending = true
 
         if (!sceneInitializedRef.current) {
@@ -849,6 +1165,7 @@ export default function DiagramEditor() {
   }, [
     fetchDiagramById,
     handleSelectDiagram,
+    enqueueSnackbar,
     isEditorReady,
     restoreLocalDraft,
     waitForCanvasHydration,
@@ -873,6 +1190,12 @@ export default function DiagramEditor() {
             onOpenDiagram={handleOpenDiagram}
             onSaveDiagram={handleSaveDiagram}
             onSaveAsDiagram={handleSaveAsDiagram}
+            onDeleteDiagram={handleRequestDelete}
+            canDeleteDiagram={canDeleteDiagram}
+            onImportJSON={handleImportJSON}
+            onExportJSON={handleExportJSON}
+            onExportDrawIO={handleExportDrawIO}
+            onExportPNG={handleExportPNG}
             onSceneChange={handleSceneChange}
             onReady={handleExcalidrawReady}
           />
@@ -896,6 +1219,13 @@ export default function DiagramEditor() {
         open={isOpenDialogOpen}
         onClose={handleCloseOpenDialog}
         onSelect={handleSelectDiagram}
+      />
+      <DeleteDiagramDialog
+        open={isDeleteDialogOpen}
+        onClose={handleCloseDeleteDialog}
+        onDeleted={handleDiagramDeleted}
+        diagramId={currentDiagramId}
+        diagramTitle={currentDiagramName}
       />
     </>
   )
