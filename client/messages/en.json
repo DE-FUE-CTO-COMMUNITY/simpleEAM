@@ -140,6 +140,7 @@
       "exportPNG": "Export PNG",
       "syncDatabase": "Sync Database",
       "findOnCanvas": "Find on Canvas",
+      "liveCollaboration": "Live Collaboration",
       "addRelatedElements": "Add Related Elements"
     },
     "contextMenu": {

@@ -139,6 +139,7 @@
       "exportPNG": "PNG exportieren",
       "syncDatabase": "DB Synchronisieren",
       "findOnCanvas": "Auf Canvas finden",
+      "liveCollaboration": "Live-Zusammenarbeit",
       "addRelatedElements": "Verwandte Elemente hinzufügen"
     },
     "contextMenu": {

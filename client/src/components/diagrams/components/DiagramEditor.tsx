@@ -1,19 +1,207 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
+import { useMutation } from '@apollo/client'
 import { FONT_FAMILY } from '@excalidraw/excalidraw'
+import { useTranslations, useLocale } from 'next-intl'
 import type { ExcalidrawFont } from '@/components/companies/types'
 import { useThemeMode } from '@/contexts/ThemeContext'
 import { useCompanyContext } from '@/contexts/CompanyContext'
+import { useCurrentPerson } from '@/hooks/useCurrentPerson'
 import { useThemeConfig } from '@/lib/runtime-config'
+import { CREATE_DIAGRAM, UPDATE_DIAGRAM } from '@/graphql/diagram'
 import DiagramLibrarySidebar from './DiagramLibrarySidebar'
+import LocalOpenDiagramDialog, { LocalOpenDialogDiagram } from './dialogs/LocalOpenDiagramDialog'
+import LocalSaveDiagramDialog from './dialogs/LocalSaveDiagramDialog'
+import type { LocalStoredDiagramMetadata } from './dialogs/types'
 
-const ExcalidrawCanvas = dynamic(
+interface MinimalExcalidrawProps {
+  theme: 'light' | 'dark'
+  initialData: any
+  onNewDiagram: () => void
+  onOpenDiagram: () => void
+  onSaveDiagram: () => void
+  onSaveAsDiagram: () => void
+  onSceneChange: (elements: readonly any[], appState: any, files: any) => void
+  onReady: (api: any) => void
+}
+
+const ExcalidrawCanvas = dynamic<MinimalExcalidrawProps>(
   async () => {
     await import('@excalidraw/excalidraw/index.css')
-    const { Excalidraw } = await import('@excalidraw/excalidraw')
-    return Excalidraw
+    const { Excalidraw, MainMenu } = await import('@excalidraw/excalidraw')
+
+    const MenuIcon = ({ path }: { path: string }) => (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+        <path d={path} />
+      </svg>
+    )
+
+    const MinimalExcalidraw = ({
+      theme,
+      initialData,
+      onNewDiagram,
+      onOpenDiagram,
+      onSaveDiagram,
+      onSaveAsDiagram,
+      onSceneChange,
+      onReady,
+    }: MinimalExcalidrawProps) => {
+      const t = useTranslations('diagrams')
+      const locale = useLocale()
+
+      const placeholder = (action: string) => () =>
+        console.info(`[DiagramEditor] ${action} action not implemented yet.`)
+      const MainMenuDefaultItems = (MainMenu as any).DefaultItems
+
+      const excalidrawLangCode = useMemo(() => {
+        switch (locale) {
+          case 'de':
+            return 'de-DE'
+          case 'en':
+          default:
+            return 'en'
+        }
+      }, [locale])
+
+      return (
+        <div style={{ height: '100%', width: '100%' }}>
+          <Excalidraw
+            theme={theme}
+            initialData={initialData}
+            langCode={excalidrawLangCode}
+            onChange={onSceneChange}
+            excalidrawAPI={api => {
+              onReady(api)
+            }}
+          >
+            <MainMenu>
+              <MainMenu.Item
+                onSelect={onNewDiagram}
+                icon={<MenuIcon path="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />}
+                shortcut="Ctrl+N"
+              >
+                {t('actions.new')}
+              </MainMenu.Item>
+              <MainMenu.Item
+                onSelect={onOpenDiagram}
+                icon={
+                  <MenuIcon path="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
+                }
+                shortcut="Ctrl+O"
+              >
+                {t('actions.open')}
+              </MainMenu.Item>
+              <MainMenu.Item
+                onSelect={onSaveDiagram}
+                icon={
+                  <MenuIcon path="M15,9H5V5H15M12,19A3,3 0 0,1 9,16A3,3 0 0,1 12,13A3,3 0 0,1 15,16A3,3 0 0,1 12,19M17,3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V7L17,3Z" />
+                }
+                shortcut="Ctrl+S"
+              >
+                {t('actions.save')}
+              </MainMenu.Item>
+              <MainMenu.Item
+                onSelect={onSaveAsDiagram}
+                icon={
+                  <MenuIcon path="M17,3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V7L17,3M17,7H19V19H5V5H14V7H17M10,17L14,13L10.5,9.5L9.08,10.92L11.5,13.33L12.92,11.92L17,16V17H10Z" />
+                }
+                shortcut="Ctrl+Shift+S"
+              >
+                {t('actions.saveAs')}
+              </MainMenu.Item>
+              <MainMenu.Item
+                onSelect={placeholder('delete')}
+                icon={
+                  <MenuIcon path="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" />
+                }
+                shortcut="Shift+Del"
+              >
+                {t('actions.delete')}
+              </MainMenu.Item>
+              <MainMenu.Item
+                onSelect={placeholder('manualSync')}
+                icon={
+                  <MenuIcon path="M12,18A6,6 0 0,1 6,12C6,11 6.25,10.03 6.7,9.2L5.24,7.74C4.46,8.97 4,10.43 4,12A8,8 0 0,0 12,20V23L16,19L12,15M12,4V1L8,5L12,9V6A6,6 0 0,1 18,12C18,13 17.75,13.97 17.3,14.8L18.76,16.26C19.54,15.03 20,13.57 20,12A8,8 0 0,0 12,4Z" />
+                }
+                shortcut="Ctrl+R"
+              >
+                {t('actions.syncDatabase')}
+              </MainMenu.Item>
+              <MainMenu.Item
+                onSelect={placeholder('capabilityMap')}
+                icon={
+                  <MenuIcon path="M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3M19,19H5V5H19V19Z M13,17V15H18V13H13V11L10,14L13,17Z M11,10V8H6V10H11V12L14,9L11,6V8Z" />
+                }
+                shortcut="Ctrl+M"
+              >
+                {t('actions.generateCapabilityMap')}
+              </MainMenu.Item>
+              <MainMenu.Item
+                onSelect={placeholder('findOnCanvas')}
+                icon={
+                  <MenuIcon path="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z" />
+                }
+                shortcut="Ctrl+F"
+              >
+                {t('actions.findOnCanvas')}
+              </MainMenu.Item>
+              <MainMenu.Item
+                onSelect={placeholder('liveCollaboration')}
+                icon={
+                  <MenuIcon path="M16,4C18.21,4 20,5.79 20,8C20,10.21 18.21,12 16,12C13.79,12 12,10.21 12,8C12,5.79 13.79,4 16,4M16,14C18.67,14 24,15.33 24,18V20H8V18C8,15.33 13.33,14 16,14M8,12C10.21,12 12,10.21 12,8C12,5.79 10.21,4 8,4C5.79,4 4,5.79 4,8C4,10.21 5.79,12 8,12M8,14C5.33,14 0,15.33 0,18V20H8V18C8,16.9 8.63,15.72 9.69,14.81C9.08,14.61 8.42,14.5 8,14Z" />
+                }
+                shortcut="Ctrl+L"
+              >
+                {t('actions.liveCollaboration') ?? 'Live Collaboration'}
+              </MainMenu.Item>
+              <MainMenu.Separator />
+              <MainMenu.Item
+                onSelect={placeholder('exportJSON')}
+                icon={
+                  <MenuIcon path="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z M8,12V14H16V12H8Z M10,10V16H14V10H10Z" />
+                }
+                shortcut="Ctrl+E"
+              >
+                {t('actions.exportJSON')}
+              </MainMenu.Item>
+              <MainMenu.Item
+                onSelect={placeholder('exportDrawIO')}
+                icon={
+                  <MenuIcon path="M12,2A2,2 0 0,1 14,4C14,4.74 13.6,5.39 13,5.73V7.27C13.4,7.61 13.6,8.26 13.6,9A2.4,2.4 0 0,1 11.2,11.4A2.4,2.4 0 0,1 8.8,9A2.4,2.4 0 0,1 11.2,6.6C11.93,6.6 12.58,7 12.92,7.4V5.73C12.31,5.39 12,4.74 12,4A2,2 0 0,1 14,2M21,9V15C21,16.1 20.1,17 19,17H13L16,14H19V10H16L13,7H19C20.1,7 21,7.9 21,9M8,13A2,2 0 0,1 6,15A2,2 0 0,1 4,13A2,2 0 0,1 6,11A2,2 0 0,1 8,13Z" />
+                }
+                shortcut="Ctrl+D"
+              >
+                {t('actions.exportDrawIO')}
+              </MainMenu.Item>
+              <MainMenu.Item
+                onSelect={placeholder('importJSON')}
+                icon={
+                  <MenuIcon path="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z M8,12V14H16V12H8Z M10,10V16H14V10H10Z" />
+                }
+                shortcut="Ctrl+I"
+              >
+                {t('actions.importJSON')}
+              </MainMenu.Item>
+              <MainMenu.Item
+                onSelect={placeholder('exportPNG')}
+                icon={
+                  <MenuIcon path="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z M12,17L16,12H13V8H11V12H8L12,17Z" />
+                }
+                shortcut="Ctrl+Shift+E"
+              >
+                {t('actions.exportPNG')}
+              </MainMenu.Item>
+              <MainMenu.Separator />
+              <MainMenuDefaultItems.ChangeCanvasBackground />
+            </MainMenu>
+          </Excalidraw>
+        </div>
+      )
+    }
+
+    return MinimalExcalidraw
   },
   {
     ssr: false,
@@ -32,9 +220,25 @@ const FALLBACK_EXCALIDRAW_FONT = FONT_FAMILY.Excalifont
 
 export default function DiagramEditor() {
   const { mode } = useThemeMode()
-  const { selectedCompany } = useCompanyContext()
+  const { selectedCompany, selectedCompanyId } = useCompanyContext()
+  const { currentPerson } = useCurrentPerson()
   const themeConfig = useThemeConfig()
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+  const [currentDiagramName, setCurrentDiagramName] = useState<string | null>(null)
+  const [currentDiagramId, setCurrentDiagramId] = useState<string | null>(null)
+  const [currentDiagramMetadata, setCurrentDiagramMetadata] = useState<LocalStoredDiagramMetadata>()
+  const [, setHasUnsavedChanges] = useState(false)
+  const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false)
+  const [isOpenDialogOpen, setIsOpenDialogOpen] = useState(false)
+  const [saveDialogInitialName, setSaveDialogInitialName] = useState<string | null>(null)
+  const [saveDialogInitialMetadata, setSaveDialogInitialMetadata] = useState<
+    LocalStoredDiagramMetadata | undefined
+  >(undefined)
+  const [saveDialogForceSaveAs, setSaveDialogForceSaveAs] = useState(false)
+  const [createDiagramMutation] = useMutation(CREATE_DIAGRAM)
+  const [updateDiagramMutation] = useMutation(UPDATE_DIAGRAM)
+  const excalidrawAPIRef = useRef<any>(null)
+  const suppressSceneChangeRef = useRef(false)
 
   const branding = useMemo(
     () => ({
@@ -43,6 +247,8 @@ export default function DiagramEditor() {
     }),
     [selectedCompany?.primaryColor, selectedCompany?.secondaryColor]
   )
+
+  const defaultCanvasBackground = useMemo(() => (mode === 'dark' ? '#121212' : '#ffffff'), [mode])
 
   const companyFontFamily = useMemo(() => {
     const diagramFont = selectedCompany?.diagramFont as ExcalidrawFont | undefined
@@ -73,11 +279,323 @@ export default function DiagramEditor() {
     () => ({
       elements: [],
       appState: {
-        viewBackgroundColor: mode === 'dark' ? '#121212' : '#ffffff',
+        viewBackgroundColor: defaultCanvasBackground,
         currentItemFontFamily: companyFontFamily,
       },
     }),
-    [mode, companyFontFamily]
+    [defaultCanvasBackground, companyFontFamily]
+  )
+
+  const handleExcalidrawReady = useCallback((api: any) => {
+    excalidrawAPIRef.current = api
+  }, [])
+
+  const serializeCurrentScene = useCallback(() => {
+    const api = excalidrawAPIRef.current
+    if (!api?.getSceneElements || !api?.getAppState) {
+      window.alert('Diagram editor is not ready yet.')
+      return null
+    }
+
+    const elements = api.getSceneElements() ?? []
+    const appState = api.getAppState() ?? {}
+    const filesFromApi = api.getFiles ? api.getFiles() : undefined
+    let files: Record<string, unknown> | undefined
+    if (filesFromApi) {
+      if (filesFromApi instanceof Map) {
+        files = Object.fromEntries(filesFromApi.entries())
+      } else {
+        files = filesFromApi as Record<string, unknown>
+      }
+    }
+
+    return JSON.stringify({
+      elements,
+      appState: {
+        ...appState,
+        collaborators: undefined,
+      },
+      files,
+    })
+  }, [])
+
+  const loadDiagramFromJson = useCallback(
+    (diagramJson: string) => {
+      const api = excalidrawAPIRef.current
+      if (!api?.updateScene) {
+        window.alert('Diagram editor is not ready yet.')
+        return false
+      }
+
+      let parsed: {
+        elements?: any[]
+        appState?: Record<string, unknown>
+        files?: Record<string, unknown>
+      }
+      try {
+        parsed = JSON.parse(diagramJson)
+      } catch (error) {
+        console.error('DiagramEditor: Unable to parse diagram JSON', error)
+        window.alert('Unable to open diagram because its data is corrupted.')
+        return false
+      }
+
+      suppressSceneChangeRef.current = true
+      api.updateScene({
+        elements: parsed.elements ?? [],
+        appState: {
+          ...(parsed.appState ?? {}),
+          collaborators: new Map(),
+          currentItemFontFamily: companyFontFamily,
+        },
+        files: parsed.files ?? {},
+      })
+      setHasUnsavedChanges(false)
+      return true
+    },
+    [companyFontFamily]
+  )
+
+  const openSaveDialog = useCallback(
+    (proposedName?: string | null, metadata?: LocalStoredDiagramMetadata, forceSaveAs = false) => {
+      setSaveDialogInitialName(proposedName ?? '')
+      setSaveDialogInitialMetadata(metadata)
+      setSaveDialogForceSaveAs(forceSaveAs)
+      setIsSaveDialogOpen(true)
+    },
+    []
+  )
+
+  const handleNewDiagram = useCallback(() => {
+    const api = excalidrawAPIRef.current
+    if (!api?.resetScene) {
+      console.warn('DiagramEditor: Excalidraw API not ready for new diagram action')
+      return
+    }
+
+    const previousAppState = api.getAppState?.()
+    const viewBackgroundColor = previousAppState?.viewBackgroundColor ?? defaultCanvasBackground
+
+    suppressSceneChangeRef.current = true
+    api.resetScene()
+
+    const freshAppState = api.getAppState?.() || {}
+    suppressSceneChangeRef.current = true
+    api.updateScene({
+      appState: {
+        ...freshAppState,
+        viewBackgroundColor,
+        currentItemFontFamily: companyFontFamily,
+      },
+    })
+    setCurrentDiagramName(null)
+    setCurrentDiagramId(null)
+    setCurrentDiagramMetadata(undefined)
+    setHasUnsavedChanges(false)
+  }, [companyFontFamily, defaultCanvasBackground])
+
+  const handleSceneChange = useCallback(
+    (_: readonly unknown[] = [], __: unknown = null, ___: unknown = null) => {
+      if (suppressSceneChangeRef.current) {
+        suppressSceneChangeRef.current = false
+        return
+      }
+      setHasUnsavedChanges(true)
+    },
+    []
+  )
+
+  const handleSaveAsDiagram = useCallback(() => {
+    const proposedName = currentDiagramName ? `${currentDiagramName} - Copy` : ''
+    openSaveDialog(proposedName, currentDiagramMetadata, true)
+  }, [currentDiagramMetadata, currentDiagramName, openSaveDialog])
+
+  const handleSaveDiagram = useCallback(() => {
+    const proposedName = currentDiagramName ?? ''
+    openSaveDialog(proposedName, currentDiagramMetadata, false)
+  }, [currentDiagramMetadata, currentDiagramName, openSaveDialog])
+
+  const handleOpenDiagram = useCallback(() => {
+    setIsOpenDialogOpen(true)
+  }, [])
+
+  const handleConfirmSave = useCallback(
+    async ({ name, metadata }: { name: string; metadata: LocalStoredDiagramMetadata }) => {
+      const serialized = serializeCurrentScene()
+      if (!serialized) {
+        return false
+      }
+
+      if (!metadata.architecture?.id) {
+        window.alert('Please select an architecture before saving the diagram.')
+        return false
+      }
+
+      const diagramType = metadata.diagramType ?? 'ARCHITECTURE'
+      const architectureConnect = {
+        connect: [
+          {
+            where: {
+              node: { id: { eq: metadata.architecture.id } },
+            },
+          },
+        ],
+      }
+
+      try {
+        if (currentDiagramId && !saveDialogForceSaveAs) {
+          const updateInput: Record<string, unknown> = {
+            title: { set: name },
+            description: { set: metadata.description ?? undefined },
+            diagramType: { set: diagramType },
+            diagramJson: { set: serialized },
+            architecture: {
+              disconnect: [{ where: {} }],
+              ...architectureConnect,
+            },
+          }
+
+          if (selectedCompanyId) {
+            updateInput.company = {
+              disconnect: [{ where: {} }],
+              connect: [
+                {
+                  where: {
+                    node: { id: { eq: selectedCompanyId } },
+                  },
+                },
+              ],
+            }
+          }
+
+          const { data } = await updateDiagramMutation({
+            variables: {
+              id: currentDiagramId,
+              input: updateInput,
+            },
+          })
+
+          const updated = data?.updateDiagrams?.diagrams?.[0]
+          if (!updated) {
+            throw new Error('No diagram returned from update mutation')
+          }
+          setCurrentDiagramId(updated.id)
+        } else {
+          const createInput: Record<string, unknown> = {
+            title: name,
+            description: metadata.description ?? undefined,
+            diagramType,
+            diagramJson: serialized,
+            architecture: architectureConnect,
+          }
+
+          if (selectedCompanyId) {
+            createInput.company = {
+              connect: [
+                {
+                  where: {
+                    node: { id: { eq: selectedCompanyId } },
+                  },
+                },
+              ],
+            }
+          }
+
+          if (currentPerson?.id) {
+            createInput.creator = {
+              connect: [
+                {
+                  where: {
+                    node: { id: { eq: currentPerson.id } },
+                  },
+                },
+              ],
+            }
+          }
+
+          const { data } = await createDiagramMutation({
+            variables: {
+              input: [createInput],
+            },
+          })
+
+          const created = data?.createDiagrams?.diagrams?.[0]
+          if (!created) {
+            throw new Error('No diagram returned from create mutation')
+          }
+          setCurrentDiagramId(created.id)
+        }
+
+        setCurrentDiagramName(name)
+        setCurrentDiagramMetadata(metadata)
+        setSaveDialogInitialMetadata(metadata)
+        setSaveDialogInitialName(name)
+        setIsSaveDialogOpen(false)
+        setSaveDialogForceSaveAs(false)
+        setHasUnsavedChanges(false)
+        return true
+      } catch (error) {
+        console.error('DiagramEditor: Failed to save diagram', error)
+        window.alert('Failed to save the diagram. Please try again.')
+        return false
+      }
+    },
+    [
+      createDiagramMutation,
+      currentDiagramId,
+      currentPerson?.id,
+      saveDialogForceSaveAs,
+      selectedCompanyId,
+      serializeCurrentScene,
+      updateDiagramMutation,
+    ]
+  )
+
+  const handleCancelSaveDialog = useCallback(() => {
+    setIsSaveDialogOpen(false)
+    setSaveDialogInitialMetadata(undefined)
+    setSaveDialogForceSaveAs(false)
+  }, [])
+
+  const handleCloseOpenDialog = useCallback(() => {
+    setIsOpenDialogOpen(false)
+  }, [])
+
+  const handleSelectDiagram = useCallback(
+    (diagram: LocalOpenDialogDiagram) => {
+      if (!diagram.diagramJson) {
+        window.alert('Selected diagram has no stored content.')
+        return
+      }
+
+      const loaded = loadDiagramFromJson(diagram.diagramJson)
+      if (!loaded) {
+        return
+      }
+
+      const firstArchitecture = diagram.architecture?.[0]
+      const metadata: LocalStoredDiagramMetadata = {
+        description: diagram.description ?? undefined,
+        diagramType: diagram.diagramType ?? 'ARCHITECTURE',
+        architecture: firstArchitecture
+          ? {
+              id: firstArchitecture.id,
+              name: firstArchitecture.name,
+              type: firstArchitecture.type,
+              domain: firstArchitecture.domain,
+            }
+          : undefined,
+        architectureName: firstArchitecture?.name,
+      }
+
+      setCurrentDiagramId(diagram.id)
+      setCurrentDiagramName(diagram.title)
+      setCurrentDiagramMetadata(metadata)
+      setSaveDialogInitialMetadata(metadata)
+      setSaveDialogInitialName(diagram.title)
+      setIsOpenDialogOpen(false)
+    },
+    [loadDiagramFromJson]
   )
 
   const handleToggleSidebar = useCallback(() => {
@@ -85,23 +603,48 @@ export default function DiagramEditor() {
   }, [])
 
   return (
-    <div
-      style={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        overflow: 'hidden',
-        backgroundColor: 'var(--excalidraw-bg, transparent)',
-      }}
-    >
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <ExcalidrawCanvas theme={excalidrawTheme} initialData={initialData} />
+    <>
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          overflow: 'hidden',
+          backgroundColor: 'var(--excalidraw-bg, transparent)',
+        }}
+      >
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <ExcalidrawCanvas
+            theme={excalidrawTheme}
+            initialData={initialData}
+            onNewDiagram={handleNewDiagram}
+            onOpenDiagram={handleOpenDiagram}
+            onSaveDiagram={handleSaveDiagram}
+            onSaveAsDiagram={handleSaveAsDiagram}
+            onSceneChange={handleSceneChange}
+            onReady={handleExcalidrawReady}
+          />
+        </div>
+        <DiagramLibrarySidebar
+          defaultFontFamily={companyFontFamily}
+          isOpen={isSidebarOpen}
+          onToggle={handleToggleSidebar}
+        />
       </div>
-      <DiagramLibrarySidebar
-        defaultFontFamily={companyFontFamily}
-        isOpen={isSidebarOpen}
-        onToggle={handleToggleSidebar}
+      <LocalSaveDiagramDialog
+        open={isSaveDialogOpen}
+        initialName={saveDialogInitialName}
+        initialMetadata={saveDialogInitialMetadata}
+        forceSaveAs={saveDialogForceSaveAs}
+        isUpdate={!saveDialogForceSaveAs && Boolean(saveDialogInitialName)}
+        onCancel={handleCancelSaveDialog}
+        onConfirm={handleConfirmSave}
       />
-    </div>
+      <LocalOpenDiagramDialog
+        open={isOpenDialogOpen}
+        onClose={handleCloseOpenDialog}
+        onSelect={handleSelectDiagram}
+      />
+    </>
   )
 }
