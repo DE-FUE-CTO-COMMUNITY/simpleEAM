@@ -32,6 +32,10 @@ export interface LocalStoredDiagramMetadata {
    * that only stored the architecture name.
    */
   architectureName?: string
+  company?: {
+    id: string
+    name?: string | null
+  }
 }
 
 export interface LocalStoredDiagramEntry {

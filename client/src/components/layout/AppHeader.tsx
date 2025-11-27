@@ -8,6 +8,7 @@ import {
   Box,
   Select,
   MenuItem,
+  Tooltip,
 } from '@mui/material'
 import { Menu as MenuIcon } from '@mui/icons-material'
 import UserProfileMenu from './UserProfileMenu'
@@ -30,7 +31,56 @@ const AppHeader: React.FC<AppHeaderProps> = ({
   handleDrawerToggle,
 }) => {
   const theme = useTheme()
-  const { companies, selectedCompanyId, setSelectedCompanyId } = useCompanyContext()
+  const {
+    companies,
+    selectedCompanyId,
+    setSelectedCompanyId,
+    isCompanySelectionLocked,
+    companySelectionLockReason,
+  } = useCompanyContext()
+  const hasMultipleCompanies = (companies?.length ?? 0) > 1
+
+  const renderCompanySelector = () => {
+    if (!companies || companies.length === 0) {
+      return null
+    }
+
+    const selector = (
+      <Select
+        size="small"
+        value={selectedCompanyId || ''}
+        onChange={e => setSelectedCompanyId(e.target.value as string)}
+        disabled={isCompanySelectionLocked}
+        sx={{
+          color: 'inherit',
+          borderColor: 'rgba(255,255,255,0.7)',
+          '& .MuiSelect-icon': { color: 'inherit' },
+          minWidth: 200,
+          bgcolor: 'rgba(255,255,255,0.08)',
+        }}
+      >
+        {companies.map(c => (
+          <MenuItem key={c.id} value={c.id}>
+            {c.name}
+          </MenuItem>
+        ))}
+      </Select>
+    )
+
+    if (!isCompanySelectionLocked) {
+      return selector
+    }
+
+    return (
+      <Tooltip
+        title={companySelectionLockReason ?? 'Company selection is temporarily locked.'}
+        placement="bottom"
+        arrow
+      >
+        <span style={{ display: 'inline-flex' }}>{selector}</span>
+      </Tooltip>
+    )
+  }
 
   return (
     <AppBar
@@ -60,25 +110,8 @@ const AppHeader: React.FC<AppHeaderProps> = ({
             Simple Enterprise Architecture Management
           </Typography>
           {/* Company selector: show dropdown if multiple, otherwise static label */}
-          {companies?.length > 1 ? (
-            <Select
-              size="small"
-              value={selectedCompanyId || ''}
-              onChange={e => setSelectedCompanyId(e.target.value as string)}
-              sx={{
-                color: 'inherit',
-                borderColor: 'rgba(255,255,255,0.7)',
-                '& .MuiSelect-icon': { color: 'inherit' },
-                minWidth: 200,
-                bgcolor: 'rgba(255,255,255,0.08)',
-              }}
-            >
-              {companies.map(c => (
-                <MenuItem key={c.id} value={c.id}>
-                  {c.name}
-                </MenuItem>
-              ))}
-            </Select>
+          {hasMultipleCompanies ? (
+            renderCompanySelector()
           ) : (
             <Typography variant="body1" noWrap component="div" sx={{ opacity: 0.9 }}>
               {companies?.[0]?.name || ''}

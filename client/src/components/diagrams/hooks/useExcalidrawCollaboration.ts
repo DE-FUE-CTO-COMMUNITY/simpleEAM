@@ -3,6 +3,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { io, Socket } from 'socket.io-client'
 import { useExcalidrawConfig } from '@/lib/runtime-config'
+import type { LocalStoredDiagramMetadata } from '@/components/diagrams/components/dialogs/types'
+
+export type CollaborationAccessDecision = 'allow' | 'deny' | 'ignore'
 
 export interface Collaborator {
   id: string
@@ -31,6 +34,13 @@ interface AppState {
   [key: string]: unknown
 }
 
+interface SceneBroadcastPayload {
+  elements?: ExcalidrawElement[]
+  appState?: Pick<AppState, 'scrollX' | 'scrollY' | 'zoom'>
+  diagram?: CurrentDiagramInfo | null
+  collaborator?: Collaborator
+}
+
 interface ExcalidrawImperativeAPI {
   updateScene: (sceneData: {
     elements?: ExcalidrawElement[]
@@ -42,10 +52,16 @@ interface ExcalidrawImperativeAPI {
   [key: string]: unknown
 }
 
+type ExcalidrawImperativeAPIWithBroadcast = ExcalidrawImperativeAPI & {
+  broadcastSceneUpdate?: (elements: ExcalidrawElement[], appState: AppState) => void
+}
+
 export interface CurrentDiagramInfo {
   id: string | null
   title?: string | null
-  [key: string]: unknown
+  metadata?: LocalStoredDiagramMetadata
+  companyId?: string | null
+  companyName?: string | null
 }
 
 interface UseExcalidrawCollaborationProps {
@@ -54,6 +70,9 @@ interface UseExcalidrawCollaborationProps {
   userAvatarUrl?: string
   currentDiagram?: CurrentDiagramInfo | null
   onDiagramUpdate?: (diagram: CurrentDiagramInfo | null) => void
+  authorizeAccess?: (diagram: CurrentDiagramInfo | null) => CollaborationAccessDecision
+  onAuthorizationDenied?: () => void
+  onAuthorizationGranted?: () => void
 }
 
 interface CollaborationState {
@@ -69,6 +88,9 @@ export function useExcalidrawCollaboration({
   userAvatarUrl,
   currentDiagram,
   onDiagramUpdate,
+  authorizeAccess,
+  onAuthorizationDenied,
+  onAuthorizationGranted,
 }: UseExcalidrawCollaborationProps) {
   const [state, setState] = useState<CollaborationState>({
     isCollaborating: false,
@@ -80,6 +102,8 @@ export function useExcalidrawCollaboration({
   const isReceivingUpdateRef = useRef(false)
   const hasReceivedInitialSceneRef = useRef(false)
   const isFirstUserRef = useRef(false)
+  const [isFirstUser, setIsFirstUser] = useState(false)
+  const hasConfirmedAccessRef = useRef(false)
 
   const excalidrawConfig = useExcalidrawConfig()
   const socketServerUrl = excalidrawConfig.wsServerUrl || 'http://localhost:8890'
@@ -108,6 +132,8 @@ export function useExcalidrawCollaboration({
     isReceivingUpdateRef.current = false
     hasReceivedInitialSceneRef.current = false
     isFirstUserRef.current = false
+    setIsFirstUser(false)
+    hasConfirmedAccessRef.current = false
 
     if (typeof window !== 'undefined') {
       const url = new URL(window.location.href)
@@ -126,14 +152,39 @@ export function useExcalidrawCollaboration({
       isReceivingUpdateRef.current = false
       hasReceivedInitialSceneRef.current = false
       isFirstUserRef.current = false
+      setIsFirstUser(false)
+      hasConfirmedAccessRef.current = false
 
       const socket = io(socketServerUrl, {
         transports: ['websocket', 'polling'],
         autoConnect: true,
       })
 
+      const emitCollaboratorPresence = () => {
+        if (!socket.id) {
+          return
+        }
+        try {
+          const payload: SceneBroadcastPayload = {
+            diagram: currentDiagram ? { ...currentDiagram } : null,
+            collaborator: {
+              id: socket.id,
+              name: providedUsername,
+              avatarUrl: userAvatarUrl,
+            },
+          }
+          const encoder = new TextEncoder()
+          const dataBuffer = encoder.encode(JSON.stringify(payload)).buffer
+          const iv = new Uint8Array(16)
+          socket.emit('server-broadcast', roomId, dataBuffer, iv)
+        } catch (error) {
+          console.error('Failed to broadcast collaborator presence:', error)
+        }
+      }
+
       socket.on('connect', () => {
         socket.emit('join-room', roomId)
+        setTimeout(emitCollaboratorPresence, 100)
       })
 
       socket.on('connect_error', error => {
@@ -142,19 +193,23 @@ export function useExcalidrawCollaboration({
 
       socket.on('first-in-room', () => {
         isFirstUserRef.current = true
+        setIsFirstUser(true)
         hasReceivedInitialSceneRef.current = true
+        if (!hasConfirmedAccessRef.current) {
+          hasConfirmedAccessRef.current = true
+          onAuthorizationGranted?.()
+        }
       })
 
       socket.on('new-user', (socketId: string) => {
-        const newCollaborator: Collaborator = {
-          id: socketId,
-          name: `${providedUsername} ${socketId.substring(0, 8)}`.trim(),
-          avatarUrl: userAvatarUrl,
-        }
-
         setState(prev => {
           const updated = new Map(prev.collaborators)
-          updated.set(socketId, newCollaborator)
+          if (!updated.has(socketId)) {
+            updated.set(socketId, {
+              id: socketId,
+              name: `Participant ${socketId.substring(0, 8)}`,
+            })
+          }
           return { ...prev, collaborators: updated }
         })
 
@@ -164,7 +219,7 @@ export function useExcalidrawCollaboration({
               const currentElements = excalidrawAPI.getSceneElements() || []
               const currentAppState = excalidrawAPI.getAppState()
 
-              const sceneData = {
+              const sceneData: SceneBroadcastPayload = {
                 elements: currentElements,
                 appState: {
                   scrollX: currentAppState.scrollX,
@@ -172,6 +227,13 @@ export function useExcalidrawCollaboration({
                   zoom: currentAppState.zoom,
                 },
                 diagram: currentDiagram ? { ...currentDiagram } : null,
+                collaborator: socket.id
+                  ? {
+                      id: socket.id,
+                      name: providedUsername,
+                      avatarUrl: userAvatarUrl,
+                    }
+                  : undefined,
               }
 
               const encoder = new TextEncoder()
@@ -190,10 +252,14 @@ export function useExcalidrawCollaboration({
           const collaborators = new Map<string, Collaborator>()
           userIds.forEach(id => {
             if (id !== socket.id) {
-              collaborators.set(id, {
+              const existing = prev.collaborators.get(id)
+              collaborators.set(
                 id,
-                name: `${providedUsername} ${id.substring(0, 8)}`.trim(),
-              })
+                existing || {
+                  id,
+                  name: `Participant ${id.substring(0, 8)}`,
+                }
+              )
             }
           })
           return { ...prev, collaborators }
@@ -207,8 +273,45 @@ export function useExcalidrawCollaboration({
           const dataString = decoder.decode(encryptedData)
           const sceneData = JSON.parse(dataString)
 
-          if (sceneData?.diagram && onDiagramUpdate) {
-            onDiagramUpdate(sceneData.diagram)
+          const diagramInfo: CurrentDiagramInfo | null = sceneData?.diagram ?? null
+
+          const accessDecision = authorizeAccess ? authorizeAccess(diagramInfo) : 'allow'
+
+          if (accessDecision === 'deny') {
+            stopCollaboration()
+            onAuthorizationDenied?.()
+            isReceivingUpdateRef.current = false
+            return
+          }
+
+          if (accessDecision === 'ignore') {
+            isReceivingUpdateRef.current = false
+            return
+          }
+
+          if (!hasConfirmedAccessRef.current) {
+            hasConfirmedAccessRef.current = true
+            onAuthorizationGranted?.()
+          }
+
+          if (diagramInfo && onDiagramUpdate) {
+            onDiagramUpdate(diagramInfo)
+          }
+
+          if (sceneData?.collaborator?.id && sceneData.collaborator.id !== socket.id) {
+            setState(prev => {
+              const updated = new Map(prev.collaborators)
+              const existing = updated.get(sceneData.collaborator!.id)
+              updated.set(sceneData.collaborator!.id, {
+                id: sceneData.collaborator!.id,
+                name:
+                  sceneData.collaborator!.name?.trim() ||
+                  existing?.name ||
+                  `Participant ${sceneData.collaborator!.id.substring(0, 8)}`,
+                avatarUrl: sceneData.collaborator!.avatarUrl ?? existing?.avatarUrl,
+              })
+              return { ...prev, collaborators: updated }
+            })
           }
 
           if (excalidrawAPI && Array.isArray(sceneData?.elements)) {
@@ -216,8 +319,9 @@ export function useExcalidrawCollaboration({
               hasReceivedInitialSceneRef.current = true
             }
 
-            const originalBroadcast = (excalidrawAPI as any).broadcastSceneUpdate
-            delete (excalidrawAPI as any).broadcastSceneUpdate
+            const apiWithBroadcast = excalidrawAPI as ExcalidrawImperativeAPIWithBroadcast
+            const originalBroadcast = apiWithBroadcast.broadcastSceneUpdate
+            delete apiWithBroadcast.broadcastSceneUpdate
 
             excalidrawAPI.updateScene({
               elements: sceneData.elements,
@@ -226,7 +330,7 @@ export function useExcalidrawCollaboration({
             })
 
             setTimeout(() => {
-              ;(excalidrawAPI as any).broadcastSceneUpdate = originalBroadcast
+              apiWithBroadcast.broadcastSceneUpdate = originalBroadcast
               isReceivingUpdateRef.current = false
             }, 50)
           } else {
@@ -252,11 +356,15 @@ export function useExcalidrawCollaboration({
       }
     },
     [
+      authorizeAccess,
       cleanupSocket,
       currentDiagram,
       excalidrawAPI,
       onDiagramUpdate,
+      onAuthorizationDenied,
+      onAuthorizationGranted,
       providedUsername,
+      stopCollaboration,
       socketServerUrl,
       state.socket,
       userAvatarUrl,
@@ -276,7 +384,7 @@ export function useExcalidrawCollaboration({
       }
 
       try {
-        const sceneData = {
+        const sceneData: SceneBroadcastPayload = {
           elements,
           appState: {
             scrollX: appState.scrollX,
@@ -284,6 +392,13 @@ export function useExcalidrawCollaboration({
             zoom: appState.zoom,
           },
           diagram: currentDiagram ? { ...currentDiagram } : null,
+          collaborator: state.socket?.id
+            ? {
+                id: state.socket.id,
+                name: providedUsername,
+                avatarUrl: userAvatarUrl,
+              }
+            : undefined,
         }
 
         const encoder = new TextEncoder()
@@ -294,12 +409,20 @@ export function useExcalidrawCollaboration({
         console.error('Failed to broadcast scene update:', error)
       }
     },
-    [currentDiagram, state.isCollaborating, state.roomId, state.socket]
+    [
+      currentDiagram,
+      providedUsername,
+      state.isCollaborating,
+      state.roomId,
+      state.socket,
+      userAvatarUrl,
+    ]
   )
 
   useEffect(() => {
     if (excalidrawAPI && state.isCollaborating) {
-      ;(excalidrawAPI as any).broadcastSceneUpdate = broadcastSceneUpdate
+      const apiWithBroadcast = excalidrawAPI as ExcalidrawImperativeAPIWithBroadcast
+      apiWithBroadcast.broadcastSceneUpdate = broadcastSceneUpdate
     }
   }, [broadcastSceneUpdate, excalidrawAPI, state.isCollaborating])
 
@@ -312,5 +435,6 @@ export function useExcalidrawCollaboration({
     collaborators: state.collaborators,
     roomId: state.roomId,
     broadcastSceneUpdate,
+    isFirstUser,
   }
 }

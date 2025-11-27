@@ -42,6 +42,10 @@ export interface LocalOpenDialogDiagram {
     type?: string | null
     domain?: string | null
   }>
+  company?: Array<{
+    id: string
+    name?: string | null
+  }>
 }
 
 interface LocalOpenDiagramDialogProps {

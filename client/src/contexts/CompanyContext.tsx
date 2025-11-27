@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useQuery } from '@apollo/client'
 import { GET_COMPANIES } from '@/graphql/company'
 import { GET_PERSON_BY_EMAIL } from '@/graphql/person'
@@ -20,6 +20,9 @@ type CompanyContextValue = {
   selectedCompany: Company | null
   selectedCompanyId: string | null
   setSelectedCompanyId: (id: string) => void
+  isCompanySelectionLocked: boolean
+  companySelectionLockReason: string | null
+  setCompanySelectionLock: (lockId: string, reason?: string | null) => void
   loading: boolean
 }
 
@@ -53,6 +56,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const [selectedCompanyId, setSelectedCompanyIdState] = useState<string | null>(null)
   const [isInitialized, setIsInitialized] = useState(false)
+  const [selectionLocks, setSelectionLocks] = useState<Map<string, string>>(new Map())
 
   // Set initial value from localStorage
   useEffect(() => {
@@ -169,6 +173,25 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     if (typeof window !== 'undefined') localStorage.setItem(STORAGE_KEY, id)
   }
 
+  const setCompanySelectionLock = useCallback((lockId: string, reason?: string | null) => {
+    setSelectionLocks(prev => {
+      const next = new Map(prev)
+      if (!reason) {
+        next.delete(lockId)
+      } else {
+        next.set(lockId, reason)
+      }
+      return next
+    })
+  }, [])
+
+  const companySelectionLockReason = useMemo(() => {
+    const iterator = selectionLocks.values().next()
+    return iterator.done ? null : iterator.value
+  }, [selectionLocks])
+
+  const isCompanySelectionLocked = selectionLocks.size > 0
+
   const selectedCompany = useMemo(() => {
     if (!selectedCompanyId) return null
     return companies.find(c => c.id === selectedCompanyId) ?? null
@@ -180,9 +203,20 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       selectedCompanyId,
       selectedCompany,
       setSelectedCompanyId,
+      isCompanySelectionLocked,
+      companySelectionLockReason,
+      setCompanySelectionLock,
       loading,
     }),
-    [companies, selectedCompanyId, selectedCompany, loading]
+    [
+      companies,
+      selectedCompanyId,
+      selectedCompany,
+      isCompanySelectionLocked,
+      companySelectionLockReason,
+      loading,
+      setCompanySelectionLock,
+    ]
   )
 
   return <CompanyContext.Provider value={value}>{children}</CompanyContext.Provider>

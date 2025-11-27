@@ -170,6 +170,11 @@
       "errorStart": "Failed to start collaboration",
       "startSuccess": "Live collaboration started",
       "stopSuccess": "Live collaboration stopped",
+      "permissionDenied": "You are not allowed to join this collaboration.",
+      "permissionRequired": "Edit or admin permissions for the diagram's company are required.",
+      "companyPermissionDenied": "You are not allowed to collaborate on this company.",
+      "companyMissing": "This diagram is not assigned to a company, collaboration cannot start.",
+      "companySwitchLockedTooltip": "Stop live collaboration before switching companies.",
       "activeMenuLabel": "Live Collaboration (Active)"
     },
     "contextMenu": {

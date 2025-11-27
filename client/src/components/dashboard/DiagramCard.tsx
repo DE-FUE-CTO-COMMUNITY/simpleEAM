@@ -35,6 +35,10 @@ interface DiagramCardProps {
     domain: string
   }[]
   diagramJson?: string
+  company?: {
+    id: string
+    name?: string | null
+  }[]
 }
 
 const DiagramCard: React.FC<DiagramCardProps> = ({
@@ -48,6 +52,7 @@ const DiagramCard: React.FC<DiagramCardProps> = ({
   creator,
   architecture,
   diagramJson,
+  company,
 }) => {
   const router = useRouter()
   const theme = useTheme()
@@ -64,6 +69,7 @@ const DiagramCard: React.FC<DiagramCardProps> = ({
         updatedAt,
         creator,
         architecture,
+        company,
       }
 
       // If diagramJson is available, use it directly

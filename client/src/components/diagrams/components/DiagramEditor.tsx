@@ -10,6 +10,7 @@ import type { ExcalidrawFont } from '@/components/companies/types'
 import { useThemeMode } from '@/contexts/ThemeContext'
 import { useCompanyContext } from '@/contexts/CompanyContext'
 import { useCurrentPerson } from '@/hooks/useCurrentPerson'
+import { useAuth, isAdmin, isArchitect } from '@/lib/auth'
 import { useThemeConfig } from '@/lib/runtime-config'
 import { CREATE_DIAGRAM, GET_DIAGRAM, UPDATE_DIAGRAM } from '@/graphql/diagram'
 import { convertExcalidrawToDrawIO, downloadDrawIOFile } from '@/utils/drawioConverter'
@@ -17,14 +18,17 @@ import DiagramLibrarySidebar from './DiagramLibrarySidebar'
 import DeleteDiagramDialog from './dialogs/DeleteDiagramDialog'
 import LocalOpenDiagramDialog, { LocalOpenDialogDiagram } from './dialogs/LocalOpenDiagramDialog'
 import LocalSaveDiagramDialog from './dialogs/LocalSaveDiagramDialog'
-import CollaborationDialog from './dialogs/CollaborationDialog'
+import CollaborationDialog, { type CollaborationDialogHandle } from './dialogs/CollaborationDialog'
 import type { LocalStoredDiagramMetadata } from './dialogs/types'
 import {
+  type CollaborationAccessDecision,
   type CurrentDiagramInfo,
   useExcalidrawCollaboration,
 } from '@/components/diagrams/hooks/useExcalidrawCollaboration'
 
 const LOCAL_DRAFT_STORAGE_KEY = 'diagram-editor-local-draft'
+
+type CollaborationPermissionFailure = 'missing-edit' | 'missing-company' | 'forbidden-company'
 
 interface LocalDiagramDraftPayload {
   diagramJson: string
@@ -257,8 +261,15 @@ const FALLBACK_EXCALIDRAW_FONT = FONT_FAMILY.Excalifont
 
 export default function DiagramEditor() {
   const { mode } = useThemeMode()
-  const { selectedCompany, selectedCompanyId } = useCompanyContext()
-  const { currentPerson } = useCurrentPerson()
+  const {
+    selectedCompany,
+    selectedCompanyId,
+    companies,
+    setSelectedCompanyId,
+    setCompanySelectionLock,
+  } = useCompanyContext()
+  const { currentPerson, userEmail } = useCurrentPerson()
+  const { keycloak } = useAuth()
   const themeConfig = useThemeConfig()
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [currentDiagramName, setCurrentDiagramName] = useState<string | null>(null)
@@ -278,12 +289,20 @@ export default function DiagramEditor() {
   const [updateDiagramMutation] = useMutation(UPDATE_DIAGRAM)
   const [fetchDiagramById] = useLazyQuery(GET_DIAGRAM)
   const { enqueueSnackbar } = useSnackbar()
+  const collaborationDialogRef = useRef<CollaborationDialogHandle | null>(null)
+  const isCollaborationHostRef = useRef(false)
   const collaborationTranslations = useTranslations('diagrams.collaborationDialog')
   const excalidrawAPIRef = useRef<any>(null)
   const sceneInitializedRef = useRef(false)
   const pendingDiagramProcessingRef = useRef(false)
   const suppressSceneChangeRef = useRef(false)
   const autoJoinAttemptedRef = useRef(false)
+  const authorizationFailureRef = useRef(false)
+  const authorizationSuccessRef = useRef(false)
+  const authorizationOutcomeRef = useRef<{
+    resolve?: () => void
+    reject?: (error: Error) => void
+  } | null>(null)
   const [isEditorReady, setIsEditorReady] = useState(false)
   const [isSceneEmpty, setIsSceneEmpty] = useState(true)
 
@@ -322,37 +341,388 @@ export default function DiagramEditor() {
     return FALLBACK_EXCALIDRAW_FONT
   }, [selectedCompany?.diagramFont])
 
+  const accessibleCompanyIds = useMemo(
+    () => new Set(companies.map(company => company.id)),
+    [companies]
+  )
+
+  const syncSelectedCompanyToDiagram = useCallback(
+    (companyId?: string | null) => {
+      if (!companyId) {
+        return
+      }
+      if (!accessibleCompanyIds.has(companyId)) {
+        return
+      }
+      if (selectedCompanyId === companyId) {
+        return
+      }
+      setSelectedCompanyId(companyId)
+    },
+    [accessibleCompanyIds, selectedCompanyId, setSelectedCompanyId]
+  )
+
+  const buildCompanyMetadata = useCallback(() => {
+    if (!selectedCompanyId) {
+      return undefined
+    }
+    return {
+      id: selectedCompanyId,
+      name: selectedCompany?.name ?? null,
+    }
+  }, [selectedCompany?.name, selectedCompanyId])
+
+  useEffect(() => {
+    const companyInfo = buildCompanyMetadata()
+
+    const stripCompany = (metadata?: LocalStoredDiagramMetadata) => {
+      if (!metadata) {
+        return undefined
+      }
+      if (!metadata.company) {
+        return metadata
+      }
+      const rest = { ...metadata }
+      delete rest.company
+      const hasFields = Object.keys(rest).length > 0
+      return hasFields ? (rest as LocalStoredDiagramMetadata) : undefined
+    }
+
+    const applyCompany = (metadata?: LocalStoredDiagramMetadata) => {
+      if (!companyInfo) {
+        return stripCompany(metadata)
+      }
+      if (metadata?.company?.id === companyInfo.id && metadata.company.name === companyInfo.name) {
+        return metadata
+      }
+      if (!metadata) {
+        return { company: companyInfo }
+      }
+      return { ...metadata, company: companyInfo }
+    }
+
+    setCurrentDiagramMetadata(prev => applyCompany(prev))
+    setSaveDialogInitialMetadata(prev => applyCompany(prev))
+  }, [buildCompanyMetadata])
+
   const collaborationDisplayName = useMemo(() => {
     const first = currentPerson?.firstName?.trim() ?? ''
     const last = currentPerson?.lastName?.trim() ?? ''
     const combined = `${first} ${last}`.trim()
-    return combined || currentPerson?.email || 'Anonymous User'
-  }, [currentPerson?.email, currentPerson?.firstName, currentPerson?.lastName])
+    if (combined) {
+      return combined
+    }
+
+    if (currentPerson?.email?.trim()) {
+      return currentPerson.email.trim()
+    }
+
+    if (userEmail?.trim()) {
+      return userEmail.trim()
+    }
+
+    const token = keycloak?.tokenParsed
+    const tokenName = token?.name?.trim()
+    if (tokenName) {
+      return tokenName
+    }
+
+    const given = token?.given_name?.trim() ?? ''
+    const family = token?.family_name?.trim() ?? ''
+    const tokenCombined = `${given} ${family}`.trim()
+    if (tokenCombined) {
+      return tokenCombined
+    }
+
+    const preferredUsername = token?.preferred_username?.trim()
+    if (preferredUsername) {
+      return preferredUsername
+    }
+
+    return 'Anonymous User'
+  }, [
+    currentPerson?.email,
+    currentPerson?.firstName,
+    currentPerson?.lastName,
+    keycloak?.tokenParsed,
+    userEmail,
+  ])
 
   const currentDiagramInfo = useMemo<CurrentDiagramInfo | null>(() => {
-    if (!currentDiagramId && !currentDiagramName) {
+    const companyIdFromMetadata = currentDiagramMetadata?.company?.id ?? null
+    const companyNameFromMetadata = currentDiagramMetadata?.company?.name ?? undefined
+    const fallbackCompanyId = companyIdFromMetadata ?? selectedCompanyId ?? null
+    const fallbackCompanyName = companyNameFromMetadata ?? selectedCompany?.name ?? undefined
+
+    const hasAnyInfo = Boolean(
+      currentDiagramId ??
+        currentDiagramName ??
+        currentDiagramMetadata ??
+        fallbackCompanyId ??
+        fallbackCompanyName
+    )
+
+    if (!hasAnyInfo) {
       return null
     }
+
     return {
       id: currentDiagramId ?? null,
       title: currentDiagramName ?? undefined,
       metadata: currentDiagramMetadata,
+      companyId: fallbackCompanyId,
+      companyName: fallbackCompanyName,
     }
-  }, [currentDiagramId, currentDiagramMetadata, currentDiagramName])
+  }, [
+    currentDiagramId,
+    currentDiagramMetadata,
+    currentDiagramName,
+    selectedCompany?.name,
+    selectedCompanyId,
+  ])
+
+  const collaborationDiagramInfo = useMemo<CurrentDiagramInfo | null>(() => {
+    if (currentDiagramInfo) {
+      return currentDiagramInfo
+    }
+
+    if (!selectedCompanyId && !selectedCompany?.name) {
+      return null
+    }
+
+    return {
+      id: null,
+      title: undefined,
+      metadata: undefined,
+      companyId: selectedCompanyId ?? null,
+      companyName: selectedCompany?.name ?? undefined,
+    }
+  }, [currentDiagramInfo, selectedCompany?.name, selectedCompanyId])
+
+  const handleCollaborativeDiagramUpdate = useCallback(
+    (diagram: CurrentDiagramInfo | null) => {
+      if (!diagram) {
+        return
+      }
+
+      if (typeof diagram.id !== 'undefined') {
+        setCurrentDiagramId(diagram.id)
+      }
+
+      if (typeof diagram.title !== 'undefined') {
+        const normalizedTitle = diagram.title ?? null
+        setCurrentDiagramName(normalizedTitle)
+        setSaveDialogInitialName(normalizedTitle)
+      }
+
+      if (diagram.metadata) {
+        setCurrentDiagramMetadata(diagram.metadata)
+        setSaveDialogInitialMetadata(diagram.metadata)
+      }
+
+      const diagramCompanyId = diagram.companyId ?? diagram.metadata?.company?.id ?? null
+      if (diagramCompanyId) {
+        const shouldSyncCompany = !isCollaborationHostRef.current || Boolean(diagram.id)
+        if (shouldSyncCompany) {
+          syncSelectedCompanyToDiagram(diagramCompanyId)
+        }
+      }
+    },
+    [syncSelectedCompanyToDiagram]
+  )
+
+  const checkCollaborationPermission = useCallback(
+    (companyId?: string | null, options: { silent?: boolean } = {}) => {
+      let failure: CollaborationPermissionFailure | null = null
+
+      if (!isArchitect()) {
+        failure = 'missing-edit'
+      } else if (!companyId) {
+        failure = 'missing-company'
+      } else if (!isAdmin() && !accessibleCompanyIds.has(companyId)) {
+        failure = 'forbidden-company'
+      }
+
+      console.log('[DiagramEditor] Collaboration permission check:', { companyId, failure })
+
+      if (failure) {
+        if (!options.silent) {
+          const translationKey =
+            failure === 'missing-edit'
+              ? 'permissionRequired'
+              : failure === 'missing-company'
+                ? 'companyMissing'
+                : 'companyPermissionDenied'
+          const message = collaborationTranslations(translationKey as any)
+          if (collaborationDialogRef.current) {
+            collaborationDialogRef.current.setError(message)
+          } else {
+            const variant = failure === 'missing-company' ? 'warning' : 'error'
+            enqueueSnackbar(message, { variant })
+          }
+        }
+        return { allowed: false as const, reason: failure }
+      }
+
+      return { allowed: true as const }
+    },
+    [accessibleCompanyIds, collaborationTranslations, enqueueSnackbar]
+  )
+
+  const authorizeIncomingDiagram = useCallback(
+    (diagram: CurrentDiagramInfo | null): CollaborationAccessDecision => {
+      if (!diagram) {
+        return 'allow'
+      }
+
+      const localDiagramId = currentDiagramInfo?.id ?? null
+      const incomingDiagramId = diagram.id ?? null
+
+      if (localDiagramId && incomingDiagramId && incomingDiagramId !== localDiagramId) {
+        return 'ignore'
+      }
+
+      const resolvedCompanyId = diagram.companyId ?? diagram.metadata?.company?.id ?? null
+
+      if (!resolvedCompanyId) {
+        authorizationFailureRef.current = true
+        return 'deny'
+      }
+
+      const result = checkCollaborationPermission(resolvedCompanyId)
+      if (!result.allowed) {
+        authorizationFailureRef.current = true
+      }
+      return result.allowed ? 'allow' : 'deny'
+    },
+    [checkCollaborationPermission, currentDiagramInfo?.id]
+  )
+
+  const handleCollaborationAuthorizationDenied = useCallback(() => {
+    authorizationFailureRef.current = true
+    if (authorizationOutcomeRef.current?.reject) {
+      authorizationOutcomeRef.current.reject(
+        new Error('collaboration-permission:denied-after-start')
+      )
+      authorizationOutcomeRef.current = null
+    }
+  }, [])
+
+  const handleCollaborationAuthorizationGranted = useCallback(() => {
+    authorizationSuccessRef.current = true
+    if (authorizationOutcomeRef.current?.resolve) {
+      authorizationOutcomeRef.current.resolve()
+      authorizationOutcomeRef.current = null
+    }
+  }, [])
 
   const {
     startCollaboration,
-    stopCollaboration,
+    stopCollaboration: stopCollaborationBase,
     isCollaborating,
     collaborators,
     roomId,
     broadcastSceneUpdate,
+    isFirstUser,
   } = useExcalidrawCollaboration({
     excalidrawAPI: excalidrawAPIRef.current,
     username: collaborationDisplayName,
     userAvatarUrl: currentPerson?.avatarUrl ?? undefined,
-    currentDiagram: currentDiagramInfo,
+    currentDiagram: collaborationDiagramInfo,
+    onDiagramUpdate: handleCollaborativeDiagramUpdate,
+    authorizeAccess: authorizeIncomingDiagram,
+    onAuthorizationDenied: handleCollaborationAuthorizationDenied,
+    onAuthorizationGranted: handleCollaborationAuthorizationGranted,
   })
+
+  const broadcastCurrentScene = useCallback(() => {
+    const api = excalidrawAPIRef.current
+    if (!api?.getSceneElements || !api?.getAppState) {
+      return
+    }
+
+    const elements = api.getSceneElements() ?? []
+    const appState = api.getAppState() ?? {}
+    broadcastSceneUpdate(elements as any[], appState)
+  }, [broadcastSceneUpdate])
+
+  useEffect(() => {
+    isCollaborationHostRef.current = Boolean(isFirstUser)
+  }, [isFirstUser])
+
+  useEffect(() => {
+    const lockId = 'diagram-editor-collaboration-lock'
+    if (isCollaborating) {
+      const reason =
+        collaborationTranslations('companySwitchLockedTooltip') ||
+        'Stop live collaboration before switching companies.'
+      setCompanySelectionLock(lockId, reason)
+    } else {
+      setCompanySelectionLock(lockId, null)
+    }
+
+    return () => {
+      setCompanySelectionLock(lockId, null)
+    }
+  }, [collaborationTranslations, isCollaborating, setCompanySelectionLock])
+
+  const stopCollaboration = useCallback(() => {
+    authorizationOutcomeRef.current?.reject?.(new Error('collaboration-stopped'))
+    authorizationOutcomeRef.current = null
+    authorizationFailureRef.current = false
+    authorizationSuccessRef.current = false
+    stopCollaborationBase()
+  }, [stopCollaborationBase])
+
+  const guardedStartCollaboration = useCallback(
+    async (roomId: string) => {
+      authorizationFailureRef.current = false
+      authorizationSuccessRef.current = false
+      authorizationOutcomeRef.current = null
+      const companyId =
+        currentDiagramMetadata?.company?.id ??
+        currentDiagramInfo?.companyId ??
+        selectedCompanyId ??
+        null
+      const permission = checkCollaborationPermission(companyId)
+      console.log('[DiagramEditor] Collaboration permission:', permission)
+      if (!permission.allowed) {
+        throw new Error(`collaboration-permission:${permission.reason ?? 'denied'}`)
+      }
+      const outcomePromise = new Promise<void>((resolve, reject) => {
+        authorizationOutcomeRef.current = { resolve, reject }
+      })
+
+      console.log('[DiagramEditor] Starting collaboration in room:', roomId)
+      await startCollaboration(roomId)
+
+      if (authorizationFailureRef.current) {
+        authorizationOutcomeRef.current = null
+        authorizationFailureRef.current = false
+        throw new Error('collaboration-permission:denied-after-start')
+      }
+
+      if (authorizationSuccessRef.current) {
+        authorizationOutcomeRef.current = null
+        return
+      }
+
+      try {
+        await outcomePromise
+      } catch (error) {
+        throw error instanceof Error
+          ? error
+          : new Error('collaboration-permission:denied-after-start')
+      }
+    },
+    [
+      checkCollaborationPermission,
+      currentDiagramInfo?.companyId,
+      currentDiagramMetadata?.company?.id,
+      selectedCompanyId,
+      startCollaboration,
+    ]
+  )
 
   useEffect(() => {
     let isMounted = true
@@ -642,7 +1012,14 @@ export default function DiagramEditor() {
     clearLocalDraft()
     setHasUnsavedChanges(false)
     setIsSceneEmpty(true)
-  }, [clearLocalDraft, closeMainMenu, companyFontFamily, defaultCanvasBackground])
+    broadcastCurrentScene()
+  }, [
+    broadcastCurrentScene,
+    clearLocalDraft,
+    closeMainMenu,
+    companyFontFamily,
+    defaultCanvasBackground,
+  ])
 
   const handleSceneChange = useCallback(
     (elements: readonly unknown[] = [], appState: any = {}, filesParam: any = undefined) => {
@@ -876,6 +1253,7 @@ export default function DiagramEditor() {
             diagramId: null,
             diagramName: baseName || 'Imported diagram',
           })
+          broadcastCurrentScene()
           enqueueSnackbar('Diagram imported. Remember to save it to persist in the database.', {
             variant: 'success',
           })
@@ -893,7 +1271,13 @@ export default function DiagramEditor() {
     }
 
     input.click()
-  }, [closeMainMenu, enqueueSnackbar, loadDiagramFromJson, persistLocalDraft])
+  }, [
+    broadcastCurrentScene,
+    closeMainMenu,
+    enqueueSnackbar,
+    loadDiagramFromJson,
+    persistLocalDraft,
+  ])
 
   const handleRequestDelete = useCallback(() => {
     if (!canDeleteDiagram) {
@@ -926,6 +1310,20 @@ export default function DiagramEditor() {
       }
 
       const diagramType = metadata.diagramType ?? 'ARCHITECTURE'
+      const metadataWithCompany: LocalStoredDiagramMetadata = {
+        ...metadata,
+        company: buildCompanyMetadata() ?? metadata.company,
+      }
+      const targetCompanyId =
+        metadataWithCompany.company?.id ??
+        currentDiagramInfo?.companyId ??
+        selectedCompanyId ??
+        null
+
+      const permission = checkCollaborationPermission(targetCompanyId)
+      if (!permission.allowed) {
+        return false
+      }
       const architectureConnect = {
         connect: [
           {
@@ -942,7 +1340,7 @@ export default function DiagramEditor() {
         if (currentDiagramId && !saveDialogForceSaveAs) {
           const updateInput: Record<string, unknown> = {
             title: { set: name },
-            description: { set: metadata.description ?? undefined },
+            description: { set: metadataWithCompany.description ?? undefined },
             diagramType: { set: diagramType },
             diagramJson: { set: serialized },
             architecture: {
@@ -980,7 +1378,7 @@ export default function DiagramEditor() {
         } else {
           const createInput: Record<string, unknown> = {
             title: name,
-            description: metadata.description ?? undefined,
+            description: metadataWithCompany.description ?? undefined,
             diagramType,
             diagramJson: serialized,
             architecture: architectureConnect,
@@ -1025,14 +1423,17 @@ export default function DiagramEditor() {
         }
 
         setCurrentDiagramName(name)
-        setCurrentDiagramMetadata(metadata)
-        setSaveDialogInitialMetadata(metadata)
+        setCurrentDiagramMetadata(metadataWithCompany)
+        setSaveDialogInitialMetadata(metadataWithCompany)
         setSaveDialogInitialName(name)
+        if (metadataWithCompany.company?.id) {
+          syncSelectedCompanyToDiagram(metadataWithCompany.company.id)
+        }
         setIsSaveDialogOpen(false)
         setSaveDialogForceSaveAs(false)
         setHasUnsavedChanges(false)
         persistLocalDraft(serialized, {
-          metadata,
+          metadata: metadataWithCompany,
           diagramId: resultingDiagramId,
           diagramName: name,
         })
@@ -1044,14 +1445,18 @@ export default function DiagramEditor() {
       }
     },
     [
+      buildCompanyMetadata,
+      checkCollaborationPermission,
       createDiagramMutation,
       currentDiagramId,
+      currentDiagramInfo?.companyId,
       currentPerson?.id,
       enqueueSnackbar,
       persistLocalDraft,
       saveDialogForceSaveAs,
       selectedCompanyId,
       serializeCurrentScene,
+      syncSelectedCompanyToDiagram,
       updateDiagramMutation,
     ]
   )
@@ -1079,6 +1484,15 @@ export default function DiagramEditor() {
       }
 
       const firstArchitecture = diagram.architecture?.[0]
+      const owningCompany = diagram.company?.[0]
+      const metadataCompany =
+        buildCompanyMetadata() ??
+        (owningCompany
+          ? {
+              id: owningCompany.id,
+              name: owningCompany.name ?? null,
+            }
+          : undefined)
       const metadata: LocalStoredDiagramMetadata = {
         description: diagram.description ?? undefined,
         diagramType: diagram.diagramType ?? 'ARCHITECTURE',
@@ -1091,6 +1505,7 @@ export default function DiagramEditor() {
             }
           : undefined,
         architectureName: firstArchitecture?.name,
+        company: metadataCompany,
       }
 
       setCurrentDiagramId(diagram.id)
@@ -1098,16 +1513,27 @@ export default function DiagramEditor() {
       setCurrentDiagramMetadata(metadata)
       setSaveDialogInitialMetadata(metadata)
       setSaveDialogInitialName(diagram.title)
+      if (metadata.company?.id) {
+        syncSelectedCompanyToDiagram(metadata.company.id)
+      }
       sceneInitializedRef.current = true
       persistLocalDraft(diagram.diagramJson, {
         metadata,
         diagramId: diagram.id,
         diagramName: diagram.title,
       })
+      broadcastCurrentScene()
       setIsOpenDialogOpen(false)
       return true
     },
-    [enqueueSnackbar, loadDiagramFromJson, persistLocalDraft]
+    [
+      broadcastCurrentScene,
+      buildCompanyMetadata,
+      enqueueSnackbar,
+      loadDiagramFromJson,
+      persistLocalDraft,
+      syncSelectedCompanyToDiagram,
+    ]
   )
 
   const handleToggleSidebar = useCallback(() => {
@@ -1168,7 +1594,23 @@ export default function DiagramEditor() {
               diagramJson: fetched.diagramJson,
               updatedAt: fetched.updatedAt,
               architecture: fetched.architecture,
+              company: fetched.company,
             }
+          }
+        }
+
+        if (diagramToOpen?.id && (!diagramToOpen.company || diagramToOpen.company.length === 0)) {
+          try {
+            const { data } = await fetchDiagramById({ variables: { id: diagramToOpen.id } })
+            const enrichedCompany = data?.diagrams?.[0]?.company
+            if (enrichedCompany?.length) {
+              diagramToOpen = { ...diagramToOpen, company: enrichedCompany }
+            }
+          } catch (companyFetchError) {
+            console.warn(
+              'DiagramEditor: Unable to enrich pending diagram with company info',
+              companyFetchError
+            )
           }
         }
 
@@ -1243,11 +1685,17 @@ export default function DiagramEditor() {
       return
     }
 
-    void startCollaboration(roomParam)
+    void guardedStartCollaboration(roomParam)
       .then(() => {
-        enqueueSnackbar(collaborationTranslations('startSuccess'), { variant: 'success' })
+        if (!authorizationFailureRef.current) {
+          enqueueSnackbar(collaborationTranslations('startSuccess'), { variant: 'success' })
+        }
       })
       .catch(error => {
+        if (error instanceof Error && error.message.startsWith('collaboration-permission')) {
+          console.warn('DiagramEditor: Collaboration auto-join blocked due to permissions', error)
+          return
+        }
         console.error('DiagramEditor: Unable to auto-join collaboration room', error)
         enqueueSnackbar(collaborationTranslations('errorStart'), { variant: 'error' })
       })
@@ -1256,7 +1704,7 @@ export default function DiagramEditor() {
     enqueueSnackbar,
     isCollaborating,
     isEditorReady,
-    startCollaboration,
+    guardedStartCollaboration,
   ])
 
   return (
@@ -1323,7 +1771,10 @@ export default function DiagramEditor() {
         roomId={roomId}
         collaborators={collaborators}
         onClose={handleCloseCollaborationDialog}
-        onStartCollaboration={startCollaboration}
+        onStartCollaboration={guardedStartCollaboration}
+        ref={instance => {
+          collaborationDialogRef.current = instance
+        }}
         onStopCollaboration={stopCollaboration}
       />
     </>

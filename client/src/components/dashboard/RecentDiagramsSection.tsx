@@ -174,6 +174,7 @@ const RecentDiagramsSection: React.FC = () => {
                     creator={diagram.creator}
                     architecture={diagram.architecture}
                     diagramJson={diagram.diagramJson}
+                    company={diagram.company}
                   />
                 </Grid>
               ))}
