@@ -17,7 +17,12 @@ import DiagramLibrarySidebar from './DiagramLibrarySidebar'
 import DeleteDiagramDialog from './dialogs/DeleteDiagramDialog'
 import LocalOpenDiagramDialog, { LocalOpenDialogDiagram } from './dialogs/LocalOpenDiagramDialog'
 import LocalSaveDiagramDialog from './dialogs/LocalSaveDiagramDialog'
+import CollaborationDialog from './dialogs/CollaborationDialog'
 import type { LocalStoredDiagramMetadata } from './dialogs/types'
+import {
+  type CurrentDiagramInfo,
+  useExcalidrawCollaboration,
+} from '@/components/diagrams/hooks/useExcalidrawCollaboration'
 
 const LOCAL_DRAFT_STORAGE_KEY = 'diagram-editor-local-draft'
 
@@ -42,6 +47,8 @@ interface MinimalExcalidrawProps {
   onExportJSON: () => void
   onExportDrawIO: () => void
   onExportPNG: () => void
+  onOpenCollaboration: () => void
+  isCollaborating: boolean
   onSceneChange: (elements: readonly any[], appState: any, files: any) => void
   onReady: (api: any) => void
 }
@@ -70,6 +77,8 @@ const ExcalidrawCanvas = dynamic<MinimalExcalidrawProps>(
       onExportJSON,
       onExportDrawIO,
       onExportPNG,
+      onOpenCollaboration,
+      isCollaborating,
       onSceneChange,
       onReady,
     }: MinimalExcalidrawProps) => {
@@ -174,13 +183,15 @@ const ExcalidrawCanvas = dynamic<MinimalExcalidrawProps>(
                 {t('actions.findOnCanvas')}
               </MainMenu.Item>
               <MainMenu.Item
-                onSelect={placeholder('liveCollaboration')}
+                onSelect={onOpenCollaboration}
                 icon={
                   <MenuIcon path="M16,4C18.21,4 20,5.79 20,8C20,10.21 18.21,12 16,12C13.79,12 12,10.21 12,8C12,5.79 13.79,4 16,4M16,14C18.67,14 24,15.33 24,18V20H8V18C8,15.33 13.33,14 16,14M8,12C10.21,12 12,10.21 12,8C12,5.79 10.21,4 8,4C5.79,4 4,5.79 4,8C4,10.21 5.79,12 8,12M8,14C5.33,14 0,15.33 0,18V20H8V18C8,16.9 8.63,15.72 9.69,14.81C9.08,14.61 8.42,14.5 8,14Z" />
                 }
                 shortcut="Ctrl+L"
               >
-                {t('actions.liveCollaboration') ?? 'Live Collaboration'}
+                {isCollaborating
+                  ? (t('collaborationDialog.activeMenuLabel') ?? t('actions.liveCollaboration'))
+                  : (t('actions.liveCollaboration') ?? 'Live Collaboration')}
               </MainMenu.Item>
               <MainMenu.Separator />
               <MainMenu.Item
@@ -257,6 +268,7 @@ export default function DiagramEditor() {
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false)
   const [isOpenDialogOpen, setIsOpenDialogOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [isCollaborationDialogOpen, setIsCollaborationDialogOpen] = useState(false)
   const [saveDialogInitialName, setSaveDialogInitialName] = useState<string | null>(null)
   const [saveDialogInitialMetadata, setSaveDialogInitialMetadata] = useState<
     LocalStoredDiagramMetadata | undefined
@@ -266,10 +278,12 @@ export default function DiagramEditor() {
   const [updateDiagramMutation] = useMutation(UPDATE_DIAGRAM)
   const [fetchDiagramById] = useLazyQuery(GET_DIAGRAM)
   const { enqueueSnackbar } = useSnackbar()
+  const collaborationTranslations = useTranslations('diagrams.collaborationDialog')
   const excalidrawAPIRef = useRef<any>(null)
   const sceneInitializedRef = useRef(false)
   const pendingDiagramProcessingRef = useRef(false)
   const suppressSceneChangeRef = useRef(false)
+  const autoJoinAttemptedRef = useRef(false)
   const [isEditorReady, setIsEditorReady] = useState(false)
   const [isSceneEmpty, setIsSceneEmpty] = useState(true)
 
@@ -307,6 +321,38 @@ export default function DiagramEditor() {
     }
     return FALLBACK_EXCALIDRAW_FONT
   }, [selectedCompany?.diagramFont])
+
+  const collaborationDisplayName = useMemo(() => {
+    const first = currentPerson?.firstName?.trim() ?? ''
+    const last = currentPerson?.lastName?.trim() ?? ''
+    const combined = `${first} ${last}`.trim()
+    return combined || currentPerson?.email || 'Anonymous User'
+  }, [currentPerson?.email, currentPerson?.firstName, currentPerson?.lastName])
+
+  const currentDiagramInfo = useMemo<CurrentDiagramInfo | null>(() => {
+    if (!currentDiagramId && !currentDiagramName) {
+      return null
+    }
+    return {
+      id: currentDiagramId ?? null,
+      title: currentDiagramName ?? undefined,
+      metadata: currentDiagramMetadata,
+    }
+  }, [currentDiagramId, currentDiagramMetadata, currentDiagramName])
+
+  const {
+    startCollaboration,
+    stopCollaboration,
+    isCollaborating,
+    collaborators,
+    roomId,
+    broadcastSceneUpdate,
+  } = useExcalidrawCollaboration({
+    excalidrawAPI: excalidrawAPIRef.current,
+    username: collaborationDisplayName,
+    userAvatarUrl: currentPerson?.avatarUrl ?? undefined,
+    currentDiagram: currentDiagramInfo,
+  })
 
   useEffect(() => {
     let isMounted = true
@@ -432,7 +478,6 @@ export default function DiagramEditor() {
     document.body.removeChild(link)
     URL.revokeObjectURL(url)
   }, [])
-
 
   const loadDiagramFromJson = useCallback(
     (diagramJson: string) => {
@@ -635,8 +680,9 @@ export default function DiagramEditor() {
       })
 
       persistLocalDraft(serialized)
+      broadcastSceneUpdate(elements as any[], appState)
     },
-    [persistLocalDraft]
+    [broadcastSceneUpdate, persistLocalDraft]
   )
 
   const handleSaveAsDiagram = useCallback(() => {
@@ -655,6 +701,15 @@ export default function DiagramEditor() {
     closeMainMenu()
     setIsOpenDialogOpen(true)
   }, [closeMainMenu])
+
+  const handleOpenCollaborationDialog = useCallback(() => {
+    closeMainMenu()
+    setIsCollaborationDialogOpen(true)
+  }, [closeMainMenu])
+
+  const handleCloseCollaborationDialog = useCallback(() => {
+    setIsCollaborationDialogOpen(false)
+  }, [])
 
   const handleExportJSON = useCallback(() => {
     closeMainMenu()
@@ -1171,6 +1226,39 @@ export default function DiagramEditor() {
     waitForCanvasHydration,
   ])
 
+  useEffect(() => {
+    if (!isEditorReady || autoJoinAttemptedRef.current) {
+      return
+    }
+
+    if (typeof window === 'undefined') {
+      return
+    }
+
+    const params = new URLSearchParams(window.location.search)
+    const roomParam = params.get('room')
+    autoJoinAttemptedRef.current = true
+
+    if (!roomParam || isCollaborating) {
+      return
+    }
+
+    void startCollaboration(roomParam)
+      .then(() => {
+        enqueueSnackbar(collaborationTranslations('startSuccess'), { variant: 'success' })
+      })
+      .catch(error => {
+        console.error('DiagramEditor: Unable to auto-join collaboration room', error)
+        enqueueSnackbar(collaborationTranslations('errorStart'), { variant: 'error' })
+      })
+  }, [
+    collaborationTranslations,
+    enqueueSnackbar,
+    isCollaborating,
+    isEditorReady,
+    startCollaboration,
+  ])
+
   return (
     <>
       <div
@@ -1196,6 +1284,8 @@ export default function DiagramEditor() {
             onExportJSON={handleExportJSON}
             onExportDrawIO={handleExportDrawIO}
             onExportPNG={handleExportPNG}
+            onOpenCollaboration={handleOpenCollaborationDialog}
+            isCollaborating={isCollaborating}
             onSceneChange={handleSceneChange}
             onReady={handleExcalidrawReady}
           />
@@ -1226,6 +1316,15 @@ export default function DiagramEditor() {
         onDeleted={handleDiagramDeleted}
         diagramId={currentDiagramId}
         diagramTitle={currentDiagramName}
+      />
+      <CollaborationDialog
+        open={isCollaborationDialogOpen}
+        isCollaborating={isCollaborating}
+        roomId={roomId}
+        collaborators={collaborators}
+        onClose={handleCloseCollaborationDialog}
+        onStartCollaboration={startCollaboration}
+        onStopCollaboration={stopCollaboration}
       />
     </>
   )
