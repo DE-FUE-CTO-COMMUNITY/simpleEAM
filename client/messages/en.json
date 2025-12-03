@@ -1957,14 +1957,25 @@
     "librarySidebar": {
       "title": "Diagram Library",
       "description": "Drag an entry into the canvas.",
+      "searchPlaceholder": "Search in library...",
       "newHeading": "New elements",
       "existingHeading": "Existing elements",
       "noTemplates": "Templates are not available yet.",
       "noRecords": "No {type} available yet.",
+      "noFilterResults": "No elements match the search.",
       "templateRequired": "Add a {type} template to unlock database elements.",
       "toggle": {
         "show": "Show library",
         "hide": "Hide library"
+      },
+      "search": {
+        "title": "Search",
+        "description": "Search on canvas",
+        "placeholder": "Search on canvas...",
+        "noResults": "No elements found",
+        "resultsCount": "{count} result(s) found",
+        "previousResult": "Previous result",
+        "nextResult": "Next result"
       }
     },
     "elementTypes": {

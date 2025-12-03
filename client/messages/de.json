@@ -1949,14 +1949,25 @@
     "librarySidebar": {
       "title": "Diagrammbibliothek",
       "description": "Ziehe einen Eintrag auf die Zeichenfläche.",
+      "searchPlaceholder": "In Bibliothek suchen...",
       "newHeading": "Neue Elemente",
       "existingHeading": "Bestehende Elemente",
       "noTemplates": "Vorlagen sind noch nicht verfügbar.",
       "noRecords": "Noch keine {type} vorhanden.",
+      "noFilterResults": "Keine Elemente entsprechen der Suche.",
       "templateRequired": "Füge eine {type}-Vorlage hinzu, um Datenbankelemente freizuschalten.",
       "toggle": {
         "show": "Bibliothek anzeigen",
         "hide": "Bibliothek ausblenden"
+      },
+      "search": {
+        "title": "Suche",
+        "description": "Auf Canvas suchen",
+        "placeholder": "Auf Canvas suchen...",
+        "noResults": "Keine Elemente gefunden",
+        "resultsCount": "{count} Ergebnis(se) gefunden",
+        "previousResult": "Vorheriges Ergebnis",
+        "nextResult": "Nächstes Ergebnis"
       }
     },
     "elementTypes": {

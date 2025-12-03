@@ -14,7 +14,7 @@ import { useAuth, isAdmin, isArchitect } from '@/lib/auth'
 import { useThemeConfig } from '@/lib/runtime-config'
 import { CREATE_DIAGRAM, GET_DIAGRAM, UPDATE_DIAGRAM } from '@/graphql/diagram'
 import { convertExcalidrawToDrawIO, downloadDrawIOFile } from '@/utils/drawioConverter'
-import DiagramLibrarySidebar from './DiagramLibrarySidebar'
+import DiagramLibrarySidebar, { type DiagramLibrarySidebarHandle } from './DiagramLibrarySidebar'
 import DeleteDiagramDialog from './dialogs/DeleteDiagramDialog'
 import LocalOpenDiagramDialog, { LocalOpenDialogDiagram } from './dialogs/LocalOpenDiagramDialog'
 import LocalSaveDiagramDialog from './dialogs/LocalSaveDiagramDialog'
@@ -52,6 +52,7 @@ interface MinimalExcalidrawProps {
   onExportDrawIO: () => void
   onExportPNG: () => void
   onOpenCollaboration: () => void
+  onFindOnCanvas: () => void
   isCollaborating: boolean
   onSceneChange: (elements: readonly any[], appState: any, files: any) => void
   onReady: (api: any) => void
@@ -82,6 +83,7 @@ const ExcalidrawCanvas = dynamic<MinimalExcalidrawProps>(
       onExportDrawIO,
       onExportPNG,
       onOpenCollaboration,
+      onFindOnCanvas,
       isCollaborating,
       onSceneChange,
       onReady,
@@ -178,7 +180,7 @@ const ExcalidrawCanvas = dynamic<MinimalExcalidrawProps>(
                 {t('actions.generateCapabilityMap')}
               </MainMenu.Item>
               <MainMenu.Item
-                onSelect={placeholder('findOnCanvas')}
+                onSelect={onFindOnCanvas}
                 icon={
                   <MenuIcon path="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z" />
                 }
@@ -295,6 +297,7 @@ export default function DiagramEditor() {
   const activeDiagramIdRef = useRef<string | null>(null)
   const collaborationTranslations = useTranslations('diagrams.collaborationDialog')
   const excalidrawAPIRef = useRef<any>(null)
+  const sidebarRef = useRef<DiagramLibrarySidebarHandle | null>(null)
   const sceneInitializedRef = useRef(false)
   const pendingDiagramProcessingRef = useRef(false)
   const suppressSceneChangeRef = useRef(false)
@@ -1593,6 +1596,31 @@ export default function DiagramEditor() {
     setIsSidebarOpen(prev => !prev)
   }, [])
 
+  const handleFindOnCanvas = useCallback(() => {
+    closeMainMenu()
+    // Small delay to ensure menu closes before opening sidebar
+    setTimeout(() => {
+      sidebarRef.current?.openSearchTab()
+    }, 50)
+  }, [closeMainMenu])
+
+  // Handle Ctrl+F keyboard shortcut
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Check for Ctrl+F (or Cmd+F on Mac)
+      if ((event.ctrlKey || event.metaKey) && event.key === 'f') {
+        event.preventDefault()
+        event.stopPropagation()
+        handleFindOnCanvas()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown, true) // Use capture phase
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown, true)
+    }
+  }, [handleFindOnCanvas])
+
   useEffect(() => {
     if (!isEditorReady || sceneInitializedRef.current) {
       return
@@ -1786,12 +1814,15 @@ export default function DiagramEditor() {
             onExportDrawIO={handleExportDrawIO}
             onExportPNG={handleExportPNG}
             onOpenCollaboration={handleOpenCollaborationDialog}
+            onFindOnCanvas={handleFindOnCanvas}
             isCollaborating={isCollaborating}
             onSceneChange={handleSceneChange}
             onReady={handleExcalidrawReady}
           />
         </div>
         <DiagramLibrarySidebar
+          ref={sidebarRef}
+          excalidrawAPI={excalidrawAPIRef.current}
           defaultFontFamily={companyFontFamily}
           isOpen={isSidebarOpen}
           onToggle={handleToggleSidebar}
