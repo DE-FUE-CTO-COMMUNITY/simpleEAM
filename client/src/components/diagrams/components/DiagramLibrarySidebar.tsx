@@ -50,11 +50,11 @@ import {
   TEMPLATE_NAME_BY_TYPE,
   EXCALIDRAW_LIBRARY_MIME,
   buildLibraryDropPayload,
-  createLibraryItemFromDatabaseElement,
   findArchimateTemplate,
   loadArchimateLibrary,
   normalizeTemplateFonts,
 } from '../utils/library'
+import { createLibraryItemFromDatabaseElement } from '../utils/architectureElements'
 
 const SIDEBAR_WIDTH = 340
 const HANDLE_WIDTH = 32
@@ -681,7 +681,7 @@ const DiagramLibrarySidebar = forwardRef<DiagramLibrarySidebarHandle, DiagramLib
     const existingSections: SidebarSection[] = useMemo(() => {
       const filterLower = libraryFilter.toLowerCase()
 
-      return SECTION_ORDER.map((type, _index) => {
+      return SECTION_ORDER.map(type => {
         const accessor = DATA_ACCESSORS[type]
         const template = templateLookup[type] ?? null
         const list = accessor && data ? accessor(data) : []
@@ -689,7 +689,6 @@ const DiagramLibrarySidebar = forwardRef<DiagramLibrarySidebarHandle, DiagramLib
           a.name.localeCompare(b.name, 'de', { sensitivity: 'base' })
         )
 
-        // Filter items based on library filter
         const filteredList = libraryFilter.trim()
           ? sorted.filter(record => record.name.toLowerCase().includes(filterLower))
           : sorted
@@ -705,7 +704,6 @@ const DiagramLibrarySidebar = forwardRef<DiagramLibrarySidebarHandle, DiagramLib
               if (!libraryItem) {
                 return acc
               }
-
               acc.push({
                 id: libraryItem.id,
                 title: record.name,
@@ -725,7 +723,7 @@ const DiagramLibrarySidebar = forwardRef<DiagramLibrarySidebarHandle, DiagramLib
             : tSidebar('templateRequired', { type: getTypeLabel(type, 'singular') }),
         }
       })
-    }, [data, defaultFontFamily, getTypeLabel, tSidebar, templateLookup, libraryFilter])
+    }, [data, defaultFontFamily, getTypeLabel, tSidebar, libraryFilter, templateLookup])
 
     // Auto-expand sections with results when filtering
     useEffect(() => {
