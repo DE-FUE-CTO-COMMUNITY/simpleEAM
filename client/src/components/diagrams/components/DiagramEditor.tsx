@@ -32,7 +32,7 @@ type CollaborationPermissionFailure = 'missing-edit' | 'missing-company' | 'forb
 
 interface LocalDiagramDraftPayload {
   diagramJson: string
-  metadata?: LocalStoredDiagramMetadata
+  metadata?: LocalStoredDiagramMetadata | null
   diagramId?: string | null
   diagramName?: string | null
   updatedAt: string
@@ -291,6 +291,8 @@ export default function DiagramEditor() {
   const { enqueueSnackbar } = useSnackbar()
   const collaborationDialogRef = useRef<CollaborationDialogHandle | null>(null)
   const isCollaborationHostRef = useRef(false)
+  const pendingCollaborationSyncRef = useRef(false)
+  const activeDiagramIdRef = useRef<string | null>(null)
   const collaborationTranslations = useTranslations('diagrams.collaborationDialog')
   const excalidrawAPIRef = useRef<any>(null)
   const sceneInitializedRef = useRef(false)
@@ -305,6 +307,15 @@ export default function DiagramEditor() {
   } | null>(null)
   const [isEditorReady, setIsEditorReady] = useState(false)
   const [isSceneEmpty, setIsSceneEmpty] = useState(true)
+
+  const updateCurrentDiagramId = useCallback((diagramId: string | null) => {
+    activeDiagramIdRef.current = diagramId
+    setCurrentDiagramId(diagramId)
+  }, [])
+
+  useEffect(() => {
+    activeDiagramIdRef.current = currentDiagramId ?? null
+  }, [currentDiagramId])
 
   const canDeleteDiagram = useMemo(
     () => Boolean(currentDiagramId && !isSceneEmpty),
@@ -468,8 +479,8 @@ export default function DiagramEditor() {
 
     return {
       id: currentDiagramId ?? null,
-      title: currentDiagramName ?? undefined,
-      metadata: currentDiagramMetadata,
+      title: currentDiagramName,
+      metadata: typeof currentDiagramMetadata === 'undefined' ? null : currentDiagramMetadata,
       companyId: fallbackCompanyId,
       companyName: fallbackCompanyName,
     }
@@ -493,7 +504,7 @@ export default function DiagramEditor() {
     return {
       id: null,
       title: undefined,
-      metadata: undefined,
+      metadata: null,
       companyId: selectedCompanyId ?? null,
       companyName: selectedCompany?.name ?? undefined,
     }
@@ -506,7 +517,7 @@ export default function DiagramEditor() {
       }
 
       if (typeof diagram.id !== 'undefined') {
-        setCurrentDiagramId(diagram.id)
+        updateCurrentDiagramId(diagram.id ?? null)
       }
 
       if (typeof diagram.title !== 'undefined') {
@@ -515,9 +526,10 @@ export default function DiagramEditor() {
         setSaveDialogInitialName(normalizedTitle)
       }
 
-      if (diagram.metadata) {
-        setCurrentDiagramMetadata(diagram.metadata)
-        setSaveDialogInitialMetadata(diagram.metadata)
+      if (typeof diagram.metadata !== 'undefined') {
+        const normalizedMetadata = diagram.metadata ?? undefined
+        setCurrentDiagramMetadata(normalizedMetadata)
+        setSaveDialogInitialMetadata(normalizedMetadata)
       }
 
       const diagramCompanyId = diagram.companyId ?? diagram.metadata?.company?.id ?? null
@@ -528,7 +540,7 @@ export default function DiagramEditor() {
         }
       }
     },
-    [syncSelectedCompanyToDiagram]
+    [syncSelectedCompanyToDiagram, updateCurrentDiagramId]
   )
 
   const checkCollaborationPermission = useCallback(
@@ -649,6 +661,18 @@ export default function DiagramEditor() {
   useEffect(() => {
     isCollaborationHostRef.current = Boolean(isFirstUser)
   }, [isFirstUser])
+
+  const scheduleCollaborationSync = useCallback(() => {
+    pendingCollaborationSyncRef.current = true
+  }, [])
+
+  useEffect(() => {
+    if (!isCollaborating || !pendingCollaborationSyncRef.current) {
+      return
+    }
+    pendingCollaborationSyncRef.current = false
+    broadcastCurrentScene()
+  }, [broadcastCurrentScene, collaborationDiagramInfo, isCollaborating])
 
   useEffect(() => {
     const lockId = 'diagram-editor-collaboration-lock'
@@ -895,25 +919,37 @@ export default function DiagramEditor() {
     [companyFontFamily, enqueueSnackbar, notifyEditorNotReady]
   )
 
+  type LocalDraftOverride = {
+    metadata?: LocalStoredDiagramMetadata | null
+    diagramId?: string | null
+    diagramName?: string | null
+  }
+
   const persistLocalDraft = useCallback(
-    (
-      diagramJson: string,
-      override?: {
-        metadata?: LocalStoredDiagramMetadata
-        diagramId?: string | null
-        diagramName?: string | null
-      }
-    ) => {
+    (diagramJson: string, override?: LocalDraftOverride) => {
       if (typeof window === 'undefined') {
         return
       }
 
       try {
+        const hasOverride = <K extends keyof LocalDraftOverride>(key: K) =>
+          Boolean(override && Object.prototype.hasOwnProperty.call(override, key))
+
+        const metadataValue = hasOverride('metadata')
+          ? (override?.metadata ?? undefined)
+          : currentDiagramMetadata
+        const diagramIdValue = hasOverride('diagramId')
+          ? (override?.diagramId ?? null)
+          : currentDiagramId
+        const diagramNameValue = hasOverride('diagramName')
+          ? (override?.diagramName ?? null)
+          : currentDiagramName
+
         const payload: LocalDiagramDraftPayload = {
           diagramJson,
-          metadata: override?.metadata ?? currentDiagramMetadata,
-          diagramId: override?.diagramId ?? currentDiagramId,
-          diagramName: override?.diagramName ?? currentDiagramName,
+          metadata: metadataValue ?? null,
+          diagramId: diagramIdValue ?? null,
+          diagramName: diagramNameValue ?? null,
           updatedAt: new Date().toISOString(),
         }
         window.localStorage.setItem(LOCAL_DRAFT_STORAGE_KEY, JSON.stringify(payload))
@@ -958,10 +994,11 @@ export default function DiagramEditor() {
         return false
       }
 
-      setCurrentDiagramId(parsed.diagramId ?? null)
+      const restoredMetadata = parsed.metadata ?? undefined
+      updateCurrentDiagramId(parsed.diagramId ?? null)
       setCurrentDiagramName(parsed.diagramName ?? null)
-      setCurrentDiagramMetadata(parsed.metadata)
-      setSaveDialogInitialMetadata(parsed.metadata)
+      setCurrentDiagramMetadata(restoredMetadata)
+      setSaveDialogInitialMetadata(restoredMetadata)
       setSaveDialogInitialName(parsed.diagramName ?? null)
       sceneInitializedRef.current = true
       return true
@@ -970,7 +1007,7 @@ export default function DiagramEditor() {
       window.localStorage.removeItem(LOCAL_DRAFT_STORAGE_KEY)
       return false
     }
-  }, [loadDiagramFromJson, waitForCanvasHydration])
+  }, [loadDiagramFromJson, updateCurrentDiagramId, waitForCanvasHydration])
 
   const openSaveDialog = useCallback(
     (proposedName?: string | null, metadata?: LocalStoredDiagramMetadata, forceSaveAs = false) => {
@@ -1006,19 +1043,22 @@ export default function DiagramEditor() {
       },
     })
     setCurrentDiagramName(null)
-    setCurrentDiagramId(null)
+    updateCurrentDiagramId(null)
     setCurrentDiagramMetadata(undefined)
+    setSaveDialogInitialMetadata(undefined)
+    setSaveDialogInitialName(null)
     sceneInitializedRef.current = true
     clearLocalDraft()
     setHasUnsavedChanges(false)
     setIsSceneEmpty(true)
-    broadcastCurrentScene()
+    scheduleCollaborationSync()
   }, [
-    broadcastCurrentScene,
+    scheduleCollaborationSync,
     clearLocalDraft,
     closeMainMenu,
     companyFontFamily,
     defaultCanvasBackground,
+    updateCurrentDiagramId,
   ])
 
   const handleSceneChange = useCallback(
@@ -1243,17 +1283,17 @@ export default function DiagramEditor() {
           }
 
           const baseName = file.name.replace(/\.[^.]+$/, '')
-          setCurrentDiagramId(null)
+          updateCurrentDiagramId(null)
           setCurrentDiagramName(baseName || 'Imported diagram')
           setCurrentDiagramMetadata(undefined)
           setSaveDialogInitialMetadata(undefined)
           setSaveDialogInitialName(baseName || 'Imported diagram')
           persistLocalDraft(serialized, {
-            metadata: undefined,
+            metadata: null,
             diagramId: null,
             diagramName: baseName || 'Imported diagram',
           })
-          broadcastCurrentScene()
+          scheduleCollaborationSync()
           enqueueSnackbar('Diagram imported. Remember to save it to persist in the database.', {
             variant: 'success',
           })
@@ -1272,11 +1312,12 @@ export default function DiagramEditor() {
 
     input.click()
   }, [
-    broadcastCurrentScene,
     closeMainMenu,
     enqueueSnackbar,
     loadDiagramFromJson,
     persistLocalDraft,
+    scheduleCollaborationSync,
+    updateCurrentDiagramId,
   ])
 
   const handleRequestDelete = useCallback(() => {
@@ -1335,9 +1376,17 @@ export default function DiagramEditor() {
       }
 
       try {
-        let resultingDiagramId = currentDiagramId
+        const existingDiagramId = activeDiagramIdRef.current
+        const shouldUpdateCompanyRelation = Boolean(
+          targetCompanyId && targetCompanyId !== (currentDiagramInfo?.companyId ?? null)
+        )
+        const canUpdateCompanyRelation =
+          shouldUpdateCompanyRelation &&
+          targetCompanyId &&
+          (!isCollaborating || isCollaborationHostRef.current || isAdmin())
+        let resultingDiagramId = existingDiagramId
 
-        if (currentDiagramId && !saveDialogForceSaveAs) {
+        if (existingDiagramId && !saveDialogForceSaveAs) {
           const updateInput: Record<string, unknown> = {
             title: { set: name },
             description: { set: metadataWithCompany.description ?? undefined },
@@ -1349,13 +1398,13 @@ export default function DiagramEditor() {
             },
           }
 
-          if (selectedCompanyId) {
+          if (canUpdateCompanyRelation) {
             updateInput.company = {
               disconnect: [{ where: {} }],
               connect: [
                 {
                   where: {
-                    node: { id: { eq: selectedCompanyId } },
+                    node: { id: { eq: targetCompanyId } },
                   },
                 },
               ],
@@ -1364,7 +1413,7 @@ export default function DiagramEditor() {
 
           const { data } = await updateDiagramMutation({
             variables: {
-              id: currentDiagramId,
+              id: existingDiagramId,
               input: updateInput,
             },
           })
@@ -1373,7 +1422,7 @@ export default function DiagramEditor() {
           if (!updated) {
             throw new Error('No diagram returned from update mutation')
           }
-          setCurrentDiagramId(updated.id)
+          updateCurrentDiagramId(updated.id ?? null)
           resultingDiagramId = updated.id
         } else {
           const createInput: Record<string, unknown> = {
@@ -1384,12 +1433,12 @@ export default function DiagramEditor() {
             architecture: architectureConnect,
           }
 
-          if (selectedCompanyId) {
+          if (targetCompanyId) {
             createInput.company = {
               connect: [
                 {
                   where: {
-                    node: { id: { eq: selectedCompanyId } },
+                    node: { id: { eq: targetCompanyId } },
                   },
                 },
               ],
@@ -1418,7 +1467,7 @@ export default function DiagramEditor() {
           if (!created) {
             throw new Error('No diagram returned from create mutation')
           }
-          setCurrentDiagramId(created.id)
+          updateCurrentDiagramId(created.id ?? null)
           resultingDiagramId = created.id
         }
 
@@ -1437,6 +1486,7 @@ export default function DiagramEditor() {
           diagramId: resultingDiagramId,
           diagramName: name,
         })
+        scheduleCollaborationSync()
         return true
       } catch (error) {
         console.error('DiagramEditor: Failed to save diagram', error)
@@ -1448,16 +1498,18 @@ export default function DiagramEditor() {
       buildCompanyMetadata,
       checkCollaborationPermission,
       createDiagramMutation,
-      currentDiagramId,
       currentDiagramInfo?.companyId,
       currentPerson?.id,
       enqueueSnackbar,
+      isCollaborating,
       persistLocalDraft,
       saveDialogForceSaveAs,
-      selectedCompanyId,
       serializeCurrentScene,
       syncSelectedCompanyToDiagram,
+      updateCurrentDiagramId,
       updateDiagramMutation,
+      scheduleCollaborationSync,
+      selectedCompanyId,
     ]
   )
 
@@ -1508,7 +1560,7 @@ export default function DiagramEditor() {
         company: metadataCompany,
       }
 
-      setCurrentDiagramId(diagram.id)
+      updateCurrentDiagramId(diagram.id ?? null)
       setCurrentDiagramName(diagram.title)
       setCurrentDiagramMetadata(metadata)
       setSaveDialogInitialMetadata(metadata)
@@ -1522,17 +1574,18 @@ export default function DiagramEditor() {
         diagramId: diagram.id,
         diagramName: diagram.title,
       })
-      broadcastCurrentScene()
+      scheduleCollaborationSync()
       setIsOpenDialogOpen(false)
       return true
     },
     [
-      broadcastCurrentScene,
+      scheduleCollaborationSync,
       buildCompanyMetadata,
       enqueueSnackbar,
       loadDiagramFromJson,
       persistLocalDraft,
       syncSelectedCompanyToDiagram,
+      updateCurrentDiagramId,
     ]
   )
 

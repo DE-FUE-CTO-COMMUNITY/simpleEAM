@@ -59,7 +59,7 @@ type ExcalidrawImperativeAPIWithBroadcast = ExcalidrawImperativeAPI & {
 export interface CurrentDiagramInfo {
   id: string | null
   title?: string | null
-  metadata?: LocalStoredDiagramMetadata
+  metadata?: LocalStoredDiagramMetadata | null
   companyId?: string | null
   companyName?: string | null
 }
@@ -104,6 +104,11 @@ export function useExcalidrawCollaboration({
   const isFirstUserRef = useRef(false)
   const [isFirstUser, setIsFirstUser] = useState(false)
   const hasConfirmedAccessRef = useRef(false)
+  const currentDiagramRef = useRef<CurrentDiagramInfo | null>(currentDiagram ?? null)
+
+  useEffect(() => {
+    currentDiagramRef.current = currentDiagram ?? null
+  }, [currentDiagram])
 
   const excalidrawConfig = useExcalidrawConfig()
   const socketServerUrl = excalidrawConfig.wsServerUrl || 'http://localhost:8890'
@@ -160,13 +165,20 @@ export function useExcalidrawCollaboration({
         autoConnect: true,
       })
 
+      const getCurrentDiagramSnapshot = () => {
+        if (!isFirstUserRef.current && !hasReceivedInitialSceneRef.current) {
+          return null
+        }
+        return currentDiagramRef.current ? { ...currentDiagramRef.current } : null
+      }
+
       const emitCollaboratorPresence = () => {
         if (!socket.id) {
           return
         }
         try {
           const payload: SceneBroadcastPayload = {
-            diagram: currentDiagram ? { ...currentDiagram } : null,
+            diagram: getCurrentDiagramSnapshot(),
             collaborator: {
               id: socket.id,
               name: providedUsername,
@@ -226,7 +238,7 @@ export function useExcalidrawCollaboration({
                   scrollY: currentAppState.scrollY,
                   zoom: currentAppState.zoom,
                 },
-                diagram: currentDiagram ? { ...currentDiagram } : null,
+                diagram: getCurrentDiagramSnapshot(),
                 collaborator: socket.id
                   ? {
                       id: socket.id,
@@ -358,7 +370,6 @@ export function useExcalidrawCollaboration({
     [
       authorizeAccess,
       cleanupSocket,
-      currentDiagram,
       excalidrawAPI,
       onDiagramUpdate,
       onAuthorizationDenied,
@@ -391,7 +402,7 @@ export function useExcalidrawCollaboration({
             scrollY: appState.scrollY,
             zoom: appState.zoom,
           },
-          diagram: currentDiagram ? { ...currentDiagram } : null,
+          diagram: currentDiagramRef.current ? { ...currentDiagramRef.current } : null,
           collaborator: state.socket?.id
             ? {
                 id: state.socket.id,
@@ -409,14 +420,7 @@ export function useExcalidrawCollaboration({
         console.error('Failed to broadcast scene update:', error)
       }
     },
-    [
-      currentDiagram,
-      providedUsername,
-      state.isCollaborating,
-      state.roomId,
-      state.socket,
-      userAvatarUrl,
-    ]
+    [providedUsername, state.isCollaborating, state.roomId, state.socket, userAvatarUrl]
   )
 
   useEffect(() => {
