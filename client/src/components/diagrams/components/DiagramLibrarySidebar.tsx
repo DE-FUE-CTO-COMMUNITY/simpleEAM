@@ -151,12 +151,121 @@ const DiagramLibrarySidebar = forwardRef<DiagramLibrarySidebarHandle, DiagramLib
     const HIGHLIGHT_COLOR = '#ff4444' // Red for all matches
     const ACTIVE_HIGHLIGHT_COLOR = '#ff8800' // Orange for currently focused element
 
+    // Helper function to get actual canvas dimensions
+    const getCanvasDimensions = useCallback(() => {
+      // Always try to get the actual Excalidraw canvas element - it's the most reliable
+      const canvasElement = document.querySelector('.excalidraw__canvas')
+      if (canvasElement) {
+        const rect = canvasElement.getBoundingClientRect()
+        console.log('[DiagramLibrarySidebar] Canvas dimensions from .excalidraw__canvas:', {
+          width: rect.width,
+          height: rect.height,
+          isOpen,
+        })
+        return {
+          width: rect.width,
+          height: rect.height,
+        }
+      }
+
+      // Fallback: Try to get the canvas container
+      const canvasContainer = document.querySelector('.excalidraw-wrapper')
+      if (canvasContainer) {
+        const rect = canvasContainer.getBoundingClientRect()
+        console.log('[DiagramLibrarySidebar] Canvas dimensions from .excalidraw-wrapper:', {
+          width: rect.width,
+          height: rect.height,
+          isOpen,
+        })
+        return {
+          width: rect.width,
+          height: rect.height,
+        }
+      }
+
+      // Last resort: calculate based on window size and visible sidebar
+      // Query actual sidebar element to determine width
+      const sidebarElement = document.querySelector('[data-testid="library-sidebar"]')
+      const actualSidebarWidth = sidebarElement
+        ? sidebarElement.getBoundingClientRect().width
+        : isOpen
+          ? SIDEBAR_WIDTH + HANDLE_WIDTH
+          : HANDLE_WIDTH
+
+      console.log('[DiagramLibrarySidebar] Canvas dimensions calculated (fallback):', {
+        width: window.innerWidth - actualSidebarWidth,
+        height: window.innerHeight - 60,
+        windowWidth: window.innerWidth,
+        actualSidebarWidth,
+        isOpen,
+      })
+
+      return {
+        width: window.innerWidth - actualSidebarWidth,
+        height: window.innerHeight - 60, // Approximate header height
+      }
+    }, [isOpen])
+
     // Keep ref in sync with state
     useEffect(() => {
       originalColorsRef.current = originalColors
     }, [originalColors])
 
-    // Search functionality using Excalidraw API
+    // Helper to scroll to element only if not visible
+    const scrollToElementIfNeeded = useCallback(
+      (element: any, updatedElements: any[]) => {
+        if (!excalidrawAPI?.updateScene || !element) return
+
+        const appState = excalidrawAPI.getAppState()
+        const currentZoom = appState?.zoom?.value || 1
+        const currentScrollX = appState?.scrollX || 0
+        const currentScrollY = appState?.scrollY || 0
+
+        const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions()
+
+        // Calculate element bounds in viewport coordinates
+        const elementLeft = element.x * currentZoom + currentScrollX
+        const elementTop = element.y * currentZoom + currentScrollY
+        const elementRight = (element.x + (element.width || 0)) * currentZoom + currentScrollX
+        const elementBottom = (element.y + (element.height || 0)) * currentZoom + currentScrollY
+
+        // Add padding for better visibility (10% of canvas size)
+        const paddingX = canvasWidth * 0.1
+        const paddingY = canvasHeight * 0.1
+
+        // Check if element is fully visible with padding
+        const isVisible =
+          elementLeft >= paddingX &&
+          elementRight <= canvasWidth - paddingX &&
+          elementTop >= paddingY &&
+          elementBottom <= canvasHeight - paddingY
+
+        // Only scroll if element is not fully visible
+        if (!isVisible) {
+          const elementCenterX = element.x + (element.width || 0) / 2
+          const elementCenterY = element.y + (element.height || 0) / 2
+
+          const scrollX = canvasWidth / 2 - elementCenterX * currentZoom
+          const scrollY = canvasHeight / 2 - elementCenterY * currentZoom
+
+          excalidrawAPI.updateScene({
+            elements: updatedElements,
+            appState: {
+              scrollX,
+              scrollY,
+            },
+          }, false)
+        } else {
+          // Element is already visible, just update highlighting
+          excalidrawAPI.updateScene({
+            elements: updatedElements,
+          }, false)
+        }
+      },
+      [excalidrawAPI, getCanvasDimensions]
+    )
+    
+  // Search functionality using Excalidraw API
     const handleSearch = useCallback(
       (query: string) => {
         setSearchQuery(query)
@@ -264,25 +373,71 @@ const DiagramLibrarySidebar = forwardRef<DiagramLibrarySidebarHandle, DiagramLib
           if (targetElement) {
             const appState = excalidrawAPI.getAppState()
             const currentZoom = appState?.zoom?.value || 1
+            const currentScrollX = appState?.scrollX || 0
+            const currentScrollY = appState?.scrollY || 0
 
-            const elementCenterX = targetElement.x + (targetElement.width || 0) / 2
-            const elementCenterY = targetElement.y + (targetElement.height || 0) / 2
+            const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions()
 
-            const canvasWidth = window.innerWidth - 400
-            const canvasHeight = window.innerHeight - 100
+            // Calculate element bounds in viewport coordinates
+            const elementLeft = targetElement.x * currentZoom + currentScrollX
+            const elementTop = targetElement.y * currentZoom + currentScrollY
+            const elementRight = (targetElement.x + (targetElement.width || 0)) * currentZoom + currentScrollX
+            const elementBottom = (targetElement.y + (targetElement.height || 0)) * currentZoom + currentScrollY
 
-            const scrollX = canvasWidth / 2 - elementCenterX * currentZoom
-            const scrollY = canvasHeight / 2 - elementCenterY * currentZoom
+            // Add padding for better visibility (10% of canvas size)
+            const paddingX = canvasWidth * 0.1
+            const paddingY = canvasHeight * 0.1
 
-            // Use storeAction: "capture" to force re-render
-            excalidrawAPI.updateScene({
-              elements: updatedElements,
-              appState: {
+            // Check if element is fully visible with padding
+            const isVisible =
+              elementLeft >= paddingX &&
+              elementRight <= canvasWidth - paddingX &&
+              elementTop >= paddingY &&
+              elementBottom <= canvasHeight - paddingY
+
+            console.log('[DiagramLibrarySidebar] handleSearch visibility check:', {
+              isVisible,
+              elementBounds: { left: elementLeft, top: elementTop, right: elementRight, bottom: elementBottom },
+              canvasBounds: { width: canvasWidth, height: canvasHeight },
+              padding: { x: paddingX, y: paddingY },
+              currentScroll: { x: currentScrollX, y: currentScrollY },
+            })
+
+            // Only scroll if element is not fully visible
+            if (!isVisible) {
+              const elementCenterX = targetElement.x + (targetElement.width || 0) / 2
+              const elementCenterY = targetElement.y + (targetElement.height || 0) / 2
+
+              const scrollX = canvasWidth / 2 - elementCenterX * currentZoom
+              const scrollY = canvasHeight / 2 - elementCenterY * currentZoom
+
+              console.log('[DiagramLibrarySidebar] handleSearch scroll calculation:', {
+                elementCenterX,
+                elementCenterY,
+                canvasWidth,
+                canvasHeight,
+                currentZoom,
                 scrollX,
                 scrollY,
-              },
-              storeAction: 'capture',
-            })
+                targetElement: { x: targetElement.x, y: targetElement.y, width: targetElement.width, height: targetElement.height },
+              })
+
+              // Use storeAction: "capture" to force re-render
+              excalidrawAPI.updateScene({
+                elements: updatedElements,
+                appState: {
+                  scrollX,
+                  scrollY,
+                },
+                storeAction: 'capture',
+              })
+            } else {
+              // Element is already visible, just update highlighting
+              excalidrawAPI.updateScene({
+                elements: updatedElements,
+                storeAction: 'capture',
+              })
+            }
           } else {
             // No scroll needed, just update elements
             excalidrawAPI.updateScene({
@@ -298,7 +453,7 @@ const DiagramLibrarySidebar = forwardRef<DiagramLibrarySidebarHandle, DiagramLib
           })
         }
       },
-      [excalidrawAPI, HIGHLIGHT_COLOR, ACTIVE_HIGHLIGHT_COLOR]
+      [excalidrawAPI, HIGHLIGHT_COLOR, ACTIVE_HIGHLIGHT_COLOR, getCanvasDimensions]
     )
 
     const handleNextResult = useCallback(() => {
@@ -325,35 +480,19 @@ const DiagramLibrarySidebar = forwardRef<DiagramLibrarySidebarHandle, DiagramLib
 
           return el
         })
-        excalidrawAPI.updateScene({ elements: updatedElements }, false)
 
-        // Scroll to element
+        // Scroll to element if needed
         const targetElement = elements.find((el: any) => el.id === searchResults[nextIndex].id)
-        if (targetElement) {
-          const appState = excalidrawAPI.getAppState()
-          const currentZoom = appState?.zoom?.value || 1
-
-          const elementCenterX = targetElement.x + (targetElement.width || 0) / 2
-          const elementCenterY = targetElement.y + (targetElement.height || 0) / 2
-
-          const canvasWidth = window.innerWidth - 400
-          const canvasHeight = window.innerHeight - 100
-
-          const scrollX = canvasWidth / 2 - elementCenterX * currentZoom
-          const scrollY = canvasHeight / 2 - elementCenterY * currentZoom
-
-          excalidrawAPI.updateScene(
-            {
-              appState: {
-                scrollX,
-                scrollY,
-              },
-            },
-            false
-          )
-        }
+        scrollToElementIfNeeded(targetElement, updatedElements)
       }
-    }, [searchResults, selectedResultIndex, excalidrawAPI, HIGHLIGHT_COLOR, ACTIVE_HIGHLIGHT_COLOR])
+    }, [
+      searchResults,
+      selectedResultIndex,
+      excalidrawAPI,
+      HIGHLIGHT_COLOR,
+      ACTIVE_HIGHLIGHT_COLOR,
+      scrollToElementIfNeeded,
+    ])
 
     const handlePreviousResult = useCallback(() => {
       if (searchResults.length === 0) return
@@ -382,35 +521,19 @@ const DiagramLibrarySidebar = forwardRef<DiagramLibrarySidebarHandle, DiagramLib
 
           return el
         })
-        excalidrawAPI.updateScene({ elements: updatedElements }, false)
 
-        // Scroll to element
+        // Scroll to element if needed
         const targetElement = elements.find((el: any) => el.id === searchResults[prevIndex].id)
-        if (targetElement) {
-          const appState = excalidrawAPI.getAppState()
-          const currentZoom = appState?.zoom?.value || 1
-
-          const elementCenterX = targetElement.x + (targetElement.width || 0) / 2
-          const elementCenterY = targetElement.y + (targetElement.height || 0) / 2
-
-          const canvasWidth = window.innerWidth - 400
-          const canvasHeight = window.innerHeight - 100
-
-          const scrollX = canvasWidth / 2 - elementCenterX * currentZoom
-          const scrollY = canvasHeight / 2 - elementCenterY * currentZoom
-
-          excalidrawAPI.updateScene(
-            {
-              appState: {
-                scrollX,
-                scrollY,
-              },
-            },
-            false
-          )
-        }
+        scrollToElementIfNeeded(targetElement, updatedElements)
       }
-    }, [searchResults, selectedResultIndex, excalidrawAPI, HIGHLIGHT_COLOR, ACTIVE_HIGHLIGHT_COLOR])
+    }, [
+      searchResults,
+      selectedResultIndex,
+      excalidrawAPI,
+      HIGHLIGHT_COLOR,
+      ACTIVE_HIGHLIGHT_COLOR,
+      scrollToElementIfNeeded,
+    ])
 
     const handleResultClick = useCallback(
       (index: number) => {
@@ -437,39 +560,15 @@ const DiagramLibrarySidebar = forwardRef<DiagramLibrarySidebarHandle, DiagramLib
             return el
           })
 
-          excalidrawAPI.updateScene({ elements: updatedElements }, false)
-
-          // Scroll to element
+          // Scroll to element if needed
           const targetElement = elements.find((el: any) => el.id === searchResults[index].id)
-          if (targetElement) {
-            const appState = excalidrawAPI.getAppState()
-            const currentZoom = appState?.zoom?.value || 1
-
-            const elementCenterX = targetElement.x + (targetElement.width || 0) / 2
-            const elementCenterY = targetElement.y + (targetElement.height || 0) / 2
-
-            const canvasWidth = window.innerWidth - 400
-            const canvasHeight = window.innerHeight - 100
-
-            const scrollX = canvasWidth / 2 - elementCenterX * currentZoom
-            const scrollY = canvasHeight / 2 - elementCenterY * currentZoom
-
-            excalidrawAPI.updateScene(
-              {
-                appState: {
-                  scrollX,
-                  scrollY,
-                },
-              },
-              false
-            )
-          }
+          scrollToElementIfNeeded(targetElement, updatedElements)
         }
       },
-      [searchResults, excalidrawAPI, HIGHLIGHT_COLOR, ACTIVE_HIGHLIGHT_COLOR]
+      [searchResults, excalidrawAPI, HIGHLIGHT_COLOR, ACTIVE_HIGHLIGHT_COLOR, scrollToElementIfNeeded]
     )
 
-    useEffect(() => {
+  useEffect(() => {
       let cancelled = false
       setTemplatesLoading(true)
 

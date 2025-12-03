@@ -905,16 +905,36 @@ export default function DiagramEditor() {
           )
         : false
 
+      console.log('[DiagramEditor] Loading diagram with appState:', {
+        scrollX: (parsed.appState as any)?.scrollX,
+        scrollY: (parsed.appState as any)?.scrollY,
+        zoom: (parsed.appState as any)?.zoom,
+        width: (parsed.appState as any)?.width,
+        height: (parsed.appState as any)?.height,
+        offsetLeft: (parsed.appState as any)?.offsetLeft,
+        offsetTop: (parsed.appState as any)?.offsetTop,
+        allKeys: Object.keys(parsed.appState ?? {}),
+        canvasElement: document.querySelector('.excalidraw__canvas')?.getBoundingClientRect(),
+        windowSize: { width: window.innerWidth, height: window.innerHeight },
+      })
+
+      // Remove viewport-specific properties that should not be restored
+      // These are runtime values calculated by Excalidraw based on actual DOM layout
+      const { width, height, offsetLeft, offsetTop, ...restAppState } = (parsed.appState ?? {}) as Record<string, unknown>
+
       suppressSceneChangeRef.current = true
       api.updateScene({
         elements: parsed.elements ?? [],
         appState: {
-          ...(parsed.appState ?? {}),
+          ...restAppState,
           collaborators: new Map(),
           currentItemFontFamily: companyFontFamily,
+          // Let Excalidraw calculate these based on actual container size:
+          // width, height, offsetLeft, offsetTop
         },
         files: parsed.files ?? {},
       })
+
       setHasUnsavedChanges(false)
       setIsSceneEmpty(!hasRenderableElements)
       return true
