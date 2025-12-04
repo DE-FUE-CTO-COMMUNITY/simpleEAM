@@ -1,5 +1,5 @@
 """
-JWT-Typ für die Authentifizierung mit Keycloak
+JWT type for Keycloak-based authentication
 """
 type JWT @jwt {
   sub: String!
@@ -12,7 +12,7 @@ type JWT @jwt {
 extend schema @authentication
 
 """
-Business Capability - repräsentiert eine Geschäftsfähigkeit im Enterprise Architecture Management
+Business Capability – represents a business capability within Enterprise Architecture Management
 """
 type BusinessCapability
   @node
@@ -67,7 +67,7 @@ type BusinessCapability
 }
 
 """
-Person - repräsentiert eine Person im Unternehmen
+Person – represents an individual within the organization
 """
 type Person
   @node
@@ -120,7 +120,7 @@ type Person
 }
 
 """
-Application - repräsentiert eine Business-Applikation im Enterprise Architecture Management
+Application – represents a business application within Enterprise Architecture Management
 """
 type Application
   @node
@@ -190,7 +190,7 @@ type Application
 }
 
 """
-ApplicationInterface - repräsentiert eine Schnittstelle zwischen Applikationen
+ApplicationInterface – represents an interface between applications
 """
 type ApplicationInterface
   @node
@@ -246,7 +246,7 @@ type ApplicationInterface
 }
 
 """
-DataObject - repräsentiert ein Business-Datenobjekt im Enterprise Architecture Management
+DataObject – represents a business data object within Enterprise Architecture Management
 """
 type DataObject
   @node
@@ -299,7 +299,7 @@ type DataObject
 }
 
 """
-Infrastructure - repräsentiert eine Infrastruktur-Komponente im Enterprise Architecture Management
+Infrastructure – represents an infrastructure component within Enterprise Architecture Management
 """
 type Infrastructure
   @node
@@ -362,7 +362,7 @@ type Infrastructure
 }
 
 """
-AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management
+AIComponent – represents an AI component within Enterprise Architecture Management
 """
 type AIComponent
   @node
@@ -421,7 +421,7 @@ type AIComponent
 }
 
 """
-Company - repräsentiert ein Unternehmen im Enterprise Architecture Management
+Company – represents an organization within Enterprise Architecture Management
 """
 type Company
   @node
@@ -476,7 +476,7 @@ type Company
 }
 
 """
-Organisation - repräsentiert eine organisatorische Einheit im Unternehmen
+Organisation – represents an organizational unit within the company
 """
 type Organisation
   @node
@@ -525,7 +525,7 @@ type Organisation
 }
 
 """
-Mögliche Status-Werte für eine Business Capability
+Possible status values for a business capability
 """
 enum CapabilityStatus {
   ACTIVE
@@ -534,7 +534,7 @@ enum CapabilityStatus {
 }
 
 """
-Typen für Business Capabilities
+Types of business capabilities
 """
 enum CapabilityType {
   STRATEGIC
@@ -543,7 +543,7 @@ enum CapabilityType {
 }
 
 """
-Mögliche Status-Werte für eine Applikation
+Possible status values for an application
 """
 enum ApplicationStatus {
   ACTIVE
@@ -552,7 +552,7 @@ enum ApplicationStatus {
 }
 
 """
-Kritikalitätsstufen für Applikationen
+Criticality levels for applications
 """
 enum CriticalityLevel {
   LOW
@@ -562,7 +562,7 @@ enum CriticalityLevel {
 }
 
 """
-TIME-Kategorien für Applikationen zur strategischen Klassifizierung
+TIME categories for strategic application classification
 """
 enum TimeCategory {
   TOLERATE
@@ -572,7 +572,7 @@ enum TimeCategory {
 }
 
 """
-7R-Strategien für Cloud-Migration und Applikationsportfolio-Management
+7R strategies for cloud migration and application portfolio management
 """
 enum SevenRStrategy {
   RETIRE
@@ -585,7 +585,7 @@ enum SevenRStrategy {
 }
 
 """
-Datenklassifikation für Business-Datenobjekte
+Data classification for business data objects
 """
 enum DataClassification {
   PUBLIC
@@ -595,7 +595,7 @@ enum DataClassification {
 }
 
 """
-Schnittstellentypen für Applikationsschnittstellen
+Interface types for application integrations
 """
 enum InterfaceType {
   API
@@ -606,7 +606,7 @@ enum InterfaceType {
 }
 
 """
-Protokolle für Applikationsschnittstellen
+Protocols used by application interfaces
 """
 enum InterfaceProtocol {
   REST
@@ -628,7 +628,7 @@ enum InterfaceProtocol {
 }
 
 """
-Status für Applikationsschnittstellen
+Status values for application interfaces
 """
 enum InterfaceStatus {
   ACTIVE
@@ -639,7 +639,7 @@ enum InterfaceStatus {
 }
 
 """
-Architecture - repräsentiert eine Architektur im Enterprise Architecture Management
+Architecture – represents an architecture within Enterprise Architecture Management
 """
 type Architecture
   @node
@@ -684,7 +684,7 @@ type Architecture
 }
 
 """
-Diagram - repräsentiert ein Excalidraw-Diagramm
+Diagram – represents an Excalidraw diagram
 """
 type Diagram
   @node
@@ -708,8 +708,9 @@ type Diagram
   title: String!
   description: String
   diagramType: DiagramType
-  diagramJson: String! # Enthält den JSON-String des Excalidraw-Diagramms
-  diagramPng: String # Enthält das PNG-Bild des Diagramms als base64-codierter String
+  diagramJson: String! # Contains the Excalidraw diagram as a JSON string
+  diagramPng: String # Contains the diagram PNG image encoded as base64
+  diagramPngDark: String # Contains the dark-mode diagram PNG image encoded as base64
   createdAt: DateTime! @timestamp(operations: [CREATE])
   updatedAt: DateTime @timestamp(operations: [UPDATE])
   company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
@@ -724,7 +725,7 @@ type Diagram
 }
 
 """
-ArchitecturePrinciple - repräsentiert ein Architektur-Prinzip im Enterprise Architecture Management
+ArchitecturePrinciple – represents an architecture principle within Enterprise Architecture Management
 """
 type ArchitecturePrinciple
   @node
@@ -765,7 +766,7 @@ type ArchitecturePrinciple
 }
 
 """
-Architektur-Domänen
+Architecture domains
 """
 enum ArchitectureDomain {
   BUSINESS
@@ -778,7 +779,7 @@ enum ArchitectureDomain {
 }
 
 """
-Architektur-Typen
+Architecture types
 """
 enum ArchitectureType {
   CURRENT_STATE
@@ -788,7 +789,7 @@ enum ArchitectureType {
 }
 
 """
-Diagramm-Typen für Excalidraw-Diagramme
+Diagram types for Excalidraw diagrams
 """
 enum DiagramType {
   ARCHITECTURE
@@ -804,7 +805,7 @@ enum DiagramType {
 }
 
 """
-Kategorien für Architektur-Prinzipien
+Categories for architecture principles
 """
 enum PrincipleCategory {
   BUSINESS
@@ -826,7 +827,7 @@ enum PrincipleCategory {
 }
 
 """
-Prioritätsstufen für Architektur-Prinzipien
+Priority levels for architecture principles
 """
 enum PrinciplePriority {
   LOW
@@ -836,7 +837,7 @@ enum PrinciplePriority {
 }
 
 """
-Infrastruktur-Typen
+Infrastructure types
 """
 enum InfrastructureType {
   CLOUD_DATACENTER
@@ -851,7 +852,7 @@ enum InfrastructureType {
 }
 
 """
-Status-Werte für Infrastruktur-Komponenten
+Status values for infrastructure components
 """
 enum InfrastructureStatus {
   ACTIVE
@@ -863,7 +864,7 @@ enum InfrastructureStatus {
 }
 
 """
-Unternehmensgrößen
+Company sizes
 """
 enum CompanySize {
   STARTUP
@@ -875,7 +876,7 @@ enum CompanySize {
 }
 
 """
-Organisationstypen
+Organization types
 """
 enum OrganisationType {
   DIVISION
@@ -889,7 +890,7 @@ enum OrganisationType {
 }
 
 """
-KI-Komponent Typen
+AI component types
 """
 enum AIComponentType {
   MACHINE_LEARNING_MODEL
@@ -909,7 +910,7 @@ enum AIComponentType {
 }
 
 """
-Status-Werte für KI-Komponenten
+Status values for AI components
 """
 enum AIComponentStatus {
   IN_DEVELOPMENT
