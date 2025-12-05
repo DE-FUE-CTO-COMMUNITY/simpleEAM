@@ -148,7 +148,7 @@ const DiagramCard: React.FC<DiagramCardProps> = ({
               alt={title}
               sx={{
                 objectFit: 'contain',
-                backgroundColor: theme.palette.grey[100],
+                backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#ffffff',
               }}
             />
           ) : (
