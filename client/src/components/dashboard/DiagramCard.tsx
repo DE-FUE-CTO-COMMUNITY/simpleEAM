@@ -14,7 +14,8 @@ import {
 } from '@mui/material'
 import { useRouter } from 'next/navigation'
 import { format } from 'date-fns'
-import { de } from 'date-fns/locale'
+import { de, enUS } from 'date-fns/locale'
+import { useTranslations, useLocale } from 'next-intl'
 
 interface DiagramCardProps {
   id: string
@@ -56,6 +57,8 @@ const DiagramCard: React.FC<DiagramCardProps> = ({
 }) => {
   const router = useRouter()
   const theme = useTheme()
+  const t = useTranslations('dashboard')
+  const locale = useLocale()
 
   const handleClick = async () => {
     try {
@@ -94,23 +97,21 @@ const DiagramCard: React.FC<DiagramCardProps> = ({
   }
 
   const formatDate = (dateString: string) => {
-    return format(new Date(dateString), 'dd.MM.yyyy HH:mm', { locale: de })
+    const dateLocale = locale === 'de' ? de : enUS
+    const dateFormat = locale === 'de' ? 'dd.MM.yyyy HH:mm' : 'MM/dd/yyyy hh:mm a'
+    return format(new Date(dateString), dateFormat, { locale: dateLocale })
   }
 
   const getDiagramTypeLabel = (type?: string) => {
-    const types: { [key: string]: string } = {
-      ARCHITECTURE: 'Architektur',
-      APPLICATION_LANDSCAPE: 'Anwendungslandschaft',
-      CAPABILITY_MAP: 'Capability Map',
-      DATA_FLOW: 'Datenfluss',
-      PROCESS: 'Prozess',
-      NETWORK: 'Netzwerk',
-      INTEGRATION_ARCHITECTURE: 'Integration',
-      SECURITY_ARCHITECTURE: 'Sicherheit',
-      CONCEPTUAL: 'Konzept',
-      OTHER: 'Sonstige',
+    const typeKey = type || 'OTHER'
+    // Map old keys to new standardized keys
+    const keyMapping: { [key: string]: string } = {
+      INTEGRATION_ARCHITECTURE: 'INTEGRATION',
+      SECURITY_ARCHITECTURE: 'SECURITY',
+      CONCEPTUAL: 'CONCEPT',
     }
-    return types[type || 'OTHER'] || 'Unbekannt'
+    const standardizedKey = keyMapping[typeKey] || typeKey
+    return t(`diagramTypes.${standardizedKey}`, { default: t('diagramTypes.UNKNOWN') })
   }
 
   const getArchitectureInfo = () => {
@@ -159,7 +160,7 @@ const DiagramCard: React.FC<DiagramCardProps> = ({
                 color: 'text.secondary',
               }}
             >
-              <Typography variant="body2">No preview available</Typography>
+              <Typography variant="body2">{t('noPreviewAvailable')}</Typography>
             </Box>
           )}
         </Box>
@@ -208,7 +209,7 @@ const DiagramCard: React.FC<DiagramCardProps> = ({
           {archInfo && (
             <Box sx={{ mb: 2 }}>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                Architektur:
+                {t('architecture')}:
               </Typography>
               <Typography
                 variant="body2"
@@ -240,7 +241,7 @@ const DiagramCard: React.FC<DiagramCardProps> = ({
           {/* Datum und Ersteller */}
           <Box>
             <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
-              Aktualisiert: {formatDate(updatedAt || createdAt)}
+              {t('updated')}: {formatDate(updatedAt || createdAt)}
             </Typography>
           </Box>
         </CardContent>
