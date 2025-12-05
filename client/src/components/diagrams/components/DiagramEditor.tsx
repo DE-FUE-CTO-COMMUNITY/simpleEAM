@@ -11,7 +11,6 @@ import { useThemeMode } from '@/contexts/ThemeContext'
 import { useCompanyContext } from '@/contexts/CompanyContext'
 import { useCurrentPerson } from '@/hooks/useCurrentPerson'
 import { useAuth, isAdmin, isArchitect } from '@/lib/auth'
-import { useThemeConfig } from '@/lib/runtime-config'
 import { CREATE_DIAGRAM, GET_DIAGRAM, UPDATE_DIAGRAM } from '@/graphql/diagram'
 import { convertExcalidrawToDrawIO, downloadDrawIOFile } from '@/utils/drawioConverter'
 import DiagramLibrarySidebar, { type DiagramLibrarySidebarHandle } from './DiagramLibrarySidebar'
@@ -62,6 +61,9 @@ const ExcalidrawCanvas = dynamic<MinimalExcalidrawProps>(
   async () => {
     await import('@excalidraw/excalidraw/index.css')
     const { Excalidraw, MainMenu } = await import('@excalidraw/excalidraw')
+    const { useEffect, useMemo } = await import('react')
+    const { useCompanyContext } = await import('@/contexts/CompanyContext')
+    const { useThemeConfig } = await import('@/lib/runtime-config')
 
     const MenuIcon = ({ path }: { path: string }) => (
       <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -90,6 +92,8 @@ const ExcalidrawCanvas = dynamic<MinimalExcalidrawProps>(
     }: MinimalExcalidrawProps) => {
       const t = useTranslations('diagrams')
       const locale = useLocale()
+      const { selectedCompany } = useCompanyContext()
+      const themeConfig = useThemeConfig()
 
       const placeholder = (action: string) => () =>
         console.info(`[DiagramEditor] ${action} action not implemented yet.`)
@@ -104,6 +108,30 @@ const ExcalidrawCanvas = dynamic<MinimalExcalidrawProps>(
             return 'en'
         }
       }, [locale])
+
+      const excalidrawBranding = useMemo(
+        () => ({
+          primaryColor: selectedCompany?.primaryColor || undefined,
+          secondaryColor: selectedCompany?.secondaryColor || undefined,
+        }),
+        [selectedCompany?.primaryColor, selectedCompany?.secondaryColor]
+      )
+
+      // Inject Excalidraw theme CSS dynamically based on theme mode
+      useEffect(() => {
+        let isMounted = true
+        const updateTheme = async () => {
+          const { injectExcalidrawThemeCSS } = await import('@/styles/excalidraw-dynamic-theme')
+          if (isMounted) {
+            injectExcalidrawThemeCSS(theme, excalidrawBranding, themeConfig)
+          }
+        }
+        void updateTheme()
+
+        return () => {
+          isMounted = false
+        }
+      }, [theme, excalidrawBranding, themeConfig])
 
       return (
         <div style={{ height: '100%', width: '100%' }}>
@@ -272,7 +300,6 @@ export default function DiagramEditor() {
   } = useCompanyContext()
   const { currentPerson, userEmail } = useCurrentPerson()
   const { keycloak } = useAuth()
-  const themeConfig = useThemeConfig()
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [currentDiagramName, setCurrentDiagramName] = useState<string | null>(null)
   const [currentDiagramId, setCurrentDiagramId] = useState<string | null>(null)
@@ -336,14 +363,6 @@ export default function DiagramEditor() {
       })
     })
   }, [])
-
-  const branding = useMemo(
-    () => ({
-      primaryColor: selectedCompany?.primaryColor || undefined,
-      secondaryColor: selectedCompany?.secondaryColor || undefined,
-    }),
-    [selectedCompany?.primaryColor, selectedCompany?.secondaryColor]
-  )
 
   const defaultCanvasBackground = useMemo(() => (mode === 'dark' ? '#121212' : '#ffffff'), [mode])
 
@@ -751,20 +770,23 @@ export default function DiagramEditor() {
     ]
   )
 
+  // Update canvas background when theme changes
   useEffect(() => {
-    let isMounted = true
-    const updateTheme = async () => {
-      const { injectExcalidrawThemeCSS } = await import('@/styles/excalidraw-dynamic-theme')
-      if (isMounted) {
-        injectExcalidrawThemeCSS(mode, branding, themeConfig)
-      }
+    const api = excalidrawAPIRef.current
+    if (!api?.updateScene || !isEditorReady) {
+      return
     }
-    void updateTheme()
 
-    return () => {
-      isMounted = false
+    const currentAppState = api.getAppState?.()
+    if (currentAppState?.viewBackgroundColor !== defaultCanvasBackground) {
+      console.log('Updating canvas background to:', defaultCanvasBackground)
+      api.updateScene({
+        appState: {
+          viewBackgroundColor: defaultCanvasBackground,
+        },
+      })
     }
-  }, [mode, branding, themeConfig])
+  }, [defaultCanvasBackground, isEditorReady])
 
   const excalidrawTheme = mode === 'dark' ? 'dark' : 'light'
 
@@ -774,9 +796,10 @@ export default function DiagramEditor() {
       appState: {
         viewBackgroundColor: defaultCanvasBackground,
         currentItemFontFamily: companyFontFamily,
+        theme: excalidrawTheme,
       },
     }),
-    [defaultCanvasBackground, companyFontFamily]
+    [defaultCanvasBackground, companyFontFamily, excalidrawTheme]
   )
 
   const handleExcalidrawReady = useCallback((api: any) => {

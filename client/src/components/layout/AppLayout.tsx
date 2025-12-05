@@ -28,7 +28,6 @@ import 'dayjs/locale/en'
 // Import der globalen Styles
 import '@/styles/global.css'
 import '@/styles/excalidraw-fonts.css'
-import '@/styles/excalidraw-material-theme.css'
 
 // Emotion cache for server-side rendering with better hydration compatibility
 let clientSideCache: ReturnType<typeof createCache> | null = null
