@@ -825,12 +825,23 @@ export default function DiagramEditor() {
       }
     }
 
+    // Remove properties that should not be persisted:
+    // - Canvas size/viewport (width, height, offsetLeft, offsetTop) - calculated at runtime based on container
+    // - Theme (theme) - determined by user's current theme preference
+    // - Collaborators - runtime collaboration state
+    const {
+      width,
+      height,
+      offsetLeft,
+      offsetTop,
+      theme,
+      collaborators,
+      ...cleanAppState
+    } = appState as Record<string, unknown>
+
     return JSON.stringify({
       elements,
-      appState: {
-        ...appState,
-        collaborators: undefined,
-      },
+      appState: cleanAppState,
       files,
     })
   }, [notifyEditorNotReady])
@@ -905,20 +916,13 @@ export default function DiagramEditor() {
           )
         : false
 
-      // Remove viewport-specific properties that should not be restored
-      // These are runtime values calculated by Excalidraw based on actual DOM layout
-      const { width, height, offsetLeft, offsetTop, ...restAppState } = (parsed.appState ??
-        {}) as Record<string, unknown>
-
       suppressSceneChangeRef.current = true
       api.updateScene({
         elements: parsed.elements ?? [],
         appState: {
-          ...restAppState,
+          ...(parsed.appState ?? {}),
           collaborators: new Map(),
           currentItemFontFamily: companyFontFamily,
-          // Let Excalidraw calculate these based on actual container size:
-          // width, height, offsetLeft, offsetTop
         },
         files: parsed.files ?? {},
       })
@@ -1151,15 +1155,23 @@ export default function DiagramEditor() {
       return
     }
 
+    // Remove properties that should not be exported
+    const {
+      width,
+      height,
+      offsetLeft,
+      offsetTop,
+      theme,
+      collaborators,
+      ...cleanAppState
+    } = (scene.appState || {}) as Record<string, unknown>
+
     const payload = {
       type: 'excalidraw',
       version: 2,
       source: 'simple-eam',
       elements: scene.elements,
-      appState: {
-        ...(scene.appState || {}),
-        collaborators: undefined,
-      },
+      appState: cleanAppState,
       files: scene.files ?? {},
     }
 
@@ -1180,15 +1192,23 @@ export default function DiagramEditor() {
       return
     }
 
+    // Remove properties that should not be exported
+    const {
+      width,
+      height,
+      offsetLeft,
+      offsetTop,
+      theme,
+      collaborators,
+      ...cleanAppState
+    } = (scene.appState || {}) as Record<string, unknown>
+
     const exportPayload = {
       type: 'excalidraw',
       version: 2,
       source: 'simple-eam',
       elements: scene.elements,
-      appState: {
-        ...(scene.appState || {}),
-        collaborators: undefined,
-      },
+      appState: cleanAppState,
     }
 
     try {
