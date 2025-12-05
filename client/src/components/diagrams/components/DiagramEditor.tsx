@@ -829,15 +829,9 @@ export default function DiagramEditor() {
     // - Canvas size/viewport (width, height, offsetLeft, offsetTop) - calculated at runtime based on container
     // - Theme (theme) - determined by user's current theme preference
     // - Collaborators - runtime collaboration state
-    const {
-      width,
-      height,
-      offsetLeft,
-      offsetTop,
-      theme,
-      collaborators,
-      ...cleanAppState
-    } = appState as Record<string, unknown>
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { width: _width, height: _height, offsetLeft: _offsetLeft, offsetTop: _offsetTop, theme: _theme, collaborators: _collaborators, ...cleanAppState } =
+      appState as Record<string, unknown>
 
     return JSON.stringify({
       elements,
@@ -1156,15 +1150,9 @@ export default function DiagramEditor() {
     }
 
     // Remove properties that should not be exported
-    const {
-      width,
-      height,
-      offsetLeft,
-      offsetTop,
-      theme,
-      collaborators,
-      ...cleanAppState
-    } = (scene.appState || {}) as Record<string, unknown>
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { width: _width, height: _height, offsetLeft: _offsetLeft, offsetTop: _offsetTop, theme: _theme, collaborators: _collaborators, ...cleanAppState } =
+      (scene.appState || {}) as Record<string, unknown>
 
     const payload = {
       type: 'excalidraw',
@@ -1193,15 +1181,9 @@ export default function DiagramEditor() {
     }
 
     // Remove properties that should not be exported
-    const {
-      width,
-      height,
-      offsetLeft,
-      offsetTop,
-      theme,
-      collaborators,
-      ...cleanAppState
-    } = (scene.appState || {}) as Record<string, unknown>
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { width: _width, height: _height, offsetLeft: _offsetLeft, offsetTop: _offsetTop, theme: _theme, collaborators: _collaborators, ...cleanAppState } =
+      (scene.appState || {}) as Record<string, unknown>
 
     const exportPayload = {
       type: 'excalidraw',
@@ -1367,6 +1349,78 @@ export default function DiagramEditor() {
     handleNewDiagram()
   }, [handleNewDiagram])
 
+  const generateDiagramPreviews = useCallback(
+    async (scene: { elements: any[]; appState: any; files: any }) => {
+      try {
+        const { exportToBlob } = await import('@excalidraw/excalidraw')
+
+        // Generate light mode preview
+        const lightBlob = await exportToBlob({
+          elements: scene.elements,
+          appState: {
+            ...scene.appState,
+            collaborators: undefined,
+            viewBackgroundColor: '#ffffff',
+            exportBackground: true,
+            exportEmbedScene: false,
+            exportWithDarkMode: false,
+          },
+          files: scene.files ?? {},
+          mimeType: 'image/png',
+          quality: 0.85,
+          exportPadding: 20,
+        })
+
+        // Generate dark mode preview
+        const darkBlob = await exportToBlob({
+          elements: scene.elements,
+          appState: {
+            ...scene.appState,
+            collaborators: undefined,
+            viewBackgroundColor: '#121212',
+            exportBackground: true,
+            exportEmbedScene: false,
+            exportWithDarkMode: true,
+          },
+          files: scene.files ?? {},
+          mimeType: 'image/png',
+          quality: 0.85,
+          exportPadding: 20,
+        })
+
+        if (!lightBlob || !darkBlob) {
+          console.warn('DiagramEditor: Failed to generate one or both preview images')
+          return { lightPreview: null, darkPreview: null }
+        }
+
+        // Convert blobs to base64 data URLs, then strip the data URL prefix
+        const lightDataUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader()
+          reader.onloadend = () => resolve(reader.result as string)
+          reader.onerror = reject
+          reader.readAsDataURL(lightBlob)
+        })
+
+        const darkDataUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader()
+          reader.onloadend = () => resolve(reader.result as string)
+          reader.onerror = reject
+          reader.readAsDataURL(darkBlob)
+        })
+
+        // Strip the data URL prefix (data:image/png;base64,) to store only base64 string
+        const lightPreview = lightDataUrl.replace(/^data:image\/png;base64,/, '')
+        const darkPreview = darkDataUrl.replace(/^data:image\/png;base64,/, '')
+
+        return { lightPreview, darkPreview }
+      } catch (error) {
+        console.error('DiagramEditor: Failed to generate diagram previews', error)
+        return { lightPreview: null, darkPreview: null }
+      }
+    },
+    []
+  )
+
   const handleConfirmSave = useCallback(
     async ({ name, metadata }: { name: string; metadata: LocalStoredDiagramMetadata }) => {
       const serialized = serializeCurrentScene()
@@ -1406,6 +1460,12 @@ export default function DiagramEditor() {
         ],
       }
 
+      // Generate PNG previews (light and dark mode)
+      const scene = getSceneForExport()
+      const { lightPreview, darkPreview } = scene
+        ? await generateDiagramPreviews(scene)
+        : { lightPreview: null, darkPreview: null }
+
       try {
         const existingDiagramId = activeDiagramIdRef.current
         const shouldUpdateCompanyRelation = Boolean(
@@ -1427,6 +1487,14 @@ export default function DiagramEditor() {
               disconnect: [{ where: {} }],
               ...architectureConnect,
             },
+          }
+
+          // Add PNG previews if generated
+          if (lightPreview) {
+            updateInput.diagramPng = { set: lightPreview }
+          }
+          if (darkPreview) {
+            updateInput.diagramPngDark = { set: darkPreview }
           }
 
           if (canUpdateCompanyRelation) {
@@ -1462,6 +1530,14 @@ export default function DiagramEditor() {
             diagramType,
             diagramJson: serialized,
             architecture: architectureConnect,
+          }
+
+          // Add PNG previews if generated
+          if (lightPreview) {
+            createInput.diagramPng = lightPreview
+          }
+          if (darkPreview) {
+            createInput.diagramPngDark = darkPreview
           }
 
           if (targetCompanyId) {
@@ -1532,6 +1608,8 @@ export default function DiagramEditor() {
       currentDiagramInfo?.companyId,
       currentPerson?.id,
       enqueueSnackbar,
+      generateDiagramPreviews,
+      getSceneForExport,
       isCollaborating,
       persistLocalDraft,
       saveDialogForceSaveAs,

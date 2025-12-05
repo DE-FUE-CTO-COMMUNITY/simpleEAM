@@ -20,6 +20,7 @@ export const GET_RECENT_DIAGRAMS = gql`
       description
       diagramType
       diagramPng
+      diagramPngDark
       diagramJson
       createdAt
       updatedAt

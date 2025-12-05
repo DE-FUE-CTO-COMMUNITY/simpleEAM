@@ -23,6 +23,7 @@ interface DiagramCardProps {
   description?: string
   diagramType?: string
   diagramPng?: string
+  diagramPngDark?: string
   createdAt: string
   updatedAt: string
   creator?: {
@@ -48,6 +49,7 @@ const DiagramCard: React.FC<DiagramCardProps> = ({
   description,
   diagramType,
   diagramPng,
+  diagramPngDark,
   createdAt,
   updatedAt,
   creator,
@@ -138,11 +140,11 @@ const DiagramCard: React.FC<DiagramCardProps> = ({
       <CardActionArea onClick={handleClick} sx={{ height: '100%' }}>
         {/* PNG-Vorschau */}
         <Box sx={{ height: 200, position: 'relative', overflow: 'hidden' }}>
-          {diagramPng ? (
+          {diagramPng || diagramPngDark ? (
             <CardMedia
               component="img"
               height="200"
-              image={`data:image/png;base64,${diagramPng}`}
+              image={`data:image/png;base64,${theme.palette.mode === 'dark' && diagramPngDark ? diagramPngDark : diagramPng}`}
               alt={title}
               sx={{
                 objectFit: 'contain',
