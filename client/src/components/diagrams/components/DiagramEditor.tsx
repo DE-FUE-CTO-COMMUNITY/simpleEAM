@@ -9,9 +9,9 @@ import { GET_DIAGRAM } from '@/graphql/diagram'
 import SaveDiagramDialog from '../dialogs/SaveDiagramDialog'
 import OpenDiagramDialog from '../dialogs/OpenDiagramDialog'
 import DeleteDiagramDialog from '../dialogs/DeleteDiagramDialog'
-import IntegratedLibrary from './IntegratedLibrary'
 import DiagramNameDisplay from './DiagramNameDisplay'
 import ExcalidrawWrapper from './ExcalidrawWrapper'
+import DiagramLibrarySidebar, { type DiagramLibrarySidebarHandle } from './DiagramLibrarySidebar'
 import CanvasDebugOverlay from './CanvasDebugOverlay'
 import CapabilityMapGenerator from '../dialogs/CapabilityMapGenerator'
 import { DiagramEditorProps } from '../types/DiagramTypes'
@@ -50,6 +50,9 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
 
   // Collaboration status state
   const [isCollaborating, setIsCollaborating] = useState(false)
+  // Sidebar state
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+  const sidebarRef = useRef<DiagramLibrarySidebarHandle | null>(null)
 
   // Custom hooks for state management
   const {
@@ -354,19 +357,6 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     [setExcalidrawAPI]
   )
 
-  // Library Update Handler
-  const handleLibraryUpdate = useCallback(
-    (library: any) => {
-      const itemCount = Array.isArray(library) ? library.length : library.libraryItems?.length || 0
-      setNotification({
-        open: true,
-        message: t('messages.libraryLoaded', { count: itemCount }),
-        severity: 'success',
-      })
-    },
-    [setNotification, t]
-  )
-
   // Get current diagram data for save operations
   const getCurrentDiagramData = () => {
     if (!excalidrawAPI) return '{}'
@@ -397,6 +387,34 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
   const handleCollaborationStatusChange = useCallback((collaborating: boolean) => {
     setIsCollaborating(collaborating)
   }, [])
+
+  // Sidebar handlers
+  const handleToggleSidebar = useCallback(() => {
+    setIsSidebarOpen(prev => !prev)
+  }, [])
+
+  const handleFindOnCanvas = useCallback(() => {
+    // Small delay to ensure any menu closes before opening sidebar
+    setTimeout(() => {
+      sidebarRef.current?.openSearchTab()
+    }, 50)
+  }, [])
+
+  // Handle Ctrl+F keyboard shortcut for canvas search
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key === 'f') {
+        event.preventDefault()
+        event.stopPropagation()
+        handleFindOnCanvas()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown, true)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown, true)
+    }
+  }, [handleFindOnCanvas])
 
   // Create dynamic initialData that includes viewport state
   const baseInitialAppState = useMemo(() => {
@@ -602,60 +620,71 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
         ...style,
       }}
     >
-      {/* Hauptcontainer für Excalidraw */}
-      <Box sx={{ height: '100%', width: '100%', position: 'relative' }}>
-        {/* Diagram Name Display - positioned next to MainMenu */}
-        <DiagramNameDisplay
-          currentDiagram={currentDiagram}
-          hasUnsavedChanges={hasUnsavedChanges}
-          onSaveClick={() => updateDialogState('saveDialogOpen', true)}
-          isCollaborating={isCollaborating}
-        />
-
-        <ExcalidrawWrapper
-          // Remove dynamic key to prevent controlled/uncontrolled input issues
-          // The component should persist throughout the app lifecycle
-          onOpenDialog={() => updateDialogState('openDialogOpen', true)}
-          onSaveDialog={() => updateDialogState('saveDialogOpen', true)}
-          onSaveAsDialog={() => updateDialogState('saveAsDialogOpen', true)}
-          onNewDiagram={handleNewDiagram}
-          onDeleteDialog={() => updateDialogState('deleteDialogOpen', true)}
-          onExportJSON={handleExportJSON}
-          onExportDrawIO={handleExportDrawIO}
-          onImportJSON={handleImportJSON}
-          onExportPNG={handleExportPNG}
-          onManualSync={handleManualSync}
-          onCapabilityMapGenerator={handleCapabilityMapGenerator}
-          excalidrawAPI={handleExcalidrawAPI}
-          onChange={handleChange}
-          uiOptions={uiOptions}
-          initialData={initialData}
-          viewModeEnabled={isViewer()}
-          currentDiagram={currentDiagram}
-          onDiagramUpdate={handleCollaborationDiagramUpdate}
-          onCollaborationStatusChange={handleCollaborationStatusChange}
-          selectedElementForRelatedElements={selectedElementForRelatedElements}
-          onOpenAddRelatedElementsDialog={handleOpenAddRelatedElementsDialog}
-          onCloseAddRelatedElementsDialog={handleCloseAddRelatedElementsDialog}
-          isAddRelatedElementsDialogOpen={dialogStates.addRelatedElementsDialogOpen}
-        />
-
-        {/* Integrated Library Component - only for non-viewer users */}
-        {excalidrawAPI && !isViewer() && (
-          <IntegratedLibrary
-            excalidrawAPI={excalidrawAPI}
-            onLibraryUpdate={handleLibraryUpdate}
-            defaultFontFamily={companyFontFamily}
+      {/* Hauptcontainer für Excalidraw mit Sidebar */}
+      <Box
+        sx={{
+          height: '100%',
+          width: '100%',
+          position: 'relative',
+          display: 'flex',
+          overflow: 'hidden',
+        }}
+      >
+        {/* Editor content wrapper */}
+        <Box sx={{ flex: 1, minWidth: 0, position: 'relative' }}>
+          {/* Diagram Name Display - positioned next to MainMenu */}
+          <DiagramNameDisplay
+            currentDiagram={currentDiagram}
+            hasUnsavedChanges={hasUnsavedChanges}
+            onSaveClick={() => updateDialogState('saveDialogOpen', true)}
+            isCollaborating={isCollaborating}
           />
-        )}
 
-        {/* Canvas Debug Overlay - nur in Entwicklungsumgebung */}
-        {process.env.NODE_ENV === 'development' && excalidrawAPI && (
-          <CanvasDebugOverlay
-            excalidrawAPI={excalidrawAPI}
+          <ExcalidrawWrapper
+            // Remove dynamic key to prevent controlled/uncontrolled input issueses
+            // The component should persist throughout the app lifecycle
+            onOpenDialog={() => updateDialogState('openDialogOpen', true)}
+            onSaveDialog={() => updateDialogState('saveDialogOpen', true)}
+            onSaveAsDialog={() => updateDialogState('saveAsDialogOpen', true)}
+            onNewDiagram={handleNewDiagram}
+            onDeleteDialog={() => updateDialogState('deleteDialogOpen', true)}
+            onExportJSON={handleExportJSON}
+            onExportDrawIO={handleExportDrawIO}
+            onImportJSON={handleImportJSON}
+            onExportPNG={handleExportPNG}
+            onManualSync={handleManualSync}
+            onCapabilityMapGenerator={handleCapabilityMapGenerator}
+            excalidrawAPI={handleExcalidrawAPI}
+            onChange={handleChange}
+            uiOptions={uiOptions}
+            initialData={initialData}
+            viewModeEnabled={isViewer()}
+            currentDiagram={currentDiagram}
+            onDiagramUpdate={handleCollaborationDiagramUpdate}
+            onCollaborationStatusChange={handleCollaborationStatusChange}
             selectedElementForRelatedElements={selectedElementForRelatedElements}
+            onOpenAddRelatedElementsDialog={handleOpenAddRelatedElementsDialog}
+            onCloseAddRelatedElementsDialog={handleCloseAddRelatedElementsDialog}
+            isAddRelatedElementsDialogOpen={dialogStates.addRelatedElementsDialogOpen}
           />
-        )}
+
+          {/* Canvas Debug Overlay - nur in Entwicklungsumgebung */}
+          {process.env.NODE_ENV === 'development' && excalidrawAPI && (
+            <CanvasDebugOverlay
+              excalidrawAPI={excalidrawAPI}
+              selectedElementForRelatedElements={selectedElementForRelatedElements}
+            />
+          )}
+        </Box>
+
+        {/* Diagram Library Sidebar */}
+        <DiagramLibrarySidebar
+          ref={sidebarRef}
+          excalidrawAPI={excalidrawAPI}
+          defaultFontFamily={companyFontFamily}
+          isOpen={isSidebarOpen}
+          onToggle={handleToggleSidebar}
+        />
       </Box>
 
       {/* Save Dialog - only for non-viewer users */}
