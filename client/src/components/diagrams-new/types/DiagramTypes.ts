@@ -1,7 +1,9 @@
+import type { CSSProperties } from 'react'
+
 // Types and interfaces for diagram components
 export interface DiagramEditorProps {
   className?: string
-  style?: React.CSSProperties
+  style?: CSSProperties
 }
 
 export interface ExcalidrawComponentProps {

@@ -1,6 +1,6 @@
 /**
- * Diagram optimization helpers for opening diagrams
- * Replaces originalElement with elementName for better performance
+ * Diagramm-Optimierung für das Öffnen von Diagrammen
+ * Ersetzt originalElement durch elementName für bessere Performance
  */
 
 export interface DiagramElement {
@@ -26,9 +26,9 @@ export interface DiagramData {
 }
 
 /**
- * Optimizes diagram data on open by replacing originalElement with elementName
- * @param diagramData - Diagram data payload
- * @returns Optimized diagram data
+ * Optimiert Diagramm-Daten beim Öffnen durch Ersetzung von originalElement mit elementName
+ * @param diagramData - Die Diagramm-Daten
+ * @returns Optimierte Diagramm-Daten
  */
 export const optimizeDiagramOnOpen = (diagramData: DiagramData): DiagramData => {
   if (!diagramData.elements || !Array.isArray(diagramData.elements)) {
@@ -42,20 +42,20 @@ export const optimizeDiagramOnOpen = (diagramData: DiagramData): DiagramData => 
 
     const customData = element.customData
 
-    // If originalElement exists and elementName is missing, derive it
+    // Prüfe, ob originalElement vorhanden ist und elementName noch nicht gesetzt ist
     if (customData.originalElement && !customData.elementName) {
-      // Extract elementName from originalElement
+      // Extrahiere elementName aus originalElement
       const elementName = customData.originalElement.name
 
       if (elementName) {
-        // Create optimized customData with elementName and drop originalElement
+        // Erstelle optimierte customData mit elementName und entferne originalElement
         const optimizedCustomData = {
           ...customData,
           elementName: elementName,
-          // originalElement is omitted to keep storage small
+          // originalElement wird entfernt, um Speicherplatz zu sparen
         }
 
-        // Remove originalElement explicitly
+        // Entferne originalElement explizit
         delete optimizedCustomData.originalElement
 
         return {
@@ -65,13 +65,14 @@ export const optimizeDiagramOnOpen = (diagramData: DiagramData): DiagramData => 
       }
     }
 
-    // Remove redundant originalElement when both fields exist
+    // Prüfe, ob sowohl originalElement als auch elementName vorhanden sind
     if (customData.originalElement && customData.elementName) {
+      // originalElement kann entfernt werden, da elementName bereits vorhanden ist
       const optimizedCustomData = {
         ...customData,
       }
 
-      // Remove originalElement explicitly
+      // Entferne originalElement explizit
       delete optimizedCustomData.originalElement
 
       return {
@@ -80,7 +81,7 @@ export const optimizeDiagramOnOpen = (diagramData: DiagramData): DiagramData => 
       }
     }
 
-    // No optimization required
+    // Keine Optimierung erforderlich
     return element
   })
 
@@ -91,7 +92,7 @@ export const optimizeDiagramOnOpen = (diagramData: DiagramData): DiagramData => 
 }
 
 /**
- * Collects statistics about the performed optimization
+ * Statistiken über die Optimierung
  */
 export const getDiagramOptimizationStats = (
   originalData: DiagramData,
@@ -115,9 +116,9 @@ export const getDiagramOptimizationStats = (
 }
 
 /**
- * Optimizes diagram data on save by removing redundant originalElement data
- * @param diagramData - Diagram data payload
- * @returns Optimized diagram data
+ * Optimiert Diagramm-Daten beim Speichern durch Entfernung von redundanten originalElement-Daten
+ * @param diagramData - Die Diagramm-Daten
+ * @returns Optimierte Diagramm-Daten
  */
 export const optimizeDiagramOnSave = (diagramData: DiagramData): DiagramData => {
   if (!diagramData.elements || !Array.isArray(diagramData.elements)) {
@@ -131,13 +132,14 @@ export const optimizeDiagramOnSave = (diagramData: DiagramData): DiagramData => 
 
     const customData = element.customData
 
-    // Remove redundant originalElement when both fields exist
+    // Prüfe, ob sowohl originalElement als auch elementName vorhanden sind
     if (customData.originalElement && customData.elementName) {
+      // originalElement ist redundant, da elementName bereits vorhanden ist
       const optimizedCustomData = {
         ...customData,
       }
 
-      // Remove originalElement explicitly
+      // Entferne originalElement explizit
       delete optimizedCustomData.originalElement
 
       return {
@@ -146,9 +148,9 @@ export const optimizeDiagramOnSave = (diagramData: DiagramData): DiagramData => 
       }
     }
 
-    // If originalElement exists but elementName is missing, derive it
+    // Prüfe, ob originalElement vorhanden ist, aber elementName fehlt
     if (customData.originalElement && !customData.elementName) {
-      // Extract elementName from originalElement and remove originalElement
+      // Extrahiere elementName aus originalElement und entferne originalElement
       const elementName = customData.originalElement.name
 
       if (elementName) {
@@ -157,7 +159,7 @@ export const optimizeDiagramOnSave = (diagramData: DiagramData): DiagramData => 
           elementName: elementName,
         }
 
-        // Remove originalElement explicitly
+        // Entferne originalElement explizit
         delete optimizedCustomData.originalElement
 
         return {
@@ -167,7 +169,7 @@ export const optimizeDiagramOnSave = (diagramData: DiagramData): DiagramData => 
       }
     }
 
-    // No optimization required
+    // Keine Optimierung erforderlich
     return element
   })
 
