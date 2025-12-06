@@ -254,6 +254,26 @@ const ExcalidrawWrapper = dynamic(
 
       return (
         <div style={{ height: '100%', width: '100%' }}>
+          <style>{`
+            /* Hide the default library button completely - multiple selectors for robustness */
+            .excalidraw button[title*="Library"],
+            .excalidraw button[title*="library"],
+            .excalidraw button[aria-label*="Library"],
+            .excalidraw button[aria-label*="library"],
+            .excalidraw .library-button,
+            .excalidraw [data-testid*="library"],
+            .excalidraw .Island button:has(svg[width="1em"]):has(svg[height="1em"]),
+            .excalidraw button.ToolIcon_type_button--show:has(.library-icon),
+            .excalidraw button[data-testid="library-button"],
+            .excalidraw .App-toolbar__extra-tools-trigger,
+            .excalidraw .library-menu-trigger,
+            .excalidraw .layer-ui__wrapper__top-right {
+              display: none !important;
+              visibility: hidden !important;
+              opacity: 0 !important;
+              pointer-events: none !important;
+            }
+          `}</style>
           <ExcalidrawTyped
             theme={themeMode}
             langCode={excalidrawLangCode}

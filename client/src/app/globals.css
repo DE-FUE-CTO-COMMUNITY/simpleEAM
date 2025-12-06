@@ -1,0 +1,19 @@
+
+/* Hide Excalidraw default library button - we use custom DiagramLibrarySidebar */
+.excalidraw button[title*="ibrary"],
+.excalidraw button[aria-label*="ibrary"],
+.excalidraw .library-button,
+.excalidraw .library-menu-trigger,
+.excalidraw [class*="library"][class*="button"],
+.excalidraw [data-testid*="library"],
+.excalidraw .App-toolbar__extra-tools-trigger,
+.excalidraw .layer-ui__wrapper__top-right {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  position: absolute !important;
+  left: -9999px !important;
+}
