@@ -4,8 +4,11 @@ import React, { useRef, useCallback, useMemo, useEffect, useState } from 'react'
 import { Box, Alert, Snackbar } from '@mui/material'
 import { useApolloClient } from '@apollo/client'
 import { FONT_FAMILY } from '@excalidraw/excalidraw'
+import { useSnackbar } from 'notistack'
 import { useTranslations } from 'next-intl'
 import { GET_DIAGRAM } from '@/graphql/diagram'
+import { useCurrentPerson } from '@/hooks/useCurrentPerson'
+import { isAdmin, isArchitect } from '@/lib/auth'
 import SaveDiagramDialog from '../dialogs/SaveDiagramDialog'
 import OpenDiagramDialog from '../dialogs/OpenDiagramDialog'
 import DeleteDiagramDialog from '../dialogs/DeleteDiagramDialog'
@@ -23,22 +26,30 @@ import { isViewer } from '@/lib/auth'
 import { useCompanyContext } from '@/contexts/CompanyContext'
 import type { ExcalidrawFont } from '@/components/companies/types'
 
+type CollaborationPermissionFailure = 'missing-edit' | 'missing-company' | 'forbidden-company'
+
 const COMPANY_FONT_TO_EXCALIDRAW: Record<ExcalidrawFont, number> = {
-  Virgil: FONT_FAMILY.Virgil,
   'Comic Shanns': FONT_FAMILY['Comic Shanns'],
   Excalifont: FONT_FAMILY.Excalifont,
   'Lilita One': FONT_FAMILY['Lilita One'],
   Nunito: FONT_FAMILY.Nunito,
 }
 
-const FALLBACK_EXCALIDRAW_FONT = FONT_FAMILY.Virgil
+const FALLBACK_EXCALIDRAW_FONT = FONT_FAMILY.Excalifont
 
 const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const apolloClient = useApolloClient()
   const t = useTranslations('diagrams')
-  const { selectedCompanyId, selectedCompany } = useCompanyContext()
+  const { selectedCompanyId, selectedCompany, setCompanySelectionLock } = useCompanyContext()
   const prevCompanyIdRef = useRef<string | null>(null)
+  const { enqueueSnackbar } = useSnackbar()
+  const collaborationTranslations = useTranslations('diagrams.collaborationDialog')
+  const { currentPerson } = useCurrentPerson()
+  const accessibleCompanyIds = useMemo(
+    () => new Set((currentPerson?.companies || []).map((c: any) => c.id)),
+    [currentPerson?.companies]
+  )
 
   const companyFontFamily = useMemo(() => {
     const diagramFont = selectedCompany?.diagramFont as ExcalidrawFont | undefined
@@ -387,6 +398,54 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
   const handleCollaborationStatusChange = useCallback((collaborating: boolean) => {
     setIsCollaborating(collaborating)
   }, [])
+
+  // Company-aware collaboration permission checking
+  const checkCollaborationPermission = useCallback(
+    (companyId?: string | null, options: { silent?: boolean } = {}) => {
+      let failure: CollaborationPermissionFailure | null = null
+
+      if (!isArchitect()) {
+        failure = 'missing-edit'
+      } else if (!companyId) {
+        failure = 'missing-company'
+      } else if (!isAdmin() && !accessibleCompanyIds.has(companyId)) {
+        failure = 'forbidden-company'
+      }
+
+      if (failure && !options.silent) {
+        const translationKey =
+          failure === 'missing-edit'
+            ? 'permissionRequired'
+            : failure === 'missing-company'
+              ? 'companyMissing'
+              : 'companyPermissionDenied'
+        const message = collaborationTranslations(translationKey as any)
+        enqueueSnackbar(message, { variant: failure === 'missing-company' ? 'warning' : 'error' })
+      }
+
+      return failure
+        ? ({ allowed: false as const, reason: failure })
+        : ({ allowed: true as const })
+    },
+    [accessibleCompanyIds, collaborationTranslations, enqueueSnackbar]
+  )
+
+  // Company selection lock during collaboration
+  useEffect(() => {
+    const lockId = 'diagram-editor-collaboration-lock'
+    if (isCollaborating) {
+      const reason =
+        collaborationTranslations('companySwitchLockedTooltip') ||
+        'Stop live collaboration before switching companies.'
+      setCompanySelectionLock(lockId, reason)
+    } else {
+      setCompanySelectionLock(lockId, null)
+    }
+
+    return () => {
+      setCompanySelectionLock(lockId, null)
+    }
+  }, [collaborationTranslations, isCollaborating, setCompanySelectionLock])
 
   // Sidebar handlers
   const handleToggleSidebar = useCallback(() => {
