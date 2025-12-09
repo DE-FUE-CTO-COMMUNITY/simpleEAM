@@ -79,7 +79,7 @@ type Person
         where: {
           AND: [
             { jwt: { roles: { includes: "architect" } } }
-            { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+            { node: { companies: { some: { id_IN: "$jwt.company_ids" } } } }
           ]
         }
       }
@@ -91,7 +91,7 @@ type Person
         where: {
           OR: [
             { jwt: { roles: { includes: "admin" } } }
-            { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+            { node: { companies: { some: { id_IN: "$jwt.company_ids" } } } }
             { node: { email: { eq: "$jwt.email" } } }
           ]
         }
@@ -108,7 +108,7 @@ type Person
   avatarUrl: String
   createdAt: DateTime! @timestamp(operations: [CREATE])
   updatedAt: DateTime @timestamp(operations: [UPDATE])
-  company: [Company!]! @relationship(type: "EMPLOYED_BY", direction: OUT)
+  companies: [Company!]! @relationship(type: "EMPLOYED_BY", direction: OUT)
   ownedCapabilities: [BusinessCapability!]! @relationship(type: "OWNED_BY", direction: IN)
   ownedApplications: [Application!]! @relationship(type: "OWNED_BY", direction: IN)
   ownedDataObjects: [DataObject!]! @relationship(type: "OWNED_BY", direction: IN)

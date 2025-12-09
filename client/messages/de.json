@@ -2014,6 +2014,10 @@
       "aiComponent": {
         "singular": "KI-Komponente",
         "plural": "KI-Komponenten"
+      },
+      "aicomponent": {
+        "singular": "KI-Komponente",
+        "plural": "KI-Komponenten"
       }
     }
   },

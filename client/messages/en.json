@@ -2022,6 +2022,10 @@
       "aiComponent": {
         "singular": "AI Component",
         "plural": "AI Components"
+      },
+      "aicomponent": {
+        "singular": "AI Component",
+        "plural": "AI Components"
       }
     }
   },

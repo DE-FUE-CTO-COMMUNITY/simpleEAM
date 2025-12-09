@@ -31,7 +31,11 @@ export const useDiagramHandlers = (
   _setSaveDialogOpen: (open: boolean) => void,
   _setSaveAsDialogOpen: (open: boolean) => void,
   _lastSavedScene: any,
-  defaultFontFamily: number
+  defaultFontFamily: number,
+  broadcastSceneUpdateRef?: React.MutableRefObject<
+    ((elements?: any[], appState?: any) => void) | null
+  >,
+  suppressOnChangeRef?: React.MutableRefObject<boolean>
 ) => {
   const apolloClient = useApolloClient()
   const { selectedCompanyId } = useCompanyContext()
@@ -108,6 +112,11 @@ export const useDiagramHandlers = (
 
     // Set loading flag to prevent onChange from setting hasUnsavedChanges during scene update
     isLoadingRef.current = true
+
+    // Set suppressOnChangeRef to prevent onChange from running
+    if (suppressOnChangeRef) {
+      suppressOnChangeRef.current = true
+    }
 
     // Sofort die Excalidraw-Szene aktualisieren
     excalidrawAPI.updateScene(restoredScene)
@@ -318,6 +327,10 @@ export const useDiagramHandlers = (
 
         // Sofort die Excalidraw-Szene aktualisieren (mit integrierter Viewport-Position)
         try {
+          // Set suppressOnChangeRef to prevent onChange from running after this updateScene
+          if (suppressOnChangeRef) {
+            suppressOnChangeRef.current = true
+          }
           api.updateScene(restoredScene)
         } catch (updateError) {
           console.error('Fehler beim Aktualisieren der Excalidraw-Szene:', updateError)
@@ -361,6 +374,9 @@ export const useDiagramHandlers = (
             try {
               // Loading flag should still be set from the main updateScene call
 
+              if (suppressOnChangeRef) {
+                suppressOnChangeRef.current = true
+              }
               api.updateScene({
                 appState: {
                   scrollX: savedViewportState.scrollX,
@@ -461,6 +477,15 @@ export const useDiagramHandlers = (
         setCurrentDiagram(savedDiagram)
         setHasUnsavedChanges(false)
         setLastSavedScene(sceneData)
+
+        // Broadcast updated diagram metadata to collaborators
+        if (broadcastSceneUpdateRef?.current) {
+          console.log(
+            '[DiagramHandlers] Broadcasting diagram metadata update after save:',
+            savedDiagram
+          )
+          broadcastSceneUpdateRef.current(elements, appState)
+        }
 
         // Persist to localStorage
         saveSceneToStorage(sceneData)
@@ -958,6 +983,7 @@ export const useDiagramHandlers = (
     handleImportJSON,
     handleExportPNG,
     handleManualSync,
+    isLoadingRef,
   }
 }
 

@@ -48,7 +48,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const companies: Company[] = useMemo(() => {
     if (admin) return (allCompaniesData?.companies ?? []) as Company[]
     const person = meData?.people?.[0]
-    const myCompanies = (person?.company ?? []) as Company[]
+    const myCompanies = (person?.companies ?? []) as Company[]
     return myCompanies
   }, [admin, allCompaniesData?.companies, meData?.people])
 

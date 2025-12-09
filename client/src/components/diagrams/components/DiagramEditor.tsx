@@ -41,15 +41,27 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const apolloClient = useApolloClient()
   const t = useTranslations('diagrams')
-  const { selectedCompanyId, selectedCompany, setCompanySelectionLock } = useCompanyContext()
+  const {
+    selectedCompanyId,
+    selectedCompany,
+    setCompanySelectionLock,
+    setSelectedCompanyId,
+    companies,
+  } = useCompanyContext()
   const prevCompanyIdRef = useRef<string | null>(null)
   const { enqueueSnackbar } = useSnackbar()
   const collaborationTranslations = useTranslations('diagrams.collaborationDialog')
   const { currentPerson } = useCurrentPerson()
-  const accessibleCompanyIds = useMemo(
-    () => new Set((currentPerson?.companies || []).map((c: any) => c.id)),
-    [currentPerson?.companies]
-  )
+
+  console.log('[DiagramEditor] selectedCompanyId:', selectedCompanyId)
+  console.log('[DiagramEditor] currentPerson:', currentPerson)
+  console.log('[DiagramEditor] companies:', companies)
+
+  const accessibleCompanyIds = useMemo(() => {
+    const ids = new Set(companies.map(company => company.id))
+    console.log('[DiagramEditor] accessibleCompanyIds:', Array.from(ids))
+    return ids
+  }, [companies])
 
   const companyFontFamily = useMemo(() => {
     const diagramFont = selectedCompany?.diagramFont as ExcalidrawFont | undefined
@@ -64,6 +76,14 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
   // Sidebar state
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const sidebarRef = useRef<DiagramLibrarySidebarHandle | null>(null)
+  // Ref to track if we're in the middle of receiving collaboration data
+  const isReceivingCollaborationDataRef = useRef(false)
+  // Collaboration error state
+  const [collaborationError, setCollaborationError] = useState<string | null>(null)
+  // Ref to store broadcastSceneUpdate function from collaboration hook
+  const broadcastSceneUpdateRef = useRef<((elements?: any[], appState?: any) => void) | null>(null)
+  // Ref to suppress onChange callbacks after programmatic scene updates (prevents broadcast loops)
+  const suppressOnChangeRef = useRef(false)
 
   // Custom hooks for state management
   const {
@@ -148,6 +168,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     handleImportJSON,
     handleExportPNG,
     handleManualSync,
+    isLoadingRef,
   } = useDiagramHandlers(
     excalidrawAPI,
     currentDiagram,
@@ -159,7 +180,9 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     open => updateDialogState('saveDialogOpen', open),
     open => updateDialogState('saveAsDialogOpen', open),
     lastSavedScene,
-    companyFontFamily
+    companyFontFamily,
+    broadcastSceneUpdateRef,
+    suppressOnChangeRef
   )
 
   // Capability Map Generator Handler
@@ -268,7 +291,43 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
   useEffect(() => {
     // Skip on first mount when prev is undefined
     const prev = prevCompanyIdRef.current
+
     if (prev !== null && selectedCompanyId !== prev) {
+      console.log('===== COMPANY CHANGE EFFECT =====')
+      console.log('[DiagramEditor] Company changed from', prev, 'to', selectedCompanyId)
+      console.log('[DiagramEditor] isCollaborating:', isCollaborating)
+      console.log(
+        '[DiagramEditor] isReceivingCollaborationDataRef.current:',
+        isReceivingCollaborationDataRef.current
+      )
+      console.log('[DiagramEditor] isLoadingRef.current:', isLoadingRef?.current)
+      console.log('[DiagramEditor] currentDiagram:', currentDiagram?.id, currentDiagram?.title)
+
+      // Don't clear the canvas during active collaboration
+      // The collaboration system will handle content synchronization
+      if (isCollaborating) {
+        console.log('[DiagramEditor] ✓ Skipping canvas clear: active collaboration')
+        prevCompanyIdRef.current = selectedCompanyId ?? null
+        return
+      }
+
+      // Don't clear if we're receiving collaboration data (initial sync)
+      if (isReceivingCollaborationDataRef.current) {
+        console.log('[DiagramEditor] ✓ Skipping canvas clear: receiving collaboration data')
+        prevCompanyIdRef.current = selectedCompanyId ?? null
+        return
+      }
+
+      // Don't clear if we're loading a diagram
+      if (isLoadingRef?.current) {
+        console.log('[DiagramEditor] ✓ Skipping canvas clear: loading diagram')
+        prevCompanyIdRef.current = selectedCompanyId ?? null
+        return
+      }
+
+      console.log('[DiagramEditor] ✗ CLEARING CANVAS for company change')
+      console.warn('[DiagramEditor] DIAGRAM WILL BE CLEARED!')
+
       // Perform a silent reset of the editor state
       try {
         if (excalidrawAPI) {
@@ -320,6 +379,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     setLastSavedScene,
     updateDialogState,
     companyFontFamily,
+    isCollaborating,
   ])
 
   useEffect(() => {
@@ -384,14 +444,158 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     })
   }
 
+  // Stop collaboration handler
+  const handleStopCollaboration = useCallback(() => {
+    if (typeof window !== 'undefined' && (window as any).__stopCollaboration) {
+      ;(window as any).__stopCollaboration()
+      setIsCollaborating(false)
+      setCollaborationError(null)
+    }
+  }, [])
+
+  // Store broadcast function reference for use in handlers
+  const handleBroadcastReady = useCallback(
+    (broadcastFn: (elements?: any[], appState?: any) => void) => {
+      console.log('[DiagramEditor] broadcastSceneUpdate function received')
+      broadcastSceneUpdateRef.current = broadcastFn
+    },
+    []
+  )
+
+  // Expose error setter for collaboration errors
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      ;(window as any).__setCollaborationError = setCollaborationError
+    }
+  }, [])
+
   // Handle diagram metadata updates from collaboration
   const handleCollaborationDiagramUpdate = useCallback(
     (diagram: any) => {
-      if (diagram && diagram.id && diagram.title) {
-        setCurrentDiagram(diagram)
+      // Skip if no diagram
+      if (!diagram) {
+        return
+      }
+
+      console.log('[DiagramEditor] Collaboration diagram update:', {
+        id: diagram.id,
+        title: diagram.title,
+        companyId: Array.isArray(diagram.company) ? diagram.company[0]?.id : diagram.company?.id,
+      })
+
+      // Extract company ID from diagram (it's an array in GraphQL response)
+      const diagramCompanyId = Array.isArray(diagram.company)
+        ? diagram.company[0]?.id
+        : diagram.company?.id || diagram.companyId
+
+      // Check if user has access to this company
+      if (diagramCompanyId) {
+        const hasAccess = isAdmin() || accessibleCompanyIds.has(diagramCompanyId)
+
+        if (!hasAccess) {
+          // User doesn't have access - show error and stop collaboration
+          console.error('[DiagramEditor] Access denied to company:', diagramCompanyId)
+          enqueueSnackbar(collaborationTranslations('companyPermissionDenied'), {
+            variant: 'error',
+          })
+
+          // Stop the collaboration properly
+          handleStopCollaboration()
+          // Remove room parameter from URL
+          if (typeof window !== 'undefined') {
+            const url = new URL(window.location.href)
+            url.searchParams.delete('room')
+            window.history.replaceState({}, '', url.toString())
+          }
+          return // Don't update diagram or switch company
+        }
+
+        // User has access - update metadata WITHOUT calling setCurrentDiagram with full diagram object
+        // This prevents triggering any diagram loading logic that would clear the canvas
+        // The canvas content comes from the WebSocket collaboration stream, not from database load
+
+        // Set ref to prevent canvas clearing during company switch
+        isReceivingCollaborationDataRef.current = true
+
+        // Only update the currentDiagram state to match the collaboration diagram metadata
+        // Use functional update to merge with existing state without triggering load
+        setCurrentDiagram((prev: any) => ({
+          ...prev,
+          id: diagram.id,
+          title: diagram.title,
+          description: diagram.description,
+          diagramType: diagram.diagramType,
+          company: diagram.company,
+          companyId: diagramCompanyId,
+          architecture: diagram.architecture,
+        }))
+
+        // Then switch company if needed
+        if (diagramCompanyId !== selectedCompanyId) {
+          console.log('[DiagramEditor] Switching company to:', diagramCompanyId)
+          setSelectedCompanyId(diagramCompanyId)
+        }
+
+        // Reset the flag after a short delay
+        setTimeout(() => {
+          isReceivingCollaborationDataRef.current = false
+        }, 500)
+      } else {
+        // No company ID in diagram - just update metadata
+        setCurrentDiagram((prev: any) => ({
+          ...prev,
+          id: diagram.id,
+          title: diagram.title,
+          description: diagram.description,
+          diagramType: diagram.diagramType,
+          architecture: diagram.architecture,
+        }))
       }
     },
-    [setCurrentDiagram]
+    [
+      setCurrentDiagram,
+      selectedCompanyId,
+      accessibleCompanyIds,
+      setSelectedCompanyId,
+      enqueueSnackbar,
+      collaborationTranslations,
+      handleStopCollaboration,
+      isCollaborating,
+    ]
+  )
+
+  // Authorization callback for collaboration - check BEFORE loading scene
+  const authorizeCollaborationAccess = useCallback(
+    (diagram: any) => {
+      if (!diagram) {
+        return 'allow' // Allow if no diagram info
+      }
+
+      const diagramCompanyId = Array.isArray(diagram.company)
+        ? diagram.company[0]?.id
+        : diagram.company?.id || diagram.companyId
+
+      if (!diagramCompanyId) {
+        console.warn('[DiagramEditor] No company ID in diagram for authorization')
+        return 'allow' // Allow if no company specified
+      }
+
+      const hasAccess = isAdmin() || accessibleCompanyIds.has(diagramCompanyId)
+
+      if (!hasAccess) {
+        console.error(
+          '[DiagramEditor] Authorization denied - no access to company:',
+          diagramCompanyId
+        )
+        enqueueSnackbar(collaborationTranslations('companyPermissionDenied'), {
+          variant: 'error',
+        })
+        return 'deny'
+      }
+
+      return 'allow'
+    },
+    [accessibleCompanyIds, enqueueSnackbar, collaborationTranslations]
   )
 
   // Handle collaboration status changes
@@ -423,9 +627,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
         enqueueSnackbar(message, { variant: failure === 'missing-company' ? 'warning' : 'error' })
       }
 
-      return failure
-        ? ({ allowed: false as const, reason: failure })
-        : ({ allowed: true as const })
+      return failure ? { allowed: false as const, reason: failure } : { allowed: true as const }
     },
     [accessibleCompanyIds, collaborationTranslations, enqueueSnackbar]
   )
@@ -721,6 +923,11 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
             currentDiagram={currentDiagram}
             onDiagramUpdate={handleCollaborationDiagramUpdate}
             onCollaborationStatusChange={handleCollaborationStatusChange}
+            onStopCollaboration={handleStopCollaboration}
+            onBroadcastReady={handleBroadcastReady}
+            isLoadingRef={isLoadingRef}
+            suppressOnChangeRef={suppressOnChangeRef}
+            authorizeAccess={authorizeCollaborationAccess}
             selectedElementForRelatedElements={selectedElementForRelatedElements}
             onOpenAddRelatedElementsDialog={handleOpenAddRelatedElementsDialog}
             onCloseAddRelatedElementsDialog={handleCloseAddRelatedElementsDialog}

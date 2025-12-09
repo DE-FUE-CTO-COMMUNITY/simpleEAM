@@ -70,6 +70,7 @@ interface UseExcalidrawCollaborationProps {
   onCollaboratorLeave?: (collaborator: Collaborator) => void
   currentDiagram?: any // Add current diagram data for sharing
   onDiagramUpdate?: (diagram: any) => void // Callback when diagram metadata is received
+  authorizeAccess?: (diagram: any) => 'allow' | 'deny' | 'ignore' // Authorization callback
 }
 
 export const useExcalidrawCollaboration = ({
@@ -80,6 +81,7 @@ export const useExcalidrawCollaboration = ({
   onCollaboratorLeave: _onCollaboratorLeave,
   currentDiagram,
   onDiagramUpdate,
+  authorizeAccess,
 }: UseExcalidrawCollaborationProps): CollaborationAPI => {
   const [state, setState] = useState<CollaborationState>({
     isCollaborating: false,
@@ -249,9 +251,38 @@ export const useExcalidrawCollaboration = ({
             const dataString = decoder.decode(encryptedData)
             const sceneData = JSON.parse(dataString)
             if (excalidrawAPI && sceneData && sceneData.elements !== undefined) {
+              // SECURITY: Check authorization BEFORE processing diagram data
+              if (sceneData.diagram && authorizeAccess) {
+                const authResult = authorizeAccess(sceneData.diagram)
+                console.log(
+                  '[useExcalidrawCollaboration] Authorization check:',
+                  authResult,
+                  'for diagram:',
+                  sceneData.diagram
+                )
+
+                if (authResult === 'deny') {
+                  console.warn(
+                    '[useExcalidrawCollaboration] Access denied to diagram, stopping collaboration'
+                  )
+                  isReceivingUpdateRef.current = false
+                  stopCollaboration()
+                  return
+                }
+              }
+
               // Handle diagram metadata update
               if (sceneData.diagram && onDiagramUpdate) {
+                console.log(
+                  '[useExcalidrawCollaboration] Received diagram metadata:',
+                  sceneData.diagram
+                )
                 onDiagramUpdate(sceneData.diagram)
+              } else {
+                console.log('[useExcalidrawCollaboration] No diagram metadata in scene data:', {
+                  hasDiagram: !!sceneData.diagram,
+                  hasOnDiagramUpdate: !!onDiagramUpdate,
+                })
               }
 
               // Mark that we've received initial scene data
@@ -265,6 +296,13 @@ export const useExcalidrawCollaboration = ({
               // Temporarily remove the broadcast function to prevent loops
               const originalBroadcast = (excalidrawAPI as any).broadcastSceneUpdate
               delete (excalidrawAPI as any).broadcastSceneUpdate
+
+              // CRITICAL: Set suppressOnChange flag BEFORE calling updateScene
+              // This prevents the onChange callback from running at all
+              const suppressOnChangeRef = (excalidrawAPI as any).suppressOnChangeRef
+              if (suppressOnChangeRef) {
+                suppressOnChangeRef.current = true
+              }
 
               excalidrawAPI.updateScene({
                 elements: sceneData.elements || [],
@@ -333,6 +371,7 @@ export const useExcalidrawCollaboration = ({
 
       try {
         // Create a complete data structure to broadcast with diagram metadata
+        // IMPORTANT: Only send minimal diagram metadata, not the entire GraphQL object
         const sceneData = {
           elements,
           appState: {
@@ -344,8 +383,13 @@ export const useExcalidrawCollaboration = ({
             ? {
                 id: currentDiagram.id,
                 title: currentDiagram.title,
-                // Include other relevant diagram metadata
-                ...currentDiagram,
+                description: currentDiagram.description,
+                diagramType: currentDiagram.diagramType,
+                company: currentDiagram.company, // Array with {id, name}
+                companyId: Array.isArray(currentDiagram.company)
+                  ? currentDiagram.company[0]?.id
+                  : currentDiagram.company?.id,
+                architecture: currentDiagram.architecture, // Array with architecture info
               }
             : null,
         }
@@ -400,5 +444,6 @@ export const useExcalidrawCollaboration = ({
     collaborators: state.collaborators,
     roomId: state.roomId,
     broadcastSceneUpdate,
+    isReceivingUpdateRef,
   }
 }
