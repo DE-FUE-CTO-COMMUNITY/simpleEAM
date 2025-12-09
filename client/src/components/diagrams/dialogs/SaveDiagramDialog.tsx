@@ -566,8 +566,9 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
 
     setSaving(true)
     try {
-      // PNG-Generierung vor dem Speichern
+      // PNG-Generierung vor dem Speichern (light and dark mode)
       let diagramPng: string | null = null
+      let diagramPngDark: string | null = null
       try {
         const parsedDiagramData = JSON.parse(dataToSave)
         const elements = parsedDiagramData.elements || []
@@ -578,25 +579,49 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
 
           const appState = parsedDiagramData.appState || {}
 
-          // Export to PNG blob
-          const blob = await exportToBlob({
+          // Generate light mode preview
+          const lightBlob = await exportToBlob({
             elements,
             appState: {
               ...appState,
+              collaborators: undefined,
               exportBackground: true,
-              viewBackgroundColor: appState.viewBackgroundColor || '#ffffff',
+              viewBackgroundColor: '#ffffff',
               exportWithDarkMode: false,
               exportEmbedScene: false,
             },
             files: {},
             mimeType: 'image/png',
-            quality: 0.95,
+            quality: 0.85,
+            exportPadding: 20,
+            backgroundColor: '#ffffff',
+          })
+
+          // Generate dark mode preview with dark background
+          // Note: exportWithDarkMode applies an invert filter to the entire canvas,
+          // so we need to pass white (#ffffff) which will be inverted to dark (#121212)
+          const darkAppState = {
+            ...appState,
+            collaborators: undefined,
+            exportBackground: true,
+            viewBackgroundColor: '#ffffff', // Will be inverted to dark by THEME_FILTER
+            exportWithDarkMode: true,
+            exportEmbedScene: false,
+            theme: 'dark',
+          }
+
+          const darkBlob = await exportToBlob({
+            elements,
+            appState: darkAppState,
+            files: {},
+            mimeType: 'image/png',
+            quality: 0.85,
             exportPadding: 20,
           })
 
-          if (blob) {
-            // Convert blob to base64
-            const arrayBuffer = await blob.arrayBuffer()
+          if (lightBlob) {
+            // Convert light blob to base64
+            const arrayBuffer = await lightBlob.arrayBuffer()
             const base64String = btoa(
               new Uint8Array(arrayBuffer).reduce(
                 (data, byte) => data + String.fromCharCode(byte),
@@ -604,6 +629,18 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
               )
             )
             diagramPng = base64String
+          }
+
+          if (darkBlob) {
+            // Convert dark blob to base64
+            const arrayBuffer = await darkBlob.arrayBuffer()
+            const base64String = btoa(
+              new Uint8Array(arrayBuffer).reduce(
+                (data, byte) => data + String.fromCharCode(byte),
+                ''
+              )
+            )
+            diagramPngDark = base64String
           }
         }
       } catch (pngError) {
@@ -617,6 +654,7 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
         diagramJson: dataToSave,
         diagramType: diagramType,
         ...(diagramPng && { diagramPng }),
+        ...(diagramPngDark && { diagramPngDark }),
         // Safety: always connect diagram to the selected company on create
         ...(selectedCompanyId && {
           company: {
@@ -675,6 +713,7 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
           diagramJson: { set: dataToSave },
           diagramType: { set: diagramType },
           ...(diagramPng && { diagramPng: { set: diagramPng } }),
+          ...(diagramPngDark && { diagramPngDark: { set: diagramPngDark } }),
           // Only update company if it actually changed
           ...(shouldUpdateCompany && {
             company: {
