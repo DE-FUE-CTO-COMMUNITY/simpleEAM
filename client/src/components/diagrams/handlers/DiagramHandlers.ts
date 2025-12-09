@@ -28,8 +28,8 @@ export const useDiagramHandlers = (
   setHasUnsavedChanges: (hasChanges: boolean) => void,
   setLastSavedScene: (scene: any) => void,
   setNotification: (notification: NotificationState) => void,
-  _setSaveDialogOpen: (open: boolean) => void,
-  _setSaveAsDialogOpen: (open: boolean) => void,
+  setSaveDialogOpen: (open: boolean) => void,
+  setSaveAsDialogOpen: (open: boolean) => void,
   _lastSavedScene: any,
   defaultFontFamily: number,
   broadcastSceneUpdateRef?: React.MutableRefObject<
@@ -448,8 +448,8 @@ export const useDiagramHandlers = (
 
   // Save Diagram Handler
   const handleSaveDiagram = useCallback(
-    async (savedDiagram: any) => {
-      if (!excalidrawAPI) return
+    async (savedDiagram: any): Promise<boolean> => {
+      if (!excalidrawAPI) return false
 
       try {
         // Set saving flag to prevent onChange from setting hasUnsavedChanges to true
@@ -474,16 +474,16 @@ export const useDiagramHandlers = (
           // Continue with local saving even if sync fails
         }
 
+        // Close dialog before updating state (like diagrams-new)
+        setSaveDialogOpen(false)
+
+        // Update state
         setCurrentDiagram(savedDiagram)
         setHasUnsavedChanges(false)
         setLastSavedScene(sceneData)
 
         // Broadcast updated diagram metadata to collaborators
         if (broadcastSceneUpdateRef?.current) {
-          console.log(
-            '[DiagramHandlers] Broadcasting diagram metadata update after save:',
-            savedDiagram
-          )
           broadcastSceneUpdateRef.current(elements, appState)
         }
 
@@ -502,6 +502,8 @@ export const useDiagramHandlers = (
         setTimeout(() => {
           isSavingRef.current = false
         }, 100)
+
+        return true
       } catch (err) {
         console.error('Error saving diagram:', err)
         // Reset saving flag on error
@@ -511,6 +513,7 @@ export const useDiagramHandlers = (
           message: 'errors.saveDiagramError',
           severity: 'error',
         })
+        return false
       }
     },
     [
@@ -520,14 +523,18 @@ export const useDiagramHandlers = (
       setHasUnsavedChanges,
       setLastSavedScene,
       setNotification,
+      setSaveDialogOpen,
     ]
   )
 
   // Save As Diagram Handler
   const handleSaveAsDiagram = useCallback(
-    (savedDiagram: any) => {
+    async (savedDiagram: any): Promise<boolean> => {
       // Set saving flag briefly for consistency
       isSavingRef.current = true
+
+      // Close dialog before updating state (like diagrams-new)
+      setSaveAsDialogOpen(false)
 
       setCurrentDiagram(savedDiagram)
       setHasUnsavedChanges(false) // Also reset unsaved changes for Save As
@@ -545,8 +552,10 @@ export const useDiagramHandlers = (
       setTimeout(() => {
         isSavingRef.current = false
       }, 100)
+
+      return true
     },
-    [setCurrentDiagram, setHasUnsavedChanges, setNotification]
+    [setCurrentDiagram, setHasUnsavedChanges, setNotification, setSaveAsDialogOpen]
   )
 
   // Change Handler - uses Excalidraw's native onChange to detect ANY change

@@ -67,13 +67,6 @@ export default function ElementFormDialog({
   const databaseId = customData?.databaseId
   const elementType = customData?.elementType // Changed from 'type' to 'elementType'
 
-  console.log('ElementFormDialog Debug:', {
-    element: element.id,
-    customData,
-    databaseId,
-    elementType,
-  })
-
   if (!databaseId || !elementType) {
     console.warn('Element has no database ID or elementType:', element)
     return null

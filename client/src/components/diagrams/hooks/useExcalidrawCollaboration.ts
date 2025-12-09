@@ -318,12 +318,6 @@ export const useExcalidrawCollaboration = ({
             // SECURITY: Check authorization BEFORE processing diagram data
             if (sceneData.diagram && authorizeAccess) {
               const authResult = authorizeAccess(sceneData.diagram)
-              console.log(
-                '[useExcalidrawCollaboration] Authorization check:',
-                authResult,
-                'for diagram:',
-                sceneData.diagram
-              )
 
               if (authResult === 'deny') {
                 console.warn(
@@ -337,21 +331,14 @@ export const useExcalidrawCollaboration = ({
 
             // Handle diagram metadata update
             if (sceneData.diagram && onDiagramUpdate) {
-              console.log(
-                '[useExcalidrawCollaboration] Received diagram metadata:',
-                sceneData.diagram
-              )
               onDiagramUpdate(sceneData.diagram)
-            } else {
-              console.log('[useExcalidrawCollaboration] No diagram metadata in scene data:', {
-                hasDiagram: !!sceneData.diagram,
-                hasOnDiagramUpdate: !!onDiagramUpdate,
-              })
             }
 
             // Update collaborator info from received broadcast (BEFORE checking elements)
-            if (sceneData?.collaborator?.id && sceneData.collaborator.id !== socketRef.current?.id) {
-              console.log('[useExcalidrawCollaboration] Received collaborator info:', sceneData.collaborator)
+            if (
+              sceneData?.collaborator?.id &&
+              sceneData.collaborator.id !== socketRef.current?.id
+            ) {
               setState(prev => {
                 const updated = new Map(prev.collaborators)
                 const existing = updated.get(sceneData.collaborator!.id)

@@ -53,13 +53,8 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
   const collaborationTranslations = useTranslations('diagrams.collaborationDialog')
   const { currentPerson } = useCurrentPerson()
 
-  console.log('[DiagramEditor] selectedCompanyId:', selectedCompanyId)
-  console.log('[DiagramEditor] currentPerson:', currentPerson)
-  console.log('[DiagramEditor] companies:', companies)
-
   const accessibleCompanyIds = useMemo(() => {
     const ids = new Set(companies.map(company => company.id))
-    console.log('[DiagramEditor] accessibleCompanyIds:', Array.from(ids))
     return ids
   }, [companies])
 
@@ -293,40 +288,24 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     const prev = prevCompanyIdRef.current
 
     if (prev !== null && selectedCompanyId !== prev) {
-      console.log('===== COMPANY CHANGE EFFECT =====')
-      console.log('[DiagramEditor] Company changed from', prev, 'to', selectedCompanyId)
-      console.log('[DiagramEditor] isCollaborating:', isCollaborating)
-      console.log(
-        '[DiagramEditor] isReceivingCollaborationDataRef.current:',
-        isReceivingCollaborationDataRef.current
-      )
-      console.log('[DiagramEditor] isLoadingRef.current:', isLoadingRef?.current)
-      console.log('[DiagramEditor] currentDiagram:', currentDiagram?.id, currentDiagram?.title)
-
       // Don't clear the canvas during active collaboration
       // The collaboration system will handle content synchronization
       if (isCollaborating) {
-        console.log('[DiagramEditor] ✓ Skipping canvas clear: active collaboration')
         prevCompanyIdRef.current = selectedCompanyId ?? null
         return
       }
 
       // Don't clear if we're receiving collaboration data (initial sync)
       if (isReceivingCollaborationDataRef.current) {
-        console.log('[DiagramEditor] ✓ Skipping canvas clear: receiving collaboration data')
         prevCompanyIdRef.current = selectedCompanyId ?? null
         return
       }
 
       // Don't clear if we're loading a diagram
       if (isLoadingRef?.current) {
-        console.log('[DiagramEditor] ✓ Skipping canvas clear: loading diagram')
         prevCompanyIdRef.current = selectedCompanyId ?? null
         return
       }
-
-      console.log('[DiagramEditor] ✗ CLEARING CANVAS for company change')
-      console.warn('[DiagramEditor] DIAGRAM WILL BE CLEARED!')
 
       // Perform a silent reset of the editor state
       try {
@@ -456,7 +435,6 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
   // Store broadcast function reference for use in handlers
   const handleBroadcastReady = useCallback(
     (broadcastFn: (elements?: any[], appState?: any) => void) => {
-      console.log('[DiagramEditor] broadcastSceneUpdate function received')
       broadcastSceneUpdateRef.current = broadcastFn
     },
     []
@@ -477,12 +455,6 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
         return
       }
 
-      console.log('[DiagramEditor] Collaboration diagram update:', {
-        id: diagram.id,
-        title: diagram.title,
-        companyId: Array.isArray(diagram.company) ? diagram.company[0]?.id : diagram.company?.id,
-      })
-
       // Extract company ID from diagram (it's an array in GraphQL response)
       const diagramCompanyId = Array.isArray(diagram.company)
         ? diagram.company[0]?.id
@@ -494,7 +466,6 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
 
         if (!hasAccess) {
           // User doesn't have access - show error and stop collaboration
-          console.error('[DiagramEditor] Access denied to company:', diagramCompanyId)
           enqueueSnackbar(collaborationTranslations('companyPermissionDenied'), {
             variant: 'error',
           })
@@ -532,7 +503,6 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
 
         // Then switch company if needed
         if (diagramCompanyId !== selectedCompanyId) {
-          console.log('[DiagramEditor] Switching company to:', diagramCompanyId)
           setSelectedCompanyId(diagramCompanyId)
         }
 
@@ -576,17 +546,12 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
         : diagram.company?.id || diagram.companyId
 
       if (!diagramCompanyId) {
-        console.warn('[DiagramEditor] No company ID in diagram for authorization')
         return 'allow' // Allow if no company specified
       }
 
       const hasAccess = isAdmin() || accessibleCompanyIds.has(diagramCompanyId)
 
       if (!hasAccess) {
-        console.error(
-          '[DiagramEditor] Authorization denied - no access to company:',
-          diagramCompanyId
-        )
         enqueueSnackbar(collaborationTranslations('companyPermissionDenied'), {
           variant: 'error',
         })
