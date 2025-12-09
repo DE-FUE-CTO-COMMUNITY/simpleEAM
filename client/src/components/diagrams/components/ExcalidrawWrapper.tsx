@@ -12,6 +12,7 @@ import AddRelatedElementsDialog from '../dialogs/AddRelatedElementsDialog'
 import { FullCustomContextMenu } from './FullCustomContextMenu'
 import ElementFormDialog from '../dialogs/ElementFormDialog'
 import { ExcalidrawElement } from '../types/relationshipTypes'
+import { useAuth } from '@/lib/auth'
 
 // Dynamischer Import von Excalidraw, um Server-Side-Rendering zu vermeiden
 const ExcalidrawWrapper = dynamic(
@@ -80,6 +81,18 @@ const ExcalidrawWrapper = dynamic(
       const { mode: themeMode } = useThemeMode()
       const { selectedCompany } = useCompanyContext()
       const themeConfig = useThemeConfig()
+      const { keycloak } = useAuth()
+
+      // Get username from Keycloak token
+      const username = useMemo(() => {
+        if (keycloak?.tokenParsed) {
+          const firstName = keycloak.tokenParsed.given_name || ''
+          const lastName = keycloak.tokenParsed.family_name || ''
+          const fullName = `${firstName} ${lastName}`.trim()
+          return fullName || keycloak.tokenParsed.preferred_username || 'Anonymous User'
+        }
+        return 'Anonymous User'
+      }, [keycloak?.tokenParsed])
 
       const excalidrawBranding = useMemo(
         () => ({
@@ -104,7 +117,7 @@ const ExcalidrawWrapper = dynamic(
         isReceivingUpdateRef,
       } = useExcalidrawCollaboration({
         excalidrawAPI: apiRef.current,
-        username: 'User', // TODO: Get from auth context
+        username,
         currentDiagram,
         onDiagramUpdate,
         authorizeAccess,
