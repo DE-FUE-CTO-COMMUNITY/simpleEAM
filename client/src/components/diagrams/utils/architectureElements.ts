@@ -108,18 +108,31 @@ function applyMetadataToContainers(
     ? candidates
     : templateElements.filter(element => element.type === 'rectangle')
 
+  // Mark the first rectangle as the main element
+  let isFirst = true
   targetRectangles.forEach(rectangle => {
     const clone = cloneByOriginalId.get(rectangle.id)
     if (!clone) {
       return
     }
     clone.strokeColor = '#1e1e1e'
-    clone.customData = {
-      ...(clone.customData ?? {}),
-      architectureElement: {
-        ...metadata,
-        role: 'container',
-      },
+    
+    if (isFirst) {
+      // Main container gets full metadata (old format for compatibility)
+      clone.customData = {
+        isFromDatabase: true,
+        databaseId: metadata.referenceId,
+        elementType: metadata.elementType,
+        elementName: metadata.referenceName,
+        isMainElement: true,
+      }
+      isFirst = false
+    } else {
+      // Other elements just reference the main element
+      clone.customData = {
+        isFromDatabase: true,
+        isMainElement: false,
+      }
     }
   })
 }
@@ -173,13 +186,10 @@ function applyMetadataToTexts({
       clone.containerId = containerClone.id
     }
 
+    // Text elements just reference that they're from database
     clone.customData = {
-      ...(clone.customData ?? {}),
-      architectureElement: {
-        ...metadata,
-        role: 'label',
-        parentId: containerClone?.id,
-      },
+      isFromDatabase: true,
+      isMainElement: false,
     }
   })
 }
@@ -189,15 +199,13 @@ function markRemainingShapes(
   metadata: ArchitectureElementMetadata
 ) {
   cloneByOriginalId.forEach(clone => {
-    if (clone.customData?.architectureElement) {
-      return
+    if (clone.customData) {
+      return // Already has customData
     }
+    // Icon elements just reference that they're from database
     clone.customData = {
-      ...(clone.customData ?? {}),
-      architectureElement: {
-        ...metadata,
-        role: 'icon',
-      },
+      isFromDatabase: true,
+      isMainElement: false,
     }
   })
 }
