@@ -116,7 +116,7 @@ function applyMetadataToContainers(
       return
     }
     clone.strokeColor = '#1e1e1e'
-    
+
     if (isFirst) {
       // Main container gets full metadata (old format for compatibility)
       clone.customData = {
