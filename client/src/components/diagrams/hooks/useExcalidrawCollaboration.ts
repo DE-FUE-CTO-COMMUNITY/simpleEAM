@@ -70,16 +70,18 @@ interface UseExcalidrawCollaborationProps {
   onCollaboratorLeave?: (collaborator: Collaborator) => void
   currentDiagram?: any // Add current diagram data for sharing
   onDiagramUpdate?: (diagram: any) => void // Callback when diagram metadata is received
+  authorizeAccess?: (diagram: any) => 'allow' | 'deny' | 'ignore' // Authorization callback
 }
 
 export const useExcalidrawCollaboration = ({
   excalidrawAPI,
-  username: _username = 'Anonymous User',
-  userAvatarUrl: _userAvatarUrl,
+  username: providedUsername = 'Anonymous User',
+  userAvatarUrl,
   onCollaboratorJoin,
   onCollaboratorLeave: _onCollaboratorLeave,
   currentDiagram,
   onDiagramUpdate,
+  authorizeAccess,
 }: UseExcalidrawCollaborationProps): CollaborationAPI => {
   const [state, setState] = useState<CollaborationState>({
     isCollaborating: false,
@@ -94,6 +96,8 @@ export const useExcalidrawCollaboration = ({
   const hasReceivedInitialSceneRef = useRef(false)
   // Track if we're the first user in the room
   const isFirstUserRef = useRef(false)
+  // Track the current socket for comparison
+  const socketRef = useRef<Socket | null>(null)
 
   // Get Excalidraw WebSocket server URL from runtime config
   const excalidrawConfig = useExcalidrawConfig()
@@ -113,6 +117,7 @@ export const useExcalidrawCollaboration = ({
     })
 
     // Reset refs
+    socketRef.current = null
     isReceivingUpdateRef.current = false
     hasReceivedInitialSceneRef.current = false
     isFirstUserRef.current = false
@@ -152,9 +157,55 @@ export const useExcalidrawCollaboration = ({
           autoConnect: true,
         })
 
+        // Store socket reference
+        socketRef.current = socket
+
+        // Helper to get diagram snapshot - only if we're first user or have received initial scene
+        const getCurrentDiagramSnapshot = () => {
+          if (!isFirstUserRef.current && !hasReceivedInitialSceneRef.current) {
+            return null
+          }
+          return currentDiagram
+            ? {
+                id: currentDiagram.id,
+                title: currentDiagram.title,
+                description: currentDiagram.description,
+                diagramType: currentDiagram.diagramType,
+                company: currentDiagram.company,
+                companyId: currentDiagram.companyId,
+                architecture: currentDiagram.architecture,
+              }
+            : null
+        }
+
+        // Function to broadcast collaborator presence (name, avatar) to other users
+        const emitCollaboratorPresence = () => {
+          if (!socket.id) {
+            return
+          }
+          try {
+            const payload = {
+              diagram: getCurrentDiagramSnapshot(),
+              collaborator: {
+                id: socket.id,
+                name: providedUsername,
+                avatarUrl: userAvatarUrl,
+              },
+            }
+            const encoder = new TextEncoder()
+            const dataBuffer = encoder.encode(JSON.stringify(payload)).buffer
+            const iv = new Uint8Array(16)
+            socket.emit('server-broadcast', roomId, dataBuffer, iv)
+          } catch (error) {
+            console.error('Failed to broadcast collaborator presence:', error)
+          }
+        }
+
         // Set up event listeners
         socket.on('connect', () => {
           socket.emit('join-room', roomId)
+          // Broadcast presence after joining so others know our name
+          setTimeout(emitCollaboratorPresence, 100)
         })
 
         socket.on('connect_error', error => {
@@ -201,6 +252,13 @@ export const useExcalidrawCollaboration = ({
                         ...currentDiagram,
                       }
                     : null,
+                  collaborator: socket.id
+                    ? {
+                        id: socket.id,
+                        name: providedUsername,
+                        avatarUrl: userAvatarUrl,
+                      }
+                    : undefined,
                 }
 
                 // Convert to ArrayBuffer for compatibility with excalidraw-room server
@@ -226,7 +284,9 @@ export const useExcalidrawCollaboration = ({
             const newCollaborators = new Map<string, Collaborator>()
             userIds.forEach(userId => {
               if (userId !== socket.id) {
-                const collaborator: Collaborator = {
+                // Preserve existing collaborator info if available
+                const existing = prev.collaborators.get(userId)
+                const collaborator: Collaborator = existing || {
                   id: userId,
                   name: `User ${userId.substring(0, 8)}`,
                 }
@@ -248,12 +308,54 @@ export const useExcalidrawCollaboration = ({
             const decoder = new TextDecoder()
             const dataString = decoder.decode(encryptedData)
             const sceneData = JSON.parse(dataString)
-            if (excalidrawAPI && sceneData && sceneData.elements !== undefined) {
-              // Handle diagram metadata update
-              if (sceneData.diagram && onDiagramUpdate) {
-                onDiagramUpdate(sceneData.diagram)
-              }
 
+            // Skip processing our own broadcasts
+            if (sceneData?.collaborator?.id === socket.id) {
+              isReceivingUpdateRef.current = false
+              return
+            }
+
+            // SECURITY: Check authorization BEFORE processing diagram data
+            if (sceneData.diagram && authorizeAccess) {
+              const authResult = authorizeAccess(sceneData.diagram)
+
+              if (authResult === 'deny') {
+                console.warn(
+                  '[useExcalidrawCollaboration] Access denied to diagram, stopping collaboration'
+                )
+                isReceivingUpdateRef.current = false
+                stopCollaboration()
+                return
+              }
+            }
+
+            // Handle diagram metadata update
+            if (sceneData.diagram && onDiagramUpdate) {
+              onDiagramUpdate(sceneData.diagram)
+            }
+
+            // Update collaborator info from received broadcast (BEFORE checking elements)
+            if (
+              sceneData?.collaborator?.id &&
+              sceneData.collaborator.id !== socketRef.current?.id
+            ) {
+              setState(prev => {
+                const updated = new Map(prev.collaborators)
+                const existing = updated.get(sceneData.collaborator!.id)
+                updated.set(sceneData.collaborator!.id, {
+                  id: sceneData.collaborator!.id,
+                  name:
+                    sceneData.collaborator!.name?.trim() ||
+                    existing?.name ||
+                    `User ${sceneData.collaborator!.id.substring(0, 8)}`,
+                  avatarUrl: sceneData.collaborator!.avatarUrl ?? existing?.avatarUrl,
+                })
+                return { ...prev, collaborators: updated }
+              })
+            }
+
+            // Only update scene if elements are provided
+            if (excalidrawAPI && sceneData && Array.isArray(sceneData.elements)) {
               // Mark that we've received initial scene data
               if (!hasReceivedInitialSceneRef.current) {
                 hasReceivedInitialSceneRef.current = true
@@ -265,6 +367,13 @@ export const useExcalidrawCollaboration = ({
               // Temporarily remove the broadcast function to prevent loops
               const originalBroadcast = (excalidrawAPI as any).broadcastSceneUpdate
               delete (excalidrawAPI as any).broadcastSceneUpdate
+
+              // CRITICAL: Set suppressOnChange flag BEFORE calling updateScene
+              // This prevents the onChange callback from running at all
+              const suppressOnChangeRef = (excalidrawAPI as any).suppressOnChangeRef
+              if (suppressOnChangeRef) {
+                suppressOnChangeRef.current = true
+              }
 
               excalidrawAPI.updateScene({
                 elements: sceneData.elements || [],
@@ -333,6 +442,7 @@ export const useExcalidrawCollaboration = ({
 
       try {
         // Create a complete data structure to broadcast with diagram metadata
+        // IMPORTANT: Only send minimal diagram metadata, not the entire GraphQL object
         const sceneData = {
           elements,
           appState: {
@@ -344,8 +454,13 @@ export const useExcalidrawCollaboration = ({
             ? {
                 id: currentDiagram.id,
                 title: currentDiagram.title,
-                // Include other relevant diagram metadata
-                ...currentDiagram,
+                description: currentDiagram.description,
+                diagramType: currentDiagram.diagramType,
+                company: currentDiagram.company, // Array with {id, name}
+                companyId: Array.isArray(currentDiagram.company)
+                  ? currentDiagram.company[0]?.id
+                  : currentDiagram.company?.id,
+                architecture: currentDiagram.architecture, // Array with architecture info
               }
             : null,
         }
@@ -400,5 +515,6 @@ export const useExcalidrawCollaboration = ({
     collaborators: state.collaborators,
     roomId: state.roomId,
     broadcastSceneUpdate,
+    isReceivingUpdateRef,
   }
 }

@@ -169,11 +169,13 @@ const RecentDiagramsSection: React.FC = () => {
                     description={diagram.description}
                     diagramType={diagram.diagramType}
                     diagramPng={diagram.diagramPng}
+                    diagramPngDark={diagram.diagramPngDark}
                     createdAt={diagram.createdAt}
                     updatedAt={diagram.updatedAt}
                     creator={diagram.creator}
                     architecture={diagram.architecture}
                     diagramJson={diagram.diagramJson}
+                    company={diagram.company}
                   />
                 </Grid>
               ))}

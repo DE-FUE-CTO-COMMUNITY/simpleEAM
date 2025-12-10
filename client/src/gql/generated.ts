@@ -16,7 +16,7 @@ export type Scalars = {
   DateTime: { input: any; output: any; }
 };
 
-/** AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management */
+/** AIComponent – represents an AI component within Enterprise Architecture Management */
 export type AiComponent = {
   __typename?: 'AIComponent';
   accuracy?: Maybe<Scalars['Float']['output']>;
@@ -58,7 +58,7 @@ export type AiComponent = {
 };
 
 
-/** AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management */
+/** AIComponent – represents an AI component within Enterprise Architecture Management */
 export type AiComponentCompanyArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -67,7 +67,7 @@ export type AiComponentCompanyArgs = {
 };
 
 
-/** AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management */
+/** AIComponent – represents an AI component within Enterprise Architecture Management */
 export type AiComponentCompanyConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -76,7 +76,7 @@ export type AiComponentCompanyConnectionArgs = {
 };
 
 
-/** AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management */
+/** AIComponent – represents an AI component within Enterprise Architecture Management */
 export type AiComponentDepictedInDiagramsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -85,7 +85,7 @@ export type AiComponentDepictedInDiagramsArgs = {
 };
 
 
-/** AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management */
+/** AIComponent – represents an AI component within Enterprise Architecture Management */
 export type AiComponentDepictedInDiagramsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -94,7 +94,7 @@ export type AiComponentDepictedInDiagramsConnectionArgs = {
 };
 
 
-/** AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management */
+/** AIComponent – represents an AI component within Enterprise Architecture Management */
 export type AiComponentHostedOnArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -103,7 +103,7 @@ export type AiComponentHostedOnArgs = {
 };
 
 
-/** AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management */
+/** AIComponent – represents an AI component within Enterprise Architecture Management */
 export type AiComponentHostedOnConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -112,7 +112,7 @@ export type AiComponentHostedOnConnectionArgs = {
 };
 
 
-/** AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management */
+/** AIComponent – represents an AI component within Enterprise Architecture Management */
 export type AiComponentImplementsPrinciplesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -121,7 +121,7 @@ export type AiComponentImplementsPrinciplesArgs = {
 };
 
 
-/** AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management */
+/** AIComponent – represents an AI component within Enterprise Architecture Management */
 export type AiComponentImplementsPrinciplesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -130,7 +130,7 @@ export type AiComponentImplementsPrinciplesConnectionArgs = {
 };
 
 
-/** AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management */
+/** AIComponent – represents an AI component within Enterprise Architecture Management */
 export type AiComponentOwnersArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -139,7 +139,7 @@ export type AiComponentOwnersArgs = {
 };
 
 
-/** AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management */
+/** AIComponent – represents an AI component within Enterprise Architecture Management */
 export type AiComponentOwnersConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -148,7 +148,7 @@ export type AiComponentOwnersConnectionArgs = {
 };
 
 
-/** AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management */
+/** AIComponent – represents an AI component within Enterprise Architecture Management */
 export type AiComponentPartOfArchitecturesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -157,7 +157,7 @@ export type AiComponentPartOfArchitecturesArgs = {
 };
 
 
-/** AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management */
+/** AIComponent – represents an AI component within Enterprise Architecture Management */
 export type AiComponentPartOfArchitecturesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -166,7 +166,7 @@ export type AiComponentPartOfArchitecturesConnectionArgs = {
 };
 
 
-/** AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management */
+/** AIComponent – represents an AI component within Enterprise Architecture Management */
 export type AiComponentSupportsCapabilitiesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -175,7 +175,7 @@ export type AiComponentSupportsCapabilitiesArgs = {
 };
 
 
-/** AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management */
+/** AIComponent – represents an AI component within Enterprise Architecture Management */
 export type AiComponentSupportsCapabilitiesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -184,7 +184,7 @@ export type AiComponentSupportsCapabilitiesConnectionArgs = {
 };
 
 
-/** AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management */
+/** AIComponent – represents an AI component within Enterprise Architecture Management */
 export type AiComponentTrainedWithDataObjectsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -193,7 +193,7 @@ export type AiComponentTrainedWithDataObjectsArgs = {
 };
 
 
-/** AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management */
+/** AIComponent – represents an AI component within Enterprise Architecture Management */
 export type AiComponentTrainedWithDataObjectsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -202,7 +202,7 @@ export type AiComponentTrainedWithDataObjectsConnectionArgs = {
 };
 
 
-/** AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management */
+/** AIComponent – represents an AI component within Enterprise Architecture Management */
 export type AiComponentUsedByApplicationsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -211,7 +211,7 @@ export type AiComponentUsedByApplicationsArgs = {
 };
 
 
-/** AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management */
+/** AIComponent – represents an AI component within Enterprise Architecture Management */
 export type AiComponentUsedByApplicationsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -220,7 +220,7 @@ export type AiComponentUsedByApplicationsConnectionArgs = {
 };
 
 
-/** AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management */
+/** AIComponent – represents an AI component within Enterprise Architecture Management */
 export type AiComponentUsedByOrganisationsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -229,7 +229,7 @@ export type AiComponentUsedByOrganisationsArgs = {
 };
 
 
-/** AIComponent - repräsentiert eine KI-Komponente im Enterprise Architecture Management */
+/** AIComponent – represents an AI component within Enterprise Architecture Management */
 export type AiComponentUsedByOrganisationsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -616,6 +616,7 @@ export type AiComponentDepictedInDiagramsNodeAggregationWhereInput = {
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramJson?: InputMaybe<StringScalarAggregationFilters>;
   diagramPng?: InputMaybe<StringScalarAggregationFilters>;
+  diagramPngDark?: InputMaybe<StringScalarAggregationFilters>;
   title?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
@@ -651,6 +652,7 @@ export type AiComponentDiagramDepictedInDiagramsNodeAggregateSelection = {
   description: StringAggregateSelection;
   diagramJson: StringAggregateSelection;
   diagramPng: StringAggregateSelection;
+  diagramPngDark: StringAggregateSelection;
   title: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
@@ -1202,7 +1204,7 @@ export type AiComponentSort = {
   version?: InputMaybe<SortDirection>;
 };
 
-/** Status-Werte für KI-Komponenten */
+/** Status values for AI components */
 export enum AiComponentStatus {
   ACTIVE = 'ACTIVE',
   DEPLOYED = 'DEPLOYED',
@@ -1440,7 +1442,7 @@ export type AiComponentTrainedWithDataObjectsUpdateFieldInput = {
   update?: InputMaybe<AiComponentTrainedWithDataObjectsUpdateConnectionInput>;
 };
 
-/** KI-Komponent Typen */
+/** AI component types */
 export enum AiComponentType {
   AGENTIC_AI = 'AGENTIC_AI',
   AUTOMATION_ENGINE = 'AUTOMATION_ENGINE',
@@ -1763,7 +1765,7 @@ export type AiComponentsConnection = {
   totalCount: Scalars['Int']['output'];
 };
 
-/** Application - repräsentiert eine Business-Applikation im Enterprise Architecture Management */
+/** Application – represents a business application within Enterprise Architecture Management */
 export type Application = {
   __typename?: 'Application';
   company: Array<Company>;
@@ -1821,7 +1823,7 @@ export type Application = {
 };
 
 
-/** Application - repräsentiert eine Business-Applikation im Enterprise Architecture Management */
+/** Application – represents a business application within Enterprise Architecture Management */
 export type ApplicationCompanyArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -1830,7 +1832,7 @@ export type ApplicationCompanyArgs = {
 };
 
 
-/** Application - repräsentiert eine Business-Applikation im Enterprise Architecture Management */
+/** Application – represents a business application within Enterprise Architecture Management */
 export type ApplicationCompanyConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -1839,7 +1841,7 @@ export type ApplicationCompanyConnectionArgs = {
 };
 
 
-/** Application - repräsentiert eine Business-Applikation im Enterprise Architecture Management */
+/** Application – represents a business application within Enterprise Architecture Management */
 export type ApplicationComponentsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -1848,7 +1850,7 @@ export type ApplicationComponentsArgs = {
 };
 
 
-/** Application - repräsentiert eine Business-Applikation im Enterprise Architecture Management */
+/** Application – represents a business application within Enterprise Architecture Management */
 export type ApplicationComponentsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -1857,7 +1859,7 @@ export type ApplicationComponentsConnectionArgs = {
 };
 
 
-/** Application - repräsentiert eine Business-Applikation im Enterprise Architecture Management */
+/** Application – represents a business application within Enterprise Architecture Management */
 export type ApplicationDepictedInDiagramsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -1866,7 +1868,7 @@ export type ApplicationDepictedInDiagramsArgs = {
 };
 
 
-/** Application - repräsentiert eine Business-Applikation im Enterprise Architecture Management */
+/** Application – represents a business application within Enterprise Architecture Management */
 export type ApplicationDepictedInDiagramsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -1875,7 +1877,7 @@ export type ApplicationDepictedInDiagramsConnectionArgs = {
 };
 
 
-/** Application - repräsentiert eine Business-Applikation im Enterprise Architecture Management */
+/** Application – represents a business application within Enterprise Architecture Management */
 export type ApplicationHostedOnArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -1884,7 +1886,7 @@ export type ApplicationHostedOnArgs = {
 };
 
 
-/** Application - repräsentiert eine Business-Applikation im Enterprise Architecture Management */
+/** Application – represents a business application within Enterprise Architecture Management */
 export type ApplicationHostedOnConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -1893,7 +1895,7 @@ export type ApplicationHostedOnConnectionArgs = {
 };
 
 
-/** Application - repräsentiert eine Business-Applikation im Enterprise Architecture Management */
+/** Application – represents a business application within Enterprise Architecture Management */
 export type ApplicationImplementsPrinciplesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -1902,7 +1904,7 @@ export type ApplicationImplementsPrinciplesArgs = {
 };
 
 
-/** Application - repräsentiert eine Business-Applikation im Enterprise Architecture Management */
+/** Application – represents a business application within Enterprise Architecture Management */
 export type ApplicationImplementsPrinciplesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -1911,7 +1913,7 @@ export type ApplicationImplementsPrinciplesConnectionArgs = {
 };
 
 
-/** Application - repräsentiert eine Business-Applikation im Enterprise Architecture Management */
+/** Application – represents a business application within Enterprise Architecture Management */
 export type ApplicationIsDataSourceForArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -1920,7 +1922,7 @@ export type ApplicationIsDataSourceForArgs = {
 };
 
 
-/** Application - repräsentiert eine Business-Applikation im Enterprise Architecture Management */
+/** Application – represents a business application within Enterprise Architecture Management */
 export type ApplicationIsDataSourceForConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -1929,7 +1931,7 @@ export type ApplicationIsDataSourceForConnectionArgs = {
 };
 
 
-/** Application - repräsentiert eine Business-Applikation im Enterprise Architecture Management */
+/** Application – represents a business application within Enterprise Architecture Management */
 export type ApplicationOwnersArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -1938,7 +1940,7 @@ export type ApplicationOwnersArgs = {
 };
 
 
-/** Application - repräsentiert eine Business-Applikation im Enterprise Architecture Management */
+/** Application – represents a business application within Enterprise Architecture Management */
 export type ApplicationOwnersConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -1947,7 +1949,7 @@ export type ApplicationOwnersConnectionArgs = {
 };
 
 
-/** Application - repräsentiert eine Business-Applikation im Enterprise Architecture Management */
+/** Application – represents a business application within Enterprise Architecture Management */
 export type ApplicationParentsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -1956,7 +1958,7 @@ export type ApplicationParentsArgs = {
 };
 
 
-/** Application - repräsentiert eine Business-Applikation im Enterprise Architecture Management */
+/** Application – represents a business application within Enterprise Architecture Management */
 export type ApplicationParentsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -1965,7 +1967,7 @@ export type ApplicationParentsConnectionArgs = {
 };
 
 
-/** Application - repräsentiert eine Business-Applikation im Enterprise Architecture Management */
+/** Application – represents a business application within Enterprise Architecture Management */
 export type ApplicationPartOfArchitecturesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -1974,7 +1976,7 @@ export type ApplicationPartOfArchitecturesArgs = {
 };
 
 
-/** Application - repräsentiert eine Business-Applikation im Enterprise Architecture Management */
+/** Application – represents a business application within Enterprise Architecture Management */
 export type ApplicationPartOfArchitecturesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -1983,7 +1985,7 @@ export type ApplicationPartOfArchitecturesConnectionArgs = {
 };
 
 
-/** Application - repräsentiert eine Business-Applikation im Enterprise Architecture Management */
+/** Application – represents a business application within Enterprise Architecture Management */
 export type ApplicationPredecessorsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -1992,7 +1994,7 @@ export type ApplicationPredecessorsArgs = {
 };
 
 
-/** Application - repräsentiert eine Business-Applikation im Enterprise Architecture Management */
+/** Application – represents a business application within Enterprise Architecture Management */
 export type ApplicationPredecessorsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -2001,7 +2003,7 @@ export type ApplicationPredecessorsConnectionArgs = {
 };
 
 
-/** Application - repräsentiert eine Business-Applikation im Enterprise Architecture Management */
+/** Application – represents a business application within Enterprise Architecture Management */
 export type ApplicationSourceOfInterfacesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -2010,7 +2012,7 @@ export type ApplicationSourceOfInterfacesArgs = {
 };
 
 
-/** Application - repräsentiert eine Business-Applikation im Enterprise Architecture Management */
+/** Application – represents a business application within Enterprise Architecture Management */
 export type ApplicationSourceOfInterfacesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -2019,7 +2021,7 @@ export type ApplicationSourceOfInterfacesConnectionArgs = {
 };
 
 
-/** Application - repräsentiert eine Business-Applikation im Enterprise Architecture Management */
+/** Application – represents a business application within Enterprise Architecture Management */
 export type ApplicationSuccessorsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -2028,7 +2030,7 @@ export type ApplicationSuccessorsArgs = {
 };
 
 
-/** Application - repräsentiert eine Business-Applikation im Enterprise Architecture Management */
+/** Application – represents a business application within Enterprise Architecture Management */
 export type ApplicationSuccessorsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -2037,7 +2039,7 @@ export type ApplicationSuccessorsConnectionArgs = {
 };
 
 
-/** Application - repräsentiert eine Business-Applikation im Enterprise Architecture Management */
+/** Application – represents a business application within Enterprise Architecture Management */
 export type ApplicationSupportsCapabilitiesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -2046,7 +2048,7 @@ export type ApplicationSupportsCapabilitiesArgs = {
 };
 
 
-/** Application - repräsentiert eine Business-Applikation im Enterprise Architecture Management */
+/** Application – represents a business application within Enterprise Architecture Management */
 export type ApplicationSupportsCapabilitiesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -2055,7 +2057,7 @@ export type ApplicationSupportsCapabilitiesConnectionArgs = {
 };
 
 
-/** Application - repräsentiert eine Business-Applikation im Enterprise Architecture Management */
+/** Application – represents a business application within Enterprise Architecture Management */
 export type ApplicationTargetOfInterfacesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -2064,7 +2066,7 @@ export type ApplicationTargetOfInterfacesArgs = {
 };
 
 
-/** Application - repräsentiert eine Business-Applikation im Enterprise Architecture Management */
+/** Application – represents a business application within Enterprise Architecture Management */
 export type ApplicationTargetOfInterfacesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -2073,7 +2075,7 @@ export type ApplicationTargetOfInterfacesConnectionArgs = {
 };
 
 
-/** Application - repräsentiert eine Business-Applikation im Enterprise Architecture Management */
+/** Application – represents a business application within Enterprise Architecture Management */
 export type ApplicationUsedByOrganisationsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -2082,7 +2084,7 @@ export type ApplicationUsedByOrganisationsArgs = {
 };
 
 
-/** Application - repräsentiert eine Business-Applikation im Enterprise Architecture Management */
+/** Application – represents a business application within Enterprise Architecture Management */
 export type ApplicationUsedByOrganisationsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -2091,7 +2093,7 @@ export type ApplicationUsedByOrganisationsConnectionArgs = {
 };
 
 
-/** Application - repräsentiert eine Business-Applikation im Enterprise Architecture Management */
+/** Application – represents a business application within Enterprise Architecture Management */
 export type ApplicationUsesAiComponentsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -2100,7 +2102,7 @@ export type ApplicationUsesAiComponentsArgs = {
 };
 
 
-/** Application - repräsentiert eine Business-Applikation im Enterprise Architecture Management */
+/** Application – represents a business application within Enterprise Architecture Management */
 export type ApplicationUsesAiComponentsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -2109,7 +2111,7 @@ export type ApplicationUsesAiComponentsConnectionArgs = {
 };
 
 
-/** Application - repräsentiert eine Business-Applikation im Enterprise Architecture Management */
+/** Application – represents a business application within Enterprise Architecture Management */
 export type ApplicationUsesDataObjectsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -2118,7 +2120,7 @@ export type ApplicationUsesDataObjectsArgs = {
 };
 
 
-/** Application - repräsentiert eine Business-Applikation im Enterprise Architecture Management */
+/** Application – represents a business application within Enterprise Architecture Management */
 export type ApplicationUsesDataObjectsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -2755,6 +2757,7 @@ export type ApplicationDepictedInDiagramsNodeAggregationWhereInput = {
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramJson?: InputMaybe<StringScalarAggregationFilters>;
   diagramPng?: InputMaybe<StringScalarAggregationFilters>;
+  diagramPngDark?: InputMaybe<StringScalarAggregationFilters>;
   title?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
@@ -2790,6 +2793,7 @@ export type ApplicationDiagramDepictedInDiagramsNodeAggregateSelection = {
   description: StringAggregateSelection;
   diagramJson: StringAggregateSelection;
   diagramPng: StringAggregateSelection;
+  diagramPngDark: StringAggregateSelection;
   title: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
@@ -3066,7 +3070,7 @@ export type ApplicationInfrastructureHostedOnNodeAggregateSelection = {
   version: StringAggregateSelection;
 };
 
-/** ApplicationInterface - repräsentiert eine Schnittstelle zwischen Applikationen */
+/** ApplicationInterface – represents an interface between applications */
 export type ApplicationInterface = {
   __typename?: 'ApplicationInterface';
   company: Array<Company>;
@@ -3105,7 +3109,7 @@ export type ApplicationInterface = {
 };
 
 
-/** ApplicationInterface - repräsentiert eine Schnittstelle zwischen Applikationen */
+/** ApplicationInterface – represents an interface between applications */
 export type ApplicationInterfaceCompanyArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -3114,7 +3118,7 @@ export type ApplicationInterfaceCompanyArgs = {
 };
 
 
-/** ApplicationInterface - repräsentiert eine Schnittstelle zwischen Applikationen */
+/** ApplicationInterface – represents an interface between applications */
 export type ApplicationInterfaceCompanyConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -3123,7 +3127,7 @@ export type ApplicationInterfaceCompanyConnectionArgs = {
 };
 
 
-/** ApplicationInterface - repräsentiert eine Schnittstelle zwischen Applikationen */
+/** ApplicationInterface – represents an interface between applications */
 export type ApplicationInterfaceDataObjectsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -3132,7 +3136,7 @@ export type ApplicationInterfaceDataObjectsArgs = {
 };
 
 
-/** ApplicationInterface - repräsentiert eine Schnittstelle zwischen Applikationen */
+/** ApplicationInterface – represents an interface between applications */
 export type ApplicationInterfaceDataObjectsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -3141,7 +3145,7 @@ export type ApplicationInterfaceDataObjectsConnectionArgs = {
 };
 
 
-/** ApplicationInterface - repräsentiert eine Schnittstelle zwischen Applikationen */
+/** ApplicationInterface – represents an interface between applications */
 export type ApplicationInterfaceDepictedInDiagramsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -3150,7 +3154,7 @@ export type ApplicationInterfaceDepictedInDiagramsArgs = {
 };
 
 
-/** ApplicationInterface - repräsentiert eine Schnittstelle zwischen Applikationen */
+/** ApplicationInterface – represents an interface between applications */
 export type ApplicationInterfaceDepictedInDiagramsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -3159,7 +3163,7 @@ export type ApplicationInterfaceDepictedInDiagramsConnectionArgs = {
 };
 
 
-/** ApplicationInterface - repräsentiert eine Schnittstelle zwischen Applikationen */
+/** ApplicationInterface – represents an interface between applications */
 export type ApplicationInterfaceOwnersArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -3168,7 +3172,7 @@ export type ApplicationInterfaceOwnersArgs = {
 };
 
 
-/** ApplicationInterface - repräsentiert eine Schnittstelle zwischen Applikationen */
+/** ApplicationInterface – represents an interface between applications */
 export type ApplicationInterfaceOwnersConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -3177,7 +3181,7 @@ export type ApplicationInterfaceOwnersConnectionArgs = {
 };
 
 
-/** ApplicationInterface - repräsentiert eine Schnittstelle zwischen Applikationen */
+/** ApplicationInterface – represents an interface between applications */
 export type ApplicationInterfacePartOfArchitecturesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -3186,7 +3190,7 @@ export type ApplicationInterfacePartOfArchitecturesArgs = {
 };
 
 
-/** ApplicationInterface - repräsentiert eine Schnittstelle zwischen Applikationen */
+/** ApplicationInterface – represents an interface between applications */
 export type ApplicationInterfacePartOfArchitecturesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -3195,7 +3199,7 @@ export type ApplicationInterfacePartOfArchitecturesConnectionArgs = {
 };
 
 
-/** ApplicationInterface - repräsentiert eine Schnittstelle zwischen Applikationen */
+/** ApplicationInterface – represents an interface between applications */
 export type ApplicationInterfacePredecessorsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -3204,7 +3208,7 @@ export type ApplicationInterfacePredecessorsArgs = {
 };
 
 
-/** ApplicationInterface - repräsentiert eine Schnittstelle zwischen Applikationen */
+/** ApplicationInterface – represents an interface between applications */
 export type ApplicationInterfacePredecessorsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -3213,7 +3217,7 @@ export type ApplicationInterfacePredecessorsConnectionArgs = {
 };
 
 
-/** ApplicationInterface - repräsentiert eine Schnittstelle zwischen Applikationen */
+/** ApplicationInterface – represents an interface between applications */
 export type ApplicationInterfaceSourceApplicationsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -3222,7 +3226,7 @@ export type ApplicationInterfaceSourceApplicationsArgs = {
 };
 
 
-/** ApplicationInterface - repräsentiert eine Schnittstelle zwischen Applikationen */
+/** ApplicationInterface – represents an interface between applications */
 export type ApplicationInterfaceSourceApplicationsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -3231,7 +3235,7 @@ export type ApplicationInterfaceSourceApplicationsConnectionArgs = {
 };
 
 
-/** ApplicationInterface - repräsentiert eine Schnittstelle zwischen Applikationen */
+/** ApplicationInterface – represents an interface between applications */
 export type ApplicationInterfaceSuccessorsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -3240,7 +3244,7 @@ export type ApplicationInterfaceSuccessorsArgs = {
 };
 
 
-/** ApplicationInterface - repräsentiert eine Schnittstelle zwischen Applikationen */
+/** ApplicationInterface – represents an interface between applications */
 export type ApplicationInterfaceSuccessorsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -3249,7 +3253,7 @@ export type ApplicationInterfaceSuccessorsConnectionArgs = {
 };
 
 
-/** ApplicationInterface - repräsentiert eine Schnittstelle zwischen Applikationen */
+/** ApplicationInterface – represents an interface between applications */
 export type ApplicationInterfaceTargetApplicationsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -3258,7 +3262,7 @@ export type ApplicationInterfaceTargetApplicationsArgs = {
 };
 
 
-/** ApplicationInterface - repräsentiert eine Schnittstelle zwischen Applikationen */
+/** ApplicationInterface – represents an interface between applications */
 export type ApplicationInterfaceTargetApplicationsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -3267,7 +3271,7 @@ export type ApplicationInterfaceTargetApplicationsConnectionArgs = {
 };
 
 
-/** ApplicationInterface - repräsentiert eine Schnittstelle zwischen Applikationen */
+/** ApplicationInterface – represents an interface between applications */
 export type ApplicationInterfaceUsedByOrganisationsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -3276,7 +3280,7 @@ export type ApplicationInterfaceUsedByOrganisationsArgs = {
 };
 
 
-/** ApplicationInterface - repräsentiert eine Schnittstelle zwischen Applikationen */
+/** ApplicationInterface – represents an interface between applications */
 export type ApplicationInterfaceUsedByOrganisationsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -3777,6 +3781,7 @@ export type ApplicationInterfaceDepictedInDiagramsNodeAggregationWhereInput = {
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramJson?: InputMaybe<StringScalarAggregationFilters>;
   diagramPng?: InputMaybe<StringScalarAggregationFilters>;
+  diagramPngDark?: InputMaybe<StringScalarAggregationFilters>;
   title?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
@@ -3812,6 +3817,7 @@ export type ApplicationInterfaceDiagramDepictedInDiagramsNodeAggregateSelection 
   description: StringAggregateSelection;
   diagramJson: StringAggregateSelection;
   diagramPng: StringAggregateSelection;
+  diagramPngDark: StringAggregateSelection;
   title: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
@@ -5445,7 +5451,7 @@ export type ApplicationSourceOfInterfacesUpdateFieldInput = {
   update?: InputMaybe<ApplicationSourceOfInterfacesUpdateConnectionInput>;
 };
 
-/** Mögliche Status-Werte für eine Applikation */
+/** Possible status values for an application */
 export enum ApplicationStatus {
   ACTIVE = 'ACTIVE',
   IN_DEVELOPMENT = 'IN_DEVELOPMENT',
@@ -6217,7 +6223,7 @@ export type ApplicationsConnection = {
   totalCount: Scalars['Int']['output'];
 };
 
-/** Architecture - repräsentiert eine Architektur im Enterprise Architecture Management */
+/** Architecture – represents an architecture within Enterprise Architecture Management */
 export type Architecture = {
   __typename?: 'Architecture';
   appliedPrinciples: Array<ArchitecturePrinciple>;
@@ -6256,7 +6262,7 @@ export type Architecture = {
 };
 
 
-/** Architecture - repräsentiert eine Architektur im Enterprise Architecture Management */
+/** Architecture – represents an architecture within Enterprise Architecture Management */
 export type ArchitectureAppliedPrinciplesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -6265,7 +6271,7 @@ export type ArchitectureAppliedPrinciplesArgs = {
 };
 
 
-/** Architecture - repräsentiert eine Architektur im Enterprise Architecture Management */
+/** Architecture – represents an architecture within Enterprise Architecture Management */
 export type ArchitectureAppliedPrinciplesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -6274,7 +6280,7 @@ export type ArchitectureAppliedPrinciplesConnectionArgs = {
 };
 
 
-/** Architecture - repräsentiert eine Architektur im Enterprise Architecture Management */
+/** Architecture – represents an architecture within Enterprise Architecture Management */
 export type ArchitectureChildArchitecturesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -6283,7 +6289,7 @@ export type ArchitectureChildArchitecturesArgs = {
 };
 
 
-/** Architecture - repräsentiert eine Architektur im Enterprise Architecture Management */
+/** Architecture – represents an architecture within Enterprise Architecture Management */
 export type ArchitectureChildArchitecturesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -6292,7 +6298,7 @@ export type ArchitectureChildArchitecturesConnectionArgs = {
 };
 
 
-/** Architecture - repräsentiert eine Architektur im Enterprise Architecture Management */
+/** Architecture – represents an architecture within Enterprise Architecture Management */
 export type ArchitectureCompanyArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -6301,7 +6307,7 @@ export type ArchitectureCompanyArgs = {
 };
 
 
-/** Architecture - repräsentiert eine Architektur im Enterprise Architecture Management */
+/** Architecture – represents an architecture within Enterprise Architecture Management */
 export type ArchitectureCompanyConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -6310,7 +6316,7 @@ export type ArchitectureCompanyConnectionArgs = {
 };
 
 
-/** Architecture - repräsentiert eine Architektur im Enterprise Architecture Management */
+/** Architecture – represents an architecture within Enterprise Architecture Management */
 export type ArchitectureContainsAiComponentsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -6319,7 +6325,7 @@ export type ArchitectureContainsAiComponentsArgs = {
 };
 
 
-/** Architecture - repräsentiert eine Architektur im Enterprise Architecture Management */
+/** Architecture – represents an architecture within Enterprise Architecture Management */
 export type ArchitectureContainsAiComponentsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -6328,7 +6334,7 @@ export type ArchitectureContainsAiComponentsConnectionArgs = {
 };
 
 
-/** Architecture - repräsentiert eine Architektur im Enterprise Architecture Management */
+/** Architecture – represents an architecture within Enterprise Architecture Management */
 export type ArchitectureContainsApplicationsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -6337,7 +6343,7 @@ export type ArchitectureContainsApplicationsArgs = {
 };
 
 
-/** Architecture - repräsentiert eine Architektur im Enterprise Architecture Management */
+/** Architecture – represents an architecture within Enterprise Architecture Management */
 export type ArchitectureContainsApplicationsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -6346,7 +6352,7 @@ export type ArchitectureContainsApplicationsConnectionArgs = {
 };
 
 
-/** Architecture - repräsentiert eine Architektur im Enterprise Architecture Management */
+/** Architecture – represents an architecture within Enterprise Architecture Management */
 export type ArchitectureContainsCapabilitiesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -6355,7 +6361,7 @@ export type ArchitectureContainsCapabilitiesArgs = {
 };
 
 
-/** Architecture - repräsentiert eine Architektur im Enterprise Architecture Management */
+/** Architecture – represents an architecture within Enterprise Architecture Management */
 export type ArchitectureContainsCapabilitiesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -6364,7 +6370,7 @@ export type ArchitectureContainsCapabilitiesConnectionArgs = {
 };
 
 
-/** Architecture - repräsentiert eine Architektur im Enterprise Architecture Management */
+/** Architecture – represents an architecture within Enterprise Architecture Management */
 export type ArchitectureContainsDataObjectsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -6373,7 +6379,7 @@ export type ArchitectureContainsDataObjectsArgs = {
 };
 
 
-/** Architecture - repräsentiert eine Architektur im Enterprise Architecture Management */
+/** Architecture – represents an architecture within Enterprise Architecture Management */
 export type ArchitectureContainsDataObjectsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -6382,7 +6388,7 @@ export type ArchitectureContainsDataObjectsConnectionArgs = {
 };
 
 
-/** Architecture - repräsentiert eine Architektur im Enterprise Architecture Management */
+/** Architecture – represents an architecture within Enterprise Architecture Management */
 export type ArchitectureContainsInfrastructureArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -6391,7 +6397,7 @@ export type ArchitectureContainsInfrastructureArgs = {
 };
 
 
-/** Architecture - repräsentiert eine Architektur im Enterprise Architecture Management */
+/** Architecture – represents an architecture within Enterprise Architecture Management */
 export type ArchitectureContainsInfrastructureConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -6400,7 +6406,7 @@ export type ArchitectureContainsInfrastructureConnectionArgs = {
 };
 
 
-/** Architecture - repräsentiert eine Architektur im Enterprise Architecture Management */
+/** Architecture – represents an architecture within Enterprise Architecture Management */
 export type ArchitectureContainsInterfacesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -6409,7 +6415,7 @@ export type ArchitectureContainsInterfacesArgs = {
 };
 
 
-/** Architecture - repräsentiert eine Architektur im Enterprise Architecture Management */
+/** Architecture – represents an architecture within Enterprise Architecture Management */
 export type ArchitectureContainsInterfacesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -6418,7 +6424,7 @@ export type ArchitectureContainsInterfacesConnectionArgs = {
 };
 
 
-/** Architecture - repräsentiert eine Architektur im Enterprise Architecture Management */
+/** Architecture – represents an architecture within Enterprise Architecture Management */
 export type ArchitectureDiagramsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -6427,7 +6433,7 @@ export type ArchitectureDiagramsArgs = {
 };
 
 
-/** Architecture - repräsentiert eine Architektur im Enterprise Architecture Management */
+/** Architecture – represents an architecture within Enterprise Architecture Management */
 export type ArchitectureDiagramsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -6436,7 +6442,7 @@ export type ArchitectureDiagramsConnectionArgs = {
 };
 
 
-/** Architecture - repräsentiert eine Architektur im Enterprise Architecture Management */
+/** Architecture – represents an architecture within Enterprise Architecture Management */
 export type ArchitectureOwnersArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -6445,7 +6451,7 @@ export type ArchitectureOwnersArgs = {
 };
 
 
-/** Architecture - repräsentiert eine Architektur im Enterprise Architecture Management */
+/** Architecture – represents an architecture within Enterprise Architecture Management */
 export type ArchitectureOwnersConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -6454,7 +6460,7 @@ export type ArchitectureOwnersConnectionArgs = {
 };
 
 
-/** Architecture - repräsentiert eine Architektur im Enterprise Architecture Management */
+/** Architecture – represents an architecture within Enterprise Architecture Management */
 export type ArchitectureParentArchitectureArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -6463,7 +6469,7 @@ export type ArchitectureParentArchitectureArgs = {
 };
 
 
-/** Architecture - repräsentiert eine Architektur im Enterprise Architecture Management */
+/** Architecture – represents an architecture within Enterprise Architecture Management */
 export type ArchitectureParentArchitectureConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -7696,6 +7702,7 @@ export type ArchitectureDiagramDiagramsNodeAggregateSelection = {
   description: StringAggregateSelection;
   diagramJson: StringAggregateSelection;
   diagramPng: StringAggregateSelection;
+  diagramPngDark: StringAggregateSelection;
   title: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
@@ -7785,6 +7792,7 @@ export type ArchitectureDiagramsNodeAggregationWhereInput = {
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramJson?: InputMaybe<StringScalarAggregationFilters>;
   diagramPng?: InputMaybe<StringScalarAggregationFilters>;
+  diagramPngDark?: InputMaybe<StringScalarAggregationFilters>;
   title?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
@@ -7823,7 +7831,7 @@ export type ArchitectureDisconnectInput = {
   parentArchitecture?: InputMaybe<Array<ArchitectureParentArchitectureDisconnectFieldInput>>;
 };
 
-/** Architektur-Domänen */
+/** Architecture domains */
 export enum ArchitectureDomain {
   APPLICATION = 'APPLICATION',
   BUSINESS = 'BUSINESS',
@@ -8111,7 +8119,7 @@ export type ArchitecturePersonOwnersNodeAggregateSelection = {
   updatedAt: DateTimeAggregateSelection;
 };
 
-/** ArchitecturePrinciple - repräsentiert ein Architektur-Prinzip im Enterprise Architecture Management */
+/** ArchitecturePrinciple – represents an architecture principle within Enterprise Architecture Management */
 export type ArchitecturePrinciple = {
   __typename?: 'ArchitecturePrinciple';
   appliedInArchitectures: Array<Architecture>;
@@ -8138,7 +8146,7 @@ export type ArchitecturePrinciple = {
 };
 
 
-/** ArchitecturePrinciple - repräsentiert ein Architektur-Prinzip im Enterprise Architecture Management */
+/** ArchitecturePrinciple – represents an architecture principle within Enterprise Architecture Management */
 export type ArchitecturePrincipleAppliedInArchitecturesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -8147,7 +8155,7 @@ export type ArchitecturePrincipleAppliedInArchitecturesArgs = {
 };
 
 
-/** ArchitecturePrinciple - repräsentiert ein Architektur-Prinzip im Enterprise Architecture Management */
+/** ArchitecturePrinciple – represents an architecture principle within Enterprise Architecture Management */
 export type ArchitecturePrincipleAppliedInArchitecturesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -8156,7 +8164,7 @@ export type ArchitecturePrincipleAppliedInArchitecturesConnectionArgs = {
 };
 
 
-/** ArchitecturePrinciple - repräsentiert ein Architektur-Prinzip im Enterprise Architecture Management */
+/** ArchitecturePrinciple – represents an architecture principle within Enterprise Architecture Management */
 export type ArchitecturePrincipleCompanyArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -8165,7 +8173,7 @@ export type ArchitecturePrincipleCompanyArgs = {
 };
 
 
-/** ArchitecturePrinciple - repräsentiert ein Architektur-Prinzip im Enterprise Architecture Management */
+/** ArchitecturePrinciple – represents an architecture principle within Enterprise Architecture Management */
 export type ArchitecturePrincipleCompanyConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -8174,7 +8182,7 @@ export type ArchitecturePrincipleCompanyConnectionArgs = {
 };
 
 
-/** ArchitecturePrinciple - repräsentiert ein Architektur-Prinzip im Enterprise Architecture Management */
+/** ArchitecturePrinciple – represents an architecture principle within Enterprise Architecture Management */
 export type ArchitecturePrincipleImplementedByAiComponentsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -8183,7 +8191,7 @@ export type ArchitecturePrincipleImplementedByAiComponentsArgs = {
 };
 
 
-/** ArchitecturePrinciple - repräsentiert ein Architektur-Prinzip im Enterprise Architecture Management */
+/** ArchitecturePrinciple – represents an architecture principle within Enterprise Architecture Management */
 export type ArchitecturePrincipleImplementedByAiComponentsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -8192,7 +8200,7 @@ export type ArchitecturePrincipleImplementedByAiComponentsConnectionArgs = {
 };
 
 
-/** ArchitecturePrinciple - repräsentiert ein Architektur-Prinzip im Enterprise Architecture Management */
+/** ArchitecturePrinciple – represents an architecture principle within Enterprise Architecture Management */
 export type ArchitecturePrincipleImplementedByApplicationsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -8201,7 +8209,7 @@ export type ArchitecturePrincipleImplementedByApplicationsArgs = {
 };
 
 
-/** ArchitecturePrinciple - repräsentiert ein Architektur-Prinzip im Enterprise Architecture Management */
+/** ArchitecturePrinciple – represents an architecture principle within Enterprise Architecture Management */
 export type ArchitecturePrincipleImplementedByApplicationsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -8210,7 +8218,7 @@ export type ArchitecturePrincipleImplementedByApplicationsConnectionArgs = {
 };
 
 
-/** ArchitecturePrinciple - repräsentiert ein Architektur-Prinzip im Enterprise Architecture Management */
+/** ArchitecturePrinciple – represents an architecture principle within Enterprise Architecture Management */
 export type ArchitecturePrincipleOwnersArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -8219,7 +8227,7 @@ export type ArchitecturePrincipleOwnersArgs = {
 };
 
 
-/** ArchitecturePrinciple - repräsentiert ein Architektur-Prinzip im Enterprise Architecture Management */
+/** ArchitecturePrinciple – represents an architecture principle within Enterprise Architecture Management */
 export type ArchitecturePrincipleOwnersConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -9042,7 +9050,7 @@ export type ArchitectureSort = {
   updatedAt?: InputMaybe<SortDirection>;
 };
 
-/** Architektur-Typen */
+/** Architecture types */
 export enum ArchitectureType {
   CONCEPTUAL = 'CONCEPTUAL',
   CURRENT_STATE = 'CURRENT_STATE',
@@ -9148,7 +9156,7 @@ export type BusinessCapabilitiesConnection = {
   totalCount: Scalars['Int']['output'];
 };
 
-/** Business Capability - repräsentiert eine Geschäftsfähigkeit im Enterprise Architecture Management */
+/** Business Capability – represents a business capability within Enterprise Architecture Management */
 export type BusinessCapability = {
   __typename?: 'BusinessCapability';
   businessValue?: Maybe<Scalars['Int']['output']>;
@@ -9187,7 +9195,7 @@ export type BusinessCapability = {
 };
 
 
-/** Business Capability - repräsentiert eine Geschäftsfähigkeit im Enterprise Architecture Management */
+/** Business Capability – represents a business capability within Enterprise Architecture Management */
 export type BusinessCapabilityChildrenArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -9196,7 +9204,7 @@ export type BusinessCapabilityChildrenArgs = {
 };
 
 
-/** Business Capability - repräsentiert eine Geschäftsfähigkeit im Enterprise Architecture Management */
+/** Business Capability – represents a business capability within Enterprise Architecture Management */
 export type BusinessCapabilityChildrenConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -9205,7 +9213,7 @@ export type BusinessCapabilityChildrenConnectionArgs = {
 };
 
 
-/** Business Capability - repräsentiert eine Geschäftsfähigkeit im Enterprise Architecture Management */
+/** Business Capability – represents a business capability within Enterprise Architecture Management */
 export type BusinessCapabilityCompanyArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -9214,7 +9222,7 @@ export type BusinessCapabilityCompanyArgs = {
 };
 
 
-/** Business Capability - repräsentiert eine Geschäftsfähigkeit im Enterprise Architecture Management */
+/** Business Capability – represents a business capability within Enterprise Architecture Management */
 export type BusinessCapabilityCompanyConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -9223,7 +9231,7 @@ export type BusinessCapabilityCompanyConnectionArgs = {
 };
 
 
-/** Business Capability - repräsentiert eine Geschäftsfähigkeit im Enterprise Architecture Management */
+/** Business Capability – represents a business capability within Enterprise Architecture Management */
 export type BusinessCapabilityDepictedInDiagramsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -9232,7 +9240,7 @@ export type BusinessCapabilityDepictedInDiagramsArgs = {
 };
 
 
-/** Business Capability - repräsentiert eine Geschäftsfähigkeit im Enterprise Architecture Management */
+/** Business Capability – represents a business capability within Enterprise Architecture Management */
 export type BusinessCapabilityDepictedInDiagramsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -9241,7 +9249,7 @@ export type BusinessCapabilityDepictedInDiagramsConnectionArgs = {
 };
 
 
-/** Business Capability - repräsentiert eine Geschäftsfähigkeit im Enterprise Architecture Management */
+/** Business Capability – represents a business capability within Enterprise Architecture Management */
 export type BusinessCapabilityOwnersArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -9250,7 +9258,7 @@ export type BusinessCapabilityOwnersArgs = {
 };
 
 
-/** Business Capability - repräsentiert eine Geschäftsfähigkeit im Enterprise Architecture Management */
+/** Business Capability – represents a business capability within Enterprise Architecture Management */
 export type BusinessCapabilityOwnersConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -9259,7 +9267,7 @@ export type BusinessCapabilityOwnersConnectionArgs = {
 };
 
 
-/** Business Capability - repräsentiert eine Geschäftsfähigkeit im Enterprise Architecture Management */
+/** Business Capability – represents a business capability within Enterprise Architecture Management */
 export type BusinessCapabilityParentsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -9268,7 +9276,7 @@ export type BusinessCapabilityParentsArgs = {
 };
 
 
-/** Business Capability - repräsentiert eine Geschäftsfähigkeit im Enterprise Architecture Management */
+/** Business Capability – represents a business capability within Enterprise Architecture Management */
 export type BusinessCapabilityParentsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -9277,7 +9285,7 @@ export type BusinessCapabilityParentsConnectionArgs = {
 };
 
 
-/** Business Capability - repräsentiert eine Geschäftsfähigkeit im Enterprise Architecture Management */
+/** Business Capability – represents a business capability within Enterprise Architecture Management */
 export type BusinessCapabilityPartOfArchitecturesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -9286,7 +9294,7 @@ export type BusinessCapabilityPartOfArchitecturesArgs = {
 };
 
 
-/** Business Capability - repräsentiert eine Geschäftsfähigkeit im Enterprise Architecture Management */
+/** Business Capability – represents a business capability within Enterprise Architecture Management */
 export type BusinessCapabilityPartOfArchitecturesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -9295,7 +9303,7 @@ export type BusinessCapabilityPartOfArchitecturesConnectionArgs = {
 };
 
 
-/** Business Capability - repräsentiert eine Geschäftsfähigkeit im Enterprise Architecture Management */
+/** Business Capability – represents a business capability within Enterprise Architecture Management */
 export type BusinessCapabilityRelatedDataObjectsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -9304,7 +9312,7 @@ export type BusinessCapabilityRelatedDataObjectsArgs = {
 };
 
 
-/** Business Capability - repräsentiert eine Geschäftsfähigkeit im Enterprise Architecture Management */
+/** Business Capability – represents a business capability within Enterprise Architecture Management */
 export type BusinessCapabilityRelatedDataObjectsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -9313,7 +9321,7 @@ export type BusinessCapabilityRelatedDataObjectsConnectionArgs = {
 };
 
 
-/** Business Capability - repräsentiert eine Geschäftsfähigkeit im Enterprise Architecture Management */
+/** Business Capability – represents a business capability within Enterprise Architecture Management */
 export type BusinessCapabilitySupportedByAiComponentsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -9322,7 +9330,7 @@ export type BusinessCapabilitySupportedByAiComponentsArgs = {
 };
 
 
-/** Business Capability - repräsentiert eine Geschäftsfähigkeit im Enterprise Architecture Management */
+/** Business Capability – represents a business capability within Enterprise Architecture Management */
 export type BusinessCapabilitySupportedByAiComponentsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -9331,7 +9339,7 @@ export type BusinessCapabilitySupportedByAiComponentsConnectionArgs = {
 };
 
 
-/** Business Capability - repräsentiert eine Geschäftsfähigkeit im Enterprise Architecture Management */
+/** Business Capability – represents a business capability within Enterprise Architecture Management */
 export type BusinessCapabilitySupportedByApplicationsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -9340,7 +9348,7 @@ export type BusinessCapabilitySupportedByApplicationsArgs = {
 };
 
 
-/** Business Capability - repräsentiert eine Geschäftsfähigkeit im Enterprise Architecture Management */
+/** Business Capability – represents a business capability within Enterprise Architecture Management */
 export type BusinessCapabilitySupportedByApplicationsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -9349,7 +9357,7 @@ export type BusinessCapabilitySupportedByApplicationsConnectionArgs = {
 };
 
 
-/** Business Capability - repräsentiert eine Geschäftsfähigkeit im Enterprise Architecture Management */
+/** Business Capability – represents a business capability within Enterprise Architecture Management */
 export type BusinessCapabilityUsedByOrganisationsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -9358,7 +9366,7 @@ export type BusinessCapabilityUsedByOrganisationsArgs = {
 };
 
 
-/** Business Capability - repräsentiert eine Geschäftsfähigkeit im Enterprise Architecture Management */
+/** Business Capability – represents a business capability within Enterprise Architecture Management */
 export type BusinessCapabilityUsedByOrganisationsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -9869,6 +9877,7 @@ export type BusinessCapabilityDepictedInDiagramsNodeAggregationWhereInput = {
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramJson?: InputMaybe<StringScalarAggregationFilters>;
   diagramPng?: InputMaybe<StringScalarAggregationFilters>;
+  diagramPngDark?: InputMaybe<StringScalarAggregationFilters>;
   title?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
@@ -9904,6 +9913,7 @@ export type BusinessCapabilityDiagramDepictedInDiagramsNodeAggregateSelection = 
   description: StringAggregateSelection;
   diagramJson: StringAggregateSelection;
   diagramPng: StringAggregateSelection;
+  diagramPngDark: StringAggregateSelection;
   title: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
@@ -10814,7 +10824,7 @@ export type BusinessCapabilityWhere = {
   usedByOrganisationsConnection?: InputMaybe<BusinessCapabilityUsedByOrganisationsConnectionFilters>;
 };
 
-/** Mögliche Status-Werte für eine Business Capability */
+/** Possible status values for a business capability */
 export enum CapabilityStatus {
   ACTIVE = 'ACTIVE',
   PLANNED = 'PLANNED',
@@ -10832,7 +10842,7 @@ export type CapabilityStatusEnumScalarMutations = {
   set?: InputMaybe<CapabilityStatus>;
 };
 
-/** Typen für Business Capabilities */
+/** Types of business capabilities */
 export enum CapabilityType {
   OPERATIONAL = 'OPERATIONAL',
   STRATEGIC = 'STRATEGIC',
@@ -10858,7 +10868,7 @@ export type CompaniesConnection = {
   totalCount: Scalars['Int']['output'];
 };
 
-/** Company - repräsentiert ein Unternehmen im Enterprise Architecture Management */
+/** Company – represents an organization within Enterprise Architecture Management */
 export type Company = {
   __typename?: 'Company';
   address?: Maybe<Scalars['String']['output']>;
@@ -10900,7 +10910,7 @@ export type Company = {
 };
 
 
-/** Company - repräsentiert ein Unternehmen im Enterprise Architecture Management */
+/** Company – represents an organization within Enterprise Architecture Management */
 export type CompanyEmployeesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -10909,7 +10919,7 @@ export type CompanyEmployeesArgs = {
 };
 
 
-/** Company - repräsentiert ein Unternehmen im Enterprise Architecture Management */
+/** Company – represents an organization within Enterprise Architecture Management */
 export type CompanyEmployeesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -10918,7 +10928,7 @@ export type CompanyEmployeesConnectionArgs = {
 };
 
 
-/** Company - repräsentiert ein Unternehmen im Enterprise Architecture Management */
+/** Company – represents an organization within Enterprise Architecture Management */
 export type CompanyOrganisationsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -10927,7 +10937,7 @@ export type CompanyOrganisationsArgs = {
 };
 
 
-/** Company - repräsentiert ein Unternehmen im Enterprise Architecture Management */
+/** Company – represents an organization within Enterprise Architecture Management */
 export type CompanyOrganisationsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -10936,7 +10946,7 @@ export type CompanyOrganisationsConnectionArgs = {
 };
 
 
-/** Company - repräsentiert ein Unternehmen im Enterprise Architecture Management */
+/** Company – represents an organization within Enterprise Architecture Management */
 export type CompanyOwnedAiComponentsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -10945,7 +10955,7 @@ export type CompanyOwnedAiComponentsArgs = {
 };
 
 
-/** Company - repräsentiert ein Unternehmen im Enterprise Architecture Management */
+/** Company – represents an organization within Enterprise Architecture Management */
 export type CompanyOwnedAiComponentsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -10954,7 +10964,7 @@ export type CompanyOwnedAiComponentsConnectionArgs = {
 };
 
 
-/** Company - repräsentiert ein Unternehmen im Enterprise Architecture Management */
+/** Company – represents an organization within Enterprise Architecture Management */
 export type CompanyOwnedApplicationsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -10963,7 +10973,7 @@ export type CompanyOwnedApplicationsArgs = {
 };
 
 
-/** Company - repräsentiert ein Unternehmen im Enterprise Architecture Management */
+/** Company – represents an organization within Enterprise Architecture Management */
 export type CompanyOwnedApplicationsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -10972,7 +10982,7 @@ export type CompanyOwnedApplicationsConnectionArgs = {
 };
 
 
-/** Company - repräsentiert ein Unternehmen im Enterprise Architecture Management */
+/** Company – represents an organization within Enterprise Architecture Management */
 export type CompanyOwnedArchitecturePrinciplesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -10981,7 +10991,7 @@ export type CompanyOwnedArchitecturePrinciplesArgs = {
 };
 
 
-/** Company - repräsentiert ein Unternehmen im Enterprise Architecture Management */
+/** Company – represents an organization within Enterprise Architecture Management */
 export type CompanyOwnedArchitecturePrinciplesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -10990,7 +11000,7 @@ export type CompanyOwnedArchitecturePrinciplesConnectionArgs = {
 };
 
 
-/** Company - repräsentiert ein Unternehmen im Enterprise Architecture Management */
+/** Company – represents an organization within Enterprise Architecture Management */
 export type CompanyOwnedArchitecturesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -10999,7 +11009,7 @@ export type CompanyOwnedArchitecturesArgs = {
 };
 
 
-/** Company - repräsentiert ein Unternehmen im Enterprise Architecture Management */
+/** Company – represents an organization within Enterprise Architecture Management */
 export type CompanyOwnedArchitecturesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -11008,7 +11018,7 @@ export type CompanyOwnedArchitecturesConnectionArgs = {
 };
 
 
-/** Company - repräsentiert ein Unternehmen im Enterprise Architecture Management */
+/** Company – represents an organization within Enterprise Architecture Management */
 export type CompanyOwnedCapabilitiesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -11017,7 +11027,7 @@ export type CompanyOwnedCapabilitiesArgs = {
 };
 
 
-/** Company - repräsentiert ein Unternehmen im Enterprise Architecture Management */
+/** Company – represents an organization within Enterprise Architecture Management */
 export type CompanyOwnedCapabilitiesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -11026,7 +11036,7 @@ export type CompanyOwnedCapabilitiesConnectionArgs = {
 };
 
 
-/** Company - repräsentiert ein Unternehmen im Enterprise Architecture Management */
+/** Company – represents an organization within Enterprise Architecture Management */
 export type CompanyOwnedDataObjectsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -11035,7 +11045,7 @@ export type CompanyOwnedDataObjectsArgs = {
 };
 
 
-/** Company - repräsentiert ein Unternehmen im Enterprise Architecture Management */
+/** Company – represents an organization within Enterprise Architecture Management */
 export type CompanyOwnedDataObjectsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -11044,7 +11054,7 @@ export type CompanyOwnedDataObjectsConnectionArgs = {
 };
 
 
-/** Company - repräsentiert ein Unternehmen im Enterprise Architecture Management */
+/** Company – represents an organization within Enterprise Architecture Management */
 export type CompanyOwnedDiagramsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -11053,7 +11063,7 @@ export type CompanyOwnedDiagramsArgs = {
 };
 
 
-/** Company - repräsentiert ein Unternehmen im Enterprise Architecture Management */
+/** Company – represents an organization within Enterprise Architecture Management */
 export type CompanyOwnedDiagramsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -11062,7 +11072,7 @@ export type CompanyOwnedDiagramsConnectionArgs = {
 };
 
 
-/** Company - repräsentiert ein Unternehmen im Enterprise Architecture Management */
+/** Company – represents an organization within Enterprise Architecture Management */
 export type CompanyOwnedInfrastructureArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -11071,7 +11081,7 @@ export type CompanyOwnedInfrastructureArgs = {
 };
 
 
-/** Company - repräsentiert ein Unternehmen im Enterprise Architecture Management */
+/** Company – represents an organization within Enterprise Architecture Management */
 export type CompanyOwnedInfrastructureConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -11080,7 +11090,7 @@ export type CompanyOwnedInfrastructureConnectionArgs = {
 };
 
 
-/** Company - repräsentiert ein Unternehmen im Enterprise Architecture Management */
+/** Company – represents an organization within Enterprise Architecture Management */
 export type CompanyOwnedInterfacesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -11089,7 +11099,7 @@ export type CompanyOwnedInterfacesArgs = {
 };
 
 
-/** Company - repräsentiert ein Unternehmen im Enterprise Architecture Management */
+/** Company – represents an organization within Enterprise Architecture Management */
 export type CompanyOwnedInterfacesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -11305,6 +11315,7 @@ export type CompanyDiagramOwnedDiagramsNodeAggregateSelection = {
   description: StringAggregateSelection;
   diagramJson: StringAggregateSelection;
   diagramPng: StringAggregateSelection;
+  diagramPngDark: StringAggregateSelection;
   title: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
@@ -12323,6 +12334,7 @@ export type CompanyOwnedDiagramsNodeAggregationWhereInput = {
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramJson?: InputMaybe<StringScalarAggregationFilters>;
   diagramPng?: InputMaybe<StringScalarAggregationFilters>;
+  diagramPngDark?: InputMaybe<StringScalarAggregationFilters>;
   title?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
@@ -12598,7 +12610,7 @@ export type CompanyRelationshipFilters = {
   some?: InputMaybe<CompanyWhere>;
 };
 
-/** Unternehmensgrößen */
+/** Company sizes */
 export enum CompanySize {
   ENTERPRISE = 'ENTERPRISE',
   LARGE = 'LARGE',
@@ -12800,7 +12812,7 @@ export type CreatePeopleMutationResponse = {
   people: Array<Person>;
 };
 
-/** Kritikalitätsstufen für Applikationen */
+/** Criticality levels for applications */
 export enum CriticalityLevel {
   CRITICAL = 'CRITICAL',
   HIGH = 'HIGH',
@@ -12819,7 +12831,7 @@ export type CriticalityLevelEnumScalarMutations = {
   set?: InputMaybe<CriticalityLevel>;
 };
 
-/** Datenklassifikation für Business-Datenobjekte */
+/** Data classification for business data objects */
 export enum DataClassification {
   CONFIDENTIAL = 'CONFIDENTIAL',
   INTERNAL = 'INTERNAL',
@@ -12838,7 +12850,7 @@ export type DataClassificationEnumScalarMutations = {
   set?: InputMaybe<DataClassification>;
 };
 
-/** DataObject - repräsentiert ein Business-Datenobjekt im Enterprise Architecture Management */
+/** DataObject – represents a business data object within Enterprise Architecture Management */
 export type DataObject = {
   __typename?: 'DataObject';
   classification: DataClassification;
@@ -12875,7 +12887,7 @@ export type DataObject = {
 };
 
 
-/** DataObject - repräsentiert ein Business-Datenobjekt im Enterprise Architecture Management */
+/** DataObject – represents a business data object within Enterprise Architecture Management */
 export type DataObjectCompanyArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -12884,7 +12896,7 @@ export type DataObjectCompanyArgs = {
 };
 
 
-/** DataObject - repräsentiert ein Business-Datenobjekt im Enterprise Architecture Management */
+/** DataObject – represents a business data object within Enterprise Architecture Management */
 export type DataObjectCompanyConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -12893,7 +12905,7 @@ export type DataObjectCompanyConnectionArgs = {
 };
 
 
-/** DataObject - repräsentiert ein Business-Datenobjekt im Enterprise Architecture Management */
+/** DataObject – represents a business data object within Enterprise Architecture Management */
 export type DataObjectDataSourcesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -12902,7 +12914,7 @@ export type DataObjectDataSourcesArgs = {
 };
 
 
-/** DataObject - repräsentiert ein Business-Datenobjekt im Enterprise Architecture Management */
+/** DataObject – represents a business data object within Enterprise Architecture Management */
 export type DataObjectDataSourcesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -12911,7 +12923,7 @@ export type DataObjectDataSourcesConnectionArgs = {
 };
 
 
-/** DataObject - repräsentiert ein Business-Datenobjekt im Enterprise Architecture Management */
+/** DataObject – represents a business data object within Enterprise Architecture Management */
 export type DataObjectDepictedInDiagramsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -12920,7 +12932,7 @@ export type DataObjectDepictedInDiagramsArgs = {
 };
 
 
-/** DataObject - repräsentiert ein Business-Datenobjekt im Enterprise Architecture Management */
+/** DataObject – represents a business data object within Enterprise Architecture Management */
 export type DataObjectDepictedInDiagramsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -12929,7 +12941,7 @@ export type DataObjectDepictedInDiagramsConnectionArgs = {
 };
 
 
-/** DataObject - repräsentiert ein Business-Datenobjekt im Enterprise Architecture Management */
+/** DataObject – represents a business data object within Enterprise Architecture Management */
 export type DataObjectOwnersArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -12938,7 +12950,7 @@ export type DataObjectOwnersArgs = {
 };
 
 
-/** DataObject - repräsentiert ein Business-Datenobjekt im Enterprise Architecture Management */
+/** DataObject – represents a business data object within Enterprise Architecture Management */
 export type DataObjectOwnersConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -12947,7 +12959,7 @@ export type DataObjectOwnersConnectionArgs = {
 };
 
 
-/** DataObject - repräsentiert ein Business-Datenobjekt im Enterprise Architecture Management */
+/** DataObject – represents a business data object within Enterprise Architecture Management */
 export type DataObjectPartOfArchitecturesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -12956,7 +12968,7 @@ export type DataObjectPartOfArchitecturesArgs = {
 };
 
 
-/** DataObject - repräsentiert ein Business-Datenobjekt im Enterprise Architecture Management */
+/** DataObject – represents a business data object within Enterprise Architecture Management */
 export type DataObjectPartOfArchitecturesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -12965,7 +12977,7 @@ export type DataObjectPartOfArchitecturesConnectionArgs = {
 };
 
 
-/** DataObject - repräsentiert ein Business-Datenobjekt im Enterprise Architecture Management */
+/** DataObject – represents a business data object within Enterprise Architecture Management */
 export type DataObjectRelatedToCapabilitiesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -12974,7 +12986,7 @@ export type DataObjectRelatedToCapabilitiesArgs = {
 };
 
 
-/** DataObject - repräsentiert ein Business-Datenobjekt im Enterprise Architecture Management */
+/** DataObject – represents a business data object within Enterprise Architecture Management */
 export type DataObjectRelatedToCapabilitiesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -12983,7 +12995,7 @@ export type DataObjectRelatedToCapabilitiesConnectionArgs = {
 };
 
 
-/** DataObject - repräsentiert ein Business-Datenobjekt im Enterprise Architecture Management */
+/** DataObject – represents a business data object within Enterprise Architecture Management */
 export type DataObjectTransferredInInterfacesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -12992,7 +13004,7 @@ export type DataObjectTransferredInInterfacesArgs = {
 };
 
 
-/** DataObject - repräsentiert ein Business-Datenobjekt im Enterprise Architecture Management */
+/** DataObject – represents a business data object within Enterprise Architecture Management */
 export type DataObjectTransferredInInterfacesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -13001,7 +13013,7 @@ export type DataObjectTransferredInInterfacesConnectionArgs = {
 };
 
 
-/** DataObject - repräsentiert ein Business-Datenobjekt im Enterprise Architecture Management */
+/** DataObject – represents a business data object within Enterprise Architecture Management */
 export type DataObjectUsedByApplicationsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -13010,7 +13022,7 @@ export type DataObjectUsedByApplicationsArgs = {
 };
 
 
-/** DataObject - repräsentiert ein Business-Datenobjekt im Enterprise Architecture Management */
+/** DataObject – represents a business data object within Enterprise Architecture Management */
 export type DataObjectUsedByApplicationsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -13019,7 +13031,7 @@ export type DataObjectUsedByApplicationsConnectionArgs = {
 };
 
 
-/** DataObject - repräsentiert ein Business-Datenobjekt im Enterprise Architecture Management */
+/** DataObject – represents a business data object within Enterprise Architecture Management */
 export type DataObjectUsedByOrganisationsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -13028,7 +13040,7 @@ export type DataObjectUsedByOrganisationsArgs = {
 };
 
 
-/** DataObject - repräsentiert ein Business-Datenobjekt im Enterprise Architecture Management */
+/** DataObject – represents a business data object within Enterprise Architecture Management */
 export type DataObjectUsedByOrganisationsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -13037,7 +13049,7 @@ export type DataObjectUsedByOrganisationsConnectionArgs = {
 };
 
 
-/** DataObject - repräsentiert ein Business-Datenobjekt im Enterprise Architecture Management */
+/** DataObject – represents a business data object within Enterprise Architecture Management */
 export type DataObjectUsedForTrainingAiArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -13046,7 +13058,7 @@ export type DataObjectUsedForTrainingAiArgs = {
 };
 
 
-/** DataObject - repräsentiert ein Business-Datenobjekt im Enterprise Architecture Management */
+/** DataObject – represents a business data object within Enterprise Architecture Management */
 export type DataObjectUsedForTrainingAiConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -13555,6 +13567,7 @@ export type DataObjectDepictedInDiagramsNodeAggregationWhereInput = {
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramJson?: InputMaybe<StringScalarAggregationFilters>;
   diagramPng?: InputMaybe<StringScalarAggregationFilters>;
+  diagramPngDark?: InputMaybe<StringScalarAggregationFilters>;
   title?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
@@ -13590,6 +13603,7 @@ export type DataObjectDiagramDepictedInDiagramsNodeAggregateSelection = {
   description: StringAggregateSelection;
   diagramJson: StringAggregateSelection;
   diagramPng: StringAggregateSelection;
+  diagramPngDark: StringAggregateSelection;
   title: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
@@ -14552,7 +14566,7 @@ export type DeleteInfo = {
   relationshipsDeleted: Scalars['Int']['output'];
 };
 
-/** Diagram - repräsentiert ein Excalidraw-Diagramm */
+/** Diagram – represents an Excalidraw diagram */
 export type Diagram = {
   __typename?: 'Diagram';
   architecture: Array<Architecture>;
@@ -14577,6 +14591,7 @@ export type Diagram = {
   description?: Maybe<Scalars['String']['output']>;
   diagramJson: Scalars['String']['output'];
   diagramPng?: Maybe<Scalars['String']['output']>;
+  diagramPngDark?: Maybe<Scalars['String']['output']>;
   diagramType?: Maybe<DiagramType>;
   id: Scalars['ID']['output'];
   title: Scalars['String']['output'];
@@ -14584,7 +14599,7 @@ export type Diagram = {
 };
 
 
-/** Diagram - repräsentiert ein Excalidraw-Diagramm */
+/** Diagram – represents an Excalidraw diagram */
 export type DiagramArchitectureArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -14593,7 +14608,7 @@ export type DiagramArchitectureArgs = {
 };
 
 
-/** Diagram - repräsentiert ein Excalidraw-Diagramm */
+/** Diagram – represents an Excalidraw diagram */
 export type DiagramArchitectureConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -14602,7 +14617,7 @@ export type DiagramArchitectureConnectionArgs = {
 };
 
 
-/** Diagram - repräsentiert ein Excalidraw-Diagramm */
+/** Diagram – represents an Excalidraw diagram */
 export type DiagramCompanyArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -14611,7 +14626,7 @@ export type DiagramCompanyArgs = {
 };
 
 
-/** Diagram - repräsentiert ein Excalidraw-Diagramm */
+/** Diagram – represents an Excalidraw diagram */
 export type DiagramCompanyConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -14620,7 +14635,7 @@ export type DiagramCompanyConnectionArgs = {
 };
 
 
-/** Diagram - repräsentiert ein Excalidraw-Diagramm */
+/** Diagram – represents an Excalidraw diagram */
 export type DiagramContainsAiComponentsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -14629,7 +14644,7 @@ export type DiagramContainsAiComponentsArgs = {
 };
 
 
-/** Diagram - repräsentiert ein Excalidraw-Diagramm */
+/** Diagram – represents an Excalidraw diagram */
 export type DiagramContainsAiComponentsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -14638,7 +14653,7 @@ export type DiagramContainsAiComponentsConnectionArgs = {
 };
 
 
-/** Diagram - repräsentiert ein Excalidraw-Diagramm */
+/** Diagram – represents an Excalidraw diagram */
 export type DiagramContainsApplicationsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -14647,7 +14662,7 @@ export type DiagramContainsApplicationsArgs = {
 };
 
 
-/** Diagram - repräsentiert ein Excalidraw-Diagramm */
+/** Diagram – represents an Excalidraw diagram */
 export type DiagramContainsApplicationsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -14656,7 +14671,7 @@ export type DiagramContainsApplicationsConnectionArgs = {
 };
 
 
-/** Diagram - repräsentiert ein Excalidraw-Diagramm */
+/** Diagram – represents an Excalidraw diagram */
 export type DiagramContainsCapabilitiesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -14665,7 +14680,7 @@ export type DiagramContainsCapabilitiesArgs = {
 };
 
 
-/** Diagram - repräsentiert ein Excalidraw-Diagramm */
+/** Diagram – represents an Excalidraw diagram */
 export type DiagramContainsCapabilitiesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -14674,7 +14689,7 @@ export type DiagramContainsCapabilitiesConnectionArgs = {
 };
 
 
-/** Diagram - repräsentiert ein Excalidraw-Diagramm */
+/** Diagram – represents an Excalidraw diagram */
 export type DiagramContainsDataObjectsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -14683,7 +14698,7 @@ export type DiagramContainsDataObjectsArgs = {
 };
 
 
-/** Diagram - repräsentiert ein Excalidraw-Diagramm */
+/** Diagram – represents an Excalidraw diagram */
 export type DiagramContainsDataObjectsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -14692,7 +14707,7 @@ export type DiagramContainsDataObjectsConnectionArgs = {
 };
 
 
-/** Diagram - repräsentiert ein Excalidraw-Diagramm */
+/** Diagram – represents an Excalidraw diagram */
 export type DiagramContainsInfrastructureArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -14701,7 +14716,7 @@ export type DiagramContainsInfrastructureArgs = {
 };
 
 
-/** Diagram - repräsentiert ein Excalidraw-Diagramm */
+/** Diagram – represents an Excalidraw diagram */
 export type DiagramContainsInfrastructureConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -14710,7 +14725,7 @@ export type DiagramContainsInfrastructureConnectionArgs = {
 };
 
 
-/** Diagram - repräsentiert ein Excalidraw-Diagramm */
+/** Diagram – represents an Excalidraw diagram */
 export type DiagramContainsInterfacesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -14719,7 +14734,7 @@ export type DiagramContainsInterfacesArgs = {
 };
 
 
-/** Diagram - repräsentiert ein Excalidraw-Diagramm */
+/** Diagram – represents an Excalidraw diagram */
 export type DiagramContainsInterfacesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -14728,7 +14743,7 @@ export type DiagramContainsInterfacesConnectionArgs = {
 };
 
 
-/** Diagram - repräsentiert ein Excalidraw-Diagramm */
+/** Diagram – represents an Excalidraw diagram */
 export type DiagramCreatorArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -14737,7 +14752,7 @@ export type DiagramCreatorArgs = {
 };
 
 
-/** Diagram - repräsentiert ein Excalidraw-Diagramm */
+/** Diagram – represents an Excalidraw diagram */
 export type DiagramCreatorConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -14777,6 +14792,7 @@ export type DiagramAggregateNode = {
   description: StringAggregateSelection;
   diagramJson: StringAggregateSelection;
   diagramPng: StringAggregateSelection;
+  diagramPngDark: StringAggregateSelection;
   title: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
@@ -15778,6 +15794,7 @@ export type DiagramCreateInput = {
   description?: InputMaybe<Scalars['String']['input']>;
   diagramJson: Scalars['String']['input'];
   diagramPng?: InputMaybe<Scalars['String']['input']>;
+  diagramPngDark?: InputMaybe<Scalars['String']['input']>;
   diagramType?: InputMaybe<DiagramType>;
   title: Scalars['String']['input'];
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
@@ -15998,13 +16015,14 @@ export type DiagramSort = {
   description?: InputMaybe<SortDirection>;
   diagramJson?: InputMaybe<SortDirection>;
   diagramPng?: InputMaybe<SortDirection>;
+  diagramPngDark?: InputMaybe<SortDirection>;
   diagramType?: InputMaybe<SortDirection>;
   id?: InputMaybe<SortDirection>;
   title?: InputMaybe<SortDirection>;
   updatedAt?: InputMaybe<SortDirection>;
 };
 
-/** Diagramm-Typen für Excalidraw-Diagramme */
+/** Diagram types for Excalidraw diagrams */
 export enum DiagramType {
   APPLICATION_LANDSCAPE = 'APPLICATION_LANDSCAPE',
   ARCHITECTURE = 'ARCHITECTURE',
@@ -16043,6 +16061,7 @@ export type DiagramUpdateInput = {
   description?: InputMaybe<StringScalarMutations>;
   diagramJson?: InputMaybe<StringScalarMutations>;
   diagramPng?: InputMaybe<StringScalarMutations>;
+  diagramPngDark?: InputMaybe<StringScalarMutations>;
   diagramType?: InputMaybe<DiagramTypeEnumScalarMutations>;
   title?: InputMaybe<StringScalarMutations>;
 };
@@ -16073,6 +16092,7 @@ export type DiagramWhere = {
   description?: InputMaybe<StringScalarFilters>;
   diagramJson?: InputMaybe<StringScalarFilters>;
   diagramPng?: InputMaybe<StringScalarFilters>;
+  diagramPngDark?: InputMaybe<StringScalarFilters>;
   diagramType?: InputMaybe<DiagramTypeEnumScalarFilters>;
   id?: InputMaybe<IdScalarFilters>;
   title?: InputMaybe<StringScalarFilters>;
@@ -16131,7 +16151,7 @@ export type IdScalarFilters = {
   startsWith?: InputMaybe<Scalars['ID']['input']>;
 };
 
-/** Infrastructure - repräsentiert eine Infrastruktur-Komponente im Enterprise Architecture Management */
+/** Infrastructure – represents an infrastructure component within Enterprise Architecture Management */
 export type Infrastructure = {
   __typename?: 'Infrastructure';
   capacity?: Maybe<Scalars['String']['output']>;
@@ -16175,7 +16195,7 @@ export type Infrastructure = {
 };
 
 
-/** Infrastructure - repräsentiert eine Infrastruktur-Komponente im Enterprise Architecture Management */
+/** Infrastructure – represents an infrastructure component within Enterprise Architecture Management */
 export type InfrastructureChildInfrastructuresArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -16184,7 +16204,7 @@ export type InfrastructureChildInfrastructuresArgs = {
 };
 
 
-/** Infrastructure - repräsentiert eine Infrastruktur-Komponente im Enterprise Architecture Management */
+/** Infrastructure – represents an infrastructure component within Enterprise Architecture Management */
 export type InfrastructureChildInfrastructuresConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -16193,7 +16213,7 @@ export type InfrastructureChildInfrastructuresConnectionArgs = {
 };
 
 
-/** Infrastructure - repräsentiert eine Infrastruktur-Komponente im Enterprise Architecture Management */
+/** Infrastructure – represents an infrastructure component within Enterprise Architecture Management */
 export type InfrastructureCompanyArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -16202,7 +16222,7 @@ export type InfrastructureCompanyArgs = {
 };
 
 
-/** Infrastructure - repräsentiert eine Infrastruktur-Komponente im Enterprise Architecture Management */
+/** Infrastructure – represents an infrastructure component within Enterprise Architecture Management */
 export type InfrastructureCompanyConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -16211,7 +16231,7 @@ export type InfrastructureCompanyConnectionArgs = {
 };
 
 
-/** Infrastructure - repräsentiert eine Infrastruktur-Komponente im Enterprise Architecture Management */
+/** Infrastructure – represents an infrastructure component within Enterprise Architecture Management */
 export type InfrastructureDepictedInDiagramsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -16220,7 +16240,7 @@ export type InfrastructureDepictedInDiagramsArgs = {
 };
 
 
-/** Infrastructure - repräsentiert eine Infrastruktur-Komponente im Enterprise Architecture Management */
+/** Infrastructure – represents an infrastructure component within Enterprise Architecture Management */
 export type InfrastructureDepictedInDiagramsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -16229,7 +16249,7 @@ export type InfrastructureDepictedInDiagramsConnectionArgs = {
 };
 
 
-/** Infrastructure - repräsentiert eine Infrastruktur-Komponente im Enterprise Architecture Management */
+/** Infrastructure – represents an infrastructure component within Enterprise Architecture Management */
 export type InfrastructureHostsAiComponentsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -16238,7 +16258,7 @@ export type InfrastructureHostsAiComponentsArgs = {
 };
 
 
-/** Infrastructure - repräsentiert eine Infrastruktur-Komponente im Enterprise Architecture Management */
+/** Infrastructure – represents an infrastructure component within Enterprise Architecture Management */
 export type InfrastructureHostsAiComponentsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -16247,7 +16267,7 @@ export type InfrastructureHostsAiComponentsConnectionArgs = {
 };
 
 
-/** Infrastructure - repräsentiert eine Infrastruktur-Komponente im Enterprise Architecture Management */
+/** Infrastructure – represents an infrastructure component within Enterprise Architecture Management */
 export type InfrastructureHostsApplicationsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -16256,7 +16276,7 @@ export type InfrastructureHostsApplicationsArgs = {
 };
 
 
-/** Infrastructure - repräsentiert eine Infrastruktur-Komponente im Enterprise Architecture Management */
+/** Infrastructure – represents an infrastructure component within Enterprise Architecture Management */
 export type InfrastructureHostsApplicationsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -16265,7 +16285,7 @@ export type InfrastructureHostsApplicationsConnectionArgs = {
 };
 
 
-/** Infrastructure - repräsentiert eine Infrastruktur-Komponente im Enterprise Architecture Management */
+/** Infrastructure – represents an infrastructure component within Enterprise Architecture Management */
 export type InfrastructureOwnersArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -16274,7 +16294,7 @@ export type InfrastructureOwnersArgs = {
 };
 
 
-/** Infrastructure - repräsentiert eine Infrastruktur-Komponente im Enterprise Architecture Management */
+/** Infrastructure – represents an infrastructure component within Enterprise Architecture Management */
 export type InfrastructureOwnersConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -16283,7 +16303,7 @@ export type InfrastructureOwnersConnectionArgs = {
 };
 
 
-/** Infrastructure - repräsentiert eine Infrastruktur-Komponente im Enterprise Architecture Management */
+/** Infrastructure – represents an infrastructure component within Enterprise Architecture Management */
 export type InfrastructureParentInfrastructureArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -16292,7 +16312,7 @@ export type InfrastructureParentInfrastructureArgs = {
 };
 
 
-/** Infrastructure - repräsentiert eine Infrastruktur-Komponente im Enterprise Architecture Management */
+/** Infrastructure – represents an infrastructure component within Enterprise Architecture Management */
 export type InfrastructureParentInfrastructureConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -16301,7 +16321,7 @@ export type InfrastructureParentInfrastructureConnectionArgs = {
 };
 
 
-/** Infrastructure - repräsentiert eine Infrastruktur-Komponente im Enterprise Architecture Management */
+/** Infrastructure – represents an infrastructure component within Enterprise Architecture Management */
 export type InfrastructurePartOfArchitecturesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -16310,7 +16330,7 @@ export type InfrastructurePartOfArchitecturesArgs = {
 };
 
 
-/** Infrastructure - repräsentiert eine Infrastruktur-Komponente im Enterprise Architecture Management */
+/** Infrastructure – represents an infrastructure component within Enterprise Architecture Management */
 export type InfrastructurePartOfArchitecturesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -16319,7 +16339,7 @@ export type InfrastructurePartOfArchitecturesConnectionArgs = {
 };
 
 
-/** Infrastructure - repräsentiert eine Infrastruktur-Komponente im Enterprise Architecture Management */
+/** Infrastructure – represents an infrastructure component within Enterprise Architecture Management */
 export type InfrastructureUsedByOrganisationsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -16328,7 +16348,7 @@ export type InfrastructureUsedByOrganisationsArgs = {
 };
 
 
-/** Infrastructure - repräsentiert eine Infrastruktur-Komponente im Enterprise Architecture Management */
+/** Infrastructure – represents an infrastructure component within Enterprise Architecture Management */
 export type InfrastructureUsedByOrganisationsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -16806,6 +16826,7 @@ export type InfrastructureDepictedInDiagramsNodeAggregationWhereInput = {
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramJson?: InputMaybe<StringScalarAggregationFilters>;
   diagramPng?: InputMaybe<StringScalarAggregationFilters>;
+  diagramPngDark?: InputMaybe<StringScalarAggregationFilters>;
   title?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
@@ -16841,6 +16862,7 @@ export type InfrastructureDiagramDepictedInDiagramsNodeAggregateSelection = {
   description: StringAggregateSelection;
   diagramJson: StringAggregateSelection;
   diagramPng: StringAggregateSelection;
+  diagramPngDark: StringAggregateSelection;
   title: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
@@ -17533,7 +17555,7 @@ export type InfrastructureSort = {
   version?: InputMaybe<SortDirection>;
 };
 
-/** Status-Werte für Infrastruktur-Komponenten */
+/** Status values for infrastructure components */
 export enum InfrastructureStatus {
   ACTIVE = 'ACTIVE',
   DECOMMISSIONED = 'DECOMMISSIONED',
@@ -17554,7 +17576,7 @@ export type InfrastructureStatusEnumScalarMutations = {
   set?: InputMaybe<InfrastructureStatus>;
 };
 
-/** Infrastruktur-Typen */
+/** Infrastructure types */
 export enum InfrastructureType {
   CLOUD_DATACENTER = 'CLOUD_DATACENTER',
   CONTAINER_HOST = 'CONTAINER_HOST',
@@ -17800,7 +17822,7 @@ export type IntScalarMutations = {
   subtract?: InputMaybe<Scalars['Int']['input']>;
 };
 
-/** Protokolle für Applikationsschnittstellen */
+/** Protocols used by application interfaces */
 export enum InterfaceProtocol {
   FTP = 'FTP',
   GRAPHQL = 'GRAPHQL',
@@ -17831,7 +17853,7 @@ export type InterfaceProtocolEnumScalarMutations = {
   set?: InputMaybe<InterfaceProtocol>;
 };
 
-/** Status für Applikationsschnittstellen */
+/** Status values for application interfaces */
 export enum InterfaceStatus {
   ACTIVE = 'ACTIVE',
   DEPRECATED = 'DEPRECATED',
@@ -17851,7 +17873,7 @@ export type InterfaceStatusEnumScalarMutations = {
   set?: InputMaybe<InterfaceStatus>;
 };
 
-/** Schnittstellentypen für Applikationsschnittstellen */
+/** Interface types for application integrations */
 export enum InterfaceType {
   API = 'API',
   DATABASE = 'DATABASE',
@@ -18122,7 +18144,7 @@ export type MutationUpdatePeopleArgs = {
   where?: InputMaybe<PersonWhere>;
 };
 
-/** Organisation - repräsentiert eine organisatorische Einheit im Unternehmen */
+/** Organisation – represents an organizational unit within the company */
 export type Organisation = {
   __typename?: 'Organisation';
   childOrganisations: Array<Organisation>;
@@ -18153,7 +18175,7 @@ export type Organisation = {
 };
 
 
-/** Organisation - repräsentiert eine organisatorische Einheit im Unternehmen */
+/** Organisation – represents an organizational unit within the company */
 export type OrganisationChildOrganisationsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -18162,7 +18184,7 @@ export type OrganisationChildOrganisationsArgs = {
 };
 
 
-/** Organisation - repräsentiert eine organisatorische Einheit im Unternehmen */
+/** Organisation – represents an organizational unit within the company */
 export type OrganisationChildOrganisationsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -18171,7 +18193,7 @@ export type OrganisationChildOrganisationsConnectionArgs = {
 };
 
 
-/** Organisation - repräsentiert eine organisatorische Einheit im Unternehmen */
+/** Organisation – represents an organizational unit within the company */
 export type OrganisationCompanyArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -18180,7 +18202,7 @@ export type OrganisationCompanyArgs = {
 };
 
 
-/** Organisation - repräsentiert eine organisatorische Einheit im Unternehmen */
+/** Organisation – represents an organizational unit within the company */
 export type OrganisationCompanyConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -18189,7 +18211,7 @@ export type OrganisationCompanyConnectionArgs = {
 };
 
 
-/** Organisation - repräsentiert eine organisatorische Einheit im Unternehmen */
+/** Organisation – represents an organizational unit within the company */
 export type OrganisationParentOrganisationArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -18198,7 +18220,7 @@ export type OrganisationParentOrganisationArgs = {
 };
 
 
-/** Organisation - repräsentiert eine organisatorische Einheit im Unternehmen */
+/** Organisation – represents an organizational unit within the company */
 export type OrganisationParentOrganisationConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -18207,7 +18229,7 @@ export type OrganisationParentOrganisationConnectionArgs = {
 };
 
 
-/** Organisation - repräsentiert eine organisatorische Einheit im Unternehmen */
+/** Organisation – represents an organizational unit within the company */
 export type OrganisationUsedAiComponentsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -18216,7 +18238,7 @@ export type OrganisationUsedAiComponentsArgs = {
 };
 
 
-/** Organisation - repräsentiert eine organisatorische Einheit im Unternehmen */
+/** Organisation – represents an organizational unit within the company */
 export type OrganisationUsedAiComponentsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -18225,7 +18247,7 @@ export type OrganisationUsedAiComponentsConnectionArgs = {
 };
 
 
-/** Organisation - repräsentiert eine organisatorische Einheit im Unternehmen */
+/** Organisation – represents an organizational unit within the company */
 export type OrganisationUsedApplicationsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -18234,7 +18256,7 @@ export type OrganisationUsedApplicationsArgs = {
 };
 
 
-/** Organisation - repräsentiert eine organisatorische Einheit im Unternehmen */
+/** Organisation – represents an organizational unit within the company */
 export type OrganisationUsedApplicationsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -18243,7 +18265,7 @@ export type OrganisationUsedApplicationsConnectionArgs = {
 };
 
 
-/** Organisation - repräsentiert eine organisatorische Einheit im Unternehmen */
+/** Organisation – represents an organizational unit within the company */
 export type OrganisationUsedCapabilitiesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -18252,7 +18274,7 @@ export type OrganisationUsedCapabilitiesArgs = {
 };
 
 
-/** Organisation - repräsentiert eine organisatorische Einheit im Unternehmen */
+/** Organisation – represents an organizational unit within the company */
 export type OrganisationUsedCapabilitiesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -18261,7 +18283,7 @@ export type OrganisationUsedCapabilitiesConnectionArgs = {
 };
 
 
-/** Organisation - repräsentiert eine organisatorische Einheit im Unternehmen */
+/** Organisation – represents an organizational unit within the company */
 export type OrganisationUsedDataObjectsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -18270,7 +18292,7 @@ export type OrganisationUsedDataObjectsArgs = {
 };
 
 
-/** Organisation - repräsentiert eine organisatorische Einheit im Unternehmen */
+/** Organisation – represents an organizational unit within the company */
 export type OrganisationUsedDataObjectsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -18279,7 +18301,7 @@ export type OrganisationUsedDataObjectsConnectionArgs = {
 };
 
 
-/** Organisation - repräsentiert eine organisatorische Einheit im Unternehmen */
+/** Organisation – represents an organizational unit within the company */
 export type OrganisationUsedInfrastructureArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -18288,7 +18310,7 @@ export type OrganisationUsedInfrastructureArgs = {
 };
 
 
-/** Organisation - repräsentiert eine organisatorische Einheit im Unternehmen */
+/** Organisation – represents an organizational unit within the company */
 export type OrganisationUsedInfrastructureConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -18297,7 +18319,7 @@ export type OrganisationUsedInfrastructureConnectionArgs = {
 };
 
 
-/** Organisation - repräsentiert eine organisatorische Einheit im Unternehmen */
+/** Organisation – represents an organizational unit within the company */
 export type OrganisationUsedInterfacesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -18306,7 +18328,7 @@ export type OrganisationUsedInterfacesArgs = {
 };
 
 
-/** Organisation - repräsentiert eine organisatorische Einheit im Unternehmen */
+/** Organisation – represents an organizational unit within the company */
 export type OrganisationUsedInterfacesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -18902,7 +18924,7 @@ export type OrganisationSort = {
   updatedAt?: InputMaybe<SortDirection>;
 };
 
-/** Organisationstypen */
+/** Organization types */
 export enum OrganisationType {
   BRANCH = 'BRANCH',
   DEPARTMENT = 'DEPARTMENT',
@@ -19658,7 +19680,7 @@ export type PeopleConnection = {
   totalCount: Scalars['Int']['output'];
 };
 
-/** Person - repräsentiert eine Person im Unternehmen */
+/** Person – represents an individual within the organization */
 export type Person = {
   __typename?: 'Person';
   avatarUrl?: Maybe<Scalars['String']['output']>;
@@ -19692,7 +19714,7 @@ export type Person = {
 };
 
 
-/** Person - repräsentiert eine Person im Unternehmen */
+/** Person – represents an individual within the organization */
 export type PersonCompanyArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -19701,7 +19723,7 @@ export type PersonCompanyArgs = {
 };
 
 
-/** Person - repräsentiert eine Person im Unternehmen */
+/** Person – represents an individual within the organization */
 export type PersonCompanyConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -19710,7 +19732,7 @@ export type PersonCompanyConnectionArgs = {
 };
 
 
-/** Person - repräsentiert eine Person im Unternehmen */
+/** Person – represents an individual within the organization */
 export type PersonOwnedAiComponentsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -19719,7 +19741,7 @@ export type PersonOwnedAiComponentsArgs = {
 };
 
 
-/** Person - repräsentiert eine Person im Unternehmen */
+/** Person – represents an individual within the organization */
 export type PersonOwnedAiComponentsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -19728,7 +19750,7 @@ export type PersonOwnedAiComponentsConnectionArgs = {
 };
 
 
-/** Person - repräsentiert eine Person im Unternehmen */
+/** Person – represents an individual within the organization */
 export type PersonOwnedApplicationsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -19737,7 +19759,7 @@ export type PersonOwnedApplicationsArgs = {
 };
 
 
-/** Person - repräsentiert eine Person im Unternehmen */
+/** Person – represents an individual within the organization */
 export type PersonOwnedApplicationsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -19746,7 +19768,7 @@ export type PersonOwnedApplicationsConnectionArgs = {
 };
 
 
-/** Person - repräsentiert eine Person im Unternehmen */
+/** Person – represents an individual within the organization */
 export type PersonOwnedArchitecturesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -19755,7 +19777,7 @@ export type PersonOwnedArchitecturesArgs = {
 };
 
 
-/** Person - repräsentiert eine Person im Unternehmen */
+/** Person – represents an individual within the organization */
 export type PersonOwnedArchitecturesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -19764,7 +19786,7 @@ export type PersonOwnedArchitecturesConnectionArgs = {
 };
 
 
-/** Person - repräsentiert eine Person im Unternehmen */
+/** Person – represents an individual within the organization */
 export type PersonOwnedCapabilitiesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -19773,7 +19795,7 @@ export type PersonOwnedCapabilitiesArgs = {
 };
 
 
-/** Person - repräsentiert eine Person im Unternehmen */
+/** Person – represents an individual within the organization */
 export type PersonOwnedCapabilitiesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -19782,7 +19804,7 @@ export type PersonOwnedCapabilitiesConnectionArgs = {
 };
 
 
-/** Person - repräsentiert eine Person im Unternehmen */
+/** Person – represents an individual within the organization */
 export type PersonOwnedDataObjectsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -19791,7 +19813,7 @@ export type PersonOwnedDataObjectsArgs = {
 };
 
 
-/** Person - repräsentiert eine Person im Unternehmen */
+/** Person – represents an individual within the organization */
 export type PersonOwnedDataObjectsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -19800,7 +19822,7 @@ export type PersonOwnedDataObjectsConnectionArgs = {
 };
 
 
-/** Person - repräsentiert eine Person im Unternehmen */
+/** Person – represents an individual within the organization */
 export type PersonOwnedDiagramsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -19809,7 +19831,7 @@ export type PersonOwnedDiagramsArgs = {
 };
 
 
-/** Person - repräsentiert eine Person im Unternehmen */
+/** Person – represents an individual within the organization */
 export type PersonOwnedDiagramsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -19818,7 +19840,7 @@ export type PersonOwnedDiagramsConnectionArgs = {
 };
 
 
-/** Person - repräsentiert eine Person im Unternehmen */
+/** Person – represents an individual within the organization */
 export type PersonOwnedInfrastructureArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -19827,7 +19849,7 @@ export type PersonOwnedInfrastructureArgs = {
 };
 
 
-/** Person - repräsentiert eine Person im Unternehmen */
+/** Person – represents an individual within the organization */
 export type PersonOwnedInfrastructureConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -19836,7 +19858,7 @@ export type PersonOwnedInfrastructureConnectionArgs = {
 };
 
 
-/** Person - repräsentiert eine Person im Unternehmen */
+/** Person – represents an individual within the organization */
 export type PersonOwnedInterfacesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -19845,7 +19867,7 @@ export type PersonOwnedInterfacesArgs = {
 };
 
 
-/** Person - repräsentiert eine Person im Unternehmen */
+/** Person – represents an individual within the organization */
 export type PersonOwnedInterfacesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -20168,6 +20190,7 @@ export type PersonDiagramOwnedDiagramsNodeAggregateSelection = {
   description: StringAggregateSelection;
   diagramJson: StringAggregateSelection;
   diagramPng: StringAggregateSelection;
+  diagramPngDark: StringAggregateSelection;
   title: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
@@ -20843,6 +20866,7 @@ export type PersonOwnedDiagramsNodeAggregationWhereInput = {
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramJson?: InputMaybe<StringScalarAggregationFilters>;
   diagramPng?: InputMaybe<StringScalarAggregationFilters>;
+  diagramPngDark?: InputMaybe<StringScalarAggregationFilters>;
   title?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
@@ -21167,7 +21191,7 @@ export type PersonWhere = {
   updatedAt?: InputMaybe<DateTimeScalarFilters>;
 };
 
-/** Kategorien für Architektur-Prinzipien */
+/** Categories for architecture principles */
 export enum PrincipleCategory {
   APPLICATION = 'APPLICATION',
   BUSINESS = 'BUSINESS',
@@ -21198,7 +21222,7 @@ export type PrincipleCategoryEnumScalarMutations = {
   set?: InputMaybe<PrincipleCategory>;
 };
 
-/** Prioritätsstufen für Architektur-Prinzipien */
+/** Priority levels for architecture principles */
 export enum PrinciplePriority {
   CRITICAL = 'CRITICAL',
   HIGH = 'HIGH',
@@ -21437,7 +21461,7 @@ export type QueryPeopleConnectionArgs = {
   where?: InputMaybe<PersonWhere>;
 };
 
-/** 7R-Strategien für Cloud-Migration und Applikationsportfolio-Management */
+/** 7R strategies for cloud migration and application portfolio management */
 export enum SevenRStrategy {
   REARCHITECT = 'REARCHITECT',
   REFACTOR = 'REFACTOR',
@@ -21500,7 +21524,7 @@ export type StringScalarMutations = {
   set?: InputMaybe<Scalars['String']['input']>;
 };
 
-/** TIME-Kategorien für Applikationen zur strategischen Klassifizierung */
+/** TIME categories for strategic application classification */
 export enum TimeCategory {
   ELIMINATE = 'ELIMINATE',
   INVEST = 'INVEST',

@@ -108,7 +108,7 @@ const createDiagramTypes = (t: any): DiagramType[] => [
 export interface SaveDiagramDialogProps {
   open: boolean
   onClose: () => void
-  onSave: (savedDiagram: any) => void
+  onSave: (savedDiagram: any) => Promise<boolean>
   diagramData: string // JSON string des Excalidraw-Diagramms
   onDiagramUpdate?: (updatedDiagramData: string) => void // Handler für Canvas-Updates nach Element-Erstellung
   existingDiagram?: {
@@ -116,6 +116,7 @@ export interface SaveDiagramDialogProps {
     title: string
     description?: string
     diagramType?: string
+    company?: Array<{ id: string; name: string }> | { id: string; name: string }
     architecture?:
       | {
           id: string
@@ -462,8 +463,10 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
     // No new elements or parsing error - normal save
     const savedDiagram = await performSave()
     if (savedDiagram) {
-      onClose() // Close dialog
-      onSave(savedDiagram) // Inform parent about save
+      const success = await onSave(savedDiagram)
+      if (!success) {
+        setTitleError(true)
+      }
     }
   }
 
@@ -513,11 +516,8 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
         // Perform save with updated data
         const savedDiagram = await performSave(updatedDiagramData)
 
-        // Nach erfolgreichem Speichern: Dialog schließen und Canvas-Update
+        // Nach erfolgreichem Speichern: Canvas-Update und Parent benachrichtigen
         if (savedDiagram) {
-          // Dialog sofort schließen
-          onClose()
-
           // Canvas sofort mit den neuen Daten aktualisieren
           if (onDiagramUpdate) {
             onDiagramUpdate(updatedDiagramData)
@@ -530,15 +530,20 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
           }
 
           // Parent-Component über das gespeicherte Diagramm informieren
-          onSave(diagramWithUpdatedElements)
+          const success = await onSave(diagramWithUpdatedElements)
+          if (!success) {
+            setTitleError(true)
+          }
         }
       } else {
         // Zeige Fehler bei der Elementerstellung, aber speichere trotzdem
         console.error('Fehler beim Erstellen der Elemente:', creationResult.errors)
         const savedDiagram = await performSave()
         if (savedDiagram) {
-          onClose()
-          onSave(savedDiagram)
+          const success = await onSave(savedDiagram)
+          if (!success) {
+            setTitleError(true)
+          }
         }
       }
     } catch (error) {
@@ -546,8 +551,10 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
       // Bei Fehler trotzdem normal speichern
       const savedDiagram = await performSave()
       if (savedDiagram) {
-        onClose()
-        onSave(savedDiagram)
+        const success = await onSave(savedDiagram)
+        if (!success) {
+          setTitleError(true)
+        }
       }
     } finally {
       setCreatingElements(false)
@@ -559,8 +566,9 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
 
     setSaving(true)
     try {
-      // PNG-Generierung vor dem Speichern
+      // PNG-Generierung vor dem Speichern (light and dark mode)
       let diagramPng: string | null = null
+      let diagramPngDark: string | null = null
       try {
         const parsedDiagramData = JSON.parse(dataToSave)
         const elements = parsedDiagramData.elements || []
@@ -571,25 +579,49 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
 
           const appState = parsedDiagramData.appState || {}
 
-          // Export to PNG blob
-          const blob = await exportToBlob({
+          // Generate light mode preview
+          const lightBlob = await exportToBlob({
             elements,
             appState: {
               ...appState,
+              collaborators: undefined,
               exportBackground: true,
-              viewBackgroundColor: appState.viewBackgroundColor || '#ffffff',
+              viewBackgroundColor: '#ffffff',
               exportWithDarkMode: false,
               exportEmbedScene: false,
             },
             files: {},
             mimeType: 'image/png',
-            quality: 0.95,
+            quality: 0.85,
+            exportPadding: 20,
+            backgroundColor: '#ffffff',
+          })
+
+          // Generate dark mode preview with dark background
+          // Note: exportWithDarkMode applies an invert filter to the entire canvas,
+          // so we need to pass white (#ffffff) which will be inverted to dark (#121212)
+          const darkAppState = {
+            ...appState,
+            collaborators: undefined,
+            exportBackground: true,
+            viewBackgroundColor: '#ffffff', // Will be inverted to dark by THEME_FILTER
+            exportWithDarkMode: true,
+            exportEmbedScene: false,
+            theme: 'dark',
+          }
+
+          const darkBlob = await exportToBlob({
+            elements,
+            appState: darkAppState,
+            files: {},
+            mimeType: 'image/png',
+            quality: 0.85,
             exportPadding: 20,
           })
 
-          if (blob) {
-            // Convert blob to base64
-            const arrayBuffer = await blob.arrayBuffer()
+          if (lightBlob) {
+            // Convert light blob to base64
+            const arrayBuffer = await lightBlob.arrayBuffer()
             const base64String = btoa(
               new Uint8Array(arrayBuffer).reduce(
                 (data, byte) => data + String.fromCharCode(byte),
@@ -597,6 +629,18 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
               )
             )
             diagramPng = base64String
+          }
+
+          if (darkBlob) {
+            // Convert dark blob to base64
+            const arrayBuffer = await darkBlob.arrayBuffer()
+            const base64String = btoa(
+              new Uint8Array(arrayBuffer).reduce(
+                (data, byte) => data + String.fromCharCode(byte),
+                ''
+              )
+            )
+            diagramPngDark = base64String
           }
         }
       } catch (pngError) {
@@ -610,6 +654,7 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
         diagramJson: dataToSave,
         diagramType: diagramType,
         ...(diagramPng && { diagramPng }),
+        ...(diagramPngDark && { diagramPngDark }),
         // Safety: always connect diagram to the selected company on create
         ...(selectedCompanyId && {
           company: {
@@ -648,14 +693,29 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
       if (existingDiagram?.id && !forceSaveAs) {
         // Update bestehende Diagramm
         const relationshipUpdates = createDiagramRelationshipUpdatesWithDisconnect(dataToSave)
+
+        // Determine existing company ID
+        const existingCompanyId = existingDiagram.company
+          ? Array.isArray(existingDiagram.company)
+            ? existingDiagram.company[0]?.id
+            : existingDiagram.company.id
+          : null
+
+        // Only update company if:
+        // 1. We have a selectedCompanyId AND
+        // 2. It's different from the existing company
+        // Otherwise, preserve the existing company connection by not including it in the update
+        const shouldUpdateCompany = selectedCompanyId && selectedCompanyId !== existingCompanyId
+
         const updateInput = {
           title: { set: title.trim() },
           description: { set: description.trim() || undefined },
           diagramJson: { set: dataToSave },
           diagramType: { set: diagramType },
           ...(diagramPng && { diagramPng: { set: diagramPng } }),
-          // Ensure company stays connected to the selected company on update
-          ...(selectedCompanyId && {
+          ...(diagramPngDark && { diagramPngDark: { set: diagramPngDark } }),
+          // Only update company if it actually changed
+          ...(shouldUpdateCompany && {
             company: {
               disconnect: [{ where: {} }],
               connect: [
@@ -686,8 +746,17 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
           },
         })
 
-        if (!result.data || !result.data.updateDiagrams) {
-          throw new Error('Keine Daten von updateDiagrams erhalten')
+        if (
+          !result.data ||
+          !result.data.updateDiagrams ||
+          !result.data.updateDiagrams.diagrams[0]
+        ) {
+          console.error(
+            'Save failed: No diagram returned from update mutation. This is likely a permissions issue.'
+          )
+          throw new Error(
+            'Failed to save diagram: You may not have permission to update this diagram. Please ask the diagram owner to save.'
+          )
         }
 
         const savedDiagram = result.data.updateDiagrams.diagrams[0]

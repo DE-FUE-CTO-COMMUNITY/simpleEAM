@@ -24,6 +24,11 @@ export interface ExcalidrawComponentProps {
   currentDiagram?: any
   onDiagramUpdate?: (diagram: any) => void
   onCollaborationStatusChange?: (isCollaborating: boolean) => void
+  onStopCollaboration?: () => void
+  onBroadcastReady?: (broadcastFn: (elements?: any[], appState?: any) => void) => void
+  isLoadingRef?: React.MutableRefObject<boolean>
+  suppressOnChangeRef?: React.MutableRefObject<boolean>
+  authorizeAccess?: (diagram: any) => 'allow' | 'deny' | 'ignore'
   // Add Related Elements functionality
   selectedElementForRelatedElements?: any
   onOpenAddRelatedElementsDialog: (element: any) => void
@@ -66,6 +71,7 @@ export interface DiagramHandlers {
   handleImportJSON: () => void
   handleExportPNG: () => void
   handleManualSync: () => void
+  broadcastSceneUpdate?: (elements?: any[], appState?: any) => void
 }
 
 // Storage Keys

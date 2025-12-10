@@ -278,6 +278,8 @@ export const useUIOptions = () => {
     tools: {
       image: true,
     },
+    // Disable default library since we have custom DiagramLibrarySidebar
+    dockedSidebarBreakpoint: 0, // Never dock library
   }
 
   return uiOptions

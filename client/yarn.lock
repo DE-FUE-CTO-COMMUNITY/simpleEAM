@@ -8523,6 +8523,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"nextjs@npm:^0.0.3":
+  version: 0.0.3
+  resolution: "nextjs@npm:0.0.3"
+  checksum: 10c0/d9c7d0dfc94760f93dcad7444118757c7816f0471524c5229cd24396592d33f417f0a61325345543bfb3e4987e1f1294c6ab7f7e0dcc0976c7c9718425c0de28
+  languageName: node
+  linkType: hard
+
 "no-case@npm:^3.0.4":
   version: 3.0.4
   resolution: "no-case@npm:3.0.4"
@@ -10029,6 +10036,7 @@ __metadata:
     lodash: "npm:^4.17.21"
     next: "npm:^15.5.7"
     next-intl: "npm:4"
+    nextjs: "npm:^0.0.3"
     notistack: "npm:^3.0.1"
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"

@@ -56,6 +56,7 @@ const Dashboard = () => {
   const dataWhere = capWhere
   const archWhere = capWhere
   const diagWhere = capWhere
+  const personsWhere = useCompanyWhere('companies') // Person type uses 'companies' (plural)
 
   // Weiterleitung zum Login, falls nicht authentifiziert
   useEffect(() => {
@@ -135,7 +136,7 @@ const Dashboard = () => {
     error: personsError,
   } = useQuery(GET_PERSONS_COUNT, {
     skip: !authenticated || !initialized,
-    variables: { where: capWhere },
+    variables: { where: personsWhere },
   })
 
   const {

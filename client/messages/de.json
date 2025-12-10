@@ -82,6 +82,22 @@
     "createFirstDiagram": "Erstellen Sie Ihr erstes Diagramm über die Diagramm-Seite.",
     "diagramsCount": "{count} von {total} Diagrammen",
     "loadingDiagramsError": "Fehler beim Laden der Diagramme: {message}",
+    "noPreviewAvailable": "Keine Vorschau verfügbar",
+    "architecture": "Architektur",
+    "updated": "Aktualisiert",
+    "diagramTypes": {
+      "ARCHITECTURE": "Architektur",
+      "APPLICATION_LANDSCAPE": "Anwendungslandschaft",
+      "CAPABILITY_MAP": "Capability Map",
+      "DATA_FLOW": "Datenfluss",
+      "PROCESS": "Prozess",
+      "NETWORK": "Netzwerk",
+      "INTEGRATION": "Integration",
+      "SECURITY": "Sicherheit",
+      "CONCEPT": "Konzept",
+      "OTHER": "Sonstige",
+      "UNKNOWN": "Unbekannt"
+    },
     "architectureLandscape": "Architekturlandschaft",
     "overview": "Die Enterprise-Architektur-Management-Plattform zeigt Ihnen einen Überblick über die vollständige IT-Landschaft.",
     "totalElements": "Es wurden insgesamt {count} Architekturelemente erfasst: {capabilitiesCount} Business Capabilities, {applicationsCount} Applikationen, {aiComponentsCount} AI Components, {dataObjectsCount} Datenobjekte, {interfacesCount} Schnittstellen und {infrastructuresCount} Infrastrukturelemente. Darüber hinaus gibt es {architecturesCount} Architekturen, {principlesCount} Architektur Prinzipien, {diagramsCount} Diagramme und {personsCount} Personen.",
@@ -139,7 +155,42 @@
       "exportPNG": "PNG exportieren",
       "syncDatabase": "DB Synchronisieren",
       "findOnCanvas": "Auf Canvas finden",
+      "liveCollaboration": "Live-Zusammenarbeit",
       "addRelatedElements": "Verwandte Elemente hinzufügen"
+    },
+    "collaborationDialog": {
+      "title": "Live-Zusammenarbeit",
+      "description": "Starten Sie eine Live-Zusammenarbeit, um gemeinsam an Diagrammen zu arbeiten.",
+      "roomLabel": "Raum-ID",
+      "roomPlaceholder": "Raum-ID eingeben",
+      "roomHelper": "Andere Nutzer können mit derselben Raum-ID beitreten",
+      "generate": "Generieren",
+      "activeAlert": "Live-Zusammenarbeit ist aktiv",
+      "currentRoom": "Aktueller Raum",
+      "copyRoomId": "Raum-ID kopieren",
+      "participants": "Teilnehmer ({count})",
+      "noParticipants": "Keine weiteren Teilnehmer",
+      "shareSession": "Session teilen",
+      "copyLink": "Link kopieren",
+      "cancel": "Abbrechen",
+      "close": "Schließen",
+      "startCollaboration": "Zusammenarbeit starten",
+      "stopCollaboration": "Zusammenarbeit beenden",
+      "starting": "Startet...",
+      "roomGenerated": "Neue Raum-ID generiert",
+      "roomCopied": "Raum-ID kopiert",
+      "linkCopied": "Collaborations-Link kopiert",
+      "copyFailed": "Kopieren in die Zwischenablage fehlgeschlagen",
+      "errorRoomRequired": "Raum-ID ist erforderlich",
+      "errorStart": "Fehler beim Starten der Zusammenarbeit",
+      "startSuccess": "Live-Zusammenarbeit gestartet",
+      "stopSuccess": "Live-Zusammenarbeit beendet",
+      "permissionDenied": "Sie sind nicht berechtigt, an dieser Zusammenarbeit teilzunehmen.",
+      "permissionRequired": "Bearbeitungs- oder Admin-Rechte für das Unternehmen des Diagramms sind erforderlich.",
+      "companyPermissionDenied": "Sie können für dieses Unternehmen keine Zusammenarbeit starten.",
+      "companyMissing": "Dieses Diagramm ist keinem Unternehmen zugeordnet, daher ist die Zusammenarbeit gesperrt.",
+      "companySwitchLockedTooltip": "Beenden Sie die Live-Zusammenarbeit, bevor Sie das Unternehmen wechseln.",
+      "activeMenuLabel": "Live-Zusammenarbeit (Aktiv)"
     },
     "contextMenu": {
       "cut": "Ausschneiden",
@@ -1908,6 +1959,66 @@
       "updatedAtLabel": "Aktualisierungsdatum",
       "fromLabel": "Von",
       "toLabel": "Bis"
+    }
+  },
+  "diagramEditor": {
+    "librarySidebar": {
+      "title": "Diagrammbibliothek",
+      "description": "Ziehe einen Eintrag auf die Zeichenfläche.",
+      "searchPlaceholder": "In Bibliothek suchen...",
+      "newHeading": "Neue Elemente",
+      "existingHeading": "Bestehende Elemente",
+      "noTemplates": "Vorlagen sind noch nicht verfügbar.",
+      "noRecords": "Noch keine {type} vorhanden.",
+      "noFilterResults": "Keine Elemente entsprechen der Suche.",
+      "templateRequired": "Füge eine {type}-Vorlage hinzu, um Datenbankelemente freizuschalten.",
+      "toggle": {
+        "show": "Bibliothek anzeigen",
+        "hide": "Bibliothek ausblenden"
+      },
+      "search": {
+        "title": "Suche",
+        "description": "Auf Canvas suchen",
+        "placeholder": "Auf Canvas suchen...",
+        "noResults": "Keine Elemente gefunden",
+        "resultsCount": "{count} Ergebnis(se) gefunden",
+        "previousResult": "Vorheriges Ergebnis",
+        "nextResult": "Nächstes Ergebnis"
+      }
+    },
+    "elementTypes": {
+      "capability": {
+        "singular": "Business Capability",
+        "plural": "Business Capabilities"
+      },
+      "application": {
+        "singular": "Applikation",
+        "plural": "Applikationen"
+      },
+      "dataObject": {
+        "singular": "Datenobjekt",
+        "plural": "Datenobjekte"
+      },
+      "applicationInterface": {
+        "singular": "Applikationsschnittstelle",
+        "plural": "Applikationsschnittstellen"
+      },
+      "interface": {
+        "singular": "Schnittstelle",
+        "plural": "Schnittstellen"
+      },
+      "infrastructure": {
+        "singular": "Infrastruktur",
+        "plural": "Infrastruktur"
+      },
+      "aiComponent": {
+        "singular": "KI-Komponente",
+        "plural": "KI-Komponenten"
+      },
+      "aicomponent": {
+        "singular": "KI-Komponente",
+        "plural": "KI-Komponenten"
+      }
     }
   },
   "debug": {

@@ -127,7 +127,7 @@ export const GET_PERSON_BY_EMAIL = gql`
       role
       phone
       avatarUrl
-      company {
+      companies {
         id
         name
         primaryColor

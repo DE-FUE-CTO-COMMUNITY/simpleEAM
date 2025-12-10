@@ -4,14 +4,17 @@ import React, { useRef, useCallback, useMemo, useEffect, useState } from 'react'
 import { Box, Alert, Snackbar } from '@mui/material'
 import { useApolloClient } from '@apollo/client'
 import { FONT_FAMILY } from '@excalidraw/excalidraw'
+import { useSnackbar } from 'notistack'
 import { useTranslations } from 'next-intl'
 import { GET_DIAGRAM } from '@/graphql/diagram'
+import { useCurrentPerson } from '@/hooks/useCurrentPerson'
+import { isAdmin, isArchitect } from '@/lib/auth'
 import SaveDiagramDialog from '../dialogs/SaveDiagramDialog'
 import OpenDiagramDialog from '../dialogs/OpenDiagramDialog'
 import DeleteDiagramDialog from '../dialogs/DeleteDiagramDialog'
-import IntegratedLibrary from './IntegratedLibrary'
 import DiagramNameDisplay from './DiagramNameDisplay'
 import ExcalidrawWrapper from './ExcalidrawWrapper'
+import DiagramLibrarySidebar, { type DiagramLibrarySidebarHandle } from './DiagramLibrarySidebar'
 import CanvasDebugOverlay from './CanvasDebugOverlay'
 import CapabilityMapGenerator from '../dialogs/CapabilityMapGenerator'
 import { DiagramEditorProps } from '../types/DiagramTypes'
@@ -23,22 +26,37 @@ import { isViewer } from '@/lib/auth'
 import { useCompanyContext } from '@/contexts/CompanyContext'
 import type { ExcalidrawFont } from '@/components/companies/types'
 
+type CollaborationPermissionFailure = 'missing-edit' | 'missing-company' | 'forbidden-company'
+
 const COMPANY_FONT_TO_EXCALIDRAW: Record<ExcalidrawFont, number> = {
-  Virgil: FONT_FAMILY.Virgil,
   'Comic Shanns': FONT_FAMILY['Comic Shanns'],
   Excalifont: FONT_FAMILY.Excalifont,
   'Lilita One': FONT_FAMILY['Lilita One'],
   Nunito: FONT_FAMILY.Nunito,
 }
 
-const FALLBACK_EXCALIDRAW_FONT = FONT_FAMILY.Virgil
+const FALLBACK_EXCALIDRAW_FONT = FONT_FAMILY.Excalifont
 
 const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const apolloClient = useApolloClient()
   const t = useTranslations('diagrams')
-  const { selectedCompanyId, selectedCompany } = useCompanyContext()
+  const {
+    selectedCompanyId,
+    selectedCompany,
+    setCompanySelectionLock,
+    setSelectedCompanyId,
+    companies,
+  } = useCompanyContext()
   const prevCompanyIdRef = useRef<string | null>(null)
+  const { enqueueSnackbar } = useSnackbar()
+  const collaborationTranslations = useTranslations('diagrams.collaborationDialog')
+  const { currentPerson } = useCurrentPerson()
+
+  const accessibleCompanyIds = useMemo(() => {
+    const ids = new Set(companies.map(company => company.id))
+    return ids
+  }, [companies])
 
   const companyFontFamily = useMemo(() => {
     const diagramFont = selectedCompany?.diagramFont as ExcalidrawFont | undefined
@@ -50,6 +68,17 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
 
   // Collaboration status state
   const [isCollaborating, setIsCollaborating] = useState(false)
+  // Sidebar state
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+  const sidebarRef = useRef<DiagramLibrarySidebarHandle | null>(null)
+  // Ref to track if we're in the middle of receiving collaboration data
+  const isReceivingCollaborationDataRef = useRef(false)
+  // Collaboration error state
+  const [collaborationError, setCollaborationError] = useState<string | null>(null)
+  // Ref to store broadcastSceneUpdate function from collaboration hook
+  const broadcastSceneUpdateRef = useRef<((elements?: any[], appState?: any) => void) | null>(null)
+  // Ref to suppress onChange callbacks after programmatic scene updates (prevents broadcast loops)
+  const suppressOnChangeRef = useRef(false)
 
   // Custom hooks for state management
   const {
@@ -134,6 +163,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     handleImportJSON,
     handleExportPNG,
     handleManualSync,
+    isLoadingRef,
   } = useDiagramHandlers(
     excalidrawAPI,
     currentDiagram,
@@ -145,7 +175,9 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     open => updateDialogState('saveDialogOpen', open),
     open => updateDialogState('saveAsDialogOpen', open),
     lastSavedScene,
-    companyFontFamily
+    companyFontFamily,
+    broadcastSceneUpdateRef,
+    suppressOnChangeRef
   )
 
   // Capability Map Generator Handler
@@ -254,7 +286,27 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
   useEffect(() => {
     // Skip on first mount when prev is undefined
     const prev = prevCompanyIdRef.current
+
     if (prev !== null && selectedCompanyId !== prev) {
+      // Don't clear the canvas during active collaboration
+      // The collaboration system will handle content synchronization
+      if (isCollaborating) {
+        prevCompanyIdRef.current = selectedCompanyId ?? null
+        return
+      }
+
+      // Don't clear if we're receiving collaboration data (initial sync)
+      if (isReceivingCollaborationDataRef.current) {
+        prevCompanyIdRef.current = selectedCompanyId ?? null
+        return
+      }
+
+      // Don't clear if we're loading a diagram
+      if (isLoadingRef?.current) {
+        prevCompanyIdRef.current = selectedCompanyId ?? null
+        return
+      }
+
       // Perform a silent reset of the editor state
       try {
         if (excalidrawAPI) {
@@ -306,6 +358,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     setLastSavedScene,
     updateDialogState,
     companyFontFamily,
+    isCollaborating,
   ])
 
   useEffect(() => {
@@ -354,19 +407,6 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     [setExcalidrawAPI]
   )
 
-  // Library Update Handler
-  const handleLibraryUpdate = useCallback(
-    (library: any) => {
-      const itemCount = Array.isArray(library) ? library.length : library.libraryItems?.length || 0
-      setNotification({
-        open: true,
-        message: t('messages.libraryLoaded', { count: itemCount }),
-        severity: 'success',
-      })
-    },
-    [setNotification, t]
-  )
-
   // Get current diagram data for save operations
   const getCurrentDiagramData = () => {
     if (!excalidrawAPI) return '{}'
@@ -383,20 +423,224 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
     })
   }
 
+  // Stop collaboration handler
+  const handleStopCollaboration = useCallback(() => {
+    if (typeof window !== 'undefined' && (window as any).__stopCollaboration) {
+      ;(window as any).__stopCollaboration()
+      setIsCollaborating(false)
+      setCollaborationError(null)
+    }
+  }, [])
+
+  // Store broadcast function reference for use in handlers
+  const handleBroadcastReady = useCallback(
+    (broadcastFn: (elements?: any[], appState?: any) => void) => {
+      broadcastSceneUpdateRef.current = broadcastFn
+    },
+    []
+  )
+
+  // Expose error setter for collaboration errors
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      ;(window as any).__setCollaborationError = setCollaborationError
+    }
+  }, [])
+
   // Handle diagram metadata updates from collaboration
   const handleCollaborationDiagramUpdate = useCallback(
     (diagram: any) => {
-      if (diagram && diagram.id && diagram.title) {
-        setCurrentDiagram(diagram)
+      // Skip if no diagram
+      if (!diagram) {
+        return
+      }
+
+      // Extract company ID from diagram (it's an array in GraphQL response)
+      const diagramCompanyId = Array.isArray(diagram.company)
+        ? diagram.company[0]?.id
+        : diagram.company?.id || diagram.companyId
+
+      // Check if user has access to this company
+      if (diagramCompanyId) {
+        const hasAccess = isAdmin() || accessibleCompanyIds.has(diagramCompanyId)
+
+        if (!hasAccess) {
+          // User doesn't have access - show error and stop collaboration
+          enqueueSnackbar(collaborationTranslations('companyPermissionDenied'), {
+            variant: 'error',
+          })
+
+          // Stop the collaboration properly
+          handleStopCollaboration()
+          // Remove room parameter from URL
+          if (typeof window !== 'undefined') {
+            const url = new URL(window.location.href)
+            url.searchParams.delete('room')
+            window.history.replaceState({}, '', url.toString())
+          }
+          return // Don't update diagram or switch company
+        }
+
+        // User has access - update metadata WITHOUT calling setCurrentDiagram with full diagram object
+        // This prevents triggering any diagram loading logic that would clear the canvas
+        // The canvas content comes from the WebSocket collaboration stream, not from database load
+
+        // Set ref to prevent canvas clearing during company switch
+        isReceivingCollaborationDataRef.current = true
+
+        // Only update the currentDiagram state to match the collaboration diagram metadata
+        // Use functional update to merge with existing state without triggering load
+        setCurrentDiagram((prev: any) => ({
+          ...prev,
+          id: diagram.id,
+          title: diagram.title,
+          description: diagram.description,
+          diagramType: diagram.diagramType,
+          company: diagram.company,
+          companyId: diagramCompanyId,
+          architecture: diagram.architecture,
+        }))
+
+        // Then switch company if needed
+        if (diagramCompanyId !== selectedCompanyId) {
+          setSelectedCompanyId(diagramCompanyId)
+        }
+
+        // Reset the flag after a short delay
+        setTimeout(() => {
+          isReceivingCollaborationDataRef.current = false
+        }, 500)
+      } else {
+        // No company ID in diagram - just update metadata
+        setCurrentDiagram((prev: any) => ({
+          ...prev,
+          id: diagram.id,
+          title: diagram.title,
+          description: diagram.description,
+          diagramType: diagram.diagramType,
+          architecture: diagram.architecture,
+        }))
       }
     },
-    [setCurrentDiagram]
+    [
+      setCurrentDiagram,
+      selectedCompanyId,
+      accessibleCompanyIds,
+      setSelectedCompanyId,
+      enqueueSnackbar,
+      collaborationTranslations,
+      handleStopCollaboration,
+      isCollaborating,
+    ]
+  )
+
+  // Authorization callback for collaboration - check BEFORE loading scene
+  const authorizeCollaborationAccess = useCallback(
+    (diagram: any) => {
+      if (!diagram) {
+        return 'allow' // Allow if no diagram info
+      }
+
+      const diagramCompanyId = Array.isArray(diagram.company)
+        ? diagram.company[0]?.id
+        : diagram.company?.id || diagram.companyId
+
+      if (!diagramCompanyId) {
+        return 'allow' // Allow if no company specified
+      }
+
+      const hasAccess = isAdmin() || accessibleCompanyIds.has(diagramCompanyId)
+
+      if (!hasAccess) {
+        enqueueSnackbar(collaborationTranslations('companyPermissionDenied'), {
+          variant: 'error',
+        })
+        return 'deny'
+      }
+
+      return 'allow'
+    },
+    [accessibleCompanyIds, enqueueSnackbar, collaborationTranslations]
   )
 
   // Handle collaboration status changes
   const handleCollaborationStatusChange = useCallback((collaborating: boolean) => {
     setIsCollaborating(collaborating)
   }, [])
+
+  // Company-aware collaboration permission checking
+  const checkCollaborationPermission = useCallback(
+    (companyId?: string | null, options: { silent?: boolean } = {}) => {
+      let failure: CollaborationPermissionFailure | null = null
+
+      if (!isArchitect()) {
+        failure = 'missing-edit'
+      } else if (!companyId) {
+        failure = 'missing-company'
+      } else if (!isAdmin() && !accessibleCompanyIds.has(companyId)) {
+        failure = 'forbidden-company'
+      }
+
+      if (failure && !options.silent) {
+        const translationKey =
+          failure === 'missing-edit'
+            ? 'permissionRequired'
+            : failure === 'missing-company'
+              ? 'companyMissing'
+              : 'companyPermissionDenied'
+        const message = collaborationTranslations(translationKey as any)
+        enqueueSnackbar(message, { variant: failure === 'missing-company' ? 'warning' : 'error' })
+      }
+
+      return failure ? { allowed: false as const, reason: failure } : { allowed: true as const }
+    },
+    [accessibleCompanyIds, collaborationTranslations, enqueueSnackbar]
+  )
+
+  // Company selection lock during collaboration
+  useEffect(() => {
+    const lockId = 'diagram-editor-collaboration-lock'
+    if (isCollaborating) {
+      const reason =
+        collaborationTranslations('companySwitchLockedTooltip') ||
+        'Stop live collaboration before switching companies.'
+      setCompanySelectionLock(lockId, reason)
+    } else {
+      setCompanySelectionLock(lockId, null)
+    }
+
+    return () => {
+      setCompanySelectionLock(lockId, null)
+    }
+  }, [collaborationTranslations, isCollaborating, setCompanySelectionLock])
+
+  // Sidebar handlers
+  const handleToggleSidebar = useCallback(() => {
+    setIsSidebarOpen(prev => !prev)
+  }, [])
+
+  const handleFindOnCanvas = useCallback(() => {
+    // Small delay to ensure any menu closes before opening sidebar
+    setTimeout(() => {
+      sidebarRef.current?.openSearchTab()
+    }, 50)
+  }, [])
+
+  // Handle Ctrl+F keyboard shortcut for canvas search
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key === 'f') {
+        event.preventDefault()
+        event.stopPropagation()
+        handleFindOnCanvas()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown, true)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown, true)
+    }
+  }, [handleFindOnCanvas])
 
   // Create dynamic initialData that includes viewport state
   const baseInitialAppState = useMemo(() => {
@@ -602,60 +846,76 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
         ...style,
       }}
     >
-      {/* Hauptcontainer für Excalidraw */}
-      <Box sx={{ height: '100%', width: '100%', position: 'relative' }}>
-        {/* Diagram Name Display - positioned next to MainMenu */}
-        <DiagramNameDisplay
-          currentDiagram={currentDiagram}
-          hasUnsavedChanges={hasUnsavedChanges}
-          onSaveClick={() => updateDialogState('saveDialogOpen', true)}
-          isCollaborating={isCollaborating}
-        />
-
-        <ExcalidrawWrapper
-          // Remove dynamic key to prevent controlled/uncontrolled input issues
-          // The component should persist throughout the app lifecycle
-          onOpenDialog={() => updateDialogState('openDialogOpen', true)}
-          onSaveDialog={() => updateDialogState('saveDialogOpen', true)}
-          onSaveAsDialog={() => updateDialogState('saveAsDialogOpen', true)}
-          onNewDiagram={handleNewDiagram}
-          onDeleteDialog={() => updateDialogState('deleteDialogOpen', true)}
-          onExportJSON={handleExportJSON}
-          onExportDrawIO={handleExportDrawIO}
-          onImportJSON={handleImportJSON}
-          onExportPNG={handleExportPNG}
-          onManualSync={handleManualSync}
-          onCapabilityMapGenerator={handleCapabilityMapGenerator}
-          excalidrawAPI={handleExcalidrawAPI}
-          onChange={handleChange}
-          uiOptions={uiOptions}
-          initialData={initialData}
-          viewModeEnabled={isViewer()}
-          currentDiagram={currentDiagram}
-          onDiagramUpdate={handleCollaborationDiagramUpdate}
-          onCollaborationStatusChange={handleCollaborationStatusChange}
-          selectedElementForRelatedElements={selectedElementForRelatedElements}
-          onOpenAddRelatedElementsDialog={handleOpenAddRelatedElementsDialog}
-          onCloseAddRelatedElementsDialog={handleCloseAddRelatedElementsDialog}
-          isAddRelatedElementsDialogOpen={dialogStates.addRelatedElementsDialogOpen}
-        />
-
-        {/* Integrated Library Component - only for non-viewer users */}
-        {excalidrawAPI && !isViewer() && (
-          <IntegratedLibrary
-            excalidrawAPI={excalidrawAPI}
-            onLibraryUpdate={handleLibraryUpdate}
-            defaultFontFamily={companyFontFamily}
+      {/* Hauptcontainer für Excalidraw mit Sidebar */}
+      <Box
+        sx={{
+          height: '100%',
+          width: '100%',
+          position: 'relative',
+          display: 'flex',
+          overflow: 'hidden',
+        }}
+      >
+        {/* Editor content wrapper */}
+        <Box sx={{ flex: 1, minWidth: 0, position: 'relative' }}>
+          {/* Diagram Name Display - positioned next to MainMenu */}
+          <DiagramNameDisplay
+            currentDiagram={currentDiagram}
+            hasUnsavedChanges={hasUnsavedChanges}
+            onSaveClick={() => updateDialogState('saveDialogOpen', true)}
+            isCollaborating={isCollaborating}
           />
-        )}
 
-        {/* Canvas Debug Overlay - nur in Entwicklungsumgebung */}
-        {process.env.NODE_ENV === 'development' && excalidrawAPI && (
-          <CanvasDebugOverlay
-            excalidrawAPI={excalidrawAPI}
+          <ExcalidrawWrapper
+            // Remove dynamic key to prevent controlled/uncontrolled input issueses
+            // The component should persist throughout the app lifecycle
+            onOpenDialog={() => updateDialogState('openDialogOpen', true)}
+            onSaveDialog={() => updateDialogState('saveDialogOpen', true)}
+            onSaveAsDialog={() => updateDialogState('saveAsDialogOpen', true)}
+            onNewDiagram={handleNewDiagram}
+            onDeleteDialog={() => updateDialogState('deleteDialogOpen', true)}
+            onExportJSON={handleExportJSON}
+            onExportDrawIO={handleExportDrawIO}
+            onImportJSON={handleImportJSON}
+            onExportPNG={handleExportPNG}
+            onManualSync={handleManualSync}
+            onCapabilityMapGenerator={handleCapabilityMapGenerator}
+            excalidrawAPI={handleExcalidrawAPI}
+            onChange={handleChange}
+            uiOptions={uiOptions}
+            initialData={initialData}
+            viewModeEnabled={isViewer()}
+            currentDiagram={currentDiagram}
+            onDiagramUpdate={handleCollaborationDiagramUpdate}
+            onCollaborationStatusChange={handleCollaborationStatusChange}
+            onStopCollaboration={handleStopCollaboration}
+            onBroadcastReady={handleBroadcastReady}
+            isLoadingRef={isLoadingRef}
+            suppressOnChangeRef={suppressOnChangeRef}
+            authorizeAccess={authorizeCollaborationAccess}
             selectedElementForRelatedElements={selectedElementForRelatedElements}
+            onOpenAddRelatedElementsDialog={handleOpenAddRelatedElementsDialog}
+            onCloseAddRelatedElementsDialog={handleCloseAddRelatedElementsDialog}
+            isAddRelatedElementsDialogOpen={dialogStates.addRelatedElementsDialogOpen}
           />
-        )}
+
+          {/* Canvas Debug Overlay - nur in Entwicklungsumgebung */}
+          {process.env.NODE_ENV === 'development' && excalidrawAPI && (
+            <CanvasDebugOverlay
+              excalidrawAPI={excalidrawAPI}
+              selectedElementForRelatedElements={selectedElementForRelatedElements}
+            />
+          )}
+        </Box>
+
+        {/* Diagram Library Sidebar */}
+        <DiagramLibrarySidebar
+          ref={sidebarRef}
+          excalidrawAPI={excalidrawAPI}
+          defaultFontFamily={companyFontFamily}
+          isOpen={isSidebarOpen}
+          onToggle={handleToggleSidebar}
+        />
       </Box>
 
       {/* Save Dialog - only for non-viewer users */}

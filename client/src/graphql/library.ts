@@ -174,7 +174,7 @@ export const ELEMENT_TYPE_CONFIG = {
   },
   dataObject: {
     label: 'Data Objects',
-    color: '#ffec99',
+    color: '#a5d8ff',
     iconType: 'rounded-rectangle',
   },
   interface: {

@@ -12,6 +12,7 @@ import AddRelatedElementsDialog from '../dialogs/AddRelatedElementsDialog'
 import { FullCustomContextMenu } from './FullCustomContextMenu'
 import ElementFormDialog from '../dialogs/ElementFormDialog'
 import { ExcalidrawElement } from '../types/relationshipTypes'
+import { useAuth } from '@/lib/auth'
 
 // Dynamischer Import von Excalidraw, um Server-Side-Rendering zu vermeiden
 const ExcalidrawWrapper = dynamic(
@@ -44,6 +45,11 @@ const ExcalidrawWrapper = dynamic(
       currentDiagram,
       onDiagramUpdate,
       onCollaborationStatusChange,
+      onStopCollaboration,
+      onBroadcastReady,
+      isLoadingRef,
+      suppressOnChangeRef,
+      authorizeAccess,
       selectedElementForRelatedElements,
       onOpenAddRelatedElementsDialog,
       onCloseAddRelatedElementsDialog,
@@ -75,6 +81,18 @@ const ExcalidrawWrapper = dynamic(
       const { mode: themeMode } = useThemeMode()
       const { selectedCompany } = useCompanyContext()
       const themeConfig = useThemeConfig()
+      const { keycloak } = useAuth()
+
+      // Get username from Keycloak token
+      const username = useMemo(() => {
+        if (keycloak?.tokenParsed) {
+          const firstName = keycloak.tokenParsed.given_name || ''
+          const lastName = keycloak.tokenParsed.family_name || ''
+          const fullName = `${firstName} ${lastName}`.trim()
+          return fullName || keycloak.tokenParsed.preferred_username || 'Anonymous User'
+        }
+        return 'Anonymous User'
+      }, [keycloak?.tokenParsed])
 
       const excalidrawBranding = useMemo(
         () => ({
@@ -96,12 +114,21 @@ const ExcalidrawWrapper = dynamic(
         collaborators,
         roomId,
         broadcastSceneUpdate,
+        isReceivingUpdateRef,
       } = useExcalidrawCollaboration({
         excalidrawAPI: apiRef.current,
-        username: 'User', // TODO: Get from auth context
+        username,
         currentDiagram,
         onDiagramUpdate,
+        authorizeAccess,
       })
+
+      // Expose stopCollaboration to parent via window for permission checking
+      React.useEffect(() => {
+        if (onStopCollaboration) {
+          ;(window as any).__stopCollaboration = stopCollaboration
+        }
+      }, [stopCollaboration, onStopCollaboration])
 
       // Check URL for room parameter and start collaboration when API is ready
       useEffect(() => {
@@ -109,6 +136,8 @@ const ExcalidrawWrapper = dynamic(
           const urlParams = new URLSearchParams(window.location.search)
           const roomParam = urlParams.get('room')
           if (roomParam && !isCollaborating) {
+            // Note: Permission checking will happen via onDiagramUpdate callback
+            // when diagram metadata is received from the collaboration initiator
             startCollaboration(roomParam)
           }
         }
@@ -120,6 +149,13 @@ const ExcalidrawWrapper = dynamic(
           onCollaborationStatusChange(isCollaborating)
         }
       }, [isCollaborating, onCollaborationStatusChange])
+
+      // Expose broadcastSceneUpdate to parent component
+      useEffect(() => {
+        if (onBroadcastReady && broadcastSceneUpdate) {
+          onBroadcastReady(broadcastSceneUpdate)
+        }
+      }, [onBroadcastReady, broadcastSceneUpdate])
 
       // Safe collaboration start function that ensures API is ready
       const startCollaborationSafe = useCallback(
@@ -136,9 +172,26 @@ const ExcalidrawWrapper = dynamic(
       // Enhanced onChange handler to broadcast changes during collaboration
       const handleChange = React.useCallback(
         (elements: any[], appState: any) => {
+          // CRITICAL: Check suppressOnChange ref FIRST before doing anything
+          // This prevents onChange from running after programmatic scene updates
+          if (suppressOnChangeRef?.current) {
+            suppressOnChangeRef.current = false
+            return // Exit early - don't call onChange, don't broadcast, don't do anything
+          }
+
           // Call original onChange handler
           if (onChange) {
             onChange(elements, appState)
+          }
+
+          // Don't broadcast if we're receiving an update from collaborators (prevents loops)
+          if (isReceivingUpdateRef?.current) {
+            return
+          }
+
+          // Don't broadcast if we're loading a diagram (prevents broadcast storm)
+          if (isLoadingRef?.current) {
+            return
           }
 
           // Broadcast changes if collaborating - use the function directly from the hook
@@ -146,7 +199,14 @@ const ExcalidrawWrapper = dynamic(
             broadcastSceneUpdate(elements, appState)
           }
         },
-        [onChange, isCollaborating, broadcastSceneUpdate]
+        [
+          onChange,
+          isCollaborating,
+          broadcastSceneUpdate,
+          isLoadingRef,
+          isReceivingUpdateRef,
+          suppressOnChangeRef,
+        ]
       )
 
       // Konvertiere locale zu Excalidraw langCode Format
@@ -164,9 +224,11 @@ const ExcalidrawWrapper = dynamic(
       // Handle excalidrawAPI prop - store the API reference
       React.useEffect(() => {
         if (excalidrawAPI && apiRef.current) {
+          // Store suppressOnChangeRef in API object so collaboration hook can access it
+          ;(apiRef.current as any).suppressOnChangeRef = suppressOnChangeRef
           excalidrawAPI(apiRef.current)
         }
-      }, [excalidrawAPI])
+      }, [excalidrawAPI, suppressOnChangeRef])
 
       // Inject dynamic theme CSS based on selected company branding and current mode
       React.useEffect(() => {
@@ -254,6 +316,26 @@ const ExcalidrawWrapper = dynamic(
 
       return (
         <div style={{ height: '100%', width: '100%' }}>
+          <style>{`
+            /* Hide the default library button completely - multiple selectors for robustness */
+            .excalidraw button[title*="Library"],
+            .excalidraw button[title*="library"],
+            .excalidraw button[aria-label*="Library"],
+            .excalidraw button[aria-label*="library"],
+            .excalidraw .library-button,
+            .excalidraw [data-testid*="library"],
+            .excalidraw .Island button:has(svg[width="1em"]):has(svg[height="1em"]),
+            .excalidraw button.ToolIcon_type_button--show:has(.library-icon),
+            .excalidraw button[data-testid="library-button"],
+            .excalidraw .App-toolbar__extra-tools-trigger,
+            .excalidraw .library-menu-trigger,
+            .excalidraw .layer-ui__wrapper__top-right {
+              display: none !important;
+              visibility: hidden !important;
+              opacity: 0 !important;
+              pointer-events: none !important;
+            }
+          `}</style>
           <ExcalidrawTyped
             theme={themeMode}
             langCode={excalidrawLangCode}

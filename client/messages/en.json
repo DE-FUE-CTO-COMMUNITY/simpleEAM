@@ -79,6 +79,22 @@
     "lastModified": "Last modified",
     "createdBy": "Created by",
     "description_placeholder": "No description available",
+    "noPreviewAvailable": "No preview available",
+    "architecture": "Architecture",
+    "updated": "Updated",
+    "diagramTypes": {
+      "ARCHITECTURE": "Architecture",
+      "APPLICATION_LANDSCAPE": "Application Landscape",
+      "CAPABILITY_MAP": "Capability Map",
+      "DATA_FLOW": "Data Flow",
+      "PROCESS": "Process",
+      "NETWORK": "Network",
+      "INTEGRATION": "Integration",
+      "SECURITY": "Security",
+      "CONCEPT": "Concept",
+      "OTHER": "Other",
+      "UNKNOWN": "Unknown"
+    },
     "businessCapabilities": "Business Capabilities",
     "applications": "Applications",
     "aiComponents": "AI Components",
@@ -140,7 +156,42 @@
       "exportPNG": "Export PNG",
       "syncDatabase": "Sync Database",
       "findOnCanvas": "Find on Canvas",
+      "liveCollaboration": "Live Collaboration",
       "addRelatedElements": "Add Related Elements"
+    },
+    "collaborationDialog": {
+      "title": "Live Collaboration",
+      "description": "Start a live collaboration session to work together on diagrams.",
+      "roomLabel": "Room ID",
+      "roomPlaceholder": "Enter a room ID",
+      "roomHelper": "Others can join with the same room ID",
+      "generate": "Generate",
+      "activeAlert": "Live collaboration is active",
+      "currentRoom": "Current room",
+      "copyRoomId": "Copy room ID",
+      "participants": "Participants ({count})",
+      "noParticipants": "No other participants",
+      "shareSession": "Share session",
+      "copyLink": "Copy link",
+      "cancel": "Cancel",
+      "close": "Close",
+      "startCollaboration": "Start collaboration",
+      "stopCollaboration": "Stop collaboration",
+      "starting": "Starting...",
+      "roomGenerated": "Generated a new room ID",
+      "roomCopied": "Room ID copied",
+      "linkCopied": "Collaboration link copied",
+      "copyFailed": "Failed to copy to clipboard",
+      "errorRoomRequired": "Room ID is required",
+      "errorStart": "Failed to start collaboration",
+      "startSuccess": "Live collaboration started",
+      "stopSuccess": "Live collaboration stopped",
+      "permissionDenied": "You are not allowed to join this collaboration.",
+      "permissionRequired": "Edit or admin permissions for the diagram's company are required.",
+      "companyPermissionDenied": "You are not allowed to collaborate on this company.",
+      "companyMissing": "This diagram is not assigned to a company, collaboration cannot start.",
+      "companySwitchLockedTooltip": "Stop live collaboration before switching companies.",
+      "activeMenuLabel": "Live Collaboration (Active)"
     },
     "contextMenu": {
       "cut": "Cut",
@@ -1916,6 +1967,66 @@
       "updatedAtLabel": "Updated on",
       "fromLabel": "From",
       "toLabel": "To"
+    }
+  },
+  "diagramEditor": {
+    "librarySidebar": {
+      "title": "Diagram Library",
+      "description": "Drag an entry into the canvas.",
+      "searchPlaceholder": "Search in library...",
+      "newHeading": "New elements",
+      "existingHeading": "Existing elements",
+      "noTemplates": "Templates are not available yet.",
+      "noRecords": "No {type} available yet.",
+      "noFilterResults": "No elements match the search.",
+      "templateRequired": "Add a {type} template to unlock database elements.",
+      "toggle": {
+        "show": "Show library",
+        "hide": "Hide library"
+      },
+      "search": {
+        "title": "Search",
+        "description": "Search on canvas",
+        "placeholder": "Search on canvas...",
+        "noResults": "No elements found",
+        "resultsCount": "{count} result(s) found",
+        "previousResult": "Previous result",
+        "nextResult": "Next result"
+      }
+    },
+    "elementTypes": {
+      "capability": {
+        "singular": "Business Capability",
+        "plural": "Business Capabilities"
+      },
+      "application": {
+        "singular": "Application",
+        "plural": "Applications"
+      },
+      "dataObject": {
+        "singular": "Data Object",
+        "plural": "Data Objects"
+      },
+      "applicationInterface": {
+        "singular": "Application Interface",
+        "plural": "Application Interfaces"
+      },
+      "interface": {
+        "singular": "Interface",
+        "plural": "Interfaces"
+      },
+      "infrastructure": {
+        "singular": "Infrastructure",
+        "plural": "Infrastructure"
+      },
+      "aiComponent": {
+        "singular": "AI Component",
+        "plural": "AI Components"
+      },
+      "aicomponent": {
+        "singular": "AI Component",
+        "plural": "AI Components"
+      }
     }
   },
   "debug": {
