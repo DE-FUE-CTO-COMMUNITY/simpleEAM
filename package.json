@@ -1,6 +1,6 @@
 {
   "name": "simple-eam",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Enterprise Architecture Management System with Neo4j, GraphQL, Keycloak and Next.js",
   "private": true,
   "scripts": {
