@@ -126,7 +126,8 @@ const ExcalidrawWrapper = dynamic(
       // Expose stopCollaboration to parent via window for permission checking
       React.useEffect(() => {
         if (onStopCollaboration) {
-          ;(window as any).__stopCollaboration = stopCollaboration
+          const win = window as any
+          win.__stopCollaboration = stopCollaboration
         }
       }, [stopCollaboration, onStopCollaboration])
 
@@ -225,7 +226,8 @@ const ExcalidrawWrapper = dynamic(
       React.useEffect(() => {
         if (excalidrawAPI && apiRef.current) {
           // Store suppressOnChangeRef in API object so collaboration hook can access it
-          ;(apiRef.current as any).suppressOnChangeRef = suppressOnChangeRef
+          const api = apiRef.current as any
+          api.suppressOnChangeRef = suppressOnChangeRef
           excalidrawAPI(apiRef.current)
         }
       }, [excalidrawAPI, suppressOnChangeRef])

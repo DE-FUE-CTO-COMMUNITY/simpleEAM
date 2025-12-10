@@ -33,7 +33,7 @@ export const useDiagramHandlers = (
   _lastSavedScene: any,
   defaultFontFamily: number,
   broadcastSceneUpdateRef?: React.MutableRefObject<
-    ((elements?: any[], appState?: any) => void) | null
+    ((elements: any[], appState: any) => void) | null
   >,
   suppressOnChangeRef?: React.MutableRefObject<boolean>
 ) => {

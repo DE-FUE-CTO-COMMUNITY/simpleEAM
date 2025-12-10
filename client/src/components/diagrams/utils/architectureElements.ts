@@ -86,7 +86,7 @@ export function createLibraryItemFromDatabaseElement<T extends { id: string; nam
     metadata,
     defaultFontFamily,
   })
-  markRemainingShapes(cloneByOriginalId, metadata)
+  markRemainingShapes(cloneByOriginalId)
 
   return {
     id: `db-${elementType}-${element.id}`,
@@ -194,10 +194,7 @@ function applyMetadataToTexts({
   })
 }
 
-function markRemainingShapes(
-  cloneByOriginalId: Map<string, any>,
-  metadata: ArchitectureElementMetadata
-) {
+function markRemainingShapes(cloneByOriginalId: Map<string, any>) {
   cloneByOriginalId.forEach(clone => {
     if (clone.customData) {
       return // Already has customData
@@ -214,7 +211,7 @@ function isContainerRectangle(element: any, templateById: Map<string, any>) {
   if (element.type !== 'rectangle' || !Array.isArray(element.boundElements)) {
     return false
   }
-  return element.boundElements.some(bound => templateById.get(bound.id)?.type === 'text')
+  return element.boundElements.some((bound: any) => templateById.get(bound.id)?.type === 'text')
 }
 
 function findContainerForText(templateElements: any[], textId: string) {

@@ -25,7 +25,7 @@ export interface ExcalidrawComponentProps {
   onDiagramUpdate?: (diagram: any) => void
   onCollaborationStatusChange?: (isCollaborating: boolean) => void
   onStopCollaboration?: () => void
-  onBroadcastReady?: (broadcastFn: (elements?: any[], appState?: any) => void) => void
+  onBroadcastReady?: (broadcastFn: (elements: any[], appState: any) => void) => void
   isLoadingRef?: React.MutableRefObject<boolean>
   suppressOnChangeRef?: React.MutableRefObject<boolean>
   authorizeAccess?: (diagram: any) => 'allow' | 'deny' | 'ignore'

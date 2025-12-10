@@ -60,6 +60,7 @@ interface CollaborationAPI {
   collaborators: Map<string, Collaborator>
   roomId: string | null
   broadcastSceneUpdate?: (elements: ExcalidrawElement[], appState: AppState) => void
+  isReceivingUpdateRef: React.MutableRefObject<boolean>
 }
 
 interface UseExcalidrawCollaborationProps {

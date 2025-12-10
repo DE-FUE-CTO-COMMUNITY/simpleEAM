@@ -76,7 +76,7 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
   // Collaboration error state
   const [collaborationError, setCollaborationError] = useState<string | null>(null)
   // Ref to store broadcastSceneUpdate function from collaboration hook
-  const broadcastSceneUpdateRef = useRef<((elements?: any[], appState?: any) => void) | null>(null)
+  const broadcastSceneUpdateRef = useRef<((elements: any[], appState: any) => void) | null>(null)
   // Ref to suppress onChange callbacks after programmatic scene updates (prevents broadcast loops)
   const suppressOnChangeRef = useRef(false)
 
@@ -425,16 +425,19 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
 
   // Stop collaboration handler
   const handleStopCollaboration = useCallback(() => {
-    if (typeof window !== 'undefined' && (window as any).__stopCollaboration) {
-      ;(window as any).__stopCollaboration()
-      setIsCollaborating(false)
-      setCollaborationError(null)
+    if (typeof window !== 'undefined') {
+      const stopFn = (window as any).__stopCollaboration
+      if (stopFn) {
+        stopFn()
+        setIsCollaborating(false)
+        setCollaborationError(null)
+      }
     }
   }, [])
 
   // Store broadcast function reference for use in handlers
   const handleBroadcastReady = useCallback(
-    (broadcastFn: (elements?: any[], appState?: any) => void) => {
+    (broadcastFn: (elements: any[], appState: any) => void) => {
       broadcastSceneUpdateRef.current = broadcastFn
     },
     []
@@ -443,7 +446,8 @@ const DiagramEditor: React.FC<DiagramEditorProps> = ({ className, style }) => {
   // Expose error setter for collaboration errors
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
-      ;(window as any).__setCollaborationError = setCollaborationError
+      const win = window as any
+      win.__setCollaborationError = setCollaborationError
     }
   }, [])
 

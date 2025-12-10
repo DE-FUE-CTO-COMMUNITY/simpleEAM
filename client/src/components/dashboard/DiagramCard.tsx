@@ -113,7 +113,11 @@ const DiagramCard: React.FC<DiagramCardProps> = ({
       CONCEPTUAL: 'CONCEPT',
     }
     const standardizedKey = keyMapping[typeKey] || typeKey
-    return t(`diagramTypes.${standardizedKey}`, { default: t('diagramTypes.UNKNOWN') })
+    try {
+      return t(`diagramTypes.${standardizedKey}` as any)
+    } catch {
+      return t('diagramTypes.UNKNOWN')
+    }
   }
 
   const getArchitectureInfo = () => {
