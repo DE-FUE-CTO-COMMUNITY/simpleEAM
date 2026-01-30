@@ -1,0 +1,77 @@
+// GraphQL Operations für {{ENTITY_NAME_UPPER}}
+// {{ENTITY_NAME}} = plural (companies, capabilities, etc.)
+// {{ENTITY_SINGULAR}} = singular (company, capability, etc.)
+// {{ENTITY_NAME_UPPER}} = plural capitalized (Companies, Capabilities, etc.)
+// {{ENTITY_SINGULAR_UPPER}} = singular capitalized (Company, Capability, etc.)
+// {{ENTITY_GENERATED_TYPE}} = GraphQL generated type (Company, BusinessCapability, etc.)
+
+import { gql } from '@apollo/client'
+
+// Query: Alle {{ENTITY_NAME}} abrufen
+export const GET_{{ENTITY_NAME_UPPER}} = gql`
+  query Get{{ENTITY_NAME_UPPER}} {
+    {{ENTITY_NAME}} {
+      id
+      name
+      description
+      createdAt
+      updatedAt
+      # TODO: Weitere benötigte Felder hinzufügen
+    }
+  }
+`
+
+// Query: Einzelne {{ENTITY_SINGULAR}} abrufen
+export const GET_{{ENTITY_SINGULAR_UPPER}} = gql`
+  query Get{{ENTITY_SINGULAR_UPPER}}($id: ID!) {
+    {{ENTITY_SINGULAR}}(id: $id) {
+      id
+      name
+      description
+      createdAt
+      updatedAt
+      # TODO: Weitere benötigte Felder hinzufügen
+    }
+  }
+`
+
+// Mutation: Neue {{ENTITY_SINGULAR}} erstellen
+export const CREATE_{{ENTITY_SINGULAR_UPPER}} = gql`
+  mutation Create{{ENTITY_PLURAL_UPPER}}($input: [{{ENTITY_SINGULAR_UPPER}}CreateInput!]!) {
+    create{{ENTITY_PLURAL_UPPER}}(input: $input) {
+      {{ENTITY_PLURAL}} {
+        id
+        name
+        description
+        createdAt
+        updatedAt
+        # TODO: Weitere benötigte Felder hinzufügen
+      }
+    }
+  }
+`
+
+// Mutation: {{ENTITY_SINGULAR}} aktualisieren
+export const UPDATE_{{ENTITY_SINGULAR_UPPER}} = gql`
+  mutation Update{{ENTITY_PLURAL_UPPER}}($where: {{ENTITY_SINGULAR_UPPER}}Where!, $update: {{ENTITY_SINGULAR_UPPER}}UpdateInput!) {
+    update{{ENTITY_PLURAL_UPPER}}(where: $where, update: $update) {
+      {{ENTITY_PLURAL}} {
+        id
+        name
+        description
+        createdAt
+        updatedAt
+        # TODO: Weitere benötigte Felder hinzufügen
+      }
+    }
+  }
+`
+
+// Mutation: {{ENTITY_SINGULAR}} löschen
+export const DELETE_{{ENTITY_SINGULAR_UPPER}} = gql`
+  mutation Delete{{ENTITY_PLURAL_UPPER}}($where: {{ENTITY_SINGULAR_UPPER}}Where!) {
+    delete{{ENTITY_PLURAL_UPPER}}(where: $where) {
+      nodesDeleted
+    }
+  }
+`

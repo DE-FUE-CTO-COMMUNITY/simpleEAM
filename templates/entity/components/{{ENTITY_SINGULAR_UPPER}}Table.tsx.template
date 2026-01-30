@@ -1,0 +1,154 @@
+'use client'
+
+import React, { useMemo } from 'react'
+import { useTranslations } from 'next-intl'
+import { GenericTable } from '../common/GenericTable'
+import { {{ENTITY_SINGULAR_UPPER}}Type } from './types'
+import { {{ENTITY_SINGULAR_UPPER}}FormValues } from './{{ENTITY_SINGULAR_UPPER}}Form'
+import { useFormatDate } from './utils'
+import {{ENTITY_SINGULAR_UPPER}}Form from './{{ENTITY_SINGULAR_UPPER}}Form'
+import { createColumnHelper } from '@tanstack/react-table'
+import { SortingState, VisibilityState } from '@tanstack/react-table'
+import usePersistentColumnVisibility from '../../hooks/usePersistentColumnVisibility'
+
+// Exportierte Standard-Spaltenvisibilität für die {{ENTITY_SINGULAR_UPPER}}-Tabelle
+export const {{ENTITY_NAME_UPPER}}_DEFAULT_COLUMN_VISIBILITY = {
+  // Standardmäßig sichtbare Spalten
+  name: true,
+  description: true,
+  createdAt: true,
+  // TODO: Weitere sichtbare Spalten konfigurieren
+  
+  // Standardmäßig versteckte Spalten
+  id: false,
+  updatedAt: false,
+  // TODO: Weitere versteckte Spalten konfigurieren
+} as const
+
+interface {{ENTITY_SINGULAR_UPPER}}TableProps {
+  id?: string
+  {{ENTITY_NAME}}: {{ENTITY_SINGULAR_UPPER}}Type[]
+  loading: boolean
+  globalFilter: string
+  sorting: SortingState
+  onSortingChange: (sorting: SortingState) => void
+  onCreate{{ENTITY_SINGULAR_UPPER}}?: (data: {{ENTITY_SINGULAR_UPPER}}FormValues) => Promise<void>
+  onUpdate{{ENTITY_SINGULAR_UPPER}}?: (id: string, data: {{ENTITY_SINGULAR_UPPER}}FormValues) => Promise<void>
+  onDelete{{ENTITY_SINGULAR_UPPER}}?: (id: string) => Promise<void>
+  onTableReady?: (table: any) => void
+  // Diese Props sind jetzt optional, da die Persistierung intern verwaltet wird
+  columnVisibility?: VisibilityState
+  onColumnVisibilityChange?: (
+    updater: VisibilityState | ((old: VisibilityState) => VisibilityState)
+  ) => void
+}
+
+const {{ENTITY_SINGULAR_UPPER}}TableWithGenericTable: React.FC<{{ENTITY_SINGULAR_UPPER}}TableProps> = ({
+  {{ENTITY_NAME}},
+  loading,
+  globalFilter,
+  sorting,
+  onSortingChange,
+  onCreate{{ENTITY_SINGULAR_UPPER}},
+  onUpdate{{ENTITY_SINGULAR_UPPER}},
+  onDelete{{ENTITY_SINGULAR_UPPER}},
+  onTableReady,
+  columnVisibility: _externalColumnVisibility,
+  onColumnVisibilityChange: _externalOnColumnVisibilityChange,
+}) => {
+  const t = useTranslations('{{ENTITY_NAME}}.table')
+  const tEntity = useTranslations('{{ENTITY_NAME}}')
+  const formatDate = useFormatDate()
+  const columnHelper = createColumnHelper<{{ENTITY_SINGULAR_UPPER}}Type>()
+
+  // Verwende persistente Spaltensichtbarkeit
+  const {
+    columnVisibility,
+    onTableReady: persistentOnTableReady,
+    onColumnVisibilityChange,
+  } = usePersistentColumnVisibility({
+    tableKey: '{{ENTITY_NAME}}',
+    defaultColumnVisibility: {{ENTITY_NAME_UPPER}}_DEFAULT_COLUMN_VISIBILITY,
+  })
+
+  // Kombiniere externe und persistente onTableReady Callbacks
+  const handleTableReady = (table: any) => {
+    persistentOnTableReady(table)
+    if (onTableReady) {
+      onTableReady(table)
+    }
+  }
+
+  // Spalten-Definition für die {{ENTITY_SINGULAR_UPPER}}-Tabelle
+  const columns = useMemo(
+    () => [
+      columnHelper.accessor('id', {
+        header: t('headers.id'),
+        cell: info => info.getValue(),
+        enableHiding: true,
+      }),
+      columnHelper.accessor('name', {
+        header: t('headers.name'),
+        cell: info => info.getValue(),
+      }),
+      columnHelper.accessor('description', {
+        header: t('headers.description'),
+        cell: info => {
+          const value = info.getValue()
+          return value && value.length > 50 ? `${value.substring(0, 50)}...` : value || '-'
+        },
+      }),
+      // TODO: Weitere entity-spezifische Spalten hinzufügen
+      columnHelper.accessor('createdAt', {
+        header: t('headers.createdAt'),
+        cell: info => {
+          const value = info.getValue()
+          return value ? formatDate(value) : '-'
+        },
+      }),
+      columnHelper.accessor('updatedAt', {
+        header: t('headers.updatedAt'),
+        cell: info => {
+          const value = info.getValue()
+          return value ? formatDate(value) : '-'
+        },
+        enableHiding: true,
+      }),
+    ],
+    [columnHelper, t, formatDate]
+  )
+
+  // Mapping von {{ENTITY_SINGULAR_UPPER}}Type zu den erwarteten FormValues für das Formular
+  const mapToFormValues = ({{ENTITY_SINGULAR}}: {{ENTITY_SINGULAR_UPPER}}Type): {{ENTITY_SINGULAR_UPPER}}FormValues => {
+    return {
+      name: {{ENTITY_SINGULAR}}.name,
+      description: {{ENTITY_SINGULAR}}.description ?? '',
+      // TODO: Weitere Felder mappen
+    }
+  }
+
+  return (
+    <GenericTable<{{ENTITY_SINGULAR_UPPER}}Type, {{ENTITY_SINGULAR_UPPER}}FormValues>
+      data={ {{ENTITY_NAME}} }
+      loading={loading}
+      globalFilter={globalFilter}
+      sorting={sorting}
+      onSortingChange={onSortingChange}
+      columns={columns}
+      onCreate={onCreate{{ENTITY_SINGULAR_UPPER}}}
+      onUpdate={onUpdate{{ENTITY_SINGULAR_UPPER}}}
+      onDelete={onDelete{{ENTITY_SINGULAR_UPPER}}}
+      emptyMessage={t('noData')}
+      createButtonLabel={tEntity('addNew')}
+      entityName={tEntity('title')}
+      FormComponent={ {{ENTITY_SINGULAR_UPPER}}Form}
+      getIdFromData={(item: {{ENTITY_SINGULAR_UPPER}}Type) => item.id}
+      mapDataToFormValues={mapToFormValues}
+      columnVisibility={columnVisibility}
+      onColumnVisibilityChange={onColumnVisibilityChange}
+      onTableReady={handleTableReady}
+    />
+  )
+}
+
+export default {{ENTITY_SINGULAR_UPPER}}TableWithGenericTable

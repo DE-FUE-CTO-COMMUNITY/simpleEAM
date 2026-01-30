@@ -1,0 +1,16 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "ms-azuretools.vscode-docker",
+    "graphql.vscode-graphql",
+    "neo4j.neo4j-browser",
+    "redhat.vscode-yaml",
+    "mikestead.dotenv",
+    "ms-vscode.vscode-typescript-next",
+    "bradlc.vscode-tailwindcss",
+    "dsznajder.es7-react-js-snippets",
+    "github.copilot",
+    "formulahendry.auto-rename-tag"
+  ]
+}

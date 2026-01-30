@@ -1,0 +1,82 @@
+# Allgemeine Dateien
+.DS_Store
+*.log
+*.lock
+*.tmp
+*.pid
+*.seed
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+coverage/
+.nyc_output/
+.pnpm-store/
+
+# Sperren von package-lock.json (Wir verwenden yarn)
+package-lock.json
+.yarn/*
+*.lock
+
+client/.next/
+client/out/
+client/.vercel
+client/.env*.local
+client/.yarn/*
+!client/yarn.lock
+server/dist/
+server/.yarn/*
+!server/yarn.lock
+
+# Neo4j
+db/data/
+db/logs/
+db/plugins/
+db/import/
+
+# Docker
+.docker-data/
+
+# IDE und Editoren
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+
+# Build-Dateien
+dist/
+build/
+out/
+.build/
+lib-cov/
+
+# Keycloak
+auth/src/*.jar
+auth/data/
+auth/themes/*
+!auth/themes/simple-eam/
+!auth/themes/simple-eam/**
+
+# Branding assets (kept local per customer)
+client/public/brand-images/*
+!client/public/brand-images/.gitkeep
+
+# Temporäre Dateien
+tmp/
+temp/
+
+# Typoskript
+*.tsbuildinfo

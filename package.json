@@ -1,0 +1,48 @@
+{
+  "name": "simple-eam",
+  "version": "1.0.4",
+  "description": "Enterprise Architecture Management System with Neo4j, GraphQL, Keycloak and Next.js",
+  "private": true,
+  "scripts": {
+    "version": "./scripts/version.sh",
+    "version:patch": "./scripts/version.sh patch",
+    "version:minor": "./scripts/version.sh minor",
+    "version:major": "./scripts/version.sh major",
+    "start": "docker-compose up -d",
+    "stop": "docker-compose down",
+    "dev": "docker-compose up",
+    "client": "cd client && yarn dev",
+    "server": "cd server && yarn dev",
+    "build:all": "yarn build:client && yarn build:server",
+    "build:client": "cd client && yarn build",
+    "build:server": "cd server && yarn build",
+    "lint": "yarn lint:client && yarn lint:server",
+    "lint:client": "cd client && yarn lint",
+    "lint:server": "cd server && yarn lint",
+    "test": "yarn test:client && yarn test:server",
+    "test:client": "cd client && yarn test",
+    "test:server": "cd server && yarn test"
+  },
+  "author": "Marcus Friedrich",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.x",
+    "npm": "please-use-yarn",
+    "yarn": ">=4.0.0"
+  },
+  "packageManager": "yarn@4.9.1",
+  "devDependencies": {
+    "@types/compression": "^1.7.5",
+    "@types/express": "^5.0.2",
+    "@typescript-eslint/eslint-plugin": "^6.19.0",
+    "@typescript-eslint/parser": "^6.19.0",
+    "eslint": "^8.56.0",
+    "prettier": "^3.1.1",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "axios": "^1.9.0",
+    "compression": "^1.8.0",
+    "dotenv": "^16.5.0"
+  }
+}

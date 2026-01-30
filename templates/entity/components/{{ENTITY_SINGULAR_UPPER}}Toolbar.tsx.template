@@ -1,0 +1,38 @@
+'use client'
+
+import React from 'react'
+import { useTranslations } from 'next-intl'
+import GenericToolbar from '../common/GenericToolbar'
+
+interface {{ENTITY_NAME_UPPER}}ToolbarProps {
+  globalFilter: string
+  onGlobalFilterChange: (value: string) => void
+  activeFiltersCount: number
+  onFilterClick: () => void
+  onResetFilters: () => void
+  onAddClick?: () => void
+}
+
+export function {{ENTITY_NAME_UPPER}}Toolbar({
+  globalFilter,
+  onGlobalFilterChange,
+  activeFiltersCount,
+  onFilterClick,
+  onResetFilters,
+  onAddClick,
+}: {{ENTITY_NAME_UPPER}}ToolbarProps) {
+  const t = useTranslations('{{ENTITY_NAME}}')
+
+  return (
+    <GenericToolbar
+      globalFilter={globalFilter}
+      onGlobalFilterChange={onGlobalFilterChange}
+      activeFiltersCount={activeFiltersCount}
+      onFilterClick={onFilterClick}
+      onResetFilters={onResetFilters}
+      entityName={t('title')}
+    />
+  )
+}
+
+export default {{ENTITY_NAME_UPPER}}Toolbar

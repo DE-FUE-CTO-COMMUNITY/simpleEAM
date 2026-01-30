@@ -1,0 +1,48 @@
+// Template für Entity Types
+// {{ENTITY_NAME}} = plural (companies, capabilities, etc.)
+// {{ENTITY_SINGULAR}} = singular (company, capability, etc.)
+// {{ENTITY_NAME_UPPER}} = plural capitalized (Companies, Capabilities, etc.)
+// {{ENTITY_SINGULAR_UPPER}} = singular capitalized (Company, Capability, etc.)
+
+'use client'
+
+import {
+  {{ENTITY_SINGULAR_UPPER}} as Generated{{ENTITY_SINGULAR_UPPER}},
+  // TODO: Weitere Enum-Typen importieren (z.B. Category, Status, Priority, etc.)
+} from '../../gql/generated'
+
+// Nutze den generierten Typ als Basis und passe ihn für unsere Komponenten an
+export type {{ENTITY_SINGULAR_UPPER}}Type = Pick<
+  Generated{{ENTITY_SINGULAR_UPPER}},
+  | 'id'
+  | 'name'
+  | 'description'
+  | 'createdAt'
+  | 'updatedAt'
+  // TODO: Weitere relevante Felder hinzufügen
+>
+
+export interface FilterState {
+  // TODO: Filter-Felder spezifisch für diese Entity definieren
+  // z.B.:
+  // categoryFilter: SomeCategory[]
+  // statusFilter: SomeStatus[]
+  // tagsFilter: string[]
+  descriptionFilter: string
+  // ownerFilter: string
+  // updatedDateRange: [string, string]
+  // isActiveFilter: string | null // 'all', 'true', 'false'
+}
+
+export interface FilterProps {
+  filterState: FilterState
+  // TODO: Verfügbare Filter-Optionen hinzufügen
+  // z.B.:
+  // availableCategories: SomeCategory[]
+  // availableStatuses: SomeStatus[]
+  // availableTags: string[]
+  onFilterChange: (newFilter: Partial<FilterState>) => void
+  onResetFilter: () => void
+  onClose: () => void
+  onApply: (activeCount: number) => void
+}

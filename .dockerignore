@@ -1,0 +1,35 @@
+# Ignoriere Node-Module
+node_modules
+*/node_modules
+
+# Ignoriere Build-Artefakte
+.next
+*/dist
+*/.next
+
+# Ignoriere Dev-Dateien
+.git
+.github
+.vscode
+.env
+.env.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+
+# Ignoriere Docker-Dateien
+Dockerfile
+.dockerignore
+docker-compose.yml
+
+# Ignoriere Datenbank- und Authentifizierungs-Daten
+auth/data
+db/data
+db/logs
+
+# Ignoriere temporäre Dateien
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store

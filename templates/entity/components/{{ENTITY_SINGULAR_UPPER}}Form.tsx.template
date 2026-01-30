@@ -1,0 +1,145 @@
+'use client'
+
+import React, { useEffect } from 'react'
+import { useForm } from '@tanstack/react-form'
+import { useTranslations } from 'next-intl'
+import { z } from 'zod'
+import { {{ENTITY_SINGULAR_UPPER}}Type } from './types'
+import GenericForm, { FieldConfig, TabConfig } from '../common/GenericForm'
+import { GenericFormProps } from '../common/GenericFormProps'
+
+// Schema für die Formularvalidierung
+export const {{ENTITY_SINGULAR}}Schema = z.object({
+  name: z
+    .string()
+    .min(3)
+    .max(100),
+  description: z
+    .string()
+    .min(10)
+    .max(1000),
+  // TODO: Weitere entity-spezifische Felder hinzufügen
+})
+
+// TypeScript Typen basierend auf dem Schema
+export type {{ENTITY_SINGULAR_UPPER}}FormValues = z.infer<typeof {{ENTITY_SINGULAR}}Schema>
+
+const {{ENTITY_NAME_UPPER}}Form: React.FC<
+  GenericFormProps<{{ENTITY_SINGULAR_UPPER}}Type, {{ENTITY_SINGULAR_UPPER}}FormValues>
+> = ({
+  data: {{ENTITY_SINGULAR}},
+  isOpen,
+  onClose,
+  onSubmit,
+  onDelete,
+  mode,
+  loading = false,
+  onEditMode,
+}) => {
+  const t = useTranslations('{{ENTITY_NAME}}')
+  const tForms = useTranslations('forms')
+  const tCommon = useTranslations('common')
+
+  // Formulardaten mit useMemo initialisieren
+  const defaultValues = React.useMemo<{{ENTITY_SINGULAR_UPPER}}FormValues>(
+    () => ({
+      name: '',
+      description: '',
+      // TODO: Weitere Standardwerte hinzufügen
+    }),
+    []
+  )
+
+    // TanStack Form konfigurieren
+  const form = useForm({
+    defaultValues,
+    onSubmit: async ({ value }) => {
+      if (onSubmit) {
+        await onSubmit(value)
+      }
+    },
+  })
+
+  // Formulardaten aktualisieren, wenn sich die Entity ändert
+  useEffect(() => {
+    if ({{ENTITY_SINGULAR}}) {
+      form.setFieldValue('name', {{ENTITY_SINGULAR}}.name || '')
+      form.setFieldValue('description', {{ENTITY_SINGULAR}}.description || '')
+      // TODO: Weitere Felder setzen
+    }
+  }, [{{ENTITY_SINGULAR}}, form])
+
+  // Feldkonfigurationen definieren
+  const fields: FieldConfig[] = [
+    {
+      name: 'name',
+      label: t('form.name'),
+      type: 'text',
+      required: true,
+      validators: {
+        onChange: ({ value }: { value: string }) => {
+          if (!value || value.length < 3) {
+            return tForms('validation.minLength', { count: 3 })
+          }
+          if (value.length > 100) {
+            return tForms('validation.maxLength', { count: 100 })
+          }
+          return undefined
+        },
+      },
+    },
+    {
+      name: 'description',
+      label: t('form.description'),
+      type: 'textarea',
+      required: true,
+      validators: {
+        onChange: ({ value }: { value: string }) => {
+          if (!value || value.length < 10) {
+            return tForms('validation.minLength', { count: 10 })
+          }
+          if (value.length > 1000) {
+            return tForms('validation.maxLength', { count: 1000 })
+          }
+          return undefined
+        },
+      },
+    },
+    // TODO: Weitere Feldkonfigurationen hinzufügen
+  ]
+
+  // Tab-Konfigurationen (falls mehrere Tabs benötigt werden)
+  const tabs: TabConfig[] = [
+    { id: 'general', label: t('tabs.general') },
+    // TODO: Weitere Tabs hinzufügen falls benötigt
+    // { id: 'relationships', label: t('tabs.relationships') },
+  ]
+
+  return (
+    <GenericForm
+      form={form}
+      isOpen={isOpen}
+      onClose={onClose}
+      onSubmit={() => form.handleSubmit()}
+      onDelete={ {{ENTITY_SINGULAR}}?.id && onDelete ? () => onDelete({{ENTITY_SINGULAR}}.id) : undefined}
+      mode={mode}
+      isLoading={loading}
+      onEditMode={onEditMode}
+      title={
+        mode === 'create'
+          ? t('createTitle')
+          : mode === 'edit'
+          ? t('editTitle')
+          : t('viewTitle')
+      }
+      fields={fields}
+      tabs={tabs.length > 1 ? tabs : undefined}
+      submitButtonText={tCommon('save')}
+      cancelButtonText={tCommon('cancel')}
+      deleteButtonText={tCommon('delete')}
+      deleteConfirmationText={t('deleteConfirmation')}
+    />
+  )
+}
+
+export default {{ENTITY_NAME_UPPER}}Form

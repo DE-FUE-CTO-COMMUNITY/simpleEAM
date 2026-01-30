@@ -1,0 +1,74 @@
+'use client'
+
+import { useTranslations, useLocale } from 'next-intl'
+import { FilterState, {{ENTITY_SINGULAR_UPPER}}Type } from './types'
+
+/**
+ * Custom hook for formatting date values
+ */
+export const useFormatDate = () => {
+  const locale = useLocale()
+
+  return (date: string | null | undefined): string => {
+    if (!date) return '-'
+    try {
+      const dateObj = new Date(date)
+      return dateObj.toLocaleDateString(locale)
+    } catch {
+      return date || '-'
+    }
+  }
+}
+
+/**
+ * Legacy function for backward compatibility
+ * @deprecated Use useFormatDate hook instead
+ */
+export const formatDate = (date: string | null | undefined): string => {
+  if (!date) return '-'
+  return new Date(date).toLocaleDateString('de-DE')
+}
+
+/**
+ * Hook zum Formatieren von Boolean-Werten mit Internationalisierung
+ */
+export const useFormatBoolean = () => {
+  const t = useTranslations('{{ENTITY_NAME}}.states')
+
+  return (value: boolean | null | undefined): string => {
+    if (value === null || value === undefined) return '-'
+    return value ? t('active') : t('inactive')
+  }
+}
+
+/**
+ * @deprecated Legacy-Funktion - verwenden Sie useFormatBoolean() Hook stattdessen
+ */
+export const formatBoolean = (value: boolean | null | undefined): string => {
+  if (value === null || value === undefined) return '-'
+  return value ? 'Aktiv' : 'Inaktiv'
+}
+
+/**
+ * Zählt aktive Filter
+ */
+export const countActiveFilters = (filterState: FilterState): number => {
+  let count = 0
+
+  // TODO: Entity-spezifische Filter-Logik hinzufügen
+  // Beispiel:
+  // if (filterState.categoryFilter && filterState.categoryFilter.length > 0) count++
+  // if (filterState.statusFilter && filterState.statusFilter.length > 0) count++
+  // if (filterState.tagsFilter && filterState.tagsFilter.length > 0) count++
+  if (filterState.descriptionFilter) count++
+  // if (filterState.ownerFilter) count++
+
+  return count
+}
+
+
+// TODO: Entity-spezifische Utility-Funktionen hinzufügen
+// Beispiele:
+// - formatEntitySpecificValue
+// - getEntityStatusLabel
+// - calculateEntityMetrics

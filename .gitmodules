@@ -1,0 +1,3 @@
+[submodule "packages/simple-eam-excalidraw"]
+	path = packages/simple-eam-excalidraw
+	url = https://github.com/marcus-friedrich/simple-eam-excalidraw.git

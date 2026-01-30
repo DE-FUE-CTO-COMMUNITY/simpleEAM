@@ -1,0 +1,923 @@
+"""
+JWT type for Keycloak-based authentication
+"""
+type JWT @jwt {
+  sub: String!
+  preferred_username: String
+  email: String
+  roles: [String!]! @jwtClaim(path: "realm_access.roles")
+  company_ids: [String!] @jwtClaim(path: "company_ids")
+}
+
+extend schema @authentication
+
+"""
+Business Capability – represents a business capability within Enterprise Architecture Management
+"""
+type BusinessCapability
+  @node
+  @authorization(
+    validate: [
+      { operations: [CREATE], where: { jwt: { roles: { includes: "architect" } } } }
+      {
+        operations: [UPDATE, DELETE]
+        where: {
+          AND: [
+            { jwt: { roles: { includes: "architect" } } }
+            { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+          ]
+        }
+      }
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "admin" } } } }
+    ]
+    filter: [
+      {
+        where: {
+          OR: [
+            { jwt: { roles: { includes: "admin" } } }
+            { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+          ]
+        }
+      }
+    ]
+  ) {
+  id: ID! @id
+  name: String!
+  description: String
+  maturityLevel: Int
+  status: CapabilityStatus!
+  type: CapabilityType
+  businessValue: Int
+  sequenceNumber: Int
+  tags: [String!]
+  introductionDate: Date
+  endDate: Date
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime @timestamp(operations: [UPDATE])
+  owners: [Person!]! @relationship(type: "OWNED_BY", direction: OUT)
+  company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
+  usedByOrganisations: [Organisation!]! @relationship(type: "USED_BY", direction: OUT)
+  parents: [BusinessCapability!]! @relationship(type: "HAS_PARENT", direction: OUT)
+  children: [BusinessCapability!]! @relationship(type: "HAS_PARENT", direction: IN)
+  supportedByApplications: [Application!]! @relationship(type: "SUPPORTS", direction: IN)
+  supportedByAIComponents: [AIComponent!]! @relationship(type: "SUPPORTS", direction: IN)
+  relatedDataObjects: [DataObject!]! @relationship(type: "RELATED_TO", direction: OUT)
+  partOfArchitectures: [Architecture!]! @relationship(type: "CONTAINS", direction: IN)
+  depictedInDiagrams: [Diagram!]! @relationship(type: "DEPICTED_IN", direction: OUT)
+}
+
+"""
+Person – represents an individual within the organization
+"""
+type Person
+  @node
+  @authorization(
+    validate: [
+      { operations: [CREATE], where: { jwt: { roles: { includes: "architect" } } } }
+      {
+        operations: [UPDATE, DELETE]
+        where: {
+          AND: [
+            { jwt: { roles: { includes: "architect" } } }
+            { node: { companies: { some: { id_IN: "$jwt.company_ids" } } } }
+          ]
+        }
+      }
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "admin" } } } }
+      { operations: [CREATE, UPDATE], where: { node: { email: { eq: "$jwt.email" } } } }
+    ]
+    filter: [
+      {
+        where: {
+          OR: [
+            { jwt: { roles: { includes: "admin" } } }
+            { node: { companies: { some: { id_IN: "$jwt.company_ids" } } } }
+            { node: { email: { eq: "$jwt.email" } } }
+          ]
+        }
+      }
+    ]
+  ) {
+  id: ID! @id
+  firstName: String!
+  lastName: String!
+  email: String
+  department: String
+  role: String
+  phone: String
+  avatarUrl: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime @timestamp(operations: [UPDATE])
+  companies: [Company!]! @relationship(type: "EMPLOYED_BY", direction: OUT)
+  ownedCapabilities: [BusinessCapability!]! @relationship(type: "OWNED_BY", direction: IN)
+  ownedApplications: [Application!]! @relationship(type: "OWNED_BY", direction: IN)
+  ownedDataObjects: [DataObject!]! @relationship(type: "OWNED_BY", direction: IN)
+  ownedArchitectures: [Architecture!]! @relationship(type: "OWNED_BY", direction: IN)
+  ownedDiagrams: [Diagram!]! @relationship(type: "CREATED_BY", direction: IN)
+  ownedInfrastructure: [Infrastructure!]! @relationship(type: "OWNED_BY", direction: IN)
+  ownedInterfaces: [ApplicationInterface!]! @relationship(type: "OWNED_BY", direction: IN)
+  ownedAIComponents: [AIComponent!]! @relationship(type: "OWNED_BY", direction: IN)
+}
+
+"""
+Application – represents a business application within Enterprise Architecture Management
+"""
+type Application
+  @node
+  @authorization(
+    validate: [
+      { operations: [CREATE], where: { jwt: { roles: { includes: "architect" } } } }
+      {
+        operations: [UPDATE, DELETE]
+        where: {
+          AND: [
+            { jwt: { roles: { includes: "architect" } } }
+            { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+          ]
+        }
+      }
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "admin" } } } }
+    ]
+    filter: [
+      {
+        where: {
+          OR: [
+            { jwt: { roles: { includes: "admin" } } }
+            { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+          ]
+        }
+      }
+    ]
+  ) {
+  id: ID! @id
+  name: String!
+  description: String
+  status: ApplicationStatus!
+  criticality: CriticalityLevel!
+  timeCategory: TimeCategory
+  sevenRStrategy: SevenRStrategy
+  technologyStack: [String!]
+  version: String
+  hostingEnvironment: String
+  vendor: String
+  costs: Float
+  introductionDate: Date
+  endOfLifeDate: Date
+  planningDate: Date
+  endOfUseDate: Date
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime @timestamp(operations: [UPDATE])
+  owners: [Person!]! @relationship(type: "OWNED_BY", direction: OUT)
+  company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
+  usedByOrganisations: [Organisation!]! @relationship(type: "USED_BY", direction: OUT)
+  parents: [Application!]! @relationship(type: "HAS_PARENT_APPLICATION", direction: OUT)
+  components: [Application!]! @relationship(type: "HAS_PARENT_APPLICATION", direction: IN)
+  predecessors: [Application!]! @relationship(type: "SUCCESSOR_OF", direction: OUT)
+  successors: [Application!]! @relationship(type: "SUCCESSOR_OF", direction: IN)
+  supportsCapabilities: [BusinessCapability!]! @relationship(type: "SUPPORTS", direction: OUT)
+  usesDataObjects: [DataObject!]! @relationship(type: "USES", direction: OUT)
+  isDataSourceFor: [DataObject!]! @relationship(type: "DATA_SOURCE", direction: IN)
+  sourceOfInterfaces: [ApplicationInterface!]!
+    @relationship(type: "INTERFACE_SOURCE", direction: OUT)
+  targetOfInterfaces: [ApplicationInterface!]!
+    @relationship(type: "INTERFACE_TARGET", direction: OUT)
+  partOfArchitectures: [Architecture!]! @relationship(type: "CONTAINS", direction: IN)
+  depictedInDiagrams: [Diagram!]! @relationship(type: "DEPICTED_IN", direction: OUT)
+  implementsPrinciples: [ArchitecturePrinciple!]!
+    @relationship(type: "IMPLEMENTS_PRINCIPLE", direction: OUT)
+  hostedOn: [Infrastructure!]! @relationship(type: "HOSTED_ON", direction: OUT)
+  usesAIComponents: [AIComponent!]! @relationship(type: "USED_BY", direction: OUT)
+}
+
+"""
+ApplicationInterface – represents an interface between applications
+"""
+type ApplicationInterface
+  @node
+  @authorization(
+    validate: [
+      { operations: [CREATE], where: { jwt: { roles: { includes: "architect" } } } }
+      {
+        operations: [UPDATE, DELETE]
+        where: {
+          AND: [
+            { jwt: { roles: { includes: "architect" } } }
+            { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+          ]
+        }
+      }
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "admin" } } } }
+    ]
+    filter: [
+      {
+        where: {
+          OR: [
+            { jwt: { roles: { includes: "admin" } } }
+            { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+          ]
+        }
+      }
+    ]
+  ) {
+  id: ID! @id
+  name: String!
+  description: String
+  interfaceType: InterfaceType!
+  protocol: InterfaceProtocol
+  version: String
+  status: InterfaceStatus!
+  introductionDate: Date
+  endOfLifeDate: Date
+  planningDate: Date
+  endOfUseDate: Date
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime @timestamp(operations: [UPDATE])
+  owners: [Person!]! @relationship(type: "OWNED_BY", direction: OUT)
+  company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
+  usedByOrganisations: [Organisation!]! @relationship(type: "USED_BY", direction: OUT)
+  predecessors: [ApplicationInterface!]!
+    @relationship(type: "SUCCESSOR_OF_INTERFACE", direction: OUT)
+  successors: [ApplicationInterface!]! @relationship(type: "SUCCESSOR_OF_INTERFACE", direction: IN)
+  sourceApplications: [Application!]! @relationship(type: "INTERFACE_SOURCE", direction: IN)
+  targetApplications: [Application!]! @relationship(type: "INTERFACE_TARGET", direction: IN)
+  dataObjects: [DataObject!]! @relationship(type: "TRANSFERS", direction: OUT)
+  partOfArchitectures: [Architecture!]! @relationship(type: "CONTAINS", direction: IN)
+  depictedInDiagrams: [Diagram!]! @relationship(type: "DEPICTED_IN", direction: OUT)
+}
+
+"""
+DataObject – represents a business data object within Enterprise Architecture Management
+"""
+type DataObject
+  @node
+  @authorization(
+    validate: [
+      { operations: [CREATE], where: { jwt: { roles: { includes: "architect" } } } }
+      {
+        operations: [UPDATE, DELETE]
+        where: {
+          AND: [
+            { jwt: { roles: { includes: "architect" } } }
+            { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+          ]
+        }
+      }
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "admin" } } } }
+    ]
+    filter: [
+      {
+        where: {
+          OR: [
+            { jwt: { roles: { includes: "admin" } } }
+            { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+          ]
+        }
+      }
+    ]
+  ) {
+  id: ID! @id
+  name: String!
+  description: String
+  classification: DataClassification!
+  format: String
+  introductionDate: Date
+  endOfLifeDate: Date
+  planningDate: Date
+  endOfUseDate: Date
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime @timestamp(operations: [UPDATE])
+  owners: [Person!]! @relationship(type: "OWNED_BY", direction: OUT)
+  company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
+  usedByOrganisations: [Organisation!]! @relationship(type: "USED_BY", direction: OUT)
+  dataSources: [Application!]! @relationship(type: "DATA_SOURCE", direction: OUT)
+  usedByApplications: [Application!]! @relationship(type: "USES", direction: IN)
+  relatedToCapabilities: [BusinessCapability!]! @relationship(type: "RELATED_TO", direction: IN)
+  transferredInInterfaces: [ApplicationInterface!]! @relationship(type: "TRANSFERS", direction: IN)
+  usedForTrainingAI: [AIComponent!]! @relationship(type: "TRAINED_WITH", direction: IN)
+  partOfArchitectures: [Architecture!]! @relationship(type: "CONTAINS", direction: IN)
+  depictedInDiagrams: [Diagram!]! @relationship(type: "DEPICTED_IN", direction: OUT)
+}
+
+"""
+Infrastructure – represents an infrastructure component within Enterprise Architecture Management
+"""
+type Infrastructure
+  @node
+  @authorization(
+    validate: [
+      { operations: [CREATE], where: { jwt: { roles: { includes: "architect" } } } }
+      {
+        operations: [UPDATE, DELETE]
+        where: {
+          AND: [
+            { jwt: { roles: { includes: "architect" } } }
+            { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+          ]
+        }
+      }
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "admin" } } } }
+    ]
+    filter: [
+      {
+        where: {
+          OR: [
+            { jwt: { roles: { includes: "admin" } } }
+            { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+          ]
+        }
+      }
+    ]
+  ) {
+  id: ID! @id
+  name: String!
+  description: String
+  infrastructureType: InfrastructureType!
+  status: InfrastructureStatus!
+  vendor: String
+  version: String
+  capacity: String
+  location: String
+  ipAddress: String
+  operatingSystem: String
+  specifications: String
+  maintenanceWindow: String
+  costs: Float
+  introductionDate: Date
+  endOfLifeDate: Date
+  planningDate: Date
+  endOfUseDate: Date
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime @timestamp(operations: [UPDATE])
+  owners: [Person!]! @relationship(type: "OWNED_BY", direction: OUT)
+  company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
+  usedByOrganisations: [Organisation!]! @relationship(type: "USED_BY", direction: OUT)
+  parentInfrastructure: [Infrastructure!]!
+    @relationship(type: "HAS_PARENT_INFRASTRUCTURE", direction: OUT)
+  childInfrastructures: [Infrastructure!]!
+    @relationship(type: "HAS_PARENT_INFRASTRUCTURE", direction: IN)
+  hostsApplications: [Application!]! @relationship(type: "HOSTED_ON", direction: IN)
+  hostsAIComponents: [AIComponent!]! @relationship(type: "HOSTED_ON", direction: IN)
+  partOfArchitectures: [Architecture!]! @relationship(type: "CONTAINS", direction: IN)
+  depictedInDiagrams: [Diagram!]! @relationship(type: "DEPICTED_IN", direction: OUT)
+}
+
+"""
+AIComponent – represents an AI component within Enterprise Architecture Management
+"""
+type AIComponent
+  @node
+  @authorization(
+    validate: [
+      { operations: [CREATE], where: { jwt: { roles: { includes: "architect" } } } }
+      {
+        operations: [UPDATE, DELETE]
+        where: {
+          AND: [
+            { jwt: { roles: { includes: "architect" } } }
+            { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+          ]
+        }
+      }
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "admin" } } } }
+    ]
+    filter: [
+      {
+        where: {
+          OR: [
+            { jwt: { roles: { includes: "admin" } } }
+            { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+          ]
+        }
+      }
+    ]
+  ) {
+  id: ID! @id
+  name: String!
+  description: String
+  aiType: AIComponentType!
+  model: String
+  version: String
+  status: AIComponentStatus!
+  accuracy: Float
+  trainingDate: Date
+  lastUpdated: Date
+  provider: String
+  license: String
+  costs: Float
+  tags: [String!]
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime @timestamp(operations: [UPDATE])
+  owners: [Person!]! @relationship(type: "OWNED_BY", direction: OUT)
+  company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
+  usedByOrganisations: [Organisation!]! @relationship(type: "USED_BY", direction: OUT)
+  trainedWithDataObjects: [DataObject!]! @relationship(type: "TRAINED_WITH", direction: OUT)
+  usedByApplications: [Application!]! @relationship(type: "USED_BY", direction: IN)
+  supportsCapabilities: [BusinessCapability!]! @relationship(type: "SUPPORTS", direction: OUT)
+  implementsPrinciples: [ArchitecturePrinciple!]!
+    @relationship(type: "IMPLEMENTS_PRINCIPLE", direction: OUT)
+  hostedOn: [Infrastructure!]! @relationship(type: "HOSTED_ON", direction: OUT)
+  partOfArchitectures: [Architecture!]! @relationship(type: "CONTAINS", direction: IN)
+  depictedInDiagrams: [Diagram!]! @relationship(type: "DEPICTED_IN", direction: OUT)
+}
+
+"""
+Company – represents an organization within Enterprise Architecture Management
+"""
+type Company
+  @node
+  @authorization(
+    validate: [
+      { operations: [CREATE], where: { jwt: { roles: { includes: "architect" } } } }
+      {
+        operations: [UPDATE, DELETE]
+        where: {
+          AND: [
+            { jwt: { roles: { includes: "architect" } } }
+            { node: { id_IN: "$jwt.company_ids" } }
+          ]
+        }
+      }
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "admin" } } } }
+    ]
+    filter: [
+      {
+        where: {
+          OR: [{ jwt: { roles: { includes: "admin" } } }, { node: { id_IN: "$jwt.company_ids" } }]
+        }
+      }
+    ]
+  ) {
+  id: ID! @id
+  name: String!
+  description: String
+  address: String
+  website: String
+  industry: String
+  size: CompanySize
+  primaryColor: String
+  secondaryColor: String
+  font: String
+  diagramFont: String
+  logo: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime @timestamp(operations: [UPDATE])
+  organisations: [Organisation!]! @relationship(type: "BELONGS_TO", direction: IN)
+  ownedCapabilities: [BusinessCapability!]! @relationship(type: "OWNED_BY", direction: IN)
+  ownedApplications: [Application!]! @relationship(type: "OWNED_BY", direction: IN)
+  ownedDataObjects: [DataObject!]! @relationship(type: "OWNED_BY", direction: IN)
+  ownedInterfaces: [ApplicationInterface!]! @relationship(type: "OWNED_BY", direction: IN)
+  ownedInfrastructure: [Infrastructure!]! @relationship(type: "OWNED_BY", direction: IN)
+  ownedAIComponents: [AIComponent!]! @relationship(type: "OWNED_BY", direction: IN)
+  employees: [Person!]! @relationship(type: "EMPLOYED_BY", direction: IN)
+  ownedArchitectures: [Architecture!]! @relationship(type: "OWNED_BY", direction: IN)
+  ownedDiagrams: [Diagram!]! @relationship(type: "OWNED_BY", direction: IN)
+  ownedArchitecturePrinciples: [ArchitecturePrinciple!]!
+    @relationship(type: "OWNED_BY", direction: IN)
+}
+
+"""
+Organisation – represents an organizational unit within the company
+"""
+type Organisation
+  @node
+  @authorization(
+    validate: [
+      { operations: [CREATE], where: { jwt: { roles: { includes: "architect" } } } }
+      {
+        operations: [UPDATE, DELETE]
+        where: {
+          AND: [
+            { jwt: { roles: { includes: "architect" } } }
+            { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+          ]
+        }
+      }
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "admin" } } } }
+    ]
+    filter: [
+      {
+        where: {
+          OR: [
+            { jwt: { roles: { includes: "admin" } } }
+            { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+          ]
+        }
+      }
+    ]
+  ) {
+  id: ID! @id
+  name: String!
+  description: String
+  type: OrganisationType!
+  level: Int
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime @timestamp(operations: [UPDATE])
+  company: [Company!]! @relationship(type: "BELONGS_TO", direction: OUT)
+  parentOrganisation: [Organisation!]!
+    @relationship(type: "HAS_PARENT_ORGANISATION", direction: OUT)
+  childOrganisations: [Organisation!]! @relationship(type: "HAS_PARENT_ORGANISATION", direction: IN)
+  usedCapabilities: [BusinessCapability!]! @relationship(type: "USED_BY", direction: IN)
+  usedApplications: [Application!]! @relationship(type: "USED_BY", direction: IN)
+  usedDataObjects: [DataObject!]! @relationship(type: "USED_BY", direction: IN)
+  usedInterfaces: [ApplicationInterface!]! @relationship(type: "USED_BY", direction: IN)
+  usedInfrastructure: [Infrastructure!]! @relationship(type: "USED_BY", direction: IN)
+  usedAIComponents: [AIComponent!]! @relationship(type: "USED_BY", direction: IN)
+}
+
+"""
+Possible status values for a business capability
+"""
+enum CapabilityStatus {
+  ACTIVE
+  PLANNED
+  RETIRED
+}
+
+"""
+Types of business capabilities
+"""
+enum CapabilityType {
+  STRATEGIC
+  OPERATIONAL
+  SUPPORT
+}
+
+"""
+Possible status values for an application
+"""
+enum ApplicationStatus {
+  ACTIVE
+  IN_DEVELOPMENT
+  RETIRED
+}
+
+"""
+Criticality levels for applications
+"""
+enum CriticalityLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+"""
+TIME categories for strategic application classification
+"""
+enum TimeCategory {
+  TOLERATE
+  INVEST
+  MIGRATE
+  ELIMINATE
+}
+
+"""
+7R strategies for cloud migration and application portfolio management
+"""
+enum SevenRStrategy {
+  RETIRE
+  RETAIN
+  REHOST
+  REPLATFORM
+  REFACTOR
+  REARCHITECT
+  REPLACE
+}
+
+"""
+Data classification for business data objects
+"""
+enum DataClassification {
+  PUBLIC
+  INTERNAL
+  CONFIDENTIAL
+  STRICTLY_CONFIDENTIAL
+}
+
+"""
+Interface types for application integrations
+"""
+enum InterfaceType {
+  API
+  FILE
+  DATABASE
+  MESSAGE_QUEUE
+  OTHER
+}
+
+"""
+Protocols used by application interfaces
+"""
+enum InterfaceProtocol {
+  REST
+  SOAP
+  GRAPHQL
+  HTTP
+  HTTPS
+  FTP
+  SFTP
+  TCP
+  UDP
+  SMTP
+  LDAP
+  JDBC
+  ODBC
+  ORACLE
+  MQTT
+  OTHER
+}
+
+"""
+Status values for application interfaces
+"""
+enum InterfaceStatus {
+  ACTIVE
+  IN_DEVELOPMENT
+  OUT_OF_SERVICE
+  PLANNED
+  DEPRECATED
+}
+
+"""
+Architecture – represents an architecture within Enterprise Architecture Management
+"""
+type Architecture
+  @node
+  @authorization(
+    validate: [
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "architect" } } } }
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "admin" } } } }
+    ]
+    filter: [
+      {
+        where: {
+          OR: [
+            { jwt: { roles: { includes: "admin" } } }
+            { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+          ]
+        }
+      }
+    ]
+  ) {
+  id: ID! @id
+  name: String!
+  description: String
+  timestamp: DateTime!
+  domain: ArchitectureDomain!
+  type: ArchitectureType!
+  tags: [String!]
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime @timestamp(operations: [UPDATE])
+  company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
+  owners: [Person!]! @relationship(type: "OWNED_BY", direction: OUT)
+  containsCapabilities: [BusinessCapability!]! @relationship(type: "CONTAINS", direction: OUT)
+  containsApplications: [Application!]! @relationship(type: "CONTAINS", direction: OUT)
+  containsDataObjects: [DataObject!]! @relationship(type: "CONTAINS", direction: OUT)
+  containsInterfaces: [ApplicationInterface!]! @relationship(type: "CONTAINS", direction: OUT)
+  containsInfrastructure: [Infrastructure!]! @relationship(type: "CONTAINS", direction: OUT)
+  containsAIComponents: [AIComponent!]! @relationship(type: "CONTAINS", direction: OUT)
+  parentArchitecture: [Architecture!]! @relationship(type: "PART_OF", direction: OUT)
+  childArchitectures: [Architecture!]! @relationship(type: "PART_OF", direction: IN)
+  diagrams: [Diagram!]! @relationship(type: "BELONGS_TO", direction: IN)
+  appliedPrinciples: [ArchitecturePrinciple!]!
+    @relationship(type: "APPLIES_PRINCIPLE", direction: OUT)
+}
+
+"""
+Diagram – represents an Excalidraw diagram
+"""
+type Diagram
+  @node
+  @authorization(
+    validate: [
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "architect" } } } }
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "admin" } } } }
+    ]
+    filter: [
+      {
+        where: {
+          OR: [
+            { jwt: { roles: { includes: "admin" } } }
+            { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+          ]
+        }
+      }
+    ]
+  ) {
+  id: ID! @id
+  title: String!
+  description: String
+  diagramType: DiagramType
+  diagramJson: String! # Contains the Excalidraw diagram as a JSON string
+  diagramPng: String # Contains the diagram PNG image encoded as base64
+  diagramPngDark: String # Contains the dark-mode diagram PNG image encoded as base64
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime @timestamp(operations: [UPDATE])
+  company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
+  architecture: [Architecture!]! @relationship(type: "BELONGS_TO", direction: OUT)
+  creator: [Person!]! @relationship(type: "CREATED_BY", direction: OUT)
+  containsCapabilities: [BusinessCapability!]! @relationship(type: "DEPICTED_IN", direction: IN)
+  containsApplications: [Application!]! @relationship(type: "DEPICTED_IN", direction: IN)
+  containsDataObjects: [DataObject!]! @relationship(type: "DEPICTED_IN", direction: IN)
+  containsInterfaces: [ApplicationInterface!]! @relationship(type: "DEPICTED_IN", direction: IN)
+  containsInfrastructure: [Infrastructure!]! @relationship(type: "DEPICTED_IN", direction: IN)
+  containsAIComponents: [AIComponent!]! @relationship(type: "DEPICTED_IN", direction: IN)
+}
+
+"""
+ArchitecturePrinciple – represents an architecture principle within Enterprise Architecture Management
+"""
+type ArchitecturePrinciple
+  @node
+  @authorization(
+    validate: [
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "architect" } } } }
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "admin" } } } }
+    ]
+    filter: [
+      {
+        where: {
+          OR: [
+            { jwt: { roles: { includes: "admin" } } }
+            { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+          ]
+        }
+      }
+    ]
+  ) {
+  id: ID! @id
+  name: String!
+  description: String
+  category: PrincipleCategory!
+  priority: PrinciplePriority!
+  rationale: String
+  implications: String
+  tags: [String!]
+  isActive: Boolean!
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime @timestamp(operations: [UPDATE])
+  company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
+  owners: [Person!]! @relationship(type: "OWNED_BY", direction: OUT)
+  appliedInArchitectures: [Architecture!]! @relationship(type: "APPLIES_PRINCIPLE", direction: IN)
+  implementedByApplications: [Application!]!
+    @relationship(type: "IMPLEMENTS_PRINCIPLE", direction: IN)
+  implementedByAIComponents: [AIComponent!]!
+    @relationship(type: "IMPLEMENTS_PRINCIPLE", direction: IN)
+}
+
+"""
+Architecture domains
+"""
+enum ArchitectureDomain {
+  BUSINESS
+  DATA
+  APPLICATION
+  TECHNOLOGY
+  SECURITY
+  INTEGRATION
+  ENTERPRISE
+}
+
+"""
+Architecture types
+"""
+enum ArchitectureType {
+  CURRENT_STATE
+  FUTURE_STATE
+  TRANSITION
+  CONCEPTUAL
+}
+
+"""
+Diagram types for Excalidraw diagrams
+"""
+enum DiagramType {
+  ARCHITECTURE
+  APPLICATION_LANDSCAPE
+  CAPABILITY_MAP
+  DATA_FLOW
+  PROCESS
+  NETWORK
+  INTEGRATION_ARCHITECTURE
+  SECURITY_ARCHITECTURE
+  CONCEPTUAL
+  OTHER
+}
+
+"""
+Categories for architecture principles
+"""
+enum PrincipleCategory {
+  BUSINESS
+  DATA
+  APPLICATION
+  TECHNOLOGY
+  SECURITY
+  INTEGRATION
+  GOVERNANCE
+  COMPLIANCE
+  PERFORMANCE
+  SCALABILITY
+  RELIABILITY
+  MAINTAINABILITY
+  INTEROPERABILITY
+  REUSABILITY
+  FLEXIBILITY
+  COST_OPTIMIZATION
+}
+
+"""
+Priority levels for architecture principles
+"""
+enum PrinciplePriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+"""
+Infrastructure types
+"""
+enum InfrastructureType {
+  CLOUD_DATACENTER
+  ON_PREMISE_DATACENTER
+  KUBERNETES_CLUSTER
+  VIRTUALIZATION_CLUSTER
+  VIRTUAL_MACHINE
+  CONTAINER_HOST
+  PHYSICAL_SERVER
+  IOT_GATEWAY
+  IOT_PLATFORM
+}
+
+"""
+Status values for infrastructure components
+"""
+enum InfrastructureStatus {
+  ACTIVE
+  INACTIVE
+  MAINTENANCE
+  PLANNED
+  DECOMMISSIONED
+  UNDER_CONSTRUCTION
+}
+
+"""
+Company sizes
+"""
+enum CompanySize {
+  STARTUP
+  SMALL
+  MEDIUM
+  LARGE
+  ENTERPRISE
+  MULTINATIONAL
+}
+
+"""
+Organization types
+"""
+enum OrganisationType {
+  DIVISION
+  DEPARTMENT
+  TEAM
+  PROJECT
+  FUNCTION
+  SUBSIDIARY
+  BRANCH
+  UNIT
+}
+
+"""
+AI component types
+"""
+enum AIComponentType {
+  MACHINE_LEARNING_MODEL
+  DEEP_LEARNING_MODEL
+  NATURAL_LANGUAGE_PROCESSING
+  COMPUTER_VISION
+  RECOMMENDATION_ENGINE
+  PREDICTIVE_ANALYTICS
+  CHATBOT
+  VOICE_ASSISTANT
+  DECISION_SUPPORT_SYSTEM
+  AUTOMATION_ENGINE
+  GENERATIVE_AI
+  AGENTIC_AI
+  RAG
+  OTHER
+}
+
+"""
+Status values for AI components
+"""
+enum AIComponentStatus {
+  IN_DEVELOPMENT
+  TRAINING
+  TESTING
+  DEPLOYED
+  ACTIVE
+  DEPRECATED
+  RETIRED
+}

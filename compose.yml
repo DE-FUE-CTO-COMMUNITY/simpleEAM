@@ -1,0 +1,176 @@
+services:
+  # Neo4j Database
+  neo4j:
+    image: neo4j:5.26
+    restart: unless-stopped
+    ports:
+      - "${NEO4J_EXTERNAL_PORT}:${NEO4J_PORT}" # HTTP
+      - "${NEO4J_EXTERNAL_BOLT_PORT}:${NEO4J_BOLT_PORT}" # Bolt (external port changed to 7688 to avoid conflicts)
+    volumes:
+      - ./db/data:/data
+      - ./db/logs:/logs
+      - ./db/import:/import
+      - ./db/plugins:/plugins
+    environment:
+      - NEO4J_AUTH=${NEO4J_AUTH}
+      - NEO4J_dbms_memory_pagecache_size=${NEO4J_PAGECACHE_MEMORY}
+      - NEO4J_dbms_memory_heap_initial__size=${NEO4J_HEAP_INITIAL_SIZE}
+      - NEO4J_dbms_memory_heap_max__size=${NEO4J_HEAP_MAX_SIZE}
+    networks:
+      - eam-network
+      - ${TRAEFIK_NETWORK}
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-neo4j.rule=Host(`${NEO4J_SUBDOMAIN}.${BASE_DOMAIN}`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-neo4j.entrypoints=websecure
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-neo4j.tls=true
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-neo4j.tls.certresolver=${TRAEFIK_CERTRESOLVER}
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-neo4j.tls.domains[0].main=${NEO4J_SUBDOMAIN}.${BASE_DOMAIN}
+      - traefik.http.services.${COMPOSE_PROJECT_NAME:-simple-eam}-neo4j.loadbalancer.server.port=${NEO4J_PORT}
+      - "traefik.docker.network=${TRAEFIK_NETWORK}"
+
+  # Server
+  server:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "${GRAPHQL_EXTERNAL_PORT}:${GRAPHQL_INTERNAL_PORT}"
+    depends_on:
+      - neo4j
+      - keycloak
+    environment:
+      - NODE_ENV=development
+      - NEO4J_URI=bolt://neo4j:${NEO4J_BOLT_PORT}
+      - NEO4J_USER=${NEO4J_USER}
+      - NEO4J_PASSWORD=${NEO4J_PASSWORD}
+      - GRAPHQL_INTERNAL_PORT=${GRAPHQL_INTERNAL_PORT}
+      - KEYCLOAK_URL=http://keycloak:${KEYCLOAK_INTERNAL_PORT}
+      - KEYCLOAK_REALM=${KEYCLOAK_REALM}
+      - KEYCLOAK_CLIENT_ID=${KEYCLOAK_CLIENT_ID_SERVER}
+    # No bind mounts for src, prisma, tests - everything comes from the image
+    networks:
+      - eam-network
+      - ${TRAEFIK_NETWORK}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-graphql.rule=Host(`${API_SUBDOMAIN}.${BASE_DOMAIN}`)"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-graphql.entrypoints=websecure"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-graphql.tls=true"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-graphql.tls.certresolver=${TRAEFIK_CERTRESOLVER}"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-graphql.tls.domains[0].main=${API_SUBDOMAIN}.${BASE_DOMAIN}"
+      - "traefik.http.services.${COMPOSE_PROJECT_NAME:-simple-eam}-graphql.loadbalancer.server.port=${GRAPHQL_INTERNAL_PORT}"
+      - "traefik.docker.network=${TRAEFIK_NETWORK}"
+
+  # Keycloak for authentication
+  keycloak:
+    image: quay.io/keycloak/keycloak:23.0
+    restart: unless-stopped
+    environment:
+      - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN}
+      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
+      - KC_DB=${KC_DB}
+      - KC_DB_URL=jdbc:postgresql://keycloak-db:5432/${KC_DB_NAME}
+      - KC_DB_USERNAME=${KC_DB_USER}
+      - KC_DB_PASSWORD=${KC_DB_PASSWORD}
+      - KC_HOSTNAME_STRICT=false
+      - KC_HTTP_ENABLED=true
+      - KC_PROXY=edge
+      - KC_HEALTH_ENABLED=true
+    ports:
+      - "${KEYCLOAK_EXTERNAL_PORT}:${KEYCLOAK_INTERNAL_PORT}"
+    command:
+      - start
+      - --import-realm
+    volumes:
+      - ./auth/src:/opt/keycloak/data/import
+      - ./auth/themes:/opt/keycloak/themes
+    depends_on:
+      - keycloak-db
+    networks:
+      - eam-network
+      - ${TRAEFIK_NETWORK}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-keycloak.rule=Host(`${AUTH_SUBDOMAIN}.${BASE_DOMAIN}`)"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-keycloak.entrypoints=websecure"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-keycloak.tls=true"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-keycloak.tls.certresolver=${TRAEFIK_CERTRESOLVER}"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-keycloak.tls.domains[0].main=${AUTH_SUBDOMAIN}.${BASE_DOMAIN}"
+      - "traefik.http.services.${COMPOSE_PROJECT_NAME:-simple-eam}-keycloak.loadbalancer.server.port=${KEYCLOAK_INTERNAL_PORT}"
+      - "traefik.docker.network=${TRAEFIK_NETWORK}"
+
+  # Keycloak Database
+  keycloak-db:
+    image: postgres:15
+    restart: unless-stopped
+    volumes:
+      - ./auth/data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${KC_DB_NAME}
+      - POSTGRES_USER=${KC_DB_USER}
+      - POSTGRES_PASSWORD=${KC_DB_PASSWORD}
+    networks:
+      - eam-network
+
+  # Excalidraw Collaboration Room Server
+  excalidraw-room:
+    image: excalidraw/excalidraw-room:sha-03ff435
+    restart: unless-stopped
+    networks:
+      - eam-network
+      - ${TRAEFIK_NETWORK}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-excalidraw-room.rule=Host(`${EXCALIDRAW_ROOM_SUBDOMAIN}.${BASE_DOMAIN}`)"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-excalidraw-room.entrypoints=websecure"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-excalidraw-room.tls=true"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-excalidraw-room.tls.certresolver=${TRAEFIK_CERTRESOLVER}"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-excalidraw-room.tls.domains[0].main=${EXCALIDRAW_ROOM_SUBDOMAIN}.${BASE_DOMAIN}"
+      - "traefik.http.services.${COMPOSE_PROJECT_NAME:-simple-eam}-excalidraw-room.loadbalancer.server.port=80"
+      - "traefik.docker.network=${TRAEFIK_NETWORK}"
+
+  # Next.js Client
+  client:
+    build:
+      context: .
+      dockerfile: client/Dockerfile
+    restart: unless-stopped
+
+    depends_on:
+      - server
+      - excalidraw-room
+    environment:
+      - NODE_ENV=production
+      # Runtime configuration - passed to container for /api/runtime-config endpoint
+      - GRAPHQL_URL=https://${API_SUBDOMAIN}.${BASE_DOMAIN}/graphql
+      - KEYCLOAK_URL=https://${AUTH_SUBDOMAIN}.${BASE_DOMAIN}
+      - KEYCLOAK_REALM=${KEYCLOAK_REALM}
+      - KEYCLOAK_CLIENT_ID_CLIENT=${KEYCLOAK_CLIENT_ID_CLIENT}
+      - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN}
+      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
+      - EXCALIDRAW_WS_SERVER_URL=https://${EXCALIDRAW_ROOM_SUBDOMAIN}.${BASE_DOMAIN}
+      - THEME_PRIMARY_COLOR=${THEME_PRIMARY_COLOR}
+      - THEME_SECONDARY_COLOR=${THEME_SECONDARY_COLOR}
+      - THEME_FONT_FAMILY=${THEME_FONT_FAMILY}
+      - LOGO_URL=${LOGO_URL}
+      - LOGO_ALT=${LOGO_ALT}
+    networks:
+      - eam-network
+      - ${TRAEFIK_NETWORK}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-client.rule=Host(`${CLIENT_SUBDOMAIN}.${BASE_DOMAIN}`)"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-client.entrypoints=websecure"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-client.tls=true"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-client.tls.certresolver=${TRAEFIK_CERTRESOLVER}"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-client.tls.domains[0].main=${CLIENT_SUBDOMAIN}.${BASE_DOMAIN}"
+      - "traefik.http.services.${COMPOSE_PROJECT_NAME:-simple-eam}-client.loadbalancer.server.port=${CLIENT_PORT}"
+      - "traefik.docker.network=${TRAEFIK_NETWORK}"
+
+networks:
+  eam-network:
+    driver: bridge
+  traefik:
+    external: true

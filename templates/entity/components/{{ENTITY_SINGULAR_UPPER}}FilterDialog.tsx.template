@@ -1,0 +1,74 @@
+'use client'
+
+import React from 'react'
+import { useTranslations } from 'next-intl'
+import GenericFilterDialog, { FilterField } from '../common/GenericFilterDialog'
+import { FilterState } from './types'
+import { countActiveFilters } from './utils'
+
+interface {{ENTITY_NAME_UPPER}}FilterProps {
+  filterState: FilterState
+  onFilterChange: (newFilter: Partial<FilterState>) => void
+  onResetFilter: () => void
+  onClose: () => void
+  onApply: (activeCount: number) => void
+}
+
+export function {{ENTITY_NAME_UPPER}}FilterDialog({
+  filterState,
+  onFilterChange,
+  onResetFilter,
+  onClose,
+  onApply,
+}: {{ENTITY_NAME_UPPER}}FilterProps) {
+  const t = useTranslations('{{ENTITY_NAME}}')
+
+  // Konfiguration der Filterfelder
+  const filterFields: FilterField[] = [
+    // TODO: Definiere hier die spezifischen Filter-Felder für {{ENTITY_NAME}}
+    // Beispiele für verschiedene Filter-Typen:
+    // 
+    // Text-Filter:
+    // {
+    //   id: 'nameFilter',
+    //   label: t('form.name'),
+    //   type: 'text',
+    //   placeholder: t('searchPlaceholder'),
+    // },
+    //
+    // Multi-Select Filter:
+    // {
+    //   id: 'statusFilter',
+    //   label: t('form.status'),
+    //   type: 'multiSelect',
+    //   options: availableStatuses.map(status => ({
+    //     value: status,
+    //     label: t(`statuses.${status}`)
+    //   })),
+    // },
+    //
+    // Datum-Bereich Filter:
+    // {
+    //   id: 'createdDateRange',
+    //   label: 'Erstellungsdatum',
+    //   type: 'dateRange',
+    //   fromLabel: 'Von',
+    //   toLabel: 'Bis',
+    // },
+  ]
+
+  return (
+    <GenericFilterDialog
+      title={t('title')}
+      filterState={filterState}
+      filterFields={filterFields}
+      onFilterChange={onFilterChange}
+      onResetFilter={onResetFilter}
+      onClose={onClose}
+      onApply={onApply}
+      countActiveFilters={countActiveFilters as (filterState: any) => number}
+    />
+  )
+}
+
+export default {{ENTITY_NAME_UPPER}}FilterDialog
