@@ -34,6 +34,7 @@ export type JsonEntityType =
 // Hilfsfunktion: Company-Filter (inkl. Diagramm-OR-Sonderfall)
 const companyWhere = (entityType: JsonEntityType | 'all', companyId?: string): any | undefined => {
   if (!companyId) return undefined
+
   if (entityType === 'diagrams') {
     return {
       OR: [
@@ -42,6 +43,11 @@ const companyWhere = (entityType: JsonEntityType | 'all', companyId?: string): a
       ],
     }
   }
+
+  if (entityType === 'persons') {
+    return { companies: { some: { id: { eq: companyId } } } }
+  }
+
   return { company: { some: { id: { eq: companyId } } } }
 }
 

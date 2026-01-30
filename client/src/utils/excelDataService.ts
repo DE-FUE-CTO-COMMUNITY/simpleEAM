@@ -30,6 +30,7 @@ export type EntityType =
 // Hilfsfunktion: Company-Filter (inkl. Diagramm-OR-Sonderfall)
 const companyWhere = (entityType: EntityType, companyId?: string): any | undefined => {
   if (!companyId) return undefined
+
   if (entityType === 'diagrams') {
     return {
       OR: [
@@ -38,6 +39,11 @@ const companyWhere = (entityType: EntityType, companyId?: string): any | undefin
       ],
     }
   }
+
+  if (entityType === 'persons') {
+    return { companies: { some: { id: { eq: companyId } } } }
+  }
+
   return { company: { some: { id: { eq: companyId } } } }
 }
 
