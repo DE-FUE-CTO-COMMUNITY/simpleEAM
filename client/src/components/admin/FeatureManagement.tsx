@@ -67,8 +67,7 @@ export default function FeatureManagement({
                     checked={lensFlags[lens]}
                     onChange={handleToggle(lens)}
                     disabled={
-                      disabled ||
-                      (disableEnterpriseLens && lens === 'enterpriseArchitecture')
+                      disabled || (disableEnterpriseLens && lens === 'enterpriseArchitecture')
                     }
                   />
                 }

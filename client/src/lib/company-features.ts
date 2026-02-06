@@ -12,23 +12,17 @@ export type CompanyFeaturesPayload = {
 }
 
 export const buildDefaultLensFlags = (): LensFlags => {
-  return LENS_OPTIONS.reduce(
-    (acc, lens) => {
-      acc[lens] = lens === DEFAULT_LENS
-      return acc
-    },
-    {} as LensFlags
-  )
+  return LENS_OPTIONS.reduce((acc, lens) => {
+    acc[lens] = lens === DEFAULT_LENS
+    return acc
+  }, {} as LensFlags)
 }
 
 export const buildDefaultFeatureFlags = (): FeatureFlags => {
-  return FEATURE_FLAGS.reduce(
-    (acc, feature) => {
-      acc[feature] = false
-      return acc
-    },
-    {} as FeatureFlags
-  )
+  return FEATURE_FLAGS.reduce((acc, feature) => {
+    acc[feature] = false
+    return acc
+  }, {} as FeatureFlags)
 }
 
 export const parseCompanyFeatures = (featuresJson?: string | null) => {

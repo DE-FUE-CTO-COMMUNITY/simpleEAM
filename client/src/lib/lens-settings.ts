@@ -2,12 +2,7 @@
 
 import React from 'react'
 import { useCompanyContext } from '@/contexts/CompanyContext'
-import {
-  DEFAULT_LENS,
-  LENS_OPTIONS,
-  type LensFlags,
-  type LensKey,
-} from './feature-definitions'
+import { DEFAULT_LENS, LENS_OPTIONS, type LensFlags, type LensKey } from './feature-definitions'
 import { parseCompanyFeatures } from './company-features'
 
 export { LENS_OPTIONS, DEFAULT_LENS }

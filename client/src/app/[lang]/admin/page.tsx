@@ -2,10 +2,7 @@
 
 import React from 'react'
 import { Typography, Box, Paper, Button, Tabs, Tab } from '@mui/material'
-import {
-  BugReport as BugReportIcon,
-  People as PeopleIcon,
-} from '@mui/icons-material'
+import { BugReport as BugReportIcon, People as PeopleIcon } from '@mui/icons-material'
 import { useTranslations } from 'next-intl'
 import SessionDebugger from '@/components/debug/SessionDebugger'
 import UserManagement from '@/components/admin/UserManagement'
