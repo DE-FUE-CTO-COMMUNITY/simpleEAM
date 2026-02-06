@@ -428,12 +428,13 @@ Simple-EAM consists of multiple components delivered as Docker containers:
 **Acceptance criteria:**
 
 - Provide a lens selector with the following default lenses:
-   - Enterprise Architecture
-   - Business Architecture
-   - Process Architecture
-   - Solution Architecture
-   - Infrastructure Architecture
-- The selected lens is persisted per user and restored on next login.
+  - Enterprise Architecture
+  - Business Architecture
+  - Process Architecture
+  - Solution Architecture
+  - Infrastructure Architecture
+- The selected lens is persisted per user **and per company** and restored on next login.
+- If a user switches company, the lens selection updates to that company’s saved lens.
 - Switching lenses updates the UI without a full page reload.
 
 #### FR-LF-02: Lens-driven navigation
@@ -445,6 +446,7 @@ Simple-EAM consists of multiple components delivered as Docker containers:
 - Each navigation item can be linked to one or more lenses.
 - Only items linked to the active lens are visible in the menu.
 - A fallback lens (Enterprise Architecture) shows all default items.
+- Lens-to-menu mappings are configurable **per company**.
 
 #### FR-LF-03: Lens-specific import and export
 
@@ -455,6 +457,7 @@ Simple-EAM consists of multiple components delivered as Docker containers:
 - Import/export screens show only element types linked to the active lens.
 - Template availability and mapping options are filtered by lens.
 - Exports exclude element types not linked to the active lens.
+- Lens-based import/export configuration is managed **per company**.
 
 #### FR-LF-04: Lens-driven diagram editor configuration
 
@@ -465,6 +468,7 @@ Simple-EAM consists of multiple components delivered as Docker containers:
 - Diagram element type palettes are filtered by lens.
 - Automated diagram generation menu items (e.g., capability map generation) are filtered by lens.
 - Each diagram element type and generation action can be linked to one or more lenses.
+- Lens-to-diagram configuration is managed **per company**.
 
 #### FR-LF-05: Feature management in administration
 
@@ -474,12 +478,13 @@ Simple-EAM consists of multiple components delivered as Docker containers:
 
 - Features can be toggled on/off without redeploying the application.
 - Features may represent:
-   - Complete lenses
-   - Architecture element types
-   - Attributes of architecture elements
-   - Diagram editor menu items and generation actions
+  - Complete lenses
+  - Architecture element types
+  - Attributes of architecture elements
+  - Diagram editor menu items and generation actions
 - Disabled features are hidden or disabled across navigation, import/export, and the diagram editor.
 - Feature changes are audited with timestamp and user.
+- Feature toggles are stored and applied **per company**.
 
 #### FR-LF-06: Feature naming convention for data model
 
@@ -487,8 +492,8 @@ Simple-EAM consists of multiple components delivered as Docker containers:
 **Priority:** Medium  
 **Acceptance criteria:**
 
-- Feature-specific element types and attributes use the format: `<FEATURE_NAME>#<ItemName>`.
-- Example: `GEA#CapabilityMaturity` or `GEA#SolutionDomain`.
+- Feature-specific element types and attributes use the format: `<FEATURE_NAME>_<ItemName>`.
+- Example: `GEA_CapabilityMaturity` or `GEA_SolutionDomain`.
 - The prefix is enforced on creation and validated on import.
 
 ## 3. Non-functional requirements
