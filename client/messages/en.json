@@ -62,6 +62,16 @@
     "importExport": "Import/Export",
     "administration": "Administration"
   },
+  "lenses": {
+    "label": "Lens",
+    "enterpriseArchitecture": "Enterprise Architecture",
+    "businessArchitecture": "Business Architecture",
+    "processArchitecture": "Process Architecture",
+    "dataArchitecture": "Data Architecture",
+    "aiArchitecture": "AI Architecture",
+    "solutionArchitecture": "Solution Architecture",
+    "infrastructureArchitecture": "Infrastructure Architecture"
+  },
   "dashboard": {
     "title": "Dashboard",
     "subtitle": "Welcome to Simple-EAM",
@@ -1793,7 +1803,10 @@
     },
     "featureManagement": {
       "title": "Feature Management",
-      "description": "Manage feature flags and rollout settings."
+      "description": "Manage feature flags and rollout settings.",
+      "lensesTitle": "Lenses",
+      "lensesDescription": "Enable or disable lenses for the UI.",
+      "enterpriseLocked": "Enterprise Architecture is always enabled."
     },
     "userManagement": {
       "title": "User Management",

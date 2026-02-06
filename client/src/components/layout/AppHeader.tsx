@@ -11,9 +11,11 @@ import {
   Tooltip,
 } from '@mui/material'
 import { Menu as MenuIcon } from '@mui/icons-material'
+import { useTranslations } from 'next-intl'
 import UserProfileMenu from './UserProfileMenu'
 import ThemeToggleButton from '../ui/ThemeToggleButton'
 import { useCompanyContext } from '@/contexts/CompanyContext'
+import { useLensSelection } from '@/lib/lens-settings'
 
 interface AppHeaderProps {
   open: boolean
@@ -30,6 +32,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
   userName,
   handleDrawerToggle,
 }) => {
+  const tLenses = useTranslations('lenses')
   const theme = useTheme()
   const {
     companies,
@@ -39,6 +42,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
     companySelectionLockReason,
   } = useCompanyContext()
   const hasMultipleCompanies = (companies?.length ?? 0) > 1
+  const { selectedLens, setSelectedLens, enabledLenses } = useLensSelection()
 
   const renderCompanySelector = () => {
     if (!companies || companies.length === 0) {
@@ -116,6 +120,31 @@ const AppHeader: React.FC<AppHeaderProps> = ({
             <Typography variant="body1" noWrap component="div" sx={{ opacity: 0.9 }}>
               {companies?.[0]?.name || ''}
             </Typography>
+          )}
+          {enabledLenses.length > 1 && (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
+              <Typography variant="body2" noWrap sx={{ opacity: 0.9 }}>
+                {tLenses('label')}
+              </Typography>
+              <Select
+                size="small"
+                value={selectedLens}
+                onChange={e => setSelectedLens(e.target.value as typeof selectedLens)}
+                sx={{
+                  color: 'inherit',
+                  borderColor: 'rgba(255,255,255,0.7)',
+                  '& .MuiSelect-icon': { color: 'inherit' },
+                  minWidth: 180,
+                  bgcolor: 'rgba(255,255,255,0.08)',
+                }}
+              >
+                {enabledLenses.map(lens => (
+                  <MenuItem key={lens} value={lens}>
+                    {tLenses(lens)}
+                  </MenuItem>
+                ))}
+              </Select>
+            </Box>
           )}
         </Box>
         <ThemeToggleButton />

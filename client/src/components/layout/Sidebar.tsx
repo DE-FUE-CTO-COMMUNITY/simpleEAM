@@ -66,6 +66,7 @@ interface MenuItem {
   href?: string
   onClick?: () => void
   isDivider?: boolean
+  hidden?: boolean
 }
 
 interface SidebarProps {
@@ -77,6 +78,23 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ open, menuItems, handleDrawerToggle, isActive }) => {
   const theme = useTheme()
+
+  const normalizedItems = menuItems
+    .filter(item => !item.hidden)
+    .reduce<MenuItem[]>((acc, item) => {
+      if (item.isDivider) {
+        if (acc.length === 0) return acc
+        if (acc[acc.length - 1]?.isDivider) return acc
+        acc.push(item)
+        return acc
+      }
+      acc.push(item)
+      return acc
+    }, [])
+
+  if (normalizedItems.length > 0 && normalizedItems[normalizedItems.length - 1]?.isDivider) {
+    normalizedItems.pop()
+  }
 
   return (
     <StyledDrawer variant="permanent" open={open}>
@@ -95,7 +113,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, menuItems, handleDrawerToggle, 
       </Toolbar>
       <Divider />
       <List>
-        {menuItems.map((item, index) => {
+        {normalizedItems.map((item, index) => {
           // Render divider if isDivider is true
           if (item.isDivider) {
             return <Divider key={`divider-${index}`} sx={{ my: 1 }} />

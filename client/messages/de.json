@@ -64,6 +64,16 @@
     "diagrams": "Diagramme",
     "administration": "Administration"
   },
+  "lenses": {
+    "label": "Linse",
+    "enterpriseArchitecture": "Enterprise Architecture",
+    "businessArchitecture": "Business Architecture",
+    "processArchitecture": "Prozessarchitektur",
+    "dataArchitecture": "Datenarchitektur",
+    "aiArchitecture": "KI-Architektur",
+    "solutionArchitecture": "Lösungsarchitektur",
+    "infrastructureArchitecture": "Infrastrukturarchitektur"
+  },
   "dashboard": {
     "title": "Dashboard",
     "businessCapabilities": "Business Capabilities",
@@ -1790,7 +1800,10 @@
     },
     "featureManagement": {
       "title": "Feature-Management",
-      "description": "Verwalten Sie Feature-Flags und Rollout-Einstellungen."
+      "description": "Verwalten Sie Feature-Flags und Rollout-Einstellungen.",
+      "lensesTitle": "Linsen",
+      "lensesDescription": "Aktivieren oder deaktivieren Sie Linsen für die Oberfläche.",
+      "enterpriseLocked": "Enterprise Architecture ist immer aktiviert."
     },
     "userManagement": {
       "title": "Benutzerverwaltung",

@@ -22,6 +22,7 @@ import {
 import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { useAuth, isAdmin, isArchitect } from '@/lib/auth'
+import { useLensSelection, type LensKey } from '@/lib/lens-settings'
 
 import AppHeader from './AppHeader'
 import Sidebar, { drawerWidth } from './Sidebar'
@@ -49,6 +50,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
   const [open, setOpen] = useState(true)
   const [importExportDialogOpen, setImportExportDialogOpen] = useState(false)
   const t = useTranslations('navigation')
+  const { selectedLens } = useLensSelection()
 
   const handleDrawerToggle = () => {
     setOpen(!open)
@@ -70,6 +72,31 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
 
   const userName = (authenticated && keycloak?.tokenParsed?.preferred_username) || 'Benutzer'
 
+  const architectureElementItems = [
+    { key: 'businessCapabilities', text: t('businessCapabilities'), icon: <BusinessCapabilityIcon />, href: '/capabilities' },
+    { key: 'applications', text: t('applications'), icon: <ApplicationComponentIcon />, href: '/applications' },
+    { key: 'aiComponents', text: t('aiComponents'), icon: <AIComponentIcon />, href: '/aicomponents' },
+    { key: 'dataObjects', text: t('dataObjects'), icon: <BusinessObjectIcon />, href: '/dataobjects' },
+    { key: 'interfaces', text: t('interfaces'), icon: <ApplicationInterfaceIcon />, href: '/interfaces' },
+    { key: 'infrastructure', text: t('infrastructure'), icon: <InfrastructureIcon />, href: '/infrastructure' },
+  ]
+
+  const lensToElementKeys: Record<LensKey, Array<(typeof architectureElementItems)[number]['key']>> = {
+    enterpriseArchitecture: architectureElementItems.map(item => item.key),
+    businessArchitecture: ['businessCapabilities'],
+    processArchitecture: ['businessCapabilities'],
+    dataArchitecture: ['dataObjects'],
+    aiArchitecture: ['aiComponents'],
+    solutionArchitecture: ['applications', 'dataObjects', 'interfaces'],
+    infrastructureArchitecture: ['applications', 'infrastructure'],
+  }
+
+  const allowedElementKeys = new Set(lensToElementKeys[selectedLens] ?? lensToElementKeys.enterpriseArchitecture)
+
+  const visibleArchitectureItems = architectureElementItems.filter(item =>
+    allowedElementKeys.has(item.key)
+  )
+
   const menuItems = [
     { text: t('dashboard'), icon: <DashboardIcon />, href: '/' },
     { text: t('diagramEditor'), icon: <DiagramIcon />, href: '/diagrams' },
@@ -80,12 +107,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
       href: '/architecture-principles',
     },
     { isDivider: true, text: 'divider', icon: null },
-    { text: t('businessCapabilities'), icon: <BusinessCapabilityIcon />, href: '/capabilities' },
-    { text: t('applications'), icon: <ApplicationComponentIcon />, href: '/applications' },
-    { text: t('aiComponents'), icon: <AIComponentIcon />, href: '/aicomponents' },
-    { text: t('dataObjects'), icon: <BusinessObjectIcon />, href: '/dataobjects' },
-    { text: t('interfaces'), icon: <ApplicationInterfaceIcon />, href: '/interfaces' },
-    { text: t('infrastructure'), icon: <InfrastructureIcon />, href: '/infrastructure' },
+    ...visibleArchitectureItems,
     // Abschnitt: Organisation & Personen
     { isDivider: true, text: 'divider', icon: null },
     // Companies management only visible for admins

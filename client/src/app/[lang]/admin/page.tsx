@@ -11,6 +11,7 @@ import { useTranslations } from 'next-intl'
 import SessionDebugger from '@/components/debug/SessionDebugger'
 import UserManagement from '@/components/admin/UserManagement'
 import DebugSettingsPanel from '@/components/admin/DebugSettingsPanel'
+import FeatureManagement from '@/components/admin/FeatureManagement'
 import { isAdmin } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 
@@ -107,6 +108,7 @@ export default function AdminPage() {
           <Typography variant="body2" color="text.secondary">
             {t('featureManagement.description')}
           </Typography>
+          <FeatureManagement />
         </TabPanel>
 
         <TabPanel value={currentTab} index={2}>
