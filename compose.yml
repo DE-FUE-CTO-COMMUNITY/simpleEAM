@@ -137,7 +137,8 @@ services:
       context: .
       dockerfile: client/Dockerfile
     restart: unless-stopped
-
+    ports:
+      - "${CLIENT_EXTERNAL_PORT}:${CLIENT_PORT}"
     depends_on:
       - server
       - excalidraw-room
