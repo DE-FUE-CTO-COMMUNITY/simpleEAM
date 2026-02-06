@@ -1788,7 +1788,12 @@
     "title": "Administration",
     "tabs": {
       "userManagement": "User Management",
+      "featureManagement": "Feature Management",
       "debugTools": "Debug Tools"
+    },
+    "featureManagement": {
+      "title": "Feature Management",
+      "description": "Manage feature flags and rollout settings."
     },
     "userManagement": {
       "title": "User Management",

@@ -419,6 +419,78 @@ Simple-EAM consists of multiple components delivered as Docker containers:
 - SSO via SAML, OpenID Connect, or LDAP
 - Automatic role assignment based on AD groups
 
+### 2.10 Lenses and features
+
+#### FR-LF-01: Lens switching
+
+**Description:** The system must support switching between architecture lenses to reduce UI complexity and focus on relevant elements.  
+**Priority:** High  
+**Acceptance criteria:**
+
+- Provide a lens selector with the following default lenses:
+   - Enterprise Architecture
+   - Business Architecture
+   - Process Architecture
+   - Solution Architecture
+   - Infrastructure Architecture
+- The selected lens is persisted per user and restored on next login.
+- Switching lenses updates the UI without a full page reload.
+
+#### FR-LF-02: Lens-driven navigation
+
+**Description:** Menu items for architecture elements must be shown or hidden based on the selected lens.  
+**Priority:** High  
+**Acceptance criteria:**
+
+- Each navigation item can be linked to one or more lenses.
+- Only items linked to the active lens are visible in the menu.
+- A fallback lens (Enterprise Architecture) shows all default items.
+
+#### FR-LF-03: Lens-specific import and export
+
+**Description:** Import/export options must adapt to the selected lens.  
+**Priority:** High  
+**Acceptance criteria:**
+
+- Import/export screens show only element types linked to the active lens.
+- Template availability and mapping options are filtered by lens.
+- Exports exclude element types not linked to the active lens.
+
+#### FR-LF-04: Lens-driven diagram editor configuration
+
+**Description:** Diagram editor element types and automated diagram generation options must depend on the selected lens.  
+**Priority:** High  
+**Acceptance criteria:**
+
+- Diagram element type palettes are filtered by lens.
+- Automated diagram generation menu items (e.g., capability map generation) are filtered by lens.
+- Each diagram element type and generation action can be linked to one or more lenses.
+
+#### FR-LF-05: Feature management in administration
+
+**Description:** Administrators must be able to enable or disable features via the admin UI.  
+**Priority:** High  
+**Acceptance criteria:**
+
+- Features can be toggled on/off without redeploying the application.
+- Features may represent:
+   - Complete lenses
+   - Architecture element types
+   - Attributes of architecture elements
+   - Diagram editor menu items and generation actions
+- Disabled features are hidden or disabled across navigation, import/export, and the diagram editor.
+- Feature changes are audited with timestamp and user.
+
+#### FR-LF-06: Feature naming convention for data model
+
+**Description:** All feature-related element types and attributes must be prefixed for easy management in the data model.  
+**Priority:** Medium  
+**Acceptance criteria:**
+
+- Feature-specific element types and attributes use the format: `<FEATURE_NAME>#<ItemName>`.
+- Example: `GEA#CapabilityMaturity` or `GEA#SolutionDomain`.
+- The prefix is enforced on creation and validated on import.
+
 ## 3. Non-functional requirements
 
 ### 3.1 Performance and scalability
