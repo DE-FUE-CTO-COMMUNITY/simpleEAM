@@ -11,6 +11,14 @@ import { GET_PERSONS } from '@/graphql/person'
 import GenericForm, { FieldConfig, TabConfig } from '../common/GenericForm'
 import { GenericFormProps } from '../common/GenericFormProps'
 import { isArchitect } from '@/lib/auth'
+import FeatureManagement from '@/components/admin/FeatureManagement'
+import {
+  buildDefaultFeatureFlags,
+  buildDefaultLensFlags,
+  parseCompanyFeatures,
+  serializeCompanyFeatures,
+} from '@/lib/company-features'
+import type { FeatureFlags, LensFlags } from '@/lib/feature-definitions'
 
 const HEX_COLOR_REGEX = /^#(?:[0-9a-fA-F]{3}){1,2}$/
 const DEFAULT_DIAGRAM_FONT: ExcalidrawFont = 'Excalifont'
@@ -39,6 +47,7 @@ export const companySchema = z.object({
   font: z.string().max(200).optional().or(z.literal('')),
   diagramFont: z.enum(EXCALIDRAW_FONTS).optional(),
   logo: z.string().url().optional().or(z.literal('')),
+  features: z.string().optional().or(z.literal('')),
 })
 
 const CompaniesForm: React.FC<GenericFormProps<CompanyType, CompanyFormValues>> = ({
@@ -76,8 +85,14 @@ const CompaniesForm: React.FC<GenericFormProps<CompanyType, CompanyFormValues>> 
       font: '',
       diagramFont: DEFAULT_DIAGRAM_FONT,
       logo: '',
+      features: serializeCompanyFeatures(buildDefaultLensFlags(), buildDefaultFeatureFlags()),
     }),
     []
+  )
+
+  const [lensFlags, setLensFlags] = React.useState<LensFlags>(() => buildDefaultLensFlags())
+  const [featureFlags, setFeatureFlags] = React.useState<FeatureFlags>(() =>
+    buildDefaultFeatureFlags()
   )
 
   const diagramFontOptions = React.useMemo(
@@ -106,9 +121,21 @@ const CompaniesForm: React.FC<GenericFormProps<CompanyType, CompanyFormValues>> 
     },
   })
 
+  const updateFeaturesValue = React.useCallback(
+    (nextLensFlags: LensFlags, nextFeatureFlags: FeatureFlags) => {
+      const json = serializeCompanyFeatures(nextLensFlags, nextFeatureFlags)
+      form.setFieldValue('features', json)
+    },
+    [form]
+  )
+
   // Update form data when entity changes
   useEffect(() => {
     if (company) {
+      const parsedFeatures = parseCompanyFeatures(company.features)
+      setLensFlags(parsedFeatures.lensFlags)
+      setFeatureFlags(parsedFeatures.featureFlags)
+      updateFeaturesValue(parsedFeatures.lensFlags, parsedFeatures.featureFlags)
       form.setFieldValue('name', company.name || '')
       form.setFieldValue('description', company.description || '')
       form.setFieldValue('address', company.address || '')
@@ -124,8 +151,13 @@ const CompaniesForm: React.FC<GenericFormProps<CompanyType, CompanyFormValues>> 
         'employees',
         (company as any).employees?.map((emp: Person) => emp.id) || []
       )
+    } else {
+      const parsedFeatures = parseCompanyFeatures('')
+      setLensFlags(parsedFeatures.lensFlags)
+      setFeatureFlags(parsedFeatures.featureFlags)
+      updateFeaturesValue(parsedFeatures.lensFlags, parsedFeatures.featureFlags)
     }
-  }, [company, form])
+  }, [company, form, updateFeaturesValue])
 
   // Feldkonfigurationen definieren
   const fields: FieldConfig[] = [
@@ -337,6 +369,27 @@ const CompaniesForm: React.FC<GenericFormProps<CompanyType, CompanyFormValues>> 
       },
       helperText: t('form.employeesHelperText'),
     },
+    {
+      name: 'features',
+      label: t('tabs.features'),
+      type: 'custom',
+      tabId: 'features',
+      customRender: (_field, disabled) => (
+        <FeatureManagement
+          lensFlags={lensFlags}
+          featureFlags={featureFlags}
+          onLensFlagsChange={next => {
+            setLensFlags(next)
+            updateFeaturesValue(next, featureFlags)
+          }}
+          onFeatureFlagsChange={next => {
+            setFeatureFlags(next)
+            updateFeaturesValue(lensFlags, next)
+          }}
+          disabled={disabled}
+        />
+      ),
+    },
   ]
 
   // Tab-Konfigurationen definieren
@@ -344,6 +397,7 @@ const CompaniesForm: React.FC<GenericFormProps<CompanyType, CompanyFormValues>> 
     { id: 'general', label: t('tabs.general') },
     { id: 'branding', label: t('tabs.branding') },
     { id: 'employees', label: t('tabs.employees') },
+    { id: 'features', label: t('tabs.features') },
   ]
 
   return (

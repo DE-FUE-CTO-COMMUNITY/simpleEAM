@@ -17,6 +17,7 @@ export const GET_COMPANIES = gql`
       font
       diagramFont
       logo
+      features
       size
       createdAt
       updatedAt
@@ -44,6 +45,7 @@ export const GET_COMPANY = gql`
       font
       diagramFont
       logo
+      features
       size
       createdAt
       updatedAt
@@ -72,6 +74,7 @@ export const CREATE_COMPANY = gql`
         font
         diagramFont
         logo
+        features
         size
         createdAt
         updatedAt
@@ -101,6 +104,7 @@ export const UPDATE_COMPANY = gql`
         font
         diagramFont
         logo
+        features
         size
         createdAt
         updatedAt

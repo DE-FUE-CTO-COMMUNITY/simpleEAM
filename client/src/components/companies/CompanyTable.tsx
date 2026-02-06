@@ -171,6 +171,7 @@ const CompanyTableWithGenericTable: React.FC<CompanyTableProps> = ({
         (company.diagramFont as CompanyFormValues['diagramFont']) ??
         ('Excalifont' as CompanyFormValues['diagramFont']),
       logo: company.logo ?? '',
+      features: company.features ?? '',
     }
   }
 

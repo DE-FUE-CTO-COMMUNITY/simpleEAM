@@ -1,146 +1,85 @@
 'use client'
 
 import React from 'react'
+import { useCompanyContext } from '@/contexts/CompanyContext'
+import {
+  DEFAULT_LENS,
+  LENS_OPTIONS,
+  type LensFlags,
+  type LensKey,
+} from './feature-definitions'
+import { parseCompanyFeatures } from './company-features'
+
+export { LENS_OPTIONS, DEFAULT_LENS }
+export type { LensKey, LensFlags }
 
 export const LENS_STORAGE_KEY = 'selectedLens:v1'
-export const LENS_FLAGS_STORAGE_KEY = 'lensFlags:v1'
-const LENS_FLAGS_EVENT = 'lensFlagsChanged'
 const SELECTED_LENS_EVENT = 'selectedLensChanged'
-export const DEFAULT_LENS = 'enterpriseArchitecture'
-
-export const LENS_OPTIONS = [
-  'enterpriseArchitecture',
-  'businessArchitecture',
-  'processArchitecture',
-  'dataArchitecture',
-  'aiArchitecture',
-  'solutionArchitecture',
-  'infrastructureArchitecture',
-] as const
-
-export type LensKey = (typeof LENS_OPTIONS)[number]
-export type LensFlags = Record<LensKey, boolean>
-
-const defaultLensFlags: LensFlags = {
-  enterpriseArchitecture: true,
-  businessArchitecture: true,
-  processArchitecture: true,
-  dataArchitecture: true,
-  aiArchitecture: true,
-  solutionArchitecture: true,
-  infrastructureArchitecture: true,
-}
-
-const normalizeLensFlags = (flags: Partial<LensFlags> | null | undefined): LensFlags => {
-  const normalized: LensFlags = { ...defaultLensFlags, ...(flags || {}) }
-  normalized.enterpriseArchitecture = true
-  return normalized
-}
-
-export const loadLensFlags = (): LensFlags => {
-  if (typeof window === 'undefined') return { ...defaultLensFlags }
-  const raw = localStorage.getItem(LENS_FLAGS_STORAGE_KEY)
-  if (!raw) return { ...defaultLensFlags }
-  try {
-    const parsed = JSON.parse(raw) as Partial<LensFlags>
-    return normalizeLensFlags(parsed)
-  } catch {
-    return { ...defaultLensFlags }
-  }
-}
-
-export const saveLensFlags = (flags: LensFlags) => {
-  if (typeof window === 'undefined') return
-  localStorage.setItem(LENS_FLAGS_STORAGE_KEY, JSON.stringify(normalizeLensFlags(flags)))
-}
 
 export const getEnabledLenses = (flags: LensFlags): LensKey[] =>
   LENS_OPTIONS.filter(lens => flags[lens])
 
-export const loadSelectedLens = (): LensKey => {
+const getStorageKey = (companyId: string | null) =>
+  companyId ? `${LENS_STORAGE_KEY}:${companyId}` : LENS_STORAGE_KEY
+
+export const loadSelectedLens = (companyId: string | null): LensKey => {
   if (typeof window === 'undefined') return DEFAULT_LENS
-  const raw = localStorage.getItem(LENS_STORAGE_KEY)
+  const raw = localStorage.getItem(getStorageKey(companyId))
   if (!raw) return DEFAULT_LENS
   return LENS_OPTIONS.includes(raw as LensKey) ? (raw as LensKey) : DEFAULT_LENS
 }
 
-export const saveSelectedLens = (lens: LensKey) => {
+export const saveSelectedLens = (companyId: string | null, lens: LensKey) => {
   if (typeof window === 'undefined') return
-  localStorage.setItem(LENS_STORAGE_KEY, lens)
+  localStorage.setItem(getStorageKey(companyId), lens)
 }
 
 export const useLensSettings = () => {
-  const [lensFlags, setLensFlagsState] = React.useState<LensFlags>(() => ({
-    ...defaultLensFlags,
-  }))
+  const { selectedCompany } = useCompanyContext()
+  const { lensFlags } = React.useMemo(
+    () => parseCompanyFeatures(selectedCompany?.features),
+    [selectedCompany?.features]
+  )
 
-  React.useEffect(() => {
-    setLensFlagsState(loadLensFlags())
-  }, [])
-
-  React.useEffect(() => {
-    if (typeof window === 'undefined') return
-    const handler = (event: StorageEvent) => {
-      if (event.key === LENS_FLAGS_STORAGE_KEY) {
-        setLensFlagsState(loadLensFlags())
-      }
-    }
-    window.addEventListener('storage', handler)
-    const onLensFlagsChanged = () => setLensFlagsState(loadLensFlags())
-    window.addEventListener(LENS_FLAGS_EVENT, onLensFlagsChanged)
-    return () => {
-      window.removeEventListener('storage', handler)
-      window.removeEventListener(LENS_FLAGS_EVENT, onLensFlagsChanged)
-    }
-  }, [])
-
-  const setLensFlags = (next: LensFlags) => {
-    const normalized = normalizeLensFlags(next)
-    setLensFlagsState(normalized)
-    saveLensFlags(normalized)
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new Event(LENS_FLAGS_EVENT))
-    }
-  }
-
-  return { lensFlags, setLensFlags, enabledLenses: getEnabledLenses(lensFlags) }
+  return { lensFlags, enabledLenses: getEnabledLenses(lensFlags) }
 }
 
 export const useLensSelection = () => {
   const { lensFlags, enabledLenses } = useLensSettings()
+  const { selectedCompanyId } = useCompanyContext()
   const [selectedLens, setSelectedLensState] = React.useState<LensKey>(DEFAULT_LENS)
 
   React.useEffect(() => {
-    setSelectedLensState(loadSelectedLens())
-  }, [])
+    setSelectedLensState(loadSelectedLens(selectedCompanyId))
+  }, [selectedCompanyId])
 
   React.useEffect(() => {
     if (typeof window === 'undefined') return
     const onStorage = (event: StorageEvent) => {
-      if (event.key === LENS_STORAGE_KEY) {
-        setSelectedLensState(loadSelectedLens())
+      if (event.key === getStorageKey(selectedCompanyId)) {
+        setSelectedLensState(loadSelectedLens(selectedCompanyId))
       }
     }
-    const onSelectedLensChanged = () => setSelectedLensState(loadSelectedLens())
+    const onSelectedLensChanged = () => setSelectedLensState(loadSelectedLens(selectedCompanyId))
     window.addEventListener('storage', onStorage)
     window.addEventListener(SELECTED_LENS_EVENT, onSelectedLensChanged)
     return () => {
       window.removeEventListener('storage', onStorage)
       window.removeEventListener(SELECTED_LENS_EVENT, onSelectedLensChanged)
     }
-  }, [])
+  }, [selectedCompanyId])
 
   React.useEffect(() => {
     if (!enabledLenses.includes(selectedLens)) {
       setSelectedLensState(DEFAULT_LENS)
-      saveSelectedLens(DEFAULT_LENS)
+      saveSelectedLens(selectedCompanyId, DEFAULT_LENS)
     }
-  }, [enabledLenses, selectedLens])
+  }, [enabledLenses, selectedLens, selectedCompanyId])
 
   const setSelectedLens = (lens: LensKey) => {
     const next = enabledLenses.includes(lens) ? lens : DEFAULT_LENS
     setSelectedLensState(next)
-    saveSelectedLens(next)
+    saveSelectedLens(selectedCompanyId, next)
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new Event(SELECTED_LENS_EVENT))
     }

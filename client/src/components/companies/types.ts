@@ -34,7 +34,9 @@ export type CompanyType = Pick<
   | 'createdAt'
   | 'updatedAt'
   | 'employees'
->
+> & {
+  features?: string | null
+}
 
 export interface FilterState {
   // Grundlegende Text-Filter
@@ -75,4 +77,5 @@ export interface CompanyFormValues {
   font?: string
   diagramFont?: ExcalidrawFont
   logo?: string
+  features?: string
 }

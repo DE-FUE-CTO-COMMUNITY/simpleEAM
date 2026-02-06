@@ -13,6 +13,7 @@ type Company = {
   secondaryColor?: string | null
   font?: string | null
   diagramFont?: string | null
+  features?: string | null
 }
 
 type CompanyContextValue = {

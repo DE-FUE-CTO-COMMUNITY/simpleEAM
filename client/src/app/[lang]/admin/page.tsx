@@ -5,13 +5,11 @@ import { Typography, Box, Paper, Button, Tabs, Tab } from '@mui/material'
 import {
   BugReport as BugReportIcon,
   People as PeopleIcon,
-  Settings as SettingsIcon,
 } from '@mui/icons-material'
 import { useTranslations } from 'next-intl'
 import SessionDebugger from '@/components/debug/SessionDebugger'
 import UserManagement from '@/components/admin/UserManagement'
 import DebugSettingsPanel from '@/components/admin/DebugSettingsPanel'
-import FeatureManagement from '@/components/admin/FeatureManagement'
 import { isAdmin } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 
@@ -82,18 +80,11 @@ export default function AdminPage() {
             aria-controls="admin-tabpanel-0"
           />
           <Tab
-            label={t('tabs.featureManagement')}
-            icon={<SettingsIcon />}
-            iconPosition="start"
-            id="admin-tab-1"
-            aria-controls="admin-tabpanel-1"
-          />
-          <Tab
             label={t('tabs.debugTools')}
             icon={<BugReportIcon />}
             iconPosition="start"
-            id="admin-tab-2"
-            aria-controls="admin-tabpanel-2"
+            id="admin-tab-1"
+            aria-controls="admin-tabpanel-1"
           />
         </Tabs>
 
@@ -102,16 +93,6 @@ export default function AdminPage() {
         </TabPanel>
 
         <TabPanel value={currentTab} index={1}>
-          <Typography variant="h5" component="h2" gutterBottom>
-            {t('featureManagement.title')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {t('featureManagement.description')}
-          </Typography>
-          <FeatureManagement />
-        </TabPanel>
-
-        <TabPanel value={currentTab} index={2}>
           <Typography variant="h5" component="h2" gutterBottom>
             {t('debugTools.title')}
           </Typography>

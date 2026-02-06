@@ -29,6 +29,7 @@ export const GET_PERSONS = gql`
         secondaryColor
         font
         diagramFont
+        features
       }
       createdAt
       updatedAt
@@ -81,6 +82,7 @@ export const GET_PERSON = gql`
         secondaryColor
         font
         diagramFont
+        features
       }
       createdAt
       updatedAt
@@ -134,6 +136,7 @@ export const GET_PERSON_BY_EMAIL = gql`
         secondaryColor
         font
         diagramFont
+        features
       }
       createdAt
       updatedAt
@@ -158,6 +161,7 @@ export const CREATE_PERSON = gql`
           secondaryColor
           font
           diagramFont
+          features
         }
         phone
         createdAt
@@ -183,6 +187,7 @@ export const UPDATE_PERSON = gql`
           secondaryColor
           font
           diagramFont
+          features
         }
         phone
         avatarUrl

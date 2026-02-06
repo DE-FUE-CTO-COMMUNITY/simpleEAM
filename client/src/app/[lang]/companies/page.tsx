@@ -122,6 +122,7 @@ const CompaniesPage = () => {
             font: { set: sanitizeUpdateString(values.font) },
             diagramFont: { set: sanitizeUpdateString(values.diagramFont) },
             logo: { set: sanitizeUpdateString(values.logo) },
+            features: { set: values.features ?? '' },
             size: { set: values.size },
             employees: employeesUpdate,
           },
@@ -245,6 +246,7 @@ const CompaniesPage = () => {
                 font: sanitizeCreateString(values.font),
                 diagramFont: sanitizeCreateString(values.diagramFont),
                 logo: sanitizeCreateString(values.logo),
+                features: values.features ?? '',
                 size: values.size,
                 employees: values.employees?.length
                   ? {

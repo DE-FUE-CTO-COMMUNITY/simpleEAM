@@ -3,17 +3,31 @@
 import React from 'react'
 import { Box, FormControlLabel, FormGroup, Switch, Typography, Divider } from '@mui/material'
 import { useTranslations } from 'next-intl'
-import { useLensSettings, LENS_OPTIONS, LensKey } from '@/lib/lens-settings'
-import { FEATURE_FLAGS, type FeatureFlagKey, useFeatureFlags } from '@/lib/feature-flags'
+import { LENS_OPTIONS, type LensFlags, type LensKey } from '@/lib/feature-definitions'
+import { FEATURE_FLAGS, type FeatureFlagKey, type FeatureFlags } from '@/lib/feature-definitions'
 
-export default function FeatureManagement() {
+interface FeatureManagementProps {
+  lensFlags: LensFlags
+  featureFlags: FeatureFlags
+  onLensFlagsChange: (next: LensFlags) => void
+  onFeatureFlagsChange: (next: FeatureFlags) => void
+  disableEnterpriseLens?: boolean
+  disabled?: boolean
+}
+
+export default function FeatureManagement({
+  lensFlags,
+  featureFlags,
+  onLensFlagsChange,
+  onFeatureFlagsChange,
+  disableEnterpriseLens = true,
+  disabled = false,
+}: FeatureManagementProps) {
   const t = useTranslations('admin.featureManagement')
   const tLenses = useTranslations('lenses')
-  const { lensFlags, setLensFlags } = useLensSettings()
-  const { featureFlags, setFeatureFlags } = useFeatureFlags()
 
   const handleToggle = (lens: LensKey) => (event: React.ChangeEvent<HTMLInputElement>) => {
-    setLensFlags({
+    onLensFlagsChange({
       ...lensFlags,
       [lens]: event.target.checked,
     })
@@ -21,7 +35,7 @@ export default function FeatureManagement() {
 
   const handleFeatureToggle =
     (feature: FeatureFlagKey) => (event: React.ChangeEvent<HTMLInputElement>) => {
-      setFeatureFlags({
+      onFeatureFlagsChange({
         ...featureFlags,
         [feature]: event.target.checked,
       })
@@ -52,17 +66,24 @@ export default function FeatureManagement() {
                   <Switch
                     checked={lensFlags[lens]}
                     onChange={handleToggle(lens)}
-                    disabled={lens === 'enterpriseArchitecture'}
+                    disabled={
+                      disabled ||
+                      (disableEnterpriseLens && lens === 'enterpriseArchitecture')
+                    }
                   />
                 }
                 label={tLenses(lens)}
               />
             ))}
           </FormGroup>
-          <Divider sx={{ my: 2 }} />
-          <Typography variant="caption" color="text.secondary">
-            {t('enterpriseLocked')}
-          </Typography>
+          {disableEnterpriseLens && (
+            <>
+              <Divider sx={{ my: 2 }} />
+              <Typography variant="caption" color="text.secondary">
+                {t('enterpriseLocked')}
+              </Typography>
+            </>
+          )}
         </Box>
 
         <Box>
@@ -77,9 +98,13 @@ export default function FeatureManagement() {
               <FormControlLabel
                 key={feature}
                 control={
-                  <Switch checked={featureFlags[feature]} onChange={handleFeatureToggle(feature)} />
+                  <Switch
+                    checked={featureFlags[feature]}
+                    onChange={handleFeatureToggle(feature)}
+                    disabled={disabled}
+                  />
                 }
-                label={t(`features.${feature}`, { prefix: `${feature}#` })}
+                label={t(`features.${feature}`, { prefix: `${feature}_` })}
               />
             ))}
           </FormGroup>

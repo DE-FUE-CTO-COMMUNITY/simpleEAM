@@ -2063,7 +2063,8 @@
     "tabs": {
       "general": "General",
       "branding": "Branding",
-      "employees": "Employees"
+      "employees": "Employees",
+      "features": "Features"
     },
     "headers": {
       "id": "ID",
