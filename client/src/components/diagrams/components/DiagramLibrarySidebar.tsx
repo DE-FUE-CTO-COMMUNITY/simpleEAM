@@ -44,6 +44,7 @@ import {
   type LibraryElementsResponse,
 } from '@/graphql/library'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
+import { useLensSelection, type LensKey } from '@/lib/lens-settings'
 import {
   type ArchiMateLibrary,
   type ExcalidrawLibraryItem,
@@ -110,6 +111,7 @@ const DiagramLibrarySidebar = forwardRef<DiagramLibrarySidebarHandle, DiagramLib
     const tSidebar = useTranslations('diagramEditor.librarySidebar')
     const tTypes = useTranslations('diagramEditor.elementTypes')
     const tToggle = useTranslations('diagramEditor.librarySidebar.toggle')
+    const { selectedLens } = useLensSelection()
     const variables = useMemo(
       () => ({
         capWhere: companyWhere,
@@ -620,13 +622,27 @@ const DiagramLibrarySidebar = forwardRef<DiagramLibrarySidebarHandle, DiagramLib
       }
     }, [activeTab, originalColors, excalidrawAPI])
 
+    const visibleSectionOrder = useMemo(() => {
+      const lensToElementTypes: Record<LensKey, ElementType[]> = {
+        enterpriseArchitecture: SECTION_ORDER,
+        businessArchitecture: ['businessCapability'],
+        processArchitecture: ['businessCapability'],
+        dataArchitecture: ['dataObject'],
+        aiArchitecture: ['aiComponent'],
+        solutionArchitecture: ['application', 'dataObject', 'applicationInterface'],
+        infrastructureArchitecture: ['application', 'infrastructure'],
+      }
+
+      return lensToElementTypes[selectedLens] ?? SECTION_ORDER
+    }, [selectedLens])
+
     const templateLookup = useMemo(() => {
       if (!templateLibrary) {
         return {} as Partial<Record<ElementType, ExcalidrawLibraryItem>>
       }
 
       const lookup: Partial<Record<ElementType, ExcalidrawLibraryItem>> = {}
-      SECTION_ORDER.forEach(type => {
+      visibleSectionOrder.forEach(type => {
         const templateName = TEMPLATE_NAME_BY_TYPE[type]
         if (!templateName) return
         const template = findArchimateTemplate(templateLibrary, templateName)
@@ -635,11 +651,11 @@ const DiagramLibrarySidebar = forwardRef<DiagramLibrarySidebarHandle, DiagramLib
         }
       })
       return lookup
-    }, [templateLibrary])
+    }, [templateLibrary, visibleSectionOrder])
 
     const typeColors = useMemo(() => {
       const colors: Partial<Record<ElementType, string>> = {}
-      SECTION_ORDER.forEach(type => {
+      visibleSectionOrder.forEach(type => {
         const template = templateLookup[type]
         if (!template?.elements?.length) return
         const rectangle = template.elements.find(
@@ -650,7 +666,7 @@ const DiagramLibrarySidebar = forwardRef<DiagramLibrarySidebarHandle, DiagramLib
         }
       })
       return colors
-    }, [templateLookup])
+    }, [templateLookup, visibleSectionOrder])
 
     const getTypeLabel = useCallback(
       (type: ElementType, variant: 'singular' | 'plural') => {
@@ -665,7 +681,7 @@ const DiagramLibrarySidebar = forwardRef<DiagramLibrarySidebarHandle, DiagramLib
 
     const templateItems = useMemo(() => {
       const items: SidebarItem[] = []
-      SECTION_ORDER.forEach(type => {
+      visibleSectionOrder.forEach(type => {
         const template = templateLookup[type]
         if (!template) return
         items.push({
@@ -676,12 +692,12 @@ const DiagramLibrarySidebar = forwardRef<DiagramLibrarySidebarHandle, DiagramLib
         })
       })
       return items
-    }, [getTypeLabel, templateLookup])
+    }, [getTypeLabel, templateLookup, visibleSectionOrder])
 
     const existingSections: SidebarSection[] = useMemo(() => {
       const filterLower = libraryFilter.toLowerCase()
 
-      return SECTION_ORDER.map(type => {
+      return visibleSectionOrder.map(type => {
         const accessor = DATA_ACCESSORS[type]
         const template = templateLookup[type] ?? null
         const list = accessor && data ? accessor(data) : []

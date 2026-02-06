@@ -73,15 +73,48 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
   const userName = (authenticated && keycloak?.tokenParsed?.preferred_username) || 'Benutzer'
 
   const architectureElementItems = [
-    { key: 'businessCapabilities', text: t('businessCapabilities'), icon: <BusinessCapabilityIcon />, href: '/capabilities' },
-    { key: 'applications', text: t('applications'), icon: <ApplicationComponentIcon />, href: '/applications' },
-    { key: 'aiComponents', text: t('aiComponents'), icon: <AIComponentIcon />, href: '/aicomponents' },
-    { key: 'dataObjects', text: t('dataObjects'), icon: <BusinessObjectIcon />, href: '/dataobjects' },
-    { key: 'interfaces', text: t('interfaces'), icon: <ApplicationInterfaceIcon />, href: '/interfaces' },
-    { key: 'infrastructure', text: t('infrastructure'), icon: <InfrastructureIcon />, href: '/infrastructure' },
+    {
+      key: 'businessCapabilities',
+      text: t('businessCapabilities'),
+      icon: <BusinessCapabilityIcon />,
+      href: '/capabilities',
+    },
+    {
+      key: 'applications',
+      text: t('applications'),
+      icon: <ApplicationComponentIcon />,
+      href: '/applications',
+    },
+    {
+      key: 'aiComponents',
+      text: t('aiComponents'),
+      icon: <AIComponentIcon />,
+      href: '/aicomponents',
+    },
+    {
+      key: 'dataObjects',
+      text: t('dataObjects'),
+      icon: <BusinessObjectIcon />,
+      href: '/dataobjects',
+    },
+    {
+      key: 'interfaces',
+      text: t('interfaces'),
+      icon: <ApplicationInterfaceIcon />,
+      href: '/interfaces',
+    },
+    {
+      key: 'infrastructure',
+      text: t('infrastructure'),
+      icon: <InfrastructureIcon />,
+      href: '/infrastructure',
+    },
   ]
 
-  const lensToElementKeys: Record<LensKey, Array<(typeof architectureElementItems)[number]['key']>> = {
+  const lensToElementKeys: Record<
+    LensKey,
+    Array<(typeof architectureElementItems)[number]['key']>
+  > = {
     enterpriseArchitecture: architectureElementItems.map(item => item.key),
     businessArchitecture: ['businessCapabilities'],
     processArchitecture: ['businessCapabilities'],
@@ -91,7 +124,9 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
     infrastructureArchitecture: ['applications', 'infrastructure'],
   }
 
-  const allowedElementKeys = new Set(lensToElementKeys[selectedLens] ?? lensToElementKeys.enterpriseArchitecture)
+  const allowedElementKeys = new Set(
+    lensToElementKeys[selectedLens] ?? lensToElementKeys.enterpriseArchitecture
+  )
 
   const visibleArchitectureItems = architectureElementItems.filter(item =>
     allowedElementKeys.has(item.key)
