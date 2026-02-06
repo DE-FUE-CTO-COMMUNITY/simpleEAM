@@ -20,7 +20,8 @@ COPY server/ ./
 RUN yarn install
 
 # Build-Umgebung
-ENV NODE_ENV=production
+ARG NODE_ENV=production
+ENV NODE_ENV=${NODE_ENV}
 ENV TS_NODE_TRANSPILE_ONLY=1
 ENV NODE_OPTIONS="--max_old_space_size=4096"
 
