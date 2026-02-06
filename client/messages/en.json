@@ -1806,7 +1806,14 @@
       "description": "Manage feature flags and rollout settings.",
       "lensesTitle": "Lenses",
       "lensesDescription": "Enable or disable lenses for the UI.",
-      "enterpriseLocked": "Enterprise Architecture is always enabled."
+      "enterpriseLocked": "Enterprise Architecture is always enabled.",
+      "featuresTitle": "Features",
+      "featuresDescription": "Enable or disable feature sets.",
+      "features": {
+        "GEA": "General Enterprise Architecture ({prefix})",
+        "BMC": "Business Models ({prefix})",
+        "BCA": "Business Cases ({prefix})"
+      }
     },
     "userManagement": {
       "title": "User Management",

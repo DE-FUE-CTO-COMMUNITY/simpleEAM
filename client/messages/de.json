@@ -1803,7 +1803,14 @@
       "description": "Verwalten Sie Feature-Flags und Rollout-Einstellungen.",
       "lensesTitle": "Linsen",
       "lensesDescription": "Aktivieren oder deaktivieren Sie Linsen für die Oberfläche.",
-      "enterpriseLocked": "Enterprise Architecture ist immer aktiviert."
+      "enterpriseLocked": "Enterprise Architecture ist immer aktiviert.",
+      "featuresTitle": "Features",
+      "featuresDescription": "Aktivieren oder deaktivieren Sie Feature-Sets.",
+      "features": {
+        "GEA": "General Enterprise Architecture ({prefix})",
+        "BMC": "Business Models ({prefix})",
+        "BCA": "Business Cases ({prefix})"
+      }
     },
     "userManagement": {
       "title": "Benutzerverwaltung",
