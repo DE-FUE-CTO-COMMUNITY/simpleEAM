@@ -60,7 +60,20 @@
     "infrastructure": "Infrastructure",
     "persons": "Persons",
     "importExport": "Import/Export",
-    "administration": "Administration"
+    "administration": "Administration",
+    "visions": "Visions",
+    "missions": "Missions",
+    "values": "Values",
+    "goals": "Goals",
+    "strategies": "Strategies",
+    "valuePropositions": "Value Propositions",
+    "businessModels": "Business Models",
+    "applicationCollaboration": "App Collaboration",
+    "applicationFunction": "Application Function",
+    "applicationProcess": "Application Process",
+    "applicationInteraction": "Application Interaction",
+    "applicationEvent": "Application Event",
+    "applicationService": "Application Service"
   },
   "lenses": {
     "label": "Lens",
@@ -1812,7 +1825,11 @@
       "features": {
         "GEA": "General Enterprise Architecture ({prefix})",
         "BMC": "Business Models ({prefix})",
-        "BCA": "Business Cases ({prefix})"
+        "BCA": "Business Cases ({prefix})",
+        "ABH": "Archimate Behavior ({prefix})",
+        "APS": "Archimate Passive Structure ({prefix})",
+        "AAS": "Archimate Active Structure ({prefix})",
+        "AMO": "Archimate Motivation ({prefix})"
       }
     },
     "userManagement": {

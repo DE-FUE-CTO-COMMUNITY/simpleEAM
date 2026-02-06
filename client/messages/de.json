@@ -62,7 +62,20 @@
     "importExport": "Import/Export",
     "organizations": "Organisationen",
     "diagrams": "Diagramme",
-    "administration": "Administration"
+    "administration": "Administration",
+    "visions": "Visionen",
+    "missions": "Missionen",
+    "values": "Werte",
+    "goals": "Ziele",
+    "strategies": "Strategien",
+    "valuePropositions": "Wertangebote",
+    "businessModels": "Geschäftsmodelle",
+    "applicationCollaboration": "App-Kollaboration",
+    "applicationFunction": "Applikationsfunktion",
+    "applicationProcess": "Applikationsprozess",
+    "applicationInteraction": "Applikationsinteraktion",
+    "applicationEvent": "Applikationsereignis",
+    "applicationService": "Applikationsservice"
   },
   "lenses": {
     "label": "Linse",
@@ -1809,7 +1822,11 @@
       "features": {
         "GEA": "General Enterprise Architecture ({prefix})",
         "BMC": "Business Models ({prefix})",
-        "BCA": "Business Cases ({prefix})"
+        "BCA": "Business Cases ({prefix})",
+        "ABH": "Archimate Behavior ({prefix})",
+        "APS": "Archimate Passive Structure ({prefix})",
+        "AAS": "Archimate Active Structure ({prefix})",
+        "AMO": "Archimate Motivation ({prefix})"
       }
     },
     "userManagement": {
@@ -2153,7 +2170,20 @@
       },
       "interface": {
         "singular": "Schnittstelle",
-        "plural": "Schnittstellen"
+        "administration": "Administration",
+        "visions": "Visionen",
+        "missions": "Missionen",
+        "values": "Werte",
+        "goals": "Ziele",
+        "strategies": "Strategien",
+        "valuePropositions": "Wertangebote",
+        "businessModels": "Geschäftsmodelle",
+        "applicationCollaboration": "Applikationskollaboration",
+        "applicationFunction": "Applikationsfunktion",
+        "applicationProcess": "Applikationsprozess",
+        "applicationInteraction": "Applikationsinteraktion",
+        "applicationEvent": "Applikationsereignis",
+        "applicationService": "Applikationsservice"
       },
       "infrastructure": {
         "singular": "Infrastruktur",

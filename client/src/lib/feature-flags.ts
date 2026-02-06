@@ -5,7 +5,7 @@ import React from 'react'
 export const FEATURE_FLAGS_STORAGE_KEY = 'featureFlags:v1'
 const FEATURE_FLAGS_EVENT = 'featureFlagsChanged'
 
-export const FEATURE_FLAGS = ['GEA', 'BMC', 'BCA'] as const
+export const FEATURE_FLAGS = ['GEA', 'BMC', 'BCA', 'AAS', 'ABH', 'APS', 'AMO'] as const
 export type FeatureFlagKey = (typeof FEATURE_FLAGS)[number]
 export type FeatureFlags = Record<FeatureFlagKey, boolean>
 
@@ -13,6 +13,10 @@ const defaultFeatureFlags: FeatureFlags = {
   GEA: true,
   BMC: true,
   BCA: true,
+  AAS: true,
+  ABH: true,
+  APS: true,
+  AMO: true,
 }
 
 const normalizeFeatureFlags = (flags: Partial<FeatureFlags> | null | undefined): FeatureFlags => ({

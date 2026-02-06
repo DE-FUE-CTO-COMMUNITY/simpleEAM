@@ -10,6 +10,19 @@ import {
   Rule as RuleIcon,
   Settings as SettingsIcon,
   Business as CompanyIcon,
+  Visibility as VisionIcon,
+  Flag as MissionIcon,
+  Favorite as ValuesIcon,
+  TrackChanges as GoalsIcon,
+  Insights as StrategiesIcon,
+  Lightbulb as LightbulbIcon,
+  ModelTraining as ModelTrainingIcon,
+  Hub as CollaborationIcon,
+  Functions as FunctionIcon,
+  AccountTree as ProcessIcon,
+  ConnectWithoutContact as InteractionIcon,
+  Event as EventIcon,
+  MiscellaneousServices as ServiceIcon,
 } from '@mui/icons-material'
 import {
   BusinessCapabilityIcon,
@@ -23,6 +36,7 @@ import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { useAuth, isAdmin, isArchitect } from '@/lib/auth'
 import { useLensSelection, type LensKey } from '@/lib/lens-settings'
+import { useFeatureFlags } from '@/lib/feature-flags'
 
 import AppHeader from './AppHeader'
 import Sidebar, { drawerWidth } from './Sidebar'
@@ -51,6 +65,12 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
   const [importExportDialogOpen, setImportExportDialogOpen] = useState(false)
   const t = useTranslations('navigation')
   const { selectedLens } = useLensSelection()
+  const { featureFlags } = useFeatureFlags()
+  const isGeaEnabled = featureFlags.GEA
+  const isBmcEnabled = featureFlags.BMC
+  const isAbhEnabled = featureFlags.ABH
+  const isApsEnabled = featureFlags.APS
+  const isAasEnabled = featureFlags.AAS
 
   const handleDrawerToggle = () => {
     setOpen(!open)
@@ -111,16 +131,95 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
     },
   ]
 
+  const geaBusinessItems = [
+    { key: 'visions', text: t('visions'), icon: <VisionIcon />, href: '/visions' },
+    { key: 'missions', text: t('missions'), icon: <MissionIcon />, href: '/missions' },
+    { key: 'values', text: t('values'), icon: <ValuesIcon />, href: '/values' },
+    { key: 'goals', text: t('goals'), icon: <GoalsIcon />, href: '/goals' },
+    { key: 'strategies', text: t('strategies'), icon: <StrategiesIcon />, href: '/strategies' },
+  ]
+
+  const bmcItems = [
+    {
+      key: 'valuePropositions',
+      text: t('valuePropositions'),
+      icon: <LightbulbIcon />,
+      href: '/value-propositions',
+    },
+    {
+      key: 'businessModels',
+      text: t('businessModels'),
+      icon: <ModelTrainingIcon />,
+      href: '/business-models',
+    },
+  ]
+
+  const solutionArchitectureItems = [
+    ...(isAasEnabled
+      ? [
+          {
+            key: 'applicationCollaboration',
+            text: t('applicationCollaboration'),
+            icon: <CollaborationIcon />,
+            href: '/application-collaboration',
+          },
+        ]
+      : []),
+    ...(isAbhEnabled
+      ? [
+          {
+            key: 'applicationFunction',
+            text: t('applicationFunction'),
+            icon: <FunctionIcon />,
+            href: '/application-function',
+          },
+          {
+            key: 'applicationProcess',
+            text: t('applicationProcess'),
+            icon: <ProcessIcon />,
+            href: '/application-process',
+          },
+          {
+            key: 'applicationInteraction',
+            text: t('applicationInteraction'),
+            icon: <InteractionIcon />,
+            href: '/application-interaction',
+          },
+          {
+            key: 'applicationEvent',
+            text: t('applicationEvent'),
+            icon: <EventIcon />,
+            href: '/application-event',
+          },
+          {
+            key: 'applicationService',
+            text: t('applicationService'),
+            icon: <ServiceIcon />,
+            href: '/application-service',
+          },
+        ]
+      : []),
+  ]
+
   const lensToElementKeys: Record<
     LensKey,
     Array<(typeof architectureElementItems)[number]['key']>
   > = {
     enterpriseArchitecture: architectureElementItems.map(item => item.key),
-    businessArchitecture: ['businessCapabilities'],
+    businessArchitecture: [
+      ...(isGeaEnabled ? (geaBusinessItems.map(item => item.key) as string[]) : []),
+      ...(isBmcEnabled ? (bmcItems.map(item => item.key) as string[]) : []),
+      'businessCapabilities',
+    ],
     processArchitecture: ['businessCapabilities'],
     dataArchitecture: ['dataObjects'],
     aiArchitecture: ['aiComponents'],
-    solutionArchitecture: ['applications', 'dataObjects', 'interfaces'],
+    solutionArchitecture: [
+      'applications',
+      ...(solutionArchitectureItems.map(item => item.key) as string[]),
+      ...(isApsEnabled ? ['dataObjects'] : []),
+      'interfaces',
+    ],
     infrastructureArchitecture: ['applications', 'infrastructure'],
   }
 
@@ -128,8 +227,21 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
     lensToElementKeys[selectedLens] ?? lensToElementKeys.enterpriseArchitecture
   )
 
-  const visibleArchitectureItems = architectureElementItems.filter(item =>
-    allowedElementKeys.has(item.key)
+  const allArchitectureItems = [
+    ...architectureElementItems,
+    ...(isGeaEnabled ? geaBusinessItems : []),
+    ...(isBmcEnabled ? bmcItems : []),
+    ...solutionArchitectureItems,
+  ]
+
+  const itemByKey = new Map(allArchitectureItems.map(item => [item.key, item]))
+  const visibleArchitectureItems = (lensToElementKeys[selectedLens] ?? []).reduce(
+    (acc, key) => {
+      const item = itemByKey.get(key)
+      if (item) acc.push(item)
+      return acc
+    },
+    [] as typeof allArchitectureItems
   )
 
   const menuItems = [

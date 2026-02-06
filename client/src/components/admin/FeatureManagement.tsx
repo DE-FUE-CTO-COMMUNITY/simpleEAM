@@ -77,10 +77,7 @@ export default function FeatureManagement() {
               <FormControlLabel
                 key={feature}
                 control={
-                  <Switch
-                    checked={featureFlags[feature]}
-                    onChange={handleFeatureToggle(feature)}
-                  />
+                  <Switch checked={featureFlags[feature]} onChange={handleFeatureToggle(feature)} />
                 }
                 label={t(`features.${feature}`, { prefix: `${feature}#` })}
               />
