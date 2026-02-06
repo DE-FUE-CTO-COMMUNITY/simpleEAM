@@ -118,6 +118,8 @@ services:
   excalidraw-room:
     image: excalidraw/excalidraw-room:sha-03ff435
     restart: unless-stopped
+    ports:
+      - "${EXCALIDRAW_ROOM_EXTERNAL_PORT}:${EXCALIDRAW_ROOM_PORT}"
     networks:
       - eam-network
       - ${TRAEFIK_NETWORK}
@@ -137,7 +139,8 @@ services:
       context: .
       dockerfile: client/Dockerfile
     restart: unless-stopped
-
+    ports:
+      - "${CLIENT_EXTERNAL_PORT}:${CLIENT_PORT}"
     depends_on:
       - server
       - excalidraw-room
