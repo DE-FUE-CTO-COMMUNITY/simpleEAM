@@ -20,17 +20,14 @@ export const useStrategyFilter = ({ strategies = [] }: UseStrategyFilterProps) =
       if (
         filterState.descriptionFilter &&
         (!strategy.description ||
-          !strategy.description
-            .toLowerCase()
-            .includes(filterState.descriptionFilter.toLowerCase()))
+          !strategy.description.toLowerCase().includes(filterState.descriptionFilter.toLowerCase()))
       ) {
         return false
       }
 
       if (
         filterState.ownerFilter &&
-        (!strategy.owners ||
-          !strategy.owners.some(owner => owner.id === filterState.ownerFilter))
+        (!strategy.owners || !strategy.owners.some(owner => owner.id === filterState.ownerFilter))
       ) {
         return false
       }

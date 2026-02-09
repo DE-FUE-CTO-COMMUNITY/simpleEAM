@@ -21,9 +21,7 @@ export const useVisionFilter = ({ visions = [] }: UseVisionFilterProps) => {
       if (
         filterState.descriptionFilter &&
         (!vision.description ||
-          !vision.description
-            .toLowerCase()
-            .includes(filterState.descriptionFilter.toLowerCase()))
+          !vision.description.toLowerCase().includes(filterState.descriptionFilter.toLowerCase()))
       ) {
         return false
       }

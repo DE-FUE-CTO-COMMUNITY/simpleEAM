@@ -225,10 +225,12 @@ const StrategyForm: React.FC<GenericFormProps<Gea_Strategy, StrategyFormValues>>
       type: 'autocomplete',
       multiple: true,
       options:
-        diagramData?.diagrams?.map((diagram: any): SelectOption => ({
-          value: diagram.id,
-          label: diagram.title,
-        })) || [],
+        diagramData?.diagrams?.map(
+          (diagram: any): SelectOption => ({
+            value: diagram.id,
+            label: diagram.title,
+          })
+        ) || [],
       loadingOptions: diagramLoading,
       size: 12,
       tabId: 'architectures',

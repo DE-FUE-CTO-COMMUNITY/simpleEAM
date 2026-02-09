@@ -21,9 +21,7 @@ export const useMissionFilter = ({ missions = [] }: UseMissionFilterProps) => {
       if (
         filterState.descriptionFilter &&
         (!mission.description ||
-          !mission.description
-            .toLowerCase()
-            .includes(filterState.descriptionFilter.toLowerCase()))
+          !mission.description.toLowerCase().includes(filterState.descriptionFilter.toLowerCase()))
       ) {
         return false
       }

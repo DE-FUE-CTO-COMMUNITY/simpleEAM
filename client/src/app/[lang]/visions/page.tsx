@@ -9,12 +9,7 @@ import { useTranslations } from 'next-intl'
 import { isArchitect } from '@/lib/auth'
 import { useCompanyContext } from '@/contexts/CompanyContext'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
-import {
-  GET_VISIONS,
-  CREATE_VISION,
-  UPDATE_VISION,
-  DELETE_VISION,
-} from '@/graphql/vision'
+import { GET_VISIONS, CREATE_VISION, UPDATE_VISION, DELETE_VISION } from '@/graphql/vision'
 import VisionForm, { VisionFormValues } from '@/components/visions/VisionForm'
 import VisionTable, { VISION_DEFAULT_COLUMN_VISIBILITY } from '@/components/visions/VisionTable'
 import VisionToolbar from '@/components/visions/VisionToolbar'

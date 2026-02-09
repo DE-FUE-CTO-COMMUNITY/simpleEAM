@@ -111,8 +111,7 @@ const VisionForm: React.FC<VisionFormProps> = ({
       name: vision?.name || '',
       description: vision?.description || '',
       year: vision?.year ? new Date(vision.year) : new Date(),
-      ownerId:
-        vision?.owners && vision.owners.length > 0 ? vision.owners[0].id : currentPerson?.id,
+      ownerId: vision?.owners && vision.owners.length > 0 ? vision.owners[0].id : currentPerson?.id,
       partOfArchitectures: vision?.partOfArchitectures?.map(arch => arch.id) || [],
       depictedInDiagrams: vision?.depictedInDiagrams?.map(diag => diag.id) || [],
     }),
@@ -237,10 +236,12 @@ const VisionForm: React.FC<VisionFormProps> = ({
       type: 'autocomplete',
       multiple: true,
       options:
-        diagramData?.diagrams?.map((diagram: any): SelectOption => ({
-          value: diagram.id,
-          label: diagram.title,
-        })) || [],
+        diagramData?.diagrams?.map(
+          (diagram: any): SelectOption => ({
+            value: diagram.id,
+            label: diagram.title,
+          })
+        ) || [],
       loadingOptions: diagramLoading,
       size: 12,
       tabId: 'architectures',

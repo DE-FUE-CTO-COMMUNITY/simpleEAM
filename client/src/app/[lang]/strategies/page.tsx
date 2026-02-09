@@ -9,9 +9,16 @@ import { useTranslations } from 'next-intl'
 import { isArchitect } from '@/lib/auth'
 import { useCompanyContext } from '@/contexts/CompanyContext'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
-import { GET_STRATEGIES, CREATE_STRATEGY, UPDATE_STRATEGY, DELETE_STRATEGY } from '@/graphql/strategy'
+import {
+  GET_STRATEGIES,
+  CREATE_STRATEGY,
+  UPDATE_STRATEGY,
+  DELETE_STRATEGY,
+} from '@/graphql/strategy'
 import StrategyForm, { StrategyFormValues } from '@/components/strategies/StrategyForm'
-import StrategyTable, { STRATEGY_DEFAULT_COLUMN_VISIBILITY } from '@/components/strategies/StrategyTable'
+import StrategyTable, {
+  STRATEGY_DEFAULT_COLUMN_VISIBILITY,
+} from '@/components/strategies/StrategyTable'
 import StrategyToolbar from '@/components/strategies/StrategyToolbar'
 import StrategyFilterDialog from '@/components/strategies/StrategyFilterDialog'
 import { useStrategyFilter } from '@/components/strategies/useStrategyFilter'

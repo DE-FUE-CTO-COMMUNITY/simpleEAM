@@ -9,12 +9,7 @@ import { useTranslations } from 'next-intl'
 import { isArchitect } from '@/lib/auth'
 import { useCompanyContext } from '@/contexts/CompanyContext'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
-import {
-  GET_MISSIONS,
-  CREATE_MISSION,
-  UPDATE_MISSION,
-  DELETE_MISSION,
-} from '@/graphql/mission'
+import { GET_MISSIONS, CREATE_MISSION, UPDATE_MISSION, DELETE_MISSION } from '@/graphql/mission'
 import MissionForm, { MissionFormValues } from '@/components/missions/MissionForm'
 import MissionTable, { MISSION_DEFAULT_COLUMN_VISIBILITY } from '@/components/missions/MissionTable'
 import MissionToolbar from '@/components/missions/MissionToolbar'

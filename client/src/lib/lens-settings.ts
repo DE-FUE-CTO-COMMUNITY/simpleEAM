@@ -41,7 +41,7 @@ export const useLensSettings = () => {
 
 export const useLensSelection = () => {
   const { lensFlags, enabledLenses } = useLensSettings()
-  const { selectedCompanyId } = useCompanyContext()
+  const { selectedCompanyId, selectedCompany, loading } = useCompanyContext()
   const [selectedLens, setSelectedLensState] = React.useState<LensKey>(DEFAULT_LENS)
 
   React.useEffect(() => {
@@ -65,11 +65,14 @@ export const useLensSelection = () => {
   }, [selectedCompanyId])
 
   React.useEffect(() => {
+    if (loading || !selectedCompanyId || !selectedCompany) {
+      return
+    }
     if (!enabledLenses.includes(selectedLens)) {
       setSelectedLensState(DEFAULT_LENS)
       saveSelectedLens(selectedCompanyId, DEFAULT_LENS)
     }
-  }, [enabledLenses, selectedLens, selectedCompanyId])
+  }, [enabledLenses, selectedLens, selectedCompanyId, selectedCompany, loading])
 
   const setSelectedLens = (lens: LensKey) => {
     const next = enabledLenses.includes(lens) ? lens : DEFAULT_LENS
