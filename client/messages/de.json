@@ -1292,6 +1292,339 @@
       "architectures": "Architekturen"
     }
   },
+  "visions": {
+    "title": "Visionen",
+    "addNew": "Neue Vision erstellen",
+    "editTitle": "Vision bearbeiten",
+    "createTitle": "Neue Vision erstellen",
+    "viewTitle": "Vision Details",
+    "deleteConfirmation": "Sind Sie sicher, dass Sie diese Vision löschen möchten?",
+    "noVisionsFound": "Keine Visionen gefunden.",
+    "searchPlaceholder": "Visionen durchsuchen...",
+    "messages": {
+      "loadError": "Fehler beim Laden der Visionen",
+      "createSuccess": "Vision erfolgreich erstellt",
+      "createError": "Fehler beim Erstellen der Vision",
+      "updateSuccess": "Vision erfolgreich aktualisiert",
+      "updateError": "Fehler beim Aktualisieren der Vision",
+      "deleteSuccess": "Vision erfolgreich gelöscht",
+      "deleteError": "Fehler beim Löschen der Vision",
+      "selectCompanyFirst": "Bitte zuerst ein Unternehmen auswählen."
+    },
+    "form": {
+      "name": "Name",
+      "description": "Beschreibung",
+      "year": "Jahr",
+      "owner": "Verantwortlicher",
+      "partOfArchitectures": "Teil von Architekturen",
+      "depictedInDiagrams": "In Diagrammen dargestellt",
+      "none": "Keine",
+      "createTitle": "Neue Vision erstellen",
+      "editTitle": "Vision bearbeiten",
+      "viewTitle": "Vision Details",
+      "entityName": "Vision",
+      "validation": {
+        "nameMin": "Der Name muss mindestens 3 Zeichen lang sein",
+        "nameMax": "Der Name darf maximal 100 Zeichen lang sein",
+        "descriptionMin": "Die Beschreibung muss mindestens 10 Zeichen lang sein",
+        "descriptionMax": "Die Beschreibung darf maximal 1000 Zeichen lang sein",
+        "yearRequired": "Jahr ist erforderlich"
+      }
+    },
+    "table": {
+      "id": "ID",
+      "name": "Name",
+      "description": "Beschreibung",
+      "year": "Jahr",
+      "owner": "Verantwortlicher",
+      "partOfArchitectures": "Teil von Architekturen",
+      "depictedInDiagrams": "In Diagrammen dargestellt",
+      "createdAt": "Erstellt am",
+      "updatedAt": "Aktualisiert am",
+      "actions": "Aktionen",
+      "noData": "Keine Daten gefunden."
+    },
+    "filter": {
+      "title": "Visionen filtern",
+      "descriptionContains": "Beschreibung enthält",
+      "descriptionPlaceholder": "Text eingeben...",
+      "owner": "Verantwortlicher",
+      "allOwners": "Alle Verantwortlichen",
+      "yearRange": "Jahresbereich",
+      "updatedDateRange": "Aktualisiert im Zeitraum",
+      "dateFrom": "Von",
+      "dateTo": "Bis"
+    },
+    "tabs": {
+      "general": "Allgemein",
+      "relationships": "Beziehungen",
+      "architectures": "Architekturen"
+    }
+  },
+  "missions": {
+    "title": "Missionen",
+    "addNew": "Neue Mission erstellen",
+    "editTitle": "Mission bearbeiten",
+    "createTitle": "Neue Mission erstellen",
+    "viewTitle": "Mission Details",
+    "deleteConfirmation": "Sind Sie sicher, dass Sie diese Mission löschen möchten?",
+    "noMissionsFound": "Keine Missionen gefunden.",
+    "searchPlaceholder": "Missionen durchsuchen...",
+    "messages": {
+      "loadError": "Fehler beim Laden der Missionen",
+      "createSuccess": "Mission erfolgreich erstellt",
+      "createError": "Fehler beim Erstellen der Mission",
+      "updateSuccess": "Mission erfolgreich aktualisiert",
+      "updateError": "Fehler beim Aktualisieren der Mission",
+      "deleteSuccess": "Mission erfolgreich gelöscht",
+      "deleteError": "Fehler beim Löschen der Mission",
+      "selectCompanyFirst": "Bitte zuerst ein Unternehmen auswählen."
+    },
+    "form": {
+      "name": "Name",
+      "description": "Beschreibung",
+      "year": "Jahr",
+      "owner": "Verantwortlicher",
+      "partOfArchitectures": "Teil von Architekturen",
+      "depictedInDiagrams": "In Diagrammen dargestellt",
+      "none": "Keine",
+      "createTitle": "Neue Mission erstellen",
+      "editTitle": "Mission bearbeiten",
+      "viewTitle": "Mission Details",
+      "entityName": "Mission",
+      "validation": {
+        "nameMin": "Der Name muss mindestens 3 Zeichen lang sein",
+        "nameMax": "Der Name darf maximal 100 Zeichen lang sein",
+        "descriptionMin": "Die Beschreibung muss mindestens 10 Zeichen lang sein",
+        "descriptionMax": "Die Beschreibung darf maximal 1000 Zeichen lang sein",
+        "yearRequired": "Jahr ist erforderlich"
+      }
+    },
+    "table": {
+      "id": "ID",
+      "name": "Name",
+      "description": "Beschreibung",
+      "year": "Jahr",
+      "owner": "Verantwortlicher",
+      "partOfArchitectures": "Teil von Architekturen",
+      "depictedInDiagrams": "In Diagrammen dargestellt",
+      "createdAt": "Erstellt am",
+      "updatedAt": "Aktualisiert am",
+      "actions": "Aktionen",
+      "noData": "Keine Daten gefunden."
+    },
+    "filter": {
+      "title": "Missionen filtern",
+      "descriptionContains": "Beschreibung enthält",
+      "descriptionPlaceholder": "Text eingeben...",
+      "owner": "Verantwortlicher",
+      "allOwners": "Alle Verantwortlichen",
+      "yearRange": "Jahresbereich",
+      "updatedDateRange": "Aktualisiert im Zeitraum",
+      "dateFrom": "Von",
+      "dateTo": "Bis"
+    },
+    "tabs": {
+      "general": "Allgemein",
+      "relationships": "Beziehungen",
+      "architectures": "Architekturen"
+    }
+  },
+  "values": {
+    "title": "Werte",
+    "addNew": "Neuen Wert erstellen",
+    "editTitle": "Wert bearbeiten",
+    "createTitle": "Neuen Wert erstellen",
+    "viewTitle": "Wert Details",
+    "deleteConfirmation": "Sind Sie sicher, dass Sie diesen Wert löschen möchten?",
+    "noValuesFound": "Keine Werte gefunden.",
+    "searchPlaceholder": "Werte durchsuchen...",
+    "messages": {
+      "loadError": "Fehler beim Laden der Werte",
+      "createSuccess": "Wert erfolgreich erstellt",
+      "createError": "Fehler beim Erstellen des Werts",
+      "updateSuccess": "Wert erfolgreich aktualisiert",
+      "updateError": "Fehler beim Aktualisieren des Werts",
+      "deleteSuccess": "Wert erfolgreich gelöscht",
+      "deleteError": "Fehler beim Löschen des Werts",
+      "selectCompanyFirst": "Bitte zuerst ein Unternehmen auswählen."
+    },
+    "form": {
+      "name": "Name",
+      "description": "Beschreibung",
+      "owner": "Verantwortlicher",
+      "partOfArchitectures": "Teil von Architekturen",
+      "depictedInDiagrams": "In Diagrammen dargestellt",
+      "none": "Keine",
+      "createTitle": "Neuen Wert erstellen",
+      "editTitle": "Wert bearbeiten",
+      "viewTitle": "Wert Details",
+      "entityName": "Wert",
+      "validation": {
+        "nameMin": "Der Name muss mindestens 3 Zeichen lang sein",
+        "nameMax": "Der Name darf maximal 100 Zeichen lang sein",
+        "descriptionMin": "Die Beschreibung muss mindestens 10 Zeichen lang sein",
+        "descriptionMax": "Die Beschreibung darf maximal 1000 Zeichen lang sein"
+      }
+    },
+    "table": {
+      "id": "ID",
+      "name": "Name",
+      "description": "Beschreibung",
+      "owner": "Verantwortlicher",
+      "partOfArchitectures": "Teil von Architekturen",
+      "depictedInDiagrams": "In Diagrammen dargestellt",
+      "createdAt": "Erstellt am",
+      "updatedAt": "Aktualisiert am",
+      "actions": "Aktionen",
+      "noData": "Keine Daten gefunden."
+    },
+    "filter": {
+      "title": "Werte filtern",
+      "descriptionContains": "Beschreibung enthält",
+      "descriptionPlaceholder": "Text eingeben...",
+      "owner": "Verantwortlicher",
+      "allOwners": "Alle Verantwortlichen",
+      "updatedDateRange": "Aktualisiert im Zeitraum",
+      "dateFrom": "Von",
+      "dateTo": "Bis"
+    },
+    "tabs": {
+      "general": "Allgemein",
+      "relationships": "Beziehungen",
+      "architectures": "Architekturen"
+    }
+  },
+  "goals": {
+    "title": "Ziele",
+    "addNew": "Neues Ziel erstellen",
+    "editTitle": "Ziel bearbeiten",
+    "createTitle": "Neues Ziel erstellen",
+    "viewTitle": "Ziel Details",
+    "deleteConfirmation": "Sind Sie sicher, dass Sie dieses Ziel löschen möchten?",
+    "noGoalsFound": "Keine Ziele gefunden.",
+    "searchPlaceholder": "Ziele durchsuchen...",
+    "messages": {
+      "loadError": "Fehler beim Laden der Ziele",
+      "createSuccess": "Ziel erfolgreich erstellt",
+      "createError": "Fehler beim Erstellen des Ziels",
+      "updateSuccess": "Ziel erfolgreich aktualisiert",
+      "updateError": "Fehler beim Aktualisieren des Ziels",
+      "deleteSuccess": "Ziel erfolgreich gelöscht",
+      "deleteError": "Fehler beim Löschen des Ziels",
+      "selectCompanyFirst": "Bitte zuerst ein Unternehmen auswählen."
+    },
+    "form": {
+      "name": "Name",
+      "description": "Beschreibung",
+      "owner": "Verantwortlicher",
+      "partOfArchitectures": "Teil von Architekturen",
+      "depictedInDiagrams": "In Diagrammen dargestellt",
+      "none": "Keine",
+      "createTitle": "Neues Ziel erstellen",
+      "editTitle": "Ziel bearbeiten",
+      "viewTitle": "Ziel Details",
+      "entityName": "Ziel",
+      "validation": {
+        "nameMin": "Der Name muss mindestens 3 Zeichen lang sein",
+        "nameMax": "Der Name darf maximal 100 Zeichen lang sein",
+        "descriptionMin": "Die Beschreibung muss mindestens 10 Zeichen lang sein",
+        "descriptionMax": "Die Beschreibung darf maximal 1000 Zeichen lang sein"
+      }
+    },
+    "table": {
+      "id": "ID",
+      "name": "Name",
+      "description": "Beschreibung",
+      "owner": "Verantwortlicher",
+      "partOfArchitectures": "Teil von Architekturen",
+      "depictedInDiagrams": "In Diagrammen dargestellt",
+      "createdAt": "Erstellt am",
+      "updatedAt": "Aktualisiert am",
+      "actions": "Aktionen",
+      "noData": "Keine Daten gefunden."
+    },
+    "filter": {
+      "title": "Ziele filtern",
+      "descriptionContains": "Beschreibung enthält",
+      "descriptionPlaceholder": "Text eingeben...",
+      "owner": "Verantwortlicher",
+      "allOwners": "Alle Verantwortlichen",
+      "updatedDateRange": "Aktualisiert im Zeitraum",
+      "dateFrom": "Von",
+      "dateTo": "Bis"
+    },
+    "tabs": {
+      "general": "Allgemein",
+      "relationships": "Beziehungen",
+      "architectures": "Architekturen"
+    }
+  },
+  "strategies": {
+    "title": "Strategien",
+    "addNew": "Neue Strategie erstellen",
+    "editTitle": "Strategie bearbeiten",
+    "createTitle": "Neue Strategie erstellen",
+    "viewTitle": "Strategie Details",
+    "deleteConfirmation": "Sind Sie sicher, dass Sie diese Strategie löschen möchten?",
+    "noStrategiesFound": "Keine Strategien gefunden.",
+    "searchPlaceholder": "Strategien durchsuchen...",
+    "messages": {
+      "loadError": "Fehler beim Laden der Strategien",
+      "createSuccess": "Strategie erfolgreich erstellt",
+      "createError": "Fehler beim Erstellen der Strategie",
+      "updateSuccess": "Strategie erfolgreich aktualisiert",
+      "updateError": "Fehler beim Aktualisieren der Strategie",
+      "deleteSuccess": "Strategie erfolgreich gelöscht",
+      "deleteError": "Fehler beim Löschen der Strategie",
+      "selectCompanyFirst": "Bitte zuerst ein Unternehmen auswählen."
+    },
+    "form": {
+      "name": "Name",
+      "description": "Beschreibung",
+      "owner": "Verantwortlicher",
+      "partOfArchitectures": "Teil von Architekturen",
+      "depictedInDiagrams": "In Diagrammen dargestellt",
+      "none": "Keine",
+      "createTitle": "Neue Strategie erstellen",
+      "editTitle": "Strategie bearbeiten",
+      "viewTitle": "Strategie Details",
+      "entityName": "Strategie",
+      "validation": {
+        "nameMin": "Der Name muss mindestens 3 Zeichen lang sein",
+        "nameMax": "Der Name darf maximal 100 Zeichen lang sein",
+        "descriptionMin": "Die Beschreibung muss mindestens 10 Zeichen lang sein",
+        "descriptionMax": "Die Beschreibung darf maximal 1000 Zeichen lang sein"
+      }
+    },
+    "table": {
+      "id": "ID",
+      "name": "Name",
+      "description": "Beschreibung",
+      "owner": "Verantwortlicher",
+      "partOfArchitectures": "Teil von Architekturen",
+      "depictedInDiagrams": "In Diagrammen dargestellt",
+      "createdAt": "Erstellt am",
+      "updatedAt": "Aktualisiert am",
+      "actions": "Aktionen",
+      "noData": "Keine Daten gefunden."
+    },
+    "filter": {
+      "title": "Strategien filtern",
+      "descriptionContains": "Beschreibung enthält",
+      "descriptionPlaceholder": "Text eingeben...",
+      "owner": "Verantwortlicher",
+      "allOwners": "Alle Verantwortlichen",
+      "updatedDateRange": "Aktualisiert im Zeitraum",
+      "dateFrom": "Von",
+      "dateTo": "Bis"
+    },
+    "tabs": {
+      "general": "Allgemein",
+      "relationships": "Beziehungen",
+      "architectures": "Architekturen"
+    }
+  },
   "interfaces": {
     "title": "Schnittstellen",
     "addNew": "Neue Schnittstelle erstellen",
