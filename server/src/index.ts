@@ -50,7 +50,7 @@ async function startServer() {
       token: req.headers.authorization, // Token directly from Authorization header forward to Neo4j GraphQL Library
     }),
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
-    introspection: true, // Enable for development
+    introspection: process.env.NODE_ENV === 'production' ? false : true, // Enable for development
   })
 
   // Start Apollo server

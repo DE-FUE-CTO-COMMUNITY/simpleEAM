@@ -1,0 +1,14 @@
+html,
+body,
+#sandbox {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: #0b0f14;
+}
+
+#sandbox {
+  height: 100vh;
+}

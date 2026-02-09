@@ -19,8 +19,8 @@ COPY server/ ./
 # Dependencies installieren
 RUN yarn install
 
-# Build-Umgebung
-ARG NODE_ENV=production
+# Build-Umgebung (per build-arg gesetzt, z.B. aus der Root-.env via Compose)
+ARG NODE_ENV
 ENV NODE_ENV=${NODE_ENV}
 ENV TS_NODE_TRANSPILE_ONLY=1
 ENV NODE_OPTIONS="--max_old_space_size=4096"

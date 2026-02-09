@@ -34,6 +34,8 @@ services:
     build:
       context: .
       dockerfile: server/Dockerfile
+      args:
+        NODE_ENV: ${NODE_ENV}
     restart: unless-stopped
     ports:
       - "${GRAPHQL_EXTERNAL_PORT}:${GRAPHQL_INTERNAL_PORT}"
@@ -41,7 +43,7 @@ services:
       - neo4j
       - keycloak
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=${NODE_ENV}
       - NEO4J_URI=bolt://neo4j:${NEO4J_BOLT_PORT}
       - NEO4J_USER=${NEO4J_USER}
       - NEO4J_PASSWORD=${NEO4J_PASSWORD}
