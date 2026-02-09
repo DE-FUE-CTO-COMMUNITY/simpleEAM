@@ -1,4 +1,11 @@
 import type { CodegenConfig } from '@graphql-codegen/cli'
+import dotenv from 'dotenv'
+import dotenvExpand from 'dotenv-expand'
+import path from 'node:path'
+
+dotenvExpand.expand(dotenv.config({ path: path.resolve(process.cwd(), '../.env') }))
+
+console.log('Generating GraphQL types from schema...', process.env.GRAPHQL_URL)
 
 const config: CodegenConfig = {
   overwrite: true,

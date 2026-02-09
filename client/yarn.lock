@@ -5513,7 +5513,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dotenv@npm:^16.0.0":
+"dotenv-expand@npm:^12.0.1":
+  version: 12.0.3
+  resolution: "dotenv-expand@npm:12.0.3"
+  dependencies:
+    dotenv: "npm:^16.4.5"
+  checksum: 10c0/0824bdc74fc816a28b0744b7853a23e046602e9616c82121dfdae21ebc13c6e89afeb773e794e97c35d48be2be0a990fbca721ee3869a49c04210a58a3cf296f
+  languageName: node
+  linkType: hard
+
+"dotenv@npm:^16.0.0, dotenv@npm:^16.4.5, dotenv@npm:^16.5.0":
   version: 16.6.1
   resolution: "dotenv@npm:16.6.1"
   checksum: 10c0/15ce56608326ea0d1d9414a5c8ee6dcf0fffc79d2c16422b4ac2268e7e2d76ff5a572d37ffe747c377de12005f14b3cc22361e79fc7f1061cce81f77d2c973dc
@@ -10024,6 +10033,8 @@ __metadata:
     browser-fs-access: "npm:0.29.1"
     date-fns: "npm:^4.1.0"
     dayjs: "npm:^1.11.13"
+    dotenv: "npm:^16.5.0"
+    dotenv-expand: "npm:^12.0.1"
     eslint: "npm:^8.46.0"
     eslint-config-next: "npm:^15.0.0"
     fractional-indexing: "npm:^3.2.0"
