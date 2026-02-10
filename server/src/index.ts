@@ -36,6 +36,69 @@ async function startServer() {
     helmet({ contentSecurityPolicy: process.env.NODE_ENV === 'production' ? undefined : false })
   )
 
+  const authDebugEnabled = process.env.AUTH_DEBUG === 'true'
+
+  const safeDecodeJwt = (token: string) => {
+    const parts = token.split('.')
+    if (parts.length < 2) return null
+    try {
+      const decode = (part: string) =>
+        JSON.parse(Buffer.from(part.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString())
+      return { header: decode(parts[0]), payload: decode(parts[1]) }
+    } catch {
+      return null
+    }
+  }
+
+  if (authDebugEnabled) {
+    app.use('/graphql', (req, _res, next) => {
+      const authHeader = req.headers.authorization
+      const bearer = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : authHeader
+      const decoded = bearer ? safeDecodeJwt(bearer) : null
+      const payload = decoded?.payload || {}
+      const header = decoded?.header || {}
+
+      console.log('[AUTH DEBUG] request', {
+        method: req.method,
+        path: req.path,
+        host: req.headers.host,
+        forwardedProto: req.headers['x-forwarded-proto'],
+        forwardedHost: req.headers['x-forwarded-host'],
+        forwardedFor: req.headers['x-forwarded-for'],
+        hasAuthorization: Boolean(authHeader),
+        authScheme: authHeader?.split(' ')[0],
+        jwt: decoded
+          ? {
+              header: {
+                alg: header.alg,
+                kid: header.kid,
+                typ: header.typ,
+              },
+              payload: {
+                iss: payload.iss,
+                aud: payload.aud,
+                sub: payload.sub,
+                azp: payload.azp,
+                exp: payload.exp,
+                iat: payload.iat,
+                realm_access: payload.realm_access,
+                realm_access_json: payload.realm_access
+                  ? JSON.stringify(payload.realm_access)
+                  : undefined,
+                resource_access: payload.resource_access,
+                resource_access_json: payload.resource_access
+                  ? JSON.stringify(payload.resource_access)
+                  : undefined,
+                company_ids: payload.company_ids,
+              },
+            }
+          : null,
+      })
+
+      next()
+    })
+  }
+
   // Increase body parser limits for large diagram payloads
   app.use(express.json({ limit: '50mb' }))
   app.use(express.urlencoded({ limit: '50mb', extended: true }))
