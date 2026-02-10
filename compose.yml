@@ -49,6 +49,9 @@ services:
       - KEYCLOAK_URL=http://keycloak:${KEYCLOAK_INTERNAL_PORT}
       - KEYCLOAK_REALM=${KEYCLOAK_REALM}
       - KEYCLOAK_CLIENT_ID=${KEYCLOAK_CLIENT_ID_SERVER}
+      - AUTH_DEBUG=${AUTH_DEBUG}
+      - NEO4J_DEBUG=${NEO4J_DEBUG}
+      - NEO4J_LOG_LEVEL=${NEO4J_LOG_LEVEL}
     # No bind mounts for src, prisma, tests - everything comes from the image
     networks:
       - eam-network
