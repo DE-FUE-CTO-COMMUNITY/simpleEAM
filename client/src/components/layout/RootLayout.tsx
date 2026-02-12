@@ -20,6 +20,7 @@ import {
   Hub as CollaborationIcon,
   Functions as FunctionIcon,
   AccountTree as ProcessIcon,
+  GridOn as GridOnIcon,
   ConnectWithoutContact as InteractionIcon,
   Event as EventIcon,
   MiscellaneousServices as ServiceIcon,
@@ -132,8 +133,8 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
   ]
 
   const geaBusinessItems = [
-    { key: 'visions', text: t('visions'), icon: <VisionIcon />, href: '/visions' },
     { key: 'missions', text: t('missions'), icon: <MissionIcon />, href: '/missions' },
+    { key: 'visions', text: t('visions'), icon: <VisionIcon />, href: '/visions' },
     { key: 'values', text: t('values'), icon: <ValuesIcon />, href: '/values' },
     { key: 'goals', text: t('goals'), icon: <GoalsIcon />, href: '/goals' },
     { key: 'strategies', text: t('strategies'), icon: <StrategiesIcon />, href: '/strategies' },
@@ -247,6 +248,9 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
   const menuItems = [
     { text: t('dashboard'), icon: <DashboardIcon />, href: '/' },
     { text: t('diagramEditor'), icon: <DiagramIcon />, href: '/diagrams' },
+    ...(selectedLens === 'processArchitecture'
+      ? [{ text: t('processEditor'), icon: <GridOnIcon />, href: '/process-editor' }]
+      : []),
     { text: t('architectures'), icon: <ArchitectureIcon />, href: '/architectures' },
     {
       text: t('architecturePrinciples'),

@@ -49,6 +49,7 @@
   "navigation": {
     "dashboard": "Dashboard",
     "diagramEditor": "Diagram-Editor",
+    "processEditor": "Prozess-Editor",
     "architectures": "Architekturen",
     "architecturePrinciples": "Architektur Prinzipien",
     "businessCapabilities": "Business Capabilities",
@@ -2583,5 +2584,10 @@
       "authenticated": "Authentifiziert",
       "notAuthenticated": "Nicht authentifiziert"
     }
+  },
+  "processEditor": {
+    "title": "Prozess-Editor",
+    "comingSoon": "Diese Funktion wird später implementiert",
+    "description": "Der Prozess-Editor für BPMN-Diagramme ist in Entwicklung und wird in einer zukünftigen Version verfügbar sein."
   }
 }
