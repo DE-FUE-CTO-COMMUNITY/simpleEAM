@@ -14,9 +14,12 @@ export const MISSION_DEFAULT_COLUMN_VISIBILITY = {
   name: true,
   year: true,
   owners: true,
+  supportedByVisions: false,
+  supportedByValues: false,
   partOfArchitectures: true,
   depictedInDiagrams: true,
-  description: false,
+  purposeStatement: false,
+  keywords: false,
   id: false,
   createdAt: false,
   updatedAt: false,
@@ -82,11 +85,19 @@ const MissionTable: React.FC<MissionTableProps> = ({
         header: t('name'),
         cell: info => info.getValue(),
       }),
-      columnHelper.accessor('description', {
-        header: t('description'),
+      columnHelper.accessor('purposeStatement', {
+        header: t('purposeStatement'),
         cell: info => {
           const value = info.getValue()
           return value && value.length > 50 ? `${value.substring(0, 50)}...` : value || '-'
+        },
+        enableHiding: true,
+      }),
+      columnHelper.accessor('keywords', {
+        header: t('keywords'),
+        cell: info => {
+          const value = info.getValue()
+          return value && value.length > 0 ? value.join(', ') : '-'
         },
         enableHiding: true,
       }),
@@ -100,6 +111,22 @@ const MissionTable: React.FC<MissionTableProps> = ({
           const owners = info.getValue()
           return owners && owners.length > 0 ? `${owners[0].firstName} ${owners[0].lastName}` : '-'
         },
+      }),
+      columnHelper.accessor('supportedByVisions', {
+        header: t('supportedByVisions'),
+        cell: info => {
+          const visions = info.getValue()
+          return visions && visions.length > 0 ? visions.map(vision => vision.name).join(', ') : '-'
+        },
+        enableHiding: true,
+      }),
+      columnHelper.accessor('supportedByValues', {
+        header: t('supportedByValues'),
+        cell: info => {
+          const values = info.getValue()
+          return values && values.length > 0 ? values.map(value => value.name).join(', ') : '-'
+        },
+        enableHiding: true,
       }),
       columnHelper.accessor('partOfArchitectures', {
         header: t('partOfArchitectures'),
@@ -141,9 +168,12 @@ const MissionTable: React.FC<MissionTableProps> = ({
 
   const mapToFormValues = (mission: MissionType): MissionFormValues => ({
     name: mission.name,
-    description: mission.description ?? '',
+    purposeStatement: mission.purposeStatement ?? '',
+    keywords: mission.keywords ?? [],
     year: mission.year ? new Date(mission.year) : new Date(),
     ownerId: mission.owners?.[0]?.id ?? '',
+    supportedByVisions: mission.supportedByVisions?.map(vision => vision.id) ?? [],
+    supportedByValues: mission.supportedByValues?.map(value => value.id) ?? [],
     partOfArchitectures: mission.partOfArchitectures?.map(arch => arch.id) ?? [],
     depictedInDiagrams: mission.depictedInDiagrams?.map(diagram => diagram.id) ?? [],
   })

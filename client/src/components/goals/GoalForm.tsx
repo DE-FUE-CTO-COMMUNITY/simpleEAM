@@ -8,23 +8,29 @@ import { useTranslations } from 'next-intl'
 import { GET_PERSONS } from '@/graphql/person'
 import { GET_ARCHITECTURES } from '@/graphql/architecture'
 import { GET_DIAGRAMS } from '@/graphql/diagram'
+import { GET_VISIONS } from '@/graphql/vision'
+import { GET_VALUES } from '@/graphql/value'
+import { GET_STRATEGIES } from '@/graphql/strategy'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import { useCurrentPerson } from '@/hooks/useCurrentPerson'
 import { useChipClickHandlers } from '@/hooks/useChipClickHandlers'
 import { isArchitect } from '@/lib/auth'
 import GenericForm, { FieldConfig, TabConfig, SelectOption } from '../common/GenericForm'
 import { GenericFormProps } from '../common/GenericFormProps'
-import { Gea_Goal, Architecture } from '../../gql/generated'
+import { Gea_Goal, Architecture, Gea_Vision, Gea_Value, Gea_Strategy } from '../../gql/generated'
 import ArchitectureForm from '../architectures/ArchitectureForm'
 
 const createGoalSchema = (t: any) =>
   z.object({
     name: z.string().min(3, t('validation.nameMin')).max(100, t('validation.nameMax')),
-    description: z
+    goalStatement: z
       .string()
-      .min(10, t('validation.descriptionMin'))
-      .max(1000, t('validation.descriptionMax')),
+      .min(10, t('validation.goalStatementMin'))
+      .max(1000, t('validation.goalStatementMax')),
     ownerId: z.string().optional(),
+    operationalizesVisions: z.array(z.string()).optional(),
+    supportsValues: z.array(z.string()).optional(),
+    achievedByStrategies: z.array(z.string()).optional(),
     partOfArchitectures: z.array(z.string()).optional(),
     depictedInDiagrams: z.array(z.string()).optional(),
   })
@@ -94,6 +100,18 @@ const GoalForm: React.FC<GenericFormProps<Gea_Goal, GoalFormValues>> = ({
     variables: { where: companyWhere },
   })
 
+  const { data: visionsData, loading: visionsLoading } = useQuery(GET_VISIONS, {
+    variables: { where: companyWhere },
+  })
+
+  const { data: valuesData, loading: valuesLoading } = useQuery(GET_VALUES, {
+    variables: { where: companyWhere },
+  })
+
+  const { data: strategiesData, loading: strategiesLoading } = useQuery(GET_STRATEGIES, {
+    variables: { where: companyWhere },
+  })
+
   const { data: nestedArchitectureData } = useQuery(GET_ARCHITECTURES, {
     variables: {
       where: { id: { eq: nestedFormState.entityId }, ...companyWhere },
@@ -106,8 +124,11 @@ const GoalForm: React.FC<GenericFormProps<Gea_Goal, GoalFormValues>> = ({
   const defaultValues = React.useMemo<GoalFormValues>(
     () => ({
       name: goal?.name || '',
-      description: goal?.description || '',
+      goalStatement: goal?.goalStatement || '',
       ownerId: goal?.owners && goal.owners.length > 0 ? goal.owners[0].id : currentPerson?.id,
+      operationalizesVisions: goal?.operationalizesVisions?.map(vision => vision.id) || [],
+      supportsValues: goal?.supportsValues?.map(value => value.id) || [],
+      achievedByStrategies: goal?.achievedByStrategies?.map(strategy => strategy.id) || [],
       partOfArchitectures: goal?.partOfArchitectures?.map(arch => arch.id) || [],
       depictedInDiagrams: goal?.depictedInDiagrams?.map(diag => diag.id) || [],
     }),
@@ -139,8 +160,11 @@ const GoalForm: React.FC<GenericFormProps<Gea_Goal, GoalFormValues>> = ({
     if ((mode === 'view' || mode === 'edit') && goal) {
       form.reset({
         name: goal?.name || '',
-        description: goal?.description || '',
+        goalStatement: goal?.goalStatement || '',
         ownerId: goal?.owners && goal.owners.length > 0 ? goal.owners[0].id : currentPerson?.id,
+        operationalizesVisions: goal?.operationalizesVisions?.map(vision => vision.id) || [],
+        supportsValues: goal?.supportsValues?.map(value => value.id) || [],
+        achievedByStrategies: goal?.achievedByStrategies?.map(strategy => strategy.id) || [],
         partOfArchitectures: goal?.partOfArchitectures?.map(arch => arch.id) || [],
         depictedInDiagrams: goal?.depictedInDiagrams?.map(diag => diag.id) || [],
       })
@@ -158,11 +182,11 @@ const GoalForm: React.FC<GenericFormProps<Gea_Goal, GoalFormValues>> = ({
       tabId: 'general',
     },
     {
-      name: 'description',
-      label: tForm('description'),
+      name: 'goalStatement',
+      label: tForm('goalStatement'),
       type: 'textarea',
       required: true,
-      validators: goalSchema.shape.description,
+      validators: goalSchema.shape.goalStatement,
       size: { xs: 12, md: 12 },
       tabId: 'general',
     },
@@ -182,6 +206,102 @@ const GoalForm: React.FC<GenericFormProps<Gea_Goal, GoalFormValues>> = ({
       size: { xs: 12, md: 6 },
       loadingOptions: personLoading,
       tabId: 'general',
+    },
+    {
+      name: 'operationalizesVisions',
+      label: tForm('operationalizesVisions'),
+      type: 'autocomplete',
+      multiple: true,
+      options:
+        visionsData?.geaVisions?.map(
+          (vision: Gea_Vision): SelectOption => ({
+            value: vision.id,
+            label: vision.name,
+          })
+        ) || [],
+      loadingOptions: visionsLoading,
+      size: 12,
+      tabId: 'relationships',
+      onChipClick: createChipClickHandler('operationalizesVisions'),
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          const matchingVision = visionsData?.geaVisions?.find(
+            (vision: Gea_Vision) => vision.id === option
+          )
+          return matchingVision?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
+    },
+    {
+      name: 'supportsValues',
+      label: tForm('supportsValues'),
+      type: 'autocomplete',
+      multiple: true,
+      options:
+        valuesData?.geaValues?.map(
+          (value: Gea_Value): SelectOption => ({
+            value: value.id,
+            label: value.name,
+          })
+        ) || [],
+      loadingOptions: valuesLoading,
+      size: 12,
+      tabId: 'relationships',
+      onChipClick: createChipClickHandler('supportsValues'),
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          const matchingValue = valuesData?.geaValues?.find(
+            (value: Gea_Value) => value.id === option
+          )
+          return matchingValue?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
+    },
+    {
+      name: 'achievedByStrategies',
+      label: tForm('achievedByStrategies'),
+      type: 'autocomplete',
+      multiple: true,
+      options:
+        strategiesData?.geaStrategies?.map(
+          (strategy: Gea_Strategy): SelectOption => ({
+            value: strategy.id,
+            label: strategy.name,
+          })
+        ) || [],
+      loadingOptions: strategiesLoading,
+      size: 12,
+      tabId: 'relationships',
+      onChipClick: createChipClickHandler('achievedByStrategies'),
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          const matchingStrategy = strategiesData?.geaStrategies?.find(
+            (strategy: Gea_Strategy) => strategy.id === option
+          )
+          return matchingStrategy?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
     },
     {
       name: 'partOfArchitectures',
@@ -251,6 +371,7 @@ const GoalForm: React.FC<GenericFormProps<Gea_Goal, GoalFormValues>> = ({
 
   const tabs: TabConfig[] = [
     { id: 'general', label: tTabs('general') },
+    { id: 'relationships', label: tTabs('relationships') },
     { id: 'architectures', label: tTabs('architectures') },
   ]
 

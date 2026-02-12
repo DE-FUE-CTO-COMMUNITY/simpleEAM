@@ -13,9 +13,11 @@ import usePersistentColumnVisibility from '../../hooks/usePersistentColumnVisibi
 export const VALUE_DEFAULT_COLUMN_VISIBILITY = {
   name: true,
   owners: true,
+  supportsMissions: false,
+  supportsVisions: false,
   partOfArchitectures: true,
   depictedInDiagrams: true,
-  description: false,
+  valueStatement: false,
   id: false,
   createdAt: false,
   updatedAt: false,
@@ -81,8 +83,8 @@ const ValueTable: React.FC<ValueTableProps> = ({
         header: t('name'),
         cell: info => info.getValue(),
       }),
-      columnHelper.accessor('description', {
-        header: t('description'),
+      columnHelper.accessor('valueStatement', {
+        header: t('valueStatement'),
         cell: info => {
           const value = info.getValue()
           return value && value.length > 50 ? `${value.substring(0, 50)}...` : value || '-'
@@ -95,6 +97,24 @@ const ValueTable: React.FC<ValueTableProps> = ({
           const owners = info.getValue()
           return owners && owners.length > 0 ? `${owners[0].firstName} ${owners[0].lastName}` : '-'
         },
+      }),
+      columnHelper.accessor('supportsMissions', {
+        header: t('supportsMissions'),
+        cell: info => {
+          const missions = info.getValue()
+          return missions && missions.length > 0
+            ? missions.map(mission => mission.name).join(', ')
+            : '-'
+        },
+        enableHiding: true,
+      }),
+      columnHelper.accessor('supportsVisions', {
+        header: t('supportsVisions'),
+        cell: info => {
+          const visions = info.getValue()
+          return visions && visions.length > 0 ? visions.map(vision => vision.name).join(', ') : '-'
+        },
+        enableHiding: true,
       }),
       columnHelper.accessor('partOfArchitectures', {
         header: t('partOfArchitectures'),
@@ -136,8 +156,10 @@ const ValueTable: React.FC<ValueTableProps> = ({
 
   const mapToFormValues = (value: ValueType): ValueFormValues => ({
     name: value.name,
-    description: value.description ?? '',
+    valueStatement: value.valueStatement ?? '',
     ownerId: value.owners?.[0]?.id ?? '',
+    supportsMissions: value.supportsMissions?.map(mission => mission.id) ?? [],
+    supportsVisions: value.supportsVisions?.map(vision => vision.id) ?? [],
     partOfArchitectures: value.partOfArchitectures?.map(arch => arch.id) ?? [],
     depictedInDiagrams: value.depictedInDiagrams?.map(diagram => diagram.id) ?? [],
   })

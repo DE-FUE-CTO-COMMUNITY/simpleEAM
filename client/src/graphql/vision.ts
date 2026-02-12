@@ -5,7 +5,8 @@ export const GET_VISIONS = gql`
     geaVisions(where: $where) {
       id
       name
-      description
+      visionStatement
+      timeHorizon
       year
       createdAt
       updatedAt
@@ -15,6 +16,18 @@ export const GET_VISIONS = gql`
         lastName
       }
       company {
+        id
+        name
+      }
+      supportsMissions {
+        id
+        name
+      }
+      supportedByGoals {
+        id
+        name
+      }
+      supportedByValues {
         id
         name
       }
@@ -66,7 +79,8 @@ export const CREATE_VISION = gql`
       geaVisions {
         id
         name
-        description
+        visionStatement
+        timeHorizon
         year
         createdAt
         updatedAt
@@ -81,7 +95,8 @@ export const UPDATE_VISION = gql`
       geaVisions {
         id
         name
-        description
+        visionStatement
+        timeHorizon
         year
         createdAt
         updatedAt

@@ -115,12 +115,40 @@ const VisionsPage = () => {
 
     const input: Record<string, any> = {
       name: data.name,
-      description: data.description,
+      visionStatement: data.visionStatement,
+      timeHorizon: data.timeHorizon,
       year: data.year.toISOString().split('T')[0],
       ...(data.ownerId
         ? {
             owners: {
               connect: [{ where: { node: { id: { eq: data.ownerId } } } }],
+            },
+          }
+        : {}),
+      ...(data.supportsMissions && data.supportsMissions.length > 0
+        ? {
+            supportsMissions: {
+              connect: data.supportsMissions.map(id => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }
+        : {}),
+      ...(data.supportedByValues && data.supportedByValues.length > 0
+        ? {
+            supportedByValues: {
+              connect: data.supportedByValues.map(id => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }
+        : {}),
+      ...(data.supportedByGoals && data.supportedByGoals.length > 0
+        ? {
+            supportedByGoals: {
+              connect: data.supportedByGoals.map(id => ({
+                where: { node: { id: { eq: id } } },
+              })),
             },
           }
         : {}),
@@ -163,7 +191,8 @@ const VisionsPage = () => {
   const handleUpdateVisionSubmit = async (id: string, data: VisionFormValues) => {
     const input: Record<string, any> = {
       name: { set: data.name },
-      description: { set: data.description },
+      visionStatement: { set: data.visionStatement },
+      timeHorizon: { set: data.timeHorizon },
       year: { set: data.year.toISOString().split('T')[0] },
     }
 
@@ -174,6 +203,45 @@ const VisionsPage = () => {
       }
     } else {
       input.owners = {
+        disconnect: [{ where: {} }],
+      }
+    }
+
+    if (data.supportsMissions && data.supportsMissions.length > 0) {
+      input.supportsMissions = {
+        disconnect: [{ where: {} }],
+        connect: data.supportsMissions.map(id => ({
+          where: { node: { id: { eq: id } } },
+        })),
+      }
+    } else {
+      input.supportsMissions = {
+        disconnect: [{ where: {} }],
+      }
+    }
+
+    if (data.supportedByValues && data.supportedByValues.length > 0) {
+      input.supportedByValues = {
+        disconnect: [{ where: {} }],
+        connect: data.supportedByValues.map(id => ({
+          where: { node: { id: { eq: id } } },
+        })),
+      }
+    } else {
+      input.supportedByValues = {
+        disconnect: [{ where: {} }],
+      }
+    }
+
+    if (data.supportedByGoals && data.supportedByGoals.length > 0) {
+      input.supportedByGoals = {
+        disconnect: [{ where: {} }],
+        connect: data.supportedByGoals.map(id => ({
+          where: { node: { id: { eq: id } } },
+        })),
+      }
+    } else {
+      input.supportedByGoals = {
         disconnect: [{ where: {} }],
       }
     }

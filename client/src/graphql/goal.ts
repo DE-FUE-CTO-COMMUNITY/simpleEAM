@@ -5,7 +5,7 @@ export const GET_GOALS = gql`
     geaGoals(where: $where) {
       id
       name
-      description
+      goalStatement
       createdAt
       updatedAt
       owners {
@@ -14,6 +14,18 @@ export const GET_GOALS = gql`
         lastName
       }
       company {
+        id
+        name
+      }
+      operationalizesVisions {
+        id
+        name
+      }
+      supportsValues {
+        id
+        name
+      }
+      achievedByStrategies {
         id
         name
       }
@@ -64,7 +76,7 @@ export const CREATE_GOAL = gql`
       geaGoals {
         id
         name
-        description
+        goalStatement
         createdAt
         updatedAt
       }
@@ -78,7 +90,7 @@ export const UPDATE_GOAL = gql`
       geaGoals {
         id
         name
-        description
+        goalStatement
         createdAt
         updatedAt
       }

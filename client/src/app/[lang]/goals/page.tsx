@@ -114,11 +114,38 @@ const GoalsPage = () => {
 
     const input: Record<string, any> = {
       name: data.name,
-      description: data.description,
+      goalStatement: data.goalStatement,
       ...(data.ownerId
         ? {
             owners: {
               connect: [{ where: { node: { id: { eq: data.ownerId } } } }],
+            },
+          }
+        : {}),
+      ...(data.operationalizesVisions && data.operationalizesVisions.length > 0
+        ? {
+            operationalizesVisions: {
+              connect: data.operationalizesVisions.map(id => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }
+        : {}),
+      ...(data.supportsValues && data.supportsValues.length > 0
+        ? {
+            supportsValues: {
+              connect: data.supportsValues.map(id => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }
+        : {}),
+      ...(data.achievedByStrategies && data.achievedByStrategies.length > 0
+        ? {
+            achievedByStrategies: {
+              connect: data.achievedByStrategies.map(id => ({
+                where: { node: { id: { eq: id } } },
+              })),
             },
           }
         : {}),
@@ -161,7 +188,7 @@ const GoalsPage = () => {
   const handleUpdateGoalSubmit = async (id: string, data: GoalFormValues) => {
     const input: Record<string, any> = {
       name: { set: data.name },
-      description: { set: data.description },
+      goalStatement: { set: data.goalStatement },
     }
 
     if (data.ownerId) {
@@ -171,6 +198,45 @@ const GoalsPage = () => {
       }
     } else {
       input.owners = {
+        disconnect: [{ where: {} }],
+      }
+    }
+
+    if (data.operationalizesVisions && data.operationalizesVisions.length > 0) {
+      input.operationalizesVisions = {
+        disconnect: [{ where: {} }],
+        connect: data.operationalizesVisions.map(id => ({
+          where: { node: { id: { eq: id } } },
+        })),
+      }
+    } else {
+      input.operationalizesVisions = {
+        disconnect: [{ where: {} }],
+      }
+    }
+
+    if (data.supportsValues && data.supportsValues.length > 0) {
+      input.supportsValues = {
+        disconnect: [{ where: {} }],
+        connect: data.supportsValues.map(id => ({
+          where: { node: { id: { eq: id } } },
+        })),
+      }
+    } else {
+      input.supportsValues = {
+        disconnect: [{ where: {} }],
+      }
+    }
+
+    if (data.achievedByStrategies && data.achievedByStrategies.length > 0) {
+      input.achievedByStrategies = {
+        disconnect: [{ where: {} }],
+        connect: data.achievedByStrategies.map(id => ({
+          where: { node: { id: { eq: id } } },
+        })),
+      }
+    } else {
+      input.achievedByStrategies = {
         disconnect: [{ where: {} }],
       }
     }

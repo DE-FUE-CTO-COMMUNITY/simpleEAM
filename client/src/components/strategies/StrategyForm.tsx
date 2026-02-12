@@ -8,13 +8,14 @@ import { useTranslations } from 'next-intl'
 import { GET_PERSONS } from '@/graphql/person'
 import { GET_ARCHITECTURES } from '@/graphql/architecture'
 import { GET_DIAGRAMS } from '@/graphql/diagram'
+import { GET_GOALS } from '@/graphql/goal'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import { useCurrentPerson } from '@/hooks/useCurrentPerson'
 import { useChipClickHandlers } from '@/hooks/useChipClickHandlers'
 import { isArchitect } from '@/lib/auth'
 import GenericForm, { FieldConfig, TabConfig, SelectOption } from '../common/GenericForm'
 import { GenericFormProps } from '../common/GenericFormProps'
-import { Gea_Strategy, Architecture } from '../../gql/generated'
+import { Gea_Strategy, Architecture, Gea_Goal } from '../../gql/generated'
 import ArchitectureForm from '../architectures/ArchitectureForm'
 
 const createStrategySchema = (t: any) =>
@@ -25,6 +26,7 @@ const createStrategySchema = (t: any) =>
       .min(10, t('validation.descriptionMin'))
       .max(1000, t('validation.descriptionMax')),
     ownerId: z.string().optional(),
+    achievesGoals: z.array(z.string()).optional(),
     partOfArchitectures: z.array(z.string()).optional(),
     depictedInDiagrams: z.array(z.string()).optional(),
   })
@@ -94,6 +96,10 @@ const StrategyForm: React.FC<GenericFormProps<Gea_Strategy, StrategyFormValues>>
     variables: { where: companyWhere },
   })
 
+  const { data: goalsData, loading: goalsLoading } = useQuery(GET_GOALS, {
+    variables: { where: companyWhere },
+  })
+
   const { data: nestedArchitectureData } = useQuery(GET_ARCHITECTURES, {
     variables: {
       where: { id: { eq: nestedFormState.entityId }, ...companyWhere },
@@ -109,6 +115,7 @@ const StrategyForm: React.FC<GenericFormProps<Gea_Strategy, StrategyFormValues>>
       description: strategy?.description || '',
       ownerId:
         strategy?.owners && strategy.owners.length > 0 ? strategy.owners[0].id : currentPerson?.id,
+      achievesGoals: strategy?.achievesGoals?.map(goal => goal.id) || [],
       partOfArchitectures: strategy?.partOfArchitectures?.map(arch => arch.id) || [],
       depictedInDiagrams: strategy?.depictedInDiagrams?.map(diag => diag.id) || [],
     }),
@@ -145,6 +152,7 @@ const StrategyForm: React.FC<GenericFormProps<Gea_Strategy, StrategyFormValues>>
           strategy?.owners && strategy.owners.length > 0
             ? strategy.owners[0].id
             : currentPerson?.id,
+        achievesGoals: strategy?.achievesGoals?.map(goal => goal.id) || [],
         partOfArchitectures: strategy?.partOfArchitectures?.map(arch => arch.id) || [],
         depictedInDiagrams: strategy?.depictedInDiagrams?.map(diag => diag.id) || [],
       })
@@ -186,6 +194,36 @@ const StrategyForm: React.FC<GenericFormProps<Gea_Strategy, StrategyFormValues>>
       size: { xs: 12, md: 6 },
       loadingOptions: personLoading,
       tabId: 'general',
+    },
+    {
+      name: 'achievesGoals',
+      label: tForm('achievesGoals'),
+      type: 'autocomplete',
+      multiple: true,
+      options:
+        goalsData?.geaGoals?.map(
+          (goal: Gea_Goal): SelectOption => ({
+            value: goal.id,
+            label: goal.name,
+          })
+        ) || [],
+      loadingOptions: goalsLoading,
+      size: 12,
+      tabId: 'relationships',
+      onChipClick: createChipClickHandler('achievesGoals'),
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          const matchingGoal = goalsData?.geaGoals?.find((goal: Gea_Goal) => goal.id === option)
+          return matchingGoal?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
     },
     {
       name: 'partOfArchitectures',
@@ -255,6 +293,7 @@ const StrategyForm: React.FC<GenericFormProps<Gea_Strategy, StrategyFormValues>>
 
   const tabs: TabConfig[] = [
     { id: 'general', label: tTabs('general') },
+    { id: 'relationships', label: tTabs('relationships') },
     { id: 'architectures', label: tTabs('architectures') },
   ]
 

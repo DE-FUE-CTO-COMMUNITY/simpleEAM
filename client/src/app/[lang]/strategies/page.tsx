@@ -129,6 +129,15 @@ const StrategiesPage = () => {
             },
           }
         : {}),
+      ...(data.achievesGoals && data.achievesGoals.length > 0
+        ? {
+            achievesGoals: {
+              connect: data.achievesGoals.map(id => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }
+        : {}),
       ...(data.partOfArchitectures && data.partOfArchitectures.length > 0
         ? {
             partOfArchitectures: {
@@ -204,6 +213,19 @@ const StrategiesPage = () => {
       }
     } else {
       input.depictedInDiagrams = {
+        disconnect: [{ where: {} }],
+      }
+    }
+
+    if (data.achievesGoals && data.achievesGoals.length > 0) {
+      input.achievesGoals = {
+        disconnect: [{ where: {} }],
+        connect: data.achievesGoals.map(id => ({
+          where: { node: { id: { eq: id } } },
+        })),
+      }
+    } else {
+      input.achievesGoals = {
         disconnect: [{ where: {} }],
       }
     }

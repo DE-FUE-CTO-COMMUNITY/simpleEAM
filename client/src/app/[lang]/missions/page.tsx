@@ -115,12 +115,31 @@ const MissionsPage = () => {
 
     const input: Record<string, any> = {
       name: data.name,
-      description: data.description,
+      purposeStatement: data.purposeStatement,
+      keywords: data.keywords,
       year: data.year.toISOString().split('T')[0],
       ...(data.ownerId
         ? {
             owners: {
               connect: [{ where: { node: { id: { eq: data.ownerId } } } }],
+            },
+          }
+        : {}),
+      ...(data.supportedByVisions && data.supportedByVisions.length > 0
+        ? {
+            supportedByVisions: {
+              connect: data.supportedByVisions.map(id => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }
+        : {}),
+      ...(data.supportedByValues && data.supportedByValues.length > 0
+        ? {
+            supportedByValues: {
+              connect: data.supportedByValues.map(id => ({
+                where: { node: { id: { eq: id } } },
+              })),
             },
           }
         : {}),
@@ -163,7 +182,8 @@ const MissionsPage = () => {
   const handleUpdateMissionSubmit = async (id: string, data: MissionFormValues) => {
     const input: Record<string, any> = {
       name: { set: data.name },
-      description: { set: data.description },
+      purposeStatement: { set: data.purposeStatement },
+      keywords: { set: data.keywords },
       year: { set: data.year.toISOString().split('T')[0] },
     }
 
@@ -174,6 +194,32 @@ const MissionsPage = () => {
       }
     } else {
       input.owners = {
+        disconnect: [{ where: {} }],
+      }
+    }
+
+    if (data.supportedByVisions && data.supportedByVisions.length > 0) {
+      input.supportedByVisions = {
+        disconnect: [{ where: {} }],
+        connect: data.supportedByVisions.map(id => ({
+          where: { node: { id: { eq: id } } },
+        })),
+      }
+    } else {
+      input.supportedByVisions = {
+        disconnect: [{ where: {} }],
+      }
+    }
+
+    if (data.supportedByValues && data.supportedByValues.length > 0) {
+      input.supportedByValues = {
+        disconnect: [{ where: {} }],
+        connect: data.supportedByValues.map(id => ({
+          where: { node: { id: { eq: id } } },
+        })),
+      }
+    } else {
+      input.supportedByValues = {
         disconnect: [{ where: {} }],
       }
     }

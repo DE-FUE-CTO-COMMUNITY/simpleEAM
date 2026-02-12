@@ -13,6 +13,7 @@ import usePersistentColumnVisibility from '../../hooks/usePersistentColumnVisibi
 export const STRATEGY_DEFAULT_COLUMN_VISIBILITY = {
   name: true,
   owners: true,
+  achievesGoals: false,
   partOfArchitectures: true,
   depictedInDiagrams: true,
   description: false,
@@ -96,6 +97,13 @@ const StrategyTable: React.FC<StrategyTableProps> = ({
           return owners && owners.length > 0 ? `${owners[0].firstName} ${owners[0].lastName}` : '-'
         },
       }),
+      columnHelper.accessor('achievesGoals', {
+        header: t('achievesGoals'),
+        cell: info => {
+          const goals = info.getValue()
+          return goals && goals.length > 0 ? goals.map(goal => goal.name).join(', ') : '-'
+        },
+      }),
       columnHelper.accessor('partOfArchitectures', {
         header: t('partOfArchitectures'),
         cell: info => {
@@ -138,6 +146,7 @@ const StrategyTable: React.FC<StrategyTableProps> = ({
     name: strategy.name,
     description: strategy.description ?? '',
     ownerId: strategy.owners?.[0]?.id ?? '',
+    achievesGoals: strategy.achievesGoals?.map(goal => goal.id) ?? [],
     partOfArchitectures: strategy.partOfArchitectures?.map(arch => arch.id) ?? [],
     depictedInDiagrams: strategy.depictedInDiagrams?.map(diagram => diagram.id) ?? [],
   })

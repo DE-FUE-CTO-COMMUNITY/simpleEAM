@@ -8,23 +8,27 @@ import { useTranslations } from 'next-intl'
 import { GET_PERSONS } from '@/graphql/person'
 import { GET_ARCHITECTURES } from '@/graphql/architecture'
 import { GET_DIAGRAMS } from '@/graphql/diagram'
+import { GET_MISSIONS } from '@/graphql/mission'
+import { GET_VISIONS } from '@/graphql/vision'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import { useCurrentPerson } from '@/hooks/useCurrentPerson'
 import { useChipClickHandlers } from '@/hooks/useChipClickHandlers'
 import { isArchitect } from '@/lib/auth'
 import GenericForm, { FieldConfig, TabConfig, SelectOption } from '../common/GenericForm'
 import { GenericFormProps } from '../common/GenericFormProps'
-import { Gea_Value, Architecture } from '../../gql/generated'
+import { Gea_Value, Architecture, Gea_Mission, Gea_Vision } from '../../gql/generated'
 import ArchitectureForm from '../architectures/ArchitectureForm'
 
 const createValueSchema = (t: any) =>
   z.object({
     name: z.string().min(3, t('validation.nameMin')).max(100, t('validation.nameMax')),
-    description: z
+    valueStatement: z
       .string()
-      .min(10, t('validation.descriptionMin'))
-      .max(1000, t('validation.descriptionMax')),
+      .min(10, t('validation.valueStatementMin'))
+      .max(1000, t('validation.valueStatementMax')),
     ownerId: z.string().optional(),
+    supportsMissions: z.array(z.string()).optional(),
+    supportsVisions: z.array(z.string()).optional(),
     partOfArchitectures: z.array(z.string()).optional(),
     depictedInDiagrams: z.array(z.string()).optional(),
   })
@@ -94,6 +98,14 @@ const ValueForm: React.FC<GenericFormProps<Gea_Value, ValueFormValues>> = ({
     variables: { where: companyWhere },
   })
 
+  const { data: missionsData, loading: missionsLoading } = useQuery(GET_MISSIONS, {
+    variables: { where: companyWhere },
+  })
+
+  const { data: visionsData, loading: visionsLoading } = useQuery(GET_VISIONS, {
+    variables: { where: companyWhere },
+  })
+
   const { data: nestedArchitectureData } = useQuery(GET_ARCHITECTURES, {
     variables: {
       where: { id: { eq: nestedFormState.entityId }, ...companyWhere },
@@ -106,8 +118,10 @@ const ValueForm: React.FC<GenericFormProps<Gea_Value, ValueFormValues>> = ({
   const defaultValues = React.useMemo<ValueFormValues>(
     () => ({
       name: value?.name || '',
-      description: value?.description || '',
+      valueStatement: value?.valueStatement || '',
       ownerId: value?.owners && value.owners.length > 0 ? value.owners[0].id : currentPerson?.id,
+      supportsMissions: value?.supportsMissions?.map(mission => mission.id) || [],
+      supportsVisions: value?.supportsVisions?.map(vision => vision.id) || [],
       partOfArchitectures: value?.partOfArchitectures?.map(arch => arch.id) || [],
       depictedInDiagrams: value?.depictedInDiagrams?.map(diag => diag.id) || [],
     }),
@@ -139,8 +153,10 @@ const ValueForm: React.FC<GenericFormProps<Gea_Value, ValueFormValues>> = ({
     if ((mode === 'view' || mode === 'edit') && value) {
       form.reset({
         name: value?.name || '',
-        description: value?.description || '',
+        valueStatement: value?.valueStatement || '',
         ownerId: value?.owners && value.owners.length > 0 ? value.owners[0].id : currentPerson?.id,
+        supportsMissions: value?.supportsMissions?.map(mission => mission.id) || [],
+        supportsVisions: value?.supportsVisions?.map(vision => vision.id) || [],
         partOfArchitectures: value?.partOfArchitectures?.map(arch => arch.id) || [],
         depictedInDiagrams: value?.depictedInDiagrams?.map(diag => diag.id) || [],
       })
@@ -158,11 +174,11 @@ const ValueForm: React.FC<GenericFormProps<Gea_Value, ValueFormValues>> = ({
       tabId: 'general',
     },
     {
-      name: 'description',
-      label: tForm('description'),
+      name: 'valueStatement',
+      label: tForm('valueStatement'),
       type: 'textarea',
       required: true,
-      validators: valueSchema.shape.description,
+      validators: valueSchema.shape.valueStatement,
       size: { xs: 12, md: 12 },
       tabId: 'general',
     },
@@ -182,6 +198,70 @@ const ValueForm: React.FC<GenericFormProps<Gea_Value, ValueFormValues>> = ({
       size: { xs: 12, md: 6 },
       loadingOptions: personLoading,
       tabId: 'general',
+    },
+    {
+      name: 'supportsMissions',
+      label: tForm('supportsMissions'),
+      type: 'autocomplete',
+      multiple: true,
+      options:
+        missionsData?.geaMissions?.map(
+          (mission: Gea_Mission): SelectOption => ({
+            value: mission.id,
+            label: mission.name,
+          })
+        ) || [],
+      loadingOptions: missionsLoading,
+      size: 12,
+      tabId: 'relationships',
+      onChipClick: createChipClickHandler('supportsMissions'),
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          const matchingMission = missionsData?.geaMissions?.find(
+            (mission: Gea_Mission) => mission.id === option
+          )
+          return matchingMission?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
+    },
+    {
+      name: 'supportsVisions',
+      label: tForm('supportsVisions'),
+      type: 'autocomplete',
+      multiple: true,
+      options:
+        visionsData?.geaVisions?.map(
+          (vision: Gea_Vision): SelectOption => ({
+            value: vision.id,
+            label: vision.name,
+          })
+        ) || [],
+      loadingOptions: visionsLoading,
+      size: 12,
+      tabId: 'relationships',
+      onChipClick: createChipClickHandler('supportsVisions'),
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          const matchingVision = visionsData?.geaVisions?.find(
+            (vision: Gea_Vision) => vision.id === option
+          )
+          return matchingVision?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
     },
     {
       name: 'partOfArchitectures',
@@ -251,6 +331,7 @@ const ValueForm: React.FC<GenericFormProps<Gea_Value, ValueFormValues>> = ({
 
   const tabs: TabConfig[] = [
     { id: 'general', label: tTabs('general') },
+    { id: 'relationships', label: tTabs('relationships') },
     { id: 'architectures', label: tTabs('architectures') },
   ]
 

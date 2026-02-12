@@ -7611,7 +7611,7 @@ export type ArchitectureContainsGeaGoalsNodeAggregationWhereInput = {
   NOT?: InputMaybe<ArchitectureContainsGeaGoalsNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<ArchitectureContainsGeaGoalsNodeAggregationWhereInput>>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
-  description?: InputMaybe<StringScalarAggregationFilters>;
+  goalStatement?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
@@ -7717,8 +7717,8 @@ export type ArchitectureContainsGeaMissionsNodeAggregationWhereInput = {
   NOT?: InputMaybe<ArchitectureContainsGeaMissionsNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<ArchitectureContainsGeaMissionsNodeAggregationWhereInput>>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
-  description?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  purposeStatement?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
@@ -7929,9 +7929,9 @@ export type ArchitectureContainsGeaValuesNodeAggregationWhereInput = {
   NOT?: InputMaybe<ArchitectureContainsGeaValuesNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<ArchitectureContainsGeaValuesNodeAggregationWhereInput>>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
-  description?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  valueStatement?: InputMaybe<StringScalarAggregationFilters>;
 };
 
 export type ArchitectureContainsGeaValuesRelationship = {
@@ -8035,9 +8035,10 @@ export type ArchitectureContainsGeaVisionsNodeAggregationWhereInput = {
   NOT?: InputMaybe<ArchitectureContainsGeaVisionsNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<ArchitectureContainsGeaVisionsNodeAggregationWhereInput>>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
-  description?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  timeHorizon?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  visionStatement?: InputMaybe<StringScalarAggregationFilters>;
 };
 
 export type ArchitectureContainsGeaVisionsRelationship = {
@@ -8526,7 +8527,7 @@ export type ArchitectureGea_GoalContainsGeaGoalsAggregateSelection = {
 export type ArchitectureGea_GoalContainsGeaGoalsNodeAggregateSelection = {
   __typename?: 'ArchitectureGEA_GoalContainsGEAGoalsNodeAggregateSelection';
   createdAt: DateTimeAggregateSelection;
-  description: StringAggregateSelection;
+  goalStatement: StringAggregateSelection;
   name: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
@@ -8540,8 +8541,8 @@ export type ArchitectureGea_MissionContainsGeaMissionsAggregateSelection = {
 export type ArchitectureGea_MissionContainsGeaMissionsNodeAggregateSelection = {
   __typename?: 'ArchitectureGEA_MissionContainsGEAMissionsNodeAggregateSelection';
   createdAt: DateTimeAggregateSelection;
-  description: StringAggregateSelection;
   name: StringAggregateSelection;
+  purposeStatement: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -8568,9 +8569,9 @@ export type ArchitectureGea_ValueContainsGeaValuesAggregateSelection = {
 export type ArchitectureGea_ValueContainsGeaValuesNodeAggregateSelection = {
   __typename?: 'ArchitectureGEA_ValueContainsGEAValuesNodeAggregateSelection';
   createdAt: DateTimeAggregateSelection;
-  description: StringAggregateSelection;
   name: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
+  valueStatement: StringAggregateSelection;
 };
 
 export type ArchitectureGea_VisionContainsGeaVisionsAggregateSelection = {
@@ -8582,9 +8583,10 @@ export type ArchitectureGea_VisionContainsGeaVisionsAggregateSelection = {
 export type ArchitectureGea_VisionContainsGeaVisionsNodeAggregateSelection = {
   __typename?: 'ArchitectureGEA_VisionContainsGEAVisionsNodeAggregateSelection';
   createdAt: DateTimeAggregateSelection;
-  description: StringAggregateSelection;
   name: StringAggregateSelection;
+  timeHorizon: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
+  visionStatement: StringAggregateSelection;
 };
 
 export type ArchitectureInfrastructureContainsInfrastructureAggregateSelection = {
@@ -12330,7 +12332,7 @@ export type CompanyGea_GoalOwnedGeaGoalsAggregateSelection = {
 export type CompanyGea_GoalOwnedGeaGoalsNodeAggregateSelection = {
   __typename?: 'CompanyGEA_GoalOwnedGEAGoalsNodeAggregateSelection';
   createdAt: DateTimeAggregateSelection;
-  description: StringAggregateSelection;
+  goalStatement: StringAggregateSelection;
   name: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
@@ -12344,8 +12346,8 @@ export type CompanyGea_MissionOwnedGeaMissionsAggregateSelection = {
 export type CompanyGea_MissionOwnedGeaMissionsNodeAggregateSelection = {
   __typename?: 'CompanyGEA_MissionOwnedGEAMissionsNodeAggregateSelection';
   createdAt: DateTimeAggregateSelection;
-  description: StringAggregateSelection;
   name: StringAggregateSelection;
+  purposeStatement: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -12372,9 +12374,9 @@ export type CompanyGea_ValueOwnedGeaValuesAggregateSelection = {
 export type CompanyGea_ValueOwnedGeaValuesNodeAggregateSelection = {
   __typename?: 'CompanyGEA_ValueOwnedGEAValuesNodeAggregateSelection';
   createdAt: DateTimeAggregateSelection;
-  description: StringAggregateSelection;
   name: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
+  valueStatement: StringAggregateSelection;
 };
 
 export type CompanyGea_VisionOwnedGeaVisionsAggregateSelection = {
@@ -12386,9 +12388,10 @@ export type CompanyGea_VisionOwnedGeaVisionsAggregateSelection = {
 export type CompanyGea_VisionOwnedGeaVisionsNodeAggregateSelection = {
   __typename?: 'CompanyGEA_VisionOwnedGEAVisionsNodeAggregateSelection';
   createdAt: DateTimeAggregateSelection;
-  description: StringAggregateSelection;
   name: StringAggregateSelection;
+  timeHorizon: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
+  visionStatement: StringAggregateSelection;
 };
 
 export type CompanyInfrastructureOwnedInfrastructureAggregateSelection = {
@@ -13380,7 +13383,7 @@ export type CompanyOwnedGeaGoalsNodeAggregationWhereInput = {
   NOT?: InputMaybe<CompanyOwnedGeaGoalsNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<CompanyOwnedGeaGoalsNodeAggregationWhereInput>>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
-  description?: InputMaybe<StringScalarAggregationFilters>;
+  goalStatement?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
@@ -13486,8 +13489,8 @@ export type CompanyOwnedGeaMissionsNodeAggregationWhereInput = {
   NOT?: InputMaybe<CompanyOwnedGeaMissionsNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<CompanyOwnedGeaMissionsNodeAggregationWhereInput>>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
-  description?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  purposeStatement?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
@@ -13698,9 +13701,9 @@ export type CompanyOwnedGeaValuesNodeAggregationWhereInput = {
   NOT?: InputMaybe<CompanyOwnedGeaValuesNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<CompanyOwnedGeaValuesNodeAggregationWhereInput>>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
-  description?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  valueStatement?: InputMaybe<StringScalarAggregationFilters>;
 };
 
 export type CompanyOwnedGeaValuesRelationship = {
@@ -13804,9 +13807,10 @@ export type CompanyOwnedGeaVisionsNodeAggregationWhereInput = {
   NOT?: InputMaybe<CompanyOwnedGeaVisionsNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<CompanyOwnedGeaVisionsNodeAggregationWhereInput>>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
-  description?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  timeHorizon?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  visionStatement?: InputMaybe<StringScalarAggregationFilters>;
 };
 
 export type CompanyOwnedGeaVisionsRelationship = {
@@ -17268,7 +17272,7 @@ export type DiagramContainsGeaGoalsNodeAggregationWhereInput = {
   NOT?: InputMaybe<DiagramContainsGeaGoalsNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<DiagramContainsGeaGoalsNodeAggregationWhereInput>>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
-  description?: InputMaybe<StringScalarAggregationFilters>;
+  goalStatement?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
@@ -17374,8 +17378,8 @@ export type DiagramContainsGeaMissionsNodeAggregationWhereInput = {
   NOT?: InputMaybe<DiagramContainsGeaMissionsNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<DiagramContainsGeaMissionsNodeAggregationWhereInput>>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
-  description?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  purposeStatement?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
@@ -17586,9 +17590,9 @@ export type DiagramContainsGeaValuesNodeAggregationWhereInput = {
   NOT?: InputMaybe<DiagramContainsGeaValuesNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<DiagramContainsGeaValuesNodeAggregationWhereInput>>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
-  description?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  valueStatement?: InputMaybe<StringScalarAggregationFilters>;
 };
 
 export type DiagramContainsGeaValuesRelationship = {
@@ -17692,9 +17696,10 @@ export type DiagramContainsGeaVisionsNodeAggregationWhereInput = {
   NOT?: InputMaybe<DiagramContainsGeaVisionsNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<DiagramContainsGeaVisionsNodeAggregationWhereInput>>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
-  description?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  timeHorizon?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  visionStatement?: InputMaybe<StringScalarAggregationFilters>;
 };
 
 export type DiagramContainsGeaVisionsRelationship = {
@@ -18137,7 +18142,7 @@ export type DiagramGea_GoalContainsGeaGoalsAggregateSelection = {
 export type DiagramGea_GoalContainsGeaGoalsNodeAggregateSelection = {
   __typename?: 'DiagramGEA_GoalContainsGEAGoalsNodeAggregateSelection';
   createdAt: DateTimeAggregateSelection;
-  description: StringAggregateSelection;
+  goalStatement: StringAggregateSelection;
   name: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
@@ -18151,8 +18156,8 @@ export type DiagramGea_MissionContainsGeaMissionsAggregateSelection = {
 export type DiagramGea_MissionContainsGeaMissionsNodeAggregateSelection = {
   __typename?: 'DiagramGEA_MissionContainsGEAMissionsNodeAggregateSelection';
   createdAt: DateTimeAggregateSelection;
-  description: StringAggregateSelection;
   name: StringAggregateSelection;
+  purposeStatement: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -18179,9 +18184,9 @@ export type DiagramGea_ValueContainsGeaValuesAggregateSelection = {
 export type DiagramGea_ValueContainsGeaValuesNodeAggregateSelection = {
   __typename?: 'DiagramGEA_ValueContainsGEAValuesNodeAggregateSelection';
   createdAt: DateTimeAggregateSelection;
-  description: StringAggregateSelection;
   name: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
+  valueStatement: StringAggregateSelection;
 };
 
 export type DiagramGea_VisionContainsGeaVisionsAggregateSelection = {
@@ -18193,9 +18198,10 @@ export type DiagramGea_VisionContainsGeaVisionsAggregateSelection = {
 export type DiagramGea_VisionContainsGeaVisionsNodeAggregateSelection = {
   __typename?: 'DiagramGEA_VisionContainsGEAVisionsNodeAggregateSelection';
   createdAt: DateTimeAggregateSelection;
-  description: StringAggregateSelection;
   name: StringAggregateSelection;
+  timeHorizon: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
+  visionStatement: StringAggregateSelection;
 };
 
 export type DiagramInfrastructureContainsInfrastructureAggregateSelection = {
@@ -18402,19 +18408,43 @@ export type FloatScalarMutations = {
 /** GEA_Goal – represents a goal within General Enterprise Architecture */
 export type Gea_Goal = {
   __typename?: 'GEA_Goal';
+  achievedByStrategies: Array<Gea_Strategy>;
+  achievedByStrategiesConnection: Gea_GoalAchievedByStrategiesConnection;
   company: Array<Company>;
   companyConnection: Gea_GoalCompanyConnection;
   createdAt: Scalars['DateTime']['output'];
   depictedInDiagrams: Array<Diagram>;
   depictedInDiagramsConnection: Gea_GoalDepictedInDiagramsConnection;
-  description?: Maybe<Scalars['String']['output']>;
+  goalStatement?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
+  operationalizesVisions: Array<Gea_Vision>;
+  operationalizesVisionsConnection: Gea_GoalOperationalizesVisionsConnection;
   owners: Array<Person>;
   ownersConnection: Gea_GoalOwnersConnection;
   partOfArchitectures: Array<Architecture>;
   partOfArchitecturesConnection: Gea_GoalPartOfArchitecturesConnection;
+  supportsValues: Array<Gea_Value>;
+  supportsValuesConnection: Gea_GoalSupportsValuesConnection;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
+};
+
+
+/** GEA_Goal – represents a goal within General Enterprise Architecture */
+export type Gea_GoalAchievedByStrategiesArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<Gea_StrategySort>>;
+  where?: InputMaybe<Gea_StrategyWhere>;
+};
+
+
+/** GEA_Goal – represents a goal within General Enterprise Architecture */
+export type Gea_GoalAchievedByStrategiesConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<Gea_GoalAchievedByStrategiesConnectionSort>>;
+  where?: InputMaybe<Gea_GoalAchievedByStrategiesConnectionWhere>;
 };
 
 
@@ -18455,6 +18485,24 @@ export type Gea_GoalDepictedInDiagramsConnectionArgs = {
 
 
 /** GEA_Goal – represents a goal within General Enterprise Architecture */
+export type Gea_GoalOperationalizesVisionsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<Gea_VisionSort>>;
+  where?: InputMaybe<Gea_VisionWhere>;
+};
+
+
+/** GEA_Goal – represents a goal within General Enterprise Architecture */
+export type Gea_GoalOperationalizesVisionsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<Gea_GoalOperationalizesVisionsConnectionSort>>;
+  where?: InputMaybe<Gea_GoalOperationalizesVisionsConnectionWhere>;
+};
+
+
+/** GEA_Goal – represents a goal within General Enterprise Architecture */
 export type Gea_GoalOwnersArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -18489,6 +18537,130 @@ export type Gea_GoalPartOfArchitecturesConnectionArgs = {
   where?: InputMaybe<Gea_GoalPartOfArchitecturesConnectionWhere>;
 };
 
+
+/** GEA_Goal – represents a goal within General Enterprise Architecture */
+export type Gea_GoalSupportsValuesArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<Gea_ValueSort>>;
+  where?: InputMaybe<Gea_ValueWhere>;
+};
+
+
+/** GEA_Goal – represents a goal within General Enterprise Architecture */
+export type Gea_GoalSupportsValuesConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<Gea_GoalSupportsValuesConnectionSort>>;
+  where?: InputMaybe<Gea_GoalSupportsValuesConnectionWhere>;
+};
+
+export type Gea_GoalAchievedByStrategiesAggregateInput = {
+  AND?: InputMaybe<Array<Gea_GoalAchievedByStrategiesAggregateInput>>;
+  NOT?: InputMaybe<Gea_GoalAchievedByStrategiesAggregateInput>;
+  OR?: InputMaybe<Array<Gea_GoalAchievedByStrategiesAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<Gea_GoalAchievedByStrategiesNodeAggregationWhereInput>;
+};
+
+export type Gea_GoalAchievedByStrategiesConnectFieldInput = {
+  connect?: InputMaybe<Array<Gea_StrategyConnectInput>>;
+  where?: InputMaybe<Gea_StrategyConnectWhere>;
+};
+
+export type Gea_GoalAchievedByStrategiesConnection = {
+  __typename?: 'GEA_GoalAchievedByStrategiesConnection';
+  aggregate: Gea_GoalGea_StrategyAchievedByStrategiesAggregateSelection;
+  edges: Array<Gea_GoalAchievedByStrategiesRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type Gea_GoalAchievedByStrategiesConnectionAggregateInput = {
+  AND?: InputMaybe<Array<Gea_GoalAchievedByStrategiesConnectionAggregateInput>>;
+  NOT?: InputMaybe<Gea_GoalAchievedByStrategiesConnectionAggregateInput>;
+  OR?: InputMaybe<Array<Gea_GoalAchievedByStrategiesConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<Gea_GoalAchievedByStrategiesNodeAggregationWhereInput>;
+};
+
+export type Gea_GoalAchievedByStrategiesConnectionFilters = {
+  /** Filter GEA_Goals by aggregating results on related GEA_GoalAchievedByStrategiesConnections */
+  aggregate?: InputMaybe<Gea_GoalAchievedByStrategiesConnectionAggregateInput>;
+  /** Return GEA_Goals where all of the related GEA_GoalAchievedByStrategiesConnections match this filter */
+  all?: InputMaybe<Gea_GoalAchievedByStrategiesConnectionWhere>;
+  /** Return GEA_Goals where none of the related GEA_GoalAchievedByStrategiesConnections match this filter */
+  none?: InputMaybe<Gea_GoalAchievedByStrategiesConnectionWhere>;
+  /** Return GEA_Goals where one of the related GEA_GoalAchievedByStrategiesConnections match this filter */
+  single?: InputMaybe<Gea_GoalAchievedByStrategiesConnectionWhere>;
+  /** Return GEA_Goals where some of the related GEA_GoalAchievedByStrategiesConnections match this filter */
+  some?: InputMaybe<Gea_GoalAchievedByStrategiesConnectionWhere>;
+};
+
+export type Gea_GoalAchievedByStrategiesConnectionSort = {
+  node?: InputMaybe<Gea_StrategySort>;
+};
+
+export type Gea_GoalAchievedByStrategiesConnectionWhere = {
+  AND?: InputMaybe<Array<Gea_GoalAchievedByStrategiesConnectionWhere>>;
+  NOT?: InputMaybe<Gea_GoalAchievedByStrategiesConnectionWhere>;
+  OR?: InputMaybe<Array<Gea_GoalAchievedByStrategiesConnectionWhere>>;
+  node?: InputMaybe<Gea_StrategyWhere>;
+};
+
+export type Gea_GoalAchievedByStrategiesCreateFieldInput = {
+  node: Gea_StrategyCreateInput;
+};
+
+export type Gea_GoalAchievedByStrategiesDeleteFieldInput = {
+  delete?: InputMaybe<Gea_StrategyDeleteInput>;
+  where?: InputMaybe<Gea_GoalAchievedByStrategiesConnectionWhere>;
+};
+
+export type Gea_GoalAchievedByStrategiesDisconnectFieldInput = {
+  disconnect?: InputMaybe<Gea_StrategyDisconnectInput>;
+  where?: InputMaybe<Gea_GoalAchievedByStrategiesConnectionWhere>;
+};
+
+export type Gea_GoalAchievedByStrategiesFieldInput = {
+  connect?: InputMaybe<Array<Gea_GoalAchievedByStrategiesConnectFieldInput>>;
+  create?: InputMaybe<Array<Gea_GoalAchievedByStrategiesCreateFieldInput>>;
+};
+
+export type Gea_GoalAchievedByStrategiesNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<Gea_GoalAchievedByStrategiesNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<Gea_GoalAchievedByStrategiesNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<Gea_GoalAchievedByStrategiesNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type Gea_GoalAchievedByStrategiesRelationship = {
+  __typename?: 'GEA_GoalAchievedByStrategiesRelationship';
+  cursor: Scalars['String']['output'];
+  node: Gea_Strategy;
+};
+
+export type Gea_GoalAchievedByStrategiesUpdateConnectionInput = {
+  node?: InputMaybe<Gea_StrategyUpdateInput>;
+  where?: InputMaybe<Gea_GoalAchievedByStrategiesConnectionWhere>;
+};
+
+export type Gea_GoalAchievedByStrategiesUpdateFieldInput = {
+  connect?: InputMaybe<Array<Gea_GoalAchievedByStrategiesConnectFieldInput>>;
+  create?: InputMaybe<Array<Gea_GoalAchievedByStrategiesCreateFieldInput>>;
+  delete?: InputMaybe<Array<Gea_GoalAchievedByStrategiesDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<Gea_GoalAchievedByStrategiesDisconnectFieldInput>>;
+  update?: InputMaybe<Gea_GoalAchievedByStrategiesUpdateConnectionInput>;
+};
+
 export type Gea_GoalAggregate = {
   __typename?: 'GEA_GoalAggregate';
   count: Count;
@@ -18498,7 +18670,7 @@ export type Gea_GoalAggregate = {
 export type Gea_GoalAggregateNode = {
   __typename?: 'GEA_GoalAggregateNode';
   createdAt: DateTimeAggregateSelection;
-  description: StringAggregateSelection;
+  goalStatement: StringAggregateSelection;
   name: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
@@ -18657,10 +18829,13 @@ export type Gea_GoalCompanyUpdateFieldInput = {
 };
 
 export type Gea_GoalConnectInput = {
+  achievedByStrategies?: InputMaybe<Array<Gea_GoalAchievedByStrategiesConnectFieldInput>>;
   company?: InputMaybe<Array<Gea_GoalCompanyConnectFieldInput>>;
   depictedInDiagrams?: InputMaybe<Array<Gea_GoalDepictedInDiagramsConnectFieldInput>>;
+  operationalizesVisions?: InputMaybe<Array<Gea_GoalOperationalizesVisionsConnectFieldInput>>;
   owners?: InputMaybe<Array<Gea_GoalOwnersConnectFieldInput>>;
   partOfArchitectures?: InputMaybe<Array<Gea_GoalPartOfArchitecturesConnectFieldInput>>;
+  supportsValues?: InputMaybe<Array<Gea_GoalSupportsValuesConnectFieldInput>>;
 };
 
 export type Gea_GoalConnectWhere = {
@@ -18668,20 +18843,26 @@ export type Gea_GoalConnectWhere = {
 };
 
 export type Gea_GoalCreateInput = {
+  achievedByStrategies?: InputMaybe<Gea_GoalAchievedByStrategiesFieldInput>;
   company?: InputMaybe<Gea_GoalCompanyFieldInput>;
   depictedInDiagrams?: InputMaybe<Gea_GoalDepictedInDiagramsFieldInput>;
-  description?: InputMaybe<Scalars['String']['input']>;
+  goalStatement?: InputMaybe<Scalars['String']['input']>;
   name: Scalars['String']['input'];
+  operationalizesVisions?: InputMaybe<Gea_GoalOperationalizesVisionsFieldInput>;
   owners?: InputMaybe<Gea_GoalOwnersFieldInput>;
   partOfArchitectures?: InputMaybe<Gea_GoalPartOfArchitecturesFieldInput>;
+  supportsValues?: InputMaybe<Gea_GoalSupportsValuesFieldInput>;
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 export type Gea_GoalDeleteInput = {
+  achievedByStrategies?: InputMaybe<Array<Gea_GoalAchievedByStrategiesDeleteFieldInput>>;
   company?: InputMaybe<Array<Gea_GoalCompanyDeleteFieldInput>>;
   depictedInDiagrams?: InputMaybe<Array<Gea_GoalDepictedInDiagramsDeleteFieldInput>>;
+  operationalizesVisions?: InputMaybe<Array<Gea_GoalOperationalizesVisionsDeleteFieldInput>>;
   owners?: InputMaybe<Array<Gea_GoalOwnersDeleteFieldInput>>;
   partOfArchitectures?: InputMaybe<Array<Gea_GoalPartOfArchitecturesDeleteFieldInput>>;
+  supportsValues?: InputMaybe<Array<Gea_GoalSupportsValuesDeleteFieldInput>>;
 };
 
 export type Gea_GoalDepictedInDiagramsAggregateInput = {
@@ -18811,16 +18992,169 @@ export type Gea_GoalDiagramDepictedInDiagramsNodeAggregateSelection = {
 };
 
 export type Gea_GoalDisconnectInput = {
+  achievedByStrategies?: InputMaybe<Array<Gea_GoalAchievedByStrategiesDisconnectFieldInput>>;
   company?: InputMaybe<Array<Gea_GoalCompanyDisconnectFieldInput>>;
   depictedInDiagrams?: InputMaybe<Array<Gea_GoalDepictedInDiagramsDisconnectFieldInput>>;
+  operationalizesVisions?: InputMaybe<Array<Gea_GoalOperationalizesVisionsDisconnectFieldInput>>;
   owners?: InputMaybe<Array<Gea_GoalOwnersDisconnectFieldInput>>;
   partOfArchitectures?: InputMaybe<Array<Gea_GoalPartOfArchitecturesDisconnectFieldInput>>;
+  supportsValues?: InputMaybe<Array<Gea_GoalSupportsValuesDisconnectFieldInput>>;
 };
 
 export type Gea_GoalEdge = {
   __typename?: 'GEA_GoalEdge';
   cursor: Scalars['String']['output'];
   node: Gea_Goal;
+};
+
+export type Gea_GoalGea_StrategyAchievedByStrategiesAggregateSelection = {
+  __typename?: 'GEA_GoalGEA_StrategyAchievedByStrategiesAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<Gea_GoalGea_StrategyAchievedByStrategiesNodeAggregateSelection>;
+};
+
+export type Gea_GoalGea_StrategyAchievedByStrategiesNodeAggregateSelection = {
+  __typename?: 'GEA_GoalGEA_StrategyAchievedByStrategiesNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  name: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
+export type Gea_GoalGea_ValueSupportsValuesAggregateSelection = {
+  __typename?: 'GEA_GoalGEA_ValueSupportsValuesAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<Gea_GoalGea_ValueSupportsValuesNodeAggregateSelection>;
+};
+
+export type Gea_GoalGea_ValueSupportsValuesNodeAggregateSelection = {
+  __typename?: 'GEA_GoalGEA_ValueSupportsValuesNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  name: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  valueStatement: StringAggregateSelection;
+};
+
+export type Gea_GoalGea_VisionOperationalizesVisionsAggregateSelection = {
+  __typename?: 'GEA_GoalGEA_VisionOperationalizesVisionsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<Gea_GoalGea_VisionOperationalizesVisionsNodeAggregateSelection>;
+};
+
+export type Gea_GoalGea_VisionOperationalizesVisionsNodeAggregateSelection = {
+  __typename?: 'GEA_GoalGEA_VisionOperationalizesVisionsNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  name: StringAggregateSelection;
+  timeHorizon: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  visionStatement: StringAggregateSelection;
+};
+
+export type Gea_GoalOperationalizesVisionsAggregateInput = {
+  AND?: InputMaybe<Array<Gea_GoalOperationalizesVisionsAggregateInput>>;
+  NOT?: InputMaybe<Gea_GoalOperationalizesVisionsAggregateInput>;
+  OR?: InputMaybe<Array<Gea_GoalOperationalizesVisionsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<Gea_GoalOperationalizesVisionsNodeAggregationWhereInput>;
+};
+
+export type Gea_GoalOperationalizesVisionsConnectFieldInput = {
+  connect?: InputMaybe<Array<Gea_VisionConnectInput>>;
+  where?: InputMaybe<Gea_VisionConnectWhere>;
+};
+
+export type Gea_GoalOperationalizesVisionsConnection = {
+  __typename?: 'GEA_GoalOperationalizesVisionsConnection';
+  aggregate: Gea_GoalGea_VisionOperationalizesVisionsAggregateSelection;
+  edges: Array<Gea_GoalOperationalizesVisionsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type Gea_GoalOperationalizesVisionsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<Gea_GoalOperationalizesVisionsConnectionAggregateInput>>;
+  NOT?: InputMaybe<Gea_GoalOperationalizesVisionsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<Gea_GoalOperationalizesVisionsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<Gea_GoalOperationalizesVisionsNodeAggregationWhereInput>;
+};
+
+export type Gea_GoalOperationalizesVisionsConnectionFilters = {
+  /** Filter GEA_Goals by aggregating results on related GEA_GoalOperationalizesVisionsConnections */
+  aggregate?: InputMaybe<Gea_GoalOperationalizesVisionsConnectionAggregateInput>;
+  /** Return GEA_Goals where all of the related GEA_GoalOperationalizesVisionsConnections match this filter */
+  all?: InputMaybe<Gea_GoalOperationalizesVisionsConnectionWhere>;
+  /** Return GEA_Goals where none of the related GEA_GoalOperationalizesVisionsConnections match this filter */
+  none?: InputMaybe<Gea_GoalOperationalizesVisionsConnectionWhere>;
+  /** Return GEA_Goals where one of the related GEA_GoalOperationalizesVisionsConnections match this filter */
+  single?: InputMaybe<Gea_GoalOperationalizesVisionsConnectionWhere>;
+  /** Return GEA_Goals where some of the related GEA_GoalOperationalizesVisionsConnections match this filter */
+  some?: InputMaybe<Gea_GoalOperationalizesVisionsConnectionWhere>;
+};
+
+export type Gea_GoalOperationalizesVisionsConnectionSort = {
+  node?: InputMaybe<Gea_VisionSort>;
+};
+
+export type Gea_GoalOperationalizesVisionsConnectionWhere = {
+  AND?: InputMaybe<Array<Gea_GoalOperationalizesVisionsConnectionWhere>>;
+  NOT?: InputMaybe<Gea_GoalOperationalizesVisionsConnectionWhere>;
+  OR?: InputMaybe<Array<Gea_GoalOperationalizesVisionsConnectionWhere>>;
+  node?: InputMaybe<Gea_VisionWhere>;
+};
+
+export type Gea_GoalOperationalizesVisionsCreateFieldInput = {
+  node: Gea_VisionCreateInput;
+};
+
+export type Gea_GoalOperationalizesVisionsDeleteFieldInput = {
+  delete?: InputMaybe<Gea_VisionDeleteInput>;
+  where?: InputMaybe<Gea_GoalOperationalizesVisionsConnectionWhere>;
+};
+
+export type Gea_GoalOperationalizesVisionsDisconnectFieldInput = {
+  disconnect?: InputMaybe<Gea_VisionDisconnectInput>;
+  where?: InputMaybe<Gea_GoalOperationalizesVisionsConnectionWhere>;
+};
+
+export type Gea_GoalOperationalizesVisionsFieldInput = {
+  connect?: InputMaybe<Array<Gea_GoalOperationalizesVisionsConnectFieldInput>>;
+  create?: InputMaybe<Array<Gea_GoalOperationalizesVisionsCreateFieldInput>>;
+};
+
+export type Gea_GoalOperationalizesVisionsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<Gea_GoalOperationalizesVisionsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<Gea_GoalOperationalizesVisionsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<Gea_GoalOperationalizesVisionsNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  timeHorizon?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  visionStatement?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type Gea_GoalOperationalizesVisionsRelationship = {
+  __typename?: 'GEA_GoalOperationalizesVisionsRelationship';
+  cursor: Scalars['String']['output'];
+  node: Gea_Vision;
+};
+
+export type Gea_GoalOperationalizesVisionsUpdateConnectionInput = {
+  node?: InputMaybe<Gea_VisionUpdateInput>;
+  where?: InputMaybe<Gea_GoalOperationalizesVisionsConnectionWhere>;
+};
+
+export type Gea_GoalOperationalizesVisionsUpdateFieldInput = {
+  connect?: InputMaybe<Array<Gea_GoalOperationalizesVisionsConnectFieldInput>>;
+  create?: InputMaybe<Array<Gea_GoalOperationalizesVisionsCreateFieldInput>>;
+  delete?: InputMaybe<Array<Gea_GoalOperationalizesVisionsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<Gea_GoalOperationalizesVisionsDisconnectFieldInput>>;
+  update?: InputMaybe<Gea_GoalOperationalizesVisionsUpdateConnectionInput>;
 };
 
 export type Gea_GoalOwnersAggregateInput = {
@@ -19074,38 +19408,153 @@ export type Gea_GoalRelationshipFilters = {
 /** Fields to sort GeaGoals by. The order in which sorts are applied is not guaranteed when specifying many fields in one GEA_GoalSort object. */
 export type Gea_GoalSort = {
   createdAt?: InputMaybe<SortDirection>;
-  description?: InputMaybe<SortDirection>;
+  goalStatement?: InputMaybe<SortDirection>;
   id?: InputMaybe<SortDirection>;
   name?: InputMaybe<SortDirection>;
   updatedAt?: InputMaybe<SortDirection>;
 };
 
+export type Gea_GoalSupportsValuesAggregateInput = {
+  AND?: InputMaybe<Array<Gea_GoalSupportsValuesAggregateInput>>;
+  NOT?: InputMaybe<Gea_GoalSupportsValuesAggregateInput>;
+  OR?: InputMaybe<Array<Gea_GoalSupportsValuesAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<Gea_GoalSupportsValuesNodeAggregationWhereInput>;
+};
+
+export type Gea_GoalSupportsValuesConnectFieldInput = {
+  connect?: InputMaybe<Array<Gea_ValueConnectInput>>;
+  where?: InputMaybe<Gea_ValueConnectWhere>;
+};
+
+export type Gea_GoalSupportsValuesConnection = {
+  __typename?: 'GEA_GoalSupportsValuesConnection';
+  aggregate: Gea_GoalGea_ValueSupportsValuesAggregateSelection;
+  edges: Array<Gea_GoalSupportsValuesRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type Gea_GoalSupportsValuesConnectionAggregateInput = {
+  AND?: InputMaybe<Array<Gea_GoalSupportsValuesConnectionAggregateInput>>;
+  NOT?: InputMaybe<Gea_GoalSupportsValuesConnectionAggregateInput>;
+  OR?: InputMaybe<Array<Gea_GoalSupportsValuesConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<Gea_GoalSupportsValuesNodeAggregationWhereInput>;
+};
+
+export type Gea_GoalSupportsValuesConnectionFilters = {
+  /** Filter GEA_Goals by aggregating results on related GEA_GoalSupportsValuesConnections */
+  aggregate?: InputMaybe<Gea_GoalSupportsValuesConnectionAggregateInput>;
+  /** Return GEA_Goals where all of the related GEA_GoalSupportsValuesConnections match this filter */
+  all?: InputMaybe<Gea_GoalSupportsValuesConnectionWhere>;
+  /** Return GEA_Goals where none of the related GEA_GoalSupportsValuesConnections match this filter */
+  none?: InputMaybe<Gea_GoalSupportsValuesConnectionWhere>;
+  /** Return GEA_Goals where one of the related GEA_GoalSupportsValuesConnections match this filter */
+  single?: InputMaybe<Gea_GoalSupportsValuesConnectionWhere>;
+  /** Return GEA_Goals where some of the related GEA_GoalSupportsValuesConnections match this filter */
+  some?: InputMaybe<Gea_GoalSupportsValuesConnectionWhere>;
+};
+
+export type Gea_GoalSupportsValuesConnectionSort = {
+  node?: InputMaybe<Gea_ValueSort>;
+};
+
+export type Gea_GoalSupportsValuesConnectionWhere = {
+  AND?: InputMaybe<Array<Gea_GoalSupportsValuesConnectionWhere>>;
+  NOT?: InputMaybe<Gea_GoalSupportsValuesConnectionWhere>;
+  OR?: InputMaybe<Array<Gea_GoalSupportsValuesConnectionWhere>>;
+  node?: InputMaybe<Gea_ValueWhere>;
+};
+
+export type Gea_GoalSupportsValuesCreateFieldInput = {
+  node: Gea_ValueCreateInput;
+};
+
+export type Gea_GoalSupportsValuesDeleteFieldInput = {
+  delete?: InputMaybe<Gea_ValueDeleteInput>;
+  where?: InputMaybe<Gea_GoalSupportsValuesConnectionWhere>;
+};
+
+export type Gea_GoalSupportsValuesDisconnectFieldInput = {
+  disconnect?: InputMaybe<Gea_ValueDisconnectInput>;
+  where?: InputMaybe<Gea_GoalSupportsValuesConnectionWhere>;
+};
+
+export type Gea_GoalSupportsValuesFieldInput = {
+  connect?: InputMaybe<Array<Gea_GoalSupportsValuesConnectFieldInput>>;
+  create?: InputMaybe<Array<Gea_GoalSupportsValuesCreateFieldInput>>;
+};
+
+export type Gea_GoalSupportsValuesNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<Gea_GoalSupportsValuesNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<Gea_GoalSupportsValuesNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<Gea_GoalSupportsValuesNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  valueStatement?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type Gea_GoalSupportsValuesRelationship = {
+  __typename?: 'GEA_GoalSupportsValuesRelationship';
+  cursor: Scalars['String']['output'];
+  node: Gea_Value;
+};
+
+export type Gea_GoalSupportsValuesUpdateConnectionInput = {
+  node?: InputMaybe<Gea_ValueUpdateInput>;
+  where?: InputMaybe<Gea_GoalSupportsValuesConnectionWhere>;
+};
+
+export type Gea_GoalSupportsValuesUpdateFieldInput = {
+  connect?: InputMaybe<Array<Gea_GoalSupportsValuesConnectFieldInput>>;
+  create?: InputMaybe<Array<Gea_GoalSupportsValuesCreateFieldInput>>;
+  delete?: InputMaybe<Array<Gea_GoalSupportsValuesDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<Gea_GoalSupportsValuesDisconnectFieldInput>>;
+  update?: InputMaybe<Gea_GoalSupportsValuesUpdateConnectionInput>;
+};
+
 export type Gea_GoalUpdateInput = {
+  achievedByStrategies?: InputMaybe<Array<Gea_GoalAchievedByStrategiesUpdateFieldInput>>;
   company?: InputMaybe<Array<Gea_GoalCompanyUpdateFieldInput>>;
   createdAt?: InputMaybe<DateTimeScalarMutations>;
   depictedInDiagrams?: InputMaybe<Array<Gea_GoalDepictedInDiagramsUpdateFieldInput>>;
-  description?: InputMaybe<StringScalarMutations>;
+  goalStatement?: InputMaybe<StringScalarMutations>;
   name?: InputMaybe<StringScalarMutations>;
+  operationalizesVisions?: InputMaybe<Array<Gea_GoalOperationalizesVisionsUpdateFieldInput>>;
   owners?: InputMaybe<Array<Gea_GoalOwnersUpdateFieldInput>>;
   partOfArchitectures?: InputMaybe<Array<Gea_GoalPartOfArchitecturesUpdateFieldInput>>;
+  supportsValues?: InputMaybe<Array<Gea_GoalSupportsValuesUpdateFieldInput>>;
 };
 
 export type Gea_GoalWhere = {
   AND?: InputMaybe<Array<Gea_GoalWhere>>;
   NOT?: InputMaybe<Gea_GoalWhere>;
   OR?: InputMaybe<Array<Gea_GoalWhere>>;
+  achievedByStrategies?: InputMaybe<Gea_StrategyRelationshipFilters>;
+  achievedByStrategiesConnection?: InputMaybe<Gea_GoalAchievedByStrategiesConnectionFilters>;
   company?: InputMaybe<CompanyRelationshipFilters>;
   companyConnection?: InputMaybe<Gea_GoalCompanyConnectionFilters>;
   createdAt?: InputMaybe<DateTimeScalarFilters>;
   depictedInDiagrams?: InputMaybe<DiagramRelationshipFilters>;
   depictedInDiagramsConnection?: InputMaybe<Gea_GoalDepictedInDiagramsConnectionFilters>;
-  description?: InputMaybe<StringScalarFilters>;
+  goalStatement?: InputMaybe<StringScalarFilters>;
   id?: InputMaybe<IdScalarFilters>;
   name?: InputMaybe<StringScalarFilters>;
+  operationalizesVisions?: InputMaybe<Gea_VisionRelationshipFilters>;
+  operationalizesVisionsConnection?: InputMaybe<Gea_GoalOperationalizesVisionsConnectionFilters>;
   owners?: InputMaybe<PersonRelationshipFilters>;
   ownersConnection?: InputMaybe<Gea_GoalOwnersConnectionFilters>;
   partOfArchitectures?: InputMaybe<ArchitectureRelationshipFilters>;
   partOfArchitecturesConnection?: InputMaybe<Gea_GoalPartOfArchitecturesConnectionFilters>;
+  supportsValues?: InputMaybe<Gea_ValueRelationshipFilters>;
+  supportsValuesConnection?: InputMaybe<Gea_GoalSupportsValuesConnectionFilters>;
   updatedAt?: InputMaybe<DateTimeScalarFilters>;
 };
 
@@ -19117,13 +19566,18 @@ export type Gea_Mission = {
   createdAt: Scalars['DateTime']['output'];
   depictedInDiagrams: Array<Diagram>;
   depictedInDiagramsConnection: Gea_MissionDepictedInDiagramsConnection;
-  description?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
+  keywords?: Maybe<Array<Scalars['String']['output']>>;
   name: Scalars['String']['output'];
   owners: Array<Person>;
   ownersConnection: Gea_MissionOwnersConnection;
   partOfArchitectures: Array<Architecture>;
   partOfArchitecturesConnection: Gea_MissionPartOfArchitecturesConnection;
+  purposeStatement?: Maybe<Scalars['String']['output']>;
+  supportedByValues: Array<Gea_Value>;
+  supportedByValuesConnection: Gea_MissionSupportedByValuesConnection;
+  supportedByVisions: Array<Gea_Vision>;
+  supportedByVisionsConnection: Gea_MissionSupportedByVisionsConnection;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
   year: Scalars['Date']['output'];
 };
@@ -19200,6 +19654,42 @@ export type Gea_MissionPartOfArchitecturesConnectionArgs = {
   where?: InputMaybe<Gea_MissionPartOfArchitecturesConnectionWhere>;
 };
 
+
+/** GEA_Mission – represents a mission within General Enterprise Architecture */
+export type Gea_MissionSupportedByValuesArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<Gea_ValueSort>>;
+  where?: InputMaybe<Gea_ValueWhere>;
+};
+
+
+/** GEA_Mission – represents a mission within General Enterprise Architecture */
+export type Gea_MissionSupportedByValuesConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<Gea_MissionSupportedByValuesConnectionSort>>;
+  where?: InputMaybe<Gea_MissionSupportedByValuesConnectionWhere>;
+};
+
+
+/** GEA_Mission – represents a mission within General Enterprise Architecture */
+export type Gea_MissionSupportedByVisionsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<Gea_VisionSort>>;
+  where?: InputMaybe<Gea_VisionWhere>;
+};
+
+
+/** GEA_Mission – represents a mission within General Enterprise Architecture */
+export type Gea_MissionSupportedByVisionsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<Gea_MissionSupportedByVisionsConnectionSort>>;
+  where?: InputMaybe<Gea_MissionSupportedByVisionsConnectionWhere>;
+};
+
 export type Gea_MissionAggregate = {
   __typename?: 'GEA_MissionAggregate';
   count: Count;
@@ -19209,8 +19699,8 @@ export type Gea_MissionAggregate = {
 export type Gea_MissionAggregateNode = {
   __typename?: 'GEA_MissionAggregateNode';
   createdAt: DateTimeAggregateSelection;
-  description: StringAggregateSelection;
   name: StringAggregateSelection;
+  purposeStatement: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -19372,6 +19862,8 @@ export type Gea_MissionConnectInput = {
   depictedInDiagrams?: InputMaybe<Array<Gea_MissionDepictedInDiagramsConnectFieldInput>>;
   owners?: InputMaybe<Array<Gea_MissionOwnersConnectFieldInput>>;
   partOfArchitectures?: InputMaybe<Array<Gea_MissionPartOfArchitecturesConnectFieldInput>>;
+  supportedByValues?: InputMaybe<Array<Gea_MissionSupportedByValuesConnectFieldInput>>;
+  supportedByVisions?: InputMaybe<Array<Gea_MissionSupportedByVisionsConnectFieldInput>>;
 };
 
 export type Gea_MissionConnectWhere = {
@@ -19381,10 +19873,13 @@ export type Gea_MissionConnectWhere = {
 export type Gea_MissionCreateInput = {
   company?: InputMaybe<Gea_MissionCompanyFieldInput>;
   depictedInDiagrams?: InputMaybe<Gea_MissionDepictedInDiagramsFieldInput>;
-  description?: InputMaybe<Scalars['String']['input']>;
+  keywords?: InputMaybe<Array<Scalars['String']['input']>>;
   name: Scalars['String']['input'];
   owners?: InputMaybe<Gea_MissionOwnersFieldInput>;
   partOfArchitectures?: InputMaybe<Gea_MissionPartOfArchitecturesFieldInput>;
+  purposeStatement?: InputMaybe<Scalars['String']['input']>;
+  supportedByValues?: InputMaybe<Gea_MissionSupportedByValuesFieldInput>;
+  supportedByVisions?: InputMaybe<Gea_MissionSupportedByVisionsFieldInput>;
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
   year: Scalars['Date']['input'];
 };
@@ -19394,6 +19889,8 @@ export type Gea_MissionDeleteInput = {
   depictedInDiagrams?: InputMaybe<Array<Gea_MissionDepictedInDiagramsDeleteFieldInput>>;
   owners?: InputMaybe<Array<Gea_MissionOwnersDeleteFieldInput>>;
   partOfArchitectures?: InputMaybe<Array<Gea_MissionPartOfArchitecturesDeleteFieldInput>>;
+  supportedByValues?: InputMaybe<Array<Gea_MissionSupportedByValuesDeleteFieldInput>>;
+  supportedByVisions?: InputMaybe<Array<Gea_MissionSupportedByVisionsDeleteFieldInput>>;
 };
 
 export type Gea_MissionDepictedInDiagramsAggregateInput = {
@@ -19527,12 +20024,43 @@ export type Gea_MissionDisconnectInput = {
   depictedInDiagrams?: InputMaybe<Array<Gea_MissionDepictedInDiagramsDisconnectFieldInput>>;
   owners?: InputMaybe<Array<Gea_MissionOwnersDisconnectFieldInput>>;
   partOfArchitectures?: InputMaybe<Array<Gea_MissionPartOfArchitecturesDisconnectFieldInput>>;
+  supportedByValues?: InputMaybe<Array<Gea_MissionSupportedByValuesDisconnectFieldInput>>;
+  supportedByVisions?: InputMaybe<Array<Gea_MissionSupportedByVisionsDisconnectFieldInput>>;
 };
 
 export type Gea_MissionEdge = {
   __typename?: 'GEA_MissionEdge';
   cursor: Scalars['String']['output'];
   node: Gea_Mission;
+};
+
+export type Gea_MissionGea_ValueSupportedByValuesAggregateSelection = {
+  __typename?: 'GEA_MissionGEA_ValueSupportedByValuesAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<Gea_MissionGea_ValueSupportedByValuesNodeAggregateSelection>;
+};
+
+export type Gea_MissionGea_ValueSupportedByValuesNodeAggregateSelection = {
+  __typename?: 'GEA_MissionGEA_ValueSupportedByValuesNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  name: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  valueStatement: StringAggregateSelection;
+};
+
+export type Gea_MissionGea_VisionSupportedByVisionsAggregateSelection = {
+  __typename?: 'GEA_MissionGEA_VisionSupportedByVisionsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<Gea_MissionGea_VisionSupportedByVisionsNodeAggregateSelection>;
+};
+
+export type Gea_MissionGea_VisionSupportedByVisionsNodeAggregateSelection = {
+  __typename?: 'GEA_MissionGEA_VisionSupportedByVisionsNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  name: StringAggregateSelection;
+  timeHorizon: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  visionStatement: StringAggregateSelection;
 };
 
 export type Gea_MissionOwnersAggregateInput = {
@@ -19786,21 +20314,237 @@ export type Gea_MissionRelationshipFilters = {
 /** Fields to sort GeaMissions by. The order in which sorts are applied is not guaranteed when specifying many fields in one GEA_MissionSort object. */
 export type Gea_MissionSort = {
   createdAt?: InputMaybe<SortDirection>;
-  description?: InputMaybe<SortDirection>;
   id?: InputMaybe<SortDirection>;
   name?: InputMaybe<SortDirection>;
+  purposeStatement?: InputMaybe<SortDirection>;
   updatedAt?: InputMaybe<SortDirection>;
   year?: InputMaybe<SortDirection>;
+};
+
+export type Gea_MissionSupportedByValuesAggregateInput = {
+  AND?: InputMaybe<Array<Gea_MissionSupportedByValuesAggregateInput>>;
+  NOT?: InputMaybe<Gea_MissionSupportedByValuesAggregateInput>;
+  OR?: InputMaybe<Array<Gea_MissionSupportedByValuesAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<Gea_MissionSupportedByValuesNodeAggregationWhereInput>;
+};
+
+export type Gea_MissionSupportedByValuesConnectFieldInput = {
+  connect?: InputMaybe<Array<Gea_ValueConnectInput>>;
+  where?: InputMaybe<Gea_ValueConnectWhere>;
+};
+
+export type Gea_MissionSupportedByValuesConnection = {
+  __typename?: 'GEA_MissionSupportedByValuesConnection';
+  aggregate: Gea_MissionGea_ValueSupportedByValuesAggregateSelection;
+  edges: Array<Gea_MissionSupportedByValuesRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type Gea_MissionSupportedByValuesConnectionAggregateInput = {
+  AND?: InputMaybe<Array<Gea_MissionSupportedByValuesConnectionAggregateInput>>;
+  NOT?: InputMaybe<Gea_MissionSupportedByValuesConnectionAggregateInput>;
+  OR?: InputMaybe<Array<Gea_MissionSupportedByValuesConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<Gea_MissionSupportedByValuesNodeAggregationWhereInput>;
+};
+
+export type Gea_MissionSupportedByValuesConnectionFilters = {
+  /** Filter GEA_Missions by aggregating results on related GEA_MissionSupportedByValuesConnections */
+  aggregate?: InputMaybe<Gea_MissionSupportedByValuesConnectionAggregateInput>;
+  /** Return GEA_Missions where all of the related GEA_MissionSupportedByValuesConnections match this filter */
+  all?: InputMaybe<Gea_MissionSupportedByValuesConnectionWhere>;
+  /** Return GEA_Missions where none of the related GEA_MissionSupportedByValuesConnections match this filter */
+  none?: InputMaybe<Gea_MissionSupportedByValuesConnectionWhere>;
+  /** Return GEA_Missions where one of the related GEA_MissionSupportedByValuesConnections match this filter */
+  single?: InputMaybe<Gea_MissionSupportedByValuesConnectionWhere>;
+  /** Return GEA_Missions where some of the related GEA_MissionSupportedByValuesConnections match this filter */
+  some?: InputMaybe<Gea_MissionSupportedByValuesConnectionWhere>;
+};
+
+export type Gea_MissionSupportedByValuesConnectionSort = {
+  node?: InputMaybe<Gea_ValueSort>;
+};
+
+export type Gea_MissionSupportedByValuesConnectionWhere = {
+  AND?: InputMaybe<Array<Gea_MissionSupportedByValuesConnectionWhere>>;
+  NOT?: InputMaybe<Gea_MissionSupportedByValuesConnectionWhere>;
+  OR?: InputMaybe<Array<Gea_MissionSupportedByValuesConnectionWhere>>;
+  node?: InputMaybe<Gea_ValueWhere>;
+};
+
+export type Gea_MissionSupportedByValuesCreateFieldInput = {
+  node: Gea_ValueCreateInput;
+};
+
+export type Gea_MissionSupportedByValuesDeleteFieldInput = {
+  delete?: InputMaybe<Gea_ValueDeleteInput>;
+  where?: InputMaybe<Gea_MissionSupportedByValuesConnectionWhere>;
+};
+
+export type Gea_MissionSupportedByValuesDisconnectFieldInput = {
+  disconnect?: InputMaybe<Gea_ValueDisconnectInput>;
+  where?: InputMaybe<Gea_MissionSupportedByValuesConnectionWhere>;
+};
+
+export type Gea_MissionSupportedByValuesFieldInput = {
+  connect?: InputMaybe<Array<Gea_MissionSupportedByValuesConnectFieldInput>>;
+  create?: InputMaybe<Array<Gea_MissionSupportedByValuesCreateFieldInput>>;
+};
+
+export type Gea_MissionSupportedByValuesNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<Gea_MissionSupportedByValuesNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<Gea_MissionSupportedByValuesNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<Gea_MissionSupportedByValuesNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  valueStatement?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type Gea_MissionSupportedByValuesRelationship = {
+  __typename?: 'GEA_MissionSupportedByValuesRelationship';
+  cursor: Scalars['String']['output'];
+  node: Gea_Value;
+};
+
+export type Gea_MissionSupportedByValuesUpdateConnectionInput = {
+  node?: InputMaybe<Gea_ValueUpdateInput>;
+  where?: InputMaybe<Gea_MissionSupportedByValuesConnectionWhere>;
+};
+
+export type Gea_MissionSupportedByValuesUpdateFieldInput = {
+  connect?: InputMaybe<Array<Gea_MissionSupportedByValuesConnectFieldInput>>;
+  create?: InputMaybe<Array<Gea_MissionSupportedByValuesCreateFieldInput>>;
+  delete?: InputMaybe<Array<Gea_MissionSupportedByValuesDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<Gea_MissionSupportedByValuesDisconnectFieldInput>>;
+  update?: InputMaybe<Gea_MissionSupportedByValuesUpdateConnectionInput>;
+};
+
+export type Gea_MissionSupportedByVisionsAggregateInput = {
+  AND?: InputMaybe<Array<Gea_MissionSupportedByVisionsAggregateInput>>;
+  NOT?: InputMaybe<Gea_MissionSupportedByVisionsAggregateInput>;
+  OR?: InputMaybe<Array<Gea_MissionSupportedByVisionsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<Gea_MissionSupportedByVisionsNodeAggregationWhereInput>;
+};
+
+export type Gea_MissionSupportedByVisionsConnectFieldInput = {
+  connect?: InputMaybe<Array<Gea_VisionConnectInput>>;
+  where?: InputMaybe<Gea_VisionConnectWhere>;
+};
+
+export type Gea_MissionSupportedByVisionsConnection = {
+  __typename?: 'GEA_MissionSupportedByVisionsConnection';
+  aggregate: Gea_MissionGea_VisionSupportedByVisionsAggregateSelection;
+  edges: Array<Gea_MissionSupportedByVisionsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type Gea_MissionSupportedByVisionsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<Gea_MissionSupportedByVisionsConnectionAggregateInput>>;
+  NOT?: InputMaybe<Gea_MissionSupportedByVisionsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<Gea_MissionSupportedByVisionsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<Gea_MissionSupportedByVisionsNodeAggregationWhereInput>;
+};
+
+export type Gea_MissionSupportedByVisionsConnectionFilters = {
+  /** Filter GEA_Missions by aggregating results on related GEA_MissionSupportedByVisionsConnections */
+  aggregate?: InputMaybe<Gea_MissionSupportedByVisionsConnectionAggregateInput>;
+  /** Return GEA_Missions where all of the related GEA_MissionSupportedByVisionsConnections match this filter */
+  all?: InputMaybe<Gea_MissionSupportedByVisionsConnectionWhere>;
+  /** Return GEA_Missions where none of the related GEA_MissionSupportedByVisionsConnections match this filter */
+  none?: InputMaybe<Gea_MissionSupportedByVisionsConnectionWhere>;
+  /** Return GEA_Missions where one of the related GEA_MissionSupportedByVisionsConnections match this filter */
+  single?: InputMaybe<Gea_MissionSupportedByVisionsConnectionWhere>;
+  /** Return GEA_Missions where some of the related GEA_MissionSupportedByVisionsConnections match this filter */
+  some?: InputMaybe<Gea_MissionSupportedByVisionsConnectionWhere>;
+};
+
+export type Gea_MissionSupportedByVisionsConnectionSort = {
+  node?: InputMaybe<Gea_VisionSort>;
+};
+
+export type Gea_MissionSupportedByVisionsConnectionWhere = {
+  AND?: InputMaybe<Array<Gea_MissionSupportedByVisionsConnectionWhere>>;
+  NOT?: InputMaybe<Gea_MissionSupportedByVisionsConnectionWhere>;
+  OR?: InputMaybe<Array<Gea_MissionSupportedByVisionsConnectionWhere>>;
+  node?: InputMaybe<Gea_VisionWhere>;
+};
+
+export type Gea_MissionSupportedByVisionsCreateFieldInput = {
+  node: Gea_VisionCreateInput;
+};
+
+export type Gea_MissionSupportedByVisionsDeleteFieldInput = {
+  delete?: InputMaybe<Gea_VisionDeleteInput>;
+  where?: InputMaybe<Gea_MissionSupportedByVisionsConnectionWhere>;
+};
+
+export type Gea_MissionSupportedByVisionsDisconnectFieldInput = {
+  disconnect?: InputMaybe<Gea_VisionDisconnectInput>;
+  where?: InputMaybe<Gea_MissionSupportedByVisionsConnectionWhere>;
+};
+
+export type Gea_MissionSupportedByVisionsFieldInput = {
+  connect?: InputMaybe<Array<Gea_MissionSupportedByVisionsConnectFieldInput>>;
+  create?: InputMaybe<Array<Gea_MissionSupportedByVisionsCreateFieldInput>>;
+};
+
+export type Gea_MissionSupportedByVisionsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<Gea_MissionSupportedByVisionsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<Gea_MissionSupportedByVisionsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<Gea_MissionSupportedByVisionsNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  timeHorizon?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  visionStatement?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type Gea_MissionSupportedByVisionsRelationship = {
+  __typename?: 'GEA_MissionSupportedByVisionsRelationship';
+  cursor: Scalars['String']['output'];
+  node: Gea_Vision;
+};
+
+export type Gea_MissionSupportedByVisionsUpdateConnectionInput = {
+  node?: InputMaybe<Gea_VisionUpdateInput>;
+  where?: InputMaybe<Gea_MissionSupportedByVisionsConnectionWhere>;
+};
+
+export type Gea_MissionSupportedByVisionsUpdateFieldInput = {
+  connect?: InputMaybe<Array<Gea_MissionSupportedByVisionsConnectFieldInput>>;
+  create?: InputMaybe<Array<Gea_MissionSupportedByVisionsCreateFieldInput>>;
+  delete?: InputMaybe<Array<Gea_MissionSupportedByVisionsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<Gea_MissionSupportedByVisionsDisconnectFieldInput>>;
+  update?: InputMaybe<Gea_MissionSupportedByVisionsUpdateConnectionInput>;
 };
 
 export type Gea_MissionUpdateInput = {
   company?: InputMaybe<Array<Gea_MissionCompanyUpdateFieldInput>>;
   createdAt?: InputMaybe<DateTimeScalarMutations>;
   depictedInDiagrams?: InputMaybe<Array<Gea_MissionDepictedInDiagramsUpdateFieldInput>>;
-  description?: InputMaybe<StringScalarMutations>;
+  keywords?: InputMaybe<ListStringMutations>;
   name?: InputMaybe<StringScalarMutations>;
   owners?: InputMaybe<Array<Gea_MissionOwnersUpdateFieldInput>>;
   partOfArchitectures?: InputMaybe<Array<Gea_MissionPartOfArchitecturesUpdateFieldInput>>;
+  purposeStatement?: InputMaybe<StringScalarMutations>;
+  supportedByValues?: InputMaybe<Array<Gea_MissionSupportedByValuesUpdateFieldInput>>;
+  supportedByVisions?: InputMaybe<Array<Gea_MissionSupportedByVisionsUpdateFieldInput>>;
   year?: InputMaybe<DateScalarMutations>;
 };
 
@@ -19813,13 +20557,18 @@ export type Gea_MissionWhere = {
   createdAt?: InputMaybe<DateTimeScalarFilters>;
   depictedInDiagrams?: InputMaybe<DiagramRelationshipFilters>;
   depictedInDiagramsConnection?: InputMaybe<Gea_MissionDepictedInDiagramsConnectionFilters>;
-  description?: InputMaybe<StringScalarFilters>;
   id?: InputMaybe<IdScalarFilters>;
+  keywords?: InputMaybe<StringListFilters>;
   name?: InputMaybe<StringScalarFilters>;
   owners?: InputMaybe<PersonRelationshipFilters>;
   ownersConnection?: InputMaybe<Gea_MissionOwnersConnectionFilters>;
   partOfArchitectures?: InputMaybe<ArchitectureRelationshipFilters>;
   partOfArchitecturesConnection?: InputMaybe<Gea_MissionPartOfArchitecturesConnectionFilters>;
+  purposeStatement?: InputMaybe<StringScalarFilters>;
+  supportedByValues?: InputMaybe<Gea_ValueRelationshipFilters>;
+  supportedByValuesConnection?: InputMaybe<Gea_MissionSupportedByValuesConnectionFilters>;
+  supportedByVisions?: InputMaybe<Gea_VisionRelationshipFilters>;
+  supportedByVisionsConnection?: InputMaybe<Gea_MissionSupportedByVisionsConnectionFilters>;
   updatedAt?: InputMaybe<DateTimeScalarFilters>;
   year?: InputMaybe<DateScalarFilters>;
 };
@@ -19827,6 +20576,8 @@ export type Gea_MissionWhere = {
 /** GEA_Strategy – represents a strategy within General Enterprise Architecture */
 export type Gea_Strategy = {
   __typename?: 'GEA_Strategy';
+  achievesGoals: Array<Gea_Goal>;
+  achievesGoalsConnection: Gea_StrategyAchievesGoalsConnection;
   company: Array<Company>;
   companyConnection: Gea_StrategyCompanyConnection;
   createdAt: Scalars['DateTime']['output'];
@@ -19840,6 +20591,24 @@ export type Gea_Strategy = {
   partOfArchitectures: Array<Architecture>;
   partOfArchitecturesConnection: Gea_StrategyPartOfArchitecturesConnection;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
+};
+
+
+/** GEA_Strategy – represents a strategy within General Enterprise Architecture */
+export type Gea_StrategyAchievesGoalsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<Gea_GoalSort>>;
+  where?: InputMaybe<Gea_GoalWhere>;
+};
+
+
+/** GEA_Strategy – represents a strategy within General Enterprise Architecture */
+export type Gea_StrategyAchievesGoalsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<Gea_StrategyAchievesGoalsConnectionSort>>;
+  where?: InputMaybe<Gea_StrategyAchievesGoalsConnectionWhere>;
 };
 
 
@@ -19912,6 +20681,112 @@ export type Gea_StrategyPartOfArchitecturesConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<Gea_StrategyPartOfArchitecturesConnectionSort>>;
   where?: InputMaybe<Gea_StrategyPartOfArchitecturesConnectionWhere>;
+};
+
+export type Gea_StrategyAchievesGoalsAggregateInput = {
+  AND?: InputMaybe<Array<Gea_StrategyAchievesGoalsAggregateInput>>;
+  NOT?: InputMaybe<Gea_StrategyAchievesGoalsAggregateInput>;
+  OR?: InputMaybe<Array<Gea_StrategyAchievesGoalsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<Gea_StrategyAchievesGoalsNodeAggregationWhereInput>;
+};
+
+export type Gea_StrategyAchievesGoalsConnectFieldInput = {
+  connect?: InputMaybe<Array<Gea_GoalConnectInput>>;
+  where?: InputMaybe<Gea_GoalConnectWhere>;
+};
+
+export type Gea_StrategyAchievesGoalsConnection = {
+  __typename?: 'GEA_StrategyAchievesGoalsConnection';
+  aggregate: Gea_StrategyGea_GoalAchievesGoalsAggregateSelection;
+  edges: Array<Gea_StrategyAchievesGoalsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type Gea_StrategyAchievesGoalsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<Gea_StrategyAchievesGoalsConnectionAggregateInput>>;
+  NOT?: InputMaybe<Gea_StrategyAchievesGoalsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<Gea_StrategyAchievesGoalsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<Gea_StrategyAchievesGoalsNodeAggregationWhereInput>;
+};
+
+export type Gea_StrategyAchievesGoalsConnectionFilters = {
+  /** Filter GEA_Strategies by aggregating results on related GEA_StrategyAchievesGoalsConnections */
+  aggregate?: InputMaybe<Gea_StrategyAchievesGoalsConnectionAggregateInput>;
+  /** Return GEA_Strategies where all of the related GEA_StrategyAchievesGoalsConnections match this filter */
+  all?: InputMaybe<Gea_StrategyAchievesGoalsConnectionWhere>;
+  /** Return GEA_Strategies where none of the related GEA_StrategyAchievesGoalsConnections match this filter */
+  none?: InputMaybe<Gea_StrategyAchievesGoalsConnectionWhere>;
+  /** Return GEA_Strategies where one of the related GEA_StrategyAchievesGoalsConnections match this filter */
+  single?: InputMaybe<Gea_StrategyAchievesGoalsConnectionWhere>;
+  /** Return GEA_Strategies where some of the related GEA_StrategyAchievesGoalsConnections match this filter */
+  some?: InputMaybe<Gea_StrategyAchievesGoalsConnectionWhere>;
+};
+
+export type Gea_StrategyAchievesGoalsConnectionSort = {
+  node?: InputMaybe<Gea_GoalSort>;
+};
+
+export type Gea_StrategyAchievesGoalsConnectionWhere = {
+  AND?: InputMaybe<Array<Gea_StrategyAchievesGoalsConnectionWhere>>;
+  NOT?: InputMaybe<Gea_StrategyAchievesGoalsConnectionWhere>;
+  OR?: InputMaybe<Array<Gea_StrategyAchievesGoalsConnectionWhere>>;
+  node?: InputMaybe<Gea_GoalWhere>;
+};
+
+export type Gea_StrategyAchievesGoalsCreateFieldInput = {
+  node: Gea_GoalCreateInput;
+};
+
+export type Gea_StrategyAchievesGoalsDeleteFieldInput = {
+  delete?: InputMaybe<Gea_GoalDeleteInput>;
+  where?: InputMaybe<Gea_StrategyAchievesGoalsConnectionWhere>;
+};
+
+export type Gea_StrategyAchievesGoalsDisconnectFieldInput = {
+  disconnect?: InputMaybe<Gea_GoalDisconnectInput>;
+  where?: InputMaybe<Gea_StrategyAchievesGoalsConnectionWhere>;
+};
+
+export type Gea_StrategyAchievesGoalsFieldInput = {
+  connect?: InputMaybe<Array<Gea_StrategyAchievesGoalsConnectFieldInput>>;
+  create?: InputMaybe<Array<Gea_StrategyAchievesGoalsCreateFieldInput>>;
+};
+
+export type Gea_StrategyAchievesGoalsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<Gea_StrategyAchievesGoalsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<Gea_StrategyAchievesGoalsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<Gea_StrategyAchievesGoalsNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  goalStatement?: InputMaybe<StringScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type Gea_StrategyAchievesGoalsRelationship = {
+  __typename?: 'GEA_StrategyAchievesGoalsRelationship';
+  cursor: Scalars['String']['output'];
+  node: Gea_Goal;
+};
+
+export type Gea_StrategyAchievesGoalsUpdateConnectionInput = {
+  node?: InputMaybe<Gea_GoalUpdateInput>;
+  where?: InputMaybe<Gea_StrategyAchievesGoalsConnectionWhere>;
+};
+
+export type Gea_StrategyAchievesGoalsUpdateFieldInput = {
+  connect?: InputMaybe<Array<Gea_StrategyAchievesGoalsConnectFieldInput>>;
+  create?: InputMaybe<Array<Gea_StrategyAchievesGoalsCreateFieldInput>>;
+  delete?: InputMaybe<Array<Gea_StrategyAchievesGoalsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<Gea_StrategyAchievesGoalsDisconnectFieldInput>>;
+  update?: InputMaybe<Gea_StrategyAchievesGoalsUpdateConnectionInput>;
 };
 
 export type Gea_StrategyAggregate = {
@@ -20082,6 +20957,7 @@ export type Gea_StrategyCompanyUpdateFieldInput = {
 };
 
 export type Gea_StrategyConnectInput = {
+  achievesGoals?: InputMaybe<Array<Gea_StrategyAchievesGoalsConnectFieldInput>>;
   company?: InputMaybe<Array<Gea_StrategyCompanyConnectFieldInput>>;
   depictedInDiagrams?: InputMaybe<Array<Gea_StrategyDepictedInDiagramsConnectFieldInput>>;
   owners?: InputMaybe<Array<Gea_StrategyOwnersConnectFieldInput>>;
@@ -20093,6 +20969,7 @@ export type Gea_StrategyConnectWhere = {
 };
 
 export type Gea_StrategyCreateInput = {
+  achievesGoals?: InputMaybe<Gea_StrategyAchievesGoalsFieldInput>;
   company?: InputMaybe<Gea_StrategyCompanyFieldInput>;
   depictedInDiagrams?: InputMaybe<Gea_StrategyDepictedInDiagramsFieldInput>;
   description?: InputMaybe<Scalars['String']['input']>;
@@ -20103,6 +20980,7 @@ export type Gea_StrategyCreateInput = {
 };
 
 export type Gea_StrategyDeleteInput = {
+  achievesGoals?: InputMaybe<Array<Gea_StrategyAchievesGoalsDeleteFieldInput>>;
   company?: InputMaybe<Array<Gea_StrategyCompanyDeleteFieldInput>>;
   depictedInDiagrams?: InputMaybe<Array<Gea_StrategyDepictedInDiagramsDeleteFieldInput>>;
   owners?: InputMaybe<Array<Gea_StrategyOwnersDeleteFieldInput>>;
@@ -20236,6 +21114,7 @@ export type Gea_StrategyDiagramDepictedInDiagramsNodeAggregateSelection = {
 };
 
 export type Gea_StrategyDisconnectInput = {
+  achievesGoals?: InputMaybe<Array<Gea_StrategyAchievesGoalsDisconnectFieldInput>>;
   company?: InputMaybe<Array<Gea_StrategyCompanyDisconnectFieldInput>>;
   depictedInDiagrams?: InputMaybe<Array<Gea_StrategyDepictedInDiagramsDisconnectFieldInput>>;
   owners?: InputMaybe<Array<Gea_StrategyOwnersDisconnectFieldInput>>;
@@ -20246,6 +21125,20 @@ export type Gea_StrategyEdge = {
   __typename?: 'GEA_StrategyEdge';
   cursor: Scalars['String']['output'];
   node: Gea_Strategy;
+};
+
+export type Gea_StrategyGea_GoalAchievesGoalsAggregateSelection = {
+  __typename?: 'GEA_StrategyGEA_GoalAchievesGoalsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<Gea_StrategyGea_GoalAchievesGoalsNodeAggregateSelection>;
+};
+
+export type Gea_StrategyGea_GoalAchievesGoalsNodeAggregateSelection = {
+  __typename?: 'GEA_StrategyGEA_GoalAchievesGoalsNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  goalStatement: StringAggregateSelection;
+  name: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
 };
 
 export type Gea_StrategyOwnersAggregateInput = {
@@ -20506,6 +21399,7 @@ export type Gea_StrategySort = {
 };
 
 export type Gea_StrategyUpdateInput = {
+  achievesGoals?: InputMaybe<Array<Gea_StrategyAchievesGoalsUpdateFieldInput>>;
   company?: InputMaybe<Array<Gea_StrategyCompanyUpdateFieldInput>>;
   createdAt?: InputMaybe<DateTimeScalarMutations>;
   depictedInDiagrams?: InputMaybe<Array<Gea_StrategyDepictedInDiagramsUpdateFieldInput>>;
@@ -20519,6 +21413,8 @@ export type Gea_StrategyWhere = {
   AND?: InputMaybe<Array<Gea_StrategyWhere>>;
   NOT?: InputMaybe<Gea_StrategyWhere>;
   OR?: InputMaybe<Array<Gea_StrategyWhere>>;
+  achievesGoals?: InputMaybe<Gea_GoalRelationshipFilters>;
+  achievesGoalsConnection?: InputMaybe<Gea_StrategyAchievesGoalsConnectionFilters>;
   company?: InputMaybe<CompanyRelationshipFilters>;
   companyConnection?: InputMaybe<Gea_StrategyCompanyConnectionFilters>;
   createdAt?: InputMaybe<DateTimeScalarFilters>;
@@ -20542,14 +21438,18 @@ export type Gea_Value = {
   createdAt: Scalars['DateTime']['output'];
   depictedInDiagrams: Array<Diagram>;
   depictedInDiagramsConnection: Gea_ValueDepictedInDiagramsConnection;
-  description?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
   owners: Array<Person>;
   ownersConnection: Gea_ValueOwnersConnection;
   partOfArchitectures: Array<Architecture>;
   partOfArchitecturesConnection: Gea_ValuePartOfArchitecturesConnection;
+  supportsMissions: Array<Gea_Mission>;
+  supportsMissionsConnection: Gea_ValueSupportsMissionsConnection;
+  supportsVisions: Array<Gea_Vision>;
+  supportsVisionsConnection: Gea_ValueSupportsVisionsConnection;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  valueStatement?: Maybe<Scalars['String']['output']>;
 };
 
 
@@ -20624,6 +21524,42 @@ export type Gea_ValuePartOfArchitecturesConnectionArgs = {
   where?: InputMaybe<Gea_ValuePartOfArchitecturesConnectionWhere>;
 };
 
+
+/** GEA_Value – represents a value within General Enterprise Architecture */
+export type Gea_ValueSupportsMissionsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<Gea_MissionSort>>;
+  where?: InputMaybe<Gea_MissionWhere>;
+};
+
+
+/** GEA_Value – represents a value within General Enterprise Architecture */
+export type Gea_ValueSupportsMissionsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<Gea_ValueSupportsMissionsConnectionSort>>;
+  where?: InputMaybe<Gea_ValueSupportsMissionsConnectionWhere>;
+};
+
+
+/** GEA_Value – represents a value within General Enterprise Architecture */
+export type Gea_ValueSupportsVisionsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<Gea_VisionSort>>;
+  where?: InputMaybe<Gea_VisionWhere>;
+};
+
+
+/** GEA_Value – represents a value within General Enterprise Architecture */
+export type Gea_ValueSupportsVisionsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<Gea_ValueSupportsVisionsConnectionSort>>;
+  where?: InputMaybe<Gea_ValueSupportsVisionsConnectionWhere>;
+};
+
 export type Gea_ValueAggregate = {
   __typename?: 'GEA_ValueAggregate';
   count: Count;
@@ -20633,9 +21569,9 @@ export type Gea_ValueAggregate = {
 export type Gea_ValueAggregateNode = {
   __typename?: 'GEA_ValueAggregateNode';
   createdAt: DateTimeAggregateSelection;
-  description: StringAggregateSelection;
   name: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
+  valueStatement: StringAggregateSelection;
 };
 
 export type Gea_ValueArchitecturePartOfArchitecturesAggregateSelection = {
@@ -20796,6 +21732,8 @@ export type Gea_ValueConnectInput = {
   depictedInDiagrams?: InputMaybe<Array<Gea_ValueDepictedInDiagramsConnectFieldInput>>;
   owners?: InputMaybe<Array<Gea_ValueOwnersConnectFieldInput>>;
   partOfArchitectures?: InputMaybe<Array<Gea_ValuePartOfArchitecturesConnectFieldInput>>;
+  supportsMissions?: InputMaybe<Array<Gea_ValueSupportsMissionsConnectFieldInput>>;
+  supportsVisions?: InputMaybe<Array<Gea_ValueSupportsVisionsConnectFieldInput>>;
 };
 
 export type Gea_ValueConnectWhere = {
@@ -20805,11 +21743,13 @@ export type Gea_ValueConnectWhere = {
 export type Gea_ValueCreateInput = {
   company?: InputMaybe<Gea_ValueCompanyFieldInput>;
   depictedInDiagrams?: InputMaybe<Gea_ValueDepictedInDiagramsFieldInput>;
-  description?: InputMaybe<Scalars['String']['input']>;
   name: Scalars['String']['input'];
   owners?: InputMaybe<Gea_ValueOwnersFieldInput>;
   partOfArchitectures?: InputMaybe<Gea_ValuePartOfArchitecturesFieldInput>;
+  supportsMissions?: InputMaybe<Gea_ValueSupportsMissionsFieldInput>;
+  supportsVisions?: InputMaybe<Gea_ValueSupportsVisionsFieldInput>;
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  valueStatement?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Gea_ValueDeleteInput = {
@@ -20817,6 +21757,8 @@ export type Gea_ValueDeleteInput = {
   depictedInDiagrams?: InputMaybe<Array<Gea_ValueDepictedInDiagramsDeleteFieldInput>>;
   owners?: InputMaybe<Array<Gea_ValueOwnersDeleteFieldInput>>;
   partOfArchitectures?: InputMaybe<Array<Gea_ValuePartOfArchitecturesDeleteFieldInput>>;
+  supportsMissions?: InputMaybe<Array<Gea_ValueSupportsMissionsDeleteFieldInput>>;
+  supportsVisions?: InputMaybe<Array<Gea_ValueSupportsVisionsDeleteFieldInput>>;
 };
 
 export type Gea_ValueDepictedInDiagramsAggregateInput = {
@@ -20950,12 +21892,43 @@ export type Gea_ValueDisconnectInput = {
   depictedInDiagrams?: InputMaybe<Array<Gea_ValueDepictedInDiagramsDisconnectFieldInput>>;
   owners?: InputMaybe<Array<Gea_ValueOwnersDisconnectFieldInput>>;
   partOfArchitectures?: InputMaybe<Array<Gea_ValuePartOfArchitecturesDisconnectFieldInput>>;
+  supportsMissions?: InputMaybe<Array<Gea_ValueSupportsMissionsDisconnectFieldInput>>;
+  supportsVisions?: InputMaybe<Array<Gea_ValueSupportsVisionsDisconnectFieldInput>>;
 };
 
 export type Gea_ValueEdge = {
   __typename?: 'GEA_ValueEdge';
   cursor: Scalars['String']['output'];
   node: Gea_Value;
+};
+
+export type Gea_ValueGea_MissionSupportsMissionsAggregateSelection = {
+  __typename?: 'GEA_ValueGEA_MissionSupportsMissionsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<Gea_ValueGea_MissionSupportsMissionsNodeAggregateSelection>;
+};
+
+export type Gea_ValueGea_MissionSupportsMissionsNodeAggregateSelection = {
+  __typename?: 'GEA_ValueGEA_MissionSupportsMissionsNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  name: StringAggregateSelection;
+  purposeStatement: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
+export type Gea_ValueGea_VisionSupportsVisionsAggregateSelection = {
+  __typename?: 'GEA_ValueGEA_VisionSupportsVisionsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<Gea_ValueGea_VisionSupportsVisionsNodeAggregateSelection>;
+};
+
+export type Gea_ValueGea_VisionSupportsVisionsNodeAggregateSelection = {
+  __typename?: 'GEA_ValueGEA_VisionSupportsVisionsNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  name: StringAggregateSelection;
+  timeHorizon: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  visionStatement: StringAggregateSelection;
 };
 
 export type Gea_ValueOwnersAggregateInput = {
@@ -21209,20 +22182,235 @@ export type Gea_ValueRelationshipFilters = {
 /** Fields to sort GeaValues by. The order in which sorts are applied is not guaranteed when specifying many fields in one GEA_ValueSort object. */
 export type Gea_ValueSort = {
   createdAt?: InputMaybe<SortDirection>;
-  description?: InputMaybe<SortDirection>;
   id?: InputMaybe<SortDirection>;
   name?: InputMaybe<SortDirection>;
   updatedAt?: InputMaybe<SortDirection>;
+  valueStatement?: InputMaybe<SortDirection>;
+};
+
+export type Gea_ValueSupportsMissionsAggregateInput = {
+  AND?: InputMaybe<Array<Gea_ValueSupportsMissionsAggregateInput>>;
+  NOT?: InputMaybe<Gea_ValueSupportsMissionsAggregateInput>;
+  OR?: InputMaybe<Array<Gea_ValueSupportsMissionsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<Gea_ValueSupportsMissionsNodeAggregationWhereInput>;
+};
+
+export type Gea_ValueSupportsMissionsConnectFieldInput = {
+  connect?: InputMaybe<Array<Gea_MissionConnectInput>>;
+  where?: InputMaybe<Gea_MissionConnectWhere>;
+};
+
+export type Gea_ValueSupportsMissionsConnection = {
+  __typename?: 'GEA_ValueSupportsMissionsConnection';
+  aggregate: Gea_ValueGea_MissionSupportsMissionsAggregateSelection;
+  edges: Array<Gea_ValueSupportsMissionsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type Gea_ValueSupportsMissionsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<Gea_ValueSupportsMissionsConnectionAggregateInput>>;
+  NOT?: InputMaybe<Gea_ValueSupportsMissionsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<Gea_ValueSupportsMissionsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<Gea_ValueSupportsMissionsNodeAggregationWhereInput>;
+};
+
+export type Gea_ValueSupportsMissionsConnectionFilters = {
+  /** Filter GEA_Values by aggregating results on related GEA_ValueSupportsMissionsConnections */
+  aggregate?: InputMaybe<Gea_ValueSupportsMissionsConnectionAggregateInput>;
+  /** Return GEA_Values where all of the related GEA_ValueSupportsMissionsConnections match this filter */
+  all?: InputMaybe<Gea_ValueSupportsMissionsConnectionWhere>;
+  /** Return GEA_Values where none of the related GEA_ValueSupportsMissionsConnections match this filter */
+  none?: InputMaybe<Gea_ValueSupportsMissionsConnectionWhere>;
+  /** Return GEA_Values where one of the related GEA_ValueSupportsMissionsConnections match this filter */
+  single?: InputMaybe<Gea_ValueSupportsMissionsConnectionWhere>;
+  /** Return GEA_Values where some of the related GEA_ValueSupportsMissionsConnections match this filter */
+  some?: InputMaybe<Gea_ValueSupportsMissionsConnectionWhere>;
+};
+
+export type Gea_ValueSupportsMissionsConnectionSort = {
+  node?: InputMaybe<Gea_MissionSort>;
+};
+
+export type Gea_ValueSupportsMissionsConnectionWhere = {
+  AND?: InputMaybe<Array<Gea_ValueSupportsMissionsConnectionWhere>>;
+  NOT?: InputMaybe<Gea_ValueSupportsMissionsConnectionWhere>;
+  OR?: InputMaybe<Array<Gea_ValueSupportsMissionsConnectionWhere>>;
+  node?: InputMaybe<Gea_MissionWhere>;
+};
+
+export type Gea_ValueSupportsMissionsCreateFieldInput = {
+  node: Gea_MissionCreateInput;
+};
+
+export type Gea_ValueSupportsMissionsDeleteFieldInput = {
+  delete?: InputMaybe<Gea_MissionDeleteInput>;
+  where?: InputMaybe<Gea_ValueSupportsMissionsConnectionWhere>;
+};
+
+export type Gea_ValueSupportsMissionsDisconnectFieldInput = {
+  disconnect?: InputMaybe<Gea_MissionDisconnectInput>;
+  where?: InputMaybe<Gea_ValueSupportsMissionsConnectionWhere>;
+};
+
+export type Gea_ValueSupportsMissionsFieldInput = {
+  connect?: InputMaybe<Array<Gea_ValueSupportsMissionsConnectFieldInput>>;
+  create?: InputMaybe<Array<Gea_ValueSupportsMissionsCreateFieldInput>>;
+};
+
+export type Gea_ValueSupportsMissionsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<Gea_ValueSupportsMissionsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<Gea_ValueSupportsMissionsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<Gea_ValueSupportsMissionsNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  purposeStatement?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type Gea_ValueSupportsMissionsRelationship = {
+  __typename?: 'GEA_ValueSupportsMissionsRelationship';
+  cursor: Scalars['String']['output'];
+  node: Gea_Mission;
+};
+
+export type Gea_ValueSupportsMissionsUpdateConnectionInput = {
+  node?: InputMaybe<Gea_MissionUpdateInput>;
+  where?: InputMaybe<Gea_ValueSupportsMissionsConnectionWhere>;
+};
+
+export type Gea_ValueSupportsMissionsUpdateFieldInput = {
+  connect?: InputMaybe<Array<Gea_ValueSupportsMissionsConnectFieldInput>>;
+  create?: InputMaybe<Array<Gea_ValueSupportsMissionsCreateFieldInput>>;
+  delete?: InputMaybe<Array<Gea_ValueSupportsMissionsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<Gea_ValueSupportsMissionsDisconnectFieldInput>>;
+  update?: InputMaybe<Gea_ValueSupportsMissionsUpdateConnectionInput>;
+};
+
+export type Gea_ValueSupportsVisionsAggregateInput = {
+  AND?: InputMaybe<Array<Gea_ValueSupportsVisionsAggregateInput>>;
+  NOT?: InputMaybe<Gea_ValueSupportsVisionsAggregateInput>;
+  OR?: InputMaybe<Array<Gea_ValueSupportsVisionsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<Gea_ValueSupportsVisionsNodeAggregationWhereInput>;
+};
+
+export type Gea_ValueSupportsVisionsConnectFieldInput = {
+  connect?: InputMaybe<Array<Gea_VisionConnectInput>>;
+  where?: InputMaybe<Gea_VisionConnectWhere>;
+};
+
+export type Gea_ValueSupportsVisionsConnection = {
+  __typename?: 'GEA_ValueSupportsVisionsConnection';
+  aggregate: Gea_ValueGea_VisionSupportsVisionsAggregateSelection;
+  edges: Array<Gea_ValueSupportsVisionsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type Gea_ValueSupportsVisionsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<Gea_ValueSupportsVisionsConnectionAggregateInput>>;
+  NOT?: InputMaybe<Gea_ValueSupportsVisionsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<Gea_ValueSupportsVisionsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<Gea_ValueSupportsVisionsNodeAggregationWhereInput>;
+};
+
+export type Gea_ValueSupportsVisionsConnectionFilters = {
+  /** Filter GEA_Values by aggregating results on related GEA_ValueSupportsVisionsConnections */
+  aggregate?: InputMaybe<Gea_ValueSupportsVisionsConnectionAggregateInput>;
+  /** Return GEA_Values where all of the related GEA_ValueSupportsVisionsConnections match this filter */
+  all?: InputMaybe<Gea_ValueSupportsVisionsConnectionWhere>;
+  /** Return GEA_Values where none of the related GEA_ValueSupportsVisionsConnections match this filter */
+  none?: InputMaybe<Gea_ValueSupportsVisionsConnectionWhere>;
+  /** Return GEA_Values where one of the related GEA_ValueSupportsVisionsConnections match this filter */
+  single?: InputMaybe<Gea_ValueSupportsVisionsConnectionWhere>;
+  /** Return GEA_Values where some of the related GEA_ValueSupportsVisionsConnections match this filter */
+  some?: InputMaybe<Gea_ValueSupportsVisionsConnectionWhere>;
+};
+
+export type Gea_ValueSupportsVisionsConnectionSort = {
+  node?: InputMaybe<Gea_VisionSort>;
+};
+
+export type Gea_ValueSupportsVisionsConnectionWhere = {
+  AND?: InputMaybe<Array<Gea_ValueSupportsVisionsConnectionWhere>>;
+  NOT?: InputMaybe<Gea_ValueSupportsVisionsConnectionWhere>;
+  OR?: InputMaybe<Array<Gea_ValueSupportsVisionsConnectionWhere>>;
+  node?: InputMaybe<Gea_VisionWhere>;
+};
+
+export type Gea_ValueSupportsVisionsCreateFieldInput = {
+  node: Gea_VisionCreateInput;
+};
+
+export type Gea_ValueSupportsVisionsDeleteFieldInput = {
+  delete?: InputMaybe<Gea_VisionDeleteInput>;
+  where?: InputMaybe<Gea_ValueSupportsVisionsConnectionWhere>;
+};
+
+export type Gea_ValueSupportsVisionsDisconnectFieldInput = {
+  disconnect?: InputMaybe<Gea_VisionDisconnectInput>;
+  where?: InputMaybe<Gea_ValueSupportsVisionsConnectionWhere>;
+};
+
+export type Gea_ValueSupportsVisionsFieldInput = {
+  connect?: InputMaybe<Array<Gea_ValueSupportsVisionsConnectFieldInput>>;
+  create?: InputMaybe<Array<Gea_ValueSupportsVisionsCreateFieldInput>>;
+};
+
+export type Gea_ValueSupportsVisionsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<Gea_ValueSupportsVisionsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<Gea_ValueSupportsVisionsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<Gea_ValueSupportsVisionsNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  timeHorizon?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  visionStatement?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type Gea_ValueSupportsVisionsRelationship = {
+  __typename?: 'GEA_ValueSupportsVisionsRelationship';
+  cursor: Scalars['String']['output'];
+  node: Gea_Vision;
+};
+
+export type Gea_ValueSupportsVisionsUpdateConnectionInput = {
+  node?: InputMaybe<Gea_VisionUpdateInput>;
+  where?: InputMaybe<Gea_ValueSupportsVisionsConnectionWhere>;
+};
+
+export type Gea_ValueSupportsVisionsUpdateFieldInput = {
+  connect?: InputMaybe<Array<Gea_ValueSupportsVisionsConnectFieldInput>>;
+  create?: InputMaybe<Array<Gea_ValueSupportsVisionsCreateFieldInput>>;
+  delete?: InputMaybe<Array<Gea_ValueSupportsVisionsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<Gea_ValueSupportsVisionsDisconnectFieldInput>>;
+  update?: InputMaybe<Gea_ValueSupportsVisionsUpdateConnectionInput>;
 };
 
 export type Gea_ValueUpdateInput = {
   company?: InputMaybe<Array<Gea_ValueCompanyUpdateFieldInput>>;
   createdAt?: InputMaybe<DateTimeScalarMutations>;
   depictedInDiagrams?: InputMaybe<Array<Gea_ValueDepictedInDiagramsUpdateFieldInput>>;
-  description?: InputMaybe<StringScalarMutations>;
   name?: InputMaybe<StringScalarMutations>;
   owners?: InputMaybe<Array<Gea_ValueOwnersUpdateFieldInput>>;
   partOfArchitectures?: InputMaybe<Array<Gea_ValuePartOfArchitecturesUpdateFieldInput>>;
+  supportsMissions?: InputMaybe<Array<Gea_ValueSupportsMissionsUpdateFieldInput>>;
+  supportsVisions?: InputMaybe<Array<Gea_ValueSupportsVisionsUpdateFieldInput>>;
+  valueStatement?: InputMaybe<StringScalarMutations>;
 };
 
 export type Gea_ValueWhere = {
@@ -21234,14 +22422,18 @@ export type Gea_ValueWhere = {
   createdAt?: InputMaybe<DateTimeScalarFilters>;
   depictedInDiagrams?: InputMaybe<DiagramRelationshipFilters>;
   depictedInDiagramsConnection?: InputMaybe<Gea_ValueDepictedInDiagramsConnectionFilters>;
-  description?: InputMaybe<StringScalarFilters>;
   id?: InputMaybe<IdScalarFilters>;
   name?: InputMaybe<StringScalarFilters>;
   owners?: InputMaybe<PersonRelationshipFilters>;
   ownersConnection?: InputMaybe<Gea_ValueOwnersConnectionFilters>;
   partOfArchitectures?: InputMaybe<ArchitectureRelationshipFilters>;
   partOfArchitecturesConnection?: InputMaybe<Gea_ValuePartOfArchitecturesConnectionFilters>;
+  supportsMissions?: InputMaybe<Gea_MissionRelationshipFilters>;
+  supportsMissionsConnection?: InputMaybe<Gea_ValueSupportsMissionsConnectionFilters>;
+  supportsVisions?: InputMaybe<Gea_VisionRelationshipFilters>;
+  supportsVisionsConnection?: InputMaybe<Gea_ValueSupportsVisionsConnectionFilters>;
   updatedAt?: InputMaybe<DateTimeScalarFilters>;
+  valueStatement?: InputMaybe<StringScalarFilters>;
 };
 
 /** GEA_Vision – represents a vision within General Enterprise Architecture */
@@ -21252,14 +22444,21 @@ export type Gea_Vision = {
   createdAt: Scalars['DateTime']['output'];
   depictedInDiagrams: Array<Diagram>;
   depictedInDiagramsConnection: Gea_VisionDepictedInDiagramsConnection;
-  description?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
   owners: Array<Person>;
   ownersConnection: Gea_VisionOwnersConnection;
   partOfArchitectures: Array<Architecture>;
   partOfArchitecturesConnection: Gea_VisionPartOfArchitecturesConnection;
+  supportedByGoals: Array<Gea_Goal>;
+  supportedByGoalsConnection: Gea_VisionSupportedByGoalsConnection;
+  supportedByValues: Array<Gea_Value>;
+  supportedByValuesConnection: Gea_VisionSupportedByValuesConnection;
+  supportsMissions: Array<Gea_Mission>;
+  supportsMissionsConnection: Gea_VisionSupportsMissionsConnection;
+  timeHorizon?: Maybe<Scalars['String']['output']>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  visionStatement?: Maybe<Scalars['String']['output']>;
   year: Scalars['Date']['output'];
 };
 
@@ -21335,6 +22534,60 @@ export type Gea_VisionPartOfArchitecturesConnectionArgs = {
   where?: InputMaybe<Gea_VisionPartOfArchitecturesConnectionWhere>;
 };
 
+
+/** GEA_Vision – represents a vision within General Enterprise Architecture */
+export type Gea_VisionSupportedByGoalsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<Gea_GoalSort>>;
+  where?: InputMaybe<Gea_GoalWhere>;
+};
+
+
+/** GEA_Vision – represents a vision within General Enterprise Architecture */
+export type Gea_VisionSupportedByGoalsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<Gea_VisionSupportedByGoalsConnectionSort>>;
+  where?: InputMaybe<Gea_VisionSupportedByGoalsConnectionWhere>;
+};
+
+
+/** GEA_Vision – represents a vision within General Enterprise Architecture */
+export type Gea_VisionSupportedByValuesArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<Gea_ValueSort>>;
+  where?: InputMaybe<Gea_ValueWhere>;
+};
+
+
+/** GEA_Vision – represents a vision within General Enterprise Architecture */
+export type Gea_VisionSupportedByValuesConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<Gea_VisionSupportedByValuesConnectionSort>>;
+  where?: InputMaybe<Gea_VisionSupportedByValuesConnectionWhere>;
+};
+
+
+/** GEA_Vision – represents a vision within General Enterprise Architecture */
+export type Gea_VisionSupportsMissionsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<Gea_MissionSort>>;
+  where?: InputMaybe<Gea_MissionWhere>;
+};
+
+
+/** GEA_Vision – represents a vision within General Enterprise Architecture */
+export type Gea_VisionSupportsMissionsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<Gea_VisionSupportsMissionsConnectionSort>>;
+  where?: InputMaybe<Gea_VisionSupportsMissionsConnectionWhere>;
+};
+
 export type Gea_VisionAggregate = {
   __typename?: 'GEA_VisionAggregate';
   count: Count;
@@ -21344,9 +22597,10 @@ export type Gea_VisionAggregate = {
 export type Gea_VisionAggregateNode = {
   __typename?: 'GEA_VisionAggregateNode';
   createdAt: DateTimeAggregateSelection;
-  description: StringAggregateSelection;
   name: StringAggregateSelection;
+  timeHorizon: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
+  visionStatement: StringAggregateSelection;
 };
 
 export type Gea_VisionArchitecturePartOfArchitecturesAggregateSelection = {
@@ -21507,6 +22761,9 @@ export type Gea_VisionConnectInput = {
   depictedInDiagrams?: InputMaybe<Array<Gea_VisionDepictedInDiagramsConnectFieldInput>>;
   owners?: InputMaybe<Array<Gea_VisionOwnersConnectFieldInput>>;
   partOfArchitectures?: InputMaybe<Array<Gea_VisionPartOfArchitecturesConnectFieldInput>>;
+  supportedByGoals?: InputMaybe<Array<Gea_VisionSupportedByGoalsConnectFieldInput>>;
+  supportedByValues?: InputMaybe<Array<Gea_VisionSupportedByValuesConnectFieldInput>>;
+  supportsMissions?: InputMaybe<Array<Gea_VisionSupportsMissionsConnectFieldInput>>;
 };
 
 export type Gea_VisionConnectWhere = {
@@ -21516,11 +22773,15 @@ export type Gea_VisionConnectWhere = {
 export type Gea_VisionCreateInput = {
   company?: InputMaybe<Gea_VisionCompanyFieldInput>;
   depictedInDiagrams?: InputMaybe<Gea_VisionDepictedInDiagramsFieldInput>;
-  description?: InputMaybe<Scalars['String']['input']>;
   name: Scalars['String']['input'];
   owners?: InputMaybe<Gea_VisionOwnersFieldInput>;
   partOfArchitectures?: InputMaybe<Gea_VisionPartOfArchitecturesFieldInput>;
+  supportedByGoals?: InputMaybe<Gea_VisionSupportedByGoalsFieldInput>;
+  supportedByValues?: InputMaybe<Gea_VisionSupportedByValuesFieldInput>;
+  supportsMissions?: InputMaybe<Gea_VisionSupportsMissionsFieldInput>;
+  timeHorizon?: InputMaybe<Scalars['String']['input']>;
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  visionStatement?: InputMaybe<Scalars['String']['input']>;
   year: Scalars['Date']['input'];
 };
 
@@ -21529,6 +22790,9 @@ export type Gea_VisionDeleteInput = {
   depictedInDiagrams?: InputMaybe<Array<Gea_VisionDepictedInDiagramsDeleteFieldInput>>;
   owners?: InputMaybe<Array<Gea_VisionOwnersDeleteFieldInput>>;
   partOfArchitectures?: InputMaybe<Array<Gea_VisionPartOfArchitecturesDeleteFieldInput>>;
+  supportedByGoals?: InputMaybe<Array<Gea_VisionSupportedByGoalsDeleteFieldInput>>;
+  supportedByValues?: InputMaybe<Array<Gea_VisionSupportedByValuesDeleteFieldInput>>;
+  supportsMissions?: InputMaybe<Array<Gea_VisionSupportsMissionsDeleteFieldInput>>;
 };
 
 export type Gea_VisionDepictedInDiagramsAggregateInput = {
@@ -21662,12 +22926,57 @@ export type Gea_VisionDisconnectInput = {
   depictedInDiagrams?: InputMaybe<Array<Gea_VisionDepictedInDiagramsDisconnectFieldInput>>;
   owners?: InputMaybe<Array<Gea_VisionOwnersDisconnectFieldInput>>;
   partOfArchitectures?: InputMaybe<Array<Gea_VisionPartOfArchitecturesDisconnectFieldInput>>;
+  supportedByGoals?: InputMaybe<Array<Gea_VisionSupportedByGoalsDisconnectFieldInput>>;
+  supportedByValues?: InputMaybe<Array<Gea_VisionSupportedByValuesDisconnectFieldInput>>;
+  supportsMissions?: InputMaybe<Array<Gea_VisionSupportsMissionsDisconnectFieldInput>>;
 };
 
 export type Gea_VisionEdge = {
   __typename?: 'GEA_VisionEdge';
   cursor: Scalars['String']['output'];
   node: Gea_Vision;
+};
+
+export type Gea_VisionGea_GoalSupportedByGoalsAggregateSelection = {
+  __typename?: 'GEA_VisionGEA_GoalSupportedByGoalsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<Gea_VisionGea_GoalSupportedByGoalsNodeAggregateSelection>;
+};
+
+export type Gea_VisionGea_GoalSupportedByGoalsNodeAggregateSelection = {
+  __typename?: 'GEA_VisionGEA_GoalSupportedByGoalsNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  goalStatement: StringAggregateSelection;
+  name: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
+export type Gea_VisionGea_MissionSupportsMissionsAggregateSelection = {
+  __typename?: 'GEA_VisionGEA_MissionSupportsMissionsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<Gea_VisionGea_MissionSupportsMissionsNodeAggregateSelection>;
+};
+
+export type Gea_VisionGea_MissionSupportsMissionsNodeAggregateSelection = {
+  __typename?: 'GEA_VisionGEA_MissionSupportsMissionsNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  name: StringAggregateSelection;
+  purposeStatement: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
+export type Gea_VisionGea_ValueSupportedByValuesAggregateSelection = {
+  __typename?: 'GEA_VisionGEA_ValueSupportedByValuesAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<Gea_VisionGea_ValueSupportedByValuesNodeAggregateSelection>;
+};
+
+export type Gea_VisionGea_ValueSupportedByValuesNodeAggregateSelection = {
+  __typename?: 'GEA_VisionGEA_ValueSupportedByValuesNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  name: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  valueStatement: StringAggregateSelection;
 };
 
 export type Gea_VisionOwnersAggregateInput = {
@@ -21921,21 +23230,344 @@ export type Gea_VisionRelationshipFilters = {
 /** Fields to sort GeaVisions by. The order in which sorts are applied is not guaranteed when specifying many fields in one GEA_VisionSort object. */
 export type Gea_VisionSort = {
   createdAt?: InputMaybe<SortDirection>;
-  description?: InputMaybe<SortDirection>;
   id?: InputMaybe<SortDirection>;
   name?: InputMaybe<SortDirection>;
+  timeHorizon?: InputMaybe<SortDirection>;
   updatedAt?: InputMaybe<SortDirection>;
+  visionStatement?: InputMaybe<SortDirection>;
   year?: InputMaybe<SortDirection>;
+};
+
+export type Gea_VisionSupportedByGoalsAggregateInput = {
+  AND?: InputMaybe<Array<Gea_VisionSupportedByGoalsAggregateInput>>;
+  NOT?: InputMaybe<Gea_VisionSupportedByGoalsAggregateInput>;
+  OR?: InputMaybe<Array<Gea_VisionSupportedByGoalsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<Gea_VisionSupportedByGoalsNodeAggregationWhereInput>;
+};
+
+export type Gea_VisionSupportedByGoalsConnectFieldInput = {
+  connect?: InputMaybe<Array<Gea_GoalConnectInput>>;
+  where?: InputMaybe<Gea_GoalConnectWhere>;
+};
+
+export type Gea_VisionSupportedByGoalsConnection = {
+  __typename?: 'GEA_VisionSupportedByGoalsConnection';
+  aggregate: Gea_VisionGea_GoalSupportedByGoalsAggregateSelection;
+  edges: Array<Gea_VisionSupportedByGoalsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type Gea_VisionSupportedByGoalsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<Gea_VisionSupportedByGoalsConnectionAggregateInput>>;
+  NOT?: InputMaybe<Gea_VisionSupportedByGoalsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<Gea_VisionSupportedByGoalsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<Gea_VisionSupportedByGoalsNodeAggregationWhereInput>;
+};
+
+export type Gea_VisionSupportedByGoalsConnectionFilters = {
+  /** Filter GEA_Visions by aggregating results on related GEA_VisionSupportedByGoalsConnections */
+  aggregate?: InputMaybe<Gea_VisionSupportedByGoalsConnectionAggregateInput>;
+  /** Return GEA_Visions where all of the related GEA_VisionSupportedByGoalsConnections match this filter */
+  all?: InputMaybe<Gea_VisionSupportedByGoalsConnectionWhere>;
+  /** Return GEA_Visions where none of the related GEA_VisionSupportedByGoalsConnections match this filter */
+  none?: InputMaybe<Gea_VisionSupportedByGoalsConnectionWhere>;
+  /** Return GEA_Visions where one of the related GEA_VisionSupportedByGoalsConnections match this filter */
+  single?: InputMaybe<Gea_VisionSupportedByGoalsConnectionWhere>;
+  /** Return GEA_Visions where some of the related GEA_VisionSupportedByGoalsConnections match this filter */
+  some?: InputMaybe<Gea_VisionSupportedByGoalsConnectionWhere>;
+};
+
+export type Gea_VisionSupportedByGoalsConnectionSort = {
+  node?: InputMaybe<Gea_GoalSort>;
+};
+
+export type Gea_VisionSupportedByGoalsConnectionWhere = {
+  AND?: InputMaybe<Array<Gea_VisionSupportedByGoalsConnectionWhere>>;
+  NOT?: InputMaybe<Gea_VisionSupportedByGoalsConnectionWhere>;
+  OR?: InputMaybe<Array<Gea_VisionSupportedByGoalsConnectionWhere>>;
+  node?: InputMaybe<Gea_GoalWhere>;
+};
+
+export type Gea_VisionSupportedByGoalsCreateFieldInput = {
+  node: Gea_GoalCreateInput;
+};
+
+export type Gea_VisionSupportedByGoalsDeleteFieldInput = {
+  delete?: InputMaybe<Gea_GoalDeleteInput>;
+  where?: InputMaybe<Gea_VisionSupportedByGoalsConnectionWhere>;
+};
+
+export type Gea_VisionSupportedByGoalsDisconnectFieldInput = {
+  disconnect?: InputMaybe<Gea_GoalDisconnectInput>;
+  where?: InputMaybe<Gea_VisionSupportedByGoalsConnectionWhere>;
+};
+
+export type Gea_VisionSupportedByGoalsFieldInput = {
+  connect?: InputMaybe<Array<Gea_VisionSupportedByGoalsConnectFieldInput>>;
+  create?: InputMaybe<Array<Gea_VisionSupportedByGoalsCreateFieldInput>>;
+};
+
+export type Gea_VisionSupportedByGoalsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<Gea_VisionSupportedByGoalsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<Gea_VisionSupportedByGoalsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<Gea_VisionSupportedByGoalsNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  goalStatement?: InputMaybe<StringScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type Gea_VisionSupportedByGoalsRelationship = {
+  __typename?: 'GEA_VisionSupportedByGoalsRelationship';
+  cursor: Scalars['String']['output'];
+  node: Gea_Goal;
+};
+
+export type Gea_VisionSupportedByGoalsUpdateConnectionInput = {
+  node?: InputMaybe<Gea_GoalUpdateInput>;
+  where?: InputMaybe<Gea_VisionSupportedByGoalsConnectionWhere>;
+};
+
+export type Gea_VisionSupportedByGoalsUpdateFieldInput = {
+  connect?: InputMaybe<Array<Gea_VisionSupportedByGoalsConnectFieldInput>>;
+  create?: InputMaybe<Array<Gea_VisionSupportedByGoalsCreateFieldInput>>;
+  delete?: InputMaybe<Array<Gea_VisionSupportedByGoalsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<Gea_VisionSupportedByGoalsDisconnectFieldInput>>;
+  update?: InputMaybe<Gea_VisionSupportedByGoalsUpdateConnectionInput>;
+};
+
+export type Gea_VisionSupportedByValuesAggregateInput = {
+  AND?: InputMaybe<Array<Gea_VisionSupportedByValuesAggregateInput>>;
+  NOT?: InputMaybe<Gea_VisionSupportedByValuesAggregateInput>;
+  OR?: InputMaybe<Array<Gea_VisionSupportedByValuesAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<Gea_VisionSupportedByValuesNodeAggregationWhereInput>;
+};
+
+export type Gea_VisionSupportedByValuesConnectFieldInput = {
+  connect?: InputMaybe<Array<Gea_ValueConnectInput>>;
+  where?: InputMaybe<Gea_ValueConnectWhere>;
+};
+
+export type Gea_VisionSupportedByValuesConnection = {
+  __typename?: 'GEA_VisionSupportedByValuesConnection';
+  aggregate: Gea_VisionGea_ValueSupportedByValuesAggregateSelection;
+  edges: Array<Gea_VisionSupportedByValuesRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type Gea_VisionSupportedByValuesConnectionAggregateInput = {
+  AND?: InputMaybe<Array<Gea_VisionSupportedByValuesConnectionAggregateInput>>;
+  NOT?: InputMaybe<Gea_VisionSupportedByValuesConnectionAggregateInput>;
+  OR?: InputMaybe<Array<Gea_VisionSupportedByValuesConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<Gea_VisionSupportedByValuesNodeAggregationWhereInput>;
+};
+
+export type Gea_VisionSupportedByValuesConnectionFilters = {
+  /** Filter GEA_Visions by aggregating results on related GEA_VisionSupportedByValuesConnections */
+  aggregate?: InputMaybe<Gea_VisionSupportedByValuesConnectionAggregateInput>;
+  /** Return GEA_Visions where all of the related GEA_VisionSupportedByValuesConnections match this filter */
+  all?: InputMaybe<Gea_VisionSupportedByValuesConnectionWhere>;
+  /** Return GEA_Visions where none of the related GEA_VisionSupportedByValuesConnections match this filter */
+  none?: InputMaybe<Gea_VisionSupportedByValuesConnectionWhere>;
+  /** Return GEA_Visions where one of the related GEA_VisionSupportedByValuesConnections match this filter */
+  single?: InputMaybe<Gea_VisionSupportedByValuesConnectionWhere>;
+  /** Return GEA_Visions where some of the related GEA_VisionSupportedByValuesConnections match this filter */
+  some?: InputMaybe<Gea_VisionSupportedByValuesConnectionWhere>;
+};
+
+export type Gea_VisionSupportedByValuesConnectionSort = {
+  node?: InputMaybe<Gea_ValueSort>;
+};
+
+export type Gea_VisionSupportedByValuesConnectionWhere = {
+  AND?: InputMaybe<Array<Gea_VisionSupportedByValuesConnectionWhere>>;
+  NOT?: InputMaybe<Gea_VisionSupportedByValuesConnectionWhere>;
+  OR?: InputMaybe<Array<Gea_VisionSupportedByValuesConnectionWhere>>;
+  node?: InputMaybe<Gea_ValueWhere>;
+};
+
+export type Gea_VisionSupportedByValuesCreateFieldInput = {
+  node: Gea_ValueCreateInput;
+};
+
+export type Gea_VisionSupportedByValuesDeleteFieldInput = {
+  delete?: InputMaybe<Gea_ValueDeleteInput>;
+  where?: InputMaybe<Gea_VisionSupportedByValuesConnectionWhere>;
+};
+
+export type Gea_VisionSupportedByValuesDisconnectFieldInput = {
+  disconnect?: InputMaybe<Gea_ValueDisconnectInput>;
+  where?: InputMaybe<Gea_VisionSupportedByValuesConnectionWhere>;
+};
+
+export type Gea_VisionSupportedByValuesFieldInput = {
+  connect?: InputMaybe<Array<Gea_VisionSupportedByValuesConnectFieldInput>>;
+  create?: InputMaybe<Array<Gea_VisionSupportedByValuesCreateFieldInput>>;
+};
+
+export type Gea_VisionSupportedByValuesNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<Gea_VisionSupportedByValuesNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<Gea_VisionSupportedByValuesNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<Gea_VisionSupportedByValuesNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  valueStatement?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type Gea_VisionSupportedByValuesRelationship = {
+  __typename?: 'GEA_VisionSupportedByValuesRelationship';
+  cursor: Scalars['String']['output'];
+  node: Gea_Value;
+};
+
+export type Gea_VisionSupportedByValuesUpdateConnectionInput = {
+  node?: InputMaybe<Gea_ValueUpdateInput>;
+  where?: InputMaybe<Gea_VisionSupportedByValuesConnectionWhere>;
+};
+
+export type Gea_VisionSupportedByValuesUpdateFieldInput = {
+  connect?: InputMaybe<Array<Gea_VisionSupportedByValuesConnectFieldInput>>;
+  create?: InputMaybe<Array<Gea_VisionSupportedByValuesCreateFieldInput>>;
+  delete?: InputMaybe<Array<Gea_VisionSupportedByValuesDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<Gea_VisionSupportedByValuesDisconnectFieldInput>>;
+  update?: InputMaybe<Gea_VisionSupportedByValuesUpdateConnectionInput>;
+};
+
+export type Gea_VisionSupportsMissionsAggregateInput = {
+  AND?: InputMaybe<Array<Gea_VisionSupportsMissionsAggregateInput>>;
+  NOT?: InputMaybe<Gea_VisionSupportsMissionsAggregateInput>;
+  OR?: InputMaybe<Array<Gea_VisionSupportsMissionsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<Gea_VisionSupportsMissionsNodeAggregationWhereInput>;
+};
+
+export type Gea_VisionSupportsMissionsConnectFieldInput = {
+  connect?: InputMaybe<Array<Gea_MissionConnectInput>>;
+  where?: InputMaybe<Gea_MissionConnectWhere>;
+};
+
+export type Gea_VisionSupportsMissionsConnection = {
+  __typename?: 'GEA_VisionSupportsMissionsConnection';
+  aggregate: Gea_VisionGea_MissionSupportsMissionsAggregateSelection;
+  edges: Array<Gea_VisionSupportsMissionsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type Gea_VisionSupportsMissionsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<Gea_VisionSupportsMissionsConnectionAggregateInput>>;
+  NOT?: InputMaybe<Gea_VisionSupportsMissionsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<Gea_VisionSupportsMissionsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<Gea_VisionSupportsMissionsNodeAggregationWhereInput>;
+};
+
+export type Gea_VisionSupportsMissionsConnectionFilters = {
+  /** Filter GEA_Visions by aggregating results on related GEA_VisionSupportsMissionsConnections */
+  aggregate?: InputMaybe<Gea_VisionSupportsMissionsConnectionAggregateInput>;
+  /** Return GEA_Visions where all of the related GEA_VisionSupportsMissionsConnections match this filter */
+  all?: InputMaybe<Gea_VisionSupportsMissionsConnectionWhere>;
+  /** Return GEA_Visions where none of the related GEA_VisionSupportsMissionsConnections match this filter */
+  none?: InputMaybe<Gea_VisionSupportsMissionsConnectionWhere>;
+  /** Return GEA_Visions where one of the related GEA_VisionSupportsMissionsConnections match this filter */
+  single?: InputMaybe<Gea_VisionSupportsMissionsConnectionWhere>;
+  /** Return GEA_Visions where some of the related GEA_VisionSupportsMissionsConnections match this filter */
+  some?: InputMaybe<Gea_VisionSupportsMissionsConnectionWhere>;
+};
+
+export type Gea_VisionSupportsMissionsConnectionSort = {
+  node?: InputMaybe<Gea_MissionSort>;
+};
+
+export type Gea_VisionSupportsMissionsConnectionWhere = {
+  AND?: InputMaybe<Array<Gea_VisionSupportsMissionsConnectionWhere>>;
+  NOT?: InputMaybe<Gea_VisionSupportsMissionsConnectionWhere>;
+  OR?: InputMaybe<Array<Gea_VisionSupportsMissionsConnectionWhere>>;
+  node?: InputMaybe<Gea_MissionWhere>;
+};
+
+export type Gea_VisionSupportsMissionsCreateFieldInput = {
+  node: Gea_MissionCreateInput;
+};
+
+export type Gea_VisionSupportsMissionsDeleteFieldInput = {
+  delete?: InputMaybe<Gea_MissionDeleteInput>;
+  where?: InputMaybe<Gea_VisionSupportsMissionsConnectionWhere>;
+};
+
+export type Gea_VisionSupportsMissionsDisconnectFieldInput = {
+  disconnect?: InputMaybe<Gea_MissionDisconnectInput>;
+  where?: InputMaybe<Gea_VisionSupportsMissionsConnectionWhere>;
+};
+
+export type Gea_VisionSupportsMissionsFieldInput = {
+  connect?: InputMaybe<Array<Gea_VisionSupportsMissionsConnectFieldInput>>;
+  create?: InputMaybe<Array<Gea_VisionSupportsMissionsCreateFieldInput>>;
+};
+
+export type Gea_VisionSupportsMissionsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<Gea_VisionSupportsMissionsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<Gea_VisionSupportsMissionsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<Gea_VisionSupportsMissionsNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  purposeStatement?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type Gea_VisionSupportsMissionsRelationship = {
+  __typename?: 'GEA_VisionSupportsMissionsRelationship';
+  cursor: Scalars['String']['output'];
+  node: Gea_Mission;
+};
+
+export type Gea_VisionSupportsMissionsUpdateConnectionInput = {
+  node?: InputMaybe<Gea_MissionUpdateInput>;
+  where?: InputMaybe<Gea_VisionSupportsMissionsConnectionWhere>;
+};
+
+export type Gea_VisionSupportsMissionsUpdateFieldInput = {
+  connect?: InputMaybe<Array<Gea_VisionSupportsMissionsConnectFieldInput>>;
+  create?: InputMaybe<Array<Gea_VisionSupportsMissionsCreateFieldInput>>;
+  delete?: InputMaybe<Array<Gea_VisionSupportsMissionsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<Gea_VisionSupportsMissionsDisconnectFieldInput>>;
+  update?: InputMaybe<Gea_VisionSupportsMissionsUpdateConnectionInput>;
 };
 
 export type Gea_VisionUpdateInput = {
   company?: InputMaybe<Array<Gea_VisionCompanyUpdateFieldInput>>;
   createdAt?: InputMaybe<DateTimeScalarMutations>;
   depictedInDiagrams?: InputMaybe<Array<Gea_VisionDepictedInDiagramsUpdateFieldInput>>;
-  description?: InputMaybe<StringScalarMutations>;
   name?: InputMaybe<StringScalarMutations>;
   owners?: InputMaybe<Array<Gea_VisionOwnersUpdateFieldInput>>;
   partOfArchitectures?: InputMaybe<Array<Gea_VisionPartOfArchitecturesUpdateFieldInput>>;
+  supportedByGoals?: InputMaybe<Array<Gea_VisionSupportedByGoalsUpdateFieldInput>>;
+  supportedByValues?: InputMaybe<Array<Gea_VisionSupportedByValuesUpdateFieldInput>>;
+  supportsMissions?: InputMaybe<Array<Gea_VisionSupportsMissionsUpdateFieldInput>>;
+  timeHorizon?: InputMaybe<StringScalarMutations>;
+  visionStatement?: InputMaybe<StringScalarMutations>;
   year?: InputMaybe<DateScalarMutations>;
 };
 
@@ -21948,14 +23580,21 @@ export type Gea_VisionWhere = {
   createdAt?: InputMaybe<DateTimeScalarFilters>;
   depictedInDiagrams?: InputMaybe<DiagramRelationshipFilters>;
   depictedInDiagramsConnection?: InputMaybe<Gea_VisionDepictedInDiagramsConnectionFilters>;
-  description?: InputMaybe<StringScalarFilters>;
   id?: InputMaybe<IdScalarFilters>;
   name?: InputMaybe<StringScalarFilters>;
   owners?: InputMaybe<PersonRelationshipFilters>;
   ownersConnection?: InputMaybe<Gea_VisionOwnersConnectionFilters>;
   partOfArchitectures?: InputMaybe<ArchitectureRelationshipFilters>;
   partOfArchitecturesConnection?: InputMaybe<Gea_VisionPartOfArchitecturesConnectionFilters>;
+  supportedByGoals?: InputMaybe<Gea_GoalRelationshipFilters>;
+  supportedByGoalsConnection?: InputMaybe<Gea_VisionSupportedByGoalsConnectionFilters>;
+  supportedByValues?: InputMaybe<Gea_ValueRelationshipFilters>;
+  supportedByValuesConnection?: InputMaybe<Gea_VisionSupportedByValuesConnectionFilters>;
+  supportsMissions?: InputMaybe<Gea_MissionRelationshipFilters>;
+  supportsMissionsConnection?: InputMaybe<Gea_VisionSupportsMissionsConnectionFilters>;
+  timeHorizon?: InputMaybe<StringScalarFilters>;
   updatedAt?: InputMaybe<DateTimeScalarFilters>;
+  visionStatement?: InputMaybe<StringScalarFilters>;
   year?: InputMaybe<DateScalarFilters>;
 };
 
@@ -26305,7 +27944,7 @@ export type PersonGea_GoalOwnedGeaGoalsAggregateSelection = {
 export type PersonGea_GoalOwnedGeaGoalsNodeAggregateSelection = {
   __typename?: 'PersonGEA_GoalOwnedGEAGoalsNodeAggregateSelection';
   createdAt: DateTimeAggregateSelection;
-  description: StringAggregateSelection;
+  goalStatement: StringAggregateSelection;
   name: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
@@ -26319,8 +27958,8 @@ export type PersonGea_MissionOwnedGeaMissionsAggregateSelection = {
 export type PersonGea_MissionOwnedGeaMissionsNodeAggregateSelection = {
   __typename?: 'PersonGEA_MissionOwnedGEAMissionsNodeAggregateSelection';
   createdAt: DateTimeAggregateSelection;
-  description: StringAggregateSelection;
   name: StringAggregateSelection;
+  purposeStatement: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -26347,9 +27986,9 @@ export type PersonGea_ValueOwnedGeaValuesAggregateSelection = {
 export type PersonGea_ValueOwnedGeaValuesNodeAggregateSelection = {
   __typename?: 'PersonGEA_ValueOwnedGEAValuesNodeAggregateSelection';
   createdAt: DateTimeAggregateSelection;
-  description: StringAggregateSelection;
   name: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
+  valueStatement: StringAggregateSelection;
 };
 
 export type PersonGea_VisionOwnedGeaVisionsAggregateSelection = {
@@ -26361,9 +28000,10 @@ export type PersonGea_VisionOwnedGeaVisionsAggregateSelection = {
 export type PersonGea_VisionOwnedGeaVisionsNodeAggregateSelection = {
   __typename?: 'PersonGEA_VisionOwnedGEAVisionsNodeAggregateSelection';
   createdAt: DateTimeAggregateSelection;
-  description: StringAggregateSelection;
   name: StringAggregateSelection;
+  timeHorizon: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
+  visionStatement: StringAggregateSelection;
 };
 
 export type PersonInfrastructureOwnedInfrastructureAggregateSelection = {
@@ -27125,7 +28765,7 @@ export type PersonOwnedGeaGoalsNodeAggregationWhereInput = {
   NOT?: InputMaybe<PersonOwnedGeaGoalsNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<PersonOwnedGeaGoalsNodeAggregationWhereInput>>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
-  description?: InputMaybe<StringScalarAggregationFilters>;
+  goalStatement?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
@@ -27231,8 +28871,8 @@ export type PersonOwnedGeaMissionsNodeAggregationWhereInput = {
   NOT?: InputMaybe<PersonOwnedGeaMissionsNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<PersonOwnedGeaMissionsNodeAggregationWhereInput>>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
-  description?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  purposeStatement?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
@@ -27443,9 +29083,9 @@ export type PersonOwnedGeaValuesNodeAggregationWhereInput = {
   NOT?: InputMaybe<PersonOwnedGeaValuesNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<PersonOwnedGeaValuesNodeAggregationWhereInput>>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
-  description?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  valueStatement?: InputMaybe<StringScalarAggregationFilters>;
 };
 
 export type PersonOwnedGeaValuesRelationship = {
@@ -27549,9 +29189,10 @@ export type PersonOwnedGeaVisionsNodeAggregationWhereInput = {
   NOT?: InputMaybe<PersonOwnedGeaVisionsNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<PersonOwnedGeaVisionsNodeAggregationWhereInput>>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
-  description?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  timeHorizon?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  visionStatement?: InputMaybe<StringScalarAggregationFilters>;
 };
 
 export type PersonOwnedGeaVisionsRelationship = {

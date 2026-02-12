@@ -100,12 +100,16 @@ type GEA_Vision
   ) {
   id: ID! @id
   name: String!
-  description: String
+  visionStatement: String
+  timeHorizon: String
   year: Date!
   createdAt: DateTime! @timestamp(operations: [CREATE])
   updatedAt: DateTime @timestamp(operations: [UPDATE])
   owners: [Person!]! @relationship(type: "OWNED_BY", direction: OUT)
   company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
+  supportsMissions: [GEA_Mission!]! @relationship(type: "SUPPORTS", direction: OUT)
+  supportedByGoals: [GEA_Goal!]! @relationship(type: "OPERATIONALIZES", direction: IN)
+  supportedByValues: [GEA_Value!]! @relationship(type: "SUPPORTS", direction: IN)
   partOfArchitectures: [Architecture!]! @relationship(type: "CONTAINS", direction: IN)
   depictedInDiagrams: [Diagram!]! @relationship(type: "DEPICTED_IN", direction: OUT)
 }
@@ -142,12 +146,15 @@ type GEA_Mission
   ) {
   id: ID! @id
   name: String!
-  description: String
+  purposeStatement: String
+  keywords: [String!]
   year: Date!
   createdAt: DateTime! @timestamp(operations: [CREATE])
   updatedAt: DateTime @timestamp(operations: [UPDATE])
   owners: [Person!]! @relationship(type: "OWNED_BY", direction: OUT)
   company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
+  supportedByVisions: [GEA_Vision!]! @relationship(type: "SUPPORTS", direction: IN)
+  supportedByValues: [GEA_Value!]! @relationship(type: "SUPPORTS", direction: IN)
   partOfArchitectures: [Architecture!]! @relationship(type: "CONTAINS", direction: IN)
   depictedInDiagrams: [Diagram!]! @relationship(type: "DEPICTED_IN", direction: OUT)
 }
@@ -184,11 +191,13 @@ type GEA_Value
   ) {
   id: ID! @id
   name: String!
-  description: String
+  valueStatement: String
   createdAt: DateTime! @timestamp(operations: [CREATE])
   updatedAt: DateTime @timestamp(operations: [UPDATE])
   owners: [Person!]! @relationship(type: "OWNED_BY", direction: OUT)
   company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
+  supportsMissions: [GEA_Mission!]! @relationship(type: "SUPPORTS", direction: OUT)
+  supportsVisions: [GEA_Vision!]! @relationship(type: "SUPPORTS", direction: OUT)
   partOfArchitectures: [Architecture!]! @relationship(type: "CONTAINS", direction: IN)
   depictedInDiagrams: [Diagram!]! @relationship(type: "DEPICTED_IN", direction: OUT)
 }
@@ -225,11 +234,14 @@ type GEA_Goal
   ) {
   id: ID! @id
   name: String!
-  description: String
+  goalStatement: String
   createdAt: DateTime! @timestamp(operations: [CREATE])
   updatedAt: DateTime @timestamp(operations: [UPDATE])
   owners: [Person!]! @relationship(type: "OWNED_BY", direction: OUT)
   company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
+  operationalizesVisions: [GEA_Vision!]! @relationship(type: "OPERATIONALIZES", direction: OUT)
+  supportsValues: [GEA_Value!]! @relationship(type: "SUPPORTS", direction: OUT)
+  achievedByStrategies: [GEA_Strategy!]! @relationship(type: "ACHIEVES", direction: IN)
   partOfArchitectures: [Architecture!]! @relationship(type: "CONTAINS", direction: IN)
   depictedInDiagrams: [Diagram!]! @relationship(type: "DEPICTED_IN", direction: OUT)
 }
@@ -271,6 +283,7 @@ type GEA_Strategy
   updatedAt: DateTime @timestamp(operations: [UPDATE])
   owners: [Person!]! @relationship(type: "OWNED_BY", direction: OUT)
   company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
+  achievesGoals: [GEA_Goal!]! @relationship(type: "ACHIEVES", direction: OUT)
   partOfArchitectures: [Architecture!]! @relationship(type: "CONTAINS", direction: IN)
   depictedInDiagrams: [Diagram!]! @relationship(type: "DEPICTED_IN", direction: OUT)
 }

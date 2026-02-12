@@ -5,7 +5,7 @@ export const GET_VALUES = gql`
     geaValues(where: $where) {
       id
       name
-      description
+      valueStatement
       createdAt
       updatedAt
       owners {
@@ -14,6 +14,14 @@ export const GET_VALUES = gql`
         lastName
       }
       company {
+        id
+        name
+      }
+      supportsMissions {
+        id
+        name
+      }
+      supportsVisions {
         id
         name
       }
@@ -64,7 +72,7 @@ export const CREATE_VALUE = gql`
       geaValues {
         id
         name
-        description
+        valueStatement
         createdAt
         updatedAt
       }
@@ -78,7 +86,7 @@ export const UPDATE_VALUE = gql`
       geaValues {
         id
         name
-        description
+        valueStatement
         createdAt
         updatedAt
       }

@@ -5,7 +5,8 @@ export const GET_MISSIONS = gql`
     geaMissions(where: $where) {
       id
       name
-      description
+      purposeStatement
+      keywords
       year
       createdAt
       updatedAt
@@ -15,6 +16,14 @@ export const GET_MISSIONS = gql`
         lastName
       }
       company {
+        id
+        name
+      }
+      supportedByVisions {
+        id
+        name
+      }
+      supportedByValues {
         id
         name
       }
@@ -66,7 +75,8 @@ export const CREATE_MISSION = gql`
       geaMissions {
         id
         name
-        description
+        purposeStatement
+        keywords
         year
         createdAt
         updatedAt
@@ -81,7 +91,8 @@ export const UPDATE_MISSION = gql`
       geaMissions {
         id
         name
-        description
+        purposeStatement
+        keywords
         year
         createdAt
         updatedAt

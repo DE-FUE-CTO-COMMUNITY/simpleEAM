@@ -114,11 +114,29 @@ const ValuesPage = () => {
 
     const input: Record<string, any> = {
       name: data.name,
-      description: data.description,
+      valueStatement: data.valueStatement,
       ...(data.ownerId
         ? {
             owners: {
               connect: [{ where: { node: { id: { eq: data.ownerId } } } }],
+            },
+          }
+        : {}),
+      ...(data.supportsMissions && data.supportsMissions.length > 0
+        ? {
+            supportsMissions: {
+              connect: data.supportsMissions.map(id => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }
+        : {}),
+      ...(data.supportsVisions && data.supportsVisions.length > 0
+        ? {
+            supportsVisions: {
+              connect: data.supportsVisions.map(id => ({
+                where: { node: { id: { eq: id } } },
+              })),
             },
           }
         : {}),
@@ -161,7 +179,7 @@ const ValuesPage = () => {
   const handleUpdateValueSubmit = async (id: string, data: ValueFormValues) => {
     const input: Record<string, any> = {
       name: { set: data.name },
-      description: { set: data.description },
+      valueStatement: { set: data.valueStatement },
     }
 
     if (data.ownerId) {
@@ -171,6 +189,32 @@ const ValuesPage = () => {
       }
     } else {
       input.owners = {
+        disconnect: [{ where: {} }],
+      }
+    }
+
+    if (data.supportsMissions && data.supportsMissions.length > 0) {
+      input.supportsMissions = {
+        disconnect: [{ where: {} }],
+        connect: data.supportsMissions.map(id => ({
+          where: { node: { id: { eq: id } } },
+        })),
+      }
+    } else {
+      input.supportsMissions = {
+        disconnect: [{ where: {} }],
+      }
+    }
+
+    if (data.supportsVisions && data.supportsVisions.length > 0) {
+      input.supportsVisions = {
+        disconnect: [{ where: {} }],
+        connect: data.supportsVisions.map(id => ({
+          where: { node: { id: { eq: id } } },
+        })),
+      }
+    } else {
+      input.supportsVisions = {
         disconnect: [{ where: {} }],
       }
     }

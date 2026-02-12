@@ -17,6 +17,10 @@ export const GET_STRATEGIES = gql`
         id
         name
       }
+      achievesGoals {
+        id
+        name
+      }
       partOfArchitectures {
         id
         name

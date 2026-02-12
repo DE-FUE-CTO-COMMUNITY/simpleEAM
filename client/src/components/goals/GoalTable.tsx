@@ -13,9 +13,12 @@ import usePersistentColumnVisibility from '../../hooks/usePersistentColumnVisibi
 export const GOAL_DEFAULT_COLUMN_VISIBILITY = {
   name: true,
   owners: true,
+  operationalizesVisions: false,
+  supportsValues: false,
+  achievedByStrategies: false,
   partOfArchitectures: true,
   depictedInDiagrams: true,
-  description: false,
+  goalStatement: false,
   id: false,
   createdAt: false,
   updatedAt: false,
@@ -81,8 +84,8 @@ const GoalTable: React.FC<GoalTableProps> = ({
         header: t('name'),
         cell: info => info.getValue(),
       }),
-      columnHelper.accessor('description', {
-        header: t('description'),
+      columnHelper.accessor('goalStatement', {
+        header: t('goalStatement'),
         cell: info => {
           const value = info.getValue()
           return value && value.length > 50 ? `${value.substring(0, 50)}...` : value || '-'
@@ -95,6 +98,32 @@ const GoalTable: React.FC<GoalTableProps> = ({
           const owners = info.getValue()
           return owners && owners.length > 0 ? `${owners[0].firstName} ${owners[0].lastName}` : '-'
         },
+      }),
+      columnHelper.accessor('operationalizesVisions', {
+        header: t('operationalizesVisions'),
+        cell: info => {
+          const visions = info.getValue()
+          return visions && visions.length > 0 ? visions.map(vision => vision.name).join(', ') : '-'
+        },
+        enableHiding: true,
+      }),
+      columnHelper.accessor('supportsValues', {
+        header: t('supportsValues'),
+        cell: info => {
+          const values = info.getValue()
+          return values && values.length > 0 ? values.map(value => value.name).join(', ') : '-'
+        },
+        enableHiding: true,
+      }),
+      columnHelper.accessor('achievedByStrategies', {
+        header: t('achievedByStrategies'),
+        cell: info => {
+          const strategies = info.getValue()
+          return strategies && strategies.length > 0
+            ? strategies.map(strategy => strategy.name).join(', ')
+            : '-'
+        },
+        enableHiding: true,
       }),
       columnHelper.accessor('partOfArchitectures', {
         header: t('partOfArchitectures'),
@@ -136,8 +165,11 @@ const GoalTable: React.FC<GoalTableProps> = ({
 
   const mapToFormValues = (goal: GoalType): GoalFormValues => ({
     name: goal.name,
-    description: goal.description ?? '',
+    goalStatement: goal.goalStatement ?? '',
     ownerId: goal.owners?.[0]?.id ?? '',
+    operationalizesVisions: goal.operationalizesVisions?.map(vision => vision.id) ?? [],
+    supportsValues: goal.supportsValues?.map(value => value.id) ?? [],
+    achievedByStrategies: goal.achievedByStrategies?.map(strategy => strategy.id) ?? [],
     partOfArchitectures: goal.partOfArchitectures?.map(arch => arch.id) ?? [],
     depictedInDiagrams: goal.depictedInDiagrams?.map(diagram => diagram.id) ?? [],
   })

@@ -14,9 +14,13 @@ export const VISION_DEFAULT_COLUMN_VISIBILITY = {
   name: true,
   year: true,
   owners: true,
+  supportsMissions: false,
+  supportedByValues: false,
+  supportedByGoals: false,
   partOfArchitectures: true,
   depictedInDiagrams: true,
-  description: false,
+  visionStatement: false,
+  timeHorizon: false,
   id: false,
   createdAt: false,
   updatedAt: false,
@@ -82,12 +86,17 @@ const VisionTable: React.FC<VisionTableProps> = ({
         header: t('name'),
         cell: info => info.getValue(),
       }),
-      columnHelper.accessor('description', {
-        header: t('description'),
+      columnHelper.accessor('visionStatement', {
+        header: t('visionStatement'),
         cell: info => {
           const value = info.getValue()
           return value && value.length > 50 ? `${value.substring(0, 50)}...` : value || '-'
         },
+        enableHiding: true,
+      }),
+      columnHelper.accessor('timeHorizon', {
+        header: t('timeHorizon'),
+        cell: info => info.getValue() || '-',
         enableHiding: true,
       }),
       columnHelper.accessor('year', {
@@ -100,6 +109,32 @@ const VisionTable: React.FC<VisionTableProps> = ({
           const owners = info.getValue()
           return owners && owners.length > 0 ? `${owners[0].firstName} ${owners[0].lastName}` : '-'
         },
+      }),
+      columnHelper.accessor('supportsMissions', {
+        header: t('supportsMissions'),
+        cell: info => {
+          const missions = info.getValue()
+          return missions && missions.length > 0
+            ? missions.map(mission => mission.name).join(', ')
+            : '-'
+        },
+        enableHiding: true,
+      }),
+      columnHelper.accessor('supportedByValues', {
+        header: t('supportedByValues'),
+        cell: info => {
+          const values = info.getValue()
+          return values && values.length > 0 ? values.map(value => value.name).join(', ') : '-'
+        },
+        enableHiding: true,
+      }),
+      columnHelper.accessor('supportedByGoals', {
+        header: t('supportedByGoals'),
+        cell: info => {
+          const goals = info.getValue()
+          return goals && goals.length > 0 ? goals.map(goal => goal.name).join(', ') : '-'
+        },
+        enableHiding: true,
       }),
       columnHelper.accessor('partOfArchitectures', {
         header: t('partOfArchitectures'),
@@ -141,9 +176,13 @@ const VisionTable: React.FC<VisionTableProps> = ({
 
   const mapToFormValues = (vision: VisionType): VisionFormValues => ({
     name: vision.name,
-    description: vision.description ?? '',
+    visionStatement: vision.visionStatement ?? '',
+    timeHorizon: vision.timeHorizon ?? '',
     year: vision.year ? new Date(vision.year) : new Date(),
     ownerId: vision.owners?.[0]?.id ?? '',
+    supportsMissions: vision.supportsMissions?.map(mission => mission.id) ?? [],
+    supportedByValues: vision.supportedByValues?.map(value => value.id) ?? [],
+    supportedByGoals: vision.supportedByGoals?.map(goal => goal.id) ?? [],
     partOfArchitectures: vision.partOfArchitectures?.map(arch => arch.id) ?? [],
     depictedInDiagrams: vision.depictedInDiagrams?.map(diagram => diagram.id) ?? [],
   })
