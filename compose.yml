@@ -48,7 +48,7 @@ services:
       - NEO4J_USER=${NEO4J_USER}
       - NEO4J_PASSWORD=${NEO4J_PASSWORD}
       - GRAPHQL_INTERNAL_PORT=${GRAPHQL_INTERNAL_PORT}
-      - KEYCLOAK_URL=http://keycloak:${KEYCLOAK_INTERNAL_PORT}
+      - KEYCLOAK_URL=${KEYCLOAK_URL}
       - KEYCLOAK_REALM=${KEYCLOAK_REALM}
       - KEYCLOAK_CLIENT_ID=${KEYCLOAK_CLIENT_ID_SERVER}
       - AUTH_DEBUG=${AUTH_DEBUG}
@@ -123,6 +123,8 @@ services:
   excalidraw-room:
     image: excalidraw/excalidraw-room:sha-03ff435
     restart: unless-stopped
+    ports:
+      - "${EXCALIDRAW_ROOM_EXTERNAL_PORT}:${EXCALIDRAW_ROOM_PORT}"
     networks:
       - eam-network
       - ${TRAEFIK_NETWORK}
