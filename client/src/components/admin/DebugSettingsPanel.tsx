@@ -14,9 +14,11 @@ import {
 } from '@mui/material'
 import BugReportIcon from '@mui/icons-material/BugReport'
 import RestartAltIcon from '@mui/icons-material/RestartAlt'
+import { useTranslations } from 'next-intl'
 import { useDebug } from '@/contexts/DebugContext'
 
 export default function DebugSettingsPanel() {
+  const t = useTranslations('admin.debugTools.settings')
   const { settings, updateSetting, resetSettings } = useDebug()
 
   return (
@@ -25,10 +27,10 @@ export default function DebugSettingsPanel() {
         title={
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <BugReportIcon color="primary" />
-            <Typography variant="h6">Debug-Einstellungen</Typography>
+            <Typography variant="h6">{t('title')}</Typography>
           </Box>
         }
-        subheader="Entwickler-Tools und Debugging-Optionen"
+        subheader={t('subtitle')}
       />
       <CardContent>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -42,10 +44,10 @@ export default function DebugSettingsPanel() {
             label={
               <Box>
                 <Typography variant="body2" fontWeight="medium">
-                  Element-Koordinaten anzeigen
+                  {t('showElementCoordinates')}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  Zeigt Position und Größe von selektierten Elementen im Canvas an
+                  {t('showElementCoordinatesDesc')}
                 </Typography>
               </Box>
             }
@@ -63,10 +65,10 @@ export default function DebugSettingsPanel() {
             label={
               <Box>
                 <Typography variant="body2" fontWeight="medium">
-                  Pfeil-Debug-Informationen
+                  {t('showArrowDebugInfo')}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  Zeigt detaillierte Informationen über Pfeil-Berechnungen
+                  {t('showArrowDebugInfoDesc')}
                 </Typography>
               </Box>
             }
@@ -84,10 +86,31 @@ export default function DebugSettingsPanel() {
             label={
               <Box>
                 <Typography variant="body2" fontWeight="medium">
-                  Performance-Metriken
+                  {t('showPerformanceMetrics')}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  Zeigt Rendering-Zeit und Performance-Statistiken
+                  {t('showPerformanceMetricsDesc')}
+                </Typography>
+              </Box>
+            }
+          />
+
+          <Divider />
+
+          <FormControlLabel
+            control={
+              <Switch
+                checked={settings.showDiagramSaveLogs}
+                onChange={e => updateSetting('showDiagramSaveLogs', e.target.checked)}
+              />
+            }
+            label={
+              <Box>
+                <Typography variant="body2" fontWeight="medium">
+                  {t('showDiagramSaveLogs')}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {t('showDiagramSaveLogsDesc')}
                 </Typography>
               </Box>
             }
@@ -102,7 +125,7 @@ export default function DebugSettingsPanel() {
               variant="outlined"
               size="small"
             >
-              Auf Standardwerte zurücksetzen
+              {t('resetToDefaults')}
             </Button>
           </Box>
         </Box>

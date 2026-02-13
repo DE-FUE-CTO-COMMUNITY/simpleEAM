@@ -1222,6 +1222,7 @@
       "usedByApplications": "Used by Applications",
       "relatedToCapabilities": "Related to Capabilities",
       "transferredInInterfaces": "Transferred in Interfaces",
+      "relatedDataObjects": "Related Data Objects",
       "partOfArchitectures": "Part of Architectures",
       "depictedInDiagrams": "Included in Diagrams",
       "tags": "Tags",
@@ -1259,6 +1260,7 @@
       "usedByApplications": "Used by Applications",
       "relatedToCapabilities": "Related to Capabilities",
       "transferredInInterfaces": "Transferred in Interfaces",
+      "relatedDataObjects": "Related Data Objects",
       "partOfArchitectures": "Part of Architectures",
       "depictedInDiagrams": "Included in Diagrams",
       "createdAt": "Created At",
@@ -2350,7 +2352,20 @@
     "debugTools": {
       "title": "Debug Tools",
       "description": "Here you can use debug tools for the application.",
-      "sessionDebugger": "Session Debugger"
+      "sessionDebugger": "Session Debugger",
+      "settings": {
+        "title": "Debug Settings",
+        "subtitle": "Developer tools and debugging options",
+        "showElementCoordinates": "Show Element Coordinates",
+        "showElementCoordinatesDesc": "Displays position and size of selected elements in the canvas",
+        "showArrowDebugInfo": "Arrow Debug Information",
+        "showArrowDebugInfoDesc": "Shows detailed information about arrow calculations",
+        "showPerformanceMetrics": "Performance Metrics",
+        "showPerformanceMetricsDesc": "Shows rendering time and performance statistics",
+        "showDiagramSaveLogs": "Diagram Save Logs",
+        "showDiagramSaveLogsDesc": "Shows detailed performance logs when saving diagrams (PNG generation, GraphQL mutations, etc.)",
+        "resetToDefaults": "Reset to Defaults"
+      }
     },
     "debugOverlay": {
       "title": "Element Coordinates",

@@ -6,6 +6,7 @@ interface DebugSettings {
   showElementCoordinates: boolean
   showArrowDebugInfo: boolean
   showPerformanceMetrics: boolean
+  showDiagramSaveLogs: boolean
 }
 
 interface DebugContextType {
@@ -18,6 +19,7 @@ const defaultSettings: DebugSettings = {
   showElementCoordinates: false,
   showArrowDebugInfo: false,
   showPerformanceMetrics: false,
+  showDiagramSaveLogs: false,
 }
 
 const DebugContext = createContext<DebugContextType | undefined>(undefined)

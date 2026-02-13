@@ -147,6 +147,24 @@ const UPDATE_DATA_OBJECT_DATA_SOURCES = gql`
   }
 `
 
+const UPDATE_DATA_OBJECT_RELATED_DATA_OBJECTS = gql`
+  mutation UpdateDataObjectRelatedDataObjects(
+    $where: DataObjectWhere!
+    $update: DataObjectUpdateInput!
+  ) {
+    updateDataObjects(where: $where, update: $update) {
+      dataObjects {
+        id
+        name
+        relatedDataObjects {
+          id
+          name
+        }
+      }
+    }
+  }
+`
+
 // GraphQL Mutations für Hierarchie- und Nachfolge-Beziehungen
 const UPDATE_CAPABILITY_PARENTS = gql`
   mutation UpdateCapabilityParents(
@@ -307,6 +325,17 @@ const CHECK_DATA_OBJECT_DATA_SOURCE = gql`
     dataObjects(where: { id: { eq: $dataObjectId } }) {
       id
       dataSources(where: { id: { eq: $applicationId } }) {
+        id
+      }
+    }
+  }
+`
+
+const CHECK_DATA_OBJECT_RELATED_DATA_OBJECT = gql`
+  query CheckDataObjectRelatedDataObject($sourceDataObjectId: ID!, $targetDataObjectId: ID!) {
+    dataObjects(where: { id: { eq: $sourceDataObjectId } }) {
+      id
+      relatedDataObjects(where: { id: { eq: $targetDataObjectId } }) {
         id
       }
     }
@@ -475,6 +504,7 @@ const createSingleRelationship = async (
     targetElementId,
     sourceElementType,
     targetElementType,
+    relationshipName,
   } = relationship
 
   // Verwende die korrekten generierten GraphQL Mutations basierend auf dem Beziehungstyp
@@ -482,8 +512,7 @@ const createSingleRelationship = async (
     case 'SUPPORTS':
       if (
         sourceElementType === 'application' &&
-        ((targetElementType as string) === 'businessCapability' ||
-          false)
+        ((targetElementType as string) === 'businessCapability' || false)
       ) {
         await client.mutate({
           mutation: UPDATE_APPLICATION_SUPPORTS_CAPABILITIES,
@@ -497,8 +526,7 @@ const createSingleRelationship = async (
           },
         })
       } else if (
-        ((sourceElementType as string) === 'businessCapability' ||
-          false) &&
+        ((sourceElementType as string) === 'businessCapability' || false) &&
         targetElementType === 'application'
       ) {
         // Umgekehrte Richtung: BusinessCapability → Application
@@ -518,10 +546,8 @@ const createSingleRelationship = async (
 
     case 'HAS_PARENT':
       if (
-        ((sourceElementType as string) === 'businessCapability' ||
-          false) &&
-        ((targetElementType as string) === 'businessCapability' ||
-          false)
+        ((sourceElementType as string) === 'businessCapability' || false) &&
+        ((targetElementType as string) === 'businessCapability' || false)
       ) {
         await client.mutate({
           mutation: UPDATE_CAPABILITY_PARENTS,
@@ -770,6 +796,30 @@ const createSingleRelationship = async (
       }
       break
 
+    case 'RELATED_TO_DATA_OBJECT':
+      if (sourceElementType === 'dataObject' && targetElementType === 'dataObject') {
+        // Use relationshipName if available, otherwise use a default value
+        const edgeName = relationshipName || 'related'
+
+        await client.mutate({
+          mutation: UPDATE_DATA_OBJECT_RELATED_DATA_OBJECTS,
+          variables: {
+            where: { id: { eq: sourceElementId } },
+            update: {
+              relatedDataObjects: {
+                connect: [
+                  {
+                    where: { node: { id: { eq: targetElementId } } },
+                    edge: { name: edgeName },
+                  },
+                ],
+              },
+            },
+          },
+        })
+      }
+      break
+
     default:
       console.warn(
         `Beziehungstyp ${relationshipDefinition.type} zwischen ${sourceElementType} und ${targetElementType} ist noch nicht implementiert`
@@ -804,14 +854,12 @@ export const checkRelationshipExists = async (
       case 'SUPPORTS':
         if (
           sourceElementType === 'application' &&
-          ((targetElementType as string) === 'businessCapability' ||
-            false)
+          ((targetElementType as string) === 'businessCapability' || false)
         ) {
           query = CHECK_APPLICATION_SUPPORTS_CAPABILITY
           variables = { applicationId: sourceElementId, capabilityId: targetElementId }
         } else if (
-          ((sourceElementType as string) === 'businessCapability' ||
-            false) &&
+          ((sourceElementType as string) === 'businessCapability' || false) &&
           targetElementType === 'application'
         ) {
           // Umgekehrte Richtung: BusinessCapability → Application (prüfe Application)
@@ -822,10 +870,8 @@ export const checkRelationshipExists = async (
 
       case 'HAS_PARENT':
         if (
-          ((sourceElementType as string) === 'businessCapability' ||
-            false) &&
-          ((targetElementType as string) === 'businessCapability' ||
-            false)
+          ((sourceElementType as string) === 'businessCapability' || false) &&
+          ((targetElementType as string) === 'businessCapability' || false)
         ) {
           query = CHECK_CAPABILITY_HAS_PARENT
           variables = { capabilityId: sourceElementId, parentId: targetElementId }
@@ -920,6 +966,13 @@ export const checkRelationshipExists = async (
         if (sourceElementType === 'dataObject' && targetElementType === 'application') {
           query = CHECK_DATA_OBJECT_DATA_SOURCE
           variables = { dataObjectId: sourceElementId, applicationId: targetElementId }
+        }
+        break
+
+      case 'RELATED_TO_DATA_OBJECT':
+        if (sourceElementType === 'dataObject' && targetElementType === 'dataObject') {
+          query = CHECK_DATA_OBJECT_RELATED_DATA_OBJECT
+          variables = { sourceDataObjectId: sourceElementId, targetDataObjectId: targetElementId }
         }
         break
 
@@ -1026,6 +1079,12 @@ export const checkRelationshipExists = async (
           data.dataObjects &&
           data.dataObjects.length > 0 &&
           data.dataObjects[0]?.dataSources?.length > 0
+        break
+      case 'RELATED_TO_DATA_OBJECT':
+        relationshipExists =
+          data.dataObjects &&
+          data.dataObjects.length > 0 &&
+          data.dataObjects[0]?.relatedDataObjects?.length > 0
         break
     }
 
