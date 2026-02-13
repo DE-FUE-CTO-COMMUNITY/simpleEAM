@@ -496,6 +496,414 @@ Simple-EAM consists of multiple components delivered as Docker containers:
 - Example: `GEA_CapabilityMaturity` or `GEA_SolutionDomain`.
 - The prefix is enforced on creation and validated on import.
 
+### 2.11 Process modeling
+
+#### FR-PM-01: Process element management
+
+**Description:** The system must support creating and managing business processes as first-class EAM elements.  
+**Priority:** High  
+**Acceptance criteria:**
+
+- Users can create new business processes with the following attributes:
+  - Name
+  - Description
+  - Owner
+  - Process type (core, support, management)
+  - Status (active, planned, retired)
+  - Maturity level
+  - Process category/domain
+  - Tags/categories
+  - BPMN Diagram
+- Processes can be edited, deleted, or archived
+- Processes are stored in the Neo4j database as nodes with type "Process"
+
+#### FR-PM-02: BPMN diagram editor
+
+**Description:** The system must provide a BPMN editor for modeling process flows using the bpmn-js library.  
+**Priority:** High  
+**Acceptance criteria:**
+
+- Integration of bpmn-js (https://github.com/bpmn-io/bpmn-js) library for process modeling
+- Support for standard BPMN 2.0 elements:
+  - Start/End events
+  - Tasks (User Task, Service Task, etc.)
+  - Gateways (Exclusive, Parallel, Inclusive)
+  - Sequence flows
+  - Data objects
+  - Pools and lanes
+- BPMN diagrams are saved as XML (BPMN 2.0 format) in the database within the BPMN Diagram attribute of the Process element
+- Visual representation of BPMN diagrams in read-only mode for viewing
+- Export capability for BPMN XML files
+- Import capability for existing BPMN XML files
+
+#### FR-PM-03: Process hierarchy
+
+**Description:** The system must support hierarchical process structures.  
+**Priority:** High  
+**Acceptance criteria:**
+
+- Processes can have parent-child relationships (sub-processes)
+- Multiple levels of process decomposition are supported
+- A process can have multiple sub-processes
+- A sub-process can only have one parent process
+- Hierarchical process views show the full process tree
+- Navigation between parent and child processes is intuitive
+
+#### FR-PM-04: Process to capability relationships
+
+**Description:** The system must support linking processes to business capabilities.  
+**Priority:** High  
+**Acceptance criteria:**
+
+- Processes can be linked to one or more business capabilities
+- Relationship type is "realizes" or "supports"
+- Users can view all processes linked to a capability
+- Users can view all capabilities supported by a process
+- Relationships can be created via the process form or capability form
+- Relationships are visualized in diagrams
+
+#### FR-PM-05: Process to application relationships
+
+**Description:** The system must support linking processes to business applications.  
+**Priority:** High  
+**Acceptance criteria:**
+
+- Processes can be linked to one or more applications
+- Relationship type indicates "supported by" or "executed by"
+- Users can view all applications supporting a process
+- Users can view all processes supported by an application
+- Relationships can be created via the process form or application form
+- Relationships are visualized in diagrams
+
+#### FR-PM-06: Process to data relationships
+
+**Description:** The system must support linking processes to data objects.  
+**Priority:** High  
+**Acceptance criteria:**
+
+- Processes can be linked to data objects they create, read, update, or delete
+- Relationship types: "creates," "reads," "updates," "deletes" (CRUD)
+- Users can view all data objects used by a process
+- Users can view all processes that use a data object
+- Relationships can be created via the process form or data object form
+- CRUD matrix visualization showing processes and their data interactions
+
+#### FR-PM-07: Process visualization in diagrams
+
+**Description:** Processes must be available as elements in the general diagram editor.  
+**Priority:** Medium  
+**Acceptance criteria:**
+
+- Process elements can be added to architecture diagrams
+- Process symbols follow standard notation (e.g., rounded rectangles)
+- Process properties are displayed when hovering or selecting
+- Connections between processes and other elements (capabilities, applications, data) can be drawn
+- Process hierarchy is visualizable in diagrams
+
+#### FR-PM-08: Process list and filtering
+
+**Description:** The system must provide list views with filtering and sorting for processes.  
+**Priority:** Medium  
+**Acceptance criteria:**
+
+- Processes can be listed in a table view
+- Table displays key attributes: name, owner, type, status, maturity
+- Filtering by process type, status, owner, and maturity level
+- Sorting by any column
+- Search by process name or description
+- Quick access to process details and BPMN editor from the list
+
+#### FR-PM-09: Process import and export
+
+**Description:** The system must support importing and exporting process information.  
+**Priority:** Medium  
+**Acceptance criteria:**
+
+- Export processes to Excel with all attributes and relationships
+- Import processes from Excel templates
+- Export BPMN diagrams as XML files
+- Import BPMN diagrams from XML files
+- Batch operations for multiple processes
+- Validation of imported data
+
+### 2.12 Supplier management
+
+#### FR-SM-01: Supplier element management
+
+**Description:** The system must support creating and managing suppliers as first-class EAM elements.  
+**Priority:** High  
+**Acceptance criteria:**
+
+- Users can create new suppliers with the following attributes:
+  - Name
+  - Description
+  - Supplier type (software vendor, service provider, consultant, hardware vendor, cloud provider)
+  - Status (active, potential, inactive, blocked)
+  - Contact information (address, phone, email, website)
+  - Primary contact person
+  - Contract start date
+  - Contract end date
+  - Annual spend/budget
+  - Risk classification (low, medium, high, critical)
+  - Strategic importance (low, medium, high, strategic)
+  - Performance rating
+  - Compliance certifications (ISO, SOC2, etc.)
+  - Tags/categories
+- Suppliers can be edited, deleted, or archived
+- Suppliers are stored in the Neo4j database as nodes with type "Supplier"
+
+#### FR-SM-02: Feature-controlled menu integration
+
+**Description:** When the supplier management feature is enabled, a "Suppliers" menu entry must appear in the navigation.  
+**Priority:** High  
+**Acceptance criteria:**
+
+- "Suppliers" menu entry is positioned between "Companies" and "Persons" in the navigation menu
+- Menu entry is visible for all user roles (admin, architect, viewer)
+- Menu entry only appears when the supplier management feature is enabled
+- Feature can be toggled on/off per company in the feature management settings
+- When feature is disabled, the menu entry is hidden but existing supplier data is preserved
+- Clicking the menu entry navigates to the supplier list view
+
+#### FR-SM-03: Supplier to application relationships
+
+**Description:** The system must support linking suppliers to applications they provide or support.  
+**Priority:** High  
+**Acceptance criteria:**
+
+- Suppliers can be linked to one or more applications
+- Relationship types: "provides," "supports," "maintains"
+- Users can view all applications provided by a supplier
+- Users can view the supplier(s) for each application
+- Relationships can be created via the supplier form or application form
+- Application forms show supplier selection field
+
+#### FR-SM-04: Supplier to infrastructure relationships
+
+**Description:** The system must support linking suppliers to infrastructure components.  
+**Priority:** Medium  
+**Acceptance criteria:**
+
+- Suppliers can be linked to infrastructure components they provide or support
+- Relationship types: "provides," "hosts," "maintains"
+- Users can view all infrastructure components from a supplier
+- Users can view suppliers for infrastructure components
+- Useful for tracking cloud providers, hardware vendors, etc.
+
+#### FR-SM-05: Supplier list and filtering
+
+**Description:** The system must provide list views with filtering and sorting for suppliers.  
+**Priority:** High  
+**Acceptance criteria:**
+
+- Suppliers can be listed in a table view
+- Table displays key attributes: name, type, status, strategic importance, performance rating
+- Filtering by supplier type, status, strategic importance, and risk classification
+- Sorting by any column
+- Search by supplier name or description
+- Quick access to supplier details from the list
+- Export supplier list to Excel
+
+#### FR-SM-06: Supplier assessment tracking
+
+**Description:** The system must support tracking supplier assessments and reviews.  
+**Priority:** Medium  
+**Acceptance criteria:**
+
+- Suppliers can have assessment records with date, score, and notes
+- Assessment categories: performance, compliance, financial stability, innovation
+- Historical assessment data is preserved
+- Trend visualization of supplier performance over time
+- Alerts for suppliers with declining performance
+
+#### FR-SM-07: Supplier visualization in diagrams
+
+**Description:** Suppliers must be available as elements in the general diagram editor.  
+**Priority:** Low  
+**Acceptance criteria:**
+
+- Supplier elements can be added to architecture diagrams
+- Supplier symbols follow standard notation
+- Connections between suppliers and applications/infrastructure can be drawn
+- Supplier properties are displayed when hovering or selecting
+
+#### FR-SM-08: Supplier import and export
+
+**Description:** The system must support importing and exporting supplier information.  
+**Priority:** Medium  
+**Acceptance criteria:**
+
+- Export suppliers to Excel with all attributes and relationships
+- Import suppliers from Excel templates
+- Batch operations for multiple suppliers
+- Validation of imported data (contact information, dates, enum values)
+- Support for updating existing suppliers via import
+
+### 2.13 Business model canvas and value proposition canvas
+
+#### FR-BMC-01: Business model canvas management
+
+**Description:** The system must support creating and managing Business Model Canvases as strategic planning tools.  
+**Priority:** High  
+**Acceptance criteria:**
+
+- Users can create Business Model Canvases with the following nine building blocks:
+  - Customer Segments: Target groups and personas
+  - Value Propositions: Products and services offered
+  - Channels: How value propositions reach customers
+  - Customer Relationships: Type of relationships with customer segments
+  - Revenue Streams: How the business generates income
+  - Key Resources: Assets required to deliver value
+  - Key Activities: Critical actions to operate the business model
+  - Key Partnerships: Network of suppliers and partners
+  - Cost Structure: Main costs to operate the business model
+- Each building block supports rich text input with multiple entries
+- Canvas metadata: name, description, owner, company, version, status (draft, active, archived)
+- Multiple canvases can be created per company
+- Canvases can be versioned to track evolution over time
+- Canvases are stored in the Neo4j database
+
+#### FR-BMC-02: Visual business model canvas editor
+
+**Description:** The system must provide an interactive visual editor for Business Model Canvases.  
+**Priority:** High  
+**Acceptance criteria:**
+
+- Visual representation following the standard Business Model Canvas layout
+- Nine building blocks arranged in the standard configuration
+- Click-to-edit functionality for each building block
+- Drag-and-drop to reorder items within building blocks
+- Color coding options for different categories or priorities
+- Sticky note style for individual entries within blocks
+- Export canvas as PDF or image (PNG/SVG)
+- Print-friendly layout
+- Responsive design for various screen sizes
+
+#### FR-BMC-03: Value proposition canvas management
+
+**Description:** The system must support creating and managing Value Proposition Canvases.  
+**Priority:** High  
+**Acceptance criteria:**
+
+- Users can create Value Proposition Canvases with two main sections:
+  - Customer Profile:
+    - Customer Jobs: Tasks customers want to accomplish
+    - Pains: Negative experiences and obstacles
+    - Gains: Desired positive outcomes and benefits
+  - Value Map:
+    - Products & Services: What is being offered
+    - Pain Relievers: How offerings alleviate pains
+    - Gain Creators: How offerings create gains
+- Each section supports multiple entries with rich text
+- Canvas metadata: name, description, owner, customer segment, status
+- Link to specific customer segments in Business Model Canvas
+- Multiple value proposition canvases can be created per customer segment
+- Canvases are stored in the Neo4j database
+
+#### FR-BMC-04: Visual value proposition canvas editor
+
+**Description:** The system must provide an interactive visual editor for Value Proposition Canvases.  
+**Priority:** High  
+**Acceptance criteria:**
+
+- Visual representation following the standard Value Proposition Canvas layout
+- Customer Profile on the right side (circle with three sections)
+- Value Map on the left side (square with three sections)
+- Click-to-edit functionality for each section
+- Visual connections showing how pain relievers address pains
+- Visual connections showing how gain creators address gains
+- Color coding for matched/unmatched items
+- Export canvas as PDF or image (PNG/SVG)
+- Fit analysis visualization showing alignment between customer profile and value map
+
+#### FR-BMC-05: Canvas to architecture element relationships
+
+**Description:** The system must support linking canvases to architecture elements.  
+**Priority:** High  
+**Acceptance criteria:**
+
+- Business Model Canvases can be linked to:
+  - Business capabilities (for key activities and resources)
+  - Applications (for channels and key activities)
+  - Data objects (for key resources)
+  - Suppliers (for key partnerships)
+  - Processes (for key activities)
+- Value Proposition Canvases can be linked to:
+  - Business capabilities (for products & services)
+  - Applications (for pain relievers and gain creators)
+  - Customer segments (in Business Model Canvas)
+- Bidirectional navigation between canvases and architecture elements
+- Visual indicators in canvas editor showing linked elements
+- Relationship types are semantically meaningful (e.g., "supports," "delivers," "enables")
+
+#### FR-BMC-06: Canvas collaboration and comments
+
+**Description:** The system must support collaborative work on canvases.  
+**Priority:** Medium  
+**Acceptance criteria:**
+
+- Multiple users can view the same canvas simultaneously
+- Comment functionality on each building block or section
+- @mentions to tag specific users for feedback
+- Comment threads with replies
+- Comment resolution status
+- Activity log showing canvas changes and who made them
+- Notifications for comments and mentions
+
+#### FR-BMC-07: Canvas templates and duplication
+
+**Description:** The system must support canvas templates and duplication.  
+**Priority:** Medium  
+**Acceptance criteria:**
+
+- Predefined canvas templates for common business models (e.g., SaaS, Marketplace, Freemium)
+- Create custom templates from existing canvases
+- Duplicate existing canvases to create variations
+- Template library accessible from canvas creation dialog
+- Templates include placeholder text and guidance
+- Company-specific template repository
+
+#### FR-BMC-08: Canvas versioning and comparison
+
+**Description:** The system must support version control and comparison for canvases.  
+**Priority:** Medium  
+**Acceptance criteria:**
+
+- Automatic versioning when significant changes are made
+- Manual version snapshots with version notes
+- View history of all canvas versions
+- Compare two versions side-by-side
+- Highlight changes between versions
+- Restore previous versions
+- Version metadata: timestamp, author, change description
+
+#### FR-BMC-09: Canvas analytics and insights
+
+**Description:** The system must provide analytics for Business Model and Value Proposition Canvases.  
+**Priority:** Low  
+**Acceptance criteria:**
+
+- Dashboard showing canvas overview and statistics
+- Completeness indicators for each building block
+- Gap analysis identifying empty or weak building blocks
+- Alignment score between Value Proposition Canvas and Business Model Canvas
+- List of architecture elements not yet linked to canvases
+- Recommendations for missing links to architecture elements
+
+#### FR-BMC-10: Canvas import and export
+
+**Description:** The system must support importing and exporting canvas data.  
+**Priority:** Medium  
+**Acceptance criteria:**
+
+- Export Business Model Canvas to Excel format
+- Export Value Proposition Canvas to Excel format
+- Export canvases as JSON for integration with other tools
+- Import canvases from Excel templates
+- Import canvases from JSON format
+- Export canvas as PDF with all building blocks and metadata
+- Batch export of multiple canvases
+
 ## 3. Non-functional requirements
 
 ### 3.1 Performance and scalability

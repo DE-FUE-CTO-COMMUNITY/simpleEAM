@@ -10,6 +10,7 @@ import {
   Rule as RuleIcon,
   Settings as SettingsIcon,
   Business as CompanyIcon,
+  BusinessCenter as SupplierIcon,
   Visibility as VisionIcon,
   Flag as MissionIcon,
   Favorite as ValuesIcon,
@@ -72,6 +73,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
   const isAbhEnabled = featureFlags.ABH
   const isApsEnabled = featureFlags.APS
   const isAasEnabled = featureFlags.AAS
+  const isSupEnabled = featureFlags.SUP
 
   const handleDrawerToggle = () => {
     setOpen(!open)
@@ -264,6 +266,10 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
     // Companies management only visible for admins
     ...(initialized && isAdmin()
       ? [{ text: t('companies'), icon: <CompanyIcon />, href: '/companies' }]
+      : []),
+    // Suppliers visible for all users when SUP feature is enabled
+    ...(initialized && isSupEnabled
+      ? [{ text: t('suppliers'), icon: <SupplierIcon />, href: '/suppliers' }]
       : []),
     { text: t('persons'), icon: <PersonIcon />, href: '/persons' },
     // Import/Export for Admin and Architect users (Hydration fix: only when initialized)

@@ -56,6 +56,7 @@
     "applications": "Applikationen",
     "aiComponents": "KI-Komponenten",
     "companies": "Unternehmen",
+    "suppliers": "Lieferanten",
     "dataObjects": "Datenobjekte",
     "interfaces": "Schnittstellen",
     "infrastructure": "Infrastruktur",
@@ -86,7 +87,9 @@
     "dataArchitecture": "Datenarchitektur",
     "aiArchitecture": "KI-Architektur",
     "solutionArchitecture": "Lösungsarchitektur",
-    "infrastructureArchitecture": "Infrastrukturarchitektur"
+    "infrastructureArchitecture": "Infrastrukturarchitektur",
+    "transformationArchitecture": "Transformationsarchitektur",
+    "technologyManagement": "Technologiemanagement"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -2604,5 +2607,137 @@
     "title": "Prozess-Editor",
     "comingSoon": "Diese Funktion wird später implementiert",
     "description": "Der Prozess-Editor für BPMN-Diagramme ist in Entwicklung und wird in einer zukünftigen Version verfügbar sein."
+  },
+  "suppliers": {
+    "title": "Lieferanten",
+    "addNew": "Neuen Lieferant erstellen",
+    "editTitle": "Lieferant bearbeiten",
+    "createTitle": "Neuen Lieferant erstellen",
+    "viewTitle": "Lieferanten-Details",
+    "deleteConfirmation": "Sind Sie sicher, dass Sie diesen Lieferanten löschen möchten?",
+    "noSuppliersFound": "Keine Lieferanten gefunden.",
+    "searchPlaceholder": "Lieferanten suchen...",
+    "messages": {
+      "loadError": "Fehler beim Laden der Lieferanten",
+      "createSuccess": "Lieferant erfolgreich erstellt",
+      "createError": "Fehler beim Erstellen des Lieferanten",
+      "updateSuccess": "Lieferant erfolgreich aktualisiert",
+      "updateError": "Fehler beim Aktualisieren des Lieferanten",
+      "deleteSuccess": "Lieferant erfolgreich gelöscht",
+      "deleteError": "Fehler beim Löschen des Lieferanten",
+      "selectCompanyFirst": "Bitte zuerst ein Unternehmen auswählen."
+    },
+    "form": {
+      "name": "Name",
+      "description": "Beschreibung",
+      "supplierType": "Lieferantentyp",
+      "status": "Status",
+      "address": "Adresse",
+      "phone": "Telefon",
+      "email": "E-Mail",
+      "website": "Website",
+      "primaryContactPerson": "Hauptansprechpartner",
+      "contractStartDate": "Vertragsbegin",
+      "contractEndDate": "Vertragsende",
+      "annualSpend": "Jährliche Ausgaben",
+      "riskClassification": "Risikobewertung",
+      "strategicImportance": "Strategische Bedeutung",
+      "performanceRating": "Leistungsbewertung",
+      "complianceCertifications": "Compliance-Zertifizierungen",
+      "tags": "Tags",
+      "providesApplications": "Stellt Applikationen bereit",
+      "supportsApplications": "Unterstützt Applikationen",
+      "maintainsApplications": "Wartet Applikationen",
+      "providesInfrastructure": "Stellt Infrastruktur bereit",
+      "hostsInfrastructure": "Hostet Infrastruktur",
+      "maintainsInfrastructure": "Wartet Infrastruktur",
+      "none": "Keine"
+    },
+    "validation": {
+      "nameMin": "Name muss mindestens 3 Zeichen lang sein",
+      "nameMax": "Name darf maximal 100 Zeichen lang sein",
+      "descriptionMin": "Beschreibung muss mindestens 10 Zeichen lang sein",
+      "descriptionMax": "Beschreibung darf maximal 1000 Zeichen lang sein",
+      "addressMax": "Adresse darf maximal 500 Zeichen lang sein",
+      "phoneMax": "Telefonnummer darf maximal 50 Zeichen lang sein",
+      "emailInvalid": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+      "websiteInvalid": "Bitte geben Sie eine gültige URL ein",
+      "contactMax": "Ansprechpartnername darf maximal 100 Zeichen lang sein",
+      "spendMin": "Jährliche Ausgaben müssen 0 oder größer sein",
+      "ratingMin": "Bewertung muss mindestens 0 sein",
+      "ratingMax": "Bewertung darf maximal 5 sein",
+      "contractEndAfterStart": "Vertragsende muss nach Vertragsbeginn liegen"
+    },
+    "tabs": {
+      "general": "Allgemein",
+      "contact": "Kontakt",
+      "contract": "Vertrag",
+      "assessment": "Bewertung",
+      "relationships": "Beziehungen"
+    },
+    "table": {
+      "id": "ID",
+      "name": "Name",
+      "description": "Beschreibung",
+      "supplierType": "Typ",
+      "status": "Status",
+      "address": "Adresse",
+      "phone": "Telefon",
+      "email": "E-Mail",
+      "website": "Website",
+      "primaryContactPerson": "Ansprechpartner",
+      "contractStartDate": "Vertragsbeginn",
+      "contractEndDate": "Vertragsende",
+      "annualSpend": "Jährliche Ausgaben",
+      "riskClassification": "Risiko",
+      "strategicImportance": "Bedeutung",
+      "performanceRating": "Leistung",
+      "complianceCertifications": "Zertifizierungen",
+      "providesApplications": "Stellt Apps bereit",
+      "supportsApplications": "Unterstützt Apps",
+      "maintainsApplications": "Wartet Apps",
+      "providesInfrastructure": "Stellt Infra bereit",
+      "hostsInfrastructure": "Hostet Infra",
+      "maintainsInfrastructure": "Wartet Infra",
+      "tags": "Tags",
+      "createdAt": "Erstellt am",
+      "updatedAt": "Aktualisiert am",
+      "actions": "Aktionen",
+      "noData": "Keine Lieferanten gefunden"
+    },
+    "supplierTypes": {
+      "SOFTWARE_VENDOR": "Software-Anbieter",
+      "SERVICE_PROVIDER": "Dienstleister",
+      "CONSULTANT": "Berater",
+      "HARDWARE_VENDOR": "Hardware-Anbieter",
+      "CLOUD_PROVIDER": "Cloud-Anbieter"
+    },
+    "statuses": {
+      "ACTIVE": "Aktiv",
+      "POTENTIAL": "Potenziell",
+      "INACTIVE": "Inaktiv",
+      "BLOCKED": "Geblockt"
+    },
+    "riskClassifications": {
+      "LOW": "Niedrig",
+      "MEDIUM": "Mittel",
+      "HIGH": "Hoch",
+      "CRITICAL": "Kritisch"
+    },
+    "strategicImportances": {
+      "LOW": "Niedrig",
+      "MEDIUM": "Mittel",
+      "HIGH": "Hoch",
+      "STRATEGIC": "Strategisch"
+    },
+    "filter": {
+      "title": "Lieferanten filtern",
+      "supplierType": "Lieferantentyp",
+      "status": "Status",
+      "riskClassification": "Risikobewertung",
+      "strategicImportance": "Strategische Bedeutung",
+      "descriptionContains": "Beschreibung enthält",
+      "updatedDateRange": "Aktualisierungszeitraum"
+    }
   }
 }

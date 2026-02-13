@@ -347,6 +347,65 @@ type Person
 }
 
 """
+Supplier – represents a supplier or vendor providing products or services
+"""
+type Supplier
+  @node
+  @authorization(
+    validate: [
+      { operations: [CREATE], where: { jwt: { roles: { includes: "architect" } } } }
+      {
+        operations: [UPDATE, DELETE]
+        where: {
+          AND: [
+            { jwt: { roles: { includes: "architect" } } }
+            { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+          ]
+        }
+      }
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "admin" } } } }
+    ]
+    filter: [
+      {
+        where: {
+          OR: [
+            { jwt: { roles: { includes: "admin" } } }
+            { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+          ]
+        }
+      }
+    ]
+  ) {
+  id: ID! @id
+  name: String!
+  description: String
+  supplierType: SupplierType!
+  status: SupplierStatus!
+  address: String
+  phone: String
+  email: String
+  website: String
+  primaryContactPerson: String
+  contractStartDate: Date
+  contractEndDate: Date
+  annualSpend: Float
+  riskClassification: RiskClassification
+  strategicImportance: StrategicImportance
+  performanceRating: Int
+  complianceCertifications: [String!]
+  tags: [String!]
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime @timestamp(operations: [UPDATE])
+  company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
+  providesApplications: [Application!]! @relationship(type: "PROVIDED_BY", direction: IN)
+  supportsApplications: [Application!]! @relationship(type: "SUPPORTED_BY", direction: IN)
+  maintainsApplications: [Application!]! @relationship(type: "MAINTAINED_BY", direction: IN)
+  providesInfrastructure: [Infrastructure!]! @relationship(type: "PROVIDED_BY", direction: IN)
+  hostsInfrastructure: [Infrastructure!]! @relationship(type: "HOSTED_BY", direction: IN)
+  maintainsInfrastructure: [Infrastructure!]! @relationship(type: "MAINTAINED_BY", direction: IN)
+}
+
+"""
 Application – represents a business application within Enterprise Architecture Management
 """
 type Application
@@ -414,6 +473,9 @@ type Application
     @relationship(type: "IMPLEMENTS_PRINCIPLE", direction: OUT)
   hostedOn: [Infrastructure!]! @relationship(type: "HOSTED_ON", direction: OUT)
   usesAIComponents: [AIComponent!]! @relationship(type: "USED_BY", direction: OUT)
+  providedBy: [Supplier!]! @relationship(type: "PROVIDED_BY", direction: OUT)
+  supportedBy: [Supplier!]! @relationship(type: "SUPPORTED_BY", direction: OUT)
+  maintainedBy: [Supplier!]! @relationship(type: "MAINTAINED_BY", direction: OUT)
 }
 
 """
@@ -605,6 +667,9 @@ type Infrastructure
   hostsAIComponents: [AIComponent!]! @relationship(type: "HOSTED_ON", direction: IN)
   partOfArchitectures: [Architecture!]! @relationship(type: "CONTAINS", direction: IN)
   depictedInDiagrams: [Diagram!]! @relationship(type: "DEPICTED_IN", direction: OUT)
+  providedBy: [Supplier!]! @relationship(type: "PROVIDED_BY", direction: OUT)
+  hostedBy: [Supplier!]! @relationship(type: "HOSTED_BY", direction: OUT)
+  maintainedBy: [Supplier!]! @relationship(type: "MAINTAINED_BY", direction: OUT)
 }
 
 """
@@ -725,6 +790,7 @@ type Company
   ownedDiagrams: [Diagram!]! @relationship(type: "OWNED_BY", direction: IN)
   ownedArchitecturePrinciples: [ArchitecturePrinciple!]!
     @relationship(type: "OWNED_BY", direction: IN)
+  ownedSuppliers: [Supplier!]! @relationship(type: "OWNED_BY", direction: IN)
 }
 
 """
@@ -888,6 +954,47 @@ enum InterfaceStatus {
   OUT_OF_SERVICE
   PLANNED
   DEPRECATED
+}
+
+"""
+Supplier types
+"""
+enum SupplierType {
+  SOFTWARE_VENDOR
+  SERVICE_PROVIDER
+  CONSULTANT
+  HARDWARE_VENDOR
+  CLOUD_PROVIDER
+}
+
+"""
+Supplier status values
+"""
+enum SupplierStatus {
+  ACTIVE
+  POTENTIAL
+  INACTIVE
+  BLOCKED
+}
+
+"""
+Risk classification for suppliers
+"""
+enum RiskClassification {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+"""
+Strategic importance of suppliers
+"""
+enum StrategicImportance {
+  LOW
+  MEDIUM
+  HIGH
+  STRATEGIC
 }
 
 """
