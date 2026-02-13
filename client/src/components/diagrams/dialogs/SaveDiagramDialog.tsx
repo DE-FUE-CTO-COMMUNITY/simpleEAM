@@ -47,6 +47,7 @@ import {
 import { useAuth } from '@/lib/auth'
 import { useCompanyContext } from '@/contexts/CompanyContext'
 import { useCurrentPerson } from '@/hooks/useCurrentPerson'
+import { useDebug } from '@/contexts/DebugContext'
 import {
   createDiagramRelationshipUpdates,
   createDiagramRelationshipUpdatesWithDisconnect,
@@ -198,6 +199,16 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
 
   // Aktuellen Benutzer für Owner-Zuweisung abrufen
   const { currentPerson } = useCurrentPerson()
+
+  // Debug context for conditional logging
+  const { settings: debugSettings } = useDebug()
+
+  // Helper function for debug logging - only logs when showDiagramSaveLogs is enabled
+  const debugLog = (...args: any[]) => {
+    if (debugSettings.showDiagramSaveLogs) {
+      console.log(...args)
+    }
+  }
 
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -441,25 +452,25 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
 
   // Funktion zum Verknüpfen aller Diagramm-Elemente mit der Architektur
   const linkElementsToArchitecture = async (diagramJsonString: string, architectureId: string) => {
-    console.log('🔗 [SaveDiagram] linkElementsToArchitecture started')
+    debugLog('🔗 [SaveDiagram] linkElementsToArchitecture started')
     const linkingStartTime = performance.now()
-    
+
     const linkingData = createArchitectureLinkingUpdates(diagramJsonString, architectureId)
-    const totalLinks = 
+    const totalLinks =
       linkingData.capabilities.length +
       linkingData.applications.length +
       linkingData.dataObjects.length +
       linkingData.interfaces.length +
       linkingData.infrastructures.length
-    
-    console.log(`📊 [SaveDiagram] Linking ${totalLinks} elements to architecture:`, {
+
+    debugLog(`📊 [SaveDiagram] Linking ${totalLinks} elements to architecture:`, {
       capabilities: linkingData.capabilities.length,
       applications: linkingData.applications.length,
       dataObjects: linkingData.dataObjects.length,
       interfaces: linkingData.interfaces.length,
       infrastructures: linkingData.infrastructures.length,
     })
-    
+
     const promises: Promise<any>[] = []
 
     // BusinessCapabilities verknüpfen
@@ -526,13 +537,16 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
     const results = await Promise.allSettled(promises)
     const successCount = results.filter(result => result.status === 'fulfilled').length
     const errorCount = results.filter(result => result.status === 'rejected').length
-    
+
     const linkingEndTime = performance.now()
-    console.log(`✅ [SaveDiagram] linkElementsToArchitecture completed in ${(linkingEndTime - linkingStartTime).toFixed(2)}ms`, {
-      successCount,
-      errorCount,
-      totalLinks,
-    })
+    debugLog(
+      `✅ [SaveDiagram] linkElementsToArchitecture completed in ${(linkingEndTime - linkingStartTime).toFixed(2)}ms`,
+      {
+        successCount,
+        errorCount,
+        totalLinks,
+      }
+    )
 
     return { successCount, errorCount }
   }
@@ -627,9 +641,9 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
   }, [architecturesData, selectedArchitecture, open, existingDiagram?.architecture])
 
   const handleSave = async () => {
-    console.log('🕐 [SaveDiagram] handleSave started at', new Date().toISOString())
+    debugLog('🕐 [SaveDiagram] handleSave started at', new Date().toISOString())
     const saveStartTime = performance.now()
-    
+
     // Validierung
     const isTitleValid = title.trim().length > 0
     let isArchitectureValid = selectedArchitecture !== null
@@ -648,37 +662,43 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
     setArchitectureError(!isArchitectureValid)
 
     if (!isTitleValid || !isArchitectureValid) {
-      console.log('❌ [SaveDiagram] Validation failed')
+      debugLog('❌ [SaveDiagram] Validation failed')
       return
     }
 
-    console.log('✅ [SaveDiagram] Validation passed, starting performSaveAction')
+    debugLog('✅ [SaveDiagram] Validation passed, starting performSaveAction')
     // Perform save action (handles name changes, new elements, and relationships)
     await performSaveAction()
-    
+
     const saveEndTime = performance.now()
-    console.log(`✅ [SaveDiagram] handleSave completed in ${(saveEndTime - saveStartTime).toFixed(2)}ms`)
+    debugLog(
+      `✅ [SaveDiagram] handleSave completed in ${(saveEndTime - saveStartTime).toFixed(2)}ms`
+    )
   }
 
   const performSaveAction = async () => {
-    console.log('🔄 [SaveDiagram] performSaveAction started')
+    debugLog('🔄 [SaveDiagram] performSaveAction started')
     const actionStartTime = performance.now()
     setCreatingElements(true)
 
     try {
-      console.log('📊 [SaveDiagram] Parsing diagram data...')
+      debugLog('📊 [SaveDiagram] Parsing diagram data...')
       const parseStartTime = performance.now()
       // Parse diagram data for updates
       const parsedDiagramData = JSON.parse(diagramData)
       let updatedElements = parsedDiagramData.elements
-      console.log(`✅ [SaveDiagram] Diagram data parsed in ${(performance.now() - parseStartTime).toFixed(2)}ms`)
+      debugLog(
+        `✅ [SaveDiagram] Diagram data parsed in ${(performance.now() - parseStartTime).toFixed(2)}ms`
+      )
 
       // Apply name changes first (if any)
       if (detectedNameChanges.length > 0) {
-        console.log(`📝 [SaveDiagram] Applying ${detectedNameChanges.length} name changes...`)
+        debugLog(`📝 [SaveDiagram] Applying ${detectedNameChanges.length} name changes...`)
         const nameChangeStartTime = performance.now()
         const nameChangeResult = await applyNameChanges(apolloClient, detectedNameChanges)
-        console.log(`✅ [SaveDiagram] Name changes applied in ${(performance.now() - nameChangeStartTime).toFixed(2)}ms`)
+        debugLog(
+          `✅ [SaveDiagram] Name changes applied in ${(performance.now() - nameChangeStartTime).toFixed(2)}ms`
+        )
         if (nameChangeResult.success) {
           // Update diagram elements with new synced names
           updatedElements = updatedElements.map((el: any) => {
@@ -728,7 +748,7 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
       // Create selected elements in database
       let creationResult: any = { success: true, createdElements: [] }
       if (selectedElements.length > 0) {
-        console.log(`🆕 [SaveDiagram] Creating ${selectedElements.length} new elements...`)
+        debugLog(`🆕 [SaveDiagram] Creating ${selectedElements.length} new elements...`)
         const createElementsStartTime = performance.now()
         creationResult = await createNewElementsInDatabase(
           apolloClient,
@@ -736,13 +756,17 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
           currentPerson?.id,
           selectedCompanyId || undefined
         )
-        console.log(`✅ [SaveDiagram] Elements created in ${(performance.now() - createElementsStartTime).toFixed(2)}ms`)
+        debugLog(
+          `✅ [SaveDiagram] Elements created in ${(performance.now() - createElementsStartTime).toFixed(2)}ms`
+        )
       }
 
       // Create selected relationships in database
       let relationshipResult: any = { success: true, createdCount: 0, errors: [] }
       if (selectedRelationships.length > 0) {
-        console.log(`🔗 [SaveDiagram] Creating ${selectedRelationships.length} new relationships...`)
+        debugLog(
+          `🔗 [SaveDiagram] Creating ${selectedRelationships.length} new relationships...`
+        )
         const createRelStartTime = performance.now()
         // Update relationships with new database IDs of created elements
         const updatedRelationships = updateRelationshipsWithDatabaseReferences(
@@ -751,7 +775,9 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
         )
 
         relationshipResult = await createRelationshipsInDatabase(apolloClient, updatedRelationships)
-        console.log(`✅ [SaveDiagram] Relationships created in ${(performance.now() - createRelStartTime).toFixed(2)}ms`)
+        debugLog(
+          `✅ [SaveDiagram] Relationships created in ${(performance.now() - createRelStartTime).toFixed(2)}ms`
+        )
       }
 
       if (creationResult.success && relationshipResult.success) {
@@ -766,10 +792,12 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
           elements: updatedElements,
         })
         // Perform save with updated data
-        console.log('💾 [SaveDiagram] Calling performSave with updated data...')
+        debugLog('💾 [SaveDiagram] Calling performSave with updated data...')
         const performSaveStartTime = performance.now()
         const savedDiagram = await performSave(updatedDiagramData)
-        console.log(`✅ [SaveDiagram] performSave completed in ${(performance.now() - performSaveStartTime).toFixed(2)}ms`)
+        debugLog(
+          `✅ [SaveDiagram] performSave completed in ${(performance.now() - performSaveStartTime).toFixed(2)}ms`
+        )
 
         // Nach erfolgreichem Speichern: Canvas-Update und Parent benachrichtigen
         if (savedDiagram) {
@@ -817,14 +845,14 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
   }
 
   const performSave = async (customDiagramData?: string) => {
-    console.log('💾 [SaveDiagram] performSave started')
+    debugLog('💾 [SaveDiagram] performSave started')
     const performSaveStartTime = performance.now()
     const dataToSave = customDiagramData || diagramData
 
     setSaving(true)
     try {
       // PNG-Generierung vor dem Speichern (light and dark mode)
-      console.log('🖼️ [SaveDiagram] Starting PNG generation...')
+      debugLog('🖼️ [SaveDiagram] Starting PNG generation...')
       const pngStartTime = performance.now()
       let diagramPng: string | null = null
       let diagramPngDark: string | null = null
@@ -834,15 +862,25 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
 
         if (elements.length > 0) {
           // Import export function dynamically
-          console.log('📦 [SaveDiagram] Importing @excalidraw/excalidraw...')
+          debugLog('📦 [SaveDiagram] Importing @excalidraw/excalidraw...')
           const importStartTime = performance.now()
           const { exportToBlob } = await import('@excalidraw/excalidraw')
-          console.log(`✅ [SaveDiagram] Excalidraw imported in ${(performance.now() - importStartTime).toFixed(2)}ms`)
+          debugLog(
+            `✅ [SaveDiagram] Excalidraw imported in ${(performance.now() - importStartTime).toFixed(2)}ms`
+          )
 
           const appState = parsedDiagramData.appState || {}
 
+          // PNG previews are only displayed at max 200px height in dashboard cards
+          // Generate at 600px max for 3x retina display quality
+          const PREVIEW_MAX_DIMENSION = 600
+          const PREVIEW_QUALITY = 0.75
+
           // Generate light mode preview
-          console.log('🌞 [SaveDiagram] Generating light mode PNG...')
+          debugLog('🌞 [SaveDiagram] Generating light mode PNG preview...')
+          debugLog(
+            `⚙️ [SaveDiagram] Light mode settings: maxDimension=${PREVIEW_MAX_DIMENSION}, quality=${PREVIEW_QUALITY}`
+          )
           const lightBlobStartTime = performance.now()
           const lightBlob = await exportToBlob({
             elements,
@@ -856,40 +894,75 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
             },
             files: {},
             mimeType: 'image/png',
-            quality: 0.85,
+            quality: PREVIEW_QUALITY,
             exportPadding: 20,
+            maxWidthOrHeight: PREVIEW_MAX_DIMENSION,
             backgroundColor: '#ffffff',
           })
-          console.log(`✅ [SaveDiagram] Light mode PNG generated in ${(performance.now() - lightBlobStartTime).toFixed(2)}ms`)
+          debugLog(
+            `✅ [SaveDiagram] Light mode PNG generated in ${(performance.now() - lightBlobStartTime).toFixed(2)}ms`
+          )
 
-          // Generate dark mode preview with dark background
-          console.log('🌙 [SaveDiagram] Generating dark mode PNG...')
+          // Generate dark mode preview
+          debugLog('🌙 [SaveDiagram] Generating dark mode PNG preview...')
+          debugLog(
+            '🔍 [SaveDiagram] Browser:',
+            navigator.userAgent.includes('Chrome') ? 'Chrome-based' : 'Other'
+          )
+          debugLog('🔍 [SaveDiagram] Elements count:', elements.length)
+          debugLog('🔍 [SaveDiagram] Light blob size:', lightBlob?.size, 'bytes')
+
           const darkBlobStartTime = performance.now()
-          // Note: exportWithDarkMode applies an invert filter to the entire canvas,
-          // so we need to pass white (#ffffff) which will be inverted to dark (#121212)
-          const darkAppState = {
-            ...appState,
-            collaborators: undefined,
-            exportBackground: true,
-            viewBackgroundColor: '#ffffff', // Will be inverted to dark by THEME_FILTER
-            exportWithDarkMode: true,
-            exportEmbedScene: false,
-            theme: 'dark',
-          }
+          let darkBlob = null
 
-          const darkBlob = await exportToBlob({
-            elements,
-            appState: darkAppState,
-            files: {},
-            mimeType: 'image/png',
-            quality: 0.85,
-            exportPadding: 20,
-          })
-          console.log(`✅ [SaveDiagram] Dark mode PNG generated in ${(performance.now() - darkBlobStartTime).toFixed(2)}ms`)
+          try {
+            // Use same preview dimensions as light mode for consistent quality
+            // Chrome's THEME_FILTER performance scales with canvas size, so smaller = faster
+            debugLog(
+              `⚙️ [SaveDiagram] Dark mode settings: maxDimension=${PREVIEW_MAX_DIMENSION}, quality=${PREVIEW_QUALITY}`
+            )
+
+            darkBlob = await exportToBlob({
+              elements,
+              appState: {
+                ...appState,
+                collaborators: undefined,
+                exportBackground: true,
+                viewBackgroundColor: '#ffffff', // Keep white, will be inverted by filter
+                exportWithDarkMode: true, // Enable dark mode CSS filter for proper theme
+                exportEmbedScene: false,
+                theme: 'dark',
+              },
+              files: {},
+              mimeType: 'image/png',
+              quality: PREVIEW_QUALITY,
+              exportPadding: 20,
+              maxWidthOrHeight: PREVIEW_MAX_DIMENSION, // Small preview size = fast rendering
+            })
+
+            const darkBlobTime = performance.now() - darkBlobStartTime
+            debugLog(`✅ [SaveDiagram] Dark mode PNG generated in ${darkBlobTime.toFixed(2)}ms`)
+            debugLog('🔍 [SaveDiagram] Dark blob size:', darkBlob?.size, 'bytes')
+
+            const lightTime = performance.now() - lightBlobStartTime
+            const ratio = (darkBlobTime / lightTime).toFixed(2)
+            debugLog(`📊 [SaveDiagram] Performance ratio (dark/light): ${ratio}x`)
+
+            // With 600px preview size, expect <2s even for complex diagrams
+            if (darkBlobTime > 2000) {
+              console.warn(
+                `⚠️ [SaveDiagram] Dark mode preview generation took ${(darkBlobTime / 1000).toFixed(1)}s - this is unusually slow for a 600px preview`
+              )
+            }
+          } catch (darkError) {
+            console.error('❌ [SaveDiagram] Dark mode PNG generation failed:', darkError)
+            debugLog('💡 [SaveDiagram] Falling back to light mode PNG only')
+            darkBlob = null
+          }
 
           if (lightBlob) {
             // Convert light blob to base64
-            console.log('🔄 [SaveDiagram] Converting light PNG to base64...')
+            debugLog('🔄 [SaveDiagram] Converting light PNG to base64...')
             const base64StartTime = performance.now()
             const arrayBuffer = await lightBlob.arrayBuffer()
             const base64String = btoa(
@@ -899,12 +972,14 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
               )
             )
             diagramPng = base64String
-            console.log(`✅ [SaveDiagram] Light PNG converted to base64 in ${(performance.now() - base64StartTime).toFixed(2)}ms`)
+            debugLog(
+              `✅ [SaveDiagram] Light PNG converted to base64 in ${(performance.now() - base64StartTime).toFixed(2)}ms`
+            )
           }
 
           if (darkBlob) {
             // Convert dark blob to base64
-            console.log('🔄 [SaveDiagram] Converting dark PNG to base64...')
+            debugLog('🔄 [SaveDiagram] Converting dark PNG to base64...')
             const darkBase64StartTime = performance.now()
             const arrayBuffer = await darkBlob.arrayBuffer()
             const base64String = btoa(
@@ -914,13 +989,19 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
               )
             )
             diagramPngDark = base64String
-            console.log(`✅ [SaveDiagram] Dark PNG converted to base64 in ${(performance.now() - darkBase64StartTime).toFixed(2)}ms`)
+            debugLog(
+              `✅ [SaveDiagram] Dark PNG converted to base64 in ${(performance.now() - darkBase64StartTime).toFixed(2)}ms`
+            )
           }
         }
-        console.log(`✅ [SaveDiagram] Total PNG generation completed in ${(performance.now() - pngStartTime).toFixed(2)}ms`)
+        debugLog(
+          `✅ [SaveDiagram] Total PNG generation completed in ${(performance.now() - pngStartTime).toFixed(2)}ms`
+        )
       } catch (pngError) {
         console.warn('⚠️ [SaveDiagram] PNG generation failed:', pngError)
-        console.log(`❌ [SaveDiagram] PNG generation failed after ${(performance.now() - pngStartTime).toFixed(2)}ms`)
+        debugLog(
+          `❌ [SaveDiagram] PNG generation failed after ${(performance.now() - pngStartTime).toFixed(2)}ms`
+        )
         // Speichern ohne PNG fortsetzen
       }
 
@@ -965,13 +1046,13 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
         }),
       }
 
-      console.log('🔧 [SaveDiagram] Preparing mutation input...')
+      debugLog('🔧 [SaveDiagram] Preparing mutation input...')
       const mutationPrepStartTime = performance.now()
-      
+
       let result
       if (existingDiagram?.id && !forceSaveAs) {
         // Update bestehende Diagramm
-        console.log('📝 [SaveDiagram] Updating existing diagram...')
+        debugLog('📝 [SaveDiagram] Updating existing diagram...')
         const relationshipUpdates = createDiagramRelationshipUpdatesWithDisconnect(dataToSave)
 
         // Determine existing company ID
@@ -1019,8 +1100,10 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
           },
           ...relationshipUpdates, // Automatische Beziehungen zu Datenbankelementen
         }
-        console.log(`✅ [SaveDiagram] Update mutation input prepared in ${(performance.now() - mutationPrepStartTime).toFixed(2)}ms`)
-        console.log('🚀 [SaveDiagram] Sending UPDATE mutation to GraphQL...')
+        debugLog(
+          `✅ [SaveDiagram] Update mutation input prepared in ${(performance.now() - mutationPrepStartTime).toFixed(2)}ms`
+        )
+        debugLog('🚀 [SaveDiagram] Sending UPDATE mutation to GraphQL...')
         const mutationStartTime = performance.now()
         result = await updateDiagram({
           variables: {
@@ -1028,7 +1111,9 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
             input: updateInput,
           },
         })
-        console.log(`✅ [SaveDiagram] UPDATE mutation completed in ${(performance.now() - mutationStartTime).toFixed(2)}ms`)
+        debugLog(
+          `✅ [SaveDiagram] UPDATE mutation completed in ${(performance.now() - mutationStartTime).toFixed(2)}ms`
+        )
 
         if (
           !result.data ||
@@ -1045,11 +1130,13 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
 
         const savedDiagram = result.data.updateDiagrams.diagrams[0]
         // Nach erfolgreichem Update: Alle Diagramm-Elemente mit der Architektur verknüpfen
-        console.log('🔗 [SaveDiagram] Linking elements to architecture...')
+        debugLog('🔗 [SaveDiagram] Linking elements to architecture...')
         const linkingStartTime = performance.now()
         try {
           await linkElementsToArchitecture(dataToSave, selectedArchitecture.id)
-          console.log(`✅ [SaveDiagram] Elements linked to architecture in ${(performance.now() - linkingStartTime).toFixed(2)}ms`)
+          debugLog(
+            `✅ [SaveDiagram] Elements linked to architecture in ${(performance.now() - linkingStartTime).toFixed(2)}ms`
+          )
         } catch (linkingError) {
           console.warn(
             '⚠️ Fehler bei Architektur-Verknüpfung (Diagramm wurde trotzdem gespeichert):',
@@ -1060,21 +1147,25 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
         return savedDiagram
       } else {
         // Neue Diagramm erstellen (auch bei forceSaveAs)
-        console.log('🆕 [SaveDiagram] Creating new diagram...')
+        debugLog('🆕 [SaveDiagram] Creating new diagram...')
         const relationshipUpdates = createDiagramRelationshipUpdates(dataToSave)
         const input = {
           ...baseInput,
           ...relationshipUpdates, // Automatische Beziehungen zu Datenbankelementen
         }
-        console.log(`✅ [SaveDiagram] Create mutation input prepared in ${(performance.now() - mutationPrepStartTime).toFixed(2)}ms`)
-        console.log('🚀 [SaveDiagram] Sending CREATE mutation to GraphQL...')
+        debugLog(
+          `✅ [SaveDiagram] Create mutation input prepared in ${(performance.now() - mutationPrepStartTime).toFixed(2)}ms`
+        )
+        debugLog('🚀 [SaveDiagram] Sending CREATE mutation to GraphQL...')
         const mutationStartTime = performance.now()
         result = await createDiagram({
           variables: {
             input: [input],
           },
         })
-        console.log(`✅ [SaveDiagram] CREATE mutation completed in ${(performance.now() - mutationStartTime).toFixed(2)}ms`)
+        debugLog(
+          `✅ [SaveDiagram] CREATE mutation completed in ${(performance.now() - mutationStartTime).toFixed(2)}ms`
+        )
 
         if (!result.data || !result.data.createDiagrams) {
           throw new Error('Keine Daten von createDiagrams erhalten')
@@ -1083,17 +1174,21 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
         const savedDiagram = result.data.createDiagrams.diagrams[0]
 
         // Nach erfolgreichem Speichern: Alle Diagramm-Elemente mit der Architektur verknüpfen
-        console.log('🔗 [SaveDiagram] Linking elements to architecture...')
+        debugLog('🔗 [SaveDiagram] Linking elements to architecture...')
         const linkingStartTime = performance.now()
         try {
           await linkElementsToArchitecture(dataToSave, selectedArchitecture.id)
-          console.log(`✅ [SaveDiagram] Elements linked to architecture in ${(performance.now() - linkingStartTime).toFixed(2)}ms`)
+          debugLog(
+            `✅ [SaveDiagram] Elements linked to architecture in ${(performance.now() - linkingStartTime).toFixed(2)}ms`
+          )
         } catch (linkingError) {
           console.warn(
             '⚠️ [SaveDiagram] Fehler bei Architektur-Verknüpfung (Diagramm wurde trotzdem gespeichert):',
             linkingError
           )
-          console.log(`❌ [SaveDiagram] Architecture linking failed after ${(performance.now() - linkingStartTime).toFixed(2)}ms`)
+          debugLog(
+            `❌ [SaveDiagram] Architecture linking failed after ${(performance.now() - linkingStartTime).toFixed(2)}ms`
+          )
         }
 
         return savedDiagram
@@ -1104,7 +1199,9 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
     } finally {
       setSaving(false)
       const performSaveEndTime = performance.now()
-      console.log(`✅ [SaveDiagram] performSave total time: ${(performSaveEndTime - performSaveStartTime).toFixed(2)}ms`)
+      debugLog(
+        `✅ [SaveDiagram] performSave total time: ${(performSaveEndTime - performSaveStartTime).toFixed(2)}ms`
+      )
     }
   }
 

@@ -93,6 +93,28 @@ export default function DebugSettingsPanel() {
             }
           />
 
+          <Divider />
+
+          <FormControlLabel
+            control={
+              <Switch
+                checked={settings.showDiagramSaveLogs}
+                onChange={e => updateSetting('showDiagramSaveLogs', e.target.checked)}
+              />
+            }
+            label={
+              <Box>
+                <Typography variant="body2" fontWeight="medium">
+                  Diagramm-Speicher-Logs
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Zeigt detaillierte Performance-Logs beim Speichern von Diagrammen
+                  (PNG-Generierung, GraphQL-Mutationen, etc.)
+                </Typography>
+              </Box>
+            }
+          />
+
           <Divider sx={{ my: 1 }} />
 
           <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
