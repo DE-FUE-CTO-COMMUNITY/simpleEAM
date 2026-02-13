@@ -512,8 +512,7 @@ const createSingleRelationship = async (
     case 'SUPPORTS':
       if (
         sourceElementType === 'application' &&
-        ((targetElementType as string) === 'businessCapability' ||
-          false)
+        ((targetElementType as string) === 'businessCapability' || false)
       ) {
         await client.mutate({
           mutation: UPDATE_APPLICATION_SUPPORTS_CAPABILITIES,
@@ -527,8 +526,7 @@ const createSingleRelationship = async (
           },
         })
       } else if (
-        ((sourceElementType as string) === 'businessCapability' ||
-          false) &&
+        ((sourceElementType as string) === 'businessCapability' || false) &&
         targetElementType === 'application'
       ) {
         // Umgekehrte Richtung: BusinessCapability → Application
@@ -548,10 +546,8 @@ const createSingleRelationship = async (
 
     case 'HAS_PARENT':
       if (
-        ((sourceElementType as string) === 'businessCapability' ||
-          false) &&
-        ((targetElementType as string) === 'businessCapability' ||
-          false)
+        ((sourceElementType as string) === 'businessCapability' || false) &&
+        ((targetElementType as string) === 'businessCapability' || false)
       ) {
         await client.mutate({
           mutation: UPDATE_CAPABILITY_PARENTS,
@@ -804,7 +800,7 @@ const createSingleRelationship = async (
       if (sourceElementType === 'dataObject' && targetElementType === 'dataObject') {
         // Use relationshipName if available, otherwise use a default value
         const edgeName = relationshipName || 'related'
-        
+
         await client.mutate({
           mutation: UPDATE_DATA_OBJECT_RELATED_DATA_OBJECTS,
           variables: {
@@ -858,14 +854,12 @@ export const checkRelationshipExists = async (
       case 'SUPPORTS':
         if (
           sourceElementType === 'application' &&
-          ((targetElementType as string) === 'businessCapability' ||
-            false)
+          ((targetElementType as string) === 'businessCapability' || false)
         ) {
           query = CHECK_APPLICATION_SUPPORTS_CAPABILITY
           variables = { applicationId: sourceElementId, capabilityId: targetElementId }
         } else if (
-          ((sourceElementType as string) === 'businessCapability' ||
-            false) &&
+          ((sourceElementType as string) === 'businessCapability' || false) &&
           targetElementType === 'application'
         ) {
           // Umgekehrte Richtung: BusinessCapability → Application (prüfe Application)
@@ -876,10 +870,8 @@ export const checkRelationshipExists = async (
 
       case 'HAS_PARENT':
         if (
-          ((sourceElementType as string) === 'businessCapability' ||
-            false) &&
-          ((targetElementType as string) === 'businessCapability' ||
-            false)
+          ((sourceElementType as string) === 'businessCapability' || false) &&
+          ((targetElementType as string) === 'businessCapability' || false)
         ) {
           query = CHECK_CAPABILITY_HAS_PARENT
           variables = { capabilityId: sourceElementId, parentId: targetElementId }

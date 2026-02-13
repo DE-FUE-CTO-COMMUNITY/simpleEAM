@@ -114,14 +114,14 @@ export const extractArrowLabel = (
         } else if (textElement.text?.text) {
           text = textElement.text.text
         }
-        
+
         if (text && text.trim().length > 0) {
           return text.trim()
         }
       }
     }
   }
-  
+
   return undefined
 }
 
@@ -574,7 +574,7 @@ const createNewRelationshipFromResult = (
 ): NewRelationship | null => {
   // Extract arrow label (if available)
   const arrowLabel = extractArrowLabel(result.arrow, elementMap)
-  
+
   // Spezielle Behandlung für missing-binding Fälle
   if (result.status === 'missing-binding') {
     const sourceElement = result.sourceElement
