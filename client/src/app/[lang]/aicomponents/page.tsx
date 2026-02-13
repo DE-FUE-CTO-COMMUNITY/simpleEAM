@@ -159,6 +159,162 @@ const AicomponentsPage = () => {
     }
   }, [aicomponents])
 
+  const buildCreateInput = (values: AicomponentFormValues) => {
+    const {
+      ownerId,
+      supportsCapabilityIds,
+      usedByApplicationIds,
+      trainedWithDataObjectIds,
+      hostedOnIds,
+      providedByIds,
+      supportedByIds,
+      maintainedByIds,
+      partOfArchitectureIds,
+      implementsPrincipleIds,
+      depictedInDiagramIds,
+      ...aiComponentData
+    } = values
+
+    return {
+      name: aiComponentData.name,
+      description: aiComponentData.description,
+      aiType: aiComponentData.aiType,
+      model: aiComponentData.model,
+      version: aiComponentData.version,
+      status: aiComponentData.status,
+      accuracy: aiComponentData.accuracy,
+      trainingDate: aiComponentData.trainingDate || null,
+      provider: aiComponentData.provider,
+      license: aiComponentData.license,
+      costs: aiComponentData.costs,
+      tags: aiComponentData.tags,
+      ...(ownerId
+        ? {
+            owners: {
+              connect: [{ where: { node: { id: { eq: ownerId } } } }],
+            },
+          }
+        : {}),
+      ...(supportsCapabilityIds && supportsCapabilityIds.length > 0
+        ? {
+            supportsCapabilities: {
+              connect: supportsCapabilityIds.map(id => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }
+        : {}),
+      ...(usedByApplicationIds && usedByApplicationIds.length > 0
+        ? {
+            usedByApplications: {
+              connect: usedByApplicationIds.map(id => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }
+        : {}),
+      ...(trainedWithDataObjectIds && trainedWithDataObjectIds.length > 0
+        ? {
+            trainedWithDataObjects: {
+              connect: trainedWithDataObjectIds.map(id => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }
+        : {}),
+      ...(hostedOnIds && hostedOnIds.length > 0
+        ? {
+            hostedOn: {
+              connect: hostedOnIds.map(id => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }
+        : {}),
+      ...(providedByIds && providedByIds.length > 0
+        ? {
+            providedBy: {
+              connect: providedByIds.map(id => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }
+        : {}),
+      ...(supportedByIds && supportedByIds.length > 0
+        ? {
+            supportedBy: {
+              connect: supportedByIds.map(id => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }
+        : {}),
+      ...(maintainedByIds && maintainedByIds.length > 0
+        ? {
+            maintainedBy: {
+              connect: maintainedByIds.map(id => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }
+        : {}),
+      ...(partOfArchitectureIds && partOfArchitectureIds.length > 0
+        ? {
+            partOfArchitectures: {
+              connect: partOfArchitectureIds.map(id => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }
+        : {}),
+      ...(implementsPrincipleIds && implementsPrincipleIds.length > 0
+        ? {
+            implementsPrinciples: {
+              connect: implementsPrincipleIds.map(id => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }
+        : {}),
+      ...(depictedInDiagramIds && depictedInDiagramIds.length > 0
+        ? {
+            depictedInDiagrams: {
+              connect: depictedInDiagramIds.map(id => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }
+        : {}),
+      company: {
+        connect: [
+          {
+            where: { node: { id: { eq: selectedCompanyId } } },
+          },
+        ],
+      },
+    }
+  }
+
+  const handleCreateAicomponentSubmit = async (values: AicomponentFormValues) => {
+    if (!selectedCompanyId) {
+      enqueueSnackbar(t('messages.selectCompanyFirst'), { variant: 'warning' })
+      return
+    }
+
+    const input = buildCreateInput(values)
+
+    await createAicomponent({
+      variables: { input: [input] },
+      refetchQueries: [
+        {
+          query: GET_Aicomponents,
+          variables: { where: companyWhere },
+        },
+      ],
+      awaitRefetchQueries: true,
+    })
+  }
+
   // Handler for updating an existing AI Component
   const handleUpdateAicomponentSubmit = async (id: string, data: AicomponentFormValues) => {
     try {
@@ -169,6 +325,9 @@ const AicomponentsPage = () => {
         usedByApplicationIds,
         trainedWithDataObjectIds,
         hostedOnIds,
+        providedByIds,
+        supportedByIds,
+        maintainedByIds,
         partOfArchitectureIds,
         implementsPrincipleIds,
         depictedInDiagramIds,
@@ -287,6 +446,51 @@ const AicomponentsPage = () => {
               ? {
                   connect: hostedOnIds.map(infrastructureId => ({
                     where: { node: { id: { eq: infrastructureId } } },
+                  })),
+                }
+              : {}),
+          },
+        ]
+      }
+
+      if (providedByIds !== undefined) {
+        updateInput.providedBy = [
+          {
+            disconnect: [{ where: {} }],
+            ...(providedByIds.length > 0
+              ? {
+                  connect: providedByIds.map(supplierId => ({
+                    where: { node: { id: { eq: supplierId } } },
+                  })),
+                }
+              : {}),
+          },
+        ]
+      }
+
+      if (supportedByIds !== undefined) {
+        updateInput.supportedBy = [
+          {
+            disconnect: [{ where: {} }],
+            ...(supportedByIds.length > 0
+              ? {
+                  connect: supportedByIds.map(supplierId => ({
+                    where: { node: { id: { eq: supplierId } } },
+                  })),
+                }
+              : {}),
+          },
+        ]
+      }
+
+      if (maintainedByIds !== undefined) {
+        updateInput.maintainedBy = [
+          {
+            disconnect: [{ where: {} }],
+            ...(maintainedByIds.length > 0
+              ? {
+                  connect: maintainedByIds.map(supplierId => ({
+                    where: { node: { id: { eq: supplierId } } },
                   })),
                 }
               : {}),
@@ -418,11 +622,7 @@ const AicomponentsPage = () => {
             onTableReady={table => setTableInstance(table)}
             onCreateAicomponent={async data => {
               try {
-                await createAicomponent({
-                  // Most create mutations expect an array input per generated schema
-                  variables: { input: [data] },
-                  refetchQueries: [{ query: GET_Aicomponents }],
-                })
+                await handleCreateAicomponentSubmit(data)
               } catch (error) {
                 console.error('Fehler beim Erstellen des aicomponent:', error)
                 throw error // Re-throw so GenericTable can handle the error
@@ -501,145 +701,7 @@ const AicomponentsPage = () => {
           mode="create"
           onSubmit={async values => {
             try {
-              if (!selectedCompanyId) {
-                enqueueSnackbar(t('messages.selectCompanyFirst'), { variant: 'warning' })
-                return
-              }
-
-              const {
-                ownerId,
-                supportsCapabilityIds,
-                usedByApplicationIds,
-                trainedWithDataObjectIds,
-                hostedOnIds,
-                partOfArchitectureIds,
-                implementsPrincipleIds,
-                depictedInDiagramIds,
-                ...aiComponentData
-              } = values
-
-              // For CREATE, no special mutation object is needed as direct values are allowed
-              const input = {
-                name: aiComponentData.name,
-                description: aiComponentData.description,
-                aiType: aiComponentData.aiType,
-                model: aiComponentData.model,
-                version: aiComponentData.version,
-                status: aiComponentData.status,
-                accuracy: aiComponentData.accuracy,
-                trainingDate: aiComponentData.trainingDate || null,
-                provider: aiComponentData.provider,
-                license: aiComponentData.license,
-                costs: aiComponentData.costs,
-                tags: aiComponentData.tags,
-
-                // If an owner was selected, use the owners structure
-                ...(ownerId
-                  ? {
-                      owners: {
-                        connect: [{ where: { node: { id: { eq: ownerId } } } }],
-                      },
-                    }
-                  : {}),
-
-                // If values were selected, connect them
-                ...(supportsCapabilityIds && supportsCapabilityIds.length > 0
-                  ? {
-                      supportsCapabilities: {
-                        connect: supportsCapabilityIds.map(id => ({
-                          where: { node: { id: { eq: id } } },
-                        })),
-                      },
-                    }
-                  : {}),
-
-                // If values were selected, connect them
-                ...(usedByApplicationIds && usedByApplicationIds.length > 0
-                  ? {
-                      usedByApplications: {
-                        connect: usedByApplicationIds.map(id => ({
-                          where: { node: { id: { eq: id } } },
-                        })),
-                      },
-                    }
-                  : {}),
-
-                // If values were selected, connect them
-                ...(trainedWithDataObjectIds && trainedWithDataObjectIds.length > 0
-                  ? {
-                      trainedWithDataObjects: {
-                        connect: trainedWithDataObjectIds.map(id => ({
-                          where: { node: { id: { eq: id } } },
-                        })),
-                      },
-                    }
-                  : {}),
-
-                // If Infrastructure was selected, connect it
-                ...(hostedOnIds && hostedOnIds.length > 0
-                  ? {
-                      hostedOn: {
-                        connect: hostedOnIds.map(id => ({
-                          where: { node: { id: { eq: id } } },
-                        })),
-                      },
-                    }
-                  : {}),
-
-                // If values were selected, connect them
-                ...(partOfArchitectureIds && partOfArchitectureIds.length > 0
-                  ? {
-                      partOfArchitectures: {
-                        connect: partOfArchitectureIds.map(id => ({
-                          where: { node: { id: { eq: id } } },
-                        })),
-                      },
-                    }
-                  : {}),
-
-                // If values were selected, connect them
-                ...(implementsPrincipleIds && implementsPrincipleIds.length > 0
-                  ? {
-                      implementsPrinciples: {
-                        connect: implementsPrincipleIds.map(id => ({
-                          where: { node: { id: { eq: id } } },
-                        })),
-                      },
-                    }
-                  : {}),
-
-                // If values were selected, connect them
-                ...(depictedInDiagramIds && depictedInDiagramIds.length > 0
-                  ? {
-                      depictedInDiagrams: {
-                        connect: depictedInDiagramIds.map(id => ({
-                          where: { node: { id: { eq: id } } },
-                        })),
-                      },
-                    }
-                  : {}),
-
-                // Company assignment (required)
-                company: {
-                  connect: [
-                    {
-                      where: { node: { id: { eq: selectedCompanyId } } },
-                    },
-                  ],
-                },
-              }
-
-              await createAicomponent({
-                variables: { input: [input] },
-                // For safety: also update the list in cache via refetch query with filter
-                refetchQueries: [
-                  {
-                    query: GET_Aicomponents,
-                    variables: { where: companyWhere },
-                  },
-                ],
-                awaitRefetchQueries: true,
-              })
+              await handleCreateAicomponentSubmit(values)
               setShowNewAicomponentForm(false)
             } catch (error) {
               console.error('Fehler beim Erstellen der/des aicomponent:', error)

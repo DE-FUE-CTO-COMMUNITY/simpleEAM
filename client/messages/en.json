@@ -1111,6 +1111,9 @@
       "usedByApplications": "Used by Applications",
       "trainedWithDataObjects": "Trained with Data Objects",
       "hostedOn": "Hosted On",
+      "providedBy": "Provided By Suppliers",
+      "supportedBy": "Supported By Suppliers",
+      "maintainedBy": "Maintained By Suppliers",
       "partOfArchitectures": "Part of Architectures",
       "depictedInDiagrams": "Depicted in Diagrams",
       "implementsPrinciples": "Implements Principles"
@@ -1135,6 +1138,9 @@
       "usedByApplications": "Used by Applications",
       "trainedWithDataObjects": "Trained with Data Objects",
       "hostedOn": "Hosted On",
+      "providedBy": "Provided By Suppliers",
+      "supportedBy": "Supported By Suppliers",
+      "maintainedBy": "Maintained By Suppliers",
       "partOfArchitectures": "Part of Architectures",
       "implementsPrinciples": "Implements Principles",
       "depictedInDiagrams": "Depicted in Diagrams",
@@ -1194,6 +1200,7 @@
       "technical": "Technical",
       "relationships": "Relationships",
       "training": "Training",
+      "suppliers": "Suppliers",
       "architectures": "Architectures",
       "principles": "Principles"
     },
@@ -2658,6 +2665,9 @@
       "providesInfrastructure": "Provides Infrastructure",
       "hostsInfrastructure": "Hosts Infrastructure",
       "maintainsInfrastructure": "Maintains Infrastructure",
+      "providesAIComponents": "Provides AI Components",
+      "supportsAIComponents": "Supports AI Components",
+      "maintainsAIComponents": "Maintains AI Components",
       "none": "None"
     },
     "validation": {
@@ -2706,6 +2716,9 @@
       "providesInfrastructure": "Provides Infra",
       "hostsInfrastructure": "Hosts Infra",
       "maintainsInfrastructure": "Maintains Infra",
+      "providesAIComponents": "Provides AI",
+      "supportsAIComponents": "Supports AI",
+      "maintainsAIComponents": "Maintains AI",
       "tags": "Tags",
       "createdAt": "Created At",
       "updatedAt": "Updated At",

@@ -59,6 +59,18 @@ export const GET_SUPPLIERS = gql`
         id
         name
       }
+      providesAIComponents {
+        id
+        name
+      }
+      supportsAIComponents {
+        id
+        name
+      }
+      maintainsAIComponents {
+        id
+        name
+      }
     }
   }
 `
@@ -107,6 +119,18 @@ export const GET_SUPPLIER = gql`
         name
       }
       maintainsInfrastructure {
+        id
+        name
+      }
+      providesAIComponents {
+        id
+        name
+      }
+      supportsAIComponents {
+        id
+        name
+      }
+      maintainsAIComponents {
         id
         name
       }

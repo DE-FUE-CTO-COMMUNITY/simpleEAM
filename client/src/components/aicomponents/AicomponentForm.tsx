@@ -15,6 +15,7 @@ import {
   Application,
   DataObject,
   Infrastructure,
+  Supplier,
   Architecture,
   ArchitecturePrinciple,
   Diagram,
@@ -30,8 +31,10 @@ import { GET_INFRASTRUCTURES } from '@/graphql/infrastructure'
 import { GET_ARCHITECTURES } from '@/graphql/architecture'
 import { GET_ARCHITECTURE_PRINCIPLES } from '@/graphql/architecturePrinciple'
 import { GET_DIAGRAMS } from '@/graphql/diagram'
+import { GET_SUPPLIERS } from '@/graphql/supplier'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import { useChipClickHandlers } from '@/hooks/useChipClickHandlers'
+import { useFeatureFlags } from '@/lib/feature-flags'
 import CapabilityForm from '../capabilities/CapabilityForm'
 import ApplicationForm from '../applications/ApplicationForm'
 import DataObjectForm from '../dataobjects/DataObjectForm'
@@ -57,6 +60,9 @@ export type AicomponentFormValues = {
   usedByApplicationIds?: string[]
   trainedWithDataObjectIds?: string[]
   hostedOnIds?: string[]
+  providedByIds?: string[]
+  supportedByIds?: string[]
+  maintainedByIds?: string[]
   partOfArchitectureIds?: string[]
   implementsPrincipleIds?: string[]
   depictedInDiagramIds?: string[]
@@ -80,6 +86,8 @@ export default function AicomponentForm({
   const tValidation = useTranslations('forms.validation')
   const getAiTypeLabel = useAiTypeLabel()
   const getStatusLabel = useStatusLabel()
+  const { featureFlags } = useFeatureFlags()
+  const isSupEnabled = featureFlags.SUP
 
   // State for nested entity forms
   const [nestedFormState, setNestedFormState] = useState<{
@@ -137,6 +145,9 @@ export default function AicomponentForm({
     usedByApplicationIds: z.array(z.string()).optional(),
     trainedWithDataObjectIds: z.array(z.string()).optional(),
     hostedOnIds: z.array(z.string()).optional(),
+    providedByIds: z.array(z.string()).optional(),
+    supportedByIds: z.array(z.string()).optional(),
+    maintainedByIds: z.array(z.string()).optional(),
     partOfArchitectureIds: z.array(z.string()).optional(),
     implementsPrincipleIds: z.array(z.string()).optional(),
     depictedInDiagramIds: z.array(z.string()).optional(),
@@ -166,6 +177,10 @@ export default function AicomponentForm({
   )
   const { data: diagramsData, loading: diagramsLoading } = useQuery(GET_DIAGRAMS, {
     variables: { where: companyWhere },
+  })
+  const { data: suppliersData, loading: suppliersLoading } = useQuery(GET_SUPPLIERS, {
+    variables: { where: companyWhere },
+    skip: !isSupEnabled,
   })
 
   // Queries for nested entity forms
@@ -541,6 +556,9 @@ export default function AicomponentForm({
     usedByApplicationIds: aicomponent?.usedByApplications?.map((app: any) => app.id) ?? [],
     trainedWithDataObjectIds: aicomponent?.trainedWithDataObjects?.map((obj: any) => obj.id) ?? [],
     hostedOnIds: aicomponent?.hostedOn?.map((infra: any) => infra.id) ?? [],
+    providedByIds: aicomponent?.providedBy?.map((supplier: any) => supplier.id) ?? [],
+    supportedByIds: aicomponent?.supportedBy?.map((supplier: any) => supplier.id) ?? [],
+    maintainedByIds: aicomponent?.maintainedBy?.map((supplier: any) => supplier.id) ?? [],
     partOfArchitectureIds: aicomponent?.partOfArchitectures?.map((arch: any) => arch.id) ?? [],
     implementsPrincipleIds:
       aicomponent?.implementsPrinciples?.map((principle: any) => principle.id) ?? [],
@@ -596,6 +614,9 @@ export default function AicomponentForm({
         trainedWithDataObjectIds:
           aicomponent.trainedWithDataObjects?.map((obj: any) => obj.id) ?? [],
         hostedOnIds: aicomponent.hostedOn?.map((infra: any) => infra.id) ?? [],
+        providedByIds: aicomponent.providedBy?.map((supplier: any) => supplier.id) ?? [],
+        supportedByIds: aicomponent.supportedBy?.map((supplier: any) => supplier.id) ?? [],
+        maintainedByIds: aicomponent.maintainedBy?.map((supplier: any) => supplier.id) ?? [],
         partOfArchitectureIds: aicomponent.partOfArchitectures?.map((arch: any) => arch.id) ?? [],
         implementsPrincipleIds:
           aicomponent.implementsPrinciples?.map((principle: any) => principle.id) ?? [],
@@ -614,6 +635,7 @@ export default function AicomponentForm({
     { id: 'technical', label: tTabs('technical') },
     { id: 'training', label: tTabs('training') },
     { id: 'relationships', label: tTabs('relationships') },
+    ...(isSupEnabled ? [{ id: 'suppliers', label: tTabs('suppliers') }] : []),
     { id: 'architectures', label: tTabs('architectures') },
     { id: 'principles', label: tTabs('principles') },
   ]
@@ -862,6 +884,101 @@ export default function AicomponentForm({
       },
       onChipClick: createChipClickHandler('hostedOnIds'),
     },
+
+    ...(isSupEnabled
+      ? [
+          {
+            name: 'providedByIds',
+            label: t('providedBy'),
+            type: 'autocomplete',
+            multiple: true,
+            tabId: 'suppliers',
+            options:
+              suppliersData?.suppliers?.map((supplier: Supplier) => ({
+                value: supplier.id,
+                label: supplier.name,
+              })) || [],
+            loadingOptions: suppliersLoading,
+            size: 12,
+            getOptionLabel: (option: any) => {
+              if (typeof option === 'string') {
+                const matchingSupplier = suppliersData?.suppliers?.find(
+                  (supplier: Supplier) => supplier.id === option
+                )
+                return matchingSupplier?.name || option
+              }
+              return option?.label || ''
+            },
+            isOptionEqualToValue: (option: any, value: any) => {
+              if (typeof value === 'string') {
+                return option.value === value
+              }
+              return option.value === value?.value || option.value === value
+            },
+            onChipClick: createChipClickHandler('providedByIds'),
+          },
+          {
+            name: 'supportedByIds',
+            label: t('supportedBy'),
+            type: 'autocomplete',
+            multiple: true,
+            tabId: 'suppliers',
+            options:
+              suppliersData?.suppliers?.map((supplier: Supplier) => ({
+                value: supplier.id,
+                label: supplier.name,
+              })) || [],
+            loadingOptions: suppliersLoading,
+            size: 12,
+            getOptionLabel: (option: any) => {
+              if (typeof option === 'string') {
+                const matchingSupplier = suppliersData?.suppliers?.find(
+                  (supplier: Supplier) => supplier.id === option
+                )
+                return matchingSupplier?.name || option
+              }
+              return option?.label || ''
+            },
+            isOptionEqualToValue: (option: any, value: any) => {
+              if (typeof value === 'string') {
+                return option.value === value
+              }
+              return option.value === value?.value || option.value === value
+            },
+            onChipClick: createChipClickHandler('supportedByIds'),
+          },
+          {
+            name: 'maintainedByIds',
+            label: t('maintainedBy'),
+            type: 'autocomplete',
+            multiple: true,
+            tabId: 'suppliers',
+            options:
+              suppliersData?.suppliers?.map((supplier: Supplier) => ({
+                value: supplier.id,
+                label: supplier.name,
+              })) || [],
+            loadingOptions: suppliersLoading,
+            size: 12,
+            getOptionLabel: (option: any) => {
+              if (typeof option === 'string') {
+                const matchingSupplier = suppliersData?.suppliers?.find(
+                  (supplier: Supplier) => supplier.id === option
+                )
+                return matchingSupplier?.name || option
+              }
+              return option?.label || ''
+            },
+            isOptionEqualToValue: (option: any, value: any) => {
+              if (typeof value === 'string') {
+                return option.value === value
+              }
+              return option.value === value?.value || option.value === value
+            },
+            onChipClick: createChipClickHandler('maintainedByIds'),
+          },
+        ]
+      : []),
 
     // Architekturen (Tab: architectures)
     {

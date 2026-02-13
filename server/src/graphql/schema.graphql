@@ -400,6 +400,9 @@ type Supplier
   providesApplications: [Application!]! @relationship(type: "PROVIDED_BY", direction: IN)
   supportsApplications: [Application!]! @relationship(type: "SUPPORTED_BY", direction: IN)
   maintainsApplications: [Application!]! @relationship(type: "MAINTAINED_BY", direction: IN)
+  providesAIComponents: [AIComponent!]! @relationship(type: "PROVIDED_BY", direction: IN)
+  supportsAIComponents: [AIComponent!]! @relationship(type: "SUPPORTED_BY", direction: IN)
+  maintainsAIComponents: [AIComponent!]! @relationship(type: "MAINTAINED_BY", direction: IN)
   providesInfrastructure: [Infrastructure!]! @relationship(type: "PROVIDED_BY", direction: IN)
   hostsInfrastructure: [Infrastructure!]! @relationship(type: "HOSTED_BY", direction: IN)
   maintainsInfrastructure: [Infrastructure!]! @relationship(type: "MAINTAINED_BY", direction: IN)
@@ -727,6 +730,9 @@ type AIComponent
   implementsPrinciples: [ArchitecturePrinciple!]!
     @relationship(type: "IMPLEMENTS_PRINCIPLE", direction: OUT)
   hostedOn: [Infrastructure!]! @relationship(type: "HOSTED_ON", direction: OUT)
+  providedBy: [Supplier!]! @relationship(type: "PROVIDED_BY", direction: OUT)
+  supportedBy: [Supplier!]! @relationship(type: "SUPPORTED_BY", direction: OUT)
+  maintainedBy: [Supplier!]! @relationship(type: "MAINTAINED_BY", direction: OUT)
   partOfArchitectures: [Architecture!]! @relationship(type: "CONTAINS", direction: IN)
   depictedInDiagrams: [Diagram!]! @relationship(type: "DEPICTED_IN", direction: OUT)
 }

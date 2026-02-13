@@ -47,6 +47,18 @@ export const GET_Aicomponents = gql`
         id
         name
       }
+      providedBy {
+        id
+        name
+      }
+      supportedBy {
+        id
+        name
+      }
+      maintainedBy {
+        id
+        name
+      }
       partOfArchitectures {
         id
         name
@@ -105,6 +117,18 @@ export const GET_Aicomponent = gql`
         name
       }
       hostedOn {
+        id
+        name
+      }
+      providedBy {
+        id
+        name
+      }
+      supportedBy {
+        id
+        name
+      }
+      maintainedBy {
         id
         name
       }
@@ -170,6 +194,18 @@ export const CREATE_Aicomponent = gql`
           id
           name
         }
+        providedBy {
+          id
+          name
+        }
+        supportedBy {
+          id
+          name
+        }
+        maintainedBy {
+          id
+          name
+        }
         partOfArchitectures {
           id
           name
@@ -230,6 +266,18 @@ export const UPDATE_Aicomponent = gql`
           name
         }
         hostedOn {
+          id
+          name
+        }
+        providedBy {
+          id
+          name
+        }
+        supportedBy {
+          id
+          name
+        }
+        maintainedBy {
           id
           name
         }

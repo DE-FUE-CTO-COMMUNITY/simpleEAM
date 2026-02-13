@@ -11,6 +11,7 @@ import {
   Application,
   DataObject,
   Infrastructure,
+  Supplier,
   Architecture,
   ArchitecturePrinciple,
   Diagram,
@@ -45,6 +46,9 @@ export type AicomponentType = Pick<
   usedByApplications?: Application[]
   trainedWithDataObjects?: DataObject[]
   hostedOn?: Infrastructure[]
+  providedBy?: Supplier[]
+  supportedBy?: Supplier[]
+  maintainedBy?: Supplier[]
   partOfArchitectures?: Architecture[]
   implementsPrinciples?: ArchitecturePrinciple[]
   depictedInDiagrams?: Diagram[]
@@ -70,6 +74,9 @@ export interface AicomponentFormValues {
   usedByApplicationIds?: string[]
   trainedWithDataObjectIds?: string[]
   hostedOnIds?: string[]
+  providedByIds?: string[]
+  supportedByIds?: string[]
+  maintainedByIds?: string[]
   partOfArchitectureIds?: string[]
   implementsPrincipleIds?: string[]
   depictedInDiagramIds?: string[]
@@ -97,6 +104,9 @@ export type AicomponentTableColumnId =
   | 'usedByApplications'
   | 'trainedWithDataObjects'
   | 'hostedOn'
+  | 'providedBy'
+  | 'supportedBy'
+  | 'maintainedBy'
   | 'partOfArchitectures'
   | 'implementsPrinciples'
   | 'depictedInDiagrams'

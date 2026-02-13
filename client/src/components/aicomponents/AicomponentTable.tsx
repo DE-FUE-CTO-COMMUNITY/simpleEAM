@@ -9,6 +9,7 @@ import AicomponentForm from './AicomponentForm'
 import { createColumnHelper } from '@tanstack/react-table'
 import { SortingState, VisibilityState } from '@tanstack/react-table'
 import usePersistentColumnVisibility from '../../hooks/usePersistentColumnVisibility'
+import { useFeatureFlags } from '@/lib/feature-flags'
 
 // Exportierte Standard-Spaltenvisibilität für die Aicomponent-Tabelle
 export const Aicomponents_DEFAULT_COLUMN_VISIBILITY = {
@@ -35,6 +36,9 @@ export const Aicomponents_DEFAULT_COLUMN_VISIBILITY = {
   usedByApplications: false,
   trainedWithDataObjects: false,
   hostedOn: false,
+  providedBy: false,
+  supportedBy: false,
+  maintainedBy: false,
   partOfArchitectures: false,
   implementsPrinciples: false,
   depictedInDiagrams: false,
@@ -77,6 +81,8 @@ const AicomponentTableWithGenericTable: React.FC<AicomponentTableProps> = ({
   const formatDate = useFormatDate()
   const getAiTypeLabel = useAiTypeLabel()
   const getStatusLabel = useStatusLabel()
+  const { featureFlags } = useFeatureFlags()
+  const isSupEnabled = featureFlags.SUP
   const columnHelper = createColumnHelper<AicomponentType>()
 
   // Verwende persistente Spaltensichtbarkeit
@@ -232,6 +238,49 @@ const AicomponentTableWithGenericTable: React.FC<AicomponentTableProps> = ({
         },
         enableHiding: true,
       }),
+      ...(isSupEnabled
+        ? [
+            columnHelper.accessor('providedBy', {
+              header: t('providedBy'),
+              cell: info => {
+                const value = info.getValue()
+                return value && value.length > 0
+                  ? value
+                      .slice(0, 2)
+                      .map(supplier => supplier.name)
+                      .join(', ') + (value.length > 2 ? '...' : '')
+                  : '-'
+              },
+              enableHiding: true,
+            }),
+            columnHelper.accessor('supportedBy', {
+              header: t('supportedBy'),
+              cell: info => {
+                const value = info.getValue()
+                return value && value.length > 0
+                  ? value
+                      .slice(0, 2)
+                      .map(supplier => supplier.name)
+                      .join(', ') + (value.length > 2 ? '...' : '')
+                  : '-'
+              },
+              enableHiding: true,
+            }),
+            columnHelper.accessor('maintainedBy', {
+              header: t('maintainedBy'),
+              cell: info => {
+                const value = info.getValue()
+                return value && value.length > 0
+                  ? value
+                      .slice(0, 2)
+                      .map(supplier => supplier.name)
+                      .join(', ') + (value.length > 2 ? '...' : '')
+                  : '-'
+              },
+              enableHiding: true,
+            }),
+          ]
+        : []),
       columnHelper.accessor('partOfArchitectures', {
         header: t('partOfArchitectures'),
         cell: info => {
@@ -272,7 +321,7 @@ const AicomponentTableWithGenericTable: React.FC<AicomponentTableProps> = ({
         enableHiding: true,
       }),
     ],
-    [columnHelper, t, formatDate, getAiTypeLabel, getStatusLabel]
+    [columnHelper, t, formatDate, getAiTypeLabel, getStatusLabel, isSupEnabled]
   )
 
   // Mapping from AicomponentType to expected FormValues for form
@@ -300,6 +349,9 @@ const AicomponentTableWithGenericTable: React.FC<AicomponentTableProps> = ({
       usedByApplicationIds: aicomponent.usedByApplications?.map(app => app.id) ?? [],
       trainedWithDataObjectIds: aicomponent.trainedWithDataObjects?.map(obj => obj.id) ?? [],
       hostedOnIds: aicomponent.hostedOn?.map(infra => infra.id) ?? [],
+      providedByIds: aicomponent.providedBy?.map(supplier => supplier.id) ?? [],
+      supportedByIds: aicomponent.supportedBy?.map(supplier => supplier.id) ?? [],
+      maintainedByIds: aicomponent.maintainedBy?.map(supplier => supplier.id) ?? [],
       partOfArchitectureIds: aicomponent.partOfArchitectures?.map(arch => arch.id) ?? [],
       implementsPrincipleIds:
         aicomponent.implementsPrinciples?.map(principle => principle.id) ?? [],

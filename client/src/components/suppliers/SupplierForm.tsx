@@ -13,9 +13,11 @@ import {
   StrategicImportance,
   Application,
   Infrastructure,
+  AiComponent,
 } from '@/gql/generated'
 import { GET_APPLICATIONS } from '@/graphql/application'
 import { GET_INFRASTRUCTURES } from '@/graphql/infrastructure'
+import { GET_Aicomponents } from '@/graphql/aicomponent'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import { useChipClickHandlers } from '@/hooks/useChipClickHandlers'
 import GenericForm, { FieldConfig, TabConfig } from '../common/GenericForm'
@@ -48,6 +50,9 @@ const createBaseSupplierSchema = (t: any) =>
     providesInfrastructureIds: z.array(z.string()).optional(),
     hostsInfrastructureIds: z.array(z.string()).optional(),
     maintainsInfrastructureIds: z.array(z.string()).optional(),
+    providesAIComponentIds: z.array(z.string()).optional(),
+    supportsAIComponentIds: z.array(z.string()).optional(),
+    maintainsAIComponentIds: z.array(z.string()).optional(),
   })
 
 // Schema factory for form validation
@@ -101,6 +106,9 @@ const SupplierForm: React.FC<GenericFormProps<Supplier, SupplierFormValues>> = (
     GET_INFRASTRUCTURES,
     { variables: { where: companyWhere } }
   )
+  const { data: aiComponentsData, loading: aiComponentsLoading } = useQuery(GET_Aicomponents, {
+    variables: { where: companyWhere },
+  })
 
   // Initialize chip click handlers
   const { createChipClickHandler } = useChipClickHandlers({
@@ -142,6 +150,9 @@ const SupplierForm: React.FC<GenericFormProps<Supplier, SupplierFormValues>> = (
       providesInfrastructureIds: [],
       hostsInfrastructureIds: [],
       maintainsInfrastructureIds: [],
+      providesAIComponentIds: [],
+      supportsAIComponentIds: [],
+      maintainsAIComponentIds: [],
     }),
     []
   )
@@ -189,6 +200,12 @@ const SupplierForm: React.FC<GenericFormProps<Supplier, SupplierFormValues>> = (
         hostsInfrastructureIds: supplier?.hostsInfrastructure?.map((infra: any) => infra.id) ?? [],
         maintainsInfrastructureIds:
           supplier?.maintainsInfrastructure?.map((infra: any) => infra.id) ?? [],
+        providesAIComponentIds:
+          supplier?.providesAIComponents?.map((component: any) => component.id) ?? [],
+        supportsAIComponentIds:
+          supplier?.supportsAIComponents?.map((component: any) => component.id) ?? [],
+        maintainsAIComponentIds:
+          supplier?.maintainsAIComponents?.map((component: any) => component.id) ?? [],
       }
       form.reset(resetValues)
     } else if (!isOpen) {
@@ -576,6 +593,93 @@ const SupplierForm: React.FC<GenericFormProps<Supplier, SupplierFormValues>> = (
         return option.value === value?.value || option.value === value
       },
       onChipClick: createChipClickHandler('maintainsInfrastructureIds'),
+    },
+    {
+      name: 'providesAIComponentIds',
+      label: t('providesAIComponents'),
+      type: 'autocomplete',
+      tabId: 'relationships',
+      multiple: true,
+      options: (aiComponentsData?.aiComponents || []).map((component: AiComponent) => ({
+        value: component.id,
+        label: component.name,
+      })),
+      loadingOptions: aiComponentsLoading,
+      size: { xs: 12, md: 6 },
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          const matchingComponent = aiComponentsData?.aiComponents?.find(
+            (component: AiComponent) => component.id === option
+          )
+          return matchingComponent?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
+      onChipClick: createChipClickHandler('providesAIComponentIds'),
+    },
+    {
+      name: 'supportsAIComponentIds',
+      label: t('supportsAIComponents'),
+      type: 'autocomplete',
+      tabId: 'relationships',
+      multiple: true,
+      options: (aiComponentsData?.aiComponents || []).map((component: AiComponent) => ({
+        value: component.id,
+        label: component.name,
+      })),
+      loadingOptions: aiComponentsLoading,
+      size: { xs: 12, md: 6 },
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          const matchingComponent = aiComponentsData?.aiComponents?.find(
+            (component: AiComponent) => component.id === option
+          )
+          return matchingComponent?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
+      onChipClick: createChipClickHandler('supportsAIComponentIds'),
+    },
+    {
+      name: 'maintainsAIComponentIds',
+      label: t('maintainsAIComponents'),
+      type: 'autocomplete',
+      tabId: 'relationships',
+      multiple: true,
+      options: (aiComponentsData?.aiComponents || []).map((component: AiComponent) => ({
+        value: component.id,
+        label: component.name,
+      })),
+      loadingOptions: aiComponentsLoading,
+      size: { xs: 12, md: 6 },
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          const matchingComponent = aiComponentsData?.aiComponents?.find(
+            (component: AiComponent) => component.id === option
+          )
+          return matchingComponent?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
+      onChipClick: createChipClickHandler('maintainsAIComponentIds'),
     },
   ]
 

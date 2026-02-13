@@ -55,4 +55,7 @@ export interface SupplierFormValues {
   providesInfrastructureIds?: string[]
   hostsInfrastructureIds?: string[]
   maintainsInfrastructureIds?: string[]
+  providesAIComponentIds?: string[]
+  supportsAIComponentIds?: string[]
+  maintainsAIComponentIds?: string[]
 }

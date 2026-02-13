@@ -40,6 +40,9 @@ export const Suppliers_DEFAULT_COLUMN_VISIBILITY = {
   providesInfrastructure: false,
   hostsInfrastructure: false,
   maintainsInfrastructure: false,
+  providesAIComponents: false,
+  supportsAIComponents: false,
+  maintainsAIComponents: false,
   createdAt: false,
   updatedAt: false,
 } as const
@@ -295,6 +298,45 @@ const SupplierTable: React.FC<SupplierTableProps> = ({
         },
         enableHiding: true,
       }),
+      columnHelper.accessor('providesAIComponents', {
+        header: t('providesAIComponents'),
+        cell: info => {
+          const components = info.getValue()
+          return components && components.length > 0
+            ? components
+                .slice(0, 2)
+                .map(component => component.name)
+                .join(', ') + (components.length > 2 ? '...' : '')
+            : '-'
+        },
+        enableHiding: true,
+      }),
+      columnHelper.accessor('supportsAIComponents', {
+        header: t('supportsAIComponents'),
+        cell: info => {
+          const components = info.getValue()
+          return components && components.length > 0
+            ? components
+                .slice(0, 2)
+                .map(component => component.name)
+                .join(', ') + (components.length > 2 ? '...' : '')
+            : '-'
+        },
+        enableHiding: true,
+      }),
+      columnHelper.accessor('maintainsAIComponents', {
+        header: t('maintainsAIComponents'),
+        cell: info => {
+          const components = info.getValue()
+          return components && components.length > 0
+            ? components
+                .slice(0, 2)
+                .map(component => component.name)
+                .join(', ') + (components.length > 2 ? '...' : '')
+            : '-'
+        },
+        enableHiding: true,
+      }),
       columnHelper.accessor('createdAt', {
         header: t('createdAt'),
         cell: info => {
@@ -341,6 +383,10 @@ const SupplierTable: React.FC<SupplierTableProps> = ({
       providesInfrastructureIds: supplier.providesInfrastructure?.map(infra => infra.id) ?? [],
       hostsInfrastructureIds: supplier.hostsInfrastructure?.map(infra => infra.id) ?? [],
       maintainsInfrastructureIds: supplier.maintainsInfrastructure?.map(infra => infra.id) ?? [],
+      providesAIComponentIds: supplier.providesAIComponents?.map(component => component.id) ?? [],
+      supportsAIComponentIds: supplier.supportsAIComponents?.map(component => component.id) ?? [],
+      maintainsAIComponentIds:
+        supplier.maintainsAIComponents?.map(component => component.id) ?? [],
     }
   }
 

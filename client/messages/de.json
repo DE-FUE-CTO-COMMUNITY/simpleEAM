@@ -1108,6 +1108,9 @@
       "usedByApplications": "Verwendet von Applikationen",
       "trainedWithDataObjects": "Trainiert mit Datenobjekten",
       "hostedOn": "Gehostet auf",
+      "providedBy": "Bereitgestellt durch Lieferanten",
+      "supportedBy": "Unterstützt durch Lieferanten",
+      "maintainedBy": "Gewartet durch Lieferanten",
       "partOfArchitectures": "Teil von Architekturen",
       "depictedInDiagrams": "Dargestellt in Diagrammen",
       "implementsPrinciples": "Implementiert Prinzipien"
@@ -1132,6 +1135,9 @@
       "usedByApplications": "Verwendet von Applikationen",
       "trainedWithDataObjects": "Trainiert mit Datenobjekten",
       "hostedOn": "Gehostet auf",
+      "providedBy": "Bereitgestellt durch Lieferanten",
+      "supportedBy": "Unterstützt durch Lieferanten",
+      "maintainedBy": "Gewartet durch Lieferanten",
       "partOfArchitectures": "Teil von Architekturen",
       "implementsPrinciples": "Implementiert Prinzipien",
       "depictedInDiagrams": "Dargestellt in Diagrammen",
@@ -1191,6 +1197,7 @@
       "technical": "Technisch",
       "relationships": "Beziehungen",
       "training": "Training",
+      "suppliers": "Lieferanten",
       "architectures": "Architekturen",
       "principles": "Prinzipien"
     },
@@ -2663,6 +2670,9 @@
       "providesInfrastructure": "Stellt Infrastruktur bereit",
       "hostsInfrastructure": "Hostet Infrastruktur",
       "maintainsInfrastructure": "Wartet Infrastruktur",
+      "providesAIComponents": "Stellt KI-Komponenten bereit",
+      "supportsAIComponents": "Unterstützt KI-Komponenten",
+      "maintainsAIComponents": "Wartet KI-Komponenten",
       "none": "Keine"
     },
     "validation": {
@@ -2711,6 +2721,9 @@
       "providesInfrastructure": "Stellt Infra bereit",
       "hostsInfrastructure": "Hostet Infra",
       "maintainsInfrastructure": "Wartet Infra",
+      "providesAIComponents": "Stellt KI bereit",
+      "supportsAIComponents": "Unterstützt KI",
+      "maintainsAIComponents": "Wartet KI",
       "tags": "Tags",
       "createdAt": "Erstellt am",
       "updatedAt": "Aktualisiert am",

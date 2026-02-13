@@ -72,6 +72,9 @@ const SuppliersPage = () => {
         providesInfrastructureIds,
         hostsInfrastructureIds,
         maintainsInfrastructureIds,
+        providesAIComponentIds,
+        supportsAIComponentIds,
+        maintainsAIComponentIds,
         ...supplierData
       } = data
 
@@ -142,6 +145,33 @@ const SuppliersPage = () => {
           ? {
               maintainsInfrastructure: {
                 connect: maintainsInfrastructureIds.map(id => ({
+                  where: { node: { id: { eq: id } } },
+                })),
+              },
+            }
+          : {}),
+        ...(providesAIComponentIds && providesAIComponentIds.length > 0
+          ? {
+              providesAIComponents: {
+                connect: providesAIComponentIds.map(id => ({
+                  where: { node: { id: { eq: id } } },
+                })),
+              },
+            }
+          : {}),
+        ...(supportsAIComponentIds && supportsAIComponentIds.length > 0
+          ? {
+              supportsAIComponents: {
+                connect: supportsAIComponentIds.map(id => ({
+                  where: { node: { id: { eq: id } } },
+                })),
+              },
+            }
+          : {}),
+        ...(maintainsAIComponentIds && maintainsAIComponentIds.length > 0
+          ? {
+              maintainsAIComponents: {
+                connect: maintainsAIComponentIds.map(id => ({
                   where: { node: { id: { eq: id } } },
                 })),
               },
@@ -248,6 +278,9 @@ const SuppliersPage = () => {
                   providesInfrastructureIds,
                   hostsInfrastructureIds,
                   maintainsInfrastructureIds,
+                  providesAIComponentIds,
+                  supportsAIComponentIds,
+                  maintainsAIComponentIds,
                   ...supplierData
                 } = data
 
@@ -353,6 +386,45 @@ const SuppliersPage = () => {
                   }
                 } else {
                   input.maintainsInfrastructure = {
+                    disconnect: [{ where: {} }],
+                  }
+                }
+
+                if (providesAIComponentIds && providesAIComponentIds.length > 0) {
+                  input.providesAIComponents = {
+                    disconnect: [{ where: {} }],
+                    connect: providesAIComponentIds.map(componentId => ({
+                      where: { node: { id: { eq: componentId } } },
+                    })),
+                  }
+                } else {
+                  input.providesAIComponents = {
+                    disconnect: [{ where: {} }],
+                  }
+                }
+
+                if (supportsAIComponentIds && supportsAIComponentIds.length > 0) {
+                  input.supportsAIComponents = {
+                    disconnect: [{ where: {} }],
+                    connect: supportsAIComponentIds.map(componentId => ({
+                      where: { node: { id: { eq: componentId } } },
+                    })),
+                  }
+                } else {
+                  input.supportsAIComponents = {
+                    disconnect: [{ where: {} }],
+                  }
+                }
+
+                if (maintainsAIComponentIds && maintainsAIComponentIds.length > 0) {
+                  input.maintainsAIComponents = {
+                    disconnect: [{ where: {} }],
+                    connect: maintainsAIComponentIds.map(componentId => ({
+                      where: { node: { id: { eq: componentId } } },
+                    })),
+                  }
+                } else {
+                  input.maintainsAIComponents = {
                     disconnect: [{ where: {} }],
                   }
                 }
