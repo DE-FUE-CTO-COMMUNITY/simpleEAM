@@ -1,6 +1,3 @@
-import { config as dotenvConfig } from 'dotenv'
-import { expand as dotenvExpand } from 'dotenv-expand'
-import { resolve } from 'path'
 import type { CodegenConfig } from '@graphql-codegen/cli'
 import dotenv from 'dotenv'
 import dotenvExpand from 'dotenv-expand'
@@ -9,10 +6,6 @@ import path from 'node:path'
 dotenvExpand.expand(dotenv.config({ path: path.resolve(process.cwd(), '../.env') }))
 
 console.log('Generating GraphQL types from schema...', process.env.GRAPHQL_URL)
-
-// Load environment variables from parent directory's .env file with variable expansion
-const envConfig = dotenvConfig({ path: resolve(__dirname, '../.env') })
-dotenvExpand(envConfig)
 
 // Validate that GRAPHQL_URL is defined in environment
 if (!process.env.GRAPHQL_URL) {
