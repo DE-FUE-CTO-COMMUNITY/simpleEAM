@@ -22,6 +22,7 @@ import {
   Architecture,
   ArchitecturePrinciple,
   Infrastructure,
+  Supplier,
   TimeCategory,
   SevenRStrategy,
 } from '../../gql/generated'
@@ -33,12 +34,14 @@ import { GET_ARCHITECTURES } from '@/graphql/architecture'
 import { GET_DIAGRAMS } from '@/graphql/diagram'
 import { GET_ARCHITECTURE_PRINCIPLES } from '@/graphql/architecturePrinciple'
 import { GET_INFRASTRUCTURES } from '@/graphql/infrastructure'
+import { GET_SUPPLIERS } from '@/graphql/supplier'
 import { useCurrentPerson } from '@/hooks/useCurrentPerson'
 import GenericForm, { FieldConfig, TabConfig } from '../common/GenericForm'
 import { getValidSevenRStrategies } from './timeCategoryDependencies'
 import { isArchitect } from '@/lib/auth'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import { useChipClickHandlers } from '@/hooks/useChipClickHandlers'
+import { useFeatureFlags } from '@/lib/feature-flags'
 import CapabilityForm from '../capabilities/CapabilityForm'
 import DataObjectForm from '../dataobjects/DataObjectForm'
 import ApplicationInterfaceForm from '../interfaces/ApplicationInterfaceForm'
@@ -82,6 +85,9 @@ const createBaseApplicationSchema = (t: any) =>
     predecessorIds: z.array(z.string()).optional(),
     successorIds: z.array(z.string()).optional(),
     hostedOnIds: z.array(z.string()).optional(),
+    providedByIds: z.array(z.string()).optional(),
+    supportedByIds: z.array(z.string()).optional(),
+    maintainedByIds: z.array(z.string()).optional(),
     timeCategory: z.nativeEnum(TimeCategory).optional().nullable().or(z.literal('')),
     sevenRStrategy: z.nativeEnum(SevenRStrategy).optional().nullable().or(z.literal('')),
   })
@@ -314,6 +320,8 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
   const tTimeCategory = useTranslations('applications.timeCategories')
   const tSevenR = useTranslations('applications.sevenRStrategies')
   const tTabs = useTranslations('applications.tabs')
+  const { featureFlags } = useFeatureFlags()
+  const isSupEnabled = featureFlags.SUP
 
   // State for nested entity forms and parent dialog visibility
   const [nestedFormState, setNestedFormState] = useState<{
@@ -383,6 +391,10 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     GET_INFRASTRUCTURES,
     { variables: { where: companyWhere } }
   )
+  const { data: suppliersData, loading: suppliersLoading } = useQuery(GET_SUPPLIERS, {
+    variables: { where: companyWhere },
+    skip: !isSupEnabled,
+  })
 
   // Queries for individual nested entities
   const { data: nestedCapabilityData } = useQuery(GET_CAPABILITIES, {
@@ -500,6 +512,18 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
             id
             name
           }
+          providedBy {
+            id
+            name
+          }
+          supportedBy {
+            id
+            name
+          }
+          maintainedBy {
+            id
+            name
+          }
           createdAt
           updatedAt
         }
@@ -545,6 +569,9 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     predecessorIds: application?.predecessors?.map((app: any) => app.id) ?? [],
     successorIds: application?.successors?.map((app: any) => app.id) ?? [],
     hostedOnIds: application?.hostedOn?.map((app: any) => app.id) ?? [],
+    providedByIds: application?.providedBy?.map((supplier: any) => supplier.id) ?? [],
+    supportedByIds: application?.supportedBy?.map((supplier: any) => supplier.id) ?? [],
+    maintainedByIds: application?.maintainedBy?.map((supplier: any) => supplier.id) ?? [],
     timeCategory: application?.timeCategory ?? null,
     sevenRStrategy: application?.sevenRStrategy ?? null,
   }
@@ -632,6 +659,9 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
         predecessorIds: application?.predecessors?.map((app: any) => app.id) ?? [],
         successorIds: application?.successors?.map((app: any) => app.id) ?? [],
         hostedOnIds: application?.hostedOn?.map((app: any) => app.id) ?? [],
+        providedByIds: application?.providedBy?.map((supplier: any) => supplier.id) ?? [],
+        supportedByIds: application?.supportedBy?.map((supplier: any) => supplier.id) ?? [],
+        maintainedByIds: application?.maintainedBy?.map((supplier: any) => supplier.id) ?? [],
         timeCategory: application?.timeCategory ?? null,
         sevenRStrategy: application?.sevenRStrategy ?? null,
       }
@@ -670,6 +700,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     { id: 'technical', label: tTabs('technical') },
     { id: 'lifecycle', label: tTabs('lifecycle') },
     { id: 'relationships', label: tTabs('relationships') },
+    ...(isSupEnabled ? [{ id: 'suppliers', label: tTabs('suppliers') }] : []),
     { id: 'architectures', label: tTabs('architectures') },
     { id: 'principles', label: tTabs('principles') },
   ]
@@ -1186,6 +1217,95 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
       },
       onChipClick: createChipClickHandler('hostedOnIds'),
     },
+
+    ...(isSupEnabled
+      ? [
+          {
+            name: 'providedByIds',
+            label: t('providedBy'),
+            type: 'autocomplete',
+            tabId: 'suppliers',
+            multiple: true,
+            options: (suppliersData?.suppliers || []).map((supplier: Supplier) => ({
+              value: supplier.id,
+              label: supplier.name,
+            })),
+            loadingOptions: suppliersLoading,
+            size: 12,
+            getOptionLabel: (option: any) => {
+              if (typeof option === 'string') {
+                const matchingSupplier = suppliersData?.suppliers?.find(
+                  (supplier: Supplier) => supplier.id === option
+                )
+                return matchingSupplier?.name || option
+              }
+              return option?.label || ''
+            },
+            isOptionEqualToValue: (option: any, value: any) => {
+              if (typeof value === 'string') {
+                return option.value === value
+              }
+              return option.value === value?.value || option.value === value
+            },
+          },
+          {
+            name: 'supportedByIds',
+            label: t('supportedBy'),
+            type: 'autocomplete',
+            tabId: 'suppliers',
+            multiple: true,
+            options: (suppliersData?.suppliers || []).map((supplier: Supplier) => ({
+              value: supplier.id,
+              label: supplier.name,
+            })),
+            loadingOptions: suppliersLoading,
+            size: 12,
+            getOptionLabel: (option: any) => {
+              if (typeof option === 'string') {
+                const matchingSupplier = suppliersData?.suppliers?.find(
+                  (supplier: Supplier) => supplier.id === option
+                )
+                return matchingSupplier?.name || option
+              }
+              return option?.label || ''
+            },
+            isOptionEqualToValue: (option: any, value: any) => {
+              if (typeof value === 'string') {
+                return option.value === value
+              }
+              return option.value === value?.value || option.value === value
+            },
+          },
+          {
+            name: 'maintainedByIds',
+            label: t('maintainedBy'),
+            type: 'autocomplete',
+            tabId: 'suppliers',
+            multiple: true,
+            options: (suppliersData?.suppliers || []).map((supplier: Supplier) => ({
+              value: supplier.id,
+              label: supplier.name,
+            })),
+            loadingOptions: suppliersLoading,
+            size: 12,
+            getOptionLabel: (option: any) => {
+              if (typeof option === 'string') {
+                const matchingSupplier = suppliersData?.suppliers?.find(
+                  (supplier: Supplier) => supplier.id === option
+                )
+                return matchingSupplier?.name || option
+              }
+              return option?.label || ''
+            },
+            isOptionEqualToValue: (option: any, value: any) => {
+              if (typeof value === 'string') {
+                return option.value === value
+              }
+              return option.value === value?.value || option.value === value
+            },
+          },
+        ]
+      : []),
 
     // Architekturen (Tab: architectures)
     {

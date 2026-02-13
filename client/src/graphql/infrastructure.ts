@@ -58,6 +58,18 @@ export const GET_INFRASTRUCTURES = gql`
         id
         name
       }
+      providedBy {
+        id
+        name
+      }
+      hostedBy {
+        id
+        name
+      }
+      maintainedBy {
+        id
+        name
+      }
       partOfArchitectures {
         id
         name
@@ -107,6 +119,18 @@ export const GET_INFRASTRUCTURE = gql`
         name
       }
       hostsApplications {
+        id
+        name
+      }
+      providedBy {
+        id
+        name
+      }
+      hostedBy {
+        id
+        name
+      }
+      maintainedBy {
         id
         name
       }

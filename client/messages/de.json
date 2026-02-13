@@ -935,6 +935,9 @@
       "parentApplications": "Übergeordnete Applikationen",
       "componentApplications": "Komponenten (untergeordnete Applikationen)",
       "hostedOn": "Gehostet auf (Infrastructure)",
+      "providedBy": "Bereitgestellt durch Lieferanten",
+      "supportedBy": "Unterstützt durch Lieferanten",
+      "maintainedBy": "Gewartet durch Lieferanten",
       "implementedPrinciples": "Implementierte Prinzipien",
       "none": "Keine",
       "createTitle": "Neue Applikation erstellen",
@@ -1058,7 +1061,8 @@
       "relationships": "Beziehungen",
       "architectures": "Architekturen",
       "technical": "Technisch",
-      "principles": "Prinzipien"
+      "principles": "Prinzipien",
+      "suppliers": "Lieferanten"
     }
   },
   "aicomponents": {
@@ -1875,6 +1879,9 @@
       "components": "Komponenten",
       "hostsApplications": "Gehostete Applikationen",
       "hostedApplications": "Gehostete Applikationen",
+      "providedBy": "Bereitgestellt durch Lieferanten",
+      "hostedBy": "Gehostet durch Lieferanten",
+      "maintainedBy": "Gewartet durch Lieferanten",
       "partOfArchitectures": "Teil von Architekturen",
       "depictedInDiagrams": "Dargestellt in Diagrammen",
       "tags": "Tags",
@@ -1968,7 +1975,8 @@
       "technical": "Technisch",
       "lifecycle": "Lebenszyklus",
       "relationships": "Beziehungen",
-      "architectures": "Architekturen"
+      "architectures": "Architekturen",
+      "suppliers": "Lieferanten"
     }
   },
   "persons": {

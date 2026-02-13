@@ -16,14 +16,17 @@ import { GET_ARCHITECTURES } from '@/graphql/architecture'
 import { GET_DIAGRAMS } from '@/graphql/diagram'
 import { GET_INFRASTRUCTURES } from '@/graphql/infrastructure'
 import { GET_APPLICATIONS } from '@/graphql/application'
+import { GET_SUPPLIERS } from '@/graphql/supplier'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import { useCurrentPerson } from '@/hooks/useCurrentPerson'
+import { useFeatureFlags } from '@/lib/feature-flags'
 import {
   Infrastructure,
   InfrastructureType,
   InfrastructureStatus,
   Architecture,
   Application,
+  Supplier,
 } from '../../gql/generated'
 import GenericForm, { FieldConfig } from '../common/GenericForm'
 import { isArchitect } from '@/lib/auth'
@@ -54,6 +57,9 @@ const baseInfrastructureSchema = z.object({
   parentInfrastructure: z.array(z.string()).optional(),
   childInfrastructures: z.array(z.string()).optional(),
   hostsApplications: z.array(z.string()).optional(),
+  providedBy: z.array(z.string()).optional(),
+  hostedBy: z.array(z.string()).optional(),
+  maintainedBy: z.array(z.string()).optional(),
   partOfArchitectures: z.array(z.string()).optional(),
   depictedInDiagrams: z.array(z.string()).optional(),
 })
@@ -100,11 +106,12 @@ export type InfrastructureFormValues = z.infer<typeof baseInfrastructureSchema>
 import { GenericFormProps } from '../common/GenericFormProps'
 
 // Tab configuration with translations
-const INFRASTRUCTURE_TABS = (tTabs: any) => [
+const INFRASTRUCTURE_TABS = (tTabs: any, isSupEnabled: boolean) => [
   { id: 'general', label: tTabs('general') },
   { id: 'technical', label: tTabs('technical') },
   { id: 'lifecycle', label: tTabs('lifecycle') },
   { id: 'relationships', label: tTabs('relationships') },
+  ...(isSupEnabled ? [{ id: 'suppliers', label: tTabs('suppliers') }] : []),
   { id: 'architectures', label: tTabs('architectures') },
 ]
 
@@ -123,6 +130,8 @@ const InfrastructureForm: React.FC<GenericFormProps<Infrastructure, Infrastructu
   const tTabs = useTranslations('infrastructure.tabs')
   const tTypes = useTranslations('infrastructure.infrastructureTypes')
   const tStatuses = useTranslations('infrastructure.statuses')
+  const { featureFlags } = useFeatureFlags()
+  const isSupEnabled = featureFlags.SUP
 
   const [nestedFormState, setNestedFormState] = useState<{
     isOpen: boolean
@@ -208,6 +217,11 @@ const InfrastructureForm: React.FC<GenericFormProps<Infrastructure, Infrastructu
     fetchPolicy: 'cache-and-network',
     variables: { where: companyWhere },
   })
+  const { data: suppliersData, loading: suppliersLoading } = useQuery(GET_SUPPLIERS, {
+    fetchPolicy: 'cache-and-network',
+    variables: { where: companyWhere },
+    skip: !isSupEnabled,
+  })
   // Architekturen laden
   const { data: architecturesData, loading: architecturesLoading } = useQuery(GET_ARCHITECTURES, {
     variables: { where: companyWhere },
@@ -277,6 +291,9 @@ const InfrastructureForm: React.FC<GenericFormProps<Infrastructure, Infrastructu
       parentInfrastructure: infrastructure?.parentInfrastructure?.map(parent => parent.id) || [],
       childInfrastructures: infrastructure?.childInfrastructures?.map(infra => infra.id) || [],
       hostsApplications: infrastructure?.hostsApplications?.map(app => app.id) || [],
+      providedBy: infrastructure?.providedBy?.map(supplier => supplier.id) || [],
+      hostedBy: infrastructure?.hostedBy?.map(supplier => supplier.id) || [],
+      maintainedBy: infrastructure?.maintainedBy?.map(supplier => supplier.id) || [],
       partOfArchitectures: infrastructure?.partOfArchitectures?.map(arch => arch.id) || [],
       depictedInDiagrams: infrastructure?.depictedInDiagrams?.map(diag => diag.id) || [],
     }),
@@ -341,6 +358,9 @@ const InfrastructureForm: React.FC<GenericFormProps<Infrastructure, Infrastructu
         parentInfrastructure: infrastructure.parentInfrastructure?.map(parent => parent.id) ?? [],
         childInfrastructures: infrastructure.childInfrastructures?.map(infra => infra.id) ?? [],
         hostsApplications: infrastructure.hostsApplications?.map(app => app.id) ?? [],
+        providedBy: infrastructure.providedBy?.map(supplier => supplier.id) ?? [],
+        hostedBy: infrastructure.hostedBy?.map(supplier => supplier.id) ?? [],
+        maintainedBy: infrastructure.maintainedBy?.map(supplier => supplier.id) ?? [],
         partOfArchitectures: infrastructure.partOfArchitectures?.map(arch => arch.id) ?? [],
         depictedInDiagrams: infrastructure.depictedInDiagrams?.map(diagram => diagram.id) ?? [],
       }
@@ -647,6 +667,97 @@ const InfrastructureForm: React.FC<GenericFormProps<Infrastructure, Infrastructu
       },
       onChipClick: createChipClickHandler('hostsApplications'),
     },
+    ...(isSupEnabled
+      ? [
+          {
+            name: 'providedBy',
+            label: t('providedBy' as any),
+            type: 'autocomplete',
+            validators: baseInfrastructureSchema.shape.providedBy,
+            multiple: true,
+            options: (suppliersData?.suppliers || []).map((supplier: Supplier) => ({
+              value: supplier.id,
+              label: supplier.name,
+            })),
+            loadingOptions: suppliersLoading,
+            size: 12,
+            tabId: 'suppliers',
+            getOptionLabel: (option: any) => {
+              if (typeof option === 'string') {
+                const matchingSupplier = suppliersData?.suppliers?.find(
+                  (supplier: Supplier) => supplier.id === option
+                )
+                return matchingSupplier?.name || option
+              }
+              return option?.label || ''
+            },
+            isOptionEqualToValue: (option: any, value: any) => {
+              if (typeof value === 'string') {
+                return option.value === value
+              }
+              return option.value === value?.value || option.value === value
+            },
+          },
+          {
+            name: 'hostedBy',
+            label: t('hostedBy' as any),
+            type: 'autocomplete',
+            validators: baseInfrastructureSchema.shape.hostedBy,
+            multiple: true,
+            options: (suppliersData?.suppliers || []).map((supplier: Supplier) => ({
+              value: supplier.id,
+              label: supplier.name,
+            })),
+            loadingOptions: suppliersLoading,
+            size: 12,
+            tabId: 'suppliers',
+            getOptionLabel: (option: any) => {
+              if (typeof option === 'string') {
+                const matchingSupplier = suppliersData?.suppliers?.find(
+                  (supplier: Supplier) => supplier.id === option
+                )
+                return matchingSupplier?.name || option
+              }
+              return option?.label || ''
+            },
+            isOptionEqualToValue: (option: any, value: any) => {
+              if (typeof value === 'string') {
+                return option.value === value
+              }
+              return option.value === value?.value || option.value === value
+            },
+          },
+          {
+            name: 'maintainedBy',
+            label: t('maintainedBy' as any),
+            type: 'autocomplete',
+            validators: baseInfrastructureSchema.shape.maintainedBy,
+            multiple: true,
+            options: (suppliersData?.suppliers || []).map((supplier: Supplier) => ({
+              value: supplier.id,
+              label: supplier.name,
+            })),
+            loadingOptions: suppliersLoading,
+            size: 12,
+            tabId: 'suppliers',
+            getOptionLabel: (option: any) => {
+              if (typeof option === 'string') {
+                const matchingSupplier = suppliersData?.suppliers?.find(
+                  (supplier: Supplier) => supplier.id === option
+                )
+                return matchingSupplier?.name || option
+              }
+              return option?.label || ''
+            },
+            isOptionEqualToValue: (option: any, value: any) => {
+              if (typeof value === 'string') {
+                return option.value === value
+              }
+              return option.value === value?.value || option.value === value
+            },
+          },
+        ]
+      : []),
     {
       name: 'partOfArchitectures',
       label: t('partOfArchitectures' as any),
@@ -747,7 +858,7 @@ const InfrastructureForm: React.FC<GenericFormProps<Infrastructure, Infrastructu
               }
             : undefined
         }
-        tabs={INFRASTRUCTURE_TABS(tTabs)}
+        tabs={INFRASTRUCTURE_TABS(tTabs, isSupEnabled)}
       />
 
       {/* Nested Application Form */}

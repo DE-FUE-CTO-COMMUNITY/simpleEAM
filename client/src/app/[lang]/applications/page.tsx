@@ -245,6 +245,9 @@ const ApplicationsPage = () => {
       predecessorIds,
       successorIds,
       hostedOnIds,
+      providedByIds,
+      supportedByIds,
+      maintainedByIds,
       ...applicationData
     } = data
     // For CREATE, no special mutation object is needed as direct values are allowed
@@ -371,6 +374,33 @@ const ApplicationsPage = () => {
             },
           }
         : {}),
+      ...(providedByIds && providedByIds.length > 0
+        ? {
+            providedBy: {
+              connect: providedByIds.map(id => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }
+        : {}),
+      ...(supportedByIds && supportedByIds.length > 0
+        ? {
+            supportedBy: {
+              connect: supportedByIds.map(id => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }
+        : {}),
+      ...(maintainedByIds && maintainedByIds.length > 0
+        ? {
+            maintainedBy: {
+              connect: maintainedByIds.map(id => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }
+        : {}),
       // Company assignment (required)
       company: {
         connect: [
@@ -412,6 +442,9 @@ const ApplicationsPage = () => {
       predecessorIds,
       successorIds,
       hostedOnIds,
+      providedByIds,
+      supportedByIds,
+      maintainedByIds,
       ...applicationData
     } = data
 
@@ -642,6 +675,57 @@ const ApplicationsPage = () => {
     } else {
       input.hostedOn = {
         disconnect: [{ where: {} }], // Disconnect all existing connections
+      }
+    }
+
+    if (providedByIds && providedByIds.length > 0) {
+      input.providedBy = {
+        disconnect: [{ where: {} }],
+        connect: providedByIds.map(supplierId => ({
+          where: {
+            node: {
+              id: { eq: supplierId },
+            },
+          },
+        })),
+      }
+    } else {
+      input.providedBy = {
+        disconnect: [{ where: {} }],
+      }
+    }
+
+    if (supportedByIds && supportedByIds.length > 0) {
+      input.supportedBy = {
+        disconnect: [{ where: {} }],
+        connect: supportedByIds.map(supplierId => ({
+          where: {
+            node: {
+              id: { eq: supplierId },
+            },
+          },
+        })),
+      }
+    } else {
+      input.supportedBy = {
+        disconnect: [{ where: {} }],
+      }
+    }
+
+    if (maintainedByIds && maintainedByIds.length > 0) {
+      input.maintainedBy = {
+        disconnect: [{ where: {} }],
+        connect: maintainedByIds.map(supplierId => ({
+          where: {
+            node: {
+              id: { eq: supplierId },
+            },
+          },
+        })),
+      }
+    } else {
+      input.maintainedBy = {
+        disconnect: [{ where: {} }],
       }
     }
 

@@ -938,6 +938,9 @@
       "parentApplications": "Parent Applications",
       "componentApplications": "Components (sub-applications)",
       "hostedOn": "Hosted on (Infrastructure)",
+      "providedBy": "Provided By Suppliers",
+      "supportedBy": "Supported By Suppliers",
+      "maintainedBy": "Maintained By Suppliers",
       "implementedPrinciples": "Implemented Principles",
       "none": "None",
       "createTitle": "Create New Application",
@@ -1061,7 +1064,8 @@
       "relationships": "Relationships",
       "architectures": "Architectures",
       "technical": "Technical",
-      "principles": "Principles"
+      "principles": "Principles",
+      "suppliers": "Suppliers"
     }
   },
   "aicomponents": {
@@ -1878,6 +1882,9 @@
       "components": "Components",
       "hostsApplications": "Hosted Applications",
       "hostedApplications": "Hosted Applications",
+      "providedBy": "Provided By Suppliers",
+      "hostedBy": "Hosted By Suppliers",
+      "maintainedBy": "Maintained By Suppliers",
       "partOfArchitectures": "Part of Architectures",
       "depictedInDiagrams": "Included in Diagrams",
       "tags": "Tags",
@@ -1971,7 +1978,8 @@
       "technical": "Technical",
       "lifecycle": "Lifecycle",
       "relationships": "Relationships",
-      "architectures": "Architectures"
+      "architectures": "Architectures",
+      "suppliers": "Suppliers"
     }
   },
   "persons": {

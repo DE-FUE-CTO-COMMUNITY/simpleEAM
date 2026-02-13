@@ -6,9 +6,7 @@ import { useTranslations } from 'next-intl'
 import { GenericTable } from '../common/GenericTable'
 import { SupplierType } from './types'
 import { SupplierFormValues } from './types'
-import {
-  useFormatDate,
-} from './utils'
+import { useFormatDate } from './utils'
 import SupplierForm from './SupplierForm'
 import { createColumnHelper } from '@tanstack/react-table'
 import { SortingState, VisibilityState } from '@tanstack/react-table'

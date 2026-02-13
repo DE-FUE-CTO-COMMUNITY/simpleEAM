@@ -97,6 +97,18 @@ export const GET_APPLICATIONS = gql`
         id
         name
       }
+      providedBy {
+        id
+        name
+      }
+      supportedBy {
+        id
+        name
+      }
+      maintainedBy {
+        id
+        name
+      }
     }
   }
 `
@@ -175,6 +187,18 @@ export const GET_APPLICATION = gql`
         priority
       }
       hostedOn {
+        id
+        name
+      }
+      providedBy {
+        id
+        name
+      }
+      supportedBy {
+        id
+        name
+      }
+      maintainedBy {
         id
         name
       }

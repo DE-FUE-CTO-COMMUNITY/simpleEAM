@@ -179,4 +179,3 @@ export const DELETE_SUPPLIER = gql`
     }
   }
 `
-

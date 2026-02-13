@@ -135,6 +135,30 @@ export default function InfrastructuresPage() {
               })),
             },
           }),
+        ...(data.providedBy &&
+          data.providedBy.length > 0 && {
+            providedBy: {
+              connect: data.providedBy.map((id: string) => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }),
+        ...(data.hostedBy &&
+          data.hostedBy.length > 0 && {
+            hostedBy: {
+              connect: data.hostedBy.map((id: string) => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }),
+        ...(data.maintainedBy &&
+          data.maintainedBy.length > 0 && {
+            maintainedBy: {
+              connect: data.maintainedBy.map((id: string) => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }),
         ...(data.partOfArchitectures &&
           data.partOfArchitectures.length > 0 && {
             partOfArchitectures: {
@@ -240,6 +264,36 @@ export default function InfrastructuresPage() {
                 disconnect: [{ where: {} }],
                 connect: data.hostsApplications.map((aid: string) => ({
                   where: { node: { id: { eq: aid } } },
+                })),
+              }
+            : { disconnect: [{ where: {} }] },
+        ],
+        providedBy: [
+          data.providedBy && data.providedBy.length
+            ? {
+                disconnect: [{ where: {} }],
+                connect: data.providedBy.map((sid: string) => ({
+                  where: { node: { id: { eq: sid } } },
+                })),
+              }
+            : { disconnect: [{ where: {} }] },
+        ],
+        hostedBy: [
+          data.hostedBy && data.hostedBy.length
+            ? {
+                disconnect: [{ where: {} }],
+                connect: data.hostedBy.map((sid: string) => ({
+                  where: { node: { id: { eq: sid } } },
+                })),
+              }
+            : { disconnect: [{ where: {} }] },
+        ],
+        maintainedBy: [
+          data.maintainedBy && data.maintainedBy.length
+            ? {
+                disconnect: [{ where: {} }],
+                connect: data.maintainedBy.map((sid: string) => ({
+                  where: { node: { id: { eq: sid } } },
                 })),
               }
             : { disconnect: [{ where: {} }] },

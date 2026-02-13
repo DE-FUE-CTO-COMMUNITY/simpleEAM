@@ -114,4 +114,3 @@ export const useStrategicImportanceLabel = () => {
     return t(importance)
   }
 }
-

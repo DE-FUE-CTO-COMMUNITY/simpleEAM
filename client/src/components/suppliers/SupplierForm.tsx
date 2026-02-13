@@ -181,12 +181,9 @@ const SupplierForm: React.FC<GenericFormProps<Supplier, SupplierFormValues>> = (
         performanceRating: supplier?.performanceRating ?? undefined,
         complianceCertifications: supplier?.complianceCertifications ?? [],
         tags: supplier?.tags ?? [],
-        providesApplicationIds:
-          supplier?.providesApplications?.map((app: any) => app.id) ?? [],
-        supportsApplicationIds:
-          supplier?.supportsApplications?.map((app: any) => app.id) ?? [],
-        maintainsApplicationIds:
-          supplier?.maintainsApplications?.map((app: any) => app.id) ?? [],
+        providesApplicationIds: supplier?.providesApplications?.map((app: any) => app.id) ?? [],
+        supportsApplicationIds: supplier?.supportsApplications?.map((app: any) => app.id) ?? [],
+        maintainsApplicationIds: supplier?.maintainsApplications?.map((app: any) => app.id) ?? [],
         providesInfrastructureIds:
           supplier?.providesInfrastructure?.map((infra: any) => infra.id) ?? [],
         hostsInfrastructureIds: supplier?.hostsInfrastructure?.map((infra: any) => infra.id) ?? [],
@@ -597,7 +594,7 @@ const SupplierForm: React.FC<GenericFormProps<Supplier, SupplierFormValues>> = (
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={onSubmit}
-      onDelete={onDelete ? (id) => onDelete(id!) : undefined}
+      onDelete={onDelete ? id => onDelete(id!) : undefined}
       mode={mode}
       isLoading={loading}
       onEditMode={onEditMode}

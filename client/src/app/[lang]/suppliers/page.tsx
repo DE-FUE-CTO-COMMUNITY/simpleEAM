@@ -16,7 +16,9 @@ import {
 } from '@/graphql/supplier'
 import { SupplierType, SupplierFormValues } from '@/components/suppliers/types'
 import SupplierForm from '@/components/suppliers/SupplierForm'
-import SupplierTable, { Suppliers_DEFAULT_COLUMN_VISIBILITY } from '@/components/suppliers/SupplierTable'
+import SupplierTable, {
+  Suppliers_DEFAULT_COLUMN_VISIBILITY,
+} from '@/components/suppliers/SupplierTable'
 import SupplierToolbar from '@/components/suppliers/SupplierToolbar'
 import SupplierFilterDialog from '@/components/suppliers/SupplierFilterDialog'
 import { useSupplierFilter } from '@/components/suppliers/useSupplierFilter'
@@ -377,7 +379,7 @@ const SuppliersPage = () => {
                 throw error
               }
             }}
-            onDeleteSupplier={async (id) => {
+            onDeleteSupplier={async id => {
               try {
                 await deleteSupplierMutation({
                   variables: {
@@ -400,10 +402,10 @@ const SuppliersPage = () => {
       {filterDialogOpen && (
         <SupplierFilterDialog
           filterState={filterState}
-          onFilterChange={(newFilters) => setFilterState(prev => ({ ...prev, ...newFilters }))}
+          onFilterChange={newFilters => setFilterState(prev => ({ ...prev, ...newFilters }))}
           onResetFilter={resetFilters}
           onClose={() => setFilterDialogOpen(false)}
-          onApply={(activeCount) => {
+          onApply={activeCount => {
             console.log('Applied filters:', activeCount)
             setFilterDialogOpen(false)
           }}
