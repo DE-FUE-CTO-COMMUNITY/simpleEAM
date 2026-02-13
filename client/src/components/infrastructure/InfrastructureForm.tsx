@@ -672,7 +672,7 @@ const InfrastructureForm: React.FC<GenericFormProps<Infrastructure, Infrastructu
           {
             name: 'providedBy',
             label: t('providedBy' as any),
-            type: 'autocomplete',
+            type: 'autocomplete' as const,
             validators: baseInfrastructureSchema.shape.providedBy,
             multiple: true,
             options: (suppliersData?.suppliers || []).map((supplier: Supplier) => ({
@@ -701,7 +701,7 @@ const InfrastructureForm: React.FC<GenericFormProps<Infrastructure, Infrastructu
           {
             name: 'hostedBy',
             label: t('hostedBy' as any),
-            type: 'autocomplete',
+            type: 'autocomplete' as const,
             validators: baseInfrastructureSchema.shape.hostedBy,
             multiple: true,
             options: (suppliersData?.suppliers || []).map((supplier: Supplier) => ({
@@ -730,7 +730,7 @@ const InfrastructureForm: React.FC<GenericFormProps<Infrastructure, Infrastructu
           {
             name: 'maintainedBy',
             label: t('maintainedBy' as any),
-            type: 'autocomplete',
+            type: 'autocomplete' as const,
             validators: baseInfrastructureSchema.shape.maintainedBy,
             multiple: true,
             options: (suppliersData?.suppliers || []).map((supplier: Supplier) => ({

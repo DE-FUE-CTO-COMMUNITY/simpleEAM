@@ -18,9 +18,9 @@ const ValueFilterDialog: React.FC<FilterProps> = ({
   const filterFields: FilterField[] = [
     {
       id: 'descriptionFilter',
-      label: t('descriptionContains'),
+      label: t('valueStatementContains'),
       type: 'text',
-      placeholder: t('descriptionPlaceholder'),
+      placeholder: t('valueStatementPlaceholder'),
     },
     {
       id: 'ownerFilter',

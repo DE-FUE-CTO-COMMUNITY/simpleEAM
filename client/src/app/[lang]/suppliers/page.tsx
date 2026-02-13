@@ -14,7 +14,7 @@ import {
   UPDATE_SUPPLIER,
   DELETE_SUPPLIER,
 } from '@/graphql/supplier'
-import { SupplierType, SupplierFormValues } from '@/components/suppliers/types'
+import { SupplierFormValues } from '@/components/suppliers/types'
 import SupplierForm from '@/components/suppliers/SupplierForm'
 import SupplierTable, {
   Suppliers_DEFAULT_COLUMN_VISIBILITY,

@@ -631,6 +631,8 @@ const DiagramLibrarySidebar = forwardRef<DiagramLibrarySidebarHandle, DiagramLib
         aiArchitecture: ['aiComponent'],
         solutionArchitecture: ['application', 'dataObject', 'applicationInterface'],
         infrastructureArchitecture: ['application', 'infrastructure'],
+        transformationArchitecture: SECTION_ORDER,
+        technologyManagement: ['application', 'infrastructure'],
       }
 
       return lensToElementTypes[selectedLens] ?? SECTION_ORDER

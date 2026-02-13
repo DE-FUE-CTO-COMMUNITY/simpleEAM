@@ -98,7 +98,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
   loading = false,
   onEditMode,
   isNested,
-  ...restProps
+  ..._restProps
 }) => {
   const t = useTranslations()
   const tForm = useTranslations('capabilities.form')

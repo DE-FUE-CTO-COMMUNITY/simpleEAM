@@ -73,6 +73,9 @@ export type ApplicationType = Pick<
   | 'sevenRStrategy'
   | 'implementsPrinciples'
   | 'hostedOn'
+  | 'providedBy'
+  | 'supportedBy'
+  | 'maintainedBy'
   | 'predecessors'
   | 'successors'
 >

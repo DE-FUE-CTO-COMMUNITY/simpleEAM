@@ -19,9 +19,6 @@ import GenericForm, { FieldConfig, TabConfig, SelectOption } from '../common/Gen
 import { GenericFormProps } from '../common/GenericFormProps'
 import { Gea_Vision, Architecture, Gea_Mission, Gea_Value, Gea_Goal } from '../../gql/generated'
 import ArchitectureForm from '../architectures/ArchitectureForm'
-import MissionForm from '../missions/MissionForm'
-import ValueForm from '../values/ValueForm'
-import GoalForm from '../goals/GoalForm'
 
 const createVisionSchema = (t: any) =>
   z.object({
@@ -42,7 +39,7 @@ const createVisionSchema = (t: any) =>
 
 export type VisionFormValues = z.infer<ReturnType<typeof createVisionSchema>>
 
-interface VisionFormProps extends GenericFormProps<Gea_Vision, VisionFormValues> {}
+type VisionFormProps = GenericFormProps<Gea_Vision, VisionFormValues>
 
 const VisionForm: React.FC<VisionFormProps> = ({
   data: vision,

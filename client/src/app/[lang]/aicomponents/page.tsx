@@ -159,7 +159,11 @@ const AicomponentsPage = () => {
     }
   }, [aicomponents])
 
-  const buildCreateInput = (values: AicomponentFormValues) => {
+  type CreateAicomponentValues = Omit<AicomponentFormValues, 'tags'> & {
+    tags?: string[] | string
+  }
+
+  const buildCreateInput = (values: CreateAicomponentValues) => {
     const {
       ownerId,
       supportsCapabilityIds,
@@ -187,7 +191,13 @@ const AicomponentsPage = () => {
       provider: aiComponentData.provider,
       license: aiComponentData.license,
       costs: aiComponentData.costs,
-      tags: aiComponentData.tags,
+      tags:
+        typeof aiComponentData.tags === 'string'
+          ? aiComponentData.tags
+              .split(',')
+              .map(tag => tag.trim())
+              .filter(Boolean)
+          : aiComponentData.tags,
       ...(ownerId
         ? {
             owners: {
@@ -295,7 +305,7 @@ const AicomponentsPage = () => {
     }
   }
 
-  const handleCreateAicomponentSubmit = async (values: AicomponentFormValues) => {
+  const handleCreateAicomponentSubmit = async (values: CreateAicomponentValues) => {
     if (!selectedCompanyId) {
       enqueueSnackbar(t('messages.selectCompanyFirst'), { variant: 'warning' })
       return

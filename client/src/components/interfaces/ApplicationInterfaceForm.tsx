@@ -174,7 +174,7 @@ export interface ApplicationInterfaceFormProps
 
 const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
   data: applicationInterface,
-  dataObjects = [],
+  dataObjects: _dataObjects = [],
   applications: _applications = [],
   persons: _persons = [],
   isOpen,
@@ -185,7 +185,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
   loading = false,
   onEditMode,
   isNested,
-  ...restProps
+  ..._restProps
 }) => {
   const t = useTranslations('interfaces.form')
   const tTabs = useTranslations('interfaces.tabs')

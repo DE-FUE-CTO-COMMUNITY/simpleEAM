@@ -312,7 +312,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
   loading = false,
   onEditMode,
   isNested,
-  ...restProps
+  ..._restProps
 }) => {
   const t = useTranslations('applications.form')
   const tStatus = useTranslations('applications.statuses')
@@ -1223,7 +1223,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
           {
             name: 'providedByIds',
             label: t('providedBy'),
-            type: 'autocomplete',
+            type: 'autocomplete' as const,
             tabId: 'suppliers',
             multiple: true,
             options: (suppliersData?.suppliers || []).map((supplier: Supplier) => ({
@@ -1251,7 +1251,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
           {
             name: 'supportedByIds',
             label: t('supportedBy'),
-            type: 'autocomplete',
+            type: 'autocomplete' as const,
             tabId: 'suppliers',
             multiple: true,
             options: (suppliersData?.suppliers || []).map((supplier: Supplier) => ({
@@ -1279,7 +1279,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
           {
             name: 'maintainedByIds',
             label: t('maintainedBy'),
-            type: 'autocomplete',
+            type: 'autocomplete' as const,
             tabId: 'suppliers',
             multiple: true,
             options: (suppliersData?.suppliers || []).map((supplier: Supplier) => ({

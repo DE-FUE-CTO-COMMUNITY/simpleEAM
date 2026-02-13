@@ -11,8 +11,12 @@ interface UseSupplierFilterProps {
 export const useSupplierFilter = ({ suppliers = [] }: UseSupplierFilterProps) => {
   // Standardzustand für Filter
   const [filterState, setFilterState] = useState<FilterState>({
+    supplierTypeFilter: [],
+    statusFilter: [],
+    riskClassificationFilter: [],
+    strategicImportanceFilter: [],
     descriptionFilter: '',
-    // TODO: Weitere Filter-Properties hier hinzufügen
+    updatedDateRange: ['', ''],
   })
 
   // Filterfunktion für erweiterte Filter
@@ -39,8 +43,12 @@ export const useSupplierFilter = ({ suppliers = [] }: UseSupplierFilterProps) =>
 
   const resetFilters = () => {
     setFilterState({
+      supplierTypeFilter: [],
+      statusFilter: [],
+      riskClassificationFilter: [],
+      strategicImportanceFilter: [],
       descriptionFilter: '',
-      // TODO: Reset weitere Filter-Properties
+      updatedDateRange: ['', ''],
     })
   }
 

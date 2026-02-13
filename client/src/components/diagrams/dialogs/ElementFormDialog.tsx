@@ -221,8 +221,6 @@ function ApplicationFormWrapper({
         sourceOfInterfaceIds,
         targetOfInterfaceIds,
         implementsPrincipleIds,
-        partOfArchitectures,
-        depictedInDiagrams,
         parentIds,
         componentIds,
         predecessorIds,
@@ -479,7 +477,6 @@ function CapabilityFormWrapper({
         children,
         supportedByApplications,
         partOfArchitectures,
-        partOfDiagrams,
         ...capabilityData
       } = formData
 
@@ -980,7 +977,6 @@ function AiComponentFormWrapper({
         hostedOnIds,
         partOfArchitectureIds,
         implementsPrincipleIds,
-        depictedInDiagramIds,
         ...baseData
       } = values
 

@@ -224,11 +224,9 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
       'interfaces',
     ],
     infrastructureArchitecture: ['applications', 'infrastructure'],
+    transformationArchitecture: architectureElementItems.map(item => item.key),
+    technologyManagement: ['applications', 'infrastructure'],
   }
-
-  const allowedElementKeys = new Set(
-    lensToElementKeys[selectedLens] ?? lensToElementKeys.enterpriseArchitecture
-  )
 
   const allArchitectureItems = [
     ...architectureElementItems,

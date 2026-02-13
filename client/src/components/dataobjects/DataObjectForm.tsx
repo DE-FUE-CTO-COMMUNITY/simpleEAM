@@ -104,7 +104,7 @@ const DataObjectForm: React.FC<GenericFormProps<DataObject, DataObjectFormValues
   loading = false,
   onEditMode,
   isNested,
-  ...restProps
+  ..._restProps
 }) => {
   const t = useTranslations('dataObjects.form')
   const tTabs = useTranslations('dataObjects.tabs')

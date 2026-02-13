@@ -18,9 +18,9 @@ const MissionFilterDialog: React.FC<FilterProps> = ({
   const filterFields: FilterField[] = [
     {
       id: 'descriptionFilter',
-      label: t('descriptionContains'),
+      label: t('purposeStatementContains'),
       type: 'text',
-      placeholder: t('descriptionPlaceholder'),
+      placeholder: t('purposeStatementPlaceholder'),
     },
     {
       id: 'ownerFilter',

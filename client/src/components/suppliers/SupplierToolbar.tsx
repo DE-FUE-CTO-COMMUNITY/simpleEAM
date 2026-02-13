@@ -23,7 +23,7 @@ export function SuppliersToolbar({
   activeFiltersCount,
   onFilterClick,
   onResetFilters,
-  onAddClick,
+  onAddClick: _onAddClick,
   table,
   enableColumnVisibilityToggle = true,
   defaultColumnVisibility,

@@ -890,7 +890,7 @@ export default function AicomponentForm({
           {
             name: 'providedByIds',
             label: t('providedBy'),
-            type: 'autocomplete',
+            type: 'autocomplete' as const,
             multiple: true,
             tabId: 'suppliers',
             options:
@@ -920,7 +920,7 @@ export default function AicomponentForm({
           {
             name: 'supportedByIds',
             label: t('supportedBy'),
-            type: 'autocomplete',
+            type: 'autocomplete' as const,
             multiple: true,
             tabId: 'suppliers',
             options:
@@ -950,7 +950,7 @@ export default function AicomponentForm({
           {
             name: 'maintainedByIds',
             label: t('maintainedBy'),
-            type: 'autocomplete',
+            type: 'autocomplete' as const,
             multiple: true,
             tabId: 'suppliers',
             options:

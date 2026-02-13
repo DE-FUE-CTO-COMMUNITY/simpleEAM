@@ -385,8 +385,7 @@ const SupplierTable: React.FC<SupplierTableProps> = ({
       maintainsInfrastructureIds: supplier.maintainsInfrastructure?.map(infra => infra.id) ?? [],
       providesAIComponentIds: supplier.providesAIComponents?.map(component => component.id) ?? [],
       supportsAIComponentIds: supplier.supportsAIComponents?.map(component => component.id) ?? [],
-      maintainsAIComponentIds:
-        supplier.maintainsAIComponents?.map(component => component.id) ?? [],
+      maintainsAIComponentIds: supplier.maintainsAIComponents?.map(component => component.id) ?? [],
     }
   }
 

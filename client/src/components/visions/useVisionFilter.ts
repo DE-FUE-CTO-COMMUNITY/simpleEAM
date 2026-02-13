@@ -20,8 +20,10 @@ export const useVisionFilter = ({ visions = [] }: UseVisionFilterProps) => {
     return visions.filter((vision: VisionType) => {
       if (
         filterState.descriptionFilter &&
-        (!vision.description ||
-          !vision.description.toLowerCase().includes(filterState.descriptionFilter.toLowerCase()))
+        (!vision.visionStatement ||
+          !vision.visionStatement
+            .toLowerCase()
+            .includes(filterState.descriptionFilter.toLowerCase()))
       ) {
         return false
       }

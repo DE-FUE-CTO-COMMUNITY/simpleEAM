@@ -17,7 +17,6 @@ import {
   MenuItem,
   Divider,
   Paper,
-  FormControlLabel,
   Checkbox,
   Accordion,
   AccordionSummary,
@@ -678,7 +677,6 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
 
   const performSaveAction = async () => {
     debugLog('🔄 [SaveDiagram] performSaveAction started')
-    const actionStartTime = performance.now()
     setCreatingElements(true)
 
     try {

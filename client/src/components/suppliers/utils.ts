@@ -1,7 +1,7 @@
 'use client'
 
 import { useTranslations, useLocale } from 'next-intl'
-import { FilterState, SupplierType } from './types'
+import { FilterState } from './types'
 
 /**
  * Custom hook for formatting date values
@@ -33,11 +33,9 @@ export const formatDate = (date: string | null | undefined): string => {
  * Hook zum Formatieren von Boolean-Werten mit Internationalisierung
  */
 export const useFormatBoolean = () => {
-  const t = useTranslations('suppliers.states')
-
   return (value: boolean | null | undefined): string => {
     if (value === null || value === undefined) return '-'
-    return value ? t('active') : t('inactive')
+    return value ? 'Aktiv' : 'Inaktiv'
   }
 }
 
@@ -75,7 +73,7 @@ export const useSupplierTypeLabel = () => {
 
   return (type: string | null | undefined): string => {
     if (!type) return '-'
-    return t(type)
+    return t(type as any)
   }
 }
 
@@ -87,7 +85,7 @@ export const useSupplierStatusLabel = () => {
 
   return (status: string | null | undefined): string => {
     if (!status) return '-'
-    return t(status)
+    return t(status as any)
   }
 }
 
@@ -99,7 +97,7 @@ export const useRiskClassificationLabel = () => {
 
   return (risk: string | null | undefined): string => {
     if (!risk) return '-'
-    return t(risk)
+    return t(risk as any)
   }
 }
 
@@ -111,6 +109,6 @@ export const useStrategicImportanceLabel = () => {
 
   return (importance: string | null | undefined): string => {
     if (!importance) return '-'
-    return t(importance)
+    return t(importance as any)
   }
 }

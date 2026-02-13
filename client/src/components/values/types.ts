@@ -4,9 +4,11 @@ export type ValueType = Pick<
   Gea_Value,
   | 'id'
   | 'name'
-  | 'description'
+  | 'valueStatement'
   | 'owners'
   | 'company'
+  | 'supportsMissions'
+  | 'supportsVisions'
   | 'partOfArchitectures'
   | 'depictedInDiagrams'
   | 'createdAt'

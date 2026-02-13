@@ -19,8 +19,10 @@ export const useValueFilter = ({ values = [] }: UseValueFilterProps) => {
     return values.filter((value: ValueType) => {
       if (
         filterState.descriptionFilter &&
-        (!value.description ||
-          !value.description.toLowerCase().includes(filterState.descriptionFilter.toLowerCase()))
+        (!value.valueStatement ||
+          !value.valueStatement
+            .toLowerCase()
+            .includes(filterState.descriptionFilter.toLowerCase()))
       ) {
         return false
       }

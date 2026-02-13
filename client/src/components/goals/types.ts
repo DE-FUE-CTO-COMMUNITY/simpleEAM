@@ -4,9 +4,12 @@ export type GoalType = Pick<
   Gea_Goal,
   | 'id'
   | 'name'
-  | 'description'
+  | 'goalStatement'
   | 'owners'
   | 'company'
+  | 'operationalizesVisions'
+  | 'supportsValues'
+  | 'achievedByStrategies'
   | 'partOfArchitectures'
   | 'depictedInDiagrams'
   | 'createdAt'
