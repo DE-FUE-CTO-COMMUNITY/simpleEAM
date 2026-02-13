@@ -12,7 +12,8 @@ export interface ExcalidrawElement {
   y: number
   width: number
   height: number
-  text?: { text: string }
+  text?: { text: string } | string
+  boundElements?: Array<{ id: string; type: string }>
   groupIds?: string[] // Gruppen-IDs für gruppierte Elemente
   customData?: {
     isFromDatabase?: boolean
@@ -69,6 +70,7 @@ export interface NewRelationship {
   sourceElementName: string
   targetElementName: string
   relationshipDefinition: RelationshipDefinition
+  relationshipName?: string // Optional: Name from arrow label
   selected: boolean
   status: 'valid' | 'incomplete' | 'invalid'
   missingElement?: 'source' | 'target' | 'both'

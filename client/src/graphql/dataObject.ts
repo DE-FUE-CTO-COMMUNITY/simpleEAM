@@ -53,6 +53,10 @@ export const GET_DATA_OBJECTS = gql`
         id
         name
       }
+      relatedDataObjects {
+        id
+        name
+      }
       partOfArchitectures {
         id
         name
@@ -68,8 +72,8 @@ export const GET_DATA_OBJECTS = gql`
 `
 
 export const GET_DATA_OBJECT = gql`
-  query GetDataObject($id: ID!) {
-    dataObjects(where: { id: { eq: $id } }) {
+  query GetDataObject($where: DataObjectWhere) {
+    dataObjects(where: $where) {
       id
       name
       description
@@ -99,6 +103,10 @@ export const GET_DATA_OBJECT = gql`
         name
       }
       transferredInInterfaces {
+        id
+        name
+      }
+      relatedDataObjects {
         id
         name
       }
@@ -141,6 +149,10 @@ export const CREATE_DATA_OBJECT = gql`
           name
         }
         transferredInInterfaces {
+          id
+          name
+        }
+        relatedDataObjects {
           id
           name
         }
@@ -190,6 +202,10 @@ export const UPDATE_DATA_OBJECT = gql`
           name
         }
         transferredInInterfaces {
+          id
+          name
+        }
+        relatedDataObjects {
           id
           name
         }

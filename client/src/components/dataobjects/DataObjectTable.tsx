@@ -22,6 +22,7 @@ export const DATAOBJECT_DEFAULT_COLUMN_VISIBILITY = {
   usedByApplications: true,
   relatedToCapabilities: true,
   transferredInInterfaces: true,
+  relatedDataObjects: true,
   // Columns hidden by default
   id: false,
   description: false,
@@ -224,6 +225,16 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
           const interfaces = info.getValue()
           return interfaces && interfaces.length > 0
             ? interfaces.map((iface: any) => iface.name).join(', ')
+            : '-'
+        },
+        enableHiding: true,
+      }),
+      columnHelper.accessor('relatedDataObjects', {
+        header: t('relatedDataObjects'),
+        cell: info => {
+          const dataObjs = info.getValue()
+          return dataObjs && dataObjs.length > 0
+            ? dataObjs.map((obj: any) => obj.name).join(', ')
             : '-'
         },
         enableHiding: true,

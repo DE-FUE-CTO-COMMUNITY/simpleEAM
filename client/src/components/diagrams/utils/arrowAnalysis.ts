@@ -97,6 +97,35 @@ export const extractElementName = (
 }
 
 /**
+ * Extrahiert den Text-Label eines Pfeils (falls vorhanden)
+ */
+export const extractArrowLabel = (
+  arrow: ExcalidrawElement,
+  elementMap: Map<string, ExcalidrawElement>
+): string | undefined => {
+  // Suche nach verbundenen Text-Elementen
+  if (arrow.boundElements && Array.isArray(arrow.boundElements)) {
+    for (const boundElement of arrow.boundElements) {
+      const textElement = elementMap.get(boundElement.id)
+      if (textElement && textElement.type === 'text') {
+        let text = ''
+        if (typeof textElement.text === 'string') {
+          text = textElement.text
+        } else if (textElement.text?.text) {
+          text = textElement.text.text
+        }
+        
+        if (text && text.trim().length > 0) {
+          return text.trim()
+        }
+      }
+    }
+  }
+  
+  return undefined
+}
+
+/**
  * Analysiert alle Pfeile in einem Excalidraw-Diagramm
  * Führt automatische Laufzeitkorrektur für ungültige mainElementId Referenzen durch
  */
@@ -543,6 +572,9 @@ const createNewRelationshipFromResult = (
   elementMap: Map<string, ExcalidrawElement>,
   relationship?: RelationshipDefinition
 ): NewRelationship | null => {
+  // Extract arrow label (if available)
+  const arrowLabel = extractArrowLabel(result.arrow, elementMap)
+  
   // Spezielle Behandlung für missing-binding Fälle
   if (result.status === 'missing-binding') {
     const sourceElement = result.sourceElement
@@ -592,6 +624,7 @@ const createNewRelationshipFromResult = (
         fieldName: 'unknown',
         reverseArrow: false,
       },
+      relationshipName: arrowLabel,
       selected: true,
       status: 'incomplete' as const,
       missingElement,
@@ -650,6 +683,7 @@ const createNewRelationshipFromResult = (
         fieldName: 'unknown',
         reverseArrow: false,
       },
+      relationshipName: arrowLabel,
       selected: true,
       status,
       missingElement,
@@ -682,6 +716,7 @@ const createNewRelationshipFromResult = (
     sourceElementName: extractElementName(sourceElement, elementMap),
     targetElementName: extractElementName(targetElement, elementMap),
     relationshipDefinition: finalRelationship,
+    relationshipName: arrowLabel,
     selected: true,
     status,
     missingElement,

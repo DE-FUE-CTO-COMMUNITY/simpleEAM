@@ -341,10 +341,10 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
       actualTargetType = getElementTypeDisplay(relationship.targetElementType, 'target')
     }
 
-    const relationshipName = getRelationshipDisplayName(
-      relationship.relationshipDefinition.type,
-      locale
-    )
+    // Use the relationship name from the arrow label if available, otherwise use the default translation
+    const relationshipName =
+      relationship.relationshipName ||
+      getRelationshipDisplayName(relationship.relationshipDefinition.type, locale)
 
     const sourceIsMissing =
       relationship.missingElement === 'source' || relationship.missingElement === 'both'

@@ -841,7 +841,7 @@ function DataObjectFormWrapper({
   onElementUpdated?: (updatedName: string) => void
 }) {
   const { data, loading, error } = useQuery(GET_DATA_OBJECT, {
-    variables: { id: databaseId },
+    variables: { where: { id: { eq: databaseId } } },
     skip: !isOpen,
   })
 

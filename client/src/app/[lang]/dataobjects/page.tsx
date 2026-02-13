@@ -201,6 +201,15 @@ const DataObjectsPage = () => {
               })),
             }
           : undefined,
+        relatedDataObjects: data.relatedDataObjects?.length
+          ? {
+              connect: data.relatedDataObjects.map(id => ({
+                where: {
+                  node: { id: { eq: id } },
+                },
+              })),
+            }
+          : undefined,
         partOfArchitectures: data.partOfArchitectures?.length
           ? {
               connect: data.partOfArchitectures.map(id => ({
@@ -432,6 +441,36 @@ const DataObjectsPage = () => {
         } else {
           // If no Interfaces are selected, disconnect all connections
           input.transferredInInterfaces = [
+            {
+              disconnect: [{ where: {} }],
+            },
+          ]
+        }
+      }
+
+      // RelatedDataObjects Update - only update if changed
+      const currentRelatedDataObjectIds =
+        currentDataObject.relatedDataObjects?.map(obj => obj.id).sort() || []
+      const newRelatedDataObjectIds = data.relatedDataObjects?.sort() || []
+
+      const relatedDataObjectsChanged =
+        JSON.stringify(currentRelatedDataObjectIds) !== JSON.stringify(newRelatedDataObjectIds)
+
+      if (relatedDataObjectsChanged) {
+        if (newRelatedDataObjectIds.length > 0) {
+          input.relatedDataObjects = [
+            {
+              disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
+              connect: newRelatedDataObjectIds.map(id => ({
+                where: {
+                  node: { id: { eq: id } },
+                },
+              })),
+            },
+          ]
+        } else {
+          // If no DataObjects are selected, disconnect all connections
+          input.relatedDataObjects = [
             {
               disconnect: [{ where: {} }],
             },

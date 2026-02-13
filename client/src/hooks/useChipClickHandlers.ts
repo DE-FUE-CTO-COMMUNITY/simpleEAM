@@ -41,6 +41,7 @@ export const ENTITY_TYPE_MAP: Record<string, string> = {
 
   // Data Object relationships
   usedByApplicationIds: 'applications',
+  relatedDataObjects: 'dataObjects',
 
   // Architecture relationships
   containsApplicationIds: 'applications',

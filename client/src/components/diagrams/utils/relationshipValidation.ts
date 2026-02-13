@@ -170,6 +170,14 @@ export const VALID_RELATIONSHIPS: RelationshipDefinition[] = [
     fieldName: 'dataSources',
     reverseArrow: false,
   },
+  {
+    type: 'RELATED_TO_DATA_OBJECT',
+    direction: 'OUT',
+    sourceType: 'dataObject',
+    targetType: 'dataObject',
+    fieldName: 'relatedDataObjects',
+    reverseArrow: false,
+  },
 ]
 
 /**
@@ -228,6 +236,9 @@ const getReverseFieldName = (relationshipType: string, sourceType: ElementType):
     RELATED_TO: {
       dataObject: 'relatedToCapabilities',
     },
+    RELATED_TO_DATA_OBJECT: {
+      dataObject: 'inverseRelatedDataObjects',
+    },
   }
 
   return reverseFieldMapping[relationshipType]?.[sourceType] || 'unknown'
@@ -276,6 +287,7 @@ export const getRelationshipDisplayName = (
       SUCCESSOR_OF: 'ist Nachfolger von',
       HAS_PARENT_INFRASTRUCTURE: 'ist Teil der Infrastruktur',
       SUCCESSOR_OF_INTERFACE: 'ist Nachfolger der Schnittstelle',
+      RELATED_TO_DATA_OBJECT: 'ist verwandt mit',
     },
     en: {
       SUPPORTS: 'supports',
@@ -291,6 +303,7 @@ export const getRelationshipDisplayName = (
       SUCCESSOR_OF: 'is successor of',
       HAS_PARENT_INFRASTRUCTURE: 'is part of infrastructure',
       SUCCESSOR_OF_INTERFACE: 'is successor of interface',
+      RELATED_TO_DATA_OBJECT: 'is related to',
     },
   }
 

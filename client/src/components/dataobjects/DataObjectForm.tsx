@@ -17,6 +17,7 @@ import { GET_ARCHITECTURES } from '@/graphql/architecture'
 import { GET_CAPABILITIES } from '@/graphql/capability'
 import { GET_DIAGRAMS } from '@/graphql/diagram'
 import { GET_APPLICATION_INTERFACES } from '@/graphql/applicationInterface'
+import { GET_DATA_OBJECTS, GET_DATA_OBJECT } from '@/graphql/dataObject'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import { useCurrentPerson } from '@/hooks/useCurrentPerson'
 import { DataObject, DataClassification, Architecture } from '../../gql/generated'
@@ -42,6 +43,7 @@ const createBaseDataObjectSchema = (t: any) =>
     usedByApplications: z.array(z.string()).optional(),
     relatedToCapabilities: z.array(z.string()).optional(),
     transferredInInterfaces: z.array(z.string()).optional(),
+    relatedDataObjects: z.array(z.string()).optional(),
     introductionDate: z.date().optional().nullable(),
     endOfLifeDate: z.date().optional().nullable(),
     planningDate: z.date().optional().nullable(),
@@ -125,6 +127,7 @@ const DataObjectForm: React.FC<GenericFormProps<DataObject, DataObjectFormValues
       usedByApplications: 'applications',
       relatedToCapabilities: 'capabilities',
       transferredInInterfaces: 'applicationInterfaces',
+      relatedDataObjects: 'dataObjects',
       partOfArchitectures: 'architectures',
       depictedInDiagrams: 'diagrams',
     },
@@ -174,6 +177,11 @@ const DataObjectForm: React.FC<GenericFormProps<DataObject, DataObjectFormValues
       variables: { where: companyWhere },
     }
   )
+  // Data Objects laden (for related data objects)
+  const { data: dataObjectsData, loading: dataObjectsLoading } = useQuery(GET_DATA_OBJECTS, {
+    fetchPolicy: 'cache-and-network',
+    variables: { where: companyWhere },
+  })
 
   // Nested entity queries (loaded on demand via chip click)
   const { data: nestedApplicationData } = useQuery(GET_APPLICATIONS, {
@@ -204,6 +212,13 @@ const DataObjectForm: React.FC<GenericFormProps<DataObject, DataObjectFormValues
     skip: !nestedFormState.isOpen || nestedFormState.entityType !== 'architectures',
   })
 
+  const { data: nestedDataObjectData } = useQuery(GET_DATA_OBJECT, {
+    variables: {
+      where: { id: { eq: nestedFormState.entityId }, ...companyWhere },
+    },
+    skip: !nestedFormState.isOpen || nestedFormState.entityType !== 'dataObjects',
+  })
+
   // Initialize form data with useMemo to avoid unnecessary re-renders
   const defaultValues = React.useMemo<DataObjectFormValues>(
     () => ({
@@ -215,6 +230,7 @@ const DataObjectForm: React.FC<GenericFormProps<DataObject, DataObjectFormValues
       usedByApplications: dataObject?.usedByApplications?.map(app => app.id) || [],
       relatedToCapabilities: dataObject?.relatedToCapabilities?.map(cap => cap.id) || [],
       transferredInInterfaces: dataObject?.transferredInInterfaces?.map(inter => inter.id) || [],
+      relatedDataObjects: dataObject?.relatedDataObjects?.map(obj => obj.id) || [],
       introductionDate: dataObject?.introductionDate ? new Date(dataObject.introductionDate) : null,
       endOfLifeDate: dataObject?.endOfLifeDate ? new Date(dataObject.endOfLifeDate) : null,
       planningDate: dataObject?.planningDate ? new Date(dataObject.planningDate) : null,
@@ -269,6 +285,7 @@ const DataObjectForm: React.FC<GenericFormProps<DataObject, DataObjectFormValues
         usedByApplications: dataObject.usedByApplications?.map(app => app.id) ?? [],
         relatedToCapabilities: dataObject.relatedToCapabilities?.map(cap => cap.id) ?? [],
         transferredInInterfaces: dataObject.transferredInInterfaces?.map(inter => inter.id) ?? [],
+        relatedDataObjects: dataObject.relatedDataObjects?.map(obj => obj.id) ?? [],
         introductionDate: dataObject.introductionDate
           ? new Date(dataObject.introductionDate)
           : null,
@@ -547,6 +564,39 @@ const DataObjectForm: React.FC<GenericFormProps<DataObject, DataObjectFormValues
       tabId: 'relationships',
     },
     {
+      name: 'relatedDataObjects',
+      label: t('relatedDataObjects'),
+      type: 'autocomplete',
+      validators: baseDataObjectSchema.shape.relatedDataObjects,
+      size: { xs: 12, md: 6 },
+      options:
+        dataObjectsData?.dataObjects?.map(
+          (obj: { id: string; name: string }): SelectOption => ({
+            value: obj.id,
+            label: obj.name,
+          })
+        ) || [],
+      multiple: true,
+      loadingOptions: dataObjectsLoading,
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          const matchingDataObject = dataObjectsData?.dataObjects?.find(
+            (obj: { id: string; name: string }) => obj.id === option
+          )
+          return matchingDataObject?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
+      onChipClick: createChipClickHandler('relatedDataObjects'),
+      tabId: 'relationships',
+    },
+    {
       name: 'partOfArchitectures',
       label: t('partOfArchitectures'),
       type: 'autocomplete',
@@ -692,6 +742,22 @@ const DataObjectForm: React.FC<GenericFormProps<DataObject, DataObjectFormValues
         nestedArchitectureData?.architectures?.[0] && (
           <ArchitectureForm
             data={nestedArchitectureData.architectures[0]}
+            isOpen={true}
+            mode={nestedFormState.mode}
+            isNested={true}
+            onClose={handleCloseNestedForm}
+            onSubmit={async () => {}}
+            onDelete={async () => {}}
+            loading={false}
+          />
+        )}
+
+      {/* Nested DataObject Form */}
+      {nestedFormState.isOpen &&
+        nestedFormState.entityType === 'dataObjects' &&
+        nestedDataObjectData?.dataObjects?.[0] && (
+          <DataObjectForm
+            data={nestedDataObjectData.dataObjects[0]}
             isOpen={true}
             mode={nestedFormState.mode}
             isNested={true}
