@@ -246,6 +246,13 @@ type ApplicationInterface
 }
 
 """
+DataObjectRelationship – properties for relationships between DataObjects
+"""
+type DataObjectRelationship @relationshipProperties {
+  name: String!
+}
+
+"""
 DataObject – represents a business data object within Enterprise Architecture Management
 """
 type DataObject
@@ -296,6 +303,18 @@ type DataObject
   usedForTrainingAI: [AIComponent!]! @relationship(type: "TRAINED_WITH", direction: IN)
   partOfArchitectures: [Architecture!]! @relationship(type: "CONTAINS", direction: IN)
   depictedInDiagrams: [Diagram!]! @relationship(type: "DEPICTED_IN", direction: OUT)
+  relatedDataObjects: [DataObject!]!
+    @relationship(
+      type: "RELATED_TO_DATA_OBJECT"
+      direction: OUT
+      properties: "DataObjectRelationship"
+    )
+  inverseRelatedDataObjects: [DataObject!]!
+    @relationship(
+      type: "RELATED_TO_DATA_OBJECT"
+      direction: IN
+      properties: "DataObjectRelationship"
+    )
 }
 
 """

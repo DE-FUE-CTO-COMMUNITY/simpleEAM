@@ -764,9 +764,7 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
       // Create selected relationships in database
       let relationshipResult: any = { success: true, createdCount: 0, errors: [] }
       if (selectedRelationships.length > 0) {
-        debugLog(
-          `🔗 [SaveDiagram] Creating ${selectedRelationships.length} new relationships...`
-        )
+        debugLog(`🔗 [SaveDiagram] Creating ${selectedRelationships.length} new relationships...`)
         const createRelStartTime = performance.now()
         // Update relationships with new database IDs of created elements
         const updatedRelationships = updateRelationshipsWithDatabaseReferences(
