@@ -1941,7 +1941,20 @@
     "debugTools": {
       "title": "Debug-Tools",
       "description": "Hier können Sie Debug-Tools für die Anwendung verwenden.",
-      "sessionDebugger": "Session Debugger"
+      "sessionDebugger": "Session Debugger",
+      "settings": {
+        "title": "Debug-Einstellungen",
+        "subtitle": "Entwickler-Tools und Debugging-Optionen",
+        "showElementCoordinates": "Element-Koordinaten anzeigen",
+        "showElementCoordinatesDesc": "Zeigt Position und Größe von selektierten Elementen im Canvas an",
+        "showArrowDebugInfo": "Pfeil-Debug-Informationen",
+        "showArrowDebugInfoDesc": "Zeigt detaillierte Informationen über Pfeil-Berechnungen",
+        "showPerformanceMetrics": "Performance-Metriken",
+        "showPerformanceMetricsDesc": "Zeigt Rendering-Zeit und Performance-Statistiken",
+        "showDiagramSaveLogs": "Diagramm-Speicher-Logs",
+        "showDiagramSaveLogsDesc": "Zeigt detaillierte Performance-Logs beim Speichern von Diagrammen (PNG-Generierung, GraphQL-Mutationen, etc.)",
+        "resetToDefaults": "Auf Standardwerte zurücksetzen"
+      }
     },
     "debugOverlay": {
       "title": "Element-Koordinaten",
