@@ -1004,6 +1004,9 @@
       "appliedPrinciples": "Applied Principles",
       "implementedPrinciples": "Implemented Principles",
       "hostedOn": "Hosted on",
+      "providedBy": "Provided By Suppliers",
+      "supportedBy": "Supported By Suppliers",
+      "maintainedBy": "Maintained By Suppliers",
       "createdAt": "Created At",
       "updatedAt": "Updated At",
       "actions": "Actions"
@@ -2202,7 +2205,8 @@
         "ABH": "Archimate Behavior ({prefix})",
         "APS": "Archimate Passive Structure ({prefix})",
         "AAS": "Archimate Active Structure ({prefix})",
-        "AMO": "Archimate Motivation ({prefix})"
+        "AMO": "Archimate Motivation ({prefix})",
+        "SUP": "Suppliers ({prefix})"
       }
     },
     "userManagement": {

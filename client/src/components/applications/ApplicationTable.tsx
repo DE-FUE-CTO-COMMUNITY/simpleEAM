@@ -12,6 +12,7 @@ import { createColumnHelper } from '@tanstack/react-table'
 import { SortingState, VisibilityState } from '@tanstack/react-table'
 import usePersistentColumnVisibility from '../../hooks/usePersistentColumnVisibility'
 import { Application } from '../../gql/generated'
+import { useFeatureFlags } from '@/lib/feature-flags'
 
 // Exported default column visibility for application table
 export const APPLICATION_DEFAULT_COLUMN_VISIBILITY = {
@@ -44,6 +45,9 @@ export const APPLICATION_DEFAULT_COLUMN_VISIBILITY = {
   parents: false,
   components: false,
   hostedOn: false,
+  providedBy: false,
+  supportedBy: false,
+  maintainedBy: false,
   createdAt: false,
   updatedAt: false,
 } as const
@@ -88,6 +92,8 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
   const tTimeCategory = useTranslations('applications.timeCategories')
   const tSevenR = useTranslations('applications.sevenRStrategies')
   const locale = useLocale()
+  const { featureFlags } = useFeatureFlags()
+  const isSupEnabled = featureFlags.SUP
   const columnHelper = createColumnHelper<ApplicationType>()
 
   // Verwende persistente Spaltensichtbarkeit
@@ -327,6 +333,49 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
         },
         enableHiding: true,
       }),
+      ...(isSupEnabled
+        ? [
+            columnHelper.accessor('providedBy', {
+              header: t.has('providedBy') ? t('providedBy') : 'Provided By Suppliers',
+              cell: info => {
+                const suppliers = info.getValue()
+                return suppliers && suppliers.length > 0
+                  ? suppliers
+                      .slice(0, 3)
+                      .map((supplier: any) => supplier.name)
+                      .join(', ') + (suppliers.length > 3 ? '...' : '')
+                  : '-'
+              },
+              enableHiding: true,
+            }),
+            columnHelper.accessor('supportedBy', {
+              header: t.has('supportedBy') ? t('supportedBy') : 'Supported By Suppliers',
+              cell: info => {
+                const suppliers = info.getValue()
+                return suppliers && suppliers.length > 0
+                  ? suppliers
+                      .slice(0, 3)
+                      .map((supplier: any) => supplier.name)
+                      .join(', ') + (suppliers.length > 3 ? '...' : '')
+                  : '-'
+              },
+              enableHiding: true,
+            }),
+            columnHelper.accessor('maintainedBy', {
+              header: t.has('maintainedBy') ? t('maintainedBy') : 'Maintained By Suppliers',
+              cell: info => {
+                const suppliers = info.getValue()
+                return suppliers && suppliers.length > 0
+                  ? suppliers
+                      .slice(0, 3)
+                      .map((supplier: any) => supplier.name)
+                      .join(', ') + (suppliers.length > 3 ? '...' : '')
+                  : '-'
+              },
+              enableHiding: true,
+            }),
+          ]
+        : []),
       // Versteckte Zeitstempel-Spalten am Ende
       columnHelper.accessor('createdAt', {
         header: t('createdAt'),
@@ -339,7 +388,7 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
         enableHiding: true,
       }),
     ],
-    [columnHelper, t, tStatus, tTimeCategory, tSevenR, locale]
+    [columnHelper, t, tStatus, tTimeCategory, tSevenR, locale, isSupEnabled]
   )
 
   // Mapping from ApplicationType to expected FormValues for form
@@ -361,6 +410,9 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
       timeCategory: app.timeCategory ?? null,
       sevenRStrategy: app.sevenRStrategy ?? null,
       hostedOnIds: app.hostedOn?.map(infra => infra.id) ?? [],
+      providedByIds: app.providedBy?.map(supplier => supplier.id) ?? [],
+      supportedByIds: app.supportedBy?.map(supplier => supplier.id) ?? [],
+      maintainedByIds: app.maintainedBy?.map(supplier => supplier.id) ?? [],
       introductionDate: app.introductionDate ? new Date(app.introductionDate) : null,
       endOfLifeDate: app.endOfLifeDate ? new Date(app.endOfLifeDate) : null,
       planningDate: app.planningDate ? new Date(app.planningDate) : null,

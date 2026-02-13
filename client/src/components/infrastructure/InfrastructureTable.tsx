@@ -9,6 +9,7 @@ import { Infrastructure, InfrastructureType, InfrastructureStatus } from '../../
 import { createColumnHelper } from '@tanstack/react-table'
 import { SortingState, VisibilityState } from '@tanstack/react-table'
 import usePersistentColumnVisibility from '../../hooks/usePersistentColumnVisibility'
+import { useFeatureFlags } from '@/lib/feature-flags'
 
 // Exported default column visibility for Infrastructure
 export const INFRASTRUCTURE_DEFAULT_COLUMN_VISIBILITY = {
@@ -36,6 +37,9 @@ export const INFRASTRUCTURE_DEFAULT_COLUMN_VISIBILITY = {
   parentInfrastructure: false,
   childInfrastructures: false,
   hostsApplications: false,
+  providedBy: false,
+  hostedBy: false,
+  maintainedBy: false,
   partOfArchitectures: false,
   depictedInDiagrams: false,
   createdAt: false,
@@ -75,6 +79,8 @@ const InfrastructureTable: React.FC<InfrastructureTableProps> = ({
 }) => {
   const t = useTranslations('infrastructure')
   const locale = useLocale()
+  const { featureFlags } = useFeatureFlags()
+  const isSupEnabled = featureFlags.SUP
 
   // Utility functions for date formatting and translations
   const formatDate = (date: string | null | undefined, locale: string): string => {
@@ -373,6 +379,49 @@ const InfrastructureTable: React.FC<InfrastructureTableProps> = ({
         },
         enableHiding: true,
       }),
+      ...(isSupEnabled
+        ? [
+            columnHelper.accessor('providedBy', {
+              header: t('form.providedBy'),
+              cell: info => {
+                const suppliers = info.getValue()
+                return suppliers && suppliers.length > 0
+                  ? suppliers
+                      .slice(0, 3)
+                      .map((supplier: any) => supplier.name)
+                      .join(', ') + (suppliers.length > 3 ? '...' : '')
+                  : '-'
+              },
+              enableHiding: true,
+            }),
+            columnHelper.accessor('hostedBy', {
+              header: t('form.hostedBy'),
+              cell: info => {
+                const suppliers = info.getValue()
+                return suppliers && suppliers.length > 0
+                  ? suppliers
+                      .slice(0, 3)
+                      .map((supplier: any) => supplier.name)
+                      .join(', ') + (suppliers.length > 3 ? '...' : '')
+                  : '-'
+              },
+              enableHiding: true,
+            }),
+            columnHelper.accessor('maintainedBy', {
+              header: t('form.maintainedBy'),
+              cell: info => {
+                const suppliers = info.getValue()
+                return suppliers && suppliers.length > 0
+                  ? suppliers
+                      .slice(0, 3)
+                      .map((supplier: any) => supplier.name)
+                      .join(', ') + (suppliers.length > 3 ? '...' : '')
+                  : '-'
+              },
+              enableHiding: true,
+            }),
+          ]
+        : []),
       columnHelper.accessor('partOfArchitectures', {
         header: t('form.partOfArchitectures'),
         cell: info => {
@@ -408,7 +457,7 @@ const InfrastructureTable: React.FC<InfrastructureTableProps> = ({
         enableHiding: true,
       }),
     ],
-    [columnHelper, getTypeChip, getStatusChip, t, locale]
+    [columnHelper, getTypeChip, getStatusChip, t, locale, isSupEnabled]
   )
 
   return (
