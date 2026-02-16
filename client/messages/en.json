@@ -2280,6 +2280,11 @@
       "architecturePrinciples": "Architecture Principles",
       "infrastructures": "Infrastructure",
       "aicomponents": "AI Components",
+      "visions": "Visions",
+      "missions": "Missions",
+      "values": "Values",
+      "goals": "Goals",
+      "strategies": "Strategies",
       "all": "All Data"
     },
     "updateModes": {

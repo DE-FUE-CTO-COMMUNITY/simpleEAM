@@ -9,6 +9,11 @@ import { GET_DIAGRAMS } from '../graphql/diagram'
 import { GET_ARCHITECTURE_PRINCIPLES } from '../graphql/architecturePrinciple'
 import { GET_INFRASTRUCTURES } from '../graphql/infrastructure'
 import { GET_Aicomponents } from '../graphql/aicomponent'
+import { GET_VISIONS } from '../graphql/vision'
+import { GET_MISSIONS } from '../graphql/mission'
+import { GET_VALUES } from '../graphql/value'
+import { GET_GOALS } from '../graphql/goal'
+import { GET_STRATEGIES } from '../graphql/strategy'
 
 export interface ExcelExportData {
   [key: string]: string | number | boolean | Date
@@ -25,6 +30,11 @@ export type EntityType =
   | 'architecturePrinciples'
   | 'infrastructures'
   | 'aicomponents'
+  | 'visions'
+  | 'missions'
+  | 'values'
+  | 'goals'
+  | 'strategies'
   | 'all'
 
 // Hilfsfunktion: Company-Filter (inkl. Diagramm-OR-Sonderfall)
@@ -59,6 +69,29 @@ const formatDateForExport = (dateValue: string | Date | null | undefined): strin
   } catch {
     return ''
   }
+}
+
+const formatScoredRelationships = (connection: {
+  edges?: Array<{ node?: { id?: string }; properties?: { score?: number | null } }>
+}): string => {
+  if (!connection?.edges || !Array.isArray(connection.edges)) {
+    return ''
+  }
+
+  return connection.edges
+    .map(edge => {
+      const id = edge.node?.id
+      if (!id) return ''
+
+      const score = edge.properties?.score
+      if (typeof score === 'number') {
+        return `${id}:${score}`
+      }
+
+      return id
+    })
+    .filter(Boolean)
+    .join(',')
 }
 
 /**
@@ -566,13 +599,182 @@ export const fetchAicomponentsForExport = async (
   }
 }
 
+export const fetchVisionsForExport = async (
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
+): Promise<ExcelExportData[]> => {
+  try {
+    const { data } = await client.query({
+      query: GET_VISIONS,
+      variables: { where: companyWhere('visions', selectedCompanyId) },
+      fetchPolicy: 'network-only',
+    })
+
+    if (!data?.geaVisions) {
+      return []
+    }
+
+    return data.geaVisions.map((vision: any) => ({
+      id: vision.id,
+      name: vision.name,
+      visionStatement: vision.visionStatement || '',
+      timeHorizon: vision.timeHorizon || '',
+      year: vision.year || '',
+      owners: vision.owners?.map((owner: any) => owner.id).join(',') || '',
+      supportsMissions: formatScoredRelationships(vision.supportsMissionsConnection),
+      supportedByGoals: formatScoredRelationships(vision.supportedByGoalsConnection),
+      supportedByValues: formatScoredRelationships(vision.supportedByValuesConnection),
+      partOfArchitectures: vision.partOfArchitectures?.map((arch: any) => arch.id).join(',') || '',
+      depictedInDiagrams: vision.depictedInDiagrams?.map((diag: any) => diag.id).join(',') || '',
+      createdAt: formatDateForExport(vision.createdAt),
+      updatedAt: formatDateForExport(vision.updatedAt),
+    }))
+  } catch {
+    throw new Error('Visionen konnten nicht geladen werden')
+  }
+}
+
+export const fetchMissionsForExport = async (
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
+): Promise<ExcelExportData[]> => {
+  try {
+    const { data } = await client.query({
+      query: GET_MISSIONS,
+      variables: { where: companyWhere('missions', selectedCompanyId) },
+      fetchPolicy: 'network-only',
+    })
+
+    if (!data?.geaMissions) {
+      return []
+    }
+
+    return data.geaMissions.map((mission: any) => ({
+      id: mission.id,
+      name: mission.name,
+      purposeStatement: mission.purposeStatement || '',
+      keywords: mission.keywords?.join(',') || '',
+      year: mission.year || '',
+      owners: mission.owners?.map((owner: any) => owner.id).join(',') || '',
+      supportedByVisions: formatScoredRelationships(mission.supportedByVisionsConnection),
+      supportedByValues: formatScoredRelationships(mission.supportedByValuesConnection),
+      supportedByGoals: formatScoredRelationships(mission.supportedByGoalsConnection),
+      partOfArchitectures: mission.partOfArchitectures?.map((arch: any) => arch.id).join(',') || '',
+      depictedInDiagrams: mission.depictedInDiagrams?.map((diag: any) => diag.id).join(',') || '',
+      createdAt: formatDateForExport(mission.createdAt),
+      updatedAt: formatDateForExport(mission.updatedAt),
+    }))
+  } catch {
+    throw new Error('Missionen konnten nicht geladen werden')
+  }
+}
+
+export const fetchValuesForExport = async (
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
+): Promise<ExcelExportData[]> => {
+  try {
+    const { data } = await client.query({
+      query: GET_VALUES,
+      variables: { where: companyWhere('values', selectedCompanyId) },
+      fetchPolicy: 'network-only',
+    })
+
+    if (!data?.geaValues) {
+      return []
+    }
+
+    return data.geaValues.map((value: any) => ({
+      id: value.id,
+      name: value.name,
+      valueStatement: value.valueStatement || '',
+      owners: value.owners?.map((owner: any) => owner.id).join(',') || '',
+      supportsMissions: formatScoredRelationships(value.supportsMissionsConnection),
+      supportsVisions: formatScoredRelationships(value.supportsVisionsConnection),
+      partOfArchitectures: value.partOfArchitectures?.map((arch: any) => arch.id).join(',') || '',
+      depictedInDiagrams: value.depictedInDiagrams?.map((diag: any) => diag.id).join(',') || '',
+      createdAt: formatDateForExport(value.createdAt),
+      updatedAt: formatDateForExport(value.updatedAt),
+    }))
+  } catch {
+    throw new Error('Werte konnten nicht geladen werden')
+  }
+}
+
+export const fetchGoalsForExport = async (
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
+): Promise<ExcelExportData[]> => {
+  try {
+    const { data } = await client.query({
+      query: GET_GOALS,
+      variables: { where: companyWhere('goals', selectedCompanyId) },
+      fetchPolicy: 'network-only',
+    })
+
+    if (!data?.geaGoals) {
+      return []
+    }
+
+    return data.geaGoals.map((goal: any) => ({
+      id: goal.id,
+      name: goal.name,
+      goalStatement: goal.goalStatement || '',
+      owners: goal.owners?.map((owner: any) => owner.id).join(',') || '',
+      operationalizesVisions: formatScoredRelationships(goal.operationalizesVisionsConnection),
+      supportsMissions: formatScoredRelationships(goal.supportsMissionsConnection),
+      supportsValues: formatScoredRelationships(goal.supportsValuesConnection),
+      achievedByStrategies: formatScoredRelationships(goal.achievedByStrategiesConnection),
+      partOfArchitectures: goal.partOfArchitectures?.map((arch: any) => arch.id).join(',') || '',
+      depictedInDiagrams: goal.depictedInDiagrams?.map((diag: any) => diag.id).join(',') || '',
+      createdAt: formatDateForExport(goal.createdAt),
+      updatedAt: formatDateForExport(goal.updatedAt),
+    }))
+  } catch {
+    throw new Error('Ziele konnten nicht geladen werden')
+  }
+}
+
+export const fetchStrategiesForExport = async (
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
+): Promise<ExcelExportData[]> => {
+  try {
+    const { data } = await client.query({
+      query: GET_STRATEGIES,
+      variables: { where: companyWhere('strategies', selectedCompanyId) },
+      fetchPolicy: 'network-only',
+    })
+
+    if (!data?.geaStrategies) {
+      return []
+    }
+
+    return data.geaStrategies.map((strategy: any) => ({
+      id: strategy.id,
+      name: strategy.name,
+      description: strategy.description || '',
+      owners: strategy.owners?.map((owner: any) => owner.id).join(',') || '',
+      achievesGoals: formatScoredRelationships(strategy.achievesGoalsConnection),
+      partOfArchitectures:
+        strategy.partOfArchitectures?.map((arch: any) => arch.id).join(',') || '',
+      depictedInDiagrams: strategy.depictedInDiagrams?.map((diag: any) => diag.id).join(',') || '',
+      createdAt: formatDateForExport(strategy.createdAt),
+      updatedAt: formatDateForExport(strategy.updatedAt),
+    }))
+  } catch {
+    throw new Error('Strategien konnten nicht geladen werden')
+  }
+}
+
 /**
  * Holt alle Entitäten für Admin-Export (Multi-Tab Excel)
  * Hinweis: Diagramme werden beim Excel-Export ausgeblendet, da die JSON-Daten zu groß sind
  */
 export const fetchAllEntitiesForExport = async (
   client: ApolloClient<any>,
-  selectedCompanyId?: string
+  selectedCompanyId?: string,
+  includeGea: boolean = false
 ): Promise<{ [tabName: string]: ExcelExportData[] }> => {
   try {
     const [
@@ -586,6 +788,11 @@ export const fetchAllEntitiesForExport = async (
       architecturePrinciples,
       infrastructures,
       aicomponents,
+      visions,
+      missions,
+      values,
+      goals,
+      strategies,
     ] = await Promise.all([
       fetchBusinessCapabilitiesForExport(client, selectedCompanyId),
       fetchApplicationsForExport(client, selectedCompanyId),
@@ -597,9 +804,14 @@ export const fetchAllEntitiesForExport = async (
       fetchArchitecturePrinciplesForExport(client, selectedCompanyId),
       fetchInfrastructuresForExport(client, selectedCompanyId),
       fetchAicomponentsForExport(client, selectedCompanyId),
+      includeGea ? fetchVisionsForExport(client, selectedCompanyId) : Promise.resolve([]),
+      includeGea ? fetchMissionsForExport(client, selectedCompanyId) : Promise.resolve([]),
+      includeGea ? fetchValuesForExport(client, selectedCompanyId) : Promise.resolve([]),
+      includeGea ? fetchGoalsForExport(client, selectedCompanyId) : Promise.resolve([]),
+      includeGea ? fetchStrategiesForExport(client, selectedCompanyId) : Promise.resolve([]),
     ])
 
-    return {
+    const baseData = {
       'Business Capabilities': businessCapabilities,
       Applications: applications,
       'Data Objects': dataObjects,
@@ -610,6 +822,19 @@ export const fetchAllEntitiesForExport = async (
       'Architecture Principles': architecturePrinciples,
       Infrastructures: infrastructures,
       'AI Components': aicomponents,
+    }
+
+    if (!includeGea) {
+      return baseData
+    }
+
+    return {
+      ...baseData,
+      Visions: visions,
+      Missions: missions,
+      Values: values,
+      Goals: goals,
+      Strategies: strategies,
     }
   } catch {
     throw new Error('Fehler beim Laden der kompletten Datenbank')
@@ -622,7 +847,8 @@ export const fetchAllEntitiesForExport = async (
  */
 export const fetchAllEntitiesForExcelExport = async (
   client: ApolloClient<any>,
-  selectedCompanyId?: string
+  selectedCompanyId?: string,
+  includeGea: boolean = false
 ): Promise<{ [tabName: string]: ExcelExportData[] }> => {
   try {
     const [
@@ -636,6 +862,11 @@ export const fetchAllEntitiesForExcelExport = async (
       architecturePrinciples,
       infrastructures,
       aicomponents,
+      visions,
+      missions,
+      values,
+      goals,
+      strategies,
     ] = await Promise.all([
       fetchBusinessCapabilitiesForExport(client, selectedCompanyId),
       fetchApplicationsForExport(client, selectedCompanyId),
@@ -647,9 +878,14 @@ export const fetchAllEntitiesForExcelExport = async (
       fetchArchitecturePrinciplesForExport(client, selectedCompanyId),
       fetchInfrastructuresForExport(client, selectedCompanyId),
       fetchAicomponentsForExport(client, selectedCompanyId),
+      includeGea ? fetchVisionsForExport(client, selectedCompanyId) : Promise.resolve([]),
+      includeGea ? fetchMissionsForExport(client, selectedCompanyId) : Promise.resolve([]),
+      includeGea ? fetchValuesForExport(client, selectedCompanyId) : Promise.resolve([]),
+      includeGea ? fetchGoalsForExport(client, selectedCompanyId) : Promise.resolve([]),
+      includeGea ? fetchStrategiesForExport(client, selectedCompanyId) : Promise.resolve([]),
     ])
 
-    return {
+    const baseData = {
       'Business Capabilities': businessCapabilities,
       Applications: applications,
       'Data Objects': dataObjects,
@@ -660,6 +896,19 @@ export const fetchAllEntitiesForExcelExport = async (
       'Architecture Principles': architecturePrinciples,
       Infrastructures: infrastructures,
       'AI Components': aicomponents,
+    }
+
+    if (!includeGea) {
+      return baseData
+    }
+
+    return {
+      ...baseData,
+      Visions: visions,
+      Missions: missions,
+      Values: values,
+      Goals: goals,
+      Strategies: strategies,
     }
   } catch {
     throw new Error('Fehler beim Laden der kompletten Datenbank')
@@ -681,6 +930,12 @@ export const fetchDataByEntityType = async (
     | 'diagrams'
     | 'architecturePrinciples'
     | 'infrastructures'
+    | 'aicomponents'
+    | 'visions'
+    | 'missions'
+    | 'values'
+    | 'goals'
+    | 'strategies'
     | 'all',
   selectedCompanyId?: string
 ): Promise<ExcelExportData[] | { [tabName: string]: ExcelExportData[] }> => {
@@ -703,8 +958,20 @@ export const fetchDataByEntityType = async (
       return fetchArchitecturePrinciplesForExport(client, selectedCompanyId)
     case 'infrastructures':
       return fetchInfrastructuresForExport(client, selectedCompanyId)
+    case 'aicomponents':
+      return fetchAicomponentsForExport(client, selectedCompanyId)
+    case 'visions':
+      return fetchVisionsForExport(client, selectedCompanyId)
+    case 'missions':
+      return fetchMissionsForExport(client, selectedCompanyId)
+    case 'values':
+      return fetchValuesForExport(client, selectedCompanyId)
+    case 'goals':
+      return fetchGoalsForExport(client, selectedCompanyId)
+    case 'strategies':
+      return fetchStrategiesForExport(client, selectedCompanyId)
     case 'all':
-      return fetchAllEntitiesForExport(client, selectedCompanyId)
+      return fetchAllEntitiesForExport(client, selectedCompanyId, true)
     default:
       throw new Error(`Unbekannter Entity-Typ: ${entityType}`)
   }
@@ -726,8 +993,14 @@ export const fetchDataByEntityTypeAndFormat = async (
     | 'architecturePrinciples'
     | 'infrastructures'
     | 'aicomponents'
+    | 'visions'
+    | 'missions'
+    | 'values'
+    | 'goals'
+    | 'strategies'
     | 'all',
   _format: 'xlsx' | 'csv',
+  includeGea: boolean = false,
   selectedCompanyId?: string
 ): Promise<ExcelExportData[] | { [tabName: string]: ExcelExportData[] }> => {
   switch (entityType) {
@@ -751,8 +1024,18 @@ export const fetchDataByEntityTypeAndFormat = async (
       return fetchInfrastructuresForExport(client, selectedCompanyId)
     case 'aicomponents':
       return fetchAicomponentsForExport(client, selectedCompanyId)
+    case 'visions':
+      return fetchVisionsForExport(client, selectedCompanyId)
+    case 'missions':
+      return fetchMissionsForExport(client, selectedCompanyId)
+    case 'values':
+      return fetchValuesForExport(client, selectedCompanyId)
+    case 'goals':
+      return fetchGoalsForExport(client, selectedCompanyId)
+    case 'strategies':
+      return fetchStrategiesForExport(client, selectedCompanyId)
     case 'all':
-      return fetchAllEntitiesForExcelExport(client, selectedCompanyId)
+      return fetchAllEntitiesForExcelExport(client, selectedCompanyId, includeGea)
     default:
       throw new Error(`Unbekannter Entity-Typ: ${entityType}`)
   }
@@ -1036,6 +1319,78 @@ export const getAicomponentsTemplate = (): ExcelExportData => ({
   updatedAt: '', // ISO-Format: 2024-01-01T12:00:00.000Z
 })
 
+export const getVisionsTemplate = (): ExcelExportData => ({
+  id: '',
+  name: '',
+  visionStatement: '',
+  timeHorizon: '',
+  year: '',
+  owners: '',
+  supportsMissions: '',
+  supportedByGoals: '',
+  supportedByValues: '',
+  partOfArchitectures: '',
+  depictedInDiagrams: '',
+  createdAt: '',
+  updatedAt: '',
+})
+
+export const getMissionsTemplate = (): ExcelExportData => ({
+  id: '',
+  name: '',
+  purposeStatement: '',
+  keywords: '',
+  year: '',
+  owners: '',
+  supportedByVisions: '',
+  supportedByValues: '',
+  supportedByGoals: '',
+  partOfArchitectures: '',
+  depictedInDiagrams: '',
+  createdAt: '',
+  updatedAt: '',
+})
+
+export const getValuesTemplate = (): ExcelExportData => ({
+  id: '',
+  name: '',
+  valueStatement: '',
+  owners: '',
+  supportsMissions: '',
+  supportsVisions: '',
+  partOfArchitectures: '',
+  depictedInDiagrams: '',
+  createdAt: '',
+  updatedAt: '',
+})
+
+export const getGoalsTemplate = (): ExcelExportData => ({
+  id: '',
+  name: '',
+  goalStatement: '',
+  owners: '',
+  operationalizesVisions: '',
+  supportsMissions: '',
+  supportsValues: '',
+  achievedByStrategies: '',
+  partOfArchitectures: '',
+  depictedInDiagrams: '',
+  createdAt: '',
+  updatedAt: '',
+})
+
+export const getStrategiesTemplate = (): ExcelExportData => ({
+  id: '',
+  name: '',
+  description: '',
+  owners: '',
+  achievesGoals: '',
+  partOfArchitectures: '',
+  depictedInDiagrams: '',
+  createdAt: '',
+  updatedAt: '',
+})
+
 /**
  * Holt Template-Daten basierend auf dem Entity-Typ mit echten GraphQL-Feldnamen
  */
@@ -1051,6 +1406,11 @@ export const getTemplateByEntityType = (
     | 'architecturePrinciples'
     | 'infrastructures'
     | 'aicomponents'
+    | 'visions'
+    | 'missions'
+    | 'values'
+    | 'goals'
+    | 'strategies'
 ): ExcelExportData => {
   switch (entityType) {
     case 'businessCapabilities':
@@ -1073,6 +1433,16 @@ export const getTemplateByEntityType = (
       return getInfrastructuresTemplate()
     case 'aicomponents':
       return getAicomponentsTemplate()
+    case 'visions':
+      return getVisionsTemplate()
+    case 'missions':
+      return getMissionsTemplate()
+    case 'values':
+      return getValuesTemplate()
+    case 'goals':
+      return getGoalsTemplate()
+    case 'strategies':
+      return getStrategiesTemplate()
     default:
       throw new Error(`Unbekannter Entity-Typ: ${entityType}`)
   }
@@ -1092,7 +1462,12 @@ export const getTemplateByEntityTypeAndFormat = (
     | 'diagrams'
     | 'architecturePrinciples'
     | 'infrastructures'
-    | 'aicomponents',
+    | 'aicomponents'
+    | 'visions'
+    | 'missions'
+    | 'values'
+    | 'goals'
+    | 'strategies',
   format: 'xlsx' | 'csv' | 'json'
 ): ExcelExportData => {
   switch (entityType) {
@@ -1117,6 +1492,16 @@ export const getTemplateByEntityTypeAndFormat = (
       return getInfrastructuresTemplate()
     case 'aicomponents':
       return getAicomponentsTemplate()
+    case 'visions':
+      return getVisionsTemplate()
+    case 'missions':
+      return getMissionsTemplate()
+    case 'values':
+      return getValuesTemplate()
+    case 'goals':
+      return getGoalsTemplate()
+    case 'strategies':
+      return getStrategiesTemplate()
     default:
       throw new Error(`Unbekannter Entity-Typ: ${entityType}`)
   }
@@ -1136,6 +1521,12 @@ export const getFieldNamesByEntityType = (
     | 'diagrams'
     | 'architecturePrinciples'
     | 'infrastructures'
+    | 'aicomponents'
+    | 'visions'
+    | 'missions'
+    | 'values'
+    | 'goals'
+    | 'strategies'
     | 'all'
 ): string[] | { [tabName: string]: string[] } => {
   if (entityType === 'all') {
@@ -1149,6 +1540,12 @@ export const getFieldNamesByEntityType = (
       Diagrams: Object.keys(getDiagramsTemplate()), // Vollständig für JSON-Export
       'Architecture Principles': Object.keys(getArchitecturePrinciplesTemplate()),
       Infrastructures: Object.keys(getInfrastructuresTemplate()),
+      'AI Components': Object.keys(getAicomponentsTemplate()),
+      Visions: Object.keys(getVisionsTemplate()),
+      Missions: Object.keys(getMissionsTemplate()),
+      Values: Object.keys(getValuesTemplate()),
+      Goals: Object.keys(getGoalsTemplate()),
+      Strategies: Object.keys(getStrategiesTemplate()),
     }
   }
 
@@ -1170,6 +1567,12 @@ export const getFieldNamesByEntityTypeAndFormat = (
     | 'diagrams'
     | 'architecturePrinciples'
     | 'infrastructures'
+    | 'aicomponents'
+    | 'visions'
+    | 'missions'
+    | 'values'
+    | 'goals'
+    | 'strategies'
     | 'all',
   format: 'xlsx' | 'csv' | 'json'
 ): string[] | { [tabName: string]: string[] } => {
@@ -1188,6 +1591,12 @@ export const getFieldNamesByEntityTypeAndFormat = (
           : Object.keys(getDiagramsForExcelTemplate()),
       'Architecture Principles': Object.keys(getArchitecturePrinciplesTemplate()),
       Infrastructures: Object.keys(getInfrastructuresTemplate()),
+      'AI Components': Object.keys(getAicomponentsTemplate()),
+      Visions: Object.keys(getVisionsTemplate()),
+      Missions: Object.keys(getMissionsTemplate()),
+      Values: Object.keys(getValuesTemplate()),
+      Goals: Object.keys(getGoalsTemplate()),
+      Strategies: Object.keys(getStrategiesTemplate()),
     }
   }
 
@@ -1358,6 +1767,13 @@ export const getTemplateWithExamples = (
     | 'architectures'
     // 'diagrams' - Ausgeblendet für Excel-Operationen
     | 'architecturePrinciples'
+    | 'infrastructures'
+    | 'aicomponents'
+    | 'visions'
+    | 'missions'
+    | 'values'
+    | 'goals'
+    | 'strategies'
 ): ExcelExportData[] => {
   const emptyTemplate = getTemplateByEntityType(entityType)
 
@@ -1534,6 +1950,16 @@ export function getRequiredFieldsByEntityType(entityType: EntityType): string[] 
     case 'infrastructures':
       return ['name', 'infrastructureType', 'status']
     case 'aicomponents':
+      return ['name']
+    case 'visions':
+      return ['name']
+    case 'missions':
+      return ['name']
+    case 'values':
+      return ['name']
+    case 'goals':
+      return ['name']
+    case 'strategies':
       return ['name']
     default:
       return ['name']
@@ -1735,6 +2161,68 @@ export function getOptionalFieldsByEntityType(entityType: EntityType): string[] 
         'hostedOn',
         'partOfArchitectures',
         'implementsPrinciples',
+        'depictedInDiagrams',
+        'createdAt',
+        'updatedAt',
+      ]
+    case 'visions':
+      return [
+        'visionStatement',
+        'timeHorizon',
+        'year',
+        'owners',
+        'supportsMissions',
+        'supportedByGoals',
+        'supportedByValues',
+        'partOfArchitectures',
+        'depictedInDiagrams',
+        'createdAt',
+        'updatedAt',
+      ]
+    case 'missions':
+      return [
+        'purposeStatement',
+        'keywords',
+        'year',
+        'owners',
+        'supportedByVisions',
+        'supportedByValues',
+        'supportedByGoals',
+        'partOfArchitectures',
+        'depictedInDiagrams',
+        'createdAt',
+        'updatedAt',
+      ]
+    case 'values':
+      return [
+        'valueStatement',
+        'owners',
+        'supportsMissions',
+        'supportsVisions',
+        'partOfArchitectures',
+        'depictedInDiagrams',
+        'createdAt',
+        'updatedAt',
+      ]
+    case 'goals':
+      return [
+        'goalStatement',
+        'owners',
+        'operationalizesVisions',
+        'supportsMissions',
+        'supportsValues',
+        'achievedByStrategies',
+        'partOfArchitectures',
+        'depictedInDiagrams',
+        'createdAt',
+        'updatedAt',
+      ]
+    case 'strategies':
+      return [
+        'description',
+        'owners',
+        'achievesGoals',
+        'partOfArchitectures',
         'depictedInDiagrams',
         'createdAt',
         'updatedAt',

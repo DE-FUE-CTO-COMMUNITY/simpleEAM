@@ -2227,6 +2227,11 @@
       "architecturePrinciples": "Architekturprinzipien",
       "infrastructures": "Infrastruktur",
       "aicomponents": "KI-Komponenten",
+      "visions": "Visionen",
+      "missions": "Missionen",
+      "values": "Werte",
+      "goals": "Ziele",
+      "strategies": "Strategien",
       "all": "Alle Daten"
     },
     "updateModes": {

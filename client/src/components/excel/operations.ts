@@ -8,7 +8,7 @@ import {
 } from './utils'
 import { createEntityInputFromJson, sanitizeJsonImportData } from '../../utils/jsonInputUtils'
 import { ImportWithMappingResult, EntityMapping, ImportResult } from './types'
-import { entityTypeMapping } from './constants'
+import { entityTypeMapping, isGeaEntityType } from './constants'
 
 /**
  * Extracts a readable error message from various error types
@@ -136,6 +136,11 @@ export const importEntityDataWithMapping = async (
             case 'architecturePrinciples':
             case 'infrastructures':
             case 'aicomponents':
+            case 'visions':
+            case 'missions':
+            case 'values':
+            case 'goals':
+            case 'strategies':
               updateInput = { ...updateInput, company: companyUpdate }
               break
             default:
@@ -169,6 +174,11 @@ export const importEntityDataWithMapping = async (
             case 'architecturePrinciples':
             case 'infrastructures':
             case 'aicomponents':
+            case 'visions':
+            case 'missions':
+            case 'values':
+            case 'goals':
+            case 'strategies':
               input = { ...input, company: companyConnect }
               break
             default:
@@ -207,6 +217,16 @@ export const importEntityDataWithMapping = async (
             createdEntities = resultData.createInfrastructures.infrastructures
           } else if (resultData.createAiComponents) {
             createdEntities = resultData.createAiComponents.aiComponents
+          } else if (resultData.createGeaVisions) {
+            createdEntities = resultData.createGeaVisions.geaVisions
+          } else if (resultData.createGeaMissions) {
+            createdEntities = resultData.createGeaMissions.geaMissions
+          } else if (resultData.createGeaValues) {
+            createdEntities = resultData.createGeaValues.geaValues
+          } else if (resultData.createGeaGoals) {
+            createdEntities = resultData.createGeaGoals.geaGoals
+          } else if (resultData.createGeaStrategies) {
+            createdEntities = resultData.createGeaStrategies.geaStrategies
           }
           if (createdEntities && createdEntities.length > 0) {
             entityMappings[originalId] = createdEntities[0].id
@@ -250,6 +270,7 @@ export const handleMultiTabImport = async (
   client: ApolloClient<any>,
   file: File,
   format: 'xlsx' | 'json',
+  includeGea: boolean,
   onProgress?: (progress: number) => void,
   selectedCompanyId?: string
 ): Promise<{ totalImported: number; totalFailed: number; importResults: ImportResult[] }> => {
@@ -270,7 +291,12 @@ export const handleMultiTabImport = async (
 
   const totalTabs = Object.keys(allData).filter(tabName => {
     const entityType = entityTypeMapping[tabName]
-    return entityType && Array.isArray(allData[tabName]) && allData[tabName].length > 0
+    return (
+      entityType &&
+      Array.isArray(allData[tabName]) &&
+      allData[tabName].length > 0 &&
+      (includeGea || !isGeaEntityType(entityType as any))
+    )
   }).length
 
   let tabsProcessed = 0
@@ -278,6 +304,10 @@ export const handleMultiTabImport = async (
   // Phase 1: Erstelle alle Entitäten ohne Beziehungen
   for (const [tabName, tabData] of Object.entries(allData)) {
     const entityType = entityTypeMapping[tabName]
+
+    if (entityType && !includeGea && isGeaEntityType(entityType as any)) {
+      continue
+    }
 
     if (entityType && Array.isArray(tabData) && tabData.length > 0) {
       try {
@@ -344,7 +374,8 @@ export const handleMultiTabImport = async (
       entityType &&
       Array.isArray(allData[tabName]) &&
       allData[tabName].length > 0 &&
-      allEntityMappings[entityType]
+      allEntityMappings[entityType] &&
+      (includeGea || !isGeaEntityType(entityType as any))
     )
   })
 
@@ -352,6 +383,10 @@ export const handleMultiTabImport = async (
 
   for (const [tabName, tabData] of Object.entries(allData)) {
     const entityType = entityTypeMapping[tabName]
+
+    if (entityType && !includeGea && isGeaEntityType(entityType as any)) {
+      continue
+    }
 
     if (
       entityType &&
@@ -469,6 +504,7 @@ export const exportEntityData = async (
   apolloClient: ApolloClient<any>,
   entityType: string,
   format: 'xlsx' | 'csv' | 'json',
+  includeGea: boolean,
   selectedCompanyId?: string
 ): Promise<void> => {
   try {
@@ -498,7 +534,7 @@ export const exportEntityData = async (
       if (format === 'json') {
         const { fetchAllDataForJson } = await import('../../utils/jsonDataService')
         const { exportToJson } = await import('../../utils/jsonUtils')
-        const allData = await fetchAllDataForJson(apolloClient, selectedCompanyId)
+        const allData = await fetchAllDataForJson(apolloClient, selectedCompanyId, includeGea)
 
         const timestamp = formatTimestampForFilename()
         exportToJson(allData, {
@@ -513,6 +549,7 @@ export const exportEntityData = async (
           apolloClient,
           'all',
           format,
+          includeGea,
           selectedCompanyId
         )
 
@@ -537,6 +574,11 @@ export const exportEntityData = async (
         architecturePrinciples: 'Architecture_Principles',
         infrastructures: 'Infrastructure',
         aicomponents: 'AI_Components',
+        visions: 'Visions',
+        missions: 'Missions',
+        values: 'Values',
+        goals: 'Goals',
+        strategies: 'Strategies',
       }
 
       const filename = `${entityTypeLabels[entityType] || entityType}_Export${companySuffix}`
@@ -547,6 +589,7 @@ export const exportEntityData = async (
         const data = await fetchDataByEntityTypeForJson(
           apolloClient,
           entityType as any,
+          includeGea,
           selectedCompanyId
         )
 
@@ -563,6 +606,7 @@ export const exportEntityData = async (
           apolloClient,
           entityType as any,
           format,
+          includeGea,
           selectedCompanyId
         )) as any[]
 
@@ -629,6 +673,11 @@ export const deleteEntityData = async (
       'architecturePrinciples',
       'infrastructures',
       'aicomponents',
+      'visions',
+      'missions',
+      'values',
+      'goals',
+      'strategies',
     ]
 
     let totalDeleted = 0
@@ -793,6 +842,71 @@ const createRelationshipUpdateInput = (
           .map((id: string) => ({ where: { node: { id: { eq: id.trim() } } } })),
       }
     }
+    return undefined
+  }
+
+  const processGeaRelationshipField = (value: any) => {
+    let relationshipItems: Array<{ id: string; score?: number }> = []
+
+    if (!value) {
+      return undefined
+    }
+
+    if (typeof value === 'string') {
+      relationshipItems = value
+        .split(',')
+        .map(item => item.trim())
+        .filter(Boolean)
+        .map(item => {
+          const [id, rawScore] = item.split(':')
+          const parsedScore = Number(rawScore)
+          return {
+            id,
+            score: Number.isFinite(parsedScore) ? parsedScore : undefined,
+          }
+        })
+    } else if (Array.isArray(value)) {
+      relationshipItems = value
+        .filter(item => item && (typeof item === 'string' || typeof item === 'object'))
+        .map(item => {
+          if (typeof item === 'string') {
+            const [id, rawScore] = item.split(':')
+            const parsedScore = Number(rawScore)
+            return {
+              id,
+              score: Number.isFinite(parsedScore) ? parsedScore : undefined,
+            }
+          }
+          if (typeof item === 'object' && item.id) {
+            const parsedScore = Number(item.score ?? item.properties?.score)
+            return {
+              id: item.id,
+              score: Number.isFinite(parsedScore) ? parsedScore : undefined,
+            }
+          }
+          return { id: String(item) }
+        })
+    } else if (typeof value === 'object' && value.id) {
+      const parsedScore = Number(value.score ?? value.properties?.score)
+      relationshipItems = [
+        {
+          id: String(value.id),
+          score: Number.isFinite(parsedScore) ? parsedScore : undefined,
+        },
+      ]
+    } else {
+      relationshipItems = [{ id: String(value) }]
+    }
+
+    if (relationshipItems.length > 0) {
+      return {
+        connect: relationshipItems.map(item => ({
+          where: { node: { id: { eq: item.id.trim() } } },
+          edge: { score: typeof item.score === 'number' ? item.score : 0 },
+        })),
+      }
+    }
+
     return undefined
   }
 
@@ -1053,6 +1167,125 @@ const createRelationshipUpdateInput = (
         input.childInfrastructures = processRelationshipField(
           'childInfrastructures',
           row.childInfrastructures
+        )
+      }
+      break
+
+    case 'visions':
+      if (row.owners) input.owners = processRelationshipField('owners', row.owners)
+      if (row.supportsMissions) {
+        input.supportsMissions = processGeaRelationshipField(row.supportsMissions)
+      }
+      if (row.supportedByGoals) {
+        input.supportedByGoals = processGeaRelationshipField(row.supportedByGoals)
+      }
+      if (row.supportedByValues) {
+        input.supportedByValues = processGeaRelationshipField(row.supportedByValues)
+      }
+      if (row.partOfArchitectures) {
+        input.partOfArchitectures = processRelationshipField(
+          'partOfArchitectures',
+          row.partOfArchitectures
+        )
+      }
+      if (row.depictedInDiagrams) {
+        input.depictedInDiagrams = processRelationshipField(
+          'depictedInDiagrams',
+          row.depictedInDiagrams
+        )
+      }
+      break
+
+    case 'missions':
+      if (row.owners) input.owners = processRelationshipField('owners', row.owners)
+      if (row.supportedByVisions) {
+        input.supportedByVisions = processGeaRelationshipField(row.supportedByVisions)
+      }
+      if (row.supportedByValues) {
+        input.supportedByValues = processGeaRelationshipField(row.supportedByValues)
+      }
+      if (row.supportedByGoals) {
+        input.supportedByGoals = processGeaRelationshipField(row.supportedByGoals)
+      }
+      if (row.partOfArchitectures) {
+        input.partOfArchitectures = processRelationshipField(
+          'partOfArchitectures',
+          row.partOfArchitectures
+        )
+      }
+      if (row.depictedInDiagrams) {
+        input.depictedInDiagrams = processRelationshipField(
+          'depictedInDiagrams',
+          row.depictedInDiagrams
+        )
+      }
+      break
+
+    case 'values':
+      if (row.owners) input.owners = processRelationshipField('owners', row.owners)
+      if (row.supportsMissions) {
+        input.supportsMissions = processGeaRelationshipField(row.supportsMissions)
+      }
+      if (row.supportsVisions) {
+        input.supportsVisions = processGeaRelationshipField(row.supportsVisions)
+      }
+      if (row.partOfArchitectures) {
+        input.partOfArchitectures = processRelationshipField(
+          'partOfArchitectures',
+          row.partOfArchitectures
+        )
+      }
+      if (row.depictedInDiagrams) {
+        input.depictedInDiagrams = processRelationshipField(
+          'depictedInDiagrams',
+          row.depictedInDiagrams
+        )
+      }
+      break
+
+    case 'goals':
+      if (row.owners) input.owners = processRelationshipField('owners', row.owners)
+      if (row.operationalizesVisions) {
+        input.operationalizesVisions = processGeaRelationshipField(row.operationalizesVisions)
+      }
+      if (row.supportsMissions) {
+        input.supportsMissions = processGeaRelationshipField(row.supportsMissions)
+      }
+      if (row.supportsValues) {
+        input.supportsValues = processGeaRelationshipField(row.supportsValues)
+      }
+      if (row.achievedByStrategies) {
+        input.achievedByStrategies = processGeaRelationshipField(row.achievedByStrategies)
+      }
+      if (row.partOfArchitectures) {
+        input.partOfArchitectures = processRelationshipField(
+          'partOfArchitectures',
+          row.partOfArchitectures
+        )
+      }
+      if (row.depictedInDiagrams) {
+        input.depictedInDiagrams = processRelationshipField(
+          'depictedInDiagrams',
+          row.depictedInDiagrams
+        )
+      }
+      break
+
+    case 'strategies':
+      if (row.owners) input.owners = processRelationshipField('owners', row.owners)
+      if (row.achievesGoals) {
+        input.achievesGoals = processGeaRelationshipField(row.achievesGoals)
+      }
+      if (row.partOfArchitectures) {
+        input.partOfArchitectures = processRelationshipField(
+          'partOfArchitectures',
+          row.partOfArchitectures
+        )
+      }
+      if (row.depictedInDiagrams) {
+        input.depictedInDiagrams = processRelationshipField(
+          'depictedInDiagrams',
+          row.depictedInDiagrams
         )
       }
       break

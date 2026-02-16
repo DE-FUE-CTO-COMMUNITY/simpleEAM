@@ -9,6 +9,11 @@ import { GET_DIAGRAMS } from '../graphql/diagram'
 import { GET_ARCHITECTURE_PRINCIPLES } from '../graphql/architecturePrinciple'
 import { GET_INFRASTRUCTURES } from '../graphql/infrastructure'
 import { GET_Aicomponents } from '../graphql/aicomponent'
+import { GET_VISIONS } from '../graphql/vision'
+import { GET_MISSIONS } from '../graphql/mission'
+import { GET_VALUES } from '../graphql/value'
+import { GET_GOALS } from '../graphql/goal'
+import { GET_STRATEGIES } from '../graphql/strategy'
 import { ValidationResult } from '../components/excel/types'
 import { getRequiredFieldsByEntityType, getOptionalFieldsByEntityType } from './excelDataService'
 
@@ -30,6 +35,11 @@ export type JsonEntityType =
   | 'architecturePrinciples'
   | 'infrastructures'
   | 'aicomponents'
+  | 'visions'
+  | 'missions'
+  | 'values'
+  | 'goals'
+  | 'strategies'
 
 // Hilfsfunktion: Company-Filter (inkl. Diagramm-OR-Sonderfall)
 const companyWhere = (entityType: JsonEntityType | 'all', companyId?: string): any | undefined => {
@@ -71,6 +81,33 @@ export interface ValidationWarning {
 const formatDateForJsonExport = (date: string | null | undefined): string => {
   if (!date) return ''
   return date // JSON behält ISO-Format bei
+}
+
+const mapScoredEdges = (connection: {
+  edges?: Array<{ node?: { id?: string; name?: string }; properties?: { score?: number | null } }>
+}): Array<{ id: string; name?: string; score?: number }> => {
+  if (!connection?.edges || !Array.isArray(connection.edges)) {
+    return []
+  }
+
+  return connection.edges.reduce<Array<{ id: string; name?: string; score?: number }>>(
+    (acc, edge) => {
+      const id = edge.node?.id
+      if (!id) {
+        return acc
+      }
+
+      const score = edge.properties?.score
+      acc.push({
+        id,
+        name: edge.node?.name,
+        score: typeof score === 'number' ? score : undefined,
+      })
+
+      return acc
+    },
+    []
+  )
 }
 
 /**
@@ -512,12 +549,160 @@ export const fetchAicomponentsForJson = async (
   }
 }
 
+export const fetchVisionsForJson = async (
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
+): Promise<JsonExportData[]> => {
+  try {
+    const { data } = await client.query({
+      query: GET_VISIONS,
+      variables: { where: companyWhere('visions', selectedCompanyId) },
+      fetchPolicy: 'cache-first',
+    })
+
+    return data.geaVisions?.map((vision: any) => ({
+      id: vision.id,
+      name: vision.name || '',
+      visionStatement: vision.visionStatement || '',
+      timeHorizon: vision.timeHorizon || '',
+      year: vision.year || '',
+      createdAt: formatDateForJsonExport(vision.createdAt),
+      updatedAt: formatDateForJsonExport(vision.updatedAt),
+      owners: vision.owners || [],
+      supportsMissions: mapScoredEdges(vision.supportsMissionsConnection),
+      supportedByGoals: mapScoredEdges(vision.supportedByGoalsConnection),
+      supportedByValues: mapScoredEdges(vision.supportedByValuesConnection),
+      partOfArchitectures: vision.partOfArchitectures || [],
+      depictedInDiagrams: vision.depictedInDiagrams || [],
+    }))
+  } catch {
+    throw new Error('Fehler beim Laden der Visions für JSON-Export')
+  }
+}
+
+export const fetchMissionsForJson = async (
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
+): Promise<JsonExportData[]> => {
+  try {
+    const { data } = await client.query({
+      query: GET_MISSIONS,
+      variables: { where: companyWhere('missions', selectedCompanyId) },
+      fetchPolicy: 'cache-first',
+    })
+
+    return data.geaMissions?.map((mission: any) => ({
+      id: mission.id,
+      name: mission.name || '',
+      purposeStatement: mission.purposeStatement || '',
+      keywords: mission.keywords || [],
+      year: mission.year || '',
+      createdAt: formatDateForJsonExport(mission.createdAt),
+      updatedAt: formatDateForJsonExport(mission.updatedAt),
+      owners: mission.owners || [],
+      supportedByVisions: mapScoredEdges(mission.supportedByVisionsConnection),
+      supportedByValues: mapScoredEdges(mission.supportedByValuesConnection),
+      supportedByGoals: mapScoredEdges(mission.supportedByGoalsConnection),
+      partOfArchitectures: mission.partOfArchitectures || [],
+      depictedInDiagrams: mission.depictedInDiagrams || [],
+    }))
+  } catch {
+    throw new Error('Fehler beim Laden der Missions für JSON-Export')
+  }
+}
+
+export const fetchValuesForJson = async (
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
+): Promise<JsonExportData[]> => {
+  try {
+    const { data } = await client.query({
+      query: GET_VALUES,
+      variables: { where: companyWhere('values', selectedCompanyId) },
+      fetchPolicy: 'cache-first',
+    })
+
+    return data.geaValues?.map((value: any) => ({
+      id: value.id,
+      name: value.name || '',
+      valueStatement: value.valueStatement || '',
+      createdAt: formatDateForJsonExport(value.createdAt),
+      updatedAt: formatDateForJsonExport(value.updatedAt),
+      owners: value.owners || [],
+      supportsMissions: mapScoredEdges(value.supportsMissionsConnection),
+      supportsVisions: mapScoredEdges(value.supportsVisionsConnection),
+      partOfArchitectures: value.partOfArchitectures || [],
+      depictedInDiagrams: value.depictedInDiagrams || [],
+    }))
+  } catch {
+    throw new Error('Fehler beim Laden der Values für JSON-Export')
+  }
+}
+
+export const fetchGoalsForJson = async (
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
+): Promise<JsonExportData[]> => {
+  try {
+    const { data } = await client.query({
+      query: GET_GOALS,
+      variables: { where: companyWhere('goals', selectedCompanyId) },
+      fetchPolicy: 'cache-first',
+    })
+
+    return data.geaGoals?.map((goal: any) => ({
+      id: goal.id,
+      name: goal.name || '',
+      goalStatement: goal.goalStatement || '',
+      createdAt: formatDateForJsonExport(goal.createdAt),
+      updatedAt: formatDateForJsonExport(goal.updatedAt),
+      owners: goal.owners || [],
+      operationalizesVisions: mapScoredEdges(goal.operationalizesVisionsConnection),
+      supportsMissions: mapScoredEdges(goal.supportsMissionsConnection),
+      supportsValues: mapScoredEdges(goal.supportsValuesConnection),
+      achievedByStrategies: mapScoredEdges(goal.achievedByStrategiesConnection),
+      partOfArchitectures: goal.partOfArchitectures || [],
+      depictedInDiagrams: goal.depictedInDiagrams || [],
+    }))
+  } catch {
+    throw new Error('Fehler beim Laden der Goals für JSON-Export')
+  }
+}
+
+export const fetchStrategiesForJson = async (
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
+): Promise<JsonExportData[]> => {
+  try {
+    const { data } = await client.query({
+      query: GET_STRATEGIES,
+      variables: { where: companyWhere('strategies', selectedCompanyId) },
+      fetchPolicy: 'cache-first',
+    })
+
+    return data.geaStrategies?.map((strategy: any) => ({
+      id: strategy.id,
+      name: strategy.name || '',
+      description: strategy.description || '',
+      createdAt: formatDateForJsonExport(strategy.createdAt),
+      updatedAt: formatDateForJsonExport(strategy.updatedAt),
+      owners: strategy.owners || [],
+      achievesGoals: mapScoredEdges(strategy.achievesGoalsConnection),
+      partOfArchitectures: strategy.partOfArchitectures || [],
+      depictedInDiagrams: strategy.depictedInDiagrams || [],
+    }))
+  } catch {
+    throw new Error('Fehler beim Laden der Strategies für JSON-Export')
+  }
+}
+
 /**
  * Holt alle Daten für JSON-Export mit vollständigen Beziehungsinformationen
  */
 export const fetchAllDataForJson = async (
   client: ApolloClient<any>,
-  selectedCompanyId?: string
+  selectedCompanyId?: string,
+  includeGea: boolean = false
 ): Promise<{ [tabName: string]: JsonExportData[] }> => {
   try {
     const [
@@ -531,6 +716,11 @@ export const fetchAllDataForJson = async (
       architecturePrinciples,
       infrastructures,
       aicomponents,
+      visions,
+      missions,
+      values,
+      goals,
+      strategies,
     ] = await Promise.all([
       fetchBusinessCapabilitiesForJson(client, selectedCompanyId),
       fetchApplicationsForJson(client, selectedCompanyId),
@@ -542,9 +732,14 @@ export const fetchAllDataForJson = async (
       fetchArchitecturePrinciplesForJson(client, selectedCompanyId),
       fetchInfrastructuresForJson(client, selectedCompanyId),
       fetchAicomponentsForJson(client, selectedCompanyId),
+      includeGea ? fetchVisionsForJson(client, selectedCompanyId) : Promise.resolve([]),
+      includeGea ? fetchMissionsForJson(client, selectedCompanyId) : Promise.resolve([]),
+      includeGea ? fetchValuesForJson(client, selectedCompanyId) : Promise.resolve([]),
+      includeGea ? fetchGoalsForJson(client, selectedCompanyId) : Promise.resolve([]),
+      includeGea ? fetchStrategiesForJson(client, selectedCompanyId) : Promise.resolve([]),
     ])
 
-    return {
+    const baseData = {
       'Business Capabilities': businessCapabilities,
       Applications: applications,
       'Data Objects': dataObjects,
@@ -555,6 +750,19 @@ export const fetchAllDataForJson = async (
       'Architecture Principles': architecturePrinciples,
       Infrastructure: infrastructures,
       'AI Components': aicomponents,
+    }
+
+    if (!includeGea) {
+      return baseData
+    }
+
+    return {
+      ...baseData,
+      Visions: visions,
+      Missions: missions,
+      Values: values,
+      Goals: goals,
+      Strategies: strategies,
     }
   } catch (error) {
     console.error('Fehler beim Laden aller Daten für JSON-Export:', error)
@@ -568,10 +776,11 @@ export const fetchAllDataForJson = async (
 export const fetchDataByEntityTypeForJson = async (
   client: ApolloClient<any>,
   entityType: JsonEntityType | 'all',
+  includeGea: boolean = false,
   selectedCompanyId?: string
 ): Promise<JsonExportData[] | { [tabName: string]: JsonExportData[] }> => {
   if (entityType === 'all') {
-    return await fetchAllDataForJson(client, selectedCompanyId)
+    return await fetchAllDataForJson(client, selectedCompanyId, includeGea)
   }
 
   switch (entityType) {
@@ -595,6 +804,16 @@ export const fetchDataByEntityTypeForJson = async (
       return await fetchInfrastructuresForJson(client, selectedCompanyId)
     case 'aicomponents':
       return await fetchAicomponentsForJson(client, selectedCompanyId)
+    case 'visions':
+      return await fetchVisionsForJson(client, selectedCompanyId)
+    case 'missions':
+      return await fetchMissionsForJson(client, selectedCompanyId)
+    case 'values':
+      return await fetchValuesForJson(client, selectedCompanyId)
+    case 'goals':
+      return await fetchGoalsForJson(client, selectedCompanyId)
+    case 'strategies':
+      return await fetchStrategiesForJson(client, selectedCompanyId)
     default:
       throw new Error(`Unbekannter Entity-Type: ${entityType}`)
   }

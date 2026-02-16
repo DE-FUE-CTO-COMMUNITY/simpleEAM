@@ -59,6 +59,26 @@ import {
   CHECK_AICOMPONENT_EXISTS,
   GET_AICOMPONENTS_COUNT,
 } from '../../graphql/aicomponent'
+import {
+  CREATE_VISION,
+  UPDATE_VISION,
+  CHECK_VISION_EXISTS,
+  GET_VISIONS,
+} from '../../graphql/vision'
+import {
+  CREATE_MISSION,
+  UPDATE_MISSION,
+  CHECK_MISSION_EXISTS,
+  GET_MISSIONS,
+} from '../../graphql/mission'
+import { CREATE_VALUE, UPDATE_VALUE, CHECK_VALUE_EXISTS, GET_VALUES } from '../../graphql/value'
+import { CREATE_GOAL, UPDATE_GOAL, CHECK_GOAL_EXISTS, GET_GOALS } from '../../graphql/goal'
+import {
+  CREATE_STRATEGY,
+  UPDATE_STRATEGY,
+  CHECK_STRATEGY_EXISTS,
+  GET_STRATEGIES,
+} from '../../graphql/strategy'
 
 // GraphQL mutations for data deletion
 export const DELETE_BUSINESS_CAPABILITIES = () => `
@@ -141,6 +161,46 @@ export const DELETE_AICOMPONENTS = () => `
   }
 `
 
+export const DELETE_VISIONS = () => `
+  mutation DeleteVisions($where: GEA_VisionWhere) {
+    deleteGeaVisions(where: $where) {
+      nodesDeleted
+    }
+  }
+`
+
+export const DELETE_MISSIONS = () => `
+  mutation DeleteMissions($where: GEA_MissionWhere) {
+    deleteGeaMissions(where: $where) {
+      nodesDeleted
+    }
+  }
+`
+
+export const DELETE_VALUES = () => `
+  mutation DeleteValues($where: GEA_ValueWhere) {
+    deleteGeaValues(where: $where) {
+      nodesDeleted
+    }
+  }
+`
+
+export const DELETE_GOALS = () => `
+  mutation DeleteGoals($where: GEA_GoalWhere) {
+    deleteGeaGoals(where: $where) {
+      nodesDeleted
+    }
+  }
+`
+
+export const DELETE_STRATEGIES = () => `
+  mutation DeleteStrategies($where: GEA_StrategyWhere) {
+    deleteGeaStrategies(where: $where) {
+      nodesDeleted
+    }
+  }
+`
+
 // Helper-Funktion: Gibt die passenden CREATE/UPDATE Mutations für einen Entity-Type zurück
 export const getMutationsByEntityType = (entityType: string) => {
   const mutationMap = {
@@ -194,6 +254,31 @@ export const getMutationsByEntityType = (entityType: string) => {
       update: UPDATE_Aicomponent,
       check: CHECK_AICOMPONENT_EXISTS,
     },
+    visions: {
+      create: CREATE_VISION,
+      update: UPDATE_VISION,
+      check: CHECK_VISION_EXISTS,
+    },
+    missions: {
+      create: CREATE_MISSION,
+      update: UPDATE_MISSION,
+      check: CHECK_MISSION_EXISTS,
+    },
+    values: {
+      create: CREATE_VALUE,
+      update: UPDATE_VALUE,
+      check: CHECK_VALUE_EXISTS,
+    },
+    goals: {
+      create: CREATE_GOAL,
+      update: UPDATE_GOAL,
+      check: CHECK_GOAL_EXISTS,
+    },
+    strategies: {
+      create: CREATE_STRATEGY,
+      update: UPDATE_STRATEGY,
+      check: CHECK_STRATEGY_EXISTS,
+    },
   }
 
   return mutationMap[entityType as keyof typeof mutationMap]
@@ -212,6 +297,11 @@ export const getDeleteMutationByEntityType = (entityType: string) => {
     architecturePrinciples: DELETE_ARCHITECTURE_PRINCIPLES(),
     infrastructures: DELETE_INFRASTRUCTURES(),
     aicomponents: DELETE_AICOMPONENTS(),
+    visions: DELETE_VISIONS(),
+    missions: DELETE_MISSIONS(),
+    values: DELETE_VALUES(),
+    goals: DELETE_GOALS(),
+    strategies: DELETE_STRATEGIES(),
   }
 
   return deleteMutationMap[entityType as keyof typeof deleteMutationMap]
@@ -259,4 +349,24 @@ export {
   UPDATE_Aicomponent,
   CHECK_AICOMPONENT_EXISTS,
   GET_AICOMPONENTS_COUNT,
+  CREATE_VISION,
+  UPDATE_VISION,
+  CHECK_VISION_EXISTS,
+  GET_VISIONS,
+  CREATE_MISSION,
+  UPDATE_MISSION,
+  CHECK_MISSION_EXISTS,
+  GET_MISSIONS,
+  CREATE_VALUE,
+  UPDATE_VALUE,
+  CHECK_VALUE_EXISTS,
+  GET_VALUES,
+  CREATE_GOAL,
+  UPDATE_GOAL,
+  CHECK_GOAL_EXISTS,
+  GET_GOALS,
+  CREATE_STRATEGY,
+  UPDATE_STRATEGY,
+  CHECK_STRATEGY_EXISTS,
+  GET_STRATEGIES,
 }

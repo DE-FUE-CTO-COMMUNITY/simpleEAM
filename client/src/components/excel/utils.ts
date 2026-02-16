@@ -84,6 +84,44 @@ export const getRelationshipFields = (entityType: string): string[] => {
         'parentInfrastructure',
         'childInfrastructures',
       ]
+    case 'visions':
+      return [
+        'owners',
+        'supportsMissions',
+        'supportedByGoals',
+        'supportedByValues',
+        'partOfArchitectures',
+        'depictedInDiagrams',
+      ]
+    case 'missions':
+      return [
+        'owners',
+        'supportedByVisions',
+        'supportedByValues',
+        'supportedByGoals',
+        'partOfArchitectures',
+        'depictedInDiagrams',
+      ]
+    case 'values':
+      return [
+        'owners',
+        'supportsMissions',
+        'supportsVisions',
+        'partOfArchitectures',
+        'depictedInDiagrams',
+      ]
+    case 'goals':
+      return [
+        'owners',
+        'operationalizesVisions',
+        'supportsMissions',
+        'supportsValues',
+        'achievedByStrategies',
+        'partOfArchitectures',
+        'depictedInDiagrams',
+      ]
+    case 'strategies':
+      return ['owners', 'achievesGoals', 'partOfArchitectures', 'depictedInDiagrams']
     default:
       return []
   }
@@ -155,6 +193,16 @@ export const checkEntityExists = async (
         return result.data?.infrastructures?.length > 0
       case 'aicomponents':
         return result.data?.aiComponents?.length > 0
+      case 'visions':
+        return result.data?.geaVisions?.length > 0
+      case 'missions':
+        return result.data?.geaMissions?.length > 0
+      case 'values':
+        return result.data?.geaValues?.length > 0
+      case 'goals':
+        return result.data?.geaGoals?.length > 0
+      case 'strategies':
+        return result.data?.geaStrategies?.length > 0
       default:
         return false
     }
@@ -491,6 +539,56 @@ export const createEntityInput = (entityType: string, row: any): any => {
       }
     }
 
+    case 'visions': {
+      return {
+        name: generateFallbackName('Vision', row),
+        visionStatement: row.visionStatement || row.description || '',
+        timeHorizon: row.timeHorizon || '',
+        year:
+          typeof row.year === 'number' ? row.year : row.year ? parseInt(row.year, 10) : undefined,
+        updatedAt: row.updatedAt ? new Date(row.updatedAt) : new Date(),
+      }
+    }
+
+    case 'missions': {
+      return {
+        name: generateFallbackName('Mission', row),
+        purposeStatement: row.purposeStatement || row.description || '',
+        keywords: Array.isArray(row.keywords)
+          ? row.keywords
+          : typeof row.keywords === 'string' && row.keywords.trim()
+            ? row.keywords.split(',').map((k: string) => k.trim())
+            : undefined,
+        year:
+          typeof row.year === 'number' ? row.year : row.year ? parseInt(row.year, 10) : undefined,
+        updatedAt: row.updatedAt ? new Date(row.updatedAt) : new Date(),
+      }
+    }
+
+    case 'values': {
+      return {
+        name: generateFallbackName('Value', row),
+        valueStatement: row.valueStatement || row.description || '',
+        updatedAt: row.updatedAt ? new Date(row.updatedAt) : new Date(),
+      }
+    }
+
+    case 'goals': {
+      return {
+        name: generateFallbackName('Goal', row),
+        goalStatement: row.goalStatement || row.description || '',
+        updatedAt: row.updatedAt ? new Date(row.updatedAt) : new Date(),
+      }
+    }
+
+    case 'strategies': {
+      return {
+        name: generateFallbackName('Strategy', row),
+        description: row.description || '',
+        updatedAt: row.updatedAt ? new Date(row.updatedAt) : new Date(),
+      }
+    }
+
     default:
       throw new Error(`Unsupported entity type: ${entityType}`)
   }
@@ -504,36 +602,67 @@ export const mapRelationshipValues = (
 ): any => {
   const updatedRow = { ...row }
   const relationshipFields = getRelationshipFields(entityType)
+  const geaEntityTypes = new Set(['visions', 'missions', 'values', 'goals', 'strategies'])
 
   relationshipFields.forEach(field => {
     if (row[field]) {
-      let originalIds: string[] = []
+      let relationshipItems: Array<{ id: string; score?: number }> = []
 
       // Handle different formats of relationship data
       if (Array.isArray(row[field])) {
         // JSON format: Array of objects with id property
-        originalIds = row[field]
-          .map((item: any) => {
+        relationshipItems = row[field].reduce<Array<{ id: string; score?: number }>>(
+          (acc, item: any) => {
             if (typeof item === 'string') {
-              return item
+              const [itemId, itemScore] = item.split(':')
+              const parsedScore = Number(itemScore)
+              acc.push({
+                id: itemId,
+                score: Number.isFinite(parsedScore) ? parsedScore : undefined,
+              })
             } else if (typeof item === 'object' && item.id) {
-              return item.id
+              const directScore = item.score
+              const nestedScore = item.properties?.score
+              const parsedScore = Number(directScore ?? nestedScore)
+              acc.push({
+                id: item.id,
+                score: Number.isFinite(parsedScore) ? parsedScore : undefined,
+              })
             }
-            return null
-          })
-          .filter((id: string | null) => id !== null)
+            return acc
+          },
+          []
+        )
       } else if (typeof row[field] === 'string') {
         // Excel format: comma-separated string
-        originalIds = parseRelationshipIds(row[field])
+        relationshipItems = parseRelationshipIds(row[field]).map(item => {
+          const [itemId, itemScore] = item.split(':')
+          const parsedScore = Number(itemScore)
+          return {
+            id: itemId,
+            score: Number.isFinite(parsedScore) ? parsedScore : undefined,
+          }
+        })
       } else if (typeof row[field] === 'object' && row[field].id) {
         // Single object with id
-        originalIds = [row[field].id]
+        const parsedScore = Number(row[field].score ?? row[field].properties?.score)
+        relationshipItems = [
+          {
+            id: row[field].id,
+            score: Number.isFinite(parsedScore) ? parsedScore : undefined,
+          },
+        ]
       }
 
-      if (originalIds.length > 0) {
-        const mappedIds = originalIds
-          .map(originalId => {
-            const mappedId = allEntityMappings[originalId] || originalId
+      if (relationshipItems.length > 0) {
+        const mappedIds = relationshipItems
+          .map(item => {
+            const mappedId = allEntityMappings[item.id] || item.id
+
+            if (geaEntityTypes.has(entityType) && typeof item.score === 'number') {
+              return `${mappedId}:${item.score}`
+            }
+
             return mappedId
           })
           .filter(id => id)

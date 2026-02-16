@@ -285,6 +285,51 @@ export const createEntityInputFromJson = (entityType: string, row: any): any => 
         updatedAt: row.updatedAt ? new Date(row.updatedAt) : undefined,
       }
 
+    case 'visions':
+      return {
+        name: generateFallbackName('Vision', row),
+        visionStatement: row.visionStatement || row.description || '',
+        timeHorizon: row.timeHorizon || '',
+        year:
+          typeof row.year === 'number' ? row.year : row.year ? parseInt(row.year, 10) : undefined,
+        updatedAt: row.updatedAt ? new Date(row.updatedAt) : new Date(),
+      }
+
+    case 'missions':
+      return {
+        name: generateFallbackName('Mission', row),
+        purposeStatement: row.purposeStatement || row.description || '',
+        keywords: Array.isArray(row.keywords)
+          ? row.keywords
+          : typeof row.keywords === 'string' && row.keywords.trim()
+            ? row.keywords.split(',').map((k: string) => k.trim())
+            : undefined,
+        year:
+          typeof row.year === 'number' ? row.year : row.year ? parseInt(row.year, 10) : undefined,
+        updatedAt: row.updatedAt ? new Date(row.updatedAt) : new Date(),
+      }
+
+    case 'values':
+      return {
+        name: generateFallbackName('Value', row),
+        valueStatement: row.valueStatement || row.description || '',
+        updatedAt: row.updatedAt ? new Date(row.updatedAt) : new Date(),
+      }
+
+    case 'goals':
+      return {
+        name: generateFallbackName('Goal', row),
+        goalStatement: row.goalStatement || row.description || '',
+        updatedAt: row.updatedAt ? new Date(row.updatedAt) : new Date(),
+      }
+
+    case 'strategies':
+      return {
+        name: generateFallbackName('Strategy', row),
+        description: row.description || '',
+        updatedAt: row.updatedAt ? new Date(row.updatedAt) : new Date(),
+      }
+
     default:
       return baseInput
   }
@@ -347,6 +392,11 @@ export const generateFallbackNameForJson = (
     diagrams: ['type', 'version', 'description'],
     architecturePrinciples: ['category', 'priority', 'description'],
     infrastructures: ['type', 'technology', 'location'],
+    visions: ['visionStatement', 'timeHorizon', 'description'],
+    missions: ['purposeStatement', 'keywords', 'description'],
+    values: ['valueStatement', 'description'],
+    goals: ['goalStatement', 'description'],
+    strategies: ['description'],
   }
 
   const fallbackFields = fallbacks[entityType] || ['description']
@@ -515,6 +565,11 @@ export const validateJsonEntityStructure = (
     diagrams: ['id', 'name'],
     architecturePrinciples: ['id', 'name'],
     infrastructures: ['id', 'name'],
+    visions: ['id', 'name'],
+    missions: ['id', 'name'],
+    values: ['id', 'name'],
+    goals: ['id', 'name'],
+    strategies: ['id', 'name'],
   }
 
   const required = requiredFields[entityType] || ['id', 'name']

@@ -12,6 +12,11 @@ export const entityTypeLabels: Record<EntityType, string> = {
   architecturePrinciples: 'Architekturprinzipien',
   infrastructures: 'Infrastruktur',
   aicomponents: 'AI Components',
+  visions: 'Visionen',
+  missions: 'Missionen',
+  values: 'Werte',
+  goals: 'Ziele',
+  strategies: 'Strategien',
   all: 'Alle Daten',
 }
 
@@ -28,6 +33,11 @@ export const entityTypeMapping: Record<string, string> = {
   Infrastructure: 'infrastructures',
   Infrastructures: 'infrastructures', // Support both singular and plural
   'AI Components': 'aicomponents',
+  Visions: 'visions',
+  Missions: 'missions',
+  Values: 'values',
+  Goals: 'goals',
+  Strategies: 'strategies',
 }
 
 // Umkehrung für Export-Tab-Namen
@@ -42,10 +52,15 @@ export const reverseEntityTypeMapping: Record<string, string> = {
   diagrams: 'Diagrams',
   infrastructures: 'Infrastructure',
   aicomponents: 'AI Components',
+  visions: 'Visions',
+  missions: 'Missions',
+  values: 'Values',
+  goals: 'Goals',
+  strategies: 'Strategies',
 }
 
 // Reihenfolge der Entity Types wie im Hauptmenü
-export const entityTypeOrder: EntityType[] = [
+const coreEntityTypeOrder: EntityType[] = [
   'businessCapabilities',
   'applications',
   'aicomponents',
@@ -57,6 +72,23 @@ export const entityTypeOrder: EntityType[] = [
   'architectures',
   'architecturePrinciples',
 ]
+
+export const geaEntityTypeOrder: EntityType[] = [
+  'visions',
+  'missions',
+  'values',
+  'goals',
+  'strategies',
+]
+
+export const entityTypeOrder: EntityType[] = [...coreEntityTypeOrder]
+
+const geaEntityTypeSet = new Set<EntityType>(geaEntityTypeOrder)
+
+export const isGeaEntityType = (entityType: EntityType): boolean => geaEntityTypeSet.has(entityType)
+
+export const getEntityTypeOrder = (isGeaEnabled: boolean): EntityType[] =>
+  isGeaEnabled ? [...coreEntityTypeOrder, ...geaEntityTypeOrder] : coreEntityTypeOrder
 
 // Format-Optionen
 export const formatOptions = {

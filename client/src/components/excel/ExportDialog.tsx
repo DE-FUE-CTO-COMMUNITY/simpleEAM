@@ -13,7 +13,7 @@ import Grid from '@mui/material/Grid'
 import { Info as InfoIcon } from '@mui/icons-material'
 import { useTranslations } from 'next-intl'
 
-import { ExportSettings } from './types'
+import { EntityType, ExportSettings } from './types'
 import { useCompanyContext } from '@/contexts/CompanyContext'
 import { entityTypeLabels, entityTypeOrder } from './constants'
 
@@ -21,12 +21,14 @@ interface ExportDialogProps {
   exportSettings: ExportSettings
   onEntityTypeChange: (entityType: string) => void
   onFormatChange: (format: string) => void
+  availableEntityTypes?: readonly EntityType[]
 }
 
 const ExportDialog: React.FC<ExportDialogProps> = ({
   exportSettings,
   onEntityTypeChange,
   onFormatChange,
+  availableEntityTypes = entityTypeOrder,
 }) => {
   const t = useTranslations('importExport.export')
   const tEntityTypes = useTranslations('importExport.entityTypes')
@@ -59,7 +61,7 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
                     label={t('dataType')}
                     onChange={e => onEntityTypeChange(e.target.value)}
                   >
-                    {entityTypeOrder.map(entityType => (
+                    {availableEntityTypes.map(entityType => (
                       <MenuItem key={entityType} value={entityType}>
                         {tEntityTypes(entityType as keyof typeof entityTypeLabels) || entityType}
                       </MenuItem>
@@ -346,6 +348,73 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
                       'hostedOn',
                       'partOfArchitectures',
                       'implementsPrinciples',
+                      'depictedInDiagrams',
+                      'createdAt',
+                      'updatedAt',
+                    ],
+                    visions: [
+                      'id',
+                      'name',
+                      'visionStatement',
+                      'timeHorizon',
+                      'year',
+                      'owners',
+                      'supportsMissions',
+                      'supportedByGoals',
+                      'supportedByValues',
+                      'partOfArchitectures',
+                      'depictedInDiagrams',
+                      'createdAt',
+                      'updatedAt',
+                    ],
+                    missions: [
+                      'id',
+                      'name',
+                      'purposeStatement',
+                      'keywords',
+                      'year',
+                      'owners',
+                      'supportedByVisions',
+                      'supportedByValues',
+                      'supportedByGoals',
+                      'partOfArchitectures',
+                      'depictedInDiagrams',
+                      'createdAt',
+                      'updatedAt',
+                    ],
+                    values: [
+                      'id',
+                      'name',
+                      'valueStatement',
+                      'owners',
+                      'supportsMissions',
+                      'supportsVisions',
+                      'partOfArchitectures',
+                      'depictedInDiagrams',
+                      'createdAt',
+                      'updatedAt',
+                    ],
+                    goals: [
+                      'id',
+                      'name',
+                      'goalStatement',
+                      'owners',
+                      'operationalizesVisions',
+                      'supportsMissions',
+                      'supportsValues',
+                      'achievedByStrategies',
+                      'partOfArchitectures',
+                      'depictedInDiagrams',
+                      'createdAt',
+                      'updatedAt',
+                    ],
+                    strategies: [
+                      'id',
+                      'name',
+                      'description',
+                      'owners',
+                      'achievesGoals',
+                      'partOfArchitectures',
                       'depictedInDiagrams',
                       'createdAt',
                       'updatedAt',

@@ -581,6 +581,11 @@ export const downloadTemplateWithRealFields = async (
     | 'architecturePrinciples'
     | 'infrastructures'
     | 'aicomponents'
+    | 'visions'
+    | 'missions'
+    | 'values'
+    | 'goals'
+    | 'strategies'
     | 'all'
 ): Promise<void> => {
   // Dynamischen Import für ES-Module-Kompatibilität verwenden
@@ -595,6 +600,11 @@ export const downloadTemplateWithRealFields = async (
     getArchitecturesTemplate,
     getArchitecturePrinciplesTemplate,
     getInfrastructuresTemplate,
+    getVisionsTemplate,
+    getMissionsTemplate,
+    getValuesTemplate,
+    getGoalsTemplate,
+    getStrategiesTemplate,
     // getDiagramsTemplate, - Ausgeblendet für Excel-Export
   } = moduleImport
 
@@ -609,6 +619,11 @@ export const downloadTemplateWithRealFields = async (
       Architectures: [getArchitecturesTemplate()],
       'Architecture Principles': [getArchitecturePrinciplesTemplate()],
       Infrastructures: [getInfrastructuresTemplate()],
+      Visions: [getVisionsTemplate()],
+      Missions: [getMissionsTemplate()],
+      Values: [getValuesTemplate()],
+      Goals: [getGoalsTemplate()],
+      Strategies: [getStrategiesTemplate()],
       // Diagrams: [getDiagramsTemplate()], - Ausgeblendet für Excel (zu große JSON-Daten)
     }
 
@@ -663,6 +678,11 @@ export const downloadTemplateWithRealFields = async (
     architecturePrinciples: 'Architecture Principles',
     infrastructures: 'Infrastructures',
     aicomponents: 'AI Components',
+    visions: 'Visions',
+    missions: 'Missions',
+    values: 'Values',
+    goals: 'Goals',
+    strategies: 'Strategies',
   }
 
   await exportToExcel([template], {

@@ -21,6 +21,7 @@ import { useTranslations } from 'next-intl'
 import { clearDiagramStorage } from '../diagrams/utils/DiagramStorageUtils'
 import { isAdmin } from '@/lib/auth'
 import { useCompanyContext } from '@/contexts/CompanyContext'
+import { useFeatureFlags } from '@/lib/feature-flags'
 
 // Import der Tab-Komponenten
 import ImportDialog from './ImportDialog'
@@ -31,9 +32,12 @@ import ManagementDialog from './ManagementDialog'
 import { ImportSettings, ExportSettings, DeleteSettings, ValidationResult } from './types'
 import {
   entityTypeLabels,
+  entityTypeMapping,
   defaultImportSettings,
   defaultExportSettings,
   defaultDeleteSettings,
+  getEntityTypeOrder,
+  isGeaEntityType,
 } from './constants'
 import {
   handleMultiTabImport,
@@ -65,6 +69,9 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
   const tCommon = useTranslations('common')
   const tEntityTypes = useTranslations('importExport.entityTypes')
   const { selectedCompanyId } = useCompanyContext()
+  const { featureFlags } = useFeatureFlags()
+  const isGeaEnabled = featureFlags.GEA
+  const availableEntityTypes = React.useMemo(() => getEntityTypeOrder(isGeaEnabled), [isGeaEnabled])
 
   // State Management
   const [currentTab, setCurrentTab] = useState<'import' | 'export' | 'management'>(defaultTab)
@@ -133,20 +140,11 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
         let totalErrors = 0
 
         Object.entries(allData).forEach(([tabName, tabData]) => {
-          const entityTypeMapping: { [key: string]: string } = {
-            'Business Capabilities': 'businessCapabilities',
-            Applications: 'applications',
-            'Data Objects': 'dataObjects',
-            Interfaces: 'interfaces',
-            Persons: 'persons',
-            Architectures: 'architectures',
-            'Architecture Principles': 'architecturePrinciples',
-            Diagrams: 'diagrams',
-            Infrastructures: 'infrastructures',
-            Infrastructure: 'infrastructures', // Fallback for singular form
+          const entityType = entityTypeMapping[tabName]
+          if (entityType && !isGeaEnabled && isGeaEntityType(entityType as any)) {
+            return
           }
 
-          const entityType = entityTypeMapping[tabName]
           if (entityType && Array.isArray(tabData) && tabData.length > 0) {
             // Verwende JSON-spezifische Validierung für JSON-Format
             if (importSettings.format === 'json') {
@@ -244,6 +242,7 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
           apolloClient,
           selectedFile,
           importSettings.format,
+          isGeaEnabled,
           progress => {
             setImportProgress(progress)
           },
@@ -337,6 +336,7 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
         apolloClient,
         exportSettings.entityType,
         exportSettings.format,
+        isGeaEnabled,
         selectedCompanyId ?? undefined
       )
       enqueueSnackbar(
@@ -548,6 +548,7 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
             onFileUpload={handleFileUpload}
             onEntityTypeChange={handleEntityTypeChange}
             onFormatChange={handleFormatChange}
+            availableEntityTypes={availableEntityTypes}
           />
         )}
 
@@ -556,6 +557,7 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
             exportSettings={exportSettings}
             onEntityTypeChange={handleExportEntityTypeChange}
             onFormatChange={handleExportFormatChange}
+            availableEntityTypes={availableEntityTypes}
           />
         )}
 

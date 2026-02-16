@@ -15,7 +15,7 @@ import Grid from '@mui/material/Grid'
 import { Upload as UploadIcon, Warning as WarningIcon, Info as InfoIcon } from '@mui/icons-material'
 import { useTranslations } from 'next-intl'
 
-import { ImportSettings, ValidationResult } from './types'
+import { EntityType, ImportSettings, ValidationResult } from './types'
 import { entityTypeLabels, entityTypeOrder, isFormatLocked, updateModeOptions } from './constants'
 
 interface ImportDialogProps {
@@ -29,6 +29,7 @@ interface ImportDialogProps {
   onFileUpload: (event: React.ChangeEvent<HTMLInputElement>) => void
   onEntityTypeChange: (entityType: string) => void
   onFormatChange: (format: string) => void
+  availableEntityTypes?: readonly EntityType[]
 }
 
 const ImportDialog: React.FC<ImportDialogProps> = ({
@@ -42,6 +43,7 @@ const ImportDialog: React.FC<ImportDialogProps> = ({
   onFileUpload,
   onEntityTypeChange,
   onFormatChange,
+  availableEntityTypes = entityTypeOrder,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const t = useTranslations('importExport.import')
@@ -67,7 +69,7 @@ const ImportDialog: React.FC<ImportDialogProps> = ({
                     label={t('dataType')}
                     onChange={e => onEntityTypeChange(e.target.value)}
                   >
-                    {entityTypeOrder.map(entityType => (
+                    {availableEntityTypes.map(entityType => (
                       <MenuItem key={entityType} value={entityType}>
                         {tEntityTypes(entityType as keyof typeof entityTypeLabels) || entityType}
                       </MenuItem>
