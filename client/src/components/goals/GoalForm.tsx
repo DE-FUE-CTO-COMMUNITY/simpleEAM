@@ -11,13 +11,21 @@ import { GET_DIAGRAMS } from '@/graphql/diagram'
 import { GET_VISIONS } from '@/graphql/vision'
 import { GET_VALUES } from '@/graphql/value'
 import { GET_STRATEGIES } from '@/graphql/strategy'
+import { GET_MISSIONS } from '@/graphql/mission'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import { useCurrentPerson } from '@/hooks/useCurrentPerson'
 import { useChipClickHandlers } from '@/hooks/useChipClickHandlers'
 import { isArchitect } from '@/lib/auth'
 import GenericForm, { FieldConfig, TabConfig, SelectOption } from '../common/GenericForm'
 import { GenericFormProps } from '../common/GenericFormProps'
-import { Gea_Goal, Architecture, Gea_Vision, Gea_Value, Gea_Strategy } from '../../gql/generated'
+import {
+  Gea_Goal,
+  Architecture,
+  Gea_Vision,
+  Gea_Value,
+  Gea_Strategy,
+  Gea_Mission,
+} from '../../gql/generated'
 import ArchitectureForm from '../architectures/ArchitectureForm'
 
 const createGoalSchema = (t: any) =>
@@ -29,6 +37,7 @@ const createGoalSchema = (t: any) =>
       .max(1000, t('validation.goalStatementMax')),
     ownerId: z.string().optional(),
     operationalizesVisions: z.array(z.string()).optional(),
+    supportsMissions: z.array(z.string()).optional(),
     supportsValues: z.array(z.string()).optional(),
     achievedByStrategies: z.array(z.string()).optional(),
     partOfArchitectures: z.array(z.string()).optional(),
@@ -108,6 +117,10 @@ const GoalForm: React.FC<GenericFormProps<Gea_Goal, GoalFormValues>> = ({
     variables: { where: companyWhere },
   })
 
+  const { data: missionsData, loading: missionsLoading } = useQuery(GET_MISSIONS, {
+    variables: { where: companyWhere },
+  })
+
   const { data: strategiesData, loading: strategiesLoading } = useQuery(GET_STRATEGIES, {
     variables: { where: companyWhere },
   })
@@ -127,6 +140,7 @@ const GoalForm: React.FC<GenericFormProps<Gea_Goal, GoalFormValues>> = ({
       goalStatement: goal?.goalStatement || '',
       ownerId: goal?.owners && goal.owners.length > 0 ? goal.owners[0].id : currentPerson?.id,
       operationalizesVisions: goal?.operationalizesVisions?.map(vision => vision.id) || [],
+      supportsMissions: goal?.supportsMissions?.map(mission => mission.id) || [],
       supportsValues: goal?.supportsValues?.map(value => value.id) || [],
       achievedByStrategies: goal?.achievedByStrategies?.map(strategy => strategy.id) || [],
       partOfArchitectures: goal?.partOfArchitectures?.map(arch => arch.id) || [],
@@ -163,6 +177,7 @@ const GoalForm: React.FC<GenericFormProps<Gea_Goal, GoalFormValues>> = ({
         goalStatement: goal?.goalStatement || '',
         ownerId: goal?.owners && goal.owners.length > 0 ? goal.owners[0].id : currentPerson?.id,
         operationalizesVisions: goal?.operationalizesVisions?.map(vision => vision.id) || [],
+        supportsMissions: goal?.supportsMissions?.map(mission => mission.id) || [],
         supportsValues: goal?.supportsValues?.map(value => value.id) || [],
         achievedByStrategies: goal?.achievedByStrategies?.map(strategy => strategy.id) || [],
         partOfArchitectures: goal?.partOfArchitectures?.map(arch => arch.id) || [],
@@ -229,6 +244,38 @@ const GoalForm: React.FC<GenericFormProps<Gea_Goal, GoalFormValues>> = ({
             (vision: Gea_Vision) => vision.id === option
           )
           return matchingVision?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
+    },
+    {
+      name: 'supportsMissions',
+      label: tForm('supportsMissions'),
+      type: 'autocomplete',
+      multiple: true,
+      options:
+        missionsData?.geaMissions?.map(
+          (mission: Gea_Mission): SelectOption => ({
+            value: mission.id,
+            label: mission.name,
+          })
+        ) || [],
+      loadingOptions: missionsLoading,
+      size: 12,
+      tabId: 'relationships',
+      onChipClick: createChipClickHandler('supportsMissions'),
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          const matchingMission = missionsData?.geaMissions?.find(
+            (mission: Gea_Mission) => mission.id === option
+          )
+          return matchingMission?.name || option
         }
         return option?.label || ''
       },

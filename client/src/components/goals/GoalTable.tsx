@@ -14,6 +14,7 @@ export const GOAL_DEFAULT_COLUMN_VISIBILITY = {
   name: true,
   owners: true,
   operationalizesVisions: false,
+  supportsMissions: false,
   supportsValues: false,
   achievedByStrategies: false,
   partOfArchitectures: true,
@@ -107,6 +108,16 @@ const GoalTable: React.FC<GoalTableProps> = ({
         },
         enableHiding: true,
       }),
+      columnHelper.accessor('supportsMissions', {
+        header: t('supportsMissions'),
+        cell: info => {
+          const missions = info.getValue()
+          return missions && missions.length > 0
+            ? missions.map(mission => mission.name).join(', ')
+            : '-'
+        },
+        enableHiding: true,
+      }),
       columnHelper.accessor('supportsValues', {
         header: t('supportsValues'),
         cell: info => {
@@ -168,6 +179,7 @@ const GoalTable: React.FC<GoalTableProps> = ({
     goalStatement: goal.goalStatement ?? '',
     ownerId: goal.owners?.[0]?.id ?? '',
     operationalizesVisions: goal.operationalizesVisions?.map(vision => vision.id) ?? [],
+    supportsMissions: goal.supportsMissions?.map(mission => mission.id) ?? [],
     supportsValues: goal.supportsValues?.map(value => value.id) ?? [],
     achievedByStrategies: goal.achievedByStrategies?.map(strategy => strategy.id) ?? [],
     partOfArchitectures: goal.partOfArchitectures?.map(arch => arch.id) ?? [],

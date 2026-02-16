@@ -126,6 +126,7 @@ const ValuesPage = () => {
         ? {
             supportsMissions: {
               connect: data.supportsMissions.map(id => ({
+                edge: { score: 0 },
                 where: { node: { id: { eq: id } } },
               })),
             },
@@ -135,6 +136,7 @@ const ValuesPage = () => {
         ? {
             supportsVisions: {
               connect: data.supportsVisions.map(id => ({
+                edge: { score: 0 },
                 where: { node: { id: { eq: id } } },
               })),
             },
@@ -197,6 +199,7 @@ const ValuesPage = () => {
       input.supportsMissions = {
         disconnect: [{ where: {} }],
         connect: data.supportsMissions.map(id => ({
+          edge: { score: 0 },
           where: { node: { id: { eq: id } } },
         })),
       }
@@ -210,6 +213,7 @@ const ValuesPage = () => {
       input.supportsVisions = {
         disconnect: [{ where: {} }],
         connect: data.supportsVisions.map(id => ({
+          edge: { score: 0 },
           where: { node: { id: { eq: id } } },
         })),
       }

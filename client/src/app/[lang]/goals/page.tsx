@@ -126,6 +126,17 @@ const GoalsPage = () => {
         ? {
             operationalizesVisions: {
               connect: data.operationalizesVisions.map(id => ({
+                edge: { score: 0 },
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }
+        : {}),
+      ...(data.supportsMissions && data.supportsMissions.length > 0
+        ? {
+            supportsMissions: {
+              connect: data.supportsMissions.map(id => ({
+                edge: { score: 0 },
                 where: { node: { id: { eq: id } } },
               })),
             },
@@ -135,6 +146,7 @@ const GoalsPage = () => {
         ? {
             supportsValues: {
               connect: data.supportsValues.map(id => ({
+                edge: { score: 0 },
                 where: { node: { id: { eq: id } } },
               })),
             },
@@ -144,6 +156,7 @@ const GoalsPage = () => {
         ? {
             achievedByStrategies: {
               connect: data.achievedByStrategies.map(id => ({
+                edge: { score: 0 },
                 where: { node: { id: { eq: id } } },
               })),
             },
@@ -206,6 +219,7 @@ const GoalsPage = () => {
       input.operationalizesVisions = {
         disconnect: [{ where: {} }],
         connect: data.operationalizesVisions.map(id => ({
+          edge: { score: 0 },
           where: { node: { id: { eq: id } } },
         })),
       }
@@ -215,10 +229,25 @@ const GoalsPage = () => {
       }
     }
 
+    if (data.supportsMissions && data.supportsMissions.length > 0) {
+      input.supportsMissions = {
+        disconnect: [{ where: {} }],
+        connect: data.supportsMissions.map(id => ({
+          edge: { score: 0 },
+          where: { node: { id: { eq: id } } },
+        })),
+      }
+    } else {
+      input.supportsMissions = {
+        disconnect: [{ where: {} }],
+      }
+    }
+
     if (data.supportsValues && data.supportsValues.length > 0) {
       input.supportsValues = {
         disconnect: [{ where: {} }],
         connect: data.supportsValues.map(id => ({
+          edge: { score: 0 },
           where: { node: { id: { eq: id } } },
         })),
       }
@@ -232,6 +261,7 @@ const GoalsPage = () => {
       input.achievedByStrategies = {
         disconnect: [{ where: {} }],
         connect: data.achievedByStrategies.map(id => ({
+          edge: { score: 0 },
           where: { node: { id: { eq: id } } },
         })),
       }

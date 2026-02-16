@@ -21,6 +21,10 @@ export const GET_GOALS = gql`
         id
         name
       }
+      supportsMissions {
+        id
+        name
+      }
       supportsValues {
         id
         name

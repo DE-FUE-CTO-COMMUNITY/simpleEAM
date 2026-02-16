@@ -10,13 +10,14 @@ import { GET_ARCHITECTURES } from '@/graphql/architecture'
 import { GET_DIAGRAMS } from '@/graphql/diagram'
 import { GET_VISIONS } from '@/graphql/vision'
 import { GET_VALUES } from '@/graphql/value'
+import { GET_GOALS } from '@/graphql/goal'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import { useCurrentPerson } from '@/hooks/useCurrentPerson'
 import { useChipClickHandlers } from '@/hooks/useChipClickHandlers'
 import { isArchitect } from '@/lib/auth'
 import GenericForm, { FieldConfig, TabConfig, SelectOption } from '../common/GenericForm'
 import { GenericFormProps } from '../common/GenericFormProps'
-import { Gea_Mission, Architecture, Gea_Vision, Gea_Value } from '../../gql/generated'
+import { Gea_Mission, Architecture, Gea_Vision, Gea_Value, Gea_Goal } from '../../gql/generated'
 import ArchitectureForm from '../architectures/ArchitectureForm'
 
 const createMissionSchema = (t: any) =>
@@ -31,6 +32,7 @@ const createMissionSchema = (t: any) =>
     ownerId: z.string().optional(),
     supportedByVisions: z.array(z.string()).optional(),
     supportedByValues: z.array(z.string()).optional(),
+    supportedByGoals: z.array(z.string()).optional(),
     partOfArchitectures: z.array(z.string()).optional(),
     depictedInDiagrams: z.array(z.string()).optional(),
   })
@@ -108,6 +110,10 @@ const MissionForm: React.FC<GenericFormProps<Gea_Mission, MissionFormValues>> = 
     variables: { where: companyWhere },
   })
 
+  const { data: goalsData, loading: goalsLoading } = useQuery(GET_GOALS, {
+    variables: { where: companyWhere },
+  })
+
   const { data: nestedArchitectureData } = useQuery(GET_ARCHITECTURES, {
     variables: {
       where: { id: { eq: nestedFormState.entityId }, ...companyWhere },
@@ -127,6 +133,7 @@ const MissionForm: React.FC<GenericFormProps<Gea_Mission, MissionFormValues>> = 
         mission?.owners && mission.owners.length > 0 ? mission.owners[0].id : currentPerson?.id,
       supportedByVisions: mission?.supportedByVisions?.map(vision => vision.id) || [],
       supportedByValues: mission?.supportedByValues?.map(value => value.id) || [],
+      supportedByGoals: mission?.supportedByGoals?.map(goal => goal.id) || [],
       partOfArchitectures: mission?.partOfArchitectures?.map(arch => arch.id) || [],
       depictedInDiagrams: mission?.depictedInDiagrams?.map(diag => diag.id) || [],
     }),
@@ -165,6 +172,7 @@ const MissionForm: React.FC<GenericFormProps<Gea_Mission, MissionFormValues>> = 
           mission?.owners && mission.owners.length > 0 ? mission.owners[0].id : currentPerson?.id,
         supportedByVisions: mission?.supportedByVisions?.map(vision => vision.id) || [],
         supportedByValues: mission?.supportedByValues?.map(value => value.id) || [],
+        supportedByGoals: mission?.supportedByGoals?.map(goal => goal.id) || [],
         partOfArchitectures: mission?.partOfArchitectures?.map(arch => arch.id) || [],
         depictedInDiagrams: mission?.depictedInDiagrams?.map(diag => diag.id) || [],
       })
@@ -280,6 +288,36 @@ const MissionForm: React.FC<GenericFormProps<Gea_Mission, MissionFormValues>> = 
             (value: Gea_Value) => value.id === option
           )
           return matchingValue?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
+    },
+    {
+      name: 'supportedByGoals',
+      label: tForm('supportedByGoals'),
+      type: 'autocomplete',
+      multiple: true,
+      options:
+        goalsData?.geaGoals?.map(
+          (goal: Gea_Goal): SelectOption => ({
+            value: goal.id,
+            label: goal.name,
+          })
+        ) || [],
+      loadingOptions: goalsLoading,
+      size: 12,
+      tabId: 'relationships',
+      onChipClick: createChipClickHandler('supportedByGoals'),
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          const matchingGoal = goalsData?.geaGoals?.find((goal: Gea_Goal) => goal.id === option)
+          return matchingGoal?.name || option
         }
         return option?.label || ''
       },

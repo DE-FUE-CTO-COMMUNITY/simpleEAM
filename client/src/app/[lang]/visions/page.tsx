@@ -129,6 +129,7 @@ const VisionsPage = () => {
         ? {
             supportsMissions: {
               connect: data.supportsMissions.map(id => ({
+                edge: { score: 0 },
                 where: { node: { id: { eq: id } } },
               })),
             },
@@ -138,6 +139,7 @@ const VisionsPage = () => {
         ? {
             supportedByValues: {
               connect: data.supportedByValues.map(id => ({
+                edge: { score: 0 },
                 where: { node: { id: { eq: id } } },
               })),
             },
@@ -147,6 +149,7 @@ const VisionsPage = () => {
         ? {
             supportedByGoals: {
               connect: data.supportedByGoals.map(id => ({
+                edge: { score: 0 },
                 where: { node: { id: { eq: id } } },
               })),
             },
@@ -211,6 +214,7 @@ const VisionsPage = () => {
       input.supportsMissions = {
         disconnect: [{ where: {} }],
         connect: data.supportsMissions.map(id => ({
+          edge: { score: 0 },
           where: { node: { id: { eq: id } } },
         })),
       }
@@ -224,6 +228,7 @@ const VisionsPage = () => {
       input.supportedByValues = {
         disconnect: [{ where: {} }],
         connect: data.supportedByValues.map(id => ({
+          edge: { score: 0 },
           where: { node: { id: { eq: id } } },
         })),
       }
@@ -237,6 +242,7 @@ const VisionsPage = () => {
       input.supportedByGoals = {
         disconnect: [{ where: {} }],
         connect: data.supportedByGoals.map(id => ({
+          edge: { score: 0 },
           where: { node: { id: { eq: id } } },
         })),
       }

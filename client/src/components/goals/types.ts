@@ -8,6 +8,7 @@ export type GoalType = Pick<
   | 'owners'
   | 'company'
   | 'operationalizesVisions'
+  | 'supportsMissions'
   | 'supportsValues'
   | 'achievedByStrategies'
   | 'partOfArchitectures'

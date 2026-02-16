@@ -16,6 +16,7 @@ export const MISSION_DEFAULT_COLUMN_VISIBILITY = {
   owners: true,
   supportedByVisions: false,
   supportedByValues: false,
+  supportedByGoals: false,
   partOfArchitectures: true,
   depictedInDiagrams: true,
   purposeStatement: false,
@@ -128,6 +129,14 @@ const MissionTable: React.FC<MissionTableProps> = ({
         },
         enableHiding: true,
       }),
+      columnHelper.accessor('supportedByGoals', {
+        header: t('supportedByGoals'),
+        cell: info => {
+          const goals = info.getValue()
+          return goals && goals.length > 0 ? goals.map(goal => goal.name).join(', ') : '-'
+        },
+        enableHiding: true,
+      }),
       columnHelper.accessor('partOfArchitectures', {
         header: t('partOfArchitectures'),
         cell: info => {
@@ -174,6 +183,7 @@ const MissionTable: React.FC<MissionTableProps> = ({
     ownerId: mission.owners?.[0]?.id ?? '',
     supportedByVisions: mission.supportedByVisions?.map(vision => vision.id) ?? [],
     supportedByValues: mission.supportedByValues?.map(value => value.id) ?? [],
+    supportedByGoals: mission.supportedByGoals?.map(goal => goal.id) ?? [],
     partOfArchitectures: mission.partOfArchitectures?.map(arch => arch.id) ?? [],
     depictedInDiagrams: mission.depictedInDiagrams?.map(diagram => diagram.id) ?? [],
   })

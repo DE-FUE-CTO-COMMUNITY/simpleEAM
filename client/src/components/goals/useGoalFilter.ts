@@ -20,9 +20,7 @@ export const useGoalFilter = ({ goals = [] }: UseGoalFilterProps) => {
       if (
         filterState.descriptionFilter &&
         (!goal.goalStatement ||
-          !goal.goalStatement
-            .toLowerCase()
-            .includes(filterState.descriptionFilter.toLowerCase()))
+          !goal.goalStatement.toLowerCase().includes(filterState.descriptionFilter.toLowerCase()))
       ) {
         return false
       }

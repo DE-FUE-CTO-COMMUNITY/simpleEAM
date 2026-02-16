@@ -11,6 +11,7 @@ export type MissionType = Pick<
   | 'company'
   | 'supportedByVisions'
   | 'supportedByValues'
+  | 'supportedByGoals'
   | 'partOfArchitectures'
   | 'depictedInDiagrams'
   | 'createdAt'

@@ -27,6 +27,10 @@ export const GET_MISSIONS = gql`
         id
         name
       }
+      supportedByGoals {
+        id
+        name
+      }
       partOfArchitectures {
         id
         name

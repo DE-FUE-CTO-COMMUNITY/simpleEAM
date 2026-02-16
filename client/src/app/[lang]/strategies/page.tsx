@@ -133,6 +133,7 @@ const StrategiesPage = () => {
         ? {
             achievesGoals: {
               connect: data.achievesGoals.map(id => ({
+                edge: { score: 0 },
                 where: { node: { id: { eq: id } } },
               })),
             },
@@ -221,6 +222,7 @@ const StrategiesPage = () => {
       input.achievesGoals = {
         disconnect: [{ where: {} }],
         connect: data.achievesGoals.map(id => ({
+          edge: { score: 0 },
           where: { node: { id: { eq: id } } },
         })),
       }
