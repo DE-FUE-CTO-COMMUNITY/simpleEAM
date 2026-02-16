@@ -32,6 +32,7 @@ interface ManagementDialogProps {
   onDeleteConfirm: () => void
   onOpenDeleteConfirmDialog: (entityType: string) => void
   onCloseDeleteConfirmDialog: () => void
+  availableEntityTypes?: readonly EntityType[]
 }
 
 const ManagementDialog: React.FC<ManagementDialogProps> = ({
@@ -43,6 +44,7 @@ const ManagementDialog: React.FC<ManagementDialogProps> = ({
   onDeleteConfirm,
   onOpenDeleteConfirmDialog,
   onCloseDeleteConfirmDialog,
+  availableEntityTypes = entityTypeOrder,
 }) => {
   const t = useTranslations('importExport.management')
   const tEntityTypes = useTranslations('importExport.entityTypes')
@@ -73,6 +75,16 @@ const ManagementDialog: React.FC<ManagementDialogProps> = ({
         return tEntityTypes('infrastructures')
       case 'aicomponents':
         return tEntityTypes('aicomponents')
+      case 'visions':
+        return tEntityTypes('visions')
+      case 'missions':
+        return tEntityTypes('missions')
+      case 'values':
+        return tEntityTypes('values')
+      case 'goals':
+        return tEntityTypes('goals')
+      case 'strategies':
+        return tEntityTypes('strategies')
       case 'all':
         return tEntityTypes('all')
       default:
@@ -146,7 +158,7 @@ const ManagementDialog: React.FC<ManagementDialogProps> = ({
                     })
                   }
                 >
-                  {entityTypeOrder
+                  {availableEntityTypes
                     .filter(entityType => entityType !== 'all')
                     .map(entityType => (
                       <MenuItem key={entityType} value={entityType}>

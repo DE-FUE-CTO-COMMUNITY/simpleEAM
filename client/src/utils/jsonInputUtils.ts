@@ -19,6 +19,38 @@ const generateFallbackName = (prefix: string, row: any): string => {
  * WICHTIG: Entfernt id und createdAt, da diese in Create-Input-Typen nicht erlaubt sind
  */
 export const createEntityInputFromJson = (entityType: string, row: any): any => {
+  const toYearDate = (value: unknown): Date | undefined => {
+    if (value === null || value === undefined || value === '') {
+      return undefined
+    }
+
+    if (value instanceof Date) {
+      return value
+    }
+
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return new Date(Date.UTC(Math.trunc(value), 0, 1))
+    }
+
+    if (typeof value === 'string') {
+      const trimmed = value.trim()
+      if (!trimmed) {
+        return undefined
+      }
+
+      if (/^\d{4}$/.test(trimmed)) {
+        return new Date(Date.UTC(parseInt(trimmed, 10), 0, 1))
+      }
+
+      const parsed = new Date(trimmed)
+      if (!Number.isNaN(parsed.getTime())) {
+        return parsed
+      }
+    }
+
+    return undefined
+  }
+
   const baseInput = {
     name: row.name || '',
     description: row.description || '',
@@ -290,8 +322,7 @@ export const createEntityInputFromJson = (entityType: string, row: any): any => 
         name: generateFallbackName('Vision', row),
         visionStatement: row.visionStatement || row.description || '',
         timeHorizon: row.timeHorizon || '',
-        year:
-          typeof row.year === 'number' ? row.year : row.year ? parseInt(row.year, 10) : undefined,
+        year: toYearDate(row.year),
         updatedAt: row.updatedAt ? new Date(row.updatedAt) : new Date(),
       }
 
@@ -304,8 +335,7 @@ export const createEntityInputFromJson = (entityType: string, row: any): any => 
           : typeof row.keywords === 'string' && row.keywords.trim()
             ? row.keywords.split(',').map((k: string) => k.trim())
             : undefined,
-        year:
-          typeof row.year === 'number' ? row.year : row.year ? parseInt(row.year, 10) : undefined,
+        year: toYearDate(row.year),
         updatedAt: row.updatedAt ? new Date(row.updatedAt) : new Date(),
       }
 

@@ -571,6 +571,7 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
             onDeleteConfirm={handleDeleteConfirm}
             onOpenDeleteConfirmDialog={openDeleteConfirmDialog}
             onCloseDeleteConfirmDialog={closeDeleteConfirmDialog}
+            availableEntityTypes={availableEntityTypes}
           />
         )}
       </DialogContent>

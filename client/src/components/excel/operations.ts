@@ -130,7 +130,6 @@ export const importEntityDataWithMapping = async (
             case 'applications':
             case 'dataObjects':
             case 'interfaces':
-            case 'persons':
             case 'architectures':
             case 'diagrams':
             case 'architecturePrinciples':
@@ -142,6 +141,9 @@ export const importEntityDataWithMapping = async (
             case 'goals':
             case 'strategies':
               updateInput = { ...updateInput, company: companyUpdate }
+              break
+            case 'persons':
+              updateInput = { ...updateInput, companies: companyUpdate }
               break
             default:
               break
@@ -168,7 +170,6 @@ export const importEntityDataWithMapping = async (
             case 'applications':
             case 'dataObjects':
             case 'interfaces':
-            case 'persons':
             case 'architectures':
             case 'diagrams':
             case 'architecturePrinciples':
@@ -180,6 +181,9 @@ export const importEntityDataWithMapping = async (
             case 'goals':
             case 'strategies':
               input = { ...input, company: companyConnect }
+              break
+            case 'persons':
+              input = { ...input, companies: companyConnect }
               break
             default:
               break
@@ -654,6 +658,10 @@ export const deleteEntityData = async (
           { architecture: { some: { company: { some: { id: { eq: selectedCompanyId } } } } } },
         ],
       }
+    }
+
+    if (entityType === 'persons') {
+      return { companies: { some: { id: { eq: selectedCompanyId } } } }
     }
 
     // Standard-Behandlung für alle anderen Entitäten
