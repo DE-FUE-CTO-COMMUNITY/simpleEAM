@@ -2760,7 +2760,7 @@
     "matrices": {
       "missionToVision": "Mission to Vision",
       "valueToMissionVision": "Value to Mission & Vision",
-      "goalToMissionVision": "Goal to Mission & Vision",
+      "goalToMissionVision": "Goal to Mission & Vision & Value",
       "goalToStrategy": "Goal to Strategy"
     },
     "axes": {

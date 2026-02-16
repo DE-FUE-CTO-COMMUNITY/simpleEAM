@@ -49,7 +49,7 @@ type MatrixMode = 'missionVision' | 'valueMissionVision' | 'goalMissionVision' |
 type VerticalNode = {
   id: string
   name: string
-  type: 'mission' | 'vision' | 'strategy'
+  type: 'mission' | 'vision' | 'value' | 'strategy'
   statement?: string
 }
 
@@ -200,8 +200,10 @@ const MatrixEditorPage = () => {
   const verticalTypes: AxisEntityType[] =
     mode === 'missionVision'
       ? ['vision']
-      : mode === 'valueMissionVision' || mode === 'goalMissionVision'
+      : mode === 'valueMissionVision'
         ? ['mission', 'vision']
+        : mode === 'goalMissionVision'
+          ? ['mission', 'vision', 'value']
         : ['strategy']
 
   const axisLabel =
@@ -210,7 +212,7 @@ const MatrixEditorPage = () => {
       : mode === 'valueMissionVision'
         ? `${t('axes.missionAndVision')}/${t('axes.value')}`
         : mode === 'goalMissionVision'
-          ? `${t('axes.missionAndVision')}/${t('axes.goal')}`
+          ? `${t('axes.missionAndVision')}/${t('axes.value')}/${t('axes.goal')}`
           : `${t('axes.strategy')}/${t('axes.goal')}`
 
   const entityTypeLabel: Record<AxisEntityType, string> = {
@@ -222,8 +224,8 @@ const MatrixEditorPage = () => {
   }
 
   const verticalButtonTypeLabel =
-    verticalTypes.length === 2
-      ? `${entityTypeLabel[verticalTypes[0]]}/${entityTypeLabel[verticalTypes[1]]}`
+    verticalTypes.length > 1
+      ? verticalTypes.map(type => entityTypeLabel[type]).join('/')
       : entityTypeLabel[verticalTypes[0]]
 
   const horizontalButtonTypeLabel = entityTypeLabel[horizontalType]
@@ -491,6 +493,8 @@ const MatrixEditorPage = () => {
           ? 'supportsMissions'
           : vertical.type === 'vision'
             ? 'operationalizesVisions'
+            : vertical.type === 'value'
+              ? 'supportsValues'
             : 'achievedByStrategies'
 
       const relationInput: Record<string, unknown> = {
@@ -523,15 +527,17 @@ const MatrixEditorPage = () => {
 
   const verticalNodes: VerticalNode[] = React.useMemo(() => {
     if (mode === 'missionVision') {
-      return visions.map((vision: { id: string; name: string; visionStatement?: string | null }) => ({
-        id: vision.id,
-        name: vision.name,
-        type: 'vision' as const,
-        statement: vision.visionStatement ?? undefined,
-      }))
+      return visions.map(
+        (vision: { id: string; name: string; visionStatement?: string | null }) => ({
+          id: vision.id,
+          name: vision.name,
+          type: 'vision' as const,
+          statement: vision.visionStatement ?? undefined,
+        })
+      )
     }
 
-    if (mode === 'valueMissionVision' || mode === 'goalMissionVision') {
+    if (mode === 'valueMissionVision') {
       return [
         ...missions.map(
           (mission: { id: string; name: string; purposeStatement?: string | null }) => ({
@@ -550,13 +556,40 @@ const MatrixEditorPage = () => {
       ]
     }
 
-    return strategies.map((strategy: { id: string; name: string; description?: string | null }) => ({
-      id: strategy.id,
-      name: strategy.name,
-      type: 'strategy' as const,
-      statement: strategy.description ?? undefined,
-    }))
-  }, [mode, missions, visions, strategies])
+    if (mode === 'goalMissionVision') {
+      return [
+        ...missions.map(
+          (mission: { id: string; name: string; purposeStatement?: string | null }) => ({
+            id: mission.id,
+            name: mission.name,
+            type: 'mission' as const,
+            statement: mission.purposeStatement ?? undefined,
+          })
+        ),
+        ...visions.map((vision: { id: string; name: string; visionStatement?: string | null }) => ({
+          id: vision.id,
+          name: vision.name,
+          type: 'vision' as const,
+          statement: vision.visionStatement ?? undefined,
+        })),
+        ...values.map((value: { id: string; name: string; valueStatement?: string | null }) => ({
+          id: value.id,
+          name: value.name,
+          type: 'value' as const,
+          statement: value.valueStatement ?? undefined,
+        })),
+      ]
+    }
+
+    return strategies.map(
+      (strategy: { id: string; name: string; description?: string | null }) => ({
+        id: strategy.id,
+        name: strategy.name,
+        type: 'strategy' as const,
+        statement: strategy.description ?? undefined,
+      })
+    )
+  }, [mode, missions, visions, values, strategies])
 
   const horizontalNodes: HorizontalNode[] = React.useMemo(() => {
     if (mode === 'missionVision') {
@@ -596,7 +629,10 @@ const MatrixEditorPage = () => {
       if (verticalNode.type === 'mission') {
         return getEdgeScore(horizontalNode.supportsMissionsConnection?.edges, verticalNode.id)
       }
-      return getEdgeScore(horizontalNode.operationalizesVisionsConnection?.edges, verticalNode.id)
+      if (verticalNode.type === 'vision') {
+        return getEdgeScore(horizontalNode.operationalizesVisionsConnection?.edges, verticalNode.id)
+      }
+      return getEdgeScore(horizontalNode.supportsValuesConnection?.edges, verticalNode.id)
     }
 
     return getEdgeScore(horizontalNode.achievedByStrategiesConnection?.edges, verticalNode.id)
@@ -796,76 +832,95 @@ const MatrixEditorPage = () => {
                   tableLayout: 'fixed',
                 }}
               >
-              <TableHead>
-                <TableRow>
-                  <TableCell sx={{ minWidth: firstColumnMinWidth, whiteSpace: 'nowrap' }}>
-                    {axisLabel}
-                  </TableCell>
-                  {horizontalNodes.map((item: { id: string; name: string; statement?: string }) => (
-                    <TableCell
-                      key={`horizontal-${item.id}`}
-                      align="center"
-                      sx={{
-                        width: matrixColumnWidth,
-                        minWidth: matrixColumnWidth,
-                        maxWidth: matrixColumnWidth,
-                      }}
-                    >
-                      {item.statement ? (
-                        <Tooltip title={item.statement} arrow placement="top">
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              whiteSpace: 'normal',
-                              wordBreak: 'break-word',
-                              lineHeight: 1.2,
-                              cursor: 'default',
-                            }}
-                          >
-                            {item.name}
-                          </Typography>
-                        </Tooltip>
-                      ) : (
-                        <Typography
-                          variant="body2"
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ minWidth: firstColumnMinWidth, whiteSpace: 'nowrap' }}>
+                      {axisLabel}
+                    </TableCell>
+                    {horizontalNodes.map(
+                      (item: { id: string; name: string; statement?: string }) => (
+                        <TableCell
+                          key={`horizontal-${item.id}`}
+                          align="center"
                           sx={{
-                            whiteSpace: 'normal',
-                            wordBreak: 'break-word',
-                            lineHeight: 1.2,
-                            cursor: 'default',
+                            width: matrixColumnWidth,
+                            minWidth: matrixColumnWidth,
+                            maxWidth: matrixColumnWidth,
                           }}
                         >
-                          {item.name}
-                        </Typography>
-                      )}
-                    </TableCell>
-                  ))}
-                  <TableCell
-                    align="center"
-                    sx={{
-                      width: sumColumnWidth,
-                      minWidth: sumColumnWidth,
-                      maxWidth: sumColumnWidth,
-                      fontWeight: 700,
-                      backgroundColor: 'action.hover',
-                    }}
-                  >
-                    {t('rowSum')}
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-
-              <TableBody>
-                {verticalNodes.map((verticalNode, rowIndex) => (
-                  <TableRow key={`${verticalNode.type}-${verticalNode.id}`}>
+                          {item.statement ? (
+                            <Tooltip title={item.statement} arrow placement="top">
+                              <Typography
+                                variant="body2"
+                                sx={{
+                                  whiteSpace: 'normal',
+                                  wordBreak: 'break-word',
+                                  lineHeight: 1.2,
+                                  cursor: 'default',
+                                }}
+                              >
+                                {item.name}
+                              </Typography>
+                            </Tooltip>
+                          ) : (
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                whiteSpace: 'normal',
+                                wordBreak: 'break-word',
+                                lineHeight: 1.2,
+                                cursor: 'default',
+                              }}
+                            >
+                              {item.name}
+                            </Typography>
+                          )}
+                        </TableCell>
+                      )
+                    )}
                     <TableCell
+                      align="center"
                       sx={{
-                        minWidth: firstColumnMinWidth,
+                        width: sumColumnWidth,
+                        minWidth: sumColumnWidth,
+                        maxWidth: sumColumnWidth,
+                        fontWeight: 700,
+                        backgroundColor: 'action.hover',
                       }}
                     >
-                      <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-                        {verticalNode.statement ? (
-                          <Tooltip title={verticalNode.statement} arrow placement="top-start">
+                      {t('rowSum')}
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+
+                <TableBody>
+                  {verticalNodes.map((verticalNode, rowIndex) => (
+                    <TableRow key={`${verticalNode.type}-${verticalNode.id}`}>
+                      <TableCell
+                        sx={{
+                          minWidth: firstColumnMinWidth,
+                        }}
+                      >
+                        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+                          {verticalNode.statement ? (
+                            <Tooltip title={verticalNode.statement} arrow placement="top-start">
+                              <Typography
+                                variant="body2"
+                                sx={{
+                                  whiteSpace: { xs: 'normal', xl: 'nowrap' },
+                                  wordBreak: 'break-word',
+                                  display: { xs: '-webkit-box', xl: 'block' },
+                                  WebkitLineClamp: { xs: 2, xl: 'unset' },
+                                  WebkitBoxOrient: 'vertical',
+                                  overflow: 'hidden',
+                                  textOverflow: { xs: 'clip', xl: 'ellipsis' },
+                                  cursor: 'default',
+                                }}
+                              >
+                                {verticalNode.name}
+                              </Typography>
+                            </Tooltip>
+                          ) : (
                             <Typography
                               variant="body2"
                               sx={{
@@ -881,78 +936,96 @@ const MatrixEditorPage = () => {
                             >
                               {verticalNode.name}
                             </Typography>
-                          </Tooltip>
-                        ) : (
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              whiteSpace: { xs: 'normal', xl: 'nowrap' },
-                              wordBreak: 'break-word',
-                              display: { xs: '-webkit-box', xl: 'block' },
-                              WebkitLineClamp: { xs: 2, xl: 'unset' },
-                              WebkitBoxOrient: 'vertical',
-                              overflow: 'hidden',
-                              textOverflow: { xs: 'clip', xl: 'ellipsis' },
-                              cursor: 'default',
-                            }}
-                          >
-                            {verticalNode.name}
-                          </Typography>
-                        )}
-                        {(mode === 'valueMissionVision' || mode === 'goalMissionVision') && (
-                          <Chip
-                            size="small"
-                            label={
-                              verticalNode.type === 'mission'
-                                ? t('types.mission')
-                                : t('types.vision')
-                            }
-                          />
-                        )}
-                      </Box>
-                    </TableCell>
-
-                    {horizontalNodes.map(
-                      (horizontalNode: { id: string; name: string }, columnIndex: number) => {
-                        const score = matrixScores[rowIndex]?.[columnIndex] ?? null
-                        const selectValue = score === null ? '' : String(score)
-
-                        return (
-                          <TableCell
-                            key={`${verticalNode.type}-${verticalNode.id}-${horizontalNode.id}`}
-                            align="center"
-                            sx={{
-                              width: matrixColumnWidth,
-                              minWidth: matrixColumnWidth,
-                              maxWidth: matrixColumnWidth,
-                              backgroundColor: getCellBackground(score),
-                              transition: 'background-color 150ms ease-in-out',
-                            }}
-                          >
-                            <Select
-                              value={selectValue}
+                          )}
+                          {(mode === 'valueMissionVision' || mode === 'goalMissionVision') && (
+                            <Chip
                               size="small"
-                              displayEmpty
-                              onChange={event =>
-                                void updateCell(horizontalNode, verticalNode, event.target.value)
+                              label={
+                                verticalNode.type === 'mission'
+                                  ? t('types.mission')
+                                  : verticalNode.type === 'vision'
+                                    ? t('types.vision')
+                                    : t('axes.value')
                               }
-                              sx={{ minWidth: 90 }}
-                            >
-                              <MenuItem value="">{t('emptyCell')}</MenuItem>
-                              {scoreOptions.map(option => (
-                                <MenuItem
-                                  key={`option-${option.value}`}
-                                  value={String(option.value)}
-                                >
-                                  {option.value}
-                                </MenuItem>
-                              ))}
-                            </Select>
-                          </TableCell>
-                        )
-                      }
-                    )}
+                            />
+                          )}
+                        </Box>
+                      </TableCell>
 
+                      {horizontalNodes.map(
+                        (horizontalNode: { id: string; name: string }, columnIndex: number) => {
+                          const score = matrixScores[rowIndex]?.[columnIndex] ?? null
+                          const selectValue = score === null ? '' : String(score)
+
+                          return (
+                            <TableCell
+                              key={`${verticalNode.type}-${verticalNode.id}-${horizontalNode.id}`}
+                              align="center"
+                              sx={{
+                                width: matrixColumnWidth,
+                                minWidth: matrixColumnWidth,
+                                maxWidth: matrixColumnWidth,
+                                backgroundColor: getCellBackground(score),
+                                transition: 'background-color 150ms ease-in-out',
+                              }}
+                            >
+                              <Select
+                                value={selectValue}
+                                size="small"
+                                displayEmpty
+                                onChange={event =>
+                                  void updateCell(horizontalNode, verticalNode, event.target.value)
+                                }
+                                sx={{ minWidth: 90 }}
+                              >
+                                <MenuItem value="">{t('emptyCell')}</MenuItem>
+                                {scoreOptions.map(option => (
+                                  <MenuItem
+                                    key={`option-${option.value}`}
+                                    value={String(option.value)}
+                                  >
+                                    {option.value}
+                                  </MenuItem>
+                                ))}
+                              </Select>
+                            </TableCell>
+                          )
+                        }
+                      )}
+
+                      <TableCell
+                        align="center"
+                        sx={{
+                          width: sumColumnWidth,
+                          minWidth: sumColumnWidth,
+                          maxWidth: sumColumnWidth,
+                          fontWeight: 700,
+                          backgroundColor: 'action.hover',
+                        }}
+                      >
+                        {formatSignedNumber(rowSums[rowIndex] ?? 0)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+
+                  <TableRow sx={{ backgroundColor: 'action.hover' }}>
+                    <TableCell sx={{ minWidth: firstColumnMinWidth, fontWeight: 700 }}>
+                      {t('columnSum')}
+                    </TableCell>
+                    {columnSums.map((sum: number, index: number) => (
+                      <TableCell
+                        key={`column-sum-${index}`}
+                        align="center"
+                        sx={{
+                          width: matrixColumnWidth,
+                          minWidth: matrixColumnWidth,
+                          maxWidth: matrixColumnWidth,
+                          fontWeight: 700,
+                        }}
+                      >
+                        {formatSignedNumber(sum)}
+                      </TableCell>
+                    ))}
                     <TableCell
                       align="center"
                       sx={{
@@ -960,45 +1033,12 @@ const MatrixEditorPage = () => {
                         minWidth: sumColumnWidth,
                         maxWidth: sumColumnWidth,
                         fontWeight: 700,
-                        backgroundColor: 'action.hover',
                       }}
                     >
-                      {formatSignedNumber(rowSums[rowIndex] ?? 0)}
+                      {formatSignedNumber(totalSum)}
                     </TableCell>
                   </TableRow>
-                ))}
-
-                <TableRow sx={{ backgroundColor: 'action.hover' }}>
-                  <TableCell sx={{ minWidth: firstColumnMinWidth, fontWeight: 700 }}>
-                    {t('columnSum')}
-                  </TableCell>
-                  {columnSums.map((sum: number, index: number) => (
-                    <TableCell
-                      key={`column-sum-${index}`}
-                      align="center"
-                      sx={{
-                        width: matrixColumnWidth,
-                        minWidth: matrixColumnWidth,
-                        maxWidth: matrixColumnWidth,
-                        fontWeight: 700,
-                      }}
-                    >
-                      {formatSignedNumber(sum)}
-                    </TableCell>
-                  ))}
-                  <TableCell
-                    align="center"
-                    sx={{
-                      width: sumColumnWidth,
-                      minWidth: sumColumnWidth,
-                      maxWidth: sumColumnWidth,
-                      fontWeight: 700,
-                    }}
-                  >
-                    {formatSignedNumber(totalSum)}
-                  </TableCell>
-                </TableRow>
-              </TableBody>
+                </TableBody>
               </Table>
             </Box>
           </TableContainer>
@@ -1036,9 +1076,7 @@ const MatrixEditorPage = () => {
           {t('addType', {
             type:
               addDialog.axis === 'vertical'
-                ? verticalTypes.length === 2
-                  ? `${entityTypeLabel[verticalTypes[0]]}/${entityTypeLabel[verticalTypes[1]]}`
-                  : entityTypeLabel[verticalTypes[0]]
+                ? verticalTypes.map(type => entityTypeLabel[type]).join('/')
                 : entityTypeLabel[horizontalType],
           })}
         </DialogTitle>
