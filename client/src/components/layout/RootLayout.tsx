@@ -48,6 +48,7 @@ import { ImportExportDialog } from '../excel'
 // Styled components for layout
 const Main = styled('main')(({ theme }) => ({
   flexGrow: 1,
+  minWidth: 0,
   padding: 0,
   transition: theme.transitions.create('margin', {
     easing: theme.transitions.easing.sharp,

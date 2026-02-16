@@ -297,7 +297,7 @@ const Dashboard = () => {
 
   const formatSignedPercent = (value: number) => {
     const rounded = Math.round(value * 10) / 10
-    return `${rounded > 0 ? '+' : ''}${rounded}%`
+    return `${rounded}%`
   }
 
   const getGeaScoreBackground = (percent: number) => {

@@ -1,13 +1,13 @@
 'use client'
 
 import React from 'react'
+import { Add as AddIcon } from '@mui/icons-material'
 import {
   Alert,
   Box,
   Button,
   Chip,
   CircularProgress,
-  Container,
   Dialog,
   DialogActions,
   DialogContent,
@@ -25,6 +25,7 @@ import {
   TableHead,
   TableRow,
   TextField,
+  Tooltip,
   Typography,
 } from '@mui/material'
 import { alpha, useTheme } from '@mui/material/styles'
@@ -49,6 +50,14 @@ type VerticalNode = {
   id: string
   name: string
   type: 'mission' | 'vision' | 'strategy'
+  statement?: string
+}
+
+type HorizontalNode = {
+  id: string
+  name: string
+  statement?: string
+  [key: string]: unknown
 }
 
 type AxisEntityType = 'mission' | 'vision' | 'value' | 'goal' | 'strategy'
@@ -92,6 +101,7 @@ const MatrixEditorPage = () => {
     axis: 'horizontal',
   })
   const [newElementName, setNewElementName] = React.useState('')
+  const [newElementStatement, setNewElementStatement] = React.useState('')
   const [newElementType, setNewElementType] = React.useState<AxisEntityType>('mission')
 
   const {
@@ -221,6 +231,7 @@ const MatrixEditorPage = () => {
   const resetAddDialog = () => {
     setAddDialog({ open: false, axis: 'horizontal' })
     setNewElementName('')
+    setNewElementStatement('')
     setNewElementType('mission')
   }
 
@@ -228,8 +239,42 @@ const MatrixEditorPage = () => {
     const defaultType = axis === 'horizontal' ? horizontalType : verticalTypes[0]
     setNewElementType(defaultType)
     setNewElementName('')
+    setNewElementStatement('')
     setAddDialog({ open: true, axis })
   }
+
+  const tableContainerRef = React.useRef<HTMLDivElement | null>(null)
+  const scrollBeforeUpdateRef = React.useRef<{ top: number; left: number } | null>(null)
+
+  const captureScrollPosition = React.useCallback(() => {
+    const container = tableContainerRef.current
+    if (!container) {
+      return
+    }
+
+    scrollBeforeUpdateRef.current = {
+      top: container.scrollTop,
+      left: container.scrollLeft,
+    }
+  }, [])
+
+  const restoreScrollPosition = React.useCallback(() => {
+    const container = tableContainerRef.current
+    if (!container) {
+      return
+    }
+
+    if (!scrollBeforeUpdateRef.current) {
+      return
+    }
+
+    const { top, left } = scrollBeforeUpdateRef.current
+    scrollBeforeUpdateRef.current = null
+
+    requestAnimationFrame(() => {
+      container.scrollTo({ top, left, behavior: 'auto' })
+    })
+  }, [])
 
   const withNotifications = async (action: () => Promise<void>) => {
     try {
@@ -238,6 +283,8 @@ const MatrixEditorPage = () => {
     } catch (error) {
       const message = error instanceof Error ? error.message : t('messages.updateError')
       enqueueSnackbar(`${t('messages.updateError')}: ${message}`, { variant: 'error' })
+    } finally {
+      restoreScrollPosition()
     }
   }
 
@@ -271,6 +318,7 @@ const MatrixEditorPage = () => {
     }
 
     const trimmedName = newElementName.trim()
+    const trimmedStatement = newElementStatement.trim()
     if (!trimmedName) {
       enqueueSnackbar(t('messages.nameRequired'), { variant: 'warning' })
       return
@@ -283,7 +331,7 @@ const MatrixEditorPage = () => {
             input: [
               {
                 name: trimmedName,
-                purposeStatement: '',
+                purposeStatement: trimmedStatement,
                 year: new Date().toISOString().split('T')[0],
                 company: {
                   connect: [{ where: { node: { id: { eq: selectedCompanyId } } } }],
@@ -299,7 +347,7 @@ const MatrixEditorPage = () => {
             input: [
               {
                 name: trimmedName,
-                visionStatement: '',
+                visionStatement: trimmedStatement,
                 year: new Date().toISOString().split('T')[0],
                 company: {
                   connect: [{ where: { node: { id: { eq: selectedCompanyId } } } }],
@@ -314,7 +362,7 @@ const MatrixEditorPage = () => {
             input: [
               {
                 name: trimmedName,
-                valueStatement: '',
+                valueStatement: trimmedStatement,
                 company: {
                   connect: [{ where: { node: { id: { eq: selectedCompanyId } } } }],
                 },
@@ -329,7 +377,7 @@ const MatrixEditorPage = () => {
             input: [
               {
                 name: trimmedName,
-                goalStatement: '',
+                goalStatement: trimmedStatement,
                 company: {
                   connect: [{ where: { node: { id: { eq: selectedCompanyId } } } }],
                 },
@@ -344,7 +392,7 @@ const MatrixEditorPage = () => {
             input: [
               {
                 name: trimmedName,
-                description: '',
+                description: trimmedStatement,
                 company: {
                   connect: [{ where: { node: { id: { eq: selectedCompanyId } } } }],
                 },
@@ -475,43 +523,58 @@ const MatrixEditorPage = () => {
 
   const verticalNodes: VerticalNode[] = React.useMemo(() => {
     if (mode === 'missionVision') {
-      return visions.map((vision: { id: string; name: string }) => ({
+      return visions.map((vision: { id: string; name: string; visionStatement?: string | null }) => ({
         id: vision.id,
         name: vision.name,
         type: 'vision' as const,
+        statement: vision.visionStatement ?? undefined,
       }))
     }
 
     if (mode === 'valueMissionVision' || mode === 'goalMissionVision') {
       return [
-        ...missions.map((mission: { id: string; name: string }) => ({
-          id: mission.id,
-          name: mission.name,
-          type: 'mission' as const,
-        })),
-        ...visions.map((vision: { id: string; name: string }) => ({
+        ...missions.map(
+          (mission: { id: string; name: string; purposeStatement?: string | null }) => ({
+            id: mission.id,
+            name: mission.name,
+            type: 'mission' as const,
+            statement: mission.purposeStatement ?? undefined,
+          })
+        ),
+        ...visions.map((vision: { id: string; name: string; visionStatement?: string | null }) => ({
           id: vision.id,
           name: vision.name,
           type: 'vision' as const,
+          statement: vision.visionStatement ?? undefined,
         })),
       ]
     }
 
-    return strategies.map((strategy: { id: string; name: string }) => ({
+    return strategies.map((strategy: { id: string; name: string; description?: string | null }) => ({
       id: strategy.id,
       name: strategy.name,
       type: 'strategy' as const,
+      statement: strategy.description ?? undefined,
     }))
   }, [mode, missions, visions, strategies])
 
-  const horizontalNodes = React.useMemo(() => {
+  const horizontalNodes: HorizontalNode[] = React.useMemo(() => {
     if (mode === 'missionVision') {
-      return missions
+      return missions.map((mission: Record<string, unknown>) => ({
+        ...mission,
+        statement: (mission.purposeStatement as string | null | undefined) ?? undefined,
+      }))
     }
     if (mode === 'valueMissionVision') {
-      return values
+      return values.map((value: Record<string, unknown>) => ({
+        ...value,
+        statement: (value.valueStatement as string | null | undefined) ?? undefined,
+      }))
     }
-    return goals
+    return goals.map((goal: Record<string, unknown>) => ({
+      ...goal,
+      statement: (goal.goalStatement as string | null | undefined) ?? undefined,
+    }))
   }, [mode, missions, values, goals])
 
   const resolveScore = (
@@ -544,6 +607,8 @@ const MatrixEditorPage = () => {
     verticalNode: VerticalNode,
     value: string
   ) => {
+    captureScrollPosition()
+
     const parsed = value === '' ? null : Number(value)
     if (parsed !== null && (parsed < -3 || parsed > 3 || Number.isNaN(parsed))) {
       return
@@ -592,18 +657,29 @@ const MatrixEditorPage = () => {
   const formatSignedNumber = (value: number) => (value > 0 ? `+${value}` : `${value}`)
   const formatSignedPercent = (value: number) => {
     const rounded = Math.round(value * 10) / 10
-    return `${rounded > 0 ? '+' : ''}${rounded}%`
+    return `${rounded}%`
   }
 
+  const statementLabelByType: Record<AxisEntityType, string> = {
+    mission: t('purposeStatement'),
+    vision: t('visionStatement'),
+    value: t('valueStatement'),
+    goal: t('goalStatement'),
+    strategy: t('description'),
+  }
+
+  const firstColumnMinWidth = 260
+  const matrixColumnWidth = 150
+  const sumColumnWidth = 120
+  const tableMinWidth =
+    firstColumnMinWidth + horizontalNodes.length * matrixColumnWidth + sumColumnWidth
+
   const isLoading =
-    missionsLoading ||
-    visionsLoading ||
-    valuesLoading ||
-    goalsLoading ||
-    strategiesLoading ||
-    isUpdatingMission ||
-    isUpdatingValue ||
-    isUpdatingGoal ||
+    (!missionData && missionsLoading) ||
+    (!visionData && visionsLoading) ||
+    (!valueData && valuesLoading) ||
+    (!goalData && goalsLoading) ||
+    (!strategyData && strategiesLoading) ||
     isCreatingMission ||
     isCreatingVision ||
     isCreatingValue ||
@@ -613,18 +689,23 @@ const MatrixEditorPage = () => {
   const hasError = missionsError || visionsError || valuesError || goalsError || strategiesError
 
   return (
-    <Container maxWidth="lg">
-      <Box sx={{ py: 4 }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          {t('title')}
-        </Typography>
-
-        <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-          {t('description')}
-        </Typography>
-
-        <Paper sx={{ p: 3, mb: 3 }}>
-          <FormControl fullWidth>
+    <Box
+      sx={{
+        width: '100%',
+        maxWidth: '100%',
+        minWidth: 0,
+        px: 2,
+        pt: 2,
+        pb: 0.5,
+        height: 'calc(100dvh - 64px)',
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      <Paper sx={{ p: 3, mb: 3 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+          <FormControl fullWidth sx={{ flex: 1, minWidth: 260 }}>
             <InputLabel id="matrix-mode-label">{t('selectMatrix')}</InputLabel>
             <Select<MatrixMode>
               labelId="matrix-mode-label"
@@ -641,174 +722,313 @@ const MatrixEditorPage = () => {
 
           <Box
             sx={{
-              mt: 2,
+              px: 2,
+              minHeight: 56,
+              boxSizing: 'border-box',
+              borderRadius: 2,
+              backgroundColor: getCellBackground((totalScorePercent / 100) * 3),
+              border: `1px solid ${alpha(theme.palette.text.primary, 0.12)}`,
               display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'flex-start',
-              gap: 2,
-              flexWrap: 'wrap',
+              alignItems: 'center',
+              gap: 1,
+              whiteSpace: 'nowrap',
             }}
           >
-            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', flex: 1 }}>
-              {scoreOptions.map(option => (
-                <Chip
-                  key={`legend-${option.value}`}
-                  label={`${option.value}: ${t(option.key)}`}
-                  size="small"
-                  sx={{ backgroundColor: getCellBackground(option.value) }}
-                />
-              ))}
-            </Box>
-
-            <Box
-              sx={{
-                px: 2.5,
-                py: 1.25,
-                borderRadius: 2,
-                backgroundColor: getCellBackground((totalScorePercent / 100) * 3),
-                border: `1px solid ${alpha(theme.palette.text.primary, 0.12)}`,
-                minWidth: 140,
-                textAlign: 'right',
-              }}
-            >
-              <Typography variant="subtitle2" color="text.secondary">
-                {t('totalScore')}
-              </Typography>
-              <Typography variant="h5" sx={{ fontWeight: 700, lineHeight: 1.2 }}>
-                {formatSignedPercent(totalScorePercent)}
-              </Typography>
-            </Box>
+            <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>
+              {t('totalScore')}:
+            </Typography>
+            <Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1.1 }}>
+              {formatSignedPercent(totalScorePercent)}
+            </Typography>
           </Box>
-        </Paper>
+        </Box>
 
-        {hasError && <Alert severity="error">{t('messages.loadError')}</Alert>}
+        <Box sx={{ mt: 1.5, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+          {scoreOptions.map(option => (
+            <Chip
+              key={`legend-${option.value}`}
+              label={`${option.value}: ${t(option.key)}`}
+              size="small"
+              sx={{ backgroundColor: getCellBackground(option.value) }}
+            />
+          ))}
+        </Box>
+      </Paper>
 
-        <Paper sx={{ p: 2 }}>
-          {isLoading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-              <CircularProgress />
-            </Box>
-          ) : (
-            <TableContainer sx={{ maxHeight: '70vh' }}>
-              <Table size="small" stickyHeader>
-                <TableHead>
-                  <TableRow>
-                    <TableCell sx={{ minWidth: 220 }}>{axisLabel}</TableCell>
-                    {horizontalNodes.map((item: { id: string; name: string }) => (
-                      <TableCell
-                        key={`horizontal-${item.id}`}
-                        align="center"
-                        sx={{ minWidth: 170 }}
-                      >
-                        {item.name}
-                      </TableCell>
-                    ))}
+      {hasError && <Alert severity="error">{t('messages.loadError')}</Alert>}
+
+      <Paper
+        sx={{
+          p: 2,
+          flex: 1,
+          minHeight: 0,
+          minWidth: 0,
+          maxWidth: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        {isLoading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 6, flex: 1 }}>
+            <CircularProgress />
+          </Box>
+        ) : (
+          <TableContainer
+            ref={tableContainerRef}
+            sx={{
+              flex: 1,
+              minHeight: 0,
+              minWidth: 0,
+              overflow: 'auto',
+              overflowX: 'auto',
+              overflowY: 'auto',
+              width: '100%',
+              maxWidth: '100%',
+              display: 'block',
+            }}
+          >
+            <Box sx={{ width: tableMinWidth, minWidth: '100%' }}>
+              <Table
+                size="small"
+                stickyHeader
+                sx={{
+                  width: '100%',
+                  tableLayout: 'fixed',
+                }}
+              >
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={{ minWidth: firstColumnMinWidth, whiteSpace: 'nowrap' }}>
+                    {axisLabel}
+                  </TableCell>
+                  {horizontalNodes.map((item: { id: string; name: string; statement?: string }) => (
                     <TableCell
+                      key={`horizontal-${item.id}`}
                       align="center"
-                      sx={{ minWidth: 120, fontWeight: 700, backgroundColor: 'action.hover' }}
+                      sx={{
+                        width: matrixColumnWidth,
+                        minWidth: matrixColumnWidth,
+                        maxWidth: matrixColumnWidth,
+                      }}
                     >
-                      {t('rowSum')}
+                      {item.statement ? (
+                        <Tooltip title={item.statement} arrow placement="top">
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              whiteSpace: 'normal',
+                              wordBreak: 'break-word',
+                              lineHeight: 1.2,
+                              cursor: 'default',
+                            }}
+                          >
+                            {item.name}
+                          </Typography>
+                        </Tooltip>
+                      ) : (
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            whiteSpace: 'normal',
+                            wordBreak: 'break-word',
+                            lineHeight: 1.2,
+                            cursor: 'default',
+                          }}
+                        >
+                          {item.name}
+                        </Typography>
+                      )}
                     </TableCell>
-                  </TableRow>
-                </TableHead>
+                  ))}
+                  <TableCell
+                    align="center"
+                    sx={{
+                      width: sumColumnWidth,
+                      minWidth: sumColumnWidth,
+                      maxWidth: sumColumnWidth,
+                      fontWeight: 700,
+                      backgroundColor: 'action.hover',
+                    }}
+                  >
+                    {t('rowSum')}
+                  </TableCell>
+                </TableRow>
+              </TableHead>
 
-                <TableBody>
-                  {verticalNodes.map((verticalNode, rowIndex) => (
-                    <TableRow key={`${verticalNode.type}-${verticalNode.id}`}>
-                      <TableCell>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <Typography variant="body2">{verticalNode.name}</Typography>
-                          {(mode === 'valueMissionVision' || mode === 'goalMissionVision') && (
-                            <Chip
-                              size="small"
-                              label={
-                                verticalNode.type === 'mission'
-                                  ? t('types.mission')
-                                  : t('types.vision')
-                              }
-                            />
-                          )}
-                        </Box>
-                      </TableCell>
-
-                      {horizontalNodes.map(
-                        (horizontalNode: { id: string; name: string }, columnIndex: number) => {
-                          const score = matrixScores[rowIndex]?.[columnIndex] ?? null
-                          const selectValue = score === null ? '' : String(score)
-
-                          return (
-                            <TableCell
-                              key={`${verticalNode.type}-${verticalNode.id}-${horizontalNode.id}`}
-                              align="center"
+              <TableBody>
+                {verticalNodes.map((verticalNode, rowIndex) => (
+                  <TableRow key={`${verticalNode.type}-${verticalNode.id}`}>
+                    <TableCell
+                      sx={{
+                        minWidth: firstColumnMinWidth,
+                      }}
+                    >
+                      <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+                        {verticalNode.statement ? (
+                          <Tooltip title={verticalNode.statement} arrow placement="top-start">
+                            <Typography
+                              variant="body2"
                               sx={{
-                                backgroundColor: getCellBackground(score),
-                                transition: 'background-color 150ms ease-in-out',
+                                whiteSpace: { xs: 'normal', xl: 'nowrap' },
+                                wordBreak: 'break-word',
+                                display: { xs: '-webkit-box', xl: 'block' },
+                                WebkitLineClamp: { xs: 2, xl: 'unset' },
+                                WebkitBoxOrient: 'vertical',
+                                overflow: 'hidden',
+                                textOverflow: { xs: 'clip', xl: 'ellipsis' },
+                                cursor: 'default',
                               }}
                             >
-                              <Select
-                                value={selectValue}
-                                size="small"
-                                displayEmpty
-                                onChange={event =>
-                                  void updateCell(horizontalNode, verticalNode, event.target.value)
-                                }
-                                sx={{ minWidth: 90 }}
-                              >
-                                <MenuItem value="">{t('emptyCell')}</MenuItem>
-                                {scoreOptions.map(option => (
-                                  <MenuItem
-                                    key={`option-${option.value}`}
-                                    value={String(option.value)}
-                                  >
-                                    {option.value}
-                                  </MenuItem>
-                                ))}
-                              </Select>
-                            </TableCell>
-                          )
-                        }
-                      )}
+                              {verticalNode.name}
+                            </Typography>
+                          </Tooltip>
+                        ) : (
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              whiteSpace: { xs: 'normal', xl: 'nowrap' },
+                              wordBreak: 'break-word',
+                              display: { xs: '-webkit-box', xl: 'block' },
+                              WebkitLineClamp: { xs: 2, xl: 'unset' },
+                              WebkitBoxOrient: 'vertical',
+                              overflow: 'hidden',
+                              textOverflow: { xs: 'clip', xl: 'ellipsis' },
+                              cursor: 'default',
+                            }}
+                          >
+                            {verticalNode.name}
+                          </Typography>
+                        )}
+                        {(mode === 'valueMissionVision' || mode === 'goalMissionVision') && (
+                          <Chip
+                            size="small"
+                            label={
+                              verticalNode.type === 'mission'
+                                ? t('types.mission')
+                                : t('types.vision')
+                            }
+                          />
+                        )}
+                      </Box>
+                    </TableCell>
 
-                      <TableCell
-                        align="center"
-                        sx={{ fontWeight: 700, backgroundColor: 'action.hover' }}
-                      >
-                        {formatSignedNumber(rowSums[rowIndex] ?? 0)}
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                    {horizontalNodes.map(
+                      (horizontalNode: { id: string; name: string }, columnIndex: number) => {
+                        const score = matrixScores[rowIndex]?.[columnIndex] ?? null
+                        const selectValue = score === null ? '' : String(score)
 
-                  <TableRow sx={{ backgroundColor: 'action.hover' }}>
-                    <TableCell sx={{ fontWeight: 700 }}>{t('columnSum')}</TableCell>
-                    {columnSums.map((sum: number, index: number) => (
-                      <TableCell
-                        key={`column-sum-${index}`}
-                        align="center"
-                        sx={{ fontWeight: 700 }}
-                      >
-                        {formatSignedNumber(sum)}
-                      </TableCell>
-                    ))}
-                    <TableCell align="center" sx={{ fontWeight: 700 }}>
-                      {formatSignedNumber(totalSum)}
+                        return (
+                          <TableCell
+                            key={`${verticalNode.type}-${verticalNode.id}-${horizontalNode.id}`}
+                            align="center"
+                            sx={{
+                              width: matrixColumnWidth,
+                              minWidth: matrixColumnWidth,
+                              maxWidth: matrixColumnWidth,
+                              backgroundColor: getCellBackground(score),
+                              transition: 'background-color 150ms ease-in-out',
+                            }}
+                          >
+                            <Select
+                              value={selectValue}
+                              size="small"
+                              displayEmpty
+                              onChange={event =>
+                                void updateCell(horizontalNode, verticalNode, event.target.value)
+                              }
+                              sx={{ minWidth: 90 }}
+                            >
+                              <MenuItem value="">{t('emptyCell')}</MenuItem>
+                              {scoreOptions.map(option => (
+                                <MenuItem
+                                  key={`option-${option.value}`}
+                                  value={String(option.value)}
+                                >
+                                  {option.value}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </TableCell>
+                        )
+                      }
+                    )}
+
+                    <TableCell
+                      align="center"
+                      sx={{
+                        width: sumColumnWidth,
+                        minWidth: sumColumnWidth,
+                        maxWidth: sumColumnWidth,
+                        fontWeight: 700,
+                        backgroundColor: 'action.hover',
+                      }}
+                    >
+                      {formatSignedNumber(rowSums[rowIndex] ?? 0)}
                     </TableCell>
                   </TableRow>
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
-        </Paper>
+                ))}
 
-        <Box
-          sx={{ display: 'flex', gap: 1.5, mt: 2, flexWrap: 'wrap', justifyContent: 'flex-end' }}
+                <TableRow sx={{ backgroundColor: 'action.hover' }}>
+                  <TableCell sx={{ minWidth: firstColumnMinWidth, fontWeight: 700 }}>
+                    {t('columnSum')}
+                  </TableCell>
+                  {columnSums.map((sum: number, index: number) => (
+                    <TableCell
+                      key={`column-sum-${index}`}
+                      align="center"
+                      sx={{
+                        width: matrixColumnWidth,
+                        minWidth: matrixColumnWidth,
+                        maxWidth: matrixColumnWidth,
+                        fontWeight: 700,
+                      }}
+                    >
+                      {formatSignedNumber(sum)}
+                    </TableCell>
+                  ))}
+                  <TableCell
+                    align="center"
+                    sx={{
+                      width: sumColumnWidth,
+                      minWidth: sumColumnWidth,
+                      maxWidth: sumColumnWidth,
+                      fontWeight: 700,
+                    }}
+                  >
+                    {formatSignedNumber(totalSum)}
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+              </Table>
+            </Box>
+          </TableContainer>
+        )}
+      </Paper>
+
+      <Box
+        sx={{
+          display: 'flex',
+          gap: 1.5,
+          mt: 1,
+          mb: 0.5,
+          flexWrap: 'wrap',
+          justifyContent: 'flex-end',
+        }}
+      >
+        <Button
+          variant="contained"
+          onClick={() => openAddDialog('vertical')}
+          startIcon={<AddIcon />}
         >
-          <Button variant="outlined" onClick={() => openAddDialog('vertical')}>
-            {t('addType', { type: verticalButtonTypeLabel })}
-          </Button>
-          <Button variant="outlined" onClick={() => openAddDialog('horizontal')}>
-            {t('addType', { type: horizontalButtonTypeLabel })}
-          </Button>
-        </Box>
+          {t('addType', { type: verticalButtonTypeLabel })}
+        </Button>
+        <Button
+          variant="contained"
+          onClick={() => openAddDialog('horizontal')}
+          startIcon={<AddIcon />}
+        >
+          {t('addType', { type: horizontalButtonTypeLabel })}
+        </Button>
       </Box>
 
       <Dialog open={addDialog.open} onClose={resetAddDialog} fullWidth maxWidth="sm">
@@ -847,6 +1067,15 @@ const MatrixEditorPage = () => {
               fullWidth
               autoFocus
             />
+
+            <TextField
+              label={statementLabelByType[newElementType]}
+              value={newElementStatement}
+              onChange={event => setNewElementStatement(event.target.value)}
+              fullWidth
+              multiline
+              minRows={3}
+            />
           </Box>
         </DialogContent>
         <DialogActions>
@@ -856,7 +1085,7 @@ const MatrixEditorPage = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </Container>
+    </Box>
   )
 }
 
