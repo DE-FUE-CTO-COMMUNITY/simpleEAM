@@ -329,7 +329,9 @@ const MissionForm: React.FC<GenericFormProps<Gea_Mission, MissionFormValues>> = 
           ? (formField.state.value as MissionVisionRelationInput[])
           : []
         const allVisions: Gea_Vision[] = visionsData?.geaVisions || []
-        const selectedVisionIds = new Set(relations.map(relation => relation.visionId).filter(Boolean))
+        const selectedVisionIds = new Set(
+          relations.map(relation => relation.visionId).filter(Boolean)
+        )
         const hasMoreVisionsToAdd = allVisions.some(vision => !selectedVisionIds.has(vision.id))
 
         const updateRelation = (
@@ -432,7 +434,9 @@ const MissionForm: React.FC<GenericFormProps<Gea_Mission, MissionFormValues>> = 
           ? (formField.state.value as MissionValueRelationInput[])
           : []
         const allValues: Gea_Value[] = valuesData?.geaValues || []
-        const selectedValueIds = new Set(relations.map(relation => relation.valueId).filter(Boolean))
+        const selectedValueIds = new Set(
+          relations.map(relation => relation.valueId).filter(Boolean)
+        )
         const hasMoreValuesToAdd = allValues.some(value => !selectedValueIds.has(value.id))
 
         const updateRelation = (
@@ -569,20 +573,20 @@ const MissionForm: React.FC<GenericFormProps<Gea_Mission, MissionFormValues>> = 
                   )
 
                   return (
-                <TextField
-                  select
-                  label={tForm('goal')}
-                  value={relation.goalId}
-                  onChange={event => updateRelation(index, 'goalId', event.target.value)}
-                  disabled={disabled}
-                  fullWidth
-                >
-                  {availableGoalsForRow.map((goal: Gea_Goal) => (
-                    <MenuItem key={goal.id} value={goal.id}>
-                      {goal.name}
-                    </MenuItem>
-                  ))}
-                </TextField>
+                    <TextField
+                      select
+                      label={tForm('goal')}
+                      value={relation.goalId}
+                      onChange={event => updateRelation(index, 'goalId', event.target.value)}
+                      disabled={disabled}
+                      fullWidth
+                    >
+                      {availableGoalsForRow.map((goal: Gea_Goal) => (
+                        <MenuItem key={goal.id} value={goal.id}>
+                          {goal.name}
+                        </MenuItem>
+                      ))}
+                    </TextField>
                   )
                 })()}
 

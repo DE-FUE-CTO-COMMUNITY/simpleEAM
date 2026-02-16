@@ -257,10 +257,7 @@ const GoalsPage = () => {
       }
     }
 
-    if (
-      data.achievedByStrategiesRelations &&
-      data.achievedByStrategiesRelations.length > 0
-    ) {
+    if (data.achievedByStrategiesRelations && data.achievedByStrategiesRelations.length > 0) {
       input.achievedByStrategies = {
         disconnect: [{ where: {} }],
         connect: data.achievedByStrategiesRelations.map(relation => ({

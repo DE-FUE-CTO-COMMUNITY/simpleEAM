@@ -294,8 +294,7 @@ const ValueForm: React.FC<GenericFormProps<Gea_Value, ValueFormValues>> = ({
           <Stack spacing={2}>
             {relations.map((relation, index) => {
               const availableMissionsForRow = allMissions.filter(
-                mission =>
-                  mission.id === relation.missionId || !selectedMissionIds.has(mission.id)
+                mission => mission.id === relation.missionId || !selectedMissionIds.has(mission.id)
               )
 
               return (
@@ -370,7 +369,9 @@ const ValueForm: React.FC<GenericFormProps<Gea_Value, ValueFormValues>> = ({
           ? (formField.state.value as ValueVisionRelationInput[])
           : []
         const allVisions: Gea_Vision[] = visionsData?.geaVisions || []
-        const selectedVisionIds = new Set(relations.map(relation => relation.visionId).filter(Boolean))
+        const selectedVisionIds = new Set(
+          relations.map(relation => relation.visionId).filter(Boolean)
+        )
         const hasMoreVisionsToAdd = allVisions.some(vision => !selectedVisionIds.has(vision.id))
 
         const updateRelation = (

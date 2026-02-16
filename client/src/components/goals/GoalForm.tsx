@@ -325,7 +325,9 @@ const GoalForm: React.FC<GenericFormProps<Gea_Goal, GoalFormValues>> = ({
           ? (formField.state.value as GoalVisionRelationInput[])
           : []
         const allVisions: Gea_Vision[] = visionsData?.geaVisions || []
-        const selectedVisionIds = new Set(relations.map(relation => relation.visionId).filter(Boolean))
+        const selectedVisionIds = new Set(
+          relations.map(relation => relation.visionId).filter(Boolean)
+        )
         const hasMoreVisionsToAdd = allVisions.some(vision => !selectedVisionIds.has(vision.id))
 
         const updateRelation = (
@@ -460,8 +462,7 @@ const GoalForm: React.FC<GenericFormProps<Gea_Goal, GoalFormValues>> = ({
           <Stack spacing={2}>
             {relations.map((relation, index) => {
               const availableMissionsForRow = allMissions.filter(
-                mission =>
-                  mission.id === relation.missionId || !selectedMissionIds.has(mission.id)
+                mission => mission.id === relation.missionId || !selectedMissionIds.has(mission.id)
               )
 
               return (
@@ -536,7 +537,9 @@ const GoalForm: React.FC<GenericFormProps<Gea_Goal, GoalFormValues>> = ({
           ? (formField.state.value as GoalValueRelationInput[])
           : []
         const allValues: Gea_Value[] = valuesData?.geaValues || []
-        const selectedValueIds = new Set(relations.map(relation => relation.valueId).filter(Boolean))
+        const selectedValueIds = new Set(
+          relations.map(relation => relation.valueId).filter(Boolean)
+        )
         const hasMoreValuesToAdd = allValues.some(value => !selectedValueIds.has(value.id))
 
         const updateRelation = (
@@ -701,9 +704,7 @@ const GoalForm: React.FC<GenericFormProps<Gea_Goal, GoalFormValues>> = ({
                     select
                     label={tForm('score')}
                     value={relation.score}
-                    onChange={event =>
-                      updateRelation(index, 'score', Number(event.target.value))
-                    }
+                    onChange={event => updateRelation(index, 'score', Number(event.target.value))}
                     disabled={disabled}
                     sx={{ minWidth: 260 }}
                   >

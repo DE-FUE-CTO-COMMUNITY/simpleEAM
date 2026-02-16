@@ -348,8 +348,7 @@ const VisionForm: React.FC<VisionFormProps> = ({
           <Stack spacing={2}>
             {relations.map((relation, index) => {
               const availableMissionsForRow = allMissions.filter(
-                mission =>
-                  mission.id === relation.missionId || !selectedMissionIds.has(mission.id)
+                mission => mission.id === relation.missionId || !selectedMissionIds.has(mission.id)
               )
 
               return (
@@ -424,7 +423,9 @@ const VisionForm: React.FC<VisionFormProps> = ({
           ? (formField.state.value as VisionValueRelationInput[])
           : []
         const allValues: Gea_Value[] = valuesData?.geaValues || []
-        const selectedValueIds = new Set(relations.map(relation => relation.valueId).filter(Boolean))
+        const selectedValueIds = new Set(
+          relations.map(relation => relation.valueId).filter(Boolean)
+        )
         const hasMoreValuesToAdd = allValues.some(value => !selectedValueIds.has(value.id))
 
         const updateRelation = (
