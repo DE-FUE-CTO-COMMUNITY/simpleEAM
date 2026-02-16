@@ -38,7 +38,10 @@ import { CREATE_VISION, GET_VISIONS } from '@/graphql/vision'
 import { CREATE_VALUE, GET_VALUES, UPDATE_VALUE } from '@/graphql/value'
 import { CREATE_GOAL, GET_GOALS, UPDATE_GOAL } from '@/graphql/goal'
 import { CREATE_STRATEGY, GET_STRATEGIES } from '@/graphql/strategy'
-import { calculateNormalizedScorePercent, getEdgeScore } from '@/components/matrix-editor/scoreUtils'
+import {
+  calculateNormalizedScorePercent,
+  getEdgeScore,
+} from '@/components/matrix-editor/scoreUtils'
 
 type MatrixMode = 'missionVision' | 'valueMissionVision' | 'goalMissionVision' | 'goalStrategy'
 
@@ -571,7 +574,7 @@ const MatrixEditorPage = () => {
 
   const columnSums: number[] = horizontalNodes.map(
     (_horizontalNode: { id: string; name: string }, columnIndex: number) =>
-    matrixScores.reduce((sum, row) => sum + (row[columnIndex] ?? 0), 0)
+      matrixScores.reduce((sum, row) => sum + (row[columnIndex] ?? 0), 0)
   )
 
   const totalSum: number = matrixScores.reduce(
@@ -584,9 +587,7 @@ const MatrixEditorPage = () => {
     0
   )
 
-  const totalScorePercent = calculateNormalizedScorePercent(
-    matrixScores.flatMap(row => row)
-  )
+  const totalScorePercent = calculateNormalizedScorePercent(matrixScores.flatMap(row => row))
 
   const formatSignedNumber = (value: number) => (value > 0 ? `+${value}` : `${value}`)
   const formatSignedPercent = (value: number) => {
@@ -730,43 +731,48 @@ const MatrixEditorPage = () => {
                         </Box>
                       </TableCell>
 
-                      {horizontalNodes.map((horizontalNode: { id: string; name: string }, columnIndex: number) => {
-                        const score = matrixScores[rowIndex]?.[columnIndex] ?? null
-                        const selectValue = score === null ? '' : String(score)
+                      {horizontalNodes.map(
+                        (horizontalNode: { id: string; name: string }, columnIndex: number) => {
+                          const score = matrixScores[rowIndex]?.[columnIndex] ?? null
+                          const selectValue = score === null ? '' : String(score)
 
-                        return (
-                          <TableCell
-                            key={`${verticalNode.type}-${verticalNode.id}-${horizontalNode.id}`}
-                            align="center"
-                            sx={{
-                              backgroundColor: getCellBackground(score),
-                              transition: 'background-color 150ms ease-in-out',
-                            }}
-                          >
-                            <Select
-                              value={selectValue}
-                              size="small"
-                              displayEmpty
-                              onChange={event =>
-                                void updateCell(horizontalNode, verticalNode, event.target.value)
-                              }
-                              sx={{ minWidth: 90 }}
+                          return (
+                            <TableCell
+                              key={`${verticalNode.type}-${verticalNode.id}-${horizontalNode.id}`}
+                              align="center"
+                              sx={{
+                                backgroundColor: getCellBackground(score),
+                                transition: 'background-color 150ms ease-in-out',
+                              }}
                             >
-                              <MenuItem value="">{t('emptyCell')}</MenuItem>
-                              {scoreOptions.map(option => (
-                                <MenuItem
-                                  key={`option-${option.value}`}
-                                  value={String(option.value)}
-                                >
-                                  {option.value}
-                                </MenuItem>
-                              ))}
-                            </Select>
-                          </TableCell>
-                        )
-                      })}
+                              <Select
+                                value={selectValue}
+                                size="small"
+                                displayEmpty
+                                onChange={event =>
+                                  void updateCell(horizontalNode, verticalNode, event.target.value)
+                                }
+                                sx={{ minWidth: 90 }}
+                              >
+                                <MenuItem value="">{t('emptyCell')}</MenuItem>
+                                {scoreOptions.map(option => (
+                                  <MenuItem
+                                    key={`option-${option.value}`}
+                                    value={String(option.value)}
+                                  >
+                                    {option.value}
+                                  </MenuItem>
+                                ))}
+                              </Select>
+                            </TableCell>
+                          )
+                        }
+                      )}
 
-                      <TableCell align="center" sx={{ fontWeight: 700, backgroundColor: 'action.hover' }}>
+                      <TableCell
+                        align="center"
+                        sx={{ fontWeight: 700, backgroundColor: 'action.hover' }}
+                      >
                         {formatSignedNumber(rowSums[rowIndex] ?? 0)}
                       </TableCell>
                     </TableRow>
@@ -775,7 +781,11 @@ const MatrixEditorPage = () => {
                   <TableRow sx={{ backgroundColor: 'action.hover' }}>
                     <TableCell sx={{ fontWeight: 700 }}>{t('columnSum')}</TableCell>
                     {columnSums.map((sum: number, index: number) => (
-                      <TableCell key={`column-sum-${index}`} align="center" sx={{ fontWeight: 700 }}>
+                      <TableCell
+                        key={`column-sum-${index}`}
+                        align="center"
+                        sx={{ fontWeight: 700 }}
+                      >
                         {formatSignedNumber(sum)}
                       </TableCell>
                     ))}

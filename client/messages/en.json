@@ -96,6 +96,7 @@
     "description": "Enterprise Architecture Management System",
     "companyNotSelected": "No company selected",
     "geaTotalScore": "GEA Total Score",
+    "geaScoreTooltip": "Go to Matrix Editor",
     "totalArchitectures": "Total Architectures",
     "totalDiagrams": "Total Diagrams",
     "totalApplications": "Total Applications",

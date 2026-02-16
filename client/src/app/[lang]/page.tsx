@@ -5,6 +5,7 @@ import {
   ButtonBase,
   Chip,
   Box,
+  Tooltip,
   Typography,
   Grid,
   Card,
@@ -365,37 +366,39 @@ const Dashboard = () => {
           </Box>
 
           {isGeaEnabled && (
-            <ButtonBase
-              onClick={() => router.push('/matrix-editor')}
-              sx={{
-                borderRadius: 2,
-                textAlign: 'right',
-                display: 'block',
-              }}
-            >
-              <Box
+            <Tooltip title={t('geaScoreTooltip')} arrow>
+              <ButtonBase
+                onClick={() => router.push('/matrix-editor')}
                 sx={{
-                px: 2.5,
-                py: 1.25,
-                borderRadius: 2,
-                minWidth: 180,
-                textAlign: 'right',
-                backgroundColor: getGeaScoreBackground(geaTotalScorePercent),
-                border: `1px solid ${alpha(theme.palette.text.primary, 0.12)}`,
-                transition: 'transform 120ms ease',
-                '&:hover': {
-                  transform: 'translateY(-1px)',
-                },
-              }}
+                  borderRadius: 2,
+                  textAlign: 'right',
+                  display: 'block',
+                }}
               >
-                <Typography variant="subtitle2" color="text.secondary">
-                  {t('geaTotalScore')}
-                </Typography>
-                <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                  {geaScoreLoading ? '...' : formatSignedPercent(geaTotalScorePercent)}
-                </Typography>
-              </Box>
-            </ButtonBase>
+                <Box
+                  sx={{
+                    px: 2.5,
+                    py: 1.25,
+                    borderRadius: 2,
+                    minWidth: 180,
+                    textAlign: 'right',
+                    backgroundColor: getGeaScoreBackground(geaTotalScorePercent),
+                    border: `1px solid ${alpha(theme.palette.text.primary, 0.12)}`,
+                    transition: 'transform 120ms ease',
+                    '&:hover': {
+                      transform: 'translateY(-1px)',
+                    },
+                  }}
+                >
+                  <Typography variant="subtitle2" color="text.secondary">
+                    {t('geaTotalScore')}
+                  </Typography>
+                  <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                    {geaScoreLoading ? '...' : formatSignedPercent(geaTotalScorePercent)}
+                  </Typography>
+                </Box>
+              </ButtonBase>
+            </Tooltip>
           )}
         </CardContent>
       </Card>

@@ -103,6 +103,7 @@
     "companyNotSelected": "Kein Unternehmen ausgewählt",
     "description_placeholder": "Keine Beschreibung verfügbar",
     "geaTotalScore": "GEA Gesamtscore",
+    "geaScoreTooltip": "Zum Matrix Editor",
     "businessCapabilities": "Business Capabilities",
     "applications": "Applikationen",
     "aiComponents": "AI Components",
