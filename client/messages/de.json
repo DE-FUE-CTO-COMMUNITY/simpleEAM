@@ -55,6 +55,7 @@
   "navigation": {
     "dashboard": "Dashboard",
     "diagramEditor": "Diagram-Editor",
+    "matrixEditor": "Matrix-Editor",
     "processEditor": "Prozess-Editor",
     "architectures": "Architekturen",
     "architecturePrinciples": "Architektur Prinzipien",
@@ -2674,6 +2675,11 @@
     "title": "Prozess-Editor",
     "comingSoon": "Diese Funktion wird später implementiert",
     "description": "Der Prozess-Editor für BPMN-Diagramme ist in Entwicklung und wird in einer zukünftigen Version verfügbar sein."
+  },
+  "matrixEditor": {
+    "title": "Matrix-Editor",
+    "comingSoon": "Diese Funktion wird später implementiert",
+    "description": "Der Matrix-Editor für die Analyse der Business-Architektur ist in Entwicklung und wird in einer zukünftigen Version verfügbar sein."
   },
   "suppliers": {
     "title": "Lieferanten",

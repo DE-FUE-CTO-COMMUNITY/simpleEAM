@@ -248,6 +248,9 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
   const menuItems = [
     { text: t('dashboard'), icon: <DashboardIcon />, href: '/' },
     { text: t('diagramEditor'), icon: <DiagramIcon />, href: '/diagrams' },
+    ...(isGeaEnabled && selectedLens === 'businessArchitecture'
+      ? [{ text: t('matrixEditor'), icon: <GridOnIcon />, href: '/matrix-editor' }]
+      : []),
     ...(selectedLens === 'processArchitecture'
       ? [{ text: t('processEditor'), icon: <GridOnIcon />, href: '/process-editor' }]
       : []),
