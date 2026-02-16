@@ -129,12 +129,12 @@ const StrategiesPage = () => {
             },
           }
         : {}),
-      ...(data.achievesGoals && data.achievesGoals.length > 0
+      ...(data.achievesGoalsRelations && data.achievesGoalsRelations.length > 0
         ? {
             achievesGoals: {
-              connect: data.achievesGoals.map(id => ({
-                edge: { score: 0 },
-                where: { node: { id: { eq: id } } },
+              connect: data.achievesGoalsRelations.map(relation => ({
+                edge: { score: relation.score },
+                where: { node: { id: { eq: relation.goalId } } },
               })),
             },
           }
@@ -218,12 +218,12 @@ const StrategiesPage = () => {
       }
     }
 
-    if (data.achievesGoals && data.achievesGoals.length > 0) {
+    if (data.achievesGoalsRelations && data.achievesGoalsRelations.length > 0) {
       input.achievesGoals = {
         disconnect: [{ where: {} }],
-        connect: data.achievesGoals.map(id => ({
-          edge: { score: 0 },
-          where: { node: { id: { eq: id } } },
+        connect: data.achievesGoalsRelations.map(relation => ({
+          edge: { score: relation.score },
+          where: { node: { id: { eq: relation.goalId } } },
         })),
       }
     } else {

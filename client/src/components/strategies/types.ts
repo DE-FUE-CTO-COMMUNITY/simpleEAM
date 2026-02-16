@@ -8,6 +8,7 @@ export type StrategyType = Pick<
   | 'owners'
   | 'company'
   | 'achievesGoals'
+  | 'achievesGoalsConnection'
   | 'partOfArchitectures'
   | 'depictedInDiagrams'
   | 'createdAt'

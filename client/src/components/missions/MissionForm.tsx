@@ -1,6 +1,8 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import { Button, IconButton, MenuItem, Stack, TextField } from '@mui/material'
+import { Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material'
 import { useForm } from '@tanstack/react-form'
 import { z } from 'zod'
 import { useQuery } from '@apollo/client'
@@ -20,6 +22,21 @@ import { GenericFormProps } from '../common/GenericFormProps'
 import { Gea_Mission, Architecture, Gea_Vision, Gea_Value, Gea_Goal } from '../../gql/generated'
 import ArchitectureForm from '../architectures/ArchitectureForm'
 
+interface MissionGoalRelationInput {
+  goalId: string
+  score: number
+}
+
+interface MissionVisionRelationInput {
+  visionId: string
+  score: number
+}
+
+interface MissionValueRelationInput {
+  valueId: string
+  score: number
+}
+
 const createMissionSchema = (t: any) =>
   z.object({
     name: z.string().min(3, t('validation.nameMin')).max(100, t('validation.nameMax')),
@@ -30,9 +47,30 @@ const createMissionSchema = (t: any) =>
     keywords: z.array(z.string()).optional(),
     year: z.date({ required_error: t('validation.yearRequired') }),
     ownerId: z.string().optional(),
-    supportedByVisions: z.array(z.string()).optional(),
-    supportedByValues: z.array(z.string()).optional(),
-    supportedByGoals: z.array(z.string()).optional(),
+    supportedByVisionsRelations: z
+      .array(
+        z.object({
+          visionId: z.string().min(1, t('validation.visionRequired')),
+          score: z.number().min(-3, t('validation.scoreRange')).max(3, t('validation.scoreRange')),
+        })
+      )
+      .optional(),
+    supportedByValuesRelations: z
+      .array(
+        z.object({
+          valueId: z.string().min(1, t('validation.valueRequired')),
+          score: z.number().min(-3, t('validation.scoreRange')).max(3, t('validation.scoreRange')),
+        })
+      )
+      .optional(),
+    supportedByGoalsRelations: z
+      .array(
+        z.object({
+          goalId: z.string().min(1, t('validation.goalRequired')),
+          score: z.number().min(-3, t('validation.scoreRange')).max(3, t('validation.scoreRange')),
+        })
+      )
+      .optional(),
     partOfArchitectures: z.array(z.string()).optional(),
     depictedInDiagrams: z.array(z.string()).optional(),
   })
@@ -52,6 +90,16 @@ const MissionForm: React.FC<GenericFormProps<Gea_Mission, MissionFormValues>> = 
 }) => {
   const tForm = useTranslations('missions.form')
   const tTabs = useTranslations('missions.tabs')
+
+  const scoreOptions: Array<{ value: number; label: string }> = [
+    { value: 3, label: tForm('scoreStrongSupport') },
+    { value: 2, label: tForm('scoreSupport') },
+    { value: 1, label: tForm('scoreWeakSupport') },
+    { value: 0, label: tForm('scoreNeutral') },
+    { value: -1, label: tForm('scoreSlightContradiction') },
+    { value: -2, label: tForm('scoreSignificantConflict') },
+    { value: -3, label: tForm('scoreDirectContradiction') },
+  ]
 
   const { currentPerson } = useCurrentPerson()
 
@@ -131,9 +179,27 @@ const MissionForm: React.FC<GenericFormProps<Gea_Mission, MissionFormValues>> = 
       year: mission?.year ? new Date(mission.year) : new Date(),
       ownerId:
         mission?.owners && mission.owners.length > 0 ? mission.owners[0].id : currentPerson?.id,
-      supportedByVisions: mission?.supportedByVisions?.map(vision => vision.id) || [],
-      supportedByValues: mission?.supportedByValues?.map(value => value.id) || [],
-      supportedByGoals: mission?.supportedByGoals?.map(goal => goal.id) || [],
+      supportedByVisionsRelations:
+        mission?.supportedByVisionsConnection?.edges?.map(edge => ({
+          visionId: edge.node.id,
+          score: edge.properties.score,
+        })) ||
+        mission?.supportedByVisions?.map(vision => ({ visionId: vision.id, score: 0 })) ||
+        [],
+      supportedByValuesRelations:
+        mission?.supportedByValuesConnection?.edges?.map(edge => ({
+          valueId: edge.node.id,
+          score: edge.properties.score,
+        })) ||
+        mission?.supportedByValues?.map(value => ({ valueId: value.id, score: 0 })) ||
+        [],
+      supportedByGoalsRelations:
+        mission?.supportedByGoalsConnection?.edges?.map(edge => ({
+          goalId: edge.node.id,
+          score: edge.properties.score,
+        })) ||
+        mission?.supportedByGoals?.map(goal => ({ goalId: goal.id, score: 0 })) ||
+        [],
       partOfArchitectures: mission?.partOfArchitectures?.map(arch => arch.id) || [],
       depictedInDiagrams: mission?.depictedInDiagrams?.map(diag => diag.id) || [],
     }),
@@ -170,9 +236,27 @@ const MissionForm: React.FC<GenericFormProps<Gea_Mission, MissionFormValues>> = 
         year: mission?.year ? new Date(mission.year) : new Date(),
         ownerId:
           mission?.owners && mission.owners.length > 0 ? mission.owners[0].id : currentPerson?.id,
-        supportedByVisions: mission?.supportedByVisions?.map(vision => vision.id) || [],
-        supportedByValues: mission?.supportedByValues?.map(value => value.id) || [],
-        supportedByGoals: mission?.supportedByGoals?.map(goal => goal.id) || [],
+        supportedByVisionsRelations:
+          mission?.supportedByVisionsConnection?.edges?.map(edge => ({
+            visionId: edge.node.id,
+            score: edge.properties.score,
+          })) ||
+          mission?.supportedByVisions?.map(vision => ({ visionId: vision.id, score: 0 })) ||
+          [],
+        supportedByValuesRelations:
+          mission?.supportedByValuesConnection?.edges?.map(edge => ({
+            valueId: edge.node.id,
+            score: edge.properties.score,
+          })) ||
+          mission?.supportedByValues?.map(value => ({ valueId: value.id, score: 0 })) ||
+          [],
+        supportedByGoalsRelations:
+          mission?.supportedByGoalsConnection?.edges?.map(edge => ({
+            goalId: edge.node.id,
+            score: edge.properties.score,
+          })) ||
+          mission?.supportedByGoals?.map(goal => ({ goalId: goal.id, score: 0 })) ||
+          [],
         partOfArchitectures: mission?.partOfArchitectures?.map(arch => arch.id) || [],
         depictedInDiagrams: mission?.depictedInDiagrams?.map(diag => diag.id) || [],
       })
@@ -235,97 +319,309 @@ const MissionForm: React.FC<GenericFormProps<Gea_Mission, MissionFormValues>> = 
       tabId: 'general',
     },
     {
-      name: 'supportedByVisions',
+      name: 'supportedByVisionsRelations',
       label: tForm('supportedByVisions'),
-      type: 'autocomplete',
-      multiple: true,
-      options:
-        visionsData?.geaVisions?.map(
-          (vision: Gea_Vision): SelectOption => ({
-            value: vision.id,
-            label: vision.name,
-          })
-        ) || [],
-      loadingOptions: visionsLoading,
+      type: 'custom',
       size: 12,
       tabId: 'relationships',
-      onChipClick: createChipClickHandler('supportedByVisions'),
-      getOptionLabel: (option: any) => {
-        if (typeof option === 'string') {
-          const matchingVision = visionsData?.geaVisions?.find(
-            (vision: Gea_Vision) => vision.id === option
+      customRender: (formField, disabled) => {
+        const relations = Array.isArray(formField.state.value)
+          ? (formField.state.value as MissionVisionRelationInput[])
+          : []
+        const allVisions: Gea_Vision[] = visionsData?.geaVisions || []
+        const selectedVisionIds = new Set(relations.map(relation => relation.visionId).filter(Boolean))
+        const hasMoreVisionsToAdd = allVisions.some(vision => !selectedVisionIds.has(vision.id))
+
+        const updateRelation = (
+          index: number,
+          key: keyof MissionVisionRelationInput,
+          value: string | number
+        ) => {
+          const nextRelations = relations.map((relation, relationIndex) =>
+            relationIndex === index ? { ...relation, [key]: value } : relation
           )
-          return matchingVision?.name || option
+          formField.handleChange(nextRelations)
         }
-        return option?.label || ''
-      },
-      isOptionEqualToValue: (option: any, value: any) => {
-        if (typeof value === 'string') {
-          return option.value === value
+
+        const removeRelation = (index: number) => {
+          const nextRelations = relations.filter((_, relationIndex) => relationIndex !== index)
+          formField.handleChange(nextRelations)
         }
-        return option.value === value?.value || option.value === value
+
+        const addRelation = () => {
+          const nextRelations = [...relations, { visionId: '', score: 0 }]
+          formField.handleChange(nextRelations)
+        }
+
+        return (
+          <Stack spacing={2}>
+            {relations.map((relation, index) => {
+              const availableVisionsForRow = allVisions.filter(
+                vision => vision.id === relation.visionId || !selectedVisionIds.has(vision.id)
+              )
+
+              return (
+                <Stack
+                  key={`vision-relation-${index}`}
+                  direction="row"
+                  spacing={1}
+                  alignItems="center"
+                >
+                  <TextField
+                    select
+                    label={tForm('vision')}
+                    value={relation.visionId}
+                    onChange={event => updateRelation(index, 'visionId', event.target.value)}
+                    disabled={disabled}
+                    fullWidth
+                  >
+                    {availableVisionsForRow.map((vision: Gea_Vision) => (
+                      <MenuItem key={vision.id} value={vision.id}>
+                        {vision.name}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+
+                  <TextField
+                    select
+                    label={tForm('score')}
+                    value={relation.score}
+                    onChange={event => updateRelation(index, 'score', Number(event.target.value))}
+                    disabled={disabled}
+                    sx={{ minWidth: 260 }}
+                  >
+                    {scoreOptions.map(option => (
+                      <MenuItem key={`score-${option.value}`} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+
+                  <IconButton
+                    onClick={() => removeRelation(index)}
+                    disabled={disabled}
+                    aria-label={tForm('removeVisionRelation')}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </Stack>
+              )
+            })}
+
+            <Button
+              variant="outlined"
+              startIcon={<AddIcon />}
+              onClick={addRelation}
+              disabled={disabled || visionsLoading || !hasMoreVisionsToAdd}
+              sx={{ alignSelf: 'flex-start' }}
+            >
+              {tForm('addVisionRelation')}
+            </Button>
+          </Stack>
+        )
       },
     },
     {
-      name: 'supportedByValues',
+      name: 'supportedByValuesRelations',
       label: tForm('supportedByValues'),
-      type: 'autocomplete',
-      multiple: true,
-      options:
-        valuesData?.geaValues?.map(
-          (value: Gea_Value): SelectOption => ({
-            value: value.id,
-            label: value.name,
-          })
-        ) || [],
-      loadingOptions: valuesLoading,
+      type: 'custom',
       size: 12,
       tabId: 'relationships',
-      onChipClick: createChipClickHandler('supportedByValues'),
-      getOptionLabel: (option: any) => {
-        if (typeof option === 'string') {
-          const matchingValue = valuesData?.geaValues?.find(
-            (value: Gea_Value) => value.id === option
+      customRender: (formField, disabled) => {
+        const relations = Array.isArray(formField.state.value)
+          ? (formField.state.value as MissionValueRelationInput[])
+          : []
+        const allValues: Gea_Value[] = valuesData?.geaValues || []
+        const selectedValueIds = new Set(relations.map(relation => relation.valueId).filter(Boolean))
+        const hasMoreValuesToAdd = allValues.some(value => !selectedValueIds.has(value.id))
+
+        const updateRelation = (
+          index: number,
+          key: keyof MissionValueRelationInput,
+          value: string | number
+        ) => {
+          const nextRelations = relations.map((relation, relationIndex) =>
+            relationIndex === index ? { ...relation, [key]: value } : relation
           )
-          return matchingValue?.name || option
+          formField.handleChange(nextRelations)
         }
-        return option?.label || ''
-      },
-      isOptionEqualToValue: (option: any, value: any) => {
-        if (typeof value === 'string') {
-          return option.value === value
+
+        const removeRelation = (index: number) => {
+          const nextRelations = relations.filter((_, relationIndex) => relationIndex !== index)
+          formField.handleChange(nextRelations)
         }
-        return option.value === value?.value || option.value === value
+
+        const addRelation = () => {
+          const nextRelations = [...relations, { valueId: '', score: 0 }]
+          formField.handleChange(nextRelations)
+        }
+
+        return (
+          <Stack spacing={2}>
+            {relations.map((relation, index) => {
+              const availableValuesForRow = allValues.filter(
+                value => value.id === relation.valueId || !selectedValueIds.has(value.id)
+              )
+
+              return (
+                <Stack
+                  key={`value-relation-${index}`}
+                  direction="row"
+                  spacing={1}
+                  alignItems="center"
+                >
+                  <TextField
+                    select
+                    label={tForm('value')}
+                    value={relation.valueId}
+                    onChange={event => updateRelation(index, 'valueId', event.target.value)}
+                    disabled={disabled}
+                    fullWidth
+                  >
+                    {availableValuesForRow.map((value: Gea_Value) => (
+                      <MenuItem key={value.id} value={value.id}>
+                        {value.name}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+
+                  <TextField
+                    select
+                    label={tForm('score')}
+                    value={relation.score}
+                    onChange={event => updateRelation(index, 'score', Number(event.target.value))}
+                    disabled={disabled}
+                    sx={{ minWidth: 260 }}
+                  >
+                    {scoreOptions.map(option => (
+                      <MenuItem key={`score-${option.value}`} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+
+                  <IconButton
+                    onClick={() => removeRelation(index)}
+                    disabled={disabled}
+                    aria-label={tForm('removeValueRelation')}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </Stack>
+              )
+            })}
+
+            <Button
+              variant="outlined"
+              startIcon={<AddIcon />}
+              onClick={addRelation}
+              disabled={disabled || valuesLoading || !hasMoreValuesToAdd}
+              sx={{ alignSelf: 'flex-start' }}
+            >
+              {tForm('addValueRelation')}
+            </Button>
+          </Stack>
+        )
       },
     },
     {
-      name: 'supportedByGoals',
+      name: 'supportedByGoalsRelations',
       label: tForm('supportedByGoals'),
-      type: 'autocomplete',
-      multiple: true,
-      options:
-        goalsData?.geaGoals?.map(
-          (goal: Gea_Goal): SelectOption => ({
-            value: goal.id,
-            label: goal.name,
-          })
-        ) || [],
-      loadingOptions: goalsLoading,
+      type: 'custom',
       size: 12,
       tabId: 'relationships',
-      onChipClick: createChipClickHandler('supportedByGoals'),
-      getOptionLabel: (option: any) => {
-        if (typeof option === 'string') {
-          const matchingGoal = goalsData?.geaGoals?.find((goal: Gea_Goal) => goal.id === option)
-          return matchingGoal?.name || option
+      customRender: (formField, disabled) => {
+        const relations = Array.isArray(formField.state.value)
+          ? (formField.state.value as MissionGoalRelationInput[])
+          : []
+        const allGoals: Gea_Goal[] = goalsData?.geaGoals || []
+        const selectedGoalIds = new Set(relations.map(relation => relation.goalId).filter(Boolean))
+        const hasMoreGoalsToAdd = allGoals.some(goal => !selectedGoalIds.has(goal.id))
+
+        const updateRelation = (
+          index: number,
+          key: keyof MissionGoalRelationInput,
+          value: string | number
+        ) => {
+          const nextRelations = relations.map((relation, relationIndex) =>
+            relationIndex === index ? { ...relation, [key]: value } : relation
+          )
+          formField.handleChange(nextRelations)
         }
-        return option?.label || ''
-      },
-      isOptionEqualToValue: (option: any, value: any) => {
-        if (typeof value === 'string') {
-          return option.value === value
+
+        const removeRelation = (index: number) => {
+          const nextRelations = relations.filter((_, relationIndex) => relationIndex !== index)
+          formField.handleChange(nextRelations)
         }
-        return option.value === value?.value || option.value === value
+
+        const addRelation = () => {
+          const nextRelations = [...relations, { goalId: '', score: 0 }]
+          formField.handleChange(nextRelations)
+        }
+
+        return (
+          <Stack spacing={2}>
+            {relations.map((relation, index) => (
+              <Stack key={`goal-relation-${index}`} direction="row" spacing={1} alignItems="center">
+                {(() => {
+                  const availableGoalsForRow = allGoals.filter(
+                    goal => goal.id === relation.goalId || !selectedGoalIds.has(goal.id)
+                  )
+
+                  return (
+                <TextField
+                  select
+                  label={tForm('goal')}
+                  value={relation.goalId}
+                  onChange={event => updateRelation(index, 'goalId', event.target.value)}
+                  disabled={disabled}
+                  fullWidth
+                >
+                  {availableGoalsForRow.map((goal: Gea_Goal) => (
+                    <MenuItem key={goal.id} value={goal.id}>
+                      {goal.name}
+                    </MenuItem>
+                  ))}
+                </TextField>
+                  )
+                })()}
+
+                <TextField
+                  select
+                  label={tForm('score')}
+                  value={relation.score}
+                  onChange={event => updateRelation(index, 'score', Number(event.target.value))}
+                  disabled={disabled}
+                  sx={{ minWidth: 260 }}
+                >
+                  {scoreOptions.map(option => (
+                    <MenuItem key={`score-${option.value}`} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+
+                <IconButton
+                  onClick={() => removeRelation(index)}
+                  disabled={disabled}
+                  aria-label={tForm('removeGoalRelation')}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </Stack>
+            ))}
+
+            <Button
+              variant="outlined"
+              startIcon={<AddIcon />}
+              onClick={addRelation}
+              disabled={disabled || goalsLoading || !hasMoreGoalsToAdd}
+              sx={{ alignSelf: 'flex-start' }}
+            >
+              {tForm('addGoalRelation')}
+            </Button>
+          </Stack>
+        )
       },
     },
     {

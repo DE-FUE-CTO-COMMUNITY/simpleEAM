@@ -21,9 +21,31 @@ export const GET_VALUES = gql`
         id
         name
       }
+      supportsMissionsConnection {
+        edges {
+          node {
+            id
+            name
+          }
+          properties {
+            score
+          }
+        }
+      }
       supportsVisions {
         id
         name
+      }
+      supportsVisionsConnection {
+        edges {
+          node {
+            id
+            name
+          }
+          properties {
+            score
+          }
+        }
       }
       partOfArchitectures {
         id

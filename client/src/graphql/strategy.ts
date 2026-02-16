@@ -21,6 +21,17 @@ export const GET_STRATEGIES = gql`
         id
         name
       }
+      achievesGoalsConnection {
+        edges {
+          node {
+            id
+            name
+          }
+          properties {
+            score
+          }
+        }
+      }
       partOfArchitectures {
         id
         name

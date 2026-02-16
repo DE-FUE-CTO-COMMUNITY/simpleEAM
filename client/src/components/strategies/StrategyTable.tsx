@@ -146,7 +146,11 @@ const StrategyTable: React.FC<StrategyTableProps> = ({
     name: strategy.name,
     description: strategy.description ?? '',
     ownerId: strategy.owners?.[0]?.id ?? '',
-    achievesGoals: strategy.achievesGoals?.map(goal => goal.id) ?? [],
+    achievesGoalsRelations:
+      strategy.achievesGoalsConnection?.edges?.map(edge => ({
+        goalId: edge?.node?.id ?? '',
+        score: edge?.properties?.score ?? 0,
+      })) ?? [],
     partOfArchitectures: strategy.partOfArchitectures?.map(arch => arch.id) ?? [],
     depictedInDiagrams: strategy.depictedInDiagrams?.map(diagram => diagram.id) ?? [],
   })

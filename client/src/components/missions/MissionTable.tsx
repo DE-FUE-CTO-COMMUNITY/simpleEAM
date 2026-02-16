@@ -181,9 +181,27 @@ const MissionTable: React.FC<MissionTableProps> = ({
     keywords: mission.keywords ?? [],
     year: mission.year ? new Date(mission.year) : new Date(),
     ownerId: mission.owners?.[0]?.id ?? '',
-    supportedByVisions: mission.supportedByVisions?.map(vision => vision.id) ?? [],
-    supportedByValues: mission.supportedByValues?.map(value => value.id) ?? [],
-    supportedByGoals: mission.supportedByGoals?.map(goal => goal.id) ?? [],
+    supportedByVisionsRelations:
+      mission.supportedByVisionsConnection?.edges?.map(edge => ({
+        visionId: edge.node.id,
+        score: edge.properties.score,
+      })) ??
+      mission.supportedByVisions?.map(vision => ({ visionId: vision.id, score: 0 })) ??
+      [],
+    supportedByValuesRelations:
+      mission.supportedByValuesConnection?.edges?.map(edge => ({
+        valueId: edge.node.id,
+        score: edge.properties.score,
+      })) ??
+      mission.supportedByValues?.map(value => ({ valueId: value.id, score: 0 })) ??
+      [],
+    supportedByGoalsRelations:
+      mission.supportedByGoalsConnection?.edges?.map(edge => ({
+        goalId: edge.node.id,
+        score: edge.properties.score,
+      })) ??
+      mission.supportedByGoals?.map(goal => ({ goalId: goal.id, score: 0 })) ??
+      [],
     partOfArchitectures: mission.partOfArchitectures?.map(arch => arch.id) ?? [],
     depictedInDiagrams: mission.depictedInDiagrams?.map(diagram => diagram.id) ?? [],
   })

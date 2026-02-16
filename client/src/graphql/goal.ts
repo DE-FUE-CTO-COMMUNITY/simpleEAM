@@ -21,17 +21,61 @@ export const GET_GOALS = gql`
         id
         name
       }
+      operationalizesVisionsConnection {
+        edges {
+          node {
+            id
+            name
+          }
+          properties {
+            score
+          }
+        }
+      }
       supportsMissions {
         id
         name
+      }
+      supportsMissionsConnection {
+        edges {
+          node {
+            id
+            name
+          }
+          properties {
+            score
+          }
+        }
       }
       supportsValues {
         id
         name
       }
+      supportsValuesConnection {
+        edges {
+          node {
+            id
+            name
+          }
+          properties {
+            score
+          }
+        }
+      }
       achievedByStrategies {
         id
         name
+      }
+      achievedByStrategiesConnection {
+        edges {
+          node {
+            id
+            name
+          }
+          properties {
+            score
+          }
+        }
       }
       partOfArchitectures {
         id

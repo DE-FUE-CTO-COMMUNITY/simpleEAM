@@ -122,22 +122,22 @@ const ValuesPage = () => {
             },
           }
         : {}),
-      ...(data.supportsMissions && data.supportsMissions.length > 0
+      ...(data.supportsMissionsRelations && data.supportsMissionsRelations.length > 0
         ? {
             supportsMissions: {
-              connect: data.supportsMissions.map(id => ({
-                edge: { score: 0 },
-                where: { node: { id: { eq: id } } },
+              connect: data.supportsMissionsRelations.map(relation => ({
+                edge: { score: relation.score },
+                where: { node: { id: { eq: relation.missionId } } },
               })),
             },
           }
         : {}),
-      ...(data.supportsVisions && data.supportsVisions.length > 0
+      ...(data.supportsVisionsRelations && data.supportsVisionsRelations.length > 0
         ? {
             supportsVisions: {
-              connect: data.supportsVisions.map(id => ({
-                edge: { score: 0 },
-                where: { node: { id: { eq: id } } },
+              connect: data.supportsVisionsRelations.map(relation => ({
+                edge: { score: relation.score },
+                where: { node: { id: { eq: relation.visionId } } },
               })),
             },
           }
@@ -195,12 +195,12 @@ const ValuesPage = () => {
       }
     }
 
-    if (data.supportsMissions && data.supportsMissions.length > 0) {
+    if (data.supportsMissionsRelations && data.supportsMissionsRelations.length > 0) {
       input.supportsMissions = {
         disconnect: [{ where: {} }],
-        connect: data.supportsMissions.map(id => ({
-          edge: { score: 0 },
-          where: { node: { id: { eq: id } } },
+        connect: data.supportsMissionsRelations.map(relation => ({
+          edge: { score: relation.score },
+          where: { node: { id: { eq: relation.missionId } } },
         })),
       }
     } else {
@@ -209,12 +209,12 @@ const ValuesPage = () => {
       }
     }
 
-    if (data.supportsVisions && data.supportsVisions.length > 0) {
+    if (data.supportsVisionsRelations && data.supportsVisionsRelations.length > 0) {
       input.supportsVisions = {
         disconnect: [{ where: {} }],
-        connect: data.supportsVisions.map(id => ({
-          edge: { score: 0 },
-          where: { node: { id: { eq: id } } },
+        connect: data.supportsVisionsRelations.map(relation => ({
+          edge: { score: relation.score },
+          where: { node: { id: { eq: relation.visionId } } },
         })),
       }
     } else {

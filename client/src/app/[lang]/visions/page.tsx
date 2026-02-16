@@ -125,32 +125,32 @@ const VisionsPage = () => {
             },
           }
         : {}),
-      ...(data.supportsMissions && data.supportsMissions.length > 0
+      ...(data.supportsMissionsRelations && data.supportsMissionsRelations.length > 0
         ? {
             supportsMissions: {
-              connect: data.supportsMissions.map(id => ({
-                edge: { score: 0 },
-                where: { node: { id: { eq: id } } },
+              connect: data.supportsMissionsRelations.map(relation => ({
+                edge: { score: relation.score },
+                where: { node: { id: { eq: relation.missionId } } },
               })),
             },
           }
         : {}),
-      ...(data.supportedByValues && data.supportedByValues.length > 0
+      ...(data.supportedByValuesRelations && data.supportedByValuesRelations.length > 0
         ? {
             supportedByValues: {
-              connect: data.supportedByValues.map(id => ({
-                edge: { score: 0 },
-                where: { node: { id: { eq: id } } },
+              connect: data.supportedByValuesRelations.map(relation => ({
+                edge: { score: relation.score },
+                where: { node: { id: { eq: relation.valueId } } },
               })),
             },
           }
         : {}),
-      ...(data.supportedByGoals && data.supportedByGoals.length > 0
+      ...(data.supportedByGoalsRelations && data.supportedByGoalsRelations.length > 0
         ? {
             supportedByGoals: {
-              connect: data.supportedByGoals.map(id => ({
-                edge: { score: 0 },
-                where: { node: { id: { eq: id } } },
+              connect: data.supportedByGoalsRelations.map(relation => ({
+                edge: { score: relation.score },
+                where: { node: { id: { eq: relation.goalId } } },
               })),
             },
           }
@@ -210,12 +210,12 @@ const VisionsPage = () => {
       }
     }
 
-    if (data.supportsMissions && data.supportsMissions.length > 0) {
+    if (data.supportsMissionsRelations && data.supportsMissionsRelations.length > 0) {
       input.supportsMissions = {
         disconnect: [{ where: {} }],
-        connect: data.supportsMissions.map(id => ({
-          edge: { score: 0 },
-          where: { node: { id: { eq: id } } },
+        connect: data.supportsMissionsRelations.map(relation => ({
+          edge: { score: relation.score },
+          where: { node: { id: { eq: relation.missionId } } },
         })),
       }
     } else {
@@ -224,12 +224,12 @@ const VisionsPage = () => {
       }
     }
 
-    if (data.supportedByValues && data.supportedByValues.length > 0) {
+    if (data.supportedByValuesRelations && data.supportedByValuesRelations.length > 0) {
       input.supportedByValues = {
         disconnect: [{ where: {} }],
-        connect: data.supportedByValues.map(id => ({
-          edge: { score: 0 },
-          where: { node: { id: { eq: id } } },
+        connect: data.supportedByValuesRelations.map(relation => ({
+          edge: { score: relation.score },
+          where: { node: { id: { eq: relation.valueId } } },
         })),
       }
     } else {
@@ -238,12 +238,12 @@ const VisionsPage = () => {
       }
     }
 
-    if (data.supportedByGoals && data.supportedByGoals.length > 0) {
+    if (data.supportedByGoalsRelations && data.supportedByGoalsRelations.length > 0) {
       input.supportedByGoals = {
         disconnect: [{ where: {} }],
-        connect: data.supportedByGoals.map(id => ({
-          edge: { score: 0 },
-          where: { node: { id: { eq: id } } },
+        connect: data.supportedByGoalsRelations.map(relation => ({
+          edge: { score: relation.score },
+          where: { node: { id: { eq: relation.goalId } } },
         })),
       }
     } else {

@@ -122,42 +122,42 @@ const GoalsPage = () => {
             },
           }
         : {}),
-      ...(data.operationalizesVisions && data.operationalizesVisions.length > 0
+      ...(data.operationalizesVisionsRelations && data.operationalizesVisionsRelations.length > 0
         ? {
             operationalizesVisions: {
-              connect: data.operationalizesVisions.map(id => ({
-                edge: { score: 0 },
-                where: { node: { id: { eq: id } } },
+              connect: data.operationalizesVisionsRelations.map(relation => ({
+                edge: { score: relation.score },
+                where: { node: { id: { eq: relation.visionId } } },
               })),
             },
           }
         : {}),
-      ...(data.supportsMissions && data.supportsMissions.length > 0
+      ...(data.supportsMissionsRelations && data.supportsMissionsRelations.length > 0
         ? {
             supportsMissions: {
-              connect: data.supportsMissions.map(id => ({
-                edge: { score: 0 },
-                where: { node: { id: { eq: id } } },
+              connect: data.supportsMissionsRelations.map(relation => ({
+                edge: { score: relation.score },
+                where: { node: { id: { eq: relation.missionId } } },
               })),
             },
           }
         : {}),
-      ...(data.supportsValues && data.supportsValues.length > 0
+      ...(data.supportsValuesRelations && data.supportsValuesRelations.length > 0
         ? {
             supportsValues: {
-              connect: data.supportsValues.map(id => ({
-                edge: { score: 0 },
-                where: { node: { id: { eq: id } } },
+              connect: data.supportsValuesRelations.map(relation => ({
+                edge: { score: relation.score },
+                where: { node: { id: { eq: relation.valueId } } },
               })),
             },
           }
         : {}),
-      ...(data.achievedByStrategies && data.achievedByStrategies.length > 0
+      ...(data.achievedByStrategiesRelations && data.achievedByStrategiesRelations.length > 0
         ? {
             achievedByStrategies: {
-              connect: data.achievedByStrategies.map(id => ({
-                edge: { score: 0 },
-                where: { node: { id: { eq: id } } },
+              connect: data.achievedByStrategiesRelations.map(relation => ({
+                edge: { score: relation.score },
+                where: { node: { id: { eq: relation.strategyId } } },
               })),
             },
           }
@@ -215,12 +215,12 @@ const GoalsPage = () => {
       }
     }
 
-    if (data.operationalizesVisions && data.operationalizesVisions.length > 0) {
+    if (data.operationalizesVisionsRelations && data.operationalizesVisionsRelations.length > 0) {
       input.operationalizesVisions = {
         disconnect: [{ where: {} }],
-        connect: data.operationalizesVisions.map(id => ({
-          edge: { score: 0 },
-          where: { node: { id: { eq: id } } },
+        connect: data.operationalizesVisionsRelations.map(relation => ({
+          edge: { score: relation.score },
+          where: { node: { id: { eq: relation.visionId } } },
         })),
       }
     } else {
@@ -229,12 +229,12 @@ const GoalsPage = () => {
       }
     }
 
-    if (data.supportsMissions && data.supportsMissions.length > 0) {
+    if (data.supportsMissionsRelations && data.supportsMissionsRelations.length > 0) {
       input.supportsMissions = {
         disconnect: [{ where: {} }],
-        connect: data.supportsMissions.map(id => ({
-          edge: { score: 0 },
-          where: { node: { id: { eq: id } } },
+        connect: data.supportsMissionsRelations.map(relation => ({
+          edge: { score: relation.score },
+          where: { node: { id: { eq: relation.missionId } } },
         })),
       }
     } else {
@@ -243,12 +243,12 @@ const GoalsPage = () => {
       }
     }
 
-    if (data.supportsValues && data.supportsValues.length > 0) {
+    if (data.supportsValuesRelations && data.supportsValuesRelations.length > 0) {
       input.supportsValues = {
         disconnect: [{ where: {} }],
-        connect: data.supportsValues.map(id => ({
-          edge: { score: 0 },
-          where: { node: { id: { eq: id } } },
+        connect: data.supportsValuesRelations.map(relation => ({
+          edge: { score: relation.score },
+          where: { node: { id: { eq: relation.valueId } } },
         })),
       }
     } else {
@@ -257,12 +257,15 @@ const GoalsPage = () => {
       }
     }
 
-    if (data.achievedByStrategies && data.achievedByStrategies.length > 0) {
+    if (
+      data.achievedByStrategiesRelations &&
+      data.achievedByStrategiesRelations.length > 0
+    ) {
       input.achievedByStrategies = {
         disconnect: [{ where: {} }],
-        connect: data.achievedByStrategies.map(id => ({
-          edge: { score: 0 },
-          where: { node: { id: { eq: id } } },
+        connect: data.achievedByStrategiesRelations.map(relation => ({
+          edge: { score: relation.score },
+          where: { node: { id: { eq: relation.strategyId } } },
         })),
       }
     } else {

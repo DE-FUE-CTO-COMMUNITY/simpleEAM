@@ -158,8 +158,16 @@ const ValueTable: React.FC<ValueTableProps> = ({
     name: value.name,
     valueStatement: value.valueStatement ?? '',
     ownerId: value.owners?.[0]?.id ?? '',
-    supportsMissions: value.supportsMissions?.map(mission => mission.id) ?? [],
-    supportsVisions: value.supportsVisions?.map(vision => vision.id) ?? [],
+    supportsMissionsRelations:
+      value.supportsMissionsConnection?.edges?.map(edge => ({
+        missionId: edge?.node?.id ?? '',
+        score: edge?.properties?.score ?? 0,
+      })) ?? [],
+    supportsVisionsRelations:
+      value.supportsVisionsConnection?.edges?.map(edge => ({
+        visionId: edge?.node?.id ?? '',
+        score: edge?.properties?.score ?? 0,
+      })) ?? [],
     partOfArchitectures: value.partOfArchitectures?.map(arch => arch.id) ?? [],
     depictedInDiagrams: value.depictedInDiagrams?.map(diagram => diagram.id) ?? [],
   })

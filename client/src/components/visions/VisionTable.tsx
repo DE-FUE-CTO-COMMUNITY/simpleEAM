@@ -180,9 +180,21 @@ const VisionTable: React.FC<VisionTableProps> = ({
     timeHorizon: vision.timeHorizon ?? '',
     year: vision.year ? new Date(vision.year) : new Date(),
     ownerId: vision.owners?.[0]?.id ?? '',
-    supportsMissions: vision.supportsMissions?.map(mission => mission.id) ?? [],
-    supportedByValues: vision.supportedByValues?.map(value => value.id) ?? [],
-    supportedByGoals: vision.supportedByGoals?.map(goal => goal.id) ?? [],
+    supportsMissionsRelations:
+      vision.supportsMissionsConnection?.edges?.map(edge => ({
+        missionId: edge?.node?.id ?? '',
+        score: edge?.properties?.score ?? 0,
+      })) ?? [],
+    supportedByValuesRelations:
+      vision.supportedByValuesConnection?.edges?.map(edge => ({
+        valueId: edge?.node?.id ?? '',
+        score: edge?.properties?.score ?? 0,
+      })) ?? [],
+    supportedByGoalsRelations:
+      vision.supportedByGoalsConnection?.edges?.map(edge => ({
+        goalId: edge?.node?.id ?? '',
+        score: edge?.properties?.score ?? 0,
+      })) ?? [],
     partOfArchitectures: vision.partOfArchitectures?.map(arch => arch.id) ?? [],
     depictedInDiagrams: vision.depictedInDiagrams?.map(diagram => diagram.id) ?? [],
   })

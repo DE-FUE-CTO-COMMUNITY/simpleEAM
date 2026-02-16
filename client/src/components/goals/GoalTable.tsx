@@ -178,10 +178,26 @@ const GoalTable: React.FC<GoalTableProps> = ({
     name: goal.name,
     goalStatement: goal.goalStatement ?? '',
     ownerId: goal.owners?.[0]?.id ?? '',
-    operationalizesVisions: goal.operationalizesVisions?.map(vision => vision.id) ?? [],
-    supportsMissions: goal.supportsMissions?.map(mission => mission.id) ?? [],
-    supportsValues: goal.supportsValues?.map(value => value.id) ?? [],
-    achievedByStrategies: goal.achievedByStrategies?.map(strategy => strategy.id) ?? [],
+    operationalizesVisionsRelations:
+      goal.operationalizesVisionsConnection?.edges?.map(edge => ({
+        visionId: edge?.node?.id ?? '',
+        score: edge?.properties?.score ?? 0,
+      })) ?? [],
+    supportsMissionsRelations:
+      goal.supportsMissionsConnection?.edges?.map(edge => ({
+        missionId: edge?.node?.id ?? '',
+        score: edge?.properties?.score ?? 0,
+      })) ?? [],
+    supportsValuesRelations:
+      goal.supportsValuesConnection?.edges?.map(edge => ({
+        valueId: edge?.node?.id ?? '',
+        score: edge?.properties?.score ?? 0,
+      })) ?? [],
+    achievedByStrategiesRelations:
+      goal.achievedByStrategiesConnection?.edges?.map(edge => ({
+        strategyId: edge?.node?.id ?? '',
+        score: edge?.properties?.score ?? 0,
+      })) ?? [],
     partOfArchitectures: goal.partOfArchitectures?.map(arch => arch.id) ?? [],
     depictedInDiagrams: goal.depictedInDiagrams?.map(diagram => diagram.id) ?? [],
   })

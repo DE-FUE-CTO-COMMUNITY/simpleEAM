@@ -23,13 +23,46 @@ export const GET_VISIONS = gql`
         id
         name
       }
+      supportsMissionsConnection {
+        edges {
+          node {
+            id
+            name
+          }
+          properties {
+            score
+          }
+        }
+      }
       supportedByGoals {
         id
         name
       }
+      supportedByGoalsConnection {
+        edges {
+          node {
+            id
+            name
+          }
+          properties {
+            score
+          }
+        }
+      }
       supportedByValues {
         id
         name
+      }
+      supportedByValuesConnection {
+        edges {
+          node {
+            id
+            name
+          }
+          properties {
+            score
+          }
+        }
       }
       partOfArchitectures {
         id

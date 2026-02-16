@@ -23,13 +23,46 @@ export const GET_MISSIONS = gql`
         id
         name
       }
+      supportedByVisionsConnection {
+        edges {
+          node {
+            id
+            name
+          }
+          properties {
+            score
+          }
+        }
+      }
       supportedByValues {
         id
         name
       }
+      supportedByValuesConnection {
+        edges {
+          node {
+            id
+            name
+          }
+          properties {
+            score
+          }
+        }
+      }
       supportedByGoals {
         id
         name
+      }
+      supportedByGoalsConnection {
+        edges {
+          node {
+            id
+            name
+          }
+          properties {
+            score
+          }
+        }
       }
       partOfArchitectures {
         id
