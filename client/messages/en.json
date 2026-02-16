@@ -2724,8 +2724,50 @@
   },
   "matrixEditor": {
     "title": "Matrix Editor",
-    "comingSoon": "This feature will be implemented later",
-    "description": "The Matrix Editor for business architecture analysis is under development and will be available in a future release."
+    "description": "Edit relationship scores across the Business Architecture matrices.",
+    "selectMatrix": "Select Matrix",
+    "addType": "Add {type}",
+    "addVerticalElement": "Add vertical element",
+    "addHorizontalElement": "Add horizontal element",
+    "entityType": "Entity type",
+    "name": "Name",
+    "create": "Create",
+    "cancel": "Cancel",
+    "emptyCell": "No relation",
+    "scoreStrongSupport": "Strong support",
+    "scoreSupport": "Support",
+    "scoreWeakSupport": "Weak support",
+    "scoreNeutral": "Neutral",
+    "scoreSlightContradiction": "Slight contradiction",
+    "scoreSignificantConflict": "Significant conflict",
+    "scoreDirectContradiction": "Direct contradiction",
+    "matrices": {
+      "missionToVision": "Mission to Vision",
+      "valueToMissionVision": "Value to Mission & Vision",
+      "goalToMissionVision": "Goal to Mission & Vision",
+      "goalToStrategy": "Goal to Strategy"
+    },
+    "axes": {
+      "mission": "Mission",
+      "vision": "Vision",
+      "missionAndVision": "Mission & Vision",
+      "value": "Value",
+      "goal": "Goal",
+      "strategy": "Strategy"
+    },
+    "types": {
+      "mission": "Mission",
+      "vision": "Vision"
+    },
+    "messages": {
+      "loadError": "Error loading matrix data",
+      "updateSuccess": "Score updated",
+      "updateError": "Failed to update score",
+      "createSuccess": "Element created",
+      "createError": "Failed to create element",
+      "nameRequired": "Please provide a name",
+      "selectCompanyFirst": "Please select a company first"
+    }
   },
   "suppliers": {
     "title": "Suppliers",

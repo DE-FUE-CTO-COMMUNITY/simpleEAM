@@ -2678,8 +2678,50 @@
   },
   "matrixEditor": {
     "title": "Matrix-Editor",
-    "comingSoon": "Diese Funktion wird später implementiert",
-    "description": "Der Matrix-Editor für die Analyse der Business-Architektur ist in Entwicklung und wird in einer zukünftigen Version verfügbar sein."
+    "description": "Bearbeiten Sie Beziehungsscores über die Matrizen der Business-Architektur.",
+    "selectMatrix": "Matrix auswählen",
+    "addType": "{type} hinzufügen",
+    "addVerticalElement": "Vertikales Element hinzufügen",
+    "addHorizontalElement": "Horizontales Element hinzufügen",
+    "entityType": "Entitätstyp",
+    "name": "Name",
+    "create": "Erstellen",
+    "cancel": "Abbrechen",
+    "emptyCell": "Keine Beziehung",
+    "scoreStrongSupport": "Starke Unterstützung",
+    "scoreSupport": "Unterstützung",
+    "scoreWeakSupport": "Schwache Unterstützung",
+    "scoreNeutral": "Neutral",
+    "scoreSlightContradiction": "Leichter Widerspruch",
+    "scoreSignificantConflict": "Deutlicher Konflikt",
+    "scoreDirectContradiction": "Direkter Widerspruch",
+    "matrices": {
+      "missionToVision": "Mission zu Vision",
+      "valueToMissionVision": "Wert zu Mission & Vision",
+      "goalToMissionVision": "Ziel zu Mission & Vision",
+      "goalToStrategy": "Ziel zu Strategie"
+    },
+    "axes": {
+      "mission": "Mission",
+      "vision": "Vision",
+      "missionAndVision": "Mission & Vision",
+      "value": "Wert",
+      "goal": "Ziel",
+      "strategy": "Strategie"
+    },
+    "types": {
+      "mission": "Mission",
+      "vision": "Vision"
+    },
+    "messages": {
+      "loadError": "Fehler beim Laden der Matrix-Daten",
+      "updateSuccess": "Score aktualisiert",
+      "updateError": "Aktualisierung des Scores fehlgeschlagen",
+      "createSuccess": "Element erstellt",
+      "createError": "Element konnte nicht erstellt werden",
+      "nameRequired": "Bitte einen Namen eingeben",
+      "selectCompanyFirst": "Bitte zuerst ein Unternehmen auswählen"
+    }
   },
   "suppliers": {
     "title": "Lieferanten",

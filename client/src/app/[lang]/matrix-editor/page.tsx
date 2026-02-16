@@ -1,12 +1,582 @@
 'use client'
 
 import React from 'react'
-import { Box, Typography, Paper, Container } from '@mui/material'
-import { GridOn as GridOnIcon } from '@mui/icons-material'
+import {
+  Alert,
+  Box,
+  Button,
+  Chip,
+  CircularProgress,
+  Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
+  SelectChangeEvent,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField,
+  Typography,
+} from '@mui/material'
+import { alpha, useTheme } from '@mui/material/styles'
+import { useMutation, useQuery } from '@apollo/client'
 import { useTranslations } from 'next-intl'
+import { useSnackbar } from 'notistack'
+import { useCompanyWhere } from '@/hooks/useCompanyWhere'
+import { useCompanyContext } from '@/contexts/CompanyContext'
+import { CREATE_MISSION, GET_MISSIONS, UPDATE_MISSION } from '@/graphql/mission'
+import { CREATE_VISION, GET_VISIONS } from '@/graphql/vision'
+import { CREATE_VALUE, GET_VALUES, UPDATE_VALUE } from '@/graphql/value'
+import { CREATE_GOAL, GET_GOALS, UPDATE_GOAL } from '@/graphql/goal'
+import { CREATE_STRATEGY, GET_STRATEGIES } from '@/graphql/strategy'
+
+type MatrixMode =
+  | 'missionVision'
+  | 'valueMissionVision'
+  | 'goalMissionVision'
+  | 'goalStrategy'
+
+type VerticalNode = {
+  id: string
+  name: string
+  type: 'mission' | 'vision' | 'strategy'
+}
+
+type AxisEntityType = 'mission' | 'vision' | 'value' | 'goal' | 'strategy'
+
+type AddAxisDialogState = {
+  open: boolean
+  axis: 'horizontal' | 'vertical'
+}
+
+type ScoreValue = -3 | -2 | -1 | 0 | 1 | 2 | 3
+type ScoreLabelKey =
+  | 'scoreStrongSupport'
+  | 'scoreSupport'
+  | 'scoreWeakSupport'
+  | 'scoreNeutral'
+  | 'scoreSlightContradiction'
+  | 'scoreSignificantConflict'
+  | 'scoreDirectContradiction'
+
+const scoreOptions: ReadonlyArray<{ value: ScoreValue; key: ScoreLabelKey }> = [
+  { value: 3, key: 'scoreStrongSupport' },
+  { value: 2, key: 'scoreSupport' },
+  { value: 1, key: 'scoreWeakSupport' },
+  { value: 0, key: 'scoreNeutral' },
+  { value: -1, key: 'scoreSlightContradiction' },
+  { value: -2, key: 'scoreSignificantConflict' },
+  { value: -3, key: 'scoreDirectContradiction' },
+]
+
+const getEdgeScore = (
+  edges:
+    | Array<{
+        node?: { id?: string | null } | null
+        properties?: { score?: number | null } | null
+      } | null>
+    | undefined,
+  targetId: string
+): number | null => {
+  const edge = edges?.find(item => item?.node?.id === targetId)
+  const score = edge?.properties?.score
+  return typeof score === 'number' ? score : null
+}
 
 const MatrixEditorPage = () => {
+  const theme = useTheme()
+  const { enqueueSnackbar } = useSnackbar()
   const t = useTranslations('matrixEditor')
+  const { selectedCompanyId } = useCompanyContext()
+  const companyWhere = useCompanyWhere('company')
+  const [mode, setMode] = React.useState<MatrixMode>('missionVision')
+  const [addDialog, setAddDialog] = React.useState<AddAxisDialogState>({
+    open: false,
+    axis: 'horizontal',
+  })
+  const [newElementName, setNewElementName] = React.useState('')
+  const [newElementType, setNewElementType] = React.useState<AxisEntityType>('mission')
+
+  const { data: missionData, loading: missionsLoading, error: missionsError, refetch: refetchMissions } =
+    useQuery(GET_MISSIONS, {
+      variables: { where: companyWhere },
+      fetchPolicy: 'cache-and-network',
+      notifyOnNetworkStatusChange: true,
+    })
+  const {
+    data: visionData,
+    loading: visionsLoading,
+    error: visionsError,
+    refetch: refetchVisions,
+  } = useQuery(GET_VISIONS, {
+    variables: { where: companyWhere },
+    fetchPolicy: 'cache-and-network',
+  })
+  const { data: valueData, loading: valuesLoading, error: valuesError, refetch: refetchValues } =
+    useQuery(GET_VALUES, {
+      variables: { where: companyWhere },
+      fetchPolicy: 'cache-and-network',
+      notifyOnNetworkStatusChange: true,
+    })
+  const { data: goalData, loading: goalsLoading, error: goalsError, refetch: refetchGoals } = useQuery(
+    GET_GOALS,
+    {
+      variables: { where: companyWhere },
+      fetchPolicy: 'cache-and-network',
+      notifyOnNetworkStatusChange: true,
+    }
+  )
+  const {
+    data: strategyData,
+    loading: strategiesLoading,
+    error: strategiesError,
+    refetch: refetchStrategies,
+  } = useQuery(GET_STRATEGIES, {
+    variables: { where: companyWhere },
+    fetchPolicy: 'cache-and-network',
+  })
+
+  const [updateMission, { loading: isUpdatingMission }] = useMutation(UPDATE_MISSION)
+  const [updateValue, { loading: isUpdatingValue }] = useMutation(UPDATE_VALUE)
+  const [updateGoal, { loading: isUpdatingGoal }] = useMutation(UPDATE_GOAL)
+  const [createMission, { loading: isCreatingMission }] = useMutation(CREATE_MISSION)
+  const [createVision, { loading: isCreatingVision }] = useMutation(CREATE_VISION)
+  const [createValue, { loading: isCreatingValue }] = useMutation(CREATE_VALUE)
+  const [createGoal, { loading: isCreatingGoal }] = useMutation(CREATE_GOAL)
+  const [createStrategy, { loading: isCreatingStrategy }] = useMutation(CREATE_STRATEGY)
+
+  const missions = React.useMemo(() => missionData?.geaMissions ?? [], [missionData?.geaMissions])
+  const visions = React.useMemo(() => visionData?.geaVisions ?? [], [visionData?.geaVisions])
+  const values = React.useMemo(() => valueData?.geaValues ?? [], [valueData?.geaValues])
+  const goals = React.useMemo(() => goalData?.geaGoals ?? [], [goalData?.geaGoals])
+  const strategies = React.useMemo(() => strategyData?.geaStrategies ?? [], [strategyData?.geaStrategies])
+
+  const getCellBackground = React.useCallback(
+    (score: number | null) => {
+      if (score === null) {
+        return theme.palette.background.paper
+      }
+
+      if (score > 0) {
+        return alpha(theme.palette.success.main, (Math.min(score, 3) / 3) * 0.5)
+      }
+
+      if (score < 0) {
+        return alpha(theme.palette.error.main, (Math.min(Math.abs(score), 3) / 3) * 0.5)
+      }
+
+      return theme.palette.background.paper
+    },
+    [theme]
+  )
+
+  const onModeChange = (event: SelectChangeEvent<MatrixMode>) => {
+    setMode(event.target.value as MatrixMode)
+  }
+
+  const horizontalType: AxisEntityType =
+    mode === 'missionVision' ? 'mission' : mode === 'valueMissionVision' ? 'value' : 'goal'
+
+  const verticalTypes: AxisEntityType[] =
+    mode === 'missionVision'
+      ? ['vision']
+      : mode === 'valueMissionVision' || mode === 'goalMissionVision'
+        ? ['mission', 'vision']
+        : ['strategy']
+
+  const axisLabel =
+    mode === 'missionVision'
+      ? `${t('axes.vision')}/${t('axes.mission')}`
+      : mode === 'valueMissionVision'
+        ? `${t('axes.missionAndVision')}/${t('axes.value')}`
+        : mode === 'goalMissionVision'
+          ? `${t('axes.missionAndVision')}/${t('axes.goal')}`
+          : `${t('axes.strategy')}/${t('axes.goal')}`
+
+  const entityTypeLabel: Record<AxisEntityType, string> = {
+    mission: t('axes.mission'),
+    vision: t('axes.vision'),
+    value: t('axes.value'),
+    goal: t('axes.goal'),
+    strategy: t('axes.strategy'),
+  }
+
+  const verticalButtonTypeLabel =
+    verticalTypes.length === 2
+      ? `${entityTypeLabel[verticalTypes[0]]}/${entityTypeLabel[verticalTypes[1]]}`
+      : entityTypeLabel[verticalTypes[0]]
+
+  const horizontalButtonTypeLabel = entityTypeLabel[horizontalType]
+
+  const resetAddDialog = () => {
+    setAddDialog({ open: false, axis: 'horizontal' })
+    setNewElementName('')
+    setNewElementType('mission')
+  }
+
+  const openAddDialog = (axis: 'horizontal' | 'vertical') => {
+    const defaultType = axis === 'horizontal' ? horizontalType : verticalTypes[0]
+    setNewElementType(defaultType)
+    setNewElementName('')
+    setAddDialog({ open: true, axis })
+  }
+
+  const withNotifications = async (action: () => Promise<void>) => {
+    try {
+      await action()
+      enqueueSnackbar(t('messages.updateSuccess'), { variant: 'success' })
+    } catch (error) {
+      const message = error instanceof Error ? error.message : t('messages.updateError')
+      enqueueSnackbar(`${t('messages.updateError')}: ${message}`, { variant: 'error' })
+    }
+  }
+
+  const refetchAfterCreate = async (entityType: AxisEntityType) => {
+    if (entityType === 'mission') {
+      await refetchMissions({ where: companyWhere })
+      return
+    }
+    if (entityType === 'vision') {
+      await refetchVisions({ where: companyWhere })
+      return
+    }
+    if (entityType === 'value') {
+      await refetchValues({ where: companyWhere })
+      return
+    }
+    if (entityType === 'goal') {
+      await refetchGoals({ where: companyWhere })
+      return
+    }
+
+    if (entityType === 'strategy') {
+      await refetchStrategies({ where: companyWhere })
+    }
+  }
+
+  const createEntity = async () => {
+    if (!selectedCompanyId) {
+      enqueueSnackbar(t('messages.selectCompanyFirst'), { variant: 'warning' })
+      return
+    }
+
+    const trimmedName = newElementName.trim()
+    if (!trimmedName) {
+      enqueueSnackbar(t('messages.nameRequired'), { variant: 'warning' })
+      return
+    }
+
+    try {
+      if (newElementType === 'mission') {
+        await createMission({
+          variables: {
+            input: [
+              {
+                name: trimmedName,
+                purposeStatement: '',
+                year: new Date().toISOString().split('T')[0],
+                company: {
+                  connect: [{ where: { node: { id: { eq: selectedCompanyId } } } }],
+                },
+              },
+            ],
+          },
+        })
+        await refetchMissions({ where: companyWhere })
+      } else if (newElementType === 'vision') {
+        await createVision({
+          variables: {
+            input: [
+              {
+                name: trimmedName,
+                visionStatement: '',
+                year: new Date().toISOString().split('T')[0],
+                company: {
+                  connect: [{ where: { node: { id: { eq: selectedCompanyId } } } }],
+                },
+              },
+            ],
+          },
+        })
+      } else if (newElementType === 'value') {
+        await createValue({
+          variables: {
+            input: [
+              {
+                name: trimmedName,
+                valueStatement: '',
+                company: {
+                  connect: [{ where: { node: { id: { eq: selectedCompanyId } } } }],
+                },
+              },
+            ],
+          },
+        })
+        await refetchValues({ where: companyWhere })
+      } else if (newElementType === 'goal') {
+        await createGoal({
+          variables: {
+            input: [
+              {
+                name: trimmedName,
+                goalStatement: '',
+                company: {
+                  connect: [{ where: { node: { id: { eq: selectedCompanyId } } } }],
+                },
+              },
+            ],
+          },
+        })
+        await refetchGoals({ where: companyWhere })
+      } else {
+        await createStrategy({
+          variables: {
+            input: [
+              {
+                name: trimmedName,
+                description: '',
+                company: {
+                  connect: [{ where: { node: { id: { eq: selectedCompanyId } } } }],
+                },
+              },
+            ],
+          },
+        })
+      }
+
+      await refetchAfterCreate(newElementType)
+      enqueueSnackbar(t('messages.createSuccess'), { variant: 'success' })
+      resetAddDialog()
+    } catch (error) {
+      const message = error instanceof Error ? error.message : t('messages.createError')
+      enqueueSnackbar(`${t('messages.createError')}: ${message}`, { variant: 'error' })
+    }
+  }
+
+  const updateMissionVisionCell = async (
+    missionId: string,
+    visionId: string,
+    newScore: number | null
+  ) => {
+    await withNotifications(async () => {
+      const relationInput: Record<string, unknown> = {
+        supportedByVisions: {
+          disconnect: [{ where: { node: { id: { eq: visionId } } } }],
+        },
+      }
+
+      if (newScore !== null) {
+        relationInput.supportedByVisions = {
+          disconnect: [{ where: { node: { id: { eq: visionId } } } }],
+          connect: [
+            {
+              where: { node: { id: { eq: visionId } } },
+              edge: { score: newScore },
+            },
+          ],
+        }
+      }
+
+      await updateMission({
+        variables: {
+          id: missionId,
+          input: relationInput,
+        },
+      })
+      await refetchMissions({ where: companyWhere })
+    })
+  }
+
+  const updateValueCell = async (
+    valueId: string,
+    vertical: VerticalNode,
+    newScore: number | null
+  ) => {
+    await withNotifications(async () => {
+      const relationKey = vertical.type === 'mission' ? 'supportsMissions' : 'supportsVisions'
+      const relationInput: Record<string, unknown> = {
+        [relationKey]: {
+          disconnect: [{ where: { node: { id: { eq: vertical.id } } } }],
+        },
+      }
+
+      if (newScore !== null) {
+        relationInput[relationKey] = {
+          disconnect: [{ where: { node: { id: { eq: vertical.id } } } }],
+          connect: [
+            {
+              where: { node: { id: { eq: vertical.id } } },
+              edge: { score: newScore },
+            },
+          ],
+        }
+      }
+
+      await updateValue({
+        variables: {
+          id: valueId,
+          input: relationInput,
+        },
+      })
+      await refetchValues({ where: companyWhere })
+    })
+  }
+
+  const updateGoalCell = async (
+    goalId: string,
+    vertical: VerticalNode,
+    newScore: number | null
+  ) => {
+    await withNotifications(async () => {
+      const relationKey =
+        vertical.type === 'mission'
+          ? 'supportsMissions'
+          : vertical.type === 'vision'
+            ? 'operationalizesVisions'
+            : 'achievedByStrategies'
+
+      const relationInput: Record<string, unknown> = {
+        [relationKey]: {
+          disconnect: [{ where: { node: { id: { eq: vertical.id } } } }],
+        },
+      }
+
+      if (newScore !== null) {
+        relationInput[relationKey] = {
+          disconnect: [{ where: { node: { id: { eq: vertical.id } } } }],
+          connect: [
+            {
+              where: { node: { id: { eq: vertical.id } } },
+              edge: { score: newScore },
+            },
+          ],
+        }
+      }
+
+      await updateGoal({
+        variables: {
+          id: goalId,
+          input: relationInput,
+        },
+      })
+      await refetchGoals({ where: companyWhere })
+    })
+  }
+
+  const verticalNodes: VerticalNode[] = React.useMemo(() => {
+    if (mode === 'missionVision') {
+      return visions.map((vision: { id: string; name: string }) => ({
+        id: vision.id,
+        name: vision.name,
+        type: 'vision' as const,
+      }))
+    }
+
+    if (mode === 'valueMissionVision' || mode === 'goalMissionVision') {
+      return [
+        ...missions.map((mission: { id: string; name: string }) => ({
+          id: mission.id,
+          name: mission.name,
+          type: 'mission' as const,
+        })),
+        ...visions.map((vision: { id: string; name: string }) => ({
+          id: vision.id,
+          name: vision.name,
+          type: 'vision' as const,
+        })),
+      ]
+    }
+
+    return strategies.map((strategy: { id: string; name: string }) => ({
+      id: strategy.id,
+      name: strategy.name,
+      type: 'strategy' as const,
+    }))
+  }, [mode, missions, visions, strategies])
+
+  const horizontalNodes = React.useMemo(() => {
+    if (mode === 'missionVision') {
+      return missions
+    }
+    if (mode === 'valueMissionVision') {
+      return values
+    }
+    return goals
+  }, [mode, missions, values, goals])
+
+  const resolveScore = (
+    horizontalNode: Record<string, any>,
+    verticalNode: VerticalNode
+  ): number | null => {
+    if (mode === 'missionVision') {
+      return getEdgeScore(horizontalNode.supportedByVisionsConnection?.edges, verticalNode.id)
+    }
+
+    if (mode === 'valueMissionVision') {
+      if (verticalNode.type === 'mission') {
+        return getEdgeScore(horizontalNode.supportsMissionsConnection?.edges, verticalNode.id)
+      }
+      return getEdgeScore(horizontalNode.supportsVisionsConnection?.edges, verticalNode.id)
+    }
+
+    if (mode === 'goalMissionVision') {
+      if (verticalNode.type === 'mission') {
+        return getEdgeScore(horizontalNode.supportsMissionsConnection?.edges, verticalNode.id)
+      }
+      return getEdgeScore(horizontalNode.operationalizesVisionsConnection?.edges, verticalNode.id)
+    }
+
+    return getEdgeScore(horizontalNode.achievedByStrategiesConnection?.edges, verticalNode.id)
+  }
+
+  const updateCell = async (
+    horizontalNode: { id: string },
+    verticalNode: VerticalNode,
+    value: string
+  ) => {
+    const parsed = value === '' ? null : Number(value)
+    if (parsed !== null && (parsed < -3 || parsed > 3 || Number.isNaN(parsed))) {
+      return
+    }
+
+    if (mode === 'missionVision') {
+      await updateMissionVisionCell(horizontalNode.id, verticalNode.id, parsed)
+      return
+    }
+
+    if (mode === 'valueMissionVision') {
+      await updateValueCell(horizontalNode.id, verticalNode, parsed)
+      return
+    }
+
+    await updateGoalCell(horizontalNode.id, verticalNode, parsed)
+  }
+
+  const isLoading =
+    missionsLoading ||
+    visionsLoading ||
+    valuesLoading ||
+    goalsLoading ||
+    strategiesLoading ||
+    isUpdatingMission ||
+    isUpdatingValue ||
+    isUpdatingGoal ||
+    isCreatingMission ||
+    isCreatingVision ||
+    isCreatingValue ||
+    isCreatingGoal ||
+    isCreatingStrategy
+
+  const hasError = missionsError || visionsError || valuesError || goalsError || strategiesError
 
   return (
     <Container maxWidth="lg">
@@ -15,27 +585,173 @@ const MatrixEditorPage = () => {
           {t('title')}
         </Typography>
 
-        <Paper
-          sx={{
-            p: 6,
-            mt: 4,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            minHeight: '400px',
-            bgcolor: 'background.paper',
-          }}
-        >
-          <GridOnIcon sx={{ fontSize: 80, color: 'text.secondary', mb: 3 }} />
-          <Typography variant="h5" color="text.secondary" gutterBottom>
-            {t('comingSoon')}
-          </Typography>
-          <Typography variant="body1" color="text.secondary" sx={{ mt: 2, textAlign: 'center' }}>
-            {t('description')}
-          </Typography>
+        <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+          {t('description')}
+        </Typography>
+
+        <Paper sx={{ p: 3, mb: 3 }}>
+          <FormControl fullWidth>
+            <InputLabel id="matrix-mode-label">{t('selectMatrix')}</InputLabel>
+            <Select<MatrixMode>
+              labelId="matrix-mode-label"
+              value={mode}
+              label={t('selectMatrix')}
+              onChange={onModeChange}
+            >
+              <MenuItem value="missionVision">{t('matrices.missionToVision')}</MenuItem>
+              <MenuItem value="valueMissionVision">{t('matrices.valueToMissionVision')}</MenuItem>
+              <MenuItem value="goalMissionVision">{t('matrices.goalToMissionVision')}</MenuItem>
+              <MenuItem value="goalStrategy">{t('matrices.goalToStrategy')}</MenuItem>
+            </Select>
+          </FormControl>
+
+          <Box sx={{ display: 'flex', gap: 1, mt: 2, flexWrap: 'wrap' }}>
+            {scoreOptions.map(option => (
+              <Chip
+                key={`legend-${option.value}`}
+                label={`${option.value}: ${t(option.key)}`}
+                size="small"
+                sx={{ backgroundColor: getCellBackground(option.value) }}
+              />
+            ))}
+          </Box>
         </Paper>
+
+        {hasError && <Alert severity="error">{t('messages.loadError')}</Alert>}
+
+        <Paper sx={{ p: 2 }}>
+          {isLoading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+              <CircularProgress />
+            </Box>
+          ) : (
+            <TableContainer sx={{ maxHeight: '70vh' }}>
+              <Table size="small" stickyHeader>
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ minWidth: 220 }}>{axisLabel}</TableCell>
+                    {horizontalNodes.map((item: { id: string; name: string }) => (
+                      <TableCell key={`horizontal-${item.id}`} align="center" sx={{ minWidth: 170 }}>
+                        {item.name}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                </TableHead>
+
+                <TableBody>
+                  {verticalNodes.map(verticalNode => (
+                    <TableRow key={`${verticalNode.type}-${verticalNode.id}`}>
+                      <TableCell>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Typography variant="body2">{verticalNode.name}</Typography>
+                          {(mode === 'valueMissionVision' || mode === 'goalMissionVision') && (
+                            <Chip
+                              size="small"
+                              label={
+                                verticalNode.type === 'mission'
+                                  ? t('types.mission')
+                                  : t('types.vision')
+                              }
+                            />
+                          )}
+                        </Box>
+                      </TableCell>
+
+                      {horizontalNodes.map((horizontalNode: { id: string; name: string }) => {
+                        const score = resolveScore(horizontalNode as Record<string, any>, verticalNode)
+                        const selectValue = score === null ? '' : String(score)
+
+                        return (
+                          <TableCell
+                            key={`${verticalNode.type}-${verticalNode.id}-${horizontalNode.id}`}
+                            align="center"
+                            sx={{
+                              backgroundColor: getCellBackground(score),
+                              transition: 'background-color 150ms ease-in-out',
+                            }}
+                          >
+                            <Select
+                              value={selectValue}
+                              size="small"
+                              displayEmpty
+                              onChange={event =>
+                                void updateCell(horizontalNode, verticalNode, event.target.value)
+                              }
+                              sx={{ minWidth: 90 }}
+                            >
+                              <MenuItem value="">{t('emptyCell')}</MenuItem>
+                              {scoreOptions.map(option => (
+                                <MenuItem key={`option-${option.value}`} value={String(option.value)}>
+                                  {option.value}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </TableCell>
+                        )
+                      })}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
+        </Paper>
+
+        <Box sx={{ display: 'flex', gap: 1.5, mt: 2, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+          <Button variant="outlined" onClick={() => openAddDialog('vertical')}>
+            {t('addType', { type: verticalButtonTypeLabel })}
+          </Button>
+          <Button variant="outlined" onClick={() => openAddDialog('horizontal')}>
+            {t('addType', { type: horizontalButtonTypeLabel })}
+          </Button>
+        </Box>
       </Box>
+
+      <Dialog open={addDialog.open} onClose={resetAddDialog} fullWidth maxWidth="sm">
+        <DialogTitle>
+          {t('addType', {
+            type:
+              addDialog.axis === 'vertical'
+                ? verticalTypes.length === 2
+                  ? `${entityTypeLabel[verticalTypes[0]]}/${entityTypeLabel[verticalTypes[1]]}`
+                  : entityTypeLabel[verticalTypes[0]]
+                : entityTypeLabel[horizontalType],
+          })}
+        </DialogTitle>
+        <DialogContent>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+            <FormControl fullWidth>
+              <InputLabel id="new-element-type-label">{t('entityType')}</InputLabel>
+              <Select<AxisEntityType>
+                labelId="new-element-type-label"
+                value={newElementType}
+                label={t('entityType')}
+                onChange={event => setNewElementType(event.target.value as AxisEntityType)}
+              >
+                {(addDialog.axis === 'horizontal' ? [horizontalType] : verticalTypes).map(type => (
+                  <MenuItem key={`type-${type}`} value={type}>
+                    {entityTypeLabel[type]}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+            <TextField
+              label={t('name')}
+              value={newElementName}
+              onChange={event => setNewElementName(event.target.value)}
+              fullWidth
+              autoFocus
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={resetAddDialog}>{t('cancel')}</Button>
+          <Button variant="contained" onClick={() => void createEntity()}>
+            {t('create')}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   )
 }
