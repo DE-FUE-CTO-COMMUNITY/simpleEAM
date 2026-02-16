@@ -38,12 +38,9 @@ import { CREATE_VISION, GET_VISIONS } from '@/graphql/vision'
 import { CREATE_VALUE, GET_VALUES, UPDATE_VALUE } from '@/graphql/value'
 import { CREATE_GOAL, GET_GOALS, UPDATE_GOAL } from '@/graphql/goal'
 import { CREATE_STRATEGY, GET_STRATEGIES } from '@/graphql/strategy'
+import { calculateNormalizedScorePercent, getEdgeScore } from '@/components/matrix-editor/scoreUtils'
 
-type MatrixMode =
-  | 'missionVision'
-  | 'valueMissionVision'
-  | 'goalMissionVision'
-  | 'goalStrategy'
+type MatrixMode = 'missionVision' | 'valueMissionVision' | 'goalMissionVision' | 'goalStrategy'
 
 type VerticalNode = {
   id: string
@@ -57,6 +54,8 @@ type AddAxisDialogState = {
   open: boolean
   axis: 'horizontal' | 'vertical'
 }
+
+type MatrixCellScore = number | null
 
 type ScoreValue = -3 | -2 | -1 | 0 | 1 | 2 | 3
 type ScoreLabelKey =
@@ -78,20 +77,6 @@ const scoreOptions: ReadonlyArray<{ value: ScoreValue; key: ScoreLabelKey }> = [
   { value: -3, key: 'scoreDirectContradiction' },
 ]
 
-const getEdgeScore = (
-  edges:
-    | Array<{
-        node?: { id?: string | null } | null
-        properties?: { score?: number | null } | null
-      } | null>
-    | undefined,
-  targetId: string
-): number | null => {
-  const edge = edges?.find(item => item?.node?.id === targetId)
-  const score = edge?.properties?.score
-  return typeof score === 'number' ? score : null
-}
-
 const MatrixEditorPage = () => {
   const theme = useTheme()
   const { enqueueSnackbar } = useSnackbar()
@@ -106,12 +91,16 @@ const MatrixEditorPage = () => {
   const [newElementName, setNewElementName] = React.useState('')
   const [newElementType, setNewElementType] = React.useState<AxisEntityType>('mission')
 
-  const { data: missionData, loading: missionsLoading, error: missionsError, refetch: refetchMissions } =
-    useQuery(GET_MISSIONS, {
-      variables: { where: companyWhere },
-      fetchPolicy: 'cache-and-network',
-      notifyOnNetworkStatusChange: true,
-    })
+  const {
+    data: missionData,
+    loading: missionsLoading,
+    error: missionsError,
+    refetch: refetchMissions,
+  } = useQuery(GET_MISSIONS, {
+    variables: { where: companyWhere },
+    fetchPolicy: 'cache-and-network',
+    notifyOnNetworkStatusChange: true,
+  })
   const {
     data: visionData,
     loading: visionsLoading,
@@ -121,20 +110,26 @@ const MatrixEditorPage = () => {
     variables: { where: companyWhere },
     fetchPolicy: 'cache-and-network',
   })
-  const { data: valueData, loading: valuesLoading, error: valuesError, refetch: refetchValues } =
-    useQuery(GET_VALUES, {
-      variables: { where: companyWhere },
-      fetchPolicy: 'cache-and-network',
-      notifyOnNetworkStatusChange: true,
-    })
-  const { data: goalData, loading: goalsLoading, error: goalsError, refetch: refetchGoals } = useQuery(
-    GET_GOALS,
-    {
-      variables: { where: companyWhere },
-      fetchPolicy: 'cache-and-network',
-      notifyOnNetworkStatusChange: true,
-    }
-  )
+  const {
+    data: valueData,
+    loading: valuesLoading,
+    error: valuesError,
+    refetch: refetchValues,
+  } = useQuery(GET_VALUES, {
+    variables: { where: companyWhere },
+    fetchPolicy: 'cache-and-network',
+    notifyOnNetworkStatusChange: true,
+  })
+  const {
+    data: goalData,
+    loading: goalsLoading,
+    error: goalsError,
+    refetch: refetchGoals,
+  } = useQuery(GET_GOALS, {
+    variables: { where: companyWhere },
+    fetchPolicy: 'cache-and-network',
+    notifyOnNetworkStatusChange: true,
+  })
   const {
     data: strategyData,
     loading: strategiesLoading,
@@ -158,7 +153,10 @@ const MatrixEditorPage = () => {
   const visions = React.useMemo(() => visionData?.geaVisions ?? [], [visionData?.geaVisions])
   const values = React.useMemo(() => valueData?.geaValues ?? [], [valueData?.geaValues])
   const goals = React.useMemo(() => goalData?.geaGoals ?? [], [goalData?.geaGoals])
-  const strategies = React.useMemo(() => strategyData?.geaStrategies ?? [], [strategyData?.geaStrategies])
+  const strategies = React.useMemo(
+    () => strategyData?.geaStrategies ?? [],
+    [strategyData?.geaStrategies]
+  )
 
   const getCellBackground = React.useCallback(
     (score: number | null) => {
@@ -561,6 +559,41 @@ const MatrixEditorPage = () => {
     await updateGoalCell(horizontalNode.id, verticalNode, parsed)
   }
 
+  const matrixScores: MatrixCellScore[][] = verticalNodes.map(verticalNode =>
+    horizontalNodes.map((horizontalNode: { id: string; name: string }) =>
+      resolveScore(horizontalNode as Record<string, any>, verticalNode)
+    )
+  )
+
+  const rowSums: number[] = matrixScores.map(row =>
+    row.reduce<number>((sum, score) => sum + (score ?? 0), 0)
+  )
+
+  const columnSums: number[] = horizontalNodes.map(
+    (_horizontalNode: { id: string; name: string }, columnIndex: number) =>
+    matrixScores.reduce((sum, row) => sum + (row[columnIndex] ?? 0), 0)
+  )
+
+  const totalSum: number = matrixScores.reduce(
+    (sum, row) => sum + row.reduce<number>((rowSum, score) => rowSum + (score ?? 0), 0),
+    0
+  )
+
+  const scoredCellCount = matrixScores.reduce(
+    (count, row) => count + row.filter(score => score !== null).length,
+    0
+  )
+
+  const totalScorePercent = calculateNormalizedScorePercent(
+    matrixScores.flatMap(row => row)
+  )
+
+  const formatSignedNumber = (value: number) => (value > 0 ? `+${value}` : `${value}`)
+  const formatSignedPercent = (value: number) => {
+    const rounded = Math.round(value * 10) / 10
+    return `${rounded > 0 ? '+' : ''}${rounded}%`
+  }
+
   const isLoading =
     missionsLoading ||
     visionsLoading ||
@@ -605,15 +638,45 @@ const MatrixEditorPage = () => {
             </Select>
           </FormControl>
 
-          <Box sx={{ display: 'flex', gap: 1, mt: 2, flexWrap: 'wrap' }}>
-            {scoreOptions.map(option => (
-              <Chip
-                key={`legend-${option.value}`}
-                label={`${option.value}: ${t(option.key)}`}
-                size="small"
-                sx={{ backgroundColor: getCellBackground(option.value) }}
-              />
-            ))}
+          <Box
+            sx={{
+              mt: 2,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'flex-start',
+              gap: 2,
+              flexWrap: 'wrap',
+            }}
+          >
+            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', flex: 1 }}>
+              {scoreOptions.map(option => (
+                <Chip
+                  key={`legend-${option.value}`}
+                  label={`${option.value}: ${t(option.key)}`}
+                  size="small"
+                  sx={{ backgroundColor: getCellBackground(option.value) }}
+                />
+              ))}
+            </Box>
+
+            <Box
+              sx={{
+                px: 2.5,
+                py: 1.25,
+                borderRadius: 2,
+                backgroundColor: getCellBackground((totalScorePercent / 100) * 3),
+                border: `1px solid ${alpha(theme.palette.text.primary, 0.12)}`,
+                minWidth: 140,
+                textAlign: 'right',
+              }}
+            >
+              <Typography variant="subtitle2" color="text.secondary">
+                {t('totalScore')}
+              </Typography>
+              <Typography variant="h5" sx={{ fontWeight: 700, lineHeight: 1.2 }}>
+                {formatSignedPercent(totalScorePercent)}
+              </Typography>
+            </Box>
           </Box>
         </Paper>
 
@@ -631,15 +694,25 @@ const MatrixEditorPage = () => {
                   <TableRow>
                     <TableCell sx={{ minWidth: 220 }}>{axisLabel}</TableCell>
                     {horizontalNodes.map((item: { id: string; name: string }) => (
-                      <TableCell key={`horizontal-${item.id}`} align="center" sx={{ minWidth: 170 }}>
+                      <TableCell
+                        key={`horizontal-${item.id}`}
+                        align="center"
+                        sx={{ minWidth: 170 }}
+                      >
                         {item.name}
                       </TableCell>
                     ))}
+                    <TableCell
+                      align="center"
+                      sx={{ minWidth: 120, fontWeight: 700, backgroundColor: 'action.hover' }}
+                    >
+                      {t('rowSum')}
+                    </TableCell>
                   </TableRow>
                 </TableHead>
 
                 <TableBody>
-                  {verticalNodes.map(verticalNode => (
+                  {verticalNodes.map((verticalNode, rowIndex) => (
                     <TableRow key={`${verticalNode.type}-${verticalNode.id}`}>
                       <TableCell>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -657,8 +730,8 @@ const MatrixEditorPage = () => {
                         </Box>
                       </TableCell>
 
-                      {horizontalNodes.map((horizontalNode: { id: string; name: string }) => {
-                        const score = resolveScore(horizontalNode as Record<string, any>, verticalNode)
+                      {horizontalNodes.map((horizontalNode: { id: string; name: string }, columnIndex: number) => {
+                        const score = matrixScores[rowIndex]?.[columnIndex] ?? null
                         const selectValue = score === null ? '' : String(score)
 
                         return (
@@ -681,7 +754,10 @@ const MatrixEditorPage = () => {
                             >
                               <MenuItem value="">{t('emptyCell')}</MenuItem>
                               {scoreOptions.map(option => (
-                                <MenuItem key={`option-${option.value}`} value={String(option.value)}>
+                                <MenuItem
+                                  key={`option-${option.value}`}
+                                  value={String(option.value)}
+                                >
                                   {option.value}
                                 </MenuItem>
                               ))}
@@ -689,15 +765,33 @@ const MatrixEditorPage = () => {
                           </TableCell>
                         )
                       })}
+
+                      <TableCell align="center" sx={{ fontWeight: 700, backgroundColor: 'action.hover' }}>
+                        {formatSignedNumber(rowSums[rowIndex] ?? 0)}
+                      </TableCell>
                     </TableRow>
                   ))}
+
+                  <TableRow sx={{ backgroundColor: 'action.hover' }}>
+                    <TableCell sx={{ fontWeight: 700 }}>{t('columnSum')}</TableCell>
+                    {columnSums.map((sum: number, index: number) => (
+                      <TableCell key={`column-sum-${index}`} align="center" sx={{ fontWeight: 700 }}>
+                        {formatSignedNumber(sum)}
+                      </TableCell>
+                    ))}
+                    <TableCell align="center" sx={{ fontWeight: 700 }}>
+                      {formatSignedNumber(totalSum)}
+                    </TableCell>
+                  </TableRow>
                 </TableBody>
               </Table>
             </TableContainer>
           )}
         </Paper>
 
-        <Box sx={{ display: 'flex', gap: 1.5, mt: 2, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+        <Box
+          sx={{ display: 'flex', gap: 1.5, mt: 2, flexWrap: 'wrap', justifyContent: 'flex-end' }}
+        >
           <Button variant="outlined" onClick={() => openAddDialog('vertical')}>
             {t('addType', { type: verticalButtonTypeLabel })}
           </Button>

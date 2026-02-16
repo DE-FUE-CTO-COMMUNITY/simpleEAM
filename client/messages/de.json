@@ -100,6 +100,9 @@
   },
   "dashboard": {
     "title": "Dashboard",
+    "companyNotSelected": "Kein Unternehmen ausgewählt",
+    "description_placeholder": "Keine Beschreibung verfügbar",
+    "geaTotalScore": "GEA Gesamtscore",
     "businessCapabilities": "Business Capabilities",
     "applications": "Applikationen",
     "aiComponents": "AI Components",
@@ -2678,8 +2681,11 @@
   },
   "matrixEditor": {
     "title": "Matrix-Editor",
-    "description": "Bearbeiten Sie Beziehungsscores über die Matrizen der Business-Architektur.",
+    "description": "Bearbeitung der Beziehungsscores über die Matrizen der Business-Architektur.",
     "selectMatrix": "Matrix auswählen",
+    "rowSum": "Zeilensumme",
+    "columnSum": "Spaltensumme",
+    "totalScore": "Gesamtscore",
     "addType": "{type} hinzufügen",
     "addVerticalElement": "Vertikales Element hinzufügen",
     "addHorizontalElement": "Horizontales Element hinzufügen",

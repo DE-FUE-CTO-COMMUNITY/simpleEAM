@@ -9,6 +9,7 @@ import { useAuth, isAdmin } from '@/lib/auth'
 type Company = {
   id: string
   name: string
+  description?: string | null
   primaryColor?: string | null
   secondaryColor?: string | null
   font?: string | null

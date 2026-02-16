@@ -2,14 +2,15 @@
 
 import React, { useEffect } from 'react'
 import {
+  ButtonBase,
+  Chip,
   Box,
   Typography,
   Grid,
   Card,
   CardContent,
-  CardHeader,
-  Divider,
   useTheme,
+  alpha,
 } from '@mui/material'
 import {
   Architecture as ArchitectureIcon,
@@ -27,9 +28,12 @@ import {
   InfrastructureIcon,
 } from '@/components/icons'
 import { useQuery } from '@apollo/client'
+import { useRouter } from 'next/navigation'
 import { useSnackbar } from 'notistack'
 import { useTranslations } from 'next-intl'
 import { useAuth, login } from '@/lib/auth'
+import { useFeatureFlags } from '@/lib/feature-flags'
+import { useCompanyContext } from '@/contexts/CompanyContext'
 import { GET_CAPABILITIES_COUNT } from '@/graphql/capability'
 import { GET_APPLICATIONS_COUNT } from '@/graphql/application'
 import { GET_AICOMPONENTS_COUNT } from '@/graphql/aicomponent'
@@ -40,11 +44,20 @@ import { GET_APPLICATION_INTERFACES_COUNT } from '@/graphql/applicationInterface
 import { GET_INFRASTRUCTURES_COUNT } from '@/graphql/infrastructure'
 import { GET_PERSONS_COUNT } from '@/graphql/person'
 import { GET_ARCHITECTURE_PRINCIPLES_COUNT } from '@/graphql/architecturePrinciple'
+import { GET_MISSIONS } from '@/graphql/mission'
+import { GET_VALUES } from '@/graphql/value'
+import { GET_GOALS } from '@/graphql/goal'
+import { GET_STRATEGIES } from '@/graphql/strategy'
 import RecentDiagramsSection from '@/components/dashboard/RecentDiagramsSection'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
+import { calculateGeaTotalScorePercent } from '@/components/matrix-editor/scoreUtils'
 
 const Dashboard = () => {
+  const router = useRouter()
   const { authenticated, initialized } = useAuth()
+  const { selectedCompany } = useCompanyContext()
+  const { featureFlags } = useFeatureFlags()
+  const isGeaEnabled = featureFlags.GEA
   const theme = useTheme()
   const { enqueueSnackbar } = useSnackbar()
   const t = useTranslations('dashboard')
@@ -157,6 +170,34 @@ const Dashboard = () => {
     variables: { where: capWhere },
   })
 
+  const { data: geaMissionsData, loading: geaMissionsLoading } = useQuery(GET_MISSIONS, {
+    skip: !authenticated || !initialized || !isGeaEnabled,
+    variables: { where: capWhere },
+    fetchPolicy: 'cache-and-network',
+    notifyOnNetworkStatusChange: true,
+  })
+
+  const { data: geaValuesData, loading: geaValuesLoading } = useQuery(GET_VALUES, {
+    skip: !authenticated || !initialized || !isGeaEnabled,
+    variables: { where: capWhere },
+    fetchPolicy: 'cache-and-network',
+    notifyOnNetworkStatusChange: true,
+  })
+
+  const { data: geaGoalsData, loading: geaGoalsLoading } = useQuery(GET_GOALS, {
+    skip: !authenticated || !initialized || !isGeaEnabled,
+    variables: { where: capWhere },
+    fetchPolicy: 'cache-and-network',
+    notifyOnNetworkStatusChange: true,
+  })
+
+  const { data: geaStrategiesData, loading: geaStrategiesLoading } = useQuery(GET_STRATEGIES, {
+    skip: !authenticated || !initialized || !isGeaEnabled,
+    variables: { where: capWhere },
+    fetchPolicy: 'cache-and-network',
+    notifyOnNetworkStatusChange: true,
+  })
+
   // Error handling
   useEffect(() => {
     if (capabilitiesError) {
@@ -221,14 +262,6 @@ const Dashboard = () => {
   const infrastructuresCount =
     infrastructuresData?.infrastructuresConnection?.aggregate?.count?.nodes || 0
 
-  const totalCount =
-    capabilitiesCount +
-    applicationsCount +
-    aiComponentsCount +
-    dataObjectsCount +
-    interfacesCount +
-    infrastructuresCount
-
   const isLoading =
     capabilitiesLoading ||
     applicationsLoading ||
@@ -240,6 +273,42 @@ const Dashboard = () => {
     personsLoading ||
     principlesLoading ||
     infrastructuresLoading
+
+  const geaScoreLoading =
+    isGeaEnabled &&
+    (geaMissionsLoading || geaValuesLoading || geaGoalsLoading || geaStrategiesLoading)
+
+  const geaTotalScorePercent = React.useMemo(
+    () =>
+      calculateGeaTotalScorePercent({
+        missions: geaMissionsData?.geaMissions ?? [],
+        values: geaValuesData?.geaValues ?? [],
+        goals: geaGoalsData?.geaGoals ?? [],
+        strategies: geaStrategiesData?.geaStrategies ?? [],
+      }),
+    [
+      geaMissionsData?.geaMissions,
+      geaValuesData?.geaValues,
+      geaGoalsData?.geaGoals,
+      geaStrategiesData?.geaStrategies,
+    ]
+  )
+
+  const formatSignedPercent = (value: number) => {
+    const rounded = Math.round(value * 10) / 10
+    return `${rounded > 0 ? '+' : ''}${rounded}%`
+  }
+
+  const getGeaScoreBackground = (percent: number) => {
+    const score = (percent / 100) * 3
+    if (score > 0) {
+      return alpha(theme.palette.success.main, (Math.min(score, 3) / 3) * 0.5)
+    }
+    if (score < 0) {
+      return alpha(theme.palette.error.main, (Math.min(Math.abs(score), 3) / 3) * 0.5)
+    }
+    return theme.palette.background.paper
+  }
 
   const getCardIcon = (type: string) => {
     switch (type) {
@@ -276,7 +345,62 @@ const Dashboard = () => {
         {t('title')}
       </Typography>
 
-      <Grid container spacing={3} sx={{ mb: 6 }}>
+      <Card sx={{ mb: 4 }}>
+        <CardContent
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+            gap: 2,
+            flexWrap: 'wrap',
+          }}
+        >
+          <Box sx={{ flex: 1, minWidth: 280 }}>
+            <Typography variant="h5" sx={{ mb: 0.5 }}>
+              {selectedCompany?.name || t('companyNotSelected')}
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              {selectedCompany?.description || t('description_placeholder')}
+            </Typography>
+          </Box>
+
+          {isGeaEnabled && (
+            <ButtonBase
+              onClick={() => router.push('/matrix-editor')}
+              sx={{
+                borderRadius: 2,
+                textAlign: 'right',
+                display: 'block',
+              }}
+            >
+              <Box
+                sx={{
+                px: 2.5,
+                py: 1.25,
+                borderRadius: 2,
+                minWidth: 180,
+                textAlign: 'right',
+                backgroundColor: getGeaScoreBackground(geaTotalScorePercent),
+                border: `1px solid ${alpha(theme.palette.text.primary, 0.12)}`,
+                transition: 'transform 120ms ease',
+                '&:hover': {
+                  transform: 'translateY(-1px)',
+                },
+              }}
+              >
+                <Typography variant="subtitle2" color="text.secondary">
+                  {t('geaTotalScore')}
+                </Typography>
+                <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                  {geaScoreLoading ? '...' : formatSignedPercent(geaTotalScorePercent)}
+                </Typography>
+              </Box>
+            </ButtonBase>
+          )}
+        </CardContent>
+      </Card>
+
+      <Grid container spacing={3} sx={{ mb: 6, mt: 3 }}>
         {/* Architekturelemente */}
         <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3, xl: 2 }}>
           <Card>
@@ -442,36 +566,6 @@ const Dashboard = () => {
 
       {/* Letzte Diagramme */}
       <RecentDiagramsSection />
-
-      <Card sx={{ mt: 4 }}>
-        <CardHeader title={t('architectureLandscape')} />
-        <Divider />
-        <CardContent>
-          <Typography variant="body1" paragraph>
-            {t('overview')}
-          </Typography>
-          <Typography variant="body1" paragraph>
-            {t('totalElements', {
-              count: totalCount,
-              capabilitiesCount,
-              applicationsCount,
-              aiComponentsCount,
-              dataObjectsCount,
-              interfacesCount,
-              infrastructuresCount,
-              architecturesCount,
-              principlesCount,
-              diagramsCount,
-              personsCount,
-            })}
-          </Typography>
-          <Box sx={{ mt: 2 }}>
-            <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
-              {t('navigationHint')}
-            </Typography>
-          </Box>
-        </CardContent>
-      </Card>
     </Box>
   )
 }
