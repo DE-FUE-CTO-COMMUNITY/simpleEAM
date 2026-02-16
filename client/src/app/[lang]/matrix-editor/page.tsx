@@ -204,7 +204,7 @@ const MatrixEditorPage = () => {
         ? ['mission', 'vision']
         : mode === 'goalMissionVision'
           ? ['mission', 'vision', 'value']
-        : ['strategy']
+          : ['strategy']
 
   const axisLabel =
     mode === 'missionVision'
@@ -495,7 +495,7 @@ const MatrixEditorPage = () => {
             ? 'operationalizesVisions'
             : vertical.type === 'value'
               ? 'supportsValues'
-            : 'achievedByStrategies'
+              : 'achievedByStrategies'
 
       const relationInput: Record<string, unknown> = {
         [relationKey]: {

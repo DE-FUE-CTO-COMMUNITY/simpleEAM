@@ -831,11 +831,11 @@
     "statuses": {
       "ACTIVE": "Aktiv",
       "PLANNED": "Geplant",
-      "RETIRED": "Zurückgezogen"
+      "RETIRED": "Außer Betrieb"
     },
     "types": {
-      "STRATEGIC": "Strategisch",
       "OPERATIONAL": "Operativ",
+      "STRATEGIC": "Strategisch",
       "SUPPORT": "Unterstützend"
     },
     "filter": {
@@ -2261,14 +2261,14 @@
       "featuresTitle": "Features",
       "featuresDescription": "Aktivieren oder deaktivieren Sie Feature-Sets.",
       "features": {
-        "GEA": "General Enterprise Architecture ({prefix})",
-        "BMC": "Business Models ({prefix})",
-        "BCA": "Business Cases ({prefix})",
-        "ABH": "Archimate Behavior ({prefix})",
-        "APS": "Archimate Passive Structure ({prefix})",
-        "AAS": "Archimate Active Structure ({prefix})",
-        "AMO": "Archimate Motivation ({prefix})",
-        "SUP": "Lieferanten ({prefix})"
+        "GEA": "General Enterprise Architecture",
+        "BMC": "Business Models",
+        "BCA": "Business Cases",
+        "ABH": "Archimate Behavior",
+        "APS": "Archimate Passive Structure",
+        "AAS": "Archimate Active Structure",
+        "AMO": "Archimate Motivation",
+        "SUP": "Lieferanten"
       }
     },
     "userManagement": {

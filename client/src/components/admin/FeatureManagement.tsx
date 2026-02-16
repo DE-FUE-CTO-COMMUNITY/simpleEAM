@@ -25,6 +25,7 @@ export default function FeatureManagement({
 }: FeatureManagementProps) {
   const t = useTranslations('admin.featureManagement')
   const tLenses = useTranslations('lenses')
+  const isBusinessArchitectureForced = featureFlags.GEA || featureFlags.BMC || featureFlags.BCA
 
   const handleToggle = (lens: LensKey) => (event: React.ChangeEvent<HTMLInputElement>) => {
     onLensFlagsChange({
@@ -67,7 +68,9 @@ export default function FeatureManagement({
                     checked={lensFlags[lens]}
                     onChange={handleToggle(lens)}
                     disabled={
-                      disabled || (disableEnterpriseLens && lens === 'enterpriseArchitecture')
+                      disabled ||
+                      (disableEnterpriseLens && lens === 'enterpriseArchitecture') ||
+                      (lens === 'businessArchitecture' && isBusinessArchitectureForced)
                     }
                   />
                 }
@@ -103,7 +106,7 @@ export default function FeatureManagement({
                     disabled={disabled}
                   />
                 }
-                label={t(`features.${feature}`, { prefix: `${feature}_` })}
+                label={t(`features.${feature}`)}
               />
             ))}
           </FormGroup>

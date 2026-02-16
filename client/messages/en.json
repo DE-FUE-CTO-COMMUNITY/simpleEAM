@@ -859,8 +859,8 @@
       "RETIRED": "Retired"
     },
     "types": {
-      "STRATEGIC": "Strategic",
       "OPERATIONAL": "Operational",
+      "STRATEGIC": "Strategic",
       "SUPPORT": "Support"
     },
     "filter": {
@@ -2314,14 +2314,14 @@
       "featuresTitle": "Features",
       "featuresDescription": "Enable or disable feature sets.",
       "features": {
-        "GEA": "General Enterprise Architecture ({prefix})",
-        "BMC": "Business Models ({prefix})",
-        "BCA": "Business Cases ({prefix})",
-        "ABH": "Archimate Behavior ({prefix})",
-        "APS": "Archimate Passive Structure ({prefix})",
-        "AAS": "Archimate Active Structure ({prefix})",
-        "AMO": "Archimate Motivation ({prefix})",
-        "SUP": "Suppliers ({prefix})"
+        "GEA": "General Enterprise Architecture",
+        "BMC": "Business Models",
+        "BCA": "Business Cases",
+        "ABH": "Archimate Behavior",
+        "APS": "Archimate Passive Structure",
+        "AAS": "Archimate Active Structure",
+        "AMO": "Archimate Motivation",
+        "SUP": "Suppliers"
       }
     },
     "userManagement": {

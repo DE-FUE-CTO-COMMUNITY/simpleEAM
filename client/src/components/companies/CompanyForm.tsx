@@ -95,6 +95,45 @@ const CompaniesForm: React.FC<GenericFormProps<CompanyType, CompanyFormValues>> 
     buildDefaultFeatureFlags()
   )
 
+  const applyFeatureDependencies = React.useCallback(
+    (
+      nextLensFlags: LensFlags,
+      nextFeatureFlags: FeatureFlags,
+      previousFeatureFlags?: FeatureFlags
+    ) => {
+      const normalizedFeatureFlags: FeatureFlags = { ...nextFeatureFlags }
+
+      if (normalizedFeatureFlags.GEA && normalizedFeatureFlags.AMO) {
+        const geaChanged =
+          previousFeatureFlags && previousFeatureFlags.GEA !== normalizedFeatureFlags.GEA
+        const amoChanged =
+          previousFeatureFlags && previousFeatureFlags.AMO !== normalizedFeatureFlags.AMO
+
+        if (geaChanged && normalizedFeatureFlags.GEA) {
+          normalizedFeatureFlags.AMO = false
+        } else if (amoChanged && normalizedFeatureFlags.AMO) {
+          normalizedFeatureFlags.GEA = false
+        } else {
+          normalizedFeatureFlags.AMO = false
+        }
+      }
+
+      const normalizedLensFlags: LensFlags = { ...nextLensFlags }
+      const requiresBusinessArchitectureLens =
+        normalizedFeatureFlags.GEA || normalizedFeatureFlags.BMC || normalizedFeatureFlags.BCA
+
+      if (requiresBusinessArchitectureLens) {
+        normalizedLensFlags.businessArchitecture = true
+      }
+
+      return {
+        lensFlags: normalizedLensFlags,
+        featureFlags: normalizedFeatureFlags,
+      }
+    },
+    []
+  )
+
   const diagramFontOptions = React.useMemo(
     () =>
       EXCALIDRAW_FONTS.map(font => ({
@@ -133,9 +172,10 @@ const CompaniesForm: React.FC<GenericFormProps<CompanyType, CompanyFormValues>> 
   useEffect(() => {
     if (company) {
       const parsedFeatures = parseCompanyFeatures(company.features)
-      setLensFlags(parsedFeatures.lensFlags)
-      setFeatureFlags(parsedFeatures.featureFlags)
-      updateFeaturesValue(parsedFeatures.lensFlags, parsedFeatures.featureFlags)
+      const normalized = applyFeatureDependencies(parsedFeatures.lensFlags, parsedFeatures.featureFlags)
+      setLensFlags(normalized.lensFlags)
+      setFeatureFlags(normalized.featureFlags)
+      updateFeaturesValue(normalized.lensFlags, normalized.featureFlags)
       form.setFieldValue('name', company.name || '')
       form.setFieldValue('description', company.description || '')
       form.setFieldValue('address', company.address || '')
@@ -153,11 +193,12 @@ const CompaniesForm: React.FC<GenericFormProps<CompanyType, CompanyFormValues>> 
       )
     } else {
       const parsedFeatures = parseCompanyFeatures('')
-      setLensFlags(parsedFeatures.lensFlags)
-      setFeatureFlags(parsedFeatures.featureFlags)
-      updateFeaturesValue(parsedFeatures.lensFlags, parsedFeatures.featureFlags)
+      const normalized = applyFeatureDependencies(parsedFeatures.lensFlags, parsedFeatures.featureFlags)
+      setLensFlags(normalized.lensFlags)
+      setFeatureFlags(normalized.featureFlags)
+      updateFeaturesValue(normalized.lensFlags, normalized.featureFlags)
     }
-  }, [company, form, updateFeaturesValue])
+  }, [applyFeatureDependencies, company, form, updateFeaturesValue])
 
   // Feldkonfigurationen definieren
   const fields: FieldConfig[] = [
@@ -379,12 +420,16 @@ const CompaniesForm: React.FC<GenericFormProps<CompanyType, CompanyFormValues>> 
           lensFlags={lensFlags}
           featureFlags={featureFlags}
           onLensFlagsChange={next => {
-            setLensFlags(next)
-            updateFeaturesValue(next, featureFlags)
+            const normalized = applyFeatureDependencies(next, featureFlags, featureFlags)
+            setLensFlags(normalized.lensFlags)
+            setFeatureFlags(normalized.featureFlags)
+            updateFeaturesValue(normalized.lensFlags, normalized.featureFlags)
           }}
           onFeatureFlagsChange={next => {
-            setFeatureFlags(next)
-            updateFeaturesValue(lensFlags, next)
+            const normalized = applyFeatureDependencies(lensFlags, next, featureFlags)
+            setLensFlags(normalized.lensFlags)
+            setFeatureFlags(normalized.featureFlags)
+            updateFeaturesValue(normalized.lensFlags, normalized.featureFlags)
           }}
           disabled={disabled}
         />
