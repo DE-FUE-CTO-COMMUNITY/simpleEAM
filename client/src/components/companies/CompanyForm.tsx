@@ -172,7 +172,10 @@ const CompaniesForm: React.FC<GenericFormProps<CompanyType, CompanyFormValues>> 
   useEffect(() => {
     if (company) {
       const parsedFeatures = parseCompanyFeatures(company.features)
-      const normalized = applyFeatureDependencies(parsedFeatures.lensFlags, parsedFeatures.featureFlags)
+      const normalized = applyFeatureDependencies(
+        parsedFeatures.lensFlags,
+        parsedFeatures.featureFlags
+      )
       setLensFlags(normalized.lensFlags)
       setFeatureFlags(normalized.featureFlags)
       updateFeaturesValue(normalized.lensFlags, normalized.featureFlags)
@@ -193,7 +196,10 @@ const CompaniesForm: React.FC<GenericFormProps<CompanyType, CompanyFormValues>> 
       )
     } else {
       const parsedFeatures = parseCompanyFeatures('')
-      const normalized = applyFeatureDependencies(parsedFeatures.lensFlags, parsedFeatures.featureFlags)
+      const normalized = applyFeatureDependencies(
+        parsedFeatures.lensFlags,
+        parsedFeatures.featureFlags
+      )
       setLensFlags(normalized.lensFlags)
       setFeatureFlags(normalized.featureFlags)
       updateFeaturesValue(normalized.lensFlags, normalized.featureFlags)

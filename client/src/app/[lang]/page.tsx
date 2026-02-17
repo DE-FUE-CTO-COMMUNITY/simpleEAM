@@ -19,6 +19,19 @@ import {
   Person as PersonIcon,
   Construction as ConstructionIcon,
   Rule as PrincipleIcon,
+  Visibility as VisionIcon,
+  Flag as MissionIcon,
+  Favorite as ValuesIcon,
+  TrackChanges as GoalsIcon,
+  Insights as StrategiesIcon,
+  Lightbulb as LightbulbIcon,
+  ModelTraining as ModelTrainingIcon,
+  Hub as CollaborationIcon,
+  Functions as FunctionIcon,
+  AccountTree as ProcessIcon,
+  ConnectWithoutContact as InteractionIcon,
+  Event as EventIcon,
+  MiscellaneousServices as ServiceIcon,
 } from '@mui/icons-material'
 import {
   BusinessCapabilityIcon,
@@ -34,6 +47,7 @@ import { useSnackbar } from 'notistack'
 import { useTranslations } from 'next-intl'
 import { useAuth, login } from '@/lib/auth'
 import { useFeatureFlags } from '@/lib/feature-flags'
+import { type LensKey, useLensSelection } from '@/lib/lens-settings'
 import { useCompanyContext } from '@/contexts/CompanyContext'
 import { GET_CAPABILITIES_COUNT } from '@/graphql/capability'
 import { GET_APPLICATIONS_COUNT } from '@/graphql/application'
@@ -46,6 +60,7 @@ import { GET_INFRASTRUCTURES_COUNT } from '@/graphql/infrastructure'
 import { GET_PERSONS_COUNT } from '@/graphql/person'
 import { GET_ARCHITECTURE_PRINCIPLES_COUNT } from '@/graphql/architecturePrinciple'
 import { GET_MISSIONS } from '@/graphql/mission'
+import { GET_VISIONS } from '@/graphql/vision'
 import { GET_VALUES } from '@/graphql/value'
 import { GET_GOALS } from '@/graphql/goal'
 import { GET_STRATEGIES } from '@/graphql/strategy'
@@ -58,11 +73,17 @@ const Dashboard = () => {
   const { authenticated, initialized } = useAuth()
   const { selectedCompany } = useCompanyContext()
   const { featureFlags } = useFeatureFlags()
+  const { selectedLens } = useLensSelection()
   const isGeaEnabled = featureFlags.GEA
+  const isBmcEnabled = featureFlags.BMC
+  const isAbhEnabled = featureFlags.ABH
+  const isApsEnabled = featureFlags.APS
+  const isAasEnabled = featureFlags.AAS
   const theme = useTheme()
   const { enqueueSnackbar } = useSnackbar()
   const t = useTranslations('dashboard')
   const tCommon = useTranslations('common')
+  const tNavigation = useTranslations('navigation')
 
   // Company-Filter für alle Architektur-Elemente
   const capWhere = useCompanyWhere('company')
@@ -178,6 +199,13 @@ const Dashboard = () => {
     notifyOnNetworkStatusChange: true,
   })
 
+  const { data: geaVisionsData, loading: geaVisionsLoading } = useQuery(GET_VISIONS, {
+    skip: !authenticated || !initialized || !isGeaEnabled,
+    variables: { where: capWhere },
+    fetchPolicy: 'cache-and-network',
+    notifyOnNetworkStatusChange: true,
+  })
+
   const { data: geaValuesData, loading: geaValuesLoading } = useQuery(GET_VALUES, {
     skip: !authenticated || !initialized || !isGeaEnabled,
     variables: { where: capWhere },
@@ -262,6 +290,13 @@ const Dashboard = () => {
     principlesData?.architecturePrinciplesConnection?.aggregate?.count?.nodes || 0
   const infrastructuresCount =
     infrastructuresData?.infrastructuresConnection?.aggregate?.count?.nodes || 0
+  const missionsCount = geaMissionsData?.geaMissions?.length || 0
+  const visionsCount = geaVisionsData?.geaVisions?.length || 0
+  const valuesCount = geaValuesData?.geaValues?.length || 0
+  const goalsCount = geaGoalsData?.geaGoals?.length || 0
+  const strategiesCount = geaStrategiesData?.geaStrategies?.length || 0
+  const valuePropositionsCount = 0
+  const businessCasesCount = 0
 
   const isLoading =
     capabilitiesLoading ||
@@ -277,7 +312,207 @@ const Dashboard = () => {
 
   const geaScoreLoading =
     isGeaEnabled &&
-    (geaMissionsLoading || geaValuesLoading || geaGoalsLoading || geaStrategiesLoading)
+    (geaMissionsLoading ||
+      geaVisionsLoading ||
+      geaValuesLoading ||
+      geaGoalsLoading ||
+      geaStrategiesLoading)
+
+  const geaElementsLoading = geaScoreLoading
+
+  type CardKey =
+    | 'businessCapabilities'
+    | 'applications'
+    | 'aiComponents'
+    | 'dataObjects'
+    | 'interfaces'
+    | 'infrastructure'
+    | 'applicationCollaboration'
+    | 'applicationFunction'
+    | 'applicationProcess'
+    | 'applicationInteraction'
+    | 'applicationEvent'
+    | 'applicationService'
+    | 'missions'
+    | 'visions'
+    | 'values'
+    | 'goals'
+    | 'strategies'
+    | 'valuePropositions'
+    | 'businessCases'
+
+  const lensToElementKeys: Record<LensKey, CardKey[]> = {
+    enterpriseArchitecture: [
+      'businessCapabilities',
+      'applications',
+      'aiComponents',
+      'dataObjects',
+      'interfaces',
+      'infrastructure',
+    ],
+    businessArchitecture: [
+      ...(isGeaEnabled
+        ? (['missions', 'visions', 'values', 'goals', 'strategies'] as CardKey[])
+        : []),
+      ...(isBmcEnabled ? (['valuePropositions', 'businessCases'] as CardKey[]) : []),
+      'businessCapabilities',
+    ],
+    processArchitecture: ['businessCapabilities'],
+    dataArchitecture: ['dataObjects'],
+    aiArchitecture: ['aiComponents'],
+    solutionArchitecture: [
+      'applications',
+      ...(isAasEnabled ? (['applicationCollaboration'] as CardKey[]) : []),
+      ...(isAbhEnabled
+        ? ([
+            'applicationFunction',
+            'applicationProcess',
+            'applicationInteraction',
+            'applicationEvent',
+            'applicationService',
+          ] as CardKey[])
+        : []),
+      ...(isApsEnabled ? (['dataObjects'] as CardKey[]) : []),
+      'interfaces',
+    ],
+    infrastructureArchitecture: ['applications', 'infrastructure'],
+    transformationArchitecture: [
+      'businessCapabilities',
+      'applications',
+      'aiComponents',
+      'dataObjects',
+      'interfaces',
+      'infrastructure',
+    ],
+    technologyManagement: ['applications', 'infrastructure'],
+  }
+
+  const cardDefinitions: Record<
+    CardKey,
+    {
+      label: string
+      count: number
+      iconType: string
+      loading: boolean
+    }
+  > = {
+    businessCapabilities: {
+      label: t('businessCapabilities'),
+      count: capabilitiesCount,
+      iconType: 'capability',
+      loading: isLoading,
+    },
+    applications: {
+      label: t('applications'),
+      count: applicationsCount,
+      iconType: 'application',
+      loading: isLoading,
+    },
+    aiComponents: {
+      label: t('aiComponents'),
+      count: aiComponentsCount,
+      iconType: 'aiComponent',
+      loading: isLoading,
+    },
+    dataObjects: {
+      label: t('dataObjects'),
+      count: dataObjectsCount,
+      iconType: 'dataObject',
+      loading: isLoading,
+    },
+    interfaces: {
+      label: t('interfaces'),
+      count: interfacesCount,
+      iconType: 'interface',
+      loading: isLoading,
+    },
+    infrastructure: {
+      label: t('infrastructure'),
+      count: infrastructuresCount,
+      iconType: 'infrastructure',
+      loading: isLoading,
+    },
+    applicationCollaboration: {
+      label: tNavigation('applicationCollaboration'),
+      count: 0,
+      iconType: 'applicationCollaboration',
+      loading: false,
+    },
+    applicationFunction: {
+      label: tNavigation('applicationFunction'),
+      count: 0,
+      iconType: 'applicationFunction',
+      loading: false,
+    },
+    applicationProcess: {
+      label: tNavigation('applicationProcess'),
+      count: 0,
+      iconType: 'applicationProcess',
+      loading: false,
+    },
+    applicationInteraction: {
+      label: tNavigation('applicationInteraction'),
+      count: 0,
+      iconType: 'applicationInteraction',
+      loading: false,
+    },
+    applicationEvent: {
+      label: tNavigation('applicationEvent'),
+      count: 0,
+      iconType: 'applicationEvent',
+      loading: false,
+    },
+    applicationService: {
+      label: tNavigation('applicationService'),
+      count: 0,
+      iconType: 'applicationService',
+      loading: false,
+    },
+    missions: {
+      label: tNavigation('missions'),
+      count: missionsCount,
+      iconType: 'mission',
+      loading: geaElementsLoading,
+    },
+    visions: {
+      label: tNavigation('visions'),
+      count: visionsCount,
+      iconType: 'vision',
+      loading: geaElementsLoading,
+    },
+    values: {
+      label: tNavigation('values'),
+      count: valuesCount,
+      iconType: 'value',
+      loading: geaElementsLoading,
+    },
+    goals: {
+      label: tNavigation('goals'),
+      count: goalsCount,
+      iconType: 'goal',
+      loading: geaElementsLoading,
+    },
+    strategies: {
+      label: tNavigation('strategies'),
+      count: strategiesCount,
+      iconType: 'strategy',
+      loading: geaElementsLoading,
+    },
+    valuePropositions: {
+      label: tNavigation('valuePropositions'),
+      count: valuePropositionsCount,
+      iconType: 'valueProposition',
+      loading: false,
+    },
+    businessCases: {
+      label: tNavigation('businessCases'),
+      count: businessCasesCount,
+      iconType: 'businessCase',
+      loading: false,
+    },
+  }
+
+  const visibleCardKeys = lensToElementKeys[selectedLens] ?? []
 
   const geaTotalScorePercent = React.useMemo(
     () =>
@@ -335,6 +570,32 @@ const Dashboard = () => {
         return <PersonIcon sx={{ fontSize: 40, color: theme.palette.grey[800] }} />
       case 'principle':
         return <PrincipleIcon sx={{ fontSize: 40, color: theme.palette.grey[600] }} />
+      case 'mission':
+        return <MissionIcon sx={{ fontSize: 40, color: theme.palette.warning.main }} />
+      case 'vision':
+        return <VisionIcon sx={{ fontSize: 40, color: theme.palette.info.main }} />
+      case 'value':
+        return <ValuesIcon sx={{ fontSize: 40, color: theme.palette.error.main }} />
+      case 'goal':
+        return <GoalsIcon sx={{ fontSize: 40, color: theme.palette.success.main }} />
+      case 'strategy':
+        return <StrategiesIcon sx={{ fontSize: 40, color: theme.palette.secondary.main }} />
+      case 'valueProposition':
+        return <LightbulbIcon sx={{ fontSize: 40, color: theme.palette.primary.main }} />
+      case 'businessCase':
+        return <ModelTrainingIcon sx={{ fontSize: 40, color: theme.palette.secondary.dark }} />
+      case 'applicationCollaboration':
+        return <CollaborationIcon sx={{ fontSize: 40, color: theme.palette.primary.main }} />
+      case 'applicationFunction':
+        return <FunctionIcon sx={{ fontSize: 40, color: theme.palette.secondary.main }} />
+      case 'applicationProcess':
+        return <ProcessIcon sx={{ fontSize: 40, color: theme.palette.info.main }} />
+      case 'applicationInteraction':
+        return <InteractionIcon sx={{ fontSize: 40, color: theme.palette.error.main }} />
+      case 'applicationEvent':
+        return <EventIcon sx={{ fontSize: 40, color: theme.palette.warning.main }} />
+      case 'applicationService':
+        return <ServiceIcon sx={{ fontSize: 40, color: theme.palette.success.main }} />
       default:
         return <ConstructionIcon sx={{ fontSize: 40, color: theme.palette.grey[500] }} />
     }
@@ -404,104 +665,27 @@ const Dashboard = () => {
       </Card>
 
       <Grid container spacing={3} sx={{ mb: 6, mt: 3 }}>
-        {/* Architekturelemente */}
-        <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3, xl: 2 }}>
-          <Card>
-            <CardContent
-              sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
-            >
-              <Box>
-                <Typography variant="subtitle2" color="text.secondary">
-                  {t('businessCapabilities')}
-                </Typography>
-                <Typography variant="h4">{isLoading ? '...' : capabilitiesCount}</Typography>
-              </Box>
-              {getCardIcon('capability')}
-            </CardContent>
-          </Card>
-        </Grid>
+        {visibleCardKeys.map(cardKey => {
+          const card = cardDefinitions[cardKey]
+          return (
+            <Grid key={cardKey} size={{ xs: 12, sm: 6, md: 4, lg: 3, xl: 2 }}>
+              <Card>
+                <CardContent
+                  sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+                >
+                  <Box>
+                    <Typography variant="subtitle2" color="text.secondary">
+                      {card.label}
+                    </Typography>
+                    <Typography variant="h4">{card.loading ? '...' : card.count}</Typography>
+                  </Box>
+                  {getCardIcon(card.iconType)}
+                </CardContent>
+              </Card>
+            </Grid>
+          )
+        })}
 
-        <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3, xl: 2 }}>
-          <Card>
-            <CardContent
-              sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
-            >
-              <Box>
-                <Typography variant="subtitle2" color="text.secondary">
-                  {t('applications')}
-                </Typography>
-                <Typography variant="h4">{isLoading ? '...' : applicationsCount}</Typography>
-              </Box>
-              {getCardIcon('application')}
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3, xl: 2 }}>
-          <Card>
-            <CardContent
-              sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
-            >
-              <Box>
-                <Typography variant="subtitle2" color="text.secondary">
-                  {t('aiComponents')}
-                </Typography>
-                <Typography variant="h4">{isLoading ? '...' : aiComponentsCount}</Typography>
-              </Box>
-              {getCardIcon('aiComponent')}
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3, xl: 2 }}>
-          <Card>
-            <CardContent
-              sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
-            >
-              <Box>
-                <Typography variant="subtitle2" color="text.secondary">
-                  {t('dataObjects')}
-                </Typography>
-                <Typography variant="h4">{isLoading ? '...' : dataObjectsCount}</Typography>
-              </Box>
-              {getCardIcon('dataObject')}
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3, xl: 2 }}>
-          <Card>
-            <CardContent
-              sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
-            >
-              <Box>
-                <Typography variant="subtitle2" color="text.secondary">
-                  {t('interfaces')}
-                </Typography>
-                <Typography variant="h4">{isLoading ? '...' : interfacesCount}</Typography>
-              </Box>
-              {getCardIcon('interface')}
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3, xl: 2 }}>
-          <Card>
-            <CardContent
-              sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
-            >
-              <Box>
-                <Typography variant="subtitle2" color="text.secondary">
-                  {t('infrastructure')}
-                </Typography>
-                <Typography variant="h4">{isLoading ? '...' : infrastructuresCount}</Typography>
-              </Box>
-              {getCardIcon('infrastructure')}
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Nicht-Architekturelemente */}
         <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3, xl: 2 }}>
           <Card>
             <CardContent
