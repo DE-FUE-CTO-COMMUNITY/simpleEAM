@@ -15,7 +15,7 @@ import Grid from '@mui/material/Grid'
 import { Upload as UploadIcon, Warning as WarningIcon, Info as InfoIcon } from '@mui/icons-material'
 import { useTranslations } from 'next-intl'
 
-import { EntityType, ImportSettings, ValidationResult } from './types'
+import { EntityType, ImportSettings, ValidationResult, ExportedCompanyInfo } from './types'
 import { entityTypeLabels, entityTypeOrder, isFormatLocked, updateModeOptions } from './constants'
 
 interface ImportDialogProps {
@@ -30,6 +30,8 @@ interface ImportDialogProps {
   onEntityTypeChange: (entityType: string) => void
   onFormatChange: (format: string) => void
   availableEntityTypes?: readonly EntityType[]
+  selectedCompanyName?: string
+  exportedCompanyInfo: ExportedCompanyInfo | null
 }
 
 const ImportDialog: React.FC<ImportDialogProps> = ({
@@ -44,6 +46,8 @@ const ImportDialog: React.FC<ImportDialogProps> = ({
   onEntityTypeChange,
   onFormatChange,
   availableEntityTypes = entityTypeOrder,
+  selectedCompanyName,
+  exportedCompanyInfo,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const t = useTranslations('importExport.import')
@@ -121,6 +125,39 @@ const ImportDialog: React.FC<ImportDialogProps> = ({
                   </Select>
                 </FormControl>
               </Grid>
+
+              <Grid size={12}>
+                <FormControl fullWidth margin="normal">
+                  <InputLabel>{t('targetCompanyMode')}</InputLabel>
+                  <Select
+                    value={importSettings.companyImportMode}
+                    label={t('targetCompanyMode')}
+                    onChange={e =>
+                      setImportSettings({
+                        ...importSettings,
+                        companyImportMode: e.target.value as ImportSettings['companyImportMode'],
+                      })
+                    }
+                  >
+                    <MenuItem value="selectedCompany">
+                      {t('targetCompanySelected', {
+                        companyName: selectedCompanyName || t('noSelectedCompany'),
+                      })}
+                    </MenuItem>
+                    <MenuItem value="exportedCompany">{t('targetCompanyExported')}</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              {importSettings.companyImportMode === 'exportedCompany' && (
+                <Grid size={12}>
+                  <Alert severity={exportedCompanyInfo ? 'info' : 'warning'}>
+                    {exportedCompanyInfo
+                      ? t('exportedCompanyDetected', { companyName: exportedCompanyInfo.name })
+                      : t('exportedCompanyMissing')}
+                  </Alert>
+                </Grid>
+              )}
 
               <Grid size={12}>
                 <Box sx={{ mt: 2 }}>

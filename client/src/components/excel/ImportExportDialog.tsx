@@ -29,7 +29,13 @@ import ExportDialog from './ExportDialog'
 import ManagementDialog from './ManagementDialog'
 
 // Import der Typen und Konstanten
-import { ImportSettings, ExportSettings, DeleteSettings, ValidationResult } from './types'
+import {
+  ImportSettings,
+  ExportSettings,
+  DeleteSettings,
+  ValidationResult,
+  ExportedCompanyInfo,
+} from './types'
 import {
   entityTypeLabels,
   entityTypeMapping,
@@ -68,7 +74,7 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
   const t = useTranslations('importExport')
   const tCommon = useTranslations('common')
   const tEntityTypes = useTranslations('importExport.entityTypes')
-  const { selectedCompanyId } = useCompanyContext()
+  const { selectedCompanyId, companies } = useCompanyContext()
   const { featureFlags } = useFeatureFlags()
   const isGeaEnabled = featureFlags.GEA
   const availableEntityTypes = React.useMemo(() => getEntityTypeOrder(isGeaEnabled), [isGeaEnabled])
@@ -92,6 +98,125 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
 
   // Export State
   const [isExporting, setIsExporting] = useState(false)
+  const [exportedCompanyInfo, setExportedCompanyInfo] = useState<ExportedCompanyInfo | null>(null)
+
+  const selectedCompanyName = companies.find(company => company.id === selectedCompanyId)?.name
+
+  const extractCompanyFromObject = (raw: any): ExportedCompanyInfo | null => {
+    if (!raw || typeof raw !== 'object') return null
+    const name = typeof raw.name === 'string' ? raw.name.trim() : ''
+    const id = typeof raw.id === 'string' ? raw.id.trim() : undefined
+    if (!name && !id) return null
+
+    return {
+      id,
+      name: name || id || 'Exported Company',
+      description: typeof raw.description === 'string' ? raw.description : undefined,
+      address: typeof raw.address === 'string' ? raw.address : undefined,
+      industry: typeof raw.industry === 'string' ? raw.industry : undefined,
+      website: typeof raw.website === 'string' ? raw.website : undefined,
+      primaryColor: typeof raw.primaryColor === 'string' ? raw.primaryColor : undefined,
+      secondaryColor: typeof raw.secondaryColor === 'string' ? raw.secondaryColor : undefined,
+      font: typeof raw.font === 'string' ? raw.font : undefined,
+      diagramFont: typeof raw.diagramFont === 'string' ? raw.diagramFont : undefined,
+      logo: typeof raw.logo === 'string' ? raw.logo : undefined,
+      features: typeof raw.features === 'string' ? raw.features : undefined,
+      size: typeof raw.size === 'string' ? raw.size : undefined,
+    }
+  }
+
+  const detectExportedCompany = (
+    multiTabData?: { [tabName: string]: any[] },
+    singleTabData?: any[]
+  ): ExportedCompanyInfo | null => {
+    if (multiTabData) {
+      const companyTab =
+        multiTabData.Companies ||
+        multiTabData.companies ||
+        multiTabData.Company ||
+        multiTabData.company
+
+      if (Array.isArray(companyTab) && companyTab.length > 0) {
+        const fromTab = extractCompanyFromObject(companyTab[0])
+        if (fromTab) return fromTab
+      }
+    }
+
+    if (singleTabData && singleTabData.length > 0) {
+      const firstRow = singleTabData[0]
+      if (firstRow && typeof firstRow === 'object') {
+        const metaCompany = extractCompanyFromObject({
+          id: firstRow._exportCompanyId,
+          name: firstRow._exportCompanyName,
+        })
+        if (metaCompany) return metaCompany
+
+        if (firstRow.company && typeof firstRow.company === 'object') {
+          const directCompany = extractCompanyFromObject(firstRow.company)
+          if (directCompany) return directCompany
+        }
+      }
+    }
+
+    return null
+  }
+
+  const resolveTargetCompanyId = async (): Promise<string | undefined> => {
+    if (importSettings.companyImportMode === 'selectedCompany') {
+      return selectedCompanyId ?? undefined
+    }
+
+    if (!exportedCompanyInfo) {
+      throw new Error(t('import.messages.exportedCompanyNotFound'))
+    }
+
+    const { GET_COMPANIES, CREATE_COMPANY } = await import('../../graphql/company')
+    const companyResult = await apolloClient.query({
+      query: GET_COMPANIES,
+      fetchPolicy: 'network-only',
+    })
+
+    const existingCompanies = companyResult.data?.companies || []
+    const existing = existingCompanies.find(
+      (company: any) =>
+        (exportedCompanyInfo.id && company.id === exportedCompanyInfo.id) ||
+        company.name === exportedCompanyInfo.name
+    )
+
+    if (existing?.id) {
+      return existing.id
+    }
+
+    const createResult = await apolloClient.mutate({
+      mutation: CREATE_COMPANY,
+      variables: {
+        input: [
+          {
+            ...(exportedCompanyInfo.id ? { id: exportedCompanyInfo.id } : {}),
+            name: exportedCompanyInfo.name,
+            description: exportedCompanyInfo.description || '',
+            address: exportedCompanyInfo.address || '',
+            industry: exportedCompanyInfo.industry || '',
+            website: exportedCompanyInfo.website || '',
+            primaryColor: exportedCompanyInfo.primaryColor || '#1976d2',
+            secondaryColor: exportedCompanyInfo.secondaryColor || '#dc004e',
+            font: exportedCompanyInfo.font || '',
+            diagramFont: exportedCompanyInfo.diagramFont || '',
+            logo: exportedCompanyInfo.logo || '',
+            features: exportedCompanyInfo.features || '',
+            size: exportedCompanyInfo.size || 'UNKNOWN',
+          },
+        ],
+      },
+    })
+
+    const createdCompany = createResult.data?.createCompanies?.companies?.[0]
+    if (!createdCompany?.id) {
+      throw new Error(t('import.messages.exportedCompanyCreateFailed'))
+    }
+
+    return createdCompany.id
+  }
 
   // Delete State
   const [isDeleting, setIsDeleting] = useState(false)
@@ -106,6 +231,7 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
       setValidationResult(null)
       setImportProgress(0)
       setImportSummary(null)
+      setExportedCompanyInfo(null)
       setIsImporting(false)
       setIsExporting(false)
       setIsDeleting(false)
@@ -133,6 +259,8 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
           const { importMultiTabFromJson } = await import('../../utils/jsonUtils')
           allData = await importMultiTabFromJson(file)
         }
+
+        setExportedCompanyInfo(detectExportedCompany(allData))
 
         // Validate all tabs
         const allValidations: { [tabName: string]: any } = {}
@@ -197,6 +325,8 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
           data = await importFromJson(file)
         }
 
+        setExportedCompanyInfo(detectExportedCompany(undefined, data))
+
         // Verwende formatspezifische Validierung
         let validation
         if (importSettings.format === 'json') {
@@ -233,6 +363,7 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
     setImportSummary(null)
 
     try {
+      const targetCompanyId = await resolveTargetCompanyId()
       let totalImported = 0
       let totalFailed = 0
       let importResults: any[] = []
@@ -246,7 +377,7 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
           progress => {
             setImportProgress(progress)
           },
-          selectedCompanyId ?? undefined
+          targetCompanyId
         )
         totalImported = result.totalImported
         totalFailed = result.totalFailed
@@ -260,7 +391,7 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
           progress => {
             setImportProgress(progress)
           },
-          selectedCompanyId ?? undefined
+          targetCompanyId
         )
         totalImported = result.imported
         totalFailed = result.failed
@@ -549,6 +680,8 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
             onEntityTypeChange={handleEntityTypeChange}
             onFormatChange={handleFormatChange}
             availableEntityTypes={availableEntityTypes}
+            selectedCompanyName={selectedCompanyName}
+            exportedCompanyInfo={exportedCompanyInfo}
           />
         )}
 
@@ -607,9 +740,18 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
                     isImporting ||
                     validationResult.errors.length > 0 ||
                     validationResult.summary.validRows === 0 ||
-                    !selectedCompanyId
+                    (importSettings.companyImportMode === 'selectedCompany' && !selectedCompanyId) ||
+                    (importSettings.companyImportMode === 'exportedCompany' &&
+                      !exportedCompanyInfo)
                   }
-                  title={!selectedCompanyId ? 'Bitte zuerst eine Company auswählen' : undefined}
+                  title={
+                    importSettings.companyImportMode === 'selectedCompany' && !selectedCompanyId
+                      ? t('import.noSelectedCompany')
+                      : importSettings.companyImportMode === 'exportedCompany' &&
+                          !exportedCompanyInfo
+                        ? t('import.exportedCompanyMissing')
+                        : undefined
+                  }
                   startIcon={isImporting ? <CircularProgress size={20} /> : <UploadIcon />}
                 >
                   {isImporting ? t('import.importing_') : t('import.startImport')}

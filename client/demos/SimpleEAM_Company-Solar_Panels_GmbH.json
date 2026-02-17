@@ -1,4 +1,152 @@
 {
+  "Companies": [
+    {
+      "__typename": "Company",
+      "id": "company-solar-panels-gmbh",
+      "name": "Solar Panels GmbH",
+      "description": "Leading manufacturer of high-efficiency photovoltaic solar panels and renewable energy solutions. Specializing in monocrystalline and polycrystalline solar cell technology with global distribution.",
+      "address": "Sonnenallee 42, 10997 Berlin, Germany",
+      "industry": "Renewable Energy / Solar Manufacturing",
+      "website": "https://www.solarpanels-gmbh.de",
+      "primaryColor": "#000000",
+      "secondaryColor": "#666666",
+      "font": "Roboto",
+      "diagramFont": "Comic Shanns",
+      "logo": null,
+      "features": "{\"lenses\":{\"enterpriseArchitecture\":true,\"businessArchitecture\":true,\"processArchitecture\":true,\"dataArchitecture\":true,\"aiArchitecture\":true,\"solutionArchitecture\":true,\"infrastructureArchitecture\":true,\"transformationArchitecture\":true,\"technologyManagement\":true},\"features\":{\"GEA\":true,\"BMC\":true,\"BCA\":false,\"AAS\":false,\"ABH\":true,\"APS\":false,\"AMO\":false,\"SUP\":true}}",
+      "size": "LARGE",
+      "createdAt": "2025-09-09T12:16:52.575Z",
+      "updatedAt": "2026-02-13T14:58:28.370Z",
+      "employees": [
+        {
+          "__typename": "Person",
+          "id": "person-data-scientist",
+          "firstName": "Dr. Alex",
+          "lastName": "Chen"
+        },
+        {
+          "__typename": "Person",
+          "id": "person-it-manager",
+          "firstName": "Mark",
+          "lastName": "Lee"
+        },
+        {
+          "__typename": "Person",
+          "id": "person-dir-hr",
+          "firstName": "Kevin",
+          "lastName": "Jones"
+        },
+        {
+          "__typename": "Person",
+          "id": "person-dir-cs",
+          "firstName": "Amanda",
+          "lastName": "Taylor"
+        },
+        {
+          "__typename": "Person",
+          "id": "person-cfo",
+          "firstName": "Robert",
+          "lastName": "Davis"
+        },
+        {
+          "__typename": "Person",
+          "id": "8cdbe966-a286-4a43-8725-fea7d48102d6",
+          "firstName": "Marcus",
+          "lastName": "Friedrich"
+        },
+        {
+          "__typename": "Person",
+          "id": "person-vp-supply-chain",
+          "firstName": "Maria",
+          "lastName": "Rodriguez"
+        },
+        {
+          "__typename": "Person",
+          "id": "person-coo",
+          "firstName": "Jennifer",
+          "lastName": "Williams"
+        },
+        {
+          "__typename": "Person",
+          "id": "person-cio",
+          "firstName": "Sandra",
+          "lastName": "Garcia"
+        },
+        {
+          "__typename": "Person",
+          "id": "person-enterprise-architect",
+          "firstName": "Dr. Rachel",
+          "lastName": "White"
+        },
+        {
+          "__typename": "Person",
+          "id": "person-dir-sales",
+          "firstName": "David",
+          "lastName": "Wilson"
+        },
+        {
+          "__typename": "Person",
+          "id": "4bcf75a0-805d-4727-b03d-164ddfb63e6a",
+          "firstName": "Test3",
+          "lastName": "user"
+        },
+        {
+          "__typename": "Person",
+          "id": "person-ceo",
+          "firstName": "Sarah",
+          "lastName": "Johnson"
+        },
+        {
+          "__typename": "Person",
+          "id": "person-ml-engineer",
+          "firstName": "Sarah",
+          "lastName": "Kumar"
+        },
+        {
+          "__typename": "Person",
+          "id": "person-dir-manufacturing",
+          "firstName": "James",
+          "lastName": "Thompson"
+        },
+        {
+          "__typename": "Person",
+          "id": "person-dir-quality",
+          "firstName": "Dr. Thomas",
+          "lastName": "Miller"
+        },
+        {
+          "__typename": "Person",
+          "id": "person-vp-rd",
+          "firstName": "Dr. Lisa",
+          "lastName": "Anderson"
+        },
+        {
+          "__typename": "Person",
+          "id": "person-dir-marketing",
+          "firstName": "Emily",
+          "lastName": "Brown"
+        },
+        {
+          "__typename": "Person",
+          "id": "person-cto",
+          "firstName": "Dr. Michael",
+          "lastName": "Chen"
+        },
+        {
+          "__typename": "Person",
+          "id": "person-ai-product-manager",
+          "firstName": "Michael",
+          "lastName": "Taylor"
+        },
+        {
+          "__typename": "Person",
+          "id": "8431c76c-6b12-4247-9245-46a237279d30",
+          "firstName": "Test",
+          "lastName": "Tester"
+        }
+      ]
+    }
+  ],
   "Business Capabilities": [
     {
       "id": "cap-research-development",
@@ -13,11 +161,7 @@
       "endDate": "",
       "createdAt": "2025-09-09T12:16:52.622Z",
       "updatedAt": "2025-09-09T12:16:52.622Z",
-      "tags": [
-        "innovation",
-        "r&d",
-        "technology"
-      ],
+      "tags": ["innovation", "r&d", "technology"],
       "owners": [
         {
           "__typename": "Person",
@@ -79,11 +223,7 @@
       "endDate": "",
       "createdAt": "2025-09-09T12:16:52.622Z",
       "updatedAt": "2025-09-09T12:16:52.622Z",
-      "tags": [
-        "production",
-        "manufacturing",
-        "operations"
-      ],
+      "tags": ["production", "manufacturing", "operations"],
       "owners": [
         {
           "__typename": "Person",
@@ -145,11 +285,7 @@
       "endDate": "",
       "createdAt": "2025-09-09T12:16:52.622Z",
       "updatedAt": "2025-09-09T12:16:52.622Z",
-      "tags": [
-        "procurement",
-        "suppliers",
-        "logistics"
-      ],
+      "tags": ["procurement", "suppliers", "logistics"],
       "owners": [
         {
           "__typename": "Person",
@@ -211,11 +347,7 @@
       "endDate": "",
       "createdAt": "2025-09-09T12:16:52.622Z",
       "updatedAt": "2025-09-09T12:16:52.622Z",
-      "tags": [
-        "sales",
-        "marketing",
-        "customers"
-      ],
+      "tags": ["sales", "marketing", "customers"],
       "owners": [
         {
           "__typename": "Person",
@@ -283,11 +415,7 @@
       "endDate": "",
       "createdAt": "2025-09-09T12:16:52.622Z",
       "updatedAt": "2025-09-09T12:16:52.622Z",
-      "tags": [
-        "support",
-        "warranty",
-        "service"
-      ],
+      "tags": ["support", "warranty", "service"],
       "owners": [
         {
           "__typename": "Person",
@@ -349,11 +477,7 @@
       "endDate": "",
       "createdAt": "2025-09-09T12:16:52.622Z",
       "updatedAt": "2025-09-09T12:16:52.622Z",
-      "tags": [
-        "quality",
-        "testing",
-        "compliance"
-      ],
+      "tags": ["quality", "testing", "compliance"],
       "owners": [
         {
           "__typename": "Person",
@@ -415,11 +539,7 @@
       "endDate": "",
       "createdAt": "2025-09-09T12:16:52.622Z",
       "updatedAt": "2025-09-09T12:16:52.622Z",
-      "tags": [
-        "finance",
-        "accounting",
-        "reporting"
-      ],
+      "tags": ["finance", "accounting", "reporting"],
       "owners": [
         {
           "__typename": "Person",
@@ -487,11 +607,7 @@
       "endDate": "",
       "createdAt": "2025-09-09T12:16:52.622Z",
       "updatedAt": "2025-09-09T12:16:52.622Z",
-      "tags": [
-        "hr",
-        "talent",
-        "workforce"
-      ],
+      "tags": ["hr", "talent", "workforce"],
       "owners": [
         {
           "__typename": "Person",
@@ -553,11 +669,7 @@
       "endDate": "",
       "createdAt": "2025-09-09T12:16:52.622Z",
       "updatedAt": "2025-09-09T12:16:52.622Z",
-      "tags": [
-        "it",
-        "technology",
-        "infrastructure"
-      ],
+      "tags": ["it", "technology", "infrastructure"],
       "owners": [
         {
           "__typename": "Person",
@@ -619,11 +731,7 @@
       "endDate": "",
       "createdAt": "2025-09-09T12:16:52.670Z",
       "updatedAt": "2025-09-09T12:16:52.670Z",
-      "tags": [
-        "innovation",
-        "product",
-        "technology"
-      ],
+      "tags": ["innovation", "product", "technology"],
       "owners": [
         {
           "__typename": "Person",
@@ -686,11 +794,7 @@
       "endDate": "",
       "createdAt": "2025-09-09T12:16:52.670Z",
       "updatedAt": "2025-09-09T12:16:52.670Z",
-      "tags": [
-        "materials",
-        "research",
-        "cells"
-      ],
+      "tags": ["materials", "research", "cells"],
       "owners": [
         {
           "__typename": "Person",
@@ -748,11 +852,7 @@
       "endDate": "",
       "createdAt": "2025-09-09T12:16:52.670Z",
       "updatedAt": "2025-09-09T12:16:52.670Z",
-      "tags": [
-        "prototype",
-        "testing",
-        "development"
-      ],
+      "tags": ["prototype", "testing", "development"],
       "owners": [
         {
           "__typename": "Person",
@@ -810,11 +910,7 @@
       "endDate": "",
       "createdAt": "2025-09-09T12:16:52.670Z",
       "updatedAt": "2025-09-09T12:16:52.670Z",
-      "tags": [
-        "cells",
-        "production",
-        "manufacturing"
-      ],
+      "tags": ["cells", "production", "manufacturing"],
       "owners": [
         {
           "__typename": "Person",
@@ -872,11 +968,7 @@
       "endDate": "",
       "createdAt": "2025-09-09T12:16:52.670Z",
       "updatedAt": "2025-09-09T12:16:52.670Z",
-      "tags": [
-        "assembly",
-        "modules",
-        "manufacturing"
-      ],
+      "tags": ["assembly", "modules", "manufacturing"],
       "owners": [
         {
           "__typename": "Person",
@@ -934,11 +1026,7 @@
       "endDate": "",
       "createdAt": "2025-09-09T12:16:52.670Z",
       "updatedAt": "2025-09-09T12:16:52.670Z",
-      "tags": [
-        "packaging",
-        "shipping",
-        "logistics"
-      ],
+      "tags": ["packaging", "shipping", "logistics"],
       "owners": [
         {
           "__typename": "Person",
@@ -1001,11 +1089,7 @@
       "endDate": "",
       "createdAt": "2025-09-09T12:16:52.670Z",
       "updatedAt": "2025-09-09T12:16:52.670Z",
-      "tags": [
-        "suppliers",
-        "relationships",
-        "performance"
-      ],
+      "tags": ["suppliers", "relationships", "performance"],
       "owners": [
         {
           "__typename": "Person",
@@ -1063,11 +1147,7 @@
       "endDate": "",
       "createdAt": "2025-09-09T12:16:52.670Z",
       "updatedAt": "2025-09-09T12:16:52.670Z",
-      "tags": [
-        "procurement",
-        "sourcing",
-        "purchasing"
-      ],
+      "tags": ["procurement", "sourcing", "purchasing"],
       "owners": [
         {
           "__typename": "Person",
@@ -1130,11 +1210,7 @@
       "endDate": "",
       "createdAt": "2025-09-09T12:16:52.670Z",
       "updatedAt": "2025-09-09T12:16:52.670Z",
-      "tags": [
-        "inventory",
-        "warehousing",
-        "stock"
-      ],
+      "tags": ["inventory", "warehousing", "stock"],
       "owners": [
         {
           "__typename": "Person",
@@ -1197,11 +1273,7 @@
       "endDate": "",
       "createdAt": "2025-09-09T12:16:52.670Z",
       "updatedAt": "2025-09-09T12:16:52.670Z",
-      "tags": [
-        "leads",
-        "marketing",
-        "generation"
-      ],
+      "tags": ["leads", "marketing", "generation"],
       "owners": [
         {
           "__typename": "Person",
@@ -1259,11 +1331,7 @@
       "endDate": "",
       "createdAt": "2025-09-09T12:16:52.670Z",
       "updatedAt": "2025-09-09T12:16:52.670Z",
-      "tags": [
-        "sales",
-        "orders",
-        "execution"
-      ],
+      "tags": ["sales", "orders", "execution"],
       "owners": [
         {
           "__typename": "Person",
@@ -1326,11 +1394,7 @@
       "endDate": "",
       "createdAt": "2025-09-09T12:16:52.670Z",
       "updatedAt": "2025-09-09T12:16:52.670Z",
-      "tags": [
-        "channels",
-        "partners",
-        "distribution"
-      ],
+      "tags": ["channels", "partners", "distribution"],
       "owners": [
         {
           "__typename": "Person",
@@ -1388,11 +1452,7 @@
       "endDate": "",
       "createdAt": "2025-09-09T12:16:52.670Z",
       "updatedAt": "2025-09-09T12:16:52.670Z",
-      "tags": [
-        "inspection",
-        "quality",
-        "materials"
-      ],
+      "tags": ["inspection", "quality", "materials"],
       "owners": [
         {
           "__typename": "Person",
@@ -1450,11 +1510,7 @@
       "endDate": "",
       "createdAt": "2025-09-09T12:16:52.670Z",
       "updatedAt": "2025-09-09T12:16:52.670Z",
-      "tags": [
-        "testing",
-        "production",
-        "quality"
-      ],
+      "tags": ["testing", "production", "quality"],
       "owners": [
         {
           "__typename": "Person",
@@ -1512,11 +1568,7 @@
       "endDate": "",
       "createdAt": "2025-09-09T12:16:52.670Z",
       "updatedAt": "2025-09-09T12:16:52.670Z",
-      "tags": [
-        "certification",
-        "compliance",
-        "standards"
-      ],
+      "tags": ["certification", "compliance", "standards"],
       "owners": [
         {
           "__typename": "Person",
@@ -1574,11 +1626,7 @@
       "endDate": "",
       "createdAt": "2025-09-09T12:16:52.670Z",
       "updatedAt": "2025-09-09T12:16:52.670Z",
-      "tags": [
-        "planning",
-        "analysis",
-        "budgeting"
-      ],
+      "tags": ["planning", "analysis", "budgeting"],
       "owners": [],
       "supportedByApplications": [
         {
@@ -1634,11 +1682,7 @@
       "endDate": "",
       "createdAt": "2025-09-09T12:16:52.670Z",
       "updatedAt": "2025-09-09T12:16:52.670Z",
-      "tags": [
-        "payable",
-        "suppliers",
-        "payments"
-      ],
+      "tags": ["payable", "suppliers", "payments"],
       "owners": [],
       "supportedByApplications": [
         {
@@ -1699,11 +1743,7 @@
       "endDate": "",
       "createdAt": "2025-09-09T12:16:52.670Z",
       "updatedAt": "2025-09-09T12:16:52.670Z",
-      "tags": [
-        "reporting",
-        "statements",
-        "regulatory"
-      ],
+      "tags": ["reporting", "statements", "regulatory"],
       "owners": [],
       "supportedByApplications": [
         {
@@ -1754,11 +1794,7 @@
       "endDate": "",
       "createdAt": "2025-09-09T12:16:52.670Z",
       "updatedAt": "2025-09-09T12:16:52.670Z",
-      "tags": [
-        "recruitment",
-        "hiring",
-        "onboarding"
-      ],
+      "tags": ["recruitment", "hiring", "onboarding"],
       "owners": [],
       "supportedByApplications": [
         {
@@ -1809,11 +1845,7 @@
       "endDate": "",
       "createdAt": "2025-09-09T12:16:52.670Z",
       "updatedAt": "2025-09-09T12:16:52.670Z",
-      "tags": [
-        "performance",
-        "evaluation",
-        "development"
-      ],
+      "tags": ["performance", "evaluation", "development"],
       "owners": [],
       "supportedByApplications": [
         {
@@ -1869,11 +1901,7 @@
       "endDate": "",
       "createdAt": "2025-09-09T12:16:52.670Z",
       "updatedAt": "2025-09-09T12:16:52.670Z",
-      "tags": [
-        "payroll",
-        "benefits",
-        "compensation"
-      ],
+      "tags": ["payroll", "benefits", "compensation"],
       "owners": [],
       "supportedByApplications": [
         {
@@ -1924,11 +1952,7 @@
       "endDate": "",
       "createdAt": "2025-09-09T12:16:52.670Z",
       "updatedAt": "2025-09-09T12:16:52.670Z",
-      "tags": [
-        "service",
-        "incident",
-        "change"
-      ],
+      "tags": ["service", "incident", "change"],
       "owners": [],
       "supportedByApplications": [
         {
@@ -1979,11 +2003,7 @@
       "endDate": "",
       "createdAt": "2025-09-09T12:16:52.670Z",
       "updatedAt": "2025-09-09T12:16:52.670Z",
-      "tags": [
-        "infrastructure",
-        "servers",
-        "networks"
-      ],
+      "tags": ["infrastructure", "servers", "networks"],
       "owners": [],
       "supportedByApplications": [
         {
@@ -2034,11 +2054,7 @@
       "endDate": "",
       "createdAt": "2025-09-09T12:16:52.670Z",
       "updatedAt": "2025-09-09T12:16:52.670Z",
-      "tags": [
-        "applications",
-        "lifecycle",
-        "portfolio"
-      ],
+      "tags": ["applications", "lifecycle", "portfolio"],
       "owners": [],
       "supportedByApplications": [
         {
@@ -2089,11 +2105,7 @@
       "endDate": "",
       "createdAt": "2025-09-09T12:16:52.670Z",
       "updatedAt": "2025-09-09T12:16:52.670Z",
-      "tags": [
-        "technical",
-        "support",
-        "troubleshooting"
-      ],
+      "tags": ["technical", "support", "troubleshooting"],
       "owners": [],
       "supportedByApplications": [
         {
@@ -2144,11 +2156,7 @@
       "endDate": "",
       "createdAt": "2025-09-09T12:16:52.670Z",
       "updatedAt": "2025-09-09T12:16:52.670Z",
-      "tags": [
-        "warranty",
-        "claims",
-        "processing"
-      ],
+      "tags": ["warranty", "claims", "processing"],
       "owners": [],
       "supportedByApplications": [
         {
@@ -2199,11 +2207,7 @@
       "endDate": "",
       "createdAt": "2025-09-09T12:16:52.670Z",
       "updatedAt": "2025-09-09T12:16:52.670Z",
-      "tags": [
-        "training",
-        "education",
-        "customers"
-      ],
+      "tags": ["training", "education", "customers"],
       "owners": [],
       "supportedByApplications": [
         {
@@ -2242,6 +2246,7 @@
       "children": []
     }
   ],
+  "Business Processes": [],
   "Applications": [
     {
       "id": "app-sap-s4hana",
@@ -2259,11 +2264,7 @@
       "planningDate": "2021-06-01",
       "createdAt": "2025-09-09T12:16:52.765Z",
       "updatedAt": "2025-12-15T08:59:24.686Z",
-      "technologyStack": [
-        "SAP HANA",
-        "ABAP",
-        "Fiori"
-      ],
+      "technologyStack": ["SAP HANA", "ABAP", "Fiori"],
       "sevenRStrategy": "RETAIN",
       "timeCategory": "INVEST",
       "owners": [
@@ -2291,6 +2292,7 @@
           "name": "Finance & Accounting"
         }
       ],
+      "supportsBusinessProcesses": [],
       "usesDataObjects": [
         {
           "__typename": "DataObject",
@@ -2467,11 +2469,7 @@
       "planningDate": "2020-10-01",
       "createdAt": "2025-09-09T12:16:52.765Z",
       "updatedAt": "2025-09-09T12:16:52.765Z",
-      "technologyStack": [
-        "Salesforce Platform",
-        "Apex",
-        "Lightning"
-      ],
+      "technologyStack": ["Salesforce Platform", "Apex", "Lightning"],
       "sevenRStrategy": "RETAIN",
       "timeCategory": "INVEST",
       "owners": [
@@ -2494,6 +2492,7 @@
           "name": "Channel Management"
         }
       ],
+      "supportsBusinessProcesses": [],
       "usesDataObjects": [
         {
           "__typename": "DataObject",
@@ -2623,13 +2622,7 @@
       "planningDate": "2022-01-01",
       "createdAt": "2025-09-09T12:16:52.765Z",
       "updatedAt": "2025-09-09T12:16:52.765Z",
-      "technologyStack": [
-        "Node.js",
-        "React",
-        "PostgreSQL",
-        "Docker",
-        "Kubernetes"
-      ],
+      "technologyStack": ["Node.js", "React", "PostgreSQL", "Docker", "Kubernetes"],
       "sevenRStrategy": "RETAIN",
       "timeCategory": "INVEST",
       "owners": [
@@ -2657,6 +2650,7 @@
           "name": "Module Assembly"
         }
       ],
+      "supportsBusinessProcesses": [],
       "usesDataObjects": [
         {
           "__typename": "DataObject",
@@ -2811,13 +2805,7 @@
       "planningDate": "2021-11-01",
       "createdAt": "2025-09-09T12:16:52.765Z",
       "updatedAt": "2025-09-09T12:16:52.765Z",
-      "technologyStack": [
-        "Python",
-        "Django",
-        "PostgreSQL",
-        "InfluxDB",
-        "Grafana"
-      ],
+      "technologyStack": ["Python", "Django", "PostgreSQL", "InfluxDB", "Grafana"],
       "sevenRStrategy": "RETAIN",
       "timeCategory": "INVEST",
       "owners": [
@@ -2845,6 +2833,7 @@
           "name": "Certification & Compliance"
         }
       ],
+      "supportsBusinessProcesses": [],
       "usesDataObjects": [
         {
           "__typename": "DataObject",
@@ -2981,11 +2970,7 @@
       "planningDate": "2019-12-01",
       "createdAt": "2025-09-09T12:16:52.765Z",
       "updatedAt": "2025-09-09T12:16:52.765Z",
-      "technologyStack": [
-        "Oracle Cloud",
-        "Java",
-        "Oracle Database"
-      ],
+      "technologyStack": ["Oracle Cloud", "Java", "Oracle Database"],
       "sevenRStrategy": "REPLATFORM",
       "timeCategory": "TOLERATE",
       "owners": [
@@ -3013,6 +2998,7 @@
           "name": "Inventory Management"
         }
       ],
+      "supportsBusinessProcesses": [],
       "usesDataObjects": [
         {
           "__typename": "DataObject",
@@ -3130,13 +3116,7 @@
       "planningDate": "2022-06-01",
       "createdAt": "2025-09-09T12:16:52.765Z",
       "updatedAt": "2025-09-09T12:16:52.765Z",
-      "technologyStack": [
-        "Python",
-        "FastAPI",
-        "MongoDB",
-        "Apache Kafka",
-        "Jupyter"
-      ],
+      "technologyStack": ["Python", "FastAPI", "MongoDB", "Apache Kafka", "Jupyter"],
       "sevenRStrategy": "RETAIN",
       "timeCategory": "INVEST",
       "owners": [
@@ -3164,6 +3144,7 @@
           "name": "Materials Research"
         }
       ],
+      "supportsBusinessProcesses": [],
       "usesDataObjects": [
         {
           "__typename": "DataObject",
@@ -3279,10 +3260,7 @@
       "planningDate": "2021-01-01",
       "createdAt": "2025-09-09T12:16:52.765Z",
       "updatedAt": "2025-09-09T12:16:52.765Z",
-      "technologyStack": [
-        "Workday Platform",
-        "Cloud Native"
-      ],
+      "technologyStack": ["Workday Platform", "Cloud Native"],
       "sevenRStrategy": "RETAIN",
       "timeCategory": "INVEST",
       "owners": [
@@ -3310,6 +3288,7 @@
           "name": "Talent Acquisition"
         }
       ],
+      "supportsBusinessProcesses": [],
       "usesDataObjects": [
         {
           "__typename": "DataObject",
@@ -3404,11 +3383,7 @@
       "planningDate": "2020-08-01",
       "createdAt": "2025-09-09T12:16:52.765Z",
       "updatedAt": "2025-09-09T12:16:52.765Z",
-      "technologyStack": [
-        "HubSpot Platform",
-        "JavaScript",
-        "APIs"
-      ],
+      "technologyStack": ["HubSpot Platform", "JavaScript", "APIs"],
       "sevenRStrategy": "RETAIN",
       "timeCategory": "INVEST",
       "owners": [
@@ -3426,6 +3401,7 @@
           "name": "Lead Generation"
         }
       ],
+      "supportsBusinessProcesses": [],
       "usesDataObjects": [
         {
           "__typename": "DataObject",
@@ -3517,11 +3493,7 @@
       "planningDate": "2020-02-01",
       "createdAt": "2025-09-09T12:16:52.765Z",
       "updatedAt": "2025-09-09T12:16:52.765Z",
-      "technologyStack": [
-        "Zendesk Platform",
-        "APIs",
-        "Webhooks"
-      ],
+      "technologyStack": ["Zendesk Platform", "APIs", "Webhooks"],
       "sevenRStrategy": "RETAIN",
       "timeCategory": "INVEST",
       "owners": [
@@ -3544,6 +3516,7 @@
           "name": "Warranty Management"
         }
       ],
+      "supportsBusinessProcesses": [],
       "usesDataObjects": [
         {
           "__typename": "DataObject",
@@ -3640,11 +3613,7 @@
       "planningDate": "2018-09-01",
       "createdAt": "2025-09-09T12:16:52.765Z",
       "updatedAt": "2025-09-09T12:16:52.765Z",
-      "technologyStack": [
-        "Java",
-        "Oracle Database",
-        "Windows Server"
-      ],
+      "technologyStack": ["Java", "Oracle Database", "Windows Server"],
       "sevenRStrategy": "REPLATFORM",
       "timeCategory": "TOLERATE",
       "owners": [
@@ -3667,6 +3636,7 @@
           "name": "Inventory Management"
         }
       ],
+      "supportsBusinessProcesses": [],
       "usesDataObjects": [
         {
           "__typename": "DataObject",
@@ -3769,11 +3739,7 @@
       "planningDate": "2021-06-01",
       "createdAt": "2025-09-09T12:16:52.765Z",
       "updatedAt": "2025-09-09T12:16:52.765Z",
-      "technologyStack": [
-        "Power BI Service",
-        "DAX",
-        "Power Query"
-      ],
+      "technologyStack": ["Power BI Service", "DAX", "Power Query"],
       "sevenRStrategy": "RETAIN",
       "timeCategory": "INVEST",
       "owners": [
@@ -3785,6 +3751,7 @@
         }
       ],
       "supportsCapabilities": [],
+      "supportsBusinessProcesses": [],
       "usesDataObjects": [],
       "sourceOfInterfaces": [],
       "targetOfInterfaces": [
@@ -3886,11 +3853,7 @@
       "planningDate": "2020-06-01",
       "createdAt": "2025-09-09T12:16:52.765Z",
       "updatedAt": "2025-09-09T12:16:52.765Z",
-      "technologyStack": [
-        "Teamcenter",
-        "Oracle Database",
-        "Windows Server"
-      ],
+      "technologyStack": ["Teamcenter", "Oracle Database", "Windows Server"],
       "sevenRStrategy": "RETAIN",
       "timeCategory": "INVEST",
       "owners": [
@@ -3908,6 +3871,7 @@
           "name": "Product Innovation"
         }
       ],
+      "supportsBusinessProcesses": [],
       "usesDataObjects": [
         {
           "__typename": "DataObject",
@@ -4028,11 +3992,7 @@
       "planningDate": "2004-06-01",
       "createdAt": "2025-09-09T12:16:52.765Z",
       "updatedAt": "2025-09-09T12:16:52.765Z",
-      "technologyStack": [
-        "COBOL",
-        "DB2",
-        "mainframe"
-      ],
+      "technologyStack": ["COBOL", "DB2", "mainframe"],
       "sevenRStrategy": "RETIRE",
       "timeCategory": "ELIMINATE",
       "owners": [
@@ -4044,6 +4004,7 @@
         }
       ],
       "supportsCapabilities": [],
+      "supportsBusinessProcesses": [],
       "usesDataObjects": [],
       "sourceOfInterfaces": [],
       "targetOfInterfaces": [],
@@ -4079,11 +4040,7 @@
       "planningDate": "2022-08-01",
       "createdAt": "2025-09-09T12:16:52.765Z",
       "updatedAt": "2025-09-09T12:16:52.765Z",
-      "technologyStack": [
-        "ServiceNow Platform",
-        "JavaScript",
-        "REST APIs"
-      ],
+      "technologyStack": ["ServiceNow Platform", "JavaScript", "REST APIs"],
       "sevenRStrategy": "RETAIN",
       "timeCategory": "INVEST",
       "owners": [
@@ -4111,6 +4068,7 @@
           "name": "Infrastructure Management"
         }
       ],
+      "supportsBusinessProcesses": [],
       "usesDataObjects": [],
       "sourceOfInterfaces": [
         {
@@ -4209,10 +4167,7 @@
       "planningDate": "2022-01-01",
       "createdAt": "2025-09-09T12:16:52.765Z",
       "updatedAt": "2025-09-09T12:16:52.765Z",
-      "technologyStack": [
-        "SAP Concur Platform",
-        "APIs"
-      ],
+      "technologyStack": ["SAP Concur Platform", "APIs"],
       "sevenRStrategy": "RETAIN",
       "timeCategory": "INVEST",
       "owners": [
@@ -4235,6 +4190,7 @@
           "name": "Financial Planning & Analysis"
         }
       ],
+      "supportsBusinessProcesses": [],
       "usesDataObjects": [],
       "sourceOfInterfaces": [
         {
@@ -4320,11 +4276,7 @@
       "planningDate": "2021-04-01",
       "createdAt": "2025-09-09T12:16:52.765Z",
       "updatedAt": "2026-02-13T14:46:53.282Z",
-      "technologyStack": [
-        "Cornerstone Platform",
-        "APIs",
-        "SCORM"
-      ],
+      "technologyStack": ["Cornerstone Platform", "APIs", "SCORM"],
       "sevenRStrategy": "RETAIN",
       "timeCategory": "INVEST",
       "owners": [
@@ -4347,6 +4299,7 @@
           "name": "Performance Management"
         }
       ],
+      "supportsBusinessProcesses": [],
       "usesDataObjects": [],
       "sourceOfInterfaces": [
         {
@@ -4442,11 +4395,7 @@
       "planningDate": "2018-08-01",
       "createdAt": "2025-09-09T12:16:52.765Z",
       "updatedAt": "2025-09-09T12:16:52.765Z",
-      "technologyStack": [
-        "Oracle Hyperion",
-        "Essbase",
-        "Oracle Database"
-      ],
+      "technologyStack": ["Oracle Hyperion", "Essbase", "Oracle Database"],
       "sevenRStrategy": "REPLATFORM",
       "timeCategory": "TOLERATE",
       "owners": [
@@ -4469,6 +4418,7 @@
           "name": "Financial Reporting"
         }
       ],
+      "supportsBusinessProcesses": [],
       "usesDataObjects": [],
       "sourceOfInterfaces": [
         {
@@ -4555,6 +4505,7 @@
         }
       ],
       "supportsCapabilities": [],
+      "supportsBusinessProcesses": [],
       "usesDataObjects": [],
       "sourceOfInterfaces": [
         {
@@ -7834,12 +7785,7 @@
       "description": "Current enterprise architecture with mix of legacy and modern systems, partial cloud adoption, and heterogeneous integration landscape",
       "domain": "ENTERPRISE",
       "type": "CURRENT_STATE",
-      "tags": [
-        "enterprise",
-        "current",
-        "hybrid-cloud",
-        "legacy"
-      ],
+      "tags": ["enterprise", "current", "hybrid-cloud", "legacy"],
       "timestamp": "2025-09-09T12:16:52.986Z",
       "createdAt": "2025-09-09T12:16:52.986Z",
       "updatedAt": "2025-09-09T12:16:52.986Z",
@@ -8281,12 +8227,7 @@
       "description": "Target enterprise architecture with cloud-native applications, API-first integration, real-time analytics, and digital manufacturing capabilities",
       "domain": "ENTERPRISE",
       "type": "FUTURE_STATE",
-      "tags": [
-        "enterprise",
-        "future",
-        "cloud-native",
-        "api-first"
-      ],
+      "tags": ["enterprise", "future", "cloud-native", "api-first"],
       "timestamp": "2025-09-09T12:16:52.986Z",
       "createdAt": "2025-09-09T12:16:52.986Z",
       "updatedAt": "2025-09-09T12:16:52.986Z",
@@ -8425,12 +8366,7 @@
       "description": "First phase focusing on API gateway implementation, cloud migration of non-critical systems, and real-time manufacturing integration",
       "domain": "INTEGRATION",
       "type": "TRANSITION",
-      "tags": [
-        "transition",
-        "integration",
-        "api-gateway",
-        "phase1"
-      ],
+      "tags": ["transition", "integration", "api-gateway", "phase1"],
       "timestamp": "2025-09-09T12:16:52.986Z",
       "createdAt": "2025-09-09T12:16:52.986Z",
       "updatedAt": "2025-09-09T12:16:52.986Z",
@@ -8471,13 +8407,7 @@
       "description": "Second phase implementing IoT integration, AI-driven quality control, and advanced analytics capabilities",
       "domain": "TECHNOLOGY",
       "type": "TRANSITION",
-      "tags": [
-        "transition",
-        "iot",
-        "ai",
-        "smart-manufacturing",
-        "phase2"
-      ],
+      "tags": ["transition", "iot", "ai", "smart-manufacturing", "phase2"],
       "timestamp": "2025-09-09T12:16:52.986Z",
       "createdAt": "2025-09-09T12:16:52.986Z",
       "updatedAt": "2025-09-09T12:16:52.986Z",
@@ -8518,12 +8448,7 @@
       "description": "Business capability model and operating model for solar panel manufacturing with focus on R&D innovation and quality excellence",
       "domain": "BUSINESS",
       "type": "CURRENT_STATE",
-      "tags": [
-        "business",
-        "capabilities",
-        "solar",
-        "manufacturing"
-      ],
+      "tags": ["business", "capabilities", "solar", "manufacturing"],
       "timestamp": "2025-09-09T12:16:52.986Z",
       "createdAt": "2025-09-09T12:16:52.986Z",
       "updatedAt": "2025-09-09T12:16:52.986Z",
@@ -8577,12 +8502,7 @@
       "description": "Data architecture supporting analytics, compliance, and operational reporting across manufacturing and business processes",
       "domain": "DATA",
       "type": "CURRENT_STATE",
-      "tags": [
-        "data",
-        "analytics",
-        "compliance",
-        "reporting"
-      ],
+      "tags": ["data", "analytics", "compliance", "reporting"],
       "timestamp": "2025-09-09T12:16:52.986Z",
       "createdAt": "2025-09-09T12:16:52.986Z",
       "updatedAt": "2025-09-09T12:16:52.986Z",
@@ -8644,12 +8564,7 @@
       "description": "Application landscape with core ERP, specialized manufacturing systems, and cloud-based customer engagement platforms",
       "domain": "APPLICATION",
       "type": "CURRENT_STATE",
-      "tags": [
-        "application",
-        "portfolio",
-        "erp",
-        "manufacturing"
-      ],
+      "tags": ["application", "portfolio", "erp", "manufacturing"],
       "timestamp": "2025-09-09T12:16:52.986Z",
       "createdAt": "2025-09-09T12:16:52.986Z",
       "updatedAt": "2025-09-09T12:16:52.986Z",
@@ -8747,12 +8662,7 @@
       "description": "Infrastructure architecture with AWS cloud services, on-premise manufacturing systems, and hybrid connectivity",
       "domain": "TECHNOLOGY",
       "type": "CURRENT_STATE",
-      "tags": [
-        "technology",
-        "infrastructure",
-        "aws",
-        "hybrid"
-      ],
+      "tags": ["technology", "infrastructure", "aws", "hybrid"],
       "timestamp": "2025-09-09T12:16:52.986Z",
       "createdAt": "2025-09-09T12:16:52.986Z",
       "updatedAt": "2025-09-09T12:16:52.986Z",
@@ -9610,11 +9520,7 @@
       "category": "BUSINESS",
       "priority": "CRITICAL",
       "isActive": true,
-      "tags": [
-        "agility",
-        "flexibility",
-        "adaptation"
-      ],
+      "tags": ["agility", "flexibility", "adaptation"],
       "createdAt": "2025-09-09T12:16:52.898Z",
       "updatedAt": "2025-09-09T12:16:52.898Z",
       "appliedInArchitectures": [
@@ -9660,11 +9566,7 @@
       "category": "BUSINESS",
       "priority": "HIGH",
       "isActive": true,
-      "tags": [
-        "customer",
-        "experience",
-        "satisfaction"
-      ],
+      "tags": ["customer", "experience", "satisfaction"],
       "createdAt": "2025-09-09T12:16:52.898Z",
       "updatedAt": "2025-09-09T12:16:52.898Z",
       "appliedInArchitectures": [
@@ -9725,11 +9627,7 @@
       "category": "BUSINESS",
       "priority": "HIGH",
       "isActive": true,
-      "tags": [
-        "sustainability",
-        "environment",
-        "responsibility"
-      ],
+      "tags": ["sustainability", "environment", "responsibility"],
       "createdAt": "2025-09-09T12:16:52.898Z",
       "updatedAt": "2025-09-09T12:16:52.898Z",
       "appliedInArchitectures": [
@@ -9775,11 +9673,7 @@
       "category": "DATA",
       "priority": "CRITICAL",
       "isActive": true,
-      "tags": [
-        "data",
-        "governance",
-        "analytics"
-      ],
+      "tags": ["data", "governance", "analytics"],
       "createdAt": "2025-09-09T12:16:52.898Z",
       "updatedAt": "2025-09-09T12:16:52.898Z",
       "appliedInArchitectures": [
@@ -9815,11 +9709,7 @@
       "category": "DATA",
       "priority": "HIGH",
       "isActive": true,
-      "tags": [
-        "consistency",
-        "accuracy",
-        "reliability"
-      ],
+      "tags": ["consistency", "accuracy", "reliability"],
       "createdAt": "2025-09-09T12:16:52.898Z",
       "updatedAt": "2025-09-09T12:16:52.898Z",
       "appliedInArchitectures": [
@@ -9855,11 +9745,7 @@
       "category": "DATA",
       "priority": "HIGH",
       "isActive": true,
-      "tags": [
-        "real-time",
-        "monitoring",
-        "visibility"
-      ],
+      "tags": ["real-time", "monitoring", "visibility"],
       "createdAt": "2025-09-09T12:16:52.898Z",
       "updatedAt": "2025-09-09T12:16:52.898Z",
       "appliedInArchitectures": [
@@ -9900,11 +9786,7 @@
       "category": "APPLICATION",
       "priority": "CRITICAL",
       "isActive": true,
-      "tags": [
-        "cloud",
-        "scalability",
-        "efficiency"
-      ],
+      "tags": ["cloud", "scalability", "efficiency"],
       "createdAt": "2025-09-09T12:16:52.898Z",
       "updatedAt": "2025-09-09T12:16:52.898Z",
       "appliedInArchitectures": [
@@ -10000,11 +9882,7 @@
       "category": "APPLICATION",
       "priority": "HIGH",
       "isActive": true,
-      "tags": [
-        "api",
-        "integration",
-        "ecosystem"
-      ],
+      "tags": ["api", "integration", "ecosystem"],
       "createdAt": "2025-09-09T12:16:52.898Z",
       "updatedAt": "2025-09-09T12:16:52.898Z",
       "appliedInArchitectures": [
@@ -10080,11 +9958,7 @@
       "category": "APPLICATION",
       "priority": "MEDIUM",
       "isActive": true,
-      "tags": [
-        "microservices",
-        "modularity",
-        "scalability"
-      ],
+      "tags": ["microservices", "modularity", "scalability"],
       "createdAt": "2025-09-09T12:16:52.898Z",
       "updatedAt": "2025-09-09T12:16:52.898Z",
       "appliedInArchitectures": [
@@ -10130,11 +10004,7 @@
       "category": "TECHNOLOGY",
       "priority": "HIGH",
       "isActive": true,
-      "tags": [
-        "automation",
-        "efficiency",
-        "reliability"
-      ],
+      "tags": ["automation", "efficiency", "reliability"],
       "createdAt": "2025-09-09T12:16:52.898Z",
       "updatedAt": "2025-09-09T12:16:52.898Z",
       "appliedInArchitectures": [
@@ -10190,11 +10060,7 @@
       "category": "TECHNOLOGY",
       "priority": "MEDIUM",
       "isActive": true,
-      "tags": [
-        "open-source",
-        "standards",
-        "interoperability"
-      ],
+      "tags": ["open-source", "standards", "interoperability"],
       "createdAt": "2025-09-09T12:16:52.898Z",
       "updatedAt": "2025-09-09T12:16:52.898Z",
       "appliedInArchitectures": [
@@ -10240,11 +10106,7 @@
       "category": "TECHNOLOGY",
       "priority": "MEDIUM",
       "isActive": true,
-      "tags": [
-        "edge",
-        "manufacturing",
-        "latency"
-      ],
+      "tags": ["edge", "manufacturing", "latency"],
       "createdAt": "2025-09-09T12:16:52.898Z",
       "updatedAt": "2025-09-09T12:16:52.898Z",
       "appliedInArchitectures": [
@@ -10279,11 +10141,7 @@
       "category": "SECURITY",
       "priority": "CRITICAL",
       "isActive": true,
-      "tags": [
-        "security",
-        "zero-trust",
-        "identity"
-      ],
+      "tags": ["security", "zero-trust", "identity"],
       "createdAt": "2025-09-09T12:16:52.898Z",
       "updatedAt": "2025-09-09T12:16:52.898Z",
       "appliedInArchitectures": [
@@ -10404,11 +10262,7 @@
       "category": "SECURITY",
       "priority": "CRITICAL",
       "isActive": true,
-      "tags": [
-        "privacy",
-        "protection",
-        "compliance"
-      ],
+      "tags": ["privacy", "protection", "compliance"],
       "createdAt": "2025-09-09T12:16:52.898Z",
       "updatedAt": "2025-09-09T12:16:52.898Z",
       "appliedInArchitectures": [
@@ -10494,11 +10348,7 @@
       "category": "INTEGRATION",
       "priority": "HIGH",
       "isActive": true,
-      "tags": [
-        "events",
-        "streaming",
-        "real-time"
-      ],
+      "tags": ["events", "streaming", "real-time"],
       "createdAt": "2025-09-09T12:16:52.898Z",
       "updatedAt": "2025-09-09T12:16:52.898Z",
       "appliedInArchitectures": [
@@ -10528,11 +10378,7 @@
       "category": "INTEGRATION",
       "priority": "MEDIUM",
       "isActive": true,
-      "tags": [
-        "async",
-        "resilience",
-        "scalability"
-      ],
+      "tags": ["async", "resilience", "scalability"],
       "createdAt": "2025-09-09T12:16:52.898Z",
       "updatedAt": "2025-09-09T12:16:52.898Z",
       "appliedInArchitectures": [],
@@ -10556,11 +10402,7 @@
       "category": "PERFORMANCE",
       "priority": "HIGH",
       "isActive": true,
-      "tags": [
-        "performance",
-        "efficiency",
-        "optimization"
-      ],
+      "tags": ["performance", "efficiency", "optimization"],
       "createdAt": "2025-09-09T12:16:52.898Z",
       "updatedAt": "2025-09-09T12:16:52.898Z",
       "appliedInArchitectures": [
@@ -10611,11 +10453,7 @@
       "category": "COST_OPTIMIZATION",
       "priority": "HIGH",
       "isActive": true,
-      "tags": [
-        "cost",
-        "transparency",
-        "optimization"
-      ],
+      "tags": ["cost", "transparency", "optimization"],
       "createdAt": "2025-09-09T12:16:52.898Z",
       "updatedAt": "2025-09-09T12:16:52.898Z",
       "appliedInArchitectures": [
@@ -11179,11 +11017,7 @@
       "lastUpdated": "2024-08-20",
       "createdAt": "2025-09-09T12:16:53.289Z",
       "updatedAt": "2025-09-09T12:16:53.289Z",
-      "tags": [
-        "quality-control",
-        "manufacturing",
-        "predictive-analytics"
-      ],
+      "tags": ["quality-control", "manufacturing", "predictive-analytics"],
       "owners": [],
       "supportsCapabilities": [
         {
@@ -11259,9 +11093,7 @@
       "lastUpdated": "2024-09-05",
       "createdAt": "2025-09-09T12:16:53.289Z",
       "updatedAt": "2026-02-13T15:13:58.626Z",
-      "tags": [
-        "computer-vision, defect-detection, quality-assurance"
-      ],
+      "tags": ["computer-vision, defect-detection, quality-assurance"],
       "owners": [],
       "supportsCapabilities": [
         {
@@ -11332,11 +11164,7 @@
       "lastUpdated": "2024-08-30",
       "createdAt": "2025-09-09T12:16:53.289Z",
       "updatedAt": "2025-09-09T12:16:53.289Z",
-      "tags": [
-        "predictive-maintenance",
-        "equipment",
-        "iot"
-      ],
+      "tags": ["predictive-maintenance", "equipment", "iot"],
       "owners": [],
       "supportsCapabilities": [
         {
@@ -11402,11 +11230,7 @@
       "lastUpdated": "2024-09-01",
       "createdAt": "2025-09-09T12:16:53.289Z",
       "updatedAt": "2025-09-09T12:16:53.289Z",
-      "tags": [
-        "demand-forecasting",
-        "market-analysis",
-        "time-series"
-      ],
+      "tags": ["demand-forecasting", "market-analysis", "time-series"],
       "owners": [],
       "supportsCapabilities": [
         {
@@ -11487,11 +11311,7 @@
       "lastUpdated": "2024-09-06",
       "createdAt": "2025-09-09T12:16:53.289Z",
       "updatedAt": "2025-09-09T12:16:53.289Z",
-      "tags": [
-        "customer-service",
-        "nlp",
-        "automation"
-      ],
+      "tags": ["customer-service", "nlp", "automation"],
       "owners": [],
       "supportsCapabilities": [
         {
@@ -11567,11 +11387,7 @@
       "lastUpdated": "2024-08-25",
       "createdAt": "2025-09-09T12:16:53.289Z",
       "updatedAt": "2025-09-09T12:16:53.289Z",
-      "tags": [
-        "supply-chain",
-        "optimization",
-        "logistics"
-      ],
+      "tags": ["supply-chain", "optimization", "logistics"],
       "owners": [],
       "supportsCapabilities": [
         {
@@ -11647,11 +11463,7 @@
       "lastUpdated": "2024-09-03",
       "createdAt": "2025-09-09T12:16:53.289Z",
       "updatedAt": "2025-09-09T12:16:53.289Z",
-      "tags": [
-        "energy-forecasting",
-        "weather-data",
-        "performance"
-      ],
+      "tags": ["energy-forecasting", "weather-data", "performance"],
       "owners": [],
       "supportsCapabilities": [
         {
@@ -11722,11 +11534,7 @@
       "lastUpdated": "2024-08-28",
       "createdAt": "2025-09-09T12:16:53.289Z",
       "updatedAt": "2025-09-09T12:16:53.289Z",
-      "tags": [
-        "recommendations",
-        "customer-experience",
-        "sales"
-      ],
+      "tags": ["recommendations", "customer-experience", "sales"],
       "owners": [],
       "supportsCapabilities": [
         {
@@ -11812,11 +11620,7 @@
       "lastUpdated": "2024-09-07",
       "createdAt": "2025-09-09T12:16:53.289Z",
       "updatedAt": "2025-09-09T12:16:53.289Z",
-      "tags": [
-        "pricing",
-        "optimization",
-        "market-intelligence"
-      ],
+      "tags": ["pricing", "optimization", "market-intelligence"],
       "owners": [],
       "supportsCapabilities": [
         {
@@ -11887,9 +11691,7 @@
       "lastUpdated": "2024-08-22",
       "createdAt": "2025-09-09T12:16:53.289Z",
       "updatedAt": "2025-12-16T15:54:02.776Z",
-      "tags": [
-        "sustainability, carbon-footprint, environmental"
-      ],
+      "tags": ["sustainability, carbon-footprint, environmental"],
       "owners": [],
       "supportsCapabilities": [
         {

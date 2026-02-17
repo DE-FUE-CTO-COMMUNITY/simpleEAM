@@ -47,8 +47,8 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
             <Alert severity="info" icon={<InfoIcon />} sx={{ mb: 2 }}>
               <Typography variant="body2">
                 {selectedCompanyName
-                  ? `Export wird auf die ausgewählte Company gefiltert: ${selectedCompanyName}`
-                  : 'Export wird auf die ausgewählte Company gefiltert.'}
+                  ? t('companyFilterInfo', { companyName: selectedCompanyName })
+                  : t('companyFilterDefault')}
               </Typography>
             </Alert>
 
@@ -499,7 +499,7 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
                                     color="textSecondary"
                                     sx={{ ml: 1 }}
                                   >
-                                    (ohne diagramJson)
+                                    ({t('withoutDiagramJsonSuffix')})
                                   </Typography>
                                 )}
                                 {entityType === 'businessProcesses' &&
@@ -510,7 +510,7 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
                                       color="textSecondary"
                                       sx={{ ml: 1 }}
                                     >
-                                      (ohne bpmnXml)
+                                      ({t('withoutBpmnXmlSuffix')})
                                     </Typography>
                                   )}
                               </Typography>

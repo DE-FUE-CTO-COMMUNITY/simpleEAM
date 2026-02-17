@@ -112,6 +112,7 @@ export const defaultImportSettings: ImportSettings = {
   entityType: 'businessCapabilities',
   format: 'xlsx',
   updateMode: 'overwrite',
+  companyImportMode: 'selectedCompany',
   createTemplate: false,
 }
 

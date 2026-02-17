@@ -516,18 +516,63 @@ export const exportEntityData = async (
   selectedCompanyId?: string
 ): Promise<void> => {
   try {
+    const { GET_COMPANIES, GET_COMPANY } = await import('../../graphql/company')
+
+    const companyResult = await apolloClient.query({
+      query: GET_COMPANIES,
+      fetchPolicy: 'cache-first',
+    })
+
+    const availableCompanies = (companyResult.data?.companies || []) as any[]
+    let exportCompanies = selectedCompanyId
+      ? availableCompanies.filter(company => company.id === selectedCompanyId)
+      : availableCompanies
+
+    if (selectedCompanyId && exportCompanies.length === 0) {
+      try {
+        const singleCompanyResult = await apolloClient.query({
+          query: GET_COMPANY,
+          variables: { id: selectedCompanyId },
+          fetchPolicy: 'network-only',
+        })
+        const singleCompany = singleCompanyResult.data?.company
+        if (singleCompany) {
+          exportCompanies = [singleCompany]
+        }
+      } catch {
+        exportCompanies = [{ id: selectedCompanyId, name: selectedCompanyId }]
+      }
+    }
+
+    const primaryExportCompany = exportCompanies[0]
+
+    const addCompanyMetadataToRows = (rows: any[]): any[] => {
+      if (!Array.isArray(rows)) return []
+      if (!primaryExportCompany?.id || !primaryExportCompany?.name) return rows
+
+      return rows.map(row => ({
+        ...row,
+        _exportCompanyId: primaryExportCompany.id,
+        _exportCompanyName: primaryExportCompany.name,
+        _exportCompanyDescription: primaryExportCompany.description || '',
+        _exportCompanyAddress: primaryExportCompany.address || '',
+        _exportCompanyIndustry: primaryExportCompany.industry || '',
+        _exportCompanyWebsite: primaryExportCompany.website || '',
+        _exportCompanyPrimaryColor: primaryExportCompany.primaryColor || '',
+        _exportCompanySecondaryColor: primaryExportCompany.secondaryColor || '',
+        _exportCompanyFont: primaryExportCompany.font || '',
+        _exportCompanyDiagramFont: primaryExportCompany.diagramFont || '',
+        _exportCompanyLogo: primaryExportCompany.logo || '',
+        _exportCompanyFeatures: primaryExportCompany.features || '',
+        _exportCompanySize: primaryExportCompany.size || '',
+      }))
+    }
+
     // Company-Name für Dateiname auflösen (optional)
     let companySuffix = ''
     if (selectedCompanyId) {
       try {
-        const { GET_COMPANIES } = await import('../../graphql/company')
-        const res = await apolloClient.query({
-          query: GET_COMPANIES,
-          variables: { where: { id: { eq: selectedCompanyId } } },
-          fetchPolicy: 'cache-first',
-        })
-        // Da wir nach ID filtern, sollte genau ein Unternehmen zurückkommen
-        const company = res.data?.companies?.find((c: any) => c.id === selectedCompanyId)
+        const company = availableCompanies.find((c: any) => c.id === selectedCompanyId)
         const name = company?.name as string | undefined
         if (name) {
           const safe = name.replace(/[^a-z0-9-_]+/gi, '_')
@@ -543,9 +588,13 @@ export const exportEntityData = async (
         const { fetchAllDataForJson } = await import('../../utils/jsonDataService')
         const { exportToJson } = await import('../../utils/jsonUtils')
         const allData = await fetchAllDataForJson(apolloClient, selectedCompanyId, includeGea)
+        const exportPayload = {
+          Companies: exportCompanies,
+          ...allData,
+        }
 
         const timestamp = formatTimestampForFilename()
-        exportToJson(allData, {
+        exportToJson(exportPayload, {
           filename: `SimpleEAM_Complete_Export${companySuffix}_${timestamp}`,
           pretty: true,
         })
@@ -560,9 +609,13 @@ export const exportEntityData = async (
           includeGea,
           selectedCompanyId
         )
+        const excelPayload = {
+          Companies: exportCompanies,
+          ...(allData as { [tabName: string]: any[] }),
+        }
 
         if (format === 'xlsx') {
-          await exportMultiTabToExcel(allData as { [tabName: string]: any[] }, {
+          await exportMultiTabToExcel(excelPayload, {
             filename: `SimpleEAM_Complete_Export${companySuffix}`,
             format: 'xlsx',
             includeHeaders: true,
@@ -601,16 +654,22 @@ export const exportEntityData = async (
           includeGea,
           selectedCompanyId
         )
+        const dataWithMetadata = addCompanyMetadataToRows(data as any[])
+        const tabName = entityTypeLabels[entityType] || entityType
+        const exportPayload = {
+          [tabName]: dataWithMetadata,
+          Companies: exportCompanies,
+        }
 
         const timestamp = formatTimestampForFilename()
-        exportToJson(data, {
+        exportToJson(exportPayload, {
           filename: `${filename}_${timestamp}`,
           pretty: true,
         })
       } else {
         // Excel/CSV Export
         const { fetchDataByEntityTypeAndFormat } = await import('../../utils/excelDataService')
-        const { exportToExcel } = await import('../../utils/excelUtils')
+        const { exportToExcel, exportMultiTabToExcel } = await import('../../utils/excelUtils')
         const data = (await fetchDataByEntityTypeAndFormat(
           apolloClient,
           entityType as any,
@@ -618,17 +677,24 @@ export const exportEntityData = async (
           includeGea,
           selectedCompanyId
         )) as any[]
+        const dataWithMetadata = addCompanyMetadataToRows(data)
 
         if (format === 'xlsx') {
-          await exportToExcel(data, {
-            filename,
-            sheetName: entityTypeLabels[entityType] || entityType,
-            format: 'xlsx',
-            includeHeaders: true,
-          })
+          const sheetName = entityTypeLabels[entityType] || entityType
+          await exportMultiTabToExcel(
+            {
+              [sheetName]: dataWithMetadata,
+              Companies: exportCompanies,
+            },
+            {
+              filename,
+              format: 'xlsx',
+              includeHeaders: true,
+            }
+          )
         } else if (format === 'csv') {
           // CSV-Export für Diagramme ist jetzt möglich (ohne diagramJson)
-          await exportToExcel(data, {
+          await exportToExcel(dataWithMetadata, {
             filename,
             sheetName: entityTypeLabels[entityType] || entityType,
             format: 'csv',

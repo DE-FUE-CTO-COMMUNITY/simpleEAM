@@ -20,7 +20,24 @@ export interface ImportSettings {
     | 'all'
   format: 'xlsx' | 'json'
   updateMode: 'overwrite' | 'merge' | 'skipExisting'
+  companyImportMode: 'selectedCompany' | 'exportedCompany'
   createTemplate: boolean
+}
+
+export interface ExportedCompanyInfo {
+  id?: string
+  name: string
+  description?: string
+  address?: string
+  industry?: string
+  website?: string
+  primaryColor?: string
+  secondaryColor?: string
+  font?: string
+  diagramFont?: string
+  logo?: string
+  features?: string
+  size?: string
 }
 
 export interface ExportSettings {
