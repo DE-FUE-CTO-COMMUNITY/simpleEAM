@@ -24,7 +24,10 @@ import {
 import BusinessProcessToolbar from '@/components/business-processes/BusinessProcessToolbar'
 import BusinessProcessFilterDialog from '@/components/business-processes/BusinessProcessFilterDialog'
 import { useBusinessProcessFilter } from '@/components/business-processes/useBusinessProcessFilter'
-import { BusinessProcessFormValues, BusinessProcessType } from '@/components/business-processes/types'
+import {
+  BusinessProcessFormValues,
+  BusinessProcessType,
+} from '@/components/business-processes/types'
 
 const BusinessProcessesPage = () => {
   const t = useTranslations('businessProcesses')
@@ -59,7 +62,9 @@ const BusinessProcessesPage = () => {
     if (businessProcesses.length === 0) return
 
     setAvailableStatuses(
-      Array.from(new Set(businessProcesses.map(process => process.status).filter(Boolean))).sort() as ProcessStatus[]
+      Array.from(
+        new Set(businessProcesses.map(process => process.status).filter(Boolean))
+      ).sort() as ProcessStatus[]
     )
 
     setAvailableProcessTypes(
@@ -69,7 +74,9 @@ const BusinessProcessesPage = () => {
     )
 
     setAvailableCategories(
-      Array.from(new Set(businessProcesses.map(process => process.category).filter(Boolean) as string[])).sort()
+      Array.from(
+        new Set(businessProcesses.map(process => process.category).filter(Boolean) as string[])
+      ).sort()
     )
   }, [businessProcesses])
 
@@ -200,7 +207,10 @@ const BusinessProcessesPage = () => {
     setShowNewBusinessProcessForm(false)
   }
 
-  const handleUpdateBusinessProcessSubmit = async (id: string, values: BusinessProcessFormValues) => {
+  const handleUpdateBusinessProcessSubmit = async (
+    id: string,
+    values: BusinessProcessFormValues
+  ) => {
     const {
       ownerId,
       parentProcessId,

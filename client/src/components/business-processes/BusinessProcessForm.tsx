@@ -98,8 +98,10 @@ const BusinessProcessForm: React.FC<BusinessProcessFormProps> = ({
         businessProcess?.parentProcess && businessProcess.parentProcess.length > 0
           ? businessProcess.parentProcess[0].id
           : '',
-      supportsCapabilityIds: businessProcess?.supportsCapabilities?.map(capability => capability.id) || [],
-      partOfArchitectures: businessProcess?.partOfArchitectures?.map(architecture => architecture.id) || [],
+      supportsCapabilityIds:
+        businessProcess?.supportsCapabilities?.map(capability => capability.id) || [],
+      partOfArchitectures:
+        businessProcess?.partOfArchitectures?.map(architecture => architecture.id) || [],
       depictedInDiagrams: businessProcess?.depictedInDiagrams?.map(diagram => diagram.id) || [],
     }),
     [businessProcess, currentPerson?.id]
@@ -239,7 +241,9 @@ const BusinessProcessForm: React.FC<BusinessProcessFormProps> = ({
       tabId: 'relationships',
       getOptionLabel: (option: any) => {
         if (typeof option === 'string') {
-          const matching = capabilitiesData?.businessCapabilities?.find((cap: any) => cap.id === option)
+          const matching = capabilitiesData?.businessCapabilities?.find(
+            (cap: any) => cap.id === option
+          )
           return matching?.name || option
         }
         return option?.label || ''

@@ -157,7 +157,9 @@ const BusinessProcessTable: React.FC<BusinessProcessTableProps> = ({
     [columnHelper, t, tStatuses, tTypes, locale]
   )
 
-  const mapDataToFormValues = (businessProcess: BusinessProcessType): BusinessProcessFormValues => ({
+  const mapDataToFormValues = (
+    businessProcess: BusinessProcessType
+  ): BusinessProcessFormValues => ({
     name: businessProcess.name,
     description: businessProcess.description || '',
     processType: businessProcess.processType,
@@ -167,7 +169,8 @@ const BusinessProcessTable: React.FC<BusinessProcessTableProps> = ({
     tags: businessProcess.tags || [],
     ownerId: businessProcess.owners?.[0]?.id || '',
     parentProcessId: businessProcess.parentProcess?.[0]?.id || '',
-    supportsCapabilityIds: businessProcess.supportsCapabilities?.map(capability => capability.id) || [],
+    supportsCapabilityIds:
+      businessProcess.supportsCapabilities?.map(capability => capability.id) || [],
     partOfArchitectures:
       businessProcess.partOfArchitectures?.map(architecture => architecture.id) || [],
     depictedInDiagrams: businessProcess.depictedInDiagrams?.map(diagram => diagram.id) || [],

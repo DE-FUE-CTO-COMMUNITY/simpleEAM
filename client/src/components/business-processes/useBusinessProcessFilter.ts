@@ -8,9 +8,7 @@ interface UseBusinessProcessFilterProps {
   businessProcesses: BusinessProcessType[]
 }
 
-export const useBusinessProcessFilter = ({
-  businessProcesses,
-}: UseBusinessProcessFilterProps) => {
+export const useBusinessProcessFilter = ({ businessProcesses }: UseBusinessProcessFilterProps) => {
   const [filterState, setFilterState] = useState<FilterState>({
     statusFilter: [] as ProcessStatus[],
     processTypeFilter: [] as ProcessType[],

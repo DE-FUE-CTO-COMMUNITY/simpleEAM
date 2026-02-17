@@ -61,8 +61,7 @@ type BusinessCapability
   children: [BusinessCapability!]! @relationship(type: "HAS_PARENT", direction: IN)
   supportedByApplications: [Application!]! @relationship(type: "SUPPORTS", direction: IN)
   supportedByAIComponents: [AIComponent!]! @relationship(type: "SUPPORTS", direction: IN)
-  supportedByBusinessProcesses: [BusinessProcess!]!
-    @relationship(type: "SUPPORTS", direction: IN)
+  supportedByBusinessProcesses: [BusinessProcess!]! @relationship(type: "SUPPORTS", direction: IN)
   relatedDataObjects: [DataObject!]! @relationship(type: "RELATED_TO", direction: OUT)
   partOfArchitectures: [Architecture!]! @relationship(type: "CONTAINS", direction: IN)
   depictedInDiagrams: [Diagram!]! @relationship(type: "DEPICTED_IN", direction: OUT)
