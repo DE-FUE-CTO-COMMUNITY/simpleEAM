@@ -3,17 +3,15 @@
 import React from 'react'
 import {
   Alert,
+  Autocomplete,
   Box,
   Button,
   Card,
   CardContent,
   CircularProgress,
-  FormControl,
-  InputLabel,
-  MenuItem,
   Paper,
-  Select,
   Stack,
+  TextField,
   Typography,
 } from '@mui/material'
 import {
@@ -100,7 +98,9 @@ const ProcessEditorPage = () => {
 
   const selectionStorageKey = React.useMemo(
     () =>
-      selectedCompanyId ? `${PROCESS_EDITOR_SELECTION_KEY}:${selectedCompanyId}` : PROCESS_EDITOR_SELECTION_KEY,
+      selectedCompanyId
+        ? `${PROCESS_EDITOR_SELECTION_KEY}:${selectedCompanyId}`
+        : PROCESS_EDITOR_SELECTION_KEY,
     [selectedCompanyId]
   )
 
@@ -186,7 +186,14 @@ const ProcessEditorPage = () => {
     }
 
     setSelectedProcessId(processes[0].id)
-  }, [companyLoading, selectedCompanyId, loading, processes, selectedProcessId, selectionStorageKey])
+  }, [
+    companyLoading,
+    selectedCompanyId,
+    loading,
+    processes,
+    selectedProcessId,
+    selectionStorageKey,
+  ])
 
   React.useEffect(() => {
     if (companyLoading || !selectedCompanyId) return
@@ -313,25 +320,25 @@ const ProcessEditorPage = () => {
       <Card sx={{ mb: 3 }}>
         <CardContent>
           <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems={{ md: 'center' }}>
-            <FormControl
-              sx={{ minWidth: 300 }}
+            <Autocomplete
+              sx={{ minWidth: 320 }}
               size="small"
+              options={processes}
+              loading={loading}
+              value={selectedProcess || null}
+              disableClearable={processes.length > 0}
+              getOptionLabel={option => option?.name ?? ''}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              onChange={(_, value) => {
+                const nextProcessId = value?.id ?? ''
+                if (nextProcessId === selectedProcessId) {
+                  return
+                }
+                void handleProcessChange(nextProcessId)
+              }}
               disabled={loading || processes.length === 0}
-            >
-              <InputLabel id="process-select-label">{t('process')}</InputLabel>
-              <Select
-                labelId="process-select-label"
-                value={selectedProcessId}
-                label={t('process')}
-                onChange={event => void handleProcessChange(event.target.value)}
-              >
-                {processes.map((process: any) => (
-                  <MenuItem key={process.id} value={process.id}>
-                    {process.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+              renderInput={params => <TextField {...params} label={t('process')} />}
+            />
 
             <Button
               variant="contained"
