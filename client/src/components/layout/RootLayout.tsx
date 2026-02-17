@@ -28,6 +28,7 @@ import {
 } from '@mui/icons-material'
 import {
   BusinessCapabilityIcon,
+  BusinessProcessIcon,
   ApplicationComponentIcon,
   ApplicationInterfaceIcon,
   BusinessObjectIcon,
@@ -209,7 +210,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
     {
       key: 'businessProcesses',
       text: t('businessProcesses'),
-      icon: <ProcessIcon />,
+      icon: <BusinessProcessIcon />,
       href: '/business-processes',
     },
   ]
