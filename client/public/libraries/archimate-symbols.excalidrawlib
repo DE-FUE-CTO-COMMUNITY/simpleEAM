@@ -1022,6 +1022,179 @@
       "status": "published",
       "elements": [
         {
+          "id": "BusinessProcessMainRect",
+          "type": "rectangle",
+          "x": 0,
+          "y": 0,
+          "width": 209.234375,
+          "height": 74.62109375000003,
+          "angle": 0,
+          "strokeColor": "#2f9e44",
+          "backgroundColor": "#FFFFAF",
+          "fillStyle": "solid",
+          "strokeWidth": 2,
+          "strokeStyle": "solid",
+          "roughness": 1,
+          "opacity": 100,
+          "groupIds": [
+            "BusinessProcessGroup"
+          ],
+          "frameId": null,
+          "index": "ahG",
+          "roundness": {
+            "type": 3
+          },
+          "seed": 1902475981,
+          "version": 1,
+          "versionNonce": 1095770781,
+          "isDeleted": false,
+          "boundElements": [
+            {
+              "id": "BusinessProcessText",
+              "type": "text"
+            }
+          ],
+          "updated": 1738336012611,
+          "link": null,
+          "locked": false,
+          "customData": {
+            "elementType": "businessProcess"
+          }
+        },
+        {
+          "id": "BusinessProcessText",
+          "type": "text",
+          "x": 58.36723754882814,
+          "y": 12.310546875,
+          "width": 91.49990844726562,
+          "height": 50,
+          "angle": 0,
+          "strokeColor": "#1e1e1e",
+          "backgroundColor": "transparent",
+          "fillStyle": "solid",
+          "strokeWidth": 2,
+          "strokeStyle": "solid",
+          "roughness": 1,
+          "opacity": 100,
+          "groupIds": [
+            "BusinessProcessGroup"
+          ],
+          "frameId": null,
+          "index": "ahV",
+          "roundness": null,
+          "seed": 1643969707,
+          "version": 1,
+          "versionNonce": 2290617707,
+          "isDeleted": false,
+          "boundElements": [],
+          "updated": 1738336012611,
+          "link": null,
+          "locked": false,
+          "text": "Business\nProcess",
+          "fontSize": 20,
+          "fontFamily": 1,
+          "textAlign": "center",
+          "verticalAlign": "middle",
+          "containerId": "BusinessProcessMainRect",
+          "originalText": "Business\nProcess",
+          "autoResize": true,
+          "lineHeight": 1.25
+        },
+        {
+          "id": "business_process_icon_line",
+          "type": "line",
+          "x": 177.75,
+          "y": 7,
+          "width": 22.5,
+          "height": 18,
+          "angle": 0,
+          "strokeColor": "#1e1e1e",
+          "backgroundColor": "transparent",
+          "fillStyle": "solid",
+          "strokeWidth": 2,
+          "strokeStyle": "solid",
+          "roughness": 0,
+          "opacity": 100,
+          "groupIds": [
+            "BusinessProcessGroup"
+          ],
+          "frameId": null,
+          "index": "ai1",
+          "roundness": null,
+          "seed": 1234567920,
+          "version": 1,
+          "versionNonce": 1234567920,
+          "isDeleted": false,
+          "boundElements": [],
+          "updated": 1738336012611,
+          "link": null,
+          "locked": false,
+          "points": [
+            [0, 6],
+            [10.5, 6],
+            [10.5, 0],
+            [22.5, 9],
+            [10.5, 18],
+            [10.5, 12],
+            [0, 12],
+            [0, 6]
+          ],
+          "lastCommittedPoint": null,
+          "startBinding": null,
+          "endBinding": null,
+          "startArrowhead": null,
+          "endArrowhead": null
+        },
+        {
+          "id": "business_process_icon_arrow",
+          "type": "line",
+          "x": 192,
+          "y": 4,
+          "width": 8,
+          "height": 12,
+          "angle": 0,
+          "strokeColor": "#1e1e1e",
+          "backgroundColor": "transparent",
+          "fillStyle": "solid",
+          "strokeWidth": 2,
+          "strokeStyle": "solid",
+          "roughness": 0,
+          "opacity": 100,
+          "groupIds": [
+            "BusinessProcessGroup"
+          ],
+          "frameId": null,
+          "index": "ai2",
+          "roundness": null,
+          "seed": 1234567921,
+          "version": 1,
+          "versionNonce": 1234567921,
+          "isDeleted": true,
+          "boundElements": [],
+          "updated": 1738336012611,
+          "link": null,
+          "locked": false,
+          "points": [
+            [0, 0],
+            [8, 6],
+            [0, 12]
+          ],
+          "lastCommittedPoint": null,
+          "startBinding": null,
+          "endBinding": null,
+          "startArrowhead": null,
+          "endArrowhead": null
+        }
+      ],
+      "id": "business-process-symbol",
+      "created": 1738336796308,
+      "name": "Business Process"
+    },
+
+    {
+      "status": "published",
+      "elements": [
+        {
           "id": "InfraNodeMainRect",
           "type": "rectangle",
           "x": 0,

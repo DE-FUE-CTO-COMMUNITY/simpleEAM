@@ -2672,6 +2672,10 @@
         "singular": "Business Capability",
         "plural": "Business Capabilities"
       },
+      "businessProcess": {
+        "singular": "Business Process",
+        "plural": "Business Processes"
+      },
       "application": {
         "singular": "Application",
         "plural": "Applications"

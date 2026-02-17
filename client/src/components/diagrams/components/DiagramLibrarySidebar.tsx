@@ -87,6 +87,7 @@ const DATA_ACCESSORS: Partial<
   Record<ElementType, (data: LibraryElementsResponse) => Array<{ id: string; name: string }>>
 > = {
   businessCapability: data => data.businessCapabilities ?? [],
+  businessProcess: data => data.businessProcesses ?? [],
   application: data => data.applications ?? [],
   dataObject: data => data.dataObjects ?? [],
   applicationInterface: data => data.applicationInterfaces ?? [],
@@ -115,6 +116,7 @@ const DiagramLibrarySidebar = forwardRef<DiagramLibrarySidebarHandle, DiagramLib
     const variables = useMemo(
       () => ({
         capWhere: companyWhere,
+        processWhere: companyWhere,
         appWhere: companyWhere,
         dataWhere: companyWhere,
         ifaceWhere: companyWhere,
@@ -626,7 +628,7 @@ const DiagramLibrarySidebar = forwardRef<DiagramLibrarySidebarHandle, DiagramLib
       const lensToElementTypes: Record<LensKey, ElementType[]> = {
         enterpriseArchitecture: SECTION_ORDER,
         businessArchitecture: ['businessCapability'],
-        processArchitecture: ['businessCapability'],
+        processArchitecture: ['businessCapability', 'businessProcess'],
         dataArchitecture: ['dataObject'],
         aiArchitecture: ['aiComponent'],
         solutionArchitecture: ['application', 'dataObject', 'applicationInterface'],

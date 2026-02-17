@@ -4,6 +4,7 @@ import { gql } from '@apollo/client'
 export const GET_LIBRARY_ELEMENTS = gql`
   query GetLibraryElements(
     $capWhere: BusinessCapabilityWhere
+    $processWhere: BusinessProcessWhere
     $appWhere: ApplicationWhere
     $dataWhere: DataObjectWhere
     $ifaceWhere: ApplicationInterfaceWhere
@@ -21,6 +22,16 @@ export const GET_LIBRARY_ELEMENTS = gql`
         id
         name
       }
+    }
+    businessProcesses(where: $processWhere) {
+      id
+      name
+      description
+      processType
+      status
+      maturityLevel
+      category
+      tags
     }
     applications(where: $appWhere) {
       id
@@ -99,6 +110,17 @@ export interface LibraryApplication {
   version?: string
 }
 
+export interface LibraryBusinessProcess {
+  id: string
+  name: string
+  description?: string
+  processType?: string
+  status?: string
+  maturityLevel?: number
+  category?: string
+  tags?: string[]
+}
+
 export interface LibraryDataObject {
   id: string
   name: string
@@ -146,6 +168,7 @@ export interface LibraryAiComponent {
 
 export interface LibraryElementsResponse {
   businessCapabilities: LibraryCapability[]
+  businessProcesses: LibraryBusinessProcess[]
   applications: LibraryApplication[]
   dataObjects: LibraryDataObject[]
   applicationInterfaces: LibraryInterface[]
@@ -155,6 +178,7 @@ export interface LibraryElementsResponse {
 
 export type LibraryElement =
   | LibraryCapability
+  | LibraryBusinessProcess
   | LibraryApplication
   | LibraryDataObject
   | LibraryInterface
@@ -165,6 +189,11 @@ export const ELEMENT_TYPE_CONFIG = {
   businessCapability: {
     label: 'Business Capabilities',
     color: '#f0e68c',
+    iconType: 'rounded-rectangle',
+  },
+  businessProcess: {
+    label: 'Business Processes',
+    color: '#FFFFAF',
     iconType: 'rounded-rectangle',
   },
   application: {

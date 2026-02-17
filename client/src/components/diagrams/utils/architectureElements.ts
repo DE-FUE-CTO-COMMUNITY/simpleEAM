@@ -173,6 +173,7 @@ export interface ExcalidrawLibraryItem {
 
 export const TEMPLATE_NAME_BY_TYPE: Partial<Record<ElementType, string>> = {
   businessCapability: 'Capability',
+  businessProcess: 'Business Process',
   application: 'Application Component',
   dataObject: 'Data Object',
   applicationInterface: 'Application Interface',

@@ -2614,6 +2614,10 @@
         "singular": "Business Capability",
         "plural": "Business Capabilities"
       },
+      "businessProcess": {
+        "singular": "Geschäftsprozess",
+        "plural": "Geschäftsprozesse"
+      },
       "application": {
         "singular": "Applikation",
         "plural": "Applikationen"
