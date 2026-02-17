@@ -7208,6 +7208,8 @@ export type Architecture = {
   containsAIComponentsConnection: ArchitectureContainsAiComponentsConnection;
   containsApplications: Array<Application>;
   containsApplicationsConnection: ArchitectureContainsApplicationsConnection;
+  containsBusinessProcesses: Array<BusinessProcess>;
+  containsBusinessProcessesConnection: ArchitectureContainsBusinessProcessesConnection;
   containsCapabilities: Array<BusinessCapability>;
   containsCapabilitiesConnection: ArchitectureContainsCapabilitiesConnection;
   containsDataObjects: Array<DataObject>;
@@ -7331,6 +7333,24 @@ export type ArchitectureContainsApplicationsConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<ArchitectureContainsApplicationsConnectionSort>>;
   where?: InputMaybe<ArchitectureContainsApplicationsConnectionWhere>;
+};
+
+
+/** Architecture – represents an architecture within Enterprise Architecture Management */
+export type ArchitectureContainsBusinessProcessesArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<BusinessProcessSort>>;
+  where?: InputMaybe<BusinessProcessWhere>;
+};
+
+
+/** Architecture – represents an architecture within Enterprise Architecture Management */
+export type ArchitectureContainsBusinessProcessesConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<ArchitectureContainsBusinessProcessesConnectionSort>>;
+  where?: InputMaybe<ArchitectureContainsBusinessProcessesConnectionWhere>;
 };
 
 
@@ -7788,6 +7808,23 @@ export type ArchitectureBusinessCapabilityContainsCapabilitiesNodeAggregateSelec
   updatedAt: DateTimeAggregateSelection;
 };
 
+export type ArchitectureBusinessProcessContainsBusinessProcessesAggregateSelection = {
+  __typename?: 'ArchitectureBusinessProcessContainsBusinessProcessesAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<ArchitectureBusinessProcessContainsBusinessProcessesNodeAggregateSelection>;
+};
+
+export type ArchitectureBusinessProcessContainsBusinessProcessesNodeAggregateSelection = {
+  __typename?: 'ArchitectureBusinessProcessContainsBusinessProcessesNodeAggregateSelection';
+  bpmnXml: StringAggregateSelection;
+  category: StringAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  maturityLevel: IntAggregateSelection;
+  name: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
 export type ArchitectureChildArchitecturesAggregateInput = {
   AND?: InputMaybe<Array<ArchitectureChildArchitecturesAggregateInput>>;
   NOT?: InputMaybe<ArchitectureChildArchitecturesAggregateInput>;
@@ -8039,6 +8076,7 @@ export type ArchitectureConnectInput = {
   company?: InputMaybe<Array<ArchitectureCompanyConnectFieldInput>>;
   containsAIComponents?: InputMaybe<Array<ArchitectureContainsAiComponentsConnectFieldInput>>;
   containsApplications?: InputMaybe<Array<ArchitectureContainsApplicationsConnectFieldInput>>;
+  containsBusinessProcesses?: InputMaybe<Array<ArchitectureContainsBusinessProcessesConnectFieldInput>>;
   containsCapabilities?: InputMaybe<Array<ArchitectureContainsCapabilitiesConnectFieldInput>>;
   containsDataObjects?: InputMaybe<Array<ArchitectureContainsDataObjectsConnectFieldInput>>;
   containsGEAGoals?: InputMaybe<Array<ArchitectureContainsGeaGoalsConnectFieldInput>>;
@@ -8277,6 +8315,115 @@ export type ArchitectureContainsApplicationsUpdateFieldInput = {
   delete?: InputMaybe<Array<ArchitectureContainsApplicationsDeleteFieldInput>>;
   disconnect?: InputMaybe<Array<ArchitectureContainsApplicationsDisconnectFieldInput>>;
   update?: InputMaybe<ArchitectureContainsApplicationsUpdateConnectionInput>;
+};
+
+export type ArchitectureContainsBusinessProcessesAggregateInput = {
+  AND?: InputMaybe<Array<ArchitectureContainsBusinessProcessesAggregateInput>>;
+  NOT?: InputMaybe<ArchitectureContainsBusinessProcessesAggregateInput>;
+  OR?: InputMaybe<Array<ArchitectureContainsBusinessProcessesAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<ArchitectureContainsBusinessProcessesNodeAggregationWhereInput>;
+};
+
+export type ArchitectureContainsBusinessProcessesConnectFieldInput = {
+  connect?: InputMaybe<Array<BusinessProcessConnectInput>>;
+  where?: InputMaybe<BusinessProcessConnectWhere>;
+};
+
+export type ArchitectureContainsBusinessProcessesConnection = {
+  __typename?: 'ArchitectureContainsBusinessProcessesConnection';
+  aggregate: ArchitectureBusinessProcessContainsBusinessProcessesAggregateSelection;
+  edges: Array<ArchitectureContainsBusinessProcessesRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type ArchitectureContainsBusinessProcessesConnectionAggregateInput = {
+  AND?: InputMaybe<Array<ArchitectureContainsBusinessProcessesConnectionAggregateInput>>;
+  NOT?: InputMaybe<ArchitectureContainsBusinessProcessesConnectionAggregateInput>;
+  OR?: InputMaybe<Array<ArchitectureContainsBusinessProcessesConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<ArchitectureContainsBusinessProcessesNodeAggregationWhereInput>;
+};
+
+export type ArchitectureContainsBusinessProcessesConnectionFilters = {
+  /** Filter Architectures by aggregating results on related ArchitectureContainsBusinessProcessesConnections */
+  aggregate?: InputMaybe<ArchitectureContainsBusinessProcessesConnectionAggregateInput>;
+  /** Return Architectures where all of the related ArchitectureContainsBusinessProcessesConnections match this filter */
+  all?: InputMaybe<ArchitectureContainsBusinessProcessesConnectionWhere>;
+  /** Return Architectures where none of the related ArchitectureContainsBusinessProcessesConnections match this filter */
+  none?: InputMaybe<ArchitectureContainsBusinessProcessesConnectionWhere>;
+  /** Return Architectures where one of the related ArchitectureContainsBusinessProcessesConnections match this filter */
+  single?: InputMaybe<ArchitectureContainsBusinessProcessesConnectionWhere>;
+  /** Return Architectures where some of the related ArchitectureContainsBusinessProcessesConnections match this filter */
+  some?: InputMaybe<ArchitectureContainsBusinessProcessesConnectionWhere>;
+};
+
+export type ArchitectureContainsBusinessProcessesConnectionSort = {
+  node?: InputMaybe<BusinessProcessSort>;
+};
+
+export type ArchitectureContainsBusinessProcessesConnectionWhere = {
+  AND?: InputMaybe<Array<ArchitectureContainsBusinessProcessesConnectionWhere>>;
+  NOT?: InputMaybe<ArchitectureContainsBusinessProcessesConnectionWhere>;
+  OR?: InputMaybe<Array<ArchitectureContainsBusinessProcessesConnectionWhere>>;
+  node?: InputMaybe<BusinessProcessWhere>;
+};
+
+export type ArchitectureContainsBusinessProcessesCreateFieldInput = {
+  node: BusinessProcessCreateInput;
+};
+
+export type ArchitectureContainsBusinessProcessesDeleteFieldInput = {
+  delete?: InputMaybe<BusinessProcessDeleteInput>;
+  where?: InputMaybe<ArchitectureContainsBusinessProcessesConnectionWhere>;
+};
+
+export type ArchitectureContainsBusinessProcessesDisconnectFieldInput = {
+  disconnect?: InputMaybe<BusinessProcessDisconnectInput>;
+  where?: InputMaybe<ArchitectureContainsBusinessProcessesConnectionWhere>;
+};
+
+export type ArchitectureContainsBusinessProcessesFieldInput = {
+  connect?: InputMaybe<Array<ArchitectureContainsBusinessProcessesConnectFieldInput>>;
+  create?: InputMaybe<Array<ArchitectureContainsBusinessProcessesCreateFieldInput>>;
+};
+
+export type ArchitectureContainsBusinessProcessesNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<ArchitectureContainsBusinessProcessesNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<ArchitectureContainsBusinessProcessesNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<ArchitectureContainsBusinessProcessesNodeAggregationWhereInput>>;
+  bpmnXml?: InputMaybe<StringScalarAggregationFilters>;
+  category?: InputMaybe<StringScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  maturityLevel?: InputMaybe<IntScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type ArchitectureContainsBusinessProcessesRelationship = {
+  __typename?: 'ArchitectureContainsBusinessProcessesRelationship';
+  cursor: Scalars['String']['output'];
+  node: BusinessProcess;
+};
+
+export type ArchitectureContainsBusinessProcessesUpdateConnectionInput = {
+  node?: InputMaybe<BusinessProcessUpdateInput>;
+  where?: InputMaybe<ArchitectureContainsBusinessProcessesConnectionWhere>;
+};
+
+export type ArchitectureContainsBusinessProcessesUpdateFieldInput = {
+  connect?: InputMaybe<Array<ArchitectureContainsBusinessProcessesConnectFieldInput>>;
+  create?: InputMaybe<Array<ArchitectureContainsBusinessProcessesCreateFieldInput>>;
+  delete?: InputMaybe<Array<ArchitectureContainsBusinessProcessesDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<ArchitectureContainsBusinessProcessesDisconnectFieldInput>>;
+  update?: InputMaybe<ArchitectureContainsBusinessProcessesUpdateConnectionInput>;
 };
 
 export type ArchitectureContainsCapabilitiesAggregateInput = {
@@ -9254,6 +9401,7 @@ export type ArchitectureCreateInput = {
   company?: InputMaybe<ArchitectureCompanyFieldInput>;
   containsAIComponents?: InputMaybe<ArchitectureContainsAiComponentsFieldInput>;
   containsApplications?: InputMaybe<ArchitectureContainsApplicationsFieldInput>;
+  containsBusinessProcesses?: InputMaybe<ArchitectureContainsBusinessProcessesFieldInput>;
   containsCapabilities?: InputMaybe<ArchitectureContainsCapabilitiesFieldInput>;
   containsDataObjects?: InputMaybe<ArchitectureContainsDataObjectsFieldInput>;
   containsGEAGoals?: InputMaybe<ArchitectureContainsGeaGoalsFieldInput>;
@@ -9296,6 +9444,7 @@ export type ArchitectureDeleteInput = {
   company?: InputMaybe<Array<ArchitectureCompanyDeleteFieldInput>>;
   containsAIComponents?: InputMaybe<Array<ArchitectureContainsAiComponentsDeleteFieldInput>>;
   containsApplications?: InputMaybe<Array<ArchitectureContainsApplicationsDeleteFieldInput>>;
+  containsBusinessProcesses?: InputMaybe<Array<ArchitectureContainsBusinessProcessesDeleteFieldInput>>;
   containsCapabilities?: InputMaybe<Array<ArchitectureContainsCapabilitiesDeleteFieldInput>>;
   containsDataObjects?: InputMaybe<Array<ArchitectureContainsDataObjectsDeleteFieldInput>>;
   containsGEAGoals?: InputMaybe<Array<ArchitectureContainsGeaGoalsDeleteFieldInput>>;
@@ -9442,6 +9591,7 @@ export type ArchitectureDisconnectInput = {
   company?: InputMaybe<Array<ArchitectureCompanyDisconnectFieldInput>>;
   containsAIComponents?: InputMaybe<Array<ArchitectureContainsAiComponentsDisconnectFieldInput>>;
   containsApplications?: InputMaybe<Array<ArchitectureContainsApplicationsDisconnectFieldInput>>;
+  containsBusinessProcesses?: InputMaybe<Array<ArchitectureContainsBusinessProcessesDisconnectFieldInput>>;
   containsCapabilities?: InputMaybe<Array<ArchitectureContainsCapabilitiesDisconnectFieldInput>>;
   containsDataObjects?: InputMaybe<Array<ArchitectureContainsDataObjectsDisconnectFieldInput>>;
   containsGEAGoals?: InputMaybe<Array<ArchitectureContainsGeaGoalsDisconnectFieldInput>>;
@@ -10773,6 +10923,7 @@ export type ArchitectureUpdateInput = {
   company?: InputMaybe<Array<ArchitectureCompanyUpdateFieldInput>>;
   containsAIComponents?: InputMaybe<Array<ArchitectureContainsAiComponentsUpdateFieldInput>>;
   containsApplications?: InputMaybe<Array<ArchitectureContainsApplicationsUpdateFieldInput>>;
+  containsBusinessProcesses?: InputMaybe<Array<ArchitectureContainsBusinessProcessesUpdateFieldInput>>;
   containsCapabilities?: InputMaybe<Array<ArchitectureContainsCapabilitiesUpdateFieldInput>>;
   containsDataObjects?: InputMaybe<Array<ArchitectureContainsDataObjectsUpdateFieldInput>>;
   containsGEAGoals?: InputMaybe<Array<ArchitectureContainsGeaGoalsUpdateFieldInput>>;
@@ -10808,6 +10959,8 @@ export type ArchitectureWhere = {
   containsAIComponentsConnection?: InputMaybe<ArchitectureContainsAiComponentsConnectionFilters>;
   containsApplications?: InputMaybe<ApplicationRelationshipFilters>;
   containsApplicationsConnection?: InputMaybe<ArchitectureContainsApplicationsConnectionFilters>;
+  containsBusinessProcesses?: InputMaybe<BusinessProcessRelationshipFilters>;
+  containsBusinessProcessesConnection?: InputMaybe<ArchitectureContainsBusinessProcessesConnectionFilters>;
   containsCapabilities?: InputMaybe<BusinessCapabilityRelationshipFilters>;
   containsCapabilitiesConnection?: InputMaybe<ArchitectureContainsCapabilitiesConnectionFilters>;
   containsDataObjects?: InputMaybe<DataObjectRelationshipFilters>;
@@ -10900,6 +11053,8 @@ export type BusinessCapability = {
   supportedByAIComponentsConnection: BusinessCapabilitySupportedByAiComponentsConnection;
   supportedByApplications: Array<Application>;
   supportedByApplicationsConnection: BusinessCapabilitySupportedByApplicationsConnection;
+  supportedByBusinessProcesses: Array<BusinessProcess>;
+  supportedByBusinessProcessesConnection: BusinessCapabilitySupportedByBusinessProcessesConnection;
   tags?: Maybe<Array<Scalars['String']['output']>>;
   type?: Maybe<CapabilityType>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
@@ -11071,6 +11226,24 @@ export type BusinessCapabilitySupportedByApplicationsConnectionArgs = {
 
 
 /** Business Capability – represents a business capability within Enterprise Architecture Management */
+export type BusinessCapabilitySupportedByBusinessProcessesArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<BusinessProcessSort>>;
+  where?: InputMaybe<BusinessProcessWhere>;
+};
+
+
+/** Business Capability – represents a business capability within Enterprise Architecture Management */
+export type BusinessCapabilitySupportedByBusinessProcessesConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<BusinessCapabilitySupportedByBusinessProcessesConnectionSort>>;
+  where?: InputMaybe<BusinessCapabilitySupportedByBusinessProcessesConnectionWhere>;
+};
+
+
+/** Business Capability – represents a business capability within Enterprise Architecture Management */
 export type BusinessCapabilityUsedByOrganisationsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -11188,6 +11361,23 @@ export type BusinessCapabilityBusinessCapabilityParentsNodeAggregateSelection = 
   maturityLevel: IntAggregateSelection;
   name: StringAggregateSelection;
   sequenceNumber: IntAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
+export type BusinessCapabilityBusinessProcessSupportedByBusinessProcessesAggregateSelection = {
+  __typename?: 'BusinessCapabilityBusinessProcessSupportedByBusinessProcessesAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<BusinessCapabilityBusinessProcessSupportedByBusinessProcessesNodeAggregateSelection>;
+};
+
+export type BusinessCapabilityBusinessProcessSupportedByBusinessProcessesNodeAggregateSelection = {
+  __typename?: 'BusinessCapabilityBusinessProcessSupportedByBusinessProcessesNodeAggregateSelection';
+  bpmnXml: StringAggregateSelection;
+  category: StringAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  maturityLevel: IntAggregateSelection;
+  name: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -11448,6 +11638,7 @@ export type BusinessCapabilityConnectInput = {
   relatedDataObjects?: InputMaybe<Array<BusinessCapabilityRelatedDataObjectsConnectFieldInput>>;
   supportedByAIComponents?: InputMaybe<Array<BusinessCapabilitySupportedByAiComponentsConnectFieldInput>>;
   supportedByApplications?: InputMaybe<Array<BusinessCapabilitySupportedByApplicationsConnectFieldInput>>;
+  supportedByBusinessProcesses?: InputMaybe<Array<BusinessCapabilitySupportedByBusinessProcessesConnectFieldInput>>;
   usedByOrganisations?: InputMaybe<Array<BusinessCapabilityUsedByOrganisationsConnectFieldInput>>;
 };
 
@@ -11473,6 +11664,7 @@ export type BusinessCapabilityCreateInput = {
   status: CapabilityStatus;
   supportedByAIComponents?: InputMaybe<BusinessCapabilitySupportedByAiComponentsFieldInput>;
   supportedByApplications?: InputMaybe<BusinessCapabilitySupportedByApplicationsFieldInput>;
+  supportedByBusinessProcesses?: InputMaybe<BusinessCapabilitySupportedByBusinessProcessesFieldInput>;
   tags?: InputMaybe<Array<Scalars['String']['input']>>;
   type?: InputMaybe<CapabilityType>;
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
@@ -11504,6 +11696,7 @@ export type BusinessCapabilityDeleteInput = {
   relatedDataObjects?: InputMaybe<Array<BusinessCapabilityRelatedDataObjectsDeleteFieldInput>>;
   supportedByAIComponents?: InputMaybe<Array<BusinessCapabilitySupportedByAiComponentsDeleteFieldInput>>;
   supportedByApplications?: InputMaybe<Array<BusinessCapabilitySupportedByApplicationsDeleteFieldInput>>;
+  supportedByBusinessProcesses?: InputMaybe<Array<BusinessCapabilitySupportedByBusinessProcessesDeleteFieldInput>>;
   usedByOrganisations?: InputMaybe<Array<BusinessCapabilityUsedByOrganisationsDeleteFieldInput>>;
 };
 
@@ -11643,6 +11836,7 @@ export type BusinessCapabilityDisconnectInput = {
   relatedDataObjects?: InputMaybe<Array<BusinessCapabilityRelatedDataObjectsDisconnectFieldInput>>;
   supportedByAIComponents?: InputMaybe<Array<BusinessCapabilitySupportedByAiComponentsDisconnectFieldInput>>;
   supportedByApplications?: InputMaybe<Array<BusinessCapabilitySupportedByApplicationsDisconnectFieldInput>>;
+  supportedByBusinessProcesses?: InputMaybe<Array<BusinessCapabilitySupportedByBusinessProcessesDisconnectFieldInput>>;
   usedByOrganisations?: InputMaybe<Array<BusinessCapabilityUsedByOrganisationsDisconnectFieldInput>>;
 };
 
@@ -12369,6 +12563,115 @@ export type BusinessCapabilitySupportedByApplicationsUpdateFieldInput = {
   update?: InputMaybe<BusinessCapabilitySupportedByApplicationsUpdateConnectionInput>;
 };
 
+export type BusinessCapabilitySupportedByBusinessProcessesAggregateInput = {
+  AND?: InputMaybe<Array<BusinessCapabilitySupportedByBusinessProcessesAggregateInput>>;
+  NOT?: InputMaybe<BusinessCapabilitySupportedByBusinessProcessesAggregateInput>;
+  OR?: InputMaybe<Array<BusinessCapabilitySupportedByBusinessProcessesAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<BusinessCapabilitySupportedByBusinessProcessesNodeAggregationWhereInput>;
+};
+
+export type BusinessCapabilitySupportedByBusinessProcessesConnectFieldInput = {
+  connect?: InputMaybe<Array<BusinessProcessConnectInput>>;
+  where?: InputMaybe<BusinessProcessConnectWhere>;
+};
+
+export type BusinessCapabilitySupportedByBusinessProcessesConnection = {
+  __typename?: 'BusinessCapabilitySupportedByBusinessProcessesConnection';
+  aggregate: BusinessCapabilityBusinessProcessSupportedByBusinessProcessesAggregateSelection;
+  edges: Array<BusinessCapabilitySupportedByBusinessProcessesRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type BusinessCapabilitySupportedByBusinessProcessesConnectionAggregateInput = {
+  AND?: InputMaybe<Array<BusinessCapabilitySupportedByBusinessProcessesConnectionAggregateInput>>;
+  NOT?: InputMaybe<BusinessCapabilitySupportedByBusinessProcessesConnectionAggregateInput>;
+  OR?: InputMaybe<Array<BusinessCapabilitySupportedByBusinessProcessesConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<BusinessCapabilitySupportedByBusinessProcessesNodeAggregationWhereInput>;
+};
+
+export type BusinessCapabilitySupportedByBusinessProcessesConnectionFilters = {
+  /** Filter BusinessCapabilities by aggregating results on related BusinessCapabilitySupportedByBusinessProcessesConnections */
+  aggregate?: InputMaybe<BusinessCapabilitySupportedByBusinessProcessesConnectionAggregateInput>;
+  /** Return BusinessCapabilities where all of the related BusinessCapabilitySupportedByBusinessProcessesConnections match this filter */
+  all?: InputMaybe<BusinessCapabilitySupportedByBusinessProcessesConnectionWhere>;
+  /** Return BusinessCapabilities where none of the related BusinessCapabilitySupportedByBusinessProcessesConnections match this filter */
+  none?: InputMaybe<BusinessCapabilitySupportedByBusinessProcessesConnectionWhere>;
+  /** Return BusinessCapabilities where one of the related BusinessCapabilitySupportedByBusinessProcessesConnections match this filter */
+  single?: InputMaybe<BusinessCapabilitySupportedByBusinessProcessesConnectionWhere>;
+  /** Return BusinessCapabilities where some of the related BusinessCapabilitySupportedByBusinessProcessesConnections match this filter */
+  some?: InputMaybe<BusinessCapabilitySupportedByBusinessProcessesConnectionWhere>;
+};
+
+export type BusinessCapabilitySupportedByBusinessProcessesConnectionSort = {
+  node?: InputMaybe<BusinessProcessSort>;
+};
+
+export type BusinessCapabilitySupportedByBusinessProcessesConnectionWhere = {
+  AND?: InputMaybe<Array<BusinessCapabilitySupportedByBusinessProcessesConnectionWhere>>;
+  NOT?: InputMaybe<BusinessCapabilitySupportedByBusinessProcessesConnectionWhere>;
+  OR?: InputMaybe<Array<BusinessCapabilitySupportedByBusinessProcessesConnectionWhere>>;
+  node?: InputMaybe<BusinessProcessWhere>;
+};
+
+export type BusinessCapabilitySupportedByBusinessProcessesCreateFieldInput = {
+  node: BusinessProcessCreateInput;
+};
+
+export type BusinessCapabilitySupportedByBusinessProcessesDeleteFieldInput = {
+  delete?: InputMaybe<BusinessProcessDeleteInput>;
+  where?: InputMaybe<BusinessCapabilitySupportedByBusinessProcessesConnectionWhere>;
+};
+
+export type BusinessCapabilitySupportedByBusinessProcessesDisconnectFieldInput = {
+  disconnect?: InputMaybe<BusinessProcessDisconnectInput>;
+  where?: InputMaybe<BusinessCapabilitySupportedByBusinessProcessesConnectionWhere>;
+};
+
+export type BusinessCapabilitySupportedByBusinessProcessesFieldInput = {
+  connect?: InputMaybe<Array<BusinessCapabilitySupportedByBusinessProcessesConnectFieldInput>>;
+  create?: InputMaybe<Array<BusinessCapabilitySupportedByBusinessProcessesCreateFieldInput>>;
+};
+
+export type BusinessCapabilitySupportedByBusinessProcessesNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<BusinessCapabilitySupportedByBusinessProcessesNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<BusinessCapabilitySupportedByBusinessProcessesNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<BusinessCapabilitySupportedByBusinessProcessesNodeAggregationWhereInput>>;
+  bpmnXml?: InputMaybe<StringScalarAggregationFilters>;
+  category?: InputMaybe<StringScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  maturityLevel?: InputMaybe<IntScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type BusinessCapabilitySupportedByBusinessProcessesRelationship = {
+  __typename?: 'BusinessCapabilitySupportedByBusinessProcessesRelationship';
+  cursor: Scalars['String']['output'];
+  node: BusinessProcess;
+};
+
+export type BusinessCapabilitySupportedByBusinessProcessesUpdateConnectionInput = {
+  node?: InputMaybe<BusinessProcessUpdateInput>;
+  where?: InputMaybe<BusinessCapabilitySupportedByBusinessProcessesConnectionWhere>;
+};
+
+export type BusinessCapabilitySupportedByBusinessProcessesUpdateFieldInput = {
+  connect?: InputMaybe<Array<BusinessCapabilitySupportedByBusinessProcessesConnectFieldInput>>;
+  create?: InputMaybe<Array<BusinessCapabilitySupportedByBusinessProcessesCreateFieldInput>>;
+  delete?: InputMaybe<Array<BusinessCapabilitySupportedByBusinessProcessesDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<BusinessCapabilitySupportedByBusinessProcessesDisconnectFieldInput>>;
+  update?: InputMaybe<BusinessCapabilitySupportedByBusinessProcessesUpdateConnectionInput>;
+};
+
 export type BusinessCapabilityUpdateInput = {
   businessValue?: InputMaybe<IntScalarMutations>;
   children?: InputMaybe<Array<BusinessCapabilityChildrenUpdateFieldInput>>;
@@ -12388,6 +12691,7 @@ export type BusinessCapabilityUpdateInput = {
   status?: InputMaybe<CapabilityStatusEnumScalarMutations>;
   supportedByAIComponents?: InputMaybe<Array<BusinessCapabilitySupportedByAiComponentsUpdateFieldInput>>;
   supportedByApplications?: InputMaybe<Array<BusinessCapabilitySupportedByApplicationsUpdateFieldInput>>;
+  supportedByBusinessProcesses?: InputMaybe<Array<BusinessCapabilitySupportedByBusinessProcessesUpdateFieldInput>>;
   tags?: InputMaybe<ListStringMutations>;
   type?: InputMaybe<CapabilityTypeEnumScalarMutations>;
   usedByOrganisations?: InputMaybe<Array<BusinessCapabilityUsedByOrganisationsUpdateFieldInput>>;
@@ -12532,11 +12836,1371 @@ export type BusinessCapabilityWhere = {
   supportedByAIComponentsConnection?: InputMaybe<BusinessCapabilitySupportedByAiComponentsConnectionFilters>;
   supportedByApplications?: InputMaybe<ApplicationRelationshipFilters>;
   supportedByApplicationsConnection?: InputMaybe<BusinessCapabilitySupportedByApplicationsConnectionFilters>;
+  supportedByBusinessProcesses?: InputMaybe<BusinessProcessRelationshipFilters>;
+  supportedByBusinessProcessesConnection?: InputMaybe<BusinessCapabilitySupportedByBusinessProcessesConnectionFilters>;
   tags?: InputMaybe<StringListFilters>;
   type?: InputMaybe<CapabilityTypeEnumScalarFilters>;
   updatedAt?: InputMaybe<DateTimeScalarFilters>;
   usedByOrganisations?: InputMaybe<OrganisationRelationshipFilters>;
   usedByOrganisationsConnection?: InputMaybe<BusinessCapabilityUsedByOrganisationsConnectionFilters>;
+};
+
+/** BusinessProcess – represents a business process within Enterprise Architecture Management */
+export type BusinessProcess = {
+  __typename?: 'BusinessProcess';
+  bpmnXml?: Maybe<Scalars['String']['output']>;
+  category?: Maybe<Scalars['String']['output']>;
+  childProcesses: Array<BusinessProcess>;
+  childProcessesConnection: BusinessProcessChildProcessesConnection;
+  company: Array<Company>;
+  companyConnection: BusinessProcessCompanyConnection;
+  createdAt: Scalars['DateTime']['output'];
+  depictedInDiagrams: Array<Diagram>;
+  depictedInDiagramsConnection: BusinessProcessDepictedInDiagramsConnection;
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  maturityLevel?: Maybe<Scalars['Int']['output']>;
+  name: Scalars['String']['output'];
+  owners: Array<Person>;
+  ownersConnection: BusinessProcessOwnersConnection;
+  parentProcess: Array<BusinessProcess>;
+  parentProcessConnection: BusinessProcessParentProcessConnection;
+  partOfArchitectures: Array<Architecture>;
+  partOfArchitecturesConnection: BusinessProcessPartOfArchitecturesConnection;
+  processType: ProcessType;
+  status: ProcessStatus;
+  supportsCapabilities: Array<BusinessCapability>;
+  supportsCapabilitiesConnection: BusinessProcessSupportsCapabilitiesConnection;
+  tags?: Maybe<Array<Scalars['String']['output']>>;
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  usedByOrganisations: Array<Organisation>;
+  usedByOrganisationsConnection: BusinessProcessUsedByOrganisationsConnection;
+};
+
+
+/** BusinessProcess – represents a business process within Enterprise Architecture Management */
+export type BusinessProcessChildProcessesArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<BusinessProcessSort>>;
+  where?: InputMaybe<BusinessProcessWhere>;
+};
+
+
+/** BusinessProcess – represents a business process within Enterprise Architecture Management */
+export type BusinessProcessChildProcessesConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<BusinessProcessChildProcessesConnectionSort>>;
+  where?: InputMaybe<BusinessProcessChildProcessesConnectionWhere>;
+};
+
+
+/** BusinessProcess – represents a business process within Enterprise Architecture Management */
+export type BusinessProcessCompanyArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<CompanySort>>;
+  where?: InputMaybe<CompanyWhere>;
+};
+
+
+/** BusinessProcess – represents a business process within Enterprise Architecture Management */
+export type BusinessProcessCompanyConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<BusinessProcessCompanyConnectionSort>>;
+  where?: InputMaybe<BusinessProcessCompanyConnectionWhere>;
+};
+
+
+/** BusinessProcess – represents a business process within Enterprise Architecture Management */
+export type BusinessProcessDepictedInDiagramsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<DiagramSort>>;
+  where?: InputMaybe<DiagramWhere>;
+};
+
+
+/** BusinessProcess – represents a business process within Enterprise Architecture Management */
+export type BusinessProcessDepictedInDiagramsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<BusinessProcessDepictedInDiagramsConnectionSort>>;
+  where?: InputMaybe<BusinessProcessDepictedInDiagramsConnectionWhere>;
+};
+
+
+/** BusinessProcess – represents a business process within Enterprise Architecture Management */
+export type BusinessProcessOwnersArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<PersonSort>>;
+  where?: InputMaybe<PersonWhere>;
+};
+
+
+/** BusinessProcess – represents a business process within Enterprise Architecture Management */
+export type BusinessProcessOwnersConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<BusinessProcessOwnersConnectionSort>>;
+  where?: InputMaybe<BusinessProcessOwnersConnectionWhere>;
+};
+
+
+/** BusinessProcess – represents a business process within Enterprise Architecture Management */
+export type BusinessProcessParentProcessArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<BusinessProcessSort>>;
+  where?: InputMaybe<BusinessProcessWhere>;
+};
+
+
+/** BusinessProcess – represents a business process within Enterprise Architecture Management */
+export type BusinessProcessParentProcessConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<BusinessProcessParentProcessConnectionSort>>;
+  where?: InputMaybe<BusinessProcessParentProcessConnectionWhere>;
+};
+
+
+/** BusinessProcess – represents a business process within Enterprise Architecture Management */
+export type BusinessProcessPartOfArchitecturesArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<ArchitectureSort>>;
+  where?: InputMaybe<ArchitectureWhere>;
+};
+
+
+/** BusinessProcess – represents a business process within Enterprise Architecture Management */
+export type BusinessProcessPartOfArchitecturesConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<BusinessProcessPartOfArchitecturesConnectionSort>>;
+  where?: InputMaybe<BusinessProcessPartOfArchitecturesConnectionWhere>;
+};
+
+
+/** BusinessProcess – represents a business process within Enterprise Architecture Management */
+export type BusinessProcessSupportsCapabilitiesArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<BusinessCapabilitySort>>;
+  where?: InputMaybe<BusinessCapabilityWhere>;
+};
+
+
+/** BusinessProcess – represents a business process within Enterprise Architecture Management */
+export type BusinessProcessSupportsCapabilitiesConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<BusinessProcessSupportsCapabilitiesConnectionSort>>;
+  where?: InputMaybe<BusinessProcessSupportsCapabilitiesConnectionWhere>;
+};
+
+
+/** BusinessProcess – represents a business process within Enterprise Architecture Management */
+export type BusinessProcessUsedByOrganisationsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<OrganisationSort>>;
+  where?: InputMaybe<OrganisationWhere>;
+};
+
+
+/** BusinessProcess – represents a business process within Enterprise Architecture Management */
+export type BusinessProcessUsedByOrganisationsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<BusinessProcessUsedByOrganisationsConnectionSort>>;
+  where?: InputMaybe<BusinessProcessUsedByOrganisationsConnectionWhere>;
+};
+
+export type BusinessProcessAggregate = {
+  __typename?: 'BusinessProcessAggregate';
+  count: Count;
+  node: BusinessProcessAggregateNode;
+};
+
+export type BusinessProcessAggregateNode = {
+  __typename?: 'BusinessProcessAggregateNode';
+  bpmnXml: StringAggregateSelection;
+  category: StringAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  maturityLevel: IntAggregateSelection;
+  name: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
+export type BusinessProcessArchitecturePartOfArchitecturesAggregateSelection = {
+  __typename?: 'BusinessProcessArchitecturePartOfArchitecturesAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<BusinessProcessArchitecturePartOfArchitecturesNodeAggregateSelection>;
+};
+
+export type BusinessProcessArchitecturePartOfArchitecturesNodeAggregateSelection = {
+  __typename?: 'BusinessProcessArchitecturePartOfArchitecturesNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  name: StringAggregateSelection;
+  timestamp: DateTimeAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
+export type BusinessProcessBusinessCapabilitySupportsCapabilitiesAggregateSelection = {
+  __typename?: 'BusinessProcessBusinessCapabilitySupportsCapabilitiesAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<BusinessProcessBusinessCapabilitySupportsCapabilitiesNodeAggregateSelection>;
+};
+
+export type BusinessProcessBusinessCapabilitySupportsCapabilitiesNodeAggregateSelection = {
+  __typename?: 'BusinessProcessBusinessCapabilitySupportsCapabilitiesNodeAggregateSelection';
+  businessValue: IntAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  maturityLevel: IntAggregateSelection;
+  name: StringAggregateSelection;
+  sequenceNumber: IntAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
+export type BusinessProcessBusinessProcessChildProcessesAggregateSelection = {
+  __typename?: 'BusinessProcessBusinessProcessChildProcessesAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<BusinessProcessBusinessProcessChildProcessesNodeAggregateSelection>;
+};
+
+export type BusinessProcessBusinessProcessChildProcessesNodeAggregateSelection = {
+  __typename?: 'BusinessProcessBusinessProcessChildProcessesNodeAggregateSelection';
+  bpmnXml: StringAggregateSelection;
+  category: StringAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  maturityLevel: IntAggregateSelection;
+  name: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
+export type BusinessProcessBusinessProcessParentProcessAggregateSelection = {
+  __typename?: 'BusinessProcessBusinessProcessParentProcessAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<BusinessProcessBusinessProcessParentProcessNodeAggregateSelection>;
+};
+
+export type BusinessProcessBusinessProcessParentProcessNodeAggregateSelection = {
+  __typename?: 'BusinessProcessBusinessProcessParentProcessNodeAggregateSelection';
+  bpmnXml: StringAggregateSelection;
+  category: StringAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  maturityLevel: IntAggregateSelection;
+  name: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
+export type BusinessProcessChildProcessesAggregateInput = {
+  AND?: InputMaybe<Array<BusinessProcessChildProcessesAggregateInput>>;
+  NOT?: InputMaybe<BusinessProcessChildProcessesAggregateInput>;
+  OR?: InputMaybe<Array<BusinessProcessChildProcessesAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<BusinessProcessChildProcessesNodeAggregationWhereInput>;
+};
+
+export type BusinessProcessChildProcessesConnectFieldInput = {
+  connect?: InputMaybe<Array<BusinessProcessConnectInput>>;
+  where?: InputMaybe<BusinessProcessConnectWhere>;
+};
+
+export type BusinessProcessChildProcessesConnection = {
+  __typename?: 'BusinessProcessChildProcessesConnection';
+  aggregate: BusinessProcessBusinessProcessChildProcessesAggregateSelection;
+  edges: Array<BusinessProcessChildProcessesRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type BusinessProcessChildProcessesConnectionAggregateInput = {
+  AND?: InputMaybe<Array<BusinessProcessChildProcessesConnectionAggregateInput>>;
+  NOT?: InputMaybe<BusinessProcessChildProcessesConnectionAggregateInput>;
+  OR?: InputMaybe<Array<BusinessProcessChildProcessesConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<BusinessProcessChildProcessesNodeAggregationWhereInput>;
+};
+
+export type BusinessProcessChildProcessesConnectionFilters = {
+  /** Filter BusinessProcesses by aggregating results on related BusinessProcessChildProcessesConnections */
+  aggregate?: InputMaybe<BusinessProcessChildProcessesConnectionAggregateInput>;
+  /** Return BusinessProcesses where all of the related BusinessProcessChildProcessesConnections match this filter */
+  all?: InputMaybe<BusinessProcessChildProcessesConnectionWhere>;
+  /** Return BusinessProcesses where none of the related BusinessProcessChildProcessesConnections match this filter */
+  none?: InputMaybe<BusinessProcessChildProcessesConnectionWhere>;
+  /** Return BusinessProcesses where one of the related BusinessProcessChildProcessesConnections match this filter */
+  single?: InputMaybe<BusinessProcessChildProcessesConnectionWhere>;
+  /** Return BusinessProcesses where some of the related BusinessProcessChildProcessesConnections match this filter */
+  some?: InputMaybe<BusinessProcessChildProcessesConnectionWhere>;
+};
+
+export type BusinessProcessChildProcessesConnectionSort = {
+  node?: InputMaybe<BusinessProcessSort>;
+};
+
+export type BusinessProcessChildProcessesConnectionWhere = {
+  AND?: InputMaybe<Array<BusinessProcessChildProcessesConnectionWhere>>;
+  NOT?: InputMaybe<BusinessProcessChildProcessesConnectionWhere>;
+  OR?: InputMaybe<Array<BusinessProcessChildProcessesConnectionWhere>>;
+  node?: InputMaybe<BusinessProcessWhere>;
+};
+
+export type BusinessProcessChildProcessesCreateFieldInput = {
+  node: BusinessProcessCreateInput;
+};
+
+export type BusinessProcessChildProcessesDeleteFieldInput = {
+  delete?: InputMaybe<BusinessProcessDeleteInput>;
+  where?: InputMaybe<BusinessProcessChildProcessesConnectionWhere>;
+};
+
+export type BusinessProcessChildProcessesDisconnectFieldInput = {
+  disconnect?: InputMaybe<BusinessProcessDisconnectInput>;
+  where?: InputMaybe<BusinessProcessChildProcessesConnectionWhere>;
+};
+
+export type BusinessProcessChildProcessesFieldInput = {
+  connect?: InputMaybe<Array<BusinessProcessChildProcessesConnectFieldInput>>;
+  create?: InputMaybe<Array<BusinessProcessChildProcessesCreateFieldInput>>;
+};
+
+export type BusinessProcessChildProcessesNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<BusinessProcessChildProcessesNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<BusinessProcessChildProcessesNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<BusinessProcessChildProcessesNodeAggregationWhereInput>>;
+  bpmnXml?: InputMaybe<StringScalarAggregationFilters>;
+  category?: InputMaybe<StringScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  maturityLevel?: InputMaybe<IntScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type BusinessProcessChildProcessesRelationship = {
+  __typename?: 'BusinessProcessChildProcessesRelationship';
+  cursor: Scalars['String']['output'];
+  node: BusinessProcess;
+};
+
+export type BusinessProcessChildProcessesUpdateConnectionInput = {
+  node?: InputMaybe<BusinessProcessUpdateInput>;
+  where?: InputMaybe<BusinessProcessChildProcessesConnectionWhere>;
+};
+
+export type BusinessProcessChildProcessesUpdateFieldInput = {
+  connect?: InputMaybe<Array<BusinessProcessChildProcessesConnectFieldInput>>;
+  create?: InputMaybe<Array<BusinessProcessChildProcessesCreateFieldInput>>;
+  delete?: InputMaybe<Array<BusinessProcessChildProcessesDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<BusinessProcessChildProcessesDisconnectFieldInput>>;
+  update?: InputMaybe<BusinessProcessChildProcessesUpdateConnectionInput>;
+};
+
+export type BusinessProcessCompanyAggregateInput = {
+  AND?: InputMaybe<Array<BusinessProcessCompanyAggregateInput>>;
+  NOT?: InputMaybe<BusinessProcessCompanyAggregateInput>;
+  OR?: InputMaybe<Array<BusinessProcessCompanyAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<BusinessProcessCompanyNodeAggregationWhereInput>;
+};
+
+export type BusinessProcessCompanyCompanyAggregateSelection = {
+  __typename?: 'BusinessProcessCompanyCompanyAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<BusinessProcessCompanyCompanyNodeAggregateSelection>;
+};
+
+export type BusinessProcessCompanyCompanyNodeAggregateSelection = {
+  __typename?: 'BusinessProcessCompanyCompanyNodeAggregateSelection';
+  address: StringAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  diagramFont: StringAggregateSelection;
+  features: StringAggregateSelection;
+  font: StringAggregateSelection;
+  industry: StringAggregateSelection;
+  logo: StringAggregateSelection;
+  name: StringAggregateSelection;
+  primaryColor: StringAggregateSelection;
+  secondaryColor: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  website: StringAggregateSelection;
+};
+
+export type BusinessProcessCompanyConnectFieldInput = {
+  connect?: InputMaybe<Array<CompanyConnectInput>>;
+  where?: InputMaybe<CompanyConnectWhere>;
+};
+
+export type BusinessProcessCompanyConnection = {
+  __typename?: 'BusinessProcessCompanyConnection';
+  aggregate: BusinessProcessCompanyCompanyAggregateSelection;
+  edges: Array<BusinessProcessCompanyRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type BusinessProcessCompanyConnectionAggregateInput = {
+  AND?: InputMaybe<Array<BusinessProcessCompanyConnectionAggregateInput>>;
+  NOT?: InputMaybe<BusinessProcessCompanyConnectionAggregateInput>;
+  OR?: InputMaybe<Array<BusinessProcessCompanyConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<BusinessProcessCompanyNodeAggregationWhereInput>;
+};
+
+export type BusinessProcessCompanyConnectionFilters = {
+  /** Filter BusinessProcesses by aggregating results on related BusinessProcessCompanyConnections */
+  aggregate?: InputMaybe<BusinessProcessCompanyConnectionAggregateInput>;
+  /** Return BusinessProcesses where all of the related BusinessProcessCompanyConnections match this filter */
+  all?: InputMaybe<BusinessProcessCompanyConnectionWhere>;
+  /** Return BusinessProcesses where none of the related BusinessProcessCompanyConnections match this filter */
+  none?: InputMaybe<BusinessProcessCompanyConnectionWhere>;
+  /** Return BusinessProcesses where one of the related BusinessProcessCompanyConnections match this filter */
+  single?: InputMaybe<BusinessProcessCompanyConnectionWhere>;
+  /** Return BusinessProcesses where some of the related BusinessProcessCompanyConnections match this filter */
+  some?: InputMaybe<BusinessProcessCompanyConnectionWhere>;
+};
+
+export type BusinessProcessCompanyConnectionSort = {
+  node?: InputMaybe<CompanySort>;
+};
+
+export type BusinessProcessCompanyConnectionWhere = {
+  AND?: InputMaybe<Array<BusinessProcessCompanyConnectionWhere>>;
+  NOT?: InputMaybe<BusinessProcessCompanyConnectionWhere>;
+  OR?: InputMaybe<Array<BusinessProcessCompanyConnectionWhere>>;
+  node?: InputMaybe<CompanyWhere>;
+};
+
+export type BusinessProcessCompanyCreateFieldInput = {
+  node: CompanyCreateInput;
+};
+
+export type BusinessProcessCompanyDeleteFieldInput = {
+  delete?: InputMaybe<CompanyDeleteInput>;
+  where?: InputMaybe<BusinessProcessCompanyConnectionWhere>;
+};
+
+export type BusinessProcessCompanyDisconnectFieldInput = {
+  disconnect?: InputMaybe<CompanyDisconnectInput>;
+  where?: InputMaybe<BusinessProcessCompanyConnectionWhere>;
+};
+
+export type BusinessProcessCompanyFieldInput = {
+  connect?: InputMaybe<Array<BusinessProcessCompanyConnectFieldInput>>;
+  create?: InputMaybe<Array<BusinessProcessCompanyCreateFieldInput>>;
+};
+
+export type BusinessProcessCompanyNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<BusinessProcessCompanyNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<BusinessProcessCompanyNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<BusinessProcessCompanyNodeAggregationWhereInput>>;
+  address?: InputMaybe<StringScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  diagramFont?: InputMaybe<StringScalarAggregationFilters>;
+  features?: InputMaybe<StringScalarAggregationFilters>;
+  font?: InputMaybe<StringScalarAggregationFilters>;
+  industry?: InputMaybe<StringScalarAggregationFilters>;
+  logo?: InputMaybe<StringScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  primaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  website?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type BusinessProcessCompanyRelationship = {
+  __typename?: 'BusinessProcessCompanyRelationship';
+  cursor: Scalars['String']['output'];
+  node: Company;
+};
+
+export type BusinessProcessCompanyUpdateConnectionInput = {
+  node?: InputMaybe<CompanyUpdateInput>;
+  where?: InputMaybe<BusinessProcessCompanyConnectionWhere>;
+};
+
+export type BusinessProcessCompanyUpdateFieldInput = {
+  connect?: InputMaybe<Array<BusinessProcessCompanyConnectFieldInput>>;
+  create?: InputMaybe<Array<BusinessProcessCompanyCreateFieldInput>>;
+  delete?: InputMaybe<Array<BusinessProcessCompanyDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<BusinessProcessCompanyDisconnectFieldInput>>;
+  update?: InputMaybe<BusinessProcessCompanyUpdateConnectionInput>;
+};
+
+export type BusinessProcessConnectInput = {
+  childProcesses?: InputMaybe<Array<BusinessProcessChildProcessesConnectFieldInput>>;
+  company?: InputMaybe<Array<BusinessProcessCompanyConnectFieldInput>>;
+  depictedInDiagrams?: InputMaybe<Array<BusinessProcessDepictedInDiagramsConnectFieldInput>>;
+  owners?: InputMaybe<Array<BusinessProcessOwnersConnectFieldInput>>;
+  parentProcess?: InputMaybe<Array<BusinessProcessParentProcessConnectFieldInput>>;
+  partOfArchitectures?: InputMaybe<Array<BusinessProcessPartOfArchitecturesConnectFieldInput>>;
+  supportsCapabilities?: InputMaybe<Array<BusinessProcessSupportsCapabilitiesConnectFieldInput>>;
+  usedByOrganisations?: InputMaybe<Array<BusinessProcessUsedByOrganisationsConnectFieldInput>>;
+};
+
+export type BusinessProcessConnectWhere = {
+  node: BusinessProcessWhere;
+};
+
+export type BusinessProcessCreateInput = {
+  bpmnXml?: InputMaybe<Scalars['String']['input']>;
+  category?: InputMaybe<Scalars['String']['input']>;
+  childProcesses?: InputMaybe<BusinessProcessChildProcessesFieldInput>;
+  company?: InputMaybe<BusinessProcessCompanyFieldInput>;
+  depictedInDiagrams?: InputMaybe<BusinessProcessDepictedInDiagramsFieldInput>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  maturityLevel?: InputMaybe<Scalars['Int']['input']>;
+  name: Scalars['String']['input'];
+  owners?: InputMaybe<BusinessProcessOwnersFieldInput>;
+  parentProcess?: InputMaybe<BusinessProcessParentProcessFieldInput>;
+  partOfArchitectures?: InputMaybe<BusinessProcessPartOfArchitecturesFieldInput>;
+  processType: ProcessType;
+  status: ProcessStatus;
+  supportsCapabilities?: InputMaybe<BusinessProcessSupportsCapabilitiesFieldInput>;
+  tags?: InputMaybe<Array<Scalars['String']['input']>>;
+  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  usedByOrganisations?: InputMaybe<BusinessProcessUsedByOrganisationsFieldInput>;
+};
+
+export type BusinessProcessDeleteInput = {
+  childProcesses?: InputMaybe<Array<BusinessProcessChildProcessesDeleteFieldInput>>;
+  company?: InputMaybe<Array<BusinessProcessCompanyDeleteFieldInput>>;
+  depictedInDiagrams?: InputMaybe<Array<BusinessProcessDepictedInDiagramsDeleteFieldInput>>;
+  owners?: InputMaybe<Array<BusinessProcessOwnersDeleteFieldInput>>;
+  parentProcess?: InputMaybe<Array<BusinessProcessParentProcessDeleteFieldInput>>;
+  partOfArchitectures?: InputMaybe<Array<BusinessProcessPartOfArchitecturesDeleteFieldInput>>;
+  supportsCapabilities?: InputMaybe<Array<BusinessProcessSupportsCapabilitiesDeleteFieldInput>>;
+  usedByOrganisations?: InputMaybe<Array<BusinessProcessUsedByOrganisationsDeleteFieldInput>>;
+};
+
+export type BusinessProcessDepictedInDiagramsAggregateInput = {
+  AND?: InputMaybe<Array<BusinessProcessDepictedInDiagramsAggregateInput>>;
+  NOT?: InputMaybe<BusinessProcessDepictedInDiagramsAggregateInput>;
+  OR?: InputMaybe<Array<BusinessProcessDepictedInDiagramsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<BusinessProcessDepictedInDiagramsNodeAggregationWhereInput>;
+};
+
+export type BusinessProcessDepictedInDiagramsConnectFieldInput = {
+  connect?: InputMaybe<Array<DiagramConnectInput>>;
+  where?: InputMaybe<DiagramConnectWhere>;
+};
+
+export type BusinessProcessDepictedInDiagramsConnection = {
+  __typename?: 'BusinessProcessDepictedInDiagramsConnection';
+  aggregate: BusinessProcessDiagramDepictedInDiagramsAggregateSelection;
+  edges: Array<BusinessProcessDepictedInDiagramsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type BusinessProcessDepictedInDiagramsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<BusinessProcessDepictedInDiagramsConnectionAggregateInput>>;
+  NOT?: InputMaybe<BusinessProcessDepictedInDiagramsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<BusinessProcessDepictedInDiagramsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<BusinessProcessDepictedInDiagramsNodeAggregationWhereInput>;
+};
+
+export type BusinessProcessDepictedInDiagramsConnectionFilters = {
+  /** Filter BusinessProcesses by aggregating results on related BusinessProcessDepictedInDiagramsConnections */
+  aggregate?: InputMaybe<BusinessProcessDepictedInDiagramsConnectionAggregateInput>;
+  /** Return BusinessProcesses where all of the related BusinessProcessDepictedInDiagramsConnections match this filter */
+  all?: InputMaybe<BusinessProcessDepictedInDiagramsConnectionWhere>;
+  /** Return BusinessProcesses where none of the related BusinessProcessDepictedInDiagramsConnections match this filter */
+  none?: InputMaybe<BusinessProcessDepictedInDiagramsConnectionWhere>;
+  /** Return BusinessProcesses where one of the related BusinessProcessDepictedInDiagramsConnections match this filter */
+  single?: InputMaybe<BusinessProcessDepictedInDiagramsConnectionWhere>;
+  /** Return BusinessProcesses where some of the related BusinessProcessDepictedInDiagramsConnections match this filter */
+  some?: InputMaybe<BusinessProcessDepictedInDiagramsConnectionWhere>;
+};
+
+export type BusinessProcessDepictedInDiagramsConnectionSort = {
+  node?: InputMaybe<DiagramSort>;
+};
+
+export type BusinessProcessDepictedInDiagramsConnectionWhere = {
+  AND?: InputMaybe<Array<BusinessProcessDepictedInDiagramsConnectionWhere>>;
+  NOT?: InputMaybe<BusinessProcessDepictedInDiagramsConnectionWhere>;
+  OR?: InputMaybe<Array<BusinessProcessDepictedInDiagramsConnectionWhere>>;
+  node?: InputMaybe<DiagramWhere>;
+};
+
+export type BusinessProcessDepictedInDiagramsCreateFieldInput = {
+  node: DiagramCreateInput;
+};
+
+export type BusinessProcessDepictedInDiagramsDeleteFieldInput = {
+  delete?: InputMaybe<DiagramDeleteInput>;
+  where?: InputMaybe<BusinessProcessDepictedInDiagramsConnectionWhere>;
+};
+
+export type BusinessProcessDepictedInDiagramsDisconnectFieldInput = {
+  disconnect?: InputMaybe<DiagramDisconnectInput>;
+  where?: InputMaybe<BusinessProcessDepictedInDiagramsConnectionWhere>;
+};
+
+export type BusinessProcessDepictedInDiagramsFieldInput = {
+  connect?: InputMaybe<Array<BusinessProcessDepictedInDiagramsConnectFieldInput>>;
+  create?: InputMaybe<Array<BusinessProcessDepictedInDiagramsCreateFieldInput>>;
+};
+
+export type BusinessProcessDepictedInDiagramsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<BusinessProcessDepictedInDiagramsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<BusinessProcessDepictedInDiagramsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<BusinessProcessDepictedInDiagramsNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  diagramJson?: InputMaybe<StringScalarAggregationFilters>;
+  diagramPng?: InputMaybe<StringScalarAggregationFilters>;
+  diagramPngDark?: InputMaybe<StringScalarAggregationFilters>;
+  title?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type BusinessProcessDepictedInDiagramsRelationship = {
+  __typename?: 'BusinessProcessDepictedInDiagramsRelationship';
+  cursor: Scalars['String']['output'];
+  node: Diagram;
+};
+
+export type BusinessProcessDepictedInDiagramsUpdateConnectionInput = {
+  node?: InputMaybe<DiagramUpdateInput>;
+  where?: InputMaybe<BusinessProcessDepictedInDiagramsConnectionWhere>;
+};
+
+export type BusinessProcessDepictedInDiagramsUpdateFieldInput = {
+  connect?: InputMaybe<Array<BusinessProcessDepictedInDiagramsConnectFieldInput>>;
+  create?: InputMaybe<Array<BusinessProcessDepictedInDiagramsCreateFieldInput>>;
+  delete?: InputMaybe<Array<BusinessProcessDepictedInDiagramsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<BusinessProcessDepictedInDiagramsDisconnectFieldInput>>;
+  update?: InputMaybe<BusinessProcessDepictedInDiagramsUpdateConnectionInput>;
+};
+
+export type BusinessProcessDiagramDepictedInDiagramsAggregateSelection = {
+  __typename?: 'BusinessProcessDiagramDepictedInDiagramsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<BusinessProcessDiagramDepictedInDiagramsNodeAggregateSelection>;
+};
+
+export type BusinessProcessDiagramDepictedInDiagramsNodeAggregateSelection = {
+  __typename?: 'BusinessProcessDiagramDepictedInDiagramsNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  diagramJson: StringAggregateSelection;
+  diagramPng: StringAggregateSelection;
+  diagramPngDark: StringAggregateSelection;
+  title: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
+export type BusinessProcessDisconnectInput = {
+  childProcesses?: InputMaybe<Array<BusinessProcessChildProcessesDisconnectFieldInput>>;
+  company?: InputMaybe<Array<BusinessProcessCompanyDisconnectFieldInput>>;
+  depictedInDiagrams?: InputMaybe<Array<BusinessProcessDepictedInDiagramsDisconnectFieldInput>>;
+  owners?: InputMaybe<Array<BusinessProcessOwnersDisconnectFieldInput>>;
+  parentProcess?: InputMaybe<Array<BusinessProcessParentProcessDisconnectFieldInput>>;
+  partOfArchitectures?: InputMaybe<Array<BusinessProcessPartOfArchitecturesDisconnectFieldInput>>;
+  supportsCapabilities?: InputMaybe<Array<BusinessProcessSupportsCapabilitiesDisconnectFieldInput>>;
+  usedByOrganisations?: InputMaybe<Array<BusinessProcessUsedByOrganisationsDisconnectFieldInput>>;
+};
+
+export type BusinessProcessEdge = {
+  __typename?: 'BusinessProcessEdge';
+  cursor: Scalars['String']['output'];
+  node: BusinessProcess;
+};
+
+export type BusinessProcessOrganisationUsedByOrganisationsAggregateSelection = {
+  __typename?: 'BusinessProcessOrganisationUsedByOrganisationsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<BusinessProcessOrganisationUsedByOrganisationsNodeAggregateSelection>;
+};
+
+export type BusinessProcessOrganisationUsedByOrganisationsNodeAggregateSelection = {
+  __typename?: 'BusinessProcessOrganisationUsedByOrganisationsNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  level: IntAggregateSelection;
+  name: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
+export type BusinessProcessOwnersAggregateInput = {
+  AND?: InputMaybe<Array<BusinessProcessOwnersAggregateInput>>;
+  NOT?: InputMaybe<BusinessProcessOwnersAggregateInput>;
+  OR?: InputMaybe<Array<BusinessProcessOwnersAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<BusinessProcessOwnersNodeAggregationWhereInput>;
+};
+
+export type BusinessProcessOwnersConnectFieldInput = {
+  connect?: InputMaybe<Array<PersonConnectInput>>;
+  where?: InputMaybe<PersonConnectWhere>;
+};
+
+export type BusinessProcessOwnersConnection = {
+  __typename?: 'BusinessProcessOwnersConnection';
+  aggregate: BusinessProcessPersonOwnersAggregateSelection;
+  edges: Array<BusinessProcessOwnersRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type BusinessProcessOwnersConnectionAggregateInput = {
+  AND?: InputMaybe<Array<BusinessProcessOwnersConnectionAggregateInput>>;
+  NOT?: InputMaybe<BusinessProcessOwnersConnectionAggregateInput>;
+  OR?: InputMaybe<Array<BusinessProcessOwnersConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<BusinessProcessOwnersNodeAggregationWhereInput>;
+};
+
+export type BusinessProcessOwnersConnectionFilters = {
+  /** Filter BusinessProcesses by aggregating results on related BusinessProcessOwnersConnections */
+  aggregate?: InputMaybe<BusinessProcessOwnersConnectionAggregateInput>;
+  /** Return BusinessProcesses where all of the related BusinessProcessOwnersConnections match this filter */
+  all?: InputMaybe<BusinessProcessOwnersConnectionWhere>;
+  /** Return BusinessProcesses where none of the related BusinessProcessOwnersConnections match this filter */
+  none?: InputMaybe<BusinessProcessOwnersConnectionWhere>;
+  /** Return BusinessProcesses where one of the related BusinessProcessOwnersConnections match this filter */
+  single?: InputMaybe<BusinessProcessOwnersConnectionWhere>;
+  /** Return BusinessProcesses where some of the related BusinessProcessOwnersConnections match this filter */
+  some?: InputMaybe<BusinessProcessOwnersConnectionWhere>;
+};
+
+export type BusinessProcessOwnersConnectionSort = {
+  node?: InputMaybe<PersonSort>;
+};
+
+export type BusinessProcessOwnersConnectionWhere = {
+  AND?: InputMaybe<Array<BusinessProcessOwnersConnectionWhere>>;
+  NOT?: InputMaybe<BusinessProcessOwnersConnectionWhere>;
+  OR?: InputMaybe<Array<BusinessProcessOwnersConnectionWhere>>;
+  node?: InputMaybe<PersonWhere>;
+};
+
+export type BusinessProcessOwnersCreateFieldInput = {
+  node: PersonCreateInput;
+};
+
+export type BusinessProcessOwnersDeleteFieldInput = {
+  delete?: InputMaybe<PersonDeleteInput>;
+  where?: InputMaybe<BusinessProcessOwnersConnectionWhere>;
+};
+
+export type BusinessProcessOwnersDisconnectFieldInput = {
+  disconnect?: InputMaybe<PersonDisconnectInput>;
+  where?: InputMaybe<BusinessProcessOwnersConnectionWhere>;
+};
+
+export type BusinessProcessOwnersFieldInput = {
+  connect?: InputMaybe<Array<BusinessProcessOwnersConnectFieldInput>>;
+  create?: InputMaybe<Array<BusinessProcessOwnersCreateFieldInput>>;
+};
+
+export type BusinessProcessOwnersNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<BusinessProcessOwnersNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<BusinessProcessOwnersNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<BusinessProcessOwnersNodeAggregationWhereInput>>;
+  avatarUrl?: InputMaybe<StringScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  department?: InputMaybe<StringScalarAggregationFilters>;
+  email?: InputMaybe<StringScalarAggregationFilters>;
+  firstName?: InputMaybe<StringScalarAggregationFilters>;
+  lastName?: InputMaybe<StringScalarAggregationFilters>;
+  phone?: InputMaybe<StringScalarAggregationFilters>;
+  role?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type BusinessProcessOwnersRelationship = {
+  __typename?: 'BusinessProcessOwnersRelationship';
+  cursor: Scalars['String']['output'];
+  node: Person;
+};
+
+export type BusinessProcessOwnersUpdateConnectionInput = {
+  node?: InputMaybe<PersonUpdateInput>;
+  where?: InputMaybe<BusinessProcessOwnersConnectionWhere>;
+};
+
+export type BusinessProcessOwnersUpdateFieldInput = {
+  connect?: InputMaybe<Array<BusinessProcessOwnersConnectFieldInput>>;
+  create?: InputMaybe<Array<BusinessProcessOwnersCreateFieldInput>>;
+  delete?: InputMaybe<Array<BusinessProcessOwnersDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<BusinessProcessOwnersDisconnectFieldInput>>;
+  update?: InputMaybe<BusinessProcessOwnersUpdateConnectionInput>;
+};
+
+export type BusinessProcessParentProcessAggregateInput = {
+  AND?: InputMaybe<Array<BusinessProcessParentProcessAggregateInput>>;
+  NOT?: InputMaybe<BusinessProcessParentProcessAggregateInput>;
+  OR?: InputMaybe<Array<BusinessProcessParentProcessAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<BusinessProcessParentProcessNodeAggregationWhereInput>;
+};
+
+export type BusinessProcessParentProcessConnectFieldInput = {
+  connect?: InputMaybe<Array<BusinessProcessConnectInput>>;
+  where?: InputMaybe<BusinessProcessConnectWhere>;
+};
+
+export type BusinessProcessParentProcessConnection = {
+  __typename?: 'BusinessProcessParentProcessConnection';
+  aggregate: BusinessProcessBusinessProcessParentProcessAggregateSelection;
+  edges: Array<BusinessProcessParentProcessRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type BusinessProcessParentProcessConnectionAggregateInput = {
+  AND?: InputMaybe<Array<BusinessProcessParentProcessConnectionAggregateInput>>;
+  NOT?: InputMaybe<BusinessProcessParentProcessConnectionAggregateInput>;
+  OR?: InputMaybe<Array<BusinessProcessParentProcessConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<BusinessProcessParentProcessNodeAggregationWhereInput>;
+};
+
+export type BusinessProcessParentProcessConnectionFilters = {
+  /** Filter BusinessProcesses by aggregating results on related BusinessProcessParentProcessConnections */
+  aggregate?: InputMaybe<BusinessProcessParentProcessConnectionAggregateInput>;
+  /** Return BusinessProcesses where all of the related BusinessProcessParentProcessConnections match this filter */
+  all?: InputMaybe<BusinessProcessParentProcessConnectionWhere>;
+  /** Return BusinessProcesses where none of the related BusinessProcessParentProcessConnections match this filter */
+  none?: InputMaybe<BusinessProcessParentProcessConnectionWhere>;
+  /** Return BusinessProcesses where one of the related BusinessProcessParentProcessConnections match this filter */
+  single?: InputMaybe<BusinessProcessParentProcessConnectionWhere>;
+  /** Return BusinessProcesses where some of the related BusinessProcessParentProcessConnections match this filter */
+  some?: InputMaybe<BusinessProcessParentProcessConnectionWhere>;
+};
+
+export type BusinessProcessParentProcessConnectionSort = {
+  node?: InputMaybe<BusinessProcessSort>;
+};
+
+export type BusinessProcessParentProcessConnectionWhere = {
+  AND?: InputMaybe<Array<BusinessProcessParentProcessConnectionWhere>>;
+  NOT?: InputMaybe<BusinessProcessParentProcessConnectionWhere>;
+  OR?: InputMaybe<Array<BusinessProcessParentProcessConnectionWhere>>;
+  node?: InputMaybe<BusinessProcessWhere>;
+};
+
+export type BusinessProcessParentProcessCreateFieldInput = {
+  node: BusinessProcessCreateInput;
+};
+
+export type BusinessProcessParentProcessDeleteFieldInput = {
+  delete?: InputMaybe<BusinessProcessDeleteInput>;
+  where?: InputMaybe<BusinessProcessParentProcessConnectionWhere>;
+};
+
+export type BusinessProcessParentProcessDisconnectFieldInput = {
+  disconnect?: InputMaybe<BusinessProcessDisconnectInput>;
+  where?: InputMaybe<BusinessProcessParentProcessConnectionWhere>;
+};
+
+export type BusinessProcessParentProcessFieldInput = {
+  connect?: InputMaybe<Array<BusinessProcessParentProcessConnectFieldInput>>;
+  create?: InputMaybe<Array<BusinessProcessParentProcessCreateFieldInput>>;
+};
+
+export type BusinessProcessParentProcessNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<BusinessProcessParentProcessNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<BusinessProcessParentProcessNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<BusinessProcessParentProcessNodeAggregationWhereInput>>;
+  bpmnXml?: InputMaybe<StringScalarAggregationFilters>;
+  category?: InputMaybe<StringScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  maturityLevel?: InputMaybe<IntScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type BusinessProcessParentProcessRelationship = {
+  __typename?: 'BusinessProcessParentProcessRelationship';
+  cursor: Scalars['String']['output'];
+  node: BusinessProcess;
+};
+
+export type BusinessProcessParentProcessUpdateConnectionInput = {
+  node?: InputMaybe<BusinessProcessUpdateInput>;
+  where?: InputMaybe<BusinessProcessParentProcessConnectionWhere>;
+};
+
+export type BusinessProcessParentProcessUpdateFieldInput = {
+  connect?: InputMaybe<Array<BusinessProcessParentProcessConnectFieldInput>>;
+  create?: InputMaybe<Array<BusinessProcessParentProcessCreateFieldInput>>;
+  delete?: InputMaybe<Array<BusinessProcessParentProcessDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<BusinessProcessParentProcessDisconnectFieldInput>>;
+  update?: InputMaybe<BusinessProcessParentProcessUpdateConnectionInput>;
+};
+
+export type BusinessProcessPartOfArchitecturesAggregateInput = {
+  AND?: InputMaybe<Array<BusinessProcessPartOfArchitecturesAggregateInput>>;
+  NOT?: InputMaybe<BusinessProcessPartOfArchitecturesAggregateInput>;
+  OR?: InputMaybe<Array<BusinessProcessPartOfArchitecturesAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<BusinessProcessPartOfArchitecturesNodeAggregationWhereInput>;
+};
+
+export type BusinessProcessPartOfArchitecturesConnectFieldInput = {
+  connect?: InputMaybe<Array<ArchitectureConnectInput>>;
+  where?: InputMaybe<ArchitectureConnectWhere>;
+};
+
+export type BusinessProcessPartOfArchitecturesConnection = {
+  __typename?: 'BusinessProcessPartOfArchitecturesConnection';
+  aggregate: BusinessProcessArchitecturePartOfArchitecturesAggregateSelection;
+  edges: Array<BusinessProcessPartOfArchitecturesRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type BusinessProcessPartOfArchitecturesConnectionAggregateInput = {
+  AND?: InputMaybe<Array<BusinessProcessPartOfArchitecturesConnectionAggregateInput>>;
+  NOT?: InputMaybe<BusinessProcessPartOfArchitecturesConnectionAggregateInput>;
+  OR?: InputMaybe<Array<BusinessProcessPartOfArchitecturesConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<BusinessProcessPartOfArchitecturesNodeAggregationWhereInput>;
+};
+
+export type BusinessProcessPartOfArchitecturesConnectionFilters = {
+  /** Filter BusinessProcesses by aggregating results on related BusinessProcessPartOfArchitecturesConnections */
+  aggregate?: InputMaybe<BusinessProcessPartOfArchitecturesConnectionAggregateInput>;
+  /** Return BusinessProcesses where all of the related BusinessProcessPartOfArchitecturesConnections match this filter */
+  all?: InputMaybe<BusinessProcessPartOfArchitecturesConnectionWhere>;
+  /** Return BusinessProcesses where none of the related BusinessProcessPartOfArchitecturesConnections match this filter */
+  none?: InputMaybe<BusinessProcessPartOfArchitecturesConnectionWhere>;
+  /** Return BusinessProcesses where one of the related BusinessProcessPartOfArchitecturesConnections match this filter */
+  single?: InputMaybe<BusinessProcessPartOfArchitecturesConnectionWhere>;
+  /** Return BusinessProcesses where some of the related BusinessProcessPartOfArchitecturesConnections match this filter */
+  some?: InputMaybe<BusinessProcessPartOfArchitecturesConnectionWhere>;
+};
+
+export type BusinessProcessPartOfArchitecturesConnectionSort = {
+  node?: InputMaybe<ArchitectureSort>;
+};
+
+export type BusinessProcessPartOfArchitecturesConnectionWhere = {
+  AND?: InputMaybe<Array<BusinessProcessPartOfArchitecturesConnectionWhere>>;
+  NOT?: InputMaybe<BusinessProcessPartOfArchitecturesConnectionWhere>;
+  OR?: InputMaybe<Array<BusinessProcessPartOfArchitecturesConnectionWhere>>;
+  node?: InputMaybe<ArchitectureWhere>;
+};
+
+export type BusinessProcessPartOfArchitecturesCreateFieldInput = {
+  node: ArchitectureCreateInput;
+};
+
+export type BusinessProcessPartOfArchitecturesDeleteFieldInput = {
+  delete?: InputMaybe<ArchitectureDeleteInput>;
+  where?: InputMaybe<BusinessProcessPartOfArchitecturesConnectionWhere>;
+};
+
+export type BusinessProcessPartOfArchitecturesDisconnectFieldInput = {
+  disconnect?: InputMaybe<ArchitectureDisconnectInput>;
+  where?: InputMaybe<BusinessProcessPartOfArchitecturesConnectionWhere>;
+};
+
+export type BusinessProcessPartOfArchitecturesFieldInput = {
+  connect?: InputMaybe<Array<BusinessProcessPartOfArchitecturesConnectFieldInput>>;
+  create?: InputMaybe<Array<BusinessProcessPartOfArchitecturesCreateFieldInput>>;
+};
+
+export type BusinessProcessPartOfArchitecturesNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<BusinessProcessPartOfArchitecturesNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<BusinessProcessPartOfArchitecturesNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<BusinessProcessPartOfArchitecturesNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  timestamp?: InputMaybe<DateTimeScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type BusinessProcessPartOfArchitecturesRelationship = {
+  __typename?: 'BusinessProcessPartOfArchitecturesRelationship';
+  cursor: Scalars['String']['output'];
+  node: Architecture;
+};
+
+export type BusinessProcessPartOfArchitecturesUpdateConnectionInput = {
+  node?: InputMaybe<ArchitectureUpdateInput>;
+  where?: InputMaybe<BusinessProcessPartOfArchitecturesConnectionWhere>;
+};
+
+export type BusinessProcessPartOfArchitecturesUpdateFieldInput = {
+  connect?: InputMaybe<Array<BusinessProcessPartOfArchitecturesConnectFieldInput>>;
+  create?: InputMaybe<Array<BusinessProcessPartOfArchitecturesCreateFieldInput>>;
+  delete?: InputMaybe<Array<BusinessProcessPartOfArchitecturesDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<BusinessProcessPartOfArchitecturesDisconnectFieldInput>>;
+  update?: InputMaybe<BusinessProcessPartOfArchitecturesUpdateConnectionInput>;
+};
+
+export type BusinessProcessPersonOwnersAggregateSelection = {
+  __typename?: 'BusinessProcessPersonOwnersAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<BusinessProcessPersonOwnersNodeAggregateSelection>;
+};
+
+export type BusinessProcessPersonOwnersNodeAggregateSelection = {
+  __typename?: 'BusinessProcessPersonOwnersNodeAggregateSelection';
+  avatarUrl: StringAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  department: StringAggregateSelection;
+  email: StringAggregateSelection;
+  firstName: StringAggregateSelection;
+  lastName: StringAggregateSelection;
+  phone: StringAggregateSelection;
+  role: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
+export type BusinessProcessRelationshipFilters = {
+  /** Filter type where all of the related BusinessProcesses match this filter */
+  all?: InputMaybe<BusinessProcessWhere>;
+  /** Filter type where none of the related BusinessProcesses match this filter */
+  none?: InputMaybe<BusinessProcessWhere>;
+  /** Filter type where one of the related BusinessProcesses match this filter */
+  single?: InputMaybe<BusinessProcessWhere>;
+  /** Filter type where some of the related BusinessProcesses match this filter */
+  some?: InputMaybe<BusinessProcessWhere>;
+};
+
+/** Fields to sort BusinessProcesses by. The order in which sorts are applied is not guaranteed when specifying many fields in one BusinessProcessSort object. */
+export type BusinessProcessSort = {
+  bpmnXml?: InputMaybe<SortDirection>;
+  category?: InputMaybe<SortDirection>;
+  createdAt?: InputMaybe<SortDirection>;
+  description?: InputMaybe<SortDirection>;
+  id?: InputMaybe<SortDirection>;
+  maturityLevel?: InputMaybe<SortDirection>;
+  name?: InputMaybe<SortDirection>;
+  processType?: InputMaybe<SortDirection>;
+  status?: InputMaybe<SortDirection>;
+  updatedAt?: InputMaybe<SortDirection>;
+};
+
+export type BusinessProcessSupportsCapabilitiesAggregateInput = {
+  AND?: InputMaybe<Array<BusinessProcessSupportsCapabilitiesAggregateInput>>;
+  NOT?: InputMaybe<BusinessProcessSupportsCapabilitiesAggregateInput>;
+  OR?: InputMaybe<Array<BusinessProcessSupportsCapabilitiesAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<BusinessProcessSupportsCapabilitiesNodeAggregationWhereInput>;
+};
+
+export type BusinessProcessSupportsCapabilitiesConnectFieldInput = {
+  connect?: InputMaybe<Array<BusinessCapabilityConnectInput>>;
+  where?: InputMaybe<BusinessCapabilityConnectWhere>;
+};
+
+export type BusinessProcessSupportsCapabilitiesConnection = {
+  __typename?: 'BusinessProcessSupportsCapabilitiesConnection';
+  aggregate: BusinessProcessBusinessCapabilitySupportsCapabilitiesAggregateSelection;
+  edges: Array<BusinessProcessSupportsCapabilitiesRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type BusinessProcessSupportsCapabilitiesConnectionAggregateInput = {
+  AND?: InputMaybe<Array<BusinessProcessSupportsCapabilitiesConnectionAggregateInput>>;
+  NOT?: InputMaybe<BusinessProcessSupportsCapabilitiesConnectionAggregateInput>;
+  OR?: InputMaybe<Array<BusinessProcessSupportsCapabilitiesConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<BusinessProcessSupportsCapabilitiesNodeAggregationWhereInput>;
+};
+
+export type BusinessProcessSupportsCapabilitiesConnectionFilters = {
+  /** Filter BusinessProcesses by aggregating results on related BusinessProcessSupportsCapabilitiesConnections */
+  aggregate?: InputMaybe<BusinessProcessSupportsCapabilitiesConnectionAggregateInput>;
+  /** Return BusinessProcesses where all of the related BusinessProcessSupportsCapabilitiesConnections match this filter */
+  all?: InputMaybe<BusinessProcessSupportsCapabilitiesConnectionWhere>;
+  /** Return BusinessProcesses where none of the related BusinessProcessSupportsCapabilitiesConnections match this filter */
+  none?: InputMaybe<BusinessProcessSupportsCapabilitiesConnectionWhere>;
+  /** Return BusinessProcesses where one of the related BusinessProcessSupportsCapabilitiesConnections match this filter */
+  single?: InputMaybe<BusinessProcessSupportsCapabilitiesConnectionWhere>;
+  /** Return BusinessProcesses where some of the related BusinessProcessSupportsCapabilitiesConnections match this filter */
+  some?: InputMaybe<BusinessProcessSupportsCapabilitiesConnectionWhere>;
+};
+
+export type BusinessProcessSupportsCapabilitiesConnectionSort = {
+  node?: InputMaybe<BusinessCapabilitySort>;
+};
+
+export type BusinessProcessSupportsCapabilitiesConnectionWhere = {
+  AND?: InputMaybe<Array<BusinessProcessSupportsCapabilitiesConnectionWhere>>;
+  NOT?: InputMaybe<BusinessProcessSupportsCapabilitiesConnectionWhere>;
+  OR?: InputMaybe<Array<BusinessProcessSupportsCapabilitiesConnectionWhere>>;
+  node?: InputMaybe<BusinessCapabilityWhere>;
+};
+
+export type BusinessProcessSupportsCapabilitiesCreateFieldInput = {
+  node: BusinessCapabilityCreateInput;
+};
+
+export type BusinessProcessSupportsCapabilitiesDeleteFieldInput = {
+  delete?: InputMaybe<BusinessCapabilityDeleteInput>;
+  where?: InputMaybe<BusinessProcessSupportsCapabilitiesConnectionWhere>;
+};
+
+export type BusinessProcessSupportsCapabilitiesDisconnectFieldInput = {
+  disconnect?: InputMaybe<BusinessCapabilityDisconnectInput>;
+  where?: InputMaybe<BusinessProcessSupportsCapabilitiesConnectionWhere>;
+};
+
+export type BusinessProcessSupportsCapabilitiesFieldInput = {
+  connect?: InputMaybe<Array<BusinessProcessSupportsCapabilitiesConnectFieldInput>>;
+  create?: InputMaybe<Array<BusinessProcessSupportsCapabilitiesCreateFieldInput>>;
+};
+
+export type BusinessProcessSupportsCapabilitiesNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<BusinessProcessSupportsCapabilitiesNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<BusinessProcessSupportsCapabilitiesNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<BusinessProcessSupportsCapabilitiesNodeAggregationWhereInput>>;
+  businessValue?: InputMaybe<IntScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  maturityLevel?: InputMaybe<IntScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  sequenceNumber?: InputMaybe<IntScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type BusinessProcessSupportsCapabilitiesRelationship = {
+  __typename?: 'BusinessProcessSupportsCapabilitiesRelationship';
+  cursor: Scalars['String']['output'];
+  node: BusinessCapability;
+};
+
+export type BusinessProcessSupportsCapabilitiesUpdateConnectionInput = {
+  node?: InputMaybe<BusinessCapabilityUpdateInput>;
+  where?: InputMaybe<BusinessProcessSupportsCapabilitiesConnectionWhere>;
+};
+
+export type BusinessProcessSupportsCapabilitiesUpdateFieldInput = {
+  connect?: InputMaybe<Array<BusinessProcessSupportsCapabilitiesConnectFieldInput>>;
+  create?: InputMaybe<Array<BusinessProcessSupportsCapabilitiesCreateFieldInput>>;
+  delete?: InputMaybe<Array<BusinessProcessSupportsCapabilitiesDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<BusinessProcessSupportsCapabilitiesDisconnectFieldInput>>;
+  update?: InputMaybe<BusinessProcessSupportsCapabilitiesUpdateConnectionInput>;
+};
+
+export type BusinessProcessUpdateInput = {
+  bpmnXml?: InputMaybe<StringScalarMutations>;
+  category?: InputMaybe<StringScalarMutations>;
+  childProcesses?: InputMaybe<Array<BusinessProcessChildProcessesUpdateFieldInput>>;
+  company?: InputMaybe<Array<BusinessProcessCompanyUpdateFieldInput>>;
+  createdAt?: InputMaybe<DateTimeScalarMutations>;
+  depictedInDiagrams?: InputMaybe<Array<BusinessProcessDepictedInDiagramsUpdateFieldInput>>;
+  description?: InputMaybe<StringScalarMutations>;
+  maturityLevel?: InputMaybe<IntScalarMutations>;
+  name?: InputMaybe<StringScalarMutations>;
+  owners?: InputMaybe<Array<BusinessProcessOwnersUpdateFieldInput>>;
+  parentProcess?: InputMaybe<Array<BusinessProcessParentProcessUpdateFieldInput>>;
+  partOfArchitectures?: InputMaybe<Array<BusinessProcessPartOfArchitecturesUpdateFieldInput>>;
+  processType?: InputMaybe<ProcessTypeEnumScalarMutations>;
+  status?: InputMaybe<ProcessStatusEnumScalarMutations>;
+  supportsCapabilities?: InputMaybe<Array<BusinessProcessSupportsCapabilitiesUpdateFieldInput>>;
+  tags?: InputMaybe<ListStringMutations>;
+  usedByOrganisations?: InputMaybe<Array<BusinessProcessUsedByOrganisationsUpdateFieldInput>>;
+};
+
+export type BusinessProcessUsedByOrganisationsAggregateInput = {
+  AND?: InputMaybe<Array<BusinessProcessUsedByOrganisationsAggregateInput>>;
+  NOT?: InputMaybe<BusinessProcessUsedByOrganisationsAggregateInput>;
+  OR?: InputMaybe<Array<BusinessProcessUsedByOrganisationsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<BusinessProcessUsedByOrganisationsNodeAggregationWhereInput>;
+};
+
+export type BusinessProcessUsedByOrganisationsConnectFieldInput = {
+  connect?: InputMaybe<Array<OrganisationConnectInput>>;
+  where?: InputMaybe<OrganisationConnectWhere>;
+};
+
+export type BusinessProcessUsedByOrganisationsConnection = {
+  __typename?: 'BusinessProcessUsedByOrganisationsConnection';
+  aggregate: BusinessProcessOrganisationUsedByOrganisationsAggregateSelection;
+  edges: Array<BusinessProcessUsedByOrganisationsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type BusinessProcessUsedByOrganisationsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<BusinessProcessUsedByOrganisationsConnectionAggregateInput>>;
+  NOT?: InputMaybe<BusinessProcessUsedByOrganisationsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<BusinessProcessUsedByOrganisationsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<BusinessProcessUsedByOrganisationsNodeAggregationWhereInput>;
+};
+
+export type BusinessProcessUsedByOrganisationsConnectionFilters = {
+  /** Filter BusinessProcesses by aggregating results on related BusinessProcessUsedByOrganisationsConnections */
+  aggregate?: InputMaybe<BusinessProcessUsedByOrganisationsConnectionAggregateInput>;
+  /** Return BusinessProcesses where all of the related BusinessProcessUsedByOrganisationsConnections match this filter */
+  all?: InputMaybe<BusinessProcessUsedByOrganisationsConnectionWhere>;
+  /** Return BusinessProcesses where none of the related BusinessProcessUsedByOrganisationsConnections match this filter */
+  none?: InputMaybe<BusinessProcessUsedByOrganisationsConnectionWhere>;
+  /** Return BusinessProcesses where one of the related BusinessProcessUsedByOrganisationsConnections match this filter */
+  single?: InputMaybe<BusinessProcessUsedByOrganisationsConnectionWhere>;
+  /** Return BusinessProcesses where some of the related BusinessProcessUsedByOrganisationsConnections match this filter */
+  some?: InputMaybe<BusinessProcessUsedByOrganisationsConnectionWhere>;
+};
+
+export type BusinessProcessUsedByOrganisationsConnectionSort = {
+  node?: InputMaybe<OrganisationSort>;
+};
+
+export type BusinessProcessUsedByOrganisationsConnectionWhere = {
+  AND?: InputMaybe<Array<BusinessProcessUsedByOrganisationsConnectionWhere>>;
+  NOT?: InputMaybe<BusinessProcessUsedByOrganisationsConnectionWhere>;
+  OR?: InputMaybe<Array<BusinessProcessUsedByOrganisationsConnectionWhere>>;
+  node?: InputMaybe<OrganisationWhere>;
+};
+
+export type BusinessProcessUsedByOrganisationsCreateFieldInput = {
+  node: OrganisationCreateInput;
+};
+
+export type BusinessProcessUsedByOrganisationsDeleteFieldInput = {
+  delete?: InputMaybe<OrganisationDeleteInput>;
+  where?: InputMaybe<BusinessProcessUsedByOrganisationsConnectionWhere>;
+};
+
+export type BusinessProcessUsedByOrganisationsDisconnectFieldInput = {
+  disconnect?: InputMaybe<OrganisationDisconnectInput>;
+  where?: InputMaybe<BusinessProcessUsedByOrganisationsConnectionWhere>;
+};
+
+export type BusinessProcessUsedByOrganisationsFieldInput = {
+  connect?: InputMaybe<Array<BusinessProcessUsedByOrganisationsConnectFieldInput>>;
+  create?: InputMaybe<Array<BusinessProcessUsedByOrganisationsCreateFieldInput>>;
+};
+
+export type BusinessProcessUsedByOrganisationsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<BusinessProcessUsedByOrganisationsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<BusinessProcessUsedByOrganisationsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<BusinessProcessUsedByOrganisationsNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  level?: InputMaybe<IntScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type BusinessProcessUsedByOrganisationsRelationship = {
+  __typename?: 'BusinessProcessUsedByOrganisationsRelationship';
+  cursor: Scalars['String']['output'];
+  node: Organisation;
+};
+
+export type BusinessProcessUsedByOrganisationsUpdateConnectionInput = {
+  node?: InputMaybe<OrganisationUpdateInput>;
+  where?: InputMaybe<BusinessProcessUsedByOrganisationsConnectionWhere>;
+};
+
+export type BusinessProcessUsedByOrganisationsUpdateFieldInput = {
+  connect?: InputMaybe<Array<BusinessProcessUsedByOrganisationsConnectFieldInput>>;
+  create?: InputMaybe<Array<BusinessProcessUsedByOrganisationsCreateFieldInput>>;
+  delete?: InputMaybe<Array<BusinessProcessUsedByOrganisationsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<BusinessProcessUsedByOrganisationsDisconnectFieldInput>>;
+  update?: InputMaybe<BusinessProcessUsedByOrganisationsUpdateConnectionInput>;
+};
+
+export type BusinessProcessWhere = {
+  AND?: InputMaybe<Array<BusinessProcessWhere>>;
+  NOT?: InputMaybe<BusinessProcessWhere>;
+  OR?: InputMaybe<Array<BusinessProcessWhere>>;
+  bpmnXml?: InputMaybe<StringScalarFilters>;
+  category?: InputMaybe<StringScalarFilters>;
+  childProcesses?: InputMaybe<BusinessProcessRelationshipFilters>;
+  childProcessesConnection?: InputMaybe<BusinessProcessChildProcessesConnectionFilters>;
+  company?: InputMaybe<CompanyRelationshipFilters>;
+  companyConnection?: InputMaybe<BusinessProcessCompanyConnectionFilters>;
+  createdAt?: InputMaybe<DateTimeScalarFilters>;
+  depictedInDiagrams?: InputMaybe<DiagramRelationshipFilters>;
+  depictedInDiagramsConnection?: InputMaybe<BusinessProcessDepictedInDiagramsConnectionFilters>;
+  description?: InputMaybe<StringScalarFilters>;
+  id?: InputMaybe<IdScalarFilters>;
+  maturityLevel?: InputMaybe<IntScalarFilters>;
+  name?: InputMaybe<StringScalarFilters>;
+  owners?: InputMaybe<PersonRelationshipFilters>;
+  ownersConnection?: InputMaybe<BusinessProcessOwnersConnectionFilters>;
+  parentProcess?: InputMaybe<BusinessProcessRelationshipFilters>;
+  parentProcessConnection?: InputMaybe<BusinessProcessParentProcessConnectionFilters>;
+  partOfArchitectures?: InputMaybe<ArchitectureRelationshipFilters>;
+  partOfArchitecturesConnection?: InputMaybe<BusinessProcessPartOfArchitecturesConnectionFilters>;
+  processType?: InputMaybe<ProcessTypeEnumScalarFilters>;
+  status?: InputMaybe<ProcessStatusEnumScalarFilters>;
+  supportsCapabilities?: InputMaybe<BusinessCapabilityRelationshipFilters>;
+  supportsCapabilitiesConnection?: InputMaybe<BusinessProcessSupportsCapabilitiesConnectionFilters>;
+  tags?: InputMaybe<StringListFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarFilters>;
+  usedByOrganisations?: InputMaybe<OrganisationRelationshipFilters>;
+  usedByOrganisationsConnection?: InputMaybe<BusinessProcessUsedByOrganisationsConnectionFilters>;
+};
+
+export type BusinessProcessesConnection = {
+  __typename?: 'BusinessProcessesConnection';
+  aggregate: BusinessProcessAggregate;
+  edges: Array<BusinessProcessEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
 };
 
 /** Possible status values for a business capability */
@@ -12608,6 +14272,8 @@ export type Company = {
   ownedArchitecturePrinciplesConnection: CompanyOwnedArchitecturePrinciplesConnection;
   ownedArchitectures: Array<Architecture>;
   ownedArchitecturesConnection: CompanyOwnedArchitecturesConnection;
+  ownedBusinessProcesses: Array<BusinessProcess>;
+  ownedBusinessProcessesConnection: CompanyOwnedBusinessProcessesConnection;
   ownedCapabilities: Array<BusinessCapability>;
   ownedCapabilitiesConnection: CompanyOwnedCapabilitiesConnection;
   ownedDataObjects: Array<DataObject>;
@@ -12743,6 +14409,24 @@ export type CompanyOwnedArchitecturesConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<CompanyOwnedArchitecturesConnectionSort>>;
   where?: InputMaybe<CompanyOwnedArchitecturesConnectionWhere>;
+};
+
+
+/** Company – represents an organization within Enterprise Architecture Management */
+export type CompanyOwnedBusinessProcessesArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<BusinessProcessSort>>;
+  where?: InputMaybe<BusinessProcessWhere>;
+};
+
+
+/** Company – represents an organization within Enterprise Architecture Management */
+export type CompanyOwnedBusinessProcessesConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<CompanyOwnedBusinessProcessesConnectionSort>>;
+  where?: InputMaybe<CompanyOwnedBusinessProcessesConnectionWhere>;
 };
 
 
@@ -13067,6 +14751,23 @@ export type CompanyBusinessCapabilityOwnedCapabilitiesNodeAggregateSelection = {
   updatedAt: DateTimeAggregateSelection;
 };
 
+export type CompanyBusinessProcessOwnedBusinessProcessesAggregateSelection = {
+  __typename?: 'CompanyBusinessProcessOwnedBusinessProcessesAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<CompanyBusinessProcessOwnedBusinessProcessesNodeAggregateSelection>;
+};
+
+export type CompanyBusinessProcessOwnedBusinessProcessesNodeAggregateSelection = {
+  __typename?: 'CompanyBusinessProcessOwnedBusinessProcessesNodeAggregateSelection';
+  bpmnXml: StringAggregateSelection;
+  category: StringAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  maturityLevel: IntAggregateSelection;
+  name: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
 export type CompanyConnectInput = {
   employees?: InputMaybe<Array<CompanyEmployeesConnectFieldInput>>;
   organisations?: InputMaybe<Array<CompanyOrganisationsConnectFieldInput>>;
@@ -13074,6 +14775,7 @@ export type CompanyConnectInput = {
   ownedApplications?: InputMaybe<Array<CompanyOwnedApplicationsConnectFieldInput>>;
   ownedArchitecturePrinciples?: InputMaybe<Array<CompanyOwnedArchitecturePrinciplesConnectFieldInput>>;
   ownedArchitectures?: InputMaybe<Array<CompanyOwnedArchitecturesConnectFieldInput>>;
+  ownedBusinessProcesses?: InputMaybe<Array<CompanyOwnedBusinessProcessesConnectFieldInput>>;
   ownedCapabilities?: InputMaybe<Array<CompanyOwnedCapabilitiesConnectFieldInput>>;
   ownedDataObjects?: InputMaybe<Array<CompanyOwnedDataObjectsConnectFieldInput>>;
   ownedDiagrams?: InputMaybe<Array<CompanyOwnedDiagramsConnectFieldInput>>;
@@ -13106,6 +14808,7 @@ export type CompanyCreateInput = {
   ownedApplications?: InputMaybe<CompanyOwnedApplicationsFieldInput>;
   ownedArchitecturePrinciples?: InputMaybe<CompanyOwnedArchitecturePrinciplesFieldInput>;
   ownedArchitectures?: InputMaybe<CompanyOwnedArchitecturesFieldInput>;
+  ownedBusinessProcesses?: InputMaybe<CompanyOwnedBusinessProcessesFieldInput>;
   ownedCapabilities?: InputMaybe<CompanyOwnedCapabilitiesFieldInput>;
   ownedDataObjects?: InputMaybe<CompanyOwnedDataObjectsFieldInput>;
   ownedDiagrams?: InputMaybe<CompanyOwnedDiagramsFieldInput>;
@@ -13146,6 +14849,7 @@ export type CompanyDeleteInput = {
   ownedApplications?: InputMaybe<Array<CompanyOwnedApplicationsDeleteFieldInput>>;
   ownedArchitecturePrinciples?: InputMaybe<Array<CompanyOwnedArchitecturePrinciplesDeleteFieldInput>>;
   ownedArchitectures?: InputMaybe<Array<CompanyOwnedArchitecturesDeleteFieldInput>>;
+  ownedBusinessProcesses?: InputMaybe<Array<CompanyOwnedBusinessProcessesDeleteFieldInput>>;
   ownedCapabilities?: InputMaybe<Array<CompanyOwnedCapabilitiesDeleteFieldInput>>;
   ownedDataObjects?: InputMaybe<Array<CompanyOwnedDataObjectsDeleteFieldInput>>;
   ownedDiagrams?: InputMaybe<Array<CompanyOwnedDiagramsDeleteFieldInput>>;
@@ -13183,6 +14887,7 @@ export type CompanyDisconnectInput = {
   ownedApplications?: InputMaybe<Array<CompanyOwnedApplicationsDisconnectFieldInput>>;
   ownedArchitecturePrinciples?: InputMaybe<Array<CompanyOwnedArchitecturePrinciplesDisconnectFieldInput>>;
   ownedArchitectures?: InputMaybe<Array<CompanyOwnedArchitecturesDisconnectFieldInput>>;
+  ownedBusinessProcesses?: InputMaybe<Array<CompanyOwnedBusinessProcessesDisconnectFieldInput>>;
   ownedCapabilities?: InputMaybe<Array<CompanyOwnedCapabilitiesDisconnectFieldInput>>;
   ownedDataObjects?: InputMaybe<Array<CompanyOwnedDataObjectsDisconnectFieldInput>>;
   ownedDiagrams?: InputMaybe<Array<CompanyOwnedDiagramsDisconnectFieldInput>>;
@@ -13964,6 +15669,115 @@ export type CompanyOwnedArchitecturesUpdateFieldInput = {
   delete?: InputMaybe<Array<CompanyOwnedArchitecturesDeleteFieldInput>>;
   disconnect?: InputMaybe<Array<CompanyOwnedArchitecturesDisconnectFieldInput>>;
   update?: InputMaybe<CompanyOwnedArchitecturesUpdateConnectionInput>;
+};
+
+export type CompanyOwnedBusinessProcessesAggregateInput = {
+  AND?: InputMaybe<Array<CompanyOwnedBusinessProcessesAggregateInput>>;
+  NOT?: InputMaybe<CompanyOwnedBusinessProcessesAggregateInput>;
+  OR?: InputMaybe<Array<CompanyOwnedBusinessProcessesAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<CompanyOwnedBusinessProcessesNodeAggregationWhereInput>;
+};
+
+export type CompanyOwnedBusinessProcessesConnectFieldInput = {
+  connect?: InputMaybe<Array<BusinessProcessConnectInput>>;
+  where?: InputMaybe<BusinessProcessConnectWhere>;
+};
+
+export type CompanyOwnedBusinessProcessesConnection = {
+  __typename?: 'CompanyOwnedBusinessProcessesConnection';
+  aggregate: CompanyBusinessProcessOwnedBusinessProcessesAggregateSelection;
+  edges: Array<CompanyOwnedBusinessProcessesRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type CompanyOwnedBusinessProcessesConnectionAggregateInput = {
+  AND?: InputMaybe<Array<CompanyOwnedBusinessProcessesConnectionAggregateInput>>;
+  NOT?: InputMaybe<CompanyOwnedBusinessProcessesConnectionAggregateInput>;
+  OR?: InputMaybe<Array<CompanyOwnedBusinessProcessesConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<CompanyOwnedBusinessProcessesNodeAggregationWhereInput>;
+};
+
+export type CompanyOwnedBusinessProcessesConnectionFilters = {
+  /** Filter Companies by aggregating results on related CompanyOwnedBusinessProcessesConnections */
+  aggregate?: InputMaybe<CompanyOwnedBusinessProcessesConnectionAggregateInput>;
+  /** Return Companies where all of the related CompanyOwnedBusinessProcessesConnections match this filter */
+  all?: InputMaybe<CompanyOwnedBusinessProcessesConnectionWhere>;
+  /** Return Companies where none of the related CompanyOwnedBusinessProcessesConnections match this filter */
+  none?: InputMaybe<CompanyOwnedBusinessProcessesConnectionWhere>;
+  /** Return Companies where one of the related CompanyOwnedBusinessProcessesConnections match this filter */
+  single?: InputMaybe<CompanyOwnedBusinessProcessesConnectionWhere>;
+  /** Return Companies where some of the related CompanyOwnedBusinessProcessesConnections match this filter */
+  some?: InputMaybe<CompanyOwnedBusinessProcessesConnectionWhere>;
+};
+
+export type CompanyOwnedBusinessProcessesConnectionSort = {
+  node?: InputMaybe<BusinessProcessSort>;
+};
+
+export type CompanyOwnedBusinessProcessesConnectionWhere = {
+  AND?: InputMaybe<Array<CompanyOwnedBusinessProcessesConnectionWhere>>;
+  NOT?: InputMaybe<CompanyOwnedBusinessProcessesConnectionWhere>;
+  OR?: InputMaybe<Array<CompanyOwnedBusinessProcessesConnectionWhere>>;
+  node?: InputMaybe<BusinessProcessWhere>;
+};
+
+export type CompanyOwnedBusinessProcessesCreateFieldInput = {
+  node: BusinessProcessCreateInput;
+};
+
+export type CompanyOwnedBusinessProcessesDeleteFieldInput = {
+  delete?: InputMaybe<BusinessProcessDeleteInput>;
+  where?: InputMaybe<CompanyOwnedBusinessProcessesConnectionWhere>;
+};
+
+export type CompanyOwnedBusinessProcessesDisconnectFieldInput = {
+  disconnect?: InputMaybe<BusinessProcessDisconnectInput>;
+  where?: InputMaybe<CompanyOwnedBusinessProcessesConnectionWhere>;
+};
+
+export type CompanyOwnedBusinessProcessesFieldInput = {
+  connect?: InputMaybe<Array<CompanyOwnedBusinessProcessesConnectFieldInput>>;
+  create?: InputMaybe<Array<CompanyOwnedBusinessProcessesCreateFieldInput>>;
+};
+
+export type CompanyOwnedBusinessProcessesNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<CompanyOwnedBusinessProcessesNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<CompanyOwnedBusinessProcessesNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<CompanyOwnedBusinessProcessesNodeAggregationWhereInput>>;
+  bpmnXml?: InputMaybe<StringScalarAggregationFilters>;
+  category?: InputMaybe<StringScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  maturityLevel?: InputMaybe<IntScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type CompanyOwnedBusinessProcessesRelationship = {
+  __typename?: 'CompanyOwnedBusinessProcessesRelationship';
+  cursor: Scalars['String']['output'];
+  node: BusinessProcess;
+};
+
+export type CompanyOwnedBusinessProcessesUpdateConnectionInput = {
+  node?: InputMaybe<BusinessProcessUpdateInput>;
+  where?: InputMaybe<CompanyOwnedBusinessProcessesConnectionWhere>;
+};
+
+export type CompanyOwnedBusinessProcessesUpdateFieldInput = {
+  connect?: InputMaybe<Array<CompanyOwnedBusinessProcessesConnectFieldInput>>;
+  create?: InputMaybe<Array<CompanyOwnedBusinessProcessesCreateFieldInput>>;
+  delete?: InputMaybe<Array<CompanyOwnedBusinessProcessesDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<CompanyOwnedBusinessProcessesDisconnectFieldInput>>;
+  update?: InputMaybe<CompanyOwnedBusinessProcessesUpdateConnectionInput>;
 };
 
 export type CompanyOwnedCapabilitiesAggregateInput = {
@@ -15264,6 +17078,7 @@ export type CompanyUpdateInput = {
   ownedApplications?: InputMaybe<Array<CompanyOwnedApplicationsUpdateFieldInput>>;
   ownedArchitecturePrinciples?: InputMaybe<Array<CompanyOwnedArchitecturePrinciplesUpdateFieldInput>>;
   ownedArchitectures?: InputMaybe<Array<CompanyOwnedArchitecturesUpdateFieldInput>>;
+  ownedBusinessProcesses?: InputMaybe<Array<CompanyOwnedBusinessProcessesUpdateFieldInput>>;
   ownedCapabilities?: InputMaybe<Array<CompanyOwnedCapabilitiesUpdateFieldInput>>;
   ownedDataObjects?: InputMaybe<Array<CompanyOwnedDataObjectsUpdateFieldInput>>;
   ownedDiagrams?: InputMaybe<Array<CompanyOwnedDiagramsUpdateFieldInput>>;
@@ -15307,6 +17122,8 @@ export type CompanyWhere = {
   ownedArchitecturePrinciplesConnection?: InputMaybe<CompanyOwnedArchitecturePrinciplesConnectionFilters>;
   ownedArchitectures?: InputMaybe<ArchitectureRelationshipFilters>;
   ownedArchitecturesConnection?: InputMaybe<CompanyOwnedArchitecturesConnectionFilters>;
+  ownedBusinessProcesses?: InputMaybe<BusinessProcessRelationshipFilters>;
+  ownedBusinessProcessesConnection?: InputMaybe<CompanyOwnedBusinessProcessesConnectionFilters>;
   ownedCapabilities?: InputMaybe<BusinessCapabilityRelationshipFilters>;
   ownedCapabilitiesConnection?: InputMaybe<CompanyOwnedCapabilitiesConnectionFilters>;
   ownedDataObjects?: InputMaybe<DataObjectRelationshipFilters>;
@@ -15385,6 +17202,12 @@ export type CreateArchitecturesMutationResponse = {
 export type CreateBusinessCapabilitiesMutationResponse = {
   __typename?: 'CreateBusinessCapabilitiesMutationResponse';
   businessCapabilities: Array<BusinessCapability>;
+  info: CreateInfo;
+};
+
+export type CreateBusinessProcessesMutationResponse = {
+  __typename?: 'CreateBusinessProcessesMutationResponse';
+  businessProcesses: Array<BusinessProcess>;
   info: CreateInfo;
 };
 
@@ -17596,6 +19419,8 @@ export type Diagram = {
   containsAIComponentsConnection: DiagramContainsAiComponentsConnection;
   containsApplications: Array<Application>;
   containsApplicationsConnection: DiagramContainsApplicationsConnection;
+  containsBusinessProcesses: Array<BusinessProcess>;
+  containsBusinessProcessesConnection: DiagramContainsBusinessProcessesConnection;
   containsCapabilities: Array<BusinessCapability>;
   containsCapabilitiesConnection: DiagramContainsCapabilitiesConnection;
   containsDataObjects: Array<DataObject>;
@@ -17697,6 +19522,24 @@ export type DiagramContainsApplicationsConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<DiagramContainsApplicationsConnectionSort>>;
   where?: InputMaybe<DiagramContainsApplicationsConnectionWhere>;
+};
+
+
+/** Diagram – represents an Excalidraw diagram */
+export type DiagramContainsBusinessProcessesArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<BusinessProcessSort>>;
+  where?: InputMaybe<BusinessProcessWhere>;
+};
+
+
+/** Diagram – represents an Excalidraw diagram */
+export type DiagramContainsBusinessProcessesConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<DiagramContainsBusinessProcessesConnectionSort>>;
+  where?: InputMaybe<DiagramContainsBusinessProcessesConnectionWhere>;
 };
 
 
@@ -18088,6 +19931,23 @@ export type DiagramBusinessCapabilityContainsCapabilitiesNodeAggregateSelection 
   updatedAt: DateTimeAggregateSelection;
 };
 
+export type DiagramBusinessProcessContainsBusinessProcessesAggregateSelection = {
+  __typename?: 'DiagramBusinessProcessContainsBusinessProcessesAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<DiagramBusinessProcessContainsBusinessProcessesNodeAggregateSelection>;
+};
+
+export type DiagramBusinessProcessContainsBusinessProcessesNodeAggregateSelection = {
+  __typename?: 'DiagramBusinessProcessContainsBusinessProcessesNodeAggregateSelection';
+  bpmnXml: StringAggregateSelection;
+  category: StringAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  maturityLevel: IntAggregateSelection;
+  name: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
 export type DiagramCompanyAggregateInput = {
   AND?: InputMaybe<Array<DiagramCompanyAggregateInput>>;
   NOT?: InputMaybe<DiagramCompanyAggregateInput>;
@@ -18231,6 +20091,7 @@ export type DiagramConnectInput = {
   company?: InputMaybe<Array<DiagramCompanyConnectFieldInput>>;
   containsAIComponents?: InputMaybe<Array<DiagramContainsAiComponentsConnectFieldInput>>;
   containsApplications?: InputMaybe<Array<DiagramContainsApplicationsConnectFieldInput>>;
+  containsBusinessProcesses?: InputMaybe<Array<DiagramContainsBusinessProcessesConnectFieldInput>>;
   containsCapabilities?: InputMaybe<Array<DiagramContainsCapabilitiesConnectFieldInput>>;
   containsDataObjects?: InputMaybe<Array<DiagramContainsDataObjectsConnectFieldInput>>;
   containsGEAGoals?: InputMaybe<Array<DiagramContainsGeaGoalsConnectFieldInput>>;
@@ -18467,6 +20328,115 @@ export type DiagramContainsApplicationsUpdateFieldInput = {
   delete?: InputMaybe<Array<DiagramContainsApplicationsDeleteFieldInput>>;
   disconnect?: InputMaybe<Array<DiagramContainsApplicationsDisconnectFieldInput>>;
   update?: InputMaybe<DiagramContainsApplicationsUpdateConnectionInput>;
+};
+
+export type DiagramContainsBusinessProcessesAggregateInput = {
+  AND?: InputMaybe<Array<DiagramContainsBusinessProcessesAggregateInput>>;
+  NOT?: InputMaybe<DiagramContainsBusinessProcessesAggregateInput>;
+  OR?: InputMaybe<Array<DiagramContainsBusinessProcessesAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<DiagramContainsBusinessProcessesNodeAggregationWhereInput>;
+};
+
+export type DiagramContainsBusinessProcessesConnectFieldInput = {
+  connect?: InputMaybe<Array<BusinessProcessConnectInput>>;
+  where?: InputMaybe<BusinessProcessConnectWhere>;
+};
+
+export type DiagramContainsBusinessProcessesConnection = {
+  __typename?: 'DiagramContainsBusinessProcessesConnection';
+  aggregate: DiagramBusinessProcessContainsBusinessProcessesAggregateSelection;
+  edges: Array<DiagramContainsBusinessProcessesRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type DiagramContainsBusinessProcessesConnectionAggregateInput = {
+  AND?: InputMaybe<Array<DiagramContainsBusinessProcessesConnectionAggregateInput>>;
+  NOT?: InputMaybe<DiagramContainsBusinessProcessesConnectionAggregateInput>;
+  OR?: InputMaybe<Array<DiagramContainsBusinessProcessesConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<DiagramContainsBusinessProcessesNodeAggregationWhereInput>;
+};
+
+export type DiagramContainsBusinessProcessesConnectionFilters = {
+  /** Filter Diagrams by aggregating results on related DiagramContainsBusinessProcessesConnections */
+  aggregate?: InputMaybe<DiagramContainsBusinessProcessesConnectionAggregateInput>;
+  /** Return Diagrams where all of the related DiagramContainsBusinessProcessesConnections match this filter */
+  all?: InputMaybe<DiagramContainsBusinessProcessesConnectionWhere>;
+  /** Return Diagrams where none of the related DiagramContainsBusinessProcessesConnections match this filter */
+  none?: InputMaybe<DiagramContainsBusinessProcessesConnectionWhere>;
+  /** Return Diagrams where one of the related DiagramContainsBusinessProcessesConnections match this filter */
+  single?: InputMaybe<DiagramContainsBusinessProcessesConnectionWhere>;
+  /** Return Diagrams where some of the related DiagramContainsBusinessProcessesConnections match this filter */
+  some?: InputMaybe<DiagramContainsBusinessProcessesConnectionWhere>;
+};
+
+export type DiagramContainsBusinessProcessesConnectionSort = {
+  node?: InputMaybe<BusinessProcessSort>;
+};
+
+export type DiagramContainsBusinessProcessesConnectionWhere = {
+  AND?: InputMaybe<Array<DiagramContainsBusinessProcessesConnectionWhere>>;
+  NOT?: InputMaybe<DiagramContainsBusinessProcessesConnectionWhere>;
+  OR?: InputMaybe<Array<DiagramContainsBusinessProcessesConnectionWhere>>;
+  node?: InputMaybe<BusinessProcessWhere>;
+};
+
+export type DiagramContainsBusinessProcessesCreateFieldInput = {
+  node: BusinessProcessCreateInput;
+};
+
+export type DiagramContainsBusinessProcessesDeleteFieldInput = {
+  delete?: InputMaybe<BusinessProcessDeleteInput>;
+  where?: InputMaybe<DiagramContainsBusinessProcessesConnectionWhere>;
+};
+
+export type DiagramContainsBusinessProcessesDisconnectFieldInput = {
+  disconnect?: InputMaybe<BusinessProcessDisconnectInput>;
+  where?: InputMaybe<DiagramContainsBusinessProcessesConnectionWhere>;
+};
+
+export type DiagramContainsBusinessProcessesFieldInput = {
+  connect?: InputMaybe<Array<DiagramContainsBusinessProcessesConnectFieldInput>>;
+  create?: InputMaybe<Array<DiagramContainsBusinessProcessesCreateFieldInput>>;
+};
+
+export type DiagramContainsBusinessProcessesNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<DiagramContainsBusinessProcessesNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<DiagramContainsBusinessProcessesNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<DiagramContainsBusinessProcessesNodeAggregationWhereInput>>;
+  bpmnXml?: InputMaybe<StringScalarAggregationFilters>;
+  category?: InputMaybe<StringScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  maturityLevel?: InputMaybe<IntScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type DiagramContainsBusinessProcessesRelationship = {
+  __typename?: 'DiagramContainsBusinessProcessesRelationship';
+  cursor: Scalars['String']['output'];
+  node: BusinessProcess;
+};
+
+export type DiagramContainsBusinessProcessesUpdateConnectionInput = {
+  node?: InputMaybe<BusinessProcessUpdateInput>;
+  where?: InputMaybe<DiagramContainsBusinessProcessesConnectionWhere>;
+};
+
+export type DiagramContainsBusinessProcessesUpdateFieldInput = {
+  connect?: InputMaybe<Array<DiagramContainsBusinessProcessesConnectFieldInput>>;
+  create?: InputMaybe<Array<DiagramContainsBusinessProcessesCreateFieldInput>>;
+  delete?: InputMaybe<Array<DiagramContainsBusinessProcessesDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<DiagramContainsBusinessProcessesDisconnectFieldInput>>;
+  update?: InputMaybe<DiagramContainsBusinessProcessesUpdateConnectionInput>;
 };
 
 export type DiagramContainsCapabilitiesAggregateInput = {
@@ -19443,6 +21413,7 @@ export type DiagramCreateInput = {
   company?: InputMaybe<DiagramCompanyFieldInput>;
   containsAIComponents?: InputMaybe<DiagramContainsAiComponentsFieldInput>;
   containsApplications?: InputMaybe<DiagramContainsApplicationsFieldInput>;
+  containsBusinessProcesses?: InputMaybe<DiagramContainsBusinessProcessesFieldInput>;
   containsCapabilities?: InputMaybe<DiagramContainsCapabilitiesFieldInput>;
   containsDataObjects?: InputMaybe<DiagramContainsDataObjectsFieldInput>;
   containsGEAGoals?: InputMaybe<DiagramContainsGeaGoalsFieldInput>;
@@ -19593,6 +21564,7 @@ export type DiagramDeleteInput = {
   company?: InputMaybe<Array<DiagramCompanyDeleteFieldInput>>;
   containsAIComponents?: InputMaybe<Array<DiagramContainsAiComponentsDeleteFieldInput>>;
   containsApplications?: InputMaybe<Array<DiagramContainsApplicationsDeleteFieldInput>>;
+  containsBusinessProcesses?: InputMaybe<Array<DiagramContainsBusinessProcessesDeleteFieldInput>>;
   containsCapabilities?: InputMaybe<Array<DiagramContainsCapabilitiesDeleteFieldInput>>;
   containsDataObjects?: InputMaybe<Array<DiagramContainsDataObjectsDeleteFieldInput>>;
   containsGEAGoals?: InputMaybe<Array<DiagramContainsGeaGoalsDeleteFieldInput>>;
@@ -19610,6 +21582,7 @@ export type DiagramDisconnectInput = {
   company?: InputMaybe<Array<DiagramCompanyDisconnectFieldInput>>;
   containsAIComponents?: InputMaybe<Array<DiagramContainsAiComponentsDisconnectFieldInput>>;
   containsApplications?: InputMaybe<Array<DiagramContainsApplicationsDisconnectFieldInput>>;
+  containsBusinessProcesses?: InputMaybe<Array<DiagramContainsBusinessProcessesDisconnectFieldInput>>;
   containsCapabilities?: InputMaybe<Array<DiagramContainsCapabilitiesDisconnectFieldInput>>;
   containsDataObjects?: InputMaybe<Array<DiagramContainsDataObjectsDisconnectFieldInput>>;
   containsGEAGoals?: InputMaybe<Array<DiagramContainsGeaGoalsDisconnectFieldInput>>;
@@ -19795,6 +21768,7 @@ export type DiagramUpdateInput = {
   company?: InputMaybe<Array<DiagramCompanyUpdateFieldInput>>;
   containsAIComponents?: InputMaybe<Array<DiagramContainsAiComponentsUpdateFieldInput>>;
   containsApplications?: InputMaybe<Array<DiagramContainsApplicationsUpdateFieldInput>>;
+  containsBusinessProcesses?: InputMaybe<Array<DiagramContainsBusinessProcessesUpdateFieldInput>>;
   containsCapabilities?: InputMaybe<Array<DiagramContainsCapabilitiesUpdateFieldInput>>;
   containsDataObjects?: InputMaybe<Array<DiagramContainsDataObjectsUpdateFieldInput>>;
   containsGEAGoals?: InputMaybe<Array<DiagramContainsGeaGoalsUpdateFieldInput>>;
@@ -19826,6 +21800,8 @@ export type DiagramWhere = {
   containsAIComponentsConnection?: InputMaybe<DiagramContainsAiComponentsConnectionFilters>;
   containsApplications?: InputMaybe<ApplicationRelationshipFilters>;
   containsApplicationsConnection?: InputMaybe<DiagramContainsApplicationsConnectionFilters>;
+  containsBusinessProcesses?: InputMaybe<BusinessProcessRelationshipFilters>;
+  containsBusinessProcessesConnection?: InputMaybe<DiagramContainsBusinessProcessesConnectionFilters>;
   containsCapabilities?: InputMaybe<BusinessCapabilityRelationshipFilters>;
   containsCapabilitiesConnection?: InputMaybe<DiagramContainsCapabilitiesConnectionFilters>;
   containsDataObjects?: InputMaybe<DataObjectRelationshipFilters>;
@@ -27907,6 +29883,7 @@ export type Mutation = {
   createArchitecturePrinciples: CreateArchitecturePrinciplesMutationResponse;
   createArchitectures: CreateArchitecturesMutationResponse;
   createBusinessCapabilities: CreateBusinessCapabilitiesMutationResponse;
+  createBusinessProcesses: CreateBusinessProcessesMutationResponse;
   createCompanies: CreateCompaniesMutationResponse;
   createDataObjects: CreateDataObjectsMutationResponse;
   createDiagrams: CreateDiagramsMutationResponse;
@@ -27925,6 +29902,7 @@ export type Mutation = {
   deleteArchitecturePrinciples: DeleteInfo;
   deleteArchitectures: DeleteInfo;
   deleteBusinessCapabilities: DeleteInfo;
+  deleteBusinessProcesses: DeleteInfo;
   deleteCompanies: DeleteInfo;
   deleteDataObjects: DeleteInfo;
   deleteDiagrams: DeleteInfo;
@@ -27943,6 +29921,7 @@ export type Mutation = {
   updateArchitecturePrinciples: UpdateArchitecturePrinciplesMutationResponse;
   updateArchitectures: UpdateArchitecturesMutationResponse;
   updateBusinessCapabilities: UpdateBusinessCapabilitiesMutationResponse;
+  updateBusinessProcesses: UpdateBusinessProcessesMutationResponse;
   updateCompanies: UpdateCompaniesMutationResponse;
   updateDataObjects: UpdateDataObjectsMutationResponse;
   updateDiagrams: UpdateDiagramsMutationResponse;
@@ -27985,6 +29964,11 @@ export type MutationCreateArchitecturesArgs = {
 
 export type MutationCreateBusinessCapabilitiesArgs = {
   input: Array<BusinessCapabilityCreateInput>;
+};
+
+
+export type MutationCreateBusinessProcessesArgs = {
+  input: Array<BusinessProcessCreateInput>;
 };
 
 
@@ -28081,6 +30065,12 @@ export type MutationDeleteArchitecturesArgs = {
 export type MutationDeleteBusinessCapabilitiesArgs = {
   delete?: InputMaybe<BusinessCapabilityDeleteInput>;
   where?: InputMaybe<BusinessCapabilityWhere>;
+};
+
+
+export type MutationDeleteBusinessProcessesArgs = {
+  delete?: InputMaybe<BusinessProcessDeleteInput>;
+  where?: InputMaybe<BusinessProcessWhere>;
 };
 
 
@@ -28192,6 +30182,12 @@ export type MutationUpdateBusinessCapabilitiesArgs = {
 };
 
 
+export type MutationUpdateBusinessProcessesArgs = {
+  update?: InputMaybe<BusinessProcessUpdateInput>;
+  where?: InputMaybe<BusinessProcessWhere>;
+};
+
+
 export type MutationUpdateCompaniesArgs = {
   update?: InputMaybe<CompanyUpdateInput>;
   where?: InputMaybe<CompanyWhere>;
@@ -28283,6 +30279,8 @@ export type Organisation = {
   usedAIComponentsConnection: OrganisationUsedAiComponentsConnection;
   usedApplications: Array<Application>;
   usedApplicationsConnection: OrganisationUsedApplicationsConnection;
+  usedBusinessProcesses: Array<BusinessProcess>;
+  usedBusinessProcessesConnection: OrganisationUsedBusinessProcessesConnection;
   usedCapabilities: Array<BusinessCapability>;
   usedCapabilitiesConnection: OrganisationUsedCapabilitiesConnection;
   usedDataObjects: Array<DataObject>;
@@ -28381,6 +30379,24 @@ export type OrganisationUsedApplicationsConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<OrganisationUsedApplicationsConnectionSort>>;
   where?: InputMaybe<OrganisationUsedApplicationsConnectionWhere>;
+};
+
+
+/** Organisation – represents an organizational unit within the company */
+export type OrganisationUsedBusinessProcessesArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<BusinessProcessSort>>;
+  where?: InputMaybe<BusinessProcessWhere>;
+};
+
+
+/** Organisation – represents an organizational unit within the company */
+export type OrganisationUsedBusinessProcessesConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<OrganisationUsedBusinessProcessesConnectionSort>>;
+  where?: InputMaybe<OrganisationUsedBusinessProcessesConnectionWhere>;
 };
 
 
@@ -28537,6 +30553,23 @@ export type OrganisationBusinessCapabilityUsedCapabilitiesNodeAggregateSelection
   maturityLevel: IntAggregateSelection;
   name: StringAggregateSelection;
   sequenceNumber: IntAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
+export type OrganisationBusinessProcessUsedBusinessProcessesAggregateSelection = {
+  __typename?: 'OrganisationBusinessProcessUsedBusinessProcessesAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<OrganisationBusinessProcessUsedBusinessProcessesNodeAggregateSelection>;
+};
+
+export type OrganisationBusinessProcessUsedBusinessProcessesNodeAggregateSelection = {
+  __typename?: 'OrganisationBusinessProcessUsedBusinessProcessesNodeAggregateSelection';
+  bpmnXml: StringAggregateSelection;
+  category: StringAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  maturityLevel: IntAggregateSelection;
+  name: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -28791,6 +30824,7 @@ export type OrganisationConnectInput = {
   parentOrganisation?: InputMaybe<Array<OrganisationParentOrganisationConnectFieldInput>>;
   usedAIComponents?: InputMaybe<Array<OrganisationUsedAiComponentsConnectFieldInput>>;
   usedApplications?: InputMaybe<Array<OrganisationUsedApplicationsConnectFieldInput>>;
+  usedBusinessProcesses?: InputMaybe<Array<OrganisationUsedBusinessProcessesConnectFieldInput>>;
   usedCapabilities?: InputMaybe<Array<OrganisationUsedCapabilitiesConnectFieldInput>>;
   usedDataObjects?: InputMaybe<Array<OrganisationUsedDataObjectsConnectFieldInput>>;
   usedInfrastructure?: InputMaybe<Array<OrganisationUsedInfrastructureConnectFieldInput>>;
@@ -28812,6 +30846,7 @@ export type OrganisationCreateInput = {
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
   usedAIComponents?: InputMaybe<OrganisationUsedAiComponentsFieldInput>;
   usedApplications?: InputMaybe<OrganisationUsedApplicationsFieldInput>;
+  usedBusinessProcesses?: InputMaybe<OrganisationUsedBusinessProcessesFieldInput>;
   usedCapabilities?: InputMaybe<OrganisationUsedCapabilitiesFieldInput>;
   usedDataObjects?: InputMaybe<OrganisationUsedDataObjectsFieldInput>;
   usedInfrastructure?: InputMaybe<OrganisationUsedInfrastructureFieldInput>;
@@ -28839,6 +30874,7 @@ export type OrganisationDeleteInput = {
   parentOrganisation?: InputMaybe<Array<OrganisationParentOrganisationDeleteFieldInput>>;
   usedAIComponents?: InputMaybe<Array<OrganisationUsedAiComponentsDeleteFieldInput>>;
   usedApplications?: InputMaybe<Array<OrganisationUsedApplicationsDeleteFieldInput>>;
+  usedBusinessProcesses?: InputMaybe<Array<OrganisationUsedBusinessProcessesDeleteFieldInput>>;
   usedCapabilities?: InputMaybe<Array<OrganisationUsedCapabilitiesDeleteFieldInput>>;
   usedDataObjects?: InputMaybe<Array<OrganisationUsedDataObjectsDeleteFieldInput>>;
   usedInfrastructure?: InputMaybe<Array<OrganisationUsedInfrastructureDeleteFieldInput>>;
@@ -28851,6 +30887,7 @@ export type OrganisationDisconnectInput = {
   parentOrganisation?: InputMaybe<Array<OrganisationParentOrganisationDisconnectFieldInput>>;
   usedAIComponents?: InputMaybe<Array<OrganisationUsedAiComponentsDisconnectFieldInput>>;
   usedApplications?: InputMaybe<Array<OrganisationUsedApplicationsDisconnectFieldInput>>;
+  usedBusinessProcesses?: InputMaybe<Array<OrganisationUsedBusinessProcessesDisconnectFieldInput>>;
   usedCapabilities?: InputMaybe<Array<OrganisationUsedCapabilitiesDisconnectFieldInput>>;
   usedDataObjects?: InputMaybe<Array<OrganisationUsedDataObjectsDisconnectFieldInput>>;
   usedInfrastructure?: InputMaybe<Array<OrganisationUsedInfrastructureDisconnectFieldInput>>;
@@ -29079,6 +31116,7 @@ export type OrganisationUpdateInput = {
   type?: InputMaybe<OrganisationTypeEnumScalarMutations>;
   usedAIComponents?: InputMaybe<Array<OrganisationUsedAiComponentsUpdateFieldInput>>;
   usedApplications?: InputMaybe<Array<OrganisationUsedApplicationsUpdateFieldInput>>;
+  usedBusinessProcesses?: InputMaybe<Array<OrganisationUsedBusinessProcessesUpdateFieldInput>>;
   usedCapabilities?: InputMaybe<Array<OrganisationUsedCapabilitiesUpdateFieldInput>>;
   usedDataObjects?: InputMaybe<Array<OrganisationUsedDataObjectsUpdateFieldInput>>;
   usedInfrastructure?: InputMaybe<Array<OrganisationUsedInfrastructureUpdateFieldInput>>;
@@ -29305,6 +31343,115 @@ export type OrganisationUsedApplicationsUpdateFieldInput = {
   delete?: InputMaybe<Array<OrganisationUsedApplicationsDeleteFieldInput>>;
   disconnect?: InputMaybe<Array<OrganisationUsedApplicationsDisconnectFieldInput>>;
   update?: InputMaybe<OrganisationUsedApplicationsUpdateConnectionInput>;
+};
+
+export type OrganisationUsedBusinessProcessesAggregateInput = {
+  AND?: InputMaybe<Array<OrganisationUsedBusinessProcessesAggregateInput>>;
+  NOT?: InputMaybe<OrganisationUsedBusinessProcessesAggregateInput>;
+  OR?: InputMaybe<Array<OrganisationUsedBusinessProcessesAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<OrganisationUsedBusinessProcessesNodeAggregationWhereInput>;
+};
+
+export type OrganisationUsedBusinessProcessesConnectFieldInput = {
+  connect?: InputMaybe<Array<BusinessProcessConnectInput>>;
+  where?: InputMaybe<BusinessProcessConnectWhere>;
+};
+
+export type OrganisationUsedBusinessProcessesConnection = {
+  __typename?: 'OrganisationUsedBusinessProcessesConnection';
+  aggregate: OrganisationBusinessProcessUsedBusinessProcessesAggregateSelection;
+  edges: Array<OrganisationUsedBusinessProcessesRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type OrganisationUsedBusinessProcessesConnectionAggregateInput = {
+  AND?: InputMaybe<Array<OrganisationUsedBusinessProcessesConnectionAggregateInput>>;
+  NOT?: InputMaybe<OrganisationUsedBusinessProcessesConnectionAggregateInput>;
+  OR?: InputMaybe<Array<OrganisationUsedBusinessProcessesConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<OrganisationUsedBusinessProcessesNodeAggregationWhereInput>;
+};
+
+export type OrganisationUsedBusinessProcessesConnectionFilters = {
+  /** Filter Organisations by aggregating results on related OrganisationUsedBusinessProcessesConnections */
+  aggregate?: InputMaybe<OrganisationUsedBusinessProcessesConnectionAggregateInput>;
+  /** Return Organisations where all of the related OrganisationUsedBusinessProcessesConnections match this filter */
+  all?: InputMaybe<OrganisationUsedBusinessProcessesConnectionWhere>;
+  /** Return Organisations where none of the related OrganisationUsedBusinessProcessesConnections match this filter */
+  none?: InputMaybe<OrganisationUsedBusinessProcessesConnectionWhere>;
+  /** Return Organisations where one of the related OrganisationUsedBusinessProcessesConnections match this filter */
+  single?: InputMaybe<OrganisationUsedBusinessProcessesConnectionWhere>;
+  /** Return Organisations where some of the related OrganisationUsedBusinessProcessesConnections match this filter */
+  some?: InputMaybe<OrganisationUsedBusinessProcessesConnectionWhere>;
+};
+
+export type OrganisationUsedBusinessProcessesConnectionSort = {
+  node?: InputMaybe<BusinessProcessSort>;
+};
+
+export type OrganisationUsedBusinessProcessesConnectionWhere = {
+  AND?: InputMaybe<Array<OrganisationUsedBusinessProcessesConnectionWhere>>;
+  NOT?: InputMaybe<OrganisationUsedBusinessProcessesConnectionWhere>;
+  OR?: InputMaybe<Array<OrganisationUsedBusinessProcessesConnectionWhere>>;
+  node?: InputMaybe<BusinessProcessWhere>;
+};
+
+export type OrganisationUsedBusinessProcessesCreateFieldInput = {
+  node: BusinessProcessCreateInput;
+};
+
+export type OrganisationUsedBusinessProcessesDeleteFieldInput = {
+  delete?: InputMaybe<BusinessProcessDeleteInput>;
+  where?: InputMaybe<OrganisationUsedBusinessProcessesConnectionWhere>;
+};
+
+export type OrganisationUsedBusinessProcessesDisconnectFieldInput = {
+  disconnect?: InputMaybe<BusinessProcessDisconnectInput>;
+  where?: InputMaybe<OrganisationUsedBusinessProcessesConnectionWhere>;
+};
+
+export type OrganisationUsedBusinessProcessesFieldInput = {
+  connect?: InputMaybe<Array<OrganisationUsedBusinessProcessesConnectFieldInput>>;
+  create?: InputMaybe<Array<OrganisationUsedBusinessProcessesCreateFieldInput>>;
+};
+
+export type OrganisationUsedBusinessProcessesNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<OrganisationUsedBusinessProcessesNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<OrganisationUsedBusinessProcessesNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<OrganisationUsedBusinessProcessesNodeAggregationWhereInput>>;
+  bpmnXml?: InputMaybe<StringScalarAggregationFilters>;
+  category?: InputMaybe<StringScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  maturityLevel?: InputMaybe<IntScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type OrganisationUsedBusinessProcessesRelationship = {
+  __typename?: 'OrganisationUsedBusinessProcessesRelationship';
+  cursor: Scalars['String']['output'];
+  node: BusinessProcess;
+};
+
+export type OrganisationUsedBusinessProcessesUpdateConnectionInput = {
+  node?: InputMaybe<BusinessProcessUpdateInput>;
+  where?: InputMaybe<OrganisationUsedBusinessProcessesConnectionWhere>;
+};
+
+export type OrganisationUsedBusinessProcessesUpdateFieldInput = {
+  connect?: InputMaybe<Array<OrganisationUsedBusinessProcessesConnectFieldInput>>;
+  create?: InputMaybe<Array<OrganisationUsedBusinessProcessesCreateFieldInput>>;
+  delete?: InputMaybe<Array<OrganisationUsedBusinessProcessesDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<OrganisationUsedBusinessProcessesDisconnectFieldInput>>;
+  update?: InputMaybe<OrganisationUsedBusinessProcessesUpdateConnectionInput>;
 };
 
 export type OrganisationUsedCapabilitiesAggregateInput = {
@@ -29766,6 +31913,8 @@ export type OrganisationWhere = {
   usedAIComponentsConnection?: InputMaybe<OrganisationUsedAiComponentsConnectionFilters>;
   usedApplications?: InputMaybe<ApplicationRelationshipFilters>;
   usedApplicationsConnection?: InputMaybe<OrganisationUsedApplicationsConnectionFilters>;
+  usedBusinessProcesses?: InputMaybe<BusinessProcessRelationshipFilters>;
+  usedBusinessProcessesConnection?: InputMaybe<OrganisationUsedBusinessProcessesConnectionFilters>;
   usedCapabilities?: InputMaybe<BusinessCapabilityRelationshipFilters>;
   usedCapabilitiesConnection?: InputMaybe<OrganisationUsedCapabilitiesConnectionFilters>;
   usedDataObjects?: InputMaybe<DataObjectRelationshipFilters>;
@@ -29819,6 +31968,8 @@ export type Person = {
   ownedApplicationsConnection: PersonOwnedApplicationsConnection;
   ownedArchitectures: Array<Architecture>;
   ownedArchitecturesConnection: PersonOwnedArchitecturesConnection;
+  ownedBusinessProcesses: Array<BusinessProcess>;
+  ownedBusinessProcessesConnection: PersonOwnedBusinessProcessesConnection;
   ownedCapabilities: Array<BusinessCapability>;
   ownedCapabilitiesConnection: PersonOwnedCapabilitiesConnection;
   ownedDataObjects: Array<DataObject>;
@@ -29914,6 +32065,24 @@ export type PersonOwnedArchitecturesConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<PersonOwnedArchitecturesConnectionSort>>;
   where?: InputMaybe<PersonOwnedArchitecturesConnectionWhere>;
+};
+
+
+/** Person – represents an individual within the organization */
+export type PersonOwnedBusinessProcessesArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<BusinessProcessSort>>;
+  where?: InputMaybe<BusinessProcessWhere>;
+};
+
+
+/** Person – represents an individual within the organization */
+export type PersonOwnedBusinessProcessesConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<PersonOwnedBusinessProcessesConnectionSort>>;
+  where?: InputMaybe<PersonOwnedBusinessProcessesConnectionWhere>;
 };
 
 
@@ -30200,6 +32369,23 @@ export type PersonBusinessCapabilityOwnedCapabilitiesNodeAggregateSelection = {
   updatedAt: DateTimeAggregateSelection;
 };
 
+export type PersonBusinessProcessOwnedBusinessProcessesAggregateSelection = {
+  __typename?: 'PersonBusinessProcessOwnedBusinessProcessesAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<PersonBusinessProcessOwnedBusinessProcessesNodeAggregateSelection>;
+};
+
+export type PersonBusinessProcessOwnedBusinessProcessesNodeAggregateSelection = {
+  __typename?: 'PersonBusinessProcessOwnedBusinessProcessesNodeAggregateSelection';
+  bpmnXml: StringAggregateSelection;
+  category: StringAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  maturityLevel: IntAggregateSelection;
+  name: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
 export type PersonCompaniesAggregateInput = {
   AND?: InputMaybe<Array<PersonCompaniesAggregateInput>>;
   NOT?: InputMaybe<PersonCompaniesAggregateInput>;
@@ -30343,6 +32529,7 @@ export type PersonConnectInput = {
   ownedAIComponents?: InputMaybe<Array<PersonOwnedAiComponentsConnectFieldInput>>;
   ownedApplications?: InputMaybe<Array<PersonOwnedApplicationsConnectFieldInput>>;
   ownedArchitectures?: InputMaybe<Array<PersonOwnedArchitecturesConnectFieldInput>>;
+  ownedBusinessProcesses?: InputMaybe<Array<PersonOwnedBusinessProcessesConnectFieldInput>>;
   ownedCapabilities?: InputMaybe<Array<PersonOwnedCapabilitiesConnectFieldInput>>;
   ownedDataObjects?: InputMaybe<Array<PersonOwnedDataObjectsConnectFieldInput>>;
   ownedDiagrams?: InputMaybe<Array<PersonOwnedDiagramsConnectFieldInput>>;
@@ -30369,6 +32556,7 @@ export type PersonCreateInput = {
   ownedAIComponents?: InputMaybe<PersonOwnedAiComponentsFieldInput>;
   ownedApplications?: InputMaybe<PersonOwnedApplicationsFieldInput>;
   ownedArchitectures?: InputMaybe<PersonOwnedArchitecturesFieldInput>;
+  ownedBusinessProcesses?: InputMaybe<PersonOwnedBusinessProcessesFieldInput>;
   ownedCapabilities?: InputMaybe<PersonOwnedCapabilitiesFieldInput>;
   ownedDataObjects?: InputMaybe<PersonOwnedDataObjectsFieldInput>;
   ownedDiagrams?: InputMaybe<PersonOwnedDiagramsFieldInput>;
@@ -30404,6 +32592,7 @@ export type PersonDeleteInput = {
   ownedAIComponents?: InputMaybe<Array<PersonOwnedAiComponentsDeleteFieldInput>>;
   ownedApplications?: InputMaybe<Array<PersonOwnedApplicationsDeleteFieldInput>>;
   ownedArchitectures?: InputMaybe<Array<PersonOwnedArchitecturesDeleteFieldInput>>;
+  ownedBusinessProcesses?: InputMaybe<Array<PersonOwnedBusinessProcessesDeleteFieldInput>>;
   ownedCapabilities?: InputMaybe<Array<PersonOwnedCapabilitiesDeleteFieldInput>>;
   ownedDataObjects?: InputMaybe<Array<PersonOwnedDataObjectsDeleteFieldInput>>;
   ownedDiagrams?: InputMaybe<Array<PersonOwnedDiagramsDeleteFieldInput>>;
@@ -30438,6 +32627,7 @@ export type PersonDisconnectInput = {
   ownedAIComponents?: InputMaybe<Array<PersonOwnedAiComponentsDisconnectFieldInput>>;
   ownedApplications?: InputMaybe<Array<PersonOwnedApplicationsDisconnectFieldInput>>;
   ownedArchitectures?: InputMaybe<Array<PersonOwnedArchitecturesDisconnectFieldInput>>;
+  ownedBusinessProcesses?: InputMaybe<Array<PersonOwnedBusinessProcessesDisconnectFieldInput>>;
   ownedCapabilities?: InputMaybe<Array<PersonOwnedCapabilitiesDisconnectFieldInput>>;
   ownedDataObjects?: InputMaybe<Array<PersonOwnedDataObjectsDisconnectFieldInput>>;
   ownedDiagrams?: InputMaybe<Array<PersonOwnedDiagramsDisconnectFieldInput>>;
@@ -30877,6 +33067,115 @@ export type PersonOwnedArchitecturesUpdateFieldInput = {
   delete?: InputMaybe<Array<PersonOwnedArchitecturesDeleteFieldInput>>;
   disconnect?: InputMaybe<Array<PersonOwnedArchitecturesDisconnectFieldInput>>;
   update?: InputMaybe<PersonOwnedArchitecturesUpdateConnectionInput>;
+};
+
+export type PersonOwnedBusinessProcessesAggregateInput = {
+  AND?: InputMaybe<Array<PersonOwnedBusinessProcessesAggregateInput>>;
+  NOT?: InputMaybe<PersonOwnedBusinessProcessesAggregateInput>;
+  OR?: InputMaybe<Array<PersonOwnedBusinessProcessesAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<PersonOwnedBusinessProcessesNodeAggregationWhereInput>;
+};
+
+export type PersonOwnedBusinessProcessesConnectFieldInput = {
+  connect?: InputMaybe<Array<BusinessProcessConnectInput>>;
+  where?: InputMaybe<BusinessProcessConnectWhere>;
+};
+
+export type PersonOwnedBusinessProcessesConnection = {
+  __typename?: 'PersonOwnedBusinessProcessesConnection';
+  aggregate: PersonBusinessProcessOwnedBusinessProcessesAggregateSelection;
+  edges: Array<PersonOwnedBusinessProcessesRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type PersonOwnedBusinessProcessesConnectionAggregateInput = {
+  AND?: InputMaybe<Array<PersonOwnedBusinessProcessesConnectionAggregateInput>>;
+  NOT?: InputMaybe<PersonOwnedBusinessProcessesConnectionAggregateInput>;
+  OR?: InputMaybe<Array<PersonOwnedBusinessProcessesConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<PersonOwnedBusinessProcessesNodeAggregationWhereInput>;
+};
+
+export type PersonOwnedBusinessProcessesConnectionFilters = {
+  /** Filter People by aggregating results on related PersonOwnedBusinessProcessesConnections */
+  aggregate?: InputMaybe<PersonOwnedBusinessProcessesConnectionAggregateInput>;
+  /** Return People where all of the related PersonOwnedBusinessProcessesConnections match this filter */
+  all?: InputMaybe<PersonOwnedBusinessProcessesConnectionWhere>;
+  /** Return People where none of the related PersonOwnedBusinessProcessesConnections match this filter */
+  none?: InputMaybe<PersonOwnedBusinessProcessesConnectionWhere>;
+  /** Return People where one of the related PersonOwnedBusinessProcessesConnections match this filter */
+  single?: InputMaybe<PersonOwnedBusinessProcessesConnectionWhere>;
+  /** Return People where some of the related PersonOwnedBusinessProcessesConnections match this filter */
+  some?: InputMaybe<PersonOwnedBusinessProcessesConnectionWhere>;
+};
+
+export type PersonOwnedBusinessProcessesConnectionSort = {
+  node?: InputMaybe<BusinessProcessSort>;
+};
+
+export type PersonOwnedBusinessProcessesConnectionWhere = {
+  AND?: InputMaybe<Array<PersonOwnedBusinessProcessesConnectionWhere>>;
+  NOT?: InputMaybe<PersonOwnedBusinessProcessesConnectionWhere>;
+  OR?: InputMaybe<Array<PersonOwnedBusinessProcessesConnectionWhere>>;
+  node?: InputMaybe<BusinessProcessWhere>;
+};
+
+export type PersonOwnedBusinessProcessesCreateFieldInput = {
+  node: BusinessProcessCreateInput;
+};
+
+export type PersonOwnedBusinessProcessesDeleteFieldInput = {
+  delete?: InputMaybe<BusinessProcessDeleteInput>;
+  where?: InputMaybe<PersonOwnedBusinessProcessesConnectionWhere>;
+};
+
+export type PersonOwnedBusinessProcessesDisconnectFieldInput = {
+  disconnect?: InputMaybe<BusinessProcessDisconnectInput>;
+  where?: InputMaybe<PersonOwnedBusinessProcessesConnectionWhere>;
+};
+
+export type PersonOwnedBusinessProcessesFieldInput = {
+  connect?: InputMaybe<Array<PersonOwnedBusinessProcessesConnectFieldInput>>;
+  create?: InputMaybe<Array<PersonOwnedBusinessProcessesCreateFieldInput>>;
+};
+
+export type PersonOwnedBusinessProcessesNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<PersonOwnedBusinessProcessesNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<PersonOwnedBusinessProcessesNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<PersonOwnedBusinessProcessesNodeAggregationWhereInput>>;
+  bpmnXml?: InputMaybe<StringScalarAggregationFilters>;
+  category?: InputMaybe<StringScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  maturityLevel?: InputMaybe<IntScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type PersonOwnedBusinessProcessesRelationship = {
+  __typename?: 'PersonOwnedBusinessProcessesRelationship';
+  cursor: Scalars['String']['output'];
+  node: BusinessProcess;
+};
+
+export type PersonOwnedBusinessProcessesUpdateConnectionInput = {
+  node?: InputMaybe<BusinessProcessUpdateInput>;
+  where?: InputMaybe<PersonOwnedBusinessProcessesConnectionWhere>;
+};
+
+export type PersonOwnedBusinessProcessesUpdateFieldInput = {
+  connect?: InputMaybe<Array<PersonOwnedBusinessProcessesConnectFieldInput>>;
+  create?: InputMaybe<Array<PersonOwnedBusinessProcessesCreateFieldInput>>;
+  delete?: InputMaybe<Array<PersonOwnedBusinessProcessesDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<PersonOwnedBusinessProcessesDisconnectFieldInput>>;
+  update?: InputMaybe<PersonOwnedBusinessProcessesUpdateConnectionInput>;
 };
 
 export type PersonOwnedCapabilitiesAggregateInput = {
@@ -31993,6 +34292,7 @@ export type PersonUpdateInput = {
   ownedAIComponents?: InputMaybe<Array<PersonOwnedAiComponentsUpdateFieldInput>>;
   ownedApplications?: InputMaybe<Array<PersonOwnedApplicationsUpdateFieldInput>>;
   ownedArchitectures?: InputMaybe<Array<PersonOwnedArchitecturesUpdateFieldInput>>;
+  ownedBusinessProcesses?: InputMaybe<Array<PersonOwnedBusinessProcessesUpdateFieldInput>>;
   ownedCapabilities?: InputMaybe<Array<PersonOwnedCapabilitiesUpdateFieldInput>>;
   ownedDataObjects?: InputMaybe<Array<PersonOwnedDataObjectsUpdateFieldInput>>;
   ownedDiagrams?: InputMaybe<Array<PersonOwnedDiagramsUpdateFieldInput>>;
@@ -32026,6 +34326,8 @@ export type PersonWhere = {
   ownedApplicationsConnection?: InputMaybe<PersonOwnedApplicationsConnectionFilters>;
   ownedArchitectures?: InputMaybe<ArchitectureRelationshipFilters>;
   ownedArchitecturesConnection?: InputMaybe<PersonOwnedArchitecturesConnectionFilters>;
+  ownedBusinessProcesses?: InputMaybe<BusinessProcessRelationshipFilters>;
+  ownedBusinessProcessesConnection?: InputMaybe<PersonOwnedBusinessProcessesConnectionFilters>;
   ownedCapabilities?: InputMaybe<BusinessCapabilityRelationshipFilters>;
   ownedCapabilitiesConnection?: InputMaybe<PersonOwnedCapabilitiesConnectionFilters>;
   ownedDataObjects?: InputMaybe<DataObjectRelationshipFilters>;
@@ -32101,6 +34403,42 @@ export type PrinciplePriorityEnumScalarMutations = {
   set?: InputMaybe<PrinciplePriority>;
 };
 
+/** Possible status values for a business process */
+export enum ProcessStatus {
+  ACTIVE = 'ACTIVE',
+  PLANNED = 'PLANNED',
+  RETIRED = 'RETIRED'
+}
+
+/** ProcessStatus filters */
+export type ProcessStatusEnumScalarFilters = {
+  eq?: InputMaybe<ProcessStatus>;
+  in?: InputMaybe<Array<ProcessStatus>>;
+};
+
+/** ProcessStatus mutations */
+export type ProcessStatusEnumScalarMutations = {
+  set?: InputMaybe<ProcessStatus>;
+};
+
+/** Types of business processes */
+export enum ProcessType {
+  CORE = 'CORE',
+  MANAGEMENT = 'MANAGEMENT',
+  SUPPORT = 'SUPPORT'
+}
+
+/** ProcessType filters */
+export type ProcessTypeEnumScalarFilters = {
+  eq?: InputMaybe<ProcessType>;
+  in?: InputMaybe<Array<ProcessType>>;
+};
+
+/** ProcessType mutations */
+export type ProcessTypeEnumScalarMutations = {
+  set?: InputMaybe<ProcessType>;
+};
+
 export type Query = {
   __typename?: 'Query';
   aiComponents: Array<AiComponent>;
@@ -32115,6 +34453,8 @@ export type Query = {
   architecturesConnection: ArchitecturesConnection;
   businessCapabilities: Array<BusinessCapability>;
   businessCapabilitiesConnection: BusinessCapabilitiesConnection;
+  businessProcesses: Array<BusinessProcess>;
+  businessProcessesConnection: BusinessProcessesConnection;
   companies: Array<Company>;
   companiesConnection: CompaniesConnection;
   dataObjects: Array<DataObject>;
@@ -32235,6 +34575,22 @@ export type QueryBusinessCapabilitiesConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<BusinessCapabilitySort>>;
   where?: InputMaybe<BusinessCapabilityWhere>;
+};
+
+
+export type QueryBusinessProcessesArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<BusinessProcessSort>>;
+  where?: InputMaybe<BusinessProcessWhere>;
+};
+
+
+export type QueryBusinessProcessesConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<BusinessProcessSort>>;
+  where?: InputMaybe<BusinessProcessWhere>;
 };
 
 
@@ -34397,6 +36753,12 @@ export type UpdateArchitecturesMutationResponse = {
 export type UpdateBusinessCapabilitiesMutationResponse = {
   __typename?: 'UpdateBusinessCapabilitiesMutationResponse';
   businessCapabilities: Array<BusinessCapability>;
+  info: UpdateInfo;
+};
+
+export type UpdateBusinessProcessesMutationResponse = {
+  __typename?: 'UpdateBusinessProcessesMutationResponse';
+  businessProcesses: Array<BusinessProcess>;
   info: UpdateInfo;
 };
 

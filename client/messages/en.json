@@ -54,6 +54,7 @@
     "architectures": "Architectures",
     "architecturePrinciples": "Architecture Principles",
     "businessCapabilities": "Business Capabilities",
+    "businessProcesses": "Business Processes",
     "applications": "Applications",
     "aiComponents": "AI Components",
     "companies": "Companies",
@@ -2922,6 +2923,93 @@
       "strategicImportance": "Strategic Importance",
       "descriptionContains": "Description contains",
       "updatedDateRange": "Updated Date Range"
+    }
+  },
+  "businessProcesses": {
+    "title": "Business Processes",
+    "description": "Manage business processes and BPMN models",
+    "loading": "Loading business processes...",
+    "addNew": "Create new Business Process",
+    "editTitle": "Edit Business Process",
+    "createTitle": "Create Business Process",
+    "viewTitle": "Business Process Details",
+    "deleteConfirmation": "Are you sure you want to delete this business process?",
+    "searchPlaceholder": "Search business processes...",
+    "messages": {
+      "loadError": "Error loading business processes",
+      "createSuccess": "Business process created successfully",
+      "createError": "Error creating business process",
+      "updateSuccess": "Business process updated successfully",
+      "updateError": "Error updating business process",
+      "deleteSuccess": "Business process deleted successfully",
+      "deleteError": "Error deleting business process",
+      "selectCompanyFirst": "Please select a company first"
+    },
+    "tabs": {
+      "general": "General",
+      "relationships": "Relationships",
+      "bpmn": "BPMN",
+      "architecture": "Architecture"
+    },
+    "form": {
+      "name": "Name",
+      "description": "Description",
+      "processType": "Process Type",
+      "status": "Status",
+      "maturityLevel": "Maturity Level",
+      "category": "Category",
+      "tags": "Tags",
+      "owner": "Owner",
+      "none": "None",
+      "parentProcess": "Parent Process",
+      "supportsCapabilities": "Supports Capabilities",
+      "partOfArchitectures": "Part of Architectures",
+      "depictedInDiagrams": "Depicted in Diagrams",
+      "validation": {
+        "nameMin": "Name must contain at least 3 characters",
+        "nameMax": "Name must not exceed 100 characters",
+        "descriptionMax": "Description must not exceed 2000 characters",
+        "categoryMax": "Category must not exceed 100 characters"
+      }
+    },
+    "table": {
+      "id": "ID",
+      "name": "Name",
+      "description": "Description",
+      "processType": "Process Type",
+      "status": "Status",
+      "maturityLevel": "Maturity",
+      "category": "Category",
+      "owner": "Owner",
+      "supportsCapabilities": "Capabilities",
+      "parentProcess": "Parent Process",
+      "tags": "Tags",
+      "createdAt": "Created At",
+      "updatedAt": "Updated At",
+      "noData": "No business processes found"
+    },
+    "statuses": {
+      "ACTIVE": "Active",
+      "PLANNED": "Planned",
+      "RETIRED": "Retired"
+    },
+    "processTypes": {
+      "CORE": "Core",
+      "SUPPORT": "Support",
+      "MANAGEMENT": "Management"
+    },
+    "filter": {
+      "title": "Filter Business Processes",
+      "status": "Status",
+      "processType": "Process Type",
+      "category": "Category",
+      "descriptionContains": "Description contains",
+      "descriptionPlaceholder": "Search in description...",
+      "owner": "Owner",
+      "allOwners": "All owners",
+      "updatedDateRange": "Updated Date Range",
+      "dateFrom": "From",
+      "dateTo": "To"
     }
   }
 }

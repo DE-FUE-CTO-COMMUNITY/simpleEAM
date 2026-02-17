@@ -61,7 +61,60 @@ type BusinessCapability
   children: [BusinessCapability!]! @relationship(type: "HAS_PARENT", direction: IN)
   supportedByApplications: [Application!]! @relationship(type: "SUPPORTS", direction: IN)
   supportedByAIComponents: [AIComponent!]! @relationship(type: "SUPPORTS", direction: IN)
+  supportedByBusinessProcesses: [BusinessProcess!]!
+    @relationship(type: "SUPPORTS", direction: IN)
   relatedDataObjects: [DataObject!]! @relationship(type: "RELATED_TO", direction: OUT)
+  partOfArchitectures: [Architecture!]! @relationship(type: "CONTAINS", direction: IN)
+  depictedInDiagrams: [Diagram!]! @relationship(type: "DEPICTED_IN", direction: OUT)
+}
+
+"""
+BusinessProcess – represents a business process within Enterprise Architecture Management
+"""
+type BusinessProcess
+  @node
+  @authorization(
+    validate: [
+      { operations: [CREATE], where: { jwt: { roles: { includes: "architect" } } } }
+      {
+        operations: [UPDATE, DELETE]
+        where: {
+          AND: [
+            { jwt: { roles: { includes: "architect" } } }
+            { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+          ]
+        }
+      }
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "admin" } } } }
+    ]
+    filter: [
+      {
+        where: {
+          OR: [
+            { jwt: { roles: { includes: "admin" } } }
+            { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+          ]
+        }
+      }
+    ]
+  ) {
+  id: ID! @id
+  name: String!
+  description: String
+  processType: ProcessType!
+  status: ProcessStatus!
+  maturityLevel: Int
+  category: String
+  tags: [String!]
+  bpmnXml: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime @timestamp(operations: [UPDATE])
+  owners: [Person!]! @relationship(type: "OWNED_BY", direction: OUT)
+  company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
+  usedByOrganisations: [Organisation!]! @relationship(type: "USED_BY", direction: OUT)
+  parentProcess: [BusinessProcess!]! @relationship(type: "HAS_PARENT_PROCESS", direction: OUT)
+  childProcesses: [BusinessProcess!]! @relationship(type: "HAS_PARENT_PROCESS", direction: IN)
+  supportsCapabilities: [BusinessCapability!]! @relationship(type: "SUPPORTS", direction: OUT)
   partOfArchitectures: [Architecture!]! @relationship(type: "CONTAINS", direction: IN)
   depictedInDiagrams: [Diagram!]! @relationship(type: "DEPICTED_IN", direction: OUT)
 }
@@ -369,6 +422,7 @@ type Person
   ownedInfrastructure: [Infrastructure!]! @relationship(type: "OWNED_BY", direction: IN)
   ownedInterfaces: [ApplicationInterface!]! @relationship(type: "OWNED_BY", direction: IN)
   ownedAIComponents: [AIComponent!]! @relationship(type: "OWNED_BY", direction: IN)
+  ownedBusinessProcesses: [BusinessProcess!]! @relationship(type: "OWNED_BY", direction: IN)
   ownedGEAVisions: [GEA_Vision!]! @relationship(type: "OWNED_BY", direction: IN)
   ownedGEAMissions: [GEA_Mission!]! @relationship(type: "OWNED_BY", direction: IN)
   ownedGEAValues: [GEA_Value!]! @relationship(type: "OWNED_BY", direction: IN)
@@ -816,6 +870,7 @@ type Company
   ownedInterfaces: [ApplicationInterface!]! @relationship(type: "OWNED_BY", direction: IN)
   ownedInfrastructure: [Infrastructure!]! @relationship(type: "OWNED_BY", direction: IN)
   ownedAIComponents: [AIComponent!]! @relationship(type: "OWNED_BY", direction: IN)
+  ownedBusinessProcesses: [BusinessProcess!]! @relationship(type: "OWNED_BY", direction: IN)
   ownedGEAVisions: [GEA_Vision!]! @relationship(type: "OWNED_BY", direction: IN)
   ownedGEAMissions: [GEA_Mission!]! @relationship(type: "OWNED_BY", direction: IN)
   ownedGEAValues: [GEA_Value!]! @relationship(type: "OWNED_BY", direction: IN)
@@ -876,6 +931,7 @@ type Organisation
   usedInterfaces: [ApplicationInterface!]! @relationship(type: "USED_BY", direction: IN)
   usedInfrastructure: [Infrastructure!]! @relationship(type: "USED_BY", direction: IN)
   usedAIComponents: [AIComponent!]! @relationship(type: "USED_BY", direction: IN)
+  usedBusinessProcesses: [BusinessProcess!]! @relationship(type: "USED_BY", direction: IN)
 }
 
 """
@@ -894,6 +950,24 @@ enum CapabilityType {
   STRATEGIC
   OPERATIONAL
   SUPPORT
+}
+
+"""
+Possible status values for a business process
+"""
+enum ProcessStatus {
+  ACTIVE
+  PLANNED
+  RETIRED
+}
+
+"""
+Types of business processes
+"""
+enum ProcessType {
+  CORE
+  SUPPORT
+  MANAGEMENT
 }
 
 """
@@ -1066,6 +1140,7 @@ type Architecture
   company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
   owners: [Person!]! @relationship(type: "OWNED_BY", direction: OUT)
   containsCapabilities: [BusinessCapability!]! @relationship(type: "CONTAINS", direction: OUT)
+  containsBusinessProcesses: [BusinessProcess!]! @relationship(type: "CONTAINS", direction: OUT)
   containsApplications: [Application!]! @relationship(type: "CONTAINS", direction: OUT)
   containsDataObjects: [DataObject!]! @relationship(type: "CONTAINS", direction: OUT)
   containsInterfaces: [ApplicationInterface!]! @relationship(type: "CONTAINS", direction: OUT)
@@ -1117,6 +1192,7 @@ type Diagram
   architecture: [Architecture!]! @relationship(type: "BELONGS_TO", direction: OUT)
   creator: [Person!]! @relationship(type: "CREATED_BY", direction: OUT)
   containsCapabilities: [BusinessCapability!]! @relationship(type: "DEPICTED_IN", direction: IN)
+  containsBusinessProcesses: [BusinessProcess!]! @relationship(type: "DEPICTED_IN", direction: IN)
   containsApplications: [Application!]! @relationship(type: "DEPICTED_IN", direction: IN)
   containsDataObjects: [DataObject!]! @relationship(type: "DEPICTED_IN", direction: IN)
   containsInterfaces: [ApplicationInterface!]! @relationship(type: "DEPICTED_IN", direction: IN)

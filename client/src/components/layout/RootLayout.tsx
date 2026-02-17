@@ -205,17 +205,23 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
       : []),
   ]
 
-  const lensToElementKeys: Record<
-    LensKey,
-    Array<(typeof architectureElementItems)[number]['key']>
-  > = {
+  const processArchitectureItems = [
+    {
+      key: 'businessProcesses',
+      text: t('businessProcesses'),
+      icon: <ProcessIcon />,
+      href: '/business-processes',
+    },
+  ]
+
+  const lensToElementKeys: Record<LensKey, string[]> = {
     enterpriseArchitecture: architectureElementItems.map(item => item.key),
     businessArchitecture: [
       ...(isGeaEnabled ? (geaBusinessItems.map(item => item.key) as string[]) : []),
       ...(isBmcEnabled ? (bmcItems.map(item => item.key) as string[]) : []),
       'businessCapabilities',
     ],
-    processArchitecture: ['businessCapabilities'],
+    processArchitecture: ['businessCapabilities', 'businessProcesses'],
     dataArchitecture: ['dataObjects'],
     aiArchitecture: ['aiComponents'],
     solutionArchitecture: [
@@ -231,6 +237,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
 
   const allArchitectureItems = [
     ...architectureElementItems,
+    ...processArchitectureItems,
     ...(isGeaEnabled ? geaBusinessItems : []),
     ...(isBmcEnabled ? bmcItems : []),
     ...solutionArchitectureItems,

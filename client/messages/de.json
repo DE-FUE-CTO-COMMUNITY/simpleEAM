@@ -60,6 +60,7 @@
     "architectures": "Architekturen",
     "architecturePrinciples": "Architektur Prinzipien",
     "businessCapabilities": "Business Capabilities",
+    "businessProcesses": "Geschäftsprozesse",
     "applications": "Applikationen",
     "aiComponents": "KI-Komponenten",
     "companies": "Unternehmen",
@@ -2877,6 +2878,93 @@
       "strategicImportance": "Strategische Bedeutung",
       "descriptionContains": "Beschreibung enthält",
       "updatedDateRange": "Aktualisierungszeitraum"
+    }
+  },
+  "businessProcesses": {
+    "title": "Geschäftsprozesse",
+    "description": "Verwalten Sie Geschäftsprozesse und BPMN-Modelle",
+    "loading": "Lade Geschäftsprozesse...",
+    "addNew": "Neuen Geschäftsprozess erstellen",
+    "editTitle": "Geschäftsprozess bearbeiten",
+    "createTitle": "Geschäftsprozess erstellen",
+    "viewTitle": "Geschäftsprozess-Details",
+    "deleteConfirmation": "Möchten Sie diesen Geschäftsprozess wirklich löschen?",
+    "searchPlaceholder": "Geschäftsprozesse durchsuchen...",
+    "messages": {
+      "loadError": "Fehler beim Laden der Geschäftsprozesse",
+      "createSuccess": "Geschäftsprozess erfolgreich erstellt",
+      "createError": "Fehler beim Erstellen des Geschäftsprozesses",
+      "updateSuccess": "Geschäftsprozess erfolgreich aktualisiert",
+      "updateError": "Fehler beim Aktualisieren des Geschäftsprozesses",
+      "deleteSuccess": "Geschäftsprozess erfolgreich gelöscht",
+      "deleteError": "Fehler beim Löschen des Geschäftsprozesses",
+      "selectCompanyFirst": "Bitte zuerst ein Unternehmen auswählen"
+    },
+    "tabs": {
+      "general": "Allgemein",
+      "relationships": "Beziehungen",
+      "bpmn": "BPMN",
+      "architecture": "Architektur"
+    },
+    "form": {
+      "name": "Name",
+      "description": "Beschreibung",
+      "processType": "Prozesstyp",
+      "status": "Status",
+      "maturityLevel": "Reifegrad",
+      "category": "Kategorie",
+      "tags": "Tags",
+      "owner": "Verantwortlich",
+      "none": "Keine",
+      "parentProcess": "Übergeordneter Prozess",
+      "supportsCapabilities": "Unterstützte Capabilities",
+      "partOfArchitectures": "Teil von Architekturen",
+      "depictedInDiagrams": "Dargestellt in Diagrammen",
+      "validation": {
+        "nameMin": "Name muss mindestens 3 Zeichen enthalten",
+        "nameMax": "Name darf maximal 100 Zeichen enthalten",
+        "descriptionMax": "Beschreibung darf maximal 2000 Zeichen enthalten",
+        "categoryMax": "Kategorie darf maximal 100 Zeichen enthalten"
+      }
+    },
+    "table": {
+      "id": "ID",
+      "name": "Name",
+      "description": "Beschreibung",
+      "processType": "Prozesstyp",
+      "status": "Status",
+      "maturityLevel": "Reifegrad",
+      "category": "Kategorie",
+      "owner": "Verantwortlich",
+      "supportsCapabilities": "Capabilities",
+      "parentProcess": "Übergeordneter Prozess",
+      "tags": "Tags",
+      "createdAt": "Erstellt am",
+      "updatedAt": "Aktualisiert am",
+      "noData": "Keine Geschäftsprozesse gefunden"
+    },
+    "statuses": {
+      "ACTIVE": "Aktiv",
+      "PLANNED": "Geplant",
+      "RETIRED": "Stillgelegt"
+    },
+    "processTypes": {
+      "CORE": "Kernprozess",
+      "SUPPORT": "Unterstützungsprozess",
+      "MANAGEMENT": "Managementprozess"
+    },
+    "filter": {
+      "title": "Geschäftsprozesse filtern",
+      "status": "Status",
+      "processType": "Prozesstyp",
+      "category": "Kategorie",
+      "descriptionContains": "Beschreibung enthält",
+      "descriptionPlaceholder": "In Beschreibung suchen...",
+      "owner": "Verantwortlich",
+      "allOwners": "Alle Verantwortlichen",
+      "updatedDateRange": "Aktualisierungszeitraum",
+      "dateFrom": "Von",
+      "dateTo": "Bis"
     }
   }
 }
