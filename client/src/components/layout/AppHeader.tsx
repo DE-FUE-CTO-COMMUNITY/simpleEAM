@@ -12,6 +12,7 @@ import {
 } from '@mui/material'
 import { Menu as MenuIcon } from '@mui/icons-material'
 import { useTranslations } from 'next-intl'
+import { useRouter } from '@/i18n/navigation'
 import UserProfileMenu from './UserProfileMenu'
 import ThemeToggleButton from '../ui/ThemeToggleButton'
 import { useCompanyContext } from '@/contexts/CompanyContext'
@@ -43,6 +44,16 @@ const AppHeader: React.FC<AppHeaderProps> = ({
   } = useCompanyContext()
   const hasMultipleCompanies = (companies?.length ?? 0) > 1
   const { selectedLens, setSelectedLens, enabledLenses } = useLensSelection()
+  const router = useRouter()
+
+  const handleLensChange = (nextLens: typeof selectedLens) => {
+    if (nextLens === selectedLens) {
+      return
+    }
+
+    setSelectedLens(nextLens)
+    router.push('/')
+  }
 
   const renderCompanySelector = () => {
     if (!companies || companies.length === 0) {
@@ -129,7 +140,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
               <Select
                 size="small"
                 value={selectedLens}
-                onChange={e => setSelectedLens(e.target.value as typeof selectedLens)}
+                onChange={e => handleLensChange(e.target.value as typeof selectedLens)}
                 sx={{
                   color: 'inherit',
                   borderColor: 'rgba(255,255,255,0.7)',
