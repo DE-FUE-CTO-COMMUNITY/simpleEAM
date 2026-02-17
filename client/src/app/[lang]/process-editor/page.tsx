@@ -721,13 +721,13 @@ const ProcessEditorPage = () => {
                 {t('unsavedChanges')}
               </Typography>
             )}
-          </Stack>
 
-          {!selectedProcess && (
-            <Alert severity="info" sx={{ mt: 2 }}>
-              {t('noProcessSelected')}
-            </Alert>
-          )}
+            {!selectedProcess && (
+              <Typography variant="body2" color="info.main" sx={{ whiteSpace: 'nowrap' }}>
+                {t('noProcessSelected')}
+              </Typography>
+            )}
+          </Stack>
         </CardContent>
       </Card>
 
