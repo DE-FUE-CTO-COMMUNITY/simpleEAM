@@ -64,6 +64,7 @@ import { GET_VISIONS } from '@/graphql/vision'
 import { GET_VALUES } from '@/graphql/value'
 import { GET_GOALS } from '@/graphql/goal'
 import { GET_STRATEGIES } from '@/graphql/strategy'
+import { GET_BUSINESS_PROCESSES_COUNT } from '@/graphql/businessProcess'
 import RecentDiagramsSection from '@/components/dashboard/RecentDiagramsSection'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import { calculateGeaTotalScorePercent } from '@/components/matrix-editor/scoreUtils'
@@ -227,6 +228,15 @@ const Dashboard = () => {
     notifyOnNetworkStatusChange: true,
   })
 
+  const {
+    data: businessProcessesData,
+    loading: businessProcessesLoading,
+    error: businessProcessesError,
+  } = useQuery(GET_BUSINESS_PROCESSES_COUNT, {
+    skip: !authenticated || !initialized,
+    variables: { where: capWhere },
+  })
+
   // Error handling
   useEffect(() => {
     if (capabilitiesError) {
@@ -259,6 +269,9 @@ const Dashboard = () => {
     if (infrastructuresError) {
       enqueueSnackbar(tCommon('error'), { variant: 'error' })
     }
+    if (businessProcessesError) {
+      enqueueSnackbar(tCommon('error'), { variant: 'error' })
+    }
   }, [
     capabilitiesError,
     applicationsError,
@@ -270,6 +283,7 @@ const Dashboard = () => {
     personsError,
     principlesError,
     infrastructuresError,
+    businessProcessesError,
     enqueueSnackbar,
     tCommon,
   ])
@@ -295,6 +309,8 @@ const Dashboard = () => {
   const valuesCount = geaValuesData?.geaValues?.length || 0
   const goalsCount = geaGoalsData?.geaGoals?.length || 0
   const strategiesCount = geaStrategiesData?.geaStrategies?.length || 0
+  const businessProcessesCount =
+    businessProcessesData?.businessProcessesConnection?.aggregate?.count?.nodes || 0
   const valuePropositionsCount = 0
   const businessCasesCount = 0
 
@@ -308,7 +324,8 @@ const Dashboard = () => {
     interfacesLoading ||
     personsLoading ||
     principlesLoading ||
-    infrastructuresLoading
+    infrastructuresLoading ||
+    businessProcessesLoading
 
   const geaScoreLoading =
     isGeaEnabled &&
@@ -338,6 +355,7 @@ const Dashboard = () => {
     | 'values'
     | 'goals'
     | 'strategies'
+    | 'businessProcesses'
     | 'valuePropositions'
     | 'businessCases'
 
@@ -357,7 +375,7 @@ const Dashboard = () => {
       ...(isBmcEnabled ? (['valuePropositions', 'businessCases'] as CardKey[]) : []),
       'businessCapabilities',
     ],
-    processArchitecture: ['businessCapabilities'],
+    processArchitecture: ['businessCapabilities', 'businessProcesses'],
     dataArchitecture: ['dataObjects'],
     aiArchitecture: ['aiComponents'],
     solutionArchitecture: [
@@ -498,6 +516,12 @@ const Dashboard = () => {
       iconType: 'strategy',
       loading: geaElementsLoading,
     },
+    businessProcesses: {
+      label: tNavigation('businessProcesses'),
+      count: businessProcessesCount,
+      iconType: 'businessProcess',
+      loading: isLoading,
+    },
     valuePropositions: {
       label: tNavigation('valuePropositions'),
       count: valuePropositionsCount,
@@ -590,6 +614,8 @@ const Dashboard = () => {
         return <FunctionIcon sx={{ fontSize: 40, color: theme.palette.secondary.main }} />
       case 'applicationProcess':
         return <ProcessIcon sx={{ fontSize: 40, color: theme.palette.info.main }} />
+      case 'businessProcess':
+        return <ProcessIcon sx={{ fontSize: 40, color: theme.palette.warning.main }} />
       case 'applicationInteraction':
         return <InteractionIcon sx={{ fontSize: 40, color: theme.palette.error.main }} />
       case 'applicationEvent':

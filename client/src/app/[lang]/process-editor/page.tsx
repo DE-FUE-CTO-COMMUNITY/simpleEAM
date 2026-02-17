@@ -27,6 +27,7 @@ import { useTranslations } from 'next-intl'
 import { useSnackbar } from 'notistack'
 import { GET_BUSINESS_PROCESSES, UPDATE_BUSINESS_PROCESS } from '@/graphql/businessProcess'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
+import { useCompanyContext } from '@/contexts/CompanyContext'
 
 const DEFAULT_BPMN_XML = `<?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -66,9 +67,12 @@ const DEFAULT_BPMN_XML = `<?xml version="1.0" encoding="UTF-8"?>
   </bpmndi:BPMNDiagram>
 </bpmn:definitions>`
 
+const PROCESS_EDITOR_SELECTION_KEY = 'process-editor:selected-process-id'
+
 const ProcessEditorPage = () => {
   const t = useTranslations('processEditor')
   const { enqueueSnackbar } = useSnackbar()
+  const { selectedCompanyId, loading: companyLoading } = useCompanyContext()
   const companyWhere = useCompanyWhere('company')
 
   const { data, loading, error } = useQuery(GET_BUSINESS_PROCESSES, {
@@ -92,6 +96,12 @@ const ProcessEditorPage = () => {
   const selectedProcess = React.useMemo(
     () => processes.find((process: any) => process.id === selectedProcessId),
     [processes, selectedProcessId]
+  )
+
+  const selectionStorageKey = React.useMemo(
+    () =>
+      selectedCompanyId ? `${PROCESS_EDITOR_SELECTION_KEY}:${selectedCompanyId}` : PROCESS_EDITOR_SELECTION_KEY,
+    [selectedCompanyId]
   )
 
   const importXmlIntoCanvas = React.useCallback(
@@ -131,7 +141,9 @@ const ProcessEditorPage = () => {
         setIsModelerReady(true)
       } catch (error) {
         setIsModelerReady(false)
-        setModelerError(error instanceof Error ? error.message : 'Unknown BPMN initialization error')
+        setModelerError(
+          error instanceof Error ? error.message : 'Unknown BPMN initialization error'
+        )
       }
     }
 
@@ -152,10 +164,44 @@ const ProcessEditorPage = () => {
   }, [])
 
   React.useEffect(() => {
-    if (!loading && processes.length > 0 && !selectedProcessId) {
-      setSelectedProcessId(processes[0].id)
+    if (companyLoading || !selectedCompanyId || loading) return
+
+    if (processes.length === 0) {
+      setSelectedProcessId('')
+      return
     }
-  }, [loading, processes, selectedProcessId])
+
+    const hasCurrentSelection = processes.some((process: any) => process.id === selectedProcessId)
+    if (hasCurrentSelection) {
+      return
+    }
+
+    const savedSelectionId = window.localStorage.getItem(selectionStorageKey)
+    const hasSavedSelection =
+      !!savedSelectionId && processes.some((process: any) => process.id === savedSelectionId)
+
+    if (hasSavedSelection && savedSelectionId) {
+      setSelectedProcessId(savedSelectionId)
+      return
+    }
+
+    setSelectedProcessId(processes[0].id)
+  }, [companyLoading, selectedCompanyId, loading, processes, selectedProcessId, selectionStorageKey])
+
+  React.useEffect(() => {
+    if (companyLoading || !selectedCompanyId) return
+
+    if (!selectedProcessId) {
+      return
+    }
+
+    const hasCurrentSelection = processes.some((process: any) => process.id === selectedProcessId)
+    if (!hasCurrentSelection) {
+      return
+    }
+
+    window.localStorage.setItem(selectionStorageKey, selectedProcessId)
+  }, [companyLoading, selectedCompanyId, selectedProcessId, selectionStorageKey, processes])
 
   React.useEffect(() => {
     if (!isModelerReady) return
@@ -267,7 +313,11 @@ const ProcessEditorPage = () => {
       <Card sx={{ mb: 3 }}>
         <CardContent>
           <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems={{ md: 'center' }}>
-            <FormControl sx={{ minWidth: 300 }} size="small" disabled={loading || processes.length === 0}>
+            <FormControl
+              sx={{ minWidth: 300 }}
+              size="small"
+              disabled={loading || processes.length === 0}
+            >
               <InputLabel id="process-select-label">{t('process')}</InputLabel>
               <Select
                 labelId="process-select-label"
@@ -340,7 +390,6 @@ const ProcessEditorPage = () => {
               {t('noProcessSelected')}
             </Alert>
           )}
-
         </CardContent>
       </Card>
 
