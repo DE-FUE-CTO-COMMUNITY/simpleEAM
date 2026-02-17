@@ -127,6 +127,7 @@ export const importEntityDataWithMapping = async (
           }
           switch (entityType) {
             case 'businessCapabilities':
+            case 'businessProcesses':
             case 'applications':
             case 'dataObjects':
             case 'interfaces':
@@ -167,6 +168,7 @@ export const importEntityDataWithMapping = async (
           }
           switch (entityType) {
             case 'businessCapabilities':
+            case 'businessProcesses':
             case 'applications':
             case 'dataObjects':
             case 'interfaces':
@@ -203,6 +205,8 @@ export const importEntityDataWithMapping = async (
           // Extract created entities based on mutation response
           if (resultData.createBusinessCapabilities) {
             createdEntities = resultData.createBusinessCapabilities.businessCapabilities
+          } else if (resultData.createBusinessProcesses) {
+            createdEntities = resultData.createBusinessProcesses.businessProcesses
           } else if (resultData.createApplications) {
             createdEntities = resultData.createApplications.applications
           } else if (resultData.createDataObjects) {
@@ -569,6 +573,7 @@ export const exportEntityData = async (
       // Single Entity Export mit formatspezifischer Datenauswahl
       const entityTypeLabels: { [key: string]: string } = {
         businessCapabilities: 'Business_Capabilities',
+        businessProcesses: 'Business_Processes',
         applications: 'Applications',
         dataObjects: 'Data_Objects',
         interfaces: 'Interfaces',
@@ -672,6 +677,7 @@ export const deleteEntityData = async (
     // Lösche alle Entitätstypen (company-gefiltert)
     const entityTypes = [
       'businessCapabilities',
+      'businessProcesses',
       'applications',
       'dataObjects',
       'interfaces',
@@ -992,6 +998,12 @@ const createRelationshipUpdateInput = (
           row.supportsCapabilities
         )
       }
+      if (row.supportsBusinessProcesses) {
+        input.supportsBusinessProcesses = processRelationshipField(
+          'supportsBusinessProcesses',
+          row.supportsBusinessProcesses
+        )
+      }
       if (row.usesDataObjects) {
         input.usesDataObjects = processRelationshipField('usesDataObjects', row.usesDataObjects)
       }
@@ -999,6 +1011,40 @@ const createRelationshipUpdateInput = (
         input.partOfArchitectures = processRelationshipField(
           'partOfArchitectures',
           row.partOfArchitectures
+        )
+      }
+      break
+
+    case 'businessProcesses':
+      if (row.owners) input.owners = processRelationshipField('owners', row.owners)
+      if (row.parentProcess) {
+        input.parentProcess = processRelationshipField('parentProcess', row.parentProcess)
+      }
+      if (row.childProcesses) {
+        input.childProcesses = processRelationshipField('childProcesses', row.childProcesses)
+      }
+      if (row.supportsCapabilities) {
+        input.supportsCapabilities = processRelationshipField(
+          'supportsCapabilities',
+          row.supportsCapabilities
+        )
+      }
+      if (row.supportedByApplications) {
+        input.supportedByApplications = processRelationshipField(
+          'supportedByApplications',
+          row.supportedByApplications
+        )
+      }
+      if (row.partOfArchitectures) {
+        input.partOfArchitectures = processRelationshipField(
+          'partOfArchitectures',
+          row.partOfArchitectures
+        )
+      }
+      if (row.depictedInDiagrams) {
+        input.depictedInDiagrams = processRelationshipField(
+          'depictedInDiagrams',
+          row.depictedInDiagrams
         )
       }
       break

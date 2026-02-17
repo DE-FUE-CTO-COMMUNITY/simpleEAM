@@ -79,6 +79,12 @@ import {
   CHECK_STRATEGY_EXISTS,
   GET_STRATEGIES,
 } from '../../graphql/strategy'
+import {
+  CREATE_BUSINESS_PROCESS,
+  UPDATE_BUSINESS_PROCESS,
+  CHECK_BUSINESS_PROCESS_EXISTS,
+  GET_BUSINESS_PROCESSES_COUNT,
+} from '../../graphql/businessProcess'
 
 // GraphQL mutations for data deletion
 export const DELETE_BUSINESS_CAPABILITIES = () => `
@@ -201,6 +207,14 @@ export const DELETE_STRATEGIES = () => `
   }
 `
 
+export const DELETE_BUSINESS_PROCESSES = () => `
+  mutation DeleteBusinessProcesses($where: BusinessProcessWhere) {
+    deleteBusinessProcesses(where: $where) {
+      nodesDeleted
+    }
+  }
+`
+
 // Helper-Funktion: Gibt die passenden CREATE/UPDATE Mutations für einen Entity-Type zurück
 export const getMutationsByEntityType = (entityType: string) => {
   const mutationMap = {
@@ -208,6 +222,11 @@ export const getMutationsByEntityType = (entityType: string) => {
       create: CREATE_CAPABILITY,
       update: UPDATE_CAPABILITY,
       check: CHECK_CAPABILITY_EXISTS,
+    },
+    businessProcesses: {
+      create: CREATE_BUSINESS_PROCESS,
+      update: UPDATE_BUSINESS_PROCESS,
+      check: CHECK_BUSINESS_PROCESS_EXISTS,
     },
     applications: {
       create: CREATE_APPLICATION,
@@ -288,6 +307,7 @@ export const getMutationsByEntityType = (entityType: string) => {
 export const getDeleteMutationByEntityType = (entityType: string) => {
   const deleteMutationMap = {
     businessCapabilities: DELETE_BUSINESS_CAPABILITIES(),
+    businessProcesses: DELETE_BUSINESS_PROCESSES(),
     applications: DELETE_APPLICATIONS(),
     dataObjects: DELETE_DATA_OBJECTS(),
     interfaces: DELETE_INTERFACES(),
@@ -313,6 +333,10 @@ export {
   UPDATE_CAPABILITY,
   CHECK_CAPABILITY_EXISTS,
   GET_CAPABILITIES_COUNT,
+  CREATE_BUSINESS_PROCESS,
+  UPDATE_BUSINESS_PROCESS,
+  CHECK_BUSINESS_PROCESS_EXISTS,
+  GET_BUSINESS_PROCESSES_COUNT,
   CREATE_APPLICATION,
   UPDATE_APPLICATION,
   CHECK_APPLICATION_EXISTS,

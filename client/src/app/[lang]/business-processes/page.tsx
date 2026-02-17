@@ -126,6 +126,7 @@ const BusinessProcessesPage = () => {
       ownerId,
       parentProcessId,
       supportsCapabilityIds,
+      supportedByApplicationIds,
       name,
       description,
       processType,
@@ -163,6 +164,15 @@ const BusinessProcessesPage = () => {
         ? {
             supportsCapabilities: {
               connect: supportsCapabilityIds.map(id => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }
+        : {}),
+      ...(supportedByApplicationIds && supportedByApplicationIds.length > 0
+        ? {
+            supportedByApplications: {
+              connect: supportedByApplicationIds.map(id => ({
                 where: { node: { id: { eq: id } } },
               })),
             },
@@ -215,6 +225,7 @@ const BusinessProcessesPage = () => {
       ownerId,
       parentProcessId,
       supportsCapabilityIds,
+      supportedByApplicationIds,
       name,
       description,
       processType,
@@ -261,6 +272,18 @@ const BusinessProcessesPage = () => {
             ? {
                 connect: supportsCapabilityIds.map(capabilityId => ({
                   where: { node: { id: { eq: capabilityId } } },
+                })),
+              }
+            : {}),
+        },
+      ],
+      supportedByApplications: [
+        {
+          disconnect: [{ where: {} }],
+          ...(supportedByApplicationIds && supportedByApplicationIds.length > 0
+            ? {
+                connect: supportedByApplicationIds.map(applicationId => ({
+                  where: { node: { id: { eq: applicationId } } },
                 })),
               }
             : {}),

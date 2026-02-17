@@ -14,6 +14,7 @@ export const businessProcessSchema = z.object({
   ownerId: z.string().optional(),
   parentProcessId: z.string().optional(),
   supportsCapabilityIds: z.array(z.string()).optional(),
+  supportedByApplicationIds: z.array(z.string()).optional(),
   partOfArchitectures: z.array(z.string()).optional(),
   depictedInDiagrams: z.array(z.string()).optional(),
 })
@@ -35,6 +36,7 @@ export type BusinessProcessType = Pick<
   | 'parentProcess'
   | 'childProcesses'
   | 'supportsCapabilities'
+  | 'supportedByApplications'
   | 'partOfArchitectures'
   | 'depictedInDiagrams'
   | 'createdAt'

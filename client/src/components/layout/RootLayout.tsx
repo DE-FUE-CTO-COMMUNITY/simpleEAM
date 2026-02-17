@@ -222,7 +222,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
       ...(isBmcEnabled ? (bmcItems.map(item => item.key) as string[]) : []),
       'businessCapabilities',
     ],
-    processArchitecture: ['businessCapabilities', 'businessProcesses'],
+    processArchitecture: ['businessCapabilities', 'businessProcesses', 'applications'],
     dataArchitecture: ['dataObjects'],
     aiArchitecture: ['aiComponents'],
     solutionArchitecture: [

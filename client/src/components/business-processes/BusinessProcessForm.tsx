@@ -5,14 +5,16 @@ import { useForm } from '@tanstack/react-form'
 import { useQuery } from '@apollo/client'
 import { useTranslations } from 'next-intl'
 import { z } from 'zod'
-import { ProcessStatus, ProcessType } from '@/gql/generated'
+import { Application, ProcessStatus, ProcessType } from '@/gql/generated'
 import { GET_PERSONS } from '@/graphql/person'
+import { GET_APPLICATIONS } from '@/graphql/application'
 import { GET_CAPABILITIES } from '@/graphql/capability'
 import { GET_BUSINESS_PROCESSES } from '@/graphql/businessProcess'
 import { GET_ARCHITECTURES } from '@/graphql/architecture'
 import { GET_DIAGRAMS } from '@/graphql/diagram'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import { useCurrentPerson } from '@/hooks/useCurrentPerson'
+import { isArchitect } from '@/lib/auth'
 import GenericForm, { FieldConfig, SelectOption, TabConfig } from '../common/GenericForm'
 import { GenericFormProps } from '../common/GenericFormProps'
 import { BusinessProcessFormValues, BusinessProcessType } from './types'
@@ -29,6 +31,7 @@ const createBusinessProcessSchema = (t: any) =>
     ownerId: z.string().optional(),
     parentProcessId: z.string().optional(),
     supportsCapabilityIds: z.array(z.string()).optional(),
+    supportedByApplicationIds: z.array(z.string()).optional(),
     partOfArchitectures: z.array(z.string()).optional(),
     depictedInDiagrams: z.array(z.string()).optional(),
   })
@@ -61,6 +64,10 @@ const BusinessProcessForm: React.FC<BusinessProcessFormProps> = ({
   })
 
   const { data: capabilitiesData, loading: capabilitiesLoading } = useQuery(GET_CAPABILITIES, {
+    variables: { where: companyWhere },
+  })
+
+  const { data: applicationsData, loading: applicationsLoading } = useQuery(GET_APPLICATIONS, {
     variables: { where: companyWhere },
   })
 
@@ -100,6 +107,8 @@ const BusinessProcessForm: React.FC<BusinessProcessFormProps> = ({
           : '',
       supportsCapabilityIds:
         businessProcess?.supportsCapabilities?.map(capability => capability.id) || [],
+      supportedByApplicationIds:
+        businessProcess?.supportedByApplications?.map(applicationItem => applicationItem.id) || [],
       partOfArchitectures:
         businessProcess?.partOfArchitectures?.map(architecture => architecture.id) || [],
       depictedInDiagrams: businessProcess?.depictedInDiagrams?.map(diagram => diagram.id) || [],
@@ -256,6 +265,34 @@ const BusinessProcessForm: React.FC<BusinessProcessFormProps> = ({
       },
     },
     {
+      name: 'supportedByApplicationIds',
+      label: t('supportedByApplications'),
+      type: 'autocomplete',
+      multiple: true,
+      options:
+        applicationsData?.applications?.map((applicationItem: Application) => ({
+          value: applicationItem.id,
+          label: applicationItem.name,
+        })) || [],
+      loadingOptions: applicationsLoading,
+      tabId: 'relationships',
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          const matching = applicationsData?.applications?.find(
+            (applicationItem: Application) => applicationItem.id === option
+          )
+          return matching?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
+    },
+    {
       name: 'partOfArchitectures',
       label: t('partOfArchitectures'),
       type: 'autocomplete',
@@ -323,6 +360,7 @@ const BusinessProcessForm: React.FC<BusinessProcessFormProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={() => form.handleSubmit()}
+      enableDelete={mode === 'edit' && !!businessProcess && isArchitect()}
       onDelete={businessProcess?.id && onDelete ? () => onDelete(businessProcess.id) : undefined}
       mode={mode}
       isLoading={loading}

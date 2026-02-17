@@ -3,6 +3,7 @@ import { EntityType, ImportSettings, ExportSettings, DeleteSettings } from './ty
 // Entity Type Labels für die UI - werden durch i18n ersetzt
 export const entityTypeLabels: Record<EntityType, string> = {
   businessCapabilities: 'Business Capabilities',
+  businessProcesses: 'Business Processes',
   applications: 'Anwendungen',
   dataObjects: 'Datenobjekte',
   interfaces: 'Schnittstellen',
@@ -23,6 +24,7 @@ export const entityTypeLabels: Record<EntityType, string> = {
 // Entity Type Mapping für Tab-Namen (Import/Export)
 export const entityTypeMapping: Record<string, string> = {
   'Business Capabilities': 'businessCapabilities',
+  'Business Processes': 'businessProcesses',
   Applications: 'applications',
   'Data Objects': 'dataObjects',
   Interfaces: 'interfaces',
@@ -43,6 +45,7 @@ export const entityTypeMapping: Record<string, string> = {
 // Umkehrung für Export-Tab-Namen
 export const reverseEntityTypeMapping: Record<string, string> = {
   businessCapabilities: 'Business Capabilities',
+  businessProcesses: 'Business Processes',
   applications: 'Applications',
   dataObjects: 'Data Objects',
   interfaces: 'Interfaces',
@@ -62,6 +65,7 @@ export const reverseEntityTypeMapping: Record<string, string> = {
 // Reihenfolge der Entity Types wie im Hauptmenü
 const coreEntityTypeOrder: EntityType[] = [
   'businessCapabilities',
+  'businessProcesses',
   'applications',
   'aicomponents',
   'dataObjects',

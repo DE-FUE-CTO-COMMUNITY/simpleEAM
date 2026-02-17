@@ -137,6 +137,47 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
                       'relatedDataObjects',
                       'depictedInDiagrams',
                     ],
+                    businessProcesses:
+                      exportSettings.format === 'json'
+                        ? [
+                            'id',
+                            'name',
+                            'description',
+                            'processType',
+                            'status',
+                            'maturityLevel',
+                            'category',
+                            'tags',
+                            'bpmnXml',
+                            'owners',
+                            'parentProcess',
+                            'childProcesses',
+                            'supportsCapabilities',
+                            'supportedByApplications',
+                            'partOfArchitectures',
+                            'depictedInDiagrams',
+                            'createdAt',
+                            'updatedAt',
+                          ]
+                        : [
+                            'id',
+                            'name',
+                            'description',
+                            'processType',
+                            'status',
+                            'maturityLevel',
+                            'category',
+                            'tags',
+                            'owners',
+                            'parentProcess',
+                            'childProcesses',
+                            'supportsCapabilities',
+                            'supportedByApplications',
+                            'partOfArchitectures',
+                            'depictedInDiagrams',
+                            'createdAt',
+                            'updatedAt',
+                          ],
                     applications: [
                       'id',
                       'name',
@@ -158,6 +199,7 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
                       'createdAt',
                       'updatedAt',
                       'supportsCapabilities',
+                      'supportsBusinessProcesses',
                       'usesDataObjects',
                       'sourceOfInterfaces',
                       'targetOfInterfaces',
@@ -431,11 +473,18 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
                           {t('allEntitiesInfo')}
                         </Typography>
                         {exportSettings.format !== 'json' && (
-                          <Alert severity="info" sx={{ mb: 2 }}>
-                            <Typography variant="body2">
-                              <strong>{t('diagramExportWarning')}</strong>
-                            </Typography>
-                          </Alert>
+                          <>
+                            <Alert severity="info" sx={{ mb: 2 }}>
+                              <Typography variant="body2">
+                                <strong>{t('diagramExportWarning')}</strong>
+                              </Typography>
+                            </Alert>
+                            <Alert severity="info" sx={{ mb: 2 }}>
+                              <Typography variant="body2">
+                                <strong>{t('businessProcessExportWarning')}</strong>
+                              </Typography>
+                            </Alert>
+                          </>
                         )}
                         {Object.entries(entityFieldsMapping)
                           .filter(([key]) => key !== 'all')
@@ -453,6 +502,17 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
                                     (ohne diagramJson)
                                   </Typography>
                                 )}
+                                {entityType === 'businessProcesses' &&
+                                  exportSettings.format !== 'json' && (
+                                    <Typography
+                                      component="span"
+                                      variant="body2"
+                                      color="textSecondary"
+                                      sx={{ ml: 1 }}
+                                    >
+                                      (ohne bpmnXml)
+                                    </Typography>
+                                  )}
                               </Typography>
                               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 1 }}>
                                 {entityFields.map((field, index) => (
@@ -489,6 +549,40 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
                         <Alert severity="info" sx={{ mb: 2 }}>
                           <Typography variant="body2">
                             <strong>{t('singleDiagramExportWarning')}</strong>
+                          </Typography>
+                        </Alert>
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 2 }}>
+                          {fields.map((field, index) => (
+                            <Typography
+                              key={index}
+                              variant="body2"
+                              component="span"
+                              sx={{
+                                backgroundColor: 'primary.main',
+                                color: 'primary.contrastText',
+                                px: 1,
+                                py: 0.5,
+                                borderRadius: 1,
+                                fontSize: '0.75rem',
+                              }}
+                            >
+                              {field}
+                            </Typography>
+                          ))}
+                        </Box>
+                      </Box>
+                    )
+                  }
+
+                  if (
+                    exportSettings.entityType === 'businessProcesses' &&
+                    exportSettings.format !== 'json'
+                  ) {
+                    return (
+                      <Box sx={{ width: '100%' }}>
+                        <Alert severity="info" sx={{ mb: 2 }}>
+                          <Typography variant="body2">
+                            <strong>{t('singleBusinessProcessExportWarning')}</strong>
                           </Typography>
                         </Alert>
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 2 }}>

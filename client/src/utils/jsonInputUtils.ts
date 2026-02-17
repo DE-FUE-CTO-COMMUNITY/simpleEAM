@@ -130,6 +130,28 @@ export const createEntityInputFromJson = (entityType: string, row: any): any => 
         timeCategory: row.timeCategory || undefined,
       }
 
+    case 'businessProcesses':
+      return {
+        ...baseInput,
+        processType: ['CORE', 'SUPPORT', 'MANAGEMENT'].includes(row.processType)
+          ? row.processType
+          : 'CORE',
+        status: ['ACTIVE', 'PLANNED', 'RETIRED'].includes(row.status) ? row.status : 'ACTIVE',
+        maturityLevel:
+          typeof row.maturityLevel === 'number'
+            ? row.maturityLevel
+            : row.maturityLevel
+              ? parseInt(row.maturityLevel, 10)
+              : undefined,
+        category: row.category || '',
+        tags: Array.isArray(row.tags)
+          ? row.tags
+          : typeof row.tags === 'string' && row.tags.trim()
+            ? row.tags.split(',').map((t: string) => t.trim())
+            : undefined,
+        bpmnXml: row.bpmnXml || '',
+      }
+
     case 'dataObjects':
       return {
         ...baseInput,
@@ -414,6 +436,7 @@ export const generateFallbackNameForJson = (
   // Fallback based on other properties
   const fallbacks: { [key: string]: string[] } = {
     businessCapabilities: ['level', 'description'],
+    businessProcesses: ['processType', 'category', 'description'],
     applications: ['type', 'technology', 'version'],
     dataObjects: ['type', 'format', 'description'],
     interfaces: ['type', 'protocol', 'description'],
@@ -587,6 +610,7 @@ export const validateJsonEntityStructure = (
 
   const requiredFields: { [key: string]: string[] } = {
     businessCapabilities: ['id', 'name'],
+    businessProcesses: ['id', 'name'],
     applications: ['id', 'name'],
     dataObjects: ['id', 'name'],
     interfaces: ['id', 'name'],

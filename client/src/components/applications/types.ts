@@ -62,6 +62,7 @@ export type ApplicationType = Pick<
   | 'createdAt'
   | 'updatedAt'
   | 'supportsCapabilities'
+  | 'supportsBusinessProcesses'
   | 'usesDataObjects'
   | 'sourceOfInterfaces'
   | 'targetOfInterfaces'

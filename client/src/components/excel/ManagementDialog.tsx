@@ -57,6 +57,8 @@ const ManagementDialog: React.FC<ManagementDialogProps> = ({
     switch (entityType) {
       case 'businessCapabilities':
         return tEntityTypes('businessCapabilities')
+      case 'businessProcesses':
+        return tEntityTypes('businessProcesses')
       case 'applications':
         return tEntityTypes('applications')
       case 'dataObjects':

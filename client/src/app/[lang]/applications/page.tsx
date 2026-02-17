@@ -34,11 +34,14 @@ import { useApplicationFilter } from '@/components/applications/useApplicationFi
 import { ApplicationType, FilterState } from '@/components/applications/types'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import { useCompanyContext } from '@/contexts/CompanyContext'
+import { useLensSettings } from '@/lib/lens-settings'
 
 const ApplicationsPage = () => {
   const t = useTranslations('applications')
   const { enqueueSnackbar } = useSnackbar()
   const { selectedCompanyId } = useCompanyContext()
+  const { lensFlags } = useLensSettings()
+  const showBusinessProcessRelationship = lensFlags.processArchitecture
   const [globalFilter, setGlobalFilter] = useState<string>('')
   const [sorting, setSorting] = useState([{ id: 'name', desc: false }])
 
@@ -63,6 +66,7 @@ const ApplicationsPage = () => {
       version: true,
       owners: true,
       supportsCapabilities: true,
+      supportsBusinessProcesses: false,
       usesDataObjects: true,
       costs: true,
       hostedOn: false, // Hidden column by default
@@ -236,6 +240,7 @@ const ApplicationsPage = () => {
     const {
       ownerId,
       supportsCapabilityIds,
+      supportsBusinessProcessIds,
       usesDataObjectIds,
       sourceOfInterfaceIds,
       targetOfInterfaceIds,
@@ -280,6 +285,17 @@ const ApplicationsPage = () => {
         ? {
             supportsCapabilities: {
               connect: supportsCapabilityIds.map(id => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }
+        : {}),
+      ...(showBusinessProcessRelationship &&
+      supportsBusinessProcessIds &&
+      supportsBusinessProcessIds.length > 0
+        ? {
+            supportsBusinessProcesses: {
+              connect: supportsBusinessProcessIds.map(id => ({
                 where: { node: { id: { eq: id } } },
               })),
             },
@@ -433,6 +449,7 @@ const ApplicationsPage = () => {
     const {
       ownerId,
       supportsCapabilityIds,
+      supportsBusinessProcessIds,
       usesDataObjectIds,
       sourceOfInterfaceIds,
       targetOfInterfaceIds,
@@ -507,6 +524,25 @@ const ApplicationsPage = () => {
       // If no Capabilities were selected, remove all connections
       input.supportsCapabilities = {
         disconnect: [{ where: {} }], // Disconnect all existing connections
+      }
+    }
+
+    if (showBusinessProcessRelationship) {
+      if (supportsBusinessProcessIds && supportsBusinessProcessIds.length > 0) {
+        input.supportsBusinessProcesses = {
+          disconnect: [{ where: {} }],
+          connect: supportsBusinessProcessIds.map(processId => ({
+            where: {
+              node: {
+                id: { eq: processId },
+              },
+            },
+          })),
+        }
+      } else {
+        input.supportsBusinessProcesses = {
+          disconnect: [{ where: {} }],
+        }
       }
     }
 
@@ -808,6 +844,7 @@ const ApplicationsPage = () => {
             onDeleteApplication={handleDeleteApplication}
             availableTechStack={availableTechStack}
             availableApplications={applications as unknown as Application[]} // Added
+            showBusinessProcessRelationship={showBusinessProcessRelationship}
             onTableReady={handleTableReady}
             columnVisibility={columnVisibility}
             onColumnVisibilityChange={handleColumnVisibilityChange}
@@ -844,6 +881,7 @@ const ApplicationsPage = () => {
           mode="create"
           availableApplications={applications as unknown as Application[]}
           availableTechStack={availableTechStack}
+          showBusinessProcessRelationship={showBusinessProcessRelationship}
           application={
             {
               id: '',
@@ -862,6 +900,7 @@ const ApplicationsPage = () => {
               createdAt: new Date(0).toISOString(), // Fixed timestamp to avoid hydration mismatch
               updatedAt: null,
               supportsCapabilities: [],
+              supportsBusinessProcesses: [],
               usesDataObjects: [],
               interfacesToApplications: [],
               partOfArchitectures: [],

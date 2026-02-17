@@ -18,6 +18,7 @@ export const BUSINESS_PROCESS_DEFAULT_COLUMN_VISIBILITY = {
   category: true,
   owners: true,
   supportsCapabilities: true,
+  supportedByApplications: true,
   parentProcess: true,
   tags: false,
   createdAt: false,
@@ -128,6 +129,18 @@ const BusinessProcessTable: React.FC<BusinessProcessTableProps> = ({
             : '-'
         },
       }),
+      columnHelper.accessor('supportedByApplications', {
+        header: t('supportedByApplications'),
+        cell: info => {
+          const applications = info.getValue()
+          return applications && applications.length > 0
+            ? applications
+                .slice(0, 3)
+                .map(applicationItem => applicationItem.name)
+                .join(', ') + (applications.length > 3 ? '...' : '')
+            : '-'
+        },
+      }),
       columnHelper.accessor('parentProcess', {
         header: t('parentProcess'),
         cell: info => {
@@ -171,6 +184,8 @@ const BusinessProcessTable: React.FC<BusinessProcessTableProps> = ({
     parentProcessId: businessProcess.parentProcess?.[0]?.id || '',
     supportsCapabilityIds:
       businessProcess.supportsCapabilities?.map(capability => capability.id) || [],
+    supportedByApplicationIds:
+      businessProcess.supportedByApplications?.map(applicationItem => applicationItem.id) || [],
     partOfArchitectures:
       businessProcess.partOfArchitectures?.map(architecture => architecture.id) || [],
     depictedInDiagrams: businessProcess.depictedInDiagrams?.map(diagram => diagram.id) || [],

@@ -17,6 +17,7 @@ import {
   CriticalityLevel,
   Person,
   BusinessCapability,
+  BusinessProcess,
   DataObject,
   ApplicationInterface,
   Architecture,
@@ -28,6 +29,7 @@ import {
 } from '../../gql/generated'
 import { GET_PERSONS } from '@/graphql/person'
 import { GET_CAPABILITIES } from '@/graphql/capability'
+import { GET_BUSINESS_PROCESSES } from '@/graphql/businessProcess'
 import { GET_DATA_OBJECTS } from '@/graphql/dataObject'
 import { GET_APPLICATION_INTERFACES } from '@/graphql/applicationInterface'
 import { GET_ARCHITECTURES } from '@/graphql/architecture'
@@ -74,6 +76,7 @@ const createBaseApplicationSchema = (t: any) =>
     endOfUseDate: z.date().optional().nullable(),
     ownerId: z.string().optional(),
     supportsCapabilityIds: z.array(z.string()).optional(),
+    supportsBusinessProcessIds: z.array(z.string()).optional(),
     usesDataObjectIds: z.array(z.string()).optional(),
     sourceOfInterfaceIds: z.array(z.string()).optional(),
     targetOfInterfaceIds: z.array(z.string()).optional(),
@@ -222,6 +225,7 @@ import { GenericFormProps } from '../common/GenericFormProps'
 export interface ApplicationFormProps extends GenericFormProps<Application, ApplicationFormValues> {
   availableApplications?: Application[]
   availableTechStack?: string[]
+  showBusinessProcessRelationship?: boolean
 }
 
 const getCriticalityLabel = (criticality: CriticalityLevel, t?: any): string => {
@@ -312,6 +316,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
   loading = false,
   onEditMode,
   isNested,
+  showBusinessProcessRelationship = false,
   ..._restProps
 }) => {
   const t = useTranslations('applications.form')
@@ -370,6 +375,13 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
   const { data: capabilitiesData, loading: capabilitiesLoading } = useQuery(GET_CAPABILITIES, {
     variables: { where: companyWhere },
   })
+  const { data: businessProcessesData, loading: businessProcessesLoading } = useQuery(
+    GET_BUSINESS_PROCESSES,
+    {
+      variables: { where: companyWhere },
+      skip: !showBusinessProcessRelationship,
+    }
+  )
   const { data: dataObjectsData, loading: dataObjectsLoading } = useQuery(GET_DATA_OBJECTS, {
     variables: { where: companyWhere },
   })
@@ -468,6 +480,10 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
             id
             name
           }
+          supportsBusinessProcesses {
+            id
+            name
+          }
           usesDataObjects {
             id
             name
@@ -557,6 +573,8 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
         ? application.owners[0].id
         : currentPerson?.id,
     supportsCapabilityIds: application?.supportsCapabilities?.map((cap: any) => cap.id) ?? [],
+    supportsBusinessProcessIds:
+      application?.supportsBusinessProcesses?.map((process: any) => process.id) ?? [],
     usesDataObjectIds: application?.usesDataObjects?.map((obj: any) => obj.id) ?? [],
     sourceOfInterfaceIds: application?.sourceOfInterfaces?.map((iface: any) => iface.id) ?? [],
     targetOfInterfaceIds: application?.targetOfInterfaces?.map((iface: any) => iface.id) ?? [],
@@ -647,6 +665,8 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
             ? application.owners[0].id
             : currentPerson?.id,
         supportsCapabilityIds: application?.supportsCapabilities?.map((cap: any) => cap.id) ?? [],
+        supportsBusinessProcessIds:
+          application?.supportsBusinessProcesses?.map((process: any) => process.id) ?? [],
         usesDataObjectIds: application?.usesDataObjects?.map((obj: any) => obj.id) ?? [],
         sourceOfInterfaceIds: application?.sourceOfInterfaces?.map((iface: any) => iface.id) ?? [],
         targetOfInterfaceIds: application?.targetOfInterfaces?.map((iface: any) => iface.id) ?? [],
@@ -1042,6 +1062,40 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
       },
       onChipClick: createChipClickHandler('supportsCapabilityIds'),
     },
+    ...(showBusinessProcessRelationship
+      ? [
+          {
+            name: 'supportsBusinessProcessIds',
+            label: t('businessProcesses'),
+            type: 'autocomplete' as const,
+            tabId: 'relationships',
+            multiple: true,
+            options: (businessProcessesData?.businessProcesses || []).map(
+              (process: BusinessProcess) => ({
+                value: process.id,
+                label: process.name,
+              })
+            ),
+            loadingOptions: businessProcessesLoading,
+            size: 12,
+            getOptionLabel: (option: any) => {
+              if (typeof option === 'string') {
+                const matchingProcess = businessProcessesData?.businessProcesses?.find(
+                  (process: BusinessProcess) => process.id === option
+                )
+                return matchingProcess?.name || option
+              }
+              return option?.label || ''
+            },
+            isOptionEqualToValue: (option: any, value: any) => {
+              if (typeof value === 'string') {
+                return option.value === value
+              }
+              return option.value === value?.value || option.value === value
+            },
+          },
+        ]
+      : []),
     {
       name: 'usesDataObjectIds',
       label: t('dataObjects'),
@@ -1540,6 +1594,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
             data={nestedApplicationData.applications[0]}
             availableApplications={availableApplications}
             availableTechStack={availableTechStack}
+            showBusinessProcessRelationship={showBusinessProcessRelationship}
             isOpen={true}
             mode={nestedFormState.mode}
             isNested={true}

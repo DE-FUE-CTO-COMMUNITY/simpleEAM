@@ -30,6 +30,7 @@ export const APPLICATION_DEFAULT_COLUMN_VISIBILITY = {
   timeCategory: false,
   sevenRStrategy: false,
   supportsCapabilities: false,
+  supportsBusinessProcesses: false,
   usesDataObjects: false,
   hostingEnvironment: false,
   technologyStack: false,
@@ -64,6 +65,7 @@ interface ApplicationTableProps {
   onDeleteApplication?: (id: string) => Promise<void>
   availableTechStack?: string[]
   availableApplications?: Application[] // Added for dropdowns
+  showBusinessProcessRelationship?: boolean
   onTableReady?: (table: any) => void
   // These props are now optional as persistence is handled internally
   columnVisibility?: VisibilityState
@@ -83,6 +85,7 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
   onDeleteApplication,
   availableTechStack = [],
   availableApplications = [], // Added
+  showBusinessProcessRelationship = false,
   onTableReady,
   // columnVisibility: _externalColumnVisibility,
   // onColumnVisibilityChange: _externalOnColumnVisibilityChange,
@@ -188,6 +191,22 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
             : '-'
         },
       }),
+      ...(showBusinessProcessRelationship
+        ? [
+            columnHelper.accessor('supportsBusinessProcesses', {
+              header: t('businessProcesses'),
+              cell: info => {
+                const processes = info.getValue()
+                return processes && processes.length > 0
+                  ? processes
+                      .slice(0, 3)
+                      .map(process => process.name)
+                      .join(', ') + (processes.length > 3 ? '...' : '')
+                  : '-'
+              },
+            }),
+          ]
+        : []),
       columnHelper.accessor('usesDataObjects', {
         header: t('dataObjects'),
         cell: info => {
@@ -388,7 +407,16 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
         enableHiding: true,
       }),
     ],
-    [columnHelper, t, tStatus, tTimeCategory, tSevenR, locale, isSupEnabled]
+    [
+      columnHelper,
+      t,
+      tStatus,
+      tTimeCategory,
+      tSevenR,
+      locale,
+      isSupEnabled,
+      showBusinessProcessRelationship,
+    ]
   )
 
   // Mapping from ApplicationType to expected FormValues for form
@@ -403,6 +431,7 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
       vendor: app.vendor ?? '',
       costs: app.costs ?? 0,
       technologyStack: app.technologyStack ?? [],
+      supportsBusinessProcessIds: app.supportsBusinessProcesses?.map(process => process.id) ?? [],
       usesDataObjectIds: app.usesDataObjects?.map(obj => obj.id) ?? [],
       sourceOfInterfaceIds: app.sourceOfInterfaces?.map(iface => iface.id) ?? [],
       targetOfInterfaceIds: app.targetOfInterfaces?.map(iface => iface.id) ?? [],
@@ -449,6 +478,7 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
       additionalProps={{
         availableTechStack,
         availableApplications, // Added
+        showBusinessProcessRelationship,
       }}
       onTableReady={handleTableReady}
     />

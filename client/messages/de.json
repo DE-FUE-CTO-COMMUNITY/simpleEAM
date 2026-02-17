@@ -937,6 +937,7 @@
       "components": "Komponenten",
       "tags": "Tags",
       "businessCapabilities": "Business Capabilities",
+      "businessProcesses": "Geschäftsprozesse",
       "dataObjects": "Datenobjekte",
       "sourceOfInterfaces": "Quelle von Schnittstellen",
       "targetOfInterfaces": "Ziel von Schnittstellen",
@@ -1006,6 +1007,7 @@
       "parentApplication": "Übergeordnete Applikation",
       "components": "Komponenten",
       "businessCapabilities": "Business Capabilities",
+      "businessProcesses": "Geschäftsprozesse",
       "dataObjects": "Datenobjekte",
       "sourceOfInterfaces": "Quelle von Schnittstellen",
       "targetOfInterfaces": "Ziel von Schnittstellen",
@@ -2176,6 +2178,8 @@
       "allEntitiesInfo": "Export umfasst alle Entitätstypen mit ihren jeweiligen Feldern:",
       "diagramExportWarning": "Hinweis für Excel/CSV-Export: Diagramme werden ohne ihre Inhalte (diagramJson) exportiert, da diese zu groß für Excel-Zellen sind. Alle anderen Metadaten der Diagramme sind verfügbar.",
       "singleDiagramExportWarning": "Hinweis für Excel/CSV-Export: Das Feld \"diagramJson\" wird nicht exportiert, da die Diagramminhalte zu groß für Excel-Zellen sind. Alle anderen Metadaten sind verfügbar.",
+      "businessProcessExportWarning": "Hinweis für Excel/CSV-Export: Geschäftsprozesse werden ohne BPMN-XML-Inhalt (bpmnXml) exportiert. Alle anderen Metadaten sind verfügbar.",
+      "singleBusinessProcessExportWarning": "Hinweis für Excel/CSV-Export: Das Feld \"bpmnXml\" wird nicht exportiert. Für JSON-Export/-Import ist BPMN XML enthalten.",
       "startExport": "Export starten",
       "exporting": "Exportiere...",
       "messages": {
@@ -2220,6 +2224,7 @@
     },
     "entityTypes": {
       "businessCapabilities": "Business Capabilities",
+      "businessProcesses": "Geschäftsprozesse",
       "applications": "Applikationen",
       "dataObjects": "Datenobjekte",
       "interfaces": "Schnittstellen",
@@ -2939,6 +2944,7 @@
       "none": "Keine",
       "parentProcess": "Übergeordneter Prozess",
       "supportsCapabilities": "Unterstützte Capabilities",
+      "supportedByApplications": "Unterstützende Applikationen",
       "partOfArchitectures": "Teil von Architekturen",
       "depictedInDiagrams": "Dargestellt in Diagrammen",
       "validation": {
@@ -2958,6 +2964,7 @@
       "category": "Kategorie",
       "owner": "Verantwortlich",
       "supportsCapabilities": "Capabilities",
+      "supportedByApplications": "Applikationen",
       "parentProcess": "Übergeordneter Prozess",
       "tags": "Tags",
       "createdAt": "Erstellt am",

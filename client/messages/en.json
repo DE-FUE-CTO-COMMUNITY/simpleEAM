@@ -933,6 +933,7 @@
       "components": "Components",
       "tags": "Tags",
       "businessCapabilities": "Business Capabilities",
+      "businessProcesses": "Business Processes",
       "dataObjects": "Data Objects",
       "sourceOfInterfaces": "Source of Interfaces",
       "targetOfInterfaces": "Target of Interfaces",
@@ -1002,6 +1003,7 @@
       "parentApplication": "Parent Application",
       "components": "Components",
       "businessCapabilities": "Business Capabilities",
+      "businessProcesses": "Business Processes",
       "dataObjects": "Data Objects",
       "sourceOfInterfaces": "Source of Interfaces",
       "targetOfInterfaces": "Target of Interfaces",
@@ -2229,6 +2231,8 @@
       "allEntitiesInfo": "Export includes all entity types with their respective fields:",
       "diagramExportWarning": "Note for Excel/CSV export: Diagrams are exported without their content (diagramJson) as it's too large for Excel cells. All other diagram metadata is available.",
       "singleDiagramExportWarning": "Note for Excel/CSV export: The \"diagramJson\" field is not exported as diagram content is too large for Excel cells. All other metadata is available.",
+      "businessProcessExportWarning": "Note for Excel/CSV export: Business Processes are exported without BPMN XML content (bpmnXml). All other business process metadata is available.",
+      "singleBusinessProcessExportWarning": "Note for Excel/CSV export: The \"bpmnXml\" field is not exported. For JSON export/import, BPMN XML is included.",
       "startExport": "Start Export",
       "exporting": "Exporting...",
       "messages": {
@@ -2273,6 +2277,7 @@
     },
     "entityTypes": {
       "businessCapabilities": "Business Capabilities",
+      "businessProcesses": "Business Processes",
       "applications": "Applications",
       "dataObjects": "Data Objects",
       "interfaces": "Interfaces",
@@ -2984,6 +2989,7 @@
       "none": "None",
       "parentProcess": "Parent Process",
       "supportsCapabilities": "Supports Capabilities",
+      "supportedByApplications": "Supported by Applications",
       "partOfArchitectures": "Part of Architectures",
       "depictedInDiagrams": "Depicted in Diagrams",
       "validation": {
@@ -3003,6 +3009,7 @@
       "category": "Category",
       "owner": "Owner",
       "supportsCapabilities": "Capabilities",
+      "supportedByApplications": "Applications",
       "parentProcess": "Parent Process",
       "tags": "Tags",
       "createdAt": "Created At",

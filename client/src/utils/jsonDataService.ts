@@ -14,6 +14,7 @@ import { GET_MISSIONS } from '../graphql/mission'
 import { GET_VALUES } from '../graphql/value'
 import { GET_GOALS } from '../graphql/goal'
 import { GET_STRATEGIES } from '../graphql/strategy'
+import { GET_BUSINESS_PROCESSES } from '../graphql/businessProcess'
 import { ValidationResult } from '../components/excel/types'
 import { getRequiredFieldsByEntityType, getOptionalFieldsByEntityType } from './excelDataService'
 
@@ -26,6 +27,7 @@ export interface JsonExportData {
 
 export type JsonEntityType =
   | 'businessCapabilities'
+  | 'businessProcesses'
   | 'applications'
   | 'dataObjects'
   | 'interfaces'
@@ -155,6 +157,42 @@ export const fetchBusinessCapabilitiesForJson = async (
   }
 }
 
+export const fetchBusinessProcessesForJson = async (
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
+): Promise<JsonExportData[]> => {
+  try {
+    const { data } = await client.query({
+      query: GET_BUSINESS_PROCESSES,
+      variables: { where: companyWhere('businessProcesses', selectedCompanyId) },
+      fetchPolicy: 'cache-first',
+    })
+
+    return data.businessProcesses?.map((process: any) => ({
+      id: process.id,
+      name: process.name || '',
+      description: process.description || '',
+      processType: process.processType || '',
+      status: process.status || '',
+      maturityLevel: process.maturityLevel || undefined,
+      category: process.category || '',
+      tags: process.tags || [],
+      bpmnXml: process.bpmnXml || '',
+      createdAt: formatDateForJsonExport(process.createdAt),
+      updatedAt: formatDateForJsonExport(process.updatedAt),
+      owners: process.owners || [],
+      parentProcess: process.parentProcess || [],
+      childProcesses: process.childProcesses || [],
+      supportsCapabilities: process.supportsCapabilities || [],
+      supportedByApplications: process.supportedByApplications || [],
+      partOfArchitectures: process.partOfArchitectures || [],
+      depictedInDiagrams: process.depictedInDiagrams || [],
+    }))
+  } catch {
+    throw new Error('Fehler beim Laden der Geschäftsprozesse für JSON-Export')
+  }
+}
+
 /**
  * Holt Applications für JSON-Export mit vollständigen Daten
  */
@@ -195,6 +233,7 @@ export const fetchApplicationsForJson = async (
       // Beziehungen als verschachtelte Objekte
       owners: app.owners || [],
       supportsCapabilities: app.supportsCapabilities || [],
+      supportsBusinessProcesses: app.supportsBusinessProcesses || [],
       usesDataObjects: app.usesDataObjects || [],
       sourceOfInterfaces: app.sourceOfInterfaces || [],
       targetOfInterfaces: app.targetOfInterfaces || [],
@@ -707,6 +746,7 @@ export const fetchAllDataForJson = async (
   try {
     const [
       businessCapabilities,
+      businessProcesses,
       applications,
       dataObjects,
       interfaces,
@@ -723,6 +763,7 @@ export const fetchAllDataForJson = async (
       strategies,
     ] = await Promise.all([
       fetchBusinessCapabilitiesForJson(client, selectedCompanyId),
+      fetchBusinessProcessesForJson(client, selectedCompanyId),
       fetchApplicationsForJson(client, selectedCompanyId),
       fetchDataObjectsForJson(client, selectedCompanyId),
       fetchInterfacesForJson(client, selectedCompanyId),
@@ -741,6 +782,7 @@ export const fetchAllDataForJson = async (
 
     const baseData = {
       'Business Capabilities': businessCapabilities,
+      'Business Processes': businessProcesses,
       Applications: applications,
       'Data Objects': dataObjects,
       Interfaces: interfaces,
@@ -786,6 +828,8 @@ export const fetchDataByEntityTypeForJson = async (
   switch (entityType) {
     case 'businessCapabilities':
       return await fetchBusinessCapabilitiesForJson(client, selectedCompanyId)
+    case 'businessProcesses':
+      return await fetchBusinessProcessesForJson(client, selectedCompanyId)
     case 'applications':
       return await fetchApplicationsForJson(client, selectedCompanyId)
     case 'dataObjects':

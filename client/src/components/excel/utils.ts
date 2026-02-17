@@ -17,6 +17,8 @@ import {
   CapabilityType,
   AiComponentType,
   AiComponentStatus,
+  ProcessType,
+  ProcessStatus,
 } from '../../gql/generated'
 
 // Helper function to parse comma-separated relationship IDs
@@ -42,7 +44,23 @@ export const getRelationshipFields = (entityType: string): string[] => {
         'depictedInDiagrams',
       ]
     case 'applications':
-      return ['owners', 'supportsCapabilities', 'usesDataObjects', 'partOfArchitectures']
+      return [
+        'owners',
+        'supportsCapabilities',
+        'supportsBusinessProcesses',
+        'usesDataObjects',
+        'partOfArchitectures',
+      ]
+    case 'businessProcesses':
+      return [
+        'owners',
+        'parentProcess',
+        'childProcesses',
+        'supportsCapabilities',
+        'supportedByApplications',
+        'partOfArchitectures',
+        'depictedInDiagrams',
+      ]
     case 'dataObjects':
       return [
         'owners',
@@ -177,6 +195,8 @@ export const checkEntityExists = async (
         return result.data?.businessCapabilities?.length > 0
       case 'applications':
         return result.data?.applications?.length > 0
+      case 'businessProcesses':
+        return result.data?.businessProcesses?.length > 0
       case 'dataObjects':
         return result.data?.dataObjects?.length > 0
       case 'interfaces':
@@ -359,6 +379,40 @@ export const createEntityInput = (entityType: string, row: any): any => {
             ? row.technologyStack.split(',').map((t: string) => t.trim())
             : undefined,
         // updatedAt für Excel
+        updatedAt: row.updatedAt ? new Date(row.updatedAt) : new Date(),
+      }
+    }
+
+    case 'businessProcesses': {
+      const validProcessType = Object.values(ProcessType).includes(
+        row.processType?.toUpperCase() as ProcessType
+      )
+        ? (row.processType.toUpperCase() as ProcessType)
+        : ProcessType.CORE
+
+      const validStatus = Object.values(ProcessStatus).includes(
+        row.status?.toUpperCase() as ProcessStatus
+      )
+        ? (row.status.toUpperCase() as ProcessStatus)
+        : ProcessStatus.ACTIVE
+
+      return {
+        name: generateFallbackName('Business Process', row),
+        description: row.description || '',
+        processType: validProcessType,
+        status: validStatus,
+        maturityLevel:
+          typeof row.maturityLevel === 'number'
+            ? row.maturityLevel
+            : row.maturityLevel
+              ? parseInt(row.maturityLevel, 10)
+              : undefined,
+        category: row.category || '',
+        tags: Array.isArray(row.tags)
+          ? row.tags
+          : typeof row.tags === 'string' && row.tags.trim()
+            ? row.tags.split(',').map((t: string) => t.trim())
+            : undefined,
         updatedAt: row.updatedAt ? new Date(row.updatedAt) : new Date(),
       }
     }

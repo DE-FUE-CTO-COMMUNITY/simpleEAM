@@ -2,6 +2,7 @@
 export interface ImportSettings {
   entityType:
     | 'businessCapabilities'
+    | 'businessProcesses'
     | 'applications'
     | 'dataObjects'
     | 'interfaces'
@@ -25,6 +26,7 @@ export interface ImportSettings {
 export interface ExportSettings {
   entityType:
     | 'businessCapabilities'
+    | 'businessProcesses'
     | 'applications'
     | 'dataObjects'
     | 'interfaces'

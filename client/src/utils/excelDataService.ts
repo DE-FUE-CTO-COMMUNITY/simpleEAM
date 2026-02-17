@@ -14,6 +14,7 @@ import { GET_MISSIONS } from '../graphql/mission'
 import { GET_VALUES } from '../graphql/value'
 import { GET_GOALS } from '../graphql/goal'
 import { GET_STRATEGIES } from '../graphql/strategy'
+import { GET_BUSINESS_PROCESSES } from '../graphql/businessProcess'
 
 export interface ExcelExportData {
   [key: string]: string | number | boolean | Date
@@ -21,6 +22,7 @@ export interface ExcelExportData {
 
 export type EntityType =
   | 'businessCapabilities'
+  | 'businessProcesses'
   | 'applications'
   | 'dataObjects'
   | 'interfaces'
@@ -141,6 +143,49 @@ export const fetchBusinessCapabilitiesForExport = async (
   }
 }
 
+export const fetchBusinessProcessesForExport = async (
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
+): Promise<ExcelExportData[]> => {
+  try {
+    const { data } = await client.query({
+      query: GET_BUSINESS_PROCESSES,
+      variables: { where: companyWhere('businessProcesses', selectedCompanyId) },
+      fetchPolicy: 'network-only',
+    })
+
+    if (!data?.businessProcesses) {
+      return []
+    }
+
+    return data.businessProcesses.map((process: any) => ({
+      id: process.id,
+      name: process.name,
+      description: process.description || '',
+      processType: process.processType || '',
+      status: process.status || '',
+      maturityLevel: process.maturityLevel || '',
+      category: process.category || '',
+      tags: process.tags?.join(',') || '',
+      owners: process.owners?.map((owner: any) => owner.id).join(',') || '',
+      parentProcess: process.parentProcess?.map((parent: any) => parent.id).join(',') || '',
+      childProcesses: process.childProcesses?.map((child: any) => child.id).join(',') || '',
+      supportsCapabilities:
+        process.supportsCapabilities?.map((capability: any) => capability.id).join(',') || '',
+      supportedByApplications:
+        process.supportedByApplications?.map((application: any) => application.id).join(',') || '',
+      partOfArchitectures:
+        process.partOfArchitectures?.map((architecture: any) => architecture.id).join(',') || '',
+      depictedInDiagrams:
+        process.depictedInDiagrams?.map((diagram: any) => diagram.id).join(',') || '',
+      createdAt: formatDateForExport(process.createdAt),
+      updatedAt: formatDateForExport(process.updatedAt),
+    }))
+  } catch {
+    throw new Error('Fehler beim Laden der Geschäftsprozesse für Export')
+  }
+}
+
 /**
  * Holt echte Anwendungs-Daten für Excel Export
  * Verwendet GraphQL-Feldnamen als Spaltenüberschriften und IDs für Relationen
@@ -181,6 +226,8 @@ export const fetchApplicationsForExport = async (
       createdAt: formatDateForExport(app.createdAt),
       updatedAt: formatDateForExport(app.updatedAt),
       supportsCapabilities: app.supportsCapabilities?.map((cap: any) => cap.id).join(',') || '',
+      supportsBusinessProcesses:
+        app.supportsBusinessProcesses?.map((process: any) => process.id).join(',') || '',
       usesDataObjects: app.usesDataObjects?.map((obj: any) => obj.id).join(',') || '',
       sourceOfInterfaces: app.sourceOfInterfaces?.map((iface: any) => iface.id).join(',') || '',
       targetOfInterfaces: app.targetOfInterfaces?.map((iface: any) => iface.id).join(',') || '',
@@ -779,6 +826,7 @@ export const fetchAllEntitiesForExport = async (
   try {
     const [
       businessCapabilities,
+      businessProcesses,
       applications,
       dataObjects,
       interfaces,
@@ -795,6 +843,7 @@ export const fetchAllEntitiesForExport = async (
       strategies,
     ] = await Promise.all([
       fetchBusinessCapabilitiesForExport(client, selectedCompanyId),
+      fetchBusinessProcessesForExport(client, selectedCompanyId),
       fetchApplicationsForExport(client, selectedCompanyId),
       fetchDataObjectsForExport(client, selectedCompanyId),
       fetchInterfacesForExport(client, selectedCompanyId),
@@ -813,6 +862,7 @@ export const fetchAllEntitiesForExport = async (
 
     const baseData = {
       'Business Capabilities': businessCapabilities,
+      'Business Processes': businessProcesses,
       Applications: applications,
       'Data Objects': dataObjects,
       Interfaces: interfaces,
@@ -853,6 +903,7 @@ export const fetchAllEntitiesForExcelExport = async (
   try {
     const [
       businessCapabilities,
+      businessProcesses,
       applications,
       dataObjects,
       interfaces,
@@ -869,6 +920,7 @@ export const fetchAllEntitiesForExcelExport = async (
       strategies,
     ] = await Promise.all([
       fetchBusinessCapabilitiesForExport(client, selectedCompanyId),
+      fetchBusinessProcessesForExport(client, selectedCompanyId),
       fetchApplicationsForExport(client, selectedCompanyId),
       fetchDataObjectsForExport(client, selectedCompanyId),
       fetchInterfacesForExport(client, selectedCompanyId),
@@ -887,6 +939,7 @@ export const fetchAllEntitiesForExcelExport = async (
 
     const baseData = {
       'Business Capabilities': businessCapabilities,
+      'Business Processes': businessProcesses,
       Applications: applications,
       'Data Objects': dataObjects,
       Interfaces: interfaces,
@@ -922,6 +975,7 @@ export const fetchDataByEntityType = async (
   client: ApolloClient<any>,
   entityType:
     | 'businessCapabilities'
+    | 'businessProcesses'
     | 'applications'
     | 'dataObjects'
     | 'interfaces'
@@ -942,6 +996,8 @@ export const fetchDataByEntityType = async (
   switch (entityType) {
     case 'businessCapabilities':
       return fetchBusinessCapabilitiesForExport(client, selectedCompanyId)
+    case 'businessProcesses':
+      return fetchBusinessProcessesForExport(client, selectedCompanyId)
     case 'applications':
       return fetchApplicationsForExport(client, selectedCompanyId)
     case 'dataObjects':
@@ -984,6 +1040,7 @@ export const fetchDataByEntityTypeAndFormat = async (
   client: ApolloClient<any>,
   entityType:
     | 'businessCapabilities'
+    | 'businessProcesses'
     | 'applications'
     | 'dataObjects'
     | 'interfaces'
@@ -1006,6 +1063,8 @@ export const fetchDataByEntityTypeAndFormat = async (
   switch (entityType) {
     case 'businessCapabilities':
       return fetchBusinessCapabilitiesForExport(client, selectedCompanyId)
+    case 'businessProcesses':
+      return fetchBusinessProcessesForExport(client, selectedCompanyId)
     case 'applications':
       return fetchApplicationsForExport(client, selectedCompanyId)
     case 'dataObjects':
@@ -1091,6 +1150,7 @@ export const getApplicationsTemplate = (): ExcelExportData => ({
   createdAt: '', // ISO-Format: 2024-01-01T12:00:00.000Z
   updatedAt: '', // ISO-Format: 2024-01-01T12:00:00.000Z
   supportsCapabilities: '', // Komma-getrennte Capability-IDs
+  supportsBusinessProcesses: '', // Komma-getrennte BusinessProcess-IDs
   usesDataObjects: '', // Komma-getrennte DataObject-IDs
   sourceOfInterfaces: '', // Komma-getrennte Interface-IDs
   targetOfInterfaces: '', // Komma-getrennte Interface-IDs
@@ -1379,6 +1439,26 @@ export const getGoalsTemplate = (): ExcelExportData => ({
   updatedAt: '',
 })
 
+export const getBusinessProcessesTemplate = (): ExcelExportData => ({
+  id: '',
+  name: '',
+  description: '',
+  processType: '',
+  status: '',
+  maturityLevel: '',
+  category: '',
+  tags: '',
+  owners: '',
+  parentProcess: '',
+  childProcesses: '',
+  supportsCapabilities: '',
+  supportedByApplications: '',
+  partOfArchitectures: '',
+  depictedInDiagrams: '',
+  createdAt: '',
+  updatedAt: '',
+})
+
 export const getStrategiesTemplate = (): ExcelExportData => ({
   id: '',
   name: '',
@@ -1397,6 +1477,7 @@ export const getStrategiesTemplate = (): ExcelExportData => ({
 export const getTemplateByEntityType = (
   entityType:
     | 'businessCapabilities'
+    | 'businessProcesses'
     | 'applications'
     | 'dataObjects'
     | 'interfaces'
@@ -1415,6 +1496,8 @@ export const getTemplateByEntityType = (
   switch (entityType) {
     case 'businessCapabilities':
       return getBusinessCapabilitiesTemplate()
+    case 'businessProcesses':
+      return getBusinessProcessesTemplate()
     case 'applications':
       return getApplicationsTemplate()
     case 'dataObjects':
@@ -1454,6 +1537,7 @@ export const getTemplateByEntityType = (
 export const getTemplateByEntityTypeAndFormat = (
   entityType:
     | 'businessCapabilities'
+    | 'businessProcesses'
     | 'applications'
     | 'dataObjects'
     | 'interfaces'
@@ -1473,6 +1557,8 @@ export const getTemplateByEntityTypeAndFormat = (
   switch (entityType) {
     case 'businessCapabilities':
       return getBusinessCapabilitiesTemplate()
+    case 'businessProcesses':
+      return getBusinessProcessesTemplate()
     case 'applications':
       return getApplicationsTemplate()
     case 'dataObjects':
@@ -1513,6 +1599,7 @@ export const getTemplateByEntityTypeAndFormat = (
 export const getFieldNamesByEntityType = (
   entityType:
     | 'businessCapabilities'
+    | 'businessProcesses'
     | 'applications'
     | 'dataObjects'
     | 'interfaces'
@@ -1532,6 +1619,7 @@ export const getFieldNamesByEntityType = (
   if (entityType === 'all') {
     return {
       'Business Capabilities': Object.keys(getBusinessCapabilitiesTemplate()),
+      'Business Processes': Object.keys(getBusinessProcessesTemplate()),
       Applications: Object.keys(getApplicationsTemplate()),
       'Data Objects': Object.keys(getDataObjectsTemplate()),
       Interfaces: Object.keys(getInterfacesTemplate()),
@@ -1559,6 +1647,7 @@ export const getFieldNamesByEntityType = (
 export const getFieldNamesByEntityTypeAndFormat = (
   entityType:
     | 'businessCapabilities'
+    | 'businessProcesses'
     | 'applications'
     | 'dataObjects'
     | 'interfaces'
@@ -1579,6 +1668,7 @@ export const getFieldNamesByEntityTypeAndFormat = (
   if (entityType === 'all') {
     return {
       'Business Capabilities': Object.keys(getBusinessCapabilitiesTemplate()),
+      'Business Processes': Object.keys(getBusinessProcessesTemplate()),
       Applications: Object.keys(getApplicationsTemplate()),
       'Data Objects': Object.keys(getDataObjectsTemplate()),
       Interfaces: Object.keys(getInterfacesTemplate()),
@@ -1649,6 +1739,7 @@ export const validateImportData = (
   data: any[],
   entityType:
     | 'businessCapabilities'
+    | 'businessProcesses'
     | 'applications'
     | 'dataObjects'
     | 'interfaces'
@@ -1795,6 +1886,29 @@ export const getTemplateWithExamples = (
           parents: 'cap-parent-001',
         },
       ]
+    case 'businessProcesses':
+      return [
+        emptyTemplate,
+        {
+          id: 'proc-001',
+          name: 'Order to Cash',
+          description: 'End-to-end process from order intake to payment receipt',
+          processType: 'CORE',
+          status: 'ACTIVE',
+          maturityLevel: 3,
+          category: 'Sales',
+          tags: 'order,cash,sales',
+          owners: 'user-123',
+          parentProcess: '',
+          childProcesses: 'proc-002',
+          supportsCapabilities: 'cap-001,cap-002',
+          supportedByApplications: 'app-001,app-002',
+          partOfArchitectures: 'arch-001',
+          depictedInDiagrams: 'diag-001',
+          createdAt: '2024-01-01T10:00:00.000Z',
+          updatedAt: '2024-06-01T15:30:00.000Z',
+        },
+      ]
     case 'applications':
       return [
         emptyTemplate,
@@ -1813,6 +1927,7 @@ export const getTemplateWithExamples = (
           endOfLifeDate: '2028-12-31T23:59:59.000Z',
           owners: 'user-123',
           supportsCapabilities: 'cap-001,cap-002',
+          supportsBusinessProcesses: 'proc-001,proc-002',
           usesDataObjects: 'data-001,data-002',
           sourceOfInterfaces: 'int-001',
           targetOfInterfaces: 'int-002',
@@ -1933,6 +2048,8 @@ export function getRequiredFieldsByEntityType(entityType: EntityType): string[] 
   switch (entityType) {
     case 'businessCapabilities':
       return ['name']
+    case 'businessProcesses':
+      return ['name', 'processType', 'status']
     case 'applications':
       return ['name', 'status']
     case 'interfaces':
@@ -1989,6 +2106,22 @@ export function getOptionalFieldsByEntityType(entityType: EntityType): string[] 
         'createdAt',
         'updatedAt',
       ]
+    case 'businessProcesses':
+      return [
+        'description',
+        'maturityLevel',
+        'category',
+        'tags',
+        'owners',
+        'parentProcess',
+        'childProcesses',
+        'supportsCapabilities',
+        'supportedByApplications',
+        'partOfArchitectures',
+        'depictedInDiagrams',
+        'createdAt',
+        'updatedAt',
+      ]
     case 'applications':
       return [
         'description',
@@ -2006,6 +2139,7 @@ export function getOptionalFieldsByEntityType(entityType: EntityType): string[] 
         'endOfLifeDate',
         'owners',
         'supportsCapabilities',
+        'supportsBusinessProcesses',
         'usesDataObjects',
         'sourceOfInterfaces',
         'targetOfInterfaces',

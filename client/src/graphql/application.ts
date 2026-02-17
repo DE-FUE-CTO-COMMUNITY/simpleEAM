@@ -50,6 +50,10 @@ export const GET_APPLICATIONS = gql`
         id
         name
       }
+      supportsBusinessProcesses {
+        id
+        name
+      }
       usesDataObjects {
         id
         name
@@ -140,6 +144,10 @@ export const GET_APPLICATION = gql`
       createdAt
       updatedAt
       supportsCapabilities {
+        id
+        name
+      }
+      supportsBusinessProcesses {
         id
         name
       }

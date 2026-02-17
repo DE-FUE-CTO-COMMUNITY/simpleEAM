@@ -35,6 +35,10 @@ export const GET_BUSINESS_PROCESSES = gql`
         id
         name
       }
+      supportedByApplications {
+        id
+        name
+      }
       partOfArchitectures {
         id
         name
@@ -55,6 +59,14 @@ export const GET_BUSINESS_PROCESSES_COUNT = gql`
           nodes
         }
       }
+    }
+  }
+`
+
+export const CHECK_BUSINESS_PROCESS_EXISTS = gql`
+  query CheckBusinessProcessExists($id: ID!) {
+    businessProcesses(where: { id: { eq: $id } }) {
+      id
     }
   }
 `

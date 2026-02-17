@@ -628,7 +628,7 @@ const DiagramLibrarySidebar = forwardRef<DiagramLibrarySidebarHandle, DiagramLib
       const lensToElementTypes: Record<LensKey, ElementType[]> = {
         enterpriseArchitecture: SECTION_ORDER,
         businessArchitecture: ['businessCapability'],
-        processArchitecture: ['businessCapability', 'businessProcess'],
+        processArchitecture: ['businessCapability', 'businessProcess', 'application'],
         dataArchitecture: ['dataObject'],
         aiArchitecture: ['aiComponent'],
         solutionArchitecture: ['application', 'dataObject', 'applicationInterface'],

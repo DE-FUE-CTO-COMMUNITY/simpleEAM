@@ -572,6 +572,7 @@ export const downloadTemplate = async (
 export const downloadTemplateWithRealFields = async (
   entityType:
     | 'businessCapabilities'
+    | 'businessProcesses'
     | 'applications'
     | 'dataObjects'
     | 'interfaces'
@@ -593,6 +594,7 @@ export const downloadTemplateWithRealFields = async (
   const {
     getTemplateByEntityType,
     getBusinessCapabilitiesTemplate,
+    getBusinessProcessesTemplate,
     getApplicationsTemplate,
     getDataObjectsTemplate,
     getInterfacesTemplate,
@@ -612,6 +614,7 @@ export const downloadTemplateWithRealFields = async (
     // Multi-tab template for admin (Diagrams are hidden in Excel)
     const allTemplates = {
       'Business Capabilities': [getBusinessCapabilitiesTemplate()],
+      'Business Processes': [getBusinessProcessesTemplate()],
       Applications: [getApplicationsTemplate()],
       'Data Objects': [getDataObjectsTemplate()],
       Interfaces: [getInterfacesTemplate()],
@@ -669,6 +672,7 @@ export const downloadTemplateWithRealFields = async (
 
   const entityTypeLabels = {
     businessCapabilities: 'Business Capabilities',
+    businessProcesses: 'Business Processes',
     applications: 'Applications',
     dataObjects: 'Data Objects',
     interfaces: 'Interfaces',
