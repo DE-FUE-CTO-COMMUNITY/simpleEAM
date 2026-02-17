@@ -2729,8 +2729,25 @@
   },
   "processEditor": {
     "title": "Process Editor",
-    "comingSoon": "This feature will be implemented later",
-    "description": "The Process Editor for BPMN diagrams is under development and will be available in a future release."
+    "description": "Model BPMN 2.0 process flows and save them directly to the selected business process.",
+    "process": "Business Process",
+    "save": "Save",
+    "saving": "Saving...",
+    "importXml": "Import XML",
+    "exportXml": "Export XML",
+    "resetDiagram": "New Diagram",
+    "unsavedChanges": "You have unsaved changes.",
+    "discardChangesConfirm": "You have unsaved changes. Discard and switch process?",
+    "noProcessSelected": "No business process available. Create one first in Business Processes.",
+    "messages": {
+      "loadError": "Error loading business processes",
+      "saveSuccess": "BPMN diagram saved successfully",
+      "saveError": "Failed to save BPMN diagram",
+      "importSuccess": "BPMN XML imported",
+      "importError": "Failed to import BPMN XML",
+      "exportError": "Failed to export BPMN XML",
+      "resetError": "Failed to create a new default BPMN diagram"
+    }
   },
   "matrixEditor": {
     "title": "Matrix Editor",

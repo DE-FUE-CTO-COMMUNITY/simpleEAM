@@ -2684,8 +2684,25 @@
   },
   "processEditor": {
     "title": "Prozess-Editor",
-    "comingSoon": "Diese Funktion wird später implementiert",
-    "description": "Der Prozess-Editor für BPMN-Diagramme ist in Entwicklung und wird in einer zukünftigen Version verfügbar sein."
+    "description": "Modellieren Sie BPMN 2.0 Prozessabläufe und speichern Sie diese direkt im ausgewählten Geschäftsprozess.",
+    "process": "Geschäftsprozess",
+    "save": "Speichern",
+    "saving": "Speichert...",
+    "importXml": "XML importieren",
+    "exportXml": "XML exportieren",
+    "resetDiagram": "Neues Diagramm",
+    "unsavedChanges": "Es gibt ungespeicherte Änderungen.",
+    "discardChangesConfirm": "Es gibt ungespeicherte Änderungen. Verwerfen und Prozess wechseln?",
+    "noProcessSelected": "Kein Geschäftsprozess verfügbar. Erstellen Sie zuerst einen in Geschäftsprozesse.",
+    "messages": {
+      "loadError": "Fehler beim Laden der Geschäftsprozesse",
+      "saveSuccess": "BPMN-Diagramm erfolgreich gespeichert",
+      "saveError": "BPMN-Diagramm konnte nicht gespeichert werden",
+      "importSuccess": "BPMN-XML importiert",
+      "importError": "BPMN-XML konnte nicht importiert werden",
+      "exportError": "BPMN-XML konnte nicht exportiert werden",
+      "resetError": "Standard-BPMN-Diagramm konnte nicht erstellt werden"
+    }
   },
   "matrixEditor": {
     "title": "Matrix-Editor",

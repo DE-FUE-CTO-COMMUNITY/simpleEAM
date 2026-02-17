@@ -31,6 +31,7 @@
     "@tanstack/zod-form-adapter": "^0.42.1",
     "@types/uuid": "^10.0.0",
     "axios": "^1.5.0",
+    "bpmn-js": "^17.11.1",
     "browser-fs-access": "0.29.1",
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
