@@ -4270,6 +4270,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"bpmn-moddle@npm:^10.0.0":
+  version: 10.0.0
+  resolution: "bpmn-moddle@npm:10.0.0"
+  dependencies:
+    min-dash: "npm:^5.0.0"
+    moddle: "npm:^8.0.0"
+    moddle-xml: "npm:^12.0.0"
+  checksum: 10c0/fbec9f8225b95d298e77950f51bc1e3b7854ea1624505c9677541d9753b087a16f5d6b3d4fae20b5c03b903cab1c9e932b1de5cb4de0b4a452f97d75e19599c0
+  languageName: node
+  linkType: hard
+
 "bpmn-moddle@npm:^8.1.0":
   version: 8.1.0
   resolution: "bpmn-moddle@npm:8.1.0"
@@ -8542,12 +8553,33 @@ __metadata:
   languageName: node
   linkType: hard
 
+"moddle-xml@npm:^12.0.0":
+  version: 12.0.0
+  resolution: "moddle-xml@npm:12.0.0"
+  dependencies:
+    min-dash: "npm:^5.0.0"
+    saxen: "npm:^11.0.2"
+  peerDependencies:
+    moddle: ">= 6.2.0"
+  checksum: 10c0/a28f2be0f17b2ddbd4c00b8830ffda5b76000865a36f354908ab471d0ff949adad6a4522e87853b8fad61e8cda1a5a25f774baf29708bcfa7430dcd11e69ac0e
+  languageName: node
+  linkType: hard
+
 "moddle@npm:^6.0.0, moddle@npm:^6.2.3":
   version: 6.2.3
   resolution: "moddle@npm:6.2.3"
   dependencies:
     min-dash: "npm:^4.0.0"
   checksum: 10c0/4bbd44181014a2064e1ada22afc2f4087ec424c53d62681fa93595e2ea41a4f6c1a7b164cb3ade6f199fcb96287085e4d4d0f55ef14fb50c4f8486881a75adb3
+  languageName: node
+  linkType: hard
+
+"moddle@npm:^8.0.0":
+  version: 8.1.0
+  resolution: "moddle@npm:8.1.0"
+  dependencies:
+    min-dash: "npm:^5.0.0"
+  checksum: 10c0/6d9b7db4263973ee7f8c1113de3d7f6ed0d55d40154d8b19f2a64579d46abc2d64a710ad6196dfbd351627cd39422f282252992b4b6a1aa5e3d9025ba6d6ba1b
   languageName: node
   linkType: hard
 
@@ -9932,6 +9964,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"saxen@npm:^11.0.2":
+  version: 11.0.2
+  resolution: "saxen@npm:11.0.2"
+  checksum: 10c0/9ca99fb956e57aef2fcf5fe3376343e4ff8bb991475c7320fe741a3b41b24ce077e6a0923be7bae0953ac70ba918f7f87c5d8877dd363506ca8a828a2ca3a0c1
+  languageName: node
+  linkType: hard
+
 "saxen@npm:^8.1.2":
   version: 8.1.2
   resolution: "saxen@npm:8.1.2"
@@ -10236,6 +10275,7 @@ __metadata:
     "@types/xlsx": "npm:^0.0.36"
     axios: "npm:^1.5.0"
     bpmn-js: "npm:^17.11.1"
+    bpmn-moddle: "npm:^10.0.0"
     browser-fs-access: "npm:0.29.1"
     date-fns: "npm:^4.1.0"
     dayjs: "npm:^1.11.13"
