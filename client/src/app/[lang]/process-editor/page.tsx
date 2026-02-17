@@ -180,7 +180,9 @@ const ProcessEditorPage = () => {
           return
         }
 
-        const startEvents = flowElements.filter((element: any) => element?.$type === 'bpmn:StartEvent')
+        const startEvents = flowElements.filter(
+          (element: any) => element?.$type === 'bpmn:StartEvent'
+        )
         const endEvents = flowElements.filter((element: any) => element?.$type === 'bpmn:EndEvent')
 
         if (startEvents.length === 0) {
@@ -213,7 +215,8 @@ const ProcessEditorPage = () => {
 
           const elementName =
             typeof element?.name === 'string' && element.name.trim() ? element.name.trim() : null
-          const elementId = typeof element?.id === 'string' && element.id.trim() ? element.id.trim() : null
+          const elementId =
+            typeof element?.id === 'string' && element.id.trim() ? element.id.trim() : null
           const typeLabel = formatTypeLabel(element?.$type)
 
           if (elementName) return `${elementName} (${typeLabel})`
@@ -222,7 +225,8 @@ const ProcessEditorPage = () => {
         }
 
         const flowNodes = flowElements.filter(
-          (element: any) => element?.$type !== 'bpmn:SequenceFlow' && typeof element?.id === 'string'
+          (element: any) =>
+            element?.$type !== 'bpmn:SequenceFlow' && typeof element?.id === 'string'
         )
         const incomingById = new Map<string, number>()
         const outgoingById = new Map<string, number>()
@@ -293,7 +297,11 @@ const ProcessEditorPage = () => {
           const nodeId = node?.id
           if (!nodeId) return
 
-          if (nodeType === 'bpmn:StartEvent' || nodeType === 'bpmn:EndEvent' || nodeType === 'bpmn:BoundaryEvent') {
+          if (
+            nodeType === 'bpmn:StartEvent' ||
+            nodeType === 'bpmn:EndEvent' ||
+            nodeType === 'bpmn:BoundaryEvent'
+          ) {
             return
           }
 
@@ -302,15 +310,11 @@ const ProcessEditorPage = () => {
           const nodeLabel = getElementDisplayLabel(node)
 
           if (inCount === 0) {
-            semanticErrors.push(
-              `${nodeLabel} has no incoming sequence flow.`
-            )
+            semanticErrors.push(`${nodeLabel} has no incoming sequence flow.`)
           }
 
           if (outCount === 0) {
-            semanticErrors.push(
-              `${nodeLabel} has no outgoing sequence flow.`
-            )
+            semanticErrors.push(`${nodeLabel} has no outgoing sequence flow.`)
           }
         })
 
@@ -355,7 +359,10 @@ const ProcessEditorPage = () => {
         }
       })
 
-      const blockingErrors = [...semanticErrors, ...warnings.map(warning => `Parser warning: ${warning}`)]
+      const blockingErrors = [
+        ...semanticErrors,
+        ...warnings.map(warning => `Parser warning: ${warning}`),
+      ]
       if (blockingErrors.length > 0) {
         return {
           isValid: false,
@@ -786,12 +793,7 @@ const ProcessEditorPage = () => {
         {t('description')}
       </Typography>
 
-      <Dialog
-        open={!!validationPanel}
-        onClose={closeValidationPanel}
-        fullWidth
-        maxWidth="md"
-      >
+      <Dialog open={!!validationPanel} onClose={closeValidationPanel} fullWidth maxWidth="md">
         <DialogTitle>{validationPanel?.title || 'Validation'}</DialogTitle>
         <DialogContent dividers>
           {validationPanel && (

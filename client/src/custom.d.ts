@@ -1,3 +1,3 @@
 declare module 'bpmn-moddle' {
-	export const BpmnModdle: any
+  export const BpmnModdle: any
 }
