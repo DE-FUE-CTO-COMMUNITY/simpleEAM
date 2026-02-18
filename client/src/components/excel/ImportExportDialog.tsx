@@ -38,7 +38,7 @@ import {
 } from './types'
 import {
   entityTypeLabels,
-  entityTypeMapping,
+  resolveEntityTypeFromTabName,
   defaultImportSettings,
   defaultExportSettings,
   defaultDeleteSettings,
@@ -268,7 +268,7 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
         let totalErrors = 0
 
         Object.entries(allData).forEach(([tabName, tabData]) => {
-          const entityType = entityTypeMapping[tabName]
+          const entityType = resolveEntityTypeFromTabName(tabName)
           if (entityType && !isGeaEnabled && isGeaEntityType(entityType as any)) {
             return
           }

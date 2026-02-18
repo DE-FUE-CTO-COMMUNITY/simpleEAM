@@ -491,7 +491,9 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
                           .map(([entityType, entityFields]) => (
                             <Box key={entityType} sx={{ mb: 1 }}>
                               <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 0.5 }}>
-                                {entityTypeLabels[entityType as keyof typeof entityTypeLabels]}:
+                                {tEntityTypes(entityType as keyof typeof entityTypeLabels) ||
+                                  entityType}
+                                :
                                 {entityType === 'diagrams' && exportSettings.format !== 'json' && (
                                   <Typography
                                     component="span"

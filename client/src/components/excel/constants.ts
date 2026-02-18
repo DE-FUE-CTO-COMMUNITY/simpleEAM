@@ -25,21 +25,84 @@ export const entityTypeLabels: Record<EntityType, string> = {
 export const entityTypeMapping: Record<string, string> = {
   'Business Capabilities': 'businessCapabilities',
   'Business Processes': 'businessProcesses',
+  businessCapabilities: 'businessCapabilities',
+  businessProcesses: 'businessProcesses',
+  BusinessCapabilities: 'businessCapabilities',
+  BusinessProcesses: 'businessProcesses',
+  'Business_Capabilities': 'businessCapabilities',
+  'Business_Processes': 'businessProcesses',
   Applications: 'applications',
+  applications: 'applications',
   'Data Objects': 'dataObjects',
+  dataObjects: 'dataObjects',
+  DataObjects: 'dataObjects',
+  Data_Objects: 'dataObjects',
   Interfaces: 'interfaces',
+  interfaces: 'interfaces',
   Persons: 'persons',
+  persons: 'persons',
   Architectures: 'architectures',
+  architectures: 'architectures',
   'Architecture Principles': 'architecturePrinciples',
+  architecturePrinciples: 'architecturePrinciples',
+  ArchitecturePrinciples: 'architecturePrinciples',
+  Architecture_Principles: 'architecturePrinciples',
   Diagrams: 'diagrams',
+  diagrams: 'diagrams',
   Infrastructure: 'infrastructures',
+  infrastructure: 'infrastructures',
   Infrastructures: 'infrastructures', // Support both singular and plural
+  infrastructures: 'infrastructures',
   'AI Components': 'aicomponents',
+  aicomponents: 'aicomponents',
+  aiComponents: 'aicomponents',
+  AIComponents: 'aicomponents',
+  AI_Components: 'aicomponents',
   Visions: 'visions',
+  visions: 'visions',
+  'GEA Visions': 'visions',
+  geaVisions: 'visions',
+  GEA_Visions: 'visions',
   Missions: 'missions',
+  missions: 'missions',
+  'GEA Missions': 'missions',
+  geaMissions: 'missions',
+  GEA_Missions: 'missions',
   Values: 'values',
+  values: 'values',
+  'GEA Values': 'values',
+  geaValues: 'values',
+  GEA_Values: 'values',
   Goals: 'goals',
+  goals: 'goals',
+  'GEA Goals': 'goals',
+  geaGoals: 'goals',
+  GEA_Goals: 'goals',
   Strategies: 'strategies',
+  strategies: 'strategies',
+  'GEA Strategies': 'strategies',
+  geaStrategies: 'strategies',
+  GEA_Strategies: 'strategies',
+}
+
+const normalizeTabName = (tabName: string): string =>
+  tabName
+    .trim()
+    .replace(/[_-]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .toLowerCase()
+
+const normalizedEntityTypeMapping: Record<string, string> = Object.entries(entityTypeMapping).reduce(
+  (acc, [key, value]) => {
+    acc[normalizeTabName(key)] = value
+    return acc
+  },
+  {} as Record<string, string>
+)
+
+export const resolveEntityTypeFromTabName = (tabName: string): string | undefined => {
+  if (!tabName) return undefined
+  return entityTypeMapping[tabName] || normalizedEntityTypeMapping[normalizeTabName(tabName)]
 }
 
 // Umkehrung für Export-Tab-Namen

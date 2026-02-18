@@ -11,8 +11,9 @@ import {
   sanitizeJsonImportData,
   validateBpmnXmlForImport,
 } from '../../utils/jsonInputUtils'
+import { exportToJson } from '../../utils/jsonUtils'
 import { ImportWithMappingResult, EntityMapping, ImportResult } from './types'
-import { entityTypeMapping, isGeaEntityType } from './constants'
+import { resolveEntityTypeFromTabName, isGeaEntityType } from './constants'
 
 /**
  * Extracts a readable error message from various error types
@@ -311,7 +312,7 @@ export const handleMultiTabImport = async (
   const allEntityMappings: { [entityType: string]: EntityMapping } = {}
 
   const totalTabs = Object.keys(allData).filter(tabName => {
-    const entityType = entityTypeMapping[tabName]
+    const entityType = resolveEntityTypeFromTabName(tabName)
     return (
       entityType &&
       Array.isArray(allData[tabName]) &&
@@ -324,7 +325,7 @@ export const handleMultiTabImport = async (
 
   // Phase 1: Erstelle alle Entitäten ohne Beziehungen
   for (const [tabName, tabData] of Object.entries(allData)) {
-    const entityType = entityTypeMapping[tabName]
+    const entityType = resolveEntityTypeFromTabName(tabName)
 
     if (entityType && !includeGea && isGeaEntityType(entityType as any)) {
       continue
@@ -390,7 +391,7 @@ export const handleMultiTabImport = async (
   )
 
   const relationshipTabs = Object.keys(allData).filter(tabName => {
-    const entityType = entityTypeMapping[tabName]
+    const entityType = resolveEntityTypeFromTabName(tabName)
     return (
       entityType &&
       Array.isArray(allData[tabName]) &&
@@ -403,7 +404,7 @@ export const handleMultiTabImport = async (
   let relationshipTabsProcessed = 0
 
   for (const [tabName, tabData] of Object.entries(allData)) {
-    const entityType = entityTypeMapping[tabName]
+    const entityType = resolveEntityTypeFromTabName(tabName)
 
     if (entityType && !includeGea && isGeaEntityType(entityType as any)) {
       continue
@@ -599,7 +600,6 @@ export const exportEntityData = async (
       // Multi-Entity Export mit formatspezifischer Datenauswahl
       if (format === 'json') {
         const { fetchAllDataForJson } = await import('../../utils/jsonDataService')
-        const { exportToJson } = await import('../../utils/jsonUtils')
         const allData = await fetchAllDataForJson(apolloClient, selectedCompanyId, includeGea)
         const exportPayload = {
           Companies: exportCompanies,
@@ -660,7 +660,6 @@ export const exportEntityData = async (
 
       if (format === 'json') {
         const { fetchDataByEntityTypeForJson } = await import('../../utils/jsonDataService')
-        const { exportToJson } = await import('../../utils/jsonUtils')
         const data = await fetchDataByEntityTypeForJson(
           apolloClient,
           entityType as any,

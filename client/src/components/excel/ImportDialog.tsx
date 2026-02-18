@@ -316,7 +316,7 @@ const ImportDialog: React.FC<ImportDialogProps> = ({
                     Object.keys(validationResult.tabValidations).length > 0 && (
                       <Box sx={{ mt: 2 }}>
                         <Typography variant="subtitle2" gutterBottom>
-                          Details pro Tab:
+                          {t('tabDetailsTitle')}:
                         </Typography>
                         {Object.entries(validationResult.tabValidations).map(
                           ([tabName, tabValidation]: [string, any]) => (
@@ -331,12 +331,15 @@ const ImportDialog: React.FC<ImportDialogProps> = ({
                               }}
                             >
                               <Typography variant="body2" fontWeight="bold">
-                                {tabName}: {tabValidation.summary.validRows} von{' '}
-                                {tabValidation.summary.totalRows} Datensätzen gültig
+                                {t('tabValidationSummary', {
+                                  tabName,
+                                  validRows: tabValidation.summary.validRows,
+                                  totalRows: tabValidation.summary.totalRows,
+                                })}
                               </Typography>
                               {tabValidation.errors.length > 0 && (
                                 <Typography variant="body2" color="error">
-                                  {tabValidation.errors.length} Fehler gefunden
+                                  {t('tabErrorsFound', { count: tabValidation.errors.length })}
                                 </Typography>
                               )}
                             </Box>
@@ -359,7 +362,7 @@ const ImportDialog: React.FC<ImportDialogProps> = ({
                             color="error"
                             sx={{ mb: 0.5 }}
                           >
-                            {error.row ? `Row ${error.row}: ` : ''}
+                            {error.row ? t('rowLabel', { row: error.row }) : ''}
                             {error.message || error}
                           </Typography>
                         ))}
