@@ -904,6 +904,66 @@ Simple-EAM consists of multiple components delivered as Docker containers:
 - Export canvas as PDF with all building blocks and metadata
 - Batch export of multiple canvases
 
+### 2.14 Agentic AI functionality
+
+#### FR-AI-01: Company research and strategic enrichment agent
+
+**Description:** The system must provide an agent that researches public internet sources and drafts company-specific strategic content for GEA and BMC domains.  
+**Priority:** High  
+**Acceptance criteria:**
+
+- Users can trigger an agent run for a selected company and country/region context.
+- The agent produces draft entries for Mission, Vision, Values, Goals, Strategies, and Business Model Canvas blocks.
+- Each generated statement includes source links, extraction date, confidence score, and rationale.
+- Generated content is stored as **draft** and requires human approval before becoming active.
+- Contradictory findings are explicitly flagged for user decision.
+
+#### FR-AI-02: Technology lifecycle and vendor intelligence agent
+
+**Description:** The system must provide an agent for software and hardware lifecycle intelligence to support technology management and vendor lifecycle decisions.  
+**Priority:** High  
+**Acceptance criteria:**
+
+- The agent enriches applications and infrastructure with lifecycle data (GA, EOL, EOS, support status, version maturity where available).
+- Vendor information is normalized and mapped to supplier elements.
+- Risk indicators are calculated (e.g., unsupported version risk, end-of-support proximity).
+- Users receive recommendations such as upgrade, replace, consolidate, or monitor.
+- Scheduled scans and on-demand scans are supported per company.
+
+#### FR-AI-03: As-is to to-be architecture recommendation agent
+
+**Description:** The system must provide an agent that analyzes as-is architecture with strategic inputs (Vision, Goals, Strategies, BMC) and proposes to-be improvements.  
+**Priority:** High  
+**Acceptance criteria:**
+
+- The agent identifies capability gaps, application rationalization opportunities, and technology modernization actions.
+- Recommendations include impact dimensions (business value, risk, complexity, time horizon, dependency notes).
+- A proposed target-state option can be generated as structured recommendations and optional diagram suggestions.
+- Recommendations are traceable to source evidence and model inputs.
+- Users can accept/reject individual recommendations and track decision status.
+
+#### FR-AI-04: Relationship discovery and model quality agent
+
+**Description:** The system must provide an agent that suggests missing relationships and improves data quality across the EAM graph.  
+**Priority:** Medium  
+**Acceptance criteria:**
+
+- Agent suggests candidate relationships (e.g., process ↔ application, capability ↔ application, data object ↔ interface).
+- Agent detects duplicates, stale entries, and inconsistent statuses across linked elements.
+- Suggestions are presented with confidence and explainability metadata.
+- No automatic hard-write to productive architecture data without explicit user approval.
+
+#### FR-AI-05: Human-in-the-loop governance
+
+**Description:** AI-driven changes must be governed through approval workflows and role-based permissions.  
+**Priority:** High  
+**Acceptance criteria:**
+
+- Roles define who can run agents, review, approve, and publish AI drafts.
+- Every AI output stores audit metadata (prompt version, model, tools used, sources, timestamps).
+- Approval workflows support approve, reject, request revision, and partial acceptance.
+- Full decision history is queryable per company and artifact.
+
 ## 3. Non-functional requirements
 
 ### 3.1 Performance and scalability
@@ -994,6 +1054,48 @@ Simple-EAM consists of multiple components delivered as Docker containers:
 - Documented restore process
 - Export/import of the full EAM configuration
 
+### 3.5 AI reliability, safety, and governance
+
+#### NFR-AI-01: Explainability and evidence
+
+**Description:** AI outputs must be explainable and backed by evidence.  
+**Priority:** High  
+**Acceptance criteria:**
+
+- All externally researched statements include at least one source reference.
+- Source provenance stores URL, retrieval timestamp, and extraction summary.
+- Recommendations include confidence values and uncertainty indicators.
+
+#### NFR-AI-02: Determinism and reproducibility
+
+**Description:** Agent runs must be reproducible for audit and troubleshooting.  
+**Priority:** High  
+**Acceptance criteria:**
+
+- Workflow input snapshot and configuration version are persisted per run.
+- Model and prompt versions are persisted and visible in run details.
+- Re-run capability exists for the same input with comparable settings.
+
+#### NFR-AI-03: Cost and performance controls
+
+**Description:** AI execution must have bounded cost and predictable runtime.  
+**Priority:** Medium  
+**Acceptance criteria:**
+
+- Per-run and per-company token/cost budget limits are enforceable.
+- Caching is used for repeated retrieval and summarization steps.
+- Long-running jobs are resumable and observable.
+
+#### NFR-AI-04: Security and tenancy
+
+**Description:** AI workflows must respect enterprise security requirements and strict company isolation.  
+**Priority:** High  
+**Acceptance criteria:**
+
+- Company data is isolated in retrieval, prompts, and storage.
+- Secrets are managed securely and never exposed in logs/UI.
+- Access control is enforced for run execution and result visibility.
+
 ## 4. Technical requirements
 
 ### 4.1 Frontend
@@ -1060,6 +1162,50 @@ Simple-EAM consists of multiple components delivered as Docker containers:
 - Role-based access control
 - Secure GraphQL endpoints
 
+### 4.3 Agentic AI platform
+
+#### TR-AI-01: Agent orchestration with LangGraph
+
+**Description:** Agent workflows must be implemented with LangGraph for explicit stateful orchestration.  
+**Priority:** High  
+**Acceptance criteria:**
+
+- Agent state graph includes retrieval, reasoning, synthesis, validation, and approval-ready output nodes.
+- Tool calling is restricted to approved tools (web research, internal GraphQL retrieval, vector retrieval).
+- Checkpointing is enabled to resume interrupted runs.
+
+#### TR-AI-02: Durable workflow execution with Temporal
+
+**Description:** Long-running and scheduled agent workflows must be executed through **self-hosted Temporal (open source)**.  
+**Priority:** High  
+**Acceptance criteria:**
+
+- Temporal workflows handle retries, backoff, timeout, idempotency, and compensation steps.
+- Scheduled jobs support per-company periodic enrichment.
+- Workflow history is queryable for operational audit.
+- Temporal is deployed and operated in customer-managed infrastructure.
+- No dependency on Temporal Cloud or any managed/SaaS Temporal offering.
+
+#### TR-AI-03: Retrieval and knowledge services
+
+**Description:** The platform must support hybrid retrieval for both internal EAM context and external evidence.  
+**Priority:** High  
+**Acceptance criteria:**
+
+- Internal retrieval from Neo4j/GraphQL scoped by company.
+- External retrieval via approved search providers and domain allowlists.
+- Optional vector index for evidence chunks with metadata filters.
+
+#### TR-AI-04: AI service integration architecture
+
+**Description:** AI capabilities must be provided via a dedicated AI service integrated with existing GraphQL APIs.  
+**Priority:** High  
+**Acceptance criteria:**
+
+- AI service exposes internal APIs for run start, status, results, approval actions.
+- Existing backend remains source of truth; AI writes draft artifacts via controlled API mutations.
+- Feature toggles allow staged rollout per company.
+
 ## 5. Deliverables and timeline
 
 ### 5.1 Project phases
@@ -1087,6 +1233,24 @@ Simple-EAM consists of multiple components delivered as Docker containers:
    - Documentation and user guides
    - Acceptance testing
 
+5. **Phase 5: Agentic AI foundation and first use cases (6 weeks)**
+
+- AI service bootstrap with LangGraph and self-hosted Temporal (OSS)
+- Company strategic enrichment agent (Mission/Vision/Values/Goals/Strategies/BMC drafts)
+- Human-in-the-loop approval workflow and audit trail
+
+6. **Phase 6: Technology lifecycle intelligence (4 weeks)**
+
+- Vendor/software/hardware lifecycle ingestion and normalization
+- Lifecycle risk scoring and recommendation generation
+- Scheduled scan operations and alerting
+
+7. **Phase 7: As-is to to-be recommendations (5 weeks)**
+
+- Architecture analysis agent and improvement proposals
+- Recommendation scoring and roadmap candidate generation
+- Diagram suggestion integration
+
 ### 5.2 Milestones
 
 1. **M1: Project start** - May 12, 2025
@@ -1094,6 +1258,10 @@ Simple-EAM consists of multiple components delivered as Docker containers:
 3. **M3: Finish Phase 2** - June 30, 2025
 4. **M4: Finish Phase 3** - July 21, 2025
 5. **M5: Project completion** - August 4, 2025
+
+6. **M6: AI Foundation Complete** - planned
+7. **M7: Lifecycle Intelligence Complete** - planned
+8. **M8: To-be Recommendation Agent Complete** - planned
 
 ## 6. Assumptions and constraints
 
@@ -1108,6 +1276,77 @@ Simple-EAM consists of multiple components delivered as Docker containers:
 - The first version supports only Excel for import/export (no CSV, XML, etc.)
 - Diagram editing is limited to Excalidraw capabilities
 - No direct integration with external EA tools in the first version
+- Agent workflow orchestration must use self-hosted open-source components only (no managed SaaS dependency for orchestration).
+
+## 7. Concrete implementation blueprint (LangGraph + self-hosted Temporal)
+
+### 7.1 Target architecture
+
+- **AI Service (new):** Dedicated service for agent execution and orchestration.
+- **LangGraph Runtime:** Defines deterministic agent state graphs for each use case.
+- **Self-hosted Temporal Cluster/Service:** Executes durable workflows and schedules in customer-managed infrastructure.
+- **Simple-EAM GraphQL API:** Remains canonical write/read API for business entities.
+- **Neo4j:** System of record for architecture graph and approved AI outputs.
+- **Evidence Store:** Persist source snippets, retrieval metadata, and confidence records.
+- **Vector Index (optional):** For semantic retrieval over evidence and internal artifacts.
+
+### 7.2 Workflow blueprint by use case
+
+#### Blueprint A: Strategic enrichment (FR-AI-01)
+
+1. Trigger (manual or scheduled) with company context.
+2. Temporal workflow starts and creates run snapshot.
+3. LangGraph retrieves internal context (existing GEA/BMC data) and external evidence.
+4. Agent drafts Mission/Vision/Values/Goals/Strategies/BMC blocks with citations.
+5. Validation node checks contradictions and schema compliance.
+6. Draft artifacts stored via GraphQL mutations with `status = DRAFT`.
+7. Reviewer approves/rejects in UI; approved items are published.
+
+#### Blueprint B: Lifecycle intelligence (FR-AI-02)
+
+1. Collect portfolio inventory (applications, infrastructure, suppliers, versions).
+2. Enrich from vendor/product lifecycle sources.
+3. Normalize vendor/product/version naming.
+4. Compute risk score and urgency classification.
+5. Generate recommendations (upgrade/replace/monitor).
+6. Persist findings and open review tasks for architects.
+
+#### Blueprint C: As-is to to-be recommendations (FR-AI-03)
+
+1. Pull as-is graph submodel + strategic artifacts.
+2. Run gap analysis nodes (capability, process, application, technology).
+3. Generate candidate changes and dependency notes.
+4. Score candidates by value/risk/effort/time horizon.
+5. Produce to-be recommendation package and optional diagram suggestions.
+6. Route through approval and planning workflow.
+
+### 7.3 Data model and API additions (implementation-level)
+
+- Add AI domain entities (example names):
+  - `AiRun` (run metadata, status, model, cost, duration, company)
+  - `AiEvidence` (source URL, snippet, timestamp, confidence)
+  - `AiRecommendation` (type, target entities, rationale, score, status)
+  - `AiDraftArtifact` (proposed content for Mission/Vision/Goals/etc.)
+  - `AiApprovalTask` (assignee, decision, comments, timestamps)
+- Add GraphQL operations:
+  - `startAiRun`, `cancelAiRun`, `retryAiRun`
+  - `getAiRunStatus`, `listAiRuns`
+  - `approveAiArtifact`, `rejectAiArtifact`, `publishAiArtifact`
+  - `listAiRecommendations`, `applyAiRecommendation`
+
+### 7.4 Security, governance, and operations blueprint
+
+- Enforce company-scoped retrieval and writes in every workflow step.
+- Maintain immutable audit logs of prompts/tools/sources/decisions.
+- Add policy guardrails (disallowed domains, max-cost, max-runtime, retry limits).
+- Introduce observability dashboard (run status, failures, latency, cost by company).
+
+### 7.5 Rollout blueprint
+
+- **Wave 1 (MVP):** FR-AI-01 + approval workflow + citation traceability.
+- **Wave 2:** FR-AI-02 lifecycle intelligence + scheduled jobs + alerts.
+- **Wave 3:** FR-AI-03 target-architecture recommendations + roadmap scoring.
+- **Wave 4:** FR-AI-04 quality and relationship discovery agent.
   **Priorität:** Hoch  
   **Akzeptanzkriterien:**
 

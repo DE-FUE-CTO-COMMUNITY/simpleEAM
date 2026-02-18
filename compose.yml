@@ -138,6 +138,76 @@ services:
       - "traefik.http.services.${COMPOSE_PROJECT_NAME:-simple-eam}-excalidraw-room.loadbalancer.server.port=80"
       - "traefik.docker.network=${TRAEFIK_NETWORK}"
 
+  # Temporal PostgreSQL (self-hosted, dedicated persistence DB)
+  temporal-db:
+    image: postgres:15
+    restart: unless-stopped
+    profiles:
+      - temporal
+    environment:
+      - POSTGRES_DB=${TEMPORAL_DB_NAME:-temporal}
+      - POSTGRES_USER=${TEMPORAL_DB_USER:-temporal}
+      - POSTGRES_PASSWORD=${TEMPORAL_DB_PASSWORD:-temporal}
+    volumes:
+      - ./tools/temporal/postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${TEMPORAL_DB_USER:-temporal} -d ${TEMPORAL_DB_NAME:-temporal}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - eam-network
+
+  # Temporal Server (self-hosted, OSS)
+  temporal:
+    image: temporalio/auto-setup:1.24.2
+    restart: unless-stopped
+    profiles:
+      - temporal
+    depends_on:
+      temporal-db:
+        condition: service_healthy
+    environment:
+      - DB=postgres12
+      - DB_PORT=5432
+      - POSTGRES_USER=${TEMPORAL_DB_USER:-temporal}
+      - POSTGRES_PWD=${TEMPORAL_DB_PASSWORD:-temporal}
+      - POSTGRES_SEEDS=temporal-db
+    ports:
+      - "${TEMPORAL_EXTERNAL_PORT:-7233}:7233"
+    networks:
+      - eam-network
+
+  # Temporal UI
+  temporal-ui:
+    image: temporalio/ui:2.31.2
+    restart: unless-stopped
+    profiles:
+      - temporal
+    depends_on:
+      - temporal
+    environment:
+      - TEMPORAL_ADDRESS=temporal:7233
+      - TEMPORAL_CORS_ORIGINS=http://localhost:${TEMPORAL_UI_EXTERNAL_PORT:-8088},https://${TEMPORAL_UI_SUBDOMAIN:-temporal}.${BASE_DOMAIN}
+    ports:
+      - "${TEMPORAL_UI_EXTERNAL_PORT:-8088}:8080"
+    networks:
+      - eam-network
+      - ${TRAEFIK_NETWORK}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-temporal-ui.rule=Host(`${TEMPORAL_UI_SUBDOMAIN:-temporal}.${BASE_DOMAIN}`)"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-temporal-ui.entrypoints=websecure"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-temporal-ui.tls=true"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-temporal-ui.tls.certresolver=${TEMPORAL_UI_CERTRESOLVER:-netcupdns}"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-temporal-ui.tls.domains[0].main=${TEMPORAL_UI_SUBDOMAIN:-temporal}.${BASE_DOMAIN}"
+      - "traefik.http.services.${COMPOSE_PROJECT_NAME:-simple-eam}-temporal-ui.loadbalancer.server.port=8080"
+      - "traefik.docker.network=${TRAEFIK_NETWORK}"
+
   # Next.js Client
   client:
     build:
