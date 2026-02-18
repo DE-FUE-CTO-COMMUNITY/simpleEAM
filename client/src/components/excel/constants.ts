@@ -29,8 +29,8 @@ export const entityTypeMapping: Record<string, string> = {
   businessProcesses: 'businessProcesses',
   BusinessCapabilities: 'businessCapabilities',
   BusinessProcesses: 'businessProcesses',
-  'Business_Capabilities': 'businessCapabilities',
-  'Business_Processes': 'businessProcesses',
+  Business_Capabilities: 'businessCapabilities',
+  Business_Processes: 'businessProcesses',
   Applications: 'applications',
   applications: 'applications',
   'Data Objects': 'dataObjects',
@@ -86,13 +86,11 @@ export const entityTypeMapping: Record<string, string> = {
 }
 
 const normalizeTabName = (tabName: string): string =>
-  tabName
-    .trim()
-    .replace(/[_-]+/g, ' ')
-    .replace(/\s+/g, ' ')
-    .toLowerCase()
+  tabName.trim().replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').toLowerCase()
 
-const normalizedEntityTypeMapping: Record<string, string> = Object.entries(entityTypeMapping).reduce(
+const normalizedEntityTypeMapping: Record<string, string> = Object.entries(
+  entityTypeMapping
+).reduce(
   (acc, [key, value]) => {
     acc[normalizeTabName(key)] = value
     return acc
