@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client'
+import { gql } from '@apollo/client/core'
 
 // Query für alle Architektur-Elemente in der Bibliothek
 export const GET_LIBRARY_ELEMENTS = gql`

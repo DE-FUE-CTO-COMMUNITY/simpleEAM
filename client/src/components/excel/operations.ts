@@ -1,4 +1,4 @@
-import { ApolloClient, gql } from '@apollo/client'
+import { ApolloClient, gql } from '@apollo/client/core'
 import { getMutationsByEntityType, getDeleteMutationByEntityType } from './graphql'
 import {
   createEntityInput,
@@ -6,7 +6,11 @@ import {
   transformInputForUpdate,
   mapRelationshipValues,
 } from './utils'
-import { createEntityInputFromJson, sanitizeJsonImportData } from '../../utils/jsonInputUtils'
+import {
+  createEntityInputFromJson,
+  sanitizeJsonImportData,
+  validateBpmnXmlForImport,
+} from '../../utils/jsonInputUtils'
 import { ImportWithMappingResult, EntityMapping, ImportResult } from './types'
 import { entityTypeMapping, isGeaEntityType } from './constants'
 
@@ -104,6 +108,15 @@ export const importEntityDataWithMapping = async (
     }
 
     try {
+      if (format === 'json' && entityType === 'businessProcesses') {
+        const bpmnValidationErrors = await validateBpmnXmlForImport(row.bpmnXml)
+        if (bpmnValidationErrors.length > 0) {
+          errors.push(`Row ${i + 1}: ${bpmnValidationErrors.join(' | ')}`)
+          failed++
+          continue
+        }
+      }
+
       // WICHTIG: Format-spezifische Input-Erstellung verwenden
       if (format === 'json') {
         input = createEntityInputFromJson(entityType, row)

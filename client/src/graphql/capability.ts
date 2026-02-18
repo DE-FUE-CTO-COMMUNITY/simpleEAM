@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client'
+import { gql } from '@apollo/client/core'
 
 export const GET_CAPABILITIES_COUNT = gql`
   query GetBusinessCapabilitiesCount($where: BusinessCapabilityWhere) {

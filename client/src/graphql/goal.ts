@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client'
+import { gql } from '@apollo/client/core'
 
 export const GET_GOALS = gql`
   query GetGeaGoals($where: GEA_GoalWhere) {

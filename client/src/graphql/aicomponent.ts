@@ -1,6 +1,6 @@
 // GraphQL Operations für AI Components
 
-import { gql } from '@apollo/client'
+import { gql } from '@apollo/client/core'
 
 // Query: Alle AI Components abrufen
 export const GET_Aicomponents = gql`

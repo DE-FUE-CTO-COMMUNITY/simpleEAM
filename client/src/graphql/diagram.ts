@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client'
+import { gql } from '@apollo/client/core'
 
 export const GET_DIAGRAMS_COUNT = gql`
   query GetDiagramsCount($where: DiagramWhere) {

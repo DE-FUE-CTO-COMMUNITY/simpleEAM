@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client'
+import { gql } from '@apollo/client/core'
 
 export const GET_ARCHITECTURE_PRINCIPLES_COUNT = gql`
   query GetArchitecturePrinciplesCount($where: ArchitecturePrincipleWhere) {

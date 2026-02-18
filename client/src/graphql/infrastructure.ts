@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client'
+import { gql } from '@apollo/client/core'
 
 export const CHECK_INFRASTRUCTURE_EXISTS = gql`
   query CheckInfrastructureExists($id: ID!) {

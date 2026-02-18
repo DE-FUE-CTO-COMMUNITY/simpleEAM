@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client'
+import { gql } from '@apollo/client/core'
 
 export const GET_BUSINESS_PROCESSES = gql`
   query GetBusinessProcesses($where: BusinessProcessWhere) {

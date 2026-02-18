@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client'
+import { gql } from '@apollo/client/core'
 
 /**
  * Query zum Laden verwandter Elemente für ein bestimmtes Element

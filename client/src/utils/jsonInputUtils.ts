@@ -13,6 +13,77 @@ const generateFallbackName = (prefix: string, row: any): string => {
   return row.name || row.title || row.firstName || `${prefix} ${Date.now().toString().slice(-4)}`
 }
 
+export const validateBpmnXmlForImport = async (xml: unknown): Promise<string[]> => {
+  if (typeof xml !== 'string' || !xml.trim()) {
+    return []
+  }
+
+  const errors: string[] = []
+
+  try {
+    const bpmnModdleModule = (await import('bpmn-moddle')) as any
+    const BpmnModdleConstructor =
+      bpmnModdleModule?.BpmnModdle ??
+      bpmnModdleModule?.default?.BpmnModdle ??
+      bpmnModdleModule?.default?.default ??
+      bpmnModdleModule?.default ??
+      bpmnModdleModule
+
+    if (typeof BpmnModdleConstructor !== 'function') {
+      return ['BPMN validation library could not be initialized.']
+    }
+
+    const moddle = new BpmnModdleConstructor()
+    const validationResult = (await moddle.fromXML(xml)) as any
+
+    const rootElement = validationResult?.rootElement
+    if (rootElement?.$type !== 'bpmn:Definitions') {
+      errors.push('BPMN root element must be bpmn:Definitions.')
+      return errors
+    }
+
+    const rootElements = Array.isArray(rootElement?.rootElements) ? rootElement.rootElements : []
+    const processes = rootElements.filter((element: any) => element?.$type === 'bpmn:Process')
+
+    if (processes.length === 0) {
+      errors.push('BPMN must contain at least one bpmn:Process.')
+    }
+
+    const diagrams = Array.isArray(rootElement?.diagrams) ? rootElement.diagrams : []
+    if (diagrams.length === 0) {
+      errors.push('BPMN must contain at least one bpmndi:BPMNDiagram.')
+    } else {
+      const hasAnyPlane = diagrams.some(
+        (diagram: any) => diagram?.plane?.$type === 'bpmndi:BPMNPlane'
+      )
+      if (!hasAnyPlane) {
+        errors.push('BPMN diagram must contain a bpmndi:BPMNPlane.')
+      }
+    }
+
+    processes.forEach((process: any) => {
+      const flowElements = Array.isArray(process?.flowElements) ? process.flowElements : []
+      const startEvents = flowElements.filter(
+        (element: any) => element?.$type === 'bpmn:StartEvent'
+      )
+      const endEvents = flowElements.filter((element: any) => element?.$type === 'bpmn:EndEvent')
+
+      if (startEvents.length === 0) {
+        errors.push(`Process "${process?.name || process?.id || 'unknown'}" has no start event.`)
+      }
+
+      if (endEvents.length === 0) {
+        errors.push(`Process "${process?.name || process?.id || 'unknown'}" has no end event.`)
+      }
+    })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown BPMN parsing error'
+    errors.push(`Invalid BPMN XML: ${message}`)
+  }
+
+  return errors
+}
+
 /**
  * Erstellt Entity-Input aus JSON-Zeile für GraphQL-Mutation
  * Berücksichtigt verschachtelte Beziehungen und vollständige Objektstrukturen
@@ -269,7 +340,6 @@ export const createEntityInputFromJson = (entityType: string, row: any): any => 
         )
           ? row.diagramType.toUpperCase()
           : undefined,
-        updatedAt: row.updatedAt ? new Date(row.updatedAt) : undefined,
       }
     }
 
@@ -337,6 +407,53 @@ export const createEntityInputFromJson = (entityType: string, row: any): any => 
         endOfUseDate: row.endOfUseDate ? new Date(row.endOfUseDate) : undefined,
         endOfLifeDate: row.endOfLifeDate ? new Date(row.endOfLifeDate) : undefined,
         updatedAt: row.updatedAt ? new Date(row.updatedAt) : undefined,
+      }
+
+    case 'aicomponents':
+      return {
+        name: generateFallbackName('AI Component', row),
+        description: row.description || '',
+        aiType: [
+          'MACHINE_LEARNING_MODEL',
+          'NATURAL_LANGUAGE_MODEL',
+          'COMPUTER_VISION_MODEL',
+          'RECOMMENDATION_ENGINE',
+          'PREDICTIVE_ANALYTICS',
+          'ROBOTIC_PROCESS_AUTOMATION',
+          'EXPERT_SYSTEM',
+          'NEURAL_NETWORK',
+          'OTHER',
+        ].includes(row.aiType?.toUpperCase())
+          ? row.aiType.toUpperCase()
+          : 'MACHINE_LEARNING_MODEL',
+        status: ['ACTIVE', 'INACTIVE', 'IN_DEVELOPMENT', 'DEPRECATED', 'PLANNED'].includes(
+          row.status?.toUpperCase()
+        )
+          ? row.status.toUpperCase()
+          : 'IN_DEVELOPMENT',
+        model: row.model || '',
+        version: row.version ? String(row.version) : '',
+        provider: row.provider || '',
+        license: row.license || '',
+        accuracy:
+          typeof row.accuracy === 'number'
+            ? row.accuracy
+            : row.accuracy && row.accuracy !== ''
+              ? parseFloat(row.accuracy)
+              : undefined,
+        costs:
+          typeof row.costs === 'number'
+            ? row.costs
+            : row.costs && row.costs !== ''
+              ? parseFloat(row.costs)
+              : undefined,
+        tags: Array.isArray(row.tags)
+          ? row.tags
+          : typeof row.tags === 'string' && row.tags.trim()
+            ? row.tags.split(',').map((tag: string) => tag.trim())
+            : undefined,
+        trainingDate: row.trainingDate ? new Date(row.trainingDate) : undefined,
+        lastUpdated: row.lastUpdated ? new Date(row.lastUpdated) : undefined,
       }
 
     case 'visions':

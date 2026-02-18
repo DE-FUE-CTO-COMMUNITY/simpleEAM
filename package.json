@@ -19,6 +19,9 @@
     "lint": "yarn lint:client && yarn lint:server",
     "lint:client": "cd client && yarn lint",
     "lint:server": "cd server && yarn lint",
+    "import:json": "yarn --cwd client import:json",
+    "import:demo-json": "yarn --cwd client import:demo-json",
+    "import:demo-json:dry-run": "yarn --cwd client import:demo-json:dry-run",
     "test": "yarn test:client && yarn test:server",
     "test:client": "cd client && yarn test",
     "test:server": "cd server && yarn test"

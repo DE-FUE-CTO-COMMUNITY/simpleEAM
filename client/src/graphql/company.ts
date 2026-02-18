@@ -1,6 +1,6 @@
 // GraphQL Operations für Companies
 
-import { gql } from '@apollo/client'
+import { gql } from '@apollo/client/core'
 
 // Query: Alle companies abrufen
 export const GET_COMPANIES = gql`

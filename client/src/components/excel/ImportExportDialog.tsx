@@ -740,9 +740,9 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
                     isImporting ||
                     validationResult.errors.length > 0 ||
                     validationResult.summary.validRows === 0 ||
-                    (importSettings.companyImportMode === 'selectedCompany' && !selectedCompanyId) ||
-                    (importSettings.companyImportMode === 'exportedCompany' &&
-                      !exportedCompanyInfo)
+                    (importSettings.companyImportMode === 'selectedCompany' &&
+                      !selectedCompanyId) ||
+                    (importSettings.companyImportMode === 'exportedCompany' && !exportedCompanyInfo)
                   }
                   title={
                     importSettings.companyImportMode === 'selectedCompany' && !selectedCompanyId

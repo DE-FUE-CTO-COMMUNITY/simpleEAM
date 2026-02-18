@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client'
+import { gql } from '@apollo/client/core'
 
 export const CHECK_APPLICATION_INTERFACE_EXISTS = gql`
   query CheckApplicationInterfaceExists($id: ID!) {

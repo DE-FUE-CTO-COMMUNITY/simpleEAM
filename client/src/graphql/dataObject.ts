@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client'
+import { gql } from '@apollo/client/core'
 
 export const CHECK_DATA_OBJECT_EXISTS = gql`
   query CheckDataObjectExists($id: ID!) {

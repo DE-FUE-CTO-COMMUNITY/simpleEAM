@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client'
+import { gql } from '@apollo/client/core'
 
 // Mutation zum Verknüpfen einer BusinessCapability mit einer Architektur
 export const LINK_CAPABILITY_TO_ARCHITECTURE = gql`
