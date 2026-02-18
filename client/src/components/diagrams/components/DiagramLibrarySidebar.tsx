@@ -11,9 +11,6 @@ import {
   type DragEvent,
 } from 'react'
 import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
   Box,
   CircularProgress,
   Divider,
@@ -28,7 +25,6 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import SearchIcon from '@mui/icons-material/Search'
@@ -56,6 +52,7 @@ import {
   normalizeTemplateFonts,
   createLibraryItemFromDatabaseElement,
 } from '../utils/architectureElements'
+import GroupedElementSections, { type GroupedElementListSection } from './GroupedElementSections'
 
 const SIDEBAR_WIDTH = 340
 const HANDLE_WIDTH = 32
@@ -80,7 +77,6 @@ interface SidebarSection {
   title: string
   items: SidebarItem[]
   emptyLabel: string
-  defaultExpanded?: boolean
 }
 
 const DATA_ACCESSORS: Partial<
@@ -833,63 +829,20 @@ const DiagramLibrarySidebar = forwardRef<DiagramLibrarySidebarHandle, DiagramLib
       [handleDragStart, typeColors]
     )
 
-    const renderSection = (section: SidebarSection, loading: boolean) => (
-      <Accordion
-        key={section.key}
-        disableGutters
-        square
-        expanded={expandedSections.has(section.key)}
-        onChange={(_, isExpanded) => {
-          setExpandedSections(prev => {
-            const next = new Set(prev)
-            if (isExpanded) {
-              next.add(section.key)
-            } else {
-              next.delete(section.key)
-            }
-            return next
-          })
-        }}
-        sx={{
-          '&:before': { display: 'none' },
-          boxShadow: 'none',
-          borderBottom: theme => `1px solid ${theme.palette.divider}`,
-        }}
-      >
-        <AccordionSummary expandIcon={<ExpandMoreIcon fontSize="small" />} sx={{ px: 1 }}>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              width: '100%',
-              justifyContent: 'space-between',
-            }}
-          >
-            <Typography variant="subtitle2" fontWeight={600}>
-              {section.title}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {section.items.length}
-            </Typography>
-          </Box>
-        </AccordionSummary>
-        <AccordionDetails sx={{ px: 1 }}>
-          {loading && !section.items.length ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 1 }}>
-              <CircularProgress size={18} />
-            </Box>
-          ) : section.items.length ? (
-            <List dense disablePadding>
-              {section.items.map(item => renderListItem(item))}
-            </List>
-          ) : (
-            <Typography variant="body2" color="text.secondary">
-              {section.emptyLabel}
-            </Typography>
-          )}
-        </AccordionDetails>
-      </Accordion>
-    )
+    const existingGroupedSections = useMemo<GroupedElementListSection[]>(() => {
+      return existingSections.map(section => ({
+        key: section.key,
+        title: section.title,
+        emptyLabel: section.emptyLabel,
+        items: section.items.map(item => ({
+          id: item.id,
+          title: item.title,
+          elementType: item.elementType,
+          draggable: true,
+          onDragStart: event => handleDragStart(event, item),
+        })),
+      }))
+    }, [existingSections, handleDragStart])
 
     return (
       <Box
@@ -1011,7 +964,17 @@ const DiagramLibrarySidebar = forwardRef<DiagramLibrarySidebarHandle, DiagramLib
                   <Typography variant="overline" sx={{ px: 2, pb: 1 }} color="text.secondary">
                     {tSidebar('existingHeading')}
                   </Typography>
-                  {existingSections.map(section => renderSection(section, elementsLoading))}
+                  <GroupedElementSections
+                    sections={existingGroupedSections}
+                    loading={elementsLoading}
+                    expandedSections={expandedSections}
+                    onExpandedSectionsChange={setExpandedSections}
+                    getItemColor={item =>
+                      typeColors[item.elementType as ElementType] ??
+                      ELEMENT_TYPE_CONFIG[item.elementType as ElementType]?.color ??
+                      'transparent'
+                    }
+                  />
                 </Box>
               )}
 

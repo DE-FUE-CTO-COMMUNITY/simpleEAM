@@ -22,6 +22,13 @@ export const GET_RELATED_ELEMENTS_FOR_CAPABILITY = gql`
         status
         criticality
       }
+      supportedByBusinessProcesses {
+        id
+        name
+        description
+        processType
+        status
+      }
       relatedDataObjects {
         id
         name
@@ -64,6 +71,13 @@ export const GET_RELATED_ELEMENTS_FOR_APPLICATION = gql`
         type
         maturityLevel
         businessValue
+      }
+      supportsBusinessProcesses {
+        id
+        name
+        description
+        processType
+        status
       }
       usesDataObjects {
         id
@@ -190,12 +204,63 @@ export const GET_RELATED_ELEMENTS_FOR_INFRASTRUCTURE = gql`
   }
 `
 
+// Query für verwandte Elemente eines Business Process
+export const GET_RELATED_ELEMENTS_FOR_BUSINESS_PROCESS = gql`
+  query GetRelatedElementsForBusinessProcess($id: ID!) {
+    businessProcesses(where: { id: { eq: $id } }) {
+      id
+      name
+      description
+      processType
+      status
+      maturityLevel
+      category
+      supportsCapabilities {
+        id
+        name
+        description
+        status
+        type
+        maturityLevel
+        businessValue
+      }
+      supportedByApplications {
+        id
+        name
+        description
+        status
+        criticality
+      }
+      parentProcess {
+        id
+        name
+        description
+        processType
+        status
+      }
+      childProcesses {
+        id
+        name
+        description
+        processType
+        status
+      }
+    }
+  }
+`
+
 // Union-Type für verwandte Elemente Response
 export interface RelatedElement {
   id: string
   name: string
   description?: string
-  elementType: 'businessCapability' | 'application' | 'dataObject' | 'interface' | 'infrastructure'
+  elementType:
+    | 'businessCapability'
+    | 'businessProcess'
+    | 'application'
+    | 'dataObject'
+    | 'interface'
+    | 'infrastructure'
   // Element-spezifische Eigenschaften
   status?: string
   criticality?: string

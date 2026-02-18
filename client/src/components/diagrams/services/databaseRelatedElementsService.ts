@@ -7,6 +7,7 @@ import {
   GET_RELATED_ELEMENTS_FOR_DATA_OBJECT,
   GET_RELATED_ELEMENTS_FOR_INTERFACE,
   GET_RELATED_ELEMENTS_FOR_INFRASTRUCTURE,
+  GET_RELATED_ELEMENTS_FOR_BUSINESS_PROCESS,
   RelatedElementsResponse,
 } from '../../../graphql/relatedElements'
 import { normalizeElementType } from '../utils/relationshipValidation'
@@ -38,6 +39,10 @@ export const loadRelatedElementsFromDatabase = async ({
       case 'application':
         query = GET_RELATED_ELEMENTS_FOR_APPLICATION
         queryName = 'applications'
+        break
+      case 'businessProcess':
+        query = GET_RELATED_ELEMENTS_FOR_BUSINESS_PROCESS
+        queryName = 'businessProcesses'
         break
       case 'dataObject':
         query = GET_RELATED_ELEMENTS_FOR_DATA_OBJECT
@@ -130,6 +135,19 @@ export const extractRelatedElementsFromQueryResult = (
           })
         })
       }
+      if (elementData.supportedByBusinessProcesses) {
+        elementData.supportedByBusinessProcesses.forEach((proc: any) => {
+          relatedElements.push({
+            id: proc.id,
+            name: proc.name,
+            description: proc.description,
+            elementType: 'businessProcess',
+            status: proc.status,
+            relationshipType: 'SUPPORTS_CAPABILITY',
+            reverseArrow: true,
+          })
+        })
+      }
       if (elementData.relatedDataObjects) {
         elementData.relatedDataObjects.forEach((dataObj: any) => {
           relatedElements.push({
@@ -183,6 +201,19 @@ export const extractRelatedElementsFromQueryResult = (
           })
         })
       }
+      if (elementData.supportsBusinessProcesses) {
+        elementData.supportsBusinessProcesses.forEach((proc: any) => {
+          relatedElements.push({
+            id: proc.id,
+            name: proc.name,
+            description: proc.description,
+            elementType: 'businessProcess',
+            status: proc.status,
+            relationshipType: 'SUPPORTS_PROCESS',
+            reverseArrow: false,
+          })
+        })
+      }
       if (elementData.usesDataObjects) {
         elementData.usesDataObjects.forEach((dataObj: any) => {
           relatedElements.push({
@@ -229,6 +260,62 @@ export const extractRelatedElementsFromQueryResult = (
             elementType: 'infrastructure',
             infrastructureType: infra.infrastructureType,
             status: infra.status,
+          })
+        })
+      }
+      break
+    case 'businessProcess':
+      if (elementData.supportsCapabilities) {
+        elementData.supportsCapabilities.forEach((cap: any) => {
+          relatedElements.push({
+            id: cap.id,
+            name: cap.name,
+            description: cap.description,
+            elementType: 'businessCapability',
+            status: cap.status,
+            type: cap.type,
+            maturityLevel: cap.maturityLevel,
+            businessValue: cap.businessValue,
+          })
+        })
+      }
+      if (elementData.supportedByApplications) {
+        elementData.supportedByApplications.forEach((app: any) => {
+          relatedElements.push({
+            id: app.id,
+            name: app.name,
+            description: app.description,
+            elementType: 'application',
+            status: app.status,
+            criticality: app.criticality,
+            relationshipType: 'SUPPORTS',
+            reverseArrow: true,
+          })
+        })
+      }
+      if (elementData.parentProcess) {
+        elementData.parentProcess.forEach((proc: any) => {
+          relatedElements.push({
+            id: proc.id,
+            name: proc.name,
+            description: proc.description,
+            elementType: 'businessProcess',
+            status: proc.status,
+            relationshipType: 'HAS_PARENT_PROCESS',
+            reverseArrow: false,
+          })
+        })
+      }
+      if (elementData.childProcesses) {
+        elementData.childProcesses.forEach((proc: any) => {
+          relatedElements.push({
+            id: proc.id,
+            name: proc.name,
+            description: proc.description,
+            elementType: 'businessProcess',
+            status: proc.status,
+            relationshipType: 'HAS_CHILD_PROCESS',
+            reverseArrow: false,
           })
         })
       }
@@ -351,6 +438,7 @@ export const getRelationshipTypesForElement = (elementType: string): string[] =>
   const relationshipMap = {
     capability: ['SUPPORTS', 'RELATES_TO', 'HAS_PARENT', 'HAS_CHILD'],
     application: ['SUPPORTS', 'USES', 'SOURCE_OF', 'TARGET_OF', 'HOSTED_ON'],
+    businessProcess: ['SUPPORTS_CAPABILITY', 'SUPPORTED_BY_APPLICATION', 'PARENT_PROCESS'],
     dataObject: ['USED_BY', 'DATA_SOURCE', 'RELATES_TO', 'TRANSFERRED_IN'],
     interface: ['SOURCE', 'TARGET', 'TRANSFERS'],
     infrastructure: ['HOSTS'],

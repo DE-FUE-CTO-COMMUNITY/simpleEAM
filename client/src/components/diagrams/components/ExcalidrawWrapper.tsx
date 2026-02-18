@@ -8,7 +8,7 @@ import { useThemeConfig } from '@/lib/runtime-config'
 import ExcalidrawLoading from './ExcalidrawLoading'
 import { useExcalidrawCollaboration } from '../hooks/useExcalidrawCollaboration'
 import { CollaborationDialog } from '../dialogs/CollaborationDialog'
-import AddRelatedElementsDialog from '../dialogs/AddRelatedElementsDialog'
+import LinkRelatedElementDialog from '../dialogs/LinkRelatedElementDialog'
 import { FullCustomContextMenu } from './FullCustomContextMenu'
 import ElementFormDialog from '../dialogs/ElementFormDialog'
 import { ExcalidrawElement } from '../types/relationshipTypes'
@@ -623,8 +623,8 @@ const ExcalidrawWrapper = dynamic(
             onStopCollaboration={stopCollaboration}
           />
 
-          {/* Add Related Elements Dialog */}
-          <AddRelatedElementsDialog
+          {/* Link Related Element Dialog */}
+          <LinkRelatedElementDialog
             isOpen={isAddRelatedElementsDialogOpen}
             onClose={onCloseAddRelatedElementsDialog}
             selectedElement={selectedElementForRelatedElements}

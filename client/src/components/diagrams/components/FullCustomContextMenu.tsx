@@ -5,7 +5,7 @@ import {
   ContentCopy as CopyIcon,
   ContentPaste as PasteIcon,
   Delete as DeleteIcon,
-  Add as AddRelatedIcon,
+  Link as LinkIcon,
   FlipToFront as BringToFrontIcon,
   FlipToBack as SendToBackIcon,
   FileCopy as DuplicateIcon,
@@ -318,8 +318,7 @@ export const FullCustomContextMenu: React.FC<CustomContextMenuProps> = ({
     handleClose()
   }, [excalidrawAPI, contextMenu, handleClose])
 
-  // Custom action: Add related elements
-  const handleAddRelatedElements = useCallback(() => {
+  const handleLinkRelatedElement = useCallback(() => {
     if (contextMenu?.selectedElements && contextMenu.selectedElements.length > 0) {
       // Find the first element with a databaseId
       const elementWithDb = contextMenu.selectedElements.find(
@@ -478,13 +477,12 @@ export const FullCustomContextMenu: React.FC<CustomContextMenuProps> = ({
           </MenuItem>
         )}
 
-        {/* Verwandte Elemente hinzufügen - im main-Branch deaktiviert */}
-        {false && hasDbElement && !viewModeEnabled && (
-          <MenuItem onClick={handleAddRelatedElements}>
+        {hasDbElement && !viewModeEnabled && !isViewerRole && (
+          <MenuItem onClick={handleLinkRelatedElement}>
             <ListItemIcon>
-              <AddRelatedIcon fontSize="small" />
+              <LinkIcon fontSize="small" />
             </ListItemIcon>
-            <ListItemText>{t('diagrams.contextMenu.addRelatedElements')}</ListItemText>
+            <ListItemText>{t('diagrams.contextMenu.linkRelatedElement')}</ListItemText>
           </MenuItem>
         )}
 

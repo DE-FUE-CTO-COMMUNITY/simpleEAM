@@ -244,8 +244,30 @@
       "bringToFront": "In den Vordergrund",
       "sendToBack": "In den Hintergrund",
       "addRelatedElements": "Verwandte Elemente hinzufügen",
+      "linkRelatedElement": "Verwandtes Element hinzufügen",
       "viewElement": "Element anzeigen",
       "editElement": "Element bearbeiten"
+    },
+    "linkRelatedElement": {
+      "title": "Verwandtes Element hinzufügen",
+      "description": "Wählen Sie ein verwandtes Element für \"{element}\". Es wird auf der Zeichenfläche hinzugefügt und per Pfeil verknüpft.",
+      "loading": "Verwandte Elemente werden geladen...",
+      "noRelations": "Für dieses Element wurden keine verwandten Elemente gefunden.",
+      "unsupportedType": "Dieser Elementtyp wird für die Verknüpfung verwandter Elemente nicht unterstützt.",
+      "libraryError": "Die ArchiMate-Bibliothek konnte nicht geladen werden.",
+      "templateMissing": "Kein Template für Typ \"{type}\" gefunden.",
+      "createElementError": "Das verwandte Element konnte nicht auf der Zeichenfläche erstellt werden.",
+      "loadError": "Fehler beim Laden verwandter Elemente: {error}",
+      "linkError": "Fehler beim Verknüpfen des verwandten Elements: {error}",
+      "elementTypes": {
+        "businessCapability": "Business Capabilities",
+        "businessProcess": "Geschäftsprozesse",
+        "application": "Applikationen",
+        "dataObject": "Datenobjekte",
+        "interface": "Schnittstellen",
+        "infrastructure": "Infrastruktur",
+        "aiComponent": "KI-Komponenten"
+      }
     },
     "addRelatedElements": {
       "title": "Verwandte Elemente hinzufügen",

@@ -238,8 +238,30 @@
       "bringToFront": "Bring to Front",
       "sendToBack": "Send to Back",
       "addRelatedElements": "Add Related Elements",
+      "linkRelatedElement": "Add Related Element",
       "viewElement": "View Element",
       "editElement": "Edit Element"
+    },
+    "linkRelatedElement": {
+      "title": "Add Related Element",
+      "description": "Select one related element for \"{element}\". It will be added to the canvas and linked with an arrow.",
+      "loading": "Loading related elements...",
+      "noRelations": "No related elements found for this element.",
+      "unsupportedType": "This element type is not supported for related-element linking.",
+      "libraryError": "ArchiMate library could not be loaded.",
+      "templateMissing": "No template found for type \"{type}\".",
+      "createElementError": "The related element could not be created on canvas.",
+      "loadError": "Error while loading related elements: {error}",
+      "linkError": "Error while linking related element: {error}",
+      "elementTypes": {
+        "businessCapability": "Business Capabilities",
+        "businessProcess": "Business Processes",
+        "application": "Applications",
+        "dataObject": "Data Objects",
+        "interface": "Interfaces",
+        "infrastructure": "Infrastructure",
+        "aiComponent": "AI Components"
+      }
     },
     "addRelatedElements": {
       "title": "Add Related Elements",

@@ -7,6 +7,7 @@
 // Nur Architekturelemente, die in Diagrammen vorkommen können
 export type ElementType =
   | 'businessCapability'
+  | 'businessProcess'
   | 'application'
   | 'dataObject'
   | 'applicationInterface'
@@ -317,10 +318,16 @@ export const normalizeElementType = (elementType: string): ElementType | null =>
   const typeMapping: Record<string, ElementType> = {
     capability: 'businessCapability',
     businessCapability: 'businessCapability',
+    businessProcess: 'businessProcess',
+    'business-process': 'businessProcess',
+    business_process: 'businessProcess',
+    process: 'businessProcess',
     application: 'application',
     dataObject: 'dataObject',
     interface: 'applicationInterface',
     applicationInterface: 'applicationInterface',
+    'application-interface': 'applicationInterface',
+    application_interface: 'applicationInterface',
     infrastructure: 'infrastructure',
   }
 
