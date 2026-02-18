@@ -1851,6 +1851,7 @@ export const validateImportData = (
 export const getTemplateWithExamples = (
   entityType:
     | 'businessCapabilities'
+    | 'businessProcesses'
     | 'applications'
     | 'dataObjects'
     | 'interfaces'

@@ -153,9 +153,9 @@ const MatrixEditorPage = () => {
     fetchPolicy: 'cache-and-network',
   })
 
-  const [updateMission, { loading: isUpdatingMission }] = useMutation(UPDATE_MISSION)
-  const [updateValue, { loading: isUpdatingValue }] = useMutation(UPDATE_VALUE)
-  const [updateGoal, { loading: isUpdatingGoal }] = useMutation(UPDATE_GOAL)
+  const [updateMission] = useMutation(UPDATE_MISSION)
+  const [updateValue] = useMutation(UPDATE_VALUE)
+  const [updateGoal] = useMutation(UPDATE_GOAL)
   const [createMission, { loading: isCreatingMission }] = useMutation(CREATE_MISSION)
   const [createVision, { loading: isCreatingVision }] = useMutation(CREATE_VISION)
   const [createValue, { loading: isCreatingValue }] = useMutation(CREATE_VALUE)
@@ -680,11 +680,6 @@ const MatrixEditorPage = () => {
 
   const totalSum: number = matrixScores.reduce(
     (sum, row) => sum + row.reduce<number>((rowSum, score) => rowSum + (score ?? 0), 0),
-    0
-  )
-
-  const scoredCellCount = matrixScores.reduce(
-    (count, row) => count + row.filter(score => score !== null).length,
     0
   )
 
