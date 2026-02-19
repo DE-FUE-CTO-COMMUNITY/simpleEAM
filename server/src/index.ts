@@ -9,6 +9,7 @@ import http from 'http'
 // Import custom modules
 import { testConnection, closeDriver } from './db/neo4j-client'
 import { neoSchema } from './graphql/schema'
+import { aiRunRouter } from './ai/routes'
 
 // Load environment variables
 dotenv.config()
@@ -102,6 +103,9 @@ async function startServer() {
   // Increase body parser limits for large diagram payloads
   app.use(express.json({ limit: '50mb' }))
   app.use(express.urlencoded({ limit: '50mb', extended: true }))
+
+  // AI run REST endpoints
+  app.use(aiRunRouter)
 
   // Create GraphQL schema
   const schema = await neoSchema.getSchema()

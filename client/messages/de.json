@@ -2294,6 +2294,7 @@
     "tabs": {
       "userManagement": "Benutzerverwaltung",
       "featureManagement": "Feature-Management",
+      "aiRuns": "KI-Läufe",
       "debugTools": "Debug-Tools"
     },
     "featureManagement": {
@@ -2483,6 +2484,24 @@
         "showDiagramSaveLogsDesc": "Zeigt detaillierte Performance-Logs beim Speichern von Diagrammen (PNG-Generierung, GraphQL-Mutationen, etc.)",
         "resetToDefaults": "Auf Standardwerte zurücksetzen"
       }
+    },
+    "aiRuns": {
+      "title": "KI-Workflow-Läufe",
+      "description": "Starten Sie einen minimalen Temporal-KI-Lauf und überwachen Sie Statusänderungen.",
+      "selectedCompany": "Ausgewähltes Unternehmen: {name}",
+      "noCompanySelected": "Kein Unternehmen ausgewählt.",
+      "promptLabel": "Prompt",
+      "objectiveLabel": "Ziel (optional)",
+      "startButton": "KI-Lauf starten",
+      "starting": "Wird gestartet...",
+      "selectCompanyFirst": "Bitte zuerst ein Unternehmen auswählen.",
+      "promptRequired": "Bitte geben Sie einen Prompt ein.",
+      "startSuccess": "KI-Lauf gestartet (Workflow: {workflowId}).",
+      "startError": "KI-Lauf konnte nicht gestartet werden.",
+      "loadError": "KI-Läufe konnten nicht geladen werden.",
+      "historyTitle": "Laufhistorie",
+      "noRuns": "Keine Läufe für das ausgewählte Unternehmen gefunden.",
+      "workflowId": "Workflow-ID"
     },
     "debugOverlay": {
       "title": "Element-Koordinaten",

@@ -54,6 +54,9 @@ services:
       - AUTH_DEBUG=${AUTH_DEBUG}
       - NEO4J_DEBUG=${NEO4J_DEBUG}
       - NEO4J_LOG_LEVEL=${NEO4J_LOG_LEVEL}
+      - TEMPORAL_ADDRESS=${TEMPORAL_ADDRESS:-temporal:7233}
+      - TEMPORAL_NAMESPACE=${TEMPORAL_NAMESPACE:-default}
+      - AI_RUN_TASK_QUEUE=${AI_RUN_TASK_QUEUE:-simple-eam-ai}
     # No bind mounts for src, prisma, tests - everything comes from the image
     networks:
       - eam-network
@@ -207,6 +210,32 @@ services:
       - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-temporal-ui.tls.domains[0].main=${TEMPORAL_UI_SUBDOMAIN:-temporal}.${BASE_DOMAIN}"
       - "traefik.http.services.${COMPOSE_PROJECT_NAME:-simple-eam}-temporal-ui.loadbalancer.server.port=8080"
       - "traefik.docker.network=${TRAEFIK_NETWORK}"
+
+  # AI Worker (Temporal worker for AI runs)
+  ai-worker:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+      args:
+        NODE_ENV: ${NODE_ENV}
+    restart: unless-stopped
+    profiles:
+      - temporal
+    depends_on:
+      - neo4j
+      - temporal
+    entrypoint: ["yarn"]
+    command: ["worker"]
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - NEO4J_URI=bolt://neo4j:${NEO4J_BOLT_PORT}
+      - NEO4J_USER=${NEO4J_USER}
+      - NEO4J_PASSWORD=${NEO4J_PASSWORD}
+      - TEMPORAL_ADDRESS=${TEMPORAL_ADDRESS:-temporal:7233}
+      - TEMPORAL_NAMESPACE=${TEMPORAL_NAMESPACE:-default}
+      - AI_RUN_TASK_QUEUE=${AI_RUN_TASK_QUEUE:-simple-eam-ai}
+    networks:
+      - eam-network
 
   # Next.js Client
   client:

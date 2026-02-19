@@ -2347,6 +2347,7 @@
     "tabs": {
       "userManagement": "User Management",
       "featureManagement": "Feature Management",
+      "aiRuns": "AI Runs",
       "debugTools": "Debug Tools"
     },
     "featureManagement": {
@@ -2540,6 +2541,24 @@
         "showDiagramSaveLogsDesc": "Shows detailed performance logs when saving diagrams (PNG generation, GraphQL mutations, etc.)",
         "resetToDefaults": "Reset to Defaults"
       }
+    },
+    "aiRuns": {
+      "title": "AI Workflow Runs",
+      "description": "Trigger a minimal Temporal AI run and monitor status updates.",
+      "selectedCompany": "Selected company: {name}",
+      "noCompanySelected": "No company selected.",
+      "promptLabel": "Prompt",
+      "objectiveLabel": "Objective (optional)",
+      "startButton": "Start AI Run",
+      "starting": "Starting...",
+      "selectCompanyFirst": "Please select a company first.",
+      "promptRequired": "Please provide a prompt.",
+      "startSuccess": "AI run started (workflow: {workflowId}).",
+      "startError": "Failed to start AI run.",
+      "loadError": "Failed to load AI runs.",
+      "historyTitle": "Run History",
+      "noRuns": "No runs found for the selected company.",
+      "workflowId": "Workflow ID"
     },
     "debugOverlay": {
       "title": "Element Coordinates",
