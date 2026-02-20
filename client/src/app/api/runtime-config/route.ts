@@ -22,6 +22,11 @@ export async function GET() {
       url: process.env.GRAPHQL_URL || 'http://localhost:4000/graphql',
     },
 
+    // AI support configuration
+    ai: {
+      llmUrl: process.env.AI_LLM_URL || '',
+    },
+
     // Excalidraw Collaboration
     excalidraw: {
       wsServerUrl: process.env.EXCALIDRAW_WS_SERVER_URL || 'http://localhost:3002',
