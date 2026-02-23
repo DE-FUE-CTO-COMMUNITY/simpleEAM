@@ -59,7 +59,7 @@ export const calculateNormalizedScorePercent = (scores: Array<number | null>): n
   return Math.max(-100, Math.min(100, scaledPercent))
 }
 
-export const calculateGeaTotalScorePercent = (params: {
+export const calculatePurposeCoherenceScorePercent = (params: {
   missions: GeaMissionForScore[]
   values: GeaValueForScore[]
   goals: GeaGoalForScore[]

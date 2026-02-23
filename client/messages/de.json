@@ -105,7 +105,7 @@
     "title": "Dashboard",
     "companyNotSelected": "Kein Unternehmen ausgewählt",
     "description_placeholder": "Keine Beschreibung verfügbar",
-    "geaTotalScore": "GEA Gesamtscore",
+    "purposeCoherenceScore": "Purpose-Kohärenz-Score",
     "geaScoreTooltip": "Zum Matrix Editor",
     "businessCapabilities": "Business Capabilities",
     "applications": "Applikationen",
@@ -616,7 +616,7 @@
     "table": {
       "name": "Name",
       "description": "Beschreibung",
-      "domain": "Domäne",
+      "aiSupport": "AI Support",
       "type": "Typ",
       "timestamp": "Architekturdatum",
       "owner": "Verantwortlicher",
@@ -2486,13 +2486,14 @@
         "resetToDefaults": "Auf Standardwerte zurücksetzen"
       }
     },
-    "aiRuns": {
+    "aiSupport": {
       "title": "KI-Workflow-Läufe",
-      "description": "Starten Sie einen minimalen Temporal-KI-Lauf und überwachen Sie Statusänderungen.",
+      "description": "Starten Sie KI-Workflow-Läufe, überwachen Sie den Fortschritt und prüfen Sie erzeugte Ergebnisse.",
       "selectedCompany": "Ausgewähltes Unternehmen: {name}",
       "noCompanySelected": "Kein Unternehmen ausgewählt.",
       "useCaseLabel": "Anwendungsfall",
       "useCaseStrategicEnrichment": "Strategische Anreicherung",
+      "useCaseDescriptionStrategicEnrichment": "Erzeugt auf Basis von Unternehmenskontext und recherchierten öffentlichen Quellen einen strategischen Entwurf zur Prüfung und Freigabe.",
       "promptLabel": "Prompt",
       "objectiveLabel": "Ziel (optional)",
       "startButton": "KI-Lauf starten",

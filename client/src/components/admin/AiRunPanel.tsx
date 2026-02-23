@@ -144,11 +144,10 @@ const parseDraftPayload = (raw: string | null | undefined): StrategicDraftPayloa
 }
 
 export default function AiRunPanel() {
-  const t = useTranslations('admin.aiRuns')
+  const t = useTranslations('admin.aiSupport')
   const { selectedCompanyId, selectedCompany } = useCompanyContext()
   const { url: graphQlUrl } = useGraphQLConfig()
 
-  const [prompt, setPrompt] = React.useState('')
   const [objective, setObjective] = React.useState('')
   const [useCase, setUseCase] = React.useState<'STRATEGIC_ENRICHMENT'>('STRATEGIC_ENRICHMENT')
   const [runs, setRuns] = React.useState<AiRun[]>([])
@@ -263,8 +262,6 @@ export default function AiRunPanel() {
       return
     }
 
-    const normalizedPrompt = prompt.trim()
-
     setSubmitError(null)
     setSubmitSuccess(null)
     setSubmitLoading(true)
@@ -280,7 +277,7 @@ export default function AiRunPanel() {
         },
         body: JSON.stringify({
           companyId: selectedCompanyId,
-          prompt: normalizedPrompt,
+          prompt: '',
           objective: objective.trim() || null,
           useCase,
         }),
@@ -295,7 +292,6 @@ export default function AiRunPanel() {
       }
 
       setSubmitSuccess(t('startSuccess', { workflowId: result.workflowId ?? '-' }))
-      setPrompt('')
       setObjective('')
       await loadRuns()
     } catch (error) {
@@ -446,6 +442,13 @@ export default function AiRunPanel() {
   )
 
   const hasNoRuns = runs.length === 0
+  const useCaseDescription = React.useMemo(() => {
+    switch (useCase) {
+      case 'STRATEGIC_ENRICHMENT':
+      default:
+        return t('useCaseDescriptionStrategicEnrichment')
+    }
+  }, [t, useCase])
 
   return (
     <Card>
@@ -478,16 +481,10 @@ export default function AiRunPanel() {
             >
               <MenuItem value="STRATEGIC_ENRICHMENT">{t('useCaseStrategicEnrichment')}</MenuItem>
             </Select>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+              {useCaseDescription}
+            </Typography>
           </Box>
-
-          <TextField
-            label={t('promptLabel')}
-            value={prompt}
-            onChange={event => setPrompt(event.target.value)}
-            multiline
-            minRows={3}
-            fullWidth
-          />
 
           <TextField
             label={t('objectiveLabel')}

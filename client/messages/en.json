@@ -98,7 +98,7 @@
     "subtitle": "Welcome to Simple-EAM",
     "description": "Enterprise Architecture Management System",
     "companyNotSelected": "No company selected",
-    "geaTotalScore": "GEA Total Score",
+    "purposeCoherenceScore": "Purpose Coherence Score",
     "geaScoreTooltip": "Go to Matrix Editor",
     "totalArchitectures": "Total Architectures",
     "totalDiagrams": "Total Diagrams",
@@ -2348,7 +2348,7 @@
     "tabs": {
       "userManagement": "User Management",
       "featureManagement": "Feature Management",
-      "aiRuns": "AI Runs",
+      "aiSupport": "AI Support",
       "debugTools": "Debug Tools"
     },
     "featureManagement": {
@@ -2543,13 +2543,14 @@
         "resetToDefaults": "Reset to Defaults"
       }
     },
-    "aiRuns": {
+    "aiSupport": {
       "title": "AI Workflow Runs",
-      "description": "Trigger a minimal Temporal AI run and monitor status updates.",
+      "description": "Start AI workflow runs, monitor progress, and review generated results.",
       "selectedCompany": "Selected company: {name}",
       "noCompanySelected": "No company selected.",
       "useCaseLabel": "Use case",
       "useCaseStrategicEnrichment": "Strategic enrichment",
+      "useCaseDescriptionStrategicEnrichment": "Generates a strategic draft using company context and researched public sources for review and approval.",
       "promptLabel": "Prompt",
       "objectiveLabel": "Objective (optional)",
       "startButton": "Start AI Run",

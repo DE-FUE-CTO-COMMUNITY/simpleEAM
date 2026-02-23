@@ -964,6 +964,19 @@ Simple-EAM consists of multiple components delivered as Docker containers:
 - Approval workflows support approve, reject, request revision, and partial acceptance.
 - Full decision history is queryable per company and artifact.
 
+#### FR-AI-06: Conversational architecture assistant and controlled change agent
+
+**Description:** The system must provide an AI assistant that can answer architecture questions in natural language and propose/apply architecture changes through controlled workflows.  
+**Priority:** High  
+**Acceptance criteria:**
+
+- Users can ask free-text questions about their company architecture (elements, relationships, ownership, lifecycle, risks, dependencies).
+- Answers include traceability (referenced entities, relationships, and evidence links) and confidence indicators.
+- The assistant can generate change proposals (create, update, connect, disconnect) as explicit structured actions before execution.
+- For write actions, the system supports preview/dry-run, impact summary, and role-based approval before applying to productive data.
+- Applied changes are persisted with full audit metadata (who, when, why, prompt/context, before/after snapshot, run ID).
+- Changes can only be executed for companies the user is authorized to access; unauthorized actions are blocked and logged.
+
 ## 3. Non-functional requirements
 
 ### 3.1 Performance and scalability
@@ -1206,6 +1219,16 @@ Simple-EAM consists of multiple components delivered as Docker containers:
 - Existing backend remains source of truth; AI writes draft artifacts via controlled API mutations.
 - Feature toggles allow staged rollout per company.
 
+#### TR-AI-05: Agent data access pattern (GraphQL/REST governed access)
+
+**Description:** Agent access to EAM data and mutations must use controlled service APIs through the existing backend.  
+**Priority:** High  
+**Acceptance criteria:**
+
+- Default pattern: agent reads and writes through internal backend APIs (GraphQL/REST) with Keycloak-based authorization and company scoping.
+- Agents must never access Neo4j directly (read or write) from model runtime; all data access must pass through governed backend APIs.
+- All write operations must pass backend validation, authorization, and governance checks before persistence.
+
 ## 5. Deliverables and timeline
 
 ### 5.1 Project phases
@@ -1320,6 +1343,16 @@ Simple-EAM consists of multiple components delivered as Docker containers:
 5. Produce to-be recommendation package and optional diagram suggestions.
 6. Route through approval and planning workflow.
 
+#### Blueprint D: Conversational assistant and controlled architecture changes (FR-AI-06)
+
+1. User asks a natural-language architecture question or requests a change.
+2. Agent retrieves company-scoped graph context through backend APIs.
+3. For Q&A: agent returns answer with entity-level citations and confidence.
+4. For changes: agent produces structured mutation plan and impact analysis.
+5. System runs dry-run validation (schema, permissions, conflicts, integrity checks).
+6. Authorized user reviews and approves/rejects proposed changes.
+7. Approved plan is executed via governed API mutations and fully audited.
+
 ### 7.3 Data model and API additions (implementation-level)
 
 - Add AI domain entities (example names):
@@ -1347,6 +1380,7 @@ Simple-EAM consists of multiple components delivered as Docker containers:
 - **Wave 2:** FR-AI-02 lifecycle intelligence + scheduled jobs + alerts.
 - **Wave 3:** FR-AI-03 target-architecture recommendations + roadmap scoring.
 - **Wave 4:** FR-AI-04 quality and relationship discovery agent.
+- **Wave 5:** FR-AI-06 conversational assistant + controlled architecture change execution.
   **Priorität:** Hoch  
   **Akzeptanzkriterien:**
 

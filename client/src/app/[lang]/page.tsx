@@ -66,7 +66,7 @@ import { GET_STRATEGIES } from '@/graphql/strategy'
 import { GET_BUSINESS_PROCESSES_COUNT } from '@/graphql/businessProcess'
 import RecentDiagramsSection from '@/components/dashboard/RecentDiagramsSection'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
-import { calculateGeaTotalScorePercent } from '@/components/matrix-editor/scoreUtils'
+import { calculatePurposeCoherenceScorePercent } from '@/components/matrix-editor/scoreUtils'
 
 const Dashboard = () => {
   const router = useRouter()
@@ -537,9 +537,9 @@ const Dashboard = () => {
 
   const visibleCardKeys = lensToElementKeys[selectedLens] ?? []
 
-  const geaTotalScorePercent = React.useMemo(
+  const purposeCoherenceScorePercent = React.useMemo(
     () =>
-      calculateGeaTotalScorePercent({
+      calculatePurposeCoherenceScorePercent({
         missions: geaMissionsData?.geaMissions ?? [],
         values: geaValuesData?.geaValues ?? [],
         goals: geaGoalsData?.geaGoals ?? [],
@@ -558,7 +558,7 @@ const Dashboard = () => {
     return `${rounded}%`
   }
 
-  const getGeaScoreBackground = (percent: number) => {
+  const getPurposeCoherenceScoreBackground = (percent: number) => {
     const score = (percent / 100) * 3
     if (score > 0) {
       return alpha(theme.palette.success.main, (Math.min(score, 3) / 3) * 0.5)
@@ -668,7 +668,7 @@ const Dashboard = () => {
                     borderRadius: 2,
                     minWidth: 180,
                     textAlign: 'right',
-                    backgroundColor: getGeaScoreBackground(geaTotalScorePercent),
+                    backgroundColor: getPurposeCoherenceScoreBackground(purposeCoherenceScorePercent),
                     border: `1px solid ${alpha(theme.palette.text.primary, 0.12)}`,
                     transition: 'transform 120ms ease',
                     '&:hover': {
@@ -677,10 +677,10 @@ const Dashboard = () => {
                   }}
                 >
                   <Typography variant="subtitle2" color="text.secondary">
-                    {t('geaTotalScore')}
+                    {t('purposeCoherenceScore')}
                   </Typography>
                   <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                    {geaScoreLoading ? '...' : formatSignedPercent(geaTotalScorePercent)}
+                    {geaScoreLoading ? '...' : formatSignedPercent(purposeCoherenceScorePercent)}
                   </Typography>
                 </Box>
               </ButtonBase>

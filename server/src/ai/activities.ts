@@ -1,4 +1,5 @@
 import neo4jDriver from '../db/neo4j-client'
+import { Annotation, END, START, StateGraph } from '@langchain/langgraph'
 import {
   CompleteAiRunInput,
   FailAiRunInput,
@@ -1217,6 +1218,232 @@ const getCompanyName = async (companyId: string): Promise<string> => {
   }
 }
 
+interface StrategicEnrichmentGraphState {
+  input: GenerateSummaryInput
+  companyName: string
+  objective: string | null
+  sources: StrategicResearchSource[]
+  prompt: string
+  summary: string
+  draftPayload: StrategicDraftPayload | null
+  llmErrorMessage: string | null
+  fallbackEnabled: boolean
+}
+
+const strategicEnrichmentState = Annotation.Root({
+  input: Annotation<GenerateSummaryInput>({
+    reducer: (_, update) => update,
+  }),
+  companyName: Annotation<string>({
+    reducer: (_, update) => update,
+  }),
+  objective: Annotation<string | null>({
+    reducer: (_, update) => update,
+  }),
+  sources: Annotation<StrategicResearchSource[]>({
+    reducer: (_, update) => update,
+    default: () => [],
+  }),
+  prompt: Annotation<string>({
+    reducer: (_, update) => update,
+    default: () => '',
+  }),
+  summary: Annotation<string>({
+    reducer: (_, update) => update,
+    default: () => '',
+  }),
+  draftPayload: Annotation<StrategicDraftPayload | null>({
+    reducer: (_, update) => update,
+    default: () => null,
+  }),
+  llmErrorMessage: Annotation<string | null>({
+    reducer: (_, update) => update,
+    default: () => null,
+  }),
+  fallbackEnabled: Annotation<boolean>({
+    reducer: (_, update) => update,
+  }),
+})
+
+const executeStrategicEnrichmentGraph = async (
+  input: GenerateSummaryInput,
+  companyName: string,
+  objective: string | null
+): Promise<GeneratedRunOutput> => {
+  const workflow = new StateGraph(strategicEnrichmentState)
+    .addNode('research', async state => {
+      try {
+        const sources = await collectWebSources(state.companyName, state.objective)
+        console.info('[AI RUN][WORKER][WEB_RESEARCH][RESULT]', {
+          companyId: state.input.companyId,
+          companyName: state.companyName,
+          sourceCount: sources.length,
+          sources: sources.map(source => ({
+            title: source.title,
+            url: source.url,
+            snippetPreview:
+              source.snippet.length > 220 ? `${source.snippet.slice(0, 220)}…` : source.snippet,
+          })),
+        })
+        return { sources }
+      } catch (error) {
+        console.warn('[AI RUN][WORKER][WEB_RESEARCH][FAILED]', {
+          companyId: state.input.companyId,
+          error: error instanceof Error ? error.message : 'Unknown web research error',
+        })
+        return { sources: [] }
+      }
+    })
+    .addNode('preparePrompt', async state => {
+      const prompt = buildLlmPrompt({
+        companyName: state.companyName,
+        prompt: state.input.prompt,
+        objective: state.objective,
+        sources: state.sources,
+      })
+
+      const llmConfig = resolveLlmConfig()
+      const promptLoggingEnabled = isLlmPromptLoggingEnabled()
+
+      console.info('[AI RUN][WORKER][LLM][REQUEST]', {
+        companyId: state.input.companyId,
+        llmUrl: llmConfig.endpointUrl,
+        llmModel: llmConfig.model || null,
+        llmTimeoutMs: getLlmTimeoutMs(),
+        llmRetryCount: getLlmRetryCount(),
+        sourcesCount: state.sources.length,
+        promptLength: prompt.length,
+        promptLoggingEnabled,
+      })
+
+      if (promptLoggingEnabled) {
+        const previewChars = getLlmPromptPreviewChars()
+        const promptPreview =
+          prompt.length > previewChars ? `${prompt.slice(0, previewChars)}…` : prompt
+
+        console.info('[AI RUN][WORKER][LLM][PROMPT_PREVIEW]', {
+          companyId: state.input.companyId,
+          previewChars,
+          promptPreview,
+        })
+      }
+
+      return { prompt }
+    })
+    .addNode('generateDraft', async state => {
+      try {
+        const llmRawText = await callLlm(state.prompt)
+        const parsedOutput = parseJsonObject(llmRawText)
+
+        if (!parsedOutput) {
+          throw new Error('LLM output was not valid JSON')
+        }
+
+        const draftPayload = buildDraftFromModelOutput({
+          companyName: state.companyName,
+          modelOutput: parsedOutput,
+          sources: state.sources,
+        })
+
+        const summary = asString(
+          parsedOutput.summary,
+          `Strategic enrichment draft generated for ${state.companyName} using ${state.sources.length} web sources.`,
+          600
+        )
+
+        return {
+          draftPayload,
+          summary,
+          llmErrorMessage: null,
+        }
+      } catch (error) {
+        const llmConfig = resolveLlmConfig()
+        const llmErrorMessage = error instanceof Error ? error.message : 'Unknown LLM error'
+
+        console.warn('[AI RUN][WORKER][LLM][FAILED]', {
+          companyId: state.input.companyId,
+          llmUrl: llmConfig.endpointUrl,
+          llmModel: llmConfig.model || null,
+          llmTimeoutMs: getLlmTimeoutMs(),
+          llmRetryCount: getLlmRetryCount(),
+          fallbackEnabled: state.fallbackEnabled,
+          error: llmErrorMessage,
+        })
+
+        return {
+          llmErrorMessage,
+        }
+      }
+    })
+    .addNode('fallbackDraft', async state => {
+      console.warn('[AI RUN][WORKER][LLM][FALLBACK_ENABLED]', {
+        companyId: state.input.companyId,
+        message: 'Using template fallback because AI_ALLOW_LLM_FALLBACK=true',
+      })
+
+      const draftPayload = createFallbackDraft({
+        companyName: state.companyName,
+        prompt: state.input.prompt,
+        objective: state.objective,
+        sources: state.sources,
+      })
+
+      const summary = `Strategic enrichment draft generated for ${state.companyName} using fallback template and ${state.sources.length} web sources.`
+
+      return {
+        draftPayload,
+        summary,
+      }
+    })
+    .addNode('failDraftGeneration', async state => {
+      throw new Error(state.llmErrorMessage ?? 'Strategic enrichment generation failed')
+    })
+    .addNode('completeDraft', async () => ({}))
+    .addEdge(START, 'research')
+    .addEdge('research', 'preparePrompt')
+    .addEdge('preparePrompt', 'generateDraft')
+    .addConditionalEdges(
+      'generateDraft',
+      state => {
+        if (!state.llmErrorMessage) {
+          return 'completeDraft'
+        }
+
+        return state.fallbackEnabled ? 'fallbackDraft' : 'failDraftGeneration'
+      },
+      {
+        completeDraft: 'completeDraft',
+        fallbackDraft: 'fallbackDraft',
+        failDraftGeneration: 'failDraftGeneration',
+      }
+    )
+    .addEdge('fallbackDraft', END)
+    .addEdge('completeDraft', END)
+    .addEdge('failDraftGeneration', END)
+
+  const graph = workflow.compile()
+  const result = await graph.invoke({
+    input,
+    companyName,
+    objective,
+    sources: [],
+    prompt: '',
+    summary: '',
+    draftPayload: null,
+    llmErrorMessage: null,
+    fallbackEnabled: isLlmFallbackEnabled(),
+  })
+
+  if (!result.draftPayload) {
+    throw new Error('Strategic enrichment graph completed without draft payload')
+  }
+
+  return {
+    summary: result.summary,
+    draftPayload: result.draftPayload,
+  }
+}
+
 export const markAiRunRunning = async (runId: string) => {
   const session = neo4jDriver.session()
   try {
@@ -1252,118 +1479,7 @@ export const generateAiRunSummary = async (
   const companyName = await getCompanyName(input.companyId)
   const normalizedObjective = input.objective?.trim() || null
 
-  let sources: StrategicResearchSource[] = []
-  try {
-    sources = await collectWebSources(companyName, normalizedObjective)
-    console.info('[AI RUN][WORKER][WEB_RESEARCH][RESULT]', {
-      companyId: input.companyId,
-      companyName,
-      sourceCount: sources.length,
-      sources: sources.map(source => ({
-        title: source.title,
-        url: source.url,
-        snippetPreview:
-          source.snippet.length > 220 ? `${source.snippet.slice(0, 220)}…` : source.snippet,
-      })),
-    })
-  } catch (error) {
-    console.warn('[AI RUN][WORKER][WEB_RESEARCH][FAILED]', {
-      companyId: input.companyId,
-      error: error instanceof Error ? error.message : 'Unknown web research error',
-    })
-  }
-
-  let draftPayload: StrategicDraftPayload
-  let summary: string
-
-  try {
-    const prompt = buildLlmPrompt({
-      companyName,
-      prompt: input.prompt,
-      objective: normalizedObjective,
-      sources,
-    })
-
-    const llmConfig = resolveLlmConfig()
-    const promptLoggingEnabled = isLlmPromptLoggingEnabled()
-
-    console.info('[AI RUN][WORKER][LLM][REQUEST]', {
-      companyId: input.companyId,
-      llmUrl: llmConfig.endpointUrl,
-      llmModel: llmConfig.model || null,
-      llmTimeoutMs: getLlmTimeoutMs(),
-      llmRetryCount: getLlmRetryCount(),
-      sourcesCount: sources.length,
-      promptLength: prompt.length,
-      promptLoggingEnabled,
-    })
-
-    if (promptLoggingEnabled) {
-      const previewChars = getLlmPromptPreviewChars()
-      const promptPreview =
-        prompt.length > previewChars ? `${prompt.slice(0, previewChars)}…` : prompt
-
-      console.info('[AI RUN][WORKER][LLM][PROMPT_PREVIEW]', {
-        companyId: input.companyId,
-        previewChars,
-        promptPreview,
-      })
-    }
-
-    const llmRawText = await callLlm(prompt)
-    const parsedOutput = parseJsonObject(llmRawText)
-
-    if (!parsedOutput) {
-      throw new Error('LLM output was not valid JSON')
-    }
-
-    draftPayload = buildDraftFromModelOutput({
-      companyName,
-      modelOutput: parsedOutput,
-      sources,
-    })
-
-    summary = asString(
-      parsedOutput.summary,
-      `Strategic enrichment draft generated for ${companyName} using ${sources.length} web sources.`,
-      600
-    )
-  } catch (error) {
-    const llmConfig = resolveLlmConfig()
-    const fallbackEnabled = isLlmFallbackEnabled()
-
-    console.warn('[AI RUN][WORKER][LLM][FAILED]', {
-      companyId: input.companyId,
-      llmUrl: llmConfig.endpointUrl,
-      llmModel: llmConfig.model || null,
-      llmTimeoutMs: getLlmTimeoutMs(),
-      llmRetryCount: getLlmRetryCount(),
-      fallbackEnabled,
-      error: error instanceof Error ? error.message : 'Unknown LLM error',
-    })
-
-    if (!fallbackEnabled) {
-      throw error
-    }
-
-    console.warn('[AI RUN][WORKER][LLM][FALLBACK_ENABLED]', {
-      companyId: input.companyId,
-      message: 'Using template fallback because AI_ALLOW_LLM_FALLBACK=true',
-    })
-
-    draftPayload = createFallbackDraft({
-      companyName,
-      prompt: input.prompt,
-      objective: normalizedObjective,
-      sources,
-    })
-    summary = `Strategic enrichment draft generated for ${companyName} using fallback template and ${sources.length} web sources.`
-  }
-
-  return {
-    summary,
-    draftPayload,
-  }
+  return executeStrategicEnrichmentGraph(input, companyName, normalizedObjective)
 }
 
 export const markAiRunCompleted = async ({ runId, summary, draftPayload }: CompleteAiRunInput) => {
