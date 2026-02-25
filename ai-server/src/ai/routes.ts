@@ -1,7 +1,7 @@
 import { Response, Router } from 'express'
 import { v4 as uuidv4 } from 'uuid'
-import neo4jDriver from '../db/neo4j-client'
 import { verifyToken } from '../auth/auth-jwks'
+import { graphqlRequest } from '../graphql/client'
 import { startAiRunWorkflow } from './temporal-client'
 import { AiRunUseCase, CreateAiAuditEventInput, StrategicDraftPayload } from './types'
 
@@ -141,9 +141,9 @@ const enforceAdminAccess = (decodedToken: DecodedToken) => {
   }
 }
 
-const mapAiRunRecord = (run: Record<string, unknown>, companyId: string): AiRunRecord => ({
+const mapAiRunRecord = (run: Record<string, unknown>): AiRunRecord => ({
   id: String(run.id),
-  companyId,
+  companyId: String(run.companyId ?? ''),
   prompt: String(run.prompt ?? ''),
   objective: typeof run.objective === 'string' ? run.objective : null,
   useCase: (run.useCase as AiRunUseCase) ?? 'STRATEGIC_ENRICHMENT',
@@ -160,59 +160,70 @@ const mapAiRunRecord = (run: Record<string, unknown>, companyId: string): AiRunR
   completedAt: toIsoString(run.completedAt),
 })
 
-const loadAiRunById = async (runId: string): Promise<AiRunRecord | null> => {
-  const session = neo4jDriver.session()
-  try {
-    const result = await session.run(
-      `
-      MATCH (r:AiRun {id: $runId})-[:OWNED_BY]->(c:Company)
-      RETURN r, c.id AS companyId
-      LIMIT 1
-      `,
-      { runId }
-    )
+const loadAiRunById = async (runId: string, accessToken: string): Promise<AiRunRecord | null> => {
+  const data = await graphqlRequest<{ aiRuns: Array<Record<string, unknown>> }>({
+    query: `
+      query LoadAiRunById($runId: ID!) {
+        aiRuns(where: { id: { eq: $runId } }, limit: 1) {
+          id
+          companyId
+          prompt
+          objective
+          useCase
+          status
+          approvalStatus
+          workflowId
+          initiatedBy
+          resultSummary
+          draftPayload
+          errorMessage
+          createdAt
+          updatedAt
+          startedAt
+          completedAt
+        }
+      }
+    `,
+    variables: { runId },
+    accessToken,
+  })
 
-    if (result.records.length === 0) return null
-
-    const record = result.records[0]
-    const run = record.get('r').properties as Record<string, unknown>
-    const companyId = String(record.get('companyId'))
-    return mapAiRunRecord(run, companyId)
-  } finally {
-    await session.close()
+  if (!data.aiRuns || data.aiRuns.length === 0) {
+    return null
   }
+
+  return mapAiRunRecord(data.aiRuns[0])
 }
 
-const createAuditEvent = async (input: CreateAiAuditEventInput): Promise<void> => {
-  const session = neo4jDriver.session()
-  try {
-    const eventId = uuidv4()
-    const timestamp = new Date().toISOString()
-    await session.run(
-      `
-      MATCH (r:AiRun {id: $runId})
-      CREATE (e:AiRunAuditEvent {
-        id: $eventId,
-        runId: $runId,
-        action: $action,
-        actor: $actor,
-        comment: $comment,
-        createdAt: datetime($timestamp)
-      })
-      MERGE (e)-[:FOR_RUN]->(r)
-      `,
-      {
-        eventId,
-        runId: input.runId,
-        action: input.action,
-        actor: input.actor,
-        comment: input.comment ?? null,
-        timestamp,
+const createAuditEvent = async (
+  input: CreateAiAuditEventInput & { accessToken: string }
+): Promise<void> => {
+  await graphqlRequest({
+    query: `
+      mutation CreateAiRunAuditEvent($input: [AiRunAuditEventCreateInput!]!) {
+        createAiRunAuditEvents(input: $input) {
+          aiRunAuditEvents {
+            id
+          }
+        }
       }
-    )
-  } finally {
-    await session.close()
-  }
+    `,
+    variables: {
+      input: [
+        {
+          id: uuidv4(),
+          runId: input.runId,
+          action: input.action,
+          actor: input.actor,
+          comment: input.comment ?? null,
+          run: {
+            connect: [{ where: { node: { id: { eq: input.runId } } } }],
+          },
+        },
+      ],
+    },
+    accessToken: input.accessToken,
+  })
 }
 
 const isNonEmptyString = (value: unknown): value is string =>
@@ -281,13 +292,13 @@ const validateStrategicDraftPayload = (
   return null
 }
 
-const persistStrategicDraftToNeo4j = async (input: {
+const persistStrategicDraftToGraphql = async (input: {
   companyId: string
   runId: string
   actor: string
   draftPayload: StrategicDraftPayload
+  accessToken: string
 }) => {
-  const session = neo4jDriver.session()
   const timestamp = new Date().toISOString()
   const missionId = uuidv4()
   const visionId = uuidv4()
@@ -314,170 +325,164 @@ const persistStrategicDraftToNeo4j = async (input: {
     ? input.draftPayload.vision.year
     : `${new Date().getUTCFullYear()}-01-01`
 
-  const transaction = session.beginTransaction()
-
-  try {
-    const createCoreResult = await transaction.run(
-      `
-      MATCH (c:Company {id: $companyId})
-      CREATE (m:GEA_Mission {
-        id: $missionId,
-        name: $missionName,
-        purposeStatement: $missionStatement,
-        keywords: $missionKeywords,
-        year: date($missionYear),
-        aiGenerated: true,
-        aiGeneratedByRunId: $runId,
-        aiGeneratedBy: $actor,
-        createdAt: datetime($timestamp),
-        updatedAt: datetime($timestamp)
-      })
-      CREATE (v:GEA_Vision {
-        id: $visionId,
-        name: $visionName,
-        visionStatement: $visionStatement,
-        timeHorizon: $visionTimeHorizon,
-        year: date($visionYear),
-        aiGenerated: true,
-        aiGeneratedByRunId: $runId,
-        aiGeneratedBy: $actor,
-        createdAt: datetime($timestamp),
-        updatedAt: datetime($timestamp)
-      })
-      MERGE (m)-[:OWNED_BY]->(c)
-      MERGE (v)-[:OWNED_BY]->(c)
-      MERGE (v)-[:SUPPORTS {score: 2}]->(m)
-      RETURN c.id AS companyId
-      `,
-      {
-        companyId: input.companyId,
-        missionId,
-        missionName: input.draftPayload.mission.name.trim(),
-        missionStatement: input.draftPayload.mission.purposeStatement.trim(),
-        missionKeywords: input.draftPayload.mission.keywords,
-        missionYear,
-        visionId,
-        visionName: input.draftPayload.vision.name.trim(),
-        visionStatement: input.draftPayload.vision.visionStatement.trim(),
-        visionTimeHorizon: input.draftPayload.vision.timeHorizon,
-        visionYear,
-        runId: input.runId,
-        actor: input.actor,
-        timestamp,
+  await graphqlRequest({
+    query: `
+      mutation CreateMission($input: [GEA_MissionCreateInput!]!) {
+        createGeaMissions(input: $input) {
+          geaMissions { id }
+        }
       }
-    )
+    `,
+    variables: {
+      input: [
+        {
+          id: missionId,
+          name: input.draftPayload.mission.name.trim(),
+          purposeStatement: input.draftPayload.mission.purposeStatement.trim(),
+          keywords: input.draftPayload.mission.keywords,
+          year: missionYear,
+          company: {
+            connect: [{ where: { node: { id: { eq: input.companyId } } } }],
+          },
+        },
+      ],
+    },
+    accessToken: input.accessToken,
+  })
 
-    if (createCoreResult.records.length === 0) {
-      throw createApiError(404, 'NOT_FOUND', 'Company not found')
-    }
+  await graphqlRequest({
+    query: `
+      mutation CreateVision($input: [GEA_VisionCreateInput!]!) {
+        createGeaVisions(input: $input) {
+          geaVisions { id }
+        }
+      }
+    `,
+    variables: {
+      input: [
+        {
+          id: visionId,
+          name: input.draftPayload.vision.name.trim(),
+          visionStatement: input.draftPayload.vision.visionStatement.trim(),
+          timeHorizon: input.draftPayload.vision.timeHorizon,
+          year: visionYear,
+          company: {
+            connect: [{ where: { node: { id: { eq: input.companyId } } } }],
+          },
+          supportsMissions: {
+            connect: [
+              {
+                where: { node: { id: { eq: missionId } } },
+                edge: { score: 2 },
+              },
+            ],
+          },
+        },
+      ],
+    },
+    accessToken: input.accessToken,
+  })
 
-    if (valueRows.length > 0) {
-      await transaction.run(
-        `
-        MATCH (c:Company {id: $companyId})
-        MATCH (m:GEA_Mission {id: $missionId})
-        MATCH (v:GEA_Vision {id: $visionId})
-        UNWIND $values AS value
-        CREATE (val:GEA_Value {
+  if (valueRows.length > 0) {
+    await graphqlRequest({
+      query: `
+        mutation CreateValues($input: [GEA_ValueCreateInput!]!) {
+          createGeaValues(input: $input) {
+            geaValues { id }
+          }
+        }
+      `,
+      variables: {
+        input: valueRows.map(value => ({
           id: value.id,
           name: value.name,
           valueStatement: value.valueStatement,
-          aiGenerated: true,
-          aiGeneratedByRunId: $runId,
-          aiGeneratedBy: $actor,
-          createdAt: datetime($timestamp),
-          updatedAt: datetime($timestamp)
-        })
-        MERGE (val)-[:OWNED_BY]->(c)
-        MERGE (val)-[:SUPPORTS {score: 2}]->(m)
-        MERGE (val)-[:SUPPORTS {score: 2}]->(v)
-        `,
-        {
-          companyId: input.companyId,
-          missionId,
-          visionId,
-          values: valueRows,
-          runId: input.runId,
-          actor: input.actor,
-          timestamp,
-        }
-      )
-    }
+          company: {
+            connect: [{ where: { node: { id: { eq: input.companyId } } } }],
+          },
+          supportsMissions: {
+            connect: [{ where: { node: { id: { eq: missionId } } }, edge: { score: 2 } }],
+          },
+          supportsVisions: {
+            connect: [{ where: { node: { id: { eq: visionId } } }, edge: { score: 2 } }],
+          },
+        })),
+      },
+      accessToken: input.accessToken,
+    })
+  }
 
-    if (goalRows.length > 0) {
-      await transaction.run(
-        `
-        MATCH (c:Company {id: $companyId})
-        MATCH (m:GEA_Mission {id: $missionId})
-        MATCH (v:GEA_Vision {id: $visionId})
-        UNWIND $goals AS goal
-        CREATE (g:GEA_Goal {
+  if (goalRows.length > 0) {
+    await graphqlRequest({
+      query: `
+        mutation CreateGoals($input: [GEA_GoalCreateInput!]!) {
+          createGeaGoals(input: $input) {
+            geaGoals { id }
+          }
+        }
+      `,
+      variables: {
+        input: goalRows.map(goal => ({
           id: goal.id,
           name: goal.name,
           goalStatement: goal.goalStatement,
-          aiGenerated: true,
-          aiGeneratedByRunId: $runId,
-          aiGeneratedBy: $actor,
-          createdAt: datetime($timestamp),
-          updatedAt: datetime($timestamp)
-        })
-        MERGE (g)-[:OWNED_BY]->(c)
-        MERGE (g)-[:SUPPORTS {score: 2}]->(m)
-        MERGE (g)-[:OPERATIONALIZES {score: 2}]->(v)
-        `,
-        {
-          companyId: input.companyId,
-          missionId,
-          visionId,
-          goals: goalRows,
-          runId: input.runId,
-          actor: input.actor,
-          timestamp,
-        }
-      )
-    }
+          company: {
+            connect: [{ where: { node: { id: { eq: input.companyId } } } }],
+          },
+          supportsMissions: {
+            connect: [{ where: { node: { id: { eq: missionId } } }, edge: { score: 2 } }],
+          },
+          operationalizesVisions: {
+            connect: [{ where: { node: { id: { eq: visionId } } }, edge: { score: 2 } }],
+          },
+        })),
+      },
+      accessToken: input.accessToken,
+    })
+  }
 
-    if (strategyRows.length > 0) {
-      await transaction.run(
-        `
-        MATCH (c:Company {id: $companyId})
-        OPTIONAL MATCH (firstGoal:GEA_Goal)-[:OWNED_BY]->(c)
-        WHERE firstGoal.aiGeneratedByRunId = $runId
-        WITH c, firstGoal
-        LIMIT 1
-        UNWIND $strategies AS strategy
-        CREATE (s:GEA_Strategy {
+  if (strategyRows.length > 0) {
+    const firstGoalId = goalRows[0]?.id
+    await graphqlRequest({
+      query: `
+        mutation CreateStrategies($input: [GEA_StrategyCreateInput!]!) {
+          createGeaStrategies(input: $input) {
+            geaStrategies { id }
+          }
+        }
+      `,
+      variables: {
+        input: strategyRows.map(strategy => ({
           id: strategy.id,
           name: strategy.name,
           description: strategy.description,
-          aiGenerated: true,
-          aiGeneratedByRunId: $runId,
-          aiGeneratedBy: $actor,
-          createdAt: datetime($timestamp),
-          updatedAt: datetime($timestamp)
-        })
-        MERGE (s)-[:OWNED_BY]->(c)
-        FOREACH (_ IN CASE WHEN firstGoal IS NULL THEN [] ELSE [1] END |
-          MERGE (s)-[:ACHIEVES {score: 2}]->(firstGoal)
-        )
-        `,
-        {
-          companyId: input.companyId,
-          strategies: strategyRows,
-          runId: input.runId,
-          actor: input.actor,
-          timestamp,
-        }
-      )
-    }
-
-    await transaction.commit()
-  } catch (error) {
-    await transaction.rollback()
-    throw error
-  } finally {
-    await session.close()
+          company: {
+            connect: [{ where: { node: { id: { eq: input.companyId } } } }],
+          },
+          ...(firstGoalId
+            ? {
+                achievesGoals: {
+                  connect: [
+                    {
+                      where: { node: { id: { eq: firstGoalId } } },
+                      edge: { score: 2 },
+                    },
+                  ],
+                },
+              }
+            : {}),
+        })),
+      },
+      accessToken: input.accessToken,
+    })
   }
+
+  console.info('[AI RUN][APPROVAL][PERSISTED]', {
+    runId: input.runId,
+    actor: input.actor,
+    companyId: input.companyId,
+    createdAt: timestamp,
+  })
 }
 
 export const aiRunRouter = Router()
@@ -498,45 +503,88 @@ aiRunRouter.delete('/ai-runs', async (req, res) => {
       initiatedBy: decodedToken.sub ?? 'unknown',
     })
 
-    const session = neo4jDriver.session()
-    try {
-      const result = await session.run(
-        `
-        MATCH (c:Company {id: $companyId})
-        OPTIONAL MATCH (r:AiRun)-[:OWNED_BY]->(c)
-        WITH c, [run IN collect(DISTINCT r) WHERE run IS NOT NULL] AS runs
-        OPTIONAL MATCH (e:AiRunAuditEvent)-[:FOR_RUN]->(r2:AiRun)-[:OWNED_BY]->(c)
-        WITH c, runs, [event IN collect(DISTINCT e) WHERE event IS NOT NULL] AS events
-        FOREACH (event IN events | DETACH DELETE event)
-        FOREACH (run IN runs | DETACH DELETE run)
-        RETURN c.id AS companyId, size(runs) AS deletedRuns, size(events) AS deletedAuditEvents
-        `,
-        { companyId }
-      )
+    const companiesResult = await graphqlRequest<{ companies: Array<{ id: string }> }>({
+      query: `
+        query CheckCompany($companyId: ID!) {
+          companies(where: { id: { eq: $companyId } }, limit: 1) { id }
+        }
+      `,
+      variables: { companyId },
+      accessToken: req.headers.authorization?.startsWith('Bearer ')
+        ? req.headers.authorization.slice(7)
+        : null,
+    })
 
-      if (result.records.length === 0) {
-        throw createApiError(404, 'NOT_FOUND', 'Company not found')
-      }
-
-      const record = result.records[0]
-      const deletedRuns = Number(record.get('deletedRuns') ?? 0)
-      const deletedAuditEvents = Number(record.get('deletedAuditEvents') ?? 0)
-
-      console.info('[AI RUN][DELETE_HISTORY][SUCCESS]', {
-        companyId,
-        deletedRuns,
-        deletedAuditEvents,
-        initiatedBy: decodedToken.sub ?? 'unknown',
-      })
-
-      return res.status(200).json({
-        companyId,
-        deletedRuns,
-        deletedAuditEvents,
-      })
-    } finally {
-      await session.close()
+    if (!companiesResult.companies || companiesResult.companies.length === 0) {
+      throw createApiError(404, 'NOT_FOUND', 'Company not found')
     }
+
+    const token = req.headers.authorization?.startsWith('Bearer ')
+      ? req.headers.authorization.slice(7)
+      : null
+    if (!token) {
+      throw createApiError(401, 'UNAUTHENTICATED', 'Authentication required')
+    }
+
+    const runQuery = await graphqlRequest<{ aiRuns: Array<{ id: string }> }>({
+      query: `
+        query AiRunsByCompany($companyId: String!) {
+          aiRuns(where: { companyId: { eq: $companyId } }) {
+            id
+          }
+        }
+      `,
+      variables: { companyId },
+      accessToken: token,
+    })
+
+    const runIds = runQuery.aiRuns.map(run => run.id)
+
+    let deletedAuditEvents = 0
+    if (runIds.length > 0) {
+      const auditDeleteResult = await graphqlRequest<{
+        deleteAiRunAuditEvents: { nodesDeleted: number }
+      }>({
+        query: `
+          mutation DeleteAiRunAuditEvents($runIds: [String!]!) {
+            deleteAiRunAuditEvents(where: { runId: { in: $runIds } }) {
+              nodesDeleted
+            }
+          }
+        `,
+        variables: { runIds },
+        accessToken: token,
+      })
+
+      deletedAuditEvents = Number(auditDeleteResult.deleteAiRunAuditEvents?.nodesDeleted ?? 0)
+    }
+
+    const runDeleteResult = await graphqlRequest<{ deleteAiRuns: { nodesDeleted: number } }>({
+      query: `
+        mutation DeleteAiRuns($companyId: String!) {
+          deleteAiRuns(where: { companyId: { eq: $companyId } }) {
+            nodesDeleted
+          }
+        }
+      `,
+      variables: { companyId },
+      accessToken: token,
+    })
+
+    const deletedRuns = Number(runDeleteResult.deleteAiRuns?.nodesDeleted ?? 0)
+
+    console.info('[AI RUN][DELETE_HISTORY][SUCCESS]', {
+      companyId,
+      deletedRuns,
+      deletedAuditEvents,
+      initiatedBy: decodedToken.sub ?? 'unknown',
+    })
+
+    return res.status(200).json({
+      companyId,
+      deletedRuns,
+      deletedAuditEvents,
+    })
   } catch (error) {
     return sendApiError(res, error, { companyId })
   }
@@ -557,32 +605,51 @@ aiRunRouter.get('/ai-runs', async (req, res) => {
       initiatedBy: decodedToken.sub ?? 'unknown',
     })
 
-    const session = neo4jDriver.session()
-    try {
-      const result = await session.run(
-        `
-        MATCH (r:AiRun)-[:OWNED_BY]->(c:Company {id: $companyId})
-        RETURN r
-        ORDER BY r.createdAt DESC
-        LIMIT 20
-        `,
-        { companyId }
-      )
-
-      const runs = result.records.map(record => {
-        const run = record.get('r').properties as Record<string, unknown>
-        return mapAiRunRecord(run, companyId)
-      })
-
-      console.info('[AI RUN][LIST][SUCCESS]', {
-        companyId,
-        count: runs.length,
-      })
-
-      return res.status(200).json(runs)
-    } finally {
-      await session.close()
+    const token = req.headers.authorization?.startsWith('Bearer ')
+      ? req.headers.authorization.slice(7)
+      : null
+    if (!token) {
+      throw createApiError(401, 'UNAUTHENTICATED', 'Authentication required')
     }
+
+    const result = await graphqlRequest<{ aiRuns: Array<Record<string, unknown>> }>({
+      query: `
+        query AiRunsByCompany($companyId: String!) {
+          aiRuns(where: { companyId: { eq: $companyId } }) {
+            id
+            companyId
+            prompt
+            objective
+            useCase
+            status
+            approvalStatus
+            workflowId
+            initiatedBy
+            resultSummary
+            draftPayload
+            errorMessage
+            createdAt
+            updatedAt
+            startedAt
+            completedAt
+          }
+        }
+      `,
+      variables: { companyId },
+      accessToken: token,
+    })
+
+    const runs = result.aiRuns
+      .map(run => mapAiRunRecord(run))
+      .sort((left, right) => (right.createdAt || '').localeCompare(left.createdAt || ''))
+      .slice(0, 20)
+
+    console.info('[AI RUN][LIST][SUCCESS]', {
+      companyId,
+      count: runs.length,
+    })
+
+    return res.status(200).json(runs)
   } catch (error) {
     return sendApiError(res, error, { companyId })
   }
@@ -618,117 +685,146 @@ aiRunRouter.post('/ai-runs', async (req, res) => {
       useCase,
     })
 
-    const session = neo4jDriver.session()
-    try {
-      const createResult = await session.run(
-        `
-        MATCH (c:Company {id: $companyId})
-        CREATE (r:AiRun {
-          id: $runId,
-          prompt: $prompt,
-          objective: $objective,
-          useCase: $useCase,
-          status: 'QUEUED',
-          approvalStatus: 'PENDING_REVIEW',
-          initiatedBy: $initiatedBy,
-          createdAt: datetime($createdAt),
-          updatedAt: datetime($createdAt)
-        })
-        MERGE (r)-[:OWNED_BY]->(c)
-        RETURN c.id AS companyId
-        `,
-        {
-          companyId,
-          runId,
-          prompt: effectivePrompt,
-          objective,
-          useCase,
-          initiatedBy,
-          createdAt,
-        }
-      )
+    const token = req.headers.authorization?.startsWith('Bearer ')
+      ? req.headers.authorization.slice(7)
+      : null
+    if (!token) {
+      throw createApiError(401, 'UNAUTHENTICATED', 'Authentication required')
+    }
 
-      if (createResult.records.length === 0) {
-        throw createApiError(404, 'NOT_FOUND', 'Company not found')
-      }
-
-      try {
-        await startAiRunWorkflow({
-          workflowId,
-          runId,
-          companyId,
-          prompt: effectivePrompt,
-          objective,
-          initiatedBy,
-          useCase,
-        })
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Failed to start workflow'
-        await session.run(
-          `
-          MATCH (r:AiRun {id: $runId})
-          SET r.status = 'FAILED',
-              r.errorMessage = $errorMessage,
-              r.updatedAt = datetime($updatedAt),
-              r.completedAt = datetime($updatedAt)
-          `,
-          {
-            runId,
-            errorMessage,
-            updatedAt: new Date().toISOString(),
+    const companyResult = await graphqlRequest<{ companies: Array<{ id: string; name: string }> }>({
+      query: `
+        query LoadCompany($companyId: ID!) {
+          companies(where: { id: { eq: $companyId } }, limit: 1) {
+            id
+            name
           }
-        )
-        throw createApiError(
-          500,
-          'WORKFLOW_START_FAILED',
-          `Failed to start AI workflow: ${errorMessage}`
-        )
-      }
-
-      const updatedAt = new Date().toISOString()
-      await session.run(
-        `
-        MATCH (r:AiRun {id: $runId})
-        SET r.workflowId = $workflowId,
-            r.updatedAt = datetime($updatedAt)
-        `,
-        {
-          runId,
-          workflowId,
-          updatedAt,
         }
-      )
+      `,
+      variables: { companyId },
+      accessToken: token,
+    })
 
-      console.info('[AI RUN][START][QUEUED]', {
+    const company = companyResult.companies[0]
+    if (!company) {
+      throw createApiError(404, 'NOT_FOUND', 'Company not found')
+    }
+
+    await graphqlRequest({
+      query: `
+        mutation CreateAiRun($input: [AiRunCreateInput!]!) {
+          createAiRuns(input: $input) {
+            aiRuns { id }
+          }
+        }
+      `,
+      variables: {
+        input: [
+          {
+            id: runId,
+            companyId,
+            prompt: effectivePrompt,
+            objective,
+            useCase,
+            status: 'QUEUED',
+            approvalStatus: 'PENDING_REVIEW',
+            initiatedBy,
+            company: {
+              connect: [{ where: { node: { id: { eq: companyId } } } }],
+            },
+          },
+        ],
+      },
+      accessToken: token,
+    })
+
+    try {
+      await startAiRunWorkflow({
+        workflowId,
+        runId,
+        companyId,
+        companyName: company.name,
+        prompt: effectivePrompt,
+        objective,
+        initiatedBy,
+        useCase,
+        accessToken: token,
+      })
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to start workflow'
+      await graphqlRequest({
+        query: `
+            mutation MarkRunFailed($runId: ID!, $errorMessage: String!) {
+              updateAiRuns(
+                where: { id: { eq: $runId } }
+                update: {
+                  status: "FAILED"
+                  errorMessage: $errorMessage
+                  completedAt: datetime()
+                }
+              ) {
+                aiRuns { id }
+              }
+            }
+          `,
+        variables: {
+          runId,
+          errorMessage,
+        },
+        accessToken: token,
+      })
+      throw createApiError(
+        500,
+        'WORKFLOW_START_FAILED',
+        `Failed to start AI workflow: ${errorMessage}`
+      )
+    }
+
+    await graphqlRequest({
+      query: `
+          mutation SetWorkflowId($runId: ID!, $workflowId: String!) {
+            updateAiRuns(
+              where: { id: { eq: $runId } }
+              update: { workflowId: $workflowId }
+            ) {
+              aiRuns { id }
+            }
+          }
+        `,
+      variables: {
         runId,
         workflowId,
-        companyId,
-      })
+      },
+      accessToken: token,
+    })
 
-      return res.status(201).json({
+    console.info('[AI RUN][START][QUEUED]', {
+      runId,
+      workflowId,
+      companyId,
+    })
+
+    return res.status(201).json({
+      workflowId,
+      run: {
+        id: runId,
+        companyId,
+        prompt: effectivePrompt,
+        objective,
+        useCase,
+        status: 'QUEUED',
+        approvalStatus: 'PENDING_REVIEW',
         workflowId,
-        run: {
-          id: runId,
-          companyId,
-          prompt: effectivePrompt,
-          objective,
-          useCase,
-          status: 'QUEUED',
-          approvalStatus: 'PENDING_REVIEW',
-          workflowId,
-          initiatedBy,
-          createdAt,
-          updatedAt,
-          resultSummary: null,
-          draftPayload: null,
-          errorMessage: null,
-          startedAt: null,
-          completedAt: null,
-        },
-      })
-    } finally {
-      await session.close()
-    }
+        initiatedBy,
+        createdAt,
+        updatedAt: createdAt,
+        resultSummary: null,
+        draftPayload: null,
+        errorMessage: null,
+        startedAt: null,
+        completedAt: null,
+      },
+    })
   } catch (error) {
     return sendApiError(res, error, {
       companyId,
@@ -742,7 +838,14 @@ aiRunRouter.post('/ai-runs/:runId/approve', async (req, res) => {
 
   try {
     const decodedToken = await getUserContext(req.headers.authorization)
-    const run = await loadAiRunById(runId)
+    const token = req.headers.authorization?.startsWith('Bearer ')
+      ? req.headers.authorization.slice(7)
+      : null
+    if (!token) {
+      throw createApiError(401, 'UNAUTHENTICATED', 'Authentication required')
+    }
+
+    const run = await loadAiRunById(runId, token)
     if (!run) {
       throw createApiError(404, 'NOT_FOUND', 'AI run not found')
     }
@@ -769,39 +872,39 @@ aiRunRouter.post('/ai-runs/:runId/approve', async (req, res) => {
       )
     }
 
-    await persistStrategicDraftToNeo4j({
+    await persistStrategicDraftToGraphql({
       companyId: run.companyId,
       runId,
       actor: initiatedBy,
       draftPayload,
+      accessToken: token,
     })
 
-    const timestamp = new Date().toISOString()
-    const session = neo4jDriver.session()
-    try {
-      await session.run(
-        `
-        MATCH (r:AiRun {id: $runId})
-        SET r.approvalStatus = 'APPROVED',
-            r.approvedBy = $actor,
-            r.approvedAt = datetime($timestamp),
-            r.updatedAt = datetime($timestamp)
-        `,
-        {
-          runId,
-          actor: initiatedBy,
-          timestamp,
+    await graphqlRequest({
+      query: `
+        mutation ApproveRun($runId: ID!, $actor: String!) {
+          updateAiRuns(
+            where: { id: { eq: $runId } }
+            update: {
+              approvalStatus: "APPROVED"
+              approvedBy: $actor
+              approvedAt: datetime()
+            }
+          ) {
+            aiRuns { id }
+          }
         }
-      )
-    } finally {
-      await session.close()
-    }
+      `,
+      variables: { runId, actor: initiatedBy },
+      accessToken: token,
+    })
 
     await createAuditEvent({
       runId,
       action: 'APPROVED',
       actor: initiatedBy,
       comment,
+      accessToken: token,
     })
 
     console.info('[AI RUN][APPROVAL][APPROVED]', {
@@ -825,7 +928,14 @@ aiRunRouter.post('/ai-runs/:runId/reject', async (req, res) => {
 
   try {
     const decodedToken = await getUserContext(req.headers.authorization)
-    const run = await loadAiRunById(runId)
+    const token = req.headers.authorization?.startsWith('Bearer ')
+      ? req.headers.authorization.slice(7)
+      : null
+    if (!token) {
+      throw createApiError(401, 'UNAUTHENTICATED', 'Authentication required')
+    }
+
+    const run = await loadAiRunById(runId, token)
     if (!run) {
       throw createApiError(404, 'NOT_FOUND', 'AI run not found')
     }
@@ -839,32 +949,31 @@ aiRunRouter.post('/ai-runs/:runId/reject', async (req, res) => {
       throw createApiError(409, 'CONFLICT', 'AI run already rejected')
     }
 
-    const timestamp = new Date().toISOString()
-    const session = neo4jDriver.session()
-    try {
-      await session.run(
-        `
-        MATCH (r:AiRun {id: $runId})
-        SET r.approvalStatus = 'REJECTED',
-            r.rejectedBy = $actor,
-            r.rejectedAt = datetime($timestamp),
-            r.updatedAt = datetime($timestamp)
-        `,
-        {
-          runId,
-          actor: initiatedBy,
-          timestamp,
+    await graphqlRequest({
+      query: `
+        mutation RejectRun($runId: ID!, $actor: String!) {
+          updateAiRuns(
+            where: { id: { eq: $runId } }
+            update: {
+              approvalStatus: "REJECTED"
+              rejectedBy: $actor
+              rejectedAt: datetime()
+            }
+          ) {
+            aiRuns { id }
+          }
         }
-      )
-    } finally {
-      await session.close()
-    }
+      `,
+      variables: { runId, actor: initiatedBy },
+      accessToken: token,
+    })
 
     await createAuditEvent({
       runId,
       action: 'REJECTED',
       actor: initiatedBy,
       comment,
+      accessToken: token,
     })
 
     console.info('[AI RUN][APPROVAL][REJECTED]', {
@@ -886,39 +995,48 @@ aiRunRouter.get('/ai-runs/:runId/audit', async (req, res) => {
   const runId = req.params.runId
   try {
     const decodedToken = await getUserContext(req.headers.authorization)
-    const run = await loadAiRunById(runId)
+    const token = req.headers.authorization?.startsWith('Bearer ')
+      ? req.headers.authorization.slice(7)
+      : null
+    if (!token) {
+      throw createApiError(401, 'UNAUTHENTICATED', 'Authentication required')
+    }
+
+    const run = await loadAiRunById(runId, token)
     if (!run) {
       throw createApiError(404, 'NOT_FOUND', 'AI run not found')
     }
     enforceAiRunAccess(decodedToken, run.companyId)
 
-    const session = neo4jDriver.session()
-    try {
-      const result = await session.run(
-        `
-        MATCH (e:AiRunAuditEvent)-[:FOR_RUN]->(r:AiRun {id: $runId})
-        RETURN e
-        ORDER BY e.createdAt DESC
-        `,
-        { runId }
-      )
-
-      const events: AiAuditEventRecord[] = result.records.map(record => {
-        const event = record.get('e').properties as Record<string, unknown>
-        return {
-          id: String(event.id),
-          runId: String(event.runId),
-          action: event.action === 'REJECTED' ? 'REJECTED' : 'APPROVED',
-          actor: String(event.actor ?? ''),
-          comment: typeof event.comment === 'string' ? event.comment : null,
-          createdAt: toIsoString(event.createdAt),
+    const result = await graphqlRequest<{ aiRunAuditEvents: Array<Record<string, unknown>> }>({
+      query: `
+        query LoadAiRunAudit($runId: String!) {
+          aiRunAuditEvents(where: { runId: { eq: $runId } }) {
+            id
+            runId
+            action
+            actor
+            comment
+            createdAt
+          }
         }
-      })
+      `,
+      variables: { runId },
+      accessToken: token,
+    })
 
-      return res.status(200).json(events)
-    } finally {
-      await session.close()
-    }
+    const events: AiAuditEventRecord[] = result.aiRunAuditEvents
+      .map(event => ({
+        id: String(event.id),
+        runId: String(event.runId),
+        action: (event.action === 'REJECTED' ? 'REJECTED' : 'APPROVED') as 'APPROVED' | 'REJECTED',
+        actor: String(event.actor ?? ''),
+        comment: typeof event.comment === 'string' ? event.comment : null,
+        createdAt: toIsoString(event.createdAt),
+      }))
+      .sort((left, right) => (right.createdAt || '').localeCompare(left.createdAt || ''))
+
+    return res.status(200).json(events)
   } catch (error) {
     return sendApiError(res, error, { runId })
   }

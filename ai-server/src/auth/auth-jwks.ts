@@ -79,9 +79,7 @@ const parseAudience = (audience: unknown): string[] => {
   }
 
   if (Array.isArray(audience)) {
-    return audience
-      .map(value => (typeof value === 'string' ? value.trim() : ''))
-      .filter(Boolean)
+    return audience.map(value => (typeof value === 'string' ? value.trim() : '')).filter(Boolean)
   }
 
   return []
@@ -94,9 +92,7 @@ const getAllowedAudiences = (): string[] => {
     process.env.KEYCLOAK_CLIENT_ID,
   ]
 
-  return values
-    .map(value => (typeof value === 'string' ? value.trim() : ''))
-    .filter(Boolean)
+  return values.map(value => (typeof value === 'string' ? value.trim() : '')).filter(Boolean)
 }
 
 const isAudienceAccepted = (decoded: jwt.JwtPayload): boolean => {

@@ -2,44 +2,46 @@ import { proxyActivities } from '@temporalio/workflow'
 import { AiRunWorkflowInput } from './types'
 import type * as activities from './activities'
 
-const { markAiRunRunning, markAiRunCompleted, markAiRunFailed } = proxyActivities<
-  typeof activities
->({
-  startToCloseTimeout: '30 seconds',
+const {
+  markAiRunRunningWithToken,
+  markAiRunCompletedWithToken,
+  markAiRunFailedWithToken,
+  generateAiRunSummary,
+} = proxyActivities<typeof activities>({
+  startToCloseTimeout: '5 minutes',
   retry: {
     maximumAttempts: 3,
   },
 })
 
-const { generateAiRunSummary } = proxyActivities<typeof activities>({
-  startToCloseTimeout: '5 minutes',
-  retry: {
-    maximumAttempts: 1,
-  },
-})
-
 export async function aiRunWorkflow(input: AiRunWorkflowInput): Promise<void> {
-  await markAiRunRunning(input.runId)
+  await markAiRunRunningWithToken({
+    runId: input.runId,
+    accessToken: input.accessToken,
+  })
 
   try {
     const generatedOutput = await generateAiRunSummary({
       companyId: input.companyId,
+      companyName: input.companyName,
       prompt: input.prompt,
       objective: input.objective,
       useCase: input.useCase,
     })
 
-    await markAiRunCompleted({
+    await markAiRunCompletedWithToken({
       runId: input.runId,
       summary: generatedOutput.summary,
       draftPayload: generatedOutput.draftPayload,
+      accessToken: input.accessToken,
     })
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown AI run workflow error'
 
-    await markAiRunFailed({
+    await markAiRunFailedWithToken({
       runId: input.runId,
       errorMessage,
+      accessToken: input.accessToken,
     })
 
     throw error

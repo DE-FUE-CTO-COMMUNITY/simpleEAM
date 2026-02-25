@@ -1,5 +1,5 @@
-import neo4jDriver from '../db/neo4j-client'
 import { Annotation, END, START, StateGraph } from '@langchain/langgraph'
+import { graphqlRequest } from '../graphql/client'
 import {
   CompleteAiRunInput,
   FailAiRunInput,
@@ -1195,29 +1195,6 @@ const buildDraftFromModelOutput = (input: {
   }
 }
 
-const getCompanyName = async (companyId: string): Promise<string> => {
-  const session = neo4jDriver.session()
-  try {
-    const result = await session.run(
-      `
-      MATCH (c:Company {id: $companyId})
-      RETURN c.name AS companyName
-      LIMIT 1
-      `,
-      { companyId }
-    )
-
-    if (result.records.length === 0) {
-      return 'Selected Company'
-    }
-
-    const rawValue = result.records[0].get('companyName')
-    return typeof rawValue === 'string' && rawValue.trim() ? rawValue : 'Selected Company'
-  } finally {
-    await session.close()
-  }
-}
-
 interface StrategicEnrichmentGraphState {
   input: GenerateSummaryInput
   companyName: string
@@ -1445,25 +1422,7 @@ const executeStrategicEnrichmentGraph = async (
 }
 
 export const markAiRunRunning = async (runId: string) => {
-  const session = neo4jDriver.session()
-  try {
-    const timestamp = new Date().toISOString()
-    console.info('[AI RUN][WORKER][RUNNING]', { runId, timestamp })
-    await session.run(
-      `
-      MATCH (r:AiRun {id: $runId})
-      SET r.status = 'RUNNING',
-          r.startedAt = datetime($timestamp),
-          r.updatedAt = datetime($timestamp)
-      `,
-      {
-        runId,
-        timestamp,
-      }
-    )
-  } finally {
-    await session.close()
-  }
+  throw new Error('markAiRunRunning requires access token input after GraphQL migration')
 }
 
 export const generateAiRunSummary = async (
@@ -1476,67 +1435,105 @@ export const generateAiRunSummary = async (
     companyId: input.companyId,
   })
 
-  const companyName = await getCompanyName(input.companyId)
+  const companyName = input.companyName || 'Selected Company'
   const normalizedObjective = input.objective?.trim() || null
 
   return executeStrategicEnrichmentGraph(input, companyName, normalizedObjective)
 }
 
 export const markAiRunCompleted = async ({ runId, summary, draftPayload }: CompleteAiRunInput) => {
-  const session = neo4jDriver.session()
-  try {
-    const timestamp = new Date().toISOString()
-    console.info('[AI RUN][WORKER][COMPLETED]', {
-      runId,
-      timestamp,
-      summaryLength: summary.length,
-    })
-    await session.run(
-      `
-      MATCH (r:AiRun {id: $runId})
-      SET r.status = 'COMPLETED',
-          r.resultSummary = $summary,
-          r.draftPayload = $draftPayload,
-          r.approvalStatus = 'PENDING_REVIEW',
-          r.updatedAt = datetime($timestamp),
-          r.completedAt = datetime($timestamp)
-      `,
-      {
-        runId,
-        summary,
-        draftPayload: draftPayload ? JSON.stringify(draftPayload) : null,
-        timestamp,
-      }
-    )
-  } finally {
-    await session.close()
-  }
+  throw new Error('markAiRunCompleted requires access token input after GraphQL migration')
 }
 
 export const markAiRunFailed = async ({ runId, errorMessage }: FailAiRunInput) => {
-  const session = neo4jDriver.session()
-  try {
-    const timestamp = new Date().toISOString()
-    console.error('[AI RUN][WORKER][FAILED]', {
-      runId,
-      timestamp,
-      errorMessage,
-    })
-    await session.run(
-      `
-      MATCH (r:AiRun {id: $runId})
-      SET r.status = 'FAILED',
-          r.errorMessage = $errorMessage,
-          r.updatedAt = datetime($timestamp),
-          r.completedAt = datetime($timestamp)
-      `,
-      {
-        runId,
-        errorMessage,
-        timestamp,
+  throw new Error('markAiRunFailed requires access token input after GraphQL migration')
+}
+
+export const markAiRunRunningWithToken = async (input: { runId: string; accessToken: string }) => {
+  const timestamp = new Date().toISOString()
+  console.info('[AI RUN][WORKER][RUNNING]', { runId: input.runId, timestamp })
+
+  await graphqlRequest({
+    query: `
+      mutation MarkAiRunRunning($runId: ID!) {
+        updateAiRuns(
+          where: { id: { eq: $runId } }
+          update: { status: "RUNNING", startedAt: datetime() }
+        ) {
+          aiRuns { id }
+        }
       }
-    )
-  } finally {
-    await session.close()
-  }
+    `,
+    variables: {
+      runId: input.runId,
+    },
+    accessToken: input.accessToken,
+  })
+}
+
+export const markAiRunCompletedWithToken = async (
+  input: CompleteAiRunInput & { accessToken: string }
+) => {
+  const timestamp = new Date().toISOString()
+  console.info('[AI RUN][WORKER][COMPLETED]', {
+    runId: input.runId,
+    timestamp,
+    summaryLength: input.summary.length,
+  })
+
+  await graphqlRequest({
+    query: `
+      mutation MarkAiRunCompleted($runId: ID!, $summary: String!, $draftPayload: String) {
+        updateAiRuns(
+          where: { id: { eq: $runId } }
+          update: {
+            status: "COMPLETED"
+            resultSummary: $summary
+            draftPayload: $draftPayload
+            approvalStatus: "PENDING_REVIEW"
+            completedAt: datetime()
+          }
+        ) {
+          aiRuns { id }
+        }
+      }
+    `,
+    variables: {
+      runId: input.runId,
+      summary: input.summary,
+      draftPayload: input.draftPayload ? JSON.stringify(input.draftPayload) : null,
+    },
+    accessToken: input.accessToken,
+  })
+}
+
+export const markAiRunFailedWithToken = async (input: FailAiRunInput & { accessToken: string }) => {
+  const timestamp = new Date().toISOString()
+  console.error('[AI RUN][WORKER][FAILED]', {
+    runId: input.runId,
+    timestamp,
+    errorMessage: input.errorMessage,
+  })
+
+  await graphqlRequest({
+    query: `
+      mutation MarkAiRunFailed($runId: ID!, $errorMessage: String!) {
+        updateAiRuns(
+          where: { id: { eq: $runId } }
+          update: {
+            status: "FAILED"
+            errorMessage: $errorMessage
+            completedAt: datetime()
+          }
+        ) {
+          aiRuns { id }
+        }
+      }
+    `,
+    variables: {
+      runId: input.runId,
+      errorMessage: input.errorMessage,
+    },
+    accessToken: input.accessToken,
+  })
 }

@@ -82,16 +82,13 @@ services:
     ports:
       - "${AI_SERVER_EXTERNAL_PORT}:${AI_SERVER_INTERNAL_PORT}"
     depends_on:
-      - neo4j
       - keycloak
       - temporal
     entrypoint: ["yarn"]
     command: ["start"]
     environment:
       - NODE_ENV=${NODE_ENV}
-      - NEO4J_URI=bolt://neo4j:${NEO4J_BOLT_PORT}
-      - NEO4J_USER=${NEO4J_USER}
-      - NEO4J_PASSWORD=${NEO4J_PASSWORD}
+      - GRAPHQL_INTERNAL_URL=http://server:${GRAPHQL_INTERNAL_PORT}/graphql
       - AI_SERVER_INTERNAL_PORT=${AI_SERVER_INTERNAL_PORT}
       - KEYCLOAK_URL=${KEYCLOAK_URL}
       - KEYCLOAK_REALM=${KEYCLOAK_REALM}
@@ -280,15 +277,13 @@ services:
     profiles:
       - ai
     depends_on:
-      - neo4j
+      - server
       - temporal
     entrypoint: ["yarn"]
     command: ["worker"]
     environment:
       - NODE_ENV=${NODE_ENV}
-      - NEO4J_URI=bolt://neo4j:${NEO4J_BOLT_PORT}
-      - NEO4J_USER=${NEO4J_USER}
-      - NEO4J_PASSWORD=${NEO4J_PASSWORD}
+      - GRAPHQL_INTERNAL_URL=http://server:${GRAPHQL_INTERNAL_PORT}/graphql
       - TEMPORAL_ADDRESS=${TEMPORAL_ADDRESS:-temporal:7233}
       - TEMPORAL_NAMESPACE=${TEMPORAL_NAMESPACE:-default}
       - AI_RUN_TASK_QUEUE=${AI_RUN_TASK_QUEUE:-simple-eam-ai}

@@ -4,7 +4,7 @@ import helmet from 'helmet'
 import dotenv from 'dotenv'
 import http from 'http'
 
-import { testConnection, closeDriver } from './db/neo4j-client'
+import { isGraphqlReachable } from './graphql/client'
 import { aiRunRouter } from './ai/routes'
 
 dotenv.config()
@@ -12,10 +12,9 @@ dotenv.config()
 const PORT = parseInt(process.env.AI_SERVER_INTERNAL_PORT || '4001')
 
 async function startAiServer() {
-  const connectionSuccessful = await testConnection()
-  if (!connectionSuccessful) {
-    console.error('Critical error: Could not establish Neo4j connection.')
-    process.exit(1)
+  const graphqlReachable = await isGraphqlReachable()
+  if (!graphqlReachable) {
+    console.error('Warning: GraphQL API is currently not reachable at startup.')
   }
 
   const app = express()
@@ -46,7 +45,6 @@ async function startAiServer() {
 
   const cleanup = async () => {
     console.log('AI server is shutting down...')
-    await closeDriver()
     process.exit(0)
   }
 

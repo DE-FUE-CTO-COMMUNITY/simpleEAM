@@ -357,6 +357,47 @@ type GEA_Strategy
 }
 
 """
+AiRun – orchestration and review state for AI generated drafts
+"""
+type AiRun @node {
+  id: ID! @id
+  companyId: String!
+  prompt: String!
+  objective: String
+  useCase: String!
+  status: String!
+  approvalStatus: String
+  workflowId: String
+  initiatedBy: String
+  resultSummary: String
+  draftPayload: String
+  errorMessage: String
+  approvedBy: String
+  approvedAt: DateTime
+  rejectedBy: String
+  rejectedAt: DateTime
+  startedAt: DateTime
+  completedAt: DateTime
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime @timestamp(operations: [UPDATE])
+  company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
+  auditEvents: [AiRunAuditEvent!]! @relationship(type: "FOR_RUN", direction: IN)
+}
+
+"""
+AiRunAuditEvent – immutable audit trail entries for AI run approval actions
+"""
+type AiRunAuditEvent @node {
+  id: ID! @id
+  runId: String!
+  action: String!
+  actor: String!
+  comment: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  run: [AiRun!]! @relationship(type: "FOR_RUN", direction: OUT)
+}
+
+"""
 GEA relationship properties for relationships between Vision, Mission, Value, Goal and Strategy.
 Score range and meaning:
 +3 Strong support

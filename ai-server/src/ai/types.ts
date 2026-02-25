@@ -38,10 +38,12 @@ export interface StrategicStrategyDraft {
 export interface AiRunWorkflowInput {
   readonly runId: string
   readonly companyId: string
+  readonly companyName: string
   readonly prompt: string
   readonly objective?: string | null
   readonly initiatedBy: string
   readonly useCase: AiRunUseCase
+  readonly accessToken: string
 }
 
 export interface StrategicDraftPayload {
@@ -73,15 +75,18 @@ export interface CompleteAiRunInput {
   readonly runId: string
   readonly summary: string
   readonly draftPayload: StrategicDraftPayload | null
+  readonly accessToken?: string
 }
 
 export interface FailAiRunInput {
   readonly runId: string
   readonly errorMessage: string
+  readonly accessToken?: string
 }
 
 export interface GenerateSummaryInput {
   readonly companyId: string
+  readonly companyName?: string
   readonly prompt: string
   readonly objective?: string | null
   readonly useCase: AiRunUseCase
