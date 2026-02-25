@@ -54,10 +54,54 @@ services:
       - AUTH_DEBUG=${AUTH_DEBUG}
       - NEO4J_DEBUG=${NEO4J_DEBUG}
       - NEO4J_LOG_LEVEL=${NEO4J_LOG_LEVEL}
+    # No bind mounts for src, prisma, tests - everything comes from the image
+    networks:
+      - eam-network
+      - ${TRAEFIK_NETWORK}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-graphql.rule=Host(`${API_SUBDOMAIN}.${BASE_DOMAIN}`) && (PathPrefix(`/graphql`) || Path(`/health`))"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-graphql.entrypoints=websecure"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-graphql.tls=true"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-graphql.tls.certresolver=${TRAEFIK_CERTRESOLVER}"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-graphql.tls.domains[0].main=${API_SUBDOMAIN}.${BASE_DOMAIN}"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-graphql.priority=10"
+      - "traefik.http.services.${COMPOSE_PROJECT_NAME:-simple-eam}-graphql.loadbalancer.server.port=${GRAPHQL_INTERNAL_PORT}"
+      - "traefik.docker.network=${TRAEFIK_NETWORK}"
+
+  # AI Server (REST endpoints for AI run orchestration)
+  ai-server:
+    build:
+      context: .
+      dockerfile: ai-server/Dockerfile
+      args:
+        NODE_ENV: ${NODE_ENV}
+    restart: unless-stopped
+    profiles:
+      - ai
+    ports:
+      - "${AI_SERVER_EXTERNAL_PORT}:${AI_SERVER_INTERNAL_PORT}"
+    depends_on:
+      - neo4j
+      - keycloak
+      - temporal
+    entrypoint: ["yarn"]
+    command: ["start"]
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - NEO4J_URI=bolt://neo4j:${NEO4J_BOLT_PORT}
+      - NEO4J_USER=${NEO4J_USER}
+      - NEO4J_PASSWORD=${NEO4J_PASSWORD}
+      - AI_SERVER_INTERNAL_PORT=${AI_SERVER_INTERNAL_PORT}
+      - KEYCLOAK_URL=${KEYCLOAK_URL}
+      - KEYCLOAK_REALM=${KEYCLOAK_REALM}
+      - KEYCLOAK_CLIENT_ID=${KEYCLOAK_CLIENT_ID_SERVER}
+      - KEYCLOAK_CLIENT_ID_SERVER=${KEYCLOAK_CLIENT_ID_SERVER}
+      - KEYCLOAK_CLIENT_ID_CLIENT=${KEYCLOAK_CLIENT_ID_CLIENT}
       - TEMPORAL_ADDRESS=${TEMPORAL_ADDRESS:-temporal:7233}
       - TEMPORAL_NAMESPACE=${TEMPORAL_NAMESPACE:-default}
       - AI_RUN_TASK_QUEUE=${AI_RUN_TASK_QUEUE:-simple-eam-ai}
-      - AI_LLM_URL=${AI_LLM_URL:-https://localai.mf2.eu/v1/chat/completions}
+      - AI_LLM_URL=${AI_LLM_URL:-}
       - AI_LLM_MODEL=${AI_LLM_MODEL:-mistral-7b-instruct-v0.3}
       - AI_LLM_API_KEY=${AI_LLM_API_KEY:-}
       - AI_LLM_TIMEOUT_MS=${AI_LLM_TIMEOUT_MS:-45000}
@@ -71,18 +115,18 @@ services:
       - AI_SEARCH_PROVIDERS=${AI_SEARCH_PROVIDERS:-duckduckgo_html,duckduckgo_lite,wikipedia_api}
       - AI_SEARCH_SEARXNG_URL=${AI_SEARCH_SEARXNG_URL:-}
       - AI_SEARCH_SEARXNG_API_KEY=${AI_SEARCH_SEARXNG_API_KEY:-}
-    # No bind mounts for src, prisma, tests - everything comes from the image
     networks:
       - eam-network
       - ${TRAEFIK_NETWORK}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-graphql.rule=Host(`${API_SUBDOMAIN}.${BASE_DOMAIN}`)"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-graphql.entrypoints=websecure"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-graphql.tls=true"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-graphql.tls.certresolver=${TRAEFIK_CERTRESOLVER}"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-graphql.tls.domains[0].main=${API_SUBDOMAIN}.${BASE_DOMAIN}"
-      - "traefik.http.services.${COMPOSE_PROJECT_NAME:-simple-eam}-graphql.loadbalancer.server.port=${GRAPHQL_INTERNAL_PORT}"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-ai.rule=Host(`${API_SUBDOMAIN}.${BASE_DOMAIN}`) && PathPrefix(`/ai-runs`)"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-ai.entrypoints=websecure"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-ai.tls=true"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-ai.tls.certresolver=${TRAEFIK_CERTRESOLVER}"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-ai.tls.domains[0].main=${API_SUBDOMAIN}.${BASE_DOMAIN}"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-ai.priority=100"
+      - "traefik.http.services.${COMPOSE_PROJECT_NAME:-simple-eam}-ai.loadbalancer.server.port=${AI_SERVER_INTERNAL_PORT}"
       - "traefik.docker.network=${TRAEFIK_NETWORK}"
 
   # Keycloak for authentication
@@ -160,7 +204,7 @@ services:
     image: postgres:15
     restart: unless-stopped
     profiles:
-      - temporal
+      - ai
     environment:
       - POSTGRES_DB=${TEMPORAL_DB_NAME:-temporal}
       - POSTGRES_USER=${TEMPORAL_DB_USER:-temporal}
@@ -184,7 +228,7 @@ services:
     image: temporalio/auto-setup:1.24.2
     restart: unless-stopped
     profiles:
-      - temporal
+      - ai
     depends_on:
       temporal-db:
         condition: service_healthy
@@ -204,7 +248,7 @@ services:
     image: temporalio/ui:2.31.2
     restart: unless-stopped
     profiles:
-      - temporal
+      - ai
     depends_on:
       - temporal
     environment:
@@ -229,12 +273,12 @@ services:
   ai-worker:
     build:
       context: .
-      dockerfile: server/Dockerfile
+      dockerfile: ai-server/Dockerfile
       args:
         NODE_ENV: ${NODE_ENV}
     restart: unless-stopped
     profiles:
-      - temporal
+      - ai
     depends_on:
       - neo4j
       - temporal
@@ -248,7 +292,7 @@ services:
       - TEMPORAL_ADDRESS=${TEMPORAL_ADDRESS:-temporal:7233}
       - TEMPORAL_NAMESPACE=${TEMPORAL_NAMESPACE:-default}
       - AI_RUN_TASK_QUEUE=${AI_RUN_TASK_QUEUE:-simple-eam-ai}
-      - AI_LLM_URL=${AI_LLM_URL:-https://localai.mf2.eu/v1/chat/completions}
+      - AI_LLM_URL=${AI_LLM_URL:-}
       - AI_LLM_MODEL=${AI_LLM_MODEL:-mistral-7b-instruct-v0.3}
       - AI_LLM_API_KEY=${AI_LLM_API_KEY:-}
       - AI_LLM_TIMEOUT_MS=${AI_LLM_TIMEOUT_MS:-45000}
@@ -287,6 +331,7 @@ services:
       - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
       - EXCALIDRAW_WS_SERVER_URL=https://${EXCALIDRAW_ROOM_SUBDOMAIN}.${BASE_DOMAIN}
       - AI_LLM_URL=${AI_LLM_URL:-}
+      - AI_API_URL=${AI_API_URL:-}
       - THEME_PRIMARY_COLOR=${THEME_PRIMARY_COLOR}
       - THEME_SECONDARY_COLOR=${THEME_SECONDARY_COLOR}
       - THEME_FONT_FAMILY=${THEME_FONT_FAMILY}

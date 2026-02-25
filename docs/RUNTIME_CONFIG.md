@@ -31,6 +31,7 @@ The client uses a special runtime configuration system:
 ### Client Configuration
 
 - `GRAPHQL_URL` - GraphQL API endpoint URL
+- `AI_API_URL` - AI API base URL (served by dedicated `ai-server`, e.g. `https://api.example.com`)
 - `KEYCLOAK_URL` - Keycloak server URL
 - `KEYCLOAK_REALM` - Keycloak realm name
 - `KEYCLOAK_CLIENT_ID` - Keycloak client ID

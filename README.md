@@ -95,7 +95,8 @@ simple-eam/
 │   │   ├── components/    # React components
 │   │   └── graphql/       # GraphQL queries
 ├── db/                     # Neo4j database
-├── server/                 # GraphQL server
+├── server/                 # GraphQL server (GraphQL only)
+├── ai-server/              # AI server (Temporal/LangGraph and AI REST API)
 ├── templates/              # Entity templates
 ├── scripts/               # Automation scripts
 └── docs/                  # Documentation
@@ -160,6 +161,7 @@ Detailed documentation can be found in the [`docs/`](./docs/) directory:
 
 - **Frontend**: http://localhost:3000
 - **GraphQL Playground**: http://localhost:4000/graphql
+- **AI Server**: http://localhost:4001/health
 - **Neo4j Browser**: http://localhost:7474
 - **Keycloak Admin**: http://localhost:8080
 

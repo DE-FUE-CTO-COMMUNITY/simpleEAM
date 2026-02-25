@@ -30,7 +30,7 @@ import SmartToyIcon from '@mui/icons-material/SmartToy'
 import { useTranslations } from 'next-intl'
 import { useCompanyContext } from '@/contexts/CompanyContext'
 import { keycloak } from '@/lib/auth'
-import { useGraphQLConfig } from '@/lib/runtime-config'
+import { useAiConfig, useGraphQLConfig } from '@/lib/runtime-config'
 
 type AiRunApprovalStatus = 'PENDING_REVIEW' | 'APPROVED' | 'REJECTED' | null
 
@@ -146,6 +146,7 @@ const parseDraftPayload = (raw: string | null | undefined): StrategicDraftPayloa
 export default function AiRunPanel() {
   const t = useTranslations('admin.aiSupport')
   const { selectedCompanyId, selectedCompany } = useCompanyContext()
+  const { apiUrl: aiApiUrl } = useAiConfig()
   const { url: graphQlUrl } = useGraphQLConfig()
 
   const [objective, setObjective] = React.useState('')
@@ -169,11 +170,15 @@ export default function AiRunPanel() {
   )
 
   const apiBaseUrl = React.useMemo(() => {
+    if (aiApiUrl) {
+      return aiApiUrl
+    }
+
     if (!graphQlUrl) {
       return ''
     }
     return graphQlUrl.endsWith('/graphql') ? graphQlUrl.slice(0, -8) : graphQlUrl
-  }, [graphQlUrl])
+  }, [aiApiUrl, graphQlUrl])
 
   const isAdmin = React.useMemo(() => {
     const tokenParsed = keycloak?.tokenParsed as

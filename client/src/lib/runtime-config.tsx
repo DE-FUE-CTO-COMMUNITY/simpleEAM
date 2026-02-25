@@ -63,6 +63,11 @@ export function useGraphQLConfig() {
   return config.graphql
 }
 
+export function useAiConfig() {
+  const config = useRuntimeConfig()
+  return config.ai
+}
+
 export function useExcalidrawConfig() {
   const config = useRuntimeConfig()
   return config.excalidraw

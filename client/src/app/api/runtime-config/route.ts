@@ -24,6 +24,7 @@ export async function GET() {
 
     // AI support configuration
     ai: {
+      apiUrl: process.env.AI_API_URL || '',
       llmUrl: process.env.AI_LLM_URL || '',
     },
 

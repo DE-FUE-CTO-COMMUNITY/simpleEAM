@@ -8,6 +8,7 @@ export interface RuntimeConfig {
     url: string
   }
   ai: {
+    apiUrl: string
     llmUrl: string
   }
   excalidraw: {
@@ -37,6 +38,7 @@ export const defaultConfig: RuntimeConfig = {
     url: 'http://localhost:4000/graphql',
   },
   ai: {
+    apiUrl: '',
     llmUrl: '',
   },
   excalidraw: {

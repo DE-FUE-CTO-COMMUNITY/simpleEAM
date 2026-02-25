@@ -25,6 +25,9 @@ jobs:
           - id: client
             image: simple-eam-client
             dockerfile: client/Dockerfile
+          - id: ai-server
+            image: simple-eam-ai-server
+            dockerfile: ai-server/Dockerfile
           - id: server
             image: simple-eam-server
             dockerfile: server/Dockerfile

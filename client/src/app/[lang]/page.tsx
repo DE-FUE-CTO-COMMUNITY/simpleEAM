@@ -668,7 +668,9 @@ const Dashboard = () => {
                     borderRadius: 2,
                     minWidth: 180,
                     textAlign: 'right',
-                    backgroundColor: getPurposeCoherenceScoreBackground(purposeCoherenceScorePercent),
+                    backgroundColor: getPurposeCoherenceScoreBackground(
+                      purposeCoherenceScorePercent
+                    ),
                     border: `1px solid ${alpha(theme.palette.text.primary, 0.12)}`,
                     transition: 'transform 120ms ease',
                     '&:hover': {
