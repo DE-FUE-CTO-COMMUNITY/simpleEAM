@@ -132,7 +132,6 @@ const tableInstance = useReactTable({
 #### Spalten-Definition
 
 - **Neues API für Spalten-Definitionen**:
-
   - `accessor` wurde aufgeteilt in `accessorKey` (für Strings) und `accessorFn` (für Funktionen)
   - `Header` wurde zu `header`
   - `Cell` wurde zu `cell`
@@ -223,7 +222,6 @@ const table = useReactTable({
 > [Offizielle Dokumentation: Basic Concepts](https://tanstack.com/form/latest/docs/framework/react/guides/basic-concepts)
 
 - **Form Definition**:
-
   - Verwenden Sie `formOptions` zur Erstellung wiederverwendbarer Form-Konfigurationen
   - Typ-Parameter für strikte Typisierung der Formulardaten einsetzen
   - Defaultwerte konsistent definieren, um Schema und Formular abzugleichen
@@ -253,14 +251,12 @@ const table = useReactTable({
   ```
 
 - **Field Management**:
-
   - `form.Field` mit eindeutigen Namen verwenden
   - Stets mit Render Props arbeiten für optimale Typ-Unterstützung
   - Field-Status für UI-Anpassungen nutzen (`isTouched`, `isDirty`, `isPristine`)
   - Verwendung von `form.Field` mit mode="array" für Array-Manipulation
 
 - **Validierung**:
-
   - Vorzugsweise Schema-Validierung mit Zod verwenden für konsistente Datentypen
   - Bei komplexen Szenarien kombinieren mit feldspezifischen Validierungen
   - Asynchrone Validierungen für Server-Checks wie Eindeutigkeit von Benutzernames
@@ -287,7 +283,6 @@ const table = useReactTable({
   ```
 
   #### Erweiterte Validierungskonzepte
-
   - **Validierungszeitpunkte (WICHTIG - Anti-Pattern vermeiden)**:
 
     ⚠️ **NICHT alle Events mit derselben Validierung ausstatten**:
@@ -340,13 +335,11 @@ const table = useReactTable({
     ```
 
   - **Fehleranzeige**:
-
     - Zugriff auf Fehler als Array: `field.state.meta.errors`
     - Zugriff auf Fehler nach Validierungstyp: `field.state.meta.errorMap['onChange']`
     - Typsichere Fehlerbehandlung durch Inferenz der Fehlertypen
 
   - **Formular- vs. Feldvalidierung**:
-
     - Validierung kann auf Formularebene oder pro Feld definiert werden
     - Formularvalidierung kann Feldfehlermeldungen setzen:
 
@@ -373,7 +366,6 @@ const table = useReactTable({
     ```
 
   - **Asynchrone Validierung**:
-
     - Unterstützung für asynchrone Validierungen mit Endungen wie `onChangeAsync`
     - Kombinierbar mit synchronen Validierungen (ausführbar in Reihenfolge)
     - Integriertes Debouncing:
@@ -394,7 +386,6 @@ const table = useReactTable({
     ```
 
   - **Schema-basierte Validierung**:
-
     - Unterstützung für Libraries nach [Standard Schema](https://github.com/standard-schema/standard-schema):
     - Zod, Valibot, ArkType, Effect/Schema
     - Kann mit benutzerdefinierten Funktionen kombiniert werden:
@@ -420,7 +411,6 @@ const table = useReactTable({
     ```
 
   - **Formularübermittlung blockieren**:
-
     - Formular-State enthält `canSubmit`-Flag, das `false` ist, wenn Felder ungültig sind
     - Submit-Button kann automatisch deaktiviert werden:
 
@@ -436,7 +426,6 @@ const table = useReactTable({
     ```
 
 - **Optimierung und Reaktivität**:
-
   - Fein abgestimmte Komponenten-Updates mit `useStore` und selektiven Selektoren
   - `form.Subscribe` für optimierte Rendering-Performance verwenden
   - Selektoren immer angeben, um unnötige Re-Renders zu vermeiden
@@ -450,13 +439,11 @@ const table = useReactTable({
   ```
 
 - **Formular-Reset**:
-
   - Verwenden von Button vom Typ "button" statt "reset" bei der Arbeit mit Tanstack Form
   - Native Form-Reset verhindern mit `event.preventDefault()` wenn nötig
   - Listener einsetzen für komplexe Reset-Logik mit Abhängigkeiten
 
 - **Formular-Dialog Interaktion**:
-
   - **Klare Verantwortlichkeiten definieren**:
     - Die Tabellen-Komponente sollte primär für Zustandsverwaltung des Dialogs verantwortlich sein (geöffnet/geschlossen)
     - Die Formular-Komponente sollte nur für Datenvalidierung und -übermittlung verantwortlich sein
@@ -502,7 +489,6 @@ const table = useReactTable({
       ```
 
 - **Integration mit UI-Bibliotheken**:
-
   - Tanstack Form ist eine headless Bibliothek und lässt sich mit verschiedenen UI-Frameworks kombinieren
   - Besonders gut geeignet für Material UI, aber auch mit anderen Bibliotheken wie Mantine nutzbar
 
@@ -583,7 +569,6 @@ const table = useReactTable({
     - Konsistente Validierungsrückmeldung über alle Formularkomponenten hinweg
 
 - **Integration mit Next.js App Router und Server Components**:
-
   - Für die Integration mit Next.js App Router sind spezielle Import-Pfade und Konfigurationen erforderlich
   - Nutzung von React Server Actions für serverseitige Validierung und Formularverarbeitung
 
@@ -707,7 +692,6 @@ const table = useReactTable({
   ```
 
   - **Wichtige Hinweise für SSR mit Next.js**:
-
     - Unterschiedliche Import-Pfade beachten: `@tanstack/react-form/nextjs` für Server-Code
     - Formularoptionen sollten in einer gemeinsam genutzten Datei definiert werden
     - Server Actions müssen mit `'use server'` markiert sein
@@ -739,25 +723,21 @@ const table = useReactTable({
 #### Wichtige Änderungen in Next.js 15
 
 1. **Asynchrone Request APIs** (Breaking Change):
-
    - `cookies()`, `headers()`, `draftMode()` sind jetzt asynchron
    - Empfohlene Verwendung: `const cookieStore = await cookies()`
    - Temporär kann mit Type-Casting synchron gearbeitet werden:
      `const cookieStore = cookies() as unknown as UnsafeUnwrappedCookies`
 
 2. **Fetch-Caching**:
-
    - `fetch` Requests werden standardmäßig nicht mehr gecached
    - Für explizites Caching: `fetch('https://...', { cache: 'force-cache' })`
    - Opt-in für alle Fetch-Requests mit `export const fetchCache = 'default-cache'`
 
 3. **Route Handlers**:
-
    - `GET`-Funktionen werden standardmäßig nicht mehr gecached
    - Für Caching: `export const dynamic = 'force-static'`
 
 4. **Client-Side Router Cache**:
-
    - Seiten-Segmente werden bei Navigation nicht mehr aus dem Client-Cache wiederverwendet
    - Konfigurierbar mit der `staleTimes`-Option in der next.config.js
 
@@ -784,12 +764,10 @@ const table = useReactTable({
 Die Migration von Material UI v6 auf v7 bringt folgende wichtige Änderungen:
 
 1. **Verbesserte ESM-Unterstützung**:
-
    - Aktualisiertes Package-Layout mit eindeutiger Unterstützung für ESM und CommonJS
    - Behebt Probleme mit Bundlern wie Vite und webpack
 
 2. **Package-Layout-Änderungen**:
-
    - Deep Imports mit mehr als einer Ebene funktionieren nicht mehr:
      ```tsx
      // Alt
@@ -800,7 +778,6 @@ Die Migration von Material UI v6 auf v7 bringt folgende wichtige Änderungen:
    - Modern Bundles wurden entfernt; Aliase für diese müssen entfernt werden
 
 3. **Grid-Umbenennungen**:
-
    - Der veraltete `Grid` wurde zu `GridLegacy` umbenannt
    - `Grid2` ersetzt nun den `Grid`-Namespace
    - Codemod verfügbar: `yarn dlx @mui/codemod v7.0.0/grid-props <path>`
@@ -808,7 +785,6 @@ Die Migration von Material UI v6 auf v7 bringt folgende wichtige Änderungen:
    **Upgrade zu Grid v2:**
 
    Die Migration zu Grid v2 bietet folgende Verbesserungen:
-
    - Verwendet CSS-Variablen, entfernt CSS-Spezifität von Klassenselektoren
    - Alle Grids werden als Items betrachtet, ohne dass der `item`-Prop angegeben werden muss
    - Bietet Offset-Funktionalität für flexiblere Positionierung
@@ -816,7 +792,6 @@ Die Migration von Material UI v6 auf v7 bringt folgende wichtige Änderungen:
    - Verwendet keine negativen Margins, vermeidet dadurch Überlauf-Probleme
 
    **So führen Sie das Upgrade durch:**
-
    1. Import aktualisieren:
 
       ```tsx
@@ -852,17 +827,14 @@ Die Migration von Material UI v6 auf v7 bringt folgende wichtige Änderungen:
       ```
 
 4. **InputLabel size-Prop standardisiert**:
-
    - `'normal'` wurde durch `'medium'` ersetzt
    - Codemod verfügbar: `yarn dlx @mui/codemod v7.0.0/input-label-size-normal-medium <path>`
 
 5. **Theme-Verhalten bei CSS-Variablen**:
-
    - Bei aktivierten CSS-Variablen mit Light/Dark-Modi ändert sich das Theme-Objekt nicht mehr
    - Es wird empfohlen, direkt mit `theme.vars.*` zu arbeiten
 
 6. **Entfernte APIs**:
-
    - `createMuiTheme` → `createTheme`
    - `onBackdropClick` in Dialog und Modal → `onClose`-Callback verwenden
    - `experimentalStyled` → `styled`
@@ -870,7 +842,6 @@ Die Migration von Material UI v6 auf v7 bringt folgende wichtige Änderungen:
    - Lab-Komponenten wurden in das Hauptpaket verschoben
 
 7. **Pakete aktualisieren**:
-
    - Alle @mui-Pakete auf Version "7.0.0" aktualisieren:
      - `@mui/material`
      - `@mui/icons-material`
@@ -902,7 +873,6 @@ Bei der Integration von Material UI 7 mit Next.js 15 sind folgende Punkte zu bea
    ```
 
 2. **Häufige Grid-bezogene Probleme nach Update auf Grid v2:**
-
    - **Spaltenrichtung**: Weder in GridLegacy noch in Grid v2 wird `direction="column"` oder `direction="column-reverse"` unterstützt. Für vertikale Layouts sollten die [Alternative Ansätze in der Dokumentation](https://mui.com/material-ui/react-grid/#column-direction) verwendet werden.
    - **Container-Breite**: Die aktualisierte Grid-Komponente wächst standardmäßig nicht auf die volle Breite des Containers:
 
@@ -962,7 +932,6 @@ Bei der Integration von Material UI 7 mit Next.js 15 sind folgende Punkte zu bea
    ```
 
 5. **Vermeidung von Hydration-Fehlern**:
-
    - Bei clientseitigen Komponenten verwenden Sie `'use client';` Direktive
    - Sorgen Sie für eine konsistente DOM-Struktur beim serverseitigen und clientseitigen Rendering
    - Verwenden Sie `AppRouterCacheProvider` für korrekte CSS-Handhabung

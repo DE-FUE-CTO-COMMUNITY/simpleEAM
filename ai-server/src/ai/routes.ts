@@ -366,7 +366,11 @@ const normalizeEntityType = (value: string): AssistantEntityType | null => {
   if (['data object', 'data objects', 'dataobject', 'dataobjects'].includes(normalized)) {
     return 'DATA_OBJECT'
   }
-  if (['application interface', 'application interfaces', 'interface', 'interfaces'].includes(normalized)) {
+  if (
+    ['application interface', 'application interfaces', 'interface', 'interfaces'].includes(
+      normalized
+    )
+  ) {
     return 'APPLICATION_INTERFACE'
   }
   if (['infrastructure', 'infrastructures'].includes(normalized)) return 'INFRASTRUCTURE'
@@ -481,7 +485,11 @@ const loadArchitectureSnapshot = async (
       capabilityName: capability.name,
       applicationCount: capability.supportedByApplications.length,
     })),
-    dataObjects: data.dataObjects.map(item => ({ id: item.id, name: item.name, status: item.classification })),
+    dataObjects: data.dataObjects.map(item => ({
+      id: item.id,
+      name: item.name,
+      status: item.classification,
+    })),
     applicationInterfaces: data.applicationInterfaces,
     infrastructure: data.infrastructures,
     businessProcesses: data.businessProcesses,
@@ -811,7 +819,12 @@ const extractAssistantLlmText = (payload: unknown): string => {
 
 const buildEntityIndex = (
   snapshot: AssistantArchitectureSnapshot
-): Array<{ entityType: AssistantEntityType; entityId: string; entityName: string; normalizedName: string }> => {
+): Array<{
+  entityType: AssistantEntityType
+  entityId: string
+  entityName: string
+  normalizedName: string
+}> => {
   const types: AssistantEntityType[] = [
     'APPLICATION',
     'BUSINESS_CAPABILITY',
@@ -831,7 +844,9 @@ const buildEntityIndex = (
   )
 }
 
-const buildDeterministicRiskCitations = (snapshot: AssistantArchitectureSnapshot): AssistantCitation[] => {
+const buildDeterministicRiskCitations = (
+  snapshot: AssistantArchitectureSnapshot
+): AssistantCitation[] => {
   const orphanCapabilities = snapshot.capabilityApplicationCounts
     .filter(capability => capability.applicationCount === 0)
     .slice(0, 3)
@@ -923,7 +938,9 @@ const buildAssistantLlmAnswer = async (
     const answer = followUpQuestion ? `${answerText}\n\nFollow-up: ${followUpQuestion}` : answerText
 
     const candidateNames = Array.isArray(json.entityNames)
-      ? json.entityNames.filter((name): name is string => typeof name === 'string').map(name => name.trim())
+      ? json.entityNames
+          .filter((name): name is string => typeof name === 'string')
+          .map(name => name.trim())
       : []
 
     const entityIndex = buildEntityIndex(snapshot)
@@ -1371,7 +1388,9 @@ const loadEntityForCompany = async (input: {
   accessToken: string
 }): Promise<{ id: string; name: string; status?: string } | null> => {
   if (input.entityType === 'APPLICATION') {
-    const data = await graphqlRequest<{ applications: Array<{ id: string; name: string; status: string }> }>({
+    const data = await graphqlRequest<{
+      applications: Array<{ id: string; name: string; status: string }>
+    }>({
       query: `
         query LoadApplication($entityId: ID!, $companyId: ID!) {
           applications(
@@ -1413,7 +1432,9 @@ const loadEntityForCompany = async (input: {
   }
 
   if (input.entityType === 'DATA_OBJECT') {
-    const data = await graphqlRequest<{ dataObjects: Array<{ id: string; name: string; classification: string }> }>({
+    const data = await graphqlRequest<{
+      dataObjects: Array<{ id: string; name: string; classification: string }>
+    }>({
       query: `
         query LoadDataObject($entityId: ID!, $companyId: ID!) {
           dataObjects(
@@ -1512,9 +1533,15 @@ const dryRunChangeActions = async (input: {
   for (const action of input.actions) {
     if (action.kind === 'CREATE') {
       if (!isNonEmptyString(action.values.name)) {
-        findings.push({ severity: 'ERROR', message: `Create action for ${action.entityType} misses a name` })
+        findings.push({
+          severity: 'ERROR',
+          message: `Create action for ${action.entityType} misses a name`,
+        })
       } else {
-        findings.push({ severity: 'INFO', message: `Create ${action.entityType} with name "${action.values.name}"` })
+        findings.push({
+          severity: 'INFO',
+          message: `Create ${action.entityType} with name "${action.values.name}"`,
+        })
       }
       continue
     }
@@ -1541,7 +1568,12 @@ const dryRunChangeActions = async (input: {
       continue
     }
 
-    if (!(action.sourceEntityType === 'APPLICATION' && action.targetEntityType === 'BUSINESS_CAPABILITY')) {
+    if (
+      !(
+        action.sourceEntityType === 'APPLICATION' &&
+        action.targetEntityType === 'BUSINESS_CAPABILITY'
+      )
+    ) {
       findings.push({
         severity: 'ERROR',
         message: `Only APPLICATION -> BUSINESS_CAPABILITY connect/disconnect is supported in this release`,
@@ -1761,7 +1793,11 @@ const executeChangeActions = async (input: {
         continue
       }
 
-      throw createApiError(409, 'CONFLICT', `Create action for ${action.entityType} is not supported`)
+      throw createApiError(
+        409,
+        'CONFLICT',
+        `Create action for ${action.entityType} is not supported`
+      )
     }
 
     if (action.kind === 'UPDATE') {
@@ -1798,7 +1834,10 @@ const executeChangeActions = async (input: {
         continue
       }
 
-      if (action.entityType === 'BUSINESS_CAPABILITY' && (field === 'name' || field === 'description')) {
+      if (
+        action.entityType === 'BUSINESS_CAPABILITY' &&
+        (field === 'name' || field === 'description')
+      ) {
         await graphqlRequest({
           query: `
             mutation UpdateAssistantCapability($entityId: ID!, $companyId: ID!, $value: String!) {
@@ -1830,11 +1869,24 @@ const executeChangeActions = async (input: {
         continue
       }
 
-      throw createApiError(409, 'CONFLICT', `Update action for ${action.entityType}.${field} is not supported`)
+      throw createApiError(
+        409,
+        'CONFLICT',
+        `Update action for ${action.entityType}.${field} is not supported`
+      )
     }
 
-    if (!(action.sourceEntityType === 'APPLICATION' && action.targetEntityType === 'BUSINESS_CAPABILITY')) {
-      throw createApiError(409, 'CONFLICT', 'Only APPLICATION -> BUSINESS_CAPABILITY relation changes are supported')
+    if (
+      !(
+        action.sourceEntityType === 'APPLICATION' &&
+        action.targetEntityType === 'BUSINESS_CAPABILITY'
+      )
+    ) {
+      throw createApiError(
+        409,
+        'CONFLICT',
+        'Only APPLICATION -> BUSINESS_CAPABILITY relation changes are supported'
+      )
     }
 
     await graphqlRequest({

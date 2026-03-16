@@ -541,14 +541,7 @@ export default function AiRunPanel() {
     } finally {
       setAssistantQuestionLoading(false)
     }
-  }, [
-    apiBaseUrl,
-    assistantQuestion,
-    parseApiErrorMessage,
-    selectedCompanyId,
-    t,
-    withToken,
-  ])
+  }, [apiBaseUrl, assistantQuestion, parseApiErrorMessage, selectedCompanyId, t, withToken])
 
   const createChangeProposal = React.useCallback(async () => {
     if (!selectedCompanyId) {
@@ -609,14 +602,17 @@ export default function AiRunPanel() {
         setSubmitSuccess(null)
 
         const token = await withToken()
-        const response = await fetch(`${apiBaseUrl}/ai-assistant/change-proposals/${runId}/${action}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ comment: null }),
-        })
+        const response = await fetch(
+          `${apiBaseUrl}/ai-assistant/change-proposals/${runId}/${action}`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ comment: null }),
+          }
+        )
 
         if (!response.ok) {
           throw new Error(await parseApiErrorMessage(response, t('reviewActionError')))
@@ -747,8 +743,13 @@ export default function AiRunPanel() {
                   }}
                 >
                   <Typography variant="body2">{assistantAnswer.answer}</Typography>
-                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
-                    {t('assistantConfidence')}: {Math.round((assistantAnswer.confidence || 0) * 100)}%
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ display: 'block', mt: 0.5 }}
+                  >
+                    {t('assistantConfidence')}:{' '}
+                    {Math.round((assistantAnswer.confidence || 0) * 100)}%
                   </Typography>
                   {!!assistantAnswer.citations?.length && (
                     <Stack spacing={0.5} sx={{ mt: 1 }}>
@@ -756,7 +757,11 @@ export default function AiRunPanel() {
                         {t('assistantCitations')}
                       </Typography>
                       {assistantAnswer.citations.map(citation => (
-                        <Typography key={`${citation.entityType}-${citation.entityId}`} variant="caption" color="text.secondary">
+                        <Typography
+                          key={`${citation.entityType}-${citation.entityId}`}
+                          variant="caption"
+                          color="text.secondary"
+                        >
                           {citation.entityType} · {citation.entityName} · {citation.evidenceLink}
                         </Typography>
                       ))}
@@ -792,7 +797,9 @@ export default function AiRunPanel() {
                   }}
                   disabled={!selectedCompanyId || changeProposalLoading || !apiBaseUrl}
                 >
-                  {changeProposalLoading ? t('assistantProposalCreating') : t('assistantProposalButton')}
+                  {changeProposalLoading
+                    ? t('assistantProposalCreating')
+                    : t('assistantProposalButton')}
                 </Button>
               </Box>
             </Stack>
@@ -937,104 +944,106 @@ export default function AiRunPanel() {
                                 {isExpanded ? t('hideDetails') : t('showDetails')}
                               </Button>
                             </Box>
-                            {isExpanded && run.status === 'COMPLETED' && run.useCase !== 'CONVERSATIONAL_ASSISTANT' && (
-                              <Box
-                                sx={{
-                                  p: 1,
-                                  border: theme => `1px solid ${theme.palette.divider}`,
-                                  borderRadius: 1,
-                                  backgroundColor: theme => theme.palette.background.default,
-                                }}
-                              >
-                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-                                  {t('draftTitle')}
-                                </Typography>
-
-                                {draft ? (
-                                  <Stack spacing={0.75}>
-                                    {draft.generatedAt && (
-                                      <Typography variant="caption" color="text.secondary">
-                                        {t('draftGeneratedAt')}:{' '}
-                                        {new Date(draft.generatedAt).toLocaleString()}
-                                      </Typography>
-                                    )}
-                                    {draft.mission?.purposeStatement && (
-                                      <Typography variant="body2">
-                                        <strong>{t('missionLabel')}:</strong>{' '}
-                                        {draft.mission.purposeStatement}
-                                      </Typography>
-                                    )}
-                                    {draft.vision?.visionStatement && (
-                                      <Typography variant="body2">
-                                        <strong>{t('visionLabel')}:</strong>{' '}
-                                        {draft.vision.visionStatement}
-                                      </Typography>
-                                    )}
-                                    {!!draft.values?.length && (
-                                      <Typography variant="body2">
-                                        <strong>{t('valuesLabel')}:</strong>{' '}
-                                        {draft.values
-                                          .map(value => value.name)
-                                          .filter(Boolean)
-                                          .join(', ')}
-                                      </Typography>
-                                    )}
-                                    {!!draft.goals?.length && (
-                                      <Typography variant="body2">
-                                        <strong>{t('goalsLabel')}:</strong>{' '}
-                                        {draft.goals
-                                          .map(goal => goal.name)
-                                          .filter(Boolean)
-                                          .join(', ')}
-                                      </Typography>
-                                    )}
-                                    {!!draft.strategies?.length && (
-                                      <Typography variant="body2">
-                                        <strong>{t('strategiesLabel')}:</strong>{' '}
-                                        {draft.strategies
-                                          .map(strategy => strategy.name)
-                                          .filter(Boolean)
-                                          .join(', ')}
-                                      </Typography>
-                                    )}
-                                    {!!draft.sources?.length && (
-                                      <Stack spacing={0.5}>
-                                        <Typography variant="body2">
-                                          <strong>{t('sourcesLabel')}:</strong>{' '}
-                                          {draft.sources.length}
-                                        </Typography>
-                                        {draft.sources.map((source, index) => (
-                                          <Box key={`${run.id}-source-${index}`}>
-                                            <Link
-                                              href={source.url}
-                                              target="_blank"
-                                              rel="noopener noreferrer"
-                                              underline="hover"
-                                              variant="body2"
-                                            >
-                                              {source.title || source.url}
-                                            </Link>
-                                            {source.snippet && (
-                                              <Typography
-                                                variant="caption"
-                                                color="text.secondary"
-                                                sx={{ display: 'block' }}
-                                              >
-                                                {source.snippet}
-                                              </Typography>
-                                            )}
-                                          </Box>
-                                        ))}
-                                      </Stack>
-                                    )}
-                                  </Stack>
-                                ) : (
-                                  <Typography variant="body2" color="text.secondary">
-                                    {t('noDraftPayload')}
+                            {isExpanded &&
+                              run.status === 'COMPLETED' &&
+                              run.useCase !== 'CONVERSATIONAL_ASSISTANT' && (
+                                <Box
+                                  sx={{
+                                    p: 1,
+                                    border: theme => `1px solid ${theme.palette.divider}`,
+                                    borderRadius: 1,
+                                    backgroundColor: theme => theme.palette.background.default,
+                                  }}
+                                >
+                                  <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
+                                    {t('draftTitle')}
                                   </Typography>
-                                )}
-                              </Box>
-                            )}
+
+                                  {draft ? (
+                                    <Stack spacing={0.75}>
+                                      {draft.generatedAt && (
+                                        <Typography variant="caption" color="text.secondary">
+                                          {t('draftGeneratedAt')}:{' '}
+                                          {new Date(draft.generatedAt).toLocaleString()}
+                                        </Typography>
+                                      )}
+                                      {draft.mission?.purposeStatement && (
+                                        <Typography variant="body2">
+                                          <strong>{t('missionLabel')}:</strong>{' '}
+                                          {draft.mission.purposeStatement}
+                                        </Typography>
+                                      )}
+                                      {draft.vision?.visionStatement && (
+                                        <Typography variant="body2">
+                                          <strong>{t('visionLabel')}:</strong>{' '}
+                                          {draft.vision.visionStatement}
+                                        </Typography>
+                                      )}
+                                      {!!draft.values?.length && (
+                                        <Typography variant="body2">
+                                          <strong>{t('valuesLabel')}:</strong>{' '}
+                                          {draft.values
+                                            .map(value => value.name)
+                                            .filter(Boolean)
+                                            .join(', ')}
+                                        </Typography>
+                                      )}
+                                      {!!draft.goals?.length && (
+                                        <Typography variant="body2">
+                                          <strong>{t('goalsLabel')}:</strong>{' '}
+                                          {draft.goals
+                                            .map(goal => goal.name)
+                                            .filter(Boolean)
+                                            .join(', ')}
+                                        </Typography>
+                                      )}
+                                      {!!draft.strategies?.length && (
+                                        <Typography variant="body2">
+                                          <strong>{t('strategiesLabel')}:</strong>{' '}
+                                          {draft.strategies
+                                            .map(strategy => strategy.name)
+                                            .filter(Boolean)
+                                            .join(', ')}
+                                        </Typography>
+                                      )}
+                                      {!!draft.sources?.length && (
+                                        <Stack spacing={0.5}>
+                                          <Typography variant="body2">
+                                            <strong>{t('sourcesLabel')}:</strong>{' '}
+                                            {draft.sources.length}
+                                          </Typography>
+                                          {draft.sources.map((source, index) => (
+                                            <Box key={`${run.id}-source-${index}`}>
+                                              <Link
+                                                href={source.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                underline="hover"
+                                                variant="body2"
+                                              >
+                                                {source.title || source.url}
+                                              </Link>
+                                              {source.snippet && (
+                                                <Typography
+                                                  variant="caption"
+                                                  color="text.secondary"
+                                                  sx={{ display: 'block' }}
+                                                >
+                                                  {source.snippet}
+                                                </Typography>
+                                              )}
+                                            </Box>
+                                          ))}
+                                        </Stack>
+                                      )}
+                                    </Stack>
+                                  ) : (
+                                    <Typography variant="body2" color="text.secondary">
+                                      {t('noDraftPayload')}
+                                    </Typography>
+                                  )}
+                                </Box>
+                              )}
                             {isExpanded && run.useCase === 'CONVERSATIONAL_ASSISTANT' && (
                               <Box
                                 sx={{
@@ -1068,7 +1077,11 @@ export default function AiRunPanel() {
                                           <Typography
                                             key={`${run.id}-finding-${index}`}
                                             variant="caption"
-                                            color={finding.severity === 'ERROR' ? 'error.main' : 'text.secondary'}
+                                            color={
+                                              finding.severity === 'ERROR'
+                                                ? 'error.main'
+                                                : 'text.secondary'
+                                            }
                                           >
                                             {finding.severity} · {finding.message}
                                           </Typography>
