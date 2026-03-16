@@ -122,7 +122,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
         </IconButton>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexGrow: 1, minWidth: 0 }}>
           <Typography variant="h6" noWrap component="div" sx={{ whiteSpace: 'nowrap' }}>
-            Simple Enterprise Architecture Management
+            NextGen Enterprise Architecture Management
           </Typography>
           {/* Company selector: show dropdown if multiple, otherwise static label */}
           {hasMultipleCompanies ? (

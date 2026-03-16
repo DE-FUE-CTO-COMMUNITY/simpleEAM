@@ -61,7 +61,7 @@ echo "======================="
 
 if [ -z "$1" ]; then
   # Standardmäßig das aktuelle Projektverzeichnis scannen
-  find_and_convert "/home/mf2admin/simple-eam-try2"
+  find_and_convert "/home/mf2admin/nextgen-eam-try2"
 else
   # Oder das angegebene Verzeichnis
   find_and_convert "$1"

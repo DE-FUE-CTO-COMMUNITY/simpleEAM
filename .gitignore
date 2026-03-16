@@ -67,8 +67,8 @@ lib-cov/
 auth/src/*.jar
 auth/data/
 auth/themes/*
-!auth/themes/simple-eam/
-!auth/themes/simple-eam/**
+!auth/themes/nextgen-eam/
+!auth/themes/nextgen-eam/**
 
 # Branding assets (kept local per customer)
 client/public/brand-images/*

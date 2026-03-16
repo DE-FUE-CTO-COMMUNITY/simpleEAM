@@ -1,6 +1,6 @@
 # Material UI Autocomplete - Best Practices und Richtlinien
 
-Dieses Dokument enthält Richtlinien und Best Practices für die Verwendung der Material UI Autocomplete-Komponente in Simple-EAM, insbesondere zur Fehlerbehebung bei der Anzeige von IDs statt Namen in Autocomplete-Chips.
+Dieses Dokument enthält Richtlinien und Best Practices für die Verwendung der Material UI Autocomplete-Komponente in NextGen EAM, insbesondere zur Fehlerbehebung bei der Anzeige von IDs statt Namen in Autocomplete-Chips.
 
 ## Grundlegende Konzepte
 

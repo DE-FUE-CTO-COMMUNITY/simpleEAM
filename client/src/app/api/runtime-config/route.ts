@@ -13,7 +13,7 @@ export async function GET() {
     // Keycloak Configuration
     keycloak: {
       url: process.env.KEYCLOAK_URL || 'http://localhost:8080',
-      realm: process.env.KEYCLOAK_REALM || 'simple-eam',
+      realm: process.env.KEYCLOAK_REALM || 'nextgen-eam',
       clientId: process.env.KEYCLOAK_CLIENT_ID_CLIENT || 'eam-client',
     },
 
@@ -42,8 +42,8 @@ export async function GET() {
 
     // Logo Configuration
     logo: {
-      url: process.env.LOGO_URL || '/images/Simple-EAM-Logo.svg',
-      alt: process.env.LOGO_ALT || 'Simple-EAM Logo',
+      url: process.env.LOGO_URL || '/images/NextGen-EAM-Logo.svg',
+      alt: process.env.LOGO_ALT || 'NextGen EAM Logo',
     },
 
     // Tool metadata

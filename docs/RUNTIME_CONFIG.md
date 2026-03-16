@@ -1,57 +1,70 @@
-# Runtime Environment Configuration for Simple EAM
+# Runtime Environment Configuration for NextGen EAM
 
-This project uses **runtime environment variables** instead of build-time variables. This means you can change configuration without rebuilding the application.
+NextGen EAM uses **runtime environment variables** instead of build-time `NEXT_PUBLIC_*` variables. You can change runtime behavior by editing `.env` and restarting containers.
 
-## How it Works
+## Runtime Services
 
-### Server (GraphQL API)
+### `server` (GraphQL API)
 
-The server reads environment variables directly from `process.env` at runtime. Simply update the `.env` file and restart the server container.
+The `server` container exposes the GraphQL API and reads its configuration from `process.env` at startup.
 
-### Client (Next.js Frontend)
+### `ai-server` (AI REST API)
 
-The client uses a special runtime configuration system:
+The `ai-server` container exposes AI REST endpoints (for example `/ai-runs`) and communicates with the GraphQL API (not directly with Neo4j).
 
-1. Configuration is loaded from `/api/config` endpoint at runtime
-2. The API endpoint reads from environment variables (without `NEXT_PUBLIC_` prefix)
-3. No rebuild needed - just restart the client container
+### `ai-worker` (Temporal worker)
 
-## Environment Variables
+The `ai-worker` container executes AI workflows and activities and updates run state through GraphQL.
 
-### Server Configuration
+### `client` (Next.js frontend)
 
-- `NEO4J_URI` - Neo4j database connection URI
-- `NEO4J_USER` - Neo4j username
-- `NEO4J_PASSWORD` - Neo4j password
-- `KEYCLOAK_URL` - Keycloak server URL
-- `KEYCLOAK_REALM` - Keycloak realm name
-- `KEYCLOAK_CLIENT_ID_SERVER` - Keycloak client ID for server
-- `PORT` - Server port (default: 4000)
+The client fetches runtime config from `/api/runtime-config`, so frontend endpoints and branding can be updated without rebuilding the image.
 
-### Client Configuration
+## AI Profile Behavior
 
-- `GRAPHQL_URL` - GraphQL API endpoint URL
-- `AI_API_URL` - AI API base URL (served by dedicated `ai-server`, e.g. `https://api.example.com`)
-- `KEYCLOAK_URL` - Keycloak server URL
-- `KEYCLOAK_REALM` - Keycloak realm name
-- `KEYCLOAK_CLIENT_ID` - Keycloak client ID
-- `THEME_PRIMARY_COLOR` - Primary theme color (hex)
-- `THEME_SECONDARY_COLOR` - Secondary theme color (hex)
-- `THEME_FONT_FAMILY` - Font family
-- `LOGO_PATH` - Path to logo image
-- `LOGO_NAME` - Application name
-- `EXCALIDRAW_WS_SERVER_URL` - Excalidraw collaboration server URL
-- `DEBUG_MODE` - Enable debug mode (true/false)
+AI services are profile-based and optional:
 
-## Docker Configuration
+- `ai-server`, `ai-worker`, `temporal`, `temporal-db`, and `temporal-ui` are in the `ai` profile.
+- Start AI stack explicitly with:
 
-The runtime configuration is injected via environment variables in `docker-compose.yml`:
-
-```yaml
-services:
-  client:
-    environment:
-      - GRAPHQL_URL=${GRAPHQL_URL}
-      - KEYCLOAK_URL=${KEYCLOAK_URL}
-      # ... other variables
+```bash
+COMPOSE_PROFILES=ai docker compose up -d
 ```
+
+- If `AI_LLM_URL` and `AI_API_URL` are empty, AI functionality stays disabled in runtime configuration.
+
+## Key Runtime Variables
+
+### GraphQL Server (`server`)
+
+- `GRAPHQL_INTERNAL_PORT` - Internal GraphQL port (default `4000`)
+- `NEO4J_URI`, `NEO4J_USER`, `NEO4J_PASSWORD` - Neo4j connection for GraphQL service
+- `KEYCLOAK_URL`, `KEYCLOAK_REALM`, `KEYCLOAK_CLIENT_ID_SERVER` - Auth validation settings
+
+### AI Server / Worker (`ai-server`, `ai-worker`)
+
+- `GRAPHQL_INTERNAL_URL` - Internal GraphQL endpoint used by AI services (e.g. `http://server:4000/graphql`)
+- `AI_SERVER_INTERNAL_PORT`, `AI_SERVER_EXTERNAL_PORT` - AI server port mapping
+- `AI_RUN_TASK_QUEUE`, `TEMPORAL_ADDRESS`, `TEMPORAL_NAMESPACE` - Temporal runtime settings
+- `AI_LLM_URL`, `AI_LLM_MODEL`, `AI_LLM_API_KEY` - LLM provider settings
+- `AI_LLM_TIMEOUT_MS`, `AI_LLM_RETRY_COUNT`, `AI_ALLOW_LLM_FALLBACK` - LLM behavior controls
+- `AI_WEB_SOURCE_COUNT`, `AI_WEB_SEARCH_RESULT_COUNT`, `AI_WEB_FETCH_TIMEOUT_MS` - Web research settings
+- `AI_SEARCH_PROVIDERS`, `AI_SEARCH_SEARXNG_URL`, `AI_SEARCH_SEARXNG_API_KEY` - Search provider settings
+
+### Client Runtime (`client`)
+
+- `GRAPHQL_URL` - Public GraphQL URL for browser/API routes
+- `AI_API_URL` - Public AI API base URL (used for `/ai-runs` calls)
+- `AI_LLM_URL` - Used by UI feature gating for AI navigation/support visibility
+- `KEYCLOAK_URL`, `KEYCLOAK_REALM`, `KEYCLOAK_CLIENT_ID_CLIENT` - Client auth setup
+- `EXCALIDRAW_WS_SERVER_URL` - Collaboration endpoint
+- `THEME_PRIMARY_COLOR`, `THEME_SECONDARY_COLOR`, `THEME_FONT_FAMILY` - Runtime branding
+- `LOGO_URL`, `LOGO_ALT` - Runtime logo configuration
+
+## Runtime Config Endpoint
+
+The frontend consumes runtime values via:
+
+- `GET /api/runtime-config`
+
+This endpoint returns the effective runtime config object used by hooks such as runtime GraphQL and AI API configuration.

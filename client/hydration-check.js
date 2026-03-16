@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Hydration-Fehler Check Script für Simple-EAM Client
+ * Hydration-Fehler Check Script für NextGen EAM Client
  * Dieses Script überprüft häufige Hydration-Problemquellen
  */
 

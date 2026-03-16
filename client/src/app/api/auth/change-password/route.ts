@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
 
     // Keycloak Admin API Konfiguration
     const keycloakUrl = process.env.KEYCLOAK_URL || 'http://localhost:8080'
-    const realm = process.env.KEYCLOAK_REALM || 'simple-eam'
+    const realm = process.env.KEYCLOAK_REALM || 'nextgen-eam'
     const adminUsername = process.env.KEYCLOAK_ADMIN || 'admin'
     const adminPassword = process.env.KEYCLOAK_ADMIN_PASSWORD
 

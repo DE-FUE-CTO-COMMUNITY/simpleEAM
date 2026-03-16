@@ -78,7 +78,7 @@ async function fetchKeycloakConfig() {
   // Fallback to defaults
   keycloakConfig = {
     url: 'http://localhost:8080',
-    realm: 'simple-eam',
+    realm: 'nextgen-eam',
     clientId: 'eam-client',
   }
   return keycloakConfig

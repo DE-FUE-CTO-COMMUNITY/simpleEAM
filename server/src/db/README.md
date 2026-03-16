@@ -2,7 +2,7 @@
 
 ## Überblick
 
-Dieses Verzeichnis verwaltet alle datenbankbezogenen Skripte und Szenarien für Simple-EAM. Das System nutzt Neo4j als Graph-Datenbank für die Speicherung des Enterprise Architecture Models.
+Dieses Verzeichnis verwaltet alle datenbankbezogenen Skripte und Szenarien für NextGen EAM. Das System nutzt Neo4j als Graph-Datenbank für die Speicherung des Enterprise Architecture Models.
 
 ## Verzeichnisstruktur
 
@@ -160,5 +160,5 @@ DEBUG=* yarn init-db-{scenario}
 ## Siehe auch
 
 - [Neo4j GraphQL Library](https://neo4j.com/docs/graphql-library/)
-- [Simple-EAM Hauptdokumentation](../../../docs/)
+- [NextGen EAM Hauptdokumentation](../../../docs/)
 - [Docker Compose Setup](../../../docker-compose.yml)

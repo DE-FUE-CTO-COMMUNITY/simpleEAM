@@ -10524,9 +10524,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"simple-eam-client@workspace:.":
+"nextgen-eam-client@workspace:.":
   version: 0.0.0-use.local
-  resolution: "simple-eam-client@workspace:."
+  resolution: "nextgen-eam-client@workspace:."
   dependencies:
     "@apollo/client": "npm:^3.8.0"
     "@emotion/cache": "npm:^11.14.0"

@@ -16,8 +16,8 @@ const Logo: React.FC<LogoProps> = ({ height = 40, ...boxProps }) => {
   // Logo configuration from runtime config
   const logoConfig = useLogoConfig()
 
-  const logoPath = logoConfig.url || '/images/Simple-EAM-Logo.png'
-  const logoName = logoConfig.alt || 'Simple-EAM'
+  const logoPath = logoConfig.url || '/images/NextGen-EAM-Logo.png'
+  const logoName = logoConfig.alt || 'NextGen EAM'
 
   return (
     <Box {...boxProps} sx={{ display: 'inline-flex', alignItems: 'center', ...boxProps.sx }}>

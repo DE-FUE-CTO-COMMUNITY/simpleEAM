@@ -42,7 +42,7 @@ export interface ExcalidrawData {
   files?: any
 }
 
-// ArchiMate element types mapping from simple-eam types to Archi types
+// ArchiMate element types mapping from nextgen-eam types to Archi types
 const ARCHIMATE_TYPE_MAPPING: Record<string, string> = {
   businessCapability: 'Capability',
   application: 'ApplicationComponent',
@@ -210,7 +210,7 @@ export function convertExcalidrawToArchi(
   xml += `                name="${escapeXml(diagramName)}"\n`
   xml += `                id="${modelId}"\n`
   xml += '                version="4.9.0">\n'
-  xml += `  <purpose>${escapeXml('Generated from simple-eam diagram on ' + timestamp)}</purpose>\n`
+  xml += `  <purpose>${escapeXml('Generated from nextgen-eam diagram on ' + timestamp)}</purpose>\n`
 
   // Group elements by folder type
   const elementsByFolder = new Map<string, Array<{ element: ExcalidrawElement; archiId: string }>>()

@@ -413,7 +413,7 @@ const collectDuckduckgoHtmlCandidates = async (
     `${SEARCH_BASE_URL}?q=${encodeURIComponent(query)}`,
     {
       headers: {
-        'User-Agent': 'simple-eam-ai-worker/1.0',
+        'User-Agent': 'nextgen-eam-ai-worker/1.0',
       },
     },
     getWebFetchTimeoutMs()
@@ -459,7 +459,7 @@ const collectDuckduckgoLiteCandidates = async (
     `${SEARCH_LITE_BASE_URL}?q=${encodeURIComponent(query)}`,
     {
       headers: {
-        'User-Agent': 'simple-eam-ai-worker/1.0',
+        'User-Agent': 'nextgen-eam-ai-worker/1.0',
       },
     },
     getWebFetchTimeoutMs()
@@ -503,7 +503,7 @@ const collectWikipediaCandidates = async (
     {
       headers: {
         Accept: 'application/json',
-        'User-Agent': 'simple-eam-ai-worker/1.0',
+        'User-Agent': 'nextgen-eam-ai-worker/1.0',
       },
     },
     getWebFetchTimeoutMs()
@@ -555,7 +555,7 @@ const collectSearxngCandidates = async (
 
   const headers: Record<string, string> = {
     Accept: 'application/json',
-    'User-Agent': 'simple-eam-ai-worker/1.0',
+    'User-Agent': 'nextgen-eam-ai-worker/1.0',
   }
 
   const apiKey = getSearxngApiKey()
@@ -708,7 +708,7 @@ const collectWebSources = async (
         link.url,
         {
           headers: {
-            'User-Agent': 'simple-eam-ai-worker/1.0',
+            'User-Agent': 'nextgen-eam-ai-worker/1.0',
           },
         },
         getWebFetchTimeoutMs()
@@ -1455,10 +1455,10 @@ export const markAiRunRunningWithToken = async (input: { runId: string; accessTo
 
   await graphqlRequest({
     query: `
-      mutation MarkAiRunRunning($runId: ID!) {
+      mutation MarkAiRunRunning($runId: ID!, $startedAt: DateTime!) {
         updateAiRuns(
           where: { id: { eq: $runId } }
-          update: { status: "RUNNING", startedAt: datetime() }
+          update: { status: { set: "RUNNING" }, startedAt: { set: $startedAt } }
         ) {
           aiRuns { id }
         }
@@ -1466,6 +1466,7 @@ export const markAiRunRunningWithToken = async (input: { runId: string; accessTo
     `,
     variables: {
       runId: input.runId,
+      startedAt: timestamp,
     },
     accessToken: input.accessToken,
   })
@@ -1483,15 +1484,15 @@ export const markAiRunCompletedWithToken = async (
 
   await graphqlRequest({
     query: `
-      mutation MarkAiRunCompleted($runId: ID!, $summary: String!, $draftPayload: String) {
+      mutation MarkAiRunCompleted($runId: ID!, $summary: String!, $draftPayload: String, $completedAt: DateTime!) {
         updateAiRuns(
           where: { id: { eq: $runId } }
           update: {
-            status: "COMPLETED"
-            resultSummary: $summary
-            draftPayload: $draftPayload
-            approvalStatus: "PENDING_REVIEW"
-            completedAt: datetime()
+            status: { set: "COMPLETED" }
+            resultSummary: { set: $summary }
+            draftPayload: { set: $draftPayload }
+            approvalStatus: { set: "PENDING_REVIEW" }
+            completedAt: { set: $completedAt }
           }
         ) {
           aiRuns { id }
@@ -1502,6 +1503,7 @@ export const markAiRunCompletedWithToken = async (
       runId: input.runId,
       summary: input.summary,
       draftPayload: input.draftPayload ? JSON.stringify(input.draftPayload) : null,
+      completedAt: timestamp,
     },
     accessToken: input.accessToken,
   })
@@ -1517,13 +1519,13 @@ export const markAiRunFailedWithToken = async (input: FailAiRunInput & { accessT
 
   await graphqlRequest({
     query: `
-      mutation MarkAiRunFailed($runId: ID!, $errorMessage: String!) {
+      mutation MarkAiRunFailed($runId: ID!, $errorMessage: String!, $completedAt: DateTime!) {
         updateAiRuns(
           where: { id: { eq: $runId } }
           update: {
-            status: "FAILED"
-            errorMessage: $errorMessage
-            completedAt: datetime()
+            status: { set: "FAILED" }
+            errorMessage: { set: $errorMessage }
+            completedAt: { set: $completedAt }
           }
         ) {
           aiRuns { id }
@@ -1533,6 +1535,7 @@ export const markAiRunFailedWithToken = async (input: FailAiRunInput & { accessT
     variables: {
       runId: input.runId,
       errorMessage: input.errorMessage,
+      completedAt: timestamp,
     },
     accessToken: input.accessToken,
   })

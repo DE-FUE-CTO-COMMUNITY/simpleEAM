@@ -5,7 +5,7 @@ import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Simple EAM',
+  title: 'NextGen EAM',
   description: 'Enterprise Architecture Management System',
 }
 

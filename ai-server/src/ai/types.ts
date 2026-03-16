@@ -1,4 +1,4 @@
-export type AiRunUseCase = 'STRATEGIC_ENRICHMENT'
+export type AiRunUseCase = 'STRATEGIC_ENRICHMENT' | 'CONVERSATIONAL_ASSISTANT'
 
 export interface StrategicResearchSource {
   readonly title: string
@@ -94,7 +94,14 @@ export interface GenerateSummaryInput {
 
 export interface CreateAiAuditEventInput {
   readonly runId: string
-  readonly action: 'APPROVED' | 'REJECTED'
+  readonly action:
+    | 'APPROVED'
+    | 'REJECTED'
+    | 'PROPOSAL_CREATED'
+    | 'DRY_RUN_VALIDATED'
+    | 'APPLY_REQUESTED'
+    | 'APPLIED'
+    | 'UNAUTHORIZED_BLOCKED'
   readonly actor: string
   readonly comment?: string | null
 }

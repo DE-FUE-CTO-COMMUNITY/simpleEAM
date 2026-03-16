@@ -5488,9 +5488,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"simple-eam-server@workspace:.":
+"nextgen-eam-server@workspace:.":
   version: 0.0.0-use.local
-  resolution: "simple-eam-server@workspace:."
+  resolution: "nextgen-eam-server@workspace:."
   dependencies:
     "@graphql-tools/schema": "npm:^10.0.25"
     "@neo4j/graphql": "npm:7.1.1"

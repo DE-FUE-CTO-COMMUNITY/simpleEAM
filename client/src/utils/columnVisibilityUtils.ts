@@ -4,7 +4,7 @@ import { VisibilityState } from '@tanstack/react-table'
 
 // Storage-Schlüssel-Konstanten
 export const STORAGE_KEYS = {
-  COLUMN_VISIBILITY: 'simple-eam-column-visibility',
+  COLUMN_VISIBILITY: 'nextgen-eam-column-visibility',
 } as const
 
 /**

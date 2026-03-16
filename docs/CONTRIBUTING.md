@@ -1,4 +1,4 @@
-# Contribution Guidelines for the Simple-EAM Project
+# Contribution Guidelines for the NextGen EAM Project
 
 ## AI-only contributions
 
@@ -64,7 +64,7 @@ import Stack from '@mui/material/Stack'
 
 ## Tanstack Table V8
 
-Simple-EAM uses Tanstack Table V8 (formerly React Table V7). There are key differences from the previous version:
+NextGen EAM uses Tanstack Table V8 (formerly React Table V7). There are key differences from the previous version:
 
 ### Correct Tanstack Table V8 usage
 

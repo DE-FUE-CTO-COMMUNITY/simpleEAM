@@ -56,7 +56,7 @@ async function main() {
     console.log('   2. Open GraphQL Playground: http://localhost:4000/graphql')
     console.log('   3. Explore the enterprise architecture model')
     console.log('   4. Run with --test flag to see validation queries')
-    console.log('   5. Use the Simple-EAM frontend to visualize the architecture')
+    console.log('   5. Use the NextGen EAM frontend to visualize the architecture')
   } catch (error) {
     console.error('❌ Failed to initialize Solar Panel Manufacturing scenario:', error)
     process.exit(1)

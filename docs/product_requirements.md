@@ -1,4 +1,4 @@
-# Simple-EAM: Product Requirements Document
+# NextGen EAM: Product Requirements Document
 
 ## Document information
 
@@ -13,11 +13,11 @@
 
 ### 1.1 Purpose
 
-Simple-EAM is an Enterprise Architecture Management solution that helps organizations document, analyze, and optimize their IT landscape. This document outlines the functional and non-functional requirements for the system.
+NextGen EAM is an Enterprise Architecture Management solution that helps organizations document, analyze, and optimize their IT landscape. This document outlines the functional and non-functional requirements for the system.
 
 ### 1.2 Project overview
 
-Simple-EAM consists of multiple components delivered as Docker containers:
+NextGen EAM consists of multiple components delivered as Docker containers:
 
 - Neo4j database to store the Enterprise Architecture Model as a graph
 - GraphQL server as the API layer
@@ -1205,7 +1205,7 @@ Simple-EAM consists of multiple components delivered as Docker containers:
 **Priority:** High  
 **Acceptance criteria:**
 
-- Internal retrieval from Neo4j/GraphQL scoped by company.
+- Internal retrieval from GraphQL scoped by company.
 - External retrieval via approved search providers and domain allowlists.
 - Optional vector index for evidence chunks with metadata filters.
 
@@ -1308,7 +1308,7 @@ Simple-EAM consists of multiple components delivered as Docker containers:
 - **AI Service (new):** Dedicated service for agent execution and orchestration.
 - **LangGraph Runtime:** Defines deterministic agent state graphs for each use case.
 - **Self-hosted Temporal Cluster/Service:** Executes durable workflows and schedules in customer-managed infrastructure.
-- **Simple-EAM GraphQL API:** Remains canonical write/read API for business entities.
+- **NextGen EAM GraphQL API:** Remains canonical write/read API for business entities.
 - **Neo4j:** System of record for architecture graph and approved AI outputs.
 - **Evidence Store:** Persist source snippets, retrieval metadata, and confidence records.
 - **Vector Index (optional):** For semantic retrieval over evidence and internal artifacts.

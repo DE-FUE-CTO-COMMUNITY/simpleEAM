@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document describes the standardized pattern for implementing new entities in the Simple-EAM system. The pattern builds on the existing generic components to ensure consistent implementations.
+This document describes the standardized pattern for implementing new entities in the NextGen EAM system. The pattern builds on the existing generic components to ensure consistent implementations.
 
 ## Automated Entity Creation
 

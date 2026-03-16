@@ -1,6 +1,6 @@
 # Branding and Theming
 
-Customize Simple-EAM branding (logo, app name, and theme) without rebuilding. Client settings are loaded at runtime via `/api/config`.
+Customize NextGen EAM branding (logo, app name, and theme) without rebuilding. Client settings are loaded at runtime via `/api/config`.
 
 ## Runtime branding variables
 

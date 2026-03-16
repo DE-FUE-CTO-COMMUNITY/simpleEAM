@@ -1,4 +1,4 @@
-# Simple-EAM: Enterprise Architecture Management
+# NextGen EAM: Enterprise Architecture Management
 
 A scalable Enterprise Architecture Management System consisting of multiple Docker containers using modern web technologies.
 
@@ -21,7 +21,7 @@ The project is technically configured to block npm calls.
 
 ## Project Overview
 
-This mono-repository contains all components of the Simple-EAM System:
+This mono-repository contains all components of the NextGen EAM System:
 
 - **Neo4j Database**: Graph database for storing the Enterprise Architecture Model
 - **GraphQL Server**: API layer for efficient data communication
@@ -31,7 +31,7 @@ This mono-repository contains all components of the Simple-EAM System:
 ## Project Structure
 
 ```
-simple-eam/
+nextgen-eam/
 ├── auth/                   # Keycloak configuration
 │   └── src/                # Keycloak customizations
 ├── client/                 # Next.js frontend
@@ -70,8 +70,8 @@ simple-eam/
 1. Clone repository:
 
    ```bash
-   git clone https://your-repository-url/simple-eam.git
-   cd simple-eam
+   git clone https://your-repository-url/nextgen-eam.git
+   cd nextgen-eam
    ```
 
 2. Install dependencies:

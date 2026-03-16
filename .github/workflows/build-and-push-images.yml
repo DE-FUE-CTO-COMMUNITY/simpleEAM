@@ -23,13 +23,13 @@ jobs:
       matrix:
         service:
           - id: client
-            image: simple-eam-client
+            image: nextgen-eam-client
             dockerfile: client/Dockerfile
           - id: ai-server
-            image: simple-eam-ai-server
+            image: nextgen-eam-ai-server
             dockerfile: ai-server/Dockerfile
           - id: server
-            image: simple-eam-server
+            image: nextgen-eam-server
             dockerfile: server/Dockerfile
     steps:
       - name: Checkout repository

@@ -15,12 +15,12 @@ const {
 })
 
 export async function aiRunWorkflow(input: AiRunWorkflowInput): Promise<void> {
-  await markAiRunRunningWithToken({
-    runId: input.runId,
-    accessToken: input.accessToken,
-  })
-
   try {
+    await markAiRunRunningWithToken({
+      runId: input.runId,
+      accessToken: input.accessToken,
+    })
+
     const generatedOutput = await generateAiRunSummary({
       companyId: input.companyId,
       companyName: input.companyName,
@@ -38,11 +38,17 @@ export async function aiRunWorkflow(input: AiRunWorkflowInput): Promise<void> {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown AI run workflow error'
 
-    await markAiRunFailedWithToken({
-      runId: input.runId,
-      errorMessage,
-      accessToken: input.accessToken,
-    })
+    try {
+      await markAiRunFailedWithToken({
+        runId: input.runId,
+        errorMessage,
+        accessToken: input.accessToken,
+      })
+    } catch (markFailedError) {
+      const markFailedMessage =
+        markFailedError instanceof Error ? markFailedError.message : 'Unknown mark-failed error'
+      throw new Error(`${errorMessage}; additionally failed to persist FAILED state: ${markFailedMessage}`)
+    }
 
     throw error
   }

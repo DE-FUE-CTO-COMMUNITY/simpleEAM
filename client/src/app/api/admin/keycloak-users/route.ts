@@ -16,7 +16,7 @@ export const GET = withAuth(async (request: NextRequest) => {
   try {
     // Get admin token
     const keycloakUrl = process.env.KEYCLOAK_URL || 'http://localhost:8080'
-    const realm = process.env.KEYCLOAK_REALM || 'simple-eam'
+    const realm = process.env.KEYCLOAK_REALM || 'nextgen-eam'
 
     const tokenResponse = await fetch(
       `${keycloakUrl}/realms/master/protocol/openid-connect/token`,
@@ -134,7 +134,7 @@ export const POST = withAuth(async (request: NextRequest) => {
 
     // Get admin token
     const keycloakUrl = process.env.KEYCLOAK_URL || 'http://localhost:8080'
-    const realm = process.env.KEYCLOAK_REALM || 'simple-eam'
+    const realm = process.env.KEYCLOAK_REALM || 'nextgen-eam'
 
     const tokenResponse = await fetch(
       `${keycloakUrl}/realms/master/protocol/openid-connect/token`,

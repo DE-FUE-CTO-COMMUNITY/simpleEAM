@@ -1,4 +1,4 @@
-# Simple-EAM (Enterprise Architecture Management)
+# NextGen EAM (Enterprise Architecture Management)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](./VERSION)
@@ -52,8 +52,8 @@ A modern Enterprise Architecture Management system that helps organizations mana
 1. **Clone repository**
 
 ```bash
-git clone https://github.com/marcus-friedrich/simple-eam.git
-cd simple-eam
+git clone https://github.com/marcus-friedrich/nextgen-eam.git
+cd nextgen-eam
 ```
 
 2. **Install dependencies**
@@ -65,17 +65,24 @@ yarn install
 3. **Configure environment variables**
 
 ```bash
-cp env.sample .env
+cp env.template .env
 # Adjust variables as needed
 ```
 
 4. **Start Docker services**
 
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
-5. **Start development server**
+5. **Optional: enable AI stack (`ai-server`, `ai-worker`, Temporal)**
+
+```bash
+# set AI_LLM_URL in .env first
+COMPOSE_PROFILES=ai docker compose up -d
+```
+
+6. **Start development server**
 
 ```bash
 cd client
@@ -87,7 +94,7 @@ The application is then available at: http://localhost:3000
 ## 📁 Project Structure
 
 ```
-simple-eam/
+nextgen-eam/
 ├── auth/                   # Keycloak configuration
 ├── client/                 # Next.js frontend
 │   ├── src/
@@ -136,8 +143,9 @@ yarn version:major    # Increment major version (1.0.0 -> 2.0.0)
 ./scripts/create-entity.sh [name]  # Create new entity
 
 # Docker
-docker-compose up -d   # Start all services
-docker-compose down    # Stop all services
+docker compose up -d                    # Start core services
+COMPOSE_PROFILES=ai docker compose up -d # Start AI profile services too
+docker compose down                     # Stop all services
 ```
 
 ### Code Standards
@@ -161,7 +169,8 @@ Detailed documentation can be found in the [`docs/`](./docs/) directory:
 
 - **Frontend**: http://localhost:3000
 - **GraphQL Playground**: http://localhost:4000/graphql
-- **AI Server**: http://localhost:4001/health
+- **AI Server** (AI profile): http://localhost:4001/health
+- **Temporal UI** (AI profile): http://localhost:8088
 - **Neo4j Browser**: http://localhost:7474
 - **Keycloak Admin**: http://localhost:8080
 

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import jwt from 'jsonwebtoken'
 
 const KEYCLOAK_URL = process.env.KEYCLOAK_URL || 'http://localhost:8080'
-const KEYCLOAK_REALM = process.env.KEYCLOAK_REALM || 'simple-eam'
+const KEYCLOAK_REALM = process.env.KEYCLOAK_REALM || 'nextgen-eam'
 
 interface JWTPayload {
   sub?: string

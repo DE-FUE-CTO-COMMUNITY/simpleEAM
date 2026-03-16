@@ -182,7 +182,7 @@ export const TEMPLATE_NAME_BY_TYPE: Partial<Record<ElementType, string>> = {
 }
 
 export const EXCALIDRAW_LIBRARY_MIME = 'application/vnd.excalidrawlib+json'
-const EXCALIDRAW_SOURCE = 'simple-eam'
+const EXCALIDRAW_SOURCE = 'nextgen-eam'
 
 export function buildLibraryDropPayload(libraryItem: ExcalidrawLibraryItem) {
   return JSON.stringify({

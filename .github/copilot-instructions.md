@@ -1,4 +1,4 @@
-# Simple-EAM AI Coding Instructions
+# NextGen EAM AI Coding Instructions
 
 ## Critical Rules
 
@@ -300,4 +300,4 @@ docker-compose logs -f neo4j
 
 ---
 
-**See full guidelines:** `.github/instructions/simple-eam.instructions.md`
+**See full guidelines:** `.github/instructions/nextgen-eam.instructions.md`

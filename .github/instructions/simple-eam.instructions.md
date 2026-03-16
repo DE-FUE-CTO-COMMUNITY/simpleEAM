@@ -2,7 +2,7 @@
 applyTo: '**'
 ---
 
-# Simple-EAM (Enterprise Architecture Management)
+# NextGen EAM (Enterprise Architecture Management)
 
 ## Projektübersicht
 
@@ -1210,7 +1210,7 @@ Das Projekt ist so konfiguriert, dass npm-Aufrufe technisch blockiert werden.
 ## Projektstruktur
 
 ```
-simple-eam/
+nextgen-eam/
 ├── auth/                   # Keycloak-Konfiguration
 │   └── src/                # Keycloak-Anpassungen
 ├── client/                 # Next.js-Frontend

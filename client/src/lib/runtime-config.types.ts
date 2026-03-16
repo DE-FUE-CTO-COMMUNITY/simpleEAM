@@ -31,7 +31,7 @@ export interface RuntimeConfig {
 export const defaultConfig: RuntimeConfig = {
   keycloak: {
     url: 'http://localhost:8080',
-    realm: 'simple-eam',
+    realm: 'nextgen-eam',
     clientId: 'eam-client',
   },
   graphql: {
@@ -50,8 +50,8 @@ export const defaultConfig: RuntimeConfig = {
     fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
   },
   logo: {
-    url: '/images/Simple-EAM-Logo.svg',
-    alt: 'Simple-EAM Logo',
+    url: '/images/NextGen-EAM-Logo.svg',
+    alt: 'NextGen EAM Logo',
   },
   tool: {
     version: '0.0.0',

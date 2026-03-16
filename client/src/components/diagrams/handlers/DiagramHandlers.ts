@@ -631,7 +631,7 @@ export const useDiagramHandlers = (
         const exportData = {
           type: 'excalidraw',
           version: 2,
-          source: 'simple-eam',
+          source: 'nextgen-eam',
           elements: elements,
           appState: {
             viewBackgroundColor: appState.viewBackgroundColor || '#ffffff',
@@ -690,7 +690,7 @@ export const useDiagramHandlers = (
         const exportData = {
           type: 'excalidraw',
           version: 2,
-          source: 'simple-eam',
+          source: 'nextgen-eam',
           elements: elements,
           appState: {
             viewBackgroundColor: appState.viewBackgroundColor || '#ffffff',
@@ -745,7 +745,7 @@ export const useDiagramHandlers = (
         const exportData = {
           type: 'excalidraw',
           version: 2,
-          source: 'simple-eam',
+          source: 'nextgen-eam',
           elements: elements,
           appState: {
             viewBackgroundColor: appState.viewBackgroundColor || '#ffffff',

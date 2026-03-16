@@ -1,8 +1,8 @@
 {
-  "realm": "simple-eam",
+  "realm": "nextgen-eam",
   "enabled": true,
-  "displayName": "Simple EAM",
-  "displayNameHtml": "<div class=\"kc-logo-text\"><span>Simple EAM</span></div>",
+  "displayName": "NextGen EAM",
+  "displayNameHtml": "<div class=\"kc-logo-text\"><span>NextGen EAM</span></div>",
   "sslRequired": "external",
   "registrationAllowed": false,
   "loginWithEmailAllowed": true,

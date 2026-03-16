@@ -203,7 +203,7 @@ const UserProfileDialog: React.FC<UserProfileDialogProps> = ({
           (role: string) =>
             role !== 'offline_access' &&
             role !== 'uma_authorization' &&
-            role !== 'default-roles-simple-eam'
+            role !== 'default-roles-nextgen-eam'
         ) || ''
       )
       form.setFieldValue('phone', tokenData.phone_number || '')
@@ -250,7 +250,7 @@ const UserProfileDialog: React.FC<UserProfileDialogProps> = ({
             (role: string) =>
               role !== 'offline_access' &&
               role !== 'uma_authorization' &&
-              role !== 'default-roles-simple-eam'
+              role !== 'default-roles-nextgen-eam'
           ) || ''
         )
         form.setFieldValue('phone', tokenData.phone_number || '')

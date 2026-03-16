@@ -6,7 +6,7 @@ dotenv.config()
 
 // Keycloak configuration from environment variables
 const KEYCLOAK_URL = process.env.KEYCLOAK_URL || 'http://localhost:8081'
-const KEYCLOAK_REALM = process.env.KEYCLOAK_REALM || 'simple-eam'
+const KEYCLOAK_REALM = process.env.KEYCLOAK_REALM || 'nextgen-eam'
 const KEYCLOAK_CLIENT_ID = process.env.KEYCLOAK_CLIENT_ID || 'eam-server'
 
 /**

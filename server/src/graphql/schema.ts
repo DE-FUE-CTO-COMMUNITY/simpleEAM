@@ -12,7 +12,7 @@ const typeDefs = readFileSync(resolve(__dirname, 'schema.graphql')).toString('ut
 
 // Construct JWKS URL
 const KEYCLOAK_URL = process.env.KEYCLOAK_URL || 'http://localhost:8080'
-const KEYCLOAK_REALM = process.env.KEYCLOAK_REALM || 'simple-eam'
+const KEYCLOAK_REALM = process.env.KEYCLOAK_REALM || 'nextgen-eam'
 const jwksUrl = `${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/certs`
 
 // Create Neo4j GraphQL instance with JWT configuration

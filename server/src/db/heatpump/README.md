@@ -211,5 +211,5 @@ Um das Szenario zu erweitern:
 
 - [PV-Szenario](../pv/README.md)
 - [Haupt-Datenbank README](../README.md)
-- [Simple EAM Dokumentation](../../../../docs/)
+- [NextGen EAM Dokumentation](../../../../docs/)
 - [Neo4j GraphQL Library Dokumentation](https://neo4j.com/docs/graphql-library/)

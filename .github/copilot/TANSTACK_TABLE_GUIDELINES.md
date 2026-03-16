@@ -2,9 +2,9 @@
 
 > **Hinweis für GitHub Copilot**: Dieses Dokument enthält wichtige Anweisungen zur korrekten Verwendung von Tanstack Table V8 in diesem Projekt.
 
-## Tanstack Table V8 in Simple-EAM
+## Tanstack Table V8 in NextGen EAM
 
-Das Simple-EAM Projekt verwendet Tanstack Table V8, welches sich erheblich von der vorherigen React Table v7 unterscheidet. Bitte stelle sicher, dass alle Tabellenimplementierungen mit dem neuen API erstellt werden.
+Das NextGen EAM Projekt verwendet Tanstack Table V8, welches sich erheblich von der vorherigen React Table v7 unterscheidet. Bitte stelle sicher, dass alle Tabellenimplementierungen mit dem neuen API erstellt werden.
 
 ### 1. Import Statements
 

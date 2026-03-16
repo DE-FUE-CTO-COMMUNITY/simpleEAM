@@ -71,8 +71,8 @@ type AiRun = {
   id: string
   prompt: string
   objective?: string | null
-  useCase?: 'STRATEGIC_ENRICHMENT'
-  status: 'QUEUED' | 'RUNNING' | 'COMPLETED' | 'FAILED'
+  useCase?: 'STRATEGIC_ENRICHMENT' | 'CONVERSATIONAL_ASSISTANT'
+  status: 'QUEUED' | 'RUNNING' | 'COMPLETED' | 'FAILED' | 'APPLIED'
   approvalStatus?: AiRunApprovalStatus
   workflowId?: string | null
   initiatedBy?: string | null
@@ -94,15 +94,50 @@ type ApiErrorPayload = {
 type AiRunAuditEvent = {
   id: string
   runId: string
-  action: 'APPROVED' | 'REJECTED'
+  action: string
   actor: string
   comment: string | null
   createdAt: string | null
 }
 
+type AssistantAnswer = {
+  answer: string
+  confidence: number
+  citations: Array<{
+    entityType: string
+    entityId: string
+    entityName: string
+    evidenceLink: string
+  }>
+}
+
+type AssistantChangePlanPayload = {
+  mode: 'CHANGE_PLAN'
+  requestText: string
+  actions: Array<Record<string, unknown>>
+  dryRun: {
+    isValid: boolean
+    findings: Array<{
+      severity: 'INFO' | 'WARNING' | 'ERROR'
+      message: string
+    }>
+  }
+  impactSummary: {
+    creates: number
+    updates: number
+    connects: number
+    disconnects: number
+    touchedEntityIds: string[]
+  }
+  applied: boolean
+  executionResults: Array<Record<string, unknown>>
+}
+
 const getStatusColor = (status: AiRun['status']) => {
   switch (status) {
     case 'COMPLETED':
+      return 'success'
+    case 'APPLIED':
       return 'success'
     case 'FAILED':
       return 'error'
@@ -143,6 +178,29 @@ const parseDraftPayload = (raw: string | null | undefined): StrategicDraftPayloa
   }
 }
 
+const parseAssistantPlanPayload = (
+  raw: string | null | undefined
+): AssistantChangePlanPayload | null => {
+  if (!raw) {
+    return null
+  }
+
+  try {
+    const parsed = JSON.parse(raw) as unknown
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      return null
+    }
+
+    const payload = parsed as AssistantChangePlanPayload
+    if (payload.mode !== 'CHANGE_PLAN') {
+      return null
+    }
+    return payload
+  } catch {
+    return null
+  }
+}
+
 export default function AiRunPanel() {
   const t = useTranslations('admin.aiSupport')
   const { selectedCompanyId, selectedCompany } = useCompanyContext()
@@ -167,6 +225,14 @@ export default function AiRunPanel() {
   const [auditLoadingByRunId, setAuditLoadingByRunId] = React.useState<Record<string, boolean>>({})
   const [auditErrorByRunId, setAuditErrorByRunId] = React.useState<Record<string, string | null>>(
     {}
+  )
+  const [assistantQuestion, setAssistantQuestion] = React.useState('')
+  const [assistantQuestionLoading, setAssistantQuestionLoading] = React.useState(false)
+  const [assistantAnswer, setAssistantAnswer] = React.useState<AssistantAnswer | null>(null)
+  const [changeRequestText, setChangeRequestText] = React.useState('')
+  const [changeProposalLoading, setChangeProposalLoading] = React.useState(false)
+  const [applyProposalLoadingRunId, setApplyProposalLoadingRunId] = React.useState<string | null>(
+    null
   )
 
   const apiBaseUrl = React.useMemo(() => {
@@ -398,7 +464,7 @@ export default function AiRunPanel() {
   }, [apiBaseUrl, loadRuns, parseApiErrorMessage, selectedCompanyId, t, withToken])
 
   const loadAuditForRun = React.useCallback(
-    async (runId: string) => {
+    async (runId: string, useCase?: AiRun['useCase']) => {
       if (auditByRunId[runId] || auditLoadingByRunId[runId]) {
         return
       }
@@ -408,7 +474,12 @@ export default function AiRunPanel() {
         setAuditErrorByRunId(prev => ({ ...prev, [runId]: null }))
 
         const token = await withToken()
-        const response = await fetch(`${apiBaseUrl}/ai-runs/${runId}/audit`, {
+        const endpoint =
+          useCase === 'CONVERSATIONAL_ASSISTANT'
+            ? `${apiBaseUrl}/ai-assistant/change-proposals/${runId}/audit`
+            : `${apiBaseUrl}/ai-runs/${runId}/audit`
+
+        const response = await fetch(endpoint, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -432,6 +503,168 @@ export default function AiRunPanel() {
     [apiBaseUrl, auditByRunId, auditLoadingByRunId, parseApiErrorMessage, t, withToken]
   )
 
+  const askAssistantQuestion = React.useCallback(async () => {
+    if (!selectedCompanyId) {
+      setSubmitError(t('selectCompanyFirst'))
+      return
+    }
+
+    if (!assistantQuestion.trim()) {
+      setSubmitError(t('assistantQuestionRequired'))
+      return
+    }
+
+    try {
+      setAssistantQuestionLoading(true)
+      setSubmitError(null)
+      const token = await withToken()
+      const response = await fetch(`${apiBaseUrl}/ai-assistant/query`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          companyId: selectedCompanyId,
+          question: assistantQuestion.trim(),
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error(await parseApiErrorMessage(response, t('assistantAskError')))
+      }
+
+      const payload = (await response.json()) as AssistantAnswer
+      setAssistantAnswer(payload)
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : t('assistantAskError'))
+    } finally {
+      setAssistantQuestionLoading(false)
+    }
+  }, [
+    apiBaseUrl,
+    assistantQuestion,
+    parseApiErrorMessage,
+    selectedCompanyId,
+    t,
+    withToken,
+  ])
+
+  const createChangeProposal = React.useCallback(async () => {
+    if (!selectedCompanyId) {
+      setSubmitError(t('selectCompanyFirst'))
+      return
+    }
+
+    if (!changeRequestText.trim()) {
+      setSubmitError(t('assistantChangeRequestRequired'))
+      return
+    }
+
+    try {
+      setChangeProposalLoading(true)
+      setSubmitError(null)
+      setSubmitSuccess(null)
+      const token = await withToken()
+      const response = await fetch(`${apiBaseUrl}/ai-assistant/change-proposals`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          companyId: selectedCompanyId,
+          requestText: changeRequestText.trim(),
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error(await parseApiErrorMessage(response, t('assistantProposalError')))
+      }
+
+      const payload = (await response.json()) as { runId: string }
+      setSubmitSuccess(t('assistantProposalSuccess', { runId: payload.runId }))
+      setChangeRequestText('')
+      await loadRuns()
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : t('assistantProposalError'))
+    } finally {
+      setChangeProposalLoading(false)
+    }
+  }, [
+    apiBaseUrl,
+    changeRequestText,
+    loadRuns,
+    parseApiErrorMessage,
+    selectedCompanyId,
+    t,
+    withToken,
+  ])
+
+  const triggerProposalReviewAction = React.useCallback(
+    async (runId: string, action: 'approve' | 'reject') => {
+      try {
+        setReviewActionLoadingRunId(runId)
+        setSubmitError(null)
+        setSubmitSuccess(null)
+
+        const token = await withToken()
+        const response = await fetch(`${apiBaseUrl}/ai-assistant/change-proposals/${runId}/${action}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ comment: null }),
+        })
+
+        if (!response.ok) {
+          throw new Error(await parseApiErrorMessage(response, t('reviewActionError')))
+        }
+
+        setSubmitSuccess(action === 'approve' ? t('approveSuccess') : t('rejectSuccess'))
+        await loadRuns()
+      } catch (error) {
+        setSubmitError(error instanceof Error ? error.message : t('reviewActionError'))
+      } finally {
+        setReviewActionLoadingRunId(null)
+      }
+    },
+    [apiBaseUrl, loadRuns, parseApiErrorMessage, t, withToken]
+  )
+
+  const applyApprovedProposal = React.useCallback(
+    async (runId: string) => {
+      try {
+        setApplyProposalLoadingRunId(runId)
+        setSubmitError(null)
+        setSubmitSuccess(null)
+
+        const token = await withToken()
+        const response = await fetch(`${apiBaseUrl}/ai-assistant/change-proposals/${runId}/apply`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ reason: 'Approved via AI Support panel' }),
+        })
+
+        if (!response.ok) {
+          throw new Error(await parseApiErrorMessage(response, t('assistantApplyError')))
+        }
+
+        setSubmitSuccess(t('assistantApplySuccess'))
+        await loadRuns()
+      } catch (error) {
+        setSubmitError(error instanceof Error ? error.message : t('assistantApplyError'))
+      } finally {
+        setApplyProposalLoadingRunId(null)
+      }
+    },
+    [apiBaseUrl, loadRuns, parseApiErrorMessage, t, withToken]
+  )
+
   const toggleRunDetails = React.useCallback(
     (runId: string) => {
       setExpandedRunIds(prev => {
@@ -439,11 +672,12 @@ export default function AiRunPanel() {
           return prev.filter(id => id !== runId)
         }
 
-        void loadAuditForRun(runId)
+        const run = runs.find(item => item.id === runId)
+        void loadAuditForRun(runId, run?.useCase)
         return [...prev, runId]
       })
     },
-    [loadAuditForRun]
+    [loadAuditForRun, runs]
   )
 
   const hasNoRuns = runs.length === 0
@@ -473,6 +707,96 @@ export default function AiRunPanel() {
               ? t('selectedCompany', { name: selectedCompany.name })
               : t('noCompanySelected')}
           </Typography>
+
+          <Box
+            sx={{
+              p: 1.5,
+              border: theme => `1px solid ${theme.palette.divider}`,
+              borderRadius: 1,
+            }}
+          >
+            <Stack spacing={1}>
+              <Typography variant="subtitle2">{t('assistantQuestionTitle')}</Typography>
+              <TextField
+                label={t('assistantQuestionLabel')}
+                value={assistantQuestion}
+                onChange={event => setAssistantQuestion(event.target.value)}
+                fullWidth
+                multiline
+                minRows={2}
+              />
+              <Box>
+                <Button
+                  variant="outlined"
+                  onClick={() => {
+                    void askAssistantQuestion()
+                  }}
+                  disabled={!selectedCompanyId || assistantQuestionLoading || !apiBaseUrl}
+                >
+                  {assistantQuestionLoading ? t('assistantAsking') : t('assistantAskButton')}
+                </Button>
+              </Box>
+
+              {assistantAnswer && (
+                <Box
+                  sx={{
+                    p: 1,
+                    border: theme => `1px solid ${theme.palette.divider}`,
+                    borderRadius: 1,
+                    backgroundColor: theme => theme.palette.background.default,
+                  }}
+                >
+                  <Typography variant="body2">{assistantAnswer.answer}</Typography>
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+                    {t('assistantConfidence')}: {Math.round((assistantAnswer.confidence || 0) * 100)}%
+                  </Typography>
+                  {!!assistantAnswer.citations?.length && (
+                    <Stack spacing={0.5} sx={{ mt: 1 }}>
+                      <Typography variant="caption" color="text.secondary">
+                        {t('assistantCitations')}
+                      </Typography>
+                      {assistantAnswer.citations.map(citation => (
+                        <Typography key={`${citation.entityType}-${citation.entityId}`} variant="caption" color="text.secondary">
+                          {citation.entityType} · {citation.entityName} · {citation.evidenceLink}
+                        </Typography>
+                      ))}
+                    </Stack>
+                  )}
+                </Box>
+              )}
+            </Stack>
+          </Box>
+
+          <Box
+            sx={{
+              p: 1.5,
+              border: theme => `1px solid ${theme.palette.divider}`,
+              borderRadius: 1,
+            }}
+          >
+            <Stack spacing={1}>
+              <Typography variant="subtitle2">{t('assistantChangeTitle')}</Typography>
+              <TextField
+                label={t('assistantChangeLabel')}
+                value={changeRequestText}
+                onChange={event => setChangeRequestText(event.target.value)}
+                fullWidth
+                multiline
+                minRows={2}
+              />
+              <Box>
+                <Button
+                  variant="outlined"
+                  onClick={() => {
+                    void createChangeProposal()
+                  }}
+                  disabled={!selectedCompanyId || changeProposalLoading || !apiBaseUrl}
+                >
+                  {changeProposalLoading ? t('assistantProposalCreating') : t('assistantProposalButton')}
+                </Button>
+              </Box>
+            </Stack>
+          </Box>
 
           <Box>
             <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
@@ -547,6 +871,7 @@ export default function AiRunPanel() {
                 <ListItem key={run.id} sx={{ px: 0, alignItems: 'flex-start' }}>
                   {(() => {
                     const draft = parseDraftPayload(run.draftPayload)
+                    const assistantPlan = parseAssistantPlanPayload(run.draftPayload)
                     const isExpanded = expandedRunIds.includes(run.id)
                     const auditEntries = auditByRunId[run.id] ?? []
                     const isAuditLoading = auditLoadingByRunId[run.id] ?? false
@@ -588,6 +913,11 @@ export default function AiRunPanel() {
                         secondary={
                           <Stack spacing={0.75} sx={{ mt: 0.5 }}>
                             <Typography variant="body2">{run.prompt}</Typography>
+                            {run.useCase && (
+                              <Typography variant="caption" color="text.secondary">
+                                {t('useCaseLabel')}: {run.useCase}
+                              </Typography>
+                            )}
                             {run.resultSummary && (
                               <Typography variant="body2" color="text.secondary">
                                 {run.resultSummary}
@@ -607,7 +937,7 @@ export default function AiRunPanel() {
                                 {isExpanded ? t('hideDetails') : t('showDetails')}
                               </Button>
                             </Box>
-                            {isExpanded && run.status === 'COMPLETED' && (
+                            {isExpanded && run.status === 'COMPLETED' && run.useCase !== 'CONVERSATIONAL_ASSISTANT' && (
                               <Box
                                 sx={{
                                   p: 1,
@@ -705,6 +1035,54 @@ export default function AiRunPanel() {
                                 )}
                               </Box>
                             )}
+                            {isExpanded && run.useCase === 'CONVERSATIONAL_ASSISTANT' && (
+                              <Box
+                                sx={{
+                                  p: 1,
+                                  border: theme => `1px solid ${theme.palette.divider}`,
+                                  borderRadius: 1,
+                                  backgroundColor: theme => theme.palette.background.default,
+                                }}
+                              >
+                                <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
+                                  {t('assistantProposalTitle')}
+                                </Typography>
+                                {assistantPlan ? (
+                                  <Stack spacing={0.75}>
+                                    <Typography variant="body2" color="text.secondary">
+                                      {t('assistantProposalDryRun')}:{' '}
+                                      {assistantPlan.dryRun.isValid
+                                        ? t('assistantProposalDryRunValid')
+                                        : t('assistantProposalDryRunInvalid')}
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                      {t('assistantProposalImpact')}:{' '}
+                                      {`+${assistantPlan.impactSummary.creates} ${t('assistantProposalCreates')}, `}
+                                      {`~${assistantPlan.impactSummary.updates} ${t('assistantProposalUpdates')}, `}
+                                      {`${assistantPlan.impactSummary.connects} ${t('assistantProposalConnects')}, `}
+                                      {`${assistantPlan.impactSummary.disconnects} ${t('assistantProposalDisconnects')}`}
+                                    </Typography>
+                                    {!!assistantPlan.dryRun.findings?.length && (
+                                      <Stack spacing={0.25}>
+                                        {assistantPlan.dryRun.findings.map((finding, index) => (
+                                          <Typography
+                                            key={`${run.id}-finding-${index}`}
+                                            variant="caption"
+                                            color={finding.severity === 'ERROR' ? 'error.main' : 'text.secondary'}
+                                          >
+                                            {finding.severity} · {finding.message}
+                                          </Typography>
+                                        ))}
+                                      </Stack>
+                                    )}
+                                  </Stack>
+                                ) : (
+                                  <Typography variant="body2" color="text.secondary">
+                                    {t('noDraftPayload')}
+                                  </Typography>
+                                )}
+                              </Box>
+                            )}
                             {isExpanded && (
                               <Box
                                 sx={{
@@ -755,7 +1133,11 @@ export default function AiRunPanel() {
                                     color="success"
                                     disabled={reviewActionLoadingRunId === run.id}
                                     onClick={() => {
-                                      void triggerReviewAction(run.id, 'approve')
+                                      if (run.useCase === 'CONVERSATIONAL_ASSISTANT') {
+                                        void triggerProposalReviewAction(run.id, 'approve')
+                                      } else {
+                                        void triggerReviewAction(run.id, 'approve')
+                                      }
                                     }}
                                   >
                                     {t('approveButton')}
@@ -766,12 +1148,32 @@ export default function AiRunPanel() {
                                     color="error"
                                     disabled={reviewActionLoadingRunId === run.id}
                                     onClick={() => {
-                                      void triggerReviewAction(run.id, 'reject')
+                                      if (run.useCase === 'CONVERSATIONAL_ASSISTANT') {
+                                        void triggerProposalReviewAction(run.id, 'reject')
+                                      } else {
+                                        void triggerReviewAction(run.id, 'reject')
+                                      }
                                     }}
                                   >
                                     {t('rejectButton')}
                                   </Button>
                                 </Stack>
+                              )}
+                            {run.useCase === 'CONVERSATIONAL_ASSISTANT' &&
+                              run.approvalStatus === 'APPROVED' &&
+                              run.status !== 'APPLIED' && (
+                                <Button
+                                  size="small"
+                                  variant="contained"
+                                  onClick={() => {
+                                    void applyApprovedProposal(run.id)
+                                  }}
+                                  disabled={applyProposalLoadingRunId === run.id}
+                                >
+                                  {applyProposalLoadingRunId === run.id
+                                    ? t('assistantApplying')
+                                    : t('assistantApplyButton')}
+                                </Button>
                               )}
                           </Stack>
                         }

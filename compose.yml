@@ -21,12 +21,12 @@ services:
       - ${TRAEFIK_NETWORK}
     labels:
       - traefik.enable=true
-      - traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-neo4j.rule=Host(`${NEO4J_SUBDOMAIN}.${BASE_DOMAIN}`)
-      - traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-neo4j.entrypoints=websecure
-      - traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-neo4j.tls=true
-      - traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-neo4j.tls.certresolver=${TRAEFIK_CERTRESOLVER}
-      - traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-neo4j.tls.domains[0].main=${NEO4J_SUBDOMAIN}.${BASE_DOMAIN}
-      - traefik.http.services.${COMPOSE_PROJECT_NAME:-simple-eam}-neo4j.loadbalancer.server.port=${NEO4J_PORT}
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-neo4j.rule=Host(`${NEO4J_SUBDOMAIN}.${BASE_DOMAIN}`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-neo4j.entrypoints=websecure
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-neo4j.tls=true
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-neo4j.tls.certresolver=${TRAEFIK_CERTRESOLVER}
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-neo4j.tls.domains[0].main=${NEO4J_SUBDOMAIN}.${BASE_DOMAIN}
+      - traefik.http.services.${COMPOSE_PROJECT_NAME:-nextgen-eam}-neo4j.loadbalancer.server.port=${NEO4J_PORT}
       - "traefik.docker.network=${TRAEFIK_NETWORK}"
 
   # Server
@@ -60,13 +60,13 @@ services:
       - ${TRAEFIK_NETWORK}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-graphql.rule=Host(`${API_SUBDOMAIN}.${BASE_DOMAIN}`) && (PathPrefix(`/graphql`) || Path(`/health`))"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-graphql.entrypoints=websecure"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-graphql.tls=true"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-graphql.tls.certresolver=${TRAEFIK_CERTRESOLVER}"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-graphql.tls.domains[0].main=${API_SUBDOMAIN}.${BASE_DOMAIN}"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-graphql.priority=10"
-      - "traefik.http.services.${COMPOSE_PROJECT_NAME:-simple-eam}-graphql.loadbalancer.server.port=${GRAPHQL_INTERNAL_PORT}"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-graphql.rule=Host(`${API_SUBDOMAIN}.${BASE_DOMAIN}`) && (PathPrefix(`/graphql`) || Path(`/health`))"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-graphql.entrypoints=websecure"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-graphql.tls=true"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-graphql.tls.certresolver=${TRAEFIK_CERTRESOLVER}"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-graphql.tls.domains[0].main=${API_SUBDOMAIN}.${BASE_DOMAIN}"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-graphql.priority=10"
+      - "traefik.http.services.${COMPOSE_PROJECT_NAME:-nextgen-eam}-graphql.loadbalancer.server.port=${GRAPHQL_INTERNAL_PORT}"
       - "traefik.docker.network=${TRAEFIK_NETWORK}"
 
   # AI Server (REST endpoints for AI run orchestration)
@@ -97,7 +97,7 @@ services:
       - KEYCLOAK_CLIENT_ID_CLIENT=${KEYCLOAK_CLIENT_ID_CLIENT}
       - TEMPORAL_ADDRESS=${TEMPORAL_ADDRESS:-temporal:7233}
       - TEMPORAL_NAMESPACE=${TEMPORAL_NAMESPACE:-default}
-      - AI_RUN_TASK_QUEUE=${AI_RUN_TASK_QUEUE:-simple-eam-ai}
+      - AI_RUN_TASK_QUEUE=${AI_RUN_TASK_QUEUE:-nextgen-eam-ai}
       - AI_LLM_URL=${AI_LLM_URL:-}
       - AI_LLM_MODEL=${AI_LLM_MODEL:-mistral-7b-instruct-v0.3}
       - AI_LLM_API_KEY=${AI_LLM_API_KEY:-}
@@ -117,13 +117,13 @@ services:
       - ${TRAEFIK_NETWORK}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-ai.rule=Host(`${API_SUBDOMAIN}.${BASE_DOMAIN}`) && PathPrefix(`/ai-runs`)"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-ai.entrypoints=websecure"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-ai.tls=true"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-ai.tls.certresolver=${TRAEFIK_CERTRESOLVER}"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-ai.tls.domains[0].main=${API_SUBDOMAIN}.${BASE_DOMAIN}"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-ai.priority=100"
-      - "traefik.http.services.${COMPOSE_PROJECT_NAME:-simple-eam}-ai.loadbalancer.server.port=${AI_SERVER_INTERNAL_PORT}"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-ai.rule=Host(`${API_SUBDOMAIN}.${BASE_DOMAIN}`) && (PathPrefix(`/ai-runs`) || PathPrefix(`/ai-assistant`))"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-ai.entrypoints=websecure"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-ai.tls=true"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-ai.tls.certresolver=${TRAEFIK_CERTRESOLVER}"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-ai.tls.domains[0].main=${API_SUBDOMAIN}.${BASE_DOMAIN}"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-ai.priority=100"
+      - "traefik.http.services.${COMPOSE_PROJECT_NAME:-nextgen-eam}-ai.loadbalancer.server.port=${AI_SERVER_INTERNAL_PORT}"
       - "traefik.docker.network=${TRAEFIK_NETWORK}"
 
   # Keycloak for authentication
@@ -156,12 +156,12 @@ services:
       - ${TRAEFIK_NETWORK}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-keycloak.rule=Host(`${AUTH_SUBDOMAIN}.${BASE_DOMAIN}`)"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-keycloak.entrypoints=websecure"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-keycloak.tls=true"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-keycloak.tls.certresolver=${TRAEFIK_CERTRESOLVER}"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-keycloak.tls.domains[0].main=${AUTH_SUBDOMAIN}.${BASE_DOMAIN}"
-      - "traefik.http.services.${COMPOSE_PROJECT_NAME:-simple-eam}-keycloak.loadbalancer.server.port=${KEYCLOAK_INTERNAL_PORT}"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-keycloak.rule=Host(`${AUTH_SUBDOMAIN}.${BASE_DOMAIN}`)"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-keycloak.entrypoints=websecure"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-keycloak.tls=true"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-keycloak.tls.certresolver=${TRAEFIK_CERTRESOLVER}"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-keycloak.tls.domains[0].main=${AUTH_SUBDOMAIN}.${BASE_DOMAIN}"
+      - "traefik.http.services.${COMPOSE_PROJECT_NAME:-nextgen-eam}-keycloak.loadbalancer.server.port=${KEYCLOAK_INTERNAL_PORT}"
       - "traefik.docker.network=${TRAEFIK_NETWORK}"
 
   # Keycloak Database
@@ -188,12 +188,12 @@ services:
       - ${TRAEFIK_NETWORK}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-excalidraw-room.rule=Host(`${EXCALIDRAW_ROOM_SUBDOMAIN}.${BASE_DOMAIN}`)"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-excalidraw-room.entrypoints=websecure"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-excalidraw-room.tls=true"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-excalidraw-room.tls.certresolver=${TRAEFIK_CERTRESOLVER}"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-excalidraw-room.tls.domains[0].main=${EXCALIDRAW_ROOM_SUBDOMAIN}.${BASE_DOMAIN}"
-      - "traefik.http.services.${COMPOSE_PROJECT_NAME:-simple-eam}-excalidraw-room.loadbalancer.server.port=80"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-excalidraw-room.rule=Host(`${EXCALIDRAW_ROOM_SUBDOMAIN}.${BASE_DOMAIN}`)"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-excalidraw-room.entrypoints=websecure"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-excalidraw-room.tls=true"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-excalidraw-room.tls.certresolver=${TRAEFIK_CERTRESOLVER}"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-excalidraw-room.tls.domains[0].main=${EXCALIDRAW_ROOM_SUBDOMAIN}.${BASE_DOMAIN}"
+      - "traefik.http.services.${COMPOSE_PROJECT_NAME:-nextgen-eam}-excalidraw-room.loadbalancer.server.port=80"
       - "traefik.docker.network=${TRAEFIK_NETWORK}"
 
   # Temporal PostgreSQL (self-hosted, dedicated persistence DB)
@@ -258,12 +258,12 @@ services:
       - ${TRAEFIK_NETWORK}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-temporal-ui.rule=Host(`${TEMPORAL_UI_SUBDOMAIN:-temporal}.${BASE_DOMAIN}`)"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-temporal-ui.entrypoints=websecure"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-temporal-ui.tls=true"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-temporal-ui.tls.certresolver=${TEMPORAL_UI_CERTRESOLVER:-netcupdns}"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-temporal-ui.tls.domains[0].main=${TEMPORAL_UI_SUBDOMAIN:-temporal}.${BASE_DOMAIN}"
-      - "traefik.http.services.${COMPOSE_PROJECT_NAME:-simple-eam}-temporal-ui.loadbalancer.server.port=8080"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-temporal-ui.rule=Host(`${TEMPORAL_UI_SUBDOMAIN:-temporal}.${BASE_DOMAIN}`)"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-temporal-ui.entrypoints=websecure"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-temporal-ui.tls=true"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-temporal-ui.tls.certresolver=${TEMPORAL_UI_CERTRESOLVER:-netcupdns}"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-temporal-ui.tls.domains[0].main=${TEMPORAL_UI_SUBDOMAIN:-temporal}.${BASE_DOMAIN}"
+      - "traefik.http.services.${COMPOSE_PROJECT_NAME:-nextgen-eam}-temporal-ui.loadbalancer.server.port=8080"
       - "traefik.docker.network=${TRAEFIK_NETWORK}"
 
   # AI Worker (Temporal worker for AI runs)
@@ -286,7 +286,7 @@ services:
       - GRAPHQL_INTERNAL_URL=http://server:${GRAPHQL_INTERNAL_PORT}/graphql
       - TEMPORAL_ADDRESS=${TEMPORAL_ADDRESS:-temporal:7233}
       - TEMPORAL_NAMESPACE=${TEMPORAL_NAMESPACE:-default}
-      - AI_RUN_TASK_QUEUE=${AI_RUN_TASK_QUEUE:-simple-eam-ai}
+      - AI_RUN_TASK_QUEUE=${AI_RUN_TASK_QUEUE:-nextgen-eam-ai}
       - AI_LLM_URL=${AI_LLM_URL:-}
       - AI_LLM_MODEL=${AI_LLM_MODEL:-mistral-7b-instruct-v0.3}
       - AI_LLM_API_KEY=${AI_LLM_API_KEY:-}
@@ -337,12 +337,12 @@ services:
       - ${TRAEFIK_NETWORK}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-client.rule=Host(`${CLIENT_SUBDOMAIN}.${BASE_DOMAIN}`)"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-client.entrypoints=websecure"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-client.tls=true"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-client.tls.certresolver=${TRAEFIK_CERTRESOLVER}"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-simple-eam}-client.tls.domains[0].main=${CLIENT_SUBDOMAIN}.${BASE_DOMAIN}"
-      - "traefik.http.services.${COMPOSE_PROJECT_NAME:-simple-eam}-client.loadbalancer.server.port=${CLIENT_PORT}"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-client.rule=Host(`${CLIENT_SUBDOMAIN}.${BASE_DOMAIN}`)"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-client.entrypoints=websecure"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-client.tls=true"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-client.tls.certresolver=${TRAEFIK_CERTRESOLVER}"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-client.tls.domains[0].main=${CLIENT_SUBDOMAIN}.${BASE_DOMAIN}"
+      - "traefik.http.services.${COMPOSE_PROJECT_NAME:-nextgen-eam}-client.loadbalancer.server.port=${CLIENT_PORT}"
       - "traefik.docker.network=${TRAEFIK_NETWORK}"
 
 networks:

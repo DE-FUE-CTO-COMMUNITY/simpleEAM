@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
 
     // Use Keycloak token introspection endpoint for password validation
     const keycloakUrl = process.env.KEYCLOAK_URL || 'http://localhost:8080'
-    const realm = process.env.KEYCLOAK_REALM || 'simple-eam'
+    const realm = process.env.KEYCLOAK_REALM || 'nextgen-eam'
 
     // Decrypt token to get user information
     const tokenPayload = JSON.parse(atob(token.split('.')[1]))

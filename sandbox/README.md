@@ -1,4 +1,4 @@
-# Simple-EAM Apollo Sandbox
+# NextGen EAM Apollo Sandbox
 
 Run the embedded Apollo Sandbox against the local GraphQL API.
 

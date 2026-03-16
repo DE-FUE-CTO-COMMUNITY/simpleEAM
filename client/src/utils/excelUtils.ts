@@ -631,7 +631,7 @@ export const downloadTemplateWithRealFields = async (
     }
 
     await exportMultiTabToExcel(allTemplates, {
-      filename: 'SimpleEAM_Complete_Import_Template',
+      filename: 'NextGenEAM_Complete_Import_Template',
       format: 'xlsx',
       includeHeaders: true,
     })

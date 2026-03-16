@@ -74,7 +74,7 @@ export function convertExcalidrawToDrawIO(excalidrawData: ExcalidrawData): strin
   xml +=
     '<mxfile host="app.diagrams.net" modified="' +
     new Date().toISOString() +
-    '" agent="simple-eam" version="24.7.17">\n'
+    '" agent="nextgen-eam" version="24.7.17">\n'
   xml += '  <diagram name="Page-1" id="page-1">\n'
   xml +=
     '    <mxGraphModel dx="1000" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">\n'

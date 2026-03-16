@@ -24,7 +24,7 @@ interface CliOptions {
 const parseArgs = (): CliOptions => {
   const args = process.argv.slice(2)
   const options: Partial<CliOptions> = {
-    filePath: 'demos/SimpleEAM_Company-Solar_Panels_GmbH.json',
+    filePath: 'demos/NextGenEAM_Company-Solar_Panels_GmbH.json',
     graphqlUrl:
       process.env.GRAPHQL_URL ||
       process.env.NEXT_PUBLIC_GRAPHQL_URL ||

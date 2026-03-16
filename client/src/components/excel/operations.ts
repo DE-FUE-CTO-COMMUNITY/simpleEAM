@@ -608,7 +608,7 @@ export const exportEntityData = async (
 
         const timestamp = formatTimestampForFilename()
         exportToJson(exportPayload, {
-          filename: `SimpleEAM_Complete_Export${companySuffix}_${timestamp}`,
+          filename: `NextGenEAM_Complete_Export${companySuffix}_${timestamp}`,
           pretty: true,
         })
       } else {
@@ -629,7 +629,7 @@ export const exportEntityData = async (
 
         if (format === 'xlsx') {
           await exportMultiTabToExcel(excelPayload, {
-            filename: `SimpleEAM_Complete_Export${companySuffix}`,
+            filename: `NextGenEAM_Complete_Export${companySuffix}`,
             format: 'xlsx',
             includeHeaders: true,
           })

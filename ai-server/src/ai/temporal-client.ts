@@ -1,7 +1,7 @@
 import { Connection, WorkflowClient } from '@temporalio/client'
 import { AiRunWorkflowInput } from './types'
 
-export const AI_RUN_TASK_QUEUE = process.env.AI_RUN_TASK_QUEUE || 'simple-eam-ai'
+export const AI_RUN_TASK_QUEUE = process.env.AI_RUN_TASK_QUEUE || 'nextgen-eam-ai'
 export const AI_RUN_WORKFLOW_NAME = 'aiRunWorkflow'
 
 const getTemporalAddress = () => process.env.TEMPORAL_ADDRESS || 'localhost:7233'

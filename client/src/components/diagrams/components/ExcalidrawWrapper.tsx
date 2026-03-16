@@ -342,7 +342,7 @@ const ExcalidrawWrapper = dynamic(
           <ExcalidrawTyped
             theme={themeMode}
             langCode={excalidrawLangCode}
-            name="simple-eam-diagram"
+            name="nextgen-eam-diagram"
             UIOptions={uiOptions}
             initialData={safeInitialData}
             excalidrawAPI={(api: any) => {

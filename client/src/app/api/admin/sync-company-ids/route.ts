@@ -10,7 +10,7 @@ type SyncResultItem = {
 }
 
 const KEYCLOAK_URL = process.env.KEYCLOAK_URL || 'http://localhost:8080'
-const KEYCLOAK_REALM = process.env.KEYCLOAK_REALM || 'simple-eam'
+const KEYCLOAK_REALM = process.env.KEYCLOAK_REALM || 'nextgen-eam'
 const REALM = KEYCLOAK_REALM
 const GRAPHQL_URL = process.env.GRAPHQL_URL || 'http://localhost:4000/graphql'
 

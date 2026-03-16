@@ -1,7 +1,7 @@
 {
-  "name": "simple-eam-ai-server",
+  "name": "nextgen-eam-ai-server",
   "version": "1.0.4",
-  "description": "Simple EAM AI server",
+  "description": "NextGen EAM AI server",
   "license": "MIT",
   "main": "dist/index.js",
   "scripts": {
