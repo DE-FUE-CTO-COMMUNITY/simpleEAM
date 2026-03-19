@@ -26,6 +26,14 @@ export const GET_DATA_OBJECTS = gql`
       id
       name
       description
+      sovereigntyReqDataResidency
+      sovereigntyReqJurisdictionControl
+      sovereigntyReqOperationalControl
+      sovereigntyReqInteroperability
+      sovereigntyReqPortability
+      sovereigntyReqSupplyChainTransparency
+      sovereigntyReqWeight
+      sovereigntyReqRationale
       owners {
         id
         firstName
@@ -77,6 +85,14 @@ export const GET_DATA_OBJECT = gql`
       id
       name
       description
+      sovereigntyReqDataResidency
+      sovereigntyReqJurisdictionControl
+      sovereigntyReqOperationalControl
+      sovereigntyReqInteroperability
+      sovereigntyReqPortability
+      sovereigntyReqSupplyChainTransparency
+      sovereigntyReqWeight
+      sovereigntyReqRationale
       owners {
         id
         firstName
@@ -125,6 +141,14 @@ export const CREATE_DATA_OBJECT = gql`
         id
         name
         description
+        sovereigntyReqDataResidency
+        sovereigntyReqJurisdictionControl
+        sovereigntyReqOperationalControl
+        sovereigntyReqInteroperability
+        sovereigntyReqPortability
+        sovereigntyReqSupplyChainTransparency
+        sovereigntyReqWeight
+        sovereigntyReqRationale
         owners {
           id
           firstName
@@ -178,6 +202,14 @@ export const UPDATE_DATA_OBJECT = gql`
         id
         name
         description
+        sovereigntyReqDataResidency
+        sovereigntyReqJurisdictionControl
+        sovereigntyReqOperationalControl
+        sovereigntyReqInteroperability
+        sovereigntyReqPortability
+        sovereigntyReqSupplyChainTransparency
+        sovereigntyReqWeight
+        sovereigntyReqRationale
         owners {
           id
           firstName

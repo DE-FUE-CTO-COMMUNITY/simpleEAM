@@ -18,6 +18,14 @@ export const GET_SUPPLIERS = gql`
       id
       name
       description
+      sovereigntyAchDataResidency
+      sovereigntyAchJurisdictionControl
+      sovereigntyAchOperationalControl
+      sovereigntyAchInteroperability
+      sovereigntyAchPortability
+      sovereigntyAchSupplyChainTransparency
+      sovereigntyEvidence
+      lastSovereigntyAssessmentAt
       supplierType
       status
       address
@@ -81,6 +89,14 @@ export const GET_SUPPLIER = gql`
       id
       name
       description
+      sovereigntyAchDataResidency
+      sovereigntyAchJurisdictionControl
+      sovereigntyAchOperationalControl
+      sovereigntyAchInteroperability
+      sovereigntyAchPortability
+      sovereigntyAchSupplyChainTransparency
+      sovereigntyEvidence
+      lastSovereigntyAssessmentAt
       supplierType
       status
       address
@@ -145,6 +161,14 @@ export const CREATE_SUPPLIER = gql`
         id
         name
         description
+        sovereigntyAchDataResidency
+        sovereigntyAchJurisdictionControl
+        sovereigntyAchOperationalControl
+        sovereigntyAchInteroperability
+        sovereigntyAchPortability
+        sovereigntyAchSupplyChainTransparency
+        sovereigntyEvidence
+        lastSovereigntyAssessmentAt
         supplierType
         status
         address
@@ -174,6 +198,14 @@ export const UPDATE_SUPPLIER = gql`
         id
         name
         description
+        sovereigntyAchDataResidency
+        sovereigntyAchJurisdictionControl
+        sovereigntyAchOperationalControl
+        sovereigntyAchInteroperability
+        sovereigntyAchPortability
+        sovereigntyAchSupplyChainTransparency
+        sovereigntyEvidence
+        lastSovereigntyAssessmentAt
         supplierType
         status
         address

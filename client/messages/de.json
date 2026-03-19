@@ -50,7 +50,35 @@
     "to": "Bis",
     "contains": "enthält",
     "none": "Keine",
-    "unknownError": "Unbekannter Fehler"
+    "unknownError": "Unbekannter Fehler",
+    "sovereignty": {
+      "tab": "Souveränität",
+      "fields": {
+        "reqDataResidency": "Erforderliche Datenresidenz",
+        "reqJurisdictionControl": "Erforderliche Jurisdiktionskontrolle",
+        "reqOperationalControl": "Erforderliche Betriebskontrolle",
+        "reqInteroperability": "Erforderliche Interoperabilität",
+        "reqPortability": "Erforderliche Portabilität",
+        "reqSupplyChainTransparency": "Erforderliche Lieferkettentransparenz",
+        "reqWeight": "Anforderungsgewicht",
+        "reqRationale": "Begründung der Anforderung",
+        "achDataResidency": "Erreichte Datenresidenz",
+        "achJurisdictionControl": "Erreichte Jurisdiktionskontrolle",
+        "achOperationalControl": "Erreichte Betriebskontrolle",
+        "achInteroperability": "Erreichte Interoperabilität",
+        "achPortability": "Erreichte Portabilität",
+        "achSupplyChainTransparency": "Erreichte Lieferkettentransparenz",
+        "evidence": "Nachweise",
+        "lastAssessmentAt": "Letzte Souveranitätsbewertung"
+      },
+      "maturity": {
+        "NONE": "Keine",
+        "LOW": "Niedrig",
+        "MEDIUM": "Mittel",
+        "HIGH": "Hoch",
+        "VERY_HIGH": "Sehr hoch"
+      }
+    }
   },
   "navigation": {
     "dashboard": "Dashboard",

@@ -81,6 +81,14 @@ const SuppliersPage = () => {
       const input = {
         name: supplierData.name,
         description: supplierData.description,
+        sovereigntyAchDataResidency: supplierData.sovereigntyAchDataResidency,
+        sovereigntyAchJurisdictionControl: supplierData.sovereigntyAchJurisdictionControl,
+        sovereigntyAchOperationalControl: supplierData.sovereigntyAchOperationalControl,
+        sovereigntyAchInteroperability: supplierData.sovereigntyAchInteroperability,
+        sovereigntyAchPortability: supplierData.sovereigntyAchPortability,
+        sovereigntyAchSupplyChainTransparency: supplierData.sovereigntyAchSupplyChainTransparency,
+        sovereigntyEvidence: supplierData.sovereigntyEvidence,
+        lastSovereigntyAssessmentAt: supplierData.lastSovereigntyAssessmentAt,
         supplierType: supplierData.supplierType,
         status: supplierData.status,
         address: supplierData.address,
@@ -289,6 +297,22 @@ const SuppliersPage = () => {
                 const input: Record<string, any> = {
                   name: { set: supplierData.name },
                   description: { set: supplierData.description },
+                  sovereigntyAchDataResidency: { set: supplierData.sovereigntyAchDataResidency ?? null },
+                  sovereigntyAchJurisdictionControl: {
+                    set: supplierData.sovereigntyAchJurisdictionControl ?? null,
+                  },
+                  sovereigntyAchOperationalControl: {
+                    set: supplierData.sovereigntyAchOperationalControl ?? null,
+                  },
+                  sovereigntyAchInteroperability: {
+                    set: supplierData.sovereigntyAchInteroperability ?? null,
+                  },
+                  sovereigntyAchPortability: { set: supplierData.sovereigntyAchPortability ?? null },
+                  sovereigntyAchSupplyChainTransparency: {
+                    set: supplierData.sovereigntyAchSupplyChainTransparency ?? null,
+                  },
+                  sovereigntyEvidence: { set: supplierData.sovereigntyEvidence ?? null },
+                  lastSovereigntyAssessmentAt: { set: supplierData.lastSovereigntyAssessmentAt ?? null },
                   supplierType: { set: supplierData.supplierType },
                   status: { set: supplierData.status },
                   address: { set: supplierData.address },

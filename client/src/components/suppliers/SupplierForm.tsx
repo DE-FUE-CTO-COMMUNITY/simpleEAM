@@ -14,15 +14,18 @@ import {
   Application,
   Infrastructure,
   AiComponent,
+  SovereigntyMaturity,
 } from '@/gql/generated'
 import { GET_APPLICATIONS } from '@/graphql/application'
 import { GET_INFRASTRUCTURES } from '@/graphql/infrastructure'
 import { GET_Aicomponents } from '@/graphql/aicomponent'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import { useChipClickHandlers } from '@/hooks/useChipClickHandlers'
+import { useFeatureFlags } from '@/lib/feature-flags'
 import GenericForm, { FieldConfig, TabConfig } from '../common/GenericForm'
 import { GenericFormProps } from '../common/GenericFormProps'
 import { SupplierFormValues } from './types'
+import { buildSovereigntyAchievedFields } from '../common/SovereigntyFields'
 
 // Schema factory function that accepts translations
 const createBaseSupplierSchema = (t: any) =>
@@ -53,6 +56,16 @@ const createBaseSupplierSchema = (t: any) =>
     providesAIComponentIds: z.array(z.string()).optional(),
     supportsAIComponentIds: z.array(z.string()).optional(),
     maintainsAIComponentIds: z.array(z.string()).optional(),
+    sovereigntyAchDataResidency: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyAchJurisdictionControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyAchOperationalControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyAchInteroperability: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyAchPortability: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyAchSupplyChainTransparency: z.nativeEnum(SovereigntyMaturity)
+      .optional()
+      .nullable(),
+    sovereigntyEvidence: z.string().optional(),
+    lastSovereigntyAssessmentAt: z.date().optional().nullable(),
   })
 
 // Schema factory for form validation
@@ -95,6 +108,9 @@ const SupplierForm: React.FC<GenericFormProps<Supplier, SupplierFormValues>> = (
   const tRisk = useTranslations('suppliers.riskClassifications')
   const tImportance = useTranslations('suppliers.strategicImportances')
   const tTabs = useTranslations('suppliers.tabs')
+  const tCommon = useTranslations('common')
+  const { featureFlags } = useFeatureFlags()
+  const isSovereigntyEnabled = featureFlags.Sovereignty
 
   const companyWhere = useCompanyWhere('company')
 
@@ -153,6 +169,14 @@ const SupplierForm: React.FC<GenericFormProps<Supplier, SupplierFormValues>> = (
       providesAIComponentIds: [],
       supportsAIComponentIds: [],
       maintainsAIComponentIds: [],
+      sovereigntyAchDataResidency: null,
+      sovereigntyAchJurisdictionControl: null,
+      sovereigntyAchOperationalControl: null,
+      sovereigntyAchInteroperability: null,
+      sovereigntyAchPortability: null,
+      sovereigntyAchSupplyChainTransparency: null,
+      sovereigntyEvidence: '',
+      lastSovereigntyAssessmentAt: null,
     }),
     []
   )
@@ -206,6 +230,17 @@ const SupplierForm: React.FC<GenericFormProps<Supplier, SupplierFormValues>> = (
           supplier?.supportsAIComponents?.map((component: any) => component.id) ?? [],
         maintainsAIComponentIds:
           supplier?.maintainsAIComponents?.map((component: any) => component.id) ?? [],
+        sovereigntyAchDataResidency: supplier?.sovereigntyAchDataResidency ?? null,
+        sovereigntyAchJurisdictionControl: supplier?.sovereigntyAchJurisdictionControl ?? null,
+        sovereigntyAchOperationalControl: supplier?.sovereigntyAchOperationalControl ?? null,
+        sovereigntyAchInteroperability: supplier?.sovereigntyAchInteroperability ?? null,
+        sovereigntyAchPortability: supplier?.sovereigntyAchPortability ?? null,
+        sovereigntyAchSupplyChainTransparency:
+          supplier?.sovereigntyAchSupplyChainTransparency ?? null,
+        sovereigntyEvidence: supplier?.sovereigntyEvidence ?? '',
+        lastSovereigntyAssessmentAt: supplier?.lastSovereigntyAssessmentAt
+          ? new Date(supplier.lastSovereigntyAssessmentAt)
+          : null,
       }
       form.reset(resetValues)
     } else if (!isOpen) {
@@ -220,6 +255,7 @@ const SupplierForm: React.FC<GenericFormProps<Supplier, SupplierFormValues>> = (
     { id: 'contract', label: tTabs('contract') },
     { id: 'assessment', label: tTabs('assessment') },
     { id: 'relationships', label: tTabs('relationships') },
+    ...(isSovereigntyEnabled ? [{ id: 'sovereignty', label: tCommon('sovereignty.tab') }] : []),
   ]
 
   // Define fields
@@ -681,6 +717,7 @@ const SupplierForm: React.FC<GenericFormProps<Supplier, SupplierFormValues>> = (
       },
       onChipClick: createChipClickHandler('maintainsAIComponentIds'),
     },
+    ...(isSovereigntyEnabled ? buildSovereigntyAchievedFields(tCommon) : []),
   ]
 
   return (

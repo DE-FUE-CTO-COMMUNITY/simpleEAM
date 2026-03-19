@@ -9,6 +9,14 @@ export const GET_Aicomponents = gql`
       id
       name
       description
+      sovereigntyAchDataResidency
+      sovereigntyAchJurisdictionControl
+      sovereigntyAchOperationalControl
+      sovereigntyAchInteroperability
+      sovereigntyAchPortability
+      sovereigntyAchSupplyChainTransparency
+      sovereigntyEvidence
+      lastSovereigntyAssessmentAt
       aiType
       model
       version
@@ -82,6 +90,14 @@ export const GET_Aicomponent = gql`
       id
       name
       description
+      sovereigntyAchDataResidency
+      sovereigntyAchJurisdictionControl
+      sovereigntyAchOperationalControl
+      sovereigntyAchInteroperability
+      sovereigntyAchPortability
+      sovereigntyAchSupplyChainTransparency
+      sovereigntyEvidence
+      lastSovereigntyAssessmentAt
       aiType
       model
       version
@@ -156,6 +172,14 @@ export const CREATE_Aicomponent = gql`
         id
         name
         description
+        sovereigntyAchDataResidency
+        sovereigntyAchJurisdictionControl
+        sovereigntyAchOperationalControl
+        sovereigntyAchInteroperability
+        sovereigntyAchPortability
+        sovereigntyAchSupplyChainTransparency
+        sovereigntyEvidence
+        lastSovereigntyAssessmentAt
         aiType
         model
         version
@@ -231,6 +255,14 @@ export const UPDATE_Aicomponent = gql`
         id
         name
         description
+        sovereigntyAchDataResidency
+        sovereigntyAchJurisdictionControl
+        sovereigntyAchOperationalControl
+        sovereigntyAchInteroperability
+        sovereigntyAchPortability
+        sovereigntyAchSupplyChainTransparency
+        sovereigntyEvidence
+        lastSovereigntyAssessmentAt
         aiType
         model
         version

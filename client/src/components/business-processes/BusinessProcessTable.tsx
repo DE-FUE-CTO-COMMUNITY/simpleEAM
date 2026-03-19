@@ -180,6 +180,15 @@ const BusinessProcessTable: React.FC<BusinessProcessTableProps> = ({
     maturityLevel: businessProcess.maturityLevel || null,
     category: businessProcess.category || '',
     tags: businessProcess.tags || [],
+    sovereigntyReqDataResidency: businessProcess.sovereigntyReqDataResidency || null,
+    sovereigntyReqJurisdictionControl: businessProcess.sovereigntyReqJurisdictionControl || null,
+    sovereigntyReqOperationalControl: businessProcess.sovereigntyReqOperationalControl || null,
+    sovereigntyReqInteroperability: businessProcess.sovereigntyReqInteroperability || null,
+    sovereigntyReqPortability: businessProcess.sovereigntyReqPortability || null,
+    sovereigntyReqSupplyChainTransparency:
+      businessProcess.sovereigntyReqSupplyChainTransparency || null,
+    sovereigntyReqWeight: businessProcess.sovereigntyReqWeight || null,
+    sovereigntyReqRationale: businessProcess.sovereigntyReqRationale || '',
     ownerId: businessProcess.owners?.[0]?.id || '',
     parentProcessId: businessProcess.parentProcess?.[0]?.id || '',
     supportsCapabilityIds:

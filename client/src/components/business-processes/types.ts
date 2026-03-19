@@ -1,7 +1,7 @@
 'use client'
 
 import { z } from 'zod'
-import { BusinessProcess, ProcessStatus, ProcessType } from '../../gql/generated'
+import { BusinessProcess, ProcessStatus, ProcessType, SovereigntyMaturity } from '../../gql/generated'
 
 export const businessProcessSchema = z.object({
   name: z.string().min(3).max(100),
@@ -17,6 +17,14 @@ export const businessProcessSchema = z.object({
   supportedByApplicationIds: z.array(z.string()).optional(),
   partOfArchitectures: z.array(z.string()).optional(),
   depictedInDiagrams: z.array(z.string()).optional(),
+  sovereigntyReqDataResidency: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+  sovereigntyReqJurisdictionControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+  sovereigntyReqOperationalControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+  sovereigntyReqInteroperability: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+  sovereigntyReqPortability: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+  sovereigntyReqSupplyChainTransparency: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+  sovereigntyReqWeight: z.number().optional().nullable(),
+  sovereigntyReqRationale: z.string().optional().nullable(),
 })
 
 export type BusinessProcessFormValues = z.infer<typeof businessProcessSchema>

@@ -27,10 +27,12 @@ import {
   Architecture,
   Application,
   Supplier,
+  SovereigntyMaturity,
 } from '../../gql/generated'
 import GenericForm, { FieldConfig } from '../common/GenericForm'
 import { isArchitect } from '@/lib/auth'
 import { useChipClickHandlers } from '@/hooks/useChipClickHandlers'
+import { buildSovereigntyAchievedFields } from '../common/SovereigntyFields'
 import ApplicationForm from '../applications/ApplicationForm'
 import ArchitectureForm from '../architectures/ArchitectureForm'
 
@@ -62,6 +64,16 @@ const baseInfrastructureSchema = z.object({
   maintainedBy: z.array(z.string()).optional(),
   partOfArchitectures: z.array(z.string()).optional(),
   depictedInDiagrams: z.array(z.string()).optional(),
+  sovereigntyAchDataResidency: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+  sovereigntyAchJurisdictionControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+  sovereigntyAchOperationalControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+  sovereigntyAchInteroperability: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+  sovereigntyAchPortability: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+  sovereigntyAchSupplyChainTransparency: z.nativeEnum(SovereigntyMaturity)
+    .optional()
+    .nullable(),
+  sovereigntyEvidence: z.string().optional().nullable(),
+  lastSovereigntyAssessmentAt: z.date().optional().nullable(),
 })
 
 // Schema for form validation with extended validations
@@ -106,13 +118,19 @@ export type InfrastructureFormValues = z.infer<typeof baseInfrastructureSchema>
 import { GenericFormProps } from '../common/GenericFormProps'
 
 // Tab configuration with translations
-const INFRASTRUCTURE_TABS = (tTabs: any, isSupEnabled: boolean) => [
+const INFRASTRUCTURE_TABS = (
+  tTabs: any,
+  tCommon: any,
+  isSupEnabled: boolean,
+  isSovereigntyEnabled: boolean
+) => [
   { id: 'general', label: tTabs('general') },
   { id: 'technical', label: tTabs('technical') },
   { id: 'lifecycle', label: tTabs('lifecycle') },
   { id: 'relationships', label: tTabs('relationships') },
   ...(isSupEnabled ? [{ id: 'suppliers', label: tTabs('suppliers') }] : []),
   { id: 'architectures', label: tTabs('architectures') },
+  ...(isSovereigntyEnabled ? [{ id: 'sovereignty', label: tCommon('sovereignty.tab') }] : []),
 ]
 
 const InfrastructureForm: React.FC<GenericFormProps<Infrastructure, InfrastructureFormValues>> = ({
@@ -128,10 +146,12 @@ const InfrastructureForm: React.FC<GenericFormProps<Infrastructure, Infrastructu
 }) => {
   const t = useTranslations('infrastructure.form')
   const tTabs = useTranslations('infrastructure.tabs')
+  const tCommon = useTranslations('common')
   const tTypes = useTranslations('infrastructure.infrastructureTypes')
   const tStatuses = useTranslations('infrastructure.statuses')
   const { featureFlags } = useFeatureFlags()
   const isSupEnabled = featureFlags.SUP
+  const isSovereigntyEnabled = featureFlags.Sovereignty
 
   const [nestedFormState, setNestedFormState] = useState<{
     isOpen: boolean
@@ -296,6 +316,17 @@ const InfrastructureForm: React.FC<GenericFormProps<Infrastructure, Infrastructu
       maintainedBy: infrastructure?.maintainedBy?.map(supplier => supplier.id) || [],
       partOfArchitectures: infrastructure?.partOfArchitectures?.map(arch => arch.id) || [],
       depictedInDiagrams: infrastructure?.depictedInDiagrams?.map(diag => diag.id) || [],
+      sovereigntyAchDataResidency: infrastructure?.sovereigntyAchDataResidency || null,
+      sovereigntyAchJurisdictionControl: infrastructure?.sovereigntyAchJurisdictionControl || null,
+      sovereigntyAchOperationalControl: infrastructure?.sovereigntyAchOperationalControl || null,
+      sovereigntyAchInteroperability: infrastructure?.sovereigntyAchInteroperability || null,
+      sovereigntyAchPortability: infrastructure?.sovereigntyAchPortability || null,
+      sovereigntyAchSupplyChainTransparency:
+        infrastructure?.sovereigntyAchSupplyChainTransparency || null,
+      sovereigntyEvidence: infrastructure?.sovereigntyEvidence || '',
+      lastSovereigntyAssessmentAt: infrastructure?.lastSovereigntyAssessmentAt
+        ? new Date(infrastructure.lastSovereigntyAssessmentAt)
+        : null,
     }),
     [infrastructure, currentPerson?.id]
   )
@@ -363,6 +394,17 @@ const InfrastructureForm: React.FC<GenericFormProps<Infrastructure, Infrastructu
         maintainedBy: infrastructure.maintainedBy?.map(supplier => supplier.id) ?? [],
         partOfArchitectures: infrastructure.partOfArchitectures?.map(arch => arch.id) ?? [],
         depictedInDiagrams: infrastructure.depictedInDiagrams?.map(diagram => diagram.id) ?? [],
+        sovereigntyAchDataResidency: infrastructure.sovereigntyAchDataResidency ?? null,
+        sovereigntyAchJurisdictionControl: infrastructure.sovereigntyAchJurisdictionControl ?? null,
+        sovereigntyAchOperationalControl: infrastructure.sovereigntyAchOperationalControl ?? null,
+        sovereigntyAchInteroperability: infrastructure.sovereigntyAchInteroperability ?? null,
+        sovereigntyAchPortability: infrastructure.sovereigntyAchPortability ?? null,
+        sovereigntyAchSupplyChainTransparency:
+          infrastructure.sovereigntyAchSupplyChainTransparency ?? null,
+        sovereigntyEvidence: infrastructure.sovereigntyEvidence ?? '',
+        lastSovereigntyAssessmentAt: infrastructure.lastSovereigntyAssessmentAt
+          ? new Date(infrastructure.lastSovereigntyAssessmentAt)
+          : null,
       }
 
       // Reset form with values from existing Infrastructure
@@ -818,6 +860,7 @@ const InfrastructureForm: React.FC<GenericFormProps<Infrastructure, Infrastructu
       },
       onChipClick: createChipClickHandler('depictedInDiagrams'),
     },
+    ...(isSovereigntyEnabled ? buildSovereigntyAchievedFields(tCommon) : []),
   ]
 
   return (
@@ -858,7 +901,7 @@ const InfrastructureForm: React.FC<GenericFormProps<Infrastructure, Infrastructu
               }
             : undefined
         }
-        tabs={INFRASTRUCTURE_TABS(tTabs, isSupEnabled)}
+        tabs={INFRASTRUCTURE_TABS(tTabs, tCommon, isSupEnabled, isSovereigntyEnabled)}
       />
 
       {/* Nested Application Form */}

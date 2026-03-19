@@ -26,6 +26,14 @@ export const GET_APPLICATION_INTERFACES = gql`
       id
       name
       description
+      sovereigntyAchDataResidency
+      sovereigntyAchJurisdictionControl
+      sovereigntyAchOperationalControl
+      sovereigntyAchInteroperability
+      sovereigntyAchPortability
+      sovereigntyAchSupplyChainTransparency
+      sovereigntyEvidence
+      lastSovereigntyAssessmentAt
       interfaceType
       protocol
       version
@@ -79,6 +87,14 @@ export const GET_APPLICATION_INTERFACE = gql`
       id
       name
       description
+      sovereigntyAchDataResidency
+      sovereigntyAchJurisdictionControl
+      sovereigntyAchOperationalControl
+      sovereigntyAchInteroperability
+      sovereigntyAchPortability
+      sovereigntyAchSupplyChainTransparency
+      sovereigntyEvidence
+      lastSovereigntyAssessmentAt
       interfaceType
       protocol
       version
@@ -133,6 +149,14 @@ export const CREATE_APPLICATION_INTERFACE = gql`
         id
         name
         description
+        sovereigntyAchDataResidency
+        sovereigntyAchJurisdictionControl
+        sovereigntyAchOperationalControl
+        sovereigntyAchInteroperability
+        sovereigntyAchPortability
+        sovereigntyAchSupplyChainTransparency
+        sovereigntyEvidence
+        lastSovereigntyAssessmentAt
         interfaceType
         protocol
         version
@@ -184,6 +208,14 @@ export const UPDATE_APPLICATION_INTERFACE = gql`
         id
         name
         description
+        sovereigntyAchDataResidency
+        sovereigntyAchJurisdictionControl
+        sovereigntyAchOperationalControl
+        sovereigntyAchInteroperability
+        sovereigntyAchPortability
+        sovereigntyAchSupplyChainTransparency
+        sovereigntyEvidence
+        lastSovereigntyAssessmentAt
         interfaceType
         protocol
         version

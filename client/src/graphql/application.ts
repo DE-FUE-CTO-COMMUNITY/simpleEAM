@@ -26,6 +26,14 @@ export const GET_APPLICATIONS = gql`
       id
       name
       description
+      sovereigntyAchDataResidency
+      sovereigntyAchJurisdictionControl
+      sovereigntyAchOperationalControl
+      sovereigntyAchInteroperability
+      sovereigntyAchPortability
+      sovereigntyAchSupplyChainTransparency
+      sovereigntyEvidence
+      lastSovereigntyAssessmentAt
       status
       criticality
       timeCategory
@@ -123,6 +131,14 @@ export const GET_APPLICATION = gql`
       id
       name
       description
+      sovereigntyAchDataResidency
+      sovereigntyAchJurisdictionControl
+      sovereigntyAchOperationalControl
+      sovereigntyAchInteroperability
+      sovereigntyAchPortability
+      sovereigntyAchSupplyChainTransparency
+      sovereigntyEvidence
+      lastSovereigntyAssessmentAt
       status
       criticality
       timeCategory
@@ -221,6 +237,14 @@ export const CREATE_APPLICATION = gql`
         id
         name
         description
+        sovereigntyAchDataResidency
+        sovereigntyAchJurisdictionControl
+        sovereigntyAchOperationalControl
+        sovereigntyAchInteroperability
+        sovereigntyAchPortability
+        sovereigntyAchSupplyChainTransparency
+        sovereigntyEvidence
+        lastSovereigntyAssessmentAt
         status
         criticality
         timeCategory
@@ -270,6 +294,14 @@ export const UPDATE_APPLICATION = gql`
         id
         name
         description
+        sovereigntyAchDataResidency
+        sovereigntyAchJurisdictionControl
+        sovereigntyAchOperationalControl
+        sovereigntyAchInteroperability
+        sovereigntyAchPortability
+        sovereigntyAchSupplyChainTransparency
+        sovereigntyEvidence
+        lastSovereigntyAssessmentAt
         status
         criticality
         timeCategory

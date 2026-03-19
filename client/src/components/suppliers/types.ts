@@ -6,6 +6,7 @@ import {
   SupplierStatus,
   RiskClassification,
   StrategicImportance,
+  SovereigntyMaturity,
 } from '../../gql/generated'
 
 export type SupplierType = Supplier
@@ -58,4 +59,12 @@ export interface SupplierFormValues {
   providesAIComponentIds?: string[]
   supportsAIComponentIds?: string[]
   maintainsAIComponentIds?: string[]
+  sovereigntyAchDataResidency?: SovereigntyMaturity | null
+  sovereigntyAchJurisdictionControl?: SovereigntyMaturity | null
+  sovereigntyAchOperationalControl?: SovereigntyMaturity | null
+  sovereigntyAchInteroperability?: SovereigntyMaturity | null
+  sovereigntyAchPortability?: SovereigntyMaturity | null
+  sovereigntyAchSupplyChainTransparency?: SovereigntyMaturity | null
+  sovereigntyEvidence?: string
+  lastSovereigntyAssessmentAt?: Date | null
 }

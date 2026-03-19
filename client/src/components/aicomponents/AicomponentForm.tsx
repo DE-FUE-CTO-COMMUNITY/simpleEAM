@@ -19,6 +19,7 @@ import {
   Architecture,
   ArchitecturePrinciple,
   Diagram,
+  SovereigntyMaturity,
 } from '../../gql/generated'
 import { useAiTypeLabel, useStatusLabel } from './utils'
 import GenericForm, { FieldConfig, TabConfig } from '../common/GenericForm'
@@ -35,6 +36,7 @@ import { GET_SUPPLIERS } from '@/graphql/supplier'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import { useChipClickHandlers } from '@/hooks/useChipClickHandlers'
 import { useFeatureFlags } from '@/lib/feature-flags'
+import { buildSovereigntyAchievedFields } from '../common/SovereigntyFields'
 import CapabilityForm from '../capabilities/CapabilityForm'
 import ApplicationForm from '../applications/ApplicationForm'
 import DataObjectForm from '../dataobjects/DataObjectForm'
@@ -66,6 +68,14 @@ export type AicomponentFormValues = {
   partOfArchitectureIds?: string[]
   implementsPrincipleIds?: string[]
   depictedInDiagramIds?: string[]
+  sovereigntyAchDataResidency?: SovereigntyMaturity | null
+  sovereigntyAchJurisdictionControl?: SovereigntyMaturity | null
+  sovereigntyAchOperationalControl?: SovereigntyMaturity | null
+  sovereigntyAchInteroperability?: SovereigntyMaturity | null
+  sovereigntyAchPortability?: SovereigntyMaturity | null
+  sovereigntyAchSupplyChainTransparency?: SovereigntyMaturity | null
+  sovereigntyEvidence?: string
+  lastSovereigntyAssessmentAt?: Date | null
 }
 
 export type AicomponentFormProps = GenericFormProps<AiComponent, AicomponentFormValues>
@@ -83,11 +93,13 @@ export default function AicomponentForm({
   const t = useTranslations('aicomponents.form')
   const tGeneral = useTranslations('aicomponents')
   const tTabs = useTranslations('aicomponents.tabs')
+  const tCommon = useTranslations('common')
   const tValidation = useTranslations('forms.validation')
   const getAiTypeLabel = useAiTypeLabel()
   const getStatusLabel = useStatusLabel()
   const { featureFlags } = useFeatureFlags()
   const isSupEnabled = featureFlags.SUP
+  const isSovereigntyEnabled = featureFlags.Sovereignty
 
   // State for nested entity forms
   const [nestedFormState, setNestedFormState] = useState<{
@@ -151,6 +163,16 @@ export default function AicomponentForm({
     partOfArchitectureIds: z.array(z.string()).optional(),
     implementsPrincipleIds: z.array(z.string()).optional(),
     depictedInDiagramIds: z.array(z.string()).optional(),
+    sovereigntyAchDataResidency: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyAchJurisdictionControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyAchOperationalControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyAchInteroperability: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyAchPortability: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyAchSupplyChainTransparency: z.nativeEnum(SovereigntyMaturity)
+      .optional()
+      .nullable(),
+    sovereigntyEvidence: z.string().optional(),
+    lastSovereigntyAssessmentAt: z.date().optional().nullable(),
   })
 
   // GraphQL Queries für Relationship-Daten
@@ -563,6 +585,17 @@ export default function AicomponentForm({
     implementsPrincipleIds:
       aicomponent?.implementsPrinciples?.map((principle: any) => principle.id) ?? [],
     depictedInDiagramIds: aicomponent?.depictedInDiagrams?.map((diag: any) => diag.id) ?? [],
+    sovereigntyAchDataResidency: aicomponent?.sovereigntyAchDataResidency ?? null,
+    sovereigntyAchJurisdictionControl: aicomponent?.sovereigntyAchJurisdictionControl ?? null,
+    sovereigntyAchOperationalControl: aicomponent?.sovereigntyAchOperationalControl ?? null,
+    sovereigntyAchInteroperability: aicomponent?.sovereigntyAchInteroperability ?? null,
+    sovereigntyAchPortability: aicomponent?.sovereigntyAchPortability ?? null,
+    sovereigntyAchSupplyChainTransparency:
+      aicomponent?.sovereigntyAchSupplyChainTransparency ?? null,
+    sovereigntyEvidence: aicomponent?.sovereigntyEvidence ?? '',
+    lastSovereigntyAssessmentAt: aicomponent?.lastSovereigntyAssessmentAt
+      ? new Date(aicomponent.lastSovereigntyAssessmentAt)
+      : null,
   }
 
   // Form erstellen
@@ -621,6 +654,17 @@ export default function AicomponentForm({
         implementsPrincipleIds:
           aicomponent.implementsPrinciples?.map((principle: any) => principle.id) ?? [],
         depictedInDiagramIds: aicomponent.depictedInDiagrams?.map((diag: any) => diag.id) ?? [],
+        sovereigntyAchDataResidency: aicomponent.sovereigntyAchDataResidency ?? null,
+        sovereigntyAchJurisdictionControl: aicomponent.sovereigntyAchJurisdictionControl ?? null,
+        sovereigntyAchOperationalControl: aicomponent.sovereigntyAchOperationalControl ?? null,
+        sovereigntyAchInteroperability: aicomponent.sovereigntyAchInteroperability ?? null,
+        sovereigntyAchPortability: aicomponent.sovereigntyAchPortability ?? null,
+        sovereigntyAchSupplyChainTransparency:
+          aicomponent.sovereigntyAchSupplyChainTransparency ?? null,
+        sovereigntyEvidence: aicomponent.sovereigntyEvidence ?? '',
+        lastSovereigntyAssessmentAt: aicomponent.lastSovereigntyAssessmentAt
+          ? new Date(aicomponent.lastSovereigntyAssessmentAt)
+          : null,
       }
 
       form.reset(resetValues)
@@ -638,6 +682,7 @@ export default function AicomponentForm({
     ...(isSupEnabled ? [{ id: 'suppliers', label: tTabs('suppliers') }] : []),
     { id: 'architectures', label: tTabs('architectures') },
     { id: 'principles', label: tTabs('principles') },
+    ...(isSovereigntyEnabled ? [{ id: 'sovereignty', label: tCommon('sovereignty.tab') }] : []),
   ]
   // Felder für das Formular definieren
   const fields: FieldConfig[] = [
@@ -1031,6 +1076,7 @@ export default function AicomponentForm({
         }
         return option?.label || ''
       },
+      ...(isSovereigntyEnabled ? buildSovereigntyAchievedFields(tCommon) : []),
       isOptionEqualToValue: (option: any, value: any) => {
         if (typeof value === 'string') {
           return option.value === value

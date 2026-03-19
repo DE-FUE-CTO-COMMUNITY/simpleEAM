@@ -17,10 +17,13 @@ import {
   CapabilityType,
   Application,
   Architecture,
+  SovereigntyMaturity,
 } from '../../gql/generated'
 import GenericForm, { FieldConfig } from '../common/GenericForm'
 import { isArchitect } from '@/lib/auth'
 import { useChipClickHandlers } from '@/hooks/useChipClickHandlers'
+import { useFeatureFlags } from '@/lib/feature-flags'
+import { buildSovereigntyRequirementFields } from '../common/SovereigntyFields'
 import ApplicationForm from '../applications/ApplicationForm'
 import ArchitectureForm from '../architectures/ArchitectureForm'
 
@@ -57,6 +60,16 @@ const createCapabilitySchema = (t: any) =>
     supportedByApplications: z.array(z.string()).optional(),
     partOfArchitectures: z.array(z.string()).optional(),
     partOfDiagrams: z.array(z.string()).optional(),
+    sovereigntyReqDataResidency: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyReqJurisdictionControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyReqOperationalControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyReqInteroperability: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyReqPortability: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyReqSupplyChainTransparency: z.nativeEnum(SovereigntyMaturity)
+      .optional()
+      .nullable(),
+    sovereigntyReqWeight: z.number().optional().nullable(),
+    sovereigntyReqRationale: z.string().optional().nullable(),
   })
 
 // TypeScript Typen basierend auf dem Schema
@@ -103,6 +116,9 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
   const t = useTranslations()
   const tForm = useTranslations('capabilities.form')
   const tTabs = useTranslations('capabilities.tabs')
+  const tCommon = useTranslations('common')
+  const { featureFlags } = useFeatureFlags()
+  const isSovereigntyEnabled = featureFlags.Sovereignty
 
   // Create schema with translations
   const capabilitySchema = React.useMemo(() => createCapabilitySchema(tForm), [tForm])
@@ -206,6 +222,14 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
       supportedByApplications: [],
       partOfArchitectures: [],
       partOfDiagrams: [],
+      sovereigntyReqDataResidency: null,
+      sovereigntyReqJurisdictionControl: null,
+      sovereigntyReqOperationalControl: null,
+      sovereigntyReqInteroperability: null,
+      sovereigntyReqPortability: null,
+      sovereigntyReqSupplyChainTransparency: null,
+      sovereigntyReqWeight: null,
+      sovereigntyReqRationale: '',
     }),
     []
   )
@@ -255,6 +279,29 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
         'partOfDiagrams',
         capability?.depictedInDiagrams?.map((diagram: any) => diagram.id) ?? []
       )
+      form.setFieldValue(
+        'sovereigntyReqDataResidency',
+        capability?.sovereigntyReqDataResidency ?? null
+      )
+      form.setFieldValue(
+        'sovereigntyReqJurisdictionControl',
+        capability?.sovereigntyReqJurisdictionControl ?? null
+      )
+      form.setFieldValue(
+        'sovereigntyReqOperationalControl',
+        capability?.sovereigntyReqOperationalControl ?? null
+      )
+      form.setFieldValue(
+        'sovereigntyReqInteroperability',
+        capability?.sovereigntyReqInteroperability ?? null
+      )
+      form.setFieldValue('sovereigntyReqPortability', capability?.sovereigntyReqPortability ?? null)
+      form.setFieldValue(
+        'sovereigntyReqSupplyChainTransparency',
+        capability?.sovereigntyReqSupplyChainTransparency ?? null
+      )
+      form.setFieldValue('sovereigntyReqWeight', capability?.sovereigntyReqWeight ?? null)
+      form.setFieldValue('sovereigntyReqRationale', capability?.sovereigntyReqRationale ?? '')
     } else if (!isOpen) {
       form.reset()
     }
@@ -545,6 +592,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
       size: { xs: 12, md: 6 },
       tabId: 'lifecycle',
     },
+    ...(isSovereigntyEnabled ? buildSovereigntyRequirementFields(tCommon) : []),
   ]
 
   // Tabs-Konfiguration
@@ -553,6 +601,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
     { id: 'lifecycle', label: tTabs('lifecycle') },
     { id: 'relationships', label: tTabs('relationships') },
     { id: 'architectures', label: tTabs('architectures') },
+    ...(isSovereigntyEnabled ? [{ id: 'sovereignty', label: tCommon('sovereignty.tab') }] : []),
   ]
 
   return (

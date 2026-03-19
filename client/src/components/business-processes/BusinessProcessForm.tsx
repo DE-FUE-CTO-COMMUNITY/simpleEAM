@@ -5,7 +5,7 @@ import { useForm } from '@tanstack/react-form'
 import { useQuery } from '@apollo/client'
 import { useTranslations } from 'next-intl'
 import { z } from 'zod'
-import { Application, ProcessStatus, ProcessType } from '@/gql/generated'
+import { Application, ProcessStatus, ProcessType, SovereigntyMaturity } from '@/gql/generated'
 import { GET_PERSONS } from '@/graphql/person'
 import { GET_APPLICATIONS } from '@/graphql/application'
 import { GET_CAPABILITIES } from '@/graphql/capability'
@@ -14,8 +14,10 @@ import { GET_ARCHITECTURES } from '@/graphql/architecture'
 import { GET_DIAGRAMS } from '@/graphql/diagram'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import { useCurrentPerson } from '@/hooks/useCurrentPerson'
+import { useFeatureFlags } from '@/lib/feature-flags'
 import { isArchitect } from '@/lib/auth'
 import GenericForm, { FieldConfig, SelectOption, TabConfig } from '../common/GenericForm'
+import { buildSovereigntyRequirementFields } from '../common/SovereigntyFields'
 import { GenericFormProps } from '../common/GenericFormProps'
 import { BusinessProcessFormValues, BusinessProcessType } from './types'
 
@@ -34,6 +36,16 @@ const createBusinessProcessSchema = (t: any) =>
     supportedByApplicationIds: z.array(z.string()).optional(),
     partOfArchitectures: z.array(z.string()).optional(),
     depictedInDiagrams: z.array(z.string()).optional(),
+    sovereigntyReqDataResidency: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyReqJurisdictionControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyReqOperationalControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyReqInteroperability: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyReqPortability: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyReqSupplyChainTransparency: z.nativeEnum(SovereigntyMaturity)
+      .optional()
+      .nullable(),
+    sovereigntyReqWeight: z.number().optional().nullable(),
+    sovereigntyReqRationale: z.string().optional().nullable(),
   })
 
 type BusinessProcessFormProps = GenericFormProps<BusinessProcessType, BusinessProcessFormValues>
@@ -54,6 +66,8 @@ const BusinessProcessForm: React.FC<BusinessProcessFormProps> = ({
   const tStatuses = useTranslations('businessProcesses.statuses')
   const tTypes = useTranslations('businessProcesses.processTypes')
   const tCommon = useTranslations('common')
+  const { featureFlags } = useFeatureFlags()
+  const isSovereigntyEnabled = featureFlags.Sovereignty
   const { currentPerson } = useCurrentPerson()
 
   const personWhere = useCompanyWhere('companies')
@@ -112,6 +126,16 @@ const BusinessProcessForm: React.FC<BusinessProcessFormProps> = ({
       partOfArchitectures:
         businessProcess?.partOfArchitectures?.map(architecture => architecture.id) || [],
       depictedInDiagrams: businessProcess?.depictedInDiagrams?.map(diagram => diagram.id) || [],
+      sovereigntyReqDataResidency: businessProcess?.sovereigntyReqDataResidency || null,
+      sovereigntyReqJurisdictionControl:
+        businessProcess?.sovereigntyReqJurisdictionControl || null,
+      sovereigntyReqOperationalControl: businessProcess?.sovereigntyReqOperationalControl || null,
+      sovereigntyReqInteroperability: businessProcess?.sovereigntyReqInteroperability || null,
+      sovereigntyReqPortability: businessProcess?.sovereigntyReqPortability || null,
+      sovereigntyReqSupplyChainTransparency:
+        businessProcess?.sovereigntyReqSupplyChainTransparency || null,
+      sovereigntyReqWeight: businessProcess?.sovereigntyReqWeight || null,
+      sovereigntyReqRationale: businessProcess?.sovereigntyReqRationale || '',
     }),
     [businessProcess, currentPerson?.id]
   )
@@ -346,12 +370,14 @@ const BusinessProcessForm: React.FC<BusinessProcessFormProps> = ({
         return option.value === value?.value || option.value === value
       },
     },
+    ...(isSovereigntyEnabled ? buildSovereigntyRequirementFields(tCommon) : []),
   ]
 
   const tabs: TabConfig[] = [
     { id: 'general', label: tTabs('general') },
     { id: 'relationships', label: tTabs('relationships') },
     { id: 'architecture', label: tTabs('architecture') },
+    ...(isSovereigntyEnabled ? [{ id: 'sovereignty', label: tCommon('sovereignty.tab') }] : []),
   ]
 
   return (

@@ -375,6 +375,17 @@ const SupplierTable: React.FC<SupplierTableProps> = ({
       riskClassification: supplier.riskClassification ?? undefined,
       strategicImportance: supplier.strategicImportance ?? undefined,
       performanceRating: supplier.performanceRating ?? undefined,
+      sovereigntyAchDataResidency: supplier.sovereigntyAchDataResidency ?? null,
+      sovereigntyAchJurisdictionControl: supplier.sovereigntyAchJurisdictionControl ?? null,
+      sovereigntyAchOperationalControl: supplier.sovereigntyAchOperationalControl ?? null,
+      sovereigntyAchInteroperability: supplier.sovereigntyAchInteroperability ?? null,
+      sovereigntyAchPortability: supplier.sovereigntyAchPortability ?? null,
+      sovereigntyAchSupplyChainTransparency:
+        supplier.sovereigntyAchSupplyChainTransparency ?? null,
+      sovereigntyEvidence: supplier.sovereigntyEvidence ?? '',
+      lastSovereigntyAssessmentAt: supplier.lastSovereigntyAssessmentAt
+        ? new Date(supplier.lastSovereigntyAssessmentAt)
+        : null,
       complianceCertifications: supplier.complianceCertifications ?? [],
       tags: supplier.tags ?? [],
       providesApplicationIds: supplier.providesApplications?.map(app => app.id) ?? [],

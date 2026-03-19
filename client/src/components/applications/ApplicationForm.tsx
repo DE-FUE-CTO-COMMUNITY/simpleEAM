@@ -26,6 +26,7 @@ import {
   Supplier,
   TimeCategory,
   SevenRStrategy,
+  SovereigntyMaturity,
 } from '../../gql/generated'
 import { GET_PERSONS } from '@/graphql/person'
 import { GET_CAPABILITIES } from '@/graphql/capability'
@@ -44,6 +45,7 @@ import { isArchitect } from '@/lib/auth'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import { useChipClickHandlers } from '@/hooks/useChipClickHandlers'
 import { useFeatureFlags } from '@/lib/feature-flags'
+import { buildSovereigntyAchievedFields } from '../common/SovereigntyFields'
 import CapabilityForm from '../capabilities/CapabilityForm'
 import DataObjectForm from '../dataobjects/DataObjectForm'
 import ApplicationInterfaceForm from '../interfaces/ApplicationInterfaceForm'
@@ -93,6 +95,16 @@ const createBaseApplicationSchema = (t: any) =>
     maintainedByIds: z.array(z.string()).optional(),
     timeCategory: z.nativeEnum(TimeCategory).optional().nullable().or(z.literal('')),
     sevenRStrategy: z.nativeEnum(SevenRStrategy).optional().nullable().or(z.literal('')),
+    sovereigntyAchDataResidency: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyAchJurisdictionControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyAchOperationalControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyAchInteroperability: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyAchPortability: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyAchSupplyChainTransparency: z.nativeEnum(SovereigntyMaturity)
+      .optional()
+      .nullable(),
+    sovereigntyEvidence: z.string().optional().nullable(),
+    lastSovereigntyAssessmentAt: z.date().optional().nullable(),
   })
 
 // Schema factory function for form validation with extended validations
@@ -325,8 +337,10 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
   const tTimeCategory = useTranslations('applications.timeCategories')
   const tSevenR = useTranslations('applications.sevenRStrategies')
   const tTabs = useTranslations('applications.tabs')
+  const tCommon = useTranslations('common')
   const { featureFlags } = useFeatureFlags()
   const isSupEnabled = featureFlags.SUP
+  const isSovereigntyEnabled = featureFlags.Sovereignty
 
   // State for nested entity forms and parent dialog visibility
   const [nestedFormState, setNestedFormState] = useState<{
@@ -592,6 +606,17 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     maintainedByIds: application?.maintainedBy?.map((supplier: any) => supplier.id) ?? [],
     timeCategory: application?.timeCategory ?? null,
     sevenRStrategy: application?.sevenRStrategy ?? null,
+    sovereigntyAchDataResidency: application?.sovereigntyAchDataResidency ?? null,
+    sovereigntyAchJurisdictionControl: application?.sovereigntyAchJurisdictionControl ?? null,
+    sovereigntyAchOperationalControl: application?.sovereigntyAchOperationalControl ?? null,
+    sovereigntyAchInteroperability: application?.sovereigntyAchInteroperability ?? null,
+    sovereigntyAchPortability: application?.sovereigntyAchPortability ?? null,
+    sovereigntyAchSupplyChainTransparency:
+      application?.sovereigntyAchSupplyChainTransparency ?? null,
+    sovereigntyEvidence: application?.sovereigntyEvidence ?? '',
+    lastSovereigntyAssessmentAt: application?.lastSovereigntyAssessmentAt
+      ? new Date(application.lastSovereigntyAssessmentAt)
+      : null,
   }
 
   // Create schema with translations
@@ -684,6 +709,17 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
         maintainedByIds: application?.maintainedBy?.map((supplier: any) => supplier.id) ?? [],
         timeCategory: application?.timeCategory ?? null,
         sevenRStrategy: application?.sevenRStrategy ?? null,
+        sovereigntyAchDataResidency: application?.sovereigntyAchDataResidency ?? null,
+        sovereigntyAchJurisdictionControl: application?.sovereigntyAchJurisdictionControl ?? null,
+        sovereigntyAchOperationalControl: application?.sovereigntyAchOperationalControl ?? null,
+        sovereigntyAchInteroperability: application?.sovereigntyAchInteroperability ?? null,
+        sovereigntyAchPortability: application?.sovereigntyAchPortability ?? null,
+        sovereigntyAchSupplyChainTransparency:
+          application?.sovereigntyAchSupplyChainTransparency ?? null,
+        sovereigntyEvidence: application?.sovereigntyEvidence ?? '',
+        lastSovereigntyAssessmentAt: application?.lastSovereigntyAssessmentAt
+          ? new Date(application.lastSovereigntyAssessmentAt)
+          : null,
       }
 
       setCurrentTimeCategory(resetValues.timeCategory)
@@ -723,6 +759,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     ...(isSupEnabled ? [{ id: 'suppliers', label: tTabs('suppliers') }] : []),
     { id: 'architectures', label: tTabs('architectures') },
     { id: 'principles', label: tTabs('principles') },
+    ...(isSovereigntyEnabled ? [{ id: 'sovereignty', label: tCommon('sovereignty.tab') }] : []),
   ]
 
   // Felder für das Formular definieren
@@ -1423,6 +1460,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
       },
       onChipClick: createChipClickHandler('depictedInDiagrams'),
     },
+    ...(isSovereigntyEnabled ? buildSovereigntyAchievedFields(tCommon) : []),
 
     // Prinzipien (Tab: principles)
     {

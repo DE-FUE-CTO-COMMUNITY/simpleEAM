@@ -259,6 +259,15 @@ const ApplicationsPage = () => {
     const input = {
       name: applicationData.name,
       description: applicationData.description,
+      sovereigntyAchDataResidency: applicationData.sovereigntyAchDataResidency,
+      sovereigntyAchJurisdictionControl: applicationData.sovereigntyAchJurisdictionControl,
+      sovereigntyAchOperationalControl: applicationData.sovereigntyAchOperationalControl,
+      sovereigntyAchInteroperability: applicationData.sovereigntyAchInteroperability,
+      sovereigntyAchPortability: applicationData.sovereigntyAchPortability,
+      sovereigntyAchSupplyChainTransparency:
+        applicationData.sovereigntyAchSupplyChainTransparency,
+      sovereigntyEvidence: applicationData.sovereigntyEvidence,
+      lastSovereigntyAssessmentAt: applicationData.lastSovereigntyAssessmentAt,
       status: applicationData.status,
       criticality: applicationData.criticality,
       timeCategory: applicationData.timeCategory,
@@ -470,6 +479,20 @@ const ApplicationsPage = () => {
     const input: Record<string, any> = {
       name: { set: applicationData.name },
       description: { set: applicationData.description },
+      sovereigntyAchDataResidency: { set: applicationData.sovereigntyAchDataResidency ?? null },
+      sovereigntyAchJurisdictionControl: {
+        set: applicationData.sovereigntyAchJurisdictionControl ?? null,
+      },
+      sovereigntyAchOperationalControl: {
+        set: applicationData.sovereigntyAchOperationalControl ?? null,
+      },
+      sovereigntyAchInteroperability: { set: applicationData.sovereigntyAchInteroperability ?? null },
+      sovereigntyAchPortability: { set: applicationData.sovereigntyAchPortability ?? null },
+      sovereigntyAchSupplyChainTransparency: {
+        set: applicationData.sovereigntyAchSupplyChainTransparency ?? null,
+      },
+      sovereigntyEvidence: { set: applicationData.sovereigntyEvidence ?? null },
+      lastSovereigntyAssessmentAt: { set: applicationData.lastSovereigntyAssessmentAt ?? null },
       status: { set: applicationData.status },
       criticality: { set: applicationData.criticality },
       costs: { set: applicationData.costs },

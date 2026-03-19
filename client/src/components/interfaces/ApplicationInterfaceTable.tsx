@@ -345,6 +345,19 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
       protocol: applicationInterface.protocol ?? null,
       version: applicationInterface.version ?? null,
       status: applicationInterface.status,
+      sovereigntyAchDataResidency: applicationInterface.sovereigntyAchDataResidency ?? null,
+      sovereigntyAchJurisdictionControl:
+        applicationInterface.sovereigntyAchJurisdictionControl ?? null,
+      sovereigntyAchOperationalControl:
+        applicationInterface.sovereigntyAchOperationalControl ?? null,
+      sovereigntyAchInteroperability: applicationInterface.sovereigntyAchInteroperability ?? null,
+      sovereigntyAchPortability: applicationInterface.sovereigntyAchPortability ?? null,
+      sovereigntyAchSupplyChainTransparency:
+        applicationInterface.sovereigntyAchSupplyChainTransparency ?? null,
+      sovereigntyEvidence: applicationInterface.sovereigntyEvidence ?? '',
+      lastSovereigntyAssessmentAt: applicationInterface.lastSovereigntyAssessmentAt
+        ? new Date(applicationInterface.lastSovereigntyAssessmentAt)
+        : null,
       introductionDate: applicationInterface.introductionDate ?? null,
       endOfLifeDate: applicationInterface.endOfLifeDate ?? null,
       owners:

@@ -6,6 +6,14 @@ export const GET_BUSINESS_PROCESSES = gql`
       id
       name
       description
+      sovereigntyReqDataResidency
+      sovereigntyReqJurisdictionControl
+      sovereigntyReqOperationalControl
+      sovereigntyReqInteroperability
+      sovereigntyReqPortability
+      sovereigntyReqSupplyChainTransparency
+      sovereigntyReqWeight
+      sovereigntyReqRationale
       processType
       status
       maturityLevel
@@ -77,6 +85,14 @@ export const CREATE_BUSINESS_PROCESS = gql`
       businessProcesses {
         id
         name
+        sovereigntyReqDataResidency
+        sovereigntyReqJurisdictionControl
+        sovereigntyReqOperationalControl
+        sovereigntyReqInteroperability
+        sovereigntyReqPortability
+        sovereigntyReqSupplyChainTransparency
+        sovereigntyReqWeight
+        sovereigntyReqRationale
         processType
         status
         maturityLevel
@@ -95,6 +111,14 @@ export const UPDATE_BUSINESS_PROCESS = gql`
       businessProcesses {
         id
         name
+        sovereigntyReqDataResidency
+        sovereigntyReqJurisdictionControl
+        sovereigntyReqOperationalControl
+        sovereigntyReqInteroperability
+        sovereigntyReqPortability
+        sovereigntyReqSupplyChainTransparency
+        sovereigntyReqWeight
+        sovereigntyReqRationale
         processType
         status
         maturityLevel

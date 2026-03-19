@@ -19,6 +19,14 @@ export const GET_CAPABILITIES = gql`
       name
       description
       maturityLevel
+      sovereigntyReqDataResidency
+      sovereigntyReqJurisdictionControl
+      sovereigntyReqOperationalControl
+      sovereigntyReqInteroperability
+      sovereigntyReqPortability
+      sovereigntyReqSupplyChainTransparency
+      sovereigntyReqWeight
+      sovereigntyReqRationale
       status
       type
       businessValue
@@ -72,6 +80,14 @@ export const GET_CAPABILITY = gql`
       name
       description
       maturityLevel
+      sovereigntyReqDataResidency
+      sovereigntyReqJurisdictionControl
+      sovereigntyReqOperationalControl
+      sovereigntyReqInteroperability
+      sovereigntyReqPortability
+      sovereigntyReqSupplyChainTransparency
+      sovereigntyReqWeight
+      sovereigntyReqRationale
       status
       type
       businessValue
@@ -126,6 +142,14 @@ export const CREATE_CAPABILITY = gql`
         name
         description
         maturityLevel
+        sovereigntyReqDataResidency
+        sovereigntyReqJurisdictionControl
+        sovereigntyReqOperationalControl
+        sovereigntyReqInteroperability
+        sovereigntyReqPortability
+        sovereigntyReqSupplyChainTransparency
+        sovereigntyReqWeight
+        sovereigntyReqRationale
         status
         type
         businessValue
@@ -146,6 +170,14 @@ export const UPDATE_CAPABILITY = gql`
         name
         description
         maturityLevel
+        sovereigntyReqDataResidency
+        sovereigntyReqJurisdictionControl
+        sovereigntyReqOperationalControl
+        sovereigntyReqInteroperability
+        sovereigntyReqPortability
+        sovereigntyReqSupplyChainTransparency
+        sovereigntyReqWeight
+        sovereigntyReqRationale
         status
         type
         businessValue

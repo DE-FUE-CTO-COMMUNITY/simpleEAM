@@ -18,6 +18,14 @@ export const GET_ARCHITECTURE_PRINCIPLES = gql`
       id
       name
       description
+      sovereigntyReqDataResidency
+      sovereigntyReqJurisdictionControl
+      sovereigntyReqOperationalControl
+      sovereigntyReqInteroperability
+      sovereigntyReqPortability
+      sovereigntyReqSupplyChainTransparency
+      sovereigntyReqWeight
+      sovereigntyReqRationale
       category
       priority
       rationale
@@ -54,6 +62,14 @@ export const CREATE_ARCHITECTURE_PRINCIPLE = gql`
         id
         name
         description
+        sovereigntyReqDataResidency
+        sovereigntyReqJurisdictionControl
+        sovereigntyReqOperationalControl
+        sovereigntyReqInteroperability
+        sovereigntyReqPortability
+        sovereigntyReqSupplyChainTransparency
+        sovereigntyReqWeight
+        sovereigntyReqRationale
         category
         priority
         rationale
@@ -81,6 +97,14 @@ export const UPDATE_ARCHITECTURE_PRINCIPLE = gql`
         id
         name
         description
+        sovereigntyReqDataResidency
+        sovereigntyReqJurisdictionControl
+        sovereigntyReqOperationalControl
+        sovereigntyReqInteroperability
+        sovereigntyReqPortability
+        sovereigntyReqSupplyChainTransparency
+        sovereigntyReqWeight
+        sovereigntyReqRationale
         category
         priority
         rationale

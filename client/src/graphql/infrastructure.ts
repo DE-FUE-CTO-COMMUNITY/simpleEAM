@@ -26,6 +26,14 @@ export const GET_INFRASTRUCTURES = gql`
       id
       name
       description
+      sovereigntyAchDataResidency
+      sovereigntyAchJurisdictionControl
+      sovereigntyAchOperationalControl
+      sovereigntyAchInteroperability
+      sovereigntyAchPortability
+      sovereigntyAchSupplyChainTransparency
+      sovereigntyEvidence
+      lastSovereigntyAssessmentAt
       infrastructureType
       status
       vendor
@@ -90,6 +98,14 @@ export const GET_INFRASTRUCTURE = gql`
       id
       name
       description
+      sovereigntyAchDataResidency
+      sovereigntyAchJurisdictionControl
+      sovereigntyAchOperationalControl
+      sovereigntyAchInteroperability
+      sovereigntyAchPortability
+      sovereigntyAchSupplyChainTransparency
+      sovereigntyEvidence
+      lastSovereigntyAssessmentAt
       infrastructureType
       status
       vendor
@@ -155,6 +171,14 @@ export const CREATE_INFRASTRUCTURE = gql`
         id
         name
         description
+        sovereigntyAchDataResidency
+        sovereigntyAchJurisdictionControl
+        sovereigntyAchOperationalControl
+        sovereigntyAchInteroperability
+        sovereigntyAchPortability
+        sovereigntyAchSupplyChainTransparency
+        sovereigntyEvidence
+        lastSovereigntyAssessmentAt
         infrastructureType
         status
         vendor
@@ -209,6 +233,14 @@ export const UPDATE_INFRASTRUCTURE = gql`
         id
         name
         description
+        sovereigntyAchDataResidency
+        sovereigntyAchJurisdictionControl
+        sovereigntyAchOperationalControl
+        sovereigntyAchInteroperability
+        sovereigntyAchPortability
+        sovereigntyAchSupplyChainTransparency
+        sovereigntyEvidence
+        lastSovereigntyAssessmentAt
         infrastructureType
         status
         vendor
