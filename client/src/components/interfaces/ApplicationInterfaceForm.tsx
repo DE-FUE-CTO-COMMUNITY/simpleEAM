@@ -69,9 +69,7 @@ const createBaseApplicationInterfaceSchema = (t: any) =>
     sovereigntyAchOperationalControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
     sovereigntyAchInteroperability: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
     sovereigntyAchPortability: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyAchSupplyChainTransparency: z.nativeEnum(SovereigntyMaturity)
-      .optional()
-      .nullable(),
+    sovereigntyAchSupplyChainTransparency: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
     sovereigntyEvidence: z.string().optional().nullable(),
     lastSovereigntyAssessmentAt: z.date().optional().nullable(),
   })
@@ -384,7 +382,8 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       sovereigntyAchDataResidency: applicationInterface?.sovereigntyAchDataResidency || null,
       sovereigntyAchJurisdictionControl:
         applicationInterface?.sovereigntyAchJurisdictionControl || null,
-      sovereigntyAchOperationalControl: applicationInterface?.sovereigntyAchOperationalControl || null,
+      sovereigntyAchOperationalControl:
+        applicationInterface?.sovereigntyAchOperationalControl || null,
       sovereigntyAchInteroperability: applicationInterface?.sovereigntyAchInteroperability || null,
       sovereigntyAchPortability: applicationInterface?.sovereigntyAchPortability || null,
       sovereigntyAchSupplyChainTransparency:

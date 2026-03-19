@@ -357,8 +357,12 @@ const AicomponentsPage = () => {
         name: { set: baseData.name },
         description: { set: baseData.description },
         sovereigntyAchDataResidency: { set: baseData.sovereigntyAchDataResidency ?? null },
-        sovereigntyAchJurisdictionControl: { set: baseData.sovereigntyAchJurisdictionControl ?? null },
-        sovereigntyAchOperationalControl: { set: baseData.sovereigntyAchOperationalControl ?? null },
+        sovereigntyAchJurisdictionControl: {
+          set: baseData.sovereigntyAchJurisdictionControl ?? null,
+        },
+        sovereigntyAchOperationalControl: {
+          set: baseData.sovereigntyAchOperationalControl ?? null,
+        },
         sovereigntyAchInteroperability: { set: baseData.sovereigntyAchInteroperability ?? null },
         sovereigntyAchPortability: { set: baseData.sovereigntyAchPortability ?? null },
         sovereigntyAchSupplyChainTransparency: {

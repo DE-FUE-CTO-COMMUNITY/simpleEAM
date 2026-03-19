@@ -222,7 +222,8 @@ const ArchitecturePrincipleTable: React.FC<ArchitecturePrincipleTableProps> = ({
       sovereigntyReqOperationalControl: principle.sovereigntyReqOperationalControl ?? null,
       sovereigntyReqInteroperability: principle.sovereigntyReqInteroperability ?? null,
       sovereigntyReqPortability: principle.sovereigntyReqPortability ?? null,
-      sovereigntyReqSupplyChainTransparency: principle.sovereigntyReqSupplyChainTransparency ?? null,
+      sovereigntyReqSupplyChainTransparency:
+        principle.sovereigntyReqSupplyChainTransparency ?? null,
       sovereigntyReqWeight: principle.sovereigntyReqWeight ?? null,
       sovereigntyReqRationale: principle.sovereigntyReqRationale ?? '',
       tags: principle.tags ?? [],

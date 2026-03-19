@@ -50,9 +50,7 @@ const createArchitecturePrincipleSchema = (t: any) =>
     sovereigntyReqOperationalControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
     sovereigntyReqInteroperability: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
     sovereigntyReqPortability: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyReqSupplyChainTransparency: z.nativeEnum(SovereigntyMaturity)
-      .optional()
-      .nullable(),
+    sovereigntyReqSupplyChainTransparency: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
     sovereigntyReqWeight: z.number().optional().nullable(),
     sovereigntyReqRationale: z.string().optional().nullable(),
   })

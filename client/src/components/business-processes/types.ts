@@ -1,7 +1,12 @@
 'use client'
 
 import { z } from 'zod'
-import { BusinessProcess, ProcessStatus, ProcessType, SovereigntyMaturity } from '../../gql/generated'
+import {
+  BusinessProcess,
+  ProcessStatus,
+  ProcessType,
+  SovereigntyMaturity,
+} from '../../gql/generated'
 
 export const businessProcessSchema = z.object({
   name: z.string().min(3).max(100),

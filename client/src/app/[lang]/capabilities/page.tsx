@@ -261,8 +261,12 @@ const CapabilitiesPage = () => {
       sovereigntyReqJurisdictionControl: {
         set: capabilityData.sovereigntyReqJurisdictionControl ?? null,
       },
-      sovereigntyReqOperationalControl: { set: capabilityData.sovereigntyReqOperationalControl ?? null },
-      sovereigntyReqInteroperability: { set: capabilityData.sovereigntyReqInteroperability ?? null },
+      sovereigntyReqOperationalControl: {
+        set: capabilityData.sovereigntyReqOperationalControl ?? null,
+      },
+      sovereigntyReqInteroperability: {
+        set: capabilityData.sovereigntyReqInteroperability ?? null,
+      },
       sovereigntyReqPortability: { set: capabilityData.sovereigntyReqPortability ?? null },
       sovereigntyReqSupplyChainTransparency: {
         set: capabilityData.sovereigntyReqSupplyChainTransparency ?? null,

@@ -264,8 +264,7 @@ const ApplicationsPage = () => {
       sovereigntyAchOperationalControl: applicationData.sovereigntyAchOperationalControl,
       sovereigntyAchInteroperability: applicationData.sovereigntyAchInteroperability,
       sovereigntyAchPortability: applicationData.sovereigntyAchPortability,
-      sovereigntyAchSupplyChainTransparency:
-        applicationData.sovereigntyAchSupplyChainTransparency,
+      sovereigntyAchSupplyChainTransparency: applicationData.sovereigntyAchSupplyChainTransparency,
       sovereigntyEvidence: applicationData.sovereigntyEvidence,
       lastSovereigntyAssessmentAt: applicationData.lastSovereigntyAssessmentAt,
       status: applicationData.status,
@@ -486,7 +485,9 @@ const ApplicationsPage = () => {
       sovereigntyAchOperationalControl: {
         set: applicationData.sovereigntyAchOperationalControl ?? null,
       },
-      sovereigntyAchInteroperability: { set: applicationData.sovereigntyAchInteroperability ?? null },
+      sovereigntyAchInteroperability: {
+        set: applicationData.sovereigntyAchInteroperability ?? null,
+      },
       sovereigntyAchPortability: { set: applicationData.sovereigntyAchPortability ?? null },
       sovereigntyAchSupplyChainTransparency: {
         set: applicationData.sovereigntyAchSupplyChainTransparency ?? null,

@@ -168,9 +168,7 @@ export default function AicomponentForm({
     sovereigntyAchOperationalControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
     sovereigntyAchInteroperability: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
     sovereigntyAchPortability: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyAchSupplyChainTransparency: z.nativeEnum(SovereigntyMaturity)
-      .optional()
-      .nullable(),
+    sovereigntyAchSupplyChainTransparency: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
     sovereigntyEvidence: z.string().optional(),
     lastSovereigntyAssessmentAt: z.date().optional().nullable(),
   })

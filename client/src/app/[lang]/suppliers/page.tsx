@@ -297,7 +297,9 @@ const SuppliersPage = () => {
                 const input: Record<string, any> = {
                   name: { set: supplierData.name },
                   description: { set: supplierData.description },
-                  sovereigntyAchDataResidency: { set: supplierData.sovereigntyAchDataResidency ?? null },
+                  sovereigntyAchDataResidency: {
+                    set: supplierData.sovereigntyAchDataResidency ?? null,
+                  },
                   sovereigntyAchJurisdictionControl: {
                     set: supplierData.sovereigntyAchJurisdictionControl ?? null,
                   },
@@ -307,12 +309,16 @@ const SuppliersPage = () => {
                   sovereigntyAchInteroperability: {
                     set: supplierData.sovereigntyAchInteroperability ?? null,
                   },
-                  sovereigntyAchPortability: { set: supplierData.sovereigntyAchPortability ?? null },
+                  sovereigntyAchPortability: {
+                    set: supplierData.sovereigntyAchPortability ?? null,
+                  },
                   sovereigntyAchSupplyChainTransparency: {
                     set: supplierData.sovereigntyAchSupplyChainTransparency ?? null,
                   },
                   sovereigntyEvidence: { set: supplierData.sovereigntyEvidence ?? null },
-                  lastSovereigntyAssessmentAt: { set: supplierData.lastSovereigntyAssessmentAt ?? null },
+                  lastSovereigntyAssessmentAt: {
+                    set: supplierData.lastSovereigntyAssessmentAt ?? null,
+                  },
                   supplierType: { set: supplierData.supplierType },
                   status: { set: supplierData.status },
                   address: { set: supplierData.address },

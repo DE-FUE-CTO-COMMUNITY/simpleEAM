@@ -21,7 +21,12 @@ import { GET_DATA_OBJECTS, GET_DATA_OBJECT } from '@/graphql/dataObject'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import { useCurrentPerson } from '@/hooks/useCurrentPerson'
 import { useFeatureFlags } from '@/lib/feature-flags'
-import { DataObject, DataClassification, Architecture, SovereigntyMaturity } from '../../gql/generated'
+import {
+  DataObject,
+  DataClassification,
+  Architecture,
+  SovereigntyMaturity,
+} from '../../gql/generated'
 import GenericForm, { FieldConfig } from '../common/GenericForm'
 import { isArchitect } from '@/lib/auth'
 import { useChipClickHandlers } from '@/hooks/useChipClickHandlers'
@@ -58,9 +63,7 @@ const createBaseDataObjectSchema = (t: any) =>
     sovereigntyReqOperationalControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
     sovereigntyReqInteroperability: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
     sovereigntyReqPortability: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyReqSupplyChainTransparency: z.nativeEnum(SovereigntyMaturity)
-      .optional()
-      .nullable(),
+    sovereigntyReqSupplyChainTransparency: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
     sovereigntyReqWeight: z.number().optional().nullable(),
     sovereigntyReqRationale: z.string().optional().nullable(),
   })

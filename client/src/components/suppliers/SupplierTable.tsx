@@ -380,8 +380,7 @@ const SupplierTable: React.FC<SupplierTableProps> = ({
       sovereigntyAchOperationalControl: supplier.sovereigntyAchOperationalControl ?? null,
       sovereigntyAchInteroperability: supplier.sovereigntyAchInteroperability ?? null,
       sovereigntyAchPortability: supplier.sovereigntyAchPortability ?? null,
-      sovereigntyAchSupplyChainTransparency:
-        supplier.sovereigntyAchSupplyChainTransparency ?? null,
+      sovereigntyAchSupplyChainTransparency: supplier.sovereigntyAchSupplyChainTransparency ?? null,
       sovereigntyEvidence: supplier.sovereigntyEvidence ?? '',
       lastSovereigntyAssessmentAt: supplier.lastSovereigntyAssessmentAt
         ? new Date(supplier.lastSovereigntyAssessmentAt)

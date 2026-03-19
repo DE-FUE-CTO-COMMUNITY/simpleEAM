@@ -41,9 +41,7 @@ const createBusinessProcessSchema = (t: any) =>
     sovereigntyReqOperationalControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
     sovereigntyReqInteroperability: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
     sovereigntyReqPortability: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyReqSupplyChainTransparency: z.nativeEnum(SovereigntyMaturity)
-      .optional()
-      .nullable(),
+    sovereigntyReqSupplyChainTransparency: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
     sovereigntyReqWeight: z.number().optional().nullable(),
     sovereigntyReqRationale: z.string().optional().nullable(),
   })
@@ -127,8 +125,7 @@ const BusinessProcessForm: React.FC<BusinessProcessFormProps> = ({
         businessProcess?.partOfArchitectures?.map(architecture => architecture.id) || [],
       depictedInDiagrams: businessProcess?.depictedInDiagrams?.map(diagram => diagram.id) || [],
       sovereigntyReqDataResidency: businessProcess?.sovereigntyReqDataResidency || null,
-      sovereigntyReqJurisdictionControl:
-        businessProcess?.sovereigntyReqJurisdictionControl || null,
+      sovereigntyReqJurisdictionControl: businessProcess?.sovereigntyReqJurisdictionControl || null,
       sovereigntyReqOperationalControl: businessProcess?.sovereigntyReqOperationalControl || null,
       sovereigntyReqInteroperability: businessProcess?.sovereigntyReqInteroperability || null,
       sovereigntyReqPortability: businessProcess?.sovereigntyReqPortability || null,

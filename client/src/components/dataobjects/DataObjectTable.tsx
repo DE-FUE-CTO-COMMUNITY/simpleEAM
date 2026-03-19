@@ -288,7 +288,8 @@ const DataObjectTable: React.FC<DataObjectTableProps> = ({
       sovereigntyReqOperationalControl: dataObject.sovereigntyReqOperationalControl || null,
       sovereigntyReqInteroperability: dataObject.sovereigntyReqInteroperability || null,
       sovereigntyReqPortability: dataObject.sovereigntyReqPortability || null,
-      sovereigntyReqSupplyChainTransparency: dataObject.sovereigntyReqSupplyChainTransparency || null,
+      sovereigntyReqSupplyChainTransparency:
+        dataObject.sovereigntyReqSupplyChainTransparency || null,
       sovereigntyReqWeight: dataObject.sovereigntyReqWeight || null,
       sovereigntyReqRationale: dataObject.sovereigntyReqRationale || '',
       format: dataObject.format || undefined,
