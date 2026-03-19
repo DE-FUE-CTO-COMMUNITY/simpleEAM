@@ -1,4 +1,4 @@
-import { InfrastructureType, InfrastructureStatus } from '../../gql/generated'
+import { InfrastructureType, InfrastructureStatus, SovereigntyMaturity } from '../../gql/generated'
 
 /**
  * Simplified version of Owner type for example data
@@ -27,6 +27,14 @@ export interface Infrastructure {
   specifications?: string | null
   maintenanceWindow?: string | null
   costs?: number | null
+  sovereigntyAchDataResidency?: SovereigntyMaturity | null
+  sovereigntyAchJurisdictionControl?: SovereigntyMaturity | null
+  sovereigntyAchOperationalControl?: SovereigntyMaturity | null
+  sovereigntyAchInteroperability?: SovereigntyMaturity | null
+  sovereigntyAchPortability?: SovereigntyMaturity | null
+  sovereigntyAchSupplyChainTransparency?: SovereigntyMaturity | null
+  sovereigntyEvidence?: string | null
+  lastSovereigntyAssessmentAt?: string | null
   planningDate?: string | null
   introductionDate?: string | null
   endOfUseDate?: string | null
@@ -53,6 +61,14 @@ export interface InfrastructureFormValues {
   specifications?: string
   maintenanceWindow?: string
   costs?: number
+  sovereigntyAchDataResidency?: SovereigntyMaturity | null
+  sovereigntyAchJurisdictionControl?: SovereigntyMaturity | null
+  sovereigntyAchOperationalControl?: SovereigntyMaturity | null
+  sovereigntyAchInteroperability?: SovereigntyMaturity | null
+  sovereigntyAchPortability?: SovereigntyMaturity | null
+  sovereigntyAchSupplyChainTransparency?: SovereigntyMaturity | null
+  sovereigntyEvidence?: string
+  lastSovereigntyAssessmentAt?: Date | null
   planningDate?: string
   introductionDate?: string
   endOfUseDate?: string

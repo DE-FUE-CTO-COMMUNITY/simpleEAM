@@ -331,7 +331,7 @@ const ArchitecturePrincipleForm: React.FC<
 
   // Field configuration for the generic form
   interface SelectOption {
-    value: string | number | boolean
+    value: string | number | boolean | null
     label: string
   }
 
@@ -481,10 +481,12 @@ const ArchitecturePrincipleForm: React.FC<
   ]
 
   // Combine all fields
-  const fields: FieldConfigWithSelect[] = [
+  const fields: FieldConfig[] = [
     ...generalFields,
     ...relationshipFields,
-    ...(isSovereigntyEnabled ? buildSovereigntyRequirementFields(tCommon) : []),
+    ...(isSovereigntyEnabled
+      ? buildSovereigntyRequirementFields((key: string) => tCommon(key as any))
+      : []),
   ]
 
   // Provide default values for optional props

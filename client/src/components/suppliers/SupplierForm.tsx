@@ -715,7 +715,9 @@ const SupplierForm: React.FC<GenericFormProps<Supplier, SupplierFormValues>> = (
       },
       onChipClick: createChipClickHandler('maintainsAIComponentIds'),
     },
-    ...(isSovereigntyEnabled ? buildSovereigntyAchievedFields(tCommon) : []),
+    ...(isSovereigntyEnabled
+      ? buildSovereigntyAchievedFields((key: string) => tCommon(key as any))
+      : []),
   ]
 
   return (

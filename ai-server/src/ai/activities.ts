@@ -1753,7 +1753,12 @@ export async function computeSovereigntyScores(input: {
       ? (achievedSovereigntyScore / expectedSovereigntyScore) * 100
       : null
 
-  return { expectedSovereigntyScore, achievedSovereigntyScore, sovereigntyGap, sovereigntyScorePercent }
+  return {
+    expectedSovereigntyScore,
+    achievedSovereigntyScore,
+    sovereigntyGap,
+    sovereigntyScorePercent,
+  }
 }
 
 export async function updateCompanySovereigntyScores(input: {

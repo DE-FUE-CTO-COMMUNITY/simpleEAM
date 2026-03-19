@@ -6,6 +6,7 @@ import {
   AiComponent as GeneratedAiComponent,
   AiComponentType,
   AiComponentStatus,
+  SovereigntyMaturity,
   Person,
   BusinessCapability,
   Application,
@@ -35,6 +36,14 @@ export type AicomponentType = Pick<
   | 'license'
   | 'costs'
   | 'tags'
+  | 'sovereigntyAchDataResidency'
+  | 'sovereigntyAchJurisdictionControl'
+  | 'sovereigntyAchOperationalControl'
+  | 'sovereigntyAchInteroperability'
+  | 'sovereigntyAchPortability'
+  | 'sovereigntyAchSupplyChainTransparency'
+  | 'sovereigntyEvidence'
+  | 'lastSovereigntyAssessmentAt'
   | 'createdAt'
   | 'updatedAt'
 > & {
@@ -80,6 +89,14 @@ export interface AicomponentFormValues {
   partOfArchitectureIds?: string[]
   implementsPrincipleIds?: string[]
   depictedInDiagramIds?: string[]
+  sovereigntyAchDataResidency?: SovereigntyMaturity | null
+  sovereigntyAchJurisdictionControl?: SovereigntyMaturity | null
+  sovereigntyAchOperationalControl?: SovereigntyMaturity | null
+  sovereigntyAchInteroperability?: SovereigntyMaturity | null
+  sovereigntyAchPortability?: SovereigntyMaturity | null
+  sovereigntyAchSupplyChainTransparency?: SovereigntyMaturity | null
+  sovereigntyEvidence?: string
+  lastSovereigntyAssessmentAt?: Date | null
 }
 
 // Column Visibility für Tables

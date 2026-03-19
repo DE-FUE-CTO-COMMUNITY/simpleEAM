@@ -79,6 +79,14 @@ export type ApplicationType = Pick<
   | 'maintainedBy'
   | 'predecessors'
   | 'successors'
+  | 'sovereigntyAchDataResidency'
+  | 'sovereigntyAchJurisdictionControl'
+  | 'sovereigntyAchOperationalControl'
+  | 'sovereigntyAchInteroperability'
+  | 'sovereigntyAchPortability'
+  | 'sovereigntyAchSupplyChainTransparency'
+  | 'sovereigntyEvidence'
+  | 'lastSovereigntyAssessmentAt'
 >
 
 export interface FilterState {

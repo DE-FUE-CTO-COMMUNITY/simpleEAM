@@ -108,11 +108,11 @@ export const POST = withAuth(async (request: NextRequest, auth: AuthResult) => {
           continue
         }
         const gqlData = await gqlResp.json()
-        const people = gqlData?.data?.people || []
+        const people = (gqlData?.data?.people || []) as Array<{ companies?: Array<{ id?: string }> }>
 
         // Aggregate IDs across all matching persons (if duplicates exist)
         const companyIdsRaw: string[] = people.flatMap(person => {
-          const companies = (person?.companies ?? []) as Array<{ id?: string }>
+          const companies = person.companies ?? []
           return Array.isArray(companies)
             ? companies.map(c => c.id).filter((id): id is string => Boolean(id))
             : []

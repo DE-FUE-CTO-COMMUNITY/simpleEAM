@@ -419,18 +419,11 @@ const InfrastructureForm: React.FC<GenericFormProps<Infrastructure, Infrastructu
 
   // Field configuration for the generic form
   interface SelectOption {
-    value: string | number
+    value: string | number | boolean | null
     label: string
   }
 
-  interface FieldConfigWithSelect extends FieldConfig {
-    options?: SelectOption[]
-    loadingOptions?: boolean
-    rows?: number
-    size?: { xs: number; md: number } | number
-  }
-
-  const fields: FieldConfigWithSelect[] = [
+  const fields: FieldConfig[] = [
     {
       name: 'name',
       label: t('name'),
@@ -858,7 +851,9 @@ const InfrastructureForm: React.FC<GenericFormProps<Infrastructure, Infrastructu
       },
       onChipClick: createChipClickHandler('depictedInDiagrams'),
     },
-    ...(isSovereigntyEnabled ? buildSovereigntyAchievedFields(tCommon) : []),
+    ...(isSovereigntyEnabled
+      ? buildSovereigntyAchievedFields((key: string) => tCommon(key as any))
+      : []),
   ]
 
   return (

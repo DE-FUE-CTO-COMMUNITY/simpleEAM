@@ -307,18 +307,11 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
 
   // Field configuration for the generic form
   interface SelectOption {
-    value: string | number
+    value: string | number | boolean | null
     label: string
   }
 
-  interface FieldConfigWithSelect extends FieldConfig {
-    options?: SelectOption[]
-    loadingOptions?: boolean
-    rows?: number
-    size?: { xs: number; md: number } | number
-  }
-
-  const fields: FieldConfigWithSelect[] = [
+  const fields: FieldConfig[] = [
     {
       name: 'name',
       label: tForm('name'),
@@ -590,7 +583,9 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
       size: { xs: 12, md: 6 },
       tabId: 'lifecycle',
     },
-    ...(isSovereigntyEnabled ? buildSovereigntyRequirementFields(tCommon) : []),
+    ...(isSovereigntyEnabled
+      ? buildSovereigntyRequirementFields((key: string) => tCommon(key as any))
+      : []),
   ]
 
   // Tabs-Konfiguration

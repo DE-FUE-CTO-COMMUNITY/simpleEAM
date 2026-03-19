@@ -1,4 +1,4 @@
-import { DataClassification } from '../../gql/generated'
+import { DataClassification, SovereigntyMaturity } from '../../gql/generated'
 
 /**
  * Simplified version of Owner type for example data
@@ -19,6 +19,14 @@ export interface DataObject {
   classification: DataClassification
   format?: string | null
   source?: string | null
+  sovereigntyReqDataResidency?: SovereigntyMaturity | null
+  sovereigntyReqJurisdictionControl?: SovereigntyMaturity | null
+  sovereigntyReqOperationalControl?: SovereigntyMaturity | null
+  sovereigntyReqInteroperability?: SovereigntyMaturity | null
+  sovereigntyReqPortability?: SovereigntyMaturity | null
+  sovereigntyReqSupplyChainTransparency?: SovereigntyMaturity | null
+  sovereigntyReqWeight?: number | null
+  sovereigntyReqRationale?: string | null
   owners: SimplePerson[]
   createdAt: string
   updatedAt?: string | null
@@ -33,6 +41,14 @@ export interface DataObjectFormValues {
   classification: DataClassification
   format?: string
   source?: string
+  sovereigntyReqDataResidency?: SovereigntyMaturity | null
+  sovereigntyReqJurisdictionControl?: SovereigntyMaturity | null
+  sovereigntyReqOperationalControl?: SovereigntyMaturity | null
+  sovereigntyReqInteroperability?: SovereigntyMaturity | null
+  sovereigntyReqPortability?: SovereigntyMaturity | null
+  sovereigntyReqSupplyChainTransparency?: SovereigntyMaturity | null
+  sovereigntyReqWeight?: number | null
+  sovereigntyReqRationale?: string
   ownerId?: string
 }
 

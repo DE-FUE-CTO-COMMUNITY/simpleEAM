@@ -23,6 +23,14 @@ export type ArchitecturePrincipleType = Pick<
   | 'owners'
   | 'appliedInArchitectures'
   | 'implementedByApplications'
+  | 'sovereigntyReqDataResidency'
+  | 'sovereigntyReqJurisdictionControl'
+  | 'sovereigntyReqOperationalControl'
+  | 'sovereigntyReqInteroperability'
+  | 'sovereigntyReqPortability'
+  | 'sovereigntyReqSupplyChainTransparency'
+  | 'sovereigntyReqWeight'
+  | 'sovereigntyReqRationale'
 >
 
 export interface FilterState {

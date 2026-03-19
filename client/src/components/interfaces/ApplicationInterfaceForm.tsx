@@ -848,7 +848,9 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       },
       onChipClick: createChipClickHandler('depictedInDiagrams'),
     },
-    ...(isSovereigntyEnabled ? buildSovereigntyAchievedFields(tCommon) : []),
+    ...(isSovereigntyEnabled
+      ? buildSovereigntyAchievedFields((key: string) => tCommon(key as any))
+      : []),
   ]
 
   return (

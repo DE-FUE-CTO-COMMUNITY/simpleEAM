@@ -367,7 +367,9 @@ const BusinessProcessForm: React.FC<BusinessProcessFormProps> = ({
         return option.value === value?.value || option.value === value
       },
     },
-    ...(isSovereigntyEnabled ? buildSovereigntyRequirementFields(tCommon) : []),
+    ...(isSovereigntyEnabled
+      ? buildSovereigntyRequirementFields((key: string) => tCommon(key as any))
+      : []),
   ]
 
   const tabs: TabConfig[] = [

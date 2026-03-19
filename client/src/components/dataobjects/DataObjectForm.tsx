@@ -348,15 +348,8 @@ const DataObjectForm: React.FC<GenericFormProps<DataObject, DataObjectFormValues
 
   // Field configuration for the generic form
   interface SelectOption {
-    value: string | number
+    value: string | number | boolean | null
     label: string
-  }
-
-  interface FieldConfigWithSelect extends FieldConfig {
-    options?: SelectOption[]
-    loadingOptions?: boolean
-    rows?: number
-    size?: { xs: number; md: number } | number
   }
 
   // Dynamic tab configuration with translations
@@ -371,7 +364,7 @@ const DataObjectForm: React.FC<GenericFormProps<DataObject, DataObjectFormValues
     [isSovereigntyEnabled, tCommon, tTabs]
   )
 
-  const fields: FieldConfigWithSelect[] = [
+  const fields: FieldConfig[] = [
     {
       name: 'name',
       label: t('name'),
@@ -693,7 +686,9 @@ const DataObjectForm: React.FC<GenericFormProps<DataObject, DataObjectFormValues
       },
       onChipClick: createChipClickHandler('depictedInDiagrams'),
     },
-    ...(isSovereigntyEnabled ? buildSovereigntyRequirementFields(tCommon) : []),
+    ...(isSovereigntyEnabled
+      ? buildSovereigntyRequirementFields((key: string) => tCommon(key as any))
+      : []),
   ]
 
   return (

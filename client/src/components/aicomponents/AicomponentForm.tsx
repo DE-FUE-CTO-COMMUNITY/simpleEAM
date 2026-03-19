@@ -1074,7 +1074,9 @@ export default function AicomponentForm({
         }
         return option?.label || ''
       },
-      ...(isSovereigntyEnabled ? buildSovereigntyAchievedFields(tCommon) : []),
+      ...(isSovereigntyEnabled
+        ? buildSovereigntyAchievedFields((key: string) => tCommon(key as any))
+        : []),
       isOptionEqualToValue: (option: any, value: any) => {
         if (typeof value === 'string') {
           return option.value === value
