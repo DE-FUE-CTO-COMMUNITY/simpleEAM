@@ -1,8 +1,9 @@
 import { Connection, WorkflowClient } from '@temporalio/client'
-import { AiRunWorkflowInput } from './types'
+import { AiRunWorkflowInput, SovereigntyScoreWorkflowInput } from './types'
 
 export const AI_RUN_TASK_QUEUE = process.env.AI_RUN_TASK_QUEUE || 'nextgen-eam-ai'
 export const AI_RUN_WORKFLOW_NAME = 'aiRunWorkflow'
+export const SOVEREIGNTY_SCORE_WORKFLOW_NAME = 'sovereigntyScoreWorkflow'
 
 const getTemporalAddress = () => process.env.TEMPORAL_ADDRESS || 'localhost:7233'
 const getTemporalNamespace = () => process.env.TEMPORAL_NAMESPACE || 'default'
@@ -34,6 +35,18 @@ export const startAiRunWorkflow = async (
   const workflowClient = await getWorkflowClient()
 
   await workflowClient.start(AI_RUN_WORKFLOW_NAME, {
+    taskQueue: AI_RUN_TASK_QUEUE,
+    workflowId: input.workflowId,
+    args: [input],
+  })
+}
+
+export const startSovereigntyScoreWorkflow = async (
+  input: SovereigntyScoreWorkflowInput & { readonly workflowId: string }
+) => {
+  const workflowClient = await getWorkflowClient()
+
+  await workflowClient.start(SOVEREIGNTY_SCORE_WORKFLOW_NAME, {
     taskQueue: AI_RUN_TASK_QUEUE,
     workflowId: input.workflowId,
     args: [input],

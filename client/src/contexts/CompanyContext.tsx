@@ -15,6 +15,9 @@ type Company = {
   font?: string | null
   diagramFont?: string | null
   features?: string | null
+  expectedSovereigntyScore?: number | null
+  achievedSovereigntyScore?: number | null
+  sovereigntyScoreStatus?: string | null
 }
 
 type CompanyContextValue = {

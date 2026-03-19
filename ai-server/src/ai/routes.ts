@@ -2,7 +2,7 @@ import { Response, Router } from 'express'
 import { v4 as uuidv4 } from 'uuid'
 import { verifyToken } from '../auth/auth-jwks'
 import { graphqlRequest } from '../graphql/client'
-import { startAiRunWorkflow } from './temporal-client'
+import { startAiRunWorkflow, startSovereigntyScoreWorkflow } from './temporal-client'
 import { AiRunUseCase, CreateAiAuditEventInput, StrategicDraftPayload } from './types'
 
 type ApiErrorCode =
@@ -2168,6 +2168,47 @@ const persistStrategicDraftToGraphql = async (input: {
 }
 
 export const aiRunRouter = Router()
+
+aiRunRouter.post('/sovereignty/recalculate', async (req, res) => {
+  const companyId = typeof req.body?.companyId === 'string' ? req.body.companyId.trim() : ''
+
+  try {
+    if (!companyId) {
+      throw createApiError(400, 'BAD_REQUEST', 'companyId is required')
+    }
+
+    const token = getBearerToken(req.headers.authorization)
+    if (!token) {
+      throw createApiError(401, 'UNAUTHENTICATED', 'Missing authorization token')
+    }
+
+    const decodedToken = await getUserContext(req.headers.authorization)
+    const roles = decodedToken.realm_access?.roles ?? []
+    const isAdminOrArchitect = roles.includes('admin') || roles.includes('architect')
+    if (!isAdminOrArchitect) {
+      throw createApiError(403, 'FORBIDDEN', 'Missing required role for sovereignty recalculation')
+    }
+
+    const companyIds = decodedToken.company_ids ?? []
+    if (!roles.includes('admin') && !companyIds.includes(companyId)) {
+      throw createApiError(403, 'FORBIDDEN', 'No access to selected company')
+    }
+
+    const workflowId = `sovereignty-score-${companyId}-${Date.now()}`
+
+    await startSovereigntyScoreWorkflow({
+      companyId,
+      accessToken: token,
+      workflowId,
+    })
+
+    console.info('[SOVEREIGNTY][RECALCULATE][STARTED]', { companyId, workflowId })
+
+    return res.status(202).json({ workflowId, status: 'CALCULATING' })
+  } catch (error) {
+    return sendApiError(res, error, { companyId })
+  }
+})
 
 aiRunRouter.delete('/ai-runs', async (req, res) => {
   const companyId = typeof req.query.companyId === 'string' ? req.query.companyId : ''

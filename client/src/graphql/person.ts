@@ -30,6 +30,8 @@ export const GET_PERSONS = gql`
         font
         diagramFont
         features
+        expectedSovereigntyScore
+        achievedSovereigntyScore
       }
       createdAt
       updatedAt
@@ -83,6 +85,8 @@ export const GET_PERSON = gql`
         font
         diagramFont
         features
+        expectedSovereigntyScore
+        achievedSovereigntyScore
       }
       createdAt
       updatedAt
@@ -137,6 +141,8 @@ export const GET_PERSON_BY_EMAIL = gql`
         font
         diagramFont
         features
+        expectedSovereigntyScore
+        achievedSovereigntyScore
       }
       createdAt
       updatedAt
@@ -162,6 +168,8 @@ export const CREATE_PERSON = gql`
           font
           diagramFont
           features
+          expectedSovereigntyScore
+          achievedSovereigntyScore
         }
         phone
         createdAt
@@ -188,6 +196,8 @@ export const UPDATE_PERSON = gql`
           font
           diagramFont
           features
+          expectedSovereigntyScore
+          achievedSovereigntyScore
         }
         phone
         avatarUrl

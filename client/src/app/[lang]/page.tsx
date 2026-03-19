@@ -1,9 +1,11 @@
 'use client'
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   ButtonBase,
   Box,
+  CircularProgress,
+  IconButton,
   Tooltip,
   Typography,
   Grid,
@@ -31,6 +33,7 @@ import {
   ConnectWithoutContact as InteractionIcon,
   Event as EventIcon,
   MiscellaneousServices as ServiceIcon,
+  Refresh as RefreshIcon,
 } from '@mui/icons-material'
 import {
   BusinessCapabilityIcon,
@@ -44,7 +47,7 @@ import { useQuery } from '@apollo/client'
 import { useRouter } from 'next/navigation'
 import { useSnackbar } from 'notistack'
 import { useTranslations } from 'next-intl'
-import { useAuth, login } from '@/lib/auth'
+import { useAuth, login, keycloak } from '@/lib/auth'
 import { useFeatureFlags } from '@/lib/feature-flags'
 import { type LensKey, useLensSelection } from '@/lib/lens-settings'
 import { useCompanyContext } from '@/contexts/CompanyContext'
@@ -67,14 +70,17 @@ import { GET_BUSINESS_PROCESSES_COUNT } from '@/graphql/businessProcess'
 import RecentDiagramsSection from '@/components/dashboard/RecentDiagramsSection'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import { calculatePurposeCoherenceScorePercent } from '@/components/matrix-editor/scoreUtils'
+import { useAiConfig } from '@/lib/runtime-config'
+import { GET_COMPANY } from '@/graphql/company'
 
 const Dashboard = () => {
   const router = useRouter()
   const { authenticated, initialized } = useAuth()
-  const { selectedCompany } = useCompanyContext()
+  const { selectedCompany, selectedCompanyId } = useCompanyContext()
   const { featureFlags } = useFeatureFlags()
   const { selectedLens } = useLensSelection()
   const isGeaEnabled = featureFlags.GEA
+  const isSovereigntyEnabled = featureFlags.Sovereignty
   const isBmcEnabled = featureFlags.BMC
   const isAbhEnabled = featureFlags.ABH
   const isApsEnabled = featureFlags.APS
@@ -84,6 +90,47 @@ const Dashboard = () => {
   const t = useTranslations('dashboard')
   const tCommon = useTranslations('common')
   const tNavigation = useTranslations('navigation')
+  const aiConfig = useAiConfig()
+
+  // Sovereignty score recalculation polling
+  const [isRecalculating, setIsRecalculating] = useState(false)
+  const { startPolling, stopPolling } = useQuery(GET_COMPANY, {
+    variables: { id: selectedCompanyId ?? '' },
+    skip: !selectedCompanyId,
+    fetchPolicy: 'cache-first',
+  })
+
+  useEffect(() => {
+    if (!isRecalculating) return
+    const status = selectedCompany?.sovereigntyScoreStatus
+    if (status !== 'CALCULATING') {
+      stopPolling()
+      setIsRecalculating(false)
+    }
+  }, [selectedCompany?.sovereigntyScoreStatus, isRecalculating, stopPolling])
+
+  const handleRecalculate = async () => {
+    if (!selectedCompanyId || isRecalculating) return
+    setIsRecalculating(true)
+    try {
+      const token = keycloak?.token ?? ''
+      const response = await fetch(`${aiConfig.apiUrl}/sovereignty/recalculate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ companyId: selectedCompanyId }),
+      })
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`)
+      }
+      startPolling(1000)
+    } catch {
+      setIsRecalculating(false)
+      enqueueSnackbar(t('sovereigntyScoreRecalculateFailed'), { variant: 'error' })
+    }
+  }
 
   // Company-Filter für alle Architektur-Elemente
   const capWhere = useCompanyWhere('company')
@@ -558,6 +605,14 @@ const Dashboard = () => {
     return `${rounded}%`
   }
 
+  const formatScore = (value: number | null | undefined) => {
+    if (value === null || value === undefined || Number.isNaN(value)) return '-'
+    return (Math.round(value * 10) / 10).toString()
+  }
+
+  const expectedCompanySovereigntyScore = selectedCompany?.expectedSovereigntyScore
+  const achievedCompanySovereigntyScore = selectedCompany?.achievedSovereigntyScore
+
   const getPurposeCoherenceScoreBackground = (percent: number) => {
     const score = (percent / 100) * 3
     if (score > 0) {
@@ -652,41 +707,95 @@ const Dashboard = () => {
           </Box>
 
           {isGeaEnabled && (
-            <Tooltip title={t('geaScoreTooltip')} arrow>
-              <ButtonBase
-                onClick={() => router.push('/matrix-editor')}
-                sx={{
-                  borderRadius: 2,
-                  textAlign: 'right',
-                  display: 'block',
-                }}
-              >
+            <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'stretch', flexWrap: 'wrap' }}>
+              {isSovereigntyEnabled && (
                 <Box
                   sx={{
                     px: 2.5,
                     py: 1.25,
                     borderRadius: 2,
-                    minWidth: 180,
-                    textAlign: 'right',
-                    backgroundColor: getPurposeCoherenceScoreBackground(
-                      purposeCoherenceScorePercent
-                    ),
+                    minWidth: 220,
                     border: `1px solid ${alpha(theme.palette.text.primary, 0.12)}`,
-                    transition: 'transform 120ms ease',
-                    '&:hover': {
-                      transform: 'translateY(-1px)',
-                    },
                   }}
                 >
-                  <Typography variant="subtitle2" color="text.secondary">
-                    {t('purposeCoherenceScore')}
-                  </Typography>
-                  <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                    {geaScoreLoading ? '...' : formatSignedPercent(purposeCoherenceScorePercent)}
-                  </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.5 }}>
+                    <Typography variant="subtitle2" color="text.secondary">
+                      {t('companySovereigntyScore')}
+                    </Typography>
+                    <Tooltip title={t('sovereigntyScoreRecalculate')} arrow>
+                      <span>
+                        <IconButton
+                          size="small"
+                          onClick={handleRecalculate}
+                          disabled={isRecalculating || !selectedCompanyId}
+                          sx={{ ml: 0.5, p: 0.25 }}
+                        >
+                          {isRecalculating ? (
+                            <CircularProgress size={14} />
+                          ) : (
+                            <RefreshIcon sx={{ fontSize: 16 }} />
+                          )}
+                        </IconButton>
+                      </span>
+                    </Tooltip>
+                  </Box>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 2 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
+                      <Typography variant="caption" color="text.secondary">
+                        {t('expected')}
+                      </Typography>
+                      <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                        {formatScore(expectedCompanySovereigntyScore)}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
+                      <Typography variant="caption" color="text.secondary">
+                        {t('achieved')}
+                      </Typography>
+                      <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                        {formatScore(achievedCompanySovereigntyScore)}
+                      </Typography>
+                    </Box>
+                  </Box>
                 </Box>
-              </ButtonBase>
-            </Tooltip>
+              )}
+
+              <Tooltip title={t('geaScoreTooltip')} arrow>
+                <ButtonBase
+                  onClick={() => router.push('/matrix-editor')}
+                  sx={{
+                    borderRadius: 2,
+                    textAlign: 'right',
+                    display: 'block',
+                  }}
+                >
+                  <Box
+                    sx={{
+                      px: 2.5,
+                      py: 1.25,
+                      borderRadius: 2,
+                      minWidth: 180,
+                      textAlign: 'right',
+                      backgroundColor: getPurposeCoherenceScoreBackground(
+                        purposeCoherenceScorePercent
+                      ),
+                      border: `1px solid ${alpha(theme.palette.text.primary, 0.12)}`,
+                      transition: 'transform 120ms ease',
+                      '&:hover': {
+                        transform: 'translateY(-1px)',
+                      },
+                    }}
+                  >
+                    <Typography variant="subtitle2" color="text.secondary">
+                      {t('purposeCoherenceScore')}
+                    </Typography>
+                    <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                      {geaScoreLoading ? '...' : formatSignedPercent(purposeCoherenceScorePercent)}
+                    </Typography>
+                  </Box>
+                </ButtonBase>
+              </Tooltip>
+            </Box>
           )}
         </CardContent>
       </Card>

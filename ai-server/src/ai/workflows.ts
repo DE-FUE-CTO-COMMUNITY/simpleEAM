@@ -1,5 +1,5 @@
 import { proxyActivities } from '@temporalio/workflow'
-import { AiRunWorkflowInput } from './types'
+import { AiRunWorkflowInput, SovereigntyScoreWorkflowInput } from './types'
 import type * as activities from './activities'
 
 const {
@@ -7,6 +7,12 @@ const {
   markAiRunCompletedWithToken,
   markAiRunFailedWithToken,
   generateAiRunSummary,
+  fetchSovereigntyReqEntities,
+  fetchSovereigntyAchEntities,
+  computeSovereigntyScores,
+  updateCompanySovereigntyScores,
+  markSovereigntyCalculating,
+  markSovereigntyError,
 } = proxyActivities<typeof activities>({
   startToCloseTimeout: '5 minutes',
   retry: {
@@ -52,6 +58,45 @@ export async function aiRunWorkflow(input: AiRunWorkflowInput): Promise<void> {
       )
     }
 
+    throw error
+  }
+}
+
+export async function sovereigntyScoreWorkflow(
+  input: SovereigntyScoreWorkflowInput
+): Promise<void> {
+  await markSovereigntyCalculating({
+    companyId: input.companyId,
+    accessToken: input.accessToken,
+  })
+
+  try {
+    const reqEntities = await fetchSovereigntyReqEntities({
+      companyId: input.companyId,
+      accessToken: input.accessToken,
+    })
+
+    const achEntities = await fetchSovereigntyAchEntities({
+      companyId: input.companyId,
+      accessToken: input.accessToken,
+    })
+
+    const scores = await computeSovereigntyScores({ reqEntities, achEntities })
+
+    await updateCompanySovereigntyScores({
+      companyId: input.companyId,
+      scores,
+      accessToken: input.accessToken,
+    })
+  } catch (error) {
+    try {
+      await markSovereigntyError({
+        companyId: input.companyId,
+        accessToken: input.accessToken,
+      })
+    } catch {
+      // best-effort – don't swallow original error
+    }
     throw error
   }
 }

@@ -92,6 +92,18 @@ export interface GenerateSummaryInput {
   readonly useCase: AiRunUseCase
 }
 
+export interface SovereigntyScoreWorkflowInput {
+  readonly companyId: string
+  readonly accessToken: string
+}
+
+export interface SovereigntyScores {
+  readonly expectedSovereigntyScore: number | null
+  readonly achievedSovereigntyScore: number | null
+  readonly sovereigntyGap: number | null
+  readonly sovereigntyScorePercent: number | null
+}
+
 export interface CreateAiAuditEventInput {
   readonly runId: string
   readonly action:

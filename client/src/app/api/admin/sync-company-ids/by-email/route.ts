@@ -71,7 +71,7 @@ export const POST = withAuth(async (request: NextRequest, auth: AuthResult) => {
         Authorization: bearer,
       },
       body: JSON.stringify({
-        query: `query GetPersonByEmail($email: String!) { people(where: { email: { eq: $email } }) { company { id } } }`,
+        query: `query GetPersonByEmail($email: String!) { people(where: { email: { eq: $email } }) { companies { id } } }`,
         variables: { email },
       }),
     })
@@ -83,12 +83,14 @@ export const POST = withAuth(async (request: NextRequest, auth: AuthResult) => {
       )
     }
     const data = await gqlResp.json()
-    const companies = (data?.data?.people?.[0]?.company ?? []) as Array<{ id?: string }>
+    const people = (data?.data?.people ?? []) as Array<{ companies?: Array<{ id?: string }> }>
     const companyIds = Array.from(
       new Set(
-        companies
-          .map(c => c.id)
-          .filter((id): id is string => typeof id === 'string' && id.length > 0)
+        people.flatMap(person =>
+          (person.companies ?? [])
+            .map(company => company.id)
+            .filter((id): id is string => typeof id === 'string' && id.length > 0)
+        )
       )
     ).sort()
 

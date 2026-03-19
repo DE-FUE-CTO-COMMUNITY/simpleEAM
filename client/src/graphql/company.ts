@@ -18,6 +18,9 @@ export const GET_COMPANIES = gql`
       diagramFont
       logo
       features
+      expectedSovereigntyScore
+      achievedSovereigntyScore
+      sovereigntyScoreStatus
       size
       createdAt
       updatedAt
@@ -46,6 +49,9 @@ export const GET_COMPANY = gql`
       diagramFont
       logo
       features
+      expectedSovereigntyScore
+      achievedSovereigntyScore
+      sovereigntyScoreStatus
       size
       createdAt
       updatedAt

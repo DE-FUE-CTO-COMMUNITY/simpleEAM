@@ -90,7 +90,7 @@ export const POST = withAuth(async (request: NextRequest, auth: AuthResult) => {
           body: JSON.stringify({
             query: `query GetPersonByEmail($email: String!) {
               people(where: { email: { eq: $email } }) {
-                company { id }
+                companies { id }
               }
             }`,
             variables: { email },
@@ -110,11 +110,13 @@ export const POST = withAuth(async (request: NextRequest, auth: AuthResult) => {
         const gqlData = await gqlResp.json()
         const people = gqlData?.data?.people || []
 
-        // Person.company is an array -> extract IDs
-        const companies = (people[0]?.company ?? []) as Array<{ id?: string }>
-        const companyIdsRaw: string[] = Array.isArray(companies)
-          ? companies.map(c => c.id).filter((id): id is string => Boolean(id))
-          : []
+        // Aggregate IDs across all matching persons (if duplicates exist)
+        const companyIdsRaw: string[] = people.flatMap(person => {
+          const companies = (person?.companies ?? []) as Array<{ id?: string }>
+          return Array.isArray(companies)
+            ? companies.map(c => c.id).filter((id): id is string => Boolean(id))
+            : []
+        })
 
         // Normalize: unique, sorted list for stable comparison
         const normalize = (arr: string[]) => Array.from(new Set(arr)).sort()

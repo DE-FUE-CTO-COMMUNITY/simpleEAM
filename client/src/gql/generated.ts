@@ -424,10 +424,12 @@ export type AiComponentCompanyCompanyAggregateSelection = {
 
 export type AiComponentCompanyCompanyNodeAggregateSelection = {
   __typename?: 'AIComponentCompanyCompanyNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
   address: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   diagramFont: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
@@ -435,6 +437,9 @@ export type AiComponentCompanyCompanyNodeAggregateSelection = {
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
   secondaryColor: StringAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
+  sovereigntyScoreStatus: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -507,10 +512,12 @@ export type AiComponentCompanyNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<AiComponentCompanyNodeAggregationWhereInput>>;
   NOT?: InputMaybe<AiComponentCompanyNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<AiComponentCompanyNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   address?: InputMaybe<StringScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramFont?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
@@ -518,6 +525,9 @@ export type AiComponentCompanyNodeAggregationWhereInput = {
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
   secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -2839,10 +2849,12 @@ export type AiRunCompanyCompanyAggregateSelection = {
 
 export type AiRunCompanyCompanyNodeAggregateSelection = {
   __typename?: 'AiRunCompanyCompanyNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
   address: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   diagramFont: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
@@ -2850,6 +2862,9 @@ export type AiRunCompanyCompanyNodeAggregateSelection = {
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
   secondaryColor: StringAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
+  sovereigntyScoreStatus: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -2922,10 +2937,12 @@ export type AiRunCompanyNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<AiRunCompanyNodeAggregationWhereInput>>;
   NOT?: InputMaybe<AiRunCompanyNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<AiRunCompanyNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   address?: InputMaybe<StringScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramFont?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
@@ -2933,6 +2950,9 @@ export type AiRunCompanyNodeAggregationWhereInput = {
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
   secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -3803,10 +3823,12 @@ export type ApplicationCompanyCompanyAggregateSelection = {
 
 export type ApplicationCompanyCompanyNodeAggregateSelection = {
   __typename?: 'ApplicationCompanyCompanyNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
   address: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   diagramFont: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
@@ -3814,6 +3836,9 @@ export type ApplicationCompanyCompanyNodeAggregateSelection = {
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
   secondaryColor: StringAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
+  sovereigntyScoreStatus: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -3886,10 +3911,12 @@ export type ApplicationCompanyNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<ApplicationCompanyNodeAggregationWhereInput>>;
   NOT?: InputMaybe<ApplicationCompanyNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<ApplicationCompanyNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   address?: InputMaybe<StringScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramFont?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
@@ -3897,6 +3924,9 @@ export type ApplicationCompanyNodeAggregationWhereInput = {
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
   secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -4931,10 +4961,12 @@ export type ApplicationInterfaceCompanyCompanyAggregateSelection = {
 
 export type ApplicationInterfaceCompanyCompanyNodeAggregateSelection = {
   __typename?: 'ApplicationInterfaceCompanyCompanyNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
   address: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   diagramFont: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
@@ -4942,6 +4974,9 @@ export type ApplicationInterfaceCompanyCompanyNodeAggregateSelection = {
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
   secondaryColor: StringAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
+  sovereigntyScoreStatus: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -5014,10 +5049,12 @@ export type ApplicationInterfaceCompanyNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<ApplicationInterfaceCompanyNodeAggregationWhereInput>>;
   NOT?: InputMaybe<ApplicationInterfaceCompanyNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<ApplicationInterfaceCompanyNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   address?: InputMaybe<StringScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramFont?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
@@ -5025,6 +5062,9 @@ export type ApplicationInterfaceCompanyNodeAggregationWhereInput = {
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
   secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -9174,10 +9214,12 @@ export type ArchitectureCompanyCompanyAggregateSelection = {
 
 export type ArchitectureCompanyCompanyNodeAggregateSelection = {
   __typename?: 'ArchitectureCompanyCompanyNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
   address: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   diagramFont: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
@@ -9185,6 +9227,9 @@ export type ArchitectureCompanyCompanyNodeAggregateSelection = {
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
   secondaryColor: StringAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
+  sovereigntyScoreStatus: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -9257,10 +9302,12 @@ export type ArchitectureCompanyNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<ArchitectureCompanyNodeAggregationWhereInput>>;
   NOT?: InputMaybe<ArchitectureCompanyNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<ArchitectureCompanyNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   address?: InputMaybe<StringScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramFont?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
@@ -9268,6 +9315,9 @@ export type ArchitectureCompanyNodeAggregationWhereInput = {
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
   secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -11547,10 +11597,12 @@ export type ArchitecturePrincipleCompanyCompanyAggregateSelection = {
 
 export type ArchitecturePrincipleCompanyCompanyNodeAggregateSelection = {
   __typename?: 'ArchitecturePrincipleCompanyCompanyNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
   address: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   diagramFont: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
@@ -11558,6 +11610,9 @@ export type ArchitecturePrincipleCompanyCompanyNodeAggregateSelection = {
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
   secondaryColor: StringAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
+  sovereigntyScoreStatus: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -11630,10 +11685,12 @@ export type ArchitecturePrincipleCompanyNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<ArchitecturePrincipleCompanyNodeAggregationWhereInput>>;
   NOT?: InputMaybe<ArchitecturePrincipleCompanyNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<ArchitecturePrincipleCompanyNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   address?: InputMaybe<StringScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramFont?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
@@ -11641,6 +11698,9 @@ export type ArchitecturePrincipleCompanyNodeAggregationWhereInput = {
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
   secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -12854,10 +12914,12 @@ export type BusinessCapabilityCompanyCompanyAggregateSelection = {
 
 export type BusinessCapabilityCompanyCompanyNodeAggregateSelection = {
   __typename?: 'BusinessCapabilityCompanyCompanyNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
   address: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   diagramFont: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
@@ -12865,6 +12927,9 @@ export type BusinessCapabilityCompanyCompanyNodeAggregateSelection = {
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
   secondaryColor: StringAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
+  sovereigntyScoreStatus: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -12937,10 +13002,12 @@ export type BusinessCapabilityCompanyNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<BusinessCapabilityCompanyNodeAggregationWhereInput>>;
   NOT?: InputMaybe<BusinessCapabilityCompanyNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<BusinessCapabilityCompanyNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   address?: InputMaybe<StringScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramFont?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
@@ -12948,6 +13015,9 @@ export type BusinessCapabilityCompanyNodeAggregationWhereInput = {
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
   secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -14687,10 +14757,12 @@ export type BusinessProcessCompanyCompanyAggregateSelection = {
 
 export type BusinessProcessCompanyCompanyNodeAggregateSelection = {
   __typename?: 'BusinessProcessCompanyCompanyNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
   address: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   diagramFont: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
@@ -14698,6 +14770,9 @@ export type BusinessProcessCompanyCompanyNodeAggregateSelection = {
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
   secondaryColor: StringAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
+  sovereigntyScoreStatus: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -14770,10 +14845,12 @@ export type BusinessProcessCompanyNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<BusinessProcessCompanyNodeAggregationWhereInput>>;
   NOT?: InputMaybe<BusinessProcessCompanyNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<BusinessProcessCompanyNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   address?: InputMaybe<StringScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramFont?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
@@ -14781,6 +14858,9 @@ export type BusinessProcessCompanyNodeAggregationWhereInput = {
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
   secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -15862,12 +15942,14 @@ export type CompaniesConnection = {
 /** Company – represents an organization within Enterprise Architecture Management */
 export type Company = {
   __typename?: 'Company';
+  achievedSovereigntyScore?: Maybe<Scalars['Float']['output']>;
   address?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
   description?: Maybe<Scalars['String']['output']>;
   diagramFont?: Maybe<Scalars['String']['output']>;
   employees: Array<Person>;
   employeesConnection: CompanyEmployeesConnection;
+  expectedSovereigntyScore?: Maybe<Scalars['Float']['output']>;
   features?: Maybe<Scalars['String']['output']>;
   font?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
@@ -15911,6 +15993,9 @@ export type Company = {
   primaryColor?: Maybe<Scalars['String']['output']>;
   secondaryColor?: Maybe<Scalars['String']['output']>;
   size?: Maybe<CompanySize>;
+  sovereigntyGap?: Maybe<Scalars['Float']['output']>;
+  sovereigntyScorePercent?: Maybe<Scalars['Float']['output']>;
+  sovereigntyScoreStatus?: Maybe<Scalars['String']['output']>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
   website?: Maybe<Scalars['String']['output']>;
 };
@@ -16269,10 +16354,12 @@ export type CompanyAggregate = {
 
 export type CompanyAggregateNode = {
   __typename?: 'CompanyAggregateNode';
+  achievedSovereigntyScore: FloatAggregateSelection;
   address: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   diagramFont: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
@@ -16280,6 +16367,9 @@ export type CompanyAggregateNode = {
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
   secondaryColor: StringAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
+  sovereigntyScoreStatus: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -16422,10 +16512,12 @@ export type CompanyConnectWhere = {
 };
 
 export type CompanyCreateInput = {
+  achievedSovereigntyScore?: InputMaybe<Scalars['Float']['input']>;
   address?: InputMaybe<Scalars['String']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
   diagramFont?: InputMaybe<Scalars['String']['input']>;
   employees?: InputMaybe<CompanyEmployeesFieldInput>;
+  expectedSovereigntyScore?: InputMaybe<Scalars['Float']['input']>;
   features?: InputMaybe<Scalars['String']['input']>;
   font?: InputMaybe<Scalars['String']['input']>;
   industry?: InputMaybe<Scalars['String']['input']>;
@@ -16451,6 +16543,9 @@ export type CompanyCreateInput = {
   primaryColor?: InputMaybe<Scalars['String']['input']>;
   secondaryColor?: InputMaybe<Scalars['String']['input']>;
   size?: InputMaybe<CompanySize>;
+  sovereigntyGap?: InputMaybe<Scalars['Float']['input']>;
+  sovereigntyScorePercent?: InputMaybe<Scalars['Float']['input']>;
+  sovereigntyScoreStatus?: InputMaybe<Scalars['String']['input']>;
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
   website?: InputMaybe<Scalars['String']['input']>;
 };
@@ -18678,10 +18773,12 @@ export type CompanySizeEnumScalarMutations = {
 
 /** Fields to sort Companies by. The order in which sorts are applied is not guaranteed when specifying many fields in one CompanySort object. */
 export type CompanySort = {
+  achievedSovereigntyScore?: InputMaybe<SortDirection>;
   address?: InputMaybe<SortDirection>;
   createdAt?: InputMaybe<SortDirection>;
   description?: InputMaybe<SortDirection>;
   diagramFont?: InputMaybe<SortDirection>;
+  expectedSovereigntyScore?: InputMaybe<SortDirection>;
   features?: InputMaybe<SortDirection>;
   font?: InputMaybe<SortDirection>;
   id?: InputMaybe<SortDirection>;
@@ -18691,6 +18788,9 @@ export type CompanySort = {
   primaryColor?: InputMaybe<SortDirection>;
   secondaryColor?: InputMaybe<SortDirection>;
   size?: InputMaybe<SortDirection>;
+  sovereigntyGap?: InputMaybe<SortDirection>;
+  sovereigntyScorePercent?: InputMaybe<SortDirection>;
+  sovereigntyScoreStatus?: InputMaybe<SortDirection>;
   updatedAt?: InputMaybe<SortDirection>;
   website?: InputMaybe<SortDirection>;
 };
@@ -18719,11 +18819,13 @@ export type CompanySupplierOwnedSuppliersNodeAggregateSelection = {
 };
 
 export type CompanyUpdateInput = {
+  achievedSovereigntyScore?: InputMaybe<FloatScalarMutations>;
   address?: InputMaybe<StringScalarMutations>;
   createdAt?: InputMaybe<DateTimeScalarMutations>;
   description?: InputMaybe<StringScalarMutations>;
   diagramFont?: InputMaybe<StringScalarMutations>;
   employees?: InputMaybe<Array<CompanyEmployeesUpdateFieldInput>>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarMutations>;
   features?: InputMaybe<StringScalarMutations>;
   font?: InputMaybe<StringScalarMutations>;
   industry?: InputMaybe<StringScalarMutations>;
@@ -18749,6 +18851,9 @@ export type CompanyUpdateInput = {
   primaryColor?: InputMaybe<StringScalarMutations>;
   secondaryColor?: InputMaybe<StringScalarMutations>;
   size?: InputMaybe<CompanySizeEnumScalarMutations>;
+  sovereigntyGap?: InputMaybe<FloatScalarMutations>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarMutations>;
+  sovereigntyScoreStatus?: InputMaybe<StringScalarMutations>;
   website?: InputMaybe<StringScalarMutations>;
 };
 
@@ -18756,12 +18861,14 @@ export type CompanyWhere = {
   AND?: InputMaybe<Array<CompanyWhere>>;
   NOT?: InputMaybe<CompanyWhere>;
   OR?: InputMaybe<Array<CompanyWhere>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarFilters>;
   address?: InputMaybe<StringScalarFilters>;
   createdAt?: InputMaybe<DateTimeScalarFilters>;
   description?: InputMaybe<StringScalarFilters>;
   diagramFont?: InputMaybe<StringScalarFilters>;
   employees?: InputMaybe<PersonRelationshipFilters>;
   employeesConnection?: InputMaybe<CompanyEmployeesConnectionFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarFilters>;
   features?: InputMaybe<StringScalarFilters>;
   font?: InputMaybe<StringScalarFilters>;
   id?: InputMaybe<IdScalarFilters>;
@@ -18805,6 +18912,9 @@ export type CompanyWhere = {
   primaryColor?: InputMaybe<StringScalarFilters>;
   secondaryColor?: InputMaybe<StringScalarFilters>;
   size?: InputMaybe<CompanySizeEnumScalarFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarFilters>;
+  sovereigntyScoreStatus?: InputMaybe<StringScalarFilters>;
   updatedAt?: InputMaybe<DateTimeScalarFilters>;
   website?: InputMaybe<StringScalarFilters>;
 };
@@ -19415,10 +19525,12 @@ export type DataObjectCompanyCompanyAggregateSelection = {
 
 export type DataObjectCompanyCompanyNodeAggregateSelection = {
   __typename?: 'DataObjectCompanyCompanyNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
   address: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   diagramFont: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
@@ -19426,6 +19538,9 @@ export type DataObjectCompanyCompanyNodeAggregateSelection = {
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
   secondaryColor: StringAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
+  sovereigntyScoreStatus: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -19498,10 +19613,12 @@ export type DataObjectCompanyNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<DataObjectCompanyNodeAggregationWhereInput>>;
   NOT?: InputMaybe<DataObjectCompanyNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<DataObjectCompanyNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   address?: InputMaybe<StringScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramFont?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
@@ -19509,6 +19626,9 @@ export type DataObjectCompanyNodeAggregationWhereInput = {
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
   secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -21733,10 +21853,12 @@ export type DiagramCompanyCompanyAggregateSelection = {
 
 export type DiagramCompanyCompanyNodeAggregateSelection = {
   __typename?: 'DiagramCompanyCompanyNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
   address: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   diagramFont: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
@@ -21744,6 +21866,9 @@ export type DiagramCompanyCompanyNodeAggregateSelection = {
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
   secondaryColor: StringAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
+  sovereigntyScoreStatus: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -21816,10 +21941,12 @@ export type DiagramCompanyNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<DiagramCompanyNodeAggregationWhereInput>>;
   NOT?: InputMaybe<DiagramCompanyNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<DiagramCompanyNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   address?: InputMaybe<StringScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramFont?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
@@ -21827,6 +21954,9 @@ export type DiagramCompanyNodeAggregationWhereInput = {
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
   secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -24043,10 +24173,12 @@ export type Gea_GoalCompanyCompanyAggregateSelection = {
 
 export type Gea_GoalCompanyCompanyNodeAggregateSelection = {
   __typename?: 'GEA_GoalCompanyCompanyNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
   address: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   diagramFont: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
@@ -24054,6 +24186,9 @@ export type Gea_GoalCompanyCompanyNodeAggregateSelection = {
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
   secondaryColor: StringAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
+  sovereigntyScoreStatus: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -24126,10 +24261,12 @@ export type Gea_GoalCompanyNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<Gea_GoalCompanyNodeAggregationWhereInput>>;
   NOT?: InputMaybe<Gea_GoalCompanyNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<Gea_GoalCompanyNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   address?: InputMaybe<StringScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramFont?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
@@ -24137,6 +24274,9 @@ export type Gea_GoalCompanyNodeAggregationWhereInput = {
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
   secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -25275,10 +25415,12 @@ export type Gea_MissionCompanyCompanyAggregateSelection = {
 
 export type Gea_MissionCompanyCompanyNodeAggregateSelection = {
   __typename?: 'GEA_MissionCompanyCompanyNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
   address: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   diagramFont: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
@@ -25286,6 +25428,9 @@ export type Gea_MissionCompanyCompanyNodeAggregateSelection = {
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
   secondaryColor: StringAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
+  sovereigntyScoreStatus: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -25358,10 +25503,12 @@ export type Gea_MissionCompanyNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<Gea_MissionCompanyNodeAggregationWhereInput>>;
   NOT?: InputMaybe<Gea_MissionCompanyNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<Gea_MissionCompanyNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   address?: InputMaybe<StringScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramFont?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
@@ -25369,6 +25516,9 @@ export type Gea_MissionCompanyNodeAggregationWhereInput = {
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
   secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -26559,10 +26709,12 @@ export type Gea_StrategyCompanyCompanyAggregateSelection = {
 
 export type Gea_StrategyCompanyCompanyNodeAggregateSelection = {
   __typename?: 'GEA_StrategyCompanyCompanyNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
   address: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   diagramFont: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
@@ -26570,6 +26722,9 @@ export type Gea_StrategyCompanyCompanyNodeAggregateSelection = {
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
   secondaryColor: StringAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
+  sovereigntyScoreStatus: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -26642,10 +26797,12 @@ export type Gea_StrategyCompanyNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<Gea_StrategyCompanyNodeAggregationWhereInput>>;
   NOT?: InputMaybe<Gea_StrategyCompanyNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<Gea_StrategyCompanyNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   address?: InputMaybe<StringScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramFont?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
@@ -26653,6 +26810,9 @@ export type Gea_StrategyCompanyNodeAggregationWhereInput = {
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
   secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -27344,10 +27504,12 @@ export type Gea_ValueCompanyCompanyAggregateSelection = {
 
 export type Gea_ValueCompanyCompanyNodeAggregateSelection = {
   __typename?: 'GEA_ValueCompanyCompanyNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
   address: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   diagramFont: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
@@ -27355,6 +27517,9 @@ export type Gea_ValueCompanyCompanyNodeAggregateSelection = {
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
   secondaryColor: StringAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
+  sovereigntyScoreStatus: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -27427,10 +27592,12 @@ export type Gea_ValueCompanyNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<Gea_ValueCompanyNodeAggregationWhereInput>>;
   NOT?: InputMaybe<Gea_ValueCompanyNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<Gea_ValueCompanyNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   address?: InputMaybe<StringScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramFont?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
@@ -27438,6 +27605,9 @@ export type Gea_ValueCompanyNodeAggregationWhereInput = {
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
   secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -28409,10 +28579,12 @@ export type Gea_VisionCompanyCompanyAggregateSelection = {
 
 export type Gea_VisionCompanyCompanyNodeAggregateSelection = {
   __typename?: 'GEA_VisionCompanyCompanyNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
   address: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   diagramFont: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
@@ -28420,6 +28592,9 @@ export type Gea_VisionCompanyCompanyNodeAggregateSelection = {
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
   secondaryColor: StringAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
+  sovereigntyScoreStatus: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -28492,10 +28667,12 @@ export type Gea_VisionCompanyNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<Gea_VisionCompanyNodeAggregationWhereInput>>;
   NOT?: InputMaybe<Gea_VisionCompanyNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<Gea_VisionCompanyNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   address?: InputMaybe<StringScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramFont?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
@@ -28503,6 +28680,9 @@ export type Gea_VisionCompanyNodeAggregationWhereInput = {
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
   secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -29960,10 +30140,12 @@ export type InfrastructureCompanyCompanyAggregateSelection = {
 
 export type InfrastructureCompanyCompanyNodeAggregateSelection = {
   __typename?: 'InfrastructureCompanyCompanyNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
   address: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   diagramFont: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
@@ -29971,6 +30153,9 @@ export type InfrastructureCompanyCompanyNodeAggregateSelection = {
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
   secondaryColor: StringAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
+  sovereigntyScoreStatus: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -30043,10 +30228,12 @@ export type InfrastructureCompanyNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<InfrastructureCompanyNodeAggregationWhereInput>>;
   NOT?: InputMaybe<InfrastructureCompanyNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<InfrastructureCompanyNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   address?: InputMaybe<StringScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramFont?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
@@ -30054,6 +30241,9 @@ export type InfrastructureCompanyNodeAggregationWhereInput = {
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
   secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -32651,10 +32841,12 @@ export type OrganisationCompanyCompanyAggregateSelection = {
 
 export type OrganisationCompanyCompanyNodeAggregateSelection = {
   __typename?: 'OrganisationCompanyCompanyNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
   address: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   diagramFont: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
@@ -32662,6 +32854,9 @@ export type OrganisationCompanyCompanyNodeAggregateSelection = {
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
   secondaryColor: StringAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
+  sovereigntyScoreStatus: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -32734,10 +32929,12 @@ export type OrganisationCompanyNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<OrganisationCompanyNodeAggregationWhereInput>>;
   NOT?: InputMaybe<OrganisationCompanyNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<OrganisationCompanyNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   address?: InputMaybe<StringScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramFont?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
@@ -32745,6 +32942,9 @@ export type OrganisationCompanyNodeAggregationWhereInput = {
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
   secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -34449,10 +34649,12 @@ export type PersonCompaniesNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<PersonCompaniesNodeAggregationWhereInput>>;
   NOT?: InputMaybe<PersonCompaniesNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<PersonCompaniesNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   address?: InputMaybe<StringScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramFont?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
@@ -34460,6 +34662,9 @@ export type PersonCompaniesNodeAggregationWhereInput = {
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
   secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -34491,10 +34696,12 @@ export type PersonCompanyCompaniesAggregateSelection = {
 
 export type PersonCompanyCompaniesNodeAggregateSelection = {
   __typename?: 'PersonCompanyCompaniesNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
   address: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   diagramFont: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
@@ -34502,6 +34709,9 @@ export type PersonCompanyCompaniesNodeAggregateSelection = {
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
   secondaryColor: StringAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
+  sovereigntyScoreStatus: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -37349,10 +37559,12 @@ export type SupplierCompanyCompanyAggregateSelection = {
 
 export type SupplierCompanyCompanyNodeAggregateSelection = {
   __typename?: 'SupplierCompanyCompanyNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
   address: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   diagramFont: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
@@ -37360,6 +37572,9 @@ export type SupplierCompanyCompanyNodeAggregateSelection = {
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
   secondaryColor: StringAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
+  sovereigntyScoreStatus: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -37432,10 +37647,12 @@ export type SupplierCompanyNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<SupplierCompanyNodeAggregationWhereInput>>;
   NOT?: InputMaybe<SupplierCompanyNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<SupplierCompanyNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   address?: InputMaybe<StringScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramFont?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
@@ -37443,6 +37660,9 @@ export type SupplierCompanyNodeAggregationWhereInput = {
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
   secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };

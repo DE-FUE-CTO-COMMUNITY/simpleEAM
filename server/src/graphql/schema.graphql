@@ -967,6 +967,11 @@ type Company
   diagramFont: String
   logo: String
   features: String
+  expectedSovereigntyScore: Float
+  achievedSovereigntyScore: Float
+  sovereigntyGap: Float
+  sovereigntyScorePercent: Float
+  sovereigntyScoreStatus: String
   createdAt: DateTime! @timestamp(operations: [CREATE])
   updatedAt: DateTime @timestamp(operations: [UPDATE])
   organisations: [Organisation!]! @relationship(type: "BELONGS_TO", direction: IN)
