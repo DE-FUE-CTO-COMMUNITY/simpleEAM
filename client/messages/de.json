@@ -2314,7 +2314,8 @@
         "APS": "Archimate Passive Structure",
         "AAS": "Archimate Active Structure",
         "AMO": "Archimate Motivation",
-        "SUP": "Lieferanten"
+        "SUP": "Lieferanten",
+        "Sovereignty": "Souveränität"
       }
     },
     "userManagement": {

@@ -33,6 +33,7 @@ export type AiComponent = {
   id: Scalars['ID']['output'];
   implementsPrinciples: Array<ArchitecturePrinciple>;
   implementsPrinciplesConnection: AiComponentImplementsPrinciplesConnection;
+  lastSovereigntyAssessmentAt?: Maybe<Scalars['DateTime']['output']>;
   lastUpdated?: Maybe<Scalars['Date']['output']>;
   license?: Maybe<Scalars['String']['output']>;
   maintainedBy: Array<Supplier>;
@@ -46,6 +47,13 @@ export type AiComponent = {
   providedBy: Array<Supplier>;
   providedByConnection: AiComponentProvidedByConnection;
   provider?: Maybe<Scalars['String']['output']>;
+  sovereigntyAchDataResidency?: Maybe<SovereigntyMaturity>;
+  sovereigntyAchInteroperability?: Maybe<SovereigntyMaturity>;
+  sovereigntyAchJurisdictionControl?: Maybe<SovereigntyMaturity>;
+  sovereigntyAchOperationalControl?: Maybe<SovereigntyMaturity>;
+  sovereigntyAchPortability?: Maybe<SovereigntyMaturity>;
+  sovereigntyAchSupplyChainTransparency?: Maybe<SovereigntyMaturity>;
+  sovereigntyEvidence?: Maybe<Scalars['String']['output']>;
   status: AiComponentStatus;
   supportedBy: Array<Supplier>;
   supportedByConnection: AiComponentSupportedByConnection;
@@ -309,10 +317,12 @@ export type AiComponentAggregateNode = {
   costs: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   license: StringAggregateSelection;
   model: StringAggregateSelection;
   name: StringAggregateSelection;
   provider: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   version: StringAggregateSelection;
 };
@@ -329,7 +339,9 @@ export type AiComponentApplicationUsedByApplicationsNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   hostingEnvironment: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
   version: StringAggregateSelection;
@@ -343,9 +355,13 @@ export type AiComponentArchitecturePartOfArchitecturesAggregateSelection = {
 
 export type AiComponentArchitecturePartOfArchitecturesNodeAggregateSelection = {
   __typename?: 'AIComponentArchitecturePartOfArchitecturesNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
   timestamp: DateTimeAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
@@ -363,6 +379,8 @@ export type AiComponentArchitecturePrincipleImplementsPrinciplesNodeAggregateSel
   implications: StringAggregateSelection;
   name: StringAggregateSelection;
   rationale: StringAggregateSelection;
+  sovereigntyReqRationale: StringAggregateSelection;
+  sovereigntyReqWeight: FloatAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -380,6 +398,8 @@ export type AiComponentBusinessCapabilitySupportsCapabilitiesNodeAggregateSelect
   maturityLevel: IntAggregateSelection;
   name: StringAggregateSelection;
   sequenceNumber: IntAggregateSelection;
+  sovereigntyReqRationale: StringAggregateSelection;
+  sovereigntyReqWeight: FloatAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -550,6 +570,7 @@ export type AiComponentCreateInput = {
   description?: InputMaybe<Scalars['String']['input']>;
   hostedOn?: InputMaybe<AiComponentHostedOnFieldInput>;
   implementsPrinciples?: InputMaybe<AiComponentImplementsPrinciplesFieldInput>;
+  lastSovereigntyAssessmentAt?: InputMaybe<Scalars['DateTime']['input']>;
   lastUpdated?: InputMaybe<Scalars['Date']['input']>;
   license?: InputMaybe<Scalars['String']['input']>;
   maintainedBy?: InputMaybe<AiComponentMaintainedByFieldInput>;
@@ -559,6 +580,13 @@ export type AiComponentCreateInput = {
   partOfArchitectures?: InputMaybe<AiComponentPartOfArchitecturesFieldInput>;
   providedBy?: InputMaybe<AiComponentProvidedByFieldInput>;
   provider?: InputMaybe<Scalars['String']['input']>;
+  sovereigntyAchDataResidency?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyAchInteroperability?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyAchJurisdictionControl?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyAchOperationalControl?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyAchPortability?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyAchSupplyChainTransparency?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyEvidence?: InputMaybe<Scalars['String']['input']>;
   status: AiComponentStatus;
   supportedBy?: InputMaybe<AiComponentSupportedByFieldInput>;
   supportsCapabilities?: InputMaybe<AiComponentSupportsCapabilitiesFieldInput>;
@@ -583,6 +611,8 @@ export type AiComponentDataObjectTrainedWithDataObjectsNodeAggregateSelection = 
   description: StringAggregateSelection;
   format: StringAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyReqRationale: StringAggregateSelection;
+  sovereigntyReqWeight: FloatAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -836,10 +866,12 @@ export type AiComponentHostedOnNodeAggregationWhereInput = {
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   ipAddress?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   location?: InputMaybe<StringScalarAggregationFilters>;
   maintenanceWindow?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   operatingSystem?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   specifications?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
@@ -951,6 +983,8 @@ export type AiComponentImplementsPrinciplesNodeAggregationWhereInput = {
   implications?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   rationale?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
@@ -986,10 +1020,12 @@ export type AiComponentInfrastructureHostedOnNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   ipAddress: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   location: StringAggregateSelection;
   maintenanceWindow: StringAggregateSelection;
   name: StringAggregateSelection;
   operatingSystem: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   specifications: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
@@ -1082,10 +1118,12 @@ export type AiComponentMaintainedByNodeAggregationWhereInput = {
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   email?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   performanceRating?: InputMaybe<IntScalarAggregationFilters>;
   phone?: InputMaybe<StringScalarAggregationFilters>;
   primaryContactPerson?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -1316,9 +1354,13 @@ export type AiComponentPartOfArchitecturesNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<AiComponentPartOfArchitecturesNodeAggregationWhereInput>>;
   NOT?: InputMaybe<AiComponentPartOfArchitecturesNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<AiComponentPartOfArchitecturesNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
   timestamp?: InputMaybe<DateTimeScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
@@ -1447,10 +1489,12 @@ export type AiComponentProvidedByNodeAggregationWhereInput = {
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   email?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   performanceRating?: InputMaybe<IntScalarAggregationFilters>;
   phone?: InputMaybe<StringScalarAggregationFilters>;
   primaryContactPerson?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -1493,11 +1537,19 @@ export type AiComponentSort = {
   createdAt?: InputMaybe<SortDirection>;
   description?: InputMaybe<SortDirection>;
   id?: InputMaybe<SortDirection>;
+  lastSovereigntyAssessmentAt?: InputMaybe<SortDirection>;
   lastUpdated?: InputMaybe<SortDirection>;
   license?: InputMaybe<SortDirection>;
   model?: InputMaybe<SortDirection>;
   name?: InputMaybe<SortDirection>;
   provider?: InputMaybe<SortDirection>;
+  sovereigntyAchDataResidency?: InputMaybe<SortDirection>;
+  sovereigntyAchInteroperability?: InputMaybe<SortDirection>;
+  sovereigntyAchJurisdictionControl?: InputMaybe<SortDirection>;
+  sovereigntyAchOperationalControl?: InputMaybe<SortDirection>;
+  sovereigntyAchPortability?: InputMaybe<SortDirection>;
+  sovereigntyAchSupplyChainTransparency?: InputMaybe<SortDirection>;
+  sovereigntyEvidence?: InputMaybe<SortDirection>;
   status?: InputMaybe<SortDirection>;
   trainingDate?: InputMaybe<SortDirection>;
   updatedAt?: InputMaybe<SortDirection>;
@@ -1539,10 +1591,12 @@ export type AiComponentSupplierMaintainedByNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   email: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
   performanceRating: IntAggregateSelection;
   phone: StringAggregateSelection;
   primaryContactPerson: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -1560,10 +1614,12 @@ export type AiComponentSupplierProvidedByNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   email: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
   performanceRating: IntAggregateSelection;
   phone: StringAggregateSelection;
   primaryContactPerson: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -1581,10 +1637,12 @@ export type AiComponentSupplierSupportedByNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   email: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
   performanceRating: IntAggregateSelection;
   phone: StringAggregateSelection;
   primaryContactPerson: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -1675,10 +1733,12 @@ export type AiComponentSupportedByNodeAggregationWhereInput = {
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   email?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   performanceRating?: InputMaybe<IntScalarAggregationFilters>;
   phone?: InputMaybe<StringScalarAggregationFilters>;
   primaryContactPerson?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -1789,6 +1849,8 @@ export type AiComponentSupportsCapabilitiesNodeAggregationWhereInput = {
   maturityLevel?: InputMaybe<IntScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   sequenceNumber?: InputMaybe<IntScalarAggregationFilters>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
@@ -1896,6 +1958,8 @@ export type AiComponentTrainedWithDataObjectsNodeAggregationWhereInput = {
   description?: InputMaybe<StringScalarAggregationFilters>;
   format?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
@@ -1957,6 +2021,7 @@ export type AiComponentUpdateInput = {
   description?: InputMaybe<StringScalarMutations>;
   hostedOn?: InputMaybe<Array<AiComponentHostedOnUpdateFieldInput>>;
   implementsPrinciples?: InputMaybe<Array<AiComponentImplementsPrinciplesUpdateFieldInput>>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarMutations>;
   lastUpdated?: InputMaybe<DateScalarMutations>;
   license?: InputMaybe<StringScalarMutations>;
   maintainedBy?: InputMaybe<Array<AiComponentMaintainedByUpdateFieldInput>>;
@@ -1966,6 +2031,13 @@ export type AiComponentUpdateInput = {
   partOfArchitectures?: InputMaybe<Array<AiComponentPartOfArchitecturesUpdateFieldInput>>;
   providedBy?: InputMaybe<Array<AiComponentProvidedByUpdateFieldInput>>;
   provider?: InputMaybe<StringScalarMutations>;
+  sovereigntyAchDataResidency?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyAchInteroperability?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyAchJurisdictionControl?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyAchOperationalControl?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyAchPortability?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyAchSupplyChainTransparency?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyEvidence?: InputMaybe<StringScalarMutations>;
   status?: InputMaybe<AiComponentStatusEnumScalarMutations>;
   supportedBy?: InputMaybe<Array<AiComponentSupportedByUpdateFieldInput>>;
   supportsCapabilities?: InputMaybe<Array<AiComponentSupportsCapabilitiesUpdateFieldInput>>;
@@ -2062,7 +2134,9 @@ export type AiComponentUsedByApplicationsNodeAggregationWhereInput = {
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
@@ -2212,6 +2286,7 @@ export type AiComponentWhere = {
   id?: InputMaybe<IdScalarFilters>;
   implementsPrinciples?: InputMaybe<ArchitecturePrincipleRelationshipFilters>;
   implementsPrinciplesConnection?: InputMaybe<AiComponentImplementsPrinciplesConnectionFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarFilters>;
   lastUpdated?: InputMaybe<DateScalarFilters>;
   license?: InputMaybe<StringScalarFilters>;
   maintainedBy?: InputMaybe<SupplierRelationshipFilters>;
@@ -2225,6 +2300,13 @@ export type AiComponentWhere = {
   providedBy?: InputMaybe<SupplierRelationshipFilters>;
   providedByConnection?: InputMaybe<AiComponentProvidedByConnectionFilters>;
   provider?: InputMaybe<StringScalarFilters>;
+  sovereigntyAchDataResidency?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyAchInteroperability?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyAchJurisdictionControl?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyAchOperationalControl?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyAchPortability?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyAchSupplyChainTransparency?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarFilters>;
   status?: InputMaybe<AiComponentStatusEnumScalarFilters>;
   supportedBy?: InputMaybe<SupplierRelationshipFilters>;
   supportedByConnection?: InputMaybe<AiComponentSupportedByConnectionFilters>;
@@ -2246,6 +2328,774 @@ export type AiComponentsConnection = {
   __typename?: 'AiComponentsConnection';
   aggregate: AiComponentAggregate;
   edges: Array<AiComponentEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+/** AiRun – orchestration and review state for AI generated drafts */
+export type AiRun = {
+  __typename?: 'AiRun';
+  approvalStatus?: Maybe<Scalars['String']['output']>;
+  approvedAt?: Maybe<Scalars['DateTime']['output']>;
+  approvedBy?: Maybe<Scalars['String']['output']>;
+  auditEvents: Array<AiRunAuditEvent>;
+  auditEventsConnection: AiRunAuditEventsConnection;
+  company: Array<Company>;
+  companyConnection: AiRunCompanyConnection;
+  companyId: Scalars['String']['output'];
+  completedAt?: Maybe<Scalars['DateTime']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  draftPayload?: Maybe<Scalars['String']['output']>;
+  errorMessage?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  initiatedBy?: Maybe<Scalars['String']['output']>;
+  objective?: Maybe<Scalars['String']['output']>;
+  prompt: Scalars['String']['output'];
+  rejectedAt?: Maybe<Scalars['DateTime']['output']>;
+  rejectedBy?: Maybe<Scalars['String']['output']>;
+  resultSummary?: Maybe<Scalars['String']['output']>;
+  startedAt?: Maybe<Scalars['DateTime']['output']>;
+  status: Scalars['String']['output'];
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  useCase: Scalars['String']['output'];
+  workflowId?: Maybe<Scalars['String']['output']>;
+};
+
+
+/** AiRun – orchestration and review state for AI generated drafts */
+export type AiRunAuditEventsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<AiRunAuditEventSort>>;
+  where?: InputMaybe<AiRunAuditEventWhere>;
+};
+
+
+/** AiRun – orchestration and review state for AI generated drafts */
+export type AiRunAuditEventsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<AiRunAuditEventsConnectionSort>>;
+  where?: InputMaybe<AiRunAuditEventsConnectionWhere>;
+};
+
+
+/** AiRun – orchestration and review state for AI generated drafts */
+export type AiRunCompanyArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<CompanySort>>;
+  where?: InputMaybe<CompanyWhere>;
+};
+
+
+/** AiRun – orchestration and review state for AI generated drafts */
+export type AiRunCompanyConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<AiRunCompanyConnectionSort>>;
+  where?: InputMaybe<AiRunCompanyConnectionWhere>;
+};
+
+export type AiRunAggregate = {
+  __typename?: 'AiRunAggregate';
+  count: Count;
+  node: AiRunAggregateNode;
+};
+
+export type AiRunAggregateNode = {
+  __typename?: 'AiRunAggregateNode';
+  approvalStatus: StringAggregateSelection;
+  approvedAt: DateTimeAggregateSelection;
+  approvedBy: StringAggregateSelection;
+  companyId: StringAggregateSelection;
+  completedAt: DateTimeAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  draftPayload: StringAggregateSelection;
+  errorMessage: StringAggregateSelection;
+  initiatedBy: StringAggregateSelection;
+  objective: StringAggregateSelection;
+  prompt: StringAggregateSelection;
+  rejectedAt: DateTimeAggregateSelection;
+  rejectedBy: StringAggregateSelection;
+  resultSummary: StringAggregateSelection;
+  startedAt: DateTimeAggregateSelection;
+  status: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  useCase: StringAggregateSelection;
+  workflowId: StringAggregateSelection;
+};
+
+export type AiRunAiRunAuditEventAuditEventsAggregateSelection = {
+  __typename?: 'AiRunAiRunAuditEventAuditEventsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<AiRunAiRunAuditEventAuditEventsNodeAggregateSelection>;
+};
+
+export type AiRunAiRunAuditEventAuditEventsNodeAggregateSelection = {
+  __typename?: 'AiRunAiRunAuditEventAuditEventsNodeAggregateSelection';
+  action: StringAggregateSelection;
+  actor: StringAggregateSelection;
+  comment: StringAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  runId: StringAggregateSelection;
+};
+
+/** AiRunAuditEvent – immutable audit trail entries for AI run approval actions */
+export type AiRunAuditEvent = {
+  __typename?: 'AiRunAuditEvent';
+  action: Scalars['String']['output'];
+  actor: Scalars['String']['output'];
+  comment?: Maybe<Scalars['String']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  run: Array<AiRun>;
+  runConnection: AiRunAuditEventRunConnection;
+  runId: Scalars['String']['output'];
+};
+
+
+/** AiRunAuditEvent – immutable audit trail entries for AI run approval actions */
+export type AiRunAuditEventRunArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<AiRunSort>>;
+  where?: InputMaybe<AiRunWhere>;
+};
+
+
+/** AiRunAuditEvent – immutable audit trail entries for AI run approval actions */
+export type AiRunAuditEventRunConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<AiRunAuditEventRunConnectionSort>>;
+  where?: InputMaybe<AiRunAuditEventRunConnectionWhere>;
+};
+
+export type AiRunAuditEventAggregate = {
+  __typename?: 'AiRunAuditEventAggregate';
+  count: Count;
+  node: AiRunAuditEventAggregateNode;
+};
+
+export type AiRunAuditEventAggregateNode = {
+  __typename?: 'AiRunAuditEventAggregateNode';
+  action: StringAggregateSelection;
+  actor: StringAggregateSelection;
+  comment: StringAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  runId: StringAggregateSelection;
+};
+
+export type AiRunAuditEventAiRunRunAggregateSelection = {
+  __typename?: 'AiRunAuditEventAiRunRunAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<AiRunAuditEventAiRunRunNodeAggregateSelection>;
+};
+
+export type AiRunAuditEventAiRunRunNodeAggregateSelection = {
+  __typename?: 'AiRunAuditEventAiRunRunNodeAggregateSelection';
+  approvalStatus: StringAggregateSelection;
+  approvedAt: DateTimeAggregateSelection;
+  approvedBy: StringAggregateSelection;
+  companyId: StringAggregateSelection;
+  completedAt: DateTimeAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  draftPayload: StringAggregateSelection;
+  errorMessage: StringAggregateSelection;
+  initiatedBy: StringAggregateSelection;
+  objective: StringAggregateSelection;
+  prompt: StringAggregateSelection;
+  rejectedAt: DateTimeAggregateSelection;
+  rejectedBy: StringAggregateSelection;
+  resultSummary: StringAggregateSelection;
+  startedAt: DateTimeAggregateSelection;
+  status: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  useCase: StringAggregateSelection;
+  workflowId: StringAggregateSelection;
+};
+
+export type AiRunAuditEventConnectInput = {
+  run?: InputMaybe<Array<AiRunAuditEventRunConnectFieldInput>>;
+};
+
+export type AiRunAuditEventConnectWhere = {
+  node: AiRunAuditEventWhere;
+};
+
+export type AiRunAuditEventCreateInput = {
+  action: Scalars['String']['input'];
+  actor: Scalars['String']['input'];
+  comment?: InputMaybe<Scalars['String']['input']>;
+  run?: InputMaybe<AiRunAuditEventRunFieldInput>;
+  runId: Scalars['String']['input'];
+};
+
+export type AiRunAuditEventDeleteInput = {
+  run?: InputMaybe<Array<AiRunAuditEventRunDeleteFieldInput>>;
+};
+
+export type AiRunAuditEventDisconnectInput = {
+  run?: InputMaybe<Array<AiRunAuditEventRunDisconnectFieldInput>>;
+};
+
+export type AiRunAuditEventEdge = {
+  __typename?: 'AiRunAuditEventEdge';
+  cursor: Scalars['String']['output'];
+  node: AiRunAuditEvent;
+};
+
+export type AiRunAuditEventRelationshipFilters = {
+  /** Filter type where all of the related AiRunAuditEvents match this filter */
+  all?: InputMaybe<AiRunAuditEventWhere>;
+  /** Filter type where none of the related AiRunAuditEvents match this filter */
+  none?: InputMaybe<AiRunAuditEventWhere>;
+  /** Filter type where one of the related AiRunAuditEvents match this filter */
+  single?: InputMaybe<AiRunAuditEventWhere>;
+  /** Filter type where some of the related AiRunAuditEvents match this filter */
+  some?: InputMaybe<AiRunAuditEventWhere>;
+};
+
+export type AiRunAuditEventRunAggregateInput = {
+  AND?: InputMaybe<Array<AiRunAuditEventRunAggregateInput>>;
+  NOT?: InputMaybe<AiRunAuditEventRunAggregateInput>;
+  OR?: InputMaybe<Array<AiRunAuditEventRunAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<AiRunAuditEventRunNodeAggregationWhereInput>;
+};
+
+export type AiRunAuditEventRunConnectFieldInput = {
+  connect?: InputMaybe<Array<AiRunConnectInput>>;
+  where?: InputMaybe<AiRunConnectWhere>;
+};
+
+export type AiRunAuditEventRunConnection = {
+  __typename?: 'AiRunAuditEventRunConnection';
+  aggregate: AiRunAuditEventAiRunRunAggregateSelection;
+  edges: Array<AiRunAuditEventRunRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type AiRunAuditEventRunConnectionAggregateInput = {
+  AND?: InputMaybe<Array<AiRunAuditEventRunConnectionAggregateInput>>;
+  NOT?: InputMaybe<AiRunAuditEventRunConnectionAggregateInput>;
+  OR?: InputMaybe<Array<AiRunAuditEventRunConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<AiRunAuditEventRunNodeAggregationWhereInput>;
+};
+
+export type AiRunAuditEventRunConnectionFilters = {
+  /** Filter AiRunAuditEvents by aggregating results on related AiRunAuditEventRunConnections */
+  aggregate?: InputMaybe<AiRunAuditEventRunConnectionAggregateInput>;
+  /** Return AiRunAuditEvents where all of the related AiRunAuditEventRunConnections match this filter */
+  all?: InputMaybe<AiRunAuditEventRunConnectionWhere>;
+  /** Return AiRunAuditEvents where none of the related AiRunAuditEventRunConnections match this filter */
+  none?: InputMaybe<AiRunAuditEventRunConnectionWhere>;
+  /** Return AiRunAuditEvents where one of the related AiRunAuditEventRunConnections match this filter */
+  single?: InputMaybe<AiRunAuditEventRunConnectionWhere>;
+  /** Return AiRunAuditEvents where some of the related AiRunAuditEventRunConnections match this filter */
+  some?: InputMaybe<AiRunAuditEventRunConnectionWhere>;
+};
+
+export type AiRunAuditEventRunConnectionSort = {
+  node?: InputMaybe<AiRunSort>;
+};
+
+export type AiRunAuditEventRunConnectionWhere = {
+  AND?: InputMaybe<Array<AiRunAuditEventRunConnectionWhere>>;
+  NOT?: InputMaybe<AiRunAuditEventRunConnectionWhere>;
+  OR?: InputMaybe<Array<AiRunAuditEventRunConnectionWhere>>;
+  node?: InputMaybe<AiRunWhere>;
+};
+
+export type AiRunAuditEventRunCreateFieldInput = {
+  node: AiRunCreateInput;
+};
+
+export type AiRunAuditEventRunDeleteFieldInput = {
+  delete?: InputMaybe<AiRunDeleteInput>;
+  where?: InputMaybe<AiRunAuditEventRunConnectionWhere>;
+};
+
+export type AiRunAuditEventRunDisconnectFieldInput = {
+  disconnect?: InputMaybe<AiRunDisconnectInput>;
+  where?: InputMaybe<AiRunAuditEventRunConnectionWhere>;
+};
+
+export type AiRunAuditEventRunFieldInput = {
+  connect?: InputMaybe<Array<AiRunAuditEventRunConnectFieldInput>>;
+  create?: InputMaybe<Array<AiRunAuditEventRunCreateFieldInput>>;
+};
+
+export type AiRunAuditEventRunNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<AiRunAuditEventRunNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<AiRunAuditEventRunNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<AiRunAuditEventRunNodeAggregationWhereInput>>;
+  approvalStatus?: InputMaybe<StringScalarAggregationFilters>;
+  approvedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  approvedBy?: InputMaybe<StringScalarAggregationFilters>;
+  companyId?: InputMaybe<StringScalarAggregationFilters>;
+  completedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  draftPayload?: InputMaybe<StringScalarAggregationFilters>;
+  errorMessage?: InputMaybe<StringScalarAggregationFilters>;
+  initiatedBy?: InputMaybe<StringScalarAggregationFilters>;
+  objective?: InputMaybe<StringScalarAggregationFilters>;
+  prompt?: InputMaybe<StringScalarAggregationFilters>;
+  rejectedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  rejectedBy?: InputMaybe<StringScalarAggregationFilters>;
+  resultSummary?: InputMaybe<StringScalarAggregationFilters>;
+  startedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  status?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  useCase?: InputMaybe<StringScalarAggregationFilters>;
+  workflowId?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type AiRunAuditEventRunRelationship = {
+  __typename?: 'AiRunAuditEventRunRelationship';
+  cursor: Scalars['String']['output'];
+  node: AiRun;
+};
+
+export type AiRunAuditEventRunUpdateConnectionInput = {
+  node?: InputMaybe<AiRunUpdateInput>;
+  where?: InputMaybe<AiRunAuditEventRunConnectionWhere>;
+};
+
+export type AiRunAuditEventRunUpdateFieldInput = {
+  connect?: InputMaybe<Array<AiRunAuditEventRunConnectFieldInput>>;
+  create?: InputMaybe<Array<AiRunAuditEventRunCreateFieldInput>>;
+  delete?: InputMaybe<Array<AiRunAuditEventRunDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<AiRunAuditEventRunDisconnectFieldInput>>;
+  update?: InputMaybe<AiRunAuditEventRunUpdateConnectionInput>;
+};
+
+/** Fields to sort AiRunAuditEvents by. The order in which sorts are applied is not guaranteed when specifying many fields in one AiRunAuditEventSort object. */
+export type AiRunAuditEventSort = {
+  action?: InputMaybe<SortDirection>;
+  actor?: InputMaybe<SortDirection>;
+  comment?: InputMaybe<SortDirection>;
+  createdAt?: InputMaybe<SortDirection>;
+  id?: InputMaybe<SortDirection>;
+  runId?: InputMaybe<SortDirection>;
+};
+
+export type AiRunAuditEventUpdateInput = {
+  action?: InputMaybe<StringScalarMutations>;
+  actor?: InputMaybe<StringScalarMutations>;
+  comment?: InputMaybe<StringScalarMutations>;
+  createdAt?: InputMaybe<DateTimeScalarMutations>;
+  run?: InputMaybe<Array<AiRunAuditEventRunUpdateFieldInput>>;
+  runId?: InputMaybe<StringScalarMutations>;
+};
+
+export type AiRunAuditEventWhere = {
+  AND?: InputMaybe<Array<AiRunAuditEventWhere>>;
+  NOT?: InputMaybe<AiRunAuditEventWhere>;
+  OR?: InputMaybe<Array<AiRunAuditEventWhere>>;
+  action?: InputMaybe<StringScalarFilters>;
+  actor?: InputMaybe<StringScalarFilters>;
+  comment?: InputMaybe<StringScalarFilters>;
+  createdAt?: InputMaybe<DateTimeScalarFilters>;
+  id?: InputMaybe<IdScalarFilters>;
+  run?: InputMaybe<AiRunRelationshipFilters>;
+  runConnection?: InputMaybe<AiRunAuditEventRunConnectionFilters>;
+  runId?: InputMaybe<StringScalarFilters>;
+};
+
+export type AiRunAuditEventsAggregateInput = {
+  AND?: InputMaybe<Array<AiRunAuditEventsAggregateInput>>;
+  NOT?: InputMaybe<AiRunAuditEventsAggregateInput>;
+  OR?: InputMaybe<Array<AiRunAuditEventsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<AiRunAuditEventsNodeAggregationWhereInput>;
+};
+
+export type AiRunAuditEventsConnectFieldInput = {
+  connect?: InputMaybe<Array<AiRunAuditEventConnectInput>>;
+  where?: InputMaybe<AiRunAuditEventConnectWhere>;
+};
+
+export type AiRunAuditEventsConnection = {
+  __typename?: 'AiRunAuditEventsConnection';
+  aggregate: AiRunAiRunAuditEventAuditEventsAggregateSelection;
+  edges: Array<AiRunAuditEventsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type AiRunAuditEventsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<AiRunAuditEventsConnectionAggregateInput>>;
+  NOT?: InputMaybe<AiRunAuditEventsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<AiRunAuditEventsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<AiRunAuditEventsNodeAggregationWhereInput>;
+};
+
+export type AiRunAuditEventsConnectionFilters = {
+  /** Filter AiRuns by aggregating results on related AiRunAuditEventsConnections */
+  aggregate?: InputMaybe<AiRunAuditEventsConnectionAggregateInput>;
+  /** Return AiRuns where all of the related AiRunAuditEventsConnections match this filter */
+  all?: InputMaybe<AiRunAuditEventsConnectionWhere>;
+  /** Return AiRuns where none of the related AiRunAuditEventsConnections match this filter */
+  none?: InputMaybe<AiRunAuditEventsConnectionWhere>;
+  /** Return AiRuns where one of the related AiRunAuditEventsConnections match this filter */
+  single?: InputMaybe<AiRunAuditEventsConnectionWhere>;
+  /** Return AiRuns where some of the related AiRunAuditEventsConnections match this filter */
+  some?: InputMaybe<AiRunAuditEventsConnectionWhere>;
+};
+
+export type AiRunAuditEventsConnectionSort = {
+  node?: InputMaybe<AiRunAuditEventSort>;
+};
+
+export type AiRunAuditEventsConnectionWhere = {
+  AND?: InputMaybe<Array<AiRunAuditEventsConnectionWhere>>;
+  NOT?: InputMaybe<AiRunAuditEventsConnectionWhere>;
+  OR?: InputMaybe<Array<AiRunAuditEventsConnectionWhere>>;
+  node?: InputMaybe<AiRunAuditEventWhere>;
+};
+
+export type AiRunAuditEventsCreateFieldInput = {
+  node: AiRunAuditEventCreateInput;
+};
+
+export type AiRunAuditEventsDeleteFieldInput = {
+  delete?: InputMaybe<AiRunAuditEventDeleteInput>;
+  where?: InputMaybe<AiRunAuditEventsConnectionWhere>;
+};
+
+export type AiRunAuditEventsDisconnectFieldInput = {
+  disconnect?: InputMaybe<AiRunAuditEventDisconnectInput>;
+  where?: InputMaybe<AiRunAuditEventsConnectionWhere>;
+};
+
+export type AiRunAuditEventsFieldInput = {
+  connect?: InputMaybe<Array<AiRunAuditEventsConnectFieldInput>>;
+  create?: InputMaybe<Array<AiRunAuditEventsCreateFieldInput>>;
+};
+
+export type AiRunAuditEventsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<AiRunAuditEventsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<AiRunAuditEventsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<AiRunAuditEventsNodeAggregationWhereInput>>;
+  action?: InputMaybe<StringScalarAggregationFilters>;
+  actor?: InputMaybe<StringScalarAggregationFilters>;
+  comment?: InputMaybe<StringScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  runId?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type AiRunAuditEventsRelationship = {
+  __typename?: 'AiRunAuditEventsRelationship';
+  cursor: Scalars['String']['output'];
+  node: AiRunAuditEvent;
+};
+
+export type AiRunAuditEventsUpdateConnectionInput = {
+  node?: InputMaybe<AiRunAuditEventUpdateInput>;
+  where?: InputMaybe<AiRunAuditEventsConnectionWhere>;
+};
+
+export type AiRunAuditEventsUpdateFieldInput = {
+  connect?: InputMaybe<Array<AiRunAuditEventsConnectFieldInput>>;
+  create?: InputMaybe<Array<AiRunAuditEventsCreateFieldInput>>;
+  delete?: InputMaybe<Array<AiRunAuditEventsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<AiRunAuditEventsDisconnectFieldInput>>;
+  update?: InputMaybe<AiRunAuditEventsUpdateConnectionInput>;
+};
+
+export type AiRunCompanyAggregateInput = {
+  AND?: InputMaybe<Array<AiRunCompanyAggregateInput>>;
+  NOT?: InputMaybe<AiRunCompanyAggregateInput>;
+  OR?: InputMaybe<Array<AiRunCompanyAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<AiRunCompanyNodeAggregationWhereInput>;
+};
+
+export type AiRunCompanyCompanyAggregateSelection = {
+  __typename?: 'AiRunCompanyCompanyAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<AiRunCompanyCompanyNodeAggregateSelection>;
+};
+
+export type AiRunCompanyCompanyNodeAggregateSelection = {
+  __typename?: 'AiRunCompanyCompanyNodeAggregateSelection';
+  address: StringAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  diagramFont: StringAggregateSelection;
+  features: StringAggregateSelection;
+  font: StringAggregateSelection;
+  industry: StringAggregateSelection;
+  logo: StringAggregateSelection;
+  name: StringAggregateSelection;
+  primaryColor: StringAggregateSelection;
+  secondaryColor: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  website: StringAggregateSelection;
+};
+
+export type AiRunCompanyConnectFieldInput = {
+  connect?: InputMaybe<Array<CompanyConnectInput>>;
+  where?: InputMaybe<CompanyConnectWhere>;
+};
+
+export type AiRunCompanyConnection = {
+  __typename?: 'AiRunCompanyConnection';
+  aggregate: AiRunCompanyCompanyAggregateSelection;
+  edges: Array<AiRunCompanyRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type AiRunCompanyConnectionAggregateInput = {
+  AND?: InputMaybe<Array<AiRunCompanyConnectionAggregateInput>>;
+  NOT?: InputMaybe<AiRunCompanyConnectionAggregateInput>;
+  OR?: InputMaybe<Array<AiRunCompanyConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<AiRunCompanyNodeAggregationWhereInput>;
+};
+
+export type AiRunCompanyConnectionFilters = {
+  /** Filter AiRuns by aggregating results on related AiRunCompanyConnections */
+  aggregate?: InputMaybe<AiRunCompanyConnectionAggregateInput>;
+  /** Return AiRuns where all of the related AiRunCompanyConnections match this filter */
+  all?: InputMaybe<AiRunCompanyConnectionWhere>;
+  /** Return AiRuns where none of the related AiRunCompanyConnections match this filter */
+  none?: InputMaybe<AiRunCompanyConnectionWhere>;
+  /** Return AiRuns where one of the related AiRunCompanyConnections match this filter */
+  single?: InputMaybe<AiRunCompanyConnectionWhere>;
+  /** Return AiRuns where some of the related AiRunCompanyConnections match this filter */
+  some?: InputMaybe<AiRunCompanyConnectionWhere>;
+};
+
+export type AiRunCompanyConnectionSort = {
+  node?: InputMaybe<CompanySort>;
+};
+
+export type AiRunCompanyConnectionWhere = {
+  AND?: InputMaybe<Array<AiRunCompanyConnectionWhere>>;
+  NOT?: InputMaybe<AiRunCompanyConnectionWhere>;
+  OR?: InputMaybe<Array<AiRunCompanyConnectionWhere>>;
+  node?: InputMaybe<CompanyWhere>;
+};
+
+export type AiRunCompanyCreateFieldInput = {
+  node: CompanyCreateInput;
+};
+
+export type AiRunCompanyDeleteFieldInput = {
+  delete?: InputMaybe<CompanyDeleteInput>;
+  where?: InputMaybe<AiRunCompanyConnectionWhere>;
+};
+
+export type AiRunCompanyDisconnectFieldInput = {
+  disconnect?: InputMaybe<CompanyDisconnectInput>;
+  where?: InputMaybe<AiRunCompanyConnectionWhere>;
+};
+
+export type AiRunCompanyFieldInput = {
+  connect?: InputMaybe<Array<AiRunCompanyConnectFieldInput>>;
+  create?: InputMaybe<Array<AiRunCompanyCreateFieldInput>>;
+};
+
+export type AiRunCompanyNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<AiRunCompanyNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<AiRunCompanyNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<AiRunCompanyNodeAggregationWhereInput>>;
+  address?: InputMaybe<StringScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  diagramFont?: InputMaybe<StringScalarAggregationFilters>;
+  features?: InputMaybe<StringScalarAggregationFilters>;
+  font?: InputMaybe<StringScalarAggregationFilters>;
+  industry?: InputMaybe<StringScalarAggregationFilters>;
+  logo?: InputMaybe<StringScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  primaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  website?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type AiRunCompanyRelationship = {
+  __typename?: 'AiRunCompanyRelationship';
+  cursor: Scalars['String']['output'];
+  node: Company;
+};
+
+export type AiRunCompanyUpdateConnectionInput = {
+  node?: InputMaybe<CompanyUpdateInput>;
+  where?: InputMaybe<AiRunCompanyConnectionWhere>;
+};
+
+export type AiRunCompanyUpdateFieldInput = {
+  connect?: InputMaybe<Array<AiRunCompanyConnectFieldInput>>;
+  create?: InputMaybe<Array<AiRunCompanyCreateFieldInput>>;
+  delete?: InputMaybe<Array<AiRunCompanyDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<AiRunCompanyDisconnectFieldInput>>;
+  update?: InputMaybe<AiRunCompanyUpdateConnectionInput>;
+};
+
+export type AiRunConnectInput = {
+  auditEvents?: InputMaybe<Array<AiRunAuditEventsConnectFieldInput>>;
+  company?: InputMaybe<Array<AiRunCompanyConnectFieldInput>>;
+};
+
+export type AiRunConnectWhere = {
+  node: AiRunWhere;
+};
+
+export type AiRunCreateInput = {
+  approvalStatus?: InputMaybe<Scalars['String']['input']>;
+  approvedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  approvedBy?: InputMaybe<Scalars['String']['input']>;
+  auditEvents?: InputMaybe<AiRunAuditEventsFieldInput>;
+  company?: InputMaybe<AiRunCompanyFieldInput>;
+  companyId: Scalars['String']['input'];
+  completedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  draftPayload?: InputMaybe<Scalars['String']['input']>;
+  errorMessage?: InputMaybe<Scalars['String']['input']>;
+  initiatedBy?: InputMaybe<Scalars['String']['input']>;
+  objective?: InputMaybe<Scalars['String']['input']>;
+  prompt: Scalars['String']['input'];
+  rejectedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  rejectedBy?: InputMaybe<Scalars['String']['input']>;
+  resultSummary?: InputMaybe<Scalars['String']['input']>;
+  startedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  status: Scalars['String']['input'];
+  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  useCase: Scalars['String']['input'];
+  workflowId?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type AiRunDeleteInput = {
+  auditEvents?: InputMaybe<Array<AiRunAuditEventsDeleteFieldInput>>;
+  company?: InputMaybe<Array<AiRunCompanyDeleteFieldInput>>;
+};
+
+export type AiRunDisconnectInput = {
+  auditEvents?: InputMaybe<Array<AiRunAuditEventsDisconnectFieldInput>>;
+  company?: InputMaybe<Array<AiRunCompanyDisconnectFieldInput>>;
+};
+
+export type AiRunEdge = {
+  __typename?: 'AiRunEdge';
+  cursor: Scalars['String']['output'];
+  node: AiRun;
+};
+
+export type AiRunRelationshipFilters = {
+  /** Filter type where all of the related AiRuns match this filter */
+  all?: InputMaybe<AiRunWhere>;
+  /** Filter type where none of the related AiRuns match this filter */
+  none?: InputMaybe<AiRunWhere>;
+  /** Filter type where one of the related AiRuns match this filter */
+  single?: InputMaybe<AiRunWhere>;
+  /** Filter type where some of the related AiRuns match this filter */
+  some?: InputMaybe<AiRunWhere>;
+};
+
+/** Fields to sort AiRuns by. The order in which sorts are applied is not guaranteed when specifying many fields in one AiRunSort object. */
+export type AiRunSort = {
+  approvalStatus?: InputMaybe<SortDirection>;
+  approvedAt?: InputMaybe<SortDirection>;
+  approvedBy?: InputMaybe<SortDirection>;
+  companyId?: InputMaybe<SortDirection>;
+  completedAt?: InputMaybe<SortDirection>;
+  createdAt?: InputMaybe<SortDirection>;
+  draftPayload?: InputMaybe<SortDirection>;
+  errorMessage?: InputMaybe<SortDirection>;
+  id?: InputMaybe<SortDirection>;
+  initiatedBy?: InputMaybe<SortDirection>;
+  objective?: InputMaybe<SortDirection>;
+  prompt?: InputMaybe<SortDirection>;
+  rejectedAt?: InputMaybe<SortDirection>;
+  rejectedBy?: InputMaybe<SortDirection>;
+  resultSummary?: InputMaybe<SortDirection>;
+  startedAt?: InputMaybe<SortDirection>;
+  status?: InputMaybe<SortDirection>;
+  updatedAt?: InputMaybe<SortDirection>;
+  useCase?: InputMaybe<SortDirection>;
+  workflowId?: InputMaybe<SortDirection>;
+};
+
+export type AiRunUpdateInput = {
+  approvalStatus?: InputMaybe<StringScalarMutations>;
+  approvedAt?: InputMaybe<DateTimeScalarMutations>;
+  approvedBy?: InputMaybe<StringScalarMutations>;
+  auditEvents?: InputMaybe<Array<AiRunAuditEventsUpdateFieldInput>>;
+  company?: InputMaybe<Array<AiRunCompanyUpdateFieldInput>>;
+  companyId?: InputMaybe<StringScalarMutations>;
+  completedAt?: InputMaybe<DateTimeScalarMutations>;
+  createdAt?: InputMaybe<DateTimeScalarMutations>;
+  draftPayload?: InputMaybe<StringScalarMutations>;
+  errorMessage?: InputMaybe<StringScalarMutations>;
+  initiatedBy?: InputMaybe<StringScalarMutations>;
+  objective?: InputMaybe<StringScalarMutations>;
+  prompt?: InputMaybe<StringScalarMutations>;
+  rejectedAt?: InputMaybe<DateTimeScalarMutations>;
+  rejectedBy?: InputMaybe<StringScalarMutations>;
+  resultSummary?: InputMaybe<StringScalarMutations>;
+  startedAt?: InputMaybe<DateTimeScalarMutations>;
+  status?: InputMaybe<StringScalarMutations>;
+  useCase?: InputMaybe<StringScalarMutations>;
+  workflowId?: InputMaybe<StringScalarMutations>;
+};
+
+export type AiRunWhere = {
+  AND?: InputMaybe<Array<AiRunWhere>>;
+  NOT?: InputMaybe<AiRunWhere>;
+  OR?: InputMaybe<Array<AiRunWhere>>;
+  approvalStatus?: InputMaybe<StringScalarFilters>;
+  approvedAt?: InputMaybe<DateTimeScalarFilters>;
+  approvedBy?: InputMaybe<StringScalarFilters>;
+  auditEvents?: InputMaybe<AiRunAuditEventRelationshipFilters>;
+  auditEventsConnection?: InputMaybe<AiRunAuditEventsConnectionFilters>;
+  company?: InputMaybe<CompanyRelationshipFilters>;
+  companyConnection?: InputMaybe<AiRunCompanyConnectionFilters>;
+  companyId?: InputMaybe<StringScalarFilters>;
+  completedAt?: InputMaybe<DateTimeScalarFilters>;
+  createdAt?: InputMaybe<DateTimeScalarFilters>;
+  draftPayload?: InputMaybe<StringScalarFilters>;
+  errorMessage?: InputMaybe<StringScalarFilters>;
+  id?: InputMaybe<IdScalarFilters>;
+  initiatedBy?: InputMaybe<StringScalarFilters>;
+  objective?: InputMaybe<StringScalarFilters>;
+  prompt?: InputMaybe<StringScalarFilters>;
+  rejectedAt?: InputMaybe<DateTimeScalarFilters>;
+  rejectedBy?: InputMaybe<StringScalarFilters>;
+  resultSummary?: InputMaybe<StringScalarFilters>;
+  startedAt?: InputMaybe<DateTimeScalarFilters>;
+  status?: InputMaybe<StringScalarFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarFilters>;
+  useCase?: InputMaybe<StringScalarFilters>;
+  workflowId?: InputMaybe<StringScalarFilters>;
+};
+
+export type AiRunsConnection = {
+  __typename?: 'AiRunsConnection';
+  aggregate: AiRunAggregate;
+  edges: Array<AiRunEdge>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
@@ -2274,6 +3124,7 @@ export type Application = {
   introductionDate?: Maybe<Scalars['Date']['output']>;
   isDataSourceFor: Array<DataObject>;
   isDataSourceForConnection: ApplicationIsDataSourceForConnection;
+  lastSovereigntyAssessmentAt?: Maybe<Scalars['DateTime']['output']>;
   maintainedBy: Array<Supplier>;
   maintainedByConnection: ApplicationMaintainedByConnection;
   name: Scalars['String']['output'];
@@ -2291,6 +3142,13 @@ export type Application = {
   sevenRStrategy?: Maybe<SevenRStrategy>;
   sourceOfInterfaces: Array<ApplicationInterface>;
   sourceOfInterfacesConnection: ApplicationSourceOfInterfacesConnection;
+  sovereigntyAchDataResidency?: Maybe<SovereigntyMaturity>;
+  sovereigntyAchInteroperability?: Maybe<SovereigntyMaturity>;
+  sovereigntyAchJurisdictionControl?: Maybe<SovereigntyMaturity>;
+  sovereigntyAchOperationalControl?: Maybe<SovereigntyMaturity>;
+  sovereigntyAchPortability?: Maybe<SovereigntyMaturity>;
+  sovereigntyAchSupplyChainTransparency?: Maybe<SovereigntyMaturity>;
+  sovereigntyEvidence?: Maybe<Scalars['String']['output']>;
   status: ApplicationStatus;
   successors: Array<Application>;
   successorsConnection: ApplicationSuccessorsConnection;
@@ -2705,10 +3563,12 @@ export type ApplicationAiComponentUsesAiComponentsNodeAggregateSelection = {
   costs: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   license: StringAggregateSelection;
   model: StringAggregateSelection;
   name: StringAggregateSelection;
   provider: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   version: StringAggregateSelection;
 };
@@ -2725,7 +3585,9 @@ export type ApplicationAggregateNode = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   hostingEnvironment: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
   version: StringAggregateSelection;
@@ -2743,7 +3605,9 @@ export type ApplicationApplicationComponentsNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   hostingEnvironment: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
   version: StringAggregateSelection;
@@ -2759,7 +3623,9 @@ export type ApplicationApplicationInterfaceSourceOfInterfacesNodeAggregateSelect
   __typename?: 'ApplicationApplicationInterfaceSourceOfInterfacesNodeAggregateSelection';
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   version: StringAggregateSelection;
 };
@@ -2774,7 +3640,9 @@ export type ApplicationApplicationInterfaceTargetOfInterfacesNodeAggregateSelect
   __typename?: 'ApplicationApplicationInterfaceTargetOfInterfacesNodeAggregateSelection';
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   version: StringAggregateSelection;
 };
@@ -2791,7 +3659,9 @@ export type ApplicationApplicationParentsNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   hostingEnvironment: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
   version: StringAggregateSelection;
@@ -2809,7 +3679,9 @@ export type ApplicationApplicationPredecessorsNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   hostingEnvironment: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
   version: StringAggregateSelection;
@@ -2827,7 +3699,9 @@ export type ApplicationApplicationSuccessorsNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   hostingEnvironment: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
   version: StringAggregateSelection;
@@ -2841,9 +3715,13 @@ export type ApplicationArchitecturePartOfArchitecturesAggregateSelection = {
 
 export type ApplicationArchitecturePartOfArchitecturesNodeAggregateSelection = {
   __typename?: 'ApplicationArchitecturePartOfArchitecturesNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
   timestamp: DateTimeAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
@@ -2861,6 +3739,8 @@ export type ApplicationArchitecturePrincipleImplementsPrinciplesNodeAggregateSel
   implications: StringAggregateSelection;
   name: StringAggregateSelection;
   rationale: StringAggregateSelection;
+  sovereigntyReqRationale: StringAggregateSelection;
+  sovereigntyReqWeight: FloatAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -2878,6 +3758,8 @@ export type ApplicationBusinessCapabilitySupportsCapabilitiesNodeAggregateSelect
   maturityLevel: IntAggregateSelection;
   name: StringAggregateSelection;
   sequenceNumber: IntAggregateSelection;
+  sovereigntyReqRationale: StringAggregateSelection;
+  sovereigntyReqWeight: FloatAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -2895,6 +3777,8 @@ export type ApplicationBusinessProcessSupportsBusinessProcessesNodeAggregateSele
   description: StringAggregateSelection;
   maturityLevel: IntAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyReqRationale: StringAggregateSelection;
+  sovereigntyReqWeight: FloatAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -3121,7 +4005,9 @@ export type ApplicationComponentsNodeAggregationWhereInput = {
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
@@ -3188,6 +4074,7 @@ export type ApplicationCreateInput = {
   implementsPrinciples?: InputMaybe<ApplicationImplementsPrinciplesFieldInput>;
   introductionDate?: InputMaybe<Scalars['Date']['input']>;
   isDataSourceFor?: InputMaybe<ApplicationIsDataSourceForFieldInput>;
+  lastSovereigntyAssessmentAt?: InputMaybe<Scalars['DateTime']['input']>;
   maintainedBy?: InputMaybe<ApplicationMaintainedByFieldInput>;
   name: Scalars['String']['input'];
   owners?: InputMaybe<ApplicationOwnersFieldInput>;
@@ -3198,6 +4085,13 @@ export type ApplicationCreateInput = {
   providedBy?: InputMaybe<ApplicationProvidedByFieldInput>;
   sevenRStrategy?: InputMaybe<SevenRStrategy>;
   sourceOfInterfaces?: InputMaybe<ApplicationSourceOfInterfacesFieldInput>;
+  sovereigntyAchDataResidency?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyAchInteroperability?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyAchJurisdictionControl?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyAchOperationalControl?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyAchPortability?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyAchSupplyChainTransparency?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyEvidence?: InputMaybe<Scalars['String']['input']>;
   status: ApplicationStatus;
   successors?: InputMaybe<ApplicationSuccessorsFieldInput>;
   supportedBy?: InputMaybe<ApplicationSupportedByFieldInput>;
@@ -3226,6 +4120,8 @@ export type ApplicationDataObjectIsDataSourceForNodeAggregateSelection = {
   description: StringAggregateSelection;
   format: StringAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyReqRationale: StringAggregateSelection;
+  sovereigntyReqWeight: FloatAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -3241,6 +4137,8 @@ export type ApplicationDataObjectUsesDataObjectsNodeAggregateSelection = {
   description: StringAggregateSelection;
   format: StringAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyReqRationale: StringAggregateSelection;
+  sovereigntyReqWeight: FloatAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -3510,10 +4408,12 @@ export type ApplicationHostedOnNodeAggregationWhereInput = {
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   ipAddress?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   location?: InputMaybe<StringScalarAggregationFilters>;
   maintenanceWindow?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   operatingSystem?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   specifications?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
@@ -3625,6 +4525,8 @@ export type ApplicationImplementsPrinciplesNodeAggregationWhereInput = {
   implications?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   rationale?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
@@ -3660,10 +4562,12 @@ export type ApplicationInfrastructureHostedOnNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   ipAddress: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   location: StringAggregateSelection;
   maintenanceWindow: StringAggregateSelection;
   name: StringAggregateSelection;
   operatingSystem: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   specifications: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
@@ -3686,6 +4590,7 @@ export type ApplicationInterface = {
   id: Scalars['ID']['output'];
   interfaceType: InterfaceType;
   introductionDate?: Maybe<Scalars['Date']['output']>;
+  lastSovereigntyAssessmentAt?: Maybe<Scalars['DateTime']['output']>;
   name: Scalars['String']['output'];
   owners: Array<Person>;
   ownersConnection: ApplicationInterfaceOwnersConnection;
@@ -3697,6 +4602,13 @@ export type ApplicationInterface = {
   protocol?: Maybe<InterfaceProtocol>;
   sourceApplications: Array<Application>;
   sourceApplicationsConnection: ApplicationInterfaceSourceApplicationsConnection;
+  sovereigntyAchDataResidency?: Maybe<SovereigntyMaturity>;
+  sovereigntyAchInteroperability?: Maybe<SovereigntyMaturity>;
+  sovereigntyAchJurisdictionControl?: Maybe<SovereigntyMaturity>;
+  sovereigntyAchOperationalControl?: Maybe<SovereigntyMaturity>;
+  sovereigntyAchPortability?: Maybe<SovereigntyMaturity>;
+  sovereigntyAchSupplyChainTransparency?: Maybe<SovereigntyMaturity>;
+  sovereigntyEvidence?: Maybe<Scalars['String']['output']>;
   status: InterfaceStatus;
   successors: Array<ApplicationInterface>;
   successorsConnection: ApplicationInterfaceSuccessorsConnection;
@@ -3898,7 +4810,9 @@ export type ApplicationInterfaceAggregateNode = {
   __typename?: 'ApplicationInterfaceAggregateNode';
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   version: StringAggregateSelection;
 };
@@ -3913,7 +4827,9 @@ export type ApplicationInterfaceApplicationInterfacePredecessorsNodeAggregateSel
   __typename?: 'ApplicationInterfaceApplicationInterfacePredecessorsNodeAggregateSelection';
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   version: StringAggregateSelection;
 };
@@ -3928,7 +4844,9 @@ export type ApplicationInterfaceApplicationInterfaceSuccessorsNodeAggregateSelec
   __typename?: 'ApplicationInterfaceApplicationInterfaceSuccessorsNodeAggregateSelection';
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   version: StringAggregateSelection;
 };
@@ -3945,7 +4863,9 @@ export type ApplicationInterfaceApplicationSourceApplicationsNodeAggregateSelect
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   hostingEnvironment: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
   version: StringAggregateSelection;
@@ -3963,7 +4883,9 @@ export type ApplicationInterfaceApplicationTargetApplicationsNodeAggregateSelect
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   hostingEnvironment: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
   version: StringAggregateSelection;
@@ -3977,9 +4899,13 @@ export type ApplicationInterfaceArchitecturePartOfArchitecturesAggregateSelectio
 
 export type ApplicationInterfaceArchitecturePartOfArchitecturesNodeAggregateSelection = {
   __typename?: 'ApplicationInterfaceArchitecturePartOfArchitecturesNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
   timestamp: DateTimeAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
@@ -4148,6 +5074,7 @@ export type ApplicationInterfaceCreateInput = {
   endOfUseDate?: InputMaybe<Scalars['Date']['input']>;
   interfaceType: InterfaceType;
   introductionDate?: InputMaybe<Scalars['Date']['input']>;
+  lastSovereigntyAssessmentAt?: InputMaybe<Scalars['DateTime']['input']>;
   name: Scalars['String']['input'];
   owners?: InputMaybe<ApplicationInterfaceOwnersFieldInput>;
   partOfArchitectures?: InputMaybe<ApplicationInterfacePartOfArchitecturesFieldInput>;
@@ -4155,6 +5082,13 @@ export type ApplicationInterfaceCreateInput = {
   predecessors?: InputMaybe<ApplicationInterfacePredecessorsFieldInput>;
   protocol?: InputMaybe<InterfaceProtocol>;
   sourceApplications?: InputMaybe<ApplicationInterfaceSourceApplicationsFieldInput>;
+  sovereigntyAchDataResidency?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyAchInteroperability?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyAchJurisdictionControl?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyAchOperationalControl?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyAchPortability?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyAchSupplyChainTransparency?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyEvidence?: InputMaybe<Scalars['String']['input']>;
   status: InterfaceStatus;
   successors?: InputMaybe<ApplicationInterfaceSuccessorsFieldInput>;
   targetApplications?: InputMaybe<ApplicationInterfaceTargetApplicationsFieldInput>;
@@ -4175,6 +5109,8 @@ export type ApplicationInterfaceDataObjectDataObjectsNodeAggregateSelection = {
   description: StringAggregateSelection;
   format: StringAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyReqRationale: StringAggregateSelection;
+  sovereigntyReqWeight: FloatAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -4263,6 +5199,8 @@ export type ApplicationInterfaceDataObjectsNodeAggregationWhereInput = {
   description?: InputMaybe<StringScalarAggregationFilters>;
   format?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
@@ -4650,9 +5588,13 @@ export type ApplicationInterfacePartOfArchitecturesNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<ApplicationInterfacePartOfArchitecturesNodeAggregationWhereInput>>;
   NOT?: InputMaybe<ApplicationInterfacePartOfArchitecturesNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<ApplicationInterfacePartOfArchitecturesNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
   timestamp?: InputMaybe<DateTimeScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
@@ -4778,7 +5720,9 @@ export type ApplicationInterfacePredecessorsNodeAggregationWhereInput = {
   OR?: InputMaybe<Array<ApplicationInterfacePredecessorsNodeAggregationWhereInput>>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -4822,9 +5766,17 @@ export type ApplicationInterfaceSort = {
   id?: InputMaybe<SortDirection>;
   interfaceType?: InputMaybe<SortDirection>;
   introductionDate?: InputMaybe<SortDirection>;
+  lastSovereigntyAssessmentAt?: InputMaybe<SortDirection>;
   name?: InputMaybe<SortDirection>;
   planningDate?: InputMaybe<SortDirection>;
   protocol?: InputMaybe<SortDirection>;
+  sovereigntyAchDataResidency?: InputMaybe<SortDirection>;
+  sovereigntyAchInteroperability?: InputMaybe<SortDirection>;
+  sovereigntyAchJurisdictionControl?: InputMaybe<SortDirection>;
+  sovereigntyAchOperationalControl?: InputMaybe<SortDirection>;
+  sovereigntyAchPortability?: InputMaybe<SortDirection>;
+  sovereigntyAchSupplyChainTransparency?: InputMaybe<SortDirection>;
+  sovereigntyEvidence?: InputMaybe<SortDirection>;
   status?: InputMaybe<SortDirection>;
   updatedAt?: InputMaybe<SortDirection>;
   version?: InputMaybe<SortDirection>;
@@ -4915,7 +5867,9 @@ export type ApplicationInterfaceSourceApplicationsNodeAggregationWhereInput = {
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
@@ -5023,7 +5977,9 @@ export type ApplicationInterfaceSuccessorsNodeAggregationWhereInput = {
   OR?: InputMaybe<Array<ApplicationInterfaceSuccessorsNodeAggregationWhereInput>>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -5132,7 +6088,9 @@ export type ApplicationInterfaceTargetApplicationsNodeAggregationWhereInput = {
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
@@ -5167,6 +6125,7 @@ export type ApplicationInterfaceUpdateInput = {
   endOfUseDate?: InputMaybe<DateScalarMutations>;
   interfaceType?: InputMaybe<InterfaceTypeEnumScalarMutations>;
   introductionDate?: InputMaybe<DateScalarMutations>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarMutations>;
   name?: InputMaybe<StringScalarMutations>;
   owners?: InputMaybe<Array<ApplicationInterfaceOwnersUpdateFieldInput>>;
   partOfArchitectures?: InputMaybe<Array<ApplicationInterfacePartOfArchitecturesUpdateFieldInput>>;
@@ -5174,6 +6133,13 @@ export type ApplicationInterfaceUpdateInput = {
   predecessors?: InputMaybe<Array<ApplicationInterfacePredecessorsUpdateFieldInput>>;
   protocol?: InputMaybe<InterfaceProtocolEnumScalarMutations>;
   sourceApplications?: InputMaybe<Array<ApplicationInterfaceSourceApplicationsUpdateFieldInput>>;
+  sovereigntyAchDataResidency?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyAchInteroperability?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyAchJurisdictionControl?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyAchOperationalControl?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyAchPortability?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyAchSupplyChainTransparency?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyEvidence?: InputMaybe<StringScalarMutations>;
   status?: InputMaybe<InterfaceStatusEnumScalarMutations>;
   successors?: InputMaybe<Array<ApplicationInterfaceSuccessorsUpdateFieldInput>>;
   targetApplications?: InputMaybe<Array<ApplicationInterfaceTargetApplicationsUpdateFieldInput>>;
@@ -5305,6 +6271,7 @@ export type ApplicationInterfaceWhere = {
   id?: InputMaybe<IdScalarFilters>;
   interfaceType?: InputMaybe<InterfaceTypeEnumScalarFilters>;
   introductionDate?: InputMaybe<DateScalarFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarFilters>;
   name?: InputMaybe<StringScalarFilters>;
   owners?: InputMaybe<PersonRelationshipFilters>;
   ownersConnection?: InputMaybe<ApplicationInterfaceOwnersConnectionFilters>;
@@ -5316,6 +6283,13 @@ export type ApplicationInterfaceWhere = {
   protocol?: InputMaybe<InterfaceProtocolEnumScalarFilters>;
   sourceApplications?: InputMaybe<ApplicationRelationshipFilters>;
   sourceApplicationsConnection?: InputMaybe<ApplicationInterfaceSourceApplicationsConnectionFilters>;
+  sovereigntyAchDataResidency?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyAchInteroperability?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyAchJurisdictionControl?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyAchOperationalControl?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyAchPortability?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyAchSupplyChainTransparency?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarFilters>;
   status?: InputMaybe<InterfaceStatusEnumScalarFilters>;
   successors?: InputMaybe<ApplicationInterfaceRelationshipFilters>;
   successorsConnection?: InputMaybe<ApplicationInterfaceSuccessorsConnectionFilters>;
@@ -5420,6 +6394,8 @@ export type ApplicationIsDataSourceForNodeAggregationWhereInput = {
   description?: InputMaybe<StringScalarAggregationFilters>;
   format?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
@@ -5528,10 +6504,12 @@ export type ApplicationMaintainedByNodeAggregationWhereInput = {
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   email?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   performanceRating?: InputMaybe<IntScalarAggregationFilters>;
   phone?: InputMaybe<StringScalarAggregationFilters>;
   primaryContactPerson?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -5766,7 +6744,9 @@ export type ApplicationParentsNodeAggregationWhereInput = {
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
@@ -5872,9 +6852,13 @@ export type ApplicationPartOfArchitecturesNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<ApplicationPartOfArchitecturesNodeAggregationWhereInput>>;
   NOT?: InputMaybe<ApplicationPartOfArchitecturesNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<ApplicationPartOfArchitecturesNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
   timestamp?: InputMaybe<DateTimeScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
@@ -6002,7 +6986,9 @@ export type ApplicationPredecessorsNodeAggregationWhereInput = {
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
@@ -6113,10 +7099,12 @@ export type ApplicationProvidedByNodeAggregationWhereInput = {
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   email?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   performanceRating?: InputMaybe<IntScalarAggregationFilters>;
   phone?: InputMaybe<StringScalarAggregationFilters>;
   primaryContactPerson?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -6162,9 +7150,17 @@ export type ApplicationSort = {
   hostingEnvironment?: InputMaybe<SortDirection>;
   id?: InputMaybe<SortDirection>;
   introductionDate?: InputMaybe<SortDirection>;
+  lastSovereigntyAssessmentAt?: InputMaybe<SortDirection>;
   name?: InputMaybe<SortDirection>;
   planningDate?: InputMaybe<SortDirection>;
   sevenRStrategy?: InputMaybe<SortDirection>;
+  sovereigntyAchDataResidency?: InputMaybe<SortDirection>;
+  sovereigntyAchInteroperability?: InputMaybe<SortDirection>;
+  sovereigntyAchJurisdictionControl?: InputMaybe<SortDirection>;
+  sovereigntyAchOperationalControl?: InputMaybe<SortDirection>;
+  sovereigntyAchPortability?: InputMaybe<SortDirection>;
+  sovereigntyAchSupplyChainTransparency?: InputMaybe<SortDirection>;
+  sovereigntyEvidence?: InputMaybe<SortDirection>;
   status?: InputMaybe<SortDirection>;
   timeCategory?: InputMaybe<SortDirection>;
   updatedAt?: InputMaybe<SortDirection>;
@@ -6255,7 +7251,9 @@ export type ApplicationSourceOfInterfacesNodeAggregationWhereInput = {
   OR?: InputMaybe<Array<ApplicationSourceOfInterfacesNodeAggregationWhereInput>>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -6382,7 +7380,9 @@ export type ApplicationSuccessorsNodeAggregationWhereInput = {
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
@@ -6420,10 +7420,12 @@ export type ApplicationSupplierMaintainedByNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   email: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
   performanceRating: IntAggregateSelection;
   phone: StringAggregateSelection;
   primaryContactPerson: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -6441,10 +7443,12 @@ export type ApplicationSupplierProvidedByNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   email: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
   performanceRating: IntAggregateSelection;
   phone: StringAggregateSelection;
   primaryContactPerson: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -6462,10 +7466,12 @@ export type ApplicationSupplierSupportedByNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   email: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
   performanceRating: IntAggregateSelection;
   phone: StringAggregateSelection;
   primaryContactPerson: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -6556,10 +7562,12 @@ export type ApplicationSupportedByNodeAggregationWhereInput = {
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   email?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   performanceRating?: InputMaybe<IntScalarAggregationFilters>;
   phone?: InputMaybe<StringScalarAggregationFilters>;
   primaryContactPerson?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -6670,6 +7678,8 @@ export type ApplicationSupportsBusinessProcessesNodeAggregationWhereInput = {
   description?: InputMaybe<StringScalarAggregationFilters>;
   maturityLevel?: InputMaybe<IntScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
@@ -6779,6 +7789,8 @@ export type ApplicationSupportsCapabilitiesNodeAggregationWhereInput = {
   maturityLevel?: InputMaybe<IntScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   sequenceNumber?: InputMaybe<IntScalarAggregationFilters>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
@@ -6884,7 +7896,9 @@ export type ApplicationTargetOfInterfacesNodeAggregationWhereInput = {
   OR?: InputMaybe<Array<ApplicationTargetOfInterfacesNodeAggregationWhereInput>>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -6923,6 +7937,7 @@ export type ApplicationUpdateInput = {
   implementsPrinciples?: InputMaybe<Array<ApplicationImplementsPrinciplesUpdateFieldInput>>;
   introductionDate?: InputMaybe<DateScalarMutations>;
   isDataSourceFor?: InputMaybe<Array<ApplicationIsDataSourceForUpdateFieldInput>>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarMutations>;
   maintainedBy?: InputMaybe<Array<ApplicationMaintainedByUpdateFieldInput>>;
   name?: InputMaybe<StringScalarMutations>;
   owners?: InputMaybe<Array<ApplicationOwnersUpdateFieldInput>>;
@@ -6933,6 +7948,13 @@ export type ApplicationUpdateInput = {
   providedBy?: InputMaybe<Array<ApplicationProvidedByUpdateFieldInput>>;
   sevenRStrategy?: InputMaybe<SevenRStrategyEnumScalarMutations>;
   sourceOfInterfaces?: InputMaybe<Array<ApplicationSourceOfInterfacesUpdateFieldInput>>;
+  sovereigntyAchDataResidency?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyAchInteroperability?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyAchJurisdictionControl?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyAchOperationalControl?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyAchPortability?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyAchSupplyChainTransparency?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyEvidence?: InputMaybe<StringScalarMutations>;
   status?: InputMaybe<ApplicationStatusEnumScalarMutations>;
   successors?: InputMaybe<Array<ApplicationSuccessorsUpdateFieldInput>>;
   supportedBy?: InputMaybe<Array<ApplicationSupportedByUpdateFieldInput>>;
@@ -7140,10 +8162,12 @@ export type ApplicationUsesAiComponentsNodeAggregationWhereInput = {
   costs?: InputMaybe<FloatScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   license?: InputMaybe<StringScalarAggregationFilters>;
   model?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   provider?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -7252,6 +8276,8 @@ export type ApplicationUsesDataObjectsNodeAggregationWhereInput = {
   description?: InputMaybe<StringScalarAggregationFilters>;
   format?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
@@ -7299,6 +8325,7 @@ export type ApplicationWhere = {
   introductionDate?: InputMaybe<DateScalarFilters>;
   isDataSourceFor?: InputMaybe<DataObjectRelationshipFilters>;
   isDataSourceForConnection?: InputMaybe<ApplicationIsDataSourceForConnectionFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarFilters>;
   maintainedBy?: InputMaybe<SupplierRelationshipFilters>;
   maintainedByConnection?: InputMaybe<ApplicationMaintainedByConnectionFilters>;
   name?: InputMaybe<StringScalarFilters>;
@@ -7316,6 +8343,13 @@ export type ApplicationWhere = {
   sevenRStrategy?: InputMaybe<SevenRStrategyEnumScalarFilters>;
   sourceOfInterfaces?: InputMaybe<ApplicationInterfaceRelationshipFilters>;
   sourceOfInterfacesConnection?: InputMaybe<ApplicationSourceOfInterfacesConnectionFilters>;
+  sovereigntyAchDataResidency?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyAchInteroperability?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyAchJurisdictionControl?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyAchOperationalControl?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyAchPortability?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyAchSupplyChainTransparency?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarFilters>;
   status?: InputMaybe<ApplicationStatusEnumScalarFilters>;
   successors?: InputMaybe<ApplicationRelationshipFilters>;
   successorsConnection?: InputMaybe<ApplicationSuccessorsConnectionFilters>;
@@ -7351,6 +8385,7 @@ export type ApplicationsConnection = {
 /** Architecture – represents an architecture within Enterprise Architecture Management */
 export type Architecture = {
   __typename?: 'Architecture';
+  achievedSovereigntyScore?: Maybe<Scalars['Float']['output']>;
   appliedPrinciples: Array<ArchitecturePrinciple>;
   appliedPrinciplesConnection: ArchitectureAppliedPrinciplesConnection;
   childArchitectures: Array<Architecture>;
@@ -7386,12 +8421,15 @@ export type Architecture = {
   diagrams: Array<Diagram>;
   diagramsConnection: ArchitectureDiagramsConnection;
   domain: ArchitectureDomain;
+  expectedSovereigntyScore?: Maybe<Scalars['Float']['output']>;
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
   owners: Array<Person>;
   ownersConnection: ArchitectureOwnersConnection;
   parentArchitecture: Array<Architecture>;
   parentArchitectureConnection: ArchitectureParentArchitectureConnection;
+  sovereigntyGap?: Maybe<Scalars['Float']['output']>;
+  sovereigntyScorePercent?: Maybe<Scalars['Float']['output']>;
   tags?: Maybe<Array<Scalars['String']['output']>>;
   timestamp: Scalars['DateTime']['output'];
   type: ArchitectureType;
@@ -7734,10 +8772,12 @@ export type ArchitectureAiComponentContainsAiComponentsNodeAggregateSelection = 
   costs: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   license: StringAggregateSelection;
   model: StringAggregateSelection;
   name: StringAggregateSelection;
   provider: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   version: StringAggregateSelection;
 };
@@ -7750,9 +8790,13 @@ export type ArchitectureAggregate = {
 
 export type ArchitectureAggregateNode = {
   __typename?: 'ArchitectureAggregateNode';
+  achievedSovereigntyScore: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
   timestamp: DateTimeAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
@@ -7769,7 +8813,9 @@ export type ArchitectureApplicationContainsApplicationsNodeAggregateSelection = 
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   hostingEnvironment: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
   version: StringAggregateSelection;
@@ -7785,7 +8831,9 @@ export type ArchitectureApplicationInterfaceContainsInterfacesNodeAggregateSelec
   __typename?: 'ArchitectureApplicationInterfaceContainsInterfacesNodeAggregateSelection';
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   version: StringAggregateSelection;
 };
@@ -7876,6 +8924,8 @@ export type ArchitectureAppliedPrinciplesNodeAggregationWhereInput = {
   implications?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   rationale?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
@@ -7906,9 +8956,13 @@ export type ArchitectureArchitectureChildArchitecturesAggregateSelection = {
 
 export type ArchitectureArchitectureChildArchitecturesNodeAggregateSelection = {
   __typename?: 'ArchitectureArchitectureChildArchitecturesNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
   timestamp: DateTimeAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
@@ -7921,9 +8975,13 @@ export type ArchitectureArchitectureParentArchitectureAggregateSelection = {
 
 export type ArchitectureArchitectureParentArchitectureNodeAggregateSelection = {
   __typename?: 'ArchitectureArchitectureParentArchitectureNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
   timestamp: DateTimeAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
@@ -7941,6 +8999,8 @@ export type ArchitectureArchitecturePrincipleAppliedPrinciplesNodeAggregateSelec
   implications: StringAggregateSelection;
   name: StringAggregateSelection;
   rationale: StringAggregateSelection;
+  sovereigntyReqRationale: StringAggregateSelection;
+  sovereigntyReqWeight: FloatAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -7958,6 +9018,8 @@ export type ArchitectureBusinessCapabilityContainsCapabilitiesNodeAggregateSelec
   maturityLevel: IntAggregateSelection;
   name: StringAggregateSelection;
   sequenceNumber: IntAggregateSelection;
+  sovereigntyReqRationale: StringAggregateSelection;
+  sovereigntyReqWeight: FloatAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -7975,6 +9037,8 @@ export type ArchitectureBusinessProcessContainsBusinessProcessesNodeAggregateSel
   description: StringAggregateSelection;
   maturityLevel: IntAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyReqRationale: StringAggregateSelection;
+  sovereigntyReqWeight: FloatAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -8059,9 +9123,13 @@ export type ArchitectureChildArchitecturesNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<ArchitectureChildArchitecturesNodeAggregationWhereInput>>;
   NOT?: InputMaybe<ArchitectureChildArchitecturesNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<ArchitectureChildArchitecturesNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
   timestamp?: InputMaybe<DateTimeScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
@@ -8333,10 +9401,12 @@ export type ArchitectureContainsAiComponentsNodeAggregationWhereInput = {
   costs?: InputMaybe<FloatScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   license?: InputMaybe<StringScalarAggregationFilters>;
   model?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   provider?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -8445,7 +9515,9 @@ export type ArchitectureContainsApplicationsNodeAggregationWhereInput = {
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
@@ -8557,6 +9629,8 @@ export type ArchitectureContainsBusinessProcessesNodeAggregationWhereInput = {
   description?: InputMaybe<StringScalarAggregationFilters>;
   maturityLevel?: InputMaybe<IntScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
@@ -8666,6 +9740,8 @@ export type ArchitectureContainsCapabilitiesNodeAggregationWhereInput = {
   maturityLevel?: InputMaybe<IntScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   sequenceNumber?: InputMaybe<IntScalarAggregationFilters>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
@@ -8773,6 +9849,8 @@ export type ArchitectureContainsDataObjectsNodeAggregationWhereInput = {
   description?: InputMaybe<StringScalarAggregationFilters>;
   format?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
@@ -9412,10 +10490,12 @@ export type ArchitectureContainsInfrastructureNodeAggregationWhereInput = {
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   ipAddress?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   location?: InputMaybe<StringScalarAggregationFilters>;
   maintenanceWindow?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   operatingSystem?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   specifications?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
@@ -9524,7 +10604,9 @@ export type ArchitectureContainsInterfacesNodeAggregationWhereInput = {
   OR?: InputMaybe<Array<ArchitectureContainsInterfacesNodeAggregationWhereInput>>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -9549,6 +10631,7 @@ export type ArchitectureContainsInterfacesUpdateFieldInput = {
 };
 
 export type ArchitectureCreateInput = {
+  achievedSovereigntyScore?: InputMaybe<Scalars['Float']['input']>;
   appliedPrinciples?: InputMaybe<ArchitectureAppliedPrinciplesFieldInput>;
   childArchitectures?: InputMaybe<ArchitectureChildArchitecturesFieldInput>;
   company?: InputMaybe<ArchitectureCompanyFieldInput>;
@@ -9567,9 +10650,12 @@ export type ArchitectureCreateInput = {
   description?: InputMaybe<Scalars['String']['input']>;
   diagrams?: InputMaybe<ArchitectureDiagramsFieldInput>;
   domain: ArchitectureDomain;
+  expectedSovereigntyScore?: InputMaybe<Scalars['Float']['input']>;
   name: Scalars['String']['input'];
   owners?: InputMaybe<ArchitectureOwnersFieldInput>;
   parentArchitecture?: InputMaybe<ArchitectureParentArchitectureFieldInput>;
+  sovereigntyGap?: InputMaybe<Scalars['Float']['input']>;
+  sovereigntyScorePercent?: InputMaybe<Scalars['Float']['input']>;
   tags?: InputMaybe<Array<Scalars['String']['input']>>;
   timestamp: Scalars['DateTime']['input'];
   type: ArchitectureType;
@@ -9588,6 +10674,8 @@ export type ArchitectureDataObjectContainsDataObjectsNodeAggregateSelection = {
   description: StringAggregateSelection;
   format: StringAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyReqRationale: StringAggregateSelection;
+  sovereigntyReqWeight: FloatAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -9871,10 +10959,12 @@ export type ArchitectureInfrastructureContainsInfrastructureNodeAggregateSelecti
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   ipAddress: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   location: StringAggregateSelection;
   maintenanceWindow: StringAggregateSelection;
   name: StringAggregateSelection;
   operatingSystem: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   specifications: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
@@ -10073,9 +11163,13 @@ export type ArchitectureParentArchitectureNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<ArchitectureParentArchitectureNodeAggregationWhereInput>>;
   NOT?: InputMaybe<ArchitectureParentArchitectureNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<ArchitectureParentArchitectureNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
   timestamp?: InputMaybe<DateTimeScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
@@ -10140,6 +11234,14 @@ export type ArchitecturePrinciple = {
   ownersConnection: ArchitecturePrincipleOwnersConnection;
   priority: PrinciplePriority;
   rationale?: Maybe<Scalars['String']['output']>;
+  sovereigntyReqDataResidency?: Maybe<SovereigntyMaturity>;
+  sovereigntyReqInteroperability?: Maybe<SovereigntyMaturity>;
+  sovereigntyReqJurisdictionControl?: Maybe<SovereigntyMaturity>;
+  sovereigntyReqOperationalControl?: Maybe<SovereigntyMaturity>;
+  sovereigntyReqPortability?: Maybe<SovereigntyMaturity>;
+  sovereigntyReqRationale?: Maybe<Scalars['String']['output']>;
+  sovereigntyReqSupplyChainTransparency?: Maybe<SovereigntyMaturity>;
+  sovereigntyReqWeight?: Maybe<Scalars['Float']['output']>;
   tags?: Maybe<Array<Scalars['String']['output']>>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
 };
@@ -10246,10 +11348,12 @@ export type ArchitecturePrincipleAiComponentImplementedByAiComponentsNodeAggrega
   costs: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   license: StringAggregateSelection;
   model: StringAggregateSelection;
   name: StringAggregateSelection;
   provider: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   version: StringAggregateSelection;
 };
@@ -10267,6 +11371,8 @@ export type ArchitecturePrincipleAggregateNode = {
   implications: StringAggregateSelection;
   name: StringAggregateSelection;
   rationale: StringAggregateSelection;
+  sovereigntyReqRationale: StringAggregateSelection;
+  sovereigntyReqWeight: FloatAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -10282,7 +11388,9 @@ export type ArchitecturePrincipleApplicationImplementedByApplicationsNodeAggrega
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   hostingEnvironment: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
   version: StringAggregateSelection;
@@ -10369,9 +11477,13 @@ export type ArchitecturePrincipleAppliedInArchitecturesNodeAggregationWhereInput
   AND?: InputMaybe<Array<ArchitecturePrincipleAppliedInArchitecturesNodeAggregationWhereInput>>;
   NOT?: InputMaybe<ArchitecturePrincipleAppliedInArchitecturesNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<ArchitecturePrincipleAppliedInArchitecturesNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
   timestamp?: InputMaybe<DateTimeScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
@@ -10403,9 +11515,13 @@ export type ArchitecturePrincipleArchitectureAppliedInArchitecturesAggregateSele
 
 export type ArchitecturePrincipleArchitectureAppliedInArchitecturesNodeAggregateSelection = {
   __typename?: 'ArchitecturePrincipleArchitectureAppliedInArchitecturesNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
   timestamp: DateTimeAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
@@ -10573,6 +11689,14 @@ export type ArchitecturePrincipleCreateInput = {
   owners?: InputMaybe<ArchitecturePrincipleOwnersFieldInput>;
   priority: PrinciplePriority;
   rationale?: InputMaybe<Scalars['String']['input']>;
+  sovereigntyReqDataResidency?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyReqInteroperability?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyReqJurisdictionControl?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyReqOperationalControl?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyReqPortability?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyReqRationale?: InputMaybe<Scalars['String']['input']>;
+  sovereigntyReqSupplyChainTransparency?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyReqWeight?: InputMaybe<Scalars['Float']['input']>;
   tags?: InputMaybe<Array<Scalars['String']['input']>>;
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
 };
@@ -10684,10 +11808,12 @@ export type ArchitecturePrincipleImplementedByAiComponentsNodeAggregationWhereIn
   costs?: InputMaybe<FloatScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   license?: InputMaybe<StringScalarAggregationFilters>;
   model?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   provider?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -10796,7 +11922,9 @@ export type ArchitecturePrincipleImplementedByApplicationsNodeAggregationWhereIn
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
@@ -10973,6 +12101,14 @@ export type ArchitecturePrincipleSort = {
   name?: InputMaybe<SortDirection>;
   priority?: InputMaybe<SortDirection>;
   rationale?: InputMaybe<SortDirection>;
+  sovereigntyReqDataResidency?: InputMaybe<SortDirection>;
+  sovereigntyReqInteroperability?: InputMaybe<SortDirection>;
+  sovereigntyReqJurisdictionControl?: InputMaybe<SortDirection>;
+  sovereigntyReqOperationalControl?: InputMaybe<SortDirection>;
+  sovereigntyReqPortability?: InputMaybe<SortDirection>;
+  sovereigntyReqRationale?: InputMaybe<SortDirection>;
+  sovereigntyReqSupplyChainTransparency?: InputMaybe<SortDirection>;
+  sovereigntyReqWeight?: InputMaybe<SortDirection>;
   updatedAt?: InputMaybe<SortDirection>;
 };
 
@@ -10990,6 +12126,14 @@ export type ArchitecturePrincipleUpdateInput = {
   owners?: InputMaybe<Array<ArchitecturePrincipleOwnersUpdateFieldInput>>;
   priority?: InputMaybe<PrinciplePriorityEnumScalarMutations>;
   rationale?: InputMaybe<StringScalarMutations>;
+  sovereigntyReqDataResidency?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyReqInteroperability?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyReqJurisdictionControl?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyReqOperationalControl?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyReqPortability?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarMutations>;
+  sovereigntyReqSupplyChainTransparency?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarMutations>;
   tags?: InputMaybe<ListStringMutations>;
 };
 
@@ -11016,6 +12160,14 @@ export type ArchitecturePrincipleWhere = {
   ownersConnection?: InputMaybe<ArchitecturePrincipleOwnersConnectionFilters>;
   priority?: InputMaybe<PrinciplePriorityEnumScalarFilters>;
   rationale?: InputMaybe<StringScalarFilters>;
+  sovereigntyReqDataResidency?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyReqInteroperability?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyReqJurisdictionControl?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyReqOperationalControl?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyReqPortability?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarFilters>;
+  sovereigntyReqSupplyChainTransparency?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarFilters>;
   tags?: InputMaybe<StringListFilters>;
   updatedAt?: InputMaybe<DateTimeScalarFilters>;
 };
@@ -11041,11 +12193,15 @@ export type ArchitectureRelationshipFilters = {
 
 /** Fields to sort Architectures by. The order in which sorts are applied is not guaranteed when specifying many fields in one ArchitectureSort object. */
 export type ArchitectureSort = {
+  achievedSovereigntyScore?: InputMaybe<SortDirection>;
   createdAt?: InputMaybe<SortDirection>;
   description?: InputMaybe<SortDirection>;
   domain?: InputMaybe<SortDirection>;
+  expectedSovereigntyScore?: InputMaybe<SortDirection>;
   id?: InputMaybe<SortDirection>;
   name?: InputMaybe<SortDirection>;
+  sovereigntyGap?: InputMaybe<SortDirection>;
+  sovereigntyScorePercent?: InputMaybe<SortDirection>;
   timestamp?: InputMaybe<SortDirection>;
   type?: InputMaybe<SortDirection>;
   updatedAt?: InputMaybe<SortDirection>;
@@ -11071,6 +12227,7 @@ export type ArchitectureTypeEnumScalarMutations = {
 };
 
 export type ArchitectureUpdateInput = {
+  achievedSovereigntyScore?: InputMaybe<FloatScalarMutations>;
   appliedPrinciples?: InputMaybe<Array<ArchitectureAppliedPrinciplesUpdateFieldInput>>;
   childArchitectures?: InputMaybe<Array<ArchitectureChildArchitecturesUpdateFieldInput>>;
   company?: InputMaybe<Array<ArchitectureCompanyUpdateFieldInput>>;
@@ -11090,9 +12247,12 @@ export type ArchitectureUpdateInput = {
   description?: InputMaybe<StringScalarMutations>;
   diagrams?: InputMaybe<Array<ArchitectureDiagramsUpdateFieldInput>>;
   domain?: InputMaybe<ArchitectureDomainEnumScalarMutations>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarMutations>;
   name?: InputMaybe<StringScalarMutations>;
   owners?: InputMaybe<Array<ArchitectureOwnersUpdateFieldInput>>;
   parentArchitecture?: InputMaybe<Array<ArchitectureParentArchitectureUpdateFieldInput>>;
+  sovereigntyGap?: InputMaybe<FloatScalarMutations>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarMutations>;
   tags?: InputMaybe<ListStringMutations>;
   timestamp?: InputMaybe<DateTimeScalarMutations>;
   type?: InputMaybe<ArchitectureTypeEnumScalarMutations>;
@@ -11102,6 +12262,7 @@ export type ArchitectureWhere = {
   AND?: InputMaybe<Array<ArchitectureWhere>>;
   NOT?: InputMaybe<ArchitectureWhere>;
   OR?: InputMaybe<Array<ArchitectureWhere>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarFilters>;
   appliedPrinciples?: InputMaybe<ArchitecturePrincipleRelationshipFilters>;
   appliedPrinciplesConnection?: InputMaybe<ArchitectureAppliedPrinciplesConnectionFilters>;
   childArchitectures?: InputMaybe<ArchitectureRelationshipFilters>;
@@ -11137,12 +12298,15 @@ export type ArchitectureWhere = {
   diagrams?: InputMaybe<DiagramRelationshipFilters>;
   diagramsConnection?: InputMaybe<ArchitectureDiagramsConnectionFilters>;
   domain?: InputMaybe<ArchitectureDomainEnumScalarFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarFilters>;
   id?: InputMaybe<IdScalarFilters>;
   name?: InputMaybe<StringScalarFilters>;
   owners?: InputMaybe<PersonRelationshipFilters>;
   ownersConnection?: InputMaybe<ArchitectureOwnersConnectionFilters>;
   parentArchitecture?: InputMaybe<ArchitectureRelationshipFilters>;
   parentArchitectureConnection?: InputMaybe<ArchitectureParentArchitectureConnectionFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarFilters>;
   tags?: InputMaybe<StringListFilters>;
   timestamp?: InputMaybe<DateTimeScalarFilters>;
   type?: InputMaybe<ArchitectureTypeEnumScalarFilters>;
@@ -11201,6 +12365,14 @@ export type BusinessCapability = {
   relatedDataObjects: Array<DataObject>;
   relatedDataObjectsConnection: BusinessCapabilityRelatedDataObjectsConnection;
   sequenceNumber?: Maybe<Scalars['Int']['output']>;
+  sovereigntyReqDataResidency?: Maybe<SovereigntyMaturity>;
+  sovereigntyReqInteroperability?: Maybe<SovereigntyMaturity>;
+  sovereigntyReqJurisdictionControl?: Maybe<SovereigntyMaturity>;
+  sovereigntyReqOperationalControl?: Maybe<SovereigntyMaturity>;
+  sovereigntyReqPortability?: Maybe<SovereigntyMaturity>;
+  sovereigntyReqRationale?: Maybe<Scalars['String']['output']>;
+  sovereigntyReqSupplyChainTransparency?: Maybe<SovereigntyMaturity>;
+  sovereigntyReqWeight?: Maybe<Scalars['Float']['output']>;
   status: CapabilityStatus;
   supportedByAIComponents: Array<AiComponent>;
   supportedByAIComponentsConnection: BusinessCapabilitySupportedByAiComponentsConnection;
@@ -11425,10 +12597,12 @@ export type BusinessCapabilityAiComponentSupportedByAiComponentsNodeAggregateSel
   costs: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   license: StringAggregateSelection;
   model: StringAggregateSelection;
   name: StringAggregateSelection;
   provider: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   version: StringAggregateSelection;
 };
@@ -11447,6 +12621,8 @@ export type BusinessCapabilityAggregateNode = {
   maturityLevel: IntAggregateSelection;
   name: StringAggregateSelection;
   sequenceNumber: IntAggregateSelection;
+  sovereigntyReqRationale: StringAggregateSelection;
+  sovereigntyReqWeight: FloatAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -11462,7 +12638,9 @@ export type BusinessCapabilityApplicationSupportedByApplicationsNodeAggregateSel
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   hostingEnvironment: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
   version: StringAggregateSelection;
@@ -11476,9 +12654,13 @@ export type BusinessCapabilityArchitecturePartOfArchitecturesAggregateSelection 
 
 export type BusinessCapabilityArchitecturePartOfArchitecturesNodeAggregateSelection = {
   __typename?: 'BusinessCapabilityArchitecturePartOfArchitecturesNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
   timestamp: DateTimeAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
@@ -11497,6 +12679,8 @@ export type BusinessCapabilityBusinessCapabilityChildrenNodeAggregateSelection =
   maturityLevel: IntAggregateSelection;
   name: StringAggregateSelection;
   sequenceNumber: IntAggregateSelection;
+  sovereigntyReqRationale: StringAggregateSelection;
+  sovereigntyReqWeight: FloatAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -11514,6 +12698,8 @@ export type BusinessCapabilityBusinessCapabilityParentsNodeAggregateSelection = 
   maturityLevel: IntAggregateSelection;
   name: StringAggregateSelection;
   sequenceNumber: IntAggregateSelection;
+  sovereigntyReqRationale: StringAggregateSelection;
+  sovereigntyReqWeight: FloatAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -11531,6 +12717,8 @@ export type BusinessCapabilityBusinessProcessSupportedByBusinessProcessesNodeAgg
   description: StringAggregateSelection;
   maturityLevel: IntAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyReqRationale: StringAggregateSelection;
+  sovereigntyReqWeight: FloatAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -11621,6 +12809,8 @@ export type BusinessCapabilityChildrenNodeAggregationWhereInput = {
   maturityLevel?: InputMaybe<IntScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   sequenceNumber?: InputMaybe<IntScalarAggregationFilters>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
@@ -11814,6 +13004,14 @@ export type BusinessCapabilityCreateInput = {
   partOfArchitectures?: InputMaybe<BusinessCapabilityPartOfArchitecturesFieldInput>;
   relatedDataObjects?: InputMaybe<BusinessCapabilityRelatedDataObjectsFieldInput>;
   sequenceNumber?: InputMaybe<Scalars['Int']['input']>;
+  sovereigntyReqDataResidency?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyReqInteroperability?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyReqJurisdictionControl?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyReqOperationalControl?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyReqPortability?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyReqRationale?: InputMaybe<Scalars['String']['input']>;
+  sovereigntyReqSupplyChainTransparency?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyReqWeight?: InputMaybe<Scalars['Float']['input']>;
   status: CapabilityStatus;
   supportedByAIComponents?: InputMaybe<BusinessCapabilitySupportedByAiComponentsFieldInput>;
   supportedByApplications?: InputMaybe<BusinessCapabilitySupportedByApplicationsFieldInput>;
@@ -11836,6 +13034,8 @@ export type BusinessCapabilityDataObjectRelatedDataObjectsNodeAggregateSelection
   description: StringAggregateSelection;
   format: StringAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyReqRationale: StringAggregateSelection;
+  sovereigntyReqWeight: FloatAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -12212,6 +13412,8 @@ export type BusinessCapabilityParentsNodeAggregationWhereInput = {
   maturityLevel?: InputMaybe<IntScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   sequenceNumber?: InputMaybe<IntScalarAggregationFilters>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
@@ -12315,9 +13517,13 @@ export type BusinessCapabilityPartOfArchitecturesNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<BusinessCapabilityPartOfArchitecturesNodeAggregationWhereInput>>;
   NOT?: InputMaybe<BusinessCapabilityPartOfArchitecturesNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<BusinessCapabilityPartOfArchitecturesNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
   timestamp?: InputMaybe<DateTimeScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
@@ -12445,6 +13651,8 @@ export type BusinessCapabilityRelatedDataObjectsNodeAggregationWhereInput = {
   description?: InputMaybe<StringScalarAggregationFilters>;
   format?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
@@ -12489,6 +13697,14 @@ export type BusinessCapabilitySort = {
   maturityLevel?: InputMaybe<SortDirection>;
   name?: InputMaybe<SortDirection>;
   sequenceNumber?: InputMaybe<SortDirection>;
+  sovereigntyReqDataResidency?: InputMaybe<SortDirection>;
+  sovereigntyReqInteroperability?: InputMaybe<SortDirection>;
+  sovereigntyReqJurisdictionControl?: InputMaybe<SortDirection>;
+  sovereigntyReqOperationalControl?: InputMaybe<SortDirection>;
+  sovereigntyReqPortability?: InputMaybe<SortDirection>;
+  sovereigntyReqRationale?: InputMaybe<SortDirection>;
+  sovereigntyReqSupplyChainTransparency?: InputMaybe<SortDirection>;
+  sovereigntyReqWeight?: InputMaybe<SortDirection>;
   status?: InputMaybe<SortDirection>;
   type?: InputMaybe<SortDirection>;
   updatedAt?: InputMaybe<SortDirection>;
@@ -12579,10 +13795,12 @@ export type BusinessCapabilitySupportedByAiComponentsNodeAggregationWhereInput =
   costs?: InputMaybe<FloatScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   license?: InputMaybe<StringScalarAggregationFilters>;
   model?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   provider?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -12691,7 +13909,9 @@ export type BusinessCapabilitySupportedByApplicationsNodeAggregationWhereInput =
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
@@ -12803,6 +14023,8 @@ export type BusinessCapabilitySupportedByBusinessProcessesNodeAggregationWhereIn
   description?: InputMaybe<StringScalarAggregationFilters>;
   maturityLevel?: InputMaybe<IntScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
@@ -12841,6 +14063,14 @@ export type BusinessCapabilityUpdateInput = {
   partOfArchitectures?: InputMaybe<Array<BusinessCapabilityPartOfArchitecturesUpdateFieldInput>>;
   relatedDataObjects?: InputMaybe<Array<BusinessCapabilityRelatedDataObjectsUpdateFieldInput>>;
   sequenceNumber?: InputMaybe<IntScalarMutations>;
+  sovereigntyReqDataResidency?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyReqInteroperability?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyReqJurisdictionControl?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyReqOperationalControl?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyReqPortability?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarMutations>;
+  sovereigntyReqSupplyChainTransparency?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarMutations>;
   status?: InputMaybe<CapabilityStatusEnumScalarMutations>;
   supportedByAIComponents?: InputMaybe<Array<BusinessCapabilitySupportedByAiComponentsUpdateFieldInput>>;
   supportedByApplications?: InputMaybe<Array<BusinessCapabilitySupportedByApplicationsUpdateFieldInput>>;
@@ -12984,6 +14214,14 @@ export type BusinessCapabilityWhere = {
   relatedDataObjects?: InputMaybe<DataObjectRelationshipFilters>;
   relatedDataObjectsConnection?: InputMaybe<BusinessCapabilityRelatedDataObjectsConnectionFilters>;
   sequenceNumber?: InputMaybe<IntScalarFilters>;
+  sovereigntyReqDataResidency?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyReqInteroperability?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyReqJurisdictionControl?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyReqOperationalControl?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyReqPortability?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarFilters>;
+  sovereigntyReqSupplyChainTransparency?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarFilters>;
   status?: InputMaybe<CapabilityStatusEnumScalarFilters>;
   supportedByAIComponents?: InputMaybe<AiComponentRelationshipFilters>;
   supportedByAIComponentsConnection?: InputMaybe<BusinessCapabilitySupportedByAiComponentsConnectionFilters>;
@@ -13021,6 +14259,14 @@ export type BusinessProcess = {
   partOfArchitectures: Array<Architecture>;
   partOfArchitecturesConnection: BusinessProcessPartOfArchitecturesConnection;
   processType: ProcessType;
+  sovereigntyReqDataResidency?: Maybe<SovereigntyMaturity>;
+  sovereigntyReqInteroperability?: Maybe<SovereigntyMaturity>;
+  sovereigntyReqJurisdictionControl?: Maybe<SovereigntyMaturity>;
+  sovereigntyReqOperationalControl?: Maybe<SovereigntyMaturity>;
+  sovereigntyReqPortability?: Maybe<SovereigntyMaturity>;
+  sovereigntyReqRationale?: Maybe<Scalars['String']['output']>;
+  sovereigntyReqSupplyChainTransparency?: Maybe<SovereigntyMaturity>;
+  sovereigntyReqWeight?: Maybe<Scalars['Float']['output']>;
   status: ProcessStatus;
   supportedByApplications: Array<Application>;
   supportedByApplicationsConnection: BusinessProcessSupportedByApplicationsConnection;
@@ -13208,6 +14454,8 @@ export type BusinessProcessAggregateNode = {
   description: StringAggregateSelection;
   maturityLevel: IntAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyReqRationale: StringAggregateSelection;
+  sovereigntyReqWeight: FloatAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -13223,7 +14471,9 @@ export type BusinessProcessApplicationSupportedByApplicationsNodeAggregateSelect
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   hostingEnvironment: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
   version: StringAggregateSelection;
@@ -13237,9 +14487,13 @@ export type BusinessProcessArchitecturePartOfArchitecturesAggregateSelection = {
 
 export type BusinessProcessArchitecturePartOfArchitecturesNodeAggregateSelection = {
   __typename?: 'BusinessProcessArchitecturePartOfArchitecturesNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
   timestamp: DateTimeAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
@@ -13258,6 +14512,8 @@ export type BusinessProcessBusinessCapabilitySupportsCapabilitiesNodeAggregateSe
   maturityLevel: IntAggregateSelection;
   name: StringAggregateSelection;
   sequenceNumber: IntAggregateSelection;
+  sovereigntyReqRationale: StringAggregateSelection;
+  sovereigntyReqWeight: FloatAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -13275,6 +14531,8 @@ export type BusinessProcessBusinessProcessChildProcessesNodeAggregateSelection =
   description: StringAggregateSelection;
   maturityLevel: IntAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyReqRationale: StringAggregateSelection;
+  sovereigntyReqWeight: FloatAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -13292,6 +14550,8 @@ export type BusinessProcessBusinessProcessParentProcessNodeAggregateSelection = 
   description: StringAggregateSelection;
   maturityLevel: IntAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyReqRationale: StringAggregateSelection;
+  sovereigntyReqWeight: FloatAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -13382,6 +14642,8 @@ export type BusinessProcessChildProcessesNodeAggregationWhereInput = {
   description?: InputMaybe<StringScalarAggregationFilters>;
   maturityLevel?: InputMaybe<IntScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
@@ -13571,6 +14833,14 @@ export type BusinessProcessCreateInput = {
   parentProcess?: InputMaybe<BusinessProcessParentProcessFieldInput>;
   partOfArchitectures?: InputMaybe<BusinessProcessPartOfArchitecturesFieldInput>;
   processType: ProcessType;
+  sovereigntyReqDataResidency?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyReqInteroperability?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyReqJurisdictionControl?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyReqOperationalControl?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyReqPortability?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyReqRationale?: InputMaybe<Scalars['String']['input']>;
+  sovereigntyReqSupplyChainTransparency?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyReqWeight?: InputMaybe<Scalars['Float']['input']>;
   status: ProcessStatus;
   supportedByApplications?: InputMaybe<BusinessProcessSupportedByApplicationsFieldInput>;
   supportsCapabilities?: InputMaybe<BusinessProcessSupportsCapabilitiesFieldInput>;
@@ -13948,6 +15218,8 @@ export type BusinessProcessParentProcessNodeAggregationWhereInput = {
   description?: InputMaybe<StringScalarAggregationFilters>;
   maturityLevel?: InputMaybe<IntScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
@@ -14051,9 +15323,13 @@ export type BusinessProcessPartOfArchitecturesNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<BusinessProcessPartOfArchitecturesNodeAggregationWhereInput>>;
   NOT?: InputMaybe<BusinessProcessPartOfArchitecturesNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<BusinessProcessPartOfArchitecturesNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
   timestamp?: InputMaybe<DateTimeScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
@@ -14117,6 +15393,14 @@ export type BusinessProcessSort = {
   maturityLevel?: InputMaybe<SortDirection>;
   name?: InputMaybe<SortDirection>;
   processType?: InputMaybe<SortDirection>;
+  sovereigntyReqDataResidency?: InputMaybe<SortDirection>;
+  sovereigntyReqInteroperability?: InputMaybe<SortDirection>;
+  sovereigntyReqJurisdictionControl?: InputMaybe<SortDirection>;
+  sovereigntyReqOperationalControl?: InputMaybe<SortDirection>;
+  sovereigntyReqPortability?: InputMaybe<SortDirection>;
+  sovereigntyReqRationale?: InputMaybe<SortDirection>;
+  sovereigntyReqSupplyChainTransparency?: InputMaybe<SortDirection>;
+  sovereigntyReqWeight?: InputMaybe<SortDirection>;
   status?: InputMaybe<SortDirection>;
   updatedAt?: InputMaybe<SortDirection>;
 };
@@ -14206,7 +15490,9 @@ export type BusinessProcessSupportedByApplicationsNodeAggregationWhereInput = {
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
@@ -14318,6 +15604,8 @@ export type BusinessProcessSupportsCapabilitiesNodeAggregationWhereInput = {
   maturityLevel?: InputMaybe<IntScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   sequenceNumber?: InputMaybe<IntScalarAggregationFilters>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
@@ -14354,6 +15642,14 @@ export type BusinessProcessUpdateInput = {
   parentProcess?: InputMaybe<Array<BusinessProcessParentProcessUpdateFieldInput>>;
   partOfArchitectures?: InputMaybe<Array<BusinessProcessPartOfArchitecturesUpdateFieldInput>>;
   processType?: InputMaybe<ProcessTypeEnumScalarMutations>;
+  sovereigntyReqDataResidency?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyReqInteroperability?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyReqJurisdictionControl?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyReqOperationalControl?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyReqPortability?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarMutations>;
+  sovereigntyReqSupplyChainTransparency?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarMutations>;
   status?: InputMaybe<ProcessStatusEnumScalarMutations>;
   supportedByApplications?: InputMaybe<Array<BusinessProcessSupportedByApplicationsUpdateFieldInput>>;
   supportsCapabilities?: InputMaybe<Array<BusinessProcessSupportsCapabilitiesUpdateFieldInput>>;
@@ -14492,6 +15788,14 @@ export type BusinessProcessWhere = {
   partOfArchitectures?: InputMaybe<ArchitectureRelationshipFilters>;
   partOfArchitecturesConnection?: InputMaybe<BusinessProcessPartOfArchitecturesConnectionFilters>;
   processType?: InputMaybe<ProcessTypeEnumScalarFilters>;
+  sovereigntyReqDataResidency?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyReqInteroperability?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyReqJurisdictionControl?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyReqOperationalControl?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyReqPortability?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarFilters>;
+  sovereigntyReqSupplyChainTransparency?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarFilters>;
   status?: InputMaybe<ProcessStatusEnumScalarFilters>;
   supportedByApplications?: InputMaybe<ApplicationRelationshipFilters>;
   supportedByApplicationsConnection?: InputMaybe<BusinessProcessSupportedByApplicationsConnectionFilters>;
@@ -14947,10 +16251,12 @@ export type CompanyAiComponentOwnedAiComponentsNodeAggregateSelection = {
   costs: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   license: StringAggregateSelection;
   model: StringAggregateSelection;
   name: StringAggregateSelection;
   provider: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   version: StringAggregateSelection;
 };
@@ -14988,7 +16294,9 @@ export type CompanyApplicationInterfaceOwnedInterfacesNodeAggregateSelection = {
   __typename?: 'CompanyApplicationInterfaceOwnedInterfacesNodeAggregateSelection';
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   version: StringAggregateSelection;
 };
@@ -15005,7 +16313,9 @@ export type CompanyApplicationOwnedApplicationsNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   hostingEnvironment: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
   version: StringAggregateSelection;
@@ -15019,9 +16329,13 @@ export type CompanyArchitectureOwnedArchitecturesAggregateSelection = {
 
 export type CompanyArchitectureOwnedArchitecturesNodeAggregateSelection = {
   __typename?: 'CompanyArchitectureOwnedArchitecturesNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
   timestamp: DateTimeAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
@@ -15039,6 +16353,8 @@ export type CompanyArchitecturePrincipleOwnedArchitecturePrinciplesNodeAggregate
   implications: StringAggregateSelection;
   name: StringAggregateSelection;
   rationale: StringAggregateSelection;
+  sovereigntyReqRationale: StringAggregateSelection;
+  sovereigntyReqWeight: FloatAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -15056,6 +16372,8 @@ export type CompanyBusinessCapabilityOwnedCapabilitiesNodeAggregateSelection = {
   maturityLevel: IntAggregateSelection;
   name: StringAggregateSelection;
   sequenceNumber: IntAggregateSelection;
+  sovereigntyReqRationale: StringAggregateSelection;
+  sovereigntyReqWeight: FloatAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -15073,6 +16391,8 @@ export type CompanyBusinessProcessOwnedBusinessProcessesNodeAggregateSelection =
   description: StringAggregateSelection;
   maturityLevel: IntAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyReqRationale: StringAggregateSelection;
+  sovereigntyReqWeight: FloatAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -15147,6 +16467,8 @@ export type CompanyDataObjectOwnedDataObjectsNodeAggregateSelection = {
   description: StringAggregateSelection;
   format: StringAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyReqRationale: StringAggregateSelection;
+  sovereigntyReqWeight: FloatAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -15410,10 +16732,12 @@ export type CompanyInfrastructureOwnedInfrastructureNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   ipAddress: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   location: StringAggregateSelection;
   maintenanceWindow: StringAggregateSelection;
   name: StringAggregateSelection;
   operatingSystem: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   specifications: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
@@ -15627,10 +16951,12 @@ export type CompanyOwnedAiComponentsNodeAggregationWhereInput = {
   costs?: InputMaybe<FloatScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   license?: InputMaybe<StringScalarAggregationFilters>;
   model?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   provider?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -15739,7 +17065,9 @@ export type CompanyOwnedApplicationsNodeAggregationWhereInput = {
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
@@ -15850,6 +17178,8 @@ export type CompanyOwnedArchitecturePrinciplesNodeAggregationWhereInput = {
   implications?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   rationale?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
@@ -15953,9 +17283,13 @@ export type CompanyOwnedArchitecturesNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<CompanyOwnedArchitecturesNodeAggregationWhereInput>>;
   NOT?: InputMaybe<CompanyOwnedArchitecturesNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<CompanyOwnedArchitecturesNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
   timestamp?: InputMaybe<DateTimeScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
@@ -16066,6 +17400,8 @@ export type CompanyOwnedBusinessProcessesNodeAggregationWhereInput = {
   description?: InputMaybe<StringScalarAggregationFilters>;
   maturityLevel?: InputMaybe<IntScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
@@ -16175,6 +17511,8 @@ export type CompanyOwnedCapabilitiesNodeAggregationWhereInput = {
   maturityLevel?: InputMaybe<IntScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   sequenceNumber?: InputMaybe<IntScalarAggregationFilters>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
@@ -16282,6 +17620,8 @@ export type CompanyOwnedDataObjectsNodeAggregationWhereInput = {
   description?: InputMaybe<StringScalarAggregationFilters>;
   format?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
@@ -17030,10 +18370,12 @@ export type CompanyOwnedInfrastructureNodeAggregationWhereInput = {
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   ipAddress?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   location?: InputMaybe<StringScalarAggregationFilters>;
   maintenanceWindow?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   operatingSystem?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   specifications?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
@@ -17142,7 +18484,9 @@ export type CompanyOwnedInterfacesNodeAggregationWhereInput = {
   OR?: InputMaybe<Array<CompanyOwnedInterfacesNodeAggregationWhereInput>>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -17252,10 +18596,12 @@ export type CompanyOwnedSuppliersNodeAggregationWhereInput = {
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   email?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   performanceRating?: InputMaybe<IntScalarAggregationFilters>;
   phone?: InputMaybe<StringScalarAggregationFilters>;
   primaryContactPerson?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -17362,10 +18708,12 @@ export type CompanySupplierOwnedSuppliersNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   email: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
   performanceRating: IntAggregateSelection;
   phone: StringAggregateSelection;
   primaryContactPerson: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -17480,6 +18828,18 @@ export type CountConnection = {
 export type CreateAiComponentsMutationResponse = {
   __typename?: 'CreateAiComponentsMutationResponse';
   aiComponents: Array<AiComponent>;
+  info: CreateInfo;
+};
+
+export type CreateAiRunAuditEventsMutationResponse = {
+  __typename?: 'CreateAiRunAuditEventsMutationResponse';
+  aiRunAuditEvents: Array<AiRunAuditEvent>;
+  info: CreateInfo;
+};
+
+export type CreateAiRunsMutationResponse = {
+  __typename?: 'CreateAiRunsMutationResponse';
+  aiRuns: Array<AiRun>;
   info: CreateInfo;
 };
 
@@ -17665,6 +19025,14 @@ export type DataObject = {
   relatedDataObjectsConnection: DataObjectRelatedDataObjectsConnection;
   relatedToCapabilities: Array<BusinessCapability>;
   relatedToCapabilitiesConnection: DataObjectRelatedToCapabilitiesConnection;
+  sovereigntyReqDataResidency?: Maybe<SovereigntyMaturity>;
+  sovereigntyReqInteroperability?: Maybe<SovereigntyMaturity>;
+  sovereigntyReqJurisdictionControl?: Maybe<SovereigntyMaturity>;
+  sovereigntyReqOperationalControl?: Maybe<SovereigntyMaturity>;
+  sovereigntyReqPortability?: Maybe<SovereigntyMaturity>;
+  sovereigntyReqRationale?: Maybe<Scalars['String']['output']>;
+  sovereigntyReqSupplyChainTransparency?: Maybe<SovereigntyMaturity>;
+  sovereigntyReqWeight?: Maybe<Scalars['Float']['output']>;
   transferredInInterfaces: Array<ApplicationInterface>;
   transferredInInterfacesConnection: DataObjectTransferredInInterfacesConnection;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
@@ -17904,10 +19272,12 @@ export type DataObjectAiComponentUsedForTrainingAiNodeAggregateSelection = {
   costs: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   license: StringAggregateSelection;
   model: StringAggregateSelection;
   name: StringAggregateSelection;
   provider: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   version: StringAggregateSelection;
 };
@@ -17924,6 +19294,8 @@ export type DataObjectAggregateNode = {
   description: StringAggregateSelection;
   format: StringAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyReqRationale: StringAggregateSelection;
+  sovereigntyReqWeight: FloatAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -17939,7 +19311,9 @@ export type DataObjectApplicationDataSourcesNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   hostingEnvironment: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
   version: StringAggregateSelection;
@@ -17955,7 +19329,9 @@ export type DataObjectApplicationInterfaceTransferredInInterfacesNodeAggregateSe
   __typename?: 'DataObjectApplicationInterfaceTransferredInInterfacesNodeAggregateSelection';
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   version: StringAggregateSelection;
 };
@@ -17972,7 +19348,9 @@ export type DataObjectApplicationUsedByApplicationsNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   hostingEnvironment: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
   version: StringAggregateSelection;
@@ -17986,9 +19364,13 @@ export type DataObjectArchitecturePartOfArchitecturesAggregateSelection = {
 
 export type DataObjectArchitecturePartOfArchitecturesNodeAggregateSelection = {
   __typename?: 'DataObjectArchitecturePartOfArchitecturesNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
   timestamp: DateTimeAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
@@ -18007,6 +19389,8 @@ export type DataObjectBusinessCapabilityRelatedToCapabilitiesNodeAggregateSelect
   maturityLevel: IntAggregateSelection;
   name: StringAggregateSelection;
   sequenceNumber: IntAggregateSelection;
+  sovereigntyReqRationale: StringAggregateSelection;
+  sovereigntyReqWeight: FloatAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -18184,6 +19568,14 @@ export type DataObjectCreateInput = {
   planningDate?: InputMaybe<Scalars['Date']['input']>;
   relatedDataObjects?: InputMaybe<DataObjectRelatedDataObjectsFieldInput>;
   relatedToCapabilities?: InputMaybe<DataObjectRelatedToCapabilitiesFieldInput>;
+  sovereigntyReqDataResidency?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyReqInteroperability?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyReqJurisdictionControl?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyReqOperationalControl?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyReqPortability?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyReqRationale?: InputMaybe<Scalars['String']['input']>;
+  sovereigntyReqSupplyChainTransparency?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyReqWeight?: InputMaybe<Scalars['Float']['input']>;
   transferredInInterfaces?: InputMaybe<DataObjectTransferredInInterfacesFieldInput>;
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
   usedByApplications?: InputMaybe<DataObjectUsedByApplicationsFieldInput>;
@@ -18209,6 +19601,8 @@ export type DataObjectDataObjectInverseRelatedDataObjectsNodeAggregateSelection 
   description: StringAggregateSelection;
   format: StringAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyReqRationale: StringAggregateSelection;
+  sovereigntyReqWeight: FloatAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -18230,6 +19624,8 @@ export type DataObjectDataObjectRelatedDataObjectsNodeAggregateSelection = {
   description: StringAggregateSelection;
   format: StringAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyReqRationale: StringAggregateSelection;
+  sovereigntyReqWeight: FloatAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -18318,7 +19714,9 @@ export type DataObjectDataSourcesNodeAggregationWhereInput = {
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
@@ -18596,6 +19994,8 @@ export type DataObjectInverseRelatedDataObjectsNodeAggregationWhereInput = {
   description?: InputMaybe<StringScalarAggregationFilters>;
   format?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
@@ -18827,9 +20227,13 @@ export type DataObjectPartOfArchitecturesNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<DataObjectPartOfArchitecturesNodeAggregationWhereInput>>;
   NOT?: InputMaybe<DataObjectPartOfArchitecturesNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<DataObjectPartOfArchitecturesNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
   timestamp?: InputMaybe<DateTimeScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
@@ -18963,6 +20367,8 @@ export type DataObjectRelatedDataObjectsNodeAggregationWhereInput = {
   description?: InputMaybe<StringScalarAggregationFilters>;
   format?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
@@ -19074,6 +20480,8 @@ export type DataObjectRelatedToCapabilitiesNodeAggregationWhereInput = {
   maturityLevel?: InputMaybe<IntScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   sequenceNumber?: InputMaybe<IntScalarAggregationFilters>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
@@ -19155,6 +20563,14 @@ export type DataObjectSort = {
   introductionDate?: InputMaybe<SortDirection>;
   name?: InputMaybe<SortDirection>;
   planningDate?: InputMaybe<SortDirection>;
+  sovereigntyReqDataResidency?: InputMaybe<SortDirection>;
+  sovereigntyReqInteroperability?: InputMaybe<SortDirection>;
+  sovereigntyReqJurisdictionControl?: InputMaybe<SortDirection>;
+  sovereigntyReqOperationalControl?: InputMaybe<SortDirection>;
+  sovereigntyReqPortability?: InputMaybe<SortDirection>;
+  sovereigntyReqRationale?: InputMaybe<SortDirection>;
+  sovereigntyReqSupplyChainTransparency?: InputMaybe<SortDirection>;
+  sovereigntyReqWeight?: InputMaybe<SortDirection>;
   updatedAt?: InputMaybe<SortDirection>;
 };
 
@@ -19241,7 +20657,9 @@ export type DataObjectTransferredInInterfacesNodeAggregationWhereInput = {
   OR?: InputMaybe<Array<DataObjectTransferredInInterfacesNodeAggregationWhereInput>>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -19283,6 +20701,14 @@ export type DataObjectUpdateInput = {
   planningDate?: InputMaybe<DateScalarMutations>;
   relatedDataObjects?: InputMaybe<Array<DataObjectRelatedDataObjectsUpdateFieldInput>>;
   relatedToCapabilities?: InputMaybe<Array<DataObjectRelatedToCapabilitiesUpdateFieldInput>>;
+  sovereigntyReqDataResidency?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyReqInteroperability?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyReqJurisdictionControl?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyReqOperationalControl?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyReqPortability?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarMutations>;
+  sovereigntyReqSupplyChainTransparency?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarMutations>;
   transferredInInterfaces?: InputMaybe<Array<DataObjectTransferredInInterfacesUpdateFieldInput>>;
   usedByApplications?: InputMaybe<Array<DataObjectUsedByApplicationsUpdateFieldInput>>;
   usedByOrganisations?: InputMaybe<Array<DataObjectUsedByOrganisationsUpdateFieldInput>>;
@@ -19374,7 +20800,9 @@ export type DataObjectUsedByApplicationsNodeAggregationWhereInput = {
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
@@ -19591,10 +21019,12 @@ export type DataObjectUsedForTrainingAiNodeAggregationWhereInput = {
   costs?: InputMaybe<FloatScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   license?: InputMaybe<StringScalarAggregationFilters>;
   model?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   provider?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -19648,6 +21078,14 @@ export type DataObjectWhere = {
   relatedDataObjectsConnection?: InputMaybe<DataObjectRelatedDataObjectsConnectionFilters>;
   relatedToCapabilities?: InputMaybe<BusinessCapabilityRelationshipFilters>;
   relatedToCapabilitiesConnection?: InputMaybe<DataObjectRelatedToCapabilitiesConnectionFilters>;
+  sovereigntyReqDataResidency?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyReqInteroperability?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyReqJurisdictionControl?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyReqOperationalControl?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyReqPortability?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarFilters>;
+  sovereigntyReqSupplyChainTransparency?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarFilters>;
   transferredInInterfaces?: InputMaybe<ApplicationInterfaceRelationshipFilters>;
   transferredInInterfacesConnection?: InputMaybe<DataObjectTransferredInInterfacesConnectionFilters>;
   updatedAt?: InputMaybe<DateTimeScalarFilters>;
@@ -20042,10 +21480,12 @@ export type DiagramAiComponentContainsAiComponentsNodeAggregateSelection = {
   costs: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   license: StringAggregateSelection;
   model: StringAggregateSelection;
   name: StringAggregateSelection;
   provider: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   version: StringAggregateSelection;
 };
@@ -20079,7 +21519,9 @@ export type DiagramApplicationContainsApplicationsNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   hostingEnvironment: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
   version: StringAggregateSelection;
@@ -20095,7 +21537,9 @@ export type DiagramApplicationInterfaceContainsInterfacesNodeAggregateSelection 
   __typename?: 'DiagramApplicationInterfaceContainsInterfacesNodeAggregateSelection';
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   version: StringAggregateSelection;
 };
@@ -20121,9 +21565,13 @@ export type DiagramArchitectureArchitectureAggregateSelection = {
 
 export type DiagramArchitectureArchitectureNodeAggregateSelection = {
   __typename?: 'DiagramArchitectureArchitectureNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
   timestamp: DateTimeAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
@@ -20196,9 +21644,13 @@ export type DiagramArchitectureNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<DiagramArchitectureNodeAggregationWhereInput>>;
   NOT?: InputMaybe<DiagramArchitectureNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<DiagramArchitectureNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
   timestamp?: InputMaybe<DateTimeScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
@@ -20236,6 +21688,8 @@ export type DiagramBusinessCapabilityContainsCapabilitiesNodeAggregateSelection 
   maturityLevel: IntAggregateSelection;
   name: StringAggregateSelection;
   sequenceNumber: IntAggregateSelection;
+  sovereigntyReqRationale: StringAggregateSelection;
+  sovereigntyReqWeight: FloatAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -20253,6 +21707,8 @@ export type DiagramBusinessProcessContainsBusinessProcessesNodeAggregateSelectio
   description: StringAggregateSelection;
   maturityLevel: IntAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyReqRationale: StringAggregateSelection;
+  sovereigntyReqWeight: FloatAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -20501,10 +21957,12 @@ export type DiagramContainsAiComponentsNodeAggregationWhereInput = {
   costs?: InputMaybe<FloatScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   license?: InputMaybe<StringScalarAggregationFilters>;
   model?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   provider?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -20613,7 +22071,9 @@ export type DiagramContainsApplicationsNodeAggregationWhereInput = {
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
@@ -20725,6 +22185,8 @@ export type DiagramContainsBusinessProcessesNodeAggregationWhereInput = {
   description?: InputMaybe<StringScalarAggregationFilters>;
   maturityLevel?: InputMaybe<IntScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
@@ -20834,6 +22296,8 @@ export type DiagramContainsCapabilitiesNodeAggregationWhereInput = {
   maturityLevel?: InputMaybe<IntScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   sequenceNumber?: InputMaybe<IntScalarAggregationFilters>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
@@ -20941,6 +22405,8 @@ export type DiagramContainsDataObjectsNodeAggregationWhereInput = {
   description?: InputMaybe<StringScalarAggregationFilters>;
   format?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
@@ -21580,10 +23046,12 @@ export type DiagramContainsInfrastructureNodeAggregationWhereInput = {
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   ipAddress?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   location?: InputMaybe<StringScalarAggregationFilters>;
   maintenanceWindow?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   operatingSystem?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   specifications?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
@@ -21692,7 +23160,9 @@ export type DiagramContainsInterfacesNodeAggregationWhereInput = {
   OR?: InputMaybe<Array<DiagramContainsInterfacesNodeAggregationWhereInput>>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -21864,6 +23334,8 @@ export type DiagramDataObjectContainsDataObjectsNodeAggregateSelection = {
   description: StringAggregateSelection;
   format: StringAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyReqRationale: StringAggregateSelection;
+  sovereigntyReqWeight: FloatAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -21993,10 +23465,12 @@ export type DiagramInfrastructureContainsInfrastructureNodeAggregateSelection = 
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   ipAddress: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   location: StringAggregateSelection;
   maintenanceWindow: StringAggregateSelection;
   name: StringAggregateSelection;
   operatingSystem: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   specifications: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
@@ -22537,9 +24011,13 @@ export type Gea_GoalArchitecturePartOfArchitecturesAggregateSelection = {
 
 export type Gea_GoalArchitecturePartOfArchitecturesNodeAggregateSelection = {
   __typename?: 'GEA_GoalArchitecturePartOfArchitecturesNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
   timestamp: DateTimeAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
@@ -23253,9 +24731,13 @@ export type Gea_GoalPartOfArchitecturesNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<Gea_GoalPartOfArchitecturesNodeAggregationWhereInput>>;
   NOT?: InputMaybe<Gea_GoalPartOfArchitecturesNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<Gea_GoalPartOfArchitecturesNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
   timestamp?: InputMaybe<DateTimeScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
@@ -23761,9 +25243,13 @@ export type Gea_MissionArchitecturePartOfArchitecturesAggregateSelection = {
 
 export type Gea_MissionArchitecturePartOfArchitecturesNodeAggregateSelection = {
   __typename?: 'GEA_MissionArchitecturePartOfArchitecturesNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
   timestamp: DateTimeAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
@@ -24340,9 +25826,13 @@ export type Gea_MissionPartOfArchitecturesNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<Gea_MissionPartOfArchitecturesNodeAggregationWhereInput>>;
   NOT?: InputMaybe<Gea_MissionPartOfArchitecturesNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<Gea_MissionPartOfArchitecturesNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
   timestamp?: InputMaybe<DateTimeScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
@@ -25037,9 +26527,13 @@ export type Gea_StrategyArchitecturePartOfArchitecturesAggregateSelection = {
 
 export type Gea_StrategyArchitecturePartOfArchitecturesNodeAggregateSelection = {
   __typename?: 'GEA_StrategyArchitecturePartOfArchitecturesNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
   timestamp: DateTimeAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
@@ -25565,9 +27059,13 @@ export type Gea_StrategyPartOfArchitecturesNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<Gea_StrategyPartOfArchitecturesNodeAggregationWhereInput>>;
   NOT?: InputMaybe<Gea_StrategyPartOfArchitecturesNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<Gea_StrategyPartOfArchitecturesNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
   timestamp?: InputMaybe<DateTimeScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
@@ -25814,9 +27312,13 @@ export type Gea_ValueArchitecturePartOfArchitecturesAggregateSelection = {
 
 export type Gea_ValueArchitecturePartOfArchitecturesNodeAggregateSelection = {
   __typename?: 'GEA_ValueArchitecturePartOfArchitecturesNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
   timestamp: DateTimeAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
@@ -26367,9 +27869,13 @@ export type Gea_ValuePartOfArchitecturesNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<Gea_ValuePartOfArchitecturesNodeAggregationWhereInput>>;
   NOT?: InputMaybe<Gea_ValuePartOfArchitecturesNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<Gea_ValuePartOfArchitecturesNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
   timestamp?: InputMaybe<DateTimeScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
@@ -26871,9 +28377,13 @@ export type Gea_VisionArchitecturePartOfArchitecturesAggregateSelection = {
 
 export type Gea_VisionArchitecturePartOfArchitecturesNodeAggregateSelection = {
   __typename?: 'GEA_VisionArchitecturePartOfArchitecturesNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
   timestamp: DateTimeAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
@@ -27449,9 +28959,13 @@ export type Gea_VisionPartOfArchitecturesNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<Gea_VisionPartOfArchitecturesNodeAggregationWhereInput>>;
   NOT?: InputMaybe<Gea_VisionPartOfArchitecturesNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<Gea_VisionPartOfArchitecturesNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
   timestamp?: InputMaybe<DateTimeScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
@@ -27974,6 +29488,7 @@ export type Infrastructure = {
   infrastructureType: InfrastructureType;
   introductionDate?: Maybe<Scalars['Date']['output']>;
   ipAddress?: Maybe<Scalars['String']['output']>;
+  lastSovereigntyAssessmentAt?: Maybe<Scalars['DateTime']['output']>;
   location?: Maybe<Scalars['String']['output']>;
   maintainedBy: Array<Supplier>;
   maintainedByConnection: InfrastructureMaintainedByConnection;
@@ -27989,6 +29504,13 @@ export type Infrastructure = {
   planningDate?: Maybe<Scalars['Date']['output']>;
   providedBy: Array<Supplier>;
   providedByConnection: InfrastructureProvidedByConnection;
+  sovereigntyAchDataResidency?: Maybe<SovereigntyMaturity>;
+  sovereigntyAchInteroperability?: Maybe<SovereigntyMaturity>;
+  sovereigntyAchJurisdictionControl?: Maybe<SovereigntyMaturity>;
+  sovereigntyAchOperationalControl?: Maybe<SovereigntyMaturity>;
+  sovereigntyAchPortability?: Maybe<SovereigntyMaturity>;
+  sovereigntyAchSupplyChainTransparency?: Maybe<SovereigntyMaturity>;
+  sovereigntyEvidence?: Maybe<Scalars['String']['output']>;
   specifications?: Maybe<Scalars['String']['output']>;
   status: InfrastructureStatus;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
@@ -28226,10 +29748,12 @@ export type InfrastructureAiComponentHostsAiComponentsNodeAggregateSelection = {
   costs: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   license: StringAggregateSelection;
   model: StringAggregateSelection;
   name: StringAggregateSelection;
   provider: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   version: StringAggregateSelection;
 };
@@ -28247,10 +29771,12 @@ export type InfrastructureAggregateNode = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   ipAddress: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   location: StringAggregateSelection;
   maintenanceWindow: StringAggregateSelection;
   name: StringAggregateSelection;
   operatingSystem: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   specifications: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
@@ -28269,7 +29795,9 @@ export type InfrastructureApplicationHostsApplicationsNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   hostingEnvironment: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
   version: StringAggregateSelection;
@@ -28283,9 +29811,13 @@ export type InfrastructureArchitecturePartOfArchitecturesAggregateSelection = {
 
 export type InfrastructureArchitecturePartOfArchitecturesNodeAggregateSelection = {
   __typename?: 'InfrastructureArchitecturePartOfArchitecturesNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
   timestamp: DateTimeAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
@@ -28376,10 +29908,12 @@ export type InfrastructureChildInfrastructuresNodeAggregationWhereInput = {
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   ipAddress?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   location?: InputMaybe<StringScalarAggregationFilters>;
   maintenanceWindow?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   operatingSystem?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   specifications?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
@@ -28577,6 +30111,7 @@ export type InfrastructureCreateInput = {
   infrastructureType: InfrastructureType;
   introductionDate?: InputMaybe<Scalars['Date']['input']>;
   ipAddress?: InputMaybe<Scalars['String']['input']>;
+  lastSovereigntyAssessmentAt?: InputMaybe<Scalars['DateTime']['input']>;
   location?: InputMaybe<Scalars['String']['input']>;
   maintainedBy?: InputMaybe<InfrastructureMaintainedByFieldInput>;
   maintenanceWindow?: InputMaybe<Scalars['String']['input']>;
@@ -28587,6 +30122,13 @@ export type InfrastructureCreateInput = {
   partOfArchitectures?: InputMaybe<InfrastructurePartOfArchitecturesFieldInput>;
   planningDate?: InputMaybe<Scalars['Date']['input']>;
   providedBy?: InputMaybe<InfrastructureProvidedByFieldInput>;
+  sovereigntyAchDataResidency?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyAchInteroperability?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyAchJurisdictionControl?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyAchOperationalControl?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyAchPortability?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyAchSupplyChainTransparency?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyEvidence?: InputMaybe<Scalars['String']['input']>;
   specifications?: InputMaybe<Scalars['String']['input']>;
   status: InfrastructureStatus;
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
@@ -28843,10 +30385,12 @@ export type InfrastructureHostedByNodeAggregationWhereInput = {
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   email?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   performanceRating?: InputMaybe<IntScalarAggregationFilters>;
   phone?: InputMaybe<StringScalarAggregationFilters>;
   primaryContactPerson?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -28955,10 +30499,12 @@ export type InfrastructureHostsAiComponentsNodeAggregationWhereInput = {
   costs?: InputMaybe<FloatScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   license?: InputMaybe<StringScalarAggregationFilters>;
   model?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   provider?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -29067,7 +30613,9 @@ export type InfrastructureHostsApplicationsNodeAggregationWhereInput = {
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
@@ -29105,10 +30653,12 @@ export type InfrastructureInfrastructureChildInfrastructuresNodeAggregateSelecti
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   ipAddress: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   location: StringAggregateSelection;
   maintenanceWindow: StringAggregateSelection;
   name: StringAggregateSelection;
   operatingSystem: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   specifications: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
@@ -29128,10 +30678,12 @@ export type InfrastructureInfrastructureParentInfrastructureNodeAggregateSelecti
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   ipAddress: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   location: StringAggregateSelection;
   maintenanceWindow: StringAggregateSelection;
   name: StringAggregateSelection;
   operatingSystem: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   specifications: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
@@ -29224,10 +30776,12 @@ export type InfrastructureMaintainedByNodeAggregationWhereInput = {
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   email?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   performanceRating?: InputMaybe<IntScalarAggregationFilters>;
   phone?: InputMaybe<StringScalarAggregationFilters>;
   primaryContactPerson?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -29463,10 +31017,12 @@ export type InfrastructureParentInfrastructureNodeAggregationWhereInput = {
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   ipAddress?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   location?: InputMaybe<StringScalarAggregationFilters>;
   maintenanceWindow?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   operatingSystem?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   specifications?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
@@ -29573,9 +31129,13 @@ export type InfrastructurePartOfArchitecturesNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<InfrastructurePartOfArchitecturesNodeAggregationWhereInput>>;
   NOT?: InputMaybe<InfrastructurePartOfArchitecturesNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<InfrastructurePartOfArchitecturesNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
   timestamp?: InputMaybe<DateTimeScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
@@ -29704,10 +31264,12 @@ export type InfrastructureProvidedByNodeAggregationWhereInput = {
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   email?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   performanceRating?: InputMaybe<IntScalarAggregationFilters>;
   phone?: InputMaybe<StringScalarAggregationFilters>;
   primaryContactPerson?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -29754,11 +31316,19 @@ export type InfrastructureSort = {
   infrastructureType?: InputMaybe<SortDirection>;
   introductionDate?: InputMaybe<SortDirection>;
   ipAddress?: InputMaybe<SortDirection>;
+  lastSovereigntyAssessmentAt?: InputMaybe<SortDirection>;
   location?: InputMaybe<SortDirection>;
   maintenanceWindow?: InputMaybe<SortDirection>;
   name?: InputMaybe<SortDirection>;
   operatingSystem?: InputMaybe<SortDirection>;
   planningDate?: InputMaybe<SortDirection>;
+  sovereigntyAchDataResidency?: InputMaybe<SortDirection>;
+  sovereigntyAchInteroperability?: InputMaybe<SortDirection>;
+  sovereigntyAchJurisdictionControl?: InputMaybe<SortDirection>;
+  sovereigntyAchOperationalControl?: InputMaybe<SortDirection>;
+  sovereigntyAchPortability?: InputMaybe<SortDirection>;
+  sovereigntyAchSupplyChainTransparency?: InputMaybe<SortDirection>;
+  sovereigntyEvidence?: InputMaybe<SortDirection>;
   specifications?: InputMaybe<SortDirection>;
   status?: InputMaybe<SortDirection>;
   updatedAt?: InputMaybe<SortDirection>;
@@ -29800,10 +31370,12 @@ export type InfrastructureSupplierHostedByNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   email: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
   performanceRating: IntAggregateSelection;
   phone: StringAggregateSelection;
   primaryContactPerson: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -29821,10 +31393,12 @@ export type InfrastructureSupplierMaintainedByNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   email: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
   performanceRating: IntAggregateSelection;
   phone: StringAggregateSelection;
   primaryContactPerson: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -29842,10 +31416,12 @@ export type InfrastructureSupplierProvidedByNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   email: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
   performanceRating: IntAggregateSelection;
   phone: StringAggregateSelection;
   primaryContactPerson: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -29890,6 +31466,7 @@ export type InfrastructureUpdateInput = {
   infrastructureType?: InputMaybe<InfrastructureTypeEnumScalarMutations>;
   introductionDate?: InputMaybe<DateScalarMutations>;
   ipAddress?: InputMaybe<StringScalarMutations>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarMutations>;
   location?: InputMaybe<StringScalarMutations>;
   maintainedBy?: InputMaybe<Array<InfrastructureMaintainedByUpdateFieldInput>>;
   maintenanceWindow?: InputMaybe<StringScalarMutations>;
@@ -29900,6 +31477,13 @@ export type InfrastructureUpdateInput = {
   partOfArchitectures?: InputMaybe<Array<InfrastructurePartOfArchitecturesUpdateFieldInput>>;
   planningDate?: InputMaybe<DateScalarMutations>;
   providedBy?: InputMaybe<Array<InfrastructureProvidedByUpdateFieldInput>>;
+  sovereigntyAchDataResidency?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyAchInteroperability?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyAchJurisdictionControl?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyAchOperationalControl?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyAchPortability?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyAchSupplyChainTransparency?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyEvidence?: InputMaybe<StringScalarMutations>;
   specifications?: InputMaybe<StringScalarMutations>;
   status?: InputMaybe<InfrastructureStatusEnumScalarMutations>;
   usedByOrganisations?: InputMaybe<Array<InfrastructureUsedByOrganisationsUpdateFieldInput>>;
@@ -30040,6 +31624,7 @@ export type InfrastructureWhere = {
   infrastructureType?: InputMaybe<InfrastructureTypeEnumScalarFilters>;
   introductionDate?: InputMaybe<DateScalarFilters>;
   ipAddress?: InputMaybe<StringScalarFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarFilters>;
   location?: InputMaybe<StringScalarFilters>;
   maintainedBy?: InputMaybe<SupplierRelationshipFilters>;
   maintainedByConnection?: InputMaybe<InfrastructureMaintainedByConnectionFilters>;
@@ -30055,6 +31640,13 @@ export type InfrastructureWhere = {
   planningDate?: InputMaybe<DateScalarFilters>;
   providedBy?: InputMaybe<SupplierRelationshipFilters>;
   providedByConnection?: InputMaybe<InfrastructureProvidedByConnectionFilters>;
+  sovereigntyAchDataResidency?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyAchInteroperability?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyAchJurisdictionControl?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyAchOperationalControl?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyAchPortability?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyAchSupplyChainTransparency?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarFilters>;
   specifications?: InputMaybe<StringScalarFilters>;
   status?: InputMaybe<InfrastructureStatusEnumScalarFilters>;
   updatedAt?: InputMaybe<DateTimeScalarFilters>;
@@ -30186,6 +31778,8 @@ export type ListStringMutations = {
 export type Mutation = {
   __typename?: 'Mutation';
   createAiComponents: CreateAiComponentsMutationResponse;
+  createAiRunAuditEvents: CreateAiRunAuditEventsMutationResponse;
+  createAiRuns: CreateAiRunsMutationResponse;
   createApplicationInterfaces: CreateApplicationInterfacesMutationResponse;
   createApplications: CreateApplicationsMutationResponse;
   createArchitecturePrinciples: CreateArchitecturePrinciplesMutationResponse;
@@ -30205,6 +31799,8 @@ export type Mutation = {
   createPeople: CreatePeopleMutationResponse;
   createSuppliers: CreateSuppliersMutationResponse;
   deleteAiComponents: DeleteInfo;
+  deleteAiRunAuditEvents: DeleteInfo;
+  deleteAiRuns: DeleteInfo;
   deleteApplicationInterfaces: DeleteInfo;
   deleteApplications: DeleteInfo;
   deleteArchitecturePrinciples: DeleteInfo;
@@ -30224,6 +31820,8 @@ export type Mutation = {
   deletePeople: DeleteInfo;
   deleteSuppliers: DeleteInfo;
   updateAiComponents: UpdateAiComponentsMutationResponse;
+  updateAiRunAuditEvents: UpdateAiRunAuditEventsMutationResponse;
+  updateAiRuns: UpdateAiRunsMutationResponse;
   updateApplicationInterfaces: UpdateApplicationInterfacesMutationResponse;
   updateApplications: UpdateApplicationsMutationResponse;
   updateArchitecturePrinciples: UpdateArchitecturePrinciplesMutationResponse;
@@ -30247,6 +31845,16 @@ export type Mutation = {
 
 export type MutationCreateAiComponentsArgs = {
   input: Array<AiComponentCreateInput>;
+};
+
+
+export type MutationCreateAiRunAuditEventsArgs = {
+  input: Array<AiRunAuditEventCreateInput>;
+};
+
+
+export type MutationCreateAiRunsArgs = {
+  input: Array<AiRunCreateInput>;
 };
 
 
@@ -30343,6 +31951,18 @@ export type MutationCreateSuppliersArgs = {
 export type MutationDeleteAiComponentsArgs = {
   delete?: InputMaybe<AiComponentDeleteInput>;
   where?: InputMaybe<AiComponentWhere>;
+};
+
+
+export type MutationDeleteAiRunAuditEventsArgs = {
+  delete?: InputMaybe<AiRunAuditEventDeleteInput>;
+  where?: InputMaybe<AiRunAuditEventWhere>;
+};
+
+
+export type MutationDeleteAiRunsArgs = {
+  delete?: InputMaybe<AiRunDeleteInput>;
+  where?: InputMaybe<AiRunWhere>;
 };
 
 
@@ -30457,6 +32077,18 @@ export type MutationDeleteSuppliersArgs = {
 export type MutationUpdateAiComponentsArgs = {
   update?: InputMaybe<AiComponentUpdateInput>;
   where?: InputMaybe<AiComponentWhere>;
+};
+
+
+export type MutationUpdateAiRunAuditEventsArgs = {
+  update?: InputMaybe<AiRunAuditEventUpdateInput>;
+  where?: InputMaybe<AiRunAuditEventWhere>;
+};
+
+
+export type MutationUpdateAiRunsArgs = {
+  update?: InputMaybe<AiRunUpdateInput>;
+  where?: InputMaybe<AiRunWhere>;
 };
 
 
@@ -30791,10 +32423,12 @@ export type OrganisationAiComponentUsedAiComponentsNodeAggregateSelection = {
   costs: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   license: StringAggregateSelection;
   model: StringAggregateSelection;
   name: StringAggregateSelection;
   provider: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   version: StringAggregateSelection;
 };
@@ -30824,7 +32458,9 @@ export type OrganisationApplicationInterfaceUsedInterfacesNodeAggregateSelection
   __typename?: 'OrganisationApplicationInterfaceUsedInterfacesNodeAggregateSelection';
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   version: StringAggregateSelection;
 };
@@ -30841,7 +32477,9 @@ export type OrganisationApplicationUsedApplicationsNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   hostingEnvironment: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
   version: StringAggregateSelection;
@@ -30861,6 +32499,8 @@ export type OrganisationBusinessCapabilityUsedCapabilitiesNodeAggregateSelection
   maturityLevel: IntAggregateSelection;
   name: StringAggregateSelection;
   sequenceNumber: IntAggregateSelection;
+  sovereigntyReqRationale: StringAggregateSelection;
+  sovereigntyReqWeight: FloatAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -30878,6 +32518,8 @@ export type OrganisationBusinessProcessUsedBusinessProcessesNodeAggregateSelecti
   description: StringAggregateSelection;
   maturityLevel: IntAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyReqRationale: StringAggregateSelection;
+  sovereigntyReqWeight: FloatAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -31173,6 +32815,8 @@ export type OrganisationDataObjectUsedDataObjectsNodeAggregateSelection = {
   description: StringAggregateSelection;
   format: StringAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyReqRationale: StringAggregateSelection;
+  sovereigntyReqWeight: FloatAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -31221,10 +32865,12 @@ export type OrganisationInfrastructureUsedInfrastructureNodeAggregateSelection =
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   ipAddress: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   location: StringAggregateSelection;
   maintenanceWindow: StringAggregateSelection;
   name: StringAggregateSelection;
   operatingSystem: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   specifications: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
@@ -31516,10 +33162,12 @@ export type OrganisationUsedAiComponentsNodeAggregationWhereInput = {
   costs?: InputMaybe<FloatScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   license?: InputMaybe<StringScalarAggregationFilters>;
   model?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   provider?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -31628,7 +33276,9 @@ export type OrganisationUsedApplicationsNodeAggregationWhereInput = {
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
@@ -31740,6 +33390,8 @@ export type OrganisationUsedBusinessProcessesNodeAggregationWhereInput = {
   description?: InputMaybe<StringScalarAggregationFilters>;
   maturityLevel?: InputMaybe<IntScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
@@ -31849,6 +33501,8 @@ export type OrganisationUsedCapabilitiesNodeAggregationWhereInput = {
   maturityLevel?: InputMaybe<IntScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   sequenceNumber?: InputMaybe<IntScalarAggregationFilters>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
@@ -31956,6 +33610,8 @@ export type OrganisationUsedDataObjectsNodeAggregationWhereInput = {
   description?: InputMaybe<StringScalarAggregationFilters>;
   format?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
@@ -32064,10 +33720,12 @@ export type OrganisationUsedInfrastructureNodeAggregationWhereInput = {
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   ipAddress?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   location?: InputMaybe<StringScalarAggregationFilters>;
   maintenanceWindow?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   operatingSystem?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   specifications?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
@@ -32176,7 +33834,9 @@ export type OrganisationUsedInterfacesNodeAggregationWhereInput = {
   OR?: InputMaybe<Array<OrganisationUsedInterfacesNodeAggregationWhereInput>>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -32585,10 +34245,12 @@ export type PersonAiComponentOwnedAiComponentsNodeAggregateSelection = {
   costs: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   license: StringAggregateSelection;
   model: StringAggregateSelection;
   name: StringAggregateSelection;
   provider: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   version: StringAggregateSelection;
 };
@@ -32622,7 +34284,9 @@ export type PersonApplicationInterfaceOwnedInterfacesNodeAggregateSelection = {
   __typename?: 'PersonApplicationInterfaceOwnedInterfacesNodeAggregateSelection';
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   version: StringAggregateSelection;
 };
@@ -32639,7 +34303,9 @@ export type PersonApplicationOwnedApplicationsNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   hostingEnvironment: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
   version: StringAggregateSelection;
@@ -32653,9 +34319,13 @@ export type PersonArchitectureOwnedArchitecturesAggregateSelection = {
 
 export type PersonArchitectureOwnedArchitecturesNodeAggregateSelection = {
   __typename?: 'PersonArchitectureOwnedArchitecturesNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
   timestamp: DateTimeAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
@@ -32674,6 +34344,8 @@ export type PersonBusinessCapabilityOwnedCapabilitiesNodeAggregateSelection = {
   maturityLevel: IntAggregateSelection;
   name: StringAggregateSelection;
   sequenceNumber: IntAggregateSelection;
+  sovereigntyReqRationale: StringAggregateSelection;
+  sovereigntyReqWeight: FloatAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -32691,6 +34363,8 @@ export type PersonBusinessProcessOwnedBusinessProcessesNodeAggregateSelection = 
   description: StringAggregateSelection;
   maturityLevel: IntAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyReqRationale: StringAggregateSelection;
+  sovereigntyReqWeight: FloatAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -32892,6 +34566,8 @@ export type PersonDataObjectOwnedDataObjectsNodeAggregateSelection = {
   description: StringAggregateSelection;
   format: StringAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyReqRationale: StringAggregateSelection;
+  sovereigntyReqWeight: FloatAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
 };
 
@@ -33038,10 +34714,12 @@ export type PersonInfrastructureOwnedInfrastructureNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   ipAddress: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   location: StringAggregateSelection;
   maintenanceWindow: StringAggregateSelection;
   name: StringAggregateSelection;
   operatingSystem: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   specifications: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
@@ -33133,10 +34811,12 @@ export type PersonOwnedAiComponentsNodeAggregationWhereInput = {
   costs?: InputMaybe<FloatScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   license?: InputMaybe<StringScalarAggregationFilters>;
   model?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   provider?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -33245,7 +34925,9 @@ export type PersonOwnedApplicationsNodeAggregationWhereInput = {
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
@@ -33351,9 +35033,13 @@ export type PersonOwnedArchitecturesNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<PersonOwnedArchitecturesNodeAggregationWhereInput>>;
   NOT?: InputMaybe<PersonOwnedArchitecturesNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<PersonOwnedArchitecturesNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
   timestamp?: InputMaybe<DateTimeScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
@@ -33464,6 +35150,8 @@ export type PersonOwnedBusinessProcessesNodeAggregationWhereInput = {
   description?: InputMaybe<StringScalarAggregationFilters>;
   maturityLevel?: InputMaybe<IntScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
@@ -33573,6 +35261,8 @@ export type PersonOwnedCapabilitiesNodeAggregationWhereInput = {
   maturityLevel?: InputMaybe<IntScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   sequenceNumber?: InputMaybe<IntScalarAggregationFilters>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
@@ -33680,6 +35370,8 @@ export type PersonOwnedDataObjectsNodeAggregationWhereInput = {
   description?: InputMaybe<StringScalarAggregationFilters>;
   format?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqRationale?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyReqWeight?: InputMaybe<FloatScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
 };
 
@@ -34428,10 +36120,12 @@ export type PersonOwnedInfrastructureNodeAggregationWhereInput = {
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   ipAddress?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   location?: InputMaybe<StringScalarAggregationFilters>;
   maintenanceWindow?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   operatingSystem?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   specifications?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
@@ -34540,7 +36234,9 @@ export type PersonOwnedInterfacesNodeAggregationWhereInput = {
   OR?: InputMaybe<Array<PersonOwnedInterfacesNodeAggregationWhereInput>>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -34751,6 +36447,10 @@ export type Query = {
   __typename?: 'Query';
   aiComponents: Array<AiComponent>;
   aiComponentsConnection: AiComponentsConnection;
+  aiRunAuditEvents: Array<AiRunAuditEvent>;
+  aiRunAuditEventsConnection: AiRunAuditEventsConnection;
+  aiRuns: Array<AiRun>;
+  aiRunsConnection: AiRunsConnection;
   applicationInterfaces: Array<ApplicationInterface>;
   applicationInterfacesConnection: ApplicationInterfacesConnection;
   applications: Array<Application>;
@@ -34803,6 +36503,38 @@ export type QueryAiComponentsConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<AiComponentSort>>;
   where?: InputMaybe<AiComponentWhere>;
+};
+
+
+export type QueryAiRunAuditEventsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<AiRunAuditEventSort>>;
+  where?: InputMaybe<AiRunAuditEventWhere>;
+};
+
+
+export type QueryAiRunAuditEventsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<AiRunAuditEventSort>>;
+  where?: InputMaybe<AiRunAuditEventWhere>;
+};
+
+
+export type QueryAiRunsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<AiRunSort>>;
+  where?: InputMaybe<AiRunWhere>;
+};
+
+
+export type QueryAiRunsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<AiRunSort>>;
+  where?: InputMaybe<AiRunWhere>;
 };
 
 
@@ -35142,6 +36874,26 @@ export enum SortDirection {
   DESC = 'DESC'
 }
 
+/** Sovereignty maturity level for requirement and achieved evaluations */
+export enum SovereigntyMaturity {
+  HIGH = 'HIGH',
+  LOW = 'LOW',
+  MEDIUM = 'MEDIUM',
+  NONE = 'NONE',
+  VERY_HIGH = 'VERY_HIGH'
+}
+
+/** SovereigntyMaturity filters */
+export type SovereigntyMaturityEnumScalarFilters = {
+  eq?: InputMaybe<SovereigntyMaturity>;
+  in?: InputMaybe<Array<SovereigntyMaturity>>;
+};
+
+/** SovereigntyMaturity mutations */
+export type SovereigntyMaturityEnumScalarMutations = {
+  set?: InputMaybe<SovereigntyMaturity>;
+};
+
 /** Strategic importance of suppliers */
 export enum StrategicImportance {
   HIGH = 'HIGH',
@@ -35210,6 +36962,7 @@ export type Supplier = {
   hostsInfrastructure: Array<Infrastructure>;
   hostsInfrastructureConnection: SupplierHostsInfrastructureConnection;
   id: Scalars['ID']['output'];
+  lastSovereigntyAssessmentAt?: Maybe<Scalars['DateTime']['output']>;
   maintainsAIComponents: Array<AiComponent>;
   maintainsAIComponentsConnection: SupplierMaintainsAiComponentsConnection;
   maintainsApplications: Array<Application>;
@@ -35227,6 +36980,13 @@ export type Supplier = {
   providesInfrastructure: Array<Infrastructure>;
   providesInfrastructureConnection: SupplierProvidesInfrastructureConnection;
   riskClassification?: Maybe<RiskClassification>;
+  sovereigntyAchDataResidency?: Maybe<SovereigntyMaturity>;
+  sovereigntyAchInteroperability?: Maybe<SovereigntyMaturity>;
+  sovereigntyAchJurisdictionControl?: Maybe<SovereigntyMaturity>;
+  sovereigntyAchOperationalControl?: Maybe<SovereigntyMaturity>;
+  sovereigntyAchPortability?: Maybe<SovereigntyMaturity>;
+  sovereigntyAchSupplyChainTransparency?: Maybe<SovereigntyMaturity>;
+  sovereigntyEvidence?: Maybe<Scalars['String']['output']>;
   status: SupplierStatus;
   strategicImportance?: Maybe<StrategicImportance>;
   supplierType: SupplierType;
@@ -35431,10 +37191,12 @@ export type SupplierAiComponentMaintainsAiComponentsNodeAggregateSelection = {
   costs: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   license: StringAggregateSelection;
   model: StringAggregateSelection;
   name: StringAggregateSelection;
   provider: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   version: StringAggregateSelection;
 };
@@ -35451,10 +37213,12 @@ export type SupplierAiComponentProvidesAiComponentsNodeAggregateSelection = {
   costs: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   license: StringAggregateSelection;
   model: StringAggregateSelection;
   name: StringAggregateSelection;
   provider: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   version: StringAggregateSelection;
 };
@@ -35471,10 +37235,12 @@ export type SupplierAiComponentSupportsAiComponentsNodeAggregateSelection = {
   costs: FloatAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   license: StringAggregateSelection;
   model: StringAggregateSelection;
   name: StringAggregateSelection;
   provider: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   version: StringAggregateSelection;
 };
@@ -35492,10 +37258,12 @@ export type SupplierAggregateNode = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   email: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
   performanceRating: IntAggregateSelection;
   phone: StringAggregateSelection;
   primaryContactPerson: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -35512,7 +37280,9 @@ export type SupplierApplicationMaintainsApplicationsNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   hostingEnvironment: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
   version: StringAggregateSelection;
@@ -35530,7 +37300,9 @@ export type SupplierApplicationProvidesApplicationsNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   hostingEnvironment: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
   version: StringAggregateSelection;
@@ -35548,7 +37320,9 @@ export type SupplierApplicationSupportsApplicationsNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   hostingEnvironment: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
   version: StringAggregateSelection;
@@ -35719,6 +37493,7 @@ export type SupplierCreateInput = {
   description?: InputMaybe<Scalars['String']['input']>;
   email?: InputMaybe<Scalars['String']['input']>;
   hostsInfrastructure?: InputMaybe<SupplierHostsInfrastructureFieldInput>;
+  lastSovereigntyAssessmentAt?: InputMaybe<Scalars['DateTime']['input']>;
   maintainsAIComponents?: InputMaybe<SupplierMaintainsAiComponentsFieldInput>;
   maintainsApplications?: InputMaybe<SupplierMaintainsApplicationsFieldInput>;
   maintainsInfrastructure?: InputMaybe<SupplierMaintainsInfrastructureFieldInput>;
@@ -35730,6 +37505,13 @@ export type SupplierCreateInput = {
   providesApplications?: InputMaybe<SupplierProvidesApplicationsFieldInput>;
   providesInfrastructure?: InputMaybe<SupplierProvidesInfrastructureFieldInput>;
   riskClassification?: InputMaybe<RiskClassification>;
+  sovereigntyAchDataResidency?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyAchInteroperability?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyAchJurisdictionControl?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyAchOperationalControl?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyAchPortability?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyAchSupplyChainTransparency?: InputMaybe<SovereigntyMaturity>;
+  sovereigntyEvidence?: InputMaybe<Scalars['String']['input']>;
   status: SupplierStatus;
   strategicImportance?: InputMaybe<StrategicImportance>;
   supplierType: SupplierType;
@@ -35858,10 +37640,12 @@ export type SupplierHostsInfrastructureNodeAggregationWhereInput = {
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   ipAddress?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   location?: InputMaybe<StringScalarAggregationFilters>;
   maintenanceWindow?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   operatingSystem?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   specifications?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
@@ -35900,10 +37684,12 @@ export type SupplierInfrastructureHostsInfrastructureNodeAggregateSelection = {
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   ipAddress: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   location: StringAggregateSelection;
   maintenanceWindow: StringAggregateSelection;
   name: StringAggregateSelection;
   operatingSystem: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   specifications: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
@@ -35923,10 +37709,12 @@ export type SupplierInfrastructureMaintainsInfrastructureNodeAggregateSelection 
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   ipAddress: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   location: StringAggregateSelection;
   maintenanceWindow: StringAggregateSelection;
   name: StringAggregateSelection;
   operatingSystem: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   specifications: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
@@ -35946,10 +37734,12 @@ export type SupplierInfrastructureProvidesInfrastructureNodeAggregateSelection =
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   ipAddress: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   location: StringAggregateSelection;
   maintenanceWindow: StringAggregateSelection;
   name: StringAggregateSelection;
   operatingSystem: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
   specifications: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
@@ -36041,10 +37831,12 @@ export type SupplierMaintainsAiComponentsNodeAggregationWhereInput = {
   costs?: InputMaybe<FloatScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   license?: InputMaybe<StringScalarAggregationFilters>;
   model?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   provider?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -36153,7 +37945,9 @@ export type SupplierMaintainsApplicationsNodeAggregationWhereInput = {
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
@@ -36264,10 +38058,12 @@ export type SupplierMaintainsInfrastructureNodeAggregationWhereInput = {
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   ipAddress?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   location?: InputMaybe<StringScalarAggregationFilters>;
   maintenanceWindow?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   operatingSystem?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   specifications?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
@@ -36378,10 +38174,12 @@ export type SupplierProvidesAiComponentsNodeAggregationWhereInput = {
   costs?: InputMaybe<FloatScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   license?: InputMaybe<StringScalarAggregationFilters>;
   model?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   provider?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -36490,7 +38288,9 @@ export type SupplierProvidesApplicationsNodeAggregationWhereInput = {
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
@@ -36601,10 +38401,12 @@ export type SupplierProvidesInfrastructureNodeAggregationWhereInput = {
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   ipAddress?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   location?: InputMaybe<StringScalarAggregationFilters>;
   maintenanceWindow?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   operatingSystem?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   specifications?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
@@ -36651,11 +38453,19 @@ export type SupplierSort = {
   description?: InputMaybe<SortDirection>;
   email?: InputMaybe<SortDirection>;
   id?: InputMaybe<SortDirection>;
+  lastSovereigntyAssessmentAt?: InputMaybe<SortDirection>;
   name?: InputMaybe<SortDirection>;
   performanceRating?: InputMaybe<SortDirection>;
   phone?: InputMaybe<SortDirection>;
   primaryContactPerson?: InputMaybe<SortDirection>;
   riskClassification?: InputMaybe<SortDirection>;
+  sovereigntyAchDataResidency?: InputMaybe<SortDirection>;
+  sovereigntyAchInteroperability?: InputMaybe<SortDirection>;
+  sovereigntyAchJurisdictionControl?: InputMaybe<SortDirection>;
+  sovereigntyAchOperationalControl?: InputMaybe<SortDirection>;
+  sovereigntyAchPortability?: InputMaybe<SortDirection>;
+  sovereigntyAchSupplyChainTransparency?: InputMaybe<SortDirection>;
+  sovereigntyEvidence?: InputMaybe<SortDirection>;
   status?: InputMaybe<SortDirection>;
   strategicImportance?: InputMaybe<SortDirection>;
   supplierType?: InputMaybe<SortDirection>;
@@ -36767,10 +38577,12 @@ export type SupplierSupportsAiComponentsNodeAggregationWhereInput = {
   costs?: InputMaybe<FloatScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   license?: InputMaybe<StringScalarAggregationFilters>;
   model?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   provider?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -36879,7 +38691,9 @@ export type SupplierSupportsApplicationsNodeAggregationWhereInput = {
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
   version?: InputMaybe<StringScalarAggregationFilters>;
@@ -36935,6 +38749,7 @@ export type SupplierUpdateInput = {
   description?: InputMaybe<StringScalarMutations>;
   email?: InputMaybe<StringScalarMutations>;
   hostsInfrastructure?: InputMaybe<Array<SupplierHostsInfrastructureUpdateFieldInput>>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarMutations>;
   maintainsAIComponents?: InputMaybe<Array<SupplierMaintainsAiComponentsUpdateFieldInput>>;
   maintainsApplications?: InputMaybe<Array<SupplierMaintainsApplicationsUpdateFieldInput>>;
   maintainsInfrastructure?: InputMaybe<Array<SupplierMaintainsInfrastructureUpdateFieldInput>>;
@@ -36946,6 +38761,13 @@ export type SupplierUpdateInput = {
   providesApplications?: InputMaybe<Array<SupplierProvidesApplicationsUpdateFieldInput>>;
   providesInfrastructure?: InputMaybe<Array<SupplierProvidesInfrastructureUpdateFieldInput>>;
   riskClassification?: InputMaybe<RiskClassificationEnumScalarMutations>;
+  sovereigntyAchDataResidency?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyAchInteroperability?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyAchJurisdictionControl?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyAchOperationalControl?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyAchPortability?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyAchSupplyChainTransparency?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
+  sovereigntyEvidence?: InputMaybe<StringScalarMutations>;
   status?: InputMaybe<SupplierStatusEnumScalarMutations>;
   strategicImportance?: InputMaybe<StrategicImportanceEnumScalarMutations>;
   supplierType?: InputMaybe<SupplierTypeEnumScalarMutations>;
@@ -36972,6 +38794,7 @@ export type SupplierWhere = {
   hostsInfrastructure?: InputMaybe<InfrastructureRelationshipFilters>;
   hostsInfrastructureConnection?: InputMaybe<SupplierHostsInfrastructureConnectionFilters>;
   id?: InputMaybe<IdScalarFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarFilters>;
   maintainsAIComponents?: InputMaybe<AiComponentRelationshipFilters>;
   maintainsAIComponentsConnection?: InputMaybe<SupplierMaintainsAiComponentsConnectionFilters>;
   maintainsApplications?: InputMaybe<ApplicationRelationshipFilters>;
@@ -36989,6 +38812,13 @@ export type SupplierWhere = {
   providesInfrastructure?: InputMaybe<InfrastructureRelationshipFilters>;
   providesInfrastructureConnection?: InputMaybe<SupplierProvidesInfrastructureConnectionFilters>;
   riskClassification?: InputMaybe<RiskClassificationEnumScalarFilters>;
+  sovereigntyAchDataResidency?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyAchInteroperability?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyAchJurisdictionControl?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyAchOperationalControl?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyAchPortability?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyAchSupplyChainTransparency?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarFilters>;
   status?: InputMaybe<SupplierStatusEnumScalarFilters>;
   strategicImportance?: InputMaybe<StrategicImportanceEnumScalarFilters>;
   supplierType?: InputMaybe<SupplierTypeEnumScalarFilters>;
@@ -37031,6 +38861,18 @@ export type TimeCategoryEnumScalarMutations = {
 export type UpdateAiComponentsMutationResponse = {
   __typename?: 'UpdateAiComponentsMutationResponse';
   aiComponents: Array<AiComponent>;
+  info: UpdateInfo;
+};
+
+export type UpdateAiRunAuditEventsMutationResponse = {
+  __typename?: 'UpdateAiRunAuditEventsMutationResponse';
+  aiRunAuditEvents: Array<AiRunAuditEvent>;
+  info: UpdateInfo;
+};
+
+export type UpdateAiRunsMutationResponse = {
+  __typename?: 'UpdateAiRunsMutationResponse';
+  aiRuns: Array<AiRun>;
   info: UpdateInfo;
 };
 
