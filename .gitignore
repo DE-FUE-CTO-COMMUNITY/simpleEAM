@@ -34,6 +34,8 @@ client/.yarn/*
 server/dist/
 server/.yarn/*
 !server/yarn.lock
+ai-server/.yarn/*
+!ai-server/yarn.lock
 
 # Neo4j
 db/data/
