@@ -549,7 +549,7 @@ export const exportEntityData = async (
           variables: { id: selectedCompanyId },
           fetchPolicy: 'network-only',
         })
-        const singleCompany = singleCompanyResult.data?.company
+        const singleCompany = singleCompanyResult.data?.companies?.[0]
         if (singleCompany) {
           exportCompanies = [singleCompany]
         }

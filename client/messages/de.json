@@ -388,7 +388,8 @@
         "saving": "Speichere...",
         "saveAsCopy": "Als Kopie speichern",
         "update": "Aktualisieren",
-        "descriptionHelperText": "Optionale Beschreibung des Diagramms"
+        "descriptionHelperText": "Optionale Beschreibung des Diagramms",
+        "createdAt": "Erstellt: {date}"
       },
       "open": {
         "title": "Diagramm öffnen",

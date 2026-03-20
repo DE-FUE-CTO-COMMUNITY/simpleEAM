@@ -138,6 +138,7 @@ export interface SaveDiagramDialogProps {
     title: string
     description?: string
     diagramType?: string
+    createdAt?: string
     company?: Array<{ id: string; name: string }> | { id: string; name: string }
     architecture?:
       | {
@@ -1545,6 +1546,15 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
             )}
           </Box>
         </DialogContent>
+        {existingDiagram?.createdAt && !forceSaveAs && (
+          <Box sx={{ px: 3, pb: 1 }}>
+            <Typography variant="caption" color="text.secondary">
+              {t('dialogs.save.createdAt', {
+                date: new Date(existingDiagram.createdAt).toLocaleString(locale),
+              })}
+            </Typography>
+          </Box>
+        )}
         <DialogActions>
           <Button onClick={onClose} disabled={saving || creatingElements}>
             {tCommon('cancel')}

@@ -36,7 +36,7 @@ export const GET_COMPANIES = gql`
 // Query: Einzelne company abrufen
 export const GET_COMPANY = gql`
   query GetCompany($id: ID!) {
-    company(id: $id) {
+    companies(where: { id: { eq: $id } }, limit: 1) {
       id
       name
       description

@@ -117,7 +117,7 @@ services:
       - ${TRAEFIK_NETWORK}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-ai.rule=Host(`${API_SUBDOMAIN}.${BASE_DOMAIN}`) && (PathPrefix(`/ai-runs`) || PathPrefix(`/ai-assistant`))"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-ai.rule=Host(`${API_SUBDOMAIN}.${BASE_DOMAIN}`) && (PathPrefix(`/ai-runs`) || PathPrefix(`/ai-assistant`) || PathPrefix(`/sovereignty`))"
       - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-ai.entrypoints=websecure"
       - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-ai.tls=true"
       - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-ai.tls.certresolver=${TRAEFIK_CERTRESOLVER}"

@@ -382,7 +382,8 @@
         "saving": "Saving...",
         "saveAsCopy": "Save as Copy",
         "update": "Update",
-        "descriptionHelperText": "Optional description of the diagram"
+        "descriptionHelperText": "Optional description of the diagram",
+        "createdAt": "Created: {date}"
       },
       "open": {
         "title": "Open Diagram",
