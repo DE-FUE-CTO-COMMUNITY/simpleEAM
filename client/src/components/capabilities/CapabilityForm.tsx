@@ -226,7 +226,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
       sovereigntyReqInteroperability: null,
       sovereigntyReqPortability: null,
       sovereigntyReqSupplyChainTransparency: null,
-      sovereigntyReqWeight: null,
+      sovereigntyReqWeight: 1,
       sovereigntyReqRationale: '',
     }),
     []
@@ -298,7 +298,7 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
         'sovereigntyReqSupplyChainTransparency',
         capability?.sovereigntyReqSupplyChainTransparency ?? null
       )
-      form.setFieldValue('sovereigntyReqWeight', capability?.sovereigntyReqWeight ?? null)
+      form.setFieldValue('sovereigntyReqWeight', capability?.sovereigntyReqWeight ?? 1)
       form.setFieldValue('sovereigntyReqRationale', capability?.sovereigntyReqRationale ?? '')
     } else if (!isOpen) {
       form.reset()

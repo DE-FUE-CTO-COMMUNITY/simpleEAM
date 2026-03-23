@@ -1,0 +1,356 @@
+'use client'
+
+import React, { useEffect } from 'react'
+import { useLazyQuery, useMutation, useApolloClient } from '@apollo/client'
+import { Box, CircularProgress, Dialog, DialogContent } from '@mui/material'
+import CapabilityForm, { CapabilityFormValues } from '@/components/capabilities/CapabilityForm'
+import ApplicationForm, { ApplicationFormValues } from '@/components/applications/ApplicationForm'
+import DataObjectForm, { DataObjectFormValues } from '@/components/dataobjects/DataObjectForm'
+import AicomponentForm, { AicomponentFormValues } from '@/components/aicomponents/AicomponentForm'
+import { GET_CAPABILITY, UPDATE_CAPABILITY } from '@/graphql/capability'
+import { GET_APPLICATION, UPDATE_APPLICATION } from '@/graphql/application'
+import { GET_DATA_OBJECT, UPDATE_DATA_OBJECT } from '@/graphql/dataObject'
+import { GET_Aicomponent, UPDATE_Aicomponent } from '@/graphql/aicomponent'
+import { EntityRef } from './types'
+
+// Builds a Neo4j relationship update (disconnect all → reconnect with new IDs).
+// Use for Capability and Application handlers (non-array format).
+function rel(ids: string[] | undefined) {
+  const base = { disconnect: [{ where: {} }] } as Record<string, any>
+  if (ids && ids.length > 0) {
+    base.connect = ids.map(id => ({ where: { node: { id: { eq: id } } } }))
+  }
+  return base
+}
+
+// Array-wrapped variant used by DataObject and AIComponent handlers.
+function relArr(ids: string[] | undefined) {
+  return [rel(ids)]
+}
+
+interface Props {
+  entity: EntityRef | null
+  onClose: () => void
+}
+
+export default function SovereigntyEntityDialog({ entity, onClose }: Props) {
+  const client = useApolloClient()
+
+  const [fetchCapability, { data: capData, loading: capLoading }] = useLazyQuery(GET_CAPABILITY)
+  const [fetchApplication, { data: appData, loading: appLoading }] =
+    useLazyQuery(GET_APPLICATION)
+  const [fetchDataObject, { data: doData, loading: doLoading }] = useLazyQuery(GET_DATA_OBJECT)
+  const [fetchAicomponent, { data: aiData, loading: aiLoading }] =
+    useLazyQuery(GET_Aicomponent)
+
+  const [updateCapability, { loading: capUpdating }] = useMutation(UPDATE_CAPABILITY)
+  const [updateApplication, { loading: appUpdating }] = useMutation(UPDATE_APPLICATION)
+  const [updateDataObject, { loading: doUpdating }] = useMutation(UPDATE_DATA_OBJECT)
+  const [updateAicomponent, { loading: aiUpdating }] = useMutation(UPDATE_Aicomponent)
+
+  useEffect(() => {
+    if (!entity) return
+    switch (entity.type) {
+      case 'capability':
+        fetchCapability({ variables: { id: entity.id } })
+        break
+      case 'application':
+        fetchApplication({ variables: { id: entity.id } })
+        break
+      case 'dataobject':
+        fetchDataObject({ variables: { where: { id: { eq: entity.id } } } })
+        break
+      case 'aicomponent':
+        fetchAicomponent({ variables: { id: entity.id } })
+        break
+    }
+  }, [entity?.id, entity?.type]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  if (!entity) return null
+
+  const capabilityData = capData?.businessCapabilities?.[0] ?? null
+  const applicationData = appData?.applications?.[0] ?? null
+  const dataObjectData = doData?.dataObjects?.[0] ?? null
+  const aiComponentData = aiData?.aiComponents?.[0] ?? null
+
+  const isLoading = capLoading || appLoading || doLoading || aiLoading
+  const isUpdating = capUpdating || appUpdating || doUpdating || aiUpdating
+
+  const hasCurrentData =
+    (entity.type === 'capability' && capabilityData != null) ||
+    (entity.type === 'application' && applicationData != null) ||
+    (entity.type === 'dataobject' && dataObjectData != null) ||
+    (entity.type === 'aicomponent' && aiComponentData != null)
+
+  const afterSave = () => {
+    client.refetchQueries({
+      include: ['GetSovereigntyCapabilityDetail', 'GetSovereigntyDataDetail'],
+    })
+    onClose()
+  }
+
+  const handleCapabilitySubmit = async (data: CapabilityFormValues) => {
+    if (!capabilityData) return
+    const { parentId, ownerId, children, supportedByApplications, partOfArchitectures, ...base } =
+      data
+    const input: Record<string, any> = {
+      name: { set: base.name },
+      description: { set: base.description },
+      maturityLevel: { set: base.maturityLevel },
+      sovereigntyReqDataResidency: { set: base.sovereigntyReqDataResidency ?? null },
+      sovereigntyReqJurisdictionControl: { set: base.sovereigntyReqJurisdictionControl ?? null },
+      sovereigntyReqOperationalControl: { set: base.sovereigntyReqOperationalControl ?? null },
+      sovereigntyReqInteroperability: { set: base.sovereigntyReqInteroperability ?? null },
+      sovereigntyReqPortability: { set: base.sovereigntyReqPortability ?? null },
+      sovereigntyReqSupplyChainTransparency: {
+        set: base.sovereigntyReqSupplyChainTransparency ?? null,
+      },
+      sovereigntyReqWeight: { set: base.sovereigntyReqWeight ?? null },
+      sovereigntyReqRationale: { set: base.sovereigntyReqRationale ?? null },
+      businessValue: { set: base.businessValue },
+      status: { set: base.status },
+      sequenceNumber: { set: base.sequenceNumber },
+      tags: { set: base.tags || [] },
+      owners: rel(ownerId ? [ownerId] : []),
+      parents: rel(parentId ? [parentId] : []),
+      children: rel(children),
+      supportedByApplications: rel(supportedByApplications),
+      partOfArchitectures: rel(partOfArchitectures),
+    }
+    if (base.type) input.type = { set: base.type }
+    if (base.introductionDate) {
+      const d = base.introductionDate as any
+      input.introductionDate = { set: d.toISOString ? d.toISOString().split('T')[0] : d }
+    }
+    if (base.endDate) {
+      const d = base.endDate as any
+      input.endDate = { set: d.toISOString ? d.toISOString().split('T')[0] : d }
+    }
+    await updateCapability({ variables: { id: capabilityData.id, input } })
+    afterSave()
+  }
+
+  const handleApplicationSubmit = async (data: ApplicationFormValues) => {
+    if (!applicationData) return
+    const {
+      ownerId,
+      supportsCapabilityIds,
+      supportsBusinessProcessIds,
+      usesDataObjectIds,
+      sourceOfInterfaceIds,
+      targetOfInterfaceIds,
+      implementsPrincipleIds,
+      parentIds,
+      componentIds,
+      predecessorIds,
+      successorIds,
+      hostedOnIds,
+      providedByIds,
+      supportedByIds,
+      maintainedByIds,
+      ...base
+    } = data
+    const input: Record<string, any> = {
+      name: { set: base.name },
+      description: { set: base.description },
+      sovereigntyAchDataResidency: { set: base.sovereigntyAchDataResidency ?? null },
+      sovereigntyAchJurisdictionControl: { set: base.sovereigntyAchJurisdictionControl ?? null },
+      sovereigntyAchOperationalControl: { set: base.sovereigntyAchOperationalControl ?? null },
+      sovereigntyAchInteroperability: { set: base.sovereigntyAchInteroperability ?? null },
+      sovereigntyAchPortability: { set: base.sovereigntyAchPortability ?? null },
+      sovereigntyAchSupplyChainTransparency: {
+        set: base.sovereigntyAchSupplyChainTransparency ?? null,
+      },
+      sovereigntyEvidence: { set: base.sovereigntyEvidence ?? null },
+      lastSovereigntyAssessmentAt: { set: base.lastSovereigntyAssessmentAt ?? null },
+      status: { set: base.status },
+      criticality: { set: base.criticality },
+      costs: { set: base.costs },
+      vendor: { set: base.vendor },
+      version: { set: base.version },
+      hostingEnvironment: { set: base.hostingEnvironment },
+      technologyStack: { set: base.technologyStack },
+      planningDate: { set: base.planningDate },
+      introductionDate: { set: base.introductionDate },
+      endOfUseDate: { set: base.endOfUseDate },
+      endOfLifeDate: { set: base.endOfLifeDate },
+      timeCategory: { set: base.timeCategory },
+      sevenRStrategy: { set: base.sevenRStrategy },
+      owners: rel(ownerId ? [ownerId] : []),
+      supportsCapabilities: rel(supportsCapabilityIds),
+      usesDataObjects: rel(usesDataObjectIds),
+      sourceOfInterfaces: rel(sourceOfInterfaceIds),
+      targetOfInterfaces: rel(targetOfInterfaceIds),
+      parents: rel(parentIds),
+      components: rel(componentIds),
+      predecessors: rel(predecessorIds),
+      successors: rel(successorIds),
+      hostedOn: rel(hostedOnIds),
+      providedBy: rel(providedByIds),
+      supportedBy: rel(supportedByIds),
+      maintainedBy: rel(maintainedByIds),
+      implementsPrinciples: rel(implementsPrincipleIds),
+    }
+    if (supportsBusinessProcessIds !== undefined) {
+      input.supportsBusinessProcesses = rel(supportsBusinessProcessIds)
+    }
+    await updateApplication({ variables: { id: applicationData.id, input } })
+    afterSave()
+  }
+
+  const handleDataObjectSubmit = async (data: DataObjectFormValues) => {
+    if (!dataObjectData) return
+    const input: Record<string, any> = {
+      name: { set: data.name },
+      description: { set: data.description },
+      sovereigntyReqDataResidency: { set: data.sovereigntyReqDataResidency ?? null },
+      sovereigntyReqJurisdictionControl: { set: data.sovereigntyReqJurisdictionControl ?? null },
+      sovereigntyReqOperationalControl: { set: data.sovereigntyReqOperationalControl ?? null },
+      sovereigntyReqInteroperability: { set: data.sovereigntyReqInteroperability ?? null },
+      sovereigntyReqPortability: { set: data.sovereigntyReqPortability ?? null },
+      sovereigntyReqSupplyChainTransparency: {
+        set: data.sovereigntyReqSupplyChainTransparency ?? null,
+      },
+      sovereigntyReqWeight: { set: data.sovereigntyReqWeight ?? null },
+      sovereigntyReqRationale: { set: data.sovereigntyReqRationale ?? null },
+      classification: { set: data.classification },
+      format: { set: data.format },
+      planningDate: { set: data.planningDate },
+      introductionDate: { set: data.introductionDate },
+      endOfUseDate: { set: data.endOfUseDate },
+      endOfLifeDate: { set: data.endOfLifeDate },
+      owners: relArr(data.ownerId ? [data.ownerId] : []),
+      dataSources: relArr(data.dataSources),
+      usedByApplications: relArr(data.usedByApplications),
+      relatedToCapabilities: relArr(data.relatedToCapabilities),
+    }
+    if (data.depictedInDiagrams !== undefined) {
+      input.depictedInDiagrams = relArr(data.depictedInDiagrams)
+    }
+    await updateDataObject({ variables: { id: dataObjectData.id, input } })
+    afterSave()
+  }
+
+  const handleAicomponentSubmit = async (data: AicomponentFormValues) => {
+    if (!aiComponentData) return
+    const {
+      ownerId,
+      supportsCapabilityIds,
+      usedByApplicationIds,
+      trainedWithDataObjectIds,
+      hostedOnIds,
+      providedByIds,
+      supportedByIds,
+      maintainedByIds,
+      partOfArchitectureIds,
+      implementsPrincipleIds,
+      depictedInDiagramIds,
+      ...base
+    } = data
+    const updateInput: Record<string, any> = {
+      name: { set: base.name },
+      description: { set: base.description },
+      sovereigntyAchDataResidency: { set: base.sovereigntyAchDataResidency ?? null },
+      sovereigntyAchJurisdictionControl: { set: base.sovereigntyAchJurisdictionControl ?? null },
+      sovereigntyAchOperationalControl: { set: base.sovereigntyAchOperationalControl ?? null },
+      sovereigntyAchInteroperability: { set: base.sovereigntyAchInteroperability ?? null },
+      sovereigntyAchPortability: { set: base.sovereigntyAchPortability ?? null },
+      sovereigntyAchSupplyChainTransparency: {
+        set: base.sovereigntyAchSupplyChainTransparency ?? null,
+      },
+      sovereigntyEvidence: { set: base.sovereigntyEvidence ?? null },
+      lastSovereigntyAssessmentAt: { set: base.lastSovereigntyAssessmentAt ?? null },
+      aiType: { set: base.aiType },
+      status: { set: base.status },
+      tags: { set: base.tags || [] },
+      owners: relArr(ownerId ? [ownerId] : []),
+      supportsCapabilities: relArr(supportsCapabilityIds),
+      usedByApplications: relArr(usedByApplicationIds),
+      trainedWithDataObjects: relArr(trainedWithDataObjectIds),
+      hostedOn: relArr(hostedOnIds),
+      providedBy: relArr(providedByIds),
+      supportedBy: relArr(supportedByIds),
+      maintainedBy: relArr(maintainedByIds),
+      partOfArchitectures: relArr(partOfArchitectureIds),
+      implementsPrinciples: relArr(implementsPrincipleIds),
+      depictedInDiagrams: relArr(depictedInDiagramIds),
+    }
+    if (base.model?.trim()) updateInput.model = { set: base.model }
+    if (base.version?.trim()) updateInput.version = { set: base.version }
+    if (base.provider?.trim()) updateInput.provider = { set: base.provider }
+    if (base.license?.trim()) updateInput.license = { set: base.license }
+    if (base.trainingDate?.trim()) updateInput.trainingDate = { set: base.trainingDate }
+    if (base.accuracy !== undefined) updateInput.accuracy = { set: base.accuracy }
+    if (base.costs !== undefined) updateInput.costs = { set: base.costs }
+    await updateAicomponent({
+      variables: { where: { id: { eq: aiComponentData.id } }, update: updateInput },
+    })
+    afterSave()
+  }
+
+  if (isLoading || !hasCurrentData) {
+    return (
+      <Dialog open onClose={onClose}>
+        <DialogContent>
+          <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+            <CircularProgress />
+          </Box>
+        </DialogContent>
+      </Dialog>
+    )
+  }
+
+  if (entity.type === 'capability') {
+    return (
+      <CapabilityForm
+        isOpen
+        onClose={onClose}
+        onSubmit={handleCapabilitySubmit}
+        mode="edit"
+        data={capabilityData}
+        loading={isUpdating}
+      />
+    )
+  }
+
+  if (entity.type === 'application') {
+    return (
+      <ApplicationForm
+        isOpen
+        onClose={onClose}
+        onSubmit={handleApplicationSubmit}
+        mode="edit"
+        data={applicationData}
+        loading={isUpdating}
+      />
+    )
+  }
+
+  if (entity.type === 'dataobject') {
+    return (
+      <DataObjectForm
+        isOpen
+        onClose={onClose}
+        onSubmit={handleDataObjectSubmit}
+        mode="edit"
+        data={dataObjectData}
+        loading={isUpdating}
+      />
+    )
+  }
+
+  if (entity.type === 'aicomponent') {
+    return (
+      <AicomponentForm
+        isOpen
+        onClose={onClose}
+        onSubmit={handleAicomponentSubmit}
+        mode="edit"
+        data={aiComponentData}
+        loading={isUpdating}
+      />
+    )
+  }
+
+  return null
+}

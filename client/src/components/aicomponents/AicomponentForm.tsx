@@ -593,7 +593,7 @@ export default function AicomponentForm({
     sovereigntyEvidence: aicomponent?.sovereigntyEvidence ?? '',
     lastSovereigntyAssessmentAt: aicomponent?.lastSovereigntyAssessmentAt
       ? new Date(aicomponent.lastSovereigntyAssessmentAt)
-      : null,
+      : new Date(),
   }
 
   // Form erstellen
@@ -662,7 +662,7 @@ export default function AicomponentForm({
         sovereigntyEvidence: aicomponent.sovereigntyEvidence ?? '',
         lastSovereigntyAssessmentAt: aicomponent.lastSovereigntyAssessmentAt
           ? new Date(aicomponent.lastSovereigntyAssessmentAt)
-          : null,
+          : new Date(),
       }
 
       form.reset(resetValues)
@@ -1074,9 +1074,6 @@ export default function AicomponentForm({
         }
         return option?.label || ''
       },
-      ...(isSovereigntyEnabled
-        ? buildSovereigntyAchievedFields((key: string) => tCommon(key as any))
-        : []),
       isOptionEqualToValue: (option: any, value: any) => {
         if (typeof value === 'string') {
           return option.value === value
@@ -1117,6 +1114,11 @@ export default function AicomponentForm({
       },
       onChipClick: createChipClickHandler('implementsPrincipleIds'),
     },
+
+    // Sovereignty (Tab: sovereignty)
+    ...(isSovereigntyEnabled
+      ? buildSovereigntyAchievedFields((key: string) => tCommon(key as any))
+      : []),
   ]
 
   return (

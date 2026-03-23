@@ -128,6 +128,7 @@
     "companyNotSelected": "No company selected",
     "companySovereigntyScore": "Sovereignty Score",
     "sovereigntyScoreRecalculate": "Recalculate sovereignty scores",
+    "sovereigntyScoreDetails": "View sovereignty details",
     "sovereigntyScoreRecalculateFailed": "Failed to start sovereignty score recalculation",
     "expected": "Expected",
     "achieved": "Achieved",
@@ -3193,5 +3194,30 @@
       "dateFrom": "From",
       "dateTo": "To"
     }
+  },
+  "sovereigntyDetail": {
+    "title": "Sovereignty Details",
+    "subtitle": "Breakdown of sovereignty scores per capability and data object",
+    "capabilityView": "Capability View",
+    "dataView": "Data View",
+    "capability": "Capability",
+    "dataObject": "Data Object",
+    "expectedScore": "Expected Score",
+    "achievedScore": "Achieved Score",
+    "gap": "Gap",
+    "weight": "Weight",
+    "associatedElements": "Associated Elements",
+    "noAssociatedElements": "No associated elements",
+    "noSovereigntyData": "No sovereignty data set",
+    "entityTypes": {
+      "capability": "Capability",
+      "application": "Application",
+      "aicomponent": "AI Component",
+      "dataobject": "Data Object"
+    },
+    "noCapabilities": "No capabilities found for selected company.",
+    "noDataObjects": "No data objects found for selected company.",
+    "noCompanySelected": "Please select a company to view sovereignty details.",
+    "featureDisabled": "The Sovereignty feature is not enabled."
   }
 }

@@ -709,69 +709,83 @@ const Dashboard = () => {
           {isGeaEnabled && (
             <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'stretch', flexWrap: 'wrap' }}>
               {isSovereigntyEnabled && (
-                <Box
-                  sx={{
-                    px: 2.5,
-                    py: 1.25,
-                    borderRadius: 2,
-                    minWidth: 220,
-                    border: `1px solid ${alpha(theme.palette.text.primary, 0.12)}`,
-                  }}
-                >
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      mb: 0.5,
-                    }}
+                <Tooltip title={t('sovereigntyScoreDetails')} arrow>
+                  <ButtonBase
+                    onClick={() => router.push('/sovereignty')}
+                    sx={{ borderRadius: 2, textAlign: 'left', display: 'block' }}
                   >
-                    <Typography variant="subtitle2" color="text.secondary">
-                      {t('companySovereigntyScore')}
-                    </Typography>
-                    <Tooltip title={t('sovereigntyScoreRecalculate')} arrow>
-                      <span>
-                        <IconButton
-                          size="small"
-                          onClick={handleRecalculate}
-                          disabled={isRecalculating || !selectedCompanyId}
-                          sx={{ ml: 0.5, p: 0.25 }}
-                        >
-                          {isRecalculating ? (
-                            <CircularProgress size={14} />
-                          ) : (
-                            <RefreshIcon sx={{ fontSize: 16 }} />
-                          )}
-                        </IconButton>
-                      </span>
-                    </Tooltip>
-                  </Box>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'baseline',
-                      gap: 2,
-                    }}
-                  >
-                    <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
-                      <Typography variant="caption" color="text.secondary">
-                        {t('expected')}
-                      </Typography>
-                      <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                        {formatScore(expectedCompanySovereigntyScore)}
-                      </Typography>
+                    <Box
+                      sx={{
+                        px: 2.5,
+                        py: 1.25,
+                        borderRadius: 2,
+                        minWidth: 220,
+                        border: `1px solid ${alpha(theme.palette.text.primary, 0.12)}`,
+                        transition: 'transform 120ms ease',
+                        '&:hover': {
+                          transform: 'translateY(-1px)',
+                        },
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          mb: 0.5,
+                        }}
+                      >
+                        <Typography variant="subtitle2" color="text.secondary">
+                          {t('companySovereigntyScore')}
+                        </Typography>
+                        <Tooltip title={t('sovereigntyScoreRecalculate')} arrow>
+                          <span>
+                            <IconButton
+                              size="small"
+                              onClick={e => {
+                                e.stopPropagation()
+                                handleRecalculate()
+                              }}
+                              disabled={isRecalculating || !selectedCompanyId}
+                              sx={{ ml: 0.5, p: 0.25 }}
+                            >
+                              {isRecalculating ? (
+                                <CircularProgress size={14} />
+                              ) : (
+                                <RefreshIcon sx={{ fontSize: 16 }} />
+                              )}
+                            </IconButton>
+                          </span>
+                        </Tooltip>
+                      </Box>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'baseline',
+                          gap: 2,
+                        }}
+                      >
+                        <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
+                          <Typography variant="caption" color="text.secondary">
+                            {t('expected')}
+                          </Typography>
+                          <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                            {formatScore(expectedCompanySovereigntyScore)}
+                          </Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
+                          <Typography variant="caption" color="text.secondary">
+                            {t('achieved')}
+                          </Typography>
+                          <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                            {formatScore(achievedCompanySovereigntyScore)}
+                          </Typography>
+                        </Box>
+                      </Box>
                     </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
-                      <Typography variant="caption" color="text.secondary">
-                        {t('achieved')}
-                      </Typography>
-                      <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                        {formatScore(achievedCompanySovereigntyScore)}
-                      </Typography>
-                    </Box>
-                  </Box>
-                </Box>
+                  </ButtonBase>
+                </Tooltip>
               )}
 
               <Tooltip title={t('geaScoreTooltip')} arrow>

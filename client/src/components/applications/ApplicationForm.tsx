@@ -614,7 +614,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     sovereigntyEvidence: application?.sovereigntyEvidence ?? '',
     lastSovereigntyAssessmentAt: application?.lastSovereigntyAssessmentAt
       ? new Date(application.lastSovereigntyAssessmentAt)
-      : null,
+      : new Date(),
   }
 
   // Create schema with translations
@@ -717,7 +717,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
         sovereigntyEvidence: application?.sovereigntyEvidence ?? '',
         lastSovereigntyAssessmentAt: application?.lastSovereigntyAssessmentAt
           ? new Date(application.lastSovereigntyAssessmentAt)
-          : null,
+          : new Date(),
       }
 
       setCurrentTimeCategory(resetValues.timeCategory)

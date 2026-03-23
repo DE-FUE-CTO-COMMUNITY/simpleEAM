@@ -266,7 +266,7 @@ const DataObjectForm: React.FC<GenericFormProps<DataObject, DataObjectFormValues
       sovereigntyReqPortability: dataObject?.sovereigntyReqPortability || null,
       sovereigntyReqSupplyChainTransparency:
         dataObject?.sovereigntyReqSupplyChainTransparency || null,
-      sovereigntyReqWeight: dataObject?.sovereigntyReqWeight || null,
+      sovereigntyReqWeight: dataObject?.sovereigntyReqWeight ?? 1,
       sovereigntyReqRationale: dataObject?.sovereigntyReqRationale || '',
     }),
     [dataObject, currentPerson?.id]
