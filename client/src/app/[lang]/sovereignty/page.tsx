@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Box, Card, CardContent, Tab, Tabs, Typography } from '@mui/material'
 import { useTranslations } from 'next-intl'
 import { useFeatureFlags } from '@/lib/feature-flags'
@@ -16,6 +17,7 @@ export default function SovereigntyDetailPage() {
   const { authenticated, initialized } = useAuth()
   const t = useTranslations('sovereigntyDetail')
   const { featureFlags } = useFeatureFlags()
+  const router = useRouter()
   const [activeView, setActiveView] = useState<ViewType>('capabilities')
   const [selectedEntity, setSelectedEntity] = useState<EntityRef | null>(null)
 
@@ -24,13 +26,8 @@ export default function SovereigntyDetailPage() {
   }
 
   if (!featureFlags.Sovereignty) {
-    return (
-      <Box sx={{ p: 4 }}>
-        <Typography variant="h6" color="text.secondary">
-          {t('featureDisabled')}
-        </Typography>
-      </Box>
-    )
+    router.replace('/')
+    return null
   }
 
   return (

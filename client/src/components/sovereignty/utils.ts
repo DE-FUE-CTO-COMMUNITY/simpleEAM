@@ -2,11 +2,11 @@
 export const MATURITY_LEVELS = ['NONE', 'LOW', 'MEDIUM', 'HIGH', 'VERY_HIGH'] as const
 export type MaturityLevel = (typeof MATURITY_LEVELS)[number]
 
-// Convert maturity string to numeric score (0–4)
+// Convert maturity string to numeric score (1–5)
 export function maturityScore(level: string | null | undefined): number {
-  if (!level) return 0
+  if (!level) return 1
   const idx = MATURITY_LEVELS.indexOf(level as MaturityLevel)
-  return idx >= 0 ? idx : 0
+  return idx >= 0 ? idx + 1 : 1
 }
 
 const SOVEREIGNTY_ACH_FIELDS: Array<keyof AchievedEntity> = [
