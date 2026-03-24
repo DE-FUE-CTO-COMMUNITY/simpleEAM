@@ -26,6 +26,10 @@ import {
   ConnectWithoutContact as InteractionIcon,
   Event as EventIcon,
   MiscellaneousServices as ServiceIcon,
+  Category as SoftwareProductIcon,
+  Sell as SoftwareVersionIcon,
+  PrecisionManufacturing as HardwareProductIcon,
+  SettingsInputComponent as HardwareVersionIcon,
 } from '@mui/icons-material'
 import {
   BusinessCapabilityIcon,
@@ -138,6 +142,30 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
       icon: <InfrastructureIcon />,
       href: '/infrastructure',
     },
+    {
+      key: 'softwareProducts',
+      text: t('softwareProducts'),
+      icon: <SoftwareProductIcon />,
+      href: '/software-products',
+    },
+    {
+      key: 'softwareVersions',
+      text: t('softwareVersions'),
+      icon: <SoftwareVersionIcon />,
+      href: '/software-versions',
+    },
+    {
+      key: 'hardwareProducts',
+      text: t('hardwareProducts'),
+      icon: <HardwareProductIcon />,
+      href: '/hardware-products',
+    },
+    {
+      key: 'hardwareVersions',
+      text: t('hardwareVersions'),
+      icon: <HardwareVersionIcon />,
+      href: '/hardware-versions',
+    },
   ]
 
   const geaBusinessItems = [
@@ -238,7 +266,14 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
     cybersecurityArchitecture: ['applications', 'aiComponents', 'dataObjects', 'interfaces'],
     infrastructureArchitecture: ['applications', 'infrastructure'],
     transformationArchitecture: architectureElementItems.map(item => item.key),
-    technologyManagement: ['applications', 'infrastructure'],
+    technologyManagement: [
+      'applications',
+      'infrastructure',
+      'softwareProducts',
+      'softwareVersions',
+      'hardwareProducts',
+      'hardwareVersions',
+    ],
   }
 
   const allArchitectureItems = [

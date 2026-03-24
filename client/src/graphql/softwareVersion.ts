@@ -1,5 +1,17 @@
 import { gql } from '@apollo/client/core'
 
+export const GET_SOFTWARE_VERSIONS_COUNT = gql`
+  query GetSoftwareVersionsCount($where: SoftwareVersionWhere) {
+    softwareVersionsConnection(where: $where) {
+      aggregate {
+        count {
+          nodes
+        }
+      }
+    }
+  }
+`
+
 export const GET_SOFTWARE_VERSIONS = gql`
   query GetSoftwareVersions($where: SoftwareVersionWhere) {
     softwareVersions(where: $where) {

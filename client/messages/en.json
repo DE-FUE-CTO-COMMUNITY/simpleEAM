@@ -91,6 +91,10 @@
     "dataObjects": "Data Objects",
     "interfaces": "Interfaces",
     "infrastructure": "Infrastructure",
+    "softwareProducts": "Software Products",
+    "softwareVersions": "Software Versions",
+    "hardwareProducts": "Hardware Products",
+    "hardwareVersions": "Hardware Versions",
     "persons": "Persons",
     "importExport": "Import/Export",
     "administration": "Administration",
@@ -3195,6 +3199,262 @@
       "descriptionPlaceholder": "Search in description...",
       "owner": "Owner",
       "allOwners": "All owners",
+      "updatedDateRange": "Updated Date Range",
+      "dateFrom": "From",
+      "dateTo": "To"
+    }
+  },
+  "softwareProducts": {
+    "title": "Software Products",
+    "addNew": "Create Software Product",
+    "createTitle": "Create Software Product",
+    "editTitle": "Edit Software Product",
+    "viewTitle": "Software Product Details",
+    "deleteConfirmation": "Are you sure you want to delete this software product?",
+    "searchPlaceholder": "Search software products...",
+    "messages": {
+      "loadError": "Error loading software products",
+      "createSuccess": "Software product created successfully",
+      "createError": "Error creating software product",
+      "updateSuccess": "Software product updated successfully",
+      "updateError": "Error updating software product",
+      "deleteSuccess": "Software product deleted successfully",
+      "deleteError": "Error deleting software product",
+      "selectCompanyFirst": "Please select a company first"
+    },
+    "tabs": {
+      "general": "General",
+      "relationships": "Relationships"
+    },
+    "form": {
+      "name": "Name",
+      "productFamily": "Product Family",
+      "lifecycleStatus": "Lifecycle Status",
+      "isActive": "Active",
+      "developedBy": "Developed By",
+      "providedBy": "Provided By",
+      "maintainedBy": "Maintained By",
+      "none": "None",
+      "nameMin": "Name must contain at least 2 characters",
+      "nameMax": "Name must not exceed 100 characters",
+      "productFamilyMax": "Product family must not exceed 150 characters"
+    },
+    "table": {
+      "name": "Name",
+      "productFamily": "Product Family",
+      "lifecycleStatus": "Lifecycle Status",
+      "isActive": "Active",
+      "active": "Active",
+      "inactive": "Inactive",
+      "developedBy": "Developed By",
+      "providedBy": "Provided By",
+      "maintainedBy": "Maintained By",
+      "versions": "Versions",
+      "createdAt": "Created At",
+      "updatedAt": "Updated At",
+      "noData": "No software products found"
+    },
+    "filter": {
+      "title": "Filter Software Products",
+      "nameContains": "Name contains",
+      "namePlaceholder": "Search by name...",
+      "lifecycleStatus": "Lifecycle Status",
+      "allLifecycleStatuses": "All lifecycle statuses",
+      "updatedDateRange": "Updated Date Range",
+      "dateFrom": "From",
+      "dateTo": "To"
+    },
+    "lifecycleStatuses": {
+      "SUPPORTED": "Supported",
+      "APPROACHING_EOS": "Approaching EOS",
+      "APPROACHING_EOL": "Approaching EOL",
+      "EOS": "EOS",
+      "EOL": "EOL",
+      "UNSUPPORTED": "Unsupported"
+    }
+  },
+  "softwareVersions": {
+    "title": "Software Versions",
+    "addNew": "Create Software Version",
+    "createTitle": "Create Software Version",
+    "editTitle": "Edit Software Version",
+    "viewTitle": "Software Version Details",
+    "deleteConfirmation": "Are you sure you want to delete this software version?",
+    "searchPlaceholder": "Search software versions...",
+    "messages": {
+      "loadError": "Error loading software versions",
+      "createSuccess": "Software version created successfully",
+      "createError": "Error creating software version",
+      "updateSuccess": "Software version updated successfully",
+      "updateError": "Error updating software version",
+      "deleteSuccess": "Software version deleted successfully",
+      "deleteError": "Error deleting software version",
+      "selectCompanyFirst": "Please select a company first"
+    },
+    "tabs": {
+      "general": "General",
+      "relationships": "Relationships"
+    },
+    "form": {
+      "versionString": "Version",
+      "normalizedVersion": "Normalized Version",
+      "releaseChannel": "Release Channel",
+      "supportTier": "Support Tier",
+      "isLts": "LTS",
+      "softwareProduct": "Software Product",
+      "none": "None",
+      "versionStringRequired": "Version is required",
+      "versionStringMax": "Version must not exceed 100 characters",
+      "normalizedVersionMax": "Normalized version must not exceed 100 characters",
+      "releaseChannelMax": "Release channel must not exceed 100 characters",
+      "supportTierMax": "Support tier must not exceed 100 characters"
+    },
+    "table": {
+      "versionString": "Version",
+      "normalizedVersion": "Normalized Version",
+      "releaseChannel": "Release Channel",
+      "supportTier": "Support Tier",
+      "isLts": "LTS",
+      "yes": "Yes",
+      "no": "No",
+      "softwareProduct": "Software Product",
+      "lifecycleRecords": "Lifecycle Records",
+      "createdAt": "Created At",
+      "updatedAt": "Updated At",
+      "noData": "No software versions found"
+    },
+    "filter": {
+      "title": "Filter Software Versions",
+      "versionContains": "Version contains",
+      "versionPlaceholder": "Search by version...",
+      "softwareProduct": "Software Product",
+      "allProducts": "All products",
+      "updatedDateRange": "Updated Date Range",
+      "dateFrom": "From",
+      "dateTo": "To"
+    }
+  },
+  "hardwareProducts": {
+    "title": "Hardware Products",
+    "addNew": "Create Hardware Product",
+    "createTitle": "Create Hardware Product",
+    "editTitle": "Edit Hardware Product",
+    "viewTitle": "Hardware Product Details",
+    "deleteConfirmation": "Are you sure you want to delete this hardware product?",
+    "searchPlaceholder": "Search hardware products...",
+    "messages": {
+      "loadError": "Error loading hardware products",
+      "createSuccess": "Hardware product created successfully",
+      "createError": "Error creating hardware product",
+      "updateSuccess": "Hardware product updated successfully",
+      "updateError": "Error updating hardware product",
+      "deleteSuccess": "Hardware product deleted successfully",
+      "deleteError": "Error deleting hardware product",
+      "selectCompanyFirst": "Please select a company first"
+    },
+    "tabs": {
+      "general": "General",
+      "relationships": "Relationships"
+    },
+    "form": {
+      "name": "Name",
+      "productFamily": "Product Family",
+      "lifecycleStatus": "Lifecycle Status",
+      "isActive": "Active",
+      "manufacturedBy": "Manufactured By",
+      "providedBy": "Provided By",
+      "maintainedBy": "Maintained By",
+      "none": "None",
+      "nameMin": "Name must contain at least 2 characters",
+      "nameMax": "Name must not exceed 100 characters",
+      "productFamilyMax": "Product family must not exceed 150 characters"
+    },
+    "table": {
+      "name": "Name",
+      "productFamily": "Product Family",
+      "lifecycleStatus": "Lifecycle Status",
+      "isActive": "Active",
+      "active": "Active",
+      "inactive": "Inactive",
+      "manufacturedBy": "Manufactured By",
+      "providedBy": "Provided By",
+      "maintainedBy": "Maintained By",
+      "versions": "Versions",
+      "createdAt": "Created At",
+      "updatedAt": "Updated At",
+      "noData": "No hardware products found"
+    },
+    "filter": {
+      "title": "Filter Hardware Products",
+      "nameContains": "Name contains",
+      "namePlaceholder": "Search by name...",
+      "lifecycleStatus": "Lifecycle Status",
+      "allLifecycleStatuses": "All lifecycle statuses",
+      "updatedDateRange": "Updated Date Range",
+      "dateFrom": "From",
+      "dateTo": "To"
+    },
+    "lifecycleStatuses": {
+      "SUPPORTED": "Supported",
+      "APPROACHING_EOS": "Approaching EOS",
+      "APPROACHING_EOL": "Approaching EOL",
+      "EOS": "EOS",
+      "EOL": "EOL",
+      "UNSUPPORTED": "Unsupported"
+    }
+  },
+  "hardwareVersions": {
+    "title": "Hardware Versions",
+    "addNew": "Create Hardware Version",
+    "createTitle": "Create Hardware Version",
+    "editTitle": "Edit Hardware Version",
+    "viewTitle": "Hardware Version Details",
+    "deleteConfirmation": "Are you sure you want to delete this hardware version?",
+    "searchPlaceholder": "Search hardware versions...",
+    "messages": {
+      "loadError": "Error loading hardware versions",
+      "createSuccess": "Hardware version created successfully",
+      "createError": "Error creating hardware version",
+      "updateSuccess": "Hardware version updated successfully",
+      "updateError": "Error updating hardware version",
+      "deleteSuccess": "Hardware version deleted successfully",
+      "deleteError": "Error deleting hardware version",
+      "selectCompanyFirst": "Please select a company first"
+    },
+    "tabs": {
+      "general": "General",
+      "relationships": "Relationships"
+    },
+    "form": {
+      "versionModelString": "Version/Model",
+      "normalizedVersionModel": "Normalized Version/Model",
+      "releaseChannel": "Release Channel",
+      "supportTier": "Support Tier",
+      "hardwareProduct": "Hardware Product",
+      "none": "None",
+      "versionModelStringRequired": "Version/Model is required",
+      "versionModelStringMax": "Version/Model must not exceed 100 characters",
+      "normalizedVersionModelMax": "Normalized version/model must not exceed 100 characters",
+      "releaseChannelMax": "Release channel must not exceed 100 characters",
+      "supportTierMax": "Support tier must not exceed 100 characters"
+    },
+    "table": {
+      "versionModelString": "Version/Model",
+      "normalizedVersionModel": "Normalized Version/Model",
+      "releaseChannel": "Release Channel",
+      "supportTier": "Support Tier",
+      "hardwareProduct": "Hardware Product",
+      "lifecycleRecords": "Lifecycle Records",
+      "createdAt": "Created At",
+      "updatedAt": "Updated At",
+      "noData": "No hardware versions found"
+    },
+    "filter": {
+      "title": "Filter Hardware Versions",
+      "versionContains": "Version/model contains",
+      "versionPlaceholder": "Search by version/model...",
+      "hardwareProduct": "Hardware Product",
+      "allProducts": "All products",
       "updatedDateRange": "Updated Date Range",
       "dateFrom": "From",
       "dateTo": "To"

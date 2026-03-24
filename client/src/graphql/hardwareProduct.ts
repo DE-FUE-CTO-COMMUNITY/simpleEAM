@@ -1,5 +1,17 @@
 import { gql } from '@apollo/client/core'
 
+export const GET_HARDWARE_PRODUCTS_COUNT = gql`
+  query GetHardwareProductsCount($where: HardwareProductWhere) {
+    hardwareProductsConnection(where: $where) {
+      aggregate {
+        count {
+          nodes
+        }
+      }
+    }
+  }
+`
+
 export const GET_HARDWARE_PRODUCTS = gql`
   query GetHardwareProducts($where: HardwareProductWhere) {
     hardwareProducts(where: $where) {

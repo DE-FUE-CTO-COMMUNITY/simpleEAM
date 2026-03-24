@@ -33,6 +33,10 @@ import {
   ConnectWithoutContact as InteractionIcon,
   Event as EventIcon,
   MiscellaneousServices as ServiceIcon,
+  Category as SoftwareProductIcon,
+  Sell as SoftwareVersionIcon,
+  PrecisionManufacturing as HardwareProductIcon,
+  SettingsInputComponent as HardwareVersionIcon,
   Refresh as RefreshIcon,
 } from '@mui/icons-material'
 import {
@@ -67,6 +71,10 @@ import { GET_VALUES } from '@/graphql/value'
 import { GET_GOALS } from '@/graphql/goal'
 import { GET_STRATEGIES } from '@/graphql/strategy'
 import { GET_BUSINESS_PROCESSES_COUNT } from '@/graphql/businessProcess'
+import { GET_SOFTWARE_PRODUCTS_COUNT } from '@/graphql/softwareProduct'
+import { GET_SOFTWARE_VERSIONS_COUNT } from '@/graphql/softwareVersion'
+import { GET_HARDWARE_PRODUCTS_COUNT } from '@/graphql/hardwareProduct'
+import { GET_HARDWARE_VERSIONS_COUNT } from '@/graphql/hardwareVersion'
 import RecentDiagramsSection from '@/components/dashboard/RecentDiagramsSection'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import { calculatePurposeCoherenceScorePercent } from '@/components/matrix-editor/scoreUtils'
@@ -290,6 +298,42 @@ const Dashboard = () => {
     variables: { where: capWhere },
   })
 
+  const {
+    data: softwareProductsData,
+    loading: softwareProductsLoading,
+    error: softwareProductsError,
+  } = useQuery(GET_SOFTWARE_PRODUCTS_COUNT, {
+    skip: !authenticated || !initialized,
+    variables: { where: capWhere },
+  })
+
+  const {
+    data: softwareVersionsData,
+    loading: softwareVersionsLoading,
+    error: softwareVersionsError,
+  } = useQuery(GET_SOFTWARE_VERSIONS_COUNT, {
+    skip: !authenticated || !initialized,
+    variables: { where: capWhere },
+  })
+
+  const {
+    data: hardwareProductsData,
+    loading: hardwareProductsLoading,
+    error: hardwareProductsError,
+  } = useQuery(GET_HARDWARE_PRODUCTS_COUNT, {
+    skip: !authenticated || !initialized,
+    variables: { where: capWhere },
+  })
+
+  const {
+    data: hardwareVersionsData,
+    loading: hardwareVersionsLoading,
+    error: hardwareVersionsError,
+  } = useQuery(GET_HARDWARE_VERSIONS_COUNT, {
+    skip: !authenticated || !initialized,
+    variables: { where: capWhere },
+  })
+
   // Error handling
   useEffect(() => {
     if (capabilitiesError) {
@@ -325,6 +369,18 @@ const Dashboard = () => {
     if (businessProcessesError) {
       enqueueSnackbar(tCommon('error'), { variant: 'error' })
     }
+    if (softwareProductsError) {
+      enqueueSnackbar(tCommon('error'), { variant: 'error' })
+    }
+    if (softwareVersionsError) {
+      enqueueSnackbar(tCommon('error'), { variant: 'error' })
+    }
+    if (hardwareProductsError) {
+      enqueueSnackbar(tCommon('error'), { variant: 'error' })
+    }
+    if (hardwareVersionsError) {
+      enqueueSnackbar(tCommon('error'), { variant: 'error' })
+    }
   }, [
     capabilitiesError,
     applicationsError,
@@ -337,6 +393,10 @@ const Dashboard = () => {
     principlesError,
     infrastructuresError,
     businessProcessesError,
+    softwareProductsError,
+    softwareVersionsError,
+    hardwareProductsError,
+    hardwareVersionsError,
     enqueueSnackbar,
     tCommon,
   ])
@@ -364,6 +424,14 @@ const Dashboard = () => {
   const strategiesCount = geaStrategiesData?.geaStrategies?.length || 0
   const businessProcessesCount =
     businessProcessesData?.businessProcessesConnection?.aggregate?.count?.nodes || 0
+  const softwareProductsCount =
+    softwareProductsData?.softwareProductsConnection?.aggregate?.count?.nodes || 0
+  const softwareVersionsCount =
+    softwareVersionsData?.softwareVersionsConnection?.aggregate?.count?.nodes || 0
+  const hardwareProductsCount =
+    hardwareProductsData?.hardwareProductsConnection?.aggregate?.count?.nodes || 0
+  const hardwareVersionsCount =
+    hardwareVersionsData?.hardwareVersionsConnection?.aggregate?.count?.nodes || 0
   const valuePropositionsCount = 0
   const businessCasesCount = 0
 
@@ -378,7 +446,11 @@ const Dashboard = () => {
     personsLoading ||
     principlesLoading ||
     infrastructuresLoading ||
-    businessProcessesLoading
+    businessProcessesLoading ||
+    softwareProductsLoading ||
+    softwareVersionsLoading ||
+    hardwareProductsLoading ||
+    hardwareVersionsLoading
 
   const geaScoreLoading =
     isGeaEnabled &&
@@ -409,6 +481,10 @@ const Dashboard = () => {
     | 'goals'
     | 'strategies'
     | 'businessProcesses'
+    | 'softwareProducts'
+    | 'softwareVersions'
+    | 'hardwareProducts'
+    | 'hardwareVersions'
     | 'valuePropositions'
     | 'businessCases'
 
@@ -456,7 +532,14 @@ const Dashboard = () => {
       'interfaces',
       'infrastructure',
     ],
-    technologyManagement: ['applications', 'infrastructure'],
+    technologyManagement: [
+      'applications',
+      'infrastructure',
+      'softwareProducts',
+      'softwareVersions',
+      'hardwareProducts',
+      'hardwareVersions',
+    ],
   }
 
   const cardDefinitions: Record<
@@ -576,6 +659,30 @@ const Dashboard = () => {
       iconType: 'businessProcess',
       loading: isLoading,
     },
+    softwareProducts: {
+      label: tNavigation('softwareProducts'),
+      count: softwareProductsCount,
+      iconType: 'softwareProduct',
+      loading: isLoading,
+    },
+    softwareVersions: {
+      label: tNavigation('softwareVersions'),
+      count: softwareVersionsCount,
+      iconType: 'softwareVersion',
+      loading: isLoading,
+    },
+    hardwareProducts: {
+      label: tNavigation('hardwareProducts'),
+      count: hardwareProductsCount,
+      iconType: 'hardwareProduct',
+      loading: isLoading,
+    },
+    hardwareVersions: {
+      label: tNavigation('hardwareVersions'),
+      count: hardwareVersionsCount,
+      iconType: 'hardwareVersion',
+      loading: isLoading,
+    },
     valuePropositions: {
       label: tNavigation('valuePropositions'),
       count: valuePropositionsCount,
@@ -684,6 +791,14 @@ const Dashboard = () => {
         return <EventIcon sx={{ fontSize: 40, color: theme.palette.warning.main }} />
       case 'applicationService':
         return <ServiceIcon sx={{ fontSize: 40, color: theme.palette.success.main }} />
+      case 'softwareProduct':
+        return <SoftwareProductIcon sx={{ fontSize: 40, color: theme.palette.info.main }} />
+      case 'softwareVersion':
+        return <SoftwareVersionIcon sx={{ fontSize: 40, color: theme.palette.primary.main }} />
+      case 'hardwareProduct':
+        return <HardwareProductIcon sx={{ fontSize: 40, color: theme.palette.warning.main }} />
+      case 'hardwareVersion':
+        return <HardwareVersionIcon sx={{ fontSize: 40, color: theme.palette.secondary.main }} />
       default:
         return <ConstructionIcon sx={{ fontSize: 40, color: theme.palette.grey[500] }} />
     }

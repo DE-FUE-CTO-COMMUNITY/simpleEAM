@@ -1,5 +1,17 @@
 import { gql } from '@apollo/client/core'
 
+export const GET_HARDWARE_VERSIONS_COUNT = gql`
+  query GetHardwareVersionsCount($where: HardwareVersionWhere) {
+    hardwareVersionsConnection(where: $where) {
+      aggregate {
+        count {
+          nodes
+        }
+      }
+    }
+  }
+`
+
 export const GET_HARDWARE_VERSIONS = gql`
   query GetHardwareVersions($where: HardwareVersionWhere) {
     hardwareVersions(where: $where) {

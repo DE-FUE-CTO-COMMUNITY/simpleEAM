@@ -1,5 +1,17 @@
 import { gql } from '@apollo/client/core'
 
+export const GET_SOFTWARE_PRODUCTS_COUNT = gql`
+  query GetSoftwareProductsCount($where: SoftwareProductWhere) {
+    softwareProductsConnection(where: $where) {
+      aggregate {
+        count {
+          nodes
+        }
+      }
+    }
+  }
+`
+
 export const GET_SOFTWARE_PRODUCTS = gql`
   query GetSoftwareProducts($where: SoftwareProductWhere) {
     softwareProducts(where: $where) {
