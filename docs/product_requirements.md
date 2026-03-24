@@ -89,7 +89,7 @@ NextGen EAM consists of multiple components delivered as Docker containers:
   - Technology stack
   - Version
   - Hosting environment
-  - Vendor/manufacturer
+  - Supplier/manufacturer
   - Cost
   - Go-live date
   - End-of-life date
@@ -904,7 +904,286 @@ NextGen EAM consists of multiple components delivered as Docker containers:
 - Export canvas as PDF with all building blocks and metadata
 - Batch export of multiple canvases
 
-### 2.14 Agentic AI functionality
+### 2.14 Technology management
+
+#### FR-TM-01: Technology portfolio and lifecycle inventory
+
+**Description:** The system must provide a dedicated technology management view for applications, infrastructure, and supplier relationships with lifecycle context.  
+**Priority:** High  
+**Acceptance criteria:**
+
+- Users can view technology portfolio entries including SoftwareProduct/SoftwareVersion and HardwareProduct/HardwareVersion, deployment context, owner, and linked suppliers.
+- Each entry supports lifecycle milestones such as GA, mainstream support end, EOS, and EOL when available.
+- Users can mark lifecycle confidence and source quality per record.
+- Users can filter by lifecycle state (supported, approaching EOS/EOL, unsupported).
+- Users can group portfolio entries by supplier, product family, and criticality.
+
+#### FR-TM-02: Manual lifecycle data governance
+
+**Description:** The system must support manual maintenance of technology lifecycle data independent from AI enrichment.  
+**Priority:** High  
+**Acceptance criteria:**
+
+- Authorized users can create, update, and archive lifecycle records.
+- Manual changes are timestamped and include actor and optional change rationale.
+- Records support structured status values and effective dates.
+- Validation prevents invalid chronology (e.g., EOS before GA).
+- Role-based permissions define who can edit lifecycle governance data.
+
+#### FR-TM-03: Supplier and product normalization workspace
+
+**Description:** The system must provide normalization capabilities for supplier aliases, product names, and version naming across sources.  
+**Priority:** Medium  
+**Acceptance criteria:**
+
+- Users can merge source aliases into canonical supplier and product names.
+- Version normalization rules can be configured and previewed.
+- Duplicate detection flags likely equivalent supplier/product/version entries.
+- Persisted supplier and product entities store normalized names only.
+- Source-specific raw names may be retained only in synchronization logs/audit trails.
+- Normalized entities can be linked to supplier objects in the architecture model.
+
+#### FR-TM-04: Lifecycle risk scoring and thresholds
+
+**Description:** The system must calculate technology lifecycle risks using configurable scoring rules.  
+**Priority:** High  
+**Acceptance criteria:**
+
+- Risk scores are computed per portfolio entry using lifecycle state and proximity thresholds.
+- Thresholds are configurable per company (e.g., warning at 180 days before EOS).
+- Risk levels are visible as categorical indicators (low, medium, high, critical).
+- Risk computation inputs are explainable for each score.
+- Historical score changes are retained for trend analysis.
+
+#### FR-TM-05: Recommendation and decision tracking
+
+**Description:** The system must support structured technology decisions based on lifecycle risks and recommendations.  
+**Priority:** High  
+**Acceptance criteria:**
+
+- Recommendations support at least upgrade, replace, consolidate, retain, and monitor.
+- Users can assign recommendation owners and target dates.
+- Decision status can be tracked (proposed, approved, in progress, completed, rejected).
+- Decision records include rationale, expected impact, and dependency notes.
+- Recommendation outcomes are linked back to the originating portfolio entries.
+
+#### FR-TM-06: SBOM and component evidence management
+
+**Description:** The system must support Software Bill of Materials (SBOM) references for technology assets.  
+**Priority:** Medium  
+**Acceptance criteria:**
+
+- Applications can be linked to dedicated SBOM objects.
+- SBOM metadata includes source, generation timestamp, and format.
+- SBOM records are versioned or historically retained.
+- Users can filter technology entries by SBOM availability.
+- Missing SBOM coverage is visible in technology management dashboards.
+
+#### FR-TM-07: Technology dashboards, alerts, and reporting
+
+**Description:** The system must provide technology management dashboards and alerting capabilities.  
+**Priority:** Medium  
+**Acceptance criteria:**
+
+- Dashboard shows lifecycle distribution, top risk items, and upcoming EOS/EOL events.
+- Alerts can be configured for lifecycle threshold breaches.
+- Reports can be exported by company, domain, supplier, and risk level.
+- Dashboard supports drill-down from aggregate metrics to affected entries.
+- KPI trends are available over selectable time ranges.
+
+#### FR-TM-08: Integration and synchronization operations
+
+**Description:** The system must support controlled ingestion and synchronization of lifecycle and supplier data from external sources.  
+**Priority:** Medium  
+**Acceptance criteria:**
+
+- Connectors support scheduled and on-demand synchronization.
+- Sync jobs produce run logs with success/failure metrics.
+- Conflict handling rules are configurable (source priority, manual override, merge).
+- Failed imports can be retried with partial recovery.
+- Ingestion and synchronization actions are fully auditable.
+
+#### TM-DM-01: Required objects, attributes, and relationships (Technology Management)
+
+**Description:** The technology management domain must define required data objects, required attributes, and explicit relationships to support lifecycle governance, risk scoring, recommendations, and SBOM evidence.  
+**Priority:** High  
+**Acceptance criteria:**
+
+- The required objects listed in this section exist in the canonical data model.
+- Each required object includes the mandatory attributes listed in this section.
+- Each required relationship listed in this section is queryable and writable according to permissions.
+- Technology management dashboards and workflows can be implemented without additional undefined core entities.
+
+**Required objects and mandatory attributes:**
+
+- The system must support the following technology management objects.
+- Users can create and manage technology records with the following attributes:
+
+##### Application (extended for Technology Management)
+
+- Name
+- Version
+- Criticality
+- Hosting environment
+- Created at
+- Updated at
+
+##### Infrastructure (extended for Technology Management)
+
+- Name
+- Version
+- Infrastructure type
+- Status
+- Location
+- Criticality
+- Created at
+- Updated at
+
+##### Supplier (canonical supplier anchor)
+
+- Name
+- Supplier type
+- Status
+- Risk classification
+- Strategic importance
+- Website
+- Created at
+- Updated at
+
+##### SoftwareProduct (new)
+
+- Name
+- Product family
+- Lifecycle status
+- Is active
+- Created at
+- Updated at
+
+##### SoftwareVersion (new)
+
+- Version string
+- Normalized version
+- Release channel
+- Is LTS
+- Support tier
+- Created at
+- Updated at
+
+##### HardwareProduct (new)
+
+- Name
+- Product family
+- Lifecycle status
+- Is active
+- Created at
+- Updated at
+
+##### SbomDocument (new)
+
+- SBOM ID
+- Format
+- Version
+- Source
+- Source URL
+- Generated at
+- Tool
+- Digest
+- Storage reference
+- Created at
+- Updated at
+
+##### HardwareVersion (new)
+
+- Version/model string
+- Release channel
+- Support tier
+- Created at
+- Updated at
+
+##### LifecycleRecord (new)
+
+- GA date
+- Mainstream support end date
+- Extended support end date
+- EOS date
+- EOL date
+- Lifecycle status
+- Source
+- Source URL
+- Source confidence
+- Last validated at
+- Created at
+- Updated at
+
+##### TechnologyRiskAssessment (new)
+
+- Risk level
+- Risk score
+- Urgency
+- Assessment reason
+- Threshold profile
+- Assessed at
+- Created at
+- Updated at
+
+##### TechnologyRecommendation (new)
+
+- Action type (upgrade, replace, consolidate, retain, monitor)
+- Priority
+- Target date
+- Status
+- Rationale
+- Business impact
+- Risk impact
+- Effort
+- Dependency notes
+- Created at
+- Updated at
+
+##### SyncJobRun (new)
+
+- Job type
+- Source system
+- Started at
+- Finished at
+- Status
+- Records read
+- Records created
+- Records updated
+- Records failed
+- Error summary
+
+**Required relationships:**
+
+- `Application` -> `Supplier`: provided/supported/maintained by supplier.
+- `Infrastructure` -> `Supplier`: provided/hosted/maintained by supplier.
+- `SoftwareProduct` -> `Supplier`: developed/provided/maintained by supplier.
+- `HardwareProduct` -> `Supplier`: manufactured/provided/maintained by supplier.
+- `Application` -> `SoftwareProduct`: implements/uses software product.
+- `Infrastructure` -> `SoftwareProduct`: runs/uses infrastructure software products (e.g., OS, hypervisor, platform software).
+- `Infrastructure` -> `HardwareProduct`: runs on/uses hardware products.
+- `Application` -> `SbomDocument`: has SBOM evidence.
+- `SoftwareProduct` -> `SoftwareVersion`: has software versions.
+- `HardwareProduct` -> `HardwareVersion`: has hardware versions/models.
+- `SoftwareVersion` -> `LifecycleRecord`: lifecycle metadata for a specific software version.
+- `HardwareVersion` -> `LifecycleRecord`: lifecycle metadata for a specific hardware version/model.
+- `SoftwareProduct` -> `LifecycleRecord`: lifecycle metadata for product-level support when version detail is unavailable.
+- `HardwareProduct` -> `LifecycleRecord`: lifecycle metadata for product-level support when version detail is unavailable.
+- `TechnologyRiskAssessment` -> `Application` and/or `Infrastructure`: risk assessed for asset.
+- `TechnologyRiskAssessment` -> `LifecycleRecord`: risk is derived from lifecycle state.
+- `TechnologyRecommendation` -> `Application` and/or `Infrastructure`: recommendation target.
+- `TechnologyRecommendation` -> `TechnologyRiskAssessment`: recommendation justified by assessment.
+- `SyncJobRun` -> affected `SoftwareProduct`/`SoftwareVersion`/`HardwareProduct`/`HardwareVersion`/`LifecycleRecord`: provenance of imported updates.
+
+**Relationship governance requirements:**
+
+- All technology-management relationships are company-scoped and must respect role-based authorization.
+- Relationship changes must be auditable (actor, timestamp, operation, before/after where applicable).
+- Relationship provenance from synchronization jobs and AI enrichment must be distinguishable from manual edits.
+- Supplier assignment must always be represented as a relationship to `Supplier` and never as a denormalized text attribute on technology entities.
+- Supplier relationships must point to supplier records in supplier categories (e.g., software vendor, hardware vendor, cloud provider).
+
+### 2.15 Agentic AI functionality
 
 #### FR-AI-01: Company research and strategic enrichment agent
 
@@ -918,14 +1197,14 @@ NextGen EAM consists of multiple components delivered as Docker containers:
 - Generated content is stored as **draft** and requires human approval before becoming active.
 - Contradictory findings are explicitly flagged for user decision.
 
-#### FR-AI-02: Technology lifecycle and vendor intelligence agent
+#### FR-AI-02: Technology lifecycle and supplier intelligence agent
 
-**Description:** The system must provide an agent for software and hardware lifecycle intelligence to support technology management and vendor lifecycle decisions.  
+**Description:** The system must provide an agent for software and hardware lifecycle intelligence to support technology management and supplier lifecycle decisions.  
 **Priority:** High  
 **Acceptance criteria:**
 
 - The agent enriches applications and infrastructure with lifecycle data (GA, EOL, EOS, support status, version maturity where available).
-- Vendor information is normalized and mapped to supplier elements.
+- Supplier information is normalized and mapped to supplier elements.
 - Risk indicators are calculated (e.g., unsupported version risk, end-of-support proximity).
 - Users receive recommendations such as upgrade, replace, consolidate, or monitor.
 - Scheduled scans and on-demand scans are supported per company.
@@ -1264,7 +1543,8 @@ NextGen EAM consists of multiple components delivered as Docker containers:
 
 6. **Phase 6: Technology lifecycle intelligence (4 weeks)**
 
-- Vendor/software/hardware lifecycle ingestion and normalization
+- SoftwareProduct/SoftwareVersion and HardwareProduct/HardwareVersion lifecycle ingestion and normalization
+- Supplier relationship mapping for supplier assignment
 - Lifecycle risk scoring and recommendation generation
 - Scheduled scan operations and alerting
 
@@ -1327,9 +1607,9 @@ NextGen EAM consists of multiple components delivered as Docker containers:
 
 #### Blueprint B: Lifecycle intelligence (FR-AI-02)
 
-1. Collect portfolio inventory (applications, infrastructure, suppliers, versions).
-2. Enrich from vendor/product lifecycle sources.
-3. Normalize vendor/product/version naming.
+1. Collect portfolio inventory (applications, infrastructure, supplier relationships, software versions, hardware versions, SBOM links).
+2. Enrich SoftwareProduct/SoftwareVersion and HardwareProduct/HardwareVersion from lifecycle sources.
+3. Normalize product/version naming and map supplier assignment via Supplier relationships.
 4. Compute risk score and urgency classification.
 5. Generate recommendations (upgrade/replace/monitor).
 6. Persist findings and open review tasks for architects.
@@ -1377,7 +1657,7 @@ NextGen EAM consists of multiple components delivered as Docker containers:
 ### 7.5 Rollout blueprint
 
 - **Wave 1 (MVP):** FR-AI-01 + approval workflow + citation traceability.
-- **Wave 2:** FR-AI-02 lifecycle intelligence + scheduled jobs + alerts.
+- **Wave 2:** FR-AI-02 lifecycle intelligence for SoftwareProduct/HardwareProduct + scheduled jobs + alerts.
 - **Wave 3:** FR-AI-03 target-architecture recommendations + roadmap scoring.
 - **Wave 4:** FR-AI-04 quality and relationship discovery agent.
 - **Wave 5:** FR-AI-06 conversational assistant + controlled architecture change execution.

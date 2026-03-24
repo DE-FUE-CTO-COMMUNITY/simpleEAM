@@ -1,0 +1,70 @@
+import { gql } from '@apollo/client/core'
+
+export const GET_SOFTWARE_PRODUCTS = gql`
+  query GetSoftwareProducts($where: SoftwareProductWhere) {
+    softwareProducts(where: $where) {
+      id
+      name
+      productFamily
+      lifecycleStatus
+      isActive
+      createdAt
+      updatedAt
+      developedBy {
+        id
+        name
+      }
+      providedBy {
+        id
+        name
+      }
+      maintainedBy {
+        id
+        name
+      }
+      versions {
+        id
+        versionString
+        normalizedVersion
+      }
+      usedByApplications {
+        id
+        name
+      }
+      usedByInfrastructure {
+        id
+        name
+      }
+    }
+  }
+`
+
+export const CREATE_SOFTWARE_PRODUCT = gql`
+  mutation CreateSoftwareProducts($input: [SoftwareProductCreateInput!]!) {
+    createSoftwareProducts(input: $input) {
+      softwareProducts {
+        id
+        name
+      }
+    }
+  }
+`
+
+export const UPDATE_SOFTWARE_PRODUCT = gql`
+  mutation UpdateSoftwareProducts($id: ID!, $input: SoftwareProductUpdateInput!) {
+    updateSoftwareProducts(where: { id: { eq: $id } }, update: $input) {
+      softwareProducts {
+        id
+        name
+      }
+    }
+  }
+`
+
+export const DELETE_SOFTWARE_PRODUCT = gql`
+  mutation DeleteSoftwareProducts($id: ID!) {
+    deleteSoftwareProducts(where: { id: { eq: $id } }) {
+      nodesDeleted
+    }
+  }
+`

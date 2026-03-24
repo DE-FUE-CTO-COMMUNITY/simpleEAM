@@ -1,0 +1,66 @@
+import { gql } from '@apollo/client/core'
+
+export const GET_HARDWARE_PRODUCTS = gql`
+  query GetHardwareProducts($where: HardwareProductWhere) {
+    hardwareProducts(where: $where) {
+      id
+      name
+      productFamily
+      lifecycleStatus
+      isActive
+      createdAt
+      updatedAt
+      manufacturedBy {
+        id
+        name
+      }
+      providedBy {
+        id
+        name
+      }
+      maintainedBy {
+        id
+        name
+      }
+      versions {
+        id
+        versionModelString
+        normalizedVersionModel
+      }
+      usedByInfrastructure {
+        id
+        name
+      }
+    }
+  }
+`
+
+export const CREATE_HARDWARE_PRODUCT = gql`
+  mutation CreateHardwareProducts($input: [HardwareProductCreateInput!]!) {
+    createHardwareProducts(input: $input) {
+      hardwareProducts {
+        id
+        name
+      }
+    }
+  }
+`
+
+export const UPDATE_HARDWARE_PRODUCT = gql`
+  mutation UpdateHardwareProducts($id: ID!, $input: HardwareProductUpdateInput!) {
+    updateHardwareProducts(where: { id: { eq: $id } }, update: $input) {
+      hardwareProducts {
+        id
+        name
+      }
+    }
+  }
+`
+
+export const DELETE_HARDWARE_PRODUCT = gql`
+  mutation DeleteHardwareProducts($id: ID!) {
+    deleteHardwareProducts(where: { id: { eq: $id } }) {
+      nodesDeleted
+    }
+  }
+`

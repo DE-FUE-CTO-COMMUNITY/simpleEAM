@@ -1,7 +1,15 @@
 'use client'
 
 import React from 'react'
-import { Box, FormControlLabel, FormGroup, Switch, Typography, Divider, Tooltip } from '@mui/material'
+import {
+  Box,
+  FormControlLabel,
+  FormGroup,
+  Switch,
+  Typography,
+  Divider,
+  Tooltip,
+} from '@mui/material'
 import { useTranslations } from 'next-intl'
 import {
   LENS_OPTIONS,

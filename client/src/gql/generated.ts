@@ -341,6 +341,7 @@ export type AiComponentApplicationUsedByApplicationsNodeAggregateSelection = {
   hostingEnvironment: StringAggregateSelection;
   lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sbom: StringAggregateSelection;
   sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
@@ -426,6 +427,7 @@ export type AiComponentCompanyCompanyNodeAggregateSelection = {
   __typename?: 'AIComponentCompanyCompanyNodeAggregateSelection';
   achievedSovereigntyScore: FloatAggregateSelection;
   address: StringAggregateSelection;
+  controlPriority: IntAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   diagramFont: StringAggregateSelection;
@@ -436,10 +438,13 @@ export type AiComponentCompanyCompanyNodeAggregateSelection = {
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
+  resiliencePriority: IntAggregateSelection;
   secondaryColor: StringAggregateSelection;
+  securityPriority: IntAggregateSelection;
   sovereigntyGap: FloatAggregateSelection;
   sovereigntyScorePercent: FloatAggregateSelection;
   sovereigntyScoreStatus: StringAggregateSelection;
+  strategicAutonomyPriority: IntAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -514,6 +519,7 @@ export type AiComponentCompanyNodeAggregationWhereInput = {
   OR?: InputMaybe<Array<AiComponentCompanyNodeAggregationWhereInput>>;
   achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   address?: InputMaybe<StringScalarAggregationFilters>;
+  controlPriority?: InputMaybe<IntScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramFont?: InputMaybe<StringScalarAggregationFilters>;
@@ -524,10 +530,13 @@ export type AiComponentCompanyNodeAggregationWhereInput = {
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  resiliencePriority?: InputMaybe<IntScalarAggregationFilters>;
   secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  securityPriority?: InputMaybe<IntScalarAggregationFilters>;
   sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
   sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
   sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
+  strategicAutonomyPriority?: InputMaybe<IntScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -2146,6 +2155,7 @@ export type AiComponentUsedByApplicationsNodeAggregationWhereInput = {
   hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
   lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sbom?: InputMaybe<StringScalarAggregationFilters>;
   sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
@@ -2851,6 +2861,7 @@ export type AiRunCompanyCompanyNodeAggregateSelection = {
   __typename?: 'AiRunCompanyCompanyNodeAggregateSelection';
   achievedSovereigntyScore: FloatAggregateSelection;
   address: StringAggregateSelection;
+  controlPriority: IntAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   diagramFont: StringAggregateSelection;
@@ -2861,10 +2872,13 @@ export type AiRunCompanyCompanyNodeAggregateSelection = {
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
+  resiliencePriority: IntAggregateSelection;
   secondaryColor: StringAggregateSelection;
+  securityPriority: IntAggregateSelection;
   sovereigntyGap: FloatAggregateSelection;
   sovereigntyScorePercent: FloatAggregateSelection;
   sovereigntyScoreStatus: StringAggregateSelection;
+  strategicAutonomyPriority: IntAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -2939,6 +2953,7 @@ export type AiRunCompanyNodeAggregationWhereInput = {
   OR?: InputMaybe<Array<AiRunCompanyNodeAggregationWhereInput>>;
   achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   address?: InputMaybe<StringScalarAggregationFilters>;
+  controlPriority?: InputMaybe<IntScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramFont?: InputMaybe<StringScalarAggregationFilters>;
@@ -2949,10 +2964,13 @@ export type AiRunCompanyNodeAggregationWhereInput = {
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  resiliencePriority?: InputMaybe<IntScalarAggregationFilters>;
   secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  securityPriority?: InputMaybe<IntScalarAggregationFilters>;
   sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
   sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
   sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
+  strategicAutonomyPriority?: InputMaybe<IntScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -3159,6 +3177,9 @@ export type Application = {
   predecessorsConnection: ApplicationPredecessorsConnection;
   providedBy: Array<Supplier>;
   providedByConnection: ApplicationProvidedByConnection;
+  sbom?: Maybe<Scalars['String']['output']>;
+  sbomDocuments: Array<SbomDocument>;
+  sbomDocumentsConnection: ApplicationSbomDocumentsConnection;
   sevenRStrategy?: Maybe<SevenRStrategy>;
   sourceOfInterfaces: Array<ApplicationInterface>;
   sourceOfInterfacesConnection: ApplicationSourceOfInterfacesConnection;
@@ -3189,6 +3210,8 @@ export type Application = {
   usesAIComponentsConnection: ApplicationUsesAiComponentsConnection;
   usesDataObjects: Array<DataObject>;
   usesDataObjectsConnection: ApplicationUsesDataObjectsConnection;
+  usesSoftwareProducts: Array<SoftwareProduct>;
+  usesSoftwareProductsConnection: ApplicationUsesSoftwareProductsConnection;
   vendor?: Maybe<Scalars['String']['output']>;
   version?: Maybe<Scalars['String']['output']>;
 };
@@ -3411,6 +3434,24 @@ export type ApplicationProvidedByConnectionArgs = {
 
 
 /** Application – represents a business application within Enterprise Architecture Management */
+export type ApplicationSbomDocumentsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SbomDocumentSort>>;
+  where?: InputMaybe<SbomDocumentWhere>;
+};
+
+
+/** Application – represents a business application within Enterprise Architecture Management */
+export type ApplicationSbomDocumentsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<ApplicationSbomDocumentsConnectionSort>>;
+  where?: InputMaybe<ApplicationSbomDocumentsConnectionWhere>;
+};
+
+
+/** Application – represents a business application within Enterprise Architecture Management */
 export type ApplicationSourceOfInterfacesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -3571,6 +3612,24 @@ export type ApplicationUsesDataObjectsConnectionArgs = {
   where?: InputMaybe<ApplicationUsesDataObjectsConnectionWhere>;
 };
 
+
+/** Application – represents a business application within Enterprise Architecture Management */
+export type ApplicationUsesSoftwareProductsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SoftwareProductSort>>;
+  where?: InputMaybe<SoftwareProductWhere>;
+};
+
+
+/** Application – represents a business application within Enterprise Architecture Management */
+export type ApplicationUsesSoftwareProductsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<ApplicationUsesSoftwareProductsConnectionSort>>;
+  where?: InputMaybe<ApplicationUsesSoftwareProductsConnectionWhere>;
+};
+
 export type ApplicationAiComponentUsesAiComponentsAggregateSelection = {
   __typename?: 'ApplicationAIComponentUsesAIComponentsAggregateSelection';
   count: CountConnection;
@@ -3607,6 +3666,7 @@ export type ApplicationAggregateNode = {
   hostingEnvironment: StringAggregateSelection;
   lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sbom: StringAggregateSelection;
   sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
@@ -3627,6 +3687,7 @@ export type ApplicationApplicationComponentsNodeAggregateSelection = {
   hostingEnvironment: StringAggregateSelection;
   lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sbom: StringAggregateSelection;
   sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
@@ -3681,6 +3742,7 @@ export type ApplicationApplicationParentsNodeAggregateSelection = {
   hostingEnvironment: StringAggregateSelection;
   lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sbom: StringAggregateSelection;
   sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
@@ -3701,6 +3763,7 @@ export type ApplicationApplicationPredecessorsNodeAggregateSelection = {
   hostingEnvironment: StringAggregateSelection;
   lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sbom: StringAggregateSelection;
   sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
@@ -3721,6 +3784,7 @@ export type ApplicationApplicationSuccessorsNodeAggregateSelection = {
   hostingEnvironment: StringAggregateSelection;
   lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sbom: StringAggregateSelection;
   sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
@@ -3825,6 +3889,7 @@ export type ApplicationCompanyCompanyNodeAggregateSelection = {
   __typename?: 'ApplicationCompanyCompanyNodeAggregateSelection';
   achievedSovereigntyScore: FloatAggregateSelection;
   address: StringAggregateSelection;
+  controlPriority: IntAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   diagramFont: StringAggregateSelection;
@@ -3835,10 +3900,13 @@ export type ApplicationCompanyCompanyNodeAggregateSelection = {
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
+  resiliencePriority: IntAggregateSelection;
   secondaryColor: StringAggregateSelection;
+  securityPriority: IntAggregateSelection;
   sovereigntyGap: FloatAggregateSelection;
   sovereigntyScorePercent: FloatAggregateSelection;
   sovereigntyScoreStatus: StringAggregateSelection;
+  strategicAutonomyPriority: IntAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -3913,6 +3981,7 @@ export type ApplicationCompanyNodeAggregationWhereInput = {
   OR?: InputMaybe<Array<ApplicationCompanyNodeAggregationWhereInput>>;
   achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   address?: InputMaybe<StringScalarAggregationFilters>;
+  controlPriority?: InputMaybe<IntScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramFont?: InputMaybe<StringScalarAggregationFilters>;
@@ -3923,10 +3992,13 @@ export type ApplicationCompanyNodeAggregationWhereInput = {
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  resiliencePriority?: InputMaybe<IntScalarAggregationFilters>;
   secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  securityPriority?: InputMaybe<IntScalarAggregationFilters>;
   sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
   sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
   sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
+  strategicAutonomyPriority?: InputMaybe<IntScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -4037,6 +4109,7 @@ export type ApplicationComponentsNodeAggregationWhereInput = {
   hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
   lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sbom?: InputMaybe<StringScalarAggregationFilters>;
   sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
@@ -4075,6 +4148,7 @@ export type ApplicationConnectInput = {
   partOfArchitectures?: InputMaybe<Array<ApplicationPartOfArchitecturesConnectFieldInput>>;
   predecessors?: InputMaybe<Array<ApplicationPredecessorsConnectFieldInput>>;
   providedBy?: InputMaybe<Array<ApplicationProvidedByConnectFieldInput>>;
+  sbomDocuments?: InputMaybe<Array<ApplicationSbomDocumentsConnectFieldInput>>;
   sourceOfInterfaces?: InputMaybe<Array<ApplicationSourceOfInterfacesConnectFieldInput>>;
   successors?: InputMaybe<Array<ApplicationSuccessorsConnectFieldInput>>;
   supportedBy?: InputMaybe<Array<ApplicationSupportedByConnectFieldInput>>;
@@ -4084,6 +4158,7 @@ export type ApplicationConnectInput = {
   usedByOrganisations?: InputMaybe<Array<ApplicationUsedByOrganisationsConnectFieldInput>>;
   usesAIComponents?: InputMaybe<Array<ApplicationUsesAiComponentsConnectFieldInput>>;
   usesDataObjects?: InputMaybe<Array<ApplicationUsesDataObjectsConnectFieldInput>>;
+  usesSoftwareProducts?: InputMaybe<Array<ApplicationUsesSoftwareProductsConnectFieldInput>>;
 };
 
 export type ApplicationConnectWhere = {
@@ -4113,6 +4188,8 @@ export type ApplicationCreateInput = {
   planningDate?: InputMaybe<Scalars['Date']['input']>;
   predecessors?: InputMaybe<ApplicationPredecessorsFieldInput>;
   providedBy?: InputMaybe<ApplicationProvidedByFieldInput>;
+  sbom?: InputMaybe<Scalars['String']['input']>;
+  sbomDocuments?: InputMaybe<ApplicationSbomDocumentsFieldInput>;
   sevenRStrategy?: InputMaybe<SevenRStrategy>;
   sourceOfInterfaces?: InputMaybe<ApplicationSourceOfInterfacesFieldInput>;
   sovereigntyAchDataResidency?: InputMaybe<SovereigntyMaturity>;
@@ -4134,6 +4211,7 @@ export type ApplicationCreateInput = {
   usedByOrganisations?: InputMaybe<ApplicationUsedByOrganisationsFieldInput>;
   usesAIComponents?: InputMaybe<ApplicationUsesAiComponentsFieldInput>;
   usesDataObjects?: InputMaybe<ApplicationUsesDataObjectsFieldInput>;
+  usesSoftwareProducts?: InputMaybe<ApplicationUsesSoftwareProductsFieldInput>;
   vendor?: InputMaybe<Scalars['String']['input']>;
   version?: InputMaybe<Scalars['String']['input']>;
 };
@@ -4185,6 +4263,7 @@ export type ApplicationDeleteInput = {
   partOfArchitectures?: InputMaybe<Array<ApplicationPartOfArchitecturesDeleteFieldInput>>;
   predecessors?: InputMaybe<Array<ApplicationPredecessorsDeleteFieldInput>>;
   providedBy?: InputMaybe<Array<ApplicationProvidedByDeleteFieldInput>>;
+  sbomDocuments?: InputMaybe<Array<ApplicationSbomDocumentsDeleteFieldInput>>;
   sourceOfInterfaces?: InputMaybe<Array<ApplicationSourceOfInterfacesDeleteFieldInput>>;
   successors?: InputMaybe<Array<ApplicationSuccessorsDeleteFieldInput>>;
   supportedBy?: InputMaybe<Array<ApplicationSupportedByDeleteFieldInput>>;
@@ -4194,6 +4273,7 @@ export type ApplicationDeleteInput = {
   usedByOrganisations?: InputMaybe<Array<ApplicationUsedByOrganisationsDeleteFieldInput>>;
   usesAIComponents?: InputMaybe<Array<ApplicationUsesAiComponentsDeleteFieldInput>>;
   usesDataObjects?: InputMaybe<Array<ApplicationUsesDataObjectsDeleteFieldInput>>;
+  usesSoftwareProducts?: InputMaybe<Array<ApplicationUsesSoftwareProductsDeleteFieldInput>>;
 };
 
 export type ApplicationDepictedInDiagramsAggregateInput = {
@@ -4335,6 +4415,7 @@ export type ApplicationDisconnectInput = {
   partOfArchitectures?: InputMaybe<Array<ApplicationPartOfArchitecturesDisconnectFieldInput>>;
   predecessors?: InputMaybe<Array<ApplicationPredecessorsDisconnectFieldInput>>;
   providedBy?: InputMaybe<Array<ApplicationProvidedByDisconnectFieldInput>>;
+  sbomDocuments?: InputMaybe<Array<ApplicationSbomDocumentsDisconnectFieldInput>>;
   sourceOfInterfaces?: InputMaybe<Array<ApplicationSourceOfInterfacesDisconnectFieldInput>>;
   successors?: InputMaybe<Array<ApplicationSuccessorsDisconnectFieldInput>>;
   supportedBy?: InputMaybe<Array<ApplicationSupportedByDisconnectFieldInput>>;
@@ -4344,6 +4425,7 @@ export type ApplicationDisconnectInput = {
   usedByOrganisations?: InputMaybe<Array<ApplicationUsedByOrganisationsDisconnectFieldInput>>;
   usesAIComponents?: InputMaybe<Array<ApplicationUsesAiComponentsDisconnectFieldInput>>;
   usesDataObjects?: InputMaybe<Array<ApplicationUsesDataObjectsDisconnectFieldInput>>;
+  usesSoftwareProducts?: InputMaybe<Array<ApplicationUsesSoftwareProductsDisconnectFieldInput>>;
 };
 
 export type ApplicationEdge = {
@@ -4895,6 +4977,7 @@ export type ApplicationInterfaceApplicationSourceApplicationsNodeAggregateSelect
   hostingEnvironment: StringAggregateSelection;
   lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sbom: StringAggregateSelection;
   sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
@@ -4915,6 +4998,7 @@ export type ApplicationInterfaceApplicationTargetApplicationsNodeAggregateSelect
   hostingEnvironment: StringAggregateSelection;
   lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sbom: StringAggregateSelection;
   sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
@@ -4963,6 +5047,7 @@ export type ApplicationInterfaceCompanyCompanyNodeAggregateSelection = {
   __typename?: 'ApplicationInterfaceCompanyCompanyNodeAggregateSelection';
   achievedSovereigntyScore: FloatAggregateSelection;
   address: StringAggregateSelection;
+  controlPriority: IntAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   diagramFont: StringAggregateSelection;
@@ -4973,10 +5058,13 @@ export type ApplicationInterfaceCompanyCompanyNodeAggregateSelection = {
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
+  resiliencePriority: IntAggregateSelection;
   secondaryColor: StringAggregateSelection;
+  securityPriority: IntAggregateSelection;
   sovereigntyGap: FloatAggregateSelection;
   sovereigntyScorePercent: FloatAggregateSelection;
   sovereigntyScoreStatus: StringAggregateSelection;
+  strategicAutonomyPriority: IntAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -5051,6 +5139,7 @@ export type ApplicationInterfaceCompanyNodeAggregationWhereInput = {
   OR?: InputMaybe<Array<ApplicationInterfaceCompanyNodeAggregationWhereInput>>;
   achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   address?: InputMaybe<StringScalarAggregationFilters>;
+  controlPriority?: InputMaybe<IntScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramFont?: InputMaybe<StringScalarAggregationFilters>;
@@ -5061,10 +5150,13 @@ export type ApplicationInterfaceCompanyNodeAggregationWhereInput = {
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  resiliencePriority?: InputMaybe<IntScalarAggregationFilters>;
   secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  securityPriority?: InputMaybe<IntScalarAggregationFilters>;
   sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
   sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
   sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
+  strategicAutonomyPriority?: InputMaybe<IntScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -5909,6 +6001,7 @@ export type ApplicationInterfaceSourceApplicationsNodeAggregationWhereInput = {
   hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
   lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sbom?: InputMaybe<StringScalarAggregationFilters>;
   sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
@@ -6130,6 +6223,7 @@ export type ApplicationInterfaceTargetApplicationsNodeAggregationWhereInput = {
   hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
   lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sbom?: InputMaybe<StringScalarAggregationFilters>;
   sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
@@ -6786,6 +6880,7 @@ export type ApplicationParentsNodeAggregationWhereInput = {
   hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
   lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sbom?: InputMaybe<StringScalarAggregationFilters>;
   sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
@@ -7028,6 +7123,7 @@ export type ApplicationPredecessorsNodeAggregationWhereInput = {
   hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
   lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sbom?: InputMaybe<StringScalarAggregationFilters>;
   sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
@@ -7179,6 +7275,154 @@ export type ApplicationRelationshipFilters = {
   some?: InputMaybe<ApplicationWhere>;
 };
 
+export type ApplicationSbomDocumentSbomDocumentsAggregateSelection = {
+  __typename?: 'ApplicationSbomDocumentSbomDocumentsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<ApplicationSbomDocumentSbomDocumentsNodeAggregateSelection>;
+};
+
+export type ApplicationSbomDocumentSbomDocumentsNodeAggregateSelection = {
+  __typename?: 'ApplicationSbomDocumentSbomDocumentsNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  digest: StringAggregateSelection;
+  format: StringAggregateSelection;
+  generatedAt: DateTimeAggregateSelection;
+  sbomId: StringAggregateSelection;
+  source: StringAggregateSelection;
+  sourceUrl: StringAggregateSelection;
+  storageReference: StringAggregateSelection;
+  tool: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  version: StringAggregateSelection;
+};
+
+export type ApplicationSbomDocumentsAggregateInput = {
+  AND?: InputMaybe<Array<ApplicationSbomDocumentsAggregateInput>>;
+  NOT?: InputMaybe<ApplicationSbomDocumentsAggregateInput>;
+  OR?: InputMaybe<Array<ApplicationSbomDocumentsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<ApplicationSbomDocumentsNodeAggregationWhereInput>;
+};
+
+export type ApplicationSbomDocumentsConnectFieldInput = {
+  connect?: InputMaybe<Array<SbomDocumentConnectInput>>;
+  where?: InputMaybe<SbomDocumentConnectWhere>;
+};
+
+export type ApplicationSbomDocumentsConnection = {
+  __typename?: 'ApplicationSbomDocumentsConnection';
+  aggregate: ApplicationSbomDocumentSbomDocumentsAggregateSelection;
+  edges: Array<ApplicationSbomDocumentsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type ApplicationSbomDocumentsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<ApplicationSbomDocumentsConnectionAggregateInput>>;
+  NOT?: InputMaybe<ApplicationSbomDocumentsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<ApplicationSbomDocumentsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<ApplicationSbomDocumentsNodeAggregationWhereInput>;
+};
+
+export type ApplicationSbomDocumentsConnectionFilters = {
+  /** Filter Applications by aggregating results on related ApplicationSbomDocumentsConnections */
+  aggregate?: InputMaybe<ApplicationSbomDocumentsConnectionAggregateInput>;
+  /** Return Applications where all of the related ApplicationSbomDocumentsConnections match this filter */
+  all?: InputMaybe<ApplicationSbomDocumentsConnectionWhere>;
+  /** Return Applications where none of the related ApplicationSbomDocumentsConnections match this filter */
+  none?: InputMaybe<ApplicationSbomDocumentsConnectionWhere>;
+  /** Return Applications where one of the related ApplicationSbomDocumentsConnections match this filter */
+  single?: InputMaybe<ApplicationSbomDocumentsConnectionWhere>;
+  /** Return Applications where some of the related ApplicationSbomDocumentsConnections match this filter */
+  some?: InputMaybe<ApplicationSbomDocumentsConnectionWhere>;
+};
+
+export type ApplicationSbomDocumentsConnectionSort = {
+  node?: InputMaybe<SbomDocumentSort>;
+};
+
+export type ApplicationSbomDocumentsConnectionWhere = {
+  AND?: InputMaybe<Array<ApplicationSbomDocumentsConnectionWhere>>;
+  NOT?: InputMaybe<ApplicationSbomDocumentsConnectionWhere>;
+  OR?: InputMaybe<Array<ApplicationSbomDocumentsConnectionWhere>>;
+  node?: InputMaybe<SbomDocumentWhere>;
+};
+
+export type ApplicationSbomDocumentsCreateFieldInput = {
+  node: SbomDocumentCreateInput;
+};
+
+export type ApplicationSbomDocumentsDeleteFieldInput = {
+  delete?: InputMaybe<SbomDocumentDeleteInput>;
+  where?: InputMaybe<ApplicationSbomDocumentsConnectionWhere>;
+};
+
+export type ApplicationSbomDocumentsDisconnectFieldInput = {
+  disconnect?: InputMaybe<SbomDocumentDisconnectInput>;
+  where?: InputMaybe<ApplicationSbomDocumentsConnectionWhere>;
+};
+
+export type ApplicationSbomDocumentsFieldInput = {
+  connect?: InputMaybe<Array<ApplicationSbomDocumentsConnectFieldInput>>;
+  create?: InputMaybe<Array<ApplicationSbomDocumentsCreateFieldInput>>;
+};
+
+export type ApplicationSbomDocumentsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<ApplicationSbomDocumentsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<ApplicationSbomDocumentsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<ApplicationSbomDocumentsNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  digest?: InputMaybe<StringScalarAggregationFilters>;
+  format?: InputMaybe<StringScalarAggregationFilters>;
+  generatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  sbomId?: InputMaybe<StringScalarAggregationFilters>;
+  source?: InputMaybe<StringScalarAggregationFilters>;
+  sourceUrl?: InputMaybe<StringScalarAggregationFilters>;
+  storageReference?: InputMaybe<StringScalarAggregationFilters>;
+  tool?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  version?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type ApplicationSbomDocumentsRelationship = {
+  __typename?: 'ApplicationSbomDocumentsRelationship';
+  cursor: Scalars['String']['output'];
+  node: SbomDocument;
+};
+
+export type ApplicationSbomDocumentsUpdateConnectionInput = {
+  node?: InputMaybe<SbomDocumentUpdateInput>;
+  where?: InputMaybe<ApplicationSbomDocumentsConnectionWhere>;
+};
+
+export type ApplicationSbomDocumentsUpdateFieldInput = {
+  connect?: InputMaybe<Array<ApplicationSbomDocumentsConnectFieldInput>>;
+  create?: InputMaybe<Array<ApplicationSbomDocumentsCreateFieldInput>>;
+  delete?: InputMaybe<Array<ApplicationSbomDocumentsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<ApplicationSbomDocumentsDisconnectFieldInput>>;
+  update?: InputMaybe<ApplicationSbomDocumentsUpdateConnectionInput>;
+};
+
+export type ApplicationSoftwareProductUsesSoftwareProductsAggregateSelection = {
+  __typename?: 'ApplicationSoftwareProductUsesSoftwareProductsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<ApplicationSoftwareProductUsesSoftwareProductsNodeAggregateSelection>;
+};
+
+export type ApplicationSoftwareProductUsesSoftwareProductsNodeAggregateSelection = {
+  __typename?: 'ApplicationSoftwareProductUsesSoftwareProductsNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  name: StringAggregateSelection;
+  productFamily: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
 /** Fields to sort Applications by. The order in which sorts are applied is not guaranteed when specifying many fields in one ApplicationSort object. */
 export type ApplicationSort = {
   costs?: InputMaybe<SortDirection>;
@@ -7193,6 +7437,7 @@ export type ApplicationSort = {
   lastSovereigntyAssessmentAt?: InputMaybe<SortDirection>;
   name?: InputMaybe<SortDirection>;
   planningDate?: InputMaybe<SortDirection>;
+  sbom?: InputMaybe<SortDirection>;
   sevenRStrategy?: InputMaybe<SortDirection>;
   sovereigntyAchDataResidency?: InputMaybe<SortDirection>;
   sovereigntyAchInteroperability?: InputMaybe<SortDirection>;
@@ -7422,6 +7667,7 @@ export type ApplicationSuccessorsNodeAggregationWhereInput = {
   hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
   lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sbom?: InputMaybe<StringScalarAggregationFilters>;
   sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
@@ -7986,6 +8232,8 @@ export type ApplicationUpdateInput = {
   planningDate?: InputMaybe<DateScalarMutations>;
   predecessors?: InputMaybe<Array<ApplicationPredecessorsUpdateFieldInput>>;
   providedBy?: InputMaybe<Array<ApplicationProvidedByUpdateFieldInput>>;
+  sbom?: InputMaybe<StringScalarMutations>;
+  sbomDocuments?: InputMaybe<Array<ApplicationSbomDocumentsUpdateFieldInput>>;
   sevenRStrategy?: InputMaybe<SevenRStrategyEnumScalarMutations>;
   sourceOfInterfaces?: InputMaybe<Array<ApplicationSourceOfInterfacesUpdateFieldInput>>;
   sovereigntyAchDataResidency?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
@@ -8006,6 +8254,7 @@ export type ApplicationUpdateInput = {
   usedByOrganisations?: InputMaybe<Array<ApplicationUsedByOrganisationsUpdateFieldInput>>;
   usesAIComponents?: InputMaybe<Array<ApplicationUsesAiComponentsUpdateFieldInput>>;
   usesDataObjects?: InputMaybe<Array<ApplicationUsesDataObjectsUpdateFieldInput>>;
+  usesSoftwareProducts?: InputMaybe<Array<ApplicationUsesSoftwareProductsUpdateFieldInput>>;
   vendor?: InputMaybe<StringScalarMutations>;
   version?: InputMaybe<StringScalarMutations>;
 };
@@ -8340,6 +8589,112 @@ export type ApplicationUsesDataObjectsUpdateFieldInput = {
   update?: InputMaybe<ApplicationUsesDataObjectsUpdateConnectionInput>;
 };
 
+export type ApplicationUsesSoftwareProductsAggregateInput = {
+  AND?: InputMaybe<Array<ApplicationUsesSoftwareProductsAggregateInput>>;
+  NOT?: InputMaybe<ApplicationUsesSoftwareProductsAggregateInput>;
+  OR?: InputMaybe<Array<ApplicationUsesSoftwareProductsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<ApplicationUsesSoftwareProductsNodeAggregationWhereInput>;
+};
+
+export type ApplicationUsesSoftwareProductsConnectFieldInput = {
+  connect?: InputMaybe<Array<SoftwareProductConnectInput>>;
+  where?: InputMaybe<SoftwareProductConnectWhere>;
+};
+
+export type ApplicationUsesSoftwareProductsConnection = {
+  __typename?: 'ApplicationUsesSoftwareProductsConnection';
+  aggregate: ApplicationSoftwareProductUsesSoftwareProductsAggregateSelection;
+  edges: Array<ApplicationUsesSoftwareProductsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type ApplicationUsesSoftwareProductsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<ApplicationUsesSoftwareProductsConnectionAggregateInput>>;
+  NOT?: InputMaybe<ApplicationUsesSoftwareProductsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<ApplicationUsesSoftwareProductsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<ApplicationUsesSoftwareProductsNodeAggregationWhereInput>;
+};
+
+export type ApplicationUsesSoftwareProductsConnectionFilters = {
+  /** Filter Applications by aggregating results on related ApplicationUsesSoftwareProductsConnections */
+  aggregate?: InputMaybe<ApplicationUsesSoftwareProductsConnectionAggregateInput>;
+  /** Return Applications where all of the related ApplicationUsesSoftwareProductsConnections match this filter */
+  all?: InputMaybe<ApplicationUsesSoftwareProductsConnectionWhere>;
+  /** Return Applications where none of the related ApplicationUsesSoftwareProductsConnections match this filter */
+  none?: InputMaybe<ApplicationUsesSoftwareProductsConnectionWhere>;
+  /** Return Applications where one of the related ApplicationUsesSoftwareProductsConnections match this filter */
+  single?: InputMaybe<ApplicationUsesSoftwareProductsConnectionWhere>;
+  /** Return Applications where some of the related ApplicationUsesSoftwareProductsConnections match this filter */
+  some?: InputMaybe<ApplicationUsesSoftwareProductsConnectionWhere>;
+};
+
+export type ApplicationUsesSoftwareProductsConnectionSort = {
+  node?: InputMaybe<SoftwareProductSort>;
+};
+
+export type ApplicationUsesSoftwareProductsConnectionWhere = {
+  AND?: InputMaybe<Array<ApplicationUsesSoftwareProductsConnectionWhere>>;
+  NOT?: InputMaybe<ApplicationUsesSoftwareProductsConnectionWhere>;
+  OR?: InputMaybe<Array<ApplicationUsesSoftwareProductsConnectionWhere>>;
+  node?: InputMaybe<SoftwareProductWhere>;
+};
+
+export type ApplicationUsesSoftwareProductsCreateFieldInput = {
+  node: SoftwareProductCreateInput;
+};
+
+export type ApplicationUsesSoftwareProductsDeleteFieldInput = {
+  delete?: InputMaybe<SoftwareProductDeleteInput>;
+  where?: InputMaybe<ApplicationUsesSoftwareProductsConnectionWhere>;
+};
+
+export type ApplicationUsesSoftwareProductsDisconnectFieldInput = {
+  disconnect?: InputMaybe<SoftwareProductDisconnectInput>;
+  where?: InputMaybe<ApplicationUsesSoftwareProductsConnectionWhere>;
+};
+
+export type ApplicationUsesSoftwareProductsFieldInput = {
+  connect?: InputMaybe<Array<ApplicationUsesSoftwareProductsConnectFieldInput>>;
+  create?: InputMaybe<Array<ApplicationUsesSoftwareProductsCreateFieldInput>>;
+};
+
+export type ApplicationUsesSoftwareProductsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<ApplicationUsesSoftwareProductsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<ApplicationUsesSoftwareProductsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<ApplicationUsesSoftwareProductsNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  productFamily?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type ApplicationUsesSoftwareProductsRelationship = {
+  __typename?: 'ApplicationUsesSoftwareProductsRelationship';
+  cursor: Scalars['String']['output'];
+  node: SoftwareProduct;
+};
+
+export type ApplicationUsesSoftwareProductsUpdateConnectionInput = {
+  node?: InputMaybe<SoftwareProductUpdateInput>;
+  where?: InputMaybe<ApplicationUsesSoftwareProductsConnectionWhere>;
+};
+
+export type ApplicationUsesSoftwareProductsUpdateFieldInput = {
+  connect?: InputMaybe<Array<ApplicationUsesSoftwareProductsConnectFieldInput>>;
+  create?: InputMaybe<Array<ApplicationUsesSoftwareProductsCreateFieldInput>>;
+  delete?: InputMaybe<Array<ApplicationUsesSoftwareProductsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<ApplicationUsesSoftwareProductsDisconnectFieldInput>>;
+  update?: InputMaybe<ApplicationUsesSoftwareProductsUpdateConnectionInput>;
+};
+
 export type ApplicationWhere = {
   AND?: InputMaybe<Array<ApplicationWhere>>;
   NOT?: InputMaybe<ApplicationWhere>;
@@ -8380,6 +8735,9 @@ export type ApplicationWhere = {
   predecessorsConnection?: InputMaybe<ApplicationPredecessorsConnectionFilters>;
   providedBy?: InputMaybe<SupplierRelationshipFilters>;
   providedByConnection?: InputMaybe<ApplicationProvidedByConnectionFilters>;
+  sbom?: InputMaybe<StringScalarFilters>;
+  sbomDocuments?: InputMaybe<SbomDocumentRelationshipFilters>;
+  sbomDocumentsConnection?: InputMaybe<ApplicationSbomDocumentsConnectionFilters>;
   sevenRStrategy?: InputMaybe<SevenRStrategyEnumScalarFilters>;
   sourceOfInterfaces?: InputMaybe<ApplicationInterfaceRelationshipFilters>;
   sourceOfInterfacesConnection?: InputMaybe<ApplicationSourceOfInterfacesConnectionFilters>;
@@ -8410,6 +8768,8 @@ export type ApplicationWhere = {
   usesAIComponentsConnection?: InputMaybe<ApplicationUsesAiComponentsConnectionFilters>;
   usesDataObjects?: InputMaybe<DataObjectRelationshipFilters>;
   usesDataObjectsConnection?: InputMaybe<ApplicationUsesDataObjectsConnectionFilters>;
+  usesSoftwareProducts?: InputMaybe<SoftwareProductRelationshipFilters>;
+  usesSoftwareProductsConnection?: InputMaybe<ApplicationUsesSoftwareProductsConnectionFilters>;
   vendor?: InputMaybe<StringScalarFilters>;
   version?: InputMaybe<StringScalarFilters>;
 };
@@ -8855,6 +9215,7 @@ export type ArchitectureApplicationContainsApplicationsNodeAggregateSelection = 
   hostingEnvironment: StringAggregateSelection;
   lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sbom: StringAggregateSelection;
   sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
@@ -9216,6 +9577,7 @@ export type ArchitectureCompanyCompanyNodeAggregateSelection = {
   __typename?: 'ArchitectureCompanyCompanyNodeAggregateSelection';
   achievedSovereigntyScore: FloatAggregateSelection;
   address: StringAggregateSelection;
+  controlPriority: IntAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   diagramFont: StringAggregateSelection;
@@ -9226,10 +9588,13 @@ export type ArchitectureCompanyCompanyNodeAggregateSelection = {
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
+  resiliencePriority: IntAggregateSelection;
   secondaryColor: StringAggregateSelection;
+  securityPriority: IntAggregateSelection;
   sovereigntyGap: FloatAggregateSelection;
   sovereigntyScorePercent: FloatAggregateSelection;
   sovereigntyScoreStatus: StringAggregateSelection;
+  strategicAutonomyPriority: IntAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -9304,6 +9669,7 @@ export type ArchitectureCompanyNodeAggregationWhereInput = {
   OR?: InputMaybe<Array<ArchitectureCompanyNodeAggregationWhereInput>>;
   achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   address?: InputMaybe<StringScalarAggregationFilters>;
+  controlPriority?: InputMaybe<IntScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramFont?: InputMaybe<StringScalarAggregationFilters>;
@@ -9314,10 +9680,13 @@ export type ArchitectureCompanyNodeAggregationWhereInput = {
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  resiliencePriority?: InputMaybe<IntScalarAggregationFilters>;
   secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  securityPriority?: InputMaybe<IntScalarAggregationFilters>;
   sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
   sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
   sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
+  strategicAutonomyPriority?: InputMaybe<IntScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -9567,6 +9936,7 @@ export type ArchitectureContainsApplicationsNodeAggregationWhereInput = {
   hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
   lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sbom?: InputMaybe<StringScalarAggregationFilters>;
   sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
@@ -11440,6 +11810,7 @@ export type ArchitecturePrincipleApplicationImplementedByApplicationsNodeAggrega
   hostingEnvironment: StringAggregateSelection;
   lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sbom: StringAggregateSelection;
   sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
@@ -11599,6 +11970,7 @@ export type ArchitecturePrincipleCompanyCompanyNodeAggregateSelection = {
   __typename?: 'ArchitecturePrincipleCompanyCompanyNodeAggregateSelection';
   achievedSovereigntyScore: FloatAggregateSelection;
   address: StringAggregateSelection;
+  controlPriority: IntAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   diagramFont: StringAggregateSelection;
@@ -11609,10 +11981,13 @@ export type ArchitecturePrincipleCompanyCompanyNodeAggregateSelection = {
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
+  resiliencePriority: IntAggregateSelection;
   secondaryColor: StringAggregateSelection;
+  securityPriority: IntAggregateSelection;
   sovereigntyGap: FloatAggregateSelection;
   sovereigntyScorePercent: FloatAggregateSelection;
   sovereigntyScoreStatus: StringAggregateSelection;
+  strategicAutonomyPriority: IntAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -11687,6 +12062,7 @@ export type ArchitecturePrincipleCompanyNodeAggregationWhereInput = {
   OR?: InputMaybe<Array<ArchitecturePrincipleCompanyNodeAggregationWhereInput>>;
   achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   address?: InputMaybe<StringScalarAggregationFilters>;
+  controlPriority?: InputMaybe<IntScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramFont?: InputMaybe<StringScalarAggregationFilters>;
@@ -11697,10 +12073,13 @@ export type ArchitecturePrincipleCompanyNodeAggregationWhereInput = {
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  resiliencePriority?: InputMaybe<IntScalarAggregationFilters>;
   secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  securityPriority?: InputMaybe<IntScalarAggregationFilters>;
   sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
   sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
   sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
+  strategicAutonomyPriority?: InputMaybe<IntScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -11984,6 +12363,7 @@ export type ArchitecturePrincipleImplementedByApplicationsNodeAggregationWhereIn
   hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
   lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sbom?: InputMaybe<StringScalarAggregationFilters>;
   sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
@@ -12700,6 +13080,7 @@ export type BusinessCapabilityApplicationSupportedByApplicationsNodeAggregateSel
   hostingEnvironment: StringAggregateSelection;
   lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sbom: StringAggregateSelection;
   sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
@@ -12916,6 +13297,7 @@ export type BusinessCapabilityCompanyCompanyNodeAggregateSelection = {
   __typename?: 'BusinessCapabilityCompanyCompanyNodeAggregateSelection';
   achievedSovereigntyScore: FloatAggregateSelection;
   address: StringAggregateSelection;
+  controlPriority: IntAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   diagramFont: StringAggregateSelection;
@@ -12926,10 +13308,13 @@ export type BusinessCapabilityCompanyCompanyNodeAggregateSelection = {
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
+  resiliencePriority: IntAggregateSelection;
   secondaryColor: StringAggregateSelection;
+  securityPriority: IntAggregateSelection;
   sovereigntyGap: FloatAggregateSelection;
   sovereigntyScorePercent: FloatAggregateSelection;
   sovereigntyScoreStatus: StringAggregateSelection;
+  strategicAutonomyPriority: IntAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -13004,6 +13389,7 @@ export type BusinessCapabilityCompanyNodeAggregationWhereInput = {
   OR?: InputMaybe<Array<BusinessCapabilityCompanyNodeAggregationWhereInput>>;
   achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   address?: InputMaybe<StringScalarAggregationFilters>;
+  controlPriority?: InputMaybe<IntScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramFont?: InputMaybe<StringScalarAggregationFilters>;
@@ -13014,10 +13400,13 @@ export type BusinessCapabilityCompanyNodeAggregationWhereInput = {
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  resiliencePriority?: InputMaybe<IntScalarAggregationFilters>;
   secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  securityPriority?: InputMaybe<IntScalarAggregationFilters>;
   sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
   sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
   sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
+  strategicAutonomyPriority?: InputMaybe<IntScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -13981,6 +14370,7 @@ export type BusinessCapabilitySupportedByApplicationsNodeAggregationWhereInput =
   hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
   lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sbom?: InputMaybe<StringScalarAggregationFilters>;
   sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
@@ -14543,6 +14933,7 @@ export type BusinessProcessApplicationSupportedByApplicationsNodeAggregateSelect
   hostingEnvironment: StringAggregateSelection;
   lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sbom: StringAggregateSelection;
   sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
@@ -14759,6 +15150,7 @@ export type BusinessProcessCompanyCompanyNodeAggregateSelection = {
   __typename?: 'BusinessProcessCompanyCompanyNodeAggregateSelection';
   achievedSovereigntyScore: FloatAggregateSelection;
   address: StringAggregateSelection;
+  controlPriority: IntAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   diagramFont: StringAggregateSelection;
@@ -14769,10 +15161,13 @@ export type BusinessProcessCompanyCompanyNodeAggregateSelection = {
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
+  resiliencePriority: IntAggregateSelection;
   secondaryColor: StringAggregateSelection;
+  securityPriority: IntAggregateSelection;
   sovereigntyGap: FloatAggregateSelection;
   sovereigntyScorePercent: FloatAggregateSelection;
   sovereigntyScoreStatus: StringAggregateSelection;
+  strategicAutonomyPriority: IntAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -14847,6 +15242,7 @@ export type BusinessProcessCompanyNodeAggregationWhereInput = {
   OR?: InputMaybe<Array<BusinessProcessCompanyNodeAggregationWhereInput>>;
   achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   address?: InputMaybe<StringScalarAggregationFilters>;
+  controlPriority?: InputMaybe<IntScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramFont?: InputMaybe<StringScalarAggregationFilters>;
@@ -14857,10 +15253,13 @@ export type BusinessProcessCompanyNodeAggregationWhereInput = {
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  resiliencePriority?: InputMaybe<IntScalarAggregationFilters>;
   secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  securityPriority?: InputMaybe<IntScalarAggregationFilters>;
   sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
   sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
   sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
+  strategicAutonomyPriority?: InputMaybe<IntScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -15572,6 +15971,7 @@ export type BusinessProcessSupportedByApplicationsNodeAggregationWhereInput = {
   hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
   lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sbom?: InputMaybe<StringScalarAggregationFilters>;
   sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
@@ -15944,6 +16344,7 @@ export type Company = {
   __typename?: 'Company';
   achievedSovereigntyScore?: Maybe<Scalars['Float']['output']>;
   address?: Maybe<Scalars['String']['output']>;
+  controlPriority?: Maybe<Scalars['Int']['output']>;
   createdAt: Scalars['DateTime']['output'];
   description?: Maybe<Scalars['String']['output']>;
   diagramFont?: Maybe<Scalars['String']['output']>;
@@ -15991,11 +16392,14 @@ export type Company = {
   ownedSuppliers: Array<Supplier>;
   ownedSuppliersConnection: CompanyOwnedSuppliersConnection;
   primaryColor?: Maybe<Scalars['String']['output']>;
+  resiliencePriority?: Maybe<Scalars['Int']['output']>;
   secondaryColor?: Maybe<Scalars['String']['output']>;
+  securityPriority?: Maybe<Scalars['Int']['output']>;
   size?: Maybe<CompanySize>;
   sovereigntyGap?: Maybe<Scalars['Float']['output']>;
   sovereigntyScorePercent?: Maybe<Scalars['Float']['output']>;
   sovereigntyScoreStatus?: Maybe<Scalars['String']['output']>;
+  strategicAutonomyPriority?: Maybe<Scalars['Int']['output']>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
   website?: Maybe<Scalars['String']['output']>;
 };
@@ -16356,6 +16760,7 @@ export type CompanyAggregateNode = {
   __typename?: 'CompanyAggregateNode';
   achievedSovereigntyScore: FloatAggregateSelection;
   address: StringAggregateSelection;
+  controlPriority: IntAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   diagramFont: StringAggregateSelection;
@@ -16366,10 +16771,13 @@ export type CompanyAggregateNode = {
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
+  resiliencePriority: IntAggregateSelection;
   secondaryColor: StringAggregateSelection;
+  securityPriority: IntAggregateSelection;
   sovereigntyGap: FloatAggregateSelection;
   sovereigntyScorePercent: FloatAggregateSelection;
   sovereigntyScoreStatus: StringAggregateSelection;
+  strategicAutonomyPriority: IntAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -16405,6 +16813,7 @@ export type CompanyApplicationOwnedApplicationsNodeAggregateSelection = {
   hostingEnvironment: StringAggregateSelection;
   lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sbom: StringAggregateSelection;
   sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
@@ -16514,6 +16923,7 @@ export type CompanyConnectWhere = {
 export type CompanyCreateInput = {
   achievedSovereigntyScore?: InputMaybe<Scalars['Float']['input']>;
   address?: InputMaybe<Scalars['String']['input']>;
+  controlPriority?: InputMaybe<Scalars['Int']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
   diagramFont?: InputMaybe<Scalars['String']['input']>;
   employees?: InputMaybe<CompanyEmployeesFieldInput>;
@@ -16541,11 +16951,14 @@ export type CompanyCreateInput = {
   ownedInterfaces?: InputMaybe<CompanyOwnedInterfacesFieldInput>;
   ownedSuppliers?: InputMaybe<CompanyOwnedSuppliersFieldInput>;
   primaryColor?: InputMaybe<Scalars['String']['input']>;
+  resiliencePriority?: InputMaybe<Scalars['Int']['input']>;
   secondaryColor?: InputMaybe<Scalars['String']['input']>;
+  securityPriority?: InputMaybe<Scalars['Int']['input']>;
   size?: InputMaybe<CompanySize>;
   sovereigntyGap?: InputMaybe<Scalars['Float']['input']>;
   sovereigntyScorePercent?: InputMaybe<Scalars['Float']['input']>;
   sovereigntyScoreStatus?: InputMaybe<Scalars['String']['input']>;
+  strategicAutonomyPriority?: InputMaybe<Scalars['Int']['input']>;
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
   website?: InputMaybe<Scalars['String']['input']>;
 };
@@ -17162,6 +17575,7 @@ export type CompanyOwnedApplicationsNodeAggregationWhereInput = {
   hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
   lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sbom?: InputMaybe<StringScalarAggregationFilters>;
   sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
@@ -18775,6 +19189,7 @@ export type CompanySizeEnumScalarMutations = {
 export type CompanySort = {
   achievedSovereigntyScore?: InputMaybe<SortDirection>;
   address?: InputMaybe<SortDirection>;
+  controlPriority?: InputMaybe<SortDirection>;
   createdAt?: InputMaybe<SortDirection>;
   description?: InputMaybe<SortDirection>;
   diagramFont?: InputMaybe<SortDirection>;
@@ -18786,11 +19201,14 @@ export type CompanySort = {
   logo?: InputMaybe<SortDirection>;
   name?: InputMaybe<SortDirection>;
   primaryColor?: InputMaybe<SortDirection>;
+  resiliencePriority?: InputMaybe<SortDirection>;
   secondaryColor?: InputMaybe<SortDirection>;
+  securityPriority?: InputMaybe<SortDirection>;
   size?: InputMaybe<SortDirection>;
   sovereigntyGap?: InputMaybe<SortDirection>;
   sovereigntyScorePercent?: InputMaybe<SortDirection>;
   sovereigntyScoreStatus?: InputMaybe<SortDirection>;
+  strategicAutonomyPriority?: InputMaybe<SortDirection>;
   updatedAt?: InputMaybe<SortDirection>;
   website?: InputMaybe<SortDirection>;
 };
@@ -18821,6 +19239,7 @@ export type CompanySupplierOwnedSuppliersNodeAggregateSelection = {
 export type CompanyUpdateInput = {
   achievedSovereigntyScore?: InputMaybe<FloatScalarMutations>;
   address?: InputMaybe<StringScalarMutations>;
+  controlPriority?: InputMaybe<IntScalarMutations>;
   createdAt?: InputMaybe<DateTimeScalarMutations>;
   description?: InputMaybe<StringScalarMutations>;
   diagramFont?: InputMaybe<StringScalarMutations>;
@@ -18849,11 +19268,14 @@ export type CompanyUpdateInput = {
   ownedInterfaces?: InputMaybe<Array<CompanyOwnedInterfacesUpdateFieldInput>>;
   ownedSuppliers?: InputMaybe<Array<CompanyOwnedSuppliersUpdateFieldInput>>;
   primaryColor?: InputMaybe<StringScalarMutations>;
+  resiliencePriority?: InputMaybe<IntScalarMutations>;
   secondaryColor?: InputMaybe<StringScalarMutations>;
+  securityPriority?: InputMaybe<IntScalarMutations>;
   size?: InputMaybe<CompanySizeEnumScalarMutations>;
   sovereigntyGap?: InputMaybe<FloatScalarMutations>;
   sovereigntyScorePercent?: InputMaybe<FloatScalarMutations>;
   sovereigntyScoreStatus?: InputMaybe<StringScalarMutations>;
+  strategicAutonomyPriority?: InputMaybe<IntScalarMutations>;
   website?: InputMaybe<StringScalarMutations>;
 };
 
@@ -18863,6 +19285,7 @@ export type CompanyWhere = {
   OR?: InputMaybe<Array<CompanyWhere>>;
   achievedSovereigntyScore?: InputMaybe<FloatScalarFilters>;
   address?: InputMaybe<StringScalarFilters>;
+  controlPriority?: InputMaybe<IntScalarFilters>;
   createdAt?: InputMaybe<DateTimeScalarFilters>;
   description?: InputMaybe<StringScalarFilters>;
   diagramFont?: InputMaybe<StringScalarFilters>;
@@ -18910,11 +19333,14 @@ export type CompanyWhere = {
   ownedSuppliers?: InputMaybe<SupplierRelationshipFilters>;
   ownedSuppliersConnection?: InputMaybe<CompanyOwnedSuppliersConnectionFilters>;
   primaryColor?: InputMaybe<StringScalarFilters>;
+  resiliencePriority?: InputMaybe<IntScalarFilters>;
   secondaryColor?: InputMaybe<StringScalarFilters>;
+  securityPriority?: InputMaybe<IntScalarFilters>;
   size?: InputMaybe<CompanySizeEnumScalarFilters>;
   sovereigntyGap?: InputMaybe<FloatScalarFilters>;
   sovereigntyScorePercent?: InputMaybe<FloatScalarFilters>;
   sovereigntyScoreStatus?: InputMaybe<StringScalarFilters>;
+  strategicAutonomyPriority?: InputMaybe<IntScalarFilters>;
   updatedAt?: InputMaybe<DateTimeScalarFilters>;
   website?: InputMaybe<StringScalarFilters>;
 };
@@ -19037,6 +19463,18 @@ export type CreateGeaVisionsMutationResponse = {
   info: CreateInfo;
 };
 
+export type CreateHardwareProductsMutationResponse = {
+  __typename?: 'CreateHardwareProductsMutationResponse';
+  hardwareProducts: Array<HardwareProduct>;
+  info: CreateInfo;
+};
+
+export type CreateHardwareVersionsMutationResponse = {
+  __typename?: 'CreateHardwareVersionsMutationResponse';
+  hardwareVersions: Array<HardwareVersion>;
+  info: CreateInfo;
+};
+
 /** Information about the number of nodes and relationships created during a create mutation */
 export type CreateInfo = {
   __typename?: 'CreateInfo';
@@ -19050,6 +19488,12 @@ export type CreateInfrastructuresMutationResponse = {
   infrastructures: Array<Infrastructure>;
 };
 
+export type CreateLifecycleRecordsMutationResponse = {
+  __typename?: 'CreateLifecycleRecordsMutationResponse';
+  info: CreateInfo;
+  lifecycleRecords: Array<LifecycleRecord>;
+};
+
 export type CreateOrganisationsMutationResponse = {
   __typename?: 'CreateOrganisationsMutationResponse';
   info: CreateInfo;
@@ -19060,6 +19504,24 @@ export type CreatePeopleMutationResponse = {
   __typename?: 'CreatePeopleMutationResponse';
   info: CreateInfo;
   people: Array<Person>;
+};
+
+export type CreateSbomDocumentsMutationResponse = {
+  __typename?: 'CreateSbomDocumentsMutationResponse';
+  info: CreateInfo;
+  sbomDocuments: Array<SbomDocument>;
+};
+
+export type CreateSoftwareProductsMutationResponse = {
+  __typename?: 'CreateSoftwareProductsMutationResponse';
+  info: CreateInfo;
+  softwareProducts: Array<SoftwareProduct>;
+};
+
+export type CreateSoftwareVersionsMutationResponse = {
+  __typename?: 'CreateSoftwareVersionsMutationResponse';
+  info: CreateInfo;
+  softwareVersions: Array<SoftwareVersion>;
 };
 
 export type CreateSuppliersMutationResponse = {
@@ -19423,6 +19885,7 @@ export type DataObjectApplicationDataSourcesNodeAggregateSelection = {
   hostingEnvironment: StringAggregateSelection;
   lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sbom: StringAggregateSelection;
   sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
@@ -19460,6 +19923,7 @@ export type DataObjectApplicationUsedByApplicationsNodeAggregateSelection = {
   hostingEnvironment: StringAggregateSelection;
   lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sbom: StringAggregateSelection;
   sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
@@ -19527,6 +19991,7 @@ export type DataObjectCompanyCompanyNodeAggregateSelection = {
   __typename?: 'DataObjectCompanyCompanyNodeAggregateSelection';
   achievedSovereigntyScore: FloatAggregateSelection;
   address: StringAggregateSelection;
+  controlPriority: IntAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   diagramFont: StringAggregateSelection;
@@ -19537,10 +20002,13 @@ export type DataObjectCompanyCompanyNodeAggregateSelection = {
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
+  resiliencePriority: IntAggregateSelection;
   secondaryColor: StringAggregateSelection;
+  securityPriority: IntAggregateSelection;
   sovereigntyGap: FloatAggregateSelection;
   sovereigntyScorePercent: FloatAggregateSelection;
   sovereigntyScoreStatus: StringAggregateSelection;
+  strategicAutonomyPriority: IntAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -19615,6 +20083,7 @@ export type DataObjectCompanyNodeAggregationWhereInput = {
   OR?: InputMaybe<Array<DataObjectCompanyNodeAggregationWhereInput>>;
   achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   address?: InputMaybe<StringScalarAggregationFilters>;
+  controlPriority?: InputMaybe<IntScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramFont?: InputMaybe<StringScalarAggregationFilters>;
@@ -19625,10 +20094,13 @@ export type DataObjectCompanyNodeAggregationWhereInput = {
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  resiliencePriority?: InputMaybe<IntScalarAggregationFilters>;
   secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  securityPriority?: InputMaybe<IntScalarAggregationFilters>;
   sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
   sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
   sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
+  strategicAutonomyPriority?: InputMaybe<IntScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -19836,6 +20308,7 @@ export type DataObjectDataSourcesNodeAggregationWhereInput = {
   hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
   lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sbom?: InputMaybe<StringScalarAggregationFilters>;
   sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
@@ -20922,6 +21395,7 @@ export type DataObjectUsedByApplicationsNodeAggregationWhereInput = {
   hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
   lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sbom?: InputMaybe<StringScalarAggregationFilters>;
   sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
@@ -21641,6 +22115,7 @@ export type DiagramApplicationContainsApplicationsNodeAggregateSelection = {
   hostingEnvironment: StringAggregateSelection;
   lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sbom: StringAggregateSelection;
   sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
@@ -21855,6 +22330,7 @@ export type DiagramCompanyCompanyNodeAggregateSelection = {
   __typename?: 'DiagramCompanyCompanyNodeAggregateSelection';
   achievedSovereigntyScore: FloatAggregateSelection;
   address: StringAggregateSelection;
+  controlPriority: IntAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   diagramFont: StringAggregateSelection;
@@ -21865,10 +22341,13 @@ export type DiagramCompanyCompanyNodeAggregateSelection = {
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
+  resiliencePriority: IntAggregateSelection;
   secondaryColor: StringAggregateSelection;
+  securityPriority: IntAggregateSelection;
   sovereigntyGap: FloatAggregateSelection;
   sovereigntyScorePercent: FloatAggregateSelection;
   sovereigntyScoreStatus: StringAggregateSelection;
+  strategicAutonomyPriority: IntAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -21943,6 +22422,7 @@ export type DiagramCompanyNodeAggregationWhereInput = {
   OR?: InputMaybe<Array<DiagramCompanyNodeAggregationWhereInput>>;
   achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   address?: InputMaybe<StringScalarAggregationFilters>;
+  controlPriority?: InputMaybe<IntScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramFont?: InputMaybe<StringScalarAggregationFilters>;
@@ -21953,10 +22433,13 @@ export type DiagramCompanyNodeAggregationWhereInput = {
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  resiliencePriority?: InputMaybe<IntScalarAggregationFilters>;
   secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  securityPriority?: InputMaybe<IntScalarAggregationFilters>;
   sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
   sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
   sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
+  strategicAutonomyPriority?: InputMaybe<IntScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -22203,6 +22686,7 @@ export type DiagramContainsApplicationsNodeAggregationWhereInput = {
   hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
   lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sbom?: InputMaybe<StringScalarAggregationFilters>;
   sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
@@ -24175,6 +24659,7 @@ export type Gea_GoalCompanyCompanyNodeAggregateSelection = {
   __typename?: 'GEA_GoalCompanyCompanyNodeAggregateSelection';
   achievedSovereigntyScore: FloatAggregateSelection;
   address: StringAggregateSelection;
+  controlPriority: IntAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   diagramFont: StringAggregateSelection;
@@ -24185,10 +24670,13 @@ export type Gea_GoalCompanyCompanyNodeAggregateSelection = {
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
+  resiliencePriority: IntAggregateSelection;
   secondaryColor: StringAggregateSelection;
+  securityPriority: IntAggregateSelection;
   sovereigntyGap: FloatAggregateSelection;
   sovereigntyScorePercent: FloatAggregateSelection;
   sovereigntyScoreStatus: StringAggregateSelection;
+  strategicAutonomyPriority: IntAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -24263,6 +24751,7 @@ export type Gea_GoalCompanyNodeAggregationWhereInput = {
   OR?: InputMaybe<Array<Gea_GoalCompanyNodeAggregationWhereInput>>;
   achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   address?: InputMaybe<StringScalarAggregationFilters>;
+  controlPriority?: InputMaybe<IntScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramFont?: InputMaybe<StringScalarAggregationFilters>;
@@ -24273,10 +24762,13 @@ export type Gea_GoalCompanyNodeAggregationWhereInput = {
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  resiliencePriority?: InputMaybe<IntScalarAggregationFilters>;
   secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  securityPriority?: InputMaybe<IntScalarAggregationFilters>;
   sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
   sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
   sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
+  strategicAutonomyPriority?: InputMaybe<IntScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -25417,6 +25909,7 @@ export type Gea_MissionCompanyCompanyNodeAggregateSelection = {
   __typename?: 'GEA_MissionCompanyCompanyNodeAggregateSelection';
   achievedSovereigntyScore: FloatAggregateSelection;
   address: StringAggregateSelection;
+  controlPriority: IntAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   diagramFont: StringAggregateSelection;
@@ -25427,10 +25920,13 @@ export type Gea_MissionCompanyCompanyNodeAggregateSelection = {
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
+  resiliencePriority: IntAggregateSelection;
   secondaryColor: StringAggregateSelection;
+  securityPriority: IntAggregateSelection;
   sovereigntyGap: FloatAggregateSelection;
   sovereigntyScorePercent: FloatAggregateSelection;
   sovereigntyScoreStatus: StringAggregateSelection;
+  strategicAutonomyPriority: IntAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -25505,6 +26001,7 @@ export type Gea_MissionCompanyNodeAggregationWhereInput = {
   OR?: InputMaybe<Array<Gea_MissionCompanyNodeAggregationWhereInput>>;
   achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   address?: InputMaybe<StringScalarAggregationFilters>;
+  controlPriority?: InputMaybe<IntScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramFont?: InputMaybe<StringScalarAggregationFilters>;
@@ -25515,10 +26012,13 @@ export type Gea_MissionCompanyNodeAggregationWhereInput = {
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  resiliencePriority?: InputMaybe<IntScalarAggregationFilters>;
   secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  securityPriority?: InputMaybe<IntScalarAggregationFilters>;
   sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
   sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
   sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
+  strategicAutonomyPriority?: InputMaybe<IntScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -26711,6 +27211,7 @@ export type Gea_StrategyCompanyCompanyNodeAggregateSelection = {
   __typename?: 'GEA_StrategyCompanyCompanyNodeAggregateSelection';
   achievedSovereigntyScore: FloatAggregateSelection;
   address: StringAggregateSelection;
+  controlPriority: IntAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   diagramFont: StringAggregateSelection;
@@ -26721,10 +27222,13 @@ export type Gea_StrategyCompanyCompanyNodeAggregateSelection = {
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
+  resiliencePriority: IntAggregateSelection;
   secondaryColor: StringAggregateSelection;
+  securityPriority: IntAggregateSelection;
   sovereigntyGap: FloatAggregateSelection;
   sovereigntyScorePercent: FloatAggregateSelection;
   sovereigntyScoreStatus: StringAggregateSelection;
+  strategicAutonomyPriority: IntAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -26799,6 +27303,7 @@ export type Gea_StrategyCompanyNodeAggregationWhereInput = {
   OR?: InputMaybe<Array<Gea_StrategyCompanyNodeAggregationWhereInput>>;
   achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   address?: InputMaybe<StringScalarAggregationFilters>;
+  controlPriority?: InputMaybe<IntScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramFont?: InputMaybe<StringScalarAggregationFilters>;
@@ -26809,10 +27314,13 @@ export type Gea_StrategyCompanyNodeAggregationWhereInput = {
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  resiliencePriority?: InputMaybe<IntScalarAggregationFilters>;
   secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  securityPriority?: InputMaybe<IntScalarAggregationFilters>;
   sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
   sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
   sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
+  strategicAutonomyPriority?: InputMaybe<IntScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -27506,6 +28014,7 @@ export type Gea_ValueCompanyCompanyNodeAggregateSelection = {
   __typename?: 'GEA_ValueCompanyCompanyNodeAggregateSelection';
   achievedSovereigntyScore: FloatAggregateSelection;
   address: StringAggregateSelection;
+  controlPriority: IntAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   diagramFont: StringAggregateSelection;
@@ -27516,10 +28025,13 @@ export type Gea_ValueCompanyCompanyNodeAggregateSelection = {
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
+  resiliencePriority: IntAggregateSelection;
   secondaryColor: StringAggregateSelection;
+  securityPriority: IntAggregateSelection;
   sovereigntyGap: FloatAggregateSelection;
   sovereigntyScorePercent: FloatAggregateSelection;
   sovereigntyScoreStatus: StringAggregateSelection;
+  strategicAutonomyPriority: IntAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -27594,6 +28106,7 @@ export type Gea_ValueCompanyNodeAggregationWhereInput = {
   OR?: InputMaybe<Array<Gea_ValueCompanyNodeAggregationWhereInput>>;
   achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   address?: InputMaybe<StringScalarAggregationFilters>;
+  controlPriority?: InputMaybe<IntScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramFont?: InputMaybe<StringScalarAggregationFilters>;
@@ -27604,10 +28117,13 @@ export type Gea_ValueCompanyNodeAggregationWhereInput = {
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  resiliencePriority?: InputMaybe<IntScalarAggregationFilters>;
   secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  securityPriority?: InputMaybe<IntScalarAggregationFilters>;
   sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
   sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
   sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
+  strategicAutonomyPriority?: InputMaybe<IntScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -28581,6 +29097,7 @@ export type Gea_VisionCompanyCompanyNodeAggregateSelection = {
   __typename?: 'GEA_VisionCompanyCompanyNodeAggregateSelection';
   achievedSovereigntyScore: FloatAggregateSelection;
   address: StringAggregateSelection;
+  controlPriority: IntAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   diagramFont: StringAggregateSelection;
@@ -28591,10 +29108,13 @@ export type Gea_VisionCompanyCompanyNodeAggregateSelection = {
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
+  resiliencePriority: IntAggregateSelection;
   secondaryColor: StringAggregateSelection;
+  securityPriority: IntAggregateSelection;
   sovereigntyGap: FloatAggregateSelection;
   sovereigntyScorePercent: FloatAggregateSelection;
   sovereigntyScoreStatus: StringAggregateSelection;
+  strategicAutonomyPriority: IntAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -28669,6 +29189,7 @@ export type Gea_VisionCompanyNodeAggregationWhereInput = {
   OR?: InputMaybe<Array<Gea_VisionCompanyNodeAggregationWhereInput>>;
   achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   address?: InputMaybe<StringScalarAggregationFilters>;
+  controlPriority?: InputMaybe<IntScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramFont?: InputMaybe<StringScalarAggregationFilters>;
@@ -28679,10 +29200,13 @@ export type Gea_VisionCompanyNodeAggregationWhereInput = {
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  resiliencePriority?: InputMaybe<IntScalarAggregationFilters>;
   secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  securityPriority?: InputMaybe<IntScalarAggregationFilters>;
   sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
   sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
   sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
+  strategicAutonomyPriority?: InputMaybe<IntScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -29634,6 +30158,1695 @@ export type GeaVisionsConnection = {
   totalCount: Scalars['Int']['output'];
 };
 
+/** HardwareProduct – normalized hardware product entity for technology lifecycle management */
+export type HardwareProduct = {
+  __typename?: 'HardwareProduct';
+  company: Array<Company>;
+  companyConnection: HardwareProductCompanyConnection;
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  isActive?: Maybe<Scalars['Boolean']['output']>;
+  lifecycleStatus?: Maybe<LifecycleStatus>;
+  maintainedBy: Array<Supplier>;
+  maintainedByConnection: HardwareProductMaintainedByConnection;
+  manufacturedBy: Array<Supplier>;
+  manufacturedByConnection: HardwareProductManufacturedByConnection;
+  name: Scalars['String']['output'];
+  productFamily?: Maybe<Scalars['String']['output']>;
+  providedBy: Array<Supplier>;
+  providedByConnection: HardwareProductProvidedByConnection;
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  usedByInfrastructure: Array<Infrastructure>;
+  usedByInfrastructureConnection: HardwareProductUsedByInfrastructureConnection;
+  versions: Array<HardwareVersion>;
+  versionsConnection: HardwareProductVersionsConnection;
+};
+
+
+/** HardwareProduct – normalized hardware product entity for technology lifecycle management */
+export type HardwareProductCompanyArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<CompanySort>>;
+  where?: InputMaybe<CompanyWhere>;
+};
+
+
+/** HardwareProduct – normalized hardware product entity for technology lifecycle management */
+export type HardwareProductCompanyConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<HardwareProductCompanyConnectionSort>>;
+  where?: InputMaybe<HardwareProductCompanyConnectionWhere>;
+};
+
+
+/** HardwareProduct – normalized hardware product entity for technology lifecycle management */
+export type HardwareProductMaintainedByArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SupplierSort>>;
+  where?: InputMaybe<SupplierWhere>;
+};
+
+
+/** HardwareProduct – normalized hardware product entity for technology lifecycle management */
+export type HardwareProductMaintainedByConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<HardwareProductMaintainedByConnectionSort>>;
+  where?: InputMaybe<HardwareProductMaintainedByConnectionWhere>;
+};
+
+
+/** HardwareProduct – normalized hardware product entity for technology lifecycle management */
+export type HardwareProductManufacturedByArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SupplierSort>>;
+  where?: InputMaybe<SupplierWhere>;
+};
+
+
+/** HardwareProduct – normalized hardware product entity for technology lifecycle management */
+export type HardwareProductManufacturedByConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<HardwareProductManufacturedByConnectionSort>>;
+  where?: InputMaybe<HardwareProductManufacturedByConnectionWhere>;
+};
+
+
+/** HardwareProduct – normalized hardware product entity for technology lifecycle management */
+export type HardwareProductProvidedByArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SupplierSort>>;
+  where?: InputMaybe<SupplierWhere>;
+};
+
+
+/** HardwareProduct – normalized hardware product entity for technology lifecycle management */
+export type HardwareProductProvidedByConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<HardwareProductProvidedByConnectionSort>>;
+  where?: InputMaybe<HardwareProductProvidedByConnectionWhere>;
+};
+
+
+/** HardwareProduct – normalized hardware product entity for technology lifecycle management */
+export type HardwareProductUsedByInfrastructureArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<InfrastructureSort>>;
+  where?: InputMaybe<InfrastructureWhere>;
+};
+
+
+/** HardwareProduct – normalized hardware product entity for technology lifecycle management */
+export type HardwareProductUsedByInfrastructureConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<HardwareProductUsedByInfrastructureConnectionSort>>;
+  where?: InputMaybe<HardwareProductUsedByInfrastructureConnectionWhere>;
+};
+
+
+/** HardwareProduct – normalized hardware product entity for technology lifecycle management */
+export type HardwareProductVersionsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<HardwareVersionSort>>;
+  where?: InputMaybe<HardwareVersionWhere>;
+};
+
+
+/** HardwareProduct – normalized hardware product entity for technology lifecycle management */
+export type HardwareProductVersionsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<HardwareProductVersionsConnectionSort>>;
+  where?: InputMaybe<HardwareProductVersionsConnectionWhere>;
+};
+
+export type HardwareProductAggregate = {
+  __typename?: 'HardwareProductAggregate';
+  count: Count;
+  node: HardwareProductAggregateNode;
+};
+
+export type HardwareProductAggregateNode = {
+  __typename?: 'HardwareProductAggregateNode';
+  createdAt: DateTimeAggregateSelection;
+  name: StringAggregateSelection;
+  productFamily: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
+export type HardwareProductCompanyAggregateInput = {
+  AND?: InputMaybe<Array<HardwareProductCompanyAggregateInput>>;
+  NOT?: InputMaybe<HardwareProductCompanyAggregateInput>;
+  OR?: InputMaybe<Array<HardwareProductCompanyAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<HardwareProductCompanyNodeAggregationWhereInput>;
+};
+
+export type HardwareProductCompanyCompanyAggregateSelection = {
+  __typename?: 'HardwareProductCompanyCompanyAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<HardwareProductCompanyCompanyNodeAggregateSelection>;
+};
+
+export type HardwareProductCompanyCompanyNodeAggregateSelection = {
+  __typename?: 'HardwareProductCompanyCompanyNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
+  address: StringAggregateSelection;
+  controlPriority: IntAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  diagramFont: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
+  features: StringAggregateSelection;
+  font: StringAggregateSelection;
+  industry: StringAggregateSelection;
+  logo: StringAggregateSelection;
+  name: StringAggregateSelection;
+  primaryColor: StringAggregateSelection;
+  resiliencePriority: IntAggregateSelection;
+  secondaryColor: StringAggregateSelection;
+  securityPriority: IntAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
+  sovereigntyScoreStatus: StringAggregateSelection;
+  strategicAutonomyPriority: IntAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  website: StringAggregateSelection;
+};
+
+export type HardwareProductCompanyConnectFieldInput = {
+  connect?: InputMaybe<Array<CompanyConnectInput>>;
+  where?: InputMaybe<CompanyConnectWhere>;
+};
+
+export type HardwareProductCompanyConnection = {
+  __typename?: 'HardwareProductCompanyConnection';
+  aggregate: HardwareProductCompanyCompanyAggregateSelection;
+  edges: Array<HardwareProductCompanyRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type HardwareProductCompanyConnectionAggregateInput = {
+  AND?: InputMaybe<Array<HardwareProductCompanyConnectionAggregateInput>>;
+  NOT?: InputMaybe<HardwareProductCompanyConnectionAggregateInput>;
+  OR?: InputMaybe<Array<HardwareProductCompanyConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<HardwareProductCompanyNodeAggregationWhereInput>;
+};
+
+export type HardwareProductCompanyConnectionFilters = {
+  /** Filter HardwareProducts by aggregating results on related HardwareProductCompanyConnections */
+  aggregate?: InputMaybe<HardwareProductCompanyConnectionAggregateInput>;
+  /** Return HardwareProducts where all of the related HardwareProductCompanyConnections match this filter */
+  all?: InputMaybe<HardwareProductCompanyConnectionWhere>;
+  /** Return HardwareProducts where none of the related HardwareProductCompanyConnections match this filter */
+  none?: InputMaybe<HardwareProductCompanyConnectionWhere>;
+  /** Return HardwareProducts where one of the related HardwareProductCompanyConnections match this filter */
+  single?: InputMaybe<HardwareProductCompanyConnectionWhere>;
+  /** Return HardwareProducts where some of the related HardwareProductCompanyConnections match this filter */
+  some?: InputMaybe<HardwareProductCompanyConnectionWhere>;
+};
+
+export type HardwareProductCompanyConnectionSort = {
+  node?: InputMaybe<CompanySort>;
+};
+
+export type HardwareProductCompanyConnectionWhere = {
+  AND?: InputMaybe<Array<HardwareProductCompanyConnectionWhere>>;
+  NOT?: InputMaybe<HardwareProductCompanyConnectionWhere>;
+  OR?: InputMaybe<Array<HardwareProductCompanyConnectionWhere>>;
+  node?: InputMaybe<CompanyWhere>;
+};
+
+export type HardwareProductCompanyCreateFieldInput = {
+  node: CompanyCreateInput;
+};
+
+export type HardwareProductCompanyDeleteFieldInput = {
+  delete?: InputMaybe<CompanyDeleteInput>;
+  where?: InputMaybe<HardwareProductCompanyConnectionWhere>;
+};
+
+export type HardwareProductCompanyDisconnectFieldInput = {
+  disconnect?: InputMaybe<CompanyDisconnectInput>;
+  where?: InputMaybe<HardwareProductCompanyConnectionWhere>;
+};
+
+export type HardwareProductCompanyFieldInput = {
+  connect?: InputMaybe<Array<HardwareProductCompanyConnectFieldInput>>;
+  create?: InputMaybe<Array<HardwareProductCompanyCreateFieldInput>>;
+};
+
+export type HardwareProductCompanyNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<HardwareProductCompanyNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<HardwareProductCompanyNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<HardwareProductCompanyNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
+  address?: InputMaybe<StringScalarAggregationFilters>;
+  controlPriority?: InputMaybe<IntScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  diagramFont?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
+  features?: InputMaybe<StringScalarAggregationFilters>;
+  font?: InputMaybe<StringScalarAggregationFilters>;
+  industry?: InputMaybe<StringScalarAggregationFilters>;
+  logo?: InputMaybe<StringScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  primaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  resiliencePriority?: InputMaybe<IntScalarAggregationFilters>;
+  secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  securityPriority?: InputMaybe<IntScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
+  strategicAutonomyPriority?: InputMaybe<IntScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  website?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type HardwareProductCompanyRelationship = {
+  __typename?: 'HardwareProductCompanyRelationship';
+  cursor: Scalars['String']['output'];
+  node: Company;
+};
+
+export type HardwareProductCompanyUpdateConnectionInput = {
+  node?: InputMaybe<CompanyUpdateInput>;
+  where?: InputMaybe<HardwareProductCompanyConnectionWhere>;
+};
+
+export type HardwareProductCompanyUpdateFieldInput = {
+  connect?: InputMaybe<Array<HardwareProductCompanyConnectFieldInput>>;
+  create?: InputMaybe<Array<HardwareProductCompanyCreateFieldInput>>;
+  delete?: InputMaybe<Array<HardwareProductCompanyDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<HardwareProductCompanyDisconnectFieldInput>>;
+  update?: InputMaybe<HardwareProductCompanyUpdateConnectionInput>;
+};
+
+export type HardwareProductConnectInput = {
+  company?: InputMaybe<Array<HardwareProductCompanyConnectFieldInput>>;
+  maintainedBy?: InputMaybe<Array<HardwareProductMaintainedByConnectFieldInput>>;
+  manufacturedBy?: InputMaybe<Array<HardwareProductManufacturedByConnectFieldInput>>;
+  providedBy?: InputMaybe<Array<HardwareProductProvidedByConnectFieldInput>>;
+  usedByInfrastructure?: InputMaybe<Array<HardwareProductUsedByInfrastructureConnectFieldInput>>;
+  versions?: InputMaybe<Array<HardwareProductVersionsConnectFieldInput>>;
+};
+
+export type HardwareProductConnectWhere = {
+  node: HardwareProductWhere;
+};
+
+export type HardwareProductCreateInput = {
+  company?: InputMaybe<HardwareProductCompanyFieldInput>;
+  isActive?: InputMaybe<Scalars['Boolean']['input']>;
+  lifecycleStatus?: InputMaybe<LifecycleStatus>;
+  maintainedBy?: InputMaybe<HardwareProductMaintainedByFieldInput>;
+  manufacturedBy?: InputMaybe<HardwareProductManufacturedByFieldInput>;
+  name: Scalars['String']['input'];
+  productFamily?: InputMaybe<Scalars['String']['input']>;
+  providedBy?: InputMaybe<HardwareProductProvidedByFieldInput>;
+  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  usedByInfrastructure?: InputMaybe<HardwareProductUsedByInfrastructureFieldInput>;
+  versions?: InputMaybe<HardwareProductVersionsFieldInput>;
+};
+
+export type HardwareProductDeleteInput = {
+  company?: InputMaybe<Array<HardwareProductCompanyDeleteFieldInput>>;
+  maintainedBy?: InputMaybe<Array<HardwareProductMaintainedByDeleteFieldInput>>;
+  manufacturedBy?: InputMaybe<Array<HardwareProductManufacturedByDeleteFieldInput>>;
+  providedBy?: InputMaybe<Array<HardwareProductProvidedByDeleteFieldInput>>;
+  usedByInfrastructure?: InputMaybe<Array<HardwareProductUsedByInfrastructureDeleteFieldInput>>;
+  versions?: InputMaybe<Array<HardwareProductVersionsDeleteFieldInput>>;
+};
+
+export type HardwareProductDisconnectInput = {
+  company?: InputMaybe<Array<HardwareProductCompanyDisconnectFieldInput>>;
+  maintainedBy?: InputMaybe<Array<HardwareProductMaintainedByDisconnectFieldInput>>;
+  manufacturedBy?: InputMaybe<Array<HardwareProductManufacturedByDisconnectFieldInput>>;
+  providedBy?: InputMaybe<Array<HardwareProductProvidedByDisconnectFieldInput>>;
+  usedByInfrastructure?: InputMaybe<Array<HardwareProductUsedByInfrastructureDisconnectFieldInput>>;
+  versions?: InputMaybe<Array<HardwareProductVersionsDisconnectFieldInput>>;
+};
+
+export type HardwareProductEdge = {
+  __typename?: 'HardwareProductEdge';
+  cursor: Scalars['String']['output'];
+  node: HardwareProduct;
+};
+
+export type HardwareProductHardwareVersionVersionsAggregateSelection = {
+  __typename?: 'HardwareProductHardwareVersionVersionsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<HardwareProductHardwareVersionVersionsNodeAggregateSelection>;
+};
+
+export type HardwareProductHardwareVersionVersionsNodeAggregateSelection = {
+  __typename?: 'HardwareProductHardwareVersionVersionsNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  normalizedVersionModel: StringAggregateSelection;
+  releaseChannel: StringAggregateSelection;
+  supportTier: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  versionModelString: StringAggregateSelection;
+};
+
+export type HardwareProductInfrastructureUsedByInfrastructureAggregateSelection = {
+  __typename?: 'HardwareProductInfrastructureUsedByInfrastructureAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<HardwareProductInfrastructureUsedByInfrastructureNodeAggregateSelection>;
+};
+
+export type HardwareProductInfrastructureUsedByInfrastructureNodeAggregateSelection = {
+  __typename?: 'HardwareProductInfrastructureUsedByInfrastructureNodeAggregateSelection';
+  capacity: StringAggregateSelection;
+  costs: FloatAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  ipAddress: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
+  location: StringAggregateSelection;
+  maintenanceWindow: StringAggregateSelection;
+  name: StringAggregateSelection;
+  operatingSystem: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
+  specifications: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  vendor: StringAggregateSelection;
+  version: StringAggregateSelection;
+};
+
+export type HardwareProductMaintainedByAggregateInput = {
+  AND?: InputMaybe<Array<HardwareProductMaintainedByAggregateInput>>;
+  NOT?: InputMaybe<HardwareProductMaintainedByAggregateInput>;
+  OR?: InputMaybe<Array<HardwareProductMaintainedByAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<HardwareProductMaintainedByNodeAggregationWhereInput>;
+};
+
+export type HardwareProductMaintainedByConnectFieldInput = {
+  connect?: InputMaybe<Array<SupplierConnectInput>>;
+  where?: InputMaybe<SupplierConnectWhere>;
+};
+
+export type HardwareProductMaintainedByConnection = {
+  __typename?: 'HardwareProductMaintainedByConnection';
+  aggregate: HardwareProductSupplierMaintainedByAggregateSelection;
+  edges: Array<HardwareProductMaintainedByRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type HardwareProductMaintainedByConnectionAggregateInput = {
+  AND?: InputMaybe<Array<HardwareProductMaintainedByConnectionAggregateInput>>;
+  NOT?: InputMaybe<HardwareProductMaintainedByConnectionAggregateInput>;
+  OR?: InputMaybe<Array<HardwareProductMaintainedByConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<HardwareProductMaintainedByNodeAggregationWhereInput>;
+};
+
+export type HardwareProductMaintainedByConnectionFilters = {
+  /** Filter HardwareProducts by aggregating results on related HardwareProductMaintainedByConnections */
+  aggregate?: InputMaybe<HardwareProductMaintainedByConnectionAggregateInput>;
+  /** Return HardwareProducts where all of the related HardwareProductMaintainedByConnections match this filter */
+  all?: InputMaybe<HardwareProductMaintainedByConnectionWhere>;
+  /** Return HardwareProducts where none of the related HardwareProductMaintainedByConnections match this filter */
+  none?: InputMaybe<HardwareProductMaintainedByConnectionWhere>;
+  /** Return HardwareProducts where one of the related HardwareProductMaintainedByConnections match this filter */
+  single?: InputMaybe<HardwareProductMaintainedByConnectionWhere>;
+  /** Return HardwareProducts where some of the related HardwareProductMaintainedByConnections match this filter */
+  some?: InputMaybe<HardwareProductMaintainedByConnectionWhere>;
+};
+
+export type HardwareProductMaintainedByConnectionSort = {
+  node?: InputMaybe<SupplierSort>;
+};
+
+export type HardwareProductMaintainedByConnectionWhere = {
+  AND?: InputMaybe<Array<HardwareProductMaintainedByConnectionWhere>>;
+  NOT?: InputMaybe<HardwareProductMaintainedByConnectionWhere>;
+  OR?: InputMaybe<Array<HardwareProductMaintainedByConnectionWhere>>;
+  node?: InputMaybe<SupplierWhere>;
+};
+
+export type HardwareProductMaintainedByCreateFieldInput = {
+  node: SupplierCreateInput;
+};
+
+export type HardwareProductMaintainedByDeleteFieldInput = {
+  delete?: InputMaybe<SupplierDeleteInput>;
+  where?: InputMaybe<HardwareProductMaintainedByConnectionWhere>;
+};
+
+export type HardwareProductMaintainedByDisconnectFieldInput = {
+  disconnect?: InputMaybe<SupplierDisconnectInput>;
+  where?: InputMaybe<HardwareProductMaintainedByConnectionWhere>;
+};
+
+export type HardwareProductMaintainedByFieldInput = {
+  connect?: InputMaybe<Array<HardwareProductMaintainedByConnectFieldInput>>;
+  create?: InputMaybe<Array<HardwareProductMaintainedByCreateFieldInput>>;
+};
+
+export type HardwareProductMaintainedByNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<HardwareProductMaintainedByNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<HardwareProductMaintainedByNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<HardwareProductMaintainedByNodeAggregationWhereInput>>;
+  address?: InputMaybe<StringScalarAggregationFilters>;
+  annualSpend?: InputMaybe<FloatScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  email?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  performanceRating?: InputMaybe<IntScalarAggregationFilters>;
+  phone?: InputMaybe<StringScalarAggregationFilters>;
+  primaryContactPerson?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  website?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type HardwareProductMaintainedByRelationship = {
+  __typename?: 'HardwareProductMaintainedByRelationship';
+  cursor: Scalars['String']['output'];
+  node: Supplier;
+};
+
+export type HardwareProductMaintainedByUpdateConnectionInput = {
+  node?: InputMaybe<SupplierUpdateInput>;
+  where?: InputMaybe<HardwareProductMaintainedByConnectionWhere>;
+};
+
+export type HardwareProductMaintainedByUpdateFieldInput = {
+  connect?: InputMaybe<Array<HardwareProductMaintainedByConnectFieldInput>>;
+  create?: InputMaybe<Array<HardwareProductMaintainedByCreateFieldInput>>;
+  delete?: InputMaybe<Array<HardwareProductMaintainedByDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<HardwareProductMaintainedByDisconnectFieldInput>>;
+  update?: InputMaybe<HardwareProductMaintainedByUpdateConnectionInput>;
+};
+
+export type HardwareProductManufacturedByAggregateInput = {
+  AND?: InputMaybe<Array<HardwareProductManufacturedByAggregateInput>>;
+  NOT?: InputMaybe<HardwareProductManufacturedByAggregateInput>;
+  OR?: InputMaybe<Array<HardwareProductManufacturedByAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<HardwareProductManufacturedByNodeAggregationWhereInput>;
+};
+
+export type HardwareProductManufacturedByConnectFieldInput = {
+  connect?: InputMaybe<Array<SupplierConnectInput>>;
+  where?: InputMaybe<SupplierConnectWhere>;
+};
+
+export type HardwareProductManufacturedByConnection = {
+  __typename?: 'HardwareProductManufacturedByConnection';
+  aggregate: HardwareProductSupplierManufacturedByAggregateSelection;
+  edges: Array<HardwareProductManufacturedByRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type HardwareProductManufacturedByConnectionAggregateInput = {
+  AND?: InputMaybe<Array<HardwareProductManufacturedByConnectionAggregateInput>>;
+  NOT?: InputMaybe<HardwareProductManufacturedByConnectionAggregateInput>;
+  OR?: InputMaybe<Array<HardwareProductManufacturedByConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<HardwareProductManufacturedByNodeAggregationWhereInput>;
+};
+
+export type HardwareProductManufacturedByConnectionFilters = {
+  /** Filter HardwareProducts by aggregating results on related HardwareProductManufacturedByConnections */
+  aggregate?: InputMaybe<HardwareProductManufacturedByConnectionAggregateInput>;
+  /** Return HardwareProducts where all of the related HardwareProductManufacturedByConnections match this filter */
+  all?: InputMaybe<HardwareProductManufacturedByConnectionWhere>;
+  /** Return HardwareProducts where none of the related HardwareProductManufacturedByConnections match this filter */
+  none?: InputMaybe<HardwareProductManufacturedByConnectionWhere>;
+  /** Return HardwareProducts where one of the related HardwareProductManufacturedByConnections match this filter */
+  single?: InputMaybe<HardwareProductManufacturedByConnectionWhere>;
+  /** Return HardwareProducts where some of the related HardwareProductManufacturedByConnections match this filter */
+  some?: InputMaybe<HardwareProductManufacturedByConnectionWhere>;
+};
+
+export type HardwareProductManufacturedByConnectionSort = {
+  node?: InputMaybe<SupplierSort>;
+};
+
+export type HardwareProductManufacturedByConnectionWhere = {
+  AND?: InputMaybe<Array<HardwareProductManufacturedByConnectionWhere>>;
+  NOT?: InputMaybe<HardwareProductManufacturedByConnectionWhere>;
+  OR?: InputMaybe<Array<HardwareProductManufacturedByConnectionWhere>>;
+  node?: InputMaybe<SupplierWhere>;
+};
+
+export type HardwareProductManufacturedByCreateFieldInput = {
+  node: SupplierCreateInput;
+};
+
+export type HardwareProductManufacturedByDeleteFieldInput = {
+  delete?: InputMaybe<SupplierDeleteInput>;
+  where?: InputMaybe<HardwareProductManufacturedByConnectionWhere>;
+};
+
+export type HardwareProductManufacturedByDisconnectFieldInput = {
+  disconnect?: InputMaybe<SupplierDisconnectInput>;
+  where?: InputMaybe<HardwareProductManufacturedByConnectionWhere>;
+};
+
+export type HardwareProductManufacturedByFieldInput = {
+  connect?: InputMaybe<Array<HardwareProductManufacturedByConnectFieldInput>>;
+  create?: InputMaybe<Array<HardwareProductManufacturedByCreateFieldInput>>;
+};
+
+export type HardwareProductManufacturedByNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<HardwareProductManufacturedByNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<HardwareProductManufacturedByNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<HardwareProductManufacturedByNodeAggregationWhereInput>>;
+  address?: InputMaybe<StringScalarAggregationFilters>;
+  annualSpend?: InputMaybe<FloatScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  email?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  performanceRating?: InputMaybe<IntScalarAggregationFilters>;
+  phone?: InputMaybe<StringScalarAggregationFilters>;
+  primaryContactPerson?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  website?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type HardwareProductManufacturedByRelationship = {
+  __typename?: 'HardwareProductManufacturedByRelationship';
+  cursor: Scalars['String']['output'];
+  node: Supplier;
+};
+
+export type HardwareProductManufacturedByUpdateConnectionInput = {
+  node?: InputMaybe<SupplierUpdateInput>;
+  where?: InputMaybe<HardwareProductManufacturedByConnectionWhere>;
+};
+
+export type HardwareProductManufacturedByUpdateFieldInput = {
+  connect?: InputMaybe<Array<HardwareProductManufacturedByConnectFieldInput>>;
+  create?: InputMaybe<Array<HardwareProductManufacturedByCreateFieldInput>>;
+  delete?: InputMaybe<Array<HardwareProductManufacturedByDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<HardwareProductManufacturedByDisconnectFieldInput>>;
+  update?: InputMaybe<HardwareProductManufacturedByUpdateConnectionInput>;
+};
+
+export type HardwareProductProvidedByAggregateInput = {
+  AND?: InputMaybe<Array<HardwareProductProvidedByAggregateInput>>;
+  NOT?: InputMaybe<HardwareProductProvidedByAggregateInput>;
+  OR?: InputMaybe<Array<HardwareProductProvidedByAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<HardwareProductProvidedByNodeAggregationWhereInput>;
+};
+
+export type HardwareProductProvidedByConnectFieldInput = {
+  connect?: InputMaybe<Array<SupplierConnectInput>>;
+  where?: InputMaybe<SupplierConnectWhere>;
+};
+
+export type HardwareProductProvidedByConnection = {
+  __typename?: 'HardwareProductProvidedByConnection';
+  aggregate: HardwareProductSupplierProvidedByAggregateSelection;
+  edges: Array<HardwareProductProvidedByRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type HardwareProductProvidedByConnectionAggregateInput = {
+  AND?: InputMaybe<Array<HardwareProductProvidedByConnectionAggregateInput>>;
+  NOT?: InputMaybe<HardwareProductProvidedByConnectionAggregateInput>;
+  OR?: InputMaybe<Array<HardwareProductProvidedByConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<HardwareProductProvidedByNodeAggregationWhereInput>;
+};
+
+export type HardwareProductProvidedByConnectionFilters = {
+  /** Filter HardwareProducts by aggregating results on related HardwareProductProvidedByConnections */
+  aggregate?: InputMaybe<HardwareProductProvidedByConnectionAggregateInput>;
+  /** Return HardwareProducts where all of the related HardwareProductProvidedByConnections match this filter */
+  all?: InputMaybe<HardwareProductProvidedByConnectionWhere>;
+  /** Return HardwareProducts where none of the related HardwareProductProvidedByConnections match this filter */
+  none?: InputMaybe<HardwareProductProvidedByConnectionWhere>;
+  /** Return HardwareProducts where one of the related HardwareProductProvidedByConnections match this filter */
+  single?: InputMaybe<HardwareProductProvidedByConnectionWhere>;
+  /** Return HardwareProducts where some of the related HardwareProductProvidedByConnections match this filter */
+  some?: InputMaybe<HardwareProductProvidedByConnectionWhere>;
+};
+
+export type HardwareProductProvidedByConnectionSort = {
+  node?: InputMaybe<SupplierSort>;
+};
+
+export type HardwareProductProvidedByConnectionWhere = {
+  AND?: InputMaybe<Array<HardwareProductProvidedByConnectionWhere>>;
+  NOT?: InputMaybe<HardwareProductProvidedByConnectionWhere>;
+  OR?: InputMaybe<Array<HardwareProductProvidedByConnectionWhere>>;
+  node?: InputMaybe<SupplierWhere>;
+};
+
+export type HardwareProductProvidedByCreateFieldInput = {
+  node: SupplierCreateInput;
+};
+
+export type HardwareProductProvidedByDeleteFieldInput = {
+  delete?: InputMaybe<SupplierDeleteInput>;
+  where?: InputMaybe<HardwareProductProvidedByConnectionWhere>;
+};
+
+export type HardwareProductProvidedByDisconnectFieldInput = {
+  disconnect?: InputMaybe<SupplierDisconnectInput>;
+  where?: InputMaybe<HardwareProductProvidedByConnectionWhere>;
+};
+
+export type HardwareProductProvidedByFieldInput = {
+  connect?: InputMaybe<Array<HardwareProductProvidedByConnectFieldInput>>;
+  create?: InputMaybe<Array<HardwareProductProvidedByCreateFieldInput>>;
+};
+
+export type HardwareProductProvidedByNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<HardwareProductProvidedByNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<HardwareProductProvidedByNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<HardwareProductProvidedByNodeAggregationWhereInput>>;
+  address?: InputMaybe<StringScalarAggregationFilters>;
+  annualSpend?: InputMaybe<FloatScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  email?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  performanceRating?: InputMaybe<IntScalarAggregationFilters>;
+  phone?: InputMaybe<StringScalarAggregationFilters>;
+  primaryContactPerson?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  website?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type HardwareProductProvidedByRelationship = {
+  __typename?: 'HardwareProductProvidedByRelationship';
+  cursor: Scalars['String']['output'];
+  node: Supplier;
+};
+
+export type HardwareProductProvidedByUpdateConnectionInput = {
+  node?: InputMaybe<SupplierUpdateInput>;
+  where?: InputMaybe<HardwareProductProvidedByConnectionWhere>;
+};
+
+export type HardwareProductProvidedByUpdateFieldInput = {
+  connect?: InputMaybe<Array<HardwareProductProvidedByConnectFieldInput>>;
+  create?: InputMaybe<Array<HardwareProductProvidedByCreateFieldInput>>;
+  delete?: InputMaybe<Array<HardwareProductProvidedByDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<HardwareProductProvidedByDisconnectFieldInput>>;
+  update?: InputMaybe<HardwareProductProvidedByUpdateConnectionInput>;
+};
+
+export type HardwareProductRelationshipFilters = {
+  /** Filter type where all of the related HardwareProducts match this filter */
+  all?: InputMaybe<HardwareProductWhere>;
+  /** Filter type where none of the related HardwareProducts match this filter */
+  none?: InputMaybe<HardwareProductWhere>;
+  /** Filter type where one of the related HardwareProducts match this filter */
+  single?: InputMaybe<HardwareProductWhere>;
+  /** Filter type where some of the related HardwareProducts match this filter */
+  some?: InputMaybe<HardwareProductWhere>;
+};
+
+/** Fields to sort HardwareProducts by. The order in which sorts are applied is not guaranteed when specifying many fields in one HardwareProductSort object. */
+export type HardwareProductSort = {
+  createdAt?: InputMaybe<SortDirection>;
+  id?: InputMaybe<SortDirection>;
+  isActive?: InputMaybe<SortDirection>;
+  lifecycleStatus?: InputMaybe<SortDirection>;
+  name?: InputMaybe<SortDirection>;
+  productFamily?: InputMaybe<SortDirection>;
+  updatedAt?: InputMaybe<SortDirection>;
+};
+
+export type HardwareProductSupplierMaintainedByAggregateSelection = {
+  __typename?: 'HardwareProductSupplierMaintainedByAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<HardwareProductSupplierMaintainedByNodeAggregateSelection>;
+};
+
+export type HardwareProductSupplierMaintainedByNodeAggregateSelection = {
+  __typename?: 'HardwareProductSupplierMaintainedByNodeAggregateSelection';
+  address: StringAggregateSelection;
+  annualSpend: FloatAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  email: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
+  name: StringAggregateSelection;
+  performanceRating: IntAggregateSelection;
+  phone: StringAggregateSelection;
+  primaryContactPerson: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  website: StringAggregateSelection;
+};
+
+export type HardwareProductSupplierManufacturedByAggregateSelection = {
+  __typename?: 'HardwareProductSupplierManufacturedByAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<HardwareProductSupplierManufacturedByNodeAggregateSelection>;
+};
+
+export type HardwareProductSupplierManufacturedByNodeAggregateSelection = {
+  __typename?: 'HardwareProductSupplierManufacturedByNodeAggregateSelection';
+  address: StringAggregateSelection;
+  annualSpend: FloatAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  email: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
+  name: StringAggregateSelection;
+  performanceRating: IntAggregateSelection;
+  phone: StringAggregateSelection;
+  primaryContactPerson: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  website: StringAggregateSelection;
+};
+
+export type HardwareProductSupplierProvidedByAggregateSelection = {
+  __typename?: 'HardwareProductSupplierProvidedByAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<HardwareProductSupplierProvidedByNodeAggregateSelection>;
+};
+
+export type HardwareProductSupplierProvidedByNodeAggregateSelection = {
+  __typename?: 'HardwareProductSupplierProvidedByNodeAggregateSelection';
+  address: StringAggregateSelection;
+  annualSpend: FloatAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  email: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
+  name: StringAggregateSelection;
+  performanceRating: IntAggregateSelection;
+  phone: StringAggregateSelection;
+  primaryContactPerson: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  website: StringAggregateSelection;
+};
+
+export type HardwareProductUpdateInput = {
+  company?: InputMaybe<Array<HardwareProductCompanyUpdateFieldInput>>;
+  createdAt?: InputMaybe<DateTimeScalarMutations>;
+  isActive?: InputMaybe<BooleanScalarMutations>;
+  lifecycleStatus?: InputMaybe<LifecycleStatusEnumScalarMutations>;
+  maintainedBy?: InputMaybe<Array<HardwareProductMaintainedByUpdateFieldInput>>;
+  manufacturedBy?: InputMaybe<Array<HardwareProductManufacturedByUpdateFieldInput>>;
+  name?: InputMaybe<StringScalarMutations>;
+  productFamily?: InputMaybe<StringScalarMutations>;
+  providedBy?: InputMaybe<Array<HardwareProductProvidedByUpdateFieldInput>>;
+  usedByInfrastructure?: InputMaybe<Array<HardwareProductUsedByInfrastructureUpdateFieldInput>>;
+  versions?: InputMaybe<Array<HardwareProductVersionsUpdateFieldInput>>;
+};
+
+export type HardwareProductUsedByInfrastructureAggregateInput = {
+  AND?: InputMaybe<Array<HardwareProductUsedByInfrastructureAggregateInput>>;
+  NOT?: InputMaybe<HardwareProductUsedByInfrastructureAggregateInput>;
+  OR?: InputMaybe<Array<HardwareProductUsedByInfrastructureAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<HardwareProductUsedByInfrastructureNodeAggregationWhereInput>;
+};
+
+export type HardwareProductUsedByInfrastructureConnectFieldInput = {
+  connect?: InputMaybe<Array<InfrastructureConnectInput>>;
+  where?: InputMaybe<InfrastructureConnectWhere>;
+};
+
+export type HardwareProductUsedByInfrastructureConnection = {
+  __typename?: 'HardwareProductUsedByInfrastructureConnection';
+  aggregate: HardwareProductInfrastructureUsedByInfrastructureAggregateSelection;
+  edges: Array<HardwareProductUsedByInfrastructureRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type HardwareProductUsedByInfrastructureConnectionAggregateInput = {
+  AND?: InputMaybe<Array<HardwareProductUsedByInfrastructureConnectionAggregateInput>>;
+  NOT?: InputMaybe<HardwareProductUsedByInfrastructureConnectionAggregateInput>;
+  OR?: InputMaybe<Array<HardwareProductUsedByInfrastructureConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<HardwareProductUsedByInfrastructureNodeAggregationWhereInput>;
+};
+
+export type HardwareProductUsedByInfrastructureConnectionFilters = {
+  /** Filter HardwareProducts by aggregating results on related HardwareProductUsedByInfrastructureConnections */
+  aggregate?: InputMaybe<HardwareProductUsedByInfrastructureConnectionAggregateInput>;
+  /** Return HardwareProducts where all of the related HardwareProductUsedByInfrastructureConnections match this filter */
+  all?: InputMaybe<HardwareProductUsedByInfrastructureConnectionWhere>;
+  /** Return HardwareProducts where none of the related HardwareProductUsedByInfrastructureConnections match this filter */
+  none?: InputMaybe<HardwareProductUsedByInfrastructureConnectionWhere>;
+  /** Return HardwareProducts where one of the related HardwareProductUsedByInfrastructureConnections match this filter */
+  single?: InputMaybe<HardwareProductUsedByInfrastructureConnectionWhere>;
+  /** Return HardwareProducts where some of the related HardwareProductUsedByInfrastructureConnections match this filter */
+  some?: InputMaybe<HardwareProductUsedByInfrastructureConnectionWhere>;
+};
+
+export type HardwareProductUsedByInfrastructureConnectionSort = {
+  node?: InputMaybe<InfrastructureSort>;
+};
+
+export type HardwareProductUsedByInfrastructureConnectionWhere = {
+  AND?: InputMaybe<Array<HardwareProductUsedByInfrastructureConnectionWhere>>;
+  NOT?: InputMaybe<HardwareProductUsedByInfrastructureConnectionWhere>;
+  OR?: InputMaybe<Array<HardwareProductUsedByInfrastructureConnectionWhere>>;
+  node?: InputMaybe<InfrastructureWhere>;
+};
+
+export type HardwareProductUsedByInfrastructureCreateFieldInput = {
+  node: InfrastructureCreateInput;
+};
+
+export type HardwareProductUsedByInfrastructureDeleteFieldInput = {
+  delete?: InputMaybe<InfrastructureDeleteInput>;
+  where?: InputMaybe<HardwareProductUsedByInfrastructureConnectionWhere>;
+};
+
+export type HardwareProductUsedByInfrastructureDisconnectFieldInput = {
+  disconnect?: InputMaybe<InfrastructureDisconnectInput>;
+  where?: InputMaybe<HardwareProductUsedByInfrastructureConnectionWhere>;
+};
+
+export type HardwareProductUsedByInfrastructureFieldInput = {
+  connect?: InputMaybe<Array<HardwareProductUsedByInfrastructureConnectFieldInput>>;
+  create?: InputMaybe<Array<HardwareProductUsedByInfrastructureCreateFieldInput>>;
+};
+
+export type HardwareProductUsedByInfrastructureNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<HardwareProductUsedByInfrastructureNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<HardwareProductUsedByInfrastructureNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<HardwareProductUsedByInfrastructureNodeAggregationWhereInput>>;
+  capacity?: InputMaybe<StringScalarAggregationFilters>;
+  costs?: InputMaybe<FloatScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  ipAddress?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  location?: InputMaybe<StringScalarAggregationFilters>;
+  maintenanceWindow?: InputMaybe<StringScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  operatingSystem?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
+  specifications?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  vendor?: InputMaybe<StringScalarAggregationFilters>;
+  version?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type HardwareProductUsedByInfrastructureRelationship = {
+  __typename?: 'HardwareProductUsedByInfrastructureRelationship';
+  cursor: Scalars['String']['output'];
+  node: Infrastructure;
+};
+
+export type HardwareProductUsedByInfrastructureUpdateConnectionInput = {
+  node?: InputMaybe<InfrastructureUpdateInput>;
+  where?: InputMaybe<HardwareProductUsedByInfrastructureConnectionWhere>;
+};
+
+export type HardwareProductUsedByInfrastructureUpdateFieldInput = {
+  connect?: InputMaybe<Array<HardwareProductUsedByInfrastructureConnectFieldInput>>;
+  create?: InputMaybe<Array<HardwareProductUsedByInfrastructureCreateFieldInput>>;
+  delete?: InputMaybe<Array<HardwareProductUsedByInfrastructureDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<HardwareProductUsedByInfrastructureDisconnectFieldInput>>;
+  update?: InputMaybe<HardwareProductUsedByInfrastructureUpdateConnectionInput>;
+};
+
+export type HardwareProductVersionsAggregateInput = {
+  AND?: InputMaybe<Array<HardwareProductVersionsAggregateInput>>;
+  NOT?: InputMaybe<HardwareProductVersionsAggregateInput>;
+  OR?: InputMaybe<Array<HardwareProductVersionsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<HardwareProductVersionsNodeAggregationWhereInput>;
+};
+
+export type HardwareProductVersionsConnectFieldInput = {
+  connect?: InputMaybe<Array<HardwareVersionConnectInput>>;
+  where?: InputMaybe<HardwareVersionConnectWhere>;
+};
+
+export type HardwareProductVersionsConnection = {
+  __typename?: 'HardwareProductVersionsConnection';
+  aggregate: HardwareProductHardwareVersionVersionsAggregateSelection;
+  edges: Array<HardwareProductVersionsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type HardwareProductVersionsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<HardwareProductVersionsConnectionAggregateInput>>;
+  NOT?: InputMaybe<HardwareProductVersionsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<HardwareProductVersionsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<HardwareProductVersionsNodeAggregationWhereInput>;
+};
+
+export type HardwareProductVersionsConnectionFilters = {
+  /** Filter HardwareProducts by aggregating results on related HardwareProductVersionsConnections */
+  aggregate?: InputMaybe<HardwareProductVersionsConnectionAggregateInput>;
+  /** Return HardwareProducts where all of the related HardwareProductVersionsConnections match this filter */
+  all?: InputMaybe<HardwareProductVersionsConnectionWhere>;
+  /** Return HardwareProducts where none of the related HardwareProductVersionsConnections match this filter */
+  none?: InputMaybe<HardwareProductVersionsConnectionWhere>;
+  /** Return HardwareProducts where one of the related HardwareProductVersionsConnections match this filter */
+  single?: InputMaybe<HardwareProductVersionsConnectionWhere>;
+  /** Return HardwareProducts where some of the related HardwareProductVersionsConnections match this filter */
+  some?: InputMaybe<HardwareProductVersionsConnectionWhere>;
+};
+
+export type HardwareProductVersionsConnectionSort = {
+  node?: InputMaybe<HardwareVersionSort>;
+};
+
+export type HardwareProductVersionsConnectionWhere = {
+  AND?: InputMaybe<Array<HardwareProductVersionsConnectionWhere>>;
+  NOT?: InputMaybe<HardwareProductVersionsConnectionWhere>;
+  OR?: InputMaybe<Array<HardwareProductVersionsConnectionWhere>>;
+  node?: InputMaybe<HardwareVersionWhere>;
+};
+
+export type HardwareProductVersionsCreateFieldInput = {
+  node: HardwareVersionCreateInput;
+};
+
+export type HardwareProductVersionsDeleteFieldInput = {
+  delete?: InputMaybe<HardwareVersionDeleteInput>;
+  where?: InputMaybe<HardwareProductVersionsConnectionWhere>;
+};
+
+export type HardwareProductVersionsDisconnectFieldInput = {
+  disconnect?: InputMaybe<HardwareVersionDisconnectInput>;
+  where?: InputMaybe<HardwareProductVersionsConnectionWhere>;
+};
+
+export type HardwareProductVersionsFieldInput = {
+  connect?: InputMaybe<Array<HardwareProductVersionsConnectFieldInput>>;
+  create?: InputMaybe<Array<HardwareProductVersionsCreateFieldInput>>;
+};
+
+export type HardwareProductVersionsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<HardwareProductVersionsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<HardwareProductVersionsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<HardwareProductVersionsNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  normalizedVersionModel?: InputMaybe<StringScalarAggregationFilters>;
+  releaseChannel?: InputMaybe<StringScalarAggregationFilters>;
+  supportTier?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  versionModelString?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type HardwareProductVersionsRelationship = {
+  __typename?: 'HardwareProductVersionsRelationship';
+  cursor: Scalars['String']['output'];
+  node: HardwareVersion;
+};
+
+export type HardwareProductVersionsUpdateConnectionInput = {
+  node?: InputMaybe<HardwareVersionUpdateInput>;
+  where?: InputMaybe<HardwareProductVersionsConnectionWhere>;
+};
+
+export type HardwareProductVersionsUpdateFieldInput = {
+  connect?: InputMaybe<Array<HardwareProductVersionsConnectFieldInput>>;
+  create?: InputMaybe<Array<HardwareProductVersionsCreateFieldInput>>;
+  delete?: InputMaybe<Array<HardwareProductVersionsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<HardwareProductVersionsDisconnectFieldInput>>;
+  update?: InputMaybe<HardwareProductVersionsUpdateConnectionInput>;
+};
+
+export type HardwareProductWhere = {
+  AND?: InputMaybe<Array<HardwareProductWhere>>;
+  NOT?: InputMaybe<HardwareProductWhere>;
+  OR?: InputMaybe<Array<HardwareProductWhere>>;
+  company?: InputMaybe<CompanyRelationshipFilters>;
+  companyConnection?: InputMaybe<HardwareProductCompanyConnectionFilters>;
+  createdAt?: InputMaybe<DateTimeScalarFilters>;
+  id?: InputMaybe<IdScalarFilters>;
+  isActive?: InputMaybe<BooleanScalarFilters>;
+  lifecycleStatus?: InputMaybe<LifecycleStatusEnumScalarFilters>;
+  maintainedBy?: InputMaybe<SupplierRelationshipFilters>;
+  maintainedByConnection?: InputMaybe<HardwareProductMaintainedByConnectionFilters>;
+  manufacturedBy?: InputMaybe<SupplierRelationshipFilters>;
+  manufacturedByConnection?: InputMaybe<HardwareProductManufacturedByConnectionFilters>;
+  name?: InputMaybe<StringScalarFilters>;
+  productFamily?: InputMaybe<StringScalarFilters>;
+  providedBy?: InputMaybe<SupplierRelationshipFilters>;
+  providedByConnection?: InputMaybe<HardwareProductProvidedByConnectionFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarFilters>;
+  usedByInfrastructure?: InputMaybe<InfrastructureRelationshipFilters>;
+  usedByInfrastructureConnection?: InputMaybe<HardwareProductUsedByInfrastructureConnectionFilters>;
+  versions?: InputMaybe<HardwareVersionRelationshipFilters>;
+  versionsConnection?: InputMaybe<HardwareProductVersionsConnectionFilters>;
+};
+
+export type HardwareProductsConnection = {
+  __typename?: 'HardwareProductsConnection';
+  aggregate: HardwareProductAggregate;
+  edges: Array<HardwareProductEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+/** HardwareVersion – version/model metadata for a hardware product */
+export type HardwareVersion = {
+  __typename?: 'HardwareVersion';
+  company: Array<Company>;
+  companyConnection: HardwareVersionCompanyConnection;
+  createdAt: Scalars['DateTime']['output'];
+  hardwareProduct: Array<HardwareProduct>;
+  hardwareProductConnection: HardwareVersionHardwareProductConnection;
+  id: Scalars['ID']['output'];
+  lifecycleRecords: Array<LifecycleRecord>;
+  lifecycleRecordsConnection: HardwareVersionLifecycleRecordsConnection;
+  normalizedVersionModel?: Maybe<Scalars['String']['output']>;
+  releaseChannel?: Maybe<Scalars['String']['output']>;
+  supportTier?: Maybe<Scalars['String']['output']>;
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  versionModelString: Scalars['String']['output'];
+};
+
+
+/** HardwareVersion – version/model metadata for a hardware product */
+export type HardwareVersionCompanyArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<CompanySort>>;
+  where?: InputMaybe<CompanyWhere>;
+};
+
+
+/** HardwareVersion – version/model metadata for a hardware product */
+export type HardwareVersionCompanyConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<HardwareVersionCompanyConnectionSort>>;
+  where?: InputMaybe<HardwareVersionCompanyConnectionWhere>;
+};
+
+
+/** HardwareVersion – version/model metadata for a hardware product */
+export type HardwareVersionHardwareProductArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<HardwareProductSort>>;
+  where?: InputMaybe<HardwareProductWhere>;
+};
+
+
+/** HardwareVersion – version/model metadata for a hardware product */
+export type HardwareVersionHardwareProductConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<HardwareVersionHardwareProductConnectionSort>>;
+  where?: InputMaybe<HardwareVersionHardwareProductConnectionWhere>;
+};
+
+
+/** HardwareVersion – version/model metadata for a hardware product */
+export type HardwareVersionLifecycleRecordsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<LifecycleRecordSort>>;
+  where?: InputMaybe<LifecycleRecordWhere>;
+};
+
+
+/** HardwareVersion – version/model metadata for a hardware product */
+export type HardwareVersionLifecycleRecordsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<HardwareVersionLifecycleRecordsConnectionSort>>;
+  where?: InputMaybe<HardwareVersionLifecycleRecordsConnectionWhere>;
+};
+
+export type HardwareVersionAggregate = {
+  __typename?: 'HardwareVersionAggregate';
+  count: Count;
+  node: HardwareVersionAggregateNode;
+};
+
+export type HardwareVersionAggregateNode = {
+  __typename?: 'HardwareVersionAggregateNode';
+  createdAt: DateTimeAggregateSelection;
+  normalizedVersionModel: StringAggregateSelection;
+  releaseChannel: StringAggregateSelection;
+  supportTier: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  versionModelString: StringAggregateSelection;
+};
+
+export type HardwareVersionCompanyAggregateInput = {
+  AND?: InputMaybe<Array<HardwareVersionCompanyAggregateInput>>;
+  NOT?: InputMaybe<HardwareVersionCompanyAggregateInput>;
+  OR?: InputMaybe<Array<HardwareVersionCompanyAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<HardwareVersionCompanyNodeAggregationWhereInput>;
+};
+
+export type HardwareVersionCompanyCompanyAggregateSelection = {
+  __typename?: 'HardwareVersionCompanyCompanyAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<HardwareVersionCompanyCompanyNodeAggregateSelection>;
+};
+
+export type HardwareVersionCompanyCompanyNodeAggregateSelection = {
+  __typename?: 'HardwareVersionCompanyCompanyNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
+  address: StringAggregateSelection;
+  controlPriority: IntAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  diagramFont: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
+  features: StringAggregateSelection;
+  font: StringAggregateSelection;
+  industry: StringAggregateSelection;
+  logo: StringAggregateSelection;
+  name: StringAggregateSelection;
+  primaryColor: StringAggregateSelection;
+  resiliencePriority: IntAggregateSelection;
+  secondaryColor: StringAggregateSelection;
+  securityPriority: IntAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
+  sovereigntyScoreStatus: StringAggregateSelection;
+  strategicAutonomyPriority: IntAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  website: StringAggregateSelection;
+};
+
+export type HardwareVersionCompanyConnectFieldInput = {
+  connect?: InputMaybe<Array<CompanyConnectInput>>;
+  where?: InputMaybe<CompanyConnectWhere>;
+};
+
+export type HardwareVersionCompanyConnection = {
+  __typename?: 'HardwareVersionCompanyConnection';
+  aggregate: HardwareVersionCompanyCompanyAggregateSelection;
+  edges: Array<HardwareVersionCompanyRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type HardwareVersionCompanyConnectionAggregateInput = {
+  AND?: InputMaybe<Array<HardwareVersionCompanyConnectionAggregateInput>>;
+  NOT?: InputMaybe<HardwareVersionCompanyConnectionAggregateInput>;
+  OR?: InputMaybe<Array<HardwareVersionCompanyConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<HardwareVersionCompanyNodeAggregationWhereInput>;
+};
+
+export type HardwareVersionCompanyConnectionFilters = {
+  /** Filter HardwareVersions by aggregating results on related HardwareVersionCompanyConnections */
+  aggregate?: InputMaybe<HardwareVersionCompanyConnectionAggregateInput>;
+  /** Return HardwareVersions where all of the related HardwareVersionCompanyConnections match this filter */
+  all?: InputMaybe<HardwareVersionCompanyConnectionWhere>;
+  /** Return HardwareVersions where none of the related HardwareVersionCompanyConnections match this filter */
+  none?: InputMaybe<HardwareVersionCompanyConnectionWhere>;
+  /** Return HardwareVersions where one of the related HardwareVersionCompanyConnections match this filter */
+  single?: InputMaybe<HardwareVersionCompanyConnectionWhere>;
+  /** Return HardwareVersions where some of the related HardwareVersionCompanyConnections match this filter */
+  some?: InputMaybe<HardwareVersionCompanyConnectionWhere>;
+};
+
+export type HardwareVersionCompanyConnectionSort = {
+  node?: InputMaybe<CompanySort>;
+};
+
+export type HardwareVersionCompanyConnectionWhere = {
+  AND?: InputMaybe<Array<HardwareVersionCompanyConnectionWhere>>;
+  NOT?: InputMaybe<HardwareVersionCompanyConnectionWhere>;
+  OR?: InputMaybe<Array<HardwareVersionCompanyConnectionWhere>>;
+  node?: InputMaybe<CompanyWhere>;
+};
+
+export type HardwareVersionCompanyCreateFieldInput = {
+  node: CompanyCreateInput;
+};
+
+export type HardwareVersionCompanyDeleteFieldInput = {
+  delete?: InputMaybe<CompanyDeleteInput>;
+  where?: InputMaybe<HardwareVersionCompanyConnectionWhere>;
+};
+
+export type HardwareVersionCompanyDisconnectFieldInput = {
+  disconnect?: InputMaybe<CompanyDisconnectInput>;
+  where?: InputMaybe<HardwareVersionCompanyConnectionWhere>;
+};
+
+export type HardwareVersionCompanyFieldInput = {
+  connect?: InputMaybe<Array<HardwareVersionCompanyConnectFieldInput>>;
+  create?: InputMaybe<Array<HardwareVersionCompanyCreateFieldInput>>;
+};
+
+export type HardwareVersionCompanyNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<HardwareVersionCompanyNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<HardwareVersionCompanyNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<HardwareVersionCompanyNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
+  address?: InputMaybe<StringScalarAggregationFilters>;
+  controlPriority?: InputMaybe<IntScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  diagramFont?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
+  features?: InputMaybe<StringScalarAggregationFilters>;
+  font?: InputMaybe<StringScalarAggregationFilters>;
+  industry?: InputMaybe<StringScalarAggregationFilters>;
+  logo?: InputMaybe<StringScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  primaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  resiliencePriority?: InputMaybe<IntScalarAggregationFilters>;
+  secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  securityPriority?: InputMaybe<IntScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
+  strategicAutonomyPriority?: InputMaybe<IntScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  website?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type HardwareVersionCompanyRelationship = {
+  __typename?: 'HardwareVersionCompanyRelationship';
+  cursor: Scalars['String']['output'];
+  node: Company;
+};
+
+export type HardwareVersionCompanyUpdateConnectionInput = {
+  node?: InputMaybe<CompanyUpdateInput>;
+  where?: InputMaybe<HardwareVersionCompanyConnectionWhere>;
+};
+
+export type HardwareVersionCompanyUpdateFieldInput = {
+  connect?: InputMaybe<Array<HardwareVersionCompanyConnectFieldInput>>;
+  create?: InputMaybe<Array<HardwareVersionCompanyCreateFieldInput>>;
+  delete?: InputMaybe<Array<HardwareVersionCompanyDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<HardwareVersionCompanyDisconnectFieldInput>>;
+  update?: InputMaybe<HardwareVersionCompanyUpdateConnectionInput>;
+};
+
+export type HardwareVersionConnectInput = {
+  company?: InputMaybe<Array<HardwareVersionCompanyConnectFieldInput>>;
+  hardwareProduct?: InputMaybe<Array<HardwareVersionHardwareProductConnectFieldInput>>;
+  lifecycleRecords?: InputMaybe<Array<HardwareVersionLifecycleRecordsConnectFieldInput>>;
+};
+
+export type HardwareVersionConnectWhere = {
+  node: HardwareVersionWhere;
+};
+
+export type HardwareVersionCreateInput = {
+  company?: InputMaybe<HardwareVersionCompanyFieldInput>;
+  hardwareProduct?: InputMaybe<HardwareVersionHardwareProductFieldInput>;
+  lifecycleRecords?: InputMaybe<HardwareVersionLifecycleRecordsFieldInput>;
+  normalizedVersionModel?: InputMaybe<Scalars['String']['input']>;
+  releaseChannel?: InputMaybe<Scalars['String']['input']>;
+  supportTier?: InputMaybe<Scalars['String']['input']>;
+  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  versionModelString: Scalars['String']['input'];
+};
+
+export type HardwareVersionDeleteInput = {
+  company?: InputMaybe<Array<HardwareVersionCompanyDeleteFieldInput>>;
+  hardwareProduct?: InputMaybe<Array<HardwareVersionHardwareProductDeleteFieldInput>>;
+  lifecycleRecords?: InputMaybe<Array<HardwareVersionLifecycleRecordsDeleteFieldInput>>;
+};
+
+export type HardwareVersionDisconnectInput = {
+  company?: InputMaybe<Array<HardwareVersionCompanyDisconnectFieldInput>>;
+  hardwareProduct?: InputMaybe<Array<HardwareVersionHardwareProductDisconnectFieldInput>>;
+  lifecycleRecords?: InputMaybe<Array<HardwareVersionLifecycleRecordsDisconnectFieldInput>>;
+};
+
+export type HardwareVersionEdge = {
+  __typename?: 'HardwareVersionEdge';
+  cursor: Scalars['String']['output'];
+  node: HardwareVersion;
+};
+
+export type HardwareVersionHardwareProductAggregateInput = {
+  AND?: InputMaybe<Array<HardwareVersionHardwareProductAggregateInput>>;
+  NOT?: InputMaybe<HardwareVersionHardwareProductAggregateInput>;
+  OR?: InputMaybe<Array<HardwareVersionHardwareProductAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<HardwareVersionHardwareProductNodeAggregationWhereInput>;
+};
+
+export type HardwareVersionHardwareProductConnectFieldInput = {
+  connect?: InputMaybe<Array<HardwareProductConnectInput>>;
+  where?: InputMaybe<HardwareProductConnectWhere>;
+};
+
+export type HardwareVersionHardwareProductConnection = {
+  __typename?: 'HardwareVersionHardwareProductConnection';
+  aggregate: HardwareVersionHardwareProductHardwareProductAggregateSelection;
+  edges: Array<HardwareVersionHardwareProductRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type HardwareVersionHardwareProductConnectionAggregateInput = {
+  AND?: InputMaybe<Array<HardwareVersionHardwareProductConnectionAggregateInput>>;
+  NOT?: InputMaybe<HardwareVersionHardwareProductConnectionAggregateInput>;
+  OR?: InputMaybe<Array<HardwareVersionHardwareProductConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<HardwareVersionHardwareProductNodeAggregationWhereInput>;
+};
+
+export type HardwareVersionHardwareProductConnectionFilters = {
+  /** Filter HardwareVersions by aggregating results on related HardwareVersionHardwareProductConnections */
+  aggregate?: InputMaybe<HardwareVersionHardwareProductConnectionAggregateInput>;
+  /** Return HardwareVersions where all of the related HardwareVersionHardwareProductConnections match this filter */
+  all?: InputMaybe<HardwareVersionHardwareProductConnectionWhere>;
+  /** Return HardwareVersions where none of the related HardwareVersionHardwareProductConnections match this filter */
+  none?: InputMaybe<HardwareVersionHardwareProductConnectionWhere>;
+  /** Return HardwareVersions where one of the related HardwareVersionHardwareProductConnections match this filter */
+  single?: InputMaybe<HardwareVersionHardwareProductConnectionWhere>;
+  /** Return HardwareVersions where some of the related HardwareVersionHardwareProductConnections match this filter */
+  some?: InputMaybe<HardwareVersionHardwareProductConnectionWhere>;
+};
+
+export type HardwareVersionHardwareProductConnectionSort = {
+  node?: InputMaybe<HardwareProductSort>;
+};
+
+export type HardwareVersionHardwareProductConnectionWhere = {
+  AND?: InputMaybe<Array<HardwareVersionHardwareProductConnectionWhere>>;
+  NOT?: InputMaybe<HardwareVersionHardwareProductConnectionWhere>;
+  OR?: InputMaybe<Array<HardwareVersionHardwareProductConnectionWhere>>;
+  node?: InputMaybe<HardwareProductWhere>;
+};
+
+export type HardwareVersionHardwareProductCreateFieldInput = {
+  node: HardwareProductCreateInput;
+};
+
+export type HardwareVersionHardwareProductDeleteFieldInput = {
+  delete?: InputMaybe<HardwareProductDeleteInput>;
+  where?: InputMaybe<HardwareVersionHardwareProductConnectionWhere>;
+};
+
+export type HardwareVersionHardwareProductDisconnectFieldInput = {
+  disconnect?: InputMaybe<HardwareProductDisconnectInput>;
+  where?: InputMaybe<HardwareVersionHardwareProductConnectionWhere>;
+};
+
+export type HardwareVersionHardwareProductFieldInput = {
+  connect?: InputMaybe<Array<HardwareVersionHardwareProductConnectFieldInput>>;
+  create?: InputMaybe<Array<HardwareVersionHardwareProductCreateFieldInput>>;
+};
+
+export type HardwareVersionHardwareProductHardwareProductAggregateSelection = {
+  __typename?: 'HardwareVersionHardwareProductHardwareProductAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<HardwareVersionHardwareProductHardwareProductNodeAggregateSelection>;
+};
+
+export type HardwareVersionHardwareProductHardwareProductNodeAggregateSelection = {
+  __typename?: 'HardwareVersionHardwareProductHardwareProductNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  name: StringAggregateSelection;
+  productFamily: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
+export type HardwareVersionHardwareProductNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<HardwareVersionHardwareProductNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<HardwareVersionHardwareProductNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<HardwareVersionHardwareProductNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  productFamily?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type HardwareVersionHardwareProductRelationship = {
+  __typename?: 'HardwareVersionHardwareProductRelationship';
+  cursor: Scalars['String']['output'];
+  node: HardwareProduct;
+};
+
+export type HardwareVersionHardwareProductUpdateConnectionInput = {
+  node?: InputMaybe<HardwareProductUpdateInput>;
+  where?: InputMaybe<HardwareVersionHardwareProductConnectionWhere>;
+};
+
+export type HardwareVersionHardwareProductUpdateFieldInput = {
+  connect?: InputMaybe<Array<HardwareVersionHardwareProductConnectFieldInput>>;
+  create?: InputMaybe<Array<HardwareVersionHardwareProductCreateFieldInput>>;
+  delete?: InputMaybe<Array<HardwareVersionHardwareProductDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<HardwareVersionHardwareProductDisconnectFieldInput>>;
+  update?: InputMaybe<HardwareVersionHardwareProductUpdateConnectionInput>;
+};
+
+export type HardwareVersionLifecycleRecordLifecycleRecordsAggregateSelection = {
+  __typename?: 'HardwareVersionLifecycleRecordLifecycleRecordsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<HardwareVersionLifecycleRecordLifecycleRecordsNodeAggregateSelection>;
+};
+
+export type HardwareVersionLifecycleRecordLifecycleRecordsNodeAggregateSelection = {
+  __typename?: 'HardwareVersionLifecycleRecordLifecycleRecordsNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  lastValidatedAt: DateTimeAggregateSelection;
+  source: StringAggregateSelection;
+  sourceConfidence: FloatAggregateSelection;
+  sourceUrl: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
+export type HardwareVersionLifecycleRecordsAggregateInput = {
+  AND?: InputMaybe<Array<HardwareVersionLifecycleRecordsAggregateInput>>;
+  NOT?: InputMaybe<HardwareVersionLifecycleRecordsAggregateInput>;
+  OR?: InputMaybe<Array<HardwareVersionLifecycleRecordsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<HardwareVersionLifecycleRecordsNodeAggregationWhereInput>;
+};
+
+export type HardwareVersionLifecycleRecordsConnectFieldInput = {
+  connect?: InputMaybe<Array<LifecycleRecordConnectInput>>;
+  where?: InputMaybe<LifecycleRecordConnectWhere>;
+};
+
+export type HardwareVersionLifecycleRecordsConnection = {
+  __typename?: 'HardwareVersionLifecycleRecordsConnection';
+  aggregate: HardwareVersionLifecycleRecordLifecycleRecordsAggregateSelection;
+  edges: Array<HardwareVersionLifecycleRecordsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type HardwareVersionLifecycleRecordsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<HardwareVersionLifecycleRecordsConnectionAggregateInput>>;
+  NOT?: InputMaybe<HardwareVersionLifecycleRecordsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<HardwareVersionLifecycleRecordsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<HardwareVersionLifecycleRecordsNodeAggregationWhereInput>;
+};
+
+export type HardwareVersionLifecycleRecordsConnectionFilters = {
+  /** Filter HardwareVersions by aggregating results on related HardwareVersionLifecycleRecordsConnections */
+  aggregate?: InputMaybe<HardwareVersionLifecycleRecordsConnectionAggregateInput>;
+  /** Return HardwareVersions where all of the related HardwareVersionLifecycleRecordsConnections match this filter */
+  all?: InputMaybe<HardwareVersionLifecycleRecordsConnectionWhere>;
+  /** Return HardwareVersions where none of the related HardwareVersionLifecycleRecordsConnections match this filter */
+  none?: InputMaybe<HardwareVersionLifecycleRecordsConnectionWhere>;
+  /** Return HardwareVersions where one of the related HardwareVersionLifecycleRecordsConnections match this filter */
+  single?: InputMaybe<HardwareVersionLifecycleRecordsConnectionWhere>;
+  /** Return HardwareVersions where some of the related HardwareVersionLifecycleRecordsConnections match this filter */
+  some?: InputMaybe<HardwareVersionLifecycleRecordsConnectionWhere>;
+};
+
+export type HardwareVersionLifecycleRecordsConnectionSort = {
+  node?: InputMaybe<LifecycleRecordSort>;
+};
+
+export type HardwareVersionLifecycleRecordsConnectionWhere = {
+  AND?: InputMaybe<Array<HardwareVersionLifecycleRecordsConnectionWhere>>;
+  NOT?: InputMaybe<HardwareVersionLifecycleRecordsConnectionWhere>;
+  OR?: InputMaybe<Array<HardwareVersionLifecycleRecordsConnectionWhere>>;
+  node?: InputMaybe<LifecycleRecordWhere>;
+};
+
+export type HardwareVersionLifecycleRecordsCreateFieldInput = {
+  node: LifecycleRecordCreateInput;
+};
+
+export type HardwareVersionLifecycleRecordsDeleteFieldInput = {
+  delete?: InputMaybe<LifecycleRecordDeleteInput>;
+  where?: InputMaybe<HardwareVersionLifecycleRecordsConnectionWhere>;
+};
+
+export type HardwareVersionLifecycleRecordsDisconnectFieldInput = {
+  disconnect?: InputMaybe<LifecycleRecordDisconnectInput>;
+  where?: InputMaybe<HardwareVersionLifecycleRecordsConnectionWhere>;
+};
+
+export type HardwareVersionLifecycleRecordsFieldInput = {
+  connect?: InputMaybe<Array<HardwareVersionLifecycleRecordsConnectFieldInput>>;
+  create?: InputMaybe<Array<HardwareVersionLifecycleRecordsCreateFieldInput>>;
+};
+
+export type HardwareVersionLifecycleRecordsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<HardwareVersionLifecycleRecordsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<HardwareVersionLifecycleRecordsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<HardwareVersionLifecycleRecordsNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  lastValidatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  source?: InputMaybe<StringScalarAggregationFilters>;
+  sourceConfidence?: InputMaybe<FloatScalarAggregationFilters>;
+  sourceUrl?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type HardwareVersionLifecycleRecordsRelationship = {
+  __typename?: 'HardwareVersionLifecycleRecordsRelationship';
+  cursor: Scalars['String']['output'];
+  node: LifecycleRecord;
+};
+
+export type HardwareVersionLifecycleRecordsUpdateConnectionInput = {
+  node?: InputMaybe<LifecycleRecordUpdateInput>;
+  where?: InputMaybe<HardwareVersionLifecycleRecordsConnectionWhere>;
+};
+
+export type HardwareVersionLifecycleRecordsUpdateFieldInput = {
+  connect?: InputMaybe<Array<HardwareVersionLifecycleRecordsConnectFieldInput>>;
+  create?: InputMaybe<Array<HardwareVersionLifecycleRecordsCreateFieldInput>>;
+  delete?: InputMaybe<Array<HardwareVersionLifecycleRecordsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<HardwareVersionLifecycleRecordsDisconnectFieldInput>>;
+  update?: InputMaybe<HardwareVersionLifecycleRecordsUpdateConnectionInput>;
+};
+
+export type HardwareVersionRelationshipFilters = {
+  /** Filter type where all of the related HardwareVersions match this filter */
+  all?: InputMaybe<HardwareVersionWhere>;
+  /** Filter type where none of the related HardwareVersions match this filter */
+  none?: InputMaybe<HardwareVersionWhere>;
+  /** Filter type where one of the related HardwareVersions match this filter */
+  single?: InputMaybe<HardwareVersionWhere>;
+  /** Filter type where some of the related HardwareVersions match this filter */
+  some?: InputMaybe<HardwareVersionWhere>;
+};
+
+/** Fields to sort HardwareVersions by. The order in which sorts are applied is not guaranteed when specifying many fields in one HardwareVersionSort object. */
+export type HardwareVersionSort = {
+  createdAt?: InputMaybe<SortDirection>;
+  id?: InputMaybe<SortDirection>;
+  normalizedVersionModel?: InputMaybe<SortDirection>;
+  releaseChannel?: InputMaybe<SortDirection>;
+  supportTier?: InputMaybe<SortDirection>;
+  updatedAt?: InputMaybe<SortDirection>;
+  versionModelString?: InputMaybe<SortDirection>;
+};
+
+export type HardwareVersionUpdateInput = {
+  company?: InputMaybe<Array<HardwareVersionCompanyUpdateFieldInput>>;
+  createdAt?: InputMaybe<DateTimeScalarMutations>;
+  hardwareProduct?: InputMaybe<Array<HardwareVersionHardwareProductUpdateFieldInput>>;
+  lifecycleRecords?: InputMaybe<Array<HardwareVersionLifecycleRecordsUpdateFieldInput>>;
+  normalizedVersionModel?: InputMaybe<StringScalarMutations>;
+  releaseChannel?: InputMaybe<StringScalarMutations>;
+  supportTier?: InputMaybe<StringScalarMutations>;
+  versionModelString?: InputMaybe<StringScalarMutations>;
+};
+
+export type HardwareVersionWhere = {
+  AND?: InputMaybe<Array<HardwareVersionWhere>>;
+  NOT?: InputMaybe<HardwareVersionWhere>;
+  OR?: InputMaybe<Array<HardwareVersionWhere>>;
+  company?: InputMaybe<CompanyRelationshipFilters>;
+  companyConnection?: InputMaybe<HardwareVersionCompanyConnectionFilters>;
+  createdAt?: InputMaybe<DateTimeScalarFilters>;
+  hardwareProduct?: InputMaybe<HardwareProductRelationshipFilters>;
+  hardwareProductConnection?: InputMaybe<HardwareVersionHardwareProductConnectionFilters>;
+  id?: InputMaybe<IdScalarFilters>;
+  lifecycleRecords?: InputMaybe<LifecycleRecordRelationshipFilters>;
+  lifecycleRecordsConnection?: InputMaybe<HardwareVersionLifecycleRecordsConnectionFilters>;
+  normalizedVersionModel?: InputMaybe<StringScalarFilters>;
+  releaseChannel?: InputMaybe<StringScalarFilters>;
+  supportTier?: InputMaybe<StringScalarFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarFilters>;
+  versionModelString?: InputMaybe<StringScalarFilters>;
+};
+
+export type HardwareVersionsConnection = {
+  __typename?: 'HardwareVersionsConnection';
+  aggregate: HardwareVersionAggregate;
+  edges: Array<HardwareVersionEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
 /** ID filters */
 export type IdScalarFilters = {
   contains?: InputMaybe<Scalars['ID']['input']>;
@@ -29696,6 +31909,10 @@ export type Infrastructure = {
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
   usedByOrganisations: Array<Organisation>;
   usedByOrganisationsConnection: InfrastructureUsedByOrganisationsConnection;
+  usesHardwareProducts: Array<HardwareProduct>;
+  usesHardwareProductsConnection: InfrastructureUsesHardwareProductsConnection;
+  usesSoftwareProducts: Array<SoftwareProduct>;
+  usesSoftwareProductsConnection: InfrastructureUsesSoftwareProductsConnection;
   vendor?: Maybe<Scalars['String']['output']>;
   version?: Maybe<Scalars['String']['output']>;
 };
@@ -29916,6 +32133,42 @@ export type InfrastructureUsedByOrganisationsConnectionArgs = {
   where?: InputMaybe<InfrastructureUsedByOrganisationsConnectionWhere>;
 };
 
+
+/** Infrastructure – represents an infrastructure component within Enterprise Architecture Management */
+export type InfrastructureUsesHardwareProductsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<HardwareProductSort>>;
+  where?: InputMaybe<HardwareProductWhere>;
+};
+
+
+/** Infrastructure – represents an infrastructure component within Enterprise Architecture Management */
+export type InfrastructureUsesHardwareProductsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<InfrastructureUsesHardwareProductsConnectionSort>>;
+  where?: InputMaybe<InfrastructureUsesHardwareProductsConnectionWhere>;
+};
+
+
+/** Infrastructure – represents an infrastructure component within Enterprise Architecture Management */
+export type InfrastructureUsesSoftwareProductsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SoftwareProductSort>>;
+  where?: InputMaybe<SoftwareProductWhere>;
+};
+
+
+/** Infrastructure – represents an infrastructure component within Enterprise Architecture Management */
+export type InfrastructureUsesSoftwareProductsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<InfrastructureUsesSoftwareProductsConnectionSort>>;
+  where?: InputMaybe<InfrastructureUsesSoftwareProductsConnectionWhere>;
+};
+
 export type InfrastructureAiComponentHostsAiComponentsAggregateSelection = {
   __typename?: 'InfrastructureAIComponentHostsAIComponentsAggregateSelection';
   count: CountConnection;
@@ -29977,6 +32230,7 @@ export type InfrastructureApplicationHostsApplicationsNodeAggregateSelection = {
   hostingEnvironment: StringAggregateSelection;
   lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sbom: StringAggregateSelection;
   sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
@@ -30142,6 +32396,7 @@ export type InfrastructureCompanyCompanyNodeAggregateSelection = {
   __typename?: 'InfrastructureCompanyCompanyNodeAggregateSelection';
   achievedSovereigntyScore: FloatAggregateSelection;
   address: StringAggregateSelection;
+  controlPriority: IntAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   diagramFont: StringAggregateSelection;
@@ -30152,10 +32407,13 @@ export type InfrastructureCompanyCompanyNodeAggregateSelection = {
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
+  resiliencePriority: IntAggregateSelection;
   secondaryColor: StringAggregateSelection;
+  securityPriority: IntAggregateSelection;
   sovereigntyGap: FloatAggregateSelection;
   sovereigntyScorePercent: FloatAggregateSelection;
   sovereigntyScoreStatus: StringAggregateSelection;
+  strategicAutonomyPriority: IntAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -30230,6 +32488,7 @@ export type InfrastructureCompanyNodeAggregationWhereInput = {
   OR?: InputMaybe<Array<InfrastructureCompanyNodeAggregationWhereInput>>;
   achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   address?: InputMaybe<StringScalarAggregationFilters>;
+  controlPriority?: InputMaybe<IntScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramFont?: InputMaybe<StringScalarAggregationFilters>;
@@ -30240,10 +32499,13 @@ export type InfrastructureCompanyNodeAggregationWhereInput = {
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  resiliencePriority?: InputMaybe<IntScalarAggregationFilters>;
   secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  securityPriority?: InputMaybe<IntScalarAggregationFilters>;
   sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
   sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
   sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
+  strategicAutonomyPriority?: InputMaybe<IntScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -30280,6 +32542,8 @@ export type InfrastructureConnectInput = {
   partOfArchitectures?: InputMaybe<Array<InfrastructurePartOfArchitecturesConnectFieldInput>>;
   providedBy?: InputMaybe<Array<InfrastructureProvidedByConnectFieldInput>>;
   usedByOrganisations?: InputMaybe<Array<InfrastructureUsedByOrganisationsConnectFieldInput>>;
+  usesHardwareProducts?: InputMaybe<Array<InfrastructureUsesHardwareProductsConnectFieldInput>>;
+  usesSoftwareProducts?: InputMaybe<Array<InfrastructureUsesSoftwareProductsConnectFieldInput>>;
 };
 
 export type InfrastructureConnectWhere = {
@@ -30323,6 +32587,8 @@ export type InfrastructureCreateInput = {
   status: InfrastructureStatus;
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
   usedByOrganisations?: InputMaybe<InfrastructureUsedByOrganisationsFieldInput>;
+  usesHardwareProducts?: InputMaybe<InfrastructureUsesHardwareProductsFieldInput>;
+  usesSoftwareProducts?: InputMaybe<InfrastructureUsesSoftwareProductsFieldInput>;
   vendor?: InputMaybe<Scalars['String']['input']>;
   version?: InputMaybe<Scalars['String']['input']>;
 };
@@ -30340,6 +32606,8 @@ export type InfrastructureDeleteInput = {
   partOfArchitectures?: InputMaybe<Array<InfrastructurePartOfArchitecturesDeleteFieldInput>>;
   providedBy?: InputMaybe<Array<InfrastructureProvidedByDeleteFieldInput>>;
   usedByOrganisations?: InputMaybe<Array<InfrastructureUsedByOrganisationsDeleteFieldInput>>;
+  usesHardwareProducts?: InputMaybe<Array<InfrastructureUsesHardwareProductsDeleteFieldInput>>;
+  usesSoftwareProducts?: InputMaybe<Array<InfrastructureUsesSoftwareProductsDeleteFieldInput>>;
 };
 
 export type InfrastructureDepictedInDiagramsAggregateInput = {
@@ -30481,12 +32749,28 @@ export type InfrastructureDisconnectInput = {
   partOfArchitectures?: InputMaybe<Array<InfrastructurePartOfArchitecturesDisconnectFieldInput>>;
   providedBy?: InputMaybe<Array<InfrastructureProvidedByDisconnectFieldInput>>;
   usedByOrganisations?: InputMaybe<Array<InfrastructureUsedByOrganisationsDisconnectFieldInput>>;
+  usesHardwareProducts?: InputMaybe<Array<InfrastructureUsesHardwareProductsDisconnectFieldInput>>;
+  usesSoftwareProducts?: InputMaybe<Array<InfrastructureUsesSoftwareProductsDisconnectFieldInput>>;
 };
 
 export type InfrastructureEdge = {
   __typename?: 'InfrastructureEdge';
   cursor: Scalars['String']['output'];
   node: Infrastructure;
+};
+
+export type InfrastructureHardwareProductUsesHardwareProductsAggregateSelection = {
+  __typename?: 'InfrastructureHardwareProductUsesHardwareProductsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<InfrastructureHardwareProductUsesHardwareProductsNodeAggregateSelection>;
+};
+
+export type InfrastructureHardwareProductUsesHardwareProductsNodeAggregateSelection = {
+  __typename?: 'InfrastructureHardwareProductUsesHardwareProductsNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  name: StringAggregateSelection;
+  productFamily: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
 };
 
 export type InfrastructureHostedByAggregateInput = {
@@ -30805,6 +33089,7 @@ export type InfrastructureHostsApplicationsNodeAggregationWhereInput = {
   hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
   lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sbom?: InputMaybe<StringScalarAggregationFilters>;
   sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
@@ -31494,6 +33779,20 @@ export type InfrastructureRelationshipFilters = {
   some?: InputMaybe<InfrastructureWhere>;
 };
 
+export type InfrastructureSoftwareProductUsesSoftwareProductsAggregateSelection = {
+  __typename?: 'InfrastructureSoftwareProductUsesSoftwareProductsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<InfrastructureSoftwareProductUsesSoftwareProductsNodeAggregateSelection>;
+};
+
+export type InfrastructureSoftwareProductUsesSoftwareProductsNodeAggregateSelection = {
+  __typename?: 'InfrastructureSoftwareProductUsesSoftwareProductsNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  name: StringAggregateSelection;
+  productFamily: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
 /** Fields to sort Infrastructures by. The order in which sorts are applied is not guaranteed when specifying many fields in one InfrastructureSort object. */
 export type InfrastructureSort = {
   capacity?: InputMaybe<SortDirection>;
@@ -31677,6 +33976,8 @@ export type InfrastructureUpdateInput = {
   specifications?: InputMaybe<StringScalarMutations>;
   status?: InputMaybe<InfrastructureStatusEnumScalarMutations>;
   usedByOrganisations?: InputMaybe<Array<InfrastructureUsedByOrganisationsUpdateFieldInput>>;
+  usesHardwareProducts?: InputMaybe<Array<InfrastructureUsesHardwareProductsUpdateFieldInput>>;
+  usesSoftwareProducts?: InputMaybe<Array<InfrastructureUsesSoftwareProductsUpdateFieldInput>>;
   vendor?: InputMaybe<StringScalarMutations>;
   version?: InputMaybe<StringScalarMutations>;
 };
@@ -31788,6 +34089,218 @@ export type InfrastructureUsedByOrganisationsUpdateFieldInput = {
   update?: InputMaybe<InfrastructureUsedByOrganisationsUpdateConnectionInput>;
 };
 
+export type InfrastructureUsesHardwareProductsAggregateInput = {
+  AND?: InputMaybe<Array<InfrastructureUsesHardwareProductsAggregateInput>>;
+  NOT?: InputMaybe<InfrastructureUsesHardwareProductsAggregateInput>;
+  OR?: InputMaybe<Array<InfrastructureUsesHardwareProductsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<InfrastructureUsesHardwareProductsNodeAggregationWhereInput>;
+};
+
+export type InfrastructureUsesHardwareProductsConnectFieldInput = {
+  connect?: InputMaybe<Array<HardwareProductConnectInput>>;
+  where?: InputMaybe<HardwareProductConnectWhere>;
+};
+
+export type InfrastructureUsesHardwareProductsConnection = {
+  __typename?: 'InfrastructureUsesHardwareProductsConnection';
+  aggregate: InfrastructureHardwareProductUsesHardwareProductsAggregateSelection;
+  edges: Array<InfrastructureUsesHardwareProductsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type InfrastructureUsesHardwareProductsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<InfrastructureUsesHardwareProductsConnectionAggregateInput>>;
+  NOT?: InputMaybe<InfrastructureUsesHardwareProductsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<InfrastructureUsesHardwareProductsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<InfrastructureUsesHardwareProductsNodeAggregationWhereInput>;
+};
+
+export type InfrastructureUsesHardwareProductsConnectionFilters = {
+  /** Filter Infrastructures by aggregating results on related InfrastructureUsesHardwareProductsConnections */
+  aggregate?: InputMaybe<InfrastructureUsesHardwareProductsConnectionAggregateInput>;
+  /** Return Infrastructures where all of the related InfrastructureUsesHardwareProductsConnections match this filter */
+  all?: InputMaybe<InfrastructureUsesHardwareProductsConnectionWhere>;
+  /** Return Infrastructures where none of the related InfrastructureUsesHardwareProductsConnections match this filter */
+  none?: InputMaybe<InfrastructureUsesHardwareProductsConnectionWhere>;
+  /** Return Infrastructures where one of the related InfrastructureUsesHardwareProductsConnections match this filter */
+  single?: InputMaybe<InfrastructureUsesHardwareProductsConnectionWhere>;
+  /** Return Infrastructures where some of the related InfrastructureUsesHardwareProductsConnections match this filter */
+  some?: InputMaybe<InfrastructureUsesHardwareProductsConnectionWhere>;
+};
+
+export type InfrastructureUsesHardwareProductsConnectionSort = {
+  node?: InputMaybe<HardwareProductSort>;
+};
+
+export type InfrastructureUsesHardwareProductsConnectionWhere = {
+  AND?: InputMaybe<Array<InfrastructureUsesHardwareProductsConnectionWhere>>;
+  NOT?: InputMaybe<InfrastructureUsesHardwareProductsConnectionWhere>;
+  OR?: InputMaybe<Array<InfrastructureUsesHardwareProductsConnectionWhere>>;
+  node?: InputMaybe<HardwareProductWhere>;
+};
+
+export type InfrastructureUsesHardwareProductsCreateFieldInput = {
+  node: HardwareProductCreateInput;
+};
+
+export type InfrastructureUsesHardwareProductsDeleteFieldInput = {
+  delete?: InputMaybe<HardwareProductDeleteInput>;
+  where?: InputMaybe<InfrastructureUsesHardwareProductsConnectionWhere>;
+};
+
+export type InfrastructureUsesHardwareProductsDisconnectFieldInput = {
+  disconnect?: InputMaybe<HardwareProductDisconnectInput>;
+  where?: InputMaybe<InfrastructureUsesHardwareProductsConnectionWhere>;
+};
+
+export type InfrastructureUsesHardwareProductsFieldInput = {
+  connect?: InputMaybe<Array<InfrastructureUsesHardwareProductsConnectFieldInput>>;
+  create?: InputMaybe<Array<InfrastructureUsesHardwareProductsCreateFieldInput>>;
+};
+
+export type InfrastructureUsesHardwareProductsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<InfrastructureUsesHardwareProductsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<InfrastructureUsesHardwareProductsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<InfrastructureUsesHardwareProductsNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  productFamily?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type InfrastructureUsesHardwareProductsRelationship = {
+  __typename?: 'InfrastructureUsesHardwareProductsRelationship';
+  cursor: Scalars['String']['output'];
+  node: HardwareProduct;
+};
+
+export type InfrastructureUsesHardwareProductsUpdateConnectionInput = {
+  node?: InputMaybe<HardwareProductUpdateInput>;
+  where?: InputMaybe<InfrastructureUsesHardwareProductsConnectionWhere>;
+};
+
+export type InfrastructureUsesHardwareProductsUpdateFieldInput = {
+  connect?: InputMaybe<Array<InfrastructureUsesHardwareProductsConnectFieldInput>>;
+  create?: InputMaybe<Array<InfrastructureUsesHardwareProductsCreateFieldInput>>;
+  delete?: InputMaybe<Array<InfrastructureUsesHardwareProductsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<InfrastructureUsesHardwareProductsDisconnectFieldInput>>;
+  update?: InputMaybe<InfrastructureUsesHardwareProductsUpdateConnectionInput>;
+};
+
+export type InfrastructureUsesSoftwareProductsAggregateInput = {
+  AND?: InputMaybe<Array<InfrastructureUsesSoftwareProductsAggregateInput>>;
+  NOT?: InputMaybe<InfrastructureUsesSoftwareProductsAggregateInput>;
+  OR?: InputMaybe<Array<InfrastructureUsesSoftwareProductsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<InfrastructureUsesSoftwareProductsNodeAggregationWhereInput>;
+};
+
+export type InfrastructureUsesSoftwareProductsConnectFieldInput = {
+  connect?: InputMaybe<Array<SoftwareProductConnectInput>>;
+  where?: InputMaybe<SoftwareProductConnectWhere>;
+};
+
+export type InfrastructureUsesSoftwareProductsConnection = {
+  __typename?: 'InfrastructureUsesSoftwareProductsConnection';
+  aggregate: InfrastructureSoftwareProductUsesSoftwareProductsAggregateSelection;
+  edges: Array<InfrastructureUsesSoftwareProductsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type InfrastructureUsesSoftwareProductsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<InfrastructureUsesSoftwareProductsConnectionAggregateInput>>;
+  NOT?: InputMaybe<InfrastructureUsesSoftwareProductsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<InfrastructureUsesSoftwareProductsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<InfrastructureUsesSoftwareProductsNodeAggregationWhereInput>;
+};
+
+export type InfrastructureUsesSoftwareProductsConnectionFilters = {
+  /** Filter Infrastructures by aggregating results on related InfrastructureUsesSoftwareProductsConnections */
+  aggregate?: InputMaybe<InfrastructureUsesSoftwareProductsConnectionAggregateInput>;
+  /** Return Infrastructures where all of the related InfrastructureUsesSoftwareProductsConnections match this filter */
+  all?: InputMaybe<InfrastructureUsesSoftwareProductsConnectionWhere>;
+  /** Return Infrastructures where none of the related InfrastructureUsesSoftwareProductsConnections match this filter */
+  none?: InputMaybe<InfrastructureUsesSoftwareProductsConnectionWhere>;
+  /** Return Infrastructures where one of the related InfrastructureUsesSoftwareProductsConnections match this filter */
+  single?: InputMaybe<InfrastructureUsesSoftwareProductsConnectionWhere>;
+  /** Return Infrastructures where some of the related InfrastructureUsesSoftwareProductsConnections match this filter */
+  some?: InputMaybe<InfrastructureUsesSoftwareProductsConnectionWhere>;
+};
+
+export type InfrastructureUsesSoftwareProductsConnectionSort = {
+  node?: InputMaybe<SoftwareProductSort>;
+};
+
+export type InfrastructureUsesSoftwareProductsConnectionWhere = {
+  AND?: InputMaybe<Array<InfrastructureUsesSoftwareProductsConnectionWhere>>;
+  NOT?: InputMaybe<InfrastructureUsesSoftwareProductsConnectionWhere>;
+  OR?: InputMaybe<Array<InfrastructureUsesSoftwareProductsConnectionWhere>>;
+  node?: InputMaybe<SoftwareProductWhere>;
+};
+
+export type InfrastructureUsesSoftwareProductsCreateFieldInput = {
+  node: SoftwareProductCreateInput;
+};
+
+export type InfrastructureUsesSoftwareProductsDeleteFieldInput = {
+  delete?: InputMaybe<SoftwareProductDeleteInput>;
+  where?: InputMaybe<InfrastructureUsesSoftwareProductsConnectionWhere>;
+};
+
+export type InfrastructureUsesSoftwareProductsDisconnectFieldInput = {
+  disconnect?: InputMaybe<SoftwareProductDisconnectInput>;
+  where?: InputMaybe<InfrastructureUsesSoftwareProductsConnectionWhere>;
+};
+
+export type InfrastructureUsesSoftwareProductsFieldInput = {
+  connect?: InputMaybe<Array<InfrastructureUsesSoftwareProductsConnectFieldInput>>;
+  create?: InputMaybe<Array<InfrastructureUsesSoftwareProductsCreateFieldInput>>;
+};
+
+export type InfrastructureUsesSoftwareProductsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<InfrastructureUsesSoftwareProductsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<InfrastructureUsesSoftwareProductsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<InfrastructureUsesSoftwareProductsNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  productFamily?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type InfrastructureUsesSoftwareProductsRelationship = {
+  __typename?: 'InfrastructureUsesSoftwareProductsRelationship';
+  cursor: Scalars['String']['output'];
+  node: SoftwareProduct;
+};
+
+export type InfrastructureUsesSoftwareProductsUpdateConnectionInput = {
+  node?: InputMaybe<SoftwareProductUpdateInput>;
+  where?: InputMaybe<InfrastructureUsesSoftwareProductsConnectionWhere>;
+};
+
+export type InfrastructureUsesSoftwareProductsUpdateFieldInput = {
+  connect?: InputMaybe<Array<InfrastructureUsesSoftwareProductsConnectFieldInput>>;
+  create?: InputMaybe<Array<InfrastructureUsesSoftwareProductsCreateFieldInput>>;
+  delete?: InputMaybe<Array<InfrastructureUsesSoftwareProductsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<InfrastructureUsesSoftwareProductsDisconnectFieldInput>>;
+  update?: InputMaybe<InfrastructureUsesSoftwareProductsUpdateConnectionInput>;
+};
+
 export type InfrastructureWhere = {
   AND?: InputMaybe<Array<InfrastructureWhere>>;
   NOT?: InputMaybe<InfrastructureWhere>;
@@ -31842,6 +34355,10 @@ export type InfrastructureWhere = {
   updatedAt?: InputMaybe<DateTimeScalarFilters>;
   usedByOrganisations?: InputMaybe<OrganisationRelationshipFilters>;
   usedByOrganisationsConnection?: InputMaybe<InfrastructureUsedByOrganisationsConnectionFilters>;
+  usesHardwareProducts?: InputMaybe<HardwareProductRelationshipFilters>;
+  usesHardwareProductsConnection?: InputMaybe<InfrastructureUsesHardwareProductsConnectionFilters>;
+  usesSoftwareProducts?: InputMaybe<SoftwareProductRelationshipFilters>;
+  usesSoftwareProductsConnection?: InputMaybe<InfrastructureUsesSoftwareProductsConnectionFilters>;
   vendor?: InputMaybe<StringScalarFilters>;
   version?: InputMaybe<StringScalarFilters>;
 };
@@ -31958,6 +34475,647 @@ export type InterfaceTypeEnumScalarMutations = {
   set?: InputMaybe<InterfaceType>;
 };
 
+/** LifecycleRecord – lifecycle metadata for software/hardware versions */
+export type LifecycleRecord = {
+  __typename?: 'LifecycleRecord';
+  company: Array<Company>;
+  companyConnection: LifecycleRecordCompanyConnection;
+  createdAt: Scalars['DateTime']['output'];
+  eolDate?: Maybe<Scalars['Date']['output']>;
+  eosDate?: Maybe<Scalars['Date']['output']>;
+  extendedSupportEndDate?: Maybe<Scalars['Date']['output']>;
+  gaDate?: Maybe<Scalars['Date']['output']>;
+  hardwareVersions: Array<HardwareVersion>;
+  hardwareVersionsConnection: LifecycleRecordHardwareVersionsConnection;
+  id: Scalars['ID']['output'];
+  lastValidatedAt?: Maybe<Scalars['DateTime']['output']>;
+  lifecycleStatus?: Maybe<LifecycleStatus>;
+  mainstreamSupportEndDate?: Maybe<Scalars['Date']['output']>;
+  softwareVersions: Array<SoftwareVersion>;
+  softwareVersionsConnection: LifecycleRecordSoftwareVersionsConnection;
+  source?: Maybe<Scalars['String']['output']>;
+  sourceConfidence?: Maybe<Scalars['Float']['output']>;
+  sourceUrl?: Maybe<Scalars['String']['output']>;
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+};
+
+
+/** LifecycleRecord – lifecycle metadata for software/hardware versions */
+export type LifecycleRecordCompanyArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<CompanySort>>;
+  where?: InputMaybe<CompanyWhere>;
+};
+
+
+/** LifecycleRecord – lifecycle metadata for software/hardware versions */
+export type LifecycleRecordCompanyConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<LifecycleRecordCompanyConnectionSort>>;
+  where?: InputMaybe<LifecycleRecordCompanyConnectionWhere>;
+};
+
+
+/** LifecycleRecord – lifecycle metadata for software/hardware versions */
+export type LifecycleRecordHardwareVersionsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<HardwareVersionSort>>;
+  where?: InputMaybe<HardwareVersionWhere>;
+};
+
+
+/** LifecycleRecord – lifecycle metadata for software/hardware versions */
+export type LifecycleRecordHardwareVersionsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<LifecycleRecordHardwareVersionsConnectionSort>>;
+  where?: InputMaybe<LifecycleRecordHardwareVersionsConnectionWhere>;
+};
+
+
+/** LifecycleRecord – lifecycle metadata for software/hardware versions */
+export type LifecycleRecordSoftwareVersionsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SoftwareVersionSort>>;
+  where?: InputMaybe<SoftwareVersionWhere>;
+};
+
+
+/** LifecycleRecord – lifecycle metadata for software/hardware versions */
+export type LifecycleRecordSoftwareVersionsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<LifecycleRecordSoftwareVersionsConnectionSort>>;
+  where?: InputMaybe<LifecycleRecordSoftwareVersionsConnectionWhere>;
+};
+
+export type LifecycleRecordAggregate = {
+  __typename?: 'LifecycleRecordAggregate';
+  count: Count;
+  node: LifecycleRecordAggregateNode;
+};
+
+export type LifecycleRecordAggregateNode = {
+  __typename?: 'LifecycleRecordAggregateNode';
+  createdAt: DateTimeAggregateSelection;
+  lastValidatedAt: DateTimeAggregateSelection;
+  source: StringAggregateSelection;
+  sourceConfidence: FloatAggregateSelection;
+  sourceUrl: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
+export type LifecycleRecordCompanyAggregateInput = {
+  AND?: InputMaybe<Array<LifecycleRecordCompanyAggregateInput>>;
+  NOT?: InputMaybe<LifecycleRecordCompanyAggregateInput>;
+  OR?: InputMaybe<Array<LifecycleRecordCompanyAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<LifecycleRecordCompanyNodeAggregationWhereInput>;
+};
+
+export type LifecycleRecordCompanyCompanyAggregateSelection = {
+  __typename?: 'LifecycleRecordCompanyCompanyAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<LifecycleRecordCompanyCompanyNodeAggregateSelection>;
+};
+
+export type LifecycleRecordCompanyCompanyNodeAggregateSelection = {
+  __typename?: 'LifecycleRecordCompanyCompanyNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
+  address: StringAggregateSelection;
+  controlPriority: IntAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  diagramFont: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
+  features: StringAggregateSelection;
+  font: StringAggregateSelection;
+  industry: StringAggregateSelection;
+  logo: StringAggregateSelection;
+  name: StringAggregateSelection;
+  primaryColor: StringAggregateSelection;
+  resiliencePriority: IntAggregateSelection;
+  secondaryColor: StringAggregateSelection;
+  securityPriority: IntAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
+  sovereigntyScoreStatus: StringAggregateSelection;
+  strategicAutonomyPriority: IntAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  website: StringAggregateSelection;
+};
+
+export type LifecycleRecordCompanyConnectFieldInput = {
+  connect?: InputMaybe<Array<CompanyConnectInput>>;
+  where?: InputMaybe<CompanyConnectWhere>;
+};
+
+export type LifecycleRecordCompanyConnection = {
+  __typename?: 'LifecycleRecordCompanyConnection';
+  aggregate: LifecycleRecordCompanyCompanyAggregateSelection;
+  edges: Array<LifecycleRecordCompanyRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type LifecycleRecordCompanyConnectionAggregateInput = {
+  AND?: InputMaybe<Array<LifecycleRecordCompanyConnectionAggregateInput>>;
+  NOT?: InputMaybe<LifecycleRecordCompanyConnectionAggregateInput>;
+  OR?: InputMaybe<Array<LifecycleRecordCompanyConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<LifecycleRecordCompanyNodeAggregationWhereInput>;
+};
+
+export type LifecycleRecordCompanyConnectionFilters = {
+  /** Filter LifecycleRecords by aggregating results on related LifecycleRecordCompanyConnections */
+  aggregate?: InputMaybe<LifecycleRecordCompanyConnectionAggregateInput>;
+  /** Return LifecycleRecords where all of the related LifecycleRecordCompanyConnections match this filter */
+  all?: InputMaybe<LifecycleRecordCompanyConnectionWhere>;
+  /** Return LifecycleRecords where none of the related LifecycleRecordCompanyConnections match this filter */
+  none?: InputMaybe<LifecycleRecordCompanyConnectionWhere>;
+  /** Return LifecycleRecords where one of the related LifecycleRecordCompanyConnections match this filter */
+  single?: InputMaybe<LifecycleRecordCompanyConnectionWhere>;
+  /** Return LifecycleRecords where some of the related LifecycleRecordCompanyConnections match this filter */
+  some?: InputMaybe<LifecycleRecordCompanyConnectionWhere>;
+};
+
+export type LifecycleRecordCompanyConnectionSort = {
+  node?: InputMaybe<CompanySort>;
+};
+
+export type LifecycleRecordCompanyConnectionWhere = {
+  AND?: InputMaybe<Array<LifecycleRecordCompanyConnectionWhere>>;
+  NOT?: InputMaybe<LifecycleRecordCompanyConnectionWhere>;
+  OR?: InputMaybe<Array<LifecycleRecordCompanyConnectionWhere>>;
+  node?: InputMaybe<CompanyWhere>;
+};
+
+export type LifecycleRecordCompanyCreateFieldInput = {
+  node: CompanyCreateInput;
+};
+
+export type LifecycleRecordCompanyDeleteFieldInput = {
+  delete?: InputMaybe<CompanyDeleteInput>;
+  where?: InputMaybe<LifecycleRecordCompanyConnectionWhere>;
+};
+
+export type LifecycleRecordCompanyDisconnectFieldInput = {
+  disconnect?: InputMaybe<CompanyDisconnectInput>;
+  where?: InputMaybe<LifecycleRecordCompanyConnectionWhere>;
+};
+
+export type LifecycleRecordCompanyFieldInput = {
+  connect?: InputMaybe<Array<LifecycleRecordCompanyConnectFieldInput>>;
+  create?: InputMaybe<Array<LifecycleRecordCompanyCreateFieldInput>>;
+};
+
+export type LifecycleRecordCompanyNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<LifecycleRecordCompanyNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<LifecycleRecordCompanyNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<LifecycleRecordCompanyNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
+  address?: InputMaybe<StringScalarAggregationFilters>;
+  controlPriority?: InputMaybe<IntScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  diagramFont?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
+  features?: InputMaybe<StringScalarAggregationFilters>;
+  font?: InputMaybe<StringScalarAggregationFilters>;
+  industry?: InputMaybe<StringScalarAggregationFilters>;
+  logo?: InputMaybe<StringScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  primaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  resiliencePriority?: InputMaybe<IntScalarAggregationFilters>;
+  secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  securityPriority?: InputMaybe<IntScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
+  strategicAutonomyPriority?: InputMaybe<IntScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  website?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type LifecycleRecordCompanyRelationship = {
+  __typename?: 'LifecycleRecordCompanyRelationship';
+  cursor: Scalars['String']['output'];
+  node: Company;
+};
+
+export type LifecycleRecordCompanyUpdateConnectionInput = {
+  node?: InputMaybe<CompanyUpdateInput>;
+  where?: InputMaybe<LifecycleRecordCompanyConnectionWhere>;
+};
+
+export type LifecycleRecordCompanyUpdateFieldInput = {
+  connect?: InputMaybe<Array<LifecycleRecordCompanyConnectFieldInput>>;
+  create?: InputMaybe<Array<LifecycleRecordCompanyCreateFieldInput>>;
+  delete?: InputMaybe<Array<LifecycleRecordCompanyDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<LifecycleRecordCompanyDisconnectFieldInput>>;
+  update?: InputMaybe<LifecycleRecordCompanyUpdateConnectionInput>;
+};
+
+export type LifecycleRecordConnectInput = {
+  company?: InputMaybe<Array<LifecycleRecordCompanyConnectFieldInput>>;
+  hardwareVersions?: InputMaybe<Array<LifecycleRecordHardwareVersionsConnectFieldInput>>;
+  softwareVersions?: InputMaybe<Array<LifecycleRecordSoftwareVersionsConnectFieldInput>>;
+};
+
+export type LifecycleRecordConnectWhere = {
+  node: LifecycleRecordWhere;
+};
+
+export type LifecycleRecordCreateInput = {
+  company?: InputMaybe<LifecycleRecordCompanyFieldInput>;
+  eolDate?: InputMaybe<Scalars['Date']['input']>;
+  eosDate?: InputMaybe<Scalars['Date']['input']>;
+  extendedSupportEndDate?: InputMaybe<Scalars['Date']['input']>;
+  gaDate?: InputMaybe<Scalars['Date']['input']>;
+  hardwareVersions?: InputMaybe<LifecycleRecordHardwareVersionsFieldInput>;
+  lastValidatedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  lifecycleStatus?: InputMaybe<LifecycleStatus>;
+  mainstreamSupportEndDate?: InputMaybe<Scalars['Date']['input']>;
+  softwareVersions?: InputMaybe<LifecycleRecordSoftwareVersionsFieldInput>;
+  source?: InputMaybe<Scalars['String']['input']>;
+  sourceConfidence?: InputMaybe<Scalars['Float']['input']>;
+  sourceUrl?: InputMaybe<Scalars['String']['input']>;
+  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+export type LifecycleRecordDeleteInput = {
+  company?: InputMaybe<Array<LifecycleRecordCompanyDeleteFieldInput>>;
+  hardwareVersions?: InputMaybe<Array<LifecycleRecordHardwareVersionsDeleteFieldInput>>;
+  softwareVersions?: InputMaybe<Array<LifecycleRecordSoftwareVersionsDeleteFieldInput>>;
+};
+
+export type LifecycleRecordDisconnectInput = {
+  company?: InputMaybe<Array<LifecycleRecordCompanyDisconnectFieldInput>>;
+  hardwareVersions?: InputMaybe<Array<LifecycleRecordHardwareVersionsDisconnectFieldInput>>;
+  softwareVersions?: InputMaybe<Array<LifecycleRecordSoftwareVersionsDisconnectFieldInput>>;
+};
+
+export type LifecycleRecordEdge = {
+  __typename?: 'LifecycleRecordEdge';
+  cursor: Scalars['String']['output'];
+  node: LifecycleRecord;
+};
+
+export type LifecycleRecordHardwareVersionHardwareVersionsAggregateSelection = {
+  __typename?: 'LifecycleRecordHardwareVersionHardwareVersionsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<LifecycleRecordHardwareVersionHardwareVersionsNodeAggregateSelection>;
+};
+
+export type LifecycleRecordHardwareVersionHardwareVersionsNodeAggregateSelection = {
+  __typename?: 'LifecycleRecordHardwareVersionHardwareVersionsNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  normalizedVersionModel: StringAggregateSelection;
+  releaseChannel: StringAggregateSelection;
+  supportTier: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  versionModelString: StringAggregateSelection;
+};
+
+export type LifecycleRecordHardwareVersionsAggregateInput = {
+  AND?: InputMaybe<Array<LifecycleRecordHardwareVersionsAggregateInput>>;
+  NOT?: InputMaybe<LifecycleRecordHardwareVersionsAggregateInput>;
+  OR?: InputMaybe<Array<LifecycleRecordHardwareVersionsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<LifecycleRecordHardwareVersionsNodeAggregationWhereInput>;
+};
+
+export type LifecycleRecordHardwareVersionsConnectFieldInput = {
+  connect?: InputMaybe<Array<HardwareVersionConnectInput>>;
+  where?: InputMaybe<HardwareVersionConnectWhere>;
+};
+
+export type LifecycleRecordHardwareVersionsConnection = {
+  __typename?: 'LifecycleRecordHardwareVersionsConnection';
+  aggregate: LifecycleRecordHardwareVersionHardwareVersionsAggregateSelection;
+  edges: Array<LifecycleRecordHardwareVersionsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type LifecycleRecordHardwareVersionsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<LifecycleRecordHardwareVersionsConnectionAggregateInput>>;
+  NOT?: InputMaybe<LifecycleRecordHardwareVersionsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<LifecycleRecordHardwareVersionsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<LifecycleRecordHardwareVersionsNodeAggregationWhereInput>;
+};
+
+export type LifecycleRecordHardwareVersionsConnectionFilters = {
+  /** Filter LifecycleRecords by aggregating results on related LifecycleRecordHardwareVersionsConnections */
+  aggregate?: InputMaybe<LifecycleRecordHardwareVersionsConnectionAggregateInput>;
+  /** Return LifecycleRecords where all of the related LifecycleRecordHardwareVersionsConnections match this filter */
+  all?: InputMaybe<LifecycleRecordHardwareVersionsConnectionWhere>;
+  /** Return LifecycleRecords where none of the related LifecycleRecordHardwareVersionsConnections match this filter */
+  none?: InputMaybe<LifecycleRecordHardwareVersionsConnectionWhere>;
+  /** Return LifecycleRecords where one of the related LifecycleRecordHardwareVersionsConnections match this filter */
+  single?: InputMaybe<LifecycleRecordHardwareVersionsConnectionWhere>;
+  /** Return LifecycleRecords where some of the related LifecycleRecordHardwareVersionsConnections match this filter */
+  some?: InputMaybe<LifecycleRecordHardwareVersionsConnectionWhere>;
+};
+
+export type LifecycleRecordHardwareVersionsConnectionSort = {
+  node?: InputMaybe<HardwareVersionSort>;
+};
+
+export type LifecycleRecordHardwareVersionsConnectionWhere = {
+  AND?: InputMaybe<Array<LifecycleRecordHardwareVersionsConnectionWhere>>;
+  NOT?: InputMaybe<LifecycleRecordHardwareVersionsConnectionWhere>;
+  OR?: InputMaybe<Array<LifecycleRecordHardwareVersionsConnectionWhere>>;
+  node?: InputMaybe<HardwareVersionWhere>;
+};
+
+export type LifecycleRecordHardwareVersionsCreateFieldInput = {
+  node: HardwareVersionCreateInput;
+};
+
+export type LifecycleRecordHardwareVersionsDeleteFieldInput = {
+  delete?: InputMaybe<HardwareVersionDeleteInput>;
+  where?: InputMaybe<LifecycleRecordHardwareVersionsConnectionWhere>;
+};
+
+export type LifecycleRecordHardwareVersionsDisconnectFieldInput = {
+  disconnect?: InputMaybe<HardwareVersionDisconnectInput>;
+  where?: InputMaybe<LifecycleRecordHardwareVersionsConnectionWhere>;
+};
+
+export type LifecycleRecordHardwareVersionsFieldInput = {
+  connect?: InputMaybe<Array<LifecycleRecordHardwareVersionsConnectFieldInput>>;
+  create?: InputMaybe<Array<LifecycleRecordHardwareVersionsCreateFieldInput>>;
+};
+
+export type LifecycleRecordHardwareVersionsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<LifecycleRecordHardwareVersionsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<LifecycleRecordHardwareVersionsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<LifecycleRecordHardwareVersionsNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  normalizedVersionModel?: InputMaybe<StringScalarAggregationFilters>;
+  releaseChannel?: InputMaybe<StringScalarAggregationFilters>;
+  supportTier?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  versionModelString?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type LifecycleRecordHardwareVersionsRelationship = {
+  __typename?: 'LifecycleRecordHardwareVersionsRelationship';
+  cursor: Scalars['String']['output'];
+  node: HardwareVersion;
+};
+
+export type LifecycleRecordHardwareVersionsUpdateConnectionInput = {
+  node?: InputMaybe<HardwareVersionUpdateInput>;
+  where?: InputMaybe<LifecycleRecordHardwareVersionsConnectionWhere>;
+};
+
+export type LifecycleRecordHardwareVersionsUpdateFieldInput = {
+  connect?: InputMaybe<Array<LifecycleRecordHardwareVersionsConnectFieldInput>>;
+  create?: InputMaybe<Array<LifecycleRecordHardwareVersionsCreateFieldInput>>;
+  delete?: InputMaybe<Array<LifecycleRecordHardwareVersionsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<LifecycleRecordHardwareVersionsDisconnectFieldInput>>;
+  update?: InputMaybe<LifecycleRecordHardwareVersionsUpdateConnectionInput>;
+};
+
+export type LifecycleRecordRelationshipFilters = {
+  /** Filter type where all of the related LifecycleRecords match this filter */
+  all?: InputMaybe<LifecycleRecordWhere>;
+  /** Filter type where none of the related LifecycleRecords match this filter */
+  none?: InputMaybe<LifecycleRecordWhere>;
+  /** Filter type where one of the related LifecycleRecords match this filter */
+  single?: InputMaybe<LifecycleRecordWhere>;
+  /** Filter type where some of the related LifecycleRecords match this filter */
+  some?: InputMaybe<LifecycleRecordWhere>;
+};
+
+export type LifecycleRecordSoftwareVersionSoftwareVersionsAggregateSelection = {
+  __typename?: 'LifecycleRecordSoftwareVersionSoftwareVersionsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<LifecycleRecordSoftwareVersionSoftwareVersionsNodeAggregateSelection>;
+};
+
+export type LifecycleRecordSoftwareVersionSoftwareVersionsNodeAggregateSelection = {
+  __typename?: 'LifecycleRecordSoftwareVersionSoftwareVersionsNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  normalizedVersion: StringAggregateSelection;
+  releaseChannel: StringAggregateSelection;
+  supportTier: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  versionString: StringAggregateSelection;
+};
+
+export type LifecycleRecordSoftwareVersionsAggregateInput = {
+  AND?: InputMaybe<Array<LifecycleRecordSoftwareVersionsAggregateInput>>;
+  NOT?: InputMaybe<LifecycleRecordSoftwareVersionsAggregateInput>;
+  OR?: InputMaybe<Array<LifecycleRecordSoftwareVersionsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<LifecycleRecordSoftwareVersionsNodeAggregationWhereInput>;
+};
+
+export type LifecycleRecordSoftwareVersionsConnectFieldInput = {
+  connect?: InputMaybe<Array<SoftwareVersionConnectInput>>;
+  where?: InputMaybe<SoftwareVersionConnectWhere>;
+};
+
+export type LifecycleRecordSoftwareVersionsConnection = {
+  __typename?: 'LifecycleRecordSoftwareVersionsConnection';
+  aggregate: LifecycleRecordSoftwareVersionSoftwareVersionsAggregateSelection;
+  edges: Array<LifecycleRecordSoftwareVersionsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type LifecycleRecordSoftwareVersionsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<LifecycleRecordSoftwareVersionsConnectionAggregateInput>>;
+  NOT?: InputMaybe<LifecycleRecordSoftwareVersionsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<LifecycleRecordSoftwareVersionsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<LifecycleRecordSoftwareVersionsNodeAggregationWhereInput>;
+};
+
+export type LifecycleRecordSoftwareVersionsConnectionFilters = {
+  /** Filter LifecycleRecords by aggregating results on related LifecycleRecordSoftwareVersionsConnections */
+  aggregate?: InputMaybe<LifecycleRecordSoftwareVersionsConnectionAggregateInput>;
+  /** Return LifecycleRecords where all of the related LifecycleRecordSoftwareVersionsConnections match this filter */
+  all?: InputMaybe<LifecycleRecordSoftwareVersionsConnectionWhere>;
+  /** Return LifecycleRecords where none of the related LifecycleRecordSoftwareVersionsConnections match this filter */
+  none?: InputMaybe<LifecycleRecordSoftwareVersionsConnectionWhere>;
+  /** Return LifecycleRecords where one of the related LifecycleRecordSoftwareVersionsConnections match this filter */
+  single?: InputMaybe<LifecycleRecordSoftwareVersionsConnectionWhere>;
+  /** Return LifecycleRecords where some of the related LifecycleRecordSoftwareVersionsConnections match this filter */
+  some?: InputMaybe<LifecycleRecordSoftwareVersionsConnectionWhere>;
+};
+
+export type LifecycleRecordSoftwareVersionsConnectionSort = {
+  node?: InputMaybe<SoftwareVersionSort>;
+};
+
+export type LifecycleRecordSoftwareVersionsConnectionWhere = {
+  AND?: InputMaybe<Array<LifecycleRecordSoftwareVersionsConnectionWhere>>;
+  NOT?: InputMaybe<LifecycleRecordSoftwareVersionsConnectionWhere>;
+  OR?: InputMaybe<Array<LifecycleRecordSoftwareVersionsConnectionWhere>>;
+  node?: InputMaybe<SoftwareVersionWhere>;
+};
+
+export type LifecycleRecordSoftwareVersionsCreateFieldInput = {
+  node: SoftwareVersionCreateInput;
+};
+
+export type LifecycleRecordSoftwareVersionsDeleteFieldInput = {
+  delete?: InputMaybe<SoftwareVersionDeleteInput>;
+  where?: InputMaybe<LifecycleRecordSoftwareVersionsConnectionWhere>;
+};
+
+export type LifecycleRecordSoftwareVersionsDisconnectFieldInput = {
+  disconnect?: InputMaybe<SoftwareVersionDisconnectInput>;
+  where?: InputMaybe<LifecycleRecordSoftwareVersionsConnectionWhere>;
+};
+
+export type LifecycleRecordSoftwareVersionsFieldInput = {
+  connect?: InputMaybe<Array<LifecycleRecordSoftwareVersionsConnectFieldInput>>;
+  create?: InputMaybe<Array<LifecycleRecordSoftwareVersionsCreateFieldInput>>;
+};
+
+export type LifecycleRecordSoftwareVersionsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<LifecycleRecordSoftwareVersionsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<LifecycleRecordSoftwareVersionsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<LifecycleRecordSoftwareVersionsNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  normalizedVersion?: InputMaybe<StringScalarAggregationFilters>;
+  releaseChannel?: InputMaybe<StringScalarAggregationFilters>;
+  supportTier?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  versionString?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type LifecycleRecordSoftwareVersionsRelationship = {
+  __typename?: 'LifecycleRecordSoftwareVersionsRelationship';
+  cursor: Scalars['String']['output'];
+  node: SoftwareVersion;
+};
+
+export type LifecycleRecordSoftwareVersionsUpdateConnectionInput = {
+  node?: InputMaybe<SoftwareVersionUpdateInput>;
+  where?: InputMaybe<LifecycleRecordSoftwareVersionsConnectionWhere>;
+};
+
+export type LifecycleRecordSoftwareVersionsUpdateFieldInput = {
+  connect?: InputMaybe<Array<LifecycleRecordSoftwareVersionsConnectFieldInput>>;
+  create?: InputMaybe<Array<LifecycleRecordSoftwareVersionsCreateFieldInput>>;
+  delete?: InputMaybe<Array<LifecycleRecordSoftwareVersionsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<LifecycleRecordSoftwareVersionsDisconnectFieldInput>>;
+  update?: InputMaybe<LifecycleRecordSoftwareVersionsUpdateConnectionInput>;
+};
+
+/** Fields to sort LifecycleRecords by. The order in which sorts are applied is not guaranteed when specifying many fields in one LifecycleRecordSort object. */
+export type LifecycleRecordSort = {
+  createdAt?: InputMaybe<SortDirection>;
+  eolDate?: InputMaybe<SortDirection>;
+  eosDate?: InputMaybe<SortDirection>;
+  extendedSupportEndDate?: InputMaybe<SortDirection>;
+  gaDate?: InputMaybe<SortDirection>;
+  id?: InputMaybe<SortDirection>;
+  lastValidatedAt?: InputMaybe<SortDirection>;
+  lifecycleStatus?: InputMaybe<SortDirection>;
+  mainstreamSupportEndDate?: InputMaybe<SortDirection>;
+  source?: InputMaybe<SortDirection>;
+  sourceConfidence?: InputMaybe<SortDirection>;
+  sourceUrl?: InputMaybe<SortDirection>;
+  updatedAt?: InputMaybe<SortDirection>;
+};
+
+export type LifecycleRecordUpdateInput = {
+  company?: InputMaybe<Array<LifecycleRecordCompanyUpdateFieldInput>>;
+  createdAt?: InputMaybe<DateTimeScalarMutations>;
+  eolDate?: InputMaybe<DateScalarMutations>;
+  eosDate?: InputMaybe<DateScalarMutations>;
+  extendedSupportEndDate?: InputMaybe<DateScalarMutations>;
+  gaDate?: InputMaybe<DateScalarMutations>;
+  hardwareVersions?: InputMaybe<Array<LifecycleRecordHardwareVersionsUpdateFieldInput>>;
+  lastValidatedAt?: InputMaybe<DateTimeScalarMutations>;
+  lifecycleStatus?: InputMaybe<LifecycleStatusEnumScalarMutations>;
+  mainstreamSupportEndDate?: InputMaybe<DateScalarMutations>;
+  softwareVersions?: InputMaybe<Array<LifecycleRecordSoftwareVersionsUpdateFieldInput>>;
+  source?: InputMaybe<StringScalarMutations>;
+  sourceConfidence?: InputMaybe<FloatScalarMutations>;
+  sourceUrl?: InputMaybe<StringScalarMutations>;
+};
+
+export type LifecycleRecordWhere = {
+  AND?: InputMaybe<Array<LifecycleRecordWhere>>;
+  NOT?: InputMaybe<LifecycleRecordWhere>;
+  OR?: InputMaybe<Array<LifecycleRecordWhere>>;
+  company?: InputMaybe<CompanyRelationshipFilters>;
+  companyConnection?: InputMaybe<LifecycleRecordCompanyConnectionFilters>;
+  createdAt?: InputMaybe<DateTimeScalarFilters>;
+  eolDate?: InputMaybe<DateScalarFilters>;
+  eosDate?: InputMaybe<DateScalarFilters>;
+  extendedSupportEndDate?: InputMaybe<DateScalarFilters>;
+  gaDate?: InputMaybe<DateScalarFilters>;
+  hardwareVersions?: InputMaybe<HardwareVersionRelationshipFilters>;
+  hardwareVersionsConnection?: InputMaybe<LifecycleRecordHardwareVersionsConnectionFilters>;
+  id?: InputMaybe<IdScalarFilters>;
+  lastValidatedAt?: InputMaybe<DateTimeScalarFilters>;
+  lifecycleStatus?: InputMaybe<LifecycleStatusEnumScalarFilters>;
+  mainstreamSupportEndDate?: InputMaybe<DateScalarFilters>;
+  softwareVersions?: InputMaybe<SoftwareVersionRelationshipFilters>;
+  softwareVersionsConnection?: InputMaybe<LifecycleRecordSoftwareVersionsConnectionFilters>;
+  source?: InputMaybe<StringScalarFilters>;
+  sourceConfidence?: InputMaybe<FloatScalarFilters>;
+  sourceUrl?: InputMaybe<StringScalarFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarFilters>;
+};
+
+export type LifecycleRecordsConnection = {
+  __typename?: 'LifecycleRecordsConnection';
+  aggregate: LifecycleRecordAggregate;
+  edges: Array<LifecycleRecordEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export enum LifecycleStatus {
+  APPROACHING_EOL = 'APPROACHING_EOL',
+  APPROACHING_EOS = 'APPROACHING_EOS',
+  EOL = 'EOL',
+  EOS = 'EOS',
+  SUPPORTED = 'SUPPORTED',
+  UNSUPPORTED = 'UNSUPPORTED'
+}
+
+/** LifecycleStatus filters */
+export type LifecycleStatusEnumScalarFilters = {
+  eq?: InputMaybe<LifecycleStatus>;
+  in?: InputMaybe<Array<LifecycleStatus>>;
+};
+
+/** LifecycleStatus mutations */
+export type LifecycleStatusEnumScalarMutations = {
+  set?: InputMaybe<LifecycleStatus>;
+};
+
 /** Mutations for a list for String */
 export type ListStringMutations = {
   pop?: InputMaybe<Scalars['Int']['input']>;
@@ -31984,9 +35142,15 @@ export type Mutation = {
   createGeaStrategies: CreateGeaStrategiesMutationResponse;
   createGeaValues: CreateGeaValuesMutationResponse;
   createGeaVisions: CreateGeaVisionsMutationResponse;
+  createHardwareProducts: CreateHardwareProductsMutationResponse;
+  createHardwareVersions: CreateHardwareVersionsMutationResponse;
   createInfrastructures: CreateInfrastructuresMutationResponse;
+  createLifecycleRecords: CreateLifecycleRecordsMutationResponse;
   createOrganisations: CreateOrganisationsMutationResponse;
   createPeople: CreatePeopleMutationResponse;
+  createSbomDocuments: CreateSbomDocumentsMutationResponse;
+  createSoftwareProducts: CreateSoftwareProductsMutationResponse;
+  createSoftwareVersions: CreateSoftwareVersionsMutationResponse;
   createSuppliers: CreateSuppliersMutationResponse;
   deleteAiComponents: DeleteInfo;
   deleteAiRunAuditEvents: DeleteInfo;
@@ -32005,9 +35169,15 @@ export type Mutation = {
   deleteGeaStrategies: DeleteInfo;
   deleteGeaValues: DeleteInfo;
   deleteGeaVisions: DeleteInfo;
+  deleteHardwareProducts: DeleteInfo;
+  deleteHardwareVersions: DeleteInfo;
   deleteInfrastructures: DeleteInfo;
+  deleteLifecycleRecords: DeleteInfo;
   deleteOrganisations: DeleteInfo;
   deletePeople: DeleteInfo;
+  deleteSbomDocuments: DeleteInfo;
+  deleteSoftwareProducts: DeleteInfo;
+  deleteSoftwareVersions: DeleteInfo;
   deleteSuppliers: DeleteInfo;
   updateAiComponents: UpdateAiComponentsMutationResponse;
   updateAiRunAuditEvents: UpdateAiRunAuditEventsMutationResponse;
@@ -32026,9 +35196,15 @@ export type Mutation = {
   updateGeaStrategies: UpdateGeaStrategiesMutationResponse;
   updateGeaValues: UpdateGeaValuesMutationResponse;
   updateGeaVisions: UpdateGeaVisionsMutationResponse;
+  updateHardwareProducts: UpdateHardwareProductsMutationResponse;
+  updateHardwareVersions: UpdateHardwareVersionsMutationResponse;
   updateInfrastructures: UpdateInfrastructuresMutationResponse;
+  updateLifecycleRecords: UpdateLifecycleRecordsMutationResponse;
   updateOrganisations: UpdateOrganisationsMutationResponse;
   updatePeople: UpdatePeopleMutationResponse;
+  updateSbomDocuments: UpdateSbomDocumentsMutationResponse;
+  updateSoftwareProducts: UpdateSoftwareProductsMutationResponse;
+  updateSoftwareVersions: UpdateSoftwareVersionsMutationResponse;
   updateSuppliers: UpdateSuppliersMutationResponse;
 };
 
@@ -32118,8 +35294,23 @@ export type MutationCreateGeaVisionsArgs = {
 };
 
 
+export type MutationCreateHardwareProductsArgs = {
+  input: Array<HardwareProductCreateInput>;
+};
+
+
+export type MutationCreateHardwareVersionsArgs = {
+  input: Array<HardwareVersionCreateInput>;
+};
+
+
 export type MutationCreateInfrastructuresArgs = {
   input: Array<InfrastructureCreateInput>;
+};
+
+
+export type MutationCreateLifecycleRecordsArgs = {
+  input: Array<LifecycleRecordCreateInput>;
 };
 
 
@@ -32130,6 +35321,21 @@ export type MutationCreateOrganisationsArgs = {
 
 export type MutationCreatePeopleArgs = {
   input: Array<PersonCreateInput>;
+};
+
+
+export type MutationCreateSbomDocumentsArgs = {
+  input: Array<SbomDocumentCreateInput>;
+};
+
+
+export type MutationCreateSoftwareProductsArgs = {
+  input: Array<SoftwareProductCreateInput>;
+};
+
+
+export type MutationCreateSoftwareVersionsArgs = {
+  input: Array<SoftwareVersionCreateInput>;
 };
 
 
@@ -32240,9 +35446,27 @@ export type MutationDeleteGeaVisionsArgs = {
 };
 
 
+export type MutationDeleteHardwareProductsArgs = {
+  delete?: InputMaybe<HardwareProductDeleteInput>;
+  where?: InputMaybe<HardwareProductWhere>;
+};
+
+
+export type MutationDeleteHardwareVersionsArgs = {
+  delete?: InputMaybe<HardwareVersionDeleteInput>;
+  where?: InputMaybe<HardwareVersionWhere>;
+};
+
+
 export type MutationDeleteInfrastructuresArgs = {
   delete?: InputMaybe<InfrastructureDeleteInput>;
   where?: InputMaybe<InfrastructureWhere>;
+};
+
+
+export type MutationDeleteLifecycleRecordsArgs = {
+  delete?: InputMaybe<LifecycleRecordDeleteInput>;
+  where?: InputMaybe<LifecycleRecordWhere>;
 };
 
 
@@ -32255,6 +35479,24 @@ export type MutationDeleteOrganisationsArgs = {
 export type MutationDeletePeopleArgs = {
   delete?: InputMaybe<PersonDeleteInput>;
   where?: InputMaybe<PersonWhere>;
+};
+
+
+export type MutationDeleteSbomDocumentsArgs = {
+  delete?: InputMaybe<SbomDocumentDeleteInput>;
+  where?: InputMaybe<SbomDocumentWhere>;
+};
+
+
+export type MutationDeleteSoftwareProductsArgs = {
+  delete?: InputMaybe<SoftwareProductDeleteInput>;
+  where?: InputMaybe<SoftwareProductWhere>;
+};
+
+
+export type MutationDeleteSoftwareVersionsArgs = {
+  delete?: InputMaybe<SoftwareVersionDeleteInput>;
+  where?: InputMaybe<SoftwareVersionWhere>;
 };
 
 
@@ -32366,9 +35608,27 @@ export type MutationUpdateGeaVisionsArgs = {
 };
 
 
+export type MutationUpdateHardwareProductsArgs = {
+  update?: InputMaybe<HardwareProductUpdateInput>;
+  where?: InputMaybe<HardwareProductWhere>;
+};
+
+
+export type MutationUpdateHardwareVersionsArgs = {
+  update?: InputMaybe<HardwareVersionUpdateInput>;
+  where?: InputMaybe<HardwareVersionWhere>;
+};
+
+
 export type MutationUpdateInfrastructuresArgs = {
   update?: InputMaybe<InfrastructureUpdateInput>;
   where?: InputMaybe<InfrastructureWhere>;
+};
+
+
+export type MutationUpdateLifecycleRecordsArgs = {
+  update?: InputMaybe<LifecycleRecordUpdateInput>;
+  where?: InputMaybe<LifecycleRecordWhere>;
 };
 
 
@@ -32381,6 +35641,24 @@ export type MutationUpdateOrganisationsArgs = {
 export type MutationUpdatePeopleArgs = {
   update?: InputMaybe<PersonUpdateInput>;
   where?: InputMaybe<PersonWhere>;
+};
+
+
+export type MutationUpdateSbomDocumentsArgs = {
+  update?: InputMaybe<SbomDocumentUpdateInput>;
+  where?: InputMaybe<SbomDocumentWhere>;
+};
+
+
+export type MutationUpdateSoftwareProductsArgs = {
+  update?: InputMaybe<SoftwareProductUpdateInput>;
+  where?: InputMaybe<SoftwareProductWhere>;
+};
+
+
+export type MutationUpdateSoftwareVersionsArgs = {
+  update?: InputMaybe<SoftwareVersionUpdateInput>;
+  where?: InputMaybe<SoftwareVersionWhere>;
 };
 
 
@@ -32669,6 +35947,7 @@ export type OrganisationApplicationUsedApplicationsNodeAggregateSelection = {
   hostingEnvironment: StringAggregateSelection;
   lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sbom: StringAggregateSelection;
   sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
@@ -32843,6 +36122,7 @@ export type OrganisationCompanyCompanyNodeAggregateSelection = {
   __typename?: 'OrganisationCompanyCompanyNodeAggregateSelection';
   achievedSovereigntyScore: FloatAggregateSelection;
   address: StringAggregateSelection;
+  controlPriority: IntAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   diagramFont: StringAggregateSelection;
@@ -32853,10 +36133,13 @@ export type OrganisationCompanyCompanyNodeAggregateSelection = {
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
+  resiliencePriority: IntAggregateSelection;
   secondaryColor: StringAggregateSelection;
+  securityPriority: IntAggregateSelection;
   sovereigntyGap: FloatAggregateSelection;
   sovereigntyScorePercent: FloatAggregateSelection;
   sovereigntyScoreStatus: StringAggregateSelection;
+  strategicAutonomyPriority: IntAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -32931,6 +36214,7 @@ export type OrganisationCompanyNodeAggregationWhereInput = {
   OR?: InputMaybe<Array<OrganisationCompanyNodeAggregationWhereInput>>;
   achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   address?: InputMaybe<StringScalarAggregationFilters>;
+  controlPriority?: InputMaybe<IntScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramFont?: InputMaybe<StringScalarAggregationFilters>;
@@ -32941,10 +36225,13 @@ export type OrganisationCompanyNodeAggregationWhereInput = {
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  resiliencePriority?: InputMaybe<IntScalarAggregationFilters>;
   secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  securityPriority?: InputMaybe<IntScalarAggregationFilters>;
   sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
   sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
   sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
+  strategicAutonomyPriority?: InputMaybe<IntScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -33478,6 +36765,7 @@ export type OrganisationUsedApplicationsNodeAggregationWhereInput = {
   hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
   lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sbom?: InputMaybe<StringScalarAggregationFilters>;
   sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
@@ -34505,6 +37793,7 @@ export type PersonApplicationOwnedApplicationsNodeAggregateSelection = {
   hostingEnvironment: StringAggregateSelection;
   lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sbom: StringAggregateSelection;
   sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
@@ -34651,6 +37940,7 @@ export type PersonCompaniesNodeAggregationWhereInput = {
   OR?: InputMaybe<Array<PersonCompaniesNodeAggregationWhereInput>>;
   achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   address?: InputMaybe<StringScalarAggregationFilters>;
+  controlPriority?: InputMaybe<IntScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramFont?: InputMaybe<StringScalarAggregationFilters>;
@@ -34661,10 +37951,13 @@ export type PersonCompaniesNodeAggregationWhereInput = {
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  resiliencePriority?: InputMaybe<IntScalarAggregationFilters>;
   secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  securityPriority?: InputMaybe<IntScalarAggregationFilters>;
   sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
   sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
   sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
+  strategicAutonomyPriority?: InputMaybe<IntScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -34698,6 +37991,7 @@ export type PersonCompanyCompaniesNodeAggregateSelection = {
   __typename?: 'PersonCompanyCompaniesNodeAggregateSelection';
   achievedSovereigntyScore: FloatAggregateSelection;
   address: StringAggregateSelection;
+  controlPriority: IntAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   diagramFont: StringAggregateSelection;
@@ -34708,10 +38002,13 @@ export type PersonCompanyCompaniesNodeAggregateSelection = {
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
+  resiliencePriority: IntAggregateSelection;
   secondaryColor: StringAggregateSelection;
+  securityPriority: IntAggregateSelection;
   sovereigntyGap: FloatAggregateSelection;
   sovereigntyScorePercent: FloatAggregateSelection;
   sovereigntyScoreStatus: StringAggregateSelection;
+  strategicAutonomyPriority: IntAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -35137,6 +38434,7 @@ export type PersonOwnedApplicationsNodeAggregationWhereInput = {
   hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
   lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sbom?: InputMaybe<StringScalarAggregationFilters>;
   sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
@@ -36689,12 +39987,24 @@ export type Query = {
   geaValuesConnection: GeaValuesConnection;
   geaVisions: Array<Gea_Vision>;
   geaVisionsConnection: GeaVisionsConnection;
+  hardwareProducts: Array<HardwareProduct>;
+  hardwareProductsConnection: HardwareProductsConnection;
+  hardwareVersions: Array<HardwareVersion>;
+  hardwareVersionsConnection: HardwareVersionsConnection;
   infrastructures: Array<Infrastructure>;
   infrastructuresConnection: InfrastructuresConnection;
+  lifecycleRecords: Array<LifecycleRecord>;
+  lifecycleRecordsConnection: LifecycleRecordsConnection;
   organisations: Array<Organisation>;
   organisationsConnection: OrganisationsConnection;
   people: Array<Person>;
   peopleConnection: PeopleConnection;
+  sbomDocuments: Array<SbomDocument>;
+  sbomDocumentsConnection: SbomDocumentsConnection;
+  softwareProducts: Array<SoftwareProduct>;
+  softwareProductsConnection: SoftwareProductsConnection;
+  softwareVersions: Array<SoftwareVersion>;
+  softwareVersionsConnection: SoftwareVersionsConnection;
   suppliers: Array<Supplier>;
   suppliersConnection: SuppliersConnection;
 };
@@ -36972,6 +40282,38 @@ export type QueryGeaVisionsConnectionArgs = {
 };
 
 
+export type QueryHardwareProductsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<HardwareProductSort>>;
+  where?: InputMaybe<HardwareProductWhere>;
+};
+
+
+export type QueryHardwareProductsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<HardwareProductSort>>;
+  where?: InputMaybe<HardwareProductWhere>;
+};
+
+
+export type QueryHardwareVersionsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<HardwareVersionSort>>;
+  where?: InputMaybe<HardwareVersionWhere>;
+};
+
+
+export type QueryHardwareVersionsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<HardwareVersionSort>>;
+  where?: InputMaybe<HardwareVersionWhere>;
+};
+
+
 export type QueryInfrastructuresArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -36985,6 +40327,22 @@ export type QueryInfrastructuresConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<InfrastructureSort>>;
   where?: InputMaybe<InfrastructureWhere>;
+};
+
+
+export type QueryLifecycleRecordsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<LifecycleRecordSort>>;
+  where?: InputMaybe<LifecycleRecordWhere>;
+};
+
+
+export type QueryLifecycleRecordsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<LifecycleRecordSort>>;
+  where?: InputMaybe<LifecycleRecordWhere>;
 };
 
 
@@ -37017,6 +40375,54 @@ export type QueryPeopleConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<PersonSort>>;
   where?: InputMaybe<PersonWhere>;
+};
+
+
+export type QuerySbomDocumentsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SbomDocumentSort>>;
+  where?: InputMaybe<SbomDocumentWhere>;
+};
+
+
+export type QuerySbomDocumentsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SbomDocumentSort>>;
+  where?: InputMaybe<SbomDocumentWhere>;
+};
+
+
+export type QuerySoftwareProductsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SoftwareProductSort>>;
+  where?: InputMaybe<SoftwareProductWhere>;
+};
+
+
+export type QuerySoftwareProductsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SoftwareProductSort>>;
+  where?: InputMaybe<SoftwareProductWhere>;
+};
+
+
+export type QuerySoftwareVersionsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SoftwareVersionSort>>;
+  where?: InputMaybe<SoftwareVersionWhere>;
+};
+
+
+export type QuerySoftwareVersionsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SoftwareVersionSort>>;
+  where?: InputMaybe<SoftwareVersionWhere>;
 };
 
 
@@ -37054,6 +40460,486 @@ export type RiskClassificationEnumScalarMutations = {
   set?: InputMaybe<RiskClassification>;
 };
 
+/** SbomDocument – Software Bill of Materials evidence document */
+export type SbomDocument = {
+  __typename?: 'SbomDocument';
+  applications: Array<Application>;
+  applicationsConnection: SbomDocumentApplicationsConnection;
+  company: Array<Company>;
+  companyConnection: SbomDocumentCompanyConnection;
+  createdAt: Scalars['DateTime']['output'];
+  digest?: Maybe<Scalars['String']['output']>;
+  format?: Maybe<Scalars['String']['output']>;
+  generatedAt?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['ID']['output'];
+  sbomId?: Maybe<Scalars['String']['output']>;
+  source?: Maybe<Scalars['String']['output']>;
+  sourceUrl?: Maybe<Scalars['String']['output']>;
+  storageReference?: Maybe<Scalars['String']['output']>;
+  tool?: Maybe<Scalars['String']['output']>;
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  version?: Maybe<Scalars['String']['output']>;
+};
+
+
+/** SbomDocument – Software Bill of Materials evidence document */
+export type SbomDocumentApplicationsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<ApplicationSort>>;
+  where?: InputMaybe<ApplicationWhere>;
+};
+
+
+/** SbomDocument – Software Bill of Materials evidence document */
+export type SbomDocumentApplicationsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SbomDocumentApplicationsConnectionSort>>;
+  where?: InputMaybe<SbomDocumentApplicationsConnectionWhere>;
+};
+
+
+/** SbomDocument – Software Bill of Materials evidence document */
+export type SbomDocumentCompanyArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<CompanySort>>;
+  where?: InputMaybe<CompanyWhere>;
+};
+
+
+/** SbomDocument – Software Bill of Materials evidence document */
+export type SbomDocumentCompanyConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SbomDocumentCompanyConnectionSort>>;
+  where?: InputMaybe<SbomDocumentCompanyConnectionWhere>;
+};
+
+export type SbomDocumentAggregate = {
+  __typename?: 'SbomDocumentAggregate';
+  count: Count;
+  node: SbomDocumentAggregateNode;
+};
+
+export type SbomDocumentAggregateNode = {
+  __typename?: 'SbomDocumentAggregateNode';
+  createdAt: DateTimeAggregateSelection;
+  digest: StringAggregateSelection;
+  format: StringAggregateSelection;
+  generatedAt: DateTimeAggregateSelection;
+  sbomId: StringAggregateSelection;
+  source: StringAggregateSelection;
+  sourceUrl: StringAggregateSelection;
+  storageReference: StringAggregateSelection;
+  tool: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  version: StringAggregateSelection;
+};
+
+export type SbomDocumentApplicationApplicationsAggregateSelection = {
+  __typename?: 'SbomDocumentApplicationApplicationsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<SbomDocumentApplicationApplicationsNodeAggregateSelection>;
+};
+
+export type SbomDocumentApplicationApplicationsNodeAggregateSelection = {
+  __typename?: 'SbomDocumentApplicationApplicationsNodeAggregateSelection';
+  costs: FloatAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  hostingEnvironment: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
+  name: StringAggregateSelection;
+  sbom: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  vendor: StringAggregateSelection;
+  version: StringAggregateSelection;
+};
+
+export type SbomDocumentApplicationsAggregateInput = {
+  AND?: InputMaybe<Array<SbomDocumentApplicationsAggregateInput>>;
+  NOT?: InputMaybe<SbomDocumentApplicationsAggregateInput>;
+  OR?: InputMaybe<Array<SbomDocumentApplicationsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<SbomDocumentApplicationsNodeAggregationWhereInput>;
+};
+
+export type SbomDocumentApplicationsConnectFieldInput = {
+  connect?: InputMaybe<Array<ApplicationConnectInput>>;
+  where?: InputMaybe<ApplicationConnectWhere>;
+};
+
+export type SbomDocumentApplicationsConnection = {
+  __typename?: 'SbomDocumentApplicationsConnection';
+  aggregate: SbomDocumentApplicationApplicationsAggregateSelection;
+  edges: Array<SbomDocumentApplicationsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type SbomDocumentApplicationsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<SbomDocumentApplicationsConnectionAggregateInput>>;
+  NOT?: InputMaybe<SbomDocumentApplicationsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<SbomDocumentApplicationsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<SbomDocumentApplicationsNodeAggregationWhereInput>;
+};
+
+export type SbomDocumentApplicationsConnectionFilters = {
+  /** Filter SbomDocuments by aggregating results on related SbomDocumentApplicationsConnections */
+  aggregate?: InputMaybe<SbomDocumentApplicationsConnectionAggregateInput>;
+  /** Return SbomDocuments where all of the related SbomDocumentApplicationsConnections match this filter */
+  all?: InputMaybe<SbomDocumentApplicationsConnectionWhere>;
+  /** Return SbomDocuments where none of the related SbomDocumentApplicationsConnections match this filter */
+  none?: InputMaybe<SbomDocumentApplicationsConnectionWhere>;
+  /** Return SbomDocuments where one of the related SbomDocumentApplicationsConnections match this filter */
+  single?: InputMaybe<SbomDocumentApplicationsConnectionWhere>;
+  /** Return SbomDocuments where some of the related SbomDocumentApplicationsConnections match this filter */
+  some?: InputMaybe<SbomDocumentApplicationsConnectionWhere>;
+};
+
+export type SbomDocumentApplicationsConnectionSort = {
+  node?: InputMaybe<ApplicationSort>;
+};
+
+export type SbomDocumentApplicationsConnectionWhere = {
+  AND?: InputMaybe<Array<SbomDocumentApplicationsConnectionWhere>>;
+  NOT?: InputMaybe<SbomDocumentApplicationsConnectionWhere>;
+  OR?: InputMaybe<Array<SbomDocumentApplicationsConnectionWhere>>;
+  node?: InputMaybe<ApplicationWhere>;
+};
+
+export type SbomDocumentApplicationsCreateFieldInput = {
+  node: ApplicationCreateInput;
+};
+
+export type SbomDocumentApplicationsDeleteFieldInput = {
+  delete?: InputMaybe<ApplicationDeleteInput>;
+  where?: InputMaybe<SbomDocumentApplicationsConnectionWhere>;
+};
+
+export type SbomDocumentApplicationsDisconnectFieldInput = {
+  disconnect?: InputMaybe<ApplicationDisconnectInput>;
+  where?: InputMaybe<SbomDocumentApplicationsConnectionWhere>;
+};
+
+export type SbomDocumentApplicationsFieldInput = {
+  connect?: InputMaybe<Array<SbomDocumentApplicationsConnectFieldInput>>;
+  create?: InputMaybe<Array<SbomDocumentApplicationsCreateFieldInput>>;
+};
+
+export type SbomDocumentApplicationsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<SbomDocumentApplicationsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<SbomDocumentApplicationsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<SbomDocumentApplicationsNodeAggregationWhereInput>>;
+  costs?: InputMaybe<FloatScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  sbom?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  vendor?: InputMaybe<StringScalarAggregationFilters>;
+  version?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type SbomDocumentApplicationsRelationship = {
+  __typename?: 'SbomDocumentApplicationsRelationship';
+  cursor: Scalars['String']['output'];
+  node: Application;
+};
+
+export type SbomDocumentApplicationsUpdateConnectionInput = {
+  node?: InputMaybe<ApplicationUpdateInput>;
+  where?: InputMaybe<SbomDocumentApplicationsConnectionWhere>;
+};
+
+export type SbomDocumentApplicationsUpdateFieldInput = {
+  connect?: InputMaybe<Array<SbomDocumentApplicationsConnectFieldInput>>;
+  create?: InputMaybe<Array<SbomDocumentApplicationsCreateFieldInput>>;
+  delete?: InputMaybe<Array<SbomDocumentApplicationsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<SbomDocumentApplicationsDisconnectFieldInput>>;
+  update?: InputMaybe<SbomDocumentApplicationsUpdateConnectionInput>;
+};
+
+export type SbomDocumentCompanyAggregateInput = {
+  AND?: InputMaybe<Array<SbomDocumentCompanyAggregateInput>>;
+  NOT?: InputMaybe<SbomDocumentCompanyAggregateInput>;
+  OR?: InputMaybe<Array<SbomDocumentCompanyAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<SbomDocumentCompanyNodeAggregationWhereInput>;
+};
+
+export type SbomDocumentCompanyCompanyAggregateSelection = {
+  __typename?: 'SbomDocumentCompanyCompanyAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<SbomDocumentCompanyCompanyNodeAggregateSelection>;
+};
+
+export type SbomDocumentCompanyCompanyNodeAggregateSelection = {
+  __typename?: 'SbomDocumentCompanyCompanyNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
+  address: StringAggregateSelection;
+  controlPriority: IntAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  diagramFont: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
+  features: StringAggregateSelection;
+  font: StringAggregateSelection;
+  industry: StringAggregateSelection;
+  logo: StringAggregateSelection;
+  name: StringAggregateSelection;
+  primaryColor: StringAggregateSelection;
+  resiliencePriority: IntAggregateSelection;
+  secondaryColor: StringAggregateSelection;
+  securityPriority: IntAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
+  sovereigntyScoreStatus: StringAggregateSelection;
+  strategicAutonomyPriority: IntAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  website: StringAggregateSelection;
+};
+
+export type SbomDocumentCompanyConnectFieldInput = {
+  connect?: InputMaybe<Array<CompanyConnectInput>>;
+  where?: InputMaybe<CompanyConnectWhere>;
+};
+
+export type SbomDocumentCompanyConnection = {
+  __typename?: 'SbomDocumentCompanyConnection';
+  aggregate: SbomDocumentCompanyCompanyAggregateSelection;
+  edges: Array<SbomDocumentCompanyRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type SbomDocumentCompanyConnectionAggregateInput = {
+  AND?: InputMaybe<Array<SbomDocumentCompanyConnectionAggregateInput>>;
+  NOT?: InputMaybe<SbomDocumentCompanyConnectionAggregateInput>;
+  OR?: InputMaybe<Array<SbomDocumentCompanyConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<SbomDocumentCompanyNodeAggregationWhereInput>;
+};
+
+export type SbomDocumentCompanyConnectionFilters = {
+  /** Filter SbomDocuments by aggregating results on related SbomDocumentCompanyConnections */
+  aggregate?: InputMaybe<SbomDocumentCompanyConnectionAggregateInput>;
+  /** Return SbomDocuments where all of the related SbomDocumentCompanyConnections match this filter */
+  all?: InputMaybe<SbomDocumentCompanyConnectionWhere>;
+  /** Return SbomDocuments where none of the related SbomDocumentCompanyConnections match this filter */
+  none?: InputMaybe<SbomDocumentCompanyConnectionWhere>;
+  /** Return SbomDocuments where one of the related SbomDocumentCompanyConnections match this filter */
+  single?: InputMaybe<SbomDocumentCompanyConnectionWhere>;
+  /** Return SbomDocuments where some of the related SbomDocumentCompanyConnections match this filter */
+  some?: InputMaybe<SbomDocumentCompanyConnectionWhere>;
+};
+
+export type SbomDocumentCompanyConnectionSort = {
+  node?: InputMaybe<CompanySort>;
+};
+
+export type SbomDocumentCompanyConnectionWhere = {
+  AND?: InputMaybe<Array<SbomDocumentCompanyConnectionWhere>>;
+  NOT?: InputMaybe<SbomDocumentCompanyConnectionWhere>;
+  OR?: InputMaybe<Array<SbomDocumentCompanyConnectionWhere>>;
+  node?: InputMaybe<CompanyWhere>;
+};
+
+export type SbomDocumentCompanyCreateFieldInput = {
+  node: CompanyCreateInput;
+};
+
+export type SbomDocumentCompanyDeleteFieldInput = {
+  delete?: InputMaybe<CompanyDeleteInput>;
+  where?: InputMaybe<SbomDocumentCompanyConnectionWhere>;
+};
+
+export type SbomDocumentCompanyDisconnectFieldInput = {
+  disconnect?: InputMaybe<CompanyDisconnectInput>;
+  where?: InputMaybe<SbomDocumentCompanyConnectionWhere>;
+};
+
+export type SbomDocumentCompanyFieldInput = {
+  connect?: InputMaybe<Array<SbomDocumentCompanyConnectFieldInput>>;
+  create?: InputMaybe<Array<SbomDocumentCompanyCreateFieldInput>>;
+};
+
+export type SbomDocumentCompanyNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<SbomDocumentCompanyNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<SbomDocumentCompanyNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<SbomDocumentCompanyNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
+  address?: InputMaybe<StringScalarAggregationFilters>;
+  controlPriority?: InputMaybe<IntScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  diagramFont?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
+  features?: InputMaybe<StringScalarAggregationFilters>;
+  font?: InputMaybe<StringScalarAggregationFilters>;
+  industry?: InputMaybe<StringScalarAggregationFilters>;
+  logo?: InputMaybe<StringScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  primaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  resiliencePriority?: InputMaybe<IntScalarAggregationFilters>;
+  secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  securityPriority?: InputMaybe<IntScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
+  strategicAutonomyPriority?: InputMaybe<IntScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  website?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type SbomDocumentCompanyRelationship = {
+  __typename?: 'SbomDocumentCompanyRelationship';
+  cursor: Scalars['String']['output'];
+  node: Company;
+};
+
+export type SbomDocumentCompanyUpdateConnectionInput = {
+  node?: InputMaybe<CompanyUpdateInput>;
+  where?: InputMaybe<SbomDocumentCompanyConnectionWhere>;
+};
+
+export type SbomDocumentCompanyUpdateFieldInput = {
+  connect?: InputMaybe<Array<SbomDocumentCompanyConnectFieldInput>>;
+  create?: InputMaybe<Array<SbomDocumentCompanyCreateFieldInput>>;
+  delete?: InputMaybe<Array<SbomDocumentCompanyDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<SbomDocumentCompanyDisconnectFieldInput>>;
+  update?: InputMaybe<SbomDocumentCompanyUpdateConnectionInput>;
+};
+
+export type SbomDocumentConnectInput = {
+  applications?: InputMaybe<Array<SbomDocumentApplicationsConnectFieldInput>>;
+  company?: InputMaybe<Array<SbomDocumentCompanyConnectFieldInput>>;
+};
+
+export type SbomDocumentConnectWhere = {
+  node: SbomDocumentWhere;
+};
+
+export type SbomDocumentCreateInput = {
+  applications?: InputMaybe<SbomDocumentApplicationsFieldInput>;
+  company?: InputMaybe<SbomDocumentCompanyFieldInput>;
+  digest?: InputMaybe<Scalars['String']['input']>;
+  format?: InputMaybe<Scalars['String']['input']>;
+  generatedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  sbomId?: InputMaybe<Scalars['String']['input']>;
+  source?: InputMaybe<Scalars['String']['input']>;
+  sourceUrl?: InputMaybe<Scalars['String']['input']>;
+  storageReference?: InputMaybe<Scalars['String']['input']>;
+  tool?: InputMaybe<Scalars['String']['input']>;
+  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  version?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type SbomDocumentDeleteInput = {
+  applications?: InputMaybe<Array<SbomDocumentApplicationsDeleteFieldInput>>;
+  company?: InputMaybe<Array<SbomDocumentCompanyDeleteFieldInput>>;
+};
+
+export type SbomDocumentDisconnectInput = {
+  applications?: InputMaybe<Array<SbomDocumentApplicationsDisconnectFieldInput>>;
+  company?: InputMaybe<Array<SbomDocumentCompanyDisconnectFieldInput>>;
+};
+
+export type SbomDocumentEdge = {
+  __typename?: 'SbomDocumentEdge';
+  cursor: Scalars['String']['output'];
+  node: SbomDocument;
+};
+
+export type SbomDocumentRelationshipFilters = {
+  /** Filter type where all of the related SbomDocuments match this filter */
+  all?: InputMaybe<SbomDocumentWhere>;
+  /** Filter type where none of the related SbomDocuments match this filter */
+  none?: InputMaybe<SbomDocumentWhere>;
+  /** Filter type where one of the related SbomDocuments match this filter */
+  single?: InputMaybe<SbomDocumentWhere>;
+  /** Filter type where some of the related SbomDocuments match this filter */
+  some?: InputMaybe<SbomDocumentWhere>;
+};
+
+/** Fields to sort SbomDocuments by. The order in which sorts are applied is not guaranteed when specifying many fields in one SbomDocumentSort object. */
+export type SbomDocumentSort = {
+  createdAt?: InputMaybe<SortDirection>;
+  digest?: InputMaybe<SortDirection>;
+  format?: InputMaybe<SortDirection>;
+  generatedAt?: InputMaybe<SortDirection>;
+  id?: InputMaybe<SortDirection>;
+  sbomId?: InputMaybe<SortDirection>;
+  source?: InputMaybe<SortDirection>;
+  sourceUrl?: InputMaybe<SortDirection>;
+  storageReference?: InputMaybe<SortDirection>;
+  tool?: InputMaybe<SortDirection>;
+  updatedAt?: InputMaybe<SortDirection>;
+  version?: InputMaybe<SortDirection>;
+};
+
+export type SbomDocumentUpdateInput = {
+  applications?: InputMaybe<Array<SbomDocumentApplicationsUpdateFieldInput>>;
+  company?: InputMaybe<Array<SbomDocumentCompanyUpdateFieldInput>>;
+  createdAt?: InputMaybe<DateTimeScalarMutations>;
+  digest?: InputMaybe<StringScalarMutations>;
+  format?: InputMaybe<StringScalarMutations>;
+  generatedAt?: InputMaybe<DateTimeScalarMutations>;
+  sbomId?: InputMaybe<StringScalarMutations>;
+  source?: InputMaybe<StringScalarMutations>;
+  sourceUrl?: InputMaybe<StringScalarMutations>;
+  storageReference?: InputMaybe<StringScalarMutations>;
+  tool?: InputMaybe<StringScalarMutations>;
+  version?: InputMaybe<StringScalarMutations>;
+};
+
+export type SbomDocumentWhere = {
+  AND?: InputMaybe<Array<SbomDocumentWhere>>;
+  NOT?: InputMaybe<SbomDocumentWhere>;
+  OR?: InputMaybe<Array<SbomDocumentWhere>>;
+  applications?: InputMaybe<ApplicationRelationshipFilters>;
+  applicationsConnection?: InputMaybe<SbomDocumentApplicationsConnectionFilters>;
+  company?: InputMaybe<CompanyRelationshipFilters>;
+  companyConnection?: InputMaybe<SbomDocumentCompanyConnectionFilters>;
+  createdAt?: InputMaybe<DateTimeScalarFilters>;
+  digest?: InputMaybe<StringScalarFilters>;
+  format?: InputMaybe<StringScalarFilters>;
+  generatedAt?: InputMaybe<DateTimeScalarFilters>;
+  id?: InputMaybe<IdScalarFilters>;
+  sbomId?: InputMaybe<StringScalarFilters>;
+  source?: InputMaybe<StringScalarFilters>;
+  sourceUrl?: InputMaybe<StringScalarFilters>;
+  storageReference?: InputMaybe<StringScalarFilters>;
+  tool?: InputMaybe<StringScalarFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarFilters>;
+  version?: InputMaybe<StringScalarFilters>;
+};
+
+export type SbomDocumentsConnection = {
+  __typename?: 'SbomDocumentsConnection';
+  aggregate: SbomDocumentAggregate;
+  edges: Array<SbomDocumentEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
 /** 7R strategies for cloud migration and application portfolio management */
 export enum SevenRStrategy {
   REARCHITECT = 'REARCHITECT',
@@ -37074,6 +40960,1861 @@ export type SevenRStrategyEnumScalarFilters = {
 /** SevenRStrategy mutations */
 export type SevenRStrategyEnumScalarMutations = {
   set?: InputMaybe<SevenRStrategy>;
+};
+
+/** SoftwareProduct – normalized software product entity for technology lifecycle management */
+export type SoftwareProduct = {
+  __typename?: 'SoftwareProduct';
+  company: Array<Company>;
+  companyConnection: SoftwareProductCompanyConnection;
+  createdAt: Scalars['DateTime']['output'];
+  developedBy: Array<Supplier>;
+  developedByConnection: SoftwareProductDevelopedByConnection;
+  id: Scalars['ID']['output'];
+  isActive?: Maybe<Scalars['Boolean']['output']>;
+  lifecycleStatus?: Maybe<LifecycleStatus>;
+  maintainedBy: Array<Supplier>;
+  maintainedByConnection: SoftwareProductMaintainedByConnection;
+  name: Scalars['String']['output'];
+  productFamily?: Maybe<Scalars['String']['output']>;
+  providedBy: Array<Supplier>;
+  providedByConnection: SoftwareProductProvidedByConnection;
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  usedByApplications: Array<Application>;
+  usedByApplicationsConnection: SoftwareProductUsedByApplicationsConnection;
+  usedByInfrastructure: Array<Infrastructure>;
+  usedByInfrastructureConnection: SoftwareProductUsedByInfrastructureConnection;
+  versions: Array<SoftwareVersion>;
+  versionsConnection: SoftwareProductVersionsConnection;
+};
+
+
+/** SoftwareProduct – normalized software product entity for technology lifecycle management */
+export type SoftwareProductCompanyArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<CompanySort>>;
+  where?: InputMaybe<CompanyWhere>;
+};
+
+
+/** SoftwareProduct – normalized software product entity for technology lifecycle management */
+export type SoftwareProductCompanyConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SoftwareProductCompanyConnectionSort>>;
+  where?: InputMaybe<SoftwareProductCompanyConnectionWhere>;
+};
+
+
+/** SoftwareProduct – normalized software product entity for technology lifecycle management */
+export type SoftwareProductDevelopedByArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SupplierSort>>;
+  where?: InputMaybe<SupplierWhere>;
+};
+
+
+/** SoftwareProduct – normalized software product entity for technology lifecycle management */
+export type SoftwareProductDevelopedByConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SoftwareProductDevelopedByConnectionSort>>;
+  where?: InputMaybe<SoftwareProductDevelopedByConnectionWhere>;
+};
+
+
+/** SoftwareProduct – normalized software product entity for technology lifecycle management */
+export type SoftwareProductMaintainedByArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SupplierSort>>;
+  where?: InputMaybe<SupplierWhere>;
+};
+
+
+/** SoftwareProduct – normalized software product entity for technology lifecycle management */
+export type SoftwareProductMaintainedByConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SoftwareProductMaintainedByConnectionSort>>;
+  where?: InputMaybe<SoftwareProductMaintainedByConnectionWhere>;
+};
+
+
+/** SoftwareProduct – normalized software product entity for technology lifecycle management */
+export type SoftwareProductProvidedByArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SupplierSort>>;
+  where?: InputMaybe<SupplierWhere>;
+};
+
+
+/** SoftwareProduct – normalized software product entity for technology lifecycle management */
+export type SoftwareProductProvidedByConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SoftwareProductProvidedByConnectionSort>>;
+  where?: InputMaybe<SoftwareProductProvidedByConnectionWhere>;
+};
+
+
+/** SoftwareProduct – normalized software product entity for technology lifecycle management */
+export type SoftwareProductUsedByApplicationsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<ApplicationSort>>;
+  where?: InputMaybe<ApplicationWhere>;
+};
+
+
+/** SoftwareProduct – normalized software product entity for technology lifecycle management */
+export type SoftwareProductUsedByApplicationsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SoftwareProductUsedByApplicationsConnectionSort>>;
+  where?: InputMaybe<SoftwareProductUsedByApplicationsConnectionWhere>;
+};
+
+
+/** SoftwareProduct – normalized software product entity for technology lifecycle management */
+export type SoftwareProductUsedByInfrastructureArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<InfrastructureSort>>;
+  where?: InputMaybe<InfrastructureWhere>;
+};
+
+
+/** SoftwareProduct – normalized software product entity for technology lifecycle management */
+export type SoftwareProductUsedByInfrastructureConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SoftwareProductUsedByInfrastructureConnectionSort>>;
+  where?: InputMaybe<SoftwareProductUsedByInfrastructureConnectionWhere>;
+};
+
+
+/** SoftwareProduct – normalized software product entity for technology lifecycle management */
+export type SoftwareProductVersionsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SoftwareVersionSort>>;
+  where?: InputMaybe<SoftwareVersionWhere>;
+};
+
+
+/** SoftwareProduct – normalized software product entity for technology lifecycle management */
+export type SoftwareProductVersionsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SoftwareProductVersionsConnectionSort>>;
+  where?: InputMaybe<SoftwareProductVersionsConnectionWhere>;
+};
+
+export type SoftwareProductAggregate = {
+  __typename?: 'SoftwareProductAggregate';
+  count: Count;
+  node: SoftwareProductAggregateNode;
+};
+
+export type SoftwareProductAggregateNode = {
+  __typename?: 'SoftwareProductAggregateNode';
+  createdAt: DateTimeAggregateSelection;
+  name: StringAggregateSelection;
+  productFamily: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
+export type SoftwareProductApplicationUsedByApplicationsAggregateSelection = {
+  __typename?: 'SoftwareProductApplicationUsedByApplicationsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<SoftwareProductApplicationUsedByApplicationsNodeAggregateSelection>;
+};
+
+export type SoftwareProductApplicationUsedByApplicationsNodeAggregateSelection = {
+  __typename?: 'SoftwareProductApplicationUsedByApplicationsNodeAggregateSelection';
+  costs: FloatAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  hostingEnvironment: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
+  name: StringAggregateSelection;
+  sbom: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  vendor: StringAggregateSelection;
+  version: StringAggregateSelection;
+};
+
+export type SoftwareProductCompanyAggregateInput = {
+  AND?: InputMaybe<Array<SoftwareProductCompanyAggregateInput>>;
+  NOT?: InputMaybe<SoftwareProductCompanyAggregateInput>;
+  OR?: InputMaybe<Array<SoftwareProductCompanyAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<SoftwareProductCompanyNodeAggregationWhereInput>;
+};
+
+export type SoftwareProductCompanyCompanyAggregateSelection = {
+  __typename?: 'SoftwareProductCompanyCompanyAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<SoftwareProductCompanyCompanyNodeAggregateSelection>;
+};
+
+export type SoftwareProductCompanyCompanyNodeAggregateSelection = {
+  __typename?: 'SoftwareProductCompanyCompanyNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
+  address: StringAggregateSelection;
+  controlPriority: IntAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  diagramFont: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
+  features: StringAggregateSelection;
+  font: StringAggregateSelection;
+  industry: StringAggregateSelection;
+  logo: StringAggregateSelection;
+  name: StringAggregateSelection;
+  primaryColor: StringAggregateSelection;
+  resiliencePriority: IntAggregateSelection;
+  secondaryColor: StringAggregateSelection;
+  securityPriority: IntAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
+  sovereigntyScoreStatus: StringAggregateSelection;
+  strategicAutonomyPriority: IntAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  website: StringAggregateSelection;
+};
+
+export type SoftwareProductCompanyConnectFieldInput = {
+  connect?: InputMaybe<Array<CompanyConnectInput>>;
+  where?: InputMaybe<CompanyConnectWhere>;
+};
+
+export type SoftwareProductCompanyConnection = {
+  __typename?: 'SoftwareProductCompanyConnection';
+  aggregate: SoftwareProductCompanyCompanyAggregateSelection;
+  edges: Array<SoftwareProductCompanyRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type SoftwareProductCompanyConnectionAggregateInput = {
+  AND?: InputMaybe<Array<SoftwareProductCompanyConnectionAggregateInput>>;
+  NOT?: InputMaybe<SoftwareProductCompanyConnectionAggregateInput>;
+  OR?: InputMaybe<Array<SoftwareProductCompanyConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<SoftwareProductCompanyNodeAggregationWhereInput>;
+};
+
+export type SoftwareProductCompanyConnectionFilters = {
+  /** Filter SoftwareProducts by aggregating results on related SoftwareProductCompanyConnections */
+  aggregate?: InputMaybe<SoftwareProductCompanyConnectionAggregateInput>;
+  /** Return SoftwareProducts where all of the related SoftwareProductCompanyConnections match this filter */
+  all?: InputMaybe<SoftwareProductCompanyConnectionWhere>;
+  /** Return SoftwareProducts where none of the related SoftwareProductCompanyConnections match this filter */
+  none?: InputMaybe<SoftwareProductCompanyConnectionWhere>;
+  /** Return SoftwareProducts where one of the related SoftwareProductCompanyConnections match this filter */
+  single?: InputMaybe<SoftwareProductCompanyConnectionWhere>;
+  /** Return SoftwareProducts where some of the related SoftwareProductCompanyConnections match this filter */
+  some?: InputMaybe<SoftwareProductCompanyConnectionWhere>;
+};
+
+export type SoftwareProductCompanyConnectionSort = {
+  node?: InputMaybe<CompanySort>;
+};
+
+export type SoftwareProductCompanyConnectionWhere = {
+  AND?: InputMaybe<Array<SoftwareProductCompanyConnectionWhere>>;
+  NOT?: InputMaybe<SoftwareProductCompanyConnectionWhere>;
+  OR?: InputMaybe<Array<SoftwareProductCompanyConnectionWhere>>;
+  node?: InputMaybe<CompanyWhere>;
+};
+
+export type SoftwareProductCompanyCreateFieldInput = {
+  node: CompanyCreateInput;
+};
+
+export type SoftwareProductCompanyDeleteFieldInput = {
+  delete?: InputMaybe<CompanyDeleteInput>;
+  where?: InputMaybe<SoftwareProductCompanyConnectionWhere>;
+};
+
+export type SoftwareProductCompanyDisconnectFieldInput = {
+  disconnect?: InputMaybe<CompanyDisconnectInput>;
+  where?: InputMaybe<SoftwareProductCompanyConnectionWhere>;
+};
+
+export type SoftwareProductCompanyFieldInput = {
+  connect?: InputMaybe<Array<SoftwareProductCompanyConnectFieldInput>>;
+  create?: InputMaybe<Array<SoftwareProductCompanyCreateFieldInput>>;
+};
+
+export type SoftwareProductCompanyNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<SoftwareProductCompanyNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<SoftwareProductCompanyNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<SoftwareProductCompanyNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
+  address?: InputMaybe<StringScalarAggregationFilters>;
+  controlPriority?: InputMaybe<IntScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  diagramFont?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
+  features?: InputMaybe<StringScalarAggregationFilters>;
+  font?: InputMaybe<StringScalarAggregationFilters>;
+  industry?: InputMaybe<StringScalarAggregationFilters>;
+  logo?: InputMaybe<StringScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  primaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  resiliencePriority?: InputMaybe<IntScalarAggregationFilters>;
+  secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  securityPriority?: InputMaybe<IntScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
+  strategicAutonomyPriority?: InputMaybe<IntScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  website?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type SoftwareProductCompanyRelationship = {
+  __typename?: 'SoftwareProductCompanyRelationship';
+  cursor: Scalars['String']['output'];
+  node: Company;
+};
+
+export type SoftwareProductCompanyUpdateConnectionInput = {
+  node?: InputMaybe<CompanyUpdateInput>;
+  where?: InputMaybe<SoftwareProductCompanyConnectionWhere>;
+};
+
+export type SoftwareProductCompanyUpdateFieldInput = {
+  connect?: InputMaybe<Array<SoftwareProductCompanyConnectFieldInput>>;
+  create?: InputMaybe<Array<SoftwareProductCompanyCreateFieldInput>>;
+  delete?: InputMaybe<Array<SoftwareProductCompanyDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<SoftwareProductCompanyDisconnectFieldInput>>;
+  update?: InputMaybe<SoftwareProductCompanyUpdateConnectionInput>;
+};
+
+export type SoftwareProductConnectInput = {
+  company?: InputMaybe<Array<SoftwareProductCompanyConnectFieldInput>>;
+  developedBy?: InputMaybe<Array<SoftwareProductDevelopedByConnectFieldInput>>;
+  maintainedBy?: InputMaybe<Array<SoftwareProductMaintainedByConnectFieldInput>>;
+  providedBy?: InputMaybe<Array<SoftwareProductProvidedByConnectFieldInput>>;
+  usedByApplications?: InputMaybe<Array<SoftwareProductUsedByApplicationsConnectFieldInput>>;
+  usedByInfrastructure?: InputMaybe<Array<SoftwareProductUsedByInfrastructureConnectFieldInput>>;
+  versions?: InputMaybe<Array<SoftwareProductVersionsConnectFieldInput>>;
+};
+
+export type SoftwareProductConnectWhere = {
+  node: SoftwareProductWhere;
+};
+
+export type SoftwareProductCreateInput = {
+  company?: InputMaybe<SoftwareProductCompanyFieldInput>;
+  developedBy?: InputMaybe<SoftwareProductDevelopedByFieldInput>;
+  isActive?: InputMaybe<Scalars['Boolean']['input']>;
+  lifecycleStatus?: InputMaybe<LifecycleStatus>;
+  maintainedBy?: InputMaybe<SoftwareProductMaintainedByFieldInput>;
+  name: Scalars['String']['input'];
+  productFamily?: InputMaybe<Scalars['String']['input']>;
+  providedBy?: InputMaybe<SoftwareProductProvidedByFieldInput>;
+  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  usedByApplications?: InputMaybe<SoftwareProductUsedByApplicationsFieldInput>;
+  usedByInfrastructure?: InputMaybe<SoftwareProductUsedByInfrastructureFieldInput>;
+  versions?: InputMaybe<SoftwareProductVersionsFieldInput>;
+};
+
+export type SoftwareProductDeleteInput = {
+  company?: InputMaybe<Array<SoftwareProductCompanyDeleteFieldInput>>;
+  developedBy?: InputMaybe<Array<SoftwareProductDevelopedByDeleteFieldInput>>;
+  maintainedBy?: InputMaybe<Array<SoftwareProductMaintainedByDeleteFieldInput>>;
+  providedBy?: InputMaybe<Array<SoftwareProductProvidedByDeleteFieldInput>>;
+  usedByApplications?: InputMaybe<Array<SoftwareProductUsedByApplicationsDeleteFieldInput>>;
+  usedByInfrastructure?: InputMaybe<Array<SoftwareProductUsedByInfrastructureDeleteFieldInput>>;
+  versions?: InputMaybe<Array<SoftwareProductVersionsDeleteFieldInput>>;
+};
+
+export type SoftwareProductDevelopedByAggregateInput = {
+  AND?: InputMaybe<Array<SoftwareProductDevelopedByAggregateInput>>;
+  NOT?: InputMaybe<SoftwareProductDevelopedByAggregateInput>;
+  OR?: InputMaybe<Array<SoftwareProductDevelopedByAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<SoftwareProductDevelopedByNodeAggregationWhereInput>;
+};
+
+export type SoftwareProductDevelopedByConnectFieldInput = {
+  connect?: InputMaybe<Array<SupplierConnectInput>>;
+  where?: InputMaybe<SupplierConnectWhere>;
+};
+
+export type SoftwareProductDevelopedByConnection = {
+  __typename?: 'SoftwareProductDevelopedByConnection';
+  aggregate: SoftwareProductSupplierDevelopedByAggregateSelection;
+  edges: Array<SoftwareProductDevelopedByRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type SoftwareProductDevelopedByConnectionAggregateInput = {
+  AND?: InputMaybe<Array<SoftwareProductDevelopedByConnectionAggregateInput>>;
+  NOT?: InputMaybe<SoftwareProductDevelopedByConnectionAggregateInput>;
+  OR?: InputMaybe<Array<SoftwareProductDevelopedByConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<SoftwareProductDevelopedByNodeAggregationWhereInput>;
+};
+
+export type SoftwareProductDevelopedByConnectionFilters = {
+  /** Filter SoftwareProducts by aggregating results on related SoftwareProductDevelopedByConnections */
+  aggregate?: InputMaybe<SoftwareProductDevelopedByConnectionAggregateInput>;
+  /** Return SoftwareProducts where all of the related SoftwareProductDevelopedByConnections match this filter */
+  all?: InputMaybe<SoftwareProductDevelopedByConnectionWhere>;
+  /** Return SoftwareProducts where none of the related SoftwareProductDevelopedByConnections match this filter */
+  none?: InputMaybe<SoftwareProductDevelopedByConnectionWhere>;
+  /** Return SoftwareProducts where one of the related SoftwareProductDevelopedByConnections match this filter */
+  single?: InputMaybe<SoftwareProductDevelopedByConnectionWhere>;
+  /** Return SoftwareProducts where some of the related SoftwareProductDevelopedByConnections match this filter */
+  some?: InputMaybe<SoftwareProductDevelopedByConnectionWhere>;
+};
+
+export type SoftwareProductDevelopedByConnectionSort = {
+  node?: InputMaybe<SupplierSort>;
+};
+
+export type SoftwareProductDevelopedByConnectionWhere = {
+  AND?: InputMaybe<Array<SoftwareProductDevelopedByConnectionWhere>>;
+  NOT?: InputMaybe<SoftwareProductDevelopedByConnectionWhere>;
+  OR?: InputMaybe<Array<SoftwareProductDevelopedByConnectionWhere>>;
+  node?: InputMaybe<SupplierWhere>;
+};
+
+export type SoftwareProductDevelopedByCreateFieldInput = {
+  node: SupplierCreateInput;
+};
+
+export type SoftwareProductDevelopedByDeleteFieldInput = {
+  delete?: InputMaybe<SupplierDeleteInput>;
+  where?: InputMaybe<SoftwareProductDevelopedByConnectionWhere>;
+};
+
+export type SoftwareProductDevelopedByDisconnectFieldInput = {
+  disconnect?: InputMaybe<SupplierDisconnectInput>;
+  where?: InputMaybe<SoftwareProductDevelopedByConnectionWhere>;
+};
+
+export type SoftwareProductDevelopedByFieldInput = {
+  connect?: InputMaybe<Array<SoftwareProductDevelopedByConnectFieldInput>>;
+  create?: InputMaybe<Array<SoftwareProductDevelopedByCreateFieldInput>>;
+};
+
+export type SoftwareProductDevelopedByNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<SoftwareProductDevelopedByNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<SoftwareProductDevelopedByNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<SoftwareProductDevelopedByNodeAggregationWhereInput>>;
+  address?: InputMaybe<StringScalarAggregationFilters>;
+  annualSpend?: InputMaybe<FloatScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  email?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  performanceRating?: InputMaybe<IntScalarAggregationFilters>;
+  phone?: InputMaybe<StringScalarAggregationFilters>;
+  primaryContactPerson?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  website?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type SoftwareProductDevelopedByRelationship = {
+  __typename?: 'SoftwareProductDevelopedByRelationship';
+  cursor: Scalars['String']['output'];
+  node: Supplier;
+};
+
+export type SoftwareProductDevelopedByUpdateConnectionInput = {
+  node?: InputMaybe<SupplierUpdateInput>;
+  where?: InputMaybe<SoftwareProductDevelopedByConnectionWhere>;
+};
+
+export type SoftwareProductDevelopedByUpdateFieldInput = {
+  connect?: InputMaybe<Array<SoftwareProductDevelopedByConnectFieldInput>>;
+  create?: InputMaybe<Array<SoftwareProductDevelopedByCreateFieldInput>>;
+  delete?: InputMaybe<Array<SoftwareProductDevelopedByDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<SoftwareProductDevelopedByDisconnectFieldInput>>;
+  update?: InputMaybe<SoftwareProductDevelopedByUpdateConnectionInput>;
+};
+
+export type SoftwareProductDisconnectInput = {
+  company?: InputMaybe<Array<SoftwareProductCompanyDisconnectFieldInput>>;
+  developedBy?: InputMaybe<Array<SoftwareProductDevelopedByDisconnectFieldInput>>;
+  maintainedBy?: InputMaybe<Array<SoftwareProductMaintainedByDisconnectFieldInput>>;
+  providedBy?: InputMaybe<Array<SoftwareProductProvidedByDisconnectFieldInput>>;
+  usedByApplications?: InputMaybe<Array<SoftwareProductUsedByApplicationsDisconnectFieldInput>>;
+  usedByInfrastructure?: InputMaybe<Array<SoftwareProductUsedByInfrastructureDisconnectFieldInput>>;
+  versions?: InputMaybe<Array<SoftwareProductVersionsDisconnectFieldInput>>;
+};
+
+export type SoftwareProductEdge = {
+  __typename?: 'SoftwareProductEdge';
+  cursor: Scalars['String']['output'];
+  node: SoftwareProduct;
+};
+
+export type SoftwareProductInfrastructureUsedByInfrastructureAggregateSelection = {
+  __typename?: 'SoftwareProductInfrastructureUsedByInfrastructureAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<SoftwareProductInfrastructureUsedByInfrastructureNodeAggregateSelection>;
+};
+
+export type SoftwareProductInfrastructureUsedByInfrastructureNodeAggregateSelection = {
+  __typename?: 'SoftwareProductInfrastructureUsedByInfrastructureNodeAggregateSelection';
+  capacity: StringAggregateSelection;
+  costs: FloatAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  ipAddress: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
+  location: StringAggregateSelection;
+  maintenanceWindow: StringAggregateSelection;
+  name: StringAggregateSelection;
+  operatingSystem: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
+  specifications: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  vendor: StringAggregateSelection;
+  version: StringAggregateSelection;
+};
+
+export type SoftwareProductMaintainedByAggregateInput = {
+  AND?: InputMaybe<Array<SoftwareProductMaintainedByAggregateInput>>;
+  NOT?: InputMaybe<SoftwareProductMaintainedByAggregateInput>;
+  OR?: InputMaybe<Array<SoftwareProductMaintainedByAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<SoftwareProductMaintainedByNodeAggregationWhereInput>;
+};
+
+export type SoftwareProductMaintainedByConnectFieldInput = {
+  connect?: InputMaybe<Array<SupplierConnectInput>>;
+  where?: InputMaybe<SupplierConnectWhere>;
+};
+
+export type SoftwareProductMaintainedByConnection = {
+  __typename?: 'SoftwareProductMaintainedByConnection';
+  aggregate: SoftwareProductSupplierMaintainedByAggregateSelection;
+  edges: Array<SoftwareProductMaintainedByRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type SoftwareProductMaintainedByConnectionAggregateInput = {
+  AND?: InputMaybe<Array<SoftwareProductMaintainedByConnectionAggregateInput>>;
+  NOT?: InputMaybe<SoftwareProductMaintainedByConnectionAggregateInput>;
+  OR?: InputMaybe<Array<SoftwareProductMaintainedByConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<SoftwareProductMaintainedByNodeAggregationWhereInput>;
+};
+
+export type SoftwareProductMaintainedByConnectionFilters = {
+  /** Filter SoftwareProducts by aggregating results on related SoftwareProductMaintainedByConnections */
+  aggregate?: InputMaybe<SoftwareProductMaintainedByConnectionAggregateInput>;
+  /** Return SoftwareProducts where all of the related SoftwareProductMaintainedByConnections match this filter */
+  all?: InputMaybe<SoftwareProductMaintainedByConnectionWhere>;
+  /** Return SoftwareProducts where none of the related SoftwareProductMaintainedByConnections match this filter */
+  none?: InputMaybe<SoftwareProductMaintainedByConnectionWhere>;
+  /** Return SoftwareProducts where one of the related SoftwareProductMaintainedByConnections match this filter */
+  single?: InputMaybe<SoftwareProductMaintainedByConnectionWhere>;
+  /** Return SoftwareProducts where some of the related SoftwareProductMaintainedByConnections match this filter */
+  some?: InputMaybe<SoftwareProductMaintainedByConnectionWhere>;
+};
+
+export type SoftwareProductMaintainedByConnectionSort = {
+  node?: InputMaybe<SupplierSort>;
+};
+
+export type SoftwareProductMaintainedByConnectionWhere = {
+  AND?: InputMaybe<Array<SoftwareProductMaintainedByConnectionWhere>>;
+  NOT?: InputMaybe<SoftwareProductMaintainedByConnectionWhere>;
+  OR?: InputMaybe<Array<SoftwareProductMaintainedByConnectionWhere>>;
+  node?: InputMaybe<SupplierWhere>;
+};
+
+export type SoftwareProductMaintainedByCreateFieldInput = {
+  node: SupplierCreateInput;
+};
+
+export type SoftwareProductMaintainedByDeleteFieldInput = {
+  delete?: InputMaybe<SupplierDeleteInput>;
+  where?: InputMaybe<SoftwareProductMaintainedByConnectionWhere>;
+};
+
+export type SoftwareProductMaintainedByDisconnectFieldInput = {
+  disconnect?: InputMaybe<SupplierDisconnectInput>;
+  where?: InputMaybe<SoftwareProductMaintainedByConnectionWhere>;
+};
+
+export type SoftwareProductMaintainedByFieldInput = {
+  connect?: InputMaybe<Array<SoftwareProductMaintainedByConnectFieldInput>>;
+  create?: InputMaybe<Array<SoftwareProductMaintainedByCreateFieldInput>>;
+};
+
+export type SoftwareProductMaintainedByNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<SoftwareProductMaintainedByNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<SoftwareProductMaintainedByNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<SoftwareProductMaintainedByNodeAggregationWhereInput>>;
+  address?: InputMaybe<StringScalarAggregationFilters>;
+  annualSpend?: InputMaybe<FloatScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  email?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  performanceRating?: InputMaybe<IntScalarAggregationFilters>;
+  phone?: InputMaybe<StringScalarAggregationFilters>;
+  primaryContactPerson?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  website?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type SoftwareProductMaintainedByRelationship = {
+  __typename?: 'SoftwareProductMaintainedByRelationship';
+  cursor: Scalars['String']['output'];
+  node: Supplier;
+};
+
+export type SoftwareProductMaintainedByUpdateConnectionInput = {
+  node?: InputMaybe<SupplierUpdateInput>;
+  where?: InputMaybe<SoftwareProductMaintainedByConnectionWhere>;
+};
+
+export type SoftwareProductMaintainedByUpdateFieldInput = {
+  connect?: InputMaybe<Array<SoftwareProductMaintainedByConnectFieldInput>>;
+  create?: InputMaybe<Array<SoftwareProductMaintainedByCreateFieldInput>>;
+  delete?: InputMaybe<Array<SoftwareProductMaintainedByDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<SoftwareProductMaintainedByDisconnectFieldInput>>;
+  update?: InputMaybe<SoftwareProductMaintainedByUpdateConnectionInput>;
+};
+
+export type SoftwareProductProvidedByAggregateInput = {
+  AND?: InputMaybe<Array<SoftwareProductProvidedByAggregateInput>>;
+  NOT?: InputMaybe<SoftwareProductProvidedByAggregateInput>;
+  OR?: InputMaybe<Array<SoftwareProductProvidedByAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<SoftwareProductProvidedByNodeAggregationWhereInput>;
+};
+
+export type SoftwareProductProvidedByConnectFieldInput = {
+  connect?: InputMaybe<Array<SupplierConnectInput>>;
+  where?: InputMaybe<SupplierConnectWhere>;
+};
+
+export type SoftwareProductProvidedByConnection = {
+  __typename?: 'SoftwareProductProvidedByConnection';
+  aggregate: SoftwareProductSupplierProvidedByAggregateSelection;
+  edges: Array<SoftwareProductProvidedByRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type SoftwareProductProvidedByConnectionAggregateInput = {
+  AND?: InputMaybe<Array<SoftwareProductProvidedByConnectionAggregateInput>>;
+  NOT?: InputMaybe<SoftwareProductProvidedByConnectionAggregateInput>;
+  OR?: InputMaybe<Array<SoftwareProductProvidedByConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<SoftwareProductProvidedByNodeAggregationWhereInput>;
+};
+
+export type SoftwareProductProvidedByConnectionFilters = {
+  /** Filter SoftwareProducts by aggregating results on related SoftwareProductProvidedByConnections */
+  aggregate?: InputMaybe<SoftwareProductProvidedByConnectionAggregateInput>;
+  /** Return SoftwareProducts where all of the related SoftwareProductProvidedByConnections match this filter */
+  all?: InputMaybe<SoftwareProductProvidedByConnectionWhere>;
+  /** Return SoftwareProducts where none of the related SoftwareProductProvidedByConnections match this filter */
+  none?: InputMaybe<SoftwareProductProvidedByConnectionWhere>;
+  /** Return SoftwareProducts where one of the related SoftwareProductProvidedByConnections match this filter */
+  single?: InputMaybe<SoftwareProductProvidedByConnectionWhere>;
+  /** Return SoftwareProducts where some of the related SoftwareProductProvidedByConnections match this filter */
+  some?: InputMaybe<SoftwareProductProvidedByConnectionWhere>;
+};
+
+export type SoftwareProductProvidedByConnectionSort = {
+  node?: InputMaybe<SupplierSort>;
+};
+
+export type SoftwareProductProvidedByConnectionWhere = {
+  AND?: InputMaybe<Array<SoftwareProductProvidedByConnectionWhere>>;
+  NOT?: InputMaybe<SoftwareProductProvidedByConnectionWhere>;
+  OR?: InputMaybe<Array<SoftwareProductProvidedByConnectionWhere>>;
+  node?: InputMaybe<SupplierWhere>;
+};
+
+export type SoftwareProductProvidedByCreateFieldInput = {
+  node: SupplierCreateInput;
+};
+
+export type SoftwareProductProvidedByDeleteFieldInput = {
+  delete?: InputMaybe<SupplierDeleteInput>;
+  where?: InputMaybe<SoftwareProductProvidedByConnectionWhere>;
+};
+
+export type SoftwareProductProvidedByDisconnectFieldInput = {
+  disconnect?: InputMaybe<SupplierDisconnectInput>;
+  where?: InputMaybe<SoftwareProductProvidedByConnectionWhere>;
+};
+
+export type SoftwareProductProvidedByFieldInput = {
+  connect?: InputMaybe<Array<SoftwareProductProvidedByConnectFieldInput>>;
+  create?: InputMaybe<Array<SoftwareProductProvidedByCreateFieldInput>>;
+};
+
+export type SoftwareProductProvidedByNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<SoftwareProductProvidedByNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<SoftwareProductProvidedByNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<SoftwareProductProvidedByNodeAggregationWhereInput>>;
+  address?: InputMaybe<StringScalarAggregationFilters>;
+  annualSpend?: InputMaybe<FloatScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  email?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  performanceRating?: InputMaybe<IntScalarAggregationFilters>;
+  phone?: InputMaybe<StringScalarAggregationFilters>;
+  primaryContactPerson?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  website?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type SoftwareProductProvidedByRelationship = {
+  __typename?: 'SoftwareProductProvidedByRelationship';
+  cursor: Scalars['String']['output'];
+  node: Supplier;
+};
+
+export type SoftwareProductProvidedByUpdateConnectionInput = {
+  node?: InputMaybe<SupplierUpdateInput>;
+  where?: InputMaybe<SoftwareProductProvidedByConnectionWhere>;
+};
+
+export type SoftwareProductProvidedByUpdateFieldInput = {
+  connect?: InputMaybe<Array<SoftwareProductProvidedByConnectFieldInput>>;
+  create?: InputMaybe<Array<SoftwareProductProvidedByCreateFieldInput>>;
+  delete?: InputMaybe<Array<SoftwareProductProvidedByDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<SoftwareProductProvidedByDisconnectFieldInput>>;
+  update?: InputMaybe<SoftwareProductProvidedByUpdateConnectionInput>;
+};
+
+export type SoftwareProductRelationshipFilters = {
+  /** Filter type where all of the related SoftwareProducts match this filter */
+  all?: InputMaybe<SoftwareProductWhere>;
+  /** Filter type where none of the related SoftwareProducts match this filter */
+  none?: InputMaybe<SoftwareProductWhere>;
+  /** Filter type where one of the related SoftwareProducts match this filter */
+  single?: InputMaybe<SoftwareProductWhere>;
+  /** Filter type where some of the related SoftwareProducts match this filter */
+  some?: InputMaybe<SoftwareProductWhere>;
+};
+
+export type SoftwareProductSoftwareVersionVersionsAggregateSelection = {
+  __typename?: 'SoftwareProductSoftwareVersionVersionsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<SoftwareProductSoftwareVersionVersionsNodeAggregateSelection>;
+};
+
+export type SoftwareProductSoftwareVersionVersionsNodeAggregateSelection = {
+  __typename?: 'SoftwareProductSoftwareVersionVersionsNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  normalizedVersion: StringAggregateSelection;
+  releaseChannel: StringAggregateSelection;
+  supportTier: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  versionString: StringAggregateSelection;
+};
+
+/** Fields to sort SoftwareProducts by. The order in which sorts are applied is not guaranteed when specifying many fields in one SoftwareProductSort object. */
+export type SoftwareProductSort = {
+  createdAt?: InputMaybe<SortDirection>;
+  id?: InputMaybe<SortDirection>;
+  isActive?: InputMaybe<SortDirection>;
+  lifecycleStatus?: InputMaybe<SortDirection>;
+  name?: InputMaybe<SortDirection>;
+  productFamily?: InputMaybe<SortDirection>;
+  updatedAt?: InputMaybe<SortDirection>;
+};
+
+export type SoftwareProductSupplierDevelopedByAggregateSelection = {
+  __typename?: 'SoftwareProductSupplierDevelopedByAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<SoftwareProductSupplierDevelopedByNodeAggregateSelection>;
+};
+
+export type SoftwareProductSupplierDevelopedByNodeAggregateSelection = {
+  __typename?: 'SoftwareProductSupplierDevelopedByNodeAggregateSelection';
+  address: StringAggregateSelection;
+  annualSpend: FloatAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  email: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
+  name: StringAggregateSelection;
+  performanceRating: IntAggregateSelection;
+  phone: StringAggregateSelection;
+  primaryContactPerson: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  website: StringAggregateSelection;
+};
+
+export type SoftwareProductSupplierMaintainedByAggregateSelection = {
+  __typename?: 'SoftwareProductSupplierMaintainedByAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<SoftwareProductSupplierMaintainedByNodeAggregateSelection>;
+};
+
+export type SoftwareProductSupplierMaintainedByNodeAggregateSelection = {
+  __typename?: 'SoftwareProductSupplierMaintainedByNodeAggregateSelection';
+  address: StringAggregateSelection;
+  annualSpend: FloatAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  email: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
+  name: StringAggregateSelection;
+  performanceRating: IntAggregateSelection;
+  phone: StringAggregateSelection;
+  primaryContactPerson: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  website: StringAggregateSelection;
+};
+
+export type SoftwareProductSupplierProvidedByAggregateSelection = {
+  __typename?: 'SoftwareProductSupplierProvidedByAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<SoftwareProductSupplierProvidedByNodeAggregateSelection>;
+};
+
+export type SoftwareProductSupplierProvidedByNodeAggregateSelection = {
+  __typename?: 'SoftwareProductSupplierProvidedByNodeAggregateSelection';
+  address: StringAggregateSelection;
+  annualSpend: FloatAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  email: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
+  name: StringAggregateSelection;
+  performanceRating: IntAggregateSelection;
+  phone: StringAggregateSelection;
+  primaryContactPerson: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  website: StringAggregateSelection;
+};
+
+export type SoftwareProductUpdateInput = {
+  company?: InputMaybe<Array<SoftwareProductCompanyUpdateFieldInput>>;
+  createdAt?: InputMaybe<DateTimeScalarMutations>;
+  developedBy?: InputMaybe<Array<SoftwareProductDevelopedByUpdateFieldInput>>;
+  isActive?: InputMaybe<BooleanScalarMutations>;
+  lifecycleStatus?: InputMaybe<LifecycleStatusEnumScalarMutations>;
+  maintainedBy?: InputMaybe<Array<SoftwareProductMaintainedByUpdateFieldInput>>;
+  name?: InputMaybe<StringScalarMutations>;
+  productFamily?: InputMaybe<StringScalarMutations>;
+  providedBy?: InputMaybe<Array<SoftwareProductProvidedByUpdateFieldInput>>;
+  usedByApplications?: InputMaybe<Array<SoftwareProductUsedByApplicationsUpdateFieldInput>>;
+  usedByInfrastructure?: InputMaybe<Array<SoftwareProductUsedByInfrastructureUpdateFieldInput>>;
+  versions?: InputMaybe<Array<SoftwareProductVersionsUpdateFieldInput>>;
+};
+
+export type SoftwareProductUsedByApplicationsAggregateInput = {
+  AND?: InputMaybe<Array<SoftwareProductUsedByApplicationsAggregateInput>>;
+  NOT?: InputMaybe<SoftwareProductUsedByApplicationsAggregateInput>;
+  OR?: InputMaybe<Array<SoftwareProductUsedByApplicationsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<SoftwareProductUsedByApplicationsNodeAggregationWhereInput>;
+};
+
+export type SoftwareProductUsedByApplicationsConnectFieldInput = {
+  connect?: InputMaybe<Array<ApplicationConnectInput>>;
+  where?: InputMaybe<ApplicationConnectWhere>;
+};
+
+export type SoftwareProductUsedByApplicationsConnection = {
+  __typename?: 'SoftwareProductUsedByApplicationsConnection';
+  aggregate: SoftwareProductApplicationUsedByApplicationsAggregateSelection;
+  edges: Array<SoftwareProductUsedByApplicationsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type SoftwareProductUsedByApplicationsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<SoftwareProductUsedByApplicationsConnectionAggregateInput>>;
+  NOT?: InputMaybe<SoftwareProductUsedByApplicationsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<SoftwareProductUsedByApplicationsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<SoftwareProductUsedByApplicationsNodeAggregationWhereInput>;
+};
+
+export type SoftwareProductUsedByApplicationsConnectionFilters = {
+  /** Filter SoftwareProducts by aggregating results on related SoftwareProductUsedByApplicationsConnections */
+  aggregate?: InputMaybe<SoftwareProductUsedByApplicationsConnectionAggregateInput>;
+  /** Return SoftwareProducts where all of the related SoftwareProductUsedByApplicationsConnections match this filter */
+  all?: InputMaybe<SoftwareProductUsedByApplicationsConnectionWhere>;
+  /** Return SoftwareProducts where none of the related SoftwareProductUsedByApplicationsConnections match this filter */
+  none?: InputMaybe<SoftwareProductUsedByApplicationsConnectionWhere>;
+  /** Return SoftwareProducts where one of the related SoftwareProductUsedByApplicationsConnections match this filter */
+  single?: InputMaybe<SoftwareProductUsedByApplicationsConnectionWhere>;
+  /** Return SoftwareProducts where some of the related SoftwareProductUsedByApplicationsConnections match this filter */
+  some?: InputMaybe<SoftwareProductUsedByApplicationsConnectionWhere>;
+};
+
+export type SoftwareProductUsedByApplicationsConnectionSort = {
+  node?: InputMaybe<ApplicationSort>;
+};
+
+export type SoftwareProductUsedByApplicationsConnectionWhere = {
+  AND?: InputMaybe<Array<SoftwareProductUsedByApplicationsConnectionWhere>>;
+  NOT?: InputMaybe<SoftwareProductUsedByApplicationsConnectionWhere>;
+  OR?: InputMaybe<Array<SoftwareProductUsedByApplicationsConnectionWhere>>;
+  node?: InputMaybe<ApplicationWhere>;
+};
+
+export type SoftwareProductUsedByApplicationsCreateFieldInput = {
+  node: ApplicationCreateInput;
+};
+
+export type SoftwareProductUsedByApplicationsDeleteFieldInput = {
+  delete?: InputMaybe<ApplicationDeleteInput>;
+  where?: InputMaybe<SoftwareProductUsedByApplicationsConnectionWhere>;
+};
+
+export type SoftwareProductUsedByApplicationsDisconnectFieldInput = {
+  disconnect?: InputMaybe<ApplicationDisconnectInput>;
+  where?: InputMaybe<SoftwareProductUsedByApplicationsConnectionWhere>;
+};
+
+export type SoftwareProductUsedByApplicationsFieldInput = {
+  connect?: InputMaybe<Array<SoftwareProductUsedByApplicationsConnectFieldInput>>;
+  create?: InputMaybe<Array<SoftwareProductUsedByApplicationsCreateFieldInput>>;
+};
+
+export type SoftwareProductUsedByApplicationsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<SoftwareProductUsedByApplicationsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<SoftwareProductUsedByApplicationsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<SoftwareProductUsedByApplicationsNodeAggregationWhereInput>>;
+  costs?: InputMaybe<FloatScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  sbom?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  vendor?: InputMaybe<StringScalarAggregationFilters>;
+  version?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type SoftwareProductUsedByApplicationsRelationship = {
+  __typename?: 'SoftwareProductUsedByApplicationsRelationship';
+  cursor: Scalars['String']['output'];
+  node: Application;
+};
+
+export type SoftwareProductUsedByApplicationsUpdateConnectionInput = {
+  node?: InputMaybe<ApplicationUpdateInput>;
+  where?: InputMaybe<SoftwareProductUsedByApplicationsConnectionWhere>;
+};
+
+export type SoftwareProductUsedByApplicationsUpdateFieldInput = {
+  connect?: InputMaybe<Array<SoftwareProductUsedByApplicationsConnectFieldInput>>;
+  create?: InputMaybe<Array<SoftwareProductUsedByApplicationsCreateFieldInput>>;
+  delete?: InputMaybe<Array<SoftwareProductUsedByApplicationsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<SoftwareProductUsedByApplicationsDisconnectFieldInput>>;
+  update?: InputMaybe<SoftwareProductUsedByApplicationsUpdateConnectionInput>;
+};
+
+export type SoftwareProductUsedByInfrastructureAggregateInput = {
+  AND?: InputMaybe<Array<SoftwareProductUsedByInfrastructureAggregateInput>>;
+  NOT?: InputMaybe<SoftwareProductUsedByInfrastructureAggregateInput>;
+  OR?: InputMaybe<Array<SoftwareProductUsedByInfrastructureAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<SoftwareProductUsedByInfrastructureNodeAggregationWhereInput>;
+};
+
+export type SoftwareProductUsedByInfrastructureConnectFieldInput = {
+  connect?: InputMaybe<Array<InfrastructureConnectInput>>;
+  where?: InputMaybe<InfrastructureConnectWhere>;
+};
+
+export type SoftwareProductUsedByInfrastructureConnection = {
+  __typename?: 'SoftwareProductUsedByInfrastructureConnection';
+  aggregate: SoftwareProductInfrastructureUsedByInfrastructureAggregateSelection;
+  edges: Array<SoftwareProductUsedByInfrastructureRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type SoftwareProductUsedByInfrastructureConnectionAggregateInput = {
+  AND?: InputMaybe<Array<SoftwareProductUsedByInfrastructureConnectionAggregateInput>>;
+  NOT?: InputMaybe<SoftwareProductUsedByInfrastructureConnectionAggregateInput>;
+  OR?: InputMaybe<Array<SoftwareProductUsedByInfrastructureConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<SoftwareProductUsedByInfrastructureNodeAggregationWhereInput>;
+};
+
+export type SoftwareProductUsedByInfrastructureConnectionFilters = {
+  /** Filter SoftwareProducts by aggregating results on related SoftwareProductUsedByInfrastructureConnections */
+  aggregate?: InputMaybe<SoftwareProductUsedByInfrastructureConnectionAggregateInput>;
+  /** Return SoftwareProducts where all of the related SoftwareProductUsedByInfrastructureConnections match this filter */
+  all?: InputMaybe<SoftwareProductUsedByInfrastructureConnectionWhere>;
+  /** Return SoftwareProducts where none of the related SoftwareProductUsedByInfrastructureConnections match this filter */
+  none?: InputMaybe<SoftwareProductUsedByInfrastructureConnectionWhere>;
+  /** Return SoftwareProducts where one of the related SoftwareProductUsedByInfrastructureConnections match this filter */
+  single?: InputMaybe<SoftwareProductUsedByInfrastructureConnectionWhere>;
+  /** Return SoftwareProducts where some of the related SoftwareProductUsedByInfrastructureConnections match this filter */
+  some?: InputMaybe<SoftwareProductUsedByInfrastructureConnectionWhere>;
+};
+
+export type SoftwareProductUsedByInfrastructureConnectionSort = {
+  node?: InputMaybe<InfrastructureSort>;
+};
+
+export type SoftwareProductUsedByInfrastructureConnectionWhere = {
+  AND?: InputMaybe<Array<SoftwareProductUsedByInfrastructureConnectionWhere>>;
+  NOT?: InputMaybe<SoftwareProductUsedByInfrastructureConnectionWhere>;
+  OR?: InputMaybe<Array<SoftwareProductUsedByInfrastructureConnectionWhere>>;
+  node?: InputMaybe<InfrastructureWhere>;
+};
+
+export type SoftwareProductUsedByInfrastructureCreateFieldInput = {
+  node: InfrastructureCreateInput;
+};
+
+export type SoftwareProductUsedByInfrastructureDeleteFieldInput = {
+  delete?: InputMaybe<InfrastructureDeleteInput>;
+  where?: InputMaybe<SoftwareProductUsedByInfrastructureConnectionWhere>;
+};
+
+export type SoftwareProductUsedByInfrastructureDisconnectFieldInput = {
+  disconnect?: InputMaybe<InfrastructureDisconnectInput>;
+  where?: InputMaybe<SoftwareProductUsedByInfrastructureConnectionWhere>;
+};
+
+export type SoftwareProductUsedByInfrastructureFieldInput = {
+  connect?: InputMaybe<Array<SoftwareProductUsedByInfrastructureConnectFieldInput>>;
+  create?: InputMaybe<Array<SoftwareProductUsedByInfrastructureCreateFieldInput>>;
+};
+
+export type SoftwareProductUsedByInfrastructureNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<SoftwareProductUsedByInfrastructureNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<SoftwareProductUsedByInfrastructureNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<SoftwareProductUsedByInfrastructureNodeAggregationWhereInput>>;
+  capacity?: InputMaybe<StringScalarAggregationFilters>;
+  costs?: InputMaybe<FloatScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  ipAddress?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  location?: InputMaybe<StringScalarAggregationFilters>;
+  maintenanceWindow?: InputMaybe<StringScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  operatingSystem?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
+  specifications?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  vendor?: InputMaybe<StringScalarAggregationFilters>;
+  version?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type SoftwareProductUsedByInfrastructureRelationship = {
+  __typename?: 'SoftwareProductUsedByInfrastructureRelationship';
+  cursor: Scalars['String']['output'];
+  node: Infrastructure;
+};
+
+export type SoftwareProductUsedByInfrastructureUpdateConnectionInput = {
+  node?: InputMaybe<InfrastructureUpdateInput>;
+  where?: InputMaybe<SoftwareProductUsedByInfrastructureConnectionWhere>;
+};
+
+export type SoftwareProductUsedByInfrastructureUpdateFieldInput = {
+  connect?: InputMaybe<Array<SoftwareProductUsedByInfrastructureConnectFieldInput>>;
+  create?: InputMaybe<Array<SoftwareProductUsedByInfrastructureCreateFieldInput>>;
+  delete?: InputMaybe<Array<SoftwareProductUsedByInfrastructureDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<SoftwareProductUsedByInfrastructureDisconnectFieldInput>>;
+  update?: InputMaybe<SoftwareProductUsedByInfrastructureUpdateConnectionInput>;
+};
+
+export type SoftwareProductVersionsAggregateInput = {
+  AND?: InputMaybe<Array<SoftwareProductVersionsAggregateInput>>;
+  NOT?: InputMaybe<SoftwareProductVersionsAggregateInput>;
+  OR?: InputMaybe<Array<SoftwareProductVersionsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<SoftwareProductVersionsNodeAggregationWhereInput>;
+};
+
+export type SoftwareProductVersionsConnectFieldInput = {
+  connect?: InputMaybe<Array<SoftwareVersionConnectInput>>;
+  where?: InputMaybe<SoftwareVersionConnectWhere>;
+};
+
+export type SoftwareProductVersionsConnection = {
+  __typename?: 'SoftwareProductVersionsConnection';
+  aggregate: SoftwareProductSoftwareVersionVersionsAggregateSelection;
+  edges: Array<SoftwareProductVersionsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type SoftwareProductVersionsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<SoftwareProductVersionsConnectionAggregateInput>>;
+  NOT?: InputMaybe<SoftwareProductVersionsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<SoftwareProductVersionsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<SoftwareProductVersionsNodeAggregationWhereInput>;
+};
+
+export type SoftwareProductVersionsConnectionFilters = {
+  /** Filter SoftwareProducts by aggregating results on related SoftwareProductVersionsConnections */
+  aggregate?: InputMaybe<SoftwareProductVersionsConnectionAggregateInput>;
+  /** Return SoftwareProducts where all of the related SoftwareProductVersionsConnections match this filter */
+  all?: InputMaybe<SoftwareProductVersionsConnectionWhere>;
+  /** Return SoftwareProducts where none of the related SoftwareProductVersionsConnections match this filter */
+  none?: InputMaybe<SoftwareProductVersionsConnectionWhere>;
+  /** Return SoftwareProducts where one of the related SoftwareProductVersionsConnections match this filter */
+  single?: InputMaybe<SoftwareProductVersionsConnectionWhere>;
+  /** Return SoftwareProducts where some of the related SoftwareProductVersionsConnections match this filter */
+  some?: InputMaybe<SoftwareProductVersionsConnectionWhere>;
+};
+
+export type SoftwareProductVersionsConnectionSort = {
+  node?: InputMaybe<SoftwareVersionSort>;
+};
+
+export type SoftwareProductVersionsConnectionWhere = {
+  AND?: InputMaybe<Array<SoftwareProductVersionsConnectionWhere>>;
+  NOT?: InputMaybe<SoftwareProductVersionsConnectionWhere>;
+  OR?: InputMaybe<Array<SoftwareProductVersionsConnectionWhere>>;
+  node?: InputMaybe<SoftwareVersionWhere>;
+};
+
+export type SoftwareProductVersionsCreateFieldInput = {
+  node: SoftwareVersionCreateInput;
+};
+
+export type SoftwareProductVersionsDeleteFieldInput = {
+  delete?: InputMaybe<SoftwareVersionDeleteInput>;
+  where?: InputMaybe<SoftwareProductVersionsConnectionWhere>;
+};
+
+export type SoftwareProductVersionsDisconnectFieldInput = {
+  disconnect?: InputMaybe<SoftwareVersionDisconnectInput>;
+  where?: InputMaybe<SoftwareProductVersionsConnectionWhere>;
+};
+
+export type SoftwareProductVersionsFieldInput = {
+  connect?: InputMaybe<Array<SoftwareProductVersionsConnectFieldInput>>;
+  create?: InputMaybe<Array<SoftwareProductVersionsCreateFieldInput>>;
+};
+
+export type SoftwareProductVersionsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<SoftwareProductVersionsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<SoftwareProductVersionsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<SoftwareProductVersionsNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  normalizedVersion?: InputMaybe<StringScalarAggregationFilters>;
+  releaseChannel?: InputMaybe<StringScalarAggregationFilters>;
+  supportTier?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  versionString?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type SoftwareProductVersionsRelationship = {
+  __typename?: 'SoftwareProductVersionsRelationship';
+  cursor: Scalars['String']['output'];
+  node: SoftwareVersion;
+};
+
+export type SoftwareProductVersionsUpdateConnectionInput = {
+  node?: InputMaybe<SoftwareVersionUpdateInput>;
+  where?: InputMaybe<SoftwareProductVersionsConnectionWhere>;
+};
+
+export type SoftwareProductVersionsUpdateFieldInput = {
+  connect?: InputMaybe<Array<SoftwareProductVersionsConnectFieldInput>>;
+  create?: InputMaybe<Array<SoftwareProductVersionsCreateFieldInput>>;
+  delete?: InputMaybe<Array<SoftwareProductVersionsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<SoftwareProductVersionsDisconnectFieldInput>>;
+  update?: InputMaybe<SoftwareProductVersionsUpdateConnectionInput>;
+};
+
+export type SoftwareProductWhere = {
+  AND?: InputMaybe<Array<SoftwareProductWhere>>;
+  NOT?: InputMaybe<SoftwareProductWhere>;
+  OR?: InputMaybe<Array<SoftwareProductWhere>>;
+  company?: InputMaybe<CompanyRelationshipFilters>;
+  companyConnection?: InputMaybe<SoftwareProductCompanyConnectionFilters>;
+  createdAt?: InputMaybe<DateTimeScalarFilters>;
+  developedBy?: InputMaybe<SupplierRelationshipFilters>;
+  developedByConnection?: InputMaybe<SoftwareProductDevelopedByConnectionFilters>;
+  id?: InputMaybe<IdScalarFilters>;
+  isActive?: InputMaybe<BooleanScalarFilters>;
+  lifecycleStatus?: InputMaybe<LifecycleStatusEnumScalarFilters>;
+  maintainedBy?: InputMaybe<SupplierRelationshipFilters>;
+  maintainedByConnection?: InputMaybe<SoftwareProductMaintainedByConnectionFilters>;
+  name?: InputMaybe<StringScalarFilters>;
+  productFamily?: InputMaybe<StringScalarFilters>;
+  providedBy?: InputMaybe<SupplierRelationshipFilters>;
+  providedByConnection?: InputMaybe<SoftwareProductProvidedByConnectionFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarFilters>;
+  usedByApplications?: InputMaybe<ApplicationRelationshipFilters>;
+  usedByApplicationsConnection?: InputMaybe<SoftwareProductUsedByApplicationsConnectionFilters>;
+  usedByInfrastructure?: InputMaybe<InfrastructureRelationshipFilters>;
+  usedByInfrastructureConnection?: InputMaybe<SoftwareProductUsedByInfrastructureConnectionFilters>;
+  versions?: InputMaybe<SoftwareVersionRelationshipFilters>;
+  versionsConnection?: InputMaybe<SoftwareProductVersionsConnectionFilters>;
+};
+
+export type SoftwareProductsConnection = {
+  __typename?: 'SoftwareProductsConnection';
+  aggregate: SoftwareProductAggregate;
+  edges: Array<SoftwareProductEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+/** SoftwareVersion – version metadata for a software product */
+export type SoftwareVersion = {
+  __typename?: 'SoftwareVersion';
+  company: Array<Company>;
+  companyConnection: SoftwareVersionCompanyConnection;
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  isLts?: Maybe<Scalars['Boolean']['output']>;
+  lifecycleRecords: Array<LifecycleRecord>;
+  lifecycleRecordsConnection: SoftwareVersionLifecycleRecordsConnection;
+  normalizedVersion?: Maybe<Scalars['String']['output']>;
+  releaseChannel?: Maybe<Scalars['String']['output']>;
+  softwareProduct: Array<SoftwareProduct>;
+  softwareProductConnection: SoftwareVersionSoftwareProductConnection;
+  supportTier?: Maybe<Scalars['String']['output']>;
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  versionString: Scalars['String']['output'];
+};
+
+
+/** SoftwareVersion – version metadata for a software product */
+export type SoftwareVersionCompanyArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<CompanySort>>;
+  where?: InputMaybe<CompanyWhere>;
+};
+
+
+/** SoftwareVersion – version metadata for a software product */
+export type SoftwareVersionCompanyConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SoftwareVersionCompanyConnectionSort>>;
+  where?: InputMaybe<SoftwareVersionCompanyConnectionWhere>;
+};
+
+
+/** SoftwareVersion – version metadata for a software product */
+export type SoftwareVersionLifecycleRecordsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<LifecycleRecordSort>>;
+  where?: InputMaybe<LifecycleRecordWhere>;
+};
+
+
+/** SoftwareVersion – version metadata for a software product */
+export type SoftwareVersionLifecycleRecordsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SoftwareVersionLifecycleRecordsConnectionSort>>;
+  where?: InputMaybe<SoftwareVersionLifecycleRecordsConnectionWhere>;
+};
+
+
+/** SoftwareVersion – version metadata for a software product */
+export type SoftwareVersionSoftwareProductArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SoftwareProductSort>>;
+  where?: InputMaybe<SoftwareProductWhere>;
+};
+
+
+/** SoftwareVersion – version metadata for a software product */
+export type SoftwareVersionSoftwareProductConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SoftwareVersionSoftwareProductConnectionSort>>;
+  where?: InputMaybe<SoftwareVersionSoftwareProductConnectionWhere>;
+};
+
+export type SoftwareVersionAggregate = {
+  __typename?: 'SoftwareVersionAggregate';
+  count: Count;
+  node: SoftwareVersionAggregateNode;
+};
+
+export type SoftwareVersionAggregateNode = {
+  __typename?: 'SoftwareVersionAggregateNode';
+  createdAt: DateTimeAggregateSelection;
+  normalizedVersion: StringAggregateSelection;
+  releaseChannel: StringAggregateSelection;
+  supportTier: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  versionString: StringAggregateSelection;
+};
+
+export type SoftwareVersionCompanyAggregateInput = {
+  AND?: InputMaybe<Array<SoftwareVersionCompanyAggregateInput>>;
+  NOT?: InputMaybe<SoftwareVersionCompanyAggregateInput>;
+  OR?: InputMaybe<Array<SoftwareVersionCompanyAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<SoftwareVersionCompanyNodeAggregationWhereInput>;
+};
+
+export type SoftwareVersionCompanyCompanyAggregateSelection = {
+  __typename?: 'SoftwareVersionCompanyCompanyAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<SoftwareVersionCompanyCompanyNodeAggregateSelection>;
+};
+
+export type SoftwareVersionCompanyCompanyNodeAggregateSelection = {
+  __typename?: 'SoftwareVersionCompanyCompanyNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
+  address: StringAggregateSelection;
+  controlPriority: IntAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  diagramFont: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
+  features: StringAggregateSelection;
+  font: StringAggregateSelection;
+  industry: StringAggregateSelection;
+  logo: StringAggregateSelection;
+  name: StringAggregateSelection;
+  primaryColor: StringAggregateSelection;
+  resiliencePriority: IntAggregateSelection;
+  secondaryColor: StringAggregateSelection;
+  securityPriority: IntAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
+  sovereigntyScoreStatus: StringAggregateSelection;
+  strategicAutonomyPriority: IntAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  website: StringAggregateSelection;
+};
+
+export type SoftwareVersionCompanyConnectFieldInput = {
+  connect?: InputMaybe<Array<CompanyConnectInput>>;
+  where?: InputMaybe<CompanyConnectWhere>;
+};
+
+export type SoftwareVersionCompanyConnection = {
+  __typename?: 'SoftwareVersionCompanyConnection';
+  aggregate: SoftwareVersionCompanyCompanyAggregateSelection;
+  edges: Array<SoftwareVersionCompanyRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type SoftwareVersionCompanyConnectionAggregateInput = {
+  AND?: InputMaybe<Array<SoftwareVersionCompanyConnectionAggregateInput>>;
+  NOT?: InputMaybe<SoftwareVersionCompanyConnectionAggregateInput>;
+  OR?: InputMaybe<Array<SoftwareVersionCompanyConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<SoftwareVersionCompanyNodeAggregationWhereInput>;
+};
+
+export type SoftwareVersionCompanyConnectionFilters = {
+  /** Filter SoftwareVersions by aggregating results on related SoftwareVersionCompanyConnections */
+  aggregate?: InputMaybe<SoftwareVersionCompanyConnectionAggregateInput>;
+  /** Return SoftwareVersions where all of the related SoftwareVersionCompanyConnections match this filter */
+  all?: InputMaybe<SoftwareVersionCompanyConnectionWhere>;
+  /** Return SoftwareVersions where none of the related SoftwareVersionCompanyConnections match this filter */
+  none?: InputMaybe<SoftwareVersionCompanyConnectionWhere>;
+  /** Return SoftwareVersions where one of the related SoftwareVersionCompanyConnections match this filter */
+  single?: InputMaybe<SoftwareVersionCompanyConnectionWhere>;
+  /** Return SoftwareVersions where some of the related SoftwareVersionCompanyConnections match this filter */
+  some?: InputMaybe<SoftwareVersionCompanyConnectionWhere>;
+};
+
+export type SoftwareVersionCompanyConnectionSort = {
+  node?: InputMaybe<CompanySort>;
+};
+
+export type SoftwareVersionCompanyConnectionWhere = {
+  AND?: InputMaybe<Array<SoftwareVersionCompanyConnectionWhere>>;
+  NOT?: InputMaybe<SoftwareVersionCompanyConnectionWhere>;
+  OR?: InputMaybe<Array<SoftwareVersionCompanyConnectionWhere>>;
+  node?: InputMaybe<CompanyWhere>;
+};
+
+export type SoftwareVersionCompanyCreateFieldInput = {
+  node: CompanyCreateInput;
+};
+
+export type SoftwareVersionCompanyDeleteFieldInput = {
+  delete?: InputMaybe<CompanyDeleteInput>;
+  where?: InputMaybe<SoftwareVersionCompanyConnectionWhere>;
+};
+
+export type SoftwareVersionCompanyDisconnectFieldInput = {
+  disconnect?: InputMaybe<CompanyDisconnectInput>;
+  where?: InputMaybe<SoftwareVersionCompanyConnectionWhere>;
+};
+
+export type SoftwareVersionCompanyFieldInput = {
+  connect?: InputMaybe<Array<SoftwareVersionCompanyConnectFieldInput>>;
+  create?: InputMaybe<Array<SoftwareVersionCompanyCreateFieldInput>>;
+};
+
+export type SoftwareVersionCompanyNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<SoftwareVersionCompanyNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<SoftwareVersionCompanyNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<SoftwareVersionCompanyNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
+  address?: InputMaybe<StringScalarAggregationFilters>;
+  controlPriority?: InputMaybe<IntScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  diagramFont?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
+  features?: InputMaybe<StringScalarAggregationFilters>;
+  font?: InputMaybe<StringScalarAggregationFilters>;
+  industry?: InputMaybe<StringScalarAggregationFilters>;
+  logo?: InputMaybe<StringScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  primaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  resiliencePriority?: InputMaybe<IntScalarAggregationFilters>;
+  secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  securityPriority?: InputMaybe<IntScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
+  strategicAutonomyPriority?: InputMaybe<IntScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  website?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type SoftwareVersionCompanyRelationship = {
+  __typename?: 'SoftwareVersionCompanyRelationship';
+  cursor: Scalars['String']['output'];
+  node: Company;
+};
+
+export type SoftwareVersionCompanyUpdateConnectionInput = {
+  node?: InputMaybe<CompanyUpdateInput>;
+  where?: InputMaybe<SoftwareVersionCompanyConnectionWhere>;
+};
+
+export type SoftwareVersionCompanyUpdateFieldInput = {
+  connect?: InputMaybe<Array<SoftwareVersionCompanyConnectFieldInput>>;
+  create?: InputMaybe<Array<SoftwareVersionCompanyCreateFieldInput>>;
+  delete?: InputMaybe<Array<SoftwareVersionCompanyDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<SoftwareVersionCompanyDisconnectFieldInput>>;
+  update?: InputMaybe<SoftwareVersionCompanyUpdateConnectionInput>;
+};
+
+export type SoftwareVersionConnectInput = {
+  company?: InputMaybe<Array<SoftwareVersionCompanyConnectFieldInput>>;
+  lifecycleRecords?: InputMaybe<Array<SoftwareVersionLifecycleRecordsConnectFieldInput>>;
+  softwareProduct?: InputMaybe<Array<SoftwareVersionSoftwareProductConnectFieldInput>>;
+};
+
+export type SoftwareVersionConnectWhere = {
+  node: SoftwareVersionWhere;
+};
+
+export type SoftwareVersionCreateInput = {
+  company?: InputMaybe<SoftwareVersionCompanyFieldInput>;
+  isLts?: InputMaybe<Scalars['Boolean']['input']>;
+  lifecycleRecords?: InputMaybe<SoftwareVersionLifecycleRecordsFieldInput>;
+  normalizedVersion?: InputMaybe<Scalars['String']['input']>;
+  releaseChannel?: InputMaybe<Scalars['String']['input']>;
+  softwareProduct?: InputMaybe<SoftwareVersionSoftwareProductFieldInput>;
+  supportTier?: InputMaybe<Scalars['String']['input']>;
+  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  versionString: Scalars['String']['input'];
+};
+
+export type SoftwareVersionDeleteInput = {
+  company?: InputMaybe<Array<SoftwareVersionCompanyDeleteFieldInput>>;
+  lifecycleRecords?: InputMaybe<Array<SoftwareVersionLifecycleRecordsDeleteFieldInput>>;
+  softwareProduct?: InputMaybe<Array<SoftwareVersionSoftwareProductDeleteFieldInput>>;
+};
+
+export type SoftwareVersionDisconnectInput = {
+  company?: InputMaybe<Array<SoftwareVersionCompanyDisconnectFieldInput>>;
+  lifecycleRecords?: InputMaybe<Array<SoftwareVersionLifecycleRecordsDisconnectFieldInput>>;
+  softwareProduct?: InputMaybe<Array<SoftwareVersionSoftwareProductDisconnectFieldInput>>;
+};
+
+export type SoftwareVersionEdge = {
+  __typename?: 'SoftwareVersionEdge';
+  cursor: Scalars['String']['output'];
+  node: SoftwareVersion;
+};
+
+export type SoftwareVersionLifecycleRecordLifecycleRecordsAggregateSelection = {
+  __typename?: 'SoftwareVersionLifecycleRecordLifecycleRecordsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<SoftwareVersionLifecycleRecordLifecycleRecordsNodeAggregateSelection>;
+};
+
+export type SoftwareVersionLifecycleRecordLifecycleRecordsNodeAggregateSelection = {
+  __typename?: 'SoftwareVersionLifecycleRecordLifecycleRecordsNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  lastValidatedAt: DateTimeAggregateSelection;
+  source: StringAggregateSelection;
+  sourceConfidence: FloatAggregateSelection;
+  sourceUrl: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
+export type SoftwareVersionLifecycleRecordsAggregateInput = {
+  AND?: InputMaybe<Array<SoftwareVersionLifecycleRecordsAggregateInput>>;
+  NOT?: InputMaybe<SoftwareVersionLifecycleRecordsAggregateInput>;
+  OR?: InputMaybe<Array<SoftwareVersionLifecycleRecordsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<SoftwareVersionLifecycleRecordsNodeAggregationWhereInput>;
+};
+
+export type SoftwareVersionLifecycleRecordsConnectFieldInput = {
+  connect?: InputMaybe<Array<LifecycleRecordConnectInput>>;
+  where?: InputMaybe<LifecycleRecordConnectWhere>;
+};
+
+export type SoftwareVersionLifecycleRecordsConnection = {
+  __typename?: 'SoftwareVersionLifecycleRecordsConnection';
+  aggregate: SoftwareVersionLifecycleRecordLifecycleRecordsAggregateSelection;
+  edges: Array<SoftwareVersionLifecycleRecordsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type SoftwareVersionLifecycleRecordsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<SoftwareVersionLifecycleRecordsConnectionAggregateInput>>;
+  NOT?: InputMaybe<SoftwareVersionLifecycleRecordsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<SoftwareVersionLifecycleRecordsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<SoftwareVersionLifecycleRecordsNodeAggregationWhereInput>;
+};
+
+export type SoftwareVersionLifecycleRecordsConnectionFilters = {
+  /** Filter SoftwareVersions by aggregating results on related SoftwareVersionLifecycleRecordsConnections */
+  aggregate?: InputMaybe<SoftwareVersionLifecycleRecordsConnectionAggregateInput>;
+  /** Return SoftwareVersions where all of the related SoftwareVersionLifecycleRecordsConnections match this filter */
+  all?: InputMaybe<SoftwareVersionLifecycleRecordsConnectionWhere>;
+  /** Return SoftwareVersions where none of the related SoftwareVersionLifecycleRecordsConnections match this filter */
+  none?: InputMaybe<SoftwareVersionLifecycleRecordsConnectionWhere>;
+  /** Return SoftwareVersions where one of the related SoftwareVersionLifecycleRecordsConnections match this filter */
+  single?: InputMaybe<SoftwareVersionLifecycleRecordsConnectionWhere>;
+  /** Return SoftwareVersions where some of the related SoftwareVersionLifecycleRecordsConnections match this filter */
+  some?: InputMaybe<SoftwareVersionLifecycleRecordsConnectionWhere>;
+};
+
+export type SoftwareVersionLifecycleRecordsConnectionSort = {
+  node?: InputMaybe<LifecycleRecordSort>;
+};
+
+export type SoftwareVersionLifecycleRecordsConnectionWhere = {
+  AND?: InputMaybe<Array<SoftwareVersionLifecycleRecordsConnectionWhere>>;
+  NOT?: InputMaybe<SoftwareVersionLifecycleRecordsConnectionWhere>;
+  OR?: InputMaybe<Array<SoftwareVersionLifecycleRecordsConnectionWhere>>;
+  node?: InputMaybe<LifecycleRecordWhere>;
+};
+
+export type SoftwareVersionLifecycleRecordsCreateFieldInput = {
+  node: LifecycleRecordCreateInput;
+};
+
+export type SoftwareVersionLifecycleRecordsDeleteFieldInput = {
+  delete?: InputMaybe<LifecycleRecordDeleteInput>;
+  where?: InputMaybe<SoftwareVersionLifecycleRecordsConnectionWhere>;
+};
+
+export type SoftwareVersionLifecycleRecordsDisconnectFieldInput = {
+  disconnect?: InputMaybe<LifecycleRecordDisconnectInput>;
+  where?: InputMaybe<SoftwareVersionLifecycleRecordsConnectionWhere>;
+};
+
+export type SoftwareVersionLifecycleRecordsFieldInput = {
+  connect?: InputMaybe<Array<SoftwareVersionLifecycleRecordsConnectFieldInput>>;
+  create?: InputMaybe<Array<SoftwareVersionLifecycleRecordsCreateFieldInput>>;
+};
+
+export type SoftwareVersionLifecycleRecordsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<SoftwareVersionLifecycleRecordsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<SoftwareVersionLifecycleRecordsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<SoftwareVersionLifecycleRecordsNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  lastValidatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  source?: InputMaybe<StringScalarAggregationFilters>;
+  sourceConfidence?: InputMaybe<FloatScalarAggregationFilters>;
+  sourceUrl?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type SoftwareVersionLifecycleRecordsRelationship = {
+  __typename?: 'SoftwareVersionLifecycleRecordsRelationship';
+  cursor: Scalars['String']['output'];
+  node: LifecycleRecord;
+};
+
+export type SoftwareVersionLifecycleRecordsUpdateConnectionInput = {
+  node?: InputMaybe<LifecycleRecordUpdateInput>;
+  where?: InputMaybe<SoftwareVersionLifecycleRecordsConnectionWhere>;
+};
+
+export type SoftwareVersionLifecycleRecordsUpdateFieldInput = {
+  connect?: InputMaybe<Array<SoftwareVersionLifecycleRecordsConnectFieldInput>>;
+  create?: InputMaybe<Array<SoftwareVersionLifecycleRecordsCreateFieldInput>>;
+  delete?: InputMaybe<Array<SoftwareVersionLifecycleRecordsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<SoftwareVersionLifecycleRecordsDisconnectFieldInput>>;
+  update?: InputMaybe<SoftwareVersionLifecycleRecordsUpdateConnectionInput>;
+};
+
+export type SoftwareVersionRelationshipFilters = {
+  /** Filter type where all of the related SoftwareVersions match this filter */
+  all?: InputMaybe<SoftwareVersionWhere>;
+  /** Filter type where none of the related SoftwareVersions match this filter */
+  none?: InputMaybe<SoftwareVersionWhere>;
+  /** Filter type where one of the related SoftwareVersions match this filter */
+  single?: InputMaybe<SoftwareVersionWhere>;
+  /** Filter type where some of the related SoftwareVersions match this filter */
+  some?: InputMaybe<SoftwareVersionWhere>;
+};
+
+export type SoftwareVersionSoftwareProductAggregateInput = {
+  AND?: InputMaybe<Array<SoftwareVersionSoftwareProductAggregateInput>>;
+  NOT?: InputMaybe<SoftwareVersionSoftwareProductAggregateInput>;
+  OR?: InputMaybe<Array<SoftwareVersionSoftwareProductAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<SoftwareVersionSoftwareProductNodeAggregationWhereInput>;
+};
+
+export type SoftwareVersionSoftwareProductConnectFieldInput = {
+  connect?: InputMaybe<Array<SoftwareProductConnectInput>>;
+  where?: InputMaybe<SoftwareProductConnectWhere>;
+};
+
+export type SoftwareVersionSoftwareProductConnection = {
+  __typename?: 'SoftwareVersionSoftwareProductConnection';
+  aggregate: SoftwareVersionSoftwareProductSoftwareProductAggregateSelection;
+  edges: Array<SoftwareVersionSoftwareProductRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type SoftwareVersionSoftwareProductConnectionAggregateInput = {
+  AND?: InputMaybe<Array<SoftwareVersionSoftwareProductConnectionAggregateInput>>;
+  NOT?: InputMaybe<SoftwareVersionSoftwareProductConnectionAggregateInput>;
+  OR?: InputMaybe<Array<SoftwareVersionSoftwareProductConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<SoftwareVersionSoftwareProductNodeAggregationWhereInput>;
+};
+
+export type SoftwareVersionSoftwareProductConnectionFilters = {
+  /** Filter SoftwareVersions by aggregating results on related SoftwareVersionSoftwareProductConnections */
+  aggregate?: InputMaybe<SoftwareVersionSoftwareProductConnectionAggregateInput>;
+  /** Return SoftwareVersions where all of the related SoftwareVersionSoftwareProductConnections match this filter */
+  all?: InputMaybe<SoftwareVersionSoftwareProductConnectionWhere>;
+  /** Return SoftwareVersions where none of the related SoftwareVersionSoftwareProductConnections match this filter */
+  none?: InputMaybe<SoftwareVersionSoftwareProductConnectionWhere>;
+  /** Return SoftwareVersions where one of the related SoftwareVersionSoftwareProductConnections match this filter */
+  single?: InputMaybe<SoftwareVersionSoftwareProductConnectionWhere>;
+  /** Return SoftwareVersions where some of the related SoftwareVersionSoftwareProductConnections match this filter */
+  some?: InputMaybe<SoftwareVersionSoftwareProductConnectionWhere>;
+};
+
+export type SoftwareVersionSoftwareProductConnectionSort = {
+  node?: InputMaybe<SoftwareProductSort>;
+};
+
+export type SoftwareVersionSoftwareProductConnectionWhere = {
+  AND?: InputMaybe<Array<SoftwareVersionSoftwareProductConnectionWhere>>;
+  NOT?: InputMaybe<SoftwareVersionSoftwareProductConnectionWhere>;
+  OR?: InputMaybe<Array<SoftwareVersionSoftwareProductConnectionWhere>>;
+  node?: InputMaybe<SoftwareProductWhere>;
+};
+
+export type SoftwareVersionSoftwareProductCreateFieldInput = {
+  node: SoftwareProductCreateInput;
+};
+
+export type SoftwareVersionSoftwareProductDeleteFieldInput = {
+  delete?: InputMaybe<SoftwareProductDeleteInput>;
+  where?: InputMaybe<SoftwareVersionSoftwareProductConnectionWhere>;
+};
+
+export type SoftwareVersionSoftwareProductDisconnectFieldInput = {
+  disconnect?: InputMaybe<SoftwareProductDisconnectInput>;
+  where?: InputMaybe<SoftwareVersionSoftwareProductConnectionWhere>;
+};
+
+export type SoftwareVersionSoftwareProductFieldInput = {
+  connect?: InputMaybe<Array<SoftwareVersionSoftwareProductConnectFieldInput>>;
+  create?: InputMaybe<Array<SoftwareVersionSoftwareProductCreateFieldInput>>;
+};
+
+export type SoftwareVersionSoftwareProductNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<SoftwareVersionSoftwareProductNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<SoftwareVersionSoftwareProductNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<SoftwareVersionSoftwareProductNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  productFamily?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type SoftwareVersionSoftwareProductRelationship = {
+  __typename?: 'SoftwareVersionSoftwareProductRelationship';
+  cursor: Scalars['String']['output'];
+  node: SoftwareProduct;
+};
+
+export type SoftwareVersionSoftwareProductSoftwareProductAggregateSelection = {
+  __typename?: 'SoftwareVersionSoftwareProductSoftwareProductAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<SoftwareVersionSoftwareProductSoftwareProductNodeAggregateSelection>;
+};
+
+export type SoftwareVersionSoftwareProductSoftwareProductNodeAggregateSelection = {
+  __typename?: 'SoftwareVersionSoftwareProductSoftwareProductNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  name: StringAggregateSelection;
+  productFamily: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
+export type SoftwareVersionSoftwareProductUpdateConnectionInput = {
+  node?: InputMaybe<SoftwareProductUpdateInput>;
+  where?: InputMaybe<SoftwareVersionSoftwareProductConnectionWhere>;
+};
+
+export type SoftwareVersionSoftwareProductUpdateFieldInput = {
+  connect?: InputMaybe<Array<SoftwareVersionSoftwareProductConnectFieldInput>>;
+  create?: InputMaybe<Array<SoftwareVersionSoftwareProductCreateFieldInput>>;
+  delete?: InputMaybe<Array<SoftwareVersionSoftwareProductDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<SoftwareVersionSoftwareProductDisconnectFieldInput>>;
+  update?: InputMaybe<SoftwareVersionSoftwareProductUpdateConnectionInput>;
+};
+
+/** Fields to sort SoftwareVersions by. The order in which sorts are applied is not guaranteed when specifying many fields in one SoftwareVersionSort object. */
+export type SoftwareVersionSort = {
+  createdAt?: InputMaybe<SortDirection>;
+  id?: InputMaybe<SortDirection>;
+  isLts?: InputMaybe<SortDirection>;
+  normalizedVersion?: InputMaybe<SortDirection>;
+  releaseChannel?: InputMaybe<SortDirection>;
+  supportTier?: InputMaybe<SortDirection>;
+  updatedAt?: InputMaybe<SortDirection>;
+  versionString?: InputMaybe<SortDirection>;
+};
+
+export type SoftwareVersionUpdateInput = {
+  company?: InputMaybe<Array<SoftwareVersionCompanyUpdateFieldInput>>;
+  createdAt?: InputMaybe<DateTimeScalarMutations>;
+  isLts?: InputMaybe<BooleanScalarMutations>;
+  lifecycleRecords?: InputMaybe<Array<SoftwareVersionLifecycleRecordsUpdateFieldInput>>;
+  normalizedVersion?: InputMaybe<StringScalarMutations>;
+  releaseChannel?: InputMaybe<StringScalarMutations>;
+  softwareProduct?: InputMaybe<Array<SoftwareVersionSoftwareProductUpdateFieldInput>>;
+  supportTier?: InputMaybe<StringScalarMutations>;
+  versionString?: InputMaybe<StringScalarMutations>;
+};
+
+export type SoftwareVersionWhere = {
+  AND?: InputMaybe<Array<SoftwareVersionWhere>>;
+  NOT?: InputMaybe<SoftwareVersionWhere>;
+  OR?: InputMaybe<Array<SoftwareVersionWhere>>;
+  company?: InputMaybe<CompanyRelationshipFilters>;
+  companyConnection?: InputMaybe<SoftwareVersionCompanyConnectionFilters>;
+  createdAt?: InputMaybe<DateTimeScalarFilters>;
+  id?: InputMaybe<IdScalarFilters>;
+  isLts?: InputMaybe<BooleanScalarFilters>;
+  lifecycleRecords?: InputMaybe<LifecycleRecordRelationshipFilters>;
+  lifecycleRecordsConnection?: InputMaybe<SoftwareVersionLifecycleRecordsConnectionFilters>;
+  normalizedVersion?: InputMaybe<StringScalarFilters>;
+  releaseChannel?: InputMaybe<StringScalarFilters>;
+  softwareProduct?: InputMaybe<SoftwareProductRelationshipFilters>;
+  softwareProductConnection?: InputMaybe<SoftwareVersionSoftwareProductConnectionFilters>;
+  supportTier?: InputMaybe<StringScalarFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarFilters>;
+  versionString?: InputMaybe<StringScalarFilters>;
+};
+
+export type SoftwareVersionsConnection = {
+  __typename?: 'SoftwareVersionsConnection';
+  aggregate: SoftwareVersionAggregate;
+  edges: Array<SoftwareVersionEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
 };
 
 /** An enum for sorting in either ascending or descending order. */
@@ -37168,6 +42909,8 @@ export type Supplier = {
   contractStartDate?: Maybe<Scalars['Date']['output']>;
   createdAt: Scalars['DateTime']['output'];
   description?: Maybe<Scalars['String']['output']>;
+  developsSoftwareProducts: Array<SoftwareProduct>;
+  developsSoftwareProductsConnection: SupplierDevelopsSoftwareProductsConnection;
   email?: Maybe<Scalars['String']['output']>;
   hostsInfrastructure: Array<Infrastructure>;
   hostsInfrastructureConnection: SupplierHostsInfrastructureConnection;
@@ -37177,8 +42920,14 @@ export type Supplier = {
   maintainsAIComponentsConnection: SupplierMaintainsAiComponentsConnection;
   maintainsApplications: Array<Application>;
   maintainsApplicationsConnection: SupplierMaintainsApplicationsConnection;
+  maintainsHardwareProducts: Array<HardwareProduct>;
+  maintainsHardwareProductsConnection: SupplierMaintainsHardwareProductsConnection;
   maintainsInfrastructure: Array<Infrastructure>;
   maintainsInfrastructureConnection: SupplierMaintainsInfrastructureConnection;
+  maintainsSoftwareProducts: Array<SoftwareProduct>;
+  maintainsSoftwareProductsConnection: SupplierMaintainsSoftwareProductsConnection;
+  manufacturesHardwareProducts: Array<HardwareProduct>;
+  manufacturesHardwareProductsConnection: SupplierManufacturesHardwareProductsConnection;
   name: Scalars['String']['output'];
   performanceRating?: Maybe<Scalars['Int']['output']>;
   phone?: Maybe<Scalars['String']['output']>;
@@ -37187,8 +42936,12 @@ export type Supplier = {
   providesAIComponentsConnection: SupplierProvidesAiComponentsConnection;
   providesApplications: Array<Application>;
   providesApplicationsConnection: SupplierProvidesApplicationsConnection;
+  providesHardwareProducts: Array<HardwareProduct>;
+  providesHardwareProductsConnection: SupplierProvidesHardwareProductsConnection;
   providesInfrastructure: Array<Infrastructure>;
   providesInfrastructureConnection: SupplierProvidesInfrastructureConnection;
+  providesSoftwareProducts: Array<SoftwareProduct>;
+  providesSoftwareProductsConnection: SupplierProvidesSoftwareProductsConnection;
   riskClassification?: Maybe<RiskClassification>;
   sovereigntyAchDataResidency?: Maybe<SovereigntyMaturity>;
   sovereigntyAchInteroperability?: Maybe<SovereigntyMaturity>;
@@ -37225,6 +42978,24 @@ export type SupplierCompanyConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<SupplierCompanyConnectionSort>>;
   where?: InputMaybe<SupplierCompanyConnectionWhere>;
+};
+
+
+/** Supplier – represents a supplier or vendor providing products or services */
+export type SupplierDevelopsSoftwareProductsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SoftwareProductSort>>;
+  where?: InputMaybe<SoftwareProductWhere>;
+};
+
+
+/** Supplier – represents a supplier or vendor providing products or services */
+export type SupplierDevelopsSoftwareProductsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SupplierDevelopsSoftwareProductsConnectionSort>>;
+  where?: InputMaybe<SupplierDevelopsSoftwareProductsConnectionWhere>;
 };
 
 
@@ -37283,6 +43054,24 @@ export type SupplierMaintainsApplicationsConnectionArgs = {
 
 
 /** Supplier – represents a supplier or vendor providing products or services */
+export type SupplierMaintainsHardwareProductsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<HardwareProductSort>>;
+  where?: InputMaybe<HardwareProductWhere>;
+};
+
+
+/** Supplier – represents a supplier or vendor providing products or services */
+export type SupplierMaintainsHardwareProductsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SupplierMaintainsHardwareProductsConnectionSort>>;
+  where?: InputMaybe<SupplierMaintainsHardwareProductsConnectionWhere>;
+};
+
+
+/** Supplier – represents a supplier or vendor providing products or services */
 export type SupplierMaintainsInfrastructureArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -37297,6 +43086,42 @@ export type SupplierMaintainsInfrastructureConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<SupplierMaintainsInfrastructureConnectionSort>>;
   where?: InputMaybe<SupplierMaintainsInfrastructureConnectionWhere>;
+};
+
+
+/** Supplier – represents a supplier or vendor providing products or services */
+export type SupplierMaintainsSoftwareProductsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SoftwareProductSort>>;
+  where?: InputMaybe<SoftwareProductWhere>;
+};
+
+
+/** Supplier – represents a supplier or vendor providing products or services */
+export type SupplierMaintainsSoftwareProductsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SupplierMaintainsSoftwareProductsConnectionSort>>;
+  where?: InputMaybe<SupplierMaintainsSoftwareProductsConnectionWhere>;
+};
+
+
+/** Supplier – represents a supplier or vendor providing products or services */
+export type SupplierManufacturesHardwareProductsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<HardwareProductSort>>;
+  where?: InputMaybe<HardwareProductWhere>;
+};
+
+
+/** Supplier – represents a supplier or vendor providing products or services */
+export type SupplierManufacturesHardwareProductsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SupplierManufacturesHardwareProductsConnectionSort>>;
+  where?: InputMaybe<SupplierManufacturesHardwareProductsConnectionWhere>;
 };
 
 
@@ -37337,6 +43162,24 @@ export type SupplierProvidesApplicationsConnectionArgs = {
 
 
 /** Supplier – represents a supplier or vendor providing products or services */
+export type SupplierProvidesHardwareProductsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<HardwareProductSort>>;
+  where?: InputMaybe<HardwareProductWhere>;
+};
+
+
+/** Supplier – represents a supplier or vendor providing products or services */
+export type SupplierProvidesHardwareProductsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SupplierProvidesHardwareProductsConnectionSort>>;
+  where?: InputMaybe<SupplierProvidesHardwareProductsConnectionWhere>;
+};
+
+
+/** Supplier – represents a supplier or vendor providing products or services */
 export type SupplierProvidesInfrastructureArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -37351,6 +43194,24 @@ export type SupplierProvidesInfrastructureConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<SupplierProvidesInfrastructureConnectionSort>>;
   where?: InputMaybe<SupplierProvidesInfrastructureConnectionWhere>;
+};
+
+
+/** Supplier – represents a supplier or vendor providing products or services */
+export type SupplierProvidesSoftwareProductsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SoftwareProductSort>>;
+  where?: InputMaybe<SoftwareProductWhere>;
+};
+
+
+/** Supplier – represents a supplier or vendor providing products or services */
+export type SupplierProvidesSoftwareProductsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SupplierProvidesSoftwareProductsConnectionSort>>;
+  where?: InputMaybe<SupplierProvidesSoftwareProductsConnectionWhere>;
 };
 
 
@@ -37492,6 +43353,7 @@ export type SupplierApplicationMaintainsApplicationsNodeAggregateSelection = {
   hostingEnvironment: StringAggregateSelection;
   lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sbom: StringAggregateSelection;
   sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
@@ -37512,6 +43374,7 @@ export type SupplierApplicationProvidesApplicationsNodeAggregateSelection = {
   hostingEnvironment: StringAggregateSelection;
   lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sbom: StringAggregateSelection;
   sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
@@ -37532,6 +43395,7 @@ export type SupplierApplicationSupportsApplicationsNodeAggregateSelection = {
   hostingEnvironment: StringAggregateSelection;
   lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
+  sbom: StringAggregateSelection;
   sovereigntyEvidence: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   vendor: StringAggregateSelection;
@@ -37561,6 +43425,7 @@ export type SupplierCompanyCompanyNodeAggregateSelection = {
   __typename?: 'SupplierCompanyCompanyNodeAggregateSelection';
   achievedSovereigntyScore: FloatAggregateSelection;
   address: StringAggregateSelection;
+  controlPriority: IntAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   description: StringAggregateSelection;
   diagramFont: StringAggregateSelection;
@@ -37571,10 +43436,13 @@ export type SupplierCompanyCompanyNodeAggregateSelection = {
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
+  resiliencePriority: IntAggregateSelection;
   secondaryColor: StringAggregateSelection;
+  securityPriority: IntAggregateSelection;
   sovereigntyGap: FloatAggregateSelection;
   sovereigntyScorePercent: FloatAggregateSelection;
   sovereigntyScoreStatus: StringAggregateSelection;
+  strategicAutonomyPriority: IntAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   website: StringAggregateSelection;
 };
@@ -37649,6 +43517,7 @@ export type SupplierCompanyNodeAggregationWhereInput = {
   OR?: InputMaybe<Array<SupplierCompanyNodeAggregationWhereInput>>;
   achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
   address?: InputMaybe<StringScalarAggregationFilters>;
+  controlPriority?: InputMaybe<IntScalarAggregationFilters>;
   createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   description?: InputMaybe<StringScalarAggregationFilters>;
   diagramFont?: InputMaybe<StringScalarAggregationFilters>;
@@ -37659,10 +43528,13 @@ export type SupplierCompanyNodeAggregationWhereInput = {
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  resiliencePriority?: InputMaybe<IntScalarAggregationFilters>;
   secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  securityPriority?: InputMaybe<IntScalarAggregationFilters>;
   sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
   sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
   sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
+  strategicAutonomyPriority?: InputMaybe<IntScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   website?: InputMaybe<StringScalarAggregationFilters>;
 };
@@ -37688,13 +43560,19 @@ export type SupplierCompanyUpdateFieldInput = {
 
 export type SupplierConnectInput = {
   company?: InputMaybe<Array<SupplierCompanyConnectFieldInput>>;
+  developsSoftwareProducts?: InputMaybe<Array<SupplierDevelopsSoftwareProductsConnectFieldInput>>;
   hostsInfrastructure?: InputMaybe<Array<SupplierHostsInfrastructureConnectFieldInput>>;
   maintainsAIComponents?: InputMaybe<Array<SupplierMaintainsAiComponentsConnectFieldInput>>;
   maintainsApplications?: InputMaybe<Array<SupplierMaintainsApplicationsConnectFieldInput>>;
+  maintainsHardwareProducts?: InputMaybe<Array<SupplierMaintainsHardwareProductsConnectFieldInput>>;
   maintainsInfrastructure?: InputMaybe<Array<SupplierMaintainsInfrastructureConnectFieldInput>>;
+  maintainsSoftwareProducts?: InputMaybe<Array<SupplierMaintainsSoftwareProductsConnectFieldInput>>;
+  manufacturesHardwareProducts?: InputMaybe<Array<SupplierManufacturesHardwareProductsConnectFieldInput>>;
   providesAIComponents?: InputMaybe<Array<SupplierProvidesAiComponentsConnectFieldInput>>;
   providesApplications?: InputMaybe<Array<SupplierProvidesApplicationsConnectFieldInput>>;
+  providesHardwareProducts?: InputMaybe<Array<SupplierProvidesHardwareProductsConnectFieldInput>>;
   providesInfrastructure?: InputMaybe<Array<SupplierProvidesInfrastructureConnectFieldInput>>;
+  providesSoftwareProducts?: InputMaybe<Array<SupplierProvidesSoftwareProductsConnectFieldInput>>;
   supportsAIComponents?: InputMaybe<Array<SupplierSupportsAiComponentsConnectFieldInput>>;
   supportsApplications?: InputMaybe<Array<SupplierSupportsApplicationsConnectFieldInput>>;
 };
@@ -37711,19 +43589,25 @@ export type SupplierCreateInput = {
   contractEndDate?: InputMaybe<Scalars['Date']['input']>;
   contractStartDate?: InputMaybe<Scalars['Date']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
+  developsSoftwareProducts?: InputMaybe<SupplierDevelopsSoftwareProductsFieldInput>;
   email?: InputMaybe<Scalars['String']['input']>;
   hostsInfrastructure?: InputMaybe<SupplierHostsInfrastructureFieldInput>;
   lastSovereigntyAssessmentAt?: InputMaybe<Scalars['DateTime']['input']>;
   maintainsAIComponents?: InputMaybe<SupplierMaintainsAiComponentsFieldInput>;
   maintainsApplications?: InputMaybe<SupplierMaintainsApplicationsFieldInput>;
+  maintainsHardwareProducts?: InputMaybe<SupplierMaintainsHardwareProductsFieldInput>;
   maintainsInfrastructure?: InputMaybe<SupplierMaintainsInfrastructureFieldInput>;
+  maintainsSoftwareProducts?: InputMaybe<SupplierMaintainsSoftwareProductsFieldInput>;
+  manufacturesHardwareProducts?: InputMaybe<SupplierManufacturesHardwareProductsFieldInput>;
   name: Scalars['String']['input'];
   performanceRating?: InputMaybe<Scalars['Int']['input']>;
   phone?: InputMaybe<Scalars['String']['input']>;
   primaryContactPerson?: InputMaybe<Scalars['String']['input']>;
   providesAIComponents?: InputMaybe<SupplierProvidesAiComponentsFieldInput>;
   providesApplications?: InputMaybe<SupplierProvidesApplicationsFieldInput>;
+  providesHardwareProducts?: InputMaybe<SupplierProvidesHardwareProductsFieldInput>;
   providesInfrastructure?: InputMaybe<SupplierProvidesInfrastructureFieldInput>;
+  providesSoftwareProducts?: InputMaybe<SupplierProvidesSoftwareProductsFieldInput>;
   riskClassification?: InputMaybe<RiskClassification>;
   sovereigntyAchDataResidency?: InputMaybe<SovereigntyMaturity>;
   sovereigntyAchInteroperability?: InputMaybe<SovereigntyMaturity>;
@@ -37744,26 +43628,144 @@ export type SupplierCreateInput = {
 
 export type SupplierDeleteInput = {
   company?: InputMaybe<Array<SupplierCompanyDeleteFieldInput>>;
+  developsSoftwareProducts?: InputMaybe<Array<SupplierDevelopsSoftwareProductsDeleteFieldInput>>;
   hostsInfrastructure?: InputMaybe<Array<SupplierHostsInfrastructureDeleteFieldInput>>;
   maintainsAIComponents?: InputMaybe<Array<SupplierMaintainsAiComponentsDeleteFieldInput>>;
   maintainsApplications?: InputMaybe<Array<SupplierMaintainsApplicationsDeleteFieldInput>>;
+  maintainsHardwareProducts?: InputMaybe<Array<SupplierMaintainsHardwareProductsDeleteFieldInput>>;
   maintainsInfrastructure?: InputMaybe<Array<SupplierMaintainsInfrastructureDeleteFieldInput>>;
+  maintainsSoftwareProducts?: InputMaybe<Array<SupplierMaintainsSoftwareProductsDeleteFieldInput>>;
+  manufacturesHardwareProducts?: InputMaybe<Array<SupplierManufacturesHardwareProductsDeleteFieldInput>>;
   providesAIComponents?: InputMaybe<Array<SupplierProvidesAiComponentsDeleteFieldInput>>;
   providesApplications?: InputMaybe<Array<SupplierProvidesApplicationsDeleteFieldInput>>;
+  providesHardwareProducts?: InputMaybe<Array<SupplierProvidesHardwareProductsDeleteFieldInput>>;
   providesInfrastructure?: InputMaybe<Array<SupplierProvidesInfrastructureDeleteFieldInput>>;
+  providesSoftwareProducts?: InputMaybe<Array<SupplierProvidesSoftwareProductsDeleteFieldInput>>;
   supportsAIComponents?: InputMaybe<Array<SupplierSupportsAiComponentsDeleteFieldInput>>;
   supportsApplications?: InputMaybe<Array<SupplierSupportsApplicationsDeleteFieldInput>>;
 };
 
+export type SupplierDevelopsSoftwareProductsAggregateInput = {
+  AND?: InputMaybe<Array<SupplierDevelopsSoftwareProductsAggregateInput>>;
+  NOT?: InputMaybe<SupplierDevelopsSoftwareProductsAggregateInput>;
+  OR?: InputMaybe<Array<SupplierDevelopsSoftwareProductsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<SupplierDevelopsSoftwareProductsNodeAggregationWhereInput>;
+};
+
+export type SupplierDevelopsSoftwareProductsConnectFieldInput = {
+  connect?: InputMaybe<Array<SoftwareProductConnectInput>>;
+  where?: InputMaybe<SoftwareProductConnectWhere>;
+};
+
+export type SupplierDevelopsSoftwareProductsConnection = {
+  __typename?: 'SupplierDevelopsSoftwareProductsConnection';
+  aggregate: SupplierSoftwareProductDevelopsSoftwareProductsAggregateSelection;
+  edges: Array<SupplierDevelopsSoftwareProductsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type SupplierDevelopsSoftwareProductsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<SupplierDevelopsSoftwareProductsConnectionAggregateInput>>;
+  NOT?: InputMaybe<SupplierDevelopsSoftwareProductsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<SupplierDevelopsSoftwareProductsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<SupplierDevelopsSoftwareProductsNodeAggregationWhereInput>;
+};
+
+export type SupplierDevelopsSoftwareProductsConnectionFilters = {
+  /** Filter Suppliers by aggregating results on related SupplierDevelopsSoftwareProductsConnections */
+  aggregate?: InputMaybe<SupplierDevelopsSoftwareProductsConnectionAggregateInput>;
+  /** Return Suppliers where all of the related SupplierDevelopsSoftwareProductsConnections match this filter */
+  all?: InputMaybe<SupplierDevelopsSoftwareProductsConnectionWhere>;
+  /** Return Suppliers where none of the related SupplierDevelopsSoftwareProductsConnections match this filter */
+  none?: InputMaybe<SupplierDevelopsSoftwareProductsConnectionWhere>;
+  /** Return Suppliers where one of the related SupplierDevelopsSoftwareProductsConnections match this filter */
+  single?: InputMaybe<SupplierDevelopsSoftwareProductsConnectionWhere>;
+  /** Return Suppliers where some of the related SupplierDevelopsSoftwareProductsConnections match this filter */
+  some?: InputMaybe<SupplierDevelopsSoftwareProductsConnectionWhere>;
+};
+
+export type SupplierDevelopsSoftwareProductsConnectionSort = {
+  node?: InputMaybe<SoftwareProductSort>;
+};
+
+export type SupplierDevelopsSoftwareProductsConnectionWhere = {
+  AND?: InputMaybe<Array<SupplierDevelopsSoftwareProductsConnectionWhere>>;
+  NOT?: InputMaybe<SupplierDevelopsSoftwareProductsConnectionWhere>;
+  OR?: InputMaybe<Array<SupplierDevelopsSoftwareProductsConnectionWhere>>;
+  node?: InputMaybe<SoftwareProductWhere>;
+};
+
+export type SupplierDevelopsSoftwareProductsCreateFieldInput = {
+  node: SoftwareProductCreateInput;
+};
+
+export type SupplierDevelopsSoftwareProductsDeleteFieldInput = {
+  delete?: InputMaybe<SoftwareProductDeleteInput>;
+  where?: InputMaybe<SupplierDevelopsSoftwareProductsConnectionWhere>;
+};
+
+export type SupplierDevelopsSoftwareProductsDisconnectFieldInput = {
+  disconnect?: InputMaybe<SoftwareProductDisconnectInput>;
+  where?: InputMaybe<SupplierDevelopsSoftwareProductsConnectionWhere>;
+};
+
+export type SupplierDevelopsSoftwareProductsFieldInput = {
+  connect?: InputMaybe<Array<SupplierDevelopsSoftwareProductsConnectFieldInput>>;
+  create?: InputMaybe<Array<SupplierDevelopsSoftwareProductsCreateFieldInput>>;
+};
+
+export type SupplierDevelopsSoftwareProductsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<SupplierDevelopsSoftwareProductsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<SupplierDevelopsSoftwareProductsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<SupplierDevelopsSoftwareProductsNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  productFamily?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type SupplierDevelopsSoftwareProductsRelationship = {
+  __typename?: 'SupplierDevelopsSoftwareProductsRelationship';
+  cursor: Scalars['String']['output'];
+  node: SoftwareProduct;
+};
+
+export type SupplierDevelopsSoftwareProductsUpdateConnectionInput = {
+  node?: InputMaybe<SoftwareProductUpdateInput>;
+  where?: InputMaybe<SupplierDevelopsSoftwareProductsConnectionWhere>;
+};
+
+export type SupplierDevelopsSoftwareProductsUpdateFieldInput = {
+  connect?: InputMaybe<Array<SupplierDevelopsSoftwareProductsConnectFieldInput>>;
+  create?: InputMaybe<Array<SupplierDevelopsSoftwareProductsCreateFieldInput>>;
+  delete?: InputMaybe<Array<SupplierDevelopsSoftwareProductsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<SupplierDevelopsSoftwareProductsDisconnectFieldInput>>;
+  update?: InputMaybe<SupplierDevelopsSoftwareProductsUpdateConnectionInput>;
+};
+
 export type SupplierDisconnectInput = {
   company?: InputMaybe<Array<SupplierCompanyDisconnectFieldInput>>;
+  developsSoftwareProducts?: InputMaybe<Array<SupplierDevelopsSoftwareProductsDisconnectFieldInput>>;
   hostsInfrastructure?: InputMaybe<Array<SupplierHostsInfrastructureDisconnectFieldInput>>;
   maintainsAIComponents?: InputMaybe<Array<SupplierMaintainsAiComponentsDisconnectFieldInput>>;
   maintainsApplications?: InputMaybe<Array<SupplierMaintainsApplicationsDisconnectFieldInput>>;
+  maintainsHardwareProducts?: InputMaybe<Array<SupplierMaintainsHardwareProductsDisconnectFieldInput>>;
   maintainsInfrastructure?: InputMaybe<Array<SupplierMaintainsInfrastructureDisconnectFieldInput>>;
+  maintainsSoftwareProducts?: InputMaybe<Array<SupplierMaintainsSoftwareProductsDisconnectFieldInput>>;
+  manufacturesHardwareProducts?: InputMaybe<Array<SupplierManufacturesHardwareProductsDisconnectFieldInput>>;
   providesAIComponents?: InputMaybe<Array<SupplierProvidesAiComponentsDisconnectFieldInput>>;
   providesApplications?: InputMaybe<Array<SupplierProvidesApplicationsDisconnectFieldInput>>;
+  providesHardwareProducts?: InputMaybe<Array<SupplierProvidesHardwareProductsDisconnectFieldInput>>;
   providesInfrastructure?: InputMaybe<Array<SupplierProvidesInfrastructureDisconnectFieldInput>>;
+  providesSoftwareProducts?: InputMaybe<Array<SupplierProvidesSoftwareProductsDisconnectFieldInput>>;
   supportsAIComponents?: InputMaybe<Array<SupplierSupportsAiComponentsDisconnectFieldInput>>;
   supportsApplications?: InputMaybe<Array<SupplierSupportsApplicationsDisconnectFieldInput>>;
 };
@@ -37772,6 +43774,48 @@ export type SupplierEdge = {
   __typename?: 'SupplierEdge';
   cursor: Scalars['String']['output'];
   node: Supplier;
+};
+
+export type SupplierHardwareProductMaintainsHardwareProductsAggregateSelection = {
+  __typename?: 'SupplierHardwareProductMaintainsHardwareProductsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<SupplierHardwareProductMaintainsHardwareProductsNodeAggregateSelection>;
+};
+
+export type SupplierHardwareProductMaintainsHardwareProductsNodeAggregateSelection = {
+  __typename?: 'SupplierHardwareProductMaintainsHardwareProductsNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  name: StringAggregateSelection;
+  productFamily: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
+export type SupplierHardwareProductManufacturesHardwareProductsAggregateSelection = {
+  __typename?: 'SupplierHardwareProductManufacturesHardwareProductsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<SupplierHardwareProductManufacturesHardwareProductsNodeAggregateSelection>;
+};
+
+export type SupplierHardwareProductManufacturesHardwareProductsNodeAggregateSelection = {
+  __typename?: 'SupplierHardwareProductManufacturesHardwareProductsNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  name: StringAggregateSelection;
+  productFamily: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
+export type SupplierHardwareProductProvidesHardwareProductsAggregateSelection = {
+  __typename?: 'SupplierHardwareProductProvidesHardwareProductsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<SupplierHardwareProductProvidesHardwareProductsNodeAggregateSelection>;
+};
+
+export type SupplierHardwareProductProvidesHardwareProductsNodeAggregateSelection = {
+  __typename?: 'SupplierHardwareProductProvidesHardwareProductsNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  name: StringAggregateSelection;
+  productFamily: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
 };
 
 export type SupplierHostsInfrastructureAggregateInput = {
@@ -38167,6 +44211,7 @@ export type SupplierMaintainsApplicationsNodeAggregationWhereInput = {
   hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
   lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sbom?: InputMaybe<StringScalarAggregationFilters>;
   sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
@@ -38190,6 +44235,112 @@ export type SupplierMaintainsApplicationsUpdateFieldInput = {
   delete?: InputMaybe<Array<SupplierMaintainsApplicationsDeleteFieldInput>>;
   disconnect?: InputMaybe<Array<SupplierMaintainsApplicationsDisconnectFieldInput>>;
   update?: InputMaybe<SupplierMaintainsApplicationsUpdateConnectionInput>;
+};
+
+export type SupplierMaintainsHardwareProductsAggregateInput = {
+  AND?: InputMaybe<Array<SupplierMaintainsHardwareProductsAggregateInput>>;
+  NOT?: InputMaybe<SupplierMaintainsHardwareProductsAggregateInput>;
+  OR?: InputMaybe<Array<SupplierMaintainsHardwareProductsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<SupplierMaintainsHardwareProductsNodeAggregationWhereInput>;
+};
+
+export type SupplierMaintainsHardwareProductsConnectFieldInput = {
+  connect?: InputMaybe<Array<HardwareProductConnectInput>>;
+  where?: InputMaybe<HardwareProductConnectWhere>;
+};
+
+export type SupplierMaintainsHardwareProductsConnection = {
+  __typename?: 'SupplierMaintainsHardwareProductsConnection';
+  aggregate: SupplierHardwareProductMaintainsHardwareProductsAggregateSelection;
+  edges: Array<SupplierMaintainsHardwareProductsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type SupplierMaintainsHardwareProductsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<SupplierMaintainsHardwareProductsConnectionAggregateInput>>;
+  NOT?: InputMaybe<SupplierMaintainsHardwareProductsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<SupplierMaintainsHardwareProductsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<SupplierMaintainsHardwareProductsNodeAggregationWhereInput>;
+};
+
+export type SupplierMaintainsHardwareProductsConnectionFilters = {
+  /** Filter Suppliers by aggregating results on related SupplierMaintainsHardwareProductsConnections */
+  aggregate?: InputMaybe<SupplierMaintainsHardwareProductsConnectionAggregateInput>;
+  /** Return Suppliers where all of the related SupplierMaintainsHardwareProductsConnections match this filter */
+  all?: InputMaybe<SupplierMaintainsHardwareProductsConnectionWhere>;
+  /** Return Suppliers where none of the related SupplierMaintainsHardwareProductsConnections match this filter */
+  none?: InputMaybe<SupplierMaintainsHardwareProductsConnectionWhere>;
+  /** Return Suppliers where one of the related SupplierMaintainsHardwareProductsConnections match this filter */
+  single?: InputMaybe<SupplierMaintainsHardwareProductsConnectionWhere>;
+  /** Return Suppliers where some of the related SupplierMaintainsHardwareProductsConnections match this filter */
+  some?: InputMaybe<SupplierMaintainsHardwareProductsConnectionWhere>;
+};
+
+export type SupplierMaintainsHardwareProductsConnectionSort = {
+  node?: InputMaybe<HardwareProductSort>;
+};
+
+export type SupplierMaintainsHardwareProductsConnectionWhere = {
+  AND?: InputMaybe<Array<SupplierMaintainsHardwareProductsConnectionWhere>>;
+  NOT?: InputMaybe<SupplierMaintainsHardwareProductsConnectionWhere>;
+  OR?: InputMaybe<Array<SupplierMaintainsHardwareProductsConnectionWhere>>;
+  node?: InputMaybe<HardwareProductWhere>;
+};
+
+export type SupplierMaintainsHardwareProductsCreateFieldInput = {
+  node: HardwareProductCreateInput;
+};
+
+export type SupplierMaintainsHardwareProductsDeleteFieldInput = {
+  delete?: InputMaybe<HardwareProductDeleteInput>;
+  where?: InputMaybe<SupplierMaintainsHardwareProductsConnectionWhere>;
+};
+
+export type SupplierMaintainsHardwareProductsDisconnectFieldInput = {
+  disconnect?: InputMaybe<HardwareProductDisconnectInput>;
+  where?: InputMaybe<SupplierMaintainsHardwareProductsConnectionWhere>;
+};
+
+export type SupplierMaintainsHardwareProductsFieldInput = {
+  connect?: InputMaybe<Array<SupplierMaintainsHardwareProductsConnectFieldInput>>;
+  create?: InputMaybe<Array<SupplierMaintainsHardwareProductsCreateFieldInput>>;
+};
+
+export type SupplierMaintainsHardwareProductsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<SupplierMaintainsHardwareProductsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<SupplierMaintainsHardwareProductsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<SupplierMaintainsHardwareProductsNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  productFamily?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type SupplierMaintainsHardwareProductsRelationship = {
+  __typename?: 'SupplierMaintainsHardwareProductsRelationship';
+  cursor: Scalars['String']['output'];
+  node: HardwareProduct;
+};
+
+export type SupplierMaintainsHardwareProductsUpdateConnectionInput = {
+  node?: InputMaybe<HardwareProductUpdateInput>;
+  where?: InputMaybe<SupplierMaintainsHardwareProductsConnectionWhere>;
+};
+
+export type SupplierMaintainsHardwareProductsUpdateFieldInput = {
+  connect?: InputMaybe<Array<SupplierMaintainsHardwareProductsConnectFieldInput>>;
+  create?: InputMaybe<Array<SupplierMaintainsHardwareProductsCreateFieldInput>>;
+  delete?: InputMaybe<Array<SupplierMaintainsHardwareProductsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<SupplierMaintainsHardwareProductsDisconnectFieldInput>>;
+  update?: InputMaybe<SupplierMaintainsHardwareProductsUpdateConnectionInput>;
 };
 
 export type SupplierMaintainsInfrastructureAggregateInput = {
@@ -38307,6 +44458,218 @@ export type SupplierMaintainsInfrastructureUpdateFieldInput = {
   delete?: InputMaybe<Array<SupplierMaintainsInfrastructureDeleteFieldInput>>;
   disconnect?: InputMaybe<Array<SupplierMaintainsInfrastructureDisconnectFieldInput>>;
   update?: InputMaybe<SupplierMaintainsInfrastructureUpdateConnectionInput>;
+};
+
+export type SupplierMaintainsSoftwareProductsAggregateInput = {
+  AND?: InputMaybe<Array<SupplierMaintainsSoftwareProductsAggregateInput>>;
+  NOT?: InputMaybe<SupplierMaintainsSoftwareProductsAggregateInput>;
+  OR?: InputMaybe<Array<SupplierMaintainsSoftwareProductsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<SupplierMaintainsSoftwareProductsNodeAggregationWhereInput>;
+};
+
+export type SupplierMaintainsSoftwareProductsConnectFieldInput = {
+  connect?: InputMaybe<Array<SoftwareProductConnectInput>>;
+  where?: InputMaybe<SoftwareProductConnectWhere>;
+};
+
+export type SupplierMaintainsSoftwareProductsConnection = {
+  __typename?: 'SupplierMaintainsSoftwareProductsConnection';
+  aggregate: SupplierSoftwareProductMaintainsSoftwareProductsAggregateSelection;
+  edges: Array<SupplierMaintainsSoftwareProductsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type SupplierMaintainsSoftwareProductsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<SupplierMaintainsSoftwareProductsConnectionAggregateInput>>;
+  NOT?: InputMaybe<SupplierMaintainsSoftwareProductsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<SupplierMaintainsSoftwareProductsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<SupplierMaintainsSoftwareProductsNodeAggregationWhereInput>;
+};
+
+export type SupplierMaintainsSoftwareProductsConnectionFilters = {
+  /** Filter Suppliers by aggregating results on related SupplierMaintainsSoftwareProductsConnections */
+  aggregate?: InputMaybe<SupplierMaintainsSoftwareProductsConnectionAggregateInput>;
+  /** Return Suppliers where all of the related SupplierMaintainsSoftwareProductsConnections match this filter */
+  all?: InputMaybe<SupplierMaintainsSoftwareProductsConnectionWhere>;
+  /** Return Suppliers where none of the related SupplierMaintainsSoftwareProductsConnections match this filter */
+  none?: InputMaybe<SupplierMaintainsSoftwareProductsConnectionWhere>;
+  /** Return Suppliers where one of the related SupplierMaintainsSoftwareProductsConnections match this filter */
+  single?: InputMaybe<SupplierMaintainsSoftwareProductsConnectionWhere>;
+  /** Return Suppliers where some of the related SupplierMaintainsSoftwareProductsConnections match this filter */
+  some?: InputMaybe<SupplierMaintainsSoftwareProductsConnectionWhere>;
+};
+
+export type SupplierMaintainsSoftwareProductsConnectionSort = {
+  node?: InputMaybe<SoftwareProductSort>;
+};
+
+export type SupplierMaintainsSoftwareProductsConnectionWhere = {
+  AND?: InputMaybe<Array<SupplierMaintainsSoftwareProductsConnectionWhere>>;
+  NOT?: InputMaybe<SupplierMaintainsSoftwareProductsConnectionWhere>;
+  OR?: InputMaybe<Array<SupplierMaintainsSoftwareProductsConnectionWhere>>;
+  node?: InputMaybe<SoftwareProductWhere>;
+};
+
+export type SupplierMaintainsSoftwareProductsCreateFieldInput = {
+  node: SoftwareProductCreateInput;
+};
+
+export type SupplierMaintainsSoftwareProductsDeleteFieldInput = {
+  delete?: InputMaybe<SoftwareProductDeleteInput>;
+  where?: InputMaybe<SupplierMaintainsSoftwareProductsConnectionWhere>;
+};
+
+export type SupplierMaintainsSoftwareProductsDisconnectFieldInput = {
+  disconnect?: InputMaybe<SoftwareProductDisconnectInput>;
+  where?: InputMaybe<SupplierMaintainsSoftwareProductsConnectionWhere>;
+};
+
+export type SupplierMaintainsSoftwareProductsFieldInput = {
+  connect?: InputMaybe<Array<SupplierMaintainsSoftwareProductsConnectFieldInput>>;
+  create?: InputMaybe<Array<SupplierMaintainsSoftwareProductsCreateFieldInput>>;
+};
+
+export type SupplierMaintainsSoftwareProductsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<SupplierMaintainsSoftwareProductsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<SupplierMaintainsSoftwareProductsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<SupplierMaintainsSoftwareProductsNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  productFamily?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type SupplierMaintainsSoftwareProductsRelationship = {
+  __typename?: 'SupplierMaintainsSoftwareProductsRelationship';
+  cursor: Scalars['String']['output'];
+  node: SoftwareProduct;
+};
+
+export type SupplierMaintainsSoftwareProductsUpdateConnectionInput = {
+  node?: InputMaybe<SoftwareProductUpdateInput>;
+  where?: InputMaybe<SupplierMaintainsSoftwareProductsConnectionWhere>;
+};
+
+export type SupplierMaintainsSoftwareProductsUpdateFieldInput = {
+  connect?: InputMaybe<Array<SupplierMaintainsSoftwareProductsConnectFieldInput>>;
+  create?: InputMaybe<Array<SupplierMaintainsSoftwareProductsCreateFieldInput>>;
+  delete?: InputMaybe<Array<SupplierMaintainsSoftwareProductsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<SupplierMaintainsSoftwareProductsDisconnectFieldInput>>;
+  update?: InputMaybe<SupplierMaintainsSoftwareProductsUpdateConnectionInput>;
+};
+
+export type SupplierManufacturesHardwareProductsAggregateInput = {
+  AND?: InputMaybe<Array<SupplierManufacturesHardwareProductsAggregateInput>>;
+  NOT?: InputMaybe<SupplierManufacturesHardwareProductsAggregateInput>;
+  OR?: InputMaybe<Array<SupplierManufacturesHardwareProductsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<SupplierManufacturesHardwareProductsNodeAggregationWhereInput>;
+};
+
+export type SupplierManufacturesHardwareProductsConnectFieldInput = {
+  connect?: InputMaybe<Array<HardwareProductConnectInput>>;
+  where?: InputMaybe<HardwareProductConnectWhere>;
+};
+
+export type SupplierManufacturesHardwareProductsConnection = {
+  __typename?: 'SupplierManufacturesHardwareProductsConnection';
+  aggregate: SupplierHardwareProductManufacturesHardwareProductsAggregateSelection;
+  edges: Array<SupplierManufacturesHardwareProductsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type SupplierManufacturesHardwareProductsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<SupplierManufacturesHardwareProductsConnectionAggregateInput>>;
+  NOT?: InputMaybe<SupplierManufacturesHardwareProductsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<SupplierManufacturesHardwareProductsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<SupplierManufacturesHardwareProductsNodeAggregationWhereInput>;
+};
+
+export type SupplierManufacturesHardwareProductsConnectionFilters = {
+  /** Filter Suppliers by aggregating results on related SupplierManufacturesHardwareProductsConnections */
+  aggregate?: InputMaybe<SupplierManufacturesHardwareProductsConnectionAggregateInput>;
+  /** Return Suppliers where all of the related SupplierManufacturesHardwareProductsConnections match this filter */
+  all?: InputMaybe<SupplierManufacturesHardwareProductsConnectionWhere>;
+  /** Return Suppliers where none of the related SupplierManufacturesHardwareProductsConnections match this filter */
+  none?: InputMaybe<SupplierManufacturesHardwareProductsConnectionWhere>;
+  /** Return Suppliers where one of the related SupplierManufacturesHardwareProductsConnections match this filter */
+  single?: InputMaybe<SupplierManufacturesHardwareProductsConnectionWhere>;
+  /** Return Suppliers where some of the related SupplierManufacturesHardwareProductsConnections match this filter */
+  some?: InputMaybe<SupplierManufacturesHardwareProductsConnectionWhere>;
+};
+
+export type SupplierManufacturesHardwareProductsConnectionSort = {
+  node?: InputMaybe<HardwareProductSort>;
+};
+
+export type SupplierManufacturesHardwareProductsConnectionWhere = {
+  AND?: InputMaybe<Array<SupplierManufacturesHardwareProductsConnectionWhere>>;
+  NOT?: InputMaybe<SupplierManufacturesHardwareProductsConnectionWhere>;
+  OR?: InputMaybe<Array<SupplierManufacturesHardwareProductsConnectionWhere>>;
+  node?: InputMaybe<HardwareProductWhere>;
+};
+
+export type SupplierManufacturesHardwareProductsCreateFieldInput = {
+  node: HardwareProductCreateInput;
+};
+
+export type SupplierManufacturesHardwareProductsDeleteFieldInput = {
+  delete?: InputMaybe<HardwareProductDeleteInput>;
+  where?: InputMaybe<SupplierManufacturesHardwareProductsConnectionWhere>;
+};
+
+export type SupplierManufacturesHardwareProductsDisconnectFieldInput = {
+  disconnect?: InputMaybe<HardwareProductDisconnectInput>;
+  where?: InputMaybe<SupplierManufacturesHardwareProductsConnectionWhere>;
+};
+
+export type SupplierManufacturesHardwareProductsFieldInput = {
+  connect?: InputMaybe<Array<SupplierManufacturesHardwareProductsConnectFieldInput>>;
+  create?: InputMaybe<Array<SupplierManufacturesHardwareProductsCreateFieldInput>>;
+};
+
+export type SupplierManufacturesHardwareProductsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<SupplierManufacturesHardwareProductsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<SupplierManufacturesHardwareProductsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<SupplierManufacturesHardwareProductsNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  productFamily?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type SupplierManufacturesHardwareProductsRelationship = {
+  __typename?: 'SupplierManufacturesHardwareProductsRelationship';
+  cursor: Scalars['String']['output'];
+  node: HardwareProduct;
+};
+
+export type SupplierManufacturesHardwareProductsUpdateConnectionInput = {
+  node?: InputMaybe<HardwareProductUpdateInput>;
+  where?: InputMaybe<SupplierManufacturesHardwareProductsConnectionWhere>;
+};
+
+export type SupplierManufacturesHardwareProductsUpdateFieldInput = {
+  connect?: InputMaybe<Array<SupplierManufacturesHardwareProductsConnectFieldInput>>;
+  create?: InputMaybe<Array<SupplierManufacturesHardwareProductsCreateFieldInput>>;
+  delete?: InputMaybe<Array<SupplierManufacturesHardwareProductsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<SupplierManufacturesHardwareProductsDisconnectFieldInput>>;
+  update?: InputMaybe<SupplierManufacturesHardwareProductsUpdateConnectionInput>;
 };
 
 export type SupplierProvidesAiComponentsAggregateInput = {
@@ -38510,6 +44873,7 @@ export type SupplierProvidesApplicationsNodeAggregationWhereInput = {
   hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
   lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sbom?: InputMaybe<StringScalarAggregationFilters>;
   sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
@@ -38533,6 +44897,112 @@ export type SupplierProvidesApplicationsUpdateFieldInput = {
   delete?: InputMaybe<Array<SupplierProvidesApplicationsDeleteFieldInput>>;
   disconnect?: InputMaybe<Array<SupplierProvidesApplicationsDisconnectFieldInput>>;
   update?: InputMaybe<SupplierProvidesApplicationsUpdateConnectionInput>;
+};
+
+export type SupplierProvidesHardwareProductsAggregateInput = {
+  AND?: InputMaybe<Array<SupplierProvidesHardwareProductsAggregateInput>>;
+  NOT?: InputMaybe<SupplierProvidesHardwareProductsAggregateInput>;
+  OR?: InputMaybe<Array<SupplierProvidesHardwareProductsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<SupplierProvidesHardwareProductsNodeAggregationWhereInput>;
+};
+
+export type SupplierProvidesHardwareProductsConnectFieldInput = {
+  connect?: InputMaybe<Array<HardwareProductConnectInput>>;
+  where?: InputMaybe<HardwareProductConnectWhere>;
+};
+
+export type SupplierProvidesHardwareProductsConnection = {
+  __typename?: 'SupplierProvidesHardwareProductsConnection';
+  aggregate: SupplierHardwareProductProvidesHardwareProductsAggregateSelection;
+  edges: Array<SupplierProvidesHardwareProductsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type SupplierProvidesHardwareProductsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<SupplierProvidesHardwareProductsConnectionAggregateInput>>;
+  NOT?: InputMaybe<SupplierProvidesHardwareProductsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<SupplierProvidesHardwareProductsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<SupplierProvidesHardwareProductsNodeAggregationWhereInput>;
+};
+
+export type SupplierProvidesHardwareProductsConnectionFilters = {
+  /** Filter Suppliers by aggregating results on related SupplierProvidesHardwareProductsConnections */
+  aggregate?: InputMaybe<SupplierProvidesHardwareProductsConnectionAggregateInput>;
+  /** Return Suppliers where all of the related SupplierProvidesHardwareProductsConnections match this filter */
+  all?: InputMaybe<SupplierProvidesHardwareProductsConnectionWhere>;
+  /** Return Suppliers where none of the related SupplierProvidesHardwareProductsConnections match this filter */
+  none?: InputMaybe<SupplierProvidesHardwareProductsConnectionWhere>;
+  /** Return Suppliers where one of the related SupplierProvidesHardwareProductsConnections match this filter */
+  single?: InputMaybe<SupplierProvidesHardwareProductsConnectionWhere>;
+  /** Return Suppliers where some of the related SupplierProvidesHardwareProductsConnections match this filter */
+  some?: InputMaybe<SupplierProvidesHardwareProductsConnectionWhere>;
+};
+
+export type SupplierProvidesHardwareProductsConnectionSort = {
+  node?: InputMaybe<HardwareProductSort>;
+};
+
+export type SupplierProvidesHardwareProductsConnectionWhere = {
+  AND?: InputMaybe<Array<SupplierProvidesHardwareProductsConnectionWhere>>;
+  NOT?: InputMaybe<SupplierProvidesHardwareProductsConnectionWhere>;
+  OR?: InputMaybe<Array<SupplierProvidesHardwareProductsConnectionWhere>>;
+  node?: InputMaybe<HardwareProductWhere>;
+};
+
+export type SupplierProvidesHardwareProductsCreateFieldInput = {
+  node: HardwareProductCreateInput;
+};
+
+export type SupplierProvidesHardwareProductsDeleteFieldInput = {
+  delete?: InputMaybe<HardwareProductDeleteInput>;
+  where?: InputMaybe<SupplierProvidesHardwareProductsConnectionWhere>;
+};
+
+export type SupplierProvidesHardwareProductsDisconnectFieldInput = {
+  disconnect?: InputMaybe<HardwareProductDisconnectInput>;
+  where?: InputMaybe<SupplierProvidesHardwareProductsConnectionWhere>;
+};
+
+export type SupplierProvidesHardwareProductsFieldInput = {
+  connect?: InputMaybe<Array<SupplierProvidesHardwareProductsConnectFieldInput>>;
+  create?: InputMaybe<Array<SupplierProvidesHardwareProductsCreateFieldInput>>;
+};
+
+export type SupplierProvidesHardwareProductsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<SupplierProvidesHardwareProductsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<SupplierProvidesHardwareProductsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<SupplierProvidesHardwareProductsNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  productFamily?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type SupplierProvidesHardwareProductsRelationship = {
+  __typename?: 'SupplierProvidesHardwareProductsRelationship';
+  cursor: Scalars['String']['output'];
+  node: HardwareProduct;
+};
+
+export type SupplierProvidesHardwareProductsUpdateConnectionInput = {
+  node?: InputMaybe<HardwareProductUpdateInput>;
+  where?: InputMaybe<SupplierProvidesHardwareProductsConnectionWhere>;
+};
+
+export type SupplierProvidesHardwareProductsUpdateFieldInput = {
+  connect?: InputMaybe<Array<SupplierProvidesHardwareProductsConnectFieldInput>>;
+  create?: InputMaybe<Array<SupplierProvidesHardwareProductsCreateFieldInput>>;
+  delete?: InputMaybe<Array<SupplierProvidesHardwareProductsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<SupplierProvidesHardwareProductsDisconnectFieldInput>>;
+  update?: InputMaybe<SupplierProvidesHardwareProductsUpdateConnectionInput>;
 };
 
 export type SupplierProvidesInfrastructureAggregateInput = {
@@ -38652,6 +45122,112 @@ export type SupplierProvidesInfrastructureUpdateFieldInput = {
   update?: InputMaybe<SupplierProvidesInfrastructureUpdateConnectionInput>;
 };
 
+export type SupplierProvidesSoftwareProductsAggregateInput = {
+  AND?: InputMaybe<Array<SupplierProvidesSoftwareProductsAggregateInput>>;
+  NOT?: InputMaybe<SupplierProvidesSoftwareProductsAggregateInput>;
+  OR?: InputMaybe<Array<SupplierProvidesSoftwareProductsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<SupplierProvidesSoftwareProductsNodeAggregationWhereInput>;
+};
+
+export type SupplierProvidesSoftwareProductsConnectFieldInput = {
+  connect?: InputMaybe<Array<SoftwareProductConnectInput>>;
+  where?: InputMaybe<SoftwareProductConnectWhere>;
+};
+
+export type SupplierProvidesSoftwareProductsConnection = {
+  __typename?: 'SupplierProvidesSoftwareProductsConnection';
+  aggregate: SupplierSoftwareProductProvidesSoftwareProductsAggregateSelection;
+  edges: Array<SupplierProvidesSoftwareProductsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type SupplierProvidesSoftwareProductsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<SupplierProvidesSoftwareProductsConnectionAggregateInput>>;
+  NOT?: InputMaybe<SupplierProvidesSoftwareProductsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<SupplierProvidesSoftwareProductsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<SupplierProvidesSoftwareProductsNodeAggregationWhereInput>;
+};
+
+export type SupplierProvidesSoftwareProductsConnectionFilters = {
+  /** Filter Suppliers by aggregating results on related SupplierProvidesSoftwareProductsConnections */
+  aggregate?: InputMaybe<SupplierProvidesSoftwareProductsConnectionAggregateInput>;
+  /** Return Suppliers where all of the related SupplierProvidesSoftwareProductsConnections match this filter */
+  all?: InputMaybe<SupplierProvidesSoftwareProductsConnectionWhere>;
+  /** Return Suppliers where none of the related SupplierProvidesSoftwareProductsConnections match this filter */
+  none?: InputMaybe<SupplierProvidesSoftwareProductsConnectionWhere>;
+  /** Return Suppliers where one of the related SupplierProvidesSoftwareProductsConnections match this filter */
+  single?: InputMaybe<SupplierProvidesSoftwareProductsConnectionWhere>;
+  /** Return Suppliers where some of the related SupplierProvidesSoftwareProductsConnections match this filter */
+  some?: InputMaybe<SupplierProvidesSoftwareProductsConnectionWhere>;
+};
+
+export type SupplierProvidesSoftwareProductsConnectionSort = {
+  node?: InputMaybe<SoftwareProductSort>;
+};
+
+export type SupplierProvidesSoftwareProductsConnectionWhere = {
+  AND?: InputMaybe<Array<SupplierProvidesSoftwareProductsConnectionWhere>>;
+  NOT?: InputMaybe<SupplierProvidesSoftwareProductsConnectionWhere>;
+  OR?: InputMaybe<Array<SupplierProvidesSoftwareProductsConnectionWhere>>;
+  node?: InputMaybe<SoftwareProductWhere>;
+};
+
+export type SupplierProvidesSoftwareProductsCreateFieldInput = {
+  node: SoftwareProductCreateInput;
+};
+
+export type SupplierProvidesSoftwareProductsDeleteFieldInput = {
+  delete?: InputMaybe<SoftwareProductDeleteInput>;
+  where?: InputMaybe<SupplierProvidesSoftwareProductsConnectionWhere>;
+};
+
+export type SupplierProvidesSoftwareProductsDisconnectFieldInput = {
+  disconnect?: InputMaybe<SoftwareProductDisconnectInput>;
+  where?: InputMaybe<SupplierProvidesSoftwareProductsConnectionWhere>;
+};
+
+export type SupplierProvidesSoftwareProductsFieldInput = {
+  connect?: InputMaybe<Array<SupplierProvidesSoftwareProductsConnectFieldInput>>;
+  create?: InputMaybe<Array<SupplierProvidesSoftwareProductsCreateFieldInput>>;
+};
+
+export type SupplierProvidesSoftwareProductsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<SupplierProvidesSoftwareProductsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<SupplierProvidesSoftwareProductsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<SupplierProvidesSoftwareProductsNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  productFamily?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type SupplierProvidesSoftwareProductsRelationship = {
+  __typename?: 'SupplierProvidesSoftwareProductsRelationship';
+  cursor: Scalars['String']['output'];
+  node: SoftwareProduct;
+};
+
+export type SupplierProvidesSoftwareProductsUpdateConnectionInput = {
+  node?: InputMaybe<SoftwareProductUpdateInput>;
+  where?: InputMaybe<SupplierProvidesSoftwareProductsConnectionWhere>;
+};
+
+export type SupplierProvidesSoftwareProductsUpdateFieldInput = {
+  connect?: InputMaybe<Array<SupplierProvidesSoftwareProductsConnectFieldInput>>;
+  create?: InputMaybe<Array<SupplierProvidesSoftwareProductsCreateFieldInput>>;
+  delete?: InputMaybe<Array<SupplierProvidesSoftwareProductsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<SupplierProvidesSoftwareProductsDisconnectFieldInput>>;
+  update?: InputMaybe<SupplierProvidesSoftwareProductsUpdateConnectionInput>;
+};
+
 export type SupplierRelationshipFilters = {
   /** Filter type where all of the related Suppliers match this filter */
   all?: InputMaybe<SupplierWhere>;
@@ -38661,6 +45237,48 @@ export type SupplierRelationshipFilters = {
   single?: InputMaybe<SupplierWhere>;
   /** Filter type where some of the related Suppliers match this filter */
   some?: InputMaybe<SupplierWhere>;
+};
+
+export type SupplierSoftwareProductDevelopsSoftwareProductsAggregateSelection = {
+  __typename?: 'SupplierSoftwareProductDevelopsSoftwareProductsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<SupplierSoftwareProductDevelopsSoftwareProductsNodeAggregateSelection>;
+};
+
+export type SupplierSoftwareProductDevelopsSoftwareProductsNodeAggregateSelection = {
+  __typename?: 'SupplierSoftwareProductDevelopsSoftwareProductsNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  name: StringAggregateSelection;
+  productFamily: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
+export type SupplierSoftwareProductMaintainsSoftwareProductsAggregateSelection = {
+  __typename?: 'SupplierSoftwareProductMaintainsSoftwareProductsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<SupplierSoftwareProductMaintainsSoftwareProductsNodeAggregateSelection>;
+};
+
+export type SupplierSoftwareProductMaintainsSoftwareProductsNodeAggregateSelection = {
+  __typename?: 'SupplierSoftwareProductMaintainsSoftwareProductsNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  name: StringAggregateSelection;
+  productFamily: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
+export type SupplierSoftwareProductProvidesSoftwareProductsAggregateSelection = {
+  __typename?: 'SupplierSoftwareProductProvidesSoftwareProductsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<SupplierSoftwareProductProvidesSoftwareProductsNodeAggregateSelection>;
+};
+
+export type SupplierSoftwareProductProvidesSoftwareProductsNodeAggregateSelection = {
+  __typename?: 'SupplierSoftwareProductProvidesSoftwareProductsNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  name: StringAggregateSelection;
+  productFamily: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
 };
 
 /** Fields to sort Suppliers by. The order in which sorts are applied is not guaranteed when specifying many fields in one SupplierSort object. */
@@ -38913,6 +45531,7 @@ export type SupplierSupportsApplicationsNodeAggregationWhereInput = {
   hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
   lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  sbom?: InputMaybe<StringScalarAggregationFilters>;
   sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   vendor?: InputMaybe<StringScalarAggregationFilters>;
@@ -38967,19 +45586,25 @@ export type SupplierUpdateInput = {
   contractStartDate?: InputMaybe<DateScalarMutations>;
   createdAt?: InputMaybe<DateTimeScalarMutations>;
   description?: InputMaybe<StringScalarMutations>;
+  developsSoftwareProducts?: InputMaybe<Array<SupplierDevelopsSoftwareProductsUpdateFieldInput>>;
   email?: InputMaybe<StringScalarMutations>;
   hostsInfrastructure?: InputMaybe<Array<SupplierHostsInfrastructureUpdateFieldInput>>;
   lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarMutations>;
   maintainsAIComponents?: InputMaybe<Array<SupplierMaintainsAiComponentsUpdateFieldInput>>;
   maintainsApplications?: InputMaybe<Array<SupplierMaintainsApplicationsUpdateFieldInput>>;
+  maintainsHardwareProducts?: InputMaybe<Array<SupplierMaintainsHardwareProductsUpdateFieldInput>>;
   maintainsInfrastructure?: InputMaybe<Array<SupplierMaintainsInfrastructureUpdateFieldInput>>;
+  maintainsSoftwareProducts?: InputMaybe<Array<SupplierMaintainsSoftwareProductsUpdateFieldInput>>;
+  manufacturesHardwareProducts?: InputMaybe<Array<SupplierManufacturesHardwareProductsUpdateFieldInput>>;
   name?: InputMaybe<StringScalarMutations>;
   performanceRating?: InputMaybe<IntScalarMutations>;
   phone?: InputMaybe<StringScalarMutations>;
   primaryContactPerson?: InputMaybe<StringScalarMutations>;
   providesAIComponents?: InputMaybe<Array<SupplierProvidesAiComponentsUpdateFieldInput>>;
   providesApplications?: InputMaybe<Array<SupplierProvidesApplicationsUpdateFieldInput>>;
+  providesHardwareProducts?: InputMaybe<Array<SupplierProvidesHardwareProductsUpdateFieldInput>>;
   providesInfrastructure?: InputMaybe<Array<SupplierProvidesInfrastructureUpdateFieldInput>>;
+  providesSoftwareProducts?: InputMaybe<Array<SupplierProvidesSoftwareProductsUpdateFieldInput>>;
   riskClassification?: InputMaybe<RiskClassificationEnumScalarMutations>;
   sovereigntyAchDataResidency?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
   sovereigntyAchInteroperability?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
@@ -39010,6 +45635,8 @@ export type SupplierWhere = {
   contractStartDate?: InputMaybe<DateScalarFilters>;
   createdAt?: InputMaybe<DateTimeScalarFilters>;
   description?: InputMaybe<StringScalarFilters>;
+  developsSoftwareProducts?: InputMaybe<SoftwareProductRelationshipFilters>;
+  developsSoftwareProductsConnection?: InputMaybe<SupplierDevelopsSoftwareProductsConnectionFilters>;
   email?: InputMaybe<StringScalarFilters>;
   hostsInfrastructure?: InputMaybe<InfrastructureRelationshipFilters>;
   hostsInfrastructureConnection?: InputMaybe<SupplierHostsInfrastructureConnectionFilters>;
@@ -39019,8 +45646,14 @@ export type SupplierWhere = {
   maintainsAIComponentsConnection?: InputMaybe<SupplierMaintainsAiComponentsConnectionFilters>;
   maintainsApplications?: InputMaybe<ApplicationRelationshipFilters>;
   maintainsApplicationsConnection?: InputMaybe<SupplierMaintainsApplicationsConnectionFilters>;
+  maintainsHardwareProducts?: InputMaybe<HardwareProductRelationshipFilters>;
+  maintainsHardwareProductsConnection?: InputMaybe<SupplierMaintainsHardwareProductsConnectionFilters>;
   maintainsInfrastructure?: InputMaybe<InfrastructureRelationshipFilters>;
   maintainsInfrastructureConnection?: InputMaybe<SupplierMaintainsInfrastructureConnectionFilters>;
+  maintainsSoftwareProducts?: InputMaybe<SoftwareProductRelationshipFilters>;
+  maintainsSoftwareProductsConnection?: InputMaybe<SupplierMaintainsSoftwareProductsConnectionFilters>;
+  manufacturesHardwareProducts?: InputMaybe<HardwareProductRelationshipFilters>;
+  manufacturesHardwareProductsConnection?: InputMaybe<SupplierManufacturesHardwareProductsConnectionFilters>;
   name?: InputMaybe<StringScalarFilters>;
   performanceRating?: InputMaybe<IntScalarFilters>;
   phone?: InputMaybe<StringScalarFilters>;
@@ -39029,8 +45662,12 @@ export type SupplierWhere = {
   providesAIComponentsConnection?: InputMaybe<SupplierProvidesAiComponentsConnectionFilters>;
   providesApplications?: InputMaybe<ApplicationRelationshipFilters>;
   providesApplicationsConnection?: InputMaybe<SupplierProvidesApplicationsConnectionFilters>;
+  providesHardwareProducts?: InputMaybe<HardwareProductRelationshipFilters>;
+  providesHardwareProductsConnection?: InputMaybe<SupplierProvidesHardwareProductsConnectionFilters>;
   providesInfrastructure?: InputMaybe<InfrastructureRelationshipFilters>;
   providesInfrastructureConnection?: InputMaybe<SupplierProvidesInfrastructureConnectionFilters>;
+  providesSoftwareProducts?: InputMaybe<SoftwareProductRelationshipFilters>;
+  providesSoftwareProductsConnection?: InputMaybe<SupplierProvidesSoftwareProductsConnectionFilters>;
   riskClassification?: InputMaybe<RiskClassificationEnumScalarFilters>;
   sovereigntyAchDataResidency?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
   sovereigntyAchInteroperability?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
@@ -39180,6 +45817,18 @@ export type UpdateGeaVisionsMutationResponse = {
   info: UpdateInfo;
 };
 
+export type UpdateHardwareProductsMutationResponse = {
+  __typename?: 'UpdateHardwareProductsMutationResponse';
+  hardwareProducts: Array<HardwareProduct>;
+  info: UpdateInfo;
+};
+
+export type UpdateHardwareVersionsMutationResponse = {
+  __typename?: 'UpdateHardwareVersionsMutationResponse';
+  hardwareVersions: Array<HardwareVersion>;
+  info: UpdateInfo;
+};
+
 /** Information about the number of nodes and relationships created and deleted during an update mutation */
 export type UpdateInfo = {
   __typename?: 'UpdateInfo';
@@ -39195,6 +45844,12 @@ export type UpdateInfrastructuresMutationResponse = {
   infrastructures: Array<Infrastructure>;
 };
 
+export type UpdateLifecycleRecordsMutationResponse = {
+  __typename?: 'UpdateLifecycleRecordsMutationResponse';
+  info: UpdateInfo;
+  lifecycleRecords: Array<LifecycleRecord>;
+};
+
 export type UpdateOrganisationsMutationResponse = {
   __typename?: 'UpdateOrganisationsMutationResponse';
   info: UpdateInfo;
@@ -39205,6 +45860,24 @@ export type UpdatePeopleMutationResponse = {
   __typename?: 'UpdatePeopleMutationResponse';
   info: UpdateInfo;
   people: Array<Person>;
+};
+
+export type UpdateSbomDocumentsMutationResponse = {
+  __typename?: 'UpdateSbomDocumentsMutationResponse';
+  info: UpdateInfo;
+  sbomDocuments: Array<SbomDocument>;
+};
+
+export type UpdateSoftwareProductsMutationResponse = {
+  __typename?: 'UpdateSoftwareProductsMutationResponse';
+  info: UpdateInfo;
+  softwareProducts: Array<SoftwareProduct>;
+};
+
+export type UpdateSoftwareVersionsMutationResponse = {
+  __typename?: 'UpdateSoftwareVersionsMutationResponse';
+  info: UpdateInfo;
+  softwareVersions: Array<SoftwareVersion>;
 };
 
 export type UpdateSuppliersMutationResponse = {

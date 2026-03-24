@@ -555,6 +555,13 @@ type Supplier
   providesInfrastructure: [Infrastructure!]! @relationship(type: "PROVIDED_BY", direction: IN)
   hostsInfrastructure: [Infrastructure!]! @relationship(type: "HOSTED_BY", direction: IN)
   maintainsInfrastructure: [Infrastructure!]! @relationship(type: "MAINTAINED_BY", direction: IN)
+  developsSoftwareProducts: [SoftwareProduct!]! @relationship(type: "DEVELOPED_BY", direction: IN)
+  providesSoftwareProducts: [SoftwareProduct!]! @relationship(type: "PROVIDED_BY", direction: IN)
+  maintainsSoftwareProducts: [SoftwareProduct!]! @relationship(type: "MAINTAINED_BY", direction: IN)
+  manufacturesHardwareProducts: [HardwareProduct!]!
+    @relationship(type: "MANUFACTURED_BY", direction: IN)
+  providesHardwareProducts: [HardwareProduct!]! @relationship(type: "PROVIDED_BY", direction: IN)
+  maintainsHardwareProducts: [HardwareProduct!]! @relationship(type: "MAINTAINED_BY", direction: IN)
 }
 
 """
@@ -598,6 +605,7 @@ type Application
   version: String
   hostingEnvironment: String
   vendor: String
+  sbom: String
   costs: Float
   sovereigntyAchDataResidency: SovereigntyMaturity
   sovereigntyAchJurisdictionControl: SovereigntyMaturity
@@ -633,6 +641,9 @@ type Application
   implementsPrinciples: [ArchitecturePrinciple!]!
     @relationship(type: "IMPLEMENTS_PRINCIPLE", direction: OUT)
   hostedOn: [Infrastructure!]! @relationship(type: "HOSTED_ON", direction: OUT)
+  usesSoftwareProducts: [SoftwareProduct!]!
+    @relationship(type: "USES_SOFTWARE_PRODUCT", direction: OUT)
+  sbomDocuments: [SbomDocument!]! @relationship(type: "HAS_SBOM", direction: OUT)
   usesAIComponents: [AIComponent!]! @relationship(type: "USED_BY", direction: OUT)
   providedBy: [Supplier!]! @relationship(type: "PROVIDED_BY", direction: OUT)
   supportedBy: [Supplier!]! @relationship(type: "SUPPORTED_BY", direction: OUT)
@@ -850,11 +861,287 @@ type Infrastructure
     @relationship(type: "HAS_PARENT_INFRASTRUCTURE", direction: IN)
   hostsApplications: [Application!]! @relationship(type: "HOSTED_ON", direction: IN)
   hostsAIComponents: [AIComponent!]! @relationship(type: "HOSTED_ON", direction: IN)
+  usesSoftwareProducts: [SoftwareProduct!]!
+    @relationship(type: "USES_SOFTWARE_PRODUCT", direction: OUT)
+  usesHardwareProducts: [HardwareProduct!]!
+    @relationship(type: "USES_HARDWARE_PRODUCT", direction: OUT)
   partOfArchitectures: [Architecture!]! @relationship(type: "CONTAINS", direction: IN)
   depictedInDiagrams: [Diagram!]! @relationship(type: "DEPICTED_IN", direction: OUT)
   providedBy: [Supplier!]! @relationship(type: "PROVIDED_BY", direction: OUT)
   hostedBy: [Supplier!]! @relationship(type: "HOSTED_BY", direction: OUT)
   maintainedBy: [Supplier!]! @relationship(type: "MAINTAINED_BY", direction: OUT)
+}
+
+"""
+SoftwareProduct – normalized software product entity for technology lifecycle management
+"""
+type SoftwareProduct
+  @node
+  @authorization(
+    validate: [
+      { operations: [CREATE], where: { jwt: { roles: { includes: "architect" } } } }
+      {
+        operations: [UPDATE, DELETE]
+        where: {
+          AND: [
+            { jwt: { roles: { includes: "architect" } } }
+            { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+          ]
+        }
+      }
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "admin" } } } }
+    ]
+    filter: [
+      {
+        where: {
+          OR: [
+            { jwt: { roles: { includes: "admin" } } }
+            { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+          ]
+        }
+      }
+    ]
+  ) {
+  id: ID! @id
+  name: String!
+  productFamily: String
+  lifecycleStatus: LifecycleStatus
+  isActive: Boolean
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime @timestamp(operations: [UPDATE])
+  company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
+  usedByApplications: [Application!]! @relationship(type: "USES_SOFTWARE_PRODUCT", direction: IN)
+  usedByInfrastructure: [Infrastructure!]!
+    @relationship(type: "USES_SOFTWARE_PRODUCT", direction: IN)
+  versions: [SoftwareVersion!]! @relationship(type: "HAS_SOFTWARE_VERSION", direction: OUT)
+  developedBy: [Supplier!]! @relationship(type: "DEVELOPED_BY", direction: OUT)
+  providedBy: [Supplier!]! @relationship(type: "PROVIDED_BY", direction: OUT)
+  maintainedBy: [Supplier!]! @relationship(type: "MAINTAINED_BY", direction: OUT)
+}
+
+"""
+SoftwareVersion – version metadata for a software product
+"""
+type SoftwareVersion
+  @node
+  @authorization(
+    validate: [
+      { operations: [CREATE], where: { jwt: { roles: { includes: "architect" } } } }
+      {
+        operations: [UPDATE, DELETE]
+        where: {
+          AND: [
+            { jwt: { roles: { includes: "architect" } } }
+            { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+          ]
+        }
+      }
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "admin" } } } }
+    ]
+    filter: [
+      {
+        where: {
+          OR: [
+            { jwt: { roles: { includes: "admin" } } }
+            { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+          ]
+        }
+      }
+    ]
+  ) {
+  id: ID! @id
+  versionString: String!
+  normalizedVersion: String
+  releaseChannel: String
+  isLts: Boolean
+  supportTier: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime @timestamp(operations: [UPDATE])
+  company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
+  softwareProduct: [SoftwareProduct!]! @relationship(type: "HAS_SOFTWARE_VERSION", direction: IN)
+  lifecycleRecords: [LifecycleRecord!]! @relationship(type: "HAS_LIFECYCLE_RECORD", direction: OUT)
+}
+
+"""
+HardwareProduct – normalized hardware product entity for technology lifecycle management
+"""
+type HardwareProduct
+  @node
+  @authorization(
+    validate: [
+      { operations: [CREATE], where: { jwt: { roles: { includes: "architect" } } } }
+      {
+        operations: [UPDATE, DELETE]
+        where: {
+          AND: [
+            { jwt: { roles: { includes: "architect" } } }
+            { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+          ]
+        }
+      }
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "admin" } } } }
+    ]
+    filter: [
+      {
+        where: {
+          OR: [
+            { jwt: { roles: { includes: "admin" } } }
+            { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+          ]
+        }
+      }
+    ]
+  ) {
+  id: ID! @id
+  name: String!
+  productFamily: String
+  lifecycleStatus: LifecycleStatus
+  isActive: Boolean
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime @timestamp(operations: [UPDATE])
+  company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
+  usedByInfrastructure: [Infrastructure!]!
+    @relationship(type: "USES_HARDWARE_PRODUCT", direction: IN)
+  versions: [HardwareVersion!]! @relationship(type: "HAS_HARDWARE_VERSION", direction: OUT)
+  manufacturedBy: [Supplier!]! @relationship(type: "MANUFACTURED_BY", direction: OUT)
+  providedBy: [Supplier!]! @relationship(type: "PROVIDED_BY", direction: OUT)
+  maintainedBy: [Supplier!]! @relationship(type: "MAINTAINED_BY", direction: OUT)
+}
+
+"""
+HardwareVersion – version/model metadata for a hardware product
+"""
+type HardwareVersion
+  @node
+  @authorization(
+    validate: [
+      { operations: [CREATE], where: { jwt: { roles: { includes: "architect" } } } }
+      {
+        operations: [UPDATE, DELETE]
+        where: {
+          AND: [
+            { jwt: { roles: { includes: "architect" } } }
+            { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+          ]
+        }
+      }
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "admin" } } } }
+    ]
+    filter: [
+      {
+        where: {
+          OR: [
+            { jwt: { roles: { includes: "admin" } } }
+            { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+          ]
+        }
+      }
+    ]
+  ) {
+  id: ID! @id
+  versionModelString: String!
+  normalizedVersionModel: String
+  releaseChannel: String
+  supportTier: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime @timestamp(operations: [UPDATE])
+  company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
+  hardwareProduct: [HardwareProduct!]! @relationship(type: "HAS_HARDWARE_VERSION", direction: IN)
+  lifecycleRecords: [LifecycleRecord!]! @relationship(type: "HAS_LIFECYCLE_RECORD", direction: OUT)
+}
+
+"""
+SbomDocument – Software Bill of Materials evidence document
+"""
+type SbomDocument
+  @node
+  @authorization(
+    validate: [
+      { operations: [CREATE], where: { jwt: { roles: { includes: "architect" } } } }
+      {
+        operations: [UPDATE, DELETE]
+        where: {
+          AND: [
+            { jwt: { roles: { includes: "architect" } } }
+            { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+          ]
+        }
+      }
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "admin" } } } }
+    ]
+    filter: [
+      {
+        where: {
+          OR: [
+            { jwt: { roles: { includes: "admin" } } }
+            { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+          ]
+        }
+      }
+    ]
+  ) {
+  id: ID! @id
+  sbomId: String
+  format: String
+  version: String
+  source: String
+  sourceUrl: String
+  generatedAt: DateTime
+  tool: String
+  digest: String
+  storageReference: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime @timestamp(operations: [UPDATE])
+  company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
+  applications: [Application!]! @relationship(type: "HAS_SBOM", direction: IN)
+}
+
+"""
+LifecycleRecord – lifecycle metadata for software/hardware versions
+"""
+type LifecycleRecord
+  @node
+  @authorization(
+    validate: [
+      { operations: [CREATE], where: { jwt: { roles: { includes: "architect" } } } }
+      {
+        operations: [UPDATE, DELETE]
+        where: {
+          AND: [
+            { jwt: { roles: { includes: "architect" } } }
+            { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+          ]
+        }
+      }
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "admin" } } } }
+    ]
+    filter: [
+      {
+        where: {
+          OR: [
+            { jwt: { roles: { includes: "admin" } } }
+            { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+          ]
+        }
+      }
+    ]
+  ) {
+  id: ID! @id
+  gaDate: Date
+  mainstreamSupportEndDate: Date
+  extendedSupportEndDate: Date
+  eosDate: Date
+  eolDate: Date
+  lifecycleStatus: LifecycleStatus
+  source: String
+  sourceUrl: String
+  sourceConfidence: Float
+  lastValidatedAt: DateTime
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime @timestamp(operations: [UPDATE])
+  company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
+  softwareVersions: [SoftwareVersion!]! @relationship(type: "HAS_LIFECYCLE_RECORD", direction: IN)
+  hardwareVersions: [HardwareVersion!]! @relationship(type: "HAS_LIFECYCLE_RECORD", direction: IN)
 }
 
 """
@@ -967,6 +1254,10 @@ type Company
   diagramFont: String
   logo: String
   features: String
+  strategicAutonomyPriority: Int
+  resiliencePriority: Int
+  securityPriority: Int
+  controlPriority: Int
   expectedSovereigntyScore: Float
   achievedSovereigntyScore: Float
   sovereigntyGap: Float
@@ -1121,6 +1412,15 @@ enum SevenRStrategy {
   REFACTOR
   REARCHITECT
   REPLACE
+}
+
+enum LifecycleStatus {
+  SUPPORTED
+  APPROACHING_EOS
+  APPROACHING_EOL
+  EOS
+  EOL
+  UNSUPPORTED
 }
 
 """
