@@ -3,8 +3,8 @@ import { HardwareVersion } from '@/gql/generated'
 export type HardwareVersionType = Pick<
   HardwareVersion,
   | 'id'
-  | 'versionModelString'
-  | 'normalizedVersionModel'
+  | 'name'
+  | 'version'
   | 'releaseChannel'
   | 'supportTier'
   | 'createdAt'

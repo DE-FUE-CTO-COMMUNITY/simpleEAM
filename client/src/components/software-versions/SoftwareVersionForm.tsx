@@ -5,20 +5,25 @@ import { useForm } from '@tanstack/react-form'
 import { useTranslations } from 'next-intl'
 import { z } from 'zod'
 import { useQuery } from '@apollo/client'
-import { SoftwareVersion, SoftwareProduct } from '@/gql/generated'
+import { LifecycleStatus, SoftwareVersion, SoftwareProduct } from '@/gql/generated'
 import { GET_SOFTWARE_PRODUCTS } from '@/graphql/softwareProduct'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
+import { isArchitect } from '@/lib/auth'
 import GenericForm, { FieldConfig } from '../common/GenericForm'
 import { GenericFormProps } from '../common/GenericFormProps'
 
 const createSchema = (t: any) =>
   z.object({
-    versionString: z.string().min(1, t('versionStringRequired')).max(100, t('versionStringMax')),
-    normalizedVersion: z.string().max(100, t('normalizedVersionMax')).optional(),
+    name: z.string().min(1, t('nameRequired')).max(100, t('nameMax')),
+    version: z.string().max(100, t('versionMax')).optional(),
     releaseChannel: z.string().max(100, t('releaseChannelMax')).optional(),
     supportTier: z.string().max(100, t('supportTierMax')).optional(),
     isLts: z.boolean().optional(),
     softwareProductId: z.string().optional(),
+    lifecycleRecordId: z.string().optional(),
+    lifecycleStatus: z.nativeEnum(LifecycleStatus).optional().nullable(),
+    eosDate: z.any().optional().nullable(),
+    eolDate: z.any().optional().nullable(),
   })
 
 export type SoftwareVersionFormValues = z.infer<ReturnType<typeof createSchema>>
@@ -29,6 +34,7 @@ const SoftwareVersionForm: React.FC<
   const t = useTranslations('softwareVersions.form')
   const tEntity = useTranslations('softwareVersions')
   const tCommon = useTranslations('common')
+  const tLifecycle = useTranslations('softwareProducts.lifecycleStatuses')
   const companyWhere = useCompanyWhere('company')
 
   const { data: productsData, loading: productsLoading } = useQuery(GET_SOFTWARE_PRODUCTS, {
@@ -45,12 +51,16 @@ const SoftwareVersionForm: React.FC<
 
   const defaultValues = useMemo<SoftwareVersionFormValues>(
     () => ({
-      versionString: '',
-      normalizedVersion: '',
+      name: '',
+      version: '',
       releaseChannel: '',
       supportTier: '',
       isLts: false,
       softwareProductId: '',
+      lifecycleRecordId: '',
+      lifecycleStatus: null,
+      eosDate: null,
+      eolDate: null,
     }),
     []
   )
@@ -73,13 +83,19 @@ const SoftwareVersionForm: React.FC<
     }
 
     if ((mode === 'view' || mode === 'edit') && data) {
+      const lifecycleRecord = data.lifecycleRecords?.[0]
+
       form.reset({
-        versionString: data.versionString ?? '',
-        normalizedVersion: data.normalizedVersion ?? '',
+        name: data.name ?? '',
+        version: data.version ?? '',
         releaseChannel: data.releaseChannel ?? '',
         supportTier: data.supportTier ?? '',
         isLts: data.isLts ?? false,
         softwareProductId: data.softwareProduct?.[0]?.id ?? '',
+        lifecycleRecordId: lifecycleRecord?.id ?? '',
+        lifecycleStatus: lifecycleRecord?.lifecycleStatus ?? null,
+        eosDate: lifecycleRecord?.eosDate ?? null,
+        eolDate: lifecycleRecord?.eolDate ?? null,
       })
     }
 
@@ -90,25 +106,43 @@ const SoftwareVersionForm: React.FC<
 
   const fields: FieldConfig[] = [
     {
-      name: 'versionString',
-      label: t('versionString'),
+      name: 'name',
+      label: t('name'),
       type: 'text',
       required: true,
     },
     {
-      name: 'normalizedVersion',
-      label: t('normalizedVersion'),
+      name: 'version',
+      label: t('version'),
       type: 'text',
     },
     {
       name: 'releaseChannel',
       label: t('releaseChannel'),
-      type: 'text',
+      type: 'select',
+      options: [
+        { value: '', label: t('none') },
+        { value: 'STABLE', label: 'Stable' },
+        { value: 'LTS', label: 'LTS' },
+        { value: 'RC', label: 'Release Candidate' },
+        { value: 'BETA', label: 'Beta' },
+        { value: 'ALPHA', label: 'Alpha' },
+        { value: 'PREVIEW', label: 'Preview' },
+      ],
     },
     {
       name: 'supportTier',
       label: t('supportTier'),
-      type: 'text',
+      type: 'select',
+      options: [
+        { value: '', label: t('none') },
+        { value: 'STANDARD', label: 'Standard' },
+        { value: 'EXTENDED', label: 'Extended' },
+        { value: 'PREMIUM', label: 'Premium' },
+        { value: 'COMMUNITY', label: 'Community' },
+        { value: 'DEPRECATED', label: 'Deprecated' },
+        { value: 'END_OF_SUPPORT', label: 'End of Support' },
+      ],
     },
     {
       name: 'isLts',
@@ -123,6 +157,33 @@ const SoftwareVersionForm: React.FC<
       loadingOptions: productsLoading,
       tabId: 'relationships',
     },
+    {
+      name: 'lifecycleStatus',
+      label: t('lifecycleStatus'),
+      type: 'select',
+      options: [
+        { value: null, label: t('none') },
+        { value: LifecycleStatus.SUPPORTED, label: tLifecycle('SUPPORTED') },
+        { value: LifecycleStatus.APPROACHING_EOS, label: tLifecycle('APPROACHING_EOS') },
+        { value: LifecycleStatus.APPROACHING_EOL, label: tLifecycle('APPROACHING_EOL') },
+        { value: LifecycleStatus.EOS, label: tLifecycle('EOS') },
+        { value: LifecycleStatus.EOL, label: tLifecycle('EOL') },
+        { value: LifecycleStatus.UNSUPPORTED, label: tLifecycle('UNSUPPORTED') },
+      ],
+      tabId: 'lifecycle',
+    },
+    {
+      name: 'eosDate',
+      label: t('eosDate'),
+      type: 'date',
+      tabId: 'lifecycle',
+    },
+    {
+      name: 'eolDate',
+      label: t('eolDate'),
+      type: 'date',
+      tabId: 'lifecycle',
+    },
   ]
 
   return (
@@ -131,6 +192,7 @@ const SoftwareVersionForm: React.FC<
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={() => form.handleSubmit()}
+      enableDelete={mode === 'edit' && !!data && isArchitect()}
       onDelete={data?.id && onDelete ? () => onDelete(data.id) : undefined}
       mode={mode}
       isLoading={loading}
@@ -146,6 +208,7 @@ const SoftwareVersionForm: React.FC<
       tabs={[
         { id: 'general', label: tEntity('tabs.general') },
         { id: 'relationships', label: tEntity('tabs.relationships') },
+        { id: 'lifecycle', label: tEntity('tabs.lifecycle') },
       ]}
       submitButtonText={tCommon('save')}
       cancelButtonText={tCommon('cancel')}

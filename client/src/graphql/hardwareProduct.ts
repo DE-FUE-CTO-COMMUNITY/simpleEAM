@@ -17,7 +17,12 @@ export const GET_HARDWARE_PRODUCTS = gql`
     hardwareProducts(where: $where) {
       id
       name
-      productFamily
+      productFamily {
+        id
+        name
+        category
+        type
+      }
       lifecycleStatus
       isActive
       createdAt
@@ -36,8 +41,8 @@ export const GET_HARDWARE_PRODUCTS = gql`
       }
       versions {
         id
-        versionModelString
-        normalizedVersionModel
+        name
+        version
       }
       usedByInfrastructure {
         id

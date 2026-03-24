@@ -20,7 +20,7 @@ export const useHardwareVersionFilter = ({
     return hardwareVersions.filter(version => {
       if (
         filterState.versionFilter &&
-        !version.versionModelString.toLowerCase().includes(filterState.versionFilter.toLowerCase())
+        !version.name.toLowerCase().includes(filterState.versionFilter.toLowerCase())
       ) {
         return false
       }

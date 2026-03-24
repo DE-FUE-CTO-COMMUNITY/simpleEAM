@@ -79,10 +79,14 @@ const SoftwareProductTable: React.FC<SoftwareProductTableProps> = ({
         header: t('name'),
         cell: info => info.getValue(),
       }),
-      columnHelper.accessor('productFamily', {
-        header: t('productFamily'),
-        cell: info => info.getValue() || '-',
-      }),
+      columnHelper.accessor(
+        row => row.productFamily?.map(family => family.name).join(', ') || '-',
+        {
+          id: 'productFamily',
+          header: t('productFamily'),
+          cell: info => info.getValue(),
+        }
+      ),
       columnHelper.accessor('lifecycleStatus', {
         header: t('lifecycleStatus'),
         cell: info => {
@@ -123,7 +127,7 @@ const SoftwareProductTable: React.FC<SoftwareProductTableProps> = ({
         cell: info =>
           info
             .getValue()
-            ?.map(v => v.versionString)
+            ?.map(v => v.name)
             .join(', ') || '-',
       }),
       columnHelper.accessor('createdAt', {
@@ -140,12 +144,13 @@ const SoftwareProductTable: React.FC<SoftwareProductTableProps> = ({
 
   const mapToFormValues = (item: SoftwareProductType): SoftwareProductFormValues => ({
     name: item.name,
-    productFamily: item.productFamily ?? '',
+    productFamilyId: item.productFamily?.[0]?.id ?? '',
     lifecycleStatus: item.lifecycleStatus ?? null,
     isActive: item.isActive ?? true,
     developedByIds: item.developedBy?.map(s => s.id) ?? [],
     providedByIds: item.providedBy?.map(s => s.id) ?? [],
     maintainedByIds: item.maintainedBy?.map(s => s.id) ?? [],
+    versionIds: item.versions?.map(v => v.id) ?? [],
   })
 
   return (

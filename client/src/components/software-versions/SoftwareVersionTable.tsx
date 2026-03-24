@@ -10,8 +10,8 @@ import { formatDate } from './utils'
 import usePersistentColumnVisibility from '@/hooks/usePersistentColumnVisibility'
 
 export const SOFTWARE_VERSION_DEFAULT_COLUMN_VISIBILITY = {
-  versionString: true,
-  normalizedVersion: true,
+  name: true,
+  version: true,
   releaseChannel: true,
   supportTier: true,
   isLts: true,
@@ -72,11 +72,11 @@ const SoftwareVersionTable: React.FC<SoftwareVersionTableProps> = ({
 
   const columns = useMemo(
     () => [
-      columnHelper.accessor('versionString', {
+      columnHelper.accessor('name', {
         header: t('versionString'),
         cell: info => info.getValue(),
       }),
-      columnHelper.accessor('normalizedVersion', {
+      columnHelper.accessor('version', {
         header: t('normalizedVersion'),
         cell: info => info.getValue() || '-',
       }),
@@ -121,8 +121,12 @@ const SoftwareVersionTable: React.FC<SoftwareVersionTableProps> = ({
   )
 
   const mapToFormValues = (item: SoftwareVersionType): SoftwareVersionFormValues => ({
-    versionString: item.versionString,
-    normalizedVersion: item.normalizedVersion ?? '',
+    lifecycleRecordId: item.lifecycleRecords?.[0]?.id ?? '',
+    lifecycleStatus: item.lifecycleRecords?.[0]?.lifecycleStatus ?? null,
+    eosDate: item.lifecycleRecords?.[0]?.eosDate ?? null,
+    eolDate: item.lifecycleRecords?.[0]?.eolDate ?? null,
+    name: item.name,
+    version: item.version ?? '',
     releaseChannel: item.releaseChannel ?? '',
     supportTier: item.supportTier ?? '',
     isLts: item.isLts ?? false,

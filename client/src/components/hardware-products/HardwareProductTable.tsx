@@ -78,10 +78,14 @@ const HardwareProductTable: React.FC<HardwareProductTableProps> = ({
         header: t('name'),
         cell: info => info.getValue(),
       }),
-      columnHelper.accessor('productFamily', {
-        header: t('productFamily'),
-        cell: info => info.getValue() || '-',
-      }),
+      columnHelper.accessor(
+        row => row.productFamily?.map(family => family.name).join(', ') || '-',
+        {
+          id: 'productFamily',
+          header: t('productFamily'),
+          cell: info => info.getValue(),
+        }
+      ),
       columnHelper.accessor('lifecycleStatus', {
         header: t('lifecycleStatus'),
         cell: info => {
@@ -122,7 +126,7 @@ const HardwareProductTable: React.FC<HardwareProductTableProps> = ({
         cell: info =>
           info
             .getValue()
-            ?.map(v => v.versionModelString)
+            ?.map(v => v.name)
             .join(', ') || '-',
       }),
       columnHelper.accessor('createdAt', {
@@ -139,12 +143,13 @@ const HardwareProductTable: React.FC<HardwareProductTableProps> = ({
 
   const mapToFormValues = (item: HardwareProductType): HardwareProductFormValues => ({
     name: item.name,
-    productFamily: item.productFamily ?? '',
+    productFamilyId: item.productFamily?.[0]?.id ?? '',
     lifecycleStatus: item.lifecycleStatus ?? null,
     isActive: item.isActive ?? true,
     manufacturedByIds: item.manufacturedBy?.map(s => s.id) ?? [],
     providedByIds: item.providedBy?.map(s => s.id) ?? [],
     maintainedByIds: item.maintainedBy?.map(s => s.id) ?? [],
+    versionIds: item.versions?.map(v => v.id) ?? [],
   })
 
   return (

@@ -747,7 +747,9 @@
     },
     "tabs": {
       "general": "General",
-      "relationships": "Relationships"
+      "relationships": "Relationships",
+      "versions": "Versions",
+      "suppliers": "Suppliers"
     },
     "form": {
       "name": "Name",
@@ -2392,6 +2394,7 @@
     "title": "Administration",
     "tabs": {
       "userManagement": "User Management",
+      "productFamilies": "Product Families",
       "featureManagement": "Feature Management",
       "aiSupport": "AI Support",
       "debugTools": "Debug Tools"
@@ -2667,6 +2670,57 @@
       "deleteHistorySuccess": "Deleted {count} AI runs.",
       "deleteHistoryError": "Failed to delete AI run history.",
       "unknownCompany": "Unknown company"
+    },
+    "productFamilies": {
+      "title": "Product Family Management",
+      "addNew": "Create Product Family",
+      "createTitle": "Create Product Family",
+      "editTitle": "Edit Product Family",
+      "searchPlaceholder": "Search product families...",
+      "noData": "No product families found",
+      "validation": {
+        "nameRequired": "Name is required"
+      },
+      "form": {
+        "name": "Name",
+        "category": "Category",
+        "type": "Type"
+      },
+      "actions": {
+        "edit": "Edit",
+        "delete": "Delete",
+        "save": "Save",
+        "cancel": "Cancel"
+      },
+      "table": {
+        "name": "Name",
+        "category": "Category",
+        "type": "Type",
+        "usedBy": "Used By",
+        "softwareProducts": "Software Products",
+        "hardwareProducts": "Hardware Products",
+        "actions": "Actions"
+      },
+      "types": {
+        "HARDWARE": "Hardware",
+        "SOFTWARE": "Software"
+      },
+      "categories": {
+        "COMPUTE_END_USER_DEVICES": "Compute & End User Devices",
+        "NETWORK_DEVICES": "Network Devices",
+        "STORAGE_DATA_INFRASTRUCTURE": "Storage & Data Infrastructure",
+        "SECURITY_HARDWARE": "Security Hardware",
+        "PERIPHERALS_OUTPUT_DEVICES": "Peripherals & Output Devices",
+        "DATA_CENTER_INFRASTRUCTURE": "Data Center Infrastructure",
+        "OPERATING_PLATFORM_SOFTWARE": "Operating & Platform Software",
+        "INFRASTRUCTURE_PLATFORM_SOFTWARE": "Infrastructure & Platform Software",
+        "CLOUD_PLATFORM_SERVICES": "Cloud & Platform Services",
+        "SECURITY_SOFTWARE": "Security Software",
+        "MANAGEMENT_OPERATIONS_SOFTWARE": "Management & Operations Software",
+        "END_USER_COLLABORATION_SOFTWARE": "End User & Collaboration Software",
+        "DEVELOPMENT_ENGINEERING_SOFTWARE": "Development & Engineering Software",
+        "BUSINESS_ENTERPRISE_APPLICATIONS": "Business & Enterprise Applications"
+      }
     },
     "debugOverlay": {
       "title": "Element Coordinates",
@@ -3224,7 +3278,9 @@
     },
     "tabs": {
       "general": "General",
-      "relationships": "Relationships"
+      "relationships": "Relationships",
+      "versions": "Versions",
+      "suppliers": "Suppliers"
     },
     "form": {
       "name": "Name",
@@ -3234,6 +3290,7 @@
       "developedBy": "Developed By",
       "providedBy": "Provided By",
       "maintainedBy": "Maintained By",
+      "versions": "Versions",
       "none": "None",
       "nameMin": "Name must contain at least 2 characters",
       "nameMax": "Name must not exceed 100 characters",
@@ -3293,21 +3350,64 @@
     },
     "tabs": {
       "general": "General",
-      "relationships": "Relationships"
+      "relationships": "Relationships",
+      "versions": "Versions",
+      "suppliers": "Suppliers",
+      "lifecycle": "Lifecycle"
     },
     "form": {
+      "name": "Name",
+      "version": "Version",
       "versionString": "Version",
       "normalizedVersion": "Normalized Version",
       "releaseChannel": "Release Channel",
       "supportTier": "Support Tier",
       "isLts": "LTS",
+      "lifecycleStatus": "Lifecycle Status",
+      "eosDate": "End of Support (EOS)",
+      "eolDate": "End of Life (EOL)",
       "softwareProduct": "Software Product",
       "none": "None",
+      "nameRequired": "Name is required",
+      "nameMax": "Name must not exceed 100 characters",
+      "versionMax": "Version must not exceed 100 characters",
       "versionStringRequired": "Version is required",
       "versionStringMax": "Version must not exceed 100 characters",
       "normalizedVersionMax": "Normalized version must not exceed 100 characters",
       "releaseChannelMax": "Release channel must not exceed 100 characters",
-      "supportTierMax": "Support tier must not exceed 100 characters"
+      "supportTierMax": "Support tier must not exceed 100 characters",
+      "releaseChannels": {
+        "STABLE": "Stable",
+        "LTS": "LTS",
+        "RC": "Release Candidate",
+        "BETA": "Beta",
+        "ALPHA": "Alpha",
+        "PREVIEW": "Preview"
+      },
+      "supportTiers": {
+        "STANDARD": "Standard",
+        "EXTENDED": "Extended",
+        "PREMIUM": "Premium",
+        "COMMUNITY": "Community",
+        "DEPRECATED": "Deprecated",
+        "END_OF_SUPPORT": "End of Support"
+      }
+    },
+    "releaseChannels": {
+      "STABLE": "Stable",
+      "LTS": "LTS",
+      "RC": "Release Candidate",
+      "BETA": "Beta",
+      "ALPHA": "Alpha",
+      "PREVIEW": "Preview"
+    },
+    "supportTiers": {
+      "STANDARD": "Standard",
+      "EXTENDED": "Extended",
+      "PREMIUM": "Premium",
+      "COMMUNITY": "Community",
+      "DEPRECATED": "Deprecated",
+      "END_OF_SUPPORT": "End of Support"
     },
     "table": {
       "versionString": "Version",
@@ -3354,7 +3454,9 @@
     },
     "tabs": {
       "general": "General",
-      "relationships": "Relationships"
+      "relationships": "Relationships",
+      "versions": "Versions",
+      "suppliers": "Suppliers"
     },
     "form": {
       "name": "Name",
@@ -3364,6 +3466,7 @@
       "manufacturedBy": "Manufactured By",
       "providedBy": "Provided By",
       "maintainedBy": "Maintained By",
+      "versions": "Versions",
       "none": "None",
       "nameMin": "Name must contain at least 2 characters",
       "nameMax": "Name must not exceed 100 characters",
@@ -3423,20 +3526,61 @@
     },
     "tabs": {
       "general": "General",
-      "relationships": "Relationships"
+      "relationships": "Relationships",
+      "lifecycle": "Lifecycle"
     },
     "form": {
+      "name": "Name",
+      "version": "Version",
       "versionModelString": "Version/Model",
       "normalizedVersionModel": "Normalized Version/Model",
       "releaseChannel": "Release Channel",
       "supportTier": "Support Tier",
+      "lifecycleStatus": "Lifecycle Status",
+      "eosDate": "End of Support (EOS)",
+      "eolDate": "End of Life (EOL)",
       "hardwareProduct": "Hardware Product",
       "none": "None",
+      "nameRequired": "Name is required",
+      "nameMax": "Name must not exceed 100 characters",
+      "versionMax": "Version must not exceed 100 characters",
       "versionModelStringRequired": "Version/Model is required",
       "versionModelStringMax": "Version/Model must not exceed 100 characters",
       "normalizedVersionModelMax": "Normalized version/model must not exceed 100 characters",
       "releaseChannelMax": "Release channel must not exceed 100 characters",
-      "supportTierMax": "Support tier must not exceed 100 characters"
+      "supportTierMax": "Support tier must not exceed 100 characters",
+      "releaseChannels": {
+        "STABLE": "Stable",
+        "LTS": "LTS",
+        "RC": "Release Candidate",
+        "BETA": "Beta",
+        "ALPHA": "Alpha",
+        "PREVIEW": "Preview"
+      },
+      "supportTiers": {
+        "STANDARD": "Standard",
+        "EXTENDED": "Extended",
+        "PREMIUM": "Premium",
+        "COMMUNITY": "Community",
+        "DEPRECATED": "Deprecated",
+        "END_OF_SUPPORT": "End of Support"
+      }
+    },
+    "releaseChannels": {
+      "STABLE": "Stable",
+      "LTS": "LTS",
+      "RC": "Release Candidate",
+      "BETA": "Beta",
+      "ALPHA": "Alpha",
+      "PREVIEW": "Preview"
+    },
+    "supportTiers": {
+      "STANDARD": "Standard",
+      "EXTENDED": "Extended",
+      "PREMIUM": "Premium",
+      "COMMUNITY": "Community",
+      "DEPRECATED": "Deprecated",
+      "END_OF_SUPPORT": "End of Support"
     },
     "table": {
       "versionModelString": "Version/Model",

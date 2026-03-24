@@ -126,7 +126,6 @@ const SoftwareProductsPage = () => {
 
     const input: Record<string, any> = {
       name: values.name,
-      productFamily: values.productFamily || null,
       lifecycleStatus: values.lifecycleStatus || null,
       isActive: values.isActive ?? true,
       company: {
@@ -143,6 +142,12 @@ const SoftwareProductsPage = () => {
     if (values.maintainedByIds && values.maintainedByIds.length > 0) {
       input.maintainedBy = { connect: toConnectById(values.maintainedByIds) }
     }
+    if (values.versionIds && values.versionIds.length > 0) {
+      input.versions = { connect: toConnectById(values.versionIds) }
+    }
+    if (values.productFamilyId) {
+      input.productFamily = { connect: toConnectById([values.productFamilyId]) }
+    }
 
     await createSoftwareProduct({ variables: { input: [input] } })
     setShowCreateForm(false)
@@ -151,9 +156,12 @@ const SoftwareProductsPage = () => {
   const handleUpdate = async (id: string, values: SoftwareProductFormValues) => {
     const input: Record<string, any> = {
       name: { set: values.name },
-      productFamily: { set: values.productFamily || null },
       lifecycleStatus: { set: values.lifecycleStatus || null },
       isActive: { set: values.isActive ?? true },
+      productFamily: {
+        disconnect: [{ where: {} }],
+        ...(values.productFamilyId ? { connect: toConnectById([values.productFamilyId]) } : {}),
+      },
       developedBy: {
         disconnect: [{ where: {} }],
         ...(values.developedByIds?.length ? { connect: toConnectById(values.developedByIds) } : {}),
@@ -167,6 +175,10 @@ const SoftwareProductsPage = () => {
         ...(values.maintainedByIds?.length
           ? { connect: toConnectById(values.maintainedByIds) }
           : {}),
+      },
+      versions: {
+        disconnect: [{ where: {} }],
+        ...(values.versionIds?.length ? { connect: toConnectById(values.versionIds) } : {}),
       },
     }
 

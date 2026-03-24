@@ -721,7 +721,9 @@
     },
     "tabs": {
       "general": "Allgemein",
-      "relationships": "Beziehungen"
+      "relationships": "Beziehungen",
+      "versions": "Versionen",
+      "suppliers": "Lieferanten"
     },
     "form": {
       "name": "Name",
@@ -2339,6 +2341,7 @@
     "title": "Administration",
     "tabs": {
       "userManagement": "Benutzerverwaltung",
+      "productFamilies": "Produktfamilien",
       "featureManagement": "Feature-Management",
       "aiRuns": "KI-Läufe",
       "debugTools": "Debug-Tools"
@@ -2610,6 +2613,57 @@
       "deleteHistorySuccess": "{count} KI-Läufe gelöscht.",
       "deleteHistoryError": "Run-Historie konnte nicht gelöscht werden.",
       "unknownCompany": "Unbekanntes Unternehmen"
+    },
+    "productFamilies": {
+      "title": "Verwaltung Produktfamilien",
+      "addNew": "Produktfamilie erstellen",
+      "createTitle": "Produktfamilie erstellen",
+      "editTitle": "Produktfamilie bearbeiten",
+      "searchPlaceholder": "Produktfamilien suchen...",
+      "noData": "Keine Produktfamilien gefunden",
+      "validation": {
+        "nameRequired": "Name ist erforderlich"
+      },
+      "form": {
+        "name": "Name",
+        "category": "Kategorie",
+        "type": "Typ"
+      },
+      "actions": {
+        "edit": "Bearbeiten",
+        "delete": "Löschen",
+        "save": "Speichern",
+        "cancel": "Abbrechen"
+      },
+      "table": {
+        "name": "Name",
+        "category": "Kategorie",
+        "type": "Typ",
+        "usedBy": "Verwendet von",
+        "softwareProducts": "Softwareprodukten",
+        "hardwareProducts": "Hardwareprodukten",
+        "actions": "Aktionen"
+      },
+      "types": {
+        "HARDWARE": "Hardware",
+        "SOFTWARE": "Software"
+      },
+      "categories": {
+        "COMPUTE_END_USER_DEVICES": "Compute & End User Devices",
+        "NETWORK_DEVICES": "Network Devices",
+        "STORAGE_DATA_INFRASTRUCTURE": "Storage & Data Infrastructure",
+        "SECURITY_HARDWARE": "Security Hardware",
+        "PERIPHERALS_OUTPUT_DEVICES": "Peripherals & Output Devices",
+        "DATA_CENTER_INFRASTRUCTURE": "Data Center Infrastructure",
+        "OPERATING_PLATFORM_SOFTWARE": "Operating & Platform Software",
+        "INFRASTRUCTURE_PLATFORM_SOFTWARE": "Infrastructure & Platform Software",
+        "CLOUD_PLATFORM_SERVICES": "Cloud & Platform Services",
+        "SECURITY_SOFTWARE": "Security Software",
+        "MANAGEMENT_OPERATIONS_SOFTWARE": "Management & Operations Software",
+        "END_USER_COLLABORATION_SOFTWARE": "End User & Collaboration Software",
+        "DEVELOPMENT_ENGINEERING_SOFTWARE": "Development & Engineering Software",
+        "BUSINESS_ENTERPRISE_APPLICATIONS": "Business & Enterprise Applications"
+      }
     },
     "debugOverlay": {
       "title": "Element-Koordinaten",
@@ -3179,7 +3233,9 @@
     },
     "tabs": {
       "general": "Allgemein",
-      "relationships": "Beziehungen"
+      "relationships": "Beziehungen",
+      "versions": "Versionen",
+      "suppliers": "Lieferanten"
     },
     "form": {
       "name": "Name",
@@ -3189,6 +3245,7 @@
       "developedBy": "Entwickelt von",
       "providedBy": "Bereitgestellt von",
       "maintainedBy": "Gewartet von",
+      "versions": "Versionen",
       "none": "Keine",
       "nameMin": "Name muss mindestens 2 Zeichen enthalten",
       "nameMax": "Name darf maximal 100 Zeichen enthalten",
@@ -3248,21 +3305,64 @@
     },
     "tabs": {
       "general": "Allgemein",
-      "relationships": "Beziehungen"
+      "relationships": "Beziehungen",
+      "versions": "Versionen",
+      "suppliers": "Lieferanten",
+      "lifecycle": "Lifecycle"
     },
     "form": {
+      "name": "Name",
+      "version": "Version",
       "versionString": "Version",
       "normalizedVersion": "Normalisierte Version",
       "releaseChannel": "Release-Kanal",
       "supportTier": "Support-Stufe",
       "isLts": "LTS",
+      "lifecycleStatus": "Lifecycle-Status",
+      "eosDate": "End of Support (EOS)",
+      "eolDate": "End of Life (EOL)",
       "softwareProduct": "Softwareprodukt",
       "none": "Keine",
+      "nameRequired": "Name ist erforderlich",
+      "nameMax": "Name darf maximal 100 Zeichen enthalten",
+      "versionMax": "Version darf maximal 100 Zeichen enthalten",
       "versionStringRequired": "Version ist erforderlich",
       "versionStringMax": "Version darf maximal 100 Zeichen enthalten",
       "normalizedVersionMax": "Normalisierte Version darf maximal 100 Zeichen enthalten",
       "releaseChannelMax": "Release-Kanal darf maximal 100 Zeichen enthalten",
-      "supportTierMax": "Support-Stufe darf maximal 100 Zeichen enthalten"
+      "supportTierMax": "Support-Stufe darf maximal 100 Zeichen enthalten",
+      "releaseChannels": {
+        "STABLE": "Stable",
+        "LTS": "LTS",
+        "RC": "Release Candidate",
+        "BETA": "Beta",
+        "ALPHA": "Alpha",
+        "PREVIEW": "Vorschau"
+      },
+      "supportTiers": {
+        "STANDARD": "Standard",
+        "EXTENDED": "Erweitert",
+        "PREMIUM": "Premium",
+        "COMMUNITY": "Community",
+        "DEPRECATED": "Veraltet",
+        "END_OF_SUPPORT": "Ende des Supports"
+      }
+    },
+    "releaseChannels": {
+      "STABLE": "Stable",
+      "LTS": "LTS",
+      "RC": "Release Candidate",
+      "BETA": "Beta",
+      "ALPHA": "Alpha",
+      "PREVIEW": "Vorschau"
+    },
+    "supportTiers": {
+      "STANDARD": "Standard",
+      "EXTENDED": "Erweitert",
+      "PREMIUM": "Premium",
+      "COMMUNITY": "Community",
+      "DEPRECATED": "Veraltet",
+      "END_OF_SUPPORT": "Ende des Supports"
     },
     "table": {
       "versionString": "Version",
@@ -3309,7 +3409,9 @@
     },
     "tabs": {
       "general": "Allgemein",
-      "relationships": "Beziehungen"
+      "relationships": "Beziehungen",
+      "versions": "Versionen",
+      "suppliers": "Lieferanten"
     },
     "form": {
       "name": "Name",
@@ -3319,6 +3421,7 @@
       "manufacturedBy": "Hergestellt von",
       "providedBy": "Bereitgestellt von",
       "maintainedBy": "Gewartet von",
+      "versions": "Versionen",
       "none": "Keine",
       "nameMin": "Name muss mindestens 2 Zeichen enthalten",
       "nameMax": "Name darf maximal 100 Zeichen enthalten",
@@ -3378,20 +3481,61 @@
     },
     "tabs": {
       "general": "Allgemein",
-      "relationships": "Beziehungen"
+      "relationships": "Beziehungen",
+      "lifecycle": "Lifecycle"
     },
     "form": {
+      "name": "Name",
+      "version": "Version",
       "versionModelString": "Version/Modell",
       "normalizedVersionModel": "Normalisierte Version/Modell",
       "releaseChannel": "Release-Kanal",
       "supportTier": "Support-Stufe",
+      "lifecycleStatus": "Lifecycle-Status",
+      "eosDate": "End of Support (EOS)",
+      "eolDate": "End of Life (EOL)",
       "hardwareProduct": "Hardwareprodukt",
       "none": "Keine",
+      "nameRequired": "Name ist erforderlich",
+      "nameMax": "Name darf maximal 100 Zeichen enthalten",
+      "versionMax": "Version darf maximal 100 Zeichen enthalten",
       "versionModelStringRequired": "Version/Modell ist erforderlich",
       "versionModelStringMax": "Version/Modell darf maximal 100 Zeichen enthalten",
       "normalizedVersionModelMax": "Normalisierte Version/Modell darf maximal 100 Zeichen enthalten",
       "releaseChannelMax": "Release-Kanal darf maximal 100 Zeichen enthalten",
-      "supportTierMax": "Support-Stufe darf maximal 100 Zeichen enthalten"
+      "supportTierMax": "Support-Stufe darf maximal 100 Zeichen enthalten",
+      "releaseChannels": {
+        "STABLE": "Stable",
+        "LTS": "LTS",
+        "RC": "Release Candidate",
+        "BETA": "Beta",
+        "ALPHA": "Alpha",
+        "PREVIEW": "Vorschau"
+      },
+      "supportTiers": {
+        "STANDARD": "Standard",
+        "EXTENDED": "Erweitert",
+        "PREMIUM": "Premium",
+        "COMMUNITY": "Community",
+        "DEPRECATED": "Veraltet",
+        "END_OF_SUPPORT": "Ende des Supports"
+      }
+    },
+    "releaseChannels": {
+      "STABLE": "Stable",
+      "LTS": "LTS",
+      "RC": "Release Candidate",
+      "BETA": "Beta",
+      "ALPHA": "Alpha",
+      "PREVIEW": "Vorschau"
+    },
+    "supportTiers": {
+      "STANDARD": "Standard",
+      "EXTENDED": "Erweitert",
+      "PREMIUM": "Premium",
+      "COMMUNITY": "Community",
+      "DEPRECATED": "Veraltet",
+      "END_OF_SUPPORT": "Ende des Supports"
     },
     "table": {
       "versionModelString": "Version/Modell",

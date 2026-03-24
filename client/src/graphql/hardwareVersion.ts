@@ -16,8 +16,8 @@ export const GET_HARDWARE_VERSIONS = gql`
   query GetHardwareVersions($where: HardwareVersionWhere) {
     hardwareVersions(where: $where) {
       id
-      versionModelString
-      normalizedVersionModel
+      name
+      version
       releaseChannel
       supportTier
       createdAt
@@ -41,7 +41,7 @@ export const CREATE_HARDWARE_VERSION = gql`
     createHardwareVersions(input: $input) {
       hardwareVersions {
         id
-        versionModelString
+        name
       }
     }
   }
@@ -52,7 +52,7 @@ export const UPDATE_HARDWARE_VERSION = gql`
     updateHardwareVersions(where: { id: { eq: $id } }, update: $input) {
       hardwareVersions {
         id
-        versionModelString
+        name
       }
     }
   }

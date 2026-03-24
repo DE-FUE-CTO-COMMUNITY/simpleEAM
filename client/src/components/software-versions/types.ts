@@ -3,8 +3,8 @@ import { SoftwareVersion } from '@/gql/generated'
 export type SoftwareVersionType = Pick<
   SoftwareVersion,
   | 'id'
-  | 'versionString'
-  | 'normalizedVersion'
+  | 'name'
+  | 'version'
   | 'releaseChannel'
   | 'isLts'
   | 'supportTier'

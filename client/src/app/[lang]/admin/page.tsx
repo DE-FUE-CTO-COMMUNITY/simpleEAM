@@ -2,11 +2,16 @@
 
 import React from 'react'
 import { Typography, Box, Paper, Button, Tabs, Tab } from '@mui/material'
-import { BugReport as BugReportIcon, People as PeopleIcon } from '@mui/icons-material'
+import {
+  BugReport as BugReportIcon,
+  Category as CategoryIcon,
+  People as PeopleIcon,
+} from '@mui/icons-material'
 import { useTranslations } from 'next-intl'
 import SessionDebugger from '@/components/debug/SessionDebugger'
 import UserManagement from '@/components/admin/UserManagement'
 import DebugSettingsPanel from '@/components/admin/DebugSettingsPanel'
+import ProductFamilyManagement from '@/components/admin/ProductFamilyManagement'
 import { isAdmin } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 
@@ -77,11 +82,18 @@ export default function AdminPage() {
             aria-controls="admin-tabpanel-0"
           />
           <Tab
-            label={t('tabs.debugTools')}
-            icon={<BugReportIcon />}
+            label={t('tabs.productFamilies')}
+            icon={<CategoryIcon />}
             iconPosition="start"
             id="admin-tab-1"
             aria-controls="admin-tabpanel-1"
+          />
+          <Tab
+            label={t('tabs.debugTools')}
+            icon={<BugReportIcon />}
+            iconPosition="start"
+            id="admin-tab-2"
+            aria-controls="admin-tabpanel-2"
           />
         </Tabs>
 
@@ -90,6 +102,10 @@ export default function AdminPage() {
         </TabPanel>
 
         <TabPanel value={currentTab} index={1}>
+          <ProductFamilyManagement />
+        </TabPanel>
+
+        <TabPanel value={currentTab} index={2}>
           <Typography variant="h5" component="h2" gutterBottom>
             {t('debugTools.title')}
           </Typography>

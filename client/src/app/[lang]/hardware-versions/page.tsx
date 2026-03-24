@@ -34,7 +34,7 @@ const HardwareVersionsPage = () => {
   const companyWhere = useCompanyWhere('company')
 
   const [globalFilter, setGlobalFilter] = useState('')
-  const [sorting, setSorting] = useState([{ id: 'versionModelString', desc: false }])
+  const [sorting, setSorting] = useState([{ id: 'name', desc: false }])
   const [tableInstance, setTableInstance] = useState<any>(null)
   const [filterOpen, setFilterOpen] = useState(false)
   const [showCreateForm, setShowCreateForm] = useState(false)
@@ -126,6 +126,21 @@ const HardwareVersionsPage = () => {
     },
   })
 
+  const normalizeDateValue = (value: unknown) => {
+    if (!value) {
+      return null
+    }
+
+    if (value instanceof Date) {
+      return value.toISOString().slice(0, 10)
+    }
+
+    return String(value)
+  }
+
+  const hasLifecycleRecordData = (values: HardwareVersionFormValues) =>
+    !!(values.lifecycleStatus || values.eosDate || values.eolDate)
+
   const handleCreate = async (values: HardwareVersionFormValues) => {
     if (!selectedCompanyId) {
       enqueueSnackbar(t('messages.selectCompanyFirst'), { variant: 'warning' })
@@ -133,8 +148,8 @@ const HardwareVersionsPage = () => {
     }
 
     const input: Record<string, any> = {
-      versionModelString: values.versionModelString,
-      normalizedVersionModel: values.normalizedVersionModel || null,
+      name: values.name,
+      version: values.version || null,
       releaseChannel: values.releaseChannel || null,
       supportTier: values.supportTier || null,
       company: {
@@ -148,14 +163,31 @@ const HardwareVersionsPage = () => {
       }
     }
 
+    if (hasLifecycleRecordData(values)) {
+      input.lifecycleRecords = {
+        create: [
+          {
+            node: {
+              lifecycleStatus: values.lifecycleStatus || null,
+              eosDate: normalizeDateValue(values.eosDate),
+              eolDate: normalizeDateValue(values.eolDate),
+              company: {
+                connect: [{ where: { node: { id: { eq: selectedCompanyId } } } }],
+              },
+            },
+          },
+        ],
+      }
+    }
+
     await createHardwareVersion({ variables: { input: [input] } })
     setShowCreateForm(false)
   }
 
   const handleUpdate = async (id: string, values: HardwareVersionFormValues) => {
     const input: Record<string, any> = {
-      versionModelString: { set: values.versionModelString },
-      normalizedVersionModel: { set: values.normalizedVersionModel || null },
+      name: { set: values.name },
+      version: { set: values.version || null },
       releaseChannel: { set: values.releaseChannel || null },
       supportTier: { set: values.supportTier || null },
       hardwareProduct: {
@@ -166,6 +198,38 @@ const HardwareVersionsPage = () => {
             }
           : {}),
       },
+    }
+
+    if (values.lifecycleRecordId) {
+      input.lifecycleRecords = [
+        {
+          update: {
+            where: { node: { id: { eq: values.lifecycleRecordId } } },
+            node: {
+              lifecycleStatus: { set: values.lifecycleStatus || null },
+              eosDate: { set: normalizeDateValue(values.eosDate) },
+              eolDate: { set: normalizeDateValue(values.eolDate) },
+            },
+          },
+        },
+      ]
+    } else if (hasLifecycleRecordData(values) && selectedCompanyId) {
+      input.lifecycleRecords = [
+        {
+          create: [
+            {
+              node: {
+                lifecycleStatus: values.lifecycleStatus || null,
+                eosDate: normalizeDateValue(values.eosDate),
+                eolDate: normalizeDateValue(values.eolDate),
+                company: {
+                  connect: [{ where: { node: { id: { eq: selectedCompanyId } } } }],
+                },
+              },
+            },
+          ],
+        },
+      ]
     }
 
     await updateHardwareVersion({ variables: { id, input } })

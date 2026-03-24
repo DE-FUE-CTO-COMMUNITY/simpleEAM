@@ -20,6 +20,8 @@ import {
   Chip,
   Autocomplete,
   DialogContentText,
+  Checkbox,
+  FormControlLabel,
 } from '@mui/material'
 import {
   Save as SaveIcon,
@@ -747,6 +749,34 @@ const GenericForm: React.FC<GenericFormProps> = ({
                   />
                 )}
 
+                {field.type === 'checkbox' && (
+                  <Box>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={!!formField.state.value}
+                          onChange={e => {
+                            const value = e.target.checked
+                            formField.handleChange(value)
+                            field.onChange?.(value)
+                          }}
+                          onBlur={formField.handleBlur}
+                          disabled={disabled}
+                        />
+                      }
+                      label={field.label + (field.required ? ' *' : '')}
+                    />
+                    {getHelperText() && (
+                      <Typography
+                        variant="caption"
+                        color={finalShouldShowError ? 'error' : 'text.secondary'}
+                      >
+                        {getHelperText()}
+                      </Typography>
+                    )}
+                  </Box>
+                )}
+
                 {field.type === 'autocomplete' && (
                   <Autocomplete
                     options={(field.options || []).slice().sort((a, b) => {
@@ -754,7 +784,53 @@ const GenericForm: React.FC<GenericFormProps> = ({
                       const labelB = typeof b === 'string' ? b : b?.label || ''
                       return labelA.localeCompare(labelB, 'de', { sensitivity: 'base' })
                     })}
-                    value={formField.state.value}
+                    value={
+                      field.multiple
+                        ? Array.isArray(formField.state.value)
+                          ? formField.state.value.map((item: unknown) => {
+                              if (typeof item === 'object' && item !== null) {
+                                return item
+                              }
+
+                              const matchedOption = (field.options || []).find(option => {
+                                if (
+                                  typeof option === 'object' &&
+                                  option !== null &&
+                                  'value' in option
+                                ) {
+                                  return option.value === item
+                                }
+                                return option === item
+                              })
+
+                              return matchedOption ?? item
+                            })
+                          : []
+                        : (() => {
+                            const currentValue = formField.state.value
+
+                            if (currentValue === null || currentValue === undefined) {
+                              return currentValue
+                            }
+
+                            if (typeof currentValue === 'object') {
+                              return currentValue
+                            }
+
+                            const matchedOption = (field.options || []).find(option => {
+                              if (
+                                typeof option === 'object' &&
+                                option !== null &&
+                                'value' in option
+                              ) {
+                                return option.value === currentValue
+                              }
+                              return option === currentValue
+                            })
+
+                            return matchedOption ?? currentValue
+                          })()
+                    }
                     onChange={(_, newValue) => {
                       // Extrahiere IDs/Werte aus Objekten bei Multiple-Auswahl
                       let processedValue = newValue

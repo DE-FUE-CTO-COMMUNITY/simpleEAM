@@ -34,7 +34,7 @@ const SoftwareVersionsPage = () => {
   const companyWhere = useCompanyWhere('company')
 
   const [globalFilter, setGlobalFilter] = useState('')
-  const [sorting, setSorting] = useState([{ id: 'versionString', desc: false }])
+  const [sorting, setSorting] = useState([{ id: 'name', desc: false }])
   const [tableInstance, setTableInstance] = useState<any>(null)
   const [filterOpen, setFilterOpen] = useState(false)
   const [showCreateForm, setShowCreateForm] = useState(false)
@@ -126,6 +126,21 @@ const SoftwareVersionsPage = () => {
     },
   })
 
+  const normalizeDateValue = (value: unknown) => {
+    if (!value) {
+      return null
+    }
+
+    if (value instanceof Date) {
+      return value.toISOString().slice(0, 10)
+    }
+
+    return String(value)
+  }
+
+  const hasLifecycleRecordData = (values: SoftwareVersionFormValues) =>
+    !!(values.lifecycleStatus || values.eosDate || values.eolDate)
+
   const handleCreate = async (values: SoftwareVersionFormValues) => {
     if (!selectedCompanyId) {
       enqueueSnackbar(t('messages.selectCompanyFirst'), { variant: 'warning' })
@@ -133,8 +148,8 @@ const SoftwareVersionsPage = () => {
     }
 
     const input: Record<string, any> = {
-      versionString: values.versionString,
-      normalizedVersion: values.normalizedVersion || null,
+      name: values.name,
+      version: values.version || null,
       releaseChannel: values.releaseChannel || null,
       supportTier: values.supportTier || null,
       isLts: values.isLts ?? false,
@@ -149,14 +164,31 @@ const SoftwareVersionsPage = () => {
       }
     }
 
+    if (hasLifecycleRecordData(values)) {
+      input.lifecycleRecords = {
+        create: [
+          {
+            node: {
+              lifecycleStatus: values.lifecycleStatus || null,
+              eosDate: normalizeDateValue(values.eosDate),
+              eolDate: normalizeDateValue(values.eolDate),
+              company: {
+                connect: [{ where: { node: { id: { eq: selectedCompanyId } } } }],
+              },
+            },
+          },
+        ],
+      }
+    }
+
     await createSoftwareVersion({ variables: { input: [input] } })
     setShowCreateForm(false)
   }
 
   const handleUpdate = async (id: string, values: SoftwareVersionFormValues) => {
     const input: Record<string, any> = {
-      versionString: { set: values.versionString },
-      normalizedVersion: { set: values.normalizedVersion || null },
+      name: { set: values.name },
+      version: { set: values.version || null },
       releaseChannel: { set: values.releaseChannel || null },
       supportTier: { set: values.supportTier || null },
       isLts: { set: values.isLts ?? false },
@@ -168,6 +200,38 @@ const SoftwareVersionsPage = () => {
             }
           : {}),
       },
+    }
+
+    if (values.lifecycleRecordId) {
+      input.lifecycleRecords = [
+        {
+          update: {
+            where: { node: { id: { eq: values.lifecycleRecordId } } },
+            node: {
+              lifecycleStatus: { set: values.lifecycleStatus || null },
+              eosDate: { set: normalizeDateValue(values.eosDate) },
+              eolDate: { set: normalizeDateValue(values.eolDate) },
+            },
+          },
+        },
+      ]
+    } else if (hasLifecycleRecordData(values) && selectedCompanyId) {
+      input.lifecycleRecords = [
+        {
+          create: [
+            {
+              node: {
+                lifecycleStatus: values.lifecycleStatus || null,
+                eosDate: normalizeDateValue(values.eosDate),
+                eolDate: normalizeDateValue(values.eolDate),
+                company: {
+                  connect: [{ where: { node: { id: { eq: selectedCompanyId } } } }],
+                },
+              },
+            },
+          ],
+        },
+      ]
     }
 
     await updateSoftwareVersion({ variables: { id, input } })

@@ -20,7 +20,7 @@ export const useSoftwareVersionFilter = ({
     return softwareVersions.filter(version => {
       if (
         filterState.versionFilter &&
-        !version.versionString.toLowerCase().includes(filterState.versionFilter.toLowerCase())
+        !version.name.toLowerCase().includes(filterState.versionFilter.toLowerCase())
       ) {
         return false
       }

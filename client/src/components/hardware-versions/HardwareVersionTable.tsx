@@ -10,8 +10,8 @@ import { formatDate } from './utils'
 import usePersistentColumnVisibility from '@/hooks/usePersistentColumnVisibility'
 
 export const HARDWARE_VERSION_DEFAULT_COLUMN_VISIBILITY = {
-  versionModelString: true,
-  normalizedVersionModel: true,
+  name: true,
+  version: true,
   releaseChannel: true,
   supportTier: true,
   hardwareProduct: true,
@@ -71,11 +71,11 @@ const HardwareVersionTable: React.FC<HardwareVersionTableProps> = ({
 
   const columns = useMemo(
     () => [
-      columnHelper.accessor('versionModelString', {
+      columnHelper.accessor('name', {
         header: t('versionModelString'),
         cell: info => info.getValue(),
       }),
-      columnHelper.accessor('normalizedVersionModel', {
+      columnHelper.accessor('version', {
         header: t('normalizedVersionModel'),
         cell: info => info.getValue() || '-',
       }),
@@ -116,8 +116,12 @@ const HardwareVersionTable: React.FC<HardwareVersionTableProps> = ({
   )
 
   const mapToFormValues = (item: HardwareVersionType): HardwareVersionFormValues => ({
-    versionModelString: item.versionModelString,
-    normalizedVersionModel: item.normalizedVersionModel ?? '',
+    lifecycleRecordId: item.lifecycleRecords?.[0]?.id ?? '',
+    lifecycleStatus: item.lifecycleRecords?.[0]?.lifecycleStatus ?? null,
+    eosDate: item.lifecycleRecords?.[0]?.eosDate ?? null,
+    eolDate: item.lifecycleRecords?.[0]?.eolDate ?? null,
+    name: item.name,
+    version: item.version ?? '',
     releaseChannel: item.releaseChannel ?? '',
     supportTier: item.supportTier ?? '',
     hardwareProductId: item.hardwareProduct?.[0]?.id ?? '',

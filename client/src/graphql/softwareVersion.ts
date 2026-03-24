@@ -16,8 +16,8 @@ export const GET_SOFTWARE_VERSIONS = gql`
   query GetSoftwareVersions($where: SoftwareVersionWhere) {
     softwareVersions(where: $where) {
       id
-      versionString
-      normalizedVersion
+      name
+      version
       releaseChannel
       isLts
       supportTier
@@ -42,7 +42,7 @@ export const CREATE_SOFTWARE_VERSION = gql`
     createSoftwareVersions(input: $input) {
       softwareVersions {
         id
-        versionString
+        name
       }
     }
   }
@@ -53,7 +53,7 @@ export const UPDATE_SOFTWARE_VERSION = gql`
     updateSoftwareVersions(where: { id: { eq: $id } }, update: $input) {
       softwareVersions {
         id
-        versionString
+        name
       }
     }
   }

@@ -904,7 +904,7 @@ type SoftwareProduct
   ) {
   id: ID! @id
   name: String!
-  productFamily: String
+  productFamily: [ProductFamily!]! @relationship(type: "HAS_PRODUCT_FAMILY", direction: OUT)
   lifecycleStatus: LifecycleStatus
   isActive: Boolean
   createdAt: DateTime! @timestamp(operations: [CREATE])
@@ -950,8 +950,8 @@ type SoftwareVersion
     ]
   ) {
   id: ID! @id
-  versionString: String!
-  normalizedVersion: String
+  name: String!
+  version: String
   releaseChannel: String
   isLts: Boolean
   supportTier: String
@@ -994,7 +994,7 @@ type HardwareProduct
   ) {
   id: ID! @id
   name: String!
-  productFamily: String
+  productFamily: [ProductFamily!]! @relationship(type: "HAS_PRODUCT_FAMILY", direction: OUT)
   lifecycleStatus: LifecycleStatus
   isActive: Boolean
   createdAt: DateTime! @timestamp(operations: [CREATE])
@@ -1039,8 +1039,8 @@ type HardwareVersion
     ]
   ) {
   id: ID! @id
-  versionModelString: String!
-  normalizedVersionModel: String
+  name: String!
+  version: String
   releaseChannel: String
   supportTier: String
   createdAt: DateTime! @timestamp(operations: [CREATE])
@@ -1048,6 +1048,38 @@ type HardwareVersion
   company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
   hardwareProduct: [HardwareProduct!]! @relationship(type: "HAS_HARDWARE_VERSION", direction: IN)
   lifecycleRecords: [LifecycleRecord!]! @relationship(type: "HAS_LIFECYCLE_RECORD", direction: OUT)
+}
+
+"""
+ProductFamily – shared family taxonomy for software and hardware products
+"""
+type ProductFamily
+  @node
+  @authorization(
+    validate: [
+      { operations: [CREATE], where: { jwt: { roles: { includes: "architect" } } } }
+      { operations: [UPDATE, DELETE], where: { jwt: { roles: { includes: "architect" } } } }
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "admin" } } } }
+    ]
+    filter: [
+      {
+        where: {
+          OR: [
+            { jwt: { roles: { includes: "admin" } } }
+            { jwt: { roles: { includes: "architect" } } }
+          ]
+        }
+      }
+    ]
+  ) {
+  id: ID! @id
+  name: String!
+  category: ProductFamilyCategory!
+  type: ProductFamilyType!
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime @timestamp(operations: [UPDATE])
+  softwareProducts: [SoftwareProduct!]! @relationship(type: "HAS_PRODUCT_FAMILY", direction: IN)
+  hardwareProducts: [HardwareProduct!]! @relationship(type: "HAS_PRODUCT_FAMILY", direction: IN)
 }
 
 """
@@ -1421,6 +1453,34 @@ enum LifecycleStatus {
   EOS
   EOL
   UNSUPPORTED
+}
+
+"""
+Product family type distinguishing software and hardware families
+"""
+enum ProductFamilyType {
+  HARDWARE
+  SOFTWARE
+}
+
+"""
+Fixed product family categories (i18n labels are resolved in the client)
+"""
+enum ProductFamilyCategory {
+  COMPUTE_END_USER_DEVICES
+  NETWORK_DEVICES
+  STORAGE_DATA_INFRASTRUCTURE
+  SECURITY_HARDWARE
+  PERIPHERALS_OUTPUT_DEVICES
+  DATA_CENTER_INFRASTRUCTURE
+  OPERATING_PLATFORM_SOFTWARE
+  INFRASTRUCTURE_PLATFORM_SOFTWARE
+  CLOUD_PLATFORM_SERVICES
+  SECURITY_SOFTWARE
+  MANAGEMENT_OPERATIONS_SOFTWARE
+  END_USER_COLLABORATION_SOFTWARE
+  DEVELOPMENT_ENGINEERING_SOFTWARE
+  BUSINESS_ENTERPRISE_APPLICATIONS
 }
 
 """

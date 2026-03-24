@@ -17,7 +17,12 @@ export const GET_SOFTWARE_PRODUCTS = gql`
     softwareProducts(where: $where) {
       id
       name
-      productFamily
+      productFamily {
+        id
+        name
+        category
+        type
+      }
       lifecycleStatus
       isActive
       createdAt
@@ -36,8 +41,8 @@ export const GET_SOFTWARE_PRODUCTS = gql`
       }
       versions {
         id
-        versionString
-        normalizedVersion
+        name
+        version
       }
       usedByApplications {
         id
