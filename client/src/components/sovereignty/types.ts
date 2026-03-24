@@ -1,4 +1,9 @@
-export type EntityType = 'capability' | 'application' | 'aicomponent' | 'dataobject'
+export type EntityType =
+  | 'capability'
+  | 'application'
+  | 'aicomponent'
+  | 'dataobject'
+  | 'infrastructure'
 
 export interface EntityRef {
   id: string

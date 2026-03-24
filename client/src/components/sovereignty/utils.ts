@@ -38,6 +38,26 @@ export interface AchievedEntity {
   sovereigntyAchSupplyChainTransparency?: string | null
 }
 
+interface EntityRef {
+  id: string
+}
+
+interface DependencyInfrastructure extends AchievedEntity {
+  parentInfrastructure?: AchievedEntity | null
+}
+
+interface HasInfrastructureDependencies {
+  hostedOn?: DependencyInfrastructure[] | null
+}
+
+export interface DependencyApplication extends AchievedEntity, HasInfrastructureDependencies {
+  components?: EntityRef[] | null
+}
+
+export interface DependencyAIComponent extends AchievedEntity, HasInfrastructureDependencies {
+  usedByApplications?: EntityRef[] | null
+}
+
 export interface RequirementEntity {
   id: string
   name: string
@@ -68,8 +88,161 @@ export function computeEntityRequiredScore(entity: RequirementEntity): number {
 // Aggregate achieved scores across multiple entities (avg of entity averages)
 export function computeAggregatedAchievedScore(entities: AchievedEntity[]): number {
   if (entities.length === 0) return 0
-  const entityScores = entities.map(computeEntityAchivedScore)
-  return entityScores.reduce((sum, s) => sum + s, 0) / entityScores.length
+  const minScoresByDimension = SOVEREIGNTY_ACH_FIELDS.map(field => {
+    const explicitScores = entities
+      .map(entity => entity[field] as string | null | undefined)
+      .filter((value): value is string => value != null)
+      .map(maturityScore)
+
+    if (explicitScores.length === 0) {
+      return null
+    }
+
+    return explicitScores.reduce((min, score) => (score < min ? score : min), explicitScores[0])
+  }).filter((score): score is number => score !== null)
+
+  if (minScoresByDimension.length === 0) {
+    return 0
+  }
+
+  return minScoresByDimension.reduce((sum, s) => sum + s, 0) / minScoresByDimension.length
+}
+
+function mergeAchievedEntity(existing: AchievedEntity, incoming: AchievedEntity): AchievedEntity {
+  return {
+    ...existing,
+    ...incoming,
+    name: existing.name || incoming.name,
+    sovereigntyAchDataResidency:
+      existing.sovereigntyAchDataResidency ?? incoming.sovereigntyAchDataResidency,
+    sovereigntyAchJurisdictionControl:
+      existing.sovereigntyAchJurisdictionControl ?? incoming.sovereigntyAchJurisdictionControl,
+    sovereigntyAchOperationalControl:
+      existing.sovereigntyAchOperationalControl ?? incoming.sovereigntyAchOperationalControl,
+    sovereigntyAchInteroperability:
+      existing.sovereigntyAchInteroperability ?? incoming.sovereigntyAchInteroperability,
+    sovereigntyAchPortability:
+      existing.sovereigntyAchPortability ?? incoming.sovereigntyAchPortability,
+    sovereigntyAchSupplyChainTransparency:
+      existing.sovereigntyAchSupplyChainTransparency ??
+      incoming.sovereigntyAchSupplyChainTransparency,
+  }
+}
+
+function addAchievedEntity(
+  target: Map<string, AchievedEntity>,
+  entity: AchievedEntity | null | undefined
+) {
+  if (!entity) return
+  const existing = target.get(entity.id)
+  if (!existing) {
+    target.set(entity.id, entity)
+    return
+  }
+  target.set(entity.id, mergeAchievedEntity(existing, entity))
+}
+
+function addAssociatedInfrastructure(
+  target: Map<string, AchievedEntity>,
+  entity: HasInfrastructureDependencies | null | undefined
+) {
+  const buildEffectiveInfrastructure = (
+    infrastructure: DependencyInfrastructure
+  ): AchievedEntity => {
+    const parent = infrastructure.parentInfrastructure
+    if (!parent) {
+      return infrastructure
+    }
+
+    // Inherit sovereignty achievements from parent infrastructure when a parent exists.
+    return {
+      ...infrastructure,
+      sovereigntyAchDataResidency: parent.sovereigntyAchDataResidency,
+      sovereigntyAchJurisdictionControl: parent.sovereigntyAchJurisdictionControl,
+      sovereigntyAchOperationalControl: parent.sovereigntyAchOperationalControl,
+      sovereigntyAchInteroperability: parent.sovereigntyAchInteroperability,
+      sovereigntyAchPortability: parent.sovereigntyAchPortability,
+      sovereigntyAchSupplyChainTransparency: parent.sovereigntyAchSupplyChainTransparency,
+    }
+  }
+
+  if (!entity) return
+  const relationLists = [entity.hostedOn]
+  for (const list of relationLists) {
+    if (!list) continue
+    for (const infrastructure of list) {
+      addAchievedEntity(target, buildEffectiveInfrastructure(infrastructure))
+    }
+  }
+}
+
+interface DependencyTreeParams {
+  rootApplications: AchievedEntity[]
+  rootAIComponents?: AchievedEntity[]
+  allApplications: DependencyApplication[]
+  allAIComponents: DependencyAIComponent[]
+}
+
+export function collectAchievedDependencyTree({
+  rootApplications,
+  rootAIComponents = [],
+  allApplications,
+  allAIComponents,
+}: DependencyTreeParams): AchievedEntity[] {
+  const allById = new Map<string, AchievedEntity>()
+  const appById = new Map(allApplications.map(app => [app.id, app]))
+  const aiById = new Map(allAIComponents.map(ai => [ai.id, ai]))
+  const rootAppById = new Map(rootApplications.map(app => [app.id, app]))
+  const rootAiById = new Map(rootAIComponents.map(ai => [ai.id, ai as DependencyAIComponent]))
+
+  const visitedApplicationIds = new Set<string>()
+  const applicationStack = rootApplications.map(app => app.id)
+
+  while (applicationStack.length > 0) {
+    const applicationId = applicationStack.pop()
+    if (!applicationId || visitedApplicationIds.has(applicationId)) {
+      continue
+    }
+
+    visitedApplicationIds.add(applicationId)
+
+    const application =
+      appById.get(applicationId) ??
+      (rootAppById.get(applicationId) as DependencyApplication | undefined)
+    if (!application) {
+      continue
+    }
+
+    addAchievedEntity(allById, application)
+    addAssociatedInfrastructure(allById, application)
+
+    for (const componentRef of application.components ?? []) {
+      if (componentRef?.id && !visitedApplicationIds.has(componentRef.id)) {
+        applicationStack.push(componentRef.id)
+      }
+    }
+  }
+
+  const aiIds = new Set(rootAIComponents.map(ai => ai.id))
+  for (const ai of allAIComponents) {
+    const isLinkedToVisitedApp = (ai.usedByApplications ?? []).some(app =>
+      visitedApplicationIds.has(app.id)
+    )
+    if (isLinkedToVisitedApp) {
+      aiIds.add(ai.id)
+    }
+  }
+
+  aiIds.forEach(aiId => {
+    const aiComponent = aiById.get(aiId) ?? rootAiById.get(aiId)
+    if (!aiComponent) {
+      return
+    }
+    addAchievedEntity(allById, aiComponent)
+    addAssociatedInfrastructure(allById, aiComponent)
+  })
+
+  return Array.from(allById.values())
 }
 
 export function formatSovereigntyScore(score: number): string {

@@ -1603,7 +1603,7 @@ export async function fetchSovereigntyReqEntities(input: {
     sovereigntyReqWeight
   `
 
-  const [capabilities, processes, dataObjs, principles] = await Promise.all([
+  const [capabilities, dataObjs] = await Promise.all([
     fetchAllPages<SovereigntyEntity>(offset =>
       graphqlRequest<{ businessCapabilities: SovereigntyEntity[] }>({
         query: `query FetchCapReq($where: BusinessCapabilityWhere, $limit: Int!, $offset: Int!) {
@@ -1614,15 +1614,6 @@ export async function fetchSovereigntyReqEntities(input: {
       }).then(d => d.businessCapabilities)
     ),
     fetchAllPages<SovereigntyEntity>(offset =>
-      graphqlRequest<{ businessProcesses: SovereigntyEntity[] }>({
-        query: `query FetchBpReq($where: BusinessProcessWhere, $limit: Int!, $offset: Int!) {
-          businessProcesses(where: $where, limit: $limit, offset: $offset) { ${reqFields} }
-        }`,
-        variables: { where: companyFilter, limit: SOVEREIGNTY_BATCH_SIZE, offset },
-        accessToken: input.accessToken,
-      }).then(d => d.businessProcesses)
-    ),
-    fetchAllPages<SovereigntyEntity>(offset =>
       graphqlRequest<{ dataObjects: SovereigntyEntity[] }>({
         query: `query FetchDoReq($where: DataObjectWhere, $limit: Int!, $offset: Int!) {
           dataObjects(where: $where, limit: $limit, offset: $offset) { ${reqFields} }
@@ -1631,18 +1622,9 @@ export async function fetchSovereigntyReqEntities(input: {
         accessToken: input.accessToken,
       }).then(d => d.dataObjects)
     ),
-    fetchAllPages<SovereigntyEntity>(offset =>
-      graphqlRequest<{ architecturePrinciples: SovereigntyEntity[] }>({
-        query: `query FetchApReq($where: ArchitecturePrincipleWhere, $limit: Int!, $offset: Int!) {
-          architecturePrinciples(where: $where, limit: $limit, offset: $offset) { ${reqFields} }
-        }`,
-        variables: { where: companyFilter, limit: SOVEREIGNTY_BATCH_SIZE, offset },
-        accessToken: input.accessToken,
-      }).then(d => d.architecturePrinciples)
-    ),
   ])
 
-  return [...capabilities, ...processes, ...dataObjs, ...principles]
+  return [...capabilities, ...dataObjs]
 }
 
 export async function fetchSovereigntyAchEntities(input: {
@@ -1714,34 +1696,34 @@ export async function computeSovereigntyScores(input: {
   readonly reqEntities: SovereigntyEntity[]
   readonly achEntities: SovereigntyEntity[]
 }): Promise<SovereigntyScores> {
-  const weightedAvg = (
-    entities: SovereigntyEntity[],
-    dims: readonly string[],
-    weightField?: string
+  const extractEntityScore = (
+    entity: SovereigntyEntity,
+    dims: readonly string[]
   ): number | null => {
-    let wSum = 0
-    let wTotal = 0
-    for (const entity of entities) {
-      const scores = dims
-        .map(dim => {
-          const val = entity[dim]
-          return typeof val === 'string' ? (MATURITY_SCORE[val] ?? null) : null
-        })
-        .filter((s): s is number => s !== null)
-      if (scores.length === 0) continue
-      const entityScore = scores.reduce((a, b) => a + b, 0) / scores.length
-      const weight =
-        weightField && typeof entity[weightField] === 'number'
-          ? (entity[weightField] as number)
-          : 1.0
-      wSum += weight * entityScore
-      wTotal += weight
+    const scores = dims
+      .map(dim => {
+        const val = entity[dim]
+        return typeof val === 'string' ? (MATURITY_SCORE[val] ?? null) : null
+      })
+      .filter((s): s is number => s !== null)
+
+    if (scores.length === 0) {
+      return null
     }
-    return wTotal > 0 ? wSum / wTotal : null
+
+    return scores.reduce((a, b) => a + b, 0) / scores.length
   }
 
-  const expectedSovereigntyScore = weightedAvg(input.reqEntities, REQ_DIMS, 'sovereigntyReqWeight')
-  const achievedSovereigntyScore = weightedAvg(input.achEntities, ACH_DIMS)
+  const reqScores = input.reqEntities
+    .map(entity => extractEntityScore(entity, REQ_DIMS))
+    .filter((score): score is number => score !== null)
+
+  const achScores = input.achEntities
+    .map(entity => extractEntityScore(entity, ACH_DIMS))
+    .filter((score): score is number => score !== null)
+
+  const expectedSovereigntyScore = reqScores.length > 0 ? Math.max(...reqScores) : null
+  const achievedSovereigntyScore = achScores.length > 0 ? Math.min(...achScores) : null
   const sovereigntyGap =
     expectedSovereigntyScore !== null && achievedSovereigntyScore !== null
       ? expectedSovereigntyScore - achievedSovereigntyScore

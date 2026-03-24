@@ -1,7 +1,11 @@
 import { gql } from '@apollo/client/core'
 
 export const GET_SOVEREIGNTY_CAPABILITY_DETAIL = gql`
-  query GetSovereigntyCapabilityDetail($where: BusinessCapabilityWhere) {
+  query GetSovereigntyCapabilityDetail(
+    $where: BusinessCapabilityWhere
+    $applicationWhere: ApplicationWhere
+    $aiComponentWhere: AIComponentWhere
+  ) {
     businessCapabilities(where: $where) {
       id
       name
@@ -33,11 +37,81 @@ export const GET_SOVEREIGNTY_CAPABILITY_DETAIL = gql`
         sovereigntyAchSupplyChainTransparency
       }
     }
+    applications(where: $applicationWhere) {
+      id
+      name
+      sovereigntyAchDataResidency
+      sovereigntyAchJurisdictionControl
+      sovereigntyAchOperationalControl
+      sovereigntyAchInteroperability
+      sovereigntyAchPortability
+      sovereigntyAchSupplyChainTransparency
+      components {
+        id
+      }
+      hostedOn {
+        id
+        name
+        sovereigntyAchDataResidency
+        sovereigntyAchJurisdictionControl
+        sovereigntyAchOperationalControl
+        sovereigntyAchInteroperability
+        sovereigntyAchPortability
+        sovereigntyAchSupplyChainTransparency
+        parentInfrastructure {
+          id
+          name
+          sovereigntyAchDataResidency
+          sovereigntyAchJurisdictionControl
+          sovereigntyAchOperationalControl
+          sovereigntyAchInteroperability
+          sovereigntyAchPortability
+          sovereigntyAchSupplyChainTransparency
+        }
+      }
+    }
+    aiComponents(where: $aiComponentWhere) {
+      id
+      name
+      sovereigntyAchDataResidency
+      sovereigntyAchJurisdictionControl
+      sovereigntyAchOperationalControl
+      sovereigntyAchInteroperability
+      sovereigntyAchPortability
+      sovereigntyAchSupplyChainTransparency
+      usedByApplications {
+        id
+      }
+      hostedOn {
+        id
+        name
+        sovereigntyAchDataResidency
+        sovereigntyAchJurisdictionControl
+        sovereigntyAchOperationalControl
+        sovereigntyAchInteroperability
+        sovereigntyAchPortability
+        sovereigntyAchSupplyChainTransparency
+        parentInfrastructure {
+          id
+          name
+          sovereigntyAchDataResidency
+          sovereigntyAchJurisdictionControl
+          sovereigntyAchOperationalControl
+          sovereigntyAchInteroperability
+          sovereigntyAchPortability
+          sovereigntyAchSupplyChainTransparency
+        }
+      }
+    }
   }
 `
 
 export const GET_SOVEREIGNTY_DATA_DETAIL = gql`
-  query GetSovereigntyDataDetail($where: DataObjectWhere) {
+  query GetSovereigntyDataDetail(
+    $where: DataObjectWhere
+    $applicationWhere: ApplicationWhere
+    $aiComponentWhere: AIComponentWhere
+  ) {
     dataObjects(where: $where) {
       id
       name
@@ -57,6 +131,72 @@ export const GET_SOVEREIGNTY_DATA_DETAIL = gql`
         sovereigntyAchInteroperability
         sovereigntyAchPortability
         sovereigntyAchSupplyChainTransparency
+      }
+    }
+    applications(where: $applicationWhere) {
+      id
+      name
+      sovereigntyAchDataResidency
+      sovereigntyAchJurisdictionControl
+      sovereigntyAchOperationalControl
+      sovereigntyAchInteroperability
+      sovereigntyAchPortability
+      sovereigntyAchSupplyChainTransparency
+      components {
+        id
+      }
+      hostedOn {
+        id
+        name
+        sovereigntyAchDataResidency
+        sovereigntyAchJurisdictionControl
+        sovereigntyAchOperationalControl
+        sovereigntyAchInteroperability
+        sovereigntyAchPortability
+        sovereigntyAchSupplyChainTransparency
+        parentInfrastructure {
+          id
+          name
+          sovereigntyAchDataResidency
+          sovereigntyAchJurisdictionControl
+          sovereigntyAchOperationalControl
+          sovereigntyAchInteroperability
+          sovereigntyAchPortability
+          sovereigntyAchSupplyChainTransparency
+        }
+      }
+    }
+    aiComponents(where: $aiComponentWhere) {
+      id
+      name
+      sovereigntyAchDataResidency
+      sovereigntyAchJurisdictionControl
+      sovereigntyAchOperationalControl
+      sovereigntyAchInteroperability
+      sovereigntyAchPortability
+      sovereigntyAchSupplyChainTransparency
+      usedByApplications {
+        id
+      }
+      hostedOn {
+        id
+        name
+        sovereigntyAchDataResidency
+        sovereigntyAchJurisdictionControl
+        sovereigntyAchOperationalControl
+        sovereigntyAchInteroperability
+        sovereigntyAchPortability
+        sovereigntyAchSupplyChainTransparency
+        parentInfrastructure {
+          id
+          name
+          sovereigntyAchDataResidency
+          sovereigntyAchJurisdictionControl
+          sovereigntyAchOperationalControl
+          sovereigntyAchInteroperability
+          sovereigntyAchPortability
+          sovereigntyAchSupplyChainTransparency
+        }
       }
     }
   }

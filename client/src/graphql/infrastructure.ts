@@ -57,6 +57,14 @@ export const GET_INFRASTRUCTURES = gql`
       parentInfrastructure {
         id
         name
+        sovereigntyAchDataResidency
+        sovereigntyAchJurisdictionControl
+        sovereigntyAchOperationalControl
+        sovereigntyAchInteroperability
+        sovereigntyAchPortability
+        sovereigntyAchSupplyChainTransparency
+        sovereigntyEvidence
+        lastSovereigntyAssessmentAt
       }
       childInfrastructures {
         id

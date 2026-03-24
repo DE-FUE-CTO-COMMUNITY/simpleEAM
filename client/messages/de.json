@@ -2016,6 +2016,9 @@
       "createNew": "Neue Infrastruktur erstellen",
       "edit": "Infrastruktur bearbeiten",
       "details": "Infrastruktur-Details",
+      "sovereigntyInheritedFromParent": "Souveränitätsinformationen werden von der übergeordneten Infrastruktur übernommen:",
+      "parentSovereigntyDataAvailable": "Souveränitätsdaten sind in der übergeordneten Infrastruktur vorhanden.",
+      "parentSovereigntyDataMissing": "In der übergeordneten Infrastruktur sind keine Souveränitätsdaten gesetzt.",
       "createTitle": "Neue Infrastruktur erstellen",
       "editTitle": "Infrastruktur bearbeiten",
       "viewTitle": "Infrastruktur-Details",
@@ -3168,7 +3171,8 @@
       "capability": "Fähigkeit",
       "application": "Anwendung",
       "aicomponent": "KI-Komponente",
-      "dataobject": "Datenobjekt"
+      "dataobject": "Datenobjekt",
+      "infrastructure": "Infrastruktur"
     },
     "noCapabilities": "Keine Fähigkeiten für das ausgewählte Unternehmen gefunden.",
     "noDataObjects": "Keine Datenobjekte für das ausgewählte Unternehmen gefunden.",

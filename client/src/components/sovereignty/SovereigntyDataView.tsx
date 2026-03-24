@@ -9,9 +9,12 @@ import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import { GET_SOVEREIGNTY_DATA_DETAIL } from '@/graphql/sovereigntyDetail'
 import {
   AchievedEntity,
+  collectAchievedDependencyTree,
   computeAggregatedAchievedScore,
   computeEntityAchivedScore,
   computeEntityRequiredScore,
+  DependencyAIComponent,
+  DependencyApplication,
   formatSovereigntyScore,
   hasAnySovereigntyAchs,
   hasAnySovereigntyReqs,
@@ -44,11 +47,13 @@ export default function SovereigntyDataView({ onEntityClick }: SovereigntyDataVi
   const t = useTranslations('sovereigntyDetail')
   const { selectedCompanyId } = useCompanyContext()
   const companyWhere = useCompanyWhere('company')
+  const applicationWhere = useCompanyWhere('company')
+  const aiComponentWhere = useCompanyWhere('company')
 
   const { data, loading, error } = useQuery(GET_SOVEREIGNTY_DATA_DETAIL, {
     skip: !selectedCompanyId,
     fetchPolicy: 'cache-and-network',
-    variables: { where: companyWhere },
+    variables: { where: companyWhere, applicationWhere, aiComponentWhere },
   })
 
   if (!selectedCompanyId) {
@@ -68,6 +73,10 @@ export default function SovereigntyDataView({ onEntityClick }: SovereigntyDataVi
   }
 
   const dataObjects: DataObjectItem[] = data?.dataObjects ?? []
+  const allApplications: DependencyApplication[] = data?.applications ?? []
+  const allAIComponents: DependencyAIComponent[] = data?.aiComponents ?? []
+  const applicationIds = new Set(allApplications.map(app => app.id))
+  const aiComponentIds = new Set(allAIComponents.map(ai => ai.id))
 
   if (dataObjects.length === 0) {
     return (
@@ -80,15 +89,17 @@ export default function SovereigntyDataView({ onEntityClick }: SovereigntyDataVi
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
       {dataObjects.map(dataObject => {
+        const allAssociated: AchievedEntity[] = collectAchievedDependencyTree({
+          rootApplications: dataObject.usedByApplications,
+          allApplications,
+          allAIComponents,
+        })
+
         const hasReqs = hasAnySovereigntyReqs(dataObject)
-        const hasAchs =
-          dataObject.usedByApplications.length > 0 &&
-          dataObject.usedByApplications.some(hasAnySovereigntyAchs)
+        const hasAchs = allAssociated.length > 0 && allAssociated.some(hasAnySovereigntyAchs)
 
         const expectedScore = hasReqs ? computeEntityRequiredScore(dataObject) : null
-        const achievedScore = hasAchs
-          ? computeAggregatedAchievedScore(dataObject.usedByApplications)
-          : null
+        const achievedScore = hasAchs ? computeAggregatedAchievedScore(allAssociated) : null
         const gap =
           expectedScore !== null && achievedScore !== null ? achievedScore - expectedScore : null
 
@@ -129,27 +140,44 @@ export default function SovereigntyDataView({ onEntityClick }: SovereigntyDataVi
               </Box>
             </Box>
 
-            {dataObject.usedByApplications.length > 0 ? (
+            {allAssociated.length > 0 ? (
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 1 }}>
-                {dataObject.usedByApplications.map(app => (
-                  <Tooltip
-                    key={app.id}
-                    title={
-                      hasAnySovereigntyAchs(app)
-                        ? `${t('achievedScore')}: ${formatSovereigntyScore(computeEntityAchivedScore(app))}`
-                        : t('noSovereigntyData')
-                    }
-                    arrow
-                  >
-                    <Chip
-                      label={`${app.name} (${t('entityTypes.application')})`}
-                      size="small"
-                      variant="outlined"
-                      onClick={() => onEntityClick({ id: app.id, type: 'application' })}
-                      clickable
-                    />
-                  </Tooltip>
-                ))}
+                {allAssociated.map(entity => {
+                  const isApplication = applicationIds.has(entity.id)
+                  const isAIComponent = aiComponentIds.has(entity.id)
+                  const label = isApplication
+                    ? `${entity.name} (${t('entityTypes.application')})`
+                    : isAIComponent
+                      ? `${entity.name} (${t('entityTypes.aicomponent')})`
+                      : `${entity.name} (${t('entityTypes.infrastructure')})`
+
+                  return (
+                    <Tooltip
+                      key={entity.id}
+                      title={
+                        hasAnySovereigntyAchs(entity)
+                          ? `${t('achievedScore')}: ${formatSovereigntyScore(computeEntityAchivedScore(entity))}`
+                          : t('noSovereigntyData')
+                      }
+                      arrow
+                    >
+                      <Chip
+                        label={label}
+                        size="small"
+                        variant="outlined"
+                        color={isAIComponent ? 'secondary' : 'default'}
+                        onClick={
+                          isApplication
+                            ? () => onEntityClick({ id: entity.id, type: 'application' })
+                            : isAIComponent
+                              ? () => onEntityClick({ id: entity.id, type: 'aicomponent' })
+                              : () => onEntityClick({ id: entity.id, type: 'infrastructure' })
+                        }
+                        clickable
+                      />
+                    </Tooltip>
+                  )
+                })}
               </Box>
             ) : (
               <Typography

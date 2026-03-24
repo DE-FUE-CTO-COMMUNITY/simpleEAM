@@ -7,10 +7,14 @@ import CapabilityForm, { CapabilityFormValues } from '@/components/capabilities/
 import ApplicationForm, { ApplicationFormValues } from '@/components/applications/ApplicationForm'
 import DataObjectForm, { DataObjectFormValues } from '@/components/dataobjects/DataObjectForm'
 import AicomponentForm, { AicomponentFormValues } from '@/components/aicomponents/AicomponentForm'
+import InfrastructureForm, {
+  InfrastructureFormValues,
+} from '@/components/infrastructure/InfrastructureForm'
 import { GET_CAPABILITY, UPDATE_CAPABILITY } from '@/graphql/capability'
 import { GET_APPLICATION, UPDATE_APPLICATION } from '@/graphql/application'
 import { GET_DATA_OBJECT, UPDATE_DATA_OBJECT } from '@/graphql/dataObject'
 import { GET_Aicomponent, UPDATE_Aicomponent } from '@/graphql/aicomponent'
+import { GET_INFRASTRUCTURE, UPDATE_INFRASTRUCTURE } from '@/graphql/infrastructure'
 import { EntityRef } from './types'
 
 // Builds a Neo4j relationship update (disconnect all → reconnect with new IDs).
@@ -37,16 +41,17 @@ export default function SovereigntyEntityDialog({ entity, onClose }: Props) {
   const client = useApolloClient()
 
   const [fetchCapability, { data: capData, loading: capLoading }] = useLazyQuery(GET_CAPABILITY)
-  const [fetchApplication, { data: appData, loading: appLoading }] =
-    useLazyQuery(GET_APPLICATION)
+  const [fetchApplication, { data: appData, loading: appLoading }] = useLazyQuery(GET_APPLICATION)
   const [fetchDataObject, { data: doData, loading: doLoading }] = useLazyQuery(GET_DATA_OBJECT)
-  const [fetchAicomponent, { data: aiData, loading: aiLoading }] =
-    useLazyQuery(GET_Aicomponent)
+  const [fetchAicomponent, { data: aiData, loading: aiLoading }] = useLazyQuery(GET_Aicomponent)
+  const [fetchInfrastructure, { data: infraData, loading: infraLoading }] =
+    useLazyQuery(GET_INFRASTRUCTURE)
 
   const [updateCapability, { loading: capUpdating }] = useMutation(UPDATE_CAPABILITY)
   const [updateApplication, { loading: appUpdating }] = useMutation(UPDATE_APPLICATION)
   const [updateDataObject, { loading: doUpdating }] = useMutation(UPDATE_DATA_OBJECT)
   const [updateAicomponent, { loading: aiUpdating }] = useMutation(UPDATE_Aicomponent)
+  const [updateInfrastructure, { loading: infraUpdating }] = useMutation(UPDATE_INFRASTRUCTURE)
 
   useEffect(() => {
     if (!entity) return
@@ -63,6 +68,9 @@ export default function SovereigntyEntityDialog({ entity, onClose }: Props) {
       case 'aicomponent':
         fetchAicomponent({ variables: { id: entity.id } })
         break
+      case 'infrastructure':
+        fetchInfrastructure({ variables: { id: entity.id } })
+        break
     }
   }, [entity?.id, entity?.type]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -72,15 +80,17 @@ export default function SovereigntyEntityDialog({ entity, onClose }: Props) {
   const applicationData = appData?.applications?.[0] ?? null
   const dataObjectData = doData?.dataObjects?.[0] ?? null
   const aiComponentData = aiData?.aiComponents?.[0] ?? null
+  const infrastructureData = infraData?.infrastructures?.[0] ?? null
 
-  const isLoading = capLoading || appLoading || doLoading || aiLoading
-  const isUpdating = capUpdating || appUpdating || doUpdating || aiUpdating
+  const isLoading = capLoading || appLoading || doLoading || aiLoading || infraLoading
+  const isUpdating = capUpdating || appUpdating || doUpdating || aiUpdating || infraUpdating
 
   const hasCurrentData =
     (entity.type === 'capability' && capabilityData != null) ||
     (entity.type === 'application' && applicationData != null) ||
     (entity.type === 'dataobject' && dataObjectData != null) ||
-    (entity.type === 'aicomponent' && aiComponentData != null)
+    (entity.type === 'aicomponent' && aiComponentData != null) ||
+    (entity.type === 'infrastructure' && infrastructureData != null)
 
   const afterSave = () => {
     client.refetchQueries({
@@ -288,6 +298,57 @@ export default function SovereigntyEntityDialog({ entity, onClose }: Props) {
     afterSave()
   }
 
+  const handleInfrastructureSubmit = async (data: InfrastructureFormValues) => {
+    if (!infrastructureData) return
+
+    const parentId = Array.isArray(data.parentInfrastructure)
+      ? data.parentInfrastructure[0]
+      : data.parentInfrastructure
+    const lastSovereigntyAssessmentAt = data.lastSovereigntyAssessmentAt ?? new Date().toISOString()
+
+    const input: Record<string, any> = {
+      name: { set: data.name },
+      description: { set: data.description || '' },
+      sovereigntyAchDataResidency: { set: data.sovereigntyAchDataResidency ?? null },
+      sovereigntyAchJurisdictionControl: { set: data.sovereigntyAchJurisdictionControl ?? null },
+      sovereigntyAchOperationalControl: { set: data.sovereigntyAchOperationalControl ?? null },
+      sovereigntyAchInteroperability: { set: data.sovereigntyAchInteroperability ?? null },
+      sovereigntyAchPortability: { set: data.sovereigntyAchPortability ?? null },
+      sovereigntyAchSupplyChainTransparency: {
+        set: data.sovereigntyAchSupplyChainTransparency ?? null,
+      },
+      sovereigntyEvidence: { set: data.sovereigntyEvidence ?? null },
+      lastSovereigntyAssessmentAt: { set: lastSovereigntyAssessmentAt },
+      infrastructureType: { set: data.infrastructureType },
+      status: { set: data.status },
+      vendor: { set: data.vendor || '' },
+      version: { set: data.version || '' },
+      capacity: { set: data.capacity || '' },
+      location: { set: data.location || '' },
+      ipAddress: { set: data.ipAddress || '' },
+      operatingSystem: { set: data.operatingSystem || '' },
+      specifications: { set: data.specifications || '' },
+      maintenanceWindow: { set: data.maintenanceWindow || '' },
+      costs: { set: data.costs ?? null },
+      planningDate: { set: data.planningDate || null },
+      introductionDate: { set: data.introductionDate || null },
+      endOfUseDate: { set: data.endOfUseDate || null },
+      endOfLifeDate: { set: data.endOfLifeDate || null },
+      owners: relArr(data.ownerId ? [data.ownerId] : []),
+      parentInfrastructure: relArr(parentId ? [parentId] : []),
+      childInfrastructures: relArr(data.childInfrastructures),
+      hostsApplications: relArr(data.hostsApplications),
+      providedBy: relArr(data.providedBy),
+      hostedBy: relArr(data.hostedBy),
+      maintainedBy: relArr(data.maintainedBy),
+      partOfArchitectures: relArr(data.partOfArchitectures),
+      depictedInDiagrams: relArr(data.depictedInDiagrams),
+    }
+
+    await updateInfrastructure({ variables: { id: infrastructureData.id, input } })
+    afterSave()
+  }
+
   if (isLoading || !hasCurrentData) {
     return (
       <Dialog open onClose={onClose}>
@@ -347,6 +408,19 @@ export default function SovereigntyEntityDialog({ entity, onClose }: Props) {
         onSubmit={handleAicomponentSubmit}
         mode="edit"
         data={aiComponentData}
+        loading={isUpdating}
+      />
+    )
+  }
+
+  if (entity.type === 'infrastructure') {
+    return (
+      <InfrastructureForm
+        isOpen
+        onClose={onClose}
+        onSubmit={handleInfrastructureSubmit}
+        mode="edit"
+        data={infrastructureData}
         loading={isUpdating}
       />
     )

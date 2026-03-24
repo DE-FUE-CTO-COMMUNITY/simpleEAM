@@ -82,6 +82,8 @@ export default function InfrastructuresPage() {
       const parentId = Array.isArray(data.parentInfrastructure)
         ? data.parentInfrastructure[0]
         : data.parentInfrastructure
+      const lastSovereigntyAssessmentAt =
+        data.lastSovereigntyAssessmentAt ?? new Date().toISOString()
 
       const input = {
         name: data.name,
@@ -93,7 +95,7 @@ export default function InfrastructuresPage() {
         sovereigntyAchPortability: data.sovereigntyAchPortability,
         sovereigntyAchSupplyChainTransparency: data.sovereigntyAchSupplyChainTransparency,
         sovereigntyEvidence: data.sovereigntyEvidence,
-        lastSovereigntyAssessmentAt: data.lastSovereigntyAssessmentAt,
+        lastSovereigntyAssessmentAt,
         infrastructureType: data.infrastructureType,
         status: data.status,
         vendor: data.vendor || '',
@@ -213,6 +215,8 @@ export default function InfrastructuresPage() {
       const parentId = Array.isArray(data.parentInfrastructure)
         ? data.parentInfrastructure[0]
         : data.parentInfrastructure
+      const lastSovereigntyAssessmentAt =
+        data.lastSovereigntyAssessmentAt ?? new Date().toISOString()
 
       const updateInput = {
         name: { set: data.name },
@@ -226,7 +230,7 @@ export default function InfrastructuresPage() {
           set: data.sovereigntyAchSupplyChainTransparency ?? null,
         },
         sovereigntyEvidence: { set: data.sovereigntyEvidence ?? null },
-        lastSovereigntyAssessmentAt: { set: data.lastSovereigntyAssessmentAt ?? null },
+        lastSovereigntyAssessmentAt: { set: lastSovereigntyAssessmentAt },
         infrastructureType: { set: data.infrastructureType },
         status: { set: data.status },
         vendor: { set: data.vendor || '' },

@@ -94,20 +94,27 @@ const Dashboard = () => {
 
   // Sovereignty score recalculation polling
   const [isRecalculating, setIsRecalculating] = useState(false)
-  const { startPolling, stopPolling } = useQuery(GET_COMPANY, {
+  const {
+    data: companyData,
+    startPolling,
+    stopPolling,
+  } = useQuery(GET_COMPANY, {
     variables: { id: selectedCompanyId ?? '' },
     skip: !selectedCompanyId,
-    fetchPolicy: 'cache-first',
+    fetchPolicy: 'cache-and-network',
+    notifyOnNetworkStatusChange: true,
   })
+
+  const sovereigntyCompany = companyData?.companies?.[0] ?? selectedCompany
 
   useEffect(() => {
     if (!isRecalculating) return
-    const status = selectedCompany?.sovereigntyScoreStatus
+    const status = sovereigntyCompany?.sovereigntyScoreStatus
     if (status !== 'CALCULATING') {
       stopPolling()
       setIsRecalculating(false)
     }
-  }, [selectedCompany?.sovereigntyScoreStatus, isRecalculating, stopPolling])
+  }, [sovereigntyCompany?.sovereigntyScoreStatus, isRecalculating, stopPolling])
 
   const handleRecalculate = async () => {
     if (!selectedCompanyId || isRecalculating) return
@@ -610,8 +617,8 @@ const Dashboard = () => {
     return (Math.round(value * 10) / 10).toString()
   }
 
-  const expectedCompanySovereigntyScore = selectedCompany?.expectedSovereigntyScore
-  const achievedCompanySovereigntyScore = selectedCompany?.achievedSovereigntyScore
+  const expectedCompanySovereigntyScore = sovereigntyCompany?.expectedSovereigntyScore
+  const achievedCompanySovereigntyScore = sovereigntyCompany?.achievedSovereigntyScore
 
   const getPurposeCoherenceScoreBackground = (percent: number) => {
     const score = (percent / 100) * 3
