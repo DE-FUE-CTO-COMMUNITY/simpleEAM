@@ -1,10 +1,20 @@
 'use client'
 
 import React from 'react'
-import { Box, FormControlLabel, FormGroup, Switch, Typography, Divider } from '@mui/material'
+import { Box, FormControlLabel, FormGroup, Switch, Typography, Divider, Tooltip } from '@mui/material'
 import { useTranslations } from 'next-intl'
-import { LENS_OPTIONS, type LensFlags, type LensKey } from '@/lib/feature-definitions'
-import { FEATURE_FLAGS, type FeatureFlagKey, type FeatureFlags } from '@/lib/feature-definitions'
+import {
+  LENS_OPTIONS,
+  NOT_IMPLEMENTED_LENSES,
+  type LensFlags,
+  type LensKey,
+} from '@/lib/feature-definitions'
+import {
+  FEATURE_FLAGS,
+  NOT_IMPLEMENTED_FEATURE_FLAGS,
+  type FeatureFlagKey,
+  type FeatureFlags,
+} from '@/lib/feature-definitions'
 
 interface FeatureManagementProps {
   lensFlags: LensFlags
@@ -26,6 +36,7 @@ export default function FeatureManagement({
   const t = useTranslations('admin.featureManagement')
   const tLenses = useTranslations('lenses')
   const isBusinessArchitectureForced = featureFlags.GEA || featureFlags.BMC || featureFlags.BCA
+  const isTechnologyManagementForced = featureFlags.Sovereignty
 
   const handleToggle = (lens: LensKey) => (event: React.ChangeEvent<HTMLInputElement>) => {
     onLensFlagsChange({
@@ -60,23 +71,39 @@ export default function FeatureManagement({
             {t('lensesDescription')}
           </Typography>
           <FormGroup>
-            {LENS_OPTIONS.map(lens => (
-              <FormControlLabel
-                key={lens}
-                control={
-                  <Switch
-                    checked={lensFlags[lens]}
-                    onChange={handleToggle(lens)}
-                    disabled={
-                      disabled ||
-                      (disableEnterpriseLens && lens === 'enterpriseArchitecture') ||
-                      (lens === 'businessArchitecture' && isBusinessArchitectureForced)
-                    }
-                  />
-                }
-                label={tLenses(lens)}
-              />
-            ))}
+            {LENS_OPTIONS.map(lens => {
+              const isNotImplemented = NOT_IMPLEMENTED_LENSES.includes(lens)
+              const isLensDisabled =
+                disabled ||
+                isNotImplemented ||
+                (disableEnterpriseLens && lens === 'enterpriseArchitecture') ||
+                (lens === 'businessArchitecture' && isBusinessArchitectureForced) ||
+                (lens === 'technologyManagement' && isTechnologyManagementForced)
+
+              const lensRow = (
+                <FormControlLabel
+                  key={lens}
+                  control={
+                    <Switch
+                      checked={lensFlags[lens]}
+                      onChange={handleToggle(lens)}
+                      disabled={isLensDisabled}
+                    />
+                  }
+                  label={tLenses(lens)}
+                />
+              )
+
+              if (!isNotImplemented) {
+                return lensRow
+              }
+
+              return (
+                <Tooltip key={lens} title={t('notYetImplemented')} arrow followCursor>
+                  <span>{lensRow}</span>
+                </Tooltip>
+              )
+            })}
           </FormGroup>
           {disableEnterpriseLens && (
             <>
@@ -96,19 +123,32 @@ export default function FeatureManagement({
             {t('featuresDescription')}
           </Typography>
           <FormGroup>
-            {FEATURE_FLAGS.map(feature => (
-              <FormControlLabel
-                key={feature}
-                control={
-                  <Switch
-                    checked={featureFlags[feature]}
-                    onChange={handleFeatureToggle(feature)}
-                    disabled={disabled}
-                  />
-                }
-                label={t(`features.${feature}`)}
-              />
-            ))}
+            {FEATURE_FLAGS.map(feature => {
+              const isNotImplemented = NOT_IMPLEMENTED_FEATURE_FLAGS.includes(feature)
+              const featureRow = (
+                <FormControlLabel
+                  key={feature}
+                  control={
+                    <Switch
+                      checked={featureFlags[feature]}
+                      onChange={handleFeatureToggle(feature)}
+                      disabled={disabled || isNotImplemented}
+                    />
+                  }
+                  label={t(`features.${feature}`)}
+                />
+              )
+
+              if (!isNotImplemented) {
+                return featureRow
+              }
+
+              return (
+                <Tooltip key={feature} title={t('notYetImplemented')} arrow followCursor>
+                  <span>{featureRow}</span>
+                </Tooltip>
+              )
+            })}
           </FormGroup>
         </Box>
       </Box>

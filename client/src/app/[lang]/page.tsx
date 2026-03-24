@@ -446,6 +446,7 @@ const Dashboard = () => {
       ...(isApsEnabled ? (['dataObjects'] as CardKey[]) : []),
       'interfaces',
     ],
+    cybersecurityArchitecture: ['applications', 'aiComponents', 'dataObjects', 'interfaces'],
     infrastructureArchitecture: ['applications', 'infrastructure'],
     transformationArchitecture: [
       'businessCapabilities',

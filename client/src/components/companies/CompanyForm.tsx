@@ -121,9 +121,14 @@ const CompaniesForm: React.FC<GenericFormProps<CompanyType, CompanyFormValues>> 
       const normalizedLensFlags: LensFlags = { ...nextLensFlags }
       const requiresBusinessArchitectureLens =
         normalizedFeatureFlags.GEA || normalizedFeatureFlags.BMC || normalizedFeatureFlags.BCA
+      const requiresTechnologyManagementLens = normalizedFeatureFlags.Sovereignty
 
       if (requiresBusinessArchitectureLens) {
         normalizedLensFlags.businessArchitecture = true
+      }
+
+      if (requiresTechnologyManagementLens) {
+        normalizedLensFlags.technologyManagement = true
       }
 
       return {

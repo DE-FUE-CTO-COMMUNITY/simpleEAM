@@ -125,6 +125,7 @@
     "dataArchitecture": "Datenarchitektur",
     "aiArchitecture": "KI-Architektur",
     "solutionArchitecture": "Lösungsarchitektur",
+    "cybersecurityArchitecture": "Cybersicherheitsarchitektur",
     "infrastructureArchitecture": "Infrastrukturarchitektur",
     "transformationArchitecture": "Transformationsarchitektur",
     "technologyManagement": "Technologiemanagement"
@@ -2344,6 +2345,7 @@
       "lensesTitle": "Linsen",
       "lensesDescription": "Aktivieren oder deaktivieren Sie Linsen für die Oberfläche.",
       "enterpriseLocked": "Enterprise Architecture ist immer aktiviert.",
+      "notYetImplemented": "Noch nicht implementiert",
       "featuresTitle": "Features",
       "featuresDescription": "Aktivieren oder deaktivieren Sie Feature-Sets.",
       "features": {

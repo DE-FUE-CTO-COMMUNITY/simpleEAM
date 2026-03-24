@@ -235,6 +235,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
       ...(isApsEnabled ? ['dataObjects'] : []),
       'interfaces',
     ],
+    cybersecurityArchitecture: ['applications', 'aiComponents', 'dataObjects', 'interfaces'],
     infrastructureArchitecture: ['applications', 'infrastructure'],
     transformationArchitecture: architectureElementItems.map(item => item.key),
     technologyManagement: ['applications', 'infrastructure'],

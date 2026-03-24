@@ -628,6 +628,12 @@ const DiagramLibrarySidebar = forwardRef<DiagramLibrarySidebarHandle, DiagramLib
         dataArchitecture: ['dataObject'],
         aiArchitecture: ['aiComponent'],
         solutionArchitecture: ['application', 'dataObject', 'applicationInterface'],
+        cybersecurityArchitecture: [
+          'application',
+          'aiComponent',
+          'dataObject',
+          'applicationInterface',
+        ],
         infrastructureArchitecture: ['application', 'infrastructure'],
         transformationArchitecture: SECTION_ORDER,
         technologyManagement: ['application', 'infrastructure'],

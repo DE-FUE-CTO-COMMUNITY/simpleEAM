@@ -117,6 +117,7 @@
     "dataArchitecture": "Data Architecture",
     "aiArchitecture": "AI Architecture",
     "solutionArchitecture": "Solution Architecture",
+    "cybersecurityArchitecture": "Cybersecurity Architecture",
     "infrastructureArchitecture": "Infrastructure Architecture",
     "transformationArchitecture": "Transformation Architecture",
     "technologyManagement": "Technology Management"
@@ -2397,6 +2398,7 @@
       "lensesTitle": "Lenses",
       "lensesDescription": "Enable or disable lenses for the UI.",
       "enterpriseLocked": "Enterprise Architecture is always enabled.",
+      "notYetImplemented": "Not yet implemented",
       "featuresTitle": "Features",
       "featuresDescription": "Enable or disable feature sets.",
       "features": {

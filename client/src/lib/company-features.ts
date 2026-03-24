@@ -2,6 +2,8 @@ import {
   DEFAULT_LENS,
   FEATURE_FLAGS,
   LENS_OPTIONS,
+  NOT_IMPLEMENTED_FEATURE_FLAGS,
+  NOT_IMPLEMENTED_LENSES,
   type FeatureFlags,
   type LensFlags,
 } from './feature-definitions'
@@ -40,11 +42,17 @@ export const parseCompanyFeatures = (featuresJson?: string | null) => {
       ...(parsed?.lenses || {}),
     }
     lensFlags[DEFAULT_LENS] = true
+    NOT_IMPLEMENTED_LENSES.forEach(lens => {
+      lensFlags[lens] = false
+    })
 
     const featureFlags: FeatureFlags = {
       ...defaultFeatureFlags,
       ...(parsed?.features || {}),
     }
+    NOT_IMPLEMENTED_FEATURE_FLAGS.forEach(feature => {
+      featureFlags[feature] = false
+    })
 
     return { lensFlags, featureFlags }
   } catch {
