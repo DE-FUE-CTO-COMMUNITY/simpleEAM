@@ -138,8 +138,31 @@ const HardwareVersionsPage = () => {
     return String(value)
   }
 
+  const normalizeDateTimeValue = (value: unknown) => {
+    if (!value) {
+      return null
+    }
+
+    if (value instanceof Date) {
+      return value.toISOString()
+    }
+
+    return String(value)
+  }
+
   const hasLifecycleRecordData = (values: HardwareVersionFormValues) =>
-    !!(values.lifecycleStatus || values.eosDate || values.eolDate)
+    !!(
+      values.lifecycleStatus ||
+      values.gaDate ||
+      values.mainstreamSupportEndDate ||
+      values.extendedSupportEndDate ||
+      values.eosDate ||
+      values.eolDate ||
+      values.source ||
+      values.sourceUrl ||
+      values.sourceConfidence !== null ||
+      values.lastValidatedAt
+    )
 
   const handleCreate = async (values: HardwareVersionFormValues) => {
     if (!selectedCompanyId) {
@@ -176,9 +199,16 @@ const HardwareVersionsPage = () => {
         create: [
           {
             node: {
+              gaDate: normalizeDateValue(values.gaDate),
+              mainstreamSupportEndDate: normalizeDateValue(values.mainstreamSupportEndDate),
+              extendedSupportEndDate: normalizeDateValue(values.extendedSupportEndDate),
               lifecycleStatus: values.lifecycleStatus || null,
               eosDate: normalizeDateValue(values.eosDate),
               eolDate: normalizeDateValue(values.eolDate),
+              source: values.source || null,
+              sourceUrl: values.sourceUrl || null,
+              sourceConfidence: values.sourceConfidence ?? null,
+              lastValidatedAt: normalizeDateTimeValue(values.lastValidatedAt),
               company: {
                 connect: [{ where: { node: { id: { eq: selectedCompanyId } } } }],
               },
@@ -224,9 +254,20 @@ const HardwareVersionsPage = () => {
           update: {
             where: { node: { id: { eq: values.lifecycleRecordId } } },
             node: {
+              gaDate: { set: normalizeDateValue(values.gaDate) },
+              mainstreamSupportEndDate: {
+                set: normalizeDateValue(values.mainstreamSupportEndDate),
+              },
+              extendedSupportEndDate: {
+                set: normalizeDateValue(values.extendedSupportEndDate),
+              },
               lifecycleStatus: { set: values.lifecycleStatus || null },
               eosDate: { set: normalizeDateValue(values.eosDate) },
               eolDate: { set: normalizeDateValue(values.eolDate) },
+              source: { set: values.source || null },
+              sourceUrl: { set: values.sourceUrl || null },
+              sourceConfidence: { set: values.sourceConfidence ?? null },
+              lastValidatedAt: { set: normalizeDateTimeValue(values.lastValidatedAt) },
             },
           },
         },
@@ -237,9 +278,16 @@ const HardwareVersionsPage = () => {
           create: [
             {
               node: {
+                gaDate: normalizeDateValue(values.gaDate),
+                mainstreamSupportEndDate: normalizeDateValue(values.mainstreamSupportEndDate),
+                extendedSupportEndDate: normalizeDateValue(values.extendedSupportEndDate),
                 lifecycleStatus: values.lifecycleStatus || null,
                 eosDate: normalizeDateValue(values.eosDate),
                 eolDate: normalizeDateValue(values.eolDate),
+                source: values.source || null,
+                sourceUrl: values.sourceUrl || null,
+                sourceConfidence: values.sourceConfidence ?? null,
+                lastValidatedAt: normalizeDateTimeValue(values.lastValidatedAt),
                 company: {
                   connect: [{ where: { node: { id: { eq: selectedCompanyId } } } }],
                 },

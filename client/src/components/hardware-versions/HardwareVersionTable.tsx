@@ -15,6 +15,9 @@ export const HARDWARE_VERSION_DEFAULT_COLUMN_VISIBILITY = {
   releaseChannel: true,
   supportTier: true,
   hardwareProduct: true,
+  gaDate: true,
+  mainstreamSupportEndDate: true,
+  extendedSupportEndDate: true,
   lifecycleRecords: true,
   createdAt: false,
   updatedAt: false,
@@ -128,6 +131,21 @@ const HardwareVersionTable: React.FC<HardwareVersionTableProps> = ({
             .getValue()
             ?.map(product => product.name)
             .join(', ') || '-',
+      }),
+      columnHelper.accessor(row => row.lifecycleRecords?.[0]?.gaDate ?? null, {
+        id: 'gaDate',
+        header: t('gaDate'),
+        cell: info => (info.getValue() ? formatDate(info.getValue() as string, locale) : '-'),
+      }),
+      columnHelper.accessor(row => row.lifecycleRecords?.[0]?.mainstreamSupportEndDate ?? null, {
+        id: 'mainstreamSupportEndDate',
+        header: t('mainstreamSupportEndDate'),
+        cell: info => (info.getValue() ? formatDate(info.getValue() as string, locale) : '-'),
+      }),
+      columnHelper.accessor(row => row.lifecycleRecords?.[0]?.extendedSupportEndDate ?? null, {
+        id: 'extendedSupportEndDate',
+        header: t('extendedSupportEndDate'),
+        cell: info => (info.getValue() ? formatDate(info.getValue() as string, locale) : '-'),
       }),
       columnHelper.accessor('lifecycleRecords', {
         header: t('lifecycleRecords'),

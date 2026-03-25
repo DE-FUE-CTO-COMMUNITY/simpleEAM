@@ -37,9 +37,16 @@ export const GET_SOFTWARE_VERSIONS = gql`
       }
       lifecycleRecords {
         id
+        gaDate
+        mainstreamSupportEndDate
+        extendedSupportEndDate
         lifecycleStatus
         eosDate
         eolDate
+        source
+        sourceUrl
+        sourceConfidence
+        lastValidatedAt
       }
     }
   }

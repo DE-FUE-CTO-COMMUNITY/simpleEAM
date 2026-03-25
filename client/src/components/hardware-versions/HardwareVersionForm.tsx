@@ -23,8 +23,15 @@ const createSchema = (t: any) =>
     usedByInfrastructureIds: z.array(z.string()).optional(),
     lifecycleRecordId: z.string().optional(),
     lifecycleStatus: z.nativeEnum(LifecycleStatus).optional().nullable(),
+    gaDate: z.any().optional().nullable(),
+    mainstreamSupportEndDate: z.any().optional().nullable(),
+    extendedSupportEndDate: z.any().optional().nullable(),
     eosDate: z.any().optional().nullable(),
     eolDate: z.any().optional().nullable(),
+    source: z.string().optional().nullable(),
+    sourceUrl: z.string().optional().nullable(),
+    sourceConfidence: z.number().optional().nullable(),
+    lastValidatedAt: z.any().optional().nullable(),
   })
 
 export type HardwareVersionFormValues = z.infer<ReturnType<typeof createSchema>>
@@ -66,8 +73,15 @@ const HardwareVersionForm: React.FC<
       usedByInfrastructureIds: [],
       lifecycleRecordId: '',
       lifecycleStatus: null,
+      gaDate: null,
+      mainstreamSupportEndDate: null,
+      extendedSupportEndDate: null,
       eosDate: null,
       eolDate: null,
+      source: '',
+      sourceUrl: '',
+      sourceConfidence: null,
+      lastValidatedAt: null,
     }),
     []
   )
@@ -102,8 +116,15 @@ const HardwareVersionForm: React.FC<
           data.usedByInfrastructure?.map(infrastructure => infrastructure.id) ?? [],
         lifecycleRecordId: lifecycleRecord?.id ?? '',
         lifecycleStatus: lifecycleRecord?.lifecycleStatus ?? null,
+        gaDate: lifecycleRecord?.gaDate ?? null,
+        mainstreamSupportEndDate: lifecycleRecord?.mainstreamSupportEndDate ?? null,
+        extendedSupportEndDate: lifecycleRecord?.extendedSupportEndDate ?? null,
         eosDate: lifecycleRecord?.eosDate ?? null,
         eolDate: lifecycleRecord?.eolDate ?? null,
+        source: lifecycleRecord?.source ?? '',
+        sourceUrl: lifecycleRecord?.sourceUrl ?? '',
+        sourceConfidence: lifecycleRecord?.sourceConfidence ?? null,
+        lastValidatedAt: lifecycleRecord?.lastValidatedAt ?? null,
       })
     }
 
@@ -205,6 +226,24 @@ const HardwareVersionForm: React.FC<
       tabId: 'lifecycle',
     },
     {
+      name: 'gaDate',
+      label: t('gaDate'),
+      type: 'date',
+      tabId: 'lifecycle',
+    },
+    {
+      name: 'mainstreamSupportEndDate',
+      label: t('mainstreamSupportEndDate'),
+      type: 'date',
+      tabId: 'lifecycle',
+    },
+    {
+      name: 'extendedSupportEndDate',
+      label: t('extendedSupportEndDate'),
+      type: 'date',
+      tabId: 'lifecycle',
+    },
+    {
       name: 'eosDate',
       label: t('eosDate'),
       type: 'date',
@@ -214,6 +253,30 @@ const HardwareVersionForm: React.FC<
       name: 'eolDate',
       label: t('eolDate'),
       type: 'date',
+      tabId: 'lifecycle',
+    },
+    {
+      name: 'source',
+      label: t('source'),
+      type: 'text',
+      tabId: 'lifecycle',
+    },
+    {
+      name: 'sourceUrl',
+      label: t('sourceUrl'),
+      type: 'text',
+      tabId: 'lifecycle',
+    },
+    {
+      name: 'sourceConfidence',
+      label: t('sourceConfidence'),
+      type: 'number',
+      tabId: 'lifecycle',
+    },
+    {
+      name: 'lastValidatedAt',
+      label: t('lastValidatedAt'),
+      type: 'datetime',
       tabId: 'lifecycle',
     },
   ]
