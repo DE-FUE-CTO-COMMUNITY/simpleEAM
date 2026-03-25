@@ -85,3 +85,11 @@ export const DELETE_SOFTWARE_PRODUCT = gql`
     }
   }
 `
+
+export const CHECK_SOFTWARE_PRODUCT_EXISTS = gql`
+  query CheckSoftwareProductExists($id: ID!) {
+    softwareProducts(where: { id: { eq: $id } }) {
+      id
+    }
+  }
+`

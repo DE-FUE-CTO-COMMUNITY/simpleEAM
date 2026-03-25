@@ -581,6 +581,11 @@ export const downloadTemplateWithRealFields = async (
     | 'diagrams' // Für JSON-Export verfügbar
     | 'architecturePrinciples'
     | 'infrastructures'
+    | 'productFamilies'
+    | 'softwareProducts'
+    | 'softwareVersions'
+    | 'hardwareProducts'
+    | 'hardwareVersions'
     | 'aicomponents'
     | 'visions'
     | 'missions'
@@ -622,6 +627,11 @@ export const downloadTemplateWithRealFields = async (
       Architectures: [getArchitecturesTemplate()],
       'Architecture Principles': [getArchitecturePrinciplesTemplate()],
       Infrastructures: [getInfrastructuresTemplate()],
+      'Product Families': [getTemplateByEntityType('productFamilies')],
+      'Software Products': [getTemplateByEntityType('softwareProducts')],
+      'Software Versions': [getTemplateByEntityType('softwareVersions')],
+      'Hardware Products': [getTemplateByEntityType('hardwareProducts')],
+      'Hardware Versions': [getTemplateByEntityType('hardwareVersions')],
       Visions: [getVisionsTemplate()],
       Missions: [getMissionsTemplate()],
       Values: [getValuesTemplate()],
@@ -681,6 +691,11 @@ export const downloadTemplateWithRealFields = async (
     diagrams: 'Diagrams', // Für JSON-Export verfügbar
     architecturePrinciples: 'Architecture Principles',
     infrastructures: 'Infrastructures',
+    productFamilies: 'Product Families',
+    softwareProducts: 'Software Products',
+    softwareVersions: 'Software Versions',
+    hardwareProducts: 'Hardware Products',
+    hardwareVersions: 'Hardware Versions',
     aicomponents: 'AI Components',
     visions: 'Visions',
     missions: 'Missions',

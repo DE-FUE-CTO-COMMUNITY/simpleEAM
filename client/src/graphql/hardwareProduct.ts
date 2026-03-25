@@ -81,3 +81,11 @@ export const DELETE_HARDWARE_PRODUCT = gql`
     }
   }
 `
+
+export const CHECK_HARDWARE_PRODUCT_EXISTS = gql`
+  query CheckHardwareProductExists($id: ID!) {
+    hardwareProducts(where: { id: { eq: $id } }) {
+      id
+    }
+  }
+`

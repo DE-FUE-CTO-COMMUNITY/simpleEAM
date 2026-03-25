@@ -499,6 +499,54 @@ export const createEntityInputFromJson = (entityType: string, row: any): any => 
         updatedAt: row.updatedAt ? new Date(row.updatedAt) : new Date(),
       }
 
+    case 'softwareProducts':
+      return {
+        name: generateFallbackName('Software Product', row),
+        lifecycleStatus: row.lifecycleStatus || undefined,
+        isActive: row.isActive === true || row.isActive === 'true' || row.isActive === 1,
+        updatedAt: row.updatedAt ? new Date(row.updatedAt) : new Date(),
+      }
+
+    case 'softwareVersions':
+      return {
+        name: generateFallbackName('Software Version', row),
+        version: row.version ? String(row.version) : undefined,
+        releaseChannel: row.releaseChannel ? String(row.releaseChannel) : undefined,
+        supportTier: row.supportTier ? String(row.supportTier) : undefined,
+        isLts: row.isLts === true || row.isLts === 'true' || row.isLts === 1,
+        updatedAt: row.updatedAt ? new Date(row.updatedAt) : new Date(),
+      }
+
+    case 'hardwareProducts':
+      return {
+        name: generateFallbackName('Hardware Product', row),
+        lifecycleStatus: row.lifecycleStatus || undefined,
+        isActive: row.isActive === true || row.isActive === 'true' || row.isActive === 1,
+        updatedAt: row.updatedAt ? new Date(row.updatedAt) : new Date(),
+      }
+
+    case 'hardwareVersions':
+      return {
+        name: generateFallbackName('Hardware Version', row),
+        version: row.version ? String(row.version) : undefined,
+        releaseChannel: row.releaseChannel ? String(row.releaseChannel) : undefined,
+        supportTier: row.supportTier ? String(row.supportTier) : undefined,
+        updatedAt: row.updatedAt ? new Date(row.updatedAt) : new Date(),
+      }
+
+    case 'productFamilies': {
+      const normalizedType = typeof row.type === 'string' ? row.type.trim().toUpperCase() : ''
+      const normalizedCategory =
+        typeof row.category === 'string' ? row.category.trim().toUpperCase() : ''
+
+      return {
+        name: generateFallbackName('Product Family', row),
+        type: ['SOFTWARE', 'HARDWARE'].includes(normalizedType) ? normalizedType : 'SOFTWARE',
+        category: normalizedCategory || 'OPERATING_PLATFORM_SOFTWARE',
+        updatedAt: row.updatedAt ? new Date(row.updatedAt) : new Date(),
+      }
+    }
+
     default:
       return baseInput
   }
@@ -562,6 +610,11 @@ export const generateFallbackNameForJson = (
     diagrams: ['type', 'version', 'description'],
     architecturePrinciples: ['category', 'priority', 'description'],
     infrastructures: ['type', 'technology', 'location'],
+    productFamilies: ['category', 'type', 'description'],
+    softwareProducts: ['lifecycleStatus', 'description'],
+    softwareVersions: ['version', 'releaseChannel', 'supportTier'],
+    hardwareProducts: ['lifecycleStatus', 'description'],
+    hardwareVersions: ['version', 'releaseChannel', 'supportTier'],
     visions: ['visionStatement', 'timeHorizon', 'description'],
     missions: ['purposeStatement', 'keywords', 'description'],
     values: ['valueStatement', 'description'],
@@ -736,6 +789,11 @@ export const validateJsonEntityStructure = (
     diagrams: ['id', 'name'],
     architecturePrinciples: ['id', 'name'],
     infrastructures: ['id', 'name'],
+    productFamilies: ['id', 'name'],
+    softwareProducts: ['id', 'name'],
+    softwareVersions: ['id', 'name'],
+    hardwareProducts: ['id', 'name'],
+    hardwareVersions: ['id', 'name'],
     visions: ['id', 'name'],
     missions: ['id', 'name'],
     values: ['id', 'name'],

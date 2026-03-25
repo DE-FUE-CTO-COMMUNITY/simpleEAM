@@ -22,6 +22,7 @@ import { clearDiagramStorage } from '../diagrams/utils/DiagramStorageUtils'
 import { isAdmin } from '@/lib/auth'
 import { useCompanyContext } from '@/contexts/CompanyContext'
 import { useFeatureFlags } from '@/lib/feature-flags'
+import { useLensSelection } from '@/lib/lens-settings'
 
 // Import der Tab-Komponenten
 import ImportDialog from './ImportDialog'
@@ -35,6 +36,7 @@ import {
   DeleteSettings,
   ValidationResult,
   ExportedCompanyInfo,
+  EntityType,
 } from './types'
 import {
   entityTypeLabels,
@@ -76,8 +78,26 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
   const tEntityTypes = useTranslations('importExport.entityTypes')
   const { selectedCompanyId, companies } = useCompanyContext()
   const { featureFlags } = useFeatureFlags()
+  const { selectedLens } = useLensSelection()
   const isGeaEnabled = featureFlags.GEA
-  const availableEntityTypes = React.useMemo(() => getEntityTypeOrder(isGeaEnabled), [isGeaEnabled])
+  const isTechnologyManagementLensActive = selectedLens === 'technologyManagement'
+  const technologyManagementEntityTypes: EntityType[] = [
+    'productFamilies',
+    'softwareProducts',
+    'softwareVersions',
+    'hardwareProducts',
+    'hardwareVersions',
+  ]
+  const availableEntityTypes = React.useMemo(() => {
+    const baseEntityTypes = getEntityTypeOrder(isGeaEnabled)
+    if (isTechnologyManagementLensActive) {
+      return [...baseEntityTypes]
+    }
+
+    return baseEntityTypes.filter(
+      entityType => !technologyManagementEntityTypes.includes(entityType)
+    )
+  }, [isGeaEnabled, isTechnologyManagementLensActive])
 
   // State Management
   const [currentTab, setCurrentTab] = useState<'import' | 'export' | 'management'>(defaultTab)

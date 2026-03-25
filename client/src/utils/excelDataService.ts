@@ -15,6 +15,11 @@ import { GET_VALUES } from '../graphql/value'
 import { GET_GOALS } from '../graphql/goal'
 import { GET_STRATEGIES } from '../graphql/strategy'
 import { GET_BUSINESS_PROCESSES } from '../graphql/businessProcess'
+import { GET_PRODUCT_FAMILIES } from '../graphql/productFamily'
+import { GET_SOFTWARE_PRODUCTS } from '../graphql/softwareProduct'
+import { GET_SOFTWARE_VERSIONS } from '../graphql/softwareVersion'
+import { GET_HARDWARE_PRODUCTS } from '../graphql/hardwareProduct'
+import { GET_HARDWARE_VERSIONS } from '../graphql/hardwareVersion'
 
 export interface ExcelExportData {
   [key: string]: string | number | boolean | Date
@@ -31,6 +36,11 @@ export type EntityType =
   | 'diagrams'
   | 'architecturePrinciples'
   | 'infrastructures'
+  | 'productFamilies'
+  | 'softwareProducts'
+  | 'softwareVersions'
+  | 'hardwareProducts'
+  | 'hardwareVersions'
   | 'aicomponents'
   | 'visions'
   | 'missions'
@@ -54,6 +64,15 @@ const companyWhere = (entityType: EntityType, companyId?: string): any | undefin
 
   if (entityType === 'persons') {
     return { companies: { some: { id: { eq: companyId } } } }
+  }
+
+  if (entityType === 'productFamilies') {
+    return {
+      OR: [
+        { softwareProducts: { some: { company: { some: { id: { eq: companyId } } } } } },
+        { hardwareProducts: { some: { company: { some: { id: { eq: companyId } } } } } },
+      ],
+    }
   }
 
   return { company: { some: { id: { eq: companyId } } } }
@@ -596,6 +615,201 @@ export const fetchInfrastructuresForExport = async (
   }
 }
 
+export const fetchProductFamiliesForExport = async (
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
+): Promise<ExcelExportData[]> => {
+  try {
+    const where = selectedCompanyId
+      ? {
+          OR: [
+            {
+              softwareProducts: {
+                some: {
+                  company: { some: { id: { eq: selectedCompanyId } } },
+                },
+              },
+            },
+            {
+              hardwareProducts: {
+                some: {
+                  company: { some: { id: { eq: selectedCompanyId } } },
+                },
+              },
+            },
+          ],
+        }
+      : undefined
+
+    const { data } = await client.query({
+      query: GET_PRODUCT_FAMILIES,
+      variables: { where },
+      fetchPolicy: 'network-only',
+    })
+
+    if (!data?.productFamilies) {
+      return []
+    }
+
+    return data.productFamilies.map((family: any) => ({
+      id: family.id,
+      name: family.name,
+      category: family.category || '',
+      type: family.type || '',
+      softwareProducts: family.softwareProducts?.map((product: any) => product.id).join(',') || '',
+      hardwareProducts: family.hardwareProducts?.map((product: any) => product.id).join(',') || '',
+      createdAt: formatDateForExport(family.createdAt),
+      updatedAt: formatDateForExport(family.updatedAt),
+    }))
+  } catch {
+    throw new Error('Produktfamilien konnten nicht geladen werden')
+  }
+}
+
+export const fetchSoftwareProductsForExport = async (
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
+): Promise<ExcelExportData[]> => {
+  try {
+    const { data } = await client.query({
+      query: GET_SOFTWARE_PRODUCTS,
+      variables: { where: companyWhere('softwareProducts', selectedCompanyId) },
+      fetchPolicy: 'network-only',
+    })
+
+    if (!data?.softwareProducts) {
+      return []
+    }
+
+    return data.softwareProducts.map((product: any) => ({
+      id: product.id,
+      name: product.name,
+      lifecycleStatus: product.lifecycleStatus || '',
+      isActive: !!product.isActive,
+      productFamily: product.productFamily?.[0]?.id || '',
+      developedBy: product.developedBy?.map((supplier: any) => supplier.id).join(',') || '',
+      providedBy: product.providedBy?.map((supplier: any) => supplier.id).join(',') || '',
+      maintainedBy: product.maintainedBy?.map((supplier: any) => supplier.id).join(',') || '',
+      versions: product.versions?.map((version: any) => version.id).join(',') || '',
+      usedByApplications:
+        product.usedByApplications?.map((application: any) => application.id).join(',') || '',
+      usedByInfrastructure:
+        product.usedByInfrastructure?.map((infrastructure: any) => infrastructure.id).join(',') ||
+        '',
+      createdAt: formatDateForExport(product.createdAt),
+      updatedAt: formatDateForExport(product.updatedAt),
+    }))
+  } catch {
+    throw new Error('Softwareprodukte konnten nicht geladen werden')
+  }
+}
+
+export const fetchSoftwareVersionsForExport = async (
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
+): Promise<ExcelExportData[]> => {
+  try {
+    const { data } = await client.query({
+      query: GET_SOFTWARE_VERSIONS,
+      variables: { where: companyWhere('softwareVersions', selectedCompanyId) },
+      fetchPolicy: 'network-only',
+    })
+
+    if (!data?.softwareVersions) {
+      return []
+    }
+
+    return data.softwareVersions.map((version: any) => ({
+      id: version.id,
+      name: version.name,
+      version: version.version || '',
+      releaseChannel: version.releaseChannel || '',
+      supportTier: version.supportTier || '',
+      isLts: !!version.isLts,
+      softwareProduct: version.softwareProduct?.[0]?.id || '',
+      usedByApplications:
+        version.usedByApplications?.map((application: any) => application.id).join(',') || '',
+      usedByInfrastructure:
+        version.usedByInfrastructure?.map((infrastructure: any) => infrastructure.id).join(',') ||
+        '',
+      createdAt: formatDateForExport(version.createdAt),
+      updatedAt: formatDateForExport(version.updatedAt),
+    }))
+  } catch {
+    throw new Error('Softwareversionen konnten nicht geladen werden')
+  }
+}
+
+export const fetchHardwareProductsForExport = async (
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
+): Promise<ExcelExportData[]> => {
+  try {
+    const { data } = await client.query({
+      query: GET_HARDWARE_PRODUCTS,
+      variables: { where: companyWhere('hardwareProducts', selectedCompanyId) },
+      fetchPolicy: 'network-only',
+    })
+
+    if (!data?.hardwareProducts) {
+      return []
+    }
+
+    return data.hardwareProducts.map((product: any) => ({
+      id: product.id,
+      name: product.name,
+      lifecycleStatus: product.lifecycleStatus || '',
+      isActive: !!product.isActive,
+      productFamily: product.productFamily?.[0]?.id || '',
+      manufacturedBy:
+        product.manufacturedBy?.map((supplier: any) => supplier.id).join(',') || '',
+      providedBy: product.providedBy?.map((supplier: any) => supplier.id).join(',') || '',
+      maintainedBy: product.maintainedBy?.map((supplier: any) => supplier.id).join(',') || '',
+      versions: product.versions?.map((version: any) => version.id).join(',') || '',
+      usedByInfrastructure:
+        product.usedByInfrastructure?.map((infrastructure: any) => infrastructure.id).join(',') ||
+        '',
+      createdAt: formatDateForExport(product.createdAt),
+      updatedAt: formatDateForExport(product.updatedAt),
+    }))
+  } catch {
+    throw new Error('Hardwareprodukte konnten nicht geladen werden')
+  }
+}
+
+export const fetchHardwareVersionsForExport = async (
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
+): Promise<ExcelExportData[]> => {
+  try {
+    const { data } = await client.query({
+      query: GET_HARDWARE_VERSIONS,
+      variables: { where: companyWhere('hardwareVersions', selectedCompanyId) },
+      fetchPolicy: 'network-only',
+    })
+
+    if (!data?.hardwareVersions) {
+      return []
+    }
+
+    return data.hardwareVersions.map((version: any) => ({
+      id: version.id,
+      name: version.name,
+      version: version.version || '',
+      releaseChannel: version.releaseChannel || '',
+      supportTier: version.supportTier || '',
+      hardwareProduct: version.hardwareProduct?.[0]?.id || '',
+      usedByInfrastructure:
+        version.usedByInfrastructure?.map((infrastructure: any) => infrastructure.id).join(',') ||
+        '',
+      createdAt: formatDateForExport(version.createdAt),
+      updatedAt: formatDateForExport(version.updatedAt),
+    }))
+  } catch {
+    throw new Error('Hardwareversionen konnten nicht geladen werden')
+  }
+}
+
 /**
  * Holt echte AI Components Daten für Excel Export
  * Verwendet GraphQL-Feldnamen als Spaltenüberschriften und IDs für Relationen
@@ -835,6 +1049,11 @@ export const fetchAllEntitiesForExport = async (
       diagrams, // Für JSON-Export verfügbar
       architecturePrinciples,
       infrastructures,
+      productFamilies,
+      softwareProducts,
+      softwareVersions,
+      hardwareProducts,
+      hardwareVersions,
       aicomponents,
       visions,
       missions,
@@ -852,6 +1071,11 @@ export const fetchAllEntitiesForExport = async (
       fetchDiagramsForExport(client, selectedCompanyId), // Für JSON-Export verfügbar
       fetchArchitecturePrinciplesForExport(client, selectedCompanyId),
       fetchInfrastructuresForExport(client, selectedCompanyId),
+      fetchProductFamiliesForExport(client, selectedCompanyId),
+      fetchSoftwareProductsForExport(client, selectedCompanyId),
+      fetchSoftwareVersionsForExport(client, selectedCompanyId),
+      fetchHardwareProductsForExport(client, selectedCompanyId),
+      fetchHardwareVersionsForExport(client, selectedCompanyId),
       fetchAicomponentsForExport(client, selectedCompanyId),
       includeGea ? fetchVisionsForExport(client, selectedCompanyId) : Promise.resolve([]),
       includeGea ? fetchMissionsForExport(client, selectedCompanyId) : Promise.resolve([]),
@@ -871,6 +1095,11 @@ export const fetchAllEntitiesForExport = async (
       Diagrams: diagrams, // Für JSON-Export verfügbar
       'Architecture Principles': architecturePrinciples,
       Infrastructures: infrastructures,
+      'Product Families': productFamilies,
+      'Software Products': softwareProducts,
+      'Software Versions': softwareVersions,
+      'Hardware Products': hardwareProducts,
+      'Hardware Versions': hardwareVersions,
       'AI Components': aicomponents,
     }
 
@@ -912,6 +1141,11 @@ export const fetchAllEntitiesForExcelExport = async (
       diagrams, // Für Excel-Export ohne Inhalte
       architecturePrinciples,
       infrastructures,
+      productFamilies,
+      softwareProducts,
+      softwareVersions,
+      hardwareProducts,
+      hardwareVersions,
       aicomponents,
       visions,
       missions,
@@ -929,6 +1163,11 @@ export const fetchAllEntitiesForExcelExport = async (
       fetchDiagramsForExcelExport(client, selectedCompanyId), // Ohne diagramJson
       fetchArchitecturePrinciplesForExport(client, selectedCompanyId),
       fetchInfrastructuresForExport(client, selectedCompanyId),
+      fetchProductFamiliesForExport(client, selectedCompanyId),
+      fetchSoftwareProductsForExport(client, selectedCompanyId),
+      fetchSoftwareVersionsForExport(client, selectedCompanyId),
+      fetchHardwareProductsForExport(client, selectedCompanyId),
+      fetchHardwareVersionsForExport(client, selectedCompanyId),
       fetchAicomponentsForExport(client, selectedCompanyId),
       includeGea ? fetchVisionsForExport(client, selectedCompanyId) : Promise.resolve([]),
       includeGea ? fetchMissionsForExport(client, selectedCompanyId) : Promise.resolve([]),
@@ -948,6 +1187,11 @@ export const fetchAllEntitiesForExcelExport = async (
       Diagrams: diagrams, // Mit Metadaten aber ohne diagramJson
       'Architecture Principles': architecturePrinciples,
       Infrastructures: infrastructures,
+      'Product Families': productFamilies,
+      'Software Products': softwareProducts,
+      'Software Versions': softwareVersions,
+      'Hardware Products': hardwareProducts,
+      'Hardware Versions': hardwareVersions,
       'AI Components': aicomponents,
     }
 
@@ -984,6 +1228,11 @@ export const fetchDataByEntityType = async (
     | 'diagrams'
     | 'architecturePrinciples'
     | 'infrastructures'
+    | 'productFamilies'
+    | 'softwareProducts'
+    | 'softwareVersions'
+    | 'hardwareProducts'
+    | 'hardwareVersions'
     | 'aicomponents'
     | 'visions'
     | 'missions'
@@ -1014,6 +1263,16 @@ export const fetchDataByEntityType = async (
       return fetchArchitecturePrinciplesForExport(client, selectedCompanyId)
     case 'infrastructures':
       return fetchInfrastructuresForExport(client, selectedCompanyId)
+    case 'productFamilies':
+      return fetchProductFamiliesForExport(client, selectedCompanyId)
+    case 'softwareProducts':
+      return fetchSoftwareProductsForExport(client, selectedCompanyId)
+    case 'softwareVersions':
+      return fetchSoftwareVersionsForExport(client, selectedCompanyId)
+    case 'hardwareProducts':
+      return fetchHardwareProductsForExport(client, selectedCompanyId)
+    case 'hardwareVersions':
+      return fetchHardwareVersionsForExport(client, selectedCompanyId)
     case 'aicomponents':
       return fetchAicomponentsForExport(client, selectedCompanyId)
     case 'visions':
@@ -1049,6 +1308,11 @@ export const fetchDataByEntityTypeAndFormat = async (
     | 'diagrams'
     | 'architecturePrinciples'
     | 'infrastructures'
+    | 'productFamilies'
+    | 'softwareProducts'
+    | 'softwareVersions'
+    | 'hardwareProducts'
+    | 'hardwareVersions'
     | 'aicomponents'
     | 'visions'
     | 'missions'
@@ -1081,6 +1345,16 @@ export const fetchDataByEntityTypeAndFormat = async (
       return fetchArchitecturePrinciplesForExport(client, selectedCompanyId)
     case 'infrastructures':
       return fetchInfrastructuresForExport(client, selectedCompanyId)
+    case 'productFamilies':
+      return fetchProductFamiliesForExport(client, selectedCompanyId)
+    case 'softwareProducts':
+      return fetchSoftwareProductsForExport(client, selectedCompanyId)
+    case 'softwareVersions':
+      return fetchSoftwareVersionsForExport(client, selectedCompanyId)
+    case 'hardwareProducts':
+      return fetchHardwareProductsForExport(client, selectedCompanyId)
+    case 'hardwareVersions':
+      return fetchHardwareVersionsForExport(client, selectedCompanyId)
     case 'aicomponents':
       return fetchAicomponentsForExport(client, selectedCompanyId)
     case 'visions':
@@ -1349,6 +1623,77 @@ export const getInfrastructuresTemplate = (): ExcelExportData => ({
   updatedAt: '', // ISO-Format: 2024-01-01T12:00:00.000Z
 })
 
+export const getProductFamiliesTemplate = (): ExcelExportData => ({
+  id: '',
+  name: '',
+  description: '',
+  vendor: '',
+  manufacturer: '',
+  softwareProducts: '', // Komma-getrennte Software Product-IDs
+  hardwareProducts: '', // Komma-getrennte Hardware Product-IDs
+  createdAt: '',
+  updatedAt: '',
+})
+
+export const getSoftwareProductsTemplate = (): ExcelExportData => ({
+  id: '',
+  name: '',
+  description: '',
+  vendor: '',
+  manufacturer: '',
+  productType: '',
+  deliveryModel: '',
+  mainLicenseType: '',
+  productFamily: '',
+  company: '',
+  versions: '', // Komma-getrennte Version-IDs
+  createdAt: '',
+  updatedAt: '',
+})
+
+export const getSoftwareVersionsTemplate = (): ExcelExportData => ({
+  id: '',
+  name: '',
+  version: '',
+  releaseDate: '',
+  eolDate: '',
+  isLTS: '',
+  isCurrent: '',
+  product: '',
+  company: '',
+  createdAt: '',
+  updatedAt: '',
+})
+
+export const getHardwareProductsTemplate = (): ExcelExportData => ({
+  id: '',
+  name: '',
+  description: '',
+  vendor: '',
+  manufacturer: '',
+  productType: '',
+  lifecycleType: '',
+  mainLicenseType: '',
+  productFamily: '',
+  company: '',
+  versions: '', // Komma-getrennte Version-IDs
+  createdAt: '',
+  updatedAt: '',
+})
+
+export const getHardwareVersionsTemplate = (): ExcelExportData => ({
+  id: '',
+  name: '',
+  version: '',
+  releaseDate: '',
+  eolDate: '',
+  isCurrent: '',
+  product: '',
+  company: '',
+  createdAt: '',
+  updatedAt: '',
+})
+
 /**
  * Erstellt Template-Daten mit echten GraphQL-Feldnamen für AI Components
  */
@@ -1486,6 +1831,11 @@ export const getTemplateByEntityType = (
     | 'diagrams' // Für JSON-Import verfügbar
     | 'architecturePrinciples'
     | 'infrastructures'
+    | 'productFamilies'
+    | 'softwareProducts'
+    | 'softwareVersions'
+    | 'hardwareProducts'
+    | 'hardwareVersions'
     | 'aicomponents'
     | 'visions'
     | 'missions'
@@ -1514,6 +1864,16 @@ export const getTemplateByEntityType = (
       return getArchitecturePrinciplesTemplate()
     case 'infrastructures':
       return getInfrastructuresTemplate()
+    case 'productFamilies':
+      return getProductFamiliesTemplate()
+    case 'softwareProducts':
+      return getSoftwareProductsTemplate()
+    case 'softwareVersions':
+      return getSoftwareVersionsTemplate()
+    case 'hardwareProducts':
+      return getHardwareProductsTemplate()
+    case 'hardwareVersions':
+      return getHardwareVersionsTemplate()
     case 'aicomponents':
       return getAicomponentsTemplate()
     case 'visions':
@@ -1546,6 +1906,11 @@ export const getTemplateByEntityTypeAndFormat = (
     | 'diagrams'
     | 'architecturePrinciples'
     | 'infrastructures'
+    | 'productFamilies'
+    | 'softwareProducts'
+    | 'softwareVersions'
+    | 'hardwareProducts'
+    | 'hardwareVersions'
     | 'aicomponents'
     | 'visions'
     | 'missions'
@@ -1576,6 +1941,16 @@ export const getTemplateByEntityTypeAndFormat = (
       return getArchitecturePrinciplesTemplate()
     case 'infrastructures':
       return getInfrastructuresTemplate()
+    case 'productFamilies':
+      return getProductFamiliesTemplate()
+    case 'softwareProducts':
+      return getSoftwareProductsTemplate()
+    case 'softwareVersions':
+      return getSoftwareVersionsTemplate()
+    case 'hardwareProducts':
+      return getHardwareProductsTemplate()
+    case 'hardwareVersions':
+      return getHardwareVersionsTemplate()
     case 'aicomponents':
       return getAicomponentsTemplate()
     case 'visions':
@@ -1608,6 +1983,11 @@ export const getFieldNamesByEntityType = (
     | 'diagrams'
     | 'architecturePrinciples'
     | 'infrastructures'
+    | 'productFamilies'
+    | 'softwareProducts'
+    | 'softwareVersions'
+    | 'hardwareProducts'
+    | 'hardwareVersions'
     | 'aicomponents'
     | 'visions'
     | 'missions'
@@ -1628,6 +2008,11 @@ export const getFieldNamesByEntityType = (
       Diagrams: Object.keys(getDiagramsTemplate()), // Vollständig für JSON-Export
       'Architecture Principles': Object.keys(getArchitecturePrinciplesTemplate()),
       Infrastructures: Object.keys(getInfrastructuresTemplate()),
+      'Product Families': Object.keys(getProductFamiliesTemplate()),
+      'Software Products': Object.keys(getSoftwareProductsTemplate()),
+      'Software Versions': Object.keys(getSoftwareVersionsTemplate()),
+      'Hardware Products': Object.keys(getHardwareProductsTemplate()),
+      'Hardware Versions': Object.keys(getHardwareVersionsTemplate()),
       'AI Components': Object.keys(getAicomponentsTemplate()),
       Visions: Object.keys(getVisionsTemplate()),
       Missions: Object.keys(getMissionsTemplate()),
@@ -1656,6 +2041,11 @@ export const getFieldNamesByEntityTypeAndFormat = (
     | 'diagrams'
     | 'architecturePrinciples'
     | 'infrastructures'
+    | 'productFamilies'
+    | 'softwareProducts'
+    | 'softwareVersions'
+    | 'hardwareProducts'
+    | 'hardwareVersions'
     | 'aicomponents'
     | 'visions'
     | 'missions'
@@ -1681,6 +2071,11 @@ export const getFieldNamesByEntityTypeAndFormat = (
           : Object.keys(getDiagramsForExcelTemplate()),
       'Architecture Principles': Object.keys(getArchitecturePrinciplesTemplate()),
       Infrastructures: Object.keys(getInfrastructuresTemplate()),
+      'Product Families': Object.keys(getProductFamiliesTemplate()),
+      'Software Products': Object.keys(getSoftwareProductsTemplate()),
+      'Software Versions': Object.keys(getSoftwareVersionsTemplate()),
+      'Hardware Products': Object.keys(getHardwareProductsTemplate()),
+      'Hardware Versions': Object.keys(getHardwareVersionsTemplate()),
       'AI Components': Object.keys(getAicomponentsTemplate()),
       Visions: Object.keys(getVisionsTemplate()),
       Missions: Object.keys(getMissionsTemplate()),
@@ -1748,6 +2143,11 @@ export const validateImportData = (
     | 'diagrams'
     | 'architecturePrinciples'
     | 'infrastructures'
+    | 'productFamilies'
+    | 'softwareProducts'
+    | 'softwareVersions'
+    | 'hardwareProducts'
+    | 'hardwareVersions'
 ): ValidationResult => {
   const errors: ValidationError[] = []
   const warnings: ValidationWarning[] = []
@@ -1860,6 +2260,11 @@ export const getTemplateWithExamples = (
     // 'diagrams' - Ausgeblendet für Excel-Operationen
     | 'architecturePrinciples'
     | 'infrastructures'
+    | 'productFamilies'
+    | 'softwareProducts'
+    | 'softwareVersions'
+    | 'hardwareProducts'
+    | 'hardwareVersions'
     | 'aicomponents'
     | 'visions'
     | 'missions'
@@ -2039,6 +2444,92 @@ export const getTemplateWithExamples = (
           updatedAt: '2024-06-01T15:30:00.000Z',
         },
       ]
+    case 'productFamilies':
+      return [
+        emptyTemplate,
+        {
+          id: 'pf-001',
+          name: 'SAP Product Family',
+          description: 'Enterprise software suite family',
+          vendor: 'SAP',
+          manufacturer: 'SAP SE',
+          softwareProducts: 'sp-001,sp-002',
+          hardwareProducts: 'hp-001',
+          createdAt: '2024-01-01T10:00:00.000Z',
+          updatedAt: '2024-06-01T15:30:00.000Z',
+        },
+      ]
+    case 'softwareProducts':
+      return [
+        emptyTemplate,
+        {
+          id: 'sp-001',
+          name: 'SAP S/4HANA',
+          description: 'ERP platform',
+          vendor: 'SAP',
+          manufacturer: 'SAP SE',
+          productType: 'ERP',
+          deliveryModel: 'CLOUD',
+          mainLicenseType: 'SUBSCRIPTION',
+          productFamily: 'pf-001',
+          company: 'company-001',
+          versions: 'sv-001,sv-002',
+          createdAt: '2024-01-01T10:00:00.000Z',
+          updatedAt: '2024-06-01T15:30:00.000Z',
+        },
+      ]
+    case 'softwareVersions':
+      return [
+        emptyTemplate,
+        {
+          id: 'sv-001',
+          name: 'S/4HANA 2023 FPS01',
+          version: '2023.1',
+          releaseDate: '2023-11-15T00:00:00.000Z',
+          eolDate: '2030-12-31T00:00:00.000Z',
+          isLTS: 'true',
+          isCurrent: 'true',
+          product: 'sp-001',
+          company: 'company-001',
+          createdAt: '2024-01-01T10:00:00.000Z',
+          updatedAt: '2024-06-01T15:30:00.000Z',
+        },
+      ]
+    case 'hardwareProducts':
+      return [
+        emptyTemplate,
+        {
+          id: 'hp-001',
+          name: 'PowerEdge R760',
+          description: 'Enterprise rack server',
+          vendor: 'Dell',
+          manufacturer: 'Dell Technologies',
+          productType: 'SERVER',
+          lifecycleType: 'STANDARD',
+          mainLicenseType: 'PURCHASE',
+          productFamily: 'pf-002',
+          company: 'company-001',
+          versions: 'hv-001',
+          createdAt: '2024-01-01T10:00:00.000Z',
+          updatedAt: '2024-06-01T15:30:00.000Z',
+        },
+      ]
+    case 'hardwareVersions':
+      return [
+        emptyTemplate,
+        {
+          id: 'hv-001',
+          name: 'PowerEdge R760 Gen1',
+          version: '1.0',
+          releaseDate: '2024-01-15T00:00:00.000Z',
+          eolDate: '2032-12-31T00:00:00.000Z',
+          isCurrent: 'true',
+          product: 'hp-001',
+          company: 'company-001',
+          createdAt: '2024-01-01T10:00:00.000Z',
+          updatedAt: '2024-06-01T15:30:00.000Z',
+        },
+      ]
     default:
       return [emptyTemplate]
   }
@@ -2067,6 +2558,16 @@ export function getRequiredFieldsByEntityType(entityType: EntityType): string[] 
       return ['name', 'category', 'priority']
     case 'infrastructures':
       return ['name', 'infrastructureType', 'status']
+    case 'productFamilies':
+      return ['name']
+    case 'softwareProducts':
+      return ['name']
+    case 'softwareVersions':
+      return ['name', 'version']
+    case 'hardwareProducts':
+      return ['name']
+    case 'hardwareVersions':
+      return ['name', 'version']
     case 'aicomponents':
       return ['name']
     case 'visions':
@@ -2272,6 +2773,65 @@ export function getOptionalFieldsByEntityType(entityType: EntityType): string[] 
         'hostsApplications',
         'partOfArchitectures',
         'depictedInDiagrams',
+        'createdAt',
+        'updatedAt',
+      ]
+    case 'productFamilies':
+      return [
+        'description',
+        'vendor',
+        'manufacturer',
+        'softwareProducts',
+        'hardwareProducts',
+        'createdAt',
+        'updatedAt',
+      ]
+    case 'softwareProducts':
+      return [
+        'description',
+        'vendor',
+        'manufacturer',
+        'productType',
+        'deliveryModel',
+        'mainLicenseType',
+        'productFamily',
+        'company',
+        'versions',
+        'createdAt',
+        'updatedAt',
+      ]
+    case 'softwareVersions':
+      return [
+        'releaseDate',
+        'eolDate',
+        'isLTS',
+        'isCurrent',
+        'product',
+        'company',
+        'createdAt',
+        'updatedAt',
+      ]
+    case 'hardwareProducts':
+      return [
+        'description',
+        'vendor',
+        'manufacturer',
+        'productType',
+        'lifecycleType',
+        'mainLicenseType',
+        'productFamily',
+        'company',
+        'versions',
+        'createdAt',
+        'updatedAt',
+      ]
+    case 'hardwareVersions':
+      return [
+        'releaseDate',
+        'eolDate',
+        'isCurrent',
+        'product',
+        'company',
         'createdAt',
         'updatedAt',
       ]

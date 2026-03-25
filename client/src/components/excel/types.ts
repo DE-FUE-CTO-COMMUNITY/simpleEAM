@@ -11,6 +11,11 @@ export interface ImportSettings {
     | 'diagrams' // Only available for JSON import
     | 'architecturePrinciples'
     | 'infrastructures'
+    | 'productFamilies'
+    | 'softwareProducts'
+    | 'softwareVersions'
+    | 'hardwareProducts'
+    | 'hardwareVersions'
     | 'aicomponents'
     | 'visions'
     | 'missions'
@@ -52,6 +57,11 @@ export interface ExportSettings {
     | 'diagrams' // Only available for JSON export
     | 'architecturePrinciples'
     | 'infrastructures'
+    | 'productFamilies'
+    | 'softwareProducts'
+    | 'softwareVersions'
+    | 'hardwareProducts'
+    | 'hardwareVersions'
     | 'aicomponents'
     | 'visions'
     | 'missions'

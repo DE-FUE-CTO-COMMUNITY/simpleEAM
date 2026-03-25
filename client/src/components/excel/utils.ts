@@ -140,6 +140,31 @@ export const getRelationshipFields = (entityType: string): string[] => {
       ]
     case 'strategies':
       return ['owners', 'achievesGoals', 'partOfArchitectures', 'depictedInDiagrams']
+    case 'softwareProducts':
+      return [
+        'productFamily',
+        'developedBy',
+        'providedBy',
+        'maintainedBy',
+        'versions',
+        'usedByApplications',
+        'usedByInfrastructure',
+      ]
+    case 'softwareVersions':
+      return ['softwareProduct', 'usedByApplications', 'usedByInfrastructure']
+    case 'hardwareProducts':
+      return [
+        'productFamily',
+        'manufacturedBy',
+        'providedBy',
+        'maintainedBy',
+        'versions',
+        'usedByInfrastructure',
+      ]
+    case 'hardwareVersions':
+      return ['hardwareProduct', 'usedByInfrastructure']
+    case 'productFamilies':
+      return ['softwareProducts', 'hardwareProducts']
     default:
       return []
   }
@@ -223,6 +248,16 @@ export const checkEntityExists = async (
         return result.data?.geaGoals?.length > 0
       case 'strategies':
         return result.data?.geaStrategies?.length > 0
+      case 'softwareProducts':
+        return result.data?.softwareProducts?.length > 0
+      case 'softwareVersions':
+        return result.data?.softwareVersions?.length > 0
+      case 'hardwareProducts':
+        return result.data?.hardwareProducts?.length > 0
+      case 'hardwareVersions':
+        return result.data?.hardwareVersions?.length > 0
+      case 'productFamilies':
+        return result.data?.productFamilies?.length > 0
       default:
         return false
     }
@@ -669,6 +704,74 @@ export const createEntityInput = (entityType: string, row: any): any => {
       return {
         name: generateFallbackName('Strategy', row),
         description: row.description || '',
+        updatedAt: row.updatedAt ? new Date(row.updatedAt) : new Date(),
+      }
+    }
+
+    case 'softwareProducts': {
+      const validLifecycleStatus =
+        typeof row.lifecycleStatus === 'string' && row.lifecycleStatus.trim()
+          ? row.lifecycleStatus.trim().toUpperCase()
+          : undefined
+
+      return {
+        name: generateFallbackName('Software Product', row),
+        lifecycleStatus: validLifecycleStatus,
+        isActive:
+          row.isActive === true || row.isActive === 'true' || row.isActive === 1 || row.isActive === '1',
+        updatedAt: row.updatedAt ? new Date(row.updatedAt) : new Date(),
+      }
+    }
+
+    case 'softwareVersions': {
+      return {
+        name: generateFallbackName('Software Version', row),
+        version: row.version ? String(row.version) : undefined,
+        releaseChannel: row.releaseChannel ? String(row.releaseChannel) : undefined,
+        supportTier: row.supportTier ? String(row.supportTier) : undefined,
+        isLts: row.isLts === true || row.isLts === 'true' || row.isLts === 1 || row.isLts === '1',
+        updatedAt: row.updatedAt ? new Date(row.updatedAt) : new Date(),
+      }
+    }
+
+    case 'hardwareProducts': {
+      const validLifecycleStatus =
+        typeof row.lifecycleStatus === 'string' && row.lifecycleStatus.trim()
+          ? row.lifecycleStatus.trim().toUpperCase()
+          : undefined
+
+      return {
+        name: generateFallbackName('Hardware Product', row),
+        lifecycleStatus: validLifecycleStatus,
+        isActive:
+          row.isActive === true || row.isActive === 'true' || row.isActive === 1 || row.isActive === '1',
+        updatedAt: row.updatedAt ? new Date(row.updatedAt) : new Date(),
+      }
+    }
+
+    case 'hardwareVersions': {
+      return {
+        name: generateFallbackName('Hardware Version', row),
+        version: row.version ? String(row.version) : undefined,
+        releaseChannel: row.releaseChannel ? String(row.releaseChannel) : undefined,
+        supportTier: row.supportTier ? String(row.supportTier) : undefined,
+        updatedAt: row.updatedAt ? new Date(row.updatedAt) : new Date(),
+      }
+    }
+
+    case 'productFamilies': {
+      const normalizedType = typeof row.type === 'string' ? row.type.trim().toUpperCase() : ''
+      const normalizedCategory =
+        typeof row.category === 'string' ? row.category.trim().toUpperCase() : ''
+
+      const validType = ['SOFTWARE', 'HARDWARE'].includes(normalizedType)
+        ? normalizedType
+        : 'SOFTWARE'
+
+      return {
+        name: generateFallbackName('Product Family', row),
+        type: validType,
+        category: normalizedCategory || 'OPERATING_PLATFORM_SOFTWARE',
         updatedAt: row.updatedAt ? new Date(row.updatedAt) : new Date(),
       }
     }

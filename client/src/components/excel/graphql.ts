@@ -85,6 +85,35 @@ import {
   CHECK_BUSINESS_PROCESS_EXISTS,
   GET_BUSINESS_PROCESSES_COUNT,
 } from '../../graphql/businessProcess'
+import {
+  CREATE_PRODUCT_FAMILY,
+  UPDATE_PRODUCT_FAMILY,
+  CHECK_PRODUCT_FAMILY_EXISTS,
+} from '../../graphql/productFamily'
+import {
+  CREATE_SOFTWARE_PRODUCT,
+  UPDATE_SOFTWARE_PRODUCT,
+  CHECK_SOFTWARE_PRODUCT_EXISTS,
+  GET_SOFTWARE_PRODUCTS_COUNT,
+} from '../../graphql/softwareProduct'
+import {
+  CREATE_SOFTWARE_VERSION,
+  UPDATE_SOFTWARE_VERSION,
+  CHECK_SOFTWARE_VERSION_EXISTS,
+  GET_SOFTWARE_VERSIONS_COUNT,
+} from '../../graphql/softwareVersion'
+import {
+  CREATE_HARDWARE_PRODUCT,
+  UPDATE_HARDWARE_PRODUCT,
+  CHECK_HARDWARE_PRODUCT_EXISTS,
+  GET_HARDWARE_PRODUCTS_COUNT,
+} from '../../graphql/hardwareProduct'
+import {
+  CREATE_HARDWARE_VERSION,
+  UPDATE_HARDWARE_VERSION,
+  CHECK_HARDWARE_VERSION_EXISTS,
+  GET_HARDWARE_VERSIONS_COUNT,
+} from '../../graphql/hardwareVersion'
 
 // GraphQL mutations for data deletion
 export const DELETE_BUSINESS_CAPABILITIES = () => `
@@ -215,6 +244,46 @@ export const DELETE_BUSINESS_PROCESSES = () => `
   }
 `
 
+export const DELETE_PRODUCT_FAMILIES = () => `
+  mutation DeleteProductFamilies($where: ProductFamilyWhere) {
+    deleteProductFamilies(where: $where) {
+      nodesDeleted
+    }
+  }
+`
+
+export const DELETE_SOFTWARE_PRODUCTS = () => `
+  mutation DeleteSoftwareProducts($where: SoftwareProductWhere) {
+    deleteSoftwareProducts(where: $where) {
+      nodesDeleted
+    }
+  }
+`
+
+export const DELETE_SOFTWARE_VERSIONS = () => `
+  mutation DeleteSoftwareVersions($where: SoftwareVersionWhere) {
+    deleteSoftwareVersions(where: $where) {
+      nodesDeleted
+    }
+  }
+`
+
+export const DELETE_HARDWARE_PRODUCTS = () => `
+  mutation DeleteHardwareProducts($where: HardwareProductWhere) {
+    deleteHardwareProducts(where: $where) {
+      nodesDeleted
+    }
+  }
+`
+
+export const DELETE_HARDWARE_VERSIONS = () => `
+  mutation DeleteHardwareVersions($where: HardwareVersionWhere) {
+    deleteHardwareVersions(where: $where) {
+      nodesDeleted
+    }
+  }
+`
+
 // Helper-Funktion: Gibt die passenden CREATE/UPDATE Mutations für einen Entity-Type zurück
 export const getMutationsByEntityType = (entityType: string) => {
   const mutationMap = {
@@ -298,6 +367,31 @@ export const getMutationsByEntityType = (entityType: string) => {
       update: UPDATE_STRATEGY,
       check: CHECK_STRATEGY_EXISTS,
     },
+    productFamilies: {
+      create: CREATE_PRODUCT_FAMILY,
+      update: UPDATE_PRODUCT_FAMILY,
+      check: CHECK_PRODUCT_FAMILY_EXISTS,
+    },
+    softwareProducts: {
+      create: CREATE_SOFTWARE_PRODUCT,
+      update: UPDATE_SOFTWARE_PRODUCT,
+      check: CHECK_SOFTWARE_PRODUCT_EXISTS,
+    },
+    softwareVersions: {
+      create: CREATE_SOFTWARE_VERSION,
+      update: UPDATE_SOFTWARE_VERSION,
+      check: CHECK_SOFTWARE_VERSION_EXISTS,
+    },
+    hardwareProducts: {
+      create: CREATE_HARDWARE_PRODUCT,
+      update: UPDATE_HARDWARE_PRODUCT,
+      check: CHECK_HARDWARE_PRODUCT_EXISTS,
+    },
+    hardwareVersions: {
+      create: CREATE_HARDWARE_VERSION,
+      update: UPDATE_HARDWARE_VERSION,
+      check: CHECK_HARDWARE_VERSION_EXISTS,
+    },
   }
 
   return mutationMap[entityType as keyof typeof mutationMap]
@@ -322,6 +416,11 @@ export const getDeleteMutationByEntityType = (entityType: string) => {
     values: DELETE_VALUES(),
     goals: DELETE_GOALS(),
     strategies: DELETE_STRATEGIES(),
+    productFamilies: DELETE_PRODUCT_FAMILIES(),
+    softwareProducts: DELETE_SOFTWARE_PRODUCTS(),
+    softwareVersions: DELETE_SOFTWARE_VERSIONS(),
+    hardwareProducts: DELETE_HARDWARE_PRODUCTS(),
+    hardwareVersions: DELETE_HARDWARE_VERSIONS(),
   }
 
   return deleteMutationMap[entityType as keyof typeof deleteMutationMap]
@@ -393,4 +492,23 @@ export {
   UPDATE_STRATEGY,
   CHECK_STRATEGY_EXISTS,
   GET_STRATEGIES,
+  CREATE_PRODUCT_FAMILY,
+  UPDATE_PRODUCT_FAMILY,
+  CHECK_PRODUCT_FAMILY_EXISTS,
+  CREATE_SOFTWARE_PRODUCT,
+  UPDATE_SOFTWARE_PRODUCT,
+  CHECK_SOFTWARE_PRODUCT_EXISTS,
+  GET_SOFTWARE_PRODUCTS_COUNT,
+  CREATE_SOFTWARE_VERSION,
+  UPDATE_SOFTWARE_VERSION,
+  CHECK_SOFTWARE_VERSION_EXISTS,
+  GET_SOFTWARE_VERSIONS_COUNT,
+  CREATE_HARDWARE_PRODUCT,
+  UPDATE_HARDWARE_PRODUCT,
+  CHECK_HARDWARE_PRODUCT_EXISTS,
+  GET_HARDWARE_PRODUCTS_COUNT,
+  CREATE_HARDWARE_VERSION,
+  UPDATE_HARDWARE_VERSION,
+  CHECK_HARDWARE_VERSION_EXISTS,
+  GET_HARDWARE_VERSIONS_COUNT,
 }

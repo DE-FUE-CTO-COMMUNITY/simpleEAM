@@ -15,6 +15,11 @@ import { GET_VALUES } from '../graphql/value'
 import { GET_GOALS } from '../graphql/goal'
 import { GET_STRATEGIES } from '../graphql/strategy'
 import { GET_BUSINESS_PROCESSES } from '../graphql/businessProcess'
+import { GET_PRODUCT_FAMILIES } from '../graphql/productFamily'
+import { GET_SOFTWARE_PRODUCTS } from '../graphql/softwareProduct'
+import { GET_SOFTWARE_VERSIONS } from '../graphql/softwareVersion'
+import { GET_HARDWARE_PRODUCTS } from '../graphql/hardwareProduct'
+import { GET_HARDWARE_VERSIONS } from '../graphql/hardwareVersion'
 import { ValidationResult } from '../components/excel/types'
 import { getRequiredFieldsByEntityType, getOptionalFieldsByEntityType } from './excelDataService'
 
@@ -36,6 +41,11 @@ export type JsonEntityType =
   | 'diagrams'
   | 'architecturePrinciples'
   | 'infrastructures'
+  | 'productFamilies'
+  | 'softwareProducts'
+  | 'softwareVersions'
+  | 'hardwareProducts'
+  | 'hardwareVersions'
   | 'aicomponents'
   | 'visions'
   | 'missions'
@@ -58,6 +68,15 @@ const companyWhere = (entityType: JsonEntityType | 'all', companyId?: string): a
 
   if (entityType === 'persons') {
     return { companies: { some: { id: { eq: companyId } } } }
+  }
+
+  if (entityType === 'productFamilies') {
+    return {
+      OR: [
+        { softwareProducts: { some: { company: { some: { id: { eq: companyId } } } } } },
+        { hardwareProducts: { some: { company: { some: { id: { eq: companyId } } } } } },
+      ],
+    }
   }
 
   return { company: { some: { id: { eq: companyId } } } }
@@ -735,6 +754,151 @@ export const fetchStrategiesForJson = async (
   }
 }
 
+export const fetchProductFamiliesForJson = async (
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
+): Promise<JsonExportData[]> => {
+  try {
+    const { data } = await client.query({
+      query: GET_PRODUCT_FAMILIES,
+      variables: { where: companyWhere('productFamilies', selectedCompanyId) },
+      fetchPolicy: 'cache-first',
+    })
+
+    return data.productFamilies?.map((family: any) => ({
+      id: family.id,
+      name: family.name || '',
+      category: family.category || '',
+      type: family.type || '',
+      createdAt: formatDateForJsonExport(family.createdAt),
+      updatedAt: formatDateForJsonExport(family.updatedAt),
+      softwareProducts: family.softwareProducts || [],
+      hardwareProducts: family.hardwareProducts || [],
+    }))
+  } catch {
+    throw new Error('Fehler beim Laden der Product Families für JSON-Export')
+  }
+}
+
+export const fetchSoftwareProductsForJson = async (
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
+): Promise<JsonExportData[]> => {
+  try {
+    const { data } = await client.query({
+      query: GET_SOFTWARE_PRODUCTS,
+      variables: { where: companyWhere('softwareProducts', selectedCompanyId) },
+      fetchPolicy: 'cache-first',
+    })
+
+    return data.softwareProducts?.map((product: any) => ({
+      id: product.id,
+      name: product.name || '',
+      lifecycleStatus: product.lifecycleStatus || '',
+      isActive: product.isActive ?? undefined,
+      createdAt: formatDateForJsonExport(product.createdAt),
+      updatedAt: formatDateForJsonExport(product.updatedAt),
+      productFamily: product.productFamily || [],
+      developedBy: product.developedBy || [],
+      providedBy: product.providedBy || [],
+      maintainedBy: product.maintainedBy || [],
+      versions: product.versions || [],
+      usedByApplications: product.usedByApplications || [],
+      usedByInfrastructure: product.usedByInfrastructure || [],
+    }))
+  } catch {
+    throw new Error('Fehler beim Laden der Software Products für JSON-Export')
+  }
+}
+
+export const fetchSoftwareVersionsForJson = async (
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
+): Promise<JsonExportData[]> => {
+  try {
+    const { data } = await client.query({
+      query: GET_SOFTWARE_VERSIONS,
+      variables: { where: companyWhere('softwareVersions', selectedCompanyId) },
+      fetchPolicy: 'cache-first',
+    })
+
+    return data.softwareVersions?.map((version: any) => ({
+      id: version.id,
+      name: version.name || '',
+      version: version.version || '',
+      releaseChannel: version.releaseChannel || '',
+      supportTier: version.supportTier || '',
+      isLts: version.isLts ?? undefined,
+      createdAt: formatDateForJsonExport(version.createdAt),
+      updatedAt: formatDateForJsonExport(version.updatedAt),
+      softwareProduct: version.softwareProduct || [],
+      usedByApplications: version.usedByApplications || [],
+      usedByInfrastructure: version.usedByInfrastructure || [],
+      lifecycleRecords: version.lifecycleRecords || [],
+    }))
+  } catch {
+    throw new Error('Fehler beim Laden der Software Versions für JSON-Export')
+  }
+}
+
+export const fetchHardwareProductsForJson = async (
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
+): Promise<JsonExportData[]> => {
+  try {
+    const { data } = await client.query({
+      query: GET_HARDWARE_PRODUCTS,
+      variables: { where: companyWhere('hardwareProducts', selectedCompanyId) },
+      fetchPolicy: 'cache-first',
+    })
+
+    return data.hardwareProducts?.map((product: any) => ({
+      id: product.id,
+      name: product.name || '',
+      lifecycleStatus: product.lifecycleStatus || '',
+      isActive: product.isActive ?? undefined,
+      createdAt: formatDateForJsonExport(product.createdAt),
+      updatedAt: formatDateForJsonExport(product.updatedAt),
+      productFamily: product.productFamily || [],
+      manufacturedBy: product.manufacturedBy || [],
+      providedBy: product.providedBy || [],
+      maintainedBy: product.maintainedBy || [],
+      versions: product.versions || [],
+      usedByInfrastructure: product.usedByInfrastructure || [],
+    }))
+  } catch {
+    throw new Error('Fehler beim Laden der Hardware Products für JSON-Export')
+  }
+}
+
+export const fetchHardwareVersionsForJson = async (
+  client: ApolloClient<any>,
+  selectedCompanyId?: string
+): Promise<JsonExportData[]> => {
+  try {
+    const { data } = await client.query({
+      query: GET_HARDWARE_VERSIONS,
+      variables: { where: companyWhere('hardwareVersions', selectedCompanyId) },
+      fetchPolicy: 'cache-first',
+    })
+
+    return data.hardwareVersions?.map((version: any) => ({
+      id: version.id,
+      name: version.name || '',
+      version: version.version || '',
+      releaseChannel: version.releaseChannel || '',
+      supportTier: version.supportTier || '',
+      createdAt: formatDateForJsonExport(version.createdAt),
+      updatedAt: formatDateForJsonExport(version.updatedAt),
+      hardwareProduct: version.hardwareProduct || [],
+      usedByInfrastructure: version.usedByInfrastructure || [],
+      lifecycleRecords: version.lifecycleRecords || [],
+    }))
+  } catch {
+    throw new Error('Fehler beim Laden der Hardware Versions für JSON-Export')
+  }
+}
+
 /**
  * Holt alle Daten für JSON-Export mit vollständigen Beziehungsinformationen
  */
@@ -755,6 +919,11 @@ export const fetchAllDataForJson = async (
       diagrams,
       architecturePrinciples,
       infrastructures,
+      productFamilies,
+      softwareProducts,
+      softwareVersions,
+      hardwareProducts,
+      hardwareVersions,
       aicomponents,
       visions,
       missions,
@@ -772,6 +941,11 @@ export const fetchAllDataForJson = async (
       fetchDiagramsForJson(client, selectedCompanyId),
       fetchArchitecturePrinciplesForJson(client, selectedCompanyId),
       fetchInfrastructuresForJson(client, selectedCompanyId),
+      fetchProductFamiliesForJson(client, selectedCompanyId),
+      fetchSoftwareProductsForJson(client, selectedCompanyId),
+      fetchSoftwareVersionsForJson(client, selectedCompanyId),
+      fetchHardwareProductsForJson(client, selectedCompanyId),
+      fetchHardwareVersionsForJson(client, selectedCompanyId),
       fetchAicomponentsForJson(client, selectedCompanyId),
       includeGea ? fetchVisionsForJson(client, selectedCompanyId) : Promise.resolve([]),
       includeGea ? fetchMissionsForJson(client, selectedCompanyId) : Promise.resolve([]),
@@ -791,6 +965,11 @@ export const fetchAllDataForJson = async (
       Diagrams: diagrams, // Vollständige Diagramme mit JSON-Daten
       'Architecture Principles': architecturePrinciples,
       Infrastructure: infrastructures,
+      'Product Families': productFamilies,
+      'Software Products': softwareProducts,
+      'Software Versions': softwareVersions,
+      'Hardware Products': hardwareProducts,
+      'Hardware Versions': hardwareVersions,
       'AI Components': aicomponents,
     }
 
@@ -846,6 +1025,16 @@ export const fetchDataByEntityTypeForJson = async (
       return await fetchArchitecturePrinciplesForJson(client, selectedCompanyId)
     case 'infrastructures':
       return await fetchInfrastructuresForJson(client, selectedCompanyId)
+    case 'productFamilies':
+      return await fetchProductFamiliesForJson(client, selectedCompanyId)
+    case 'softwareProducts':
+      return await fetchSoftwareProductsForJson(client, selectedCompanyId)
+    case 'softwareVersions':
+      return await fetchSoftwareVersionsForJson(client, selectedCompanyId)
+    case 'hardwareProducts':
+      return await fetchHardwareProductsForJson(client, selectedCompanyId)
+    case 'hardwareVersions':
+      return await fetchHardwareVersionsForJson(client, selectedCompanyId)
     case 'aicomponents':
       return await fetchAicomponentsForJson(client, selectedCompanyId)
     case 'visions':

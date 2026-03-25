@@ -81,3 +81,11 @@ export const DELETE_SOFTWARE_VERSION = gql`
     }
   }
 `
+
+export const CHECK_SOFTWARE_VERSION_EXISTS = gql`
+  query CheckSoftwareVersionExists($id: ID!) {
+    softwareVersions(where: { id: { eq: $id } }) {
+      id
+    }
+  }
+`

@@ -155,6 +155,10 @@ export const importEntityDataWithMapping = async (
             case 'values':
             case 'goals':
             case 'strategies':
+            case 'softwareProducts':
+            case 'softwareVersions':
+            case 'hardwareProducts':
+            case 'hardwareVersions':
               updateInput = { ...updateInput, company: companyUpdate }
               break
             case 'persons':
@@ -196,6 +200,10 @@ export const importEntityDataWithMapping = async (
             case 'values':
             case 'goals':
             case 'strategies':
+            case 'softwareProducts':
+            case 'softwareVersions':
+            case 'hardwareProducts':
+            case 'hardwareVersions':
               input = { ...input, company: companyConnect }
               break
             case 'persons':
@@ -249,6 +257,16 @@ export const importEntityDataWithMapping = async (
             createdEntities = resultData.createGeaGoals.geaGoals
           } else if (resultData.createGeaStrategies) {
             createdEntities = resultData.createGeaStrategies.geaStrategies
+          } else if (resultData.createProductFamilies) {
+            createdEntities = resultData.createProductFamilies.productFamilies
+          } else if (resultData.createSoftwareProducts) {
+            createdEntities = resultData.createSoftwareProducts.softwareProducts
+          } else if (resultData.createSoftwareVersions) {
+            createdEntities = resultData.createSoftwareVersions.softwareVersions
+          } else if (resultData.createHardwareProducts) {
+            createdEntities = resultData.createHardwareProducts.hardwareProducts
+          } else if (resultData.createHardwareVersions) {
+            createdEntities = resultData.createHardwareVersions.hardwareVersions
           }
           if (createdEntities && createdEntities.length > 0) {
             entityMappings[originalId] = createdEntities[0].id
@@ -747,6 +765,15 @@ export const deleteEntityData = async (
       return { companies: { some: { id: { eq: selectedCompanyId } } } }
     }
 
+    if (entityType === 'productFamilies') {
+      return {
+        OR: [
+          { softwareProducts: { some: { company: { some: { id: { eq: selectedCompanyId } } } } } },
+          { hardwareProducts: { some: { company: { some: { id: { eq: selectedCompanyId } } } } } },
+        ],
+      }
+    }
+
     // Standard-Behandlung für alle anderen Entitäten
     return { company: { some: { id: { eq: selectedCompanyId } } } }
   }
@@ -764,6 +791,11 @@ export const deleteEntityData = async (
       'diagrams',
       'architecturePrinciples',
       'infrastructures',
+      'productFamilies',
+      'softwareProducts',
+      'softwareVersions',
+      'hardwareProducts',
+      'hardwareVersions',
       'aicomponents',
       'visions',
       'missions',
@@ -1300,6 +1332,99 @@ const createRelationshipUpdateInput = (
           'childInfrastructures',
           row.childInfrastructures
         )
+      }
+      break
+
+    case 'softwareProducts':
+      if (row.productFamily) {
+        input.productFamily = processRelationshipField('productFamily', row.productFamily)
+      }
+      if (row.developedBy) {
+        input.developedBy = processRelationshipField('developedBy', row.developedBy)
+      }
+      if (row.providedBy) {
+        input.providedBy = processRelationshipField('providedBy', row.providedBy)
+      }
+      if (row.maintainedBy) {
+        input.maintainedBy = processRelationshipField('maintainedBy', row.maintainedBy)
+      }
+      if (row.versions) {
+        input.versions = processRelationshipField('versions', row.versions)
+      }
+      if (row.usedByApplications) {
+        input.usedByApplications = processRelationshipField(
+          'usedByApplications',
+          row.usedByApplications
+        )
+      }
+      if (row.usedByInfrastructure) {
+        input.usedByInfrastructure = processRelationshipField(
+          'usedByInfrastructure',
+          row.usedByInfrastructure
+        )
+      }
+      break
+
+    case 'softwareVersions':
+      if (row.softwareProduct) {
+        input.softwareProduct = processRelationshipField('softwareProduct', row.softwareProduct)
+      }
+      if (row.usedByApplications) {
+        input.usedByApplications = processRelationshipField(
+          'usedByApplications',
+          row.usedByApplications
+        )
+      }
+      if (row.usedByInfrastructure) {
+        input.usedByInfrastructure = processRelationshipField(
+          'usedByInfrastructure',
+          row.usedByInfrastructure
+        )
+      }
+      break
+
+    case 'hardwareProducts':
+      if (row.productFamily) {
+        input.productFamily = processRelationshipField('productFamily', row.productFamily)
+      }
+      if (row.manufacturedBy) {
+        input.manufacturedBy = processRelationshipField('manufacturedBy', row.manufacturedBy)
+      }
+      if (row.providedBy) {
+        input.providedBy = processRelationshipField('providedBy', row.providedBy)
+      }
+      if (row.maintainedBy) {
+        input.maintainedBy = processRelationshipField('maintainedBy', row.maintainedBy)
+      }
+      if (row.versions) {
+        input.versions = processRelationshipField('versions', row.versions)
+      }
+      if (row.usedByInfrastructure) {
+        input.usedByInfrastructure = processRelationshipField(
+          'usedByInfrastructure',
+          row.usedByInfrastructure
+        )
+      }
+      break
+
+    case 'hardwareVersions':
+      if (row.hardwareProduct) {
+        input.hardwareProduct = processRelationshipField('hardwareProduct', row.hardwareProduct)
+      }
+      if (row.usedByInfrastructure) {
+        input.usedByInfrastructure = processRelationshipField(
+          'usedByInfrastructure',
+          row.usedByInfrastructure
+        )
+      }
+      break
+
+    case 'productFamilies':
+      if (row.softwareProducts) {
+        input.softwareProducts = processRelationshipField('softwareProducts', row.softwareProducts)
+      }
+      if (row.hardwareProducts) {
+        input.hardwareProducts = processRelationshipField('hardwareProducts', row.hardwareProducts)
       }
       break
 

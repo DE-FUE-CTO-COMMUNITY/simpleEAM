@@ -76,3 +76,11 @@ export const DELETE_HARDWARE_VERSION = gql`
     }
   }
 `
+
+export const CHECK_HARDWARE_VERSION_EXISTS = gql`
+  query CheckHardwareVersionExists($id: ID!) {
+    hardwareVersions(where: { id: { eq: $id } }) {
+      id
+    }
+  }
+`

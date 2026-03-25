@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client/core'
 
 export const GET_PRODUCT_FAMILIES = gql`
-  query GetProductFamilies {
-    productFamilies {
+  query GetProductFamilies($where: ProductFamilyWhere) {
+    productFamilies(where: $where) {
       id
       name
       category
@@ -15,6 +15,14 @@ export const GET_PRODUCT_FAMILIES = gql`
       hardwareProducts {
         id
       }
+    }
+  }
+`
+
+export const CHECK_PRODUCT_FAMILY_EXISTS = gql`
+  query CheckProductFamilyExists($id: ID!) {
+    productFamilies(where: { id: { eq: $id } }) {
+      id
     }
   }
 `
