@@ -54,6 +54,40 @@ const SoftwareVersionTable: React.FC<SoftwareVersionTableProps> = ({
   const locale = useLocale()
   const columnHelper = createColumnHelper<SoftwareVersionType>()
 
+  const getReleaseChannelLabel = (value?: string | null): string => {
+    if (!value) {
+      return '-'
+    }
+
+    const labels: Record<string, string> = {
+      STABLE: tEntity('releaseChannels.STABLE'),
+      LTS: tEntity('releaseChannels.LTS'),
+      RC: tEntity('releaseChannels.RC'),
+      BETA: tEntity('releaseChannels.BETA'),
+      ALPHA: tEntity('releaseChannels.ALPHA'),
+      PREVIEW: tEntity('releaseChannels.PREVIEW'),
+    }
+
+    return labels[value] ?? value
+  }
+
+  const getSupportTierLabel = (value?: string | null): string => {
+    if (!value) {
+      return '-'
+    }
+
+    const labels: Record<string, string> = {
+      STANDARD: tEntity('supportTiers.STANDARD'),
+      EXTENDED: tEntity('supportTiers.EXTENDED'),
+      PREMIUM: tEntity('supportTiers.PREMIUM'),
+      COMMUNITY: tEntity('supportTiers.COMMUNITY'),
+      DEPRECATED: tEntity('supportTiers.DEPRECATED'),
+      END_OF_SUPPORT: tEntity('supportTiers.END_OF_SUPPORT'),
+    }
+
+    return labels[value] ?? value
+  }
+
   const {
     columnVisibility,
     onTableReady: persistentOnTableReady,
@@ -82,11 +116,11 @@ const SoftwareVersionTable: React.FC<SoftwareVersionTableProps> = ({
       }),
       columnHelper.accessor('releaseChannel', {
         header: t('releaseChannel'),
-        cell: info => info.getValue() || '-',
+        cell: info => getReleaseChannelLabel(info.getValue()),
       }),
       columnHelper.accessor('supportTier', {
         header: t('supportTier'),
-        cell: info => info.getValue() || '-',
+        cell: info => getSupportTierLabel(info.getValue()),
       }),
       columnHelper.accessor('isLts', {
         header: t('isLts'),
@@ -117,7 +151,7 @@ const SoftwareVersionTable: React.FC<SoftwareVersionTableProps> = ({
         cell: info => (info.getValue() ? formatDate(info.getValue() as string, locale) : '-'),
       }),
     ],
-    [columnHelper, locale, t, tLifecycle]
+    [columnHelper, locale, t, tEntity, tLifecycle]
   )
 
   const mapToFormValues = (item: SoftwareVersionType): SoftwareVersionFormValues => ({
@@ -131,6 +165,9 @@ const SoftwareVersionTable: React.FC<SoftwareVersionTableProps> = ({
     supportTier: item.supportTier ?? '',
     isLts: item.isLts ?? false,
     softwareProductId: item.softwareProduct?.[0]?.id ?? '',
+    usedByApplicationIds: item.usedByApplications?.map(application => application.id) ?? [],
+    usedByInfrastructureIds:
+      item.usedByInfrastructure?.map(infrastructure => infrastructure.id) ?? [],
   })
 
   return (

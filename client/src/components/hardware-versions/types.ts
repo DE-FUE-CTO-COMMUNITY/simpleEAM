@@ -10,6 +10,7 @@ export type HardwareVersionType = Pick<
   | 'createdAt'
   | 'updatedAt'
   | 'hardwareProduct'
+  | 'usedByInfrastructure'
   | 'lifecycleRecords'
 >
 

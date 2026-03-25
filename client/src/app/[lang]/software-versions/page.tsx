@@ -164,6 +164,20 @@ const SoftwareVersionsPage = () => {
       }
     }
 
+    if (values.usedByApplicationIds && values.usedByApplicationIds.length > 0) {
+      input.usedByApplications = {
+        connect: values.usedByApplicationIds.map(id => ({ where: { node: { id: { eq: id } } } })),
+      }
+    }
+
+    if (values.usedByInfrastructureIds && values.usedByInfrastructureIds.length > 0) {
+      input.usedByInfrastructure = {
+        connect: values.usedByInfrastructureIds.map(id => ({
+          where: { node: { id: { eq: id } } },
+        })),
+      }
+    }
+
     if (hasLifecycleRecordData(values)) {
       input.lifecycleRecords = {
         create: [
@@ -197,6 +211,26 @@ const SoftwareVersionsPage = () => {
         ...(values.softwareProductId
           ? {
               connect: [{ where: { node: { id: { eq: values.softwareProductId } } } }],
+            }
+          : {}),
+      },
+      usedByApplications: {
+        disconnect: [{ where: {} }],
+        ...(values.usedByApplicationIds && values.usedByApplicationIds.length > 0
+          ? {
+              connect: values.usedByApplicationIds.map(id => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            }
+          : {}),
+      },
+      usedByInfrastructure: {
+        disconnect: [{ where: {} }],
+        ...(values.usedByInfrastructureIds && values.usedByInfrastructureIds.length > 0
+          ? {
+              connect: values.usedByInfrastructureIds.map(id => ({
+                where: { node: { id: { eq: id } } },
+              })),
             }
           : {}),
       },

@@ -28,11 +28,14 @@ import {
   DELETE_INFRASTRUCTURE,
 } from '@/graphql/infrastructure'
 import { useCompanyContext } from '@/contexts/CompanyContext'
+import { useLensSettings } from '@/lib/lens-settings'
 
 export default function InfrastructuresPage() {
   const t = useTranslations('infrastructure')
   const { enqueueSnackbar } = useSnackbar()
   const { selectedCompanyId } = useCompanyContext()
+  const { lensFlags } = useLensSettings()
+  const showTechnologyManagementRelationship = lensFlags.technologyManagement
   const [sorting, setSorting] = useState<SortingState>([])
   const [globalFilter, setGlobalFilter] = useState('')
   const [tableInstance, setTableInstance] = useState<any>(null)
@@ -141,6 +144,24 @@ export default function InfrastructuresPage() {
           data.hostsApplications.length > 0 && {
             hostsApplications: {
               connect: data.hostsApplications.map((id: string) => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }),
+        ...(showTechnologyManagementRelationship &&
+          data.softwareVersionIds &&
+          data.softwareVersionIds.length > 0 && {
+            softwareVersions: {
+              connect: data.softwareVersionIds.map((id: string) => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }),
+        ...(showTechnologyManagementRelationship &&
+          data.hardwareVersionIds &&
+          data.hardwareVersionIds.length > 0 && {
+            hardwareVersions: {
+              connect: data.hardwareVersionIds.map((id: string) => ({
                 where: { node: { id: { eq: id } } },
               })),
             },
@@ -290,6 +311,30 @@ export default function InfrastructuresPage() {
               }
             : { disconnect: [{ where: {} }] },
         ],
+        ...(showTechnologyManagementRelationship
+          ? {
+              softwareVersions: [
+                data.softwareVersionIds && data.softwareVersionIds.length
+                  ? {
+                      disconnect: [{ where: {} }],
+                      connect: data.softwareVersionIds.map((sid: string) => ({
+                        where: { node: { id: { eq: sid } } },
+                      })),
+                    }
+                  : { disconnect: [{ where: {} }] },
+              ],
+              hardwareVersions: [
+                data.hardwareVersionIds && data.hardwareVersionIds.length
+                  ? {
+                      disconnect: [{ where: {} }],
+                      connect: data.hardwareVersionIds.map((hid: string) => ({
+                        where: { node: { id: { eq: hid } } },
+                      })),
+                    }
+                  : { disconnect: [{ where: {} }] },
+              ],
+            }
+          : {}),
         providedBy: [
           data.providedBy && data.providedBy.length
             ? {

@@ -643,6 +643,7 @@ type Application
   hostedOn: [Infrastructure!]! @relationship(type: "HOSTED_ON", direction: OUT)
   usesSoftwareProducts: [SoftwareProduct!]!
     @relationship(type: "USES_SOFTWARE_PRODUCT", direction: OUT)
+  softwareVersions: [SoftwareVersion!]! @relationship(type: "USES_SOFTWARE_VERSION", direction: OUT)
   sbomDocuments: [SbomDocument!]! @relationship(type: "HAS_SBOM", direction: OUT)
   usesAIComponents: [AIComponent!]! @relationship(type: "USED_BY", direction: OUT)
   providedBy: [Supplier!]! @relationship(type: "PROVIDED_BY", direction: OUT)
@@ -865,6 +866,8 @@ type Infrastructure
     @relationship(type: "USES_SOFTWARE_PRODUCT", direction: OUT)
   usesHardwareProducts: [HardwareProduct!]!
     @relationship(type: "USES_HARDWARE_PRODUCT", direction: OUT)
+  softwareVersions: [SoftwareVersion!]! @relationship(type: "USES_SOFTWARE_VERSION", direction: OUT)
+  hardwareVersions: [HardwareVersion!]! @relationship(type: "USES_HARDWARE_VERSION", direction: OUT)
   partOfArchitectures: [Architecture!]! @relationship(type: "CONTAINS", direction: IN)
   depictedInDiagrams: [Diagram!]! @relationship(type: "DEPICTED_IN", direction: OUT)
   providedBy: [Supplier!]! @relationship(type: "PROVIDED_BY", direction: OUT)
@@ -960,6 +963,9 @@ type SoftwareVersion
   company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
   softwareProduct: [SoftwareProduct!]! @relationship(type: "HAS_SOFTWARE_VERSION", direction: IN)
   lifecycleRecords: [LifecycleRecord!]! @relationship(type: "HAS_LIFECYCLE_RECORD", direction: OUT)
+  usedByApplications: [Application!]! @relationship(type: "USES_SOFTWARE_VERSION", direction: IN)
+  usedByInfrastructure: [Infrastructure!]!
+    @relationship(type: "USES_SOFTWARE_VERSION", direction: IN)
 }
 
 """
@@ -1048,6 +1054,8 @@ type HardwareVersion
   company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
   hardwareProduct: [HardwareProduct!]! @relationship(type: "HAS_HARDWARE_VERSION", direction: IN)
   lifecycleRecords: [LifecycleRecord!]! @relationship(type: "HAS_LIFECYCLE_RECORD", direction: OUT)
+  usedByInfrastructure: [Infrastructure!]!
+    @relationship(type: "USES_HARDWARE_VERSION", direction: IN)
 }
 
 """

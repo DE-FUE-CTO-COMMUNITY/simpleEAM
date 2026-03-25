@@ -1012,6 +1012,7 @@
       "parentApplications": "Parent Applications",
       "componentApplications": "Components (sub-applications)",
       "hostedOn": "Hosted on (Infrastructure)",
+      "softwareVersions": "Software Versions",
       "providedBy": "Provided By Suppliers",
       "supportedBy": "Supported By Suppliers",
       "maintainedBy": "Maintained By Suppliers",
@@ -1142,6 +1143,7 @@
       "relationships": "Relationships",
       "architectures": "Architectures",
       "technical": "Technical",
+      "technologyManagement": "Technology Management",
       "principles": "Principles",
       "suppliers": "Suppliers"
     }
@@ -2065,6 +2067,8 @@
       "childInfrastructures": "Child Infrastructures",
       "components": "Components",
       "hostsApplications": "Hosted Applications",
+      "softwareVersions": "Software Versions",
+      "hardwareVersions": "Hardware Versions",
       "hostedApplications": "Hosted Applications",
       "providedBy": "Provided By Suppliers",
       "hostedBy": "Hosted By Suppliers",
@@ -2165,6 +2169,7 @@
       "technical": "Technical",
       "lifecycle": "Lifecycle",
       "relationships": "Relationships",
+      "technologyManagement": "Technology Management",
       "architectures": "Architectures",
       "suppliers": "Suppliers"
     }
@@ -3367,6 +3372,8 @@
       "eosDate": "End of Support (EOS)",
       "eolDate": "End of Life (EOL)",
       "softwareProduct": "Software Product",
+      "usedByApplications": "Used by Applications",
+      "usedByInfrastructure": "Used by Infrastructure",
       "none": "None",
       "nameRequired": "Name is required",
       "nameMax": "Name must not exceed 100 characters",
@@ -3540,6 +3547,7 @@
       "eosDate": "End of Support (EOS)",
       "eolDate": "End of Life (EOL)",
       "hardwareProduct": "Hardware Product",
+      "usedByInfrastructure": "Used by Infrastructure",
       "none": "None",
       "nameRequired": "Name is required",
       "nameMax": "Name must not exceed 100 characters",

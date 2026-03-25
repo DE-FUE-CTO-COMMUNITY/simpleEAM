@@ -26,6 +26,10 @@ export const GET_HARDWARE_VERSIONS = gql`
         id
         name
       }
+      usedByInfrastructure {
+        id
+        name
+      }
       lifecycleRecords {
         id
         lifecycleStatus

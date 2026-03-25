@@ -163,6 +163,14 @@ const HardwareVersionsPage = () => {
       }
     }
 
+    if (values.usedByInfrastructureIds && values.usedByInfrastructureIds.length > 0) {
+      input.usedByInfrastructure = {
+        connect: values.usedByInfrastructureIds.map(id => ({
+          where: { node: { id: { eq: id } } },
+        })),
+      }
+    }
+
     if (hasLifecycleRecordData(values)) {
       input.lifecycleRecords = {
         create: [
@@ -195,6 +203,16 @@ const HardwareVersionsPage = () => {
         ...(values.hardwareProductId
           ? {
               connect: [{ where: { node: { id: { eq: values.hardwareProductId } } } }],
+            }
+          : {}),
+      },
+      usedByInfrastructure: {
+        disconnect: [{ where: {} }],
+        ...(values.usedByInfrastructureIds && values.usedByInfrastructureIds.length > 0
+          ? {
+              connect: values.usedByInfrastructureIds.map(id => ({
+                where: { node: { id: { eq: id } } },
+              })),
             }
           : {}),
       },

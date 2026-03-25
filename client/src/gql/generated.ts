@@ -3181,6 +3181,8 @@ export type Application = {
   sbomDocuments: Array<SbomDocument>;
   sbomDocumentsConnection: ApplicationSbomDocumentsConnection;
   sevenRStrategy?: Maybe<SevenRStrategy>;
+  softwareVersions: Array<SoftwareVersion>;
+  softwareVersionsConnection: ApplicationSoftwareVersionsConnection;
   sourceOfInterfaces: Array<ApplicationInterface>;
   sourceOfInterfacesConnection: ApplicationSourceOfInterfacesConnection;
   sovereigntyAchDataResidency?: Maybe<SovereigntyMaturity>;
@@ -3448,6 +3450,24 @@ export type ApplicationSbomDocumentsConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<ApplicationSbomDocumentsConnectionSort>>;
   where?: InputMaybe<ApplicationSbomDocumentsConnectionWhere>;
+};
+
+
+/** Application – represents a business application within Enterprise Architecture Management */
+export type ApplicationSoftwareVersionsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SoftwareVersionSort>>;
+  where?: InputMaybe<SoftwareVersionWhere>;
+};
+
+
+/** Application – represents a business application within Enterprise Architecture Management */
+export type ApplicationSoftwareVersionsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<ApplicationSoftwareVersionsConnectionSort>>;
+  where?: InputMaybe<ApplicationSoftwareVersionsConnectionWhere>;
 };
 
 
@@ -4149,6 +4169,7 @@ export type ApplicationConnectInput = {
   predecessors?: InputMaybe<Array<ApplicationPredecessorsConnectFieldInput>>;
   providedBy?: InputMaybe<Array<ApplicationProvidedByConnectFieldInput>>;
   sbomDocuments?: InputMaybe<Array<ApplicationSbomDocumentsConnectFieldInput>>;
+  softwareVersions?: InputMaybe<Array<ApplicationSoftwareVersionsConnectFieldInput>>;
   sourceOfInterfaces?: InputMaybe<Array<ApplicationSourceOfInterfacesConnectFieldInput>>;
   successors?: InputMaybe<Array<ApplicationSuccessorsConnectFieldInput>>;
   supportedBy?: InputMaybe<Array<ApplicationSupportedByConnectFieldInput>>;
@@ -4191,6 +4212,7 @@ export type ApplicationCreateInput = {
   sbom?: InputMaybe<Scalars['String']['input']>;
   sbomDocuments?: InputMaybe<ApplicationSbomDocumentsFieldInput>;
   sevenRStrategy?: InputMaybe<SevenRStrategy>;
+  softwareVersions?: InputMaybe<ApplicationSoftwareVersionsFieldInput>;
   sourceOfInterfaces?: InputMaybe<ApplicationSourceOfInterfacesFieldInput>;
   sovereigntyAchDataResidency?: InputMaybe<SovereigntyMaturity>;
   sovereigntyAchInteroperability?: InputMaybe<SovereigntyMaturity>;
@@ -4264,6 +4286,7 @@ export type ApplicationDeleteInput = {
   predecessors?: InputMaybe<Array<ApplicationPredecessorsDeleteFieldInput>>;
   providedBy?: InputMaybe<Array<ApplicationProvidedByDeleteFieldInput>>;
   sbomDocuments?: InputMaybe<Array<ApplicationSbomDocumentsDeleteFieldInput>>;
+  softwareVersions?: InputMaybe<Array<ApplicationSoftwareVersionsDeleteFieldInput>>;
   sourceOfInterfaces?: InputMaybe<Array<ApplicationSourceOfInterfacesDeleteFieldInput>>;
   successors?: InputMaybe<Array<ApplicationSuccessorsDeleteFieldInput>>;
   supportedBy?: InputMaybe<Array<ApplicationSupportedByDeleteFieldInput>>;
@@ -4416,6 +4439,7 @@ export type ApplicationDisconnectInput = {
   predecessors?: InputMaybe<Array<ApplicationPredecessorsDisconnectFieldInput>>;
   providedBy?: InputMaybe<Array<ApplicationProvidedByDisconnectFieldInput>>;
   sbomDocuments?: InputMaybe<Array<ApplicationSbomDocumentsDisconnectFieldInput>>;
+  softwareVersions?: InputMaybe<Array<ApplicationSoftwareVersionsDisconnectFieldInput>>;
   sourceOfInterfaces?: InputMaybe<Array<ApplicationSourceOfInterfacesDisconnectFieldInput>>;
   successors?: InputMaybe<Array<ApplicationSuccessorsDisconnectFieldInput>>;
   supportedBy?: InputMaybe<Array<ApplicationSupportedByDisconnectFieldInput>>;
@@ -7422,6 +7446,130 @@ export type ApplicationSoftwareProductUsesSoftwareProductsNodeAggregateSelection
   updatedAt: DateTimeAggregateSelection;
 };
 
+export type ApplicationSoftwareVersionSoftwareVersionsAggregateSelection = {
+  __typename?: 'ApplicationSoftwareVersionSoftwareVersionsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<ApplicationSoftwareVersionSoftwareVersionsNodeAggregateSelection>;
+};
+
+export type ApplicationSoftwareVersionSoftwareVersionsNodeAggregateSelection = {
+  __typename?: 'ApplicationSoftwareVersionSoftwareVersionsNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  name: StringAggregateSelection;
+  releaseChannel: StringAggregateSelection;
+  supportTier: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  version: StringAggregateSelection;
+};
+
+export type ApplicationSoftwareVersionsAggregateInput = {
+  AND?: InputMaybe<Array<ApplicationSoftwareVersionsAggregateInput>>;
+  NOT?: InputMaybe<ApplicationSoftwareVersionsAggregateInput>;
+  OR?: InputMaybe<Array<ApplicationSoftwareVersionsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<ApplicationSoftwareVersionsNodeAggregationWhereInput>;
+};
+
+export type ApplicationSoftwareVersionsConnectFieldInput = {
+  connect?: InputMaybe<Array<SoftwareVersionConnectInput>>;
+  where?: InputMaybe<SoftwareVersionConnectWhere>;
+};
+
+export type ApplicationSoftwareVersionsConnection = {
+  __typename?: 'ApplicationSoftwareVersionsConnection';
+  aggregate: ApplicationSoftwareVersionSoftwareVersionsAggregateSelection;
+  edges: Array<ApplicationSoftwareVersionsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type ApplicationSoftwareVersionsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<ApplicationSoftwareVersionsConnectionAggregateInput>>;
+  NOT?: InputMaybe<ApplicationSoftwareVersionsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<ApplicationSoftwareVersionsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<ApplicationSoftwareVersionsNodeAggregationWhereInput>;
+};
+
+export type ApplicationSoftwareVersionsConnectionFilters = {
+  /** Filter Applications by aggregating results on related ApplicationSoftwareVersionsConnections */
+  aggregate?: InputMaybe<ApplicationSoftwareVersionsConnectionAggregateInput>;
+  /** Return Applications where all of the related ApplicationSoftwareVersionsConnections match this filter */
+  all?: InputMaybe<ApplicationSoftwareVersionsConnectionWhere>;
+  /** Return Applications where none of the related ApplicationSoftwareVersionsConnections match this filter */
+  none?: InputMaybe<ApplicationSoftwareVersionsConnectionWhere>;
+  /** Return Applications where one of the related ApplicationSoftwareVersionsConnections match this filter */
+  single?: InputMaybe<ApplicationSoftwareVersionsConnectionWhere>;
+  /** Return Applications where some of the related ApplicationSoftwareVersionsConnections match this filter */
+  some?: InputMaybe<ApplicationSoftwareVersionsConnectionWhere>;
+};
+
+export type ApplicationSoftwareVersionsConnectionSort = {
+  node?: InputMaybe<SoftwareVersionSort>;
+};
+
+export type ApplicationSoftwareVersionsConnectionWhere = {
+  AND?: InputMaybe<Array<ApplicationSoftwareVersionsConnectionWhere>>;
+  NOT?: InputMaybe<ApplicationSoftwareVersionsConnectionWhere>;
+  OR?: InputMaybe<Array<ApplicationSoftwareVersionsConnectionWhere>>;
+  node?: InputMaybe<SoftwareVersionWhere>;
+};
+
+export type ApplicationSoftwareVersionsCreateFieldInput = {
+  node: SoftwareVersionCreateInput;
+};
+
+export type ApplicationSoftwareVersionsDeleteFieldInput = {
+  delete?: InputMaybe<SoftwareVersionDeleteInput>;
+  where?: InputMaybe<ApplicationSoftwareVersionsConnectionWhere>;
+};
+
+export type ApplicationSoftwareVersionsDisconnectFieldInput = {
+  disconnect?: InputMaybe<SoftwareVersionDisconnectInput>;
+  where?: InputMaybe<ApplicationSoftwareVersionsConnectionWhere>;
+};
+
+export type ApplicationSoftwareVersionsFieldInput = {
+  connect?: InputMaybe<Array<ApplicationSoftwareVersionsConnectFieldInput>>;
+  create?: InputMaybe<Array<ApplicationSoftwareVersionsCreateFieldInput>>;
+};
+
+export type ApplicationSoftwareVersionsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<ApplicationSoftwareVersionsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<ApplicationSoftwareVersionsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<ApplicationSoftwareVersionsNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  releaseChannel?: InputMaybe<StringScalarAggregationFilters>;
+  supportTier?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  version?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type ApplicationSoftwareVersionsRelationship = {
+  __typename?: 'ApplicationSoftwareVersionsRelationship';
+  cursor: Scalars['String']['output'];
+  node: SoftwareVersion;
+};
+
+export type ApplicationSoftwareVersionsUpdateConnectionInput = {
+  node?: InputMaybe<SoftwareVersionUpdateInput>;
+  where?: InputMaybe<ApplicationSoftwareVersionsConnectionWhere>;
+};
+
+export type ApplicationSoftwareVersionsUpdateFieldInput = {
+  connect?: InputMaybe<Array<ApplicationSoftwareVersionsConnectFieldInput>>;
+  create?: InputMaybe<Array<ApplicationSoftwareVersionsCreateFieldInput>>;
+  delete?: InputMaybe<Array<ApplicationSoftwareVersionsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<ApplicationSoftwareVersionsDisconnectFieldInput>>;
+  update?: InputMaybe<ApplicationSoftwareVersionsUpdateConnectionInput>;
+};
+
 /** Fields to sort Applications by. The order in which sorts are applied is not guaranteed when specifying many fields in one ApplicationSort object. */
 export type ApplicationSort = {
   costs?: InputMaybe<SortDirection>;
@@ -8234,6 +8382,7 @@ export type ApplicationUpdateInput = {
   sbom?: InputMaybe<StringScalarMutations>;
   sbomDocuments?: InputMaybe<Array<ApplicationSbomDocumentsUpdateFieldInput>>;
   sevenRStrategy?: InputMaybe<SevenRStrategyEnumScalarMutations>;
+  softwareVersions?: InputMaybe<Array<ApplicationSoftwareVersionsUpdateFieldInput>>;
   sourceOfInterfaces?: InputMaybe<Array<ApplicationSourceOfInterfacesUpdateFieldInput>>;
   sovereigntyAchDataResidency?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
   sovereigntyAchInteroperability?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
@@ -8737,6 +8886,8 @@ export type ApplicationWhere = {
   sbomDocuments?: InputMaybe<SbomDocumentRelationshipFilters>;
   sbomDocumentsConnection?: InputMaybe<ApplicationSbomDocumentsConnectionFilters>;
   sevenRStrategy?: InputMaybe<SevenRStrategyEnumScalarFilters>;
+  softwareVersions?: InputMaybe<SoftwareVersionRelationshipFilters>;
+  softwareVersionsConnection?: InputMaybe<ApplicationSoftwareVersionsConnectionFilters>;
   sourceOfInterfaces?: InputMaybe<ApplicationInterfaceRelationshipFilters>;
   sourceOfInterfacesConnection?: InputMaybe<ApplicationSourceOfInterfacesConnectionFilters>;
   sovereigntyAchDataResidency?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
@@ -31418,6 +31569,8 @@ export type HardwareVersion = {
   releaseChannel?: Maybe<Scalars['String']['output']>;
   supportTier?: Maybe<Scalars['String']['output']>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  usedByInfrastructure: Array<Infrastructure>;
+  usedByInfrastructureConnection: HardwareVersionUsedByInfrastructureConnection;
   version?: Maybe<Scalars['String']['output']>;
 };
 
@@ -31473,6 +31626,24 @@ export type HardwareVersionLifecycleRecordsConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<HardwareVersionLifecycleRecordsConnectionSort>>;
   where?: InputMaybe<HardwareVersionLifecycleRecordsConnectionWhere>;
+};
+
+
+/** HardwareVersion – version/model metadata for a hardware product */
+export type HardwareVersionUsedByInfrastructureArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<InfrastructureSort>>;
+  where?: InputMaybe<InfrastructureWhere>;
+};
+
+
+/** HardwareVersion – version/model metadata for a hardware product */
+export type HardwareVersionUsedByInfrastructureConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<HardwareVersionUsedByInfrastructureConnectionSort>>;
+  where?: InputMaybe<HardwareVersionUsedByInfrastructureConnectionWhere>;
 };
 
 export type HardwareVersionAggregate = {
@@ -31651,6 +31822,7 @@ export type HardwareVersionConnectInput = {
   company?: InputMaybe<Array<HardwareVersionCompanyConnectFieldInput>>;
   hardwareProduct?: InputMaybe<Array<HardwareVersionHardwareProductConnectFieldInput>>;
   lifecycleRecords?: InputMaybe<Array<HardwareVersionLifecycleRecordsConnectFieldInput>>;
+  usedByInfrastructure?: InputMaybe<Array<HardwareVersionUsedByInfrastructureConnectFieldInput>>;
 };
 
 export type HardwareVersionConnectWhere = {
@@ -31665,6 +31837,7 @@ export type HardwareVersionCreateInput = {
   releaseChannel?: InputMaybe<Scalars['String']['input']>;
   supportTier?: InputMaybe<Scalars['String']['input']>;
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  usedByInfrastructure?: InputMaybe<HardwareVersionUsedByInfrastructureFieldInput>;
   version?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -31672,12 +31845,14 @@ export type HardwareVersionDeleteInput = {
   company?: InputMaybe<Array<HardwareVersionCompanyDeleteFieldInput>>;
   hardwareProduct?: InputMaybe<Array<HardwareVersionHardwareProductDeleteFieldInput>>;
   lifecycleRecords?: InputMaybe<Array<HardwareVersionLifecycleRecordsDeleteFieldInput>>;
+  usedByInfrastructure?: InputMaybe<Array<HardwareVersionUsedByInfrastructureDeleteFieldInput>>;
 };
 
 export type HardwareVersionDisconnectInput = {
   company?: InputMaybe<Array<HardwareVersionCompanyDisconnectFieldInput>>;
   hardwareProduct?: InputMaybe<Array<HardwareVersionHardwareProductDisconnectFieldInput>>;
   lifecycleRecords?: InputMaybe<Array<HardwareVersionLifecycleRecordsDisconnectFieldInput>>;
+  usedByInfrastructure?: InputMaybe<Array<HardwareVersionUsedByInfrastructureDisconnectFieldInput>>;
 };
 
 export type HardwareVersionEdge = {
@@ -31802,6 +31977,31 @@ export type HardwareVersionHardwareProductUpdateFieldInput = {
   delete?: InputMaybe<Array<HardwareVersionHardwareProductDeleteFieldInput>>;
   disconnect?: InputMaybe<Array<HardwareVersionHardwareProductDisconnectFieldInput>>;
   update?: InputMaybe<HardwareVersionHardwareProductUpdateConnectionInput>;
+};
+
+export type HardwareVersionInfrastructureUsedByInfrastructureAggregateSelection = {
+  __typename?: 'HardwareVersionInfrastructureUsedByInfrastructureAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<HardwareVersionInfrastructureUsedByInfrastructureNodeAggregateSelection>;
+};
+
+export type HardwareVersionInfrastructureUsedByInfrastructureNodeAggregateSelection = {
+  __typename?: 'HardwareVersionInfrastructureUsedByInfrastructureNodeAggregateSelection';
+  capacity: StringAggregateSelection;
+  costs: FloatAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  ipAddress: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
+  location: StringAggregateSelection;
+  maintenanceWindow: StringAggregateSelection;
+  name: StringAggregateSelection;
+  operatingSystem: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
+  specifications: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  vendor: StringAggregateSelection;
+  version: StringAggregateSelection;
 };
 
 export type HardwareVersionLifecycleRecordLifecycleRecordsAggregateSelection = {
@@ -31958,7 +32158,125 @@ export type HardwareVersionUpdateInput = {
   name?: InputMaybe<StringScalarMutations>;
   releaseChannel?: InputMaybe<StringScalarMutations>;
   supportTier?: InputMaybe<StringScalarMutations>;
+  usedByInfrastructure?: InputMaybe<Array<HardwareVersionUsedByInfrastructureUpdateFieldInput>>;
   version?: InputMaybe<StringScalarMutations>;
+};
+
+export type HardwareVersionUsedByInfrastructureAggregateInput = {
+  AND?: InputMaybe<Array<HardwareVersionUsedByInfrastructureAggregateInput>>;
+  NOT?: InputMaybe<HardwareVersionUsedByInfrastructureAggregateInput>;
+  OR?: InputMaybe<Array<HardwareVersionUsedByInfrastructureAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<HardwareVersionUsedByInfrastructureNodeAggregationWhereInput>;
+};
+
+export type HardwareVersionUsedByInfrastructureConnectFieldInput = {
+  connect?: InputMaybe<Array<InfrastructureConnectInput>>;
+  where?: InputMaybe<InfrastructureConnectWhere>;
+};
+
+export type HardwareVersionUsedByInfrastructureConnection = {
+  __typename?: 'HardwareVersionUsedByInfrastructureConnection';
+  aggregate: HardwareVersionInfrastructureUsedByInfrastructureAggregateSelection;
+  edges: Array<HardwareVersionUsedByInfrastructureRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type HardwareVersionUsedByInfrastructureConnectionAggregateInput = {
+  AND?: InputMaybe<Array<HardwareVersionUsedByInfrastructureConnectionAggregateInput>>;
+  NOT?: InputMaybe<HardwareVersionUsedByInfrastructureConnectionAggregateInput>;
+  OR?: InputMaybe<Array<HardwareVersionUsedByInfrastructureConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<HardwareVersionUsedByInfrastructureNodeAggregationWhereInput>;
+};
+
+export type HardwareVersionUsedByInfrastructureConnectionFilters = {
+  /** Filter HardwareVersions by aggregating results on related HardwareVersionUsedByInfrastructureConnections */
+  aggregate?: InputMaybe<HardwareVersionUsedByInfrastructureConnectionAggregateInput>;
+  /** Return HardwareVersions where all of the related HardwareVersionUsedByInfrastructureConnections match this filter */
+  all?: InputMaybe<HardwareVersionUsedByInfrastructureConnectionWhere>;
+  /** Return HardwareVersions where none of the related HardwareVersionUsedByInfrastructureConnections match this filter */
+  none?: InputMaybe<HardwareVersionUsedByInfrastructureConnectionWhere>;
+  /** Return HardwareVersions where one of the related HardwareVersionUsedByInfrastructureConnections match this filter */
+  single?: InputMaybe<HardwareVersionUsedByInfrastructureConnectionWhere>;
+  /** Return HardwareVersions where some of the related HardwareVersionUsedByInfrastructureConnections match this filter */
+  some?: InputMaybe<HardwareVersionUsedByInfrastructureConnectionWhere>;
+};
+
+export type HardwareVersionUsedByInfrastructureConnectionSort = {
+  node?: InputMaybe<InfrastructureSort>;
+};
+
+export type HardwareVersionUsedByInfrastructureConnectionWhere = {
+  AND?: InputMaybe<Array<HardwareVersionUsedByInfrastructureConnectionWhere>>;
+  NOT?: InputMaybe<HardwareVersionUsedByInfrastructureConnectionWhere>;
+  OR?: InputMaybe<Array<HardwareVersionUsedByInfrastructureConnectionWhere>>;
+  node?: InputMaybe<InfrastructureWhere>;
+};
+
+export type HardwareVersionUsedByInfrastructureCreateFieldInput = {
+  node: InfrastructureCreateInput;
+};
+
+export type HardwareVersionUsedByInfrastructureDeleteFieldInput = {
+  delete?: InputMaybe<InfrastructureDeleteInput>;
+  where?: InputMaybe<HardwareVersionUsedByInfrastructureConnectionWhere>;
+};
+
+export type HardwareVersionUsedByInfrastructureDisconnectFieldInput = {
+  disconnect?: InputMaybe<InfrastructureDisconnectInput>;
+  where?: InputMaybe<HardwareVersionUsedByInfrastructureConnectionWhere>;
+};
+
+export type HardwareVersionUsedByInfrastructureFieldInput = {
+  connect?: InputMaybe<Array<HardwareVersionUsedByInfrastructureConnectFieldInput>>;
+  create?: InputMaybe<Array<HardwareVersionUsedByInfrastructureCreateFieldInput>>;
+};
+
+export type HardwareVersionUsedByInfrastructureNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<HardwareVersionUsedByInfrastructureNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<HardwareVersionUsedByInfrastructureNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<HardwareVersionUsedByInfrastructureNodeAggregationWhereInput>>;
+  capacity?: InputMaybe<StringScalarAggregationFilters>;
+  costs?: InputMaybe<FloatScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  ipAddress?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  location?: InputMaybe<StringScalarAggregationFilters>;
+  maintenanceWindow?: InputMaybe<StringScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  operatingSystem?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
+  specifications?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  vendor?: InputMaybe<StringScalarAggregationFilters>;
+  version?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type HardwareVersionUsedByInfrastructureRelationship = {
+  __typename?: 'HardwareVersionUsedByInfrastructureRelationship';
+  cursor: Scalars['String']['output'];
+  node: Infrastructure;
+};
+
+export type HardwareVersionUsedByInfrastructureUpdateConnectionInput = {
+  node?: InputMaybe<InfrastructureUpdateInput>;
+  where?: InputMaybe<HardwareVersionUsedByInfrastructureConnectionWhere>;
+};
+
+export type HardwareVersionUsedByInfrastructureUpdateFieldInput = {
+  connect?: InputMaybe<Array<HardwareVersionUsedByInfrastructureConnectFieldInput>>;
+  create?: InputMaybe<Array<HardwareVersionUsedByInfrastructureCreateFieldInput>>;
+  delete?: InputMaybe<Array<HardwareVersionUsedByInfrastructureDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<HardwareVersionUsedByInfrastructureDisconnectFieldInput>>;
+  update?: InputMaybe<HardwareVersionUsedByInfrastructureUpdateConnectionInput>;
 };
 
 export type HardwareVersionWhere = {
@@ -31977,6 +32295,8 @@ export type HardwareVersionWhere = {
   releaseChannel?: InputMaybe<StringScalarFilters>;
   supportTier?: InputMaybe<StringScalarFilters>;
   updatedAt?: InputMaybe<DateTimeScalarFilters>;
+  usedByInfrastructure?: InputMaybe<InfrastructureRelationshipFilters>;
+  usedByInfrastructureConnection?: InputMaybe<HardwareVersionUsedByInfrastructureConnectionFilters>;
   version?: InputMaybe<StringScalarFilters>;
 };
 
@@ -32012,6 +32332,8 @@ export type Infrastructure = {
   description?: Maybe<Scalars['String']['output']>;
   endOfLifeDate?: Maybe<Scalars['Date']['output']>;
   endOfUseDate?: Maybe<Scalars['Date']['output']>;
+  hardwareVersions: Array<HardwareVersion>;
+  hardwareVersionsConnection: InfrastructureHardwareVersionsConnection;
   hostedBy: Array<Supplier>;
   hostedByConnection: InfrastructureHostedByConnection;
   hostsAIComponents: Array<AiComponent>;
@@ -32038,6 +32360,8 @@ export type Infrastructure = {
   planningDate?: Maybe<Scalars['Date']['output']>;
   providedBy: Array<Supplier>;
   providedByConnection: InfrastructureProvidedByConnection;
+  softwareVersions: Array<SoftwareVersion>;
+  softwareVersionsConnection: InfrastructureSoftwareVersionsConnection;
   sovereigntyAchDataResidency?: Maybe<SovereigntyMaturity>;
   sovereigntyAchInteroperability?: Maybe<SovereigntyMaturity>;
   sovereigntyAchJurisdictionControl?: Maybe<SovereigntyMaturity>;
@@ -32110,6 +32434,24 @@ export type InfrastructureDepictedInDiagramsConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<InfrastructureDepictedInDiagramsConnectionSort>>;
   where?: InputMaybe<InfrastructureDepictedInDiagramsConnectionWhere>;
+};
+
+
+/** Infrastructure – represents an infrastructure component within Enterprise Architecture Management */
+export type InfrastructureHardwareVersionsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<HardwareVersionSort>>;
+  where?: InputMaybe<HardwareVersionWhere>;
+};
+
+
+/** Infrastructure – represents an infrastructure component within Enterprise Architecture Management */
+export type InfrastructureHardwareVersionsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<InfrastructureHardwareVersionsConnectionSort>>;
+  where?: InputMaybe<InfrastructureHardwareVersionsConnectionWhere>;
 };
 
 
@@ -32254,6 +32596,24 @@ export type InfrastructureProvidedByConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<InfrastructureProvidedByConnectionSort>>;
   where?: InputMaybe<InfrastructureProvidedByConnectionWhere>;
+};
+
+
+/** Infrastructure – represents an infrastructure component within Enterprise Architecture Management */
+export type InfrastructureSoftwareVersionsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SoftwareVersionSort>>;
+  where?: InputMaybe<SoftwareVersionWhere>;
+};
+
+
+/** Infrastructure – represents an infrastructure component within Enterprise Architecture Management */
+export type InfrastructureSoftwareVersionsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<InfrastructureSoftwareVersionsConnectionSort>>;
+  where?: InputMaybe<InfrastructureSoftwareVersionsConnectionWhere>;
 };
 
 
@@ -32674,6 +33034,7 @@ export type InfrastructureConnectInput = {
   childInfrastructures?: InputMaybe<Array<InfrastructureChildInfrastructuresConnectFieldInput>>;
   company?: InputMaybe<Array<InfrastructureCompanyConnectFieldInput>>;
   depictedInDiagrams?: InputMaybe<Array<InfrastructureDepictedInDiagramsConnectFieldInput>>;
+  hardwareVersions?: InputMaybe<Array<InfrastructureHardwareVersionsConnectFieldInput>>;
   hostedBy?: InputMaybe<Array<InfrastructureHostedByConnectFieldInput>>;
   hostsAIComponents?: InputMaybe<Array<InfrastructureHostsAiComponentsConnectFieldInput>>;
   hostsApplications?: InputMaybe<Array<InfrastructureHostsApplicationsConnectFieldInput>>;
@@ -32682,6 +33043,7 @@ export type InfrastructureConnectInput = {
   parentInfrastructure?: InputMaybe<Array<InfrastructureParentInfrastructureConnectFieldInput>>;
   partOfArchitectures?: InputMaybe<Array<InfrastructurePartOfArchitecturesConnectFieldInput>>;
   providedBy?: InputMaybe<Array<InfrastructureProvidedByConnectFieldInput>>;
+  softwareVersions?: InputMaybe<Array<InfrastructureSoftwareVersionsConnectFieldInput>>;
   usedByOrganisations?: InputMaybe<Array<InfrastructureUsedByOrganisationsConnectFieldInput>>;
   usesHardwareProducts?: InputMaybe<Array<InfrastructureUsesHardwareProductsConnectFieldInput>>;
   usesSoftwareProducts?: InputMaybe<Array<InfrastructureUsesSoftwareProductsConnectFieldInput>>;
@@ -32700,6 +33062,7 @@ export type InfrastructureCreateInput = {
   description?: InputMaybe<Scalars['String']['input']>;
   endOfLifeDate?: InputMaybe<Scalars['Date']['input']>;
   endOfUseDate?: InputMaybe<Scalars['Date']['input']>;
+  hardwareVersions?: InputMaybe<InfrastructureHardwareVersionsFieldInput>;
   hostedBy?: InputMaybe<InfrastructureHostedByFieldInput>;
   hostsAIComponents?: InputMaybe<InfrastructureHostsAiComponentsFieldInput>;
   hostsApplications?: InputMaybe<InfrastructureHostsApplicationsFieldInput>;
@@ -32717,6 +33080,7 @@ export type InfrastructureCreateInput = {
   partOfArchitectures?: InputMaybe<InfrastructurePartOfArchitecturesFieldInput>;
   planningDate?: InputMaybe<Scalars['Date']['input']>;
   providedBy?: InputMaybe<InfrastructureProvidedByFieldInput>;
+  softwareVersions?: InputMaybe<InfrastructureSoftwareVersionsFieldInput>;
   sovereigntyAchDataResidency?: InputMaybe<SovereigntyMaturity>;
   sovereigntyAchInteroperability?: InputMaybe<SovereigntyMaturity>;
   sovereigntyAchJurisdictionControl?: InputMaybe<SovereigntyMaturity>;
@@ -32738,6 +33102,7 @@ export type InfrastructureDeleteInput = {
   childInfrastructures?: InputMaybe<Array<InfrastructureChildInfrastructuresDeleteFieldInput>>;
   company?: InputMaybe<Array<InfrastructureCompanyDeleteFieldInput>>;
   depictedInDiagrams?: InputMaybe<Array<InfrastructureDepictedInDiagramsDeleteFieldInput>>;
+  hardwareVersions?: InputMaybe<Array<InfrastructureHardwareVersionsDeleteFieldInput>>;
   hostedBy?: InputMaybe<Array<InfrastructureHostedByDeleteFieldInput>>;
   hostsAIComponents?: InputMaybe<Array<InfrastructureHostsAiComponentsDeleteFieldInput>>;
   hostsApplications?: InputMaybe<Array<InfrastructureHostsApplicationsDeleteFieldInput>>;
@@ -32746,6 +33111,7 @@ export type InfrastructureDeleteInput = {
   parentInfrastructure?: InputMaybe<Array<InfrastructureParentInfrastructureDeleteFieldInput>>;
   partOfArchitectures?: InputMaybe<Array<InfrastructurePartOfArchitecturesDeleteFieldInput>>;
   providedBy?: InputMaybe<Array<InfrastructureProvidedByDeleteFieldInput>>;
+  softwareVersions?: InputMaybe<Array<InfrastructureSoftwareVersionsDeleteFieldInput>>;
   usedByOrganisations?: InputMaybe<Array<InfrastructureUsedByOrganisationsDeleteFieldInput>>;
   usesHardwareProducts?: InputMaybe<Array<InfrastructureUsesHardwareProductsDeleteFieldInput>>;
   usesSoftwareProducts?: InputMaybe<Array<InfrastructureUsesSoftwareProductsDeleteFieldInput>>;
@@ -32881,6 +33247,7 @@ export type InfrastructureDisconnectInput = {
   childInfrastructures?: InputMaybe<Array<InfrastructureChildInfrastructuresDisconnectFieldInput>>;
   company?: InputMaybe<Array<InfrastructureCompanyDisconnectFieldInput>>;
   depictedInDiagrams?: InputMaybe<Array<InfrastructureDepictedInDiagramsDisconnectFieldInput>>;
+  hardwareVersions?: InputMaybe<Array<InfrastructureHardwareVersionsDisconnectFieldInput>>;
   hostedBy?: InputMaybe<Array<InfrastructureHostedByDisconnectFieldInput>>;
   hostsAIComponents?: InputMaybe<Array<InfrastructureHostsAiComponentsDisconnectFieldInput>>;
   hostsApplications?: InputMaybe<Array<InfrastructureHostsApplicationsDisconnectFieldInput>>;
@@ -32889,6 +33256,7 @@ export type InfrastructureDisconnectInput = {
   parentInfrastructure?: InputMaybe<Array<InfrastructureParentInfrastructureDisconnectFieldInput>>;
   partOfArchitectures?: InputMaybe<Array<InfrastructurePartOfArchitecturesDisconnectFieldInput>>;
   providedBy?: InputMaybe<Array<InfrastructureProvidedByDisconnectFieldInput>>;
+  softwareVersions?: InputMaybe<Array<InfrastructureSoftwareVersionsDisconnectFieldInput>>;
   usedByOrganisations?: InputMaybe<Array<InfrastructureUsedByOrganisationsDisconnectFieldInput>>;
   usesHardwareProducts?: InputMaybe<Array<InfrastructureUsesHardwareProductsDisconnectFieldInput>>;
   usesSoftwareProducts?: InputMaybe<Array<InfrastructureUsesSoftwareProductsDisconnectFieldInput>>;
@@ -32911,6 +33279,130 @@ export type InfrastructureHardwareProductUsesHardwareProductsNodeAggregateSelect
   createdAt: DateTimeAggregateSelection;
   name: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
+};
+
+export type InfrastructureHardwareVersionHardwareVersionsAggregateSelection = {
+  __typename?: 'InfrastructureHardwareVersionHardwareVersionsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<InfrastructureHardwareVersionHardwareVersionsNodeAggregateSelection>;
+};
+
+export type InfrastructureHardwareVersionHardwareVersionsNodeAggregateSelection = {
+  __typename?: 'InfrastructureHardwareVersionHardwareVersionsNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  name: StringAggregateSelection;
+  releaseChannel: StringAggregateSelection;
+  supportTier: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  version: StringAggregateSelection;
+};
+
+export type InfrastructureHardwareVersionsAggregateInput = {
+  AND?: InputMaybe<Array<InfrastructureHardwareVersionsAggregateInput>>;
+  NOT?: InputMaybe<InfrastructureHardwareVersionsAggregateInput>;
+  OR?: InputMaybe<Array<InfrastructureHardwareVersionsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<InfrastructureHardwareVersionsNodeAggregationWhereInput>;
+};
+
+export type InfrastructureHardwareVersionsConnectFieldInput = {
+  connect?: InputMaybe<Array<HardwareVersionConnectInput>>;
+  where?: InputMaybe<HardwareVersionConnectWhere>;
+};
+
+export type InfrastructureHardwareVersionsConnection = {
+  __typename?: 'InfrastructureHardwareVersionsConnection';
+  aggregate: InfrastructureHardwareVersionHardwareVersionsAggregateSelection;
+  edges: Array<InfrastructureHardwareVersionsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type InfrastructureHardwareVersionsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<InfrastructureHardwareVersionsConnectionAggregateInput>>;
+  NOT?: InputMaybe<InfrastructureHardwareVersionsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<InfrastructureHardwareVersionsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<InfrastructureHardwareVersionsNodeAggregationWhereInput>;
+};
+
+export type InfrastructureHardwareVersionsConnectionFilters = {
+  /** Filter Infrastructures by aggregating results on related InfrastructureHardwareVersionsConnections */
+  aggregate?: InputMaybe<InfrastructureHardwareVersionsConnectionAggregateInput>;
+  /** Return Infrastructures where all of the related InfrastructureHardwareVersionsConnections match this filter */
+  all?: InputMaybe<InfrastructureHardwareVersionsConnectionWhere>;
+  /** Return Infrastructures where none of the related InfrastructureHardwareVersionsConnections match this filter */
+  none?: InputMaybe<InfrastructureHardwareVersionsConnectionWhere>;
+  /** Return Infrastructures where one of the related InfrastructureHardwareVersionsConnections match this filter */
+  single?: InputMaybe<InfrastructureHardwareVersionsConnectionWhere>;
+  /** Return Infrastructures where some of the related InfrastructureHardwareVersionsConnections match this filter */
+  some?: InputMaybe<InfrastructureHardwareVersionsConnectionWhere>;
+};
+
+export type InfrastructureHardwareVersionsConnectionSort = {
+  node?: InputMaybe<HardwareVersionSort>;
+};
+
+export type InfrastructureHardwareVersionsConnectionWhere = {
+  AND?: InputMaybe<Array<InfrastructureHardwareVersionsConnectionWhere>>;
+  NOT?: InputMaybe<InfrastructureHardwareVersionsConnectionWhere>;
+  OR?: InputMaybe<Array<InfrastructureHardwareVersionsConnectionWhere>>;
+  node?: InputMaybe<HardwareVersionWhere>;
+};
+
+export type InfrastructureHardwareVersionsCreateFieldInput = {
+  node: HardwareVersionCreateInput;
+};
+
+export type InfrastructureHardwareVersionsDeleteFieldInput = {
+  delete?: InputMaybe<HardwareVersionDeleteInput>;
+  where?: InputMaybe<InfrastructureHardwareVersionsConnectionWhere>;
+};
+
+export type InfrastructureHardwareVersionsDisconnectFieldInput = {
+  disconnect?: InputMaybe<HardwareVersionDisconnectInput>;
+  where?: InputMaybe<InfrastructureHardwareVersionsConnectionWhere>;
+};
+
+export type InfrastructureHardwareVersionsFieldInput = {
+  connect?: InputMaybe<Array<InfrastructureHardwareVersionsConnectFieldInput>>;
+  create?: InputMaybe<Array<InfrastructureHardwareVersionsCreateFieldInput>>;
+};
+
+export type InfrastructureHardwareVersionsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<InfrastructureHardwareVersionsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<InfrastructureHardwareVersionsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<InfrastructureHardwareVersionsNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  releaseChannel?: InputMaybe<StringScalarAggregationFilters>;
+  supportTier?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  version?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type InfrastructureHardwareVersionsRelationship = {
+  __typename?: 'InfrastructureHardwareVersionsRelationship';
+  cursor: Scalars['String']['output'];
+  node: HardwareVersion;
+};
+
+export type InfrastructureHardwareVersionsUpdateConnectionInput = {
+  node?: InputMaybe<HardwareVersionUpdateInput>;
+  where?: InputMaybe<InfrastructureHardwareVersionsConnectionWhere>;
+};
+
+export type InfrastructureHardwareVersionsUpdateFieldInput = {
+  connect?: InputMaybe<Array<InfrastructureHardwareVersionsConnectFieldInput>>;
+  create?: InputMaybe<Array<InfrastructureHardwareVersionsCreateFieldInput>>;
+  delete?: InputMaybe<Array<InfrastructureHardwareVersionsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<InfrastructureHardwareVersionsDisconnectFieldInput>>;
+  update?: InputMaybe<InfrastructureHardwareVersionsUpdateConnectionInput>;
 };
 
 export type InfrastructureHostedByAggregateInput = {
@@ -33932,6 +34424,130 @@ export type InfrastructureSoftwareProductUsesSoftwareProductsNodeAggregateSelect
   updatedAt: DateTimeAggregateSelection;
 };
 
+export type InfrastructureSoftwareVersionSoftwareVersionsAggregateSelection = {
+  __typename?: 'InfrastructureSoftwareVersionSoftwareVersionsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<InfrastructureSoftwareVersionSoftwareVersionsNodeAggregateSelection>;
+};
+
+export type InfrastructureSoftwareVersionSoftwareVersionsNodeAggregateSelection = {
+  __typename?: 'InfrastructureSoftwareVersionSoftwareVersionsNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  name: StringAggregateSelection;
+  releaseChannel: StringAggregateSelection;
+  supportTier: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  version: StringAggregateSelection;
+};
+
+export type InfrastructureSoftwareVersionsAggregateInput = {
+  AND?: InputMaybe<Array<InfrastructureSoftwareVersionsAggregateInput>>;
+  NOT?: InputMaybe<InfrastructureSoftwareVersionsAggregateInput>;
+  OR?: InputMaybe<Array<InfrastructureSoftwareVersionsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<InfrastructureSoftwareVersionsNodeAggregationWhereInput>;
+};
+
+export type InfrastructureSoftwareVersionsConnectFieldInput = {
+  connect?: InputMaybe<Array<SoftwareVersionConnectInput>>;
+  where?: InputMaybe<SoftwareVersionConnectWhere>;
+};
+
+export type InfrastructureSoftwareVersionsConnection = {
+  __typename?: 'InfrastructureSoftwareVersionsConnection';
+  aggregate: InfrastructureSoftwareVersionSoftwareVersionsAggregateSelection;
+  edges: Array<InfrastructureSoftwareVersionsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type InfrastructureSoftwareVersionsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<InfrastructureSoftwareVersionsConnectionAggregateInput>>;
+  NOT?: InputMaybe<InfrastructureSoftwareVersionsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<InfrastructureSoftwareVersionsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<InfrastructureSoftwareVersionsNodeAggregationWhereInput>;
+};
+
+export type InfrastructureSoftwareVersionsConnectionFilters = {
+  /** Filter Infrastructures by aggregating results on related InfrastructureSoftwareVersionsConnections */
+  aggregate?: InputMaybe<InfrastructureSoftwareVersionsConnectionAggregateInput>;
+  /** Return Infrastructures where all of the related InfrastructureSoftwareVersionsConnections match this filter */
+  all?: InputMaybe<InfrastructureSoftwareVersionsConnectionWhere>;
+  /** Return Infrastructures where none of the related InfrastructureSoftwareVersionsConnections match this filter */
+  none?: InputMaybe<InfrastructureSoftwareVersionsConnectionWhere>;
+  /** Return Infrastructures where one of the related InfrastructureSoftwareVersionsConnections match this filter */
+  single?: InputMaybe<InfrastructureSoftwareVersionsConnectionWhere>;
+  /** Return Infrastructures where some of the related InfrastructureSoftwareVersionsConnections match this filter */
+  some?: InputMaybe<InfrastructureSoftwareVersionsConnectionWhere>;
+};
+
+export type InfrastructureSoftwareVersionsConnectionSort = {
+  node?: InputMaybe<SoftwareVersionSort>;
+};
+
+export type InfrastructureSoftwareVersionsConnectionWhere = {
+  AND?: InputMaybe<Array<InfrastructureSoftwareVersionsConnectionWhere>>;
+  NOT?: InputMaybe<InfrastructureSoftwareVersionsConnectionWhere>;
+  OR?: InputMaybe<Array<InfrastructureSoftwareVersionsConnectionWhere>>;
+  node?: InputMaybe<SoftwareVersionWhere>;
+};
+
+export type InfrastructureSoftwareVersionsCreateFieldInput = {
+  node: SoftwareVersionCreateInput;
+};
+
+export type InfrastructureSoftwareVersionsDeleteFieldInput = {
+  delete?: InputMaybe<SoftwareVersionDeleteInput>;
+  where?: InputMaybe<InfrastructureSoftwareVersionsConnectionWhere>;
+};
+
+export type InfrastructureSoftwareVersionsDisconnectFieldInput = {
+  disconnect?: InputMaybe<SoftwareVersionDisconnectInput>;
+  where?: InputMaybe<InfrastructureSoftwareVersionsConnectionWhere>;
+};
+
+export type InfrastructureSoftwareVersionsFieldInput = {
+  connect?: InputMaybe<Array<InfrastructureSoftwareVersionsConnectFieldInput>>;
+  create?: InputMaybe<Array<InfrastructureSoftwareVersionsCreateFieldInput>>;
+};
+
+export type InfrastructureSoftwareVersionsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<InfrastructureSoftwareVersionsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<InfrastructureSoftwareVersionsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<InfrastructureSoftwareVersionsNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  releaseChannel?: InputMaybe<StringScalarAggregationFilters>;
+  supportTier?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  version?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type InfrastructureSoftwareVersionsRelationship = {
+  __typename?: 'InfrastructureSoftwareVersionsRelationship';
+  cursor: Scalars['String']['output'];
+  node: SoftwareVersion;
+};
+
+export type InfrastructureSoftwareVersionsUpdateConnectionInput = {
+  node?: InputMaybe<SoftwareVersionUpdateInput>;
+  where?: InputMaybe<InfrastructureSoftwareVersionsConnectionWhere>;
+};
+
+export type InfrastructureSoftwareVersionsUpdateFieldInput = {
+  connect?: InputMaybe<Array<InfrastructureSoftwareVersionsConnectFieldInput>>;
+  create?: InputMaybe<Array<InfrastructureSoftwareVersionsCreateFieldInput>>;
+  delete?: InputMaybe<Array<InfrastructureSoftwareVersionsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<InfrastructureSoftwareVersionsDisconnectFieldInput>>;
+  update?: InputMaybe<InfrastructureSoftwareVersionsUpdateConnectionInput>;
+};
+
 /** Fields to sort Infrastructures by. The order in which sorts are applied is not guaranteed when specifying many fields in one InfrastructureSort object. */
 export type InfrastructureSort = {
   capacity?: InputMaybe<SortDirection>;
@@ -34088,6 +34704,7 @@ export type InfrastructureUpdateInput = {
   description?: InputMaybe<StringScalarMutations>;
   endOfLifeDate?: InputMaybe<DateScalarMutations>;
   endOfUseDate?: InputMaybe<DateScalarMutations>;
+  hardwareVersions?: InputMaybe<Array<InfrastructureHardwareVersionsUpdateFieldInput>>;
   hostedBy?: InputMaybe<Array<InfrastructureHostedByUpdateFieldInput>>;
   hostsAIComponents?: InputMaybe<Array<InfrastructureHostsAiComponentsUpdateFieldInput>>;
   hostsApplications?: InputMaybe<Array<InfrastructureHostsApplicationsUpdateFieldInput>>;
@@ -34105,6 +34722,7 @@ export type InfrastructureUpdateInput = {
   partOfArchitectures?: InputMaybe<Array<InfrastructurePartOfArchitecturesUpdateFieldInput>>;
   planningDate?: InputMaybe<DateScalarMutations>;
   providedBy?: InputMaybe<Array<InfrastructureProvidedByUpdateFieldInput>>;
+  softwareVersions?: InputMaybe<Array<InfrastructureSoftwareVersionsUpdateFieldInput>>;
   sovereigntyAchDataResidency?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
   sovereigntyAchInteroperability?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
   sovereigntyAchJurisdictionControl?: InputMaybe<SovereigntyMaturityEnumScalarMutations>;
@@ -34454,6 +35072,8 @@ export type InfrastructureWhere = {
   description?: InputMaybe<StringScalarFilters>;
   endOfLifeDate?: InputMaybe<DateScalarFilters>;
   endOfUseDate?: InputMaybe<DateScalarFilters>;
+  hardwareVersions?: InputMaybe<HardwareVersionRelationshipFilters>;
+  hardwareVersionsConnection?: InputMaybe<InfrastructureHardwareVersionsConnectionFilters>;
   hostedBy?: InputMaybe<SupplierRelationshipFilters>;
   hostedByConnection?: InputMaybe<InfrastructureHostedByConnectionFilters>;
   hostsAIComponents?: InputMaybe<AiComponentRelationshipFilters>;
@@ -34480,6 +35100,8 @@ export type InfrastructureWhere = {
   planningDate?: InputMaybe<DateScalarFilters>;
   providedBy?: InputMaybe<SupplierRelationshipFilters>;
   providedByConnection?: InputMaybe<InfrastructureProvidedByConnectionFilters>;
+  softwareVersions?: InputMaybe<SoftwareVersionRelationshipFilters>;
+  softwareVersionsConnection?: InputMaybe<InfrastructureSoftwareVersionsConnectionFilters>;
   sovereigntyAchDataResidency?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
   sovereigntyAchInteroperability?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
   sovereigntyAchJurisdictionControl?: InputMaybe<SovereigntyMaturityEnumScalarFilters>;
@@ -42989,6 +43611,10 @@ export type SoftwareVersion = {
   softwareProductConnection: SoftwareVersionSoftwareProductConnection;
   supportTier?: Maybe<Scalars['String']['output']>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  usedByApplications: Array<Application>;
+  usedByApplicationsConnection: SoftwareVersionUsedByApplicationsConnection;
+  usedByInfrastructure: Array<Infrastructure>;
+  usedByInfrastructureConnection: SoftwareVersionUsedByInfrastructureConnection;
   version?: Maybe<Scalars['String']['output']>;
 };
 
@@ -43046,6 +43672,42 @@ export type SoftwareVersionSoftwareProductConnectionArgs = {
   where?: InputMaybe<SoftwareVersionSoftwareProductConnectionWhere>;
 };
 
+
+/** SoftwareVersion – version metadata for a software product */
+export type SoftwareVersionUsedByApplicationsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<ApplicationSort>>;
+  where?: InputMaybe<ApplicationWhere>;
+};
+
+
+/** SoftwareVersion – version metadata for a software product */
+export type SoftwareVersionUsedByApplicationsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SoftwareVersionUsedByApplicationsConnectionSort>>;
+  where?: InputMaybe<SoftwareVersionUsedByApplicationsConnectionWhere>;
+};
+
+
+/** SoftwareVersion – version metadata for a software product */
+export type SoftwareVersionUsedByInfrastructureArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<InfrastructureSort>>;
+  where?: InputMaybe<InfrastructureWhere>;
+};
+
+
+/** SoftwareVersion – version metadata for a software product */
+export type SoftwareVersionUsedByInfrastructureConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SoftwareVersionUsedByInfrastructureConnectionSort>>;
+  where?: InputMaybe<SoftwareVersionUsedByInfrastructureConnectionWhere>;
+};
+
 export type SoftwareVersionAggregate = {
   __typename?: 'SoftwareVersionAggregate';
   count: Count;
@@ -43059,6 +43721,27 @@ export type SoftwareVersionAggregateNode = {
   releaseChannel: StringAggregateSelection;
   supportTier: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
+  version: StringAggregateSelection;
+};
+
+export type SoftwareVersionApplicationUsedByApplicationsAggregateSelection = {
+  __typename?: 'SoftwareVersionApplicationUsedByApplicationsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<SoftwareVersionApplicationUsedByApplicationsNodeAggregateSelection>;
+};
+
+export type SoftwareVersionApplicationUsedByApplicationsNodeAggregateSelection = {
+  __typename?: 'SoftwareVersionApplicationUsedByApplicationsNodeAggregateSelection';
+  costs: FloatAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  hostingEnvironment: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
+  name: StringAggregateSelection;
+  sbom: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  vendor: StringAggregateSelection;
   version: StringAggregateSelection;
 };
 
@@ -43222,6 +43905,8 @@ export type SoftwareVersionConnectInput = {
   company?: InputMaybe<Array<SoftwareVersionCompanyConnectFieldInput>>;
   lifecycleRecords?: InputMaybe<Array<SoftwareVersionLifecycleRecordsConnectFieldInput>>;
   softwareProduct?: InputMaybe<Array<SoftwareVersionSoftwareProductConnectFieldInput>>;
+  usedByApplications?: InputMaybe<Array<SoftwareVersionUsedByApplicationsConnectFieldInput>>;
+  usedByInfrastructure?: InputMaybe<Array<SoftwareVersionUsedByInfrastructureConnectFieldInput>>;
 };
 
 export type SoftwareVersionConnectWhere = {
@@ -43237,6 +43922,8 @@ export type SoftwareVersionCreateInput = {
   softwareProduct?: InputMaybe<SoftwareVersionSoftwareProductFieldInput>;
   supportTier?: InputMaybe<Scalars['String']['input']>;
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  usedByApplications?: InputMaybe<SoftwareVersionUsedByApplicationsFieldInput>;
+  usedByInfrastructure?: InputMaybe<SoftwareVersionUsedByInfrastructureFieldInput>;
   version?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -43244,18 +43931,47 @@ export type SoftwareVersionDeleteInput = {
   company?: InputMaybe<Array<SoftwareVersionCompanyDeleteFieldInput>>;
   lifecycleRecords?: InputMaybe<Array<SoftwareVersionLifecycleRecordsDeleteFieldInput>>;
   softwareProduct?: InputMaybe<Array<SoftwareVersionSoftwareProductDeleteFieldInput>>;
+  usedByApplications?: InputMaybe<Array<SoftwareVersionUsedByApplicationsDeleteFieldInput>>;
+  usedByInfrastructure?: InputMaybe<Array<SoftwareVersionUsedByInfrastructureDeleteFieldInput>>;
 };
 
 export type SoftwareVersionDisconnectInput = {
   company?: InputMaybe<Array<SoftwareVersionCompanyDisconnectFieldInput>>;
   lifecycleRecords?: InputMaybe<Array<SoftwareVersionLifecycleRecordsDisconnectFieldInput>>;
   softwareProduct?: InputMaybe<Array<SoftwareVersionSoftwareProductDisconnectFieldInput>>;
+  usedByApplications?: InputMaybe<Array<SoftwareVersionUsedByApplicationsDisconnectFieldInput>>;
+  usedByInfrastructure?: InputMaybe<Array<SoftwareVersionUsedByInfrastructureDisconnectFieldInput>>;
 };
 
 export type SoftwareVersionEdge = {
   __typename?: 'SoftwareVersionEdge';
   cursor: Scalars['String']['output'];
   node: SoftwareVersion;
+};
+
+export type SoftwareVersionInfrastructureUsedByInfrastructureAggregateSelection = {
+  __typename?: 'SoftwareVersionInfrastructureUsedByInfrastructureAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<SoftwareVersionInfrastructureUsedByInfrastructureNodeAggregateSelection>;
+};
+
+export type SoftwareVersionInfrastructureUsedByInfrastructureNodeAggregateSelection = {
+  __typename?: 'SoftwareVersionInfrastructureUsedByInfrastructureNodeAggregateSelection';
+  capacity: StringAggregateSelection;
+  costs: FloatAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  ipAddress: StringAggregateSelection;
+  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
+  location: StringAggregateSelection;
+  maintenanceWindow: StringAggregateSelection;
+  name: StringAggregateSelection;
+  operatingSystem: StringAggregateSelection;
+  sovereigntyEvidence: StringAggregateSelection;
+  specifications: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  vendor: StringAggregateSelection;
+  version: StringAggregateSelection;
 };
 
 export type SoftwareVersionLifecycleRecordLifecycleRecordsAggregateSelection = {
@@ -43532,7 +44248,239 @@ export type SoftwareVersionUpdateInput = {
   releaseChannel?: InputMaybe<StringScalarMutations>;
   softwareProduct?: InputMaybe<Array<SoftwareVersionSoftwareProductUpdateFieldInput>>;
   supportTier?: InputMaybe<StringScalarMutations>;
+  usedByApplications?: InputMaybe<Array<SoftwareVersionUsedByApplicationsUpdateFieldInput>>;
+  usedByInfrastructure?: InputMaybe<Array<SoftwareVersionUsedByInfrastructureUpdateFieldInput>>;
   version?: InputMaybe<StringScalarMutations>;
+};
+
+export type SoftwareVersionUsedByApplicationsAggregateInput = {
+  AND?: InputMaybe<Array<SoftwareVersionUsedByApplicationsAggregateInput>>;
+  NOT?: InputMaybe<SoftwareVersionUsedByApplicationsAggregateInput>;
+  OR?: InputMaybe<Array<SoftwareVersionUsedByApplicationsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<SoftwareVersionUsedByApplicationsNodeAggregationWhereInput>;
+};
+
+export type SoftwareVersionUsedByApplicationsConnectFieldInput = {
+  connect?: InputMaybe<Array<ApplicationConnectInput>>;
+  where?: InputMaybe<ApplicationConnectWhere>;
+};
+
+export type SoftwareVersionUsedByApplicationsConnection = {
+  __typename?: 'SoftwareVersionUsedByApplicationsConnection';
+  aggregate: SoftwareVersionApplicationUsedByApplicationsAggregateSelection;
+  edges: Array<SoftwareVersionUsedByApplicationsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type SoftwareVersionUsedByApplicationsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<SoftwareVersionUsedByApplicationsConnectionAggregateInput>>;
+  NOT?: InputMaybe<SoftwareVersionUsedByApplicationsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<SoftwareVersionUsedByApplicationsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<SoftwareVersionUsedByApplicationsNodeAggregationWhereInput>;
+};
+
+export type SoftwareVersionUsedByApplicationsConnectionFilters = {
+  /** Filter SoftwareVersions by aggregating results on related SoftwareVersionUsedByApplicationsConnections */
+  aggregate?: InputMaybe<SoftwareVersionUsedByApplicationsConnectionAggregateInput>;
+  /** Return SoftwareVersions where all of the related SoftwareVersionUsedByApplicationsConnections match this filter */
+  all?: InputMaybe<SoftwareVersionUsedByApplicationsConnectionWhere>;
+  /** Return SoftwareVersions where none of the related SoftwareVersionUsedByApplicationsConnections match this filter */
+  none?: InputMaybe<SoftwareVersionUsedByApplicationsConnectionWhere>;
+  /** Return SoftwareVersions where one of the related SoftwareVersionUsedByApplicationsConnections match this filter */
+  single?: InputMaybe<SoftwareVersionUsedByApplicationsConnectionWhere>;
+  /** Return SoftwareVersions where some of the related SoftwareVersionUsedByApplicationsConnections match this filter */
+  some?: InputMaybe<SoftwareVersionUsedByApplicationsConnectionWhere>;
+};
+
+export type SoftwareVersionUsedByApplicationsConnectionSort = {
+  node?: InputMaybe<ApplicationSort>;
+};
+
+export type SoftwareVersionUsedByApplicationsConnectionWhere = {
+  AND?: InputMaybe<Array<SoftwareVersionUsedByApplicationsConnectionWhere>>;
+  NOT?: InputMaybe<SoftwareVersionUsedByApplicationsConnectionWhere>;
+  OR?: InputMaybe<Array<SoftwareVersionUsedByApplicationsConnectionWhere>>;
+  node?: InputMaybe<ApplicationWhere>;
+};
+
+export type SoftwareVersionUsedByApplicationsCreateFieldInput = {
+  node: ApplicationCreateInput;
+};
+
+export type SoftwareVersionUsedByApplicationsDeleteFieldInput = {
+  delete?: InputMaybe<ApplicationDeleteInput>;
+  where?: InputMaybe<SoftwareVersionUsedByApplicationsConnectionWhere>;
+};
+
+export type SoftwareVersionUsedByApplicationsDisconnectFieldInput = {
+  disconnect?: InputMaybe<ApplicationDisconnectInput>;
+  where?: InputMaybe<SoftwareVersionUsedByApplicationsConnectionWhere>;
+};
+
+export type SoftwareVersionUsedByApplicationsFieldInput = {
+  connect?: InputMaybe<Array<SoftwareVersionUsedByApplicationsConnectFieldInput>>;
+  create?: InputMaybe<Array<SoftwareVersionUsedByApplicationsCreateFieldInput>>;
+};
+
+export type SoftwareVersionUsedByApplicationsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<SoftwareVersionUsedByApplicationsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<SoftwareVersionUsedByApplicationsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<SoftwareVersionUsedByApplicationsNodeAggregationWhereInput>>;
+  costs?: InputMaybe<FloatScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  sbom?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  vendor?: InputMaybe<StringScalarAggregationFilters>;
+  version?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type SoftwareVersionUsedByApplicationsRelationship = {
+  __typename?: 'SoftwareVersionUsedByApplicationsRelationship';
+  cursor: Scalars['String']['output'];
+  node: Application;
+};
+
+export type SoftwareVersionUsedByApplicationsUpdateConnectionInput = {
+  node?: InputMaybe<ApplicationUpdateInput>;
+  where?: InputMaybe<SoftwareVersionUsedByApplicationsConnectionWhere>;
+};
+
+export type SoftwareVersionUsedByApplicationsUpdateFieldInput = {
+  connect?: InputMaybe<Array<SoftwareVersionUsedByApplicationsConnectFieldInput>>;
+  create?: InputMaybe<Array<SoftwareVersionUsedByApplicationsCreateFieldInput>>;
+  delete?: InputMaybe<Array<SoftwareVersionUsedByApplicationsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<SoftwareVersionUsedByApplicationsDisconnectFieldInput>>;
+  update?: InputMaybe<SoftwareVersionUsedByApplicationsUpdateConnectionInput>;
+};
+
+export type SoftwareVersionUsedByInfrastructureAggregateInput = {
+  AND?: InputMaybe<Array<SoftwareVersionUsedByInfrastructureAggregateInput>>;
+  NOT?: InputMaybe<SoftwareVersionUsedByInfrastructureAggregateInput>;
+  OR?: InputMaybe<Array<SoftwareVersionUsedByInfrastructureAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<SoftwareVersionUsedByInfrastructureNodeAggregationWhereInput>;
+};
+
+export type SoftwareVersionUsedByInfrastructureConnectFieldInput = {
+  connect?: InputMaybe<Array<InfrastructureConnectInput>>;
+  where?: InputMaybe<InfrastructureConnectWhere>;
+};
+
+export type SoftwareVersionUsedByInfrastructureConnection = {
+  __typename?: 'SoftwareVersionUsedByInfrastructureConnection';
+  aggregate: SoftwareVersionInfrastructureUsedByInfrastructureAggregateSelection;
+  edges: Array<SoftwareVersionUsedByInfrastructureRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type SoftwareVersionUsedByInfrastructureConnectionAggregateInput = {
+  AND?: InputMaybe<Array<SoftwareVersionUsedByInfrastructureConnectionAggregateInput>>;
+  NOT?: InputMaybe<SoftwareVersionUsedByInfrastructureConnectionAggregateInput>;
+  OR?: InputMaybe<Array<SoftwareVersionUsedByInfrastructureConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<SoftwareVersionUsedByInfrastructureNodeAggregationWhereInput>;
+};
+
+export type SoftwareVersionUsedByInfrastructureConnectionFilters = {
+  /** Filter SoftwareVersions by aggregating results on related SoftwareVersionUsedByInfrastructureConnections */
+  aggregate?: InputMaybe<SoftwareVersionUsedByInfrastructureConnectionAggregateInput>;
+  /** Return SoftwareVersions where all of the related SoftwareVersionUsedByInfrastructureConnections match this filter */
+  all?: InputMaybe<SoftwareVersionUsedByInfrastructureConnectionWhere>;
+  /** Return SoftwareVersions where none of the related SoftwareVersionUsedByInfrastructureConnections match this filter */
+  none?: InputMaybe<SoftwareVersionUsedByInfrastructureConnectionWhere>;
+  /** Return SoftwareVersions where one of the related SoftwareVersionUsedByInfrastructureConnections match this filter */
+  single?: InputMaybe<SoftwareVersionUsedByInfrastructureConnectionWhere>;
+  /** Return SoftwareVersions where some of the related SoftwareVersionUsedByInfrastructureConnections match this filter */
+  some?: InputMaybe<SoftwareVersionUsedByInfrastructureConnectionWhere>;
+};
+
+export type SoftwareVersionUsedByInfrastructureConnectionSort = {
+  node?: InputMaybe<InfrastructureSort>;
+};
+
+export type SoftwareVersionUsedByInfrastructureConnectionWhere = {
+  AND?: InputMaybe<Array<SoftwareVersionUsedByInfrastructureConnectionWhere>>;
+  NOT?: InputMaybe<SoftwareVersionUsedByInfrastructureConnectionWhere>;
+  OR?: InputMaybe<Array<SoftwareVersionUsedByInfrastructureConnectionWhere>>;
+  node?: InputMaybe<InfrastructureWhere>;
+};
+
+export type SoftwareVersionUsedByInfrastructureCreateFieldInput = {
+  node: InfrastructureCreateInput;
+};
+
+export type SoftwareVersionUsedByInfrastructureDeleteFieldInput = {
+  delete?: InputMaybe<InfrastructureDeleteInput>;
+  where?: InputMaybe<SoftwareVersionUsedByInfrastructureConnectionWhere>;
+};
+
+export type SoftwareVersionUsedByInfrastructureDisconnectFieldInput = {
+  disconnect?: InputMaybe<InfrastructureDisconnectInput>;
+  where?: InputMaybe<SoftwareVersionUsedByInfrastructureConnectionWhere>;
+};
+
+export type SoftwareVersionUsedByInfrastructureFieldInput = {
+  connect?: InputMaybe<Array<SoftwareVersionUsedByInfrastructureConnectFieldInput>>;
+  create?: InputMaybe<Array<SoftwareVersionUsedByInfrastructureCreateFieldInput>>;
+};
+
+export type SoftwareVersionUsedByInfrastructureNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<SoftwareVersionUsedByInfrastructureNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<SoftwareVersionUsedByInfrastructureNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<SoftwareVersionUsedByInfrastructureNodeAggregationWhereInput>>;
+  capacity?: InputMaybe<StringScalarAggregationFilters>;
+  costs?: InputMaybe<FloatScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  ipAddress?: InputMaybe<StringScalarAggregationFilters>;
+  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  location?: InputMaybe<StringScalarAggregationFilters>;
+  maintenanceWindow?: InputMaybe<StringScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  operatingSystem?: InputMaybe<StringScalarAggregationFilters>;
+  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
+  specifications?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  vendor?: InputMaybe<StringScalarAggregationFilters>;
+  version?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type SoftwareVersionUsedByInfrastructureRelationship = {
+  __typename?: 'SoftwareVersionUsedByInfrastructureRelationship';
+  cursor: Scalars['String']['output'];
+  node: Infrastructure;
+};
+
+export type SoftwareVersionUsedByInfrastructureUpdateConnectionInput = {
+  node?: InputMaybe<InfrastructureUpdateInput>;
+  where?: InputMaybe<SoftwareVersionUsedByInfrastructureConnectionWhere>;
+};
+
+export type SoftwareVersionUsedByInfrastructureUpdateFieldInput = {
+  connect?: InputMaybe<Array<SoftwareVersionUsedByInfrastructureConnectFieldInput>>;
+  create?: InputMaybe<Array<SoftwareVersionUsedByInfrastructureCreateFieldInput>>;
+  delete?: InputMaybe<Array<SoftwareVersionUsedByInfrastructureDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<SoftwareVersionUsedByInfrastructureDisconnectFieldInput>>;
+  update?: InputMaybe<SoftwareVersionUsedByInfrastructureUpdateConnectionInput>;
 };
 
 export type SoftwareVersionWhere = {
@@ -43552,6 +44500,10 @@ export type SoftwareVersionWhere = {
   softwareProductConnection?: InputMaybe<SoftwareVersionSoftwareProductConnectionFilters>;
   supportTier?: InputMaybe<StringScalarFilters>;
   updatedAt?: InputMaybe<DateTimeScalarFilters>;
+  usedByApplications?: InputMaybe<ApplicationRelationshipFilters>;
+  usedByApplicationsConnection?: InputMaybe<SoftwareVersionUsedByApplicationsConnectionFilters>;
+  usedByInfrastructure?: InputMaybe<InfrastructureRelationshipFilters>;
+  usedByInfrastructureConnection?: InputMaybe<SoftwareVersionUsedByInfrastructureConnectionFilters>;
   version?: InputMaybe<StringScalarFilters>;
 };
 

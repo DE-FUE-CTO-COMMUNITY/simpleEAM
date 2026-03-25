@@ -18,16 +18,21 @@ import { GET_ARCHITECTURES } from '@/graphql/architecture'
 import { GET_DIAGRAMS } from '@/graphql/diagram'
 import { GET_INFRASTRUCTURES } from '@/graphql/infrastructure'
 import { GET_APPLICATIONS } from '@/graphql/application'
+import { GET_SOFTWARE_VERSIONS } from '@/graphql/softwareVersion'
+import { GET_HARDWARE_VERSIONS } from '@/graphql/hardwareVersion'
 import { GET_SUPPLIERS } from '@/graphql/supplier'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import { useCurrentPerson } from '@/hooks/useCurrentPerson'
 import { useFeatureFlags } from '@/lib/feature-flags'
+import { useLensSettings } from '@/lib/lens-settings'
 import {
   Infrastructure,
   InfrastructureType,
   InfrastructureStatus,
   Architecture,
   Application,
+  SoftwareVersion,
+  HardwareVersion,
   Supplier,
   SovereigntyMaturity,
 } from '../../gql/generated'
@@ -61,6 +66,8 @@ const baseInfrastructureSchema = z.object({
   parentInfrastructure: z.array(z.string()).optional(),
   childInfrastructures: z.array(z.string()).optional(),
   hostsApplications: z.array(z.string()).optional(),
+  softwareVersionIds: z.array(z.string()).optional(),
+  hardwareVersionIds: z.array(z.string()).optional(),
   providedBy: z.array(z.string()).optional(),
   hostedBy: z.array(z.string()).optional(),
   maintainedBy: z.array(z.string()).optional(),
@@ -122,12 +129,16 @@ const INFRASTRUCTURE_TABS = (
   tTabs: any,
   tCommon: any,
   isSupEnabled: boolean,
-  isSovereigntyEnabled: boolean
+  isSovereigntyEnabled: boolean,
+  isTechnologyManagementEnabled: boolean
 ) => [
   { id: 'general', label: tTabs('general') },
   { id: 'technical', label: tTabs('technical') },
   { id: 'lifecycle', label: tTabs('lifecycle') },
   { id: 'relationships', label: tTabs('relationships') },
+  ...(isTechnologyManagementEnabled
+    ? [{ id: 'technologyManagement', label: tTabs('technologyManagement') }]
+    : []),
   ...(isSupEnabled ? [{ id: 'suppliers', label: tTabs('suppliers') }] : []),
   { id: 'architectures', label: tTabs('architectures') },
   ...(isSovereigntyEnabled ? [{ id: 'sovereignty', label: tCommon('sovereignty.tab') }] : []),
@@ -150,8 +161,10 @@ const InfrastructureForm: React.FC<GenericFormProps<Infrastructure, Infrastructu
   const tTypes = useTranslations('infrastructure.infrastructureTypes')
   const tStatuses = useTranslations('infrastructure.statuses')
   const { featureFlags } = useFeatureFlags()
+  const { lensFlags } = useLensSettings()
   const isSupEnabled = featureFlags.SUP
   const isSovereigntyEnabled = featureFlags.Sovereignty
+  const isTechnologyManagementEnabled = lensFlags.technologyManagement
 
   const [nestedFormState, setNestedFormState] = useState<{
     isOpen: boolean
@@ -252,6 +265,20 @@ const InfrastructureForm: React.FC<GenericFormProps<Infrastructure, Infrastructu
     fetchPolicy: 'cache-and-network',
     variables: { where: companyWhere },
   })
+  const { data: softwareVersionsData, loading: softwareVersionsLoading } = useQuery(
+    GET_SOFTWARE_VERSIONS,
+    {
+      fetchPolicy: 'cache-and-network',
+      variables: { where: companyWhere },
+    }
+  )
+  const { data: hardwareVersionsData, loading: hardwareVersionsLoading } = useQuery(
+    GET_HARDWARE_VERSIONS,
+    {
+      fetchPolicy: 'cache-and-network',
+      variables: { where: companyWhere },
+    }
+  )
   const { data: suppliersData, loading: suppliersLoading } = useQuery(GET_SUPPLIERS, {
     fetchPolicy: 'cache-and-network',
     variables: { where: companyWhere },
@@ -326,6 +353,10 @@ const InfrastructureForm: React.FC<GenericFormProps<Infrastructure, Infrastructu
       parentInfrastructure: infrastructure?.parentInfrastructure?.map(parent => parent.id) || [],
       childInfrastructures: infrastructure?.childInfrastructures?.map(infra => infra.id) || [],
       hostsApplications: infrastructure?.hostsApplications?.map(app => app.id) || [],
+      softwareVersionIds:
+        (infrastructure as any)?.softwareVersions?.map((version: any) => version.id) || [],
+      hardwareVersionIds:
+        (infrastructure as any)?.hardwareVersions?.map((version: any) => version.id) || [],
       providedBy: infrastructure?.providedBy?.map(supplier => supplier.id) || [],
       hostedBy: infrastructure?.hostedBy?.map(supplier => supplier.id) || [],
       maintainedBy: infrastructure?.maintainedBy?.map(supplier => supplier.id) || [],
@@ -433,6 +464,10 @@ const InfrastructureForm: React.FC<GenericFormProps<Infrastructure, Infrastructu
         parentInfrastructure: infrastructure.parentInfrastructure?.map(parent => parent.id) ?? [],
         childInfrastructures: infrastructure.childInfrastructures?.map(infra => infra.id) ?? [],
         hostsApplications: infrastructure.hostsApplications?.map(app => app.id) ?? [],
+        softwareVersionIds:
+          (infrastructure as any)?.softwareVersions?.map((version: any) => version.id) ?? [],
+        hardwareVersionIds:
+          (infrastructure as any)?.hardwareVersions?.map((version: any) => version.id) ?? [],
         providedBy: infrastructure.providedBy?.map(supplier => supplier.id) ?? [],
         hostedBy: infrastructure.hostedBy?.map(supplier => supplier.id) ?? [],
         maintainedBy: infrastructure.maintainedBy?.map(supplier => supplier.id) ?? [],
@@ -746,6 +781,82 @@ const InfrastructureForm: React.FC<GenericFormProps<Infrastructure, Infrastructu
       },
       onChipClick: createChipClickHandler('hostsApplications'),
     },
+    ...(isTechnologyManagementEnabled
+      ? [
+          {
+            name: 'softwareVersionIds',
+            label: t('softwareVersions' as any),
+            type: 'autocomplete' as const,
+            validators: baseInfrastructureSchema.shape.softwareVersionIds,
+            multiple: true,
+            options: (softwareVersionsData?.softwareVersions || []).map(
+              (version: SoftwareVersion) => ({
+                value: version.id,
+                label: version.version ? `${version.name} (${version.version})` : version.name,
+              })
+            ),
+            loadingOptions: softwareVersionsLoading,
+            size: 12,
+            tabId: 'technologyManagement',
+            getOptionLabel: (option: any) => {
+              if (typeof option === 'string') {
+                const matchingVersion = softwareVersionsData?.softwareVersions?.find(
+                  (version: SoftwareVersion) => version.id === option
+                )
+                if (!matchingVersion) {
+                  return option
+                }
+                return matchingVersion.version
+                  ? `${matchingVersion.name} (${matchingVersion.version})`
+                  : matchingVersion.name
+              }
+              return option?.label || ''
+            },
+            isOptionEqualToValue: (option: any, value: any) => {
+              if (typeof value === 'string') {
+                return option.value === value
+              }
+              return option.value === value?.value || option.value === value
+            },
+          },
+          {
+            name: 'hardwareVersionIds',
+            label: t('hardwareVersions' as any),
+            type: 'autocomplete' as const,
+            validators: baseInfrastructureSchema.shape.hardwareVersionIds,
+            multiple: true,
+            options: (hardwareVersionsData?.hardwareVersions || []).map(
+              (version: HardwareVersion) => ({
+                value: version.id,
+                label: version.version ? `${version.name} (${version.version})` : version.name,
+              })
+            ),
+            loadingOptions: hardwareVersionsLoading,
+            size: 12,
+            tabId: 'technologyManagement',
+            getOptionLabel: (option: any) => {
+              if (typeof option === 'string') {
+                const matchingVersion = hardwareVersionsData?.hardwareVersions?.find(
+                  (version: HardwareVersion) => version.id === option
+                )
+                if (!matchingVersion) {
+                  return option
+                }
+                return matchingVersion.version
+                  ? `${matchingVersion.name} (${matchingVersion.version})`
+                  : matchingVersion.name
+              }
+              return option?.label || ''
+            },
+            isOptionEqualToValue: (option: any, value: any) => {
+              if (typeof value === 'string') {
+                return option.value === value
+              }
+              return option.value === value?.value || option.value === value
+            },
+          },
+        ]
+      : []),
     ...(isSupEnabled
       ? [
           {
@@ -969,7 +1080,13 @@ const InfrastructureForm: React.FC<GenericFormProps<Infrastructure, Infrastructu
               }
             : undefined
         }
-        tabs={INFRASTRUCTURE_TABS(tTabs, tCommon, isSupEnabled, isSovereigntyEnabled)}
+        tabs={INFRASTRUCTURE_TABS(
+          tTabs,
+          tCommon,
+          isSupEnabled,
+          isSovereigntyEnabled,
+          isTechnologyManagementEnabled
+        )}
       />
 
       {/* Nested Application Form */}

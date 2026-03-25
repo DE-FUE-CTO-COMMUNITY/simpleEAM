@@ -109,6 +109,11 @@ export const GET_APPLICATIONS = gql`
         id
         name
       }
+      softwareVersions {
+        id
+        name
+        version
+      }
       providedBy {
         id
         name
@@ -214,6 +219,11 @@ export const GET_APPLICATION = gql`
         id
         name
       }
+      softwareVersions {
+        id
+        name
+        version
+      }
       providedBy {
         id
         name
@@ -282,6 +292,11 @@ export const CREATE_APPLICATION = gql`
           id
           name
         }
+        softwareVersions {
+          id
+          name
+          version
+        }
       }
     }
   }
@@ -338,6 +353,11 @@ export const UPDATE_APPLICATION = gql`
         hostedOn {
           id
           name
+        }
+        softwareVersions {
+          id
+          name
+          version
         }
       }
     }

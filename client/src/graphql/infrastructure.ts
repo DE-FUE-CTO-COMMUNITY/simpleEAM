@@ -74,6 +74,16 @@ export const GET_INFRASTRUCTURES = gql`
         id
         name
       }
+      softwareVersions {
+        id
+        name
+        version
+      }
+      hardwareVersions {
+        id
+        name
+        version
+      }
       providedBy {
         id
         name
@@ -145,6 +155,16 @@ export const GET_INFRASTRUCTURE = gql`
       hostsApplications {
         id
         name
+      }
+      softwareVersions {
+        id
+        name
+        version
+      }
+      hardwareVersions {
+        id
+        name
+        version
       }
       providedBy {
         id
@@ -219,6 +239,16 @@ export const CREATE_INFRASTRUCTURE = gql`
           id
           name
         }
+        softwareVersions {
+          id
+          name
+          version
+        }
+        hardwareVersions {
+          id
+          name
+          version
+        }
         partOfArchitectures {
           id
           name
@@ -280,6 +310,16 @@ export const UPDATE_INFRASTRUCTURE = gql`
         hostsApplications {
           id
           name
+        }
+        softwareVersions {
+          id
+          name
+          version
+        }
+        hardwareVersions {
+          id
+          name
+          version
         }
         partOfArchitectures {
           id

@@ -23,6 +23,7 @@ import {
   Architecture,
   ArchitecturePrinciple,
   Infrastructure,
+  SoftwareVersion,
   Supplier,
   TimeCategory,
   SevenRStrategy,
@@ -37,6 +38,7 @@ import { GET_ARCHITECTURES } from '@/graphql/architecture'
 import { GET_DIAGRAMS } from '@/graphql/diagram'
 import { GET_ARCHITECTURE_PRINCIPLES } from '@/graphql/architecturePrinciple'
 import { GET_INFRASTRUCTURES } from '@/graphql/infrastructure'
+import { GET_SOFTWARE_VERSIONS } from '@/graphql/softwareVersion'
 import { GET_SUPPLIERS } from '@/graphql/supplier'
 import { useCurrentPerson } from '@/hooks/useCurrentPerson'
 import GenericForm, { FieldConfig, TabConfig } from '../common/GenericForm'
@@ -45,6 +47,7 @@ import { isArchitect } from '@/lib/auth'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import { useChipClickHandlers } from '@/hooks/useChipClickHandlers'
 import { useFeatureFlags } from '@/lib/feature-flags'
+import { useLensSettings } from '@/lib/lens-settings'
 import { buildSovereigntyAchievedFields } from '../common/SovereigntyFields'
 import CapabilityForm from '../capabilities/CapabilityForm'
 import DataObjectForm from '../dataobjects/DataObjectForm'
@@ -90,6 +93,7 @@ const createBaseApplicationSchema = (t: any) =>
     predecessorIds: z.array(z.string()).optional(),
     successorIds: z.array(z.string()).optional(),
     hostedOnIds: z.array(z.string()).optional(),
+    softwareVersionIds: z.array(z.string()).optional(),
     providedByIds: z.array(z.string()).optional(),
     supportedByIds: z.array(z.string()).optional(),
     maintainedByIds: z.array(z.string()).optional(),
@@ -337,8 +341,10 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
   const tTabs = useTranslations('applications.tabs')
   const tCommon = useTranslations('common')
   const { featureFlags } = useFeatureFlags()
+  const { lensFlags } = useLensSettings()
   const isSupEnabled = featureFlags.SUP
   const isSovereigntyEnabled = featureFlags.Sovereignty
+  const isTechnologyManagementEnabled = lensFlags.technologyManagement
 
   // State for nested entity forms and parent dialog visibility
   const [nestedFormState, setNestedFormState] = useState<{
@@ -414,6 +420,12 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
   const { data: infrastructuresData, loading: infrastructuresLoading } = useQuery(
     GET_INFRASTRUCTURES,
     { variables: { where: companyWhere } }
+  )
+  const { data: softwareVersionsData, loading: softwareVersionsLoading } = useQuery(
+    GET_SOFTWARE_VERSIONS,
+    {
+      variables: { where: companyWhere },
+    }
   )
   const { data: suppliersData, loading: suppliersLoading } = useQuery(GET_SUPPLIERS, {
     variables: { where: companyWhere },
@@ -599,6 +611,8 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     predecessorIds: application?.predecessors?.map((app: any) => app.id) ?? [],
     successorIds: application?.successors?.map((app: any) => app.id) ?? [],
     hostedOnIds: application?.hostedOn?.map((app: any) => app.id) ?? [],
+    softwareVersionIds:
+      (application as any)?.softwareVersions?.map((version: any) => version.id) ?? [],
     providedByIds: application?.providedBy?.map((supplier: any) => supplier.id) ?? [],
     supportedByIds: application?.supportedBy?.map((supplier: any) => supplier.id) ?? [],
     maintainedByIds: application?.maintainedBy?.map((supplier: any) => supplier.id) ?? [],
@@ -702,6 +716,8 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
         predecessorIds: application?.predecessors?.map((app: any) => app.id) ?? [],
         successorIds: application?.successors?.map((app: any) => app.id) ?? [],
         hostedOnIds: application?.hostedOn?.map((app: any) => app.id) ?? [],
+        softwareVersionIds:
+          (application as any)?.softwareVersions?.map((version: any) => version.id) ?? [],
         providedByIds: application?.providedBy?.map((supplier: any) => supplier.id) ?? [],
         supportedByIds: application?.supportedBy?.map((supplier: any) => supplier.id) ?? [],
         maintainedByIds: application?.maintainedBy?.map((supplier: any) => supplier.id) ?? [],
@@ -754,6 +770,9 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     { id: 'technical', label: tTabs('technical') },
     { id: 'lifecycle', label: tTabs('lifecycle') },
     { id: 'relationships', label: tTabs('relationships') },
+    ...(isTechnologyManagementEnabled
+      ? [{ id: 'technologyManagement', label: tTabs('technologyManagement') }]
+      : []),
     ...(isSupEnabled ? [{ id: 'suppliers', label: tTabs('suppliers') }] : []),
     { id: 'architectures', label: tTabs('architectures') },
     { id: 'principles', label: tTabs('principles') },
@@ -1306,6 +1325,45 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
       },
       onChipClick: createChipClickHandler('hostedOnIds'),
     },
+    ...(isTechnologyManagementEnabled
+      ? [
+          {
+            name: 'softwareVersionIds',
+            label: t('softwareVersions'),
+            type: 'autocomplete' as const,
+            tabId: 'technologyManagement',
+            multiple: true,
+            options: (softwareVersionsData?.softwareVersions || []).map(
+              (version: SoftwareVersion) => ({
+                value: version.id,
+                label: version.version ? `${version.name} (${version.version})` : version.name,
+              })
+            ),
+            loadingOptions: softwareVersionsLoading,
+            size: { xs: 12, md: 12 },
+            getOptionLabel: (option: any) => {
+              if (typeof option === 'string') {
+                const matchingVersion = softwareVersionsData?.softwareVersions?.find(
+                  (version: SoftwareVersion) => version.id === option
+                )
+                if (!matchingVersion) {
+                  return option
+                }
+                return matchingVersion.version
+                  ? `${matchingVersion.name} (${matchingVersion.version})`
+                  : matchingVersion.name
+              }
+              return option?.label || ''
+            },
+            isOptionEqualToValue: (option: any, value: any) => {
+              if (typeof value === 'string') {
+                return option.value === value
+              }
+              return option.value === value?.value || option.value === value
+            },
+          },
+        ]
+      : []),
 
     ...(isSupEnabled
       ? [

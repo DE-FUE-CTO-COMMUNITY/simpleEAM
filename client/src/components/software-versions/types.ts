@@ -11,6 +11,8 @@ export type SoftwareVersionType = Pick<
   | 'createdAt'
   | 'updatedAt'
   | 'softwareProduct'
+  | 'usedByApplications'
+  | 'usedByInfrastructure'
   | 'lifecycleRecords'
 >
 

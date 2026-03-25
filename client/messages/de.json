@@ -1016,6 +1016,7 @@
       "parentApplications": "Übergeordnete Applikationen",
       "componentApplications": "Komponenten (untergeordnete Applikationen)",
       "hostedOn": "Gehostet auf (Infrastructure)",
+      "softwareVersions": "Softwareversionen",
       "providedBy": "Bereitgestellt durch Lieferanten",
       "supportedBy": "Unterstützt durch Lieferanten",
       "maintainedBy": "Gewartet durch Lieferanten",
@@ -1146,6 +1147,7 @@
       "relationships": "Beziehungen",
       "architectures": "Architekturen",
       "technical": "Technisch",
+      "technologyManagement": "Technologie-Management",
       "principles": "Prinzipien",
       "suppliers": "Lieferanten"
     }
@@ -2012,6 +2014,8 @@
       "childInfrastructures": "Untergeordnete Infrastrukturen",
       "components": "Komponenten",
       "hostsApplications": "Gehostete Applikationen",
+      "softwareVersions": "Softwareversionen",
+      "hardwareVersions": "Hardwareversionen",
       "hostedApplications": "Gehostete Applikationen",
       "providedBy": "Bereitgestellt durch Lieferanten",
       "hostedBy": "Gehostet durch Lieferanten",
@@ -2112,6 +2116,7 @@
       "technical": "Technisch",
       "lifecycle": "Lebenszyklus",
       "relationships": "Beziehungen",
+      "technologyManagement": "Technologie-Management",
       "architectures": "Architekturen",
       "suppliers": "Lieferanten"
     }
@@ -3322,6 +3327,8 @@
       "eosDate": "End of Support (EOS)",
       "eolDate": "End of Life (EOL)",
       "softwareProduct": "Softwareprodukt",
+      "usedByApplications": "Verwendet von Applikationen",
+      "usedByInfrastructure": "Verwendet von Infrastruktur",
       "none": "Keine",
       "nameRequired": "Name ist erforderlich",
       "nameMax": "Name darf maximal 100 Zeichen enthalten",
@@ -3495,6 +3502,7 @@
       "eosDate": "End of Support (EOS)",
       "eolDate": "End of Life (EOL)",
       "hardwareProduct": "Hardwareprodukt",
+      "usedByInfrastructure": "Verwendet von Infrastruktur",
       "none": "Keine",
       "nameRequired": "Name ist erforderlich",
       "nameMax": "Name darf maximal 100 Zeichen enthalten",

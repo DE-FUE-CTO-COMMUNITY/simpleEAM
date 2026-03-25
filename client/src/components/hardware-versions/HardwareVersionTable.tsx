@@ -53,6 +53,40 @@ const HardwareVersionTable: React.FC<HardwareVersionTableProps> = ({
   const locale = useLocale()
   const columnHelper = createColumnHelper<HardwareVersionType>()
 
+  const getReleaseChannelLabel = (value?: string | null): string => {
+    if (!value) {
+      return '-'
+    }
+
+    const labels: Record<string, string> = {
+      STABLE: tEntity('releaseChannels.STABLE'),
+      LTS: tEntity('releaseChannels.LTS'),
+      RC: tEntity('releaseChannels.RC'),
+      BETA: tEntity('releaseChannels.BETA'),
+      ALPHA: tEntity('releaseChannels.ALPHA'),
+      PREVIEW: tEntity('releaseChannels.PREVIEW'),
+    }
+
+    return labels[value] ?? value
+  }
+
+  const getSupportTierLabel = (value?: string | null): string => {
+    if (!value) {
+      return '-'
+    }
+
+    const labels: Record<string, string> = {
+      STANDARD: tEntity('supportTiers.STANDARD'),
+      EXTENDED: tEntity('supportTiers.EXTENDED'),
+      PREMIUM: tEntity('supportTiers.PREMIUM'),
+      COMMUNITY: tEntity('supportTiers.COMMUNITY'),
+      DEPRECATED: tEntity('supportTiers.DEPRECATED'),
+      END_OF_SUPPORT: tEntity('supportTiers.END_OF_SUPPORT'),
+    }
+
+    return labels[value] ?? value
+  }
+
   const {
     columnVisibility,
     onTableReady: persistentOnTableReady,
@@ -81,11 +115,11 @@ const HardwareVersionTable: React.FC<HardwareVersionTableProps> = ({
       }),
       columnHelper.accessor('releaseChannel', {
         header: t('releaseChannel'),
-        cell: info => info.getValue() || '-',
+        cell: info => getReleaseChannelLabel(info.getValue()),
       }),
       columnHelper.accessor('supportTier', {
         header: t('supportTier'),
-        cell: info => info.getValue() || '-',
+        cell: info => getSupportTierLabel(info.getValue()),
       }),
       columnHelper.accessor('hardwareProduct', {
         header: t('hardwareProduct'),
@@ -112,7 +146,7 @@ const HardwareVersionTable: React.FC<HardwareVersionTableProps> = ({
         cell: info => (info.getValue() ? formatDate(info.getValue() as string, locale) : '-'),
       }),
     ],
-    [columnHelper, locale, t, tLifecycle]
+    [columnHelper, locale, t, tEntity, tLifecycle]
   )
 
   const mapToFormValues = (item: HardwareVersionType): HardwareVersionFormValues => ({
@@ -125,6 +159,8 @@ const HardwareVersionTable: React.FC<HardwareVersionTableProps> = ({
     releaseChannel: item.releaseChannel ?? '',
     supportTier: item.supportTier ?? '',
     hardwareProductId: item.hardwareProduct?.[0]?.id ?? '',
+    usedByInfrastructureIds:
+      item.usedByInfrastructure?.map(infrastructure => infrastructure.id) ?? [],
   })
 
   return (

@@ -27,6 +27,14 @@ export const GET_SOFTWARE_VERSIONS = gql`
         id
         name
       }
+      usedByApplications {
+        id
+        name
+      }
+      usedByInfrastructure {
+        id
+        name
+      }
       lifecycleRecords {
         id
         lifecycleStatus

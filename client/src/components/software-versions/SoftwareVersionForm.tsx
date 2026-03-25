@@ -5,8 +5,16 @@ import { useForm } from '@tanstack/react-form'
 import { useTranslations } from 'next-intl'
 import { z } from 'zod'
 import { useQuery } from '@apollo/client'
-import { LifecycleStatus, SoftwareVersion, SoftwareProduct } from '@/gql/generated'
+import {
+  Application,
+  Infrastructure,
+  LifecycleStatus,
+  SoftwareVersion,
+  SoftwareProduct,
+} from '@/gql/generated'
 import { GET_SOFTWARE_PRODUCTS } from '@/graphql/softwareProduct'
+import { GET_APPLICATIONS } from '@/graphql/application'
+import { GET_INFRASTRUCTURES } from '@/graphql/infrastructure'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import { isArchitect } from '@/lib/auth'
 import GenericForm, { FieldConfig } from '../common/GenericForm'
@@ -20,6 +28,8 @@ const createSchema = (t: any) =>
     supportTier: z.string().max(100, t('supportTierMax')).optional(),
     isLts: z.boolean().optional(),
     softwareProductId: z.string().optional(),
+    usedByApplicationIds: z.array(z.string()).optional(),
+    usedByInfrastructureIds: z.array(z.string()).optional(),
     lifecycleRecordId: z.string().optional(),
     lifecycleStatus: z.nativeEnum(LifecycleStatus).optional().nullable(),
     eosDate: z.any().optional().nullable(),
@@ -40,6 +50,15 @@ const SoftwareVersionForm: React.FC<
   const { data: productsData, loading: productsLoading } = useQuery(GET_SOFTWARE_PRODUCTS, {
     variables: { where: companyWhere },
   })
+  const { data: applicationsData, loading: applicationsLoading } = useQuery(GET_APPLICATIONS, {
+    variables: { where: companyWhere },
+  })
+  const { data: infrastructuresData, loading: infrastructuresLoading } = useQuery(
+    GET_INFRASTRUCTURES,
+    {
+      variables: { where: companyWhere },
+    }
+  )
 
   const products = (productsData?.softwareProducts ?? []) as SoftwareProduct[]
   const productOptions = useMemo(
@@ -57,6 +76,8 @@ const SoftwareVersionForm: React.FC<
       supportTier: '',
       isLts: false,
       softwareProductId: '',
+      usedByApplicationIds: [],
+      usedByInfrastructureIds: [],
       lifecycleRecordId: '',
       lifecycleStatus: null,
       eosDate: null,
@@ -92,6 +113,9 @@ const SoftwareVersionForm: React.FC<
         supportTier: data.supportTier ?? '',
         isLts: data.isLts ?? false,
         softwareProductId: data.softwareProduct?.[0]?.id ?? '',
+        usedByApplicationIds: data.usedByApplications?.map(application => application.id) ?? [],
+        usedByInfrastructureIds:
+          data.usedByInfrastructure?.map(infrastructure => infrastructure.id) ?? [],
         lifecycleRecordId: lifecycleRecord?.id ?? '',
         lifecycleStatus: lifecycleRecord?.lifecycleStatus ?? null,
         eosDate: lifecycleRecord?.eosDate ?? null,
@@ -156,6 +180,62 @@ const SoftwareVersionForm: React.FC<
       options: [{ value: '', label: t('none') }, ...productOptions],
       loadingOptions: productsLoading,
       tabId: 'relationships',
+    },
+    {
+      name: 'usedByApplicationIds',
+      label: t('usedByApplications'),
+      type: 'autocomplete',
+      multiple: true,
+      options: (applicationsData?.applications || []).map((application: Application) => ({
+        value: application.id,
+        label: application.name,
+      })),
+      loadingOptions: applicationsLoading,
+      tabId: 'relationships',
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          const matchingApplication = applicationsData?.applications?.find(
+            (application: Application) => application.id === option
+          )
+          return matchingApplication?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
+    },
+    {
+      name: 'usedByInfrastructureIds',
+      label: t('usedByInfrastructure'),
+      type: 'autocomplete',
+      multiple: true,
+      options: (infrastructuresData?.infrastructures || []).map(
+        (infrastructure: Infrastructure) => ({
+          value: infrastructure.id,
+          label: infrastructure.name,
+        })
+      ),
+      loadingOptions: infrastructuresLoading,
+      tabId: 'relationships',
+      getOptionLabel: (option: any) => {
+        if (typeof option === 'string') {
+          const matchingInfrastructure = infrastructuresData?.infrastructures?.find(
+            (infrastructure: Infrastructure) => infrastructure.id === option
+          )
+          return matchingInfrastructure?.name || option
+        }
+        return option?.label || ''
+      },
+      isOptionEqualToValue: (option: any, value: any) => {
+        if (typeof value === 'string') {
+          return option.value === value
+        }
+        return option.value === value?.value || option.value === value
+      },
     },
     {
       name: 'lifecycleStatus',

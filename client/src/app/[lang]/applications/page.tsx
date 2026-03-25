@@ -42,6 +42,7 @@ const ApplicationsPage = () => {
   const { selectedCompanyId } = useCompanyContext()
   const { lensFlags } = useLensSettings()
   const showBusinessProcessRelationship = lensFlags.processArchitecture
+  const showTechnologyManagementRelationship = lensFlags.technologyManagement
   const [globalFilter, setGlobalFilter] = useState<string>('')
   const [sorting, setSorting] = useState([{ id: 'name', desc: false }])
 
@@ -250,6 +251,7 @@ const ApplicationsPage = () => {
       predecessorIds,
       successorIds,
       hostedOnIds,
+      softwareVersionIds,
       providedByIds,
       supportedByIds,
       maintainedByIds,
@@ -398,6 +400,17 @@ const ApplicationsPage = () => {
             },
           }
         : {}),
+      ...(showTechnologyManagementRelationship &&
+      softwareVersionIds &&
+      softwareVersionIds.length > 0
+        ? {
+            softwareVersions: {
+              connect: softwareVersionIds.map(id => ({
+                where: { node: { id: { eq: id } } },
+              })),
+            },
+          }
+        : {}),
       ...(providedByIds && providedByIds.length > 0
         ? {
             providedBy: {
@@ -467,6 +480,7 @@ const ApplicationsPage = () => {
       predecessorIds,
       successorIds,
       hostedOnIds,
+      softwareVersionIds,
       providedByIds,
       supportedByIds,
       maintainedByIds,
@@ -735,6 +749,25 @@ const ApplicationsPage = () => {
     } else {
       input.hostedOn = {
         disconnect: [{ where: {} }], // Disconnect all existing connections
+      }
+    }
+
+    if (showTechnologyManagementRelationship) {
+      if (softwareVersionIds && softwareVersionIds.length > 0) {
+        input.softwareVersions = {
+          disconnect: [{ where: {} }],
+          connect: softwareVersionIds.map(versionId => ({
+            where: {
+              node: {
+                id: { eq: versionId },
+              },
+            },
+          })),
+        }
+      } else {
+        input.softwareVersions = {
+          disconnect: [{ where: {} }],
+        }
       }
     }
 

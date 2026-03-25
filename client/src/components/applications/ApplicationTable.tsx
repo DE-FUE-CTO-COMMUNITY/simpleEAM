@@ -449,6 +449,7 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
         ? new Date(app.lastSovereigntyAssessmentAt)
         : null,
       hostedOnIds: app.hostedOn?.map(infra => infra.id) ?? [],
+      softwareVersionIds: (app as any).softwareVersions?.map((version: any) => version.id) ?? [],
       providedByIds: app.providedBy?.map(supplier => supplier.id) ?? [],
       supportedByIds: app.supportedBy?.map(supplier => supplier.id) ?? [],
       maintainedByIds: app.maintainedBy?.map(supplier => supplier.id) ?? [],
