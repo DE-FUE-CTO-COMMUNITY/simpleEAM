@@ -761,8 +761,7 @@ export const fetchHardwareProductsForExport = async (
       lifecycleStatus: product.lifecycleStatus || '',
       isActive: !!product.isActive,
       productFamily: product.productFamily?.[0]?.id || '',
-      manufacturedBy:
-        product.manufacturedBy?.map((supplier: any) => supplier.id).join(',') || '',
+      manufacturedBy: product.manufacturedBy?.map((supplier: any) => supplier.id).join(',') || '',
       providedBy: product.providedBy?.map((supplier: any) => supplier.id).join(',') || '',
       maintainedBy: product.maintainedBy?.map((supplier: any) => supplier.id).join(',') || '',
       versions: product.versions?.map((version: any) => version.id).join(',') || '',
@@ -2826,15 +2825,7 @@ export function getOptionalFieldsByEntityType(entityType: EntityType): string[] 
         'updatedAt',
       ]
     case 'hardwareVersions':
-      return [
-        'releaseDate',
-        'eolDate',
-        'isCurrent',
-        'product',
-        'company',
-        'createdAt',
-        'updatedAt',
-      ]
+      return ['releaseDate', 'eolDate', 'isCurrent', 'product', 'company', 'createdAt', 'updatedAt']
     case 'aicomponents':
       return [
         'description',

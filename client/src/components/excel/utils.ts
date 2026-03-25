@@ -718,7 +718,10 @@ export const createEntityInput = (entityType: string, row: any): any => {
         name: generateFallbackName('Software Product', row),
         lifecycleStatus: validLifecycleStatus,
         isActive:
-          row.isActive === true || row.isActive === 'true' || row.isActive === 1 || row.isActive === '1',
+          row.isActive === true ||
+          row.isActive === 'true' ||
+          row.isActive === 1 ||
+          row.isActive === '1',
         updatedAt: row.updatedAt ? new Date(row.updatedAt) : new Date(),
       }
     }
@@ -744,7 +747,10 @@ export const createEntityInput = (entityType: string, row: any): any => {
         name: generateFallbackName('Hardware Product', row),
         lifecycleStatus: validLifecycleStatus,
         isActive:
-          row.isActive === true || row.isActive === 'true' || row.isActive === 1 || row.isActive === '1',
+          row.isActive === true ||
+          row.isActive === 'true' ||
+          row.isActive === 1 ||
+          row.isActive === '1',
         updatedAt: row.updatedAt ? new Date(row.updatedAt) : new Date(),
       }
     }

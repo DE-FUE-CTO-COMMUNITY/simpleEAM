@@ -12,6 +12,7 @@
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "codegen": "graphql-codegen --config codegen.ts",
+    "set:token": "tsx scripts/set-token.ts",
     "import:json": "tsx scripts/import-json.ts",
     "import:demo-json": "tsx scripts/import-json.ts --file demos/NextGenEAM_Company-Solar_Panels_GmbH.json",
     "import:demo-json:dry-run": "tsx scripts/import-json.ts --file demos/NextGenEAM_Company-Solar_Panels_GmbH.json --dry-run"

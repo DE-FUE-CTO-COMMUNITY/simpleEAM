@@ -1,0 +1,502 @@
+{
+  "Product Families": [
+    {
+      "id": "pf-hw-server",
+      "name": "Server",
+      "type": "HARDWARE",
+      "category": "COMPUTE_END_USER_DEVICES"
+    },
+    {
+      "id": "pf-hw-blade-server",
+      "name": "Blade Server",
+      "type": "HARDWARE",
+      "category": "COMPUTE_END_USER_DEVICES"
+    },
+    {
+      "id": "pf-hw-hyperconverged-appliance",
+      "name": "Hyperconverged Appliance",
+      "type": "HARDWARE",
+      "category": "COMPUTE_END_USER_DEVICES"
+    },
+    {
+      "id": "pf-hw-mainframe",
+      "name": "Mainframe",
+      "type": "HARDWARE",
+      "category": "COMPUTE_END_USER_DEVICES"
+    },
+    {
+      "id": "pf-hw-high-performance-computing-system-hpc",
+      "name": "High Performance Computing System (HPC)",
+      "type": "HARDWARE",
+      "category": "COMPUTE_END_USER_DEVICES"
+    },
+    {
+      "id": "pf-hw-desktop-computer",
+      "name": "Desktop Computer",
+      "type": "HARDWARE",
+      "category": "COMPUTE_END_USER_DEVICES"
+    },
+    {
+      "id": "pf-hw-laptop-notebook",
+      "name": "Laptop / Notebook",
+      "type": "HARDWARE",
+      "category": "COMPUTE_END_USER_DEVICES"
+    },
+    {
+      "id": "pf-hw-thin-client",
+      "name": "Thin Client",
+      "type": "HARDWARE",
+      "category": "COMPUTE_END_USER_DEVICES"
+    },
+    {
+      "id": "pf-hw-workstation",
+      "name": "Workstation",
+      "type": "HARDWARE",
+      "category": "COMPUTE_END_USER_DEVICES"
+    },
+    {
+      "id": "pf-hw-mobile-device-smartphone-tablet",
+      "name": "Mobile Device (Smartphone, Tablet)",
+      "type": "HARDWARE",
+      "category": "COMPUTE_END_USER_DEVICES"
+    },
+    {
+      "id": "pf-hw-router",
+      "name": "Router",
+      "type": "HARDWARE",
+      "category": "NETWORK_DEVICES"
+    },
+    {
+      "id": "pf-hw-switch",
+      "name": "Switch",
+      "type": "HARDWARE",
+      "category": "NETWORK_DEVICES"
+    },
+    {
+      "id": "pf-hw-firewall-appliance",
+      "name": "Firewall Appliance",
+      "type": "HARDWARE",
+      "category": "NETWORK_DEVICES"
+    },
+    {
+      "id": "pf-hw-load-balancer",
+      "name": "Load Balancer",
+      "type": "HARDWARE",
+      "category": "NETWORK_DEVICES"
+    },
+    {
+      "id": "pf-hw-wan-optimizer",
+      "name": "WAN Optimizer",
+      "type": "HARDWARE",
+      "category": "NETWORK_DEVICES"
+    },
+    {
+      "id": "pf-hw-wireless-access-point",
+      "name": "Wireless Access Point",
+      "type": "HARDWARE",
+      "category": "NETWORK_DEVICES"
+    },
+    {
+      "id": "pf-hw-network-controller",
+      "name": "Network Controller",
+      "type": "HARDWARE",
+      "category": "NETWORK_DEVICES"
+    },
+    {
+      "id": "pf-hw-sd-wan-appliance",
+      "name": "SD-WAN Appliance",
+      "type": "HARDWARE",
+      "category": "NETWORK_DEVICES"
+    },
+    {
+      "id": "pf-hw-storage-array",
+      "name": "Storage Array",
+      "type": "HARDWARE",
+      "category": "STORAGE_DATA_INFRASTRUCTURE"
+    },
+    {
+      "id": "pf-hw-san",
+      "name": "SAN",
+      "type": "HARDWARE",
+      "category": "STORAGE_DATA_INFRASTRUCTURE"
+    },
+    {
+      "id": "pf-hw-nas",
+      "name": "NAS",
+      "type": "HARDWARE",
+      "category": "STORAGE_DATA_INFRASTRUCTURE"
+    },
+    {
+      "id": "pf-hw-object-storage-appliance",
+      "name": "Object Storage Appliance",
+      "type": "HARDWARE",
+      "category": "STORAGE_DATA_INFRASTRUCTURE"
+    },
+    {
+      "id": "pf-hw-backup-appliance",
+      "name": "Backup Appliance",
+      "type": "HARDWARE",
+      "category": "STORAGE_DATA_INFRASTRUCTURE"
+    },
+    {
+      "id": "pf-hw-tape-library",
+      "name": "Tape Library",
+      "type": "HARDWARE",
+      "category": "STORAGE_DATA_INFRASTRUCTURE"
+    },
+    {
+      "id": "pf-hw-archival-storage-system",
+      "name": "Archival Storage System",
+      "type": "HARDWARE",
+      "category": "STORAGE_DATA_INFRASTRUCTURE"
+    },
+    {
+      "id": "pf-hw-hardware-security-module-hsm",
+      "name": "Hardware Security Module (HSM)",
+      "type": "HARDWARE",
+      "category": "SECURITY_HARDWARE"
+    },
+    {
+      "id": "pf-hw-secure-gateway-appliance",
+      "name": "Secure Gateway Appliance",
+      "type": "HARDWARE",
+      "category": "SECURITY_HARDWARE"
+    },
+    {
+      "id": "pf-hw-identity-appliance",
+      "name": "Identity Appliance",
+      "type": "HARDWARE",
+      "category": "SECURITY_HARDWARE"
+    },
+    {
+      "id": "pf-hw-encryption-appliance",
+      "name": "Encryption Appliance",
+      "type": "HARDWARE",
+      "category": "SECURITY_HARDWARE"
+    },
+    {
+      "id": "pf-hw-printer",
+      "name": "Printer",
+      "type": "HARDWARE",
+      "category": "PERIPHERALS_OUTPUT_DEVICES"
+    },
+    {
+      "id": "pf-hw-multifunction-device-mfp",
+      "name": "Multifunction Device (MFP)",
+      "type": "HARDWARE",
+      "category": "PERIPHERALS_OUTPUT_DEVICES"
+    },
+    {
+      "id": "pf-hw-scanner",
+      "name": "Scanner",
+      "type": "HARDWARE",
+      "category": "PERIPHERALS_OUTPUT_DEVICES"
+    },
+    {
+      "id": "pf-hw-plotter",
+      "name": "Plotter",
+      "type": "HARDWARE",
+      "category": "PERIPHERALS_OUTPUT_DEVICES"
+    },
+    {
+      "id": "pf-hw-rack-system",
+      "name": "Rack System",
+      "type": "HARDWARE",
+      "category": "DATA_CENTER_INFRASTRUCTURE"
+    },
+    {
+      "id": "pf-hw-power-distribution-unit-pdu",
+      "name": "Power Distribution Unit (PDU)",
+      "type": "HARDWARE",
+      "category": "DATA_CENTER_INFRASTRUCTURE"
+    },
+    {
+      "id": "pf-hw-uninterruptible-power-supply-ups",
+      "name": "Uninterruptible Power Supply (UPS)",
+      "type": "HARDWARE",
+      "category": "DATA_CENTER_INFRASTRUCTURE"
+    },
+    {
+      "id": "pf-hw-cooling-system",
+      "name": "Cooling System",
+      "type": "HARDWARE",
+      "category": "DATA_CENTER_INFRASTRUCTURE"
+    },
+    {
+      "id": "pf-sw-operating-system",
+      "name": "Operating System",
+      "type": "SOFTWARE",
+      "category": "OPERATING_PLATFORM_SOFTWARE"
+    },
+    {
+      "id": "pf-sw-hypervisor",
+      "name": "Hypervisor",
+      "type": "SOFTWARE",
+      "category": "OPERATING_PLATFORM_SOFTWARE"
+    },
+    {
+      "id": "pf-sw-container-runtime",
+      "name": "Container Runtime",
+      "type": "SOFTWARE",
+      "category": "OPERATING_PLATFORM_SOFTWARE"
+    },
+    {
+      "id": "pf-sw-firmware",
+      "name": "Firmware",
+      "type": "SOFTWARE",
+      "category": "OPERATING_PLATFORM_SOFTWARE"
+    },
+    {
+      "id": "pf-sw-embedded-operating-system",
+      "name": "Embedded Operating System",
+      "type": "SOFTWARE",
+      "category": "OPERATING_PLATFORM_SOFTWARE"
+    },
+    {
+      "id": "pf-sw-database-management-system-dbms",
+      "name": "Database Management System (DBMS)",
+      "type": "SOFTWARE",
+      "category": "INFRASTRUCTURE_PLATFORM_SOFTWARE"
+    },
+    {
+      "id": "pf-sw-middleware",
+      "name": "Middleware",
+      "type": "SOFTWARE",
+      "category": "INFRASTRUCTURE_PLATFORM_SOFTWARE"
+    },
+    {
+      "id": "pf-sw-application-server",
+      "name": "Application Server",
+      "type": "SOFTWARE",
+      "category": "INFRASTRUCTURE_PLATFORM_SOFTWARE"
+    },
+    {
+      "id": "pf-sw-message-broker",
+      "name": "Message Broker",
+      "type": "SOFTWARE",
+      "category": "INFRASTRUCTURE_PLATFORM_SOFTWARE"
+    },
+    {
+      "id": "pf-sw-api-management-platform",
+      "name": "API Management Platform",
+      "type": "SOFTWARE",
+      "category": "INFRASTRUCTURE_PLATFORM_SOFTWARE"
+    },
+    {
+      "id": "pf-sw-integration-platform",
+      "name": "Integration Platform",
+      "type": "SOFTWARE",
+      "category": "INFRASTRUCTURE_PLATFORM_SOFTWARE"
+    },
+    {
+      "id": "pf-sw-infrastructure-as-a-service-iaas",
+      "name": "Infrastructure as a Service (IaaS)",
+      "type": "SOFTWARE",
+      "category": "CLOUD_PLATFORM_SERVICES"
+    },
+    {
+      "id": "pf-sw-platform-as-a-service-paas",
+      "name": "Platform as a Service (PaaS)",
+      "type": "SOFTWARE",
+      "category": "CLOUD_PLATFORM_SERVICES"
+    },
+    {
+      "id": "pf-sw-container-platform",
+      "name": "Container Platform",
+      "type": "SOFTWARE",
+      "category": "CLOUD_PLATFORM_SERVICES"
+    },
+    {
+      "id": "pf-sw-kubernetes-distribution",
+      "name": "Kubernetes Distribution",
+      "type": "SOFTWARE",
+      "category": "CLOUD_PLATFORM_SERVICES"
+    },
+    {
+      "id": "pf-sw-cloud-management-platform",
+      "name": "Cloud Management Platform",
+      "type": "SOFTWARE",
+      "category": "CLOUD_PLATFORM_SERVICES"
+    },
+    {
+      "id": "pf-sw-identity-and-access-management-iam",
+      "name": "Identity & Access Management (IAM)",
+      "type": "SOFTWARE",
+      "category": "SECURITY_SOFTWARE"
+    },
+    {
+      "id": "pf-sw-privileged-access-management-pam",
+      "name": "Privileged Access Management (PAM)",
+      "type": "SOFTWARE",
+      "category": "SECURITY_SOFTWARE"
+    },
+    {
+      "id": "pf-sw-endpoint-protection-platform",
+      "name": "Endpoint Protection Platform",
+      "type": "SOFTWARE",
+      "category": "SECURITY_SOFTWARE"
+    },
+    {
+      "id": "pf-sw-security-information-and-event-management-siem",
+      "name": "Security Information & Event Management (SIEM)",
+      "type": "SOFTWARE",
+      "category": "SECURITY_SOFTWARE"
+    },
+    {
+      "id": "pf-sw-vulnerability-management",
+      "name": "Vulnerability Management",
+      "type": "SOFTWARE",
+      "category": "SECURITY_SOFTWARE"
+    },
+    {
+      "id": "pf-sw-data-loss-prevention-dlp",
+      "name": "Data Loss Prevention (DLP)",
+      "type": "SOFTWARE",
+      "category": "SECURITY_SOFTWARE"
+    },
+    {
+      "id": "pf-sw-it-service-management-itsm",
+      "name": "IT Service Management (ITSM)",
+      "type": "SOFTWARE",
+      "category": "MANAGEMENT_OPERATIONS_SOFTWARE"
+    },
+    {
+      "id": "pf-sw-configuration-management-database-cmdb",
+      "name": "Configuration Management Database (CMDB)",
+      "type": "SOFTWARE",
+      "category": "MANAGEMENT_OPERATIONS_SOFTWARE"
+    },
+    {
+      "id": "pf-sw-it-operations-management-itom",
+      "name": "IT Operations Management (ITOM)",
+      "type": "SOFTWARE",
+      "category": "MANAGEMENT_OPERATIONS_SOFTWARE"
+    },
+    {
+      "id": "pf-sw-monitoring-and-observability",
+      "name": "Monitoring & Observability",
+      "type": "SOFTWARE",
+      "category": "MANAGEMENT_OPERATIONS_SOFTWARE"
+    },
+    {
+      "id": "pf-sw-log-management",
+      "name": "Log Management",
+      "type": "SOFTWARE",
+      "category": "MANAGEMENT_OPERATIONS_SOFTWARE"
+    },
+    {
+      "id": "pf-sw-backup-software",
+      "name": "Backup Software",
+      "type": "SOFTWARE",
+      "category": "MANAGEMENT_OPERATIONS_SOFTWARE"
+    },
+    {
+      "id": "pf-sw-patch-management",
+      "name": "Patch Management",
+      "type": "SOFTWARE",
+      "category": "MANAGEMENT_OPERATIONS_SOFTWARE"
+    },
+    {
+      "id": "pf-sw-office-productivity-suite",
+      "name": "Office Productivity Suite",
+      "type": "SOFTWARE",
+      "category": "END_USER_COLLABORATION_SOFTWARE"
+    },
+    {
+      "id": "pf-sw-email-and-messaging-platform",
+      "name": "Email & Messaging Platform",
+      "type": "SOFTWARE",
+      "category": "END_USER_COLLABORATION_SOFTWARE"
+    },
+    {
+      "id": "pf-sw-collaboration-platform",
+      "name": "Collaboration Platform",
+      "type": "SOFTWARE",
+      "category": "END_USER_COLLABORATION_SOFTWARE"
+    },
+    {
+      "id": "pf-sw-unified-communications",
+      "name": "Unified Communications",
+      "type": "SOFTWARE",
+      "category": "END_USER_COLLABORATION_SOFTWARE"
+    },
+    {
+      "id": "pf-sw-virtual-desktop-infrastructure-vdi",
+      "name": "Virtual Desktop Infrastructure (VDI)",
+      "type": "SOFTWARE",
+      "category": "END_USER_COLLABORATION_SOFTWARE"
+    },
+    {
+      "id": "pf-sw-integrated-development-environment-ide",
+      "name": "Integrated Development Environment (IDE)",
+      "type": "SOFTWARE",
+      "category": "DEVELOPMENT_ENGINEERING_SOFTWARE"
+    },
+    {
+      "id": "pf-sw-source-code-management",
+      "name": "Source Code Management",
+      "type": "SOFTWARE",
+      "category": "DEVELOPMENT_ENGINEERING_SOFTWARE"
+    },
+    {
+      "id": "pf-sw-ci-cd-platform",
+      "name": "CI/CD Platform",
+      "type": "SOFTWARE",
+      "category": "DEVELOPMENT_ENGINEERING_SOFTWARE"
+    },
+    {
+      "id": "pf-sw-artifact-repository",
+      "name": "Artifact Repository",
+      "type": "SOFTWARE",
+      "category": "DEVELOPMENT_ENGINEERING_SOFTWARE"
+    },
+    {
+      "id": "pf-sw-test-automation-platform",
+      "name": "Test Automation Platform",
+      "type": "SOFTWARE",
+      "category": "DEVELOPMENT_ENGINEERING_SOFTWARE"
+    },
+    {
+      "id": "pf-sw-low-code-no-code-platform",
+      "name": "Low-Code / No-Code Platform",
+      "type": "SOFTWARE",
+      "category": "DEVELOPMENT_ENGINEERING_SOFTWARE"
+    },
+    {
+      "id": "pf-sw-enterprise-resource-planning-erp",
+      "name": "Enterprise Resource Planning (ERP)",
+      "type": "SOFTWARE",
+      "category": "BUSINESS_ENTERPRISE_APPLICATIONS"
+    },
+    {
+      "id": "pf-sw-customer-relationship-management-crm",
+      "name": "Customer Relationship Management (CRM)",
+      "type": "SOFTWARE",
+      "category": "BUSINESS_ENTERPRISE_APPLICATIONS"
+    },
+    {
+      "id": "pf-sw-human-capital-management-hcm",
+      "name": "Human Capital Management (HCM)",
+      "type": "SOFTWARE",
+      "category": "BUSINESS_ENTERPRISE_APPLICATIONS"
+    },
+    {
+      "id": "pf-sw-enterprise-content-management-ecm",
+      "name": "Enterprise Content Management (ECM)",
+      "type": "SOFTWARE",
+      "category": "BUSINESS_ENTERPRISE_APPLICATIONS"
+    },
+    {
+      "id": "pf-sw-business-intelligence-and-analytics",
+      "name": "Business Intelligence & Analytics",
+      "type": "SOFTWARE",
+      "category": "BUSINESS_ENTERPRISE_APPLICATIONS"
+    },
+    {
+      "id": "pf-sw-data-platform-data-lake",
+      "name": "Data Platform / Data Lake",
+      "type": "SOFTWARE",
+      "category": "BUSINESS_ENTERPRISE_APPLICATIONS"
+    }
+  ]
+}

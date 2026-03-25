@@ -1,5 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import dotenv from 'dotenv'
+import dotenvExpand from 'dotenv-expand'
 import { ApolloClient, HttpLink, InMemoryCache } from '@apollo/client/core'
 import {
   importEntityDataWithMapping,
@@ -21,14 +23,69 @@ interface CliOptions {
   dryRun: boolean
 }
 
+const printHelp = (): void => {
+  console.log(`Usage: yarn import:json --file <path-to-json> [options]
+
+Required:
+  --file <path>           Path to JSON import file
+
+Options:
+  --graphql-url <url>     GraphQL endpoint (default: from .env / GRAPHQL_EXTERNAL_PORT)
+  --token <token>         Bearer token for authenticated imports
+  --company-id <id>       Explicit company id for ownership assignment
+  --include-gea           Include GEA entities (default)
+  --no-include-gea        Exclude GEA entities
+  --dry-run               Validate and show planned import without mutations
+  --help                  Show this help message
+
+Examples:
+  yarn import:json --file demos/product-families-import.json
+  yarn import:json --file demos/product-families-import.json --dry-run
+  yarn import:json --file demos/product-families-import.json --graphql-url http://localhost:4500/graphql
+`)
+}
+
+const loadEnvironment = (): void => {
+  const envCandidates = [
+    path.resolve(process.cwd(), '.env'),
+    path.resolve(process.cwd(), '../.env'),
+    path.resolve(process.cwd(), '.env.local'),
+    path.resolve(process.cwd(), '../.env.local'),
+  ]
+
+  for (const envPath of envCandidates) {
+    if (!fs.existsSync(envPath)) {
+      continue
+    }
+
+    const result = dotenv.config({ path: envPath, override: false })
+    dotenvExpand.expand(result)
+  }
+}
+
+const getDefaultGraphqlUrl = (): string => {
+  const externalPort = process.env.GRAPHQL_EXTERNAL_PORT?.trim()
+  if (externalPort) {
+    return `http://localhost:${externalPort}/graphql`
+  }
+
+  if (process.env.GRAPHQL_URL) {
+    return process.env.GRAPHQL_URL
+  }
+
+  if (process.env.NEXT_PUBLIC_GRAPHQL_URL) {
+    return process.env.NEXT_PUBLIC_GRAPHQL_URL
+  }
+
+  return 'http://localhost:4000/graphql'
+}
+
 const parseArgs = (): CliOptions => {
+  loadEnvironment()
+
   const args = process.argv.slice(2)
   const options: Partial<CliOptions> = {
-    filePath: 'demos/NextGenEAM_Company-Solar_Panels_GmbH.json',
-    graphqlUrl:
-      process.env.GRAPHQL_URL ||
-      process.env.NEXT_PUBLIC_GRAPHQL_URL ||
-      'http://localhost:4000/graphql',
+    graphqlUrl: getDefaultGraphqlUrl(),
     token: process.env.IMPORT_AUTH_TOKEN || process.env.AUTH_TOKEN,
     includeGea: true,
     companyId: process.env.COMPANY_ID,
@@ -42,6 +99,9 @@ const parseArgs = (): CliOptions => {
     if (arg === '--file' && next) {
       options.filePath = next
       i++
+    } else if (arg === '--help' || arg === '-h') {
+      printHelp()
+      process.exit(0)
     } else if (arg === '--graphql-url' && next) {
       options.graphqlUrl = next
       i++
@@ -58,6 +118,12 @@ const parseArgs = (): CliOptions => {
     } else if (arg === '--dry-run') {
       options.dryRun = true
     }
+  }
+
+  if (!options.filePath) {
+    console.error('Error: Missing required argument --file <path-to-json>')
+    console.error('Run with --help to see usage.')
+    process.exit(1)
   }
 
   return options as CliOptions
