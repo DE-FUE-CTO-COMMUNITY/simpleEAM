@@ -1,19 +1,18 @@
 'use client'
 
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from '@tanstack/react-form'
 import { useTranslations } from 'next-intl'
 import { z } from 'zod'
 import { useQuery } from '@apollo/client'
+import { sha256 } from 'js-sha256'
+import * as d3 from 'd3'
 import { Box, Button, Typography } from '@mui/material'
 import {
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  List,
-  ListItem,
-  ListItemText,
   IconButton,
   Alert,
 } from '@mui/material'
@@ -77,6 +76,14 @@ const createSchema = (t: any) =>
 
 export type SoftwareVersionFormValues = z.infer<ReturnType<typeof createSchema>>
 
+interface SbomTreeNode {
+  id: string
+  name: string
+  version: string
+  license: string
+  children: SbomTreeNode[]
+}
+
 const SoftwareVersionForm: React.FC<
   GenericFormProps<SoftwareVersion, SoftwareVersionFormValues>
 > = ({ data, isOpen, onClose, onSubmit, onDelete, mode, loading = false, onEditMode }) => {
@@ -86,11 +93,8 @@ const SoftwareVersionForm: React.FC<
   const tLifecycle = useTranslations('softwareProducts.lifecycleStatuses')
   const companyWhere = useCompanyWhere('company')
   const [sbomViewerOpen, setSbomViewerOpen] = useState(false)
-  const [sbomViewerData, setSbomViewerData] = useState<{
-    rootComponentName: string | null
-    components: Array<{ ref: string | null; name: string }>
-    dependencies: Array<{ ref: string; dependsOn: string[] }>
-  } | null>(null)
+  const [sbomViewerData, setSbomViewerData] = useState<SbomTreeNode | null>(null)
+  const sbomTreeSvgRef = useRef<SVGSVGElement | null>(null)
   const [sbomErrorOpen, setSbomErrorOpen] = useState(false)
   const [sbomErrorMessage, setSbomErrorMessage] = useState('')
 
@@ -240,17 +244,8 @@ const SoftwareVersionForm: React.FC<
     return null
   }
 
-  const calculateSha256 = async (rawContent: string): Promise<string | null> => {
-    const subtle = globalThis.crypto?.subtle
-
-    if (!subtle || typeof subtle.digest !== 'function') {
-      return null
-    }
-
-    const digestBuffer = await subtle.digest('SHA-256', new TextEncoder().encode(rawContent))
-    return Array.from(new Uint8Array(digestBuffer))
-      .map(byte => byte.toString(16).padStart(2, '0'))
-      .join('')
+  const calculateSha256 = (rawContent: string): string => {
+    return sha256(rawContent)
   }
 
   const showSbomError = (message: string) => {
@@ -258,51 +253,281 @@ const SoftwareVersionForm: React.FC<
     setSbomErrorOpen(true)
   }
 
-  const buildSbomViewerData = (parsed: unknown) => {
+  const toDisplayName = (component: Record<string, unknown>): string => {
+    const group = typeof component.group === 'string' ? component.group.trim() : ''
+    const name = typeof component.name === 'string' ? component.name.trim() : ''
+
+    if (!name) {
+      return ''
+    }
+
+    return group ? `${group}/${name}` : name
+  }
+
+  const toVersion = (component: Record<string, unknown>): string => {
+    return typeof component.version === 'string' && component.version.trim()
+      ? component.version.trim()
+      : '-'
+  }
+
+  const toLicense = (component: Record<string, any>): string => {
+    if (!Array.isArray(component.licenses) || component.licenses.length === 0) {
+      return '-'
+    }
+
+    const names = component.licenses
+      .map((entry: any) => {
+        if (!entry || typeof entry !== 'object') {
+          return null
+        }
+
+        if (typeof entry.expression === 'string' && entry.expression.trim()) {
+          return entry.expression.trim()
+        }
+
+        if (entry.license && typeof entry.license === 'object') {
+          if (typeof entry.license.id === 'string' && entry.license.id.trim()) {
+            return entry.license.id.trim()
+          }
+
+          if (typeof entry.license.name === 'string' && entry.license.name.trim()) {
+            return entry.license.name.trim()
+          }
+        }
+
+        return null
+      })
+      .filter(Boolean)
+
+    return names.length > 0 ? names.join(', ') : '-'
+  }
+
+  const buildSbomViewerData = (parsed: unknown): SbomTreeNode | null => {
     if (!parsed || typeof parsed !== 'object') {
       return null
     }
 
     const data = parsed as Record<string, any>
-    const componentMap = new Map<string, string>()
-    const components = Array.isArray(data.components)
-      ? data.components
-          .filter((component: any) => component && typeof component.name === 'string')
-          .map((component: any) => {
-            const ref =
-              typeof component['bom-ref'] === 'string'
-                ? component['bom-ref']
-                : typeof component.SPDXID === 'string'
-                  ? component.SPDXID
-                  : null
-            const name = component.name as string
-            if (ref) {
-              componentMap.set(ref, name)
-            }
-            return { ref, name }
+
+    const componentMap = new Map<
+      string,
+      { ref: string; name: string; version: string; license: string }
+    >()
+
+    if (Array.isArray(data.components)) {
+      data.components
+        .filter((component: any) => component && typeof component === 'object')
+        .forEach((component: Record<string, unknown>) => {
+          const ref =
+            typeof component['bom-ref'] === 'string'
+              ? component['bom-ref']
+              : typeof component.SPDXID === 'string'
+                ? component.SPDXID
+                : null
+
+          const name = toDisplayName(component)
+          if (!ref || !name) {
+            return
+          }
+
+          componentMap.set(ref, {
+            ref,
+            name,
+            version: toVersion(component),
+            license: toLicense(component),
           })
-      : []
+        })
+    }
 
-    const rootComponentName =
-      typeof data?.metadata?.component?.name === 'string' ? data.metadata.component.name : null
+    const sortedComponents = Array.from(componentMap.values()).sort((a, b) =>
+      a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
+    )
 
-    const dependencies = Array.isArray(data.dependencies)
-      ? data.dependencies
-          .filter((dependency: any) => dependency && typeof dependency.ref === 'string')
-          .map((dependency: any) => {
-            const dependsOnRefs = Array.isArray(dependency.dependsOn)
-              ? dependency.dependsOn.filter((ref: unknown) => typeof ref === 'string')
-              : []
-            const dependsOn = dependsOnRefs.map((ref: string) => componentMap.get(ref) || ref)
+    const dependencyMap = new Map<string, string[]>()
+    if (Array.isArray(data.dependencies)) {
+      data.dependencies
+        .filter((dependency: any) => dependency && typeof dependency.ref === 'string')
+        .forEach((dependency: Record<string, unknown>) => {
+          const ref = dependency.ref as string
+          const dependsOn = Array.isArray(dependency.dependsOn)
+            ? dependency.dependsOn.filter((depRef: unknown) => typeof depRef === 'string')
+            : []
+          dependencyMap.set(ref, Array.from(new Set(dependsOn)))
+        })
+    }
+
+    const metadataComponent =
+      data?.metadata?.component && typeof data.metadata.component === 'object'
+        ? (data.metadata.component as Record<string, unknown>)
+        : null
+
+    const rootName = metadataComponent ? toDisplayName(metadataComponent) : ''
+
+    return {
+      id: 'module-root',
+      name: rootName || t('viewerRootComponent'),
+      version: metadataComponent ? toVersion(metadataComponent) : '-',
+      license: metadataComponent ? toLicense(metadataComponent) : '-',
+      children: sortedComponents.map(component => {
+        const dependencyChildren = (dependencyMap.get(component.ref) || [])
+          .map(depRef => {
+            const dependencyComponent = componentMap.get(depRef)
+            if (dependencyComponent) {
+              return {
+                id: `${component.ref}::${depRef}`,
+                name: dependencyComponent.name,
+                version: dependencyComponent.version,
+                license: dependencyComponent.license,
+                children: [],
+              }
+            }
+
             return {
-              ref: componentMap.get(dependency.ref) || dependency.ref,
-              dependsOn,
+              id: `${component.ref}::${depRef}`,
+              name: depRef,
+              version: '-',
+              license: '-',
+              children: [],
             }
           })
-      : []
+          .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }))
 
-    return { rootComponentName, components, dependencies }
+        return {
+          id: component.ref,
+          name: component.name,
+          version: component.version,
+          license: component.license,
+          children: dependencyChildren,
+        }
+      }),
+    }
   }
+
+  useEffect(() => {
+    if (!sbomViewerOpen || !sbomViewerData || !sbomTreeSvgRef.current) {
+      return
+    }
+
+    const formatLabel = (value: string, maxLength = 72): string => {
+      if (value.length <= maxLength) {
+        return value
+      }
+      return `${value.slice(0, maxLength - 1)}…`
+    }
+
+    const nodeSize = 22
+    const indent = 26
+    let nodeIndex = 0
+    const root = d3.hierarchy(sbomViewerData).eachBefore(d => {
+      ;(d as any).index = nodeIndex
+      nodeIndex += 1
+    })
+    const nodes = root.descendants()
+    const width = 980
+    const height = Math.max((nodes.length + 2) * nodeSize, 200)
+
+    const columns = [
+      {
+        label: t('sbomVersion'),
+        x: 690,
+        value: (node: d3.HierarchyNode<SbomTreeNode>) => node.data.version,
+      },
+      {
+        label: 'License',
+        x: 840,
+        value: (node: d3.HierarchyNode<SbomTreeNode>) => node.data.license,
+      },
+    ]
+
+    const svg = d3
+      .select(sbomTreeSvgRef.current)
+      .attr('width', width)
+      .attr('height', height)
+      .attr('viewBox', `0 0 ${width} ${height}`)
+      .attr('style', 'max-width: 100%; height: auto; font: 12px sans-serif; overflow: visible;')
+
+    svg.selectAll('*').remove()
+
+    const chart = svg.append('g').attr('transform', 'translate(16,36)')
+
+    chart
+      .append('text')
+      .attr('x', 4)
+      .attr('y', -14)
+      .attr('fill', '#5f6b7a')
+      .attr('font-weight', 600)
+      .text('Name')
+
+    chart
+      .selectAll('text.column-header')
+      .data(columns)
+      .join('text')
+      .attr('class', 'column-header')
+      .attr('x', column => column.x)
+      .attr('y', -14)
+      .attr('fill', '#5f6b7a')
+      .attr('font-weight', 600)
+      .text(column => column.label)
+
+    chart
+      .append('g')
+      .attr('fill', 'none')
+      .attr('stroke', '#c7ced8')
+      .attr('stroke-opacity', 0.9)
+      .selectAll('path')
+      .data(nodes.slice(1))
+      .join('path')
+      .attr('d', node => {
+        const parent = node.parent
+        if (!parent) {
+          return ''
+        }
+
+        const x = (node as any).index * nodeSize
+        const y = node.depth * indent
+        const parentX = (parent as any).index * nodeSize
+        const parentY = parent.depth * indent
+
+        return `M${parentY},${parentX}V${x}H${y}`
+      })
+
+    const nodeGroup = chart
+      .append('g')
+      .selectAll('g')
+      .data(nodes)
+      .join('g')
+      .attr('transform', node => `translate(${node.depth * indent},${(node as any).index * nodeSize})`)
+
+    nodeGroup
+      .append('circle')
+      .attr('r', 3)
+      .attr('fill', node => (node.depth === 0 ? '#1976d2' : node.depth === 1 ? '#455a64' : '#78909c'))
+
+    nodeGroup
+      .append('text')
+      .attr('x', 10)
+      .attr('dy', '0.32em')
+      .attr('fill', '#1f2937')
+      .text(node => formatLabel(node.data.name))
+
+    nodeGroup
+      .append('text')
+      .attr('x', columns[0].x)
+      .attr('dy', '0.32em')
+      .attr('fill', '#455a64')
+      .text(node => columns[0].value(node) || '-')
+
+    nodeGroup
+      .append('text')
+      .attr('x', columns[1].x)
+      .attr('dy', '0.32em')
+      .attr('fill', '#455a64')
+      .text(node => columns[1].value(node) || '-')
+
+    nodeGroup
+      .append('title')
+      .text(node => `${node.data.name}\n${t('sbomVersion')}: ${node.data.version}\nLicense: ${node.data.license}`)
+  }, [sbomViewerData, sbomViewerOpen, t])
 
   const inferSbomMetadata = (rawJson: string) => {
     const parsed = JSON.parse(rawJson)
@@ -556,6 +781,8 @@ const SoftwareVersionForm: React.FC<
       label: t('sbomGeneratedAt'),
       type: 'datetime',
       tabId: 'sbom',
+      readOnly: true,
+      disabled: true,
       onChange: () => form.setFieldValue('sbomTouched', true),
     },
     {
@@ -580,6 +807,8 @@ const SoftwareVersionForm: React.FC<
       label: t('sbomDigest'),
       type: 'text',
       tabId: 'sbom',
+      readOnly: true,
+      disabled: true,
       onChange: () => form.setFieldValue('sbomTouched', true),
     },
     {
@@ -611,7 +840,7 @@ const SoftwareVersionForm: React.FC<
 
                   try {
                     const inferred = inferSbomMetadata(fileContent)
-                    const generatedDigest = await calculateSha256(fileContent)
+                    const generatedDigest = calculateSha256(fileContent)
                     const viewerData = buildSbomViewerData(inferred.parsed)
                     field.handleChange(fileContent)
                     form.setFieldValue('sbomTouched', true)
@@ -624,7 +853,15 @@ const SoftwareVersionForm: React.FC<
                     )
                     form.setFieldValue('sbomSourceValue', file.name)
                     form.setFieldValue('sbomSourceUrlValue', null)
-                    form.setFieldValue('sbomGeneratedAt', inferred.inferredGeneratedAt)
+                    const fileMetadataTimestamp =
+                      Number.isFinite(file.lastModified) && file.lastModified > 0
+                        ? new Date(file.lastModified).toISOString()
+                        : null
+
+                    form.setFieldValue(
+                      'sbomGeneratedAt',
+                      fileMetadataTimestamp || inferred.inferredGeneratedAt
+                    )
                     form.setFieldValue('sbomTool', inferred.inferredTool)
                     form.setFieldValue(
                       'sbomDigestValue',
@@ -778,57 +1015,8 @@ const SoftwareVersionForm: React.FC<
         </DialogTitle>
         <DialogContent dividers>
           {sbomViewerData ? (
-            <Box>
-              <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                {t('viewerRootComponent')}
-              </Typography>
-              <Typography variant="body2" sx={{ mb: 2 }}>
-                {sbomViewerData.rootComponentName || '-'}
-              </Typography>
-
-              <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                {t('viewerComponents')}
-              </Typography>
-              <List dense sx={{ mb: 2 }}>
-                {sbomViewerData.components.length > 0 ? (
-                  sbomViewerData.components.map(component => (
-                    <ListItem key={component.ref || component.name} sx={{ py: 0.25 }}>
-                      <ListItemText
-                        primary={component.name}
-                        secondary={component.ref || undefined}
-                      />
-                    </ListItem>
-                  ))
-                ) : (
-                  <ListItem sx={{ py: 0.25 }}>
-                    <ListItemText primary="-" />
-                  </ListItem>
-                )}
-              </List>
-
-              <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                {t('viewerDependencies')}
-              </Typography>
-              <List dense>
-                {sbomViewerData.dependencies.length > 0 ? (
-                  sbomViewerData.dependencies.map(dependency => (
-                    <ListItem key={dependency.ref} sx={{ py: 0.25 }}>
-                      <ListItemText
-                        primary={dependency.ref}
-                        secondary={
-                          dependency.dependsOn.length > 0
-                            ? dependency.dependsOn.join(', ')
-                            : t('viewerNoDependencies')
-                        }
-                      />
-                    </ListItem>
-                  ))
-                ) : (
-                  <ListItem sx={{ py: 0.25 }}>
-                    <ListItemText primary="-" />
-                  </ListItem>
-                )}
-              </List>
+            <Box sx={{ width: '100%', overflowX: 'auto' }}>
+              <svg ref={sbomTreeSvgRef} role="img" aria-label={t('sbomContentTitle')} />
             </Box>
           ) : (
             <Typography variant="body2" color="text.secondary">
