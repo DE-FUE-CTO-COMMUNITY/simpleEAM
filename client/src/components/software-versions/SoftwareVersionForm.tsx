@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useForm } from '@tanstack/react-form'
 import { useTranslations } from 'next-intl'
 import { z } from 'zod'
@@ -15,6 +15,7 @@ import {
   DialogActions,
   IconButton,
   Alert,
+  CircularProgress,
 } from '@mui/material'
 import {
   UploadFile as UploadFileIcon,
@@ -84,6 +85,41 @@ interface SbomTreeNode {
   children: SbomTreeNode[]
 }
 
+interface SbomViewerData {
+  alphabeticalTree: SbomTreeNode
+  nestedTree: SbomTreeNode
+}
+
+type SbomViewerMode = 'nested' | 'alphabetical'
+
+interface SbomTreeRenderNode {
+  id: string
+  name: string
+  version: string
+  license: string
+  depth: number
+  x: number
+  y: number
+}
+
+interface SbomTreeRenderLink {
+  id: string
+  d: string
+}
+
+interface SbomTreeLayout {
+  width: number
+  height: number
+  columns: {
+    versionLabel: string
+    versionX: number
+    licenseLabel: string
+    licenseX: number
+  }
+  nodes: SbomTreeRenderNode[]
+  links: SbomTreeRenderLink[]
+}
+
 const SoftwareVersionForm: React.FC<
   GenericFormProps<SoftwareVersion, SoftwareVersionFormValues>
 > = ({ data, isOpen, onClose, onSubmit, onDelete, mode, loading = false, onEditMode }) => {
@@ -93,8 +129,10 @@ const SoftwareVersionForm: React.FC<
   const tLifecycle = useTranslations('softwareProducts.lifecycleStatuses')
   const companyWhere = useCompanyWhere('company')
   const [sbomViewerOpen, setSbomViewerOpen] = useState(false)
-  const [sbomViewerData, setSbomViewerData] = useState<SbomTreeNode | null>(null)
-  const sbomTreeSvgRef = useRef<SVGSVGElement | null>(null)
+  const [sbomViewerData, setSbomViewerData] = useState<SbomViewerData | null>(null)
+  const [sbomViewerMode, setSbomViewerMode] = useState<SbomViewerMode>('alphabetical')
+  const [sbomTreeLayout, setSbomTreeLayout] = useState<SbomTreeLayout | null>(null)
+  const [isSbomLayoutLoading, setIsSbomLayoutLoading] = useState(false)
   const [sbomErrorOpen, setSbomErrorOpen] = useState(false)
   const [sbomErrorMessage, setSbomErrorMessage] = useState('')
 
@@ -302,7 +340,7 @@ const SoftwareVersionForm: React.FC<
     return names.length > 0 ? names.join(', ') : '-'
   }
 
-  const buildSbomViewerData = (parsed: unknown): SbomTreeNode | null => {
+  const buildSbomViewerData = (parsed: unknown): SbomViewerData | null => {
     if (!parsed || typeof parsed !== 'object') {
       return null
     }
@@ -339,10 +377,6 @@ const SoftwareVersionForm: React.FC<
         })
     }
 
-    const sortedComponents = Array.from(componentMap.values()).sort((a, b) =>
-      a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
-    )
-
     const dependencyMap = new Map<string, string[]>()
     if (Array.isArray(data.dependencies)) {
       data.dependencies
@@ -361,39 +395,65 @@ const SoftwareVersionForm: React.FC<
         ? (data.metadata.component as Record<string, unknown>)
         : null
 
+    const rootRef =
+      metadataComponent && typeof metadataComponent['bom-ref'] === 'string'
+        ? metadataComponent['bom-ref']
+        : metadataComponent && typeof metadataComponent.SPDXID === 'string'
+          ? metadataComponent.SPDXID
+          : 'module-root-ref'
+
+    if (metadataComponent && !componentMap.has(rootRef)) {
+      const metadataName = toDisplayName(metadataComponent)
+      if (metadataName) {
+        componentMap.set(rootRef, {
+          ref: rootRef,
+          name: metadataName,
+          version: toVersion(metadataComponent),
+          license: toLicense(metadataComponent),
+        })
+      }
+    }
+
     const rootName = metadataComponent ? toDisplayName(metadataComponent) : ''
 
-    return {
-      id: 'module-root',
+    const resolveComponent = (ref: string) => {
+      return (
+        componentMap.get(ref) || {
+          ref,
+          name: ref,
+          version: '-',
+          license: '-',
+        }
+      )
+    }
+
+    const sortedComponentRefs = Array.from(componentMap.values())
+      .filter(component => component.ref !== rootRef)
+      .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }))
+      .map(component => component.ref)
+
+    const alphabeticalTree: SbomTreeNode = {
+      id: 'module-root-alphabetical',
       name: rootName || t('viewerRootComponent'),
       version: metadataComponent ? toVersion(metadataComponent) : '-',
       license: metadataComponent ? toLicense(metadataComponent) : '-',
-      children: sortedComponents.map(component => {
-        const dependencyChildren = (dependencyMap.get(component.ref) || [])
+      children: sortedComponentRefs.map(componentRef => {
+        const component = resolveComponent(componentRef)
+        const dependencyChildren = (dependencyMap.get(componentRef) || [])
           .map(depRef => {
-            const dependencyComponent = componentMap.get(depRef)
-            if (dependencyComponent) {
-              return {
-                id: `${component.ref}::${depRef}`,
-                name: dependencyComponent.name,
-                version: dependencyComponent.version,
-                license: dependencyComponent.license,
-                children: [],
-              }
-            }
-
+            const dep = resolveComponent(depRef)
             return {
-              id: `${component.ref}::${depRef}`,
-              name: depRef,
-              version: '-',
-              license: '-',
+              id: `alpha:${componentRef}->${depRef}`,
+              name: dep.name,
+              version: dep.version,
+              license: dep.license,
               children: [],
             }
           })
           .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }))
 
         return {
-          id: component.ref,
+          id: `alpha:${componentRef}`,
           name: component.name,
           version: component.version,
           license: component.license,
@@ -401,133 +461,155 @@ const SoftwareVersionForm: React.FC<
         }
       }),
     }
+
+    const buildNestedNode = (ref: string, trail: string, path: Set<string>): SbomTreeNode => {
+      const component = resolveComponent(ref)
+
+      if (path.has(ref)) {
+        return {
+          id: `${trail}|${ref}|cycle`,
+          name: `${component.name} (cycle)`,
+          version: component.version,
+          license: component.license,
+          children: [],
+        }
+      }
+
+      const nextPath = new Set(path)
+      nextPath.add(ref)
+
+      const children = (dependencyMap.get(ref) || [])
+        .map(depRef => buildNestedNode(depRef, `${trail}|${ref}`, nextPath))
+        .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }))
+
+      return {
+        id: `${trail}|${ref}`,
+        name: component.name,
+        version: component.version,
+        license: component.license,
+        children,
+      }
+    }
+
+    const dependedOnRefs = new Set<string>()
+    dependencyMap.forEach(depRefs => {
+      depRefs.forEach(depRef => dependedOnRefs.add(depRef))
+    })
+
+    const rootDependencies = dependencyMap.get(rootRef)
+    const nestedRootRefs =
+      rootDependencies && rootDependencies.length > 0
+        ? rootDependencies
+        : sortedComponentRefs.filter(ref => !dependedOnRefs.has(ref))
+
+    const nestedTree: SbomTreeNode = {
+      id: 'module-root-nested',
+      name: rootName || t('viewerRootComponent'),
+      version: metadataComponent ? toVersion(metadataComponent) : '-',
+      license: metadataComponent ? toLicense(metadataComponent) : '-',
+      children: (nestedRootRefs.length > 0 ? nestedRootRefs : sortedComponentRefs)
+        .map(ref => buildNestedNode(ref, 'nested-root', new Set([rootRef])))
+        .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })),
+    }
+
+    return { alphabeticalTree, nestedTree }
   }
 
   useEffect(() => {
-    if (!sbomViewerOpen || !sbomViewerData || !sbomTreeSvgRef.current) {
+    if (!sbomViewerData || !sbomViewerOpen) {
+      setSbomTreeLayout(null)
+      setIsSbomLayoutLoading(false)
       return
     }
 
-    const formatLabel = (value: string, maxLength = 72): string => {
-      if (value.length <= maxLength) {
-        return value
-      }
-      return `${value.slice(0, maxLength - 1)}…`
-    }
+    setIsSbomLayoutLoading(true)
 
-    const nodeSize = 22
-    const indent = 26
-    let nodeIndex = 0
-    const root = d3.hierarchy(sbomViewerData).eachBefore(d => {
-      ;(d as any).index = nodeIndex
-      nodeIndex += 1
-    })
-    const nodes = root.descendants()
-    const width = 980
-    const height = Math.max((nodes.length + 2) * nodeSize, 200)
+    let rafId2: number
 
-    const columns = [
-      {
-        label: t('sbomVersion'),
-        x: 690,
-        value: (node: d3.HierarchyNode<SbomTreeNode>) => node.data.version,
-      },
-      {
-        label: 'License',
-        x: 840,
-        value: (node: d3.HierarchyNode<SbomTreeNode>) => node.data.license,
-      },
-    ]
+    const rafId1 = requestAnimationFrame(() => {
+      rafId2 = requestAnimationFrame(() => {
+        const activeTree =
+          sbomViewerMode === 'nested' ? sbomViewerData.nestedTree : sbomViewerData.alphabeticalTree
 
-    const svg = d3
-      .select(sbomTreeSvgRef.current)
-      .attr('width', width)
-      .attr('height', height)
-      .attr('viewBox', `0 0 ${width} ${height}`)
-      .attr('style', 'max-width: 100%; height: auto; font: 12px sans-serif; overflow: visible;')
+        const nodeSize = 22
+        const indent = 26
+        const width = 980
 
-    svg.selectAll('*').remove()
+        let nodeIndex = 0
+        const root = d3.hierarchy(activeTree).eachBefore(node => {
+          const n = node as any
+          n.index = nodeIndex
+          nodeIndex += 1
+        })
 
-    const chart = svg.append('g').attr('transform', 'translate(16,36)')
+        const hierarchyNodes = root.descendants()
+        const nodes: SbomTreeRenderNode[] = hierarchyNodes.map(node => {
+          const x = (node as any).index * nodeSize
+          const y = node.depth * indent
 
-    chart
-      .append('text')
-      .attr('x', 4)
-      .attr('y', -14)
-      .attr('fill', '#5f6b7a')
-      .attr('font-weight', 600)
-      .text('Name')
+          return {
+            id: node.data.id,
+            name: node.data.name,
+            version: node.data.version,
+            license: node.data.license,
+            depth: node.depth,
+            x,
+            y,
+          }
+        })
 
-    chart
-      .selectAll('text.column-header')
-      .data(columns)
-      .join('text')
-      .attr('class', 'column-header')
-      .attr('x', column => column.x)
-      .attr('y', -14)
-      .attr('fill', '#5f6b7a')
-      .attr('font-weight', 600)
-      .text(column => column.label)
+        const links: SbomTreeRenderLink[] = hierarchyNodes.slice(1).map(node => {
+          const parent = node.parent
+          const x = (node as any).index * nodeSize
+          const y = node.depth * indent
+          const parentX = parent ? (parent as any).index * nodeSize : x
+          const parentY = parent ? parent.depth * indent : y
 
-    chart
-      .append('g')
-      .attr('fill', 'none')
-      .attr('stroke', '#c7ced8')
-      .attr('stroke-opacity', 0.9)
-      .selectAll('path')
-      .data(nodes.slice(1))
-      .join('path')
-      .attr('d', node => {
-        const parent = node.parent
-        if (!parent) {
-          return ''
-        }
+          return {
+            id: `${parent?.data.id ?? 'root'}->${node.data.id}`,
+            d: `M${parentY},${parentX}V${x}H${y}`,
+          }
+        })
 
-        const x = (node as any).index * nodeSize
-        const y = node.depth * indent
-        const parentX = (parent as any).index * nodeSize
-        const parentY = parent.depth * indent
+        const height = Math.max((nodes.length + 2) * nodeSize + 40, 220)
 
-        return `M${parentY},${parentX}V${x}H${y}`
+        setSbomTreeLayout({
+          width,
+          height,
+          columns: {
+            versionLabel: t('sbomVersion'),
+            versionX: 690,
+            licenseLabel: 'License',
+            licenseX: 840,
+          },
+          nodes,
+          links,
+        })
+
+        setIsSbomLayoutLoading(false)
       })
+    })
 
-    const nodeGroup = chart
-      .append('g')
-      .selectAll('g')
-      .data(nodes)
-      .join('g')
-      .attr('transform', node => `translate(${node.depth * indent},${(node as any).index * nodeSize})`)
+    return () => {
+      cancelAnimationFrame(rafId1)
+      cancelAnimationFrame(rafId2)
+    }
+  }, [sbomViewerData, sbomViewerMode, sbomViewerOpen, t])
 
-    nodeGroup
-      .append('circle')
-      .attr('r', 3)
-      .attr('fill', node => (node.depth === 0 ? '#1976d2' : node.depth === 1 ? '#455a64' : '#78909c'))
+  const formatTreeLabel = (value: string, maxLength = 72): string => {
+    if (value.length <= maxLength) {
+      return value
+    }
+    return `${value.slice(0, maxLength - 1)}…`
+  }
 
-    nodeGroup
-      .append('text')
-      .attr('x', 10)
-      .attr('dy', '0.32em')
-      .attr('fill', '#1f2937')
-      .text(node => formatLabel(node.data.name))
-
-    nodeGroup
-      .append('text')
-      .attr('x', columns[0].x)
-      .attr('dy', '0.32em')
-      .attr('fill', '#455a64')
-      .text(node => columns[0].value(node) || '-')
-
-    nodeGroup
-      .append('text')
-      .attr('x', columns[1].x)
-      .attr('dy', '0.32em')
-      .attr('fill', '#455a64')
-      .text(node => columns[1].value(node) || '-')
-
-    nodeGroup
-      .append('title')
-      .text(node => `${node.data.name}\n${t('sbomVersion')}: ${node.data.version}\nLicense: ${node.data.license}`)
-  }, [sbomViewerData, sbomViewerOpen, t])
+  const handleSbomViewerModeChange = (mode: SbomViewerMode) => {
+    if (mode === sbomViewerMode) {
+      return
+    }
+    setIsSbomLayoutLoading(true)
+    setSbomViewerMode(mode)
+  }
 
   const inferSbomMetadata = (rawJson: string) => {
     const parsed = JSON.parse(rawJson)
@@ -924,6 +1006,7 @@ const SoftwareVersionForm: React.FC<
                   form.setFieldValue('sbomFormat', detectedFormat)
                   const viewerData = buildSbomViewerData(parsed)
                   setSbomViewerData(viewerData)
+                  setSbomViewerMode('alphabetical')
                   setSbomViewerOpen(true)
                 } catch {
                   showSbomError(t('invalidSbomJson'))
@@ -1001,7 +1084,10 @@ const SoftwareVersionForm: React.FC<
 
       <Dialog
         open={sbomViewerOpen}
-        onClose={() => setSbomViewerOpen(false)}
+        onClose={() => {
+          setSbomViewerOpen(false)
+          setSbomViewerMode('alphabetical')
+        }}
         maxWidth="md"
         fullWidth
       >
@@ -1009,14 +1095,118 @@ const SoftwareVersionForm: React.FC<
           sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
         >
           {t('sbomContentTitle')}
-          <IconButton aria-label={t('closeSbomViewer')} onClick={() => setSbomViewerOpen(false)}>
+          <IconButton
+            aria-label={t('closeSbomViewer')}
+            onClick={() => {
+              setSbomViewerOpen(false)
+              setSbomViewerMode('alphabetical')
+            }}
+          >
             <CloseIcon />
           </IconButton>
         </DialogTitle>
         <DialogContent dividers>
-          {sbomViewerData ? (
-            <Box sx={{ width: '100%', overflowX: 'auto' }}>
-              <svg ref={sbomTreeSvgRef} role="img" aria-label={t('sbomContentTitle')} />
+          {sbomTreeLayout ? (
+            <Box sx={{ width: '100%', overflowX: 'auto', position: 'relative' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                <Button
+                  size="small"
+                  variant={sbomViewerMode === 'alphabetical' ? 'contained' : 'outlined'}
+                  onClick={() => handleSbomViewerModeChange('alphabetical')}
+                >
+                  Alphabetical
+                </Button>
+                <Button
+                  size="small"
+                  variant={sbomViewerMode === 'nested' ? 'contained' : 'outlined'}
+                  onClick={() => handleSbomViewerModeChange('nested')}
+                >
+                  Preserve Nesting
+                </Button>
+                {isSbomLayoutLoading && (
+                  <CircularProgress
+                    size={28}
+                    sx={{
+                      '@keyframes sbom-dash': {
+                        '0%': { strokeDasharray: '50px, 200px', strokeDashoffset: '0' },
+                        '50%': { strokeDasharray: '100px, 200px', strokeDashoffset: '-20px' },
+                        '100%': { strokeDasharray: '50px, 200px', strokeDashoffset: '-130px' },
+                      },
+                      '& .MuiCircularProgress-circle': {
+                        animation: 'sbom-dash 1.4s ease-in-out infinite',
+                      },
+                    }}
+                  />
+                )}
+              </Box>
+              <svg
+                width={sbomTreeLayout.width}
+                height={sbomTreeLayout.height}
+                viewBox={`0 0 ${sbomTreeLayout.width} ${sbomTreeLayout.height}`}
+                style={{
+                  maxWidth: '100%',
+                  height: 'auto',
+                  font: '12px sans-serif',
+                  overflow: 'visible',
+                }}
+                role="img"
+                aria-label={t('sbomContentTitle')}
+              >
+                <g transform="translate(16,36)">
+                  <text x={4} y={-14} fill="#5f6b7a" fontWeight={600}>
+                    Name
+                  </text>
+                  <text x={sbomTreeLayout.columns.versionX} y={-14} fill="#5f6b7a" fontWeight={600}>
+                    {sbomTreeLayout.columns.versionLabel}
+                  </text>
+                  <text x={sbomTreeLayout.columns.licenseX} y={-14} fill="#5f6b7a" fontWeight={600}>
+                    {sbomTreeLayout.columns.licenseLabel}
+                  </text>
+
+                  <g fill="none" stroke="#c7ced8" strokeOpacity={0.9}>
+                    {sbomTreeLayout.links.map(link => (
+                      <path key={link.id} d={link.d} />
+                    ))}
+                  </g>
+
+                  <g>
+                    {sbomTreeLayout.nodes.map(node => (
+                      <g key={node.id} transform={`translate(${node.y},${node.x})`}>
+                        <circle
+                          r={3}
+                          fill={
+                            node.depth === 0 ? '#1976d2' : node.depth === 1 ? '#455a64' : '#78909c'
+                          }
+                        />
+                        <text x={10} dy="0.32em" fill="#1f2937">
+                          {formatTreeLabel(node.name)}
+                        </text>
+                        <text
+                          x={sbomTreeLayout.columns.versionX - node.y}
+                          dy="0.32em"
+                          fill="#455a64"
+                        >
+                          {node.version || '-'}
+                        </text>
+                        <text
+                          x={sbomTreeLayout.columns.licenseX - node.y}
+                          dy="0.32em"
+                          fill="#455a64"
+                        >
+                          {node.license || '-'}
+                        </text>
+                        <title>
+                          {`${node.name}\n${t('sbomVersion')}: ${node.version || '-'}\nLicense: ${node.license || '-'}`}
+                        </title>
+                      </g>
+                    ))}
+                  </g>
+                </g>
+              </svg>
+            </Box>
+          ) : isSbomLayoutLoading ? (
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', py: 6 }}>
+              <CircularProgress size={28} />
             </Box>
           ) : (
             <Typography variant="body2" color="text.secondary">
