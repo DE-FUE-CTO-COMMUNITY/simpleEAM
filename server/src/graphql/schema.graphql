@@ -644,7 +644,6 @@ type Application
   usesSoftwareProducts: [SoftwareProduct!]!
     @relationship(type: "USES_SOFTWARE_PRODUCT", direction: OUT)
   softwareVersions: [SoftwareVersion!]! @relationship(type: "USES_SOFTWARE_VERSION", direction: OUT)
-  sbomDocuments: [SbomDocument!]! @relationship(type: "HAS_SBOM", direction: OUT)
   usesAIComponents: [AIComponent!]! @relationship(type: "USED_BY", direction: OUT)
   providedBy: [Supplier!]! @relationship(type: "PROVIDED_BY", direction: OUT)
   supportedBy: [Supplier!]! @relationship(type: "SUPPORTED_BY", direction: OUT)
@@ -966,6 +965,7 @@ type SoftwareVersion
   usedByApplications: [Application!]! @relationship(type: "USES_SOFTWARE_VERSION", direction: IN)
   usedByInfrastructure: [Infrastructure!]!
     @relationship(type: "USES_SOFTWARE_VERSION", direction: IN)
+  sbomDocuments: [SbomDocument!]! @relationship(type: "HAS_SBOM", direction: OUT)
 }
 
 """
@@ -1121,7 +1121,6 @@ type SbomDocument
     ]
   ) {
   id: ID! @id
-  sbomId: String
   format: String
   version: String
   source: String
@@ -1133,7 +1132,7 @@ type SbomDocument
   createdAt: DateTime! @timestamp(operations: [CREATE])
   updatedAt: DateTime @timestamp(operations: [UPDATE])
   company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
-  applications: [Application!]! @relationship(type: "HAS_SBOM", direction: IN)
+  softwareVersions: [SoftwareVersion!]! @relationship(type: "HAS_SBOM", direction: IN)
 }
 
 """

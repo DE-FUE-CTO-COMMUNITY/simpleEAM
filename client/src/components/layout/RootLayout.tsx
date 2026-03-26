@@ -247,8 +247,19 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
     },
   ]
 
+  const technologyManagementItemKeys = new Set([
+    'softwareProducts',
+    'softwareVersions',
+    'hardwareProducts',
+    'hardwareVersions',
+  ])
+
+  const nonTechnologyArchitectureItemKeys = architectureElementItems
+    .map(item => item.key)
+    .filter(key => !technologyManagementItemKeys.has(key))
+
   const lensToElementKeys: Record<LensKey, string[]> = {
-    enterpriseArchitecture: architectureElementItems.map(item => item.key),
+    enterpriseArchitecture: nonTechnologyArchitectureItemKeys,
     businessArchitecture: [
       ...(isGeaEnabled ? (geaBusinessItems.map(item => item.key) as string[]) : []),
       ...(isBmcEnabled ? (bmcItems.map(item => item.key) as string[]) : []),
@@ -265,7 +276,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
     ],
     cybersecurityArchitecture: ['applications', 'aiComponents', 'dataObjects', 'interfaces'],
     infrastructureArchitecture: ['applications', 'infrastructure'],
-    transformationArchitecture: architectureElementItems.map(item => item.key),
+    transformationArchitecture: nonTechnologyArchitectureItemKeys,
     technologyManagement: [
       'applications',
       'infrastructure',

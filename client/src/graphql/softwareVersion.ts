@@ -48,6 +48,17 @@ export const GET_SOFTWARE_VERSIONS = gql`
         sourceConfidence
         lastValidatedAt
       }
+      sbomDocuments {
+        id
+        format
+        version
+        source
+        sourceUrl
+        generatedAt
+        tool
+        digest
+        storageReference
+      }
     }
   }
 `

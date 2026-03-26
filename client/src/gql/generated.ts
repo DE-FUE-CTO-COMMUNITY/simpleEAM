@@ -3178,8 +3178,6 @@ export type Application = {
   providedBy: Array<Supplier>;
   providedByConnection: ApplicationProvidedByConnection;
   sbom?: Maybe<Scalars['String']['output']>;
-  sbomDocuments: Array<SbomDocument>;
-  sbomDocumentsConnection: ApplicationSbomDocumentsConnection;
   sevenRStrategy?: Maybe<SevenRStrategy>;
   softwareVersions: Array<SoftwareVersion>;
   softwareVersionsConnection: ApplicationSoftwareVersionsConnection;
@@ -3432,24 +3430,6 @@ export type ApplicationProvidedByConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<ApplicationProvidedByConnectionSort>>;
   where?: InputMaybe<ApplicationProvidedByConnectionWhere>;
-};
-
-
-/** Application – represents a business application within Enterprise Architecture Management */
-export type ApplicationSbomDocumentsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<SbomDocumentSort>>;
-  where?: InputMaybe<SbomDocumentWhere>;
-};
-
-
-/** Application – represents a business application within Enterprise Architecture Management */
-export type ApplicationSbomDocumentsConnectionArgs = {
-  after?: InputMaybe<Scalars['String']['input']>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ApplicationSbomDocumentsConnectionSort>>;
-  where?: InputMaybe<ApplicationSbomDocumentsConnectionWhere>;
 };
 
 
@@ -4168,7 +4148,6 @@ export type ApplicationConnectInput = {
   partOfArchitectures?: InputMaybe<Array<ApplicationPartOfArchitecturesConnectFieldInput>>;
   predecessors?: InputMaybe<Array<ApplicationPredecessorsConnectFieldInput>>;
   providedBy?: InputMaybe<Array<ApplicationProvidedByConnectFieldInput>>;
-  sbomDocuments?: InputMaybe<Array<ApplicationSbomDocumentsConnectFieldInput>>;
   softwareVersions?: InputMaybe<Array<ApplicationSoftwareVersionsConnectFieldInput>>;
   sourceOfInterfaces?: InputMaybe<Array<ApplicationSourceOfInterfacesConnectFieldInput>>;
   successors?: InputMaybe<Array<ApplicationSuccessorsConnectFieldInput>>;
@@ -4210,7 +4189,6 @@ export type ApplicationCreateInput = {
   predecessors?: InputMaybe<ApplicationPredecessorsFieldInput>;
   providedBy?: InputMaybe<ApplicationProvidedByFieldInput>;
   sbom?: InputMaybe<Scalars['String']['input']>;
-  sbomDocuments?: InputMaybe<ApplicationSbomDocumentsFieldInput>;
   sevenRStrategy?: InputMaybe<SevenRStrategy>;
   softwareVersions?: InputMaybe<ApplicationSoftwareVersionsFieldInput>;
   sourceOfInterfaces?: InputMaybe<ApplicationSourceOfInterfacesFieldInput>;
@@ -4285,7 +4263,6 @@ export type ApplicationDeleteInput = {
   partOfArchitectures?: InputMaybe<Array<ApplicationPartOfArchitecturesDeleteFieldInput>>;
   predecessors?: InputMaybe<Array<ApplicationPredecessorsDeleteFieldInput>>;
   providedBy?: InputMaybe<Array<ApplicationProvidedByDeleteFieldInput>>;
-  sbomDocuments?: InputMaybe<Array<ApplicationSbomDocumentsDeleteFieldInput>>;
   softwareVersions?: InputMaybe<Array<ApplicationSoftwareVersionsDeleteFieldInput>>;
   sourceOfInterfaces?: InputMaybe<Array<ApplicationSourceOfInterfacesDeleteFieldInput>>;
   successors?: InputMaybe<Array<ApplicationSuccessorsDeleteFieldInput>>;
@@ -4438,7 +4415,6 @@ export type ApplicationDisconnectInput = {
   partOfArchitectures?: InputMaybe<Array<ApplicationPartOfArchitecturesDisconnectFieldInput>>;
   predecessors?: InputMaybe<Array<ApplicationPredecessorsDisconnectFieldInput>>;
   providedBy?: InputMaybe<Array<ApplicationProvidedByDisconnectFieldInput>>;
-  sbomDocuments?: InputMaybe<Array<ApplicationSbomDocumentsDisconnectFieldInput>>;
   softwareVersions?: InputMaybe<Array<ApplicationSoftwareVersionsDisconnectFieldInput>>;
   sourceOfInterfaces?: InputMaybe<Array<ApplicationSourceOfInterfacesDisconnectFieldInput>>;
   successors?: InputMaybe<Array<ApplicationSuccessorsDisconnectFieldInput>>;
@@ -7299,140 +7275,6 @@ export type ApplicationRelationshipFilters = {
   some?: InputMaybe<ApplicationWhere>;
 };
 
-export type ApplicationSbomDocumentSbomDocumentsAggregateSelection = {
-  __typename?: 'ApplicationSbomDocumentSbomDocumentsAggregateSelection';
-  count: CountConnection;
-  node?: Maybe<ApplicationSbomDocumentSbomDocumentsNodeAggregateSelection>;
-};
-
-export type ApplicationSbomDocumentSbomDocumentsNodeAggregateSelection = {
-  __typename?: 'ApplicationSbomDocumentSbomDocumentsNodeAggregateSelection';
-  createdAt: DateTimeAggregateSelection;
-  digest: StringAggregateSelection;
-  format: StringAggregateSelection;
-  generatedAt: DateTimeAggregateSelection;
-  sbomId: StringAggregateSelection;
-  source: StringAggregateSelection;
-  sourceUrl: StringAggregateSelection;
-  storageReference: StringAggregateSelection;
-  tool: StringAggregateSelection;
-  updatedAt: DateTimeAggregateSelection;
-  version: StringAggregateSelection;
-};
-
-export type ApplicationSbomDocumentsAggregateInput = {
-  AND?: InputMaybe<Array<ApplicationSbomDocumentsAggregateInput>>;
-  NOT?: InputMaybe<ApplicationSbomDocumentsAggregateInput>;
-  OR?: InputMaybe<Array<ApplicationSbomDocumentsAggregateInput>>;
-  count?: InputMaybe<IntScalarFilters>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
-  count_GT?: InputMaybe<Scalars['Int']['input']>;
-  count_GTE?: InputMaybe<Scalars['Int']['input']>;
-  count_LT?: InputMaybe<Scalars['Int']['input']>;
-  count_LTE?: InputMaybe<Scalars['Int']['input']>;
-  node?: InputMaybe<ApplicationSbomDocumentsNodeAggregationWhereInput>;
-};
-
-export type ApplicationSbomDocumentsConnectFieldInput = {
-  connect?: InputMaybe<Array<SbomDocumentConnectInput>>;
-  where?: InputMaybe<SbomDocumentConnectWhere>;
-};
-
-export type ApplicationSbomDocumentsConnection = {
-  __typename?: 'ApplicationSbomDocumentsConnection';
-  aggregate: ApplicationSbomDocumentSbomDocumentsAggregateSelection;
-  edges: Array<ApplicationSbomDocumentsRelationship>;
-  pageInfo: PageInfo;
-  totalCount: Scalars['Int']['output'];
-};
-
-export type ApplicationSbomDocumentsConnectionAggregateInput = {
-  AND?: InputMaybe<Array<ApplicationSbomDocumentsConnectionAggregateInput>>;
-  NOT?: InputMaybe<ApplicationSbomDocumentsConnectionAggregateInput>;
-  OR?: InputMaybe<Array<ApplicationSbomDocumentsConnectionAggregateInput>>;
-  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
-  node?: InputMaybe<ApplicationSbomDocumentsNodeAggregationWhereInput>;
-};
-
-export type ApplicationSbomDocumentsConnectionFilters = {
-  /** Filter Applications by aggregating results on related ApplicationSbomDocumentsConnections */
-  aggregate?: InputMaybe<ApplicationSbomDocumentsConnectionAggregateInput>;
-  /** Return Applications where all of the related ApplicationSbomDocumentsConnections match this filter */
-  all?: InputMaybe<ApplicationSbomDocumentsConnectionWhere>;
-  /** Return Applications where none of the related ApplicationSbomDocumentsConnections match this filter */
-  none?: InputMaybe<ApplicationSbomDocumentsConnectionWhere>;
-  /** Return Applications where one of the related ApplicationSbomDocumentsConnections match this filter */
-  single?: InputMaybe<ApplicationSbomDocumentsConnectionWhere>;
-  /** Return Applications where some of the related ApplicationSbomDocumentsConnections match this filter */
-  some?: InputMaybe<ApplicationSbomDocumentsConnectionWhere>;
-};
-
-export type ApplicationSbomDocumentsConnectionSort = {
-  node?: InputMaybe<SbomDocumentSort>;
-};
-
-export type ApplicationSbomDocumentsConnectionWhere = {
-  AND?: InputMaybe<Array<ApplicationSbomDocumentsConnectionWhere>>;
-  NOT?: InputMaybe<ApplicationSbomDocumentsConnectionWhere>;
-  OR?: InputMaybe<Array<ApplicationSbomDocumentsConnectionWhere>>;
-  node?: InputMaybe<SbomDocumentWhere>;
-};
-
-export type ApplicationSbomDocumentsCreateFieldInput = {
-  node: SbomDocumentCreateInput;
-};
-
-export type ApplicationSbomDocumentsDeleteFieldInput = {
-  delete?: InputMaybe<SbomDocumentDeleteInput>;
-  where?: InputMaybe<ApplicationSbomDocumentsConnectionWhere>;
-};
-
-export type ApplicationSbomDocumentsDisconnectFieldInput = {
-  disconnect?: InputMaybe<SbomDocumentDisconnectInput>;
-  where?: InputMaybe<ApplicationSbomDocumentsConnectionWhere>;
-};
-
-export type ApplicationSbomDocumentsFieldInput = {
-  connect?: InputMaybe<Array<ApplicationSbomDocumentsConnectFieldInput>>;
-  create?: InputMaybe<Array<ApplicationSbomDocumentsCreateFieldInput>>;
-};
-
-export type ApplicationSbomDocumentsNodeAggregationWhereInput = {
-  AND?: InputMaybe<Array<ApplicationSbomDocumentsNodeAggregationWhereInput>>;
-  NOT?: InputMaybe<ApplicationSbomDocumentsNodeAggregationWhereInput>;
-  OR?: InputMaybe<Array<ApplicationSbomDocumentsNodeAggregationWhereInput>>;
-  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
-  digest?: InputMaybe<StringScalarAggregationFilters>;
-  format?: InputMaybe<StringScalarAggregationFilters>;
-  generatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
-  sbomId?: InputMaybe<StringScalarAggregationFilters>;
-  source?: InputMaybe<StringScalarAggregationFilters>;
-  sourceUrl?: InputMaybe<StringScalarAggregationFilters>;
-  storageReference?: InputMaybe<StringScalarAggregationFilters>;
-  tool?: InputMaybe<StringScalarAggregationFilters>;
-  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
-  version?: InputMaybe<StringScalarAggregationFilters>;
-};
-
-export type ApplicationSbomDocumentsRelationship = {
-  __typename?: 'ApplicationSbomDocumentsRelationship';
-  cursor: Scalars['String']['output'];
-  node: SbomDocument;
-};
-
-export type ApplicationSbomDocumentsUpdateConnectionInput = {
-  node?: InputMaybe<SbomDocumentUpdateInput>;
-  where?: InputMaybe<ApplicationSbomDocumentsConnectionWhere>;
-};
-
-export type ApplicationSbomDocumentsUpdateFieldInput = {
-  connect?: InputMaybe<Array<ApplicationSbomDocumentsConnectFieldInput>>;
-  create?: InputMaybe<Array<ApplicationSbomDocumentsCreateFieldInput>>;
-  delete?: InputMaybe<Array<ApplicationSbomDocumentsDeleteFieldInput>>;
-  disconnect?: InputMaybe<Array<ApplicationSbomDocumentsDisconnectFieldInput>>;
-  update?: InputMaybe<ApplicationSbomDocumentsUpdateConnectionInput>;
-};
-
 export type ApplicationSoftwareProductUsesSoftwareProductsAggregateSelection = {
   __typename?: 'ApplicationSoftwareProductUsesSoftwareProductsAggregateSelection';
   count: CountConnection;
@@ -8380,7 +8222,6 @@ export type ApplicationUpdateInput = {
   predecessors?: InputMaybe<Array<ApplicationPredecessorsUpdateFieldInput>>;
   providedBy?: InputMaybe<Array<ApplicationProvidedByUpdateFieldInput>>;
   sbom?: InputMaybe<StringScalarMutations>;
-  sbomDocuments?: InputMaybe<Array<ApplicationSbomDocumentsUpdateFieldInput>>;
   sevenRStrategy?: InputMaybe<SevenRStrategyEnumScalarMutations>;
   softwareVersions?: InputMaybe<Array<ApplicationSoftwareVersionsUpdateFieldInput>>;
   sourceOfInterfaces?: InputMaybe<Array<ApplicationSourceOfInterfacesUpdateFieldInput>>;
@@ -8883,8 +8724,6 @@ export type ApplicationWhere = {
   providedBy?: InputMaybe<SupplierRelationshipFilters>;
   providedByConnection?: InputMaybe<ApplicationProvidedByConnectionFilters>;
   sbom?: InputMaybe<StringScalarFilters>;
-  sbomDocuments?: InputMaybe<SbomDocumentRelationshipFilters>;
-  sbomDocumentsConnection?: InputMaybe<ApplicationSbomDocumentsConnectionFilters>;
   sevenRStrategy?: InputMaybe<SevenRStrategyEnumScalarFilters>;
   softwareVersions?: InputMaybe<SoftwareVersionRelationshipFilters>;
   softwareVersionsConnection?: InputMaybe<ApplicationSoftwareVersionsConnectionFilters>;
@@ -41694,8 +41533,6 @@ export type RiskClassificationEnumScalarMutations = {
 /** SbomDocument – Software Bill of Materials evidence document */
 export type SbomDocument = {
   __typename?: 'SbomDocument';
-  applications: Array<Application>;
-  applicationsConnection: SbomDocumentApplicationsConnection;
   company: Array<Company>;
   companyConnection: SbomDocumentCompanyConnection;
   createdAt: Scalars['DateTime']['output'];
@@ -41703,31 +41540,14 @@ export type SbomDocument = {
   format?: Maybe<Scalars['String']['output']>;
   generatedAt?: Maybe<Scalars['DateTime']['output']>;
   id: Scalars['ID']['output'];
-  sbomId?: Maybe<Scalars['String']['output']>;
+  softwareVersions: Array<SoftwareVersion>;
+  softwareVersionsConnection: SbomDocumentSoftwareVersionsConnection;
   source?: Maybe<Scalars['String']['output']>;
   sourceUrl?: Maybe<Scalars['String']['output']>;
   storageReference?: Maybe<Scalars['String']['output']>;
   tool?: Maybe<Scalars['String']['output']>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
   version?: Maybe<Scalars['String']['output']>;
-};
-
-
-/** SbomDocument – Software Bill of Materials evidence document */
-export type SbomDocumentApplicationsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ApplicationSort>>;
-  where?: InputMaybe<ApplicationWhere>;
-};
-
-
-/** SbomDocument – Software Bill of Materials evidence document */
-export type SbomDocumentApplicationsConnectionArgs = {
-  after?: InputMaybe<Scalars['String']['input']>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<SbomDocumentApplicationsConnectionSort>>;
-  where?: InputMaybe<SbomDocumentApplicationsConnectionWhere>;
 };
 
 
@@ -41748,6 +41568,24 @@ export type SbomDocumentCompanyConnectionArgs = {
   where?: InputMaybe<SbomDocumentCompanyConnectionWhere>;
 };
 
+
+/** SbomDocument – Software Bill of Materials evidence document */
+export type SbomDocumentSoftwareVersionsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SoftwareVersionSort>>;
+  where?: InputMaybe<SoftwareVersionWhere>;
+};
+
+
+/** SbomDocument – Software Bill of Materials evidence document */
+export type SbomDocumentSoftwareVersionsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SbomDocumentSoftwareVersionsConnectionSort>>;
+  where?: InputMaybe<SbomDocumentSoftwareVersionsConnectionWhere>;
+};
+
 export type SbomDocumentAggregate = {
   __typename?: 'SbomDocumentAggregate';
   count: Count;
@@ -41760,147 +41598,12 @@ export type SbomDocumentAggregateNode = {
   digest: StringAggregateSelection;
   format: StringAggregateSelection;
   generatedAt: DateTimeAggregateSelection;
-  sbomId: StringAggregateSelection;
   source: StringAggregateSelection;
   sourceUrl: StringAggregateSelection;
   storageReference: StringAggregateSelection;
   tool: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   version: StringAggregateSelection;
-};
-
-export type SbomDocumentApplicationApplicationsAggregateSelection = {
-  __typename?: 'SbomDocumentApplicationApplicationsAggregateSelection';
-  count: CountConnection;
-  node?: Maybe<SbomDocumentApplicationApplicationsNodeAggregateSelection>;
-};
-
-export type SbomDocumentApplicationApplicationsNodeAggregateSelection = {
-  __typename?: 'SbomDocumentApplicationApplicationsNodeAggregateSelection';
-  costs: FloatAggregateSelection;
-  createdAt: DateTimeAggregateSelection;
-  description: StringAggregateSelection;
-  hostingEnvironment: StringAggregateSelection;
-  lastSovereigntyAssessmentAt: DateTimeAggregateSelection;
-  name: StringAggregateSelection;
-  sbom: StringAggregateSelection;
-  sovereigntyEvidence: StringAggregateSelection;
-  updatedAt: DateTimeAggregateSelection;
-  vendor: StringAggregateSelection;
-  version: StringAggregateSelection;
-};
-
-export type SbomDocumentApplicationsAggregateInput = {
-  AND?: InputMaybe<Array<SbomDocumentApplicationsAggregateInput>>;
-  NOT?: InputMaybe<SbomDocumentApplicationsAggregateInput>;
-  OR?: InputMaybe<Array<SbomDocumentApplicationsAggregateInput>>;
-  count?: InputMaybe<IntScalarFilters>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
-  count_GT?: InputMaybe<Scalars['Int']['input']>;
-  count_GTE?: InputMaybe<Scalars['Int']['input']>;
-  count_LT?: InputMaybe<Scalars['Int']['input']>;
-  count_LTE?: InputMaybe<Scalars['Int']['input']>;
-  node?: InputMaybe<SbomDocumentApplicationsNodeAggregationWhereInput>;
-};
-
-export type SbomDocumentApplicationsConnectFieldInput = {
-  connect?: InputMaybe<Array<ApplicationConnectInput>>;
-  where?: InputMaybe<ApplicationConnectWhere>;
-};
-
-export type SbomDocumentApplicationsConnection = {
-  __typename?: 'SbomDocumentApplicationsConnection';
-  aggregate: SbomDocumentApplicationApplicationsAggregateSelection;
-  edges: Array<SbomDocumentApplicationsRelationship>;
-  pageInfo: PageInfo;
-  totalCount: Scalars['Int']['output'];
-};
-
-export type SbomDocumentApplicationsConnectionAggregateInput = {
-  AND?: InputMaybe<Array<SbomDocumentApplicationsConnectionAggregateInput>>;
-  NOT?: InputMaybe<SbomDocumentApplicationsConnectionAggregateInput>;
-  OR?: InputMaybe<Array<SbomDocumentApplicationsConnectionAggregateInput>>;
-  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
-  node?: InputMaybe<SbomDocumentApplicationsNodeAggregationWhereInput>;
-};
-
-export type SbomDocumentApplicationsConnectionFilters = {
-  /** Filter SbomDocuments by aggregating results on related SbomDocumentApplicationsConnections */
-  aggregate?: InputMaybe<SbomDocumentApplicationsConnectionAggregateInput>;
-  /** Return SbomDocuments where all of the related SbomDocumentApplicationsConnections match this filter */
-  all?: InputMaybe<SbomDocumentApplicationsConnectionWhere>;
-  /** Return SbomDocuments where none of the related SbomDocumentApplicationsConnections match this filter */
-  none?: InputMaybe<SbomDocumentApplicationsConnectionWhere>;
-  /** Return SbomDocuments where one of the related SbomDocumentApplicationsConnections match this filter */
-  single?: InputMaybe<SbomDocumentApplicationsConnectionWhere>;
-  /** Return SbomDocuments where some of the related SbomDocumentApplicationsConnections match this filter */
-  some?: InputMaybe<SbomDocumentApplicationsConnectionWhere>;
-};
-
-export type SbomDocumentApplicationsConnectionSort = {
-  node?: InputMaybe<ApplicationSort>;
-};
-
-export type SbomDocumentApplicationsConnectionWhere = {
-  AND?: InputMaybe<Array<SbomDocumentApplicationsConnectionWhere>>;
-  NOT?: InputMaybe<SbomDocumentApplicationsConnectionWhere>;
-  OR?: InputMaybe<Array<SbomDocumentApplicationsConnectionWhere>>;
-  node?: InputMaybe<ApplicationWhere>;
-};
-
-export type SbomDocumentApplicationsCreateFieldInput = {
-  node: ApplicationCreateInput;
-};
-
-export type SbomDocumentApplicationsDeleteFieldInput = {
-  delete?: InputMaybe<ApplicationDeleteInput>;
-  where?: InputMaybe<SbomDocumentApplicationsConnectionWhere>;
-};
-
-export type SbomDocumentApplicationsDisconnectFieldInput = {
-  disconnect?: InputMaybe<ApplicationDisconnectInput>;
-  where?: InputMaybe<SbomDocumentApplicationsConnectionWhere>;
-};
-
-export type SbomDocumentApplicationsFieldInput = {
-  connect?: InputMaybe<Array<SbomDocumentApplicationsConnectFieldInput>>;
-  create?: InputMaybe<Array<SbomDocumentApplicationsCreateFieldInput>>;
-};
-
-export type SbomDocumentApplicationsNodeAggregationWhereInput = {
-  AND?: InputMaybe<Array<SbomDocumentApplicationsNodeAggregationWhereInput>>;
-  NOT?: InputMaybe<SbomDocumentApplicationsNodeAggregationWhereInput>;
-  OR?: InputMaybe<Array<SbomDocumentApplicationsNodeAggregationWhereInput>>;
-  costs?: InputMaybe<FloatScalarAggregationFilters>;
-  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
-  description?: InputMaybe<StringScalarAggregationFilters>;
-  hostingEnvironment?: InputMaybe<StringScalarAggregationFilters>;
-  lastSovereigntyAssessmentAt?: InputMaybe<DateTimeScalarAggregationFilters>;
-  name?: InputMaybe<StringScalarAggregationFilters>;
-  sbom?: InputMaybe<StringScalarAggregationFilters>;
-  sovereigntyEvidence?: InputMaybe<StringScalarAggregationFilters>;
-  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
-  vendor?: InputMaybe<StringScalarAggregationFilters>;
-  version?: InputMaybe<StringScalarAggregationFilters>;
-};
-
-export type SbomDocumentApplicationsRelationship = {
-  __typename?: 'SbomDocumentApplicationsRelationship';
-  cursor: Scalars['String']['output'];
-  node: Application;
-};
-
-export type SbomDocumentApplicationsUpdateConnectionInput = {
-  node?: InputMaybe<ApplicationUpdateInput>;
-  where?: InputMaybe<SbomDocumentApplicationsConnectionWhere>;
-};
-
-export type SbomDocumentApplicationsUpdateFieldInput = {
-  connect?: InputMaybe<Array<SbomDocumentApplicationsConnectFieldInput>>;
-  create?: InputMaybe<Array<SbomDocumentApplicationsCreateFieldInput>>;
-  delete?: InputMaybe<Array<SbomDocumentApplicationsDeleteFieldInput>>;
-  disconnect?: InputMaybe<Array<SbomDocumentApplicationsDisconnectFieldInput>>;
-  update?: InputMaybe<SbomDocumentApplicationsUpdateConnectionInput>;
 };
 
 export type SbomDocumentCompanyAggregateInput = {
@@ -42060,8 +41763,8 @@ export type SbomDocumentCompanyUpdateFieldInput = {
 };
 
 export type SbomDocumentConnectInput = {
-  applications?: InputMaybe<Array<SbomDocumentApplicationsConnectFieldInput>>;
   company?: InputMaybe<Array<SbomDocumentCompanyConnectFieldInput>>;
+  softwareVersions?: InputMaybe<Array<SbomDocumentSoftwareVersionsConnectFieldInput>>;
 };
 
 export type SbomDocumentConnectWhere = {
@@ -42069,12 +41772,11 @@ export type SbomDocumentConnectWhere = {
 };
 
 export type SbomDocumentCreateInput = {
-  applications?: InputMaybe<SbomDocumentApplicationsFieldInput>;
   company?: InputMaybe<SbomDocumentCompanyFieldInput>;
   digest?: InputMaybe<Scalars['String']['input']>;
   format?: InputMaybe<Scalars['String']['input']>;
   generatedAt?: InputMaybe<Scalars['DateTime']['input']>;
-  sbomId?: InputMaybe<Scalars['String']['input']>;
+  softwareVersions?: InputMaybe<SbomDocumentSoftwareVersionsFieldInput>;
   source?: InputMaybe<Scalars['String']['input']>;
   sourceUrl?: InputMaybe<Scalars['String']['input']>;
   storageReference?: InputMaybe<Scalars['String']['input']>;
@@ -42084,13 +41786,13 @@ export type SbomDocumentCreateInput = {
 };
 
 export type SbomDocumentDeleteInput = {
-  applications?: InputMaybe<Array<SbomDocumentApplicationsDeleteFieldInput>>;
   company?: InputMaybe<Array<SbomDocumentCompanyDeleteFieldInput>>;
+  softwareVersions?: InputMaybe<Array<SbomDocumentSoftwareVersionsDeleteFieldInput>>;
 };
 
 export type SbomDocumentDisconnectInput = {
-  applications?: InputMaybe<Array<SbomDocumentApplicationsDisconnectFieldInput>>;
   company?: InputMaybe<Array<SbomDocumentCompanyDisconnectFieldInput>>;
+  softwareVersions?: InputMaybe<Array<SbomDocumentSoftwareVersionsDisconnectFieldInput>>;
 };
 
 export type SbomDocumentEdge = {
@@ -42110,6 +41812,130 @@ export type SbomDocumentRelationshipFilters = {
   some?: InputMaybe<SbomDocumentWhere>;
 };
 
+export type SbomDocumentSoftwareVersionSoftwareVersionsAggregateSelection = {
+  __typename?: 'SbomDocumentSoftwareVersionSoftwareVersionsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<SbomDocumentSoftwareVersionSoftwareVersionsNodeAggregateSelection>;
+};
+
+export type SbomDocumentSoftwareVersionSoftwareVersionsNodeAggregateSelection = {
+  __typename?: 'SbomDocumentSoftwareVersionSoftwareVersionsNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  name: StringAggregateSelection;
+  releaseChannel: StringAggregateSelection;
+  supportTier: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  version: StringAggregateSelection;
+};
+
+export type SbomDocumentSoftwareVersionsAggregateInput = {
+  AND?: InputMaybe<Array<SbomDocumentSoftwareVersionsAggregateInput>>;
+  NOT?: InputMaybe<SbomDocumentSoftwareVersionsAggregateInput>;
+  OR?: InputMaybe<Array<SbomDocumentSoftwareVersionsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<SbomDocumentSoftwareVersionsNodeAggregationWhereInput>;
+};
+
+export type SbomDocumentSoftwareVersionsConnectFieldInput = {
+  connect?: InputMaybe<Array<SoftwareVersionConnectInput>>;
+  where?: InputMaybe<SoftwareVersionConnectWhere>;
+};
+
+export type SbomDocumentSoftwareVersionsConnection = {
+  __typename?: 'SbomDocumentSoftwareVersionsConnection';
+  aggregate: SbomDocumentSoftwareVersionSoftwareVersionsAggregateSelection;
+  edges: Array<SbomDocumentSoftwareVersionsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type SbomDocumentSoftwareVersionsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<SbomDocumentSoftwareVersionsConnectionAggregateInput>>;
+  NOT?: InputMaybe<SbomDocumentSoftwareVersionsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<SbomDocumentSoftwareVersionsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<SbomDocumentSoftwareVersionsNodeAggregationWhereInput>;
+};
+
+export type SbomDocumentSoftwareVersionsConnectionFilters = {
+  /** Filter SbomDocuments by aggregating results on related SbomDocumentSoftwareVersionsConnections */
+  aggregate?: InputMaybe<SbomDocumentSoftwareVersionsConnectionAggregateInput>;
+  /** Return SbomDocuments where all of the related SbomDocumentSoftwareVersionsConnections match this filter */
+  all?: InputMaybe<SbomDocumentSoftwareVersionsConnectionWhere>;
+  /** Return SbomDocuments where none of the related SbomDocumentSoftwareVersionsConnections match this filter */
+  none?: InputMaybe<SbomDocumentSoftwareVersionsConnectionWhere>;
+  /** Return SbomDocuments where one of the related SbomDocumentSoftwareVersionsConnections match this filter */
+  single?: InputMaybe<SbomDocumentSoftwareVersionsConnectionWhere>;
+  /** Return SbomDocuments where some of the related SbomDocumentSoftwareVersionsConnections match this filter */
+  some?: InputMaybe<SbomDocumentSoftwareVersionsConnectionWhere>;
+};
+
+export type SbomDocumentSoftwareVersionsConnectionSort = {
+  node?: InputMaybe<SoftwareVersionSort>;
+};
+
+export type SbomDocumentSoftwareVersionsConnectionWhere = {
+  AND?: InputMaybe<Array<SbomDocumentSoftwareVersionsConnectionWhere>>;
+  NOT?: InputMaybe<SbomDocumentSoftwareVersionsConnectionWhere>;
+  OR?: InputMaybe<Array<SbomDocumentSoftwareVersionsConnectionWhere>>;
+  node?: InputMaybe<SoftwareVersionWhere>;
+};
+
+export type SbomDocumentSoftwareVersionsCreateFieldInput = {
+  node: SoftwareVersionCreateInput;
+};
+
+export type SbomDocumentSoftwareVersionsDeleteFieldInput = {
+  delete?: InputMaybe<SoftwareVersionDeleteInput>;
+  where?: InputMaybe<SbomDocumentSoftwareVersionsConnectionWhere>;
+};
+
+export type SbomDocumentSoftwareVersionsDisconnectFieldInput = {
+  disconnect?: InputMaybe<SoftwareVersionDisconnectInput>;
+  where?: InputMaybe<SbomDocumentSoftwareVersionsConnectionWhere>;
+};
+
+export type SbomDocumentSoftwareVersionsFieldInput = {
+  connect?: InputMaybe<Array<SbomDocumentSoftwareVersionsConnectFieldInput>>;
+  create?: InputMaybe<Array<SbomDocumentSoftwareVersionsCreateFieldInput>>;
+};
+
+export type SbomDocumentSoftwareVersionsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<SbomDocumentSoftwareVersionsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<SbomDocumentSoftwareVersionsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<SbomDocumentSoftwareVersionsNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  releaseChannel?: InputMaybe<StringScalarAggregationFilters>;
+  supportTier?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  version?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type SbomDocumentSoftwareVersionsRelationship = {
+  __typename?: 'SbomDocumentSoftwareVersionsRelationship';
+  cursor: Scalars['String']['output'];
+  node: SoftwareVersion;
+};
+
+export type SbomDocumentSoftwareVersionsUpdateConnectionInput = {
+  node?: InputMaybe<SoftwareVersionUpdateInput>;
+  where?: InputMaybe<SbomDocumentSoftwareVersionsConnectionWhere>;
+};
+
+export type SbomDocumentSoftwareVersionsUpdateFieldInput = {
+  connect?: InputMaybe<Array<SbomDocumentSoftwareVersionsConnectFieldInput>>;
+  create?: InputMaybe<Array<SbomDocumentSoftwareVersionsCreateFieldInput>>;
+  delete?: InputMaybe<Array<SbomDocumentSoftwareVersionsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<SbomDocumentSoftwareVersionsDisconnectFieldInput>>;
+  update?: InputMaybe<SbomDocumentSoftwareVersionsUpdateConnectionInput>;
+};
+
 /** Fields to sort SbomDocuments by. The order in which sorts are applied is not guaranteed when specifying many fields in one SbomDocumentSort object. */
 export type SbomDocumentSort = {
   createdAt?: InputMaybe<SortDirection>;
@@ -42117,7 +41943,6 @@ export type SbomDocumentSort = {
   format?: InputMaybe<SortDirection>;
   generatedAt?: InputMaybe<SortDirection>;
   id?: InputMaybe<SortDirection>;
-  sbomId?: InputMaybe<SortDirection>;
   source?: InputMaybe<SortDirection>;
   sourceUrl?: InputMaybe<SortDirection>;
   storageReference?: InputMaybe<SortDirection>;
@@ -42127,13 +41952,12 @@ export type SbomDocumentSort = {
 };
 
 export type SbomDocumentUpdateInput = {
-  applications?: InputMaybe<Array<SbomDocumentApplicationsUpdateFieldInput>>;
   company?: InputMaybe<Array<SbomDocumentCompanyUpdateFieldInput>>;
   createdAt?: InputMaybe<DateTimeScalarMutations>;
   digest?: InputMaybe<StringScalarMutations>;
   format?: InputMaybe<StringScalarMutations>;
   generatedAt?: InputMaybe<DateTimeScalarMutations>;
-  sbomId?: InputMaybe<StringScalarMutations>;
+  softwareVersions?: InputMaybe<Array<SbomDocumentSoftwareVersionsUpdateFieldInput>>;
   source?: InputMaybe<StringScalarMutations>;
   sourceUrl?: InputMaybe<StringScalarMutations>;
   storageReference?: InputMaybe<StringScalarMutations>;
@@ -42145,8 +41969,6 @@ export type SbomDocumentWhere = {
   AND?: InputMaybe<Array<SbomDocumentWhere>>;
   NOT?: InputMaybe<SbomDocumentWhere>;
   OR?: InputMaybe<Array<SbomDocumentWhere>>;
-  applications?: InputMaybe<ApplicationRelationshipFilters>;
-  applicationsConnection?: InputMaybe<SbomDocumentApplicationsConnectionFilters>;
   company?: InputMaybe<CompanyRelationshipFilters>;
   companyConnection?: InputMaybe<SbomDocumentCompanyConnectionFilters>;
   createdAt?: InputMaybe<DateTimeScalarFilters>;
@@ -42154,7 +41976,8 @@ export type SbomDocumentWhere = {
   format?: InputMaybe<StringScalarFilters>;
   generatedAt?: InputMaybe<DateTimeScalarFilters>;
   id?: InputMaybe<IdScalarFilters>;
-  sbomId?: InputMaybe<StringScalarFilters>;
+  softwareVersions?: InputMaybe<SoftwareVersionRelationshipFilters>;
+  softwareVersionsConnection?: InputMaybe<SbomDocumentSoftwareVersionsConnectionFilters>;
   source?: InputMaybe<StringScalarFilters>;
   sourceUrl?: InputMaybe<StringScalarFilters>;
   storageReference?: InputMaybe<StringScalarFilters>;
@@ -43607,6 +43430,8 @@ export type SoftwareVersion = {
   lifecycleRecordsConnection: SoftwareVersionLifecycleRecordsConnection;
   name: Scalars['String']['output'];
   releaseChannel?: Maybe<Scalars['String']['output']>;
+  sbomDocuments: Array<SbomDocument>;
+  sbomDocumentsConnection: SoftwareVersionSbomDocumentsConnection;
   softwareProduct: Array<SoftwareProduct>;
   softwareProductConnection: SoftwareVersionSoftwareProductConnection;
   supportTier?: Maybe<Scalars['String']['output']>;
@@ -43652,6 +43477,24 @@ export type SoftwareVersionLifecycleRecordsConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<SoftwareVersionLifecycleRecordsConnectionSort>>;
   where?: InputMaybe<SoftwareVersionLifecycleRecordsConnectionWhere>;
+};
+
+
+/** SoftwareVersion – version metadata for a software product */
+export type SoftwareVersionSbomDocumentsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SbomDocumentSort>>;
+  where?: InputMaybe<SbomDocumentWhere>;
+};
+
+
+/** SoftwareVersion – version metadata for a software product */
+export type SoftwareVersionSbomDocumentsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<SoftwareVersionSbomDocumentsConnectionSort>>;
+  where?: InputMaybe<SoftwareVersionSbomDocumentsConnectionWhere>;
 };
 
 
@@ -43904,6 +43747,7 @@ export type SoftwareVersionCompanyUpdateFieldInput = {
 export type SoftwareVersionConnectInput = {
   company?: InputMaybe<Array<SoftwareVersionCompanyConnectFieldInput>>;
   lifecycleRecords?: InputMaybe<Array<SoftwareVersionLifecycleRecordsConnectFieldInput>>;
+  sbomDocuments?: InputMaybe<Array<SoftwareVersionSbomDocumentsConnectFieldInput>>;
   softwareProduct?: InputMaybe<Array<SoftwareVersionSoftwareProductConnectFieldInput>>;
   usedByApplications?: InputMaybe<Array<SoftwareVersionUsedByApplicationsConnectFieldInput>>;
   usedByInfrastructure?: InputMaybe<Array<SoftwareVersionUsedByInfrastructureConnectFieldInput>>;
@@ -43919,6 +43763,7 @@ export type SoftwareVersionCreateInput = {
   lifecycleRecords?: InputMaybe<SoftwareVersionLifecycleRecordsFieldInput>;
   name: Scalars['String']['input'];
   releaseChannel?: InputMaybe<Scalars['String']['input']>;
+  sbomDocuments?: InputMaybe<SoftwareVersionSbomDocumentsFieldInput>;
   softwareProduct?: InputMaybe<SoftwareVersionSoftwareProductFieldInput>;
   supportTier?: InputMaybe<Scalars['String']['input']>;
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
@@ -43930,6 +43775,7 @@ export type SoftwareVersionCreateInput = {
 export type SoftwareVersionDeleteInput = {
   company?: InputMaybe<Array<SoftwareVersionCompanyDeleteFieldInput>>;
   lifecycleRecords?: InputMaybe<Array<SoftwareVersionLifecycleRecordsDeleteFieldInput>>;
+  sbomDocuments?: InputMaybe<Array<SoftwareVersionSbomDocumentsDeleteFieldInput>>;
   softwareProduct?: InputMaybe<Array<SoftwareVersionSoftwareProductDeleteFieldInput>>;
   usedByApplications?: InputMaybe<Array<SoftwareVersionUsedByApplicationsDeleteFieldInput>>;
   usedByInfrastructure?: InputMaybe<Array<SoftwareVersionUsedByInfrastructureDeleteFieldInput>>;
@@ -43938,6 +43784,7 @@ export type SoftwareVersionDeleteInput = {
 export type SoftwareVersionDisconnectInput = {
   company?: InputMaybe<Array<SoftwareVersionCompanyDisconnectFieldInput>>;
   lifecycleRecords?: InputMaybe<Array<SoftwareVersionLifecycleRecordsDisconnectFieldInput>>;
+  sbomDocuments?: InputMaybe<Array<SoftwareVersionSbomDocumentsDisconnectFieldInput>>;
   softwareProduct?: InputMaybe<Array<SoftwareVersionSoftwareProductDisconnectFieldInput>>;
   usedByApplications?: InputMaybe<Array<SoftwareVersionUsedByApplicationsDisconnectFieldInput>>;
   usedByInfrastructure?: InputMaybe<Array<SoftwareVersionUsedByInfrastructureDisconnectFieldInput>>;
@@ -44109,6 +43956,138 @@ export type SoftwareVersionRelationshipFilters = {
   some?: InputMaybe<SoftwareVersionWhere>;
 };
 
+export type SoftwareVersionSbomDocumentSbomDocumentsAggregateSelection = {
+  __typename?: 'SoftwareVersionSbomDocumentSbomDocumentsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<SoftwareVersionSbomDocumentSbomDocumentsNodeAggregateSelection>;
+};
+
+export type SoftwareVersionSbomDocumentSbomDocumentsNodeAggregateSelection = {
+  __typename?: 'SoftwareVersionSbomDocumentSbomDocumentsNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  digest: StringAggregateSelection;
+  format: StringAggregateSelection;
+  generatedAt: DateTimeAggregateSelection;
+  source: StringAggregateSelection;
+  sourceUrl: StringAggregateSelection;
+  storageReference: StringAggregateSelection;
+  tool: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  version: StringAggregateSelection;
+};
+
+export type SoftwareVersionSbomDocumentsAggregateInput = {
+  AND?: InputMaybe<Array<SoftwareVersionSbomDocumentsAggregateInput>>;
+  NOT?: InputMaybe<SoftwareVersionSbomDocumentsAggregateInput>;
+  OR?: InputMaybe<Array<SoftwareVersionSbomDocumentsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<SoftwareVersionSbomDocumentsNodeAggregationWhereInput>;
+};
+
+export type SoftwareVersionSbomDocumentsConnectFieldInput = {
+  connect?: InputMaybe<Array<SbomDocumentConnectInput>>;
+  where?: InputMaybe<SbomDocumentConnectWhere>;
+};
+
+export type SoftwareVersionSbomDocumentsConnection = {
+  __typename?: 'SoftwareVersionSbomDocumentsConnection';
+  aggregate: SoftwareVersionSbomDocumentSbomDocumentsAggregateSelection;
+  edges: Array<SoftwareVersionSbomDocumentsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type SoftwareVersionSbomDocumentsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<SoftwareVersionSbomDocumentsConnectionAggregateInput>>;
+  NOT?: InputMaybe<SoftwareVersionSbomDocumentsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<SoftwareVersionSbomDocumentsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<SoftwareVersionSbomDocumentsNodeAggregationWhereInput>;
+};
+
+export type SoftwareVersionSbomDocumentsConnectionFilters = {
+  /** Filter SoftwareVersions by aggregating results on related SoftwareVersionSbomDocumentsConnections */
+  aggregate?: InputMaybe<SoftwareVersionSbomDocumentsConnectionAggregateInput>;
+  /** Return SoftwareVersions where all of the related SoftwareVersionSbomDocumentsConnections match this filter */
+  all?: InputMaybe<SoftwareVersionSbomDocumentsConnectionWhere>;
+  /** Return SoftwareVersions where none of the related SoftwareVersionSbomDocumentsConnections match this filter */
+  none?: InputMaybe<SoftwareVersionSbomDocumentsConnectionWhere>;
+  /** Return SoftwareVersions where one of the related SoftwareVersionSbomDocumentsConnections match this filter */
+  single?: InputMaybe<SoftwareVersionSbomDocumentsConnectionWhere>;
+  /** Return SoftwareVersions where some of the related SoftwareVersionSbomDocumentsConnections match this filter */
+  some?: InputMaybe<SoftwareVersionSbomDocumentsConnectionWhere>;
+};
+
+export type SoftwareVersionSbomDocumentsConnectionSort = {
+  node?: InputMaybe<SbomDocumentSort>;
+};
+
+export type SoftwareVersionSbomDocumentsConnectionWhere = {
+  AND?: InputMaybe<Array<SoftwareVersionSbomDocumentsConnectionWhere>>;
+  NOT?: InputMaybe<SoftwareVersionSbomDocumentsConnectionWhere>;
+  OR?: InputMaybe<Array<SoftwareVersionSbomDocumentsConnectionWhere>>;
+  node?: InputMaybe<SbomDocumentWhere>;
+};
+
+export type SoftwareVersionSbomDocumentsCreateFieldInput = {
+  node: SbomDocumentCreateInput;
+};
+
+export type SoftwareVersionSbomDocumentsDeleteFieldInput = {
+  delete?: InputMaybe<SbomDocumentDeleteInput>;
+  where?: InputMaybe<SoftwareVersionSbomDocumentsConnectionWhere>;
+};
+
+export type SoftwareVersionSbomDocumentsDisconnectFieldInput = {
+  disconnect?: InputMaybe<SbomDocumentDisconnectInput>;
+  where?: InputMaybe<SoftwareVersionSbomDocumentsConnectionWhere>;
+};
+
+export type SoftwareVersionSbomDocumentsFieldInput = {
+  connect?: InputMaybe<Array<SoftwareVersionSbomDocumentsConnectFieldInput>>;
+  create?: InputMaybe<Array<SoftwareVersionSbomDocumentsCreateFieldInput>>;
+};
+
+export type SoftwareVersionSbomDocumentsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<SoftwareVersionSbomDocumentsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<SoftwareVersionSbomDocumentsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<SoftwareVersionSbomDocumentsNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  digest?: InputMaybe<StringScalarAggregationFilters>;
+  format?: InputMaybe<StringScalarAggregationFilters>;
+  generatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  source?: InputMaybe<StringScalarAggregationFilters>;
+  sourceUrl?: InputMaybe<StringScalarAggregationFilters>;
+  storageReference?: InputMaybe<StringScalarAggregationFilters>;
+  tool?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  version?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type SoftwareVersionSbomDocumentsRelationship = {
+  __typename?: 'SoftwareVersionSbomDocumentsRelationship';
+  cursor: Scalars['String']['output'];
+  node: SbomDocument;
+};
+
+export type SoftwareVersionSbomDocumentsUpdateConnectionInput = {
+  node?: InputMaybe<SbomDocumentUpdateInput>;
+  where?: InputMaybe<SoftwareVersionSbomDocumentsConnectionWhere>;
+};
+
+export type SoftwareVersionSbomDocumentsUpdateFieldInput = {
+  connect?: InputMaybe<Array<SoftwareVersionSbomDocumentsConnectFieldInput>>;
+  create?: InputMaybe<Array<SoftwareVersionSbomDocumentsCreateFieldInput>>;
+  delete?: InputMaybe<Array<SoftwareVersionSbomDocumentsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<SoftwareVersionSbomDocumentsDisconnectFieldInput>>;
+  update?: InputMaybe<SoftwareVersionSbomDocumentsUpdateConnectionInput>;
+};
+
 export type SoftwareVersionSoftwareProductAggregateInput = {
   AND?: InputMaybe<Array<SoftwareVersionSoftwareProductAggregateInput>>;
   NOT?: InputMaybe<SoftwareVersionSoftwareProductAggregateInput>;
@@ -44246,6 +44225,7 @@ export type SoftwareVersionUpdateInput = {
   lifecycleRecords?: InputMaybe<Array<SoftwareVersionLifecycleRecordsUpdateFieldInput>>;
   name?: InputMaybe<StringScalarMutations>;
   releaseChannel?: InputMaybe<StringScalarMutations>;
+  sbomDocuments?: InputMaybe<Array<SoftwareVersionSbomDocumentsUpdateFieldInput>>;
   softwareProduct?: InputMaybe<Array<SoftwareVersionSoftwareProductUpdateFieldInput>>;
   supportTier?: InputMaybe<StringScalarMutations>;
   usedByApplications?: InputMaybe<Array<SoftwareVersionUsedByApplicationsUpdateFieldInput>>;
@@ -44496,6 +44476,8 @@ export type SoftwareVersionWhere = {
   lifecycleRecordsConnection?: InputMaybe<SoftwareVersionLifecycleRecordsConnectionFilters>;
   name?: InputMaybe<StringScalarFilters>;
   releaseChannel?: InputMaybe<StringScalarFilters>;
+  sbomDocuments?: InputMaybe<SbomDocumentRelationshipFilters>;
+  sbomDocumentsConnection?: InputMaybe<SoftwareVersionSbomDocumentsConnectionFilters>;
   softwareProduct?: InputMaybe<SoftwareProductRelationshipFilters>;
   softwareProductConnection?: InputMaybe<SoftwareVersionSoftwareProductConnectionFilters>;
   supportTier?: InputMaybe<StringScalarFilters>;

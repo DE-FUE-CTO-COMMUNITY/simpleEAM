@@ -14,6 +14,7 @@ export type SoftwareVersionType = Pick<
   | 'usedByApplications'
   | 'usedByInfrastructure'
   | 'lifecycleRecords'
+  | 'sbomDocuments'
 >
 
 export interface FilterState {

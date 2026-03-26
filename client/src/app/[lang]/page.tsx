@@ -834,6 +834,7 @@ const Dashboard = () => {
               {isSovereigntyEnabled && (
                 <Tooltip title={t('sovereigntyScoreDetails')} arrow>
                   <ButtonBase
+                    component="div"
                     onClick={() => router.push('/sovereignty')}
                     sx={{ borderRadius: 2, textAlign: 'left', display: 'block' }}
                   >
