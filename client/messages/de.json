@@ -3422,6 +3422,8 @@
       "gaDate": "General Availability (GA)",
       "mainstreamSupportEndDate": "Mainstream-Support Ende",
       "extendedSupportEndDate": "Extended-Support Ende",
+      "eosDate": "End of Support (EOS)",
+      "eolDate": "End of Life (EOL)",
       "lifecycleRecords": "Lifecycle-Einträge",
       "createdAt": "Erstellt am",
       "updatedAt": "Aktualisiert am",

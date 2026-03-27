@@ -19,6 +19,8 @@ export const SOFTWARE_VERSION_DEFAULT_COLUMN_VISIBILITY = {
   gaDate: true,
   mainstreamSupportEndDate: true,
   extendedSupportEndDate: true,
+  eosDate: false,
+  eolDate: false,
   lifecycleRecords: true,
   createdAt: false,
   updatedAt: false,
@@ -150,6 +152,16 @@ const SoftwareVersionTable: React.FC<SoftwareVersionTableProps> = ({
       columnHelper.accessor(row => row.lifecycleRecords?.[0]?.extendedSupportEndDate ?? null, {
         id: 'extendedSupportEndDate',
         header: t('extendedSupportEndDate'),
+        cell: info => (info.getValue() ? formatDate(info.getValue() as string, locale) : '-'),
+      }),
+      columnHelper.accessor(row => row.lifecycleRecords?.[0]?.eosDate ?? null, {
+        id: 'eosDate',
+        header: t('eosDate'),
+        cell: info => (info.getValue() ? formatDate(info.getValue() as string, locale) : '-'),
+      }),
+      columnHelper.accessor(row => row.lifecycleRecords?.[0]?.eolDate ?? null, {
+        id: 'eolDate',
+        header: t('eolDate'),
         cell: info => (info.getValue() ? formatDate(info.getValue() as string, locale) : '-'),
       }),
       columnHelper.accessor('lifecycleRecords', {
