@@ -183,17 +183,23 @@ interface TabPanelProps {
 
 function TabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props
+  const isActive = value === index
 
   return (
     <div
       role="tabpanel"
-      hidden={value !== index}
       id={`form-tabpanel-${index}`}
       aria-labelledby={`form-tab-${index}`}
+      aria-hidden={!isActive}
       {...other}
-      style={{ padding: '16px 0' }}
+      style={{
+        padding: '16px 0',
+        gridArea: '1 / 1',
+        visibility: isActive ? 'visible' : 'hidden',
+        pointerEvents: isActive ? 'auto' : 'none',
+      }}
     >
-      {value === index && <Box>{children}</Box>}
+      <Box>{children}</Box>
     </div>
   )
 }
@@ -1231,13 +1237,15 @@ const GenericForm: React.FC<GenericFormProps> = ({
                   </Tabs>
                 </Box>
 
-                {tabs.map((tab, index) => (
-                  <TabPanel key={tab.id} value={activeTab} index={index}>
-                    <Grid container spacing={2}>
-                      {fieldsByTab[tab.id]?.map(field => renderField(field))}
-                    </Grid>
-                  </TabPanel>
-                ))}
+                <Box sx={{ display: 'grid' }}>
+                  {tabs.map((tab, index) => (
+                    <TabPanel key={tab.id} value={activeTab} index={index}>
+                      <Grid container spacing={2}>
+                        {fieldsByTab[tab.id]?.map(field => renderField(field))}
+                      </Grid>
+                    </TabPanel>
+                  ))}
+                </Box>
               </>
             ) : (
               <Grid container spacing={2}>
