@@ -1554,11 +1554,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
               tabId: 'sovereignty',
               size: 12,
               customRender: () => (
-                <Alert
-                  severity={
-                    componentsWithSovereigntyValuesCount > 0 ? 'success' : 'warning'
-                  }
-                >
+                <Alert severity={componentsWithSovereigntyValuesCount > 0 ? 'success' : 'warning'}>
                   {t('componentsSovereigntyDataCount', {
                     withValues: componentsWithSovereigntyValuesCount,
                     total: selectedComponents.length,

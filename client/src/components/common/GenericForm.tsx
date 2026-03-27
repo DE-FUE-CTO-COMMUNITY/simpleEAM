@@ -449,10 +449,33 @@ const GenericForm: React.FC<GenericFormProps> = ({
     return `${entity} Details`
   }
 
+  const primaryIdentifierField = React.useMemo(() => {
+    const normalize = (value: string) => value.toLowerCase().replace(/[_\-\s]/g, '')
+    const isIdentifierName = (value: string) => {
+      const normalized = normalize(value)
+      return normalized === 'name' || normalized === 'title'
+    }
+
+    const byName = fields.find(field => isIdentifierName(field.name))
+    if (byName) {
+      return byName
+    }
+
+    return fields.find(field => isIdentifierName(field.label))
+  }, [fields])
+
+  const contentFields = React.useMemo(() => {
+    if (!primaryIdentifierField) {
+      return fields
+    }
+
+    return fields.filter(field => field.name !== primaryIdentifierField.name)
+  }, [fields, primaryIdentifierField])
+
   // Gruppiere Felder nach Tabs oder ohne Tab-Zuordnung
-  const groupFieldsByTab = () => {
+  const groupFieldsByTab = (groupedFields: FieldConfig[]) => {
     if (!tabs || tabs.length === 0) {
-      return { noTab: fields }
+      return { noTab: groupedFields }
     }
 
     const fieldsByTab: Record<string, FieldConfig[]> = {}
@@ -463,7 +486,7 @@ const GenericForm: React.FC<GenericFormProps> = ({
     })
 
     // Füge Felder dem entsprechenden Tab hinzu
-    fields.forEach(field => {
+    groupedFields.forEach(field => {
       if (field.tabId && fieldsByTab[field.tabId]) {
         fieldsByTab[field.tabId].push(field)
       } else if (!field.tabId) {
@@ -478,7 +501,7 @@ const GenericForm: React.FC<GenericFormProps> = ({
     return fieldsByTab
   }
 
-  const fieldsByTab = groupFieldsByTab()
+  const fieldsByTab = groupFieldsByTab(contentFields)
 
   // Rendert ein einzelnes Feld basierend auf dem Feld-Typ
   const renderField = (field: FieldConfig) => {
@@ -1180,6 +1203,18 @@ const GenericForm: React.FC<GenericFormProps> = ({
         <DialogTitle>{getDialogTitle()}</DialogTitle>
         <form onSubmit={handleFormSubmit}>
           <DialogContent>
+            {primaryIdentifierField && (
+              <Box sx={{ mb: 2 }}>
+                <Grid container spacing={2}>
+                  {renderField({
+                    ...primaryIdentifierField,
+                    size: 12,
+                    fullWidth: true,
+                  })}
+                </Grid>
+              </Box>
+            )}
+
             {tabs && tabs.length > 0 ? (
               <>
                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
@@ -1206,7 +1241,7 @@ const GenericForm: React.FC<GenericFormProps> = ({
               </>
             ) : (
               <Grid container spacing={2}>
-                {fields.map(field => renderField(field))}
+                {contentFields.map(field => renderField(field))}
               </Grid>
             )}
 

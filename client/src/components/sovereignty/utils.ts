@@ -143,7 +143,8 @@ function addAssociatedInfrastructure(
       const withSovereigntyValues = parentInfrastructure.find(parent =>
         hasAnySovereigntyAchs(parent)
       )
-      const selected = (withSovereigntyValues ?? parentInfrastructure[0]) as DependencyInfrastructure
+      const selected = (withSovereigntyValues ??
+        parentInfrastructure[0]) as DependencyInfrastructure
 
       if (!selected?.id) {
         return selected
