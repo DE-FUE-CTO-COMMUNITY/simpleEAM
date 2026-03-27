@@ -1555,21 +1555,17 @@ const MATURITY_SCORE: Record<string, number> = {
 }
 
 const REQ_DIMS = [
-  'sovereigntyReqDataResidency',
-  'sovereigntyReqJurisdictionControl',
-  'sovereigntyReqOperationalControl',
-  'sovereigntyReqInteroperability',
-  'sovereigntyReqPortability',
-  'sovereigntyReqSupplyChainTransparency',
+  'sovereigntyReqStrategicAutonomy',
+  'sovereigntyReqResilience',
+  'sovereigntyReqSecurity',
+  'sovereigntyReqControl',
 ] as const
 
 const ACH_DIMS = [
-  'sovereigntyAchDataResidency',
-  'sovereigntyAchJurisdictionControl',
-  'sovereigntyAchOperationalControl',
-  'sovereigntyAchInteroperability',
-  'sovereigntyAchPortability',
-  'sovereigntyAchSupplyChainTransparency',
+  'sovereigntyAchStrategicAutonomy',
+  'sovereigntyAchResilience',
+  'sovereigntyAchSecurity',
+  'sovereigntyAchControl',
 ] as const
 
 const SOVEREIGNTY_BATCH_SIZE = 200
@@ -1594,12 +1590,10 @@ export async function fetchSovereigntyReqEntities(input: {
 }): Promise<SovereigntyEntity[]> {
   const companyFilter = { company: { some: { id: { eq: input.companyId } } } }
   const reqFields = `
-    sovereigntyReqDataResidency
-    sovereigntyReqJurisdictionControl
-    sovereigntyReqOperationalControl
-    sovereigntyReqInteroperability
-    sovereigntyReqPortability
-    sovereigntyReqSupplyChainTransparency
+    sovereigntyReqStrategicAutonomy
+    sovereigntyReqResilience
+    sovereigntyReqSecurity
+    sovereigntyReqControl
     sovereigntyReqWeight
   `
 
@@ -1633,15 +1627,13 @@ export async function fetchSovereigntyAchEntities(input: {
 }): Promise<SovereigntyEntity[]> {
   const companyFilter = { company: { some: { id: { eq: input.companyId } } } }
   const achFields = `
-    sovereigntyAchDataResidency
-    sovereigntyAchJurisdictionControl
-    sovereigntyAchOperationalControl
-    sovereigntyAchInteroperability
-    sovereigntyAchPortability
-    sovereigntyAchSupplyChainTransparency
+    sovereigntyAchStrategicAutonomy
+    sovereigntyAchResilience
+    sovereigntyAchSecurity
+    sovereigntyAchControl
   `
 
-  const [applications, aiComponents, infrastructure, suppliers, interfaces] = await Promise.all([
+  const [applications, aiComponents, infrastructure, suppliers] = await Promise.all([
     fetchAllPages<SovereigntyEntity>(offset =>
       graphqlRequest<{ applications: SovereigntyEntity[] }>({
         query: `query FetchAppAch($where: ApplicationWhere, $limit: Int!, $offset: Int!) {
@@ -1678,18 +1670,9 @@ export async function fetchSovereigntyAchEntities(input: {
         accessToken: input.accessToken,
       }).then(d => d.suppliers)
     ),
-    fetchAllPages<SovereigntyEntity>(offset =>
-      graphqlRequest<{ applicationInterfaces: SovereigntyEntity[] }>({
-        query: `query FetchIntAch($where: ApplicationInterfaceWhere, $limit: Int!, $offset: Int!) {
-          applicationInterfaces(where: $where, limit: $limit, offset: $offset) { ${achFields} }
-        }`,
-        variables: { where: companyFilter, limit: SOVEREIGNTY_BATCH_SIZE, offset },
-        accessToken: input.accessToken,
-      }).then(d => d.applicationInterfaces)
-    ),
   ])
 
-  return [...applications, ...aiComponents, ...infrastructure, ...suppliers, ...interfaces]
+  return [...applications, ...aiComponents, ...infrastructure, ...suppliers]
 }
 
 export async function computeSovereigntyScores(input: {

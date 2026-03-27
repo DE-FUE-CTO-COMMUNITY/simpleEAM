@@ -5,23 +5,16 @@ import { useForm } from '@tanstack/react-form'
 import { useTranslations } from 'next-intl'
 import { z } from 'zod'
 import { useQuery } from '@apollo/client'
-import {
-  ArchitecturePrinciple,
-  PrincipleCategory,
-  PrinciplePriority,
-  SovereigntyMaturity,
-} from '../../gql/generated'
+import { ArchitecturePrinciple, PrincipleCategory, PrinciplePriority } from '../../gql/generated'
 import { GET_PERSONS } from '@/graphql/person'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import { GET_ARCHITECTURES } from '@/graphql/architecture'
 import { GET_APPLICATIONS } from '@/graphql/application'
 import { useCurrentPerson } from '@/hooks/useCurrentPerson'
-import { useFeatureFlags } from '@/lib/feature-flags'
 import GenericForm, { FieldConfig, TabConfig } from '../common/GenericForm'
 import { isArchitect } from '@/lib/auth'
 import { useCategoryLabel, usePriorityLabel } from './utils'
 import { useChipClickHandlers } from '@/hooks/useChipClickHandlers'
-import { buildSovereigntyRequirementFields } from '../common/SovereigntyFields'
 import ArchitectureForm from '../architectures/ArchitectureForm'
 import ApplicationForm from '../applications/ApplicationForm'
 
@@ -45,14 +38,6 @@ const createArchitecturePrincipleSchema = (t: any) =>
     ownerId: z.string().optional(),
     appliedInArchitectureIds: z.array(z.string()).optional(),
     implementedByApplicationIds: z.array(z.string()).optional(),
-    sovereigntyReqDataResidency: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyReqJurisdictionControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyReqOperationalControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyReqInteroperability: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyReqPortability: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyReqSupplyChainTransparency: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyReqWeight: z.number().optional().nullable(),
-    sovereigntyReqRationale: z.string().optional().nullable(),
   })
 
 // TypeScript Typen basierend auf dem Schema
@@ -79,8 +64,6 @@ const ArchitecturePrincipleForm: React.FC<
   const tForm = useTranslations('architecturePrinciples.form')
   const tCommon = useTranslations('common')
   const tForms = useTranslations('forms.validation')
-  const { featureFlags } = useFeatureFlags()
-  const isSovereigntyEnabled = featureFlags.Sovereignty
   const getCategoryLabel = useCategoryLabel()
   const getPriorityLabel = usePriorityLabel()
 
@@ -154,14 +137,6 @@ const ArchitecturePrincipleForm: React.FC<
       ownerId: currentPerson?.id || '',
       appliedInArchitectureIds: [],
       implementedByApplicationIds: [],
-      sovereigntyReqDataResidency: null,
-      sovereigntyReqJurisdictionControl: null,
-      sovereigntyReqOperationalControl: null,
-      sovereigntyReqInteroperability: null,
-      sovereigntyReqPortability: null,
-      sovereigntyReqSupplyChainTransparency: null,
-      sovereigntyReqWeight: null,
-      sovereigntyReqRationale: '',
     }),
     [currentPerson?.id]
   )
@@ -300,15 +275,6 @@ const ArchitecturePrincipleForm: React.FC<
         ownerId: principle.owners && principle.owners.length > 0 ? principle.owners[0].id : '',
         appliedInArchitectureIds: principle.appliedInArchitectures?.map(arch => arch.id) || [],
         implementedByApplicationIds: principle.implementedByApplications?.map(app => app.id) || [],
-        sovereigntyReqDataResidency: principle.sovereigntyReqDataResidency || null,
-        sovereigntyReqJurisdictionControl: principle.sovereigntyReqJurisdictionControl || null,
-        sovereigntyReqOperationalControl: principle.sovereigntyReqOperationalControl || null,
-        sovereigntyReqInteroperability: principle.sovereigntyReqInteroperability || null,
-        sovereigntyReqPortability: principle.sovereigntyReqPortability || null,
-        sovereigntyReqSupplyChainTransparency:
-          principle.sovereigntyReqSupplyChainTransparency || null,
-        sovereigntyReqWeight: principle.sovereigntyReqWeight || null,
-        sovereigntyReqRationale: principle.sovereigntyReqRationale || '',
       }
 
       // Use setValues instead of reset to avoid triggering new re-renders
@@ -326,7 +292,6 @@ const ArchitecturePrincipleForm: React.FC<
   const tabs: TabConfig[] = [
     { id: 'general', label: t('tabs.general') },
     { id: 'relationships', label: t('tabs.relationships') },
-    ...(isSovereigntyEnabled ? [{ id: 'sovereignty', label: tCommon('sovereignty.tab') }] : []),
   ]
 
   // Field configuration for the generic form
@@ -481,13 +446,7 @@ const ArchitecturePrincipleForm: React.FC<
   ]
 
   // Combine all fields
-  const fields: FieldConfig[] = [
-    ...generalFields,
-    ...relationshipFields,
-    ...(isSovereigntyEnabled
-      ? buildSovereigntyRequirementFields((key: string) => tCommon(key as any))
-      : []),
-  ]
+  const fields: FieldConfig[] = [...generalFields, ...relationshipFields]
 
   // Provide default values for optional props
   const formMode = mode || 'view'

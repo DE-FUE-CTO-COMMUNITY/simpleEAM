@@ -26,13 +26,11 @@ export const GET_INFRASTRUCTURES = gql`
       id
       name
       description
-      sovereigntyAchDataResidency
-      sovereigntyAchJurisdictionControl
-      sovereigntyAchOperationalControl
-      sovereigntyAchInteroperability
-      sovereigntyAchPortability
-      sovereigntyAchSupplyChainTransparency
-      sovereigntyEvidence
+      sovereigntyAchStrategicAutonomy
+      sovereigntyAchResilience
+      sovereigntyAchSecurity
+      sovereigntyAchControl
+      sovereigntyAchStrategicAutonomyEvidence
       lastSovereigntyAssessmentAt
       infrastructureType
       status
@@ -57,13 +55,11 @@ export const GET_INFRASTRUCTURES = gql`
       parentInfrastructure {
         id
         name
-        sovereigntyAchDataResidency
-        sovereigntyAchJurisdictionControl
-        sovereigntyAchOperationalControl
-        sovereigntyAchInteroperability
-        sovereigntyAchPortability
-        sovereigntyAchSupplyChainTransparency
-        sovereigntyEvidence
+        sovereigntyAchStrategicAutonomy
+        sovereigntyAchResilience
+        sovereigntyAchSecurity
+        sovereigntyAchControl
+        sovereigntyAchStrategicAutonomyEvidence
         lastSovereigntyAssessmentAt
       }
       childInfrastructures {
@@ -116,13 +112,11 @@ export const GET_INFRASTRUCTURE = gql`
       id
       name
       description
-      sovereigntyAchDataResidency
-      sovereigntyAchJurisdictionControl
-      sovereigntyAchOperationalControl
-      sovereigntyAchInteroperability
-      sovereigntyAchPortability
-      sovereigntyAchSupplyChainTransparency
-      sovereigntyEvidence
+      sovereigntyAchStrategicAutonomy
+      sovereigntyAchResilience
+      sovereigntyAchSecurity
+      sovereigntyAchControl
+      sovereigntyAchStrategicAutonomyEvidence
       lastSovereigntyAssessmentAt
       infrastructureType
       status
@@ -199,13 +193,11 @@ export const CREATE_INFRASTRUCTURE = gql`
         id
         name
         description
-        sovereigntyAchDataResidency
-        sovereigntyAchJurisdictionControl
-        sovereigntyAchOperationalControl
-        sovereigntyAchInteroperability
-        sovereigntyAchPortability
-        sovereigntyAchSupplyChainTransparency
-        sovereigntyEvidence
+        sovereigntyAchStrategicAutonomy
+        sovereigntyAchResilience
+        sovereigntyAchSecurity
+        sovereigntyAchControl
+        sovereigntyAchStrategicAutonomyEvidence
         lastSovereigntyAssessmentAt
         infrastructureType
         status
@@ -271,13 +263,11 @@ export const UPDATE_INFRASTRUCTURE = gql`
         id
         name
         description
-        sovereigntyAchDataResidency
-        sovereigntyAchJurisdictionControl
-        sovereigntyAchOperationalControl
-        sovereigntyAchInteroperability
-        sovereigntyAchPortability
-        sovereigntyAchSupplyChainTransparency
-        sovereigntyEvidence
+        sovereigntyAchStrategicAutonomy
+        sovereigntyAchResilience
+        sovereigntyAchSecurity
+        sovereigntyAchControl
+        sovereigntyAchStrategicAutonomyEvidence
         lastSovereigntyAssessmentAt
         infrastructureType
         status

@@ -339,14 +339,11 @@ const AicomponentTableWithGenericTable: React.FC<AicomponentTableProps> = ({
       provider: aicomponent.provider ?? '',
       license: aicomponent.license ?? '',
       costs: aicomponent.costs ?? undefined,
-      sovereigntyAchDataResidency: aicomponent.sovereigntyAchDataResidency ?? null,
-      sovereigntyAchJurisdictionControl: aicomponent.sovereigntyAchJurisdictionControl ?? null,
-      sovereigntyAchOperationalControl: aicomponent.sovereigntyAchOperationalControl ?? null,
-      sovereigntyAchInteroperability: aicomponent.sovereigntyAchInteroperability ?? null,
-      sovereigntyAchPortability: aicomponent.sovereigntyAchPortability ?? null,
-      sovereigntyAchSupplyChainTransparency:
-        aicomponent.sovereigntyAchSupplyChainTransparency ?? null,
-      sovereigntyEvidence: aicomponent.sovereigntyEvidence ?? '',
+      sovereigntyAchStrategicAutonomy: aicomponent.sovereigntyAchStrategicAutonomy ?? null,
+      sovereigntyAchResilience: aicomponent.sovereigntyAchResilience ?? null,
+      sovereigntyAchSecurity: aicomponent.sovereigntyAchSecurity ?? null,
+      sovereigntyAchControl: aicomponent.sovereigntyAchControl ?? null,
+      sovereigntyAchStrategicAutonomyEvidence: aicomponent.sovereigntyAchStrategicAutonomyEvidence ?? '',
       lastSovereigntyAssessmentAt: aicomponent.lastSovereigntyAssessmentAt
         ? new Date(aicomponent.lastSovereigntyAssessmentAt)
         : null,

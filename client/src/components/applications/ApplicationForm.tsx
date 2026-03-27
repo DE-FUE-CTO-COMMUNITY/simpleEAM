@@ -99,13 +99,11 @@ const createBaseApplicationSchema = (t: any) =>
     maintainedByIds: z.array(z.string()).optional(),
     timeCategory: z.nativeEnum(TimeCategory).optional().nullable().or(z.literal('')),
     sevenRStrategy: z.nativeEnum(SevenRStrategy).optional().nullable().or(z.literal('')),
-    sovereigntyAchDataResidency: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyAchJurisdictionControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyAchOperationalControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyAchInteroperability: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyAchPortability: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyAchSupplyChainTransparency: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyEvidence: z.string().optional().nullable(),
+    sovereigntyAchStrategicAutonomy: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyAchResilience: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyAchSecurity: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyAchControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyAchStrategicAutonomyEvidence: z.string().optional().nullable(),
     lastSovereigntyAssessmentAt: z.date().optional().nullable(),
   })
 
@@ -530,7 +528,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
           }
           depictedInDiagrams {
             id
-            name
+            title
           }
           parents {
             id
@@ -618,14 +616,12 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     maintainedByIds: application?.maintainedBy?.map((supplier: any) => supplier.id) ?? [],
     timeCategory: application?.timeCategory ?? null,
     sevenRStrategy: application?.sevenRStrategy ?? null,
-    sovereigntyAchDataResidency: application?.sovereigntyAchDataResidency ?? null,
-    sovereigntyAchJurisdictionControl: application?.sovereigntyAchJurisdictionControl ?? null,
-    sovereigntyAchOperationalControl: application?.sovereigntyAchOperationalControl ?? null,
-    sovereigntyAchInteroperability: application?.sovereigntyAchInteroperability ?? null,
-    sovereigntyAchPortability: application?.sovereigntyAchPortability ?? null,
-    sovereigntyAchSupplyChainTransparency:
-      application?.sovereigntyAchSupplyChainTransparency ?? null,
-    sovereigntyEvidence: application?.sovereigntyEvidence ?? '',
+    sovereigntyAchStrategicAutonomy: application?.sovereigntyAchStrategicAutonomy ?? null,
+    sovereigntyAchResilience: application?.sovereigntyAchResilience ?? null,
+    sovereigntyAchSecurity: application?.sovereigntyAchSecurity ?? null,
+    sovereigntyAchControl: application?.sovereigntyAchControl ?? null,
+    sovereigntyAchStrategicAutonomyEvidence:
+      application?.sovereigntyAchStrategicAutonomyEvidence ?? '',
     lastSovereigntyAssessmentAt: application?.lastSovereigntyAssessmentAt
       ? new Date(application.lastSovereigntyAssessmentAt)
       : new Date(),
@@ -723,14 +719,12 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
         maintainedByIds: application?.maintainedBy?.map((supplier: any) => supplier.id) ?? [],
         timeCategory: application?.timeCategory ?? null,
         sevenRStrategy: application?.sevenRStrategy ?? null,
-        sovereigntyAchDataResidency: application?.sovereigntyAchDataResidency ?? null,
-        sovereigntyAchJurisdictionControl: application?.sovereigntyAchJurisdictionControl ?? null,
-        sovereigntyAchOperationalControl: application?.sovereigntyAchOperationalControl ?? null,
-        sovereigntyAchInteroperability: application?.sovereigntyAchInteroperability ?? null,
-        sovereigntyAchPortability: application?.sovereigntyAchPortability ?? null,
-        sovereigntyAchSupplyChainTransparency:
-          application?.sovereigntyAchSupplyChainTransparency ?? null,
-        sovereigntyEvidence: application?.sovereigntyEvidence ?? '',
+        sovereigntyAchStrategicAutonomy: application?.sovereigntyAchStrategicAutonomy ?? null,
+        sovereigntyAchResilience: application?.sovereigntyAchResilience ?? null,
+        sovereigntyAchSecurity: application?.sovereigntyAchSecurity ?? null,
+        sovereigntyAchControl: application?.sovereigntyAchControl ?? null,
+        sovereigntyAchStrategicAutonomyEvidence:
+          application?.sovereigntyAchStrategicAutonomyEvidence ?? '',
         lastSovereigntyAssessmentAt: application?.lastSovereigntyAssessmentAt
           ? new Date(application.lastSovereigntyAssessmentAt)
           : new Date(),

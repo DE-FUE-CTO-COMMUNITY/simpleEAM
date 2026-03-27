@@ -17,14 +17,12 @@ export type Capability = Pick<
   | 'parents'
   | 'supportedByApplications'
   | 'partOfArchitectures'
-  | 'sovereigntyReqDataResidency'
-  | 'sovereigntyReqJurisdictionControl'
-  | 'sovereigntyReqOperationalControl'
-  | 'sovereigntyReqInteroperability'
-  | 'sovereigntyReqPortability'
-  | 'sovereigntyReqSupplyChainTransparency'
+  | 'sovereigntyReqStrategicAutonomy'
+  | 'sovereigntyReqResilience'
+  | 'sovereigntyReqSecurity'
+  | 'sovereigntyReqControl'
   | 'sovereigntyReqWeight'
-  | 'sovereigntyReqRationale'
+  | 'sovereigntyReqStrategicAutonomyRationale'
 >
 
 export interface FilterState {

@@ -19,7 +19,6 @@ import { GET_DIAGRAMS } from '@/graphql/diagram'
 import { GET_APPLICATION_INTERFACES } from '@/graphql/applicationInterface'
 import { GET_DATA_OBJECTS } from '@/graphql/dataObject'
 import { useCurrentPerson } from '@/hooks/useCurrentPerson'
-import { useFeatureFlags } from '@/lib/feature-flags'
 import {
   ApplicationInterface,
   InterfaceType,
@@ -27,13 +26,11 @@ import {
   InterfaceStatus,
   Application,
   Person,
-  SovereigntyMaturity,
 } from '../../gql/generated'
 import GenericForm, { FieldConfig } from '../common/GenericForm'
 import { isArchitect } from '@/lib/auth'
 import { DataObject } from '@/gql/generated'
 import { useChipClickHandlers } from '@/hooks/useChipClickHandlers'
-import { buildSovereigntyAchievedFields } from '../common/SovereigntyFields'
 import ApplicationForm from '../applications/ApplicationForm'
 import DataObjectForm from '../dataobjects/DataObjectForm'
 import ArchitectureForm from '../architectures/ArchitectureForm'
@@ -64,14 +61,6 @@ const createBaseApplicationInterfaceSchema = (t: any) =>
     depictedInDiagrams: z.array(z.string()).optional(),
     predecessorIds: z.array(z.string()).optional(),
     successorIds: z.array(z.string()).optional(),
-    sovereigntyAchDataResidency: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyAchJurisdictionControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyAchOperationalControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyAchInteroperability: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyAchPortability: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyAchSupplyChainTransparency: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyEvidence: z.string().optional().nullable(),
-    lastSovereigntyAssessmentAt: z.date().optional().nullable(),
   })
 
 // Extended schema factory function with lifecycle logic
@@ -202,9 +191,6 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
   const tTabs = useTranslations('interfaces.tabs')
   const tTypes = useTranslations('interfaces.interfaceTypes')
   const tStatuses = useTranslations('interfaces.statuses')
-  const tCommon = useTranslations('common')
-  const { featureFlags } = useFeatureFlags()
-  const isSovereigntyEnabled = featureFlags.Sovereignty
 
   const [nestedFormState, setNestedFormState] = useState<{
     isOpen: boolean
@@ -289,7 +275,6 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
     { id: 'lifecycle', label: tTabs('lifecycle') },
     { id: 'relationships', label: tTabs('relationships') },
     { id: 'architectures', label: tTabs('architectures') },
-    ...(isSovereigntyEnabled ? [{ id: 'sovereignty', label: tCommon('sovereignty.tab') }] : []),
   ]
 
   // Load data with cache-and-network policy for fresh data
@@ -379,19 +364,6 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       depictedInDiagrams: applicationInterface?.depictedInDiagrams?.map(diag => diag.id) || [],
       predecessorIds: applicationInterface?.predecessors?.map(pred => pred.id) || [],
       successorIds: applicationInterface?.successors?.map(succ => succ.id) || [],
-      sovereigntyAchDataResidency: applicationInterface?.sovereigntyAchDataResidency || null,
-      sovereigntyAchJurisdictionControl:
-        applicationInterface?.sovereigntyAchJurisdictionControl || null,
-      sovereigntyAchOperationalControl:
-        applicationInterface?.sovereigntyAchOperationalControl || null,
-      sovereigntyAchInteroperability: applicationInterface?.sovereigntyAchInteroperability || null,
-      sovereigntyAchPortability: applicationInterface?.sovereigntyAchPortability || null,
-      sovereigntyAchSupplyChainTransparency:
-        applicationInterface?.sovereigntyAchSupplyChainTransparency || null,
-      sovereigntyEvidence: applicationInterface?.sovereigntyEvidence || '',
-      lastSovereigntyAssessmentAt: applicationInterface?.lastSovereigntyAssessmentAt
-        ? new Date(applicationInterface.lastSovereigntyAssessmentAt)
-        : null,
     }),
     [applicationInterface, currentPerson?.id]
   )
@@ -466,19 +438,6 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
         depictedInDiagrams: applicationInterface.depictedInDiagrams?.map(diag => diag.id) || [],
         predecessorIds: applicationInterface.predecessors?.map(iface => iface.id) || [],
         successorIds: applicationInterface.successors?.map(iface => iface.id) || [],
-        sovereigntyAchDataResidency: applicationInterface.sovereigntyAchDataResidency ?? null,
-        sovereigntyAchJurisdictionControl:
-          applicationInterface.sovereigntyAchJurisdictionControl ?? null,
-        sovereigntyAchOperationalControl:
-          applicationInterface.sovereigntyAchOperationalControl ?? null,
-        sovereigntyAchInteroperability: applicationInterface.sovereigntyAchInteroperability ?? null,
-        sovereigntyAchPortability: applicationInterface.sovereigntyAchPortability ?? null,
-        sovereigntyAchSupplyChainTransparency:
-          applicationInterface.sovereigntyAchSupplyChainTransparency ?? null,
-        sovereigntyEvidence: applicationInterface.sovereigntyEvidence ?? '',
-        lastSovereigntyAssessmentAt: applicationInterface.lastSovereigntyAssessmentAt
-          ? new Date(applicationInterface.lastSovereigntyAssessmentAt)
-          : null,
       }
 
       // Reset form with values from existing interface
@@ -848,9 +807,6 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       },
       onChipClick: createChipClickHandler('depictedInDiagrams'),
     },
-    ...(isSovereigntyEnabled
-      ? buildSovereigntyAchievedFields((key: string) => tCommon(key as any))
-      : []),
   ]
 
   return (

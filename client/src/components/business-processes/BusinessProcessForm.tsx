@@ -36,14 +36,12 @@ const createBusinessProcessSchema = (t: any) =>
     supportedByApplicationIds: z.array(z.string()).optional(),
     partOfArchitectures: z.array(z.string()).optional(),
     depictedInDiagrams: z.array(z.string()).optional(),
-    sovereigntyReqDataResidency: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyReqJurisdictionControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyReqOperationalControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyReqInteroperability: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyReqPortability: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyReqSupplyChainTransparency: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyReqStrategicAutonomy: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyReqResilience: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyReqSecurity: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyReqControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
     sovereigntyReqWeight: z.number().optional().nullable(),
-    sovereigntyReqRationale: z.string().optional().nullable(),
+    sovereigntyReqStrategicAutonomyRationale: z.string().optional().nullable(),
   })
 
 type BusinessProcessFormProps = GenericFormProps<BusinessProcessType, BusinessProcessFormValues>
@@ -124,15 +122,12 @@ const BusinessProcessForm: React.FC<BusinessProcessFormProps> = ({
       partOfArchitectures:
         businessProcess?.partOfArchitectures?.map(architecture => architecture.id) || [],
       depictedInDiagrams: businessProcess?.depictedInDiagrams?.map(diagram => diagram.id) || [],
-      sovereigntyReqDataResidency: businessProcess?.sovereigntyReqDataResidency || null,
-      sovereigntyReqJurisdictionControl: businessProcess?.sovereigntyReqJurisdictionControl || null,
-      sovereigntyReqOperationalControl: businessProcess?.sovereigntyReqOperationalControl || null,
-      sovereigntyReqInteroperability: businessProcess?.sovereigntyReqInteroperability || null,
-      sovereigntyReqPortability: businessProcess?.sovereigntyReqPortability || null,
-      sovereigntyReqSupplyChainTransparency:
-        businessProcess?.sovereigntyReqSupplyChainTransparency || null,
+      sovereigntyReqStrategicAutonomy: businessProcess?.sovereigntyReqStrategicAutonomy || null,
+      sovereigntyReqResilience: businessProcess?.sovereigntyReqResilience || null,
+      sovereigntyReqSecurity: businessProcess?.sovereigntyReqSecurity || null,
+      sovereigntyReqControl: businessProcess?.sovereigntyReqControl || null,
       sovereigntyReqWeight: businessProcess?.sovereigntyReqWeight || null,
-      sovereigntyReqRationale: businessProcess?.sovereigntyReqRationale || '',
+      sovereigntyReqStrategicAutonomyRationale: businessProcess?.sovereigntyReqStrategicAutonomyRationale || '',
     }),
     [businessProcess, currentPerson?.id]
   )

@@ -58,14 +58,12 @@ const createBaseDataObjectSchema = (t: any) =>
     ownerId: z.string().optional(),
     partOfArchitectures: z.array(z.string()).optional(),
     depictedInDiagrams: z.array(z.string()).optional(),
-    sovereigntyReqDataResidency: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyReqJurisdictionControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyReqOperationalControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyReqInteroperability: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyReqPortability: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyReqSupplyChainTransparency: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyReqStrategicAutonomy: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyReqResilience: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyReqSecurity: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyReqControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
     sovereigntyReqWeight: z.number().optional().nullable(),
-    sovereigntyReqRationale: z.string().optional().nullable(),
+    sovereigntyReqStrategicAutonomyRationale: z.string().optional().nullable(),
   })
 
 // Schema factory function for form validation with extended validations
@@ -259,15 +257,12 @@ const DataObjectForm: React.FC<GenericFormProps<DataObject, DataObjectFormValues
           : currentPerson?.id,
       partOfArchitectures: dataObject?.partOfArchitectures?.map(arch => arch.id) || [],
       depictedInDiagrams: dataObject?.depictedInDiagrams?.map(diag => diag.id) || [],
-      sovereigntyReqDataResidency: dataObject?.sovereigntyReqDataResidency || null,
-      sovereigntyReqJurisdictionControl: dataObject?.sovereigntyReqJurisdictionControl || null,
-      sovereigntyReqOperationalControl: dataObject?.sovereigntyReqOperationalControl || null,
-      sovereigntyReqInteroperability: dataObject?.sovereigntyReqInteroperability || null,
-      sovereigntyReqPortability: dataObject?.sovereigntyReqPortability || null,
-      sovereigntyReqSupplyChainTransparency:
-        dataObject?.sovereigntyReqSupplyChainTransparency || null,
+      sovereigntyReqStrategicAutonomy: dataObject?.sovereigntyReqStrategicAutonomy || null,
+      sovereigntyReqResilience: dataObject?.sovereigntyReqResilience || null,
+      sovereigntyReqSecurity: dataObject?.sovereigntyReqSecurity || null,
+      sovereigntyReqControl: dataObject?.sovereigntyReqControl || null,
       sovereigntyReqWeight: dataObject?.sovereigntyReqWeight ?? 1,
-      sovereigntyReqRationale: dataObject?.sovereigntyReqRationale || '',
+      sovereigntyReqStrategicAutonomyRationale: dataObject?.sovereigntyReqStrategicAutonomyRationale || '',
     }),
     [dataObject, currentPerson?.id]
   )
@@ -323,15 +318,12 @@ const DataObjectForm: React.FC<GenericFormProps<DataObject, DataObjectFormValues
           dataObject.owners && dataObject.owners.length > 0 ? dataObject.owners[0].id : undefined,
         partOfArchitectures: dataObject.partOfArchitectures?.map(arch => arch.id) ?? [],
         depictedInDiagrams: dataObject.depictedInDiagrams?.map(diagram => diagram.id) ?? [],
-        sovereigntyReqDataResidency: dataObject.sovereigntyReqDataResidency ?? null,
-        sovereigntyReqJurisdictionControl: dataObject.sovereigntyReqJurisdictionControl ?? null,
-        sovereigntyReqOperationalControl: dataObject.sovereigntyReqOperationalControl ?? null,
-        sovereigntyReqInteroperability: dataObject.sovereigntyReqInteroperability ?? null,
-        sovereigntyReqPortability: dataObject.sovereigntyReqPortability ?? null,
-        sovereigntyReqSupplyChainTransparency:
-          dataObject.sovereigntyReqSupplyChainTransparency ?? null,
+        sovereigntyReqStrategicAutonomy: dataObject.sovereigntyReqStrategicAutonomy ?? null,
+        sovereigntyReqResilience: dataObject.sovereigntyReqResilience ?? null,
+        sovereigntyReqSecurity: dataObject.sovereigntyReqSecurity ?? null,
+        sovereigntyReqControl: dataObject.sovereigntyReqControl ?? null,
         sovereigntyReqWeight: dataObject.sovereigntyReqWeight ?? null,
-        sovereigntyReqRationale: dataObject.sovereigntyReqRationale ?? '',
+        sovereigntyReqStrategicAutonomyRationale: dataObject.sovereigntyReqStrategicAutonomyRationale ?? '',
       }
 
       // Reset form with values from existing DataObject

@@ -26,13 +26,11 @@ export const GET_APPLICATIONS = gql`
       id
       name
       description
-      sovereigntyAchDataResidency
-      sovereigntyAchJurisdictionControl
-      sovereigntyAchOperationalControl
-      sovereigntyAchInteroperability
-      sovereigntyAchPortability
-      sovereigntyAchSupplyChainTransparency
-      sovereigntyEvidence
+      sovereigntyAchStrategicAutonomy
+      sovereigntyAchResilience
+      sovereigntyAchSecurity
+      sovereigntyAchControl
+      sovereigntyAchStrategicAutonomyEvidence
       lastSovereigntyAssessmentAt
       status
       criticality
@@ -136,13 +134,11 @@ export const GET_APPLICATION = gql`
       id
       name
       description
-      sovereigntyAchDataResidency
-      sovereigntyAchJurisdictionControl
-      sovereigntyAchOperationalControl
-      sovereigntyAchInteroperability
-      sovereigntyAchPortability
-      sovereigntyAchSupplyChainTransparency
-      sovereigntyEvidence
+      sovereigntyAchStrategicAutonomy
+      sovereigntyAchResilience
+      sovereigntyAchSecurity
+      sovereigntyAchControl
+      sovereigntyAchStrategicAutonomyEvidence
       lastSovereigntyAssessmentAt
       status
       criticality
@@ -247,13 +243,11 @@ export const CREATE_APPLICATION = gql`
         id
         name
         description
-        sovereigntyAchDataResidency
-        sovereigntyAchJurisdictionControl
-        sovereigntyAchOperationalControl
-        sovereigntyAchInteroperability
-        sovereigntyAchPortability
-        sovereigntyAchSupplyChainTransparency
-        sovereigntyEvidence
+        sovereigntyAchStrategicAutonomy
+        sovereigntyAchResilience
+        sovereigntyAchSecurity
+        sovereigntyAchControl
+        sovereigntyAchStrategicAutonomyEvidence
         lastSovereigntyAssessmentAt
         status
         criticality
@@ -309,13 +303,11 @@ export const UPDATE_APPLICATION = gql`
         id
         name
         description
-        sovereigntyAchDataResidency
-        sovereigntyAchJurisdictionControl
-        sovereigntyAchOperationalControl
-        sovereigntyAchInteroperability
-        sovereigntyAchPortability
-        sovereigntyAchSupplyChainTransparency
-        sovereigntyEvidence
+        sovereigntyAchStrategicAutonomy
+        sovereigntyAchResilience
+        sovereigntyAchSecurity
+        sovereigntyAchControl
+        sovereigntyAchStrategicAutonomyEvidence
         lastSovereigntyAssessmentAt
         status
         criticality

@@ -9,13 +9,11 @@ export const GET_Aicomponents = gql`
       id
       name
       description
-      sovereigntyAchDataResidency
-      sovereigntyAchJurisdictionControl
-      sovereigntyAchOperationalControl
-      sovereigntyAchInteroperability
-      sovereigntyAchPortability
-      sovereigntyAchSupplyChainTransparency
-      sovereigntyEvidence
+      sovereigntyAchStrategicAutonomy
+      sovereigntyAchResilience
+      sovereigntyAchSecurity
+      sovereigntyAchControl
+      sovereigntyAchStrategicAutonomyEvidence
       lastSovereigntyAssessmentAt
       aiType
       model
@@ -90,13 +88,11 @@ export const GET_Aicomponent = gql`
       id
       name
       description
-      sovereigntyAchDataResidency
-      sovereigntyAchJurisdictionControl
-      sovereigntyAchOperationalControl
-      sovereigntyAchInteroperability
-      sovereigntyAchPortability
-      sovereigntyAchSupplyChainTransparency
-      sovereigntyEvidence
+      sovereigntyAchStrategicAutonomy
+      sovereigntyAchResilience
+      sovereigntyAchSecurity
+      sovereigntyAchControl
+      sovereigntyAchStrategicAutonomyEvidence
       lastSovereigntyAssessmentAt
       aiType
       model
@@ -172,13 +168,11 @@ export const CREATE_Aicomponent = gql`
         id
         name
         description
-        sovereigntyAchDataResidency
-        sovereigntyAchJurisdictionControl
-        sovereigntyAchOperationalControl
-        sovereigntyAchInteroperability
-        sovereigntyAchPortability
-        sovereigntyAchSupplyChainTransparency
-        sovereigntyEvidence
+        sovereigntyAchStrategicAutonomy
+        sovereigntyAchResilience
+        sovereigntyAchSecurity
+        sovereigntyAchControl
+        sovereigntyAchStrategicAutonomyEvidence
         lastSovereigntyAssessmentAt
         aiType
         model
@@ -255,13 +249,11 @@ export const UPDATE_Aicomponent = gql`
         id
         name
         description
-        sovereigntyAchDataResidency
-        sovereigntyAchJurisdictionControl
-        sovereigntyAchOperationalControl
-        sovereigntyAchInteroperability
-        sovereigntyAchPortability
-        sovereigntyAchSupplyChainTransparency
-        sovereigntyEvidence
+        sovereigntyAchStrategicAutonomy
+        sovereigntyAchResilience
+        sovereigntyAchSecurity
+        sovereigntyAchControl
+        sovereigntyAchStrategicAutonomyEvidence
         lastSovereigntyAssessmentAt
         aiType
         model

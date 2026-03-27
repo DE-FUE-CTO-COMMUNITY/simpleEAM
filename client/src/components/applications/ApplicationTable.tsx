@@ -438,13 +438,11 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
       supportsCapabilityIds: app.supportsCapabilities?.map(cap => cap.id) ?? [],
       timeCategory: app.timeCategory ?? null,
       sevenRStrategy: app.sevenRStrategy ?? null,
-      sovereigntyAchDataResidency: app.sovereigntyAchDataResidency ?? null,
-      sovereigntyAchJurisdictionControl: app.sovereigntyAchJurisdictionControl ?? null,
-      sovereigntyAchOperationalControl: app.sovereigntyAchOperationalControl ?? null,
-      sovereigntyAchInteroperability: app.sovereigntyAchInteroperability ?? null,
-      sovereigntyAchPortability: app.sovereigntyAchPortability ?? null,
-      sovereigntyAchSupplyChainTransparency: app.sovereigntyAchSupplyChainTransparency ?? null,
-      sovereigntyEvidence: app.sovereigntyEvidence ?? '',
+      sovereigntyAchStrategicAutonomy: app.sovereigntyAchStrategicAutonomy ?? null,
+      sovereigntyAchResilience: app.sovereigntyAchResilience ?? null,
+      sovereigntyAchSecurity: app.sovereigntyAchSecurity ?? null,
+      sovereigntyAchControl: app.sovereigntyAchControl ?? null,
+      sovereigntyAchStrategicAutonomyEvidence: app.sovereigntyAchStrategicAutonomyEvidence ?? '',
       lastSovereigntyAssessmentAt: app.lastSovereigntyAssessmentAt
         ? new Date(app.lastSovereigntyAssessmentAt)
         : null,

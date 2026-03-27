@@ -1,11 +1,12 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Box, Card, CardContent, Tab, Tabs, Typography } from '@mui/material'
 import { useTranslations } from 'next-intl'
 import { useFeatureFlags } from '@/lib/feature-flags'
 import { useAuth } from '@/lib/auth'
+import { useCompanyContext } from '@/contexts/CompanyContext'
 import SovereigntyCapabilityView from '@/components/sovereignty/SovereigntyCapabilityView'
 import SovereigntyDataView from '@/components/sovereignty/SovereigntyDataView'
 import SovereigntyEntityDialog from '@/components/sovereignty/SovereigntyEntityDialog'
@@ -17,16 +18,39 @@ export default function SovereigntyDetailPage() {
   const { authenticated, initialized } = useAuth()
   const t = useTranslations('sovereigntyDetail')
   const { featureFlags } = useFeatureFlags()
+  const { selectedCompany, loading: companyLoading } = useCompanyContext()
   const router = useRouter()
   const [activeView, setActiveView] = useState<ViewType>('capabilities')
   const [selectedEntity, setSelectedEntity] = useState<EntityRef | null>(null)
 
-  if (!initialized || !authenticated) {
+  useEffect(() => {
+    if (
+      initialized &&
+      authenticated &&
+      !companyLoading &&
+      !!selectedCompany &&
+      !featureFlags.Sovereignty
+    ) {
+      router.replace('/')
+    }
+  }, [
+    initialized,
+    authenticated,
+    companyLoading,
+    selectedCompany,
+    featureFlags.Sovereignty,
+    router,
+  ])
+
+  if (!initialized || !authenticated || companyLoading) {
+    return null
+  }
+
+  if (!selectedCompany) {
     return null
   }
 
   if (!featureFlags.Sovereignty) {
-    router.replace('/')
     return null
   }
 

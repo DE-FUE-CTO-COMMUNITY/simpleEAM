@@ -50,14 +50,15 @@ type BusinessCapability
   businessValue: Int
   sequenceNumber: Int
   tags: [String!]
-  sovereigntyReqDataResidency: SovereigntyMaturity
-  sovereigntyReqJurisdictionControl: SovereigntyMaturity
-  sovereigntyReqOperationalControl: SovereigntyMaturity
-  sovereigntyReqInteroperability: SovereigntyMaturity
-  sovereigntyReqPortability: SovereigntyMaturity
-  sovereigntyReqSupplyChainTransparency: SovereigntyMaturity
+  sovereigntyReqStrategicAutonomy: SovereigntyMaturity
+  sovereigntyReqStrategicAutonomyRationale: String
+  sovereigntyReqResilience: SovereigntyMaturity
+  sovereigntyReqResilienceRationale: String
+  sovereigntyReqSecurity: SovereigntyMaturity
+  sovereigntyReqSecurityRationale: String
+  sovereigntyReqControl: SovereigntyMaturity
+  sovereigntyReqControlRationale: String
   sovereigntyReqWeight: Float
-  sovereigntyReqRationale: String
   introductionDate: Date
   endDate: Date
   createdAt: DateTime! @timestamp(operations: [CREATE])
@@ -113,14 +114,15 @@ type BusinessProcess
   maturityLevel: Int
   category: String
   tags: [String!]
-  sovereigntyReqDataResidency: SovereigntyMaturity
-  sovereigntyReqJurisdictionControl: SovereigntyMaturity
-  sovereigntyReqOperationalControl: SovereigntyMaturity
-  sovereigntyReqInteroperability: SovereigntyMaturity
-  sovereigntyReqPortability: SovereigntyMaturity
-  sovereigntyReqSupplyChainTransparency: SovereigntyMaturity
+  sovereigntyReqStrategicAutonomy: SovereigntyMaturity
+  sovereigntyReqStrategicAutonomyRationale: String
+  sovereigntyReqResilience: SovereigntyMaturity
+  sovereigntyReqResilienceRationale: String
+  sovereigntyReqSecurity: SovereigntyMaturity
+  sovereigntyReqSecurityRationale: String
+  sovereigntyReqControl: SovereigntyMaturity
+  sovereigntyReqControlRationale: String
   sovereigntyReqWeight: Float
-  sovereigntyReqRationale: String
   bpmnXml: String
   createdAt: DateTime! @timestamp(operations: [CREATE])
   updatedAt: DateTime @timestamp(operations: [UPDATE])
@@ -534,13 +536,14 @@ type Supplier
   strategicImportance: StrategicImportance
   performanceRating: Int
   complianceCertifications: [String!]
-  sovereigntyAchDataResidency: SovereigntyMaturity
-  sovereigntyAchJurisdictionControl: SovereigntyMaturity
-  sovereigntyAchOperationalControl: SovereigntyMaturity
-  sovereigntyAchInteroperability: SovereigntyMaturity
-  sovereigntyAchPortability: SovereigntyMaturity
-  sovereigntyAchSupplyChainTransparency: SovereigntyMaturity
-  sovereigntyEvidence: String
+  sovereigntyAchStrategicAutonomy: SovereigntyMaturity
+  sovereigntyAchStrategicAutonomyEvidence: String
+  sovereigntyAchResilience: SovereigntyMaturity
+  sovereigntyAchResilienceEvidence: String
+  sovereigntyAchSecurity: SovereigntyMaturity
+  sovereigntyAchSecurityEvidence: String
+  sovereigntyAchControl: SovereigntyMaturity
+  sovereigntyAchControlEvidence: String
   lastSovereigntyAssessmentAt: DateTime
   tags: [String!]
   createdAt: DateTime! @timestamp(operations: [CREATE])
@@ -607,13 +610,14 @@ type Application
   vendor: String
   sbom: String
   costs: Float
-  sovereigntyAchDataResidency: SovereigntyMaturity
-  sovereigntyAchJurisdictionControl: SovereigntyMaturity
-  sovereigntyAchOperationalControl: SovereigntyMaturity
-  sovereigntyAchInteroperability: SovereigntyMaturity
-  sovereigntyAchPortability: SovereigntyMaturity
-  sovereigntyAchSupplyChainTransparency: SovereigntyMaturity
-  sovereigntyEvidence: String
+  sovereigntyAchStrategicAutonomy: SovereigntyMaturity
+  sovereigntyAchStrategicAutonomyEvidence: String
+  sovereigntyAchResilience: SovereigntyMaturity
+  sovereigntyAchResilienceEvidence: String
+  sovereigntyAchSecurity: SovereigntyMaturity
+  sovereigntyAchSecurityEvidence: String
+  sovereigntyAchControl: SovereigntyMaturity
+  sovereigntyAchControlEvidence: String
   lastSovereigntyAssessmentAt: DateTime
   introductionDate: Date
   endOfLifeDate: Date
@@ -687,14 +691,6 @@ type ApplicationInterface
   protocol: InterfaceProtocol
   version: String
   status: InterfaceStatus!
-  sovereigntyAchDataResidency: SovereigntyMaturity
-  sovereigntyAchJurisdictionControl: SovereigntyMaturity
-  sovereigntyAchOperationalControl: SovereigntyMaturity
-  sovereigntyAchInteroperability: SovereigntyMaturity
-  sovereigntyAchPortability: SovereigntyMaturity
-  sovereigntyAchSupplyChainTransparency: SovereigntyMaturity
-  sovereigntyEvidence: String
-  lastSovereigntyAssessmentAt: DateTime
   introductionDate: Date
   endOfLifeDate: Date
   planningDate: Date
@@ -756,14 +752,15 @@ type DataObject
   description: String
   classification: DataClassification!
   format: String
-  sovereigntyReqDataResidency: SovereigntyMaturity
-  sovereigntyReqJurisdictionControl: SovereigntyMaturity
-  sovereigntyReqOperationalControl: SovereigntyMaturity
-  sovereigntyReqInteroperability: SovereigntyMaturity
-  sovereigntyReqPortability: SovereigntyMaturity
-  sovereigntyReqSupplyChainTransparency: SovereigntyMaturity
+  sovereigntyReqStrategicAutonomy: SovereigntyMaturity
+  sovereigntyReqStrategicAutonomyRationale: String
+  sovereigntyReqResilience: SovereigntyMaturity
+  sovereigntyReqResilienceRationale: String
+  sovereigntyReqSecurity: SovereigntyMaturity
+  sovereigntyReqSecurityRationale: String
+  sovereigntyReqControl: SovereigntyMaturity
+  sovereigntyReqControlRationale: String
   sovereigntyReqWeight: Float
-  sovereigntyReqRationale: String
   introductionDate: Date
   endOfLifeDate: Date
   planningDate: Date
@@ -838,13 +835,14 @@ type Infrastructure
   specifications: String
   maintenanceWindow: String
   costs: Float
-  sovereigntyAchDataResidency: SovereigntyMaturity
-  sovereigntyAchJurisdictionControl: SovereigntyMaturity
-  sovereigntyAchOperationalControl: SovereigntyMaturity
-  sovereigntyAchInteroperability: SovereigntyMaturity
-  sovereigntyAchPortability: SovereigntyMaturity
-  sovereigntyAchSupplyChainTransparency: SovereigntyMaturity
-  sovereigntyEvidence: String
+  sovereigntyAchStrategicAutonomy: SovereigntyMaturity
+  sovereigntyAchStrategicAutonomyEvidence: String
+  sovereigntyAchResilience: SovereigntyMaturity
+  sovereigntyAchResilienceEvidence: String
+  sovereigntyAchSecurity: SovereigntyMaturity
+  sovereigntyAchSecurityEvidence: String
+  sovereigntyAchControl: SovereigntyMaturity
+  sovereigntyAchControlEvidence: String
   lastSovereigntyAssessmentAt: DateTime
   introductionDate: Date
   endOfLifeDate: Date
@@ -1226,13 +1224,14 @@ type AIComponent
   provider: String
   license: String
   costs: Float
-  sovereigntyAchDataResidency: SovereigntyMaturity
-  sovereigntyAchJurisdictionControl: SovereigntyMaturity
-  sovereigntyAchOperationalControl: SovereigntyMaturity
-  sovereigntyAchInteroperability: SovereigntyMaturity
-  sovereigntyAchPortability: SovereigntyMaturity
-  sovereigntyAchSupplyChainTransparency: SovereigntyMaturity
-  sovereigntyEvidence: String
+  sovereigntyAchStrategicAutonomy: SovereigntyMaturity
+  sovereigntyAchStrategicAutonomyEvidence: String
+  sovereigntyAchResilience: SovereigntyMaturity
+  sovereigntyAchResilienceEvidence: String
+  sovereigntyAchSecurity: SovereigntyMaturity
+  sovereigntyAchSecurityEvidence: String
+  sovereigntyAchControl: SovereigntyMaturity
+  sovereigntyAchControlEvidence: String
   lastSovereigntyAssessmentAt: DateTime
   tags: [String!]
   createdAt: DateTime! @timestamp(operations: [CREATE])
@@ -1727,14 +1726,6 @@ type ArchitecturePrinciple
   rationale: String
   implications: String
   tags: [String!]
-  sovereigntyReqDataResidency: SovereigntyMaturity
-  sovereigntyReqJurisdictionControl: SovereigntyMaturity
-  sovereigntyReqOperationalControl: SovereigntyMaturity
-  sovereigntyReqInteroperability: SovereigntyMaturity
-  sovereigntyReqPortability: SovereigntyMaturity
-  sovereigntyReqSupplyChainTransparency: SovereigntyMaturity
-  sovereigntyReqWeight: Float
-  sovereigntyReqRationale: String
   isActive: Boolean!
   createdAt: DateTime! @timestamp(operations: [CREATE])
   updatedAt: DateTime @timestamp(operations: [UPDATE])

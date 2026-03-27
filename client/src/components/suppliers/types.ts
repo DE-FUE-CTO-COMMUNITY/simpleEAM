@@ -59,12 +59,10 @@ export interface SupplierFormValues {
   providesAIComponentIds?: string[]
   supportsAIComponentIds?: string[]
   maintainsAIComponentIds?: string[]
-  sovereigntyAchDataResidency?: SovereigntyMaturity | null
-  sovereigntyAchJurisdictionControl?: SovereigntyMaturity | null
-  sovereigntyAchOperationalControl?: SovereigntyMaturity | null
-  sovereigntyAchInteroperability?: SovereigntyMaturity | null
-  sovereigntyAchPortability?: SovereigntyMaturity | null
-  sovereigntyAchSupplyChainTransparency?: SovereigntyMaturity | null
-  sovereigntyEvidence?: string
+  sovereigntyAchStrategicAutonomy?: SovereigntyMaturity | null
+  sovereigntyAchResilience?: SovereigntyMaturity | null
+  sovereigntyAchSecurity?: SovereigntyMaturity | null
+  sovereigntyAchControl?: SovereigntyMaturity | null
+  sovereigntyAchStrategicAutonomyEvidence?: string
   lastSovereigntyAssessmentAt?: Date | null
 }

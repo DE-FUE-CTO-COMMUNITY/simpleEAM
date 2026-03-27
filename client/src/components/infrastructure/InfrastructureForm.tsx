@@ -73,13 +73,11 @@ const baseInfrastructureSchema = z.object({
   maintainedBy: z.array(z.string()).optional(),
   partOfArchitectures: z.array(z.string()).optional(),
   depictedInDiagrams: z.array(z.string()).optional(),
-  sovereigntyAchDataResidency: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-  sovereigntyAchJurisdictionControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-  sovereigntyAchOperationalControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-  sovereigntyAchInteroperability: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-  sovereigntyAchPortability: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-  sovereigntyAchSupplyChainTransparency: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-  sovereigntyEvidence: z.string().optional().nullable(),
+  sovereigntyAchStrategicAutonomy: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+  sovereigntyAchResilience: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+  sovereigntyAchSecurity: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+  sovereigntyAchControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+  sovereigntyAchStrategicAutonomyEvidence: z.string().optional().nullable(),
   lastSovereigntyAssessmentAt: z.date().optional().nullable(),
 })
 
@@ -200,14 +198,12 @@ const InfrastructureForm: React.FC<GenericFormProps<Infrastructure, Infrastructu
   const hasAnySovereigntyData = (entity: any | null | undefined): boolean => {
     if (!entity) return false
     return (
-      entity.sovereigntyAchDataResidency != null ||
-      entity.sovereigntyAchJurisdictionControl != null ||
-      entity.sovereigntyAchOperationalControl != null ||
-      entity.sovereigntyAchInteroperability != null ||
-      entity.sovereigntyAchPortability != null ||
-      entity.sovereigntyAchSupplyChainTransparency != null ||
-      (typeof entity.sovereigntyEvidence === 'string' &&
-        entity.sovereigntyEvidence.trim() !== '') ||
+      entity.sovereigntyAchStrategicAutonomy != null ||
+      entity.sovereigntyAchResilience != null ||
+      entity.sovereigntyAchSecurity != null ||
+      entity.sovereigntyAchControl != null ||
+      (typeof entity.sovereigntyAchStrategicAutonomyEvidence === 'string' &&
+        entity.sovereigntyAchStrategicAutonomyEvidence.trim() !== '') ||
       entity.lastSovereigntyAssessmentAt != null
     )
   }
@@ -362,14 +358,11 @@ const InfrastructureForm: React.FC<GenericFormProps<Infrastructure, Infrastructu
       maintainedBy: infrastructure?.maintainedBy?.map(supplier => supplier.id) || [],
       partOfArchitectures: infrastructure?.partOfArchitectures?.map(arch => arch.id) || [],
       depictedInDiagrams: infrastructure?.depictedInDiagrams?.map(diag => diag.id) || [],
-      sovereigntyAchDataResidency: infrastructure?.sovereigntyAchDataResidency || null,
-      sovereigntyAchJurisdictionControl: infrastructure?.sovereigntyAchJurisdictionControl || null,
-      sovereigntyAchOperationalControl: infrastructure?.sovereigntyAchOperationalControl || null,
-      sovereigntyAchInteroperability: infrastructure?.sovereigntyAchInteroperability || null,
-      sovereigntyAchPortability: infrastructure?.sovereigntyAchPortability || null,
-      sovereigntyAchSupplyChainTransparency:
-        infrastructure?.sovereigntyAchSupplyChainTransparency || null,
-      sovereigntyEvidence: infrastructure?.sovereigntyEvidence || '',
+      sovereigntyAchStrategicAutonomy: infrastructure?.sovereigntyAchStrategicAutonomy || null,
+      sovereigntyAchResilience: infrastructure?.sovereigntyAchResilience || null,
+      sovereigntyAchSecurity: infrastructure?.sovereigntyAchSecurity || null,
+      sovereigntyAchControl: infrastructure?.sovereigntyAchControl || null,
+      sovereigntyAchStrategicAutonomyEvidence: infrastructure?.sovereigntyAchStrategicAutonomyEvidence || '',
       lastSovereigntyAssessmentAt: infrastructure?.lastSovereigntyAssessmentAt
         ? new Date(infrastructure.lastSovereigntyAssessmentAt)
         : null,
@@ -473,14 +466,11 @@ const InfrastructureForm: React.FC<GenericFormProps<Infrastructure, Infrastructu
         maintainedBy: infrastructure.maintainedBy?.map(supplier => supplier.id) ?? [],
         partOfArchitectures: infrastructure.partOfArchitectures?.map(arch => arch.id) ?? [],
         depictedInDiagrams: infrastructure.depictedInDiagrams?.map(diagram => diagram.id) ?? [],
-        sovereigntyAchDataResidency: infrastructure.sovereigntyAchDataResidency ?? null,
-        sovereigntyAchJurisdictionControl: infrastructure.sovereigntyAchJurisdictionControl ?? null,
-        sovereigntyAchOperationalControl: infrastructure.sovereigntyAchOperationalControl ?? null,
-        sovereigntyAchInteroperability: infrastructure.sovereigntyAchInteroperability ?? null,
-        sovereigntyAchPortability: infrastructure.sovereigntyAchPortability ?? null,
-        sovereigntyAchSupplyChainTransparency:
-          infrastructure.sovereigntyAchSupplyChainTransparency ?? null,
-        sovereigntyEvidence: infrastructure.sovereigntyEvidence ?? '',
+        sovereigntyAchStrategicAutonomy: infrastructure.sovereigntyAchStrategicAutonomy ?? null,
+        sovereigntyAchResilience: infrastructure.sovereigntyAchResilience ?? null,
+        sovereigntyAchSecurity: infrastructure.sovereigntyAchSecurity ?? null,
+        sovereigntyAchControl: infrastructure.sovereigntyAchControl ?? null,
+        sovereigntyAchStrategicAutonomyEvidence: infrastructure.sovereigntyAchStrategicAutonomyEvidence ?? '',
         lastSovereigntyAssessmentAt: infrastructure.lastSovereigntyAssessmentAt
           ? new Date(infrastructure.lastSovereigntyAssessmentAt)
           : null,

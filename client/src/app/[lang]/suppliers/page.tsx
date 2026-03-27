@@ -81,13 +81,12 @@ const SuppliersPage = () => {
       const input = {
         name: supplierData.name,
         description: supplierData.description,
-        sovereigntyAchDataResidency: supplierData.sovereigntyAchDataResidency,
-        sovereigntyAchJurisdictionControl: supplierData.sovereigntyAchJurisdictionControl,
-        sovereigntyAchOperationalControl: supplierData.sovereigntyAchOperationalControl,
-        sovereigntyAchInteroperability: supplierData.sovereigntyAchInteroperability,
-        sovereigntyAchPortability: supplierData.sovereigntyAchPortability,
-        sovereigntyAchSupplyChainTransparency: supplierData.sovereigntyAchSupplyChainTransparency,
-        sovereigntyEvidence: supplierData.sovereigntyEvidence,
+        sovereigntyAchStrategicAutonomy: supplierData.sovereigntyAchStrategicAutonomy,
+        sovereigntyAchResilience: supplierData.sovereigntyAchResilience,
+        sovereigntyAchSecurity: supplierData.sovereigntyAchSecurity,
+        sovereigntyAchControl: supplierData.sovereigntyAchControl,
+        sovereigntyAchStrategicAutonomyEvidence:
+          supplierData.sovereigntyAchStrategicAutonomyEvidence,
         lastSovereigntyAssessmentAt: supplierData.lastSovereigntyAssessmentAt,
         supplierType: supplierData.supplierType,
         status: supplierData.status,
@@ -297,25 +296,21 @@ const SuppliersPage = () => {
                 const input: Record<string, any> = {
                   name: { set: supplierData.name },
                   description: { set: supplierData.description },
-                  sovereigntyAchDataResidency: {
-                    set: supplierData.sovereigntyAchDataResidency ?? null,
+                  sovereigntyAchStrategicAutonomy: {
+                    set: supplierData.sovereigntyAchStrategicAutonomy ?? null,
                   },
-                  sovereigntyAchJurisdictionControl: {
-                    set: supplierData.sovereigntyAchJurisdictionControl ?? null,
+                  sovereigntyAchResilience: {
+                    set: supplierData.sovereigntyAchResilience ?? null,
                   },
-                  sovereigntyAchOperationalControl: {
-                    set: supplierData.sovereigntyAchOperationalControl ?? null,
+                  sovereigntyAchSecurity: {
+                    set: supplierData.sovereigntyAchSecurity ?? null,
                   },
-                  sovereigntyAchInteroperability: {
-                    set: supplierData.sovereigntyAchInteroperability ?? null,
+                  sovereigntyAchControl: {
+                    set: supplierData.sovereigntyAchControl ?? null,
                   },
-                  sovereigntyAchPortability: {
-                    set: supplierData.sovereigntyAchPortability ?? null,
+                  sovereigntyAchStrategicAutonomyEvidence: {
+                    set: supplierData.sovereigntyAchStrategicAutonomyEvidence ?? null,
                   },
-                  sovereigntyAchSupplyChainTransparency: {
-                    set: supplierData.sovereigntyAchSupplyChainTransparency ?? null,
-                  },
-                  sovereigntyEvidence: { set: supplierData.sovereigntyEvidence ?? null },
                   lastSovereigntyAssessmentAt: {
                     set: supplierData.lastSovereigntyAssessmentAt ?? null,
                   },

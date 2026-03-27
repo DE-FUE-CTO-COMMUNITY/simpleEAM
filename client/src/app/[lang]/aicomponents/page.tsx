@@ -182,13 +182,11 @@ const AicomponentsPage = () => {
     return {
       name: aiComponentData.name,
       description: aiComponentData.description,
-      sovereigntyAchDataResidency: aiComponentData.sovereigntyAchDataResidency,
-      sovereigntyAchJurisdictionControl: aiComponentData.sovereigntyAchJurisdictionControl,
-      sovereigntyAchOperationalControl: aiComponentData.sovereigntyAchOperationalControl,
-      sovereigntyAchInteroperability: aiComponentData.sovereigntyAchInteroperability,
-      sovereigntyAchPortability: aiComponentData.sovereigntyAchPortability,
-      sovereigntyAchSupplyChainTransparency: aiComponentData.sovereigntyAchSupplyChainTransparency,
-      sovereigntyEvidence: aiComponentData.sovereigntyEvidence,
+      sovereigntyAchStrategicAutonomy: aiComponentData.sovereigntyAchStrategicAutonomy,
+      sovereigntyAchResilience: aiComponentData.sovereigntyAchResilience,
+      sovereigntyAchSecurity: aiComponentData.sovereigntyAchSecurity,
+      sovereigntyAchControl: aiComponentData.sovereigntyAchControl,
+      sovereigntyAchStrategicAutonomyEvidence: aiComponentData.sovereigntyAchStrategicAutonomyEvidence,
       lastSovereigntyAssessmentAt: aiComponentData.lastSovereigntyAssessmentAt,
       aiType: aiComponentData.aiType,
       model: aiComponentData.model,
@@ -356,19 +354,15 @@ const AicomponentsPage = () => {
       const updateInput: Record<string, any> = {
         name: { set: baseData.name },
         description: { set: baseData.description },
-        sovereigntyAchDataResidency: { set: baseData.sovereigntyAchDataResidency ?? null },
-        sovereigntyAchJurisdictionControl: {
-          set: baseData.sovereigntyAchJurisdictionControl ?? null,
+        sovereigntyAchStrategicAutonomy: { set: baseData.sovereigntyAchStrategicAutonomy ?? null },
+        sovereigntyAchResilience: {
+          set: baseData.sovereigntyAchResilience ?? null,
         },
-        sovereigntyAchOperationalControl: {
-          set: baseData.sovereigntyAchOperationalControl ?? null,
+        sovereigntyAchSecurity: {
+          set: baseData.sovereigntyAchSecurity ?? null,
         },
-        sovereigntyAchInteroperability: { set: baseData.sovereigntyAchInteroperability ?? null },
-        sovereigntyAchPortability: { set: baseData.sovereigntyAchPortability ?? null },
-        sovereigntyAchSupplyChainTransparency: {
-          set: baseData.sovereigntyAchSupplyChainTransparency ?? null,
-        },
-        sovereigntyEvidence: { set: baseData.sovereigntyEvidence ?? null },
+        sovereigntyAchControl: { set: baseData.sovereigntyAchControl ?? null },
+        sovereigntyAchStrategicAutonomyEvidence: { set: baseData.sovereigntyAchStrategicAutonomyEvidence ?? null },
         lastSovereigntyAssessmentAt: { set: baseData.lastSovereigntyAssessmentAt ?? null },
         aiType: { set: baseData.aiType },
         status: { set: baseData.status },

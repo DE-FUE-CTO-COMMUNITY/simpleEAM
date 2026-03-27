@@ -19,14 +19,12 @@ export interface DataObject {
   classification: DataClassification
   format?: string | null
   source?: string | null
-  sovereigntyReqDataResidency?: SovereigntyMaturity | null
-  sovereigntyReqJurisdictionControl?: SovereigntyMaturity | null
-  sovereigntyReqOperationalControl?: SovereigntyMaturity | null
-  sovereigntyReqInteroperability?: SovereigntyMaturity | null
-  sovereigntyReqPortability?: SovereigntyMaturity | null
-  sovereigntyReqSupplyChainTransparency?: SovereigntyMaturity | null
+  sovereigntyReqStrategicAutonomy?: SovereigntyMaturity | null
+  sovereigntyReqResilience?: SovereigntyMaturity | null
+  sovereigntyReqSecurity?: SovereigntyMaturity | null
+  sovereigntyReqControl?: SovereigntyMaturity | null
   sovereigntyReqWeight?: number | null
-  sovereigntyReqRationale?: string | null
+  sovereigntyReqStrategicAutonomyRationale?: string | null
   owners: SimplePerson[]
   createdAt: string
   updatedAt?: string | null
@@ -41,14 +39,12 @@ export interface DataObjectFormValues {
   classification: DataClassification
   format?: string
   source?: string
-  sovereigntyReqDataResidency?: SovereigntyMaturity | null
-  sovereigntyReqJurisdictionControl?: SovereigntyMaturity | null
-  sovereigntyReqOperationalControl?: SovereigntyMaturity | null
-  sovereigntyReqInteroperability?: SovereigntyMaturity | null
-  sovereigntyReqPortability?: SovereigntyMaturity | null
-  sovereigntyReqSupplyChainTransparency?: SovereigntyMaturity | null
+  sovereigntyReqStrategicAutonomy?: SovereigntyMaturity | null
+  sovereigntyReqResilience?: SovereigntyMaturity | null
+  sovereigntyReqSecurity?: SovereigntyMaturity | null
+  sovereigntyReqControl?: SovereigntyMaturity | null
   sovereigntyReqWeight?: number | null
-  sovereigntyReqRationale?: string
+  sovereigntyReqStrategicAutonomyRationale?: string
   ownerId?: string
 }
 

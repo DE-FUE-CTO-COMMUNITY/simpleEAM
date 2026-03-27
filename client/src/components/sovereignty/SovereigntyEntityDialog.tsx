@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect } from 'react'
-import { useLazyQuery, useMutation, useApolloClient } from '@apollo/client'
+import { useLazyQuery, useMutation, useApolloClient, useQuery } from '@apollo/client'
 import { Box, CircularProgress, Dialog, DialogContent } from '@mui/material'
 import CapabilityForm, { CapabilityFormValues } from '@/components/capabilities/CapabilityForm'
 import ApplicationForm, { ApplicationFormValues } from '@/components/applications/ApplicationForm'
@@ -10,8 +10,11 @@ import AicomponentForm, { AicomponentFormValues } from '@/components/aicomponent
 import InfrastructureForm, {
   InfrastructureFormValues,
 } from '@/components/infrastructure/InfrastructureForm'
+import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import { GET_CAPABILITY, UPDATE_CAPABILITY } from '@/graphql/capability'
 import { GET_APPLICATION, UPDATE_APPLICATION } from '@/graphql/application'
+import { GET_CAPABILITIES } from '@/graphql/capability'
+import { GET_APPLICATIONS } from '@/graphql/application'
 import { GET_DATA_OBJECT, UPDATE_DATA_OBJECT } from '@/graphql/dataObject'
 import { GET_Aicomponent, UPDATE_Aicomponent } from '@/graphql/aicomponent'
 import { GET_INFRASTRUCTURE, UPDATE_INFRASTRUCTURE } from '@/graphql/infrastructure'
@@ -39,6 +42,7 @@ interface Props {
 
 export default function SovereigntyEntityDialog({ entity, onClose }: Props) {
   const client = useApolloClient()
+  const companyWhere = useCompanyWhere('company')
 
   const [fetchCapability, { data: capData, loading: capLoading }] = useLazyQuery(GET_CAPABILITY)
   const [fetchApplication, { data: appData, loading: appLoading }] = useLazyQuery(GET_APPLICATION)
@@ -52,6 +56,16 @@ export default function SovereigntyEntityDialog({ entity, onClose }: Props) {
   const [updateDataObject, { loading: doUpdating }] = useMutation(UPDATE_DATA_OBJECT)
   const [updateAicomponent, { loading: aiUpdating }] = useMutation(UPDATE_Aicomponent)
   const [updateInfrastructure, { loading: infraUpdating }] = useMutation(UPDATE_INFRASTRUCTURE)
+
+  const { data: applicationsListData } = useQuery(GET_APPLICATIONS, {
+    variables: { where: companyWhere },
+    skip: !entity || (entity.type !== 'application' && entity.type !== 'capability'),
+  })
+
+  const { data: capabilitiesListData } = useQuery(GET_CAPABILITIES, {
+    variables: { where: companyWhere },
+    skip: !entity || entity.type !== 'capability',
+  })
 
   useEffect(() => {
     if (!entity) return
@@ -107,16 +121,12 @@ export default function SovereigntyEntityDialog({ entity, onClose }: Props) {
       name: { set: base.name },
       description: { set: base.description },
       maturityLevel: { set: base.maturityLevel },
-      sovereigntyReqDataResidency: { set: base.sovereigntyReqDataResidency ?? null },
-      sovereigntyReqJurisdictionControl: { set: base.sovereigntyReqJurisdictionControl ?? null },
-      sovereigntyReqOperationalControl: { set: base.sovereigntyReqOperationalControl ?? null },
-      sovereigntyReqInteroperability: { set: base.sovereigntyReqInteroperability ?? null },
-      sovereigntyReqPortability: { set: base.sovereigntyReqPortability ?? null },
-      sovereigntyReqSupplyChainTransparency: {
-        set: base.sovereigntyReqSupplyChainTransparency ?? null,
-      },
+      sovereigntyReqStrategicAutonomy: { set: base.sovereigntyReqStrategicAutonomy ?? null },
+      sovereigntyReqResilience: { set: base.sovereigntyReqResilience ?? null },
+      sovereigntyReqSecurity: { set: base.sovereigntyReqSecurity ?? null },
+      sovereigntyReqControl: { set: base.sovereigntyReqControl ?? null },
       sovereigntyReqWeight: { set: base.sovereigntyReqWeight ?? null },
-      sovereigntyReqRationale: { set: base.sovereigntyReqRationale ?? null },
+      sovereigntyReqStrategicAutonomyRationale: { set: base.sovereigntyReqStrategicAutonomyRationale ?? null },
       businessValue: { set: base.businessValue },
       status: { set: base.status },
       sequenceNumber: { set: base.sequenceNumber },
@@ -163,15 +173,11 @@ export default function SovereigntyEntityDialog({ entity, onClose }: Props) {
     const input: Record<string, any> = {
       name: { set: base.name },
       description: { set: base.description },
-      sovereigntyAchDataResidency: { set: base.sovereigntyAchDataResidency ?? null },
-      sovereigntyAchJurisdictionControl: { set: base.sovereigntyAchJurisdictionControl ?? null },
-      sovereigntyAchOperationalControl: { set: base.sovereigntyAchOperationalControl ?? null },
-      sovereigntyAchInteroperability: { set: base.sovereigntyAchInteroperability ?? null },
-      sovereigntyAchPortability: { set: base.sovereigntyAchPortability ?? null },
-      sovereigntyAchSupplyChainTransparency: {
-        set: base.sovereigntyAchSupplyChainTransparency ?? null,
-      },
-      sovereigntyEvidence: { set: base.sovereigntyEvidence ?? null },
+      sovereigntyAchStrategicAutonomy: { set: base.sovereigntyAchStrategicAutonomy ?? null },
+      sovereigntyAchResilience: { set: base.sovereigntyAchResilience ?? null },
+      sovereigntyAchSecurity: { set: base.sovereigntyAchSecurity ?? null },
+      sovereigntyAchControl: { set: base.sovereigntyAchControl ?? null },
+      sovereigntyAchStrategicAutonomyEvidence: { set: base.sovereigntyAchStrategicAutonomyEvidence ?? null },
       lastSovereigntyAssessmentAt: { set: base.lastSovereigntyAssessmentAt ?? null },
       status: { set: base.status },
       criticality: { set: base.criticality },
@@ -213,16 +219,12 @@ export default function SovereigntyEntityDialog({ entity, onClose }: Props) {
     const input: Record<string, any> = {
       name: { set: data.name },
       description: { set: data.description },
-      sovereigntyReqDataResidency: { set: data.sovereigntyReqDataResidency ?? null },
-      sovereigntyReqJurisdictionControl: { set: data.sovereigntyReqJurisdictionControl ?? null },
-      sovereigntyReqOperationalControl: { set: data.sovereigntyReqOperationalControl ?? null },
-      sovereigntyReqInteroperability: { set: data.sovereigntyReqInteroperability ?? null },
-      sovereigntyReqPortability: { set: data.sovereigntyReqPortability ?? null },
-      sovereigntyReqSupplyChainTransparency: {
-        set: data.sovereigntyReqSupplyChainTransparency ?? null,
-      },
+      sovereigntyReqStrategicAutonomy: { set: data.sovereigntyReqStrategicAutonomy ?? null },
+      sovereigntyReqResilience: { set: data.sovereigntyReqResilience ?? null },
+      sovereigntyReqSecurity: { set: data.sovereigntyReqSecurity ?? null },
+      sovereigntyReqControl: { set: data.sovereigntyReqControl ?? null },
       sovereigntyReqWeight: { set: data.sovereigntyReqWeight ?? null },
-      sovereigntyReqRationale: { set: data.sovereigntyReqRationale ?? null },
+      sovereigntyReqStrategicAutonomyRationale: { set: data.sovereigntyReqStrategicAutonomyRationale ?? null },
       classification: { set: data.classification },
       format: { set: data.format },
       planningDate: { set: data.planningDate },
@@ -260,15 +262,11 @@ export default function SovereigntyEntityDialog({ entity, onClose }: Props) {
     const updateInput: Record<string, any> = {
       name: { set: base.name },
       description: { set: base.description },
-      sovereigntyAchDataResidency: { set: base.sovereigntyAchDataResidency ?? null },
-      sovereigntyAchJurisdictionControl: { set: base.sovereigntyAchJurisdictionControl ?? null },
-      sovereigntyAchOperationalControl: { set: base.sovereigntyAchOperationalControl ?? null },
-      sovereigntyAchInteroperability: { set: base.sovereigntyAchInteroperability ?? null },
-      sovereigntyAchPortability: { set: base.sovereigntyAchPortability ?? null },
-      sovereigntyAchSupplyChainTransparency: {
-        set: base.sovereigntyAchSupplyChainTransparency ?? null,
-      },
-      sovereigntyEvidence: { set: base.sovereigntyEvidence ?? null },
+      sovereigntyAchStrategicAutonomy: { set: base.sovereigntyAchStrategicAutonomy ?? null },
+      sovereigntyAchResilience: { set: base.sovereigntyAchResilience ?? null },
+      sovereigntyAchSecurity: { set: base.sovereigntyAchSecurity ?? null },
+      sovereigntyAchControl: { set: base.sovereigntyAchControl ?? null },
+      sovereigntyAchStrategicAutonomyEvidence: { set: base.sovereigntyAchStrategicAutonomyEvidence ?? null },
       lastSovereigntyAssessmentAt: { set: base.lastSovereigntyAssessmentAt ?? null },
       aiType: { set: base.aiType },
       status: { set: base.status },
@@ -309,15 +307,11 @@ export default function SovereigntyEntityDialog({ entity, onClose }: Props) {
     const input: Record<string, any> = {
       name: { set: data.name },
       description: { set: data.description || '' },
-      sovereigntyAchDataResidency: { set: data.sovereigntyAchDataResidency ?? null },
-      sovereigntyAchJurisdictionControl: { set: data.sovereigntyAchJurisdictionControl ?? null },
-      sovereigntyAchOperationalControl: { set: data.sovereigntyAchOperationalControl ?? null },
-      sovereigntyAchInteroperability: { set: data.sovereigntyAchInteroperability ?? null },
-      sovereigntyAchPortability: { set: data.sovereigntyAchPortability ?? null },
-      sovereigntyAchSupplyChainTransparency: {
-        set: data.sovereigntyAchSupplyChainTransparency ?? null,
-      },
-      sovereigntyEvidence: { set: data.sovereigntyEvidence ?? null },
+      sovereigntyAchStrategicAutonomy: { set: data.sovereigntyAchStrategicAutonomy ?? null },
+      sovereigntyAchResilience: { set: data.sovereigntyAchResilience ?? null },
+      sovereigntyAchSecurity: { set: data.sovereigntyAchSecurity ?? null },
+      sovereigntyAchControl: { set: data.sovereigntyAchControl ?? null },
+      sovereigntyAchStrategicAutonomyEvidence: { set: data.sovereigntyAchStrategicAutonomyEvidence ?? null },
       lastSovereigntyAssessmentAt: { set: lastSovereigntyAssessmentAt },
       infrastructureType: { set: data.infrastructureType },
       status: { set: data.status },
@@ -369,6 +363,7 @@ export default function SovereigntyEntityDialog({ entity, onClose }: Props) {
         onSubmit={handleCapabilitySubmit}
         mode="edit"
         data={capabilityData}
+        availableCapabilities={capabilitiesListData?.businessCapabilities || []}
         loading={isUpdating}
       />
     )
@@ -382,6 +377,7 @@ export default function SovereigntyEntityDialog({ entity, onClose }: Props) {
         onSubmit={handleApplicationSubmit}
         mode="edit"
         data={applicationData}
+        availableApplications={applicationsListData?.applications || []}
         loading={isUpdating}
       />
     )

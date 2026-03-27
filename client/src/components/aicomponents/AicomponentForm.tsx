@@ -68,13 +68,11 @@ export type AicomponentFormValues = {
   partOfArchitectureIds?: string[]
   implementsPrincipleIds?: string[]
   depictedInDiagramIds?: string[]
-  sovereigntyAchDataResidency?: SovereigntyMaturity | null
-  sovereigntyAchJurisdictionControl?: SovereigntyMaturity | null
-  sovereigntyAchOperationalControl?: SovereigntyMaturity | null
-  sovereigntyAchInteroperability?: SovereigntyMaturity | null
-  sovereigntyAchPortability?: SovereigntyMaturity | null
-  sovereigntyAchSupplyChainTransparency?: SovereigntyMaturity | null
-  sovereigntyEvidence?: string
+  sovereigntyAchStrategicAutonomy?: SovereigntyMaturity | null
+  sovereigntyAchResilience?: SovereigntyMaturity | null
+  sovereigntyAchSecurity?: SovereigntyMaturity | null
+  sovereigntyAchControl?: SovereigntyMaturity | null
+  sovereigntyAchStrategicAutonomyEvidence?: string
   lastSovereigntyAssessmentAt?: Date | null
 }
 
@@ -163,13 +161,11 @@ export default function AicomponentForm({
     partOfArchitectureIds: z.array(z.string()).optional(),
     implementsPrincipleIds: z.array(z.string()).optional(),
     depictedInDiagramIds: z.array(z.string()).optional(),
-    sovereigntyAchDataResidency: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyAchJurisdictionControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyAchOperationalControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyAchInteroperability: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyAchPortability: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyAchSupplyChainTransparency: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyEvidence: z.string().optional(),
+    sovereigntyAchStrategicAutonomy: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyAchResilience: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyAchSecurity: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyAchControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyAchStrategicAutonomyEvidence: z.string().optional(),
     lastSovereigntyAssessmentAt: z.date().optional().nullable(),
   })
 
@@ -583,14 +579,11 @@ export default function AicomponentForm({
     implementsPrincipleIds:
       aicomponent?.implementsPrinciples?.map((principle: any) => principle.id) ?? [],
     depictedInDiagramIds: aicomponent?.depictedInDiagrams?.map((diag: any) => diag.id) ?? [],
-    sovereigntyAchDataResidency: aicomponent?.sovereigntyAchDataResidency ?? null,
-    sovereigntyAchJurisdictionControl: aicomponent?.sovereigntyAchJurisdictionControl ?? null,
-    sovereigntyAchOperationalControl: aicomponent?.sovereigntyAchOperationalControl ?? null,
-    sovereigntyAchInteroperability: aicomponent?.sovereigntyAchInteroperability ?? null,
-    sovereigntyAchPortability: aicomponent?.sovereigntyAchPortability ?? null,
-    sovereigntyAchSupplyChainTransparency:
-      aicomponent?.sovereigntyAchSupplyChainTransparency ?? null,
-    sovereigntyEvidence: aicomponent?.sovereigntyEvidence ?? '',
+    sovereigntyAchStrategicAutonomy: aicomponent?.sovereigntyAchStrategicAutonomy ?? null,
+    sovereigntyAchResilience: aicomponent?.sovereigntyAchResilience ?? null,
+    sovereigntyAchSecurity: aicomponent?.sovereigntyAchSecurity ?? null,
+    sovereigntyAchControl: aicomponent?.sovereigntyAchControl ?? null,
+    sovereigntyAchStrategicAutonomyEvidence: aicomponent?.sovereigntyAchStrategicAutonomyEvidence ?? '',
     lastSovereigntyAssessmentAt: aicomponent?.lastSovereigntyAssessmentAt
       ? new Date(aicomponent.lastSovereigntyAssessmentAt)
       : new Date(),
@@ -652,14 +645,11 @@ export default function AicomponentForm({
         implementsPrincipleIds:
           aicomponent.implementsPrinciples?.map((principle: any) => principle.id) ?? [],
         depictedInDiagramIds: aicomponent.depictedInDiagrams?.map((diag: any) => diag.id) ?? [],
-        sovereigntyAchDataResidency: aicomponent.sovereigntyAchDataResidency ?? null,
-        sovereigntyAchJurisdictionControl: aicomponent.sovereigntyAchJurisdictionControl ?? null,
-        sovereigntyAchOperationalControl: aicomponent.sovereigntyAchOperationalControl ?? null,
-        sovereigntyAchInteroperability: aicomponent.sovereigntyAchInteroperability ?? null,
-        sovereigntyAchPortability: aicomponent.sovereigntyAchPortability ?? null,
-        sovereigntyAchSupplyChainTransparency:
-          aicomponent.sovereigntyAchSupplyChainTransparency ?? null,
-        sovereigntyEvidence: aicomponent.sovereigntyEvidence ?? '',
+        sovereigntyAchStrategicAutonomy: aicomponent.sovereigntyAchStrategicAutonomy ?? null,
+        sovereigntyAchResilience: aicomponent.sovereigntyAchResilience ?? null,
+        sovereigntyAchSecurity: aicomponent.sovereigntyAchSecurity ?? null,
+        sovereigntyAchControl: aicomponent.sovereigntyAchControl ?? null,
+        sovereigntyAchStrategicAutonomyEvidence: aicomponent.sovereigntyAchStrategicAutonomyEvidence ?? '',
         lastSovereigntyAssessmentAt: aicomponent.lastSovereigntyAssessmentAt
           ? new Date(aicomponent.lastSovereigntyAssessmentAt)
           : new Date(),

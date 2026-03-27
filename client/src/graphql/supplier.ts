@@ -18,13 +18,11 @@ export const GET_SUPPLIERS = gql`
       id
       name
       description
-      sovereigntyAchDataResidency
-      sovereigntyAchJurisdictionControl
-      sovereigntyAchOperationalControl
-      sovereigntyAchInteroperability
-      sovereigntyAchPortability
-      sovereigntyAchSupplyChainTransparency
-      sovereigntyEvidence
+      sovereigntyAchStrategicAutonomy
+      sovereigntyAchResilience
+      sovereigntyAchSecurity
+      sovereigntyAchControl
+      sovereigntyAchStrategicAutonomyEvidence
       lastSovereigntyAssessmentAt
       supplierType
       status
@@ -89,13 +87,11 @@ export const GET_SUPPLIER = gql`
       id
       name
       description
-      sovereigntyAchDataResidency
-      sovereigntyAchJurisdictionControl
-      sovereigntyAchOperationalControl
-      sovereigntyAchInteroperability
-      sovereigntyAchPortability
-      sovereigntyAchSupplyChainTransparency
-      sovereigntyEvidence
+      sovereigntyAchStrategicAutonomy
+      sovereigntyAchResilience
+      sovereigntyAchSecurity
+      sovereigntyAchControl
+      sovereigntyAchStrategicAutonomyEvidence
       lastSovereigntyAssessmentAt
       supplierType
       status
@@ -161,13 +157,11 @@ export const CREATE_SUPPLIER = gql`
         id
         name
         description
-        sovereigntyAchDataResidency
-        sovereigntyAchJurisdictionControl
-        sovereigntyAchOperationalControl
-        sovereigntyAchInteroperability
-        sovereigntyAchPortability
-        sovereigntyAchSupplyChainTransparency
-        sovereigntyEvidence
+        sovereigntyAchStrategicAutonomy
+        sovereigntyAchResilience
+        sovereigntyAchSecurity
+        sovereigntyAchControl
+        sovereigntyAchStrategicAutonomyEvidence
         lastSovereigntyAssessmentAt
         supplierType
         status
@@ -198,13 +192,11 @@ export const UPDATE_SUPPLIER = gql`
         id
         name
         description
-        sovereigntyAchDataResidency
-        sovereigntyAchJurisdictionControl
-        sovereigntyAchOperationalControl
-        sovereigntyAchInteroperability
-        sovereigntyAchPortability
-        sovereigntyAchSupplyChainTransparency
-        sovereigntyEvidence
+        sovereigntyAchStrategicAutonomy
+        sovereigntyAchResilience
+        sovereigntyAchSecurity
+        sovereigntyAchControl
+        sovereigntyAchStrategicAutonomyEvidence
         lastSovereigntyAssessmentAt
         supplierType
         status

@@ -60,14 +60,12 @@ const createCapabilitySchema = (t: any) =>
     supportedByApplications: z.array(z.string()).optional(),
     partOfArchitectures: z.array(z.string()).optional(),
     partOfDiagrams: z.array(z.string()).optional(),
-    sovereigntyReqDataResidency: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyReqJurisdictionControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyReqOperationalControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyReqInteroperability: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyReqPortability: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-    sovereigntyReqSupplyChainTransparency: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyReqStrategicAutonomy: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyReqResilience: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyReqSecurity: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+    sovereigntyReqControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
     sovereigntyReqWeight: z.number().optional().nullable(),
-    sovereigntyReqRationale: z.string().optional().nullable(),
+    sovereigntyReqStrategicAutonomyRationale: z.string().optional().nullable(),
   })
 
 // TypeScript Typen basierend auf dem Schema
@@ -220,14 +218,12 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
       supportedByApplications: [],
       partOfArchitectures: [],
       partOfDiagrams: [],
-      sovereigntyReqDataResidency: null,
-      sovereigntyReqJurisdictionControl: null,
-      sovereigntyReqOperationalControl: null,
-      sovereigntyReqInteroperability: null,
-      sovereigntyReqPortability: null,
-      sovereigntyReqSupplyChainTransparency: null,
+      sovereigntyReqStrategicAutonomy: null,
+      sovereigntyReqResilience: null,
+      sovereigntyReqSecurity: null,
+      sovereigntyReqControl: null,
       sovereigntyReqWeight: 1,
-      sovereigntyReqRationale: '',
+      sovereigntyReqStrategicAutonomyRationale: '',
     }),
     []
   )
@@ -278,28 +274,17 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
         capability?.depictedInDiagrams?.map((diagram: any) => diagram.id) ?? []
       )
       form.setFieldValue(
-        'sovereigntyReqDataResidency',
-        capability?.sovereigntyReqDataResidency ?? null
+        'sovereigntyReqStrategicAutonomy',
+        capability?.sovereigntyReqStrategicAutonomy ?? null
       )
-      form.setFieldValue(
-        'sovereigntyReqJurisdictionControl',
-        capability?.sovereigntyReqJurisdictionControl ?? null
-      )
-      form.setFieldValue(
-        'sovereigntyReqOperationalControl',
-        capability?.sovereigntyReqOperationalControl ?? null
-      )
-      form.setFieldValue(
-        'sovereigntyReqInteroperability',
-        capability?.sovereigntyReqInteroperability ?? null
-      )
-      form.setFieldValue('sovereigntyReqPortability', capability?.sovereigntyReqPortability ?? null)
-      form.setFieldValue(
-        'sovereigntyReqSupplyChainTransparency',
-        capability?.sovereigntyReqSupplyChainTransparency ?? null
-      )
+      form.setFieldValue('sovereigntyReqResilience', capability?.sovereigntyReqResilience ?? null)
+      form.setFieldValue('sovereigntyReqSecurity', capability?.sovereigntyReqSecurity ?? null)
+      form.setFieldValue('sovereigntyReqControl', capability?.sovereigntyReqControl ?? null)
       form.setFieldValue('sovereigntyReqWeight', capability?.sovereigntyReqWeight ?? 1)
-      form.setFieldValue('sovereigntyReqRationale', capability?.sovereigntyReqRationale ?? '')
+      form.setFieldValue(
+        'sovereigntyReqStrategicAutonomyRationale',
+        capability?.sovereigntyReqStrategicAutonomyRationale ?? ''
+      )
     } else if (!isOpen) {
       form.reset()
     }

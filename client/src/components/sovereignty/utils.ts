@@ -10,32 +10,26 @@ export function maturityScore(level: string | null | undefined): number {
 }
 
 const SOVEREIGNTY_ACH_FIELDS: Array<keyof AchievedEntity> = [
-  'sovereigntyAchDataResidency',
-  'sovereigntyAchJurisdictionControl',
-  'sovereigntyAchOperationalControl',
-  'sovereigntyAchInteroperability',
-  'sovereigntyAchPortability',
-  'sovereigntyAchSupplyChainTransparency',
+  'sovereigntyAchStrategicAutonomy',
+  'sovereigntyAchResilience',
+  'sovereigntyAchSecurity',
+  'sovereigntyAchControl',
 ]
 
 const SOVEREIGNTY_REQ_FIELDS: Array<keyof RequirementEntity> = [
-  'sovereigntyReqDataResidency',
-  'sovereigntyReqJurisdictionControl',
-  'sovereigntyReqOperationalControl',
-  'sovereigntyReqInteroperability',
-  'sovereigntyReqPortability',
-  'sovereigntyReqSupplyChainTransparency',
+  'sovereigntyReqStrategicAutonomy',
+  'sovereigntyReqResilience',
+  'sovereigntyReqSecurity',
+  'sovereigntyReqControl',
 ]
 
 export interface AchievedEntity {
   id: string
   name: string
-  sovereigntyAchDataResidency?: string | null
-  sovereigntyAchJurisdictionControl?: string | null
-  sovereigntyAchOperationalControl?: string | null
-  sovereigntyAchInteroperability?: string | null
-  sovereigntyAchPortability?: string | null
-  sovereigntyAchSupplyChainTransparency?: string | null
+  sovereigntyAchStrategicAutonomy?: string | null
+  sovereigntyAchResilience?: string | null
+  sovereigntyAchSecurity?: string | null
+  sovereigntyAchControl?: string | null
 }
 
 interface EntityRef {
@@ -43,7 +37,7 @@ interface EntityRef {
 }
 
 interface DependencyInfrastructure extends AchievedEntity {
-  parentInfrastructure?: AchievedEntity | null
+  parentInfrastructure?: AchievedEntity[] | AchievedEntity | null
 }
 
 interface HasInfrastructureDependencies {
@@ -61,12 +55,10 @@ export interface DependencyAIComponent extends AchievedEntity, HasInfrastructure
 export interface RequirementEntity {
   id: string
   name: string
-  sovereigntyReqDataResidency?: string | null
-  sovereigntyReqJurisdictionControl?: string | null
-  sovereigntyReqOperationalControl?: string | null
-  sovereigntyReqInteroperability?: string | null
-  sovereigntyReqPortability?: string | null
-  sovereigntyReqSupplyChainTransparency?: string | null
+  sovereigntyReqStrategicAutonomy?: string | null
+  sovereigntyReqResilience?: string | null
+  sovereigntyReqSecurity?: string | null
+  sovereigntyReqControl?: string | null
   sovereigntyReqWeight?: number | null
 }
 
@@ -85,27 +77,23 @@ export function computeEntityRequiredScore(entity: RequirementEntity): number {
   return scores.reduce((sum, s) => sum + s, 0) / scores.length
 }
 
-// Aggregate achieved scores across multiple entities (avg of entity averages)
+// Aggregate achieved scores across multiple entities using the worst-case element.
+// The capability/data achieved score should reflect the lowest achieved linked entity.
 export function computeAggregatedAchievedScore(entities: AchievedEntity[]): number {
   if (entities.length === 0) return 0
-  const minScoresByDimension = SOVEREIGNTY_ACH_FIELDS.map(field => {
-    const explicitScores = entities
-      .map(entity => entity[field] as string | null | undefined)
-      .filter((value): value is string => value != null)
-      .map(maturityScore)
 
-    if (explicitScores.length === 0) {
-      return null
-    }
+  const explicitEntityScores = entities
+    .filter(hasAnySovereigntyAchs)
+    .map(entity => computeEntityAchivedScore(entity))
 
-    return explicitScores.reduce((min, score) => (score < min ? score : min), explicitScores[0])
-  }).filter((score): score is number => score !== null)
-
-  if (minScoresByDimension.length === 0) {
+  if (explicitEntityScores.length === 0) {
     return 0
   }
 
-  return minScoresByDimension.reduce((sum, s) => sum + s, 0) / minScoresByDimension.length
+  return explicitEntityScores.reduce(
+    (min, score) => (score < min ? score : min),
+    explicitEntityScores[0]
+  )
 }
 
 function mergeAchievedEntity(existing: AchievedEntity, incoming: AchievedEntity): AchievedEntity {
@@ -113,19 +101,14 @@ function mergeAchievedEntity(existing: AchievedEntity, incoming: AchievedEntity)
     ...existing,
     ...incoming,
     name: existing.name || incoming.name,
-    sovereigntyAchDataResidency:
-      existing.sovereigntyAchDataResidency ?? incoming.sovereigntyAchDataResidency,
-    sovereigntyAchJurisdictionControl:
-      existing.sovereigntyAchJurisdictionControl ?? incoming.sovereigntyAchJurisdictionControl,
-    sovereigntyAchOperationalControl:
-      existing.sovereigntyAchOperationalControl ?? incoming.sovereigntyAchOperationalControl,
-    sovereigntyAchInteroperability:
-      existing.sovereigntyAchInteroperability ?? incoming.sovereigntyAchInteroperability,
-    sovereigntyAchPortability:
-      existing.sovereigntyAchPortability ?? incoming.sovereigntyAchPortability,
-    sovereigntyAchSupplyChainTransparency:
-      existing.sovereigntyAchSupplyChainTransparency ??
-      incoming.sovereigntyAchSupplyChainTransparency,
+    sovereigntyAchStrategicAutonomy:
+      existing.sovereigntyAchStrategicAutonomy ?? incoming.sovereigntyAchStrategicAutonomy,
+    sovereigntyAchResilience:
+      existing.sovereigntyAchResilience ?? incoming.sovereigntyAchResilience,
+    sovereigntyAchSecurity:
+      existing.sovereigntyAchSecurity ?? incoming.sovereigntyAchSecurity,
+    sovereigntyAchControl:
+      existing.sovereigntyAchControl ?? incoming.sovereigntyAchControl,
   }
 }
 
@@ -146,23 +129,45 @@ function addAssociatedInfrastructure(
   target: Map<string, AchievedEntity>,
   entity: HasInfrastructureDependencies | null | undefined
 ) {
+  const pickParentInfrastructure = (
+    parentInfrastructure: DependencyInfrastructure['parentInfrastructure']
+  ): AchievedEntity | null => {
+    if (!parentInfrastructure) {
+      return null
+    }
+
+    if (Array.isArray(parentInfrastructure)) {
+      if (parentInfrastructure.length === 0) {
+        return null
+      }
+
+      const withSovereigntyValues = parentInfrastructure.find(parent => hasAnySovereigntyAchs(parent))
+      return withSovereigntyValues ?? parentInfrastructure[0]
+    }
+
+    return parentInfrastructure
+  }
+
   const buildEffectiveInfrastructure = (
     infrastructure: DependencyInfrastructure
   ): AchievedEntity => {
-    const parent = infrastructure.parentInfrastructure
+    const parent = pickParentInfrastructure(infrastructure.parentInfrastructure)
     if (!parent) {
       return infrastructure
     }
 
-    // Inherit sovereignty achievements from parent infrastructure when a parent exists.
+    // Inherit sovereignty achievements from parent infrastructure only as fallback.
+    // Explicit child values must take precedence.
     return {
       ...infrastructure,
-      sovereigntyAchDataResidency: parent.sovereigntyAchDataResidency,
-      sovereigntyAchJurisdictionControl: parent.sovereigntyAchJurisdictionControl,
-      sovereigntyAchOperationalControl: parent.sovereigntyAchOperationalControl,
-      sovereigntyAchInteroperability: parent.sovereigntyAchInteroperability,
-      sovereigntyAchPortability: parent.sovereigntyAchPortability,
-      sovereigntyAchSupplyChainTransparency: parent.sovereigntyAchSupplyChainTransparency,
+      sovereigntyAchStrategicAutonomy:
+        infrastructure.sovereigntyAchStrategicAutonomy ?? parent.sovereigntyAchStrategicAutonomy,
+      sovereigntyAchResilience:
+        infrastructure.sovereigntyAchResilience ?? parent.sovereigntyAchResilience,
+      sovereigntyAchSecurity:
+        infrastructure.sovereigntyAchSecurity ?? parent.sovereigntyAchSecurity,
+      sovereigntyAchControl:
+        infrastructure.sovereigntyAchControl ?? parent.sovereigntyAchControl,
     }
   }
 

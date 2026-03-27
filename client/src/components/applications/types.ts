@@ -79,13 +79,11 @@ export type ApplicationType = Pick<
   | 'maintainedBy'
   | 'predecessors'
   | 'successors'
-  | 'sovereigntyAchDataResidency'
-  | 'sovereigntyAchJurisdictionControl'
-  | 'sovereigntyAchOperationalControl'
-  | 'sovereigntyAchInteroperability'
-  | 'sovereigntyAchPortability'
-  | 'sovereigntyAchSupplyChainTransparency'
-  | 'sovereigntyEvidence'
+  | 'sovereigntyAchStrategicAutonomy'
+  | 'sovereigntyAchResilience'
+  | 'sovereigntyAchSecurity'
+  | 'sovereigntyAchControl'
+  | 'sovereigntyAchStrategicAutonomyEvidence'
   | 'lastSovereigntyAssessmentAt'
 >
 

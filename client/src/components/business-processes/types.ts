@@ -22,14 +22,12 @@ export const businessProcessSchema = z.object({
   supportedByApplicationIds: z.array(z.string()).optional(),
   partOfArchitectures: z.array(z.string()).optional(),
   depictedInDiagrams: z.array(z.string()).optional(),
-  sovereigntyReqDataResidency: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-  sovereigntyReqJurisdictionControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-  sovereigntyReqOperationalControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-  sovereigntyReqInteroperability: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-  sovereigntyReqPortability: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
-  sovereigntyReqSupplyChainTransparency: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+  sovereigntyReqStrategicAutonomy: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+  sovereigntyReqResilience: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+  sovereigntyReqSecurity: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
+  sovereigntyReqControl: z.nativeEnum(SovereigntyMaturity).optional().nullable(),
   sovereigntyReqWeight: z.number().optional().nullable(),
-  sovereigntyReqRationale: z.string().optional().nullable(),
+  sovereigntyReqStrategicAutonomyRationale: z.string().optional().nullable(),
 })
 
 export type BusinessProcessFormValues = z.infer<typeof businessProcessSchema>
@@ -52,14 +50,12 @@ export type BusinessProcessType = Pick<
   | 'supportedByApplications'
   | 'partOfArchitectures'
   | 'depictedInDiagrams'
-  | 'sovereigntyReqDataResidency'
-  | 'sovereigntyReqJurisdictionControl'
-  | 'sovereigntyReqOperationalControl'
-  | 'sovereigntyReqInteroperability'
-  | 'sovereigntyReqPortability'
-  | 'sovereigntyReqSupplyChainTransparency'
+  | 'sovereigntyReqStrategicAutonomy'
+  | 'sovereigntyReqResilience'
+  | 'sovereigntyReqSecurity'
+  | 'sovereigntyReqControl'
   | 'sovereigntyReqWeight'
-  | 'sovereigntyReqRationale'
+  | 'sovereigntyReqStrategicAutonomyRationale'
   | 'createdAt'
   | 'updatedAt'
 >

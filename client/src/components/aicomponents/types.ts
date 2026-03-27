@@ -36,13 +36,11 @@ export type AicomponentType = Pick<
   | 'license'
   | 'costs'
   | 'tags'
-  | 'sovereigntyAchDataResidency'
-  | 'sovereigntyAchJurisdictionControl'
-  | 'sovereigntyAchOperationalControl'
-  | 'sovereigntyAchInteroperability'
-  | 'sovereigntyAchPortability'
-  | 'sovereigntyAchSupplyChainTransparency'
-  | 'sovereigntyEvidence'
+  | 'sovereigntyAchStrategicAutonomy'
+  | 'sovereigntyAchResilience'
+  | 'sovereigntyAchSecurity'
+  | 'sovereigntyAchControl'
+  | 'sovereigntyAchStrategicAutonomyEvidence'
   | 'lastSovereigntyAssessmentAt'
   | 'createdAt'
   | 'updatedAt'
@@ -89,13 +87,11 @@ export interface AicomponentFormValues {
   partOfArchitectureIds?: string[]
   implementsPrincipleIds?: string[]
   depictedInDiagramIds?: string[]
-  sovereigntyAchDataResidency?: SovereigntyMaturity | null
-  sovereigntyAchJurisdictionControl?: SovereigntyMaturity | null
-  sovereigntyAchOperationalControl?: SovereigntyMaturity | null
-  sovereigntyAchInteroperability?: SovereigntyMaturity | null
-  sovereigntyAchPortability?: SovereigntyMaturity | null
-  sovereigntyAchSupplyChainTransparency?: SovereigntyMaturity | null
-  sovereigntyEvidence?: string
+  sovereigntyAchStrategicAutonomy?: SovereigntyMaturity | null
+  sovereigntyAchResilience?: SovereigntyMaturity | null
+  sovereigntyAchSecurity?: SovereigntyMaturity | null
+  sovereigntyAchControl?: SovereigntyMaturity | null
+  sovereigntyAchStrategicAutonomyEvidence?: string
   lastSovereigntyAssessmentAt?: Date | null
 }
 

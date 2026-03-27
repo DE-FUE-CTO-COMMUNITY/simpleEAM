@@ -261,13 +261,11 @@ const ApplicationsPage = () => {
     const input = {
       name: applicationData.name,
       description: applicationData.description,
-      sovereigntyAchDataResidency: applicationData.sovereigntyAchDataResidency,
-      sovereigntyAchJurisdictionControl: applicationData.sovereigntyAchJurisdictionControl,
-      sovereigntyAchOperationalControl: applicationData.sovereigntyAchOperationalControl,
-      sovereigntyAchInteroperability: applicationData.sovereigntyAchInteroperability,
-      sovereigntyAchPortability: applicationData.sovereigntyAchPortability,
-      sovereigntyAchSupplyChainTransparency: applicationData.sovereigntyAchSupplyChainTransparency,
-      sovereigntyEvidence: applicationData.sovereigntyEvidence,
+      sovereigntyAchStrategicAutonomy: applicationData.sovereigntyAchStrategicAutonomy,
+      sovereigntyAchResilience: applicationData.sovereigntyAchResilience,
+      sovereigntyAchSecurity: applicationData.sovereigntyAchSecurity,
+      sovereigntyAchControl: applicationData.sovereigntyAchControl,
+      sovereigntyAchStrategicAutonomyEvidence: applicationData.sovereigntyAchStrategicAutonomyEvidence,
       lastSovereigntyAssessmentAt: applicationData.lastSovereigntyAssessmentAt,
       status: applicationData.status,
       criticality: applicationData.criticality,
@@ -492,21 +490,17 @@ const ApplicationsPage = () => {
     const input: Record<string, any> = {
       name: { set: applicationData.name },
       description: { set: applicationData.description },
-      sovereigntyAchDataResidency: { set: applicationData.sovereigntyAchDataResidency ?? null },
-      sovereigntyAchJurisdictionControl: {
-        set: applicationData.sovereigntyAchJurisdictionControl ?? null,
+      sovereigntyAchStrategicAutonomy: { set: applicationData.sovereigntyAchStrategicAutonomy ?? null },
+      sovereigntyAchResilience: {
+        set: applicationData.sovereigntyAchResilience ?? null,
       },
-      sovereigntyAchOperationalControl: {
-        set: applicationData.sovereigntyAchOperationalControl ?? null,
+      sovereigntyAchSecurity: {
+        set: applicationData.sovereigntyAchSecurity ?? null,
       },
-      sovereigntyAchInteroperability: {
-        set: applicationData.sovereigntyAchInteroperability ?? null,
+      sovereigntyAchControl: {
+        set: applicationData.sovereigntyAchControl ?? null,
       },
-      sovereigntyAchPortability: { set: applicationData.sovereigntyAchPortability ?? null },
-      sovereigntyAchSupplyChainTransparency: {
-        set: applicationData.sovereigntyAchSupplyChainTransparency ?? null,
-      },
-      sovereigntyEvidence: { set: applicationData.sovereigntyEvidence ?? null },
+      sovereigntyAchStrategicAutonomyEvidence: { set: applicationData.sovereigntyAchStrategicAutonomyEvidence ?? null },
       lastSovereigntyAssessmentAt: { set: applicationData.lastSovereigntyAssessmentAt ?? null },
       status: { set: applicationData.status },
       criticality: { set: applicationData.criticality },
