@@ -5,6 +5,7 @@ export const GET_SOVEREIGNTY_CAPABILITY_DETAIL = gql`
     $where: BusinessCapabilityWhere
     $applicationWhere: ApplicationWhere
     $aiComponentWhere: AIComponentWhere
+    $infrastructureWhere: InfrastructureWhere
   ) {
     businessCapabilities(where: $where) {
       id
@@ -85,6 +86,17 @@ export const GET_SOVEREIGNTY_CAPABILITY_DETAIL = gql`
         }
       }
     }
+    infrastructures(where: $infrastructureWhere) {
+      id
+      name
+      sovereigntyAchStrategicAutonomy
+      sovereigntyAchResilience
+      sovereigntyAchSecurity
+      sovereigntyAchControl
+      parentInfrastructure {
+        id
+      }
+    }
   }
 `
 
@@ -93,6 +105,7 @@ export const GET_SOVEREIGNTY_DATA_DETAIL = gql`
     $where: DataObjectWhere
     $applicationWhere: ApplicationWhere
     $aiComponentWhere: AIComponentWhere
+    $infrastructureWhere: InfrastructureWhere
   ) {
     dataObjects(where: $where) {
       id
@@ -163,6 +176,17 @@ export const GET_SOVEREIGNTY_DATA_DETAIL = gql`
           sovereigntyAchSecurity
           sovereigntyAchControl
         }
+      }
+    }
+    infrastructures(where: $infrastructureWhere) {
+      id
+      name
+      sovereigntyAchStrategicAutonomy
+      sovereigntyAchResilience
+      sovereigntyAchSecurity
+      sovereigntyAchControl
+      parentInfrastructure {
+        id
       }
     }
   }

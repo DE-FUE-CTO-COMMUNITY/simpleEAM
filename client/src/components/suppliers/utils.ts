@@ -60,7 +60,7 @@ export const countActiveFilters = (filterState: FilterState): number => {
   if (filterState.strategicImportanceFilter && filterState.strategicImportanceFilter.length > 0)
     count++
   if (filterState.descriptionFilter) count++
-  if (filterState.updatedDateRange[0] && filterState.updatedDateRange[1]) count++
+  if (filterState.updatedDateRange[0] || filterState.updatedDateRange[1]) count++
 
   return count
 }

@@ -52,11 +52,12 @@ export default function SovereigntyCapabilityView({
   const companyWhere = useCompanyWhere('company')
   const applicationWhere = useCompanyWhere('company')
   const aiComponentWhere = useCompanyWhere('company')
+  const infrastructureWhere = useCompanyWhere('company')
 
   const { data, loading, error } = useQuery(GET_SOVEREIGNTY_CAPABILITY_DETAIL, {
     skip: !selectedCompanyId,
     fetchPolicy: 'cache-and-network',
-    variables: { where: companyWhere, applicationWhere, aiComponentWhere },
+    variables: { where: companyWhere, applicationWhere, aiComponentWhere, infrastructureWhere },
   })
 
   if (!selectedCompanyId) {
@@ -78,6 +79,7 @@ export default function SovereigntyCapabilityView({
   const capabilities: CapabilityItem[] = data?.businessCapabilities ?? []
   const allApplications: DependencyApplication[] = data?.applications ?? []
   const allAIComponents: DependencyAIComponent[] = data?.aiComponents ?? []
+  const allInfrastructures: AchievedEntity[] = data?.infrastructures ?? []
   const applicationIds = new Set(allApplications.map(app => app.id))
   const aiComponentIds = new Set(allAIComponents.map(ai => ai.id))
 
@@ -97,6 +99,7 @@ export default function SovereigntyCapabilityView({
           rootAIComponents: capability.supportedByAIComponents,
           allApplications,
           allAIComponents,
+          allInfrastructures,
         })
 
         const hasReqs = hasAnySovereigntyReqs(capability)

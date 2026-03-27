@@ -105,10 +105,8 @@ function mergeAchievedEntity(existing: AchievedEntity, incoming: AchievedEntity)
       existing.sovereigntyAchStrategicAutonomy ?? incoming.sovereigntyAchStrategicAutonomy,
     sovereigntyAchResilience:
       existing.sovereigntyAchResilience ?? incoming.sovereigntyAchResilience,
-    sovereigntyAchSecurity:
-      existing.sovereigntyAchSecurity ?? incoming.sovereigntyAchSecurity,
-    sovereigntyAchControl:
-      existing.sovereigntyAchControl ?? incoming.sovereigntyAchControl,
+    sovereigntyAchSecurity: existing.sovereigntyAchSecurity ?? incoming.sovereigntyAchSecurity,
+    sovereigntyAchControl: existing.sovereigntyAchControl ?? incoming.sovereigntyAchControl,
   }
 }
 
@@ -127,11 +125,12 @@ function addAchievedEntity(
 
 function addAssociatedInfrastructure(
   target: Map<string, AchievedEntity>,
-  entity: HasInfrastructureDependencies | null | undefined
+  entity: HasInfrastructureDependencies | null | undefined,
+  infrastructureById: Map<string, DependencyInfrastructure>
 ) {
   const pickParentInfrastructure = (
     parentInfrastructure: DependencyInfrastructure['parentInfrastructure']
-  ): AchievedEntity | null => {
+  ): DependencyInfrastructure | null => {
     if (!parentInfrastructure) {
       return null
     }
@@ -141,33 +140,78 @@ function addAssociatedInfrastructure(
         return null
       }
 
-      const withSovereigntyValues = parentInfrastructure.find(parent => hasAnySovereigntyAchs(parent))
-      return withSovereigntyValues ?? parentInfrastructure[0]
+      const withSovereigntyValues = parentInfrastructure.find(parent =>
+        hasAnySovereigntyAchs(parent)
+      )
+      const selected = (withSovereigntyValues ?? parentInfrastructure[0]) as DependencyInfrastructure
+
+      if (!selected?.id) {
+        return selected
+      }
+
+      return infrastructureById.get(selected.id) ?? selected
     }
 
-    return parentInfrastructure
+    const selected = parentInfrastructure as DependencyInfrastructure
+    if (!selected?.id) {
+      return selected
+    }
+
+    return infrastructureById.get(selected.id) ?? selected
+  }
+
+  const resolveInheritedValue = (
+    infrastructure: DependencyInfrastructure,
+    field: keyof AchievedEntity,
+    visited: Set<string>
+  ): string | null | undefined => {
+    const directValue = infrastructure[field] as string | null | undefined
+    if (directValue != null) {
+      return directValue
+    }
+
+    if (!infrastructure.id || visited.has(infrastructure.id)) {
+      return directValue
+    }
+
+    const nextVisited = new Set(visited)
+    nextVisited.add(infrastructure.id)
+
+    const parent = pickParentInfrastructure(
+      infrastructure.parentInfrastructure as DependencyInfrastructure['parentInfrastructure']
+    )
+    if (!parent) {
+      return directValue
+    }
+
+    return resolveInheritedValue(parent, field, nextVisited)
   }
 
   const buildEffectiveInfrastructure = (
     infrastructure: DependencyInfrastructure
   ): AchievedEntity => {
-    const parent = pickParentInfrastructure(infrastructure.parentInfrastructure)
-    if (!parent) {
-      return infrastructure
-    }
-
-    // Inherit sovereignty achievements from parent infrastructure only as fallback.
-    // Explicit child values must take precedence.
     return {
       ...infrastructure,
-      sovereigntyAchStrategicAutonomy:
-        infrastructure.sovereigntyAchStrategicAutonomy ?? parent.sovereigntyAchStrategicAutonomy,
-      sovereigntyAchResilience:
-        infrastructure.sovereigntyAchResilience ?? parent.sovereigntyAchResilience,
-      sovereigntyAchSecurity:
-        infrastructure.sovereigntyAchSecurity ?? parent.sovereigntyAchSecurity,
-      sovereigntyAchControl:
-        infrastructure.sovereigntyAchControl ?? parent.sovereigntyAchControl,
+      sovereigntyAchStrategicAutonomy: resolveInheritedValue(
+        infrastructure,
+        'sovereigntyAchStrategicAutonomy',
+        new Set<string>()
+      ),
+      sovereigntyAchResilience: resolveInheritedValue(
+        infrastructure,
+        'sovereigntyAchResilience',
+        new Set<string>()
+      ),
+      sovereigntyAchSecurity: resolveInheritedValue(
+        infrastructure,
+        'sovereigntyAchSecurity',
+        new Set<string>()
+      ),
+      sovereigntyAchControl: resolveInheritedValue(
+        infrastructure,
+        'sovereigntyAchControl',
+        new Set<string>()
+      ),
     }
   }
 
@@ -176,8 +220,28 @@ function addAssociatedInfrastructure(
   for (const list of relationLists) {
     if (!list) continue
     for (const infrastructure of list) {
-      addAchievedEntity(target, buildEffectiveInfrastructure(infrastructure))
+      addAchievedEntity(
+        target,
+        buildEffectiveInfrastructure(infrastructure as DependencyInfrastructure)
+      )
     }
+  }
+}
+
+function buildEffectiveApplication(application: DependencyApplication): DependencyApplication {
+  const hasComponents = (application.components?.length ?? 0) > 0
+  if (!hasComponents) {
+    return application
+  }
+
+  // Container applications inherit their achieved sovereignty from components.
+  // Therefore, hide direct application achievements for scoring and tooltip display.
+  return {
+    ...application,
+    sovereigntyAchStrategicAutonomy: null,
+    sovereigntyAchResilience: null,
+    sovereigntyAchSecurity: null,
+    sovereigntyAchControl: null,
   }
 }
 
@@ -186,6 +250,7 @@ interface DependencyTreeParams {
   rootAIComponents?: AchievedEntity[]
   allApplications: DependencyApplication[]
   allAIComponents: DependencyAIComponent[]
+  allInfrastructures?: DependencyInfrastructure[]
 }
 
 export function collectAchievedDependencyTree({
@@ -193,12 +258,14 @@ export function collectAchievedDependencyTree({
   rootAIComponents = [],
   allApplications,
   allAIComponents,
+  allInfrastructures = [],
 }: DependencyTreeParams): AchievedEntity[] {
   const allById = new Map<string, AchievedEntity>()
   const appById = new Map(allApplications.map(app => [app.id, app]))
   const aiById = new Map(allAIComponents.map(ai => [ai.id, ai]))
   const rootAppById = new Map(rootApplications.map(app => [app.id, app]))
   const rootAiById = new Map(rootAIComponents.map(ai => [ai.id, ai as DependencyAIComponent]))
+  const infrastructureById = new Map(allInfrastructures.map(infra => [infra.id, infra]))
 
   const visitedApplicationIds = new Set<string>()
   const applicationStack = rootApplications.map(app => app.id)
@@ -218,8 +285,10 @@ export function collectAchievedDependencyTree({
       continue
     }
 
-    addAchievedEntity(allById, application)
-    addAssociatedInfrastructure(allById, application)
+    const effectiveApplication = buildEffectiveApplication(application)
+
+    addAchievedEntity(allById, effectiveApplication)
+    addAssociatedInfrastructure(allById, effectiveApplication, infrastructureById)
 
     for (const componentRef of application.components ?? []) {
       if (componentRef?.id && !visitedApplicationIds.has(componentRef.id)) {
@@ -244,7 +313,7 @@ export function collectAchievedDependencyTree({
       return
     }
     addAchievedEntity(allById, aiComponent)
-    addAssociatedInfrastructure(allById, aiComponent)
+    addAssociatedInfrastructure(allById, aiComponent, infrastructureById)
   })
 
   return Array.from(allById.values())

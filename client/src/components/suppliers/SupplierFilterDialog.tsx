@@ -5,6 +5,12 @@ import { useTranslations } from 'next-intl'
 import GenericFilterDialog, { FilterField } from '../common/GenericFilterDialog'
 import { FilterState } from './types'
 import { countActiveFilters } from './utils'
+import {
+  SupplierType as SupplierTypeEnum,
+  SupplierStatus,
+  RiskClassification,
+  StrategicImportance,
+} from '@/gql/generated'
 
 interface SuppliersFilterProps {
   filterState: FilterState
@@ -22,39 +28,63 @@ export function SuppliersFilterDialog({
   onApply,
 }: SuppliersFilterProps) {
   const t = useTranslations('suppliers')
+  const tType = useTranslations('suppliers.supplierTypes')
+  const tStatus = useTranslations('suppliers.statuses')
+  const tRisk = useTranslations('suppliers.riskClassifications')
+  const tImportance = useTranslations('suppliers.strategicImportances')
+  const tCommon = useTranslations('common')
 
   // Konfiguration der Filterfelder
   const filterFields: FilterField[] = [
-    // TODO: Definiere hier die spezifischen Filter-Felder für suppliers
-    // Beispiele für verschiedene Filter-Typen:
-    // 
-    // Text-Filter:
-    // {
-    //   id: 'nameFilter',
-    //   label: t('form.name'),
-    //   type: 'text',
-    //   placeholder: t('searchPlaceholder'),
-    // },
-    //
-    // Multi-Select Filter:
-    // {
-    //   id: 'statusFilter',
-    //   label: t('form.status'),
-    //   type: 'multiSelect',
-    //   options: availableStatuses.map(status => ({
-    //     value: status,
-    //     label: t(`statuses.${status}`)
-    //   })),
-    // },
-    //
-    // Datum-Bereich Filter:
-    // {
-    //   id: 'createdDateRange',
-    //   label: 'Erstellungsdatum',
-    //   type: 'dateRange',
-    //   fromLabel: 'Von',
-    //   toLabel: 'Bis',
-    // },
+    {
+      id: 'supplierTypeFilter',
+      label: t('form.supplierType'),
+      type: 'multiSelect',
+      options: Object.values(SupplierTypeEnum).map(value => ({
+        value,
+        label: tType(value),
+      })),
+    },
+    {
+      id: 'statusFilter',
+      label: t('form.status'),
+      type: 'multiSelect',
+      options: Object.values(SupplierStatus).map(value => ({
+        value,
+        label: tStatus(value),
+      })),
+    },
+    {
+      id: 'riskClassificationFilter',
+      label: t('form.riskClassification'),
+      type: 'multiSelect',
+      options: Object.values(RiskClassification).map(value => ({
+        value,
+        label: tRisk(value),
+      })),
+    },
+    {
+      id: 'strategicImportanceFilter',
+      label: t('form.strategicImportance'),
+      type: 'multiSelect',
+      options: Object.values(StrategicImportance).map(value => ({
+        value,
+        label: tImportance(value),
+      })),
+    },
+    {
+      id: 'descriptionFilter',
+      label: t('form.description'),
+      type: 'text',
+      placeholder: t('searchPlaceholder'),
+    },
+    {
+      id: 'updatedDateRange',
+      label: t('table.updatedAt'),
+      type: 'dateRange',
+      fromLabel: tCommon('from'),
+      toLabel: tCommon('to'),
+    },
   ]
 
   return (

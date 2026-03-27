@@ -49,11 +49,12 @@ export default function SovereigntyDataView({ onEntityClick }: SovereigntyDataVi
   const companyWhere = useCompanyWhere('company')
   const applicationWhere = useCompanyWhere('company')
   const aiComponentWhere = useCompanyWhere('company')
+  const infrastructureWhere = useCompanyWhere('company')
 
   const { data, loading, error } = useQuery(GET_SOVEREIGNTY_DATA_DETAIL, {
     skip: !selectedCompanyId,
     fetchPolicy: 'cache-and-network',
-    variables: { where: companyWhere, applicationWhere, aiComponentWhere },
+    variables: { where: companyWhere, applicationWhere, aiComponentWhere, infrastructureWhere },
   })
 
   if (!selectedCompanyId) {
@@ -75,6 +76,7 @@ export default function SovereigntyDataView({ onEntityClick }: SovereigntyDataVi
   const dataObjects: DataObjectItem[] = data?.dataObjects ?? []
   const allApplications: DependencyApplication[] = data?.applications ?? []
   const allAIComponents: DependencyAIComponent[] = data?.aiComponents ?? []
+  const allInfrastructures: AchievedEntity[] = data?.infrastructures ?? []
   const applicationIds = new Set(allApplications.map(app => app.id))
   const aiComponentIds = new Set(allAIComponents.map(ai => ai.id))
 
@@ -93,6 +95,7 @@ export default function SovereigntyDataView({ onEntityClick }: SovereigntyDataVi
           rootApplications: dataObject.usedByApplications,
           allApplications,
           allAIComponents,
+          allInfrastructures,
         })
 
         const hasReqs = hasAnySovereigntyReqs(dataObject)

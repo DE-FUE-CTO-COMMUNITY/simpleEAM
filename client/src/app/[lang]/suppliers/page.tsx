@@ -22,6 +22,7 @@ import SupplierTable, {
 import SupplierToolbar from '@/components/suppliers/SupplierToolbar'
 import SupplierFilterDialog from '@/components/suppliers/SupplierFilterDialog'
 import { useSupplierFilter } from '@/components/suppliers/useSupplierFilter'
+import { countActiveFilters } from '@/components/suppliers/utils'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import { useCompanyContext } from '@/contexts/CompanyContext'
 
@@ -216,12 +217,7 @@ const SuppliersPage = () => {
 
   // Aktive Filter zählen
   const activeFiltersCount = useMemo(() => {
-    return Object.values(filterState).filter(value => {
-      if (Array.isArray(value)) return value.length > 0
-      if (value === null || value === undefined) return false
-      if (typeof value === 'string') return value.trim() !== ''
-      return true
-    }).length
+    return countActiveFilters(filterState)
   }, [filterState])
 
   // Error Handling
