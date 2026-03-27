@@ -462,19 +462,34 @@ const SoftwareVersionForm: React.FC<
       }),
     }
 
+    // Track globally expanded refs to prevent combinatorial explosion.
+    // A node that was already fully expanded elsewhere is shown as a leaf (no children).
+    const expandedRefs = new Set<string>()
+
     const buildNestedNode = (ref: string, trail: string, path: Set<string>): SbomTreeNode => {
       const component = resolveComponent(ref)
 
       if (path.has(ref)) {
         return {
           id: `${trail}|${ref}|cycle`,
-          name: `${component.name} (cycle)`,
+          name: `${component.name} ↺`,
           version: component.version,
           license: component.license,
           children: [],
         }
       }
 
+      if (expandedRefs.has(ref)) {
+        return {
+          id: `${trail}|${ref}|dup`,
+          name: `${component.name} →`,
+          version: component.version,
+          license: component.license,
+          children: [],
+        }
+      }
+
+      expandedRefs.add(ref)
       const nextPath = new Set(path)
       nextPath.add(ref)
 
