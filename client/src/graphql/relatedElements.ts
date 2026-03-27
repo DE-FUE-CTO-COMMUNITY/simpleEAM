@@ -104,6 +104,20 @@ export const GET_RELATED_ELEMENTS_FOR_APPLICATION = gql`
         infrastructureType
         status
       }
+      parents {
+        id
+        name
+        description
+        status
+        criticality
+      }
+      components {
+        id
+        name
+        description
+        status
+        criticality
+      }
     }
   }
 `
@@ -199,6 +213,20 @@ export const GET_RELATED_ELEMENTS_FOR_INFRASTRUCTURE = gql`
         description
         status
         criticality
+      }
+      parentInfrastructure {
+        id
+        name
+        description
+        infrastructureType
+        status
+      }
+      childInfrastructures {
+        id
+        name
+        description
+        infrastructureType
+        status
       }
     }
   }

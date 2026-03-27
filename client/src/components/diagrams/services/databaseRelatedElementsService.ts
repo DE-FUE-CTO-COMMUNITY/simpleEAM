@@ -263,6 +263,34 @@ export const extractRelatedElementsFromQueryResult = (
           })
         })
       }
+      if (elementData.parents) {
+        elementData.parents.forEach((app: any) => {
+          relatedElements.push({
+            id: app.id,
+            name: app.name,
+            description: app.description,
+            elementType: 'application',
+            status: app.status,
+            criticality: app.criticality,
+            relationshipType: 'HAS_PARENT_APPLICATION',
+            reverseArrow: false,
+          })
+        })
+      }
+      if (elementData.components) {
+        elementData.components.forEach((app: any) => {
+          relatedElements.push({
+            id: app.id,
+            name: app.name,
+            description: app.description,
+            elementType: 'application',
+            status: app.status,
+            criticality: app.criticality,
+            relationshipType: 'HAS_PARENT_APPLICATION',
+            reverseArrow: false,
+          })
+        })
+      }
       break
     case 'businessProcess':
       if (elementData.supportsCapabilities) {
@@ -422,6 +450,37 @@ export const extractRelatedElementsFromQueryResult = (
             elementType: 'application',
             status: app.status,
             criticality: app.criticality,
+          })
+        })
+      }
+      if (elementData.parentInfrastructure) {
+        const parents = Array.isArray(elementData.parentInfrastructure)
+          ? elementData.parentInfrastructure
+          : [elementData.parentInfrastructure]
+        parents.forEach((infra: any) => {
+          relatedElements.push({
+            id: infra.id,
+            name: infra.name,
+            description: infra.description,
+            elementType: 'infrastructure',
+            infrastructureType: infra.infrastructureType,
+            status: infra.status,
+            relationshipType: 'HAS_PARENT_INFRASTRUCTURE',
+            reverseArrow: false,
+          })
+        })
+      }
+      if (elementData.childInfrastructures) {
+        elementData.childInfrastructures.forEach((infra: any) => {
+          relatedElements.push({
+            id: infra.id,
+            name: infra.name,
+            description: infra.description,
+            elementType: 'infrastructure',
+            infrastructureType: infra.infrastructureType,
+            status: infra.status,
+            relationshipType: 'HAS_PARENT_INFRASTRUCTURE',
+            reverseArrow: true,
           })
         })
       }

@@ -565,13 +565,15 @@ const createSingleRelationship = async (
 
     case 'HAS_PARENT_APPLICATION':
       if (sourceElementType === 'application' && targetElementType === 'application') {
+        // Arrow goes parent (source) → component (target, arrowhead here).
+        // Semantics: component.parents = [parent], so targetElementId is the component.
         await client.mutate({
           mutation: UPDATE_APPLICATION_PARENTS,
           variables: {
-            where: { id: { eq: sourceElementId } },
+            where: { id: { eq: targetElementId } },
             update: {
               parents: {
-                connect: [{ where: { node: { id: { eq: targetElementId } } } }],
+                connect: [{ where: { node: { id: { eq: sourceElementId } } } }],
               },
             },
           },
@@ -880,8 +882,9 @@ export const checkRelationshipExists = async (
 
       case 'HAS_PARENT_APPLICATION':
         if (sourceElementType === 'application' && targetElementType === 'application') {
+          // Arrow goes parent (source) → component (target). Check if component already has this parent.
           query = CHECK_APPLICATION_HAS_PARENT
-          variables = { applicationId: sourceElementId, parentId: targetElementId }
+          variables = { applicationId: targetElementId, parentId: sourceElementId }
         }
         break
 
