@@ -7,8 +7,9 @@ import { MenuItem, ListItemIcon, ListItemText, Menu } from '@mui/material'
 
 // Supported languages
 const languages = [
-  { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
-  { code: 'en', name: 'English', flag: '🇺🇸' },
+  { code: 'de', name: 'Deutsch', flag: 'DE' },
+  { code: 'en', name: 'English', flag: 'EN' },
+  { code: 'fr', name: 'Français', flag: 'FR' },
 ] as const
 
 interface LanguageSwitcherProps {
@@ -23,7 +24,7 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ anchorEl, open, onC
   const router = useRouter()
   const pathname = usePathname()
 
-  const handleLanguageChange = (langCode: 'de' | 'en') => {
+  const handleLanguageChange = (langCode: 'de' | 'en' | 'fr') => {
     // next-intl Navigation verwendet automatisch die richtige URL-Struktur
     router.replace(pathname, { locale: langCode })
     onClose()
@@ -50,10 +51,24 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ anchorEl, open, onC
           selected={language.code === locale}
         >
           <ListItemIcon>
-            <span style={{ fontSize: '1.2em' }}>{language.flag}</span>
+            <span
+              style={{
+                fontSize: '0.75em',
+                fontWeight: 600,
+                display: 'inline-flex',
+                width: '1.2em',
+                justifyContent: 'center',
+              }}
+            >
+              {language.flag}
+            </span>
           </ListItemIcon>
           <ListItemText>
-            {language.code === 'de' ? t('german') : t('english')}
+            {language.code === 'de'
+              ? t('german')
+              : language.code === 'en'
+                ? t('english')
+                : t('french')}
             {language.code === locale && ' ✓'}
           </ListItemText>
         </MenuItem>

@@ -699,6 +699,7 @@
   "language": {
     "german": "Deutsch",
     "english": "Englisch",
+    "french": "Französisch",
     "current": "Aktuelle Sprache: {language}"
   },
   "architecturePrinciples": {

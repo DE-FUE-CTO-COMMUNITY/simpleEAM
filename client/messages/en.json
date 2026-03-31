@@ -696,6 +696,7 @@
   "language": {
     "german": "German",
     "english": "English",
+    "french": "French",
     "current": "Current language: {language}"
   },
   "errors": {
