@@ -309,7 +309,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
   const menuItems = [
     { text: t('dashboard'), icon: <DashboardIcon />, href: '/' },
     ...(initialized && hasAiSupport && (isAdmin() || isArchitect())
-      ? [{ text: t('agenticArchitect'), icon: <AgenticArchitectIcon />, href: '/ai-support' }]
+      ? [{ text: t('agenticArchitect'), icon: <AgenticArchitectIcon />, href: '/agentic-architect' }]
       : []),
     { text: t('diagramEditor'), icon: <DiagramIcon />, href: '/diagrams' },
     ...(isGeaEnabled && selectedLens === 'businessArchitecture'

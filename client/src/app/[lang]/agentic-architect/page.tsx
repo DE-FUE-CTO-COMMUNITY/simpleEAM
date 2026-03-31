@@ -7,8 +7,9 @@ import { useTranslations } from 'next-intl'
 import AiRunPanel from '@/components/admin/AiRunPanel'
 import { isAdmin, isArchitect, useAuth } from '@/lib/auth'
 import { useRuntimeConfig } from '@/lib/runtime-config'
+import { AgenticArchitectIcon } from '@/components/icons'
 
-export default function AiSupportPage() {
+export default function AgenticArchitectPage() {
   const tNavigation = useTranslations('navigation')
   const { initialized } = useAuth()
   const runtimeConfig = useRuntimeConfig()
@@ -37,9 +38,12 @@ export default function AiSupportPage() {
 
   return (
     <Box sx={{ mt: 4, mb: 4, mx: 3 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        {tNavigation('aiSupport')}
-      </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
+        <AgenticArchitectIcon sx={{ fontSize: 36 }} />
+        <Typography variant="h4" component="h1">
+          {tNavigation('agenticArchitect')}
+        </Typography>
+      </Box>
       <AiRunPanel />
     </Box>
   )
