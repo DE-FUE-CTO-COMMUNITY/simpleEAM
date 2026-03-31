@@ -78,6 +78,7 @@
   },
   "navigation": {
     "dashboard": "Tableau de bord",
+    "agenticArchitect": "Architecte Agentique",
     "diagramEditor": "Éditeur de diagramme",
     "aiSupport": "Prise en charge de l'IA",
     "matrixEditor": "Éditeur de matrice",
@@ -696,6 +697,7 @@
   "language": {
     "german": "Allemand",
     "english": "Anglais",
+    "french": "Français",
     "current": "Langue actuelle : {language}"
   },
   "errors": {

@@ -32,6 +32,7 @@ import {
   SettingsInputComponent as HardwareVersionIcon,
 } from '@mui/icons-material'
 import {
+  AgenticArchitectIcon,
   BusinessCapabilityIcon,
   BusinessProcessIcon,
   ApplicationComponentIcon,
@@ -307,15 +308,15 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
 
   const menuItems = [
     { text: t('dashboard'), icon: <DashboardIcon />, href: '/' },
+    ...(initialized && hasAiSupport && (isAdmin() || isArchitect())
+      ? [{ text: t('agenticArchitect'), icon: <AgenticArchitectIcon />, href: '/ai-support' }]
+      : []),
     { text: t('diagramEditor'), icon: <DiagramIcon />, href: '/diagrams' },
     ...(isGeaEnabled && selectedLens === 'businessArchitecture'
       ? [{ text: t('matrixEditor'), icon: <GridOnIcon />, href: '/matrix-editor' }]
       : []),
     ...(selectedLens === 'processArchitecture'
       ? [{ text: t('processEditor'), icon: <GridOnIcon />, href: '/process-editor' }]
-      : []),
-    ...(initialized && hasAiSupport && (isAdmin() || isArchitect())
-      ? [{ text: t('aiSupport'), icon: <SmartToyIcon />, href: '/ai-support' }]
       : []),
     { text: t('architectures'), icon: <ArchitectureIcon />, href: '/architectures' },
     {

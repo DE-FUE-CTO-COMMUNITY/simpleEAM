@@ -84,6 +84,7 @@
   },
   "navigation": {
     "dashboard": "Dashboard",
+    "agenticArchitect": "Agentischer Architekt",
     "diagramEditor": "Diagram-Editor",
     "aiSupport": "AI Support",
     "matrixEditor": "Matrix-Editor",

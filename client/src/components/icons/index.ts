@@ -1,4 +1,5 @@
 // ArchiMate Icons Export
+export { default as AgenticArchitectIcon } from './AgenticArchitectIcon'
 export { default as AIComponentIcon } from './AIComponentIcon'
 export { default as ApplicationComponentIcon } from './ApplicationComponentIcon'
 export { default as ApplicationInterfaceIcon } from './ApplicationInterfaceIcon'
