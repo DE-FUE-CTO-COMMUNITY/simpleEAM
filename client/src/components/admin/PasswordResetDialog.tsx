@@ -21,6 +21,7 @@ import { z } from 'zod'
 import { useTranslations } from 'next-intl'
 import { KeycloakUser } from '@/lib/keycloak-types'
 import { keycloak } from '@/lib/auth'
+import { useBrandConfig } from '@/lib/runtime-config'
 
 interface PasswordResetData {
   newPassword: string
@@ -103,6 +104,7 @@ export default function PasswordResetDialog({
   onClipboardMessage,
 }: PasswordResetDialogProps) {
   const t = useTranslations('admin.userManagement.passwordReset')
+  const brandConfig = useBrandConfig()
   const [submitLoading, setSubmitLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showPassword, setShowPassword] = useState(false)
@@ -215,7 +217,7 @@ export default function PasswordResetDialog({
   const handleCopyToClipboard = async (password: string) => {
     if (!user) return false
 
-    const clipboardText = `${t('clipboard.accessDataIntro')}
+    const clipboardText = `${t('clipboard.accessDataIntro', { brandNameShort: brandConfig.nameShort })}
 
 ${t('clipboard.username')}: ${user.username}
 ${t('clipboard.email')}: ${user.email || 'N/A'}

@@ -17,6 +17,7 @@ import UserProfileMenu from './UserProfileMenu'
 import ThemeToggleButton from '../ui/ThemeToggleButton'
 import { useCompanyContext } from '@/contexts/CompanyContext'
 import { useLensSelection } from '@/lib/lens-settings'
+import { useBrandConfig } from '@/lib/runtime-config'
 
 interface AppHeaderProps {
   open: boolean
@@ -45,6 +46,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
   const hasMultipleCompanies = (companies?.length ?? 0) > 1
   const { selectedLens, setSelectedLens, enabledLenses } = useLensSelection()
   const router = useRouter()
+  const brandConfig = useBrandConfig()
 
   const handleLensChange = (nextLens: typeof selectedLens) => {
     if (nextLens === selectedLens) {
@@ -122,7 +124,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
         </IconButton>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexGrow: 1, minWidth: 0 }}>
           <Typography variant="h6" noWrap component="div" sx={{ whiteSpace: 'nowrap' }}>
-            NextGen Enterprise Architecture Management
+            {brandConfig.nameLong}
           </Typography>
           {/* Company selector: show dropdown if multiple, otherwise static label */}
           {hasMultipleCompanies ? (

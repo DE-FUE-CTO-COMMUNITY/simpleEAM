@@ -2521,7 +2521,7 @@
         "success": "Passwort erfolgreich zurückgesetzt. Der Benutzer muss es beim nächsten Login ändern.",
         "error": "Fehler beim Zurücksetzen des Passworts",
         "clipboard": {
-          "accessDataIntro": "Hier sind die Zugangsdaten für NextGen EAM:",
+          "accessDataIntro": "Hier sind die Zugangsdaten für {brandNameShort}:",
           "username": "Benutzername",
           "email": "E-Mail",
           "password": "Passwort",

@@ -130,7 +130,7 @@
   },
   "dashboard": {
     "title": "Dashboard",
-    "subtitle": "Welcome to NextGen EAM",
+    "subtitle": "Welcome to {brandNameShort}",
     "description": "Enterprise Architecture Management System",
     "companyNotSelected": "No company selected",
     "companySovereigntyScore": "Sovereignty Score",
@@ -2578,7 +2578,7 @@
         "success": "Password successfully reset. User must change it on next login.",
         "error": "Error resetting password",
         "clipboard": {
-          "accessDataIntro": "Here are the access credentials for NextGen EAM:",
+          "accessDataIntro": "Here are the access credentials for {brandNameShort}:",
           "username": "Username",
           "email": "Email",
           "password": "Password",

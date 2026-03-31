@@ -1,4 +1,8 @@
 export interface RuntimeConfig {
+  brand: {
+    nameLong: string
+    nameShort: string
+  }
   keycloak: {
     url: string
     realm: string
@@ -22,6 +26,8 @@ export interface RuntimeConfig {
   logo: {
     url: string
     alt: string
+    width: number
+    darkUrl: string
   }
   tool: {
     version: string
@@ -29,6 +35,10 @@ export interface RuntimeConfig {
 }
 
 export const defaultConfig: RuntimeConfig = {
+  brand: {
+    nameLong: 'NextGen Enterprise Architecture Management',
+    nameShort: 'NextGen EAM',
+  },
   keycloak: {
     url: 'http://localhost:8080',
     realm: 'nextgen-eam',
@@ -52,6 +62,8 @@ export const defaultConfig: RuntimeConfig = {
   logo: {
     url: '/images/NextGen-EAM-Logo.svg',
     alt: 'NextGen EAM Logo',
+    width: 120,
+    darkUrl: '',
   },
   tool: {
     version: '0.0.0',

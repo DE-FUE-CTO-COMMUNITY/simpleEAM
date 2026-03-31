@@ -87,3 +87,8 @@ export function useToolConfig() {
   const config = useRuntimeConfig()
   return config.tool
 }
+
+export function useBrandConfig() {
+  const config = useRuntimeConfig()
+  return config.brand
+}

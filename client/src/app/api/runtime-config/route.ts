@@ -10,6 +10,13 @@ const appVersion = packageJson.version ?? '0.0.0'
  */
 export async function GET() {
   const config = {
+    // Brand Configuration
+    brand: {
+      nameLong:
+        process.env.BRAND_NAME_LONG || 'NextGen Enterprise Architecture Management',
+      nameShort: process.env.BRAND_NAME_SHORT || 'NextGen EAM',
+    },
+
     // Keycloak Configuration
     keycloak: {
       url: process.env.KEYCLOAK_URL || 'http://localhost:8080',
@@ -44,6 +51,8 @@ export async function GET() {
     logo: {
       url: process.env.LOGO_URL || '/images/NextGen-EAM-Logo.svg',
       alt: process.env.LOGO_ALT || 'NextGen EAM Logo',
+      width: Math.min(parseInt(process.env.LOGO_LENGTH || '120', 10), 184),
+      darkUrl: process.env.LOGO_DARK_URL || '',
     },
 
     // Tool metadata
