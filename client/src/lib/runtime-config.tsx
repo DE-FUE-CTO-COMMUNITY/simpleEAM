@@ -92,3 +92,13 @@ export function useBrandConfig() {
   const config = useRuntimeConfig()
   return config.brand
 }
+
+export function useUiConfig() {
+  const config = useRuntimeConfig()
+  return config.ui
+}
+
+export function useFaviconConfig() {
+  const config = useRuntimeConfig()
+  return config.favicon
+}

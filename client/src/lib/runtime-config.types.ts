@@ -29,6 +29,12 @@ export interface RuntimeConfig {
     width: number
     darkUrl: string
   }
+  ui: {
+    drawerWidth: number
+  }
+  favicon: {
+    url: string
+  }
   tool: {
     version: string
   }
@@ -64,6 +70,12 @@ export const defaultConfig: RuntimeConfig = {
     alt: 'NextGen EAM Logo',
     width: 120,
     darkUrl: '',
+  },
+  ui: {
+    drawerWidth: 240,
+  },
+  favicon: {
+    url: '/favicon.ico',
   },
   tool: {
     version: '0.0.0',

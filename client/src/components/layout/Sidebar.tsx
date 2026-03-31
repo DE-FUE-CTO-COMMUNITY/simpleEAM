@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import {
   Toolbar,
   Divider,
@@ -16,49 +16,49 @@ import { ChevronLeft as ChevronLeftIcon } from '@mui/icons-material'
 import MuiDrawer from '@mui/material/Drawer'
 import Link from 'next/link'
 import Logo from '../common/Logo'
-
-// Konstanten und Styles
-const drawerWidth = 240
-
-// Styled components for layout
-const openedMixin = (theme: Theme) => ({
-  width: drawerWidth,
-  transition: theme.transitions.create('width', {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.enteringScreen,
-  }),
-  overflowX: 'hidden' as const,
-})
-
-const closedMixin = (theme: Theme) => ({
-  transition: theme.transitions.create('width', {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  overflowX: 'hidden' as const,
-  width: `calc(${theme.spacing(7)} + 1px)`,
-})
+import { useUiConfig } from '@/lib/runtime-config'
 
 interface DrawerProps {
   open?: boolean
+  drawerWidth?: number
 }
 
-const StyledDrawer = styled(MuiDrawer, {
-  shouldForwardProp: prop => prop !== 'open',
-})<DrawerProps>(({ theme, open }) => ({
-  width: drawerWidth,
-  flexShrink: 0,
-  whiteSpace: 'nowrap',
-  boxSizing: 'border-box',
-  ...(open && {
-    ...openedMixin(theme),
-    '& .MuiDrawer-paper': openedMixin(theme),
-  }),
-  ...(!open && {
-    ...closedMixin(theme),
-    '& .MuiDrawer-paper': closedMixin(theme),
-  }),
-}))
+const createStyledDrawer = (drawerWidth: number) => {
+  const openedMixin = (theme: Theme) => ({
+    width: drawerWidth,
+    transition: theme.transitions.create('width', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+    overflowX: 'hidden' as const,
+  })
+
+  const closedMixin = (theme: Theme) => ({
+    transition: theme.transitions.create('width', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+    overflowX: 'hidden' as const,
+    width: `calc(${theme.spacing(7)} + 1px)`,
+  })
+
+  return styled(MuiDrawer, {
+    shouldForwardProp: prop => prop !== 'open',
+  })<DrawerProps>(({ theme, open }) => ({
+    width: drawerWidth,
+    flexShrink: 0,
+    whiteSpace: 'nowrap',
+    boxSizing: 'border-box',
+    ...(open && {
+      ...openedMixin(theme),
+      '& .MuiDrawer-paper': openedMixin(theme),
+    }),
+    ...(!open && {
+      ...closedMixin(theme),
+      '& .MuiDrawer-paper': closedMixin(theme),
+    }),
+  }))
+}
 
 interface MenuItem {
   text: string
@@ -78,6 +78,10 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ open, menuItems, handleDrawerToggle, isActive }) => {
   const theme = useTheme()
+  const { drawerWidth } = useUiConfig()
+
+  // Create the StyledDrawer with the runtime drawer width
+  const StyledDrawer = useMemo(() => createStyledDrawer(drawerWidth), [drawerWidth])
 
   const normalizedItems = menuItems
     .filter(item => !item.hidden)
@@ -182,5 +186,4 @@ const Sidebar: React.FC<SidebarProps> = ({ open, menuItems, handleDrawerToggle, 
   )
 }
 
-export { drawerWidth }
 export default Sidebar

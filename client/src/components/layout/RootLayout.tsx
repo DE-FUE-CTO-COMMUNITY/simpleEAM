@@ -48,7 +48,7 @@ import { useFeatureFlags } from '@/lib/feature-flags'
 import { useRuntimeConfig } from '@/lib/runtime-config'
 
 import AppHeader from './AppHeader'
-import Sidebar, { drawerWidth } from './Sidebar'
+import Sidebar from './Sidebar'
 import ExcelIcon from '../icons/ExcelIcon'
 import { ImportExportDialog } from '../excel'
 
@@ -362,7 +362,6 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
 
       <AppHeader
         open={open}
-        drawerWidth={drawerWidth}
         authenticated={authenticated || false}
         userName={userName}
         handleDrawerToggle={handleDrawerToggle}

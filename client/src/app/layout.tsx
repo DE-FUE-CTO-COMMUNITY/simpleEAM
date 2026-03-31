@@ -7,6 +7,9 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: process.env.BRAND_NAME_SHORT || 'NextGen EAM',
   description: 'Enterprise Architecture Management System',
+  icons: {
+    icon: process.env.FAVICON_URL || '/favicon.ico',
+  },
 }
 
 // Root layout - minimal HTML structure

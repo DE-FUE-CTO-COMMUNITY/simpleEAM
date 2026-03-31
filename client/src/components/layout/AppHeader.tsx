@@ -17,11 +17,10 @@ import UserProfileMenu from './UserProfileMenu'
 import ThemeToggleButton from '../ui/ThemeToggleButton'
 import { useCompanyContext } from '@/contexts/CompanyContext'
 import { useLensSelection } from '@/lib/lens-settings'
-import { useBrandConfig } from '@/lib/runtime-config'
+import { useBrandConfig, useUiConfig } from '@/lib/runtime-config'
 
 interface AppHeaderProps {
   open: boolean
-  drawerWidth: number
   authenticated: boolean
   userName: string
   handleDrawerToggle: () => void
@@ -29,7 +28,6 @@ interface AppHeaderProps {
 
 const AppHeader: React.FC<AppHeaderProps> = ({
   open,
-  drawerWidth,
   authenticated,
   userName,
   handleDrawerToggle,
@@ -47,6 +45,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
   const { selectedLens, setSelectedLens, enabledLenses } = useLensSelection()
   const router = useRouter()
   const brandConfig = useBrandConfig()
+  const { drawerWidth } = useUiConfig()
 
   const handleLensChange = (nextLens: typeof selectedLens) => {
     if (nextLens === selectedLens) {

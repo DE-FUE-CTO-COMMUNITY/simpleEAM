@@ -12,8 +12,7 @@ export async function GET() {
   const config = {
     // Brand Configuration
     brand: {
-      nameLong:
-        process.env.BRAND_NAME_LONG || 'NextGen Enterprise Architecture Management',
+      nameLong: process.env.BRAND_NAME_LONG || 'NextGen Enterprise Architecture Management',
       nameShort: process.env.BRAND_NAME_SHORT || 'NextGen EAM',
     },
 
@@ -53,6 +52,16 @@ export async function GET() {
       alt: process.env.LOGO_ALT || 'NextGen EAM Logo',
       width: Math.min(parseInt(process.env.LOGO_LENGTH || '120', 10), 184),
       darkUrl: process.env.LOGO_DARK_URL || '',
+    },
+
+    // UI Configuration
+    ui: {
+      drawerWidth: parseInt(process.env.DRAWER_WIDTH || '240', 10),
+    },
+
+    // Favicon Configuration
+    favicon: {
+      url: process.env.FAVICON_URL || '/favicon.ico',
     },
 
     // Tool metadata
