@@ -1292,6 +1292,9 @@ type Company
   diagramFont: String
   logo: String
   features: String
+  llmUrl: String
+  llmModel: String
+  llmKey: String
   strategicAutonomyPriority: Int
   resiliencePriority: Int
   securityPriority: Int

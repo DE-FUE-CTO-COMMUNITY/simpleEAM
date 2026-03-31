@@ -123,6 +123,9 @@ const CompaniesPage = () => {
             diagramFont: { set: sanitizeUpdateString(values.diagramFont) },
             logo: { set: sanitizeUpdateString(values.logo) },
             features: { set: values.features ?? '' },
+            llmUrl: { set: sanitizeUpdateString(values.llmUrl) },
+            llmModel: { set: sanitizeUpdateString(values.llmModel) },
+            llmKey: { set: sanitizeUpdateString(values.llmKey) },
             size: { set: values.size },
             employees: employeesUpdate,
           },
@@ -247,6 +250,9 @@ const CompaniesPage = () => {
                 diagramFont: sanitizeCreateString(values.diagramFont),
                 logo: sanitizeCreateString(values.logo),
                 features: values.features ?? '',
+                llmUrl: sanitizeCreateString(values.llmUrl),
+                llmModel: sanitizeCreateString(values.llmModel),
+                llmKey: sanitizeCreateString(values.llmKey),
                 size: values.size,
                 employees: values.employees?.length
                   ? {

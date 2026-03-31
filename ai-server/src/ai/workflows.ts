@@ -33,6 +33,9 @@ export async function aiRunWorkflow(input: AiRunWorkflowInput): Promise<void> {
       prompt: input.prompt,
       objective: input.objective,
       useCase: input.useCase,
+      llmUrl: input.llmUrl,
+      llmModel: input.llmModel,
+      llmKey: input.llmKey,
     })
 
     await markAiRunCompletedWithToken({

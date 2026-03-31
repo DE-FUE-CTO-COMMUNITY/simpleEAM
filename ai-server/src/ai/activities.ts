@@ -10,8 +10,6 @@ import {
   SovereigntyScores,
 } from './types'
 
-const DEFAULT_LLM_URL = 'https://localai.mf2.eu/v1/chat/completions'
-const DEFAULT_LLM_MODEL = 'mistral-7b-instruct-v0.3'
 const SEARCH_BASE_URL = 'https://duckduckgo.com/html/'
 const SEARCH_LITE_BASE_URL = 'https://lite.duckduckgo.com/lite/'
 const WIKIPEDIA_SEARCH_URL = 'https://en.wikipedia.org/w/api.php'
@@ -37,9 +35,6 @@ const STRATEGY_KEYWORDS = [
   'value proposition',
 ] as const
 
-const getLlmUrl = () => process.env.AI_LLM_URL?.trim() || DEFAULT_LLM_URL
-const getLlmApiKey = () => process.env.AI_LLM_API_KEY?.trim() || ''
-const getLlmModel = () => process.env.AI_LLM_MODEL?.trim() || DEFAULT_LLM_MODEL
 const getLlmTimeoutMs = () => {
   const value = Number(process.env.AI_LLM_TIMEOUT_MS)
   return Number.isFinite(value) && value >= 5000 ? Math.floor(value) : DEFAULT_LLM_TIMEOUT_MS
@@ -137,9 +132,12 @@ const fetchWithTimeout = async (url: string, init: RequestInit = {}, timeoutMs: 
   }
 }
 
-const resolveLlmConfig = (): { endpointUrl: string; model: string } => {
-  const configuredUrl = getLlmUrl()
-  const configuredModel = getLlmModel()
+const resolveLlmConfig = (override: {
+  llmUrl: string
+  llmModel: string
+}): { endpointUrl: string; model: string } => {
+  const configuredUrl = override.llmUrl
+  const configuredModel = override.llmModel
 
   try {
     const parsedUrl = new URL(configuredUrl)
@@ -902,10 +900,13 @@ const extractLlmText = (payload: unknown): string => {
   return ''
 }
 
-const callLlm = async (prompt: string): Promise<string> => {
-  const llmConfig = resolveLlmConfig()
+const callLlm = async (
+  prompt: string,
+  override: { llmUrl: string; llmModel: string; llmKey: string }
+): Promise<string> => {
+  const llmConfig = resolveLlmConfig(override)
   const llmUrl = llmConfig.endpointUrl
-  const llmApiKey = getLlmApiKey()
+  const llmApiKey = override.llmKey
   const llmModel = llmConfig.model
   const llmTimeoutMs = getLlmTimeoutMs()
   const llmRetryCount = getLlmRetryCount()
@@ -1241,6 +1242,9 @@ const strategicEnrichmentState = Annotation.Root({
   fallbackEnabled: Annotation<boolean>({
     reducer: (_, update) => update,
   }),
+  llmOverride: Annotation<{ llmUrl: string; llmModel: string; llmKey: string }>({
+    reducer: (_, update) => update,
+  }),
 })
 
 const executeStrategicEnrichmentGraph = async (
@@ -1248,6 +1252,11 @@ const executeStrategicEnrichmentGraph = async (
   companyName: string,
   objective: string | null
 ): Promise<GeneratedRunOutput> => {
+  const llmOverride = {
+    llmUrl: input.llmUrl!,
+    llmModel: input.llmModel!,
+    llmKey: input.llmKey!,
+  }
   const workflow = new StateGraph(strategicEnrichmentState)
     .addNode('research', async state => {
       try {
@@ -1280,7 +1289,7 @@ const executeStrategicEnrichmentGraph = async (
         sources: state.sources,
       })
 
-      const llmConfig = resolveLlmConfig()
+      const llmConfig = resolveLlmConfig(state.llmOverride ?? undefined)
       const promptLoggingEnabled = isLlmPromptLoggingEnabled()
 
       console.info('[AI RUN][WORKER][LLM][REQUEST]', {
@@ -1310,7 +1319,7 @@ const executeStrategicEnrichmentGraph = async (
     })
     .addNode('generateDraft', async state => {
       try {
-        const llmRawText = await callLlm(state.prompt)
+        const llmRawText = await callLlm(state.prompt, state.llmOverride)
         const parsedOutput = parseJsonObject(llmRawText)
 
         if (!parsedOutput) {
@@ -1335,7 +1344,7 @@ const executeStrategicEnrichmentGraph = async (
           llmErrorMessage: null,
         }
       } catch (error) {
-        const llmConfig = resolveLlmConfig()
+        const llmConfig = resolveLlmConfig(state.llmOverride)
         const llmErrorMessage = error instanceof Error ? error.message : 'Unknown LLM error'
 
         console.warn('[AI RUN][WORKER][LLM][FAILED]', {
@@ -1410,6 +1419,7 @@ const executeStrategicEnrichmentGraph = async (
     draftPayload: null,
     llmErrorMessage: null,
     fallbackEnabled: isLlmFallbackEnabled(),
+    llmOverride,
   })
 
   if (!result.draftPayload) {
@@ -1429,6 +1439,12 @@ export const markAiRunRunning = async (runId: string) => {
 export const generateAiRunSummary = async (
   input: GenerateSummaryInput
 ): Promise<GeneratedRunOutput> => {
+  if (!input.llmUrl?.trim() || !input.llmModel?.trim() || !input.llmKey?.trim()) {
+    throw new Error(
+      'LLM configuration is missing for this company. Please configure LLM URL, model, and API key in the company settings.'
+    )
+  }
+
   console.info('[AI RUN][WORKER][SUMMARY_GENERATION]', {
     promptLength: input.prompt.trim().length,
     hasObjective: Boolean(input.objective?.trim()),

@@ -46,7 +46,7 @@ import { useTranslations } from 'next-intl'
 import { useAuth, isAdmin, isArchitect } from '@/lib/auth'
 import { useLensSelection, type LensKey } from '@/lib/lens-settings'
 import { useFeatureFlags } from '@/lib/feature-flags'
-import { useRuntimeConfig } from '@/lib/runtime-config'
+import { useCompanyContext } from '@/contexts/CompanyContext'
 
 import AppHeader from './AppHeader'
 import Sidebar from './Sidebar'
@@ -76,15 +76,19 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
   const [importExportDialogOpen, setImportExportDialogOpen] = useState(false)
   const t = useTranslations('navigation')
   const { selectedLens } = useLensSelection()
-  const runtimeConfig = useRuntimeConfig()
   const { featureFlags } = useFeatureFlags()
+  const { selectedCompany } = useCompanyContext()
   const isGeaEnabled = featureFlags.GEA
   const isBmcEnabled = featureFlags.BMC
   const isAbhEnabled = featureFlags.ABH
   const isApsEnabled = featureFlags.APS
   const isAasEnabled = featureFlags.AAS
   const isSupEnabled = featureFlags.SUP
-  const hasAiSupport = Boolean(runtimeConfig.ai.llmUrl.trim())
+  const hasCompanyLlmConfig = Boolean(
+    selectedCompany?.llmUrl?.trim() &&
+      selectedCompany?.llmModel?.trim() &&
+      selectedCompany?.llmKey?.trim()
+  )
 
   const handleDrawerToggle = () => {
     setOpen(!open)
@@ -308,8 +312,14 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
 
   const menuItems = [
     { text: t('dashboard'), icon: <DashboardIcon />, href: '/' },
-    ...(initialized && hasAiSupport && (isAdmin() || isArchitect())
-      ? [{ text: t('agenticArchitect'), icon: <AgenticArchitectIcon />, href: '/agentic-architect' }]
+    ...(initialized && hasCompanyLlmConfig && (isAdmin() || isArchitect())
+      ? [
+          {
+            text: t('agenticArchitect'),
+            icon: <AgenticArchitectIcon />,
+            href: '/agentic-architect',
+          },
+        ]
       : []),
     { text: t('diagramEditor'), icon: <DiagramIcon />, href: '/diagrams' },
     ...(isGeaEnabled && selectedLens === 'businessArchitecture'

@@ -18,6 +18,9 @@ type Company = {
   expectedSovereigntyScore?: number | null
   achievedSovereigntyScore?: number | null
   sovereigntyScoreStatus?: string | null
+  llmUrl?: string | null
+  llmModel?: string | null
+  llmKey?: string | null
 }
 
 type CompanyContextValue = {

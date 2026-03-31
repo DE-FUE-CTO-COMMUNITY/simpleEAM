@@ -34,6 +34,9 @@ export type CompanyType = Pick<
   | 'createdAt'
   | 'updatedAt'
   | 'employees'
+  | 'llmUrl'
+  | 'llmModel'
+  | 'llmKey'
 > & {
   features?: string | null
 }
@@ -78,4 +81,7 @@ export interface CompanyFormValues {
   diagramFont?: ExcalidrawFont
   logo?: string
   features?: string
+  llmUrl?: string
+  llmModel?: string
+  llmKey?: string
 }

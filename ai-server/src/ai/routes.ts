@@ -11,6 +11,7 @@ type ApiErrorCode =
   | 'BAD_REQUEST'
   | 'NOT_FOUND'
   | 'CONFLICT'
+  | 'LLM_CONFIG_MISSING'
   | 'WORKFLOW_START_FAILED'
   | 'INTERNAL_ERROR'
 
@@ -716,12 +717,6 @@ const isArchitectureAssessmentQuestion = (question: string): boolean => {
   )
 }
 
-const getAssistantLlmUrl = () => process.env.AI_LLM_URL?.trim() || ''
-
-const getAssistantLlmModel = () => process.env.AI_LLM_MODEL?.trim() || 'mistral-7b-instruct-v0.3'
-
-const getAssistantLlmApiKey = () => process.env.AI_LLM_API_KEY?.trim() || ''
-
 const getAssistantLlmTimeoutMs = () => {
   const value = Number(process.env.AI_LLM_TIMEOUT_MS)
   return Number.isFinite(value) && value >= 5000 ? Math.floor(value) : 45000
@@ -872,13 +867,12 @@ const buildDeterministicRiskCitations = (
 
 const buildAssistantLlmAnswer = async (
   question: string,
-  snapshot: AssistantArchitectureSnapshot
+  snapshot: AssistantArchitectureSnapshot,
+  llmConfig: { llmUrl: string; llmModel: string; llmKey: string }
 ): Promise<AssistantAnswerPayload | null> => {
-  const llmUrl = getAssistantLlmUrl()
-  if (!llmUrl) return null
-
-  const model = getAssistantLlmModel()
-  const apiKey = getAssistantLlmApiKey()
+  const llmUrl = llmConfig.llmUrl
+  const model = llmConfig.llmModel
+  const apiKey = llmConfig.llmKey
   const timeoutMs = getAssistantLlmTimeoutMs()
   const context = buildSnapshotContextForAssistantLlm(snapshot)
 
@@ -1022,6 +1016,7 @@ const scoreEntityMatch = (entityName: string, tokens: string[]): number => {
 const buildQuestionAnswer = async (input: {
   question: string
   snapshot: AssistantArchitectureSnapshot
+  llmConfig?: { llmUrl: string; llmModel: string; llmKey: string }
 }): Promise<AssistantAnswerPayload> => {
   const question = input.question.trim()
   const lowered = question.toLowerCase()
@@ -1031,7 +1026,9 @@ const buildQuestionAnswer = async (input: {
   }
 
   if (isArchitectureAssessmentQuestion(question)) {
-    const llmAnswer = await buildAssistantLlmAnswer(question, input.snapshot)
+    const llmAnswer = input.llmConfig
+      ? await buildAssistantLlmAnswer(question, input.snapshot, input.llmConfig)
+      : null
     if (llmAnswer) {
       return llmAnswer
     }
@@ -1271,7 +1268,9 @@ const buildQuestionAnswer = async (input: {
     .slice(0, 5)
 
   if (weightedMatches.length === 0) {
-    const llmAnswer = await buildAssistantLlmAnswer(question, input.snapshot)
+    const llmAnswer = input.llmConfig
+      ? await buildAssistantLlmAnswer(question, input.snapshot, input.llmConfig)
+      : null
     if (llmAnswer) {
       return llmAnswer
     }
@@ -2407,12 +2406,23 @@ aiRunRouter.post('/ai-runs', async (req, res) => {
       throw createApiError(401, 'UNAUTHENTICATED', 'Authentication required')
     }
 
-    const companyResult = await graphqlRequest<{ companies: Array<{ id: string; name: string }> }>({
+    const companyResult = await graphqlRequest<{
+      companies: Array<{
+        id: string
+        name: string
+        llmUrl?: string | null
+        llmModel?: string | null
+        llmKey?: string | null
+      }>
+    }>({
       query: `
         query LoadCompany($companyId: ID!) {
           companies(where: { id: { eq: $companyId } }, limit: 1) {
             id
             name
+            llmUrl
+            llmModel
+            llmKey
           }
         }
       `,
@@ -2423,6 +2433,14 @@ aiRunRouter.post('/ai-runs', async (req, res) => {
     const company = companyResult.companies[0]
     if (!company) {
       throw createApiError(404, 'NOT_FOUND', 'Company not found')
+    }
+
+    if (!company.llmUrl?.trim() || !company.llmModel?.trim() || !company.llmKey?.trim()) {
+      throw createApiError(
+        422,
+        'LLM_CONFIG_MISSING',
+        'LLM configuration is incomplete for this company. Please configure LLM URL, model, and API key in the company settings.'
+      )
     }
 
     const createResult = await graphqlRequest<{ createAiRuns: { aiRuns: Array<{ id: string }> } }>({
@@ -2478,6 +2496,9 @@ aiRunRouter.post('/ai-runs', async (req, res) => {
         initiatedBy,
         useCase,
         accessToken: token,
+        llmUrl: company.llmUrl,
+        llmModel: company.llmModel,
+        llmKey: company.llmKey,
       })
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to start workflow'
@@ -2798,9 +2819,36 @@ aiRunRouter.post('/ai-assistant/query', async (req, res) => {
     }
 
     const snapshot = await loadArchitectureSnapshot(companyId, token)
+
+    const companyLlmResult = await graphqlRequest<{
+      companies: Array<{ llmUrl?: string | null; llmModel?: string | null; llmKey?: string | null }>
+    }>({
+      query: `
+        query LoadCompanyLlm($companyId: ID!) {
+          companies(where: { id: { eq: $companyId } }, limit: 1) {
+            llmUrl
+            llmModel
+            llmKey
+          }
+        }
+      `,
+      variables: { companyId },
+      accessToken: token,
+    })
+    const companyLlm = companyLlmResult.companies[0]
+    const llmConfig =
+      companyLlm?.llmUrl?.trim() && companyLlm?.llmModel?.trim() && companyLlm?.llmKey?.trim()
+        ? {
+            llmUrl: companyLlm.llmUrl.trim(),
+            llmModel: companyLlm.llmModel.trim(),
+            llmKey: companyLlm.llmKey.trim(),
+          }
+        : undefined
+
     const answer = await buildQuestionAnswer({
       question,
       snapshot,
+      llmConfig,
     })
 
     return res.status(200).json(answer)

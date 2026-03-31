@@ -44,6 +44,9 @@ export interface AiRunWorkflowInput {
   readonly initiatedBy: string
   readonly useCase: AiRunUseCase
   readonly accessToken: string
+  readonly llmUrl?: string | null
+  readonly llmModel?: string | null
+  readonly llmKey?: string | null
 }
 
 export interface StrategicDraftPayload {
@@ -90,6 +93,9 @@ export interface GenerateSummaryInput {
   readonly prompt: string
   readonly objective?: string | null
   readonly useCase: AiRunUseCase
+  readonly llmUrl?: string | null
+  readonly llmModel?: string | null
+  readonly llmKey?: string | null
 }
 
 export interface SovereigntyScoreWorkflowInput {

@@ -443,6 +443,9 @@ export type AiComponentCompanyCompanyNodeAggregateSelection = {
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
+  llmKey: StringAggregateSelection;
+  llmModel: StringAggregateSelection;
+  llmUrl: StringAggregateSelection;
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
@@ -535,6 +538,9 @@ export type AiComponentCompanyNodeAggregationWhereInput = {
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
+  llmKey?: InputMaybe<StringScalarAggregationFilters>;
+  llmModel?: InputMaybe<StringScalarAggregationFilters>;
+  llmUrl?: InputMaybe<StringScalarAggregationFilters>;
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
@@ -2915,6 +2921,9 @@ export type AiRunCompanyCompanyNodeAggregateSelection = {
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
+  llmKey: StringAggregateSelection;
+  llmModel: StringAggregateSelection;
+  llmUrl: StringAggregateSelection;
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
@@ -3007,6 +3016,9 @@ export type AiRunCompanyNodeAggregationWhereInput = {
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
+  llmKey?: InputMaybe<StringScalarAggregationFilters>;
+  llmModel?: InputMaybe<StringScalarAggregationFilters>;
+  llmUrl?: InputMaybe<StringScalarAggregationFilters>;
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
@@ -3962,6 +3974,9 @@ export type ApplicationCompanyCompanyNodeAggregateSelection = {
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
+  llmKey: StringAggregateSelection;
+  llmModel: StringAggregateSelection;
+  llmUrl: StringAggregateSelection;
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
@@ -4054,6 +4069,9 @@ export type ApplicationCompanyNodeAggregationWhereInput = {
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
+  llmKey?: InputMaybe<StringScalarAggregationFilters>;
+  llmModel?: InputMaybe<StringScalarAggregationFilters>;
+  llmUrl?: InputMaybe<StringScalarAggregationFilters>;
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
@@ -5126,6 +5144,9 @@ export type ApplicationInterfaceCompanyCompanyNodeAggregateSelection = {
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
+  llmKey: StringAggregateSelection;
+  llmModel: StringAggregateSelection;
+  llmUrl: StringAggregateSelection;
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
@@ -5218,6 +5239,9 @@ export type ApplicationInterfaceCompanyNodeAggregationWhereInput = {
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
+  llmKey?: InputMaybe<StringScalarAggregationFilters>;
+  llmModel?: InputMaybe<StringScalarAggregationFilters>;
+  llmUrl?: InputMaybe<StringScalarAggregationFilters>;
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
@@ -9667,6 +9691,9 @@ export type ArchitectureCompanyCompanyNodeAggregateSelection = {
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
+  llmKey: StringAggregateSelection;
+  llmModel: StringAggregateSelection;
+  llmUrl: StringAggregateSelection;
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
@@ -9759,6 +9786,9 @@ export type ArchitectureCompanyNodeAggregationWhereInput = {
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
+  llmKey?: InputMaybe<StringScalarAggregationFilters>;
+  llmModel?: InputMaybe<StringScalarAggregationFilters>;
+  llmUrl?: InputMaybe<StringScalarAggregationFilters>;
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
@@ -12078,6 +12108,9 @@ export type ArchitecturePrincipleCompanyCompanyNodeAggregateSelection = {
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
+  llmKey: StringAggregateSelection;
+  llmModel: StringAggregateSelection;
+  llmUrl: StringAggregateSelection;
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
@@ -12170,6 +12203,9 @@ export type ArchitecturePrincipleCompanyNodeAggregationWhereInput = {
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
+  llmKey?: InputMaybe<StringScalarAggregationFilters>;
+  llmModel?: InputMaybe<StringScalarAggregationFilters>;
+  llmUrl?: InputMaybe<StringScalarAggregationFilters>;
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
@@ -13401,6 +13437,9 @@ export type BusinessCapabilityCompanyCompanyNodeAggregateSelection = {
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
+  llmKey: StringAggregateSelection;
+  llmModel: StringAggregateSelection;
+  llmUrl: StringAggregateSelection;
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
@@ -13493,6 +13532,9 @@ export type BusinessCapabilityCompanyNodeAggregationWhereInput = {
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
+  llmKey?: InputMaybe<StringScalarAggregationFilters>;
+  llmModel?: InputMaybe<StringScalarAggregationFilters>;
+  llmUrl?: InputMaybe<StringScalarAggregationFilters>;
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
@@ -15295,6 +15337,9 @@ export type BusinessProcessCompanyCompanyNodeAggregateSelection = {
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
+  llmKey: StringAggregateSelection;
+  llmModel: StringAggregateSelection;
+  llmUrl: StringAggregateSelection;
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
@@ -15387,6 +15432,9 @@ export type BusinessProcessCompanyNodeAggregationWhereInput = {
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
+  llmKey?: InputMaybe<StringScalarAggregationFilters>;
+  llmModel?: InputMaybe<StringScalarAggregationFilters>;
+  llmUrl?: InputMaybe<StringScalarAggregationFilters>;
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
@@ -16505,6 +16553,9 @@ export type Company = {
   font?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   industry?: Maybe<Scalars['String']['output']>;
+  llmKey?: Maybe<Scalars['String']['output']>;
+  llmModel?: Maybe<Scalars['String']['output']>;
+  llmUrl?: Maybe<Scalars['String']['output']>;
   logo?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
   organisations: Array<Organisation>;
@@ -16921,6 +16972,9 @@ export type CompanyAggregateNode = {
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
+  llmKey: StringAggregateSelection;
+  llmModel: StringAggregateSelection;
+  llmUrl: StringAggregateSelection;
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
@@ -17089,6 +17143,9 @@ export type CompanyCreateInput = {
   features?: InputMaybe<Scalars['String']['input']>;
   font?: InputMaybe<Scalars['String']['input']>;
   industry?: InputMaybe<Scalars['String']['input']>;
+  llmKey?: InputMaybe<Scalars['String']['input']>;
+  llmModel?: InputMaybe<Scalars['String']['input']>;
+  llmUrl?: InputMaybe<Scalars['String']['input']>;
   logo?: InputMaybe<Scalars['String']['input']>;
   name: Scalars['String']['input'];
   organisations?: InputMaybe<CompanyOrganisationsFieldInput>;
@@ -19379,6 +19436,9 @@ export type CompanySort = {
   font?: InputMaybe<SortDirection>;
   id?: InputMaybe<SortDirection>;
   industry?: InputMaybe<SortDirection>;
+  llmKey?: InputMaybe<SortDirection>;
+  llmModel?: InputMaybe<SortDirection>;
+  llmUrl?: InputMaybe<SortDirection>;
   logo?: InputMaybe<SortDirection>;
   name?: InputMaybe<SortDirection>;
   primaryColor?: InputMaybe<SortDirection>;
@@ -19432,6 +19492,9 @@ export type CompanyUpdateInput = {
   features?: InputMaybe<StringScalarMutations>;
   font?: InputMaybe<StringScalarMutations>;
   industry?: InputMaybe<StringScalarMutations>;
+  llmKey?: InputMaybe<StringScalarMutations>;
+  llmModel?: InputMaybe<StringScalarMutations>;
+  llmUrl?: InputMaybe<StringScalarMutations>;
   logo?: InputMaybe<StringScalarMutations>;
   name?: InputMaybe<StringScalarMutations>;
   organisations?: InputMaybe<Array<CompanyOrganisationsUpdateFieldInput>>;
@@ -19480,6 +19543,9 @@ export type CompanyWhere = {
   font?: InputMaybe<StringScalarFilters>;
   id?: InputMaybe<IdScalarFilters>;
   industry?: InputMaybe<StringScalarFilters>;
+  llmKey?: InputMaybe<StringScalarFilters>;
+  llmModel?: InputMaybe<StringScalarFilters>;
+  llmUrl?: InputMaybe<StringScalarFilters>;
   logo?: InputMaybe<StringScalarFilters>;
   name?: InputMaybe<StringScalarFilters>;
   organisations?: InputMaybe<OrganisationRelationshipFilters>;
@@ -20203,6 +20269,9 @@ export type DataObjectCompanyCompanyNodeAggregateSelection = {
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
+  llmKey: StringAggregateSelection;
+  llmModel: StringAggregateSelection;
+  llmUrl: StringAggregateSelection;
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
@@ -20295,6 +20364,9 @@ export type DataObjectCompanyNodeAggregationWhereInput = {
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
+  llmKey?: InputMaybe<StringScalarAggregationFilters>;
+  llmModel?: InputMaybe<StringScalarAggregationFilters>;
+  llmUrl?: InputMaybe<StringScalarAggregationFilters>;
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
@@ -22578,6 +22650,9 @@ export type DiagramCompanyCompanyNodeAggregateSelection = {
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
+  llmKey: StringAggregateSelection;
+  llmModel: StringAggregateSelection;
+  llmUrl: StringAggregateSelection;
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
@@ -22670,6 +22745,9 @@ export type DiagramCompanyNodeAggregationWhereInput = {
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
+  llmKey?: InputMaybe<StringScalarAggregationFilters>;
+  llmModel?: InputMaybe<StringScalarAggregationFilters>;
+  llmUrl?: InputMaybe<StringScalarAggregationFilters>;
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
@@ -24929,6 +25007,9 @@ export type Gea_GoalCompanyCompanyNodeAggregateSelection = {
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
+  llmKey: StringAggregateSelection;
+  llmModel: StringAggregateSelection;
+  llmUrl: StringAggregateSelection;
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
@@ -25021,6 +25102,9 @@ export type Gea_GoalCompanyNodeAggregationWhereInput = {
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
+  llmKey?: InputMaybe<StringScalarAggregationFilters>;
+  llmModel?: InputMaybe<StringScalarAggregationFilters>;
+  llmUrl?: InputMaybe<StringScalarAggregationFilters>;
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
@@ -26179,6 +26263,9 @@ export type Gea_MissionCompanyCompanyNodeAggregateSelection = {
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
+  llmKey: StringAggregateSelection;
+  llmModel: StringAggregateSelection;
+  llmUrl: StringAggregateSelection;
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
@@ -26271,6 +26358,9 @@ export type Gea_MissionCompanyNodeAggregationWhereInput = {
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
+  llmKey?: InputMaybe<StringScalarAggregationFilters>;
+  llmModel?: InputMaybe<StringScalarAggregationFilters>;
+  llmUrl?: InputMaybe<StringScalarAggregationFilters>;
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
@@ -27481,6 +27571,9 @@ export type Gea_StrategyCompanyCompanyNodeAggregateSelection = {
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
+  llmKey: StringAggregateSelection;
+  llmModel: StringAggregateSelection;
+  llmUrl: StringAggregateSelection;
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
@@ -27573,6 +27666,9 @@ export type Gea_StrategyCompanyNodeAggregationWhereInput = {
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
+  llmKey?: InputMaybe<StringScalarAggregationFilters>;
+  llmModel?: InputMaybe<StringScalarAggregationFilters>;
+  llmUrl?: InputMaybe<StringScalarAggregationFilters>;
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
@@ -28284,6 +28380,9 @@ export type Gea_ValueCompanyCompanyNodeAggregateSelection = {
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
+  llmKey: StringAggregateSelection;
+  llmModel: StringAggregateSelection;
+  llmUrl: StringAggregateSelection;
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
@@ -28376,6 +28475,9 @@ export type Gea_ValueCompanyNodeAggregationWhereInput = {
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
+  llmKey?: InputMaybe<StringScalarAggregationFilters>;
+  llmModel?: InputMaybe<StringScalarAggregationFilters>;
+  llmUrl?: InputMaybe<StringScalarAggregationFilters>;
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
@@ -29367,6 +29469,9 @@ export type Gea_VisionCompanyCompanyNodeAggregateSelection = {
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
+  llmKey: StringAggregateSelection;
+  llmModel: StringAggregateSelection;
+  llmUrl: StringAggregateSelection;
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
@@ -29459,6 +29564,9 @@ export type Gea_VisionCompanyNodeAggregationWhereInput = {
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
+  llmKey?: InputMaybe<StringScalarAggregationFilters>;
+  llmModel?: InputMaybe<StringScalarAggregationFilters>;
+  llmUrl?: InputMaybe<StringScalarAggregationFilters>;
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
@@ -30615,6 +30723,9 @@ export type HardwareProductCompanyCompanyNodeAggregateSelection = {
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
+  llmKey: StringAggregateSelection;
+  llmModel: StringAggregateSelection;
+  llmUrl: StringAggregateSelection;
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
@@ -30707,6 +30818,9 @@ export type HardwareProductCompanyNodeAggregationWhereInput = {
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
+  llmKey?: InputMaybe<StringScalarAggregationFilters>;
+  llmModel?: InputMaybe<StringScalarAggregationFilters>;
+  llmUrl?: InputMaybe<StringScalarAggregationFilters>;
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
@@ -31824,6 +31938,9 @@ export type HardwareVersionCompanyCompanyNodeAggregateSelection = {
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
+  llmKey: StringAggregateSelection;
+  llmModel: StringAggregateSelection;
+  llmUrl: StringAggregateSelection;
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
@@ -31916,6 +32033,9 @@ export type HardwareVersionCompanyNodeAggregationWhereInput = {
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
+  llmKey?: InputMaybe<StringScalarAggregationFilters>;
+  llmModel?: InputMaybe<StringScalarAggregationFilters>;
+  llmUrl?: InputMaybe<StringScalarAggregationFilters>;
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
@@ -33055,6 +33175,9 @@ export type InfrastructureCompanyCompanyNodeAggregateSelection = {
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
+  llmKey: StringAggregateSelection;
+  llmModel: StringAggregateSelection;
+  llmUrl: StringAggregateSelection;
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
@@ -33147,6 +33270,9 @@ export type InfrastructureCompanyNodeAggregationWhereInput = {
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
+  llmKey?: InputMaybe<StringScalarAggregationFilters>;
+  llmModel?: InputMaybe<StringScalarAggregationFilters>;
+  llmUrl?: InputMaybe<StringScalarAggregationFilters>;
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
@@ -35546,6 +35672,9 @@ export type LifecycleRecordCompanyCompanyNodeAggregateSelection = {
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
+  llmKey: StringAggregateSelection;
+  llmModel: StringAggregateSelection;
+  llmUrl: StringAggregateSelection;
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
@@ -35638,6 +35767,9 @@ export type LifecycleRecordCompanyNodeAggregationWhereInput = {
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
+  llmKey?: InputMaybe<StringScalarAggregationFilters>;
+  llmModel?: InputMaybe<StringScalarAggregationFilters>;
+  llmUrl?: InputMaybe<StringScalarAggregationFilters>;
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
@@ -37106,6 +37238,9 @@ export type OrganisationCompanyCompanyNodeAggregateSelection = {
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
+  llmKey: StringAggregateSelection;
+  llmModel: StringAggregateSelection;
+  llmUrl: StringAggregateSelection;
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
@@ -37198,6 +37333,9 @@ export type OrganisationCompanyNodeAggregationWhereInput = {
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
+  llmKey?: InputMaybe<StringScalarAggregationFilters>;
+  llmModel?: InputMaybe<StringScalarAggregationFilters>;
+  llmUrl?: InputMaybe<StringScalarAggregationFilters>;
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
@@ -38956,6 +39094,9 @@ export type PersonCompaniesNodeAggregationWhereInput = {
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
+  llmKey?: InputMaybe<StringScalarAggregationFilters>;
+  llmModel?: InputMaybe<StringScalarAggregationFilters>;
+  llmUrl?: InputMaybe<StringScalarAggregationFilters>;
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
@@ -39007,6 +39148,9 @@ export type PersonCompanyCompaniesNodeAggregateSelection = {
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
+  llmKey: StringAggregateSelection;
+  llmModel: StringAggregateSelection;
+  llmUrl: StringAggregateSelection;
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
@@ -42049,6 +42193,9 @@ export type SbomDocumentCompanyCompanyNodeAggregateSelection = {
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
+  llmKey: StringAggregateSelection;
+  llmModel: StringAggregateSelection;
+  llmUrl: StringAggregateSelection;
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
@@ -42141,6 +42288,9 @@ export type SbomDocumentCompanyNodeAggregationWhereInput = {
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
+  llmKey?: InputMaybe<StringScalarAggregationFilters>;
+  llmModel?: InputMaybe<StringScalarAggregationFilters>;
+  llmUrl?: InputMaybe<StringScalarAggregationFilters>;
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
@@ -42667,6 +42817,9 @@ export type SoftwareProductCompanyCompanyNodeAggregateSelection = {
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
+  llmKey: StringAggregateSelection;
+  llmModel: StringAggregateSelection;
+  llmUrl: StringAggregateSelection;
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
@@ -42759,6 +42912,9 @@ export type SoftwareProductCompanyNodeAggregationWhereInput = {
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
+  llmKey?: InputMaybe<StringScalarAggregationFilters>;
+  llmModel?: InputMaybe<StringScalarAggregationFilters>;
+  llmUrl?: InputMaybe<StringScalarAggregationFilters>;
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
@@ -44064,6 +44220,9 @@ export type SoftwareVersionCompanyCompanyNodeAggregateSelection = {
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
+  llmKey: StringAggregateSelection;
+  llmModel: StringAggregateSelection;
+  llmUrl: StringAggregateSelection;
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
@@ -44156,6 +44315,9 @@ export type SoftwareVersionCompanyNodeAggregationWhereInput = {
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
+  llmKey?: InputMaybe<StringScalarAggregationFilters>;
+  llmModel?: InputMaybe<StringScalarAggregationFilters>;
+  llmUrl?: InputMaybe<StringScalarAggregationFilters>;
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;
@@ -45589,6 +45751,9 @@ export type SupplierCompanyCompanyNodeAggregateSelection = {
   features: StringAggregateSelection;
   font: StringAggregateSelection;
   industry: StringAggregateSelection;
+  llmKey: StringAggregateSelection;
+  llmModel: StringAggregateSelection;
+  llmUrl: StringAggregateSelection;
   logo: StringAggregateSelection;
   name: StringAggregateSelection;
   primaryColor: StringAggregateSelection;
@@ -45681,6 +45846,9 @@ export type SupplierCompanyNodeAggregationWhereInput = {
   features?: InputMaybe<StringScalarAggregationFilters>;
   font?: InputMaybe<StringScalarAggregationFilters>;
   industry?: InputMaybe<StringScalarAggregationFilters>;
+  llmKey?: InputMaybe<StringScalarAggregationFilters>;
+  llmModel?: InputMaybe<StringScalarAggregationFilters>;
+  llmUrl?: InputMaybe<StringScalarAggregationFilters>;
   logo?: InputMaybe<StringScalarAggregationFilters>;
   name?: InputMaybe<StringScalarAggregationFilters>;
   primaryColor?: InputMaybe<StringScalarAggregationFilters>;

@@ -94,6 +94,7 @@ export interface FieldConfig {
   defaultValue?: any
   placeholder?: string
   helperText?: string
+  inputType?: string // HTML input type, e.g. 'password'
   customRender?: (field: any, disabled: boolean) => React.ReactNode
   validators?: any
   fullWidth?: boolean
@@ -597,12 +598,13 @@ const GenericForm: React.FC<GenericFormProps> = ({
                   'autocomplete',
                   'tags',
                   'displayText',
-                ].includes(field.type) && (
-                  <FormLabel sx={{ mb: 1, display: 'block' }}>
-                    {field.label}
-                    {field.required ? ' *' : ''}
-                  </FormLabel>
-                )}
+                ].includes(field.type) &&
+                  field.label && (
+                    <FormLabel sx={{ mb: 1, display: 'block' }}>
+                      {field.label}
+                      {field.required ? ' *' : ''}
+                    </FormLabel>
+                  )}
 
                 {field.type === 'textarea' && (
                   <TextField
@@ -1139,6 +1141,7 @@ const GenericForm: React.FC<GenericFormProps> = ({
                     disabled={disabled}
                     error={finalShouldShowError}
                     placeholder={field.placeholder}
+                    type={field.inputType || 'text'}
                     fullWidth={field.fullWidth !== false}
                     multiline={field.multiline}
                     rows={field.rows}

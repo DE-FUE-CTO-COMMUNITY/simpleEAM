@@ -2790,6 +2790,16 @@
       "logo": "URL du logo",
       "employees": "Employés",
       "employeesHelperText": "Sélectionnez les salariés affectés à cette entreprise.",
+      "llmUrl": "URL LLM",
+      "llmUrlHelperText": "L'URL du point de terminaison API du modèle de langage, par ex. https://api.openai.com/v1.",
+      "llmModel": "Modèle LLM",
+      "llmModelHelperText": "L'identifiant du modèle, par ex. gpt-4o ou llama3.",
+      "llmKey": "Clé API",
+      "llmKeyHelperText": "La clé API secrète pour s'authentifier auprès du fournisseur LLM.",
+      "llmProvider": "Fournisseur LLM",
+      "llmProviderHelperText": "Sélectionnez le fournisseur de modèle de langage IA pour cette entreprise.",
+      "selectProvider": "Sélectionner un fournisseur...",
+      "otherModel": "Autre modèle",
       "primaryColorHelperText": "Valeur de couleur hexadécimale, par exemple #0052CC.",
       "secondaryColorHelperText": "Valeur de couleur hexadécimale, par exemple #172B4D.",
       "fontHelperText": "Pile de polices facultative, par ex. \"Roboto, Helvetica, sans empattement\".",
@@ -2810,7 +2820,8 @@
       "general": "Général",
       "branding": "Image de marque",
       "employees": "Employés",
-      "features": "Caractéristiques"
+      "features": "Caractéristiques",
+      "llmConfig": "Config LLM"
     },
     "headers": {
       "id": "IDENTIFIANT",
