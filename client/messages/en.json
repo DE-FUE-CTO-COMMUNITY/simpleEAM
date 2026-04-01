@@ -2772,6 +2772,7 @@
     }
   },
   "companies": {
+    "label": "Company",
     "entityName": "Company",
     "title": "Companies",
     "description": "Manage companies and their information",

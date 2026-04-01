@@ -33,6 +33,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
   handleDrawerToggle,
 }) => {
   const tLenses = useTranslations('lenses')
+  const tCompanies = useTranslations('companies')
   const theme = useTheme()
   const {
     companies,
@@ -126,12 +127,19 @@ const AppHeader: React.FC<AppHeaderProps> = ({
             {brandConfig.nameLong}
           </Typography>
           {/* Company selector: show dropdown if multiple, otherwise static label */}
-          {hasMultipleCompanies ? (
-            renderCompanySelector()
-          ) : (
-            <Typography variant="body1" noWrap component="div" sx={{ opacity: 0.9 }}>
-              {companies?.[0]?.name || ''}
-            </Typography>
+          {companies && companies.length > 0 && (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
+              <Typography variant="body2" noWrap sx={{ opacity: 0.9 }}>
+                {tCompanies('label')}
+              </Typography>
+              {hasMultipleCompanies ? (
+                renderCompanySelector()
+              ) : (
+                <Typography variant="body1" noWrap component="div" sx={{ opacity: 0.9 }}>
+                  {companies[0].name}
+                </Typography>
+              )}
+            </Box>
           )}
           {enabledLenses.length > 1 && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>

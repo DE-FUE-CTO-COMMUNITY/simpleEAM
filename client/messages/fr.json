@@ -2772,6 +2772,7 @@
     }
   },
   "companies": {
+    "label": "Entreprise",
     "entityName": "Entreprise",
     "title": "Entreprises",
     "description": "Gérer les entreprises et leurs informations",
