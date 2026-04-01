@@ -2,8 +2,13 @@ import { Response, Router } from 'express'
 import { v4 as uuidv4 } from 'uuid'
 import { verifyToken } from '../auth/auth-jwks'
 import { graphqlRequest } from '../graphql/client'
-import { startAiRunWorkflow, startSovereigntyScoreWorkflow } from './temporal-client'
-import { AiRunUseCase, CreateAiAuditEventInput, StrategicDraftPayload } from './types'
+import { startCoordinatorWorkflow, startSovereigntyScoreWorkflow } from './temporal-client'
+import {
+  AiRunUseCase,
+  CreateAiAuditEventInput,
+  DocumentInput,
+  StrategicDraftPayload,
+} from './types'
 
 type ApiErrorCode =
   | 'UNAUTHENTICATED'
@@ -309,7 +314,6 @@ const createAuditEvent = async (
     variables: {
       input: [
         {
-          id: uuidv4(),
           runId: input.runId,
           action: input.action,
           actor: input.actor,
@@ -1981,20 +1985,15 @@ const persistStrategicDraftToGraphql = async (input: {
   accessToken: string
 }) => {
   const timestamp = new Date().toISOString()
-  const missionId = uuidv4()
-  const visionId = uuidv4()
   const valueRows = input.draftPayload.values.map(value => ({
-    id: uuidv4(),
     name: value.name.trim(),
     valueStatement: value.valueStatement.trim(),
   }))
   const goalRows = input.draftPayload.goals.map(goal => ({
-    id: uuidv4(),
     name: goal.name.trim(),
     goalStatement: goal.goalStatement.trim(),
   }))
   const strategyRows = input.draftPayload.strategies.map(strategy => ({
-    id: uuidv4(),
     name: strategy.name.trim(),
     description: strategy.description.trim(),
   }))
@@ -2006,7 +2005,9 @@ const persistStrategicDraftToGraphql = async (input: {
     ? input.draftPayload.vision.year
     : `${new Date().getUTCFullYear()}-01-01`
 
-  await graphqlRequest({
+  const missionResult = await graphqlRequest<{
+    createGeaMissions: { geaMissions: Array<{ id: string }> }
+  }>({
     query: `
       mutation CreateMission($input: [GEA_MissionCreateInput!]!) {
         createGeaMissions(input: $input) {
@@ -2017,7 +2018,6 @@ const persistStrategicDraftToGraphql = async (input: {
     variables: {
       input: [
         {
-          id: missionId,
           name: input.draftPayload.mission.name.trim(),
           purposeStatement: input.draftPayload.mission.purposeStatement.trim(),
           keywords: input.draftPayload.mission.keywords,
@@ -2030,8 +2030,14 @@ const persistStrategicDraftToGraphql = async (input: {
     },
     accessToken: input.accessToken,
   })
+  const missionId = missionResult.createGeaMissions.geaMissions[0]?.id
+  if (!missionId) {
+    throw createApiError(500, 'INTERNAL_ERROR', 'Failed to create GEA Mission')
+  }
 
-  await graphqlRequest({
+  const visionResult = await graphqlRequest<{
+    createGeaVisions: { geaVisions: Array<{ id: string }> }
+  }>({
     query: `
       mutation CreateVision($input: [GEA_VisionCreateInput!]!) {
         createGeaVisions(input: $input) {
@@ -2042,7 +2048,6 @@ const persistStrategicDraftToGraphql = async (input: {
     variables: {
       input: [
         {
-          id: visionId,
           name: input.draftPayload.vision.name.trim(),
           visionStatement: input.draftPayload.vision.visionStatement.trim(),
           timeHorizon: input.draftPayload.vision.timeHorizon,
@@ -2063,6 +2068,10 @@ const persistStrategicDraftToGraphql = async (input: {
     },
     accessToken: input.accessToken,
   })
+  const visionId = visionResult.createGeaVisions.geaVisions[0]?.id
+  if (!visionId) {
+    throw createApiError(500, 'INTERNAL_ERROR', 'Failed to create GEA Vision')
+  }
 
   if (valueRows.length > 0) {
     await graphqlRequest({
@@ -2075,7 +2084,6 @@ const persistStrategicDraftToGraphql = async (input: {
       `,
       variables: {
         input: valueRows.map(value => ({
-          id: value.id,
           name: value.name,
           valueStatement: value.valueStatement,
           company: {
@@ -2093,8 +2101,11 @@ const persistStrategicDraftToGraphql = async (input: {
     })
   }
 
+  let firstGoalId: string | undefined
   if (goalRows.length > 0) {
-    await graphqlRequest({
+    const goalsResult = await graphqlRequest<{
+      createGeaGoals: { geaGoals: Array<{ id: string }> }
+    }>({
       query: `
         mutation CreateGoals($input: [GEA_GoalCreateInput!]!) {
           createGeaGoals(input: $input) {
@@ -2104,7 +2115,6 @@ const persistStrategicDraftToGraphql = async (input: {
       `,
       variables: {
         input: goalRows.map(goal => ({
-          id: goal.id,
           name: goal.name,
           goalStatement: goal.goalStatement,
           company: {
@@ -2120,10 +2130,10 @@ const persistStrategicDraftToGraphql = async (input: {
       },
       accessToken: input.accessToken,
     })
+    firstGoalId = goalsResult.createGeaGoals.geaGoals[0]?.id
   }
 
   if (strategyRows.length > 0) {
-    const firstGoalId = goalRows[0]?.id
     await graphqlRequest({
       query: `
         mutation CreateStrategies($input: [GEA_StrategyCreateInput!]!) {
@@ -2134,7 +2144,6 @@ const persistStrategicDraftToGraphql = async (input: {
       `,
       variables: {
         input: strategyRows.map(strategy => ({
-          id: strategy.id,
           name: strategy.name,
           description: strategy.description,
           company: {
@@ -2382,6 +2391,15 @@ aiRunRouter.post('/ai-runs', async (req, res) => {
   const prompt = typeof req.body?.prompt === 'string' ? req.body.prompt : ''
   const objective = typeof req.body?.objective === 'string' ? req.body.objective : null
   const useCase: AiRunUseCase = 'STRATEGIC_ENRICHMENT'
+  const documents: DocumentInput[] = Array.isArray(req.body?.documents)
+    ? (req.body.documents as unknown[]).filter(
+        (d): d is DocumentInput =>
+          typeof d === 'object' &&
+          d !== null &&
+          typeof (d as DocumentInput).name === 'string' &&
+          typeof (d as DocumentInput).content === 'string'
+      )
+    : []
   const normalizedPrompt = prompt.trim()
   const effectivePrompt =
     normalizedPrompt ||
@@ -2486,19 +2504,21 @@ aiRunRouter.post('/ai-runs', async (req, res) => {
     })
 
     try {
-      await startAiRunWorkflow({
+      await startCoordinatorWorkflow({
         workflowId,
         runId,
         companyId,
         companyName: company.name,
         prompt: effectivePrompt,
         objective,
-        initiatedBy,
         useCase,
         accessToken: token,
-        llmUrl: company.llmUrl,
-        llmModel: company.llmModel,
-        llmKey: company.llmKey,
+        llmConfig: {
+          llmUrl: company.llmUrl!,
+          llmModel: company.llmModel!,
+          llmKey: company.llmKey!,
+        },
+        documents,
       })
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to start workflow'

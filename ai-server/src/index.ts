@@ -5,7 +5,7 @@ import dotenv from 'dotenv'
 import http from 'http'
 
 import { isGraphqlReachable } from './graphql/client'
-import { aiRunRouter } from './ai/routes'
+import { aiRunRouter } from './agents/routes'
 
 dotenv.config()
 
