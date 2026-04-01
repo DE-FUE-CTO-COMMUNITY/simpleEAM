@@ -2644,6 +2644,7 @@
       "chatRunQueued": "Workflow in Warteschlange, warte auf Start...",
       "chatRunRunning": "Unternehmen wird analysiert und strategischer Entwurf wird erstellt...",
       "chatRunProcessing": "Anfrage wird verarbeitet...",
+      "chatRunStale": "Dieser Workflow braucht zu lange und ist möglicherweise hängen geblieben. Bitte versuchen Sie es erneut oder wenden Sie sich an Ihren Administrator.",
       "chatRunFailed": "Der Workflow ist auf einen Fehler gestoßen",
       "chatRunApplied": "In Ihrer Architektur angewendet.",
       "chatPendingApproval": "Ihre Prüfung ist erforderlich",

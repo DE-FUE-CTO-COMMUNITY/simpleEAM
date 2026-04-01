@@ -2701,6 +2701,7 @@
       "chatRunQueued": "Workflow queued, waiting to start...",
       "chatRunRunning": "Analyzing your company and generating the strategic draft...",
       "chatRunProcessing": "Processing your request...",
+      "chatRunStale": "This workflow is taking too long and may be stuck. Please try again or contact your administrator.",
       "chatRunFailed": "The workflow encountered an error",
       "chatRunApplied": "Applied to your architecture.",
       "chatPendingApproval": "Your review is required",

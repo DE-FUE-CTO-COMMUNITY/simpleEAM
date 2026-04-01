@@ -90,6 +90,12 @@ const buildStrategyPrompt = (input: {
     '  }',
     '}',
     '',
+    'Array size requirements (IMPORTANT — output EXACTLY this many complete JSON objects in each array):',
+    '  - values: provide 4 to 6 entries',
+    '  - goals: provide 6 to 9 entries',
+    '  - strategies: provide 4 to 6 entries',
+    'Do NOT mention counts in the summary field that differ from the arrays you actually produce.',
+    '',
     'Web sources:',
     sourcesBlock || 'No web sources were available.',
   ]
@@ -202,7 +208,7 @@ const buildDraftFromModelOutput = (input: {
         valueStatement: asString(v.valueStatement, 'This value supports strategic execution.', 280),
       }
     })
-    .slice(0, 8)
+    .slice(0, 12)
 
   const goals = goalsRaw
     .map(item => {
@@ -212,7 +218,7 @@ const buildDraftFromModelOutput = (input: {
         goalStatement: asString(g.goalStatement, 'This goal guides strategic priorities.', 280),
       }
     })
-    .slice(0, 8)
+    .slice(0, 12)
 
   const strategies = strategiesRaw
     .map(item => {
@@ -222,7 +228,7 @@ const buildDraftFromModelOutput = (input: {
         description: asString(s.description, 'This strategy supports target goals.', 280),
       }
     })
-    .slice(0, 8)
+    .slice(0, 12)
 
   return {
     companyName: input.companyName,
@@ -282,6 +288,26 @@ const buildDraftFromModelOutput = (input: {
       costStructure: asStringArray(bmc.costStructure, ['Transformation investments']),
     },
   }
+}
+
+// ─────────────────────────────────────────────
+// Summary builder from parsed draft
+// ─────────────────────────────────────────────
+
+const buildSummaryFromDraft = (draft: StrategicDraftPayload, sourceCount: number): string => {
+  const valueNames = draft.values.map(v => v.name).join(', ')
+  const goalNames = draft.goals.map(g => g.name).join(', ')
+  const strategyNames = draft.strategies.map(s => s.name).join(', ')
+  const parts = [
+    `Strategic draft generated for ${draft.companyName}.`,
+    `Mission: "${limitText(draft.mission.name, 80)}".`,
+    `Vision: "${limitText(draft.vision.name, 80)}".`,
+    `${draft.values.length} value(s): ${valueNames}.`,
+    `${draft.goals.length} goal(s): ${goalNames}.`,
+    `${draft.strategies.length} strateg(y/ies): ${strategyNames}.`,
+  ]
+  if (sourceCount > 0) parts.push(`Informed by ${sourceCount} web source(s).`)
+  return limitText(parts.join(' '), 1200)
 }
 
 // ─────────────────────────────────────────────
@@ -392,11 +418,9 @@ const executeStrategyGraph = async (
           modelOutput: parsedOutput,
           sources: state.sources,
         })
-        const summary = asString(
-          parsedOutput.summary,
-          `Strategic enrichment draft generated for ${state.companyName} using ${state.sources.length} web sources.`,
-          600
-        )
+        // Build summary from the actual parsed data, not from the LLM-written
+        // summary field, to guarantee the chat reflects the real draftPayload.
+        const summary = buildSummaryFromDraft(draftPayload, state.sources.length)
         return { draftPayload, summary, llmErrorMessage: null }
       } catch (error) {
         const llmErrorMessage = error instanceof Error ? error.message : 'Unknown LLM error'
@@ -415,7 +439,7 @@ const executeStrategyGraph = async (
         objective: state.objective,
         sources: state.sources,
       })
-      const summary = `Strategic enrichment draft generated for ${state.companyName} using fallback template and ${state.sources.length} web sources.`
+      const summary = buildSummaryFromDraft(draftPayload, state.sources.length)
       return { draftPayload, summary }
     })
     .addNode('failDraftGeneration', async state => {

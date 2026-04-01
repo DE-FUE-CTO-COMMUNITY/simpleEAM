@@ -53,19 +53,50 @@ const {
   markAiRunCompletedWithToken,
   markAiRunFailedWithToken,
   updateAiRunStatusMessage,
+} = proxyActivities<
+  Pick<
+    CoordinatorActivities,
+    | 'markAiRunRunningWithToken'
+    | 'markAiRunCompletedWithToken'
+    | 'markAiRunFailedWithToken'
+    | 'updateAiRunStatusMessage'
+  >
+>({
+  // Lifecycle DB mutations are fast — short timeout, few retries
+  startToCloseTimeout: '30 seconds',
+  retry: {
+    maximumAttempts: 2,
+    backoffCoefficient: 2,
+    initialInterval: '2s',
+    maximumInterval: '10s',
+  },
+})
+
+const {
   planAgentRun,
   aggregateStepResults,
   runQualityCheck,
   performInternetResearch,
   performDocumentResearch,
   generateStrategyProposals,
-} = proxyActivities<CoordinatorActivities>({
-  startToCloseTimeout: '10 minutes',
+} = proxyActivities<
+  Pick<
+    CoordinatorActivities,
+    | 'planAgentRun'
+    | 'aggregateStepResults'
+    | 'runQualityCheck'
+    | 'performInternetResearch'
+    | 'performDocumentResearch'
+    | 'generateStrategyProposals'
+  >
+>({
+  // LLM calls can take a while, but 3 minutes per attempt is more than enough
+  startToCloseTimeout: '3 minutes',
   retry: {
-    maximumAttempts: 3,
+    maximumAttempts: 2,
     backoffCoefficient: 2,
     initialInterval: '5s',
-    maximumInterval: '60s',
+    maximumInterval: '30s',
   },
 })
 
@@ -216,6 +247,13 @@ export async function coordinatorWorkflow(input: CoordinatorWorkflowInput): Prom
         if (result.agentId === 'strategy-generator' && result.data) {
           finalDraftPayload = result.data as StrategicDraftPayload
         }
+      }
+
+      // Fail fast: if every planned step failed there is nothing useful to aggregate
+      const failedSteps = stepResults.filter(r => r.error)
+      if (failedSteps.length > 0 && failedSteps.length === stepResults.length) {
+        const errors = failedSteps.map(r => `[${r.agentId}]: ${r.error}`).join('; ')
+        throw new Error(`All ${failedSteps.length} agent step(s) failed: ${errors}`)
       }
 
       // 3. Quality check

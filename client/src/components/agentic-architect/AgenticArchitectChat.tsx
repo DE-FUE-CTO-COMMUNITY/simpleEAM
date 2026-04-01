@@ -227,13 +227,23 @@ interface AssistantMessageContentProps {
   onApproval: (runId: string, action: 'approve' | 'reject') => void
 }
 
+const STALE_RUN_TIMEOUT_MS = 15 * 60 * 1000 // 15 minutes
+
+const isRunStale = (run: AiRun): boolean => {
+  if (run.status !== 'RUNNING' && run.status !== 'QUEUED') return false
+  const ref = run.startedAt ?? run.createdAt
+  if (!ref) return false
+  return Date.now() - new Date(ref).getTime() > STALE_RUN_TIMEOUT_MS
+}
+
 const AssistantMessageContent = ({
   run,
   approvalLoadingId,
   onApproval,
 }: AssistantMessageContentProps) => {
   const t = useTranslations('admin.aiSupport')
-  const isActive = run.status === 'QUEUED' || run.status === 'RUNNING'
+  const isActive = (run.status === 'QUEUED' || run.status === 'RUNNING') && !isRunStale(run)
+  const isStale = isRunStale(run)
   const isFailed = run.status === 'FAILED'
   const isApplied = run.status === 'APPLIED'
   const isCompleted = run.status === 'COMPLETED'
@@ -251,6 +261,14 @@ const AssistantMessageContent = ({
             : run.statusMessage || t('chatRunProcessing')}
         </Typography>
       </Stack>
+    )
+  }
+
+  if (isStale) {
+    return (
+      <Typography variant="body2" color="error.main">
+        {t('chatRunStale')}
+      </Typography>
     )
   }
 

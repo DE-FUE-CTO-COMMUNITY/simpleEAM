@@ -30,6 +30,8 @@ export const startCoordinatorWorkflow = async (
     taskQueue: AI_RUN_TASK_QUEUE,
     workflowId: input.workflowId,
     args: [input],
+    // Hard cap: plan (30s) + up to 3 agent steps (3min each × 2 attempts) + QC (3min) + aggregation (3min) + buffer
+    workflowExecutionTimeout: '20 minutes',
   })
 }
 

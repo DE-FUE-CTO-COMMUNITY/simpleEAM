@@ -2701,6 +2701,7 @@
       "chatRunQueued": "Workflow en file d'attente, en attente de démarrage...",
       "chatRunRunning": "Analyse de votre entreprise et génération du brouillon stratégique...",
       "chatRunProcessing": "Traitement de votre demande...",
+      "chatRunStale": "Ce workflow prend trop de temps et est peut-être bloqué. Veuillez réessayer ou contacter votre administrateur.",
       "chatRunFailed": "Le workflow a rencontré une erreur",
       "chatRunApplied": "Appliqué à votre architecture.",
       "chatPendingApproval": "Votre révision est requise",
