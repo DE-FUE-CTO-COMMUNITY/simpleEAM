@@ -4,7 +4,7 @@ import React from 'react'
 import { Box, Typography } from '@mui/material'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import AiRunPanel from '@/components/admin/AiRunPanel'
+import AgenticArchitectChat from '@/components/agentic-architect/AgenticArchitectChat'
 import { isAdmin, isArchitect, useAuth } from '@/lib/auth'
 import { useCompanyContext } from '@/contexts/CompanyContext'
 import { AgenticArchitectIcon } from '@/components/icons'
@@ -41,14 +41,28 @@ export default function AgenticArchitectPage() {
   }
 
   return (
-    <Box sx={{ mt: 4, mb: 4, mx: 3 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
-        <AgenticArchitectIcon sx={{ fontSize: 36 }} />
-        <Typography variant="h4" component="h1">
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: 'calc(100vh - 64px)',
+        overflow: 'hidden',
+        boxSizing: 'border-box',
+        px: 3,
+        pt: 2,
+        pb: 2,
+      }}
+    >
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5, flexShrink: 0 }}>
+        <AgenticArchitectIcon sx={{ fontSize: 28 }} />
+        <Typography variant="h5" component="h1">
           {tNavigation('agenticArchitect')}
         </Typography>
       </Box>
-      <AiRunPanel />
+      <Box sx={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
+        <AgenticArchitectChat />
+      </Box>
     </Box>
   )
 }
+
