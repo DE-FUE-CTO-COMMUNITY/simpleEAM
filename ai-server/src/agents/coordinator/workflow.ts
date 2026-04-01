@@ -17,6 +17,8 @@ import type {
   DocumentResearchOutput,
   StrategyGeneratorInput,
   StrategyGeneratorOutput,
+  DataLookupInput,
+  DataLookupOutput,
   CompleteAiRunInput,
   FailAiRunInput,
 } from '../types'
@@ -46,6 +48,7 @@ type CoordinatorActivities = {
   performInternetResearch: (input: InternetResearchInput) => Promise<InternetResearchOutput>
   performDocumentResearch: (input: DocumentResearchInput) => Promise<DocumentResearchOutput>
   generateStrategyProposals: (input: StrategyGeneratorInput) => Promise<StrategyGeneratorOutput>
+  performDataLookup: (input: DataLookupInput) => Promise<DataLookupOutput>
 }
 
 const {
@@ -79,6 +82,7 @@ const {
   performInternetResearch,
   performDocumentResearch,
   generateStrategyProposals,
+  performDataLookup,
 } = proxyActivities<
   Pick<
     CoordinatorActivities,
@@ -88,6 +92,7 @@ const {
     | 'performInternetResearch'
     | 'performDocumentResearch'
     | 'generateStrategyProposals'
+    | 'performDataLookup'
   >
 >({
   // LLM calls can take a while, but 3 minutes per attempt is more than enough
@@ -167,6 +172,24 @@ async function executeStep(
       }
     }
 
+    if (step.agentId === 'data-lookup') {
+      const output = await performDataLookup({
+        stepId: step.stepId,
+        task: step.task,
+        context: contextFromDeps || undefined,
+        companyId,
+        companyName,
+        llmConfig,
+        accessToken: workflowInput.accessToken,
+      })
+      return {
+        stepId: step.stepId,
+        agentId: 'data-lookup',
+        summary: output.summary,
+        data: { queryUsed: output.queryUsed, resultCount: output.resultCount },
+      }
+    }
+
     return {
       stepId: step.stepId,
       agentId: step.agentId,
@@ -243,17 +266,16 @@ export async function coordinatorWorkflow(input: CoordinatorWorkflowInput): Prom
         const result = await executeStep(step, contextFromDeps, input)
         stepResults.push(result)
 
+        // Fail fast: stop executing further steps as soon as any step fails.
+        // Downstream steps would have no useful context and would likely also fail.
+        if (result.error) {
+          throw new Error(`Step '${result.agentId}' (${result.stepId}) failed: ${result.error}`)
+        }
+
         // Capture strategy draft payload whenever strategy-generator produces one
         if (result.agentId === 'strategy-generator' && result.data) {
           finalDraftPayload = result.data as StrategicDraftPayload
         }
-      }
-
-      // Fail fast: if every planned step failed there is nothing useful to aggregate
-      const failedSteps = stepResults.filter(r => r.error)
-      if (failedSteps.length > 0 && failedSteps.length === stepResults.length) {
-        const errors = failedSteps.map(r => `[${r.agentId}]: ${r.error}`).join('; ')
-        throw new Error(`All ${failedSteps.length} agent step(s) failed: ${errors}`)
       }
 
       // 3. Quality check

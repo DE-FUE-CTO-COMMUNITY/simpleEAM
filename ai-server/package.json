@@ -11,7 +11,8 @@
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "test": "echo \"No ai-server tests configured\"",
     "worker": "node dist/agents/worker.js",
-    "worker:dev": "ts-node-dev --respawn --transpile-only src/agents/worker.ts"
+    "worker:dev": "ts-node-dev --respawn --transpile-only src/agents/worker.ts",
+    "generate-schema-digest": "node scripts/generate-schema-digest.mjs"
   },
   "packageManager": "yarn@4.9.1",
   "dependencies": {

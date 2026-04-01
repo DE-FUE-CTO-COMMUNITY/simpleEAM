@@ -149,10 +149,87 @@ const STRATEGY_KEYWORDS = [
   'generate roadmap',
 ] as const
 
+const DATA_LOOKUP_KEYWORDS = [
+  // "which X" patterns — entity names with or without modifiers in between
+  'which application',
+  'which business',
+  'which capability',
+  'which capabilities',
+  'which infrastructure',
+  'which interface',
+  'which supplier',
+  'which organisation',
+  'which data object',
+  'which ai component',
+  // "what X do I/we have" patterns
+  'what applications',
+  'what capabilities',
+  'what infrastructure',
+  'what interfaces',
+  'what data objects',
+  'what suppliers',
+  'do i have',
+  'do we have',
+  'in my architecture',
+  'in our architecture',
+  'in the architecture',
+  // list/show/count
+  'list applications',
+  'list capabilities',
+  'list all',
+  'show applications',
+  'show capabilities',
+  'show me',
+  'show all',
+  'find all',
+  'how many applications',
+  'how many capabilities',
+  'how many',
+  'count of',
+  // standalone entity type names used as subject of a question
+  'business capabilities',
+  'business processes',
+  'application interface',
+  'data object',
+  'ai component',
+  // relationship/filter patterns
+  'confidential data',
+  'data classification',
+  'hosted on',
+  'runs on',
+  'running on',
+  'supports capability',
+  // architecture context keywords
+  'existing architecture',
+  'current architecture',
+  'my architecture',
+  'our architecture',
+  // explicit intent
+  'lookup',
+  'not supported',
+  'without support',
+  'without application',
+] as const
+
 const buildFallbackPlan = (prompt: string, documents: readonly DocumentInput[]): AgentPlan => {
   const lowerPrompt = prompt.toLowerCase()
   const isStrategyRequest = STRATEGY_KEYWORDS.some(kw => lowerPrompt.includes(kw))
+  const isDataLookupRequest = DATA_LOOKUP_KEYWORDS.some(kw => lowerPrompt.includes(kw))
   const hasDocs = documents.length > 0
+
+  if (isDataLookupRequest && !isStrategyRequest) {
+    return {
+      reasoning: 'Fallback: data/architecture lookup keywords detected → data-lookup.',
+      steps: [
+        {
+          stepId: '1',
+          agentId: 'data-lookup',
+          task: limitText(prompt, 400),
+          dependsOn: [],
+        },
+      ],
+    }
+  }
 
   if (hasDocs && isStrategyRequest) {
     return {
@@ -255,7 +332,10 @@ const buildPlannerPrompt = (input: PlanAgentRunInput): string => {
     '- If internet research is needed before strategy generation, create a dependency.',
     '- CRITICAL: Only use "strategy-generator" when the user explicitly asks to CREATE or GENERATE new strategic content (e.g. "create my mission", "generate a strategy", "draft our vision", "build a business model canvas"). The strategy-generator always produces a draft requiring user approval.',
     '- Do NOT use "strategy-generator" for informational questions, analytical queries, questions about the existing architecture, or questions that ask "what are" / "show me" / "list" / "how".',
-    '- For general questions or queries that none of the available agents can directly answer from internal data, use "internet-research" to provide external context and general knowledge as a best-effort answer.',
+    '- Use "data-lookup" for ANY question about existing architecture content in the database. This includes: (a) listing or enumerating entities — "which business capabilities do I have?", "show me all active applications", "list my suppliers"; (b) counting — "how many applications are there?", "how many capabilities without support?"; (c) relationship traversals — "which applications support capability X and run on infrastructure Y?", "which interfaces transfer confidential data?"; (d) gap analyses — "capabilities without supporting applications"; (e) any question containing entity type names (applications, capabilities, business capabilities, infrastructure, interfaces, data objects, organisations, suppliers, AI components) in the context of the user\'s own architecture.',
+    '- CRITICAL: If the user asks about their OWN architecture data (uses words like "my", "our", "I have", "we have", "current", "existing") combined with any entity type name, ALWAYS use "data-lookup".',
+    '- Prefer "data-lookup" over "internet-research" when the question is about internal architecture data that exists in the database.',
+    '- Use "internet-research" ONLY for questions about external facts, market trends, best practices, or general knowledge that cannot be answered from the database.',
     '',
     'Return ONLY valid JSON (no markdown fences):',
     '{',

@@ -9,6 +9,7 @@ import * as documentResearchActivities from './document-research/activities'
 import * as strategyGeneratorActivities from './strategy-generator/activities'
 import * as qualityControlActivities from './quality-control/activities'
 import * as sovereigntyActivities from './sovereignty/activities'
+import * as dataLookupActivities from './data-lookup/activities'
 
 const workflowsPath = require.resolve('./workflows')
 
@@ -19,6 +20,7 @@ const activities = {
   ...strategyGeneratorActivities,
   ...qualityControlActivities,
   ...sovereigntyActivities,
+  ...dataLookupActivities,
 }
 
 const run = async () => {

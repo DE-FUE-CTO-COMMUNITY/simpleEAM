@@ -135,6 +135,22 @@ export interface DocumentResearchOutput {
   readonly findings: Array<{ documentName: string; excerpt: string }>
 }
 
+export interface DataLookupInput {
+  readonly stepId: string
+  readonly task: string
+  readonly context?: string
+  readonly companyId: string
+  readonly companyName?: string
+  readonly llmConfig: LlmConfig
+  readonly accessToken: string
+}
+
+export interface DataLookupOutput {
+  readonly summary: string
+  readonly queryUsed: string
+  readonly resultCount: number
+}
+
 export interface StrategyGeneratorInput {
   readonly stepId: string
   readonly task: string
