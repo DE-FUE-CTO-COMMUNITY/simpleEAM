@@ -327,11 +327,17 @@ services:
       - EXCALIDRAW_WS_SERVER_URL=https://${EXCALIDRAW_ROOM_SUBDOMAIN}.${BASE_DOMAIN}
       - AI_LLM_URL=${AI_LLM_URL:-}
       - AI_API_URL=${AI_API_URL:-https://${API_SUBDOMAIN}.${BASE_DOMAIN}}
+      - BRAND_NAME_LONG=${BRAND_NAME_LONG:-NextGen Enterprise Architecture Management}
+      - BRAND_NAME_SHORT=${BRAND_NAME_SHORT:-NextGen EAM}
       - THEME_PRIMARY_COLOR=${THEME_PRIMARY_COLOR}
       - THEME_SECONDARY_COLOR=${THEME_SECONDARY_COLOR}
       - THEME_FONT_FAMILY=${THEME_FONT_FAMILY}
       - LOGO_URL=${LOGO_URL}
       - LOGO_ALT=${LOGO_ALT}
+      - LOGO_DARK_URL=${LOGO_DARK_URL:-}
+      - LOGO_LENGTH=${LOGO_LENGTH:-120}
+      - FAVICON_URL=${FAVICON_URL:-/favicon.ico}
+      - DRAWER_WIDTH=${DRAWER_WIDTH:-240}
     networks:
       - eam-network
       - ${TRAEFIK_NETWORK}

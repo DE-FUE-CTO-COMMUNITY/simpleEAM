@@ -204,11 +204,7 @@ const DraftSection = ({ draft, runId }: { draft: StrategicDraftPayload; runId: s
                     {src.title || src.url}
                   </Link>
                   {src.snippet && (
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{ display: 'block' }}
-                    >
+                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
                       {src.snippet}
                     </Typography>
                   )}
@@ -350,9 +346,7 @@ export default function AgenticArchitectChat() {
   }, [aiApiUrl, graphQlUrl])
 
   const isAdmin = React.useMemo(() => {
-    const tokenParsed = keycloak?.tokenParsed as
-      | { realm_access?: { roles?: string[] } }
-      | undefined
+    const tokenParsed = keycloak?.tokenParsed as { realm_access?: { roles?: string[] } } | undefined
     return (tokenParsed?.realm_access?.roles ?? []).includes('admin')
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCompanyId])
@@ -693,7 +687,11 @@ export default function AgenticArchitectChat() {
         )}
 
         {/* Predefined prompts */}
-        <Stack direction="row" spacing={0.75} sx={{ mb: 1, flexWrap: 'wrap', alignItems: 'center' }}>
+        <Stack
+          direction="row"
+          spacing={0.75}
+          sx={{ mb: 1, flexWrap: 'wrap', alignItems: 'center' }}
+        >
           <Typography variant="caption" color="text.secondary">
             {t('chatSuggestedPrompts')}:
           </Typography>
@@ -732,9 +730,7 @@ export default function AgenticArchitectChat() {
             maxRows={5}
             fullWidth
             size="small"
-            placeholder={
-              selectedCompanyId ? t('chatPlaceholder') : t('noCompanySelected')
-            }
+            placeholder={selectedCompanyId ? t('chatPlaceholder') : t('noCompanySelected')}
             value={prompt}
             onChange={e => setPrompt(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -757,11 +753,7 @@ export default function AgenticArchitectChat() {
           </Tooltip>
           <Tooltip title={`${t('chatSend')} (Ctrl+Enter)`}>
             <Box component="span" sx={{ display: 'inline-flex' }}>
-              <IconButton
-                color="primary"
-                disabled={!canSend}
-                onClick={() => void handleSend()}
-              >
+              <IconButton color="primary" disabled={!canSend} onClick={() => void handleSend()}>
                 {sendingPrompt ? <CircularProgress size={20} /> : <SendIcon />}
               </IconButton>
             </Box>
