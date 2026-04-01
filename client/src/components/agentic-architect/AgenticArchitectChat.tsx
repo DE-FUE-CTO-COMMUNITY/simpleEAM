@@ -27,6 +27,7 @@ import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined'
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 import HighlightOffIcon from '@mui/icons-material/HighlightOff'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import DownloadIcon from '@mui/icons-material/Download'
 import { useTranslations } from 'next-intl'
 import { useCompanyContext } from '@/contexts/CompanyContext'
 import { keycloak } from '@/lib/auth'
@@ -345,9 +346,10 @@ export default function AgenticArchitectChat() {
     return graphQlUrl.endsWith('/graphql') ? graphQlUrl.slice(0, -8) : graphQlUrl
   }, [aiApiUrl, graphQlUrl])
 
-  const isAdmin = React.useMemo(() => {
+  const canClearHistory = React.useMemo(() => {
     const tokenParsed = keycloak?.tokenParsed as { realm_access?: { roles?: string[] } } | undefined
-    return (tokenParsed?.realm_access?.roles ?? []).includes('admin')
+    const roles = tokenParsed?.realm_access?.roles ?? []
+    return roles.includes('admin') || roles.includes('architect')
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCompanyId])
 
@@ -518,6 +520,50 @@ export default function AgenticArchitectChat() {
     ).then(docs => setUploadedDocs(prev => [...prev, ...docs]))
     if (fileInputRef.current) fileInputRef.current.value = ''
   }
+
+  // ── Save history ────────────────────────────────────────────────────────
+
+  const handleSaveHistory = React.useCallback(() => {
+    const sorted = [...runs].sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1))
+    const lines: string[] = [
+      `Agentic Architect – Conversation Export`,
+      `Company: ${selectedCompany?.name ?? 'Unknown'}`,
+      `Exported: ${new Date().toLocaleString()}`,
+      '',
+      '═'.repeat(60),
+      '',
+    ]
+    sorted.forEach((run, idx) => {
+      lines.push(`[${idx + 1}] You — ${fmtTime(run.createdAt)}`)
+      lines.push(run.prompt)
+      lines.push('')
+      lines.push(`Assistant — ${fmtTime(run.completedAt ?? run.startedAt ?? run.createdAt)}`)
+      if (run.status === 'FAILED') {
+        lines.push(`Error: ${run.errorMessage ?? 'Unknown error'}`)
+      } else if (run.resultSummary) {
+        lines.push(run.resultSummary)
+      } else {
+        lines.push(`[${run.status}]`)
+      }
+      if (run.approvalStatus) {
+        lines.push(`Approval: ${run.approvalStatus}`)
+      }
+      lines.push('')
+      lines.push('─'.repeat(60))
+      lines.push('')
+    })
+    const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    const companySlug = (selectedCompany?.name ?? 'conversation')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '')
+    a.download = `agentic-architect-${companySlug}-${new Date().toISOString().slice(0, 10)}.txt`
+    a.click()
+    URL.revokeObjectURL(url)
+  }, [runs, selectedCompany?.name])
 
   // ── Delete history ─────────────────────────────────────────────────────
 
@@ -758,7 +804,20 @@ export default function AgenticArchitectChat() {
               </IconButton>
             </Box>
           </Tooltip>
-          {isAdmin && (
+          {canClearHistory && (
+            <Tooltip title={t('chatSaveHistoryTooltip')}>
+              <Box component="span" sx={{ display: 'inline-flex' }}>
+                <IconButton
+                  size="small"
+                  disabled={!selectedCompanyId || runs.length === 0}
+                  onClick={handleSaveHistory}
+                >
+                  <DownloadIcon fontSize="small" />
+                </IconButton>
+              </Box>
+            </Tooltip>
+          )}
+          {canClearHistory && (
             <Tooltip title={t('chatDeleteHistoryTooltip')}>
               <Box component="span" sx={{ display: 'inline-flex' }}>
                 <IconButton

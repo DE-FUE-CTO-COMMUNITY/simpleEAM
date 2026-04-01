@@ -2706,7 +2706,8 @@
       "chatPendingApproval": "Votre révision est requise",
       "chatShowDraft": "Afficher les détails du brouillon",
       "chatHideDraft": "Masquer les détails du brouillon",
-      "chatDeleteHistoryTooltip": "Effacer l'historique de conversation"
+      "chatDeleteHistoryTooltip": "Effacer l'historique de conversation",
+      "chatSaveHistoryTooltip": "Enregistrer l'historique de conversation"
     },
     "productFamilies": {
       "title": "Gestion des familles de produits",

@@ -2230,11 +2230,13 @@ aiRunRouter.delete('/ai-runs', async (req, res) => {
     }
 
     const decodedToken = await getUserContext(req.headers.authorization)
-    enforceAdminAccess(decodedToken)
+    enforceAiRunAccess(decodedToken, companyId)
+
+    const userId = decodedToken.sub ?? ''
 
     console.info('[AI RUN][DELETE_HISTORY][REQUEST]', {
       companyId,
-      initiatedBy: decodedToken.sub ?? 'unknown',
+      initiatedBy: userId,
     })
 
     const companiesResult = await graphqlRequest<{ companies: Array<{ id: string }> }>({
@@ -2262,13 +2264,13 @@ aiRunRouter.delete('/ai-runs', async (req, res) => {
 
     const runQuery = await graphqlRequest<{ aiRuns: Array<{ id: string }> }>({
       query: `
-        query AiRunsByCompany($companyId: String!) {
-          aiRuns(where: { companyId: { eq: $companyId } }) {
+        query AiRunsByUser($companyId: String!, $userId: String!) {
+          aiRuns(where: { companyId: { eq: $companyId }, initiatedBy: { eq: $userId } }) {
             id
           }
         }
       `,
-      variables: { companyId },
+      variables: { companyId, userId },
       accessToken: token,
     })
 
@@ -2295,13 +2297,13 @@ aiRunRouter.delete('/ai-runs', async (req, res) => {
 
     const runDeleteResult = await graphqlRequest<{ deleteAiRuns: { nodesDeleted: number } }>({
       query: `
-        mutation DeleteAiRuns($companyId: String!) {
-          deleteAiRuns(where: { companyId: { eq: $companyId } }) {
+        mutation DeleteAiRuns($companyId: String!, $userId: String!) {
+          deleteAiRuns(where: { companyId: { eq: $companyId }, initiatedBy: { eq: $userId } }) {
             nodesDeleted
           }
         }
       `,
-      variables: { companyId },
+      variables: { companyId, userId },
       accessToken: token,
     })
 
@@ -2311,7 +2313,7 @@ aiRunRouter.delete('/ai-runs', async (req, res) => {
       companyId,
       deletedRuns,
       deletedAuditEvents,
-      initiatedBy: decodedToken.sub ?? 'unknown',
+      initiatedBy: userId,
     })
 
     return res.status(200).json({
@@ -2346,10 +2348,12 @@ aiRunRouter.get('/ai-runs', async (req, res) => {
       throw createApiError(401, 'UNAUTHENTICATED', 'Authentication required')
     }
 
+    const userId = decodedToken.sub ?? ''
+
     const result = await graphqlRequest<{ aiRuns: Array<Record<string, unknown>> }>({
       query: `
-        query AiRunsByCompany($companyId: String!) {
-          aiRuns(where: { companyId: { eq: $companyId } }) {
+        query AiRunsByUser($companyId: String!, $userId: String!) {
+          aiRuns(where: { companyId: { eq: $companyId }, initiatedBy: { eq: $userId } }) {
             id
             companyId
             prompt
@@ -2370,7 +2374,7 @@ aiRunRouter.get('/ai-runs', async (req, res) => {
           }
         }
       `,
-      variables: { companyId },
+      variables: { companyId, userId },
       accessToken: token,
     })
 

@@ -2706,7 +2706,8 @@
       "chatPendingApproval": "Your review is required",
       "chatShowDraft": "Show draft details",
       "chatHideDraft": "Hide draft details",
-      "chatDeleteHistoryTooltip": "Clear conversation history"
+      "chatDeleteHistoryTooltip": "Clear conversation history",
+      "chatSaveHistoryTooltip": "Save conversation history"
     },
     "productFamilies": {
       "title": "Product Family Management",

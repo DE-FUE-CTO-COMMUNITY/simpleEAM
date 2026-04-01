@@ -2649,7 +2649,8 @@
       "chatPendingApproval": "Ihre Prüfung ist erforderlich",
       "chatShowDraft": "Entwurf anzeigen",
       "chatHideDraft": "Entwurf ausblenden",
-      "chatDeleteHistoryTooltip": "Gesprächsverlauf löschen"
+      "chatDeleteHistoryTooltip": "Gesprächsverlauf löschen",
+      "chatSaveHistoryTooltip": "Gesprächsverlauf speichern"
     },
     "productFamilies": {
       "title": "Verwaltung Produktfamilien",

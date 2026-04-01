@@ -131,15 +131,22 @@ export const updateAiRunStatusMessage = async (input: {
 // ─────────────────────────────────────────────
 
 const STRATEGY_KEYWORDS = [
-  'vision',
-  'mission',
-  'strategy',
-  'strategic',
-  'values',
-  'goal',
-  'purpose',
-  'business model',
-  'roadmap',
+  'create mission',
+  'create vision',
+  'generate strategy',
+  'generate strategies',
+  'generate mission',
+  'generate vision',
+  'draft strategy',
+  'draft mission',
+  'draft vision',
+  'develop strategy',
+  'develop strategies',
+  'build strategy',
+  'strategic enrichment',
+  'business model canvas',
+  'create roadmap',
+  'generate roadmap',
 ] as const
 
 const buildFallbackPlan = (prompt: string, documents: readonly DocumentInput[]): AgentPlan => {
@@ -246,6 +253,9 @@ const buildPlannerPrompt = (input: PlanAgentRunInput): string => {
     '- For document-research steps, include documentAgentIds selection in the task description if relevant.',
     '- Create the minimum number of steps needed to fulfill the request.',
     '- If internet research is needed before strategy generation, create a dependency.',
+    '- CRITICAL: Only use "strategy-generator" when the user explicitly asks to CREATE or GENERATE new strategic content (e.g. "create my mission", "generate a strategy", "draft our vision", "build a business model canvas"). The strategy-generator always produces a draft requiring user approval.',
+    '- Do NOT use "strategy-generator" for informational questions, analytical queries, questions about the existing architecture, or questions that ask "what are" / "show me" / "list" / "how".',
+    '- For general questions or queries that none of the available agents can directly answer from internal data, use "internet-research" to provide external context and general knowledge as a best-effort answer.',
     '',
     'Return ONLY valid JSON (no markdown fences):',
     '{',
@@ -393,13 +403,13 @@ export const aggregateStepResults = async (
       input.llmConfig,
       'You are an enterprise analyst. Return plain text summaries.'
     )
-    return { summary: limitText(summary, 2400) }
+    return { summary }
   } catch (error) {
     console.warn('[AI WORKER][COORDINATOR][AGGREGATION_FAILED]', {
       error: error instanceof Error ? error.message : 'Unknown error',
       fallback: 'concatenating step summaries',
     })
     const summary = input.stepResults.map(r => `[${r.agentId}]: ${r.summary}`).join('\n\n')
-    return { summary: limitText(summary, 2400) }
+    return { summary }
   }
 }
