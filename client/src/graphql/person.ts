@@ -141,6 +141,9 @@ export const GET_PERSON_BY_EMAIL = gql`
         font
         diagramFont
         features
+        llmUrl
+        llmModel
+        llmKey
         expectedSovereigntyScore
         achievedSovereigntyScore
       }

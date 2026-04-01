@@ -90,6 +90,11 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
       selectedCompany?.llmKey?.trim()
   )
 
+  // Derive roles reactively — keycloak.hasRealmRole() is not reactive by itself,
+  // so we use `authenticated` as the dependency to recompute when auth state changes.
+  const userIsAdmin = initialized && authenticated ? isAdmin() : false
+  const userIsArchitect = initialized && authenticated ? isArchitect() : false
+
   const handleDrawerToggle = () => {
     setOpen(!open)
   }
@@ -312,7 +317,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
 
   const menuItems = [
     { text: t('dashboard'), icon: <DashboardIcon />, href: '/' },
-    ...(initialized && hasCompanyLlmConfig && (isAdmin() || isArchitect())
+    ...(initialized && hasCompanyLlmConfig && (userIsAdmin || userIsArchitect)
       ? [
           {
             text: t('agenticArchitect'),
@@ -339,7 +344,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
     // Abschnitt: Organisation & Personen
     { isDivider: true, text: 'divider', icon: null },
     // Companies management only visible for admins
-    ...(initialized && isAdmin()
+    ...(initialized && userIsAdmin
       ? [{ text: t('companies'), icon: <CompanyIcon />, href: '/companies' }]
       : []),
     // Suppliers visible for all users when SUP feature is enabled
@@ -348,14 +353,14 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
       : []),
     { text: t('persons'), icon: <PersonIcon />, href: '/persons' },
     // Import/Export for Admin and Architect users (Hydration fix: only when initialized)
-    ...(initialized && (isAdmin() || isArchitect())
+    ...(initialized && (userIsAdmin || userIsArchitect)
       ? [
           { isDivider: true, text: 'divider', icon: null },
           { text: t('importExport'), icon: <ExcelIcon />, onClick: handleImportExportDialogOpen },
         ]
       : []),
     // Administration only for admins - at the bottom
-    ...(initialized && isAdmin()
+    ...(initialized && userIsAdmin
       ? [
           { isDivider: true, text: 'divider', icon: null },
           { text: t('administration'), icon: <SettingsIcon />, href: '/admin' },
@@ -392,7 +397,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
 
       {/* Excel Import/Export Dialog - für Admin- und Architect-Benutzer */}
       {/* Hydration fix: Only render when auth is initialized */}
-      {initialized && (isAdmin() || isArchitect()) && (
+      {initialized && (userIsAdmin || userIsArchitect) && (
         <ImportExportDialog
           isOpen={importExportDialogOpen}
           onClose={handleImportExportDialogClose}
