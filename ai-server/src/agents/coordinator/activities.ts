@@ -157,6 +157,7 @@ const DATA_LOOKUP_KEYWORDS = [
   'which capabilities',
   'which infrastructure',
   'which interface',
+  'which interfaces',
   'which supplier',
   'which organisation',
   'which data object',
@@ -190,6 +191,9 @@ const DATA_LOOKUP_KEYWORDS = [
   'business capabilities',
   'business processes',
   'application interface',
+  'interfaces has',
+  'has interface',
+  'has interfaces',
   'data object',
   'ai component',
   // relationship/filter patterns
@@ -210,6 +214,50 @@ const DATA_LOOKUP_KEYWORDS = [
   'without support',
   'without application',
 ] as const
+
+const looksLikeDataLookupIntent = (prompt: string): boolean => {
+  const p = prompt.toLowerCase()
+
+  if (DATA_LOOKUP_KEYWORDS.some(kw => p.includes(kw))) {
+    return true
+  }
+
+  const hasQuestionVerb = /(which|what|list|show|find|how many|count|number of)\b/.test(p)
+  const hasEntityKeyword =
+    /(application|applications|capability|capabilities|business process|business processes|interface|interfaces|data object|data objects|infrastructure|supplier|suppliers|organisation|organisations|organization|organizations|ai component|ai components)\b/.test(
+      p
+    )
+
+  // Entity-centric architecture questions should default to data-lookup.
+  return hasQuestionVerb && hasEntityKeyword
+}
+
+const forceDataLookupPlan = (prompt: string): AgentPlan => ({
+  reasoning:
+    'Deterministic guard: prompt matches architecture-entity lookup intent, forcing data-lookup.',
+  steps: [
+    {
+      stepId: '1',
+      agentId: 'data-lookup',
+      task: limitText(prompt, 400),
+      dependsOn: [],
+    },
+  ],
+})
+
+const normalizePlanForPrompt = (plan: AgentPlan, prompt: string): AgentPlan => {
+  if (!looksLikeDataLookupIntent(prompt)) {
+    return plan
+  }
+
+  const hasDataLookupStep = plan.steps.some(step => step.agentId === 'data-lookup')
+  if (hasDataLookupStep) {
+    return plan
+  }
+
+  // Planner drifted to internet/general research for an internal architecture lookup.
+  return forceDataLookupPlan(prompt)
+}
 
 const buildFallbackPlan = (prompt: string, documents: readonly DocumentInput[]): AgentPlan => {
   const lowerPrompt = prompt.toLowerCase()
@@ -412,11 +460,12 @@ export const planAgentRun = async (input: PlanAgentRunInput): Promise<AgentPlan>
     )
     const plan = parsePlanFromLlm(llmResponse, input.documents)
     if (plan) {
+      const normalizedPlan = normalizePlanForPrompt(plan, input.prompt)
       console.info('[AI WORKER][COORDINATOR][PLAN_CREATED]', {
-        reasoning: limitText(plan.reasoning, 200),
-        steps: plan.steps.map(s => ({ stepId: s.stepId, agentId: s.agentId })),
+        reasoning: limitText(normalizedPlan.reasoning, 200),
+        steps: normalizedPlan.steps.map(s => ({ stepId: s.stepId, agentId: s.agentId })),
       })
-      return plan
+      return normalizedPlan
     }
   } catch (error) {
     console.warn('[AI WORKER][COORDINATOR][PLAN_LLM_FAILED]', {

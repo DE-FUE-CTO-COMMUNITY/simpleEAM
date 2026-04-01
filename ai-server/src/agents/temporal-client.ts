@@ -51,3 +51,19 @@ export const getTemporalWorkerConfig = () => ({
   namespace: getTemporalNamespace(),
   taskQueue: AI_RUN_TASK_QUEUE,
 })
+
+/**
+ * Returns the Temporal workflow execution status string
+ * (e.g. 'RUNNING', 'FAILED', 'TERMINATED', 'TIMED_OUT', 'COMPLETED', 'CANCELED')
+ * or null if the workflow cannot be found / Temporal is unreachable.
+ */
+export const getWorkflowStatus = async (workflowId: string): Promise<string | null> => {
+  try {
+    const client = await getWorkflowClient()
+    const handle = client.getHandle(workflowId)
+    const description = await handle.describe()
+    return description.status.name
+  } catch {
+    return null
+  }
+}

@@ -227,7 +227,7 @@ interface AssistantMessageContentProps {
   onApproval: (runId: string, action: 'approve' | 'reject') => void
 }
 
-const STALE_RUN_TIMEOUT_MS = 15 * 60 * 1000 // 15 minutes
+const STALE_RUN_TIMEOUT_MS = 5 * 60 * 1000 // 5 minutes
 
 const isRunStale = (run: AiRun): boolean => {
   if (run.status !== 'RUNNING' && run.status !== 'QUEUED') return false

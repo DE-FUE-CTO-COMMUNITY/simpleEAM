@@ -2,7 +2,11 @@ import { Response, Router } from 'express'
 import { v4 as uuidv4 } from 'uuid'
 import { verifyToken } from '../auth/auth-jwks'
 import { graphqlRequest } from '../graphql/client'
-import { startCoordinatorWorkflow, startSovereigntyScoreWorkflow } from './temporal-client'
+import {
+  startCoordinatorWorkflow,
+  startSovereigntyScoreWorkflow,
+  getWorkflowStatus,
+} from './temporal-client'
 import {
   AiRunUseCase,
   CreateAiAuditEventInput,
@@ -2382,6 +2386,66 @@ aiRunRouter.get('/ai-runs', async (req, res) => {
       .map(run => mapAiRunRecord(run))
       .sort((left, right) => (right.createdAt || '').localeCompare(left.createdAt || ''))
       .slice(0, 20)
+
+    // ── Self-healing: repair RUNNING runs whose Temporal workflow has terminated ──
+    // When markAiRunFailedWithToken fails inside the Temporal worker (e.g. the user's
+    // JWT expired during a long-running workflow), the DB record stays RUNNING even
+    // though Temporal has already closed the workflow. We detect and fix this on every
+    // poll by checking Temporal's workflow status for any RUNNING run older than 2 min.
+    const TWO_MINUTES_MS = 2 * 60 * 1000
+    const stuckRuns = runs.filter(run => {
+      if (run.status !== 'RUNNING' && run.status !== 'QUEUED') return false
+      const ref = run.startedAt ?? run.createdAt
+      if (!ref) return false
+      return Date.now() - new Date(ref).getTime() > TWO_MINUTES_MS
+    })
+
+    if (stuckRuns.length > 0) {
+      const completedAt = new Date().toISOString()
+      await Promise.all(
+        stuckRuns.map(async run => {
+          if (!run.workflowId) return
+          const temporalStatus = await getWorkflowStatus(run.workflowId)
+          // If Temporal shows anything other than RUNNING, the workflow is done but the
+          // DB was never updated — heal it now using the currently valid user token.
+          if (temporalStatus !== null && temporalStatus !== 'RUNNING') {
+            console.warn('[AI RUN][SELF-HEAL]', {
+              runId: run.id,
+              workflowId: run.workflowId,
+              temporalStatus,
+            })
+            try {
+              await graphqlRequest({
+                query: `
+                  mutation HealAiRun($runId: ID!, $errorMessage: String!, $completedAt: DateTime!) {
+                    updateAiRuns(
+                      where: { id: { eq: $runId } }
+                      update: {
+                        status: { set: "FAILED" }
+                        errorMessage: { set: $errorMessage }
+                        completedAt: { set: $completedAt }
+                      }
+                    ) { aiRuns { id } }
+                  }
+                `,
+                variables: {
+                  runId: run.id,
+                  errorMessage: `Workflow terminated unexpectedly (Temporal status: ${temporalStatus}). The run may have exceeded the JWT token lifetime or the worker was restarted.`,
+                  completedAt,
+                },
+                accessToken: token,
+              })
+              // Update the in-memory record so the client sees FAILED immediately
+              run.status = 'FAILED'
+              run.errorMessage = `Workflow terminated unexpectedly (Temporal status: ${temporalStatus})`
+              run.completedAt = completedAt
+            } catch (healErr) {
+              console.error('[AI RUN][SELF-HEAL][ERROR]', { runId: run.id, error: healErr })
+            }
+          }
+        })
+      )
+    }
 
     console.info('[AI RUN][LIST][SUCCESS]', {
       companyId,
