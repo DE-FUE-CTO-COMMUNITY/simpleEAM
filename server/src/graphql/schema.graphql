@@ -388,6 +388,7 @@ type AiRun @node {
   workflowId: String
   initiatedBy: String
   resultSummary: String
+  statusMessage: String
   draftPayload: String
   errorMessage: String
   approvedBy: String

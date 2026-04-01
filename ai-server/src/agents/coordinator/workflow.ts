@@ -32,6 +32,11 @@ type CoordinatorActivities = {
     input: CompleteAiRunInput & { accessToken: string }
   ) => Promise<void>
   markAiRunFailedWithToken: (input: FailAiRunInput & { accessToken: string }) => Promise<void>
+  updateAiRunStatusMessage: (input: {
+    runId: string
+    statusMessage: string
+    accessToken: string
+  }) => Promise<void>
   // Coordinator
   planAgentRun: (input: PlanAgentRunInput) => Promise<import('../types').AgentPlan>
   aggregateStepResults: (input: AggregateStepResultsInput) => Promise<AggregateStepResultsOutput>
@@ -47,6 +52,7 @@ const {
   markAiRunRunningWithToken,
   markAiRunCompletedWithToken,
   markAiRunFailedWithToken,
+  updateAiRunStatusMessage,
   planAgentRun,
   aggregateStepResults,
   runQualityCheck,
@@ -166,6 +172,11 @@ export async function coordinatorWorkflow(input: CoordinatorWorkflowInput): Prom
 
     for (let iteration = 0; iteration <= MAX_QC_ITERATIONS; iteration++) {
       // 1. Plan — LLM decides which agents to use and in what order
+      await updateAiRunStatusMessage({
+        runId: input.runId,
+        statusMessage: 'Planning workflow...',
+        accessToken: input.accessToken,
+      })
       const plan = await planAgentRun({
         prompt: input.prompt,
         objective: input.objective ?? null,
@@ -188,6 +199,16 @@ export async function coordinatorWorkflow(input: CoordinatorWorkflowInput): Prom
           .filter(Boolean)
           .join('\n\n')
 
+        const agentLabel = step.agentId
+          .split('-')
+          .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
+          .join(' ')
+        await updateAiRunStatusMessage({
+          runId: input.runId,
+          statusMessage: `Running: ${agentLabel}...`,
+          accessToken: input.accessToken,
+        })
+
         const result = await executeStep(step, contextFromDeps, input)
         stepResults.push(result)
 
@@ -198,6 +219,11 @@ export async function coordinatorWorkflow(input: CoordinatorWorkflowInput): Prom
       }
 
       // 3. Quality check
+      await updateAiRunStatusMessage({
+        runId: input.runId,
+        statusMessage: 'Running quality check...',
+        accessToken: input.accessToken,
+      })
       const qcResult = await runQualityCheck({
         originalPrompt: input.prompt,
         companyName: input.companyName,
@@ -208,6 +234,11 @@ export async function coordinatorWorkflow(input: CoordinatorWorkflowInput): Prom
 
       if (qcResult.passed || iteration === MAX_QC_ITERATIONS) {
         // 4. Aggregate all step results into a final summary
+        await updateAiRunStatusMessage({
+          runId: input.runId,
+          statusMessage: 'Finalizing results...',
+          accessToken: input.accessToken,
+        })
         const aggregated = await aggregateStepResults({
           prompt: input.prompt,
           companyName: input.companyName,

@@ -58,6 +58,7 @@ type AiRun = {
   prompt: string
   status: 'QUEUED' | 'RUNNING' | 'COMPLETED' | 'FAILED' | 'APPLIED'
   approvalStatus?: AiRunApprovalStatus
+  statusMessage?: string | null
   resultSummary?: string | null
   draftPayload?: string | null
   errorMessage?: string | null
@@ -248,7 +249,9 @@ const AssistantMessageContent = ({
       <Stack direction="row" spacing={1} alignItems="center">
         <CircularProgress size={16} />
         <Typography variant="body2" color="text.secondary">
-          {run.status === 'QUEUED' ? t('chatRunQueued') : t('chatRunRunning')}
+          {run.status === 'QUEUED'
+            ? t('chatRunQueued')
+            : run.statusMessage || t('chatRunProcessing')}
         </Typography>
       </Stack>
     )
@@ -458,7 +461,7 @@ export default function AgenticArchitectChat() {
           companyId: selectedCompanyId,
           prompt: trimmed,
           objective: null,
-          useCase: 'STRATEGIC_ENRICHMENT',
+          useCase: 'CONVERSATIONAL_ASSISTANT',
           documents: uploadedDocs,
         }),
       })

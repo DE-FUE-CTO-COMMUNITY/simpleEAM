@@ -51,14 +51,14 @@ export const markAiRunCompletedWithToken = async (
 
   await graphqlRequest({
     query: `
-      mutation MarkAiRunCompleted($runId: ID!, $summary: String!, $draftPayload: String, $completedAt: DateTime!) {
+      mutation MarkAiRunCompleted($runId: ID!, $summary: String!, $draftPayload: String, $approvalStatus: String, $completedAt: DateTime!) {
         updateAiRuns(
           where: { id: { eq: $runId } }
           update: {
             status: { set: "COMPLETED" }
             resultSummary: { set: $summary }
             draftPayload: { set: $draftPayload }
-            approvalStatus: { set: "PENDING_REVIEW" }
+            approvalStatus: { set: $approvalStatus }
             completedAt: { set: $completedAt }
           }
         ) { aiRuns { id } }
@@ -68,6 +68,7 @@ export const markAiRunCompletedWithToken = async (
       runId: input.runId,
       summary: input.summary,
       draftPayload: input.draftPayload ? JSON.stringify(input.draftPayload) : null,
+      approvalStatus: input.draftPayload ? 'PENDING_REVIEW' : null,
       completedAt: timestamp,
     },
     accessToken: input.accessToken,
@@ -98,6 +99,29 @@ export const markAiRunFailedWithToken = async (
       }
     `,
     variables: { runId: input.runId, errorMessage: input.errorMessage, completedAt: timestamp },
+    accessToken: input.accessToken,
+  })
+}
+
+// ─────────────────────────────────────────────
+// Status message update (progress reporting)
+// ─────────────────────────────────────────────
+
+export const updateAiRunStatusMessage = async (input: {
+  runId: string
+  statusMessage: string
+  accessToken: string
+}): Promise<void> => {
+  await graphqlRequest({
+    query: `
+      mutation UpdateAiRunStatusMessage($runId: ID!, $statusMessage: String!) {
+        updateAiRuns(
+          where: { id: { eq: $runId } }
+          update: { statusMessage: { set: $statusMessage } }
+        ) { aiRuns { id } }
+      }
+    `,
+    variables: { runId: input.runId, statusMessage: input.statusMessage },
     accessToken: input.accessToken,
   })
 }

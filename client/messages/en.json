@@ -2700,6 +2700,7 @@
       "chatRejectedMessage": "Rejected",
       "chatRunQueued": "Workflow queued, waiting to start...",
       "chatRunRunning": "Analyzing your company and generating the strategic draft...",
+      "chatRunProcessing": "Processing your request...",
       "chatRunFailed": "The workflow encountered an error",
       "chatRunApplied": "Applied to your architecture.",
       "chatPendingApproval": "Your review is required",

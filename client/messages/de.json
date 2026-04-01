@@ -2643,6 +2643,7 @@
       "chatRejectedMessage": "Abgelehnt",
       "chatRunQueued": "Workflow in Warteschlange, warte auf Start...",
       "chatRunRunning": "Unternehmen wird analysiert und strategischer Entwurf wird erstellt...",
+      "chatRunProcessing": "Anfrage wird verarbeitet...",
       "chatRunFailed": "Der Workflow ist auf einen Fehler gestoßen",
       "chatRunApplied": "In Ihrer Architektur angewendet.",
       "chatPendingApproval": "Ihre Prüfung ist erforderlich",

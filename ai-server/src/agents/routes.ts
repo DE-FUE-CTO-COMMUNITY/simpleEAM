@@ -44,6 +44,7 @@ type AiRunRecord = {
   workflowId: string | null
   initiatedBy: string | null
   resultSummary: string | null
+  statusMessage: string | null
   draftPayload: string | null
   errorMessage: string | null
   createdAt: string | null
@@ -255,6 +256,7 @@ const mapAiRunRecord = (run: Record<string, unknown>): AiRunRecord => ({
   workflowId: typeof run.workflowId === 'string' ? run.workflowId : null,
   initiatedBy: typeof run.initiatedBy === 'string' ? run.initiatedBy : null,
   resultSummary: typeof run.resultSummary === 'string' ? run.resultSummary : null,
+  statusMessage: typeof run.statusMessage === 'string' ? run.statusMessage : null,
   draftPayload: typeof run.draftPayload === 'string' ? run.draftPayload : null,
   errorMessage: typeof run.errorMessage === 'string' ? run.errorMessage : null,
   createdAt: toIsoString(run.createdAt),
@@ -278,6 +280,7 @@ const loadAiRunById = async (runId: string, accessToken: string): Promise<AiRunR
           workflowId
           initiatedBy
           resultSummary
+          statusMessage
           draftPayload
           errorMessage
           createdAt
@@ -2357,6 +2360,7 @@ aiRunRouter.get('/ai-runs', async (req, res) => {
             workflowId
             initiatedBy
             resultSummary
+            statusMessage
             draftPayload
             errorMessage
             createdAt
@@ -2477,7 +2481,7 @@ aiRunRouter.post('/ai-runs', async (req, res) => {
             objective,
             useCase,
             status: 'QUEUED',
-            approvalStatus: 'PENDING_REVIEW',
+            approvalStatus: null,
             initiatedBy,
             company: {
               connect: [{ where: { node: { id: { eq: companyId } } } }],
@@ -2585,7 +2589,7 @@ aiRunRouter.post('/ai-runs', async (req, res) => {
         objective,
         useCase,
         status: 'QUEUED',
-        approvalStatus: 'PENDING_REVIEW',
+        approvalStatus: null,
         workflowId,
         initiatedBy,
         createdAt,

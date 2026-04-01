@@ -2428,6 +2428,7 @@ export type AiRun = {
   resultSummary?: Maybe<Scalars['String']['output']>;
   startedAt?: Maybe<Scalars['DateTime']['output']>;
   status: Scalars['String']['output'];
+  statusMessage?: Maybe<Scalars['String']['output']>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
   useCase: Scalars['String']['output'];
   workflowId?: Maybe<Scalars['String']['output']>;
@@ -2493,6 +2494,7 @@ export type AiRunAggregateNode = {
   resultSummary: StringAggregateSelection;
   startedAt: DateTimeAggregateSelection;
   status: StringAggregateSelection;
+  statusMessage: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   useCase: StringAggregateSelection;
   workflowId: StringAggregateSelection;
@@ -2583,6 +2585,7 @@ export type AiRunAuditEventAiRunRunNodeAggregateSelection = {
   resultSummary: StringAggregateSelection;
   startedAt: DateTimeAggregateSelection;
   status: StringAggregateSelection;
+  statusMessage: StringAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
   useCase: StringAggregateSelection;
   workflowId: StringAggregateSelection;
@@ -2726,6 +2729,7 @@ export type AiRunAuditEventRunNodeAggregationWhereInput = {
   resultSummary?: InputMaybe<StringScalarAggregationFilters>;
   startedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   status?: InputMaybe<StringScalarAggregationFilters>;
+  statusMessage?: InputMaybe<StringScalarAggregationFilters>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
   useCase?: InputMaybe<StringScalarAggregationFilters>;
   workflowId?: InputMaybe<StringScalarAggregationFilters>;
@@ -3079,6 +3083,7 @@ export type AiRunCreateInput = {
   resultSummary?: InputMaybe<Scalars['String']['input']>;
   startedAt?: InputMaybe<Scalars['DateTime']['input']>;
   status: Scalars['String']['input'];
+  statusMessage?: InputMaybe<Scalars['String']['input']>;
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
   useCase: Scalars['String']['input'];
   workflowId?: InputMaybe<Scalars['String']['input']>;
@@ -3130,6 +3135,7 @@ export type AiRunSort = {
   resultSummary?: InputMaybe<SortDirection>;
   startedAt?: InputMaybe<SortDirection>;
   status?: InputMaybe<SortDirection>;
+  statusMessage?: InputMaybe<SortDirection>;
   updatedAt?: InputMaybe<SortDirection>;
   useCase?: InputMaybe<SortDirection>;
   workflowId?: InputMaybe<SortDirection>;
@@ -3154,6 +3160,7 @@ export type AiRunUpdateInput = {
   resultSummary?: InputMaybe<StringScalarMutations>;
   startedAt?: InputMaybe<DateTimeScalarMutations>;
   status?: InputMaybe<StringScalarMutations>;
+  statusMessage?: InputMaybe<StringScalarMutations>;
   useCase?: InputMaybe<StringScalarMutations>;
   workflowId?: InputMaybe<StringScalarMutations>;
 };
@@ -3183,6 +3190,7 @@ export type AiRunWhere = {
   resultSummary?: InputMaybe<StringScalarFilters>;
   startedAt?: InputMaybe<DateTimeScalarFilters>;
   status?: InputMaybe<StringScalarFilters>;
+  statusMessage?: InputMaybe<StringScalarFilters>;
   updatedAt?: InputMaybe<DateTimeScalarFilters>;
   useCase?: InputMaybe<StringScalarFilters>;
   workflowId?: InputMaybe<StringScalarFilters>;
