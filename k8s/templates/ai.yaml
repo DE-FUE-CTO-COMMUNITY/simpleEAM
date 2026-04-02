@@ -1,0 +1,329 @@
+{{- if .Values.ai.enabled }}
+{{- $fullName := include "nextgen-eam.fullname" . -}}
+{{- $labels := include "nextgen-eam.labels" . -}}
+{{- $global := .Values.global -}}
+{{- $ai := .Values.ai -}}
+
+# ════════════════════════════════════════════════════════════════════════════
+# Temporal DB (PostgreSQL)
+# ════════════════════════════════════════════════════════════════════════════
+{{- if $ai.temporal.db.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $fullName }}-temporal-db
+  labels: {{- $labels | nindent 4 }}
+spec:
+  accessModes:
+    - {{ $ai.temporal.db.persistence.accessMode }}
+  resources:
+    requests:
+      storage: {{ $ai.temporal.db.persistence.size }}
+  {{- if $ai.temporal.db.persistence.storageClass }}
+  storageClassName: {{ $ai.temporal.db.persistence.storageClass }}
+  {{- end }}
+---
+{{- end }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $fullName }}-temporal-db
+  labels: {{- $labels | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5432
+      targetPort: 5432
+      name: postgres
+  selector:
+    app.kubernetes.io/name: {{ include "nextgen-eam.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: temporal-db
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ $fullName }}-temporal-db
+  labels: {{- $labels | nindent 4 }}
+spec:
+  serviceName: {{ $fullName }}-temporal-db
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "nextgen-eam.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: temporal-db
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "nextgen-eam.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: temporal-db
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:15
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5432
+              name: postgres
+          env:
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $fullName }}-config
+                  key: TEMPORAL_DB_NAME
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $fullName }}-config
+                  key: TEMPORAL_DB_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ default (printf "%s-temporal-db" $fullName) $ai.temporal.db.existingSecret }}
+                  key: {{ default "password" $ai.temporal.db.existingSecretKey }}
+          livenessProbe:
+            exec:
+              command: ["pg_isready", "-U", {{ $ai.temporal.db.user | quote }}]
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", {{ $ai.temporal.db.user | quote }}]
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          {{- if $ai.temporal.db.persistence.enabled }}
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+          {{- end }}
+      {{- if $ai.temporal.db.persistence.enabled }}
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ $fullName }}-temporal-db
+      {{- end }}
+
+# ════════════════════════════════════════════════════════════════════════════
+# Temporal Server
+# ════════════════════════════════════════════════════════════════════════════
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $fullName }}-temporal
+  labels: {{- $labels | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: 7233
+      targetPort: 7233
+      name: grpc
+  selector:
+    app.kubernetes.io/name: {{ include "nextgen-eam.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: temporal
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $fullName }}-temporal
+  labels: {{- $labels | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "nextgen-eam.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: temporal
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "nextgen-eam.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: temporal
+    spec:
+      containers:
+        - name: temporal
+          image: {{ printf "%s:%s" $ai.temporal.server.image.repository $ai.temporal.server.image.tag }}
+          imagePullPolicy: {{ $ai.temporal.server.image.pullPolicy }}
+          ports:
+            - containerPort: 7233
+              name: grpc
+          env:
+            - name: DB
+              value: postgres12
+            - name: DB_PORT
+              value: "5432"
+            - name: POSTGRES_SEEDS
+              value: {{ printf "%s-temporal-db" $fullName }}
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $fullName }}-config
+                  key: TEMPORAL_DB_USER
+            - name: POSTGRES_PWD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ default (printf "%s-temporal-db" $fullName) $ai.temporal.db.existingSecret }}
+                  key: {{ default "password" $ai.temporal.db.existingSecretKey }}
+          resources: {{- toYaml $ai.temporal.server.resources | nindent 12 }}
+
+# ════════════════════════════════════════════════════════════════════════════
+# Temporal UI
+# ════════════════════════════════════════════════════════════════════════════
+{{- if $ai.temporal.ui.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $fullName }}-temporal-ui
+  labels: {{- $labels | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: 8080
+      name: http
+  selector:
+    app.kubernetes.io/name: {{ include "nextgen-eam.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: temporal-ui
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $fullName }}-temporal-ui
+  labels: {{- $labels | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "nextgen-eam.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: temporal-ui
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "nextgen-eam.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: temporal-ui
+    spec:
+      containers:
+        - name: temporal-ui
+          image: {{ printf "%s:%s" $ai.temporal.ui.image.repository $ai.temporal.ui.image.tag }}
+          imagePullPolicy: {{ $ai.temporal.ui.image.pullPolicy }}
+          ports:
+            - containerPort: 8080
+              name: http
+          env:
+            - name: TEMPORAL_ADDRESS
+              value: {{ printf "%s-temporal:7233" $fullName }}
+            - name: TEMPORAL_CORS_ORIGINS
+              value: {{ printf "https://%s.%s" .Values.ingress.subdomains.temporalUi .Values.global.baseDomain }}
+          resources: {{- toYaml $ai.temporal.ui.resources | nindent 12 }}
+{{- end }}
+
+# ════════════════════════════════════════════════════════════════════════════
+# AI Server
+# ════════════════════════════════════════════════════════════════════════════
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $fullName }}-ai-server
+  labels: {{- $labels | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ $ai.server.port }}
+      targetPort: {{ $ai.server.port }}
+      name: http
+  selector:
+    app.kubernetes.io/name: {{ include "nextgen-eam.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: ai-server
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $fullName }}-ai-server
+  labels: {{- $labels | nindent 4 }}
+spec:
+  replicas: {{ $ai.server.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "nextgen-eam.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: ai-server
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "nextgen-eam.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: ai-server
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    spec:
+      {{- if $global.imagePullSecrets }}
+      imagePullSecrets: {{- toYaml $global.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: ai-server
+          image: {{ printf "%s/%s/nextgen-eam-ai-server:%s" $global.imageRegistry $global.imageRepository (default $global.imageTag $ai.server.image.tag) }}
+          imagePullPolicy: {{ default $global.imagePullPolicy $ai.server.image.pullPolicy }}
+          command: ["yarn"]
+          args: ["start"]
+          ports:
+            - containerPort: {{ $ai.server.port }}
+              name: http
+          envFrom:
+            - configMapRef:
+                name: {{ $fullName }}-config
+          env:
+            {{- include "nextgen-eam.aiSecretEnv" . | nindent 12 }}
+          resources: {{- toYaml $ai.server.resources | nindent 12 }}
+
+# ════════════════════════════════════════════════════════════════════════════
+# AI Worker
+# ════════════════════════════════════════════════════════════════════════════
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $fullName }}-ai-worker
+  labels: {{- $labels | nindent 4 }}
+spec:
+  replicas: {{ $ai.worker.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "nextgen-eam.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: ai-worker
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "nextgen-eam.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: ai-worker
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    spec:
+      {{- if $global.imagePullSecrets }}
+      imagePullSecrets: {{- toYaml $global.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: ai-worker
+          image: {{ printf "%s/%s/nextgen-eam-ai-worker:%s" $global.imageRegistry $global.imageRepository (default $global.imageTag $ai.worker.image.tag) }}
+          imagePullPolicy: {{ default $global.imagePullPolicy $ai.worker.image.pullPolicy }}
+          command: ["yarn"]
+          args: ["worker"]
+          envFrom:
+            - configMapRef:
+                name: {{ $fullName }}-config
+          env:
+            {{- include "nextgen-eam.aiSecretEnv" . | nindent 12 }}
+          resources: {{- toYaml $ai.worker.resources | nindent 12 }}
+
+{{- end }}{{/* ai.enabled */}}

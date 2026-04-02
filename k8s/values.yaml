@@ -1,0 +1,333 @@
+# ============================================================================
+# NextGen EAM Helm Values
+# ============================================================================
+# Copy this file or override specific values with -f myvalues.yaml or --set key=value
+# Credentials must be supplied at deploy time - never hardcode secrets here.
+# ============================================================================
+
+# ------------------------------------------------------------------------------
+# Global
+# ------------------------------------------------------------------------------
+global:
+  # Base domain, e.g. example.com
+  baseDomain: example.com
+
+  # Image registry where GHCR images are pulled from.
+  # Images are expected at: <registry>/<repository>/<image>:<tag>
+  imageRegistry: ghcr.io
+  # GitHub repository slug (lowercase), e.g. de-fue-cto-community/simpleeam
+  imageRepository: de-fue-cto-community/simpleeam
+  imageTag: "latest"
+  imagePullPolicy: IfNotPresent
+  # imagePullSecrets: []  # e.g. [{name: ghcr-pull-secret}]
+  imagePullSecrets: []
+
+  nodeEnv: production
+
+# ------------------------------------------------------------------------------
+# Branding
+# ------------------------------------------------------------------------------
+branding:
+  nameLong: "NextGen Enterprise Architecture Management"
+  nameShort: "NextGen EAM"
+  faviconUrl: /favicon.ico
+  drawerWidth: "240"
+  logoUrl: /images/NextGen-EAM-Logo.svg
+  logoAlt: "NextGen EAM Logo"
+  logoDarkUrl: ""
+  logoLength: "120"
+  themePrimaryColor: "#00BCD4"
+  themeSecondaryColor: "#4E342E"
+  themeFontFamily: "Roboto, Helvetica, Arial, sans-serif"
+
+# ------------------------------------------------------------------------------
+# Ingress (nginx-ingress or any ingress controller)
+# ------------------------------------------------------------------------------
+ingress:
+  enabled: true
+  className: nginx
+  annotations: {}
+  # annotations:
+  #   cert-manager.io/cluster-issuer: letsencrypt-prod
+  tls: true
+  # If tls is true, cert-manager (or pre-provisioned secrets) must provide certs.
+  # Secret names are auto-derived as <release>-<service>-tls unless overridden below.
+  tlsSecretOverride: {}
+  #  client: my-client-tls
+  #  api: my-api-tls
+  #  auth: my-auth-tls
+
+  subdomains:
+    client: eam
+    api: api
+    auth: auth
+    neo4j: neo4j
+    excalidrawRoom: room
+    temporalUi: temporal
+
+# ------------------------------------------------------------------------------
+# Neo4j
+# ------------------------------------------------------------------------------
+neo4j:
+  image:
+    repository: neo4j
+    tag: "5.26"
+    pullPolicy: IfNotPresent
+
+  # Credentials - supply via --set or external secret
+  auth:
+    # username is always "neo4j" for Neo4j
+    username: neo4j
+    # password: ""  # REQUIRED – set via --set neo4j.auth.password=<pw>
+    password: ""
+    existingSecret: ""         # If set, use this Secret instead of creating one
+    existingSecretKey: password
+
+  resources:
+    requests:
+      memory: 2Gi
+      cpu: 500m
+    limits:
+      memory: 4Gi
+      cpu: 2000m
+
+  persistence:
+    enabled: true
+    storageClass: ""
+    size: 10Gi
+    accessMode: ReadWriteOnce
+
+  memory:
+    pagecache: "512M"
+    heapInitial: "512M"
+    heapMax: "1G"
+
+# ------------------------------------------------------------------------------
+# Keycloak
+# ------------------------------------------------------------------------------
+keycloak:
+  image:
+    repository: quay.io/keycloak/keycloak
+    tag: "23.0"
+    pullPolicy: IfNotPresent
+
+  admin:
+    username: admin
+    # password: ""  # REQUIRED – set via --set keycloak.admin.password=<pw>
+    password: ""
+    existingSecret: ""
+    existingSecretPasswordKey: adminPassword
+
+  realm: nextgen-eam
+  clientIdServer: eam-server
+  clientIdClient: eam-client
+
+  resources:
+    requests:
+      memory: 1Gi
+      cpu: 500m
+    limits:
+      memory: 2Gi
+      cpu: 1000m
+
+  # Keycloak PostgreSQL database
+  db:
+    name: keycloak
+    user: keycloak
+    # password: ""  # REQUIRED – set via --set keycloak.db.password=<pw>
+    password: ""
+    existingSecret: ""
+    existingSecretKey: password
+
+    persistence:
+      enabled: true
+      storageClass: ""
+      size: 2Gi
+      accessMode: ReadWriteOnce
+
+  # Mount realm-export and themes from a ConfigMap/Secret
+  # Set to true to create a ConfigMap from the auth/src directory (requires helm package)
+  importRealm: true
+
+# ------------------------------------------------------------------------------
+# GraphQL Server
+# ------------------------------------------------------------------------------
+server:
+  replicaCount: 1
+
+  image:
+    repository: ""  # defaults to global.imageRegistry/global.imageRepository/nextgen-eam-server
+    tag: ""         # defaults to global.imageTag
+    pullPolicy: ""  # defaults to global.imagePullPolicy
+
+  port: 4000
+
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
+    limits:
+      memory: 512Mi
+      cpu: 500m
+
+  authDebug: "false"
+  neo4jDebug: "false"
+  neo4jLogLevel: "warn"
+
+# ------------------------------------------------------------------------------
+# Next.js Client
+# ------------------------------------------------------------------------------
+client:
+  replicaCount: 1
+
+  image:
+    repository: ""
+    tag: ""
+    pullPolicy: ""
+
+  port: 3000
+
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
+    limits:
+      memory: 512Mi
+      cpu: 500m
+
+# ------------------------------------------------------------------------------
+# Excalidraw Collaboration Room
+# ------------------------------------------------------------------------------
+excalidrawRoom:
+  enabled: true
+  image:
+    repository: excalidraw/excalidraw-room
+    tag: "sha-03ff435"
+    pullPolicy: IfNotPresent
+  port: 80
+  resources:
+    requests:
+      memory: 64Mi
+      cpu: 50m
+    limits:
+      memory: 128Mi
+      cpu: 200m
+
+# ------------------------------------------------------------------------------
+# AI Stack (optional - disable to deploy without AI features)
+# ------------------------------------------------------------------------------
+ai:
+  enabled: false
+
+  # AI Server (REST/orchestration)
+  server:
+    replicaCount: 1
+    image:
+      repository: ""
+      tag: ""
+      pullPolicy: ""
+    port: 4001
+    resources:
+      requests:
+        memory: 256Mi
+        cpu: 100m
+      limits:
+        memory: 512Mi
+        cpu: 500m
+
+  # AI Worker (Temporal worker)
+  worker:
+    replicaCount: 1
+    image:
+      repository: ""
+      tag: ""
+      pullPolicy: ""
+    resources:
+      requests:
+        memory: 256Mi
+        cpu: 100m
+      limits:
+        memory: 512Mi
+        cpu: 500m
+
+  # LLM configuration
+  llm:
+    url: ""
+    model: "mistral-7b-instruct-v0.3"
+    # apiKey: ""  # set via --set ai.llm.apiKey=<key>
+    apiKey: ""
+    existingSecret: ""
+    existingSecretApiKeyField: apiKey
+    timeoutMs: "45000"
+    retryCount: "1"
+    logPrompt: "false"
+    promptLogPreviewChars: "1200"
+    allowFallback: "false"
+
+  web:
+    sourceCount: "4"
+    searchResultCount: "16"
+    fetchTimeoutMs: "12000"
+    searchProviders: "duckduckgo_html,duckduckgo_lite,wikipedia_api"
+    searxngUrl: ""
+    # searxngApiKey: ""  # set via --set ai.web.searxngApiKey=<key>
+    searxngApiKey: ""
+    searxngExistingSecret: ""     # If set, use this Secret for the SearXNG API key
+    searxngExistingSecretKey: apiKey
+
+  agentConfig:
+    bootstrapClientId: ""
+    # bootstrapClientSecret: ""  # set via --set ai.agentConfig.bootstrapClientSecret=<secret>
+    bootstrapClientSecret: ""
+    existingSecret: ""
+    existingSecretClientIdField: clientId
+    existingSecretClientSecretField: clientSecret
+
+  # Temporal
+  temporal:
+    # Internal gRPC address for Temporal server.
+    # Leave empty to use the bundled temporal service (<release>-nextgen-eam-temporal:7233).
+    # Override when pointing to an external Temporal cluster.
+    address: ""
+    namespace: "default"
+    taskQueue: "nextgen-eam-ai"
+
+    server:
+      image:
+        repository: temporalio/auto-setup
+        tag: "1.24.2"
+        pullPolicy: IfNotPresent
+      resources:
+        requests:
+          memory: 512Mi
+          cpu: 200m
+        limits:
+          memory: 1Gi
+          cpu: 500m
+
+    ui:
+      enabled: true
+      image:
+        repository: temporalio/ui
+        tag: "2.31.2"
+        pullPolicy: IfNotPresent
+      resources:
+        requests:
+          memory: 64Mi
+          cpu: 50m
+        limits:
+          memory: 128Mi
+          cpu: 200m
+
+    db:
+      name: temporal
+      user: temporal
+      # password: ""  # set via --set ai.temporal.db.password=<pw>
+      password: ""
+      existingSecret: ""
+      existingSecretKey: password
+      persistence:
+        enabled: true
+        storageClass: ""
+        size: 5Gi
+        accessMode: ReadWriteOnce

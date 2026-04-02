@@ -1,0 +1,75 @@
+{{- $fullName := include "nextgen-eam.fullname" . -}}
+{{- $labels := include "nextgen-eam.labels" . -}}
+{{- $srv := .Values.server -}}
+{{- $global := .Values.global -}}
+# ── Service ───────────────────────────────────────────────────────────────────
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $fullName }}-server
+  labels: {{- $labels | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ $srv.port }}
+      targetPort: {{ $srv.port }}
+      name: graphql
+  selector:
+    app.kubernetes.io/name: {{ include "nextgen-eam.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: server
+---
+# ── Deployment ────────────────────────────────────────────────────────────────
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $fullName }}-server
+  labels: {{- $labels | nindent 4 }}
+spec:
+  replicas: {{ $srv.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "nextgen-eam.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: server
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "nextgen-eam.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: server
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    spec:
+      {{- if $global.imagePullSecrets }}
+      imagePullSecrets: {{- toYaml $global.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: server
+          image: {{ printf "%s/%s/nextgen-eam-server:%s" $global.imageRegistry $global.imageRepository (default $global.imageTag $srv.image.tag) }}
+          imagePullPolicy: {{ default $global.imagePullPolicy $srv.image.pullPolicy }}
+          ports:
+            - containerPort: {{ $srv.port }}
+              name: graphql
+          envFrom:
+            - configMapRef:
+                name: {{ $fullName }}-config
+          env:
+            - name: NEO4J_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ default (printf "%s-neo4j" $fullName) .Values.neo4j.auth.existingSecret }}
+                  key: {{ default "password" .Values.neo4j.auth.existingSecretKey }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ $srv.port }}
+            initialDelaySeconds: 30
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: {{ $srv.port }}
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          resources: {{- toYaml $srv.resources | nindent 12 }}

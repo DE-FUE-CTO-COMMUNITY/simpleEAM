@@ -1,0 +1,176 @@
+{{- if .Values.ingress.enabled }}
+{{- $fullName := include "nextgen-eam.fullname" . -}}
+{{- $labels := include "nextgen-eam.labels" . -}}
+{{- $domain := .Values.global.baseDomain -}}
+{{- $subs := .Values.ingress.subdomains -}}
+{{- $tls := .Values.ingress.tls -}}
+{{- $tlsOverride := .Values.ingress.tlsSecretOverride -}}
+
+# ── Client (Next.js) ──────────────────────────────────────────────────────────
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ $fullName }}-client
+  labels: {{- $labels | nindent 4 }}
+  {{- with .Values.ingress.annotations }}
+  annotations: {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.ingress.className }}
+  ingressClassName: {{ .Values.ingress.className }}
+  {{- end }}
+  {{- if $tls }}
+  tls:
+    - hosts:
+        - {{ printf "%s.%s" $subs.client $domain }}
+      secretName: {{ default (printf "%s-client-tls" $fullName) (get $tlsOverride "client") }}
+  {{- end }}
+  rules:
+    - host: {{ printf "%s.%s" $subs.client $domain }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ $fullName }}-client
+                port:
+                  number: {{ .Values.client.port }}
+---
+# ── API (GraphQL + AI Server) ─────────────────────────────────────────────────
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ $fullName }}-api
+  labels: {{- $labels | nindent 4 }}
+  {{- with .Values.ingress.annotations }}
+  annotations: {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.ingress.className }}
+  ingressClassName: {{ .Values.ingress.className }}
+  {{- end }}
+  {{- if $tls }}
+  tls:
+    - hosts:
+        - {{ printf "%s.%s" $subs.api $domain }}
+      secretName: {{ default (printf "%s-api-tls" $fullName) (get $tlsOverride "api") }}
+  {{- end }}
+  rules:
+    - host: {{ printf "%s.%s" $subs.api $domain }}
+      http:
+        paths:
+          {{- if .Values.ai.enabled }}
+          - path: /ai-runs
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ $fullName }}-ai-server
+                port:
+                  number: {{ .Values.ai.server.port }}
+          {{- end }}
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ $fullName }}-server
+                port:
+                  number: {{ .Values.server.port }}
+---
+# ── Authentication (Keycloak) ─────────────────────────────────────────────────
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ $fullName }}-auth
+  labels: {{- $labels | nindent 4 }}
+  {{- with .Values.ingress.annotations }}
+  annotations: {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.ingress.className }}
+  ingressClassName: {{ .Values.ingress.className }}
+  {{- end }}
+  {{- if $tls }}
+  tls:
+    - hosts:
+        - {{ printf "%s.%s" $subs.auth $domain }}
+      secretName: {{ default (printf "%s-auth-tls" $fullName) (get $tlsOverride "auth") }}
+  {{- end }}
+  rules:
+    - host: {{ printf "%s.%s" $subs.auth $domain }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ $fullName }}-keycloak
+                port:
+                  number: 8080
+{{- if .Values.excalidrawRoom.enabled }}
+---
+# ── Excalidraw Collaboration Room ─────────────────────────────────────────────
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ $fullName }}-excalidraw
+  labels: {{- $labels | nindent 4 }}
+  {{- with .Values.ingress.annotations }}
+  annotations: {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.ingress.className }}
+  ingressClassName: {{ .Values.ingress.className }}
+  {{- end }}
+  {{- if $tls }}
+  tls:
+    - hosts:
+        - {{ printf "%s.%s" $subs.excalidrawRoom $domain }}
+      secretName: {{ default (printf "%s-excalidraw-tls" $fullName) (get $tlsOverride "excalidrawRoom") }}
+  {{- end }}
+  rules:
+    - host: {{ printf "%s.%s" $subs.excalidrawRoom $domain }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ $fullName }}-excalidraw-room
+                port:
+                  number: {{ .Values.excalidrawRoom.port }}
+{{- end }}
+{{- if and .Values.ai.enabled .Values.ai.temporal.ui.enabled }}
+---
+# ── Temporal UI ───────────────────────────────────────────────────────────────
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ $fullName }}-temporal-ui
+  labels: {{- $labels | nindent 4 }}
+  {{- with .Values.ingress.annotations }}
+  annotations: {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.ingress.className }}
+  ingressClassName: {{ .Values.ingress.className }}
+  {{- end }}
+  {{- if $tls }}
+  tls:
+    - hosts:
+        - {{ printf "%s.%s" $subs.temporalUi $domain }}
+      secretName: {{ default (printf "%s-temporal-ui-tls" $fullName) (get $tlsOverride "temporalUi") }}
+  {{- end }}
+  rules:
+    - host: {{ printf "%s.%s" $subs.temporalUi $domain }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ $fullName }}-temporal-ui
+                port:
+                  number: 8080
+{{- end }}
+{{- end }}{{/* ingress.enabled */}}

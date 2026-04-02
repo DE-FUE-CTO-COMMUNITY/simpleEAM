@@ -1,0 +1,220 @@
+{{- $fullName := include "nextgen-eam.fullname" . -}}
+{{- $labels := include "nextgen-eam.labels" . -}}
+{{- $kc := .Values.keycloak -}}
+# ── Keycloak DB PVC ───────────────────────────────────────────────────────────
+{{- if $kc.db.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $fullName }}-keycloak-db
+  labels: {{- $labels | nindent 4 }}
+spec:
+  accessModes:
+    - {{ $kc.db.persistence.accessMode }}
+  resources:
+    requests:
+      storage: {{ $kc.db.persistence.size }}
+  {{- if $kc.db.persistence.storageClass }}
+  storageClassName: {{ $kc.db.persistence.storageClass }}
+  {{- end }}
+---
+{{- end }}
+# ── Keycloak DB Service ───────────────────────────────────────────────────────
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $fullName }}-keycloak-db
+  labels: {{- $labels | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5432
+      targetPort: 5432
+      name: postgres
+  selector:
+    app.kubernetes.io/name: {{ include "nextgen-eam.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: keycloak-db
+---
+# ── Keycloak DB StatefulSet ───────────────────────────────────────────────────
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ $fullName }}-keycloak-db
+  labels: {{- $labels | nindent 4 }}
+spec:
+  serviceName: {{ $fullName }}-keycloak-db
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "nextgen-eam.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: keycloak-db
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "nextgen-eam.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: keycloak-db
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:15
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5432
+              name: postgres
+          env:
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $fullName }}-config
+                  key: KC_DB_NAME
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $fullName }}-config
+                  key: KC_DB_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ default (printf "%s-keycloak-db" $fullName) $kc.db.existingSecret }}
+                  key: {{ default "password" $kc.db.existingSecretKey }}
+          livenessProbe:
+            exec:
+              command: ["pg_isready", "-U", {{ $kc.db.user | quote }}, "-d", {{ $kc.db.name | quote }}]
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", {{ $kc.db.user | quote }}, "-d", {{ $kc.db.name | quote }}]
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          {{- if $kc.db.persistence.enabled }}
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+          {{- end }}
+      {{- if $kc.db.persistence.enabled }}
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ $fullName }}-keycloak-db
+      {{- end }}
+---
+# ── Keycloak Service ──────────────────────────────────────────────────────────
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $fullName }}-keycloak
+  labels: {{- $labels | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: 8080
+      name: http
+  selector:
+    app.kubernetes.io/name: {{ include "nextgen-eam.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: keycloak
+---
+# ── Keycloak Deployment ───────────────────────────────────────────────────────
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $fullName }}-keycloak
+  labels: {{- $labels | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "nextgen-eam.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: keycloak
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "nextgen-eam.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: keycloak
+    spec:
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets: {{- toYaml .Values.global.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: keycloak
+          image: {{ printf "%s:%s" $kc.image.repository $kc.image.tag }}
+          imagePullPolicy: {{ $kc.image.pullPolicy }}
+          args:
+            - start
+            - --import-realm
+          ports:
+            - containerPort: 8080
+              name: http
+          env:
+            - name: KEYCLOAK_ADMIN
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $fullName }}-config
+                  key: KEYCLOAK_ADMIN
+            - name: KEYCLOAK_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ default (printf "%s-keycloak-admin" $fullName) $kc.admin.existingSecret }}
+                  key: {{ default "adminPassword" $kc.admin.existingSecretPasswordKey }}
+            - name: KC_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $fullName }}-config
+                  key: KC_DB
+            - name: KC_DB_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $fullName }}-config
+                  key: KC_DB_URL
+            - name: KC_DB_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $fullName }}-config
+                  key: KC_DB_USER
+            - name: KC_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ default (printf "%s-keycloak-db" $fullName) $kc.db.existingSecret }}
+                  key: {{ default "password" $kc.db.existingSecretKey }}
+            - name: KC_HOSTNAME_STRICT
+              value: "false"
+            - name: KC_HTTP_ENABLED
+              value: "true"
+            - name: KC_PROXY
+              value: "edge"
+            - name: KC_HEALTH_ENABLED
+              value: "true"
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: 8080
+            initialDelaySeconds: 90
+            periodSeconds: 30
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+          resources: {{- toYaml $kc.resources | nindent 12 }}
+          {{- if $kc.importRealm }}
+          volumeMounts:
+            - name: realm-import
+              mountPath: /opt/keycloak/data/import
+              readOnly: true
+          {{- end }}
+      {{- if $kc.importRealm }}
+      volumes:
+        - name: realm-import
+          configMap:
+            name: {{ $fullName }}-realm-import
+      {{- end }}

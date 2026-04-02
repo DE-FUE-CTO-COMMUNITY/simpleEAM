@@ -1,0 +1,75 @@
+{{- $fullName := include "nextgen-eam.fullname" . -}}
+{{- $labels := include "nextgen-eam.labels" . -}}
+{{- $cl := .Values.client -}}
+{{- $global := .Values.global -}}
+# ── Service ───────────────────────────────────────────────────────────────────
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $fullName }}-client
+  labels: {{- $labels | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ $cl.port }}
+      targetPort: {{ $cl.port }}
+      name: http
+  selector:
+    app.kubernetes.io/name: {{ include "nextgen-eam.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: client
+---
+# ── Deployment ────────────────────────────────────────────────────────────────
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $fullName }}-client
+  labels: {{- $labels | nindent 4 }}
+spec:
+  replicas: {{ $cl.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "nextgen-eam.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: client
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "nextgen-eam.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: client
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    spec:
+      {{- if $global.imagePullSecrets }}
+      imagePullSecrets: {{- toYaml $global.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: client
+          image: {{ printf "%s/%s/nextgen-eam-client:%s" $global.imageRegistry $global.imageRepository (default $global.imageTag $cl.image.tag) }}
+          imagePullPolicy: {{ default $global.imagePullPolicy $cl.image.pullPolicy }}
+          ports:
+            - containerPort: {{ $cl.port }}
+              name: http
+          envFrom:
+            - configMapRef:
+                name: {{ $fullName }}-config
+          env:
+            - name: KEYCLOAK_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ default (printf "%s-keycloak-admin" $fullName) .Values.keycloak.admin.existingSecret }}
+                  key: {{ default "adminPassword" .Values.keycloak.admin.existingSecretPasswordKey }}
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: {{ $cl.port }}
+            initialDelaySeconds: 30
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: {{ $cl.port }}
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          resources: {{- toYaml $cl.resources | nindent 12 }}

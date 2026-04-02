@@ -1,0 +1,79 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "nextgen-eam.fullname" . }}-config
+  labels: {{- include "nextgen-eam.labels" . | nindent 4 }}
+data:
+  # General
+  NODE_ENV: {{ .Values.global.nodeEnv | quote }}
+  BASE_DOMAIN: {{ .Values.global.baseDomain | quote }}
+
+  # Service URLs (internal cluster DNS)
+  NEO4J_URI: {{ printf "bolt://%s-neo4j:7687" (include "nextgen-eam.fullname" .) | quote }}
+  NEO4J_USER: {{ .Values.neo4j.auth.username | quote }}
+  NEO4J_PAGECACHE_MEMORY: {{ .Values.neo4j.memory.pagecache | quote }}
+  NEO4J_HEAP_INITIAL_SIZE: {{ .Values.neo4j.memory.heapInitial | quote }}
+  NEO4J_HEAP_MAX_SIZE: {{ .Values.neo4j.memory.heapMax | quote }}
+
+  KEYCLOAK_URL: {{ printf "https://%s.%s" .Values.ingress.subdomains.auth .Values.global.baseDomain | quote }}
+  KEYCLOAK_REALM: {{ .Values.keycloak.realm | quote }}
+  KEYCLOAK_CLIENT_ID_SERVER: {{ .Values.keycloak.clientIdServer | quote }}
+  KEYCLOAK_CLIENT_ID_CLIENT: {{ .Values.keycloak.clientIdClient | quote }}
+  KEYCLOAK_INTERNAL_URL: {{ printf "http://%s-keycloak:8080" (include "nextgen-eam.fullname" .) | quote }}
+  KEYCLOAK_ADMIN: {{ .Values.keycloak.admin.username | quote }}
+
+  GRAPHQL_URL: {{ printf "https://%s.%s/graphql" .Values.ingress.subdomains.api .Values.global.baseDomain | quote }}
+  GRAPHQL_INTERNAL_PORT: {{ .Values.server.port | quote }}
+  GRAPHQL_INTERNAL_URL: {{ printf "http://%s-server:%d/graphql" (include "nextgen-eam.fullname" .) (int .Values.server.port) | quote }}
+
+  AI_API_URL: {{ printf "https://%s.%s" .Values.ingress.subdomains.api .Values.global.baseDomain | quote }}
+
+  EXCALIDRAW_WS_SERVER_URL: {{ printf "https://%s.%s" .Values.ingress.subdomains.excalidrawRoom .Values.global.baseDomain | quote }}
+
+  # Branding
+  BRAND_NAME_LONG: {{ .Values.branding.nameLong | quote }}
+  BRAND_NAME_SHORT: {{ .Values.branding.nameShort | quote }}
+  FAVICON_URL: {{ .Values.branding.faviconUrl | quote }}
+  DRAWER_WIDTH: {{ .Values.branding.drawerWidth | quote }}
+  LOGO_URL: {{ .Values.branding.logoUrl | quote }}
+  LOGO_ALT: {{ .Values.branding.logoAlt | quote }}
+  LOGO_DARK_URL: {{ .Values.branding.logoDarkUrl | quote }}
+  LOGO_LENGTH: {{ .Values.branding.logoLength | quote }}
+  THEME_PRIMARY_COLOR: {{ .Values.branding.themePrimaryColor | quote }}
+  THEME_SECONDARY_COLOR: {{ .Values.branding.themeSecondaryColor | quote }}
+  THEME_FONT_FAMILY: {{ .Values.branding.themeFontFamily | quote }}
+
+  # Keycloak DB
+  KC_DB: "postgres"
+  KC_DB_NAME: {{ .Values.keycloak.db.name | quote }}
+  KC_DB_USER: {{ .Values.keycloak.db.user | quote }}
+  KC_DB_URL: {{ printf "jdbc:postgresql://%s-keycloak-db:5432/%s" (include "nextgen-eam.fullname" .) .Values.keycloak.db.name | quote }}
+
+  # Server debug
+  AUTH_DEBUG: {{ .Values.server.authDebug | quote }}
+  NEO4J_DEBUG: {{ .Values.server.neo4jDebug | quote }}
+  NEO4J_LOG_LEVEL: {{ .Values.server.neo4jLogLevel | quote }}
+
+  {{- if .Values.ai.enabled }}
+  # AI / Temporal
+  # If ai.temporal.address is empty, default to the bundled temporal service inside the cluster
+  TEMPORAL_ADDRESS: {{ coalesce .Values.ai.temporal.address (printf "%s-temporal:7233" (include "nextgen-eam.fullname" .)) | quote }}
+  TEMPORAL_NAMESPACE: {{ .Values.ai.temporal.namespace | quote }}
+  AI_RUN_TASK_QUEUE: {{ .Values.ai.temporal.taskQueue | quote }}
+  AI_SERVER_INTERNAL_PORT: {{ .Values.ai.server.port | quote }}
+  AI_LLM_URL: {{ .Values.ai.llm.url | quote }}
+  AI_LLM_MODEL: {{ .Values.ai.llm.model | quote }}
+  AI_LLM_TIMEOUT_MS: {{ .Values.ai.llm.timeoutMs | quote }}
+  AI_LLM_RETRY_COUNT: {{ .Values.ai.llm.retryCount | quote }}
+  AI_LOG_LLM_PROMPT: {{ .Values.ai.llm.logPrompt | quote }}
+  AI_LLM_PROMPT_LOG_PREVIEW_CHARS: {{ .Values.ai.llm.promptLogPreviewChars | quote }}
+  AI_ALLOW_LLM_FALLBACK: {{ .Values.ai.llm.allowFallback | quote }}
+  AI_WEB_SOURCE_COUNT: {{ .Values.ai.web.sourceCount | quote }}
+  AI_WEB_SEARCH_RESULT_COUNT: {{ .Values.ai.web.searchResultCount | quote }}
+  AI_WEB_FETCH_TIMEOUT_MS: {{ .Values.ai.web.fetchTimeoutMs | quote }}
+  AI_SEARCH_PROVIDERS: {{ .Values.ai.web.searchProviders | quote }}
+  AI_SEARCH_SEARXNG_URL: {{ .Values.ai.web.searxngUrl | quote }}
+  TEMPORAL_DB_NAME: {{ .Values.ai.temporal.db.name | quote }}
+  TEMPORAL_DB_USER: {{ .Values.ai.temporal.db.user | quote }}
+  TEMPORAL_DB_URL: {{ printf "postgresql://%s-temporal-db:5432/%s" (include "nextgen-eam.fullname" .) .Values.ai.temporal.db.name | quote }}
+  {{- end }}

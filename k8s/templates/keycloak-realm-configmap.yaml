@@ -1,0 +1,16 @@
+{{- if .Values.keycloak.importRealm }}
+{{- $fullName := include "nextgen-eam.fullname" . -}}
+{{- $labels := include "nextgen-eam.labels" . -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $fullName }}-realm-import
+  labels: {{- $labels | nindent 4 }}
+  annotations:
+    # Update this ConfigMap whenever the realm-export changes.
+    # helm upgrade will automatically redeploy Keycloak when the hash changes.
+    checksum/realm: {{ .Files.Get "realm-export.json" | sha256sum }}
+data:
+  realm-export.json: |
+    {{- .Files.Get "realm-export.json" | nindent 4 }}
+{{- end }}
