@@ -83,6 +83,8 @@ spec:
                 secretKeyRef:
                   name: {{ default (printf "%s-temporal-db" $fullName) $ai.temporal.db.existingSecret }}
                   key: {{ default "password" $ai.temporal.db.existingSecretKey }}
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
           livenessProbe:
             exec:
               command: ["pg_isready", "-U", {{ $ai.temporal.db.user | quote }}]
