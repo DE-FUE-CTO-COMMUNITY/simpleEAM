@@ -2411,6 +2411,7 @@
     "tabs": {
       "userManagement": "User Management",
       "productFamilies": "Product Families",
+      "agentConfig": "Agent Configuration",
       "featureManagement": "Feature Management",
       "aiSupport": "AI Support",
       "debugTools": "Debug Tools"
@@ -2759,6 +2760,53 @@
         "END_USER_COLLABORATION_SOFTWARE": "End User & Collaboration Software",
         "DEVELOPMENT_ENGINEERING_SOFTWARE": "Development & Engineering Software",
         "BUSINESS_ENTERPRISE_APPLICATIONS": "Business & Enterprise Applications"
+      }
+    },
+    "agentConfig": {
+      "title": "Agent Configuration",
+      "editTitle": "Edit Agent",
+      "searchPlaceholder": "Search agents...",
+      "noData": "No agent configurations found",
+      "table": {
+        "agentKey": "Agent Key",
+        "displayName": "Name",
+        "description": "Description",
+        "isEnabled": "Enabled",
+        "temperature": "Temperature",
+        "topP": "Top-P",
+        "maxTokens": "Max Tokens",
+        "configVersion": "Version",
+        "updatedAt": "Last Updated",
+        "actions": "Actions"
+      },
+      "form": {
+        "agentKey": "Agent Key",
+        "displayName": "Display Name",
+        "description": "Description",
+        "systemPrompt": "System Prompt",
+        "temperature": "Temperature",
+        "topP": "Top-P",
+        "maxTokens": "Maximum Tokens",
+        "isEnabled": "Enabled"
+      },
+      "actions": {
+        "edit": "Edit",
+        "save": "Save",
+        "cancel": "Cancel",
+        "enable": "Enable",
+        "disable": "Disable"
+      },
+      "validation": {
+        "systemPromptRequired": "System prompt is required",
+        "temperatureRange": "Temperature must be between 0 and 2",
+        "topPRange": "Top-P must be between 0 and 1",
+        "maxTokensPositive": "Maximum tokens must be greater than 0"
+      },
+      "hints": {
+        "agentKey": "Unique identifier (read-only)",
+        "temperature": "Range: 0.0 (deterministic) to 2.0 (creative)",
+        "topP": "Range: 0.0 to 1.0",
+        "maxTokens": "Maximum number of tokens to generate"
       }
     },
     "debugOverlay": {

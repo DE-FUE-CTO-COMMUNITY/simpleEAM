@@ -7,6 +7,10 @@ import {
   limitText,
 } from '../shared/llm'
 import { collectWebSources, getWebSourceCount } from '../shared/web-search'
+import { resolveAgentRuntimeConfig } from '../shared/agent-config'
+import { getAgentConfigDefault } from '../shared/default-agent-configs'
+
+const INTERNET_RESEARCH_DEFAULT_CONFIG = getAgentConfigDefault('internet-research')
 
 // ─────────────────────────────────────────────
 // Agent registration
@@ -88,11 +92,13 @@ export async function performInternetResearch(
     })
   }
 
-  const summary = await callLlm(
-    prompt,
-    input.llmConfig,
-    'You are a professional research analyst. Return plain text summaries, not JSON.'
-  )
+  const runtimeConfig = await resolveAgentRuntimeConfig({
+    accessToken: input.accessToken,
+    llmConfig: input.llmConfig,
+    defaults: INTERNET_RESEARCH_DEFAULT_CONFIG,
+  })
+
+  const summary = await callLlm(prompt, runtimeConfig.llmConfig, runtimeConfig.systemPrompt)
 
   console.info('[AI WORKER][INTERNET_RESEARCH][DONE]', {
     stepId: input.stepId,

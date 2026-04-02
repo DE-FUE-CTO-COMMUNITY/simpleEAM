@@ -6,6 +6,8 @@ import http from 'http'
 
 import { isGraphqlReachable } from './graphql/client'
 import { aiRunRouter } from './agents/routes'
+import { seedAgentConfigsAtStartup } from './agents/shared/agent-config'
+import { fetchServiceAccessToken } from './auth/keycloak-service-token'
 
 dotenv.config()
 
@@ -15,6 +17,32 @@ async function startAiServer() {
   const graphqlReachable = await isGraphqlReachable()
   if (!graphqlReachable) {
     console.error('Warning: GraphQL API is currently not reachable at startup.')
+  }
+
+  let bootstrapToken: string | null = null
+  try {
+    bootstrapToken = await fetchServiceAccessToken()
+  } catch (error) {
+    console.error(
+      '⚠️ Failed to fetch bootstrap service token - skipping AgentConfig startup bootstrap',
+      {
+        error: error instanceof Error ? error.message : String(error),
+      }
+    )
+  }
+  if (bootstrapToken) {
+    try {
+      await seedAgentConfigsAtStartup(bootstrapToken)
+      console.log('✅ AgentConfig startup bootstrap completed')
+    } catch (error) {
+      console.error('⚠️ AgentConfig startup bootstrap failed', {
+        error: error instanceof Error ? error.message : String(error),
+      })
+    }
+  } else {
+    console.warn(
+      '⚠️ Missing or invalid bootstrap client credentials - skipping AgentConfig startup bootstrap'
+    )
   }
 
   const app = express()

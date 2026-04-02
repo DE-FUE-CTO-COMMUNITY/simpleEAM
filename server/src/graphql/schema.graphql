@@ -417,6 +417,31 @@ type AiRunAuditEvent @node {
 }
 
 """
+AgentConfig – persisted configuration for backend agents, managed globally by administrators
+"""
+type AgentConfig
+  @node
+  @authorization(
+    validate: [
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "admin" } } } }
+    ]
+  ) {
+  id: ID! @id
+  agentKey: String!
+  displayName: String!
+  description: String
+  systemPrompt: String!
+  temperature: Float
+  topP: Float
+  maxTokens: Int
+  isEnabled: Boolean!
+  configVersion: Int!
+  metadataJson: String
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime @timestamp(operations: [UPDATE])
+}
+
+"""
 GEA relationship properties for relationships between Vision, Mission, Value, Goal and Strategy.
 Score range and meaning:
 +3 Strong support

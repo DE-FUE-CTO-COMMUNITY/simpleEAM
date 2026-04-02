@@ -1,5 +1,9 @@
 import { QualityCheckInput, QualityCheckOutput } from '../types'
 import { callLlm, parseJsonObject, limitText } from '../shared/llm'
+import { resolveAgentRuntimeConfig } from '../shared/agent-config'
+import { getAgentConfigDefault } from '../shared/default-agent-configs'
+
+const QUALITY_CONTROL_DEFAULT_CONFIG = getAgentConfigDefault('quality-control')
 
 // ─────────────────────────────────────────────
 // LLM prompt builder
@@ -72,11 +76,12 @@ export async function runQualityCheck(input: QualityCheckInput): Promise<Quality
   const prompt = buildQualityCheckPrompt(input)
 
   try {
-    const llmResponse = await callLlm(
-      prompt,
-      input.llmConfig,
-      'You are a quality control reviewer. Return only JSON.'
-    )
+    const runtimeConfig = await resolveAgentRuntimeConfig({
+      accessToken: input.accessToken,
+      llmConfig: input.llmConfig,
+      defaults: QUALITY_CONTROL_DEFAULT_CONFIG,
+    })
+    const llmResponse = await callLlm(prompt, runtimeConfig.llmConfig, runtimeConfig.systemPrompt)
 
     const parsed = parseJsonObject(llmResponse)
     if (!parsed) {

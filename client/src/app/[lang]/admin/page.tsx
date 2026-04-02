@@ -6,12 +6,14 @@ import {
   BugReport as BugReportIcon,
   Category as CategoryIcon,
   People as PeopleIcon,
+  SmartToy as SmartToyIcon,
 } from '@mui/icons-material'
 import { useTranslations } from 'next-intl'
 import SessionDebugger from '@/components/debug/SessionDebugger'
 import UserManagement from '@/components/admin/UserManagement'
 import DebugSettingsPanel from '@/components/admin/DebugSettingsPanel'
 import ProductFamilyManagement from '@/components/admin/ProductFamilyManagement'
+import AgentConfigManagement from '@/components/admin/AgentConfigManagement'
 import { isAdmin } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 
@@ -89,11 +91,18 @@ export default function AdminPage() {
             aria-controls="admin-tabpanel-1"
           />
           <Tab
-            label={t('tabs.debugTools')}
-            icon={<BugReportIcon />}
+            label={t('tabs.agentConfig')}
+            icon={<SmartToyIcon />}
             iconPosition="start"
             id="admin-tab-2"
             aria-controls="admin-tabpanel-2"
+          />
+          <Tab
+            label={t('tabs.debugTools')}
+            icon={<BugReportIcon />}
+            iconPosition="start"
+            id="admin-tab-3"
+            aria-controls="admin-tabpanel-3"
           />
         </Tabs>
 
@@ -106,6 +115,10 @@ export default function AdminPage() {
         </TabPanel>
 
         <TabPanel value={currentTab} index={2}>
+          <AgentConfigManagement />
+        </TabPanel>
+
+        <TabPanel value={currentTab} index={3}>
           <Typography variant="h5" component="h2" gutterBottom>
             {t('debugTools.title')}
           </Typography>

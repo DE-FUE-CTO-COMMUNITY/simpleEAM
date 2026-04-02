@@ -9,6 +9,10 @@ import {
 import { graphqlRequest } from '../../graphql/client'
 import { TOOLS, TOOLS_PROMPT_SECTION, ToolCallResult } from './tools'
 import { SCHEMA_DIGEST } from './generated-schema-digest'
+import { resolveAgentRuntimeConfig } from '../shared/agent-config'
+import { getAgentConfigDefault } from '../shared/default-agent-configs'
+
+const DATA_LOOKUP_DEFAULT_CONFIG = getAgentConfigDefault('data-lookup')
 
 // ─────────────────────────────────────────────
 // Agent registration
@@ -360,6 +364,11 @@ const countResults = (data: unknown): number => {
 export async function performDataLookup(input: DataLookupInput): Promise<DataLookupOutput> {
   const companyName = input.companyName || 'the company'
   const context = input.context || ''
+  const runtimeConfig = await resolveAgentRuntimeConfig({
+    accessToken: input.accessToken,
+    llmConfig: input.llmConfig,
+    defaults: DATA_LOOKUP_DEFAULT_CONFIG,
+  })
 
   console.info('[AI WORKER][DATA_LOOKUP][START]', {
     stepId: input.stepId,
@@ -386,8 +395,8 @@ export async function performDataLookup(input: DataLookupInput): Promise<DataLoo
   try {
     rawSelection = await callLlm(
       selectionPrompt,
-      input.llmConfig,
-      'You are a tool selector. Reply with ONLY a JSON object: { "tool": "...", "args": { ... } }'
+      runtimeConfig.llmConfig,
+      `${runtimeConfig.systemPrompt}\nReply with ONLY a JSON object: { "tool": "...", "args": { ... } }`
     )
   } catch (err) {
     throw new Error(
@@ -440,8 +449,8 @@ export async function performDataLookup(input: DataLookupInput): Promise<DataLoo
       const genericPrompt = buildGenericQueryPrompt(input.task, companyName, context, lastError)
       const rawGeneric = await callLlm(
         genericPrompt,
-        input.llmConfig,
-        'Return only JSON: { "query": "...", "variables": { ... } }'
+        runtimeConfig.llmConfig,
+        `${runtimeConfig.systemPrompt}\nReturn only JSON: { "query": "...", "variables": { ... } }`
       )
       const parsed = parseGenericQueryPayload(rawGeneric)
 
@@ -491,8 +500,8 @@ export async function performDataLookup(input: DataLookupInput): Promise<DataLoo
       )
       summary = await callLlm(
         interpretPrompt,
-        input.llmConfig,
-        'You are an enterprise architecture analyst. Return plain text answers, not JSON.'
+        runtimeConfig.llmConfig,
+        `${runtimeConfig.systemPrompt}\nReturn plain text answers, not JSON.`
       )
     }
 
@@ -555,8 +564,8 @@ export async function performDataLookup(input: DataLookupInput): Promise<DataLoo
     try {
       summary = await callLlm(
         interpretPrompt,
-        input.llmConfig,
-        'You are an enterprise architecture analyst. Return plain text answers, not JSON.'
+        runtimeConfig.llmConfig,
+        `${runtimeConfig.systemPrompt}\nReturn plain text answers, not JSON.`
       )
     } catch (interpErr) {
       summary = `Found ${resultCount} result(s). Raw data (truncated): ${limitText(JSON.stringify(toolResult.data), 800)}`

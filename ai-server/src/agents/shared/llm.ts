@@ -224,9 +224,11 @@ export const callLlm = async (
       { role: 'system', content: systemPrompt },
       { role: 'user', content: prompt },
     ],
-    temperature: 0.2,
+    temperature: typeof config.temperature === 'number' ? config.temperature : 0.2,
   }
   if (llmConfig.model) openAiLikeBody.model = llmConfig.model
+  if (typeof config.topP === 'number') openAiLikeBody.top_p = config.topP
+  if (typeof config.maxTokens === 'number') openAiLikeBody.max_tokens = config.maxTokens
 
   let lastError: Error | null = null
 
@@ -249,7 +251,13 @@ export const callLlm = async (
         {
           method: 'POST',
           headers,
-          body: JSON.stringify({ prompt, temperature: 0.2, model: llmConfig.model || undefined }),
+          body: JSON.stringify({
+            prompt,
+            temperature: typeof config.temperature === 'number' ? config.temperature : 0.2,
+            topP: typeof config.topP === 'number' ? config.topP : undefined,
+            maxTokens: typeof config.maxTokens === 'number' ? config.maxTokens : undefined,
+            model: llmConfig.model || undefined,
+          }),
         },
         llmTimeoutMs
       )

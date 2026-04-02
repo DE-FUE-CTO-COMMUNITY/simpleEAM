@@ -13,6 +13,12 @@ import {
 } from '../types'
 import { agentRegistry } from '../registry'
 import { callLlm, parseJsonObject, asString, limitText } from '../shared/llm'
+import { resolveAgentRuntimeConfig } from '../shared/agent-config'
+import { getAgentConfigDefault } from '../shared/default-agent-configs'
+
+const COORDINATOR_PLANNER_DEFAULT_CONFIG = getAgentConfigDefault('coordinator-planner')
+
+const COORDINATOR_AGGREGATOR_DEFAULT_CONFIG = getAgentConfigDefault('coordinator-aggregator')
 
 // ─────────────────────────────────────────────
 // AI Run lifecycle mutations
@@ -452,12 +458,13 @@ export const planAgentRun = async (input: PlanAgentRunInput): Promise<AgentPlan>
   })
 
   try {
+    const runtimeConfig = await resolveAgentRuntimeConfig({
+      accessToken: input.accessToken,
+      llmConfig: input.llmConfig,
+      defaults: COORDINATOR_PLANNER_DEFAULT_CONFIG,
+    })
     const prompt = buildPlannerPrompt(input)
-    const llmResponse = await callLlm(
-      prompt,
-      input.llmConfig,
-      'You are an enterprise AI coordinator. Return only JSON plans.'
-    )
+    const llmResponse = await callLlm(prompt, runtimeConfig.llmConfig, runtimeConfig.systemPrompt)
     const plan = parsePlanFromLlm(llmResponse, input.documents)
     if (plan) {
       const normalizedPlan = normalizePlanForPrompt(plan, input.prompt)
@@ -526,12 +533,13 @@ export const aggregateStepResults = async (
   }
 
   try {
+    const runtimeConfig = await resolveAgentRuntimeConfig({
+      accessToken: input.accessToken,
+      llmConfig: input.llmConfig,
+      defaults: COORDINATOR_AGGREGATOR_DEFAULT_CONFIG,
+    })
     const prompt = buildAggregationPrompt(input.prompt, input.companyName, input.stepResults)
-    const summary = await callLlm(
-      prompt,
-      input.llmConfig,
-      'You are an enterprise analyst. Return plain text summaries.'
-    )
+    const summary = await callLlm(prompt, runtimeConfig.llmConfig, runtimeConfig.systemPrompt)
     return { summary }
   } catch (error) {
     console.warn('[AI WORKER][COORDINATOR][AGGREGATION_FAILED]', {

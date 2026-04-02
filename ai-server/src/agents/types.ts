@@ -6,6 +6,9 @@ export interface LlmConfig {
   readonly llmUrl: string
   readonly llmModel: string
   readonly llmKey: string
+  readonly temperature?: number
+  readonly topP?: number
+  readonly maxTokens?: number
 }
 
 // ─────────────────────────────────────────────
@@ -79,6 +82,7 @@ export interface PlanAgentRunInput {
   readonly objective: string | null
   readonly companyName: string
   readonly llmConfig: LlmConfig
+  readonly accessToken: string
   readonly previousResults: readonly AgentStepResult[]
   readonly qcFeedback: string
   readonly documents: readonly DocumentInput[]
@@ -89,6 +93,7 @@ export interface AggregateStepResultsInput {
   readonly companyName: string
   readonly stepResults: readonly AgentStepResult[]
   readonly llmConfig: LlmConfig
+  readonly accessToken: string
 }
 
 export interface AggregateStepResultsOutput {
@@ -100,6 +105,7 @@ export interface QualityCheckInput {
   readonly companyName: string
   readonly stepResults: readonly AgentStepResult[]
   readonly llmConfig: LlmConfig
+  readonly accessToken: string
   readonly iterationNumber: number
 }
 
@@ -115,6 +121,7 @@ export interface InternetResearchInput {
   readonly context?: string
   readonly companyName?: string
   readonly llmConfig: LlmConfig
+  readonly accessToken: string
 }
 
 export interface InternetResearchOutput {
@@ -128,6 +135,7 @@ export interface DocumentResearchInput {
   readonly context?: string
   readonly documents: readonly DocumentInput[]
   readonly llmConfig: LlmConfig
+  readonly accessToken: string
 }
 
 export interface DocumentResearchOutput {
@@ -160,6 +168,7 @@ export interface StrategyGeneratorInput {
   readonly prompt: string
   readonly objective?: string | null
   readonly llmConfig: LlmConfig
+  readonly accessToken: string
 }
 
 export interface StrategyGeneratorOutput {

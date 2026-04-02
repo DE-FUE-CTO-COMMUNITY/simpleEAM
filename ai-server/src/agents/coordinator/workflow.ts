@@ -124,6 +124,7 @@ async function executeStep(
         context: contextFromDeps || undefined,
         companyName,
         llmConfig,
+        accessToken: workflowInput.accessToken,
       })
       return {
         stepId: step.stepId,
@@ -144,6 +145,7 @@ async function executeStep(
         context: contextFromDeps || undefined,
         documents: docs,
         llmConfig,
+        accessToken: workflowInput.accessToken,
       })
       return {
         stepId: step.stepId,
@@ -163,6 +165,7 @@ async function executeStep(
         prompt,
         objective: objective ?? null,
         llmConfig,
+        accessToken: workflowInput.accessToken,
       })
       return {
         stepId: step.stepId,
@@ -236,6 +239,7 @@ export async function coordinatorWorkflow(input: CoordinatorWorkflowInput): Prom
         objective: input.objective ?? null,
         companyName: input.companyName,
         llmConfig: input.llmConfig,
+        accessToken: input.accessToken,
         previousResults: stepResults,
         qcFeedback,
         documents: (input.documents ?? []) as DocumentInput[],
@@ -289,6 +293,7 @@ export async function coordinatorWorkflow(input: CoordinatorWorkflowInput): Prom
         companyName: input.companyName,
         stepResults,
         llmConfig: input.llmConfig,
+        accessToken: input.accessToken,
         iterationNumber: iteration,
       })
 
@@ -304,6 +309,7 @@ export async function coordinatorWorkflow(input: CoordinatorWorkflowInput): Prom
           companyName: input.companyName,
           stepResults,
           llmConfig: input.llmConfig,
+          accessToken: input.accessToken,
         })
         finalSummary = aggregated.summary
         break

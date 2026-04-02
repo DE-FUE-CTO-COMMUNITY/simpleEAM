@@ -2358,6 +2358,7 @@
     "tabs": {
       "userManagement": "Benutzerverwaltung",
       "productFamilies": "Produktfamilien",
+      "agentConfig": "Agenten-Konfiguration",
       "featureManagement": "Feature-Management",
       "aiRuns": "KI-Läufe",
       "debugTools": "Debug-Tools"
@@ -2702,6 +2703,53 @@
         "END_USER_COLLABORATION_SOFTWARE": "End User & Collaboration Software",
         "DEVELOPMENT_ENGINEERING_SOFTWARE": "Development & Engineering Software",
         "BUSINESS_ENTERPRISE_APPLICATIONS": "Business & Enterprise Applications"
+      }
+    },
+    "agentConfig": {
+      "title": "Agenten-Konfiguration",
+      "editTitle": "Agent bearbeiten",
+      "searchPlaceholder": "Agenten suchen...",
+      "noData": "Keine Agenten-Konfigurationen gefunden",
+      "table": {
+        "agentKey": "Agent-Schlüssel",
+        "displayName": "Name",
+        "description": "Beschreibung",
+        "isEnabled": "Aktiv",
+        "temperature": "Temperatur",
+        "topP": "Top-P",
+        "maxTokens": "Max. Tokens",
+        "configVersion": "Version",
+        "updatedAt": "Zuletzt aktualisiert",
+        "actions": "Aktionen"
+      },
+      "form": {
+        "agentKey": "Agent-Schlüssel",
+        "displayName": "Anzeigename",
+        "description": "Beschreibung",
+        "systemPrompt": "System-Prompt",
+        "temperature": "Temperatur",
+        "topP": "Top-P",
+        "maxTokens": "Maximale Tokens",
+        "isEnabled": "Aktiviert"
+      },
+      "actions": {
+        "edit": "Bearbeiten",
+        "save": "Speichern",
+        "cancel": "Abbrechen",
+        "enable": "Aktivieren",
+        "disable": "Deaktivieren"
+      },
+      "validation": {
+        "systemPromptRequired": "System-Prompt ist erforderlich",
+        "temperatureRange": "Temperatur muss zwischen 0 und 2 liegen",
+        "topPRange": "Top-P muss zwischen 0 und 1 liegen",
+        "maxTokensPositive": "Maximale Tokens muss größer als 0 sein"
+      },
+      "hints": {
+        "agentKey": "Eindeutiger Schlüssel (schreibgeschützt)",
+        "temperature": "Wertebereich: 0.0 (deterministisch) bis 2.0 (kreativ)",
+        "topP": "Wertebereich: 0.0 bis 1.0",
+        "maxTokens": "Maximale Anzahl generierter Tokens"
       }
     },
     "debugOverlay": {

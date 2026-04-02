@@ -2396,6 +2396,123 @@ export type AiComponentWhere = {
   version?: InputMaybe<StringScalarFilters>;
 };
 
+/** AgentConfig – persisted configuration for backend agents, managed globally by administrators */
+export type AgentConfig = {
+  __typename?: 'AgentConfig';
+  agentKey: Scalars['String']['output'];
+  configVersion: Scalars['Int']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  displayName: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  isEnabled: Scalars['Boolean']['output'];
+  maxTokens?: Maybe<Scalars['Int']['output']>;
+  metadataJson?: Maybe<Scalars['String']['output']>;
+  systemPrompt: Scalars['String']['output'];
+  temperature?: Maybe<Scalars['Float']['output']>;
+  topP?: Maybe<Scalars['Float']['output']>;
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+};
+
+export type AgentConfigAggregate = {
+  __typename?: 'AgentConfigAggregate';
+  count: Count;
+  node: AgentConfigAggregateNode;
+};
+
+export type AgentConfigAggregateNode = {
+  __typename?: 'AgentConfigAggregateNode';
+  agentKey: StringAggregateSelection;
+  configVersion: IntAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  displayName: StringAggregateSelection;
+  maxTokens: IntAggregateSelection;
+  metadataJson: StringAggregateSelection;
+  systemPrompt: StringAggregateSelection;
+  temperature: FloatAggregateSelection;
+  topP: FloatAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
+export type AgentConfigCreateInput = {
+  agentKey: Scalars['String']['input'];
+  configVersion: Scalars['Int']['input'];
+  description?: InputMaybe<Scalars['String']['input']>;
+  displayName: Scalars['String']['input'];
+  isEnabled: Scalars['Boolean']['input'];
+  maxTokens?: InputMaybe<Scalars['Int']['input']>;
+  metadataJson?: InputMaybe<Scalars['String']['input']>;
+  systemPrompt: Scalars['String']['input'];
+  temperature?: InputMaybe<Scalars['Float']['input']>;
+  topP?: InputMaybe<Scalars['Float']['input']>;
+  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+export type AgentConfigEdge = {
+  __typename?: 'AgentConfigEdge';
+  cursor: Scalars['String']['output'];
+  node: AgentConfig;
+};
+
+/** Fields to sort AgentConfigs by. The order in which sorts are applied is not guaranteed when specifying many fields in one AgentConfigSort object. */
+export type AgentConfigSort = {
+  agentKey?: InputMaybe<SortDirection>;
+  configVersion?: InputMaybe<SortDirection>;
+  createdAt?: InputMaybe<SortDirection>;
+  description?: InputMaybe<SortDirection>;
+  displayName?: InputMaybe<SortDirection>;
+  id?: InputMaybe<SortDirection>;
+  isEnabled?: InputMaybe<SortDirection>;
+  maxTokens?: InputMaybe<SortDirection>;
+  metadataJson?: InputMaybe<SortDirection>;
+  systemPrompt?: InputMaybe<SortDirection>;
+  temperature?: InputMaybe<SortDirection>;
+  topP?: InputMaybe<SortDirection>;
+  updatedAt?: InputMaybe<SortDirection>;
+};
+
+export type AgentConfigUpdateInput = {
+  agentKey?: InputMaybe<StringScalarMutations>;
+  configVersion?: InputMaybe<IntScalarMutations>;
+  createdAt?: InputMaybe<DateTimeScalarMutations>;
+  description?: InputMaybe<StringScalarMutations>;
+  displayName?: InputMaybe<StringScalarMutations>;
+  isEnabled?: InputMaybe<BooleanScalarMutations>;
+  maxTokens?: InputMaybe<IntScalarMutations>;
+  metadataJson?: InputMaybe<StringScalarMutations>;
+  systemPrompt?: InputMaybe<StringScalarMutations>;
+  temperature?: InputMaybe<FloatScalarMutations>;
+  topP?: InputMaybe<FloatScalarMutations>;
+};
+
+export type AgentConfigWhere = {
+  AND?: InputMaybe<Array<AgentConfigWhere>>;
+  NOT?: InputMaybe<AgentConfigWhere>;
+  OR?: InputMaybe<Array<AgentConfigWhere>>;
+  agentKey?: InputMaybe<StringScalarFilters>;
+  configVersion?: InputMaybe<IntScalarFilters>;
+  createdAt?: InputMaybe<DateTimeScalarFilters>;
+  description?: InputMaybe<StringScalarFilters>;
+  displayName?: InputMaybe<StringScalarFilters>;
+  id?: InputMaybe<IdScalarFilters>;
+  isEnabled?: InputMaybe<BooleanScalarFilters>;
+  maxTokens?: InputMaybe<IntScalarFilters>;
+  metadataJson?: InputMaybe<StringScalarFilters>;
+  systemPrompt?: InputMaybe<StringScalarFilters>;
+  temperature?: InputMaybe<FloatScalarFilters>;
+  topP?: InputMaybe<FloatScalarFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarFilters>;
+};
+
+export type AgentConfigsConnection = {
+  __typename?: 'AgentConfigsConnection';
+  aggregate: AgentConfigAggregate;
+  edges: Array<AgentConfigEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
 export type AiComponentsConnection = {
   __typename?: 'AiComponentsConnection';
   aggregate: AiComponentAggregate;
@@ -19619,6 +19736,12 @@ export type CountConnection = {
   nodes: Scalars['Int']['output'];
 };
 
+export type CreateAgentConfigsMutationResponse = {
+  __typename?: 'CreateAgentConfigsMutationResponse';
+  agentConfigs: Array<AgentConfig>;
+  info: CreateInfo;
+};
+
 export type CreateAiComponentsMutationResponse = {
   __typename?: 'CreateAiComponentsMutationResponse';
   aiComponents: Array<AiComponent>;
@@ -36211,6 +36334,7 @@ export type ListStringMutations = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  createAgentConfigs: CreateAgentConfigsMutationResponse;
   createAiComponents: CreateAiComponentsMutationResponse;
   createAiRunAuditEvents: CreateAiRunAuditEventsMutationResponse;
   createAiRuns: CreateAiRunsMutationResponse;
@@ -36239,6 +36363,7 @@ export type Mutation = {
   createSoftwareProducts: CreateSoftwareProductsMutationResponse;
   createSoftwareVersions: CreateSoftwareVersionsMutationResponse;
   createSuppliers: CreateSuppliersMutationResponse;
+  deleteAgentConfigs: DeleteInfo;
   deleteAiComponents: DeleteInfo;
   deleteAiRunAuditEvents: DeleteInfo;
   deleteAiRuns: DeleteInfo;
@@ -36267,6 +36392,7 @@ export type Mutation = {
   deleteSoftwareProducts: DeleteInfo;
   deleteSoftwareVersions: DeleteInfo;
   deleteSuppliers: DeleteInfo;
+  updateAgentConfigs: UpdateAgentConfigsMutationResponse;
   updateAiComponents: UpdateAiComponentsMutationResponse;
   updateAiRunAuditEvents: UpdateAiRunAuditEventsMutationResponse;
   updateAiRuns: UpdateAiRunsMutationResponse;
@@ -36295,6 +36421,11 @@ export type Mutation = {
   updateSoftwareProducts: UpdateSoftwareProductsMutationResponse;
   updateSoftwareVersions: UpdateSoftwareVersionsMutationResponse;
   updateSuppliers: UpdateSuppliersMutationResponse;
+};
+
+
+export type MutationCreateAgentConfigsArgs = {
+  input: Array<AgentConfigCreateInput>;
 };
 
 
@@ -36435,6 +36566,11 @@ export type MutationCreateSoftwareVersionsArgs = {
 
 export type MutationCreateSuppliersArgs = {
   input: Array<SupplierCreateInput>;
+};
+
+
+export type MutationDeleteAgentConfigsArgs = {
+  where?: InputMaybe<AgentConfigWhere>;
 };
 
 
@@ -36603,6 +36739,12 @@ export type MutationDeleteSoftwareVersionsArgs = {
 export type MutationDeleteSuppliersArgs = {
   delete?: InputMaybe<SupplierDeleteInput>;
   where?: InputMaybe<SupplierWhere>;
+};
+
+
+export type MutationUpdateAgentConfigsArgs = {
+  update?: InputMaybe<AgentConfigUpdateInput>;
+  where?: InputMaybe<AgentConfigWhere>;
 };
 
 
@@ -41569,6 +41711,8 @@ export type ProductFamilyWhere = {
 
 export type Query = {
   __typename?: 'Query';
+  agentConfigs: Array<AgentConfig>;
+  agentConfigsConnection: AgentConfigsConnection;
   aiComponents: Array<AiComponent>;
   aiComponentsConnection: AiComponentsConnection;
   aiRunAuditEvents: Array<AiRunAuditEvent>;
@@ -41625,6 +41769,22 @@ export type Query = {
   softwareVersionsConnection: SoftwareVersionsConnection;
   suppliers: Array<Supplier>;
   suppliersConnection: SuppliersConnection;
+};
+
+
+export type QueryAgentConfigsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<AgentConfigSort>>;
+  where?: InputMaybe<AgentConfigWhere>;
+};
+
+
+export type QueryAgentConfigsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<AgentConfigSort>>;
+  where?: InputMaybe<AgentConfigWhere>;
 };
 
 
@@ -48073,6 +48233,12 @@ export type TimeCategoryEnumScalarFilters = {
 /** TimeCategory mutations */
 export type TimeCategoryEnumScalarMutations = {
   set?: InputMaybe<TimeCategory>;
+};
+
+export type UpdateAgentConfigsMutationResponse = {
+  __typename?: 'UpdateAgentConfigsMutationResponse';
+  agentConfigs: Array<AgentConfig>;
+  info: UpdateInfo;
 };
 
 export type UpdateAiComponentsMutationResponse = {

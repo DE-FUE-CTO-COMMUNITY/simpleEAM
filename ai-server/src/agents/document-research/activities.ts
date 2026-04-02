@@ -6,6 +6,10 @@ import {
   isLlmPromptLoggingEnabled,
   getLlmPromptPreviewChars,
 } from '../shared/llm'
+import { resolveAgentRuntimeConfig } from '../shared/agent-config'
+import { getAgentConfigDefault } from '../shared/default-agent-configs'
+
+const DOCUMENT_RESEARCH_DEFAULT_CONFIG = getAgentConfigDefault('document-research')
 
 // ─────────────────────────────────────────────
 // Agent registration
@@ -105,11 +109,13 @@ export async function performDocumentResearch(
     })
   }
 
-  const summary = await callLlm(
-    prompt,
-    input.llmConfig,
-    'You are a document research analyst. Return plain text summaries, not JSON.'
-  )
+  const runtimeConfig = await resolveAgentRuntimeConfig({
+    accessToken: input.accessToken,
+    llmConfig: input.llmConfig,
+    defaults: DOCUMENT_RESEARCH_DEFAULT_CONFIG,
+  })
+
+  const summary = await callLlm(prompt, runtimeConfig.llmConfig, runtimeConfig.systemPrompt)
 
   // Extract per-document findings by looking for document name references
   const findings: Array<{ documentName: string; excerpt: string }> = input.documents

@@ -21,6 +21,10 @@ import {
   getLlmRetryCount,
 } from '../shared/llm'
 import { collectWebSources } from '../shared/web-search'
+import { resolveAgentRuntimeConfig } from '../shared/agent-config'
+import { getAgentConfigDefault } from '../shared/default-agent-configs'
+
+const STRATEGY_GENERATOR_DEFAULT_CONFIG = getAgentConfigDefault('strategy-generator')
 
 // ─────────────────────────────────────────────
 // Agent registration
@@ -325,7 +329,15 @@ interface StrategyGraphState {
   draftPayload: StrategicDraftPayload | null
   llmErrorMessage: string | null
   fallbackEnabled: boolean
-  llmConfig: { llmUrl: string; llmModel: string; llmKey: string }
+  llmConfig: {
+    llmUrl: string
+    llmModel: string
+    llmKey: string
+    temperature?: number
+    topP?: number
+    maxTokens?: number
+  }
+  systemPrompt: string
 }
 
 const strategyGraphAnnotation = Annotation.Root({
@@ -342,9 +354,17 @@ const strategyGraphAnnotation = Annotation.Root({
   }),
   llmErrorMessage: Annotation<string | null>({ reducer: (_, u) => u, default: () => null }),
   fallbackEnabled: Annotation<boolean>({ reducer: (_, u) => u }),
-  llmConfig: Annotation<{ llmUrl: string; llmModel: string; llmKey: string }>({
+  llmConfig: Annotation<{
+    llmUrl: string
+    llmModel: string
+    llmKey: string
+    temperature?: number
+    topP?: number
+    maxTokens?: number
+  }>({
     reducer: (_, u) => u,
   }),
+  systemPrompt: Annotation<string>({ reducer: (_, u) => u, default: () => '' }),
 })
 
 const executeStrategyGraph = async (
@@ -352,11 +372,12 @@ const executeStrategyGraph = async (
   companyName: string,
   objective: string | null
 ): Promise<StrategyGeneratorOutput> => {
-  const llmConfig = {
-    llmUrl: input.llmConfig.llmUrl,
-    llmModel: input.llmConfig.llmModel,
-    llmKey: input.llmConfig.llmKey,
-  }
+  const runtimeConfig = await resolveAgentRuntimeConfig({
+    accessToken: input.accessToken,
+    llmConfig: input.llmConfig,
+    defaults: STRATEGY_GENERATOR_DEFAULT_CONFIG,
+  })
+  const llmConfig = runtimeConfig.llmConfig
 
   const workflow = new StateGraph(strategyGraphAnnotation)
     .addNode('research', async state => {
@@ -405,11 +426,7 @@ const executeStrategyGraph = async (
     })
     .addNode('generateDraft', async state => {
       try {
-        const llmRawText = await callLlm(
-          state.llmPrompt,
-          state.llmConfig,
-          'You generate enterprise strategic drafts. Return only JSON.'
-        )
+        const llmRawText = await callLlm(state.llmPrompt, state.llmConfig, state.systemPrompt)
         const parsedOutput = parseJsonObject(llmRawText)
         if (!parsedOutput) throw new Error('LLM output was not valid JSON')
 
@@ -478,6 +495,7 @@ const executeStrategyGraph = async (
     llmErrorMessage: null,
     fallbackEnabled: isLlmFallbackEnabled(),
     llmConfig,
+    systemPrompt: runtimeConfig.systemPrompt,
   })
 
   if (!result.draftPayload) {

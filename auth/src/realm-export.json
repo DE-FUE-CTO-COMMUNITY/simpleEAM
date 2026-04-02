@@ -197,6 +197,14 @@
       "realmRoles": ["viewer"],
       "clientRoles": {},
       "groups": []
+    },
+    {
+      "username": "service-account-eam-server",
+      "enabled": true,
+      "emailVerified": false,
+      "realmRoles": ["admin"],
+      "clientRoles": {},
+      "groups": []
     }
   ]
 }
