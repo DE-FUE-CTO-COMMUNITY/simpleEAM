@@ -20,6 +20,13 @@ global:
   imageTag: 'latest'
   imagePullPolicy: IfNotPresent
   # imagePullSecrets: []  # e.g. [{name: ghcr-pull-secret}]
+  # GHCR images are private (org policy). Create a pull secret before installing:
+  #   kubectl create secret docker-registry ghcr-pull-secret \
+  #     --docker-server=ghcr.io \
+  #     --docker-username=<github-user> \
+  #     --docker-password=<PAT-with-read:packages> \
+  #     -n <namespace>
+  # Then set: imagePullSecrets: [{name: ghcr-pull-secret}]
   imagePullSecrets: []
 
   nodeEnv: production
