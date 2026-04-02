@@ -15,9 +15,9 @@ global:
   # Image registry where GHCR images are pulled from.
   # Images are expected at: <registry>/<repository>/<image>:<tag>
   imageRegistry: ghcr.io
-  # GitHub repository slug (lowercase), e.g. de-fue-cto-community/simpleeam
-  imageRepository: de-fue-cto-community/simpleeam
-  imageTag: "latest"
+  # GitHub org (lowercase). Images are at: <imageRegistry>/<imageOrg>/<image>:<tag>
+  imageRepository: de-fue-cto-community
+  imageTag: 'latest'
   imagePullPolicy: IfNotPresent
   # imagePullSecrets: []  # e.g. [{name: ghcr-pull-secret}]
   imagePullSecrets: []
@@ -28,17 +28,17 @@ global:
 # Branding
 # ------------------------------------------------------------------------------
 branding:
-  nameLong: "NextGen Enterprise Architecture Management"
-  nameShort: "NextGen EAM"
+  nameLong: 'NextGen Enterprise Architecture Management'
+  nameShort: 'NextGen EAM'
   faviconUrl: /favicon.ico
-  drawerWidth: "240"
+  drawerWidth: '240'
   logoUrl: /images/NextGen-EAM-Logo.svg
-  logoAlt: "NextGen EAM Logo"
-  logoDarkUrl: ""
-  logoLength: "120"
-  themePrimaryColor: "#00BCD4"
-  themeSecondaryColor: "#4E342E"
-  themeFontFamily: "Roboto, Helvetica, Arial, sans-serif"
+  logoAlt: 'NextGen EAM Logo'
+  logoDarkUrl: ''
+  logoLength: '120'
+  themePrimaryColor: '#00BCD4'
+  themeSecondaryColor: '#4E342E'
+  themeFontFamily: 'Roboto, Helvetica, Arial, sans-serif'
 
 # ------------------------------------------------------------------------------
 # Ingress (nginx-ingress or any ingress controller)
@@ -71,7 +71,7 @@ ingress:
 neo4j:
   image:
     repository: neo4j
-    tag: "5.26"
+    tag: '5.26'
     pullPolicy: IfNotPresent
 
   # Credentials - supply via --set or external secret
@@ -79,8 +79,8 @@ neo4j:
     # username is always "neo4j" for Neo4j
     username: neo4j
     # password: ""  # REQUIRED – set via --set neo4j.auth.password=<pw>
-    password: ""
-    existingSecret: ""         # If set, use this Secret instead of creating one
+    password: ''
+    existingSecret: '' # If set, use this Secret instead of creating one
     existingSecretKey: password
 
   resources:
@@ -93,14 +93,14 @@ neo4j:
 
   persistence:
     enabled: true
-    storageClass: ""
+    storageClass: ''
     size: 10Gi
     accessMode: ReadWriteOnce
 
   memory:
-    pagecache: "512M"
-    heapInitial: "512M"
-    heapMax: "1G"
+    pagecache: '512M'
+    heapInitial: '512M'
+    heapMax: '1G'
 
 # ------------------------------------------------------------------------------
 # Keycloak
@@ -108,14 +108,14 @@ neo4j:
 keycloak:
   image:
     repository: quay.io/keycloak/keycloak
-    tag: "23.0"
+    tag: '23.0'
     pullPolicy: IfNotPresent
 
   admin:
     username: admin
     # password: ""  # REQUIRED – set via --set keycloak.admin.password=<pw>
-    password: ""
-    existingSecret: ""
+    password: ''
+    existingSecret: ''
     existingSecretPasswordKey: adminPassword
 
   realm: nextgen-eam
@@ -135,13 +135,13 @@ keycloak:
     name: keycloak
     user: keycloak
     # password: ""  # REQUIRED – set via --set keycloak.db.password=<pw>
-    password: ""
-    existingSecret: ""
+    password: ''
+    existingSecret: ''
     existingSecretKey: password
 
     persistence:
       enabled: true
-      storageClass: ""
+      storageClass: ''
       size: 2Gi
       accessMode: ReadWriteOnce
 
@@ -156,9 +156,9 @@ server:
   replicaCount: 1
 
   image:
-    repository: ""  # defaults to global.imageRegistry/global.imageRepository/nextgen-eam-server
-    tag: ""         # defaults to global.imageTag
-    pullPolicy: ""  # defaults to global.imagePullPolicy
+    repository: '' # defaults to global.imageRegistry/global.imageRepository/nextgen-eam-server
+    tag: '' # defaults to global.imageTag
+    pullPolicy: '' # defaults to global.imagePullPolicy
 
   port: 4000
 
@@ -170,9 +170,9 @@ server:
       memory: 512Mi
       cpu: 500m
 
-  authDebug: "false"
-  neo4jDebug: "false"
-  neo4jLogLevel: "warn"
+  authDebug: 'false'
+  neo4jDebug: 'false'
+  neo4jLogLevel: 'warn'
 
 # ------------------------------------------------------------------------------
 # Next.js Client
@@ -181,9 +181,9 @@ client:
   replicaCount: 1
 
   image:
-    repository: ""
-    tag: ""
-    pullPolicy: ""
+    repository: ''
+    tag: ''
+    pullPolicy: ''
 
   port: 3000
 
@@ -202,7 +202,7 @@ excalidrawRoom:
   enabled: true
   image:
     repository: excalidraw/excalidraw-room
-    tag: "sha-03ff435"
+    tag: 'sha-03ff435'
     pullPolicy: IfNotPresent
   port: 80
   resources:
@@ -223,9 +223,9 @@ ai:
   server:
     replicaCount: 1
     image:
-      repository: ""
-      tag: ""
-      pullPolicy: ""
+      repository: ''
+      tag: ''
+      pullPolicy: ''
     port: 4001
     resources:
       requests:
@@ -239,9 +239,9 @@ ai:
   worker:
     replicaCount: 1
     image:
-      repository: ""
-      tag: ""
-      pullPolicy: ""
+      repository: ''
+      tag: ''
+      pullPolicy: ''
     resources:
       requests:
         memory: 256Mi
@@ -252,34 +252,34 @@ ai:
 
   # LLM configuration
   llm:
-    url: ""
-    model: "mistral-7b-instruct-v0.3"
+    url: ''
+    model: 'mistral-7b-instruct-v0.3'
     # apiKey: ""  # set via --set ai.llm.apiKey=<key>
-    apiKey: ""
-    existingSecret: ""
+    apiKey: ''
+    existingSecret: ''
     existingSecretApiKeyField: apiKey
-    timeoutMs: "45000"
-    retryCount: "1"
-    logPrompt: "false"
-    promptLogPreviewChars: "1200"
-    allowFallback: "false"
+    timeoutMs: '45000'
+    retryCount: '1'
+    logPrompt: 'false'
+    promptLogPreviewChars: '1200'
+    allowFallback: 'false'
 
   web:
-    sourceCount: "4"
-    searchResultCount: "16"
-    fetchTimeoutMs: "12000"
-    searchProviders: "duckduckgo_html,duckduckgo_lite,wikipedia_api"
-    searxngUrl: ""
+    sourceCount: '4'
+    searchResultCount: '16'
+    fetchTimeoutMs: '12000'
+    searchProviders: 'duckduckgo_html,duckduckgo_lite,wikipedia_api'
+    searxngUrl: ''
     # searxngApiKey: ""  # set via --set ai.web.searxngApiKey=<key>
-    searxngApiKey: ""
-    searxngExistingSecret: ""     # If set, use this Secret for the SearXNG API key
+    searxngApiKey: ''
+    searxngExistingSecret: '' # If set, use this Secret for the SearXNG API key
     searxngExistingSecretKey: apiKey
 
   agentConfig:
-    bootstrapClientId: ""
+    bootstrapClientId: ''
     # bootstrapClientSecret: ""  # set via --set ai.agentConfig.bootstrapClientSecret=<secret>
-    bootstrapClientSecret: ""
-    existingSecret: ""
+    bootstrapClientSecret: ''
+    existingSecret: ''
     existingSecretClientIdField: clientId
     existingSecretClientSecretField: clientSecret
 
@@ -288,14 +288,14 @@ ai:
     # Internal gRPC address for Temporal server.
     # Leave empty to use the bundled temporal service (<release>-nextgen-eam-temporal:7233).
     # Override when pointing to an external Temporal cluster.
-    address: ""
-    namespace: "default"
-    taskQueue: "nextgen-eam-ai"
+    address: ''
+    namespace: 'default'
+    taskQueue: 'nextgen-eam-ai'
 
     server:
       image:
         repository: temporalio/auto-setup
-        tag: "1.24.2"
+        tag: '1.24.2'
         pullPolicy: IfNotPresent
       resources:
         requests:
@@ -309,7 +309,7 @@ ai:
       enabled: true
       image:
         repository: temporalio/ui
-        tag: "2.31.2"
+        tag: '2.31.2'
         pullPolicy: IfNotPresent
       resources:
         requests:
@@ -323,11 +323,11 @@ ai:
       name: temporal
       user: temporal
       # password: ""  # set via --set ai.temporal.db.password=<pw>
-      password: ""
-      existingSecret: ""
+      password: ''
+      existingSecret: ''
       existingSecretKey: password
       persistence:
         enabled: true
-        storageClass: ""
+        storageClass: ''
         size: 5Gi
         accessMode: ReadWriteOnce
