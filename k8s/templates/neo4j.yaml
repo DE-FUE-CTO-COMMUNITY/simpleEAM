@@ -63,6 +63,24 @@ spec:
       {{- if .Values.global.imagePullSecrets }}
       imagePullSecrets: {{- toYaml .Values.global.imagePullSecrets | nindent 8 }}
       {{- end }}
+      initContainers:
+        - name: neo4j-apoc-init
+          image: {{ printf "%s:%s" $neo4j.image.repository $neo4j.image.tag }}
+          imagePullPolicy: {{ $neo4j.image.pullPolicy }}
+          command:
+            - /bin/bash
+            - -ec
+            - |
+              APJAR="$(ls -1 /var/lib/neo4j/labs/apoc-*.jar 2>/dev/null | head -n1 || true)"
+              if [ -z "$APJAR" ]; then
+                echo "APOC jar not found in /var/lib/neo4j/labs"
+                exit 1
+              fi
+              cp "$APJAR" /plugins/apoc.jar
+              ls -l /plugins
+          volumeMounts:
+            - name: plugins
+              mountPath: /plugins
       containers:
         - name: neo4j
           image: {{ printf "%s:%s" $neo4j.image.repository $neo4j.image.tag }}
@@ -93,6 +111,14 @@ spec:
                 configMapKeyRef:
                   name: {{ $fullName }}-config
                   key: NEO4J_HEAP_MAX_SIZE
+            - name: NEO4J_apoc_export_file_enabled
+              value: "true"
+            - name: NEO4J_apoc_import_file_enabled
+              value: "true"
+            - name: NEO4J_dbms_security_procedures_allowlist
+              value: "apoc.*"
+            - name: NEO4J_dbms_security_procedures_unrestricted
+              value: "apoc.*"
           livenessProbe:
             httpGet:
               path: /
@@ -106,13 +132,17 @@ spec:
             initialDelaySeconds: 30
             periodSeconds: 10
           resources: {{- toYaml $neo4j.resources | nindent 12 }}
-          {{- if $neo4j.persistence.enabled }}
           volumeMounts:
+            - name: plugins
+              mountPath: /plugins
+          {{- if $neo4j.persistence.enabled }}
             - name: data
               mountPath: /data
           {{- end }}
-      {{- if $neo4j.persistence.enabled }}
       volumes:
+        - name: plugins
+          emptyDir: {}
+      {{- if $neo4j.persistence.enabled }}
         - name: data
           persistentVolumeClaim:
             claimName: {{ $fullName }}-neo4j

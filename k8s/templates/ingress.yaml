@@ -107,6 +107,37 @@ spec:
                 name: {{ $fullName }}-keycloak
                 port:
                   number: 8080
+---
+# ── Neo4j Browser ────────────────────────────────────────────────────────────
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ $fullName }}-neo4j
+  labels: {{- $labels | nindent 4 }}
+  {{- with .Values.ingress.annotations }}
+  annotations: {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.ingress.className }}
+  ingressClassName: {{ .Values.ingress.className }}
+  {{- end }}
+  {{- if $tls }}
+  tls:
+    - hosts:
+        - {{ printf "%s.%s" $subs.neo4j $domain }}
+      secretName: {{ default (printf "%s-neo4j-tls" $fullName) (get $tlsOverride "neo4j") }}
+  {{- end }}
+  rules:
+    - host: {{ printf "%s.%s" $subs.neo4j $domain }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ $fullName }}-neo4j
+                port:
+                  number: 7474
 {{- if .Values.excalidrawRoom.enabled }}
 ---
 # ── Excalidraw Collaboration Room ─────────────────────────────────────────────

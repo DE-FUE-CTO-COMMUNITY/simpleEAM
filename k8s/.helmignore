@@ -1,31 +1,38 @@
 # Helm ignore file
+
 # Patterns listed here will be excluded from the chart package (.tgz)
 
 # Git metadata
+
 .git/
 .gitignore
 .gitattributes
 .github/
 
 # Documentation (not needed in the packaged chart)
-*.md
+
+\*.md
 README.md
 
 # Editor and IDE files
+
 .vscode/
 .idea/
-*.swp
-*.swo
-*~
+_.swp
+_.swo
+\*~
 
 # OS files
+
 .DS_Store
 Thumbs.db
 
 # CI/CD
+
 .travis.yml
 .circleci/
 
 # Test files
+
 tests/
 test/

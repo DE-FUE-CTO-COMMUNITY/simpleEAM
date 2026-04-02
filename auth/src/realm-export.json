@@ -82,8 +82,8 @@
       "enabled": true,
       "clientAuthenticatorType": "client-secret",
       "secret": "eam-client-secret",
-      "redirectUris": ["http://localhost:3000/*", "https://eam.example.com/*"],
-      "webOrigins": ["http://localhost:3000", "https://eam.example.com"],
+      "redirectUris": ["https://eam.example.com/*"],
+      "webOrigins": ["https://eam.example.com"],
       "bearerOnly": false,
       "consentRequired": false,
       "standardFlowEnabled": true,
@@ -151,57 +151,6 @@
       "firstName": "Admin",
       "lastName": "User",
       "email": "admin@example.com",
-      "credentials": [
-        {
-          "type": "password",
-          "value": "admin",
-          "temporary": true
-        }
-      ],
-      "realmRoles": ["admin"],
-      "clientRoles": {},
-      "groups": []
-    },
-    {
-      "username": "architect",
-      "enabled": true,
-      "emailVerified": true,
-      "firstName": "Enterprise",
-      "lastName": "Architect",
-      "email": "architect@example.com",
-      "credentials": [
-        {
-          "type": "password",
-          "value": "architect",
-          "temporary": true
-        }
-      ],
-      "realmRoles": ["architect"],
-      "clientRoles": {},
-      "groups": []
-    },
-    {
-      "username": "viewer",
-      "enabled": true,
-      "emailVerified": true,
-      "firstName": "Read-only",
-      "lastName": "User",
-      "email": "viewer@example.com",
-      "credentials": [
-        {
-          "type": "password",
-          "value": "viewer",
-          "temporary": true
-        }
-      ],
-      "realmRoles": ["viewer"],
-      "clientRoles": {},
-      "groups": []
-    },
-    {
-      "username": "service-account-eam-server",
-      "enabled": true,
-      "emailVerified": false,
       "realmRoles": ["admin"],
       "clientRoles": {},
       "groups": []

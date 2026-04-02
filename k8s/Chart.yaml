@@ -3,7 +3,7 @@ name: nextgen-eam
 description: NextGen Enterprise Architecture Management
 type: application
 version: 1.2.0
-appVersion: "1.2.0"
+appVersion: '1.2.0'
 keywords:
   - enterprise-architecture
   - neo4j

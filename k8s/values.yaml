@@ -35,17 +35,17 @@ global:
 # Branding
 # ------------------------------------------------------------------------------
 branding:
-  nameLong: 'NextGen Enterprise Architecture Management'
-  nameShort: 'NextGen EAM'
+  nameLong: 'Example Enterprise Architecture Management'
+  nameShort: 'Example EAM'
   faviconUrl: /favicon.ico
   drawerWidth: '240'
-  logoUrl: /images/NextGen-EAM-Logo.svg
-  logoAlt: 'NextGen EAM Logo'
+  logoUrl: /images/example-logo.svg
+  logoAlt: 'Example EAM Logo'
   logoDarkUrl: ''
   logoLength: '120'
-  themePrimaryColor: '#00BCD4'
-  themeSecondaryColor: '#4E342E'
-  themeFontFamily: 'Roboto, Helvetica, Arial, sans-serif'
+  themePrimaryColor: '#2563EB'
+  themeSecondaryColor: '#0F172A'
+  themeFontFamily: 'system-ui, -apple-system, Segoe UI, sans-serif'
 
 # ------------------------------------------------------------------------------
 # Ingress (nginx-ingress or any ingress controller)
@@ -155,6 +155,18 @@ keycloak:
   # Mount realm-export and themes from a ConfigMap/Secret
   # Set to true to create a ConfigMap from the auth/src directory (requires helm package)
   importRealm: true
+  # Idempotent realm bootstrap job (post-install/post-upgrade):
+  # - imports realm-export only when realm is missing
+  # - synchronizes client URLs (eam-client / eam-server) from Helm ingress values
+  bootstrapJob:
+    enabled: true
+    backoffLimit: 2
+  theme:
+    enabled: false
+    # If empty and enabled=true, chart creates <release>-keycloak-theme-assets ConfigMap
+    existingConfigMap: ''
+    archiveFileName: keycloak-theme.tar.gz
+    themeName: custom
 
 # ------------------------------------------------------------------------------
 # GraphQL Server
@@ -201,6 +213,11 @@ client:
     limits:
       memory: 512Mi
       cpu: 500m
+  brandingAssets:
+    enabled: false
+    # If empty and enabled=true, chart creates <release>-client-branding-assets ConfigMap
+    existingConfigMap: ''
+    archiveFileName: brand-images.tar.gz
 
 # ------------------------------------------------------------------------------
 # Excalidraw Collaboration Room

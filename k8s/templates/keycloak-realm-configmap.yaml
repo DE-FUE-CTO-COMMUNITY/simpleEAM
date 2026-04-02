@@ -1,4 +1,4 @@
-{{- if .Values.keycloak.importRealm }}
+{{- if or .Values.keycloak.importRealm .Values.keycloak.bootstrapJob.enabled }}
 {{- $fullName := include "nextgen-eam.fullname" . -}}
 {{- $labels := include "nextgen-eam.labels" . -}}
 apiVersion: v1

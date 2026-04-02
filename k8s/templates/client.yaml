@@ -44,6 +44,24 @@ spec:
       {{- if $global.imagePullSecrets }}
       imagePullSecrets: {{- toYaml $global.imagePullSecrets | nindent 8 }}
       {{- end }}
+      {{- if $cl.brandingAssets.enabled }}
+      initContainers:
+        - name: client-branding-init
+          image: alpine:3.20
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -ec
+            - |
+              mkdir -p /work/brand-images
+              tar -xzf /assets/{{ $cl.brandingAssets.archiveFileName }} -C /work/brand-images
+          volumeMounts:
+            - name: client-branding-assets
+              mountPath: /assets
+              readOnly: true
+            - name: client-brand-images
+              mountPath: /work/brand-images
+      {{- end }}
       containers:
         - name: client
           image: {{ printf "%s/%s/nextgen-eam-client:%s" $global.imageRegistry $global.imageRepository (default $global.imageTag $cl.image.tag) }}
@@ -72,4 +90,17 @@ spec:
               port: {{ $cl.port }}
             initialDelaySeconds: 15
             periodSeconds: 10
+          {{- if $cl.brandingAssets.enabled }}
+          volumeMounts:
+            - name: client-brand-images
+              mountPath: /app/public/brand-images
+          {{- end }}
           resources: {{- toYaml $cl.resources | nindent 12 }}
+      {{- if $cl.brandingAssets.enabled }}
+      volumes:
+        - name: client-branding-assets
+          configMap:
+            name: {{ default (printf "%s-client-branding-assets" $fullName) $cl.brandingAssets.existingConfigMap }}
+        - name: client-brand-images
+          emptyDir: {}
+      {{- end }}

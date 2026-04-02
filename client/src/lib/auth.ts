@@ -123,14 +123,10 @@ export const initKeycloak = async () => {
   keycloakInitPromise = keycloak
     .init({
       onLoad: 'login-required',
-      silentCheckSsoRedirectUri:
-        typeof window !== 'undefined'
-          ? window.location.origin + '/silent-check-sso.html'
-          : '/silent-check-sso.html',
       pkceMethod: 'S256',
-      // NO automatic redirectUri here - this always causes redirects
-      checkLoginIframe: true,
-      checkLoginIframeInterval: 5,
+      // 3rd-party cookie iframe checks are blocked in many browsers and can
+      // cause false auth failures around /3p-cookies/* endpoints.
+      checkLoginIframe: false,
       enableLogging: process.env.NODE_ENV === 'development',
     })
     .then(authenticated => {

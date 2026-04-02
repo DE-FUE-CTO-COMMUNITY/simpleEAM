@@ -80,6 +80,8 @@ spec:
                 secretKeyRef:
                   name: {{ default (printf "%s-keycloak-db" $fullName) $kc.db.existingSecret }}
                   key: {{ default "password" $kc.db.existingSecretKey }}
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
           livenessProbe:
             exec:
               command: ["pg_isready", "-U", {{ $kc.db.user | quote }}, "-d", {{ $kc.db.name | quote }}]
@@ -141,6 +143,24 @@ spec:
     spec:
       {{- if .Values.global.imagePullSecrets }}
       imagePullSecrets: {{- toYaml .Values.global.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      {{- if $kc.theme.enabled }}
+      initContainers:
+        - name: keycloak-theme-init
+          image: alpine:3.20
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -ec
+            - |
+              mkdir -p /work/themes
+              tar -xzf /assets/{{ $kc.theme.archiveFileName }} -C /work/themes
+          volumeMounts:
+            - name: keycloak-theme-assets
+              mountPath: /assets
+              readOnly: true
+            - name: keycloak-themes
+              mountPath: /work/themes
       {{- end }}
       containers:
         - name: keycloak
@@ -208,19 +228,27 @@ spec:
             periodSeconds: 10
             timeoutSeconds: 5
           resources: {{- toYaml $kc.resources | nindent 12 }}
-          {{- if $kc.importRealm }}
-          {{- if $kc.importRealm }}
           volumeMounts:
+            {{- if $kc.importRealm }}
             - name: realm-import
               mountPath: /opt/keycloak/data/import
               readOnly: true
-          {{- end }}
-          {{- end }}
-      {{- if $kc.importRealm }}
-      {{- if $kc.importRealm }}
+            {{- end }}
+            {{- if $kc.theme.enabled }}
+            - name: keycloak-themes
+              mountPath: /opt/keycloak/themes/{{ $kc.theme.themeName }}
+              subPath: {{ $kc.theme.themeName }}
+            {{- end }}
       volumes:
+        {{- if $kc.importRealm }}
         - name: realm-import
           configMap:
             name: {{ $fullName }}-realm-import
-      {{- end }}
-      {{- end }}
+        {{- end }}
+        {{- if $kc.theme.enabled }}
+        - name: keycloak-theme-assets
+          configMap:
+            name: {{ default (printf "%s-keycloak-theme-assets" $fullName) $kc.theme.existingConfigMap }}
+        - name: keycloak-themes
+          emptyDir: {}
+        {{- end }}

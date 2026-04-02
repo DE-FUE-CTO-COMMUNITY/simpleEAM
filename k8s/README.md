@@ -6,7 +6,7 @@ Deploy the full NextGen Enterprise Architecture Management stack on Kubernetes.
 
 - Kubernetes ≥ 1.25
 - Helm ≥ 3.10
-- An ingress controller (e.g., `ingress-nginx`)  
+- An ingress controller (e.g., `ingress-nginx`)
 - A StorageClass that supports `ReadWriteOnce` PVCs
 - (Optional) cert-manager for automatic TLS certificates
 
@@ -41,10 +41,10 @@ helm install nextgen-eam . -f my-values.yaml -n nextgen-eam --create-namespace
 
 Images are pulled from GitHub Container Registry (GHCR):
 
-| Service | Image |
-|---------|-------|
-| Client  | `ghcr.io/<imageRepository>/nextgen-eam-client:<tag>` |
-| Server  | `ghcr.io/<imageRepository>/nextgen-eam-server:<tag>` |
+| Service   | Image                                                   |
+| --------- | ------------------------------------------------------- |
+| Client    | `ghcr.io/<imageRepository>/nextgen-eam-client:<tag>`    |
+| Server    | `ghcr.io/<imageRepository>/nextgen-eam-server:<tag>`    |
 | AI Server | `ghcr.io/<imageRepository>/nextgen-eam-ai-server:<tag>` |
 | AI Worker | `ghcr.io/<imageRepository>/nextgen-eam-ai-worker:<tag>` |
 
@@ -70,24 +70,24 @@ global:
 
 ### Required Values
 
-| Key | Description |
-|-----|-------------|
-| `global.baseDomain` | Base DNS domain (e.g., `eam.example.com`) |
-| `neo4j.auth.password` | Neo4j password |
-| `keycloak.admin.password` | Keycloak admin console password |
-| `keycloak.db.password` | Keycloak PostgreSQL password |
+| Key                       | Description                               |
+| ------------------------- | ----------------------------------------- |
+| `global.baseDomain`       | Base DNS domain (e.g., `eam.example.com`) |
+| `neo4j.auth.password`     | Neo4j password                            |
+| `keycloak.admin.password` | Keycloak admin console password           |
+| `keycloak.db.password`    | Keycloak PostgreSQL password              |
 
 ### Service URLs
 
 By default the chart creates Ingress resources for these subdomains:
 
-| Subdomain key | Default | Service |
-|---------------|---------|---------|
-| `ingress.subdomains.client` | `eam` | Next.js frontend |
-| `ingress.subdomains.api` | `api` | GraphQL + AI API |
-| `ingress.subdomains.auth` | `auth` | Keycloak |
-| `ingress.subdomains.excalidrawRoom` | `room` | Excalidraw room |
-| `ingress.subdomains.temporalUi` | `temporal` | Temporal UI (AI only) |
+| Subdomain key                       | Default    | Service               |
+| ----------------------------------- | ---------- | --------------------- |
+| `ingress.subdomains.client`         | `eam`      | Next.js frontend      |
+| `ingress.subdomains.api`            | `api`      | GraphQL + AI API      |
+| `ingress.subdomains.auth`           | `auth`     | Keycloak              |
+| `ingress.subdomains.excalidrawRoom` | `room`     | Excalidraw room       |
+| `ingress.subdomains.temporalUi`     | `temporal` | Temporal UI (AI only) |
 
 ### TLS / cert-manager
 
@@ -126,20 +126,21 @@ ai:
   enabled: true
 
   llm:
-    url: "http://localai.example.com/v1"
-    model: "mistral-7b-instruct-v0.3"
+    url: 'http://localai.example.com/v1'
+    model: 'mistral-7b-instruct-v0.3'
     # apiKey: ""  # set via --set ai.llm.apiKey=<key>
 
   agentConfig:
-    bootstrapClientId: "ai-bootstrap"
-    bootstrapClientSecret: "change-me"
+    bootstrapClientId: 'ai-bootstrap'
+    bootstrapClientSecret: 'change-me'
 
   temporal:
     db:
-      password: "change-me-temporal-db"
+      password: 'change-me-temporal-db'
 ```
 
 When `ai.enabled=true`, the chart also deploys:
+
 - **temporal-db** — PostgreSQL 15 for Temporal persistence
 - **temporal** — Temporal server (`temporalio/auto-setup:1.24.2`)
 - **temporal-ui** — Temporal web UI
