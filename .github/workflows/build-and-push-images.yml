@@ -81,3 +81,33 @@ jobs:
             org.opencontainers.image.title=${{ matrix.service.image }}
           cache-from: type=gha,scope=${{ matrix.service.id }}
           cache-to: type=gha,scope=${{ matrix.service.id }},mode=max
+
+      # Ensures the package stays public after every push.
+      # Requires PACKAGES_TOKEN secret (PAT with write:packages scope).
+      # Skipped silently when the secret is absent (e.g. on mf2 remote).
+      - name: Make package public
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ secrets.PACKAGES_TOKEN }}
+        run: |
+          if [[ -z "${GH_TOKEN}" ]]; then
+            echo "PACKAGES_TOKEN not set – skipping."
+            exit 0
+          fi
+
+          OWNER="${GITHUB_REPOSITORY_OWNER,,}"
+          PKG="${{ matrix.service.image }}"
+
+          http_code=$(curl -s -o /tmp/api_resp.json -w "%{http_code}" \
+            -X PATCH \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/orgs/${OWNER}/packages/container/${PKG}" \
+            -d '{"visibility":"public"}')
+
+          if [[ "${http_code}" == "200" ]]; then
+            echo "✓ ghcr.io/${OWNER}/${PKG} is public"
+          else
+            echo "✗ Failed (HTTP ${http_code}):" && cat /tmp/api_resp.json && exit 1
+          fi
