@@ -85,30 +85,53 @@ jobs:
       # GITHUB_TOKEN cannot change package visibility – a PAT is required.
       # Create a PAT (classic) with the `write:packages` scope and store it
       # as a repository secret named PACKAGES_TOKEN.
-      # Without this secret the step is skipped and packages remain private.
+      # Without this secret the step exits early as a no-op.
       - name: Make package public
-        if: >
-          github.event_name == 'push' &&
-          github.ref == 'refs/heads/main' &&
-          env.HAS_PACKAGES_TOKEN == 'true'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ secrets.PACKAGES_TOKEN }}
-          HAS_PACKAGES_TOKEN: ${{ secrets.PACKAGES_TOKEN != '' }}
         run: |
+          # Exit early when the secret is not configured (e.g. on mf2 remote)
+          if [[ -z "${GH_TOKEN}" ]]; then
+            echo "PACKAGES_TOKEN not configured – skipping visibility update."
+            exit 0
+          fi
+
           OWNER="${GITHUB_REPOSITORY_OWNER,,}"
-          REPO_LC="${GITHUB_REPOSITORY#*/}"
-          REPO_LC="${REPO_LC,,}"
-          # Package name inside the owner namespace: <repo>/<image>
-          PKG="${REPO_LC}/${{ matrix.service.image }}"
-          # URL-encode the slash
-          PKG_ENCODED="${PKG/\//%2F}"
+          REPO="${GITHUB_REPOSITORY#*/}"
+          REPO="${REPO,,}"
+          PKG="${REPO}/${{ matrix.service.image }}"
+          # Encode the slash so it is not treated as a URL path separator
+          PKG_ENCODED="${PKG//\//%2F}"
 
           echo "Setting ghcr.io/${OWNER}/${PKG} visibility to public …"
 
-          # Try as org package first; fall back to user package
-          gh api --method PATCH \
-            "/orgs/${OWNER}/packages/container/${PKG_ENCODED}" \
-            -f visibility=public \
-          || gh api --method PATCH \
-            "/user/packages/container/${PKG_ENCODED}" \
-            -f visibility=public
+          # Use curl instead of gh api – gh api re-parses %2F as a path separator
+          # which produces an invalid endpoint and a 404 response.
+          http_code=$(curl -s -o /tmp/api_resp.json -w "%{http_code}" \
+            -X PATCH \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/orgs/${OWNER}/packages/container/${PKG_ENCODED}" \
+            -d '{"visibility":"public"}')
+
+          if [[ "${http_code}" == "200" ]]; then
+            echo "✓ Package is now public (org namespace)"
+          else
+            # Fallback: personal/user namespace
+            http_code=$(curl -s -o /tmp/api_resp.json -w "%{http_code}" \
+              -X PATCH \
+              -H "Authorization: Bearer ${GH_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "https://api.github.com/user/packages/container/${PKG_ENCODED}" \
+              -d '{"visibility":"public"}')
+            if [[ "${http_code}" == "200" ]]; then
+              echo "✓ Package is now public (user namespace)"
+            else
+              echo "✗ Failed to set visibility (HTTP ${http_code}):"
+              cat /tmp/api_resp.json
+              exit 1
+            fi
+          fi
