@@ -82,21 +82,22 @@ jobs:
           cache-from: type=gha,scope=${{ matrix.service.id }}
           cache-to: type=gha,scope=${{ matrix.service.id }},mode=max
 
-      # Ensures the package stays public after every push.
-      # Requires PACKAGES_TOKEN secret (PAT with write:packages scope).
-      # Skipped silently when the secret is absent (e.g. on mf2 remote).
+      # Try to keep package visibility public on each main push.
+      # Requires PACKAGES_TOKEN (PAT with write:packages and SSO authorized).
       - name: Make package public
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ secrets.PACKAGES_TOKEN }}
         run: |
           if [[ -z "${GH_TOKEN}" ]]; then
-            echo "PACKAGES_TOKEN not set – skipping."
+            echo "PACKAGES_TOKEN not set - skipping."
             exit 0
           fi
 
           OWNER="${GITHUB_REPOSITORY_OWNER,,}"
           PKG="${{ matrix.service.image }}"
+
+          echo "Setting ghcr.io/${OWNER}/${PKG} visibility to public ..."
 
           http_code=$(curl -s -o /tmp/api_resp.json -w "%{http_code}" \
             -X PATCH \
@@ -107,7 +108,16 @@ jobs:
             -d '{"visibility":"public"}')
 
           if [[ "${http_code}" == "200" ]]; then
-            echo "✓ ghcr.io/${OWNER}/${PKG} is public"
-          else
-            echo "✗ Failed (HTTP ${http_code}):" && cat /tmp/api_resp.json && exit 1
+            echo "Package visibility set to public."
+            exit 0
           fi
+
+          if [[ "${http_code}" == "403" || "${http_code}" == "404" ]]; then
+            echo "Skipping visibility change (HTTP ${http_code})."
+            cat /tmp/api_resp.json
+            exit 0
+          fi
+
+          echo "Failed to set package visibility (HTTP ${http_code}):"
+          cat /tmp/api_resp.json
+          exit 1
