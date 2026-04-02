@@ -62,13 +62,13 @@ spec:
                   key: {{ default "adminPassword" .Values.keycloak.admin.existingSecretPasswordKey }}
           livenessProbe:
             httpGet:
-              path: /api/health
+              path: /
               port: {{ $cl.port }}
             initialDelaySeconds: 30
             periodSeconds: 30
           readinessProbe:
             httpGet:
-              path: /api/health
+              path: /
               port: {{ $cl.port }}
             initialDelaySeconds: 15
             periodSeconds: 10

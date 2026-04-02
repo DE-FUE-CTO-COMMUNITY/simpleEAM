@@ -148,7 +148,9 @@ spec:
           imagePullPolicy: {{ $kc.image.pullPolicy }}
           args:
             - start
+          {{- if $kc.importRealm }}
             - --import-realm
+          {{- end }}
           ports:
             - containerPort: 8080
               name: http
@@ -207,14 +209,18 @@ spec:
             timeoutSeconds: 5
           resources: {{- toYaml $kc.resources | nindent 12 }}
           {{- if $kc.importRealm }}
+          {{- if $kc.importRealm }}
           volumeMounts:
             - name: realm-import
               mountPath: /opt/keycloak/data/import
               readOnly: true
           {{- end }}
+          {{- end }}
+      {{- if $kc.importRealm }}
       {{- if $kc.importRealm }}
       volumes:
         - name: realm-import
           configMap:
             name: {{ $fullName }}-realm-import
+      {{- end }}
       {{- end }}
