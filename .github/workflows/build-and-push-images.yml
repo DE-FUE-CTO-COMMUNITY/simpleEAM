@@ -81,3 +81,34 @@ jobs:
             org.opencontainers.image.title=${{ matrix.service.image }}
           cache-from: type=gha,scope=${{ matrix.service.id }}
           cache-to: type=gha,scope=${{ matrix.service.id }},mode=max
+
+      # GITHUB_TOKEN cannot change package visibility – a PAT is required.
+      # Create a PAT (classic) with the `write:packages` scope and store it
+      # as a repository secret named PACKAGES_TOKEN.
+      # Without this secret the step is skipped and packages remain private.
+      - name: Make package public
+        if: >
+          github.event_name == 'push' &&
+          github.ref == 'refs/heads/main' &&
+          env.HAS_PACKAGES_TOKEN == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.PACKAGES_TOKEN }}
+          HAS_PACKAGES_TOKEN: ${{ secrets.PACKAGES_TOKEN != '' }}
+        run: |
+          OWNER="${GITHUB_REPOSITORY_OWNER,,}"
+          REPO_LC="${GITHUB_REPOSITORY#*/}"
+          REPO_LC="${REPO_LC,,}"
+          # Package name inside the owner namespace: <repo>/<image>
+          PKG="${REPO_LC}/${{ matrix.service.image }}"
+          # URL-encode the slash
+          PKG_ENCODED="${PKG/\//%2F}"
+
+          echo "Setting ghcr.io/${OWNER}/${PKG} visibility to public …"
+
+          # Try as org package first; fall back to user package
+          gh api --method PATCH \
+            "/orgs/${OWNER}/packages/container/${PKG_ENCODED}" \
+            -f visibility=public \
+          || gh api --method PATCH \
+            "/user/packages/container/${PKG_ENCODED}" \
+            -f visibility=public
