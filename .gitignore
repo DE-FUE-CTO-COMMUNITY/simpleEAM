@@ -81,7 +81,8 @@ tmp/
 temp/
 
 # Helm customer/prod overrides (local only)
-k8s/values.auravio-prod.yaml
+k8s/assets/*
+k8s/values.*.yaml
 
 # Typoskript
 *.tsbuildinfo
