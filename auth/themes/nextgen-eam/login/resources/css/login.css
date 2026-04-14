@@ -733,6 +733,7 @@ body#keycloak-bg {
 
 #kc-header-wrapper {
   padding: 0;
+  margin-bottom: 16px;
   font-size: 0;
   line-height: 1;
   letter-spacing: 0;
