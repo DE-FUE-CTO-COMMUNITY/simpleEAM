@@ -82,6 +82,8 @@ export function createApolloClient(initialToken?: string, graphqlUrl?: string) {
         errorPolicy: 'all',
       },
     },
-    connectToDevTools: process.env.NODE_ENV === 'development',
+    devtools: {
+      enabled: process.env.NODE_ENV === 'development',
+    },
   })
 }

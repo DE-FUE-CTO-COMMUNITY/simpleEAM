@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Box, Toolbar, styled } from '@mui/material'
+import { Alert, Box, Button, Stack, Toolbar, Typography, styled } from '@mui/material'
 import {
   Dashboard as DashboardIcon,
   Person as PersonIcon,
@@ -43,7 +43,7 @@ import {
 } from '@/components/icons'
 import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { useAuth, isAdmin, isArchitect } from '@/lib/auth'
+import { login, useAuth, isAdmin, isArchitect } from '@/lib/auth'
 import { useLensSelection, type LensKey } from '@/lib/lens-settings'
 import { useFeatureFlags } from '@/lib/feature-flags'
 import { useCompanyContext } from '@/contexts/CompanyContext'
@@ -108,9 +108,31 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
   }
 
   // If Keycloak is initialized but user is not authenticated,
-  // wird eine leere Seite angezeigt, um Flash of Content zu vermeiden
+  // zeige eine explizite Meldung statt einer leeren Seite
   if (initialized && !authenticated) {
-    return <Box sx={{ display: 'flex', minHeight: '100vh' }} />
+    return (
+      <Box
+        sx={{
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          px: 3,
+        }}
+      >
+        <Stack spacing={2} sx={{ maxWidth: 560 }}>
+          <Typography variant="h4">Authentication required</Typography>
+          <Alert severity="warning">
+            The application is initialized, but no authenticated Keycloak session is available.
+          </Alert>
+          <Box>
+            <Button variant="contained" onClick={login}>
+              Retry sign-in
+            </Button>
+          </Box>
+        </Stack>
+      </Box>
+    )
   }
 
   const userName = (authenticated && keycloak?.tokenParsed?.preferred_username) || 'Benutzer'

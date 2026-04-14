@@ -35,34 +35,47 @@ export const useAutoUserRegistration = () => {
         setIsCreatingUser(false)
         processingRef.current = false
       }
-    } else {
+    } else if (initialized && authenticated) {
       console.error(
         '❌ Auto-Registration: Keine E-Mail im Token gefunden oder nicht authentifiziert'
       )
     }
-  }, [authenticated, keycloak])
+  }, [authenticated, initialized, keycloak])
 
   // GraphQL query to check, ob der Benutzer bereits existiert
-  const { data: existingUser, loading: checkingUser } = useQuery(GET_PERSON_BY_EMAIL, {
+  const {
+    data: existingUser,
+    loading: checkingUser,
+    error: existingUserError,
+  } = useQuery(GET_PERSON_BY_EMAIL, {
     variables: { email: userEmail || '' },
     skip: !userEmail || !authenticated || isCreatingUser || registrationAttempted.current,
-    onCompleted: data => {
-      // If user already exists, mark as checked
-      if (data?.people && data.people.length > 0) {
-        setRegistrationChecked(true)
-        registrationAttempted.current = true
-        // No sessionStorage for existing users - this blocks new checks
-      } else {
-        setRegistrationChecked(true) // Also set to true here so the effect triggers
-      }
-    },
-    onError: error => {
-      console.error('❌ Fehler beim Überprüfen des Benutzers:', error)
-      setRegistrationChecked(true) // Mark as checked, even on error
-      registrationAttempted.current = true
-      // No sessionStorage on errors - this blocks retry attempts
-    },
   })
+
+  useEffect(() => {
+    if (!userEmail || isCreatingUser || registrationAttempted.current || checkingUser) {
+      return
+    }
+
+    if (existingUserError) {
+      console.error('❌ Fehler beim Überprüfen des Benutzers:', existingUserError)
+      setRegistrationChecked(true)
+      registrationAttempted.current = true
+      return
+    }
+
+    if (!existingUser) {
+      return
+    }
+
+    if (existingUser.people && existingUser.people.length > 0) {
+      setRegistrationChecked(true)
+      registrationAttempted.current = true
+      return
+    }
+
+    setRegistrationChecked(true)
+  }, [checkingUser, existingUser, existingUserError, isCreatingUser, userEmail])
 
   // Mutation to create a new user
   const [createPerson] = useMutation(CREATE_PERSON, {

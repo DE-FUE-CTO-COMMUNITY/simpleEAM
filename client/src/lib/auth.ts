@@ -1,6 +1,21 @@
 import Keycloak from 'keycloak-js'
 import { createContext, useContext } from 'react'
 
+export const SECURE_CONTEXT_ERROR =
+  'Keycloak JS 26 requires a secure browser context. Use HTTPS or localhost for the client app.'
+
+export const getClientAuthError = (): string | null => {
+  if (typeof window === 'undefined') {
+    return null
+  }
+
+  if (!window.isSecureContext) {
+    return `${SECURE_CONTEXT_ERROR} Current origin: ${window.location.origin}`
+  }
+
+  return null
+}
+
 /**
  * LocalStorage key for login status
  */
@@ -100,6 +115,12 @@ export const initKeycloak = async () => {
     return Promise.resolve(false)
   }
 
+  const clientAuthError = getClientAuthError()
+  if (clientAuthError) {
+    console.error(clientAuthError)
+    return Promise.resolve(false)
+  }
+
   // If promise already exists, return it
   if (keycloakInitPromise) {
     return keycloakInitPromise
@@ -170,6 +191,16 @@ export const initKeycloak = async () => {
 const setupTokenRefresh = () => {
   if (!keycloak) return
 
+  const redirectToLogin = (redirectUri?: string) => {
+    if (!keycloak) {
+      return
+    }
+
+    void keycloak.login(redirectUri ? { redirectUri } : undefined).catch(error => {
+      console.error('Login redirect failed:', error)
+    })
+  }
+
   // Token-Refresh bei Ablauf
   keycloak.onTokenExpired = () => {
     if (!keycloak) return
@@ -188,9 +219,7 @@ const setupTokenRefresh = () => {
       })
       .catch(() => {
         console.error('Token-Refresh fehlgeschlagen, Benutzer wird abgemeldet')
-        if (keycloak) {
-          keycloak.login()
-        }
+        redirectToLogin()
       })
   }
 
@@ -230,16 +259,12 @@ const setupTokenRefresh = () => {
               })
             )
           } else {
-            if (keycloak) {
-              keycloak.login()
-            }
+            redirectToLogin()
           }
         })
         .catch(() => {
           console.error('Token-Refresh nach Auth-Fehler fehlgeschlagen, leite zu Login weiter')
-          if (keycloak) {
-            keycloak.login()
-          }
+          redirectToLogin()
         })
     }
   }
@@ -338,7 +363,9 @@ export const logout = () => {
   if (typeof window !== 'undefined' && keycloak) {
     // Clean up login status on logout
     clearLoginStatus()
-    keycloak.logout()
+    void keycloak.logout().catch(error => {
+      console.error('Logout failed:', error)
+    })
   }
 }
 
@@ -347,6 +374,12 @@ export const logout = () => {
  */
 export const login = () => {
   if (typeof window !== 'undefined' && keycloak) {
+    const clientAuthError = getClientAuthError()
+    if (clientAuthError) {
+      console.error(clientAuthError)
+      return
+    }
+
     // DO NOT set flag here - that happens only after successful login
 
     // Determine dashboard URL based on current language
@@ -355,9 +388,13 @@ export const login = () => {
     const lang = langMatch ? langMatch[1] : 'de'
     const dashboardUrl = `${window.location.origin}/${lang}`
 
-    keycloak.login({
-      redirectUri: dashboardUrl,
-    })
+    void keycloak
+      .login({
+        redirectUri: dashboardUrl,
+      })
+      .catch(error => {
+        console.error('Login redirect failed:', error)
+      })
   }
 }
 

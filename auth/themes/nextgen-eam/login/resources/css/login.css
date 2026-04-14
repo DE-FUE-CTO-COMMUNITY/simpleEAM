@@ -546,6 +546,7 @@ ul#kc-totp-supported-apps {
   padding: 0 20px;
   max-width: 500px;
   background: rgba(255, 255, 255, 1);
+  border-radius: 0;
 }
 
 @media (min-width: 768px) {
@@ -668,3 +669,200 @@ ul#kc-totp-supported-apps {
   margin-bottom: 16px;
 }
 /* End Recovery codes */
+
+/* Keycloak 26 layout alignment */
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body#keycloak-bg {
+  --kc-brand-panel-width: 34rem;
+  --kc-page-padding: clamp(1rem, 2vw, 2rem);
+  background: #00bbd4;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+.pf-v5-c-login {
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  padding: 0 !important;
+  padding-block-start: 0 !important;
+  padding-block-end: 0 !important;
+}
+
+.pf-v5-c-login__container {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  width: calc(100% - var(--kc-brand-panel-width));
+  margin-left: var(--kc-brand-panel-width);
+  padding: var(--kc-page-padding) !important;
+  padding-inline-start: var(--kc-page-padding) !important;
+  padding-inline-end: var(--kc-page-padding) !important;
+  box-sizing: border-box;
+  grid-template-areas: unset !important;
+  grid-template-columns: unset !important;
+  max-width: unset !important;
+}
+
+#kc-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: var(--kc-brand-panel-width);
+  height: 100vh;
+  margin: 0 !important;
+  margin-block-start: 0 !important;
+  padding: 3rem 3.5rem;
+  box-sizing: border-box;
+  background: #fff;
+  color: #111;
+  text-align: left;
+}
+
+#kc-header-wrapper {
+  padding: 0;
+  font-size: 0;
+  line-height: 1;
+  letter-spacing: 0;
+  color: inherit !important;
+  white-space: normal;
+}
+
+.kc-client-name {
+  margin-top: 2rem;
+  color: #111;
+  font-family: 'Raleway', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1.35;
+  text-align: left;
+  text-transform: none;
+}
+
+.pf-v5-c-login__main {
+  align-self: center !important;
+  width: min(100%, 34rem);
+  margin: 0;
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 0;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.22);
+}
+
+.card-pf {
+  position: static;
+  top: auto;
+  left: auto;
+  margin: 0;
+  width: 100%;
+  max-width: 34rem;
+}
+
+.pf-v5-c-login__main-header,
+.pf-v5-c-login__main-body,
+.pf-v5-c-login__main-footer,
+.pf-v5-c-login__main-footer-band {
+  background: transparent;
+}
+
+.pf-v5-c-login__main-header {
+  padding-bottom: 1rem;
+}
+
+.pf-v5-c-login__main-body {
+  padding-top: 0;
+}
+
+.pf-v5-c-login__main-footer {
+  padding-top: 0;
+}
+
+#kc-registration-container,
+#kc-social-providers {
+  margin-top: 1rem;
+}
+
+@media (min-width: 768px) {
+  .pf-v5-c-login__main {
+    background: rgba(255, 255, 255, 0.9);
+  }
+}
+
+@media (max-width: 1023px) {
+  .pf-v5-c-login {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+
+  .pf-v5-c-login__container {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    min-height: auto;
+    width: 100%;
+    margin-left: 0;
+    padding: 0;
+  }
+
+  #kc-header {
+    position: static;
+    width: 100%;
+    height: auto;
+    padding: 0;
+    background: transparent;
+    color: #fff;
+    text-align: center;
+  }
+
+  #kc-header-wrapper {
+    padding: 0 0 1.5rem;
+  }
+
+  .kc-client-name {
+    margin-top: 0.5rem;
+    color: #fff;
+    font-size: 1.125rem;
+    text-align: center;
+  }
+
+  .pf-v5-c-login__main {
+    width: min(100%, 34rem);
+  }
+}
+
+@media (max-width: 767px) {
+  .pf-v5-c-login__container {
+    width: 100%;
+  }
+
+  .pf-v5-c-login__main {
+    box-shadow: none;
+  }
+
+  #kc-header-wrapper {
+    padding-bottom: 1rem;
+    font-size: 23px;
+    letter-spacing: 2px;
+  }
+
+  div.kc-logo-text {
+    width: 210px;
+    height: 68px;
+    background-size: contain;
+  }
+}

@@ -39,16 +39,16 @@ const CompanyContext = createContext<CompanyContextValue | undefined>(undefined)
 const STORAGE_KEY = 'selectedCompanyId:v1'
 
 export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { keycloak, initialized } = useAuth()
-  const admin = isAdmin()
+  const { keycloak, initialized, authenticated } = useAuth()
+  const admin = authenticated ? isAdmin() : false
   const email = (keycloak?.tokenParsed as any)?.email as string | undefined
 
   // Admin: load all companies; Non-admin: load companies of own person (via email)
   const { data: allCompaniesData, loading: loadingAll } = useQuery(GET_COMPANIES, {
-    skip: !admin,
+    skip: !authenticated || !admin,
   })
   const { data: meData, loading: loadingMe } = useQuery(GET_PERSON_BY_EMAIL, {
-    skip: admin || !initialized || !email,
+    skip: !authenticated || admin || !initialized || !email,
     variables: { email: email ?? '' },
     fetchPolicy: 'cache-and-network',
   })
@@ -60,7 +60,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return myCompanies
   }, [admin, allCompaniesData?.companies, meData?.people])
 
-  const loading = admin ? loadingAll : loadingMe
+  const loading = !initialized || !authenticated ? true : admin ? loadingAll : loadingMe
 
   const [selectedCompanyId, setSelectedCompanyIdState] = useState<string | null>(null)
   const [isInitialized, setIsInitialized] = useState(false)
@@ -119,6 +119,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   useEffect(() => {
     // Wait until localStorage is initialized and companies are loaded
     if (!isInitialized) return
+    if (!initialized || !authenticated) return
 
     // If companies are still loading, wait (important for race condition)
     if (loading) {
@@ -174,7 +175,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
         if (typeof window !== 'undefined') localStorage.setItem(STORAGE_KEY, first)
       }
     }
-  }, [companies, selectedCompanyId, isInitialized, loading])
+  }, [authenticated, companies, initialized, selectedCompanyId, isInitialized, loading])
 
   const setSelectedCompanyId = (id: string) => {
     setSelectedCompanyIdState(id)

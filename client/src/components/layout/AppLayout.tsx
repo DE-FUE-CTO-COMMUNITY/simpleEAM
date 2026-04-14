@@ -7,14 +7,14 @@ import { useServerInsertedHTML } from 'next/navigation'
 import createCache from '@emotion/cache'
 import { ApolloProvider } from '@apollo/client'
 import { SnackbarProvider } from 'notistack'
-import { AuthContext, initKeycloak, keycloak } from '@/lib/auth'
+import { AuthContext, getClientAuthError, initKeycloak, keycloak } from '@/lib/auth'
 import { setupSessionMonitoring } from '@/utils/sessionUtils'
 import { createApolloClient } from '@/lib/apollo-client'
 import { useAutoUserRegistration } from '@/hooks/useAutoUserRegistration'
 import { useGraphQLConfig } from '@/lib/runtime-config'
 import ThemeProvider from '@/contexts/ThemeContext'
 import { DebugProvider } from '@/contexts/DebugContext'
-import { CircularProgress, Box } from '@mui/material'
+import { Alert, Box, Button, CircularProgress, Stack, Typography } from '@mui/material'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import RootLayout from '@/components/layout/RootLayout'
@@ -106,6 +106,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [authenticated, setAuthenticated] = useState(false)
   const [client, setClient] = useState<ApolloClient<NormalizedCacheObject> | null>(null)
   const [configLoaded, setConfigLoaded] = useState(false)
+  const [authError, setAuthError] = useState<string | null>(null)
 
   // Get GraphQL URL from runtime config
   const graphqlConfig = useGraphQLConfig()
@@ -129,9 +130,22 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
     const initializeApp = async () => {
       try {
+        setAuthError(null)
+
+        const clientAuthError = getClientAuthError()
+        if (clientAuthError) {
+          setAuthError(clientAuthError)
+          return
+        }
+
         // Keycloak Initialisierung zuerst
         const isAuthenticated = await initKeycloak()
         setAuthenticated(isAuthenticated)
+
+        if (!isAuthenticated) {
+          setClient(createApolloClient(undefined, graphqlConfig.url))
+          return
+        }
 
         // Session Monitoring
         setupSessionMonitoring()
@@ -161,6 +175,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         }
       } catch (error) {
         console.warn('Authentication initialization failed:', error)
+        setAuthError(
+          error instanceof Error ? error.message : 'Authentication initialization failed.'
+        )
       } finally {
         setInitialized(true)
       }
@@ -208,6 +225,41 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     )
   }
 
+  if (authError) {
+    return (
+      <CacheProvider value={cache}>
+        <CssBaseline />
+        <Box
+          sx={{
+            minHeight: '100vh',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            px: 3,
+            bgcolor: 'background.default',
+          }}
+        >
+          <Stack spacing={2} sx={{ maxWidth: 720, width: '100%' }}>
+            <Typography variant="h4">Authentication unavailable</Typography>
+            <Alert severity="error">{authError}</Alert>
+            <Typography color="text.secondary">
+              This client now uses Keycloak JS 26. The browser will block authentication on insecure
+              origins like `http://dev-server.mf2.eu:3000`.
+            </Typography>
+            <Typography color="text.secondary">
+              Open the client on `localhost` or serve it over HTTPS, then retry.
+            </Typography>
+            <Box>
+              <Button variant="outlined" onClick={() => window.location.reload()}>
+                Retry
+              </Button>
+            </Box>
+          </Stack>
+        </Box>
+      </CacheProvider>
+    )
+  }
+
   // Wait for Apollo Client initialization before rendering components
   if (!client) {
     return (
@@ -250,7 +302,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     autoHideDuration={5000}
                     className="custom-snackbar-provider"
                   >
-                    <AutoUserRegistration />
+                    {authenticated && <AutoUserRegistration />}
                     <Box
                       sx={{
                         width: '100%',

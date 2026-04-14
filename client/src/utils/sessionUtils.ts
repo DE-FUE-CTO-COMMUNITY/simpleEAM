@@ -127,7 +127,9 @@ export const setupSessionMonitoring = () => {
   window.addEventListener('storage', event => {
     if (event.key === 'kc-logout' && event.newValue) {
       if (keycloak) {
-        keycloak.logout()
+        void keycloak.logout().catch(error => {
+          console.error('Cross-tab logout failed:', error)
+        })
       }
     }
   })
