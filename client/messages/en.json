@@ -692,6 +692,7 @@
     "profile": "Profile",
     "language": "Language",
     "logout": "Logout",
+    "createPasskey": "Create Passkey",
     "administration": "Administration"
   },
   "language": {

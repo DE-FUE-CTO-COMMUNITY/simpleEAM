@@ -695,6 +695,7 @@
     "profile": "Profil",
     "language": "Sprache",
     "logout": "Abmelden",
+    "createPasskey": "Passkey erstellen",
     "administration": "Administration"
   },
   "language": {

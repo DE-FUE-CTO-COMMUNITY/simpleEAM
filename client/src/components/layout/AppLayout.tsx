@@ -180,6 +180,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         )
       } finally {
         setInitialized(true)
+        // After Keycloak's script-triggered redirect (window.location.href),
+        // Chrome may leave focus on an extension overlay (e.g. Bitwarden autofill
+        // notification) that captures pointer events over the page. Explicitly
+        // returning focus to the window releases any such capture.
+        window.focus()
       }
     }
 
@@ -317,11 +322,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                             justifyContent: 'center',
                             alignItems: 'center',
                             position: 'absolute',
-                            top: 0,
+                            // Start below the AppBar so the header stays interactive
+                            // (AppBar height: 56px mobile / 64px desktop)
+                            top: { xs: 56, sm: 64 },
                             left: 0,
                             width: '100%',
-                            height: '100%',
-                            zIndex: 9999,
+                            height: { xs: 'calc(100% - 56px)', sm: 'calc(100% - 64px)' },
+                            // Keep z-index below AppBar so it never blocks the header
+                            zIndex: theme => theme.zIndex.appBar - 1,
                             bgcolor: 'background.default',
                           }}
                         >
@@ -329,16 +337,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                         </Box>
                       )}
 
-                      <Box
-                        sx={{
-                          width: '100%',
-                          height: '100%',
-                          opacity: initialized ? 1 : 0.3,
-                          transition: 'opacity 0.3s ease-in-out',
-                        }}
-                      >
-                        <RootLayout>{children}</RootLayout>
-                      </Box>
+                      <RootLayout>{children}</RootLayout>
                     </Box>
                   </SnackbarProvider>
                 </LocalizationProvider>

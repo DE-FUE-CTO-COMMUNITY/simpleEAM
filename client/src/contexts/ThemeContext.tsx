@@ -83,26 +83,10 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     setMode(newMode)
   }
 
-  // Avoid hydration errors through delayed rendering
-  if (!mounted) {
-    // During server-side rendering or before client hydration
-    // use a default theme
-    return (
-      <ThemeContext.Provider
-        value={{
-          mode: 'light',
-          theme: createDynamicTheme('light', brandingOverrides, themeConfig),
-          toggleTheme: () => {},
-          setThemeMode: () => {},
-        }}
-      >
-        <MuiThemeProvider theme={createDynamicTheme('light', brandingOverrides, themeConfig)}>
-          {children}
-        </MuiThemeProvider>
-      </ThemeContext.Provider>
-    )
-  }
-
+  // Always render with real functions so theme toggle and setThemeMode are
+  // immediately responsive. The initial mode='light' matches the server render
+  // (no hydration mismatch). localStorage is read in the useEffect above and
+  // will update the mode after mount if the user has a saved preference.
   return (
     <ThemeContext.Provider
       value={{

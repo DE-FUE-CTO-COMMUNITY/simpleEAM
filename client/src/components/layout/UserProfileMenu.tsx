@@ -15,6 +15,7 @@ import {
   Person as PersonIcon,
   Logout as LogoutIcon,
   Language as LanguageIcon,
+  Fingerprint as FingerprintIcon,
 } from '@mui/icons-material'
 import { useLocale, useTranslations } from 'next-intl'
 import { logout, useAuth } from '@/lib/auth'
@@ -39,6 +40,7 @@ const UserProfileMenu: React.FC<UserProfileMenuProps> = ({ userName }) => {
   const [languageSwitcherAnchorEl, setLanguageSwitcherAnchorEl] = useState<null | HTMLElement>(null)
   const [userEmail, setUserEmail] = useState<string | null>(null)
   const [keycloak, setKeycloak] = useState<any>(null)
+  const [hasPasskey, setHasPasskey] = useState<boolean | null>(null)
 
   // Initialize Keycloak and extract email
   useEffect(() => {
@@ -52,6 +54,24 @@ const UserProfileMenu: React.FC<UserProfileMenuProps> = ({ userName }) => {
       })
     }
   }, [authenticated])
+
+  // Check if user already has a passkey
+  useEffect(() => {
+    if (!authenticated || !keycloak?.token) return
+
+    fetch('/api/auth/passkeys', {
+      headers: { Authorization: `Bearer ${keycloak.token}` },
+    })
+      .then(res => (res.ok ? res.json() : null))
+      .then(data => {
+        if (data !== null) {
+          setHasPasskey(data.hasPasskey as boolean)
+        }
+      })
+      .catch(() => {
+        // Silently ignore – passkey check is best-effort
+      })
+  }, [authenticated, keycloak])
 
   // GraphQL query for Person data based on email
   const { data } = useQuery(GET_PERSON_BY_EMAIL, {
@@ -95,6 +115,13 @@ const UserProfileMenu: React.FC<UserProfileMenuProps> = ({ userName }) => {
     logout()
   }
 
+  const handleCreatePasskey = () => {
+    handleProfileMenuClose()
+    if (keycloak) {
+      keycloak.login({ action: 'webauthn-register-passwordless' })
+    }
+  }
+
   const avatarUrl = data?.people?.[0]?.avatarUrl
 
   return (
@@ -123,7 +150,6 @@ const UserProfileMenu: React.FC<UserProfileMenuProps> = ({ userName }) => {
           vertical: 'top',
           horizontal: 'right',
         }}
-        keepMounted
         transformOrigin={{
           vertical: 'top',
           horizontal: 'right',
@@ -147,6 +173,14 @@ const UserProfileMenu: React.FC<UserProfileMenuProps> = ({ userName }) => {
             {t('language')} ({locale.toUpperCase()})
           </ListItemText>
         </MenuItem>
+        {hasPasskey === false && (
+          <MenuItem onClick={handleCreatePasskey}>
+            <ListItemIcon>
+              <FingerprintIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>{t('createPasskey')}</ListItemText>
+          </MenuItem>
+        )}
         <MenuItem onClick={handleLogout}>
           <ListItemIcon>
             <LogoutIcon fontSize="small" />
