@@ -7,6 +7,7 @@ import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core'
 import http from 'http'
 
 // Import custom modules
+import analyticsRouter from './analytics/routes'
 import { testConnection, closeDriver } from './db/neo4j-client'
 import { neoSchema } from './graphql/schema'
 
@@ -102,6 +103,7 @@ async function startServer() {
   // Increase body parser limits for large diagram payloads
   app.use(express.json({ limit: '50mb' }))
   app.use(express.urlencoded({ limit: '50mb', extended: true }))
+  app.use('/analytics', analyticsRouter)
 
   // Create GraphQL schema
   const schema = await neoSchema.getSchema()

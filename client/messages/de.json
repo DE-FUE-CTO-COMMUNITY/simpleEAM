@@ -85,6 +85,7 @@
   "navigation": {
     "dashboard": "Dashboard",
     "agenticArchitect": "Agentischer Architekt",
+    "analytics": "Analytics",
     "diagramEditor": "Diagram-Editor",
     "aiSupport": "AI Support",
     "matrixEditor": "Matrix-Editor",
@@ -2194,6 +2195,62 @@
       "filterTooltip": "Personenfilter hinzufügen",
       "editFilterTooltip": "Personenfilter bearbeiten",
       "resetFilterTooltip": "Personenfilter zurücksetzen"
+    }
+  },
+  "analytics": {
+    "title": "Analytics Workspace",
+    "subtitle": "Entwerfen Sie wiederverwendbare Reports auf Basis der Analytics-Pipeline von Neo4j über ClickHouse bis Cube.",
+    "builderTitle": "Report Builder",
+    "previewTitle": "Chart-Vorschau",
+    "savedReportsTitle": "Gespeicherte Reports",
+    "emptySavedReports": "Noch keine gespeicherten Reports.",
+    "emptySavedReportsHint": "Erstellen Sie eine Report-Definition und speichern Sie sie für das ausgewählte Unternehmen.",
+    "companyScope": "Unternehmenskontext",
+    "globalScope": "Globaler Workspace",
+    "reportName": "Report-Name",
+    "chartType": "Chart-Typ",
+    "dimension": "Dimension",
+    "measure": "Kennzahl",
+    "saveReport": "Report speichern",
+    "updateReport": "Report aktualisieren",
+    "newReport": "Neuer Entwurf",
+    "loadReport": "Laden",
+    "deleteReport": "Löschen",
+    "pipelineTitle": "Analytics-Pipeline",
+    "pipelineSource": "Neo4j-Quelle",
+    "pipelineProjection": "ClickHouse-Projektion",
+    "pipelineSemantic": "Cube Semantic API",
+    "pipelineUi": "Recharts-Workspace",
+    "apiEndpoint": "Cube-API-Endpunkt",
+    "connectionReady": "Konfiguriert",
+    "connectionMissing": "Nicht konfiguriert",
+    "liveDataHint": "Die Vorschau wird jetzt über das authentifizierte Analytics-Backend aus Cube geladen. Führen Sie nach Modelländerungen eine Projektion-Synchronisierung aus.",
+    "syncProjection": "Projektionen synchronisieren",
+    "syncRequiresCompany": "Wählen Sie ein Unternehmen aus, um eine unternehmensbezogene Projektion zu synchronisieren.",
+    "syncSuccess": "Die Projektion wurde synchronisiert. {applications} Applikationen und {capabilities} Capabilities wurden aktualisiert.",
+    "syncError": "Die Projektion-Synchronisierung ist fehlgeschlagen.",
+    "reportSaved": "Report gespeichert.",
+    "reportUpdated": "Report aktualisiert.",
+    "reportDeleted": "Report gelöscht.",
+    "saveError": "Der Report konnte nicht gespeichert werden.",
+    "deleteError": "Der Report konnte nicht gelöscht werden.",
+    "loadReportsError": "Gespeicherte Reports konnten nicht geladen werden.",
+    "loadPreviewError": "Die Analytics-Vorschau konnte nicht geladen werden.",
+    "emptyPreview": "Für den aktuellen Kontext sind noch keine Analytics-Daten verfügbar.",
+    "types": {
+      "bar": "Balken",
+      "line": "Linie",
+      "pie": "Kreis"
+    },
+    "dimensions": {
+      "status": "Lifecycle-Status",
+      "criticality": "Kritikalität",
+      "vendor": "Anbieter",
+      "month": "Aktualisierungsmonat"
+    },
+    "measures": {
+      "applicationCount": "Anzahl Applikationen",
+      "monthlyCost": "Monatliche Kosten"
     }
   },
   "importExport": {

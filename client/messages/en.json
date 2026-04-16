@@ -79,6 +79,7 @@
   "navigation": {
     "dashboard": "Dashboard",
     "agenticArchitect": "Agentic Architect",
+    "analytics": "Analytics",
     "diagramEditor": "Diagram Editor",
     "aiSupport": "AI Support",
     "matrixEditor": "Matrix Editor",
@@ -2247,6 +2248,62 @@
       "filterTooltip": "Add person filter",
       "editFilterTooltip": "Edit person filter",
       "resetFilterTooltip": "Reset person filter"
+    }
+  },
+  "analytics": {
+    "title": "Analytics Workspace",
+    "subtitle": "Design reusable reports on top of the Neo4j to ClickHouse to Cube analytics pipeline.",
+    "builderTitle": "Report Builder",
+    "previewTitle": "Chart Preview",
+    "savedReportsTitle": "Saved Reports",
+    "emptySavedReports": "No saved reports yet.",
+    "emptySavedReportsHint": "Create a report definition and store it for the selected company.",
+    "companyScope": "Company scope",
+    "globalScope": "Global workspace",
+    "reportName": "Report name",
+    "chartType": "Chart type",
+    "dimension": "Dimension",
+    "measure": "Measure",
+    "saveReport": "Save report",
+    "updateReport": "Update report",
+    "newReport": "New draft",
+    "loadReport": "Load",
+    "deleteReport": "Delete",
+    "pipelineTitle": "Analytics pipeline",
+    "pipelineSource": "Neo4j source",
+    "pipelineProjection": "ClickHouse projection",
+    "pipelineSemantic": "Cube semantic API",
+    "pipelineUi": "Recharts workspace",
+    "apiEndpoint": "Cube API endpoint",
+    "connectionReady": "Configured",
+    "connectionMissing": "Not configured",
+    "liveDataHint": "Preview now loads from Cube through the authenticated analytics backend. Run a projection sync after model changes.",
+    "syncProjection": "Sync projections",
+    "syncRequiresCompany": "Select a company to sync a company-scoped projection refresh.",
+    "syncSuccess": "Projection sync finished. {applications} applications and {capabilities} capabilities refreshed.",
+    "syncError": "Projection sync failed.",
+    "reportSaved": "Report saved.",
+    "reportUpdated": "Report updated.",
+    "reportDeleted": "Report deleted.",
+    "saveError": "Saving the report failed.",
+    "deleteError": "Deleting the report failed.",
+    "loadReportsError": "Loading saved reports failed.",
+    "loadPreviewError": "Loading analytics preview failed.",
+    "emptyPreview": "No analytics data available for the current scope yet.",
+    "types": {
+      "bar": "Bar",
+      "line": "Line",
+      "pie": "Pie"
+    },
+    "dimensions": {
+      "status": "Lifecycle status",
+      "criticality": "Criticality",
+      "vendor": "Vendor",
+      "month": "Update month"
+    },
+    "measures": {
+      "applicationCount": "Application count",
+      "monthlyCost": "Monthly cost"
     }
   },
   "importExport": {

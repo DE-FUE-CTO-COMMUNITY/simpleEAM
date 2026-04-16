@@ -5,7 +5,7 @@ services:
     restart: unless-stopped
     ports:
       - "${NEO4J_EXTERNAL_PORT}:${NEO4J_PORT}" # HTTP
-      - "${NEO4J_EXTERNAL_BOLT_PORT}:${NEO4J_BOLT_PORT}" # Bolt (external port changed to 7688 to avoid conflicts)
+      - "${NEO4J_EXTERNAL_BOLT_PORT}:${NEO4J_BOLT_PORT}" # Bolt
     volumes:
       - ./db/data:/data
       - ./db/logs:/logs
@@ -54,13 +54,19 @@ services:
       - AUTH_DEBUG=${AUTH_DEBUG}
       - NEO4J_DEBUG=${NEO4J_DEBUG}
       - NEO4J_LOG_LEVEL=${NEO4J_LOG_LEVEL}
+      - CLICKHOUSE_URL=${CLICKHOUSE_URL:-http://clickhouse:8123}
+      - CLICKHOUSE_DB=${CLICKHOUSE_DB:-nextgen_analytics}
+      - CLICKHOUSE_USER=${CLICKHOUSE_USER:-default}
+      - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD:-}
+      - ANALYTICS_CUBE_API_URL=${ANALYTICS_CUBE_API_URL:-http://cube:4000/cubejs-api/v1}
+      - CUBEJS_API_SECRET=${CUBEJS_API_SECRET:-nextgen-eam-analytics-dev}
     # No bind mounts for src, prisma, tests - everything comes from the image
     networks:
       - eam-network
       - ${TRAEFIK_NETWORK}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-graphql.rule=Host(`${API_SUBDOMAIN}.${BASE_DOMAIN}`) && (PathPrefix(`/graphql`) || Path(`/health`))"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-graphql.rule=Host(`${API_SUBDOMAIN}.${BASE_DOMAIN}`) && (PathPrefix(`/graphql`) || Path(`/health`) || PathPrefix(`/analytics`))"
       - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-graphql.entrypoints=websecure"
       - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-graphql.tls=true"
       - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-graphql.tls.certresolver=${TRAEFIK_CERTRESOLVER}"
@@ -306,6 +312,62 @@ services:
     networks:
       - eam-network
 
+  # ClickHouse projection database for analytics workloads
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.8
+    restart: unless-stopped
+    profiles:
+      - analytics
+    environment:
+      - CLICKHOUSE_DB=${CLICKHOUSE_DB:-nextgen_analytics}
+      - CLICKHOUSE_USER=${CLICKHOUSE_USER:-default}
+      - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD:-}
+      - CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT=1
+    ports:
+      - "${CLICKHOUSE_HTTP_EXTERNAL_PORT:-8123}:8123"
+      - "${CLICKHOUSE_NATIVE_EXTERNAL_PORT:-9000}:9000"
+    volumes:
+      - ./analytics/clickhouse/data:/var/lib/clickhouse
+      - ./analytics/clickhouse/log:/var/log/clickhouse-server
+      - ./analytics/clickhouse/init:/docker-entrypoint-initdb.d
+    networks:
+      - eam-network
+
+  # Cube semantic layer over ClickHouse projections
+  cube:
+    image: cubejs/cube:latest
+    restart: unless-stopped
+    profiles:
+      - analytics
+    depends_on:
+      - clickhouse
+    environment:
+      - CUBEJS_DEV_MODE=${CUBEJS_DEV_MODE:-true}
+      - CUBEJS_API_SECRET=${CUBEJS_API_SECRET:-nextgen-eam-analytics-dev}
+      - CUBEJS_DB_TYPE=clickhouse
+      - CUBEJS_DB_HOST=clickhouse
+      - CUBEJS_DB_PORT=8123
+      - CUBEJS_DB_NAME=${CLICKHOUSE_DB:-nextgen_analytics}
+      - CUBEJS_DB_USER=${CLICKHOUSE_USER:-default}
+      - CUBEJS_DB_PASS=${CLICKHOUSE_PASSWORD:-}
+      - CUBEJS_WEB_SOCKETS=${CUBEJS_WEB_SOCKETS:-true}
+    volumes:
+      - ./analytics/cube:/cube/conf
+    ports:
+      - "${CUBEJS_EXTERNAL_PORT:-4003}:4000"
+    networks:
+      - eam-network
+      - ${TRAEFIK_NETWORK}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-cube.rule=Host(`${API_SUBDOMAIN}.${BASE_DOMAIN}`) && (PathPrefix(`/cubejs-api`) || PathPrefix(`/cubejs-system`))"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-cube.entrypoints=websecure"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-cube.tls=true"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-cube.tls.certresolver=${TRAEFIK_CERTRESOLVER}"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-cube.tls.domains[0].main=${API_SUBDOMAIN}.${BASE_DOMAIN}"
+      - "traefik.http.services.${COMPOSE_PROJECT_NAME:-nextgen-eam}-cube.loadbalancer.server.port=4000"
+      - "traefik.docker.network=${TRAEFIK_NETWORK}"
+
   # Next.js Client
   client:
     build:
@@ -329,6 +391,9 @@ services:
       - EXCALIDRAW_WS_SERVER_URL=https://${EXCALIDRAW_ROOM_SUBDOMAIN}.${BASE_DOMAIN}
       - AI_LLM_URL=${AI_LLM_URL:-}
       - AI_API_URL=${AI_API_URL:-https://${API_SUBDOMAIN}.${BASE_DOMAIN}}
+      - ANALYTICS_ENABLED=${ANALYTICS_ENABLED:-true}
+      - ANALYTICS_API_URL=${ANALYTICS_API_URL:-https://${API_SUBDOMAIN}.${BASE_DOMAIN}/analytics}
+      - ANALYTICS_CUBE_API_URL=${ANALYTICS_CUBE_API_URL:-https://${API_SUBDOMAIN}.${BASE_DOMAIN}/cubejs-api/v1}
       - BRAND_NAME_LONG=${BRAND_NAME_LONG:-NextGen Enterprise Architecture Management}
       - BRAND_NAME_SHORT=${BRAND_NAME_SHORT:-NextGen EAM}
       - THEME_PRIMARY_COLOR=${THEME_PRIMARY_COLOR}

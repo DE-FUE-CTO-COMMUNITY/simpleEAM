@@ -79,6 +79,7 @@
   "navigation": {
     "dashboard": "Tableau de bord",
     "agenticArchitect": "Architecte Agentique",
+    "analytics": "Analytique",
     "diagramEditor": "Éditeur de diagramme",
     "aiSupport": "Prise en charge de l'IA",
     "matrixEditor": "Éditeur de matrice",
@@ -2247,6 +2248,62 @@
       "filterTooltip": "Ajouter un filtre de personne",
       "editFilterTooltip": "Modifier le filtre de personne",
       "resetFilterTooltip": "Réinitialiser le filtre de personne"
+    }
+  },
+  "analytics": {
+    "title": "Espace analytique",
+    "subtitle": "Concevez des rapports réutilisables sur la base du pipeline Neo4j vers ClickHouse puis Cube.",
+    "builderTitle": "Concepteur de rapports",
+    "previewTitle": "Aperçu du graphique",
+    "savedReportsTitle": "Rapports enregistrés",
+    "emptySavedReports": "Aucun rapport enregistré pour le moment.",
+    "emptySavedReportsHint": "Créez une définition de rapport et enregistrez-la pour l'entreprise sélectionnée.",
+    "companyScope": "Périmètre entreprise",
+    "globalScope": "Espace global",
+    "reportName": "Nom du rapport",
+    "chartType": "Type de graphique",
+    "dimension": "Dimension",
+    "measure": "Mesure",
+    "saveReport": "Enregistrer le rapport",
+    "updateReport": "Mettre à jour le rapport",
+    "newReport": "Nouveau brouillon",
+    "loadReport": "Charger",
+    "deleteReport": "Supprimer",
+    "pipelineTitle": "Pipeline analytique",
+    "pipelineSource": "Source Neo4j",
+    "pipelineProjection": "Projection ClickHouse",
+    "pipelineSemantic": "API sémantique Cube",
+    "pipelineUi": "Espace Recharts",
+    "apiEndpoint": "Point d'accès API Cube",
+    "connectionReady": "Configuré",
+    "connectionMissing": "Non configuré",
+    "liveDataHint": "L'aperçu charge désormais Cube via le backend analytique authentifié. Lancez une synchronisation des projections après chaque changement de modèle.",
+    "syncProjection": "Synchroniser les projections",
+    "syncRequiresCompany": "Sélectionnez une entreprise pour synchroniser un rafraîchissement de projection lié à cette entreprise.",
+    "syncSuccess": "La synchronisation des projections est terminée. {applications} applications et {capabilities} capacités ont été actualisées.",
+    "syncError": "La synchronisation des projections a échoué.",
+    "reportSaved": "Rapport enregistré.",
+    "reportUpdated": "Rapport mis à jour.",
+    "reportDeleted": "Rapport supprimé.",
+    "saveError": "L'enregistrement du rapport a échoué.",
+    "deleteError": "La suppression du rapport a échoué.",
+    "loadReportsError": "Le chargement des rapports enregistrés a échoué.",
+    "loadPreviewError": "Le chargement de l'aperçu analytique a échoué.",
+    "emptyPreview": "Aucune donnée analytique n'est encore disponible pour le périmètre actuel.",
+    "types": {
+      "bar": "Barres",
+      "line": "Ligne",
+      "pie": "Camembert"
+    },
+    "dimensions": {
+      "status": "Statut du cycle de vie",
+      "criticality": "Criticité",
+      "vendor": "Fournisseur",
+      "month": "Mois de mise à jour"
+    },
+    "measures": {
+      "applicationCount": "Nombre d'applications",
+      "monthlyCost": "Coût mensuel"
     }
   },
   "importExport": {

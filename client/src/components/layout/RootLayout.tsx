@@ -6,6 +6,7 @@ import {
   Dashboard as DashboardIcon,
   Person as PersonIcon,
   Architecture as ArchitectureIcon,
+  QueryStats as AnalyticsIcon,
   AccountTree as DiagramIcon,
   Rule as RuleIcon,
   Settings as SettingsIcon,
@@ -47,6 +48,7 @@ import { login, useAuth, isAdmin, isArchitect } from '@/lib/auth'
 import { useLensSelection, type LensKey } from '@/lib/lens-settings'
 import { useFeatureFlags } from '@/lib/feature-flags'
 import { useCompanyContext } from '@/contexts/CompanyContext'
+import { useAnalyticsConfig } from '@/lib/runtime-config'
 
 import AppHeader from './AppHeader'
 import Sidebar from './Sidebar'
@@ -78,6 +80,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
   const { selectedLens } = useLensSelection()
   const { featureFlags } = useFeatureFlags()
   const { selectedCompany } = useCompanyContext()
+  const analyticsConfig = useAnalyticsConfig()
   const isGeaEnabled = featureFlags.GEA
   const isBmcEnabled = featureFlags.BMC
   const isAbhEnabled = featureFlags.ABH
@@ -345,6 +348,15 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
             text: t('agenticArchitect'),
             icon: <AgenticArchitectIcon />,
             href: '/agentic-architect',
+          },
+        ]
+      : []),
+    ...(initialized && analyticsConfig.enabled && (userIsAdmin || userIsArchitect)
+      ? [
+          {
+            text: t('analytics'),
+            icon: <AnalyticsIcon />,
+            href: '/analytics',
           },
         ]
       : []),
