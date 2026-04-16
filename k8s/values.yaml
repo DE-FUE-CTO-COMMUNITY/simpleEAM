@@ -115,7 +115,7 @@ neo4j:
 keycloak:
   image:
     repository: quay.io/keycloak/keycloak
-    tag: '23.0'
+    tag: '26.6'
     pullPolicy: IfNotPresent
 
   admin:
@@ -128,6 +128,10 @@ keycloak:
   realm: nextgen-eam
   clientIdServer: eam-server
   clientIdClient: eam-client
+
+  # KC_PROXY_HEADERS replaces the deprecated KC_PROXY option (removed in KC 26).
+  # Use 'xforwarded' when behind a reverse proxy that sets X-Forwarded-* headers.
+  proxyHeaders: xforwarded
 
   resources:
     requests:

@@ -95,6 +95,35 @@ spec:
                 echo "Synced URLs for client $cid"
               }
 
+              sync_webauthn_passkey_policy() {
+                /opt/keycloak/bin/kcadm.sh update "realms/${KC_REALM}" \
+                  -s 'webAuthnPolicyRpEntityName=keycloak' \
+                  -s 'webAuthnPolicySignatureAlgorithms=["ES256"]' \
+                  -s 'webAuthnPolicyRpId=' \
+                  -s 'webAuthnPolicyAttestationConveyancePreference=not specified' \
+                  -s 'webAuthnPolicyAuthenticatorAttachment=not specified' \
+                  -s 'webAuthnPolicyRequireResidentKey=No' \
+                  -s 'webAuthnPolicyUserVerificationRequirement=not specified' \
+                  -s 'webAuthnPolicyCreateTimeout=0' \
+                  -s 'webAuthnPolicyAvoidSameAuthenticatorRegister=false' \
+                  -s 'webAuthnPolicyAcceptableAaguids=[]' \
+                  -s 'webAuthnPolicyExtraOrigins=[]' \
+                  -s 'webAuthnPolicyPasswordlessRpEntityName=NextGen EAM' \
+                  -s 'webAuthnPolicyPasswordlessSignatureAlgorithms=["ES256","RS256"]' \
+                  -s 'webAuthnPolicyPasswordlessRpId=' \
+                  -s 'webAuthnPolicyPasswordlessAttestationConveyancePreference=not specified' \
+                  -s 'webAuthnPolicyPasswordlessAuthenticatorAttachment=not specified' \
+                  -s 'webAuthnPolicyPasswordlessRequireResidentKey=Yes' \
+                  -s 'webAuthnPolicyPasswordlessUserVerificationRequirement=required' \
+                  -s 'webAuthnPolicyPasswordlessCreateTimeout=0' \
+                  -s 'webAuthnPolicyPasswordlessAvoidSameAuthenticatorRegister=false' \
+                  -s 'webAuthnPolicyPasswordlessAcceptableAaguids=[]' \
+                  -s 'webAuthnPolicyPasswordlessExtraOrigins=[]' \
+                  -s 'webAuthnPolicyPasswordlessPasskeysEnabled=true'
+
+                echo "Synchronized WebAuthn passkey policy for realm ${KC_REALM}"
+              }
+
               ensure_realm_admin_user() {
                 realm_admin_id="$(/opt/keycloak/bin/kcadm.sh get users -r "$KC_REALM" -q username=admin --fields id --format csv --noquotes 2>/dev/null | head -n1)"
 
@@ -117,6 +146,7 @@ spec:
 
               sync_client_urls "$SERVER_CLIENT_ID" "$API_PUBLIC_HOST" "http://localhost:4000"
               sync_client_urls "$CLIENT_CLIENT_ID" "$CLIENT_PUBLIC_HOST" "http://localhost:3000"
+              sync_webauthn_passkey_policy
               ensure_realm_admin_user
           volumeMounts:
             - name: realm-bootstrap

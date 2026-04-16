@@ -209,21 +209,21 @@ spec:
               value: "false"
             - name: KC_HTTP_ENABLED
               value: "true"
-            - name: KC_PROXY
-              value: "edge"
+            - name: KC_PROXY_HEADERS
+              value: {{ $kc.proxyHeaders | quote }}
             - name: KC_HEALTH_ENABLED
               value: "true"
           livenessProbe:
             httpGet:
               path: /health/live
-              port: 8080
+              port: 9000
             initialDelaySeconds: 90
             periodSeconds: 30
             timeoutSeconds: 5
           readinessProbe:
             httpGet:
               path: /health/ready
-              port: 8080
+              port: 9000
             initialDelaySeconds: 60
             periodSeconds: 10
             timeoutSeconds: 5
