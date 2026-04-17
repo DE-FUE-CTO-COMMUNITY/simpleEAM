@@ -23,7 +23,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
-import { Add, DeleteOutline, EditOutlined, FolderOutlined, Sync } from '@mui/icons-material'
+import { Add, FolderOutlined, Sync } from '@mui/icons-material'
 import { useTranslations } from 'next-intl'
 import {
   Bar,
@@ -42,6 +42,7 @@ import {
 } from 'recharts'
 import { useCompanyContext } from '@/contexts/CompanyContext'
 import { useCurrentPerson } from '@/hooks/useCurrentPerson'
+import { isAdmin } from '@/lib/auth'
 import { useAnalyticsConfig } from '@/lib/runtime-config'
 
 import {
@@ -82,6 +83,11 @@ interface FolderOption {
   readonly label: string
 }
 
+interface NotificationState {
+  readonly message: string
+  readonly severity: 'success' | 'error'
+}
+
 function createDefaultDraft(): AnalyticsDraftReport {
   return {
     id: null,
@@ -96,7 +102,9 @@ function createDefaultDraft(): AnalyticsDraftReport {
 }
 
 function sortReports(reports: readonly AnalyticsReportDefinition[]) {
-  return [...reports].sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))
+  return [...reports].sort((left, right) =>
+    (right.updatedAt ?? '').localeCompare(left.updatedAt ?? '')
+  )
 }
 
 function sortFolders(folders: readonly AnalyticsReportFolderDefinition[]) {
@@ -185,15 +193,13 @@ export function AnalyticsWorkspace() {
   const [syncing, setSyncing] = useState(false)
   const [reportScope, setReportScope] = useState<AnalyticsReportScope>('all')
   const [folderDialog, setFolderDialog] = useState<FolderDialogState | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [infoMessage, setInfoMessage] = useState<string | null>(null)
-  const [reportUpdateMessage, setReportUpdateMessage] = useState<string | null>(null)
-  const [syncSuccessMessage, setSyncSuccessMessage] = useState<string | null>(null)
+  const [notification, setNotification] = useState<NotificationState | null>(null)
 
   const analyticsBaseUrl = analyticsConfig.apiUrl
   const activeSchema = analyticsSchemaByElementType[draft.elementType]
   const availableDimensions = activeSchema.dimensions
   const availableMeasures = activeSchema.measures
+  const adminMode = isAdmin()
   const canManageFolders = Boolean(selectedCompanyId && currentPerson?.id && !currentPersonLoading)
   const currencyFormatter = useMemo(
     () =>
@@ -205,6 +211,10 @@ export function AnalyticsWorkspace() {
     []
   )
   const folderOptions = useMemo(() => buildFolderOptions(savedFolders), [savedFolders])
+
+  const showNotification = (message: string, severity: NotificationState['severity']) => {
+    setNotification({ message, severity })
+  }
 
   useEffect(() => {
     if (!selectedCompanyId) {
@@ -225,7 +235,10 @@ export function AnalyticsWorkspace() {
       .catch(loadError => {
         if (!cancelled) {
           setSavedFolders([])
-          setError(loadError instanceof Error ? loadError.message : t('loadFoldersError'))
+          showNotification(
+            loadError instanceof Error ? loadError.message : t('loadFoldersError'),
+            'error'
+          )
         }
       })
       .finally(() => {
@@ -246,12 +259,12 @@ export function AnalyticsWorkspace() {
       return
     }
 
-    if (reportScope === 'mine' && currentPersonLoading) {
+    if (currentPersonLoading) {
       setReportsLoading(true)
       return
     }
 
-    if (reportScope === 'mine' && !currentPerson?.id) {
+    if (!currentPerson?.id) {
       setSavedReports([])
       setReportsLoading(false)
       return
@@ -259,7 +272,6 @@ export function AnalyticsWorkspace() {
 
     let cancelled = false
     setReportsLoading(true)
-    setError(null)
 
     void listAnalyticsReports(
       apolloClient,
@@ -275,7 +287,10 @@ export function AnalyticsWorkspace() {
       .catch(loadError => {
         if (!cancelled) {
           setSavedReports([])
-          setError(loadError instanceof Error ? loadError.message : t('loadReportsError'))
+          showNotification(
+            loadError instanceof Error ? loadError.message : t('loadReportsError'),
+            'error'
+          )
         }
       })
       .finally(() => {
@@ -287,7 +302,15 @@ export function AnalyticsWorkspace() {
     return () => {
       cancelled = true
     }
-  }, [apolloClient, currentPerson?.id, currentPersonLoading, reportScope, selectedCompanyId, t])
+  }, [
+    apolloClient,
+    adminMode,
+    currentPerson?.id,
+    currentPersonLoading,
+    reportScope,
+    selectedCompanyId,
+    t,
+  ])
 
   useEffect(() => {
     if (!analyticsBaseUrl) {
@@ -312,7 +335,10 @@ export function AnalyticsWorkspace() {
       .catch(queryError => {
         if (!cancelled) {
           setChartData([])
-          setError(queryError instanceof Error ? queryError.message : t('loadPreviewError'))
+          showNotification(
+            queryError instanceof Error ? queryError.message : t('loadPreviewError'),
+            'error'
+          )
         }
       })
       .finally(() => {
@@ -390,9 +416,6 @@ export function AnalyticsWorkspace() {
     }
 
     setSaving(true)
-    setError(null)
-    setInfoMessage(null)
-    setReportUpdateMessage(null)
 
     try {
       const input = {
@@ -423,12 +446,12 @@ export function AnalyticsWorkspace() {
       })
       setDraft(createDefaultDraft())
       if (draft.id) {
-        setReportUpdateMessage(t('reportUpdated'))
+        showNotification(t('reportUpdated'), 'success')
       } else {
-        setInfoMessage(t('reportSaved'))
+        showNotification(t('reportSaved'), 'success')
       }
     } catch (saveError) {
-      setError(saveError instanceof Error ? saveError.message : t('saveError'))
+      showNotification(saveError instanceof Error ? saveError.message : t('saveError'), 'error')
     } finally {
       setSaving(false)
     }
@@ -449,21 +472,21 @@ export function AnalyticsWorkspace() {
     })
 
     if (!canEditReport) {
-      setInfoMessage(t('loadedAsCopy'))
+      showNotification(t('loadedAsCopy'), 'success')
     }
   }
 
   const handleDeleteReport = async (reportId: string) => {
-    setError(null)
-    setInfoMessage(null)
-
     try {
       await deleteAnalyticsReport(apolloClient, reportId)
       setSavedReports(current => current.filter(report => report.id !== reportId))
       setDraft(current => (current.id === reportId ? createDefaultDraft() : current))
-      setInfoMessage(t('reportDeleted'))
+      showNotification(t('reportDeleted'), 'success')
     } catch (deleteError) {
-      setError(deleteError instanceof Error ? deleteError.message : t('deleteError'))
+      showNotification(
+        deleteError instanceof Error ? deleteError.message : t('deleteError'),
+        'error'
+      )
     }
   }
 
@@ -473,8 +496,6 @@ export function AnalyticsWorkspace() {
     }
 
     setFolderSaving(true)
-    setError(null)
-    setInfoMessage(null)
 
     try {
       if (folderDialog.mode === 'create') {
@@ -491,7 +512,7 @@ export function AnalyticsWorkspace() {
         })
 
         setSavedFolders(current => sortFolders([...current, folder]))
-        setInfoMessage(t('folderCreated'))
+        showNotification(t('folderCreated'), 'success')
       }
 
       if (folderDialog.mode === 'edit' && folderDialog.folder) {
@@ -508,17 +529,17 @@ export function AnalyticsWorkspace() {
 
         setSavedFolders(current =>
           sortFolders(
-            current.map(currentFolder =>
-              currentFolder.id === folder.id ? folder : currentFolder
-            )
+            current.map(currentFolder => (currentFolder.id === folder.id ? folder : currentFolder))
           )
         )
-        setInfoMessage(t('folderUpdated'))
+        showNotification(t('folderUpdated'), 'success')
       }
 
       if (folderDialog.mode === 'delete' && folderDialog.folder) {
         const targetParentId = folderDialog.folder.parentId ?? null
-        const reportsToMove = savedReports.filter(report => report.folderId === folderDialog.folder?.id)
+        const reportsToMove = savedReports.filter(
+          report => report.folderId === folderDialog.folder?.id
+        )
         const childFoldersToMove = savedFolders.filter(
           folder => folder.parentId === folderDialog.folder?.id
         )
@@ -575,12 +596,15 @@ export function AnalyticsWorkspace() {
             ? { ...current, folderId: targetParentId }
             : current
         )
-        setInfoMessage(t('folderDeleted'))
+        showNotification(t('folderDeleted'), 'success')
       }
 
       setFolderDialog(null)
     } catch (folderError) {
-      setError(folderError instanceof Error ? folderError.message : t('folderSaveError'))
+      showNotification(
+        folderError instanceof Error ? folderError.message : t('folderSaveError'),
+        'error'
+      )
     } finally {
       setFolderSaving(false)
     }
@@ -592,13 +616,10 @@ export function AnalyticsWorkspace() {
     }
 
     setSyncing(true)
-    setError(null)
-    setInfoMessage(null)
-    setSyncSuccessMessage(null)
 
     try {
       const result = await syncAnalyticsProjection(analyticsBaseUrl, selectedCompanyId)
-      setSyncSuccessMessage(
+      showNotification(
         t('syncSuccess', {
           applications: result.applications,
           capabilities: result.capabilities,
@@ -606,7 +627,8 @@ export function AnalyticsWorkspace() {
           dataObjects: result.dataObjects,
           interfaces: result.interfaces,
           infrastructure: result.infrastructure,
-        })
+        }),
+        'success'
       )
       const refreshed = await queryAnalyticsPreview(analyticsBaseUrl, {
         companyId: selectedCompanyId,
@@ -616,7 +638,7 @@ export function AnalyticsWorkspace() {
       })
       setChartData(refreshed.data)
     } catch (syncError) {
-      setError(syncError instanceof Error ? syncError.message : t('syncError'))
+      showNotification(syncError instanceof Error ? syncError.message : t('syncError'), 'error')
     } finally {
       setSyncing(false)
     }
@@ -628,43 +650,31 @@ export function AnalyticsWorkspace() {
     : previewTotal.toLocaleString()
 
   const renderReportCard = (report: AnalyticsReportDefinition) => {
-    const canEditReport = currentPerson?.id === report.creatorId
+    const reportTitle =
+      report.isPublic && report.creatorName
+        ? `${report.name} (${t('reportOwner', { owner: report.creatorName })})`
+        : report.name
 
     return (
       <Card key={report.id} variant="outlined" sx={{ overflow: 'hidden' }}>
         <CardActionArea onClick={() => handleLoad(report)}>
           <CardContent sx={{ px: 1.5, py: 1.25, '&:last-child': { pb: 1.25 } }}>
-            <Stack direction="row" justifyContent="space-between" spacing={1} alignItems="flex-start">
-              <Box sx={{ minWidth: 0 }}>
-                <Typography variant="subtitle2" noWrap>
-                  {report.name}
-                </Typography>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ display: 'block', mt: 0.25 }}
-                >
-                  {t(report.isPublic ? 'publicReport' : 'privateReport')} ·{' '}
-                  {t(`elementTypes.${report.elementType}`)} · {t(`types.${report.chartType}`)}
-                </Typography>
-                <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
-                  {t(`dimensions.${report.dimension}`)} · {t(`measures.${report.measure}`)}
-                </Typography>
-              </Box>
-              {canEditReport && (
-                <IconButton
-                  color="error"
-                  size="small"
-                  aria-label={t('deleteReport')}
-                  onClick={event => {
-                    event.stopPropagation()
-                    void handleDeleteReport(report.id)
-                  }}
-                >
-                  <DeleteOutline fontSize="small" />
-                </IconButton>
-              )}
-            </Stack>
+            <Box sx={{ minWidth: 0 }}>
+              <Typography variant="subtitle2" noWrap>
+                {reportTitle}
+              </Typography>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ display: 'block', mt: 0.25 }}
+              >
+                {t(report.isPublic ? 'publicReport' : 'privateReport')} ·{' '}
+                {t(`elementTypes.${report.elementType}`)} · {t(`types.${report.chartType}`)}
+              </Typography>
+              <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                {t(`dimensions.${report.dimension}`)} · {t(`measures.${report.measure}`)}
+              </Typography>
+            </Box>
           </CardContent>
         </CardActionArea>
       </Card>
@@ -721,40 +731,40 @@ export function AnalyticsWorkspace() {
               >
                 <Stack direction="row" spacing={1} alignItems="center">
                   <FolderOutlined fontSize="small" color="action" />
-                  <Typography variant="subtitle1">{folder.name}</Typography>
+                  <Typography
+                    variant="subtitle1"
+                    component={canEditFolder ? 'button' : 'div'}
+                    onClick={canEditFolder ? () => openEditFolderDialog(folder) : undefined}
+                    sx={
+                      canEditFolder
+                        ? {
+                            border: 0,
+                            background: 'none',
+                            p: 0,
+                            cursor: 'pointer',
+                            textAlign: 'left',
+                            font: 'inherit',
+                            color: 'inherit',
+                            '&:hover': {
+                              textDecoration: 'underline',
+                            },
+                          }
+                        : undefined
+                    }
+                  >
+                    {folder.name}
+                  </Typography>
                 </Stack>
-                <Stack direction="row" spacing={0.5}>
-                  {canManageFolders && (
-                    <IconButton
-                      size="small"
-                      onClick={() => openCreateFolderDialog(folder.id)}
-                      aria-label={t('addSubfolderAria')}
-                      title={t('addSubfolder')}
-                    >
-                      <Add fontSize="small" />
-                    </IconButton>
-                  )}
-                  {canEditFolder && (
-                    <IconButton
-                      size="small"
-                      onClick={() => openEditFolderDialog(folder)}
-                      aria-label={t('editFolderAria')}
-                      title={t('editFolder')}
-                    >
-                      <EditOutlined fontSize="small" />
-                    </IconButton>
-                  )}
-                  {canEditFolder && (
-                    <IconButton
-                      size="small"
-                      onClick={() => openDeleteFolderDialog(folder)}
-                      aria-label={t('deleteFolderAria')}
-                      title={t('deleteFolder')}
-                    >
-                      <DeleteOutline fontSize="small" />
-                    </IconButton>
-                  )}
-                </Stack>
+                {canManageFolders && (
+                  <IconButton
+                    size="small"
+                    onClick={() => openCreateFolderDialog(folder.id)}
+                    aria-label={t('addSubfolderAria')}
+                    title={t('addSubfolder')}
+                  >
+                    <Add fontSize="small" />
+                  </IconButton>
+                )}
               </Stack>
 
               <Stack spacing={1} sx={{ mt: 1, ml: 2 }}>
@@ -787,16 +797,13 @@ export function AnalyticsWorkspace() {
           </Typography>
         </Stack>
 
-        {error && <Alert severity="error">{error}</Alert>}
-        {infoMessage && <Alert severity="success">{infoMessage}</Alert>}
-
         <Box
           sx={{
             display: 'grid',
             gap: 3,
             gridTemplateColumns: {
               xs: '1fr',
-              xl: 'minmax(340px, 380px) minmax(420px, 1fr) minmax(280px, 340px)',
+              xl: 'minmax(340px, 380px) minmax(420px, 1fr) minmax(400px, 460px)',
             },
           }}
         >
@@ -809,7 +816,36 @@ export function AnalyticsWorkspace() {
                   justifyContent="space-between"
                   alignItems="center"
                 >
-                  <Typography variant="h6">{t('savedReportsTitle')}</Typography>
+                  <Stack direction="row" spacing={1.25} alignItems="center" sx={{ minWidth: 0 }}>
+                    <Typography variant="h6" sx={{ whiteSpace: 'nowrap' }}>
+                      {t('savedReportsTitle')}
+                    </Typography>
+                    <Stack
+                      direction="row"
+                      spacing={1}
+                      alignItems="center"
+                      sx={{ flexWrap: 'nowrap', minWidth: 0 }}
+                    >
+                      <Typography
+                        variant="body2"
+                        color={reportScope === 'all' ? 'text.primary' : 'text.secondary'}
+                        sx={{ whiteSpace: 'nowrap' }}
+                      >
+                        {t('allReports')}
+                      </Typography>
+                      <Switch
+                        checked={reportScope === 'mine'}
+                        onChange={event => setReportScope(event.target.checked ? 'mine' : 'all')}
+                      />
+                      <Typography
+                        variant="body2"
+                        color={reportScope === 'mine' ? 'text.primary' : 'text.secondary'}
+                        sx={{ whiteSpace: 'nowrap' }}
+                      >
+                        {t('myReports')}
+                      </Typography>
+                    </Stack>
+                  </Stack>
                   {canManageFolders && (
                     <IconButton
                       size="small"
@@ -820,27 +856,6 @@ export function AnalyticsWorkspace() {
                       <Add fontSize="small" />
                     </IconButton>
                   )}
-                </Stack>
-
-                <Stack direction="row" spacing={1} alignItems="center" sx={{ flexWrap: 'nowrap' }}>
-                  <Typography
-                    variant="body2"
-                    color={reportScope === 'all' ? 'text.primary' : 'text.secondary'}
-                    sx={{ whiteSpace: 'nowrap' }}
-                  >
-                    {t('allReports')}
-                  </Typography>
-                  <Switch
-                    checked={reportScope === 'mine'}
-                    onChange={event => setReportScope(event.target.checked ? 'mine' : 'all')}
-                  />
-                  <Typography
-                    variant="body2"
-                    color={reportScope === 'mine' ? 'text.primary' : 'text.secondary'}
-                    sx={{ whiteSpace: 'nowrap' }}
-                  >
-                    {t('myReports')}
-                  </Typography>
                 </Stack>
 
                 {(reportsLoading || foldersLoading) && <LinearProgress />}
@@ -916,7 +931,8 @@ export function AnalyticsWorkspace() {
                   label={t('elementType')}
                   value={draft.elementType}
                   onChange={event => {
-                    const nextElementType = event.target.value as AnalyticsDraftReport['elementType']
+                    const nextElementType = event.target
+                      .value as AnalyticsDraftReport['elementType']
                     const nextSchema = analyticsSchemaByElementType[nextElementType]
 
                     setDraft(current => ({
@@ -1000,9 +1016,10 @@ export function AnalyticsWorkspace() {
                 <Typography variant="caption" color="text.secondary">
                   {draft.isPublic ? t('publicReportHint') : t('privateReportHint')}
                 </Typography>
-                <Stack direction="row" spacing={1.5}>
+                <Stack direction="row" spacing={1.5} sx={{ width: '100%', flexWrap: 'nowrap' }}>
                   <Button
                     variant="contained"
+                    sx={{ flex: 1, minWidth: 0 }}
                     onClick={() => void handleSave()}
                     disabled={
                       !draft.name.trim() ||
@@ -1014,9 +1031,23 @@ export function AnalyticsWorkspace() {
                   >
                     {draft.id ? t('updateReport') : t('saveReport')}
                   </Button>
-                  <Button variant="outlined" onClick={() => setDraft(createDefaultDraft())}>
+                  <Button
+                    variant="outlined"
+                    sx={{ flex: 1, minWidth: 0 }}
+                    onClick={() => setDraft(createDefaultDraft())}
+                  >
                     {t('newReport')}
                   </Button>
+                  {draft.id && (
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      sx={{ flex: 1, minWidth: 0, whiteSpace: 'nowrap' }}
+                      onClick={() => void handleDeleteReport(draft.id as string)}
+                    >
+                      {t('deleteReport')}
+                    </Button>
+                  )}
                 </Stack>
                 <Button
                   variant="outlined"
@@ -1079,6 +1110,16 @@ export function AnalyticsWorkspace() {
             )}
           </DialogContent>
           <DialogActions>
+            {folderDialog?.mode === 'edit' && folderDialog.folder && (
+              <Button
+                variant="outlined"
+                color="error"
+                sx={{ mr: 'auto' }}
+                onClick={() => openDeleteFolderDialog(folderDialog.folder!)}
+              >
+                {t('folderActionDelete')}
+              </Button>
+            )}
             <Button onClick={closeFolderDialog}>{t('folderActionCancel')}</Button>
             <Button
               variant="contained"
@@ -1086,7 +1127,8 @@ export function AnalyticsWorkspace() {
               onClick={() => void handleConfirmFolderDialog()}
               disabled={
                 folderSaving ||
-                (!folderDialog || (folderDialog.mode !== 'delete' && !folderDialog.name.trim()))
+                !folderDialog ||
+                (folderDialog.mode !== 'delete' && !folderDialog.name.trim())
               }
             >
               {folderDialog?.mode === 'create'
@@ -1099,27 +1141,17 @@ export function AnalyticsWorkspace() {
         </Dialog>
 
         <Snackbar
-          open={Boolean(reportUpdateMessage)}
+          open={Boolean(notification)}
           autoHideDuration={4000}
-          onClose={() => setReportUpdateMessage(null)}
+          onClose={() => setNotification(null)}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         >
           <Alert
-            onClose={() => setReportUpdateMessage(null)}
-            severity="success"
+            onClose={() => setNotification(null)}
+            severity={notification?.severity ?? 'success'}
             variant="filled"
           >
-            {reportUpdateMessage}
-          </Alert>
-        </Snackbar>
-        <Snackbar
-          open={Boolean(syncSuccessMessage)}
-          autoHideDuration={4000}
-          onClose={() => setSyncSuccessMessage(null)}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        >
-          <Alert onClose={() => setSyncSuccessMessage(null)} severity="success" variant="filled">
-            {syncSuccessMessage}
+            {notification?.message}
           </Alert>
         </Snackbar>
       </Stack>

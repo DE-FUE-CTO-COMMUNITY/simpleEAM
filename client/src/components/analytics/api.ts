@@ -37,24 +37,44 @@ interface AnalyticsReportGraphQlResponse {
   readonly chartType: AnalyticsReportDefinition['chartType']
   readonly dimension: AnalyticsDimensionKey
   readonly measure: AnalyticsMeasureKey
-  readonly createdAt: string
-  readonly updatedAt: string
+  readonly createdAt: string | null
+  readonly updatedAt: string | null
   readonly company?: ReadonlyArray<{ readonly id: string }> | null
-  readonly createdBy?: ReadonlyArray<{ readonly id: string }> | null
+  readonly createdBy?: ReadonlyArray<{
+    readonly id: string
+    readonly firstName: string
+    readonly lastName: string
+  }> | null
   readonly folder?: ReadonlyArray<{ readonly id: string; readonly name: string }> | null
+}
+
+function getPersonDisplayName(
+  person?: {
+    readonly firstName: string
+    readonly lastName: string
+  } | null
+) {
+  if (!person) {
+    return null
+  }
+
+  return [person.firstName, person.lastName].filter(Boolean).join(' ') || null
 }
 
 interface AnalyticsReportFolderGraphQlResponse {
   readonly id: string
   readonly name: string
-  readonly createdAt: string
-  readonly updatedAt: string
+  readonly createdAt: string | null
+  readonly updatedAt: string | null
   readonly parent?: ReadonlyArray<{ readonly id: string }> | null
   readonly company?: ReadonlyArray<{ readonly id: string }> | null
   readonly createdBy?: ReadonlyArray<{ readonly id: string }> | null
 }
 
 function mapAnalyticsReport(report: AnalyticsReportGraphQlResponse): AnalyticsReportDefinition {
+  const createdAt = report.createdAt ?? ''
+  const creator = report.createdBy?.[0]
+
   return {
     id: report.id,
     name: report.name,
@@ -64,24 +84,27 @@ function mapAnalyticsReport(report: AnalyticsReportGraphQlResponse): AnalyticsRe
     dimension: report.dimension,
     measure: report.measure,
     folderId: report.folder?.[0]?.id ?? null,
-    creatorId: report.createdBy?.[0]?.id ?? null,
+    creatorId: creator?.id ?? null,
+    creatorName: getPersonDisplayName(creator),
     companyId: report.company?.[0]?.id ?? null,
-    createdAt: report.createdAt,
-    updatedAt: report.updatedAt,
+    createdAt,
+    updatedAt: report.updatedAt ?? createdAt,
   }
 }
 
 function mapAnalyticsReportFolder(
   folder: AnalyticsReportFolderGraphQlResponse
 ): AnalyticsReportFolderDefinition {
+  const createdAt = folder.createdAt ?? ''
+
   return {
     id: folder.id,
     name: folder.name,
     parentId: folder.parent?.[0]?.id ?? null,
     creatorId: folder.createdBy?.[0]?.id ?? null,
     companyId: folder.company?.[0]?.id ?? null,
-    createdAt: folder.createdAt,
-    updatedAt: folder.updatedAt,
+    createdAt,
+    updatedAt: folder.updatedAt ?? createdAt,
   }
 }
 
@@ -104,7 +127,7 @@ export async function listAnalyticsReports(
     return []
   }
 
-  if (mineOnly && !creatorId) {
+  if (!creatorId) {
     return []
   }
 
@@ -112,14 +135,28 @@ export async function listAnalyticsReports(
     analyticsReports: AnalyticsReportGraphQlResponse[]
   }>({
     query: mineOnly ? GET_MY_ANALYTICS_REPORTS : GET_ALL_ANALYTICS_REPORTS,
-    variables: mineOnly ? { companyId, creatorId } : { companyId },
+    variables: { companyId, creatorId },
     fetchPolicy: 'network-only',
   })
 
-  return (result.data?.analyticsReports ?? []).map(mapAnalyticsReport)
+  const reports = (result.data?.analyticsReports ?? []).map(mapAnalyticsReport)
+
+  console.debug('[Analytics] listAnalyticsReports result', {
+    mineOnly,
+    companyId,
+    creatorId,
+    rawReports: result.data?.analyticsReports ?? [],
+    mappedReports: reports,
+    returnedReports: reports,
+  })
+
+  return reports
 }
 
-export async function listReportFolders(apolloClient: ApolloClient<object>, companyId: string | null) {
+export async function listReportFolders(
+  apolloClient: ApolloClient<object>,
+  companyId: string | null
+) {
   if (!companyId) {
     return []
   }
@@ -132,7 +169,15 @@ export async function listReportFolders(apolloClient: ApolloClient<object>, comp
     fetchPolicy: 'network-only',
   })
 
-  return (result.data?.reportFolders ?? []).map(mapAnalyticsReportFolder)
+  const folders = (result.data?.reportFolders ?? []).map(mapAnalyticsReportFolder)
+
+  console.debug('[Analytics] listReportFolders result', {
+    companyId,
+    rawFolders: result.data?.reportFolders ?? [],
+    returnedFolders: folders,
+  })
+
+  return folders
 }
 
 export async function createAnalyticsReport(
@@ -230,9 +275,7 @@ export async function updateAnalyticsReport(
             folder: {
               ...(input.currentFolderId
                 ? {
-                    disconnect: [
-                      { where: { node: { id: { eq: input.currentFolderId } } } },
-                    ],
+                    disconnect: [{ where: { node: { id: { eq: input.currentFolderId } } } }],
                   }
                 : {}),
               ...(input.folderId
@@ -346,9 +389,7 @@ export async function updateReportFolder(
               parent: {
                 ...(input.currentParentId
                   ? {
-                      disconnect: [
-                        { where: { node: { id: { eq: input.currentParentId } } } },
-                      ],
+                      disconnect: [{ where: { node: { id: { eq: input.currentParentId } } } }],
                     }
                   : {}),
                 ...(input.parentId

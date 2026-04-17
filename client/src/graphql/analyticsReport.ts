@@ -1,9 +1,12 @@
 import { gql } from '@apollo/client/core'
 
 export const GET_ALL_ANALYTICS_REPORTS = gql`
-  query GetAllAnalyticsReports($companyId: ID!) {
+  query GetAllAnalyticsReports($companyId: ID!, $creatorId: ID!) {
     analyticsReports(
-      where: { company: { some: { id: { eq: $companyId } } } }
+      where: {
+        company: { some: { id: { eq: $companyId } } }
+        OR: [{ isPublic: { eq: true } }, { createdBy: { some: { id: { eq: $creatorId } } } }]
+      }
       sort: { updatedAt: DESC }
     ) {
       id
@@ -20,6 +23,8 @@ export const GET_ALL_ANALYTICS_REPORTS = gql`
       }
       createdBy {
         id
+        firstName
+        lastName
       }
       folder {
         id
@@ -52,6 +57,8 @@ export const GET_MY_ANALYTICS_REPORTS = gql`
       }
       createdBy {
         id
+        firstName
+        lastName
       }
       folder {
         id
@@ -102,6 +109,8 @@ export const CREATE_ANALYTICS_REPORT = gql`
         }
         createdBy {
           id
+          firstName
+          lastName
         }
         folder {
           id
@@ -130,6 +139,8 @@ export const UPDATE_ANALYTICS_REPORT = gql`
         }
         createdBy {
           id
+          firstName
+          lastName
         }
         folder {
           id

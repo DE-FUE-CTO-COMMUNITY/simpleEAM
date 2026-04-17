@@ -2298,6 +2298,7 @@
     "publicReportToggle": "Make report visible to everyone in the company",
     "publicReport": "Public",
     "privateReport": "Private",
+    "reportOwner": "owner: {owner}",
     "publicReportHint": "Everyone with access to the selected company can see this report.",
     "privateReportHint": "Only you can see this report.",
     "saveReport": "Save report",

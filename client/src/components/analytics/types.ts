@@ -133,6 +133,7 @@ export interface AnalyticsReportDefinition {
   readonly measure: AnalyticsMeasureKey
   readonly folderId?: string | null
   readonly creatorId?: string | null
+  readonly creatorName?: string | null
   readonly companyId?: string | null
   readonly createdAt: string
   readonly updatedAt: string

@@ -2298,6 +2298,7 @@
     "publicReportToggle": "Rendre le rapport visible à toutes les personnes de l'entreprise",
     "publicReport": "Public",
     "privateReport": "Privé",
+    "reportOwner": "propriétaire : {owner}",
     "publicReportHint": "Toute personne ayant accès à l'entreprise sélectionnée peut voir ce rapport.",
     "privateReportHint": "Vous seul pouvez voir ce rapport.",
     "saveReport": "Enregistrer le rapport",
