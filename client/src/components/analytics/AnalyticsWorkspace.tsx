@@ -7,15 +7,23 @@ import {
   Box,
   Button,
   Card,
+  CardActionArea,
   CardContent,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControlLabel,
+  IconButton,
   LinearProgress,
   MenuItem,
   Snackbar,
   Stack,
+  Switch,
   TextField,
   Typography,
 } from '@mui/material'
-import { DeleteOutline, Sync } from '@mui/icons-material'
+import { Add, DeleteOutline, EditOutlined, FolderOutlined, Sync } from '@mui/icons-material'
 import { useTranslations } from 'next-intl'
 import {
   Bar,
@@ -39,7 +47,9 @@ import { useAnalyticsConfig } from '@/lib/runtime-config'
 import {
   AnalyticsChartDatum,
   AnalyticsDraftReport,
+  AnalyticsReportFolderDefinition,
   AnalyticsReportDefinition,
+  AnalyticsReportScope,
   analyticsChartTypes,
   analyticsCurrencyMeasures,
   analyticsElementTypes,
@@ -47,24 +57,68 @@ import {
 } from './types'
 import {
   createAnalyticsReport,
+  createReportFolder,
   deleteAnalyticsReport,
+  deleteReportFolder,
   listAnalyticsReports,
+  listReportFolders,
   queryAnalyticsPreview,
   syncAnalyticsProjection,
   updateAnalyticsReport,
+  updateReportFolder,
 } from './api'
 
 const chartColors = ['#00796B', '#F57C00', '#455A64', '#D84315', '#546E7A', '#00838F']
+
+interface FolderDialogState {
+  readonly mode: 'create' | 'edit' | 'delete'
+  readonly folder: AnalyticsReportFolderDefinition | null
+  readonly parentId: string | null
+  readonly name: string
+}
+
+interface FolderOption {
+  readonly id: string
+  readonly label: string
+}
 
 function createDefaultDraft(): AnalyticsDraftReport {
   return {
     id: null,
     name: '',
+    isPublic: false,
     elementType: 'application',
     chartType: 'bar',
     dimension: 'status',
     measure: 'count',
+    folderId: null,
   }
+}
+
+function sortReports(reports: readonly AnalyticsReportDefinition[]) {
+  return [...reports].sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))
+}
+
+function sortFolders(folders: readonly AnalyticsReportFolderDefinition[]) {
+  return [...folders].sort((left, right) => left.name.localeCompare(right.name))
+}
+
+function buildFolderOptions(
+  folders: readonly AnalyticsReportFolderDefinition[],
+  parentId: string | null = null,
+  depth = 0
+): FolderOption[] {
+  const directChildren = sortFolders(
+    folders.filter(folder => (folder.parentId ?? null) === parentId)
+  )
+
+  return directChildren.flatMap(folder => [
+    {
+      id: folder.id,
+      label: `${'  '.repeat(depth)}${depth > 0 ? '↳ ' : ''}${folder.name}`,
+    },
+    ...buildFolderOptions(folders, folder.id, depth + 1),
+  ])
 }
 
 function renderChart(chartType: AnalyticsDraftReport['chartType'], data: AnalyticsChartDatum[]) {
@@ -121,19 +175,26 @@ export function AnalyticsWorkspace() {
   const { currentPerson, isLoading: currentPersonLoading } = useCurrentPerson()
   const [draft, setDraft] = useState<AnalyticsDraftReport>(createDefaultDraft())
   const [savedReports, setSavedReports] = useState<AnalyticsReportDefinition[]>([])
+  const [savedFolders, setSavedFolders] = useState<AnalyticsReportFolderDefinition[]>([])
   const [chartData, setChartData] = useState<AnalyticsChartDatum[]>([])
   const [reportsLoading, setReportsLoading] = useState(false)
+  const [foldersLoading, setFoldersLoading] = useState(false)
   const [queryLoading, setQueryLoading] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [folderSaving, setFolderSaving] = useState(false)
   const [syncing, setSyncing] = useState(false)
+  const [reportScope, setReportScope] = useState<AnalyticsReportScope>('all')
+  const [folderDialog, setFolderDialog] = useState<FolderDialogState | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [infoMessage, setInfoMessage] = useState<string | null>(null)
+  const [reportUpdateMessage, setReportUpdateMessage] = useState<string | null>(null)
   const [syncSuccessMessage, setSyncSuccessMessage] = useState<string | null>(null)
 
   const analyticsBaseUrl = analyticsConfig.apiUrl
   const activeSchema = analyticsSchemaByElementType[draft.elementType]
   const availableDimensions = activeSchema.dimensions
   const availableMeasures = activeSchema.measures
+  const canManageFolders = Boolean(selectedCompanyId && currentPerson?.id && !currentPersonLoading)
   const currencyFormatter = useMemo(
     () =>
       new Intl.NumberFormat(undefined, {
@@ -143,9 +204,54 @@ export function AnalyticsWorkspace() {
       }),
     []
   )
+  const folderOptions = useMemo(() => buildFolderOptions(savedFolders), [savedFolders])
 
   useEffect(() => {
-    if (!selectedCompanyId || !currentPerson?.id) {
+    if (!selectedCompanyId) {
+      setSavedFolders([])
+      setFoldersLoading(false)
+      return
+    }
+
+    let cancelled = false
+    setFoldersLoading(true)
+
+    void listReportFolders(apolloClient, selectedCompanyId)
+      .then(folders => {
+        if (!cancelled) {
+          setSavedFolders(folders)
+        }
+      })
+      .catch(loadError => {
+        if (!cancelled) {
+          setSavedFolders([])
+          setError(loadError instanceof Error ? loadError.message : t('loadFoldersError'))
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setFoldersLoading(false)
+        }
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [apolloClient, selectedCompanyId, t])
+
+  useEffect(() => {
+    if (!selectedCompanyId) {
+      setSavedReports([])
+      setReportsLoading(false)
+      return
+    }
+
+    if (reportScope === 'mine' && currentPersonLoading) {
+      setReportsLoading(true)
+      return
+    }
+
+    if (reportScope === 'mine' && !currentPerson?.id) {
       setSavedReports([])
       setReportsLoading(false)
       return
@@ -155,7 +261,12 @@ export function AnalyticsWorkspace() {
     setReportsLoading(true)
     setError(null)
 
-    void listAnalyticsReports(apolloClient, selectedCompanyId, currentPerson.id)
+    void listAnalyticsReports(
+      apolloClient,
+      selectedCompanyId,
+      currentPerson?.id ?? null,
+      reportScope === 'mine'
+    )
       .then(reports => {
         if (!cancelled) {
           setSavedReports(reports)
@@ -176,7 +287,7 @@ export function AnalyticsWorkspace() {
     return () => {
       cancelled = true
     }
-  }, [apolloClient, currentPerson?.id, selectedCompanyId, t])
+  }, [apolloClient, currentPerson?.id, currentPersonLoading, reportScope, selectedCompanyId, t])
 
   useEffect(() => {
     if (!analyticsBaseUrl) {
@@ -235,6 +346,39 @@ export function AnalyticsWorkspace() {
     setDraft(current => ({ ...current, [key]: value }))
   }
 
+  const openCreateFolderDialog = (parentId: string | null) => {
+    setFolderDialog({
+      mode: 'create',
+      folder: null,
+      parentId,
+      name: '',
+    })
+  }
+
+  const openEditFolderDialog = (folder: AnalyticsReportFolderDefinition) => {
+    setFolderDialog({
+      mode: 'edit',
+      folder,
+      parentId: folder.parentId ?? null,
+      name: folder.name,
+    })
+  }
+
+  const openDeleteFolderDialog = (folder: AnalyticsReportFolderDefinition) => {
+    setFolderDialog({
+      mode: 'delete',
+      folder,
+      parentId: folder.parentId ?? null,
+      name: folder.name,
+    })
+  }
+
+  const closeFolderDialog = () => {
+    if (!folderSaving) {
+      setFolderDialog(null)
+    }
+  }
+
   const handleSave = async () => {
     if (!selectedCompanyId || !currentPerson?.id) {
       return
@@ -248,11 +392,14 @@ export function AnalyticsWorkspace() {
     setSaving(true)
     setError(null)
     setInfoMessage(null)
+    setReportUpdateMessage(null)
 
     try {
       const input = {
         companyId: selectedCompanyId,
         creatorId: currentPerson.id,
+        folderId: draft.folderId,
+        isPublic: draft.isPublic,
         name: reportName,
         elementType: draft.elementType,
         chartType: draft.chartType,
@@ -264,6 +411,8 @@ export function AnalyticsWorkspace() {
         ? await updateAnalyticsReport(apolloClient, draft.id, {
             currentCompanyId:
               savedReports.find(currentReport => currentReport.id === draft.id)?.companyId ?? null,
+            currentFolderId:
+              savedReports.find(currentReport => currentReport.id === draft.id)?.folderId ?? null,
             ...input,
           })
         : await createAnalyticsReport(apolloClient, input)
@@ -273,7 +422,11 @@ export function AnalyticsWorkspace() {
         return [report, ...remaining]
       })
       setDraft(createDefaultDraft())
-      setInfoMessage(draft.id ? t('reportUpdated') : t('reportSaved'))
+      if (draft.id) {
+        setReportUpdateMessage(t('reportUpdated'))
+      } else {
+        setInfoMessage(t('reportSaved'))
+      }
     } catch (saveError) {
       setError(saveError instanceof Error ? saveError.message : t('saveError'))
     } finally {
@@ -282,17 +435,25 @@ export function AnalyticsWorkspace() {
   }
 
   const handleLoad = (report: AnalyticsReportDefinition) => {
+    const canEditReport = currentPerson?.id === report.creatorId
+
     setDraft({
-      id: report.id,
+      id: canEditReport ? report.id : null,
       name: report.name,
+      isPublic: report.isPublic,
       elementType: report.elementType,
       chartType: report.chartType,
       dimension: report.dimension,
       measure: report.measure,
+      folderId: report.folderId ?? null,
     })
+
+    if (!canEditReport) {
+      setInfoMessage(t('loadedAsCopy'))
+    }
   }
 
-  const handleDelete = async (reportId: string) => {
+  const handleDeleteReport = async (reportId: string) => {
     setError(null)
     setInfoMessage(null)
 
@@ -303,6 +464,125 @@ export function AnalyticsWorkspace() {
       setInfoMessage(t('reportDeleted'))
     } catch (deleteError) {
       setError(deleteError instanceof Error ? deleteError.message : t('deleteError'))
+    }
+  }
+
+  const handleConfirmFolderDialog = async () => {
+    if (!folderDialog || !selectedCompanyId || !currentPerson?.id) {
+      return
+    }
+
+    setFolderSaving(true)
+    setError(null)
+    setInfoMessage(null)
+
+    try {
+      if (folderDialog.mode === 'create') {
+        const name = folderDialog.name.trim()
+        if (!name) {
+          return
+        }
+
+        const folder = await createReportFolder(apolloClient, {
+          companyId: selectedCompanyId,
+          creatorId: currentPerson.id,
+          parentId: folderDialog.parentId,
+          name,
+        })
+
+        setSavedFolders(current => sortFolders([...current, folder]))
+        setInfoMessage(t('folderCreated'))
+      }
+
+      if (folderDialog.mode === 'edit' && folderDialog.folder) {
+        const name = folderDialog.name.trim()
+        if (!name) {
+          return
+        }
+
+        const folder = await updateReportFolder(apolloClient, folderDialog.folder.id, {
+          name,
+          currentParentId: folderDialog.folder.parentId ?? null,
+          parentId: folderDialog.folder.parentId ?? null,
+        })
+
+        setSavedFolders(current =>
+          sortFolders(
+            current.map(currentFolder =>
+              currentFolder.id === folder.id ? folder : currentFolder
+            )
+          )
+        )
+        setInfoMessage(t('folderUpdated'))
+      }
+
+      if (folderDialog.mode === 'delete' && folderDialog.folder) {
+        const targetParentId = folderDialog.folder.parentId ?? null
+        const reportsToMove = savedReports.filter(report => report.folderId === folderDialog.folder?.id)
+        const childFoldersToMove = savedFolders.filter(
+          folder => folder.parentId === folderDialog.folder?.id
+        )
+
+        await Promise.all(
+          reportsToMove.map(report =>
+            updateAnalyticsReport(apolloClient, report.id, {
+              currentCompanyId: report.companyId ?? selectedCompanyId,
+              currentFolderId: folderDialog.folder?.id ?? null,
+              companyId: report.companyId ?? selectedCompanyId,
+              folderId: targetParentId,
+              isPublic: report.isPublic,
+              name: report.name,
+              elementType: report.elementType,
+              chartType: report.chartType,
+              dimension: report.dimension,
+              measure: report.measure,
+            })
+          )
+        )
+
+        await Promise.all(
+          childFoldersToMove.map(folder =>
+            updateReportFolder(apolloClient, folder.id, {
+              name: folder.name,
+              currentParentId: folderDialog.folder?.id ?? null,
+              parentId: targetParentId,
+            })
+          )
+        )
+
+        await deleteReportFolder(apolloClient, folderDialog.folder.id)
+
+        setSavedReports(current =>
+          current.map(report =>
+            report.folderId === folderDialog.folder?.id
+              ? { ...report, folderId: targetParentId }
+              : report
+          )
+        )
+        setSavedFolders(current =>
+          sortFolders(
+            current
+              .filter(folder => folder.id !== folderDialog.folder?.id)
+              .map(folder =>
+                folder.parentId === folderDialog.folder?.id
+                  ? { ...folder, parentId: targetParentId }
+                  : folder
+              )
+          )
+        )
+        setDraft(current =>
+          current.folderId === folderDialog.folder?.id
+            ? { ...current, folderId: targetParentId }
+            : current
+        )
+        setInfoMessage(t('folderDeleted'))
+      }
+
+      setFolderDialog(null)
+    } catch (folderError) {
+      setError(folderError instanceof Error ? folderError.message : t('folderSaveError'))
+    } finally {
+      setFolderSaving(false)
     }
   }
 
@@ -347,6 +627,154 @@ export function AnalyticsWorkspace() {
     ? currencyFormatter.format(previewTotal)
     : previewTotal.toLocaleString()
 
+  const renderReportCard = (report: AnalyticsReportDefinition) => {
+    const canEditReport = currentPerson?.id === report.creatorId
+
+    return (
+      <Card key={report.id} variant="outlined" sx={{ overflow: 'hidden' }}>
+        <CardActionArea onClick={() => handleLoad(report)}>
+          <CardContent sx={{ px: 1.5, py: 1.25, '&:last-child': { pb: 1.25 } }}>
+            <Stack direction="row" justifyContent="space-between" spacing={1} alignItems="flex-start">
+              <Box sx={{ minWidth: 0 }}>
+                <Typography variant="subtitle2" noWrap>
+                  {report.name}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ display: 'block', mt: 0.25 }}
+                >
+                  {t(report.isPublic ? 'publicReport' : 'privateReport')} ·{' '}
+                  {t(`elementTypes.${report.elementType}`)} · {t(`types.${report.chartType}`)}
+                </Typography>
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                  {t(`dimensions.${report.dimension}`)} · {t(`measures.${report.measure}`)}
+                </Typography>
+              </Box>
+              {canEditReport && (
+                <IconButton
+                  color="error"
+                  size="small"
+                  aria-label={t('deleteReport')}
+                  onClick={event => {
+                    event.stopPropagation()
+                    void handleDeleteReport(report.id)
+                  }}
+                >
+                  <DeleteOutline fontSize="small" />
+                </IconButton>
+              )}
+            </Stack>
+          </CardContent>
+        </CardActionArea>
+      </Card>
+    )
+  }
+
+  const renderFolderTree = (parentId: string | null = null, depth = 0): React.ReactNode => {
+    const childFolders = sortFolders(
+      savedFolders.filter(folder => (folder.parentId ?? null) === parentId)
+    )
+    const directReports = sortReports(
+      savedReports.filter(report => (report.folderId ?? null) === parentId)
+    )
+
+    if (parentId !== null && childFolders.length === 0 && directReports.length === 0) {
+      return null
+    }
+
+    return (
+      <Stack spacing={1.25}>
+        {parentId === null && directReports.length > 0 && (
+          <Box>
+            <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
+              {t('unfiledReports')}
+            </Typography>
+            <Stack spacing={1}>{directReports.map(renderReportCard)}</Stack>
+          </Box>
+        )}
+
+        {childFolders.map(folder => {
+          const canEditFolder = currentPerson?.id === folder.creatorId
+          const folderReports = sortReports(
+            savedReports.filter(report => (report.folderId ?? null) === folder.id)
+          )
+          const childContent = renderFolderTree(folder.id, depth + 1)
+          const hasFolderContent = folderReports.length > 0 || childContent !== null
+
+          return (
+            <Box
+              key={folder.id}
+              sx={{
+                ml: depth > 0 ? 2 : 0,
+                pl: depth > 0 ? 1.5 : 0,
+                borderLeft: depth > 0 ? '1px solid' : 'none',
+                borderColor: 'divider',
+              }}
+            >
+              <Stack
+                direction="row"
+                justifyContent="space-between"
+                spacing={1}
+                alignItems="center"
+                sx={{ py: 0.5 }}
+              >
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <FolderOutlined fontSize="small" color="action" />
+                  <Typography variant="subtitle1">{folder.name}</Typography>
+                </Stack>
+                <Stack direction="row" spacing={0.5}>
+                  {canManageFolders && (
+                    <IconButton
+                      size="small"
+                      onClick={() => openCreateFolderDialog(folder.id)}
+                      aria-label={t('addSubfolderAria')}
+                      title={t('addSubfolder')}
+                    >
+                      <Add fontSize="small" />
+                    </IconButton>
+                  )}
+                  {canEditFolder && (
+                    <IconButton
+                      size="small"
+                      onClick={() => openEditFolderDialog(folder)}
+                      aria-label={t('editFolderAria')}
+                      title={t('editFolder')}
+                    >
+                      <EditOutlined fontSize="small" />
+                    </IconButton>
+                  )}
+                  {canEditFolder && (
+                    <IconButton
+                      size="small"
+                      onClick={() => openDeleteFolderDialog(folder)}
+                      aria-label={t('deleteFolderAria')}
+                      title={t('deleteFolder')}
+                    >
+                      <DeleteOutline fontSize="small" />
+                    </IconButton>
+                  )}
+                </Stack>
+              </Stack>
+
+              <Stack spacing={1} sx={{ mt: 1, ml: 2 }}>
+                {folderReports.map(renderReportCard)}
+                {childContent}
+                {!hasFolderContent && (
+                  <Typography variant="body2" color="text.secondary">
+                    {t('emptyFolder')}
+                  </Typography>
+                )}
+              </Stack>
+            </Box>
+          )
+        })}
+      </Stack>
+    )
+  }
+
+  const hasSavedItems = savedFolders.length > 0 || savedReports.length > 0
+
   return (
     <Box sx={{ px: { xs: 2, md: 4 }, py: 3 }}>
       <Stack spacing={3}>
@@ -368,16 +796,56 @@ export function AnalyticsWorkspace() {
             gap: 3,
             gridTemplateColumns: {
               xs: '1fr',
-              xl: 'minmax(320px, 360px) minmax(420px, 1fr) minmax(280px, 340px)',
+              xl: 'minmax(340px, 380px) minmax(420px, 1fr) minmax(280px, 340px)',
             },
           }}
         >
           <Card variant="outlined">
             <CardContent>
               <Stack spacing={2}>
-                <Typography variant="h6">{t('savedReportsTitle')}</Typography>
-                {reportsLoading && <LinearProgress />}
-                {savedReports.length === 0 ? (
+                <Stack
+                  direction="row"
+                  spacing={1.5}
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Typography variant="h6">{t('savedReportsTitle')}</Typography>
+                  {canManageFolders && (
+                    <IconButton
+                      size="small"
+                      onClick={() => openCreateFolderDialog(null)}
+                      aria-label={t('addRootFolderAria')}
+                      title={t('createFolder')}
+                    >
+                      <Add fontSize="small" />
+                    </IconButton>
+                  )}
+                </Stack>
+
+                <Stack direction="row" spacing={1} alignItems="center" sx={{ flexWrap: 'nowrap' }}>
+                  <Typography
+                    variant="body2"
+                    color={reportScope === 'all' ? 'text.primary' : 'text.secondary'}
+                    sx={{ whiteSpace: 'nowrap' }}
+                  >
+                    {t('allReports')}
+                  </Typography>
+                  <Switch
+                    checked={reportScope === 'mine'}
+                    onChange={event => setReportScope(event.target.checked ? 'mine' : 'all')}
+                  />
+                  <Typography
+                    variant="body2"
+                    color={reportScope === 'mine' ? 'text.primary' : 'text.secondary'}
+                    sx={{ whiteSpace: 'nowrap' }}
+                  >
+                    {t('myReports')}
+                  </Typography>
+                </Stack>
+
+                {(reportsLoading || foldersLoading) && <LinearProgress />}
+
+                {!hasSavedItems ? (
                   <Box sx={{ py: 4 }}>
                     <Typography variant="body2" color="text.secondary">
                       {t('emptySavedReports')}
@@ -387,36 +855,7 @@ export function AnalyticsWorkspace() {
                     </Typography>
                   </Box>
                 ) : (
-                  savedReports.map(report => (
-                    <Card key={report.id} variant="outlined">
-                      <CardContent>
-                        <Stack spacing={1.5}>
-                          <Stack direction="row" justifyContent="space-between" spacing={1}>
-                            <Box>
-                              <Typography variant="subtitle1">{report.name}</Typography>
-                              <Typography variant="caption" color="text.secondary">
-                                {t(`elementTypes.${report.elementType}`)} ·{' '}
-                                {t(`types.${report.chartType}`)} ·{' '}
-                                {t(`dimensions.${report.dimension}`)} ·{' '}
-                                {t(`measures.${report.measure}`)}
-                              </Typography>
-                            </Box>
-                            <Button
-                              color="error"
-                              size="small"
-                              startIcon={<DeleteOutline />}
-                              onClick={() => void handleDelete(report.id)}
-                            >
-                              {t('deleteReport')}
-                            </Button>
-                          </Stack>
-                          <Button variant="outlined" onClick={() => handleLoad(report)}>
-                            {t('loadReport')}
-                          </Button>
-                        </Stack>
-                      </CardContent>
-                    </Card>
-                  ))
+                  renderFolderTree()
                 )}
               </Stack>
             </CardContent>
@@ -460,11 +899,24 @@ export function AnalyticsWorkspace() {
                 />
                 <TextField
                   select
+                  label={t('folder')}
+                  value={draft.folderId ?? ''}
+                  onChange={event => handleDraftChange('folderId', event.target.value || null)}
+                  fullWidth
+                >
+                  <MenuItem value="">{t('noFolder')}</MenuItem>
+                  {folderOptions.map(folder => (
+                    <MenuItem key={folder.id} value={folder.id}>
+                      {folder.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+                <TextField
+                  select
                   label={t('elementType')}
                   value={draft.elementType}
                   onChange={event => {
-                    const nextElementType = event.target
-                      .value as AnalyticsDraftReport['elementType']
+                    const nextElementType = event.target.value as AnalyticsDraftReport['elementType']
                     const nextSchema = analyticsSchemaByElementType[nextElementType]
 
                     setDraft(current => ({
@@ -536,6 +988,18 @@ export function AnalyticsWorkspace() {
                     </MenuItem>
                   ))}
                 </TextField>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={draft.isPublic}
+                      onChange={event => handleDraftChange('isPublic', event.target.checked)}
+                    />
+                  }
+                  label={t('publicReportToggle')}
+                />
+                <Typography variant="caption" color="text.secondary">
+                  {draft.isPublic ? t('publicReportHint') : t('privateReportHint')}
+                </Typography>
                 <Stack direction="row" spacing={1.5}>
                   <Button
                     variant="contained"
@@ -576,6 +1040,78 @@ export function AnalyticsWorkspace() {
             </CardContent>
           </Card>
         </Box>
+
+        <Dialog open={Boolean(folderDialog)} onClose={closeFolderDialog} fullWidth maxWidth="xs">
+          <DialogTitle>
+            {folderDialog?.mode === 'create'
+              ? folderDialog.parentId
+                ? t('createSubfolderDialogTitle')
+                : t('createFolderDialogTitle')
+              : folderDialog?.mode === 'edit'
+                ? t('editFolderDialogTitle')
+                : t('deleteFolderDialogTitle')}
+          </DialogTitle>
+          <DialogContent>
+            {folderDialog?.mode === 'delete' ? (
+              <Stack spacing={1.5} sx={{ pt: 1 }}>
+                <Typography variant="body2">
+                  {t('deleteFolderDialogDescription', { name: folderDialog.name })}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {folderDialog.parentId
+                    ? t('deleteFolderMoveToParent')
+                    : t('deleteFolderMoveToRoot')}
+                </Typography>
+              </Stack>
+            ) : (
+              <TextField
+                autoFocus
+                margin="dense"
+                label={t('folderName')}
+                value={folderDialog?.name ?? ''}
+                onChange={event =>
+                  setFolderDialog(current =>
+                    current ? { ...current, name: event.target.value } : current
+                  )
+                }
+                fullWidth
+              />
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={closeFolderDialog}>{t('folderActionCancel')}</Button>
+            <Button
+              variant="contained"
+              color={folderDialog?.mode === 'delete' ? 'error' : 'primary'}
+              onClick={() => void handleConfirmFolderDialog()}
+              disabled={
+                folderSaving ||
+                (!folderDialog || (folderDialog.mode !== 'delete' && !folderDialog.name.trim()))
+              }
+            >
+              {folderDialog?.mode === 'create'
+                ? t('folderActionCreate')
+                : folderDialog?.mode === 'edit'
+                  ? t('folderActionSave')
+                  : t('folderActionDelete')}
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        <Snackbar
+          open={Boolean(reportUpdateMessage)}
+          autoHideDuration={4000}
+          onClose={() => setReportUpdateMessage(null)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        >
+          <Alert
+            onClose={() => setReportUpdateMessage(null)}
+            severity="success"
+            variant="filled"
+          >
+            {reportUpdateMessage}
+          </Alert>
+        </Snackbar>
         <Snackbar
           open={Boolean(syncSuccessMessage)}
           autoHideDuration={4000}

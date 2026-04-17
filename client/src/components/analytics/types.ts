@@ -126,20 +126,37 @@ export interface AnalyticsChartDatum {
 export interface AnalyticsReportDefinition {
   readonly id: string
   readonly name: string
+  readonly isPublic: boolean
   readonly elementType: AnalyticsElementType
   readonly chartType: AnalyticsChartType
   readonly dimension: AnalyticsDimensionKey
   readonly measure: AnalyticsMeasureKey
+  readonly folderId?: string | null
+  readonly creatorId?: string | null
   readonly companyId?: string | null
   readonly createdAt: string
   readonly updatedAt: string
 }
 
+export interface AnalyticsReportFolderDefinition {
+  readonly id: string
+  readonly name: string
+  readonly parentId?: string | null
+  readonly creatorId?: string | null
+  readonly companyId?: string | null
+  readonly createdAt: string
+  readonly updatedAt: string
+}
+
+export type AnalyticsReportScope = 'all' | 'mine'
+
 export interface AnalyticsDraftReport {
   readonly id: string | null
   readonly name: string
+  readonly isPublic: boolean
   readonly elementType: AnalyticsElementType
   readonly chartType: AnalyticsChartType
   readonly dimension: AnalyticsDimensionKey
   readonly measure: AnalyticsMeasureKey
+  readonly folderId: string | null
 }

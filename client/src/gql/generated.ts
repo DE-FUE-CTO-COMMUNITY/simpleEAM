@@ -3332,7 +3332,10 @@ export type AnalyticsReport = {
   createdByConnection: AnalyticsReportCreatedByConnection;
   dimension: Scalars['String']['output'];
   elementType: Scalars['String']['output'];
+  folder: Array<ReportFolder>;
+  folderConnection: AnalyticsReportFolderConnection;
   id: Scalars['ID']['output'];
+  isPublic: Scalars['Boolean']['output'];
   measure: Scalars['String']['output'];
   name: Scalars['String']['output'];
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
@@ -3372,6 +3375,24 @@ export type AnalyticsReportCreatedByConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<AnalyticsReportCreatedByConnectionSort>>;
   where?: InputMaybe<AnalyticsReportCreatedByConnectionWhere>;
+};
+
+
+/** AnalyticsReport - represents a saved analytics report definition */
+export type AnalyticsReportFolderArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<ReportFolderSort>>;
+  where?: InputMaybe<ReportFolderWhere>;
+};
+
+
+/** AnalyticsReport - represents a saved analytics report definition */
+export type AnalyticsReportFolderConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<AnalyticsReportFolderConnectionSort>>;
+  where?: InputMaybe<AnalyticsReportFolderConnectionWhere>;
 };
 
 export type AnalyticsReportAggregate = {
@@ -3556,6 +3577,7 @@ export type AnalyticsReportCompanyUpdateFieldInput = {
 export type AnalyticsReportConnectInput = {
   company?: InputMaybe<Array<AnalyticsReportCompanyConnectFieldInput>>;
   createdBy?: InputMaybe<Array<AnalyticsReportCreatedByConnectFieldInput>>;
+  folder?: InputMaybe<Array<AnalyticsReportFolderConnectFieldInput>>;
 };
 
 export type AnalyticsReportConnectWhere = {
@@ -3568,6 +3590,8 @@ export type AnalyticsReportCreateInput = {
   createdBy?: InputMaybe<AnalyticsReportCreatedByFieldInput>;
   dimension: Scalars['String']['input'];
   elementType: Scalars['String']['input'];
+  folder?: InputMaybe<AnalyticsReportFolderFieldInput>;
+  isPublic: Scalars['Boolean']['input'];
   measure: Scalars['String']['input'];
   name: Scalars['String']['input'];
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
@@ -3687,17 +3711,124 @@ export type AnalyticsReportCreatedByUpdateFieldInput = {
 export type AnalyticsReportDeleteInput = {
   company?: InputMaybe<Array<AnalyticsReportCompanyDeleteFieldInput>>;
   createdBy?: InputMaybe<Array<AnalyticsReportCreatedByDeleteFieldInput>>;
+  folder?: InputMaybe<Array<AnalyticsReportFolderDeleteFieldInput>>;
 };
 
 export type AnalyticsReportDisconnectInput = {
   company?: InputMaybe<Array<AnalyticsReportCompanyDisconnectFieldInput>>;
   createdBy?: InputMaybe<Array<AnalyticsReportCreatedByDisconnectFieldInput>>;
+  folder?: InputMaybe<Array<AnalyticsReportFolderDisconnectFieldInput>>;
 };
 
 export type AnalyticsReportEdge = {
   __typename?: 'AnalyticsReportEdge';
   cursor: Scalars['String']['output'];
   node: AnalyticsReport;
+};
+
+export type AnalyticsReportFolderAggregateInput = {
+  AND?: InputMaybe<Array<AnalyticsReportFolderAggregateInput>>;
+  NOT?: InputMaybe<AnalyticsReportFolderAggregateInput>;
+  OR?: InputMaybe<Array<AnalyticsReportFolderAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<AnalyticsReportFolderNodeAggregationWhereInput>;
+};
+
+export type AnalyticsReportFolderConnectFieldInput = {
+  connect?: InputMaybe<Array<ReportFolderConnectInput>>;
+  where?: InputMaybe<ReportFolderConnectWhere>;
+};
+
+export type AnalyticsReportFolderConnection = {
+  __typename?: 'AnalyticsReportFolderConnection';
+  aggregate: AnalyticsReportReportFolderFolderAggregateSelection;
+  edges: Array<AnalyticsReportFolderRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type AnalyticsReportFolderConnectionAggregateInput = {
+  AND?: InputMaybe<Array<AnalyticsReportFolderConnectionAggregateInput>>;
+  NOT?: InputMaybe<AnalyticsReportFolderConnectionAggregateInput>;
+  OR?: InputMaybe<Array<AnalyticsReportFolderConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<AnalyticsReportFolderNodeAggregationWhereInput>;
+};
+
+export type AnalyticsReportFolderConnectionFilters = {
+  /** Filter AnalyticsReports by aggregating results on related AnalyticsReportFolderConnections */
+  aggregate?: InputMaybe<AnalyticsReportFolderConnectionAggregateInput>;
+  /** Return AnalyticsReports where all of the related AnalyticsReportFolderConnections match this filter */
+  all?: InputMaybe<AnalyticsReportFolderConnectionWhere>;
+  /** Return AnalyticsReports where none of the related AnalyticsReportFolderConnections match this filter */
+  none?: InputMaybe<AnalyticsReportFolderConnectionWhere>;
+  /** Return AnalyticsReports where one of the related AnalyticsReportFolderConnections match this filter */
+  single?: InputMaybe<AnalyticsReportFolderConnectionWhere>;
+  /** Return AnalyticsReports where some of the related AnalyticsReportFolderConnections match this filter */
+  some?: InputMaybe<AnalyticsReportFolderConnectionWhere>;
+};
+
+export type AnalyticsReportFolderConnectionSort = {
+  node?: InputMaybe<ReportFolderSort>;
+};
+
+export type AnalyticsReportFolderConnectionWhere = {
+  AND?: InputMaybe<Array<AnalyticsReportFolderConnectionWhere>>;
+  NOT?: InputMaybe<AnalyticsReportFolderConnectionWhere>;
+  OR?: InputMaybe<Array<AnalyticsReportFolderConnectionWhere>>;
+  node?: InputMaybe<ReportFolderWhere>;
+};
+
+export type AnalyticsReportFolderCreateFieldInput = {
+  node: ReportFolderCreateInput;
+};
+
+export type AnalyticsReportFolderDeleteFieldInput = {
+  delete?: InputMaybe<ReportFolderDeleteInput>;
+  where?: InputMaybe<AnalyticsReportFolderConnectionWhere>;
+};
+
+export type AnalyticsReportFolderDisconnectFieldInput = {
+  disconnect?: InputMaybe<ReportFolderDisconnectInput>;
+  where?: InputMaybe<AnalyticsReportFolderConnectionWhere>;
+};
+
+export type AnalyticsReportFolderFieldInput = {
+  connect?: InputMaybe<Array<AnalyticsReportFolderConnectFieldInput>>;
+  create?: InputMaybe<Array<AnalyticsReportFolderCreateFieldInput>>;
+};
+
+export type AnalyticsReportFolderNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<AnalyticsReportFolderNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<AnalyticsReportFolderNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<AnalyticsReportFolderNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type AnalyticsReportFolderRelationship = {
+  __typename?: 'AnalyticsReportFolderRelationship';
+  cursor: Scalars['String']['output'];
+  node: ReportFolder;
+};
+
+export type AnalyticsReportFolderUpdateConnectionInput = {
+  node?: InputMaybe<ReportFolderUpdateInput>;
+  where?: InputMaybe<AnalyticsReportFolderConnectionWhere>;
+};
+
+export type AnalyticsReportFolderUpdateFieldInput = {
+  connect?: InputMaybe<Array<AnalyticsReportFolderConnectFieldInput>>;
+  create?: InputMaybe<Array<AnalyticsReportFolderCreateFieldInput>>;
+  delete?: InputMaybe<Array<AnalyticsReportFolderDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<AnalyticsReportFolderDisconnectFieldInput>>;
+  update?: InputMaybe<AnalyticsReportFolderUpdateConnectionInput>;
 };
 
 export type AnalyticsReportPersonCreatedByAggregateSelection = {
@@ -3730,6 +3861,19 @@ export type AnalyticsReportRelationshipFilters = {
   some?: InputMaybe<AnalyticsReportWhere>;
 };
 
+export type AnalyticsReportReportFolderFolderAggregateSelection = {
+  __typename?: 'AnalyticsReportReportFolderFolderAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<AnalyticsReportReportFolderFolderNodeAggregateSelection>;
+};
+
+export type AnalyticsReportReportFolderFolderNodeAggregateSelection = {
+  __typename?: 'AnalyticsReportReportFolderFolderNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  name: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
 /** Fields to sort AnalyticsReports by. The order in which sorts are applied is not guaranteed when specifying many fields in one AnalyticsReportSort object. */
 export type AnalyticsReportSort = {
   chartType?: InputMaybe<SortDirection>;
@@ -3737,6 +3881,7 @@ export type AnalyticsReportSort = {
   dimension?: InputMaybe<SortDirection>;
   elementType?: InputMaybe<SortDirection>;
   id?: InputMaybe<SortDirection>;
+  isPublic?: InputMaybe<SortDirection>;
   measure?: InputMaybe<SortDirection>;
   name?: InputMaybe<SortDirection>;
   updatedAt?: InputMaybe<SortDirection>;
@@ -3749,6 +3894,8 @@ export type AnalyticsReportUpdateInput = {
   createdBy?: InputMaybe<Array<AnalyticsReportCreatedByUpdateFieldInput>>;
   dimension?: InputMaybe<StringScalarMutations>;
   elementType?: InputMaybe<StringScalarMutations>;
+  folder?: InputMaybe<Array<AnalyticsReportFolderUpdateFieldInput>>;
+  isPublic?: InputMaybe<BooleanScalarMutations>;
   measure?: InputMaybe<StringScalarMutations>;
   name?: InputMaybe<StringScalarMutations>;
 };
@@ -3765,7 +3912,10 @@ export type AnalyticsReportWhere = {
   createdByConnection?: InputMaybe<AnalyticsReportCreatedByConnectionFilters>;
   dimension?: InputMaybe<StringScalarFilters>;
   elementType?: InputMaybe<StringScalarFilters>;
+  folder?: InputMaybe<ReportFolderRelationshipFilters>;
+  folderConnection?: InputMaybe<AnalyticsReportFolderConnectionFilters>;
   id?: InputMaybe<IdScalarFilters>;
+  isPublic?: InputMaybe<BooleanScalarFilters>;
   measure?: InputMaybe<StringScalarFilters>;
   name?: InputMaybe<StringScalarFilters>;
   updatedAt?: InputMaybe<DateTimeScalarFilters>;
@@ -17125,6 +17275,8 @@ export type Company = {
   __typename?: 'Company';
   achievedSovereigntyScore?: Maybe<Scalars['Float']['output']>;
   address?: Maybe<Scalars['String']['output']>;
+  analyticsReportFolders: Array<ReportFolder>;
+  analyticsReportFoldersConnection: CompanyAnalyticsReportFoldersConnection;
   analyticsReports: Array<AnalyticsReport>;
   analyticsReportsConnection: CompanyAnalyticsReportsConnection;
   controlPriority?: Maybe<Scalars['Int']['output']>;
@@ -17188,6 +17340,24 @@ export type Company = {
   strategicAutonomyPriority?: Maybe<Scalars['Int']['output']>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
   website?: Maybe<Scalars['String']['output']>;
+};
+
+
+/** Company – represents an organization within Enterprise Architecture Management */
+export type CompanyAnalyticsReportFoldersArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<ReportFolderSort>>;
+  where?: InputMaybe<ReportFolderWhere>;
+};
+
+
+/** Company – represents an organization within Enterprise Architecture Management */
+export type CompanyAnalyticsReportFoldersConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<CompanyAnalyticsReportFoldersConnectionSort>>;
+  where?: InputMaybe<CompanyAnalyticsReportFoldersConnectionWhere>;
 };
 
 
@@ -17609,6 +17779,111 @@ export type CompanyAnalyticsReportAnalyticsReportsNodeAggregateSelection = {
   updatedAt: DateTimeAggregateSelection;
 };
 
+export type CompanyAnalyticsReportFoldersAggregateInput = {
+  AND?: InputMaybe<Array<CompanyAnalyticsReportFoldersAggregateInput>>;
+  NOT?: InputMaybe<CompanyAnalyticsReportFoldersAggregateInput>;
+  OR?: InputMaybe<Array<CompanyAnalyticsReportFoldersAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<CompanyAnalyticsReportFoldersNodeAggregationWhereInput>;
+};
+
+export type CompanyAnalyticsReportFoldersConnectFieldInput = {
+  connect?: InputMaybe<Array<ReportFolderConnectInput>>;
+  where?: InputMaybe<ReportFolderConnectWhere>;
+};
+
+export type CompanyAnalyticsReportFoldersConnection = {
+  __typename?: 'CompanyAnalyticsReportFoldersConnection';
+  aggregate: CompanyReportFolderAnalyticsReportFoldersAggregateSelection;
+  edges: Array<CompanyAnalyticsReportFoldersRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type CompanyAnalyticsReportFoldersConnectionAggregateInput = {
+  AND?: InputMaybe<Array<CompanyAnalyticsReportFoldersConnectionAggregateInput>>;
+  NOT?: InputMaybe<CompanyAnalyticsReportFoldersConnectionAggregateInput>;
+  OR?: InputMaybe<Array<CompanyAnalyticsReportFoldersConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<CompanyAnalyticsReportFoldersNodeAggregationWhereInput>;
+};
+
+export type CompanyAnalyticsReportFoldersConnectionFilters = {
+  /** Filter Companies by aggregating results on related CompanyAnalyticsReportFoldersConnections */
+  aggregate?: InputMaybe<CompanyAnalyticsReportFoldersConnectionAggregateInput>;
+  /** Return Companies where all of the related CompanyAnalyticsReportFoldersConnections match this filter */
+  all?: InputMaybe<CompanyAnalyticsReportFoldersConnectionWhere>;
+  /** Return Companies where none of the related CompanyAnalyticsReportFoldersConnections match this filter */
+  none?: InputMaybe<CompanyAnalyticsReportFoldersConnectionWhere>;
+  /** Return Companies where one of the related CompanyAnalyticsReportFoldersConnections match this filter */
+  single?: InputMaybe<CompanyAnalyticsReportFoldersConnectionWhere>;
+  /** Return Companies where some of the related CompanyAnalyticsReportFoldersConnections match this filter */
+  some?: InputMaybe<CompanyAnalyticsReportFoldersConnectionWhere>;
+};
+
+export type CompanyAnalyticsReportFoldersConnectionSort = {
+  node?: InputMaybe<ReportFolderSort>;
+};
+
+export type CompanyAnalyticsReportFoldersConnectionWhere = {
+  AND?: InputMaybe<Array<CompanyAnalyticsReportFoldersConnectionWhere>>;
+  NOT?: InputMaybe<CompanyAnalyticsReportFoldersConnectionWhere>;
+  OR?: InputMaybe<Array<CompanyAnalyticsReportFoldersConnectionWhere>>;
+  node?: InputMaybe<ReportFolderWhere>;
+};
+
+export type CompanyAnalyticsReportFoldersCreateFieldInput = {
+  node: ReportFolderCreateInput;
+};
+
+export type CompanyAnalyticsReportFoldersDeleteFieldInput = {
+  delete?: InputMaybe<ReportFolderDeleteInput>;
+  where?: InputMaybe<CompanyAnalyticsReportFoldersConnectionWhere>;
+};
+
+export type CompanyAnalyticsReportFoldersDisconnectFieldInput = {
+  disconnect?: InputMaybe<ReportFolderDisconnectInput>;
+  where?: InputMaybe<CompanyAnalyticsReportFoldersConnectionWhere>;
+};
+
+export type CompanyAnalyticsReportFoldersFieldInput = {
+  connect?: InputMaybe<Array<CompanyAnalyticsReportFoldersConnectFieldInput>>;
+  create?: InputMaybe<Array<CompanyAnalyticsReportFoldersCreateFieldInput>>;
+};
+
+export type CompanyAnalyticsReportFoldersNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<CompanyAnalyticsReportFoldersNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<CompanyAnalyticsReportFoldersNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<CompanyAnalyticsReportFoldersNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type CompanyAnalyticsReportFoldersRelationship = {
+  __typename?: 'CompanyAnalyticsReportFoldersRelationship';
+  cursor: Scalars['String']['output'];
+  node: ReportFolder;
+};
+
+export type CompanyAnalyticsReportFoldersUpdateConnectionInput = {
+  node?: InputMaybe<ReportFolderUpdateInput>;
+  where?: InputMaybe<CompanyAnalyticsReportFoldersConnectionWhere>;
+};
+
+export type CompanyAnalyticsReportFoldersUpdateFieldInput = {
+  connect?: InputMaybe<Array<CompanyAnalyticsReportFoldersConnectFieldInput>>;
+  create?: InputMaybe<Array<CompanyAnalyticsReportFoldersCreateFieldInput>>;
+  delete?: InputMaybe<Array<CompanyAnalyticsReportFoldersDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<CompanyAnalyticsReportFoldersDisconnectFieldInput>>;
+  update?: InputMaybe<CompanyAnalyticsReportFoldersUpdateConnectionInput>;
+};
+
 export type CompanyAnalyticsReportsAggregateInput = {
   AND?: InputMaybe<Array<CompanyAnalyticsReportsAggregateInput>>;
   NOT?: InputMaybe<CompanyAnalyticsReportsAggregateInput>;
@@ -17837,6 +18112,7 @@ export type CompanyBusinessProcessOwnedBusinessProcessesNodeAggregateSelection =
 };
 
 export type CompanyConnectInput = {
+  analyticsReportFolders?: InputMaybe<Array<CompanyAnalyticsReportFoldersConnectFieldInput>>;
   analyticsReports?: InputMaybe<Array<CompanyAnalyticsReportsConnectFieldInput>>;
   employees?: InputMaybe<Array<CompanyEmployeesConnectFieldInput>>;
   organisations?: InputMaybe<Array<CompanyOrganisationsConnectFieldInput>>;
@@ -17865,6 +18141,7 @@ export type CompanyConnectWhere = {
 export type CompanyCreateInput = {
   achievedSovereigntyScore?: InputMaybe<Scalars['Float']['input']>;
   address?: InputMaybe<Scalars['String']['input']>;
+  analyticsReportFolders?: InputMaybe<CompanyAnalyticsReportFoldersFieldInput>;
   analyticsReports?: InputMaybe<CompanyAnalyticsReportsFieldInput>;
   controlPriority?: InputMaybe<Scalars['Int']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
@@ -17930,6 +18207,7 @@ export type CompanyDataObjectOwnedDataObjectsNodeAggregateSelection = {
 };
 
 export type CompanyDeleteInput = {
+  analyticsReportFolders?: InputMaybe<Array<CompanyAnalyticsReportFoldersDeleteFieldInput>>;
   analyticsReports?: InputMaybe<Array<CompanyAnalyticsReportsDeleteFieldInput>>;
   employees?: InputMaybe<Array<CompanyEmployeesDeleteFieldInput>>;
   organisations?: InputMaybe<Array<CompanyOrganisationsDeleteFieldInput>>;
@@ -17969,6 +18247,7 @@ export type CompanyDiagramOwnedDiagramsNodeAggregateSelection = {
 };
 
 export type CompanyDisconnectInput = {
+  analyticsReportFolders?: InputMaybe<Array<CompanyAnalyticsReportFoldersDisconnectFieldInput>>;
   analyticsReports?: InputMaybe<Array<CompanyAnalyticsReportsDisconnectFieldInput>>;
   employees?: InputMaybe<Array<CompanyEmployeesDisconnectFieldInput>>;
   organisations?: InputMaybe<Array<CompanyOrganisationsDisconnectFieldInput>>;
@@ -20135,6 +20414,19 @@ export type CompanyRelationshipFilters = {
   some?: InputMaybe<CompanyWhere>;
 };
 
+export type CompanyReportFolderAnalyticsReportFoldersAggregateSelection = {
+  __typename?: 'CompanyReportFolderAnalyticsReportFoldersAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<CompanyReportFolderAnalyticsReportFoldersNodeAggregateSelection>;
+};
+
+export type CompanyReportFolderAnalyticsReportFoldersNodeAggregateSelection = {
+  __typename?: 'CompanyReportFolderAnalyticsReportFoldersNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  name: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
 /** Company sizes */
 export enum CompanySize {
   ENTERPRISE = 'ENTERPRISE',
@@ -20216,6 +20508,7 @@ export type CompanySupplierOwnedSuppliersNodeAggregateSelection = {
 export type CompanyUpdateInput = {
   achievedSovereigntyScore?: InputMaybe<FloatScalarMutations>;
   address?: InputMaybe<StringScalarMutations>;
+  analyticsReportFolders?: InputMaybe<Array<CompanyAnalyticsReportFoldersUpdateFieldInput>>;
   analyticsReports?: InputMaybe<Array<CompanyAnalyticsReportsUpdateFieldInput>>;
   controlPriority?: InputMaybe<IntScalarMutations>;
   createdAt?: InputMaybe<DateTimeScalarMutations>;
@@ -20266,6 +20559,8 @@ export type CompanyWhere = {
   OR?: InputMaybe<Array<CompanyWhere>>;
   achievedSovereigntyScore?: InputMaybe<FloatScalarFilters>;
   address?: InputMaybe<StringScalarFilters>;
+  analyticsReportFolders?: InputMaybe<ReportFolderRelationshipFilters>;
+  analyticsReportFoldersConnection?: InputMaybe<CompanyAnalyticsReportFoldersConnectionFilters>;
   analyticsReports?: InputMaybe<AnalyticsReportRelationshipFilters>;
   analyticsReportsConnection?: InputMaybe<CompanyAnalyticsReportsConnectionFilters>;
   controlPriority?: InputMaybe<IntScalarFilters>;
@@ -20508,6 +20803,12 @@ export type CreateProductFamiliesMutationResponse = {
   __typename?: 'CreateProductFamiliesMutationResponse';
   info: CreateInfo;
   productFamilies: Array<ProductFamily>;
+};
+
+export type CreateReportFoldersMutationResponse = {
+  __typename?: 'CreateReportFoldersMutationResponse';
+  info: CreateInfo;
+  reportFolders: Array<ReportFolder>;
 };
 
 export type CreateSbomDocumentsMutationResponse = {
@@ -36977,6 +37278,7 @@ export type Mutation = {
   createOrganisations: CreateOrganisationsMutationResponse;
   createPeople: CreatePeopleMutationResponse;
   createProductFamilies: CreateProductFamiliesMutationResponse;
+  createReportFolders: CreateReportFoldersMutationResponse;
   createSbomDocuments: CreateSbomDocumentsMutationResponse;
   createSoftwareProducts: CreateSoftwareProductsMutationResponse;
   createSoftwareVersions: CreateSoftwareVersionsMutationResponse;
@@ -37007,6 +37309,7 @@ export type Mutation = {
   deleteOrganisations: DeleteInfo;
   deletePeople: DeleteInfo;
   deleteProductFamilies: DeleteInfo;
+  deleteReportFolders: DeleteInfo;
   deleteSbomDocuments: DeleteInfo;
   deleteSoftwareProducts: DeleteInfo;
   deleteSoftwareVersions: DeleteInfo;
@@ -37037,6 +37340,7 @@ export type Mutation = {
   updateOrganisations: UpdateOrganisationsMutationResponse;
   updatePeople: UpdatePeopleMutationResponse;
   updateProductFamilies: UpdateProductFamiliesMutationResponse;
+  updateReportFolders: UpdateReportFoldersMutationResponse;
   updateSbomDocuments: UpdateSbomDocumentsMutationResponse;
   updateSoftwareProducts: UpdateSoftwareProductsMutationResponse;
   updateSoftwareVersions: UpdateSoftwareVersionsMutationResponse;
@@ -37171,6 +37475,11 @@ export type MutationCreatePeopleArgs = {
 
 export type MutationCreateProductFamiliesArgs = {
   input: Array<ProductFamilyCreateInput>;
+};
+
+
+export type MutationCreateReportFoldersArgs = {
+  input: Array<ReportFolderCreateInput>;
 };
 
 
@@ -37346,6 +37655,12 @@ export type MutationDeletePeopleArgs = {
 export type MutationDeleteProductFamiliesArgs = {
   delete?: InputMaybe<ProductFamilyDeleteInput>;
   where?: InputMaybe<ProductFamilyWhere>;
+};
+
+
+export type MutationDeleteReportFoldersArgs = {
+  delete?: InputMaybe<ReportFolderDeleteInput>;
+  where?: InputMaybe<ReportFolderWhere>;
 };
 
 
@@ -37526,6 +37841,12 @@ export type MutationUpdatePeopleArgs = {
 export type MutationUpdateProductFamiliesArgs = {
   update?: InputMaybe<ProductFamilyUpdateInput>;
   where?: InputMaybe<ProductFamilyWhere>;
+};
+
+
+export type MutationUpdateReportFoldersArgs = {
+  update?: InputMaybe<ReportFolderUpdateInput>;
+  where?: InputMaybe<ReportFolderWhere>;
 };
 
 
@@ -39335,6 +39656,8 @@ export type Person = {
   avatarUrl?: Maybe<Scalars['String']['output']>;
   companies: Array<Company>;
   companiesConnection: PersonCompaniesConnection;
+  createdAnalyticsReportFolders: Array<ReportFolder>;
+  createdAnalyticsReportFoldersConnection: PersonCreatedAnalyticsReportFoldersConnection;
   createdAnalyticsReports: Array<AnalyticsReport>;
   createdAnalyticsReportsConnection: PersonCreatedAnalyticsReportsConnection;
   createdAt: Scalars['DateTime']['output'];
@@ -39392,6 +39715,24 @@ export type PersonCompaniesConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<PersonCompaniesConnectionSort>>;
   where?: InputMaybe<PersonCompaniesConnectionWhere>;
+};
+
+
+/** Person – represents an individual within the organization */
+export type PersonCreatedAnalyticsReportFoldersArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<ReportFolderSort>>;
+  where?: InputMaybe<ReportFolderWhere>;
+};
+
+
+/** Person – represents an individual within the organization */
+export type PersonCreatedAnalyticsReportFoldersConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<PersonCreatedAnalyticsReportFoldersConnectionSort>>;
+  where?: InputMaybe<PersonCreatedAnalyticsReportFoldersConnectionWhere>;
 };
 
 
@@ -39991,6 +40332,7 @@ export type PersonCompanyCompaniesNodeAggregateSelection = {
 
 export type PersonConnectInput = {
   companies?: InputMaybe<Array<PersonCompaniesConnectFieldInput>>;
+  createdAnalyticsReportFolders?: InputMaybe<Array<PersonCreatedAnalyticsReportFoldersConnectFieldInput>>;
   createdAnalyticsReports?: InputMaybe<Array<PersonCreatedAnalyticsReportsConnectFieldInput>>;
   ownedAIComponents?: InputMaybe<Array<PersonOwnedAiComponentsConnectFieldInput>>;
   ownedApplications?: InputMaybe<Array<PersonOwnedApplicationsConnectFieldInput>>;
@@ -40015,6 +40357,7 @@ export type PersonConnectWhere = {
 export type PersonCreateInput = {
   avatarUrl?: InputMaybe<Scalars['String']['input']>;
   companies?: InputMaybe<PersonCompaniesFieldInput>;
+  createdAnalyticsReportFolders?: InputMaybe<PersonCreatedAnalyticsReportFoldersFieldInput>;
   createdAnalyticsReports?: InputMaybe<PersonCreatedAnalyticsReportsFieldInput>;
   department?: InputMaybe<Scalars['String']['input']>;
   email?: InputMaybe<Scalars['String']['input']>;
@@ -40037,6 +40380,111 @@ export type PersonCreateInput = {
   phone?: InputMaybe<Scalars['String']['input']>;
   role?: InputMaybe<Scalars['String']['input']>;
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+export type PersonCreatedAnalyticsReportFoldersAggregateInput = {
+  AND?: InputMaybe<Array<PersonCreatedAnalyticsReportFoldersAggregateInput>>;
+  NOT?: InputMaybe<PersonCreatedAnalyticsReportFoldersAggregateInput>;
+  OR?: InputMaybe<Array<PersonCreatedAnalyticsReportFoldersAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<PersonCreatedAnalyticsReportFoldersNodeAggregationWhereInput>;
+};
+
+export type PersonCreatedAnalyticsReportFoldersConnectFieldInput = {
+  connect?: InputMaybe<Array<ReportFolderConnectInput>>;
+  where?: InputMaybe<ReportFolderConnectWhere>;
+};
+
+export type PersonCreatedAnalyticsReportFoldersConnection = {
+  __typename?: 'PersonCreatedAnalyticsReportFoldersConnection';
+  aggregate: PersonReportFolderCreatedAnalyticsReportFoldersAggregateSelection;
+  edges: Array<PersonCreatedAnalyticsReportFoldersRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type PersonCreatedAnalyticsReportFoldersConnectionAggregateInput = {
+  AND?: InputMaybe<Array<PersonCreatedAnalyticsReportFoldersConnectionAggregateInput>>;
+  NOT?: InputMaybe<PersonCreatedAnalyticsReportFoldersConnectionAggregateInput>;
+  OR?: InputMaybe<Array<PersonCreatedAnalyticsReportFoldersConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<PersonCreatedAnalyticsReportFoldersNodeAggregationWhereInput>;
+};
+
+export type PersonCreatedAnalyticsReportFoldersConnectionFilters = {
+  /** Filter People by aggregating results on related PersonCreatedAnalyticsReportFoldersConnections */
+  aggregate?: InputMaybe<PersonCreatedAnalyticsReportFoldersConnectionAggregateInput>;
+  /** Return People where all of the related PersonCreatedAnalyticsReportFoldersConnections match this filter */
+  all?: InputMaybe<PersonCreatedAnalyticsReportFoldersConnectionWhere>;
+  /** Return People where none of the related PersonCreatedAnalyticsReportFoldersConnections match this filter */
+  none?: InputMaybe<PersonCreatedAnalyticsReportFoldersConnectionWhere>;
+  /** Return People where one of the related PersonCreatedAnalyticsReportFoldersConnections match this filter */
+  single?: InputMaybe<PersonCreatedAnalyticsReportFoldersConnectionWhere>;
+  /** Return People where some of the related PersonCreatedAnalyticsReportFoldersConnections match this filter */
+  some?: InputMaybe<PersonCreatedAnalyticsReportFoldersConnectionWhere>;
+};
+
+export type PersonCreatedAnalyticsReportFoldersConnectionSort = {
+  node?: InputMaybe<ReportFolderSort>;
+};
+
+export type PersonCreatedAnalyticsReportFoldersConnectionWhere = {
+  AND?: InputMaybe<Array<PersonCreatedAnalyticsReportFoldersConnectionWhere>>;
+  NOT?: InputMaybe<PersonCreatedAnalyticsReportFoldersConnectionWhere>;
+  OR?: InputMaybe<Array<PersonCreatedAnalyticsReportFoldersConnectionWhere>>;
+  node?: InputMaybe<ReportFolderWhere>;
+};
+
+export type PersonCreatedAnalyticsReportFoldersCreateFieldInput = {
+  node: ReportFolderCreateInput;
+};
+
+export type PersonCreatedAnalyticsReportFoldersDeleteFieldInput = {
+  delete?: InputMaybe<ReportFolderDeleteInput>;
+  where?: InputMaybe<PersonCreatedAnalyticsReportFoldersConnectionWhere>;
+};
+
+export type PersonCreatedAnalyticsReportFoldersDisconnectFieldInput = {
+  disconnect?: InputMaybe<ReportFolderDisconnectInput>;
+  where?: InputMaybe<PersonCreatedAnalyticsReportFoldersConnectionWhere>;
+};
+
+export type PersonCreatedAnalyticsReportFoldersFieldInput = {
+  connect?: InputMaybe<Array<PersonCreatedAnalyticsReportFoldersConnectFieldInput>>;
+  create?: InputMaybe<Array<PersonCreatedAnalyticsReportFoldersCreateFieldInput>>;
+};
+
+export type PersonCreatedAnalyticsReportFoldersNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<PersonCreatedAnalyticsReportFoldersNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<PersonCreatedAnalyticsReportFoldersNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<PersonCreatedAnalyticsReportFoldersNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type PersonCreatedAnalyticsReportFoldersRelationship = {
+  __typename?: 'PersonCreatedAnalyticsReportFoldersRelationship';
+  cursor: Scalars['String']['output'];
+  node: ReportFolder;
+};
+
+export type PersonCreatedAnalyticsReportFoldersUpdateConnectionInput = {
+  node?: InputMaybe<ReportFolderUpdateInput>;
+  where?: InputMaybe<PersonCreatedAnalyticsReportFoldersConnectionWhere>;
+};
+
+export type PersonCreatedAnalyticsReportFoldersUpdateFieldInput = {
+  connect?: InputMaybe<Array<PersonCreatedAnalyticsReportFoldersConnectFieldInput>>;
+  create?: InputMaybe<Array<PersonCreatedAnalyticsReportFoldersCreateFieldInput>>;
+  delete?: InputMaybe<Array<PersonCreatedAnalyticsReportFoldersDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<PersonCreatedAnalyticsReportFoldersDisconnectFieldInput>>;
+  update?: InputMaybe<PersonCreatedAnalyticsReportFoldersUpdateConnectionInput>;
 };
 
 export type PersonCreatedAnalyticsReportsAggregateInput = {
@@ -40170,6 +40618,7 @@ export type PersonDataObjectOwnedDataObjectsNodeAggregateSelection = {
 
 export type PersonDeleteInput = {
   companies?: InputMaybe<Array<PersonCompaniesDeleteFieldInput>>;
+  createdAnalyticsReportFolders?: InputMaybe<Array<PersonCreatedAnalyticsReportFoldersDeleteFieldInput>>;
   createdAnalyticsReports?: InputMaybe<Array<PersonCreatedAnalyticsReportsDeleteFieldInput>>;
   ownedAIComponents?: InputMaybe<Array<PersonOwnedAiComponentsDeleteFieldInput>>;
   ownedApplications?: InputMaybe<Array<PersonOwnedApplicationsDeleteFieldInput>>;
@@ -40206,6 +40655,7 @@ export type PersonDiagramOwnedDiagramsNodeAggregateSelection = {
 
 export type PersonDisconnectInput = {
   companies?: InputMaybe<Array<PersonCompaniesDisconnectFieldInput>>;
+  createdAnalyticsReportFolders?: InputMaybe<Array<PersonCreatedAnalyticsReportFoldersDisconnectFieldInput>>;
   createdAnalyticsReports?: InputMaybe<Array<PersonCreatedAnalyticsReportsDisconnectFieldInput>>;
   ownedAIComponents?: InputMaybe<Array<PersonOwnedAiComponentsDisconnectFieldInput>>;
   ownedApplications?: InputMaybe<Array<PersonOwnedApplicationsDisconnectFieldInput>>;
@@ -41890,6 +42340,19 @@ export type PersonRelationshipFilters = {
   some?: InputMaybe<PersonWhere>;
 };
 
+export type PersonReportFolderCreatedAnalyticsReportFoldersAggregateSelection = {
+  __typename?: 'PersonReportFolderCreatedAnalyticsReportFoldersAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<PersonReportFolderCreatedAnalyticsReportFoldersNodeAggregateSelection>;
+};
+
+export type PersonReportFolderCreatedAnalyticsReportFoldersNodeAggregateSelection = {
+  __typename?: 'PersonReportFolderCreatedAnalyticsReportFoldersNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  name: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
 /** Fields to sort People by. The order in which sorts are applied is not guaranteed when specifying many fields in one PersonSort object. */
 export type PersonSort = {
   avatarUrl?: InputMaybe<SortDirection>;
@@ -41907,6 +42370,7 @@ export type PersonSort = {
 export type PersonUpdateInput = {
   avatarUrl?: InputMaybe<StringScalarMutations>;
   companies?: InputMaybe<Array<PersonCompaniesUpdateFieldInput>>;
+  createdAnalyticsReportFolders?: InputMaybe<Array<PersonCreatedAnalyticsReportFoldersUpdateFieldInput>>;
   createdAnalyticsReports?: InputMaybe<Array<PersonCreatedAnalyticsReportsUpdateFieldInput>>;
   createdAt?: InputMaybe<DateTimeScalarMutations>;
   department?: InputMaybe<StringScalarMutations>;
@@ -41938,6 +42402,8 @@ export type PersonWhere = {
   avatarUrl?: InputMaybe<StringScalarFilters>;
   companies?: InputMaybe<CompanyRelationshipFilters>;
   companiesConnection?: InputMaybe<PersonCompaniesConnectionFilters>;
+  createdAnalyticsReportFolders?: InputMaybe<ReportFolderRelationshipFilters>;
+  createdAnalyticsReportFoldersConnection?: InputMaybe<PersonCreatedAnalyticsReportFoldersConnectionFilters>;
   createdAnalyticsReports?: InputMaybe<AnalyticsReportRelationshipFilters>;
   createdAnalyticsReportsConnection?: InputMaybe<PersonCreatedAnalyticsReportsConnectionFilters>;
   createdAt?: InputMaybe<DateTimeScalarFilters>;
@@ -42553,6 +43019,8 @@ export type Query = {
   peopleConnection: PeopleConnection;
   productFamilies: Array<ProductFamily>;
   productFamiliesConnection: ProductFamiliesConnection;
+  reportFolders: Array<ReportFolder>;
+  reportFoldersConnection: ReportFoldersConnection;
   sbomDocuments: Array<SbomDocument>;
   sbomDocumentsConnection: SbomDocumentsConnection;
   softwareProducts: Array<SoftwareProduct>;
@@ -42980,6 +43448,22 @@ export type QueryProductFamiliesConnectionArgs = {
 };
 
 
+export type QueryReportFoldersArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<ReportFolderSort>>;
+  where?: InputMaybe<ReportFolderWhere>;
+};
+
+
+export type QueryReportFoldersConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<ReportFolderSort>>;
+  where?: InputMaybe<ReportFolderWhere>;
+};
+
+
 export type QuerySbomDocumentsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -43041,6 +43525,883 @@ export type QuerySuppliersConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<SupplierSort>>;
   where?: InputMaybe<SupplierWhere>;
+};
+
+/** ReportFolder - organizes analytics reports within a company */
+export type ReportFolder = {
+  __typename?: 'ReportFolder';
+  children: Array<ReportFolder>;
+  childrenConnection: ReportFolderChildrenConnection;
+  company: Array<Company>;
+  companyConnection: ReportFolderCompanyConnection;
+  createdAt: Scalars['DateTime']['output'];
+  createdBy: Array<Person>;
+  createdByConnection: ReportFolderCreatedByConnection;
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  parent: Array<ReportFolder>;
+  parentConnection: ReportFolderParentConnection;
+  reports: Array<AnalyticsReport>;
+  reportsConnection: ReportFolderReportsConnection;
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+};
+
+
+/** ReportFolder - organizes analytics reports within a company */
+export type ReportFolderChildrenArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<ReportFolderSort>>;
+  where?: InputMaybe<ReportFolderWhere>;
+};
+
+
+/** ReportFolder - organizes analytics reports within a company */
+export type ReportFolderChildrenConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<ReportFolderChildrenConnectionSort>>;
+  where?: InputMaybe<ReportFolderChildrenConnectionWhere>;
+};
+
+
+/** ReportFolder - organizes analytics reports within a company */
+export type ReportFolderCompanyArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<CompanySort>>;
+  where?: InputMaybe<CompanyWhere>;
+};
+
+
+/** ReportFolder - organizes analytics reports within a company */
+export type ReportFolderCompanyConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<ReportFolderCompanyConnectionSort>>;
+  where?: InputMaybe<ReportFolderCompanyConnectionWhere>;
+};
+
+
+/** ReportFolder - organizes analytics reports within a company */
+export type ReportFolderCreatedByArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<PersonSort>>;
+  where?: InputMaybe<PersonWhere>;
+};
+
+
+/** ReportFolder - organizes analytics reports within a company */
+export type ReportFolderCreatedByConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<ReportFolderCreatedByConnectionSort>>;
+  where?: InputMaybe<ReportFolderCreatedByConnectionWhere>;
+};
+
+
+/** ReportFolder - organizes analytics reports within a company */
+export type ReportFolderParentArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<ReportFolderSort>>;
+  where?: InputMaybe<ReportFolderWhere>;
+};
+
+
+/** ReportFolder - organizes analytics reports within a company */
+export type ReportFolderParentConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<ReportFolderParentConnectionSort>>;
+  where?: InputMaybe<ReportFolderParentConnectionWhere>;
+};
+
+
+/** ReportFolder - organizes analytics reports within a company */
+export type ReportFolderReportsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<AnalyticsReportSort>>;
+  where?: InputMaybe<AnalyticsReportWhere>;
+};
+
+
+/** ReportFolder - organizes analytics reports within a company */
+export type ReportFolderReportsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<ReportFolderReportsConnectionSort>>;
+  where?: InputMaybe<ReportFolderReportsConnectionWhere>;
+};
+
+export type ReportFolderAggregate = {
+  __typename?: 'ReportFolderAggregate';
+  count: Count;
+  node: ReportFolderAggregateNode;
+};
+
+export type ReportFolderAggregateNode = {
+  __typename?: 'ReportFolderAggregateNode';
+  createdAt: DateTimeAggregateSelection;
+  name: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
+export type ReportFolderAnalyticsReportReportsAggregateSelection = {
+  __typename?: 'ReportFolderAnalyticsReportReportsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<ReportFolderAnalyticsReportReportsNodeAggregateSelection>;
+};
+
+export type ReportFolderAnalyticsReportReportsNodeAggregateSelection = {
+  __typename?: 'ReportFolderAnalyticsReportReportsNodeAggregateSelection';
+  chartType: StringAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  dimension: StringAggregateSelection;
+  elementType: StringAggregateSelection;
+  measure: StringAggregateSelection;
+  name: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
+export type ReportFolderChildrenAggregateInput = {
+  AND?: InputMaybe<Array<ReportFolderChildrenAggregateInput>>;
+  NOT?: InputMaybe<ReportFolderChildrenAggregateInput>;
+  OR?: InputMaybe<Array<ReportFolderChildrenAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<ReportFolderChildrenNodeAggregationWhereInput>;
+};
+
+export type ReportFolderChildrenConnectFieldInput = {
+  connect?: InputMaybe<Array<ReportFolderConnectInput>>;
+  where?: InputMaybe<ReportFolderConnectWhere>;
+};
+
+export type ReportFolderChildrenConnection = {
+  __typename?: 'ReportFolderChildrenConnection';
+  aggregate: ReportFolderReportFolderChildrenAggregateSelection;
+  edges: Array<ReportFolderChildrenRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type ReportFolderChildrenConnectionAggregateInput = {
+  AND?: InputMaybe<Array<ReportFolderChildrenConnectionAggregateInput>>;
+  NOT?: InputMaybe<ReportFolderChildrenConnectionAggregateInput>;
+  OR?: InputMaybe<Array<ReportFolderChildrenConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<ReportFolderChildrenNodeAggregationWhereInput>;
+};
+
+export type ReportFolderChildrenConnectionFilters = {
+  /** Filter ReportFolders by aggregating results on related ReportFolderChildrenConnections */
+  aggregate?: InputMaybe<ReportFolderChildrenConnectionAggregateInput>;
+  /** Return ReportFolders where all of the related ReportFolderChildrenConnections match this filter */
+  all?: InputMaybe<ReportFolderChildrenConnectionWhere>;
+  /** Return ReportFolders where none of the related ReportFolderChildrenConnections match this filter */
+  none?: InputMaybe<ReportFolderChildrenConnectionWhere>;
+  /** Return ReportFolders where one of the related ReportFolderChildrenConnections match this filter */
+  single?: InputMaybe<ReportFolderChildrenConnectionWhere>;
+  /** Return ReportFolders where some of the related ReportFolderChildrenConnections match this filter */
+  some?: InputMaybe<ReportFolderChildrenConnectionWhere>;
+};
+
+export type ReportFolderChildrenConnectionSort = {
+  node?: InputMaybe<ReportFolderSort>;
+};
+
+export type ReportFolderChildrenConnectionWhere = {
+  AND?: InputMaybe<Array<ReportFolderChildrenConnectionWhere>>;
+  NOT?: InputMaybe<ReportFolderChildrenConnectionWhere>;
+  OR?: InputMaybe<Array<ReportFolderChildrenConnectionWhere>>;
+  node?: InputMaybe<ReportFolderWhere>;
+};
+
+export type ReportFolderChildrenCreateFieldInput = {
+  node: ReportFolderCreateInput;
+};
+
+export type ReportFolderChildrenDeleteFieldInput = {
+  delete?: InputMaybe<ReportFolderDeleteInput>;
+  where?: InputMaybe<ReportFolderChildrenConnectionWhere>;
+};
+
+export type ReportFolderChildrenDisconnectFieldInput = {
+  disconnect?: InputMaybe<ReportFolderDisconnectInput>;
+  where?: InputMaybe<ReportFolderChildrenConnectionWhere>;
+};
+
+export type ReportFolderChildrenFieldInput = {
+  connect?: InputMaybe<Array<ReportFolderChildrenConnectFieldInput>>;
+  create?: InputMaybe<Array<ReportFolderChildrenCreateFieldInput>>;
+};
+
+export type ReportFolderChildrenNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<ReportFolderChildrenNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<ReportFolderChildrenNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<ReportFolderChildrenNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type ReportFolderChildrenRelationship = {
+  __typename?: 'ReportFolderChildrenRelationship';
+  cursor: Scalars['String']['output'];
+  node: ReportFolder;
+};
+
+export type ReportFolderChildrenUpdateConnectionInput = {
+  node?: InputMaybe<ReportFolderUpdateInput>;
+  where?: InputMaybe<ReportFolderChildrenConnectionWhere>;
+};
+
+export type ReportFolderChildrenUpdateFieldInput = {
+  connect?: InputMaybe<Array<ReportFolderChildrenConnectFieldInput>>;
+  create?: InputMaybe<Array<ReportFolderChildrenCreateFieldInput>>;
+  delete?: InputMaybe<Array<ReportFolderChildrenDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<ReportFolderChildrenDisconnectFieldInput>>;
+  update?: InputMaybe<ReportFolderChildrenUpdateConnectionInput>;
+};
+
+export type ReportFolderCompanyAggregateInput = {
+  AND?: InputMaybe<Array<ReportFolderCompanyAggregateInput>>;
+  NOT?: InputMaybe<ReportFolderCompanyAggregateInput>;
+  OR?: InputMaybe<Array<ReportFolderCompanyAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<ReportFolderCompanyNodeAggregationWhereInput>;
+};
+
+export type ReportFolderCompanyCompanyAggregateSelection = {
+  __typename?: 'ReportFolderCompanyCompanyAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<ReportFolderCompanyCompanyNodeAggregateSelection>;
+};
+
+export type ReportFolderCompanyCompanyNodeAggregateSelection = {
+  __typename?: 'ReportFolderCompanyCompanyNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
+  address: StringAggregateSelection;
+  controlPriority: IntAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  diagramFont: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
+  features: StringAggregateSelection;
+  font: StringAggregateSelection;
+  industry: StringAggregateSelection;
+  llmKey: StringAggregateSelection;
+  llmModel: StringAggregateSelection;
+  llmUrl: StringAggregateSelection;
+  logo: StringAggregateSelection;
+  name: StringAggregateSelection;
+  primaryColor: StringAggregateSelection;
+  resiliencePriority: IntAggregateSelection;
+  secondaryColor: StringAggregateSelection;
+  securityPriority: IntAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
+  sovereigntyScoreStatus: StringAggregateSelection;
+  strategicAutonomyPriority: IntAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  website: StringAggregateSelection;
+};
+
+export type ReportFolderCompanyConnectFieldInput = {
+  connect?: InputMaybe<Array<CompanyConnectInput>>;
+  where?: InputMaybe<CompanyConnectWhere>;
+};
+
+export type ReportFolderCompanyConnection = {
+  __typename?: 'ReportFolderCompanyConnection';
+  aggregate: ReportFolderCompanyCompanyAggregateSelection;
+  edges: Array<ReportFolderCompanyRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type ReportFolderCompanyConnectionAggregateInput = {
+  AND?: InputMaybe<Array<ReportFolderCompanyConnectionAggregateInput>>;
+  NOT?: InputMaybe<ReportFolderCompanyConnectionAggregateInput>;
+  OR?: InputMaybe<Array<ReportFolderCompanyConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<ReportFolderCompanyNodeAggregationWhereInput>;
+};
+
+export type ReportFolderCompanyConnectionFilters = {
+  /** Filter ReportFolders by aggregating results on related ReportFolderCompanyConnections */
+  aggregate?: InputMaybe<ReportFolderCompanyConnectionAggregateInput>;
+  /** Return ReportFolders where all of the related ReportFolderCompanyConnections match this filter */
+  all?: InputMaybe<ReportFolderCompanyConnectionWhere>;
+  /** Return ReportFolders where none of the related ReportFolderCompanyConnections match this filter */
+  none?: InputMaybe<ReportFolderCompanyConnectionWhere>;
+  /** Return ReportFolders where one of the related ReportFolderCompanyConnections match this filter */
+  single?: InputMaybe<ReportFolderCompanyConnectionWhere>;
+  /** Return ReportFolders where some of the related ReportFolderCompanyConnections match this filter */
+  some?: InputMaybe<ReportFolderCompanyConnectionWhere>;
+};
+
+export type ReportFolderCompanyConnectionSort = {
+  node?: InputMaybe<CompanySort>;
+};
+
+export type ReportFolderCompanyConnectionWhere = {
+  AND?: InputMaybe<Array<ReportFolderCompanyConnectionWhere>>;
+  NOT?: InputMaybe<ReportFolderCompanyConnectionWhere>;
+  OR?: InputMaybe<Array<ReportFolderCompanyConnectionWhere>>;
+  node?: InputMaybe<CompanyWhere>;
+};
+
+export type ReportFolderCompanyCreateFieldInput = {
+  node: CompanyCreateInput;
+};
+
+export type ReportFolderCompanyDeleteFieldInput = {
+  delete?: InputMaybe<CompanyDeleteInput>;
+  where?: InputMaybe<ReportFolderCompanyConnectionWhere>;
+};
+
+export type ReportFolderCompanyDisconnectFieldInput = {
+  disconnect?: InputMaybe<CompanyDisconnectInput>;
+  where?: InputMaybe<ReportFolderCompanyConnectionWhere>;
+};
+
+export type ReportFolderCompanyFieldInput = {
+  connect?: InputMaybe<Array<ReportFolderCompanyConnectFieldInput>>;
+  create?: InputMaybe<Array<ReportFolderCompanyCreateFieldInput>>;
+};
+
+export type ReportFolderCompanyNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<ReportFolderCompanyNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<ReportFolderCompanyNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<ReportFolderCompanyNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
+  address?: InputMaybe<StringScalarAggregationFilters>;
+  controlPriority?: InputMaybe<IntScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  diagramFont?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
+  features?: InputMaybe<StringScalarAggregationFilters>;
+  font?: InputMaybe<StringScalarAggregationFilters>;
+  industry?: InputMaybe<StringScalarAggregationFilters>;
+  llmKey?: InputMaybe<StringScalarAggregationFilters>;
+  llmModel?: InputMaybe<StringScalarAggregationFilters>;
+  llmUrl?: InputMaybe<StringScalarAggregationFilters>;
+  logo?: InputMaybe<StringScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  primaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  resiliencePriority?: InputMaybe<IntScalarAggregationFilters>;
+  secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  securityPriority?: InputMaybe<IntScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
+  strategicAutonomyPriority?: InputMaybe<IntScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  website?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type ReportFolderCompanyRelationship = {
+  __typename?: 'ReportFolderCompanyRelationship';
+  cursor: Scalars['String']['output'];
+  node: Company;
+};
+
+export type ReportFolderCompanyUpdateConnectionInput = {
+  node?: InputMaybe<CompanyUpdateInput>;
+  where?: InputMaybe<ReportFolderCompanyConnectionWhere>;
+};
+
+export type ReportFolderCompanyUpdateFieldInput = {
+  connect?: InputMaybe<Array<ReportFolderCompanyConnectFieldInput>>;
+  create?: InputMaybe<Array<ReportFolderCompanyCreateFieldInput>>;
+  delete?: InputMaybe<Array<ReportFolderCompanyDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<ReportFolderCompanyDisconnectFieldInput>>;
+  update?: InputMaybe<ReportFolderCompanyUpdateConnectionInput>;
+};
+
+export type ReportFolderConnectInput = {
+  children?: InputMaybe<Array<ReportFolderChildrenConnectFieldInput>>;
+  company?: InputMaybe<Array<ReportFolderCompanyConnectFieldInput>>;
+  createdBy?: InputMaybe<Array<ReportFolderCreatedByConnectFieldInput>>;
+  parent?: InputMaybe<Array<ReportFolderParentConnectFieldInput>>;
+  reports?: InputMaybe<Array<ReportFolderReportsConnectFieldInput>>;
+};
+
+export type ReportFolderConnectWhere = {
+  node: ReportFolderWhere;
+};
+
+export type ReportFolderCreateInput = {
+  children?: InputMaybe<ReportFolderChildrenFieldInput>;
+  company?: InputMaybe<ReportFolderCompanyFieldInput>;
+  createdBy?: InputMaybe<ReportFolderCreatedByFieldInput>;
+  name: Scalars['String']['input'];
+  parent?: InputMaybe<ReportFolderParentFieldInput>;
+  reports?: InputMaybe<ReportFolderReportsFieldInput>;
+  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+export type ReportFolderCreatedByAggregateInput = {
+  AND?: InputMaybe<Array<ReportFolderCreatedByAggregateInput>>;
+  NOT?: InputMaybe<ReportFolderCreatedByAggregateInput>;
+  OR?: InputMaybe<Array<ReportFolderCreatedByAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<ReportFolderCreatedByNodeAggregationWhereInput>;
+};
+
+export type ReportFolderCreatedByConnectFieldInput = {
+  connect?: InputMaybe<Array<PersonConnectInput>>;
+  where?: InputMaybe<PersonConnectWhere>;
+};
+
+export type ReportFolderCreatedByConnection = {
+  __typename?: 'ReportFolderCreatedByConnection';
+  aggregate: ReportFolderPersonCreatedByAggregateSelection;
+  edges: Array<ReportFolderCreatedByRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type ReportFolderCreatedByConnectionAggregateInput = {
+  AND?: InputMaybe<Array<ReportFolderCreatedByConnectionAggregateInput>>;
+  NOT?: InputMaybe<ReportFolderCreatedByConnectionAggregateInput>;
+  OR?: InputMaybe<Array<ReportFolderCreatedByConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<ReportFolderCreatedByNodeAggregationWhereInput>;
+};
+
+export type ReportFolderCreatedByConnectionFilters = {
+  /** Filter ReportFolders by aggregating results on related ReportFolderCreatedByConnections */
+  aggregate?: InputMaybe<ReportFolderCreatedByConnectionAggregateInput>;
+  /** Return ReportFolders where all of the related ReportFolderCreatedByConnections match this filter */
+  all?: InputMaybe<ReportFolderCreatedByConnectionWhere>;
+  /** Return ReportFolders where none of the related ReportFolderCreatedByConnections match this filter */
+  none?: InputMaybe<ReportFolderCreatedByConnectionWhere>;
+  /** Return ReportFolders where one of the related ReportFolderCreatedByConnections match this filter */
+  single?: InputMaybe<ReportFolderCreatedByConnectionWhere>;
+  /** Return ReportFolders where some of the related ReportFolderCreatedByConnections match this filter */
+  some?: InputMaybe<ReportFolderCreatedByConnectionWhere>;
+};
+
+export type ReportFolderCreatedByConnectionSort = {
+  node?: InputMaybe<PersonSort>;
+};
+
+export type ReportFolderCreatedByConnectionWhere = {
+  AND?: InputMaybe<Array<ReportFolderCreatedByConnectionWhere>>;
+  NOT?: InputMaybe<ReportFolderCreatedByConnectionWhere>;
+  OR?: InputMaybe<Array<ReportFolderCreatedByConnectionWhere>>;
+  node?: InputMaybe<PersonWhere>;
+};
+
+export type ReportFolderCreatedByCreateFieldInput = {
+  node: PersonCreateInput;
+};
+
+export type ReportFolderCreatedByDeleteFieldInput = {
+  delete?: InputMaybe<PersonDeleteInput>;
+  where?: InputMaybe<ReportFolderCreatedByConnectionWhere>;
+};
+
+export type ReportFolderCreatedByDisconnectFieldInput = {
+  disconnect?: InputMaybe<PersonDisconnectInput>;
+  where?: InputMaybe<ReportFolderCreatedByConnectionWhere>;
+};
+
+export type ReportFolderCreatedByFieldInput = {
+  connect?: InputMaybe<Array<ReportFolderCreatedByConnectFieldInput>>;
+  create?: InputMaybe<Array<ReportFolderCreatedByCreateFieldInput>>;
+};
+
+export type ReportFolderCreatedByNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<ReportFolderCreatedByNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<ReportFolderCreatedByNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<ReportFolderCreatedByNodeAggregationWhereInput>>;
+  avatarUrl?: InputMaybe<StringScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  department?: InputMaybe<StringScalarAggregationFilters>;
+  email?: InputMaybe<StringScalarAggregationFilters>;
+  firstName?: InputMaybe<StringScalarAggregationFilters>;
+  lastName?: InputMaybe<StringScalarAggregationFilters>;
+  phone?: InputMaybe<StringScalarAggregationFilters>;
+  role?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type ReportFolderCreatedByRelationship = {
+  __typename?: 'ReportFolderCreatedByRelationship';
+  cursor: Scalars['String']['output'];
+  node: Person;
+};
+
+export type ReportFolderCreatedByUpdateConnectionInput = {
+  node?: InputMaybe<PersonUpdateInput>;
+  where?: InputMaybe<ReportFolderCreatedByConnectionWhere>;
+};
+
+export type ReportFolderCreatedByUpdateFieldInput = {
+  connect?: InputMaybe<Array<ReportFolderCreatedByConnectFieldInput>>;
+  create?: InputMaybe<Array<ReportFolderCreatedByCreateFieldInput>>;
+  delete?: InputMaybe<Array<ReportFolderCreatedByDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<ReportFolderCreatedByDisconnectFieldInput>>;
+  update?: InputMaybe<ReportFolderCreatedByUpdateConnectionInput>;
+};
+
+export type ReportFolderDeleteInput = {
+  children?: InputMaybe<Array<ReportFolderChildrenDeleteFieldInput>>;
+  company?: InputMaybe<Array<ReportFolderCompanyDeleteFieldInput>>;
+  createdBy?: InputMaybe<Array<ReportFolderCreatedByDeleteFieldInput>>;
+  parent?: InputMaybe<Array<ReportFolderParentDeleteFieldInput>>;
+  reports?: InputMaybe<Array<ReportFolderReportsDeleteFieldInput>>;
+};
+
+export type ReportFolderDisconnectInput = {
+  children?: InputMaybe<Array<ReportFolderChildrenDisconnectFieldInput>>;
+  company?: InputMaybe<Array<ReportFolderCompanyDisconnectFieldInput>>;
+  createdBy?: InputMaybe<Array<ReportFolderCreatedByDisconnectFieldInput>>;
+  parent?: InputMaybe<Array<ReportFolderParentDisconnectFieldInput>>;
+  reports?: InputMaybe<Array<ReportFolderReportsDisconnectFieldInput>>;
+};
+
+export type ReportFolderEdge = {
+  __typename?: 'ReportFolderEdge';
+  cursor: Scalars['String']['output'];
+  node: ReportFolder;
+};
+
+export type ReportFolderParentAggregateInput = {
+  AND?: InputMaybe<Array<ReportFolderParentAggregateInput>>;
+  NOT?: InputMaybe<ReportFolderParentAggregateInput>;
+  OR?: InputMaybe<Array<ReportFolderParentAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<ReportFolderParentNodeAggregationWhereInput>;
+};
+
+export type ReportFolderParentConnectFieldInput = {
+  connect?: InputMaybe<Array<ReportFolderConnectInput>>;
+  where?: InputMaybe<ReportFolderConnectWhere>;
+};
+
+export type ReportFolderParentConnection = {
+  __typename?: 'ReportFolderParentConnection';
+  aggregate: ReportFolderReportFolderParentAggregateSelection;
+  edges: Array<ReportFolderParentRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type ReportFolderParentConnectionAggregateInput = {
+  AND?: InputMaybe<Array<ReportFolderParentConnectionAggregateInput>>;
+  NOT?: InputMaybe<ReportFolderParentConnectionAggregateInput>;
+  OR?: InputMaybe<Array<ReportFolderParentConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<ReportFolderParentNodeAggregationWhereInput>;
+};
+
+export type ReportFolderParentConnectionFilters = {
+  /** Filter ReportFolders by aggregating results on related ReportFolderParentConnections */
+  aggregate?: InputMaybe<ReportFolderParentConnectionAggregateInput>;
+  /** Return ReportFolders where all of the related ReportFolderParentConnections match this filter */
+  all?: InputMaybe<ReportFolderParentConnectionWhere>;
+  /** Return ReportFolders where none of the related ReportFolderParentConnections match this filter */
+  none?: InputMaybe<ReportFolderParentConnectionWhere>;
+  /** Return ReportFolders where one of the related ReportFolderParentConnections match this filter */
+  single?: InputMaybe<ReportFolderParentConnectionWhere>;
+  /** Return ReportFolders where some of the related ReportFolderParentConnections match this filter */
+  some?: InputMaybe<ReportFolderParentConnectionWhere>;
+};
+
+export type ReportFolderParentConnectionSort = {
+  node?: InputMaybe<ReportFolderSort>;
+};
+
+export type ReportFolderParentConnectionWhere = {
+  AND?: InputMaybe<Array<ReportFolderParentConnectionWhere>>;
+  NOT?: InputMaybe<ReportFolderParentConnectionWhere>;
+  OR?: InputMaybe<Array<ReportFolderParentConnectionWhere>>;
+  node?: InputMaybe<ReportFolderWhere>;
+};
+
+export type ReportFolderParentCreateFieldInput = {
+  node: ReportFolderCreateInput;
+};
+
+export type ReportFolderParentDeleteFieldInput = {
+  delete?: InputMaybe<ReportFolderDeleteInput>;
+  where?: InputMaybe<ReportFolderParentConnectionWhere>;
+};
+
+export type ReportFolderParentDisconnectFieldInput = {
+  disconnect?: InputMaybe<ReportFolderDisconnectInput>;
+  where?: InputMaybe<ReportFolderParentConnectionWhere>;
+};
+
+export type ReportFolderParentFieldInput = {
+  connect?: InputMaybe<Array<ReportFolderParentConnectFieldInput>>;
+  create?: InputMaybe<Array<ReportFolderParentCreateFieldInput>>;
+};
+
+export type ReportFolderParentNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<ReportFolderParentNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<ReportFolderParentNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<ReportFolderParentNodeAggregationWhereInput>>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type ReportFolderParentRelationship = {
+  __typename?: 'ReportFolderParentRelationship';
+  cursor: Scalars['String']['output'];
+  node: ReportFolder;
+};
+
+export type ReportFolderParentUpdateConnectionInput = {
+  node?: InputMaybe<ReportFolderUpdateInput>;
+  where?: InputMaybe<ReportFolderParentConnectionWhere>;
+};
+
+export type ReportFolderParentUpdateFieldInput = {
+  connect?: InputMaybe<Array<ReportFolderParentConnectFieldInput>>;
+  create?: InputMaybe<Array<ReportFolderParentCreateFieldInput>>;
+  delete?: InputMaybe<Array<ReportFolderParentDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<ReportFolderParentDisconnectFieldInput>>;
+  update?: InputMaybe<ReportFolderParentUpdateConnectionInput>;
+};
+
+export type ReportFolderPersonCreatedByAggregateSelection = {
+  __typename?: 'ReportFolderPersonCreatedByAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<ReportFolderPersonCreatedByNodeAggregateSelection>;
+};
+
+export type ReportFolderPersonCreatedByNodeAggregateSelection = {
+  __typename?: 'ReportFolderPersonCreatedByNodeAggregateSelection';
+  avatarUrl: StringAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  department: StringAggregateSelection;
+  email: StringAggregateSelection;
+  firstName: StringAggregateSelection;
+  lastName: StringAggregateSelection;
+  phone: StringAggregateSelection;
+  role: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
+export type ReportFolderRelationshipFilters = {
+  /** Filter type where all of the related ReportFolders match this filter */
+  all?: InputMaybe<ReportFolderWhere>;
+  /** Filter type where none of the related ReportFolders match this filter */
+  none?: InputMaybe<ReportFolderWhere>;
+  /** Filter type where one of the related ReportFolders match this filter */
+  single?: InputMaybe<ReportFolderWhere>;
+  /** Filter type where some of the related ReportFolders match this filter */
+  some?: InputMaybe<ReportFolderWhere>;
+};
+
+export type ReportFolderReportFolderChildrenAggregateSelection = {
+  __typename?: 'ReportFolderReportFolderChildrenAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<ReportFolderReportFolderChildrenNodeAggregateSelection>;
+};
+
+export type ReportFolderReportFolderChildrenNodeAggregateSelection = {
+  __typename?: 'ReportFolderReportFolderChildrenNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  name: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
+export type ReportFolderReportFolderParentAggregateSelection = {
+  __typename?: 'ReportFolderReportFolderParentAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<ReportFolderReportFolderParentNodeAggregateSelection>;
+};
+
+export type ReportFolderReportFolderParentNodeAggregateSelection = {
+  __typename?: 'ReportFolderReportFolderParentNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  name: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
+export type ReportFolderReportsAggregateInput = {
+  AND?: InputMaybe<Array<ReportFolderReportsAggregateInput>>;
+  NOT?: InputMaybe<ReportFolderReportsAggregateInput>;
+  OR?: InputMaybe<Array<ReportFolderReportsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<ReportFolderReportsNodeAggregationWhereInput>;
+};
+
+export type ReportFolderReportsConnectFieldInput = {
+  connect?: InputMaybe<Array<AnalyticsReportConnectInput>>;
+  where?: InputMaybe<AnalyticsReportConnectWhere>;
+};
+
+export type ReportFolderReportsConnection = {
+  __typename?: 'ReportFolderReportsConnection';
+  aggregate: ReportFolderAnalyticsReportReportsAggregateSelection;
+  edges: Array<ReportFolderReportsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type ReportFolderReportsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<ReportFolderReportsConnectionAggregateInput>>;
+  NOT?: InputMaybe<ReportFolderReportsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<ReportFolderReportsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<ReportFolderReportsNodeAggregationWhereInput>;
+};
+
+export type ReportFolderReportsConnectionFilters = {
+  /** Filter ReportFolders by aggregating results on related ReportFolderReportsConnections */
+  aggregate?: InputMaybe<ReportFolderReportsConnectionAggregateInput>;
+  /** Return ReportFolders where all of the related ReportFolderReportsConnections match this filter */
+  all?: InputMaybe<ReportFolderReportsConnectionWhere>;
+  /** Return ReportFolders where none of the related ReportFolderReportsConnections match this filter */
+  none?: InputMaybe<ReportFolderReportsConnectionWhere>;
+  /** Return ReportFolders where one of the related ReportFolderReportsConnections match this filter */
+  single?: InputMaybe<ReportFolderReportsConnectionWhere>;
+  /** Return ReportFolders where some of the related ReportFolderReportsConnections match this filter */
+  some?: InputMaybe<ReportFolderReportsConnectionWhere>;
+};
+
+export type ReportFolderReportsConnectionSort = {
+  node?: InputMaybe<AnalyticsReportSort>;
+};
+
+export type ReportFolderReportsConnectionWhere = {
+  AND?: InputMaybe<Array<ReportFolderReportsConnectionWhere>>;
+  NOT?: InputMaybe<ReportFolderReportsConnectionWhere>;
+  OR?: InputMaybe<Array<ReportFolderReportsConnectionWhere>>;
+  node?: InputMaybe<AnalyticsReportWhere>;
+};
+
+export type ReportFolderReportsCreateFieldInput = {
+  node: AnalyticsReportCreateInput;
+};
+
+export type ReportFolderReportsDeleteFieldInput = {
+  delete?: InputMaybe<AnalyticsReportDeleteInput>;
+  where?: InputMaybe<ReportFolderReportsConnectionWhere>;
+};
+
+export type ReportFolderReportsDisconnectFieldInput = {
+  disconnect?: InputMaybe<AnalyticsReportDisconnectInput>;
+  where?: InputMaybe<ReportFolderReportsConnectionWhere>;
+};
+
+export type ReportFolderReportsFieldInput = {
+  connect?: InputMaybe<Array<ReportFolderReportsConnectFieldInput>>;
+  create?: InputMaybe<Array<ReportFolderReportsCreateFieldInput>>;
+};
+
+export type ReportFolderReportsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<ReportFolderReportsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<ReportFolderReportsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<ReportFolderReportsNodeAggregationWhereInput>>;
+  chartType?: InputMaybe<StringScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  dimension?: InputMaybe<StringScalarAggregationFilters>;
+  elementType?: InputMaybe<StringScalarAggregationFilters>;
+  measure?: InputMaybe<StringScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type ReportFolderReportsRelationship = {
+  __typename?: 'ReportFolderReportsRelationship';
+  cursor: Scalars['String']['output'];
+  node: AnalyticsReport;
+};
+
+export type ReportFolderReportsUpdateConnectionInput = {
+  node?: InputMaybe<AnalyticsReportUpdateInput>;
+  where?: InputMaybe<ReportFolderReportsConnectionWhere>;
+};
+
+export type ReportFolderReportsUpdateFieldInput = {
+  connect?: InputMaybe<Array<ReportFolderReportsConnectFieldInput>>;
+  create?: InputMaybe<Array<ReportFolderReportsCreateFieldInput>>;
+  delete?: InputMaybe<Array<ReportFolderReportsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<ReportFolderReportsDisconnectFieldInput>>;
+  update?: InputMaybe<ReportFolderReportsUpdateConnectionInput>;
+};
+
+/** Fields to sort ReportFolders by. The order in which sorts are applied is not guaranteed when specifying many fields in one ReportFolderSort object. */
+export type ReportFolderSort = {
+  createdAt?: InputMaybe<SortDirection>;
+  id?: InputMaybe<SortDirection>;
+  name?: InputMaybe<SortDirection>;
+  updatedAt?: InputMaybe<SortDirection>;
+};
+
+export type ReportFolderUpdateInput = {
+  children?: InputMaybe<Array<ReportFolderChildrenUpdateFieldInput>>;
+  company?: InputMaybe<Array<ReportFolderCompanyUpdateFieldInput>>;
+  createdAt?: InputMaybe<DateTimeScalarMutations>;
+  createdBy?: InputMaybe<Array<ReportFolderCreatedByUpdateFieldInput>>;
+  name?: InputMaybe<StringScalarMutations>;
+  parent?: InputMaybe<Array<ReportFolderParentUpdateFieldInput>>;
+  reports?: InputMaybe<Array<ReportFolderReportsUpdateFieldInput>>;
+};
+
+export type ReportFolderWhere = {
+  AND?: InputMaybe<Array<ReportFolderWhere>>;
+  NOT?: InputMaybe<ReportFolderWhere>;
+  OR?: InputMaybe<Array<ReportFolderWhere>>;
+  children?: InputMaybe<ReportFolderRelationshipFilters>;
+  childrenConnection?: InputMaybe<ReportFolderChildrenConnectionFilters>;
+  company?: InputMaybe<CompanyRelationshipFilters>;
+  companyConnection?: InputMaybe<ReportFolderCompanyConnectionFilters>;
+  createdAt?: InputMaybe<DateTimeScalarFilters>;
+  createdBy?: InputMaybe<PersonRelationshipFilters>;
+  createdByConnection?: InputMaybe<ReportFolderCreatedByConnectionFilters>;
+  id?: InputMaybe<IdScalarFilters>;
+  name?: InputMaybe<StringScalarFilters>;
+  parent?: InputMaybe<ReportFolderRelationshipFilters>;
+  parentConnection?: InputMaybe<ReportFolderParentConnectionFilters>;
+  reports?: InputMaybe<AnalyticsReportRelationshipFilters>;
+  reportsConnection?: InputMaybe<ReportFolderReportsConnectionFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarFilters>;
+};
+
+export type ReportFoldersConnection = {
+  __typename?: 'ReportFoldersConnection';
+  aggregate: ReportFolderAggregate;
+  edges: Array<ReportFolderEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
 };
 
 /** Risk classification for suppliers */
@@ -49206,6 +50567,12 @@ export type UpdateProductFamiliesMutationResponse = {
   __typename?: 'UpdateProductFamiliesMutationResponse';
   info: UpdateInfo;
   productFamilies: Array<ProductFamily>;
+};
+
+export type UpdateReportFoldersMutationResponse = {
+  __typename?: 'UpdateReportFoldersMutationResponse';
+  info: UpdateInfo;
+  reportFolders: Array<ReportFolder>;
 };
 
 export type UpdateSbomDocumentsMutationResponse = {

@@ -1,7 +1,36 @@
 import { gql } from '@apollo/client/core'
 
-export const GET_ANALYTICS_REPORTS = gql`
-  query GetAnalyticsReports($companyId: ID!, $creatorId: ID!) {
+export const GET_ALL_ANALYTICS_REPORTS = gql`
+  query GetAllAnalyticsReports($companyId: ID!) {
+    analyticsReports(
+      where: { company: { some: { id: { eq: $companyId } } } }
+      sort: { updatedAt: DESC }
+    ) {
+      id
+      name
+      isPublic
+      elementType
+      chartType
+      dimension
+      measure
+      createdAt
+      updatedAt
+      company {
+        id
+      }
+      createdBy {
+        id
+      }
+      folder {
+        id
+        name
+      }
+    }
+  }
+`
+
+export const GET_MY_ANALYTICS_REPORTS = gql`
+  query GetMyAnalyticsReports($companyId: ID!, $creatorId: ID!) {
     analyticsReports(
       where: {
         company: { some: { id: { eq: $companyId } } }
@@ -11,12 +40,40 @@ export const GET_ANALYTICS_REPORTS = gql`
     ) {
       id
       name
+      isPublic
       elementType
       chartType
       dimension
       measure
       createdAt
       updatedAt
+      company {
+        id
+      }
+      createdBy {
+        id
+      }
+      folder {
+        id
+        name
+      }
+    }
+  }
+`
+
+export const GET_REPORT_FOLDERS = gql`
+  query GetReportFolders($companyId: ID!) {
+    reportFolders(where: { company: { some: { id: { eq: $companyId } } } }, sort: { name: ASC }) {
+      id
+      name
+      createdAt
+      updatedAt
+      parent {
+        id
+      }
+      children {
+        id
+      }
       company {
         id
       }
@@ -33,6 +90,7 @@ export const CREATE_ANALYTICS_REPORT = gql`
       analyticsReports {
         id
         name
+        isPublic
         elementType
         chartType
         dimension
@@ -44,6 +102,10 @@ export const CREATE_ANALYTICS_REPORT = gql`
         }
         createdBy {
           id
+        }
+        folder {
+          id
+          name
         }
       }
     }
@@ -56,6 +118,7 @@ export const UPDATE_ANALYTICS_REPORT = gql`
       analyticsReports {
         id
         name
+        isPublic
         elementType
         chartType
         dimension
@@ -68,7 +131,63 @@ export const UPDATE_ANALYTICS_REPORT = gql`
         createdBy {
           id
         }
+        folder {
+          id
+          name
+        }
       }
+    }
+  }
+`
+
+export const CREATE_REPORT_FOLDER = gql`
+  mutation CreateReportFolder($input: [ReportFolderCreateInput!]!) {
+    createReportFolders(input: $input) {
+      reportFolders {
+        id
+        name
+        createdAt
+        updatedAt
+        parent {
+          id
+        }
+        company {
+          id
+        }
+        createdBy {
+          id
+        }
+      }
+    }
+  }
+`
+
+export const UPDATE_REPORT_FOLDER = gql`
+  mutation UpdateReportFolder($id: ID!, $input: ReportFolderUpdateInput!) {
+    updateReportFolders(where: { id: { eq: $id } }, update: $input) {
+      reportFolders {
+        id
+        name
+        createdAt
+        updatedAt
+        parent {
+          id
+        }
+        company {
+          id
+        }
+        createdBy {
+          id
+        }
+      }
+    }
+  }
+`
+
+export const DELETE_REPORT_FOLDER = gql`
+  mutation DeleteReportFolder($id: ID!) {
+    deleteReportFolders(where: { id: { eq: $id } }) {
+      nodesDeleted
     }
   }
 `
