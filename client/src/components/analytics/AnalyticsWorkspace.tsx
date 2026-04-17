@@ -1,7 +1,8 @@
 'use client'
 
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useApolloClient } from '@apollo/client'
+import { toPng } from 'html-to-image'
 import {
   Alert,
   Box,
@@ -20,10 +21,19 @@ import {
   Snackbar,
   Stack,
   Switch,
+  Tab,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Tabs,
   TextField,
+  Tooltip as MuiTooltip,
   Typography,
 } from '@mui/material'
-import { Add, FolderOutlined, Sync } from '@mui/icons-material'
+import { Add, Download, FolderOpenOutlined, FolderOutlined, Sync } from '@mui/icons-material'
 import { useTranslations } from 'next-intl'
 import {
   Bar,
@@ -48,6 +58,7 @@ import { useAnalyticsConfig } from '@/lib/runtime-config'
 import {
   AnalyticsChartDatum,
   AnalyticsDraftReport,
+  AnalyticsPreviewRecord,
   AnalyticsReportFolderDefinition,
   AnalyticsReportDefinition,
   AnalyticsReportScope,
@@ -68,8 +79,11 @@ import {
   updateAnalyticsReport,
   updateReportFolder,
 } from './api'
+import { exportToExcel } from '@/utils/excelUtils'
 
 const chartColors = ['#00796B', '#F57C00', '#455A64', '#D84315', '#546E7A', '#00838F']
+const analyticsReportScopeStorageKey = 'analytics-report-scope'
+const analyticsCollapsedFoldersStorageKey = 'analytics-collapsed-folders'
 
 interface FolderDialogState {
   readonly mode: 'create' | 'edit' | 'delete'
@@ -87,6 +101,8 @@ interface NotificationState {
   readonly message: string
   readonly severity: 'success' | 'error'
 }
+
+type AnalyticsPreviewTab = 'chart' | 'records'
 
 function createDefaultDraft(): AnalyticsDraftReport {
   return {
@@ -132,13 +148,13 @@ function buildFolderOptions(
 function renderChart(chartType: AnalyticsDraftReport['chartType'], data: AnalyticsChartDatum[]) {
   if (chartType === 'line') {
     return (
-      <ResponsiveContainer width="100%" height={320}>
-        <LineChart data={data}>
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={data} margin={{ top: 8, right: 8, bottom: 24, left: 0 }}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="label" />
           <YAxis />
           <Tooltip />
-          <Legend />
+          <Legend verticalAlign="bottom" height={36} />
           <Line type="monotone" dataKey="value" stroke="#00796B" strokeWidth={3} />
         </LineChart>
       </ResponsiveContainer>
@@ -147,11 +163,19 @@ function renderChart(chartType: AnalyticsDraftReport['chartType'], data: Analyti
 
   if (chartType === 'pie') {
     return (
-      <ResponsiveContainer width="100%" height={320}>
+      <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Tooltip />
-          <Legend />
-          <Pie data={data} dataKey="value" nameKey="label" outerRadius={110} label>
+          <Legend layout="vertical" align="right" verticalAlign="middle" />
+          <Pie
+            data={data}
+            dataKey="value"
+            nameKey="label"
+            cx="38%"
+            cy="50%"
+            outerRadius="80%"
+            label
+          >
             {data.map((entry, index) => (
               <Cell key={entry.label} fill={chartColors[index % chartColors.length]} />
             ))}
@@ -162,13 +186,13 @@ function renderChart(chartType: AnalyticsDraftReport['chartType'], data: Analyti
   }
 
   return (
-    <ResponsiveContainer width="100%" height={320}>
-      <BarChart data={data}>
+    <ResponsiveContainer width="100%" height="100%">
+      <BarChart data={data} margin={{ top: 8, right: 8, bottom: 24, left: 0 }}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="label" />
         <YAxis />
         <Tooltip />
-        <Legend />
+        <Legend verticalAlign="bottom" height={36} />
         <Bar dataKey="value" fill="#00796B" radius={[8, 8, 0, 0]} />
       </BarChart>
     </ResponsiveContainer>
@@ -185,15 +209,41 @@ export function AnalyticsWorkspace() {
   const [savedReports, setSavedReports] = useState<AnalyticsReportDefinition[]>([])
   const [savedFolders, setSavedFolders] = useState<AnalyticsReportFolderDefinition[]>([])
   const [chartData, setChartData] = useState<AnalyticsChartDatum[]>([])
+  const [previewRecords, setPreviewRecords] = useState<AnalyticsPreviewRecord[]>([])
   const [reportsLoading, setReportsLoading] = useState(false)
   const [foldersLoading, setFoldersLoading] = useState(false)
   const [queryLoading, setQueryLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [folderSaving, setFolderSaving] = useState(false)
   const [syncing, setSyncing] = useState(false)
-  const [reportScope, setReportScope] = useState<AnalyticsReportScope>('all')
+  const [reportScope, setReportScope] = useState<AnalyticsReportScope>(() => {
+    if (typeof window === 'undefined') {
+      return 'all'
+    }
+
+    const storedReportScope = window.localStorage.getItem(analyticsReportScopeStorageKey)
+
+    return storedReportScope === 'mine' ? 'mine' : 'all'
+  })
+  const [previewTab, setPreviewTab] = useState<AnalyticsPreviewTab>('chart')
   const [folderDialog, setFolderDialog] = useState<FolderDialogState | null>(null)
   const [notification, setNotification] = useState<NotificationState | null>(null)
+  const [collapsedFolderIds, setCollapsedFolderIds] = useState<string[]>(() => {
+    if (typeof window === 'undefined') {
+      return []
+    }
+
+    try {
+      const storedCollapsedFolders = window.localStorage.getItem(
+        analyticsCollapsedFoldersStorageKey
+      )
+
+      return storedCollapsedFolders ? (JSON.parse(storedCollapsedFolders) as string[]) : []
+    } catch {
+      return []
+    }
+  })
+  const chartContainerRef = useRef<HTMLDivElement | null>(null)
 
   const analyticsBaseUrl = analyticsConfig.apiUrl
   const activeSchema = analyticsSchemaByElementType[draft.elementType]
@@ -215,6 +265,17 @@ export function AnalyticsWorkspace() {
   const showNotification = (message: string, severity: NotificationState['severity']) => {
     setNotification({ message, severity })
   }
+
+  useEffect(() => {
+    window.localStorage.setItem(analyticsReportScopeStorageKey, reportScope)
+  }, [reportScope])
+
+  useEffect(() => {
+    window.localStorage.setItem(
+      analyticsCollapsedFoldersStorageKey,
+      JSON.stringify(collapsedFolderIds)
+    )
+  }, [collapsedFolderIds])
 
   useEffect(() => {
     if (!selectedCompanyId) {
@@ -315,6 +376,7 @@ export function AnalyticsWorkspace() {
   useEffect(() => {
     if (!analyticsBaseUrl) {
       setChartData([])
+      setPreviewRecords([])
       return
     }
 
@@ -330,11 +392,13 @@ export function AnalyticsWorkspace() {
       .then(payload => {
         if (!cancelled) {
           setChartData(payload.data)
+          setPreviewRecords(payload.records)
         }
       })
       .catch(queryError => {
         if (!cancelled) {
           setChartData([])
+          setPreviewRecords([])
           showNotification(
             queryError instanceof Error ? queryError.message : t('loadPreviewError'),
             'error'
@@ -405,6 +469,14 @@ export function AnalyticsWorkspace() {
     }
   }
 
+  const toggleFolderOpen = (folderId: string) => {
+    setCollapsedFolderIds(current =>
+      current.includes(folderId)
+        ? current.filter(currentFolderId => currentFolderId !== folderId)
+        : [...current, folderId]
+    )
+  }
+
   const handleSave = async () => {
     if (!selectedCompanyId || !currentPerson?.id) {
       return
@@ -444,10 +516,21 @@ export function AnalyticsWorkspace() {
         const remaining = current.filter(currentReport => currentReport.id !== report.id)
         return [report, ...remaining]
       })
-      setDraft(createDefaultDraft())
       if (draft.id) {
+        setDraft(current => ({
+          ...current,
+          id: report.id,
+          name: report.name,
+          isPublic: report.isPublic,
+          elementType: report.elementType,
+          chartType: report.chartType,
+          dimension: report.dimension,
+          measure: report.measure,
+          folderId: report.folderId ?? null,
+        }))
         showNotification(t('reportUpdated'), 'success')
       } else {
+        setDraft(createDefaultDraft())
         showNotification(t('reportSaved'), 'success')
       }
     } catch (saveError) {
@@ -637,6 +720,7 @@ export function AnalyticsWorkspace() {
         measure: draft.measure,
       })
       setChartData(refreshed.data)
+      setPreviewRecords(refreshed.records)
     } catch (syncError) {
       showNotification(syncError instanceof Error ? syncError.message : t('syncError'), 'error')
     } finally {
@@ -644,10 +728,86 @@ export function AnalyticsWorkspace() {
     }
   }
 
+  const handleDownloadChart = async () => {
+    const chartContainer = chartContainerRef.current
+
+    if (!chartContainer) {
+      showNotification(t('downloadChartError'), 'error')
+      return
+    }
+
+    try {
+      const { width, height } = chartContainer.getBoundingClientRect()
+      const safeWidth = Math.max(Math.round(width), 320)
+      const safeHeight = Math.max(Math.round(height), draft.chartType === 'pie' ? 400 : 320)
+      const link = document.createElement('a')
+      const baseLabel = draft.name.trim() || `${draft.elementType}-${draft.chartType}-chart`
+      const fileNameBase = `${baseLabel}-${draft.dimension}-${draft.measure}`
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+
+      link.href = await toPng(chartContainer, {
+        cacheBust: true,
+        backgroundColor: '#ffffff',
+        pixelRatio: Math.max(window.devicePixelRatio, 2),
+        canvasWidth: safeWidth,
+        canvasHeight: safeHeight,
+      })
+      link.download = `${fileNameBase || 'analytics-chart'}.png`
+      link.click()
+    } catch {
+      showNotification(t('downloadChartError'), 'error')
+    }
+  }
+
+  const handleDownloadRecords = async () => {
+    if (previewRecords.length === 0) {
+      showNotification(t('downloadRecordsError'), 'error')
+      return
+    }
+
+    try {
+      const baseLabel = draft.name.trim() || `${draft.elementType}-records`
+      const filename = `${baseLabel}-${draft.dimension}-${draft.measure}-records`
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+
+      await exportToExcel(
+        previewRecords.map(record => ({
+          [t('recordsId')]: record.id,
+          [t('recordsName')]: record.name,
+          [t(`dimensions.${draft.dimension}`)]: record.label,
+          ...(showRecordMeasureColumn
+            ? {
+                [t(`measures.${draft.measure}`)]: record.value,
+              }
+            : {}),
+        })),
+        {
+          filename: filename || 'analytics-records',
+          sheetName: 'Records',
+          format: 'xlsx',
+          includeHeaders: true,
+        }
+      )
+    } catch {
+      showNotification(t('downloadRecordsError'), 'error')
+    }
+  }
+
   const previewTotal = chartData.reduce((sum, entry) => sum + entry.value, 0)
   const previewTotalLabel = analyticsCurrencyMeasures.includes(draft.measure)
     ? currencyFormatter.format(previewTotal)
     : previewTotal.toLocaleString()
+  const showRecordMeasureColumn = draft.measure !== 'count'
+  const chartTitle = draft.name.trim()
+    ? draft.name.trim()
+    : `${t(`elementTypes.${draft.elementType}`)} · ${t(`dimensions.${draft.dimension}`)} · ${t(
+        `measures.${draft.measure}`
+      )}`
+  const chartTitleWithTotal = `${chartTitle} (${previewTotalLabel})`
 
   const renderReportCard = (report: AnalyticsReportDefinition) => {
     const reportTitle =
@@ -660,9 +820,11 @@ export function AnalyticsWorkspace() {
         <CardActionArea onClick={() => handleLoad(report)}>
           <CardContent sx={{ px: 1.5, py: 1.25, '&:last-child': { pb: 1.25 } }}>
             <Box sx={{ minWidth: 0 }}>
-              <Typography variant="subtitle2" noWrap>
-                {reportTitle}
-              </Typography>
+              <MuiTooltip title={reportTitle} placement="top" arrow>
+                <Typography variant="subtitle2" noWrap>
+                  {reportTitle}
+                </Typography>
+              </MuiTooltip>
               <Typography
                 variant="caption"
                 color="text.secondary"
@@ -700,12 +862,15 @@ export function AnalyticsWorkspace() {
             <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
               {t('unfiledReports')}
             </Typography>
-            <Stack spacing={1}>{directReports.map(renderReportCard)}</Stack>
+            <Stack spacing={1.5} useFlexGap>
+              {directReports.map(renderReportCard)}
+            </Stack>
           </Box>
         )}
 
         {childFolders.map(folder => {
           const canEditFolder = currentPerson?.id === folder.creatorId
+          const isFolderOpen = !collapsedFolderIds.includes(folder.id)
           const folderReports = sortReports(
             savedReports.filter(report => (report.folderId ?? null) === folder.id)
           )
@@ -730,7 +895,18 @@ export function AnalyticsWorkspace() {
                 sx={{ py: 0.5 }}
               >
                 <Stack direction="row" spacing={1} alignItems="center">
-                  <FolderOutlined fontSize="small" color="action" />
+                  <IconButton
+                    size="small"
+                    onClick={() => toggleFolderOpen(folder.id)}
+                    aria-label={isFolderOpen ? t('collapseFolder') : t('expandFolder')}
+                    title={isFolderOpen ? t('collapseFolder') : t('expandFolder')}
+                  >
+                    {isFolderOpen ? (
+                      <FolderOpenOutlined fontSize="small" color="action" />
+                    ) : (
+                      <FolderOutlined fontSize="small" color="action" />
+                    )}
+                  </IconButton>
                   <Typography
                     variant="subtitle1"
                     component={canEditFolder ? 'button' : 'div'}
@@ -767,15 +943,21 @@ export function AnalyticsWorkspace() {
                 )}
               </Stack>
 
-              <Stack spacing={1} sx={{ mt: 1, ml: 2 }}>
-                {folderReports.map(renderReportCard)}
-                {childContent}
-                {!hasFolderContent && (
-                  <Typography variant="body2" color="text.secondary">
-                    {t('emptyFolder')}
-                  </Typography>
-                )}
-              </Stack>
+              {isFolderOpen && (
+                <Stack spacing={1.5} useFlexGap sx={{ mt: 1, ml: 2 }}>
+                  {folderReports.length > 0 && (
+                    <Stack spacing={1.5} useFlexGap>
+                      {folderReports.map(renderReportCard)}
+                    </Stack>
+                  )}
+                  {childContent}
+                  {!hasFolderContent && (
+                    <Typography variant="body2" color="text.secondary">
+                      {t('emptyFolder')}
+                    </Typography>
+                  )}
+                </Stack>
+              )}
             </Box>
           )
         })}
@@ -786,8 +968,15 @@ export function AnalyticsWorkspace() {
   const hasSavedItems = savedFolders.length > 0 || savedReports.length > 0
 
   return (
-    <Box sx={{ px: { xs: 2, md: 4 }, py: 3 }}>
-      <Stack spacing={3}>
+    <Box
+      sx={{
+        px: { xs: 2, md: 4 },
+        py: 3,
+        height: { xs: 'auto', xl: 'calc(100vh - 120px)' },
+        overflow: { xs: 'visible', xl: 'hidden' },
+      }}
+    >
+      <Stack spacing={3} sx={{ height: '100%', minHeight: 0 }}>
         <Stack spacing={1}>
           <Typography variant="h4" component="h1">
             {t('title')}
@@ -799,17 +988,19 @@ export function AnalyticsWorkspace() {
 
         <Box
           sx={{
+            flex: 1,
             display: 'grid',
             gap: 3,
+            minHeight: 0,
             gridTemplateColumns: {
               xs: '1fr',
               xl: 'minmax(340px, 380px) minmax(420px, 1fr) minmax(400px, 460px)',
             },
           }}
         >
-          <Card variant="outlined">
-            <CardContent>
-              <Stack spacing={2}>
+          <Card variant="outlined" sx={{ minHeight: 0, overflow: 'hidden' }}>
+            <CardContent sx={{ height: '100%', minHeight: 0 }}>
+              <Stack spacing={2} sx={{ height: '100%', minHeight: 0 }}>
                 <Stack
                   direction="row"
                   spacing={1.5}
@@ -861,7 +1052,7 @@ export function AnalyticsWorkspace() {
                 {(reportsLoading || foldersLoading) && <LinearProgress />}
 
                 {!hasSavedItems ? (
-                  <Box sx={{ py: 4 }}>
+                  <Box sx={{ py: 4, flex: 1 }}>
                     <Typography variant="body2" color="text.secondary">
                       {t('emptySavedReports')}
                     </Typography>
@@ -870,33 +1061,115 @@ export function AnalyticsWorkspace() {
                     </Typography>
                   </Box>
                 ) : (
-                  renderFolderTree()
+                  <Box
+                    sx={{
+                      flex: 1,
+                      minHeight: 0,
+                      overflowY: 'auto',
+                      pr: 0.5,
+                    }}
+                  >
+                    {renderFolderTree()}
+                  </Box>
                 )}
               </Stack>
             </CardContent>
           </Card>
 
-          <Card variant="outlined">
-            <CardContent>
-              <Stack spacing={2}>
+          <Card variant="outlined" sx={{ minHeight: 0, overflow: 'hidden' }}>
+            <CardContent sx={{ height: '100%', minHeight: 0 }}>
+              <Stack spacing={2} sx={{ height: '100%', minHeight: 0 }}>
                 <Stack
                   direction={{ xs: 'column', md: 'row' }}
                   spacing={1.5}
                   justifyContent="space-between"
                   alignItems={{ xs: 'flex-start', md: 'center' }}
                 >
-                  <Typography variant="h6">{t('previewTitle')}</Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {previewTotalLabel}
-                  </Typography>
+                  <Tabs
+                    value={previewTab}
+                    onChange={(_event, value: AnalyticsPreviewTab) => setPreviewTab(value)}
+                    aria-label={t('previewTabs')}
+                  >
+                    <Tab value="chart" label={t('chartTab')} />
+                    <Tab value="records" label={t('recordsTab')} />
+                  </Tabs>
+                  {previewTab === 'chart' && (
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      startIcon={<Download />}
+                      onClick={() => void handleDownloadChart()}
+                      disabled={queryLoading || chartData.length === 0}
+                    >
+                      {t('downloadChart')}
+                    </Button>
+                  )}
+                  {previewTab === 'records' && (
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      startIcon={<Download />}
+                      onClick={() => void handleDownloadRecords()}
+                      disabled={queryLoading || previewRecords.length === 0}
+                    >
+                      {t('downloadRecords')}
+                    </Button>
+                  )}
                 </Stack>
                 {(queryLoading || syncing) && <LinearProgress />}
                 {!queryLoading && chartData.length === 0 ? (
                   <Typography variant="body2" color="text.secondary">
                     {t('emptyPreview')}
                   </Typography>
+                ) : previewTab === 'records' ? (
+                  <TableContainer
+                    component={Box}
+                    sx={{
+                      flex: 1,
+                      minHeight: 0,
+                      overflow: 'auto',
+                    }}
+                  >
+                    <Table stickyHeader size="small">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>{t('recordsName')}</TableCell>
+                          <TableCell>{t(`dimensions.${draft.dimension}`)}</TableCell>
+                          {showRecordMeasureColumn && (
+                            <TableCell align="right">{t(`measures.${draft.measure}`)}</TableCell>
+                          )}
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {previewRecords.map(entry => (
+                          <TableRow key={entry.id || `${entry.name}-${entry.label}`} hover>
+                            <TableCell>{entry.name}</TableCell>
+                            <TableCell>{entry.label}</TableCell>
+                            {showRecordMeasureColumn && (
+                              <TableCell align="right">{entry.value.toLocaleString()}</TableCell>
+                            )}
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
                 ) : (
-                  renderChart(draft.chartType, chartData)
+                  <Box
+                    ref={chartContainerRef}
+                    sx={{
+                      flex: 1,
+                      minHeight: 0,
+                      display: 'flex',
+                      flexDirection: 'column',
+                    }}
+                  >
+                    <Typography variant="subtitle1" sx={{ mb: 2, textAlign: 'center' }}>
+                      {chartTitleWithTotal}
+                    </Typography>
+                    <Box sx={{ flex: 1, minHeight: draft.chartType === 'pie' ? 400 : 320 }}>
+                      {renderChart(draft.chartType, chartData)}
+                    </Box>
+                  </Box>
                 )}
               </Stack>
             </CardContent>

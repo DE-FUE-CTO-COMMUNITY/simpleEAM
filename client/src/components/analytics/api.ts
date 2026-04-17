@@ -17,6 +17,7 @@ import {
   AnalyticsDimensionKey,
   AnalyticsElementType,
   AnalyticsMeasureKey,
+  AnalyticsPreviewRecord,
   AnalyticsReportFolderDefinition,
   AnalyticsReportDefinition,
 } from './types'
@@ -26,6 +27,7 @@ interface QueryResponse {
     readonly label: string
     readonly value: number
   }>
+  readonly records: AnalyticsPreviewRecord[]
   readonly source: 'cube'
 }
 

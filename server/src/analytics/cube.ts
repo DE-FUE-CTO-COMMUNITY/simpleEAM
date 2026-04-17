@@ -16,6 +16,10 @@ interface CubeQueryResponse {
   readonly data?: Array<Record<string, string | number | null>>
 }
 
+interface CubeLoadResult {
+  readonly rows: Array<Record<string, string | number | null>>
+}
+
 const cubeApiUrl = process.env.ANALYTICS_CUBE_API_URL || 'http://cube:4000/cubejs-api/v1'
 const cubeApiSecret = process.env.CUBEJS_API_SECRET || 'nextgen-eam-analytics-dev'
 
@@ -44,6 +48,33 @@ function createCubeToken(user: AnalyticsUser, companyId: string | null): string 
   )
 }
 
+async function loadCubeRows(
+  user: AnalyticsUser,
+  companyId: string | null,
+  cubeQuery: Record<string, unknown>
+): Promise<CubeLoadResult> {
+  const queryUrl = new URL(`${cubeApiUrl}/load`)
+  queryUrl.searchParams.set('query', JSON.stringify(cubeQuery))
+
+  const response = await fetch(queryUrl.toString(), {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${createCubeToken(user, companyId)}`,
+    },
+  })
+
+  if (!response.ok) {
+    const message = await response.text()
+    throw new Error(`Cube query failed with HTTP ${response.status}: ${message}`)
+  }
+
+  const payload = (await response.json()) as CubeQueryResponse
+
+  return {
+    rows: payload.data ?? [],
+  }
+}
+
 export async function loadAnalyticsChartData(
   user: AnalyticsUser,
   input: {
@@ -63,6 +94,8 @@ export async function loadAnalyticsChartData(
   }
 
   const cubeName = getAnalyticsCubeName(input.elementType)
+  const idMember = `${cubeName}.id`
+  const nameMember = `${cubeName}.name`
   const dimensionMember = `${cubeName}.${getAnalyticsDimensionMember(input.elementType, input.dimension)}`
   const measureMember = `${cubeName}.${getAnalyticsMeasureMember(input.elementType, input.measure)}`
 
@@ -88,23 +121,21 @@ export async function loadAnalyticsChartData(
     limit: 50,
   }
 
-  const queryUrl = new URL(`${cubeApiUrl}/load`)
-  queryUrl.searchParams.set('query', JSON.stringify(cubeQuery))
-
-  const response = await fetch(queryUrl.toString(), {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${createCubeToken(user, input.companyId)}`,
+  const recordsQuery = {
+    measures: [measureMember],
+    dimensions: [idMember, nameMember, dimensionMember],
+    filters,
+    order: {
+      [dimensionMember]: 'asc',
+      [nameMember]: 'asc',
     },
-  })
-
-  if (!response.ok) {
-    const message = await response.text()
-    throw new Error(`Cube query failed with HTTP ${response.status}: ${message}`)
+    limit: 500,
   }
 
-  const payload = (await response.json()) as CubeQueryResponse
-  const rows = payload.data ?? []
+  const [{ rows }, { rows: recordRows }] = await Promise.all([
+    loadCubeRows(user, input.companyId, cubeQuery),
+    loadCubeRows(user, input.companyId, recordsQuery),
+  ])
 
   return {
     data: rows.map(row => {
@@ -117,6 +148,22 @@ export async function loadAnalyticsChartData(
       const value = typeof rawValue === 'number' ? rawValue : Number(rawValue ?? 0)
 
       return {
+        label,
+        value: Number.isFinite(value) ? value : 0,
+      }
+    }),
+    records: recordRows.map(row => {
+      const rawLabel = row[dimensionMember]
+      const rawValue = row[measureMember]
+      const label =
+        input.dimension === 'month'
+          ? normalizeMonthLabel(String(rawLabel ?? ''))
+          : String(rawLabel ?? 'UNSPECIFIED')
+      const value = typeof rawValue === 'number' ? rawValue : Number(rawValue ?? 0)
+
+      return {
+        id: String(row[idMember] ?? ''),
+        name: String(row[nameMember] ?? 'Unnamed'),
         label,
         value: Number.isFinite(value) ? value : 0,
       }

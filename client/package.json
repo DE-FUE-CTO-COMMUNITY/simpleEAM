@@ -44,6 +44,7 @@
     "dayjs": "^1.11.13",
     "fractional-indexing": "^3.2.0",
     "graphql": "^16.8.0",
+    "html-to-image": "^1.11.13",
     "hyphenation.de": "^0.2.1",
     "hyphenation.en-us": "^0.2.1",
     "hypher": "^0.2.5",

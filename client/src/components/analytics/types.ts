@@ -123,6 +123,13 @@ export interface AnalyticsChartDatum {
   readonly value: number
 }
 
+export interface AnalyticsPreviewRecord {
+  readonly id: string
+  readonly name: string
+  readonly label: string
+  readonly value: number
+}
+
 export interface AnalyticsReportDefinition {
   readonly id: string
   readonly name: string
