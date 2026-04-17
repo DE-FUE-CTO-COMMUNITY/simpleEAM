@@ -7,12 +7,14 @@ import { neo4jDriver } from '../db/neo4j-client'
 import { authenticateAnalyticsRequest, canAccessCompany, hasAnalyticsWriteAccess } from './auth'
 import { loadAnalyticsChartData } from './cube'
 import { syncAnalyticsProjections } from './projections'
+import { analyticsDimensionKeys, analyticsElementTypes, analyticsMeasureKeys } from './schema'
 
 const analyticsRouter = express.Router()
 
 const chartTypeSchema = z.enum(['bar', 'line', 'pie'])
-const dimensionSchema = z.enum(['status', 'criticality', 'vendor', 'month'])
-const measureSchema = z.enum(['applicationCount', 'monthlyCost'])
+const elementTypeSchema = z.enum(analyticsElementTypes)
+const dimensionSchema = z.enum(analyticsDimensionKeys)
+const measureSchema = z.enum(analyticsMeasureKeys)
 
 const companyIdField = z
   .string()
@@ -25,6 +27,7 @@ const companyIdField = z
 const reportInputSchema = z.object({
   companyId: companyIdField,
   name: z.string().trim().min(1).max(120),
+  elementType: elementTypeSchema,
   chartType: chartTypeSchema,
   dimension: dimensionSchema,
   measure: measureSchema,
@@ -32,6 +35,7 @@ const reportInputSchema = z.object({
 
 const queryInputSchema = z.object({
   companyId: companyIdField,
+  elementType: elementTypeSchema.default('application'),
   dimension: dimensionSchema,
   measure: measureSchema,
 })
@@ -70,6 +74,7 @@ analyticsRouter.get('/reports', async (req, res) => {
         RETURN report {
           .id,
           .name,
+          elementType: coalesce(report.elementType, 'application'),
           .chartType,
           .dimension,
           .measure,
@@ -128,6 +133,7 @@ analyticsRouter.post('/reports', async (req, res) => {
           ownerUsername: $ownerUsername,
           companyId: $companyId,
           name: $name,
+          elementType: $elementType,
           chartType: $chartType,
           dimension: $dimension,
           measure: $measure,
@@ -137,6 +143,7 @@ analyticsRouter.post('/reports', async (req, res) => {
         RETURN report {
           .id,
           .name,
+          .elementType,
           .chartType,
           .dimension,
           .measure,
@@ -151,6 +158,7 @@ analyticsRouter.post('/reports', async (req, res) => {
         ownerUsername: user.username,
         companyId: parsed.data.companyId,
         name: parsed.data.name,
+        elementType: parsed.data.elementType,
         chartType: parsed.data.chartType,
         dimension: parsed.data.dimension,
         measure: parsed.data.measure,
@@ -195,6 +203,7 @@ analyticsRouter.put('/reports/:id', async (req, res) => {
       `
         MATCH (report:AnalyticsReport { id: $id, ownerSub: $ownerSub })
         SET report.name = $name,
+          report.elementType = $elementType,
             report.chartType = $chartType,
             report.dimension = $dimension,
             report.measure = $measure,
@@ -203,6 +212,7 @@ analyticsRouter.put('/reports/:id', async (req, res) => {
         RETURN report {
           .id,
           .name,
+          .elementType,
           .chartType,
           .dimension,
           .measure,
@@ -216,6 +226,7 @@ analyticsRouter.put('/reports/:id', async (req, res) => {
         ownerSub: user.sub,
         companyId: parsed.data.companyId,
         name: parsed.data.name,
+        elementType: parsed.data.elementType,
         chartType: parsed.data.chartType,
         dimension: parsed.data.dimension,
         measure: parsed.data.measure,
@@ -252,6 +263,7 @@ analyticsRouter.delete('/reports/:id', async (req, res) => {
         WITH report, report {
           .id,
           .name,
+          elementType: coalesce(report.elementType, 'application'),
           .chartType,
           .dimension,
           .measure,
@@ -337,6 +349,7 @@ analyticsRouter.post('/query', async (req, res) => {
   try {
     const result = await loadAnalyticsChartData(user, {
       companyId,
+      elementType: parsed.data.elementType,
       companyIds: allowedCompanyIds,
       dimension: parsed.data.dimension,
       measure: parsed.data.measure,

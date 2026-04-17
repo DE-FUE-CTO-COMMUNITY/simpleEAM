@@ -1,5 +1,5 @@
-cube(`ApplicationProjection`, {
-  sql_table: `nextgen_analytics.application_analytics_projection`,
+cube(`AiComponentProjection`, {
+  sql_table: `nextgen_analytics.ai_component_projection`,
 
   measures: {
     count: {
@@ -15,20 +15,16 @@ cube(`ApplicationProjection`, {
       type: `avg`,
       format: `currency`,
     },
+    averageAccuracy: {
+      sql: `accuracy`,
+      type: `avg`,
+    },
     supportedCapabilities: {
       sql: `supported_capabilities`,
       type: `sum`,
     },
-    usedDataObjects: {
-      sql: `used_data_objects`,
-      type: `sum`,
-    },
-    aiComponents: {
-      sql: `ai_components`,
-      type: `sum`,
-    },
-    interfaces: {
-      sql: `interfaces`,
+    trainingDataObjects: {
+      sql: `training_data_objects`,
       type: `sum`,
     },
   },
@@ -51,20 +47,16 @@ cube(`ApplicationProjection`, {
       sql: `status`,
       type: `string`,
     },
-    criticality: {
-      sql: `criticality`,
+    aiType: {
+      sql: `ai_type`,
       type: `string`,
     },
-    vendor: {
-      sql: `vendor`,
+    provider: {
+      sql: `provider`,
       type: `string`,
     },
-    timeCategory: {
-      sql: `time_category`,
-      type: `string`,
-    },
-    hostingEnvironment: {
-      sql: `hosting_environment`,
+    license: {
+      sql: `license`,
       type: `string`,
     },
     updatedAt: {

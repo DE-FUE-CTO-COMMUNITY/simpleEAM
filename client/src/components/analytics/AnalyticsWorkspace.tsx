@@ -7,15 +7,14 @@ import {
   Button,
   Card,
   CardContent,
-  Chip,
-  Divider,
   LinearProgress,
   MenuItem,
+  Snackbar,
   Stack,
   TextField,
   Typography,
 } from '@mui/material'
-import { DeleteOutline, Insights, Lan, Storage, Sync } from '@mui/icons-material'
+import { DeleteOutline, Sync } from '@mui/icons-material'
 import { useTranslations } from 'next-intl'
 import {
   Bar,
@@ -40,8 +39,9 @@ import {
   AnalyticsDraftReport,
   AnalyticsReportDefinition,
   analyticsChartTypes,
-  analyticsDimensionKeys,
-  analyticsMeasureKeys,
+  analyticsCurrencyMeasures,
+  analyticsElementTypes,
+  analyticsSchemaByElementType,
 } from './types'
 import {
   createAnalyticsReport,
@@ -58,9 +58,10 @@ function createDefaultDraft(): AnalyticsDraftReport {
   return {
     id: null,
     name: '',
+    elementType: 'application',
     chartType: 'bar',
     dimension: 'status',
-    measure: 'applicationCount',
+    measure: 'count',
   }
 }
 
@@ -113,7 +114,7 @@ function renderChart(chartType: AnalyticsDraftReport['chartType'], data: Analyti
 export function AnalyticsWorkspace() {
   const t = useTranslations('analytics')
   const analyticsConfig = useAnalyticsConfig()
-  const { selectedCompany, selectedCompanyId } = useCompanyContext()
+  const { selectedCompanyId } = useCompanyContext()
   const [draft, setDraft] = useState<AnalyticsDraftReport>(createDefaultDraft())
   const [savedReports, setSavedReports] = useState<AnalyticsReportDefinition[]>([])
   const [chartData, setChartData] = useState<AnalyticsChartDatum[]>([])
@@ -123,8 +124,12 @@ export function AnalyticsWorkspace() {
   const [syncing, setSyncing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [infoMessage, setInfoMessage] = useState<string | null>(null)
+  const [syncSuccessMessage, setSyncSuccessMessage] = useState<string | null>(null)
 
   const analyticsBaseUrl = analyticsConfig.apiUrl
+  const activeSchema = analyticsSchemaByElementType[draft.elementType]
+  const availableDimensions = activeSchema.dimensions
+  const availableMeasures = activeSchema.measures
   const currencyFormatter = useMemo(
     () =>
       new Intl.NumberFormat(undefined, {
@@ -179,6 +184,7 @@ export function AnalyticsWorkspace() {
 
     void queryAnalyticsPreview(analyticsBaseUrl, {
       companyId: selectedCompanyId,
+      elementType: draft.elementType,
       dimension: draft.dimension,
       measure: draft.measure,
     })
@@ -202,7 +208,20 @@ export function AnalyticsWorkspace() {
     return () => {
       cancelled = true
     }
-  }, [analyticsBaseUrl, draft.dimension, draft.measure, selectedCompanyId, t])
+  }, [analyticsBaseUrl, draft.dimension, draft.elementType, draft.measure, selectedCompanyId, t])
+
+  useEffect(() => {
+    if (
+      !availableDimensions.includes(draft.dimension) ||
+      !availableMeasures.includes(draft.measure)
+    ) {
+      setDraft(current => ({
+        ...current,
+        dimension: availableDimensions[0],
+        measure: availableMeasures[0],
+      }))
+    }
+  }, [availableDimensions, availableMeasures, draft.dimension, draft.measure])
 
   const handleDraftChange = <T extends keyof AnalyticsDraftReport>(
     key: T,
@@ -229,6 +248,7 @@ export function AnalyticsWorkspace() {
       const input = {
         companyId: selectedCompanyId,
         name: reportName,
+        elementType: draft.elementType,
         chartType: draft.chartType,
         dimension: draft.dimension,
         measure: draft.measure,
@@ -255,6 +275,7 @@ export function AnalyticsWorkspace() {
     setDraft({
       id: report.id,
       name: report.name,
+      elementType: report.elementType,
       chartType: report.chartType,
       dimension: report.dimension,
       measure: report.measure,
@@ -287,17 +308,23 @@ export function AnalyticsWorkspace() {
     setSyncing(true)
     setError(null)
     setInfoMessage(null)
+    setSyncSuccessMessage(null)
 
     try {
       const result = await syncAnalyticsProjection(analyticsBaseUrl, selectedCompanyId)
-      setInfoMessage(
+      setSyncSuccessMessage(
         t('syncSuccess', {
           applications: result.applications,
           capabilities: result.capabilities,
+          aiComponents: result.aiComponents,
+          dataObjects: result.dataObjects,
+          interfaces: result.interfaces,
+          infrastructure: result.infrastructure,
         })
       )
       const refreshed = await queryAnalyticsPreview(analyticsBaseUrl, {
         companyId: selectedCompanyId,
+        elementType: draft.elementType,
         dimension: draft.dimension,
         measure: draft.measure,
       })
@@ -309,9 +336,10 @@ export function AnalyticsWorkspace() {
     }
   }
 
-  const scopeLabel = selectedCompany?.name || t('globalScope')
-  const connectionReady = Boolean(analyticsConfig.apiUrl)
   const previewTotal = chartData.reduce((sum, entry) => sum + entry.value, 0)
+  const previewTotalLabel = analyticsCurrencyMeasures.includes(draft.measure)
+    ? currencyFormatter.format(previewTotal)
+    : previewTotal.toLocaleString()
 
   return (
     <Box sx={{ px: { xs: 2, md: 4 }, py: 3 }}>
@@ -323,23 +351,10 @@ export function AnalyticsWorkspace() {
           <Typography variant="body1" color="text.secondary">
             {t('subtitle')}
           </Typography>
-          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
-            <Chip
-              label={`${t('companyScope')}: ${scopeLabel}`}
-              color="primary"
-              variant="outlined"
-            />
-            <Chip
-              label={`${t('apiEndpoint')}: ${connectionReady ? analyticsConfig.apiUrl : t('connectionMissing')}`}
-              color={connectionReady ? 'success' : 'default'}
-              variant="outlined"
-            />
-          </Stack>
         </Stack>
 
         {error && <Alert severity="error">{error}</Alert>}
         {infoMessage && <Alert severity="success">{infoMessage}</Alert>}
-        <Alert severity="info">{t('liveDataHint')}</Alert>
 
         <Box
           sx={{
@@ -361,6 +376,30 @@ export function AnalyticsWorkspace() {
                   onChange={event => handleDraftChange('name', event.target.value)}
                   fullWidth
                 />
+                <TextField
+                  select
+                  label={t('elementType')}
+                  value={draft.elementType}
+                  onChange={event => {
+                    const nextElementType = event.target
+                      .value as AnalyticsDraftReport['elementType']
+                    const nextSchema = analyticsSchemaByElementType[nextElementType]
+
+                    setDraft(current => ({
+                      ...current,
+                      elementType: nextElementType,
+                      dimension: nextSchema.dimensions[0],
+                      measure: nextSchema.measures[0],
+                    }))
+                  }}
+                  fullWidth
+                >
+                  {analyticsElementTypes.map(elementType => (
+                    <MenuItem key={elementType} value={elementType}>
+                      {t(`elementTypes.${elementType}`)}
+                    </MenuItem>
+                  ))}
+                </TextField>
                 <TextField
                   select
                   label={t('chartType')}
@@ -391,7 +430,7 @@ export function AnalyticsWorkspace() {
                   }
                   fullWidth
                 >
-                  {analyticsDimensionKeys.map(dimension => (
+                  {availableDimensions.map(dimension => (
                     <MenuItem key={dimension} value={dimension}>
                       {t(`dimensions.${dimension}`)}
                     </MenuItem>
@@ -409,7 +448,7 @@ export function AnalyticsWorkspace() {
                   }
                   fullWidth
                 >
-                  {analyticsMeasureKeys.map(measure => (
+                  {availableMeasures.map(measure => (
                     <MenuItem key={measure} value={measure}>
                       {t(`measures.${measure}`)}
                     </MenuItem>
@@ -433,21 +472,13 @@ export function AnalyticsWorkspace() {
                   onClick={() => void handleSync()}
                   disabled={syncing || !selectedCompanyId || !analyticsBaseUrl}
                 >
-                  {t('syncProjection')}
+                  {t('syncData')}
                 </Button>
                 {!selectedCompanyId && (
                   <Typography variant="caption" color="text.secondary">
                     {t('syncRequiresCompany')}
                   </Typography>
                 )}
-                <Divider />
-                <Typography variant="subtitle2">{t('pipelineTitle')}</Typography>
-                <Stack spacing={1.25}>
-                  <Chip icon={<Storage />} label={t('pipelineSource')} variant="outlined" />
-                  <Chip icon={<Lan />} label={t('pipelineProjection')} variant="outlined" />
-                  <Chip icon={<Insights />} label={t('pipelineSemantic')} variant="outlined" />
-                  <Chip label={t('pipelineUi')} color="primary" />
-                </Stack>
               </Stack>
             </CardContent>
           </Card>
@@ -463,9 +494,7 @@ export function AnalyticsWorkspace() {
                 >
                   <Typography variant="h6">{t('previewTitle')}</Typography>
                   <Typography variant="body2" color="text.secondary">
-                    {draft.measure === 'monthlyCost'
-                      ? currencyFormatter.format(previewTotal)
-                      : `${previewTotal.toLocaleString()} ${t('measures.applicationCount').toLowerCase()}`}
+                    {previewTotalLabel}
                   </Typography>
                 </Stack>
                 {(queryLoading || syncing) && <LinearProgress />}
@@ -503,6 +532,7 @@ export function AnalyticsWorkspace() {
                             <Box>
                               <Typography variant="subtitle1">{report.name}</Typography>
                               <Typography variant="caption" color="text.secondary">
+                                {t(`elementTypes.${report.elementType}`)} ·{' '}
                                 {t(`types.${report.chartType}`)} ·{' '}
                                 {t(`dimensions.${report.dimension}`)} ·{' '}
                                 {t(`measures.${report.measure}`)}
@@ -529,6 +559,16 @@ export function AnalyticsWorkspace() {
             </CardContent>
           </Card>
         </Box>
+        <Snackbar
+          open={Boolean(syncSuccessMessage)}
+          autoHideDuration={4000}
+          onClose={() => setSyncSuccessMessage(null)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        >
+          <Alert onClose={() => setSyncSuccessMessage(null)} severity="success" variant="filled">
+            {syncSuccessMessage}
+          </Alert>
+        </Snackbar>
       </Stack>
     </Box>
   )

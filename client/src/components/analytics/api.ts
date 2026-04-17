@@ -1,6 +1,11 @@
 import { secureApiCall } from '@/utils/sessionUtils'
 
-import { AnalyticsDimensionKey, AnalyticsMeasureKey, AnalyticsReportDefinition } from './types'
+import {
+  AnalyticsDimensionKey,
+  AnalyticsElementType,
+  AnalyticsMeasureKey,
+  AnalyticsReportDefinition,
+} from './types'
 
 interface ReportsResponse {
   readonly reports: AnalyticsReportDefinition[]
@@ -48,6 +53,7 @@ export async function createAnalyticsReport(
   input: {
     readonly companyId: string | null
     readonly name: string
+    readonly elementType: AnalyticsElementType
     readonly chartType: AnalyticsReportDefinition['chartType']
     readonly dimension: AnalyticsDimensionKey
     readonly measure: AnalyticsMeasureKey
@@ -74,6 +80,7 @@ export async function updateAnalyticsReport(
   input: {
     readonly companyId: string | null
     readonly name: string
+    readonly elementType: AnalyticsElementType
     readonly chartType: AnalyticsReportDefinition['chartType']
     readonly dimension: AnalyticsDimensionKey
     readonly measure: AnalyticsMeasureKey
@@ -120,6 +127,10 @@ export async function syncAnalyticsProjection(baseUrl: string, companyId: string
       readonly syncedAt: string
       readonly applications: number
       readonly capabilities: number
+      readonly aiComponents: number
+      readonly dataObjects: number
+      readonly interfaces: number
+      readonly infrastructure: number
     }>(response, 'Failed to sync analytics projections')
   })
 }
@@ -128,6 +139,7 @@ export async function queryAnalyticsPreview(
   baseUrl: string,
   input: {
     readonly companyId: string | null
+    readonly elementType: AnalyticsElementType
     readonly dimension: AnalyticsDimensionKey
     readonly measure: AnalyticsMeasureKey
   }

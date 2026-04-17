@@ -8,6 +8,7 @@ import http from 'http'
 
 // Import custom modules
 import analyticsRouter from './analytics/routes'
+import { ensureAnalyticsProjectionSchema } from './analytics/clickhouse'
 import { testConnection, closeDriver } from './db/neo4j-client'
 import { neoSchema } from './graphql/schema'
 
@@ -24,6 +25,8 @@ async function startServer() {
     console.error('Critical error: Could not establish Neo4j connection.')
     process.exit(1)
   }
+
+  await ensureAnalyticsProjectionSchema()
 
   // Initialize Express app
   const app = express()

@@ -1,9 +1,16 @@
 import jwt from 'jsonwebtoken'
 
 import { AnalyticsUser } from './auth'
-
-type AnalyticsDimensionKey = 'status' | 'criticality' | 'vendor' | 'month'
-type AnalyticsMeasureKey = 'applicationCount' | 'monthlyCost'
+import {
+  AnalyticsDimensionKey,
+  AnalyticsElementType,
+  AnalyticsMeasureKey,
+  getAnalyticsCubeName,
+  getAnalyticsDimensionMember,
+  getAnalyticsMeasureMember,
+  isAnalyticsDimensionSupported,
+  isAnalyticsMeasureSupported,
+} from './schema'
 
 interface CubeQueryResponse {
   readonly data?: Array<Record<string, string | number | null>>
@@ -11,18 +18,6 @@ interface CubeQueryResponse {
 
 const cubeApiUrl = process.env.ANALYTICS_CUBE_API_URL || 'http://cube:4000/cubejs-api/v1'
 const cubeApiSecret = process.env.CUBEJS_API_SECRET || 'nextgen-eam-analytics-dev'
-
-const dimensionMemberMap: Record<AnalyticsDimensionKey, string> = {
-  status: 'ApplicationProjection.status',
-  criticality: 'ApplicationProjection.criticality',
-  vendor: 'ApplicationProjection.vendor',
-  month: 'ApplicationProjection.updatedMonth',
-}
-
-const measureMemberMap: Record<AnalyticsMeasureKey, string> = {
-  applicationCount: 'ApplicationProjection.count',
-  monthlyCost: 'ApplicationProjection.totalMonthlyCost',
-}
 
 function normalizeMonthLabel(rawValue: string): string {
   if (/^\d{4}-\d{2}$/.test(rawValue)) {
@@ -52,20 +47,31 @@ function createCubeToken(user: AnalyticsUser, companyId: string | null): string 
 export async function loadAnalyticsChartData(
   user: AnalyticsUser,
   input: {
+    readonly elementType: AnalyticsElementType
     readonly companyId: string | null
     readonly companyIds: readonly string[]
     readonly dimension: AnalyticsDimensionKey
     readonly measure: AnalyticsMeasureKey
   }
 ) {
-  const dimensionMember = dimensionMemberMap[input.dimension]
-  const measureMember = measureMemberMap[input.measure]
+  if (!isAnalyticsDimensionSupported(input.elementType, input.dimension)) {
+    throw new Error(`Unsupported analytics dimension '${input.dimension}' for ${input.elementType}`)
+  }
 
+  if (!isAnalyticsMeasureSupported(input.elementType, input.measure)) {
+    throw new Error(`Unsupported analytics measure '${input.measure}' for ${input.elementType}`)
+  }
+
+  const cubeName = getAnalyticsCubeName(input.elementType)
+  const dimensionMember = `${cubeName}.${getAnalyticsDimensionMember(input.elementType, input.dimension)}`
+  const measureMember = `${cubeName}.${getAnalyticsMeasureMember(input.elementType, input.measure)}`
+
+  const companyMember = `${cubeName}.companyId`
   const filters =
     input.companyIds.length > 0
       ? [
           {
-            member: 'ApplicationProjection.companyId',
+            member: companyMember,
             operator: 'equals',
             values: input.companyIds,
           },
@@ -107,7 +113,7 @@ export async function loadAnalyticsChartData(
       const label =
         input.dimension === 'month'
           ? normalizeMonthLabel(String(rawLabel ?? ''))
-          : String(rawLabel ?? '')
+          : String(rawLabel ?? 'UNSPECIFIED')
       const value = typeof rawValue === 'number' ? rawValue : Number(rawValue ?? 0)
 
       return {
