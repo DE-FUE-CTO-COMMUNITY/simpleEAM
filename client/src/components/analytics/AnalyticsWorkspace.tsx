@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useMemo, useState } from 'react'
+import { useApolloClient } from '@apollo/client'
 import {
   Alert,
   Box,
@@ -32,6 +33,7 @@ import {
   YAxis,
 } from 'recharts'
 import { useCompanyContext } from '@/contexts/CompanyContext'
+import { useCurrentPerson } from '@/hooks/useCurrentPerson'
 import { useAnalyticsConfig } from '@/lib/runtime-config'
 
 import {
@@ -113,8 +115,10 @@ function renderChart(chartType: AnalyticsDraftReport['chartType'], data: Analyti
 
 export function AnalyticsWorkspace() {
   const t = useTranslations('analytics')
+  const apolloClient = useApolloClient()
   const analyticsConfig = useAnalyticsConfig()
   const { selectedCompanyId } = useCompanyContext()
+  const { currentPerson, isLoading: currentPersonLoading } = useCurrentPerson()
   const [draft, setDraft] = useState<AnalyticsDraftReport>(createDefaultDraft())
   const [savedReports, setSavedReports] = useState<AnalyticsReportDefinition[]>([])
   const [chartData, setChartData] = useState<AnalyticsChartDatum[]>([])
@@ -141,8 +145,9 @@ export function AnalyticsWorkspace() {
   )
 
   useEffect(() => {
-    if (!analyticsBaseUrl) {
+    if (!selectedCompanyId || !currentPerson?.id) {
       setSavedReports([])
+      setReportsLoading(false)
       return
     }
 
@@ -150,7 +155,7 @@ export function AnalyticsWorkspace() {
     setReportsLoading(true)
     setError(null)
 
-    void listAnalyticsReports(analyticsBaseUrl, selectedCompanyId)
+    void listAnalyticsReports(apolloClient, selectedCompanyId, currentPerson.id)
       .then(reports => {
         if (!cancelled) {
           setSavedReports(reports)
@@ -171,7 +176,7 @@ export function AnalyticsWorkspace() {
     return () => {
       cancelled = true
     }
-  }, [analyticsBaseUrl, selectedCompanyId, t])
+  }, [apolloClient, currentPerson?.id, selectedCompanyId, t])
 
   useEffect(() => {
     if (!analyticsBaseUrl) {
@@ -231,7 +236,7 @@ export function AnalyticsWorkspace() {
   }
 
   const handleSave = async () => {
-    if (!analyticsBaseUrl) {
+    if (!selectedCompanyId || !currentPerson?.id) {
       return
     }
 
@@ -247,6 +252,7 @@ export function AnalyticsWorkspace() {
     try {
       const input = {
         companyId: selectedCompanyId,
+        creatorId: currentPerson.id,
         name: reportName,
         elementType: draft.elementType,
         chartType: draft.chartType,
@@ -255,8 +261,12 @@ export function AnalyticsWorkspace() {
       }
 
       const report = draft.id
-        ? await updateAnalyticsReport(analyticsBaseUrl, draft.id, input)
-        : await createAnalyticsReport(analyticsBaseUrl, input)
+        ? await updateAnalyticsReport(apolloClient, draft.id, {
+            currentCompanyId:
+              savedReports.find(currentReport => currentReport.id === draft.id)?.companyId ?? null,
+            ...input,
+          })
+        : await createAnalyticsReport(apolloClient, input)
 
       setSavedReports(current => {
         const remaining = current.filter(currentReport => currentReport.id !== report.id)
@@ -283,15 +293,11 @@ export function AnalyticsWorkspace() {
   }
 
   const handleDelete = async (reportId: string) => {
-    if (!analyticsBaseUrl) {
-      return
-    }
-
     setError(null)
     setInfoMessage(null)
 
     try {
-      await deleteAnalyticsReport(analyticsBaseUrl, reportId)
+      await deleteAnalyticsReport(apolloClient, reportId)
       setSavedReports(current => current.filter(report => report.id !== reportId))
       setDraft(current => (current.id === reportId ? createDefaultDraft() : current))
       setInfoMessage(t('reportDeleted'))
@@ -366,6 +372,82 @@ export function AnalyticsWorkspace() {
             },
           }}
         >
+          <Card variant="outlined">
+            <CardContent>
+              <Stack spacing={2}>
+                <Typography variant="h6">{t('savedReportsTitle')}</Typography>
+                {reportsLoading && <LinearProgress />}
+                {savedReports.length === 0 ? (
+                  <Box sx={{ py: 4 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      {t('emptySavedReports')}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {t('emptySavedReportsHint')}
+                    </Typography>
+                  </Box>
+                ) : (
+                  savedReports.map(report => (
+                    <Card key={report.id} variant="outlined">
+                      <CardContent>
+                        <Stack spacing={1.5}>
+                          <Stack direction="row" justifyContent="space-between" spacing={1}>
+                            <Box>
+                              <Typography variant="subtitle1">{report.name}</Typography>
+                              <Typography variant="caption" color="text.secondary">
+                                {t(`elementTypes.${report.elementType}`)} ·{' '}
+                                {t(`types.${report.chartType}`)} ·{' '}
+                                {t(`dimensions.${report.dimension}`)} ·{' '}
+                                {t(`measures.${report.measure}`)}
+                              </Typography>
+                            </Box>
+                            <Button
+                              color="error"
+                              size="small"
+                              startIcon={<DeleteOutline />}
+                              onClick={() => void handleDelete(report.id)}
+                            >
+                              {t('deleteReport')}
+                            </Button>
+                          </Stack>
+                          <Button variant="outlined" onClick={() => handleLoad(report)}>
+                            {t('loadReport')}
+                          </Button>
+                        </Stack>
+                      </CardContent>
+                    </Card>
+                  ))
+                )}
+              </Stack>
+            </CardContent>
+          </Card>
+
+          <Card variant="outlined">
+            <CardContent>
+              <Stack spacing={2}>
+                <Stack
+                  direction={{ xs: 'column', md: 'row' }}
+                  spacing={1.5}
+                  justifyContent="space-between"
+                  alignItems={{ xs: 'flex-start', md: 'center' }}
+                >
+                  <Typography variant="h6">{t('previewTitle')}</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {previewTotalLabel}
+                  </Typography>
+                </Stack>
+                {(queryLoading || syncing) && <LinearProgress />}
+                {!queryLoading && chartData.length === 0 ? (
+                  <Typography variant="body2" color="text.secondary">
+                    {t('emptyPreview')}
+                  </Typography>
+                ) : (
+                  renderChart(draft.chartType, chartData)
+                )}
+              </Stack>
+            </CardContent>
+          </Card>
+
           <Card variant="outlined">
             <CardContent>
               <Stack spacing={2.5}>
@@ -458,7 +540,13 @@ export function AnalyticsWorkspace() {
                   <Button
                     variant="contained"
                     onClick={() => void handleSave()}
-                    disabled={!draft.name.trim() || saving || !analyticsBaseUrl}
+                    disabled={
+                      !draft.name.trim() ||
+                      saving ||
+                      !selectedCompanyId ||
+                      !currentPerson?.id ||
+                      currentPersonLoading
+                    }
                   >
                     {draft.id ? t('updateReport') : t('saveReport')}
                   </Button>
@@ -479,81 +567,10 @@ export function AnalyticsWorkspace() {
                     {t('syncRequiresCompany')}
                   </Typography>
                 )}
-              </Stack>
-            </CardContent>
-          </Card>
-
-          <Card variant="outlined">
-            <CardContent>
-              <Stack spacing={2}>
-                <Stack
-                  direction={{ xs: 'column', md: 'row' }}
-                  spacing={1.5}
-                  justifyContent="space-between"
-                  alignItems={{ xs: 'flex-start', md: 'center' }}
-                >
-                  <Typography variant="h6">{t('previewTitle')}</Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {previewTotalLabel}
+                {selectedCompanyId && !currentPerson?.id && !currentPersonLoading && (
+                  <Typography variant="caption" color="text.secondary">
+                    {t('saveRequiresCurrentPerson')}
                   </Typography>
-                </Stack>
-                {(queryLoading || syncing) && <LinearProgress />}
-                {!queryLoading && chartData.length === 0 ? (
-                  <Typography variant="body2" color="text.secondary">
-                    {t('emptyPreview')}
-                  </Typography>
-                ) : (
-                  renderChart(draft.chartType, chartData)
-                )}
-              </Stack>
-            </CardContent>
-          </Card>
-
-          <Card variant="outlined">
-            <CardContent>
-              <Stack spacing={2}>
-                <Typography variant="h6">{t('savedReportsTitle')}</Typography>
-                {reportsLoading && <LinearProgress />}
-                {savedReports.length === 0 ? (
-                  <Box sx={{ py: 4 }}>
-                    <Typography variant="body2" color="text.secondary">
-                      {t('emptySavedReports')}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {t('emptySavedReportsHint')}
-                    </Typography>
-                  </Box>
-                ) : (
-                  savedReports.map(report => (
-                    <Card key={report.id} variant="outlined">
-                      <CardContent>
-                        <Stack spacing={1.5}>
-                          <Stack direction="row" justifyContent="space-between" spacing={1}>
-                            <Box>
-                              <Typography variant="subtitle1">{report.name}</Typography>
-                              <Typography variant="caption" color="text.secondary">
-                                {t(`elementTypes.${report.elementType}`)} ·{' '}
-                                {t(`types.${report.chartType}`)} ·{' '}
-                                {t(`dimensions.${report.dimension}`)} ·{' '}
-                                {t(`measures.${report.measure}`)}
-                              </Typography>
-                            </Box>
-                            <Button
-                              color="error"
-                              size="small"
-                              startIcon={<DeleteOutline />}
-                              onClick={() => void handleDelete(report.id)}
-                            >
-                              {t('deleteReport')}
-                            </Button>
-                          </Stack>
-                          <Button variant="outlined" onClick={() => handleLoad(report)}>
-                            {t('loadReport')}
-                          </Button>
-                        </Stack>
-                      </CardContent>
-                    </Card>
-                  ))
                 )}
               </Stack>
             </CardContent>

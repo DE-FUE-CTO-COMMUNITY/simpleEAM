@@ -2282,6 +2282,7 @@
     "syncProjection": "Sync projections",
     "syncData": "Sync data",
     "syncRequiresCompany": "Select a company to sync a company-scoped projection refresh.",
+    "saveRequiresCurrentPerson": "A matching person record is required to save analytics reports.",
     "syncSuccess": "Projection sync finished. {applications} applications, {capabilities} capabilities, {aiComponents} AI components, {dataObjects} data objects, {interfaces} interfaces, and {infrastructure} infrastructure elements refreshed.",
     "syncError": "Projection sync failed.",
     "reportSaved": "Report saved.",

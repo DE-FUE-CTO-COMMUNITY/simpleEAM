@@ -2282,6 +2282,7 @@
     "syncProjection": "Synchroniser les projections",
     "syncData": "Synchroniser les données",
     "syncRequiresCompany": "Sélectionnez une entreprise pour synchroniser un rafraîchissement de projection lié à cette entreprise.",
+    "saveRequiresCurrentPerson": "Un enregistrement Person correspondant est requis pour enregistrer les rapports analytiques.",
     "syncSuccess": "La synchronisation des projections est terminée. {applications} applications, {capabilities} capacités, {aiComponents} composants IA, {dataObjects} objets de données, {interfaces} interfaces et {infrastructure} éléments d'infrastructure ont été actualisés.",
     "syncError": "La synchronisation des projections a échoué.",
     "reportSaved": "Rapport enregistré.",

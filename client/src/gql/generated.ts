@@ -3321,6 +3321,464 @@ export type AiRunsConnection = {
   totalCount: Scalars['Int']['output'];
 };
 
+/** AnalyticsReport - represents a saved analytics report definition */
+export type AnalyticsReport = {
+  __typename?: 'AnalyticsReport';
+  chartType: Scalars['String']['output'];
+  company: Array<Company>;
+  companyConnection: AnalyticsReportCompanyConnection;
+  createdAt: Scalars['DateTime']['output'];
+  createdBy: Array<Person>;
+  createdByConnection: AnalyticsReportCreatedByConnection;
+  dimension: Scalars['String']['output'];
+  elementType: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  measure: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+};
+
+
+/** AnalyticsReport - represents a saved analytics report definition */
+export type AnalyticsReportCompanyArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<CompanySort>>;
+  where?: InputMaybe<CompanyWhere>;
+};
+
+
+/** AnalyticsReport - represents a saved analytics report definition */
+export type AnalyticsReportCompanyConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<AnalyticsReportCompanyConnectionSort>>;
+  where?: InputMaybe<AnalyticsReportCompanyConnectionWhere>;
+};
+
+
+/** AnalyticsReport - represents a saved analytics report definition */
+export type AnalyticsReportCreatedByArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<PersonSort>>;
+  where?: InputMaybe<PersonWhere>;
+};
+
+
+/** AnalyticsReport - represents a saved analytics report definition */
+export type AnalyticsReportCreatedByConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<AnalyticsReportCreatedByConnectionSort>>;
+  where?: InputMaybe<AnalyticsReportCreatedByConnectionWhere>;
+};
+
+export type AnalyticsReportAggregate = {
+  __typename?: 'AnalyticsReportAggregate';
+  count: Count;
+  node: AnalyticsReportAggregateNode;
+};
+
+export type AnalyticsReportAggregateNode = {
+  __typename?: 'AnalyticsReportAggregateNode';
+  chartType: StringAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  dimension: StringAggregateSelection;
+  elementType: StringAggregateSelection;
+  measure: StringAggregateSelection;
+  name: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
+export type AnalyticsReportCompanyAggregateInput = {
+  AND?: InputMaybe<Array<AnalyticsReportCompanyAggregateInput>>;
+  NOT?: InputMaybe<AnalyticsReportCompanyAggregateInput>;
+  OR?: InputMaybe<Array<AnalyticsReportCompanyAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<AnalyticsReportCompanyNodeAggregationWhereInput>;
+};
+
+export type AnalyticsReportCompanyCompanyAggregateSelection = {
+  __typename?: 'AnalyticsReportCompanyCompanyAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<AnalyticsReportCompanyCompanyNodeAggregateSelection>;
+};
+
+export type AnalyticsReportCompanyCompanyNodeAggregateSelection = {
+  __typename?: 'AnalyticsReportCompanyCompanyNodeAggregateSelection';
+  achievedSovereigntyScore: FloatAggregateSelection;
+  address: StringAggregateSelection;
+  controlPriority: IntAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  diagramFont: StringAggregateSelection;
+  expectedSovereigntyScore: FloatAggregateSelection;
+  features: StringAggregateSelection;
+  font: StringAggregateSelection;
+  industry: StringAggregateSelection;
+  llmKey: StringAggregateSelection;
+  llmModel: StringAggregateSelection;
+  llmUrl: StringAggregateSelection;
+  logo: StringAggregateSelection;
+  name: StringAggregateSelection;
+  primaryColor: StringAggregateSelection;
+  resiliencePriority: IntAggregateSelection;
+  secondaryColor: StringAggregateSelection;
+  securityPriority: IntAggregateSelection;
+  sovereigntyGap: FloatAggregateSelection;
+  sovereigntyScorePercent: FloatAggregateSelection;
+  sovereigntyScoreStatus: StringAggregateSelection;
+  strategicAutonomyPriority: IntAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  website: StringAggregateSelection;
+};
+
+export type AnalyticsReportCompanyConnectFieldInput = {
+  connect?: InputMaybe<Array<CompanyConnectInput>>;
+  where?: InputMaybe<CompanyConnectWhere>;
+};
+
+export type AnalyticsReportCompanyConnection = {
+  __typename?: 'AnalyticsReportCompanyConnection';
+  aggregate: AnalyticsReportCompanyCompanyAggregateSelection;
+  edges: Array<AnalyticsReportCompanyRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type AnalyticsReportCompanyConnectionAggregateInput = {
+  AND?: InputMaybe<Array<AnalyticsReportCompanyConnectionAggregateInput>>;
+  NOT?: InputMaybe<AnalyticsReportCompanyConnectionAggregateInput>;
+  OR?: InputMaybe<Array<AnalyticsReportCompanyConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<AnalyticsReportCompanyNodeAggregationWhereInput>;
+};
+
+export type AnalyticsReportCompanyConnectionFilters = {
+  /** Filter AnalyticsReports by aggregating results on related AnalyticsReportCompanyConnections */
+  aggregate?: InputMaybe<AnalyticsReportCompanyConnectionAggregateInput>;
+  /** Return AnalyticsReports where all of the related AnalyticsReportCompanyConnections match this filter */
+  all?: InputMaybe<AnalyticsReportCompanyConnectionWhere>;
+  /** Return AnalyticsReports where none of the related AnalyticsReportCompanyConnections match this filter */
+  none?: InputMaybe<AnalyticsReportCompanyConnectionWhere>;
+  /** Return AnalyticsReports where one of the related AnalyticsReportCompanyConnections match this filter */
+  single?: InputMaybe<AnalyticsReportCompanyConnectionWhere>;
+  /** Return AnalyticsReports where some of the related AnalyticsReportCompanyConnections match this filter */
+  some?: InputMaybe<AnalyticsReportCompanyConnectionWhere>;
+};
+
+export type AnalyticsReportCompanyConnectionSort = {
+  node?: InputMaybe<CompanySort>;
+};
+
+export type AnalyticsReportCompanyConnectionWhere = {
+  AND?: InputMaybe<Array<AnalyticsReportCompanyConnectionWhere>>;
+  NOT?: InputMaybe<AnalyticsReportCompanyConnectionWhere>;
+  OR?: InputMaybe<Array<AnalyticsReportCompanyConnectionWhere>>;
+  node?: InputMaybe<CompanyWhere>;
+};
+
+export type AnalyticsReportCompanyCreateFieldInput = {
+  node: CompanyCreateInput;
+};
+
+export type AnalyticsReportCompanyDeleteFieldInput = {
+  delete?: InputMaybe<CompanyDeleteInput>;
+  where?: InputMaybe<AnalyticsReportCompanyConnectionWhere>;
+};
+
+export type AnalyticsReportCompanyDisconnectFieldInput = {
+  disconnect?: InputMaybe<CompanyDisconnectInput>;
+  where?: InputMaybe<AnalyticsReportCompanyConnectionWhere>;
+};
+
+export type AnalyticsReportCompanyFieldInput = {
+  connect?: InputMaybe<Array<AnalyticsReportCompanyConnectFieldInput>>;
+  create?: InputMaybe<Array<AnalyticsReportCompanyCreateFieldInput>>;
+};
+
+export type AnalyticsReportCompanyNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<AnalyticsReportCompanyNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<AnalyticsReportCompanyNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<AnalyticsReportCompanyNodeAggregationWhereInput>>;
+  achievedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
+  address?: InputMaybe<StringScalarAggregationFilters>;
+  controlPriority?: InputMaybe<IntScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  description?: InputMaybe<StringScalarAggregationFilters>;
+  diagramFont?: InputMaybe<StringScalarAggregationFilters>;
+  expectedSovereigntyScore?: InputMaybe<FloatScalarAggregationFilters>;
+  features?: InputMaybe<StringScalarAggregationFilters>;
+  font?: InputMaybe<StringScalarAggregationFilters>;
+  industry?: InputMaybe<StringScalarAggregationFilters>;
+  llmKey?: InputMaybe<StringScalarAggregationFilters>;
+  llmModel?: InputMaybe<StringScalarAggregationFilters>;
+  llmUrl?: InputMaybe<StringScalarAggregationFilters>;
+  logo?: InputMaybe<StringScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  primaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  resiliencePriority?: InputMaybe<IntScalarAggregationFilters>;
+  secondaryColor?: InputMaybe<StringScalarAggregationFilters>;
+  securityPriority?: InputMaybe<IntScalarAggregationFilters>;
+  sovereigntyGap?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScorePercent?: InputMaybe<FloatScalarAggregationFilters>;
+  sovereigntyScoreStatus?: InputMaybe<StringScalarAggregationFilters>;
+  strategicAutonomyPriority?: InputMaybe<IntScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  website?: InputMaybe<StringScalarAggregationFilters>;
+};
+
+export type AnalyticsReportCompanyRelationship = {
+  __typename?: 'AnalyticsReportCompanyRelationship';
+  cursor: Scalars['String']['output'];
+  node: Company;
+};
+
+export type AnalyticsReportCompanyUpdateConnectionInput = {
+  node?: InputMaybe<CompanyUpdateInput>;
+  where?: InputMaybe<AnalyticsReportCompanyConnectionWhere>;
+};
+
+export type AnalyticsReportCompanyUpdateFieldInput = {
+  connect?: InputMaybe<Array<AnalyticsReportCompanyConnectFieldInput>>;
+  create?: InputMaybe<Array<AnalyticsReportCompanyCreateFieldInput>>;
+  delete?: InputMaybe<Array<AnalyticsReportCompanyDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<AnalyticsReportCompanyDisconnectFieldInput>>;
+  update?: InputMaybe<AnalyticsReportCompanyUpdateConnectionInput>;
+};
+
+export type AnalyticsReportConnectInput = {
+  company?: InputMaybe<Array<AnalyticsReportCompanyConnectFieldInput>>;
+  createdBy?: InputMaybe<Array<AnalyticsReportCreatedByConnectFieldInput>>;
+};
+
+export type AnalyticsReportConnectWhere = {
+  node: AnalyticsReportWhere;
+};
+
+export type AnalyticsReportCreateInput = {
+  chartType: Scalars['String']['input'];
+  company?: InputMaybe<AnalyticsReportCompanyFieldInput>;
+  createdBy?: InputMaybe<AnalyticsReportCreatedByFieldInput>;
+  dimension: Scalars['String']['input'];
+  elementType: Scalars['String']['input'];
+  measure: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+export type AnalyticsReportCreatedByAggregateInput = {
+  AND?: InputMaybe<Array<AnalyticsReportCreatedByAggregateInput>>;
+  NOT?: InputMaybe<AnalyticsReportCreatedByAggregateInput>;
+  OR?: InputMaybe<Array<AnalyticsReportCreatedByAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<AnalyticsReportCreatedByNodeAggregationWhereInput>;
+};
+
+export type AnalyticsReportCreatedByConnectFieldInput = {
+  connect?: InputMaybe<Array<PersonConnectInput>>;
+  where?: InputMaybe<PersonConnectWhere>;
+};
+
+export type AnalyticsReportCreatedByConnection = {
+  __typename?: 'AnalyticsReportCreatedByConnection';
+  aggregate: AnalyticsReportPersonCreatedByAggregateSelection;
+  edges: Array<AnalyticsReportCreatedByRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type AnalyticsReportCreatedByConnectionAggregateInput = {
+  AND?: InputMaybe<Array<AnalyticsReportCreatedByConnectionAggregateInput>>;
+  NOT?: InputMaybe<AnalyticsReportCreatedByConnectionAggregateInput>;
+  OR?: InputMaybe<Array<AnalyticsReportCreatedByConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<AnalyticsReportCreatedByNodeAggregationWhereInput>;
+};
+
+export type AnalyticsReportCreatedByConnectionFilters = {
+  /** Filter AnalyticsReports by aggregating results on related AnalyticsReportCreatedByConnections */
+  aggregate?: InputMaybe<AnalyticsReportCreatedByConnectionAggregateInput>;
+  /** Return AnalyticsReports where all of the related AnalyticsReportCreatedByConnections match this filter */
+  all?: InputMaybe<AnalyticsReportCreatedByConnectionWhere>;
+  /** Return AnalyticsReports where none of the related AnalyticsReportCreatedByConnections match this filter */
+  none?: InputMaybe<AnalyticsReportCreatedByConnectionWhere>;
+  /** Return AnalyticsReports where one of the related AnalyticsReportCreatedByConnections match this filter */
+  single?: InputMaybe<AnalyticsReportCreatedByConnectionWhere>;
+  /** Return AnalyticsReports where some of the related AnalyticsReportCreatedByConnections match this filter */
+  some?: InputMaybe<AnalyticsReportCreatedByConnectionWhere>;
+};
+
+export type AnalyticsReportCreatedByConnectionSort = {
+  node?: InputMaybe<PersonSort>;
+};
+
+export type AnalyticsReportCreatedByConnectionWhere = {
+  AND?: InputMaybe<Array<AnalyticsReportCreatedByConnectionWhere>>;
+  NOT?: InputMaybe<AnalyticsReportCreatedByConnectionWhere>;
+  OR?: InputMaybe<Array<AnalyticsReportCreatedByConnectionWhere>>;
+  node?: InputMaybe<PersonWhere>;
+};
+
+export type AnalyticsReportCreatedByCreateFieldInput = {
+  node: PersonCreateInput;
+};
+
+export type AnalyticsReportCreatedByDeleteFieldInput = {
+  delete?: InputMaybe<PersonDeleteInput>;
+  where?: InputMaybe<AnalyticsReportCreatedByConnectionWhere>;
+};
+
+export type AnalyticsReportCreatedByDisconnectFieldInput = {
+  disconnect?: InputMaybe<PersonDisconnectInput>;
+  where?: InputMaybe<AnalyticsReportCreatedByConnectionWhere>;
+};
+
+export type AnalyticsReportCreatedByFieldInput = {
+  connect?: InputMaybe<Array<AnalyticsReportCreatedByConnectFieldInput>>;
+  create?: InputMaybe<Array<AnalyticsReportCreatedByCreateFieldInput>>;
+};
+
+export type AnalyticsReportCreatedByNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<AnalyticsReportCreatedByNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<AnalyticsReportCreatedByNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<AnalyticsReportCreatedByNodeAggregationWhereInput>>;
+  avatarUrl?: InputMaybe<StringScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  department?: InputMaybe<StringScalarAggregationFilters>;
+  email?: InputMaybe<StringScalarAggregationFilters>;
+  firstName?: InputMaybe<StringScalarAggregationFilters>;
+  lastName?: InputMaybe<StringScalarAggregationFilters>;
+  phone?: InputMaybe<StringScalarAggregationFilters>;
+  role?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type AnalyticsReportCreatedByRelationship = {
+  __typename?: 'AnalyticsReportCreatedByRelationship';
+  cursor: Scalars['String']['output'];
+  node: Person;
+};
+
+export type AnalyticsReportCreatedByUpdateConnectionInput = {
+  node?: InputMaybe<PersonUpdateInput>;
+  where?: InputMaybe<AnalyticsReportCreatedByConnectionWhere>;
+};
+
+export type AnalyticsReportCreatedByUpdateFieldInput = {
+  connect?: InputMaybe<Array<AnalyticsReportCreatedByConnectFieldInput>>;
+  create?: InputMaybe<Array<AnalyticsReportCreatedByCreateFieldInput>>;
+  delete?: InputMaybe<Array<AnalyticsReportCreatedByDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<AnalyticsReportCreatedByDisconnectFieldInput>>;
+  update?: InputMaybe<AnalyticsReportCreatedByUpdateConnectionInput>;
+};
+
+export type AnalyticsReportDeleteInput = {
+  company?: InputMaybe<Array<AnalyticsReportCompanyDeleteFieldInput>>;
+  createdBy?: InputMaybe<Array<AnalyticsReportCreatedByDeleteFieldInput>>;
+};
+
+export type AnalyticsReportDisconnectInput = {
+  company?: InputMaybe<Array<AnalyticsReportCompanyDisconnectFieldInput>>;
+  createdBy?: InputMaybe<Array<AnalyticsReportCreatedByDisconnectFieldInput>>;
+};
+
+export type AnalyticsReportEdge = {
+  __typename?: 'AnalyticsReportEdge';
+  cursor: Scalars['String']['output'];
+  node: AnalyticsReport;
+};
+
+export type AnalyticsReportPersonCreatedByAggregateSelection = {
+  __typename?: 'AnalyticsReportPersonCreatedByAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<AnalyticsReportPersonCreatedByNodeAggregateSelection>;
+};
+
+export type AnalyticsReportPersonCreatedByNodeAggregateSelection = {
+  __typename?: 'AnalyticsReportPersonCreatedByNodeAggregateSelection';
+  avatarUrl: StringAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  department: StringAggregateSelection;
+  email: StringAggregateSelection;
+  firstName: StringAggregateSelection;
+  lastName: StringAggregateSelection;
+  phone: StringAggregateSelection;
+  role: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
+export type AnalyticsReportRelationshipFilters = {
+  /** Filter type where all of the related AnalyticsReports match this filter */
+  all?: InputMaybe<AnalyticsReportWhere>;
+  /** Filter type where none of the related AnalyticsReports match this filter */
+  none?: InputMaybe<AnalyticsReportWhere>;
+  /** Filter type where one of the related AnalyticsReports match this filter */
+  single?: InputMaybe<AnalyticsReportWhere>;
+  /** Filter type where some of the related AnalyticsReports match this filter */
+  some?: InputMaybe<AnalyticsReportWhere>;
+};
+
+/** Fields to sort AnalyticsReports by. The order in which sorts are applied is not guaranteed when specifying many fields in one AnalyticsReportSort object. */
+export type AnalyticsReportSort = {
+  chartType?: InputMaybe<SortDirection>;
+  createdAt?: InputMaybe<SortDirection>;
+  dimension?: InputMaybe<SortDirection>;
+  elementType?: InputMaybe<SortDirection>;
+  id?: InputMaybe<SortDirection>;
+  measure?: InputMaybe<SortDirection>;
+  name?: InputMaybe<SortDirection>;
+  updatedAt?: InputMaybe<SortDirection>;
+};
+
+export type AnalyticsReportUpdateInput = {
+  chartType?: InputMaybe<StringScalarMutations>;
+  company?: InputMaybe<Array<AnalyticsReportCompanyUpdateFieldInput>>;
+  createdAt?: InputMaybe<DateTimeScalarMutations>;
+  createdBy?: InputMaybe<Array<AnalyticsReportCreatedByUpdateFieldInput>>;
+  dimension?: InputMaybe<StringScalarMutations>;
+  elementType?: InputMaybe<StringScalarMutations>;
+  measure?: InputMaybe<StringScalarMutations>;
+  name?: InputMaybe<StringScalarMutations>;
+};
+
+export type AnalyticsReportWhere = {
+  AND?: InputMaybe<Array<AnalyticsReportWhere>>;
+  NOT?: InputMaybe<AnalyticsReportWhere>;
+  OR?: InputMaybe<Array<AnalyticsReportWhere>>;
+  chartType?: InputMaybe<StringScalarFilters>;
+  company?: InputMaybe<CompanyRelationshipFilters>;
+  companyConnection?: InputMaybe<AnalyticsReportCompanyConnectionFilters>;
+  createdAt?: InputMaybe<DateTimeScalarFilters>;
+  createdBy?: InputMaybe<PersonRelationshipFilters>;
+  createdByConnection?: InputMaybe<AnalyticsReportCreatedByConnectionFilters>;
+  dimension?: InputMaybe<StringScalarFilters>;
+  elementType?: InputMaybe<StringScalarFilters>;
+  id?: InputMaybe<IdScalarFilters>;
+  measure?: InputMaybe<StringScalarFilters>;
+  name?: InputMaybe<StringScalarFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarFilters>;
+};
+
+export type AnalyticsReportsConnection = {
+  __typename?: 'AnalyticsReportsConnection';
+  aggregate: AnalyticsReportAggregate;
+  edges: Array<AnalyticsReportEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
 /** Application – represents a business application within Enterprise Architecture Management */
 export type Application = {
   __typename?: 'Application';
@@ -16667,6 +17125,8 @@ export type Company = {
   __typename?: 'Company';
   achievedSovereigntyScore?: Maybe<Scalars['Float']['output']>;
   address?: Maybe<Scalars['String']['output']>;
+  analyticsReports: Array<AnalyticsReport>;
+  analyticsReportsConnection: CompanyAnalyticsReportsConnection;
   controlPriority?: Maybe<Scalars['Int']['output']>;
   createdAt: Scalars['DateTime']['output'];
   description?: Maybe<Scalars['String']['output']>;
@@ -16728,6 +17188,24 @@ export type Company = {
   strategicAutonomyPriority?: Maybe<Scalars['Int']['output']>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
   website?: Maybe<Scalars['String']['output']>;
+};
+
+
+/** Company – represents an organization within Enterprise Architecture Management */
+export type CompanyAnalyticsReportsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<AnalyticsReportSort>>;
+  where?: InputMaybe<AnalyticsReportWhere>;
+};
+
+
+/** Company – represents an organization within Enterprise Architecture Management */
+export type CompanyAnalyticsReportsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<CompanyAnalyticsReportsConnectionSort>>;
+  where?: InputMaybe<CompanyAnalyticsReportsConnectionWhere>;
 };
 
 
@@ -17114,6 +17592,132 @@ export type CompanyAggregateNode = {
   website: StringAggregateSelection;
 };
 
+export type CompanyAnalyticsReportAnalyticsReportsAggregateSelection = {
+  __typename?: 'CompanyAnalyticsReportAnalyticsReportsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<CompanyAnalyticsReportAnalyticsReportsNodeAggregateSelection>;
+};
+
+export type CompanyAnalyticsReportAnalyticsReportsNodeAggregateSelection = {
+  __typename?: 'CompanyAnalyticsReportAnalyticsReportsNodeAggregateSelection';
+  chartType: StringAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  dimension: StringAggregateSelection;
+  elementType: StringAggregateSelection;
+  measure: StringAggregateSelection;
+  name: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
+export type CompanyAnalyticsReportsAggregateInput = {
+  AND?: InputMaybe<Array<CompanyAnalyticsReportsAggregateInput>>;
+  NOT?: InputMaybe<CompanyAnalyticsReportsAggregateInput>;
+  OR?: InputMaybe<Array<CompanyAnalyticsReportsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<CompanyAnalyticsReportsNodeAggregationWhereInput>;
+};
+
+export type CompanyAnalyticsReportsConnectFieldInput = {
+  connect?: InputMaybe<Array<AnalyticsReportConnectInput>>;
+  where?: InputMaybe<AnalyticsReportConnectWhere>;
+};
+
+export type CompanyAnalyticsReportsConnection = {
+  __typename?: 'CompanyAnalyticsReportsConnection';
+  aggregate: CompanyAnalyticsReportAnalyticsReportsAggregateSelection;
+  edges: Array<CompanyAnalyticsReportsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type CompanyAnalyticsReportsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<CompanyAnalyticsReportsConnectionAggregateInput>>;
+  NOT?: InputMaybe<CompanyAnalyticsReportsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<CompanyAnalyticsReportsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<CompanyAnalyticsReportsNodeAggregationWhereInput>;
+};
+
+export type CompanyAnalyticsReportsConnectionFilters = {
+  /** Filter Companies by aggregating results on related CompanyAnalyticsReportsConnections */
+  aggregate?: InputMaybe<CompanyAnalyticsReportsConnectionAggregateInput>;
+  /** Return Companies where all of the related CompanyAnalyticsReportsConnections match this filter */
+  all?: InputMaybe<CompanyAnalyticsReportsConnectionWhere>;
+  /** Return Companies where none of the related CompanyAnalyticsReportsConnections match this filter */
+  none?: InputMaybe<CompanyAnalyticsReportsConnectionWhere>;
+  /** Return Companies where one of the related CompanyAnalyticsReportsConnections match this filter */
+  single?: InputMaybe<CompanyAnalyticsReportsConnectionWhere>;
+  /** Return Companies where some of the related CompanyAnalyticsReportsConnections match this filter */
+  some?: InputMaybe<CompanyAnalyticsReportsConnectionWhere>;
+};
+
+export type CompanyAnalyticsReportsConnectionSort = {
+  node?: InputMaybe<AnalyticsReportSort>;
+};
+
+export type CompanyAnalyticsReportsConnectionWhere = {
+  AND?: InputMaybe<Array<CompanyAnalyticsReportsConnectionWhere>>;
+  NOT?: InputMaybe<CompanyAnalyticsReportsConnectionWhere>;
+  OR?: InputMaybe<Array<CompanyAnalyticsReportsConnectionWhere>>;
+  node?: InputMaybe<AnalyticsReportWhere>;
+};
+
+export type CompanyAnalyticsReportsCreateFieldInput = {
+  node: AnalyticsReportCreateInput;
+};
+
+export type CompanyAnalyticsReportsDeleteFieldInput = {
+  delete?: InputMaybe<AnalyticsReportDeleteInput>;
+  where?: InputMaybe<CompanyAnalyticsReportsConnectionWhere>;
+};
+
+export type CompanyAnalyticsReportsDisconnectFieldInput = {
+  disconnect?: InputMaybe<AnalyticsReportDisconnectInput>;
+  where?: InputMaybe<CompanyAnalyticsReportsConnectionWhere>;
+};
+
+export type CompanyAnalyticsReportsFieldInput = {
+  connect?: InputMaybe<Array<CompanyAnalyticsReportsConnectFieldInput>>;
+  create?: InputMaybe<Array<CompanyAnalyticsReportsCreateFieldInput>>;
+};
+
+export type CompanyAnalyticsReportsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<CompanyAnalyticsReportsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<CompanyAnalyticsReportsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<CompanyAnalyticsReportsNodeAggregationWhereInput>>;
+  chartType?: InputMaybe<StringScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  dimension?: InputMaybe<StringScalarAggregationFilters>;
+  elementType?: InputMaybe<StringScalarAggregationFilters>;
+  measure?: InputMaybe<StringScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type CompanyAnalyticsReportsRelationship = {
+  __typename?: 'CompanyAnalyticsReportsRelationship';
+  cursor: Scalars['String']['output'];
+  node: AnalyticsReport;
+};
+
+export type CompanyAnalyticsReportsUpdateConnectionInput = {
+  node?: InputMaybe<AnalyticsReportUpdateInput>;
+  where?: InputMaybe<CompanyAnalyticsReportsConnectionWhere>;
+};
+
+export type CompanyAnalyticsReportsUpdateFieldInput = {
+  connect?: InputMaybe<Array<CompanyAnalyticsReportsConnectFieldInput>>;
+  create?: InputMaybe<Array<CompanyAnalyticsReportsCreateFieldInput>>;
+  delete?: InputMaybe<Array<CompanyAnalyticsReportsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<CompanyAnalyticsReportsDisconnectFieldInput>>;
+  update?: InputMaybe<CompanyAnalyticsReportsUpdateConnectionInput>;
+};
+
 export type CompanyApplicationInterfaceOwnedInterfacesAggregateSelection = {
   __typename?: 'CompanyApplicationInterfaceOwnedInterfacesAggregateSelection';
   count: CountConnection;
@@ -17233,6 +17837,7 @@ export type CompanyBusinessProcessOwnedBusinessProcessesNodeAggregateSelection =
 };
 
 export type CompanyConnectInput = {
+  analyticsReports?: InputMaybe<Array<CompanyAnalyticsReportsConnectFieldInput>>;
   employees?: InputMaybe<Array<CompanyEmployeesConnectFieldInput>>;
   organisations?: InputMaybe<Array<CompanyOrganisationsConnectFieldInput>>;
   ownedAIComponents?: InputMaybe<Array<CompanyOwnedAiComponentsConnectFieldInput>>;
@@ -17260,6 +17865,7 @@ export type CompanyConnectWhere = {
 export type CompanyCreateInput = {
   achievedSovereigntyScore?: InputMaybe<Scalars['Float']['input']>;
   address?: InputMaybe<Scalars['String']['input']>;
+  analyticsReports?: InputMaybe<CompanyAnalyticsReportsFieldInput>;
   controlPriority?: InputMaybe<Scalars['Int']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
   diagramFont?: InputMaybe<Scalars['String']['input']>;
@@ -17324,6 +17930,7 @@ export type CompanyDataObjectOwnedDataObjectsNodeAggregateSelection = {
 };
 
 export type CompanyDeleteInput = {
+  analyticsReports?: InputMaybe<Array<CompanyAnalyticsReportsDeleteFieldInput>>;
   employees?: InputMaybe<Array<CompanyEmployeesDeleteFieldInput>>;
   organisations?: InputMaybe<Array<CompanyOrganisationsDeleteFieldInput>>;
   ownedAIComponents?: InputMaybe<Array<CompanyOwnedAiComponentsDeleteFieldInput>>;
@@ -17362,6 +17969,7 @@ export type CompanyDiagramOwnedDiagramsNodeAggregateSelection = {
 };
 
 export type CompanyDisconnectInput = {
+  analyticsReports?: InputMaybe<Array<CompanyAnalyticsReportsDisconnectFieldInput>>;
   employees?: InputMaybe<Array<CompanyEmployeesDisconnectFieldInput>>;
   organisations?: InputMaybe<Array<CompanyOrganisationsDisconnectFieldInput>>;
   ownedAIComponents?: InputMaybe<Array<CompanyOwnedAiComponentsDisconnectFieldInput>>;
@@ -19608,6 +20216,7 @@ export type CompanySupplierOwnedSuppliersNodeAggregateSelection = {
 export type CompanyUpdateInput = {
   achievedSovereigntyScore?: InputMaybe<FloatScalarMutations>;
   address?: InputMaybe<StringScalarMutations>;
+  analyticsReports?: InputMaybe<Array<CompanyAnalyticsReportsUpdateFieldInput>>;
   controlPriority?: InputMaybe<IntScalarMutations>;
   createdAt?: InputMaybe<DateTimeScalarMutations>;
   description?: InputMaybe<StringScalarMutations>;
@@ -19657,6 +20266,8 @@ export type CompanyWhere = {
   OR?: InputMaybe<Array<CompanyWhere>>;
   achievedSovereigntyScore?: InputMaybe<FloatScalarFilters>;
   address?: InputMaybe<StringScalarFilters>;
+  analyticsReports?: InputMaybe<AnalyticsReportRelationshipFilters>;
+  analyticsReportsConnection?: InputMaybe<CompanyAnalyticsReportsConnectionFilters>;
   controlPriority?: InputMaybe<IntScalarFilters>;
   createdAt?: InputMaybe<DateTimeScalarFilters>;
   description?: InputMaybe<StringScalarFilters>;
@@ -19757,6 +20368,12 @@ export type CreateAiRunAuditEventsMutationResponse = {
 export type CreateAiRunsMutationResponse = {
   __typename?: 'CreateAiRunsMutationResponse';
   aiRuns: Array<AiRun>;
+  info: CreateInfo;
+};
+
+export type CreateAnalyticsReportsMutationResponse = {
+  __typename?: 'CreateAnalyticsReportsMutationResponse';
+  analyticsReports: Array<AnalyticsReport>;
   info: CreateInfo;
 };
 
@@ -36338,6 +36955,7 @@ export type Mutation = {
   createAiComponents: CreateAiComponentsMutationResponse;
   createAiRunAuditEvents: CreateAiRunAuditEventsMutationResponse;
   createAiRuns: CreateAiRunsMutationResponse;
+  createAnalyticsReports: CreateAnalyticsReportsMutationResponse;
   createApplicationInterfaces: CreateApplicationInterfacesMutationResponse;
   createApplications: CreateApplicationsMutationResponse;
   createArchitecturePrinciples: CreateArchitecturePrinciplesMutationResponse;
@@ -36367,6 +36985,7 @@ export type Mutation = {
   deleteAiComponents: DeleteInfo;
   deleteAiRunAuditEvents: DeleteInfo;
   deleteAiRuns: DeleteInfo;
+  deleteAnalyticsReports: DeleteInfo;
   deleteApplicationInterfaces: DeleteInfo;
   deleteApplications: DeleteInfo;
   deleteArchitecturePrinciples: DeleteInfo;
@@ -36396,6 +37015,7 @@ export type Mutation = {
   updateAiComponents: UpdateAiComponentsMutationResponse;
   updateAiRunAuditEvents: UpdateAiRunAuditEventsMutationResponse;
   updateAiRuns: UpdateAiRunsMutationResponse;
+  updateAnalyticsReports: UpdateAnalyticsReportsMutationResponse;
   updateApplicationInterfaces: UpdateApplicationInterfacesMutationResponse;
   updateApplications: UpdateApplicationsMutationResponse;
   updateArchitecturePrinciples: UpdateArchitecturePrinciplesMutationResponse;
@@ -36441,6 +37061,11 @@ export type MutationCreateAiRunAuditEventsArgs = {
 
 export type MutationCreateAiRunsArgs = {
   input: Array<AiRunCreateInput>;
+};
+
+
+export type MutationCreateAnalyticsReportsArgs = {
+  input: Array<AnalyticsReportCreateInput>;
 };
 
 
@@ -36589,6 +37214,12 @@ export type MutationDeleteAiRunAuditEventsArgs = {
 export type MutationDeleteAiRunsArgs = {
   delete?: InputMaybe<AiRunDeleteInput>;
   where?: InputMaybe<AiRunWhere>;
+};
+
+
+export type MutationDeleteAnalyticsReportsArgs = {
+  delete?: InputMaybe<AnalyticsReportDeleteInput>;
+  where?: InputMaybe<AnalyticsReportWhere>;
 };
 
 
@@ -36763,6 +37394,12 @@ export type MutationUpdateAiRunAuditEventsArgs = {
 export type MutationUpdateAiRunsArgs = {
   update?: InputMaybe<AiRunUpdateInput>;
   where?: InputMaybe<AiRunWhere>;
+};
+
+
+export type MutationUpdateAnalyticsReportsArgs = {
+  update?: InputMaybe<AnalyticsReportUpdateInput>;
+  where?: InputMaybe<AnalyticsReportWhere>;
 };
 
 
@@ -38698,6 +39335,8 @@ export type Person = {
   avatarUrl?: Maybe<Scalars['String']['output']>;
   companies: Array<Company>;
   companiesConnection: PersonCompaniesConnection;
+  createdAnalyticsReports: Array<AnalyticsReport>;
+  createdAnalyticsReportsConnection: PersonCreatedAnalyticsReportsConnection;
   createdAt: Scalars['DateTime']['output'];
   department?: Maybe<Scalars['String']['output']>;
   email?: Maybe<Scalars['String']['output']>;
@@ -38753,6 +39392,24 @@ export type PersonCompaniesConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<PersonCompaniesConnectionSort>>;
   where?: InputMaybe<PersonCompaniesConnectionWhere>;
+};
+
+
+/** Person – represents an individual within the organization */
+export type PersonCreatedAnalyticsReportsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<AnalyticsReportSort>>;
+  where?: InputMaybe<AnalyticsReportWhere>;
+};
+
+
+/** Person – represents an individual within the organization */
+export type PersonCreatedAnalyticsReportsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<PersonCreatedAnalyticsReportsConnectionSort>>;
+  where?: InputMaybe<PersonCreatedAnalyticsReportsConnectionWhere>;
 };
 
 
@@ -39051,6 +39708,23 @@ export type PersonAggregateNode = {
   updatedAt: DateTimeAggregateSelection;
 };
 
+export type PersonAnalyticsReportCreatedAnalyticsReportsAggregateSelection = {
+  __typename?: 'PersonAnalyticsReportCreatedAnalyticsReportsAggregateSelection';
+  count: CountConnection;
+  node?: Maybe<PersonAnalyticsReportCreatedAnalyticsReportsNodeAggregateSelection>;
+};
+
+export type PersonAnalyticsReportCreatedAnalyticsReportsNodeAggregateSelection = {
+  __typename?: 'PersonAnalyticsReportCreatedAnalyticsReportsNodeAggregateSelection';
+  chartType: StringAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  dimension: StringAggregateSelection;
+  elementType: StringAggregateSelection;
+  measure: StringAggregateSelection;
+  name: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
 export type PersonApplicationInterfaceOwnedInterfacesAggregateSelection = {
   __typename?: 'PersonApplicationInterfaceOwnedInterfacesAggregateSelection';
   count: CountConnection;
@@ -39317,6 +39991,7 @@ export type PersonCompanyCompaniesNodeAggregateSelection = {
 
 export type PersonConnectInput = {
   companies?: InputMaybe<Array<PersonCompaniesConnectFieldInput>>;
+  createdAnalyticsReports?: InputMaybe<Array<PersonCreatedAnalyticsReportsConnectFieldInput>>;
   ownedAIComponents?: InputMaybe<Array<PersonOwnedAiComponentsConnectFieldInput>>;
   ownedApplications?: InputMaybe<Array<PersonOwnedApplicationsConnectFieldInput>>;
   ownedArchitectures?: InputMaybe<Array<PersonOwnedArchitecturesConnectFieldInput>>;
@@ -39340,6 +40015,7 @@ export type PersonConnectWhere = {
 export type PersonCreateInput = {
   avatarUrl?: InputMaybe<Scalars['String']['input']>;
   companies?: InputMaybe<PersonCompaniesFieldInput>;
+  createdAnalyticsReports?: InputMaybe<PersonCreatedAnalyticsReportsFieldInput>;
   department?: InputMaybe<Scalars['String']['input']>;
   email?: InputMaybe<Scalars['String']['input']>;
   firstName: Scalars['String']['input'];
@@ -39361,6 +40037,115 @@ export type PersonCreateInput = {
   phone?: InputMaybe<Scalars['String']['input']>;
   role?: InputMaybe<Scalars['String']['input']>;
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+export type PersonCreatedAnalyticsReportsAggregateInput = {
+  AND?: InputMaybe<Array<PersonCreatedAnalyticsReportsAggregateInput>>;
+  NOT?: InputMaybe<PersonCreatedAnalyticsReportsAggregateInput>;
+  OR?: InputMaybe<Array<PersonCreatedAnalyticsReportsAggregateInput>>;
+  count?: InputMaybe<IntScalarFilters>;
+  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<PersonCreatedAnalyticsReportsNodeAggregationWhereInput>;
+};
+
+export type PersonCreatedAnalyticsReportsConnectFieldInput = {
+  connect?: InputMaybe<Array<AnalyticsReportConnectInput>>;
+  where?: InputMaybe<AnalyticsReportConnectWhere>;
+};
+
+export type PersonCreatedAnalyticsReportsConnection = {
+  __typename?: 'PersonCreatedAnalyticsReportsConnection';
+  aggregate: PersonAnalyticsReportCreatedAnalyticsReportsAggregateSelection;
+  edges: Array<PersonCreatedAnalyticsReportsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type PersonCreatedAnalyticsReportsConnectionAggregateInput = {
+  AND?: InputMaybe<Array<PersonCreatedAnalyticsReportsConnectionAggregateInput>>;
+  NOT?: InputMaybe<PersonCreatedAnalyticsReportsConnectionAggregateInput>;
+  OR?: InputMaybe<Array<PersonCreatedAnalyticsReportsConnectionAggregateInput>>;
+  count?: InputMaybe<ConnectionAggregationCountFilterInput>;
+  node?: InputMaybe<PersonCreatedAnalyticsReportsNodeAggregationWhereInput>;
+};
+
+export type PersonCreatedAnalyticsReportsConnectionFilters = {
+  /** Filter People by aggregating results on related PersonCreatedAnalyticsReportsConnections */
+  aggregate?: InputMaybe<PersonCreatedAnalyticsReportsConnectionAggregateInput>;
+  /** Return People where all of the related PersonCreatedAnalyticsReportsConnections match this filter */
+  all?: InputMaybe<PersonCreatedAnalyticsReportsConnectionWhere>;
+  /** Return People where none of the related PersonCreatedAnalyticsReportsConnections match this filter */
+  none?: InputMaybe<PersonCreatedAnalyticsReportsConnectionWhere>;
+  /** Return People where one of the related PersonCreatedAnalyticsReportsConnections match this filter */
+  single?: InputMaybe<PersonCreatedAnalyticsReportsConnectionWhere>;
+  /** Return People where some of the related PersonCreatedAnalyticsReportsConnections match this filter */
+  some?: InputMaybe<PersonCreatedAnalyticsReportsConnectionWhere>;
+};
+
+export type PersonCreatedAnalyticsReportsConnectionSort = {
+  node?: InputMaybe<AnalyticsReportSort>;
+};
+
+export type PersonCreatedAnalyticsReportsConnectionWhere = {
+  AND?: InputMaybe<Array<PersonCreatedAnalyticsReportsConnectionWhere>>;
+  NOT?: InputMaybe<PersonCreatedAnalyticsReportsConnectionWhere>;
+  OR?: InputMaybe<Array<PersonCreatedAnalyticsReportsConnectionWhere>>;
+  node?: InputMaybe<AnalyticsReportWhere>;
+};
+
+export type PersonCreatedAnalyticsReportsCreateFieldInput = {
+  node: AnalyticsReportCreateInput;
+};
+
+export type PersonCreatedAnalyticsReportsDeleteFieldInput = {
+  delete?: InputMaybe<AnalyticsReportDeleteInput>;
+  where?: InputMaybe<PersonCreatedAnalyticsReportsConnectionWhere>;
+};
+
+export type PersonCreatedAnalyticsReportsDisconnectFieldInput = {
+  disconnect?: InputMaybe<AnalyticsReportDisconnectInput>;
+  where?: InputMaybe<PersonCreatedAnalyticsReportsConnectionWhere>;
+};
+
+export type PersonCreatedAnalyticsReportsFieldInput = {
+  connect?: InputMaybe<Array<PersonCreatedAnalyticsReportsConnectFieldInput>>;
+  create?: InputMaybe<Array<PersonCreatedAnalyticsReportsCreateFieldInput>>;
+};
+
+export type PersonCreatedAnalyticsReportsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<PersonCreatedAnalyticsReportsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<PersonCreatedAnalyticsReportsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<PersonCreatedAnalyticsReportsNodeAggregationWhereInput>>;
+  chartType?: InputMaybe<StringScalarAggregationFilters>;
+  createdAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  dimension?: InputMaybe<StringScalarAggregationFilters>;
+  elementType?: InputMaybe<StringScalarAggregationFilters>;
+  measure?: InputMaybe<StringScalarAggregationFilters>;
+  name?: InputMaybe<StringScalarAggregationFilters>;
+  updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+};
+
+export type PersonCreatedAnalyticsReportsRelationship = {
+  __typename?: 'PersonCreatedAnalyticsReportsRelationship';
+  cursor: Scalars['String']['output'];
+  node: AnalyticsReport;
+};
+
+export type PersonCreatedAnalyticsReportsUpdateConnectionInput = {
+  node?: InputMaybe<AnalyticsReportUpdateInput>;
+  where?: InputMaybe<PersonCreatedAnalyticsReportsConnectionWhere>;
+};
+
+export type PersonCreatedAnalyticsReportsUpdateFieldInput = {
+  connect?: InputMaybe<Array<PersonCreatedAnalyticsReportsConnectFieldInput>>;
+  create?: InputMaybe<Array<PersonCreatedAnalyticsReportsCreateFieldInput>>;
+  delete?: InputMaybe<Array<PersonCreatedAnalyticsReportsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<PersonCreatedAnalyticsReportsDisconnectFieldInput>>;
+  update?: InputMaybe<PersonCreatedAnalyticsReportsUpdateConnectionInput>;
 };
 
 export type PersonDataObjectOwnedDataObjectsAggregateSelection = {
@@ -39385,6 +40170,7 @@ export type PersonDataObjectOwnedDataObjectsNodeAggregateSelection = {
 
 export type PersonDeleteInput = {
   companies?: InputMaybe<Array<PersonCompaniesDeleteFieldInput>>;
+  createdAnalyticsReports?: InputMaybe<Array<PersonCreatedAnalyticsReportsDeleteFieldInput>>;
   ownedAIComponents?: InputMaybe<Array<PersonOwnedAiComponentsDeleteFieldInput>>;
   ownedApplications?: InputMaybe<Array<PersonOwnedApplicationsDeleteFieldInput>>;
   ownedArchitectures?: InputMaybe<Array<PersonOwnedArchitecturesDeleteFieldInput>>;
@@ -39420,6 +40206,7 @@ export type PersonDiagramOwnedDiagramsNodeAggregateSelection = {
 
 export type PersonDisconnectInput = {
   companies?: InputMaybe<Array<PersonCompaniesDisconnectFieldInput>>;
+  createdAnalyticsReports?: InputMaybe<Array<PersonCreatedAnalyticsReportsDisconnectFieldInput>>;
   ownedAIComponents?: InputMaybe<Array<PersonOwnedAiComponentsDisconnectFieldInput>>;
   ownedApplications?: InputMaybe<Array<PersonOwnedApplicationsDisconnectFieldInput>>;
   ownedArchitectures?: InputMaybe<Array<PersonOwnedArchitecturesDisconnectFieldInput>>;
@@ -41120,6 +41907,7 @@ export type PersonSort = {
 export type PersonUpdateInput = {
   avatarUrl?: InputMaybe<StringScalarMutations>;
   companies?: InputMaybe<Array<PersonCompaniesUpdateFieldInput>>;
+  createdAnalyticsReports?: InputMaybe<Array<PersonCreatedAnalyticsReportsUpdateFieldInput>>;
   createdAt?: InputMaybe<DateTimeScalarMutations>;
   department?: InputMaybe<StringScalarMutations>;
   email?: InputMaybe<StringScalarMutations>;
@@ -41150,6 +41938,8 @@ export type PersonWhere = {
   avatarUrl?: InputMaybe<StringScalarFilters>;
   companies?: InputMaybe<CompanyRelationshipFilters>;
   companiesConnection?: InputMaybe<PersonCompaniesConnectionFilters>;
+  createdAnalyticsReports?: InputMaybe<AnalyticsReportRelationshipFilters>;
+  createdAnalyticsReportsConnection?: InputMaybe<PersonCreatedAnalyticsReportsConnectionFilters>;
   createdAt?: InputMaybe<DateTimeScalarFilters>;
   department?: InputMaybe<StringScalarFilters>;
   email?: InputMaybe<StringScalarFilters>;
@@ -41719,6 +42509,8 @@ export type Query = {
   aiRunAuditEventsConnection: AiRunAuditEventsConnection;
   aiRuns: Array<AiRun>;
   aiRunsConnection: AiRunsConnection;
+  analyticsReports: Array<AnalyticsReport>;
+  analyticsReportsConnection: AnalyticsReportsConnection;
   applicationInterfaces: Array<ApplicationInterface>;
   applicationInterfacesConnection: ApplicationInterfacesConnection;
   applications: Array<Application>;
@@ -41833,6 +42625,22 @@ export type QueryAiRunsConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<AiRunSort>>;
   where?: InputMaybe<AiRunWhere>;
+};
+
+
+export type QueryAnalyticsReportsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<AnalyticsReportSort>>;
+  where?: InputMaybe<AnalyticsReportWhere>;
+};
+
+
+export type QueryAnalyticsReportsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<AnalyticsReportSort>>;
+  where?: InputMaybe<AnalyticsReportWhere>;
 };
 
 
@@ -48256,6 +49064,12 @@ export type UpdateAiRunAuditEventsMutationResponse = {
 export type UpdateAiRunsMutationResponse = {
   __typename?: 'UpdateAiRunsMutationResponse';
   aiRuns: Array<AiRun>;
+  info: UpdateInfo;
+};
+
+export type UpdateAnalyticsReportsMutationResponse = {
+  __typename?: 'UpdateAnalyticsReportsMutationResponse';
+  analyticsReports: Array<AnalyticsReport>;
   info: UpdateInfo;
 };
 

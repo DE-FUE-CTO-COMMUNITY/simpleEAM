@@ -2229,6 +2229,7 @@
     "syncProjection": "Projektionen synchronisieren",
     "syncData": "Daten synchronisieren",
     "syncRequiresCompany": "Wählen Sie ein Unternehmen aus, um eine unternehmensbezogene Projektion zu synchronisieren.",
+    "saveRequiresCurrentPerson": "Zum Speichern von Analytics-Reports ist ein passender Person-Eintrag erforderlich.",
     "syncSuccess": "Die Projektion wurde synchronisiert. {applications} Applikationen, {capabilities} Capabilities, {aiComponents} KI-Komponenten, {dataObjects} Datenobjekte, {interfaces} Schnittstellen und {infrastructure} Infrastrukturelemente wurden aktualisiert.",
     "syncError": "Die Projektion-Synchronisierung ist fehlgeschlagen.",
     "reportSaved": "Report gespeichert.",
