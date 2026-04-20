@@ -342,6 +342,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
 
   const menuItems = [
     { text: t('dashboard'), icon: <DashboardIcon />, href: '/' },
+    { isDivider: true, text: 'divider-after-dashboard', icon: null },
     ...(initialized && hasCompanyLlmConfig && (userIsAdmin || userIsArchitect)
       ? [
           {
@@ -367,6 +368,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
     ...(selectedLens === 'processArchitecture'
       ? [{ text: t('processEditor'), icon: <GridOnIcon />, href: '/process-editor' }]
       : []),
+    { isDivider: true, text: 'divider-before-architectures', icon: null },
     { text: t('architectures'), icon: <ArchitectureIcon />, href: '/architectures' },
     {
       text: t('architecturePrinciples'),
