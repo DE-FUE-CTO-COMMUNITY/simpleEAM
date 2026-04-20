@@ -14,6 +14,8 @@ VERSION_FILE="VERSION"
 ROOT_PACKAGE_JSON="package.json"
 CLIENT_PACKAGE_JSON="client/package.json"
 SERVER_PACKAGE_JSON="server/package.json"
+AI_SERVER_PACKAGE_JSON="ai-server/package.json"
+HELM_CHART_FILE="k8s/Chart.yaml"
 
 # Get current version
 get_current_version() {
@@ -69,6 +71,14 @@ update_version_in_file() {
             # Fallback without jq
             sed -i "s/\"version\": \".*\"/\"version\": \"$version\"/" "$file"
         fi
+    elif [[ "$file" == *.yaml ]]; then
+        if command -v yq &> /dev/null; then
+            tmp=$(mktemp)
+            yq ".version = \"$version\" | .appVersion = \"$version\"" "$file" > "$tmp" && mv "$tmp" "$file"
+        else
+            sed -i -E "s/^version: .*/version: $version/" "$file"
+            sed -i -E "s/^appVersion: .*/appVersion: '$version'/" "$file"
+        fi
     else
         # Update VERSION file
         echo "$version" > "$file"
@@ -108,10 +118,12 @@ update_version_in_file "$VERSION_FILE" "$new_version"
 update_version_in_file "$ROOT_PACKAGE_JSON" "$new_version"
 update_version_in_file "$CLIENT_PACKAGE_JSON" "$new_version"
 update_version_in_file "$SERVER_PACKAGE_JSON" "$new_version"
+update_version_in_file "$AI_SERVER_PACKAGE_JSON" "$new_version"
+update_version_in_file "$HELM_CHART_FILE" "$new_version"
 
 echo "✓ Version updated to $new_version"
 echo ""
 echo "Don't forget to:"
-echo "  1. Commit the changes: git add VERSION package.json client/package.json server/package.json"
+echo "  1. Commit the changes: git add VERSION package.json client/package.json server/package.json ai-server/package.json k8s/Chart.yaml"
 echo "  2. Create a git tag: git tag -a v$new_version -m 'Release v$new_version'"
 echo "  3. Push with tags: git push --follow-tags"

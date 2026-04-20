@@ -843,7 +843,13 @@ export function AnalyticsWorkspace() {
   ])
 
   useEffect(() => {
-    if (!initialized || !authenticated || companyLoading || !analyticsBaseUrl || !selectedCompanyId) {
+    if (
+      !initialized ||
+      !authenticated ||
+      companyLoading ||
+      !analyticsBaseUrl ||
+      !selectedCompanyId
+    ) {
       setChartData([])
       setPreviewRecords([])
       setQueryLoading(false)
