@@ -112,3 +112,16 @@ Only injects refs for secrets that were provided via existingSecret or created b
       key: {{ default "apiKey" $ai.web.searxngExistingSecretKey }}
 {{- end }}
 {{- end }}
+
+    {{/*
+    Stable Cubestore worker DNS addresses for the cluster.
+    */}}
+    {{- define "nextgen-eam.cubestoreWorkers" -}}
+    {{- $fullName := include "nextgen-eam.fullname" . -}}
+    {{- $replicas := int .Values.analytics.cubestore.worker.replicas -}}
+    {{- $port := int .Values.analytics.cubestore.worker.port -}}
+    {{- range $index, $_ := until $replicas -}}
+    {{- if gt $index 0 }},{{ end -}}
+    {{ printf "%s-cubestore-worker-%d.%s-cubestore-worker:%d" $fullName $index $fullName $port }}
+    {{- end -}}
+    {{- end }}

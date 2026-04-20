@@ -51,7 +51,16 @@ async function startServer() {
 
   await normalizeAnalyticsReports()
 
-  await ensureAnalyticsProjectionSchema()
+  if (process.env.ANALYTICS_ENABLED !== 'false') {
+    try {
+      await ensureAnalyticsProjectionSchema()
+    } catch (error) {
+      console.error(
+        '[Analytics] Projection store initialization failed. Continuing without analytics projections.',
+        error
+      )
+    }
+  }
 
   // Initialize Express app
   const app = express()

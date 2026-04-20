@@ -54,7 +54,7 @@ import {
 } from 'recharts'
 import { useCompanyContext } from '@/contexts/CompanyContext'
 import { useCurrentPerson } from '@/hooks/useCurrentPerson'
-import { isAdmin } from '@/lib/auth'
+import { isAdmin, useAuth } from '@/lib/auth'
 import { useAnalyticsConfig } from '@/lib/runtime-config'
 
 import {
@@ -246,8 +246,20 @@ function renderSankeyNode(props: SankeyNodeShapeProps) {
 
   return (
     <g>
-      <rect x={x} y={y} width={width} height={height} fill={chartColors[index % chartColors.length]} />
-      <text x={textX} y={y + height / 2} textAnchor={textAnchor} dominantBaseline="middle" fontSize={12}>
+      <rect
+        x={x}
+        y={y}
+        width={width}
+        height={height}
+        fill={chartColors[index % chartColors.length]}
+      />
+      <text
+        x={textX}
+        y={y + height / 2}
+        textAnchor={textAnchor}
+        dominantBaseline="middle"
+        fontSize={12}
+      >
         {label}
       </text>
     </g>
@@ -480,11 +492,15 @@ function renderChart(chartType: AnalyticsDraftReport['chartType'], data: Analyti
   const sankeyChartModel = buildSankeyChartModel(data)
   const sankeySourceLabelMargin = Math.max(
     64,
-    ...sankeyChartModel.nodes.slice(0, Math.ceil(sankeyChartModel.nodes.length / 2)).map(node => node.name.length * 7 + 20)
+    ...sankeyChartModel.nodes
+      .slice(0, Math.ceil(sankeyChartModel.nodes.length / 2))
+      .map(node => node.name.length * 7 + 20)
   )
   const sankeyTargetLabelMargin = Math.max(
     96,
-    ...sankeyChartModel.nodes.slice(Math.ceil(sankeyChartModel.nodes.length / 2)).map(node => node.name.length * 7 + 24)
+    ...sankeyChartModel.nodes
+      .slice(Math.ceil(sankeyChartModel.nodes.length / 2))
+      .map(node => node.name.length * 7 + 24)
   )
 
   if (chartType === 'pie') {
@@ -606,7 +622,10 @@ function renderChart(chartType: AnalyticsDraftReport['chartType'], data: Analyti
   if (chartType === 'groupedBar') {
     return (
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={cartesianChartModel.rows} margin={{ top: 8, right: 8, bottom: 24, left: 0 }}>
+        <BarChart
+          data={cartesianChartModel.rows}
+          margin={{ top: 8, right: 8, bottom: 24, left: 0 }}
+        >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="label" />
           <YAxis />
@@ -647,7 +666,8 @@ export function AnalyticsWorkspace() {
   const t = useTranslations('analytics')
   const apolloClient = useApolloClient()
   const analyticsConfig = useAnalyticsConfig()
-  const { selectedCompanyId } = useCompanyContext()
+  const { selectedCompanyId, loading: companyLoading } = useCompanyContext()
+  const { authenticated, initialized } = useAuth()
   const { currentPerson, isLoading: currentPersonLoading } = useCurrentPerson()
   const [draft, setDraft] = useState<AnalyticsDraftReport>(createDefaultDraft())
   const [savedReports, setSavedReports] = useState<AnalyticsReportDefinition[]>([])
@@ -823,9 +843,10 @@ export function AnalyticsWorkspace() {
   ])
 
   useEffect(() => {
-    if (!analyticsBaseUrl) {
+    if (!initialized || !authenticated || companyLoading || !analyticsBaseUrl || !selectedCompanyId) {
       setChartData([])
       setPreviewRecords([])
+      setQueryLoading(false)
       return
     }
 
@@ -865,12 +886,15 @@ export function AnalyticsWorkspace() {
       cancelled = true
     }
   }, [
+    authenticated,
     analyticsBaseUrl,
+    companyLoading,
     draft.chartType,
     draft.dimension,
     draft.elementType,
     draft.measure,
     draft.secondDimension,
+    initialized,
     selectedCompanyId,
     t,
   ])
@@ -891,10 +915,10 @@ export function AnalyticsWorkspace() {
     const nextSecondDimension =
       draft.chartType === 'pie'
         ? null
-        : validSecondDimension ??
+        : (validSecondDimension ??
           (requiresSecondDimension(draft.chartType)
             ? pickDefaultSecondDimension(availableSecondDimensions, nextDimension)
-            : null)
+            : null))
 
     if (
       nextDimension !== draft.dimension ||
@@ -1734,7 +1758,10 @@ export function AnalyticsWorkspace() {
                     setDraft(current => ({
                       ...current,
                       elementType: nextElementType,
-                      dimension: getAllowedPrimaryDimensions(current.chartType, nextSchema.dimensions)[0],
+                      dimension: getAllowedPrimaryDimensions(
+                        current.chartType,
+                        nextSchema.dimensions
+                      )[0],
                       secondDimension: null,
                       measure: nextSchema.measures[0],
                     }))
@@ -1769,7 +1796,8 @@ export function AnalyticsWorkspace() {
                     const nextSecondDimension =
                       nextChartType === 'pie'
                         ? null
-                        : draft.secondDimension && nextSecondDimensions.includes(draft.secondDimension)
+                        : draft.secondDimension &&
+                            nextSecondDimensions.includes(draft.secondDimension)
                           ? draft.secondDimension
                           : requiresSecondDimension(nextChartType)
                             ? pickDefaultSecondDimension(nextSecondDimensions, nextDimension)

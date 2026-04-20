@@ -48,6 +48,83 @@ branding:
   themeFontFamily: 'system-ui, -apple-system, Segoe UI, sans-serif'
 
 # ------------------------------------------------------------------------------
+# Analytics
+# ------------------------------------------------------------------------------
+analytics:
+  enabled: true
+  apiUrl: ''
+  cubeApiUrl: ''
+  clickhouse:
+    url: ''
+    db: nextgen_analytics
+    user: default
+    password: ''
+    image:
+      repository: clickhouse/clickhouse-server
+      tag: '24.8'
+      pullPolicy: IfNotPresent
+    resources:
+      requests:
+        memory: 512Mi
+        cpu: 200m
+      limits:
+        memory: 2Gi
+        cpu: 1000m
+    persistence:
+      enabled: true
+      storageClass: ''
+      size: 20Gi
+      accessMode: ReadWriteOnce
+  cube:
+    apiSecret: nextgen-eam-analytics-dev
+    image:
+      repository: cubejs/cube
+      tag: latest
+      pullPolicy: IfNotPresent
+    port: 4000
+    devMode: 'false'
+    webSockets: 'true'
+    cacheAndQueueDriver: cubestore
+    resources:
+      requests:
+        memory: 512Mi
+        cpu: 200m
+      limits:
+        memory: 1Gi
+        cpu: 1000m
+  cubestore:
+    enabled: true
+    image:
+      repository: cubejs/cubestore
+      tag: latest
+      pullPolicy: IfNotPresent
+    router:
+      metaPort: 9999
+      httpPort: 3030
+      resources:
+        requests:
+          memory: 512Mi
+          cpu: 200m
+        limits:
+          memory: 2Gi
+          cpu: 1000m
+    worker:
+      replicas: 1
+      port: 9001
+      resources:
+        requests:
+          memory: 512Mi
+          cpu: 200m
+        limits:
+          memory: 2Gi
+          cpu: 1000m
+    persistence:
+      enabled: true
+      storageClass: ''
+      size: 20Gi
+      accessMode: ReadWriteMany
+
+# ------------------------------------------------------------------------------
 # Ingress (nginx-ingress or any ingress controller)
 # ------------------------------------------------------------------------------
 ingress:

@@ -83,11 +83,15 @@ analyticsRouter.post('/query', async (req, res) => {
   }
 
   const companyId = parsed.data.companyId
+  if (!companyId) {
+    return res.status(400).json({ message: 'A companyId is required' })
+  }
+
   if (companyId && !canAccessCompany(user, companyId)) {
     return res.status(403).json({ message: 'Forbidden company scope' })
   }
 
-  const allowedCompanyIds = companyId ? [companyId] : user.isAdmin ? [] : [...user.companyIds]
+  const allowedCompanyIds = [companyId]
 
   try {
     const result = await loadAnalyticsChartData(user, {

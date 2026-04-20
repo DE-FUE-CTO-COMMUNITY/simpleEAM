@@ -60,6 +60,22 @@ spec:
     - host: {{ printf "%s.%s" $subs.api $domain }}
       http:
         paths:
+          {{- if .Values.analytics.enabled }}
+          - path: /cubejs-api
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ $fullName }}-cube
+                port:
+                  number: {{ .Values.analytics.cube.port }}
+          - path: /cubejs-system
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ $fullName }}-cube
+                port:
+                  number: {{ .Values.analytics.cube.port }}
+          {{- end }}
           {{- if .Values.ai.enabled }}
           - path: /ai-runs
             pathType: Prefix

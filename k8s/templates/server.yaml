@@ -60,6 +60,20 @@ spec:
                 secretKeyRef:
                   name: {{ default (printf "%s-neo4j" $fullName) .Values.neo4j.auth.existingSecret }}
                   key: {{ default "password" .Values.neo4j.auth.existingSecretKey }}
+            {{- if .Values.analytics.clickhouse.password }}
+            - name: CLICKHOUSE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $fullName }}-analytics
+                  key: clickhousePassword
+            {{- end }}
+            {{- if .Values.analytics.cube.apiSecret }}
+            - name: CUBEJS_API_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $fullName }}-analytics
+                  key: cubeApiSecret
+            {{- end }}
           livenessProbe:
             httpGet:
               path: /health

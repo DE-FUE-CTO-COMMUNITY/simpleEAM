@@ -1,0 +1,974 @@
+{{- if .Values.analytics.enabled }}
+{{- $fullName := include "nextgen-eam.fullname" . -}}
+{{- $labels := include "nextgen-eam.labels" . -}}
+{{- $global := .Values.global -}}
+{{- $analytics := .Values.analytics -}}
+{{- $clickhouse := $analytics.clickhouse -}}
+{{- $cube := $analytics.cube -}}
+{{- $cubestore := $analytics.cubestore -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $fullName }}-clickhouse-init
+  labels: {{- $labels | nindent 4 }}
+data:
+  001_projection_tables.sql: |
+    CREATE DATABASE IF NOT EXISTS nextgen_analytics;
+
+    CREATE TABLE IF NOT EXISTS nextgen_analytics.application_projection (
+      id String,
+      company_id String,
+      name String,
+      status LowCardinality(String),
+      criticality LowCardinality(String),
+      vendor String,
+      monthly_cost Float64,
+      updated_at DateTime,
+      updated_month Date
+    ) ENGINE = MergeTree
+    ORDER BY (company_id, status, criticality, id);
+
+    CREATE TABLE IF NOT EXISTS nextgen_analytics.capability_coverage_projection (
+      capability_id String,
+      company_id String,
+      capability_name String,
+      maturity LowCardinality(String),
+      supported_applications UInt32,
+      updated_at DateTime
+    ) ENGINE = MergeTree
+    ORDER BY (company_id, capability_id);
+
+    CREATE TABLE IF NOT EXISTS nextgen_analytics.business_capability_projection (
+      id String,
+      company_id String,
+      name String,
+      status LowCardinality(String),
+      capability_type LowCardinality(String),
+      maturity_level Float64,
+      business_value Float64,
+      supported_applications UInt32,
+      supporting_ai_components UInt32,
+      related_data_objects UInt32,
+      updated_at DateTime,
+      updated_month Date
+    ) ENGINE = MergeTree
+    ORDER BY (company_id, status, capability_type, id);
+
+    CREATE TABLE IF NOT EXISTS nextgen_analytics.application_analytics_projection (
+      id String,
+      company_id String,
+      name String,
+      status LowCardinality(String),
+      criticality LowCardinality(String),
+      vendor String,
+      time_category LowCardinality(String),
+      hosting_environment String,
+      monthly_cost Float64,
+      supported_capabilities UInt32,
+      used_data_objects UInt32,
+      ai_components UInt32,
+      interfaces UInt32,
+      updated_at DateTime,
+      updated_month Date
+    ) ENGINE = MergeTree
+    ORDER BY (company_id, status, criticality, id);
+
+    CREATE TABLE IF NOT EXISTS nextgen_analytics.ai_component_projection (
+      id String,
+      company_id String,
+      name String,
+      status LowCardinality(String),
+      ai_type LowCardinality(String),
+      provider String,
+      license String,
+      monthly_cost Float64,
+      accuracy Float64,
+      supported_capabilities UInt32,
+      training_data_objects UInt32,
+      updated_at DateTime,
+      updated_month Date
+    ) ENGINE = MergeTree
+    ORDER BY (company_id, status, ai_type, id);
+
+    CREATE TABLE IF NOT EXISTS nextgen_analytics.data_object_projection (
+      id String,
+      company_id String,
+      name String,
+      classification LowCardinality(String),
+      format String,
+      using_applications UInt32,
+      transferring_interfaces UInt32,
+      training_ai_components UInt32,
+      updated_at DateTime,
+      updated_month Date
+    ) ENGINE = MergeTree
+    ORDER BY (company_id, classification, id);
+
+    CREATE TABLE IF NOT EXISTS nextgen_analytics.application_interface_projection (
+      id String,
+      company_id String,
+      name String,
+      status LowCardinality(String),
+      interface_type LowCardinality(String),
+      protocol LowCardinality(String),
+      source_applications UInt32,
+      target_applications UInt32,
+      transferred_data_objects UInt32,
+      updated_at DateTime,
+      updated_month Date
+    ) ENGINE = MergeTree
+    ORDER BY (company_id, status, interface_type, id);
+
+    CREATE TABLE IF NOT EXISTS nextgen_analytics.infrastructure_projection (
+      id String,
+      company_id String,
+      name String,
+      status LowCardinality(String),
+      infrastructure_type LowCardinality(String),
+      vendor String,
+      location String,
+      operating_system LowCardinality(String),
+      monthly_cost Float64,
+      hosted_applications UInt32,
+      hosted_ai_components UInt32,
+      updated_at DateTime,
+      updated_month Date
+    ) ENGINE = MergeTree
+    ORDER BY (company_id, status, infrastructure_type, id);
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $fullName }}-cube-schema
+  labels: {{- $labels | nindent 4 }}
+data:
+  cube.js: |
+    module.exports = {
+      contextToAppId: ({ securityContext }) => securityContext?.companyId || 'shared',
+      contextToOrchestratorId: ({ securityContext }) => securityContext?.companyId || 'shared',
+    }
+  ApplicationProjection.js: |
+    cube(`ApplicationProjection`, {
+      sql_table: `nextgen_analytics.application_analytics_projection`,
+
+      measures: {
+        count: {
+          type: `count`,
+        },
+        totalCost: {
+          sql: `monthly_cost`,
+          type: `sum`,
+          format: `currency`,
+        },
+        averageCost: {
+          sql: `monthly_cost`,
+          type: `avg`,
+          format: `currency`,
+        },
+        supportedCapabilities: {
+          sql: `supported_capabilities`,
+          type: `sum`,
+        },
+        usedDataObjects: {
+          sql: `used_data_objects`,
+          type: `sum`,
+        },
+        aiComponents: {
+          sql: `ai_components`,
+          type: `sum`,
+        },
+        interfaces: {
+          sql: `interfaces`,
+          type: `sum`,
+        },
+      },
+
+      dimensions: {
+        id: {
+          sql: `id`,
+          type: `string`,
+          primaryKey: true,
+        },
+        companyId: {
+          sql: `company_id`,
+          type: `string`,
+        },
+        name: {
+          sql: `name`,
+          type: `string`,
+        },
+        status: {
+          sql: `status`,
+          type: `string`,
+        },
+        criticality: {
+          sql: `criticality`,
+          type: `string`,
+        },
+        vendor: {
+          sql: `vendor`,
+          type: `string`,
+        },
+        timeCategory: {
+          sql: `time_category`,
+          type: `string`,
+        },
+        hostingEnvironment: {
+          sql: `hosting_environment`,
+          type: `string`,
+        },
+        updatedAt: {
+          sql: `updated_at`,
+          type: `time`,
+        },
+        updatedMonth: {
+          sql: `updated_month`,
+          type: `time`,
+        },
+      },
+    })
+  BusinessCapabilityProjection.js: |
+    cube(`BusinessCapabilityProjection`, {
+      sql_table: `nextgen_analytics.business_capability_projection`,
+
+      measures: {
+        count: {
+          type: `count`,
+        },
+        averageMaturityLevel: {
+          sql: `maturity_level`,
+          type: `avg`,
+        },
+        totalBusinessValue: {
+          sql: `business_value`,
+          type: `sum`,
+        },
+        averageBusinessValue: {
+          sql: `business_value`,
+          type: `avg`,
+        },
+        supportedApplications: {
+          sql: `supported_applications`,
+          type: `sum`,
+        },
+        supportingAiComponents: {
+          sql: `supporting_ai_components`,
+          type: `sum`,
+        },
+        relatedDataObjects: {
+          sql: `related_data_objects`,
+          type: `sum`,
+        },
+      },
+
+      dimensions: {
+        id: {
+          sql: `id`,
+          type: `string`,
+          primaryKey: true,
+        },
+        companyId: {
+          sql: `company_id`,
+          type: `string`,
+        },
+        name: {
+          sql: `name`,
+          type: `string`,
+        },
+        status: {
+          sql: `status`,
+          type: `string`,
+        },
+        capabilityType: {
+          sql: `capability_type`,
+          type: `string`,
+        },
+        updatedAt: {
+          sql: `updated_at`,
+          type: `time`,
+        },
+        updatedMonth: {
+          sql: `updated_month`,
+          type: `time`,
+        },
+      },
+    })
+  AiComponentProjection.js: |
+    cube(`AiComponentProjection`, {
+      sql_table: `nextgen_analytics.ai_component_projection`,
+
+      measures: {
+        count: {
+          type: `count`,
+        },
+        totalCost: {
+          sql: `monthly_cost`,
+          type: `sum`,
+          format: `currency`,
+        },
+        averageCost: {
+          sql: `monthly_cost`,
+          type: `avg`,
+          format: `currency`,
+        },
+        averageAccuracy: {
+          sql: `accuracy`,
+          type: `avg`,
+        },
+        supportedCapabilities: {
+          sql: `supported_capabilities`,
+          type: `sum`,
+        },
+        trainingDataObjects: {
+          sql: `training_data_objects`,
+          type: `sum`,
+        },
+      },
+
+      dimensions: {
+        id: {
+          sql: `id`,
+          type: `string`,
+          primaryKey: true,
+        },
+        companyId: {
+          sql: `company_id`,
+          type: `string`,
+        },
+        name: {
+          sql: `name`,
+          type: `string`,
+        },
+        status: {
+          sql: `status`,
+          type: `string`,
+        },
+        aiType: {
+          sql: `ai_type`,
+          type: `string`,
+        },
+        provider: {
+          sql: `provider`,
+          type: `string`,
+        },
+        license: {
+          sql: `license`,
+          type: `string`,
+        },
+        updatedAt: {
+          sql: `updated_at`,
+          type: `time`,
+        },
+        updatedMonth: {
+          sql: `updated_month`,
+          type: `time`,
+        },
+      },
+    })
+  DataObjectProjection.js: |
+    cube(`DataObjectProjection`, {
+      sql_table: `nextgen_analytics.data_object_projection`,
+
+      measures: {
+        count: {
+          type: `count`,
+        },
+        usingApplications: {
+          sql: `using_applications`,
+          type: `sum`,
+        },
+        transferringInterfaces: {
+          sql: `transferring_interfaces`,
+          type: `sum`,
+        },
+        trainingAiComponents: {
+          sql: `training_ai_components`,
+          type: `sum`,
+        },
+      },
+
+      dimensions: {
+        id: {
+          sql: `id`,
+          type: `string`,
+          primaryKey: true,
+        },
+        companyId: {
+          sql: `company_id`,
+          type: `string`,
+        },
+        name: {
+          sql: `name`,
+          type: `string`,
+        },
+        classification: {
+          sql: `classification`,
+          type: `string`,
+        },
+        format: {
+          sql: `format`,
+          type: `string`,
+        },
+        updatedAt: {
+          sql: `updated_at`,
+          type: `time`,
+        },
+        updatedMonth: {
+          sql: `updated_month`,
+          type: `time`,
+        },
+      },
+    })
+  ApplicationInterfaceProjection.js: |
+    cube(`ApplicationInterfaceProjection`, {
+      sql_table: `nextgen_analytics.application_interface_projection`,
+
+      measures: {
+        count: {
+          type: `count`,
+        },
+        sourceApplications: {
+          sql: `source_applications`,
+          type: `sum`,
+        },
+        targetApplications: {
+          sql: `target_applications`,
+          type: `sum`,
+        },
+        transferredDataObjects: {
+          sql: `transferred_data_objects`,
+          type: `sum`,
+        },
+      },
+
+      dimensions: {
+        id: {
+          sql: `id`,
+          type: `string`,
+          primaryKey: true,
+        },
+        companyId: {
+          sql: `company_id`,
+          type: `string`,
+        },
+        name: {
+          sql: `name`,
+          type: `string`,
+        },
+        status: {
+          sql: `status`,
+          type: `string`,
+        },
+        interfaceType: {
+          sql: `interface_type`,
+          type: `string`,
+        },
+        protocol: {
+          sql: `protocol`,
+          type: `string`,
+        },
+        updatedAt: {
+          sql: `updated_at`,
+          type: `time`,
+        },
+        updatedMonth: {
+          sql: `updated_month`,
+          type: `time`,
+        },
+      },
+    })
+  InfrastructureProjection.js: |
+    cube(`InfrastructureProjection`, {
+      sql_table: `nextgen_analytics.infrastructure_projection`,
+
+      measures: {
+        count: {
+          type: `count`,
+        },
+        totalCost: {
+          sql: `monthly_cost`,
+          type: `sum`,
+          format: `currency`,
+        },
+        averageCost: {
+          sql: `monthly_cost`,
+          type: `avg`,
+          format: `currency`,
+        },
+        hostedApplications: {
+          sql: `hosted_applications`,
+          type: `sum`,
+        },
+        hostedAiComponents: {
+          sql: `hosted_ai_components`,
+          type: `sum`,
+        },
+      },
+
+      dimensions: {
+        id: {
+          sql: `id`,
+          type: `string`,
+          primaryKey: true,
+        },
+        companyId: {
+          sql: `company_id`,
+          type: `string`,
+        },
+        name: {
+          sql: `name`,
+          type: `string`,
+        },
+        status: {
+          sql: `status`,
+          type: `string`,
+        },
+        infrastructureType: {
+          sql: `infrastructure_type`,
+          type: `string`,
+        },
+        vendor: {
+          sql: `vendor`,
+          type: `string`,
+        },
+        location: {
+          sql: `location`,
+          type: `string`,
+        },
+        operatingSystem: {
+          sql: `operating_system`,
+          type: `string`,
+        },
+        updatedAt: {
+          sql: `updated_at`,
+          type: `time`,
+        },
+        updatedMonth: {
+          sql: `updated_month`,
+          type: `time`,
+        },
+      },
+    })
+  CapabilityCoverageProjection.js: |
+    cube(`CapabilityCoverageProjection`, {
+      sql_table: `nextgen_analytics.capability_coverage_projection`,
+
+      measures: {
+        count: {
+          type: `count`,
+        },
+        supportedApplicationsTotal: {
+          sql: `supported_applications`,
+          type: `sum`,
+        },
+      },
+
+      dimensions: {
+        capabilityId: {
+          sql: `capability_id`,
+          type: `string`,
+          primaryKey: true,
+        },
+        companyId: {
+          sql: `company_id`,
+          type: `string`,
+        },
+        capabilityName: {
+          sql: `capability_name`,
+          type: `string`,
+        },
+        maturity: {
+          sql: `maturity`,
+          type: `string`,
+        },
+        updatedAt: {
+          sql: `updated_at`,
+          type: `time`,
+        },
+      },
+    })
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $fullName }}-clickhouse
+  labels: {{- $labels | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8123
+      targetPort: 8123
+    - name: native
+      port: 9000
+      targetPort: 9000
+  selector:
+    app.kubernetes.io/name: {{ include "nextgen-eam.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: clickhouse
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ $fullName }}-clickhouse
+  labels: {{- $labels | nindent 4 }}
+spec:
+  serviceName: {{ $fullName }}-clickhouse
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "nextgen-eam.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: clickhouse
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "nextgen-eam.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: clickhouse
+    spec:
+      {{- if $global.imagePullSecrets }}
+      imagePullSecrets: {{- toYaml $global.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: clickhouse
+          image: {{ printf "%s:%s" $clickhouse.image.repository $clickhouse.image.tag }}
+          imagePullPolicy: {{ $clickhouse.image.pullPolicy }}
+          ports:
+            - containerPort: 8123
+              name: http
+            - containerPort: 9000
+              name: native
+          env:
+            - name: CLICKHOUSE_DB
+              value: {{ $clickhouse.db | quote }}
+            - name: CLICKHOUSE_USER
+              value: {{ $clickhouse.user | quote }}
+            - name: CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT
+              value: "1"
+            {{- if $clickhouse.password }}
+            - name: CLICKHOUSE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $fullName }}-analytics
+                  key: clickhousePassword
+            {{- end }}
+          volumeMounts:
+            - name: init
+              mountPath: /docker-entrypoint-initdb.d
+              readOnly: true
+            - name: data
+              mountPath: /var/lib/clickhouse
+          resources: {{- toYaml $clickhouse.resources | nindent 12 }}
+      volumes:
+        - name: init
+          configMap:
+            name: {{ $fullName }}-clickhouse-init
+  {{- if $clickhouse.persistence.enabled }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes:
+          - {{ $clickhouse.persistence.accessMode }}
+        {{- if $clickhouse.persistence.storageClass }}
+        storageClassName: {{ $clickhouse.persistence.storageClass | quote }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ $clickhouse.persistence.size }}
+  {{- else }}
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: Delete
+    whenScaled: Delete
+  {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $fullName }}-cube
+  labels: {{- $labels | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: {{ $cube.port }}
+      targetPort: {{ $cube.port }}
+  selector:
+    app.kubernetes.io/name: {{ include "nextgen-eam.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: cube
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $fullName }}-cube
+  labels: {{- $labels | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "nextgen-eam.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: cube
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "nextgen-eam.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: cube
+    spec:
+      {{- if $global.imagePullSecrets }}
+      imagePullSecrets: {{- toYaml $global.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: cube
+          image: {{ printf "%s:%s" $cube.image.repository $cube.image.tag }}
+          imagePullPolicy: {{ $cube.image.pullPolicy }}
+          ports:
+            - containerPort: {{ $cube.port }}
+              name: http
+          env:
+            - name: PORT
+              value: {{ $cube.port | quote }}
+            - name: CUBEJS_DEV_MODE
+              value: {{ $cube.devMode | quote }}
+            - name: CUBEJS_WEB_SOCKETS
+              value: {{ $cube.webSockets | quote }}
+            - name: CUBEJS_CACHE_AND_QUEUE_DRIVER
+              value: {{ $cube.cacheAndQueueDriver | quote }}
+            - name: CUBEJS_SCHEMA_PATH
+              value: /cube/conf/model
+            - name: CUBEJS_DB_TYPE
+              value: clickhouse
+            - name: CUBEJS_DB_HOST
+              value: {{ printf "%s-clickhouse" $fullName | quote }}
+            - name: CUBEJS_DB_PORT
+              value: "8123"
+            - name: CUBEJS_DB_NAME
+              value: {{ $clickhouse.db | quote }}
+            - name: CUBEJS_DB_USER
+              value: {{ $clickhouse.user | quote }}
+            - name: CUBEJS_CUBESTORE_HOST
+              value: {{ printf "%s-cubestore-router" $fullName | quote }}
+            - name: CUBEJS_CUBESTORE_PORT
+              value: {{ $cubestore.router.httpPort | quote }}
+            {{- if $clickhouse.password }}
+            - name: CUBEJS_DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $fullName }}-analytics
+                  key: clickhousePassword
+            {{- end }}
+            {{- if $cube.apiSecret }}
+            - name: CUBEJS_API_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $fullName }}-analytics
+                  key: cubeApiSecret
+            {{- end }}
+          volumeMounts:
+            - name: cube-schema
+              mountPath: /cube/conf
+              readOnly: true
+          resources: {{- toYaml $cube.resources | nindent 12 }}
+      volumes:
+        - name: cube-schema
+          configMap:
+            name: {{ $fullName }}-cube-schema
+            items:
+              - key: cube.js
+                path: cube.js
+              - key: ApplicationProjection.js
+                path: model/ApplicationProjection.js
+              - key: BusinessCapabilityProjection.js
+                path: model/BusinessCapabilityProjection.js
+              - key: AiComponentProjection.js
+                path: model/AiComponentProjection.js
+              - key: DataObjectProjection.js
+                path: model/DataObjectProjection.js
+              - key: ApplicationInterfaceProjection.js
+                path: model/ApplicationInterfaceProjection.js
+              - key: InfrastructureProjection.js
+                path: model/InfrastructureProjection.js
+              - key: CapabilityCoverageProjection.js
+                path: model/CapabilityCoverageProjection.js
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $fullName }}-cubestore-router
+  labels: {{- $labels | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: {{ $cubestore.router.httpPort }}
+      targetPort: http
+    - name: meta
+      port: {{ $cubestore.router.metaPort }}
+      targetPort: meta
+  selector:
+    app.kubernetes.io/name: {{ include "nextgen-eam.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: cubestore-router
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $fullName }}-cubestore-worker
+  labels: {{- $labels | nindent 4 }}
+spec:
+  clusterIP: None
+  publishNotReadyAddresses: true
+  ports:
+    - name: worker
+      port: {{ $cubestore.worker.port }}
+      targetPort: worker
+  selector:
+    app.kubernetes.io/name: {{ include "nextgen-eam.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: cubestore-worker
+---
+{{- if $cubestore.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $fullName }}-cubestore-remote
+  labels: {{- $labels | nindent 4 }}
+spec:
+  accessModes:
+    - {{ $cubestore.persistence.accessMode }}
+  {{- if $cubestore.persistence.storageClass }}
+  storageClassName: {{ $cubestore.persistence.storageClass | quote }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ $cubestore.persistence.size }}
+{{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $fullName }}-cubestore-router
+  labels: {{- $labels | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "nextgen-eam.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: cubestore-router
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "nextgen-eam.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: cubestore-router
+    spec:
+      {{- if $global.imagePullSecrets }}
+      imagePullSecrets: {{- toYaml $global.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: cubestore-router
+          image: {{ printf "%s:%s" $cubestore.image.repository $cubestore.image.tag }}
+          imagePullPolicy: {{ $cubestore.image.pullPolicy }}
+          ports:
+            - containerPort: {{ $cubestore.router.httpPort }}
+              name: http
+            - containerPort: {{ $cubestore.router.metaPort }}
+              name: meta
+          env:
+            - name: CUBESTORE_SERVER_NAME
+              value: {{ printf "%s-cubestore-router:%d" $fullName (int $cubestore.router.metaPort) | quote }}
+            - name: CUBESTORE_META_PORT
+              value: {{ $cubestore.router.metaPort | quote }}
+            - name: CUBESTORE_HTTP_PORT
+              value: {{ $cubestore.router.httpPort | quote }}
+            - name: CUBESTORE_WORKERS
+              value: {{ include "nextgen-eam.cubestoreWorkers" . | quote }}
+            - name: CUBESTORE_REMOTE_DIR
+              value: /cube/remote
+            - name: CUBESTORE_DATA_DIR
+              value: /cube/data
+          volumeMounts:
+            - name: scratch
+              mountPath: /cube/data
+            - name: remote
+              mountPath: /cube/remote
+          resources: {{- toYaml $cubestore.router.resources | nindent 12 }}
+      volumes:
+        - name: scratch
+          emptyDir: {}
+        - name: remote
+          {{- if $cubestore.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ $fullName }}-cubestore-remote
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ $fullName }}-cubestore-worker
+  labels: {{- $labels | nindent 4 }}
+spec:
+  serviceName: {{ $fullName }}-cubestore-worker
+  replicas: {{ $cubestore.worker.replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "nextgen-eam.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: cubestore-worker
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "nextgen-eam.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: cubestore-worker
+    spec:
+      {{- if $global.imagePullSecrets }}
+      imagePullSecrets: {{- toYaml $global.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: cubestore-worker
+          image: {{ printf "%s:%s" $cubestore.image.repository $cubestore.image.tag }}
+          imagePullPolicy: {{ $cubestore.image.pullPolicy }}
+          ports:
+            - containerPort: {{ $cubestore.worker.port }}
+              name: worker
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: CUBESTORE_SERVER_NAME
+              value: $(POD_NAME).{{ $fullName }}-cubestore-worker:{{ $cubestore.worker.port }}
+            - name: CUBESTORE_WORKER_PORT
+              value: {{ $cubestore.worker.port | quote }}
+            - name: CUBESTORE_META_ADDR
+              value: {{ printf "%s-cubestore-router:%d" $fullName (int $cubestore.router.metaPort) | quote }}
+            - name: CUBESTORE_WORKERS
+              value: {{ include "nextgen-eam.cubestoreWorkers" . | quote }}
+            - name: CUBESTORE_REMOTE_DIR
+              value: /cube/remote
+            - name: CUBESTORE_DATA_DIR
+              value: /cube/data
+          volumeMounts:
+            - name: scratch
+              mountPath: /cube/data
+            - name: remote
+              mountPath: /cube/remote
+          resources: {{- toYaml $cubestore.worker.resources | nindent 12 }}
+      volumes:
+        - name: scratch
+          emptyDir: {}
+        - name: remote
+          {{- if $cubestore.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ $fullName }}-cubestore-remote
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+{{- end }}
