@@ -36,6 +36,17 @@ function normalizeMonthLabel(rawValue: string): string {
   return `${date.getUTCFullYear()}-${`${date.getUTCMonth() + 1}`.padStart(2, '0')}`
 }
 
+function normalizeDimensionLabel(
+  dimension: AnalyticsDimensionKey,
+  rawValue: string | number | null | undefined
+): string {
+  if (dimension === 'month') {
+    return normalizeMonthLabel(String(rawValue ?? ''))
+  }
+
+  return String(rawValue ?? 'UNSPECIFIED')
+}
+
 function createCubeToken(user: AnalyticsUser, companyId: string | null): string {
   return jwt.sign(
     {
@@ -82,6 +93,7 @@ export async function loadAnalyticsChartData(
     readonly companyId: string | null
     readonly companyIds: readonly string[]
     readonly dimension: AnalyticsDimensionKey
+    readonly secondDimension: AnalyticsDimensionKey | null
     readonly measure: AnalyticsMeasureKey
   }
 ) {
@@ -93,10 +105,25 @@ export async function loadAnalyticsChartData(
     throw new Error(`Unsupported analytics measure '${input.measure}' for ${input.elementType}`)
   }
 
+  if (input.secondDimension) {
+    if (!isAnalyticsDimensionSupported(input.elementType, input.secondDimension)) {
+      throw new Error(
+        `Unsupported analytics second dimension '${input.secondDimension}' for ${input.elementType}`
+      )
+    }
+
+    if (input.secondDimension === input.dimension) {
+      throw new Error('The second analytics dimension must differ from the first dimension')
+    }
+  }
+
   const cubeName = getAnalyticsCubeName(input.elementType)
   const idMember = `${cubeName}.id`
   const nameMember = `${cubeName}.name`
   const dimensionMember = `${cubeName}.${getAnalyticsDimensionMember(input.elementType, input.dimension)}`
+  const secondDimensionMember = input.secondDimension
+    ? `${cubeName}.${getAnalyticsDimensionMember(input.elementType, input.secondDimension)}`
+    : null
   const measureMember = `${cubeName}.${getAnalyticsMeasureMember(input.elementType, input.measure)}`
 
   const companyMember = `${cubeName}.companyId`
@@ -113,20 +140,26 @@ export async function loadAnalyticsChartData(
 
   const cubeQuery = {
     measures: [measureMember],
-    dimensions: [dimensionMember],
+    dimensions: secondDimensionMember
+      ? [dimensionMember, secondDimensionMember]
+      : [dimensionMember],
     filters,
     order: {
       [dimensionMember]: input.dimension === 'month' ? 'asc' : 'asc',
+      ...(secondDimensionMember ? { [secondDimensionMember]: 'asc' } : {}),
     },
     limit: 50,
   }
 
   const recordsQuery = {
     measures: [measureMember],
-    dimensions: [idMember, nameMember, dimensionMember],
+    dimensions: secondDimensionMember
+      ? [idMember, nameMember, dimensionMember, secondDimensionMember]
+      : [idMember, nameMember, dimensionMember],
     filters,
     order: {
       [dimensionMember]: 'asc',
+      ...(secondDimensionMember ? { [secondDimensionMember]: 'asc' } : {}),
       [nameMember]: 'asc',
     },
     limit: 500,
@@ -140,31 +173,35 @@ export async function loadAnalyticsChartData(
   return {
     data: rows.map(row => {
       const rawLabel = row[dimensionMember]
+      const rawSeries = secondDimensionMember ? row[secondDimensionMember] : null
       const rawValue = row[measureMember]
-      const label =
-        input.dimension === 'month'
-          ? normalizeMonthLabel(String(rawLabel ?? ''))
-          : String(rawLabel ?? 'UNSPECIFIED')
+      const label = normalizeDimensionLabel(input.dimension, rawLabel)
       const value = typeof rawValue === 'number' ? rawValue : Number(rawValue ?? 0)
 
       return {
         label,
+        series:
+          input.secondDimension && secondDimensionMember
+            ? normalizeDimensionLabel(input.secondDimension, rawSeries)
+            : null,
         value: Number.isFinite(value) ? value : 0,
       }
     }),
     records: recordRows.map(row => {
       const rawLabel = row[dimensionMember]
+      const rawSecondaryLabel = secondDimensionMember ? row[secondDimensionMember] : null
       const rawValue = row[measureMember]
-      const label =
-        input.dimension === 'month'
-          ? normalizeMonthLabel(String(rawLabel ?? ''))
-          : String(rawLabel ?? 'UNSPECIFIED')
+      const label = normalizeDimensionLabel(input.dimension, rawLabel)
       const value = typeof rawValue === 'number' ? rawValue : Number(rawValue ?? 0)
 
       return {
         id: String(row[idMember] ?? ''),
         name: String(row[nameMember] ?? 'Unnamed'),
         label,
+        secondaryLabel:
+          input.secondDimension && secondDimensionMember
+            ? normalizeDimensionLabel(input.secondDimension, rawSecondaryLabel)
+            : null,
         value: Number.isFinite(value) ? value : 0,
       }
     }),

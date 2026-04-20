@@ -15,6 +15,7 @@ export const GET_ALL_ANALYTICS_REPORTS = gql`
       elementType
       chartType
       dimension
+      secondDimension
       measure
       createdAt
       updatedAt
@@ -49,6 +50,7 @@ export const GET_MY_ANALYTICS_REPORTS = gql`
       elementType
       chartType
       dimension
+      secondDimension
       measure
       createdAt
       updatedAt
@@ -101,6 +103,7 @@ export const CREATE_ANALYTICS_REPORT = gql`
         elementType
         chartType
         dimension
+        secondDimension
         measure
         createdAt
         updatedAt
@@ -131,6 +134,7 @@ export const UPDATE_ANALYTICS_REPORT = gql`
         elementType
         chartType
         dimension
+        secondDimension
         measure
         createdAt
         updatedAt

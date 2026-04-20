@@ -2251,6 +2251,8 @@
     "elementType": "Elementtyp",
     "chartType": "Chart-Typ",
     "dimension": "Dimension",
+    "secondDimension": "Zweite Dimension",
+    "noSecondDimension": "Keine zweite Dimension",
     "measure": "Kennzahl",
     "publicReportToggle": "Report für alle im Unternehmen sichtbar machen",
     "publicReport": "Öffentlich",
@@ -2296,8 +2298,11 @@
     "emptyPreview": "Für den aktuellen Kontext sind noch keine Analytics-Daten verfügbar.",
     "types": {
       "bar": "Balken",
-      "line": "Linie",
-      "pie": "Kreis"
+      "groupedBar": "Gruppierte Balken",
+      "pie": "Kreis",
+      "stackedArea": "Gestapelte Fläche",
+      "treemap": "Treemap",
+      "sankey": "Sankey"
     },
     "elementTypes": {
       "businessCapability": "Business Capability",

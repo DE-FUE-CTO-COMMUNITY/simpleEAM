@@ -14,19 +14,18 @@ import {
 import { secureApiCall } from '@/utils/sessionUtils'
 
 import {
+  AnalyticsChartDatum,
   AnalyticsDimensionKey,
   AnalyticsElementType,
   AnalyticsMeasureKey,
   AnalyticsPreviewRecord,
   AnalyticsReportFolderDefinition,
   AnalyticsReportDefinition,
+  normalizeAnalyticsChartType,
 } from './types'
 
 interface QueryResponse {
-  readonly data: Array<{
-    readonly label: string
-    readonly value: number
-  }>
+  readonly data: AnalyticsChartDatum[]
   readonly records: AnalyticsPreviewRecord[]
   readonly source: 'cube'
 }
@@ -36,8 +35,9 @@ interface AnalyticsReportGraphQlResponse {
   readonly name: string
   readonly isPublic: boolean
   readonly elementType: AnalyticsElementType
-  readonly chartType: AnalyticsReportDefinition['chartType']
+  readonly chartType: string
   readonly dimension: AnalyticsDimensionKey
+  readonly secondDimension?: AnalyticsDimensionKey | null
   readonly measure: AnalyticsMeasureKey
   readonly createdAt: string | null
   readonly updatedAt: string | null
@@ -82,8 +82,9 @@ function mapAnalyticsReport(report: AnalyticsReportGraphQlResponse): AnalyticsRe
     name: report.name,
     isPublic: report.isPublic,
     elementType: report.elementType,
-    chartType: report.chartType,
+    chartType: normalizeAnalyticsChartType(report.chartType),
     dimension: report.dimension,
+    secondDimension: report.secondDimension ?? null,
     measure: report.measure,
     folderId: report.folder?.[0]?.id ?? null,
     creatorId: creator?.id ?? null,
@@ -193,6 +194,7 @@ export async function createAnalyticsReport(
     readonly elementType: AnalyticsElementType
     readonly chartType: AnalyticsReportDefinition['chartType']
     readonly dimension: AnalyticsDimensionKey
+    readonly secondDimension: AnalyticsDimensionKey | null
     readonly measure: AnalyticsMeasureKey
   }
 ) {
@@ -214,6 +216,7 @@ export async function createAnalyticsReport(
           elementType: input.elementType,
           chartType: input.chartType,
           dimension: input.dimension,
+          secondDimension: input.secondDimension,
           measure: input.measure,
           company: { connect: [{ where: { node: { id: { eq: input.companyId } } } }] },
           createdBy: { connect: [{ where: { node: { id: { eq: input.creatorId } } } }] },
@@ -248,6 +251,7 @@ export async function updateAnalyticsReport(
     readonly elementType: AnalyticsElementType
     readonly chartType: AnalyticsReportDefinition['chartType']
     readonly dimension: AnalyticsDimensionKey
+    readonly secondDimension: AnalyticsDimensionKey | null
     readonly measure: AnalyticsMeasureKey
   }
 ) {
@@ -263,6 +267,7 @@ export async function updateAnalyticsReport(
       elementType: { set: input.elementType },
       chartType: { set: input.chartType },
       dimension: { set: input.dimension },
+      secondDimension: { set: input.secondDimension },
       measure: { set: input.measure },
       ...(input.currentCompanyId && input.currentCompanyId !== input.companyId
         ? {
@@ -459,6 +464,7 @@ export async function queryAnalyticsPreview(
     readonly companyId: string | null
     readonly elementType: AnalyticsElementType
     readonly dimension: AnalyticsDimensionKey
+    readonly secondDimension: AnalyticsDimensionKey | null
     readonly measure: AnalyticsMeasureKey
   }
 ) {

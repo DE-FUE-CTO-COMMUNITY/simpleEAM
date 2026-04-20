@@ -1,4 +1,11 @@
-export const analyticsChartTypes = ['bar', 'line', 'pie'] as const
+export const analyticsChartTypes = [
+  'bar',
+  'groupedBar',
+  'pie',
+  'stackedArea',
+  'treemap',
+  'sankey',
+] as const
 export const analyticsElementTypes = [
   'businessCapability',
   'application',
@@ -56,6 +63,19 @@ export type AnalyticsChartType = (typeof analyticsChartTypes)[number]
 export type AnalyticsElementType = (typeof analyticsElementTypes)[number]
 export type AnalyticsDimensionKey = (typeof analyticsDimensionKeys)[number]
 export type AnalyticsMeasureKey = (typeof analyticsMeasureKeys)[number]
+
+export function normalizeAnalyticsChartType(value: string): AnalyticsChartType {
+  switch (value) {
+    case 'groupedBar':
+    case 'pie':
+    case 'stackedArea':
+    case 'treemap':
+    case 'sankey':
+      return value
+    default:
+      return 'bar'
+  }
+}
 
 export const analyticsSchemaByElementType: Record<
   AnalyticsElementType,
@@ -121,12 +141,14 @@ export const analyticsCurrencyMeasures: readonly AnalyticsMeasureKey[] = [
 export interface AnalyticsChartDatum {
   readonly label: string
   readonly value: number
+  readonly series?: string | null
 }
 
 export interface AnalyticsPreviewRecord {
   readonly id: string
   readonly name: string
   readonly label: string
+  readonly secondaryLabel?: string | null
   readonly value: number
 }
 
@@ -137,6 +159,7 @@ export interface AnalyticsReportDefinition {
   readonly elementType: AnalyticsElementType
   readonly chartType: AnalyticsChartType
   readonly dimension: AnalyticsDimensionKey
+  readonly secondDimension?: AnalyticsDimensionKey | null
   readonly measure: AnalyticsMeasureKey
   readonly folderId?: string | null
   readonly creatorId?: string | null
@@ -165,6 +188,7 @@ export interface AnalyticsDraftReport {
   readonly elementType: AnalyticsElementType
   readonly chartType: AnalyticsChartType
   readonly dimension: AnalyticsDimensionKey
+  readonly secondDimension: AnalyticsDimensionKey | null
   readonly measure: AnalyticsMeasureKey
   readonly folderId: string | null
 }

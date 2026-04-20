@@ -11,6 +11,10 @@ const analyticsRouter = express.Router()
 const elementTypeSchema = z.enum(analyticsElementTypes)
 const dimensionSchema = z.enum(analyticsDimensionKeys)
 const measureSchema = z.enum(analyticsMeasureKeys)
+const secondDimensionSchema = dimensionSchema
+  .nullable()
+  .optional()
+  .transform(value => value ?? null)
 
 const companyIdField = z
   .string()
@@ -24,6 +28,7 @@ const queryInputSchema = z.object({
   companyId: companyIdField,
   elementType: elementTypeSchema.default('application'),
   dimension: dimensionSchema,
+  secondDimension: secondDimensionSchema,
   measure: measureSchema,
 })
 
@@ -90,6 +95,7 @@ analyticsRouter.post('/query', async (req, res) => {
       elementType: parsed.data.elementType,
       companyIds: allowedCompanyIds,
       dimension: parsed.data.dimension,
+      secondDimension: parsed.data.secondDimension,
       measure: parsed.data.measure,
     })
 

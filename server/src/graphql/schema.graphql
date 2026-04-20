@@ -615,6 +615,7 @@ type AnalyticsReport
   elementType: String!
   chartType: String!
   dimension: String!
+  secondDimension: String
   measure: String!
   createdAt: DateTime! @timestamp(operations: [CREATE])
   updatedAt: DateTime @timestamp(operations: [UPDATE])

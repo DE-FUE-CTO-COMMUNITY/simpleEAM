@@ -36,16 +36,18 @@ import {
 import { Add, Download, FolderOpenOutlined, FolderOutlined, Sync } from '@mui/icons-material'
 import { useTranslations } from 'next-intl'
 import {
+  Area,
+  AreaChart,
   Bar,
   BarChart,
   CartesianGrid,
   Cell,
   Legend,
-  Line,
-  LineChart,
   Pie,
   PieChart,
   ResponsiveContainer,
+  Sankey,
+  Treemap,
   Tooltip,
   XAxis,
   YAxis,
@@ -104,6 +106,154 @@ interface NotificationState {
 
 type AnalyticsPreviewTab = 'chart' | 'records'
 
+interface CartesianSeriesDefinition {
+  readonly key: string
+  readonly label: string
+  readonly color: string
+}
+
+interface CartesianChartModel {
+  readonly rows: Array<Record<string, string | number>>
+  readonly series: CartesianSeriesDefinition[]
+  readonly hasSecondarySeries: boolean
+}
+
+interface TreemapNode {
+  readonly name: string
+  readonly size?: number
+  readonly fill?: string
+  readonly primaryName?: string
+  readonly secondaryName?: string
+  readonly children?: TreemapNode[]
+}
+
+interface TreemapNodeShapeProps {
+  readonly x?: number
+  readonly y?: number
+  readonly width?: number
+  readonly height?: number
+  readonly depth?: number
+  readonly index?: number
+  readonly name?: string
+  readonly fill?: string
+  readonly primaryName?: string
+  readonly secondaryName?: string
+  readonly children?: TreemapNode[]
+  readonly payload?: TreemapNode
+}
+
+interface SankeyNode {
+  readonly name: string
+}
+
+interface SankeyLink {
+  readonly source: number
+  readonly target: number
+  readonly value: number
+}
+
+interface SankeyChartModel {
+  readonly nodes: SankeyNode[]
+  readonly links: SankeyLink[]
+}
+
+interface SankeyNodeShapeProps {
+  readonly x?: number
+  readonly y?: number
+  readonly width?: number
+  readonly height?: number
+  readonly index?: number
+  readonly payload?: {
+    readonly name?: string
+  }
+  readonly depth?: number
+}
+
+const chartTypesRequiringSecondDimension: readonly AnalyticsDraftReport['chartType'][] = [
+  'groupedBar',
+  'stackedArea',
+  'treemap',
+  'sankey',
+]
+
+function requiresSecondDimension(chartType: AnalyticsDraftReport['chartType']) {
+  return chartTypesRequiringSecondDimension.includes(chartType)
+}
+
+function pickDefaultSecondDimension(
+  dimensions: readonly AnalyticsDraftReport['dimension'][],
+  primaryDimension: AnalyticsDraftReport['dimension']
+) {
+  return dimensions.find(dimension => dimension !== primaryDimension) ?? null
+}
+
+function getChartMinHeight(chartType: AnalyticsDraftReport['chartType']) {
+  if (chartType === 'pie' || chartType === 'treemap' || chartType === 'sankey') {
+    return 400
+  }
+
+  return 320
+}
+
+function getAllowedPrimaryDimensions(
+  chartType: AnalyticsDraftReport['chartType'],
+  dimensions: readonly AnalyticsDraftReport['dimension'][]
+) {
+  if (chartType === 'stackedArea' && dimensions.includes('month')) {
+    return dimensions.filter(dimension => dimension === 'month')
+  }
+
+  return [...dimensions]
+}
+
+function getAllowedSecondDimensions(
+  chartType: AnalyticsDraftReport['chartType'],
+  dimensions: readonly AnalyticsDraftReport['dimension'][],
+  primaryDimension: AnalyticsDraftReport['dimension']
+) {
+  if (chartType === 'pie') {
+    return []
+  }
+
+  if (chartType === 'stackedArea') {
+    return dimensions.filter(dimension => dimension !== 'month')
+  }
+
+  return dimensions.filter(dimension => dimension !== primaryDimension)
+}
+
+function getAllowedMeasures(
+  chartType: AnalyticsDraftReport['chartType'],
+  measures: readonly AnalyticsDraftReport['measure'][]
+) {
+  if (chartType === 'sankey') {
+    return measures.filter(measure => measure === 'count')
+  }
+
+  return [...measures]
+}
+
+function renderSankeyNode(props: SankeyNodeShapeProps) {
+  const x = props.x ?? 0
+  const y = props.y ?? 0
+  const width = props.width ?? 0
+  const height = props.height ?? 0
+  const index = props.index ?? 0
+  const label = props.payload?.name ?? ''
+  const isTargetColumn = (props.depth ?? 0) > 0
+  const textX = isTargetColumn ? x + width + 8 : x - 8
+  const textAnchor = isTargetColumn ? 'start' : 'end'
+
+  return (
+    <g>
+      <rect x={x} y={y} width={width} height={height} fill={chartColors[index % chartColors.length]} />
+      <text x={textX} y={y + height / 2} textAnchor={textAnchor} dominantBaseline="middle" fontSize={12}>
+        {label}
+      </text>
+    </g>
+  )
+}
+
 function createDefaultDraft(): AnalyticsDraftReport {
   return {
     id: null,
@@ -112,6 +262,7 @@ function createDefaultDraft(): AnalyticsDraftReport {
     elementType: 'application',
     chartType: 'bar',
     dimension: 'status',
+    secondDimension: null,
     measure: 'count',
     folderId: null,
   }
@@ -125,6 +276,10 @@ function sortReports(reports: readonly AnalyticsReportDefinition[]) {
 
 function sortFolders(folders: readonly AnalyticsReportFolderDefinition[]) {
   return [...folders].sort((left, right) => left.name.localeCompare(right.name))
+}
+
+function applyFillOpacity(hexColor: string, opacity: string) {
+  return `${hexColor}${opacity}`
 }
 
 function buildFolderOptions(
@@ -145,21 +300,192 @@ function buildFolderOptions(
   ])
 }
 
-function renderChart(chartType: AnalyticsDraftReport['chartType'], data: AnalyticsChartDatum[]) {
-  if (chartType === 'line') {
+function buildCartesianChartModel(data: AnalyticsChartDatum[]): CartesianChartModel {
+  const hasSecondarySeries = data.some(entry => Boolean(entry.series))
+  const rowsByLabel = new Map<string, Record<string, string | number>>()
+  const seriesKeysByLabel = new Map<string, string>()
+  const series: CartesianSeriesDefinition[] = []
+
+  data.forEach(entry => {
+    const seriesLabel = hasSecondarySeries ? (entry.series ?? 'UNSPECIFIED') : 'Value'
+    let seriesKey = seriesKeysByLabel.get(seriesLabel)
+
+    if (!seriesKey) {
+      seriesKey = hasSecondarySeries ? `series${series.length}` : 'value'
+      seriesKeysByLabel.set(seriesLabel, seriesKey)
+      series.push({
+        key: seriesKey,
+        label: seriesLabel,
+        color: chartColors[series.length % chartColors.length],
+      })
+    }
+
+    const row = rowsByLabel.get(entry.label) ?? { label: entry.label }
+    row[seriesKey] = entry.value
+    rowsByLabel.set(entry.label, row)
+  })
+
+  return {
+    rows: Array.from(rowsByLabel.values()),
+    series,
+    hasSecondarySeries,
+  }
+}
+
+function buildTreemapChartModel(data: AnalyticsChartDatum[]): TreemapNode[] {
+  const hasSecondarySeries = data.some(entry => Boolean(entry.series))
+  const primaryLabels = Array.from(new Set(data.map(entry => entry.label)))
+  const primaryColorMap = new Map(
+    primaryLabels.map((label, index) => [label, chartColors[index % chartColors.length]])
+  )
+
+  if (!hasSecondarySeries) {
+    return data.map(entry => ({
+      name: entry.label,
+      primaryName: entry.label,
+      size: entry.value,
+      fill: primaryColorMap.get(entry.label) ?? chartColors[0],
+    }))
+  }
+
+  const groupedNodes = new Map<string, TreemapNode[]>()
+
+  data.forEach(entry => {
+    const seriesLabel = entry.series ?? 'UNSPECIFIED'
+
+    const groupChildren = groupedNodes.get(entry.label) ?? []
+    groupChildren.push({
+      name: `${entry.label} - ${seriesLabel}`,
+      primaryName: entry.label,
+      secondaryName: seriesLabel,
+      size: entry.value,
+      fill: primaryColorMap.get(entry.label) ?? chartColors[0],
+    })
+    groupedNodes.set(entry.label, groupChildren)
+  })
+
+  return Array.from(groupedNodes.entries()).map(([label, children]) => ({
+    name: label,
+    primaryName: label,
+    fill: primaryColorMap.get(label) ?? chartColors[0],
+    children,
+  }))
+}
+
+function buildTreemapLegendItems(nodes: readonly TreemapNode[]) {
+  return nodes.map(node => ({
+    label: node.primaryName ?? node.name,
+    color: node.fill ?? chartColors[0],
+  }))
+}
+
+function TreemapNodeContent(props: TreemapNodeShapeProps) {
+  const x = props.x ?? 0
+  const y = props.y ?? 0
+  const width = props.width ?? 0
+  const height = props.height ?? 0
+  const index = props.index ?? 0
+  const node = props.payload ?? props
+  const fill = node.fill ?? chartColors[index % chartColors.length]
+  const hasChildren = Boolean(node.children && node.children.length > 0)
+
+  if (width <= 0 || height <= 0) {
+    return null
+  }
+
+  if (hasChildren) {
     return (
-      <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={data} margin={{ top: 8, right: 8, bottom: 24, left: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="label" />
-          <YAxis />
-          <Tooltip />
-          <Legend verticalAlign="bottom" height={36} />
-          <Line type="monotone" dataKey="value" stroke="#00796B" strokeWidth={3} />
-        </LineChart>
-      </ResponsiveContainer>
+      <g>
+        <rect
+          x={x}
+          y={y}
+          width={width}
+          height={height}
+          fill={applyFillOpacity(fill, '22')}
+          stroke={fill}
+        />
+        {width > 72 && height > 20 && (
+          <text x={x + 6} y={y + 16} fontSize={12} fill="#263238">
+            {node.primaryName ?? node.name ?? props.name}
+          </text>
+        )}
+      </g>
     )
   }
+
+  return (
+    <g>
+      <rect x={x} y={y} width={width} height={height} fill={fill} stroke="#ffffff" />
+      {width > 48 && height > 22 && (
+        <text x={x + 6} y={y + 16} fontSize={11} fill="#102027">
+          {node.secondaryName || node.name || props.name}
+        </text>
+      )}
+    </g>
+  )
+}
+
+function buildSankeyChartModel(data: AnalyticsChartDatum[]): SankeyChartModel {
+  const nodeIndexByKey = new Map<string, number>()
+  const nodes: SankeyNode[] = []
+  const linksByKey = new Map<string, SankeyLink>()
+
+  data.forEach(entry => {
+    const sourceName = entry.label
+    const targetName = entry.series ?? 'UNSPECIFIED'
+    const sourceKey = `source:${sourceName}`
+    const targetKey = `target:${targetName}`
+
+    if (!nodeIndexByKey.has(sourceKey)) {
+      nodeIndexByKey.set(sourceKey, nodes.length)
+      nodes.push({ name: sourceName })
+    }
+
+    if (!nodeIndexByKey.has(targetKey)) {
+      nodeIndexByKey.set(targetKey, nodes.length)
+      nodes.push({ name: targetName })
+    }
+
+    const source = nodeIndexByKey.get(sourceKey)
+    const target = nodeIndexByKey.get(targetKey)
+    if (source === undefined || target === undefined) {
+      return
+    }
+
+    const linkKey = `${source}->${target}`
+    const existingLink = linksByKey.get(linkKey)
+
+    if (existingLink) {
+      linksByKey.set(linkKey, { ...existingLink, value: existingLink.value + entry.value })
+      return
+    }
+
+    linksByKey.set(linkKey, {
+      source,
+      target,
+      value: entry.value,
+    })
+  })
+
+  return {
+    nodes,
+    links: Array.from(linksByKey.values()),
+  }
+}
+
+function renderChart(chartType: AnalyticsDraftReport['chartType'], data: AnalyticsChartDatum[]) {
+  const cartesianChartModel = buildCartesianChartModel(data)
+  const treemapChartModel = buildTreemapChartModel(data)
+  const treemapLegendItems = buildTreemapLegendItems(treemapChartModel)
+  const sankeyChartModel = buildSankeyChartModel(data)
+  const sankeySourceLabelMargin = Math.max(
+    64,
+    ...sankeyChartModel.nodes.slice(0, Math.ceil(sankeyChartModel.nodes.length / 2)).map(node => node.name.length * 7 + 20)
+  )
+  const sankeyTargetLabelMargin = Math.max(
+    96,
+    ...sankeyChartModel.nodes.slice(Math.ceil(sankeyChartModel.nodes.length / 2)).map(node => node.name.length * 7 + 24)
+  )
 
   if (chartType === 'pie') {
     return (
@@ -185,15 +511,133 @@ function renderChart(chartType: AnalyticsDraftReport['chartType'], data: Analyti
     )
   }
 
+  if (chartType === 'treemap') {
+    return (
+      <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+        {treemapLegendItems.length > 0 && (
+          <Stack direction="row" spacing={2} useFlexGap sx={{ flexWrap: 'wrap' }}>
+            {treemapLegendItems.map(item => (
+              <Stack key={item.label} direction="row" spacing={0.75} alignItems="center">
+                <Box
+                  sx={{
+                    width: 12,
+                    height: 12,
+                    borderRadius: 0.5,
+                    backgroundColor: item.color,
+                    flexShrink: 0,
+                  }}
+                />
+                <Typography variant="caption" color="text.secondary">
+                  {item.label}
+                </Typography>
+              </Stack>
+            ))}
+          </Stack>
+        )}
+        <Box sx={{ flex: 1, minHeight: 0 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <Treemap
+              data={treemapChartModel}
+              dataKey="size"
+              nameKey="name"
+              content={<TreemapNodeContent />}
+              stroke="#ffffff"
+              aspectRatio={4 / 3}
+            >
+              <Tooltip />
+            </Treemap>
+          </ResponsiveContainer>
+        </Box>
+      </Box>
+    )
+  }
+
+  if (chartType === 'sankey') {
+    return (
+      <ResponsiveContainer width="100%" height="100%">
+        <Sankey
+          data={sankeyChartModel}
+          node={renderSankeyNode}
+          nodePadding={24}
+          nodeWidth={14}
+          margin={{
+            top: 16,
+            right: sankeyTargetLabelMargin,
+            bottom: 16,
+            left: sankeySourceLabelMargin,
+          }}
+          link={{ stroke: '#90A4AE' }}
+        >
+          <Tooltip />
+        </Sankey>
+      </ResponsiveContainer>
+    )
+  }
+
+  if (chartType === 'stackedArea') {
+    return (
+      <ResponsiveContainer width="100%" height="100%">
+        <AreaChart
+          data={cartesianChartModel.rows}
+          margin={{ top: 8, right: 8, bottom: 24, left: 0 }}
+        >
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="label" />
+          <YAxis />
+          <Tooltip />
+          {cartesianChartModel.hasSecondarySeries && <Legend verticalAlign="bottom" height={36} />}
+          {cartesianChartModel.series.map(series => (
+            <Area
+              key={series.key}
+              type="monotone"
+              dataKey={series.key}
+              name={series.label}
+              stroke={series.color}
+              fill={series.color}
+              fillOpacity={0.35}
+              stackId="total"
+            />
+          ))}
+        </AreaChart>
+      </ResponsiveContainer>
+    )
+  }
+
+  if (chartType === 'groupedBar') {
+    return (
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart data={cartesianChartModel.rows} margin={{ top: 8, right: 8, bottom: 24, left: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="label" />
+          <YAxis />
+          <Tooltip />
+          {cartesianChartModel.hasSecondarySeries && <Legend verticalAlign="bottom" height={36} />}
+          {cartesianChartModel.series.map(series => (
+            <Bar key={series.key} dataKey={series.key} name={series.label} fill={series.color} />
+          ))}
+        </BarChart>
+      </ResponsiveContainer>
+    )
+  }
+
   return (
     <ResponsiveContainer width="100%" height="100%">
-      <BarChart data={data} margin={{ top: 8, right: 8, bottom: 24, left: 0 }}>
+      <BarChart data={cartesianChartModel.rows} margin={{ top: 8, right: 8, bottom: 24, left: 0 }}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="label" />
         <YAxis />
         <Tooltip />
-        <Legend verticalAlign="bottom" height={36} />
-        <Bar dataKey="value" fill="#00796B" radius={[8, 8, 0, 0]} />
+        {cartesianChartModel.hasSecondarySeries && <Legend verticalAlign="bottom" height={36} />}
+        {cartesianChartModel.series.map(series => (
+          <Bar
+            key={series.key}
+            dataKey={series.key}
+            name={series.label}
+            fill={series.color}
+            stackId={cartesianChartModel.hasSecondarySeries ? 'total' : undefined}
+            radius={cartesianChartModel.hasSecondarySeries ? undefined : [8, 8, 0, 0]}
+          />
+        ))}
       </BarChart>
     </ResponsiveContainer>
   )
@@ -247,8 +691,13 @@ export function AnalyticsWorkspace() {
 
   const analyticsBaseUrl = analyticsConfig.apiUrl
   const activeSchema = analyticsSchemaByElementType[draft.elementType]
-  const availableDimensions = activeSchema.dimensions
-  const availableMeasures = activeSchema.measures
+  const availableDimensions = getAllowedPrimaryDimensions(draft.chartType, activeSchema.dimensions)
+  const availableSecondDimensions = getAllowedSecondDimensions(
+    draft.chartType,
+    activeSchema.dimensions,
+    draft.dimension
+  )
+  const availableMeasures = getAllowedMeasures(draft.chartType, activeSchema.measures)
   const adminMode = isAdmin()
   const canManageFolders = Boolean(selectedCompanyId && currentPerson?.id && !currentPersonLoading)
   const currencyFormatter = useMemo(
@@ -387,6 +836,7 @@ export function AnalyticsWorkspace() {
       companyId: selectedCompanyId,
       elementType: draft.elementType,
       dimension: draft.dimension,
+      secondDimension: draft.chartType === 'pie' ? null : draft.secondDimension,
       measure: draft.measure,
     })
       .then(payload => {
@@ -414,20 +864,59 @@ export function AnalyticsWorkspace() {
     return () => {
       cancelled = true
     }
-  }, [analyticsBaseUrl, draft.dimension, draft.elementType, draft.measure, selectedCompanyId, t])
+  }, [
+    analyticsBaseUrl,
+    draft.chartType,
+    draft.dimension,
+    draft.elementType,
+    draft.measure,
+    draft.secondDimension,
+    selectedCompanyId,
+    t,
+  ])
 
   useEffect(() => {
+    const nextDimension = availableDimensions.includes(draft.dimension)
+      ? draft.dimension
+      : availableDimensions[0]
+    const nextMeasure = availableMeasures.includes(draft.measure)
+      ? draft.measure
+      : availableMeasures[0]
+    const validSecondDimension =
+      draft.secondDimension &&
+      draft.secondDimension !== nextDimension &&
+      availableSecondDimensions.includes(draft.secondDimension)
+        ? draft.secondDimension
+        : null
+    const nextSecondDimension =
+      draft.chartType === 'pie'
+        ? null
+        : validSecondDimension ??
+          (requiresSecondDimension(draft.chartType)
+            ? pickDefaultSecondDimension(availableSecondDimensions, nextDimension)
+            : null)
+
     if (
-      !availableDimensions.includes(draft.dimension) ||
-      !availableMeasures.includes(draft.measure)
+      nextDimension !== draft.dimension ||
+      nextMeasure !== draft.measure ||
+      nextSecondDimension !== draft.secondDimension
     ) {
       setDraft(current => ({
         ...current,
-        dimension: availableDimensions[0],
-        measure: availableMeasures[0],
+        dimension: nextDimension,
+        secondDimension: nextSecondDimension,
+        measure: nextMeasure,
       }))
     }
-  }, [availableDimensions, availableMeasures, draft.dimension, draft.measure])
+  }, [
+    availableDimensions,
+    availableSecondDimensions,
+    availableMeasures,
+    draft.chartType,
+    draft.dimension,
+    draft.measure,
+    draft.secondDimension,
+  ])
 
   const handleDraftChange = <T extends keyof AnalyticsDraftReport>(
     key: T,
@@ -499,6 +988,7 @@ export function AnalyticsWorkspace() {
         elementType: draft.elementType,
         chartType: draft.chartType,
         dimension: draft.dimension,
+        secondDimension: draft.chartType === 'pie' ? null : draft.secondDimension,
         measure: draft.measure,
       }
 
@@ -525,12 +1015,24 @@ export function AnalyticsWorkspace() {
           elementType: report.elementType,
           chartType: report.chartType,
           dimension: report.dimension,
+          secondDimension: report.secondDimension ?? null,
           measure: report.measure,
           folderId: report.folderId ?? null,
         }))
         showNotification(t('reportUpdated'), 'success')
       } else {
-        setDraft(createDefaultDraft())
+        setDraft(current => ({
+          ...current,
+          id: report.id,
+          name: report.name,
+          isPublic: report.isPublic,
+          elementType: report.elementType,
+          chartType: report.chartType,
+          dimension: report.dimension,
+          secondDimension: report.secondDimension ?? null,
+          measure: report.measure,
+          folderId: report.folderId ?? null,
+        }))
         showNotification(t('reportSaved'), 'success')
       }
     } catch (saveError) {
@@ -550,6 +1052,7 @@ export function AnalyticsWorkspace() {
       elementType: report.elementType,
       chartType: report.chartType,
       dimension: report.dimension,
+      secondDimension: report.chartType === 'pie' ? null : (report.secondDimension ?? null),
       measure: report.measure,
       folderId: report.folderId ?? null,
     })
@@ -639,6 +1142,7 @@ export function AnalyticsWorkspace() {
               elementType: report.elementType,
               chartType: report.chartType,
               dimension: report.dimension,
+              secondDimension: report.secondDimension ?? null,
               measure: report.measure,
             })
           )
@@ -717,6 +1221,7 @@ export function AnalyticsWorkspace() {
         companyId: selectedCompanyId,
         elementType: draft.elementType,
         dimension: draft.dimension,
+        secondDimension: draft.chartType === 'pie' ? null : draft.secondDimension,
         measure: draft.measure,
       })
       setChartData(refreshed.data)
@@ -739,10 +1244,11 @@ export function AnalyticsWorkspace() {
     try {
       const { width, height } = chartContainer.getBoundingClientRect()
       const safeWidth = Math.max(Math.round(width), 320)
-      const safeHeight = Math.max(Math.round(height), draft.chartType === 'pie' ? 400 : 320)
+      const safeHeight = Math.max(Math.round(height), getChartMinHeight(draft.chartType))
       const link = document.createElement('a')
       const baseLabel = draft.name.trim() || `${draft.elementType}-${draft.chartType}-chart`
-      const fileNameBase = `${baseLabel}-${draft.dimension}-${draft.measure}`
+      const dimensionSegment = [draft.dimension, draft.secondDimension].filter(Boolean).join('-')
+      const fileNameBase = `${baseLabel}-${dimensionSegment}-${draft.measure}`
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-+|-+$/g, '')
@@ -769,7 +1275,8 @@ export function AnalyticsWorkspace() {
 
     try {
       const baseLabel = draft.name.trim() || `${draft.elementType}-records`
-      const filename = `${baseLabel}-${draft.dimension}-${draft.measure}-records`
+      const dimensionSegment = [draft.dimension, draft.secondDimension].filter(Boolean).join('-')
+      const filename = `${baseLabel}-${dimensionSegment}-${draft.measure}-records`
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-+|-+$/g, '')
@@ -779,6 +1286,11 @@ export function AnalyticsWorkspace() {
           [t('recordsId')]: record.id,
           [t('recordsName')]: record.name,
           [t(`dimensions.${draft.dimension}`)]: record.label,
+          ...(draft.secondDimension
+            ? {
+                [t(`dimensions.${draft.secondDimension}`)]: record.secondaryLabel ?? 'UNSPECIFIED',
+              }
+            : {}),
           ...(showRecordMeasureColumn
             ? {
                 [t(`measures.${draft.measure}`)]: record.value,
@@ -802,11 +1314,13 @@ export function AnalyticsWorkspace() {
     ? currencyFormatter.format(previewTotal)
     : previewTotal.toLocaleString()
   const showRecordMeasureColumn = draft.measure !== 'count'
-  const chartTitle = draft.name.trim()
-    ? draft.name.trim()
-    : `${t(`elementTypes.${draft.elementType}`)} · ${t(`dimensions.${draft.dimension}`)} · ${t(
-        `measures.${draft.measure}`
-      )}`
+  const draftDimensionsLabel = [
+    t(`dimensions.${draft.dimension}`),
+    ...(draft.secondDimension ? [t(`dimensions.${draft.secondDimension}`)] : []),
+  ].join(' + ')
+  const chartTitle = `${t(`elementTypes.${draft.elementType}`)} · ${draftDimensionsLabel} · ${t(
+    `measures.${draft.measure}`
+  )}`
   const chartTitleWithTotal = `${chartTitle} (${previewTotalLabel})`
 
   const renderReportCard = (report: AnalyticsReportDefinition) => {
@@ -834,7 +1348,10 @@ export function AnalyticsWorkspace() {
                 {t(`elementTypes.${report.elementType}`)} · {t(`types.${report.chartType}`)}
               </Typography>
               <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
-                {t(`dimensions.${report.dimension}`)} · {t(`measures.${report.measure}`)}
+                {[t(`dimensions.${report.dimension}`)]
+                  .concat(report.secondDimension ? [t(`dimensions.${report.secondDimension}`)] : [])
+                  .join(' + ')}{' '}
+                · {t(`measures.${report.measure}`)}
               </Typography>
             </Box>
           </CardContent>
@@ -1135,6 +1652,9 @@ export function AnalyticsWorkspace() {
                         <TableRow>
                           <TableCell>{t('recordsName')}</TableCell>
                           <TableCell>{t(`dimensions.${draft.dimension}`)}</TableCell>
+                          {draft.secondDimension && (
+                            <TableCell>{t(`dimensions.${draft.secondDimension}`)}</TableCell>
+                          )}
                           {showRecordMeasureColumn && (
                             <TableCell align="right">{t(`measures.${draft.measure}`)}</TableCell>
                           )}
@@ -1145,6 +1665,9 @@ export function AnalyticsWorkspace() {
                           <TableRow key={entry.id || `${entry.name}-${entry.label}`} hover>
                             <TableCell>{entry.name}</TableCell>
                             <TableCell>{entry.label}</TableCell>
+                            {draft.secondDimension && (
+                              <TableCell>{entry.secondaryLabel ?? 'UNSPECIFIED'}</TableCell>
+                            )}
                             {showRecordMeasureColumn && (
                               <TableCell align="right">{entry.value.toLocaleString()}</TableCell>
                             )}
@@ -1166,7 +1689,7 @@ export function AnalyticsWorkspace() {
                     <Typography variant="subtitle1" sx={{ mb: 2, textAlign: 'center' }}>
                       {chartTitleWithTotal}
                     </Typography>
-                    <Box sx={{ flex: 1, minHeight: draft.chartType === 'pie' ? 400 : 320 }}>
+                    <Box sx={{ flex: 1, minHeight: getChartMinHeight(draft.chartType) }}>
                       {renderChart(draft.chartType, chartData)}
                     </Box>
                   </Box>
@@ -1211,7 +1734,8 @@ export function AnalyticsWorkspace() {
                     setDraft(current => ({
                       ...current,
                       elementType: nextElementType,
-                      dimension: nextSchema.dimensions[0],
+                      dimension: getAllowedPrimaryDimensions(current.chartType, nextSchema.dimensions)[0],
+                      secondDimension: null,
                       measure: nextSchema.measures[0],
                     }))
                   }}
@@ -1227,12 +1751,40 @@ export function AnalyticsWorkspace() {
                   select
                   label={t('chartType')}
                   value={draft.chartType}
-                  onChange={event =>
-                    handleDraftChange(
-                      'chartType',
-                      event.target.value as AnalyticsDraftReport['chartType']
+                  onChange={event => {
+                    const nextChartType = event.target.value as AnalyticsDraftReport['chartType']
+                    const nextPrimaryDimensions = getAllowedPrimaryDimensions(
+                      nextChartType,
+                      activeSchema.dimensions
                     )
-                  }
+                    const nextDimension = nextPrimaryDimensions.includes(draft.dimension)
+                      ? draft.dimension
+                      : nextPrimaryDimensions[0]
+                    const nextSecondDimensions = getAllowedSecondDimensions(
+                      nextChartType,
+                      activeSchema.dimensions,
+                      nextDimension
+                    )
+                    const nextMeasures = getAllowedMeasures(nextChartType, activeSchema.measures)
+                    const nextSecondDimension =
+                      nextChartType === 'pie'
+                        ? null
+                        : draft.secondDimension && nextSecondDimensions.includes(draft.secondDimension)
+                          ? draft.secondDimension
+                          : requiresSecondDimension(nextChartType)
+                            ? pickDefaultSecondDimension(nextSecondDimensions, nextDimension)
+                            : null
+
+                    setDraft(current => ({
+                      ...current,
+                      chartType: nextChartType,
+                      dimension: nextDimension,
+                      secondDimension: nextSecondDimension,
+                      measure: nextMeasures.includes(current.measure)
+                        ? current.measure
+                        : nextMeasures[0],
+                    }))
+                  }}
                   fullWidth
                 >
                   {analyticsChartTypes.map(chartType => (
@@ -1259,6 +1811,29 @@ export function AnalyticsWorkspace() {
                     </MenuItem>
                   ))}
                 </TextField>
+                {draft.chartType !== 'pie' && (
+                  <TextField
+                    select
+                    label={t('secondDimension')}
+                    value={draft.secondDimension ?? ''}
+                    onChange={event =>
+                      handleDraftChange(
+                        'secondDimension',
+                        (event.target.value || null) as AnalyticsDraftReport['secondDimension']
+                      )
+                    }
+                    fullWidth
+                  >
+                    {!requiresSecondDimension(draft.chartType) && (
+                      <MenuItem value="">{t('noSecondDimension')}</MenuItem>
+                    )}
+                    {availableSecondDimensions.map(dimension => (
+                      <MenuItem key={dimension} value={dimension}>
+                        {t(`dimensions.${dimension}`)}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                )}
                 <TextField
                   select
                   label={t('measure')}

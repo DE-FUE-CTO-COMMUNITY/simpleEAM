@@ -2304,6 +2304,8 @@
     "elementType": "Type d'élément",
     "chartType": "Type de graphique",
     "dimension": "Dimension",
+    "secondDimension": "Deuxième dimension",
+    "noSecondDimension": "Aucune deuxième dimension",
     "measure": "Mesure",
     "publicReportToggle": "Rendre le rapport visible à toutes les personnes de l'entreprise",
     "publicReport": "Public",
@@ -2349,8 +2351,11 @@
     "emptyPreview": "Aucune donnée analytique n'est encore disponible pour le périmètre actuel.",
     "types": {
       "bar": "Barres",
-      "line": "Ligne",
-      "pie": "Camembert"
+      "groupedBar": "Barres groupées",
+      "pie": "Camembert",
+      "stackedArea": "Aire empilée",
+      "treemap": "Treemap",
+      "sankey": "Sankey"
     },
     "elementTypes": {
       "businessCapability": "Capacité métier",

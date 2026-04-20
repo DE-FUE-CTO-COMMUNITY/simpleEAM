@@ -2304,6 +2304,8 @@
     "elementType": "Element type",
     "chartType": "Chart type",
     "dimension": "Dimension",
+    "secondDimension": "Second dimension",
+    "noSecondDimension": "No second dimension",
     "measure": "Measure",
     "publicReportToggle": "Make report visible to everyone in the company",
     "publicReport": "Public",
@@ -2349,8 +2351,11 @@
     "emptyPreview": "No analytics data available for the current scope yet.",
     "types": {
       "bar": "Bar",
-      "line": "Line",
-      "pie": "Pie"
+      "groupedBar": "Grouped bar",
+      "pie": "Pie",
+      "stackedArea": "Stacked area",
+      "treemap": "Treemap",
+      "sankey": "Sankey"
     },
     "elementTypes": {
       "businessCapability": "Business Capability",
