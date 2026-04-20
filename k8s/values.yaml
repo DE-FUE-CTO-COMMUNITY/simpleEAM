@@ -311,6 +311,13 @@ ai:
     existingSecretClientIdField: clientId
     existingSecretClientSecretField: clientSecret
 
+  analytics:
+    syncUrl: ''
+    scheduleEnabled: 'false'
+    scheduleId: 'analytics-projection-refresh'
+    scheduleInterval: '1 hour'
+    maxConcurrency: '5'
+
   # Temporal
   temporal:
     # Internal gRPC address for Temporal server.

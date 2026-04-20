@@ -7,7 +7,9 @@ import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core'
 import http from 'http'
 
 // Import custom modules
-import { testConnection, closeDriver } from './db/neo4j-client'
+import analyticsRouter from './analytics/routes'
+import { ensureAnalyticsProjectionSchema } from './analytics/clickhouse'
+import { testConnection, closeDriver, neo4jDriver } from './db/neo4j-client'
 import { neoSchema } from './graphql/schema'
 
 // Load environment variables
@@ -16,6 +18,29 @@ dotenv.config()
 // Server port number (by default 4000)
 const PORT = parseInt(process.env.GRAPHQL_INTERNAL_PORT || '4000')
 
+async function normalizeAnalyticsReports() {
+  const session = neo4jDriver.session()
+
+  try {
+    const result = await session.run(
+      `
+        MATCH (report:AnalyticsReport)
+        WHERE report.isPublic IS NULL
+        SET report.isPublic = false
+        RETURN count(report) AS updated
+      `
+    )
+
+    const updated = Number(result.records[0]?.get('updated') ?? 0)
+
+    if (updated > 0) {
+      console.log(`[Analytics] Normalized ${updated} analytics reports with missing isPublic`)
+    }
+  } finally {
+    await session.close()
+  }
+}
+
 async function startServer() {
   // Test Neo4j connection
   const connectionSuccessful = await testConnection()
@@ -23,6 +48,10 @@ async function startServer() {
     console.error('Critical error: Could not establish Neo4j connection.')
     process.exit(1)
   }
+
+  await normalizeAnalyticsReports()
+
+  await ensureAnalyticsProjectionSchema()
 
   // Initialize Express app
   const app = express()
@@ -102,6 +131,7 @@ async function startServer() {
   // Increase body parser limits for large diagram payloads
   app.use(express.json({ limit: '50mb' }))
   app.use(express.urlencoded({ limit: '50mb', extended: true }))
+  app.use('/analytics', analyticsRouter)
 
   // Create GraphQL schema
   const schema = await neoSchema.getSchema()

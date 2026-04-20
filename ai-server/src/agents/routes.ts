@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { verifyToken } from '../auth/auth-jwks'
 import { graphqlRequest } from '../graphql/client'
 import {
+  startAnalyticsProjectionRefreshWorkflow,
   startCoordinatorWorkflow,
   startSovereigntyScoreWorkflow,
   getWorkflowStatus,
@@ -2222,6 +2223,63 @@ aiRunRouter.post('/sovereignty/recalculate', async (req, res) => {
     return res.status(202).json({ workflowId, status: 'CALCULATING' })
   } catch (error) {
     return sendApiError(res, error, { companyId })
+  }
+})
+
+aiRunRouter.post('/ai-runs/analytics-projections', async (req, res) => {
+  const companyId = typeof req.body?.companyId === 'string' ? req.body.companyId.trim() : ''
+
+  try {
+    const decodedToken = await getUserContext(req.headers.authorization)
+    const roles = decodedToken.realm_access?.roles ?? []
+    const isAdmin = roles.includes('admin')
+    const isArchitect = roles.includes('architect')
+
+    if (!isAdmin && !isArchitect) {
+      throw createApiError(
+        403,
+        'FORBIDDEN',
+        'Missing required role for analytics projection refresh'
+      )
+    }
+
+    const companyIds = decodedToken.company_ids ?? []
+    if (companyId && !isAdmin && !companyIds.includes(companyId)) {
+      throw createApiError(403, 'FORBIDDEN', 'No access to selected company')
+    }
+
+    if (!companyId && !isAdmin) {
+      throw createApiError(
+        400,
+        'BAD_REQUEST',
+        'A companyId is required for non-admin analytics projection refresh requests'
+      )
+    }
+
+    const workflowId = companyId
+      ? `analytics-projection-refresh-${companyId}-${Date.now()}`
+      : `analytics-projection-refresh-${Date.now()}`
+
+    await startAnalyticsProjectionRefreshWorkflow({
+      companyId: companyId || null,
+      initiatedBy: decodedToken.sub ?? 'unknown',
+      reason: 'manual',
+      workflowId,
+    })
+
+    console.info('[ANALYTICS][PROJECTION_REFRESH][STARTED]', {
+      companyId: companyId || null,
+      workflowId,
+      initiatedBy: decodedToken.sub ?? 'unknown',
+    })
+
+    return res.status(202).json({
+      workflowId,
+      companyId: companyId || null,
+      status: 'STARTED',
+    })
+  } catch (error) {
+    return sendApiError(res, error, { companyId: companyId || null })
   }
 })
 

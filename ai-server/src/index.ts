@@ -7,6 +7,7 @@ import http from 'http'
 import { isGraphqlReachable } from './graphql/client'
 import { aiRunRouter } from './agents/routes'
 import { seedAgentConfigsAtStartup } from './agents/shared/agent-config'
+import { ensureAnalyticsProjectionRefreshSchedule } from './agents/temporal-client'
 import { fetchServiceAccessToken } from './auth/keycloak-service-token'
 
 dotenv.config()
@@ -43,6 +44,14 @@ async function startAiServer() {
     console.warn(
       '⚠️ Missing or invalid bootstrap client credentials - skipping AgentConfig startup bootstrap'
     )
+  }
+
+  try {
+    await ensureAnalyticsProjectionRefreshSchedule()
+  } catch (error) {
+    console.error('⚠️ Failed to register analytics projection refresh schedule', {
+      error: error instanceof Error ? error.message : String(error),
+    })
   }
 
   const app = express()

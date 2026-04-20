@@ -68,6 +68,11 @@ export function useAiConfig() {
   return config.ai
 }
 
+export function useAnalyticsConfig() {
+  const config = useRuntimeConfig()
+  return config.analytics
+}
+
 export function useExcalidrawConfig() {
   const config = useRuntimeConfig()
   return config.excalidraw

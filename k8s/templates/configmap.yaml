@@ -61,6 +61,11 @@ data:
   TEMPORAL_NAMESPACE: {{ .Values.ai.temporal.namespace | quote }}
   AI_RUN_TASK_QUEUE: {{ .Values.ai.temporal.taskQueue | quote }}
   AI_SERVER_INTERNAL_PORT: {{ .Values.ai.server.port | quote }}
+  ANALYTICS_SYNC_URL: {{ coalesce .Values.ai.analytics.syncUrl (printf "http://%s-server:%d/analytics/projections/sync" (include "nextgen-eam.fullname" .) (int .Values.server.port)) | quote }}
+  ANALYTICS_PROJECTION_SCHEDULE_ENABLED: {{ .Values.ai.analytics.scheduleEnabled | quote }}
+  ANALYTICS_PROJECTION_SCHEDULE_ID: {{ .Values.ai.analytics.scheduleId | quote }}
+  ANALYTICS_PROJECTION_SCHEDULE_INTERVAL: {{ .Values.ai.analytics.scheduleInterval | quote }}
+  ANALYTICS_PROJECTION_MAX_CONCURRENCY: {{ .Values.ai.analytics.maxConcurrency | quote }}
   AI_LLM_URL: {{ .Values.ai.llm.url | quote }}
   AI_LLM_MODEL: {{ .Values.ai.llm.model | quote }}
   AI_LLM_TIMEOUT_MS: {{ .Values.ai.llm.timeoutMs | quote }}

@@ -45,6 +45,9 @@ db/import/
 
 # Docker
 .docker-data/
+.cubestore/
+analytics/clickhouse/data/
+analytics/clickhouse/log/
 
 # IDE und Editoren
 .idea/

@@ -34,6 +34,12 @@ export async function GET() {
       llmUrl: process.env.AI_LLM_URL || '',
     },
 
+    analytics: {
+      enabled: process.env.ANALYTICS_ENABLED !== 'false',
+      apiUrl: process.env.ANALYTICS_API_URL || '',
+      cubeApiUrl: process.env.ANALYTICS_CUBE_API_URL || '',
+    },
+
     // Excalidraw Collaboration
     excalidraw: {
       wsServerUrl: process.env.EXCALIDRAW_WS_SERVER_URL || 'http://localhost:3002',

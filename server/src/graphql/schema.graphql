@@ -513,6 +513,115 @@ type Person
   ownedGEAValues: [GEA_Value!]! @relationship(type: "OWNED_BY", direction: IN)
   ownedGEAGoals: [GEA_Goal!]! @relationship(type: "OWNED_BY", direction: IN)
   ownedGEAStrategies: [GEA_Strategy!]! @relationship(type: "OWNED_BY", direction: IN)
+  createdAnalyticsReports: [AnalyticsReport!]! @relationship(type: "CREATED_BY", direction: IN)
+  createdAnalyticsReportFolders: [ReportFolder!]! @relationship(type: "CREATED_BY", direction: IN)
+}
+
+"""
+ReportFolder - organizes analytics reports within a company
+"""
+type ReportFolder
+  @node
+  @authorization(
+    validate: [
+      { operations: [CREATE], where: { jwt: { roles: { includes: "architect" } } } }
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "admin" } } } }
+      {
+        operations: [UPDATE, DELETE]
+        where: {
+          AND: [
+            { jwt: { roles: { includes: "architect" } } }
+            { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+            { node: { createdBy: { some: { email: { eq: "$jwt.email" } } } } }
+          ]
+        }
+      }
+    ]
+    filter: [
+      {
+        where: {
+          OR: [
+            { jwt: { roles: { includes: "admin" } } }
+            { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+          ]
+        }
+      }
+    ]
+  ) {
+  id: ID! @id
+  name: String!
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime @timestamp(operations: [UPDATE])
+  createdBy: [Person!]! @relationship(type: "CREATED_BY", direction: OUT)
+  company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
+  parent: [ReportFolder!]! @relationship(type: "HAS_CHILD_FOLDER", direction: IN)
+  children: [ReportFolder!]! @relationship(type: "HAS_CHILD_FOLDER", direction: OUT)
+  reports: [AnalyticsReport!]! @relationship(type: "IN_FOLDER", direction: IN)
+}
+
+"""
+AnalyticsReport - represents a saved analytics report definition
+"""
+type AnalyticsReport
+  @node
+  @authorization(
+    validate: [
+      { operations: [CREATE], where: { jwt: { roles: { includes: "architect" } } } }
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "admin" } } } }
+      {
+        operations: [UPDATE, DELETE]
+        where: {
+          AND: [
+            { jwt: { roles: { includes: "architect" } } }
+            { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+            { node: { createdBy: { some: { email: { eq: "$jwt.email" } } } } }
+          ]
+        }
+      }
+    ]
+    filter: [
+      {
+        where: {
+          OR: [
+            {
+              AND: [{ jwt: { roles: { includes: "admin" } } }, { node: { isPublic: { eq: true } } }]
+            }
+            {
+              AND: [
+                { jwt: { roles: { includes: "admin" } } }
+                { node: { createdBy: { some: { email: { eq: "$jwt.email" } } } } }
+              ]
+            }
+            {
+              AND: [
+                { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+                { node: { isPublic: { eq: true } } }
+              ]
+            }
+            {
+              AND: [
+                { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+                { node: { createdBy: { some: { email: { eq: "$jwt.email" } } } } }
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  ) {
+  id: ID! @id
+  name: String!
+  isPublic: Boolean!
+  elementType: String!
+  chartType: String!
+  dimension: String!
+  secondDimension: String
+  measure: String!
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime @timestamp(operations: [UPDATE])
+  createdBy: [Person!]! @relationship(type: "CREATED_BY", direction: OUT)
+  company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
+  folder: [ReportFolder!]! @relationship(type: "IN_FOLDER", direction: OUT)
 }
 
 """
@@ -1348,6 +1457,8 @@ type Company
   employees: [Person!]! @relationship(type: "EMPLOYED_BY", direction: IN)
   ownedArchitectures: [Architecture!]! @relationship(type: "OWNED_BY", direction: IN)
   ownedDiagrams: [Diagram!]! @relationship(type: "OWNED_BY", direction: IN)
+  analyticsReports: [AnalyticsReport!]! @relationship(type: "OWNED_BY", direction: IN)
+  analyticsReportFolders: [ReportFolder!]! @relationship(type: "OWNED_BY", direction: IN)
   ownedArchitecturePrinciples: [ArchitecturePrinciple!]!
     @relationship(type: "OWNED_BY", direction: IN)
   ownedSuppliers: [Supplier!]! @relationship(type: "OWNED_BY", direction: IN)
