@@ -5,6 +5,28 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 
+const acceptedClientIds = [
+  process.env.KEYCLOAK_CLIENT_ID_SERVER,
+  process.env.KEYCLOAK_CLIENT_ID_CLIENT,
+].filter((value): value is string => Boolean(value))
+
+const hasAcceptedAudience = (decoded: jwt.JwtPayload): boolean => {
+  if (acceptedClientIds.length === 0) {
+    return true
+  }
+
+  const audiences = Array.isArray(decoded.aud)
+    ? decoded.aud
+    : typeof decoded.aud === 'string'
+      ? [decoded.aud]
+      : []
+  const authorizedParty = typeof decoded.azp === 'string' ? decoded.azp : null
+
+  return acceptedClientIds.some(
+    clientId => audiences.includes(clientId) || authorizedParty === clientId
+  )
+}
+
 // JWKS client for Keycloak
 const client = jwksClient({
   jwksUri: `${process.env.KEYCLOAK_URL}/realms/${process.env.KEYCLOAK_REALM}/protocol/openid-connect/certs`,
@@ -82,7 +104,6 @@ export const verifyToken = async (token: string): Promise<jwt.JwtPayload | null>
       token,
       getKey,
       {
-        audience: process.env.KEYCLOAK_CLIENT_ID_SERVER,
         issuer: `${process.env.KEYCLOAK_URL}/realms/${process.env.KEYCLOAK_REALM}`,
         algorithms: ['RS256'],
       },
@@ -91,7 +112,18 @@ export const verifyToken = async (token: string): Promise<jwt.JwtPayload | null>
           console.error('Token verification error:', err)
           return resolve(null)
         }
-        resolve(decoded as jwt.JwtPayload)
+
+        const payload = decoded as jwt.JwtPayload
+        if (!hasAcceptedAudience(payload)) {
+          console.error('Token verification error: JWT audience/azp invalid', {
+            aud: payload.aud,
+            azp: payload.azp,
+            expected: acceptedClientIds,
+          })
+          return resolve(null)
+        }
+
+        resolve(payload)
       }
     )
   })
