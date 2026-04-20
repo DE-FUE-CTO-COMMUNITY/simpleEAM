@@ -20,6 +20,15 @@ type BusinessCapability
     validate: [
       { operations: [CREATE], where: { jwt: { roles: { includes: "architect" } } } }
       {
+        operations: [UPDATE]
+        where: {
+          AND: [
+            { jwt: { roles: { includes: "company-admin" } } }
+            { node: { id_IN: "$jwt.company_ids" } }
+          ]
+        }
+      }
+      {
         operations: [UPDATE, DELETE]
         where: {
           AND: [

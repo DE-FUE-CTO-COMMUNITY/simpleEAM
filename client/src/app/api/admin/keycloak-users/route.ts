@@ -2,7 +2,15 @@ import { NextRequest, NextResponse } from 'next/server'
 import { withAuth } from '../../../../lib/auth-middleware'
 
 // Available roles in the system
-const AVAILABLE_ROLES = ['viewer', 'architect', 'admin']
+const AVAILABLE_ROLES = ['viewer', 'architect', 'company-admin', 'admin']
+
+const ROLE_DESCRIPTIONS: Record<string, string> = {
+  viewer: 'Betrachter mit Leserechten',
+  architect: 'Enterprise Architekt mit Bearbeitungsrechten',
+  'company-admin':
+    'Unternehmensadministrator mit Zugriff auf zugewiesene Unternehmenseinstellungen',
+  admin: 'Administrator mit vollen Zugriffsrechten',
+}
 
 // API Route for Keycloak Admin operations
 export const GET = withAuth(async (request: NextRequest) => {
@@ -119,6 +127,7 @@ export const POST = withAuth(async (request: NextRequest) => {
   try {
     const body = await request.json()
     const { action, userId, userData } = body
+    let createdUserId: string | null = null
 
     // Extract role from userData and remove (only for create/update)
     let role = null
@@ -191,6 +200,8 @@ export const POST = withAuth(async (request: NextRequest) => {
             // Extract user ID from Location header
             const location = apiResponse.headers.get('location')
             const extractedUserId = location?.split('/').pop()
+
+            createdUserId = extractedUserId || null
 
             if (extractedUserId) {
               // Assign role to user
@@ -340,7 +351,11 @@ export const POST = withAuth(async (request: NextRequest) => {
 
     // 201 Created for successful creates (often without JSON body)
     if (apiResponse.status === 201) {
-      return NextResponse.json({ success: true, message: 'User created successfully' })
+      return NextResponse.json({
+        success: true,
+        message: 'User created successfully',
+        userId: createdUserId,
+      })
     }
 
     // Only parse JSON if content is present
@@ -409,6 +424,8 @@ async function assignRoleToUser(
     }
   }
 
+  await ensureRealmRoleExists(keycloakUrl, realm, adminToken, roleName)
+
   // Fetch role details
   const roleResponse = await fetch(`${keycloakUrl}/admin/realms/${realm}/roles/${roleName}`, {
     headers: {
@@ -438,5 +455,48 @@ async function assignRoleToUser(
 
   if (!assignResponse.ok) {
     throw new Error(`Fehler beim Zuweisen der Rolle ${roleName}`)
+  }
+}
+
+async function ensureRealmRoleExists(
+  keycloakUrl: string,
+  realm: string,
+  adminToken: string,
+  roleName: string
+) {
+  const roleResponse = await fetch(`${keycloakUrl}/admin/realms/${realm}/roles/${roleName}`, {
+    headers: {
+      Authorization: `Bearer ${adminToken}`,
+      'Content-Type': 'application/json',
+    },
+  })
+
+  if (roleResponse.ok) {
+    return
+  }
+
+  if (roleResponse.status !== 404) {
+    throw new Error(`Fehler beim Prüfen der Rolle ${roleName}`)
+  }
+
+  if (!AVAILABLE_ROLES.includes(roleName)) {
+    throw new Error(`Unbekannte Rolle ${roleName}`)
+  }
+
+  const createResponse = await fetch(`${keycloakUrl}/admin/realms/${realm}/roles`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${adminToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      name: roleName,
+      description: ROLE_DESCRIPTIONS[roleName] || roleName,
+    }),
+  })
+
+  if (!createResponse.ok && createResponse.status !== 409) {
+    const errorText = await createResponse.text()
+    throw new Error(`Fehler beim Erstellen der Rolle ${roleName}: ${errorText}`)
   }
 }

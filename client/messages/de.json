@@ -2561,6 +2561,15 @@
       "noAdminPermission": "Keine Admin-Berechtigung vorhanden.",
       "createErrorWithStatus": "Fehler beim Erstellen: {status}",
       "updateErrorWithStatus": "Fehler beim Aktualisieren: {status}",
+      "personSync": {
+        "emailRequired": "Für die Synchronisierung der Person ist eine gültige E-Mail-Adresse erforderlich.",
+        "verificationFailed": "Die Personensynchronisierung für {email} konnte nicht verifiziert werden.",
+        "duplicateConflict": "Für {email} wurden mehrere Personensätze gefunden. Die automatische Bereinigung wurde gestoppt, weil mindestens ein Duplikat noch verknüpfte Daten hat. Gefundene Datensätze: {count}.",
+        "createFailed": "Die Benutzererstellung wurde zurückgerollt, weil die Personensynchronisierung fehlgeschlagen ist: {reason}",
+        "createRollbackFailed": "Der Benutzer wurde in Keycloak erstellt, aber die Personensynchronisierung und der Rollback sind fehlgeschlagen: {reason}. Rollback-Fehler: {rollbackReason}",
+        "updateFailed": "Der Benutzer wurde in Keycloak gespeichert, aber die Personensynchronisierung ist fehlgeschlagen: {reason}",
+        "rollbackFailed": "Der Rollback des teilweise erstellten Keycloak-Benutzers ist fehlgeschlagen."
+      },
       "searchPlaceholder": "Benutzer suchen...",
       "noUsersFound": "Keine Benutzer gefunden",
       "loadingError": "Fehler beim Laden der Keycloak-Benutzer",
@@ -2590,6 +2599,7 @@
       },
       "roles": {
         "admin": "Administrator",
+        "companyAdmin": "Unternehmensadministrator",
         "architect": "Architekt",
         "viewer": "Betrachter"
       },
@@ -2621,6 +2631,7 @@
         },
         "roleLabels": {
           "admin": "Administrator",
+          "companyAdmin": "Unternehmensadministrator",
           "architect": "Architekt",
           "viewer": "Betrachter"
         }

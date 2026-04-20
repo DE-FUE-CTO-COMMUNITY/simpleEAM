@@ -42,6 +42,7 @@ interface CompanyTableProps {
   onColumnVisibilityChange?: (
     updater: VisibilityState | ((old: VisibilityState) => VisibilityState)
   ) => void
+  canEdit?: boolean
 }
 
 const CompanyTableWithGenericTable: React.FC<CompanyTableProps> = ({
@@ -54,6 +55,7 @@ const CompanyTableWithGenericTable: React.FC<CompanyTableProps> = ({
   onUpdateCompany,
   onDeleteCompany,
   onTableReady,
+  canEdit = false,
   // columnVisibility: _externalColumnVisibility,
   // onColumnVisibilityChange: _externalOnColumnVisibilityChange,
 }) => {
@@ -194,6 +196,7 @@ const CompanyTableWithGenericTable: React.FC<CompanyTableProps> = ({
       columnVisibility={columnVisibility}
       onColumnVisibilityChange={onColumnVisibilityChange}
       onTableReady={handleTableReady}
+      canEdit={canEdit}
     />
   )
 }

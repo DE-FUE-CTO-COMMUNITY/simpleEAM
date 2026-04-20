@@ -8,7 +8,20 @@ import GenericForm, { FieldConfig } from '@/components/common/GenericForm'
 import { KeycloakUser } from '@/lib/keycloak-types'
 
 // Available roles
-const AVAILABLE_ROLES = ['viewer', 'architect', 'admin'] as const
+const AVAILABLE_ROLES = ['viewer', 'architect', 'company-admin', 'admin'] as const
+
+const getRoleTranslationKey = (role: (typeof AVAILABLE_ROLES)[number]) => {
+  switch (role) {
+    case 'company-admin':
+      return 'companyAdmin'
+    case 'admin':
+      return 'admin'
+    case 'architect':
+      return 'architect'
+    case 'viewer':
+      return 'viewer'
+  }
+}
 
 type UserFormData = {
   username: string
@@ -156,7 +169,7 @@ export default function UserFormDialog({
       required: true,
       options: AVAILABLE_ROLES.map(role => ({
         value: role,
-        label: t(`roleLabels.${role}` as any),
+        label: t(`roleLabels.${getRoleTranslationKey(role)}` as any),
       })),
       size: { xs: 12, md: 6 },
     },

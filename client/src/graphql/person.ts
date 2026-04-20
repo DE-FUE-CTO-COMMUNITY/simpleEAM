@@ -149,6 +149,54 @@ export const GET_PERSON_BY_EMAIL = gql`
       }
       createdAt
       updatedAt
+      ownedCapabilities {
+        id
+      }
+      ownedApplications {
+        id
+      }
+      ownedDataObjects {
+        id
+      }
+      ownedArchitectures {
+        id
+      }
+      ownedDiagrams {
+        id
+      }
+      ownedInfrastructure {
+        id
+      }
+      ownedInterfaces {
+        id
+      }
+      ownedAIComponents {
+        id
+      }
+      ownedBusinessProcesses {
+        id
+      }
+      ownedGEAVisions {
+        id
+      }
+      ownedGEAMissions {
+        id
+      }
+      ownedGEAValues {
+        id
+      }
+      ownedGEAGoals {
+        id
+      }
+      ownedGEAStrategies {
+        id
+      }
+      createdAnalyticsReports {
+        id
+      }
+      createdAnalyticsReportFolders {
+        id
+      }
     }
   }
 `

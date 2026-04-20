@@ -2614,6 +2614,15 @@
       "noAdminPermission": "No admin permission.",
       "createErrorWithStatus": "Create failed: {status}",
       "updateErrorWithStatus": "Update failed: {status}",
+      "personSync": {
+        "emailRequired": "A valid email address is required to synchronize the person record.",
+        "verificationFailed": "Person synchronization could not be verified for {email}.",
+        "duplicateConflict": "Multiple person records were found for {email}. Automatic cleanup stopped because at least one duplicate still has linked data. Records found: {count}.",
+        "createFailed": "User creation was rolled back because person synchronization failed: {reason}",
+        "createRollbackFailed": "User was created in Keycloak, but person synchronization failed and rollback also failed: {reason}. Rollback error: {rollbackReason}",
+        "updateFailed": "User was saved in Keycloak, but person synchronization failed: {reason}",
+        "rollbackFailed": "Rollback of the partially created Keycloak user failed."
+      },
       "searchPlaceholder": "Search users...",
       "noUsersFound": "No users found",
       "loadingError": "Error loading Keycloak users",
@@ -2647,6 +2656,7 @@
       },
       "roles": {
         "admin": "Administrator",
+        "companyAdmin": "Company Admin",
         "architect": "Architect",
         "viewer": "Viewer"
       },
@@ -2678,6 +2688,7 @@
         },
         "roleLabels": {
           "admin": "Administrator",
+          "companyAdmin": "Company Admin",
           "architect": "Architect",
           "viewer": "Viewer"
         }

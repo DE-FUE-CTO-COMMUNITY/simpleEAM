@@ -63,6 +63,7 @@ interface GenericTableProps<TData, TFormValues> {
     updater: VisibilityState | ((old: VisibilityState) => VisibilityState)
   ) => void
   onTableReady?: (table: any) => void
+  canEdit?: boolean
 }
 
 /**
@@ -88,6 +89,7 @@ export function GenericTable<T, F>({
   columnVisibility: _columnVisibility,
   onColumnVisibilityChange: _onColumnVisibilityChange,
   onTableReady,
+  canEdit = isArchitect(),
 }: GenericTableProps<T, F>) {
   const t = useTranslations('common')
   // State for das Formular-Dialog
@@ -245,7 +247,7 @@ export function GenericTable<T, F>({
               <VisibilityIcon fontSize={isMobile ? 'medium' : 'small'} />
             </IconButton>
           </Tooltip>
-          {isArchitect() && (
+          {canEdit && (
             <Tooltip title={t('edit')}>
               <IconButton
                 size={isMobile ? 'medium' : 'small'}
@@ -269,7 +271,7 @@ export function GenericTable<T, F>({
     }
 
     return [...columns, actionColumn]
-  }, [columns, handleViewItemClick, handleEditItemClick, getIdFromData, isMobile, t])
+  }, [columns, handleViewItemClick, handleEditItemClick, getIdFromData, isMobile, t, canEdit])
 
   // TanStack Table initialisieren
   const table = useReactTable({

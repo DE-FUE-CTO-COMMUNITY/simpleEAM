@@ -2613,6 +2613,15 @@
       "noAdminPermission": "Aucune autorisation d'administrateur.",
       "createErrorWithStatus": "Échec de la création : {status}",
       "updateErrorWithStatus": "Échec de la mise à jour : {status}",
+      "personSync": {
+        "emailRequired": "Une adresse e-mail valide est requise pour synchroniser la fiche personne.",
+        "verificationFailed": "La synchronisation de la personne n'a pas pu être vérifiée pour {email}.",
+        "duplicateConflict": "Plusieurs fiches personne ont été trouvées pour {email}. Le nettoyage automatique a été interrompu, car au moins un doublon contient encore des données liées. Enregistrements trouvés : {count}.",
+        "createFailed": "La création de l'utilisateur a été annulée parce que la synchronisation de la personne a échoué : {reason}",
+        "createRollbackFailed": "L'utilisateur a été créé dans Keycloak, mais la synchronisation de la personne et le rollback ont échoué : {reason}. Erreur de rollback : {rollbackReason}",
+        "updateFailed": "L'utilisateur a été enregistré dans Keycloak, mais la synchronisation de la personne a échoué : {reason}",
+        "rollbackFailed": "Le rollback de l'utilisateur Keycloak partiellement créé a échoué."
+      },
       "searchPlaceholder": "Rechercher des utilisateurs...",
       "noUsersFound": "Aucun utilisateur trouvé",
       "loadingError": "Erreur lors du chargement des utilisateurs Keycloak",
@@ -2646,6 +2655,7 @@
       },
       "roles": {
         "admin": "Administrateur",
+        "companyAdmin": "Administrateur d'entreprise",
         "architect": "Architecte",
         "viewer": "Téléspectateur"
       },
@@ -2677,6 +2687,7 @@
         },
         "roleLabels": {
           "admin": "Administrateur",
+          "companyAdmin": "Administrateur d'entreprise",
           "architect": "Architecte",
           "viewer": "Téléspectateur"
         }

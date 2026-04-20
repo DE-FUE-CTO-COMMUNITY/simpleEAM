@@ -124,6 +124,30 @@ spec:
                 echo "Synchronized WebAuthn passkey policy for realm ${KC_REALM}"
               }
 
+              ensure_realm_role() {
+                role_name="$1"
+                role_description="$2"
+
+                if /opt/keycloak/bin/kcadm.sh get "roles/${role_name}" -r "$KC_REALM" >/dev/null 2>&1; then
+                  /opt/keycloak/bin/kcadm.sh update "roles/${role_name}" -r "$KC_REALM" \
+                    -s "name=${role_name}" \
+                    -s "description=${role_description}"
+                  echo "Updated realm role ${role_name}"
+                else
+                  /opt/keycloak/bin/kcadm.sh create roles -r "$KC_REALM" \
+                    -s "name=${role_name}" \
+                    -s "description=${role_description}"
+                  echo "Created realm role ${role_name}"
+                fi
+              }
+
+              ensure_realm_roles() {
+                ensure_realm_role "admin" "Administrator mit vollen Zugriffsrechten"
+                ensure_realm_role "architect" "Enterprise Architekt mit Bearbeitungsrechten"
+                ensure_realm_role "company-admin" "Unternehmensadministrator mit Zugriff auf zugewiesene Unternehmenseinstellungen"
+                ensure_realm_role "viewer" "Betrachter mit Leserechten"
+              }
+
               ensure_realm_admin_user() {
                 realm_admin_id="$(/opt/keycloak/bin/kcadm.sh get users -r "$KC_REALM" -q username=admin --fields id --format csv --noquotes 2>/dev/null | head -n1)"
 
@@ -147,6 +171,7 @@ spec:
               sync_client_urls "$SERVER_CLIENT_ID" "$API_PUBLIC_HOST" "http://localhost:4000"
               sync_client_urls "$CLIENT_CLIENT_ID" "$CLIENT_PUBLIC_HOST" "http://localhost:3000"
               sync_webauthn_passkey_policy
+              ensure_realm_roles
               ensure_realm_admin_user
           volumeMounts:
             - name: realm-bootstrap

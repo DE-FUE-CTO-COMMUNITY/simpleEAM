@@ -6,7 +6,7 @@ import { Add as AddIcon } from '@mui/icons-material'
 import { useQuery, useMutation } from '@apollo/client'
 import { useSnackbar } from 'notistack'
 import { useTranslations } from 'next-intl'
-import { isAdmin } from '@/lib/auth'
+import { canManageCompanies, isAdmin } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 
 import { GET_COMPANIES, CREATE_COMPANY, UPDATE_COMPANY, DELETE_COMPANY } from '@/graphql/company'
@@ -34,7 +34,7 @@ const CompaniesPage = () => {
   // Admin guard similar to admin page
   const [isAuthorized, setIsAuthorized] = React.useState(false)
   React.useEffect(() => {
-    if (!isAdmin()) {
+    if (!canManageCompanies()) {
       redirect('/')
     } else {
       setIsAuthorized(true)
@@ -42,6 +42,7 @@ const CompaniesPage = () => {
   }, [])
   const t = useTranslations('companies')
   const { enqueueSnackbar } = useSnackbar()
+  const userIsAdmin = isAdmin()
   const [globalFilter, setGlobalFilter] = useState<string>('')
   const [sorting, setSorting] = useState([{ id: 'name', desc: false }])
 
@@ -176,7 +177,7 @@ const CompaniesPage = () => {
         <Typography variant="h4" component="h1">
           {t('title')}
         </Typography>
-        {isAdmin() && (
+        {userIsAdmin && (
           <Button
             variant="contained"
             color="primary"
@@ -207,10 +208,11 @@ const CompaniesPage = () => {
             globalFilter={globalFilter}
             sorting={sorting}
             onSortingChange={setSorting}
+            canEdit={isAuthorized}
             onUpdateCompany={async (companyId, data) => {
               await handleUpdateCompany({ id: companyId } as CompanyType, data)
             }}
-            onDeleteCompany={handleDeleteCompany}
+            onDeleteCompany={userIsAdmin ? handleDeleteCompany : undefined}
           />
         </Paper>
       </Card>
@@ -231,7 +233,7 @@ const CompaniesPage = () => {
       )}
 
       {/* Company Create Form */}
-      {showNewCompanyForm && (
+      {userIsAdmin && showNewCompanyForm && (
         <CompanyForm
           isOpen={showNewCompanyForm}
           onClose={() => setShowNewCompanyForm(false)}

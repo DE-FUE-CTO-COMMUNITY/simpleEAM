@@ -44,7 +44,7 @@ import {
 } from '@/components/icons'
 import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { login, useAuth, isAdmin, isArchitect } from '@/lib/auth'
+import { login, useAuth, isAdmin, isArchitect, canManageCompanies } from '@/lib/auth'
 import { useLensSelection, type LensKey } from '@/lib/lens-settings'
 import { useFeatureFlags } from '@/lib/feature-flags'
 import { useCompanyContext } from '@/contexts/CompanyContext'
@@ -97,6 +97,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
   // so we use `authenticated` as the dependency to recompute when auth state changes.
   const userIsAdmin = initialized && authenticated ? isAdmin() : false
   const userIsArchitect = initialized && authenticated ? isArchitect() : false
+  const userCanManageCompanies = initialized && authenticated ? canManageCompanies() : false
 
   const handleDrawerToggle = () => {
     setOpen(!open)
@@ -380,7 +381,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
     // Abschnitt: Organisation & Personen
     { isDivider: true, text: 'divider', icon: null },
     // Companies management only visible for admins
-    ...(initialized && userIsAdmin
+    ...(initialized && userCanManageCompanies
       ? [{ text: t('companies'), icon: <CompanyIcon />, href: '/companies' }]
       : []),
     // Suppliers visible for all users when SUP feature is enabled

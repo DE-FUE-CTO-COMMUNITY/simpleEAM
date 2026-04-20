@@ -161,6 +161,10 @@
         "description": "Enterprise Architekt mit Bearbeitungsrechten"
       },
       {
+        "name": "company-admin",
+        "description": "Unternehmensadministrator mit Zugriff auf zugewiesene Unternehmenseinstellungen"
+      },
+      {
         "name": "viewer",
         "description": "Betrachter mit Leserechten"
       }

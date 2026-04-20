@@ -426,6 +426,20 @@ export const isAdmin = (): boolean => {
 }
 
 /**
+ * Checks if user has company admin rights
+ */
+export const isCompanyAdmin = (): boolean => {
+  return hasRole('company-admin')
+}
+
+/**
+ * Checks if user can manage company settings
+ */
+export const canManageCompanies = (): boolean => {
+  return isAdmin() || isCompanyAdmin()
+}
+
+/**
  * Checks if user has architect rights
  */
 export const isArchitect = (): boolean => {
@@ -436,7 +450,7 @@ export const isArchitect = (): boolean => {
  * Checks if user has only viewer rights
  */
 export const isViewer = (): boolean => {
-  return hasRole('viewer') && !isArchitect() && !isAdmin()
+  return hasRole('viewer') && !isArchitect() && !isAdmin() && !isCompanyAdmin()
 }
 
 /**
