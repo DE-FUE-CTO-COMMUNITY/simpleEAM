@@ -48,6 +48,8 @@ db/import/
 .cubestore/
 analytics/clickhouse/data/
 analytics/clickhouse/log/
+analytics/cubestore/data/
+analytics/cubestore/remote/
 
 # IDE und Editoren
 .idea/
