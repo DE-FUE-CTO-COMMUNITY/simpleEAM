@@ -152,8 +152,11 @@ The `TEMPORAL_ADDRESS` is automatically set to the internal service DNS name `<r
 ## Upgrade
 
 ```bash
+yarn sync:cube-schema
 helm upgrade nextgen-eam . -f my-values.yaml -n nextgen-eam
 ```
+
+The Helm chart packages its Cube schema from `k8s/files/cube`, which is generated from the canonical source in `analytics/cube`. Run `yarn sync:cube-schema` before packaging or upgrading the chart after Cube model changes.
 
 ## Uninstall
 
@@ -172,6 +175,8 @@ k8s/
 ├── realm-export.json               # Keycloak realm bootstrap
 ├── .helmignore
 ├── README.md
+├── files/
+│   └── cube/                       # Generated from analytics/cube via yarn sync:cube-schema
 └── templates/
     ├── _helpers.tpl                # Named templates / helpers
     ├── configmap.yaml              # Non-secret environment config
