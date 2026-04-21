@@ -1,5 +1,5 @@
-import { graphqlRequest } from '../../graphql/client'
-import { fetchServiceAccessToken } from '../../auth/keycloak-service-token'
+import { fetchServiceAccessToken } from '../auth/keycloak-service-token'
+import { graphqlRequest } from '../graphql/client'
 import { AnalyticsProjectionCompany, AnalyticsProjectionSyncResult } from '../types'
 
 const COMPANY_BATCH_SIZE = 200

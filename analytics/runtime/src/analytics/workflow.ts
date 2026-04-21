@@ -1,4 +1,5 @@
 import { proxyActivities } from '@temporalio/workflow'
+
 import {
   AnalyticsProjectionCompany,
   AnalyticsProjectionRefreshWorkflowInput,

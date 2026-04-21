@@ -1,0 +1,25 @@
+{
+  "name": "nextgen-eam-analytics-runtime",
+  "version": "1.3.3",
+  "description": "Analytics refresh scheduler and Temporal worker for NextGen EAM",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "scripts": {
+    "preinstall": "node -e \"if(process.env.npm_execpath && process.env.npm_execpath.indexOf('yarn') === -1) throw new Error('⚠️ Please use yarn for this project!')\"",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "analytics:worker": "node dist/analytics-worker.js",
+    "test": "echo \"No analytics runtime tests configured\""
+  },
+  "packageManager": "yarn@4.9.1",
+  "dependencies": {
+    "@temporalio/client": "^1.11.6",
+    "@temporalio/worker": "^1.11.6",
+    "@temporalio/workflow": "^1.11.6",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.2",
+    "typescript": "^5.2.2"
+  }
+}

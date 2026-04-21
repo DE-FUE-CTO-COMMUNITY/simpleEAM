@@ -54,6 +54,10 @@ services:
       - AUTH_DEBUG=${AUTH_DEBUG}
       - NEO4J_DEBUG=${NEO4J_DEBUG}
       - NEO4J_LOG_LEVEL=${NEO4J_LOG_LEVEL}
+      - TEMPORAL_ADDRESS=${TEMPORAL_ADDRESS:-temporal:7233}
+      - TEMPORAL_NAMESPACE=${TEMPORAL_NAMESPACE:-default}
+      - ANALYTICS_PROJECTION_TASK_QUEUE=${ANALYTICS_PROJECTION_TASK_QUEUE:-nextgen-eam-analytics}
+      - ANALYTICS_PROJECTION_MAX_CONCURRENCY=${ANALYTICS_PROJECTION_MAX_CONCURRENCY:-5}
       - CLICKHOUSE_URL=${CLICKHOUSE_URL:-http://clickhouse:8123}
       - CLICKHOUSE_DB=${CLICKHOUSE_DB:-nextgen_analytics}
       - CLICKHOUSE_USER=${CLICKHOUSE_USER:-default}
@@ -114,12 +118,6 @@ services:
       - TEMPORAL_ADDRESS=${TEMPORAL_ADDRESS:-temporal:7233}
       - TEMPORAL_NAMESPACE=${TEMPORAL_NAMESPACE:-default}
       - AI_RUN_TASK_QUEUE=${AI_RUN_TASK_QUEUE:-nextgen-eam-ai}
-      - ANALYTICS_SYNC_URL=${ANALYTICS_SYNC_URL:-http://server:${GRAPHQL_INTERNAL_PORT}/analytics/projections/sync}
-      - ANALYTICS_PROJECTION_SCHEDULE_ENABLED=${ANALYTICS_PROJECTION_SCHEDULE_ENABLED:-false}
-      - ANALYTICS_PROJECTION_SCHEDULE_ID=${ANALYTICS_PROJECTION_SCHEDULE_ID:-analytics-projection-refresh}
-      - ANALYTICS_PROJECTION_SCHEDULE_INTERVAL=${ANALYTICS_PROJECTION_SCHEDULE_INTERVAL:-1
-        hour}
-      - ANALYTICS_PROJECTION_MAX_CONCURRENCY=${ANALYTICS_PROJECTION_MAX_CONCURRENCY:-5}
       - AI_LLM_URL=${AI_LLM_URL:-}
       - AI_LLM_MODEL=${AI_LLM_MODEL:-mistral-7b-instruct-v0.3}
       - AI_LLM_API_KEY=${AI_LLM_API_KEY:-}
@@ -154,6 +152,58 @@ services:
       - "traefik.http.services.${COMPOSE_PROJECT_NAME:-nextgen-eam}-ai.loadbala\
         ncer.server.port=${AI_SERVER_INTERNAL_PORT}"
       - "traefik.docker.network=${TRAEFIK_NETWORK}"
+
+  # Analytics scheduler
+  analytics-scheduler:
+    build:
+      context: .
+      dockerfile: analytics/runtime/Dockerfile
+      args:
+        NODE_ENV: ${NODE_ENV}
+    restart: unless-stopped
+    depends_on:
+      - temporal
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - TEMPORAL_ADDRESS=${TEMPORAL_ADDRESS:-temporal:7233}
+      - TEMPORAL_NAMESPACE=${TEMPORAL_NAMESPACE:-default}
+      - ANALYTICS_PROJECTION_TASK_QUEUE=${ANALYTICS_PROJECTION_TASK_QUEUE:-nextgen-eam-analytics}
+      - ANALYTICS_PROJECTION_SCHEDULE_ENABLED=${ANALYTICS_PROJECTION_SCHEDULE_ENABLED:-false}
+      - ANALYTICS_PROJECTION_SCHEDULE_ID=${ANALYTICS_PROJECTION_SCHEDULE_ID:-analytics-projection-refresh}
+      - ANALYTICS_PROJECTION_SCHEDULE_INTERVAL=${ANALYTICS_PROJECTION_SCHEDULE_INTERVAL:-1
+        hour}
+      - ANALYTICS_PROJECTION_MAX_CONCURRENCY=${ANALYTICS_PROJECTION_MAX_CONCURRENCY:-5}
+      - ANALYTICS_PROJECTION_SCHEDULE_RECONCILE_MS=${ANALYTICS_PROJECTION_SCHEDULE_RECONCILE_MS:-300000}
+    networks:
+      - eam-network
+
+  # Analytics worker executes projection refresh workflows on a dedicated queue
+  analytics-worker:
+    build:
+      context: .
+      dockerfile: analytics/runtime/Dockerfile
+      args:
+        NODE_ENV: ${NODE_ENV}
+    restart: unless-stopped
+    depends_on:
+      - server
+      - temporal
+    entrypoint: [ "yarn" ]
+    command: [ "analytics:worker" ]
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - GRAPHQL_INTERNAL_URL=http://server:${GRAPHQL_INTERNAL_PORT}/graphql
+      - KEYCLOAK_URL=${KEYCLOAK_URL}
+      - KEYCLOAK_REALM=${KEYCLOAK_REALM}
+      - KEYCLOAK_CLIENT_ID_SERVER=${KEYCLOAK_CLIENT_ID_SERVER}
+      - AI_AGENT_CONFIG_BOOTSTRAP_CLIENT_ID=${AI_AGENT_CONFIG_BOOTSTRAP_CLIENT_ID:-}
+      - AI_AGENT_CONFIG_BOOTSTRAP_CLIENT_SECRET=${AI_AGENT_CONFIG_BOOTSTRAP_CLIENT_SECRET:-}
+      - TEMPORAL_ADDRESS=${TEMPORAL_ADDRESS:-temporal:7233}
+      - TEMPORAL_NAMESPACE=${TEMPORAL_NAMESPACE:-default}
+      - ANALYTICS_PROJECTION_TASK_QUEUE=${ANALYTICS_PROJECTION_TASK_QUEUE:-nextgen-eam-analytics}
+      - ANALYTICS_SYNC_URL=${ANALYTICS_SYNC_URL:-http://server:${GRAPHQL_INTERNAL_PORT}/analytics/projections/sync}
+    networks:
+      - eam-network
 
   # Keycloak for authentication
   keycloak:
@@ -241,8 +291,6 @@ services:
   temporal-db:
     image: postgres:15
     restart: unless-stopped
-    profiles:
-      - ai
     environment:
       - POSTGRES_DB=${TEMPORAL_DB_NAME:-temporal}
       - POSTGRES_USER=${TEMPORAL_DB_USER:-temporal}
@@ -266,8 +314,6 @@ services:
   temporal:
     image: temporalio/auto-setup:1.24.2
     restart: unless-stopped
-    profiles:
-      - ai
     depends_on:
       temporal-db:
         condition: service_healthy
@@ -286,8 +332,6 @@ services:
   temporal-ui:
     image: temporalio/ui:2.31.2
     restart: unless-stopped
-    profiles:
-      - ai
     depends_on:
       - temporal
     environment:
@@ -332,11 +376,14 @@ services:
     environment:
       - NODE_ENV=${NODE_ENV}
       - GRAPHQL_INTERNAL_URL=http://server:${GRAPHQL_INTERNAL_PORT}/graphql
+      - KEYCLOAK_URL=${KEYCLOAK_URL}
+      - KEYCLOAK_REALM=${KEYCLOAK_REALM}
+      - KEYCLOAK_CLIENT_ID_SERVER=${KEYCLOAK_CLIENT_ID_SERVER}
+      - AI_AGENT_CONFIG_BOOTSTRAP_CLIENT_ID=${AI_AGENT_CONFIG_BOOTSTRAP_CLIENT_ID:-}
+      - AI_AGENT_CONFIG_BOOTSTRAP_CLIENT_SECRET=${AI_AGENT_CONFIG_BOOTSTRAP_CLIENT_SECRET:-}
       - TEMPORAL_ADDRESS=${TEMPORAL_ADDRESS:-temporal:7233}
       - TEMPORAL_NAMESPACE=${TEMPORAL_NAMESPACE:-default}
       - AI_RUN_TASK_QUEUE=${AI_RUN_TASK_QUEUE:-nextgen-eam-ai}
-      - ANALYTICS_SYNC_URL=${ANALYTICS_SYNC_URL:-http://server:${GRAPHQL_INTERNAL_PORT}/analytics/projections/sync}
-      - ANALYTICS_PROJECTION_MAX_CONCURRENCY=${ANALYTICS_PROJECTION_MAX_CONCURRENCY:-5}
       - AI_LLM_URL=${AI_LLM_URL:-}
       - AI_LLM_MODEL=${AI_LLM_MODEL:-mistral-7b-instruct-v0.3}
       - AI_LLM_API_KEY=${AI_LLM_API_KEY:-}
@@ -358,8 +405,6 @@ services:
   clickhouse:
     image: clickhouse/clickhouse-server:24.8
     restart: unless-stopped
-    profiles:
-      - analytics
     environment:
       - CLICKHOUSE_DB=${CLICKHOUSE_DB:-nextgen_analytics}
       - CLICKHOUSE_USER=${CLICKHOUSE_USER:-default}
@@ -379,8 +424,6 @@ services:
   cube:
     image: cubejs/cube:latest
     restart: unless-stopped
-    profiles:
-      - analytics
     depends_on:
       - clickhouse
       - cubestore
@@ -423,8 +466,6 @@ services:
   cubestore:
     image: cubejs/cubestore:latest
     restart: unless-stopped
-    profiles:
-      - analytics
     environment:
       - CUBESTORE_SERVER_NAME=${CUBESTORE_SERVER_NAME:-cubestore:9999}
       - CUBESTORE_META_PORT=${CUBESTORE_META_PORT:-9999}
