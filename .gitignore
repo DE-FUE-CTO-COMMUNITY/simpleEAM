@@ -36,6 +36,8 @@ server/.yarn/*
 !server/yarn.lock
 ai-server/.yarn/*
 !ai-server/yarn.lock
+analytics/runtime/.yarn/*
+!analytics/runtime/yarn.lock
 
 # Neo4j
 db/data/
