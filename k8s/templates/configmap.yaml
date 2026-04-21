@@ -33,6 +33,13 @@ data:
   ANALYTICS_API_URL: {{ default (printf "https://%s.%s/analytics" .Values.ingress.subdomains.api .Values.global.baseDomain) .Values.analytics.apiUrl | quote }}
   ANALYTICS_CUBE_API_URL: {{ default (printf "https://%s.%s/cubejs-api/v1" .Values.ingress.subdomains.api .Values.global.baseDomain) .Values.analytics.cubeApiUrl | quote }}
   ANALYTICS_CUBE_INTERNAL_URL: {{ printf "http://%s-cube:%d/cubejs-api/v1" (include "nextgen-eam.fullname" .) (int .Values.analytics.cube.port) | quote }}
+  ANALYTICS_PROJECTION_TASK_QUEUE: {{ .Values.analytics.runtime.taskQueue | quote }}
+  ANALYTICS_PROJECTION_MAX_CONCURRENCY: {{ .Values.analytics.runtime.maxConcurrency | quote }}
+  ANALYTICS_SYNC_URL: {{ coalesce .Values.analytics.runtime.syncUrl .Values.ai.analytics.syncUrl (printf "http://%s-server:%d/analytics/projections/sync" (include "nextgen-eam.fullname" .) (int .Values.server.port)) | quote }}
+  ANALYTICS_PROJECTION_SCHEDULE_ENABLED: {{ coalesce .Values.analytics.runtime.scheduleEnabled .Values.ai.analytics.scheduleEnabled "false" | quote }}
+  ANALYTICS_PROJECTION_SCHEDULE_ID: {{ coalesce .Values.analytics.runtime.scheduleId .Values.ai.analytics.scheduleId "analytics-projection-refresh" | quote }}
+  ANALYTICS_PROJECTION_SCHEDULE_INTERVAL: {{ coalesce .Values.analytics.runtime.scheduleInterval .Values.ai.analytics.scheduleInterval "1 hour" | quote }}
+  ANALYTICS_PROJECTION_SCHEDULE_RECONCILE_MS: {{ .Values.analytics.runtime.scheduleReconcileMs | quote }}
   CLICKHOUSE_URL: {{ default (printf "http://%s-clickhouse:8123" (include "nextgen-eam.fullname" .)) .Values.analytics.clickhouse.url | quote }}
   CLICKHOUSE_DB: {{ .Values.analytics.clickhouse.db | quote }}
   CLICKHOUSE_USER: {{ .Values.analytics.clickhouse.user | quote }}
@@ -63,18 +70,20 @@ data:
   NEO4J_DEBUG: {{ .Values.server.neo4jDebug | quote }}
   NEO4J_LOG_LEVEL: {{ .Values.server.neo4jLogLevel | quote }}
 
-  {{- if .Values.ai.enabled }}
-  # AI / Temporal
-  # If ai.temporal.address is empty, default to the bundled temporal service inside the cluster
+  {{- if or .Values.ai.enabled (and .Values.analytics.enabled .Values.analytics.runtime.enabled) }}
+  # Temporal
+  # If ai.temporal.address is empty, default to the bundled temporal service inside the cluster.
   TEMPORAL_ADDRESS: {{ coalesce .Values.ai.temporal.address (printf "%s-temporal:7233" (include "nextgen-eam.fullname" .)) | quote }}
   TEMPORAL_NAMESPACE: {{ .Values.ai.temporal.namespace | quote }}
+  TEMPORAL_DB_NAME: {{ .Values.ai.temporal.db.name | quote }}
+  TEMPORAL_DB_USER: {{ .Values.ai.temporal.db.user | quote }}
+  TEMPORAL_DB_URL: {{ printf "postgresql://%s-temporal-db:5432/%s" (include "nextgen-eam.fullname" .) .Values.ai.temporal.db.name | quote }}
+  {{- end }}
+
+  {{- if .Values.ai.enabled }}
+  # AI
   AI_RUN_TASK_QUEUE: {{ .Values.ai.temporal.taskQueue | quote }}
   AI_SERVER_INTERNAL_PORT: {{ .Values.ai.server.port | quote }}
-  ANALYTICS_SYNC_URL: {{ coalesce .Values.ai.analytics.syncUrl (printf "http://%s-server:%d/analytics/projections/sync" (include "nextgen-eam.fullname" .) (int .Values.server.port)) | quote }}
-  ANALYTICS_PROJECTION_SCHEDULE_ENABLED: {{ .Values.ai.analytics.scheduleEnabled | quote }}
-  ANALYTICS_PROJECTION_SCHEDULE_ID: {{ .Values.ai.analytics.scheduleId | quote }}
-  ANALYTICS_PROJECTION_SCHEDULE_INTERVAL: {{ .Values.ai.analytics.scheduleInterval | quote }}
-  ANALYTICS_PROJECTION_MAX_CONCURRENCY: {{ .Values.ai.analytics.maxConcurrency | quote }}
   AI_LLM_URL: {{ .Values.ai.llm.url | quote }}
   AI_LLM_MODEL: {{ .Values.ai.llm.model | quote }}
   AI_LLM_TIMEOUT_MS: {{ .Values.ai.llm.timeoutMs | quote }}
@@ -87,7 +96,4 @@ data:
   AI_WEB_FETCH_TIMEOUT_MS: {{ .Values.ai.web.fetchTimeoutMs | quote }}
   AI_SEARCH_PROVIDERS: {{ .Values.ai.web.searchProviders | quote }}
   AI_SEARCH_SEARXNG_URL: {{ .Values.ai.web.searxngUrl | quote }}
-  TEMPORAL_DB_NAME: {{ .Values.ai.temporal.db.name | quote }}
-  TEMPORAL_DB_USER: {{ .Values.ai.temporal.db.user | quote }}
-  TEMPORAL_DB_URL: {{ printf "postgresql://%s-temporal-db:5432/%s" (include "nextgen-eam.fullname" .) .Values.ai.temporal.db.name | quote }}
   {{- end }}

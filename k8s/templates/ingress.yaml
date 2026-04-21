@@ -187,7 +187,7 @@ spec:
                 port:
                   number: {{ .Values.excalidrawRoom.port }}
 {{- end }}
-{{- if and .Values.ai.enabled .Values.ai.temporal.ui.enabled }}
+{{- if and .Values.temporal.enabled (or .Values.ai.enabled (and .Values.analytics.enabled .Values.analytics.runtime.enabled)) .Values.ai.temporal.ui.enabled }}
 ---
 # ── Temporal UI ───────────────────────────────────────────────────────────────
 apiVersion: networking.k8s.io/v1

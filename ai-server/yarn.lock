@@ -5159,9 +5159,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nextgen-eam-ai-server@workspace:.":
+"nextgen-eam-ai-runtime@workspace:.":
   version: 0.0.0-use.local
-  resolution: "nextgen-eam-ai-server@workspace:."
+  resolution: "nextgen-eam-ai-runtime@workspace:."
   dependencies:
     "@graphql-codegen/cli": "npm:^5.0.0"
     "@graphql-codegen/typescript": "npm:^4.0.1"

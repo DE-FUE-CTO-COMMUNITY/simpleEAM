@@ -54,6 +54,43 @@ analytics:
   enabled: true
   apiUrl: ''
   cubeApiUrl: ''
+  runtime:
+    enabled: true
+    image:
+      repository: nextgen-eam-analytics-runtime
+      tag: ''
+      pullPolicy: ''
+    scheduler:
+      replicaCount: 1
+      resources:
+        requests:
+          memory: 128Mi
+          cpu: 100m
+        limits:
+          memory: 256Mi
+          cpu: 500m
+    worker:
+      replicaCount: 1
+      resources:
+        requests:
+          memory: 256Mi
+          cpu: 100m
+        limits:
+          memory: 512Mi
+          cpu: 500m
+    taskQueue: 'nextgen-eam-analytics'
+    syncUrl: ''
+    scheduleEnabled: 'false'
+    scheduleId: 'analytics-projection-refresh'
+    scheduleInterval: '1 hour'
+    scheduleReconcileMs: '300000'
+    maxConcurrency: '5'
+    auth:
+      bootstrapClientId: ''
+      bootstrapClientSecret: ''
+      existingSecret: ''
+      existingSecretClientIdField: clientId
+      existingSecretClientSecretField: clientSecret
   clickhouse:
     url: ''
     db: nextgen_analytics
@@ -319,18 +356,26 @@ excalidrawRoom:
       cpu: 200m
 
 # ------------------------------------------------------------------------------
+# Temporal (required for analytics runtime; also used by optional AI stack)
+# ------------------------------------------------------------------------------
+temporal:
+  enabled: true
+
+# ------------------------------------------------------------------------------
 # AI Stack (optional - disable to deploy without AI features)
 # ------------------------------------------------------------------------------
 ai:
   enabled: false
 
+  runtime:
+    image:
+      repository: nextgen-eam-ai-runtime
+      tag: ''
+      pullPolicy: ''
+
   # AI Server (REST/orchestration)
   server:
     replicaCount: 1
-    image:
-      repository: ''
-      tag: ''
-      pullPolicy: ''
     port: 4001
     resources:
       requests:
@@ -343,10 +388,6 @@ ai:
   # AI Worker (Temporal worker)
   worker:
     replicaCount: 1
-    image:
-      repository: ''
-      tag: ''
-      pullPolicy: ''
     resources:
       requests:
         memory: 256Mi
@@ -395,7 +436,8 @@ ai:
     scheduleInterval: '1 hour'
     maxConcurrency: '5'
 
-  # Temporal
+  # Temporal settings are shared with the analytics runtime for backwards compatibility.
+  # The Temporal workloads themselves are controlled by top-level temporal.enabled.
   temporal:
     # Internal gRPC address for Temporal server.
     # Leave empty to use the bundled temporal service (<release>-nextgen-eam-temporal:7233).

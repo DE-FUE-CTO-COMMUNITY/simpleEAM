@@ -1,12 +1,15 @@
-{{- if .Values.ai.enabled }}
 {{- $fullName := include "nextgen-eam.fullname" . -}}
 {{- $labels := include "nextgen-eam.labels" . -}}
 {{- $global := .Values.global -}}
 {{- $ai := .Values.ai -}}
+{{- $runtime := $ai.runtime -}}
+{{- $analyticsRuntimeEnabled := and .Values.analytics.enabled .Values.analytics.runtime.enabled -}}
+{{- $temporalEnabled := and .Values.temporal.enabled (or .Values.ai.enabled $analyticsRuntimeEnabled) -}}
 
 # ════════════════════════════════════════════════════════════════════════════
 # Temporal DB (PostgreSQL)
 # ════════════════════════════════════════════════════════════════════════════
+{{- if $temporalEnabled }}
 {{- if $ai.temporal.db.persistence.enabled }}
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -226,10 +229,12 @@ spec:
               value: {{ printf "https://%s.%s" .Values.ingress.subdomains.temporalUi .Values.global.baseDomain }}
           resources: {{- toYaml $ai.temporal.ui.resources | nindent 12 }}
 {{- end }}
+{{- end }}
 
 # ════════════════════════════════════════════════════════════════════════════
 # AI Server
 # ════════════════════════════════════════════════════════════════════════════
+{{- if .Values.ai.enabled }}
 ---
 apiVersion: v1
 kind: Service
@@ -273,8 +278,8 @@ spec:
       {{- end }}
       containers:
         - name: ai-server
-          image: {{ printf "%s/%s/nextgen-eam-ai-server:%s" $global.imageRegistry $global.imageRepository (default $global.imageTag $ai.server.image.tag) }}
-          imagePullPolicy: {{ default $global.imagePullPolicy $ai.server.image.pullPolicy }}
+          image: {{ include "nextgen-eam.image" (dict "component" $runtime "global" $global) }}
+          imagePullPolicy: {{ include "nextgen-eam.pullPolicy" (dict "component" $runtime "global" $global) }}
           command: ["yarn"]
           args: ["start"]
           ports:
@@ -317,8 +322,8 @@ spec:
       {{- end }}
       containers:
         - name: ai-worker
-          image: {{ printf "%s/%s/nextgen-eam-ai-worker:%s" $global.imageRegistry $global.imageRepository (default $global.imageTag $ai.worker.image.tag) }}
-          imagePullPolicy: {{ default $global.imagePullPolicy $ai.worker.image.pullPolicy }}
+          image: {{ include "nextgen-eam.image" (dict "component" $runtime "global" $global) }}
+          imagePullPolicy: {{ include "nextgen-eam.pullPolicy" (dict "component" $runtime "global" $global) }}
           command: ["yarn"]
           args: ["worker"]
           envFrom:

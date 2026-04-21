@@ -45,8 +45,8 @@ Images are pulled from GitHub Container Registry (GHCR):
 | --------- | ------------------------------------------------------- |
 | Client    | `ghcr.io/<imageRepository>/nextgen-eam-client:<tag>`    |
 | Server    | `ghcr.io/<imageRepository>/nextgen-eam-server:<tag>`    |
-| AI Server | `ghcr.io/<imageRepository>/nextgen-eam-ai-server:<tag>` |
-| AI Worker | `ghcr.io/<imageRepository>/nextgen-eam-ai-worker:<tag>` |
+| Analytics Runtime | `ghcr.io/<imageRepository>/nextgen-eam-analytics-runtime:<tag>` |
+| AI Runtime | `ghcr.io/<imageRepository>/nextgen-eam-ai-runtime:<tag>` |
 
 For private registries, create an image pull secret and reference it:
 
@@ -87,7 +87,7 @@ By default the chart creates Ingress resources for these subdomains:
 | `ingress.subdomains.api`            | `api`      | GraphQL + AI API      |
 | `ingress.subdomains.auth`           | `auth`     | Keycloak              |
 | `ingress.subdomains.excalidrawRoom` | `room`     | Excalidraw room       |
-| `ingress.subdomains.temporalUi`     | `temporal` | Temporal UI (AI only) |
+| `ingress.subdomains.temporalUi`     | `temporal` | Temporal UI |
 
 ### TLS / cert-manager
 
@@ -119,7 +119,7 @@ keycloak:
 
 ## AI Stack
 
-The AI stack (ai-server, ai-worker, Temporal) is **disabled by default**. Enable it with:
+The optional AI stack (ai-server, ai-worker) is **disabled by default**. Enable it with:
 
 ```yaml
 ai:
@@ -141,13 +141,19 @@ ai:
 
 When `ai.enabled=true`, the chart also deploys:
 
-- **temporal-db** — PostgreSQL 15 for Temporal persistence
-- **temporal** — Temporal server (`temporalio/auto-setup:1.24.2`)
-- **temporal-ui** — Temporal web UI
 - **ai-server** — REST orchestration server on port 4001
 - **ai-worker** — Temporal workflow worker
 
-The `TEMPORAL_ADDRESS` is automatically set to the internal service DNS name `<release>-temporal:7233`. Set `ai.temporal.address` to override (e.g., for an external Temporal cluster).
+Both workloads are backed by the shared `nextgen-eam-ai-runtime` image and use different container commands (`yarn start` and `yarn worker`).
+
+## Analytics Runtime
+
+The analytics stack now includes standalone Temporal-based runtime services:
+
+- **analytics-scheduler** — reconciles the analytics refresh Temporal schedule
+- **analytics-worker** — executes analytics refresh workflows on the dedicated analytics queue
+
+Temporal is no longer treated as AI-only. The chart deploys **temporal-db**, **temporal**, and optionally **temporal-ui** whenever `temporal.enabled=true` and either the analytics runtime or the AI stack is enabled. The `TEMPORAL_ADDRESS` is automatically set to the internal service DNS name `<release>-temporal:7233`. Set `ai.temporal.address` to override when pointing workloads at an external Temporal cluster.
 
 ## Upgrade
 
@@ -187,6 +193,7 @@ k8s/
     ├── server.yaml                 # GraphQL server
     ├── client.yaml                 # Next.js frontend
     ├── excalidraw-room.yaml        # Collaboration room (optional)
-    ├── ai.yaml                     # AI stack: temporal + ai-server + ai-worker (optional)
+    ├── ai.yaml                     # Temporal + optional AI stack
+    ├── analytics.yaml              # Analytics infra + analytics runtime
     └── ingress.yaml                # Ingress resources (optional)
 ```

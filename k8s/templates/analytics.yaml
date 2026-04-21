@@ -6,6 +6,7 @@
 {{- $clickhouse := $analytics.clickhouse -}}
 {{- $cube := $analytics.cube -}}
 {{- $cubestore := $analytics.cubestore -}}
+{{- $runtime := $analytics.runtime -}}
 {{- $clickhouseDb := $clickhouse.db -}}
 {{- $cubeModelFiles := .Files.Glob "files/cube/model/*" -}}
 apiVersion: v1
@@ -527,4 +528,78 @@ spec:
           {{- else }}
           emptyDir: {}
           {{- end }}
+{{- if $runtime.enabled }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $fullName }}-analytics-scheduler
+  labels: {{- $labels | nindent 4 }}
+spec:
+  replicas: {{ $runtime.scheduler.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "nextgen-eam.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: analytics-scheduler
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "nextgen-eam.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: analytics-scheduler
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    spec:
+      {{- if $global.imagePullSecrets }}
+      imagePullSecrets: {{- toYaml $global.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: analytics-scheduler
+          image: {{ include "nextgen-eam.image" (dict "component" $runtime "global" $global) }}
+          imagePullPolicy: {{ include "nextgen-eam.pullPolicy" (dict "component" $runtime "global" $global) }}
+          command: ["yarn"]
+          args: ["start"]
+          envFrom:
+            - configMapRef:
+                name: {{ $fullName }}-config
+          resources: {{- toYaml $runtime.scheduler.resources | nindent 12 }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $fullName }}-analytics-worker
+  labels: {{- $labels | nindent 4 }}
+spec:
+  replicas: {{ $runtime.worker.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "nextgen-eam.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: analytics-worker
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "nextgen-eam.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: analytics-worker
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    spec:
+      {{- if $global.imagePullSecrets }}
+      imagePullSecrets: {{- toYaml $global.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: analytics-worker
+          image: {{ include "nextgen-eam.image" (dict "component" $runtime "global" $global) }}
+          imagePullPolicy: {{ include "nextgen-eam.pullPolicy" (dict "component" $runtime "global" $global) }}
+          command: ["yarn"]
+          args: ["analytics:worker"]
+          envFrom:
+            - configMapRef:
+                name: {{ $fullName }}-config
+          env:
+            {{- include "nextgen-eam.analyticsRuntimeSecretEnv" . | nindent 12 }}
+          resources: {{- toYaml $runtime.worker.resources | nindent 12 }}
+{{- end }}
 {{- end }}

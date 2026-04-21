@@ -113,6 +113,32 @@ Only injects refs for secrets that were provided via existingSecret or created b
 {{- end }}
 {{- end }}
 
+{{/*
+Analytics runtime Keycloak bootstrap credentials.
+Prefers analytics.runtime.auth settings and falls back to legacy ai.agentConfig values.
+*/}}
+{{- define "nextgen-eam.analyticsRuntimeSecretEnv" -}}
+{{- $fullName := include "nextgen-eam.fullname" . -}}
+{{- $runtimeAuth := .Values.analytics.runtime.auth -}}
+{{- $legacyAuth := .Values.ai.agentConfig -}}
+{{- $existingSecret := default $legacyAuth.existingSecret $runtimeAuth.existingSecret -}}
+{{- $clientIdField := default (default "clientId" $legacyAuth.existingSecretClientIdField) $runtimeAuth.existingSecretClientIdField -}}
+{{- $clientSecretField := default (default "clientSecret" $legacyAuth.existingSecretClientSecretField) $runtimeAuth.existingSecretClientSecretField -}}
+{{- $bootstrapClientSecret := default $legacyAuth.bootstrapClientSecret $runtimeAuth.bootstrapClientSecret -}}
+{{- if or $existingSecret $bootstrapClientSecret }}
+- name: AI_AGENT_CONFIG_BOOTSTRAP_CLIENT_ID
+  valueFrom:
+    secretKeyRef:
+      name: {{ default (printf "%s-analytics-runtime-auth" $fullName) $existingSecret }}
+      key: {{ $clientIdField }}
+- name: AI_AGENT_CONFIG_BOOTSTRAP_CLIENT_SECRET
+  valueFrom:
+    secretKeyRef:
+      name: {{ default (printf "%s-analytics-runtime-auth" $fullName) $existingSecret }}
+      key: {{ $clientSecretField }}
+{{- end }}
+{{- end }}
+
     {{/*
     Stable Cubestore worker DNS addresses for the cluster.
     */}}

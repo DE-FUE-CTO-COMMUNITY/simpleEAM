@@ -25,11 +25,11 @@ jobs:
           - id: client
             image: nextgen-eam-client
             dockerfile: client/Dockerfile
-          - id: ai-server
-            image: nextgen-eam-ai-server
-            dockerfile: ai-server/Dockerfile
-          - id: ai-worker
-            image: nextgen-eam-ai-worker
+          - id: analytics-runtime
+            image: nextgen-eam-analytics-runtime
+            dockerfile: analytics/runtime/Dockerfile
+          - id: ai-runtime
+            image: nextgen-eam-ai-runtime
             dockerfile: ai-server/Dockerfile
           - id: server
             image: nextgen-eam-server
